@@ -48,6 +48,8 @@ CheckStructure::CheckStructure(const XMLNode &node, unsigned int index)
         m_check_type = CT_TOGGLE;
     else if(kind=="ambient-light")
         m_check_type = CT_AMBIENT_SPHERE;
+	else if(kind=="canon")
+		m_check_type = CT_CANON;
     else
     {
         printf("Unknown check structure '%s' - ignored.\n", kind.c_str());
@@ -62,8 +64,8 @@ CheckStructure::CheckStructure(const XMLNode &node, unsigned int index)
             == m_same_group.end())
         m_same_group.push_back(m_index);
 
-    // As a default, only lap lines are activated
-    m_active_at_reset= m_check_type==CT_NEW_LAP;
+    // As a default, only lap lines and canons are activated
+    m_active_at_reset= m_check_type==CT_NEW_LAP || m_check_type==CT_CANON;
     node.get("active", &m_active_at_reset);
 }   // CheckStructure
 

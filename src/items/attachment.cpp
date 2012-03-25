@@ -208,7 +208,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
     if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
-        m_kart->handleExplosion(Vec3(0.0f, 1.0f, 0.0f), true);
+        m_kart->explode(Vec3(0.0f, 1.0f, 0.0f), true);
         return;
     }
     
@@ -222,7 +222,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
             he->setPlayerKartHit();
         projectile_manager->addHitEffect(he);
 
-        m_kart->handleExplosion(m_kart->getXYZ(), /*direct_hit*/ true);
+        m_kart->explode(m_kart->getXYZ(), /*direct_hit*/ true);
         clear();
         if(new_attachment==-1) 
             new_attachment = m_random.get(3);
@@ -395,7 +395,7 @@ void Attachment::update(float dt)
             if(m_kart->getController()->isPlayerController())
                 he->setPlayerKartHit();
             projectile_manager->addHitEffect(he);
-            m_kart->handleExplosion(m_kart->getXYZ(), 
+            m_kart->explode(m_kart->getXYZ(), 
                                     /*direct_hit*/ true);
             
             if (m_bomb_sound)

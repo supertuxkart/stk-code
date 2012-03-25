@@ -155,9 +155,11 @@ public:
     /** Returns true if an emergency animation is being played. */
     virtual bool playingRescueAnimation() const = 0;
     // ------------------------------------------------------------------------
-    virtual void handleExplosion(const Vec3& pos, bool direct_hit) = 0;
+    virtual void explode(const Vec3& pos, bool direct_hit) = 0;
     // ------------------------------------------------------------------------
-    virtual void forceRescue(bool is_auto_rescue=false) = 0;
+    virtual void rescue(bool is_auto_rescue=false) = 0;
+    // ------------------------------------------------------------------------
+	virtual void shootTo(const Vec3 &target, float speed) = 0;
     // ------------------------------------------------------------------------
     /** Returns the timer for the currently played animation. */
     virtual float getAnimationTimer() const = 0;

@@ -43,7 +43,7 @@ KartAnimation::KartAnimation(Kart *kart)
     // and that the vehicle must be added back to the physics world. Since 
     // reset() is also called at the very start, it must be guaranteed that 
     // rescue is not set.
-    m_kart_mode    = EA_NONE;
+    m_kart_mode    = KA_NONE;
     m_eliminated   = false;
 };   // KartAnimation
 
@@ -79,7 +79,7 @@ void KartAnimation::reset()
         World::getWorld()->getPhysics()->addKart(m_kart);
     }
     m_timer      = 0;
-    m_kart_mode  = EA_NONE;
+    m_kart_mode  = KA_NONE;
     m_eliminated = false;
     if(m_referee)
     {
@@ -106,7 +106,7 @@ void KartAnimation::eliminate(bool remove)
     }
     
     m_eliminated = true;
-    m_kart_mode = EA_NONE;
+    m_kart_mode = KA_NONE;
     
     if (remove)
     {
@@ -119,16 +119,16 @@ void KartAnimation::eliminate(bool remove)
  *  and saves the current pitch and roll (for the rescue animation). It
  *  also removes the kart from the physics world.
  */
-void KartAnimation::forceRescue(bool is_auto_rescue)
+void KartAnimation::rescue(bool is_auto_rescue)
 {
     if(playingAnimation()) return;
 
     assert(!m_referee);
     m_referee     = new Referee(*m_kart);
     m_kart->getNode()->addChild(m_referee->getSceneNode());
-    m_kart_mode   = EA_RESCUE;
+    m_kart_mode   = KA_RESCUE;
     m_timer       = m_kart->getKartProperties()->getRescueTime();
-    m_up_velocity = m_kart->getKartProperties()->getRescueHeight() / m_timer;
+    m_velocity    = m_kart->getKartProperties()->getRescueHeight() / m_timer;
     m_xyz         = m_kart->getXYZ();
 
     m_kart->getAttachment()->clear();
@@ -148,14 +148,14 @@ void KartAnimation::forceRescue(bool is_auto_rescue)
         ThreeStrikesBattle *world=(ThreeStrikesBattle*)World::getWorld();
         world->kartHit(m_kart->getWorldKartId());
     }
-}   // forceRescue
+}   // rescue
 
 //-----------------------------------------------------------------------------
 /** Starts an explosion animation.
  *  \param pos The coordinates of the explosion.
  *  \param direct_hig True if the kart was hit directly --> maximal impact.
  */
-void KartAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
+void KartAnimation::explode(const Vec3 &pos, bool direct_hit)
 {
     // Avoid doing another explosion while a kart is thrown around in the air.
     if(playingAnimation())
@@ -170,7 +170,7 @@ void KartAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
     if(!direct_hit && pos.distance2(m_xyz)>r*r) return;
 
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
-    m_kart_mode = EA_EXPLOSION;
+    m_kart_mode = KA_EXPLOSION;
     m_timer     = m_kart->getKartProperties()->getExplosionTime();;
 
     // Non-direct hits will be only affected half as much.
@@ -179,11 +179,11 @@ void KartAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
     // Half of the overall time is spent in raising, so only use
     // half of the explosion time here.
     // Velocity after t seconds is:
-    // v(t) = m_up_velocity + t*gravity
+    // v(t) = m_velocity + t*gravity
     // Since v(explosion_time*0.5) = 0, the following forumla computes 
     // the right initial velocity for a kart to land back after
     // the specified time.
-    m_up_velocity = 0.5f * m_timer * World::getWorld()->getTrack()->getGravity();
+    m_velocity = 0.5f * m_timer * World::getWorld()->getTrack()->getGravity();
     World::getWorld()->getPhysics()->removeKart(m_kart);
     
     m_curr_rotation.setHeading(m_kart->getHeading());
@@ -207,10 +207,36 @@ void KartAnimation::handleExplosion(const Vec3 &pos, bool direct_hit)
     }
 
     m_kart->getAttachment()->clear();
-}   // handleExplosion
+}   // explode
 
 // ----------------------------------------------------------------------------
-/** Updates the explosion animation.
+/** Flies a kart to a given point with a specified speed. The physical body
+ *  will be removed, and only the kart animation/interpolation will be shown.
+ *  \param target Target coordinates.
+ *  \param speed Speed to use.
+ */
+void KartAnimation::shootTo(const Vec3 &target, float speed)
+{
+    m_xyz       = m_kart->getXYZ();
+	m_kart_mode = KA_SHOOTING;
+	assert(speed>0);
+	Vec3 delta  = target-m_kart->getXYZ();
+	m_timer     = delta.length()/speed;
+	m_velocity  = delta/m_timer;
+
+    World::getWorld()->getPhysics()->removeKart(m_kart);
+    
+    m_curr_rotation.setHeading(m_kart->getHeading());
+    m_curr_rotation.setPitch(m_kart->getPitch());
+    m_curr_rotation.setRoll(m_kart->getRoll());
+
+    m_add_rotation.setHeading(0);
+    m_add_rotation.setPitch(  0);
+    m_add_rotation.setRoll(   0);
+}   // shootTo
+
+// ----------------------------------------------------------------------------
+/** Updates the kart animation.
  *  \param dt Time step size.
  *  \return True if the explosion is still shown, false if it has finished.
  */
@@ -228,17 +254,27 @@ void KartAnimation::update(float dt)
     m_timer -= dt;
     if(m_timer<0)
     {
-        if(m_kart_mode==EA_RESCUE)
+        if(m_kart_mode==KA_RESCUE)
         {
             World::getWorld()->moveKartAfterRescue(m_kart);
             m_kart->getNode()->removeChild(m_referee->getSceneNode());
             delete m_referee;
             m_referee = NULL;
         }
+		if(m_kart_mode==KA_SHOOTING)
+		{
+			btTransform trans = m_kart->getTrans();
+			trans.setOrigin(m_xyz);
+			m_kart->setTrans(trans);
+			m_kart->getBody()->setCenterOfMassTransform(trans);
+		}
+		else
+		{
+	        m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
+			m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
+		}
         World::getWorld()->getPhysics()->addKart(m_kart);
-        m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
-        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-        m_kart_mode  = EA_NONE;
+        m_kart_mode  = KA_NONE;
         // We have to make sure that m_kart_mode and m_eliminated are in 
         // synch, otherwise it can happen that a kart is entered in world
         // here, and again in reset (e.g. when restarting the race) if
@@ -250,12 +286,13 @@ void KartAnimation::update(float dt)
     }
 
     // Explosions change the upwards velocity:
-    if ( m_kart_mode==EA_EXPLOSION)
+    if ( m_kart_mode==KA_EXPLOSION)
     {
-        m_up_velocity -= dt*World::getWorld()->getTrack()->getGravity();
+        m_velocity -= Vec3(0,1,0) 
+			        * ( dt*World::getWorld()->getTrack()->getGravity() );
     }
 
-    m_xyz.setY(m_xyz.getY()+dt*m_up_velocity);
+    m_xyz += dt*m_velocity;
     m_kart->setXYZ(m_xyz);
     m_curr_rotation += dt*m_add_rotation;
     btQuaternion q(m_curr_rotation.getHeading(), m_curr_rotation.getPitch(),

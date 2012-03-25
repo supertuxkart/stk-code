@@ -232,7 +232,7 @@ void EndController::handleRescue(const float DELTA)
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)
         {
-            m_kart->forceRescue();
+            m_kart->rescue();
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }

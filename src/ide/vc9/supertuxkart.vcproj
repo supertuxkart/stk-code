@@ -1053,6 +1053,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\tracks\check_canon.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\check_lap.cpp"
 					>
 				</File>
@@ -2168,6 +2172,10 @@
 				</File>
 				<File
 					RelativePath="..\..\tracks\bezier_curve.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_canon.hpp"
 					>
 				</File>
 				<File

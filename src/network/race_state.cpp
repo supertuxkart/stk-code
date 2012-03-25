@@ -141,7 +141,7 @@ void RaceState::receive(ENetPacket *pkt)
     {
         ItemInfo hi(this);
         if(hi.m_item_id==-1)     // Rescue triggered
-            world->getKart(hi.m_kart_id)->forceRescue();
+            world->getKart(hi.m_kart_id)->rescue();
         else
             item_manager->collectedItem(hi.m_item_id,
                                           world->getKart(hi.m_kart_id),

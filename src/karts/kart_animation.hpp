@@ -51,8 +51,8 @@ protected:
      *  of rotation per second. */
     Vec3 m_add_rotation;
 
-    /** The upwards velocity. */
-    float m_up_velocity;
+    /** The velocity with which the kart is moved. */
+    Vec3 m_velocity;
 
     /** Timer for the explosion. */
     float m_timer;
@@ -75,26 +75,27 @@ protected:
     Referee      *m_referee;
 
     /** Different kart modes: normal racing, being rescued, showing end
-     *  animation, explosions, kart eliminated. */
-    enum {EA_NONE, EA_RESCUE, EA_EXPLOSION}
+     *  animation, explosions, kart eliminated, shooting. */
+    enum {KA_NONE, KA_RESCUE, KA_EXPLOSION, KA_SHOOTING}
           m_kart_mode;
 public:
                  KartAnimation(Kart *kart);
     virtual     ~KartAnimation();
     void         reset();
-    virtual void handleExplosion(const Vec3& pos, bool direct_hit);
-    virtual void forceRescue(bool is_auto_rescue=false);
+    virtual void explode(const Vec3& pos, bool direct_hit);
+    virtual void rescue(bool is_auto_rescue=false);
+	virtual void shootTo(const Vec3 &target, float speed);
     void         update(float dt);
     void         eliminate (bool remove);
     // ------------------------------------------------------------------------
     /** Returns true if an animation is being played. */
-    bool playingAnimation() const {return m_kart_mode!=EA_NONE; }
+    bool playingAnimation() const {return m_kart_mode!=KA_NONE; }
     // ------------------------------------------------------------------------
     /** Returns if a rescue animation is being shown. */
-    bool playingRescueAnimation() const {return m_kart_mode==EA_RESCUE; }
+    bool playingRescueAnimation() const {return m_kart_mode==KA_RESCUE; }
     // ------------------------------------------------------------------------
     /** Returns if an explosion animation is being shown. */
-    bool playingExplosionAnimation() const {return m_kart_mode==EA_EXPLOSION;}
+    bool playingExplosionAnimation() const {return m_kart_mode==KA_EXPLOSION;}
     // ------------------------------------------------------------------------
     /** Returns the timer for the currently played animation. */
     const float getAnimationTimer() const {return m_timer;}

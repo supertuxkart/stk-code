@@ -355,7 +355,7 @@ void PlayerController::update(float dt)
     // up sitting on a brick wall, with all wheels in the air :((
     if ( m_controls->m_rescue )
     {
-        m_kart->forceRescue();
+        m_kart->rescue();
         m_controls->m_rescue=false;
     }
     if (m_kart->playingEmergencyAnimation() && 

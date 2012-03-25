@@ -384,9 +384,11 @@ public:
     // ------------------------------------------------------------------------
     virtual void eliminate (bool remove);
     // ------------------------------------------------------------------------
-    virtual void handleExplosion(const Vec3& pos, bool direct_hit);
+    virtual void explode(const Vec3& pos, bool direct_hit);
     // ------------------------------------------------------------------------
-    virtual void forceRescue(bool is_auto_rescue=false);
+    virtual void rescue(bool is_auto_rescue=false);
+    // ------------------------------------------------------------------------
+	virtual void shootTo(const Vec3 &target, float speed);
     // ------------------------------------------------------------------------
     /** Returns the timer for the currently played animation. */
     virtual float getAnimationTimer() const;

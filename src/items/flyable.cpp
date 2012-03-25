@@ -477,7 +477,7 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object)
         if(m_owner!=kart || m_owner==kart_hit)
         {
             // Set a flag it if was a direct hit.
-            kart->handleExplosion(getXYZ(), kart==kart_hit);
+            kart->explode(getXYZ(), kart==kart_hit);
             if(kart==kart_hit && world->getTrack()->isArena())
             {
                 world->kartHit(kart->getWorldKartId());

@@ -145,7 +145,7 @@ void Physics::update(float dt)
             if(obj->isCrashReset())
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
-                kart->forceRescue();
+                kart->rescue();
             }
             continue;
         }
@@ -157,7 +157,7 @@ void Physics::update(float dt)
             if(anim->isCrashReset())
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
-                kart->forceRescue();
+                kart->rescue();
             }
             continue;
 

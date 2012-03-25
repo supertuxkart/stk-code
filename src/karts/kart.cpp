@@ -910,26 +910,35 @@ void Kart::eliminate(bool remove)
 {
     m_kart_animation->eliminate(remove); 
 }   // eliminate
-
 // ------------------------------------------------------------------------
 /** Starts an explosion animation.
  *  \param pos The coordinates of the explosion.
  *  \param direct_hig True if the kart was hit directly --> maximal impact.
  */
-void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
+void Kart::explode(const Vec3& pos, bool direct_hit)
 {
-    m_kart_animation->handleExplosion(pos, direct_hit);
-}   // handleExplosion
+	m_kart_animation->explode(pos, direct_hit);
+}   // explode
 
 //-----------------------------------------------------------------------------
 /** Sets the mode of the kart to being rescued, attaches the rescue model
  *  and saves the current pitch and roll (for the rescue animation). It
  *  also removes the kart from the physics world.
  */
-void Kart::forceRescue(bool is_auto_rescue)
+void Kart::rescue(bool is_auto_rescue)
 {
-    m_kart_animation->forceRescue(is_auto_rescue);
-}   // forceRescue
+    m_kart_animation->rescue(is_auto_rescue);
+}   // rescue
+
+//-----------------------------------------------------------------------------
+/** Starts a 'shooting' animation to a specific point.
+ *  \param target The coordinates to fly to
+ *  \param speed The speed to use when flying.
+ */
+void Kart::shootTo(const Vec3 &target, float speed)
+{
+	m_kart_animation->shootTo(target, speed);
+}   // shootTo
 
 //-----------------------------------------------------------------------------
 /** Updates the kart in each time step. It updates the physics setting,
@@ -1069,7 +1078,7 @@ void Kart::update(float dt)
     // Check if a kart is (nearly) upside down and not moving much --> automatic rescue
     if((fabs(getRoll())>60*DEGREE_TO_RAD && fabs(getSpeed())<3.0f) )
     {
-        forceRescue(/*is_auto_rescue*/true);
+        rescue(/*is_auto_rescue*/true);
     }
 
     btTransform trans=getTrans();
@@ -1103,13 +1112,13 @@ void Kart::update(float dt)
         const Vec3 *min, *max;
         World::getWorld()->getTrack()->getAABB(&min, &max);
         if(min->getY() - getXYZ().getY() > 17 && !m_flying)
-            forceRescue();
+            rescue();
     }
     else
     {
         handleMaterialSFX(material);
         if     (material->isDriveReset() && isOnGround())
-            forceRescue();
+            rescue();
         else if(material->isZipper()     && isOnGround())
         {
             handleZipper(material);
@@ -1193,7 +1202,7 @@ void Kart::setSquash(float time, float slowdown)
     
     if(m_attachment->getType()==Attachment::ATTACH_BOMB)
     {
-        this->handleExplosion(getXYZ(), /*direct hit*/true);
+        explode(getXYZ(), /*direct hit*/true);
         return;
     }
     m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
@@ -1587,7 +1596,7 @@ void Kart::crashed(const Material *m)
         
         if (m->getCollisionReaction() == Material::RESCUE)
         {
-            forceRescue();
+            rescue();
         }
         else if (m->getCollisionReaction() == Material::PUSH_BACK)
         {
