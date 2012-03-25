@@ -332,6 +332,20 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam m_last_used_kart_group
             PARAM_DEFAULT( StringUserConfigParam("all", "last_kart_group", 
                                                  "Last selected kart group") );
+
+    // ---- GP start order
+    PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
+            PARAM_DEFAULT( GroupUserConfigParam("GpStartOrder",
+                                                "Order karts start in GP") );
+    PARAM_PREFIX BoolUserConfigParam         m_gp_most_points_first
+            PARAM_DEFAULT( BoolUserConfigParam(true, "most_points_first",
+            &m_gp_start_order,
+            "Starting order from most to least points (true) or other "
+            "way around (false)") );
+    PARAM_PREFIX BoolUserConfigParam         m_gp_player_last
+            PARAM_DEFAULT( BoolUserConfigParam(false, "player_last",
+            &m_gp_start_order,
+            "Always put the player at the back or not (Bully mode).") );
     
     // ---- Video
     PARAM_PREFIX GroupUserConfigParam        m_video_group

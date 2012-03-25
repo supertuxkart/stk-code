@@ -14,9 +14,8 @@
        positions for those additional karts. -->
   <karts max-number="20"/>
 
-  <!-- Scores are the number of points given when the race ends, 
-       order is most-points-first or most-points-last. -->
-  <grand-prix order = "most-points-first">
+  <!-- Scores are the number of points given when the race ends. -->
+  <grand-prix>
     <!-- Karts on position 1 and 2 will have 3 more points than the next kart;
          a kart on position 3 and 4 will have two more points than the next;
          and all remaining karts will have one more point than the next. -->

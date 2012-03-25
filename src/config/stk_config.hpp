@@ -85,8 +85,6 @@ public:
     float m_music_credit_time;       /**<Time the music credits are
                                          displayed.                          */
     int   m_max_karts;               /**<Maximum number of karts.            */
-    int   m_gp_order;                /**<Whether grand prix grid is in point
-                                         or reverse point order.             */
     int   m_max_history;             /**<Maximum number of frames to save in
                                          a history files.                    */
     bool  m_smooth_normals;          /**< If normals for raycasts for wheels

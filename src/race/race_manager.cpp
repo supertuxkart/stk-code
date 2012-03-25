@@ -336,11 +336,24 @@ void RaceManager::startNextRace()
         // since it's always the leader.
         int offset = (m_minor_mode==MINOR_MODE_FOLLOW_LEADER) ? 1 : 0;
 
-        std::sort(m_kart_status.begin()+offset, m_kart_status.end());
-        //reverse kart order if flagged in stk_config
-        if (stk_config->m_gp_order)
+        // Keep players at the end if needed
+        int player_last_offset = 0;
+        if (UserConfigParams::m_gp_player_last)
         {
-            std::reverse(m_kart_status.begin()+offset, m_kart_status.end());
+            // Doing this is enough to keep player karts at
+            // the end because of the simple reason that they
+            // are at the end when getting added. Keep them out
+            // of the later sorting and they will stay there.
+            player_last_offset = m_player_karts.size();
+        }
+
+        std::sort(m_kart_status.begin()+offset,
+                  m_kart_status.end() - player_last_offset);
+        // reverse kart order if flagged in user's config
+        if (UserConfigParams::m_gp_most_points_first)
+        {
+            std::reverse(m_kart_status.begin()+offset,
+                         m_kart_status.end() - player_last_offset);
         } 
     }   // not first race
 

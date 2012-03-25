@@ -113,7 +113,6 @@ void STKConfig::load(const std::string &filename)
     }
 
     CHECK_NEG(m_max_karts,                 "<karts max=..."             );
-    CHECK_NEG(m_gp_order,                  "grand-prix order=..."       );
     CHECK_NEG(m_parachute_friction,        "parachute-friction"         );
     CHECK_NEG(m_parachute_done_fraction,   "parachute-done-fraction"    );
     CHECK_NEG(m_parachute_time,            "parachute-time"             );
@@ -164,7 +163,6 @@ void STKConfig::init_defaults()
         m_penalty_time         = m_explosion_impulse_objects = UNDEFINED;
     m_bubble_gum_counter       = -100;
     m_max_karts                = -100;
-    m_gp_order                 = -100;
     m_max_history              = -100;
     m_max_skidmarks            = -100;
     m_min_kart_version         = -100;
@@ -211,10 +209,6 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if(const XMLNode *gp_node = root->getNode("grand-prix"))
     {
-        std::string order;
-        gp_node->get("order", &order);
-        m_gp_order = (order=="most-points-first");
-
         for(unsigned int i=0; i<gp_node->getNumNodes(); i++)
         {
             const XMLNode *pn=gp_node->getNode(i);
