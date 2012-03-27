@@ -72,12 +72,12 @@ public:
     /** Compresses all buttons into a single integer value. */
     char getButtonsCompressed() const
     {
-        return  m_brake     ?  1 : 0
-              + m_nitro     ?  2 : 0
-              + m_skid      ?  4 : 0
-              + m_rescue    ?  8 : 0
-              + m_fire      ? 16 : 0
-              + m_look_back ? 32 : 0;
+        return  (m_brake     ?  1 : 0)
+              + (m_nitro     ?  2 : 0)
+              + (m_skid      ?  4 : 0)
+              + (m_rescue    ?  8 : 0)
+              + (m_fire      ? 16 : 0)
+              + (m_look_back ? 32 : 0);
     }   // getButtonsCompressed
     // ------------------------------------------------------------------------
     /** Sets the buttons from a compressed representation.

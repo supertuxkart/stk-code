@@ -62,7 +62,6 @@
 		9542FD4C12D3E0D700C00366 /* particle_kind.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9542FD4A12D3E0D700C00366 /* particle_kind.cpp */; };
 		9543D58F14D36EE3000B0888 /* kart_gfx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9543D58D14D36EE3000B0888 /* kart_gfx.cpp */; };
 		9543D59E14D38831000B0888 /* select_challenge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9543D59D14D38831000B0888 /* select_challenge.cpp */; };
-		95453ACA11808B8700A155B9 /* emergency_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95453AC811808B8700A155B9 /* emergency_animation.cpp */; };
 		9545ABCA11E3E38300D3C37A /* progress_bar_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */; };
 		954E486A11B19C4100B1DF63 /* fribidi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 954E486911B19C4100B1DF63 /* fribidi.framework */; };
 		954E4C2D0FF98B6F0047FE3E /* animation_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C250FF98B6E0047FE3E /* animation_base.cpp */; };
@@ -356,6 +355,9 @@
 		95CB476C0FF30EF400413BAE /* bezier_curve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CB476B0FF30EF400413BAE /* bezier_curve.cpp */; };
 		95D2343F1078227A00625256 /* feature_unlocked.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D2343E1078227A00625256 /* feature_unlocked.cpp */; };
 		95D2C43013D6605600E84032 /* rubber_ball.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D2C42E13D6605600E84032 /* rubber_ball.cpp */; };
+		95D69A7115226D1D00D598D8 /* check_canon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D69A6F15226D1D00D598D8 /* check_canon.cpp */; };
+		95D69A7415226E4700D598D8 /* abstract_kart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D69A7215226E4700D598D8 /* abstract_kart.cpp */; };
+		95D69A7715226EA900D598D8 /* kart_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D69A7515226EA900D598D8 /* kart_animation.cpp */; };
 		95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950CE0FE473CA002E10AD /* stk_config.cpp */; };
 		95D950D30FE473CA002E10AD /* user_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950D00FE473CA002E10AD /* user_config.cpp */; };
 		95DFC5021106933B00A043A9 /* slip_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95DFC5001106933B00A043A9 /* slip_stream.cpp */; };
@@ -515,8 +517,6 @@
 		9543D58E14D36EE3000B0888 /* kart_gfx.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = kart_gfx.hpp; path = ../../karts/kart_gfx.hpp; sourceTree = SOURCE_ROOT; };
 		9543D59D14D38831000B0888 /* select_challenge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = select_challenge.cpp; path = ../../states_screens/dialogs/select_challenge.cpp; sourceTree = SOURCE_ROOT; };
 		9543D5A514D3885F000B0888 /* select_challenge.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = select_challenge.hpp; path = ../../states_screens/dialogs/select_challenge.hpp; sourceTree = SOURCE_ROOT; };
-		95453AC811808B8700A155B9 /* emergency_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = emergency_animation.cpp; path = ../../karts/emergency_animation.cpp; sourceTree = SOURCE_ROOT; };
-		95453AC911808B8700A155B9 /* emergency_animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = emergency_animation.hpp; path = ../../karts/emergency_animation.hpp; sourceTree = SOURCE_ROOT; };
 		9545ABC811E3E38300D3C37A /* progress_bar_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = progress_bar_widget.cpp; path = ../../guiengine/widgets/progress_bar_widget.cpp; sourceTree = SOURCE_ROOT; };
 		9545ABC911E3E38300D3C37A /* progress_bar_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = progress_bar_widget.hpp; path = ../../guiengine/widgets/progress_bar_widget.hpp; sourceTree = SOURCE_ROOT; };
 		954E486911B19C4100B1DF63 /* fribidi.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = fribidi.framework; path = /Library/Frameworks/fribidi.framework; sourceTree = "<absolute>"; };
@@ -1333,6 +1333,12 @@
 		95D2343E1078227A00625256 /* feature_unlocked.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = feature_unlocked.cpp; path = ../../states_screens/feature_unlocked.cpp; sourceTree = SOURCE_ROOT; };
 		95D2C42E13D6605600E84032 /* rubber_ball.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rubber_ball.cpp; path = ../../items/rubber_ball.cpp; sourceTree = SOURCE_ROOT; };
 		95D2C42F13D6605600E84032 /* rubber_ball.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = rubber_ball.hpp; path = ../../items/rubber_ball.hpp; sourceTree = SOURCE_ROOT; };
+		95D69A6F15226D1D00D598D8 /* check_canon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_canon.cpp; path = ../../tracks/check_canon.cpp; sourceTree = SOURCE_ROOT; };
+		95D69A7015226D1D00D598D8 /* check_canon.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_canon.hpp; path = ../../tracks/check_canon.hpp; sourceTree = SOURCE_ROOT; };
+		95D69A7215226E4700D598D8 /* abstract_kart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = abstract_kart.cpp; path = ../../karts/abstract_kart.cpp; sourceTree = SOURCE_ROOT; };
+		95D69A7315226E4700D598D8 /* abstract_kart.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = abstract_kart.hpp; path = ../../karts/abstract_kart.hpp; sourceTree = SOURCE_ROOT; };
+		95D69A7515226EA900D598D8 /* kart_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = kart_animation.cpp; path = ../../karts/kart_animation.cpp; sourceTree = SOURCE_ROOT; };
+		95D69A7615226EA900D598D8 /* kart_animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = kart_animation.hpp; path = ../../karts/kart_animation.hpp; sourceTree = SOURCE_ROOT; };
 		95D950CD0FE473CA002E10AD /* player.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = player.hpp; path = ../../config/player.hpp; sourceTree = SOURCE_ROOT; };
 		95D950CE0FE473CA002E10AD /* stk_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stk_config.cpp; path = ../../config/stk_config.cpp; sourceTree = SOURCE_ROOT; };
 		95D950CF0FE473CA002E10AD /* stk_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = stk_config.hpp; path = ../../config/stk_config.hpp; sourceTree = SOURCE_ROOT; };
@@ -2545,12 +2551,14 @@
 			isa = PBXGroup;
 			children = (
 				956C6EC71128D3FB004336C8 /* controller */,
-				95453AC811808B8700A155B9 /* emergency_animation.cpp */,
-				95453AC911808B8700A155B9 /* emergency_animation.hpp */,
+				95D69A7215226E4700D598D8 /* abstract_kart.cpp */,
+				95D69A7315226E4700D598D8 /* abstract_kart.hpp */,
 				95A1966014FC422D0074B892 /* ghost_kart.cpp */,
 				95A1966114FC422D0074B892 /* ghost_kart.hpp */,
 				95C2B1180F296545000D3E5D /* kart.cpp */,
 				95C2B1190F296545000D3E5D /* kart.hpp */,
+				95D69A7515226EA900D598D8 /* kart_animation.cpp */,
+				95D69A7615226EA900D598D8 /* kart_animation.hpp */,
 				9543D58D14D36EE3000B0888 /* kart_gfx.cpp */,
 				9543D58E14D36EE3000B0888 /* kart_gfx.hpp */,
 				95C2B11B0F296545000D3E5D /* kart_model.cpp */,
@@ -2666,6 +2674,8 @@
 				95C77D611069589B0080838E /* ambient_light_sphere.hpp */,
 				95CB476B0FF30EF400413BAE /* bezier_curve.cpp */,
 				95CB476A0FF30EF400413BAE /* bezier_curve.hpp */,
+				95D69A6F15226D1D00D598D8 /* check_canon.cpp */,
+				95D69A7015226D1D00D598D8 /* check_canon.hpp */,
 				95251F3B12554AB200505BA5 /* check_lap.cpp */,
 				95251F3C12554AB200505BA5 /* check_lap.hpp */,
 				95C77D65106958A50080838E /* check_line.cpp */,
@@ -3038,7 +3048,6 @@
 				956830E01132EC9E00088D14 /* irr_debug_drawer.cpp in Sources */,
 				957ED4801163FF18002AB42C /* ai_base_controller.cpp in Sources */,
 				958BD770117F6AE90095B483 /* music_manager.cpp in Sources */,
-				95453ACA11808B8700A155B9 /* emergency_animation.cpp in Sources */,
 				950D448C118DEE3C006CFC41 /* CGUISpriteBank.cpp in Sources */,
 				950D45D1118E040E006CFC41 /* options_screen_input2.cpp in Sources */,
 				9556A880119EF976009C558F /* options_screen_audio.cpp in Sources */,
@@ -3235,6 +3244,9 @@
 				95A197901502E5020074B892 /* replay_recorder.cpp in Sources */,
 				95A197951502E5320074B892 /* skidding.cpp in Sources */,
 				95EF1E0A1506D6CF0041AC79 /* skidding_properties.cpp in Sources */,
+				95D69A7115226D1D00D598D8 /* check_canon.cpp in Sources */,
+				95D69A7415226E4700D598D8 /* abstract_kart.cpp in Sources */,
+				95D69A7715226EA900D598D8 /* kart_animation.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3290,7 +3302,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
-				GCC_VERSION = 4.0;
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_MISSING_PARENTHESES = YES;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
@@ -3317,7 +3329,7 @@
 				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = SuperTuxKart;
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				SDKROOT = macosx10.6;
 			};
 			name = Debug;
 		};
@@ -3339,7 +3351,7 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
-				GCC_VERSION = 4.0;
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_MISSING_PARENTHESES = YES;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
@@ -3366,6 +3378,7 @@
 				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = SuperTuxKart;
+				SDKROOT = macosx10.6;
 				STRIP_STYLE = "non-global";
 			};
 			name = Release;

@@ -71,9 +71,9 @@ private:
     long long    m_num_calls;
 
 protected:
-
-    virtual Kart *createKart(const std::string &kart_ident, int index, 
-                             int local_player_id, int global_player_id);
+    virtual AbstractKart *createKart(const std::string &kart_ident, int index,
+                                     int local_player_id, int global_player_id,
+                                     RaceManager::KartType type);
 
 public:
                           ProfileWorld();
