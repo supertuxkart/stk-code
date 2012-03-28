@@ -152,7 +152,7 @@ const core::stringw Cake::getHitString(const AbstractKart *kart) const
         //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
         case 2: return _LTR("%0 should not play with %1's lunch");
         //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-        case 4: return _LTR("%1 ruins %0's cakeless diet");
+        case 3: return _LTR("%1 ruins %0's cakeless diet");
         default: assert(false); return L"";   // avoid compiler warning
     }
 }   // getHitString
