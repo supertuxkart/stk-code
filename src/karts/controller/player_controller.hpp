@@ -39,6 +39,7 @@ private:
     int            m_steer_val, m_steer_val_l, m_steer_val_r;
     int            m_prev_accel;
     bool           m_prev_brake;
+    bool           m_prev_nitro;
 
     float          m_penalty_time;
 

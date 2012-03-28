@@ -85,6 +85,7 @@ void PlayerController::reset()
     m_steer_val    = 0;
     m_prev_brake   = 0;
     m_prev_accel   = 0;
+    m_prev_nitro   = false;
     m_penalty_time = 0;
 }   // reset
 
@@ -100,6 +101,7 @@ void PlayerController::resetInputState()
     m_steer_val             = 0;
     m_prev_brake            = 0;
     m_prev_accel            = 0;
+    m_prev_nitro            = false;
     m_controls->m_accel     = 0.0f;
     m_controls->m_brake     = false;
     m_controls->m_skid      = false;
@@ -109,7 +111,7 @@ void PlayerController::resetInputState()
     m_controls->m_rescue    = false;
     m_controls->m_steer     = 0.0f;
 
-}   // resetKeyState
+}   // resetInputState
 
 // ----------------------------------------------------------------------------
 /** This function interprets a kart action and value, and set the corresponding
@@ -150,11 +152,13 @@ void PlayerController::action(PlayerAction action, int value)
         {
             m_controls->m_accel = value/32768.0f;
             m_controls->m_brake = false;
+            m_controls->m_nitro = m_prev_nitro;
         }
         else
         {
             m_controls->m_accel = 0.0f;
             m_controls->m_brake = m_prev_brake;
+            m_controls->m_nitro = false;
         }
         break;
     case PA_BRAKE:
@@ -164,15 +168,21 @@ void PlayerController::action(PlayerAction action, int value)
         {
             m_controls->m_brake = true;
             m_controls->m_accel = 0.0f;
+            m_controls->m_nitro = false;
         }
         else
         {
             m_controls->m_brake = false;
             m_controls->m_accel = m_prev_accel/32768.0f;
+            // Nitro still depends on whether we're accelerating
+            m_controls->m_nitro = (m_prev_nitro && m_prev_accel);
         }
         break;
     case PA_NITRO:
-        m_controls->m_nitro = (value!=0);
+        // This basically keeps track whether the button still is being pressed
+        m_prev_nitro = (value != 0);
+        // Enable nitro only when also accelerating
+        m_controls->m_nitro = ((value!=0) && m_controls->m_accel);
         break;
     case PA_RESCUE:
         m_controls->m_rescue = (value!=0);
