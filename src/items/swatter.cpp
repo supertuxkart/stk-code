@@ -283,6 +283,17 @@ void Swatter::squashThingsAround()
         if(dist2 >= min_dist2) continue;   // too far away, ignore this kart
 
         kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
+        
+        RaceGUIBase* gui = World::getWorld()->getRaceGUI();
+        irr::core::stringw hit_message =
+            StringUtils::insertValues(getHitString(kart),
+                                      core::stringw(kart->getName()),
+                                      core::stringw(m_kart->getName())
+                                                                         );
+        if(hit_message.size()>0)
+            gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f,
+                            video::SColor(255, 255, 255, 255), false);
+        
         if (kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
         {   // make bomb explode
             kart->getAttachment()->update(10000);
@@ -296,4 +307,28 @@ void Swatter::squashThingsAround()
     }   // for i < num_kartrs
 
     // TODO: squash items
+}
+
+
+
+// ----------------------------------------------------------------------------
+/** Picks a random message to be displayed when a kart is hit by a swatter 
+ *  \param kart The kart that was hit.
+ *  \returns The string to display.
+ */
+const core::stringw Swatter::getHitString(const AbstractKart *kart) const
+{
+    RandomGenerator r;
+
+    const int SWATTER_STRINGS_AMOUNT = 3;
+    switch (r.get(SWATTER_STRINGS_AMOUNT))
+    {
+        //I18N: shown when hit by swatter. %1 is the attacker, %0 is the victim.
+    case 0 : return _LTR("%1 thinks %0 is a big fly");
+        //I18N: shown when hit by swatter. %1 is the attacker, %0 is the victim.
+    case 1 : return _LTR("%1 flattens %0");
+        //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
+    case 2 : return _LTR("%0 feels flat today");
+    default: assert(false); return L"";  //  avoid compiler warning
+    }
 }

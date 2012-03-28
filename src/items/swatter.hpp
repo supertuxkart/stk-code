@@ -67,6 +67,8 @@ private:
     /** For some reason the built-in animation system doesn't work correctly here?? */
     float              m_swat_bomb_frame;
     
+    const core::stringw getHitString(const AbstractKart *kart) const;
+    
 public:
              Swatter(AbstractKart *kart, bool was_bomb,
                      scene::ISceneNode* bomb_scene_node);

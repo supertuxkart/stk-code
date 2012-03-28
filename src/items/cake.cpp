@@ -141,7 +141,7 @@ void Cake::init(const XMLNode &node, scene::IMesh *cake_model)
  */
 const core::stringw Cake::getHitString(const AbstractKart *kart) const
 {
-    const int CAKE_STRINGS_AMOUNT = 3;
+    const int CAKE_STRINGS_AMOUNT = 4;
     RandomGenerator r;
     switch (r.get(CAKE_STRINGS_AMOUNT))
     {
@@ -151,6 +151,8 @@ const core::stringw Cake::getHitString(const AbstractKart *kart) const
         case 1: return _LTR("%0 is dubious of %1's cooking skills");
         //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
         case 2: return _LTR("%0 should not play with %1's lunch");
+        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+        case 4: return _LTR("%1 ruins %0's cakeless diet");
         default: assert(false); return L"";   // avoid compiler warning
     }
 }   // getHitString
