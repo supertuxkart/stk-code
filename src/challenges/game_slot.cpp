@@ -89,7 +89,19 @@ void GameSlot::computeActive()
             i->second->setActive(RaceManager::RD_EASY);
         }
     }   // for i
+    
+    // now we have the number of points. Actually lock the tracks
+    for (i = m_challenges_state.begin(); i != m_challenges_state.end();  i++)
+    {
+        if (m_points < i->second->getData()->getNumTrophies())
+        {
+            m_locked_features[i->second->getData()->getTrackId()] = true;
+        }
+    }
+    
     clearUnlocked();
+    
+    
 }   // computeActive
 
 //-----------------------------------------------------------------------------
