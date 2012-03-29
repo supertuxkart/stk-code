@@ -117,6 +117,12 @@ void OptionsScreenVideo::init()
     assert( full != NULL );
     full->setState( UserConfigParams::m_fullscreen );
     
+    CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
+    rememberWinpos->setState(UserConfigParams::m_remember_window_location);
+
+    if (UserConfigParams::m_fullscreen) rememberWinpos->setDeactivated();
+    else rememberWinpos->setActivated();
+    
     // Enable back widgets if they were visited in-game previously
     if (StateManager::get()->getGameState() != GUIEngine::INGAME_MENU)
     {
@@ -462,7 +468,19 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         assert( fbos != NULL );
         UserConfigParams::m_fbo = fbos->getState();
     }
-    
+    else if (name == "rememberWinpos")
+    {
+        CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
+        UserConfigParams::m_remember_window_location = rememberWinpos->getState();
+    }
+    else if (name == "fullscreen")
+    {
+        CheckBoxWidget* fullscreen = getWidget<CheckBoxWidget>("fullscreen");
+        CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
+        
+        if (fullscreen->getState()) rememberWinpos->setDeactivated();
+        else rememberWinpos->setActivated();
+    }
 }   // eventCallback
 
 // ----------------------------------------------------------------------------

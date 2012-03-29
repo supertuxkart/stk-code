@@ -1103,6 +1103,8 @@ void initRest()
  */
 void cleanSuperTuxKart()
 {
+    irr_driver->updateConfigIfRelevant();
+    
     if(network_http)
         network_http->stopNetworkThread();
     //delete in reverse order of what they were created in.

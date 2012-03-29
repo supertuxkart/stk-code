@@ -54,6 +54,15 @@ using namespace irr::video;
 #  define round(x)  (floor(x+0.5f))
 #endif
 
+#ifdef WIN32
+#include <Windows.h>
+#endif
+#if defined(__linux__)
+namespace X11
+{
+    #include <X11/Xlib.h>
+}
+#endif
 
 /** singleton */
 IrrDriver *irr_driver = NULL;
@@ -82,10 +91,63 @@ IrrDriver::~IrrDriver()
 {
     m_post_processing.shut();
     assert(m_device != NULL);
+    
     m_device->drop();
     m_device = NULL;
     m_modes.clear();
 }   // ~IrrDriver
+
+// ----------------------------------------------------------------------------
+
+void IrrDriver::updateConfigIfRelevant()
+{
+        if (!UserConfigParams::m_fullscreen && UserConfigParams::m_remember_window_location)
+    {
+#ifdef WIN32
+        const SExposedVideoData& videoData = m_device->getVideoDriver()->getExposedVideoData();
+        // this should work even if using DirectX in theory because the HWnd is
+        // always third pointer in the struct, no matter which union is used
+        HWND window = (HWND)videoData.OpenGLWin32.HWnd;
+        WINDOWPLACEMENT placement;
+        placement.length = sizeof(WINDOWPLACEMENT);
+        if (GetWindowPlacement(window, &placement))
+        {
+            int x = (int)placement.rcNormalPosition.left;
+            int y = (int)placement.rcNormalPosition.top;
+            printf("Retrieved window location for config : %i %i\n", x, y);
+            
+            if (UserConfigParams::m_window_x != x || UserConfigParams::m_window_y != y)
+            {
+                UserConfigParams::m_window_x = x;
+                UserConfigParams::m_window_y = y;
+                user_config->saveConfig();
+            }
+        }
+        else
+        {
+            printf("Could not retrieve window location\n");
+        }
+#elif defined(__linux__)
+        using namespace X11;
+        const SExposedVideoData& videoData = m_device->getVideoDriver()->getExposedVideoData();
+        //XWindowAttributes xwa;
+        //XGetWindowAttributes((Display*)videoData.OpenGLLinux.X11Display, videoData.OpenGLLinux.X11Window, &xwa);
+        int wx = 0, wy = 0;
+        Window child;
+        XTranslateCoordinates((Display*)videoData.OpenGLLinux.X11Display, videoData.OpenGLLinux.X11Window,
+                             DefaultRootWindow((Display*)videoData.OpenGLLinux.X11Display), 0, 0,
+                             &wx, &wy, &child);
+        printf("Retrieved window location for config : %i %i\n", wx, wy);
+            
+        if (UserConfigParams::m_window_x != wx || UserConfigParams::m_window_y != wy)
+        {
+            UserConfigParams::m_window_x = wx;
+            UserConfigParams::m_window_y = wy;
+            user_config->saveConfig();
+        }
+#endif
+    }
+}
 
 // ----------------------------------------------------------------------------
 /** Gets a list of supported video modes from the irrlicht device. This data
@@ -192,7 +254,7 @@ void IrrDriver::initDevice()
                                        UserConfigParams::m_height);
                 if (UserConfigParams::m_fullscreen_antialiasing)
                     params.AntiAlias = 4;
-            
+                
                 m_device = createDeviceEx(params);
             
                 if(m_device) break;
@@ -227,6 +289,44 @@ void IrrDriver::initDevice()
     {
         fprintf(stderr, "Couldn't initialise irrlicht device. Quitting.\n");
         exit(-1);
+    }
+    
+    
+    if (!UserConfigParams::m_fullscreen && UserConfigParams::m_remember_window_location &&
+        UserConfigParams::m_window_x >= 0 && UserConfigParams::m_window_y >= 0)
+    {
+        
+#ifdef WIN32
+    const SExposedVideoData& videoData = m_device->getVideoDriver()->getExposedVideoData();
+    // this should work even if using DirectX in theory because the HWnd is
+    // always third pointer in the struct, no matter which union is used
+    HWND window = (HWND)videoData.OpenGLWin32.HWnd;
+    if (SetWindowPos(window, HWND_TOP, UserConfigParams::m_window_x, UserConfigParams::m_window_y,
+                     -1, -1, SWP_NOOWNERZORDER | SWP_NOSIZE))
+    {
+        // everything OK
+    }
+    else
+    {
+        printf("[IrrDriver] WARNING: Could not set window location\n");
+    }
+#elif defined(__linux__)
+    using namespace X11;
+    
+    const SExposedVideoData& videoData = m_device->getVideoDriver()->getExposedVideoData();
+    
+    //XSetWindowAttributes attr;
+    //attr.override_redirect = True;
+    //XChangeWindowAttributes( (Display*)videoData.OpenGLLinux.X11Display, videoData.OpenGLLinux.X11Window, CWOverrideRedirect, &attr );
+
+    // FIXME: doesn't work
+    XMoveWindow((Display*)videoData.OpenGLLinux.X11Display, videoData.OpenGLLinux.X11Window,
+                UserConfigParams::m_window_x, UserConfigParams::m_window_y);
+    
+    //attr.override_redirect = False;
+    //XChangeWindowAttributes( (Display*)videoData.OpenGLLinux.X11Display, videoData.OpenGLLinux.X11Window, CWOverrideRedirect, &attr );
+
+#endif
     }
     
     m_scene_manager = m_device->getSceneManager();

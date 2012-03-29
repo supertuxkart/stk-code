@@ -371,6 +371,16 @@ namespace UserConfigParams
                             &m_video_group) );
 
 
+    PARAM_PREFIX BoolUserConfigParam        m_remember_window_location
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "remember_window_location", 
+                            &m_video_group) );
+    PARAM_PREFIX IntUserConfigParam         m_window_x
+            PARAM_DEFAULT(  IntUserConfigParam(-1, "window_x", 
+                            &m_video_group,"If remember_window_location is true") );
+    PARAM_PREFIX IntUserConfigParam         m_window_y
+            PARAM_DEFAULT(  IntUserConfigParam(-1, "window_y", 
+                            &m_video_group,"If remember_window_location is true") );
+                            
     PARAM_PREFIX BoolUserConfigParam        m_display_fps
             PARAM_DEFAULT(  BoolUserConfigParam(false, "show_fps", 
                             &m_video_group, "Display frame per seconds") );

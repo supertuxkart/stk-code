@@ -494,6 +494,10 @@ Material::Material(const XMLNode *node, int index)
         {
             // Track version 4 uses a separate node:
             m_zipper = true;
+            m_zipper_duration = 3.5f;
+            m_zipper_max_speed_increase = 15.0f;
+            m_zipper_fade_out_time = 3.0f;
+            m_zipper_speed_gain = 4.5f;
             child_node->get("duration",          &m_zipper_duration          );
             child_node->get("fade-out-time",     &m_zipper_fade_out_time     );
             child_node->get("max-speed-increase",&m_zipper_max_speed_increase);

@@ -111,7 +111,9 @@ private:
 public:
                           IrrDriver();
                          ~IrrDriver();
-    void                 initDevice();
+    void                  initDevice();
+    
+    void                  updateConfigIfRelevant();
     
     void setAllMaterialFlags(scene::IMesh *mesh) const;
 
