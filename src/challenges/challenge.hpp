@@ -73,7 +73,7 @@ public:
     // ------------------------------------------------------------------------
     bool  isActive(RaceManager::Difficulty d) const {return m_state[d]==CH_ACTIVE;  }
     // ------------------------------------------------------------------------
-    void  setSolved(RaceManager::Difficulty d)      {m_state[d] = CH_SOLVED;        }
+    void  setSolved(RaceManager::Difficulty d);
     // ------------------------------------------------------------------------
     void  setActive(RaceManager::Difficulty d)      {m_state[d] = CH_ACTIVE;        }
     // ------------------------------------------------------------------------

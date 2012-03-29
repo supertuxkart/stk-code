@@ -78,6 +78,18 @@ void Challenge::load(const XMLNode* challengesNode)
 
 //-----------------------------------------------------------------------------
 
+void Challenge::setSolved(RaceManager::Difficulty d)
+{
+    // solve not only the current difficulty but all those before
+    // e.g. if you solved hard then you also get easy
+    for (int curr = 0; curr <= d; curr++)
+    {
+        m_state[curr] = CH_SOLVED;
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 
 const wchar_t* boolstr(bool b)
 {
