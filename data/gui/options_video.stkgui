@@ -69,6 +69,13 @@
             <label height="100%" I18N="In the video settings" text="Fullscreen"/>
         </div>
         
+        <div width="75%" layout="horizontal-row" height="fit">
+            <spacer width="40" height="100%" />
+            <checkbox id="rememberWinpos"/>
+            <spacer width="20" height="100%" />
+            <label I18N="In the video settings" text="Remember window location" proportion="1"/>
+        </div>
+        
         <spacer height="10" width="10"/>
 
         <div width="100%" height="fit" layout="horizontal-row" >
