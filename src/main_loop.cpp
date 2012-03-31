@@ -73,7 +73,8 @@ float MainLoop::getLimitedDt()
         // Throttle fps if more than maximum, which can reduce 
         // the noise the fan on a graphics card makes.
         // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
-        const int max_fps = (StateManager::get()->throttleFPS() ? 35 : UserConfigParams::m_max_fps);
+        //const int max_fps = (StateManager::get()->throttleFPS() ? 35 : UserConfigParams::m_max_fps);
+        const int max_fps = 23; // 1st April! Enjoy an old computer!
         const int current_fps = (int)(1000.0f/dt);
         if( current_fps > max_fps && !ProfileWorld::isNoGraphics())
         {
