@@ -86,20 +86,20 @@ void OptionsScreenPlayers::init()
                           translations->fribidize(UserConfigParams::m_all_players[n].getName()) );
     }
     
+    ButtonWidget* you = getWidget<ButtonWidget>("playername");
+    you->setText( unlock_manager->getCurrentSlot()->getPlayerName() );
+    ((gui::IGUIButton*)you->getIrrlichtElement())->setOverrideFont( GUIEngine::getSmallFont() );
+
     if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
     {
         players->setDeactivated();
+        you->setDeactivated();
     }
     else
     {
         players->setActivated();
+        you->setActivated();
     }
-    
-    
-    ButtonWidget* you = getWidget<ButtonWidget>("playername");
-    you->setText( unlock_manager->getCurrentSlot()->getPlayerName() );
-    ((gui::IGUIButton*)you->getIrrlichtElement())->setOverrideFont( GUIEngine::getSmallFont() );
-        
 }   // init
 
 // -----------------------------------------------------------------------------
