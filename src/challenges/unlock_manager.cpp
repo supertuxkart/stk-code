@@ -344,3 +344,8 @@ PlayerProfile* UnlockManager::getCurrentPlayer()
 
 //-----------------------------------------------------------------------------
 
+void UnlockManager::updateActiveChallengeList()
+{
+    getCurrentSlot()->computeActive();
+}
+

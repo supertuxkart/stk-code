@@ -351,7 +351,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         whats_next_btn->m_h = button_h;
         whats_next_btn->setParent(m_irrlicht_window);
         
-        whats_next_btn->setText( _("See unlocked features") );
+        whats_next_btn->setText( _("You completed a challenge!") );
         whats_next_btn->m_properties[PROP_ID] = "seeunlocked";
         
         m_widgets.push_back(whats_next_btn);

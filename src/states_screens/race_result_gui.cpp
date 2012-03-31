@@ -96,8 +96,8 @@ void RaceResultGUI::enableAllButtons()
     int n = unlock_manager->getCurrentSlot()->getRecentlyCompletedChallenges().size();
     if(n>0)
     {
-        top->setText(n==1 ? _("See unlocked feature") 
-                          : _("See unlocked features"));
+        top->setText(n==1 ? _("You completed a challenge!") 
+                          : _("You completed challenges!"));
         top->setVisible(true);
         top->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }

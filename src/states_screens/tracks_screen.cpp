@@ -41,19 +41,19 @@ const char* ALL_TRACK_GROUPS_ID = "all";
 
 DEFINE_SCREEN_SINGLETON( TracksScreen );
 
-// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 TracksScreen::TracksScreen() : Screen("tracks.stkgui")
 {
 }
 
-// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void TracksScreen::loadedFromFile()
 {
 }
 
-// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void TracksScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
@@ -167,7 +167,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
 }
 
-// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void TracksScreen::beforeAddingWidget()
 {
@@ -206,7 +206,7 @@ void TracksScreen::beforeAddingWidget()
     tracks_widget->setItemCountHint( track_manager->getNumberOfTracks() );
 }
 
-// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void TracksScreen::init()
 {
@@ -243,7 +243,8 @@ void TracksScreen::init()
         }
         if (sshot_files.size() == 0)
         {
-            std::cerr << "/!\\ WARNING: Grand Prix '" << gp->getId() << "' does not contain any valid track.\n";
+            std::cerr << "/!\\ WARNING: Grand Prix '" << gp->getId()
+                      << "' does not contain any valid track.\n";
             sshot_files.push_back("gui/main_help.png");
         }
         
@@ -255,8 +256,9 @@ void TracksScreen::init()
         }
         else
         {
-            gps_widget->addAnimatedItem(translations->fribidize(gp->getName()), gp->getId(), sshot_files, 1.5f,
-                                        TROPHY_BADGE, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+            gps_widget->addAnimatedItem(translations->fribidize(gp->getName()), gp->getId(),
+                                        sshot_files, 1.5f, TROPHY_BADGE,
+                                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
         }
     }
     gps_widget->updateItemDisplay();
@@ -270,15 +272,16 @@ void TracksScreen::init()
     buildTrackList();
     
     // select something for the game master
-    // FIXME: 'setSelection' will not scroll up to the passed track, so if given track is not visible
-    //         with current scrolling this fails
-    if (!tracks_widget->setSelection(UserConfigParams::m_last_track, PLAYER_ID_GAME_MASTER, true))
+    // FIXME: 'setSelection' will not scroll up to the passed track, so if given track
+    //         is not visible with current scrolling this fails
+    if (!tracks_widget->setSelection(UserConfigParams::m_last_track,
+                                     PLAYER_ID_GAME_MASTER, true))
     {
         tracks_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
     }
 }
 
-// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void TracksScreen::buildTrackList()
 {
@@ -314,7 +317,8 @@ void TracksScreen::buildTrackList()
             else
             {
                 tracks_widget->addItem(translations->fribidize(curr->getName()), curr->getIdent(),
-                                       curr->getScreenshotFile(), 0, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+                                       curr->getScreenshotFile(), 0,
+                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
                 m_random_track_list.push_back(curr->getIdent());
             }
         }
@@ -354,7 +358,7 @@ void TracksScreen::buildTrackList()
     std::random_shuffle( m_random_track_list.begin(), m_random_track_list.end() );
 }
 
-// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void TracksScreen::setFocusOnTrack(const std::string& trackName)
 {
@@ -365,7 +369,7 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
     tracks_widget->setSelection(trackName, PLAYER_ID_GAME_MASTER, true); 
 }
 
-// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void TracksScreen::setFocusOnGP(const std::string& gpName)
 {
@@ -376,5 +380,5 @@ void TracksScreen::setFocusOnGP(const std::string& gpName)
     gps_widget->setSelection(gpName, PLAYER_ID_GAME_MASTER, true); 
 }
 
-// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 

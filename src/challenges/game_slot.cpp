@@ -34,6 +34,7 @@ bool GameSlot::isLocked(const std::string& feature)
 void GameSlot::computeActive()
 {
     m_points = 0;
+    m_locked_features.clear(); // start afresh
     
     std::map<std::string, Challenge*>::const_iterator i;
     for(i = m_challenges_state.begin(); 
@@ -111,8 +112,10 @@ void GameSlot::lockFeature(Challenge *challenge)
     const std::vector<ChallengeData::UnlockableFeature>& features = challenge->getData()->getFeatures();
     
     const unsigned int amount = (unsigned int)features.size();
-    for(unsigned int n=0; n<amount; n++)
-        m_locked_features[features[n].m_name]=true;
+    for (unsigned int n=0; n<amount; n++)
+    {
+        m_locked_features[features[n].m_name] = true;
+    }
 }   // lockFeature
 
 //-----------------------------------------------------------------------------
@@ -120,11 +123,11 @@ void GameSlot::lockFeature(Challenge *challenge)
 void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d, bool do_save)
 {
     const unsigned int amount = (unsigned int)c->getData()->getFeatures().size();
-    for(unsigned int n=0; n<amount; n++)
+    for (unsigned int n=0; n<amount; n++)
     {
         std::string feature = c->getData()->getFeatures()[n].m_name;
-        std::map<std::string,bool>::iterator p=m_locked_features.find(feature);
-        if(p==m_locked_features.end())
+        std::map<std::string,bool>::iterator p = m_locked_features.find(feature);
+        if (p == m_locked_features.end())
         {
             //fprintf(stderr,"Unlocking feature '%s' failed: feature is not locked.\n",
             //        (feature).c_str());
@@ -138,7 +141,7 @@ void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d, bool do_sa
     c->setSolved(d);  // reset isActive flag
     
     // Save the new unlock information
-    if(do_save) unlock_manager->save();
+    if (do_save) unlock_manager->save();
 }   // unlockFeature
 
 //-----------------------------------------------------------------------------
@@ -158,6 +161,7 @@ void GameSlot::raceFinished()
             unlockFeature(i->second, race_manager->getDifficulty());
         }   // if isActive && challenge solved
     }
+    
     //race_manager->setCoinTarget(0);  //reset
 }   // raceFinished
 
@@ -176,6 +180,7 @@ void GameSlot::grandPrixFinished()
             unlockFeature(i->second, race_manager->getDifficulty());
         }
     }
+    
     race_manager->setCoinTarget(0);
 }   // grandPrixFinished
 

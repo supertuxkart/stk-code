@@ -21,6 +21,7 @@
 #include <SColor.h>
 
 #include "challenges/challenge_data.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -376,6 +377,9 @@ void FeatureUnlockedCutScene::tearDown()
 
     m_unlocked_stuff.clearAndDeleteAll();
     m_all_kart_models.clearAndDeleteAll();
+    
+    // update point count and the list of locked/unlocked stuff
+    unlock_manager->updateActiveChallengeList();
 }   // tearDown
 
 // ----------------------------------------------------------------------------

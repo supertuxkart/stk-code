@@ -80,6 +80,8 @@ public:
     
     PlayerProfile* getCurrentPlayer();
     
+    void updateActiveChallengeList();
+    
 };   // UnlockManager
 
 extern UnlockManager* unlock_manager;
