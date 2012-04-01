@@ -25,6 +25,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "modes/overworld.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
@@ -105,6 +106,12 @@ GUIEngine::EventPropagation
             ModalDialog::dismiss();
             race_manager->exitRace();
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            
+            if (race_manager->raceWasStartedFromOverworld())
+            {
+                OverWorld::enterOverWorld();
+            }
+            
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "help")

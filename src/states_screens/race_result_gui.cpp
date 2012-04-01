@@ -30,6 +30,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
+#include "modes/overworld.hpp"
 #include "modes/world_with_rank.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
 #include "states_screens/feature_unlocked.hpp"
@@ -125,7 +126,14 @@ void RaceResultGUI::enableAllButtons()
         middle->setText( _("Restart") );
         middle->setVisible(true);
 
-        bottom->setText( _("Back to the menu") );
+        if (race_manager->raceWasStartedFromOverworld())
+        {
+            bottom->setText( _("Back to track selection") );
+        }
+        else
+        {
+            bottom->setText( _("Back to the menu") );
+        }
         bottom->setVisible(true);
         
         bottom->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
@@ -212,6 +220,11 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         race_manager->exitRace();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        
+        if (race_manager->raceWasStartedFromOverworld())
+        {
+            OverWorld::enterOverWorld();
+        }
     }
     else
     {

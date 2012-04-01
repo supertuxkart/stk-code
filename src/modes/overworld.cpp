@@ -63,8 +63,7 @@ void OverWorld::enterOverWorld()
     
     StateManager::get()->enterGameState();
     network_manager->setupPlayerKartInfo();
-    race_manager->startNew();
-    
+    race_manager->startNew(false);
 }
 
 //-----------------------------------------------------------------------------

@@ -27,6 +27,7 @@
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/overworld.hpp"
 #include "modes/world.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "states_screens/main_menu_screen.hpp"
@@ -715,9 +716,14 @@ void FeatureUnlockedCutScene::continueButtonPressed()
         }
         else
         {
-            // back to menu
+            // back to menu or overworld
             race_manager->exitRace();
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            
+            if (race_manager->raceWasStartedFromOverworld())
+            {
+                OverWorld::enterOverWorld();
+            }
         }
     }
     

@@ -56,6 +56,7 @@ RaceManager::RaceManager()
     m_minor_mode         = MINOR_MODE_NORMAL_RACE;
     m_track_number       = 0;
     m_coin_target        = 0;
+    m_started_from_overworld = false;
     setReverseTrack(false);
     setTrack("jungle");
     m_default_ai_list.clear();
@@ -242,8 +243,10 @@ void RaceManager::computeRandomKartList()
 
 //-----------------------------------------------------------------------------
 
-void RaceManager::startNew()
+void RaceManager::startNew(bool from_overworld)
 {
+    m_started_from_overworld = from_overworld;
+    
     if(m_major_mode==MAJOR_MODE_GRAND_PRIX)
     {
         // GP: get tracks, laps and reverse info from grand prix
@@ -619,7 +622,7 @@ void RaceManager::rerunRace()
 
 //-----------------------------------------------------------------------------
 
-void RaceManager::startGP(const GrandPrixData* gp)
+void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld)
 {
     assert(gp != NULL);
 
@@ -629,13 +632,14 @@ void RaceManager::startGP(const GrandPrixData* gp)
     network_manager->setupPlayerKartInfo();
     
     setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
-    startNew();
+    startNew(from_overworld);
 }
 
 //-----------------------------------------------------------------------------
 
 void RaceManager::startSingleRace(const std::string trackIdent, 
-                                  const int num_laps)
+                                  const int num_laps,
+                                  bool from_overworld)
 {
     StateManager::get()->enterGameState();
     setTrack(trackIdent.c_str());
@@ -647,7 +651,7 @@ void RaceManager::startSingleRace(const std::string trackIdent,
     setCoinTarget( 0 ); // Might still be set from a previous challenge
     network_manager->setupPlayerKartInfo();
     
-    startNew();
+    startNew(from_overworld);
 }
 
 /* EOF */

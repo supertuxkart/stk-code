@@ -26,6 +26,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/overworld.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
 #include "modes/world_with_rank.hpp"
@@ -390,7 +391,14 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         whats_next_btn->m_h = button_h;
         whats_next_btn->setParent(m_irrlicht_window);
         
-        whats_next_btn->setText( _("Back to the main menu") );
+        if (race_manager->raceWasStartedFromOverworld())
+        {
+            whats_next_btn->setText( _("Back to track selection") );
+        }
+        else
+        {
+            whats_next_btn->setText( _("Back to the main menu") );
+        }
         whats_next_btn->m_properties[PROP_ID] = "backtomenu";
         
         m_widgets.push_back(whats_next_btn);
@@ -469,6 +477,12 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
         World::getWorld()->unpause();
         race_manager->exitRace();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        
+        if (race_manager->raceWasStartedFromOverworld())
+        {
+            OverWorld::enterOverWorld();
+        }
+            
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "continuegp")

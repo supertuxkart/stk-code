@@ -1328,7 +1328,7 @@ int main(int argc, char *argv[] )
             // This will setup the race manager etc.
             history->Load();
             network_manager->setupPlayerKartInfo();
-            race_manager->startNew();
+            race_manager->startNew(false);
             main_loop->run();
             // well, actually run() will never return, since
             // it exits after replaying history (see history::GetNextDT()).
@@ -1360,7 +1360,7 @@ int main(int argc, char *argv[] )
                 // ===============
                 // all defaults are set in InitTuxkart()
                 network_manager->setupPlayerKartInfo();
-                race_manager->startNew();
+                race_manager->startNew(false);
             }
         }
         else  // profile
@@ -1371,7 +1371,7 @@ int main(int argc, char *argv[] )
             race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
             race_manager->setDifficulty(RaceManager::RD_HARD);
             network_manager->setupPlayerKartInfo();
-            race_manager->startNew();
+            race_manager->startNew(false);
         }
         main_loop->run();
 

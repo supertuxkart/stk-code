@@ -199,6 +199,8 @@ public:
     enum KartType       { KT_PLAYER, KT_NETWORK_PLAYER, KT_AI, KT_LEADER, KT_GHOST };
 private:
 
+    bool m_started_from_overworld;
+
     /** This data structure accumulates kart data and race result data from
      *  each race. */
     struct KartStatus
@@ -466,7 +468,7 @@ public:
      *       NetworkManager::setupPlayerKartInfo, but could be done differently 
      *       (e.g. depending on user command line options to test certain AIs)
      */
-    void         startNew();
+    void         startNew(bool from_overworld);
     
     /** \brief Start the next race or go back to the start screen
       * If there are more races to do, starts the next race, otherwise
@@ -489,7 +491,7 @@ public:
     /**
       * \brief Higher-level method to start a GP without having to care about the exact startup sequence
       */
-    void         startGP(const GrandPrixData* gp);
+    void         startGP(const GrandPrixData* gp, bool from_overworld);
 
     /**
       * \brief Higher-level method to start a GP without having to care about 
@@ -498,7 +500,10 @@ public:
       * \param num_laps   Number of laps to race, or -1 if number of laps is 
       *        not relevant in current mode
       */
-    void         startSingleRace(const std::string trackIdent, const int num_laps);
+    void         startSingleRace(const std::string trackIdent, const int num_laps,
+                                 bool from_overworld);
+
+    bool         raceWasStartedFromOverworld() const { return m_started_from_overworld; }
 
     /** \} */
     

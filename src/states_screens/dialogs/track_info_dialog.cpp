@@ -247,7 +247,7 @@ void TrackInfoDialog::onEnterPressedInternal()
     race_manager->setReverseTrack(reverse_track);
     std::string track_ident = m_track_ident;
     ModalDialog::dismiss();
-    race_manager->startSingleRace(track_ident, num_laps);
+    race_manager->startSingleRace(track_ident, num_laps, false);
 }   // onEnterPressedInternal
 
 // ------------------------------------------------------------------------------------------------------   

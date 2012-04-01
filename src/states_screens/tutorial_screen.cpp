@@ -190,7 +190,7 @@ void TutorialScreen::eventCallback(GUIEngine::Widget* widget, const std::string&
 
             // Sets up kart info, including random list of kart for AI
             network_manager->setupPlayerKartInfo();
-            race_manager->startNew();
+            race_manager->startNew(false);
         }
         else if (name == SHARP_TURN)
         {
