@@ -33,6 +33,7 @@
 #include "network/remote_kart_info.hpp"
 #include "race/grand_prix_data.hpp"
 #include "utils/translation.hpp"
+#include "utils/vec3.hpp"
 
 class AbstractKart;
 class Track;
@@ -281,6 +282,8 @@ private:
              left.m_overall_time > right.m_overall_time);
     }
 
+    bool m_have_kart_last_position_on_overworld;
+    Vec3 m_kart_last_position_on_overworld;
 
 public:
                  RaceManager();
@@ -537,6 +540,14 @@ public:
                     { m_ai_kart_list = rkl; }
 
     /** \} */
+    
+    bool         haveKartLastPositionOnOverworld() { return m_have_kart_last_position_on_overworld; }
+    void         setKartLastPositionOnOverworld(Vec3 pos)
+    {
+        m_have_kart_last_position_on_overworld = true;
+        m_kart_last_position_on_overworld = pos;
+    }
+    Vec3         getKartLastPositionOnOverworld() { return m_kart_last_position_on_overworld; }
     
 };
 

@@ -57,6 +57,7 @@ RaceManager::RaceManager()
     m_track_number       = 0;
     m_coin_target        = 0;
     m_started_from_overworld = false;
+    m_have_kart_last_position_on_overworld = false;
     setReverseTrack(false);
     setTrack("jungle");
     m_default_ai_list.clear();

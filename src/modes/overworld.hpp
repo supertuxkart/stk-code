@@ -75,6 +75,8 @@ public:
     virtual bool useChecklineRequirements() const { return false; }
     // ------------------------------------------------------------------------    
     void scheduleReturnToGarage() { m_return_to_garage = true; }
+    // ------------------------------------------------------------------------ 
+    virtual void moveKartAfterRescue(AbstractKart* kart);
 };
 
 #endif
