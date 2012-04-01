@@ -166,7 +166,7 @@ bool Bowling::updateAndDelete(float dt)
     // the ball is too high, it is 'pushed down', which can reduce the
     // speed, which causes the speed to increase, which in turn causes
     // the ball to fly higher and higher.
-    btTransform trans = getTrans();
+    //btTransform trans = getTrans();
     float hat         = getXYZ().getY()-getHoT();
     if(hat-0.5f*m_extend.getY()<0.01f)
     {
