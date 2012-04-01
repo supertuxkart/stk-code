@@ -20,6 +20,7 @@
 
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/canon_animation.hpp"
 #include "modes/world.hpp"
 
 /** Constructor for a check canon. 
@@ -46,5 +47,5 @@ void CheckCanon::trigger(unsigned int kart_index)
 {
 	Vec3 target(m_target.getMiddle());
 	AbstractKart *kart = World::getWorld()->getKart(kart_index);
-	kart->shootTo(target, m_speed);
+	new CanonAnimation(kart, target, m_speed);
 }   // CheckCanon

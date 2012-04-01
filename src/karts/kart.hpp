@@ -41,7 +41,7 @@ class Attachment;
 class Camera;
 class Controller;
 class Item;
-class KartAnimation;
+class AbstractKartAnimation;
 class KartGFX;
 class MaxSpeed;
 class ParticleEmitter;
@@ -52,6 +52,7 @@ class Shadow;
 class Skidding;
 class SkidMarks;
 class SlipStream;
+class Stars;
 
 /** The main kart class. All type of karts are of this object, but with 
  *  different controllers. The controllers are what turn a kart into a 
@@ -65,10 +66,6 @@ class SlipStream;
 class Kart : public AbstractKart
 {
     friend class Skidding;
-protected:
-    /** Handles all kart animations, such as rescue and explosion. */
-    KartAnimation *m_kart_animation;
-
 private:
     /** Handles speed increase and capping due to powerup, terrain, ... */
     MaxSpeed           *m_max_speed;
@@ -104,7 +101,12 @@ private:
     /** Current race position (1-num_karts). */
     int m_race_position;
 
+	/** True if the kart is eliminated. */
+	bool m_eliminated;
 
+    /** For stars rotating around head effect */
+    Stars *m_stars_effect;
+    
 
 protected:       // Used by the AI atm    
     /** The camera for each kart. Not all karts have cameras (e.g. AI karts
@@ -254,9 +256,6 @@ public:
     virtual void   setPosition(int p);
     virtual void   beep             ();
     virtual void   showZipperFire   ();
-    virtual bool   playingExplosionAnimation() const;
-    virtual bool   playingRescueAnimation() const;
-    virtual bool   playingEmergencyAnimation() const;
     virtual float  getCurrentMaxSpeed() const;
 
     virtual bool   playCustomSFX    (unsigned int type);
@@ -380,21 +379,13 @@ public:
      *  the upright constraint to allow for more realistic explosions. */
     bool           isNearGround     () const;
     // ------------------------------------------------------------------------
-    virtual bool isEliminated() const;
+	/** Returns true if the kart is eliminated.  */
+	virtual bool isEliminated() const { return m_eliminated; }
     // ------------------------------------------------------------------------
-    virtual void eliminate (bool remove);
-    // ------------------------------------------------------------------------
-    virtual void explode(const Vec3& pos, bool direct_hit);
-    // ------------------------------------------------------------------------
-    virtual void rescue(bool is_auto_rescue=false);
-    // ------------------------------------------------------------------------
-	virtual void shootTo(const Vec3 &target, float speed);
-    // ------------------------------------------------------------------------
-    /** Returns the timer for the currently played animation. */
-    virtual float getAnimationTimer() const;
+    virtual void eliminate();
     // ------------------------------------------------------------------------
     /** Makes a kart invulnerable for a certain amount of time. */
-    void           setInvulnerableTime(float t) { m_invulnerable_time = t; };
+    virtual void  setInvulnerableTime(float t) { m_invulnerable_time = t; };
     // ------------------------------------------------------------------------
     /** Returns if the kart is invulnerable. */
     virtual bool   isInvulnerable() const { return m_invulnerable_time > 0; }
@@ -404,6 +395,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if the kart is currently being squashed. */
     virtual bool   isSquashed() const { return m_squash_time >0; }
+    // ------------------------------------------------------------------------
+    /** Shows the star effect for a certain time. */
+    virtual void showStarEffect(float t);
 };   // Kart
 
 

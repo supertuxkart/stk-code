@@ -833,15 +833,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\karts\abstract_kart_animation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\canon_animation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\explosion_animation.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\karts\ghost_kart.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\karts\kart.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\karts\kart_animation.cpp"
 					>
 				</File>
 				<File
@@ -870,6 +878,10 @@
 				</File>
 				<File
 					RelativePath="..\..\karts\moveable.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\rescue_animation.cpp"
 					>
 				</File>
 				<File
@@ -1987,15 +1999,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\karts\abstract_kart_animation.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\canon_animation.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\explosion_animation.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\karts\ghost_kart.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\karts\kart.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\karts\kart_animation.hpp"
 					>
 				</File>
 				<File
@@ -2024,6 +2044,10 @@
 				</File>
 				<File
 					RelativePath="..\..\karts\moveable.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\rescue_animation.hpp"
 					>
 				</File>
 				<File

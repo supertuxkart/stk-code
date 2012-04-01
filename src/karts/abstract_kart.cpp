@@ -20,6 +20,7 @@
 #include "karts/abstract_kart.hpp"
 
 #include "items/powerup.hpp"
+#include "karts/abstract_kart_animation.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -37,6 +38,7 @@ AbstractKart::AbstractKart(const std::string& ident,
 {
     m_world_kart_id   = world_kart_id;
     m_kart_properties = kart_properties_manager->getKart(ident);
+    m_kart_animation  = NULL;
     assert(m_kart_properties != NULL);
     
     // We have to take a copy of the kart model, since otherwise
@@ -56,11 +58,19 @@ AbstractKart::AbstractKart(const std::string& ident,
 AbstractKart::~AbstractKart()
 {
     delete m_kart_model;
+    if(m_kart_animation)
+        delete m_kart_animation;
 }   // ~AbstractKart
 
 // ----------------------------------------------------------------------------
 void AbstractKart::reset()
 {
+    Moveable::reset();
+    if(m_kart_animation)
+    {
+        delete m_kart_animation;
+        m_kart_animation = NULL;
+    }
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -82,3 +92,29 @@ bool AbstractKart::isWheeless() const
     return m_kart_model->getWheelModel(0)==NULL;
 }   // isWheeless
 
+// ----------------------------------------------------------------------------
+/** Sets a new kart animation. This function should either be called to 
+ *  remove an existing kart animation (ka=NULL), or to set a new kart 
+ *  animation, in which case the current kart animation must be NULL.
+ *  \param ka The new kart animation, or NULL if the current kart animation
+ *            is to be stopped.
+ */
+void AbstractKart::setKartAnimation(AbstractKartAnimation *ka) 
+{
+#ifdef DEBUG
+    if( ( (ka!=NULL) ^ (m_kart_animation!=NULL) ) ==0)
+    {
+        if(ka) printf("Setting kart animation to '%s'.\n", 
+                      ka->getName().c_str());
+        else   printf("Setting kart animation to NULL.\n");
+        if(m_kart_animation) printf("Current kart animation is '%s'.\n", 
+                                   m_kart_animation->getName().c_str());
+        else                 printf("Current kart animation is NULL.\n");
+    }
+#endif
+    // Make sure that the either the current animation is NULL and a new (!=0)
+    // is set, or there is a current animation, then it must be set to 0. This
+    // makes sure that the calling logic of this function is correct.
+    assert( (ka!=NULL) ^ (m_kart_animation!=NULL) );
+    m_kart_animation = ka; 
+}   // setKartAnimation

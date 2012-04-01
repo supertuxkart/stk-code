@@ -29,6 +29,7 @@
 #include "items/swatter.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "network/race_state.hpp"
@@ -208,7 +209,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
     if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
-        m_kart->explode(Vec3(0.0f, 1.0f, 0.0f), true);
+        ExplosionAnimation::create(m_kart);
         return;
     }
     
@@ -221,8 +222,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         if(m_kart->getController()->isPlayerController())
             he->setPlayerKartHit();
         projectile_manager->addHitEffect(he);
-
-        m_kart->explode(m_kart->getXYZ(), /*direct_hit*/ true);
+        ExplosionAnimation::create(m_kart);
         clear();
         if(new_attachment==-1) 
             new_attachment = m_random.get(3);
@@ -395,8 +395,7 @@ void Attachment::update(float dt)
             if(m_kart->getController()->isPlayerController())
                 he->setPlayerKartHit();
             projectile_manager->addHitEffect(he);
-            m_kart->explode(m_kart->getXYZ(), 
-                                    /*direct_hit*/ true);
+            ExplosionAnimation::create(m_kart);
             
             if (m_bomb_sound)
             {

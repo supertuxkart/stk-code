@@ -34,6 +34,7 @@
  *  \param kart Pointer to the kart which is animated.
  */
 KartAnimation::KartAnimation(Kart *kart)
+             : I_KartAnimation(kart)
 {
     m_stars_effect = NULL;
     m_referee      = NULL;
@@ -44,7 +45,6 @@ KartAnimation::KartAnimation(Kart *kart)
     // reset() is also called at the very start, it must be guaranteed that 
     // rescue is not set.
     m_kart_mode    = KA_NONE;
-    m_eliminated   = false;
 };   // KartAnimation
 
 //-----------------------------------------------------------------------------
@@ -72,15 +72,11 @@ void KartAnimation::reset()
     // Reset star effect in case that it is currently being shown.
     m_stars_effect->reset();
 
-    // If the kart was eliminated or rescued, the body was removed from the
-    // physics world. Add it again.
-    if(m_eliminated || playingAnimation())
-    {
-        World::getWorld()->getPhysics()->addKart(m_kart);
-    }
+	// Note that this will only add the kart if it's not already
+	// in the world.
+	World::getWorld()->getPhysics()->addKart(m_kart);
     m_timer      = 0;
     m_kart_mode  = KA_NONE;
-    m_eliminated = false;
     if(m_referee)
     {
         delete m_referee;
@@ -88,31 +84,6 @@ void KartAnimation::reset()
     }
 }   // reset
 
-//-----------------------------------------------------------------------------
-/** Eliminates a kart from the race. It removes the kart from the physics
- *  world, and makes the scene node invisible.
- */
-void KartAnimation::eliminate(bool remove)
-{
-    if (!playingAnimation() && remove)
-    {
-        World::getWorld()->getPhysics()->removeKart(m_kart);
-    }
-    
-    if (m_stars_effect)
-    {
-        m_stars_effect->reset();
-        m_stars_effect->update(1);
-    }
-    
-    m_eliminated = true;
-    m_kart_mode = KA_NONE;
-    
-    if (remove)
-    {
-         m_kart->getNode()->setVisible(false);
-    }
-}   // eliminate
 
 //-----------------------------------------------------------------------------
 /** Sets the mode of the kart to being rescued, attaches the rescue model
@@ -121,7 +92,7 @@ void KartAnimation::eliminate(bool remove)
  */
 void KartAnimation::rescue(bool is_auto_rescue)
 {
-    if(playingAnimation()) return;
+    if(getKartAnimation()) return;
 
     assert(!m_referee);
     m_referee     = new Referee(*m_kart);
@@ -275,11 +246,6 @@ void KartAnimation::update(float dt)
 		}
         World::getWorld()->getPhysics()->addKart(m_kart);
         m_kart_mode  = KA_NONE;
-        // We have to make sure that m_kart_mode and m_eliminated are in 
-        // synch, otherwise it can happen that a kart is entered in world
-        // here, and again in reset (e.g. when restarting the race) if
-        // m_eliminated is still true.
-        m_eliminated = false;
         if(m_kart->getCamera() && m_kart->getCamera()->getMode() != Camera::CM_FINAL)
             m_kart->getCamera()->setMode(Camera::CM_NORMAL);
         return;

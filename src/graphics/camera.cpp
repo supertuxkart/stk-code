@@ -30,6 +30,7 @@
 #include "graphics/irr_driver.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
@@ -445,7 +446,7 @@ void Camera::update(float dt)
 
     // If an explosion is happening, stop moving the camera,
     // but keep it target on the kart.
-    if(m_kart->playingExplosionAnimation())
+    if(dynamic_cast<ExplosionAnimation*>(m_kart->getKartAnimation()))
     {
         // The camera target needs to be 'smooth moved', otherwise
         // there will be a noticable jump in the first frame

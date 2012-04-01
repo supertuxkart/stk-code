@@ -29,6 +29,7 @@
 #include "items/item.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -338,7 +339,7 @@ void PlayerController::update(float dt)
         return;
     }
 
-    if ( m_controls->m_fire && !m_kart->playingEmergencyAnimation())
+    if ( m_controls->m_fire && !m_kart->getKartAnimation())
     {
         if (m_kart->getPowerup()->getType()==PowerupManager::POWERUP_NOTHING) 
             m_kart->beep();
@@ -365,10 +366,10 @@ void PlayerController::update(float dt)
     // up sitting on a brick wall, with all wheels in the air :((
     if ( m_controls->m_rescue )
     {
-        m_kart->rescue();
+        new RescueAnimation(m_kart);
         m_controls->m_rescue=false;
     }
-    if (m_kart->playingEmergencyAnimation() && 
+    if (m_kart->getKartAnimation() && 
         m_kart->getAttachment()->getType() != Attachment::ATTACH_TINYTUX)
     {
         m_bzzt_sound->play();

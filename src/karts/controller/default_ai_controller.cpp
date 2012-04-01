@@ -43,6 +43,7 @@
 #include "karts/controller/kart_control.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
+#include "karts/rescue_animation.hpp"
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "modes/linear_world.hpp"
@@ -194,7 +195,7 @@ void DefaultAIController::update(float dt)
 	// If the kart needs to be rescued, do it now (and nothing else)
 	if(isStuck())
 	{
-		m_kart->rescue();
+		new RescueAnimation(m_kart);
 		AIBaseController::update(dt);
 		return;
 	}
@@ -458,7 +459,7 @@ void DefaultAIController::handleSteering(float dt)
 void DefaultAIController::handleItems(const float dt)
 {
     m_controls->m_fire = false;
-    if(m_kart->playingEmergencyAnimation() || 
+    if(m_kart->getKartAnimation() || 
         m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING ) 
         return;
 
@@ -743,13 +744,13 @@ void DefaultAIController::handleRaceStart()
 void DefaultAIController::handleRescue(const float dt)
 {
     // check if kart is stuck
-    if(m_kart->getSpeed()<2.0f && !m_kart->playingEmergencyAnimation() && 
+    if(m_kart->getSpeed()<2.0f && !m_kart->getKartAnimation() && 
         !m_world->isStartPhase())
     {
         m_time_since_stuck += dt;
         if(m_time_since_stuck > 2.0f)
         {
-            m_kart->rescue();
+            new RescueAnimation(m_kart);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }

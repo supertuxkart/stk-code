@@ -21,6 +21,7 @@
 #include "animations/three_d_animation.hpp"
 #include "config/user_config.hpp"
 #include "karts/kart_properties.hpp"
+#include "karts/rescue_animation.hpp"
 #include "network/race_state.hpp"
 #include "graphics/stars.hpp"
 #include "physics/btKart.hpp"
@@ -73,12 +74,20 @@ Physics::~Physics()
 
 // ----------------------------------------------------------------------------
 /** Adds a kart to the physics engine.
- *  This adds the rigid body, the vehicle, and the upright constraint.
+ *  This adds the rigid body, the vehicle, and the upright constraint, but only
+ *  if the kart is not already in the physics world.
  *  \param kart The kart to add.
  *  \param vehicle The raycast vehicle object.
  */
 void Physics::addKart(const AbstractKart *kart)
 {
+	const btCollisionObjectArray &all_objs = 
+		m_dynamics_world->getCollisionObjectArray();
+	for(unsigned int i=0; i<(unsigned int)all_objs.size(); i++)
+	{
+		if(btRigidBody::upcast(all_objs[i])== kart->getBody())
+			return;
+	}
     m_dynamics_world->addRigidBody(kart->getBody());
     m_dynamics_world->addVehicle(kart->getVehicle());
     m_dynamics_world->addConstraint(kart->getUprightConstraint());
@@ -145,7 +154,7 @@ void Physics::update(float dt)
             if(obj->isCrashReset())
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
-                kart->rescue();
+                new RescueAnimation(kart);
             }
             continue;
         }
@@ -157,7 +166,7 @@ void Physics::update(float dt)
             if(anim->isCrashReset())
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
-                kart->rescue();
+                new RescueAnimation(kart);
             }
             continue;
 

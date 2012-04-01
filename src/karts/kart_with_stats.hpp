@@ -71,9 +71,8 @@ public:
                                const btTransform& init_transform);
     virtual void update(float dt);
     virtual void reset();
-    virtual void handleExplosion(const Vec3& pos, bool direct_hit);
-    virtual void forceRescue(bool is_auto_rescue=false);
     virtual void collectedItem(Item *item, int add_info);
+    virtual void setKartAnimation(AbstractKartAnimation *ka);
 
     /** Returns the top speed of this kart. */
     float getTopSpeed() const { return m_top_speed; }

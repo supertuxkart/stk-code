@@ -36,6 +36,7 @@
 #include "io/xml_node.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/explosion_animation.hpp"
 #include "modes/world.hpp"
 #include "network/flyable_info.hpp"
 #include "tracks/track.hpp"
@@ -216,7 +217,7 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
         // it is not considered a target anymore.
         if(kart->isEliminated() || kart == m_owner || 
             kart->isInvulnerable()                 ||
-            kart->playingEmergencyAnimation() ) continue;
+            kart->getKartAnimation()                   ) continue;
         btTransform t=kart->getTrans();
 
         Vec3 delta      = t.getOrigin()-trans_projectile.getOrigin();
@@ -476,8 +477,9 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object)
         // rockets on short distance.
         if(m_owner!=kart || m_owner==kart_hit)
         {
-            // Set a flag it if was a direct hit.
-            kart->explode(getXYZ(), kart==kart_hit);
+            // The explosion animation will register itself with the kart
+            // and will free it later.
+            ExplosionAnimation::create(kart, getXYZ(), kart==kart_hit);
             if(kart==kart_hit && world->getTrack()->isArena())
             {
                 world->kartHit(kart->getWorldKartId());

@@ -43,6 +43,7 @@
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
+#include "karts/rescue_animation.hpp"
 #include "karts/max_speed.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
@@ -357,7 +358,7 @@ void NewAIController::handleSteering(float dt)
 void NewAIController::handleItems( const float DELTA, const int STEPS )
 {
     m_controls->m_fire = false;
-    if(m_kart->playingEmergencyAnimation() || 
+    if(m_kart->getKartAnimation()  || 
         m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING ) 
         return;
 
@@ -571,13 +572,13 @@ void NewAIController::handleRaceStart()
 void NewAIController::handleRescue(const float DELTA)
 {
     // check if kart is stuck
-    if(m_kart->getSpeed()<2.0f && !m_kart->playingEmergencyAnimation() &&
+    if(m_kart->getSpeed()<2.0f && !m_kart->getKartAnimation() &&
         !m_world->isStartPhase())
     {
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)
         {
-            m_kart->rescue();
+            new RescueAnimation(m_kart);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }

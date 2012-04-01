@@ -389,9 +389,9 @@ void SlipStream::update(float dt)
         m_target_kart= world->getKart(i);
         // Don't test for slipstream with itself, a kart that is being
         // rescued or exploding, or an eliminated kart
-        if(m_target_kart==m_kart                       || 
-            m_target_kart->playingEmergencyAnimation() ||
-            m_target_kart->isEliminated()                ) continue;
+        if(m_target_kart==m_kart               || 
+            m_target_kart->getKartAnimation()  ||
+            m_target_kart->isEliminated()        ) continue;
 
         float diff = fabsf(m_target_kart->getXYZ().getY() 
                            - m_kart->getXYZ().getY()      );

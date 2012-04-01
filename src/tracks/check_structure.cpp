@@ -100,6 +100,7 @@ void CheckStructure::update(float dt)
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         const Vec3 &xyz = world->getKart(i)->getXYZ();
+        if(world->getKart(i)->getKartAnimation()) continue;
         // Only check active checklines.
         if(m_is_active[i] && isTriggered(m_previous_position[i], xyz, i))
         {

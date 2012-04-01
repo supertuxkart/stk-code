@@ -41,6 +41,7 @@
 
 #include "karts/abstract_kart.hpp"
 #include "karts/max_speed.hpp"
+#include "karts/rescue_animation.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
@@ -226,13 +227,13 @@ void EndController::handleSteering(float dt)
 void EndController::handleRescue(const float DELTA)
 {
     // check if kart is stuck
-    if(m_kart->getSpeed()<2.0f && !m_kart->playingEmergencyAnimation() &&
+    if(m_kart->getSpeed()<2.0f && !m_kart->getKartAnimation() &&
         !m_world->isStartPhase())
     {
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)
         {
-            m_kart->rescue();
+            new RescueAnimation(m_kart);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }

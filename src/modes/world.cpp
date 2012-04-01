@@ -831,8 +831,7 @@ AbstractKart *World::getLocalPlayerKart(unsigned int n) const
 
 //-----------------------------------------------------------------------------
 /** Remove (eliminate) a kart from the race */
-void World::eliminateKart(int kart_number, bool notify_of_elimination, 
-                          bool remove)
+void World::eliminateKart(int kart_number, bool notify_of_elimination)
 {
     AbstractKart *kart = m_karts[kart_number];
     
@@ -870,7 +869,7 @@ void World::eliminateKart(int kart_number, bool notify_of_elimination,
     // ignored in all loops). Important:world->getCurrentNumKarts() returns
     // the number of karts still racing. This value can not be used for loops
     // over all karts, use race_manager->getNumKarts() instead!
-    kart->eliminate(remove);
+    kart->eliminate();
     m_eliminated_karts++;
 
 }   // removeKart

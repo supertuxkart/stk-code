@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Joerg Henrichs
+//  Copyright (C) 2012 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,15 +16,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_KART_ANIMATION_HPP
-#define HEADER_KART_ANIMATION_HPP
+#ifndef HEADER_EXPLOSION_ANIMATION_HPP
+#define HEADER_EXPLOSION_ANIMATION_HPP
 
-#include "karts/i_kart_animation.hpp"
+#include "karts/abstract_kart_animation.hpp"
 #include "utils/vec3.hpp"
-
-class Kart;
-class Referee;
-class Stars;
 
 /** 
  * \brief This class is a 'mixin' for kart, and handles the animated explosion.
@@ -38,7 +34,7 @@ class Stars;
  *  explosion happens.
  * \ingroup karts
  */
-class KartAnimation: public I_KartAnimation
+class ExplosionAnimation: public AbstractKartAnimation
 {
 protected:
     /** The coordinates where the kart was hit originally. */
@@ -52,41 +48,23 @@ protected:
     Vec3 m_add_rotation;
 
     /** The velocity with which the kart is moved. */
-    Vec3 m_velocity;
-
-    /** Timer for the explosion. */
-    float m_timer;
+    float m_velocity;
 
     /** Duration for this explosion. This can potentially be set
      *  with different values for different karts, or depending
      *  on difficulty (so that on easy you can drive again earlier. */
     float m_duration;
 
-    /** A pointer to the class to which this object belongs. */
-    Kart *m_kart;
-
-    /** For stars rotating around head effect */
-    Stars        *m_stars_effect;
-    
-    /** The referee during a rescue operation. */
-    Referee      *m_referee;
-
-    /** Different kart modes: normal racing, being rescued, showing end
-     *  animation, explosions, kart eliminated, shooting. */
-    enum {KA_NONE, KA_RESCUE, KA_EXPLOSION, KA_SHOOTING}
-          m_kart_mode;
+    ExplosionAnimation(AbstractKart *kart);
+    ExplosionAnimation(AbstractKart *kart, const Vec3 &pos,
+                       bool direct_hit);
 public:
-                 KartAnimation(Kart *kart);
-    virtual     ~KartAnimation();
-    void         reset();
-    virtual void explode(const Vec3& pos, bool direct_hit);
-    virtual void rescue(bool is_auto_rescue=false);
-	virtual void shootTo(const Vec3 &target, float speed);
-    void         update(float dt);
-    void         eliminate();
-    // ------------------------------------------------------------------------
-    /** Returns a pointer to the stars effect. */
-    const Stars *getStarEffect   () const {return m_stars_effect; }
-    
-};   // KartAnimationAll
+    static ExplosionAnimation *create(AbstractKart *kart, const Vec3 &pos,
+                                      bool direct_hit);
+    static ExplosionAnimation *create(AbstractKart *kart);
+
+    virtual ~ExplosionAnimation();
+    virtual void update(float dt);
+    virtual const std::string getName() const { return "Explosion"; }
+};   // ExplosionAnimation
 #endif

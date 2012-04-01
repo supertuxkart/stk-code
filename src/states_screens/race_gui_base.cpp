@@ -39,10 +39,14 @@
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup.hpp"
-#include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/abstract_kart_animation.hpp"
+#include "karts/canon_animation.hpp"
+#include "karts/controller/controller.hpp"
+#include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/rescue_animation.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
@@ -788,7 +792,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
         unsigned int kart_id = kart->getWorldKartId();
         
         //x,y is the target position
-        int lap = info[kart->getWorldKartId()].lap;
+        int lap = info[kart_id].lap;
         
         // In battle mode there is no distance along track etc.
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
@@ -801,8 +805,10 @@ void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
             LinearWorld *linear_world      = (LinearWorld*)(World::getWorld());
             
             float distance = linear_world->getDistanceDownTrackForKart(kart_id)
-            + linear_world->getTrack()->getTrackLength()*lap;
-            if ((position>1) && (previous_distance-distance<m_dist_show_overlap) && (!kart->hasFinishedRace()))
+                           + linear_world->getTrack()->getTrackLength()*lap;
+            if ((position>1) && 
+                (previous_distance-distance<m_dist_show_overlap) &&
+                (!kart->hasFinishedRace())                          )
             {
                 //linear translation : form (0,ICON_PLAYER_WIDTH+2) to 
                 // (previous_x-x_base+(ICON_PLAYER_WIDTH+2)/2,0)
@@ -897,8 +903,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
         }
         
         // Fixes crash bug, why are certain icons not showing up?
-        if ((icon != NULL) && (!kart->playingEmergencyAnimation()) && 
-            (!kart->isSquashed())                                     )
+        if (icon  && !kart->getKartAnimation() && !kart->isSquashed())
         {
             const core::rect<s32> rect(core::position2d<s32>(0,0),
                                        icon->getOriginalSize());
@@ -906,12 +911,13 @@ void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
                                                       NULL, NULL, true);
         }
         
-        //draw status info
+        //draw status info - icon fade out in case of rescue/explode
         
-        if ((icon != NULL) && (kart->playingRescueAnimation()))
+        if (icon  && dynamic_cast<RescueAnimation*>(kart->getKartAnimation()))
         {
             //icon fades to the left
-            float t_anim=100*sin(0.5f*M_PI*kart->getAnimationTimer());
+            float t = kart->getKartAnimation()->getAnimationTimer();
+            float t_anim=100*sin(0.5f*M_PI*t);
             const core::rect<s32> rect1(core::position2d<s32>(0,0), 
                                         icon->getOriginalSize());
             const core::rect<s32> pos1((int)(x-t_anim), y, 
@@ -920,7 +926,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
                                                       NULL, NULL, true);
         }
         
-        if ((icon != NULL) && (!kart->playingEmergencyAnimation()) && (kart->isSquashed()))
+        if (icon  && !kart->getKartAnimation() && kart->isSquashed() )
         {
             //syncs icon squash with kart squash
             const core::rect<s32> destRect(core::position2d<s32>(x,y+w/4),
@@ -932,10 +938,12 @@ void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
                                                       true);
         }
         
-        if ((icon != NULL) && (kart->playingExplosionAnimation()))
+        if (icon  && 
+            dynamic_cast<ExplosionAnimation*>(kart->getKartAnimation()) )
         {
             //exploses into 4 parts
-            float t_anim=50.0f*sin(0.5f*M_PI*kart->getAnimationTimer());
+            float t = kart->getKartAnimation()->getAnimationTimer();
+            float t_anim=50.0f*sin(0.5f*M_PI*t);
             u16 icon_size_x=icon->getOriginalSize().Width;
             u16 icon_size_y=icon->getOriginalSize().Height;
             

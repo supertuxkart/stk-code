@@ -151,8 +151,7 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
         if(wheels[1]) wheels[1]->setVisible(false);
         if(wheels[2]) wheels[2]->setVisible(false);
         if(wheels[3]) wheels[3]->setVisible(false);
-        eliminateKart(kart_id, /*notify_of_elimination*/ true,
-                      /*remove*/true);
+        eliminateKart(kart_id, /*notify_of_elimination*/ true);
         m_insert_tire = 4;
     }
     

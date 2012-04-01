@@ -39,13 +39,16 @@
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
+#include "graphics/stars.hpp"
+#include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
+#include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"
 #include "karts/controller/end_controller.hpp"
-#include "karts/kart_animation.hpp"
+#include "karts/abstract_kart_animation.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/max_speed.hpp"
@@ -82,7 +85,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
 #  pragma warning(1:4355)
 #endif
 {
-    m_kart_animation       = new KartAnimation(this);
     m_max_speed            = new MaxSpeed(this);
     m_terrain_info         = new TerrainInfo();
     m_powerup              = new Powerup(this);
@@ -139,6 +141,14 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_skid_sound    = sfx_manager->createSoundSource( "skid"  );
     m_terrain_sound          = NULL;
     m_previous_terrain_sound = NULL;
+
+    // Create the stars effect
+    m_stars_effect =
+        new Stars(getNode(),
+                  core::vector3df(0.0f, 
+                                  getKartModel()->getModel()
+                                        ->getBoundingBox().MaxEdge.Y,
+                                  0.0f)                               );
 
 }   // Kart
 
@@ -242,7 +252,6 @@ Kart::~Kart()
     }
     delete m_skidding;
     delete m_max_speed;
-    delete m_kart_animation;
     delete m_terrain_info;
     delete m_powerup;
 
@@ -264,8 +273,9 @@ void Kart::reset()
         m_flying = false;
         stopFlying();
     }
-    
-    m_kart_animation->reset();
+
+    // Reset star effect in case that it is currently being shown.
+    m_stars_effect->reset();
     m_max_speed->reset();
     m_powerup->reset();
 
@@ -297,6 +307,7 @@ void Kart::reset()
 
     m_race_position        = m_initial_position;
     m_finished_race        = false;
+    m_eliminated           = false;
     m_finish_time          = 0.0f;
     m_bubblegum_time       = 0.0f;
     m_invulnerable_time    = 0.0f;
@@ -342,7 +353,7 @@ void Kart::reset()
 
     applyEngineForce (0.0f);
 
-    Moveable::reset();
+    AbstractKart::reset();
     if (m_skidmarks)
     {
         m_skidmarks->reset();
@@ -392,31 +403,6 @@ float Kart::getSpeedIncreaseTimeLeft(unsigned int category) const
 {
     return m_max_speed->getSpeedIncreaseTimeLeft(category);
 }   // getSpeedIncreaseTimeLeft
-// -----------------------------------------------------------------------------
-bool Kart::playingRescueAnimation() const
-{
-    return m_kart_animation->playingRescueAnimation();
-}   // playingRescueAnimation
-
-// -----------------------------------------------------------------------------
-bool Kart::playingExplosionAnimation() const
-{
-    return m_kart_animation->playingExplosionAnimation();
-}   // playingExplosionAnimation
-
-// -----------------------------------------------------------------------------
-/** Returns the timer for the currently played animation. */
-float Kart::getAnimationTimer() const
-{
-    return m_kart_animation->getAnimationTimer();
-}   // getAnimationTimer
-
-// -----------------------------------------------------------------------------
-/** Returns true if an emergency animation is being played. */
-bool Kart::playingEmergencyAnimation() const
-{
-    return m_kart_animation->playingAnimation();
-}   // playingEmergencyAnimation
 
 // -----------------------------------------------------------------------------
 /** Returns the current material the kart is on. */
@@ -881,7 +867,7 @@ float Kart::getActualWheelForce()
 bool Kart::isOnGround() const
 {
     return ((int)m_vehicle->getNumWheelsOnGround() == m_vehicle->getNumWheels()
-          && !playingEmergencyAnimation());
+          && !getKartAnimation());
 }   // isOnGround
 
 //-----------------------------------------------------------------------------
@@ -899,46 +885,31 @@ bool Kart::isNearGround() const
 }   // isNearGround
 
 //-----------------------------------------------------------------------------
-/** Returns true if the kart is eliminated. 
+/** Shows the star effect for a certain time. 
+ *  \param t Time to show the star effect for.
  */
-bool Kart::isEliminated() const 
+void Kart::showStarEffect(float t)
 {
-    return m_kart_animation->isEliminated(); 
-}   // isEliminated
-// ------------------------------------------------------------------------
-void Kart::eliminate(bool remove)
+    m_stars_effect->showFor(t);
+}   // showStarEffect
+
+//-----------------------------------------------------------------------------
+void Kart::eliminate()
 {
-    m_kart_animation->eliminate(remove); 
+    if (!getKartAnimation())
+    {
+        World::getWorld()->getPhysics()->removeKart(this);
+    }
+    if (m_stars_effect)
+    {
+        m_stars_effect->reset();
+        m_stars_effect->update(1);
+    }    
+
+    m_eliminated = true;
+    
+    m_node->setVisible(false);
 }   // eliminate
-// ------------------------------------------------------------------------
-/** Starts an explosion animation.
- *  \param pos The coordinates of the explosion.
- *  \param direct_hig True if the kart was hit directly --> maximal impact.
- */
-void Kart::explode(const Vec3& pos, bool direct_hit)
-{
-	m_kart_animation->explode(pos, direct_hit);
-}   // explode
-
-//-----------------------------------------------------------------------------
-/** Sets the mode of the kart to being rescued, attaches the rescue model
- *  and saves the current pitch and roll (for the rescue animation). It
- *  also removes the kart from the physics world.
- */
-void Kart::rescue(bool is_auto_rescue)
-{
-    m_kart_animation->rescue(is_auto_rescue);
-}   // rescue
-
-//-----------------------------------------------------------------------------
-/** Starts a 'shooting' animation to a specific point.
- *  \param target The coordinates to fly to
- *  \param speed The speed to use when flying.
- */
-void Kart::shootTo(const Vec3 &target, float speed)
-{
-	m_kart_animation->shootTo(target, speed);
-}   // shootTo
 
 //-----------------------------------------------------------------------------
 /** Updates the kart in each time step. It updates the physics setting,
@@ -947,7 +918,13 @@ void Kart::shootTo(const Vec3 &target, float speed)
  */
 void Kart::update(float dt)
 {
-    if (m_kart_animation->isEliminated())
+    if ( UserConfigParams::m_graphical_effects )
+    {
+        // update star effect (call will do nothing if stars are not activated)
+        m_stars_effect->update(dt);
+    }
+
+    if (isEliminated())
     {
         m_kart_animation->update(dt);
         return;
@@ -1002,7 +979,7 @@ void Kart::update(float dt)
 
     // On a client fiering is done upon receiving the command from the server.
     if ( m_controls.m_fire && network_manager->getMode()!=NetworkManager::NW_CLIENT
-        && !playingEmergencyAnimation())
+        && !getKartAnimation())
     {
         // use() needs to be called even if there currently is no collecteable
         // since use() can test if something needs to be switched on/off.
@@ -1044,7 +1021,8 @@ void Kart::update(float dt)
     m_wheel_rotation += m_speed*dt / m_kart_properties->getWheelRadius();
     m_wheel_rotation=fmodf(m_wheel_rotation, 2*M_PI);
 
-    m_kart_animation->update(dt);
+    if(m_kart_animation)
+        m_kart_animation->update(dt);
 
     m_attachment->update(dt);
 
@@ -1076,9 +1054,10 @@ void Kart::update(float dt)
     m_skid_sound->position   ( getXYZ() );
 
     // Check if a kart is (nearly) upside down and not moving much --> automatic rescue
-    if((fabs(getRoll())>60*DEGREE_TO_RAD && fabs(getSpeed())<3.0f) )
+    if(!getKartAnimation() && fabs(getRoll())>60*DEGREE_TO_RAD && 
+                              fabs(getSpeed())<3.0f                )
     {
-        rescue(/*is_auto_rescue*/true);
+        new RescueAnimation(this, /*is_auto_rescue*/true);
     }
 
     btTransform trans=getTrans();
@@ -1112,13 +1091,13 @@ void Kart::update(float dt)
         const Vec3 *min, *max;
         World::getWorld()->getTrack()->getAABB(&min, &max);
         if(min->getY() - getXYZ().getY() > 17 && !m_flying)
-            rescue();
+            new RescueAnimation(this);
     }
     else
     {
         handleMaterialSFX(material);
         if     (material->isDriveReset() && isOnGround())
-            rescue();
+            new RescueAnimation(this);
         else if(material->isZipper()     && isOnGround())
         {
             handleZipper(material);
@@ -1154,7 +1133,7 @@ void Kart::update(float dt)
                             (m_bubblegum_time > 0 ? &pink : NULL) );
     }
     
-    const bool emergency = playingEmergencyAnimation();
+    const bool emergency = getKartAnimation()!=NULL;
     
     if (emergency)
     {
@@ -1202,7 +1181,7 @@ void Kart::setSquash(float time, float slowdown)
     
     if(m_attachment->getType()==Attachment::ATTACH_BOMB)
     {
-        explode(getXYZ(), /*direct hit*/true);
+        ExplosionAnimation::create(this);
         return;
     }
     m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
@@ -1296,7 +1275,7 @@ void Kart::handleMaterialGFX()
     // something with the wheels, and the material has not the
     // below surface property set.
     if (material && isOnGround() && !material->isBelowSurface() && 
-        !m_kart_animation->playingRescueAnimation()&& 
+        !dynamic_cast<RescueAnimation*>(getKartAnimation())      && 
         UserConfigParams::m_graphical_effects)
     {
 
@@ -1353,7 +1332,7 @@ void Kart::handleMaterialGFX()
     const ParticleKind *pk = 
         surface_material->getParticlesWhen(Material::EMIT_ON_DRIVE);
 
-    if(!pk || m_flying || m_kart_animation->playingRescueAnimation())
+    if(!pk || m_flying || dynamic_cast<RescueAnimation*>(getKartAnimation()))
         return;
 
     // Now the kart is under a surface, and there is a surface effect
@@ -1371,7 +1350,7 @@ void Kart::handleMaterialGFX()
     // Play special sound effects for this terrain
     // -------------------------------------------
     const std::string s = surface_material->getSFXName();
-    if (s != "" && !m_kart_animation->playingRescueAnimation()&&
+    if (s != "" && !dynamic_cast<RescueAnimation*>(getKartAnimation())&&
         (m_terrain_sound == NULL || m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
     {
         if (m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
@@ -1566,7 +1545,7 @@ void Kart::crashed(const Material *m)
      *  for 0.5 seconds after a crash.
      */
     if(m && m->getCollisionReaction() != Material::NORMAL && 
-        !playingEmergencyAnimation())
+        !getKartAnimation())
     {
         std::string particles = m->getCrashResetParticles();
         if (particles.size() > 0)
@@ -1596,7 +1575,7 @@ void Kart::crashed(const Material *m)
         
         if (m->getCollisionReaction() == Material::RESCUE)
         {
-            rescue();
+            new RescueAnimation(this);
         }
         else if (m->getCollisionReaction() == Material::PUSH_BACK)
         {

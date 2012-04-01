@@ -18,7 +18,8 @@
 
 #include "karts/kart_with_stats.hpp"
 
-#include "karts/kart_animation.hpp"
+#include "karts/explosion_animation.hpp"
+#include "karts/rescue_animation.hpp"
 #include "items/item.hpp"
 
 KartWithStats::KartWithStats(const std::string& ident, 
@@ -62,45 +63,24 @@ void KartWithStats::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
-/** Called when an explosion should be triggered. If the explosion actually
- *  happens (i.e. the kart is neither invulnerable nor is it already playing
- *  an emergency animation), it increases the number of times a kart was
- *  exploded, and adds up the overall time spent in animation as well.
- *  \param pos The position of the explosion.
- *  \param direct_hit If the kart was hit directly, or if this is only a
- *         seconday hit.
+/** Overloading setKartAnimation with a kind of listener function in order
+ *  to gather statistics about rescues and explosions.
  */
-void KartWithStats::handleExplosion(const Vec3& pos, bool direct_hit)
+void KartWithStats::setKartAnimation(AbstractKartAnimation *ka) 
 {
-    bool is_new_explosion = !playingEmergencyAnimation() && !isInvulnerable();
-    Kart::explode(pos, direct_hit);
-    // If a kart is too far away from an explosion to be affected, its timer
-    // will be 0, and this should then not be counted as an explosion.
-    if(is_new_explosion && m_kart_animation->getAnimationTimer()>0)
+    bool is_new_explosion = !getKartAnimation() && !isInvulnerable();
+    Kart::setKartAnimation(ka);
+    if(dynamic_cast<ExplosionAnimation*>(ka))
     {
         m_explosion_count ++;
-        m_explosion_time += m_kart_animation->getAnimationTimer();
+        m_explosion_time += ka->getAnimationTimer();
     }
-
-}   // handleExplosion
-
-// ----------------------------------------------------------------------------
-/** Called when a kart is being rescued. It counts the number of times a
- *  kart is being rescued, and sums up the time for rescue as well.
- *  \param is_auto_rescue True if this is an automatically triggered rescue.
- */
-void KartWithStats::forceRescue(bool is_auto_rescue)
-{
-    bool is_new_rescue = !playingEmergencyAnimation();
-    Kart::rescue(is_auto_rescue);
-
-    // If there wasn't already a rescue happening, count this event:
-    if(is_new_rescue)
+    else if(dynamic_cast<RescueAnimation*>(ka))
     {
-        m_rescue_count++;
-        m_rescue_time += m_kart_animation->getAnimationTimer();
+        m_rescue_count ++;
+        m_rescue_time += ka->getAnimationTimer();
     }
-}   // forceRescue
+}   // setKartAnimation
 
 // ----------------------------------------------------------------------------
 /** Called when an item is collected. It will increment private variables that

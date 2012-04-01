@@ -34,6 +34,7 @@
 #include "items/attachment.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "karts/abstract_kart.hpp"
@@ -301,7 +302,7 @@ void Swatter::squashThingsAround()
             if(m_kart->getController()->isPlayerController())
                 he->setPlayerKartHit();
             projectile_manager->addHitEffect(he);
-            m_kart->explode(m_kart->getXYZ(),  /*direct_hit*/ true);
+            ExplosionAnimation::create(kart);
         }   // if kart has bomb attached
         World::getWorld()->kartHit(kart->getWorldKartId());
     }   // for i < num_kartrs

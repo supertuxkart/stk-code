@@ -31,6 +31,7 @@ class btUprightConstraint;
 class Camera;
 class Controller;
 class Item;
+class AbstractKartAnimation;
 class KartModel;
 class KartProperties;
 class Material;
@@ -70,6 +71,9 @@ protected:
 
     /** The kart controls (e.g. steering, fire, ...). */
     KartControl  m_controls;
+
+    /** A kart animation object to handle rescue, explosion etc. */
+    AbstractKartAnimation *m_kart_animation;
 
 public:
                    AbstractKart(const std::string& ident, 
@@ -146,23 +150,16 @@ public:
     // ========================================================================
     // Emergency animation related functions.
     // ------------------------------------------------------------------------
-    /** Returns true if an emergency animation is being played. */
-    virtual bool playingEmergencyAnimation() const = 0;
+    /** Returns a kart animation (if any), or NULL if currently no kart
+     *  animation is being shown. */
+    AbstractKartAnimation *getKartAnimation() { return m_kart_animation; }
     // ------------------------------------------------------------------------
-    /** Returns true if an emergency animation is being played. */
-    virtual bool playingExplosionAnimation() const = 0;
+    const AbstractKartAnimation *getKartAnimation() const 
+                                                   { return m_kart_animation; }
     // ------------------------------------------------------------------------
-    /** Returns true if an emergency animation is being played. */
-    virtual bool playingRescueAnimation() const = 0;
+    /** Sets a new kart animation. */
+    void setKartAnimation(AbstractKartAnimation *ka);
     // ------------------------------------------------------------------------
-    virtual void explode(const Vec3& pos, bool direct_hit) = 0;
-    // ------------------------------------------------------------------------
-    virtual void rescue(bool is_auto_rescue=false) = 0;
-    // ------------------------------------------------------------------------
-	virtual void shootTo(const Vec3 &target, float speed) = 0;
-    // ------------------------------------------------------------------------
-    /** Returns the timer for the currently played animation. */
-    virtual float getAnimationTimer() const = 0;
 
     // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
@@ -189,7 +186,7 @@ public:
     virtual bool isEliminated() const = 0;
     // ------------------------------------------------------------------------
     /** Marks this kart to be eliminated. */
-    virtual void eliminate (bool remove) = 0;
+    virtual void eliminate() = 0;
     // ------------------------------------------------------------------------
     virtual void finishedRace(float time) = 0;
     // ------------------------------------------------------------------------
@@ -364,6 +361,11 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if the kart is invulnerable. */
     virtual bool isInvulnerable() const = 0;
+    // ------------------------------------------------------------------------
+    virtual void setInvulnerableTime(float t) = 0;
+    // ------------------------------------------------------------------------
+    /** Shows the star effect for a certain time. */
+    virtual void showStarEffect(float t) = 0;
     // ------------------------------------------------------------------------
     /** Called when the kart crashes against another kart.
      *  \param k The kart that was hit.

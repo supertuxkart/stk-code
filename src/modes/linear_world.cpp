@@ -156,7 +156,7 @@ void LinearWorld::update(float dt)
 
         // Nothing to do for karts that are currently being 
         // rescued or eliminated
-        if(kart->playingEmergencyAnimation()) continue;
+        if(kart->getKartAnimation()) continue;
 
         kart_info.getSector()->update(kart->getXYZ());
     }   // for n
@@ -801,7 +801,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i)
 {
     if(!m_karts[i]->getController()->isPlayerController()) return;
     if(!m_kart_info[i].getSector()->isOnRoad()||
-        m_karts[i]->playingEmergencyAnimation()) return;
+        m_karts[i]->getKartAnimation()) return;
 
     const AbstractKart *kart=m_karts[i];
     // If the kart can go in more than one directions from the current track
