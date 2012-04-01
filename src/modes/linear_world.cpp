@@ -241,7 +241,7 @@ void LinearWorld::newLap(unsigned int kart_index)
         kart_info.m_race_lap++ ;
     }
     // Last lap message (kart_index's assert in previous block already)
-    if(kart_info.m_race_lap+1 == lap_count)
+    if (raceHasLaps() && kart_info.m_race_lap+1 == lap_count)
     {
         m_race_gui->addMessage(_("Final lap!"), kart,
                                3.0f, video::SColor(255, 210, 100, 50), true);
@@ -267,7 +267,7 @@ void LinearWorld::newLap(unsigned int kart_index)
             }
         }
     }
-    else if (kart_info.m_race_lap > 0 && kart_info.m_race_lap+1 < lap_count)
+    else if (raceHasLaps() && kart_info.m_race_lap > 0 && kart_info.m_race_lap+1 < lap_count)
     {
         m_race_gui->addMessage(_("Lap %i", kart_info.m_race_lap+1),
                                kart, 3.0f, video::SColor(255, 210, 100, 50), 
