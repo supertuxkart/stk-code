@@ -92,13 +92,16 @@ src/items/projectile_manager.cpp
 src/items/rubber_ball.cpp
 src/items/rubber_band.cpp
 src/items/swatter.cpp
+src/karts/abstract_kart_animation.cpp
 src/karts/abstract_kart.cpp
+src/karts/canon_animation.cpp
 src/karts/controller/ai_base_controller.cpp
 src/karts/controller/controller.cpp
 src/karts/controller/default_ai_controller.cpp
 src/karts/controller/end_controller.cpp
 src/karts/controller/new_ai_controller.cpp
 src/karts/controller/player_controller.cpp
+src/karts/explosion_animation.cpp
 src/karts/ghost_kart.cpp
 src/karts/kart_animation.cpp
 src/karts/kart.cpp
@@ -109,6 +112,7 @@ src/karts/kart_properties_manager.cpp
 src/karts/kart_with_stats.cpp
 src/karts/max_speed.cpp
 src/karts/moveable.cpp
+src/karts/rescue_animation.cpp
 src/karts/skidding.cpp
 src/karts/skidding_properties.cpp
 src/main.cpp
@@ -331,7 +335,9 @@ src/items/projectile_manager.hpp
 src/items/rubber_ball.hpp
 src/items/rubber_band.hpp
 src/items/swatter.hpp
+src/karts/abstract_kart_animation.hpp
 src/karts/abstract_kart.hpp
+src/karts/canon_animation.hpp
 src/karts/controller/ai_base_controller.hpp
 src/karts/controller/controller.hpp
 src/karts/controller/default_ai_controller.hpp
@@ -339,6 +345,7 @@ src/karts/controller/end_controller.hpp
 src/karts/controller/kart_control.hpp
 src/karts/controller/new_ai_controller.hpp
 src/karts/controller/player_controller.hpp
+src/karts/explosion_animation.hpp
 src/karts/ghost_kart.hpp
 src/karts/kart_animation.hpp
 src/karts/kart_gfx.hpp
@@ -349,6 +356,7 @@ src/karts/kart_properties_manager.hpp
 src/karts/kart_with_stats.hpp
 src/karts/max_speed.hpp
 src/karts/moveable.hpp
+src/karts/rescue_animation.hpp
 src/karts/skidding.hpp
 src/karts/skidding_properties.hpp
 src/main_loop.hpp
