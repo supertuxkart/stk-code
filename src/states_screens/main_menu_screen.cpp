@@ -22,6 +22,8 @@
 #include <string>
 
 #include "addons/network_http.hpp"
+#include "challenges/game_slot.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -283,7 +285,20 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "story")
     {
-        OverWorld::enterOverWorld();
+        GameSlot* slot = unlock_manager->getCurrentSlot();
+        if (slot->isFirstTime())
+        {
+            slot->setFirstTime(false);
+            unlock_manager->save();
+            KartSelectionScreen* s = KartSelectionScreen::getInstance();
+            s->setMultiplayer(false);
+            s->setFromOverworld(true);
+            StateManager::get()->pushScreen( s );
+        }
+        else
+        {
+            OverWorld::enterOverWorld();
+        }
     }
     else if (selection == "tutorial")
     {

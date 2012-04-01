@@ -224,6 +224,10 @@ void UnlockManager::load()
         
         m_game_slots[player_name] = slot;
         
+        bool first_time = true;
+        xml_game_slots[n]->get("firstTime", &first_time);
+        slot->setFirstTime(first_time);
+        
         for(AllChallengesType::iterator i = m_all_challenges.begin(); 
             i!=m_all_challenges.end();  i++)
         {

@@ -56,12 +56,16 @@ class GameSlot
     
     int m_points;
     
+    /** Set to false after the initial stuff (intro, select kart, etc.) */
+    bool m_first_time;
+    
 public:
     
     GameSlot(const irr::core::stringw& player_name)
     {
         m_player_name = player_name;
         m_points = 0;
+        m_first_time = true;
     }
     
     const irr::core::stringw& getPlayerName() const { return m_player_name; }
@@ -89,6 +93,9 @@ public:
     void       save              (XMLWriter& file);
     
     int        getPoints          () const { return m_points; }
+    
+    void       setFirstTime(bool ft) { m_first_time = ft;   }
+    bool       isFirstTime() const   { return m_first_time; }
     
     const Challenge* getChallenge(const std::string& id) { return m_challenges_state[id]; }
 };
