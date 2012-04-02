@@ -208,6 +208,10 @@ supertuxkart_SOURCES = \
  items/swatter.hpp \
  karts/abstract_kart.cpp \
  karts/abstract_kart.hpp \
+ karts/abstract_kart_animation.cpp \
+ karts/abstract_kart_animation.hpp \
+ karts/canon_animation.cpp \
+ karts/canon_animation.hpp \
  karts/controller/ai_base_controller.cpp \
  karts/controller/ai_base_controller.hpp \
  karts/controller/controller.cpp \
@@ -221,6 +225,8 @@ supertuxkart_SOURCES = \
  karts/controller/new_ai_controller.hpp \
  karts/controller/player_controller.cpp \
  karts/controller/player_controller.hpp \
+ karts/explosion_animation.cpp \
+ karts/explosion_animation.hpp \
  karts/kart_animation.cpp \
  karts/kart_animation.hpp \
  karts/ghost_kart.cpp \
@@ -241,6 +247,8 @@ supertuxkart_SOURCES = \
  karts/max_speed.hpp \
  karts/moveable.cpp \
  karts/moveable.hpp \
+ karts/rescue_animation.cpp \
+ karts/rescue_animation.hpp \
  karts/skidding.cpp \
  karts/skidding.hpp \
  karts/skidding_properties.cpp \
