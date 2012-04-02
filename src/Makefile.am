@@ -227,8 +227,6 @@ supertuxkart_SOURCES = \
  karts/controller/player_controller.hpp \
  karts/explosion_animation.cpp \
  karts/explosion_animation.hpp \
- karts/kart_animation.cpp \
- karts/kart_animation.hpp \
  karts/ghost_kart.cpp \
  karts/ghost_lart.hpp \
  karts/kart.cpp \
