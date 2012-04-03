@@ -23,7 +23,7 @@
 
 #include "io/xml_node.hpp"
 #include "tracks/ambient_light_sphere.hpp"
-#include "tracks/check_canon.hpp"
+#include "tracks/check_cannon.hpp"
 #include "tracks/check_lap.hpp"
 #include "tracks/check_line.hpp"
 #include "tracks/check_structure.hpp"
@@ -48,9 +48,9 @@ void CheckManager::load(const XMLNode &node)
         {
             m_all_checks.push_back(new CheckLap(*check_node, i));
         }
-		else if(type=="canon")
+		else if(type=="cannon")
 		{
-			m_all_checks.push_back(new CheckCanon(*check_node, i));
+			m_all_checks.push_back(new CheckCannon(*check_node, i));
 		}
         else if(type=="check-sphere")
         {

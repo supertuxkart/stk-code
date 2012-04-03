@@ -16,14 +16,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "karts/canon_animation.hpp"
+#include "karts/cannon_animation.hpp"
 
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 
 #include "LinearMath/btTransform.h"
 
-CanonAnimation::CanonAnimation(AbstractKart *kart, const Vec3 &target, 
+CannonAnimation::CannonAnimation(AbstractKart *kart, const Vec3 &target, 
                                float speed)
              : AbstractKartAnimation(kart)
 {
@@ -42,24 +42,24 @@ CanonAnimation::CanonAnimation(AbstractKart *kart, const Vec3 &target,
     m_add_rotation.setHeading(0);
     m_add_rotation.setPitch(  0);
     m_add_rotation.setRoll(   0);
-}   // CanonAnimation
+}   // CannonAnimation
 
 // ----------------------------------------------------------------------------
-CanonAnimation::~CanonAnimation()
+CannonAnimation::~CannonAnimation()
 {
     btTransform trans = m_kart->getTrans();
     trans.setOrigin(m_xyz);
     m_kart->setTrans(trans);
     m_kart->getBody()->setCenterOfMassTransform(trans);
     World::getWorld()->getPhysics()->addKart(m_kart);
-}   // ~CanonAnimation
+}   // ~CannonAnimation
 
 // ----------------------------------------------------------------------------
 /** Updates the kart animation.
  *  \param dt Time step size.
  *  \return True if the explosion is still shown, false if it has finished.
  */
-void CanonAnimation::update(float dt)
+void CannonAnimation::update(float dt)
 {
     m_xyz += dt*m_velocity;
     m_kart->setXYZ(m_xyz);

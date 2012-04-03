@@ -40,7 +40,7 @@ class CheckManager;
  *  CT_ACTIVATE:  Activates the specified other check structures.
  *  CT_TOGGLE:    Toggles the specified other check structures (active to 
  *                inactive and vice versa.
- *  CT_CANON:     A check line that 'shoots' the kart to a specified location.
+ *  CT_CANNON:    A check line that 'shoots' the kart to a specified location.
  *  Each check structure can be active or inactive. Only lap counters are
  *  initialised to be active, all other check structures are inactive.
  *
@@ -54,14 +54,14 @@ public:
      *            the state that check structure is in)
      *  TOGGLE:   Switches (inverts) the state of another check structure.
      *  NEW_LAP:  On crossing a new lap is counted.
-	 *  CANON:    Causes the kart to be shot to a specified point.
+	 *  CANNON:   Causes the kart to be shot to a specified point.
      *  AMBIENT_SPHERE: Modifies the ambient color.
      *  A combination of an activate and new_lap line are used to
      *  avoid shortcuts: a new_lap line is deactivated after crossing it, and
      *  you have to cross a corresponding activate structure to re-activate it,
      *  enabling you to count the lap again.
      */
-    enum CheckType {CT_NEW_LAP, CT_ACTIVATE, CT_TOGGLE, CT_CANON,
+    enum CheckType {CT_NEW_LAP, CT_ACTIVATE, CT_TOGGLE, CT_CANNON,
 		            CT_AMBIENT_SPHERE};
 
 protected:

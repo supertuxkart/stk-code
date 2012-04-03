@@ -26,7 +26,7 @@
 
 class AbstractKart;
 
-/** The base class for all kart animation, like rescue, explosion, or canon.
+/** The base class for all kart animation, like rescue, explosion, or cannon.
  *  Kart animations are done by removing the physics body from the physics 
  *  world, and instead modifying the rotation and position of the kart
  *  directly. They are registered with the kart, and only one can be

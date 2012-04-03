@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CANON_ANIMATION_HPP
-#define HEADER_CANON_ANIMATION_HPP
+#ifndef HEADER_CANNON_ANIMATION_HPP
+#define HEADER_CANNON_ANIMATION_HPP
 
 #include "karts/abstract_kart_animation.hpp"
 #include "utils/vec3.hpp"
@@ -29,7 +29,7 @@
 
 class AbstractKart;
 
-class CanonAnimation: public AbstractKartAnimation
+class CannonAnimation: public AbstractKartAnimation
 {
 protected:
     /** The coordinates where the kart was hit originally. */
@@ -51,11 +51,11 @@ protected:
     float m_duration;
 
 public:
-             CanonAnimation(AbstractKart *kart, const Vec3 &target, 
+             CannonAnimation(AbstractKart *kart, const Vec3 &target, 
                            float speed);
-    virtual ~CanonAnimation();
+    virtual ~CannonAnimation();
     virtual void  update(float dt);
-    virtual const std::string getName() const {return "Canon";}
+    virtual const std::string getName() const {return "Cannon";}
     
-};   // CanonAnimation
+};   // CannonAnimation
 #endif

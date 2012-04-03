@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CHECK_CANON_HPP
-#define HEADER_CHECK_CANON_HPP
+#ifndef HEADER_CHECK_CANNON_HPP
+#define HEADER_CHECK_CANNON_HPP
 
 #include "tracks/check_line.hpp"
 
@@ -30,7 +30,7 @@ class CheckManager;
  *
  * \ingroup tracks
  */
-class CheckCanon : public CheckLine
+class CheckCannon : public CheckLine
 {
 private:
 	/** The target point the kart will fly to. */
@@ -40,7 +40,7 @@ private:
 	float m_speed;
 
 public:
-                 CheckCanon(const XMLNode &node, unsigned int index);
+                 CheckCannon(const XMLNode &node, unsigned int index);
     virtual void trigger(unsigned int kart_index);
 };   // CheckLine
 

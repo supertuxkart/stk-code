@@ -94,7 +94,7 @@ src/items/rubber_band.cpp
 src/items/swatter.cpp
 src/karts/abstract_kart_animation.cpp
 src/karts/abstract_kart.cpp
-src/karts/canon_animation.cpp
+src/karts/cannon_animation.cpp
 src/karts/controller/ai_base_controller.cpp
 src/karts/controller/controller.cpp
 src/karts/controller/default_ai_controller.cpp
@@ -205,7 +205,7 @@ src/tinygettext/stk_file_system.cpp
 src/tinygettext/tinygettext.cpp
 src/tracks/ambient_light_sphere.cpp
 src/tracks/bezier_curve.cpp
-src/tracks/check_canon.cpp
+src/tracks/check_cannon.cpp
 src/tracks/check_lap.cpp
 src/tracks/check_line.cpp
 src/tracks/check_manager.cpp
@@ -336,7 +336,7 @@ src/items/rubber_band.hpp
 src/items/swatter.hpp
 src/karts/abstract_kart_animation.hpp
 src/karts/abstract_kart.hpp
-src/karts/canon_animation.hpp
+src/karts/cannon_animation.hpp
 src/karts/controller/ai_base_controller.hpp
 src/karts/controller/controller.hpp
 src/karts/controller/default_ai_controller.hpp
@@ -462,7 +462,7 @@ src/tinygettext/stk_file_system.hpp
 src/tinygettext/tinygettext.hpp
 src/tracks/ambient_light_sphere.hpp
 src/tracks/bezier_curve.hpp
-src/tracks/check_canon.hpp
+src/tracks/check_cannon.hpp
 src/tracks/check_lap.hpp
 src/tracks/check_line.hpp
 src/tracks/check_manager.hpp
