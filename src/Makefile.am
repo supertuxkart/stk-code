@@ -210,8 +210,8 @@ supertuxkart_SOURCES = \
  karts/abstract_kart.hpp \
  karts/abstract_kart_animation.cpp \
  karts/abstract_kart_animation.hpp \
- karts/canon_animation.cpp \
- karts/canon_animation.hpp \
+ karts/cannon_animation.cpp \
+ karts/cannon_animation.hpp \
  karts/controller/ai_base_controller.cpp \
  karts/controller/ai_base_controller.hpp \
  karts/controller/controller.cpp \
@@ -445,8 +445,8 @@ supertuxkart_SOURCES = \
  tracks/ambient_light_sphere.hpp \
  tracks/bezier_curve.cpp \
  tracks/bezier_curve.hpp \
- tracks/check_canon.cpp \
- tracks/check_canon.hpp \
+ tracks/check_cannon.cpp \
+ tracks/check_cannon.hpp \
  tracks/check_lap.cpp \
  tracks/check_lap.hpp \
  tracks/check_line.cpp \
