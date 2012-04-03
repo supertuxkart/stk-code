@@ -837,7 +837,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\karts\canon_animation.cpp"
+					RelativePath="..\..\karts\cannon_animation.cpp"
 					>
 				</File>
 				<File
@@ -1065,7 +1065,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\tracks\check_canon.cpp"
+					RelativePath="..\..\tracks\check_cannon.cpp"
 					>
 				</File>
 				<File
@@ -2003,7 +2003,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\karts\canon_animation.hpp"
+					RelativePath="..\..\karts\cannon_animation.hpp"
 					>
 				</File>
 				<File
@@ -2199,7 +2199,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\tracks\check_canon.hpp"
+					RelativePath="..\..\tracks\check_cannon.hpp"
 					>
 				</File>
 				<File
