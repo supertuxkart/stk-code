@@ -146,9 +146,16 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
                  new_pos.getY()-m_min_height>-m_under_min_height;
         if(UserConfigParams::m_check_debug && !result)
         {
-            printf("CHECK: Kart %s crosses line, but wrong height (%f vs %f).\n",
-                    World::getWorld()->getKart(indx)->getIdent().c_str(),
-                    new_pos.getY(), m_min_height);
+            if(World::getWorld()->getNumKarts()>0)
+                printf("CHECK: Kart %s crosses line, but wrong height "
+                       "(%f vs %f).\n",
+                       World::getWorld()->getKart(indx)->getIdent().c_str(),
+                       new_pos.getY(), m_min_height);
+            else
+                printf("CHECK: Kart %d crosses line, but wrong height "
+                       "(%f vs %f).\n",
+                       indx, new_pos.getY(), m_min_height);
+
         }
     }
     else
