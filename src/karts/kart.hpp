@@ -398,6 +398,9 @@ public:
     // ------------------------------------------------------------------------
     /** Shows the star effect for a certain time. */
     virtual void showStarEffect(float t);
+    // ------------------------------------------------------------------------
+    /** Returns the terrain info oject. */
+    TerrainInfo *getTerrainInfo() { return m_terrain_info; }
 };   // Kart
 
 
