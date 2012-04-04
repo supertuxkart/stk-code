@@ -52,8 +52,6 @@ Ipo::Ipo(const XMLNode &curve, float fps)
     else if(interp=="linear") m_interpolation = IP_LINEAR;
     else                      m_interpolation = IP_BEZIER;
 
-    m_min_time = 999999;
-    m_max_time = -1;
     for(unsigned int i=0; i<curve.getNumNodes(); i++)
     {
         const XMLNode *node = curve.getNode(i);
@@ -62,8 +60,6 @@ Ipo::Ipo(const XMLNode &curve, float fps)
         // Convert blender's frame number (1 ...) into time (0 ...)
         float t = (xy.X-1)/fps;
                 
-        if(t<m_min_time) m_min_time = t;
-        if(t>m_max_time) m_max_time = t;
         xy.X = t;
         m_points.push_back(xy);
         if(m_interpolation==IP_BEZIER)
@@ -102,33 +98,30 @@ void  Ipo::setInitialTransform(const core::vector3df &xyz,
  */
 void Ipo::reset()
 {
-    m_time = 0;
+    m_next_n = 1;
 }   // reset
 
 // ----------------------------------------------------------------------------
 /** Updates the time of this ipo and interpolates the new position and 
  *  rotation (taking the cycle length etc. into account).
- *  \param dt Time since last call.
+ *  \param time Current time for which to determine the interpolation.
  *  \param xyz The position that needs to be updated.
  *  \param hpr The rotation that needs to be updated.
  */
-void Ipo::update(float dt, core::vector3df *xyz, core::vector3df *hpr,
+void Ipo::update(float time, core::vector3df *xyz, core::vector3df *hpr,
                  core::vector3df *scale)
-{
-    m_time += dt;
-    if(m_extend!=ET_CONST && m_time>m_max_time) m_time = 0;
-        
+{        
     switch(m_channel)
     {
-    case Ipo::IPO_LOCX   : xyz->X   =  get(); break;
-    case Ipo::IPO_LOCY   : xyz->Y   =  get(); break;
-    case Ipo::IPO_LOCZ   : xyz->Z   =  get(); break;
-    case Ipo::IPO_ROTX   : hpr->X   =  get(); break;
-    case Ipo::IPO_ROTY   : hpr->Y   =  get(); break;
-    case Ipo::IPO_ROTZ   : hpr->Z   =  get(); break;
-    case Ipo::IPO_SCALEX : scale->X =  get(); break;
-    case Ipo::IPO_SCALEY : scale->Y =  get(); break;
-    case Ipo::IPO_SCALEZ : scale->Z =  get(); break;
+    case Ipo::IPO_LOCX   : xyz->X   =  get(time); break;
+    case Ipo::IPO_LOCY   : xyz->Y   =  get(time); break;
+    case Ipo::IPO_LOCZ   : xyz->Z   =  get(time); break;
+    case Ipo::IPO_ROTX   : hpr->X   =  get(time); break;
+    case Ipo::IPO_ROTY   : hpr->Y   =  get(time); break;
+    case Ipo::IPO_ROTZ   : hpr->Z   =  get(time); break;
+    case Ipo::IPO_SCALEX : scale->X =  get(time); break;
+    case Ipo::IPO_SCALEY : scale->Y =  get(time); break;
+    case Ipo::IPO_SCALEZ : scale->Z =  get(time); break;
     default: assert(false); // shut up compiler warning
     }    // switch
 
@@ -137,29 +130,28 @@ void Ipo::update(float dt, core::vector3df *xyz, core::vector3df *hpr,
 // ----------------------------------------------------------------------------
 /** Returns the interpolated value at the current time (which this objects
  *  keeps track of).
+ *  \param time The time for which the interpolated value should be computed.
  */
-float Ipo::get() const
+float Ipo::get(float time) const
 {
-    if(m_time<m_min_time) 
-    {
-        // FIXME: should take extend into account!
-        return 0;
-    }
-    unsigned int n=0;
+    // Avoid crash in case that only one point is given for this IPO.
+    if(m_next_n==0) 
+        return m_points[0].Y;
+
+    // Time was reset since the last cached value for n,
+    // reset n to start from the beginning again.
+    if(time < m_points[m_next_n-1].X)
+        m_next_n = 1;
     // Search for the first point in the (sorted) array which is greater or equal
     // to the current time. 
-    // FIXME: we should store the last point to speed this up!
-    while(n<m_points.size()-1 && m_time >=m_points[n].X)
-        n++;
-    // Avoid crash in case that only one point is given for this IPO.
-    if(n==0) 
-        return m_points[0].Y;
-    n--;
+    while(m_next_n<m_points.size()-1 && time >=m_points[m_next_n].X)
+        m_next_n++;
+    int n = m_next_n - 1;
     switch(m_interpolation)
     {
     case IP_CONST  : return m_points[n].Y;
     case IP_LINEAR : {
-                        float t = m_time-m_points[n].X;
+                        float t = time-m_points[n].X;
                         return m_points[n].Y + t*(m_points[n+1].Y-m_points[n].Y) /
                                                  (m_points[n+1].X-m_points[n].X);
                      }
@@ -172,7 +164,7 @@ float Ipo::get() const
                         core::vector2df c = 3.0f*(m_handle2[n]-m_points[n]);
                         core::vector2df b = 3.0f*(m_handle1[n+1]-m_handle2[n])-c;
                         core::vector2df a = m_points[n+1] - m_points[n] - c - b;
-                        float t = (m_time-m_points[n].X)/(m_points[n+1].X-m_points[n].X);
+                        float t = (time-m_points[n].X)/(m_points[n+1].X-m_points[n].X);
                         core::vector2df r = ((a*t+b)*t+c)*t+m_points[n];
                         return r.Y;
                     }
@@ -182,31 +174,77 @@ float Ipo::get() const
 }   // get
 
 // ----------------------------------------------------------------------------
+/** Inserts a new start point at the beginning of the IPO to make sure that
+ *  this IPO starts with X.
+ *  \param x The minimum value for which this IPO should be defined.
+ */
+void Ipo::extendStart(float x)
+{
+    assert(m_points[0].X > x);
+    extend(x, 0);
+}   // extendStart
+// ----------------------------------------------------------------------------
+/** Inserts an additional point at the end of the IPO to make sure that this
+ *  IPO ends with X.
+ *  \param x The maximum value for which this IPO should be defined.
+ */
+void Ipo::extendEnd(float x)
+{
+    assert(m_points[m_points.size()-1].X < x);
+    extend(x, m_points.size()-1);
+}   // extendEnd
 
-/** Extends the IPO to end at the given x time coordinate */
-void Ipo::extendTo(float x)
+// ----------------------------------------------------------------------------
+/** Extends the IPO either at the beginning (n=0) or at the end (n=size()-1). 
+ *  This is used by AnimationBase to make sure all IPOs of one curve have the 
+ *  same cycle.
+ *  \param x The X value to which the IPO must be extended.
+ *  \param n The index at (before/after) which to extend.
+ */
+void Ipo::extend(float x, unsigned int n)
 {
     switch (m_interpolation)
     {
         case IP_CONST:
         {
-            m_points.push_back( core::vector2df(x, m_points[m_points.size()-1].Y) );
+            core::vector2df new_point(x,  m_points[n].Y);
+            if(n==0)
+                m_points.insert(m_points.begin(), new_point);
+            else
+                m_points.push_back( new_point);
             break;
         }
         case IP_LINEAR:
         {
-            m_points.push_back( core::vector2df(x, m_points[m_points.size()-1].Y) );
+            core::vector2df new_point(x, m_points[n].Y);
+            if(n=0)
+                m_points.insert(m_points.begin(), new_point);
+            else
+                m_points.push_back(new_point);
             break;
         }
         case IP_BEZIER:
         {
             // FIXME: I'm somewhat dubious this is the correct way to extend handles
-            m_handle1.push_back( m_handle1[m_handle1.size() - 1] + core::vector2df(x - m_points[m_points.size()-1].X ,0) );
-            m_handle2.push_back( m_handle2[m_handle2.size() - 1] + core::vector2df(x - m_points[m_points.size()-1].X ,0) );
-            
-            m_points.push_back( core::vector2df(x, m_points[m_points.size()-1].Y) );
+            core::vector2df new_h1 = m_handle1[n] + 
+                                     core::vector2df(x - m_points[n].X ,0);
+            core::vector2df new_h2 = m_handle2[n] + 
+                                     core::vector2df(x - m_points[n].X ,0);
+            core::vector2df new_p(x, m_points[n].Y);
+            if(n==0)
+            {
+                m_handle1.insert(m_handle1.begin(), new_h1);
+                m_handle2.insert(m_handle2.begin(), new_h2);
+                m_points.insert(m_points.begin(), new_p);
+            }
+            else
+            {
+                m_handle1.push_back(new_h1);
+                m_handle2.push_back(new_h2);
+                m_points.push_back(new_p);
+            }
             break;
         }            
     }
-    m_max_time = x;
-}
+}   // extend
+

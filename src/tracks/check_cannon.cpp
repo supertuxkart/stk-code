@@ -18,10 +18,26 @@
 
 #include "tracks/check_cannon.hpp"
 
+#include "animations/animation_base.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/cannon_animation.hpp"
 #include "modes/world.hpp"
+
+
+CheckCannon::CannonCurve::CannonCurve(const XMLNode &node) 
+          : AnimationBase(node)
+{
+	m_speed = -1;
+	node.get("speed", &m_speed);
+}   // CannonCurve
+
+// ------------------------------------------------------------------------
+void CheckCannon::CannonCurve::update(float dt)
+{
+}   // update
+
+// ============================================================================
 
 /** Constructor for a check cannon. 
  *  \param node XML node containing the parameters for this checkline.
@@ -38,14 +54,19 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
 		exit(-1);
 	}
     m_target.setLine(p1, p2);
-	m_speed = -1;
-	node.get("speed", &m_speed);
+    m_curve = new CannonCurve(node);
 }   // CheckCannon
+
+// ----------------------------------------------------------------------------
+CheckCannon::~CheckCannon()
+{
+    delete m_curve;
+}   // ~CheckCannon
 
 // ----------------------------------------------------------------------------
 void CheckCannon::trigger(unsigned int kart_index)
 {
 	Vec3 target(m_target.getMiddle());
 	AbstractKart *kart = World::getWorld()->getKart(kart_index);
-	new CannonAnimation(kart, target, m_speed);
+	new CannonAnimation(kart, m_curve);
 }   // CheckCannon

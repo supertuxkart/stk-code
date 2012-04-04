@@ -18,40 +18,20 @@
 
 #include "karts/cannon_animation.hpp"
 
+#include "animations/animation_base.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 
 #include "LinearMath/btTransform.h"
 
-CannonAnimation::CannonAnimation(AbstractKart *kart, const Vec3 &target, 
-                               float speed)
+CannonAnimation::CannonAnimation(AbstractKart *kart, AnimationBase *ab)
              : AbstractKartAnimation(kart)
 {
-    m_xyz       = m_kart->getXYZ();
-	assert(speed>0);
-	Vec3 delta  = target-m_kart->getXYZ();
-	m_timer     = delta.length()/speed;
-	m_velocity  = delta/m_timer;
-
-    World::getWorld()->getPhysics()->removeKart(m_kart);
-    
-    m_curr_rotation.setHeading(m_kart->getHeading());
-    m_curr_rotation.setPitch(m_kart->getPitch());
-    m_curr_rotation.setRoll(m_kart->getRoll());
-
-    m_add_rotation.setHeading(0);
-    m_add_rotation.setPitch(  0);
-    m_add_rotation.setRoll(   0);
 }   // CannonAnimation
 
 // ----------------------------------------------------------------------------
 CannonAnimation::~CannonAnimation()
 {
-    btTransform trans = m_kart->getTrans();
-    trans.setOrigin(m_xyz);
-    m_kart->setTrans(trans);
-    m_kart->getBody()->setCenterOfMassTransform(trans);
-    World::getWorld()->getPhysics()->addKart(m_kart);
 }   // ~CannonAnimation
 
 // ----------------------------------------------------------------------------
@@ -61,12 +41,5 @@ CannonAnimation::~CannonAnimation()
  */
 void CannonAnimation::update(float dt)
 {
-    m_xyz += dt*m_velocity;
-    m_kart->setXYZ(m_xyz);
-    m_curr_rotation += dt*m_add_rotation;
-    btQuaternion q(m_curr_rotation.getHeading(), m_curr_rotation.getPitch(),
-                   m_curr_rotation.getRoll());
-    m_kart->setRotation(q);
-
     AbstractKartAnimation::update(dt);
 }   // update

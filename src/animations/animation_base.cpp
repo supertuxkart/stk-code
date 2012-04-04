@@ -36,32 +36,34 @@ AnimationBase::AnimationBase(const XMLNode &node)
         Ipo *ipo = new Ipo(*node.getNode(i), fps);
         m_all_ipos.push_back(ipo);
     }
+    if(m_all_ipos.size()==0)
+    {
+        printf("Warning: empty animation curve.\n");
+        exit(-1);
+    }
     
-    
-    // extend all IPOs to add at the same point
-    float last_x = -1;
+    // Determine start and end X values for this curve.
+    m_start_time = m_all_ipos[0].getPoints()[0].X;
+    m_end_time   = m_start_time;
     Ipo* curr;
     for_in (curr, m_all_ipos)
     {
         const std::vector<core::vector2df>& points = curr->getPoints();
-        last_x = std::max(last_x, points[points.size() - 1].X);
+        m_start_time = std::min(m_start_time, points[0].X                );
+        m_end_time   = std::max(m_end_time,   points[points.size() - 1].X);
     }
     
-    if (last_x > -1)
+    // Make sure all individual IPOs start and end at the same X value.
+    for_in (curr, m_all_ipos)
     {
-        for_in (curr, m_all_ipos)
-        {
-            const std::vector<core::vector2df>& points = curr->getPoints();
-            if (points[points.size() - 1].X < last_x)
-            {
-                curr->extendTo(last_x);
-            }
-        }
+        const std::vector<core::vector2df>& points = curr->getPoints();
+        if (points[points.size() - 1].X < m_end_time)
+            curr->extendEnd(m_end_time);
+        if(points[0].X > m_start_time)
+            curr->extendStart(m_start_time);
     }
-    
-    
-    m_playing = true;
 
+    m_playing = true;
 }   // AnimationBase
 // ----------------------------------------------------------------------------
 
@@ -90,6 +92,7 @@ void AnimationBase::setInitialTransform(const core::vector3df &xyz,
  */
 void AnimationBase::reset()
 {
+    m_current_time = m_start_time;
     Ipo* curr;
     for_in (curr, m_all_ipos)
     {
@@ -106,12 +109,58 @@ void AnimationBase::reset()
 void AnimationBase::update(float dt, core::vector3df *xyz, 
                            core::vector3df *hpr, core::vector3df *scale)
 {
+    m_current_time += dt;
+
+    while(m_current_time > m_end_time)
+        m_current_time -= (m_end_time - m_start_time);
     if ( UserConfigParams::m_graphical_effects )
     {
         Ipo* curr;
         for_in (curr, m_all_ipos)
         {
-            curr->update(dt, xyz, hpr, scale);
+            curr->update(m_current_time, xyz, hpr, scale);
         }
     }
-}   // float dt
+}   // update
+
+// ----------------------------------------------------------------------------
+/** Approximates the overall length of each segment (curve between two points)
+ *  and the overall length of the curve.
+ */
+void AnimationBase::computeLengths()
+{
+    Ipo* curr;
+    // First determine the maximum number of points among all IPOs
+    unsigned int max_points=0;
+    for_in (curr, m_all_ipos)
+    {
+        const std::vector<core::vector2df>& points = curr->getPoints();
+        max_points = std::max(max_points, points.size());
+    }
+
+    // Divide (on average) each segment into STEPS points, and use
+    // a simple linear approximation for this part of the curve
+    const float STEPS = 100.0f * (max_points-1);
+    float x           = m_start_time;
+    float dx          = (m_end_time - m_start_time) / STEPS ;
+    float distance    = 0;
+
+    core::vector3df xyz_old(0,0,0), hpr, scale;
+    for_in(curr, m_all_ipos)
+    {
+        curr->update(m_start_time, &xyz_old, &hpr, &scale);
+    }
+
+    for(unsigned int i=1; i<(unsigned int)STEPS; i++)
+    {
+        float x = m_start_time + dx * i;
+        core::vector3df xyz(0,0,0);
+        for_in(curr, m_all_ipos)
+        {
+            // hpr is not needed, so just reuse old variable
+            curr->update(x, &xyz, &hpr, &scale);
+        }   // for curr in m_all_ipos
+        distance += (xyz-xyz_old).getLength();
+        xyz_old = xyz;
+    }   // for i in m_points
+}   // computeLengths

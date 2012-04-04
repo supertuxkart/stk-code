@@ -26,7 +26,6 @@
  */
 
 #include <vector>
-
 #include <vector3d.h>
 using namespace irr;
 
@@ -50,20 +49,26 @@ private:
     /** True if the animation is currently playing. */
     bool  m_playing;
 
-    /** For one time animations: start time. */
-    float m_start;
+    /** The smallest time for which this animation is defined - usually 0.*/
+    float m_start_time;
+
+    /** The end time for this animation. */
+    float m_end_time;
+
+    /** The current time used in the IPOs. */
+    float m_current_time;
 
     /** For cyclic animations: duration of the cycle. */
     float m_cycle_length;
-
-    /** The current time in the cycle of a cyclic animation. */
-    float m_current_time;
 
     /** The inital position of this object. */
     core::vector3df m_initial_xyz;
 
     /** The initial rotation of this object. */
     core::vector3df m_initial_hpr;
+
+    void computeLengths();
+
 protected:
     /** All IPOs for this animation. */
     PtrVector<Ipo>  m_all_ipos;

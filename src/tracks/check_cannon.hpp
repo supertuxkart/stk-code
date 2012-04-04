@@ -19,10 +19,11 @@
 #ifndef HEADER_CHECK_CANNON_HPP
 #define HEADER_CHECK_CANNON_HPP
 
+#include "animations/animation_base.hpp"
 #include "tracks/check_line.hpp"
 
-class XMLNode;
 class CheckManager;
+class XMLNode;
 
 /** 
  *  \brief Implements a simple checkline that will cause a kart to be
@@ -36,11 +37,26 @@ private:
 	/** The target point the kart will fly to. */
     core::line3df   m_target;
 
-	/** The speed with which the kart moves. */
-	float m_speed;
+
+    // ------------------------------------------------------------------------
+protected:
+    class CannonCurve : public AnimationBase
+    {
+    private:
+        /** The speed with which the kart moves. */
+        float m_speed;
+    public:
+             CannonCurve(const XMLNode &node);
+        void update(float dt);
+    };   // CannonCurve
+
+    // ------------------------------------------------------------------------
+    /** Stores the cannon curve data. */
+    CannonCurve *m_curve;
 
 public:
-                 CheckCannon(const XMLNode &node, unsigned int index);
+             CheckCannon(const XMLNode &node, unsigned int index);
+    virtual ~CheckCannon();
     virtual void trigger(unsigned int kart_index);
 };   // CheckLine
 

@@ -28,31 +28,18 @@
  */
 
 class AbstractKart;
+class AnimationBase;
 
 class CannonAnimation: public AbstractKartAnimation
 {
 protected:
-    /** The coordinates where the kart was hit originally. */
-    Vec3 m_xyz;
+    /** The offset between the point where the check line was originially
+     *  crossed and the origin of the curve. */
+    Vec3 delta;
 
-    /** The kart's current rotation. */
-    Vec3 m_curr_rotation;
-
-    /** The artificial rotation to toss the kart around. It's in units
-     *  of rotation per second. */
-    Vec3 m_add_rotation;
-
-    /** The velocity with which the kart is moved. */
-    Vec3 m_velocity;
-
-    /** Duration for this explosion. This can potentially be set
-     *  with different values for different karts, or depending
-     *  on difficulty (so that on easy you can drive again earlier. */
-    float m_duration;
 
 public:
-             CannonAnimation(AbstractKart *kart, const Vec3 &target, 
-                           float speed);
+             CannonAnimation(AbstractKart *kart, AnimationBase *ab);
     virtual ~CannonAnimation();
     virtual void  update(float dt);
     virtual const std::string getName() const {return "Cannon";}
