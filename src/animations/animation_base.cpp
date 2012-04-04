@@ -135,7 +135,7 @@ void AnimationBase::computeLengths()
     for_in (curr, m_all_ipos)
     {
         const std::vector<core::vector2df>& points = curr->getPoints();
-        max_points = std::max(max_points, points.size());
+        max_points = std::max(max_points, (unsigned int) points.size());
     }
 
     // Divide (on average) each segment into STEPS points, and use
