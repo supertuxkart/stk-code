@@ -22,6 +22,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/rescue_animation.hpp"
 #include "modes/overworld.hpp"
 #include "network/network_manager.hpp"
 #include "states_screens/dialogs/select_challenge.hpp"
@@ -159,7 +160,14 @@ void OverWorld::onFirePressed(Controller* who)
 {
     const std::vector<OverworldChallenge>& challenges = m_track->getChallengeList();
 
-    Vec3 kart_xyz = getKart(0)->getXYZ();
+    AbstractKart* k = getKart(0);
+    Vec3 kart_xyz = k->getXYZ();
+    if (dynamic_cast<RescueAnimation*>(k->getKartAnimation()) != NULL)
+    {
+        // you can't start a race while being rescued
+        return;
+    }
+    
     for (unsigned int n=0; n<challenges.size(); n++)
     {
         if (challenges[n].getForceField().m_is_locked) continue;
