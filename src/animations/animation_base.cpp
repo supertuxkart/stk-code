@@ -39,7 +39,10 @@ AnimationBase::AnimationBase(const XMLNode &node)
     if(m_all_ipos.size()==0)
     {
         printf("Warning: empty animation curve.\n");
-        exit(-1);
+        m_start_time = 0.0f;
+        m_end_time = 1.0f;
+        return;
+        //exit(-1);
     }
     
     // Determine start and end X values for this curve.
