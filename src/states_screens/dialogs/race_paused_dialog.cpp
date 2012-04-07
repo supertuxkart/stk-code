@@ -74,6 +74,15 @@ void RacePausedDialog::loadedFromFile()
         const bool success = choice_ribbon->deleteChild("restart");
         assert(success);
     }
+    // Remove "endrace" button for types not (yet?) implemented
+    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_NORMAL_RACE &&
+        race_manager->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL   )
+    {
+        GUIEngine::RibbonWidget* choice_ribbon =
+            getWidget<GUIEngine::RibbonWidget>("choiceribbon");
+        const bool success = choice_ribbon->deleteChild("endrace");
+        assert(success);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -142,6 +151,12 @@ GUIEngine::EventPropagation
             Screen* newStack[] = {MainMenuScreen::getInstance(), 
                                   RaceSetupScreen::getInstance(), NULL};
             StateManager::get()->resetAndSetStack( newStack );
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == "endrace")
+        {
+            ModalDialog::dismiss();
+            World::getWorld()->endRaceEarly();
             return GUIEngine::EVENT_BLOCK;
         }
     }

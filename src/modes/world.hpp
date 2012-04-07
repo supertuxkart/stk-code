@@ -203,6 +203,7 @@ public:
     virtual void    unpause();    
     virtual void    getDefaultCollectibles(int *collectible_type, 
                                            int *amount );
+    virtual void    endRaceEarly() { return; }
 
     // ------------------------------------------------------------------------
     /** Called to determine whether this race mode uses bonus boxes. */

@@ -20,6 +20,8 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "items/powerup_manager.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
 
 //-----------------------------------------------------------------------------
 StandardRace::StandardRace() : LinearWorld()
@@ -69,3 +71,59 @@ const std::string& StandardRace::getIdent() const
         return IDENT_STD;    
 }   // getIdent
 
+//-----------------------------------------------------------------------------
+/** Ends the race early and places still active player karts at the back.
+ *  The race immediately goes to the result stage, estimating the time for the
+ *  karts still in the race. Still active player karts get a penalty in time
+ *  as well as being placed at the back. Players that already finished keep
+ *  their position.
+ */
+void StandardRace::endRaceEarly()
+{
+    const unsigned int kart_amount = m_karts.size();
+    // Estimate time for current last in race. Will be used to add to
+    // the time of the still active player karts. This way we ensure that
+    // when moving a player to the last spot, they will also have the worst
+    // time.
+    const float worst_time = 
+        estimateFinishTimeForKart(getKartAtPosition(getNumKarts()));
+    std::vector<int> active_players;
+    // Required for debugging purposes
+    beginSetKartPositions();
+    for (unsigned int i = 1; i <= kart_amount; i++)
+    {
+        int kartid = m_position_index[i-1];
+        AbstractKart* kart = m_karts[kartid];
+        if (kart->hasFinishedRace())
+        {
+            // Have to do this to keep endSetKartPosition happy
+            setKartPosition(kartid, kart->getPosition());
+            continue;
+        }
+
+        if (kart->getController()->isPlayerController())
+        {
+            // Keep active players apart for now
+            active_players.push_back(kartid);
+        }
+        else
+        {
+            // AI karts finish
+            setKartPosition(kartid, i - active_players.size());
+            kart->finishedRace(estimateFinishTimeForKart(kart));
+        }
+    } // i < kart_amount
+    // Now make the active players finish
+    for (unsigned int i = 0; i < active_players.size(); i++)
+    {
+        int kartid = active_players[i];
+        int position = getNumKarts() - active_players.size() + 1 + i;
+        setKartPosition(kartid, position);
+        m_karts[kartid]->finishedRace(
+                estimateFinishTimeForKart(m_karts[kartid]) + worst_time
+        );
+    } // Finish the active players
+    endSetKartPositions();
+    m_phase = RESULT_DISPLAY_PHASE;
+    terminateRace();
+} // endRaceEarly

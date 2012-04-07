@@ -39,6 +39,8 @@ public:
     virtual void  getDefaultCollectibles(int *collectible_type, int *amount);
     virtual bool  haveBonusBoxes();
     virtual const std::string& getIdent() const;
+
+    virtual void  endRaceEarly();
 };
 
 #endif
