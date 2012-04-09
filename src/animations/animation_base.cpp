@@ -36,14 +36,15 @@ AnimationBase::AnimationBase(const XMLNode &node)
         Ipo *ipo = new Ipo(*node.getNode(i), fps);
         m_all_ipos.push_back(ipo);
     }
+    m_playing = true;
+#ifdef DEBUG
     if(m_all_ipos.size()==0)
     {
         printf("Warning: empty animation curve.\n");
-        return;
-        //exit(-1);
+        m_playing = false;
     }
+#endif
 
-    m_playing = true;
 }   // AnimationBase
 // ----------------------------------------------------------------------------
 
@@ -88,6 +89,8 @@ void AnimationBase::reset()
  */
 void AnimationBase::update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
 {
+    // Don't do anything if the animation is disabled
+    if(!m_playing) return;
     m_current_time += dt;
 
     if ( UserConfigParams::m_graphical_effects )

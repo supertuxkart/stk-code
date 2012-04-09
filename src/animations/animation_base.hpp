@@ -75,6 +75,9 @@ public:
     void         setInitialTransform(const Vec3 &xyz, 
                                      const Vec3 &hpr);
     void         reset();
+    // ------------------------------------------------------------------------
+    /** Disables or enables an animation. */
+    void         setPlaying(bool playing) {m_playing = playing; }
 
 };   // AnimationBase
 
