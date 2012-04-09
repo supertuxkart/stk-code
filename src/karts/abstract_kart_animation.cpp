@@ -25,6 +25,20 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
     m_timer = 0;
     m_kart  = kart;
     m_name  = name;
+
+    // Remove previous animation if there is one
+#ifndef DEBUG
+    // Use this code in non-debug mode to avoid a memory leak (and messed
+    // up animations) if this should happen. In debug mode this condition
+    // is caught by setKartAnimation(), and useful error messages are
+    // printed
+    if (kart->getKartAnimation())
+    {
+        AbstractKartAnimation* ka = kart->getKartAnimation();
+        kart->setKartAnimation(NULL);
+        delete ka;
+    }
+#endif
     // Register this animation with the kart (which will free it
     // later).
     kart->setKartAnimation(this);
