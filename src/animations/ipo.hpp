@@ -83,8 +83,8 @@ private:
     Vec3 m_initial_hpr;
 
     void extend(float x, unsigned int n);
-    float Ipo::getCubicBezier(float t, float p0, float p1, 
-                              float p2, float p3) const;
+    float getCubicBezier(float t, float p0, float p1, 
+                         float p2, float p3) const;
 public:
           Ipo(const XMLNode &curve, float fps);
     void  update(float time, Vec3 *xyz, Vec3 *hpr, Vec3 *scale);

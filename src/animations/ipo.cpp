@@ -188,7 +188,7 @@ float Ipo::get(float time) const
                                  (m_points[n+1].getX()-m_points[n].getX());
                      }
     case IP_BEZIER: {  
-                        if(n==m_points.size()-1)
+        if(n==(int)m_points.size()-1)
                         {
                             // FIXME: only const implemented atm.
                             return m_points[n].getY();
@@ -264,7 +264,7 @@ void Ipo::extend(float x, unsigned int n)
         case IP_LINEAR:
         {
             Vec3 new_point(x, m_points[n].getY(), 0);
-            if(n=0)
+            if(n==0)
                 m_points.insert(m_points.begin(), new_point);
             else
                 m_points.push_back(new_point);

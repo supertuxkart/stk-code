@@ -120,7 +120,6 @@ void AnimationBase::computeLengths()
     // Divide (on average) each segment into STEPS points, and use
     // a simple linear approximation for this part of the curve
     const float STEPS = 100.0f * (max_points-1);
-    float x           = 0;
     float dx          = max_time / STEPS ;
     float distance    = 0;
 
