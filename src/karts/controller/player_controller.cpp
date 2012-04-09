@@ -364,7 +364,10 @@ void PlayerController::update(float dt)
     // We can't restrict rescue to fulfil isOnGround() (which would be more like
     // MK), since e.g. in the City track it is possible for the kart to end
     // up sitting on a brick wall, with all wheels in the air :((
-    if ( m_controls->m_rescue )
+    // Only accept rescue if there is no kart animation is already playing
+    // (e.g. if an explosion happens, wait till the explosion is over before
+    // starting any other animation).
+    if ( m_controls->m_rescue && !m_kart->getKartAnimation() )
     {
         new RescueAnimation(m_kart);
         m_controls->m_rescue=false;
