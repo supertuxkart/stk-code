@@ -65,6 +65,5 @@ public:
 
     virtual ~ExplosionAnimation();
     virtual void update(float dt);
-    virtual const std::string getName() const { return "Explosion"; }
 };   // ExplosionAnimation
 #endif

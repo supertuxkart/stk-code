@@ -37,6 +37,9 @@ class AbstractKart;
  */
 class AbstractKartAnimation: public NoCopy
 {
+private:
+    /** Name of this animation, used for debug prints only. */
+    std::string m_name;
 protected:
 	/** A pointer to the kart which is animated by this class. */
 	AbstractKart *m_kart;
@@ -45,7 +48,8 @@ protected:
     float m_timer;
 
 public:
-                 AbstractKartAnimation(AbstractKart *kart); 
+                 AbstractKartAnimation(AbstractKart *kart, 
+                                       const std::string &name);
     virtual     ~AbstractKartAnimation() {}
     virtual void update(float dt);
     // ------------------------------------------------------------------------
@@ -53,7 +57,7 @@ public:
 #ifdef DEBUG
     /** To easily allow printing the name of the animation being used atm.
      *  Used in AstractKart in case of an incorrect sequence of calls. */
-    virtual const std::string getName() const = 0;
+    virtual const std::string getName() const { return m_name; }
 #endif
 
 };   // AbstractKartAnimation

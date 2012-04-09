@@ -56,6 +56,5 @@ public:
                  RescueAnimation(AbstractKart *kart, bool is_auto_rescue=false);
     virtual     ~RescueAnimation();
     virtual void update(float dt);
-    virtual const std::string getName() const { return "Rescue"; }
 };   // RescueAnimation
 #endif

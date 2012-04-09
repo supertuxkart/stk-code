@@ -33,7 +33,7 @@
  *  \param kart Pointer to the kart which is animated.
  */
 RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
-               : AbstractKartAnimation(kart)
+               : AbstractKartAnimation(kart, "RescueAnimation")
 {
     m_referee     = new Referee(*m_kart);
     m_kart->getNode()->addChild(m_referee->getSceneNode());

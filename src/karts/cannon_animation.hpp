@@ -42,7 +42,6 @@ public:
              CannonAnimation(AbstractKart *kart, AnimationBase *ab);
     virtual ~CannonAnimation();
     virtual void  update(float dt);
-    virtual const std::string getName() const {return "Cannon";}
     
 };   // CannonAnimation
 #endif

@@ -58,7 +58,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart)
 ExplosionAnimation::ExplosionAnimation(AbstractKart *kart, 
                                        const Vec3 &explosion_position, 
                                        bool direct_hit)
-                  : AbstractKartAnimation(kart)
+                  : AbstractKartAnimation(kart, "ExplosionAnimation")
  {
     m_xyz = m_kart->getXYZ();
     // Ignore explosion that are too far away.

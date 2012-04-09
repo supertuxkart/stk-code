@@ -25,7 +25,7 @@
 #include "LinearMath/btTransform.h"
 
 CannonAnimation::CannonAnimation(AbstractKart *kart, AnimationBase *ab)
-             : AbstractKartAnimation(kart)
+             : AbstractKartAnimation(kart, "CannonAnimation")
 {
 }   // CannonAnimation
 

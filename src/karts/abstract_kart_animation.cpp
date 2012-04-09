@@ -19,10 +19,12 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/abstract_kart_animation.hpp"
 
-AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart)
+AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart, 
+                                             const std::string &name)
 {
     m_timer = 0;
     m_kart  = kart;
+    m_name  = name;
     // Register this animation with the kart (which will free it
     // later).
     kart->setKartAnimation(this);
