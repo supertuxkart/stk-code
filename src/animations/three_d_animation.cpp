@@ -285,11 +285,11 @@ void ThreeDAnimation::update(float dt)
 {
     if ( UserConfigParams::m_graphical_effects )
     {
-        core::vector3df xyz   = m_node->getPosition();
-        core::vector3df scale = m_node->getScale();
+        Vec3 xyz   = m_node->getPosition();
+        Vec3 scale = m_node->getScale();
         AnimationBase::update(dt, &xyz, &m_hpr, &scale);     //updates all IPOs
-        m_node->setPosition(xyz);
-        m_node->setScale(scale);
+        m_node->setPosition(xyz.toIrrVector());
+        m_node->setScale(scale.toIrrVector());
         // Note that the rotation order of irrlicht is different from the one
         // in blender. So in order to reproduce the blender IPO rotations 
         // correctly, we have to get the rotations around each axis and combine
@@ -297,11 +297,11 @@ void ThreeDAnimation::update(float dt)
         core::matrix4 m;
         m.makeIdentity();
         core::matrix4 mx;
-        mx.setRotationDegrees(core::vector3df(m_hpr.X, 0, 0));
+        mx.setRotationDegrees(core::vector3df(m_hpr.getX(), 0, 0));
         core::matrix4 my;
-        my.setRotationDegrees(core::vector3df(0, m_hpr.Y, 0));
+        my.setRotationDegrees(core::vector3df(0, m_hpr.getY(), 0));
         core::matrix4 mz;
-        mz.setRotationDegrees(core::vector3df(0, 0, m_hpr.Z));
+        mz.setRotationDegrees(core::vector3df(0, 0, m_hpr.getZ()));
         m = my*mz*mx;
         core::vector3df hpr = m.getRotationDegrees();
         m_node->setRotation(hpr);

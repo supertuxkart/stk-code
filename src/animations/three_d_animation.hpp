@@ -60,7 +60,7 @@ private:
     /** We have to store the rotation value as computed in blender, since
      *  irrlicht uses a different order, so for rotation animations we
      *  can not use the value returned by getRotation from a scene node. */
-    core::vector3df       m_hpr;
+    Vec3                  m_hpr;
 
     void createPhysicsBody(const std::string &shape);
 

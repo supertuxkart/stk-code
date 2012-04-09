@@ -26,8 +26,6 @@
  */
 
 #include <vector>
-#include <vector3d.h>
-using namespace irr;
 
 #include "tracks/track_object.hpp"
 #include "utils/ptr_vector.hpp"
@@ -49,12 +47,6 @@ private:
     /** True if the animation is currently playing. */
     bool  m_playing;
 
-    /** The smallest time for which this animation is defined - usually 0.*/
-    float m_start_time;
-
-    /** The end time for this animation. */
-    float m_end_time;
-
     /** The current time used in the IPOs. */
     float m_current_time;
 
@@ -62,10 +54,10 @@ private:
     float m_cycle_length;
 
     /** The inital position of this object. */
-    core::vector3df m_initial_xyz;
+    Vec3 m_initial_xyz;
 
     /** The initial rotation of this object. */
-    core::vector3df m_initial_hpr;
+    Vec3 m_initial_hpr;
 
     void computeLengths();
 
@@ -76,13 +68,12 @@ protected:
 public:
                  AnimationBase(const XMLNode &node);
     virtual     ~AnimationBase();
-    virtual void update(float dt, core::vector3df *xyz, core::vector3df *hpr,
-                        core::vector3df *scale);
+    virtual void update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale);
     /** This needs to be implemented by the inheriting classes. It is called
     *  once per frame from the track. */
     virtual void update(float dt) = 0;
-    void         setInitialTransform(const core::vector3df &xyz, 
-                                     const core::vector3df &hpr);
+    void         setInitialTransform(const Vec3 &xyz, 
+                                     const Vec3 &hpr);
     void         reset();
 
 };   // AnimationBase

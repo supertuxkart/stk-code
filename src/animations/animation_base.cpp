@@ -39,31 +39,8 @@ AnimationBase::AnimationBase(const XMLNode &node)
     if(m_all_ipos.size()==0)
     {
         printf("Warning: empty animation curve.\n");
-        m_start_time = 0.0f;
-        m_end_time = 1.0f;
         return;
         //exit(-1);
-    }
-    
-    // Determine start and end X values for this curve.
-    m_start_time = m_all_ipos[0].getPoints()[0].X;
-    m_end_time   = m_start_time;
-    Ipo* curr;
-    for_in (curr, m_all_ipos)
-    {
-        const std::vector<core::vector2df>& points = curr->getPoints();
-        m_start_time = std::min(m_start_time, points[0].X                );
-        m_end_time   = std::max(m_end_time,   points[points.size() - 1].X);
-    }
-    
-    // Make sure all individual IPOs start and end at the same X value.
-    for_in (curr, m_all_ipos)
-    {
-        const std::vector<core::vector2df>& points = curr->getPoints();
-        if (points[points.size() - 1].X < m_end_time)
-            curr->extendEnd(m_end_time);
-        if(points[0].X > m_start_time)
-            curr->extendStart(m_start_time);
     }
 
     m_playing = true;
@@ -80,8 +57,8 @@ AnimationBase::~AnimationBase()
  *  \param xyz Position of the object.
  *  \param hpr Rotation of the object.
  */
-void AnimationBase::setInitialTransform(const core::vector3df &xyz, 
-                                        const core::vector3df &hpr)
+void AnimationBase::setInitialTransform(const Vec3 &xyz, 
+                                        const Vec3 &hpr)
 {
     Ipo* curr;
     for_in (curr, m_all_ipos)
@@ -95,7 +72,7 @@ void AnimationBase::setInitialTransform(const core::vector3df &xyz,
  */
 void AnimationBase::reset()
 {
-    m_current_time = m_start_time;
+    m_current_time = 0;
     Ipo* curr;
     for_in (curr, m_all_ipos)
     {
@@ -109,13 +86,10 @@ void AnimationBase::reset()
  *  \param xyz Position to be updated.
  *  \param hpr Rotation to be updated.
  */
-void AnimationBase::update(float dt, core::vector3df *xyz, 
-                           core::vector3df *hpr, core::vector3df *scale)
+void AnimationBase::update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
 {
     m_current_time += dt;
 
-    while(m_current_time > m_end_time)
-        m_current_time -= (m_end_time - m_start_time);
     if ( UserConfigParams::m_graphical_effects )
     {
         Ipo* curr;
@@ -134,36 +108,40 @@ void AnimationBase::computeLengths()
 {
     Ipo* curr;
     // First determine the maximum number of points among all IPOs
-    unsigned int max_points=0;
+    unsigned int max_points =0;
+    float       max_time    = 0;
     for_in (curr, m_all_ipos)
     {
-        const std::vector<core::vector2df>& points = curr->getPoints();
+        const std::vector<Vec3>& points = curr->getPoints();
         max_points = std::max(max_points, (unsigned int) points.size());
+        max_time   = std::max(max_time, curr->getEndTime());
     }
 
     // Divide (on average) each segment into STEPS points, and use
     // a simple linear approximation for this part of the curve
     const float STEPS = 100.0f * (max_points-1);
-    float x           = m_start_time;
-    float dx          = (m_end_time - m_start_time) / STEPS ;
+    float x           = 0;
+    float dx          = max_time / STEPS ;
     float distance    = 0;
 
-    core::vector3df xyz_old(0,0,0), hpr, scale;
+    // Initialise xyz_old with the point at time 0
+    Vec3 xyz_old(0,0,0), hpr, scale;
     for_in(curr, m_all_ipos)
     {
-        curr->update(m_start_time, &xyz_old, &hpr, &scale);
+        curr->update(/*time*/0, &xyz_old, &hpr, &scale);
     }
 
     for(unsigned int i=1; i<(unsigned int)STEPS; i++)
     {
-        float x = m_start_time + dx * i;
-        core::vector3df xyz(0,0,0);
+        // Interpolations always start at time 0
+        float x = dx * i;
+        Vec3 xyz(0,0,0);
         for_in(curr, m_all_ipos)
         {
             // hpr is not needed, so just reuse old variable
             curr->update(x, &xyz, &hpr, &scale);
         }   // for curr in m_all_ipos
-        distance += (xyz-xyz_old).getLength();
+        distance += (xyz-xyz_old).length();
         xyz_old = xyz;
     }   // for i in m_points
 }   // computeLengths

@@ -37,8 +37,11 @@ class XMLNode;
 class Ipo : public NoCopy
 {
 public:
-    /** All supported ipo types. */
-    enum IpoChannelType {IPO_LOCX,   IPO_LOCY,   IPO_LOCZ, 
+    /** All supported ipo types. LOCXYZ is basically a curve, the
+     *  IPO is actually a 3d curve, without a time axis, only the
+     *  actual data points. */
+    enum IpoChannelType {IPO_LOCX,   IPO_LOCY,   IPO_LOCZ,
+                         IPO_LOCXYZ,
                          IPO_ROTX,   IPO_ROTY,   IPO_ROTZ,
                          IPO_SCALEX, IPO_SCALEY, IPO_SCALEZ,
                          IPO_MAX};
@@ -53,13 +56,19 @@ private:
     enum {ET_CONST, ET_EXTRAP, ET_CYCLIC_EXTRAP, ET_CYCLIC} m_extend;
 
     /** The actual control points. */
-    std::vector<core::vector2df>  m_points;
+    std::vector<Vec3>  m_points;
 
     /** Only used for bezier curves: the two handles. */
-    std::vector<core::vector2df>  m_handle1, m_handle2;
+    std::vector<Vec3>  m_handle1, m_handle2;
 
     /** Frames per second for this animation. */
     float m_fps;
+
+    /** Time of the first control point. */
+    float m_start_time;
+
+    /** Time of the last control point. */
+    float m_end_time;
 
     /** Which control points will be the next one (so m_next_n-1 and
      *  m_next_n are the control points to use now). This just reduces
@@ -68,25 +77,31 @@ private:
     mutable unsigned int m_next_n;
 
     /** Stores the inital position of the object. */
-    core::vector3df m_initial_xyz;
+    Vec3 m_initial_xyz;
 
     /** Stores the inital rotation of the object. */
-    core::vector3df m_initial_hpr;
+    Vec3 m_initial_hpr;
 
     void extend(float x, unsigned int n);
+    float Ipo::getCubicBezier(float t, float p0, float p1, 
+                              float p2, float p3) const;
 public:
           Ipo(const XMLNode &curve, float fps);
-    void  update(float time, core::vector3df *xyz, core::vector3df *hpr,
-                 core::vector3df *scale);
+    void  update(float time, Vec3 *xyz, Vec3 *hpr, Vec3 *scale);
     float get(float time) const;
-    void  setInitialTransform(const core::vector3df &xyz, 
-                              const core::vector3df &hpr);
+    void  setInitialTransform(const Vec3 &xyz, const Vec3 &hpr);
     void  reset();
 
     void  extendStart(float x);
     void  extendEnd(float x);
 
-    const std::vector<core::vector2df>& getPoints() const { return m_points; }
+    // ------------------------------------------------------------------------
+    /** Returns the raw data points for this IPO. */
+    const std::vector<Vec3>& getPoints() const { return m_points; }
+    // ------------------------------------------------------------------------
+    /** Returns the last specified time (i.e. not considering any extend 
+     *  types). */
+    float getEndTime() const { return m_end_time; }
 };   // Ipo
 
 #endif

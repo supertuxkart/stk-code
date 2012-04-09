@@ -67,14 +67,14 @@ void BillboardAnimation::update(float dt)
 {
     if ( UserConfigParams::m_graphical_effects )
     {
-        core::vector3df xyz=m_node->getPosition();
+        Vec3 xyz(m_node->getPosition());
         // Rotation doesn't make too much sense for a billboard, 
         // so just set it to 0
-        core::vector3df hpr(0, 0, 0);
-        core::vector3df scale = m_node->getScale();
+        Vec3 hpr(0, 0, 0);
+        Vec3 scale = m_node->getScale();
         AnimationBase::update(dt, &xyz, &hpr, &scale);
-        m_node->setPosition(xyz);
-        m_node->setScale(scale);
+        m_node->setPosition(xyz.toIrrVector());
+        m_node->setScale(scale.toIrrVector());
         // Setting rotation doesn't make sense
     }
     
