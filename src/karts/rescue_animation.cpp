@@ -74,9 +74,12 @@ RescueAnimation::~RescueAnimation()
     m_kart->getNode()->removeChild(m_referee->getSceneNode());
     delete m_referee;
     m_referee = NULL;
-    m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
-    m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-    World::getWorld()->getPhysics()->addKart(m_kart);
+    if(m_timer < 0)
+    {
+        m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
+        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
+        World::getWorld()->getPhysics()->addKart(m_kart);
+    }
 }   // ~RescueAnimation
 
 // ----------------------------------------------------------------------------
