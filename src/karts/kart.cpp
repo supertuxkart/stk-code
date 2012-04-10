@@ -142,14 +142,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_terrain_sound          = NULL;
     m_previous_terrain_sound = NULL;
 
-    // Create the stars effect
-    m_stars_effect =
-        new Stars(getNode(),
-                  core::vector3df(0.0f, 
-                                  getKartModel()->getModel()
-                                        ->getBoundingBox().MaxEdge.Y,
-                                  0.0f)                               );
-
 }   // Kart
 
 // -----------------------------------------------------------------------------
@@ -200,6 +192,13 @@ void Kart::init(RaceManager::KartType type, bool is_first_kart)
     m_kart_gfx = new KartGFX(this);
     m_skidding = new Skidding(this, 
                               m_kart_properties->getSkiddingProperties());
+    // Create the stars effect
+    m_stars_effect =
+        new Stars(getNode(),
+                  core::vector3df(0.0f,
+                                  getKartModel()->getModel()
+                                        ->getBoundingBox().MaxEdge.Y,
+                                  0.0f)                               );
 
     reset();
 }   // init
