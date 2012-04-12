@@ -1089,7 +1089,8 @@ void Kart::update(float dt)
         // let kart fall a bit before rescuing
         const Vec3 *min, *max;
         World::getWorld()->getTrack()->getAABB(&min, &max);
-        if(min->getY() - getXYZ().getY() > 17 && !m_flying)
+        if(min->getY() - getXYZ().getY() > 17 && !m_flying &&
+           !getKartAnimation())
             new RescueAnimation(this);
     }
     else
@@ -1274,8 +1275,7 @@ void Kart::handleMaterialGFX()
     // something with the wheels, and the material has not the
     // below surface property set.
     if (material && isOnGround() && !material->isBelowSurface() && 
-        !dynamic_cast<RescueAnimation*>(getKartAnimation())      && 
-        UserConfigParams::m_graphical_effects)
+        !getKartAnimation()      && UserConfigParams::m_graphical_effects)
     {
 
         // Get the appropriate particle data depending on
@@ -1350,7 +1350,8 @@ void Kart::handleMaterialGFX()
     // -------------------------------------------
     const std::string s = surface_material->getSFXName();
     if (s != "" && !dynamic_cast<RescueAnimation*>(getKartAnimation())&&
-        (m_terrain_sound == NULL || m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
+        (m_terrain_sound == NULL || 
+         m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
     {
         if (m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
         m_previous_terrain_sound = m_terrain_sound;
@@ -1486,7 +1487,7 @@ void Kart::crashed(AbstractKart *k, bool update_attachments)
         assert(k);
         getAttachment()->handleCollisionWithKart(k);
     }
-	m_controller->crashed(k);
+    m_controller->crashed(k);
     crashed();
 }   // crashed(Kart, update_attachments
 
@@ -1587,7 +1588,7 @@ void Kart::crashed(const Material *m)
             }
         }
     }
-	m_controller->crashed(m);
+    m_controller->crashed(m);
     crashed();
 }   // crashed(Material)
 
