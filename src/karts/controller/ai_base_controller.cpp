@@ -177,8 +177,8 @@ void AIBaseController::crashed(const Material *m)
 	// Note that typically it takes ~0.5 seconds for the AI to hit
 	// the track again if it is stuck (i.e. time for the push back plus
 	// time for the AI to accelerate and hit the terrain again).
-	const int NUM_COLLISION    = 3;
-	const float COLLISION_TIME = 1.5f;
+	const unsigned int NUM_COLLISION = 3;
+	const float COLLISION_TIME       = 1.5f;
 
 	float time = m_world->getTime();
 	if(m_collision_times.size()==0)
