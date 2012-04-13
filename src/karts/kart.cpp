@@ -1214,7 +1214,7 @@ void Kart::handleMaterialSFX(const Material *material)
         if(m_previous_terrain_sound)
             m_previous_terrain_sound->setLoop(false);
 
-        const std::string s = material->getSFXName();
+        const std::string &s = material->getSFXName();
         if (s != "")
         {
             m_terrain_sound = sfx_manager->createSoundSource(s);
@@ -1348,7 +1348,7 @@ void Kart::handleMaterialGFX()
 
     // Play special sound effects for this terrain
     // -------------------------------------------
-    const std::string s = surface_material->getSFXName();
+    const std::string &s = surface_material->getSFXName();
     if (s != "" && !dynamic_cast<RescueAnimation*>(getKartAnimation())&&
         (m_terrain_sound == NULL || 
          m_terrain_sound->getStatus() == SFXManager::SFX_STOPPED))
