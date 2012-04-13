@@ -79,6 +79,9 @@ RescueAnimation::~RescueAnimation()
         m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
         World::getWorld()->getPhysics()->addKart(m_kart);
+        if (m_kart->getCamera() &&
+             m_kart->getCamera()->getMode() != Camera::CM_FINAL)
+            m_kart->getCamera()->setMode(Camera::CM_NORMAL);
     }
 }   // ~RescueAnimation
 
