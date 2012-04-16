@@ -64,7 +64,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     // Ignore explosion that are too far away.
 
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
-    m_timer     = m_kart->getKartProperties()->getExplosionTime();;
+    m_timer     = m_kart->getKartProperties()->getExplosionTime();
 
     // Non-direct hits will be only affected half as much.
     if(!direct_hit) m_timer*=0.5f;
@@ -78,7 +78,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     // the specified time.
     m_velocity = 0.5f * m_timer * World::getWorld()->getTrack()->getGravity();
     World::getWorld()->getPhysics()->removeKart(m_kart);
-    
+
     m_curr_rotation.setHeading(m_kart->getHeading());
     m_curr_rotation.setPitch(m_kart->getPitch());
     m_curr_rotation.setRoll(m_kart->getRoll());
@@ -90,7 +90,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     m_add_rotation.setHeading( (rand()%(2*max_rotation+1)-max_rotation)*f );
     m_add_rotation.setPitch(   (rand()%(2*max_rotation+1)-max_rotation)*f );
     m_add_rotation.setRoll(    (rand()%(2*max_rotation+1)-max_rotation)*f );
-    
+
     // Set invulnerable time, and graphical effects
     float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime();
     m_kart->setInvulnerableTime(t);
@@ -106,13 +106,19 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
 //-----------------------------------------------------------------------------
 ExplosionAnimation::~ExplosionAnimation()
 {
-    m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
-    m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-    World::getWorld()->getPhysics()->addKart(m_kart);
-    if(m_kart->getCamera() && 
-        m_kart->getCamera()->getMode() != Camera::CM_FINAL)
-        m_kart->getCamera()->setMode(Camera::CM_NORMAL);
-    return;
+    // Only play with physics and camera if the object is getting destroyed
+    // because its time is up. If there is still time left when this gets
+    // called, it means that the world is getting destroyed so we don't touch
+    // these settings.
+    if (m_timer < 0)
+    {
+        m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
+        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
+        World::getWorld()->getPhysics()->addKart(m_kart);
+        if(m_kart->getCamera() &&
+            m_kart->getCamera()->getMode() != Camera::CM_FINAL)
+            m_kart->getCamera()->setMode(Camera::CM_NORMAL);
+    }
 }   // ~KartAnimation
 
 // ----------------------------------------------------------------------------
