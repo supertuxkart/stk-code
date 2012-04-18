@@ -176,6 +176,10 @@ void DefaultAIController::update(float dt)
     m_controls->m_look_back = false;
     m_controls->m_nitro     = false;
 
+    // Don't do anything if there is currently a kart animations shown.
+    if(m_kart->getKartAnimation())
+        return;
+
     // Having a non-moving AI can be useful for debugging, e.g. aiming
     // or slipstreaming.
 #undef AI_DOES_NOT_MOVE_FOR_DEBUGGING
@@ -193,7 +197,7 @@ void DefaultAIController::update(float dt)
     }
 
 	// If the kart needs to be rescued, do it now (and nothing else)
-	if(isStuck())
+	if(isStuck() && !m_kart->getKartAnimation())
 	{
 		new RescueAnimation(m_kart);
 		AIBaseController::update(dt);

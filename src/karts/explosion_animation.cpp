@@ -77,7 +77,6 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     // the right initial velocity for a kart to land back after
     // the specified time.
     m_velocity = 0.5f * m_timer * World::getWorld()->getTrack()->getGravity();
-    World::getWorld()->getPhysics()->removeKart(m_kart);
 
     m_curr_rotation.setHeading(m_kart->getHeading());
     m_curr_rotation.setPitch(m_kart->getPitch());
@@ -114,7 +113,6 @@ ExplosionAnimation::~ExplosionAnimation()
     {
         m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-        World::getWorld()->getPhysics()->addKart(m_kart);
         if(m_kart->getCamera() &&
             m_kart->getCamera()->getMode() != Camera::CM_FINAL)
             m_kart->getCamera()->setMode(Camera::CM_NORMAL);

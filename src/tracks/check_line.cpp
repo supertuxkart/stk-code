@@ -132,15 +132,15 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
     bool result=sign!=m_previous_sign[indx];
     // If the sign has changed, i.e. the infinite line was crossed somewhere,
     // check if the finite line was actually crossed:
-    core::vector2df out;
     if(sign!=m_previous_sign[indx] &&
         m_line.intersectWith(core::line2df(old_pos.toIrrVector2d(), 
-                                           new_pos.toIrrVector2d()), out) )
+                                           new_pos.toIrrVector2d()), 
+                             m_cross_point) )
     {
         // Now check the minimum height: the kart position must be within a
         // reasonable distance in the Z axis - 'reasonable' for now to be
         // between -1 and 4 units (negative numbers are unlikely, but help
-        // in case that there is 'somewhat' inside of the track, or the
+        // in case that the kart is 'somewhat' inside of the track, or the
         // checklines are a bit off in Z direction.
         result = new_pos.getY()-m_min_height<m_over_min_height   && 
                  new_pos.getY()-m_min_height>-m_under_min_height;

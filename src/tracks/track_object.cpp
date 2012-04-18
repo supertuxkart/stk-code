@@ -236,6 +236,14 @@ TrackObject::TrackObject(const core::vector3df& pos, const core::vector3df& hpr,
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
+TrackObject::TrackObject()
+{
+    m_node  = NULL;
+    m_mesh  = NULL;    
+    m_sound =  NULL;
+}   // TrackObject()
+
+// ----------------------------------------------------------------------------
 /** Destructor. Removes the node from the scene graph, and also
  *  drops the textures of the mesh. Sound buffers are also freed.
  */

@@ -18,6 +18,7 @@
 
 #include "karts/abstract_kart.hpp"
 #include "karts/abstract_kart_animation.hpp"
+#include "modes/world.hpp"
 
 AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart, 
                                              const std::string &name)
@@ -42,7 +43,23 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
     // Register this animation with the kart (which will free it
     // later).
     kart->setKartAnimation(this);
+    World::getWorld()->getPhysics()->removeKart(m_kart);
 }   // AbstractKartAnimation
+
+// ----------------------------------------------------------------------------
+AbstractKartAnimation::~AbstractKartAnimation()
+{
+    // If m_timer >=0, this object is deleted because the kart
+    // is deleted (at the end of a race), which means that
+    // world is in the process of being deleted. In this case
+    // we can't call getPhysics() anymore.
+    if(m_timer < 0)
+    {
+        //m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
+        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
+        World::getWorld()->getPhysics()->addKart(m_kart);
+    }
+}   // ~AbstractKartAnimation
 
 // ----------------------------------------------------------------------------
 /** Updates the timer, and if it expires (<0), the kart animation will be

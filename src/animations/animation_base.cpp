@@ -36,7 +36,8 @@ AnimationBase::AnimationBase(const XMLNode &node)
         Ipo *ipo = new Ipo(*node.getNode(i), fps);
         m_all_ipos.push_back(ipo);
     }
-    m_playing = true;
+    m_playing   = true;
+    m_anim_type = ATT_CYCLIC;
 #ifdef DEBUG
     if(m_all_ipos.size()==0)
     {
@@ -47,10 +48,15 @@ AnimationBase::AnimationBase(const XMLNode &node)
 
 }   // AnimationBase
 // ----------------------------------------------------------------------------
-
-AnimationBase::~AnimationBase()
+/** Special constructor which takes one IPO (or curve). This is used by the
+ */
+AnimationBase::AnimationBase(Ipo *ipo) : TrackObject()
 {
-}   // ~AnimationBase
+    m_anim_type    = ATT_CYCLIC_ONCE;
+    m_playing      = true;
+    m_all_ipos.push_back(ipo);
+    reset();
+}   // AnimationBase(Ipo)
 
 // ----------------------------------------------------------------------------
 /** Stores the initial transform (in the IPOs actually). This is necessary
@@ -93,57 +99,10 @@ void AnimationBase::update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
     if(!m_playing) return;
     m_current_time += dt;
 
-    if ( UserConfigParams::m_graphical_effects )
+    Ipo* curr;
+    for_in (curr, m_all_ipos)
     {
-        Ipo* curr;
-        for_in (curr, m_all_ipos)
-        {
-            curr->update(m_current_time, xyz, hpr, scale);
-        }
+        curr->update(m_current_time, xyz, hpr, scale);
     }
 }   // update
 
-// ----------------------------------------------------------------------------
-/** Approximates the overall length of each segment (curve between two points)
- *  and the overall length of the curve.
- */
-void AnimationBase::computeLengths()
-{
-    Ipo* curr;
-    // First determine the maximum number of points among all IPOs
-    unsigned int max_points =0;
-    float       max_time    = 0;
-    for_in (curr, m_all_ipos)
-    {
-        const std::vector<Vec3>& points = curr->getPoints();
-        max_points = std::max(max_points, (unsigned int) points.size());
-        max_time   = std::max(max_time, curr->getEndTime());
-    }
-
-    // Divide (on average) each segment into STEPS points, and use
-    // a simple linear approximation for this part of the curve
-    const float STEPS = 100.0f * (max_points-1);
-    float dx          = max_time / STEPS ;
-    float distance    = 0;
-
-    // Initialise xyz_old with the point at time 0
-    Vec3 xyz_old(0,0,0), hpr, scale;
-    for_in(curr, m_all_ipos)
-    {
-        curr->update(/*time*/0, &xyz_old, &hpr, &scale);
-    }
-
-    for(unsigned int i=1; i<(unsigned int)STEPS; i++)
-    {
-        // Interpolations always start at time 0
-        float x = dx * i;
-        Vec3 xyz(0,0,0);
-        for_in(curr, m_all_ipos)
-        {
-            // hpr is not needed, so just reuse old variable
-            curr->update(x, &xyz, &hpr, &scale);
-        }   // for curr in m_all_ipos
-        distance += (xyz-xyz_old).length();
-        xyz_old = xyz;
-    }   // for i in m_points
-}   // computeLengths

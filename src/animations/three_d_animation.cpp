@@ -20,7 +20,6 @@
 
 #include <stdio.h>
 
-#include "animations/ipo.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"

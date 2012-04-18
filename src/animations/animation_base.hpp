@@ -27,11 +27,13 @@
 
 #include <vector>
 
+// Note that ipo.hpp is included here in order that PtrVector<Ipo> can call
+// the proper destructor!
+#include "animations/ipo.hpp"
 #include "tracks/track_object.hpp"
 #include "utils/ptr_vector.hpp"
 
 class XMLNode;
-class Ipo;
 
 /**
   * \brief A base class for all animations.
@@ -59,19 +61,19 @@ private:
     /** The initial rotation of this object. */
     Vec3 m_initial_hpr;
 
-    void computeLengths();
-
 protected:
     /** All IPOs for this animation. */
     PtrVector<Ipo>  m_all_ipos;
 
 public:
                  AnimationBase(const XMLNode &node);
-    virtual     ~AnimationBase();
+                 AnimationBase(Ipo *ipo);
     virtual void update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale);
     /** This needs to be implemented by the inheriting classes. It is called
-    *  once per frame from the track. */
-    virtual void update(float dt) = 0;
+     *  once per frame from the track. It has a dummy implementation that 
+     *  just asserts so that this class can be instantiated in 
+     *  CannonAnimation. */
+    virtual void update(float dt) {assert(false); };
     void         setInitialTransform(const Vec3 &xyz, 
                                      const Vec3 &hpr);
     void         reset();

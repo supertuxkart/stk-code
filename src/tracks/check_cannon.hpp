@@ -23,6 +23,7 @@
 #include "tracks/check_line.hpp"
 
 class CheckManager;
+class Ipo;
 class XMLNode;
 
 /** 
@@ -52,7 +53,7 @@ protected:
 
     // ------------------------------------------------------------------------
     /** Stores the cannon curve data. */
-    CannonCurve *m_curve;
+    Ipo *m_curve;
 
 public:
              CheckCannon(const XMLNode &node, unsigned int index);

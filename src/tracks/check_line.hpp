@@ -19,8 +19,9 @@
 #ifndef HEADER_CHECK_LINE_HPP
 #define HEADER_CHECK_LINE_HPP
 
-#include <line2d.h>
 #include <IMeshSceneNode.h>
+#include <line2d.h>
+#include <vector2d.h>
 using namespace irr;
 
 #include "tracks/check_structure.hpp"
@@ -45,6 +46,8 @@ private:
     /** The line that is tested for being crossed. */
     core::line2df   m_line;
 
+    core::vector2df m_cross_point;
+
     /** The minimum height of the checkline. */
     float           m_min_height;
 
@@ -66,11 +69,17 @@ private:
 public:
                  CheckLine(const XMLNode &node, unsigned int index);
     virtual     ~CheckLine();
-    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx);
+    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+                             int indx);
     virtual void reset(const Track &track);
     virtual void changeDebugColor(bool is_active);
     /** Returns the actual line data for this checkpoint. */
     const core::line2df &getLine2D() const {return m_line;}
+    // ------------------------------------------------------------------------
+    /** Returns the 2d point at which the line was crossed. Note that this
+     *  value is ONLY valid after isTriggered is called and inside of
+     *  trigger(). */
+    const core::vector2df &getCrossPoint() const { return m_cross_point; }
 };   // CheckLine
 
 #endif

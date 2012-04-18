@@ -18,6 +18,7 @@
 
 #include "tracks/track_object_manager.hpp"
 
+#include "animations/ipo.hpp"
 #include "config/user_config.hpp"
 #include "animations/billboard_animation.hpp"
 #include "animations/three_d_animation.hpp"

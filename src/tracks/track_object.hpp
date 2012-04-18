@@ -95,6 +95,7 @@ protected:
     
 public:
                  TrackObject(const XMLNode &xml_node);
+                 TrackObject();
                  TrackObject(const core::vector3df& pos, const core::vector3df& hpr,
                              const core::vector3df& scale, const std::string& model);
                 ~TrackObject();

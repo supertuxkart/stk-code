@@ -56,6 +56,10 @@ public:
     /** Creates a 3d vector from three scalars. */
     inline Vec3(float x, float y, float z) : btVector3(x,y,z)            {}
     // ------------------------------------------------------------------------
+    /** Creates a 3d vector from three scalars. */
+    inline Vec3(float x, float y, float z, float w) : btVector3(x,y,z) 
+                                                     { setW(w);           }
+    // ------------------------------------------------------------------------
     /** Initialises a 3d vector from one scalar value, which is used to
      *  initialise all components. */
     inline Vec3(float x)                   : btVector3(x,x,x)            {}

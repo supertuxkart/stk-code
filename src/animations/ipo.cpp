@@ -20,12 +20,20 @@
 
 #include "io/xml_node.hpp"
 
+#include <string.h>
+
 const std::string Ipo::m_all_channel_names[IPO_MAX] =
                 {"LocX", "LocY", "LocZ", "LocXYZ",
                  "RotX", "RotY", "RotZ",
                  "ScaleX", "ScaleY", "ScaleZ" };
 
-Ipo::Ipo(const XMLNode &curve, float fps)
+// ----------------------------------------------------------------------------
+/** Initialise the Ipo from the specifications in the XML file.
+ *  \param curve The XML node with the IPO data.
+ *  \param fps Frames per second value, necessary to convert frame values
+ *             into time.
+ */
+Ipo::IpoData::IpoData(const XMLNode &curve, float fps)
 {
     if(curve.getName()!="curve")
     {
@@ -38,11 +46,16 @@ Ipo::Ipo(const XMLNode &curve, float fps)
     m_channel=IPO_MAX;
     for(unsigned int i=IPO_LOCX; i<IPO_MAX; i++)
     {
-        if(m_all_channel_names[i]==channel) m_channel=(IpoChannelType)i;
+        if(m_all_channel_names[i]==channel) 
+        {
+            m_channel=(IpoChannelType)i;
+            break;
+        }
     }
     if(m_channel==IPO_MAX)
     {
-        fprintf(stderr, "Unknown animation channel: '%s' - aborting.\n", channel.c_str());
+        fprintf(stderr, "Unknown animation channel: '%s' - aborting.\n", 
+                channel.c_str());
         exit(-1);
     }
 
@@ -52,6 +65,23 @@ Ipo::Ipo(const XMLNode &curve, float fps)
     else if(interp=="linear") m_interpolation = IP_LINEAR;
     else                      m_interpolation = IP_BEZIER;
 
+    if(m_channel==IPO_LOCXYZ)
+        readCurve(curve);
+    else
+        readIPO(curve, fps);
+
+    // ATM no other extends are supported, so hardcode the only one
+    // that works!
+    m_extend = ET_CYCLIC;
+}   // IpoData
+
+// ----------------------------------------------------------------------------
+/** Reads a blender IPO curve, which constists of a frame number and a control
+ *  point. This only handles a single axis.
+ *  \param node The root node with all curve data points.
+ */
+void Ipo::IpoData::readIPO(const XMLNode &curve, float fps)
+{
     m_start_time =  999999.9f;
     m_end_time   = -999999.9f;
     for(unsigned int i=0; i<curve.getNumNodes(); i++)
@@ -61,29 +91,302 @@ Ipo::Ipo(const XMLNode &curve, float fps)
         node->get("c", &xy);
         // Convert blender's frame number (1 ...) into time (0 ...)
         float t = (xy.X-1)/fps;
-                
-        Vec3 point(t, xy.Y, 0);
+        Vec3 point(xy.Y, 0, 0, t);
+        m_points.push_back(point);
         m_start_time = std::min(m_start_time, t);
         m_end_time   = std::max(m_end_time,   t);
-        m_points.push_back(point);
         if(m_interpolation==IP_BEZIER)
         {
+            Vec3 handle1, handle2;
             core::vector2df handle; 
             node->get("h1", &handle); 
-            handle.X = (xy.X-1)/fps;
-            m_handle1.push_back(Vec3(handle.X, handle.Y, 0));
+            handle1.setW((xy.X-1)/fps);
+            handle1.setX(handle.Y);
             node->get("h2", &handle); 
-            handle.X = (xy.X-1)/fps;
-            m_handle2.push_back(Vec3(handle.X, handle.Y, 0));
+            handle2.setW((xy.X-1)/fps);
+            handle2.setX(handle.Y);
+            m_handle1.push_back(handle1);
+            m_handle2.push_back(handle2);
         }
     }   // for i<getNumNodes()
+}   // IpoData::readIPO
 
-    // ATM no other extends are supported, so hardcode the only one
-    // that works!
-    m_extend = ET_CYCLIC;
+// ----------------------------------------------------------------------------
+/** Reads in 3 dimensional curve data - i.e. the xml file contains xyz, but no
+ *  time. If the curve is using bezier interpolation, the curve is 
+ *  approximated by piecewise linear functions. Reason is that bezier curves 
+ *  can not (easily) be used for smooth (i.e. constant speed) driving: 
+ *  A linear time variation in [0, 1] will result in non-linear distances
+ *  for the bezier function, which is a 3rd degree polynomial (--> the speed
+ *  which is the deviation of this function is a 2nd degree polynomial, and
+ *  therefore not constant!
+ *  \param node The root node with all curve data points.
+ */
+void Ipo::IpoData::readCurve(const XMLNode &curve)
+{
+    m_start_time =  0;
+    m_end_time   = -999999.9f;
+    float speed  = 30.0f;
+    curve.get("speed", &speed);
 
+    for(unsigned int i=0; i<curve.getNumNodes(); i++)
+    {
+        const XMLNode *node = curve.getNode(i);
+        Vec3 point;
+        node->get("c", &point);
+
+        if(m_interpolation==IP_BEZIER)
+        {
+            Vec3 handle;
+            node->get("h1", &handle);
+            m_handle1.push_back(handle);
+            node->get("h2", &handle);
+            m_handle2.push_back(handle);
+            if(i>0)
+            {
+                // We have to take a copy of the end point, since otherwise
+                // it can happen that as more points are added to m_points 
+                // in the approximateBezier function, the data gets 
+                // reallocated and then the reference to the original point
+                // is not correct anymore.
+                Vec3 end_point = m_points[m_points.size()-1];
+                approximateBezier(0.0f, 1.0f, end_point, point,
+                                              m_handle2[i-1], m_handle1[i]);
+            }
+        }
+        m_points.push_back(point);
+    }   // for i<getNumNodes()
+
+    // The handles of a bezier curve are not needed anymore and can be 
+    // removed now (since the bezier funciton has been replaced with a
+    // piecewise linear 
+    if(m_interpolation==IP_BEZIER)
+    {
+        m_handle1.clear();
+        m_handle2.clear();
+        m_interpolation = IP_LINEAR;
+    }
+
+    if(m_points.size()==0) return;
+
+    // Compute the time for each segment based on the speed and
+    // store it in the W component.
+    m_points[0].setW(0);
+    for(unsigned int i=1; i<m_points.size(); i++)
+    {
+        m_points[i].setW( (m_points[i]-m_points[i-1]).length()/speed
+                         + m_points[i-1].getW()                   );
+    }
+    m_end_time = m_points.back().getW();
+}   // IpoData::readCurve
+
+// ----------------------------------------------------------------------------
+/** This function approximates a bezier curve by piecewise linear functions.
+ *  It uses quite primitive approximations: if the estimated distance of
+ *  the bezier curve at between t=t0 and t=t1 is greater than 2, it 
+ *  inserts one point at (t0+t1)/2, and recursively splits the two intervals
+ *  further. End condition is either a maximum recursion depth of 6 or
+ *  an estimated curve length of less than 2. It does not add any points
+ *  at t=t0 or t=t1, only between this interval.
+ *  \param t0, t1 The interval which is approximated.
+ *  \param p0, p1, h0, h1: The bezier parameters.
+ *  \param rec_level The recursion level to avoid creating too many points.
+ */
+void Ipo::IpoData::approximateBezier(float t0, float t1, 
+                               const Vec3 &p0, const Vec3 &p1,
+                               const Vec3 &h0, const Vec3 &h1,
+                               unsigned int rec_level)
+{
+    // Limit the granularity by limiting the recursion depth
+    if(rec_level>6)
+        return;
+
+    float distance = approximateLength(t0, t1, p0, p1, h0, h1);
+    // A more sophisticated estimation might be useful (e.g. taking the
+    // difference between a linear approximation and the actual bezier
+    // curve into accound.
+    if(distance<=2.0f)
+        return;
+
+    // Insert one point at (t0+t1)/2. First split the left part of
+    // the interval by a recursive call, then insert the point at
+    // (t0+t1)/2, then approximate the right part of the interval.
+    approximateBezier(t0, (t0+t1)*0.5f, p0, p1, h0, h1, rec_level + 1);
+    Vec3 middle;
+    for(unsigned int j=0; j<3; j++)
+        middle[j] = getCubicBezier((t0+t1)*0.5f, p0[j], h0[j], h1[j], p1[j]);
+    m_points.push_back(middle);
+    approximateBezier((t0+t1)*0.5f, t1, p0, p1, h0, h1, rec_level + 1);
+
+}   // approximateBezier
+
+// ----------------------------------------------------------------------------
+/** Approximates the length of a bezier curve using a simple Euler 
+ *  approximation by dividing the interval [t0, t1] into 10 pieces. Good enough
+ *  for our needs in STK.
+ *  \param t0, t1 Approximate for t in [t0, t1].
+ *  \param p0, p1 The start and end point of the curve.
+ *  \param h0, h1 The control points for the corresponding points.
+ */
+float Ipo::IpoData::approximateLength(float t0, float t1, 
+                                      const Vec3 &p0, const Vec3 &p1,
+                                      const Vec3 &h0, const Vec3 &h1)
+{
+    assert(m_interpolation == IP_BEZIER);
+
+    float distance=0;
+    const unsigned int NUM_STEPS=10;
+    float delta = (t1-t0)/NUM_STEPS;
+    Vec3 prev_point;
+    for(unsigned int j=0; j<3; j++)
+        prev_point[j] = getCubicBezier(t0, p0[j], h0[j], h1[j], p1[j]);
+    for(unsigned int i=1; i<=NUM_STEPS; i++)
+    {
+        float t = t0 + i * delta;
+        Vec3 next_point;
+        // Interpolate all three axis
+        for(unsigned j=0; j<3; j++)
+        {
+            next_point[j] = getCubicBezier(t, p0[j], h0[j], h1[j], p1[j]);
+        }
+        distance  += (next_point - prev_point).length();
+        prev_point = next_point;
+    }   // for i< NUM_STEPS
+
+    return distance;
+}   // IpoData::approximateLength
+
+// ----------------------------------------------------------------------------
+/** Adjusts the time so that it is between start and end of this Ipo. This 
+ *  takes the extend type into account, e.g. cyclic animations will just
+ *  use a modulo operation, while constant extends will return start or
+ *  end time directly.
+ *  \param time The time to adjust.
+ */
+float Ipo::IpoData::adjustTime(float time)
+{
+    if(time<m_start_time)
+    {
+        switch(m_extend)
+        {
+        case IpoData::ET_CYCLIC: 
+            time = m_start_time + fmodf(time, m_end_time-m_start_time); break;
+        case ET_CONST:
+            time = m_start_time; break;
+        default:
+            // FIXME: ET_CYCLIC_EXTRAP and ET_EXTRAP missing
+            assert(false);
+        }   // switch m_extend
+    }   // if time < m_start_time
+
+    else if(time > m_end_time)
+    {
+        switch(m_extend)
+        {
+        case ET_CYCLIC: 
+            time = m_start_time + fmodf(time, m_end_time-m_start_time); break;
+        case ET_CONST:
+            time = m_end_time; break;
+        default:
+            // FIXME: ET_CYCLIC_EXTRAP and ET_EXTRAP missing
+            assert(false);
+        }   // switch m_extend
+    }   // if time > m_end_time
+    return time;
+}   // adjustTime
+
+// ----------------------------------------------------------------------------
+float Ipo::IpoData::get(float time, unsigned int index, unsigned int n)
+{
+    switch(m_interpolation)
+    {
+    case IP_CONST  : return m_points[n][index];
+    case IP_LINEAR : {
+                        float t = time-m_points[n].getW();
+                        return m_points[n][index] 
+                             + t*(m_points[n+1][index]-m_points[n][index]) /
+                                 (m_points[n+1].getW()-m_points[n].getW());
+                     }
+    case IP_BEZIER:  {  if(n==m_points.size()-1)
+                        {
+                            // FIXME: only const implemented atm.
+                            return m_points[n][index];
+                        }
+                        float t = (time-m_points[n].getW())
+                                / (m_points[n+1].getW()-m_points[n].getW());
+                        return getCubicBezier(t, 
+                                              m_points [n  ][index],
+                                              m_handle2[n  ][index],
+                                              m_handle1[n+1][index],
+                                              m_points [n+1][index]);
+                    }
+    }   // switch
+    // Keep the compiler happy:
+    return 0;
+}   // get
+
+// ----------------------------------------------------------------------------
+/** Computes a cubic bezier curve for a given t in [0,1] and four control
+ *  points. The curve will go through p0 (t=0), p3 (t=1).
+ *  \param t The parameter for the bezier curve, must be in [0,1].
+ *  \param p0, p1, p2, p3 The four control points.
+ */
+float Ipo::IpoData::getCubicBezier(float t, float p0, float p1, 
+                                   float p2, float p3) const
+{
+    float c = 3.0f*(p1-p0);
+    float b = 3.0f*(p2-p1)-c;
+    float a = p3 - p0 - c - b;
+    return ((a*t+b)*t+c)*t+p0;
+}   // bezier
+
+// ============================================================================
+/** The Ipo constructor. Ipos can share the actual data to interpolate, which
+ *  is stored in a separate IpoData object, see Ipo(const Ipo *ipo) 
+ *  constructor. This is used for cannons: the actual check line stores the
+ *  'master' Ipo, and each actual IPO that animate a kart just use a copy
+ *  of this read-only data.
+ *  \param curve The XML data for this curve.
+ *  \param fps Frames per second, used to convert all frame based value
+ *         in the xml file into seconds. 
+ */
+Ipo::Ipo(const XMLNode &curve, float fps)
+{
+    m_ipo_data     = new IpoData(curve, fps);
+    m_own_ipo_data = true;
     reset();
 }   // Ipo
+
+// ----------------------------------------------------------------------------
+/** A copy constructor. It shares the read-only data with the source Ipo
+ *  \param ipo The ipo to copy from.
+ */
+Ipo::Ipo(const Ipo *ipo)
+{
+    // Share the read-only data
+    m_ipo_data     = ipo->m_ipo_data;
+    m_own_ipo_data = false;
+    reset();
+}   // Ipo(Ipo*)
+
+// ----------------------------------------------------------------------------
+/** Creates a copy of this object (the copy constructor is disabled in order
+ *  to avoid implicit copies happening).
+ */
+Ipo  *Ipo::clone()
+{
+    return new Ipo(this);
+}   // clone
+
+// ----------------------------------------------------------------------------
+/** The destructor only frees IpoData if it was created by this instance (and
+ *  not if this instance was copied, therefore sharing the IpoData).
+ */
+Ipo::~Ipo()
+{
+    if(m_own_ipo_data)
+        delete m_ipo_data;
+}   // ~Ipo
 
 // ----------------------------------------------------------------------------
 /** Stores the initial transform. This is necessary for relative IPOs.
@@ -93,8 +396,8 @@ Ipo::Ipo(const XMLNode &curve, float fps)
 void  Ipo::setInitialTransform(const Vec3 &xyz, 
                                const Vec3 &hpr)
 {
-    m_initial_xyz = xyz;
-    m_initial_hpr = hpr;
+    m_ipo_data->m_initial_xyz = xyz;
+    m_ipo_data->m_initial_hpr = hpr;
 }   // setInitialTransform
 
 // ----------------------------------------------------------------------------
@@ -114,17 +417,24 @@ void Ipo::reset()
  */
 void Ipo::update(float time, Vec3 *xyz, Vec3 *hpr,Vec3 *scale)
 {        
-    switch(m_channel)
+    switch(m_ipo_data->m_channel)
     {
-    case Ipo::IPO_LOCX   : xyz  ->setX(get(time)); break;
-    case Ipo::IPO_LOCY   : xyz  ->setY(get(time)); break;
-    case Ipo::IPO_LOCZ   : xyz  ->setZ(get(time)); break;
-    case Ipo::IPO_ROTX   : hpr  ->setX(get(time)); break;
-    case Ipo::IPO_ROTY   : hpr  ->setY(get(time)); break;
-    case Ipo::IPO_ROTZ   : hpr  ->setZ(get(time)); break;
-    case Ipo::IPO_SCALEX : scale->setX(get(time)); break;
-    case Ipo::IPO_SCALEY : scale->setY(get(time)); break;
-    case Ipo::IPO_SCALEZ : scale->setZ(get(time)); break;
+    case Ipo::IPO_LOCX   : xyz  ->setX(get(time, 0)); break;
+    case Ipo::IPO_LOCY   : xyz  ->setY(get(time, 0)); break;
+    case Ipo::IPO_LOCZ   : xyz  ->setZ(get(time, 0)); break;
+    case Ipo::IPO_ROTX   : hpr  ->setX(get(time, 0)); break;
+    case Ipo::IPO_ROTY   : hpr  ->setY(get(time, 0)); break;
+    case Ipo::IPO_ROTZ   : hpr  ->setZ(get(time, 0)); break;
+    case Ipo::IPO_SCALEX : scale->setX(get(time, 0)); break;
+    case Ipo::IPO_SCALEY : scale->setY(get(time, 0)); break;
+    case Ipo::IPO_SCALEZ : scale->setZ(get(time, 0)); break;
+    case Ipo::IPO_LOCXYZ : 
+        {
+            for(unsigned int j=0; j<3; j++)
+                (*xyz)[j] = get(time, j);
+            break;
+        }
+
     default: assert(false); // shut up compiler warning
     }    // switch
 
@@ -135,162 +445,22 @@ void Ipo::update(float time, Vec3 *xyz, Vec3 *hpr,Vec3 *scale)
  *  keeps track of).
  *  \param time The time for which the interpolated value should be computed.
  */
-float Ipo::get(float time) const
+float Ipo::get(float time, unsigned int index) const
 {
-    if(time<m_start_time)
-    {
-        switch(m_extend)
-        {
-        case ET_CYCLIC: 
-            time = m_start_time + fmodf(time, m_end_time-m_start_time); break;
-        case ET_CONST:
-            time = m_start_time; break;
-        default:
-            // FIXME: ET_CYCLIC_EXTRAP and ET_EXTRAP missing
-            assert(false);
-        }   // switch m_extend
-    }   // if time < m_start_time
-
-    if(time > m_end_time)
-    {
-        switch(m_extend)
-        {
-        case ET_CYCLIC: 
-            time = m_start_time + fmodf(time, m_end_time-m_start_time); break;
-        case ET_CONST:
-            time = m_end_time; break;
-        default:
-            // FIXME: ET_CYCLIC_EXTRAP and ET_EXTRAP missing
-            assert(false);
-        }   // switch m_extend
-    }   // if time > m_end_time
-
     // Avoid crash in case that only one point is given for this IPO.
     if(m_next_n==0) 
-        return m_points[0].getY();
+        return m_ipo_data->m_points[0][index];
+float orig_t=time;
+    time = m_ipo_data->adjustTime(time);
 
     // Time was reset since the last cached value for n,
     // reset n to start from the beginning again.
-    if(time < m_points[m_next_n-1].getX())
+    if(time < m_ipo_data->m_points[m_next_n-1].getW())
         m_next_n = 1;
     // Search for the first point in the (sorted) array which is greater or equal
     // to the current time. 
-    while(m_next_n<m_points.size()-1 && time >=m_points[m_next_n].getX())
+    while(m_next_n<m_ipo_data->m_points.size()-1 && 
+         time >=m_ipo_data->m_points[m_next_n].getW())
         m_next_n++;
-    int n = m_next_n - 1;
-    switch(m_interpolation)
-    {
-    case IP_CONST  : return m_points[n].getY();
-    case IP_LINEAR : {
-                        float t = time-m_points[n].getX();
-                        return m_points[n].getY() 
-                             + t*(m_points[n+1].getY()-m_points[n].getY()) /
-                                 (m_points[n+1].getX()-m_points[n].getX());
-                     }
-    case IP_BEZIER: {  
-        if(n==(int)m_points.size()-1)
-                        {
-                            // FIXME: only const implemented atm.
-                            return m_points[n].getY();
-                        }
-                        float t = (time-m_points[n].getX())
-                                / (m_points[n+1].getX()-m_points[n].getX());
-                        return getCubicBezier(t, 
-                                              m_points[n].getY(),
-                                              m_handle2[n].getY(),
-                                              m_handle1[n+1].getY(),
-                                              m_points[n+1].getY());
-                    }
-    }   // switch
-    // Keep the compiler happy:
-    return 0;
+    return m_ipo_data->get(time, index, m_next_n-1);
 }   // get
-
-// ----------------------------------------------------------------------------
-/** Computes a cubic bezier curve for a given t in [0,1] and four control
- *  points. The curve will go through p0 (t=0), p3 (t=1).
- *  \param t The parameter for the bezier curve, must be in [0,1].
- *  \param p0, p1, p2, p3 The four control points.
- */
-float Ipo::getCubicBezier(float t, float p0, float p1, 
-                                   float p2, float p3) const
-{
-    float c = 3.0f*(p1-p0);
-    float b = 3.0f*(p2-p1)-c;
-    float a = p3 - p0 - c - b;
-    return ((a*t+b)*t+c)*t+p0;
-}   // bezier
-// ----------------------------------------------------------------------------
-/** Inserts a new start point at the beginning of the IPO to make sure that
- *  this IPO starts with X.
- *  \param x The minimum value for which this IPO should be defined.
- */
-void Ipo::extendStart(float x)
-{
-    assert(m_points[0].getX() > x);
-    extend(x, 0);
-}   // extendStart
-// ----------------------------------------------------------------------------
-/** Inserts an additional point at the end of the IPO to make sure that this
- *  IPO ends with X.
- *  \param x The maximum value for which this IPO should be defined.
- */
-void Ipo::extendEnd(float x)
-{
-    assert(m_points[m_points.size()-1].getX() < x);
-    extend(x, m_points.size()-1);
-}   // extendEnd
-
-// ----------------------------------------------------------------------------
-/** Extends the IPO either at the beginning (n=0) or at the end (n=size()-1). 
- *  This is used by AnimationBase to make sure all IPOs of one curve have the 
- *  same cycle.
- *  \param x The X value to which the IPO must be extended.
- *  \param n The index at (before/after) which to extend.
- */
-void Ipo::extend(float x, unsigned int n)
-{
-    switch (m_interpolation)
-    {
-        case IP_CONST:
-        {
-            Vec3 new_point(x,  m_points[n].getY(), 0);
-            if(n==0)
-                m_points.insert(m_points.begin(), new_point);
-            else
-                m_points.push_back( new_point);
-            break;
-        }
-        case IP_LINEAR:
-        {
-            Vec3 new_point(x, m_points[n].getY(), 0);
-            if(n==0)
-                m_points.insert(m_points.begin(), new_point);
-            else
-                m_points.push_back(new_point);
-            break;
-        }
-        case IP_BEZIER:
-        {
-            // FIXME: I'm somewhat dubious this is the correct way to 
-            // extend handles
-            Vec3 new_h1 = m_handle1[n] + Vec3(x - m_points[n].getX() ,0, 0);
-            Vec3 new_h2 = m_handle2[n] + Vec3(x - m_points[n].getX() ,0, 0);
-            Vec3 new_p(x, m_points[n].getY());
-            if(n==0)
-            {
-                m_handle1.insert(m_handle1.begin(), new_h1);
-                m_handle2.insert(m_handle2.begin(), new_h2);
-                m_points.insert(m_points.begin(), new_p);
-            }
-            else
-            {
-                m_handle1.push_back(new_h1);
-                m_handle2.push_back(new_h2);
-                m_points.push_back(new_p);
-            }
-            break;
-        }            
-    }
-}   // extend
-

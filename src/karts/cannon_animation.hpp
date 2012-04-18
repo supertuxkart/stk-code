@@ -29,17 +29,26 @@
 
 class AbstractKart;
 class AnimationBase;
+class Ipo;
 
 class CannonAnimation: public AbstractKartAnimation
 {
 protected:
-    /** The offset between the point where the check line was originially
-     *  crossed and the origin of the curve. */
-    Vec3 delta;
+    /** The offset between the origin of the curve (relative to which
+     *  all points are interpolated) and the position of the kart. */
+    Vec3           m_offset;
 
+    /** An offset that is rotated with the kart and is added to the 
+     *  interpolated point. This basically shifts the curve (usually)
+     *  to the left/right to be aligned with the crossing point of the 
+     *  kart. */
+    Vec3           m_delta;
 
+    /** Stores the curve interpolation for the cannon. */
+    AnimationBase *m_curve;
+    
 public:
-             CannonAnimation(AbstractKart *kart, AnimationBase *ab);
+             CannonAnimation(AbstractKart *kart, Ipo *ipo, const Vec3 &delta);
     virtual ~CannonAnimation();
     virtual void  update(float dt);
     

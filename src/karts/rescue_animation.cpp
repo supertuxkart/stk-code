@@ -49,8 +49,6 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     m_add_rotation = -m_curr_rotation/m_timer;
     m_curr_rotation.setHeading(m_kart->getHeading());
 
-    World::getWorld()->getPhysics()->removeKart(m_kart);
-
     // Add a hit unless it was auto-rescue
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
         !is_auto_rescue)

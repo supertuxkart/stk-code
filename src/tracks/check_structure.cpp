@@ -48,7 +48,8 @@ CheckStructure::CheckStructure(const XMLNode &node, unsigned int index)
         m_check_type = CT_TOGGLE;
     else if(kind=="ambient-light")
         m_check_type = CT_AMBIENT_SPHERE;
-	else if(kind=="cannon")
+    // Cannons don't have a kind specified, so test for the name in this case
+	else if(node.getName()=="cannon")
 		m_check_type = CT_CANNON;
     else
     {

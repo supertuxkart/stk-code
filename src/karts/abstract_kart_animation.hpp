@@ -50,7 +50,7 @@ protected:
 public:
                  AbstractKartAnimation(AbstractKart *kart, 
                                        const std::string &name);
-    virtual     ~AbstractKartAnimation() {}
+    virtual     ~AbstractKartAnimation();
     virtual void update(float dt);
     // ------------------------------------------------------------------------
     virtual float getAnimationTimer() const { return m_timer; }

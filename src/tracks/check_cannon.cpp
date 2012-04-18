@@ -19,6 +19,7 @@
 #include "tracks/check_cannon.hpp"
 
 #include "animations/animation_base.hpp"
+#include "animations/ipo.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/cannon_animation.hpp"
@@ -54,7 +55,7 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
 		exit(-1);
 	}
     m_target.setLine(p1, p2);
-    m_curve = new CannonCurve(node);
+    m_curve = new Ipo(*(node.getNode("curve")));
 }   // CheckCannon
 
 // ----------------------------------------------------------------------------
@@ -68,5 +69,10 @@ void CheckCannon::trigger(unsigned int kart_index)
 {
 	Vec3 target(m_target.getMiddle());
 	AbstractKart *kart = World::getWorld()->getKart(kart_index);
-	new CannonAnimation(kart, m_curve);
+    if(kart->getKartAnimation()) return;
+
+    const core::vector2df &cross = getCrossPoint();
+    const core::line2df   &line  = getLine2D();
+    Vec3 delta = Vec3(1,0,0) * (line.start-cross).getLength();
+	new CannonAnimation(kart, m_curve->clone(), delta);
 }   // CheckCannon
