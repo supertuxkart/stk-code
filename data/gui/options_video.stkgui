@@ -73,7 +73,7 @@
             <spacer width="40" height="100%" />
             <checkbox id="rememberWinpos"/>
             <spacer width="20" height="100%" />
-            <label I18N="In the video settings" text="Remember window location" proportion="1"/>
+            <label I18N="In the video settings" text="Remember window location"/>
         </div>
         
         <spacer height="10" width="10"/>
