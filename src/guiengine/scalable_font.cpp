@@ -89,6 +89,9 @@ void ScalableFont::setShadow(const irr::video::SColor &col)
     
 void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
 {
+    int trim_top = 0;
+    int trim_bottom = 0;
+    
     while (xml->read())
     {
         if (io::EXN_ELEMENT == xml->getNodeType())
@@ -96,6 +99,18 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
             if (core::stringw(L"include") == xml->getNodeName())
             {
                 core::stringc filename = xml->getAttributeValue(L"file");
+                /*
+                const wchar_t* iflangis = xml->getAttributeValue(L"iflanguage");
+                
+                printf("langcode = %s\n", translations->getCurrentLanguageCode().c_str());
+                
+                if (iflangis != NULL &&
+                    core::stringc(iflangis) != translations->getCurrentLanguageCode().c_str())
+                {
+                    continue;
+                }
+                */
+                
                 io::IXMLReader* included = file_manager->createXMLReader(
                     file_manager->getFontFile(filename.c_str()));
                 if (included != NULL)
@@ -142,6 +157,11 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
                 
                 m_texture_files[i] = info;                
             }
+            else if (core::stringw(L"font") == xml->getNodeName())
+            {
+                trim_top = (u32)xml->getAttributeValueAsInt(L"trim_top"); // returns 0 if no such attribute
+                trim_bottom = (u32)xml->getAttributeValueAsInt(L"trim_bottom");
+            }
             else if (core::stringw(L"c") == xml->getNodeName())
             {
                 // adding a character to this font
@@ -178,7 +198,7 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
                     val += *c - '0';
                     c++;
                 }
-                rectangle.UpperLeftCorner.Y = val;
+                rectangle.UpperLeftCorner.Y = val + trim_top;
                 while (*c == L' ' || *c == L',') c++;
                 
                 val = 0;
@@ -198,7 +218,7 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
                     val += *c - '0';
                     c++;
                 }
-                rectangle.LowerRightCorner.Y = val;
+                rectangle.LowerRightCorner.Y = val - trim_bottom;
                 
                 CharacterMap[ch] = Areas.size();
                 
