@@ -438,6 +438,12 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
             left_space -= (horizontal ? widgets[n].m_w : widgets[n].m_h);
         } // next widget
         
+        if (left_space < 0)
+        {
+            fprintf(stderr, "[LayoutManager] WARNING: statically sized widgets took all the place!!\n");
+            left_space = 0;
+        }
+        
         // ---- lay widgets in row
         int x = parent->m_x;
         int y = parent->m_y;
@@ -509,6 +515,14 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                         if (widgets[n].m_w > max_width) widgets[n].m_w = max_width;
                     }
                     
+                    if (widgets[n].m_w <= 0)
+                    {
+                        fprintf(stderr, "WARNING: widget '%s' has a width of %i (left_space = %i, "
+                                "fraction = %f, max_width = %s)\n", widgets[n].m_properties[PROP_ID].c_str(),
+                                widgets[n].m_w, left_space, fraction, widgets[n].m_properties[PROP_MAX_WIDTH].c_str());
+                        widgets[n].m_w = 1;
+                    }
+                    
                     x += widgets[n].m_w;
                 }
                 else
@@ -519,6 +533,14 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                     {
                         const int max_height = atoi_p( widgets[n].m_properties[PROP_MAX_HEIGHT].c_str() );
                         if (widgets[n].m_h > max_height) widgets[n].m_h = max_height;
+                    }
+                    
+                    if (widgets[n].m_h <= 0)
+                    {
+                        fprintf(stderr, "WARNING: widget '%s' has a height of %i (left_space = %i, "
+                                "fraction = %f, max_width = %s)\n", widgets[n].m_properties[PROP_ID].c_str(),
+                                widgets[n].m_h, left_space, fraction, widgets[n].m_properties[PROP_MAX_WIDTH].c_str());
+                        widgets[n].m_h = 1;
                     }
                     
                     std::string align = widgets[n].m_properties[ PROP_ALIGN ];
