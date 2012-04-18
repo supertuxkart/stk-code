@@ -51,6 +51,11 @@ private:
     /** The minimum height of the checkline. */
     float           m_min_height;
 
+    /** The actual (or estimated) left and right end points in 3d. This is
+     *  used by the cannon. If the xml file stores only the min_height, those
+     *  points are set from the 2d points and the min height. */
+    Vec3            m_left_point, m_right_point;
+
     /** Stores the sign (i.e. side) of the previous line to save some 
      *  computations. True if the value is >=0, i.e. the point is on
      *  or to the right of the line. */

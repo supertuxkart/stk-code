@@ -18,14 +18,15 @@
 
 #include "tracks/check_line.hpp"
 
-#include <string>
-
-#include "irrlicht.h"
-
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
+
+#include "irrlicht.h"
+
+#include <algorithm>
+#include <string>
 
 /** Constructor for a checkline. 
  *  \param node XML node containing the parameters for this checkline.
@@ -38,9 +39,21 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
     // in world, so we can't call world->getNumKarts()
     m_previous_sign.resize(race_manager->getNumberOfKarts());
     core::vector2df p1, p2;
-    node.get("p1", &p1);
-    node.get("p2", &p2);
-    node.get("min-height", &m_min_height);
+    if(node.get("p1", &p1)   &&
+        node.get("p2", &p2)  &&
+        node.get("min-height", &m_min_height))
+    {
+        m_left_point  = Vec3(p1.X, m_min_height, p1.Y);
+        m_right_point = Vec3(p2.X, m_min_height, p2.Y);
+    }
+    else
+    {
+        node.get("p1", &m_left_point);
+        p1 = core::vector2df(m_left_point.getX(), m_left_point.getZ());
+        node.get("p2", &m_right_point);
+        p2 = core::vector2df(m_right_point.getX(), m_right_point.getZ());
+        m_min_height = std::min(m_left_point.getY(), m_right_point.getY());
+    }
     m_line.setLine(p1, p2);
     if(UserConfigParams::m_check_debug)
     {
