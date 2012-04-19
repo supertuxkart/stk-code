@@ -222,6 +222,10 @@ void PlayerController::steer(float dt, int steer_val)
     if(UserConfigParams::m_gamepad_debug)
     {
         printf("steering: steer_val %d ", steer_val);
+        RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
+        gui_base->clearAllMessages();
+        gui_base->addMessage(StringUtils::insertValues(L"steer_val %i", steer_val), m_kart, 1.0f,
+                             video::SColor(255, 255, 0, 255), false);
     }
     const float STEER_CHANGE = dt/m_kart->getTimeFullSteer();  // amount the steering is changed
     if (steer_val < 0)
