@@ -326,23 +326,23 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
 
     if (gPad != NULL) 
     {
-        StateManager::ActivePlayer* thePlayer = NULL;
-        if (m_single_player != NULL)
+        if (gPad->processAndMapInput(type, btnID, value, mode, gPad->getPlayer(), action))
         {
-            thePlayer = m_single_player;
-        }
-        else if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
-        {
-            thePlayer = NULL;
-        }
-        else 
-        {
-            thePlayer = gPad->getPlayer();
-        }
-        
-        if (gPad->processAndMapInput(type, btnID, value, mode, thePlayer, action))
-        {
-            *player = thePlayer;
+            if (m_single_player != NULL)
+            {
+                *player = m_single_player;
+                
+                // in single-player mode, assign the gamepad as needed
+                if (gPad->getPlayer() != m_single_player) gPad->setPlayer(m_single_player);
+            }
+            else if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
+            {
+                *player = NULL;
+            }
+            else 
+            {
+                *player = gPad->getPlayer();
+            }
         }
         else gPad = NULL; // If no bind was found, return NULL
     }
