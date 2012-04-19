@@ -385,7 +385,9 @@ public:
         and oriented in the direction the kart is going. Can be useful
         e.g. to calculate the starting point and direction of projectiles. */
     virtual btTransform getAlignedTransform(const float customPitch=-1) = 0;
-
+    // -------------------------------------------------------------------------
+    virtual void onFirePressed() = 0;
+    
 };   // AbstractKart
 
 

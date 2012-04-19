@@ -401,6 +401,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the terrain info oject. */
     TerrainInfo *getTerrainInfo() { return m_terrain_info; }
+    // ------------------------------------------------------------------------
+    virtual void onFirePressed();
 };   // Kart
 
 

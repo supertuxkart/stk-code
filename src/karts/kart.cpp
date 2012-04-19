@@ -976,16 +976,6 @@ void Kart::update(float dt)
         race_state->storeKartControls(*this);
     }
 
-    // On a client fiering is done upon receiving the command from the server.
-    if ( m_controls.m_fire && network_manager->getMode()!=NetworkManager::NW_CLIENT
-        && !getKartAnimation())
-    {
-        // use() needs to be called even if there currently is no collecteable
-        // since use() can test if something needs to be switched on/off.
-        m_powerup->use() ;
-        m_controls.m_fire = false;
-    }
-
     if (!m_flying)
     {
         // When really on air, free fly, when near ground, try to glide / adjust for landing
@@ -1160,6 +1150,19 @@ void Kart::update(float dt)
         m_shadow_enabled = true;
     }
 }   // update
+
+//-----------------------------------------------------------------------------
+void Kart::onFirePressed()
+{
+        // On a client fiering is done upon receiving the command from the server.
+    if (network_manager->getMode()!=NetworkManager::NW_CLIENT
+        && !getKartAnimation())
+    {
+        // use() needs to be called even if there currently is no collecteable
+        // since use() can test if something needs to be switched on/off.
+        m_powerup->use() ;
+    }
+}
 
 //-----------------------------------------------------------------------------
 /** Show fire to go with a zipper.
