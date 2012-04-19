@@ -247,7 +247,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
         {
             success = m_configuration->getGameAction(type, id, value, action);
         }
-        else if (value > Input::MAX_VALUE/2)
+        else if (abs(value) > Input::MAX_VALUE/2)
         {
             // bindings can only be accessed in game and menu modes
             assert(mode == InputManager::MENU);
