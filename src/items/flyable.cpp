@@ -370,10 +370,6 @@ bool Flyable::updateAndDelete(float dt)
     if(m_do_terrain_info)
         TerrainInfo::update(xyz+m_position_offset);
 
-    // Remove flyable if its
-    if(TerrainInfo::getMaterial()==NULL)
-        return true;
-
     if(m_adjust_up_velocity)
     {
         float hat = xyz.getY()-getHoT();
