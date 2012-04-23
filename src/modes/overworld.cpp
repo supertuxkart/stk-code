@@ -193,7 +193,7 @@ void OverWorld::moveKartAfterRescue(AbstractKart* kart)
 
 //-----------------------------------------------------------------------------
 
-const btTransform& OverWorld::getClosestStartPoint(float currentKart_x, float currentKart_z)
+btTransform OverWorld::getClosestStartPoint(float currentKart_x, float currentKart_z)
 {
     // find closest point to drop kart on
     World *world = World::getWorld();

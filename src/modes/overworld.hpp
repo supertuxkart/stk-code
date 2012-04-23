@@ -42,7 +42,7 @@ protected:
     
     void moveKartAfterRescue(AbstractKart* kart, float angle);
     
-    const btTransform& getClosestStartPoint(float currentKart_x, float currentKart_z);
+    btTransform getClosestStartPoint(float currentKart_x, float currentKart_z);
 
 public:
                   OverWorld();
