@@ -331,10 +331,20 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         const core::rect<s32> source(core::position2d<s32>(0,0),
                                      m_icons[state]->getOriginalSize());
         
-        core::rect<s32> dest(m_map_left+(int)(draw_at.getX()-m_marker_challenge_size/2), 
-                             lower_y   -(int)(draw_at.getY()+m_marker_challenge_size/2),
-                             m_map_left+(int)(draw_at.getX()+m_marker_challenge_size/2), 
-                             lower_y   -(int)(draw_at.getY()-m_marker_challenge_size/2));
+        int marker_size = m_marker_challenge_size;
+        core::position2di mouse = irr_driver->getMouseLocation();
+        core::rect<s32> dest(m_map_left+(int)(draw_at.getX()-marker_size/2), 
+                             lower_y   -(int)(draw_at.getY()+marker_size/2),
+                             m_map_left+(int)(draw_at.getX()+marker_size/2), 
+                             lower_y   -(int)(draw_at.getY()-marker_size/2));
+        if (dest.isPointInside(mouse))
+        {
+            marker_size = (int)(marker_size*1.6f);
+            dest = core::rect<s32>(m_map_left+(int)(draw_at.getX()-marker_size/2), 
+                                   lower_y   -(int)(draw_at.getY()+marker_size/2),
+                                   m_map_left+(int)(draw_at.getX()+marker_size/2), 
+                                   lower_y   -(int)(draw_at.getY()-marker_size/2));
+        }
         irr_driver->getVideoDriver()->draw2DImage(m_icons[state],
                                                   dest, source, NULL, NULL, true);
     }

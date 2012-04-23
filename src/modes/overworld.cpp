@@ -66,6 +66,8 @@ void OverWorld::enterOverWorld()
     StateManager::get()->enterGameState();
     network_manager->setupPlayerKartInfo();
     race_manager->startNew(false);
+    
+    irr_driver->showPointer(); // the user should be able to click on the minimap
 }
 
 //-----------------------------------------------------------------------------
@@ -186,14 +188,19 @@ void OverWorld::onFirePressed(Controller* who)
  */
 void OverWorld::moveKartAfterRescue(AbstractKart* kart)
 {
+    moveKartAfterRescue(kart, 0);
+}
+
+//-----------------------------------------------------------------------------
+
+const btTransform& OverWorld::getClosestStartPoint(float currentKart_x, float currentKart_z)
+{
     // find closest point to drop kart on
     World *world = World::getWorld();
     const int start_spots_amount = world->getTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
     
-    const float currentKart_x = kart->getXYZ().getX();
-    const float currentKart_z = kart->getXYZ().getZ();
-
+    
     int closest_id = -1;
     float closest_distance = 999999999.0f;
 
@@ -215,7 +222,22 @@ void OverWorld::moveKartAfterRescue(AbstractKart* kart)
     }
     
     assert(closest_id != -1);
-    const btTransform &s = world->getTrack()->getStartTransform(closest_id);
+    return world->getTrack()->getStartTransform(closest_id);
+}
+
+//-----------------------------------------------------------------------------
+
+void OverWorld::moveKartAfterRescue(AbstractKart* kart, float angle)
+{
+    // find closest point to drop kart on
+    World *world = World::getWorld();
+    const int start_spots_amount = world->getTrack()->getNumberOfStartPositions();
+    assert(start_spots_amount > 0);
+    
+    const float currentKart_x = kart->getXYZ().getX();
+    const float currentKart_z = kart->getXYZ().getZ();
+
+    const btTransform& s = getClosestStartPoint(currentKart_x, currentKart_z);
     const Vec3 &xyz = s.getOrigin();
     kart->setXYZ(xyz);
     kart->setRotation(s.getRotation());
@@ -223,7 +245,7 @@ void OverWorld::moveKartAfterRescue(AbstractKart* kart)
     //position kart from same height as in World::resetAllKarts
     btTransform pos;
     pos.setOrigin(kart->getXYZ()+btVector3(0, 0.5f*kart->getKartHeight(), 0.0f));
-    pos.setRotation( btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0 /* angle */) );
+    pos.setRotation( btQuaternion(btVector3(0.0f, 1.0f, 0.0f), angle) );
 
     kart->getBody()->setCenterOfMassTransform(pos);
 
@@ -244,3 +266,44 @@ void OverWorld::moveKartAfterRescue(AbstractKart* kart)
     }
 }   // moveKartAfterRescue
 
+//-----------------------------------------------------------------------------
+
+void OverWorld::onMouseClick(int x, int y)
+{
+    //FIXME: this code is duplicated from RaceGUIOverworld
+    const float scaling = irr_driver->getFrameSize().Height / 420.0f;
+    int marker_challenge_size        = (int)( 12.0f * scaling);
+    int map_left   = 20;
+    int map_bottom = UserConfigParams::m_height-10;
+    
+    Track* t = getTrack();
+    
+    const std::vector<OverworldChallenge>& challenges = t->getChallengeList();
+    
+    for (unsigned int n=0; n<challenges.size(); n++)
+    {
+        Vec3 draw_at;
+        t->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
+        
+        int marker_size = marker_challenge_size;
+        core::position2di mouse = irr_driver->getMouseLocation();
+        core::rect<s32> dest(map_left  +(int)(draw_at.getX()-marker_size/2), 
+                             map_bottom-(int)(draw_at.getY()+marker_size/2),
+                             map_left  +(int)(draw_at.getX()+marker_size/2), 
+                             map_bottom-(int)(draw_at.getY()-marker_size/2));
+        if (dest.isPointInside(mouse))
+        {
+            AbstractKart* kart = getKart(0);
+            const btTransform& s = getClosestStartPoint(challenges[n].m_position.X,
+                                                        challenges[n].m_position.Z);
+            const Vec3 &xyz = s.getOrigin();
+            printf("Kart: %f %f    Challenge : %f %f\n", xyz[0], xyz[2], challenges[n].m_position.X, challenges[n].m_position.Z);
+            float angle = atan2(challenges[n].m_position.X - xyz[0],
+                                challenges[n].m_position.Z - xyz[2]);
+            printf("    --> %f \n", angle);
+            kart->setXYZ(xyz);
+            moveKartAfterRescue(kart, angle);
+            return;
+        }
+    }    
+}

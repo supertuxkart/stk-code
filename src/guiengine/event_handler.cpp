@@ -30,6 +30,7 @@
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input_manager.hpp"
+#include "modes/world.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
 
@@ -145,6 +146,13 @@ bool EventHandler::OnEvent (const SEvent &event)
            event.MouseInput.Event == EMIE_LMOUSE_LEFT_UP)
         {
             profiler.onClick(m_mouse_pos);
+        }
+
+        if (event.EventType == EET_MOUSE_INPUT_EVENT &&
+            event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN &&
+            StateManager::get()->getGameState() == GAME)
+        {
+            World::getWorld()->onMouseClick(event.MouseInput.X, event.MouseInput.Y);
         }
 
         // FIXME? it may be a bit unclean that all input events go trough the gui module

@@ -40,6 +40,10 @@ protected:
     
     bool m_return_to_garage;
     
+    void moveKartAfterRescue(AbstractKart* kart, float angle);
+    
+    const btTransform& getClosestStartPoint(float currentKart_x, float currentKart_z);
+
 public:
                   OverWorld();
    /** call just after instanciating. can't be moved to the contructor as child
@@ -77,6 +81,8 @@ public:
     void scheduleReturnToGarage() { m_return_to_garage = true; }
     // ------------------------------------------------------------------------ 
     virtual void moveKartAfterRescue(AbstractKart* kart);
+    // ------------------------------------------------------------------------
+    virtual void onMouseClick(int x, int y);
 };
 
 #endif

@@ -451,6 +451,13 @@ void IrrDriver::hidePointer()
 
 //-----------------------------------------------------------------------------
 
+core::position2di IrrDriver::getMouseLocation()
+{
+    return this->getDevice()->getCursorControl()->getPosition();
+}
+
+//-----------------------------------------------------------------------------
+
 void IrrDriver::changeResolution(const int w, const int h, 
                                  const bool fullscreen)
 {

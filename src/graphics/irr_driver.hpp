@@ -192,6 +192,7 @@ public:
     void                  showPointer();
     void                  hidePointer();
     bool                  isPointerShown() const { return m_pointer_shown; }
+    core::position2di     getMouseLocation();
     
     void                  printRenderStats();
     /** Returns the current real time, which might not be 0 at start of the
