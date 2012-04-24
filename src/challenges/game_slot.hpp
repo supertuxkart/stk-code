@@ -38,8 +38,12 @@ class XMLWriter;
 
 class GameSlot
 {
-    irr::core::stringw m_player_name;
     std::string m_kart_ident;
+    
+    /** Profile names can change, so rather than try to make sure all renames are done everywhere,
+     *  assign a unique ID to each profiler. Will save much headaches.
+     */
+    std::string m_player_unique_id;
     
     /** Contains whether each feature of the challenge is locked or unlocked */
     std::map<std::string, bool>   m_locked_features;
@@ -61,14 +65,16 @@ class GameSlot
     
 public:
     
-    GameSlot(const irr::core::stringw& player_name)
+    // do NOT attempt to pass 'player_unique_id' by reference here. I don't know why (compiler bug
+    // maybe?) but this screws up everything. Better pass by copy.
+    GameSlot(std::string player_unique_id)
     {
-        m_player_name = player_name;
+        m_player_unique_id = player_unique_id;
         m_points = 0;
         m_first_time = true;
     }
     
-    const irr::core::stringw& getPlayerName() const { return m_player_name; }
+    const std::string& getPlayerID() const { return m_player_unique_id; }
     const std::string& getKartIdent () const { return m_kart_ident;  }
     void setKartIdent(const std::string& kart_ident) { m_kart_ident = kart_ident; }
     

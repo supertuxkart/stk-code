@@ -362,6 +362,9 @@ namespace StringUtils
     
     std::string encodeToHtmlEntities(const irr::core::stringw &output);
     
+    /** Compute a simple hash of a string */
+    unsigned int simpleHash(const char* input);
+    
 } // namespace StringUtils
 
 #endif

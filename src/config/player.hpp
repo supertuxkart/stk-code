@@ -22,6 +22,7 @@
 #include <string>
 #include "config/user_config.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/string_utils.hpp"
 #include <irrString.h>
 using namespace irr;
 
@@ -48,6 +49,18 @@ protected:
     
     IntUserConfigParam    m_use_frequency;
 
+    /** Profile names can change, so rather than try to make sure all renames are done everywhere,
+     *  assign a unique ID to each profiler. Will save much headaches.
+     */
+    StringUserConfigParam m_unique_id;
+    
+    int64_t generateUniqueId(const char* playerName)
+    {
+        return ((int64_t)(Time::getTimeSinceEpoch()) << 32) |
+               (rand()%65536) << 16 |
+               (StringUtils::simpleHash(playerName) & 0xFFFF);
+    }
+    
 public:
     
     /**
@@ -56,11 +69,16 @@ public:
     PlayerProfile(const core::stringw& name) : m_player_group("Player", "Represents one human player"),
                                                m_name(name, "name", &m_player_group), //, m_last_kart_id(-1)
                                                m_is_guest_account(false, "guest", &m_player_group),
-                                               m_use_frequency(0, "use_frequency", &m_player_group)
+                                               m_use_frequency(0, "use_frequency", &m_player_group),
+                                               m_unique_id("", "unique_id", &m_player_group)
     {
 #ifdef DEBUG
         m_magic_number = 0xABCD1234;
 #endif
+        int64_t unique_id = generateUniqueId(core::stringc(name.c_str()).c_str());
+        char buffer[32];
+        sprintf(buffer, "%llx", unique_id);
+        m_unique_id = buffer;
     }
     
     /**
@@ -71,12 +89,23 @@ public:
     PlayerProfile(const XMLNode* node) : m_player_group("Player", "Represents one human player"),
                                          m_name("-", "name", &m_player_group), //, m_last_kart_id(-1)
                                          m_is_guest_account(false, "guest", &m_player_group),
-                                         m_use_frequency(0, "use_frequency", &m_player_group)
+                                         m_use_frequency(0, "use_frequency", &m_player_group),
+                                         m_unique_id("", "unique_id", &m_player_group)
     {
         //m_player_group.findYourDataInAChildOf(node);
         m_name.findYourDataInAnAttributeOf(node);
         m_is_guest_account.findYourDataInAnAttributeOf(node);
         m_use_frequency.findYourDataInAnAttributeOf(node);
+        m_unique_id.findYourDataInAnAttributeOf(node);
+        
+        if ((std::string)m_unique_id == "")
+        {
+            fprintf(stderr, "** WARNING: Player has no unique ID, probably it is from an older STK version\n");
+            int64_t unique_id = generateUniqueId(core::stringc(m_name.c_str()).c_str());
+            char buffer[32];
+            sprintf(buffer, "%llx", unique_id);
+            m_unique_id = buffer;
+        }
         
         #ifdef DEBUG
         m_magic_number = 0xABCD1234;
@@ -128,6 +157,12 @@ public:
         else m_use_frequency++;
     }
  
+    // please do NOT try to optimise this to return a reference, I don't know why,
+    // maybe compiler bug, but hell breaks loose when you do that
+    std::string getUniqueID() const
+    {
+        return m_unique_id;
+    }
 };
 
 #endif

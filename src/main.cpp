@@ -976,7 +976,7 @@ int handleCmdLine(int argc, char **argv)
     }   // for i <argc
     if(UserConfigParams::m_no_start_screen)
         unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
-                                       .getName()                        );
+                                       .getUniqueID()                    );
     if(ProfileWorld::isProfileMode())
     {
         UserConfigParams::m_sfx = false;  // Disable sound effects 
@@ -1155,6 +1155,7 @@ bool ShowDumpResults(const wchar_t* dump_path,
 }
 #endif
 
+
 int main(int argc, char *argv[] )
 {
 #ifdef BREAKPAD
@@ -1162,7 +1163,7 @@ int main(int argc, char *argv[] )
                                          NULL, google_breakpad::ExceptionHandler::HANDLER_ALL);
 #endif
     srand(( unsigned ) time( 0 ));
-
+    
     try {
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must

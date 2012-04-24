@@ -620,6 +620,18 @@ namespace StringUtils
         return output.str();
     }   // encodeToHtmlEntities
 
+    // ------------------------------------------------------------------------
+    
+    unsigned int simpleHash(const char* input)
+    {
+         int hash = 0;
+         for (int n=0; input[n] != 0; n++)
+         {
+            hash += (hash << (hash & 0xF)) ^ input[n];
+         }
+         
+         return hash;
+    }
 } // namespace StringUtils
 
 

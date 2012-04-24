@@ -48,12 +48,13 @@ private:
     typedef std::map<std::string, ChallengeData*> AllChallengesType;
     AllChallengesType             m_all_challenges;
     
-    std::map<irr::core::stringw, GameSlot*> m_game_slots;
+    std::map<std::string, GameSlot*> m_game_slots;
     
     void readAllChallengesInDirs(const std::vector<std::string>* all_dirs);
     bool createSlotsIfNeeded();
     
-    irr::core::stringw m_current_game_slot;
+    /** ID of the active player */
+    std::string m_current_game_slot;
     
     friend class GameSlot;
     
@@ -71,12 +72,16 @@ public:
     /** Eye- (or rather ear-) candy. Play a sound when user tries to access a locked area */
     void       playLockSound() const;
     
-    const core::stringw& getCurrentSlotName() const { return m_current_game_slot; }
+    const std::string& getCurrentSlotID() const { return m_current_game_slot; }
     
-    GameSlot*  getCurrentSlot() { return m_game_slots[m_current_game_slot]; }
+    GameSlot*  getCurrentSlot()
+    {
+        assert(m_game_slots.find(m_current_game_slot) != m_game_slots.end());
+        return m_game_slots[m_current_game_slot];
+    }
     
     /** \param slotid name of the player */
-    void       setCurrentSlot(irr::core::stringw slotid) { m_current_game_slot = slotid; }
+    void       setCurrentSlot(std::string slotid) { m_current_game_slot = slotid; }
     
     PlayerProfile* getCurrentPlayer();
     

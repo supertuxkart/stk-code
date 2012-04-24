@@ -87,7 +87,18 @@ void OptionsScreenPlayers::init()
     }
     
     ButtonWidget* you = getWidget<ButtonWidget>("playername");
-    you->setText( unlock_manager->getCurrentSlot()->getPlayerName() );
+    const std::string& playerID = unlock_manager->getCurrentSlot()->getPlayerID();
+    core::stringw playerName = L"-";
+    PlayerProfile* curr;
+    for_in (curr, UserConfigParams::m_all_players)
+    {
+        if (curr->getUniqueID() == playerID)
+        {
+            playerName = curr->getName();
+            break;
+        }
+    }
+    you->setText( playerName );
     ((gui::IGUIButton*)you->getIrrlichtElement())->setOverrideFont( GUIEngine::getSmallFont() );
 
     if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)

@@ -188,7 +188,7 @@ void GameSlot::grandPrixFinished()
 
 void GameSlot::save(XMLWriter& out)
 {
-    out << L"    <gameslot player=\"" << m_player_name.c_str() << L"\" kart=\""
+    out << L"    <gameslot playerID=\"" << m_player_unique_id.c_str() << L"\" kart=\""
         << m_kart_ident.c_str() << L"\" firstTime=\"" << (m_first_time ? L"true" : L"false")
         << L"\">\n";
     std::map<std::string, Challenge*>::const_iterator i;

@@ -61,7 +61,7 @@ void StoryModeLobbyScreen::init()
         {
             if (players[n].getName() == UserConfigParams::m_default_player.toString())
             {
-                unlock_manager->setCurrentSlot(players[n].getName());
+                unlock_manager->setCurrentSlot(players[n].getUniqueID());
                 StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
                 return;
             }
@@ -113,9 +113,9 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name
         {
             if (list->getSelectionLabel() == players[n].getName())
             {
-                unlock_manager->setCurrentSlot(players[n].getName());
+                unlock_manager->setCurrentSlot(players[n].getUniqueID());
                 slot_found = true;
-                break;;
+                break;
             }
         }
         
@@ -155,7 +155,7 @@ void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& newName)
     {
         if (players[n].getName() == newName)
         {
-            unlock_manager->setCurrentSlot(players[n].getName());
+            unlock_manager->setCurrentSlot(players[n].getUniqueID());
             slot_found = true;
             break;
         }
