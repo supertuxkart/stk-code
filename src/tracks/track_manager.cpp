@@ -195,12 +195,23 @@ bool TrackManager::loadTrack(const std::string& dirname)
 void TrackManager::removeTrack(const std::string &ident)
 {
     Track *track = getTrack(ident);
+    if (track == NULL)
+    {
+        fprintf(stderr, "[TrackManager] ERROR: There is no track named '%s'!!\n", ident.c_str());
+        assert(false);
+        return;
+    }
     
     if (track->isInternal()) return;
     
     std::vector<Track*>::iterator it = std::find(m_tracks.begin(), 
                                                  m_tracks.end(), track);
-    assert(it!=m_tracks.end());
+    if (it == m_tracks.end())
+    {
+        fprintf(stderr, "[TrackManager] INTERNAL ERROR: Cannot find track '%s' in map!!\n", ident.c_str());
+        assert(false);
+        return;
+    }
     int index = it - m_tracks.begin();
 
     // Remove the track from all groups it belongs to
