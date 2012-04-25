@@ -50,6 +50,7 @@ public:
 private:
     
     INewPlayerListener* m_listener;
+    bool m_self_destroy;
     
 public:
     
@@ -63,6 +64,7 @@ public:
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     
+    virtual void onUpdate(float dt);
     //virtual void onTextUpdated();
 };
 

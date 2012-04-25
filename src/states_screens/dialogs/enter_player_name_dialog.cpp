@@ -39,6 +39,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(INewPlayerListener* listener,
         ModalDialog(w, h)
 {
     m_listener = listener;
+    m_self_destroy = false;
     loadFromFile("enter_player_name_dialog.stkgui");
     
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
@@ -128,6 +129,27 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
         
         UserConfigParams::m_all_players.push_back( new PlayerProfile(playerName) );
         
+        // It's unsafe to delete from inside the event handler so we do it later
+        m_self_destroy = true;
+    }
+    else
+    {
+        LabelWidget* label = getWidget<LabelWidget>("title");
+        label->setText(_("Cannot add a player with this name."), false);
+        sfx_manager->quickSound( "anvil" );
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+void EnterPlayerNameDialog::onUpdate(float dt)
+{
+    // It's unsafe to delete from inside the event handler so we do it later
+    if (m_self_destroy)
+    {
+        TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
+        stringw playerName = textCtrl->getText();
+    
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand
         GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
@@ -142,14 +164,4 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
         
         if (listener != NULL) listener->onNewPlayerWithName( playerName );
     }
-    else
-    {
-        LabelWidget* label = getWidget<LabelWidget>("title");
-        label->setText(_("Cannot add a player with this name."), false);
-        sfx_manager->quickSound( "anvil" );
-    }
 }
-
-// -----------------------------------------------------------------------------
-
-
