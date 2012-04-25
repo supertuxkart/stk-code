@@ -68,7 +68,10 @@ public:
         return t;
 #else
         struct timeval tv;
-        gettimeofday(&tv, NULL);
+        if (gettimeofday(&tv, NULL) != 0)
+        {
+            throw std::runtime_error("gettimeofday failed");
+        }
         return tv.tv_sec;
 #endif
     };   // getTimeSinceEpoch
