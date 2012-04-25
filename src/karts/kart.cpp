@@ -1249,7 +1249,10 @@ void Kart::handleMaterialSFX(const Material *material)
         sfx_manager->deleteSFX(m_previous_terrain_sound);
         m_previous_terrain_sound = NULL;
     }
-    if(m_terrain_sound) 
+    
+    // terrain sound is not necessarily a looping sound so check its status before
+    // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
+    if(m_terrain_sound && m_terrain_sound->getStatus() == SFXManager::SFX_PLAYING)
     {
         m_terrain_sound->position(getXYZ());
         material->setSFXSpeed(m_terrain_sound, m_speed);
