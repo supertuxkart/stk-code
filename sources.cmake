@@ -21,6 +21,7 @@ src/challenges/challenge_data.cpp
 src/challenges/game_slot.cpp
 src/challenges/unlock_manager.cpp
 src/config/device_config.cpp
+src/config/player.cpp
 src/config/stk_config.cpp
 src/config/user_config.cpp
 src/graphics/camera.cpp
