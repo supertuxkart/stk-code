@@ -18,6 +18,7 @@
 
 #ifndef HEADER_TIME_HPP
 #define HEADER_TIME_HPP
+#include <stdexcept>
 
 #ifdef WIN32
 #  define _WINSOCKAPI_
