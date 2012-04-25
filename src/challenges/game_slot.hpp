@@ -96,7 +96,7 @@ public:
     void       raceFinished      ();
     void       grandPrixFinished ();
     
-    void       save              (XMLWriter& file);
+    void       save              (std::ofstream& file);
     
     int        getPoints          () const { return m_points; }
     

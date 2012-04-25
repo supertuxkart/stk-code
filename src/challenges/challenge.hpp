@@ -62,7 +62,7 @@ public:
     }
     virtual ~Challenge() {};
     void  load(const XMLNode* config);
-    void  save(XMLWriter& writer);
+    void  save(std::ofstream& writer);
 
     // ------------------------------------------------------------------------
     bool  isSolved(RaceManager::Difficulty d) const {return m_state[d]==CH_SOLVED;  }

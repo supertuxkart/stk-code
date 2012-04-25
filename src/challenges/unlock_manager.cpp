@@ -255,9 +255,10 @@ void UnlockManager::load()
 void UnlockManager::save()
 {
     std::string filename = file_manager->getChallengeFile("challenges.xml");
-    XMLWriter challenge_file(filename.c_str());
+    
+    std::ofstream challenge_file(filename.c_str(), std::ios::out);
 
-    if(!challenge_file.is_open())
+    if (!challenge_file.is_open())
     {
         std::cerr << "Failed to open " << filename << " for writing, challenges won't be saved\n";
         return;
@@ -265,7 +266,6 @@ void UnlockManager::save()
 
     challenge_file << "<?xml version=\"1.0\"?>\n";
     challenge_file << "<challenges>\n";
-    
     
     std::map<std::string, GameSlot*>::iterator it;
     for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)

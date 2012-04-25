@@ -91,16 +91,16 @@ void Challenge::setSolved(RaceManager::Difficulty d)
 //-----------------------------------------------------------------------------
 
 
-const wchar_t* boolstr(bool b)
+const char* boolstr(bool b)
 {
-    return (b ? L"true" : L"false");
+    return (b ? "true" : "false");
 }
 
-void Challenge::save(XMLWriter& writer)
+void Challenge::save(std::ofstream& writer)
 {
-    writer << L"        <" << core::stringw(m_data->getId().c_str()) << L">\n"
-           << L"            <easy   solved=\"" << boolstr(isSolved(RaceManager::RD_EASY))   << L"\"/>\n"
-           << L"            <medium solved=\"" << boolstr(isSolved(RaceManager::RD_MEDIUM)) << L"\"/>\n"
-           << L"            <hard   solved=\"" << boolstr(isSolved(RaceManager::RD_HARD))   << L"\"/>\n"
-           << L"        </" << core::stringw(m_data->getId().c_str()) << L">\n";
+    writer << "        <" << m_data->getId().c_str() << ">\n"
+           << "            <easy   solved=\"" << boolstr(isSolved(RaceManager::RD_EASY))   << "\"/>\n"
+           << "            <medium solved=\"" << boolstr(isSolved(RaceManager::RD_MEDIUM)) << "\"/>\n"
+           << "            <hard   solved=\"" << boolstr(isSolved(RaceManager::RD_HARD))   << "\"/>\n"
+           << "        </" << m_data->getId().c_str() << ">\n";
 }   // save
