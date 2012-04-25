@@ -77,6 +77,6 @@ void PlayerProfile::incrementUseFrequency()
 int64_t PlayerProfile::generateUniqueId(const char* playerName)
 {
     return ((int64_t)(Time::getTimeSinceEpoch()) << 32) |
-           (((rand()%65536) << 16) & 0xFFFF0000) |
+           ((rand() << 16) & 0xFFFF0000) |
            (StringUtils::simpleHash(playerName) & 0xFFFF);
 }
