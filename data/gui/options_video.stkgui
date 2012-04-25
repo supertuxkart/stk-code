@@ -24,7 +24,7 @@
             <spacer width="20" height="20"/>
             
             <div layout="vertical-row" proportion="1" height="fit" id="inner_box">
-                <gauge id="gfx_level" min_value="1" max_value="7" width="300" align="center" />
+                <gauge id="gfx_level" min_value="1" max_value="8" width="300" align="center" />
                 <spacer height="5" width="10"/>
                 <button id="custom" text="Custom settings..." I18N="In the video settings" align="center"/>
             </div>

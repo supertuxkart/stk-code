@@ -45,15 +45,15 @@ using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( OptionsScreenVideo );
 
 // Look-up table for GFX levels
-const bool GFX           [] = {false, true,  true,  true,  true,  true,  true};
-const int  GFX_ANIM_KARTS[] = {0,     0,     1,     2,     2,     2,     2};
-const bool GFX_WEATHER   [] = {false, false, false, false, true,  true,  true};
-const bool GFX_ANTIALIAS [] = {false, false, false, false, false, true,  true};
+const bool GFX           [] = {false, true,  true,  true,  true,  true,  true, true};
+const int  GFX_ANIM_KARTS[] = {0,     0,     1,     2,     2,     2,     2,    2};
+const bool GFX_WEATHER   [] = {false, false, false, false, true,  true,  true, true};
+const int  GFX_ANTIALIAS [] = {0,     0,     0,     0,     0,     2,     2,    3};
 const bool GFX_POSTPROCESSING[] = 
-                              {false, false, false, false, false, false, true};
+                              {false, false, false, false, false, false, true, true};
 const bool GFX_PIXEL_SHADERS[] =
-                              {false, false, false, false, true,  true,  true};
-const int  GFX_LEVEL_AMOUNT = 7;
+                              {false, false, false, false, true,  true,  true, true};
+const int  GFX_LEVEL_AMOUNT = 8;
 
 // ----------------------------------------------------------------------------
 
@@ -316,7 +316,7 @@ void OptionsScreenVideo::updateGfxSlider()
         if (UserConfigParams::m_show_steering_animations == GFX_ANIM_KARTS[l]&&
             UserConfigParams::m_graphical_effects        == GFX[l] &&
             UserConfigParams::m_weather_effects          == GFX_WEATHER[l] &&
-            UserConfigParams::m_fullscreen_antialiasing  == GFX_ANTIALIAS[l] &&
+            UserConfigParams::m_antialiasing             == GFX_ANTIALIAS[l] &&
             UserConfigParams::m_postprocess_enabled      == GFX_POSTPROCESSING[l] &&
             UserConfigParams::m_pixel_shaders            == GFX_PIXEL_SHADERS[l])
         {
@@ -357,6 +357,19 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: if no kart animations are enabled
     core::stringw none = _LTR("None");
     
+    core::stringw antialias_label;
+    switch ((int)UserConfigParams::m_antialiasing)
+    {
+    case 0:
+        antialias_label = disabled; break;
+    case 1:
+        antialias_label = L"x2"; break;
+    case 2:
+        antialias_label = L"x4"; break;
+    case 3:
+        antialias_label = L"x8"; break;
+    }
+    
     //I18N: in graphical options
     tooltip = _("Animated Scenery : %s", 
         UserConfigParams::m_graphical_effects ? enabled : disabled);
@@ -369,8 +382,8 @@ void OptionsScreenVideo::updateTooltip()
         ? all 
         : (UserConfigParams::m_show_steering_animations == 1 ? me : none));
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Anti-aliasing (requires restart) : %s", 
-             UserConfigParams::m_fullscreen_antialiasing ? enabled : disabled);
+    tooltip = tooltip + L"\n" + _("Anti-aliasing (requires restart) : %s",
+                                  antialias_label);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Pixel shaders : %s", 
                                   UserConfigParams::m_pixel_shaders ? enabled : disabled);
@@ -448,7 +461,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_show_steering_animations = GFX_ANIM_KARTS[level-1];
         UserConfigParams::m_graphical_effects        = GFX[level-1];
         UserConfigParams::m_weather_effects          = GFX_WEATHER[level-1];
-        UserConfigParams::m_fullscreen_antialiasing  = GFX_ANTIALIAS[level-1];
+        UserConfigParams::m_antialiasing             = GFX_ANTIALIAS[level-1];
         UserConfigParams::m_postprocess_enabled      = GFX_POSTPROCESSING[level-1];
         UserConfigParams::m_pixel_shaders            = GFX_PIXEL_SHADERS[level-1];
         

@@ -252,8 +252,23 @@ void IrrDriver::initDevice()
                 params.WindowSize    = 
                     core::dimension2du(UserConfigParams::m_width,
                                        UserConfigParams::m_height);
-                if (UserConfigParams::m_fullscreen_antialiasing)
+                switch ((int)UserConfigParams::m_antialiasing)
+                {
+                case 0:
+                    break;
+                case 1:
+                    params.AntiAlias = 2;
+                    break;
+                case 2:
                     params.AntiAlias = 4;
+                    break;
+                case 3:
+                    params.AntiAlias = 8;
+                    break;
+                default:
+                    fprintf(stderr, "[IrrDriver] WARNING: Invalid value for anti-alias setting : %i\n",
+                            (int)UserConfigParams::m_antialiasing);
+                }
                 
                 m_device = createDeviceEx(params);
             

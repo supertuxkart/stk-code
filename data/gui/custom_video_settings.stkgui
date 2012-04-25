@@ -23,26 +23,25 @@
     <spacer height="5" width="10" />
     
     <div layout="horizontal-row" width="100%" height="fit">
-        <label text="Animated Characters" I18N="Video settings"/>
+        <label text="Animated Characters" I18N="Video settings" width="40%"/>
         <spacer width="10" height="10"/>
-        <gauge id="steering_animations" min_value="0" max_value="2" proportion="1" />
+        <gauge id="steering_animations" min_value="0" max_value="2" width="50%" />
     </div>
     
     <spacer height="5" width="10" />
     
     <div layout="horizontal-row" width="100%" height="fit">
-        <label text="Texture filtering" I18N="Video settings"/>
+        <label text="Texture filtering" I18N="Video settings" width="40%"/>
         <spacer width="10" height="10"/>
         <gauge id="filtering" min_value="0" max_value="5" width="50%" />
     </div>
     
     <spacer height="5" width="10" />
     
-    <!-- TODO: allow selection anti-aliasing quality -->
     <div layout="horizontal-row" width="100%" height="fit">
-        <checkbox id="antialiasing"/>
+        <label text="Anti-aliasing (requires restart)" I18N="Video settings" width="40%" />
         <spacer width="10" height="10"/>
-        <label text="Anti-aliasing (requires restart)" I18N="Video settings"/>
+        <gauge id="antialiasing" min_value="0" max_value="3" width="50%"/>
     </div>
     
     <spacer height="5" width="10" />

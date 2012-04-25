@@ -76,7 +76,13 @@ void CustomVideoSettingsialog::beforeAddingWidgets()
 
     filtering->setValue( value );
 
-    getWidget<CheckBoxWidget>("antialiasing")->setState( UserConfigParams::m_fullscreen_antialiasing );
+    SpinnerWidget* antialias = getWidget<SpinnerWidget>("antialiasing");
+    antialias->addLabel( _("Disabled") ); // 0
+    antialias->addLabel( L"x2" );         // 1
+    antialias->addLabel( L"x4" );         // 2
+    antialias->addLabel( L"x8" );         // 3
+    antialias->setValue( UserConfigParams::m_antialiasing );
+    
     getWidget<CheckBoxWidget>("postprocessing")->setState( UserConfigParams::m_postprocess_enabled );
     getWidget<CheckBoxWidget>("pixelshaders")->setState( UserConfigParams::m_pixel_shaders );
 }
@@ -91,8 +97,8 @@ GUIEngine::EventPropagation CustomVideoSettingsialog::processEvent(const std::st
             getWidget<CheckBoxWidget>("anim_gfx")->getState();
         UserConfigParams::m_weather_effects          =
             getWidget<CheckBoxWidget>("weather_gfx")->getState();
-        UserConfigParams::m_fullscreen_antialiasing  =
-            getWidget<CheckBoxWidget>("antialiasing")->getState();
+        UserConfigParams::m_antialiasing  =
+            getWidget<SpinnerWidget>("antialiasing")->getValue();
         UserConfigParams::m_postprocess_enabled      =
             getWidget<CheckBoxWidget>("postprocessing")->getState();
         UserConfigParams::m_show_steering_animations = 
