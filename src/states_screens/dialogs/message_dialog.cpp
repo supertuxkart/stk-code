@@ -44,7 +44,8 @@ MessageDialog::MessageDialog(irr::core::stringw msg) :
 
 // ------------------------------------------------------------------------------------------------------
 
-void MessageDialog::doInit(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool own_listener)
+void MessageDialog::doInit(irr::core::stringw msg, MessageDialogType type,
+                           IConfirmDialogListener* listener, bool own_listener)
 {
     loadFromFile("confirm_dialog.stkgui");
 
@@ -56,7 +57,8 @@ void MessageDialog::doInit(irr::core::stringw msg, MessageDialogType type, IConf
 
     // If the dialog is a simple 'OK' dialog, then hide the "Yes" button and
     // change "Cancel" to "OK"
-    if (type == MessageDialog::MESSAGE_DIALOG_OK) {
+    if (type == MessageDialog::MESSAGE_DIALOG_OK)
+    {
         ButtonWidget* yesbtn = getWidget<ButtonWidget>("confirm");
         yesbtn->setVisible(false);
 
