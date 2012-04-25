@@ -21,6 +21,12 @@
 #include "config/player.hpp"
 #include "utils/string_utils.hpp"
 
+#ifdef _LP64
+static const char PRINT_INT64_HEX[] = "%lx";
+#else
+static const char PRINT_INT64_HEX[] = "%llx";
+#endif
+
 //------------------------------------------------------------------------------
 PlayerProfile::PlayerProfile(const core::stringw& name) :
     m_player_group("Player", "Represents one human player"),
@@ -34,7 +40,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name) :
 #endif
     int64_t unique_id = generateUniqueId(core::stringc(name.c_str()).c_str());
     char buffer[32];
-    sprintf(buffer, "%llx", unique_id);
+    sprintf(buffer, PRINT_INT64_HEX, unique_id);
     m_unique_id = buffer;
 }
 
@@ -57,7 +63,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node) :
         fprintf(stderr, "** WARNING: Player has no unique ID, probably it is from an older STK version\n");
         int64_t unique_id = generateUniqueId(core::stringc(m_name.c_str()).c_str());
         char buffer[32];
-        sprintf(buffer, "%llx", unique_id);
+        sprintf(buffer, PRINT_INT64_HEX, unique_id);
         m_unique_id = buffer;
     }
 
