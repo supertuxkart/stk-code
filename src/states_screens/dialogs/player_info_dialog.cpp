@@ -42,7 +42,7 @@ using namespace irr::core;
 PlayerInfoDialog::PlayerInfoDialog(PlayerProfile* player, const float w, const float h) : ModalDialog(w, h)
 {
     m_player = player;
-    
+
     showRegularDialog();
 }
 
@@ -60,16 +60,16 @@ PlayerInfoDialog::~PlayerInfoDialog()
 void PlayerInfoDialog::showRegularDialog()
 {
     clearWindow();
-    
+
     const int y1 = m_area.getHeight()/6;
     const int y2 = m_area.getHeight()*2/6;
     const int y3 = m_area.getHeight()*3/6;
     const int y4 = m_area.getHeight()*5/6;
-    
+
     ScalableFont* font = GUIEngine::getFont();
     const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
-    
+
     {
         textCtrl = new TextBoxWidget();
         textCtrl->m_properties[PROP_ID] = "newname";
@@ -82,16 +82,16 @@ void PlayerInfoDialog::showRegularDialog()
         m_widgets.push_back(textCtrl);
         textCtrl->add();
     }
-    
+
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "renameplayer";
-        
+
         //I18N: In the player info dialog
         widget->setText( _("Rename") );
-        
+
         const int textWidth = font->getDimension( widget->getText().c_str() ).Width + 40;
-        
+
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
         widget->m_y = y2;
         widget->m_w = textWidth;
@@ -104,10 +104,10 @@ void PlayerInfoDialog::showRegularDialog()
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "cancel";
         widget->setText( _("Cancel") );
-        
+
         const int textWidth = 
             font->getDimension(widget->getText().c_str()).Width + 40;
-        
+
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
         widget->m_y = y3;
         widget->m_w = textWidth;
@@ -116,17 +116,17 @@ void PlayerInfoDialog::showRegularDialog()
         m_widgets.push_back(widget);
         widget->add();
     }
-    
+
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "removeplayer";
-        
+
         //I18N: In the player info dialog
         widget->setText( _("Remove"));
-        
+
         const int textWidth = 
             font->getDimension(widget->getText().c_str()).Width + 40;
-        
+
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
         widget->m_y = y4;
         widget->m_w = textWidth;
@@ -135,7 +135,7 @@ void PlayerInfoDialog::showRegularDialog()
         m_widgets.push_back(widget);
         widget->add();
     }
-    
+
     textCtrl->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
 }
 
@@ -144,24 +144,24 @@ void PlayerInfoDialog::showRegularDialog()
 void PlayerInfoDialog::showConfirmDialog()
 {
     clearWindow();
-        
-    
+
+
     IGUIFont* font = GUIEngine::getFont();
     const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
-    
+
     irr::core::stringw message = 
         //I18N: In the player info dialog (when deleting)
         _("Do you really want to delete player '%s' ?", m_player->getName());
-    
-    
+
+
     if (unlock_manager->getCurrentSlotID() == m_player->getUniqueID())
     {
         message = _("You cannot delete this player because it is currently in use.");
     }
-    
+
     core::rect< s32 > area_left(5, 0, m_area.getWidth()-5, m_area.getHeight()/2);
-    
+
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
     IGUIStaticText* a = GUIEngine::getGUIEnv()->addStaticText( message.c_str(),
@@ -173,13 +173,13 @@ void PlayerInfoDialog::showConfirmDialog()
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "confirmremove";
-        
+
         //I18N: In the player info dialog (when deleting)
         widget->setText( _("Confirm Remove") );
-        
+
         const int textWidth = 
             font->getDimension(widget->getText().c_str()).Width + 40;
-        
+
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
         widget->m_y = m_area.getHeight()/2;
         widget->m_w = textWidth;
@@ -188,17 +188,17 @@ void PlayerInfoDialog::showConfirmDialog()
         m_widgets.push_back(widget);
         widget->add();
     }
-    
+
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "cancelremove";
-        
+
         //I18N: In the player info dialog (when deleting)
         widget->setText( _("Cancel Remove") );
-        
+
         const int textWidth = 
             font->getDimension( widget->getText().c_str() ).Width + 40;
-        
+
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
         widget->m_y = m_area.getHeight()*3/4;
         widget->m_w = textWidth;
@@ -206,10 +206,10 @@ void PlayerInfoDialog::showConfirmDialog()
         widget->setParent(m_irrlicht_window);
         m_widgets.push_back(widget);
         widget->add();
-        
+
         widget->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     }
-    
+
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -225,13 +225,13 @@ GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& ev
     if (eventSource == "renameplayer")
     {
         // accept entered name
-        stringw playerName = textCtrl->getText();
-        
+        stringw playerName = textCtrl->getText().trim();
+
         const int playerAmount =  UserConfigParams::m_all_players.size();
         for(int n=0; n<playerAmount; n++)
         {
             if (UserConfigParams::m_all_players.get(n) == m_player) continue;
-            
+
             if (UserConfigParams::m_all_players[n].getName() == playerName)
             {
                 ButtonWidget* label = getWidget<ButtonWidget>("renameplayer");
@@ -240,18 +240,18 @@ GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& ev
                 return GUIEngine::EVENT_BLOCK;
             }
         }
-        
+
         if (playerName.size() <= 0) return GUIEngine::EVENT_BLOCK;
 
         OptionsScreenPlayers::getInstance()->renamePlayer( playerName, m_player );
-        
+
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand
         GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
-        
+
         ModalDialog::dismiss();
-        
+
         dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
@@ -264,12 +264,12 @@ GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& ev
     {
         OptionsScreenPlayers::getInstance()->deletePlayer( m_player );
         m_player = NULL;
-        
+
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand
         GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
-        
+
         ModalDialog::dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
@@ -279,12 +279,12 @@ GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& ev
         return GUIEngine::EVENT_BLOCK;
     }
     else if(eventSource == "cancel")
-    {   
+    {
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand
         GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
-        
+
         ModalDialog::dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
