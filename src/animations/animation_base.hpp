@@ -68,7 +68,8 @@ protected:
 public:
                  AnimationBase(const XMLNode &node);
                  AnimationBase(Ipo *ipo);
-    virtual void update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale);
+    virtual void update(float dt, Vec3 *xyz=NULL, Vec3 *hpr=NULL,
+                                  Vec3 *scale=NULL);
     /** This needs to be implemented by the inheriting classes. It is called
      *  once per frame from the track. It has a dummy implementation that 
      *  just asserts so that this class can be instantiated in 

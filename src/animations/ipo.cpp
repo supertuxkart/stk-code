@@ -65,14 +65,24 @@ Ipo::IpoData::IpoData(const XMLNode &curve, float fps)
     else if(interp=="linear") m_interpolation = IP_LINEAR;
     else                      m_interpolation = IP_BEZIER;
 
+    std::string extend;
+    curve.get("extend", &extend);
+    if      (extend=="cyclic") m_extend = ET_CYCLIC;
+    else if (extend=="const" ) m_extend = ET_CONST;
+    else
+    {
+        // FIXME: do we want an error message here?
+        // For now extrap and cyclic_extrap do not work
+        fprintf(stderr, "Unsupported extend '%s' - defaulting to CONST.\n",
+                extend.c_str());
+        m_extend = ET_CONST;
+    }
+
     if(m_channel==IPO_LOCXYZ)
         readCurve(curve);
     else
         readIPO(curve, fps);
 
-    // ATM no other extends are supported, so hardcode the only one
-    // that works!
-    m_extend = ET_CYCLIC;
 }   // IpoData
 
 // ----------------------------------------------------------------------------
@@ -410,28 +420,33 @@ void Ipo::reset()
 
 // ----------------------------------------------------------------------------
 /** Updates the time of this ipo and interpolates the new position and 
- *  rotation (taking the cycle length etc. into account).
+ *  rotation (taking the cycle length etc. into account). If a NULL is
+ *  given, the value is not updated.
  *  \param time Current time for which to determine the interpolation.
- *  \param xyz The position that needs to be updated.
- *  \param hpr The rotation that needs to be updated.
+ *  \param xyz The position that needs to be updated (can be NULL).
+ *  \param hpr The rotation that needs to be updated (can be NULL).
+ *  \param scale The scale that needs to be updated (can be NULL)
  */
 void Ipo::update(float time, Vec3 *xyz, Vec3 *hpr,Vec3 *scale)
 {        
     switch(m_ipo_data->m_channel)
     {
-    case Ipo::IPO_LOCX   : xyz  ->setX(get(time, 0)); break;
-    case Ipo::IPO_LOCY   : xyz  ->setY(get(time, 0)); break;
-    case Ipo::IPO_LOCZ   : xyz  ->setZ(get(time, 0)); break;
-    case Ipo::IPO_ROTX   : hpr  ->setX(get(time, 0)); break;
-    case Ipo::IPO_ROTY   : hpr  ->setY(get(time, 0)); break;
-    case Ipo::IPO_ROTZ   : hpr  ->setZ(get(time, 0)); break;
-    case Ipo::IPO_SCALEX : scale->setX(get(time, 0)); break;
-    case Ipo::IPO_SCALEY : scale->setY(get(time, 0)); break;
-    case Ipo::IPO_SCALEZ : scale->setZ(get(time, 0)); break;
+    case Ipo::IPO_LOCX   : if(xyz)   xyz  ->setX(get(time, 0)); break;
+    case Ipo::IPO_LOCY   : if(xyz)   xyz  ->setY(get(time, 0)); break;
+    case Ipo::IPO_LOCZ   : if(xyz)   xyz  ->setZ(get(time, 0)); break;
+    case Ipo::IPO_ROTX   : if(hpr)   hpr  ->setX(get(time, 0)); break;
+    case Ipo::IPO_ROTY   : if(hpr)   hpr  ->setY(get(time, 0)); break;
+    case Ipo::IPO_ROTZ   : if(hpr)   hpr  ->setZ(get(time, 0)); break;
+    case Ipo::IPO_SCALEX : if(scale) scale->setX(get(time, 0)); break;
+    case Ipo::IPO_SCALEY : if(scale) scale->setY(get(time, 0)); break;
+    case Ipo::IPO_SCALEZ : if(scale) scale->setZ(get(time, 0)); break;
     case Ipo::IPO_LOCXYZ : 
         {
-            for(unsigned int j=0; j<3; j++)
-                (*xyz)[j] = get(time, j);
+            if(xyz)
+            {
+                for(unsigned int j=0; j<3; j++)
+                    (*xyz)[j] = get(time, j);
+            }
             break;
         }
 
@@ -450,7 +465,7 @@ float Ipo::get(float time, unsigned int index) const
     // Avoid crash in case that only one point is given for this IPO.
     if(m_next_n==0) 
         return m_ipo_data->m_points[0][index];
-float orig_t=time;
+
     time = m_ipo_data->adjustTime(time);
 
     // Time was reset since the last cached value for n,

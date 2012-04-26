@@ -118,7 +118,8 @@ public:
              Ipo(const XMLNode &curve, float fps=25);
     virtual ~Ipo();
     Ipo     *clone();
-    void     update(float time, Vec3 *xyz, Vec3 *hpr, Vec3 *scale);
+    void     update(float time, Vec3 *xyz=NULL, Vec3 *hpr=NULL, 
+                                Vec3 *scale=NULL);
     float    get(float time, unsigned int index) const;
     void     setInitialTransform(const Vec3 &xyz, const Vec3 &hpr);
     void     reset();
