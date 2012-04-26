@@ -38,20 +38,6 @@ private:
 	/** The target point the kart will fly to. */
     core::line3df   m_target;
 
-
-    // ------------------------------------------------------------------------
-protected:
-    class CannonCurve : public AnimationBase
-    {
-    private:
-        /** The speed with which the kart moves. */
-        float m_speed;
-    public:
-             CannonCurve(const XMLNode &node);
-        void update(float dt);
-    };   // CannonCurve
-
-    // ------------------------------------------------------------------------
     /** Stores the cannon curve data. */
     Ipo *m_curve;
 

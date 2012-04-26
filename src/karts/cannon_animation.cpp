@@ -27,18 +27,37 @@
 
 #include "LinearMath/btTransform.h"
 
-CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo, 
-                                 const Vec3 &delta)
+CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo)
              : AbstractKartAnimation(kart, "CannonAnimation")
 {
     m_curve  = new AnimationBase(ipo);
     m_timer  = ipo->getEndTime();
-    Vec3 xyz = m_kart->getXYZ();
-    Vec3 hpr, scale;
-    // Get the curve position at t=0
-    m_curve->update(0, &xyz, &hpr, &scale);
-    m_offset  = m_kart->getXYZ() - xyz-delta;
-    m_delta   = delta;
+    
+    // Compute the delta between the kart position and the start of the curve.
+    // This delta is rotated with the kart and added to the interpolated curve
+    // position to get the actual kart position during the animation.
+    m_curve->update(0, &m_previous_orig_xyz);
+    m_delta = kart->getXYZ() - m_previous_orig_xyz;
+
+    // Now the delta vector needs to be rotated back, so that it will point
+    // in the right direction when it is (in update) rotated to be the same
+    // as the kart's heading. To estimate the angle at the start, use the
+    // interpolated value at t=dt:
+    const float dt = 0.1f;
+    Vec3 xyz1;
+    m_curve->update(dt, &xyz1);
+    core::vector3df rot1 = (xyz1-m_previous_orig_xyz).toIrrVector()
+                                                     .getHorizontalAngle();
+    core::vector3df rot = (m_previous_orig_xyz-xyz1).toIrrVector()
+                                                    .getHorizontalAngle();
+    btQuaternion q(Vec3(0,1,0),rot.Y*DEGREE_TO_RAD);
+    btMatrix3x3 m(q);
+    m_delta = m * m_delta;
+
+    // The previous call to m_curve->update will set the internal timer 
+    // of the curve to dt. Reset it to 0 to make sure the timer is in
+    // synch with the timer of the CanonAnimation
+    m_curve->reset();
 }   // CannonAnimation
 
 // ----------------------------------------------------------------------------
@@ -48,9 +67,10 @@ CannonAnimation::~CannonAnimation()
     float epsilon = 0.5f * m_kart->getKartHeight();
 
     btTransform pos;
-    pos.setOrigin(m_kart->getXYZ()+btVector3(0, m_kart->getKartHeight() + epsilon,
-                                           0));
-    pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), m_kart->getHeading()));
+    pos.setOrigin(m_kart->getXYZ()
+                  +btVector3(0, m_kart->getKartHeight() + epsilon, 0) );
+    pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 
+                                 m_kart->getHeading()        ));
 
     m_kart->getBody()->setCenterOfMassTransform(pos);
     Vec3 v(0, 0, m_kart->getKartProperties()->getMaxSpeed());
@@ -69,18 +89,26 @@ void CannonAnimation::update(float dt)
         AbstractKartAnimation::update(dt);
         return;
     }
-    Vec3 xyz     = m_kart->getXYZ();
-    core::vector3df old_xyz = xyz.toIrrVector();
-    Vec3 hpr, scale;
-    m_curve->update(dt, &xyz, &hpr, &scale);
+
+    Vec3 xyz;
+    m_curve->update(dt, &xyz);
+
+    // It can happen that the same position is returned, e.g. if the end of
+    // the curve is reached, but due to floating point differences the
+    // end is not detected in the above test. To avoid that the kart then
+    // rotates to a heading of 0, do not rotate in this case at all, i.e.
+    // the previous rotation is kept.
+    if(xyz!=m_previous_orig_xyz)
+    {
+        core::vector3df rot = (xyz-m_previous_orig_xyz).toIrrVector()
+                                                       .getHorizontalAngle();
+        btQuaternion q(Vec3(0,1,0),rot.Y*DEGREE_TO_RAD);
+        m_kart->setRotation(q);
+    }
+    m_previous_orig_xyz = xyz;
 
     Vec3 rotated_delta = m_kart->getTrans().getBasis()*m_delta;
-    rotated_delta = Vec3(0,0,0);
-    Vec3 new_xyz = xyz+rotated_delta+m_offset;
-    m_kart->setXYZ(new_xyz);
+    m_kart->setXYZ(xyz + rotated_delta);
 
-    core::vector3df rot = (new_xyz.toIrrVector()-old_xyz).getHorizontalAngle();
-    btQuaternion q(Vec3(0,1,0),rot.Y*DEGREE_TO_RAD);
-    m_kart->setRotation(q);
     AbstractKartAnimation::update(dt);
 }   // update

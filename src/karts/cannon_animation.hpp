@@ -34,21 +34,21 @@ class Ipo;
 class CannonAnimation: public AbstractKartAnimation
 {
 protected:
-    /** The offset between the origin of the curve (relative to which
-     *  all points are interpolated) and the position of the kart. */
-    Vec3           m_offset;
-
-    /** An offset that is rotated with the kart and is added to the 
-     *  interpolated point. This basically shifts the curve (usually)
-     *  to the left/right to be aligned with the crossing point of the 
-     *  kart. */
+    /** This is the difference between the position of the kart when the 
+     *  cannon line is crossed and the curve interpolation at t=0. This 
+     *  is added to each interpolated curve value to give the final
+     *  kart position (so the kart moves relative to the curve). */
     Vec3           m_delta;
 
     /** Stores the curve interpolation for the cannon. */
     AnimationBase *m_curve;
-    
+
+    /** This stores the original (unmodified) interpolated curve value. THis
+     *  is used to determine the orientation of the kart. */
+    Vec3           m_previous_orig_xyz;
+
 public:
-             CannonAnimation(AbstractKart *kart, Ipo *ipo, const Vec3 &delta);
+             CannonAnimation(AbstractKart *kart, Ipo *ipo);
     virtual ~CannonAnimation();
     virtual void  update(float dt);
     
