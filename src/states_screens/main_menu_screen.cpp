@@ -264,6 +264,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     {
         KartSelectionScreen* s = KartSelectionScreen::getInstance();
         s->setMultiplayer(true);
+        s->setFromOverworld(false);
         StateManager::get()->pushScreen( s );
     }
     else if (selection == "options")

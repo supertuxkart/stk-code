@@ -949,6 +949,7 @@ KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
 {
     m_removed_widget      = NULL;
     m_multiplayer_message = NULL;
+    m_from_overworld      = false;
 }   // KartSelectionScreen
 
 // ----------------------------------------------------------------------------
