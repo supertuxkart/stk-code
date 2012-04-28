@@ -11,7 +11,8 @@
     
     <!-- Amount of particles emitted per second -->
     <rate      min="1000"
-               max="1200"         />
+               max="1200"
+               decay_rate="800"   />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
     <lifetime  min="1600"
