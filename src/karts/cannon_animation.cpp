@@ -100,10 +100,11 @@ void CannonAnimation::update(float dt)
     // the previous rotation is kept.
     if(xyz!=m_previous_orig_xyz)
     {
+        btQuaternion prev_rot = m_kart->getRotation();
         core::vector3df rot = (xyz-m_previous_orig_xyz).toIrrVector()
                                                        .getHorizontalAngle();
         btQuaternion q(Vec3(0,1,0),rot.Y*DEGREE_TO_RAD);
-        m_kart->setRotation(q);
+        m_kart->setRotation(prev_rot.slerp(q,0.1f));
     }
     m_previous_orig_xyz = xyz;
 
