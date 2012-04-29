@@ -32,8 +32,10 @@ const std::string Ipo::m_all_channel_names[IPO_MAX] =
  *  \param curve The XML node with the IPO data.
  *  \param fps Frames per second value, necessary to convert frame values
  *             into time.
+ *  \param reverse If this is set to true, the ipo data will be reverse. This
+ *             is used by the cannon if the track is driven in reverse.
  */
-Ipo::IpoData::IpoData(const XMLNode &curve, float fps)
+Ipo::IpoData::IpoData(const XMLNode &curve, float fps, bool reverse)
 {
     if(curve.getName()!="curve")
     {
@@ -79,9 +81,9 @@ Ipo::IpoData::IpoData(const XMLNode &curve, float fps)
     }
 
     if(m_channel==IPO_LOCXYZ)
-        readCurve(curve);
+        readCurve(curve, reverse);
     else
-        readIPO(curve, fps);
+        readIPO(curve, fps, reverse);
 
 }   // IpoData
 
@@ -89,14 +91,19 @@ Ipo::IpoData::IpoData(const XMLNode &curve, float fps)
 /** Reads a blender IPO curve, which constists of a frame number and a control
  *  point. This only handles a single axis.
  *  \param node The root node with all curve data points.
+ *  \param fps Frames per second value, necessary to convert the frame based
+ *             data from blender into times.
+ *  \param reverse If this is set, the data are read in reverse. This is used
+ *                 for a cannon in reverse mode.
  */
-void Ipo::IpoData::readIPO(const XMLNode &curve, float fps)
+void Ipo::IpoData::readIPO(const XMLNode &curve, float fps, bool reverse)
 {
     m_start_time =  999999.9f;
     m_end_time   = -999999.9f;
     for(unsigned int i=0; i<curve.getNumNodes(); i++)
     {
-        const XMLNode *node = curve.getNode(i);
+        int node_index = reverse ? curve.getNumNodes()-i-1 : i;
+        const XMLNode *node = curve.getNode(node_index);
         core::vector2df xy;  
         node->get("c", &xy);
         // Convert blender's frame number (1 ...) into time (0 ...)
@@ -109,10 +116,10 @@ void Ipo::IpoData::readIPO(const XMLNode &curve, float fps)
         {
             Vec3 handle1, handle2;
             core::vector2df handle; 
-            node->get("h1", &handle); 
+            node->get(reverse ? "h2" : "h1", &handle);
             handle1.setW((xy.X-1)/fps);
             handle1.setX(handle.Y);
-            node->get("h2", &handle); 
+            node->get(reverse ? "h1" : "h2", &handle); 
             handle2.setW((xy.X-1)/fps);
             handle2.setX(handle.Y);
             m_handle1.push_back(handle1);
@@ -131,8 +138,10 @@ void Ipo::IpoData::readIPO(const XMLNode &curve, float fps)
  *  which is the deviation of this function is a 2nd degree polynomial, and
  *  therefore not constant!
  *  \param node The root node with all curve data points.
+ *  \param reverse If this is set, the data are read in reverse. This is used
+ *                 for a cannon in reverse mode.
  */
-void Ipo::IpoData::readCurve(const XMLNode &curve)
+void Ipo::IpoData::readCurve(const XMLNode &curve, bool reverse)
 {
     m_start_time =  0;
     m_end_time   = -999999.9f;
@@ -141,16 +150,17 @@ void Ipo::IpoData::readCurve(const XMLNode &curve)
 
     for(unsigned int i=0; i<curve.getNumNodes(); i++)
     {
-        const XMLNode *node = curve.getNode(i);
+        int node_index = reverse ? curve.getNumNodes()-i-1 : i;
+        const XMLNode *node = curve.getNode(node_index);
         Vec3 point;
         node->get("c", &point);
 
         if(m_interpolation==IP_BEZIER)
         {
             Vec3 handle;
-            node->get("h1", &handle);
+            node->get(reverse ? "h2" : "h1", &handle);
             m_handle1.push_back(handle);
-            node->get("h2", &handle);
+            node->get(reverse ? "h1" : "h2", &handle);
             m_handle2.push_back(handle);
             if(i>0)
             {
@@ -359,10 +369,12 @@ float Ipo::IpoData::getCubicBezier(float t, float p0, float p1,
  *  \param curve The XML data for this curve.
  *  \param fps Frames per second, used to convert all frame based value
  *         in the xml file into seconds. 
+ *  \param reverse If this is set to true, the ipo data will be reverse. This
+ *             is used by the cannon if the track is driven in reverse.
  */
-Ipo::Ipo(const XMLNode &curve, float fps)
+Ipo::Ipo(const XMLNode &curve, float fps, bool reverse)
 {
-    m_ipo_data     = new IpoData(curve, fps);
+    m_ipo_data     = new IpoData(curve, fps, reverse);
     m_own_ipo_data = true;
     reset();
 }   // Ipo

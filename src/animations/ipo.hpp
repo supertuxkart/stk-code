@@ -86,9 +86,9 @@ private:
                                  const Vec3 &h0, const Vec3 &h2,
                                  unsigned int rec_level = 0);
     public:
-               IpoData(const XMLNode &curve, float fps); 
-        void   readCurve(const XMLNode &node);
-        void   readIPO(const XMLNode &node, float fps);
+               IpoData(const XMLNode &curve, float fps, bool reverse); 
+        void   readCurve(const XMLNode &node, bool reverse);
+        void   readIPO(const XMLNode &node, float fps, bool reverse);
         float  approximateLength(float t0, float t1,
                                  const Vec3 &p0, const Vec3 &p1,
                                  const Vec3 &h1, const Vec3 &h2);
@@ -115,7 +115,7 @@ private:
 
     Ipo(const Ipo *ipo);
 public:
-             Ipo(const XMLNode &curve, float fps=25);
+             Ipo(const XMLNode &curve, float fps=25, bool reverse=false);
     virtual ~Ipo();
     Ipo     *clone();
     void     update(float time, Vec3 *xyz=NULL, Vec3 *hpr=NULL, 

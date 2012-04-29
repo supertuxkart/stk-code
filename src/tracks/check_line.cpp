@@ -38,9 +38,19 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
     // Note that when this is called the karts have not been allocated
     // in world, so we can't call world->getNumKarts()
     m_previous_sign.resize(race_manager->getNumberOfKarts());
+    std::string p1_string("p1");
+    std::string p2_string("p2");
+
+    // In case of a cannon in a reverse track, we have to use the target line 
+    // as check line
+    if(getType()==CT_CANNON && race_manager->getReverseTrack())
+    {
+        p1_string = "target-p1";
+        p2_string = "target-p2";
+    }
     core::vector2df p1, p2;
-    if(node.get("p1", &p1)   &&
-        node.get("p2", &p2)  &&
+    if(node.get(p1_string, &p1)   &&
+        node.get(p2_string, &p2)  &&
         node.get("min-height", &m_min_height))
     {
         m_left_point  = Vec3(p1.X, m_min_height, p1.Y);
@@ -48,9 +58,9 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
     }
     else
     {
-        node.get("p1", &m_left_point);
+        node.get(p1_string, &m_left_point);
         p1 = core::vector2df(m_left_point.getX(), m_left_point.getZ());
-        node.get("p2", &m_right_point);
+        node.get(p2_string, &m_right_point);
         p2 = core::vector2df(m_right_point.getX(), m_right_point.getZ());
         m_min_height = std::min(m_left_point.getY(), m_right_point.getY());
     }

@@ -31,7 +31,7 @@
  *  \param index Index of this check structure in the check manager.
  */
 CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index) 
-         : CheckLine(node, index)
+           : CheckLine(node, index)
 {
     core::vector3df p1, p2;
     if(!node.get("target-p1", &p1) ||
@@ -41,7 +41,9 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
         exit(-1);
     }
     m_target.setLine(p1, p2);
-    m_curve = new Ipo(*(node.getNode("curve")));
+    m_curve = new Ipo(*(node.getNode("curve")), 
+                      /*fps*/25, 
+                      /*reverse*/race_manager->getReverseTrack());
 }   // CheckCannon
 
 // ----------------------------------------------------------------------------
