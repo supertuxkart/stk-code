@@ -77,14 +77,19 @@ const std::string& StandardRace::getIdent() const
  *  karts still in the race. Still active player karts get a penalty in time
  *  as well as being placed at the back. Players that already finished keep
  *  their position.
+ *
+ *  End time for the punished players is calculated as follows
+ *  end_time = current_time + (estimated_time - current_time)
+ *                          + (estimated_time_for_last - current_time)
+ *           = estimated_time + estimated_time_for_last - current_time
+ *  This will put them at the end at all times. The further you (and the last in
+ *  the race) are from the finish line, the harsher the punishment will be.
  */
 void StandardRace::endRaceEarly()
 {
     const unsigned int kart_amount = m_karts.size();
     // Estimate time for current last in race. Will be used to add to
-    // the time of the still active player karts. This way we ensure that
-    // when moving a player to the last spot, they will also have the worst
-    // time.
+    // the time of the still active player karts.
     const float worst_time = 
         estimateFinishTimeForKart(getKartAtPosition(getNumKarts()));
     std::vector<int> active_players;
@@ -112,7 +117,7 @@ void StandardRace::endRaceEarly()
             setKartPosition(kartid, i - active_players.size());
             kart->finishedRace(estimateFinishTimeForKart(kart));
         }
-    } // i < kart_amount
+    } // i <= kart_amount
     // Now make the active players finish
     for (unsigned int i = 0; i < active_players.size(); i++)
     {
@@ -120,7 +125,8 @@ void StandardRace::endRaceEarly()
         int position = getNumKarts() - active_players.size() + 1 + i;
         setKartPosition(kartid, position);
         m_karts[kartid]->finishedRace(
-                estimateFinishTimeForKart(m_karts[kartid]) + worst_time
+                estimateFinishTimeForKart(m_karts[kartid])
+                + worst_time - getTime()
         );
     } // Finish the active players
     endSetKartPositions();
