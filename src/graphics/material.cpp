@@ -334,6 +334,7 @@ Material::Material(const XMLNode *node, int index)
     if (crash_reset)
     {
         m_collision_reaction = RESCUE;
+        m_drive_reset = true; // if crash reset is enabled then drive reset should be too
     }
     
     std::string creaction;
