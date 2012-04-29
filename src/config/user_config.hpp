@@ -352,19 +352,19 @@ namespace UserConfigParams
         PARAM_DEFAULT( GroupUserConfigParam("Video", "Video Settings") );
     
     PARAM_PREFIX IntUserConfigParam         m_width
-            PARAM_DEFAULT(  IntUserConfigParam(800, "width", &m_video_group,
+            PARAM_DEFAULT(  IntUserConfigParam(1024, "width", &m_video_group,
                                             "Screen/window width in pixels") );
     PARAM_PREFIX IntUserConfigParam         m_height
-            PARAM_DEFAULT(  IntUserConfigParam(600, "height", &m_video_group,
+            PARAM_DEFAULT(  IntUserConfigParam(768, "height", &m_video_group,
                                            "Screen/window height in pixels") );
     PARAM_PREFIX BoolUserConfigParam        m_fullscreen
             PARAM_DEFAULT(  BoolUserConfigParam(false, "fullscreen", 
                                                 &m_video_group) );
     PARAM_PREFIX IntUserConfigParam         m_prev_width
-            PARAM_DEFAULT(  IntUserConfigParam(800, "prev_width", 
+            PARAM_DEFAULT(  IntUserConfigParam(1024, "prev_width", 
                             &m_video_group, "Previous screen/window width") );
     PARAM_PREFIX IntUserConfigParam         m_prev_height
-            PARAM_DEFAULT(  IntUserConfigParam(600, "prev_height", 
+            PARAM_DEFAULT(  IntUserConfigParam(768, "prev_height", 
                             &m_video_group,"Previous screen/window height") );
     PARAM_PREFIX BoolUserConfigParam        m_prev_fullscreen
             PARAM_DEFAULT(  BoolUserConfigParam(false, "prev_fullscreen", 
