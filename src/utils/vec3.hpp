@@ -142,6 +142,27 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the rotation given by the quaternion as HPR vector. */
     Vec3& operator=(const btQuaternion& q) {setHPR(q); return *this;}
+    
+    // ------------------------------------------------------------------------
+    /** Operator== of btQuadWord also compares m_floats[3], which is not
+     *  useful (and wrong in certain circumstances). */
+    bool operator==(const Vec3& other) const
+    {
+        return ((m_floats[2]==other.m_floats[2]) && 
+                (m_floats[1]==other.m_floats[1]) && 
+                (m_floats[0]==other.m_floats[0])   );
+    }
+
+    // ------------------------------------------------------------------------
+    /** Operator!= of btQuadWord also compares m_floats[3], which is not
+     *  useful (and wrong in certain circumstances). */
+    bool operator!=(const Vec3& other) const
+    {
+        return ((m_floats[2]!=other.m_floats[2]) || 
+                (m_floats[1]!=other.m_floats[1]) ||
+                (m_floats[0]!=other.m_floats[0])   );
+    }
+
     // ------------------------------------------------------------------------
     /** Computes this = this - v1. */
     Vec3  operator-(const Vec3& v1) const {return (Vec3)(*(btVector3*)this
