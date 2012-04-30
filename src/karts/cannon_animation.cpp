@@ -67,8 +67,7 @@ CannonAnimation::~CannonAnimation()
     float epsilon = 0.5f * m_kart->getKartHeight();
 
     btTransform pos;
-    pos.setOrigin(m_kart->getXYZ()
-                  +btVector3(0, m_kart->getKartHeight() + epsilon, 0) );
+    pos.setOrigin(m_kart->getXYZ());
     pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 
                                  m_kart->getHeading()        ));
 
