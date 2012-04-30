@@ -55,7 +55,6 @@ AbstractKartAnimation::~AbstractKartAnimation()
     // we can't call getPhysics() anymore.
     if(m_timer < 0)
     {
-        //m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
         World::getWorld()->getPhysics()->addKart(m_kart);
     }
