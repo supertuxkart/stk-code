@@ -280,50 +280,25 @@ void PlayerController::skidBonusTriggered()
  */
 void PlayerController::update(float dt)
 {
-#ifdef THIS_CAN_BE_REMOVED
-    m_controls->m_look_back = false;
-    m_controls->m_nitro     = false;
-
-    static float min_x =  99999;
-    static float max_x = -99999;
-    static float min_z =  99999;
-    static float max_z = -99999;
-    const Vec3 &xyz = m_kart->getXYZ();
-    min_x = std::min(min_x, xyz.getX());
-    max_x = std::max(max_x, xyz.getX());
-    min_z = std::min(min_z, xyz.getZ());
-    max_z = std::max(max_z, xyz.getZ());
-    m_controls->m_accel = 1.0f;
-    m_controls->m_brake = false;
-    m_controls->m_steer = 1.0f;
-    printf("xyz %f %f %f  hpr  %f %f %f x %f %f y %f %f r %f %f\n",
-        m_kart->getXYZ().getX(),
-        m_kart->getXYZ().getY(),
-        m_kart->getXYZ().getZ(),
-        m_kart->getHeading(),
-        m_kart->getPitch(),
-        m_kart->getRoll(),
-        min_x, max_x, min_z, max_z,
-        0.5f*(max_x-min_x),
-        0.5f*(max_z-min_z)
-        );
-    return;
-#endif
     // Don't do steering if it's replay. In position only replay it doesn't 
     // matter, but if it's physics replay the gradual steering causes 
     // incorrect results, since the stored values are already adjusted.
-    if(!history->replayHistory())
+    if (!history->replayHistory())
         steer(dt, m_steer_val);
 
-    if(World::getWorld()->isStartPhase())
+    if (World::getWorld()->isStartPhase())
     {
-        if(m_controls->m_accel || m_controls->m_brake ||
-           m_controls->m_fire  || m_controls->m_nitro)
+        if (m_controls->m_accel || m_controls->m_brake ||
+            m_controls->m_fire  || m_controls->m_nitro)
         {
-            if (m_penalty_time == 0.0)//eliminates machine-gun-effect for SOUND_BZZT
+            // Only give penalty time in SET_PHASE.
+            // Penalty time check makes sure it doesn't get rendered on every
+            // update.
+            if (m_penalty_time == 0.0 &&
+                World::getWorld()->getPhase() == WorldStatus::SET_PHASE)
             {
                 RaceGUIBase* m=World::getWorld()->getRaceGUI();
-                if(m)
+                if (m)
                 {
                     m->addMessage(_("Penalty time!!"), m_kart, 2.0f,
                                   video::SColor(255, 255, 128, 0));
@@ -331,28 +306,29 @@ void PlayerController::update(float dt)
                                   video::SColor(255, 210, 100, 50));
                 }
                 m_bzzt_sound->play();
+
+                m_penalty_time = stk_config->m_penalty_time;
             }   // if penalty_time = 0
-            
-            m_penalty_time      = stk_config->m_penalty_time;
+
             m_controls->m_brake = false;
             m_controls->m_accel = 0.0f;
-            
         }   // if key pressed
+
         return;
     }   // if isStartPhase
 
-    if(m_penalty_time>0.0)
+    if (m_penalty_time>0.0)
     {
         m_penalty_time-=dt;
         return;
     }
 
-    if ( m_controls->m_fire && !m_kart->getKartAnimation())
+    if (m_controls->m_fire && !m_kart->getKartAnimation())
     {
         if (m_kart->getPowerup()->getType()==PowerupManager::POWERUP_NOTHING) 
             m_kart->beep();
     }
-    
+
     // look backward when the player requests or
     // if automatic reverse camera is active
     if (m_kart->getCamera()->getMode() != Camera::CM_FINAL)
@@ -368,7 +344,7 @@ void PlayerController::update(float dt)
                 m_kart->getCamera()->setMode(Camera::CM_NORMAL);
         }
     }
-    
+
     // We can't restrict rescue to fulfil isOnGround() (which would be more like
     // MK), since e.g. in the City track it is possible for the kart to end
     // up sitting on a brick wall, with all wheels in the air :((
@@ -415,7 +391,6 @@ void PlayerController::setPosition(int p)
  */
 void PlayerController::finishedRace(float time)
 {
-    
 }   // finishedRace
 
 //-----------------------------------------------------------------------------
@@ -431,10 +406,10 @@ void PlayerController::handleZipper(bool play_sound)
     {
         m_wee_sound->play();
     }
-    
+
     // Apply the motion blur according to the speed of the kart
     irr_driver->getPostProcessing()->giveBoost();
-    
+
     m_kart->showZipperFire();
 
 }   // handleZipper
@@ -480,6 +455,6 @@ void PlayerController::collectedItem(const Item &item, int add_info, float old_e
         default:
             m_grab_sound->play();
             break; 
-        }           
+        }
     }
 }   // collectedItem
