@@ -47,7 +47,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
     ModalDialog(percentWidth, percentHeight)
 {
     loadFromFile("race_paused_dialog.stkgui");
-    
+
     World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
 
     IconButtonWidget* back_btn = getWidget<IconButtonWidget>("backbtn");
@@ -69,14 +69,15 @@ void RacePausedDialog::loadedFromFile()
     {
         GUIEngine::RibbonWidget* choice_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
-        
-        
         const bool success = choice_ribbon->deleteChild("restart");
         assert(success);
     }
     // Remove "endrace" button for types not (yet?) implemented
-    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_NORMAL_RACE &&
-        race_manager->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL   )
+    // Also don't show it unless the race has started. Prevents finishing in
+    // a time of 0:00:00.
+    if ((race_manager->getMinorMode() != RaceManager::MINOR_MODE_NORMAL_RACE  &&
+         race_manager->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL ) ||
+         World::getWorld()->isStartPhase())
     {
         GUIEngine::RibbonWidget* choice_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
@@ -98,7 +99,7 @@ GUIEngine::EventPropagation
 {
     GUIEngine::RibbonWidget* chocie_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
-    
+
     if (eventSource == "backbtn")
     {
         // unpausing is done in the destructor so nothing more to do here
@@ -115,12 +116,12 @@ GUIEngine::EventPropagation
             ModalDialog::dismiss();
             race_manager->exitRace();
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-            
+
             if (race_manager->raceWasStartedFromOverworld())
             {
                 OverWorld::enterOverWorld();
             }
-            
+
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "help")
