@@ -471,7 +471,7 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object)
         // Handle the actual explosion. The kart that fired a flyable will
         // only be affected if it's a direct hit. This allows karts to use
         // rockets on short distance.
-        if(m_owner!=kart || m_owner==kart_hit)
+        if( (m_owner!=kart || m_owner==kart_hit) && !kart->getKartAnimation())
         {
             // The explosion animation will register itself with the kart
             // and will free it later.
@@ -483,7 +483,8 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object)
         }
     }
     world->getTrack()->handleExplosion(getXYZ(), object);
-}   // hit
+}   // explode
+
 // ----------------------------------------------------------------------------
 /** Returns the hit effect object to use when this objects hits something.
  *  \returns The hit effect object, or NULL if no hit effect should be played.
