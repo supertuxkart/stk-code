@@ -80,9 +80,15 @@ class WaterShaderProvider : public video::IShaderConstantSetCallBack
     float m_dx_1, m_dy_1, m_dx_2, m_dy_2;
     float m_water_shader_speed_1;
     float m_water_shader_speed_2;
+    bool m_fog;
     
 public:
     LEAK_CHECK()
+    
+    void enableFog(bool enable)
+    {
+        m_fog = enable;
+    }
     
     
     WaterShaderProvider(float water_shader_speed_1,
@@ -95,6 +101,8 @@ public:
         
         m_water_shader_speed_1 = water_shader_speed_1/100.0f;
         m_water_shader_speed_2 = water_shader_speed_2/100.0f;
+        
+        m_fog = false;
     }
     
     virtual void OnSetConstants(
@@ -132,6 +140,23 @@ public:
         
         services->setVertexShaderConstant("delta1", &m_dx_1, 2);
         services->setVertexShaderConstant("delta2", &m_dx_2, 2);
+        
+        if (m_fog)
+        {
+            Track* t = World::getWorld()->getTrack();
+            
+            float fogStart = t->getFogStart();
+            services->setPixelShaderConstant("fogFrom", (float*)&fogStart, 1);
+            
+            float fogEnd = t->getFogEnd();
+            services->setPixelShaderConstant("fogTo", (float*)&fogEnd, 1);
+            
+            video::SColor fogColor = t->getFogColor();
+            float fogColorVec[] = {fogColor.getRed()/255.0f,
+                                   fogColor.getGreen()/255.0f,
+                                   fogColor.getBlue()/255.0f, 1.0f};
+            services->setVertexShaderConstant("fogColor", fogColorVec, 4);
+        }
     }
 };
 
@@ -1090,8 +1115,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(1, irr_driver->getTexture(file_manager->getTextureFile("waternormals.jpg")));
             m->setTexture(2, irr_driver->getTexture(file_manager->getTextureFile("waternormals2.jpg")));
                           
-            const char* vertex_shader = "shaders/water.vert";
-            const char* pixel_shader  = "shaders/water.frag";
+            bool fog = World::getWorld()->getTrack()->isFogEnabled();
+            const char* vertex_shader = (fog ? "shaders/water_fog.vert" : "shaders/water.vert");
+            const char* pixel_shader  = (fog ? "shaders/water_fog.frag" : "shaders/water.frag");
+            
+            ((WaterShaderProvider*)m_shaders[WATER_SHADER])->enableFog(fog);
             
             // Material and shaders
             IGPUProgrammingServices* gpu = 

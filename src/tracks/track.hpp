@@ -457,7 +457,10 @@ public:
     // ------------------------------------------------------------------------
     ParticleKind* getSkyParticles         () { return m_sky_particles; }
     // ------------------------------------------------------------------------
-    bool isFogEnabled() const { return m_use_fog; }
+    bool  isFogEnabled() const { return m_use_fog;   }
+    float getFogStart()  const { return m_fog_start; }
+    float getFogEnd()    const { return m_fog_end; }
+    video::SColor getFogColor() const { return m_fog_color; }
     // ------------------------------------------------------------------------
     /** Whether this is an "internal" track. If so it won't be offered
      * in the track seelction screen. */
