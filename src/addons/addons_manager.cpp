@@ -132,10 +132,15 @@ void AddonsManager::initOnline(const XMLNode *xml)
             m_addons_list.lock();
             if(index>=0)
             {
-                // Only copy the data if a newer revision is found.
-                if(m_addons_list.getData()[index].getRevision()
-                    < addon.getRevision()                       )
+                Addon& tmplist_addon = m_addons_list.getData()[index];
+                
+                // Only copy the data if a newer revision is found (ignore unapproved
+                // revisions unless player is in the mode to see them)
+                if (tmplist_addon.getRevision() < addon.getRevision() &&
+                    (addon.testStatus(Addon::AS_APPROVED) || UserConfigParams::m_artist_debug_mode))
+                {
                     m_addons_list.getData()[index].copyInstallData(addon);
+                }
             }
             else
             {
