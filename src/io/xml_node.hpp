@@ -72,6 +72,7 @@ public:
          XMLNode(const std::string &filename);
     
         ~XMLNode();
+        
     const std::string &getName() const {return m_name; }
     const XMLNode     *getNode(const std::string &name) const;
     const void         getNodes(const std::string &s, std::vector<XMLNode*>& out) const;

@@ -320,13 +320,13 @@ private:
     void getMusicInformation(std::vector<std::string>&  filenames, 
                              std::vector<MusicInformation*>& m_music   );
     void loadCurves(const XMLNode &node);
-    void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
     void handleSky(const XMLNode &root, const std::string &filename);
 
 public:
 
     bool reverseAvailable() { return m_reverse_available; }
-
+    void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
+    
     static const float NOHIT;
 
                        Track             (const std::string &filename);

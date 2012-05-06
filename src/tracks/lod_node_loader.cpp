@@ -22,6 +22,7 @@ using namespace irr;
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "io/xml_node.hpp"
+#include "tracks/track.hpp"
 
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
@@ -67,7 +68,7 @@ bool LodNodeLoader::check(const XMLNode* xml)
             std::string model_name;
             xml->get("model", &model_name);
             
-            lod_groups[lodgroup][(int)lod_distance] = LodModel(model_name, tangent);
+            lod_groups[lodgroup][(int)lod_distance] = LodModel(xml, model_name, tangent);
         }
         return true;
     }
@@ -84,7 +85,8 @@ bool LodNodeLoader::check(const XMLNode* xml)
   * @param cache the individual meshes will be added there
   * @param[out] out the nodes are added here
   */
-void LodNodeLoader::done(std::string directory,
+void LodNodeLoader::done(Track* track,
+                         std::string directory,
                          std::vector<scene::IMesh*>& cache,
                          std::vector<LODNode*>& out)
 {
@@ -174,6 +176,8 @@ void LodNodeLoader::done(std::string directory,
                     scene_node->setRotation(hpr);
                     scene_node->setScale(scale);
                     
+                    track->handleAnimatedTextures( scene_node, *group[m].second.m_xml );
+                    
                     lod_node->add( group[m].first, scene_node, true );
                 }
                 
@@ -181,7 +185,6 @@ void LodNodeLoader::done(std::string directory,
                 std::string debug_name = groupname+" (LOD track-object)";
                 lod_node->setName(debug_name.c_str());
 #endif
-                
                 out.push_back(lod_node);
             }
             else

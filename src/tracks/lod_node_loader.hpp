@@ -19,13 +19,13 @@
 #ifndef HEADER_LOD_NODE_LOADER_HPP
 #define HEADER_LOD_NODE_LOADER_HPP
 
-
-class XMLNode;
 class LODNode;
+class Track;
 
 #include <map>
 #include <vector>
 #include <string>
+#include "io/xml_node.hpp"
 
 namespace irr 
 {
@@ -39,17 +39,24 @@ struct LodModel
 {
     std::string m_model_file;
     bool m_tangent;
+    const XMLNode* m_xml;
     
     /** Constructor to allow storing this in STL containers */
     LodModel()
     {
         m_tangent = false;
+        m_xml = NULL;
     }
     
-    LodModel(std::string& model, bool tangent)
+    LodModel(const XMLNode* xml, std::string& model, bool tangent)
     {
         m_model_file = model;
         m_tangent = tangent;
+        m_xml = xml;
+    }
+    
+    ~LodModel()
+    {
     }
 };
 
@@ -66,7 +73,8 @@ public:
          LodNodeLoader();
     
     bool check(const XMLNode* xml);
-    void done(std::string directory,
+    void done(Track* track,
+              std::string directory,
               std::vector<irr::scene::IMesh*>& cache,
               std::vector<LODNode*>& out);
     

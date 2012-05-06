@@ -979,7 +979,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     
     // Create LOD nodes
     std::vector<LODNode*> lod_nodes;
-    lodLoader.done(m_root, m_all_cached_meshes, lod_nodes);
+    lodLoader.done(this, m_root, m_all_cached_meshes, lod_nodes);
     for (unsigned int n=0; n<lod_nodes.size(); n++)
     {
         // FIXME: support for animated textures on LOD objects
@@ -1428,7 +1428,7 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
     
     std::vector<LODNode*> lod_nodes;
     std::vector<scene::IMesh*> devnull;
-    lod_loader.done(m_root, devnull, lod_nodes);
+    lod_loader.done(this, m_root, devnull, lod_nodes);
     
     m_track_object_manager->assingLodNodes(lod_nodes);
     // ---------------------------------------------
