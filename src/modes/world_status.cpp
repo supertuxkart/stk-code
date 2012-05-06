@@ -226,8 +226,10 @@ void WorldStatus::update(const float dt)
                 // Wait for the race over GUI/modal dialog to appear
                 // Previously the in race race over results are shown,
                 // and getCurrent() returns NULL.
-                GUIEngine::ModalDialog *m = GUIEngine::ModalDialog::getCurrent();
-                if( m && ( (RaceOverDialog*)m)->menuIsFinished() )
+                RaceOverDialog *m = 
+                    dynamic_cast<RaceOverDialog*>(GUIEngine::ModalDialog
+                                                          ::getCurrent());
+                if( m && m->menuIsFinished() )
                 {
                     m_phase = FINISH_PHASE;
                 }
