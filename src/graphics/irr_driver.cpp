@@ -199,6 +199,16 @@ void IrrDriver::initDevice()
             }
 
         } // end if firstTime
+        
+        const core::dimension2d<u32> ssize = m_device->getVideoModeList()->getDesktopResolution();
+        if (UserConfigParams::m_width > (int)ssize.Width ||
+            UserConfigParams::m_height > (int)ssize.Height)
+        {
+            fprintf(stderr, "[IrrDriver] The window size specified in "
+                            "user config is larger than your screen!");
+            UserConfigParams::m_width = 800;
+            UserConfigParams::m_height = 600;
+        }
 
         m_device->closeDevice();
         m_video_driver  = NULL;
