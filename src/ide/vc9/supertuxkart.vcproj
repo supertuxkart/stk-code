@@ -693,6 +693,10 @@
 				Name="modes"
 				>
 				<File
+					RelativePath="..\..\modes\demo_world.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\follow_the_leader.cpp"
 					>
 				</File>
@@ -1850,6 +1854,10 @@
 			<Filter
 				Name="modes"
 				>
+				<File
+					RelativePath="..\..\modes\demo_world.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\modes\follow_the_leader.hpp"
 					>

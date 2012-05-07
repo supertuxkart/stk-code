@@ -29,6 +29,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/demo_world.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
@@ -367,7 +368,9 @@ void RaceManager::startNextRace()
     // variable world. Admittedly a bit ugly, but simplifies
     // handling of objects which get created in the constructor
     // and need world to be defined.
-    if     (ProfileWorld::isProfileMode())            
+    if(DemoWorld::isDemoMode())
+        World::setWorld(new DemoWorld());
+    else if(ProfileWorld::isProfileMode())            
         World::setWorld(new ProfileWorld());
     else if(m_minor_mode==MINOR_MODE_FOLLOW_LEADER) 
         World::setWorld(new FollowTheLeaderRace());

@@ -33,11 +33,13 @@
 #include "input/input.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
+#include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/kart_selection.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_input2.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -441,6 +443,14 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         return;
     }
     
+    // Abort demo mode if a key is pressed during the race in demo mode
+    if(dynamic_cast<DemoWorld*>(World::getWorld()))
+    {
+        race_manager->exitRace();
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        return;
+    }
+
     StateManager::ActivePlayer*   player = NULL;
     PlayerAction    action;
     bool action_found = m_device_manager->translateInput(type, deviceID, 

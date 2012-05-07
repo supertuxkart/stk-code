@@ -35,6 +35,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
 #include "modes/overworld.hpp"
+#include "modes/demo_world.hpp"
 #include "network/network_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
@@ -129,11 +130,19 @@ void MainMenuScreen::init()
 
     r = getWidget<RibbonWidget>("menu_toprow");
     r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    DemoWorld::resetIdleTime();
 }   // init
 
 // ----------------------------------------------------------------------------
 void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
+    // If a demo mode is started, do nothing more
+    if(DemoWorld::updateIdleTimeAndStartDemo(delta))
+    {
+        //StateManager::get()->popMenu();
+        return;
+    }
+
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
@@ -177,6 +186,7 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, 
                                    const int playerID)
 {
+    DemoWorld::resetIdleTime();
     // most interesting stuff is in the ribbons, so start there
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
     

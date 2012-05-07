@@ -166,6 +166,7 @@
 #include "items/projectile_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
 #include "race/grand_prix_manager.hpp"
@@ -392,6 +393,12 @@ void cmdLineHelp (char* invocation)
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
     "       --no-graphics      Do not display the actual race.\n"
+    "       --demo-mode t      Enables demo mode after t seconds idle time in "
+                               "main menu.\n"
+    "       --demo-tracks t1,t2 List of tracks to be used in demo mode. No\n"
+    "                          spaces are allowed in the track names.\n"
+    "       --demo-laps n      Number of laps in a demo.\n"
+    "       --demo-karts n     Number of karts to use in a demo.\n"
     "       --ghost            Replay ghost data together with one player kart.\n"
     // "       --history          Replay history file 'history.dat'.\n"
     // "       --history=n        Replay history file 'history.dat' using:\n"
@@ -936,6 +943,35 @@ int handleCmdLine(int argc, char **argv)
             // the player structures correctly.
             UserConfigParams::m_no_start_screen = true;
 
+        }
+        else if( !strcmp(argv[i], "--demo-mode") && i+1<argc)
+        {
+            float t;
+            StringUtils::fromString(argv[i+1], t);
+            DemoWorld::enableDemoMode(t);
+            i++;
+        } 
+        else if( !strcmp(argv[i], "--demo-laps") && i+1<argc)
+        {
+            // Note that we use a separate setting for demo mode to avoid the
+            // problem that someone plays a game, and in further demos then
+            // the wrong (i.e. last selected) number of laps would be used
+            DemoWorld::setNumLaps(atoi(argv[i+1]));
+            i++;
+        }
+        else if( !strcmp(argv[i], "--demo-karts") && i+1<argc)
+        {
+            // Note that we use a separate setting for demo mode to avoid the
+            // problem that someone plays a game, and in further demos then
+            // the wrong (i.e. last selected) number of karts would be used
+            DemoWorld::setNumKarts(atoi(argv[i+1]));
+            i++;
+        }
+        else if( !strcmp(argv[i], "--demo-tracks") && i+1<argc)
+        {
+            DemoWorld::setTracks(StringUtils::split(std::string(argv[i+1]), 
+                                                    ','));
+            i++;
         }
         else if( !strcmp(argv[i], "--item") && i+1<argc )
         {

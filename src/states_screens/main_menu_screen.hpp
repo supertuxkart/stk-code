@@ -28,10 +28,10 @@ namespace GUIEngine { class Widget; class ListWidget; }
   */
 class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<MainMenuScreen>
 {
+private:
     friend class GUIEngine::ScreenSingleton<MainMenuScreen>;
         
     MainMenuScreen();
-    
     
 public:
     

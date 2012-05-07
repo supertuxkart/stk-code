@@ -30,6 +30,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
+#include "modes/demo_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world_with_rank.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
@@ -539,6 +540,12 @@ void RaceResultGUI::renderGlobal(float dt)
     case RR_WAIT_TILL_END:      
         if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
             displayGPProgress();
+        if(m_timer - m_time_rotation > 1.0f &&
+            dynamic_cast<DemoWorld*>(World::getWorld()) )
+        {
+            race_manager->exitRace();
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        }
         break;
     }   // switch
 

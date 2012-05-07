@@ -28,7 +28,6 @@ KartWithStats::KartWithStats(const std::string& ident,
              : Kart(ident, world_kart_id, position,
                     init_transform)
 {
-    reset();
 }   // KartWithStats
 
 // ----------------------------------------------------------------------------
@@ -47,6 +46,7 @@ void KartWithStats::reset()
     m_small_nitro_count = 0;
     m_large_nitro_count = 0;
     m_bubblegum_count   = 0;
+    Kart::reset();
 }   // reset
 
 // ----------------------------------------------------------------------------
