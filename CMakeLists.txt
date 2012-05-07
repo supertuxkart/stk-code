@@ -41,10 +41,12 @@ endif()
 # Set include paths
 include_directories(${STK_SOURCE_DIR})
 
-# With these variables set libraries in "dependencies" are found
-set(ENV{PATH} ${PROJECT_SOURCE_DIR}/dependencies/include)
-set(ENV{LIB} ${PROJECT_SOURCE_DIR}/dependencies/lib)
-set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
+# These variables enable MSVC to find libraries located in "dependencies"
+if(MSVC)
+    set(ENV{PATH} ${PROJECT_SOURCE_DIR}/dependencies/include)
+    set(ENV{LIB} ${PROJECT_SOURCE_DIR}/dependencies/lib)
+    set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
+endif()
 
 # Irrlicht
 find_package(Irrlicht 1.8 REQUIRED)
