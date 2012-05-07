@@ -34,6 +34,10 @@ bool GameSlot::isLocked(const std::string& feature)
 void GameSlot::computeActive()
 {
     m_points = 0;
+    m_easy_challenges = 0;
+    m_medium_challenges = 0;
+    m_hard_challenges = 0;
+    
     m_locked_features.clear(); // start afresh
     
     std::map<std::string, Challenge*>::const_iterator i;
@@ -64,14 +68,17 @@ void GameSlot::computeActive()
             if (i->second->isSolved(RaceManager::RD_HARD))
             {
                 m_points += 10;
+                m_hard_challenges++;
             }
             else if (i->second->isSolved(RaceManager::RD_MEDIUM))
             {
                 m_points += 9;
+                m_medium_challenges++;
             }
             else if (i->second->isSolved(RaceManager::RD_EASY))
             {
                 m_points += 8;
+                m_easy_challenges;
             }
         }
         else

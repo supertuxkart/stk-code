@@ -106,7 +106,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     // Determine maximum length of the rank/lap text, in order to
     // align those texts properly on the right side of the viewport.
     gui::ScalableFont* font = GUIEngine::getFont(); 
-    m_trophy_points_width = font->getDimension(L"100").Width;
+    m_trophy_points_width = font->getDimension(L"1000").Width;
     
     m_lock = irr_driver->getTexture( file_manager->getTextureFile("gui_lock.png") );
     m_open_challenge = irr_driver->getTexture( file_manager->getGUIDir() + "challenge.png" );
@@ -200,7 +200,8 @@ void RaceGUIOverworld::renderPlayerView(const AbstractKart *kart)
  */
 void RaceGUIOverworld::drawTrophyPoints()
 {
-    const int points = unlock_manager->getCurrentSlot()->getPoints();
+    GameSlot* slot = unlock_manager->getCurrentSlot();
+    const int points = slot->getPoints();
     std::string s = StringUtils::toString(points);
     core::stringw sw(s.c_str());
     
@@ -218,16 +219,45 @@ void RaceGUIOverworld::drawTrophyPoints()
     vcenter = true;
     
     const int size = UserConfigParams::m_width/20;
-    core::rect<s32> dest(pos.UpperLeftCorner.X - size - 5, pos.UpperLeftCorner.Y,
-                         pos.UpperLeftCorner.X - 5, pos.UpperLeftCorner.Y + size);
+    core::rect<s32> dest(size, pos.UpperLeftCorner.Y,
+                         size*2, pos.UpperLeftCorner.Y + size);
     core::rect<s32> source(core::position2di(0, 0), m_trophy3->getSize());
     
+    font->setShadow(video::SColor(255,0,0,0));
+    
+    irr_driver->getVideoDriver()->draw2DImage(m_trophy1, dest, source, NULL,
+                                              NULL, true /* alpha */);
+    
+    dest += core::position2di(size*1.5, 0);
+    std::string easyTrophies = StringUtils::toString(slot->getNumEasyTrophies());
+    core::stringw easyTrophiesW(easyTrophies.c_str());
+    font->draw(easyTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
+    
+    dest += core::position2di(size*2, 0);
+    irr_driver->getVideoDriver()->draw2DImage(m_trophy2, dest, source, NULL,
+                                              NULL, true /* alpha */);
+                                
+    dest += core::position2di(size*1.5, 0);
+    std::string mediumTrophies = StringUtils::toString(slot->getNumMediumTrophies());
+    core::stringw mediumTrophiesW(mediumTrophies.c_str());
+    font->draw(mediumTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
+    
+    dest += core::position2di(size*2, 0);
     irr_driver->getVideoDriver()->draw2DImage(m_trophy3, dest, source, NULL,
+                                              NULL, true /* alpha */);
+    dest += core::position2di(size*1.5, 0);
+    std::string hardTrophies = StringUtils::toString(slot->getNumHardTrophies());
+    core::stringw hardTrophiesW(hardTrophies.c_str());
+    font->draw(hardTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
+    
+    dest = core::rect<s32>(pos.UpperLeftCorner.X - size - 5, pos.UpperLeftCorner.Y,
+                           pos.UpperLeftCorner.X - 5, pos.UpperLeftCorner.Y + size);
+    
+    irr_driver->getVideoDriver()->draw2DImage(m_open_challenge, dest, source, NULL,
                                               NULL, true /* alpha */);
     
     pos.LowerRightCorner.Y = dest.LowerRightCorner.Y;
     pos.UpperLeftCorner.X += 5;
-    font->setShadow(video::SColor(255,0,0,0));
     
     
     font->draw(sw.c_str(), pos, time_color, false, vcenter, NULL, true /* ignore RTL */);

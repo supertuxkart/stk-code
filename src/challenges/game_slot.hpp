@@ -63,6 +63,10 @@ class GameSlot
     /** Set to false after the initial stuff (intro, select kart, etc.) */
     bool m_first_time;
     
+    int m_easy_challenges;
+    int m_medium_challenges;
+    int m_hard_challenges;
+    
 public:
     
     // do NOT attempt to pass 'player_unique_id' by reference here. I don't know why (compiler bug
@@ -72,6 +76,9 @@ public:
         m_player_unique_id = player_unique_id;
         m_points = 0;
         m_first_time = true;
+        m_easy_challenges = 0;
+        m_medium_challenges = 0;
+        m_hard_challenges = 0;
     }
     
     const std::string& getPlayerID() const { return m_player_unique_id; }
@@ -99,6 +106,10 @@ public:
     void       save              (std::ofstream& file);
     
     int        getPoints          () const { return m_points; }
+    
+    int        getNumEasyTrophies  () const { return m_easy_challenges;   }
+    int        getNumMediumTrophies() const { return m_medium_challenges; }
+    int        getNumHardTrophies  () const { return m_hard_challenges;   }
     
     void       setFirstTime(bool ft) { m_first_time = ft;   }
     bool       isFirstTime() const   { return m_first_time; }
