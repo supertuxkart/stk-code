@@ -21,6 +21,7 @@
 #include <SColor.h>
 
 #include "challenges/challenge_data.hpp"
+#include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -146,13 +147,16 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
     switch (difficulty)
     {
         case RaceManager::RD_EASY:
-            msg = _("You completed the easy challenge!");
+            msg = _("You completed the easy challenge! This trophy is worth %i points",
+                    CHALLENGE_POINTS[RaceManager::RD_EASY]);
             break;
         case RaceManager::RD_MEDIUM:
-            msg = _("You completed the intermediate challenge!");
+            msg = _("You completed the intermediate challenge! This trophy is worth %i points",
+                    CHALLENGE_POINTS[RaceManager::RD_MEDIUM]);
             break;
         case RaceManager::RD_HARD:
-            msg = _("You completed the difficult challenge!");
+            msg = _("You completed the difficult challenge! This trophy is worth %i points",
+                    CHALLENGE_POINTS[RaceManager::RD_HARD]);
             break;
         default:
             assert(false);
@@ -541,7 +545,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
     static const int h = irr_driver->getFrameSize().Height;
     const irr::video::SColor color(255, 255, 255, 255);
     
-    GUIEngine::getTitleFont()->draw(_("Feature Unlocked"),
+    GUIEngine::getTitleFont()->draw(_("Challenge Completed"),
                                     core::rect< s32 >( 0, 0, w, h/10 ),
                                     color,
                                     true/* center h */, true /* center v */ );

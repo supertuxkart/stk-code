@@ -67,17 +67,17 @@ void GameSlot::computeActive()
             
             if (i->second->isSolved(RaceManager::RD_HARD))
             {
-                m_points += 10;
+                m_points += CHALLENGE_POINTS[RaceManager::RD_HARD];
                 m_hard_challenges++;
             }
             else if (i->second->isSolved(RaceManager::RD_MEDIUM))
             {
-                m_points += 9;
+                m_points += CHALLENGE_POINTS[RaceManager::RD_MEDIUM];
                 m_medium_challenges++;
             }
             else if (i->second->isSolved(RaceManager::RD_EASY))
             {
-                m_points += 8;
+                m_points += CHALLENGE_POINTS[RaceManager::RD_EASY];
                 m_easy_challenges;
             }
         }

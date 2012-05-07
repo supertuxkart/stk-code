@@ -31,6 +31,8 @@ class ChallengeData;
 class Challenge;
 class XMLWriter;
 
+const int CHALLENGE_POINTS[] = { 8, 9, 10 };
+
 /**
  * \ingroup challenges
  * This class contains the progression through challenges for one game slot
