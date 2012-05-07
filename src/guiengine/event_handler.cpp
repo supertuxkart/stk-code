@@ -30,6 +30,7 @@
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input_manager.hpp"
+#include "modes/demo_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
@@ -656,6 +657,8 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
     {
         if (event.GUIEvent.Caller == NULL) return EVENT_LET;
         const s32 id = event.GUIEvent.Caller->getID();
+        
+        DemoWorld::resetIdleTime();
         
         switch (event.GUIEvent.EventType)
         {
