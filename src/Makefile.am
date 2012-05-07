@@ -227,6 +227,8 @@ supertuxkart_SOURCES = \
  karts/max_speed.hpp \
  karts/moveable.cpp \
  karts/moveable.hpp \
+ modes/demo_world.cpp \
+ modes/demo_world.hpp \
  modes/follow_the_leader.cpp \
  modes/follow_the_leader.hpp \
  modes/game_tutorial.cpp \

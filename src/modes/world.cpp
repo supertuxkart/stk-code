@@ -164,7 +164,7 @@ void World::init()
     
     powerup_manager->updateWeightsForRace(num_karts);
     // erase messages left over
-    RaceGUIBase* rg = World::getWorld()->getRaceGUI();
+    RaceGUIBase* rg = getRaceGUI();
     rg->init();
     if (rg) rg->clearAllMessages();
 }   // init

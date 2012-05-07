@@ -41,9 +41,9 @@ ProfileWorld::ProfileWorld()
     race_manager->setNumLocalPlayers(0);
     // Set number of laps so that the end of the race can be detected by 
     // quering the number of finished karts from the race manager (in laps
-    // based profiling) - otherwise just a high number.
-    race_manager->setNumLaps(m_profile_mode==PROFILE_LAPS ? m_num_laps 
-                                                          : 99999);
+    // based profiling) - in case of time based profiling, the number of
+    // laps is set to 99999.
+    race_manager->setNumLaps(m_num_laps);
     m_phase            = RACE_PHASE;
     m_frame_count      = 0;
     m_start_time       = irr_driver->getRealTime();
@@ -56,12 +56,15 @@ ProfileWorld::ProfileWorld()
 }   // ProfileWorld
 
 //-----------------------------------------------------------------------------
-/** Enables profiling for a certain amount of time.
+/** Enables profiling for a certain amount of time. It also sets the
+ *  number of laps to a high number (so that the lap count will not finish
+ *  a race before the time is over).
  *  \param time Time to profile a race for.
  */
 void ProfileWorld::setProfileModeTime(float time)
 {
     m_profile_mode = PROFILE_TIME;
+    m_num_laps     = 99999;
     m_time         = time;
 }   // setProfileModeTime
 
@@ -75,6 +78,17 @@ void ProfileWorld::setProfileModeLaps(int laps)
     m_profile_mode = PROFILE_LAPS;
     m_num_laps     = laps;
 }   // setProfileModeLaps
+
+//-----------------------------------------------------------------------------
+/** Activates Demo mode. In this mode all karts are controlled by an AI, but
+ *  at the end no stats are printed, and the game isn't exited.
+ *  \param laps The number of laps.
+ */
+void ProfileWorld::setProfileModeDemo(int laps)
+{
+    m_profile_mode = PROFILE_DEMO;
+    m_num_laps     = laps;
+}   // setProfileModeDemo
 
 //-----------------------------------------------------------------------------
 /** Creates a kart, having a certain position, starting location, and local
@@ -117,8 +131,15 @@ bool ProfileWorld::isRaceOver()
     if(m_profile_mode==PROFILE_TIME)
         return getTime()>m_time;
 
-    // Now it must be laps based profiling:
-    return race_manager->getFinishedKarts()==getNumKarts();
+    if(m_profile_mode == PROFILE_LAPS ||
+        m_profile_mode == PROFILE_DEMO)
+    {
+        // Now it must be laps based profiling:
+        return race_manager->getFinishedKarts()==getNumKarts();
+    }
+    // Unknown profile mode
+    assert(false);
+    return false;  // keep compiler happy
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
@@ -127,6 +148,8 @@ bool ProfileWorld::isRaceOver()
 void ProfileWorld::update(float dt)
 {
     StandardRace::update(dt);
+    if(m_profile_mode==PROFILE_DEMO) return;
+
     m_frame_count++;
     video::IVideoDriver *driver = irr_driver->getVideoDriver();
     io::IAttributes   *attr = irr_driver->getSceneManager()->getParameters();
@@ -171,6 +194,9 @@ void ProfileWorld::enterRaceOverState()
             continue;
         m_karts[i]->finishedRace(estimateFinishTimeForKart(m_karts[i]));
     }
+    
+    // Do nothing more in demo mode - esp. don't abort ;)
+    if(m_profile_mode == PROFILE_DEMO) return;
 
     // Print framerate statistics
     float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;

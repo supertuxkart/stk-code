@@ -405,6 +405,8 @@ set( SRCS ${SRCS} src/main.cpp
 	src/karts/max_speed.hpp
 	src/karts/moveable.cpp
 	src/karts/moveable.hpp
+	src/modes/demo_world.cpp
+	src/modes/demo_world.hpp
 	src/modes/follow_the_leader.cpp
 	src/modes/follow_the_leader.hpp
 	src/modes/game_tutorial.cpp

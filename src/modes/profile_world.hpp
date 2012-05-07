@@ -32,7 +32,8 @@ class ProfileWorld : public StandardRace
 {
 private:
     /** Profiling modes. */
-    enum        ProfileType {PROFILE_NONE, PROFILE_TIME, PROFILE_LAPS};
+    enum        ProfileType {PROFILE_NONE, PROFILE_TIME, PROFILE_LAPS,
+                             PROFILE_DEMO};
 
     /** If profiling is done, and if so, which mode. */
     static ProfileType m_profile_mode;
@@ -40,9 +41,6 @@ private:
     /** If no graphics should be displayed. Useful for batch testing
      *  of AI changes etc. */
     static bool  m_no_graphics;
-
-    /** In laps based profiling: number of laps to run. */
-    static int   m_num_laps;
 
     /** In time based profiling only: time to run. */
     static float m_time;
@@ -73,6 +71,10 @@ private:
 
 protected:
 
+    /** In laps based profiling: number of laps to run. Also
+     *  used by DemoWorld. */
+    static int   m_num_laps;
+
     virtual Kart *createKart(const std::string &kart_ident, int index, 
                              int local_player_id, int global_player_id);
 
@@ -87,6 +89,7 @@ public:
 
     static   void setProfileModeTime(float time);
     static   void setProfileModeLaps(int laps);
+    static   void setProfileModeDemo(int laps);
     // ------------------------------------------------------------------------
     /** Returns true if profile mode was selected. */
     static   bool isProfileMode() {return m_profile_mode!=PROFILE_NONE; }
