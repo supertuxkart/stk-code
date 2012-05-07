@@ -60,7 +60,19 @@ void GameSlot::computeActive()
             {
                 unlockFeature(i->second, RaceManager::RD_HARD, /*save*/ false);
             }
-            m_points++;
+            
+            if (i->second->isSolved(RaceManager::RD_HARD))
+            {
+                m_points += 10;
+            }
+            else if (i->second->isSolved(RaceManager::RD_MEDIUM))
+            {
+                m_points += 9;
+            }
+            else if (i->second->isSolved(RaceManager::RD_EASY))
+            {
+                m_points += 8;
+            }
         }
         else
         {
