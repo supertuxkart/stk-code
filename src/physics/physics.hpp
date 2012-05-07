@@ -60,7 +60,6 @@ private:
 
         /** The contact point for each object (in local coordincates). */
         Vec3               m_contact_point[2];
-
     public:
         /** The entries in Collision Pairs are sorted: if a projectile
          * is included, it's always 'a'. If only two karts are reported
@@ -123,6 +122,18 @@ private:
         }
     };  // CollisionList
     // ========================================================================
+
+    /** This flag is set while bullets time step processing is taking
+    *  place. It is used to avoid altering data structures that might
+    *  be used (e.g. removing a kart while a loop over all karts is
+    *  taking place, as can happen in collision handling). */
+    bool               m_physics_loop_active;
+
+    /** If kart need to be removed from the physics world while physics
+    *  processing is taking place, store the pointers to the karts to
+    *  be removed here, and remove them once the physics processing
+    *  is finished. */
+    std::vector<const AbstractKart*> m_karts_to_delete;
 
     /** Pointer to the physics dynamics world. */
     STKDynamicsWorld                *m_dynamics_world;

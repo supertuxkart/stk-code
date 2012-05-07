@@ -38,8 +38,8 @@
  */
 Physics::Physics() : btSequentialImpulseConstraintSolver()
 {
-    m_collision_conf = new btDefaultCollisionConfiguration();
-    m_dispatcher     = new btCollisionDispatcher(m_collision_conf);
+    m_collision_conf      = new btDefaultCollisionConfiguration();
+    m_dispatcher          = new btCollisionDispatcher(m_collision_conf);
 }   // Physics
 
 //-----------------------------------------------------------------------------
@@ -49,11 +49,13 @@ Physics::Physics() : btSequentialImpulseConstraintSolver()
  */
 void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
 {
-    m_axis_sweep     = new btAxisSweep3(world_min, world_max);
-    m_dynamics_world = new STKDynamicsWorld(m_dispatcher,
-                                            m_axis_sweep,
-                                            this,
-                                            m_collision_conf);
+    m_physics_loop_active = false;
+    m_axis_sweep          = new btAxisSweep3(world_min, world_max);
+    m_dynamics_world      = new STKDynamicsWorld(m_dispatcher,
+                                                 m_axis_sweep,
+                                                 this,
+                                                 m_collision_conf);
+    m_karts_to_delete.clear();
     m_dynamics_world->setGravity(
         btVector3(0.0f,
                   -World::getWorld()->getTrack()->getGravity(),
@@ -100,9 +102,26 @@ void Physics::addKart(const AbstractKart *kart)
  */
 void Physics::removeKart(const AbstractKart *kart)
 {
-    m_dynamics_world->removeRigidBody(kart->getBody());
-    m_dynamics_world->removeVehicle(kart->getVehicle());
-    m_dynamics_world->removeConstraint(kart->getUprightConstraint());
+    // We can't simply remove a kart from the physics world when currently
+    // loops over all kart objects are active. This can happen in collision
+    // handling, where a collision of a kart with a cake etc. removes
+    // a kart from the physics. In this case save pointers to the kart
+    // to be removed, and remove them once the physics processing is done.
+    if(m_physics_loop_active)
+    {
+        // Make sure to remove each kart only once.
+        if(std::find(m_karts_to_delete.begin(), m_karts_to_delete.end(), kart)
+                     == m_karts_to_delete.end())
+        {
+            m_karts_to_delete.push_back(kart);
+        }
+    }
+    else
+    {
+        m_dynamics_world->removeRigidBody(kart->getBody());
+        m_dynamics_world->removeVehicle(kart->getVehicle());
+        m_dynamics_world->removeConstraint(kart->getUprightConstraint());
+    }
 }   // removeKart
 
 //-----------------------------------------------------------------------------
@@ -111,6 +130,7 @@ void Physics::removeKart(const AbstractKart *kart)
  */
 void Physics::update(float dt)
 {
+    m_physics_loop_active = true;
     // Bullet can report the same collision more than once (up to 4
     // contact points per collision). Additionally, more than one internal
     // substep might be taken, resulting in potentially even more
@@ -207,6 +227,14 @@ void Physics::update(float dt)
             p->getUserPointer(1)->getPointerFlyable()->hit(NULL);
         }
     }  // for all p in m_all_collisions
+
+    m_physics_loop_active = false;
+    // Now remove the karts that were removed while the above loop
+    // was active. Now we can safely call removeKart, since the loop
+    // is finished and m_physics_world_active is not set anymore.
+    for(unsigned int i=0; i<m_karts_to_delete.size(); i++)
+        removeKart(m_karts_to_delete[i]);
+    m_karts_to_delete.clear();
 }   // update
 
 //-----------------------------------------------------------------------------
