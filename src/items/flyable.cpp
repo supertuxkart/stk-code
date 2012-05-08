@@ -39,6 +39,7 @@
 #include "karts/explosion_animation.hpp"
 #include "modes/world.hpp"
 #include "network/flyable_info.hpp"
+#include "physics/physics.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"

@@ -49,6 +49,7 @@ using namespace irr;
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "physics/physical_object.hpp"
+#include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/bezier_curve.hpp"

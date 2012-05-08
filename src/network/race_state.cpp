@@ -17,13 +17,14 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/race_state.hpp"
-#include "items/item_manager.hpp"
 
+#include "items/item_manager.hpp"
+#include "items/powerup.hpp"
+#include "items/projectile_manager.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
-#include "items/powerup.hpp"
-#include "items/projectile_manager.hpp"
+#include "physics/physics.hpp"
 
 RaceState *race_state=NULL;
 

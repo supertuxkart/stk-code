@@ -28,6 +28,7 @@ using namespace irr;
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
+#include "physics/physics.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"

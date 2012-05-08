@@ -641,11 +641,8 @@ namespace GUIEngine
 
 #include "guiengine/engine.hpp"
 
-#include <iostream>
-#include <assert.h>
-#include <IGUIEnvironment.h>
-
 #include "io/file_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "input/input_manager.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -656,6 +653,10 @@ namespace GUIEngine
 #include "modes/demo_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui_base.hpp"
+
+#include <iostream>
+#include <assert.h>
+#include <irrlicht.h>
 
 using namespace irr::gui;
 using namespace irr::video;

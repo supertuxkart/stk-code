@@ -39,6 +39,7 @@
 #include "main_loop.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "physics/physics.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/constants.hpp"

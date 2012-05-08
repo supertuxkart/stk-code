@@ -26,6 +26,7 @@
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "network/network_manager.hpp" 
+#include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track_sector.hpp"

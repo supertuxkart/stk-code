@@ -16,9 +16,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "karts/abstract_kart.hpp"
 #include "karts/abstract_kart_animation.hpp"
+
+#include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
+#include "physics/physics.hpp"
 
 AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart, 
                                              const std::string &name)

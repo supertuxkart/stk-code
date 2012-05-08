@@ -21,8 +21,10 @@
 #include "btBulletDynamicsCommon.h"
 
 #include "modes/world.hpp"
+#include "physics/physics.hpp"
 #include "utils/constants.hpp"
 #include "utils/time.hpp"
+
 #include <fstream>
 
 // -----------------------------------------------------------------------------

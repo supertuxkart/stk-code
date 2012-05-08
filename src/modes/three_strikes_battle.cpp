@@ -21,10 +21,12 @@
 #include <IMeshSceneNode.h>
 
 #include "audio/music_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
+#include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"

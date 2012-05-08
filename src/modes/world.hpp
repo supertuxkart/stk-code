@@ -28,7 +28,6 @@
 #include <vector>
 
 #include "modes/world_status.hpp"
-#include "physics/physics.hpp"
 #include "race/highscores.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "states_screens/state_manager.hpp"
@@ -37,7 +36,14 @@
 class AbstractKart;
 class btRigidBody;
 class Controller;
+class PhysicalObject;
+class Physics;
 class Track;
+
+namespace irr
+{
+    namespace scene { class ISceneNode; }
+}
 
 /** 
  *  \brief base class for all game modes

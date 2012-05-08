@@ -21,6 +21,7 @@
 #include "audio/sfx_manager.hpp"
 #include "audio/music_manager.hpp"
 #include "config/stk_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"

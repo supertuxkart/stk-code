@@ -16,25 +16,27 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include <assert.h>
+#include "guiengine/screen.hpp"
 
 #include "io/file_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/layout_manager.hpp"
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "modes/world.hpp"
 #include "states_screens/state_manager.hpp"
 
-using namespace irr;
+#include <irrlicht.h>
 
+using namespace irr;
 using namespace core;
 using namespace scene;
 using namespace video;
 using namespace io;
 using namespace gui;
 using namespace GUIEngine;
+
+#include <assert.h>
 
 // -----------------------------------------------------------------------------
 

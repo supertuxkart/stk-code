@@ -24,6 +24,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "config/stk_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "karts/abstract_kart.hpp"

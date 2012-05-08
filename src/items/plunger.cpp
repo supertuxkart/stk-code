@@ -29,6 +29,7 @@
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "physics/physical_object.hpp"
+#include "physics/physics.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"

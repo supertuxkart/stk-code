@@ -21,12 +21,15 @@
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/stk_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "network/network_manager.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
+
+#include <irrlicht.h>
 
 //-----------------------------------------------------------------------------
 WorldStatus::WorldStatus()

@@ -16,14 +16,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "input/input_manager.hpp"
-
-#include <map>
-#include <vector>
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <algorithm>
-
 #include "main_loop.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
@@ -36,6 +28,7 @@
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/kart_selection.hpp"
@@ -45,6 +38,14 @@
 #include "utils/string_utils.hpp"
 
 #include <ISceneNode.h>
+
+#include <map>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <algorithm>
+
 
 InputManager *input_manager;
 

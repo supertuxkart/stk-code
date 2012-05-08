@@ -43,6 +43,7 @@
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 #include "physics/btKart.hpp"
+#include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"

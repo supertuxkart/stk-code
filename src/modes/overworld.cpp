@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "challenges/unlock_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
@@ -24,6 +25,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/overworld.hpp"
+#include "physics/physics.hpp"
 #include "network/network_manager.hpp"
 #include "states_screens/dialogs/select_challenge.hpp"
 #include "states_screens/kart_selection.hpp"

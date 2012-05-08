@@ -19,10 +19,12 @@
 #ifndef THREE_STRIKES_HPP
 #define THREE_STRIKES_HPP
 
-#include <string>
-
 #include "modes/world_with_rank.hpp"
 #include "states_screens/race_gui_base.hpp"
+
+#include <IMesh.h>
+
+#include <string>
 
 #define CLEAR_SPAWN_RANGE  5
 

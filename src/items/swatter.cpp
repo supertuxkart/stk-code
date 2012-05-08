@@ -30,6 +30,7 @@
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "graphics/explosion.hpp"
+#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/projectile_manager.hpp"

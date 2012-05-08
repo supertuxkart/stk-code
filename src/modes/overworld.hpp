@@ -23,6 +23,7 @@
 #include "modes/linear_world.hpp"
 #include "utils/aligned_array.hpp"
 
+#include "LinearMath/btTransform.h"
 
 /*
  * The overworld map where challenges are played.
