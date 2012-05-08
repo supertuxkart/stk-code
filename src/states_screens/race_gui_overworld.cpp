@@ -228,7 +228,7 @@ void RaceGUIOverworld::drawTrophyPoints()
     irr_driver->getVideoDriver()->draw2DImage(m_trophy1, dest, source, NULL,
                                               NULL, true /* alpha */);
     
-    dest += core::position2di(size*1.5, 0);
+    dest += core::position2di((int)(size*1.5f), 0);
     std::string easyTrophies = StringUtils::toString(slot->getNumEasyTrophies());
     core::stringw easyTrophiesW(easyTrophies.c_str());
     font->draw(easyTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
@@ -237,7 +237,7 @@ void RaceGUIOverworld::drawTrophyPoints()
     irr_driver->getVideoDriver()->draw2DImage(m_trophy2, dest, source, NULL,
                                               NULL, true /* alpha */);
                                 
-    dest += core::position2di(size*1.5, 0);
+    dest += core::position2di((int)(size*1.5f), 0);
     std::string mediumTrophies = StringUtils::toString(slot->getNumMediumTrophies());
     core::stringw mediumTrophiesW(mediumTrophies.c_str());
     font->draw(mediumTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
@@ -245,7 +245,7 @@ void RaceGUIOverworld::drawTrophyPoints()
     dest += core::position2di(size*2, 0);
     irr_driver->getVideoDriver()->draw2DImage(m_trophy3, dest, source, NULL,
                                               NULL, true /* alpha */);
-    dest += core::position2di(size*1.5, 0);
+    dest += core::position2di((int)(size*1.5f), 0);
     std::string hardTrophies = StringUtils::toString(slot->getNumHardTrophies());
     core::stringw hardTrophiesW(hardTrophies.c_str());
     font->draw(hardTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
