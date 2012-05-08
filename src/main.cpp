@@ -916,6 +916,9 @@ int handleCmdLine(int argc, char **argv)
             float t;
             StringUtils::fromString(argv[i+1], t);
             DemoWorld::enableDemoMode(t);
+            // The default number of laps is taken from ProfileWorld and 
+            // is 0. So set a more useful default for demo mode.
+            DemoWorld::setNumLaps(2);
             i++;
         } 
         else if( !strcmp(argv[i], "--demo-laps") && i+1<argc)
