@@ -20,7 +20,7 @@
                     I18N="Race paused button" text="Restart Race" word_wrap="true"/>
 
             <icon-button id="endrace" width="128" height="128" icon="gui/options_ui.png"
-                         I18N="Race paused button" text="End Race" word_wrap="true"/>
+                         I18N="Race paused button" text="Give Up Race" word_wrap="true"/>
 
             <icon-button id="options" width="128" height="128" icon="gui/main_options.png"
                          I18N="Race paused button" text="Options" word_wrap="true"/>
