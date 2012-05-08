@@ -124,13 +124,6 @@ void MainMenuScreen::init()
 // ----------------------------------------------------------------------------
 void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
-    // If a demo mode is started, do nothing more
-    if(DemoWorld::updateIdleTimeAndStartDemo(delta))
-    {
-        //StateManager::get()->popMenu();
-        return;
-    }
-
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
@@ -174,7 +167,6 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, 
                                    const int playerID)
 {
-    DemoWorld::resetIdleTime();
     // most interesting stuff is in the ribbons, so start there
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
     

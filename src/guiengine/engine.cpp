@@ -617,6 +617,7 @@ namespace GUIEngine
 #include "guiengine/screen.hpp"
 #include "guiengine/skin.hpp"
 #include "guiengine/widget.hpp"
+#include "modes/demo_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui_base.hpp"
 
@@ -1116,6 +1117,20 @@ namespace GUIEngine
         if ( UserConfigParams::m_display_fps ) irr_driver->displayFPS();
         
         g_driver->enableMaterial2D(false);
+        
+        
+        if (gamestate == MENU)
+        {
+            if (DemoWorld::updateIdleTimeAndStartDemo(elapsed_time))
+            {
+                return;
+            }
+        }
+        else
+        {
+            DemoWorld::resetIdleTime();
+        }
+        
         
     }   // render
     
