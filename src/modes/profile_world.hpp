@@ -32,8 +32,7 @@ class ProfileWorld : public StandardRace
 {
 private:
     /** Profiling modes. */
-    enum        ProfileType {PROFILE_NONE, PROFILE_TIME, PROFILE_LAPS,
-                             PROFILE_DEMO};
+    enum        ProfileType {PROFILE_NONE, PROFILE_TIME, PROFILE_LAPS};
 
     /** If profiling is done, and if so, which mode. */
     static ProfileType m_profile_mode;
@@ -89,7 +88,6 @@ public:
 
     static   void setProfileModeTime(float time);
     static   void setProfileModeLaps(int laps);
-    static   void setProfileModeDemo(int laps);
     // ------------------------------------------------------------------------
     /** Returns true if profile mode was selected. */
     static   bool isProfileMode() {return m_profile_mode!=PROFILE_NONE; }
