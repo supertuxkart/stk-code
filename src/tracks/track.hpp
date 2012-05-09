@@ -293,6 +293,9 @@ private:
     std::string         m_name;
     
     bool                m_use_fog;
+    /** True if this track supports using smoothed normals. */
+    bool                m_smooth_normals;
+
     float               m_fog_density;
     float               m_fog_start;
     float               m_fog_end;
@@ -458,14 +461,19 @@ public:
     ParticleKind* getSkyParticles         () { return m_sky_particles; }
     // ------------------------------------------------------------------------
     bool  isFogEnabled() const { return m_use_fog;   }
+    // ------------------------------------------------------------------------
     float getFogStart()  const { return m_fog_start; }
+    // ------------------------------------------------------------------------
     float getFogEnd()    const { return m_fog_end; }
+    // ------------------------------------------------------------------------
     video::SColor getFogColor() const { return m_fog_color; }
     // ------------------------------------------------------------------------
     /** Whether this is an "internal" track. If so it won't be offered
      * in the track seelction screen. */
     bool isInternal() const { return m_internal; }
-        
+    // ------------------------------------------------------------------------
+    /** Returns true if the normals of this track can be smoothed. */
+    bool smoothNormals() const { return m_smooth_normals; }        
     // ------------------------------------------------------------------------
     TrackObjectManager* getTrackObjectManager() {return m_track_object_manager;}
     

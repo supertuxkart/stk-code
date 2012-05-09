@@ -273,6 +273,7 @@ void Track::loadTrackInfo()
     m_fog_start             = 0.0f;
     m_fog_end               = 1000.0f;
     m_gravity               = 9.80665f;
+    m_smooth_normals        = false;
                               /* ARGB */
     m_fog_color             = video::SColor(255, 77, 179, 230);
     m_default_ambient_color = video::SColor(255, 120, 120, 120);
@@ -303,6 +304,7 @@ void Track::loadTrackInfo()
     root->get("groups",                &m_groups);
     root->get("internal",              &m_internal);
     root->get("reverse",               &m_reverse_available);
+    root->get("smooth-normals",        &m_smooth_normals);
     // Reverse is meaningless in arena
     m_reverse_available = !m_is_arena && m_reverse_available;
 

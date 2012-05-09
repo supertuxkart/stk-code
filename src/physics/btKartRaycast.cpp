@@ -72,7 +72,7 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
 			result.m_distFraction = rayCallback.m_closestHitFraction;
             const TriangleMesh &tm = 
                 World::getWorld()->getTrack()->getTriangleMesh();
-            if(stk_config->m_smooth_normals && 
+            if(m_smooth_normals && 
                 rayCallback.getTriangleIndex()>-1)
             {
                 btVector3 n=result.m_hitNormalInWorld;

@@ -577,7 +577,9 @@ void Kart::createPhysics()
     // Create the actual vehicle
     // -------------------------
     m_vehicle_raycaster =
-        new btKartRaycaster(World::getWorld()->getPhysics()->getPhysicsWorld());
+        new btKartRaycaster(World::getWorld()->getPhysics()->getPhysicsWorld(),
+                            stk_config->m_smooth_normals &&
+                            World::getWorld()->getTrack()->smoothNormals());
     m_vehicle = new btKart(m_body, m_vehicle_raycaster, this);
 
     // never deactivate the vehicle

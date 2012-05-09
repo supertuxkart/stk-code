@@ -22,10 +22,14 @@ class btDynamicsWorld;
 
 class btKartRaycaster : public btVehicleRaycaster
 {
+private:
 	btDynamicsWorld*	m_dynamicsWorld;
+    /** True if the normals should be smoothed. Not all tracks support this, 
+    *  so this flag is set depending on track when constructing this object. */
+    bool                m_smooth_normals;
 public:
-	btKartRaycaster(btDynamicsWorld* world)
-		:m_dynamicsWorld(world)
+	btKartRaycaster(btDynamicsWorld* world, bool smooth_normals=false)
+		:m_dynamicsWorld(world), m_smooth_normals(smooth_normals)
 	{
 	}
 
