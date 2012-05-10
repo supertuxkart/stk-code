@@ -37,6 +37,10 @@ bool                     DemoWorld::m_do_demo           = false;
  */
 DemoWorld::DemoWorld()
 {
+    // Profile mode sets the phase to RACE_PHASE, which means the track intro
+    // is not shown, the music is not start, no countdown. So reset it to
+    // the correct value.
+    setPhase(SETUP_PHASE);
     m_abort = false;
     ProfileWorld::setProfileModeLaps(m_num_laps);
     race_manager->setReverseTrack(false);
