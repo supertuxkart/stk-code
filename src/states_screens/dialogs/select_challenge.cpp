@@ -27,6 +27,8 @@
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/select_challenge.hpp"
+#include "tracks/track_manager.hpp"
+#include "tracks/track.hpp"
 
 using namespace GUIEngine;
 
@@ -113,6 +115,9 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     novice_label->setText( getLabel(RaceManager::RD_EASY,   c->getData()), false );
     medium_label->setText( getLabel(RaceManager::RD_MEDIUM, c->getData()), false );
     expert_label->setText( getLabel(RaceManager::RD_HARD,   c->getData()), false );
+    
+    const wchar_t* track_name = track_manager->getTrack(c->getData()->getTrackId())->getName();
+    getWidget<LabelWidget>("title")->setText( track_name, true );
 }
 
 // ----------------------------------------------------------------------------
