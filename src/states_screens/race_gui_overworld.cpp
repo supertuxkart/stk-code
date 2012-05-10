@@ -65,9 +65,10 @@ const int COMPLETED_HARD = 4;
 RaceGUIOverworld::RaceGUIOverworld()
 {    
     m_enabled = true;
-    m_trophy1  = irr_driver->getTexture( file_manager->getTextureFile("cup_bronze.png") );
-    m_trophy2  = irr_driver->getTexture( file_manager->getTextureFile("cup_silver.png") );
-    m_trophy3  = irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") );
+    m_close_to_a_challenge = false;
+    m_trophy1 = irr_driver->getTexture( file_manager->getTextureFile("cup_bronze.png") );
+    m_trophy2 = irr_driver->getTexture( file_manager->getTextureFile("cup_silver.png") );
+    m_trophy3 = irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") );
 
     const float scaling = irr_driver->getFrameSize().Height / 420.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
@@ -204,7 +205,7 @@ void RaceGUIOverworld::drawTrophyPoints()
     const int points = slot->getPoints();
     std::string s = StringUtils::toString(points);
     core::stringw sw(s.c_str());
-    
+   
     static video::SColor time_color = video::SColor(255, 255, 255, 255);
     
     int dist_from_right = 10 + m_trophy_points_width;
@@ -225,30 +226,48 @@ void RaceGUIOverworld::drawTrophyPoints()
     
     font->setShadow(video::SColor(255,0,0,0));
     
-    irr_driver->getVideoDriver()->draw2DImage(m_trophy1, dest, source, NULL,
-                                              NULL, true /* alpha */);
+    if (!m_close_to_a_challenge) 
+    {
+        irr_driver->getVideoDriver()->draw2DImage(m_trophy1, dest, source, NULL,
+                                                  NULL, true /* alpha */);
+    }
     
     dest += core::position2di((int)(size*1.5f), 0);
     std::string easyTrophies = StringUtils::toString(slot->getNumEasyTrophies());
     core::stringw easyTrophiesW(easyTrophies.c_str());
-    font->draw(easyTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
+    if (!m_close_to_a_challenge) 
+    {
+        font->draw(easyTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
+    }
     
     dest += core::position2di(size*2, 0);
-    irr_driver->getVideoDriver()->draw2DImage(m_trophy2, dest, source, NULL,
-                                              NULL, true /* alpha */);
-                                
+    if (!m_close_to_a_challenge) 
+    {
+        irr_driver->getVideoDriver()->draw2DImage(m_trophy2, dest, source, NULL,
+                                                  NULL, true /* alpha */);
+    }
+    
     dest += core::position2di((int)(size*1.5f), 0);
     std::string mediumTrophies = StringUtils::toString(slot->getNumMediumTrophies());
     core::stringw mediumTrophiesW(mediumTrophies.c_str());
-    font->draw(mediumTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
+    if (!m_close_to_a_challenge) 
+    {
+        font->draw(mediumTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
+    }
     
     dest += core::position2di(size*2, 0);
-    irr_driver->getVideoDriver()->draw2DImage(m_trophy3, dest, source, NULL,
-                                              NULL, true /* alpha */);
+    if (!m_close_to_a_challenge) 
+    {
+        irr_driver->getVideoDriver()->draw2DImage(m_trophy3, dest, source, NULL,
+                                                  NULL, true /* alpha */);
+    }
     dest += core::position2di((int)(size*1.5f), 0);
     std::string hardTrophies = StringUtils::toString(slot->getNumHardTrophies());
     core::stringw hardTrophiesW(hardTrophies.c_str());
-    font->draw(hardTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
+    if (!m_close_to_a_challenge) 
+    {
+        font->draw(hardTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
+    }
     
     dest = core::rect<s32>(pos.UpperLeftCorner.X - size - 5, pos.UpperLeftCorner.Y,
                            pos.UpperLeftCorner.X - 5, pos.UpperLeftCorner.Y + size);
@@ -381,12 +400,14 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     
     
     // ---- Draw nearby challenge if any
+    m_close_to_a_challenge = false;
     for (unsigned int n=0; n<challenges.size(); n++)
     {
         if (challenges[n].getForceField().m_is_locked) continue;
 
         if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < CHALLENGE_DISTANCE_SQUARED)
         {
+            m_close_to_a_challenge = true;
             core::rect<s32> pos(15,
                                 10, 
                                 15 + UserConfigParams::m_width/2,

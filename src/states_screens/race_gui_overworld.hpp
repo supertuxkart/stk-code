@@ -50,6 +50,8 @@ private:
     Material        *m_speed_meter_icon;
     Material        *m_speed_bar_icon;
     
+    bool             m_close_to_a_challenge;
+    
     /** Translated string 'lap' displayed every frame. */
     core::stringw    m_string_lap;
     
