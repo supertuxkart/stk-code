@@ -607,8 +607,8 @@ void World::updateWorld(float dt)
     }
     
     // Don't update world if a menu is shown or the race is over.
-    if( m_phase == FINISH_PHASE         ||
-        m_phase == IN_GAME_MENU_PHASE      )  
+    if( getPhase() == FINISH_PHASE         ||
+        getPhase() == IN_GAME_MENU_PHASE      )  
         return;
 
     update(dt);

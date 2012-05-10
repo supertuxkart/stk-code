@@ -112,12 +112,11 @@ void OverWorld::update(float dt)
     // Skip annoying waiting without a purpose
     // Make sure to do all things that would normally happen in the 
     // update() method of the base classes.
-    if (m_phase < GO_PHASE)
+    if (getPhase()< GO_PHASE)
     {
-        m_phase = GO_PHASE;
-        // Go message disappears at 3, music starts at 2.5
-        m_auxiliary_timer = 2.0f;
-        // Normally done in WorldStatus::update(), SET_PHASE
+        setPhase(RACE_PHASE);
+        // Normally done in WorldStatus::update(), during phase SET_PHASE,
+        // so we have to start music 'manually', since we skip all phases.
         World::getWorld()->getTrack()->startMusic();
     }
     LinearWorld::update(dt);

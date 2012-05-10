@@ -43,7 +43,7 @@ ProfileWorld::ProfileWorld()
     // based profiling) - in case of time based profiling, the number of
     // laps is set to 99999.
     race_manager->setNumLaps(m_num_laps);
-    m_phase            = RACE_PHASE;
+    setPhase(RACE_PHASE);
     m_frame_count      = 0;
     m_start_time       = irr_driver->getRealTime();
     m_num_triangles    = 0;

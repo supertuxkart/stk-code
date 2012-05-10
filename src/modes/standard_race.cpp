@@ -130,6 +130,6 @@ void StandardRace::endRaceEarly()
         );
     } // Finish the active players
     endSetKartPositions();
-    m_phase = RESULT_DISPLAY_PHASE;
+    setPhase(RESULT_DISPLAY_PHASE);
     terminateRace();
 } // endRaceEarly
