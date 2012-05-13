@@ -363,9 +363,6 @@
     <ClCompile Include="..\..\physics\triangle_mesh.cpp">
       <Filter>Source Files\physics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\karts\emergency_animation.cpp">
-      <Filter>Source Files\karts</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\karts\kart.cpp">
       <Filter>Source Files\karts</Filter>
     </ClCompile>
@@ -834,6 +831,33 @@
     <ClCompile Include="..\..\karts\skidding_properties.cpp">
       <Filter>Source Files\karts</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\karts\explosion_animation.cpp">
+      <Filter>Source Files\karts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\karts\abstract_kart_animation.cpp">
+      <Filter>Source Files\karts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\karts\abstract_kart.cpp">
+      <Filter>Source Files\karts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\karts\cannon_animation.cpp">
+      <Filter>Source Files\karts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\karts\rescue_animation.cpp">
+      <Filter>Source Files\karts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\modes\demo_world.cpp">
+      <Filter>Source Files\modes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\modes\game_tutorial.cpp">
+      <Filter>Source Files\modes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\config\player.cpp">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tracks\check_cannon.cpp">
+      <Filter>Source Files\tracks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1108,9 +1132,6 @@
     </ClInclude>
     <ClInclude Include="..\..\physics\user_pointer.hpp">
       <Filter>Header Files\physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\karts\emergency_animation.hpp">
-      <Filter>Header Files\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart.hpp">
       <Filter>Header Files\karts</Filter>
@@ -1585,6 +1606,30 @@
     </ClInclude>
     <ClInclude Include="..\..\karts\skidding_properties.hpp">
       <Filter>Header Files\karts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\explosion_animation.hpp">
+      <Filter>Header Files\karts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\abstract_kart_animation.hpp">
+      <Filter>Header Files\karts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\abstract_kart.hpp">
+      <Filter>Header Files\karts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\cannon_animation.hpp">
+      <Filter>Header Files\karts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\rescue_animation.hpp">
+      <Filter>Header Files\karts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modes\demo_world.hpp">
+      <Filter>Header Files\modes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modes\game_tutorial.hpp">
+      <Filter>Header Files\modes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tracks\check_cannon.hpp">
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
