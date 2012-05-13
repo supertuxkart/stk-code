@@ -31,14 +31,14 @@ class XMLNode;
 /** A simple class that stores all skidding related properties. It acts as
  *  interface between kart_properties and Skidding (to avoid either passing
  *  very many individual variables, or making KartProperties a dependency
- *  of Skidding.
+ *  of Skidding).
  * \ingroup karts
  */
 
 class SkiddingProperties
 {
 public:
-//    LEAK_CHECK();
+    //LEAK_CHECK();
 protected:
     /** Skidding is multiplied by this when skidding 
     *  to increase to m_skid_increase. */

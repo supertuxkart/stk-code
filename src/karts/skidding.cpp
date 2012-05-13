@@ -78,19 +78,20 @@ void Skidding::updateSteering(float steer)
     case SKID_ACCUMULATE_RIGHT:
         {
             float f = (1.0f+steer)*0.5f;   // map [-1,1] --> [0, 1]
-            m_real_steering = m_skid_reduce_turn_min+ 
-                              m_skid_reduce_turn_delta*f;
+            m_real_steering   = m_skid_reduce_turn_min+ 
+                                m_skid_reduce_turn_delta*f;
+            m_visual_rotation = m_skid_visual * m_real_steering;
             break;
         }
     case SKID_ACCUMULATE_LEFT:
         {
             float f = (-1.0f+steer)*0.5f;   // map [-1,1] --> [-1, 0]
-            m_real_steering = -m_skid_reduce_turn_min+
-                               m_skid_reduce_turn_delta*f;
+            m_real_steering   = -m_skid_reduce_turn_min+
+                                 m_skid_reduce_turn_delta*f;
+            m_visual_rotation = m_skid_visual * m_real_steering;
             break;
         }
     }   // switch m_skid_state
-    m_visual_rotation = m_skid_visual * m_real_steering;
 
     float st = fabsf(m_skid_time);
     if(st<m_skid_visual_time)
@@ -168,9 +169,7 @@ void Skidding::update(float dt, bool is_on_ground,
             // to the left. So we test for a 'clear enough' steering direction.
             if(!skidding || fabsf(steering)<0.9f) break;
             m_skid_state = steering > 0 ? SKID_ACCUMULATE_RIGHT
-                : SKID_ACCUMULATE_LEFT;
-            m_skid_time  = 0;   // fallthrough
-
+                                        : SKID_ACCUMULATE_LEFT;
             // Add a little jump to the kart. Determine the vertical speed 
             // necessary for the kart to go 0.5*jump_time up (then it needs
             // the same time to come down again), based on v = gravity * t.
@@ -180,6 +179,8 @@ void Skidding::update(float dt, bool is_on_ground,
                     * 0.5f*m_jump_time;
             btVector3 imp(0, v / m_kart->getBody()->getInvMass(),0);
             m_kart->getVehicle()->getRigidBody()->applyCentralImpulse(imp);
+
+            m_skid_time  = 0;   // fallthrough
         }
     case SKID_ACCUMULATE_LEFT:
     case SKID_ACCUMULATE_RIGHT:
