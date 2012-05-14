@@ -282,7 +282,6 @@ void DefaultAIController::update(float dt)
 
     /*And obviously general kart stuff*/
     AIBaseController::update(dt);
-    m_controls->m_fire = false;
 }   // update
 
 //-----------------------------------------------------------------------------
