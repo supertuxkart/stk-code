@@ -1005,6 +1005,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\show_curve.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\skid_marks.cpp"
 					>
 				</File>
@@ -1747,6 +1751,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\utils\cpp2011.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\leak_check.hpp"
 					>
 				</File>
@@ -2184,6 +2192,10 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\shadow.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\show_curve.hpp"
 					>
 				</File>
 				<File

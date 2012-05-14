@@ -20,6 +20,7 @@
 
 #include "animations/animation_base.hpp"
 #include "animations/ipo.hpp"
+#include "graphics/show_curve.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/cannon_animation.hpp"
@@ -44,6 +45,15 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
     m_curve = new Ipo(*(node.getNode("curve")), 
                       /*fps*/25, 
                       /*reverse*/race_manager->getReverseTrack());
+#ifdef DEBUG
+    if(UserConfigParams::m_track_debug)
+    {
+        m_show_curve = new ShowCurve(0.5f, 0.5f);
+        const std::vector<Vec3> &p = m_curve->getPoints();
+        for(unsigned int i=0; i<p.size(); i++)
+            m_show_curve->addPoint(p[i]);
+    }
+#endif
 }   // CheckCannon
 
 // ----------------------------------------------------------------------------
@@ -53,6 +63,10 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
 CheckCannon::~CheckCannon()
 {
     delete m_curve;
+#ifdef DEBUG
+    if(UserConfigParams::m_track_debug)
+        delete m_show_curve;
+#endif
 }   // ~CheckCannon
 
 // ----------------------------------------------------------------------------

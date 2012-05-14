@@ -24,6 +24,7 @@
 
 class CheckManager;
 class Ipo;
+class ShowCurve;
 class XMLNode;
 
 /** 
@@ -40,6 +41,12 @@ private:
 
     /** Stores the cannon curve data. */
     Ipo *m_curve;
+
+#ifdef DEBUG
+    /** If track debugging is enabled, this will show the the curve of
+     *  the cannon in the race. */
+    ShowCurve * m_show_curve;
+#endif
 
 public:
              CheckCannon(const XMLNode &node, unsigned int index);
