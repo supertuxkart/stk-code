@@ -92,7 +92,7 @@ class KartSelectionScreen : public GUIEngine::Screen,
 public:
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile();
+    virtual void loadedFromFile() OVERRIDE;
     
     void setMultiplayer(bool multiplayer);
     
@@ -111,25 +111,25 @@ public:
     bool playerQuit(StateManager::ActivePlayer* player);
     
      /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void init();
+    virtual void init() OVERRIDE;
     
-    virtual void beforeAddingWidget();
+    virtual void beforeAddingWidget() OVERRIDE;
     
      /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void tearDown();
+    virtual void tearDown() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, 
-                               const std::string& name, const int playerID);
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+                               const int playerID) OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onUpdate(float dt, irr::video::IVideoDriver*);
+    virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
 
     /** \brief implement optional callback from parent 
      *  class GUIEngine::Screen */
-    virtual void unloaded();
+    virtual void unloaded() OVERRIDE;
     
     /** \brief implement optional callback from parent 
      *  class GUIEngine::Screen */
-    virtual bool onEscapePressed();
+    virtual bool onEscapePressed() OVERRIDE;
 };

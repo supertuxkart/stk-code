@@ -35,22 +35,23 @@ private:
     
 public:
     
-    virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver);
+    virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver) OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile();
+    virtual void loadedFromFile() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+                               const int playerID) OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void init();
+    virtual void init() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void tearDown();
+    virtual void tearDown() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onDisabledItemClicked(const std::string& item);
+    virtual void onDisabledItemClicked(const std::string& item) OVERRIDE;
 };
 
 #endif

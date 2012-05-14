@@ -72,24 +72,25 @@ class GrandPrixLose : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
 public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile();
+    virtual void loadedFromFile() OVERRIDE;
     
     /** \brief implement optional callback from parent class GUIEngine::Screen */
-    void onUpdate(float dt, irr::video::IVideoDriver*);
+    void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    void init();
+    void init() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    void tearDown();
+    void tearDown() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+                       const int playerID) OVERRIDE;
     
     /** \brief set which karts lost this GP */
     void setKarts(std::vector<std::string> ident);
 
-    virtual MusicInformation* getMusic() const { return m_music; }
+    virtual MusicInformation* getMusic() const OVERRIDE { return m_music; }
 
 };
 

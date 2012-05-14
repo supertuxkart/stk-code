@@ -126,18 +126,19 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
 public:
 
     /** \brief implement optional callback from parent class GUIEngine::Screen */
-    void onUpdate(float dt, irr::video::IVideoDriver*);
+    void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile();
+    virtual void loadedFromFile() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    void init();
+    void init() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    void tearDown();
+    void tearDown() OVERRIDE;
     
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+                       const int playerID) OVERRIDE;
     
     /** Call before showing up the screen to make a kart come out of the chest.
         'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
@@ -165,7 +166,7 @@ public:
     void addTrophy(RaceManager::Difficulty difficulty);
     
     /** override from base class to handle escape press */
-    virtual bool onEscapePressed();
+    virtual bool onEscapePressed() OVERRIDE;
 };
 
 #endif

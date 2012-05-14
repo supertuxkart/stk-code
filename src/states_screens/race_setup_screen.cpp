@@ -28,6 +28,7 @@
 
 #include "states_screens/race_setup_screen.hpp"
 
+
 const int CONFIG_CODE_NORMAL = 0;
 const int CONFIG_CODE_TIMETRIAL = 1;
 const int CONFIG_CODE_FTL = 2;

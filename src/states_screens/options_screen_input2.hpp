@@ -59,22 +59,22 @@ public:
     void setDevice(DeviceConfig* config) { m_config = config; }
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile();
+    virtual void loadedFromFile() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, 
-                               const std::string& name, const int playerID);
+                               const std::string& name, const int playerID) OVERRIDE;
     
     /** \brief implement optional callback from parent class 
      *  GUIEngine::Screen */
-    virtual void unloaded();
+    virtual void unloaded() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void init();
+    virtual void init() OVERRIDE;
     
     /** \brief implement optional callback from parent class 
      *  GUIEngine::Screen */
-    virtual bool onEscapePressed();
+    virtual bool onEscapePressed() OVERRIDE;
 
     /**
       * \brief invoke in "input sensing" mode, when input was sensed.
@@ -83,7 +83,7 @@ public:
     void gotSensedInput(const Input& sensedInput);
     
     /** \brief Implement IConfirmDialogListener callback */
-    virtual void onConfirm();
+    virtual void onConfirm() OVERRIDE;
 };
 
 #endif

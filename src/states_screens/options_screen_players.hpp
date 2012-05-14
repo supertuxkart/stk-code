@@ -42,10 +42,11 @@ public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenPlayers>;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile();
+    virtual void loadedFromFile() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+                               const int playerID) OVERRIDE;
     
     /**
      * \brief Adds a new player (if 'player' is NULL) or renames an existing player (if 'player' is not NULL)
@@ -57,10 +58,10 @@ public:
     void selectPlayer(const irr::core::stringw& name);
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void init();
+    virtual void init() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void tearDown();
+    virtual void tearDown() OVERRIDE;
     
     /** \brief implement callback from EnterPlayerNameDialog::INewPlayerListener */
     virtual void onNewPlayerWithName(const irr::core::stringw& newName);

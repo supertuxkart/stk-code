@@ -73,24 +73,24 @@ public:
     void loadList();
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile();
+    virtual void loadedFromFile() OVERRIDE;
 
-    virtual void unloaded();
+    virtual void unloaded() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, 
-                               const std::string& name, const int playerID);
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+                               const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void beforeAddingWidget();
+    virtual void beforeAddingWidget() OVERRIDE;
     
     virtual void onColumnClicked(int columnId);
 
-    virtual void init();
-    virtual void tearDown();
+    virtual void init() OVERRIDE;
+    virtual void tearDown() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onUpdate(float dt, irr::video::IVideoDriver*);
+    virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
 
     void    setLastSelected();
 

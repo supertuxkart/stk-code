@@ -199,14 +199,14 @@ public:
     /** \brief Implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() {};
 
-    virtual void init();
-    virtual void tearDown();    
-    virtual bool onEscapePressed();
+    virtual void init() OVERRIDE;
+    virtual void tearDown() OVERRIDE;
+    virtual bool onEscapePressed() OVERRIDE;
     virtual GUIEngine::EventPropagation 
                  filterActions(PlayerAction action, int deviceID, const unsigned int value,
-                               Input::InputType type, int playerId);
+                               Input::InputType type, int playerId) OVERRIDE;
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, 
-                       const int playerID);
+                       const int playerID) OVERRIDE;
 
 
     friend class GUIEngine::ScreenSingleton<RaceResultGUI>;
@@ -218,7 +218,7 @@ public:
     /** No kart specific view needs to be rendered in the result gui. */
     virtual void renderPlayerView(const AbstractKart *kart) {}
 
-    virtual void onUpdate(float dt, irr::video::IVideoDriver*);
+    virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
 
     /** No more messages need to be displayed, but the function might still be
      *  called (e.g. 'new lap' message if the end controller is used for more
