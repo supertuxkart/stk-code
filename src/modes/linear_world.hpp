@@ -105,17 +105,17 @@ protected:
     void          rescueKartAfterShortcut(AbstractKart* kart, KartInfo& kart_info);
     virtual void  checkForWrongDirection(unsigned int i);
     void          updateRacePosition();
-    virtual float estimateFinishTimeForKart(AbstractKart* kart);
+    virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
 
 public:
                   LinearWorld();
    /** call just after instanciating. can't be moved to the contructor as child
        classes must be instanciated, otherwise polymorphism will fail and the
        results will be incorrect */
-    virtual void  init();
+    virtual void  init() OVERRIDE;
     virtual      ~LinearWorld();
 
-    virtual void  update(float delta);
+    virtual void  update(float delta) OVERRIDE;
     int           getSectorForKart(const AbstractKart *kart) const;
     float         getDistanceDownTrackForKart(const int kart_id) const;
     float         getDistanceToCenterForKart(const int kart_id) const;
@@ -124,20 +124,20 @@ public:
     float         getTimeAtLapForKart(const int kart_id) const;
 
     virtual  RaceGUIBase::KartIconDisplayInfo* 
-                  getKartsDisplayInfo();
-    virtual void  moveKartAfterRescue(AbstractKart* kart);
-    virtual void  restartRace();
-    virtual void  newLap(unsigned int kart_index);
+                  getKartsDisplayInfo() OVERRIDE;
+    virtual void  moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
+    virtual void  restartRace() OVERRIDE;
+    virtual void  newLap(unsigned int kart_index) OVERRIDE;
     
     // ------------------------------------------------------------------------    
     /** Returns if this race mode has laps. */
-    virtual bool  raceHasLaps(){ return true; }
+    virtual bool  raceHasLaps() OVERRIDE { return true; }
     // ------------------------------------------------------------------------    
     /** Returns if this race mode has bonus items. */
-    virtual bool  haveBonusBoxes(){ return true; }
+    virtual bool  haveBonusBoxes() OVERRIDE { return true; }
     // ------------------------------------------------------------------------    
     /** Override settings from base class */
-    virtual bool useChecklineRequirements() const { return true; }
+    virtual bool useChecklineRequirements() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------    
     /** Returns true if the kart is on a valid driveline quad.
      *  \param kart_index  Index of the kart. */

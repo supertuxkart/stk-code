@@ -155,7 +155,7 @@ protected:
      *  around at the end of a race, and other criteria (number of lives,
      *  race position) will be used to determine the final order.
      */
-    virtual float estimateFinishTimeForKart(AbstractKart* kart) 
+    virtual float estimateFinishTimeForKart(AbstractKart* kart)
                                         {return getTime(); }
 
     
@@ -203,17 +203,17 @@ public:
     // Virtual functions
     // =================
     virtual void    init();
-    virtual void    terminateRace();
-    virtual void    restartRace();    
-    virtual void    pause(Phase phase);
-    virtual void    unpause();    
+    virtual void    terminateRace() OVERRIDE;
+    virtual void    restartRace();
+    virtual void    pause(Phase phase) OVERRIDE;
+    virtual void    unpause() OVERRIDE;
     virtual void    getDefaultCollectibles(int *collectible_type, 
                                            int *amount );
     virtual void    endRaceEarly() { return; }
 
     // ------------------------------------------------------------------------
     /** Called to determine whether this race mode uses bonus boxes. */
-    virtual bool haveBonusBoxes(){ return true; }
+    virtual bool haveBonusBoxes() { return true; }
     // ------------------------------------------------------------------------
     /** Returns if this mode should use fast music (if available). */
     virtual bool useFastMusicNearEnd() const { return true; }
@@ -270,8 +270,8 @@ public:
     // ------------------------------------------------------------------------
     /** The code that draws the timer should call this first to know
      *  whether the game mode wants a timer drawn. */
-    virtual bool shouldDrawTimer() const { return isRacePhase() &&
-                                             getClockMode() != CLOCK_NONE; }
+    virtual bool shouldDrawTimer() const
+                    { return isRacePhase() && getClockMode() != CLOCK_NONE; }
     // ------------------------------------------------------------------------    
     /** \return whether this world can generate/have highscores */
     bool useHighScores() const { return m_use_highscores; }

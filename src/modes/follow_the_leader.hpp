@@ -35,17 +35,17 @@ public:
     virtual ~FollowTheLeaderRace();
     
     // clock events
-    virtual void countdownReachedZero();
+    virtual void countdownReachedZero() OVERRIDE;
     
     // overriding World methods
-    virtual void restartRace();
-    virtual const std::string& getIdent() const;
-    float   getClockStartTime();
-    virtual bool useFastMusicNearEnd() const { return false; }
-    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo();
+    virtual void restartRace() OVERRIDE;
+    virtual const std::string& getIdent() const OVERRIDE;
+    virtual float getClockStartTime();
+    virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
+    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo() OVERRIDE;
     
-    virtual bool isRaceOver();
-    virtual bool raceHasLaps(){ return false; }
+    virtual bool isRaceOver() OVERRIDE;
+    virtual bool raceHasLaps() OVERRIDE { return false; }
     
 };   // FollowTheLeader
 

@@ -50,40 +50,40 @@ public:
    /** call just after instanciating. can't be moved to the contructor as child
        classes must be instanciated, otherwise polymorphism will fail and the
        results will be incorrect */
-    virtual void  init();
+    virtual void  init() OVERRIDE;
     virtual      ~OverWorld();
 
     static void enterOverWorld();
     
-    virtual void  update(float delta);
+    virtual void  update(float delta) OVERRIDE;
     
     // ------------------------------------------------------------------------    
     /** Returns if this race mode has laps. */
-    virtual bool  raceHasLaps(){ return false; }
+    virtual bool  raceHasLaps() OVERRIDE { return false; }
     // ------------------------------------------------------------------------    
-    virtual void checkForWrongDirection(unsigned int i);
+    virtual void checkForWrongDirection(unsigned int i) OVERRIDE;
     // ------------------------------------------------------------------------    
     /** The overworld is not a race per se so it's never over */
-    virtual bool    isRaceOver() { return false; }
+    virtual bool    isRaceOver() OVERRIDE { return false; }
     // ------------------------------------------------------------------------
     /** Implement base class method */
     virtual const std::string& 
-                    getIdent() const { return IDENT_OVERWORLD; }
+                    getIdent() const OVERRIDE { return IDENT_OVERWORLD; }
     // ------------------------------------------------------------------------
     /** Override base class method */
-    virtual bool shouldDrawTimer() const { return false; }
+    virtual bool shouldDrawTimer() const OVERRIDE { return false; }
     // ------------------------------------------------------------------------
     /** Override base class method */
-    virtual void onFirePressed(Controller* who);
+    virtual void onFirePressed(Controller* who) OVERRIDE;
     // ------------------------------------------------------------------------    
     /** Override settings from base class */
-    virtual bool useChecklineRequirements() const { return false; }
+    virtual bool useChecklineRequirements() const OVERRIDE { return false; }
     // ------------------------------------------------------------------------    
     void scheduleReturnToGarage() { m_return_to_garage = true; }
     // ------------------------------------------------------------------------ 
-    virtual void moveKartAfterRescue(AbstractKart* kart);
+    virtual void moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void onMouseClick(int x, int y);
+    virtual void onMouseClick(int x, int y) OVERRIDE;
 };
 
 #endif

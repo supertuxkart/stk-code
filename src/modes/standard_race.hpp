@@ -36,11 +36,11 @@ public:
     virtual      ~StandardRace() {};
     
     // overriding World methods
-    virtual void  getDefaultCollectibles(int *collectible_type, int *amount);
-    virtual bool  haveBonusBoxes();
-    virtual const std::string& getIdent() const;
+    virtual void  getDefaultCollectibles(int *collectible_type, int *amount) OVERRIDE;
+    virtual bool  haveBonusBoxes() OVERRIDE;
+    virtual const std::string& getIdent() const OVERRIDE;
 
-    virtual void  endRaceEarly();
+    virtual void  endRaceEarly() OVERRIDE;
 };
 
 #endif

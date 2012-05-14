@@ -54,11 +54,12 @@ public:
                           DemoWorld();
     virtual              ~DemoWorld();
     /** Returns identifier for this world. */
-    virtual  std::string getInternalCode() const {return "DEMO"; }
-    virtual  void        update(float dt) {ProfileWorld::update(dt);};
-    virtual  bool        isRaceOver();
-    virtual  void        enterRaceOverState();
-    static   bool        updateIdleTimeAndStartDemo(float dt) ;
+    virtual  std::string getInternalCode() const OVERRIDE { return "DEMO"; }
+    virtual  void        update(float dt) OVERRIDE {ProfileWorld::update(dt);};
+    virtual  bool        isRaceOver() OVERRIDE;
+    virtual  void        enterRaceOverState() OVERRIDE;
+    // ------------------------------------------------------------------------
+    static   bool        updateIdleTimeAndStartDemo(float dt);
     // ------------------------------------------------------------------------
     /** Sets the number of laps to use in demo mode. m_num_laps is from
      *  ProfileWorld. */
