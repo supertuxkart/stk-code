@@ -858,6 +858,9 @@
     <ClCompile Include="..\..\tracks\check_cannon.cpp">
       <Filter>Source Files\tracks</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\graphics\show_curve.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1630,6 +1633,12 @@
     </ClInclude>
     <ClInclude Include="..\..\tracks\check_cannon.hpp">
       <Filter>Header Files\tracks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\utils\cpp2011.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\graphics\show_curve.hpp">
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -122,6 +122,7 @@
     <ClCompile Include="..\..\graphics\post_processing.cpp" />
     <ClCompile Include="..\..\graphics\rain.cpp" />
     <ClCompile Include="..\..\graphics\referee.cpp" />
+    <ClCompile Include="..\..\graphics\show_curve.cpp" />
     <ClCompile Include="..\..\guiengine\widgets\CGUIEditBox.cpp" />
     <ClCompile Include="..\..\items\rubber_ball.cpp" />
     <ClCompile Include="..\..\items\swatter.cpp" />
@@ -360,6 +361,7 @@
     <ClInclude Include="..\..\graphics\post_processing.hpp" />
     <ClInclude Include="..\..\graphics\rain.hpp" />
     <ClInclude Include="..\..\graphics\referee.hpp" />
+    <ClInclude Include="..\..\graphics\show_curve.hpp" />
     <ClInclude Include="..\..\guiengine\widgets\CGUIEditBox.h" />
     <ClInclude Include="..\..\items\rubber_ball.hpp" />
     <ClInclude Include="..\..\items\swatter.hpp" />
@@ -447,6 +449,7 @@
     <ClInclude Include="..\..\tracks\lod_node_loader.hpp" />
     <ClInclude Include="..\..\tracks\track_sector.hpp" />
     <ClInclude Include="..\..\utils\constants.hpp" />
+    <ClInclude Include="..\..\utils\cpp2011.h" />
     <ClInclude Include="..\..\utils\leak_check.hpp" />
     <ClInclude Include="..\..\utils\no_copy.hpp" />
     <ClInclude Include="..\..\utils\profiler.hpp" />
