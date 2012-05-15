@@ -456,15 +456,22 @@ bool AddonsManager::uninstall(const Addon &addon)
     m_addons_list.getData()[index].setInstalled(false);
 
     //remove the addons directory
-    bool error = !file_manager->removeDirectory(addon.getDataDir());
-    if(addon.getType()=="kart")
-    {
-        kart_properties_manager->removeKart(addon.getId());
-    }
-    else if(addon.getType()=="track" || addon.getType()=="arena")
-    {
-        track_manager->removeTrack(addon.getId());
-    }
+	bool error = false;
+	// if the user deleted the data directory for an add-on with
+	// filesystem tools, removeTrack/removeKart will trigger an assert
+	// because the kart/track was never added in the first place
+	if (file_manager->fileExists(addon.getDataDir()))
+	{
+		error = !file_manager->removeDirectory(addon.getDataDir());
+		if(addon.getType()=="kart")
+		{
+			kart_properties_manager->removeKart(addon.getId());
+		}
+		else if(addon.getType()=="track" || addon.getType()=="arena")
+		{
+			track_manager->removeTrack(addon.getId());
+		}
+	}
     saveInstalled();
     return !error;
 }   // uninstall
