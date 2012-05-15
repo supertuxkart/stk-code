@@ -161,6 +161,8 @@ void AIBaseController::update(float dt)
             m_next_node_index[m_track_node]==-1)
             m_track_node = old_node;
     }
+    if(m_controls->m_fire)
+        m_kart->onFirePressed();
 }   // update
 
 //-----------------------------------------------------------------------------
