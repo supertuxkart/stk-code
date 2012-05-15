@@ -105,6 +105,8 @@ supertuxkart_SOURCES = \
  graphics/referee.hpp \
  graphics/shadow.cpp \
  graphics/shadow.hpp \
+ graphics/show_curve.cpp \
+ graphics/show_curve.hpp \
  graphics/skid_marks.cpp \
  graphics/skid_marks.hpp \
  graphics/slip_stream.cpp \
