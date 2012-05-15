@@ -854,12 +854,13 @@ int handleCmdLine(int argc, char **argv)
             for (size_t i = 0; i != track_manager->getNumberOfTracks(); i++)
             {
                 const Track *track = track_manager->getTrack(i);
-                if (!unlock_manager->getCurrentSlot()->isLocked(track->getIdent()))
-                {
+                // FIXME: crashes
+                //if (!unlock_manager->getCurrentSlot()->isLocked(track->getIdent()))
+                //{
                     fprintf ( stdout, "\t%14s: %ls\n",
                               track->getIdent().c_str(),
                               track->getName());
-                }
+                //}
             }
 
             fprintf ( stdout, "Use --track N to choose track.\n\n");
@@ -872,11 +873,12 @@ int handleCmdLine(int argc, char **argv)
             {
                 const KartProperties* KP =
                     kart_properties_manager->getKartById(i);
-                if (!unlock_manager->getCurrentSlot()->isLocked(KP->getIdent()))
-                {
+                // FIXME: crashes
+                //if (!unlock_manager->getCurrentSlot()->isLocked(KP->getIdent()))
+                //{
                     fprintf (stdout, "\t%10s: %ls\n", KP->getIdent().c_str(),
                              KP->getName());
-                }
+                //}
             }
             fprintf ( stdout, "\n" );
         }
