@@ -43,6 +43,7 @@ public:
     virtual float getClockStartTime();
     virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
     virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo() OVERRIDE;
+    virtual void init() OVERRIDE;
     
     virtual bool isRaceOver() OVERRIDE;
     virtual bool raceHasLaps() OVERRIDE { return false; }
