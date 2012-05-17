@@ -926,9 +926,6 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--ghost"))
         {
             ReplayPlay::create();
-            // Force the no-start screen flag, since this initialises
-            // the player structures correctly.
-            UserConfigParams::m_no_start_screen = true;
         }
         else if( sscanf(argv[i], "--history=%d",  &n)==1)
         {
