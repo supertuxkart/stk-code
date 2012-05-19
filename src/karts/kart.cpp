@@ -273,6 +273,8 @@ void Kart::reset()
         stopFlying();
     }
 
+    World::getWorld()->getPhysics()->addKart(this);
+    
     // Reset star effect in case that it is currently being shown.
     m_stars_effect->reset();
     m_max_speed->reset();
