@@ -273,7 +273,11 @@ void Kart::reset()
         stopFlying();
     }
 
-    World::getWorld()->getPhysics()->addKart(this);
+    // Add karts back in case that they have been removed (i.e. in battle
+    // mode) - but only if they actually have a body (e.g. ghost karts
+    // don't have one).
+    if(m_body)
+        World::getWorld()->getPhysics()->addKart(this);
     
     // Reset star effect in case that it is currently being shown.
     m_stars_effect->reset();
