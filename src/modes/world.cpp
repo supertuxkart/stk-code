@@ -265,6 +265,16 @@ Controller* World::loadAIController(AbstractKart *kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
+    if(ReplayPlay::get())
+    {
+        // Destroy the old replay object, which also stored the ghost
+        // karts, and create a new one (which means that in further
+        // races the usage of ghosts will still be enabled).
+        ReplayPlay::destroy();
+        ReplayPlay::create();
+    }
+
+
     // In case that a race is aborted (e.g. track not found) m_track is 0.
     if(m_track)
         m_track->cleanup();
