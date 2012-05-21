@@ -393,9 +393,6 @@
     <ClCompile Include="..\..\karts\controller\end_controller.cpp">
       <Filter>Source Files\karts\controller</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\karts\controller\new_ai_controller.cpp">
-      <Filter>Source Files\karts\controller</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\karts\controller\player_controller.cpp">
       <Filter>Source Files\karts\controller</Filter>
     </ClCompile>
@@ -861,6 +858,9 @@
     <ClCompile Include="..\..\graphics\show_curve.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\karts\controller\skidding_ai.cpp">
+      <Filter>Source Files\karts\controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1167,9 +1167,6 @@
       <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\end_controller.hpp">
-      <Filter>Header Files\karts\controller</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\karts\controller\new_ai_controller.hpp">
       <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\player_controller.hpp">
@@ -1639,6 +1636,9 @@
     </ClInclude>
     <ClInclude Include="..\..\graphics\show_curve.hpp">
       <Filter>Header Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\controller\skidding_ai.hpp">
+      <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
