@@ -211,14 +211,12 @@ void SkiddingAI::update(float dt)
         return;
     }
 
-    /*Get information that is needed by more than 1 of the handling funcs*/
-    //Detect if we are going to crash with the track and/or kart
-    int steps = 0;
-
-    steps = calcSteps();
-
+    // Get information that is needed by more than 1 of the handling funcs
     computeNearestKarts();
-    checkCrashes( steps, m_kart->getXYZ() );
+
+    //Detect if we are going to crash with the track and/or kart
+    checkCrashes(m_kart->getXYZ());
+
     findCurve();
 
     // Special behaviour if we have a bomb attach: try to hit the kart ahead 
@@ -244,7 +242,7 @@ void SkiddingAI::update(float dt)
                                     / (m_kart->getSpeed()-m_kart_ahead->getSpeed());
                 target += m_kart_ahead->getVelocity()*time_till_hit;
             }
-            float steer_angle = steerToPoint(m_kart_ahead->getXYZ());
+            float steer_angle = steerToPoint(target);
             setSteering(steer_angle, dt);
             commands_set = true;
         }
@@ -379,21 +377,8 @@ void SkiddingAI::handleSteering(float dt)
     if( fabsf(side_dist)  >
        0.5f* QuadGraph::get()->getNode(m_track_node).getPathWidth()+0.5f )
     {
-		// If the speed is negative, the kart is most likely being pushed
-		// away from a collision with the terrain, and this most likely means
-		// that the kart is off track. In this case, steer so that the kart
-		// will rotate towards the center of the track. E.g. if the kart is 
-		// to the right, steer towards the right.
-#ifdef XX
-		if(m_kart->getSpeed()<0)
-		{
-			steer_angle = side_dist > 0 ? -m_kart->getMaxSteerAngle()
-				                        :  m_kart->getMaxSteerAngle();
-		}
-		else
-#endif
-			steer_angle = steerToPoint(QuadGraph::get()->getQuadOfNode(next)
-                                                        .getCenter());
+        steer_angle = steerToPoint(QuadGraph::get()->getQuadOfNode(next)
+                                                    .getCenter());
 
 #ifdef AI_DEBUG
         m_debug_sphere->setPosition(QuadGraph::get()->getQuadOfNode(next)
@@ -635,41 +620,45 @@ void SkiddingAI::handleItems(const float dt)
  */
 void SkiddingAI::computeNearestKarts()
 {
-    bool need_to_check = false;
     int my_position    = m_kart->getPosition();
+
     // See if the kart ahead has changed:
     if( ( m_kart_ahead && m_kart_ahead->getPosition()+1!=my_position ) ||
         (!m_kart_ahead && my_position>1                              )    )
-       need_to_check = true;
+    {
+        m_kart_ahead = m_world->getKartAtPosition(my_position-1);
+        if(m_kart_ahead && 
+              ( m_kart_ahead->isEliminated() || m_kart_ahead->hasFinishedRace()))
+              m_kart_ahead = NULL;
+    }
+
     // See if the kart behind has changed:
     if( ( m_kart_behind && m_kart_behind->getPosition()-1!=my_position   ) ||
         (!m_kart_behind && my_position<(int)m_world->getCurrentNumKarts())    )
-        need_to_check = true;
-    if(!need_to_check) return;
+    {
+        m_kart_behind = m_world->getKartAtPosition(my_position+1);
+        if(m_kart_behind && 
+            (m_kart_behind->isEliminated() || m_kart_behind->hasFinishedRace()))
+            m_kart_behind = NULL;
+    }
 
-    m_kart_behind    = m_kart_ahead      = NULL;
     m_distance_ahead = m_distance_behind = 9999999.9f;
     float my_dist = m_world->getDistanceDownTrackForKart(m_kart->getWorldKartId());
-    for(unsigned int i=0; i<m_world->getNumKarts(); i++)
+    if(m_kart_ahead)
     {
-        AbstractKart *k = m_world->getKart(i);
-        if(k->isEliminated() || k->hasFinishedRace() || k==m_kart) continue;
-        if(k->getPosition()==my_position+1) 
-        {
-            m_kart_behind = k;
-            m_distance_behind = my_dist - m_world->getDistanceDownTrackForKart(i);
-            if(m_distance_behind<0.0f)
-                m_distance_behind += m_track->getTrackLength();
-        }
-        else 
-            if(k->getPosition()==my_position-1)
-            {
-                m_kart_ahead = k;
-                m_distance_ahead = m_world->getDistanceDownTrackForKart(i) - my_dist;
-                if(m_distance_ahead<0.0f)
-                    m_distance_ahead += m_track->getTrackLength();
-            }
-    }   // for i<world->getNumKarts()
+        m_distance_ahead = 
+            m_world->getDistanceDownTrackForKart(m_kart_ahead->getWorldKartId())
+          - my_dist;
+        if(m_distance_ahead<0.0f)
+            m_distance_ahead += m_track->getTrackLength();
+    }
+    if(m_kart_behind)
+    {
+        m_distance_behind = my_dist
+            -m_world->getDistanceDownTrackForKart(m_kart_behind->getWorldKartId());
+        if(m_distance_behind<0.0f)
+            m_distance_behind += m_track->getTrackLength();
+    }
 }   // computeNearestKarts
 
 //-----------------------------------------------------------------------------
@@ -691,37 +680,27 @@ void SkiddingAI::handleAcceleration( const float dt)
 
     if(m_kart->hasViewBlockedByPlunger())
     {
-        if(!(m_kart->getSpeed() > m_kart->getCurrentMaxSpeed() / 2))
+        if(m_kart->getSpeed() < m_kart->getCurrentMaxSpeed() / 2)
             m_controls->m_accel = 0.05f;
         else 
             m_controls->m_accel = 0.0f;
         return;
     }
     
+    m_controls->m_accel = stk_config->m_ai_acceleration;
+    if(!m_wait_for_players)
+        return;
 
-    // FIXME: this needs to be rewritten, it doesn't make any sense:
-    // wait for players triggers the opposite (if a player is ahead
-    // of this AI, go full speed). Besides, it's going to use full
-    // speed anyway.
-    if( m_wait_for_players )
+    //Find if any player is ahead of this kart
+    for(unsigned int i = 0; i < race_manager->getNumPlayers(); ++i )
     {
-        //Find if any player is ahead of this kart
-        bool player_winning = false;
-        for(unsigned int i = 0; i < race_manager->getNumPlayers(); ++i )
-            if( m_kart->getPosition() > m_world->getPlayerKart(i)->getPosition() )
-            {
-                player_winning = true;
-                break;
-            }
-
-        if( player_winning )
+        if( m_kart->getPosition() > m_world->getPlayerKart(i)->getPosition() )
         {
             m_controls->m_accel = m_max_handicap_speed;
             return;
         }
     }
 
-    m_controls->m_accel = stk_config->m_ai_acceleration;
 }   // handleAcceleration
 
 //-----------------------------------------------------------------------------
@@ -852,8 +831,15 @@ void SkiddingAI::handleNitroAndZipper()
 }   // handleNitroAndZipper
 
 //-----------------------------------------------------------------------------
-void SkiddingAI::checkCrashes(int steps, const Vec3& pos )
+void SkiddingAI::checkCrashes(const Vec3& pos )
 {
+    int steps = int( m_kart->getVelocityLC().getZ() / m_kart_length );
+    if( steps < m_min_steps ) steps = m_min_steps;
+
+    // The AI drives significantly better with more steps, so for now
+    // add 5 additional steps.
+    steps+=5;
+
     //Right now there are 2 kind of 'crashes': with other karts and another
     //with the track. The sight line is used to find if the karts crash with
     //each other, but the first step is twice as big as other steps to avoid
@@ -999,37 +985,6 @@ void SkiddingAI::findNonCrashingPoint(Vec3 *result)
     }   // for i<100
     *result = QuadGraph::get()->getQuadOfNode(sector).getCenter();
 }   // findNonCrashingPoint
-
-//-----------------------------------------------------------------------------
-/** calc_steps() divides the velocity vector by the lenght of the kart,
- *  and gets the number of steps to use for the sight line of the kart.
- *  The calling sequence guarantees that m_future_sector is not UNKNOWN.
- */
-int SkiddingAI::calcSteps()
-{
-    int steps = int( m_kart->getVelocityLC().getZ() / m_kart_length );
-    if( steps < m_min_steps ) steps = m_min_steps;
-
-    //Increase the steps depending on the width, if we steering hard,
-    //mostly for curves.
-#if 0
-    // FIXME: I don't understand this: if we are steering hard, we check
-    //        for more steps if we hit another kart?? If we steer hard,
-    //        the approximation used (pos + velocity*dt) will be even
-    //        worse, since it doesn't take steering into account.
-    if( fabsf(m_controls->m_steer) > 0.95 )
-    {
-        const int WIDTH_STEPS = 
-            (int)( QuadGraph::get()->getNode(m_future_sector).getPathWidth()
-                   /( m_kart_length * 2.0 ) );
-
-        steps += WIDTH_STEPS;
-    }
-#endif
-    // The AI is driving significantly better with more steps, so for now
-    // add 5 additional steps.
-    return steps+5;
-}   // calcSteps
 
 //-----------------------------------------------------------------------------
 /**FindCurve() gathers info about the closest sectors ahead: the curve
