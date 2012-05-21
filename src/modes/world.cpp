@@ -34,9 +34,9 @@
 #include "io/file_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/default_ai_controller.hpp"
-#include "karts/controller/new_ai_controller.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
+#include "karts/controller/skidding_ai.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/profile_world.hpp"
@@ -251,7 +251,7 @@ Controller* World::loadAIController(AbstractKart *kart)
             controller = new DefaultAIController(kart);
             break;
         case 1:
-            controller = new NewAIController(kart);
+            controller = new SkiddingAI(kart);
             break;
         default:
             fprintf(stderr, "Warning: Unknown robot, using default.\n");

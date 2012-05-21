@@ -2,6 +2,7 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
 //  Copyright (C) 2006-2007 Eduardo Hernandez Munoz
+//  Copyright (C) 2010      Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,17 +18,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_NEW_AI_CONTROLLER_HPP
-#define HEADER_NEW_AI_CONTROLLER_HPP
+#ifndef HEADER_SKIDDING_AI_HPP
+#define HEADER_SKIDDING_AI__HPP
 
 #include "karts/controller/ai_base_controller.hpp"
-#include "utils/vec3.hpp"
 
-/* third coord won't be used */
-
+class Track;
 class LinearWorld;
 class QuadGraph;
-class Track;
 
 namespace irr
 {
@@ -40,7 +38,7 @@ namespace irr
 /**
   * \ingroup controller
   */
-class NewAIController : public AIBaseController
+class SkiddingAI : public AIBaseController
 {
 private:
     /** How the AI uses nitro. */
@@ -64,53 +62,57 @@ private:
     } m_crashes;
 
     /*Difficulty handling variables*/
-    float m_max_start_delay; //Delay before accelerating at the start of each
-                             //race
-    int m_min_steps; //Minimum number of steps to check. If 0, the AI doesn't
-                     //even has check around the kart, if 1, it checks around
-                     //the kart always, and more than that will check the
-                     //remaining number of steps in front of the kart, always
-    bool  m_wait_for_players; //If true, the acceleration is decreased when
-                              //the AI is in a better position than all the
-                              //human players.
-    float m_max_handicap_accel; //The allowed maximum speed, in percentage,
-                                //from 0.0 to 1.0. Used only when
-                                //m_wait_for_players == true.    
-    ItemTactic m_item_tactic; //How are items going to be used?
+    /** Chance of a false start. */
+    float m_false_start_probability;
+    /** The minimum delay time before a AI kart starts. */
+    float m_min_start_delay;
+    /** The maximum delay time before an AI kart starts. */
+    float m_max_start_delay;
+    /** The actual start delay used. */
+    float m_start_delay; 
+  
+    /** Minimum number of steps to check. If 0, the AI doesn't even has check
+     *  around the kart, if 1, it checks around the kart always, and more 
+     *  than that will check the remaining number of steps in front of the 
+     *  kart, always. */
+    int m_min_steps; 
+     /** If true, the acceleration is decreased when the AI is in a better 
+      *  position than all the human players. */
+    bool  m_wait_for_players;
+
+    /** The allowed maximum speed in percent of the kart's maximum speed. */
+    float m_max_handicap_speed; 
+    
+     /** How are items going to be used? */
+    ItemTactic m_item_tactic;
 
     /** True if the kart should try to pass on a bomb to another kart. */
-
     bool m_handle_bomb;
+
+    /** True if the AI should avtively try to make use of slipstream. */
+    bool m_make_use_of_slipstream;
+
     /*General purpose variables*/
-    //The crash percentage is how much of the time the AI has been crashing,
-    //if the AI has been crashing for some time, use the rescue.
-    float m_crash_time;
 
     /** Pointer to the closest kart ahead of this kart. NULL if this
      *  kart is first. */
     AbstractKart *m_kart_ahead;
+
     /** Distance to the kart ahead. */
     float m_distance_ahead;
 
     /** Pointer to the closest kart behind this kart. NULL if this kart
      *  is last. */
     AbstractKart *m_kart_behind;
+
     /** Distance to the kard behind. */
     float m_distance_behind;
 
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
-
-    float m_time_till_start; //Used to simulate a delay at the start of the
-                             //race, since human players don't accelerate
-                             //at the same time and rarely repeat the a
-                             //previous timing.
-
+  
     float m_curve_target_speed;
     float m_curve_angle;
-
-    /** The point the kart was aiming at when it was on track last. */
-    Vec3  m_last_target_point;
 
     float m_time_since_stuck;
 
@@ -119,7 +121,6 @@ private:
     /** For debugging purpose: a sphere indicating where the AI 
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
-    irr::scene::ISceneNode *m_debug_left, *m_debug_right;
 
     /*Functions called directly from update(). They all represent an action
      *that can be done, and end up setting their respective m_controls
@@ -127,15 +128,16 @@ private:
      *specific action (more like, associated with inaction).
      */
     void  handleRaceStart();
-    void  handleAcceleration(const float DELTA);
+    void  handleAcceleration(const float dt);
     void  handleSteering(float dt);
-    void  handleItems(const float DELTA, const int STEPS);
-    void  handleRescue(const float DELTA);
+    void  handleItems(const float dt);
+    void  handleRescue(const float dt);
     void  handleBraking();
     void  handleNitroAndZipper();
     void  computeNearestKarts();
-    void  checkCrashes(const int STEPS, const Vec3& pos);
-    float findNonCrashingAngle();
+
+    void  checkCrashes(int steps, const Vec3& pos);
+    void  findNonCrashingPoint(Vec3 *result);
 
     int   calcSteps();
     void  findCurve();
@@ -143,15 +145,11 @@ protected:
     virtual unsigned int getNextSector(unsigned int index);
 
 public:
-                 NewAIController(AbstractKart *kart);
-    virtual     ~NewAIController();
+                 SkiddingAI(AbstractKart *kart);
+                ~SkiddingAI();
     virtual void update      (float delta) ;
     virtual void reset       ();
-    virtual const irr::core::stringw& getN() const 
-    {
-        static irr::core::stringw name("(NewAI)");
-        return name;
-    }   // getName
+    virtual const irr::core::stringw& getNamePostfix() const;
 };
 
 #endif

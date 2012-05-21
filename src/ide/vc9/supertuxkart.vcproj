@@ -916,11 +916,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\karts\controller\new_ai_controller.cpp"
+						RelativePath="..\..\karts\controller\player_controller.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\karts\controller\player_controller.cpp"
+						RelativePath="..\..\karts\controller\skidding_ai.cpp"
 						>
 					</File>
 				</Filter>
@@ -2102,11 +2102,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\karts\controller\new_ai_controller.hpp"
+						RelativePath="..\..\karts\controller\player_controller.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\karts\controller\player_controller.hpp"
+						RelativePath="..\..\karts\controller\skidding_ai.hpp"
 						>
 					</File>
 				</Filter>
