@@ -24,12 +24,15 @@
 #include "utils/no_copy.hpp"
 
 class Kart;
+class ShowCurve;
 
 #include <vector>
 
 /**
  * \ingroup karts
  */
+
+#undef SKID_DEBUG
 
 class Skidding : public SkiddingProperties
 {
@@ -69,10 +72,16 @@ private:
     /** A read-only pointer to the kart's properties. */
     Kart *m_kart;
 
+#ifdef SKID_DEBUG
+    ShowCurve *m_predicted_curve;
+    ShowCurve *m_actual_curve;
+#endif
+
     unsigned int getSkidBonus(float *bonus_time, float *bonus_speed) const;
     void  updateSteering(float steer);
 public:
            Skidding(Kart *kart, const SkiddingProperties *sp);
+          ~Skidding();
       void reset();
       void update(float dt, bool is_on_ground, float steer,
                   bool skidding);

@@ -18,6 +18,9 @@
 
 #include "karts/skidding.hpp"
 
+#ifdef SKID_DEBUG
+#  include "graphics/show_curve.hpp"
+#endif
 #include "karts/kart.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_properties.hpp"
@@ -30,11 +33,28 @@
  */
 Skidding::Skidding(Kart *kart, const SkiddingProperties *sp)
 {
+#ifdef SKID_DEBUG
+    m_predicted_curve = new ShowCurve(0.05f, 0.05f, 
+                                      irr::video::SColor(128, 0, 128, 0));
+    m_actual_curve    = new ShowCurve(0.05f, 0.05f, 
+                                      irr::video::SColor(128, 0, 0, 128));
+    m_predicted_curve->setVisible(false);
+    m_actual_curve->setVisible(false);
+#endif
     m_kart = kart;
     copyFrom(sp);
     m_skid_reduce_turn_delta = m_skid_reduce_turn_max - m_skid_reduce_turn_min;
     reset();
 }   // Skidding
+
+// ----------------------------------------------------------------------------
+Skidding::~Skidding()
+{
+#ifdef SKID_DEBUG
+    delete m_predicted_curve;
+    delete m_actual_curve;
+#endif
+}   // ~Skidding
 
 // ----------------------------------------------------------------------------
 /** Resets all skidding related values.
@@ -180,11 +200,63 @@ void Skidding::update(float dt, bool is_on_ground,
             btVector3 imp(0, v / m_kart->getBody()->getInvMass(),0);
             m_kart->getVehicle()->getRigidBody()->applyCentralImpulse(imp);
 
+#ifdef SKID_DEBUG
+#define SPEED 20.0f
+            updateSteering(steering);
+            m_actual_curve->clear();
+            m_actual_curve->setVisible(true);
+            m_predicted_curve->clear();
+            m_predicted_curve->setVisible(true);
+            m_predicted_curve->setPosition(m_kart->getXYZ());
+            m_predicted_curve->setHeading(m_kart->getHeading());
+            float angle = m_kart->getKartProperties()
+                                ->getMaxSteerAngle(m_kart->getSpeed())
+                        * fabsf(getSteeringFraction());
+            angle = m_kart->getKartProperties()
+                                ->getMaxSteerAngle(SPEED)
+                        * fabsf(getSteeringFraction());
+            float r = m_kart->getKartProperties()->getWheelBase()
+                   / asin(angle)*1.0f;
+
+            const int num_steps = 50;
+
+            float dx = 2*r / num_steps;
+
+            for(float x = 0; x <=2*r; x+=dx)
+            {
+                float real_x = m_skid_state==SKID_ACCUMULATE_LEFT ? -x : x;
+                Vec3 xyz(real_x, 0.2f, sqrt(r*r-(r-x)*(r-x))*(1.0f+SPEED/150.0f)
+                          *(1+(angle/m_kart->getKartProperties()->getMaxSteerAngle(SPEED)-0.6f)*0.1f));
+                Vec3 xyz1=m_kart->getTrans()(xyz);
+                printf("predict %f %f %f speed %f angle %f\n", 
+                    xyz1.getX(), xyz1.getY(), xyz1.getZ(),
+                    m_kart->getSpeed(), angle);
+                m_predicted_curve->addPoint(xyz);
+            }
+
+#endif
             m_skid_time  = 0;   // fallthrough
         }
     case SKID_ACCUMULATE_LEFT:
     case SKID_ACCUMULATE_RIGHT:
         {
+#ifdef SKID_DEBUG
+            Vec3 v=m_kart->getVelocity();
+            if(v.length()>5)
+            {
+                float r = SPEED/sqrt(v.getX()*v.getX() + v.getZ()*v.getZ());
+                v.setX(v.getX()*r);
+                v.setZ(v.getZ()*r);
+                m_kart->getBody()->setLinearVelocity(v);
+
+            }
+
+            m_actual_curve->addPoint(m_kart->getXYZ());
+            printf("actual %f %f %f turn %f speed %f angle %f\n",
+                m_kart->getXYZ().getX(),m_kart->getXYZ().getY(),m_kart->getXYZ().getZ(),
+                m_real_steering, m_kart->getSpeed(), 
+                m_kart->getKartProperties()->getMaxSteerAngle(m_kart->getSpeed()));
+#endif
             m_skid_time += dt;
             float bonus_time, bonus_speed;
             unsigned int level = getSkidBonus(&bonus_time, 

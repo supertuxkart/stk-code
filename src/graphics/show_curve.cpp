@@ -27,19 +27,12 @@
 
 /** ShowCurve constructor. It just creates an empty scene node.
  */
-ShowCurve::ShowCurve(float width, float height) 
+ShowCurve::ShowCurve(float width, float height, 
+                     const irr::video::SColor &color) 
          : m_width(width), m_height(height)
 {
-    video::SColor color(77, 0, 179, 0);
-    video::SMaterial m;
-    m.AmbientColor    = color;
-    m.DiffuseColor    = color;
-    m.EmissiveColor   = color;
-    m.BackfaceCulling = false;
-    m_mesh            = irr_driver->createQuadMesh(&m, 
-                                                   /*create_one_quad*/ false);
-    m_buffer          = m_mesh->getMeshBuffer(0);
-    assert(m_buffer->getVertexType()==video::EVT_STANDARD);
+    m_color = color;
+    addEmptyMesh();
     m_scene_node      = irr_driver->addMesh(m_mesh);
     // After addMesh ref count is 1 (for the attachment to the
     // scene). We keep a copy here, so increase the ref count.
@@ -61,6 +54,24 @@ ShowCurve::~ShowCurve()
 }   // ShowCurve
 
 // ----------------------------------------------------------------------------
+void ShowCurve::addEmptyMesh()
+{
+    video::SMaterial m;
+    m.AmbientColor    = m_color;
+    m.DiffuseColor    = m_color;
+    m.EmissiveColor   = m_color;
+    m.BackfaceCulling = false;
+    m_mesh            = irr_driver->createQuadMesh(&m, 
+                                                   /*create_one_quad*/ false);
+    m_buffer          = m_mesh->getMeshBuffer(0);
+    assert(m_buffer->getVertexType()==video::EVT_STANDARD);
+}   // addEmptyMesh
+
+// ----------------------------------------------------------------------------
+/** Adds a point to the curve ('tunnel'). This adds 4 vertices, and it creates
+ *  the triangles to connect it to the previous point.
+ *  \param pnt The new point to add.
+ */
 void ShowCurve::addPoint(const Vec3 &pnt)
 {
     // Check (again) that buffer is indeed the right type, otherwise the
@@ -122,4 +133,44 @@ void ShowCurve::addPoint(const Vec3 &pnt)
     m_mesh->setBoundingBox(m_buffer->getBoundingBox());
 }   // addPoint
 
+// ----------------------------------------------------------------------------
+void ShowCurve::clear()
+{
+    m_scene_node->setMesh(NULL);
+    m_mesh->drop();
+    addEmptyMesh();
+    m_scene_node->setMesh(m_mesh);
+}   // clear
+
+// ----------------------------------------------------------------------------
+/** Sets the heading for the curve.
+ *  \param heading The heading (in rad).
+ */
+void ShowCurve::setHeading(float heading)
+{
+    core::vector3df rotation(0, heading*180.0f/3.1415f, 0);
+    m_scene_node->setRotation(rotation);
+}   // setHeading
+
+// ----------------------------------------------------------------------------
+/** Makes this scene node visible or not.
+ */
+void ShowCurve::setVisible(bool isVisible)
+{
+    m_scene_node->setVisible(isVisible);
+}   // setVisible
+
+// ----------------------------------------------------------------------------
+bool ShowCurve::isVisible() const
+{
+    return m_scene_node->isVisible();
+}   // isVisible
+
+// ----------------------------------------------------------------------------
+/** Sets the origin of this scene node.
+ */
+void ShowCurve::setPosition(const Vec3 &xyz)
+{
+    m_scene_node->setPosition(xyz.toIrrVector());
+}   // setPosition
 // ----------------------------------------------------------------------------

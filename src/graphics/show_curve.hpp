@@ -22,6 +22,7 @@
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 
+#include <SColor.h>
 class Vec3;
 
 namespace irr
@@ -57,10 +58,22 @@ private:
 
     /** The height of the graph when it is displayed. */
     float m_height;
+
+    /** The color to use for the curve. */
+    irr::video::SColor m_color;
+
+    void addEmptyMesh();
 public:
-         ShowCurve(float width, float height);
+         ShowCurve(float width, float height, 
+                   const irr::video::SColor &color = video::SColor(77, 0, 179, 0));
         ~ShowCurve();
     void addPoint(const Vec3 &pnt);
     void update(float dt);
+    void setVisible(bool v);
+    bool isVisible() const;
+    void setPosition(const Vec3 &xyz);
+    void setHeading(float heading);
+    void clear();
+
 };   // ShowCurve
 #endif
