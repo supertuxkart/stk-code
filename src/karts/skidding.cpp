@@ -61,10 +61,11 @@ Skidding::~Skidding()
  */
 void Skidding::reset()
 {
-    m_skid_time     = 0.0f;
-    m_skid_state    = m_skid_visual_time<=0 ? SKID_OLD : SKID_NONE;
-    m_skid_factor   = 1.0f;
-    m_real_steering = 0.0f;
+    m_skid_time       = 0.0f;
+    m_skid_state      = m_skid_visual_time<=0 ? SKID_OLD : SKID_NONE;
+    m_skid_factor     = 1.0f;
+    m_real_steering   = 0.0f;
+    m_visual_rotation = 0.0f;
 }   // reset
 
 // ----------------------------------------------------------------------------
