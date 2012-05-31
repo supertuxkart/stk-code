@@ -132,7 +132,7 @@ void World::init()
     m_physics = new Physics();
 
     unsigned int num_karts = race_manager->getNumberOfKarts();
-    assert(num_karts > 0);
+    //assert(num_karts > 0);
 
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
@@ -169,8 +169,11 @@ void World::init()
     powerup_manager->updateWeightsForRace(num_karts);
     // erase messages left over
     RaceGUIBase* rg = getRaceGUI();
-    rg->init();
-    if (rg) rg->clearAllMessages();
+    if (rg)
+    {
+        rg->init();
+        rg->clearAllMessages();
+    }
 }   // init
 
 //-----------------------------------------------------------------------------

@@ -543,18 +543,25 @@ void NetworkManager::setupPlayerKartInfo()
     for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
         m_kart_info.push_back(race_manager->getLocalKartInfo(i));
 
+    printf("[setupPlayerKartInfo] m_num_karts = %i\n", race_manager->getNumberOfKarts());
+
     // Now sort by (hostid, playerid)
     std::sort(m_kart_info.begin(), m_kart_info.end());
 
     // Set the player kart information
     race_manager->setNumPlayers(m_kart_info.size());
 
+    printf("[setupPlayerKartInfo2] m_num_karts = %i\n", race_manager->getNumberOfKarts());
+    
     // Set the global player ID for each player
     for(unsigned int i=0; i<m_kart_info.size(); i++)
     {
         m_kart_info[i].setGlobalPlayerId(i);
         race_manager->setPlayerKart(i, m_kart_info[i]);
     }
+    
+    printf("[setupPlayerKartInfo3] m_num_karts = %i\n", race_manager->getNumberOfKarts());
+    
     // Compute the id of the first kart from each host
     m_kart_id_offset.resize(m_num_clients+1);
     m_kart_id_offset[0]=0;
@@ -562,6 +569,8 @@ void NetworkManager::setupPlayerKartInfo()
         m_kart_id_offset[i]=m_kart_id_offset[i-1]+m_num_local_players[i-1];
 
     race_manager->computeRandomKartList();
+    
+    printf("[setupPlayerKartInfo4] m_num_karts = %i\n", race_manager->getNumberOfKarts());
 }   // setupPlayerKartInfo
 
 // ----------------------------------------------------------------------------

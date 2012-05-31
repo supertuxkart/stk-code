@@ -1443,7 +1443,7 @@ void IrrDriver::update(float dt)
             irr_driver->getVideoDriver()->enableMaterial2D();
 
             RaceGUIBase *rg = world->getRaceGUI();
-            rg->update(dt);
+            if (rg) rg->update(dt);
             for(unsigned int i=0; i<world->getNumKarts(); i++)
             {
                 AbstractKart *kart=world->getKart(i);

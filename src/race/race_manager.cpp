@@ -30,6 +30,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/overworld.hpp"
@@ -215,6 +216,8 @@ void RaceManager::setTrack(const std::string& track)
  */
 void RaceManager::computeRandomKartList()
 {
+    if (m_num_karts == 0) return;
+    
     int n = m_num_karts - m_player_karts.size();
     if(UserConfigParams::logMisc())
         std::cout << "AI karts count = " << n << " for m_num_karts=" 
@@ -248,6 +251,7 @@ void RaceManager::computeRandomKartList()
 
 void RaceManager::startNew(bool from_overworld)
 {
+    printf("Start New, m_num_karts = %i\n", m_num_karts);
     m_started_from_overworld = from_overworld;
     
     if(m_major_mode==MAJOR_MODE_GRAND_PRIX)
@@ -257,13 +261,15 @@ void RaceManager::startNew(bool from_overworld)
         m_num_laps      = m_grand_prix.getLaps();
         m_reverse_track = m_grand_prix.getReverse();
     }
-    assert(m_player_karts.size() > 0);
+    //assert(m_player_karts.size() > 0);
 
     // command line parameters: negative numbers=all karts
     if(m_num_karts < 0 ) m_num_karts = stk_config->m_max_karts;
     if((size_t)m_num_karts < m_player_karts.size()) 
         m_num_karts = (int)m_player_karts.size();
-
+    
+    printf("Start New 2, m_num_karts = %i\n", m_num_karts);
+    
     // Create the kart status data structure to keep track of scores, times, ...
     // ==========================================================================
     m_kart_status.clear();
@@ -290,6 +296,8 @@ void RaceManager::startNew(bool from_overworld)
                    m_ai_kart_list[i].c_str());
         }
     }
+
+printf("Start New 3, m_num_karts = %i\n", m_num_karts);
 
     // Then the players, which start behind the AI karts
     // -------------------------------------------------
@@ -325,6 +333,8 @@ void RaceManager::startNextRace()
 {
     // Uncomment to debug audio leaks
     // sfx_manager->dump();
+    
+    printf("startNextRace, m_num_karts = %i\n", m_num_karts);
     
     stk_config->getAllScores(&m_score_for_position, m_num_karts);
     IrrlichtDevice* device = irr_driver->getDevice();
@@ -365,6 +375,8 @@ void RaceManager::startNextRace()
         } 
     }   // not first race
 
+    printf("startNextRace 2, m_num_karts = %i\n", m_num_karts);
+    
     // the constructor assigns this object to the global
     // variable world. Admittedly a bit ugly, but simplifies
     // handling of objects which get created in the constructor
@@ -382,11 +394,16 @@ void RaceManager::startNextRace()
         World::setWorld(new ThreeStrikesBattle());
     else if(m_minor_mode==MINOR_MODE_OVERWORLD)     
         World::setWorld(new OverWorld());
+    else if(m_minor_mode==MINOR_MODE_CUTSCENE)
+        World::setWorld(new CutsceneWorld());
     else
     { 
         fprintf(stderr,"Could not create given race mode\n"); 
         assert(0); 
     }
+    
+    printf("startNextRace 3, m_num_karts = %i\n", m_num_karts);
+    
     World::getWorld()->init();
     // Save the current score and set last time to zero. This is necessary
     // if someone presses esc after finishing a gp, and selects restart:
@@ -648,14 +665,17 @@ void RaceManager::startSingleRace(const std::string trackIdent,
 {
     StateManager::get()->enterGameState();
     setTrack(trackIdent.c_str());
-    
+
     if (num_laps != -1) setNumLaps( num_laps );
     
     setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
     
+    printf("[startSingleRace3] m_num_karts = %i\n", m_num_karts);
+    
     setCoinTarget( 0 ); // Might still be set from a previous challenge
     network_manager->setupPlayerKartInfo();
     
+    printf("[startSingleRace4] m_num_karts = %i\n", m_num_karts);
     startNew(from_overworld);
 }
 

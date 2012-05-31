@@ -1116,9 +1116,14 @@ namespace GUIEngine
         else
         {
             if (ModalDialog::isADialogActive())
+            {
                 ModalDialog::getCurrent()->onUpdate(dt);
-            else                                
-                World::getWorld()->getRaceGUI()->renderGlobal(elapsed_time);
+            }
+            else                          
+            {      
+                RaceGUIBase* rg = World::getWorld()->getRaceGUI();
+                if (rg != NULL) rg->renderGlobal(elapsed_time);
+            }
         }
         
         
