@@ -254,6 +254,8 @@ supertuxkart_SOURCES = \
  karts/skidding.hpp \
  karts/skidding_properties.cpp \
  karts/skidding_properties.hpp \
+ modes/cutscene_world.cpp \
+ modes/cutscene_world.hpp \
  modes/demo_world.cpp \
  modes/demo_world.hpp \
  modes/follow_the_leader.cpp \
