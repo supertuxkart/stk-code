@@ -118,6 +118,7 @@ src/karts/skidding.cpp
 src/karts/skidding_properties.cpp
 src/main.cpp
 src/main_loop.cpp
+src/modes/cutscene_world.cpp
 src/modes/demo_world.cpp
 src/modes/follow_the_leader.cpp
 src/modes/game_tutorial.cpp
@@ -362,6 +363,7 @@ src/karts/rescue_animation.hpp
 src/karts/skidding.hpp
 src/karts/skidding_properties.hpp
 src/main_loop.hpp
+src/modes/cutscene_world.hpp
 src/modes/demo_world.hpp
 src/modes/follow_the_leader.hpp
 src/modes/game_tutorial.hpp
