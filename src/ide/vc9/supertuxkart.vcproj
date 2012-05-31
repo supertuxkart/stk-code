@@ -693,6 +693,10 @@
 				Name="modes"
 				>
 				<File
+					RelativePath="..\..\modes\cutscene_world.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\demo_world.cpp"
 					>
 				</File>
@@ -1862,6 +1866,10 @@
 			<Filter
 				Name="modes"
 				>
+				<File
+					RelativePath="..\..\modes\cutscene_world.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\modes\demo_world.hpp"
 					>
