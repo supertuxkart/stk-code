@@ -78,7 +78,7 @@ void GameSlot::computeActive()
             else if (i->second->isSolved(RaceManager::RD_EASY))
             {
                 m_points += CHALLENGE_POINTS[RaceManager::RD_EASY];
-                m_easy_challenges;
+                m_easy_challenges++;
             }
         }
         else
