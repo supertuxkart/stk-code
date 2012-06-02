@@ -1215,7 +1215,7 @@ void Kart::handleMaterialSFX(const Material *material)
     if(getLastMaterial()!=material)
     {
         // First stop any previously playing terrain sound
-        // and remove it, sp that m_previous_terrain_sound
+        // and remove it, so that m_previous_terrain_sound
         // can be used again.
         if(m_previous_terrain_sound)
         {
@@ -1230,8 +1230,9 @@ void Kart::handleMaterialSFX(const Material *material)
         {
             m_terrain_sound = sfx_manager->createSoundSource(s);
             
-            // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
-            // so the sounds of all AIs would be constantly heard. So silence AI karts.
+            // In multiplayer mode sounds are NOT positional, because we have
+            // multiple listeners. This would make the sounds of all AIs be
+            // audible at all times. So silence AI karts.
             if (race_manager->getNumLocalPlayers() > 1)
             {
                 if (!m_controller->isPlayerController())
@@ -1257,10 +1258,12 @@ void Kart::handleMaterialSFX(const Material *material)
         sfx_manager->deleteSFX(m_previous_terrain_sound);
         m_previous_terrain_sound = NULL;
     }
-    
+ 
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
-    if(m_terrain_sound && m_terrain_sound->getStatus() == SFXManager::SFX_PLAYING)
+    if(m_terrain_sound
+        && (m_terrain_sound->getStatus() == SFXManager::SFX_PLAYING
+         || m_terrain_sound->getStatus() == SFXManager::SFX_PAUSED))
     {
         m_terrain_sound->position(getXYZ());
         material->setSFXSpeed(m_terrain_sound, m_speed);
@@ -1269,7 +1272,7 @@ void Kart::handleMaterialSFX(const Material *material)
 }   // handleMaterialSFX
 
 //-----------------------------------------------------------------------------
-/** Handles material specific sfx, mostly particle effects. Particle 
+/** Handles material specific GFX, mostly particle effects. Particle 
  *  effects can be triggered by two different situations: either
  *  because a kart drives on top of a terrain with a special effect,
  *  or because the kart is driving or falling under a surface (e.g.

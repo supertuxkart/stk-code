@@ -807,20 +807,27 @@ void Material::initParticlesEffect(const XMLNode *node)
  */
 void Material::setSFXSpeed(SFXBase *sfx, float speed) const
 {
-    if(sfx->getStatus()==SFXManager::SFX_STOPPED)
+    // Still make a sound when driving backwards on the material.
+    if (speed < 0) speed = -speed;
+
+    // If we paused it due to too low speed earlier, we can continue now.
+    if (sfx->getStatus() == SFXManager::SFX_PAUSED)
     {
-        if(speed<m_sfx_min_speed) return;
+        if (speed<m_sfx_min_speed) return;
+        // TODO: Do we first need to stop the sound completely so it
+        // starts over?
         sfx->play();
     }
-    else if(sfx->getStatus()==SFXManager::SFX_PLAYING)
+    else if (sfx->getStatus() == SFXManager::SFX_PLAYING)
     {
-        if(speed<m_sfx_min_speed) 
+        if (speed<m_sfx_min_speed) 
         {
-            sfx->stop();
+            // Pausing it to differentiate with sounds that ended etc
+            sfx->pause();
             return;
         }
     }
-    if(speed > m_sfx_max_speed)
+    if (speed > m_sfx_max_speed)
     {
         sfx->speed(m_sfx_max_pitch);
         return;
