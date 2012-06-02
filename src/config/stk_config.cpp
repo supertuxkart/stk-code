@@ -376,6 +376,8 @@ void STKConfig::getAllData(const XMLNode * root)
  */
 void  STKConfig::getAllScores(std::vector<int> *all_scores, int num_karts)
 {
+    if (num_karts == 0) return;
+    
     assert(num_karts <= m_max_karts);
     all_scores->resize(num_karts);
     (*all_scores)[num_karts-1] = 1;  // last position gets one point

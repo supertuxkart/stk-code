@@ -1382,8 +1382,7 @@ void IrrDriver::update(float dt)
         new ConfirmResolutionDialog();
         m_resolution_changing = RES_CHANGE_NONE;
     }
-
-
+    
     if (!m_device->run())
     {
         main_loop->abort();
@@ -1444,6 +1443,13 @@ void IrrDriver::update(float dt)
 
             RaceGUIBase *rg = world->getRaceGUI();
             if (rg) rg->update(dt);
+            
+            // No kart, this must be a cutscene
+            if (world->getNumKarts() == 0)
+            {
+                m_scene_manager->drawAll();
+            }
+            
             for(unsigned int i=0; i<world->getNumKarts(); i++)
             {
                 AbstractKart *kart=world->getKart(i);

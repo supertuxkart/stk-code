@@ -43,6 +43,7 @@ static const std::string IDENT_TTRIAL   ("STD_TIMETRIAL"   );
 static const std::string IDENT_FTL      ("FOLLOW_LEADER"   );
 static const std::string IDENT_STRIKES  ("BATTLE_3_STRIKES");
 static const std::string IDENT_OVERWORLD("OVERWORLD"   );
+static const std::string IDENT_CUSTSCENE("CUTSCENE"   );
 
 /** 
  * The race manager has two functions:

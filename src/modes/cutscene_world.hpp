@@ -25,6 +25,7 @@
 #include <IMesh.h>
 
 #include <string>
+#include <ICameraSceneNode.h>
 
 
 /**
@@ -34,6 +35,8 @@
 class CutsceneWorld : public World
 {
 
+    scene::ICameraSceneNode* m_camera;
+    
 public:
     
     CutsceneWorld();

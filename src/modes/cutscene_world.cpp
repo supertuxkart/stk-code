@@ -19,6 +19,7 @@
 
 #include <string>
 #include <IMeshSceneNode.h>
+#include <ISceneManager.h>
 
 #include "audio/music_manager.hpp"
 #include "graphics/irr_driver.hpp"
@@ -48,6 +49,9 @@ CutsceneWorld::CutsceneWorld() : World()
 void CutsceneWorld::init()
 {
     World::init();
+    
+    m_camera = irr_driver->getSceneManager()->addCameraSceneNode(NULL, core::vector3df(-80.0f, 2.0f, 75.0f),
+                                core::vector3df(-97.230003, -0.010000, 50.610001));
 }   // CutsceneWorld
 
 //-----------------------------------------------------------------------------
@@ -71,7 +75,7 @@ void CutsceneWorld::kartHit(const int kart_id)
  */
 const std::string& CutsceneWorld::getIdent() const
 {
-    return IDENT_STRIKES;
+    return IDENT_CUSTSCENE;
 }   // getIdent
 
 //-----------------------------------------------------------------------------
