@@ -201,6 +201,9 @@ private:
     Vec3                     m_aabb_max;
     /** True if this track is an arena. */
     bool                     m_is_arena;
+    
+    bool                     m_is_cutscene;
+    
     /** The version of this track. A certain STK version will only support
      *  certain track versions. */
     int                      m_version;

@@ -91,6 +91,7 @@ Track::Track(const std::string &filename)
     m_all_nodes.clear();
     m_all_cached_meshes.clear();
     m_is_arena              = false;
+    m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
     m_mini_map              = NULL;
     m_sky_particles         = NULL;
@@ -301,6 +302,7 @@ void Track::loadTrackInfo()
     root->get("screenshot",            &m_screenshot);
     root->get("gravity",               &m_gravity);
     root->get("arena",                 &m_is_arena);
+    root->get("cutscene",              &m_is_cutscene);
     root->get("groups",                &m_groups);
     root->get("internal",              &m_internal);
     root->get("reverse",               &m_reverse_available);
@@ -1223,7 +1225,7 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
-    if (!m_is_arena) loadQuadGraph(mode_id, reverse_track);
+    if (!m_is_arena && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
 
     // Set the default start positions. Node that later the default
     // positions can still be overwritten.
@@ -1240,7 +1242,7 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
         default_start->get("upwards-distance",   &upwards_distance  );
         default_start->get("karts-per-row",      &karts_per_row     );
     }
-    if(!m_is_arena)
+    if(!m_is_arena && !m_is_cutscene)
     {
         m_start_transforms.resize(race_manager->getNumberOfKarts());
         QuadGraph::get()->setDefaultStartPositions(&m_start_transforms,
