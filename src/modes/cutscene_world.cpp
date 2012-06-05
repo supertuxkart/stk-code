@@ -30,8 +30,10 @@
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/ptr_vector.hpp"
 
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
@@ -49,9 +51,11 @@ CutsceneWorld::CutsceneWorld() : World()
 void CutsceneWorld::init()
 {
     World::init();
-    
-    m_camera = irr_driver->getSceneManager()->addCameraSceneNode(NULL, core::vector3df(-80.0f, 2.0f, 75.0f),
-                                core::vector3df(-97.230003, -0.010000, 50.610001));
+    const btTransform &s = getTrack()->getStartTransform(0);
+    const Vec3 &v = s.getOrigin();
+    m_camera = irr_driver->getSceneManager()->addCameraSceneNode(NULL, v.toIrrVector(),
+                                core::vector3df(-97.230003, 3.0f, 50.610001));
+    m_camera->setFOV(0.61f);
 }   // CutsceneWorld
 
 //-----------------------------------------------------------------------------
@@ -86,6 +90,19 @@ void CutsceneWorld::update(float dt)
 {
     World::update(dt);
     World::updateTrack(dt);
+    
+    const PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+    const TrackObject* curr;
+    for_in(curr, objects)
+    {
+        if (curr->getType() == "cutscene_camera")
+        {
+            m_camera->setPosition(curr->getNode()->getPosition());
+            m_camera->setRotation(curr->getNode()->getRotation());
+            break;
+            //printf("Camera %f %f %f\n", curr->getNode()->getPosition().X, curr->getNode()->getPosition().Y, curr->getNode()->getPosition().Z);
+        }
+    }
 }   // update
 
 //-----------------------------------------------------------------------------

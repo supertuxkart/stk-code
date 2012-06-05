@@ -93,6 +93,8 @@ protected:
     
     std::string                    m_interaction;
     
+    std::string                    m_type;
+    
 public:
                  TrackObject(const XMLNode &xml_node);
                  TrackObject();
@@ -110,6 +112,7 @@ public:
     void         setEnable(bool mode);
     
     scene::ISceneNode* getNode() { return m_node; }
+    const scene::ISceneNode* getNode() const { return m_node; }
     
     /** 2-step construction */
     void setNode(scene::ISceneNode* node)
@@ -122,6 +125,8 @@ public:
     }
     
     const std::string& getLodGroup() const { return m_lod_group; }
+    
+    const std::string& getType() const { return m_type; }
     
     virtual void onTriggerItemApproached(Item* who);
     

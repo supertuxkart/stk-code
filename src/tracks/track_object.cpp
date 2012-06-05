@@ -65,6 +65,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     std::string type;
     xml_node.get("type",    &type );
 
+    m_type = type;
+
     bool trigger_when_near = false;
     float trigger_distance = 1.0f;
     

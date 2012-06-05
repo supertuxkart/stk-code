@@ -251,7 +251,6 @@ void RaceManager::computeRandomKartList()
 
 void RaceManager::startNew(bool from_overworld)
 {
-    printf("Start New, m_num_karts = %i\n", m_num_karts);
     m_started_from_overworld = from_overworld;
     
     if(m_major_mode==MAJOR_MODE_GRAND_PRIX)
@@ -267,8 +266,6 @@ void RaceManager::startNew(bool from_overworld)
     if(m_num_karts < 0 ) m_num_karts = stk_config->m_max_karts;
     if((size_t)m_num_karts < m_player_karts.size()) 
         m_num_karts = (int)m_player_karts.size();
-    
-    printf("Start New 2, m_num_karts = %i\n", m_num_karts);
     
     // Create the kart status data structure to keep track of scores, times, ...
     // ==========================================================================
@@ -296,9 +293,7 @@ void RaceManager::startNew(bool from_overworld)
                    m_ai_kart_list[i].c_str());
         }
     }
-
-printf("Start New 3, m_num_karts = %i\n", m_num_karts);
-
+    
     // Then the players, which start behind the AI karts
     // -------------------------------------------------
     for(int i=m_player_karts.size()-1; i>=0; i--)
@@ -333,8 +328,6 @@ void RaceManager::startNextRace()
 {
     // Uncomment to debug audio leaks
     // sfx_manager->dump();
-    
-    printf("startNextRace, m_num_karts = %i\n", m_num_karts);
     
     stk_config->getAllScores(&m_score_for_position, m_num_karts);
     IrrlichtDevice* device = irr_driver->getDevice();
@@ -374,8 +367,6 @@ void RaceManager::startNextRace()
                          m_kart_status.end() - player_last_offset);
         } 
     }   // not first race
-
-    printf("startNextRace 2, m_num_karts = %i\n", m_num_karts);
     
     // the constructor assigns this object to the global
     // variable world. Admittedly a bit ugly, but simplifies
@@ -401,8 +392,6 @@ void RaceManager::startNextRace()
         fprintf(stderr,"Could not create given race mode\n"); 
         assert(0); 
     }
-    
-    printf("startNextRace 3, m_num_karts = %i\n", m_num_karts);
     
     World::getWorld()->init();
     // Save the current score and set last time to zero. This is necessary
@@ -670,12 +659,9 @@ void RaceManager::startSingleRace(const std::string trackIdent,
     
     setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
     
-    printf("[startSingleRace3] m_num_karts = %i\n", m_num_karts);
-    
     setCoinTarget( 0 ); // Might still be set from a previous challenge
     network_manager->setupPlayerKartInfo();
     
-    printf("[startSingleRace4] m_num_karts = %i\n", m_num_karts);
     startNew(from_overworld);
 }
 

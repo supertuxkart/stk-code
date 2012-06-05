@@ -78,6 +78,9 @@ public:
     }
     
     void assingLodNodes(const std::vector<LODNode*>& lod);
+    
+    const PtrVector<TrackObject>& getObjects() const { return m_all_objects; }
+    
 };   // class TrackObjectManager
 
 #endif

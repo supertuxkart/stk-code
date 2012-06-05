@@ -31,7 +31,7 @@
 #include "physics/triangle_mesh.hpp"
 #include "tracks/bezier_curve.hpp"
 #include "utils/constants.hpp"
-
+#include <ISceneManager.h>
 #include <IMeshSceneNode.h>
 
 ThreeDAnimation::ThreeDAnimation(const XMLNode &node)
@@ -57,6 +57,10 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node)
     if(shape!="")
     {
         createPhysicsBody(shape);
+    }
+    if (m_node == NULL)
+    {
+        m_node = irr_driver->getSceneManager()->addEmptySceneNode();
     }
 }   // ThreeDAnimation
 
