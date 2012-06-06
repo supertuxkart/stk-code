@@ -53,8 +53,9 @@ void CutsceneWorld::init()
     World::init();
     const btTransform &s = getTrack()->getStartTransform(0);
     const Vec3 &v = s.getOrigin();
-    m_camera = irr_driver->getSceneManager()->addCameraSceneNode(NULL, v.toIrrVector(),
-                                core::vector3df(-97.230003, 3.0f, 50.610001));
+    m_camera = irr_driver->getSceneManager()
+             ->addCameraSceneNode(NULL, v.toIrrVector(),
+                                  core::vector3df(-97.23f, 3.0f, 50.61f));
     m_camera->setFOV(0.61f);
 }   // CutsceneWorld
 
