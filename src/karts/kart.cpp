@@ -2240,7 +2240,9 @@ void Kart::setOnScreenText(const wchar_t *text)
                                   -1 /* id */,
                                   video::SColor(255, 255, 225, 0),
                                   video::SColor(255, 255, 89, 0));
-
+    // No need to store the reference to the billboard scene node:
+    // It has one reference to the parent, and will get deleted 
+    // when the parent is deleted.
 }   // setOnScreenText
 
 /* EOF */
