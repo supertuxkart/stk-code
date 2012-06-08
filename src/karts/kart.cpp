@@ -40,6 +40,7 @@
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
 #include "graphics/stars.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/rescue_animation.hpp"
@@ -2220,5 +2221,26 @@ btQuaternion Kart::getVisualRotation() const
          * btQuaternion(m_skidding->getVisualSkidRotation(), 0, 0);
 }   // getVisualRotation
 
+// ----------------------------------------------------------------------------
+/** Sets a text that is being displayed on top of a kart. This can be 'leader'
+ *  for the leader kart in a FTL race, the name of a driver, or even debug
+ *  output.
+ *  \param text The text to display
+ */
+void Kart::setOnScreenText(const wchar_t *text)
+{
+    core::dimension2d<u32> textsize = GUIEngine::getFont()->getDimension(text);
+    scene::ISceneManager* sm = irr_driver->getSceneManager();
+    sm->addBillboardTextSceneNode(GUIEngine::getFont(),
+                                  text,
+                                  getNode(),
+                                  core::dimension2df(textsize.Width/55.0f,
+                                                     textsize.Height/55.0f),
+                                  core::vector3df(0.0f, 1.5f, 0.0f),
+                                  -1 /* id */,
+                                  video::SColor(255, 255, 225, 0),
+                                  video::SColor(255, 255, 89, 0));
+
+}   // setOnScreenText
 
 /* EOF */

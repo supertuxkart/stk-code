@@ -403,6 +403,8 @@ public:
     TerrainInfo *getTerrainInfo() { return m_terrain_info; }
     // ------------------------------------------------------------------------
     virtual void onFirePressed();
+    // ------------------------------------------------------------------------
+    virtual void setOnScreenText(const wchar_t *text);
 };   // Kart
 
 

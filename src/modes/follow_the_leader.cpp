@@ -21,7 +21,6 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "guiengine/scalable_font.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -56,18 +55,7 @@ FollowTheLeaderRace::~FollowTheLeaderRace()
 void FollowTheLeaderRace::init()
 {
     LinearWorld::init();
-    
-    core::dimension2d<u32> textsize = GUIEngine::getFont()->getDimension(_("Leader"));
-    scene::ISceneManager* sm = irr_driver->getSceneManager();
-    sm->addBillboardTextSceneNode(GUIEngine::getFont(),
-                                  _("Leader"),
-                                  getKart(0)->getNode(),
-                                  core::dimension2df(textsize.Width/55.0f,
-                                                     textsize.Height/55.0f),
-                                  core::vector3df(0.0f, 1.5f, 0.0f),
-                                  -1 /* id */,
-                                  video::SColor(255, 255, 225, 0),
-                                  video::SColor(255, 255, 89, 0));
+    getKart(0)->setOnScreenText(_("Leader"));
 }
 
 #if 0
