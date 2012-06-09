@@ -150,7 +150,6 @@ public:
                 ~DefaultAIController();
     virtual void update      (float delta) ;
     virtual void reset       ();
-    virtual const irr::core::stringw& getNamePostfix() const;
 };
 
 #endif

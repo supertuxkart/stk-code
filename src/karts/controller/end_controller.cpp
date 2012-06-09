@@ -50,7 +50,8 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *player) 
+EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *player,
+                             Controller *prev_controller) 
              : AIBaseController(kart, player)
 {
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
@@ -102,6 +103,10 @@ EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *pla
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);
 #endif
     m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI, 0.3f, 2);
+
+    // Set the name of the previous controller as this controller name, otherwise
+    // we get the incorrect name when printing statistics in profile mode.
+    setControllerName(prev_controller->getControllerName());
 }   // EndController
 
 //-----------------------------------------------------------------------------

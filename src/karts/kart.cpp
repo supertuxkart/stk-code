@@ -744,7 +744,8 @@ void Kart::finishedRace(float time)
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
     {
         // in modes that support it, start end animation
-        setController(new EndController(this, m_controller->getPlayer()));
+        setController(new EndController(this, m_controller->getPlayer(),
+                                        m_controller));
         if(m_race_position<=0.5f*race_manager->getNumberOfKarts() ||
             m_race_position==1)
             m_kart_model->setAnimation(KartModel::AF_WIN_START);
@@ -764,7 +765,8 @@ void Kart::finishedRace(float time)
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
     {        
         // start end animation
-        setController(new EndController(this, m_controller->getPlayer()));
+        setController(new EndController(this, m_controller->getPlayer(),
+                                        m_controller));
         if(m_race_position<=2)
             m_kart_model->setAnimation(KartModel::AF_WIN_START);
         else if(m_race_position>=0.7f*race_manager->getNumberOfKarts())
@@ -782,7 +784,8 @@ void Kart::finishedRace(float time)
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
     {
-        setController(new EndController(this, m_controller->getPlayer()));
+        setController(new EndController(this, m_controller->getPlayer(),
+                                        m_controller));
     }             
         
 }   // finishedRace

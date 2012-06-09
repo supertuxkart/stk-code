@@ -78,7 +78,8 @@ private:
     int          calcSteps();
 public:
                  EndController(AbstractKart *kart, 
-                               StateManager::ActivePlayer* player);
+                               StateManager::ActivePlayer* player, 
+                               Controller *prev_controller);
                 ~EndController();
     virtual void update      (float delta) ;
     virtual void reset       ();

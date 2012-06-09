@@ -107,6 +107,7 @@ DefaultAIController::DefaultAIController(AbstractKart *kart)
 #ifdef AI_DEBUG
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);
 #endif
+    setControllerName("DefaultAI");
 }   // DefaultAIController
 
 //-----------------------------------------------------------------------------
@@ -148,14 +149,6 @@ void DefaultAIController::reset()
 
 	AIBaseController::reset();
 }   // reset
-
-//-----------------------------------------------------------------------------
-const irr::core::stringw& DefaultAIController::getNamePostfix() const 
-{
-    // Static to avoid returning the address of a temporary stringq
-    static irr::core::stringw name="(default)";
-    return name;
-}   // getNamePostfix
 
 //-----------------------------------------------------------------------------
 /** Returns the pre-computed successor of a graph node.

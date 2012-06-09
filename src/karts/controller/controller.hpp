@@ -54,6 +54,9 @@ protected:
     /** If this belongs to a player, it stores the active player data
      *  structure. Otherwise it is 0. */
     StateManager::ActivePlayer *m_player;
+
+    /** The name of the controller, mainly used for debugging purposes. */
+    std::string  m_controller_name;
 public:
                   Controller         (AbstractKart *kart, 
                                       StateManager::ActivePlayer *player=NULL);
@@ -69,7 +72,12 @@ public:
     virtual void  finishedRace       (float time) = 0;
     virtual bool  isPlayerController () const = 0;
     virtual bool  isNetworkController() const = 0;
-    virtual const irr::core::stringw& getNamePostfix() const;
+	// ---------------------------------------------------------------------------
+    /** Sets the controller name for this controller. */
+    void setControllerName(const std::string &name) {m_controller_name = name; }
+	// ---------------------------------------------------------------------------
+    /** Returns the name of this controller. */
+    const std::string &getControllerName() const { return m_controller_name; }
 	// ---------------------------------------------------------------------------
     /** Returns the active player for this controller (NULL 
      *  if this controller does not belong to a player.    */

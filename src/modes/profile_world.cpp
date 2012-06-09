@@ -22,6 +22,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "karts/kart_with_stats.hpp"
+#include "karts/controller/controller.hpp"
 #include "tracks/track.hpp"
 
 #include <ISceneManager.h>
@@ -222,7 +223,8 @@ void ProfileWorld::enterRaceOverState()
         max_t = std::max(max_t, kart->getFinishTime());
         min_t = std::min(min_t, kart->getFinishTime());
         av_t += kart->getFinishTime();
-        printf("%s,", kart->getIdent().c_str());
+        printf("%s %s,", kart->getIdent().c_str(), 
+                kart->getController()->getControllerName().c_str());
         printf("%d,", 1 + (int)i);
         printf("%d,", kart->getPosition());
         printf("%4.2f,", kart->getFinishTime());

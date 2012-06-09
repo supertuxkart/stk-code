@@ -52,7 +52,7 @@ AIBaseController::AIBaseController(AbstractKart *kart,
         m_all_look_aheads.clear();
         m_successor_index.clear();
     }   // if battle mode
-
+    setControllerName("AIBaseController");
 }   // AIBaseController
 
 //-----------------------------------------------------------------------------
