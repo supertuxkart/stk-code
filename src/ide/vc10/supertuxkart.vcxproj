@@ -170,6 +170,7 @@
     <ClCompile Include="..\..\challenges\challenge.cpp" />
     <ClCompile Include="..\..\challenges\challenge_data.cpp" />
     <ClCompile Include="..\..\challenges\unlock_manager.cpp" />
+    <ClCompile Include="..\..\modes\cutscene_world.cpp" />
     <ClCompile Include="..\..\modes\demo_world.cpp" />
     <ClCompile Include="..\..\modes\game_tutorial.cpp" />
     <ClCompile Include="..\..\modes\overworld.cpp" />
@@ -403,6 +404,7 @@
     <ClInclude Include="..\..\challenges\challenge.hpp" />
     <ClInclude Include="..\..\challenges\challenge_data.hpp" />
     <ClInclude Include="..\..\challenges\unlock_manager.hpp" />
+    <ClInclude Include="..\..\modes\cutscene_world.hpp" />
     <ClInclude Include="..\..\modes\demo_world.hpp" />
     <ClInclude Include="..\..\modes\game_tutorial.hpp" />
     <ClInclude Include="..\..\modes\overworld.hpp" />

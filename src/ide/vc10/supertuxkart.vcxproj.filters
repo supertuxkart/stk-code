@@ -861,6 +861,9 @@
     <ClCompile Include="..\..\karts\controller\skidding_ai.cpp">
       <Filter>Source Files\karts\controller</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\modes\cutscene_world.cpp">
+      <Filter>Source Files\modes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1639,6 +1642,9 @@
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\skidding_ai.hpp">
       <Filter>Header Files\karts\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modes\cutscene_world.hpp">
+      <Filter>Header Files\modes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
