@@ -147,6 +147,10 @@ public:
     virtual       ~Item ();
     void          update  (float delta);
     virtual void  collected(const AbstractKart *kart, float t=2.0f);
+    void          setParent(AbstractKart* parent);
+    void          reset();
+    void          switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh);
+    void          switchBack();
     
     // ------------------------------------------------------------------------
     /** Returns true if the Kart is close enough to hit this item, the item is 
@@ -192,10 +196,8 @@ public:
     /** Returns the time the item is disabled for. */
     float         getDisableTime() const { return m_time_till_return; }
     // ------------------------------------------------------------------------
-    void          setParent(AbstractKart* parent);
-    void          reset();
-    void          switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh);
-    void          switchBack();
+    /** Returns the XYZ position of the item. */
+    const Vec3&   getXYZ() const { return m_xyz; }
 };   // class Item
 
 #endif

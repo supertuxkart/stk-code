@@ -76,9 +76,16 @@ public:
                                     int add_info=-1);
     void           switchItems     ();
     void           setSwitchItems(const std::vector<int> &switch_items);
+    // ------------------------------------------------------------------------
     scene::IMesh*  getItemModel    (Item::ItemType type)
                                       {return m_item_mesh[type];}
-};
+    // ------------------------------------------------------------------------
+    /** Returns the number of items. */
+    unsigned int   getNumberOfItems() const { return m_all_items.size(); }
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the n-th item. */
+    const Item *   getItem(unsigned int n) const { return m_all_items[n]; };
+};   // ItemManager
 
 extern ItemManager* item_manager;
 

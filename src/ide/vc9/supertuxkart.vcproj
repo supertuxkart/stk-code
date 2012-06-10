@@ -924,6 +924,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\karts\controller\present_ai.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\karts\controller\skidding_ai.cpp"
 						>
 					</File>
@@ -2072,6 +2076,10 @@
 				</File>
 				<File
 					RelativePath="..\..\karts\moveable.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\controller\present_ai.hpp"
 					>
 				</File>
 				<File

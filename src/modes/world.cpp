@@ -37,6 +37,7 @@
 #include "karts/controller/player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
+#include "karts/controller/present_ai.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/profile_world.hpp"
@@ -243,11 +244,11 @@ Controller* World::loadAIController(AbstractKart *kart)
     // const int NUM_ROBOTS = 1;
     // For now: instead of random switching, use each
     // robot in turns: switch(m_random.get(NUM_ROBOTS))
-    // static int turn=1;
-    // turn=1-turn;
+    //static int turn=0;
+    //turn=2-turn;
 
     // For now disable the new AI.
-    int turn=0;
+    int turn=2;
     switch(turn)
     {
         case 0:
@@ -255,6 +256,9 @@ Controller* World::loadAIController(AbstractKart *kart)
             break;
         case 1:
             controller = new SkiddingAI(kart);
+            break;
+        case 2:
+            controller = new PresentAI(kart);
             break;
         default:
             fprintf(stderr, "Warning: Unknown robot, using default.\n");
