@@ -226,6 +226,8 @@ supertuxkart_SOURCES = \
  karts/controller/kart_control.hpp \
  karts/controller/player_controller.cpp \
  karts/controller/player_controller.hpp \
+ karts/controller/present_ai.cpp \
+ karts/controller/present_ai.hpp \
  karts/controller/skidding_ai.cpp \
  karts/controller/skidding_ai.hpp \
  karts/explosion_animation.cpp \
