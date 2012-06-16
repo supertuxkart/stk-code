@@ -94,6 +94,8 @@ protected:
     float           m_time;
     ClockType       m_clock_mode;
 
+    bool            m_play_racestart_sounds;
+
 private:
     Phase           m_phase;
 

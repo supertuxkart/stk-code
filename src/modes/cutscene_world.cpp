@@ -42,6 +42,7 @@ CutsceneWorld::CutsceneWorld() : World()
 {
     WorldStatus::setClockMode(CLOCK_NONE);
     m_use_highscores = false;
+    m_play_racestart_sounds = false;
 }   // CutsceneWorld
 
 //-----------------------------------------------------------------------------

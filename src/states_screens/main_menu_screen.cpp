@@ -188,6 +188,18 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     std::string selection = 
         ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     
+    
+    if (selection == "story")
+    {
+        StateManager::get()->enterGameState();
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        race_manager->setNumKarts( 0 );
+        race_manager->setNumPlayers(0);
+        race_manager->setNumLocalPlayers(0);
+        race_manager->startSingleRace("introcutscene", 999, false);
+        return;
+    }
+
 #if DEBUG_MENU_ITEM
     if (selection == "options")
     {
