@@ -40,7 +40,7 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node)
     m_crash_reset   = false;
     node.get("reset", &m_crash_reset);
     
-    m_important_animation = false;
+    m_important_animation = (World::getWorld()->getIdent() == IDENT_CUSTSCENE);
     node.get("important", &m_important_animation);
     
     m_triangle_mesh = NULL;
