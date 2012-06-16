@@ -39,6 +39,10 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node)
 {
     m_crash_reset   = false;
     node.get("reset", &m_crash_reset);
+    
+    m_important_animation = false;
+    node.get("important", &m_important_animation);
+    
     m_triangle_mesh = NULL;
     
     if (AnimationBase::m_node)
@@ -286,10 +290,11 @@ ThreeDAnimation::~ThreeDAnimation()
  */
 void ThreeDAnimation::update(float dt)
 {
-    if ( UserConfigParams::m_graphical_effects )
+    if ( UserConfigParams::m_graphical_effects || m_important_animation )
     {
         Vec3 xyz   = m_node->getPosition();
         Vec3 scale = m_node->getScale();
+        
         AnimationBase::update(dt, &xyz, &m_hpr, &scale);     //updates all IPOs
         m_node->setPosition(xyz.toIrrVector());
         m_node->setScale(scale.toIrrVector());

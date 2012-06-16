@@ -62,6 +62,11 @@ private:
      *  can not use the value returned by getRotation from a scene node. */
     Vec3                  m_hpr;
 
+    /**
+      * If true, play animation even when GFX are disabled
+      */
+    bool                  m_important_animation;
+
     void createPhysicsBody(const std::string &shape);
 
 public:
