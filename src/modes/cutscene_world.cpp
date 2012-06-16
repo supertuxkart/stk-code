@@ -51,12 +51,13 @@ CutsceneWorld::CutsceneWorld() : World()
 void CutsceneWorld::init()
 {
     World::init();
-    const btTransform &s = getTrack()->getStartTransform(0);
-    const Vec3 &v = s.getOrigin();
+    //const btTransform &s = getTrack()->getStartTransform(0);
+    //const Vec3 &v = s.getOrigin();
     m_camera = irr_driver->getSceneManager()
-             ->addCameraSceneNode(NULL, v.toIrrVector(),
-                                  core::vector3df(-97.23f, 3.0f, 50.61f));
+             ->addCameraSceneNode(NULL, core::vector3df(0.0f, 0.0f, 0.0f),
+                                  core::vector3df(0.0f, 0.0f, 0.0f));
     m_camera->setFOV(0.61f);
+    m_camera->bindTargetAndRotation(true); // no "look-at"
 }   // CutsceneWorld
 
 //-----------------------------------------------------------------------------
@@ -99,7 +100,11 @@ void CutsceneWorld::update(float dt)
         if (curr->getType() == "cutscene_camera")
         {
             m_camera->setPosition(curr->getNode()->getPosition());
-            m_camera->setRotation(curr->getNode()->getRotation());
+            
+            core::vector3df rot = curr->getNode()->getRotation();
+            Vec3 rot2(rot);
+            rot2.setPitch(rot2.getPitch() + 90.0f);
+            m_camera->setRotation(rot2.toIrrVector());
             break;
             //printf("Camera %f %f %f\n", curr->getNode()->getPosition().X, curr->getNode()->getPosition().Y, curr->getNode()->getPosition().Z);
         }
