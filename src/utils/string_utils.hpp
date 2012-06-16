@@ -29,6 +29,7 @@ namespace StringUtils
 {
 
     bool hasSuffix(const std::string& lhs, const std::string rhs);
+    bool startsWith(const std::string& str, const std::string& prefix);
 
     /** Return the filename part of a path */
     std::string getBasename(const std::string& filename);

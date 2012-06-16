@@ -59,6 +59,32 @@ void CutsceneWorld::init()
                                   core::vector3df(0.0f, 0.0f, 0.0f));
     m_camera->setFOV(0.61f);
     m_camera->bindTargetAndRotation(true); // no "look-at"
+    
+    // --- Build list of sounds to play at certain frames
+    PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+    TrackObject* curr;
+    for_in(curr, objects)
+    {
+        if (curr->getType() == "sfx-emitter" && !curr->getTriggerCondition().empty())
+        {
+            const std::string& condition = curr->getTriggerCondition();
+            
+            if (StringUtils::startsWith(condition, "frame "))
+            {
+                std::string frameStr = condition.substr(6); // remove 'frame ' prefix
+                int frame;
+                
+                if (!StringUtils::fromString(frameStr, frame))
+                {
+                    fprintf(stderr, "[CutsceneWorld] Invalid condition '%s'\n", condition.c_str());
+                    continue;
+                }
+                
+                float FPS = 25.0f; // for now we assume the cutscene is saved at 25 FPS
+                m_sounds_to_trigger[frame / FPS].push_back(curr);
+            }
+        }
+    }
 }   // CutsceneWorld
 
 //-----------------------------------------------------------------------------
@@ -91,11 +117,12 @@ const std::string& CutsceneWorld::getIdent() const
  */
 void CutsceneWorld::update(float dt)
 {
+    m_time += dt;
     World::update(dt);
     World::updateTrack(dt);
     
-    const PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
-    const TrackObject* curr;
+    PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+    TrackObject* curr;
     for_in(curr, objects)
     {
         if (curr->getType() == "cutscene_camera")
@@ -106,10 +133,27 @@ void CutsceneWorld::update(float dt)
             Vec3 rot2(rot);
             rot2.setPitch(rot2.getPitch() + 90.0f);
             m_camera->setRotation(rot2.toIrrVector());
-            break;
             //printf("Camera %f %f %f\n", curr->getNode()->getPosition().X, curr->getNode()->getPosition().Y, curr->getNode()->getPosition().Z);
         }
     }
+    
+    for (std::map<float, std::vector<TrackObject*>>::iterator it = m_sounds_to_trigger.begin();
+         it != m_sounds_to_trigger.end(); )
+    {
+        if (m_time >= it->first)
+        {
+            std::vector<TrackObject*> objects = it->second;
+            for (unsigned int i = 0; i < objects.size(); i++)
+            {
+                objects[i]->triggerSound();
+            }
+            m_sounds_to_trigger.erase(it++);
+        }
+        else
+        {
+            it++;
+        }
+     }
 }   // update
 
 //-----------------------------------------------------------------------------

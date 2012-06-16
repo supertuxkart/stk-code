@@ -42,6 +42,14 @@ namespace StringUtils
                           rhs.c_str()                             )==0;
     }   // hasSuffix
     
+    bool startsWith(const std::string& str, const std::string& prefix)
+    {
+        if (str.length() < prefix.length())
+            return false;
+        else
+            return strncmp(str.c_str(), prefix.c_str(), prefix.size())==0;
+    }
+    
     //-------------------------------------------------------------------------
     /** Returns the path of a filename, i.e. everything till the last '/'.
      */

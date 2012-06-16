@@ -28,6 +28,8 @@
 #include <ICameraSceneNode.h>
 
 
+class TrackObject;
+
 /**
  * \brief An implementation of World, to provide animated 3D cutscenes
  * \ingroup modes
@@ -36,6 +38,8 @@ class CutsceneWorld : public World
 {
 
     scene::ICameraSceneNode* m_camera;
+    
+    std::map<float, std::vector<TrackObject*>> m_sounds_to_trigger;
     
 public:
     

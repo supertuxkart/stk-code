@@ -83,6 +83,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         
         xml_node.get("distance", &trigger_distance);
 
+        xml_node.get("conditions", &m_trigger_condition);
+        
         // first try track dir, then global dir
         std::string soundfile = file_manager->getModelFile(sound);
         if (!file_manager->fileExists(soundfile))
@@ -100,7 +102,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         if (m_sound != NULL)
         {
             m_sound->position(m_init_xyz);
-            if (!trigger_when_near)
+            if (!trigger_when_near && m_trigger_condition.empty())
             {
                 m_sound->setLoop(true);
                 m_sound->play();
@@ -334,4 +336,12 @@ void TrackObject::onTriggerItemApproached(Item* who)
                     m_action.c_str());
         }
     }
+}
+
+// ----------------------------------------------------------------------------
+
+/** if this is a sound object, play the object */
+void TrackObject::triggerSound()
+{
+    if (m_sound != NULL) m_sound->play();
 }

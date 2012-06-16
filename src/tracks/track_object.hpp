@@ -63,6 +63,9 @@ private:
     /** End frame of the animation to be played. */
     unsigned int            m_frame_end;
 
+    /** Currently used for sound effects only, in cutscenes only atm */
+    std::string             m_trigger_condition;
+
     virtual void OnAnimationEnd(scene::IAnimatedMeshSceneNode* node);
 
 protected:
@@ -82,7 +85,7 @@ protected:
     /** The initial scale of the object. */
     core::vector3df                m_init_scale;
     
-    /** If a sound is attached to this objectt and/or this is a sound emitter object */
+    /** If a sound is attached to this object and/or this is a sound emitter object */
     SFXBase*                       m_sound;
 
     /** LOD group this object is part of, if it is LOD */
@@ -127,6 +130,11 @@ public:
     const std::string& getLodGroup() const { return m_lod_group; }
     
     const std::string& getType() const { return m_type; }
+    
+    /** Currently used for sound effects only, in cutscenes only atm */
+    const std::string& getTriggerCondition() const { return m_trigger_condition; }
+    
+    void triggerSound();
     
     virtual void onTriggerItemApproached(Item* who);
     
