@@ -864,6 +864,9 @@
     <ClCompile Include="..\..\modes\cutscene_world.cpp">
       <Filter>Source Files\modes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\karts\controller\present_ai.cpp">
+      <Filter>Source Files\karts\controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1645,6 +1648,9 @@
     </ClInclude>
     <ClInclude Include="..\..\modes\cutscene_world.hpp">
       <Filter>Header Files\modes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\controller\present_ai.hpp">
+      <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

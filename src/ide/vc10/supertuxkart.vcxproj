@@ -129,6 +129,7 @@
     <ClCompile Include="..\..\karts\abstract_kart.cpp" />
     <ClCompile Include="..\..\karts\abstract_kart_animation.cpp" />
     <ClCompile Include="..\..\karts\cannon_animation.cpp" />
+    <ClCompile Include="..\..\karts\controller\present_ai.cpp" />
     <ClCompile Include="..\..\karts\controller\skidding_ai.cpp" />
     <ClCompile Include="..\..\karts\explosion_animation.cpp" />
     <ClCompile Include="..\..\karts\ghost_kart.cpp" />
@@ -369,6 +370,7 @@
     <ClInclude Include="..\..\karts\abstract_kart.hpp" />
     <ClInclude Include="..\..\karts\abstract_kart_animation.hpp" />
     <ClInclude Include="..\..\karts\cannon_animation.hpp" />
+    <ClInclude Include="..\..\karts\controller\present_ai.hpp" />
     <ClInclude Include="..\..\karts\controller\skidding_ai.hpp" />
     <ClInclude Include="..\..\karts\explosion_animation.hpp" />
     <ClInclude Include="..\..\karts\ghost_kart.hpp" />
