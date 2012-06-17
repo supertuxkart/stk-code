@@ -390,6 +390,8 @@ void Track::startMusic() const
     // In case that the music wasn't found (a warning was already printed)
     if(m_music.size()>0)
         music_manager->startMusic(m_music[rand()% m_music.size()], false);
+    else
+        music_manager->clearCurrentMusic();
 }   // startMusic
 
 //-----------------------------------------------------------------------------

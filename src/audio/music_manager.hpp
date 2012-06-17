@@ -78,6 +78,7 @@ public:
     void                    loadMusicFromOneDir(const std::string& dir);
     void                    addMusicToTracks();
 
+    void                    clearCurrentMusic() { m_current_music = NULL; }
 };
 
 extern MusicManager* music_manager;
