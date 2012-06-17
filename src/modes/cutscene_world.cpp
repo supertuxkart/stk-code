@@ -137,7 +137,7 @@ void CutsceneWorld::update(float dt)
         }
     }
     
-    for (std::map<float, std::vector<TrackObject*>>::iterator it = m_sounds_to_trigger.begin();
+    for (std::map<float, std::vector<TrackObject*> >::iterator it = m_sounds_to_trigger.begin();
          it != m_sounds_to_trigger.end(); )
     {
         if (m_time >= it->first)
