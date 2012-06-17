@@ -74,7 +74,7 @@ protected:
 
     /** The mesh used here. It needs to be stored so that it can be 
      *  removed from irrlicht's mesh cache when it is deleted. */
-    scene::IAnimatedMesh          *m_mesh;
+    scene::IMesh                  *m_mesh;
 
     /** The initial XYZ position of the object. */
     core::vector3df                m_init_xyz;

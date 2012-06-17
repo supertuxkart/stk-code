@@ -35,6 +35,7 @@ using namespace irr;
 
 #include <ISceneManager.h>
 #include <IMeshManipulator.h>
+#include <IMeshSceneNode.h>
 
 // ----------------------------------------------------------------------------
 PhysicalObject::PhysicalObject(const XMLNode &xml_node)
@@ -125,9 +126,29 @@ void PhysicalObject::init()
     // 1. Determine size of the object
     // -------------------------------
     Vec3 min, max;
-    scene::IAnimatedMesh *mesh 
-        = ((scene::IAnimatedMeshSceneNode*)m_node)->getMesh();
-    MeshTools::minMax3D(mesh, &min, &max);
+    
+    
+    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
+    {
+        scene::IAnimatedMesh *mesh 
+            = ((scene::IAnimatedMeshSceneNode*)m_node)->getMesh();
+            
+        MeshTools::minMax3D(mesh, &min, &max);
+    }
+    else if (m_node->getType()==scene::ESNT_MESH)
+    {
+        scene::IMesh *mesh 
+            = ((scene::IMeshSceneNode*)m_node)->getMesh();
+            
+        MeshTools::minMax3D(mesh, &min, &max);
+    }
+    else
+    {
+        fprintf(stderr, "[PhysicalObject] Unknown node type\n");
+        max = 1.0f;
+        min = 0.0f;
+        assert(false);
+    }
     Vec3 extend = max-min;
     // Adjust the mesth of the graphical object so that its center is where it
     // is in bullet (usually at (0,0,0)). It can be changed in the case clause

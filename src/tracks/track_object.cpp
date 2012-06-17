@@ -29,6 +29,8 @@
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 
+#include <IMeshSceneNode.h>
+
 /** A track object: any additional object on the track. This object implements
  *  a graphics-only representation, i.e. there is no physical representation.
  *  Derived classes can implement a physical representation (see 
@@ -145,16 +147,27 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         std::string full_path = 
             World::getWorld()->getTrack()->getTrackFile(model_name);
         
-        if(file_manager->fileExists(full_path))
+        bool animated = (UserConfigParams::m_graphical_effects ||
+                         World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+        
+        if (file_manager->fileExists(full_path))
         {
-            m_mesh = irr_driver->getAnimatedMesh(full_path);
+            if (animated)
+            {
+                m_mesh = irr_driver->getAnimatedMesh(full_path);
+            }
+            else
+            {
+                m_mesh = irr_driver->getMesh(full_path);
+            }
         }
+        
         if(!m_mesh)
         {
             // If the model isn't found in the track directory, look 
             // in STK's model directory.
             full_path = file_manager->getModelFile(model_name);
-            m_mesh      = irr_driver->getAnimatedMesh(full_path);
+            m_mesh    = irr_driver->getAnimatedMesh(full_path);
             
             if(!m_mesh)
             {
@@ -164,18 +177,29 @@ TrackObject::TrackObject(const XMLNode &xml_node)
 
         m_mesh->grab();
         irr_driver->grabAllTextures(m_mesh);
-        scene::IAnimatedMeshSceneNode *node =
-            irr_driver->addAnimatedMesh(m_mesh);
-        m_node = node;
+        
+        if (animated)
+        {
+            scene::IAnimatedMeshSceneNode *node =
+                irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_mesh);
+            m_node = node;
+            
+            m_frame_start = node->getStartFrame();
+            xml_node.get("frame-start", &m_frame_start);
+
+            m_frame_end = node->getEndFrame();
+            xml_node.get("frame-end", &m_frame_end);
+        }
+        else
+        {
+            m_node = irr_driver->addMesh(m_mesh);
+            m_frame_start = 0.0f;
+            m_frame_end = 0.0f;
+        }
 #ifdef DEBUG
         std::string debug_name = model_name+" (track-object)";
         m_node->setName(debug_name.c_str());
 #endif
-        m_frame_start = node->getStartFrame();
-        xml_node.get("frame-start", &m_frame_start);
-
-        m_frame_end = node->getEndFrame();
-        xml_node.get("frame-end", &m_frame_end);
 
         if(!m_enabled)
             m_node->setVisible(false);
@@ -207,10 +231,21 @@ TrackObject::TrackObject(const core::vector3df& pos, const core::vector3df& hpr,
     }
     else
     {
-        if(file_manager->fileExists(model_name))
+        bool animated = (UserConfigParams::m_graphical_effects ||
+                         World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+                         
+        if (file_manager->fileExists(model_name))
         {
-            m_mesh = irr_driver->getAnimatedMesh(model_name);
+            if (animated)
+            {
+                m_mesh = irr_driver->getAnimatedMesh(model_name);
+            }
+            else
+            {
+                m_mesh = irr_driver->getMesh(model_name);
+            }
         }
+        
         if(!m_mesh)
         {
             fprintf(stderr, "Warning: '%s' not found and is ignored.\n",
@@ -220,14 +255,26 @@ TrackObject::TrackObject(const core::vector3df& pos, const core::vector3df& hpr,
         
         m_mesh->grab();
         irr_driver->grabAllTextures(m_mesh);
-        scene::IAnimatedMeshSceneNode *node=irr_driver->addAnimatedMesh(m_mesh);
-        m_node = node;
+        
+        if (animated)
+        {
+            scene::IAnimatedMeshSceneNode *node = irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_mesh);
+            m_node = node;
+            
+            m_frame_start = node->getStartFrame();
+            m_frame_end = node->getEndFrame();
+        }
+        else
+        {
+            m_node = irr_driver->addMesh(m_mesh);
+            m_frame_start = 0.0f;
+            m_frame_end = 0.0f;
+        }
+        
 #ifdef DEBUG
         std::string debug_name = model_name+" (track-object)";
         m_node->setName(debug_name.c_str());
 #endif
-        m_frame_start = node->getStartFrame();
-        m_frame_end = node->getEndFrame();
         
         if(!m_enabled)
             m_node->setVisible(false);
