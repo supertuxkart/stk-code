@@ -80,9 +80,9 @@ public:
     void setName(const core::stringw& name)
     { 
         #ifdef DEBUG
-		assert(m_magic_number == 0xABCD1234);
+        assert(m_magic_number == 0xABCD1234);
         #endif
-		m_name = name;
+        m_name = name;
     }
 
     core::stringw getName() const
@@ -90,15 +90,15 @@ public:
         #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
         #endif
-		return m_name.c_str();
+        return m_name.c_str();
     }
 
     bool isGuestAccount() const
     { 
         #ifdef DEBUG
-		assert(m_magic_number == 0xABCD1234); 
+        assert(m_magic_number == 0xABCD1234); 
         #endif
-		return m_is_guest_account;
+        return m_is_guest_account;
     }
     
     int getUseFrequency() const

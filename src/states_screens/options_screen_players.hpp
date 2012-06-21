@@ -36,8 +36,9 @@ class PlayerProfile;
 class OptionsScreenPlayers : public GUIEngine::Screen, public EnterPlayerNameDialog::INewPlayerListener,
     public GUIEngine::ScreenSingleton<OptionsScreenPlayers>
 {
-
+private:
     OptionsScreenPlayers();
+    bool refreshPlayerList();
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenPlayers>;
     
