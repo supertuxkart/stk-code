@@ -51,7 +51,6 @@ private:
     std::map<std::string, GameSlot*> m_game_slots;
     
     void readAllChallengesInDirs(const std::vector<std::string>* all_dirs);
-    bool createSlotsIfNeeded();
     
     /** ID of the active player */
     std::string m_current_game_slot;
@@ -64,6 +63,7 @@ public:
     void       addOrFreeChallenge(ChallengeData *c);
     void       addChallenge      (const std::string& filename);
     void       save              ();
+    bool       createSlotsIfNeeded();
     
     const ChallengeData *getChallenge      (const std::string& id);
 

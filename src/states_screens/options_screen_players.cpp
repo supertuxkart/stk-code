@@ -141,6 +141,8 @@ void OptionsScreenPlayers::tearDown()
 {
     Screen::tearDown();
     user_config->saveConfig();
+    bool changed = unlock_manager->createSlotsIfNeeded();
+    if (changed) unlock_manager->save();
 }   // tearDown
 
 // -----------------------------------------------------------------------------

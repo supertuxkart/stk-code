@@ -129,9 +129,10 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
 
         UserConfigParams::m_all_players.push_back( new PlayerProfile(playerName) );
 
-        // It's unsafe to delete from inside the event handler so we do it later
+        // It's unsafe to delete from inside the event handler so we do it
+        // in onUpdate (which checks for m_self_destroy)
         m_self_destroy = true;
-    }
+    } // if valid name
     else
     {
         LabelWidget* label = getWidget<LabelWidget>("title");
@@ -144,7 +145,7 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
 
 void EnterPlayerNameDialog::onUpdate(float dt)
 {
-    // It's unsafe to delete from inside the event handler so we do it later
+    // It's unsafe to delete from inside the event handler so we do it here 
     if (m_self_destroy)
     {
         TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
