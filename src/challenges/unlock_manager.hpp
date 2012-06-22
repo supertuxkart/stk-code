@@ -64,6 +64,7 @@ public:
     void       addChallenge      (const std::string& filename);
     void       save              ();
     bool       createSlotsIfNeeded();
+    bool       deleteSlotsIfNeeded();
     
     const ChallengeData *getChallenge      (const std::string& id);
 

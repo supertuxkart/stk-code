@@ -278,7 +278,9 @@ void UnlockManager::save()
 }   // save
 
 //-----------------------------------------------------------------------------
-
+/** Creates a gameslot for players that don't have one yet
+ *  \return true if any were created
+ */
 bool UnlockManager::createSlotsIfNeeded()
 {
     bool something_changed = false;
@@ -318,7 +320,48 @@ bool UnlockManager::createSlotsIfNeeded()
     }
     
     return something_changed;
-}
+} // UnlockManager::createSlotsIfNeeded
+
+//-----------------------------------------------------------------------------
+/** Removes gameslots that refer to a non-existing player.
+ *  \return true if any were removed
+ */
+bool UnlockManager::deleteSlotsIfNeeded()
+{
+    bool changed = false;
+    std::map<std::string, GameSlot*>::iterator it = m_game_slots.begin();
+    while (it != m_game_slots.end())
+    {
+        bool found = false;
+        const int playerAmount = UserConfigParams::m_all_players.size();
+        for (int i = 0; i < playerAmount; i++)
+        {
+            if (it->second->getPlayerID() ==
+                    UserConfigParams::m_all_players[i].getUniqueID())
+            {
+                found = true;
+                break;
+            }
+        } // for players
+
+        if (!found)
+        {
+#ifdef DEBUG
+            printf("Deleting gameslot %s, no player found.\n",
+                    it->second->getPlayerID().c_str());
+#endif
+            // Iterators aren't invalidated this way
+            m_game_slots.erase(it++);
+            changed = true;
+        }
+        else
+        {
+            ++it;
+        }
+    } // for gameslots
+
+    return changed;
+} // UnlockManager::deleteSlotsIfNeeded
 
 //-----------------------------------------------------------------------------
 void UnlockManager::playLockSound() const
