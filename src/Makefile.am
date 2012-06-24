@@ -346,8 +346,12 @@ supertuxkart_SOURCES = \
  replay/replay_play.hpp \
  replay/replay_recorder.cpp \
  replay/replay_recorder.hpp \
+ states_screens/arenas_screen.cpp \
+ states_screens/arenas_screen.hpp \
  states_screens/credits.cpp \
  states_screens/credits.hpp \
+ states_screens/cutscene_gui.cpp \
+ states_screens/cutscene_gui.hpp \
  states_screens/dialogs/add_device_dialog.cpp \
  states_screens/dialogs/add_device_dialog.hpp \
  states_screens/dialogs/confirm_resolution_dialog.cpp \
@@ -376,8 +380,6 @@ supertuxkart_SOURCES = \
  states_screens/dialogs/track_info_dialog.hpp \
  states_screens/dialogs/addons_loading.cpp \
  states_screens/dialogs/addons_loading.hpp \
- states_screens/arenas_screen.cpp \
- states_screens/arenas_screen.hpp \
  states_screens/feature_unlocked.cpp \
  states_screens/feature_unlocked.hpp \
  states_screens/grand_prix_lose.cpp \
