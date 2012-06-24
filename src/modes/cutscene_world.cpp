@@ -30,8 +30,8 @@
 #include "karts/kart_properties.hpp"
 #include "modes/overworld.hpp"
 #include "physics/physics.hpp"
+#include "states_screens/cutscene_gui.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
@@ -55,6 +55,8 @@ CutsceneWorld::CutsceneWorld() : World()
 void CutsceneWorld::init()
 {
     World::init();
+    
+    dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(1.0f);
     
     m_duration = -1.0f;
     
@@ -135,6 +137,19 @@ const std::string& CutsceneWorld::getIdent() const
 void CutsceneWorld::update(float dt)
 {
     m_time += dt;
+    
+    if (m_time < 2.0f)
+    {
+        dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(1.0f - m_time / 2.0f);
+    }
+    else if (m_time > m_duration - 2.0f)
+    {
+        dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel((m_time - (m_duration - 2.0f)) / 2.0f);
+    }
+    else
+    {
+        dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(0.0f);
+    }
     
     World::update(dt);
     World::updateTrack(dt);
@@ -227,3 +242,12 @@ RaceGUIBase::KartIconDisplayInfo* CutsceneWorld::getKartsDisplayInfo()
 void CutsceneWorld::moveKartAfterRescue(AbstractKart* kart)
 {
 }   // moveKartAfterRescue
+
+//-----------------------------------------------------------------------------
+
+void CutsceneWorld::createRaceGUI()
+{
+    m_race_gui = new CutsceneGUI();
+}
+    
+    

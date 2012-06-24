@@ -45,7 +45,7 @@ class CutsceneWorld : public World
     
     void abortCutscene()
     {
-        m_duration = 0.0f;
+        m_duration = m_time + 2.0f;
     }
     
 public:
@@ -71,10 +71,7 @@ public:
     virtual void kartHit(const int kart_id) OVERRIDE;
     virtual void update(float dt) OVERRIDE;
 
-    virtual void createRaceGUI() OVERRIDE
-    {
-        m_race_gui = NULL;
-    }
+    virtual void createRaceGUI() OVERRIDE;
     
     virtual void enterRaceOverState() OVERRIDE;
 
