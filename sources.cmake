@@ -160,6 +160,7 @@ src/replay/replay_recorder.cpp
 src/states_screens/addons_screen.cpp
 src/states_screens/arenas_screen.cpp
 src/states_screens/credits.cpp
+src/states_screens/cutscene_gui.cpp
 src/states_screens/dialogs/add_device_dialog.cpp
 src/states_screens/dialogs/addons_loading.cpp
 src/states_screens/dialogs/confirm_resolution_dialog.cpp
@@ -419,6 +420,7 @@ src/replay/replay_recorder.hpp
 src/states_screens/addons_screen.hpp
 src/states_screens/arenas_screen.hpp
 src/states_screens/credits.hpp
+src/states_screens/cutscene_gui.hpp
 src/states_screens/dialogs/add_device_dialog.hpp
 src/states_screens/dialogs/addons_loading.hpp
 src/states_screens/dialogs/confirm_resolution_dialog.hpp
