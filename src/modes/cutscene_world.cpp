@@ -136,18 +136,6 @@ void CutsceneWorld::update(float dt)
 {
     m_time += dt;
     
-    /*
-    if (m_time > m_duration)
-    {
-        printf("DONE!\n");
-        
-        race_manager->exitRace();
-        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-        //OverWorld::enterOverWorld();
-        return;
-    }
-    */
-    
     World::update(dt);
     World::updateTrack(dt);
     
@@ -158,11 +146,14 @@ void CutsceneWorld::update(float dt)
         if (curr->getType() == "cutscene_camera")
         {
             m_camera->setPosition(curr->getNode()->getPosition());
+            m_camera->updateAbsolutePosition();
             
             core::vector3df rot = curr->getNode()->getRotation();
             Vec3 rot2(rot);
             rot2.setPitch(rot2.getPitch() + 90.0f);
             m_camera->setRotation(rot2.toIrrVector());
+            
+            break;
             //printf("Camera %f %f %f\n", curr->getNode()->getPosition().X, curr->getNode()->getPosition().Y, curr->getNode()->getPosition().Z);
         }
     }
