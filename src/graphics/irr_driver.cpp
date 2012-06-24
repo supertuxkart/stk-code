@@ -62,6 +62,7 @@ using namespace irr::video;
 namespace X11
 {
     #include <X11/Xlib.h>
+    #include <X11/Xutil.h>
 }
 #endif
 
@@ -354,6 +355,18 @@ void IrrDriver::initDevice()
 
 #endif
     }
+
+#if defined(__linux__)
+    using namespace X11;
+    const SExposedVideoData& videoData = m_device->getVideoDriver()->getExposedVideoData();
+    XClassHint* classhint = XAllocClassHint();
+    classhint->res_name = (char*)"SuperTuxKart";
+    classhint->res_class = (char*)"SuperTuxKart";
+    XSetClassHint((Display*)videoData.OpenGLLinux.X11Display,
+                       videoData.OpenGLLinux.X11Window,
+                       classhint);
+    XFree(classhint);
+#endif
     
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
