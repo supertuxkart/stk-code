@@ -21,13 +21,16 @@
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
 
+#include "animations/animation_base.hpp"
 #include "audio/music_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
+#include "modes/overworld.hpp"
 #include "physics/physics.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
@@ -52,6 +55,9 @@ CutsceneWorld::CutsceneWorld() : World()
 void CutsceneWorld::init()
 {
     World::init();
+    
+    m_duration = -1.0f;
+    
     //const btTransform &s = getTrack()->getStartTransform(0);
     //const Vec3 &v = s.getOrigin();
     m_camera = irr_driver->getSceneManager()
@@ -84,7 +90,18 @@ void CutsceneWorld::init()
                 m_sounds_to_trigger[frame / FPS].push_back(curr);
             }
         }
+        
+        if (dynamic_cast<AnimationBase*>(curr) != NULL)
+        {
+            m_duration = std::max(m_duration, dynamic_cast<AnimationBase*>(curr)->getAnimationDuration());
+        }
     }
+    
+    if (m_duration <= 0.0f)
+    {
+        fprintf(stderr, "[CutsceneWorld] WARNING: cutscene has no duration\n");
+    }
+    
 }   // CutsceneWorld
 
 //-----------------------------------------------------------------------------
@@ -118,6 +135,19 @@ const std::string& CutsceneWorld::getIdent() const
 void CutsceneWorld::update(float dt)
 {
     m_time += dt;
+    
+    /*
+    if (m_time > m_duration)
+    {
+        printf("DONE!\n");
+        
+        race_manager->exitRace();
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        //OverWorld::enterOverWorld();
+        return;
+    }
+    */
+    
     World::update(dt);
     World::updateTrack(dt);
     
@@ -157,11 +187,20 @@ void CutsceneWorld::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+
+void CutsceneWorld::enterRaceOverState()
+{
+    race_manager->exitRace();
+    StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+    OverWorld::enterOverWorld();
+}
+
+//-----------------------------------------------------------------------------
 /** The battle is over if only one kart is left, or no player kart.
  */
 bool CutsceneWorld::isRaceOver()
 {
-    return false;
+    return m_time > m_duration;
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------

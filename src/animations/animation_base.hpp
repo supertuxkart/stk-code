@@ -33,6 +33,8 @@
 #include "tracks/track_object.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include <algorithm>
+
 class XMLNode;
 
 /**
@@ -81,6 +83,21 @@ public:
     // ------------------------------------------------------------------------
     /** Disables or enables an animation. */
     void         setPlaying(bool playing) {m_playing = playing; }
+
+    // ------------------------------------------------------------------------
+    
+    float getAnimationDuration() const
+    {
+        float duration = -1;
+        
+        const Ipo* currIpo;
+        for_in (currIpo, m_all_ipos)
+        {
+            duration = std::max(duration, currIpo->getEndTime());
+        }
+        
+        return duration;
+    }
 
 };   // AnimationBase
 

@@ -40,6 +40,8 @@ class CutsceneWorld : public World
     scene::ICameraSceneNode* m_camera;
     
     std::map<float, std::vector<TrackObject*> > m_sounds_to_trigger;
+
+    float m_duration;
     
 public:
     
@@ -68,6 +70,8 @@ public:
     {
         m_race_gui = NULL;
     }
+    
+    virtual void enterRaceOverState() OVERRIDE;
 
 };   // CutsceneWorld
 
