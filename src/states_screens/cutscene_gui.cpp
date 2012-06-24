@@ -16,19 +16,27 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "graphics/irr_driver.hpp"
 #include "states_screens/cutscene_gui.hpp"
+
+// -----------------------------------------------------------------------------
 
 CutsceneGUI::CutsceneGUI()
 {
     m_fade_level = 0.0f;
 }
 
+// -----------------------------------------------------------------------------
+
 CutsceneGUI::~CutsceneGUI()
 {
     
 }
-    
+
+// -----------------------------------------------------------------------------
+
 void CutsceneGUI::renderGlobal(float dt)
 {
     if (m_fade_level > 0.0f)
@@ -38,10 +46,21 @@ void CutsceneGUI::renderGlobal(float dt)
                                                                       UserConfigParams::m_width,
                                                                       UserConfigParams::m_height));
     }
+    
+    if (m_subtitle.size() > 0)
+    {
+        core::rect<s32> r(0, UserConfigParams::m_height - GUIEngine::getFontHeight()*2,
+                          UserConfigParams::m_width, UserConfigParams::m_height);
+        GUIEngine::getFont()->draw(m_subtitle, r,
+                                   video::SColor(255,255,255,255), true, true, NULL);
+    }
 }
+
+// -----------------------------------------------------------------------------
 
 void CutsceneGUI::renderPlayerView(const AbstractKart *kart)
 {
     
 }
 
+// -----------------------------------------------------------------------------

@@ -120,6 +120,22 @@ public:
 };
 
 
+struct Subtitle
+{
+    int m_from, m_to;
+    core::stringw m_text;
+    
+    Subtitle(int from, int to, core::stringw text)
+    {
+        m_from = from;
+        m_to = to;
+        m_text = text;
+    }
+    int getFrom() const { return m_from; }
+    int getTo()   const { return m_to;   }
+    const core::stringw& getText() const { return m_text; }
+};
+
 /**
   * \ingroup tracks
   */
@@ -140,6 +156,8 @@ private:
     std::vector<OverworldChallenge> m_challenges;
     
     std::vector<OverworldForceField> m_force_fields;
+    
+    std::vector<Subtitle> m_subtitles;
     
     /** Start transforms of karts (either the default, or the ones taken
      *  from the scene file). */
@@ -484,6 +502,7 @@ public:
     const std::vector<OverworldChallenge>& getChallengeList() const
         { return m_challenges; }
 
+    const std::vector<Subtitle>& getSubtitles() const { return m_subtitles; }
     
 };   // class Track
 

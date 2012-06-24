@@ -36,7 +36,6 @@ class TrackObject;
  */
 class CutsceneWorld : public World
 {
-
     scene::ICameraSceneNode* m_camera;
     
     std::map<float, std::vector<TrackObject*> > m_sounds_to_trigger;

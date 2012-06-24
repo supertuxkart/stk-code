@@ -43,6 +43,7 @@ class CutsceneGUI : public RaceGUIBase
 private:
 
     float m_fade_level;
+    core::stringw m_subtitle;
 
 public:
 
@@ -50,6 +51,7 @@ public:
     ~CutsceneGUI();
     
     void setFadeLevel(float level) { m_fade_level = level; }
+    void setSubtitle(const core::stringw& subtitle) { m_subtitle = subtitle; }
     
     virtual void renderGlobal(float dt);
     virtual void renderPlayerView(const AbstractKart *kart);

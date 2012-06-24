@@ -103,7 +103,6 @@ void CutsceneWorld::init()
     {
         fprintf(stderr, "[CutsceneWorld] WARNING: cutscene has no duration\n");
     }
-    
 }   // CutsceneWorld
 
 //-----------------------------------------------------------------------------
@@ -150,6 +149,26 @@ void CutsceneWorld::update(float dt)
     {
         dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(0.0f);
     }
+    
+    
+    float currFrame = m_time * 30.0f; // We assume 30 FPS
+    const std::vector<Subtitle>& subtitles = m_track->getSubtitles();
+    bool foundSubtitle = false;
+    for (int n = 0; n < subtitles.size(); n++)
+    {
+        if (currFrame >= subtitles[n].getFrom() && currFrame < subtitles[n].getTo())
+        {
+            dynamic_cast<CutsceneGUI*>(m_race_gui)->setSubtitle(subtitles[n].getText());
+            foundSubtitle = true;
+            break;
+        }
+    }
+    
+    if (!foundSubtitle)
+    {
+        dynamic_cast<CutsceneGUI*>(m_race_gui)->setSubtitle(core::stringw(L""));
+    }
+    
     
     World::update(dt);
     World::updateTrack(dt);

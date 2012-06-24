@@ -1413,6 +1413,23 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
         {
             // handled above
         }
+        else if (name == "subtitles")
+        {
+            std::vector<XMLNode*> subtitles;
+            node->getNodes("subtitle", subtitles);
+            for (int i = 0; i < subtitles.size(); i++)
+            {
+                int from = -1, to = -1;
+                std::string subtitle_text;
+                subtitles[i]->get("from", &from);
+                subtitles[i]->get("to", &to);
+                subtitles[i]->get("text", &subtitle_text);
+                if (from != -1 && to != -1 && subtitle_text.size() > 0)
+                {
+                    m_subtitles.push_back( Subtitle(from, to, _(subtitle_text.c_str())) );
+                }
+            }
+        }
         else
         {
             fprintf(stderr, "Warning: while loading track '%s', element '%s' was met but is unknown.\n",
