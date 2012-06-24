@@ -30,7 +30,6 @@
 #include "main_loop.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
-#include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
@@ -175,7 +174,7 @@ void StateManager::escapePressed()
     {
         if(World::getWorld()->getPhase()!=WorldStatus::RESULT_DISPLAY_PHASE
             && !ProfileWorld::isProfileMode())
-            new RacePausedDialog(0.8f, 0.6f);
+            World::getWorld()->escapePressed();
     }
     // In menus
     else

@@ -43,6 +43,11 @@ class CutsceneWorld : public World
 
     float m_duration;
     
+    void abortCutscene()
+    {
+        m_duration = 0.0f;
+    }
+    
 public:
     
     CutsceneWorld();
@@ -72,6 +77,10 @@ public:
     }
     
     virtual void enterRaceOverState() OVERRIDE;
+
+    virtual void onFirePressed(Controller* who) OVERRIDE { abortCutscene(); }
+
+    virtual void escapePressed() OVERRIDE { abortCutscene(); }
 
 };   // CutsceneWorld
 

@@ -93,6 +93,13 @@ void InputManager::handleStaticAction(int key, int value)
     static bool control_is_pressed = false;
     World *world = World::getWorld();
 
+    // When no players... a cutscene
+    if (race_manager->getNumPlayers() == 0 && world != NULL && value > 0 &&
+        (key == KEY_SPACE || key == KEY_RETURN))
+    {
+        world->onFirePressed(NULL);
+    }
+
     switch (key)
     {
 #ifdef DEBUG

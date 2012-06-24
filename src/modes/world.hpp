@@ -297,6 +297,8 @@ public:
     virtual bool useChecklineRequirements() const { return false; }
     // ------------------------------------------------------------------------
     void delayedSelfDestruct();
+    // ------------------------------------------------------------------------
+    virtual void escapePressed();
     
 };   // World
 

@@ -51,9 +51,10 @@
 #include "race/race_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
-#include "states_screens/state_manager.hpp"
+#include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "states_screens/race_gui.hpp"
+#include "states_screens/state_manager.hpp"
 #include "states_screens/minimal_race_gui.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "tracks/track.hpp"
@@ -991,6 +992,13 @@ void World::unpause()
 void World::delayedSelfDestruct()
 {
     m_self_destruct = true;
+}
+
+//-----------------------------------------------------------------------------
+
+void World::escapePressed()
+{
+    new RacePausedDialog(0.8f, 0.6f);
 }
 
 /* EOF */
