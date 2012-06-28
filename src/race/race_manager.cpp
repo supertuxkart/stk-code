@@ -121,7 +121,7 @@ void RaceManager::setDefaultAIKartList(const std::vector<std::string>& ai_list)
         //}
         m_default_ai_list.push_back(name);
     }
-}   // setAIKartList
+}   // setDefaultAIKartList
 
 // ----------------------------------------------------------------------------
 /** Sets information about a kart used by a local player (i.e. on this 
@@ -216,8 +216,6 @@ void RaceManager::setTrack(const std::string& track)
  */
 void RaceManager::computeRandomKartList()
 {
-    if (m_num_karts == 0) return;
-    
     int n = m_num_karts - m_player_karts.size();
     if(UserConfigParams::logMisc())
         std::cout << "AI karts count = " << n << " for m_num_karts=" 
