@@ -39,14 +39,14 @@ private:
      */
     float    m_skidding_threshold;
 
-	/** Stores the last N times when a collision happened. This is used
-	 *  to detect when the AI is stuck, i.e. N collisions happened in
-	 *  a certain period of time. */
-	std::vector<float> m_collision_times;
-	
-	/** A flag that is set during the physics processing to indicate that
-	 *  this kart is stuck and needs to be rescued. */
-	bool m_stuck_trigger_rescue;
+    /** Stores the last N times when a collision happened. This is used
+    *  to detect when the AI is stuck, i.e. N collisions happened in
+    *  a certain period of time. */
+    std::vector<float> m_collision_times;
+
+    /** A flag that is set during the physics processing to indicate that
+    *  this kart is stuck and needs to be rescued. */
+    bool m_stuck_trigger_rescue;
 
 protected:
     /** Length of the kart, storing it here saves many function calls. */
@@ -88,27 +88,27 @@ protected:
     void     setSteering   (float angle, float dt);
     void     setSkiddingFraction(float f);
     void     computePath();
-	// ------------------------------------------------------------------------
-	/** This can be called to detect if the kart is stuck (i.e. repeatedly
-	 *  hitting part of the track). */
-	bool     isStuck() const { return m_stuck_trigger_rescue; }
+    // ------------------------------------------------------------------------
+    /** This can be called to detect if the kart is stuck (i.e. repeatedly
+    *  hitting part of the track). */
+    bool     isStuck() const { return m_stuck_trigger_rescue; }
 
 public:
              AIBaseController(AbstractKart *kart,
                               StateManager::ActivePlayer *player=NULL);
     virtual ~AIBaseController() {};
-	virtual void reset();
+    virtual void reset();
     virtual void crashed(const AbstractKart *k) {};
     virtual void crashed(const Material *m);
-	virtual void handleZipper(bool play_sound) {};
-	virtual void finishedRace(float time) {};
+    virtual void handleZipper(bool play_sound) {};
+    virtual void finishedRace(float time) {};
     virtual void collectedItem(const Item &item, int add_info=-1,
 		                       float previous_energy=0) {};
-	virtual void setPosition(int p) {};
-	virtual bool isNetworkController() const { return false; }
-	virtual bool isPlayerController() const { return false; }
-	virtual void action(PlayerAction action, int value) {};
-	virtual void  skidBonusTriggered() {};
+    virtual void setPosition(int p) {};
+    virtual bool isNetworkController() const { return false; }
+    virtual bool isPlayerController() const { return false; }
+    virtual void action(PlayerAction action, int value) {};
+    virtual void  skidBonusTriggered() {};
 
 };   // AIBaseController
 

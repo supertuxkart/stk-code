@@ -189,13 +189,13 @@ void DefaultAIController::update(float dt)
         return;
     }
 
-	// If the kart needs to be rescued, do it now (and nothing else)
-	if(isStuck() && !m_kart->getKartAnimation())
-	{
-		new RescueAnimation(m_kart);
-		AIBaseController::update(dt);
-		return;
-	}
+    // If the kart needs to be rescued, do it now (and nothing else)
+    if(isStuck() && !m_kart->getKartAnimation())
+    {
+        new RescueAnimation(m_kart);
+        AIBaseController::update(dt);
+        return;
+    }
 
     if( m_world->isStartPhase() )
     {
@@ -994,7 +994,7 @@ void DefaultAIController::findNonCrashingPoint(Vec3 *result)
 }   // findNonCrashingPoint
 
 //-----------------------------------------------------------------------------
-/** calc_steps() divides the velocity vector by the lenght of the kart,
+/** calcSteps() divides the velocity vector by the length of the kart,
  *  and gets the number of steps to use for the sight line of the kart.
  *  The calling sequence guarantees that m_future_sector is not UNKNOWN.
  */
@@ -1025,7 +1025,7 @@ int DefaultAIController::calcSteps()
 }   // calcSteps
 
 //-----------------------------------------------------------------------------
-/**FindCurve() gathers info about the closest sectors ahead: the curve
+/**findCurve() gathers info about the closest sectors ahead: the curve
  * angle, the direction of the next turn, and the optimal speed at which the
  * curve can be travelled at it's widest angle.
  *
