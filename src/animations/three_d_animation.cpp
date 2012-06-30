@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 
+#include "audio/sfx_base.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
@@ -322,6 +323,11 @@ void ThreeDAnimation::update(float dt)
             Vec3 p(xyz);
             btTransform trans(q,p);
             m_motion_state->setWorldTransform(trans);
+        }
+        
+        if (m_sound != NULL)
+        {
+            m_sound->position(xyz);
         }
     }
 }   // update

@@ -84,7 +84,7 @@ void TrackObjectManager::add(const XMLNode &xml_node)
         }
         else if(type=="sfx-emitter")
         {
-            m_all_objects.push_back(new TrackObject(xml_node));
+            m_all_objects.push_back(new ThreeDAnimation(xml_node));
         }
         else if(type=="cutscene_camera")
         {
