@@ -30,8 +30,12 @@
  *  \param index Index of the quad to use for this node (in QuadSet).
  */
 GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index) 
-{ 
-    assert(quad_index<QuadSet::get()->getNumberOfQuads());
+{
+    if (quad_index<QuadSet::get()->getNumberOfQuads() == 0)
+    {
+        fprintf(stderr, "[GraphNode] ERROR: No driveline found, or empty driveline");
+        abort();
+    }
     m_quad_index          = quad_index;
     m_node_index          = node_index;
     m_predecessor         = -1;
