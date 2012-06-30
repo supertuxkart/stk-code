@@ -38,18 +38,20 @@
 
 SFXBuffer::SFXBuffer(const std::string& file,
                      bool  positional,
+                     ALuint rolloffType,
                      float rolloff,
                      float gain)
 {
-    m_buffer     = 0;
-    m_gain       = 1.0f;
-    m_rolloff    = 0.1f;
-    m_loaded     = false;
-    m_file       = file;
+    m_buffer      = 0;
+    m_gain        = 1.0f;
+    m_rolloff     = 0.1f;
+    m_loaded      = false;
+    m_file        = file;
     
-    m_rolloff    = rolloff;
-    m_positional = positional;
-    m_gain       = gain;
+    m_rolloff     = rolloff;
+    m_positional  = positional;
+    m_gain        = gain;
+    m_rolloffType = rolloffType;
 }
 
 //----------------------------------------------------------------------------
@@ -57,16 +59,27 @@ SFXBuffer::SFXBuffer(const std::string& file,
 SFXBuffer::SFXBuffer(const std::string& file,
                      const XMLNode* node)
 {
-    m_buffer     = 0;
-    m_gain       = 1.0f;
-    m_rolloff    = 0.1f;
-    m_positional = false;
-    m_loaded     = false;
-    m_file       = file;
+    m_buffer      = 0;
+    m_gain        = 1.0f;
+    m_rolloff     = 0.1f;
+    m_positional  = false;
+    m_loaded      = false;
+    m_file        = file;
+    m_rolloffType = AL_INVERSE_DISTANCE_CLAMPED;
     
     node->get("rolloff",     &m_rolloff    );
     node->get("positional",  &m_positional );
     node->get("volume",      &m_gain       );
+    
+    std::string rolloffType;
+    node->get("rolloff_type",      &rolloffType);
+    
+    if (rolloffType == "inverse")
+        m_rolloffType = AL_INVERSE_DISTANCE_CLAMPED;
+    else if (rolloffType == "linear") 
+        m_rolloffType = AL_LINEAR_DISTANCE_CLAMPED;
+    else if (rolloffType != "")
+        fprintf(stderr, "[SfxBuffer] Unknown rolloff type '%s'\n", rolloffType.c_str());
 }
 
 //----------------------------------------------------------------------------

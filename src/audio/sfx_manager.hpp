@@ -109,6 +109,7 @@ public:
     SFXBuffer*               addSingleSfx(const std::string &sfx_name,
                                           const std::string &filename,
                                           bool               positional,
+                                          ALuint             rolloff_type,
                                           float              rolloff,
                                           float              gain);
 

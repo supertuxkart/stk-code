@@ -44,6 +44,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain) : SFXBase()
     m_defaultGain = gain;
     m_loop        = false;
     m_gain        = -1.0f;
+    m_rolloffType = buffer->getRolloffType();
     
     // Don't initialise anything else if the sfx manager was not correctly
     // initialised. First of all the initialisation will not work, and it
@@ -84,7 +85,18 @@ bool SFXOpenAL::init()
     alSource3f(m_soundSource, AL_POSITION,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
-    alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  m_soundBuffer->getRolloff());
+    
+    alDistanceModel(m_rolloffType);
+    
+    if (m_rolloffType == AL_INVERSE_DISTANCE_CLAMPED)
+    {
+        alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  m_soundBuffer->getRolloff());
+    }
+    else if (m_rolloffType == AL_LINEAR_DISTANCE_CLAMPED)
+    {
+        alSourcef (m_soundSource, AL_MAX_DISTANCE,  m_soundBuffer->getRolloff());
+    }
+    
     
     if (m_gain < 0.0f)
     {
