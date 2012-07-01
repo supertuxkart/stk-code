@@ -41,10 +41,11 @@ void CutsceneGUI::renderGlobal(float dt)
 {
     if (m_fade_level > 0.0f)
     {
-        irr_driver->getVideoDriver()->draw2DRectangle(video::SColor(m_fade_level*255, 0,0,0),
-                                                      core::rect<s32>(0, 0,
-                                                                      UserConfigParams::m_width,
-                                                                      UserConfigParams::m_height));
+        irr_driver->getVideoDriver()->draw2DRectangle(
+                                video::SColor((int)(m_fade_level*255), 0,0,0),
+                                core::rect<s32>(0, 0,
+                                                UserConfigParams::m_width,
+                                                UserConfigParams::m_height));
     }
     
     if (m_subtitle.size() > 0)
