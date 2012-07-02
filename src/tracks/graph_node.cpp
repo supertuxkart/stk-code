@@ -31,7 +31,7 @@
  */
 GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index) 
 {
-    if (quad_index<QuadSet::get()->getNumberOfQuads() == 0)
+    if (quad_index >= QuadSet::get()->getNumberOfQuads())
     {
         fprintf(stderr, "[GraphNode] ERROR: No driveline found, or empty driveline");
         abort();
