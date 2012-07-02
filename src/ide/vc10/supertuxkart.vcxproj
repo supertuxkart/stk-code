@@ -179,6 +179,7 @@
     <ClCompile Include="..\..\replay\replay_base.cpp" />
     <ClCompile Include="..\..\replay\replay_play.cpp" />
     <ClCompile Include="..\..\replay\replay_recorder.cpp" />
+    <ClCompile Include="..\..\states_screens\cutscene_gui.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\custom_video_settings.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\select_challenge.cpp" />
     <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp" />
@@ -433,6 +434,7 @@
     <ClInclude Include="..\..\replay\replay_base.hpp" />
     <ClInclude Include="..\..\replay\replay_play.hpp" />
     <ClInclude Include="..\..\replay\replay_recorder.hpp" />
+    <ClInclude Include="..\..\states_screens\cutscene_gui.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\custom_video_settings.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\select_challenge.hpp" />
     <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp" />
