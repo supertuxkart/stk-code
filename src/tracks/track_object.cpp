@@ -214,8 +214,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         else
         {
             m_node = irr_driver->addMesh(m_mesh);
-            m_frame_start = 0.0f;
-            m_frame_end = 0.0f;
+            m_frame_start = 0;
+            m_frame_end = 0;
         }
 #ifdef DEBUG
         std::string debug_name = model_name+" (track-object)";
@@ -288,8 +288,8 @@ TrackObject::TrackObject(const core::vector3df& pos, const core::vector3df& hpr,
         else
         {
             m_node = irr_driver->addMesh(m_mesh);
-            m_frame_start = 0.0f;
-            m_frame_end = 0.0f;
+            m_frame_start = 0;
+            m_frame_end = 0;
         }
         
 #ifdef DEBUG
