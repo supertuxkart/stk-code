@@ -127,6 +127,9 @@ private:
     /** Stores the turn angle at the corresponding turn speed. */
     std::vector<float> m_turn_angle_at_speed;
 
+    /** Stores the turn radius at the corresponding turn speed. */
+    std::vector<float> m_turn_radius_at_speed;
+
     /** Increase of turn angle with speed. */
     std::vector<float> m_speed_angle_increase;
 
@@ -338,6 +341,9 @@ public:
 
     /** Returns the maximum steering angle (depending on speed). */
     float getMaxSteerAngle  (float speed) const;
+
+    /** Returns the (maximum) speed for a given turn radius. */
+    float getSpeedForTurnRadius(float radius) const;
 
     /** Returns the material for the kart icons. */
     Material*     getIconMaterial    () const {return m_icon_material;        }

@@ -80,7 +80,10 @@ private:
 
     void setDefaultSuccessors();
     void computeChecklineRequirements(GraphNode* node, int latest_checkline);
-    
+    void computeDirectionData();
+    void determineDirection(unsigned int current, unsigned int succ_index);
+    float normalizeAngle(float f);
+
     void addSuccessor(unsigned int from, unsigned int to);
     void load         (const std::string &filename);
     void computeDistanceFromStart(unsigned int start_node, float distance);

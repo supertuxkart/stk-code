@@ -56,6 +56,7 @@ KartProperties::KartProperties(const std::string &filename)
 
     m_groups.clear();
     m_turn_angle_at_speed.clear();
+    m_turn_radius_at_speed.clear();
     m_turn_speed.clear();
     m_speed_angle_increase.clear();
     m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
@@ -234,9 +235,11 @@ void KartProperties::load(const std::string &filename, const std::string &node)
                                            m_wheel_radius           );
     m_wheel_base = fabsf( m_kart_model->getWheelPhysicsPosition(0).getZ()
                          -m_kart_model->getWheelPhysicsPosition(2).getZ());
-    for(unsigned int i=0; i<m_turn_angle_at_speed.size(); i++)
+    for(unsigned int i=0; i<m_turn_radius_at_speed.size(); i++)
     {
-        m_turn_angle_at_speed[i] = sin(m_wheel_base/m_turn_angle_at_speed[i]);
+        m_turn_angle_at_speed.push_back(
+                     sin(m_wheel_base/m_turn_radius_at_speed[i])
+                     );
     }
     for(unsigned int i=0; i<m_turn_speed.size()-1; i++)
     {
@@ -335,14 +338,14 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *turn_node = root->getNode("turn"))
     {
-        turn_node->get("time-full-steer",      &m_time_full_steer    );
-        turn_node->get("time-full-steer-ai",   &m_time_full_steer_ai );
-        turn_node->get("turn-speed",           &m_turn_speed         );
-        turn_node->get("turn-radius",          &m_turn_angle_at_speed);
+        turn_node->get("time-full-steer",      &m_time_full_steer     );
+        turn_node->get("time-full-steer-ai",   &m_time_full_steer_ai  );
+        turn_node->get("turn-speed",           &m_turn_speed          );
+        turn_node->get("turn-radius",          &m_turn_radius_at_speed);
         // For now store the turn radius in turn angle, the correct
         // value can only be determined later in ::load
         if(m_turn_speed.size()==0 || 
-            m_turn_angle_at_speed.size() != m_turn_speed.size())
+            m_turn_radius_at_speed.size() != m_turn_speed.size())
         {
             printf("Inconsistent turn-speed and turn-radius "
                    "settings for kart %s\n", getIdent().c_str());
@@ -356,9 +359,9 @@ void KartProperties::getAllData(const XMLNode * root)
                        "values for kart %s.\n", getIdent().c_str());
                 exit(-1);
             }
-            if(m_turn_angle_at_speed[i]>m_turn_angle_at_speed[i+1])
+            if(m_turn_radius_at_speed[i]>m_turn_radius_at_speed[i+1])
             {
-                printf("The turn-angle must be increasing for kart %s.\n",
+                printf("The turn-radius must be increasing for kart %s.\n",
                        getIdent().c_str());
                 exit(-1);
             }
@@ -695,6 +698,29 @@ float KartProperties::getMaxSteerAngle(float speed) const
     assert (0);
     return 0;  // avoid compiler warning
 }   // getMaxSteerAngle
+
+// ----------------------------------------------------------------------------
+/** Returns the (maximum) speed for a given turn radius. 
+ *  \param radius The radius for which the speed needs to be computed.
+ */
+float KartProperties::getSpeedForTurnRadius(float radius) const
+{
+    if(radius < m_turn_radius_at_speed[0] )
+        return m_turn_speed[0];
+
+    const unsigned int last = m_turn_speed.size();
+
+    for(unsigned int i=1; i<last; i++)
+    {
+        if(radius < m_turn_radius_at_speed[i])
+        {
+            return m_turn_speed[i-1] 
+            + (m_turn_speed[i]-m_turn_speed[i-1]) * (radius-m_turn_radius_at_speed[i-1])
+                                                 / (m_turn_radius_at_speed[i]-m_turn_radius_at_speed[i-1]);
+        }
+    }   // for i < last
+    return m_turn_speed[last-1];
+}   // getSpeedForTurnRadius
 
 // ----------------------------------------------------------------------------
 /** Called the first time a kart accelerates after 'ready-set-go'. It searches

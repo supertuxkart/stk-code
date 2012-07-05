@@ -38,6 +38,7 @@
 #ifdef AI_DEBUG
 #  include "graphics/irr_driver.hpp"
 #endif
+#include "graphics/show_curve.hpp"
 #include "graphics/slip_stream.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
@@ -106,7 +107,20 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
 
 #ifdef AI_DEBUG
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);
+#define CURVE_PREDICT1   0
+#define CURVE_PREDICT2   1
+#define CURVE_QG         2
+#define NUM_CURVES (CURVE_QG+1)
+
+    m_curve   = new ShowCurve*[NUM_CURVES];
+    m_curve[CURVE_PREDICT1] = new ShowCurve(0.05f, 0.5f, 
+                                  irr::video::SColor(128,   0,   0, 128));
+    m_curve[CURVE_PREDICT2] = new ShowCurve(0.05f, 0.5f, 
+                                  irr::video::SColor(128,   0,   0,  64));
+    m_curve[CURVE_QG]        = new ShowCurve(0.5f, 0.5f, 
+                                   irr::video::SColor(128,  0, 128,   0));
 #endif
+    setControllerName("Skidding");
 }   // SkiddingAI
 
 //-----------------------------------------------------------------------------
@@ -117,6 +131,11 @@ SkiddingAI::~SkiddingAI()
 {
 #ifdef AI_DEBUG
     irr_driver->removeNode(m_debug_sphere);
+    for(unsigned int i=0; i<NUM_CURVES; i++)
+    {
+        delete m_curve[i];
+    }
+    delete m_curve;
 #endif
 }   // ~SkiddingAI
 
@@ -133,6 +152,8 @@ void SkiddingAI::reset()
     m_distance_ahead             = 0.0f;
     m_kart_behind                = NULL;
     m_distance_behind            = 0.0f;
+    m_current_curve_radius       = 0.0f;
+    m_current_track_direction    = GraphNode::DIR_STRAIGHT;
 
     AIBaseController::reset();
     m_track_node               = QuadGraph::UNKNOWN_SECTOR;
@@ -216,7 +237,7 @@ void SkiddingAI::update(float dt)
 
     //Detect if we are going to crash with the track and/or kart
     checkCrashes(m_kart->getXYZ());
-
+    determineTrackDirection();
     findCurve();
 
     // Special behaviour if we have a bomb attach: try to hit the kart ahead 
@@ -285,6 +306,7 @@ void SkiddingAI::update(float dt)
 //-----------------------------------------------------------------------------
 void SkiddingAI::handleBraking()
 {
+    m_controls->m_brake = false;
     // In follow the leader mode, the kart should brake if they are ahead of
     // the leader (and not the leader, i.e. don't have initial position 1)
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
@@ -295,6 +317,27 @@ void SkiddingAI::handleBraking()
         return;
     }
         
+    if(m_current_track_direction!=GraphNode::DIR_STRAIGHT)
+    {
+        float max_turn_speed = 
+            m_kart->getKartProperties()
+                   ->getSpeedForTurnRadius(m_current_curve_radius);
+
+        if(m_kart->getSpeed() > 1.5f*max_turn_speed  && 
+            m_kart->getSpeed()>7.0f                  &&
+            fabsf(m_controls->m_steer) > 0.95f          )
+        {
+            m_controls->m_brake = true;
+#ifdef AI_DEBUG
+            std::cout << "BRAKING" << std::endl;
+#endif
+            return;
+        }
+        return;
+    }
+    return;
+
+
     const float MIN_SPEED = 5.0f;
     //We may brake if we are about to get out of the road, but only if the
     //kart is on top of the road, and if we won't slow down below a certain
@@ -754,6 +797,9 @@ void SkiddingAI::handleNitroAndZipper()
     // Don't use nitro when the AI has a plunger in the face!
     if(m_kart->hasViewBlockedByPlunger()) return;
     
+    // Don't use nitro if we are braking
+    if(m_controls->m_brake) return;
+
     // Don't use nitro if the kart doesn't have any or is not on ground.
     if(!m_kart->isOnGround() || m_kart->hasFinishedRace()) return;
     
@@ -1013,3 +1059,125 @@ void SkiddingAI::findCurve()
     
     m_curve_target_speed = m_kart->getCurrentMaxSpeed();
 }   // findCurve
+
+//-----------------------------------------------------------------------------
+/** Determines the direction of the track ahead of the kart: 0 indicates 
+ *  straight, +1 right turn, -1 left turn.
+ */
+int SkiddingAI::determineTrackDirection()
+{
+    const QuadGraph *qg = QuadGraph::get();
+    unsigned int succ   = m_successor_index[m_track_node];
+    unsigned int next   = qg->getNode(m_track_node).getSuccessor(succ);
+
+    unsigned int             last;
+    //qg->getNode(m_track_node).getDirectionData(succ, &dir, &last);
+    qg->getNode(next).getDirectionData(m_successor_index[next], 
+                                       &m_current_track_direction, &last);
+
+#ifdef AI_DEBUG
+    m_curve[CURVE_QG]->clear();
+    for(unsigned int i=m_track_node; i<=last; i++)
+    {
+        m_curve[CURVE_QG]->addPoint(qg->getNode(i).getCenter());
+    }
+#endif
+
+    if(m_current_track_direction!=GraphNode::DIR_STRAIGHT)
+    {
+        Vec3 center;
+        Vec3 xyz      = m_kart->getXYZ();
+        Vec3 tangent  = m_kart->getTrans()(Vec3(0,0,1)) - xyz;
+        Vec3 last_xyz = qg->getNode(last).getCenter();
+        // Ideally we would like to have a circle that:
+        // 1) goes through the kart position
+        // 2) has the current heading of the kart as tangent in that point
+        // 3) goes through the last point
+        // 4) has a tangent at the last point that faces towards the next node
+        // Unfortunately conditions 1 to 3 already fully determine the circle,
+        // i.e. it is not always possible to find an appropriate circle.
+        // Using the first three conditions is mostly a good choice (since the
+        // kart will already point towards the direction of the circle), but
+        // it can be incorrect in certain circumstances, e.g. consider the
+        // case that the kart is on the 'right' circle for curve ahead, but
+        // already facing towards the center of the circle (i.e. it is nearly
+        // 90 degrees rotated away from the driving direction). In this case 
+        // a way too large circle will be computed (going through the end
+        // point, but again neing 90 degrees wrong - 'across' the track and 
+        // not along). To handle this case we determine two circles:
+        // one using conditions 1,2,3; and a second one using 1,3,4
+        // The latter will be more appropriate for the case desrcribed above,
+        // i.e. making sure that the kart will face the right direction at
+        // the end of the curve.
+        // The turn radius is then the minimum of the two radii.
+        float radius1;
+        determineTurnRadius(xyz, tangent, last_xyz,
+                            &center, &radius1);
+#ifdef AI_DEBUG
+        m_curve[CURVE_PREDICT1]->makeCircle(center, radius1);
+#endif
+        int next_last = m_next_node_index[last];
+        Vec3 tangent_end = qg->getNode(next_last).getCenter() - last_xyz;
+        float radius2;
+        determineTurnRadius(last_xyz, tangent_end, xyz,
+                             &center, &radius2);
+#ifdef AI_DEBUG
+        m_curve[CURVE_PREDICT2]->makeCircle(center, radius2);
+#endif
+        m_current_curve_radius = std::min(radius1,radius2);
+    }
+
+    return 0;
+}   // determineTrackDirection
+
+// ----------------------------------------------------------------------------
+/** Determine the center point and radius of a circle given two points on
+ *  the ccircle and the tangent at the first point. This is done as follows:
+ *  1) Determine the line going through the center point start+end, which is 
+ *     orthogonal to the vector from start to end. This line goes through the
+ *     center of the circle.
+ *  2) Determine the line going through the first point and is orthogonal
+ *     to the given tangent.
+ *  3) The intersection of these two lines is the center of the circle.
+ *  \param start First point.
+ *  \param tangent Tangent at first point.
+ *  \param end Second point on circle.
+ *  \return center Center point of the circle.
+ *  \return radius Radius of the circle.
+ */
+void  SkiddingAI::determineTurnRadius(const Vec3 &start,
+                                      const Vec3 &tangent,
+                                      const Vec3 &end,
+                                      Vec3 *center,
+                                      float *radius)
+{
+    // 1) Line through middle of start+end
+    Vec3 mid = 0.5f*(start+end);
+    Vec3 direction = end-start;
+
+    Vec3 orthogonal(direction.getZ(), 0, -direction.getX());
+    Vec3  q1 = mid + orthogonal;
+    irr::core::line2df line1(mid.getX(), mid.getZ(),
+                             q1.getX(),  q1.getZ()  );
+
+    Vec3 ortho_tangent(tangent.getZ(), 0, -tangent.getX());
+    Vec3  q2 = start + ortho_tangent;
+    irr::core::line2df line2(start.getX(), start.getZ(),
+                             q2.getX(),    q2.getZ());
+
+
+    irr::core::vector2df result;
+    if(line1.intersectWith(line2, result, /*checkOnlySegments*/false))
+    {
+        *center = Vec3(result.X, start.getY(), result.Y);
+        *radius = (start - *center).length();
+    }
+    else
+    {
+        // No intersection. In this case assume that the two points are
+        // on a semicircle, in which case the center is at 0.5*(start+end):
+        *center = 0.5f*(start+end);
+        *radius = 0.5f*(end-start).length();
+    }
+    return;
+}   // determineTurnRadius

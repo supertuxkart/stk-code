@@ -99,6 +99,7 @@ void ShowCurve::addPoint(const Vec3 &pnt)
     if(n==0)
     {
         m_buffer->append(vertices, 4, NULL, 0);
+        m_mesh->setDirty();
         return;
     }
 
@@ -131,6 +132,7 @@ void ShowCurve::addPoint(const Vec3 &pnt)
     }
     m_buffer->recalculateBoundingBox();
     m_mesh->setBoundingBox(m_buffer->getBoundingBox());
+    m_mesh->setDirty();
 }   // addPoint
 
 // ----------------------------------------------------------------------------
@@ -140,7 +142,26 @@ void ShowCurve::clear()
     m_mesh->drop();
     addEmptyMesh();
     m_scene_node->setMesh(m_mesh);
+    m_mesh->setDirty();
 }   // clear
+
+// ----------------------------------------------------------------------------
+/** Makes this curve to show a circle with given center point and radius.
+ *  \param center Center point of the circle.
+ *  \param radius Radius of the circle.
+ */
+void ShowCurve::makeCircle(const Vec3 &center, float radius)
+{
+    clear();
+
+    const float num_segs = 40.0f;
+    float dx = 2.0f*M_PI/num_segs;
+    for(float x = 0; x <=2.0f*M_PI; x+=dx)
+    {
+        Vec3 xyz(radius*sin(x), 0.2f, radius*cos(x));
+        addPoint(xyz+center);
+    }
+}   // makeCircle
 
 // ----------------------------------------------------------------------------
 /** Sets the heading for the curve.

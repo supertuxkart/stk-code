@@ -28,6 +28,8 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
+bool AIBaseController::m_ai_debug = false;
+
 AIBaseController::AIBaseController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player) 
                 : Controller(kart, player)
@@ -52,7 +54,9 @@ AIBaseController::AIBaseController(AbstractKart *kart,
         m_all_look_aheads.clear();
         m_successor_index.clear();
     }   // if battle mode
-    setControllerName("AIBaseController");
+    // Don't call our own setControllerName, since this will add a
+    // billboard showing 'aibasecontroller' to the kar.
+    Controller::setControllerName("AIBaseController");
 }   // AIBaseController
 
 //-----------------------------------------------------------------------------
@@ -61,6 +65,21 @@ void AIBaseController::reset()
 	m_stuck_trigger_rescue = false;
 	m_collision_times.clear();
 }   // reset 
+
+//-----------------------------------------------------------------------------
+/** In debug mode when the user specified --ai-debug on the command line set 
+ *  the name of the controller as on-screen text, so that the different AI 
+ *  controllers can be distinguished.
+ *  \param name Name of the controller.
+*/
+void AIBaseController::setControllerName(const std::string &name)
+{
+#ifdef DEBUG
+    if(m_ai_debug)
+        m_kart->setOnScreenText(core::stringw(name.c_str()).c_str());
+#endif
+    Controller::setControllerName(name);
+}   // setControllerName
 
 //-----------------------------------------------------------------------------
 /** Triggers a recomputation of the path to use, so that the AI does not

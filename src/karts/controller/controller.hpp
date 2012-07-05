@@ -74,7 +74,8 @@ public:
     virtual bool  isNetworkController() const = 0;
 	// ---------------------------------------------------------------------------
     /** Sets the controller name for this controller. */
-    void setControllerName(const std::string &name) {m_controller_name = name; }
+    virtual void setControllerName(const std::string &name) 
+                                                 { m_controller_name = name; }
 	// ---------------------------------------------------------------------------
     /** Returns the name of this controller. */
     const std::string &getControllerName() const { return m_controller_name; }

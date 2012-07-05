@@ -22,10 +22,12 @@
 #define HEADER_SKIDDING_AI__HPP
 
 #include "karts/controller/ai_base_controller.hpp"
+#include "tracks/graph_node.hpp"
 
-class Track;
 class LinearWorld;
 class QuadGraph;
+class ShowCurve;
+class Track;
 
 namespace irr
 {
@@ -118,6 +120,17 @@ private:
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
 
+    /** The direction of the track where the kart is on atm. */
+    GraphNode::DirectionType m_current_track_direction;
+
+    /** The radius of the curve the kart is currently driving. Undefined
+     *  when being on a straigt section. */
+    float m_current_curve_radius;
+
+#ifdef DEBUG
+    /** For skidding debugging: shows the estimated turn shape. */
+    ShowCurve **m_curve;
+#endif
     /** For debugging purpose: a sphere indicating where the AI 
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
@@ -140,6 +153,12 @@ private:
     void  findNonCrashingPoint(Vec3 *result);
 
     void  findCurve();
+    int   determineTrackDirection();
+    void  determineTurnRadius(const Vec3 &start,
+                              const Vec3 &start_direction,
+                              const Vec3 &end,
+                              Vec3 *center,
+                              float *radius);
 protected:
     virtual unsigned int getNextSector(unsigned int index);
 

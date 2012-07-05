@@ -2234,7 +2234,10 @@ void Kart::setOnScreenText(const wchar_t *text)
 {
     core::dimension2d<u32> textsize = GUIEngine::getFont()->getDimension(text);
     scene::ISceneManager* sm = irr_driver->getSceneManager();
-    sm->addBillboardTextSceneNode(GUIEngine::getFont(),
+    // FIXME: Titlefont is the only font guaranteed to be loaded if STK
+    // is started without splash screen (since "Loading" is shown even in this
+    // case). A smaller font would be better
+    sm->addBillboardTextSceneNode(GUIEngine::getTitleFont(),
                                   text,
                                   getNode(),
                                   core::dimension2df(textsize.Width/55.0f,

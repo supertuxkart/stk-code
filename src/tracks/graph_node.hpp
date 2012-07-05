@@ -38,6 +38,12 @@ class QuadGraph;
   */
 class GraphNode 
 {
+public:    
+    /** To indiciate in which direction the track is going: 
+     *  straight, left, right. */
+    enum         DirectionType {DIR_STRAIGHT, DIR_LEFT, DIR_RIGHT};
+
+private:
     /** Index of this node in the set of quads. Several graph nodes can use
      *  the same quad, meaning it is possible to use a quad more than once,
      *  e.g. a figure 8 like track. */
@@ -98,8 +104,14 @@ class GraphNode
       *  graph nodes.  */
      PathToNodeVector  m_path_to_node;
 
-     void markAllSuccessorsToUse(unsigned int n, 
-                                 PathToNodeVector *m_path_to_node);
+     /** The direction for each of the successors. */
+     std::vector<DirectionType>  m_direction;
+     
+     /** Stores for each successor the index of the last graph node that
+      *  has the same direction (i.e. if index 0 curves left, this vector
+      *  will store the index of the last graph node that is still turning
+      *  left. */
+     std::vector<unsigned int> m_last_index_same_direction;
 
     /**
       * Sets of checklines you should have activated when you are driving on
@@ -108,6 +120,9 @@ class GraphNode
       */
     std::vector< int > m_checkline_requirements;
     
+    void markAllSuccessorsToUse(unsigned int n, 
+                                PathToNodeVector *m_path_to_node);
+
 public:
                  GraphNode(unsigned int quad_index, unsigned int node_index);
     void         addSuccessor (unsigned int to);
@@ -115,6 +130,8 @@ public:
     float        getDistance2FromPoint(const Vec3 &xyz);
     void         setupPathsToNode();
     void         setChecklineRequirements(int latest_checkline);
+    void         setDirectionData(unsigned int successor, DirectionType dir, 
+                                  unsigned int last_node_index);
     // ------------------------------------------------------------------------
     /** Returns the i-th successor node. */
     unsigned int getSuccessor(unsigned int i)  const 
@@ -196,6 +213,14 @@ public:
     /** Returns the checkline requirements of this graph node. */
     const std::vector<int>& getChecklineRequirements() const 
                                            { return m_checkline_requirements; }
+    // ------------------------------------------------------------------------
+    /** Returns the direction in which the successor n is. */
+    void getDirectionData(unsigned int succ, DirectionType *dir,
+                          unsigned int *last) const 
+    { 
+        *dir = m_direction[succ];  *last = m_last_index_same_direction[succ];
+    }
+    // ------------------------------------------------------------------------
 };   // GraphNode
 
 #endif

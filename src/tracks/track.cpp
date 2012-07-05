@@ -1417,7 +1417,7 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
         {
             std::vector<XMLNode*> subtitles;
             node->getNodes("subtitle", subtitles);
-            for (int i = 0; i < subtitles.size(); i++)
+            for (unsigned int i = 0; i < subtitles.size(); i++)
             {
                 int from = -1, to = -1;
                 std::string subtitle_text;

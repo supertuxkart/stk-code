@@ -82,6 +82,7 @@ protected:
     virtual void update      (float delta) ;
     virtual unsigned int getNextSector(unsigned int index);
     virtual void  newLap             (int lap);
+    virtual void setControllerName(const std::string &name);
     float    steerToAngle  (const unsigned int sector, const float angle);
     float    steerToPoint  (const Vec3 &point);
     float    normalizeAngle(float angle);
@@ -93,11 +94,13 @@ protected:
     *  hitting part of the track). */
     bool     isStuck() const { return m_stuck_trigger_rescue; }
 
+    static bool m_ai_debug;
 public:
              AIBaseController(AbstractKart *kart,
                               StateManager::ActivePlayer *player=NULL);
     virtual ~AIBaseController() {};
     virtual void reset();
+    static void enableDebug() {m_ai_debug = true; }
     virtual void crashed(const AbstractKart *k) {};
     virtual void crashed(const Material *m);
     virtual void handleZipper(bool play_sound) {};

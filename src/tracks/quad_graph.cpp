@@ -95,7 +95,8 @@ void QuadGraph::load(const std::string &filename)
             m_all_nodes.push_back(new GraphNode(i, m_all_nodes.size()));
         // Then set the default loop:
         setDefaultSuccessors();
-        
+        computeDirectionData();
+
         if (m_all_nodes.size() > 0)
         {
             m_lap_length = m_all_nodes[m_all_nodes.size()-1]->getDistanceFromStart()
@@ -184,6 +185,7 @@ void QuadGraph::load(const std::string &filename)
 
     setDefaultSuccessors();    
     computeDistanceFromStart(getStartNode(), 0.0f);
+    computeDirectionData();
 
     // Define the track length as the maximum at the end of a quad
     // (i.e. distance_from_start + length till successor 0).
@@ -211,6 +213,8 @@ unsigned int QuadGraph::getStartNode() const
 }   // getStartNode
 
 // ----------------------------------------------------------------------------
+/** Sets the checkline requirements for all nodes in the graph.
+ */
 void QuadGraph::computeChecklineRequirements()
 {
     computeChecklineRequirements(m_all_nodes[0], 
@@ -640,6 +644,109 @@ void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta)
         }
     }
 }   // updateDistancesForAllSuccessors
+
+//-----------------------------------------------------------------------------
+/** Computes the direction (striaght, left, right) of all graph nodes and the
+ *  lastest graph node that is still turning in the given direction. For 
+ *  example, if a successor to this graph node is turning left, it will compute
+ *  the last graph node that is still turning left. This data is used by the
+ *  AI to estimate the turn radius.
+ *  At this stage there is one restriction: if a node with more than one
+ *  successor is ahead, only successor 0 is used. That might lead to somewhat
+ *  incorrect results (i.e. the last successor is determined assuming that 
+ *  the kart is always using successor 0, while in reality it might follow
+ *  a different successor, resulting in a different turn radius. It is not
+ *  expected that this makes much difference for the AI (since it will update
+ *  its data constantly, i.e. if it takes a different turn, it will be using
+ *  the new data).
+ */
+void QuadGraph::computeDirectionData()
+{
+    for(unsigned int i=0; i<m_all_nodes.size(); i++)
+    {
+        for(unsigned int succ_index=0; 
+            succ_index<m_all_nodes[i]->getNumberOfSuccessors();
+            succ_index++)
+        {
+            determineDirection(i, succ_index);
+        }   // for next < getNumberOfSuccessor
+
+    }   // for i < m_all_nodes.size()
+}   // computeDirectionData
+
+//-----------------------------------------------------------------------------
+/** Adjust the given angle to be in [-PI, PI].
+ */
+float QuadGraph::normalizeAngle(float f)
+{
+    if(f>M_PI)       f -= 2*M_PI;
+    else if(f<-M_PI) f += 2*M_PI;
+    return f;
+}   // normalizeAngle
+//-----------------------------------------------------------------------------
+/** Determines the direction of the quad graph when driving to the specified
+ *  successor. It also determines the last graph node that is still following
+ *  the given direction. The computed data is saved in the corresponding
+ *  graph node.
+ *  It compares the lines connecting the center point of node n with n+1 and
+ *  the lines connecting n+1 and n+2 (where n is the current node, and +1 etc.
+ *  specifying the successor). Then it keeps on testing the line from n+2 to
+ *  n+3, n+3 to n+4, ... as long as the turn direction is the same. The last
+ *  value that still has the same direction is then set as the last node 
+ *  with the same direction in the specified graph node.
+ *  \param current Index of the graph node with which to start ('n' in the
+ *                 description above).
+ *  \param succ_index The successor to be followed from the current node.
+ *                    If there should be any other branches later, successor
+ *                    0 will always be tetsed.
+ */
+void QuadGraph::determineDirection(unsigned int current, 
+                                   unsigned int succ_index)
+{
+    // The maximum angle which is still considered to be straight
+    const float max_straight_angle=0.1f;
+if(current==28)
+printf("");
+    // Compute the angle from n (=current) to n+1 (=next)
+    float angle_current = getAngleToNext(current, succ_index);
+    unsigned int next   = getNode(current).getSuccessor(succ_index);
+    float angle_next    = getAngleToNext(next, 0);
+    float rel_angle     = normalizeAngle(angle_next-angle_current);
+    // Small angles are considered to be straight
+    if(fabsf(rel_angle)<max_straight_angle)
+        rel_angle = 0;
+
+    int prev = next;                           // is now n+1
+    next     = getNode(next).getSuccessor(0);  // next is now n+2
+
+    while(1)
+    {
+        // Now compute the angle from n+1 (new current) to n+2 (new next)
+        angle_current = angle_next;
+        angle_next    = getAngleToNext(next, 0);
+        float new_rel_angle = normalizeAngle(angle_next - angle_current);
+        if(fabsf(new_rel_angle)<max_straight_angle)
+            new_rel_angle = 0;
+        // We have reached a different direction if we go from a non-straight
+        // section to a straight one, from a straight section to a non-
+        // straight section, or from a left to a right turn (or vice versa)
+        if( (rel_angle != 0 && new_rel_angle == 0 ) ||
+            (rel_angle == 0 && new_rel_angle != 0 ) ||
+            (rel_angle * new_rel_angle < 0        )     )
+            break;
+        rel_angle = new_rel_angle;
+
+        prev = next;
+        next = getNode(next).getSuccessor(0);
+    }    // while(1)
+
+    GraphNode::DirectionType dir = 
+        rel_angle==0 ? GraphNode::DIR_STRAIGHT
+                     : (rel_angle>0) ? GraphNode::DIR_RIGHT 
+                                     : GraphNode::DIR_LEFT;
+    m_all_nodes[current]->setDirectionData(succ_index, dir, next);
+}   // determineDirection
+
 
 //-----------------------------------------------------------------------------
 /** This function takes absolute coordinates (coordinates in OpenGL

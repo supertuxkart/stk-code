@@ -68,6 +68,7 @@ public:
                    const irr::video::SColor &color = video::SColor(77, 0, 179, 0));
         ~ShowCurve();
     void addPoint(const Vec3 &pnt);
+    void makeCircle(const Vec3 &center, float radius);
     void update(float dt);
     void setVisible(bool v);
     bool isVisible() const;

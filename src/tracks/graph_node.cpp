@@ -159,6 +159,19 @@ void GraphNode::markAllSuccessorsToUse(unsigned int n,
 }   // markAllSuccesorsToUse
 
 // ----------------------------------------------------------------------------
+void GraphNode::setDirectionData(unsigned int successor, DirectionType dir, 
+                                 unsigned int last_node_index)
+{
+    if(m_direction.size()<successor+1)
+    {
+        m_direction.resize(successor+1);
+        m_last_index_same_direction.resize(successor+1);
+    }
+    m_direction[successor]                 = dir;
+    m_last_index_same_direction[successor] = last_node_index;
+}   // setDirectionData
+
+// ----------------------------------------------------------------------------
 /** Returns the distance a point has from this quad in forward and sidewards
  *  direction, i.e. how far forwards the point is from the beginning of the 
  *  quad, and how far to the side from the line connecting the center points

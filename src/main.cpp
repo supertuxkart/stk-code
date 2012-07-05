@@ -164,6 +164,7 @@
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
+#include "karts/controller/ai_base_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/demo_world.hpp"
@@ -388,7 +389,7 @@ void cmdLineHelp (char* invocation)
                               "as --gfx).\n"
     "       --camera-style=n   Flexible (0) or hard like v0.6 (1) kart-camera "
                               "link.\n"
-    "       --profile-laps=n   Enable automatic driven profile mode for n "
+    "       -=n   Enable automatic driven profile mode for n "
                               "laps.\n"
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
@@ -662,6 +663,10 @@ int handleCmdLine(int argc, char **argv)
         else if(!strcmp(argv[i], "--rendering-debug"))
         {
             UserConfigParams::m_rendering_debug=true;
+        }
+        else if(!strcmp(argv[i], "--ai-debug"))
+        {
+            AIBaseController::enableDebug();
         }
         else if(sscanf(argv[i], "--server=%d",&n)==1)
         {
