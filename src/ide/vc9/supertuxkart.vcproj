@@ -1265,6 +1265,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\states_screens\cutscene_gui.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\feature_unlocked.cpp"
 					>
 				</File>
@@ -2448,6 +2452,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\credits.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\cutscene_gui.hpp"
 					>
 				</File>
 				<File
