@@ -705,8 +705,7 @@ void QuadGraph::determineDirection(unsigned int current,
 {
     // The maximum angle which is still considered to be straight
     const float max_straight_angle=0.1f;
-if(current==28)
-printf("");
+
     // Compute the angle from n (=current) to n+1 (=next)
     float angle_current = getAngleToNext(current, succ_index);
     unsigned int next   = getNode(current).getSuccessor(succ_index);
