@@ -389,7 +389,7 @@ void cmdLineHelp (char* invocation)
                               "as --gfx).\n"
     "       --camera-style=n   Flexible (0) or hard like v0.6 (1) kart-camera "
                               "link.\n"
-    "       -=n   Enable automatic driven profile mode for n "
+    "       --profile-laps=n   Enable automatic driven profile mode for n "
                               "laps.\n"
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
