@@ -479,7 +479,7 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
         }
     }
     
-    // if we reached a filler item, move again (but don't warp)
+    // if we reached a filler item, move again (but don't wrap)
     if (getSelectionIDString(playerID) == RibbonWidget::NO_ITEM_ID) 
     {
         if (m_selection[playerID] + 1 < m_children.size())
@@ -519,7 +519,7 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
         }
     }
     
-    // if we reached a filler item, move again (but don't warp)
+    // if we reached a filler item, move again (but don't wrap)
     if (getSelectionIDString(playerID) == RibbonWidget::NO_ITEM_ID) 
     {
         if (m_selection[playerID] > 0) leftPressed(playerID);

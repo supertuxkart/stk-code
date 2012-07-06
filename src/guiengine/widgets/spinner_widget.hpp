@@ -69,8 +69,8 @@ namespace GUIEngine
           */
         bool m_gauge;
         
-        /** \brief Whether to warp back to the first value when going "beyond" the last value */
-        bool m_warp_around;
+        /** \brief Whether to wrap back to the first value when going "beyond" the last value */
+        bool m_wrap_around;
         
         /** \brief implementing method from base class Widget */
         virtual EventPropagation transmitEvent(Widget* w, 

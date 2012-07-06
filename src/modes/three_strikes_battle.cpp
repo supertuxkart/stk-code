@@ -367,7 +367,7 @@ bool ThreeStrikesBattle::isRaceOver()
  */
 void ThreeStrikesBattle::terminateRace()
 {
-    updateKartRanks();   
+    updateKartRanks();
     WorldWithRank::terminateRace();
 }   // terminateRace
 

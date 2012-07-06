@@ -315,7 +315,7 @@ public:
         m_player_ident_spinner->m_properties[PROP_MAX_VALUE] = 
                                          StringUtils::toString(playerAmount-1);
         m_player_ident_spinner->m_properties[PROP_ID] = spinnerID;
-        m_player_ident_spinner->m_properties[PROP_WARP_AROUND] = "true";
+        m_player_ident_spinner->m_properties[PROP_WRAP_AROUND] = "true";
 
         //m_player_ident_spinner->m_event_handler = this;
         m_children.push_back(m_player_ident_spinner);

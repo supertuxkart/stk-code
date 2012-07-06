@@ -215,7 +215,7 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 READ_PROPERTY(extend_label,   PROP_EXTEND_LABEL);
                 READ_PROPERTY(label_location, PROP_LABELS_LOCATION);
                 READ_PROPERTY(max_rows,       PROP_MAX_ROWS);
-                READ_PROPERTY(warp_around,    PROP_WARP_AROUND);
+                READ_PROPERTY(wrap_around,    PROP_WRAP_AROUND);
 #undef READ_PROPERTY
                 
                 const wchar_t* text = xml->getAttributeValue( L"text" );

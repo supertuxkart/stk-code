@@ -57,7 +57,7 @@
   
   <spacer width="1" height="5%"/>
   
-  <spinner id="lapcountspinner" width="50%" min_value="1" max_value="20" align="center" warp_around="true"
+  <spinner id="lapcountspinner" width="50%" min_value="1" max_value="20" align="center" wrap_around="true"
         I18N="In the track setup screen (number of laps choice, where %i is the number)" text="%i laps"/>
   
   <spacer width="1" height="5%"/>

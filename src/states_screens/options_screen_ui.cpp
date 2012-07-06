@@ -63,7 +63,7 @@ void OptionsScreenUI::loadedFromFile()
     GUIEngine::SpinnerWidget* skinSelector = getWidget<GUIEngine::SpinnerWidget>("skinchoice");
     assert( skinSelector != NULL );
     
-    skinSelector->m_properties[PROP_WARP_AROUND] = "true";
+    skinSelector->m_properties[PROP_WRAP_AROUND] = "true";
     
     m_skins.clear();
     skinSelector->clearLabels();

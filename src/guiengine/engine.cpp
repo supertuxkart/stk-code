@@ -473,8 +473,8 @@ namespace GUIEngine
  this ribbon can have.
  
  \n
- \subsection prop18 PROP_WARP_AROUND
- <em> Name in XML files: </em> \c "warp_around" 
+ \subsection prop18 PROP_WRAP_AROUND
+ <em> Name in XML files: </em> \c "wrap_around" 
  
  Currently used for spinners only. Value can be "true" or "false"
  

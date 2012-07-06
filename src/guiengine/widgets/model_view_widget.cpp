@@ -110,7 +110,7 @@ void ModelViewWidget::update(float delta)
     else if (m_rotation_mode == ROTATE_TO)
     {
         // check if we should rotate clockwise or counter-clockwise to reach the target faster
-        // (taking warp-arounds into account)
+        // (taking wrap-arounds into account)
         const int angle_distance_from_end  = (int)(360 - angle);
         const int target_distance_from_end = (int)(360 - angle);
 

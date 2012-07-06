@@ -13,7 +13,7 @@
         <!--
         <spinner id="aikartamount" proportion="3" height="100%" min_value="0" max_value="8" icon="gui/karts%i.png"/> -->
         <!-- The maximum is set by stk from data/stk_config.xml. -->
-        <spinner id="aikartamount" proportion="1" height="100%" min_value="0" warp_around="true"/>
+        <spinner id="aikartamount" proportion="1" height="100%" min_value="0" wrap_around="true"/>
     </div>
     
     <spacer proportion="1" width="25"/>

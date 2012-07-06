@@ -436,7 +436,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     {    
         if (NAVIGATION_DEBUG)
         {
-            std::cout << "EventHandler::navigateUp : warp around, selecting the last widget\n";
+            std::cout << "EventHandler::navigateUp : wrap around, selecting the last widget\n";
         }
         
         // select the last widget
@@ -560,7 +560,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     if (!found)
     {
 
-        if (NAVIGATION_DEBUG) std::cout << "Navigating down : warp around\n";
+        if (NAVIGATION_DEBUG) std::cout << "Navigating down : wrap around\n";
         
         // select the first widget
         Widget* firstWidget = NULL;

@@ -63,7 +63,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     // ---- GP Name
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
     IGUIStaticText* title = GUIEngine::getGUIEnv()->addStaticText( translations->fribidize(gp->getName()),
-                                                               area_top, false, true, // border, word warp
+                                                               area_top, false, true, // border, word wrap
                                                                m_irrlicht_window);
     title->setTabStop(false);
     title->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
@@ -108,7 +108,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         widget->add();
         
         // IGUIStaticText* line = GUIEngine::getGUIEnv()->addStaticText( lineText.c_str(),
-        //                                       entry_area, false , true , // border, word warp
+        //                                       entry_area, false , true , // border, word wrap
         //                                       m_irrlicht_window);
     }
   

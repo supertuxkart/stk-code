@@ -58,7 +58,7 @@ void SpinnerWidget::add()
     std::string min_s = m_properties[PROP_MIN_VALUE];
     std::string max_s = m_properties[PROP_MAX_VALUE];
     
-    m_warp_around = (m_properties[PROP_WARP_AROUND] == "true");
+    m_wrap_around = (m_properties[PROP_WRAP_AROUND] == "true");
     
     if (min_s.size() > 0)
     {
@@ -244,7 +244,7 @@ EventPropagation SpinnerWidget::rightPressed(const int playerID)
     {
         setValue(m_value+1);
     }
-    else if (m_warp_around)
+    else if (m_wrap_around)
     {
         setValue(m_min);
     }
@@ -266,7 +266,7 @@ EventPropagation SpinnerWidget::leftPressed(const int playerID)
     {
         setValue(m_value-1);
     }
-    else if (m_warp_around)
+    else if (m_wrap_around)
     {
         setValue(m_max);
     }
