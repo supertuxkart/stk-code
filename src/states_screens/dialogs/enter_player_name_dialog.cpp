@@ -20,6 +20,8 @@
 #include <IGUIEnvironment.h>
 
 #include "audio/sfx_manager.hpp"
+#include "challenges/unlock_manager.hpp"
+#include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -96,7 +98,7 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
         return;
     }
 
-    // ---- Otherwise, accept entered name
+    // ---- Otherwise, see if we can accept the new name
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     stringw playerName = textCtrl->getText().trim();
     const int size = playerName.size();
@@ -127,7 +129,11 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
             }
         }
 
+        // Finally, add the new player.
         UserConfigParams::m_all_players.push_back( new PlayerProfile(playerName) );
+        bool created = unlock_manager->createSlotsIfNeeded();
+        if (created) unlock_manager->save();
+        user_config->saveConfig();
 
         // It's unsafe to delete from inside the event handler so we do it
         // in onUpdate (which checks for m_self_destroy)

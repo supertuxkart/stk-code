@@ -147,7 +147,6 @@ void StoryModeLobbyScreen::unloaded()
 
 void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& newName)
 {
-    
     bool slot_found = false;
     
     PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;

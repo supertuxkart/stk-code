@@ -67,7 +67,7 @@ void OptionsScreenPlayers::init()
 
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
     if (tabBar != NULL) tabBar->select( "tab_players", PLAYER_ID_GAME_MASTER );
-    
+ 
     tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
     tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
     tabBar->getRibbonChildren()[2].setTooltip( _("User Interface") );
@@ -131,7 +131,7 @@ void OptionsScreenPlayers::onNewPlayerWithName(const stringw& newName)
 void OptionsScreenPlayers::deletePlayer(PlayerProfile* player)
 {
     UserConfigParams::m_all_players.erase(player);
-    
+ 
     refreshPlayerList();
 }   // deletePlayer
 
@@ -153,7 +153,7 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
     if (name == "options_choice")
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
-        
+ 
         if (selection == "tab_audio") StateManager::get()->replaceTopMostScreen(OptionsScreenAudio::getInstance());
         else if (selection == "tab_video") StateManager::get()->replaceTopMostScreen(OptionsScreenVideo::getInstance());
         else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
@@ -173,7 +173,7 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
         // Find which player in the list was clicked
         ListWidget* players = this->getWidget<ListWidget>("players");
         assert(players != NULL);
-        
+ 
         core::stringw selectedPlayer = players->getSelectionLabel();
         const int playerAmount = UserConfigParams::m_all_players.size();
         for (int n=0; n<playerAmount; n++)
@@ -193,7 +193,7 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
         UserConfigParams::m_default_player = L"";
         StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
     }
-    
+ 
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
@@ -203,7 +203,7 @@ void OptionsScreenPlayers::selectPlayer(const irr::core::stringw& name)
     ListWidget* players = this->getWidget<ListWidget>("players");
     assert(players != NULL);
     players->selectItemWithLabel(name);
-    
+ 
     players->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }
 

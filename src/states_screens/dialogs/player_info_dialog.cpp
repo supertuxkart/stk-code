@@ -37,7 +37,7 @@ using namespace GUIEngine;
 using namespace irr::gui;
 using namespace irr::core;
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 PlayerInfoDialog::PlayerInfoDialog(PlayerProfile* player, const float w, const float h) : ModalDialog(w, h)
 {
@@ -46,7 +46,7 @@ PlayerInfoDialog::PlayerInfoDialog(PlayerProfile* player, const float w, const f
     showRegularDialog();
 }
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 PlayerInfoDialog::~PlayerInfoDialog()
 {
@@ -56,7 +56,7 @@ PlayerInfoDialog::~PlayerInfoDialog()
     }
 }
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 void PlayerInfoDialog::showRegularDialog()
 {
     clearWindow();
@@ -139,7 +139,7 @@ void PlayerInfoDialog::showRegularDialog()
     textCtrl->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
 }
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void PlayerInfoDialog::showConfirmDialog()
 {
@@ -162,8 +162,9 @@ void PlayerInfoDialog::showConfirmDialog()
 
     core::rect< s32 > area_left(5, 0, m_area.getWidth()-5, m_area.getHeight()/2);
 
-    // When there is no need to tab through / click on images/labels, we can add directly
-    // irrlicht labels (more complicated uses require the use of our widget set)
+    // When there is no need to tab through / click on images/labels,
+    // we can add irrlicht labels directly
+    // (more complicated uses require the use of our widget set)
     IGUIStaticText* a = GUIEngine::getGUIEnv()->addStaticText( message.c_str(),
                                               area_left, false /* border */, true /* word wrap */,
                                               m_irrlicht_window);
@@ -212,13 +213,13 @@ void PlayerInfoDialog::showConfirmDialog()
 
 }
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void PlayerInfoDialog::onEnterPressedInternal()
 {
 }
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& eventSource)
 {
@@ -291,5 +292,5 @@ GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& ev
     return GUIEngine::EVENT_LET;
 }
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
