@@ -82,14 +82,14 @@ RaceGUIBase::RaceGUIBase()
     m_gauge_empty           = irr_driver->getTexture(guid+"gauge_empty.png");
     m_gauge_goal            = irr_driver->getTexture(guid+"gauge_goal.png" );
 
-    m_dist_show_overlap = 2;
-    m_icons_inertia     = 2;
+    m_dist_show_overlap     = 2;
+    m_icons_inertia         = 2;
     
     
     //I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-    m_string_top        = _("Top %i");
+    m_string_top            = _("Top %i");
     
-    m_referee           = NULL;
+    m_referee               = NULL;
 }   // RaceGUIBase
 
 // ----------------------------------------------------------------------------
