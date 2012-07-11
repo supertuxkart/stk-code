@@ -153,7 +153,7 @@ private:
     void  findNonCrashingPoint(Vec3 *result);
 
     void  findCurve();
-    int   determineTrackDirection();
+    void  determineTrackDirection();
     void  determineTurnRadius(const Vec3 &start,
                               const Vec3 &start_direction,
                               const Vec3 &end,

@@ -21,7 +21,7 @@
 
 //The AI debugging works best with just 1 AI kart, so set the number of karts
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
-#undef AI_DEBUG
+#define AI_DEBUG
 
 #include "karts/controller/skidding_ai.hpp"
 
@@ -313,95 +313,59 @@ void SkiddingAI::handleBraking()
         m_kart->getPosition() < m_world->getKart(0)->getPosition()           &&
         m_kart->getInitialPosition()>1                                         )
     {
+#ifdef DEBUG
+    if(m_ai_debug)
+        printf("[AI] braking: %s ahead of leader.\n", 
+               m_kart->getIdent().c_str());
+#endif
+
         m_controls->m_brake = true;
         return;
     }
-        
-    if(m_current_track_direction!=GraphNode::DIR_STRAIGHT)
+    
+    // A kart will not brake when the speed is already slower than this 
+    // value. This prevents a kart from going too slow (or even backwards)
+    // in tight curves.
+    const float MIN_SPEED = 5.0f;
+
+    // If the kart is not facing roughly in the direction of the track, brake
+    // so that it is easier for the kart to turn in the right direction.
+    if(m_current_track_direction==GraphNode::DIR_UNDEFINED &&
+        m_kart->getSpeed() > MIN_SPEED)
+    {
+#ifdef DEBUG
+    if(m_ai_debug)
+        printf("[AI] braking: %s not aligned with track.\n",
+               m_kart->getIdent().c_str());
+#endif
+        m_controls->m_brake = true;
+        return;
+    }
+    if(m_current_track_direction==GraphNode::DIR_LEFT ||
+       m_current_track_direction==GraphNode::DIR_RIGHT   )
     {
         float max_turn_speed = 
             m_kart->getKartProperties()
                    ->getSpeedForTurnRadius(m_current_curve_radius);
 
         if(m_kart->getSpeed() > 1.5f*max_turn_speed  && 
-            m_kart->getSpeed()>7.0f                  &&
+            m_kart->getSpeed()>MIN_SPEED             &&
             fabsf(m_controls->m_steer) > 0.95f          )
         {
             m_controls->m_brake = true;
-#ifdef AI_DEBUG
-            std::cout << "BRAKING" << std::endl;
+#ifdef DEBUG
+            if(m_ai_debug)
+                printf("[AI] braking: %s too tight curve: radius %f "
+                       "speed %f.\n",
+                       m_kart->getIdent().c_str(),
+                       m_current_curve_radius, m_kart->getSpeed() );
 #endif
-            return;
         }
         return;
     }
+
     return;
 
-
-    const float MIN_SPEED = 5.0f;
-    //We may brake if we are about to get out of the road, but only if the
-    //kart is on top of the road, and if we won't slow down below a certain
-    //limit.
-    if (m_crashes.m_road && m_kart->getVelocityLC().getZ() > MIN_SPEED && 
-        m_world->isOnRoad(m_kart->getWorldKartId()) )
-    {
-        float kart_ang_diff = 
-            QuadGraph::get()->getAngleToNext(m_track_node,
-                                         m_successor_index[m_track_node])
-          - m_kart->getHeading();
-        kart_ang_diff = normalizeAngle(kart_ang_diff);
-        kart_ang_diff = fabsf(kart_ang_diff);
-
-        // FIXME: The original min_track_angle value of 20 degrees
-        // resulted in way too much braking. Is this test
-        // actually necessary at all???
-        const float MIN_TRACK_ANGLE = DEGREE_TO_RAD*60.0f;
-        const float CURVE_INSIDE_PERC = 0.25f;
-
-        //Brake only if the road does not goes somewhat straight.
-        if(m_curve_angle > MIN_TRACK_ANGLE) //Next curve is left
-        {
-            //Avoid braking if the kart is in the inside of the curve, but
-            //if the curve angle is bigger than what the kart can steer, brake
-            //even if we are in the inside, because the kart would be 'thrown'
-            //out of the curve.
-            if(!(m_world->getDistanceToCenterForKart(m_kart->getWorldKartId()) 
-                 > QuadGraph::get()->getNode(m_track_node).getPathWidth() *
-                 -CURVE_INSIDE_PERC || 
-                 m_curve_angle > RAD_TO_DEGREE*m_kart->getMaxSteerAngle()) )
-            {
-                m_controls->m_brake = false;
-                return;
-            }
-        }
-        else if( m_curve_angle < -MIN_TRACK_ANGLE ) //Next curve is right
-        {
-            if(!(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ) 
-                < QuadGraph::get()->getNode(m_track_node).getPathWidth() *
-                 CURVE_INSIDE_PERC ||
-                 m_curve_angle < -RAD_TO_DEGREE*m_kart->getMaxSteerAngle()))
-            {
-                m_controls->m_brake = false;
-                return;
-            }
-        }
-
-        //Brake if the kart's speed is bigger than the speed we need
-        //to go through the curve at the widest angle, or if the kart
-        //is not going straight in relation to the road.
-        if(m_kart->getVelocityLC().getZ() > m_curve_target_speed ||
-           kart_ang_diff          > MIN_TRACK_ANGLE         )
-        {
-#ifdef AI_DEBUG
-        std::cout << "BRAKING" << std::endl;
-#endif
-            m_controls->m_brake = true;
-            return;
-        }
-
-    }
-
-    m_controls->m_brake = false;
 }   // handleBraking
 
 //-----------------------------------------------------------------------------
@@ -1064,10 +1028,31 @@ void SkiddingAI::findCurve()
 /** Determines the direction of the track ahead of the kart: 0 indicates 
  *  straight, +1 right turn, -1 left turn.
  */
-int SkiddingAI::determineTrackDirection()
+void SkiddingAI::determineTrackDirection()
 {
     const QuadGraph *qg = QuadGraph::get();
     unsigned int succ   = m_successor_index[m_track_node];
+    float angle_to_track = qg->getNode(m_track_node).getAngleToSuccessor(succ)
+                         - m_kart->getHeading();
+    angle_to_track = normalizeAngle(angle_to_track);
+
+    // In certain circumstances (esp. S curves) it is possible that the
+    // kart is not facing in the direction of the track. In this case
+    // determining the curve radius based on the direction the kart is
+    // facing results in very incorrect results (example: if the kart is
+    // in a tight curve, but already facing towards the last point of the
+    // curve - in this case a huge curve radius will be computes (since
+    // the kart is nearly going straight), while in fact the kart would
+    // go across the circle and not along, bumping into the track).
+    // To avoid this we set the direction to undefined in this case,
+    // which causes the kart to brake (which will allow the kart to
+    // quicker be aligned with the track again).
+    if(fabsf(angle_to_track) > 0.22222f * M_PI)
+    {
+        m_current_track_direction = GraphNode::DIR_UNDEFINED;
+        return;
+    }
+
     unsigned int next   = qg->getNode(m_track_node).getSuccessor(succ);
 
     unsigned int             last;
@@ -1083,12 +1068,9 @@ int SkiddingAI::determineTrackDirection()
     }
 #endif
 
-    if(m_current_track_direction!=GraphNode::DIR_STRAIGHT)
+    if(m_current_track_direction==GraphNode::DIR_LEFT  ||
+       m_current_track_direction==GraphNode::DIR_RIGHT   )
     {
-        Vec3 center;
-        Vec3 xyz      = m_kart->getXYZ();
-        Vec3 tangent  = m_kart->getTrans()(Vec3(0,0,1)) - xyz;
-        Vec3 last_xyz = qg->getNode(last).getCenter();
         // Ideally we would like to have a circle that:
         // 1) goes through the kart position
         // 2) has the current heading of the kart as tangent in that point
@@ -1097,37 +1079,40 @@ int SkiddingAI::determineTrackDirection()
         // Unfortunately conditions 1 to 3 already fully determine the circle,
         // i.e. it is not always possible to find an appropriate circle.
         // Using the first three conditions is mostly a good choice (since the
-        // kart will already point towards the direction of the circle), but
-        // it can be incorrect in certain circumstances, e.g. consider the
-        // case that the kart is on the 'right' circle for curve ahead, but
-        // already facing towards the center of the circle (i.e. it is nearly
-        // 90 degrees rotated away from the driving direction). In this case 
-        // a way too large circle will be computed (going through the end
-        // point, but again neing 90 degrees wrong - 'across' the track and 
-        // not along). To handle this case we determine two circles:
-        // one using conditions 1,2,3; and a second one using 1,3,4
-        // The latter will be more appropriate for the case desrcribed above,
-        // i.e. making sure that the kart will face the right direction at
-        // the end of the curve.
-        // The turn radius is then the minimum of the two radii.
-        float radius1;
-        determineTurnRadius(xyz, tangent, last_xyz,
-                            &center, &radius1);
-#ifdef AI_DEBUG
-        m_curve[CURVE_PREDICT1]->makeCircle(center, radius1);
-#endif
-        int next_last = m_next_node_index[last];
-        Vec3 tangent_end = qg->getNode(next_last).getCenter() - last_xyz;
-        float radius2;
-        determineTurnRadius(last_xyz, tangent_end, xyz,
-                             &center, &radius2);
-#ifdef AI_DEBUG
-        m_curve[CURVE_PREDICT2]->makeCircle(center, radius2);
-#endif
-        m_current_curve_radius = std::min(radius1,radius2);
-    }
+        // kart will already point towards the direction of the circle), and
+        // the case that the kart is facing wrong was already tested for above
 
-    return 0;
+        Vec3 center;
+        Vec3 xyz      = m_kart->getXYZ();
+        Vec3 tangent  = m_kart->getTrans()(Vec3(0,0,1)) - xyz;
+        Vec3 last_xyz = qg->getNode(last).getCenter();
+
+        determineTurnRadius(xyz, tangent, last_xyz,
+                            &center, &m_current_curve_radius);
+#ifdef AI_DEBUG
+        m_curve[CURVE_PREDICT1]->makeCircle(center, m_current_curve_radius);
+        m_curve[CURVE_PREDICT1]->addPoint(last_xyz);
+        m_curve[CURVE_PREDICT1]->addPoint(center);
+        m_curve[CURVE_PREDICT1]->addPoint(xyz);
+#endif
+
+        // Estimate how long it takes to finish the curve
+        Vec3 diff_kart = xyz      - center;
+        Vec3 diff_last = last_xyz - center;
+        float angle_kart = atan2(diff_kart.getX(), diff_kart.getZ());
+        float angle_last = atan2(diff_last.getX(), diff_last.getZ());
+        float angle = m_current_track_direction == GraphNode::DIR_RIGHT
+                    ? angle_last - angle_kart
+                    : angle_kart - angle_last;
+        angle = normalizeAngle(angle);
+        float length = m_current_curve_radius*angle;
+        float duration = length / m_kart->getSpeed();
+        //printf("Radius %f angle %f length %f dur %f\n",
+        //    m_current_curve_radius, angle*180.0/3.1415,
+        //    length, duration);
+    }   
+
+    return;
 }   // determineTrackDirection
 
 // ----------------------------------------------------------------------------

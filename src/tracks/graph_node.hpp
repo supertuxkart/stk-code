@@ -40,8 +40,10 @@ class GraphNode
 {
 public:    
     /** To indiciate in which direction the track is going: 
-     *  straight, left, right. */
-    enum         DirectionType {DIR_STRAIGHT, DIR_LEFT, DIR_RIGHT};
+     *  straight, left, right. The undefined direction is used by the
+     *  AI only. */
+    enum         DirectionType {DIR_STRAIGHT, DIR_LEFT, DIR_RIGHT,
+                                DIR_UNDEFINED};
 
 private:
     /** Index of this node in the set of quads. Several graph nodes can use
