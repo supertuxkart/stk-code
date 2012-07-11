@@ -365,6 +365,7 @@ void cmdLineHelp (char* invocation)
     "       --list-karts       Show available karts.\n"
     "       --laps N           Define number of laps to N.\n"
     "       --mode N           N=1 novice, N=2 driver, N=3 racer.\n"
+    "       --type N           N=0 Normal, N=1 Time trial, N=2 FTL\n"
     "       --reverse          Play track in reverse (if allowed)\n"
     // TODO: add back "--players" switch
     // "       --players n      Define number of players to between 1 and 4.\n"
@@ -779,6 +780,24 @@ int handleCmdLine(int argc, char **argv)
             case 3:
                 race_manager->setDifficulty(RaceManager::RD_HARD);
                 break;
+            }
+            i++;
+        }
+        else if( (!strcmp(argv[i], "--type") && i+1<argc ))
+        {
+            switch (atoi(argv[i+1]))
+            {
+            case 0: race_manager
+                        ->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+                    break;
+            case 1: race_manager
+                        ->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+                    break;
+            case 2: race_manager
+                        ->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
+                    break;
+            default:
+                printf("Invalid race type '%d' - ignored.\n", atoi(argv[i+1]));
             }
             i++;
         }
@@ -1412,7 +1431,6 @@ int main(int argc, char *argv[] )
             // Profiling
             // =========
             race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-            race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
             race_manager->setDifficulty(RaceManager::RD_HARD);
             network_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
