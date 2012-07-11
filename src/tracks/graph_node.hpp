@@ -53,12 +53,10 @@ private:
     unsigned int       m_node_index;
 
     /** The list of successor graph nodes. */
-    std::vector<int>   m_successor_node;
+    std::vector<int>   m_successor_nodes;
 
-    /** The first predecessor. This is used in moving karts after a rescue.
-     *  For this a node on the main driveline will be used (i.e. the first
-     *  reported node which has this node as a successor). */
-    int                m_predecessor;
+    /** The list of predecessors of a node. */
+    std::vector<int>   m_predecessor_nodes;
 
     /** The distance to each of the successors. */
     std::vector<float> m_distance_to_next;
@@ -133,13 +131,22 @@ public:
     void         setDirectionData(unsigned int successor, DirectionType dir, 
                                   unsigned int last_node_index);
     // ------------------------------------------------------------------------
-    /** Returns the i-th successor node. */
-    unsigned int getSuccessor(unsigned int i)  const 
-                               { return m_successor_node[i];                  }
-    // ------------------------------------------------------------------------
     /** Returns the number of successors. */
     unsigned int getNumberOfSuccessors() const 
-                              { return (unsigned int)m_successor_node.size(); }
+                             { return (unsigned int)m_successor_nodes.size(); }
+    // ------------------------------------------------------------------------
+    /** Returns the i-th successor node. */
+    unsigned int getSuccessor(unsigned int i)  const 
+                               { return m_successor_nodes[i];                 }
+    // ------------------------------------------------------------------------
+    /** Returns the number of predecessors. */
+    unsigned int getNumberOfPredecessors() const
+                           { return (unsigned int)m_predecessor_nodes.size(); }
+    // ------------------------------------------------------------------------
+    /** Returns a predecessor for this node. Note that the first predecessor 
+     *  is the most 'natural' one, i.e. the one on the main driveline.
+     */
+    int getPredecessor(unsigned int i) const {return m_predecessor_nodes[i]; }
     // ------------------------------------------------------------------------
     /** Returns the quad_index in the quad_set of this node. */
     int          getIndex() const { return m_quad_index;                }
@@ -193,11 +200,8 @@ public:
      *  \param index Index of the successor. */
     bool        ignoreSuccessorForAI(unsigned int i) const
     {
-        return QuadSet::get()->getQuad(m_successor_node[i]).letAIIgnore();
+        return QuadSet::get()->getQuad(m_successor_nodes[i]).letAIIgnore();
     };
-    // ------------------------------------------------------------------------
-    /** Returns a predecessor for this node. */
-    int getPredecessor() const {return m_predecessor; }
     // ------------------------------------------------------------------------
     /** Returns which successor node to use in order to be able to reach the
      *  given node n.

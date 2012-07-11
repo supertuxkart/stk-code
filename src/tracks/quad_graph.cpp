@@ -324,8 +324,9 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
                                          float upwards_distance) const
 {
     // We start just before the start node (which will trigger lap
-    // counting when reached).
-    int current_node = m_all_nodes[getStartNode()]->getPredecessor();
+    // counting when reached). The first predecessor is the one on
+    // the main driveline.
+    int current_node = m_all_nodes[getStartNode()]->getPredecessor(0);
     
     float distance_from_start = 0.1f+forwards_distance;
 
@@ -340,7 +341,8 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
         if (current_node == -1)
         {
             (*start_transforms)[i].setOrigin(Vec3(0,0,0));
-            (*start_transforms)[i].setRotation(btQuaternion(btVector3(0, 1, 0), 0));
+            (*start_transforms)[i].setRotation(btQuaternion(btVector3(0, 1, 0),
+                                                            0));
         }
         else
         {
@@ -348,7 +350,8 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
             while(distance_from_start > getNode(current_node).getNodeLength())
             {
                 distance_from_start -= getNode(current_node).getNodeLength();
-                current_node = getNode(current_node).getPredecessor();
+                // Only follow the main driveline, i.e. first predecessor 
+                current_node = getNode(current_node).getPredecessor(0);
             }
             const GraphNode &gn   = getNode(current_node);
             Vec3 center_line = gn.getLowerCenter() - gn.getUpperCenter();

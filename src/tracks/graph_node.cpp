@@ -38,7 +38,6 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
     }
     m_quad_index          = quad_index;
     m_node_index          = node_index;
-    m_predecessor         = -1;
     m_distance_from_start = -1.0f;
 
     const Quad &quad      = QuadSet::get()->getQuad(m_quad_index);
@@ -74,16 +73,17 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
  */
 void GraphNode::addSuccessor(unsigned int to)
 {
-    m_successor_node.push_back(to);
+    m_successor_nodes.push_back(to);
     // m_quad_index is the quad index
     const Quad &this_quad = QuadSet::get()->getQuad(m_quad_index);
     // to is the graph node
     GraphNode &gn = QuadGraph::get()->getNode(to);
     const Quad &next_quad = QuadGraph::get()->getQuadOfNode(to);
 
-    // Keep the first predecessor, which is usually the most 'natural' one.
-    if(gn.m_predecessor==-1)
-        gn.m_predecessor = m_node_index;
+    // Note that the first predecessor is (because of the way the quad graph
+    // is exported) the most 'natural' one, i.e. the one on the main 
+    // driveline. 
+    gn.m_predecessor_nodes.push_back(m_node_index);
 
     Vec3 d = m_lower_center - QuadGraph::get()->getNode(to).m_lower_center;
     m_distance_to_next.push_back(d.length());
@@ -100,7 +100,7 @@ void GraphNode::addSuccessor(unsigned int to)
  */
 void GraphNode::setupPathsToNode()
 {
-    if(m_successor_node.size()<2) return;
+    if(m_successor_nodes.size()<2) return;
 
     const unsigned int num_nodes = QuadGraph::get()->getNumNodes();
     m_path_to_node.resize(num_nodes);

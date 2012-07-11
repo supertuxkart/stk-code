@@ -105,11 +105,13 @@ void TrackSector::rescue()
 
     // Using the predecessor has the additional advantage (besides punishing
     // the player a bit more) that it makes it less likely to fall in a 
-    // rescue loop since the kart moves back on each attempt. 
+    // rescue loop since the kart moves back on each attempt. At this stage
+    // STK does not keep track of where the kart is coming from, so always
+    // use the first predecessor, which is the one on the main driveline.
     m_current_graph_node = QuadGraph::get()->getNode(m_current_graph_node)
-                                               .getPredecessor();
+                                               .getPredecessor(0);
     m_last_valid_graph_node = QuadGraph::get()->getNode(m_current_graph_node)
-                                               .getPredecessor();
+                                               .getPredecessor(0);
 }    // rescue
 
 // ----------------------------------------------------------------------------

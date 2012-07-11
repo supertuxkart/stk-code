@@ -1546,8 +1546,10 @@ void Kart::crashed(const Material *m)
         int sector = lw->getSectorForKart(this);
         if(sector!=QuadGraph::UNKNOWN_SECTOR)
         {
+            // Use the first predecessor node, which is the most
+            // natural one (i.e. the one on the main driveline).
             const GraphNode &gn = QuadGraph::get()->getNode(
-                QuadGraph::get()->getNode(sector).getPredecessor());
+                QuadGraph::get()->getNode(sector).getPredecessor(0));
             Vec3 impulse = gn.getCenter() - getXYZ();
             impulse.setY(0);
             if(impulse.getX() || impulse.getZ())

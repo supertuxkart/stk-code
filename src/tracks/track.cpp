@@ -408,7 +408,7 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
 #ifdef DEBUG
     for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
     {
-        assert(QuadGraph::get()->getNode(i).getPredecessor()!=-1);
+        assert(QuadGraph::get()->getNode(i).getPredecessor(0)!=-1);
     }
 #endif
 
