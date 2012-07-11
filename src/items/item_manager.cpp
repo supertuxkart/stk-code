@@ -174,12 +174,14 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
 
     if(index==-1) index = m_all_items.size();
     Item* item;
-    item = new Item(type, xyz, normal, m_item_mesh[type], m_item_lowres_mesh[type], index);
+    item = new Item(type, xyz, normal, m_item_mesh[type], 
+                    m_item_lowres_mesh[type], index);
     if(parent != NULL) item->setParent(parent);
     if(m_switch_time>=0)
     {
         Item::ItemType new_type = m_switch_to[item->getType()];
-        item->switchTo(new_type, m_item_mesh[(int)new_type], m_item_lowres_mesh[(int)new_type]);
+        item->switchTo(new_type, m_item_mesh[(int)new_type], 
+                       m_item_lowres_mesh[(int)new_type]);
     }
     if(index<(int)m_all_items.size())
         m_all_items[index] = item;
@@ -193,7 +195,8 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
 /** Creates a new trigger item.
  *  \param xyz  Position of the item.
  */
-Item* ItemManager::newItem(const Vec3& xyz, float distance, TriggerItemListener* listener)
+Item* ItemManager::newItem(const Vec3& xyz, float distance, 
+                           TriggerItemListener* listener)
 {
     // Find where the item can be stored in the index list: either in a
     // previously deleted entry, otherwise at the end.
@@ -214,8 +217,8 @@ Item* ItemManager::newItem(const Vec3& xyz, float distance, TriggerItemListener*
 
 //-----------------------------------------------------------------------------
 /** Set an item as collected.
- *  This function is called on the server when an item is collected, or on the
- *  client upon receiving information about collected items.                  */
+ *  This function is called on the server when an item is collected, or on 
+ *  the client upon receiving information about collected items.             */
 void ItemManager::collectedItem(int item_id, AbstractKart *kart, int add_info)
 {
     Item *item=m_all_items[item_id];
@@ -264,7 +267,7 @@ void ItemManager::cleanup()
 
 //-----------------------------------------------------------------------------
 /** Resets all items and removes bubble gum that is stuck on the track.
- *  This is necessary in case that a race is restarted.
+ *  This is done when a race is restarted.
  */
 void ItemManager::reset()
 {
@@ -305,6 +308,10 @@ void ItemManager::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
+/** Updates all items, and handles switching items back if the switch time
+ *  is over.
+ *  \param dt Time step.
+ */
 void ItemManager::update(float dt)
 {
     // If switch time is over, switch all items back
