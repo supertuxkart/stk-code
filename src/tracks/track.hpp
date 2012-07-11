@@ -490,7 +490,7 @@ public:
     video::SColor getFogColor() const { return m_fog_color; }
     // ------------------------------------------------------------------------
     /** Whether this is an "internal" track. If so it won't be offered
-     * in the track seelction screen. */
+     * in the track selection screen. */
     bool isInternal() const { return m_internal; }
     // ------------------------------------------------------------------------
     /** Returns true if the normals of this track can be smoothed. */

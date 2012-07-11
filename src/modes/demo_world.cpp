@@ -108,9 +108,11 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     if(m_demo_tracks.size()==0)
         m_demo_tracks = track_manager->getAllTrackIdentifiers();
     Track *track = track_manager->getTrack(m_demo_tracks[0]);
-    // Remove arena tracks (outside the if statement above in case that
-    // a user requests a arena track ;)  )
-    while((!track || track->isArena()) && m_demo_tracks.size()>1)
+    // Remove arena tracks and internal tracks like the overworld
+    // (outside the if statement above in case that
+    // a user requests one of those ;) )
+    while((!track || track->isArena() || track->isInternal())
+            && m_demo_tracks.size() > 0)
     {
         if(!track)
             printf("Invalid demo track identifier '%s'.\n", 
@@ -118,6 +120,9 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
         m_demo_tracks.erase(m_demo_tracks.begin());
         track = track_manager->getTrack(m_demo_tracks[0]);
     }
+    // If all user request tracks are bad and get removed, this will
+    // return false. When the next update triggers, the track list will
+    // be filled up with all the tracks.
     if(m_demo_tracks.size()==0)
     {
         printf("No valid tracks found, no demo started.\n");
@@ -145,4 +150,4 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     m_demo_tracks.erase(m_demo_tracks.begin());
     
     return true;
-}   // updateIdleTime
+}   // updateIdleTimeAndStartDemo

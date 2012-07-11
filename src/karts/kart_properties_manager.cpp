@@ -397,11 +397,14 @@ const std::vector<int> KartPropertiesManager::getKartsInGroup(
  *  of 'existing karts'. If not enough karts are available in the current
  *  group, karts from all other groups are used to fill up the list.
  *  This is used by the race manager to select the AI karts.
- *  \param count Number of karts to select randomly.
- *  \param existing_karst List of karts that should not be used. This is the
+ *  \param count          Number of karts to select randomly.
+ *  \param existing_karts List of karts that should not be used. This is the
  *                        list of karts selected by the players.
+ *  \param ai_list        List of AI karts already selected (eg through the
+ *                        command line). The random AIs will also be added
+ *                        to this list.
  */
-void  KartPropertiesManager::getRandomKartList(int count,
+void KartPropertiesManager::getRandomKartList(int count,
                                             RemoteKartInfoList& existing_karts,
                                             std::vector<std::string> *ai_list)
 {
