@@ -21,7 +21,9 @@
 
 //The AI debugging works best with just 1 AI kart, so set the number of karts
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
-#define AI_DEBUG
+#ifdef DEBUG
+#  undef AI_DEBUG
+#endif
 
 #include "karts/controller/skidding_ai.hpp"
 
