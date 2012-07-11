@@ -255,7 +255,7 @@ Controller* World::loadAIController(AbstractKart *kart)
     int turn = 1;
 #elif defined(USE_ALL_AIS)
     static int turn=3;
-    turn=(turn++) % 3;
+    turn=(turn+1) % 3;
 #else
     int turn=0;   // use default AU
 #endif
