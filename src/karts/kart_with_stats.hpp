@@ -58,6 +58,9 @@ private:
     /** How many bubblegums were taken */
     unsigned int m_bubblegum_count;
 
+    /** How often the kart braked. */
+    unsigned int m_brake_count;
+
     /** How much time was spent in rescue. */
     float        m_rescue_time;
 
@@ -85,6 +88,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns how much time this kart spent skidding. */
     float getSkiddingTime() const { return m_skidding_time; }
+    // ------------------------------------------------------------------------
+    /** Returns how often the kart braked. */
+    unsigned int getBrakeCount() const { return m_brake_count; }
     // ------------------------------------------------------------------------
     /** Returns how often a kart was rescued. */
     unsigned int getRescueCount() const { return m_rescue_count; }

@@ -212,9 +212,9 @@ void ProfileWorld::enterRaceOverState()
         printf("average_speed,");
     }
 
-    printf("top_speed,skid_time,rescue_time,rescue_count,explosion_time,"
-           "explosion_count,bonus_count,banana_count,small_nitro_count,"
-           "large_nitro_count,bubblegum_count\n");
+    printf("top_speed,skid_time,rescue_time,rescue_count,brake_count,"
+           "explosion_time,explosion_count,bonus_count,banana_count,"
+           "small_nitro_count,large_nitro_count,bubblegum_count\n");
 
     for ( KartList::size_type i = 0; i < m_karts.size(); ++i)
     {
@@ -238,6 +238,7 @@ void ProfileWorld::enterRaceOverState()
         printf("%4.2f,", kart->getSkiddingTime());
         printf("%4.2f,%d,", kart->getRescueTime(),
                             kart->getRescueCount());
+        printf("%d,",       kart->getBrakeCount());
         printf("%4.2f,%d,", kart->getExplosionTime(),
                             kart->getExplosionCount() );
         printf("%d,", kart->getBonusCount() );

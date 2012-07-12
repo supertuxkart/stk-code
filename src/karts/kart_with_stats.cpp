@@ -46,6 +46,7 @@ void KartWithStats::reset()
     m_small_nitro_count = 0;
     m_large_nitro_count = 0;
     m_bubblegum_count   = 0;
+    m_brake_count       = 0;
     Kart::reset();
 }   // reset
 
@@ -60,6 +61,8 @@ void KartWithStats::update(float dt)
     if(getSpeed()>m_top_speed) m_top_speed = getSpeed();
     if(getControls().m_skid)
         m_skidding_time += dt;
+    if(getControls().m_brake)
+        m_brake_count ++;
 }   // update
 
 // ----------------------------------------------------------------------------
