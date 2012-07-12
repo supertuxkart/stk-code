@@ -113,7 +113,6 @@ private:
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
   
-    float m_curve_target_speed;
     float m_curve_angle;
 
     float m_time_since_stuck;
@@ -152,7 +151,6 @@ private:
     void  checkCrashes(const Vec3& pos);
     void  findNonCrashingPoint(Vec3 *result);
 
-    void  findCurve();
     void  determineTrackDirection();
     void  determineTurnRadius(const Vec3 &start,
                               const Vec3 &start_direction,

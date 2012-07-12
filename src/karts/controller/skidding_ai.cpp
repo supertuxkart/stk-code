@@ -146,8 +146,6 @@ void SkiddingAI::reset()
 {
     m_time_since_last_shot       = 0.0f;
     m_start_kart_crash_direction = 0;
-    m_curve_target_speed         = m_kart->getCurrentMaxSpeed();
-    m_curve_angle                = 0.0;
     m_start_delay                = -1.0f;
     m_time_since_stuck           = 0.0f;
     m_kart_ahead                 = NULL;
@@ -240,8 +238,7 @@ void SkiddingAI::update(float dt)
     //Detect if we are going to crash with the track and/or kart
     checkCrashes(m_kart->getXYZ());
     determineTrackDirection();
-    findCurve();
-
+    
     // Special behaviour if we have a bomb attach: try to hit the kart ahead 
     // of us.
     bool commands_set = false;
@@ -997,34 +994,6 @@ void SkiddingAI::findNonCrashingPoint(Vec3 *result)
     }   // for i<100
     *result = QuadGraph::get()->getQuadOfNode(sector).getCenter();
 }   // findNonCrashingPoint
-
-//-----------------------------------------------------------------------------
-/**FindCurve() gathers info about the closest sectors ahead: the curve
- * angle, the direction of the next turn, and the optimal speed at which the
- * curve can be travelled at it's widest angle.
- *
- * The number of sectors that form the curve is dependant on the kart's speed.
- */
-void SkiddingAI::findCurve()
-{
-    float total_dist = 0.0f;
-    int i;
-    for(i = m_track_node; total_dist < m_kart->getVelocityLC().getZ(); 
-        i = m_next_node_index[i])
-    {
-        total_dist += QuadGraph::get()->getDistanceToNext(i, 
-                                                         m_successor_index[i]);
-    }
-
-
-    m_curve_angle = 
-        normalizeAngle(QuadGraph::get()->getAngleToNext(i, 
-                                                        m_successor_index[i])
-                      -QuadGraph::get()->getAngleToNext(m_track_node, 
-                                            m_successor_index[m_track_node]) );
-    
-    m_curve_target_speed = m_kart->getCurrentMaxSpeed();
-}   // findCurve
 
 //-----------------------------------------------------------------------------
 /** Determines the direction of the track ahead of the kart: 0 indicates 
