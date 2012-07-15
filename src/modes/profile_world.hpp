@@ -78,7 +78,7 @@ protected:
 
 public:
                           ProfileWorld();
-    virtual              ~ProfileWorld() {};
+    virtual              ~ProfileWorld();
     /** Returns identifier for this world. */
     virtual  std::string getInternalCode() const {return "PROFILE"; }
     virtual  void        update(float dt);

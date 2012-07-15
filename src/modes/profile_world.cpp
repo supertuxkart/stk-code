@@ -56,6 +56,16 @@ ProfileWorld::ProfileWorld()
 }   // ProfileWorld
 
 //-----------------------------------------------------------------------------
+/** Sets profile mode off again.
+ *  Needed because demo mode's closing allows the player to continue playing
+ *  STK. If we didn't set it off, profile mode would stay activated.
+ */
+ProfileWorld::~ProfileWorld()
+{
+    m_profile_mode = PROFILE_NONE;
+}
+
+//-----------------------------------------------------------------------------
 /** Enables profiling for a certain amount of time. It also sets the
  *  number of laps to a high number (so that the lap count will not finish
  *  a race before the time is over).
