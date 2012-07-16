@@ -83,7 +83,7 @@ void KartPropertiesManager::reLoadAllKarts()
     m_kart_available.clear();
     m_groups_2_indices.clear();
     m_all_groups.clear();
-	loadAllKarts(false);
+    loadAllKarts(false);
 }   // reLoadAllKarts
 
 //-----------------------------------------------------------------------------
@@ -144,7 +144,7 @@ void KartPropertiesManager::removeKart(const std::string &ident)
 
     delete kp;
 
-    // Only used for networking only, and it is safe to just clear it. 
+    // Only used for networking and it is safe to just clear it. 
     // If a networking game is started it will be initialised properly.
     m_selected_karts.clear();
 }   // removeKart
@@ -235,7 +235,6 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
 //-----------------------------------------------------------------------------
 /** Returns index of the kart properties with the given ident.
  *  \return Index of kart (between 0 and number of karts - 1).
-
  */
 const int KartPropertiesManager::getKartId(const std::string &ident) const
 {    

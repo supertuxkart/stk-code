@@ -109,6 +109,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_flying               = false;
     m_rain                 = NULL;
     m_sky_particles_emitter= NULL;
+    m_stars_effect         = NULL;
     
     m_view_blocked_by_plunger = 0;
 
@@ -232,6 +233,7 @@ Kart::~Kart()
     if(m_rain)                   delete m_rain;
     if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
     if(m_attachment)             delete m_attachment;
+    if (m_stars_effect)          delete m_stars_effect;
 
     delete m_shadow;
 

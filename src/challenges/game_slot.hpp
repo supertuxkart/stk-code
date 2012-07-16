@@ -42,8 +42,9 @@ class GameSlot
 {
     std::string m_kart_ident;
     
-    /** Profile names can change, so rather than try to make sure all renames are done everywhere,
-     *  assign a unique ID to each profiler. Will save much headaches.
+    /** Profile names can change, so rather than try to make sure all renames
+     *  are done everywhere, assign a unique ID to each profiler.
+     *  Will save much headaches.
      */
     std::string m_player_unique_id;
     
@@ -82,6 +83,7 @@ public:
         m_medium_challenges = 0;
         m_hard_challenges = 0;
     }
+    ~GameSlot();
     
     const std::string& getPlayerID() const { return m_player_unique_id; }
     const std::string& getKartIdent () const { return m_kart_ident;  }

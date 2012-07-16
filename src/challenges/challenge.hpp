@@ -53,7 +53,7 @@ private:
     ChallengeData* m_data;
     
 public:
-             Challenge(ChallengeData* data)
+    Challenge(ChallengeData* data)
     {
         m_data = data;
         m_state[RaceManager::RD_EASY]   = CH_INACTIVE;

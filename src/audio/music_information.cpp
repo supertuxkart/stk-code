@@ -262,11 +262,13 @@ void MusicInformation::stopMusic()
     if (m_normal_music != NULL)  
     {
         m_normal_music->stopMusic();
+        delete m_normal_music;
         m_normal_music = NULL;
     }
     if (m_fast_music   != NULL)
     {
         m_fast_music->stopMusic();
+        delete m_fast_music;
         m_fast_music=NULL;
     }
 }   // stopMusic

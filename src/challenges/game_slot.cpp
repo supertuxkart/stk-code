@@ -19,12 +19,21 @@
 
 #include "challenges/game_slot.hpp"
 
+#include "challenges/challenge.hpp"
 #include "challenges/challenge_data.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "io/xml_writer.hpp"
 
 //-----------------------------------------------------------------------------
-
+GameSlot::~GameSlot()
+{
+    std::map<std::string, Challenge*>::iterator it;
+    for (it = m_challenges_state.begin();it != m_challenges_state.end();it++)
+    {
+        delete it->second;
+    }
+} // ~GameSlot
+//-----------------------------------------------------------------------------
 bool GameSlot::isLocked(const std::string& feature)
 {
     return m_locked_features.find(feature)!=m_locked_features.end();

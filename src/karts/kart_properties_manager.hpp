@@ -76,7 +76,7 @@ public:
     bool                     loadKart               (const std::string &dir);
     void                     loadAllKarts           (bool loading_icon = true);
     void                     unloadAllKarts         ();
-	void					 reLoadAllKarts			();
+    void                     reLoadAllKarts         ();
     void                     removeKart(const std::string &id);
     const std::vector<int>   getKartsInGroup        (const std::string& g);
     bool                     kartAvailable(int kartid);
