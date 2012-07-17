@@ -667,7 +667,8 @@ scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
         file_system->getFileArchive(file_system->getFileArchiveCount()-1);
         io::IReadFile* content = zip_archive->createAndOpenFile(0);
         m = m_scene_manager->getMesh(content);
-        
+        content->drop();
+
         file_system->removeFileArchive(file_system->getFileArchiveCount()-1);
     }
     else
