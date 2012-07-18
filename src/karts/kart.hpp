@@ -101,8 +101,8 @@ private:
     /** Current race position (1-num_karts). */
     int m_race_position;
 
-	/** True if the kart is eliminated. */
-	bool m_eliminated;
+    /** True if the kart is eliminated. */
+    bool m_eliminated;
 
     /** For stars rotating around head effect */
     Stars *m_stars_effect;
@@ -379,8 +379,8 @@ public:
      *  the upright constraint to allow for more realistic explosions. */
     bool           isNearGround     () const;
     // ------------------------------------------------------------------------
-	/** Returns true if the kart is eliminated.  */
-	virtual bool isEliminated() const { return m_eliminated; }
+    /** Returns true if the kart is eliminated.  */
+    virtual bool isEliminated() const { return m_eliminated; }
     // ------------------------------------------------------------------------
     virtual void eliminate();
     // ------------------------------------------------------------------------

@@ -317,51 +317,19 @@ void IrrDriver::initDevice()
         fprintf(stderr, "Couldn't initialise irrlicht device. Quitting.\n");
         exit(-1);
     }
-    
-    
-    if (!UserConfigParams::m_fullscreen && UserConfigParams::m_remember_window_location &&
-        UserConfigParams::m_window_x >= 0 && UserConfigParams::m_window_y >= 0)
-    {
-        
-#ifdef WIN32
-    const SExposedVideoData& videoData = m_device->getVideoDriver()->getExposedVideoData();
-    // this should work even if using DirectX in theory because the HWnd is
-    // always third pointer in the struct, no matter which union is used
-    HWND window = (HWND)videoData.OpenGLWin32.HWnd;
-    if (SetWindowPos(window, HWND_TOP, UserConfigParams::m_window_x, UserConfigParams::m_window_y,
-                     -1, -1, SWP_NOOWNERZORDER | SWP_NOSIZE))
-    {
-        // everything OK
-    }
-    else
-    {
-        printf("[IrrDriver] WARNING: Could not set window location\n");
-    }
-#elif defined(__linux__)
-    using namespace X11;
-    
-    const SExposedVideoData& videoData = m_device->getVideoDriver()->getExposedVideoData();
-    
-    //XSetWindowAttributes attr;
-    //attr.override_redirect = True;
-    //XChangeWindowAttributes( (Display*)videoData.OpenGLLinux.X11Display, videoData.OpenGLLinux.X11Window, CWOverrideRedirect, &attr );
 
-    // FIXME: doesn't work
-    XMoveWindow((Display*)videoData.OpenGLLinux.X11Display, videoData.OpenGLLinux.X11Window,
-                UserConfigParams::m_window_x, UserConfigParams::m_window_y);
-    
-    //attr.override_redirect = False;
-    //XChangeWindowAttributes( (Display*)videoData.OpenGLLinux.X11Display, videoData.OpenGLLinux.X11Window, CWOverrideRedirect, &attr );
+    m_scene_manager = m_device->getSceneManager();
+    m_gui_env       = m_device->getGUIEnvironment();
+    m_video_driver  = m_device->getVideoDriver();
 
-#endif
-    }
-
-#if defined(__linux__)
+    // Only change video driver settings if we are showing graphics
     if (!ProfileWorld::isNoGraphics())
     {
+#if defined(__linux__)
+        // Set class hints on Linux, used by Window Managers.
         using namespace X11;
-        const SExposedVideoData& videoData = m_device->getVideoDriver()
-                                                     ->getExposedVideoData();
+        const SExposedVideoData& videoData = m_video_driver
+                                                ->getExposedVideoData();
         XClassHint* classhint = XAllocClassHint();
         classhint->res_name = (char*)"SuperTuxKart";
         classhint->res_class = (char*)"SuperTuxKart";
@@ -369,15 +337,7 @@ void IrrDriver::initDevice()
                            videoData.OpenGLLinux.X11Window,
                            classhint);
         XFree(classhint);
-    }
 #endif
-    
-    m_scene_manager = m_device->getSceneManager();
-    m_gui_env       = m_device->getGUIEnvironment();
-    m_video_driver  = m_device->getVideoDriver();
-
-    // Only change video driver settings if we are showing graphics
-    if (!ProfileWorld::isNoGraphics()) {
         m_device->setResizable(false);
         m_device->setWindowCaption(L"SuperTuxKart");
         m_device->getVideoDriver()
@@ -393,7 +353,17 @@ void IrrDriver::initDevice()
         // does not set the 'enable mipmap' flag.
         m_scene_manager->getParameters()
             ->setAttribute(scene::B3D_LOADER_IGNORE_MIPMAP_FLAG, true);
-    }
+
+        // Set window to remembered position
+        if (  !UserConfigParams::m_fullscreen
+            && UserConfigParams::m_remember_window_location
+            && UserConfigParams::m_window_x >= 0
+            && UserConfigParams::m_window_y >= 0            )
+        {
+            moveWindow(UserConfigParams::m_window_x,
+                       UserConfigParams::m_window_y);
+        } // If reinstating window location
+    } // If showing graphics 
 
     // Stores the new file system pointer.
     file_manager->reInit();
@@ -499,6 +469,40 @@ core::position2di IrrDriver::getMouseLocation()
     return this->getDevice()->getCursorControl()->getPosition();
 }
 
+//-----------------------------------------------------------------------------
+/** Moves the STK main window to coordinates (x,y)
+ *  \return true on success, false on failure
+ *          (always true on Linux at the moment)
+ */
+bool IrrDriver::moveWindow(const int x, const int y)
+{
+    const SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
+#ifdef WIN32
+    // this should work even if using DirectX in theory,
+    // because the HWnd is always third pointer in the struct,
+    // no matter which union is used
+    HWND window = (HWND)videoData.OpenGLWin32.HWnd;
+    if (SetWindowPos(window, HWND_TOP, x, y, -1, -1,
+                     SWP_NOOWNERZORDER | SWP_NOSIZE))
+    {
+        // everything OK
+        return true;
+    }
+    else
+    {
+        printf("[IrrDriver] WARNING: Could not set window location\n");
+        return false;
+    }
+#elif defined(__linux__)
+    using namespace X11;
+
+    // TODO: Actually handle possible failure
+    XMoveWindow((Display*)videoData.OpenGLLinux.X11Display,
+                videoData.OpenGLLinux.X11Window,
+                x, y);
+#endif
+    return true;
+}
 //-----------------------------------------------------------------------------
 
 void IrrDriver::changeResolution(const int w, const int h, 

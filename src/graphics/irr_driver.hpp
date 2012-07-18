@@ -188,6 +188,8 @@ public:
     void                  changeResolution(const int w, const int h, const bool fullscreen);
   /** Call this to roll back to the previous resolution if a resolution switch attempt goes bad */
     void                  cancelResChange();
+
+    bool                  moveWindow(const int x, const int y);
     
     void                  showPointer();
     void                  hidePointer();
