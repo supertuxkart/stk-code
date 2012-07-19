@@ -122,7 +122,18 @@ bool EventHandler::OnEvent (const SEvent &event)
         }
     }
     */
-    
+
+    // We do this (seemingly) overzealously to make sure that:
+    //  1. It resets on any GUI events
+    //  2. It resets on any mouse/joystick movement
+    //  3. It resets on any keyboard presses
+    if ((StateManager::get()->getGameState() == MENU)
+        && (event.EventType != EET_LOG_TEXT_EVENT   )
+        && (event.EventType != EET_USER_EVENT       ))
+    {
+        DemoWorld::resetIdleTime();
+    }
+
     if (event.EventType == EET_GUI_EVENT)
     {
         return onGUIEvent(event) == EVENT_BLOCK;
@@ -140,7 +151,7 @@ bool EventHandler::OnEvent (const SEvent &event)
         // Remember the mouse position
         m_mouse_pos.X = event.MouseInput.X;
         m_mouse_pos.Y = event.MouseInput.Y;
-        
+
         // Notify the profiler of mouse events
         if(UserConfigParams::m_profiler_enabled &&
            event.EventType == EET_MOUSE_INPUT_EVENT &&
@@ -156,7 +167,8 @@ bool EventHandler::OnEvent (const SEvent &event)
             World::getWorld()->onMouseClick(event.MouseInput.X, event.MouseInput.Y);
         }
 
-        // FIXME? it may be a bit unclean that all input events go trough the gui module
+        // FIXME? it may be a bit unclean that all input events go trough
+        // the gui module
         const EventPropagation blockPropagation = input_manager->input(event);
         return blockPropagation == EVENT_BLOCK;
     }
@@ -657,8 +669,6 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
     {
         if (event.GUIEvent.Caller == NULL) return EVENT_LET;
         const s32 id = event.GUIEvent.Caller->getID();
-        
-        DemoWorld::resetIdleTime();
         
         switch (event.GUIEvent.EventType)
         {
