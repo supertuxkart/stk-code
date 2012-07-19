@@ -649,7 +649,7 @@ void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta)
 }   // updateDistancesForAllSuccessors
 
 //-----------------------------------------------------------------------------
-/** Computes the direction (striaght, left, right) of all graph nodes and the
+/** Computes the direction (straight, left, right) of all graph nodes and the
  *  lastest graph node that is still turning in the given direction. For 
  *  example, if a successor to this graph node is turning left, it will compute
  *  the last graph node that is still turning left. This data is used by the

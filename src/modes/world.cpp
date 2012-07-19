@@ -254,8 +254,8 @@ Controller* World::loadAIController(AbstractKart *kart)
 #elif defined(USE_SKIDDING_AI)
     int turn = 1;
 #elif defined(USE_ALL_AIS)
-    static int turn=3;
-    turn=(turn+1) % 3;
+    static int turn=1;
+    turn=(turn+1) % 3;   // %2 would switch betwen default and skidding
 #else
     int turn=0;   // use default AU
 #endif

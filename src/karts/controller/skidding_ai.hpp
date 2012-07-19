@@ -150,6 +150,7 @@ private:
 
     void  checkCrashes(const Vec3& pos);
     void  findNonCrashingPoint(Vec3 *result);
+    void  findNonCrashingPoint2(Vec3 *result);
 
     void  determineTrackDirection();
     void  determineTurnRadius(const Vec3 &start,

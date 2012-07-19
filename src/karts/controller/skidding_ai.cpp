@@ -110,17 +110,23 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
 #ifdef AI_DEBUG
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);
 #define CURVE_PREDICT1   0
-#define CURVE_PREDICT2   1
-#define CURVE_QG         2
+#define CURVE_KART       1
+#define CURVE_LEFT       2
+#define CURVE_RIGHT      3
+#define CURVE_QG         4
 #define NUM_CURVES (CURVE_QG+1)
 
     m_curve   = new ShowCurve*[NUM_CURVES];
-    m_curve[CURVE_PREDICT1] = new ShowCurve(0.05f, 0.5f, 
-                                  irr::video::SColor(128,   0,   0, 128));
-    m_curve[CURVE_PREDICT2] = new ShowCurve(0.05f, 0.5f, 
-                                  irr::video::SColor(128,   0,   0,  64));
+    m_curve[CURVE_PREDICT1]  = new ShowCurve(0.05f, 0.5f, 
+                                   irr::video::SColor(128,   0,   0, 128));
+    m_curve[CURVE_KART]      = new ShowCurve(0.5f, 0.5f, 
+                                   irr::video::SColor(128,   0,   0, 128));
+    m_curve[CURVE_LEFT]      = new ShowCurve(0.5f, 0.5f, 
+                                   irr::video::SColor(128, 128,   0,   0));
+    m_curve[CURVE_RIGHT]     = new ShowCurve(0.5f, 0.5f, 
+                                   irr::video::SColor(128,   0, 128,   0));
     m_curve[CURVE_QG]        = new ShowCurve(0.5f, 0.5f, 
-                                   irr::video::SColor(128,  0, 128,   0));
+                                   irr::video::SColor(128,   0, 128,   0));
 #endif
     setControllerName("Skidding");
 }   // SkiddingAI
@@ -333,9 +339,9 @@ void SkiddingAI::handleBraking()
         m_kart->getSpeed() > MIN_SPEED)
     {
 #ifdef DEBUG
-    if(m_ai_debug)
-        printf("[AI] braking: %s not aligned with track.\n",
-               m_kart->getIdent().c_str());
+        if(m_ai_debug)
+            printf("[AI] braking: %s not aligned with track.\n",
+            m_kart->getIdent().c_str());
 #endif
         m_controls->m_brake = true;
         return;
@@ -434,7 +440,12 @@ void SkiddingAI::handleSteering(float dt)
     {
         m_start_kart_crash_direction = 0;
         Vec3 straight_point;
+#ifdef NEW_ALGORITHM
+        findNonCrashingPoint2(straight_point);
+#else
         findNonCrashingPoint(&straight_point);
+#endif
+
 #ifdef AI_DEBUG
         m_debug_sphere->setPosition(straight_point.toIrrVector());
 #endif
@@ -931,6 +942,154 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
 }   // checkCrashes
 
 //-----------------------------------------------------------------------------
+/** This is a new version of findNonCrashingPoint, which at this stage is
+ *  slightly inferior (though faster and more correct) than the original 
+ *  version - the original code cuts corner more aggressively than this
+ *  version (and in most cases cuting the corner does not end in a 
+ *  collision, so it's actually faster).
+ *  This version find the point furthest ahead which can be reached by
+ *  travelling in a straight direction from the current location of the
+ *  kart. This is done by using two lines: one from the kart to the
+ *  lower left side of the next quad, and one from the kart to the
+ *  lower right side of the next quad. The area between those two lines
+ *  can be reached by the kart in a straight line, and will not go off
+ *  track (assuming that the kart is on track). Then the next quads are 
+ *  tested: New left/right lines are computed. If the new left line is to 
+ *  the right of the old left line, the new left line becomes the current 
+ *  left line:
+ *
+ *      X       The new left line connecting kart to X will be to the right
+ *              of the old left line, so the available space for the kart
+ *    \      /  (
+ *     \    /
+ *      kart
+ *  Similarly for the right side. This will narrow down the available area
+ *  the kart can aim at, till finally the left and right line overlap.
+ *  All points between the connection of the two end points of the left and 
+ *  right line can be reached without getting off track. Which point the
+ *  kart aims at then depends on the direction of the track: if there is
+ *  a left turn, the kart will aim to the left point (and vice versa for
+ *  right turn) - slightly offset by the width of the kart to avoid that 
+ *  the kart is getting off track.
+ *  \return result The new point the kart should aim at when steering.
+*/
+void SkiddingAI::findNonCrashingPoint2(Vec3 *result)
+{    
+    unsigned int sector = m_next_node_index[m_track_node];
+    const core::vector2df xz = m_kart->getXYZ().toIrrVector2d();
+
+    const Quad &q = QuadGraph::get()->getQuadOfNode(sector);
+
+    // Index of the left and right end of a quad.
+    const unsigned int LEFT_END_POINT  = 0;
+    const unsigned int RIGHT_END_POINT = 1;
+    core::line2df left (xz, q[LEFT_END_POINT ].toIrrVector2d());
+    core::line2df right(xz, q[RIGHT_END_POINT].toIrrVector2d());
+#ifdef AI_DEBUG
+    const Vec3 eps(0,0.5f,0);
+    m_curve[CURVE_LEFT]->clear();
+    m_curve[CURVE_LEFT]->addPoint(m_kart->getXYZ()+eps);
+    m_curve[CURVE_LEFT]->addPoint(q[LEFT_END_POINT]+eps);
+    m_curve[CURVE_LEFT]->addPoint(m_kart->getXYZ()+eps);
+    m_curve[CURVE_RIGHT]->clear();
+    m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps);
+    m_curve[CURVE_RIGHT]->addPoint(q[RIGHT_END_POINT]+eps);
+    m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps);
+    m_curve[CURVE_KART]->clear();
+    m_curve[CURVE_KART]->addPoint(m_kart->getXYZ()+eps);
+    Vec3 forw(0, 0, 50);
+    m_curve[CURVE_KART]->addPoint(m_kart->getTrans()(forw));
+#endif
+    while(1)
+    {
+        unsigned int next_sector = m_next_node_index[sector];
+        const Quad &q_next = QuadGraph::get()->getQuadOfNode(next_sector);
+        // Test if the next left point is to the right of the left
+        // line. If so, a new left line is defined.
+        if(left.getPointOrientation(q_next[LEFT_END_POINT].toIrrVector2d())
+            < 0 )
+        {
+            core::vector2df p = q_next[LEFT_END_POINT].toIrrVector2d();
+            // Stop if the new point is to the right of the right line
+            if(right.getPointOrientation(p)<0)
+                break;
+            left.end = p;
+#ifdef AI_DEBUG
+            Vec3 ppp(p.X, m_kart->getXYZ().getY(), p.Y);
+            m_curve[CURVE_LEFT]->addPoint(ppp+eps);
+            m_curve[CURVE_LEFT]->addPoint(m_kart->getXYZ()+eps);
+#endif
+        }
+
+        // Test if new right point is to the left of the right line. If
+        // so, a new right line is defined.
+        if(right.getPointOrientation(q_next[RIGHT_END_POINT].toIrrVector2d())
+            > 0 )
+        {
+            core::vector2df p = q_next[RIGHT_END_POINT].toIrrVector2d();
+            // Break if new point is to the left of left line
+            if(left.getPointOrientation(p)>0)
+                break;
+#ifdef AI_DEBUG
+            Vec3 ppp(p.X, m_kart->getXYZ().getY(), p.Y);
+            m_curve[CURVE_RIGHT]->addPoint(ppp+eps);
+            m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps);
+#endif
+            right.end = p;
+        }
+        sector = next_sector;
+    }   // while
+    
+    // Now look for the next curve to find out to which side of the
+    // track the AI should aim at
+
+    sector = m_track_node;
+    int count = 0;
+    while(1)
+    {
+        GraphNode::DirectionType dir;
+        unsigned int last;
+        unsigned int succ = m_successor_index[sector];
+        const GraphNode &gn = QuadGraph::get()->getNode(sector);
+        gn.getDirectionData(succ, &dir, &last);
+        if(dir==GraphNode::DIR_LEFT)
+        {
+            core::vector2df diff = left.end - right.end;
+            diff.normalize();
+            diff *= m_kart->getKartWidth()*0.5f;
+            *result = Vec3(left.end.X - diff.X,
+                           m_kart->getXYZ().getY(), 
+                           left.end.Y - diff.Y);
+            return;
+        }
+        else if(dir==GraphNode::DIR_RIGHT)
+        {
+            core::vector2df diff = right.end - left.end;
+            diff.normalize();
+            diff *= m_kart->getKartWidth()*0.5f;
+            *result = Vec3(right.end.X-diff.X, 
+                           m_kart->getXYZ().getY(),
+                           right.end.Y-diff.Y);
+            return;
+        }
+
+        // We are going straight. Determine point to aim for based on the 
+        // direction of the track after the straight section
+
+        sector = m_next_node_index[last];
+        count++;
+        if(count>1)
+            printf("That shouldn't happen %d!!!\n", count);
+    }
+    
+    Vec3 ppp(0.5f*(left.end.X+right.end.X),
+             m_kart->getXYZ().getY(),
+             0.5f*(left.end.Y+right.end.Y));
+    *result = QuadGraph::get()->getQuadOfNode(sector).getCenter();
+    *result = ppp;
+}   // findNonCrashingPoint2
+
+//-----------------------------------------------------------------------------
 /** Find the sector that at the longest distance from the kart, that can be
  *  driven to without crashing with the track, then find towards which of
  *  the two edges of the track is closest to the next curve after wards,
@@ -1032,10 +1191,10 @@ void SkiddingAI::determineTrackDirection()
                                        &m_current_track_direction, &last);
 
 #ifdef AI_DEBUG
-    m_curve[CURVE_QG]->clear();
+//    m_curve[CURVE_QG]->clear();
     for(unsigned int i=m_track_node; i<=last; i++)
     {
-        m_curve[CURVE_QG]->addPoint(qg->getNode(i).getCenter());
+//        m_curve[CURVE_QG]->addPoint(qg->getNode(i).getCenter());
     }
 #endif
 
@@ -1061,10 +1220,10 @@ void SkiddingAI::determineTrackDirection()
         determineTurnRadius(xyz, tangent, last_xyz,
                             &center, &m_current_curve_radius);
 #ifdef AI_DEBUG
-        m_curve[CURVE_PREDICT1]->makeCircle(center, m_current_curve_radius);
-        m_curve[CURVE_PREDICT1]->addPoint(last_xyz);
-        m_curve[CURVE_PREDICT1]->addPoint(center);
-        m_curve[CURVE_PREDICT1]->addPoint(xyz);
+//        m_curve[CURVE_PREDICT1]->makeCircle(center, m_current_curve_radius);
+//        m_curve[CURVE_PREDICT1]->addPoint(last_xyz);
+//        m_curve[CURVE_PREDICT1]->addPoint(center);
+//        m_curve[CURVE_PREDICT1]->addPoint(xyz);
 #endif
 
         // Estimate how long it takes to finish the curve
