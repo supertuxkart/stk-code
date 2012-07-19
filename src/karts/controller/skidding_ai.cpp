@@ -440,8 +440,9 @@ void SkiddingAI::handleSteering(float dt)
     {
         m_start_kart_crash_direction = 0;
         Vec3 straight_point;
+#undef NEW_ALGORITHM
 #ifdef NEW_ALGORITHM
-        findNonCrashingPoint2(straight_point);
+        findNonCrashingPoint2(&straight_point);
 #else
         findNonCrashingPoint(&straight_point);
 #endif
