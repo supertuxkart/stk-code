@@ -75,7 +75,7 @@ void AIBaseController::reset()
 void AIBaseController::setControllerName(const std::string &name)
 {
 #ifdef DEBUG
-    if(m_ai_debug)
+    if(m_ai_debug && !UserConfigParams::m_camera_debug)
         m_kart->setOnScreenText(core::stringw(name.c_str()).c_str());
 #endif
     Controller::setControllerName(name);
