@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C++ Express 2010
+# Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "supertuxkart", "supertuxkart.vcxproj", "{B1BC2764-1A43-4800-A654-788B0D05EDA2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bullet_lib", "bullet_lib.vcxproj", "{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}"
@@ -10,21 +10,35 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|Win32 = debug|Win32
+		debug|x64 = debug|x64
 		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.debug|Win32.ActiveCfg = debug|Win32
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.debug|Win32.Build.0 = debug|Win32
+		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.debug|x64.ActiveCfg = debug|x64
+		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.debug|x64.Build.0 = debug|x64
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.Release|Win32.ActiveCfg = Release|Win32
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.Release|Win32.Build.0 = Release|Win32
+		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.Release|x64.ActiveCfg = Release|x64
+		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.Release|x64.Build.0 = Release|x64
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.debug|Win32.ActiveCfg = debug|Win32
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.debug|Win32.Build.0 = debug|Win32
+		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.debug|x64.ActiveCfg = debug|x64
+		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.debug|x64.Build.0 = debug|x64
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.Release|Win32.ActiveCfg = Release|Win32
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.Release|Win32.Build.0 = Release|Win32
+		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.Release|x64.ActiveCfg = Release|x64
+		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.Release|x64.Build.0 = Release|x64
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.debug|Win32.ActiveCfg = debug|Win32
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.debug|Win32.Build.0 = debug|Win32
+		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.debug|x64.ActiveCfg = debug|x64
+		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.debug|x64.Build.0 = debug|x64
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release|Win32.ActiveCfg = Release|Win32
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release|Win32.Build.0 = Release|Win32
+		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release|x64.ActiveCfg = Release|x64
+		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
