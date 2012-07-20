@@ -249,7 +249,7 @@ void History::Load()
         exit(-2);
     }
     
-    if (sscanf(s,"Version: %s",s1)!=1)
+    if (sscanf(s,"Version: %1023s",s1)!=1)
     {
         fprintf(stderr, "ERROR: no Version information found in history file (bogus history file)\n");
         exit(-2);
@@ -294,7 +294,7 @@ void History::Load()
     race_manager->setDifficulty((RaceManager::Difficulty)n);
 
     fgets(s, 1023, fd);
-    if(sscanf(s, "track: %s",s1)!=1)
+    if(sscanf(s, "track: %1023s",s1)!=1)
     {
         fprintf(stderr,"WARNING: Track not found in history file.\n");
     }
@@ -306,7 +306,7 @@ void History::Load()
     for(unsigned int i=0; i<num_karts; i++)
     {
         fgets(s, 1023, fd);
-        if(sscanf(s, "model %d: %s",&n, s1)!=2)
+        if(sscanf(s, "model %d: %1023s",&n, s1)!=2)
         {
             fprintf(stderr,"WARNING: No model information for kart %d found.\n",
                     i);

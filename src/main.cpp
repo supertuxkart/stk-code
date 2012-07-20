@@ -682,7 +682,7 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_server_port=n;
         }
-        else if( sscanf(argv[i], "--client=%s", s) )
+        else if( sscanf(argv[i], "--client=%1023s", s) )
         {
             network_manager->setMode(NetworkManager::NW_CLIENT);
             UserConfigParams::m_server_address=s;
@@ -759,7 +759,7 @@ int handleCmdLine(int argc, char **argv)
             }
              */
         }
-        else if( sscanf(argv[i], "--ai=%s",  s)==1)
+        else if( sscanf(argv[i], "--ai=%1023s", s)==1)
         {
             const std::vector<std::string> l=
                 StringUtils::split(std::string(s),',');
