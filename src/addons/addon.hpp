@@ -92,6 +92,8 @@ private:
     bool        m_installed;
     /** Compressed size of the addon package. */
     int         m_size;
+    /** Rating for thsi addon package. */
+    float       m_rating;
     /** Minimum version addon is included with. */
     std::string m_min_include_ver;
     /** Maximum version addon is included with. */
@@ -123,6 +125,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the maximum version the addon was included with. */
     const std::string& getMaxIncludeVer() const {return m_max_include_ver; }
+    // ------------------------------------------------------------------------
+    /** Returns the rating of an addon. */
+    const float getRating() const {return m_rating; }
     // ------------------------------------------------------------------------
     /** Returns the type of the addon. */
     const std::string& getType() const { return m_type; }

@@ -99,6 +99,11 @@ void AddonsLoading::beforeAddingWidgets()
         ->setText(m_addon.getDescription().c_str());
     core::stringw revision = _("Version: %d", m_addon.getRevision());
     getWidget<LabelWidget>("revision")->setText(revision, false);
+    char rating_val[4];
+    std::sprintf(rating_val, "%.1f", m_addon.getRating());
+    //I18N: for add-on rating, "Rating: 1.5/3.0"
+    core::stringw rating = _("Rating: %s/%s", rating_val, "3.0");
+    getWidget<LabelWidget>("rating")->setText(rating, false);
 
     // Display flags for this addon
     // ============================

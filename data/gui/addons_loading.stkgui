@@ -4,15 +4,22 @@
   
   
   <div x="5%" y="0%" width="90%" proportion="6" layout="horizontal-row" >
-    <div width="50%" height="100%" layout="vertical-row" >
+    <div width="40%" height="100%" layout="vertical-row" >
         <icon id="icon" align="center" proportion="8" width="100%" icon="gui/loading.png"/>
         <spacer proportion="1" /> 
     </div>
     <spacer proportion="1" />
-    <div width="50%" height="50%" layout="vertical-row" >
-        <label id="name"     width="100%" text_align="left"/>
-        <label id="size"     width="100%" text=""/>
-        <label id="revision" width="100%" text=""/>
+    <div width="60%" height="50%" layout="vertical-row" >
+        <label id="name" width="100%" text_align="left"/>
+        <div width="100%" height="100%" layout="horizontal-row" >
+            <div width="50%" height="100%" layout="vertical-row" >
+                <label id="size"     width="100%" text=""/>
+                <label id="revision" width="100%" text=""/>
+            </div>
+            <div width="50%" height="100%" layout="vertical-row" >
+                <label id="rating"   width="100%" text=""/>
+            </div>
+        </div>
         <spacer height="10"/>
         <label id="flags"    width="100%" text="" word_wrap="true"/>
     </div>

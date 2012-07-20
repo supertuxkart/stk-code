@@ -46,6 +46,9 @@ Addon::Addon(const XMLNode &xml)
     m_icon_revision      = 0;
     m_size               = 0;
     m_date               = 0;
+    m_min_include_ver    = "";
+    m_max_include_ver    = "";
+    m_rating             = 0.0f;
     m_icon_ready         = false;
     m_still_exists       = false;
     m_type               = xml.getName();
@@ -102,6 +105,8 @@ Addon::Addon(const XMLNode &xml)
     xml.get("min-include-version",&m_min_include_ver   );
     xml.get("max-include-version",&m_max_include_ver   );
 
+    xml.get("rating",             &m_rating            );
+
 };   // Addon(const XML&)
 
 // ----------------------------------------------------------------------------
@@ -121,6 +126,7 @@ void Addon::copyInstallData(const Addon &addon)
     m_date          = addon.m_date;
     m_min_include_ver=addon.m_min_include_ver;
     m_max_include_ver=addon.m_max_include_ver;
+    m_rating        = addon.m_rating;
     // Support if the type of an addon changes, e.g. this ie necessary
     // when we introduce 'arena' as type (formerly arenas had type 'track').
     m_type          = addon.m_type;
