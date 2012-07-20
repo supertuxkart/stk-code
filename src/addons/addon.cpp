@@ -25,6 +25,7 @@
 
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
 Addon::SortOrder Addon::m_sort_order=Addon::SO_DEFAULT;
@@ -98,6 +99,9 @@ Addon::Addon(const XMLNode &xml)
     xml.get("icon-revision",      &m_icon_revision     );
     xml.get("size",               &m_size              );
 
+    xml.get("min-include-version",&m_min_include_ver   );
+    xml.get("max-include-version",&m_max_include_ver   );
+
 };   // Addon(const XML&)
 
 // ----------------------------------------------------------------------------
@@ -115,6 +119,8 @@ void Addon::copyInstallData(const Addon &addon)
     m_designer      = addon.m_designer;
     m_status        = addon.m_status;
     m_date          = addon.m_date;
+    m_min_include_ver=addon.m_min_include_ver;
+    m_max_include_ver=addon.m_max_include_ver;
     // Support if the type of an addon changes, e.g. this ie necessary
     // when we introduce 'arena' as type (formerly arenas had type 'track').
     m_type          = addon.m_type;
@@ -149,3 +155,16 @@ std::string Addon::getDateAsString() const
 {
     return Time::toString(m_date);
 }   // getDateAsString
+
+// ----------------------------------------------------------------------------
+bool Addon::testIncluded(const std::string &min_ver, const std::string &max_ver)
+{
+    if (min_ver.length() == 0 || max_ver.length() == 0)
+        return false;
+
+    int current_version = StringUtils::versionToInt(STK_VERSION);
+    int min_version = StringUtils::versionToInt(min_ver);
+    int max_version = StringUtils::versionToInt(max_ver);
+
+    return (min_version <= current_version && max_version >= current_version);
+}

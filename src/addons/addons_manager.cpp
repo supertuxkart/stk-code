@@ -110,6 +110,10 @@ void AddonsManager::initOnline(const XMLNode *xml)
             else
                 wrong_version = stk_version <stk_config->m_min_track_version ||
                                 stk_version >stk_config->m_max_track_version   ;
+            // If the add-on is included, behave like it is a wrong version
+            if (addon.testIncluded(addon.getMinIncludeVer(), addon.getMaxIncludeVer()))
+                wrong_version = true;
+
             // Check which version to use: only for this stk version,
             // and not addons that are marked as hidden (testing=0)
             if(wrong_version|| testing==0)

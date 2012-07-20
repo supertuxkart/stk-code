@@ -92,6 +92,10 @@ private:
     bool        m_installed;
     /** Compressed size of the addon package. */
     int         m_size;
+    /** Minimum version addon is included with. */
+    std::string m_min_include_ver;
+    /** Maximum version addon is included with. */
+    std::string m_max_include_ver;
     /** Type, must be 'kart' or 'track'. */
     std::string m_type;
 
@@ -113,6 +117,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
     const core::stringw& getName() const { return m_name; }
+    // ------------------------------------------------------------------------
+    /** Returns the minimum version the addon was included with. */
+    const std::string& getMinIncludeVer() const {return m_min_include_ver; }
+    // ------------------------------------------------------------------------
+    /** Returns the maximum version the addon was included with. */
+    const std::string& getMaxIncludeVer() const {return m_max_include_ver; }
     // ------------------------------------------------------------------------
     /** Returns the type of the addon. */
     const std::string& getType() const { return m_type; }
@@ -215,6 +225,10 @@ public:
         assert(false);
         return "";  // Ignore compiler warning
     }   // getTypeDirectory
+
+	// ------------------------------------------------------------------------
+    /** Returns if the current version is between min and max versions */
+	bool testIncluded(const std::string &min_ver, const std::string &max_ver);
 
     // ------------------------------------------------------------------------
     /** Returns if a certain status flag is set. */

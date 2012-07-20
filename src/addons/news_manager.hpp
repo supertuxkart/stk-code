@@ -83,7 +83,6 @@ private:
                              const std::string &filename);
     void          updateUserConfigFile() const;
     bool          conditionFulfilled(const std::string &cond);
-    int           versionToInt(const std::string &s);
     void          updateMessageDisplayCount();
 
 public:

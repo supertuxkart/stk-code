@@ -27,6 +27,7 @@
 
 namespace StringUtils
 {
+    int           versionToInt(const std::string &s);
 
     bool hasSuffix(const std::string& lhs, const std::string rhs);
     bool startsWith(const std::string& str, const std::string& prefix);
@@ -365,7 +366,6 @@ namespace StringUtils
     
     /** Compute a simple hash of a string */
     unsigned int simpleHash(const char* input);
-    
 } // namespace StringUtils
 
 #endif

@@ -640,6 +640,58 @@ namespace StringUtils
          
          return hash;
     }
+
+    // ------------------------------------------------------------------------
+    /** Converts a version string (in the form of 'X.Y.Za-rcU' into an
+	    *  integer number.
+	    *  \param s The version string to convert.
+	    */
+    int versionToInt(const std::string &version_string)
+    {
+	    // Special case: SVN
+	    if(version_string=="SVN" || version_string=="svn")
+		    // SVN version will be version 99.99.99i-rcJ
+		    return 1000000*99     
+				    +  10000*99
+				    +    100*99
+				    +     10* 9
+				    +         9;
+
+	    std::string s=version_string;
+	    // To guarantee that a release gets a higher version number than 
+	    // a release candidate, we assign a 'release_candidate' number
+	    // of 9 to versions which are not a RC. We assert that any RC
+	    // is less than 9 to guarantee the ordering.
+	    int release_candidate=9;
+	    if(sscanf(s.substr(s.length()-4, 4).c_str(), "-rc%d", 
+			    &release_candidate)==1)
+	    {
+		    s = s.substr(0, s.length()-4);
+		    // Otherwise a RC can get a higher version number than
+		    // the corresponding release! If this should ever get
+		    // triggered, multiply all scaling factors above and
+		    // below by 10, to get two digits for RC numbers.
+		    assert(release_candidate<9);
+	    }
+	    int very_minor=0;
+	    if(s[s.size()-1]>='a' && s[s.size()-1]<='z')
+	    {
+		    very_minor = s[s.size()-1]-'a'+1;
+		    s = s.substr(0, s.size()-1);
+	    }
+	    std::vector<std::string> l = StringUtils::split(s, '.');
+	    while(l.size()<3)
+		    l.push_back(0);
+	    int version = 1000000*atoi(l[0].c_str())
+				    +   10000*atoi(l[1].c_str())
+				    +     100*atoi(l[2].c_str())
+				    +      10*very_minor
+				    +         release_candidate;
+
+	    if(version<=0)
+		    printf("Invalid version string '%s'.\n", s.c_str());
+	    return version;
+    }   // versionToInt
 } // namespace StringUtils
 
 
