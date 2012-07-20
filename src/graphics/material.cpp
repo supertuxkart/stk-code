@@ -56,13 +56,11 @@ public:
                                irr::video::IMaterialRendererServices *services,
                                s32 userData)
     {
-        // Irrlicht knows this is actually a GLint and makes the conversion
-        int decaltex = 0;
-        services->setPixelShaderConstant("DecalTex", (float*)&decaltex, 1);
+        s32 decaltex = 0;
+        services->setPixelShaderConstant("DecalTex", &decaltex, 1);
         
-        // Irrlicht knows this is actually a GLint and makes the conversion
-        int bumptex = 1;
-        services->setPixelShaderConstant("BumpTex", (float*)&bumptex, 1);
+        s32 bumptex = 1;
+        services->setPixelShaderConstant("BumpTex", &bumptex, 1);
         
         // We could calculate light direction as coming from the sun (then we'd need to
         // transform it into camera space). But I find that pretending light
@@ -120,17 +118,14 @@ public:
         if (m_dx_2 > 1.0f) m_dx_2 -= 1.0f;
         if (m_dy_2 < 0.0f) m_dy_2 += 1.0f;
         
-        // Irrlicht knows this is actually a GLint and makes the conversion
-        int decaltex = 0;
-        services->setPixelShaderConstant("DecalTex", (float*)&decaltex, 1);
+        s32 decaltex = 0;
+        services->setPixelShaderConstant("DecalTex", &decaltex, 1);
         
-        // Irrlicht knows this is actually a GLint and makes the conversion
-        int bumptex = 1;
-        services->setPixelShaderConstant("BumpTex1", (float*)&bumptex, 1);
+        s32 bumptex = 1;
+        services->setPixelShaderConstant("BumpTex1", &bumptex, 1);
         
-        // Irrlicht knows this is actually a GLint and makes the conversion
         bumptex = 2;
-        services->setPixelShaderConstant("BumpTex2", (float*)&bumptex, 1);
+        services->setPixelShaderConstant("BumpTex2", &bumptex, 1);
         
         // We could calculate light direction as coming from the sun (then we'd need to
         // transform it into camera space). But I find that pretending light
@@ -146,10 +141,10 @@ public:
             Track* t = World::getWorld()->getTrack();
             
             float fogStart = t->getFogStart();
-            services->setPixelShaderConstant("fogFrom", (float*)&fogStart, 1);
+            services->setPixelShaderConstant("fogFrom", &fogStart, 1);
             
             float fogEnd = t->getFogEnd();
-            services->setPixelShaderConstant("fogTo", (float*)&fogEnd, 1);
+            services->setPixelShaderConstant("fogTo", &fogEnd, 1);
             
             video::SColor fogColor = t->getFogColor();
             float fogColorVec[] = {fogColor.getRed()/255.0f,
@@ -190,25 +185,20 @@ public:
             m_light_direction = -World::getWorld()->getTrack()->getSunRotation().rotationToDirection();
         }
         
-        // Irrlicht knows this is actually a GLint and makes the conversion
-        int tex_layout = 0;
-        services->setPixelShaderConstant("tex_layout", (float*)&tex_layout, 1);
+        s32 tex_layout = 0;
+        services->setPixelShaderConstant("tex_layout", &tex_layout, 1);
         
-        // Irrlicht knows this is actually a GLint and makes the conversion
-        int tex_detail0 = 1;
-        services->setPixelShaderConstant("tex_detail0", (float*)&tex_detail0, 1);
+        s32 tex_detail0 = 1;
+        services->setPixelShaderConstant("tex_detail0", &tex_detail0, 1);
         
-        // Irrlicht knows this is actually a GLint and makes the conversion
-        int tex_detail1 = 2;
-        services->setPixelShaderConstant("tex_detail1", (float*)&tex_detail1, 1);
+        s32 tex_detail1 = 2;
+        services->setPixelShaderConstant("tex_detail1", &tex_detail1, 1);
+
+        s32 tex_detail2 = 3;
+        services->setPixelShaderConstant("tex_detail2", &tex_detail2, 1);
         
-        // Irrlicht knows this is actually a GLint and makes the conversion
-        int tex_detail2 = 3;
-        services->setPixelShaderConstant("tex_detail2", (float*)&tex_detail2, 1);
-        
-        // Irrlicht knows this is actually a GLint and makes the conversion
-        int tex_detail3 = 4;
-        services->setPixelShaderConstant("tex_detail3", (float*)&tex_detail3, 1);
+        s32 tex_detail3 = 4;
+        services->setPixelShaderConstant("tex_detail3", &tex_detail3, 1);
         
         services->setVertexShaderConstant("lightdir", &m_light_direction.X, 3);
     }
@@ -237,9 +227,8 @@ public:
                                 irr::video::IMaterialRendererServices *services,
                                 s32 userData)
     {
-        // Irrlicht knows this is actually a GLint and makes the conversion
-        int texture = 0;
-        services->setPixelShaderConstant("texture", (float*)&texture, 1);
+        s32 texture = 0;
+        services->setPixelShaderConstant("texture", &texture, 1);
         
         services->setVertexShaderConstant("lightdir", &m_light_direction.X, 3);
     }
