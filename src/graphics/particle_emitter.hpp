@@ -25,6 +25,7 @@ namespace irr
 }
 using namespace irr;
 
+#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
@@ -74,6 +75,8 @@ private:
     
 public:
     
+    LEAK_CHECK()
+    
     ParticleEmitter             (const ParticleKind* type, 
                                  const Vec3 &position,
                                  scene::ISceneNode* parent = NULL);
@@ -94,6 +97,9 @@ public:
     void         clearParticles();
     
     scene::IParticleSystemSceneNode* getNode() { return m_node; }
+    
+    /** call this if the node was freed otherwise */
+    void         unsetNode() { m_node = NULL; }
     
     void         addHeightMapAffector(Track* t);
 };

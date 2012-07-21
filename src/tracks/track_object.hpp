@@ -34,6 +34,7 @@ using namespace irr;
 
 class XMLNode;
 class SFXBase;
+class ParticleEmitter;
 
 /**
  * \ingroup tracks
@@ -68,6 +69,8 @@ private:
 
     virtual void OnAnimationEnd(scene::IAnimatedMeshSceneNode* node);
 
+    ParticleEmitter*        m_emitter;
+
 protected:
     /** The irrlicht scene node this object is attached to. */
     scene::ISceneNode             *m_node;
@@ -97,6 +100,8 @@ protected:
     std::string                    m_interaction;
     
     std::string                    m_type;
+    
+    LODNode*                       m_lod_emitter_node;
     
 public:
                  TrackObject(const XMLNode &xml_node);

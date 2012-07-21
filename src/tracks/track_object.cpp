@@ -22,6 +22,9 @@
 #include "audio/sfx_buffer.hpp"
 #include "audio/sfx_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/lod_node.hpp"
+#include "graphics/particle_emitter.hpp"
+#include "graphics/particle_kind_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item_manager.hpp"
@@ -30,6 +33,8 @@
 #include "tracks/track.hpp"
 
 #include <IMeshSceneNode.h>
+#include <ISceneManager.h>
+#include <IParticleSystemSceneNode.h>
 
 /** A track object: any additional object on the track. This object implements
  *  a graphics-only representation, i.e. there is no physical representation.
@@ -49,7 +54,9 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     m_sound      = NULL;
     m_mesh       = NULL;
     m_node       = NULL;
-
+    m_emitter    = NULL;
+    m_lod_emitter_node = NULL;
+    
     xml_node.get("xyz",     &m_init_xyz  );
     xml_node.get("hpr",     &m_init_hpr  );
     xml_node.get("scale",   &m_init_scale);
@@ -72,9 +79,50 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     bool trigger_when_near = false;
     float trigger_distance = 1.0f;
     
+    if (xml_node.getName() == "particle-emitter")
+    {
+        std::string path;
+        irr::core::vector3df emitter_origin;
+        xml_node.get("kind", &path);
+        xml_node.getXYZ(&emitter_origin);
+
+        int clip_distance = -1;
+        xml_node.get("clip_distance", &clip_distance);
+
+        try
+        {
+            ParticleKind* kind = ParticleKindManager::get()->getParticles( path.c_str() );
+            if (kind == NULL)
+            {
+                throw std::runtime_error(path + " could not be loaded");
+            }
+            ParticleEmitter* emitter = new ParticleEmitter( kind, emitter_origin );
+            
+            if (clip_distance > 0)
+            {
+                scene::ISceneManager* sm = irr_driver->getSceneManager();
+                scene::ISceneNode* sroot = sm->getRootSceneNode();
+                LODNode* lod = new LODNode("particles", sroot, sm);
+                lod->add(clip_distance, (scene::ISceneNode*)emitter->getNode(), true);
+                //m_all_emitters.push_back(emitter);
+                m_node = lod;
+                m_lod_emitter_node = lod;
+                m_emitter = emitter;
+            }
+            else
+            {
+                m_node = emitter->getNode(); // FIXME: this leaks
+                m_emitter = emitter;
+            }
+        }
+        catch (std::runtime_error& e)
+        {
+            fprintf(stderr, "[Track] WARNING: Could not load particles '%s'; cause :\n    %s", path.c_str(), e.what());
+        }
+    }
     // FIXME: at this time sound emitters are just disabled in multiplayer
     //        otherwise the sounds would be constantly heard
-    if (sound.size() > 0 && race_manager->getNumLocalPlayers() < 2)
+    else if (sound.size() > 0 && race_manager->getNumLocalPlayers() < 2)
     {
         float rolloff = 0.5;
         xml_node.get("rolloff",  &rolloff );
@@ -155,9 +203,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     // don't use this scene node
     if (model_name == "")
     {
-        m_node = NULL;
         m_mesh = NULL;
-                
+        
         if (trigger_when_near)
         {
              item_manager->newItem(m_init_xyz, trigger_distance, this);
@@ -321,8 +368,18 @@ TrackObject::TrackObject()
  */
 TrackObject::~TrackObject()
 {
-    if(m_node)
+    if (m_emitter)
+    {
+        if (m_lod_emitter_node != NULL)
+        {
+            irr_driver->removeNode(m_lod_emitter_node);
+            m_emitter->unsetNode();
+        }
+        delete m_emitter; // this will also delete m_node
+    }
+    else if (m_node)
         irr_driver->removeNode(m_node);
+    
     if(m_mesh)
     {
         irr_driver->dropAllTextures(m_mesh);
@@ -336,7 +393,6 @@ TrackObject::~TrackObject()
         delete m_sound->getBuffer();
         sfx_manager->deleteSFX(m_sound);
     }
-    
 }   // ~TrackObject
 
 // ----------------------------------------------------------------------------

@@ -56,7 +56,12 @@ void TrackObjectManager::add(const XMLNode &xml_node)
             
         std::string type;
         xml_node.get("type", &type);
-        if(type=="movable")
+        
+        if (xml_node.getName() == "particle-emitter")
+        {
+            m_all_objects.push_back(new ThreeDAnimation(xml_node));
+        }
+        else if (type=="movable")
         {
             if (is_lod)
             {

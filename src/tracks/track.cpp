@@ -1334,41 +1334,7 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
         {
             if (UserConfigParams::m_graphical_effects)
             {
-                std::string path;
-                irr::core::vector3df emitter_origin;
-                node->get("kind", &path);
-                node->getXYZ(&emitter_origin);
-
-                int clip_distance = -1;
-                node->get("clip_distance", &clip_distance);
-
-                try
-                {
-                    ParticleKind* kind = ParticleKindManager::get()->getParticles( path.c_str() );
-                    if (kind == NULL)
-                    {
-                        throw std::runtime_error(path + " could not be loaded");
-                    }
-                    ParticleEmitter* emitter = new ParticleEmitter( kind, emitter_origin );
-                    
-                    if (clip_distance > 0)
-                    {
-                        scene::ISceneManager* sm = irr_driver->getSceneManager();
-                        scene::ISceneNode* sroot = sm->getRootSceneNode();
-                        LODNode* lod = new LODNode("particles", sroot, sm);
-                        lod->add(clip_distance, (scene::ISceneNode*)emitter->getNode(), true);
-                        //m_all_emitters.push_back(emitter);
-                        m_all_nodes.push_back( lod );
-                    }
-                    else
-                    {
-                        m_all_emitters.push_back(emitter);
-                    }
-                }
-                catch (std::runtime_error& e)
-                {
-                    fprintf(stderr, "[Track] WARNING: Could not load particles '%s'; cause :\n    %s", path.c_str(), e.what());
-                }
+                m_track_object_manager->add(*node);
             }
         }
         else if(name=="sky-dome" || name=="sky-box" || name=="sky-color")

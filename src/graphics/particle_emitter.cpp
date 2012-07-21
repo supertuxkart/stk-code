@@ -200,8 +200,8 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type,
 ParticleEmitter::~ParticleEmitter()
 {
     assert(m_magic_number == 0x58781325);
-    assert(m_node != NULL);
-    irr_driver->removeNode(m_node);
+    if (m_node != NULL)
+        irr_driver->removeNode(m_node);
     m_emitter->drop();
     
     m_magic_number = 0xDEADBEEF;
