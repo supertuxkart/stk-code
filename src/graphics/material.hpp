@@ -76,6 +76,7 @@ private:
     enum Shaders
     {
         NORMAL_MAP,
+        NORMAL_MAP_WITH_LIGHTMAP,
         SPLATTING,
         WATER_SHADER,
         SPHERE_MAP,
@@ -138,6 +139,8 @@ private:
     /** For normal maps */
     bool             m_normal_map;
     std::string      m_normal_map_tex;
+    std::string      m_normal_map_shader_lightmap;
+    
     //bool             m_normal_map_uv2; //!< Whether to use a second UV layer for normal map
     bool             m_is_heightmap;
     bool             m_parallax_map;

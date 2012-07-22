@@ -49,8 +49,15 @@ const unsigned int VCLAMP = 2;
 
 class NormalMapProvider : public video::IShaderConstantSetCallBack
 {
+    bool m_with_lightmap;
+    
 public:
     LEAK_CHECK()
+    
+    NormalMapProvider(bool withLightmap)
+    {
+        m_with_lightmap = withLightmap;
+    }
     
     virtual void OnSetConstants(
                                irr::video::IMaterialRendererServices *services,
@@ -61,6 +68,12 @@ public:
         
         s32 bumptex = 1;
         services->setPixelShaderConstant("BumpTex", &bumptex, 1);
+        
+        s32 lightmapTex = (m_with_lightmap ? 2 : 0);
+        services->setPixelShaderConstant("LightMapTex", &lightmapTex, 1);
+        
+        s32 hasLightMap = (m_with_lightmap ? 1 : 0);
+        services->setPixelShaderConstant("HasLightMap", &hasLightMap, 1);
         
         // We could calculate light direction as coming from the sun (then we'd need to
         // transform it into camera space). But I find that pretending light
@@ -409,6 +422,8 @@ Material::Material(const XMLNode *node, int index)
         {
             fprintf(stderr, "[Material] WARNING: could not find normal map image in materials.xml\n");
         }
+        
+        node->get("normal-light-map", &m_normal_map_shader_lightmap);
         
         // not supported by irrlicht
         //m_normal_map_uv2 = false;
@@ -967,9 +982,28 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             }
             m->setTexture(1, tex);
             
-            if (m_shaders[NORMAL_MAP] == NULL)
+            bool with_lightmap = false;
+            
+            if (m_normal_map_shader_lightmap.size() > 0)
             {
-                m_shaders[NORMAL_MAP] = new NormalMapProvider();
+                ITexture* lm_tex = irr_driver->getTexture(m_normal_map_shader_lightmap);
+                m->setTexture(2, lm_tex);
+                with_lightmap = true;
+            }
+            
+            if (with_lightmap)
+            {
+                if (m_shaders[NORMAL_MAP_WITH_LIGHTMAP] == NULL)
+                {
+                    m_shaders[NORMAL_MAP_WITH_LIGHTMAP] = new NormalMapProvider(true);
+                }
+            }
+            else
+            {
+                if (m_shaders[NORMAL_MAP] == NULL)
+                {
+                    m_shaders[NORMAL_MAP] = new NormalMapProvider(false);
+                }
             }
             
             const char* vertex_shader = "shaders/normalmap.vert";
@@ -985,7 +1019,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                                    (file_manager->getDataDir() + pixel_shader).c_str(), 
                                    "main",
                                    video::EPST_PS_2_0,
-                                   m_shaders[NORMAL_MAP],
+                                   m_shaders[with_lightmap ? NORMAL_MAP_WITH_LIGHTMAP : NORMAL_MAP],
                                    video::EMT_SOLID_2_LAYER );
             m->MaterialType = (E_MATERIAL_TYPE)material_type;
             m->Lighting = false;
