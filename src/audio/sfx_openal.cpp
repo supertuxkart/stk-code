@@ -87,6 +87,8 @@ bool SFXOpenAL::init()
     
     alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  m_soundBuffer->getRolloff());
     
+    alSourcef (m_soundSource, AL_MAX_DISTANCE,    m_soundBuffer->getMaxDist());
+    
     if (m_gain < 0.0f)
     {
         alSourcef (m_soundSource, AL_GAIN,        m_defaultGain);
@@ -242,6 +244,16 @@ void SFXOpenAL::position(const Vec3 &position)
 
     alSource3f(m_soundSource, AL_POSITION,
                (float)position.getX(), (float)position.getY(), (float)position.getZ());
+             
+    if (sfx_manager->getListenerPos().distance(position) > m_soundBuffer->getMaxDist())
+    {
+        alSourcef(m_soundSource, AL_GAIN, 0);
+    }
+    else
+    {
+        alSourcef(m_soundSource, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain));
+    }
+    
     SFXManager::checkError("positioning");
 }   // position
 

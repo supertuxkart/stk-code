@@ -80,6 +80,9 @@ public:
 
 private:        
     
+    /** Listener position */
+    Vec3 m_position;
+    
     /** The buffers and info for all sound effects. These are shared among all
      *  instances of SFXOpenal. */
     std::map<std::string, SFXBuffer*> m_all_sfx_types;
@@ -110,6 +113,7 @@ public:
                                           const std::string &filename,
                                           bool               positional,
                                           float              rolloff,
+                                          float              max_width,
                                           float              gain);
 
     SFXBase*                 createSoundSource(SFXBuffer* info, 
@@ -136,6 +140,8 @@ public:
     
     /** Prints the list of currently loaded sounds to stdout. Useful to debug audio leaks */
     void dump();
+    
+    Vec3 getListenerPos() const { return m_position; }
 
 };
 

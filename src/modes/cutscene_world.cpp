@@ -187,8 +187,8 @@ void CutsceneWorld::update(float dt)
             rot2.setPitch(rot2.getPitch() + 90.0f);
             m_camera->setRotation(rot2.toIrrVector());
             
-            sfx_manager->positionListener(curr->getNode()->getPosition(),
-                                          m_camera->getTarget() - curr->getNode()->getPosition());
+            sfx_manager->positionListener(m_camera->getAbsolutePosition(),
+                                          m_camera->getTarget() - m_camera->getAbsolutePosition());
             
             break;
             //printf("Camera %f %f %f\n", curr->getNode()->getPosition().X, curr->getNode()->getPosition().Y, curr->getNode()->getPosition().Z);

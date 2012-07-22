@@ -55,6 +55,7 @@ private:
     bool     m_positional;
     float    m_rolloff;
     float    m_gain;
+    float    m_max_dist;
     
     bool loadVorbisBuffer(const std::string &name, ALuint buffer);
     
@@ -63,6 +64,7 @@ public:
     SFXBuffer(const  std::string& file,
               bool   positional,
               float  rolloff,
+              float  max_width,
               float  gain);
     
     SFXBuffer(const std::string& file,
@@ -93,9 +95,10 @@ public:
     ALuint   getBufferID()    const { return m_buffer; }
     
     bool     isPositional()   const { return m_positional; }
-    float    getRolloff()     const { return m_rolloff; }
-    float    getGain()        const { return m_gain; }
-    std::string getFileName() const { return m_file; }
+    float    getRolloff()     const { return m_rolloff;    }
+    float    getGain()        const { return m_gain;       }
+    float    getMaxDist()     const { return m_max_dist;   }
+    std::string getFileName() const { return m_file;       }
     
     void     setPositional(bool positional) { m_positional = positional; }
 };

@@ -39,12 +39,14 @@
 SFXBuffer::SFXBuffer(const std::string& file,
                      bool  positional,
                      float rolloff,
+                     float max_width,
                      float gain)
 {
     m_buffer      = 0;
     m_gain        = 1.0f;
     m_rolloff     = 0.1f;
     m_loaded      = false;
+    m_max_dist    = max_width;
     m_file        = file;
     
     m_rolloff     = rolloff;
@@ -60,6 +62,7 @@ SFXBuffer::SFXBuffer(const std::string& file,
     m_buffer      = 0;
     m_gain        = 1.0f;
     m_rolloff     = 0.1f;
+    m_max_dist    = 300.0f;
     m_positional  = false;
     m_loaded      = false;
     m_file        = file;
@@ -67,6 +70,7 @@ SFXBuffer::SFXBuffer(const std::string& file,
     node->get("rolloff",     &m_rolloff    );
     node->get("positional",  &m_positional );
     node->get("volume",      &m_gain       );
+    node->get("max_dist",    &m_max_dist   );
 }
 
 //----------------------------------------------------------------------------

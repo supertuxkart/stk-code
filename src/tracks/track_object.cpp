@@ -135,8 +135,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
 
         xml_node.get("conditions", &m_trigger_condition);
         
-        float rolloff_distance = 10.0f;
-        xml_node.get("distance",      &rolloff_distance );
+        float max_dist = 390.0f;
+        xml_node.get("max_dist",      &max_dist );
         
         // first try track dir, then global dir
         std::string soundfile = file_manager->getModelFile(sound);
@@ -148,6 +148,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         SFXBuffer* buffer = new SFXBuffer(soundfile,
                                           true /* positional */,
                                           rolloff,
+                                          max_dist,
                                           volume);
         buffer->load();
         
@@ -420,6 +421,14 @@ void TrackObject::OnAnimationEnd(scene::IAnimatedMeshSceneNode* node)
 // ----------------------------------------------------------------------------
 void TrackObject::update(float dt)
 {
+    
+    if (m_sound != NULL)
+    {
+        // muting when too far is implemented manually since not supported by OpenAL
+        // so need to call this every frame to update the muting state if listener
+        // moved
+        m_sound->position(m_init_xyz);
+    }
 }   // update
 // ----------------------------------------------------------------------------
 

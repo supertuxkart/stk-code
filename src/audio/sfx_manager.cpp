@@ -185,10 +185,11 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
                                     const std::string &sfx_file,
                                     bool               positional,
                                     float              rolloff,
+                                    float              max_width,
                                     float              gain)
 {
 
-    SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff, gain);
+    SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff, max_width, gain);
     
     m_all_sfx_types[sfx_name] = buffer;
     
@@ -250,6 +251,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
     return addSingleSfx(sfx_name, full_path,
                         tmpbuffer.isPositional(),
                         tmpbuffer.getRolloff(),
+                        tmpbuffer.getMaxDist(),
                         tmpbuffer.getGain());
     
 }   // loadSingleSfx
@@ -477,6 +479,8 @@ void SFXManager::positionListener(const Vec3 &position, const Vec3 &front)
 {
 #if HAVE_OGGVORBIS
     if (!UserConfigParams::m_sfx || !m_initialized) return;
+    
+    m_position = position;
     
     //forward vector
     m_listenerVec[0] = front.getX(); 
