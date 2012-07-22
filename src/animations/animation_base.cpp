@@ -38,13 +38,11 @@ AnimationBase::AnimationBase(const XMLNode &node)
     }
     m_playing   = true;
     m_anim_type = ATT_CYCLIC;
-#ifdef DEBUG
-    if(m_all_ipos.size()==0)
+
+    if (m_all_ipos.size() == 0) // this will happen for some separate but non-animated objects
     {
-        printf("Warning: empty animation curve.\n");
         m_playing = false;
     }
-#endif
 
 }   // AnimationBase
 // ----------------------------------------------------------------------------
