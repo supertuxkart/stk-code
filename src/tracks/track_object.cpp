@@ -135,19 +135,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
 
         xml_node.get("conditions", &m_trigger_condition);
         
-        ALuint rolloffType = AL_INVERSE_DISTANCE_CLAMPED;
-        std::string rolloffTypeStr;
-        xml_node.get("rolloff_type",  &rolloffTypeStr );
-        
         float rolloff_distance = 10.0f;
         xml_node.get("distance",      &rolloff_distance );
-        
-        if (rolloffTypeStr == "inverse")
-            rolloffType = AL_INVERSE_DISTANCE_CLAMPED;
-        else if (rolloffTypeStr == "linear") 
-            rolloffType = AL_LINEAR_DISTANCE_CLAMPED;
-        else if (rolloffTypeStr != "")
-            fprintf(stderr, "[TrackObject] Unknown rolloff type '%s'\n", rolloffTypeStr.c_str());
         
         // first try track dir, then global dir
         std::string soundfile = file_manager->getModelFile(sound);
@@ -156,16 +145,9 @@ TrackObject::TrackObject(const XMLNode &xml_node)
             soundfile = file_manager->getSFXFile(sound);
         }
         
-        float rolloff_param = 1.0f;
-        if (rolloffType == AL_INVERSE_DISTANCE_CLAMPED)
-            rolloff_param = rolloff;
-        else if (rolloffType == AL_LINEAR_DISTANCE_CLAMPED)
-            rolloff_param = rolloff_distance;
-            
         SFXBuffer* buffer = new SFXBuffer(soundfile,
                                           true /* positional */,
-                                          rolloffType,
-                                          rolloff_param,
+                                          rolloff,
                                           volume);
         buffer->load();
         

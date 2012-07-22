@@ -43,8 +43,6 @@ private:
     bool         m_positional;
     float        m_defaultGain;
     
-    int          m_rolloffType;
-    
     /** The OpenAL source contains this info, but if audio is disabled initially then
         the sound source won't be created and we'll be left with no clue when enabling
         sounds later */

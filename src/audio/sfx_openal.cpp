@@ -44,7 +44,6 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain) : SFXBase()
     m_defaultGain = gain;
     m_loop        = false;
     m_gain        = -1.0f;
-    m_rolloffType = buffer->getRolloffType();
     
     // Don't initialise anything else if the sfx manager was not correctly
     // initialised. First of all the initialisation will not work, and it
@@ -86,17 +85,7 @@ bool SFXOpenAL::init()
     alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
     
-    alDistanceModel(m_rolloffType);
-    
-    if (m_rolloffType == AL_INVERSE_DISTANCE_CLAMPED)
-    {
-        alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  m_soundBuffer->getRolloff());
-    }
-    else if (m_rolloffType == AL_LINEAR_DISTANCE_CLAMPED)
-    {
-        alSourcef (m_soundSource, AL_MAX_DISTANCE,  m_soundBuffer->getRolloff());
-    }
-    
+    alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  m_soundBuffer->getRolloff());
     
     if (m_gain < 0.0f)
     {
@@ -242,8 +231,9 @@ void SFXOpenAL::position(const Vec3 &position)
     if (!m_positional)
     {
         // in multiplayer, all sounds are positional, so in this case don't bug users with
-        // an error messageif (race_manager->getNumLocalPlayers() > 1)
-        if (race_manager->getNumLocalPlayers() == 1)
+        // an error message if (race_manager->getNumLocalPlayers() > 1)
+        // (note that 0 players is also possible, in cutscenes)
+        if (race_manager->getNumLocalPlayers() < 2)
         {
             fprintf(stderr, "WARNING, position called on non-positional SFX\n");
         }

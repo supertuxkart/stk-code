@@ -184,12 +184,11 @@ void SFXManager::loadSfx()
 SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
                                     const std::string &sfx_file,
                                     bool               positional,
-                                    ALuint             rolloff_type,
                                     float              rolloff,
                                     float              gain)
 {
 
-    SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff_type, rolloff, gain);
+    SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff, gain);
     
     m_all_sfx_types[sfx_name] = buffer;
     
@@ -250,7 +249,6 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
 
     return addSingleSfx(sfx_name, full_path,
                         tmpbuffer.isPositional(),
-                        tmpbuffer.getRolloffType(),
                         tmpbuffer.getRolloff(),
                         tmpbuffer.getGain());
     
