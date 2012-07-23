@@ -116,6 +116,11 @@ void IrrDriver::updateConfigIfRelevant()
         {
             int x = (int)placement.rcNormalPosition.left;
             int y = (int)placement.rcNormalPosition.top;
+            // If the windows position is saved, it must be a non-negative 
+            // number. So if the window is partly off screen, move it to the
+            // corresponding edge.
+            if(x<0) x = 0;
+            if(y<0) y = 0;
             printf("Retrieved window location for config : %i %i\n", x, y);
             
             if (UserConfigParams::m_window_x != x || UserConfigParams::m_window_y != y)
