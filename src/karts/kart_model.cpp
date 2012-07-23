@@ -491,12 +491,11 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
 
 // ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension.
- *  \param rotation How far the wheels should rotate.
- *  \param visual_steer How much the front wheels are turned for steering.
+ *  \param rotation_dt How far the wheels have rotated since last time.
  *  \param steer The actual steer settings.
  *  \param suspension Suspension height for all four wheels.
  */
-void KartModel::update(float rotation, float steer, const float suspension[4])
+void KartModel::update(float rotation_dt, float steer, const float suspension[4])
 {
     float clamped_suspension[4];
     // Clamp suspension to minimum and maximum suspension length, so that
@@ -518,9 +517,7 @@ void KartModel::update(float rotation, float steer, const float suspension[4])
         clamped_suspension[i] = ratio*suspension_length;
     }   // for i<4
 
-    core::vector3df wheel_rear (rotation*RAD_TO_DEGREE, 0, 0);
     core::vector3df wheel_steer(0, steer*30.0f, 0);
-    core::vector3df wheel_front = wheel_rear+wheel_steer;
 
     for(unsigned int i=0; i<4; i++)
     {
@@ -538,13 +535,19 @@ void KartModel::update(float rotation, float steer, const float suspension[4])
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
         pos.Y += clamped_suspension[i];
         m_wheel_node[i]->setPosition(pos);
-    }
-    if(m_wheel_node[0]) m_wheel_node[0]->setRotation(wheel_front);
-    if(m_wheel_node[1]) m_wheel_node[1]->setRotation(wheel_front);
-    if(m_wheel_node[2]) m_wheel_node[2]->setRotation(wheel_rear );
-    if(m_wheel_node[3]) m_wheel_node[3]->setRotation(wheel_rear );
 
-    // If animaitons are disabled, stop here
+        // Now calculate the new rotation: (old + change) mod 360
+        float new_rotation = m_wheel_node[i]->getRotation().X
+                             + rotation_dt * RAD_TO_DEGREE;
+        new_rotation = fmodf(new_rotation, 360);
+        core::vector3df wheel_rotation(new_rotation, 0, 0);
+        // Only apply steer to first 2 wheels.
+        if (i < 2)
+            wheel_rotation += wheel_steer;
+        m_wheel_node[i]->setRotation(wheel_rotation);
+    } // for (i < 4)
+
+    // If animations are disabled, stop here
     if (m_animated_node == NULL) return;
     
     // Check if the end animation is being played, if so, don't

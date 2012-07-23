@@ -356,6 +356,22 @@ void Kart::reset()
     {
         m_vehicle->reset();
     }
+    // Randomize wheel rotation if needed
+    if (m_kart_properties->hasRandomWheels() && m_vehicle && m_kart_model)
+    {
+        scene::ISceneNode** graphic_wheels = m_kart_model->getWheelNodes();
+        // FIXME Hardcoded i < 4 comes from the arrays in KartModel 
+        for (int i = 0; i < m_vehicle->getNumWheels() && i < 4; i++)
+        {
+            // Physics
+            btWheelInfo& wheel = m_vehicle->getWheelInfo(i);
+            wheel.m_rotation = btScalar(rand() % 360);
+            // And graphics
+            core::vector3df wheel_rotation(wheel.m_rotation, 0, 0);
+            if (graphic_wheels[i])
+                graphic_wheels[i]->setRotation(wheel_rotation);
+        } // for wheels
+    } // if random wheel rotation
 
     setTrans(m_reset_transform);
 
@@ -620,9 +636,6 @@ void Kart::createPhysics()
         wheel.m_wheelsDampingCompression = m_kart_properties->getWheelDampingCompression();
         wheel.m_frictionSlip             = m_kart_properties->getFrictionSlip();
         wheel.m_rollInfluence            = m_kart_properties->getRollInfluence();
-        wheel.m_rotation                 = 
-            btScalar(float(m_kart_properties->hasRandomWheels()) 
-            * (rand() % 360));
     }
     // Obviously these allocs have to be properly managed/freed
     btTransform t;
@@ -1019,10 +1032,10 @@ void Kart::update(float dt)
         //m_body->setAngularVelocity(btVector3(0,0,0));
     }
 
-    //m_wheel_rotation gives the rotation around the X-axis, and since velocity's
-    //timeframe is the delta time, we don't have to multiply it with dt.
-    m_wheel_rotation += m_speed*dt / m_kart_properties->getWheelRadius();
-    m_wheel_rotation=fmodf(m_wheel_rotation, 2*M_PI);
+    //m_wheel_rotation gives the rotation around the X-axis
+    m_wheel_rotation_dt = m_speed*dt / m_kart_properties->getWheelRadius();
+    m_wheel_rotation   += m_wheel_rotation_dt;
+    m_wheel_rotation    = fmodf(m_wheel_rotation, 2*M_PI);
 
     if(m_kart_animation)
         m_kart_animation->update(dt);
@@ -2163,7 +2176,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         wheel_up_axis[i] = m_default_suspension_length[i]
                          - m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
     }
-    m_kart_model->update(m_wheel_rotation, getSteerPercent(), wheel_up_axis);
+    m_kart_model->update(m_wheel_rotation_dt, getSteerPercent(), wheel_up_axis);
 
     Vec3        center_shift  = m_kart_properties->getGravityCenterShift();
     float y = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getY()

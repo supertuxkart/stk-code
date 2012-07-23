@@ -174,6 +174,8 @@ private:
     std::string m_wheel_filename[4];
     /**  Radius of the graphical wheels.  */
     float       m_wheel_graphics_radius[4];
+    /** If the kart is supposed to have random wheel rotation at start. */
+    bool        m_has_rand_wheels;
     /** Max. length of plunger rubber band. */
     float       m_rubber_band_max_length;
     /** Force of an attached rubber band. */
@@ -328,8 +330,7 @@ private:
 
     void  load              (const std::string &filename,
                              const std::string &node);
-	/** If the kart is supposed to have random wheel rotation at start. */
-	bool m_has_rand_wheels;
+
 
 public:
           KartProperties    (const std::string &filename="");
@@ -663,7 +664,8 @@ public:
     /** Returns the slowdown of a kart that is squashed. */
     float getSquashSlowdown() const {return m_squash_slowdown; }
 
-	bool hasRandomWheels() const { return m_has_rand_wheels; }
+    /** Returns true if wheels should have random rotation at start. */
+    bool hasRandomWheels() const { return m_has_rand_wheels; }
 
     /** Returns the bevel factor (!=0 indicates to use a bevelled box). */
     const Vec3 &getBevelFactor() const { return m_bevel_factor; }

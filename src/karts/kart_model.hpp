@@ -144,7 +144,7 @@ public:
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
-    void          update(float rotation, float steer, 
+    void          update(float rotation_dt, float steer, 
                          const float suspension[4]);
     void          setDefaultPhysicsPosition(const Vec3 &center_shift, 
                                             float wheel_radius);

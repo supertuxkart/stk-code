@@ -170,7 +170,11 @@ private:
     
     Rain            *m_rain;
 
+    /** Rotation compared to the start position, same for all wheels */
     float           m_wheel_rotation;
+
+    /** Rotation change in the last time delta, same for all wheels */
+    float           m_wheel_rotation_dt;
     
     /** For each wheel it stores the suspension length after the karts are at 
      *  the start position, i.e. the suspension will be somewhat compressed.
