@@ -120,6 +120,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_reset_transform         = init_transform;
     m_speed                   = 0.0f;
     m_wheel_rotation          = 0;
+    m_wheel_rotation_dt       = 0;
 
     m_kart_model->setKart(this);
 
