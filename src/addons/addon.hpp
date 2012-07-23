@@ -231,10 +231,9 @@ public:
         return "";  // Ignore compiler warning
     }   // getTypeDirectory
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns if the current version is between min and max versions */
-	bool testIncluded(const std::string &min_ver, const std::string &max_ver);
-
+    bool testIncluded(const std::string &min_ver, const std::string &max_ver);
     // ------------------------------------------------------------------------
     /** Returns if a certain status flag is set. */
     bool testStatus(AddonStatus n) const {return (m_status & n) !=0; }
