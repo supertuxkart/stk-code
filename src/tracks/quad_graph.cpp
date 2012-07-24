@@ -398,6 +398,10 @@ void QuadGraph::createMesh(bool show_invisible,
     video::SMaterial m;
     m.BackfaceCulling = false;
     m.Lighting        = false;
+#define TRANSPARENT_DEBUG_MESH
+#ifdef TRANSPARENT_DEBUG_MESH
+    m.MaterialType    = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+#endif
     m_mesh            = irr_driver->createQuadMesh(&m);
     m_mesh_buffer     = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
@@ -523,7 +527,11 @@ void QuadGraph::createDebugMesh()
     createMesh();
 
     // Now colour the quads red/blue/red ...
+#ifdef TRANSPARENT_DEBUG_MESH
+    video::SColor     c( 32, 255, 0, 0);    
+#else
     video::SColor     c(255, 255, 0, 0);    
+#endif
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
     for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
     {
