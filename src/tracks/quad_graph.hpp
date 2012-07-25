@@ -87,7 +87,8 @@ private:
     void addSuccessor(unsigned int from, unsigned int to);
     void load         (const std::string &filename);
     void computeDistanceFromStart(unsigned int start_node, float distance);
-    void createMesh(bool show_invisible=true, 
+    void createMesh(bool show_invisible=true,
+                    bool enable_transparency=false, 
                     const video::SColor *track_color=NULL,
                     const video::SColor *lap_color=NULL);
     unsigned int getStartNode() const;

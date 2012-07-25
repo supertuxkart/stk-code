@@ -389,21 +389,26 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
 // -----------------------------------------------------------------------------
 /** Creates a mesh for this graph. The mesh is not added to a scene node and 
  *  is stored in m_mesh.
+ *  \param show_invisble  If true, also create a mesh for parts of the
+ *         driveline that are invisible.
+ *  \param enable_transparency Enable alpha blending to make the mesh
+ *         semi transparent.
+ *  \param track_color Colour of the actual quads.
+ *  \param lap_color If defined, show the lap counting line in that colour.
  */
-void QuadGraph::createMesh(bool show_invisible, 
+void QuadGraph::createMesh(bool show_invisible,
+                           bool enable_transparency,
                            const video::SColor *track_color,
                            const video::SColor *lap_color)
 {
     // The debug track will not be lighted or culled.
     video::SMaterial m;
-    m.BackfaceCulling = false;
-    m.Lighting        = false;
-#define TRANSPARENT_DEBUG_MESH
-#ifdef TRANSPARENT_DEBUG_MESH
-    m.MaterialType    = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-#endif
-    m_mesh            = irr_driver->createQuadMesh(&m);
-    m_mesh_buffer     = m_mesh->getMeshBuffer(0);
+    m.BackfaceCulling  = false;
+    m.Lighting         = false;
+    if(enable_transparency)
+        m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    m_mesh             = irr_driver->createQuadMesh(&m);
+    m_mesh_buffer      = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
 
     // Count the number of quads to display (some quads might be invisible
@@ -524,14 +529,11 @@ void QuadGraph::createDebugMesh()
 {
     if(m_all_nodes.size()<=0) return;  // no debug output if not graph
 
-    createMesh();
+    createMesh(/*show_invisible*/true,
+               /*enable_transparency*/true);
 
     // Now colour the quads red/blue/red ...
-#ifdef TRANSPARENT_DEBUG_MESH
     video::SColor     c( 32, 255, 0, 0);    
-#else
-    video::SColor     c(255, 255, 0, 0);    
-#endif
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
     for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
     {
@@ -935,9 +937,9 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     IrrDriver::RTTProvider rttProvider(dimension, name, true);
     video::SColor red(128, 255, 0, 0);
     createMesh(/*show_invisible part of the track*/ false,
+               /*enable_transparency*/ false,
                /*track_color*/    &fill_color,
                /*lap line color*/  &red                       );
-    //video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
     
     m_node = irr_driver->addMesh(m_mesh);   // add Debug Mesh
 #ifdef DEBUG
