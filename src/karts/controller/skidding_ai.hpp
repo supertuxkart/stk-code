@@ -158,6 +158,9 @@ private:
                               const Vec3 &end,
                               Vec3 *center,
                               float *radius);
+    virtual bool doSkid(float steer_fraction);
+    virtual void setSteering(float angle, float dt);
+
 protected:
     virtual unsigned int getNextSector(unsigned int index);
 

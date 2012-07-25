@@ -83,12 +83,13 @@ protected:
     virtual unsigned int getNextSector(unsigned int index);
     virtual void  newLap             (int lap);
     virtual void setControllerName(const std::string &name);
+    virtual void setSteering   (float angle, float dt);
     float    steerToAngle  (const unsigned int sector, const float angle);
     float    steerToPoint  (const Vec3 &point);
     float    normalizeAngle(float angle);
-    void     setSteering   (float angle, float dt);
     void     setSkiddingFraction(float f);
     void     computePath();
+    virtual bool doSkid(float steer_fraction);
     // ------------------------------------------------------------------------
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */

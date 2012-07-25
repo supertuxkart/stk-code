@@ -22,7 +22,14 @@
 //The AI debugging works best with just 1 AI kart, so set the number of karts
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
 #ifdef DEBUG
+   // Enable AI graphical debugging
 #  undef AI_DEBUG
+   // Shows left and right lines when using new findNonCrashing function
+#  undef AI_DEBUG_NEW_FIND_NON_CRASHING
+   // Show the predicted turn circles
+#  undef AI_DEBUG_CIRCLES
+   // Show the heading of the kart
+#  undef AI_DEBUG_KART_HEADING
 #endif
 
 #include "karts/controller/skidding_ai.hpp"
@@ -47,6 +54,8 @@
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
 #include "karts/rescue_animation.hpp"
+#include "karts/skidding.hpp"
+#include "karts/skidding_properties.hpp"
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "modes/linear_world.hpp"
@@ -117,14 +126,22 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
 #define NUM_CURVES (CURVE_QG+1)
 
     m_curve   = new ShowCurve*[NUM_CURVES];
+    for(unsigned int i=0; i<NUM_CURVES; i++)
+        m_curve[i] = NULL;
+#ifdef AI_DEBUG_CIRCLES
     m_curve[CURVE_PREDICT1]  = new ShowCurve(0.05f, 0.5f, 
                                    irr::video::SColor(128,   0,   0, 128));
+#endif
+#ifdef AI_DEBUG_KART_HEADING
     m_curve[CURVE_KART]      = new ShowCurve(0.5f, 0.5f, 
                                    irr::video::SColor(128,   0,   0, 128));
+#endif
+#ifdef AI_DEBUG_NEW_FIND_NON_CRASHING
     m_curve[CURVE_LEFT]      = new ShowCurve(0.5f, 0.5f, 
                                    irr::video::SColor(128, 128,   0,   0));
     m_curve[CURVE_RIGHT]     = new ShowCurve(0.5f, 0.5f, 
                                    irr::video::SColor(128,   0, 128,   0));
+#endif
     m_curve[CURVE_QG]        = new ShowCurve(0.5f, 0.5f, 
                                    irr::video::SColor(128,   0, 128,   0));
 #endif
@@ -343,7 +360,7 @@ void SkiddingAI::handleBraking()
             printf("[AI] braking: %s not aligned with track.\n",
             m_kart->getIdent().c_str());
 #endif
-        m_controls->m_brake = true;
+        //m_controls->m_brake = true;
         return;
     }
     if(m_current_track_direction==GraphNode::DIR_LEFT ||
@@ -690,7 +707,7 @@ void SkiddingAI::handleAcceleration( const float dt)
         return;
     }
 
-    if( m_controls->m_brake == true )
+    if( m_controls->m_brake )
     {
         m_controls->m_accel = 0.0f;
         return;
@@ -986,7 +1003,8 @@ void SkiddingAI::findNonCrashingPoint2(Vec3 *result)
     const unsigned int RIGHT_END_POINT = 1;
     core::line2df left (xz, q[LEFT_END_POINT ].toIrrVector2d());
     core::line2df right(xz, q[RIGHT_END_POINT].toIrrVector2d());
-#ifdef AI_DEBUG
+
+#if defined(AI_DEBUG) && defined(AI_DEBUG_NEW_FIND_NON_CRASHING)
     const Vec3 eps(0,0.5f,0);
     m_curve[CURVE_LEFT]->clear();
     m_curve[CURVE_LEFT]->addPoint(m_kart->getXYZ()+eps);
@@ -996,10 +1014,12 @@ void SkiddingAI::findNonCrashingPoint2(Vec3 *result)
     m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps);
     m_curve[CURVE_RIGHT]->addPoint(q[RIGHT_END_POINT]+eps);
     m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps);
+#endif
+#ifdef AI_DEBUG_KART_HEADING
     m_curve[CURVE_KART]->clear();
     m_curve[CURVE_KART]->addPoint(m_kart->getXYZ()+eps);
     Vec3 forw(0, 0, 50);
-    m_curve[CURVE_KART]->addPoint(m_kart->getTrans()(forw));
+    m_curve[CURVE_KART]->addPoint(m_kart->getTrans()(forw)+eps);
 #endif
     while(1)
     {
@@ -1015,7 +1035,7 @@ void SkiddingAI::findNonCrashingPoint2(Vec3 *result)
             if(right.getPointOrientation(p)<0)
                 break;
             left.end = p;
-#ifdef AI_DEBUG
+#if defined(AI_DEBUG) && defined(AI_DEBUG_NEW_FIND_NON_CRASHING)
             Vec3 ppp(p.X, m_kart->getXYZ().getY(), p.Y);
             m_curve[CURVE_LEFT]->addPoint(ppp+eps);
             m_curve[CURVE_LEFT]->addPoint(m_kart->getXYZ()+eps);
@@ -1031,7 +1051,8 @@ void SkiddingAI::findNonCrashingPoint2(Vec3 *result)
             // Break if new point is to the left of left line
             if(left.getPointOrientation(p)>0)
                 break;
-#ifdef AI_DEBUG
+#if defined(AI_DEBUG) && defined(AI_DEBUG_NEW_FIND_NON_CRASHING)
+
             Vec3 ppp(p.X, m_kart->getXYZ().getY(), p.Y);
             m_curve[CURVE_RIGHT]->addPoint(ppp+eps);
             m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps);
@@ -1098,6 +1119,13 @@ void SkiddingAI::findNonCrashingPoint2(Vec3 *result)
  */
 void SkiddingAI::findNonCrashingPoint(Vec3 *result)
 {    
+#ifdef AI_DEBUG_KART_HEADING
+    const Vec3 eps(0,0.5f,0);
+    m_curve[CURVE_KART]->clear();
+    m_curve[CURVE_KART]->addPoint(m_kart->getXYZ()+eps);
+    Vec3 forw(0, 0, 50);
+    m_curve[CURVE_KART]->addPoint(m_kart->getTrans()(forw)+eps);
+#endif
     unsigned int sector = m_next_node_index[m_track_node];
     int target_sector;
 
@@ -1193,11 +1221,12 @@ void SkiddingAI::determineTrackDirection()
 
 #ifdef AI_DEBUG
 //    m_curve[CURVE_QG]->clear();
-    for(unsigned int i=m_track_node; i<=last; i++)
+//    for(unsigned int i=m_track_node; i<=last; i++)
     {
 //        m_curve[CURVE_QG]->addPoint(qg->getNode(i).getCenter());
     }
 #endif
+    m_controls->m_skid = false;
 
     if(m_current_track_direction==GraphNode::DIR_LEFT  ||
        m_current_track_direction==GraphNode::DIR_RIGHT   )
@@ -1220,31 +1249,160 @@ void SkiddingAI::determineTrackDirection()
 
         determineTurnRadius(xyz, tangent, last_xyz,
                             &center, &m_current_curve_radius);
-#ifdef AI_DEBUG
-//        m_curve[CURVE_PREDICT1]->makeCircle(center, m_current_curve_radius);
-//        m_curve[CURVE_PREDICT1]->addPoint(last_xyz);
-//        m_curve[CURVE_PREDICT1]->addPoint(center);
-//        m_curve[CURVE_PREDICT1]->addPoint(xyz);
+#ifdef ADJUST_TURN_RADIUS_TO_AVOID_CRASH_INTO_TRACK
+        for(unsigned int i=next; i<=last; i++)
+        {
+            // Pick either the lower left or right point:
+            int index = m_current_track_direction==GraphNode::DIR_LEFT
+                      ? 0 : 1;
+            float r = (center - qg->getQuadOfNode(i)[index]).length();
+            if(m_current_curve_radius < r)
+            {
+                determineTurnRadius(xyz, tangent, qg->getQuadOfNode(i)[index],
+                    &center, &m_current_curve_radius);
+                break;
+            }
+        }
+#endif
+#if defined(AI_DEBUG) && defined(AI_DEBUG_CIRCLES)
+        m_curve[CURVE_PREDICT1]->makeCircle(center, m_current_curve_radius);
+        m_curve[CURVE_PREDICT1]->addPoint(last_xyz);
+        m_curve[CURVE_PREDICT1]->addPoint(center);
+        m_curve[CURVE_PREDICT1]->addPoint(xyz);
 #endif
 
-        // Estimate how long it takes to finish the curve
-        Vec3 diff_kart = xyz      - center;
-        Vec3 diff_last = last_xyz - center;
-        float angle_kart = atan2(diff_kart.getX(), diff_kart.getZ());
-        float angle_last = atan2(diff_last.getX(), diff_last.getZ());
-        float angle = m_current_track_direction == GraphNode::DIR_RIGHT
-                    ? angle_last - angle_kart
-                    : angle_kart - angle_last;
-        angle = normalizeAngle(angle);
-        float length = m_current_curve_radius*angle;
-        float duration = length / m_kart->getSpeed();
-        //printf("Radius %f angle %f length %f dur %f\n",
-        //    m_current_curve_radius, angle*180.0/3.1415,
-        //    length, duration);
-    }   
+        // Only try skidding when a certain minimum speed is reached.
+        if(m_kart->getSpeed() > 5.0f)
+        {
+            // Estimate how long it takes to finish the curve
+            Vec3 diff_kart = xyz      - center;
+            Vec3 diff_last = last_xyz - center;
+            float angle_kart = atan2(diff_kart.getX(), diff_kart.getZ());
+            float angle_last = atan2(diff_last.getX(), diff_last.getZ());
+            float angle = m_current_track_direction == GraphNode::DIR_RIGHT
+                        ? angle_last - angle_kart
+                        : angle_kart - angle_last;
+            angle = normalizeAngle(angle);
+            float length = m_current_curve_radius*fabsf(angle);
+            float duration = length / m_kart->getSpeed();
+            duration *= 1.5f;
+            const Skidding *skidding = m_kart->getSkidding();
+            if(m_controls->m_skid && duration < 1.0f)
+            {
+                m_controls->m_skid = false;
+                if(m_ai_debug)
+                    printf("[AI] skid : '%s' too short, stop skid.\n",
+                            m_kart->getIdent().c_str());
+            }
+            else if(skidding->getNumberOfBonusTimes()>0 &&
+                    skidding->getTimeTillBonus(0) < duration)
+            {
+#ifdef DEBUG
+                if(m_ai_debug)
+                    printf("[AI] skid: %s start skid, duration %f.\n",
+                    m_kart->getIdent().c_str(), duration);
+#endif
+                m_controls->m_skid = true;
+                //m_controls->m_steering = 
+                //    m_current_track_direction == GraphNode::DIR_RIGHT : 1 : -1;
+
+            }  // if curve long enough for skidding
+        }   // if speed > minimum skid speed
+    }   // if(m_current_track_direction == DIR_LEFT || DIR_RIGHT   )
+
 
     return;
 }   // determineTrackDirection
+
+// ----------------------------------------------------------------------------
+/** Determines if the kart should skid. The base implementation enables
+ *  skidding 
+ *  \param steer_fraction The steering fraction as computed by the 
+ *          AIBaseController.
+ *  \return True if the kart should skid.
+ */
+bool SkiddingAI::doSkid(float steer_fraction)
+{
+    return m_controls->m_skid;
+}   // doSkid
+
+//-----------------------------------------------------------------------------
+/** Converts the steering angle to a lr steering in the range of -1 to 1. 
+ *  If the steering angle is too great, it will also trigger skidding. This 
+ *  function uses a 'time till full steer' value specifying the time it takes
+ *  for the wheel to reach full left/right steering similar to player karts 
+ *  when using a digital input device. The parameter is defined in the kart 
+ *  properties and helps somewhat to make AI karts more 'pushable' (since
+ *  otherwise the karts counter-steer to fast).
+ *  It also takes the effect of a plunger into account by restricting the
+ *  actual steer angle to 50% of the maximum.
+ *  \param angle Steering angle.
+ *  \param dt Time step.
+ */
+void SkiddingAI::setSteering(float angle, float dt)
+{
+    float steer_fraction = angle / m_kart->getMaxSteerAngle();
+
+    m_controls->m_skid   = doSkid(steer_fraction);
+
+    // Adjust steer fraction in case to be in [-1,1]
+    if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
+    else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
+
+    // Restrict steering when a plunger is in the face
+    if(m_kart->hasViewBlockedByPlunger())
+    {
+        if     (steer_fraction >  0.5f) steer_fraction =  0.5f;
+        else if(steer_fraction < -0.5f) steer_fraction = -0.5f;
+    }
+    
+    const Skidding *skidding = m_kart->getSkidding();
+
+    // If we are supposed to skid, but the current steering is still 
+    // in the wrong direction, don't start to skid just now, since then
+    // we can't turn into the direction we want to anymore (see 
+    // Skidding class)
+    Skidding::SkidState ss = skidding->getSkidState();
+    if(ss==Skidding::SKID_ACCUMULATE_LEFT  && steer_fraction>0 ||
+       ss==Skidding::SKID_ACCUMULATE_RIGHT && steer_fraction<0    )
+    {
+        m_controls->m_skid = false;
+#ifdef DEBUG
+        if(m_ai_debug)
+            printf("[AI] skid : '%s' wrong steering, stop skid.\n",
+                    m_kart->getIdent().c_str());
+#endif
+    }
+
+    if(m_controls->m_skid && ( 
+        skidding->getSkidState()==Skidding::SKID_ACCUMULATE_LEFT ||
+        skidding->getSkidState()==Skidding::SKID_ACCUMULATE_RIGHT))
+    {
+        steer_fraction = 
+            skidding->getSteeringWhenSkidding(steer_fraction);
+        if(steer_fraction<-1.0f)
+            steer_fraction = -1.0f;
+        else if(steer_fraction>1.0f)
+            steer_fraction = 1.0f;
+    }
+
+    float old_steer      = m_controls->m_steer;
+
+    // The AI has its own 'time full steer' value (which is the time
+    float max_steer_change = dt/m_kart->getKartProperties()->getTimeFullSteerAI();
+    if(old_steer < steer_fraction)
+    {
+        m_controls->m_steer = (old_steer+max_steer_change > steer_fraction) 
+                           ? steer_fraction : old_steer+max_steer_change;
+    }
+    else
+    {
+        m_controls->m_steer = (old_steer-max_steer_change < steer_fraction) 
+                           ? steer_fraction : old_steer-max_steer_change;
+    }
+
+
+}   // setSteering
 
 // ----------------------------------------------------------------------------
 /** Determine the center point and radius of a circle given two points on

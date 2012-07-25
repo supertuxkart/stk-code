@@ -120,6 +120,41 @@ void Skidding::updateSteering(float steer)
 }   // updateSteering
 
 // ----------------------------------------------------------------------------
+/** Returns the steering value necessary to steer the specified amount in
+ *  'steering'. If the kart is not skidding, the return value is just
+ *  steering. Otherwise the value will be (depending on current skidding
+ *  direction) adjusted to a value 'steering1', so that when the kart 
+ *  steers 'steering1', it will de facto steer by the original steering
+ *  amount. If it's not possible
+ */
+float Skidding::getSteeringWhenSkidding(float steering) const
+{
+    switch(m_skid_state)
+    {
+    case SKID_OLD:            assert(false); break;
+    case SKID_SHOW_GFX_LEFT:
+    case SKID_SHOW_GFX_RIGHT:
+    case SKID_NONE:           return steering;
+        break;
+    case SKID_ACCUMULATE_RIGHT:
+        {
+            float f = (steering - m_skid_reduce_turn_min) 
+                   /  m_skid_reduce_turn_delta;
+            return f *2.0f-1.0f;
+            break;
+        }
+    case SKID_ACCUMULATE_LEFT:
+        {
+            float f = (steering + m_skid_reduce_turn_min)
+                    / m_skid_reduce_turn_delta;
+            return 2.0f * f +1.0f;
+            break;
+        }
+    }   // switch m_skid_state
+    return 0;   // keep compiler quiet
+}   // getSteeringWhenSkidding
+
+ // ----------------------------------------------------------------------------
 /** Updates skidding status.
  *  \param dt Time step size.
  *  \param is_on_ground True if the kart is on ground.
@@ -186,9 +221,10 @@ void Skidding::update(float dt, bool is_on_ground,
             // Just testing for the sign of steering can result in unexpected
             // beahviour, e.g. if a player is still turning left, but already
             // presses right (it will take a few frames for this steering to
-            // actuallu take place, see player_controller) - the kart would skid 
+            // actually take place, see player_controller) - the kart would skid 
             // to the left. So we test for a 'clear enough' steering direction.
-            if(!skidding || fabsf(steering)<0.9f) break;
+//FIXME            if(!skidding || fabsf(steering)<0.9f) break;
+            if(!skidding) break;
             m_skid_state = steering > 0 ? SKID_ACCUMULATE_RIGHT
                                         : SKID_ACCUMULATE_LEFT;
             // Add a little jump to the kart. Determine the vertical speed 
