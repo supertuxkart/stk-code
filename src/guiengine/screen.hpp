@@ -50,7 +50,7 @@ namespace GUIEngine
 {
 #define DEFINE_SCREEN_SINGLETON( ClassName )  \
     template<> ClassName* GUIEngine::ScreenSingleton< ClassName >::singleton = NULL
-    
+
     /**
      * \brief Declares a class to be a singleton.
      * Normally, all screens will be singletons.
@@ -62,14 +62,14 @@ namespace GUIEngine
     class ScreenSingleton
     {
         static SCREEN* singleton;
-        
+
     public:
-        
+
         ~ScreenSingleton()
         {
             singleton = NULL;
         }
-        
+
         static SCREEN* getInstance()
         {
             if (singleton == NULL)
@@ -77,18 +77,19 @@ namespace GUIEngine
                 singleton = new SCREEN();
                 GUIEngine::addScreenToList(singleton);
             }
-            
+
             return singleton;
         }
-        
+
     };
-    
+
     /**
      * \brief Represents a single GUI screen.
      * Mainly responsible of its children widgets; Screen lays them
      * out, asks them to add themselves, asks them to remove themselves, etc.
      *
-     * Also initiates the read of GUI files, even though most of that work is done in "screen_loader.cpp"
+     * Also initiates the read of GUI files, even though most of that work is
+     * done in "screen_loader.cpp"
      *
      * \ingroup guiengine
      */
@@ -100,194 +101,204 @@ namespace GUIEngine
          *  running while it is being shown. */
         bool m_pause_race;
 
-    private:
         friend class Skin;
-        
+
         bool m_loaded;
+
         std::string m_filename;
-                
-        /** Will be called to determine if the 3D scene must be rendered when at this screen. */
+
+        /** Will be called to determine if the 3D scene must be rendered when
+         *  at this screen.
+         */
         bool m_render_3d;
-        
+
         /** to catch errors as early as possible, for debugging purposes only */
         unsigned int m_magic_number;
-        
+
     protected:
         bool m_throttle_FPS;
 
     public:
-        
+
         LEAK_CHECK()
-        
+
         /**
          * \ingroup guiengine
          * \brief Loads a GUI screen from its XML file.
-         * Builds a hierarchy of Widget objects whose contents are a direct transcription of the XML file,
-         * with little analysis or layout performed on them.
+         *
+         * Builds a hierarchy of Widget objects whose contents are a direct
+         * transcription of the XML file, with little analysis or layout
+         * performed on them.
          */
-        static void parseScreenFileDiv(irr::io::IXMLReader* xml, PtrVector<Widget>& append_to,
+        static void parseScreenFileDiv(irr::io::IXMLReader* xml,
+                                       PtrVector<Widget>& append_to,
                                        irr::gui::IGUIElement* parent = NULL);
-        
-        
-        /** \brief creates a dummy incomplete object; only use to override behaviour in sub-class */
+
+
         Screen(bool pause_race=true);
-        
-        /** 
-          * \brief          creates a screen populated by the widgets described in a STK GUI file
-          * \param filename name of the XML file describing the screen. this is NOT a path.
-          *                 The passed file name will be searched for in the STK data/gui directory
-          */
+
         Screen(const char* filename, bool pause_race=true);
-        
+
         virtual ~Screen();
-        
+
         bool operator ==(const char* filename) const { return m_filename == filename; }
-        
-        /** \brief loads this Screen from the file passed to the constructor */
+
         void loadFromFile();
-        
+
         /** \return whether this screen is currently loaded */
         bool isLoaded() const { return m_loaded; }
 
         bool throttleFPS() const { return m_throttle_FPS; }
-        
-        /** \brief adds the irrLicht widgets corresponding to this screen to the IGUIEnvironment */
+
         void addWidgets();
-        
-        /** \brief called after all widgets have been added. namely expands layouts into absolute positions */
+
         void calculateLayout();
-        
-        /** \brief can be used for custom purposes for which the load-screen-from-XML code won't make it */
+
         void manualAddWidget(Widget* w);
-        
-        /** \brief can be used for custom purposes for which the load-screen-from-XML code won't make it */
+
         void manualRemoveWidget(Widget* w);
-        
+
         /** \return the name of this menu (which is the name of the file) */
         const std::string& getName() const { return m_filename; }
-        
-        /** Next time this menu needs to be shown, don't use cached values, re-calculate everything.
-         (useful e.g. on reschange, when sizes have changed and must be re-calculated) */
+
         virtual void unload();
-        
-        /** Will be called to determine if the 3D scene must be rendered when at this screen */
+
+        /** Will be called to determine if the 3D scene must be rendered when
+         *  at this screen
+         */
         bool needs3D() { return m_render_3d; }
-        
-        /** \brief invoke this method for screens that use a 3D scene as background
-          *
-          * (if this method is not invoked with 'true' as parameter, the menu background will
-          *  be rendered instead).
-          *
-          * \note to create the 3D background, use the facilities provided by the irrLicht scene
-          *       manager, this class will not set up any 3D scene.
-          */
+
+        /** \brief Invoke this method for screens that use a 3D scene as
+         *         background.
+         *
+         *  (if this method is not invoked with 'true' as parameter, the menu
+         *  background will be rendered instead).
+         *
+         *  \note To create the 3D background, use the facilities provided by
+         *        the irrLicht scene manager, this class will not set up any
+         *        3D scene.
+         */
         void setNeeds3D(bool needs3D) { m_render_3d = needs3D; }
-        
+
         /** 
-          * \brief callback invoked when loading this menu
-          *
-          * \pre Children widgets of this menu have been created by the time this callback
-          *               is invoked.
-          * \note this method is not called everytime the screen is shown. Screen::init is.
-          *       use this method for persistent setup code (namely, that deals with settupping
-          *       children widget objects and needs not be done everytime we visit the screen).
-          * \note a Screen object instance may be unloaded then loaded back. This method might thus
-          *       be called more than once in the lifetime of a Screen object, however there will always
-          *       be an 'unload' event in-between calls to this method.
-          */
+         * \brief Callback invoked when loading this menu.
+         *
+         * \pre   Children widgets of this menu have been created by the time
+         *        this callback is invoked.
+         * \note  This method is not called everytime the screen is shown.
+         *        Screen::init is.
+         *        Use this method for persistent setup code (namely, that
+         *        deals with setting up children widget objects and needs not
+         *        be done everytime we visit the screen).
+         * \note  A Screen object instance may be unloaded then loaded back.
+         *        This method might thus be called more than once in the
+         *        lifetime of a Screen object, however there will always
+         *        be an 'unload' event in-between calls to this method.
+         */
         virtual void loadedFromFile() = 0;
-        
+
         /**
-          * \brief callback invoked when this screen is being unloaded
-          * Override this method in children classes if you need to be notified of this.
-          * \note a Screen object instance may be unloaded then loaded back at will.
-          * \note an unloaded Screen object does not have its children widgets anymore, it only
-          *       retains its members (most importantly the path to its GUI file) so that it can be
-          *       loaded back later.
+          * \brief Callback invoked when this screen is being unloaded.
+          *        Override this method in children classes if you need to be
+          *        notified of this.
+          * \note  A Screen object instance may be unloaded then loaded back
+          *        at will.
+          * \note  An unloaded Screen object does not have its children widgets
+          *        anymore, it only retains its members (most importantly the
+          *        path to its GUI file) so that it can be loaded back later.
           */
         virtual void unloaded() {}
-        
+
         /**
-          * \brief Optional callback invoked very early, before widgets have been added (contrast with
-          *        init(), which is invoked afer widgets were added)
+          * \brief Optional callback invoked very early, before widgets have
+          *        been added (contrast with init(), which is invoked afer
+          *        widgets were added)
           */
         virtual void beforeAddingWidget() {}
-        
+
         /** 
-          * \brief callback invoked when entering this menu (after the widgets have been added)
+          * \brief Callback invoked when entering this menu (after the
+          *        widgets have been added).
           *
-          * \note the same instance of your object may be entered/left more than once, so make sure that
-          * one instance of your object can be used several times if the same screen is visited several
-          * times.
+          * \note  The same instance of your object may be entered/left more
+          *        than once, so make sure that one instance of your object
+          *        can be used several times if the same screen is visited
+          *        several times.
           */
         virtual void init();
-        
+
         /** 
-          * \brief callback invoked before leaving this menu
+          * \brief Callback invoked before leaving this menu.
           *
-          * @note the same instance of your object may be entered/left more than once, so make sure that
-          * one instance of your object can be used several times if the same screen is visited several
-          * times.
+          * \note  The same instance of your object may be entered/left more
+          *        than once, so make sure that one instance of your object can
+          *        be used several times if the same screen is visited several
+          *        times.
           */
         virtual void tearDown();
-        
+
         /** 
           * \brief  Called when escape is pressed.
-          * \return true if the screen should be closed, false if you handled the press another way
+          * \return true if the screen should be closed,
+          *         false if you handled the press another way
           */
         virtual bool onEscapePressed() { return true; }
-        
+
         /**
          * \brief will be called everytime something happens.
-         * Events are generally a widget state change. In this case, a pointer to the said widget is
-         * passed along its name, so you get its new state and/or act. There are two special events, passed
-         * with a NULL widget, and which bear the anmes "init" and "tearDown", called respectively when a
-         * screen is being made visible and when it's being left, allowing for setup/clean-up.
+         *
+         * Events are generally a widget state change. In this case, a pointer
+         * to the said widget is passed along its name, so you get its new
+         * state and/or act. There are two special events, passed with a NULL
+         * widget, and which bear the names "init" and "tearDown", called
+         * respectively when a screen is being made visible and when it's being
+         * left, allowing for setup/clean-up.
          */
         virtual void eventCallback(Widget* widget, const std::string& name, const int playerID) = 0;
-        
+
         /**
-          * \brief optional callback you can override to be notified at every frame.
-          */
+         * \brief optional callback you can override to be notified at every frame.
+         */
         virtual void onUpdate(float dt, irr::video::IVideoDriver*) { };
-        
+
         /**
-          * \return which music to play at this screen
-          */
+         * \return which music to play at this screen
+         */
         virtual MusicInformation* getMusic() const { return stk_config->m_title_music; }
-        
-        /**
-          * \brief Implementing method from AbstractTopLevelContainer
-          */
+
         virtual int getWidth();
-        
-        /**
-          * \brief Implementing method from AbstractTopLevelContainer
-          */
+
         virtual int getHeight();
-        
+
         /**
-          * \brief override this if you need to be notified of player actions in subclasses
-          */
-        virtual EventPropagation filterActions(PlayerAction action, int deviceID, const unsigned int value,
-                                               Input::InputType type, int playerId) { return EVENT_LET; }
-        
-        /** Callback you can use if you want to know when the user pressed on a disabled ribbon item
-         * (the main I see for this is to give feedback)
+         * \brief Override this if you need to be notified of player actions
+         *        in subclasses.
+         */
+        virtual EventPropagation filterActions(PlayerAction action,
+                                               int deviceID,
+                                               const unsigned int value,
+                                               Input::InputType type,
+                                               int playerId) 
+            { return EVENT_LET; }
+
+        /** Callback you can use if you want to know when the user pressed
+         *  on a disabled ribbon item.
+         *  (the main use I see for this is to give feedback)
          */
         virtual void onDisabledItemClicked(const std::string& item) {}
-        
+
         /**
-         * \brief override this if you need to be notified of raw input in subclasses
+         * \brief Override this if you need to be notified of raw input in
+         *        subclasses.
          */
         virtual void filterInput(Input::InputType type,
                                  int deviceID,
                                  int btnID,
                                  int axisDir,
                                  int value) {}
-        
+
     };
-    
+
 }
 
 #endif

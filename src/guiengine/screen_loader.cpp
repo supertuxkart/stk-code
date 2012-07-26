@@ -255,7 +255,8 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 if (wcscmp(L"topbar", xml->getNodeName()) == 0)
                     return;
                 
-                // we're done parsing this 'ribbon', return one step back in the recursive call
+                // We're done parsing this 'ribbon', return one step back in
+                // the recursive call.
                 if (wcscmp(L"ribbon", xml->getNodeName()) == 0 ||
                     wcscmp(L"buttonbar", xml->getNodeName()) == 0 ||
                     wcscmp(L"tabs", xml->getNodeName()) == 0)

@@ -39,7 +39,14 @@ using namespace GUIEngine;
 #include <assert.h>
 
 // -----------------------------------------------------------------------------
-
+/** 
+ * \brief          Creates a screen populated by the widgets described
+ *                 in a STK GUI file.
+ * \param filename Name of the XML file describing the screen.
+ *                 This is NOT a path.
+ *                 The passed file name will be searched for in the
+ *                 STK data/gui directory.
+ */
 Screen::Screen(const char* file, bool pause_race)
 {
     m_magic_number   = 0xCAFEC001;
@@ -52,7 +59,9 @@ Screen::Screen(const char* file, bool pause_race)
 }   // Screen
 
 // -----------------------------------------------------------------------------
-
+/** \brief Creates a dummy incomplete object; only use to override behaviour
+ *         in sub-class.
+ */
 Screen::Screen(bool pause_race)
 {
     m_magic_number = 0xCAFEC001;
@@ -88,7 +97,8 @@ void Screen::init()
 /** Prepares removal of this screen. If necessary this will unpause the
  *  race (so this means that if you have several consecutive screens while
  *  the race is running the race will be unpaused and paused when switching
- *  from one screen to the next. */
+ *  from one screen to the next.
+ */
 void Screen::tearDown()
 {
     if(m_pause_race && World::getWorld())
@@ -102,7 +112,7 @@ void Screen::tearDown()
 #pragma mark Load/Init
 #endif
 
-
+/** \brief loads this Screen from the file passed to the constructor */
 void Screen::loadFromFile()
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -126,7 +136,10 @@ void Screen::loadFromFile()
 }   // loadFromFile
 
 // -----------------------------------------------------------------------------
-
+/** Next time this menu needs to be shown, don't use cached values,
+ *  re-calculate everything. (useful e.g. on reschange, when sizes have changed
+ *  and must be re-calculated)
+ */
 void Screen::unload()
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -144,7 +157,9 @@ void Screen::unload()
 }   // unload
 
 // -----------------------------------------------------------------------------
-
+/** \brief Called after all widgets have been added. namely expands layouts
+ *         into absolute positions.
+ */
 void Screen::calculateLayout()
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -158,7 +173,9 @@ void Screen::calculateLayout()
 #pragma mark Adding/Removing widgets
 #endif
 
-
+/** \brief Adds the IrrLicht widgets corresponding to this screen to the
+ *         IGUIEnvironment.
+ */
 void Screen::addWidgets()
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -176,7 +193,9 @@ void Screen::addWidgets()
 }   // addWidgets
 
 // -----------------------------------------------------------------------------
-
+/** \brief Can be used for custom purposes for which the load-screen-from-XML
+ *         code won't make it.
+ */
 void Screen::manualAddWidget(Widget* w)
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -184,7 +203,8 @@ void Screen::manualAddWidget(Widget* w)
 }   // manualAddWidget
 
 // -----------------------------------------------------------------------------
-
+/** \brief Can be used for custom purposes for which the load-screen-from-XML
+ *         code won't make it. */
 void Screen::manualRemoveWidget(Widget* w)
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -207,7 +227,7 @@ void Screen::manualRemoveWidget(Widget* w)
 #endif
 
 // -----------------------------------------------------------------------------
-
+/** \brief Implementing method from AbstractTopLevelContainer */
 int Screen::getWidth()
 {
     core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
@@ -215,7 +235,7 @@ int Screen::getWidth()
 }
 
 // -----------------------------------------------------------------------------
-
+/** \brief Implementing method from AbstractTopLevelContainer */
 int Screen::getHeight()
 {
     core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();

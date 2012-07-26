@@ -271,12 +271,12 @@ ThreeDAnimation::~ThreeDAnimation()
         World::getWorld()->getPhysics()->removeBody(m_body);
         delete m_body;
         delete m_motion_state;
-		// If an exact shape was used, the collision shape pointer
-		// here is a copy of the collision shape pointer in the
-		// triangle mesh. In order to avoid double-freeing this
-		// pointer, we don't free the pointer in this case.
+        // If an exact shape was used, the collision shape pointer
+        // here is a copy of the collision shape pointer in the
+        // triangle mesh. In order to avoid double-freeing this
+        // pointer, we don't free the pointer in this case.
         if(!m_triangle_mesh)
-			delete m_collision_shape;
+            delete m_collision_shape;
     }
     
     if (m_triangle_mesh)

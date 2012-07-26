@@ -28,19 +28,19 @@ using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( HelpScreen1 );
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 HelpScreen1::HelpScreen1() : Screen("help1.stkgui")
 {
 }   // HelpScreen1
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void HelpScreen1::loadedFromFile()
 {
 }   // loadedFromFile
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
@@ -52,7 +52,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
         //else
         if (selection == "page2") StateManager::get()->replaceTopMostScreen(HelpScreen2::getInstance());
         else if (selection == "page3") StateManager::get()->replaceTopMostScreen(HelpScreen3::getInstance());
-        else if(selection == "page4") StateManager::get()->replaceTopMostScreen(HelpScreen4::getInstance());
+        else if (selection == "page4") StateManager::get()->replaceTopMostScreen(HelpScreen4::getInstance());
     }
     else if (name == "back")
     {
@@ -60,7 +60,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
     }
 }   // eventCallback
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void HelpScreen1::init()
 {
@@ -70,4 +70,4 @@ void HelpScreen1::init()
     if (w != NULL)  w->select( "page1", PLAYER_ID_GAME_MASTER );
 }   //init
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
