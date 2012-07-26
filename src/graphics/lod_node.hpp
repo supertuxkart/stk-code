@@ -22,6 +22,8 @@
 #include <aabbox3d.h>
 #include <matrix4.h>
 #include <ISceneNode.h>
+#include <vector>
+
 namespace irr
 {
     namespace scene { class ISceneManager; class ISceneNode; }
@@ -106,6 +108,30 @@ public:
     virtual scene::ESCENE_NODE_TYPE getType() const { return (scene::ESCENE_NODE_TYPE)scene::ESNT_LOD_NODE; }
 
     const std::string& getGroupName() const { return m_group_name; }
+    
+    void setNodesPosition(const core::vector3df& xyz)
+    {
+        for (unsigned int n=0; n<m_nodes.size(); n++)
+        {
+            m_nodes[n]->setPosition(xyz);
+        }
+    }
+    
+    void setNodesRotation(const core::vector3df& hpr)
+    {
+        for (unsigned int n=0; n<m_nodes.size(); n++)
+        {
+            m_nodes[n]->setRotation(hpr);
+        }
+    }
+    
+    void setNodesScale(const core::vector3df& scale)
+    {
+        for (unsigned int n=0; n<m_nodes.size(); n++)
+        {
+            m_nodes[n]->setScale(scale);
+        }
+    }
 };
 
 #endif

@@ -31,6 +31,7 @@ using namespace irr;
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 #include <string>
+#include "graphics/lod_node.hpp"
 
 class XMLNode;
 class SFXBase;
@@ -125,11 +126,25 @@ public:
     /** 2-step construction */
     void setNode(scene::ISceneNode* node)
     {
-        assert(m_node == NULL);
+        //assert(m_node == NULL);
+        if (m_node != NULL)
+        {
+            m_node->remove();
+        }
+        
         m_node = node;
-        m_node->setPosition(m_init_xyz);
-        m_node->setRotation(m_init_hpr);
-        m_node->setScale(m_init_scale);
+        if (node->getType() == irr::scene::ESNT_LOD_NODE)
+        {
+            ((LODNode*)node)->setNodesPosition(m_init_xyz);
+            ((LODNode*)node)->setNodesRotation(m_init_hpr);
+            ((LODNode*)node)->setNodesScale(m_init_scale);
+        }
+        else
+        {
+            m_node->setPosition(m_init_xyz);
+            m_node->setRotation(m_init_hpr);
+            m_node->setScale(m_init_scale);
+        }
     }
     
     const std::string& getLodGroup() const { return m_lod_group; }

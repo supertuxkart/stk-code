@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "animations/billboard_animation.hpp"
 #include "animations/three_d_animation.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/xml_node.hpp"
@@ -29,6 +30,7 @@
 #include "tracks/track_object.hpp"
 
 #include <IMeshSceneNode.h>
+#include <ISceneManager.h>
 
 TrackObjectManager::TrackObjectManager()
 {
