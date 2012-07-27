@@ -73,13 +73,19 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node)
 /** Creates a bullet rigid body for this animated model. */
 void ThreeDAnimation::createPhysicsBody(const std::string &shape)
 {
-    if (m_interaction == "ghost") return;
+    if (m_interaction == "ghost" || m_node == NULL) return;
     
     // 1. Determine size of the object
     // -------------------------------
-    Vec3 min, max;
-    MeshTools::minMax3D(m_mesh, &min, &max);
-    Vec3 extend = max-min;
+    Vec3 extend = Vec3(1.0f, 1.0f, 1.0f);
+    
+    if (m_mesh != NULL)
+    {
+        Vec3 min, max;
+        MeshTools::minMax3D(m_mesh, &min, &max);
+        extend = max - min;
+    }
+    
     if(shape=="box")
     {
         m_collision_shape = new btBoxShape(0.5*extend);
@@ -245,7 +251,7 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
         fprintf(stderr, "[3DAnimation] WARNING: Shape '%s' is not supported, ignored.\n", shape.c_str());
         return;
     }
-    const core::vector3df &hpr=m_node->getRotation()*DEGREE_TO_RAD;
+    const core::vector3df &hpr = m_node->getRotation()*DEGREE_TO_RAD;
     btQuaternion q(hpr.X, hpr.Y, hpr.Z);
     const core::vector3df &xyz=m_node->getPosition();
     Vec3 p(xyz);
