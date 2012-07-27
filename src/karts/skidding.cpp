@@ -25,6 +25,7 @@
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
+#include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "physics/btKart.hpp"
 #include "tracks/track.hpp"
@@ -219,12 +220,18 @@ void Skidding::update(float dt, bool is_on_ground,
             // If skidding is pressed while the kart is going straight,
             // do nothing (till the kart starts to steer in one direction).
             // Just testing for the sign of steering can result in unexpected
-            // beahviour, e.g. if a player is still turning left, but already
+            // behaviour, e.g. if a player is still turning left, but already
             // presses right (it will take a few frames for this steering to
-            // actually take place, see player_controller) - the kart would skid 
-            // to the left. So we test for a 'clear enough' steering direction.
-//FIXME            if(!skidding || fabsf(steering)<0.9f) break;
-            if(!skidding) break;
+            // actually take place, see player_controller) - the kart would 
+            // skid to the left. So we test for a 'clear enough' steering 
+            // direction. On the other hand, the AI takes care of that (i.e. 
+            // only skids when steering is already in the right direction) -
+            // so we allow the AI to change steering even if steering is
+            // less than 90%.
+            if(!skidding || 
+                  (m_kart->getController()->isPlayerController() && 
+                    fabsf(steering)<0.9f)   ) 
+                   break;
             m_skid_state = steering > 0 ? SKID_ACCUMULATE_RIGHT
                                         : SKID_ACCUMULATE_LEFT;
             // Add a little jump to the kart. Determine the vertical speed 
