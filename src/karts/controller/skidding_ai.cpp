@@ -22,7 +22,7 @@
 //The AI debugging works best with just 1 AI kart, so set the number of karts
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
 #ifdef DEBUG
-   // Enable AI graphical debugging
+   // Enable AeI graphical debugging
 #  undef AI_DEBUG
    // Shows left and right lines when using new findNonCrashing function
 #  undef AI_DEBUG_NEW_FIND_NON_CRASHING
@@ -1016,6 +1016,7 @@ void SkiddingAI::findNonCrashingPoint2(Vec3 *result)
     m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps);
 #endif
 #ifdef AI_DEBUG_KART_HEADING
+    const Vec3 eps(0,0.5f,0);
     m_curve[CURVE_KART]->clear();
     m_curve[CURVE_KART]->addPoint(m_kart->getXYZ()+eps);
     Vec3 forw(0, 0, 50);
@@ -1214,16 +1215,15 @@ void SkiddingAI::determineTrackDirection()
 
     unsigned int next   = qg->getNode(m_track_node).getSuccessor(succ);
 
-    unsigned int             last;
-    //qg->getNode(m_track_node).getDirectionData(succ, &dir, &last);
     qg->getNode(next).getDirectionData(m_successor_index[next], 
-                                       &m_current_track_direction, &last);
+                                       &m_current_track_direction, 
+                                       &m_last_direction_node);
 
 #ifdef AI_DEBUG
-//    m_curve[CURVE_QG]->clear();
-//    for(unsigned int i=m_track_node; i<=last; i++)
+    m_curve[CURVE_QG]->clear();
+    for(unsigned int i=m_track_node; i<=m_last_direction_node; i++)
     {
-//        m_curve[CURVE_QG]->addPoint(qg->getNode(i).getCenter());
+        m_curve[CURVE_QG]->addPoint(qg->getNode(i).getCenter());
     }
 #endif
     m_controls->m_skid = false;
@@ -1231,89 +1231,61 @@ void SkiddingAI::determineTrackDirection()
     if(m_current_track_direction==GraphNode::DIR_LEFT  ||
        m_current_track_direction==GraphNode::DIR_RIGHT   )
     {
-        // Ideally we would like to have a circle that:
-        // 1) goes through the kart position
-        // 2) has the current heading of the kart as tangent in that point
-        // 3) goes through the last point
-        // 4) has a tangent at the last point that faces towards the next node
-        // Unfortunately conditions 1 to 3 already fully determine the circle,
-        // i.e. it is not always possible to find an appropriate circle.
-        // Using the first three conditions is mostly a good choice (since the
-        // kart will already point towards the direction of the circle), and
-        // the case that the kart is facing wrong was already tested for above
-
-        Vec3 center;
-        Vec3 xyz      = m_kart->getXYZ();
-        Vec3 tangent  = m_kart->getTrans()(Vec3(0,0,1)) - xyz;
-        Vec3 last_xyz = qg->getNode(last).getCenter();
-
-        determineTurnRadius(xyz, tangent, last_xyz,
-                            &center, &m_current_curve_radius);
-#ifdef ADJUST_TURN_RADIUS_TO_AVOID_CRASH_INTO_TRACK
-        for(unsigned int i=next; i<=last; i++)
-        {
-            // Pick either the lower left or right point:
-            int index = m_current_track_direction==GraphNode::DIR_LEFT
-                      ? 0 : 1;
-            float r = (center - qg->getQuadOfNode(i)[index]).length();
-            if(m_current_curve_radius < r)
-            {
-                determineTurnRadius(xyz, tangent, qg->getQuadOfNode(i)[index],
-                    &center, &m_current_curve_radius);
-                break;
-            }
-        }
-#endif
-#if defined(AI_DEBUG) && defined(AI_DEBUG_CIRCLES)
-        m_curve[CURVE_PREDICT1]->makeCircle(center, m_current_curve_radius);
-        m_curve[CURVE_PREDICT1]->addPoint(last_xyz);
-        m_curve[CURVE_PREDICT1]->addPoint(center);
-        m_curve[CURVE_PREDICT1]->addPoint(xyz);
-#endif
-
-        // Only try skidding when a certain minimum speed is reached.
-        if(m_kart->getSpeed() > 5.0f)
-        {
-            // Estimate how long it takes to finish the curve
-            Vec3 diff_kart = xyz      - center;
-            Vec3 diff_last = last_xyz - center;
-            float angle_kart = atan2(diff_kart.getX(), diff_kart.getZ());
-            float angle_last = atan2(diff_last.getX(), diff_last.getZ());
-            float angle = m_current_track_direction == GraphNode::DIR_RIGHT
-                        ? angle_last - angle_kart
-                        : angle_kart - angle_last;
-            angle = normalizeAngle(angle);
-            float length = m_current_curve_radius*fabsf(angle);
-            float duration = length / m_kart->getSpeed();
-            duration *= 1.5f;
-            const Skidding *skidding = m_kart->getSkidding();
-            if(m_controls->m_skid && duration < 1.0f)
-            {
-                m_controls->m_skid = false;
-                if(m_ai_debug)
-                    printf("[AI] skid : '%s' too short, stop skid.\n",
-                            m_kart->getIdent().c_str());
-            }
-            else if(skidding->getNumberOfBonusTimes()>0 &&
-                    skidding->getTimeTillBonus(0) < duration)
-            {
-#ifdef DEBUG
-                if(m_ai_debug)
-                    printf("[AI] skid: %s start skid, duration %f.\n",
-                    m_kart->getIdent().c_str(), duration);
-#endif
-                m_controls->m_skid = true;
-                //m_controls->m_steering = 
-                //    m_current_track_direction == GraphNode::DIR_RIGHT : 1 : -1;
-
-            }  // if curve long enough for skidding
-        }   // if speed > minimum skid speed
+        handleCurve();
     }   // if(m_current_track_direction == DIR_LEFT || DIR_RIGHT   )
 
 
     return;
 }   // determineTrackDirection
 
+// ----------------------------------------------------------------------------
+/** If the kart is at/in a curve, determine the turn radius.
+ */
+void SkiddingAI::handleCurve()
+{
+    // Ideally we would like to have a circle that:
+    // 1) goes through the kart position
+    // 2) has the current heading of the kart as tangent in that point
+    // 3) goes through the last point
+    // 4) has a tangent at the last point that faces towards the next node
+    // Unfortunately conditions 1 to 3 already fully determine the circle,
+    // i.e. it is not always possible to find an appropriate circle.
+    // Using the first three conditions is mostly a good choice (since the
+    // kart will already point towards the direction of the circle), and
+    // the case that the kart is facing wrong was already tested for before
+
+    const QuadGraph *qg = QuadGraph::get();
+    Vec3 xyz            = m_kart->getXYZ();
+    Vec3 tangent        = m_kart->getTrans()(Vec3(0,0,1)) - xyz;
+    Vec3 last_xyz       = qg->getNode(m_last_direction_node).getCenter();
+
+    determineTurnRadius(xyz, tangent, last_xyz,
+                        &m_curve_center, &m_current_curve_radius);
+
+#ifdef ADJUST_TURN_RADIUS_TO_AVOID_CRASH_INTO_TRACK
+    for(unsigned int i=next; i<=last; i++)
+    {
+        // Pick either the lower left or right point:
+        int index = m_current_track_direction==GraphNode::DIR_LEFT
+            ? 0 : 1;
+        float r = (center - qg->getQuadOfNode(i)[index]).length();
+        if(m_current_curve_radius < r)
+        {
+            determineTurnRadius(xyz, tangent, qg->getQuadOfNode(i)[index],
+                &center, &m_current_curve_radius);
+            break;
+        }
+    }
+#endif
+#if defined(AI_DEBUG) && defined(AI_DEBUG_CIRCLES)
+    m_curve[CURVE_PREDICT1]->makeCircle(m_curve_center, 
+                                        m_current_curve_radius);
+    m_curve[CURVE_PREDICT1]->addPoint(last_xyz);
+    m_curve[CURVE_PREDICT1]->addPoint(m_curve_center);
+    m_curve[CURVE_PREDICT1]->addPoint(xyz);
+#endif
+
+}   // handleCurve
 // ----------------------------------------------------------------------------
 /** Determines if the kart should skid. The base implementation enables
  *  skidding 
@@ -1323,7 +1295,51 @@ void SkiddingAI::determineTrackDirection()
  */
 bool SkiddingAI::doSkid(float steer_fraction)
 {
-    return m_controls->m_skid;
+    // No skidding on straights
+    if(m_current_track_direction==GraphNode::DIR_STRAIGHT)
+        return false;
+
+    const float MIN_SKID_SPEED = 5.0f;
+    const QuadGraph *qg = QuadGraph::get();
+    Vec3 last_xyz       = qg->getNode(m_last_direction_node).getCenter();
+
+    // Only try skidding when a certain minimum speed is reached.
+    if(m_kart->getSpeed()<MIN_SKID_SPEED) return false;
+
+    // Estimate how long it takes to finish the curve
+    Vec3 diff_kart = m_kart->getXYZ() - m_curve_center;
+    Vec3 diff_last = last_xyz         - m_curve_center;
+    float angle_kart = atan2(diff_kart.getX(), diff_kart.getZ());
+    float angle_last = atan2(diff_last.getX(), diff_last.getZ());
+    float angle = m_current_track_direction == GraphNode::DIR_RIGHT
+                ? angle_last - angle_kart
+                : angle_kart - angle_last;
+    angle = normalizeAngle(angle);
+    float length = m_current_curve_radius*fabsf(angle);
+    float duration = length / m_kart->getSpeed();
+    duration *= 1.5f;
+    const Skidding *skidding = m_kart->getSkidding();
+    if(m_controls->m_skid && duration < 1.0f)
+    {
+        if(m_ai_debug)
+            printf("[AI] skid : '%s' too short, stop skid.\n",
+            m_kart->getIdent().c_str());
+        return false;
+    }
+
+    else if(skidding->getNumberOfBonusTimes()>0 &&
+        skidding->getTimeTillBonus(0) < duration)
+    {
+#ifdef DEBUG
+        if(m_ai_debug)
+            printf("[AI] skid: %s start skid, duration %f.\n",
+            m_kart->getIdent().c_str(), duration);
+#endif
+        return true;
+
+    }  // if curve long enough for skidding
+
+    return false;
 }   // doSkid
 
 //-----------------------------------------------------------------------------

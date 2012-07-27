@@ -113,8 +113,6 @@ private:
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
   
-    float m_curve_angle;
-
     float m_time_since_stuck;
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
@@ -126,6 +124,14 @@ private:
      *  when being on a straigt section. */
     float m_current_curve_radius;
 
+    /** Stores the center of the curve (if the kart is in a curve, 
+     *  otherwise undefined). */
+    Vec3  m_curve_center;
+
+    /** The index of the last node with the same direction as the current
+     *  node the kart is on (i.e. if kart is in a left turn, this will be
+     *  the last node that is still turning left). */
+    unsigned int m_last_direction_node;
 #ifdef DEBUG
     /** For skidding debugging: shows the estimated turn shape. */
     ShowCurve **m_curve;
@@ -160,6 +166,7 @@ private:
                               float *radius);
     virtual bool doSkid(float steer_fraction);
     virtual void setSteering(float angle, float dt);
+    void handleCurve();
 
 protected:
     virtual unsigned int getNextSector(unsigned int index);
