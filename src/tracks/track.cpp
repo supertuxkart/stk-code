@@ -427,9 +427,15 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
     }
     else
     {
+	//Check whether the hardware can do nonsquare or non power-of-two textures
+	video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
+	bool nonpower = video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
+	bool nonsquare = video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
+
+	//Create the minimap resizing it as necessary.
         m_mini_map=
             QuadGraph::get()->makeMiniMap(World::getWorld()->getRaceGUI()
-                                          ->getMiniMapSize(), 
+                                          ->getMiniMapSize().getOptimalSize(!nonpower, !nonsquare), 
                                           "minimap::"+m_ident);
 
     }

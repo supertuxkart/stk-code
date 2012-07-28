@@ -50,11 +50,20 @@ void PostProcessing::init(video::IVideoDriver* video_driver)
         m_supported = true;
     }
     
+    //Check which texture dimensions are supported on this hardware
+    bool nonsquare = video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
+    bool nonpower = video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
+    if (!nonpower) {
+        fprintf(stdout, "WARNING: Only power of two textures are supported.\n");
+    }
+    if (!nonsquare) {
+        fprintf(stdout, "WARNING: Only square textures are supported.\n");
+    }
     // Initialization
     if(m_supported)
     {
         // Render target
-        m_render_target = video_driver->addRenderTargetTexture(video_driver->getScreenSize(), "postprocess");
+        m_render_target = video_driver->addRenderTargetTexture(video_driver->getScreenSize().getOptimalSize(!nonpower, !nonsquare), "postprocess");
         if(!m_render_target)
         {
             fprintf(stderr, "Couldn't create the render target for post-processing, disabling it\n");
