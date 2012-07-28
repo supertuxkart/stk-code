@@ -44,7 +44,7 @@ class CutsceneWorld : public World
     
     void abortCutscene()
     {
-        m_duration = m_time + 2.0f;
+        if (m_time < m_duration - 2.0f) m_duration = m_time + 2.0f;
     }
     
 public:
