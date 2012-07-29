@@ -212,7 +212,7 @@ private:
     void          updateSliding();
     void          updateEnginePowerAndBrakes(float dt);
     void          updateEngineSFX();
-    float         handleNitro(float dt);
+    void          updateNitro(float dt);
     float         getActualWheelForce();
     void          crashed();
     void          loadData(RaceManager::KartType type, bool is_first_kart,
@@ -237,7 +237,8 @@ public:
     virtual void   startEngineSFX   ();
     virtual void   adjustSpeed      (float f);
     virtual void   increaseMaxSpeed(unsigned int category, float add_speed,
-                                    float duration, float fade_out_time);
+                                    float engine_force, float duration, 
+                                    float fade_out_time);
     virtual void   setSlowdown(unsigned int category, float max_speed_fraction, 
                                float fade_in_time);
     virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;

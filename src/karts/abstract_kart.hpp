@@ -227,11 +227,13 @@ public:
     /** Sets an increased maximum speed for a category.
      *  \param category The category for which to set the higher maximum speed.
      *  \param add_speed How much speed (in m/s) is added to the maximum speed.
+     *  \param engine_force Additional engine force to affect the kart.
      *  \param duration How long the speed increase will last.
      *  \param fade_out_time How long the maximum speed will fade out linearly.
      */
     virtual void increaseMaxSpeed(unsigned int category, float add_speed,
-                                  float duration, float fade_out_time) = 0;
+                                  float engine_force, float duration, 
+                                  float fade_out_time) = 0;
     // ------------------------------------------------------------------------
     /** Defines a slowdown, which is in fraction of top speed.
      *  \param category The category for which the speed is increased.

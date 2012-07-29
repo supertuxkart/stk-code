@@ -142,7 +142,7 @@
          necessary. -->
     <rescue vert-offset="0.0" time="1.2" height="2"/>
 
-    <!-- Nitro: power-boost: increase in engine power, i.e. 1=plus 100%
+    <!-- Nitro: engine-force: additional engine power
          consumption: nitro consumption - heavier characters can be set
          to need more nitro than lighter character.
          small-container: how much energy a small container gives.
@@ -153,7 +153,7 @@
          the kart stops using nitro (and the fade-out-time starts).
          fade-out-time: Duration during which the increased maximum
          speed due to nitro fades out.  -->
-    <nitro power-boost="3" consumption="1" small-container="1" big-container="3"
+    <nitro engine-force="500" consumption="1" small-container="1" big-container="3"
            max-speed-increase="5" duration="1" fade-out-time="2"/>
 
     <!-- time is the time a zipper is active. force is the additional 
@@ -176,6 +176,9 @@
          time-till-bonus: How long a kart needs to skid in order to get a bonus.
          bonus-force: A speedup applied to the kart whick skidded for a while.
          bonus-time: How long the bonus-force is applied.
+         bonus-force: Additional engine force (this is used to offset the fact
+           that turning after skidding (e.g. to correct direction) often uses
+           up the skid bonus).
          post-skid-rotate-factor: a factor to be used to determine how much 
            the chassis of a kart should rotate to match the graphical view. 
            A factor of 1 is identical, a smaller factor will rotate the kart
@@ -191,6 +194,7 @@
           visual="1.0" visual-time="0"
           time-till-bonus="1.0 3.0" 
           bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
+          bonus-force="250 350"
           post-skid-rotate-factor="1" jump-time="0.4"
           reduce-turn-min="0.4" reduce-turn-max="0.8"/>
 

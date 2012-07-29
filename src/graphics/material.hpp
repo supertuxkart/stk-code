@@ -202,6 +202,8 @@ private:
     /**  Time it takes for the zipper advantage to fade out. If this value 
      *  is <0 the kart specific value will be used. */
     float            m_zipper_fade_out_time;
+    /** Additional engine force. */
+    float            m_zipper_engine_force;
 
     std::string      m_mask;
     
@@ -314,12 +316,14 @@ public:
     void getZipperParameter(float *zipper_max_speed_increase,
                              float *zipper_duration,
                              float *zipper_speed_gain,
-                             float *zipper_fade_out_time) const
+                             float *zipper_fade_out_time,
+                             float *zipper_engine_force) const
     {
         *zipper_max_speed_increase = m_zipper_max_speed_increase;
         *zipper_duration           = m_zipper_duration;
         *zipper_speed_gain         = m_zipper_speed_gain;
         *zipper_fade_out_time      = m_zipper_fade_out_time;
+        *zipper_engine_force       = m_zipper_engine_force;
     }   // getZipperParameter
 
     bool isNormalMap() const { return m_normal_map; }

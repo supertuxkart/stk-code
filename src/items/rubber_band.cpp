@@ -180,6 +180,7 @@ void RubberBand::update(float dt)
         m_owner->getBody()->applyCentralForce(diff*force);
         m_owner->increaseMaxSpeed(MaxSpeed::MS_INCREASE_RUBBER,
             m_owner->getKartProperties()->getRubberBandSpeedIncrease(),
+            /*engine_force*/ 0.0f, 
             /*duration*/0.1f, 
             m_owner->getKartProperties()->getRubberBandFadeOutTime());
         if(m_attached_state==RB_TO_KART)

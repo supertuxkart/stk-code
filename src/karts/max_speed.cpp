@@ -81,14 +81,16 @@ void MaxSpeed::reset()
  *  \param fade_out_time How long the maximum speed will fade out linearly.
  */
 void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
-                                float duration, float fade_out_time)
+                                float engine_force, float duration, 
+                                float fade_out_time)
 {
     assert(fade_out_time>0.01f);
     assert(category>=MS_INCREASE_MIN && category <MS_INCREASE_MAX);
+    m_speed_increase[category].m_max_add_speed   = add_speed;
     m_speed_increase[category].m_duration        = duration;
     m_speed_increase[category].m_fade_out_time   = fade_out_time;
-    m_speed_increase[category].m_max_add_speed   = add_speed;
     m_speed_increase[category].m_current_speedup = add_speed;
+    m_speed_increase[category].m_engine_force    = engine_force;
 }   // increaseMaxSpeed
 
 // ----------------------------------------------------------------------------
@@ -101,14 +103,17 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
  *  \param category The category for which the speed is increased.
  *  \param add_max_speed Increase of the maximum allowed speed.
  *  \param speed_boost An instant speed increase for this kart.
+ *  \param engine_force Additional engine force.
  *  \param duration Duration of the increased speed.
  *  \param fade_out_time How long the maximum speed will fade out linearly.
  */
 void MaxSpeed::instantSpeedIncrease(unsigned int category, 
                                    float add_max_speed, float speed_boost,
-                                   float duration, float fade_out_time)
+                                   float engine_force, float duration, 
+                                   float fade_out_time)
 {
-    increaseMaxSpeed(category, add_max_speed, duration, fade_out_time);
+    increaseMaxSpeed(category, add_max_speed, engine_force, duration, 
+                     fade_out_time);
     // This will result in all max speed settings updated, but no 
     // changes to any slow downs since dt=0
     update(0);
@@ -204,6 +209,8 @@ void MaxSpeed::update(float dt)
         slowdown.update(dt);
         f = std::min(f, slowdown.getSlowdownFraction());
     }
+
+    m_add_engine_force  = 0;
     m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed() * f;
 
     // Then add the speed increase from each category
@@ -213,6 +220,7 @@ void MaxSpeed::update(float dt)
         SpeedIncrease &speedup = m_speed_increase[i];
         speedup.update(dt);
         m_current_max_speed += speedup.getSpeedIncrease();
+        m_add_engine_force  += speedup.getEngineForce();
     }
 
     // Then cap the current speed of the kart

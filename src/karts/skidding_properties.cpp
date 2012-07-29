@@ -41,6 +41,7 @@ SkiddingProperties::SkiddingProperties()
     m_skid_bonus_time.clear();
     m_skid_bonus_speed.clear();
     m_skid_time_till_bonus.clear();
+    m_skid_bonus_force.clear();
 }   // SkiddingProperties
 
 // ----------------------------------------------------------------------------
@@ -59,6 +60,7 @@ void SkiddingProperties::load(const XMLNode *skid_node)
     skid_node->get("bonus-time",             &m_skid_bonus_time        );
     skid_node->get("bonus-speed",            &m_skid_bonus_speed       );
     skid_node->get("time-till-bonus",        &m_skid_time_till_bonus   );
+    skid_node->get("bonus-force",            &m_skid_bonus_force       );
     skid_node->get("jump-time",              &m_jump_time              );
 }   // load
 
@@ -84,13 +86,19 @@ void SkiddingProperties::checkAllSet(const std::string &filename) const
         fprintf(stderr, "Warning: no skid time declared, can be ignored.\n");
     if(m_skid_time_till_bonus.size()!=m_skid_bonus_speed.size())
     {
-        fprintf(stderr, "Warning: skid time-till-bonus and bonus-force\n");
+        fprintf(stderr, "Warning: skid time-till-bonus and bonus-speed\n");
         fprintf(stderr, "         must have same number of elements.\n");
         exit(-1);
     }
     if(m_skid_time_till_bonus.size()!=m_skid_bonus_time.size())
     {
         fprintf(stderr, "Warning: skid time-till-bonus and bonus-time must\n");
+        fprintf(stderr, "         have same number of elements.\n");
+        exit(-1);
+    }
+    if(m_skid_time_till_bonus.size()!=m_skid_bonus_force.size())
+    {
+        fprintf(stderr, "Warning: skid time-till-bonus and bonus-force must\n");
         fprintf(stderr, "         have same number of elements.\n");
         exit(-1);
     }

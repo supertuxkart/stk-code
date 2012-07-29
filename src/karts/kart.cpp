@@ -406,9 +406,11 @@ void Kart::reset()
 
 // -----------------------------------------------------------------------------
 void Kart::increaseMaxSpeed(unsigned int category, float add_speed,
-                            float duration, float fade_out_time)
+                            float engine_force, float duration, 
+                            float fade_out_time)
 {
-    m_max_speed->increaseMaxSpeed(category, add_speed, duration, fade_out_time);
+    m_max_speed->increaseMaxSpeed(category, add_speed, engine_force, duration,
+                                  fade_out_time);
 }   // increaseMaxSpeed
 
 // -----------------------------------------------------------------------------
@@ -869,10 +871,8 @@ void Kart::collectedItem(Item *item, int add_info)
  */
 float Kart::getActualWheelForce()
 {
-    float time_left = 
-        m_max_speed->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER);
-    float zipper_force = time_left>0.0f ? m_kart_properties->getZipperForce()
-                                        : 0.0f;
+    float add_force = m_max_speed->getCurrentAdditionalEngineForce();
+
     const std::vector<float>& gear_ratio=m_kart_properties->getGearSwitchRatio();
     for(unsigned int i=0; i<gear_ratio.size(); i++)
     {
@@ -880,10 +880,10 @@ float Kart::getActualWheelForce()
         {
             return m_kart_properties->getMaxPower()
                   *m_kart_properties->getGearPowerIncrease()[i]
-                  +zipper_force;
+                  +add_force;
         }
     }
-    return m_kart_properties->getMaxPower()+zipper_force;
+    return m_kart_properties->getMaxPower()+add_force;
 
 }   // getActualWheelForce
 
@@ -1450,11 +1450,13 @@ void Kart::handleZipper(const Material *material, bool play_sound)
     float speed_gain;
     /** Time it takes for the zipper advantage to fade out. */
     float fade_out_time;
+    /** Additional engine force. */
+    float engine_force;
 
     if(material)
     {
         material->getZipperParameter(&max_speed_increase, &duration, 
-                                     &speed_gain, &fade_out_time);
+                                     &speed_gain, &fade_out_time, &engine_force);
         if(max_speed_increase<0) 
             max_speed_increase = m_kart_properties->getZipperMaxSpeedIncrease();
         if(duration<0)
@@ -1463,6 +1465,8 @@ void Kart::handleZipper(const Material *material, bool play_sound)
             speed_gain         = m_kart_properties->getZipperSpeedGain();
         if(fade_out_time<0)
             fade_out_time      = m_kart_properties->getZipperFadeOutTime();
+        if(engine_force<0)
+            engine_force       = m_kart_properties->getZipperForce();
     }
     else
     {
@@ -1470,39 +1474,38 @@ void Kart::handleZipper(const Material *material, bool play_sound)
         duration           = m_kart_properties->getZipperTime();
         speed_gain         = m_kart_properties->getZipperSpeedGain();
         fade_out_time      = m_kart_properties->getZipperFadeOutTime();
+        engine_force       = m_kart_properties->getZipperForce();
     }
     // Ignore a zipper that's activated while braking
     if(m_controls.m_brake || m_speed<0) return;
 
     m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
                                      max_speed_increase, speed_gain, 
-                                     duration, fade_out_time);
+                                     engine_force, duration, fade_out_time);
     // Play custom character sound (weee!)
     playCustomSFX(SFXManager::CUSTOM_ZIPPER);
     m_controller->handleZipper(play_sound);
 }   // handleZipper
 
 // -----------------------------------------------------------------------------
-/** Returned an additional engine power boost when using nitro.
+/** Updates the current nitro status.
  *  \param dt Time step size.
  */
-float Kart::handleNitro(float dt)
+void Kart::updateNitro(float dt)
 {
-    if(!m_controls.m_nitro || !isOnGround()) return 0.0;
+    if(!m_controls.m_nitro || !isOnGround()) return;
     m_collected_energy -= dt * m_kart_properties->getNitroConsumption();
     if(m_collected_energy<0)
     {
         m_collected_energy = 0;
-        return 0.0;
+        return;
     }
     m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
-                               m_kart_properties->getNitroMaxSpeedIncrease(),
-                               m_kart_properties->getNitroDuration(), 
-                               m_kart_properties->getNitroFadeOutTime()      );
-    return m_kart_properties->getNitroPowerBoost() 
-         * m_kart_properties->getMaxPower();
-
-}   // handleNitro
+                                 m_kart_properties->getNitroMaxSpeedIncrease(),
+                                 m_kart_properties->getNitroEngineForce(),
+                                 m_kart_properties->getNitroDuration(), 
+                                 m_kart_properties->getNitroFadeOutTime()    );
+}   // updateNitro
 
 // -----------------------------------------------------------------------------
 /** Activates a slipstream effect */
@@ -1745,8 +1748,10 @@ void Kart::updatePhysics(float dt)
     {
         m_has_started = true;
         float f       = m_kart_properties->getStartupBoost();
-        m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER, 0.9f*f,
-                                          f, /*duration*/5.0f,
+        m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER, 
+                                          0.9f*f, f, 
+                                          /*engine_force*/200.0f, 
+                                          /*duration*/5.0f,
                                           /*fade_out_time*/5.0f);
     }
 
@@ -1866,8 +1871,8 @@ void Kart::updateEngineSFX()
  */
 void Kart::updateEnginePowerAndBrakes(float dt)
 {
-    float engine_power = getActualWheelForce() + handleNitro(dt)
-                       + m_slipstream->getSlipstreamPower();
+    updateNitro(dt);
+    float engine_power = getActualWheelForce();
 
     // apply parachute physics if relevant
     if(m_attachment->getType()==Attachment::ATTACH_PARACHUTE) 

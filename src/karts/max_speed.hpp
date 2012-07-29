@@ -52,6 +52,9 @@ private:
     /** The current maximum speed. */
     float m_current_max_speed;
 
+    /** Additional engine force, summed from all SpeedIncrease engine forces. */
+    float m_add_engine_force;
+
     // ------------------------------------------------------------------------
     /** An internal class to store and handle speed increase related data. */
     class SpeedIncrease
@@ -68,6 +71,8 @@ private:
         float m_fade_out_time;
         /** The current max speed increase value. */
         float m_current_speedup;
+        /** Additional engine force. */
+        float m_engine_force;
 
         /** The constructor initialised the values with a no-increase 
          *  entry, i.e. an entry that does affect top speed at all. */
@@ -77,15 +82,24 @@ private:
             m_duration        = -9999999;
             m_fade_out_time   = 0;
             m_current_speedup = 0;
+            m_engine_force    = 0;
         }   // SpeedIncrease
+        // --------------------------------------------------------------------
         void update(float dt);
         /** Returns the current speedup for this category. */
+        // --------------------------------------------------------------------
         float getSpeedIncrease() const {return m_current_speedup;}
         /** Returns the remaining time till the fade out time starts.
          *  Note that this function will return a negative value if
          *  the fade_out time has started or this speed increase has
          *  expired. */
         float getTimeLeft() const      {return m_duration;       }
+        // --------------------------------------------------------------------
+        /** Returns the additional engine force for this speed increase. */
+        float getEngineForce() const 
+        { 
+            return m_duration > 0 ? m_engine_force : 0;
+        }
     };   // SpeedIncrease
 
     // ------------------------------------------------------------------------
@@ -110,6 +124,7 @@ private:
             m_current_fraction   = 1.0f;
         }   // SpeedDecrease
         void update(float dt);
+        // --------------------------------------------------------------------
         /** Returns the current slowdown fracftion, taking a 'fade in' 
          *  into account. */
         float getSlowdownFraction() const {return m_current_fraction;}
@@ -128,17 +143,22 @@ public:
           MaxSpeed(AbstractKart *kart);
  
     void  increaseMaxSpeed(unsigned int category, float add_speed,
-                           float duration, float fade_out_time);
-    void   instantSpeedIncrease(unsigned int category, 
-                                float add_speed, float speed_boost,
-                                float duration, float fade_out_time=1.0f);
+                           float engine_force, float duration,
+                           float fade_out_time);
+    void  instantSpeedIncrease(unsigned int category, 
+                               float add_speed, float speed_boost,
+                               float engine_force, float duration, 
+                               float fade_out_time/*=1.0f*/);
     void  setSlowdown(unsigned int category, float max_speed_fraction, 
                       float fade_in_time);
     float getSpeedIncreaseTimeLeft(unsigned int category);
     void  update(float dt);
     void  reset();
+    // ------------------------------------------------------------------------
     /** Returns the current maximum speed for this kart. */
     float getCurrentMaxSpeed() const { return m_current_max_speed; }
-
+    // ------------------------------------------------------------------------
+    /** Returns the additional engine force. */
+    float getCurrentAdditionalEngineForce() const { return m_add_engine_force;}
 };   // MaxSpeed
 #endif

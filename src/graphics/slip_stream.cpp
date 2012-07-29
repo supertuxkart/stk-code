@@ -299,26 +299,25 @@ bool SlipStream::isSlipstreamReady() const
 /** Returns the additional force being applied to the kart because of 
  *  slipstreaming.
  */
-float SlipStream::getSlipstreamPower()
+void SlipStream::updateSlipstreamPower()
 {
     // Low level AIs should not do any slipstreaming.
     if(!m_kart->getController()->isPlayerController() &&
-        race_manager->getDifficulty()==RaceManager::RD_EASY) return 0;
+        race_manager->getDifficulty()==RaceManager::RD_EASY) return;
 
-    // First see if we are currently using accumulated slipstream credits:
-    // -------------------------------------------------------------------
+    // See if we are currently using accumulated slipstream credits:
+    // -------------------------------------------------------------
     if(m_slipstream_mode==SS_USE)
     {
         setIntensity(2.0f, NULL);
         const KartProperties *kp=m_kart->getKartProperties();
         m_kart->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SLIPSTREAM,
                                 kp->getSlipstreamMaxSpeedIncrease(),
+                                kp->getSlipstreamAddPower(),
                                 kp->getSlipstreamDuration(),
                                 kp->getSlipstreamFadeOutTime()       );
-        return kp->getSlipstreamAddPower();
     }
-    return 0;
-}   // getSlipstreamPower
+}   // upateSlipstreamPower
 
 //-----------------------------------------------------------------------------
 /** Sets the color of the debug mesh (which shows the area in which slipstream
@@ -357,6 +356,8 @@ void SlipStream::update(float dt)
         m_slipstream_time -= dt;
         if(m_slipstream_time<0) m_slipstream_mode=SS_NONE;
     }
+
+    updateSlipstreamPower();
 
     // If this kart is too slow for slipstreaming taking effect, do nothing
     // --------------------------------------------------------------------

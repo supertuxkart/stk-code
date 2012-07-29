@@ -88,7 +88,7 @@ public:
     void         reset();
     virtual void update(float dt);
     void         setIntensity(float f, const AbstractKart* kart);
-    float        getSlipstreamPower();
+    void         updateSlipstreamPower();
     bool         isSlipstreamReady() const;
 
     // ------------------------------------------------------------------------

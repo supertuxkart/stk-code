@@ -191,8 +191,6 @@ private:
     float       m_plunger_in_face_duration[3];
     /** Wheel base of the kart. */
     float       m_wheel_base;
-    /** Nitro power boost. */
-    float       m_nitro_power_boost;
     /** Nitro consumption. */
     float       m_nitro_consumption;
     /** Nitro amount for small bottle. */
@@ -201,6 +199,8 @@ private:
     float       m_nitro_big_container;
     /* How much the speed of a kart might exceed its maximum speed (in m/s). */
     float       m_nitro_max_speed_increase;
+    /** Additional engine force to affect the kart. */
+    float       m_nitro_engine_force;
     /**  How long the increased nitro max speed will be valid after 
      *  the kart stops using nitro (and the fade-out-time starts). */
     float       m_nitro_duration;
@@ -463,9 +463,6 @@ public:
     float getMaxSpeed               () const {return
                                    m_max_speed[race_manager->getDifficulty()];}
 
-    /** Returns the nitro power boost. */
-    float getNitroPowerBoost        () const {return m_nitro_power_boost;     }
-
     /** Returns the nitro consumption. */
     float getNitroConsumption       () const {return m_nitro_consumption;     }
 
@@ -479,6 +476,7 @@ public:
     float getNitroMaxSpeedIncrease  () const 
                                           {return m_nitro_max_speed_increase; }
 
+    float getNitroEngineForce       () const {return m_nitro_engine_force;    }
     /** Returns how long the increased nitro max speed will be valid after
      *  the kart stops using nitro (and the fade-out-time starts). */
     float getNitroDuration          () const {return m_nitro_duration;        }

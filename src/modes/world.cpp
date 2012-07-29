@@ -245,17 +245,17 @@ Controller* World::loadAIController(AbstractKart *kart)
     // const int NUM_ROBOTS = 1;
     // For now: instead of random switching, use each
     // robot in turns: switch(m_random.get(NUM_ROBOTS))
-#define USE_PRESENT_AI
+#undef  USE_PRESENT_AI
 #undef  USE_SKIDDING_AI
-#undef  USE_ALL_AIS
+#define USE_ALL_AIS
 
 #ifdef USE_PRESENT_AI
     int turn = 2;
 #elif defined(USE_SKIDDING_AI)
     int turn = 1;
 #elif defined(USE_ALL_AIS)
-    static int turn=1;
-    turn=(turn+1) % 3;   // %2 would switch betwen default and skidding
+    static int turn=0;
+    turn=(turn+1) % 2;   // %2 would switch betwen default and skidding
 #else
     int turn=0;   // use default AU
 #endif

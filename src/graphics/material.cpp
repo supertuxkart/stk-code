@@ -523,15 +523,17 @@ Material::Material(const XMLNode *node, int index)
         else if (child_node->getName() == "zipper")
         {
             // Track version 4 uses a separate node:
-            m_zipper = true;
-            m_zipper_duration = 3.5f;
+            m_zipper                    = true;
+            m_zipper_duration           = 3.5f;
             m_zipper_max_speed_increase = 15.0f;
-            m_zipper_fade_out_time = 3.0f;
-            m_zipper_speed_gain = 4.5f;
+            m_zipper_fade_out_time      = 3.0f;
+            m_zipper_speed_gain         = 4.5f;
+            m_zipper_engine_force       = 250;
             child_node->get("duration",          &m_zipper_duration          );
             child_node->get("fade-out-time",     &m_zipper_fade_out_time     );
             child_node->get("max-speed-increase",&m_zipper_max_speed_increase);
             child_node->get("speed-gain",        &m_zipper_speed_gain        );
+            child_node->get("sengine-force",     &m_zipper_engine_force      );
         }
         else
         {
@@ -602,6 +604,7 @@ void Material::init(unsigned int index)
     m_zipper_fade_out_time      = -1.0f;
     m_zipper_max_speed_increase = -1.0f;
     m_zipper_speed_gain         = -1.0f;
+    m_zipper_engine_force       = -1.0f;
     m_normal_map                = false;
     //m_normal_map_uv2            = false;
     m_parallax_map              = false;

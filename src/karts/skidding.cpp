@@ -302,9 +302,9 @@ void Skidding::update(float dt, bool is_on_ground,
                 m_kart->getKartProperties()->getMaxSteerAngle(m_kart->getSpeed()));
 #endif
             m_skid_time += dt;
-            float bonus_time, bonus_speed;
-            unsigned int level = getSkidBonus(&bonus_time, 
-                                              &bonus_speed);
+            float bonus_time, bonus_speed, bonus_force;
+            unsigned int level = getSkidBonus(&bonus_time, &bonus_speed,
+                                              &bonus_force);
             // If at least level 1 bonus is reached, show appropriate gfx
             if(level>0) m_kart->getKartGFX()->setSkidLevel(level);
             // If player stops skidding, trigger bonus, and change state to
@@ -328,8 +328,8 @@ void Skidding::update(float dt, bool is_on_ground,
                           ->setCreationRateRelative(KartGFX::KGFX_SKID, 1.0f);
                     m_kart->m_max_speed->
                         instantSpeedIncrease(MaxSpeed::MS_INCREASE_SKIDDING,
-                                             bonus_speed, bonus_speed, 
-                                             bonus_time, 
+                                             bonus_speed, bonus_speed,
+                                             bonus_force, bonus_time, 
                                              /*fade-out-time*/ 1.0f);
                 }
                 else
@@ -356,18 +356,22 @@ void Skidding::update(float dt, bool is_on_ground,
  *  m_skid_time.
  *  \param bonus_time On return contains how long the bonus should be active.
  *  \param bonus_speed How much additional speed the kart should get.
+ *  \param bonus_force Additional engine force.
  *  \return The bonus level: 0 = no bonus, 1 = first entry in bonus array etc.
  */
 unsigned int Skidding::getSkidBonus(float *bonus_time, 
-                                    float *bonus_speed) const
+                                    float *bonus_speed,
+                                    float *bonus_force) const
 {
     *bonus_time  = 0;
     *bonus_speed = 0;
+    *bonus_force = 0;
     for(unsigned int i=0; i<m_skid_bonus_speed.size(); i++)
     {
         if(m_skid_time<=m_skid_time_till_bonus[i]) return i;
         *bonus_speed = m_skid_bonus_speed[i];
-        *bonus_time= m_skid_bonus_time[i];
+        *bonus_time  = m_skid_bonus_time[i];
+        *bonus_force = m_skid_bonus_force[i];
     }
     return m_skid_bonus_speed.size();
 }   // getSkidBonusForce

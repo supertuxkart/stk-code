@@ -80,6 +80,12 @@ protected:
     *   time, i.e. longer skidding gives more bonus. */
     std::vector<float> m_skid_bonus_time;
 
+    /** Additional force accelerating the kart (in addition to the immediate
+     *  speed bonus). Without this force turning to correct the direction
+     *  after skidding will use up nearly all of the additional speed (turning
+     *  reduces the forward engine impulse) */
+    std::vector<float> m_skid_bonus_force;
+
     /** A factor is used to reduce the amount of steering while skidding. This
      *  is the minimum factor used (i.e. resulting in the largest turn 
      *  radius). */
@@ -89,6 +95,7 @@ protected:
      *  is the maximum factor used (i.e. resulting in the smallest turn 
      *  radius). */
     float m_skid_reduce_turn_max;
+
 
     /** Kart leaves skid marks. */
     bool  m_has_skidmarks;
