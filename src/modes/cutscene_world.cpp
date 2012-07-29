@@ -91,6 +91,21 @@ void CutsceneWorld::init()
                 float FPS = 25.0f; // for now we assume the cutscene is saved at 25 FPS
                 m_sounds_to_trigger[frame / FPS].push_back(curr);
             }
+            else if (StringUtils::startsWith(condition, "until "))
+            {
+                std::string frameStr = condition.substr(6); // remove 'until ' prefix
+                int frame;
+                
+                if (!StringUtils::fromString(frameStr, frame))
+                {
+                    fprintf(stderr, "[CutsceneWorld] Invalid condition '%s'\n", condition.c_str());
+                    continue;
+                }
+                
+                float FPS = 25.0f; // for now we assume the cutscene is saved at 25 FPS
+                m_sounds_to_stop[frame / FPS].push_back(curr);
+                curr->triggerSound(true);
+            }
         }
         
         if (dynamic_cast<AnimationBase*>(curr) != NULL)
@@ -206,6 +221,24 @@ void CutsceneWorld::update(float dt)
                 objects[i]->triggerSound();
             }
             m_sounds_to_trigger.erase(it++);
+        }
+        else
+        {
+            it++;
+        }
+     }
+     
+     for (std::map<float, std::vector<TrackObject*> >::iterator it = m_sounds_to_stop.begin();
+         it != m_sounds_to_stop.end(); )
+    {
+        if (m_time >= it->first)
+        {
+            std::vector<TrackObject*> objects = it->second;
+            for (unsigned int i = 0; i < objects.size(); i++)
+            {
+                objects[i]->stopSound();
+            }
+            m_sounds_to_stop.erase(it++);
         }
         else
         {

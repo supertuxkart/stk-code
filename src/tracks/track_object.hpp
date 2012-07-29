@@ -154,7 +154,8 @@ public:
     /** Currently used for sound effects only, in cutscenes only atm */
     const std::string& getTriggerCondition() const { return m_trigger_condition; }
     
-    void triggerSound();
+    void triggerSound(bool loop=false);
+    void stopSound();
     
     virtual void onTriggerItemApproached(Item* who);
     

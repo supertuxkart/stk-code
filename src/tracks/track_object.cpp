@@ -456,7 +456,22 @@ void TrackObject::onTriggerItemApproached(Item* who)
 // ----------------------------------------------------------------------------
 
 /** if this is a sound object, play the object */
-void TrackObject::triggerSound()
+void TrackObject::triggerSound(bool loop)
 {
-    if (m_sound != NULL) m_sound->play();
+    if (m_sound != NULL)
+    {
+        m_sound->setLoop(loop);
+        m_sound->play();
+    }
 }
+
+// ----------------------------------------------------------------------------
+
+/** if this is a sound object, stop the object */
+void TrackObject::stopSound()
+{
+    if (m_sound != NULL) m_sound->stop();
+}
+
+// ----------------------------------------------------------------------------
+
