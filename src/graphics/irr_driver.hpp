@@ -107,6 +107,7 @@ private:
     void                 applyResolutionSettings();
     void                 createListOfVideoModes();
 
+    bool                 m_request_screenshot;
     
 public:
                           IrrDriver();
@@ -213,6 +214,8 @@ public:
     inline PostProcessing* getPostProcessing()  {return &m_post_processing;}
     
     bool supportsSplatting();
+    
+    void requestScreenshot();
     
     // --------------------- RTT --------------------
     /**

@@ -84,6 +84,7 @@ IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
     m_device              = createDevice(video::EDT_NULL);
+    m_request_screenshot  = false;
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -1601,6 +1602,42 @@ void IrrDriver::update(float dt)
     
     m_video_driver->endScene();
     
+    
+    if (m_request_screenshot)
+    {
+        m_request_screenshot = false;
+        
+        video::IImage* image = m_video_driver->createScreenShot();
+        if (image)
+        {
+            static int screenshot_id = 1;
+            
+            #if defined(WIN32)
+            std::string path = StringUtils::insertValues("C:\\Temp\\supertuxkart_%s_%i.png", race_manager->getTrackName().c_str(), screenshot_id++);
+            #else
+            std::string path = StringUtils::insertValues("/tmp/supertuxkart_%s_%i.png", race_manager->getTrackName().c_str(), screenshot_id++);
+            #endif
+            
+            if (irr_driver->getVideoDriver()->writeImageToFile(image, io::path(path.c_str()), 0))
+            {
+                RaceGUIBase* base = World::getWorld()->getRaceGUI();
+                if (base != NULL)
+                {
+                    base->addMessage(core::stringw(("Screenshot saved to\n" + path).c_str()), NULL, 2.0f, video::SColor(255,255,255,255), true, false);
+                }
+            }
+            else
+            {
+                RaceGUIBase* base = World::getWorld()->getRaceGUI();
+                if (base != NULL)
+                {
+                    base->addMessage(core::stringw(("FAILED saving screenshot to\n" + path + "\n:(").c_str()), NULL, 2.0f, video::SColor(255,255,255,255), true, false);
+                }
+            }
+            image->drop();
+        }
+    }
+    
     getPostProcessing()->update(dt);
     
     // Enable this next print statement to get render information printed
@@ -1611,6 +1648,13 @@ void IrrDriver::update(float dt)
     //if(World::getWorld() && World::getWorld()->isRacePhase()) 
     //    printRenderStats();
 }   // update
+
+// ----------------------------------------------------------------------------
+
+void IrrDriver::requestScreenshot()
+{
+    m_request_screenshot = true;
+}
 
 // ----------------------------------------------------------------------------
 // Irrlicht Event handler.
