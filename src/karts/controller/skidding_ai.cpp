@@ -23,13 +23,13 @@
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
 #ifdef DEBUG
    // Enable AeI graphical debugging
-#  undef AI_DEBUG
+#  define AI_DEBUG
    // Shows left and right lines when using new findNonCrashing function
 #  undef AI_DEBUG_NEW_FIND_NON_CRASHING
    // Show the predicted turn circles
-#  undef AI_DEBUG_CIRCLES
+#  define AI_DEBUG_CIRCLES
    // Show the heading of the kart
-#  undef AI_DEBUG_KART_HEADING
+#  define AI_DEBUG_KART_HEADING
 #endif
 
 #include "karts/controller/skidding_ai.hpp"
@@ -468,7 +468,7 @@ void SkiddingAI::handleSteering(float dt)
         m_debug_sphere->setPosition(straight_point.toIrrVector());
 #endif
         steer_angle = steerToPoint(straight_point);
-    }
+    }  // if m_current_track_direction!=LEFT/RIGHT
 
     setSteering(steer_angle, dt);
 }   // handleSteering
@@ -1263,18 +1263,24 @@ void SkiddingAI::handleCurve()
                         &m_curve_center, &m_current_curve_radius);
 
 #ifdef ADJUST_TURN_RADIUS_TO_AVOID_CRASH_INTO_TRACK
-    for(unsigned int i=next; i<=last; i++)
+    unsigned int i= m_track_node;
+    while(1)
     {
+        i = m_next_node_index[i];
         // Pick either the lower left or right point:
         int index = m_current_track_direction==GraphNode::DIR_LEFT
-            ? 0 : 1;
-        float r = (center - qg->getQuadOfNode(i)[index]).length();
+                  ? 0 : 1;
+        float r = (m_curve_center - qg->getQuadOfNode(i)[index]).length();
         if(m_current_curve_radius < r)
         {
-            determineTurnRadius(xyz, tangent, qg->getQuadOfNode(i)[index],
-                &center, &m_current_curve_radius);
+            last_xyz = qg->getQuadOfNode(i)[index];
+            determineTurnRadius(xyz, tangent, last_xyz,
+                                &m_curve_center, &m_current_curve_radius);
+            //m_current_curve_radius = r;
             break;
         }
+        if(i==m_last_direction_node)
+            break;
     }
 #endif
 #if defined(AI_DEBUG) && defined(AI_DEBUG_CIRCLES)
