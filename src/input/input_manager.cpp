@@ -161,11 +161,7 @@ void InputManager::handleStaticAction(int key, int value)
             break;
             
         case KEY_F1:
-            if (control_is_pressed)
-            {
-                irr_driver->requestScreenshot();
-            }
-            else if (UserConfigParams::m_artist_debug_mode && world)
+            if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
