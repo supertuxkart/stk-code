@@ -1612,7 +1612,7 @@ void IrrDriver::update(float dt)
         {
             time_t rawtime;
             time ( &rawtime );
-            tm* timeInfo = gmtime( &rawtime );
+            tm* timeInfo = localtime( &rawtime );
             char timeBuffer[256];
             sprintf(timeBuffer, "%i.%02i.%02i %02i.%02i.%02i",
                     timeInfo->tm_year + 1900, timeInfo->tm_mon, timeInfo->tm_mday,
