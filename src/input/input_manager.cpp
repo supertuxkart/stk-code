@@ -157,7 +157,8 @@ void InputManager::handleStaticAction(int key, int value)
             break;
         }
         case KEY_PRINT:
-            irr_driver->requestScreenshot();
+            if (value != 0)
+                irr_driver->requestScreenshot();
             break;
             
         case KEY_F1:

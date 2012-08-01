@@ -1613,19 +1613,17 @@ void IrrDriver::update(float dt)
             time_t rawtime;
             time ( &rawtime );
             tm* timeInfo = gmtime( &rawtime );
-            std::string now = StringUtils::insertValues(std::string("%i.%i.%i %i.%i.%i"),
-                                                        timeInfo->tm_year + 1900,
-                                                        timeInfo->tm_mon, timeInfo->tm_mday,
-                                                        timeInfo->tm_hour, timeInfo->tm_min,
-                                                        timeInfo->tm_sec);
-            
+            char timeBuffer[256];
+            sprintf(timeBuffer, "%i.%02i.%02i %02i.%02i.%02i",
+                    timeInfo->tm_year + 1900, timeInfo->tm_mon, timeInfo->tm_mday,
+                    timeInfo->tm_hour, timeInfo->tm_min, timeInfo->tm_sec);
             
             #if defined(WIN32)
             std::string path = StringUtils::insertValues("C:\\Temp\\supertuxkart %s %s.png",
-                                                         race_manager->getTrackName().c_str(), now);
+                                                         race_manager->getTrackName().c_str(), timeBuffer);
             #else
             std::string path = StringUtils::insertValues("/tmp/supertuxkart %s %s.png",
-                                                         race_manager->getTrackName().c_str(), now);
+                                                         race_manager->getTrackName().c_str(), timeBuffer);
             #endif
             
             if (irr_driver->getVideoDriver()->writeImageToFile(image, io::path(path.c_str()), 0))
