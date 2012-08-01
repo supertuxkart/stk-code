@@ -1618,17 +1618,20 @@ void IrrDriver::update(float dt)
                     timeInfo->tm_year + 1900, timeInfo->tm_mon, timeInfo->tm_mday,
                     timeInfo->tm_hour, timeInfo->tm_min, timeInfo->tm_sec);
             
+            std::string trackName = race_manager->getTrackName();
+            if (World::getWorld() == NULL) trackName = "menu";
+            
             #if defined(WIN32)
             std::string path = StringUtils::insertValues("C:\\Temp\\supertuxkart %s %s.png",
-                                                         race_manager->getTrackName().c_str(), timeBuffer);
+                                                         trackName, timeBuffer);
             #else
             std::string path = StringUtils::insertValues("/tmp/supertuxkart %s %s.png",
-                                                         race_manager->getTrackName().c_str(), timeBuffer);
+                                                         trackName, timeBuffer);
             #endif
             
             if (irr_driver->getVideoDriver()->writeImageToFile(image, io::path(path.c_str()), 0))
             {
-                RaceGUIBase* base = World::getWorld()->getRaceGUI();
+                RaceGUIBase* base = (World::getWorld() == NULL ? NULL : World::getWorld()->getRaceGUI());
                 if (base != NULL)
                 {
                     base->addMessage(core::stringw(("Screenshot saved to\n" + path).c_str()), NULL,
