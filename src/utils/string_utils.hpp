@@ -127,6 +127,51 @@ namespace StringUtils
     // ------------------------------------------------------------------------
     // Note: the order in which the templates are specified is important, since
     // otherwise some compilers will not find the right template to use.
+    
+    template <class T1, class T2, class T3, class T4, class T5, class T6>
+    std::string insertValues(const std::string &s, const T1 &v1,
+                             const T2 &v2, const T3 &v3, const T4 &v4,
+                             const T5 &v5,const T6 &v6)
+    {
+        std::vector<std::string> all_vals;
+        std::ostringstream dummy;
+        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy << v2; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy << v3; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy << v4; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy << v5; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy << v6; all_vals.push_back(dummy.str());
+        return insertValues(s, all_vals);
+    }
+    
+    template <class T1, class T2, class T3, class T4, class T5>
+    std::string insertValues(const std::string &s, const T1 &v1,
+                             const T2 &v2, const T3 &v3, const T4 &v4,
+                             const T5 &v5)
+    {
+        std::vector<std::string> all_vals;
+        std::ostringstream dummy;
+        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy << v2; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy << v3; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy << v4; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy << v5; all_vals.push_back(dummy.str());
+        return insertValues(s, all_vals);
+    }
+    
+    template <class T1, class T2, class T3, class T4>
+    std::string insertValues(const std::string &s, const T1 &v1,
+                             const T2 &v2, const T3 &v3, const T4 &v4)
+    {
+        std::vector<std::string> all_vals;
+        std::ostringstream dummy;
+        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy << v2; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy << v3; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy << v4; all_vals.push_back(dummy.str());
+        return insertValues(s, all_vals);
+    }
+    
     /** Shortcut insert_values taking three values, see above for
      *  full docs.
      *  \param s String in which all %s or %d are replaced.

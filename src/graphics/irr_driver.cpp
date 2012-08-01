@@ -1610,12 +1610,22 @@ void IrrDriver::update(float dt)
         video::IImage* image = m_video_driver->createScreenShot();
         if (image)
         {
-            static int screenshot_id = 1;
+            time_t rawtime;
+            time ( &rawtime );
+            tm* timeInfo = gmtime( &rawtime );
+            std::string now = StringUtils::insertValues(std::string("%i.%i.%i %i.%i.%i"),
+                                                        timeInfo->tm_year + 1900,
+                                                        timeInfo->tm_mon, timeInfo->tm_mday,
+                                                        timeInfo->tm_hour, timeInfo->tm_min,
+                                                        timeInfo->tm_sec);
+            
             
             #if defined(WIN32)
-            std::string path = StringUtils::insertValues("C:\\Temp\\supertuxkart_%s_%i.png", race_manager->getTrackName().c_str(), screenshot_id++);
+            std::string path = StringUtils::insertValues("C:\\Temp\\supertuxkart %s %s.png",
+                                                         race_manager->getTrackName().c_str(), now);
             #else
-            std::string path = StringUtils::insertValues("/tmp/supertuxkart_%s_%i.png", race_manager->getTrackName().c_str(), screenshot_id++);
+            std::string path = StringUtils::insertValues("/tmp/supertuxkart %s %s.png",
+                                                         race_manager->getTrackName().c_str(), now);
             #endif
             
             if (irr_driver->getVideoDriver()->writeImageToFile(image, io::path(path.c_str()), 0))
@@ -1623,7 +1633,8 @@ void IrrDriver::update(float dt)
                 RaceGUIBase* base = World::getWorld()->getRaceGUI();
                 if (base != NULL)
                 {
-                    base->addMessage(core::stringw(("Screenshot saved to\n" + path).c_str()), NULL, 2.0f, video::SColor(255,255,255,255), true, false);
+                    base->addMessage(core::stringw(("Screenshot saved to\n" + path).c_str()), NULL,
+                                     2.0f, video::SColor(255,255,255,255), true, false);
                 }
             }
             else
@@ -1631,7 +1642,8 @@ void IrrDriver::update(float dt)
                 RaceGUIBase* base = World::getWorld()->getRaceGUI();
                 if (base != NULL)
                 {
-                    base->addMessage(core::stringw(("FAILED saving screenshot to\n" + path + "\n:(").c_str()), NULL, 2.0f, video::SColor(255,255,255,255), true, false);
+                    base->addMessage(core::stringw(("FAILED saving screenshot to\n" + path + "\n:(").c_str()),
+                                     NULL, 2.0f, video::SColor(255,255,255,255), true, false);
                 }
             }
             image->drop();
