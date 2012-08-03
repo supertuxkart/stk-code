@@ -201,7 +201,7 @@ void AIBaseController::crashed(const Material *m)
 	const unsigned int NUM_COLLISION = 3;
 	const float COLLISION_TIME       = 1.5f;
 
-	float time = m_world->getTime();
+	float time = World::getWorld()->getTime();
 	if(m_collision_times.size()==0)
 	{
 		m_collision_times.push_back(time);

@@ -273,6 +273,7 @@ TrackObject::TrackObject(const core::vector3df& pos, const core::vector3df& hpr,
     m_enabled    = true;
     m_is_looped  = false;
     m_sound      = NULL;
+    m_emitter    = NULL;
     
     // Some animated objects (billboards, sound emitters) don't use this scene node
     if (model_name == "")
@@ -343,6 +344,7 @@ TrackObject::TrackObject()
     m_node  = NULL;
     m_mesh  = NULL;    
     m_sound =  NULL;
+    m_emitter = NULL;
 }   // TrackObject()
 
 // ----------------------------------------------------------------------------
