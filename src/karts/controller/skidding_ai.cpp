@@ -358,9 +358,9 @@ void SkiddingAI::handleBraking()
 #ifdef DEBUG
         if(m_ai_debug)
             printf("[AI] braking: %s not aligned with track.\n",
-            m_kart->getIdent().c_str());
+                   m_kart->getIdent().c_str());
 #endif
-        //m_controls->m_brake = true;
+        m_controls->m_brake = true;
         return;
     }
     if(m_current_track_direction==GraphNode::DIR_LEFT ||
@@ -1226,7 +1226,6 @@ void SkiddingAI::determineTrackDirection()
         m_curve[CURVE_QG]->addPoint(qg->getNode(i).getCenter());
     }
 #endif
-    m_controls->m_skid = false;
 
     if(m_current_track_direction==GraphNode::DIR_LEFT  ||
        m_current_track_direction==GraphNode::DIR_RIGHT   )
@@ -1262,7 +1261,10 @@ void SkiddingAI::handleCurve()
     determineTurnRadius(xyz, tangent, last_xyz,
                         &m_curve_center, &m_current_curve_radius);
 
+#undef ADJUST_TURN_RADIUS_TO_AVOID_CRASH_INTO_TRACK
 #ifdef ADJUST_TURN_RADIUS_TO_AVOID_CRASH_INTO_TRACK
+    // NOTE: this can deadlock if the AI is going on a shortcut, since
+    // m_last_direction_node is based on going on the main driveline :(
     unsigned int i= m_track_node;
     while(1)
     {
@@ -1276,7 +1278,8 @@ void SkiddingAI::handleCurve()
             last_xyz = qg->getQuadOfNode(i)[index];
             determineTurnRadius(xyz, tangent, last_xyz,
                                 &m_curve_center, &m_current_curve_radius);
-            //m_current_curve_radius = r;
+            m_current_curve_radius = r;
+            m_last_direction_node = i;
             break;
         }
         if(i==m_last_direction_node)
@@ -1301,9 +1304,42 @@ void SkiddingAI::handleCurve()
  */
 bool SkiddingAI::doSkid(float steer_fraction)
 {
+    if(fabsf(steer_fraction)>1.5f)
+    {
+        // If the kart has to do a sharp turn, but is already skidding, find
+        // a good time to release the skid button, since this will turn the
+        // kart more sharply:
+        if(m_controls->m_skid)
+        {
+#ifdef DEBUG
+            if(m_ai_debug)
+            {
+                if(fabsf(steer_fraction)>=2.5f)
+                    printf("[AI] skid: %s stops skidding (%f).\n",
+                           m_kart->getIdent().c_str(), steer_fraction);
+            }
+#endif
+            // If the current turn is not sharp enough, delay releasing 
+            // the skid button.
+            return fabsf(steer_fraction)<2.5f;
+        }
+
+        // If the kart is not skidding, now is not a good time to start
+        return false;
+    }
+
     // No skidding on straights
     if(m_current_track_direction==GraphNode::DIR_STRAIGHT)
+    {
+#ifdef DEBUG
+        if(m_controls->m_skid && m_ai_debug)
+        {
+            printf("[AI] skid: %s stops skidding on straight.\n",
+                m_kart->getIdent().c_str());
+        }
+#endif
         return false;
+    }
 
     const float MIN_SKID_SPEED = 5.0f;
     const QuadGraph *qg = QuadGraph::get();
@@ -1323,8 +1359,15 @@ bool SkiddingAI::doSkid(float steer_fraction)
     angle = normalizeAngle(angle);
     float length = m_current_curve_radius*fabsf(angle);
     float duration = length / m_kart->getSpeed();
+    // The estimated skdding time is usually too short - partly because
+    // he speed of the kart decreases during the turn, partly because
+    // the actual path is adjusted during the turn. So apply an
+    // experimentally found factor in to get better estimates.
     duration *= 1.5f;
     const Skidding *skidding = m_kart->getSkidding();
+
+    // If the remaining estimated time for skidding is too short, stop
+    // it. This code will mostly trigger the bonus at the end of a skid.
     if(m_controls->m_skid && duration < 1.0f)
     {
         if(m_ai_debug)
@@ -1332,12 +1375,28 @@ bool SkiddingAI::doSkid(float steer_fraction)
             m_kart->getIdent().c_str());
         return false;
     }
-
+    // Test if the AI is trying to skid against track direction. This 
+    // can happen if the AI is adjusting steering somewhat (e.g. in a 
+    // left turn steer right to avoid getting too close to the left
+    // vorder). In this case skidding will be useless.
+    else if( (steer_fraction > 0 && 
+              m_current_track_direction==GraphNode::DIR_LEFT) ||
+             (steer_fraction < 0 && 
+              m_current_track_direction==GraphNode::DIR_RIGHT)  )
+        {
+#ifdef DEBUG
+            if(m_controls->m_skid && m_ai_debug)
+                printf("[AI] skid: %s skidding against track direction.\n",
+                        m_kart->getIdent().c_str());
+#endif
+            return false;
+        }
+    // If there is a skidding bonus, try to get it.
     else if(skidding->getNumberOfBonusTimes()>0 &&
-        skidding->getTimeTillBonus(0) < duration)
+            skidding->getTimeTillBonus(0) < duration)
     {
 #ifdef DEBUG
-        if(m_ai_debug)
+        if(!m_controls->m_skid && m_ai_debug)
             printf("[AI] skid: %s start skid, duration %f.\n",
             m_kart->getIdent().c_str(), duration);
 #endif
@@ -1345,6 +1404,11 @@ bool SkiddingAI::doSkid(float steer_fraction)
 
     }  // if curve long enough for skidding
 
+#ifdef DEBUG
+        if(m_controls->m_skid && m_ai_debug)
+            printf("[AI] skid: %s has no reasons to skid anymore.\n",
+                   m_kart->getIdent().c_str());
+#endif
     return false;
 }   // doSkid
 
@@ -1385,8 +1449,8 @@ void SkiddingAI::setSteering(float angle, float dt)
     // we can't turn into the direction we want to anymore (see 
     // Skidding class)
     Skidding::SkidState ss = skidding->getSkidState();
-    if(ss==Skidding::SKID_ACCUMULATE_LEFT  && steer_fraction>0 ||
-       ss==Skidding::SKID_ACCUMULATE_RIGHT && steer_fraction<0    )
+    if(ss==Skidding::SKID_ACCUMULATE_LEFT  && steer_fraction>0.2f ||
+       ss==Skidding::SKID_ACCUMULATE_RIGHT && steer_fraction<-0.2f    )
     {
         m_controls->m_skid = false;
 #ifdef DEBUG
@@ -1396,12 +1460,20 @@ void SkiddingAI::setSteering(float angle, float dt)
 #endif
     }
 
-    if(m_controls->m_skid && ( 
-        skidding->getSkidState()==Skidding::SKID_ACCUMULATE_LEFT ||
-        skidding->getSkidState()==Skidding::SKID_ACCUMULATE_RIGHT))
+    if(m_controls->m_skid && ( ss==Skidding::SKID_ACCUMULATE_LEFT ||
+                               ss==Skidding::SKID_ACCUMULATE_RIGHT  ) )
     {
         steer_fraction = 
             skidding->getSteeringWhenSkidding(steer_fraction);
+        if(fabsf(steer_fraction)>1.8)
+        {
+#ifdef DEBUG
+        if(m_ai_debug)
+            printf("[AI] skid: %s steering too much (%f).\n",
+                    m_kart->getIdent().c_str(), steer_fraction);
+#endif
+            m_controls->m_skid = false;
+        }
         if(steer_fraction<-1.0f)
             steer_fraction = -1.0f;
         else if(steer_fraction>1.0f)
