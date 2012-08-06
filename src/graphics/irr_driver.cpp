@@ -102,6 +102,41 @@ IrrDriver::~IrrDriver()
 
 // ----------------------------------------------------------------------------
 
+#if defined(__linux__)
+/*
+Returns the parent window of "window" (i.e. the ancestor of window
+that is a direct child of the root, or window itself if it is a direct child).
+If window is the root window, returns window.
+*/
+X11::Window get_toplevel_parent(X11::Display* display, X11::Window window)
+{
+     X11::Window parent;
+     X11::Window root;
+     X11::Window * children;
+     unsigned int num_children;
+
+     while (true)
+     {
+         if (0 == X11::XQueryTree(display, window, &root,
+                   &parent, &children, &num_children))
+         {
+             fprintf(stderr, "XQueryTree error\n");
+             abort(); //change to whatever error handling you prefer
+         }
+         if (children) { //must test for null
+             X11::XFree(children);
+         }
+         if (window == root || parent == root) {
+             return window;
+         }
+         else {
+             window = parent;
+         }
+     }
+}
+#endif
+
+
 void IrrDriver::updateConfigIfRelevant()
 {
         if (!UserConfigParams::m_fullscreen && UserConfigParams::m_remember_window_location)
@@ -138,15 +173,14 @@ void IrrDriver::updateConfigIfRelevant()
 #elif defined(__linux__)
         using namespace X11;
         const SExposedVideoData& videoData = m_device->getVideoDriver()->getExposedVideoData();
-        //XWindowAttributes xwa;
-        //XGetWindowAttributes((Display*)videoData.OpenGLLinux.X11Display, videoData.OpenGLLinux.X11Window, &xwa);
-        int wx = 0, wy = 0;
-        Window child;
-        XTranslateCoordinates((Display*)videoData.OpenGLLinux.X11Display, videoData.OpenGLLinux.X11Window,
-                             DefaultRootWindow((Display*)videoData.OpenGLLinux.X11Display), 0, 0,
-                             &wx, &wy, &child);
+        Display* display = (Display*)videoData.OpenGLLinux.X11Display;
+        XWindowAttributes xwa;
+        XGetWindowAttributes(display, get_toplevel_parent(display, videoData.OpenGLLinux.X11Window), &xwa);
+        int wx = xwa.x;
+        int wy = xwa.y;
         printf("Retrieved window location for config : %i %i\n", wx, wy);
-            
+        
+        
         if (UserConfigParams::m_window_x != wx || UserConfigParams::m_window_y != wy)
         {
             UserConfigParams::m_window_x = wx;
