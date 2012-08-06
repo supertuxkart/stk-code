@@ -23,13 +23,13 @@
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
 #ifdef DEBUG
    // Enable AeI graphical debugging
-#  define AI_DEBUG
+#  undef AI_DEBUG
    // Shows left and right lines when using new findNonCrashing function
 #  undef AI_DEBUG_NEW_FIND_NON_CRASHING
    // Show the predicted turn circles
-#  define AI_DEBUG_CIRCLES
+#  undef AI_DEBUG_CIRCLES
    // Show the heading of the kart
-#  define AI_DEBUG_KART_HEADING
+#  undef AI_DEBUG_KART_HEADING
 #endif
 
 #include "karts/controller/skidding_ai.hpp"
