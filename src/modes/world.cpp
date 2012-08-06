@@ -903,7 +903,7 @@ void World::eliminateKart(int kart_number, bool notify_of_elimination)
     kart->eliminate();
     m_eliminated_karts++;
 
-}   // removeKart
+}   // eliminateKart
 
 //-----------------------------------------------------------------------------
 /** Called to determine the default collectibles to give each player at the 

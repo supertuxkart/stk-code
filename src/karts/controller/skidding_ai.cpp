@@ -1454,8 +1454,8 @@ void SkiddingAI::setSteering(float angle, float dt)
     // we can't turn into the direction we want to anymore (see 
     // Skidding class)
     Skidding::SkidState ss = skidding->getSkidState();
-    if(ss==Skidding::SKID_ACCUMULATE_LEFT  && steer_fraction>0.2f ||
-       ss==Skidding::SKID_ACCUMULATE_RIGHT && steer_fraction<-0.2f    )
+    if((ss==Skidding::SKID_ACCUMULATE_LEFT  && steer_fraction>0.2f ) ||
+       (ss==Skidding::SKID_ACCUMULATE_RIGHT && steer_fraction<-0.2f)    )
     {
         m_controls->m_skid = false;
 #ifdef DEBUG
