@@ -1284,7 +1284,6 @@ void SkiddingAI::handleCurve()
             last_xyz = qg->getQuadOfNode(i)[index];
             determineTurnRadius(xyz, tangent, last_xyz,
                                 &m_curve_center, &m_current_curve_radius);
-            m_current_curve_radius = r;
             m_last_direction_node = i;
             break;
         }
