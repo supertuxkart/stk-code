@@ -71,6 +71,12 @@
 #  pragma warning(disable:4355)
 #endif
 
+#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
+#  define isnan _isnan
+#else
+#  include <math.h>
+#endif
+
 /** The kart constructor. 
  *  \param ident  The identifier for the kart model to use.
  *  \param position The position (or rank) for this kart (between 1 and
@@ -2147,6 +2153,7 @@ void Kart::setSuspensionLength()
  */
 void Kart::applyEngineForce(float force)
 {
+    assert(!isnan(force));
     // Split power to simulate a 4WD 40-60, other values possible
     // FWD or RWD is a matter of putting a 0 and 1 in the right place
     float frontForce = force*0.4f;
