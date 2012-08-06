@@ -39,6 +39,12 @@
    using namespace irr;
 #endif
 
+#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
+#  define isnan _isnan
+#else
+#  include <math.h>
+#endif
+
 #include <cstdlib>
 #include <ctime>
 #include <cstdio>
@@ -1537,6 +1543,9 @@ void  SkiddingAI::determineTurnRadius(const Vec3 &start,
     irr::core::vector2df result;
     if(line1.intersectWith(line2, result, /*checkOnlySegments*/false))
     {
+        assert(!isnan(result.X));
+        assert(!isnan(start.getY()));
+        assert(!isnan(result.Y));
         *center = Vec3(result.X, start.getY(), result.Y);
         *radius = (start - *center).length();
     }
@@ -1545,6 +1554,9 @@ void  SkiddingAI::determineTurnRadius(const Vec3 &start,
         // No intersection. In this case assume that the two points are
         // on a semicircle, in which case the center is at 0.5*(start+end):
         *center = 0.5f*(start+end);
+        assert(!isnan(center->getX()));
+        assert(!isnan(center->getY()));
+        assert(!isnan(center->getZ()));
         *radius = 0.5f*(end-start).length();
     }
     return;
