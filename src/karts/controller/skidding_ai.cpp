@@ -1312,9 +1312,6 @@ void SkiddingAI::handleCurve()
  */
 bool SkiddingAI::doSkid(float steer_fraction)
 {
-    assert(!isnan(m_curve_center.getX()));
-    assert(!isnan(m_curve_center.getY()));
-    assert(!isnan(m_curve_center.getZ()));
     if(fabsf(steer_fraction)>1.5f)
     {
         // If the kart has to do a sharp turn, but is already skidding, find
@@ -1351,6 +1348,10 @@ bool SkiddingAI::doSkid(float steer_fraction)
 #endif
         return false;
     }
+
+    assert(!isnan(m_curve_center.getX()));
+    assert(!isnan(m_curve_center.getY()));
+    assert(!isnan(m_curve_center.getZ()));
 
     const float MIN_SKID_SPEED = 5.0f;
     const QuadGraph *qg = QuadGraph::get();
