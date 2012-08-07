@@ -65,9 +65,7 @@ INetworkHttp *network_http = NULL;
  *  since the user might trigger another save in the menu (potentially
  *  ending up with an corrupted file).
  */
-NetworkHttp::NetworkHttp() : m_all_requests(std::priority_queue<Request*, 
-                                                         std::vector<Request*>,
-                                                         Request::Compare>()),
+NetworkHttp::NetworkHttp() : 
                              m_current_request(NULL),
                              m_abort(false),
                              m_thread_id(NULL)

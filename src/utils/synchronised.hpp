@@ -33,6 +33,14 @@ private:
     /** The actual data to be used. */
     TYPE                     m_data;                        
 public:
+    // ------------------------------------------------------------------------
+    /** Initialise the data and the mutex with default constructors. */
+    Synchronised() : m_data(TYPE())
+    {
+        pthread_mutex_init(&m_mutex, NULL);
+    }   // Synchronised()
+
+    // ------------------------------------------------------------------------
     /** Initialise the data and the mutex. */
     Synchronised(const TYPE &v)
     {
