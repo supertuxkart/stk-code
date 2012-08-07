@@ -182,6 +182,7 @@ void SkiddingAI::reset()
     m_kart_behind                = NULL;
     m_distance_behind            = 0.0f;
     m_current_curve_radius       = 0.0f;
+    m_curve_center               = Vec3(0,0,0);
     m_current_track_direction    = GraphNode::DIR_STRAIGHT;
 
     AIBaseController::reset();
@@ -1337,7 +1338,8 @@ bool SkiddingAI::doSkid(float steer_fraction)
     }
 
     // No skidding on straights
-    if(m_current_track_direction==GraphNode::DIR_STRAIGHT)
+    if(m_current_track_direction==GraphNode::DIR_STRAIGHT ||
+       m_current_track_direction==GraphNode::DIR_UNDEFINED  )
     {
 #ifdef DEBUG
         if(m_controls->m_skid && m_ai_debug)
@@ -1348,10 +1350,6 @@ bool SkiddingAI::doSkid(float steer_fraction)
 #endif
         return false;
     }
-
-    assert(!isnan(m_curve_center.getX()));
-    assert(!isnan(m_curve_center.getY()));
-    assert(!isnan(m_curve_center.getZ()));
 
     const float MIN_SKID_SPEED = 5.0f;
     const QuadGraph *qg = QuadGraph::get();
@@ -1549,9 +1547,6 @@ void  SkiddingAI::determineTurnRadius(const Vec3 &start,
     irr::core::vector2df result;
     if(line1.intersectWith(line2, result, /*checkOnlySegments*/false))
     {
-        assert(!isnan(result.X));
-        assert(!isnan(start.getY()));
-        assert(!isnan(result.Y));
         *center = Vec3(result.X, start.getY(), result.Y);
         *radius = (start - *center).length();
     }
@@ -1560,9 +1555,6 @@ void  SkiddingAI::determineTurnRadius(const Vec3 &start,
         // No intersection. In this case assume that the two points are
         // on a semicircle, in which case the center is at 0.5*(start+end):
         *center = 0.5f*(start+end);
-        assert(!isnan(center->getX()));
-        assert(!isnan(center->getY()));
-        assert(!isnan(center->getZ()));
         *radius = 0.5f*(end-start).length();
     }
     return;
