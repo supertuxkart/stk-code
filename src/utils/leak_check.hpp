@@ -1,22 +1,24 @@
-/*
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
- 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
- 
- You should have received a copy of the GNU General Public License along
- with this program; if not, write to the Free Software Foundation, Inc.,
- 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2011-2012 Marianne Gagnon, Joerg Henrichs
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, write to the Free Software Foundation, Inc.,
+// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-#ifndef __LEAK_CHECK_H__
-#define __LEAK_CHECK_H__
+#ifndef HEADER_LEAK_CHECK_HPP
+#define HEADER_LEAK_CHECK_HPP
 
 #ifdef DEBUG
 
@@ -24,57 +26,30 @@
 
 namespace MemoryLeaks
 {
-    
-    class AbstractLeakCheck;
-    
-    class MyObject
-    {
-        char** stack;
-        int stackSize;
-    public:
-        AbstractLeakCheck* obj;
         
-        MyObject(AbstractLeakCheck* obj);
-        void print();
-    };
-    
+    class AllocatedObject
+    {
+        /** Keep stack information if available (OSX only). */
+        char **m_stack;
+        /** Keeps stacksize information if available (OSX only). */
+        int    m_stack_size;
+    public:        
+        AllocatedObject();
+        virtual ~AllocatedObject();
+        virtual void print() const;
+    };   // AllocatedObjects
+
+    // ========================================================================
     void checkForLeaks();
     
-    void addObj(MyObject* obj);
-    void removeObj(MyObject* obj);
+    void addObject(AllocatedObject* obj);
+    void removeObject(AllocatedObject* obj);
     
-    class AbstractLeakCheck
-    {
-        MyObject* m_object;
-        
-    public:
-        
-        AbstractLeakCheck()
-        {
-            m_object = new MyObject( this );
-            addObj( m_object );
-        }
-        
-        AbstractLeakCheck(const AbstractLeakCheck &t)
-        {
-            m_object = new MyObject( this );
-            addObj( m_object );
-        }
-        
-        virtual ~AbstractLeakCheck()
-        {
-            removeObj( m_object );
-        }
-        
-        virtual void print() const
-        {
-        }
-    };
     
-}
+}   // namespace MemoryLeaks
 
 #define LEAK_CHECK() \
-class LeakCheck : public MemoryLeaks::AbstractLeakCheck\
+class LeakCheck : public MemoryLeaks::AllocatedObject\
 {  public:\
 virtual void print() const\
 { \
