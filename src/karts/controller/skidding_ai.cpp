@@ -1266,6 +1266,9 @@ void SkiddingAI::handleCurve()
 
     determineTurnRadius(xyz, tangent, last_xyz,
                         &m_curve_center, &m_current_curve_radius);
+    assert(!isnan(m_curve_center.getX()));
+    assert(!isnan(m_curve_center.getY()));
+    assert(!isnan(m_curve_center.getZ()));
 
 #undef ADJUST_TURN_RADIUS_TO_AVOID_CRASH_INTO_TRACK
 #ifdef ADJUST_TURN_RADIUS_TO_AVOID_CRASH_INTO_TRACK
@@ -1309,6 +1312,9 @@ void SkiddingAI::handleCurve()
  */
 bool SkiddingAI::doSkid(float steer_fraction)
 {
+    assert(!isnan(m_curve_center.getX()));
+    assert(!isnan(m_curve_center.getY()));
+    assert(!isnan(m_curve_center.getZ()));
     if(fabsf(steer_fraction)>1.5f)
     {
         // If the kart has to do a sharp turn, but is already skidding, find
