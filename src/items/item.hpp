@@ -130,8 +130,6 @@ private:
      *  indicates that the item still exists, =0 that the item can be
      *  deleted, and <0 that the item will never be deleted. */
     int           m_disappear_counter;
-
-    void          setType(ItemType type);
     
     /** callback used if type == ITEM_TRIGGER */
     TriggerItemListener* m_listener;
@@ -139,11 +137,14 @@ private:
     /** square distance at which item is collected */
     float m_distance_2;
     
+    void          initItem(ItemType type, const Vec3 &xyz);
+    void          setType(ItemType type);
+
 public:
-                  Item (ItemType type, const Vec3& xyz, const Vec3& normal,
-                        scene::IMesh* mesh, scene::IMesh* lowres_mesh, unsigned int item_id);
-                  Item (const Vec3& xyz, float distance, TriggerItemListener* trigger,
-                        unsigned int item_id);
+                  Item(ItemType type, const Vec3& xyz, const Vec3& normal,
+                       scene::IMesh* mesh, scene::IMesh* lowres_mesh);
+                  Item(const Vec3& xyz, float distance, 
+                       TriggerItemListener* trigger);
     virtual       ~Item ();
     void          update  (float delta);
     virtual void  collected(const AbstractKart *kart, float t=2.0f);
@@ -166,6 +167,9 @@ public:
                (xyz-m_xyz).length2()<m_distance_2;
     }   // hitKart
 
+    // ------------------------------------------------------------------------
+    /** Sets the index of this item in the item manager list. */
+    void          setItemId(unsigned int n)  { m_item_id = n; }
     // ------------------------------------------------------------------------
     /** Returns the index of this item in the item manager list. */
     unsigned int  getItemId()    const { return m_item_id;  }

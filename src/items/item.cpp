@@ -31,24 +31,14 @@
 #include "utils/vec3.hpp"
 
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
-           scene::IMesh* mesh, scene::IMesh* lowres_mesh, unsigned int item_id)
+           scene::IMesh* mesh, scene::IMesh* lowres_mesh)
 {
     assert(type != ITEM_TRIGGER); // use other constructor for that
     
-    setType(type);
-    m_event_handler     = NULL;
-    m_xyz               = xyz;
-    m_deactive_time     = 0;
+    initItem(type, xyz);
     m_distance_2        = 0.8f;
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
     m_original_hpr      = Vec3(0, normal);
-    m_item_id           = item_id;
-    m_original_type     = ITEM_NONE;
-    m_collected         = false;
-    m_time_till_return  = 0.0f;  // not strictly necessary, see isCollected()
-    m_disappear_counter = m_type==ITEM_BUBBLEGUM 
-                        ? stk_config->m_bubble_gum_counter
-                        : -1 ;
     m_original_mesh     = mesh;
     m_original_lowmesh  = lowres_mesh;
     m_listener          = NULL;
@@ -83,7 +73,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_node->setPosition(xyz.toIrrVector());
     m_node->setRotation(m_original_hpr.toIrrHPR());
     m_node->grab();
-}   // Item
+}   // Item(type, xyz, normal, mesh, lowres_mesh)
 
 //-----------------------------------------------------------------------------
 
@@ -91,37 +81,46 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
   * Trigger items are invisible and can be used to trigger a behavior when
   * approaching a point.
   */
-Item::Item (const Vec3& xyz, float distance, TriggerItemListener* trigger,
-            unsigned int item_id)
+Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
 {
-    m_type = ITEM_TRIGGER;
-    m_event_handler     = NULL;
-    m_xyz               = xyz;
-    m_deactive_time     = 0;
+    initItem(ITEM_TRIGGER, xyz);
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
     m_original_hpr      = Vec3(0, 0, 0);
-    m_item_id           = item_id;
-    m_original_type     = ITEM_NONE;
-    m_collected         = false;
-    m_time_till_return  = 0.0f;  // not strictly necessary, see isCollected()
-    m_disappear_counter = -1;
     m_original_mesh     = NULL;
     m_original_lowmesh  = NULL;
     m_node              = NULL;
     m_listener          = trigger;
-    m_rotate            = false;
     m_distance_2        = distance*distance;
-}
+}   // Item(xyz, distance, trigger)
 
 //-----------------------------------------------------------------------------
-/** Sets the type of this item, but also derived values, e.g. m_rotate.
- *  (bubblegums do not return).
- *  \param type New type of the item.
+/** Initialises the item.
+ *  \param type Type of the item.
+ */
+void Item::initItem(ItemType type, const Vec3 &xyz)
+{
+    m_type   = type;
+    m_xyz               = xyz;
+    m_event_handler     = NULL;
+    m_item_id           = -1;
+    m_collected         = false;
+    m_original_type     = ITEM_NONE;
+    m_deactive_time     = 0;
+    m_time_till_return  = 0.0f;  // not strictly necessary, see isCollected()
+    m_rotate            = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
+    m_disappear_counter = m_type==ITEM_BUBBLEGUM 
+                        ? stk_config->m_bubble_gum_counter
+                        : -1 ;
+}   // initItem
+
+//-----------------------------------------------------------------------------
+/** Sets the type of the item (and also derived attributes lile m_rotate
+ *  \param type Type of the item.
  */
 void Item::setType(ItemType type)
 {
     m_type   = type;
-    m_rotate = type!=ITEM_BUBBLEGUM;
+    m_rotate = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
 }   // setType
 
 //-----------------------------------------------------------------------------

@@ -41,21 +41,22 @@ private:
     AllItemTypes m_all_items;
 
     /** This stores all item models. */
-    scene::IMesh *m_item_mesh[Item::ITEM_LAST-Item::ITEM_FIRST+1];
-    scene::IMesh *m_item_lowres_mesh[Item::ITEM_LAST-Item::ITEM_FIRST+1];
+    std::vector<scene::IMesh *> m_item_mesh;
 
-    /** Stores all meshes for all items. */
-    std::map<std::string,scene::IMesh*> m_all_meshes;
-    std::map<std::string,scene::IMesh*> m_all_low_meshes;
-
+    std::vector<scene::IMesh *> m_item_lowres_mesh;
+    
+    /** The filename of item.xml, which can be overwritten from the command line
+     *  in order to select different models. */
     std::string m_user_filename;
 
-    /** What item is item is switched to. */
+    /** What item this item is switched to. */
     std::vector<Item::ItemType> m_switch_to;
 
     /** Remaining time that items should remain switched. If the
      *  value is <0, it indicates that the items are not switched atm. */
     float m_switch_time;
+
+    void  ItemManager::insertItem(Item *item);
 
 public:
                    ItemManager();

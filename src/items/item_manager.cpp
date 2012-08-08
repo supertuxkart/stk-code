@@ -30,6 +30,7 @@
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "network/network_manager.hpp"
+#include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
@@ -44,7 +45,6 @@ typedef std::map<std::string,scene::IMesh*>::const_iterator CI_type;
 ItemManager::ItemManager()
 {
     m_switch_time = -1.0f;
-    m_all_meshes.clear();
     // The actual loading is done in loadDefaultItems
 
     // Prepare the switch to array, which stores which item should be
@@ -68,6 +68,8 @@ void ItemManager::setSwitchItems(const std::vector<int> &switch_items)
 }   // setSwitchItems
 
 //-----------------------------------------------------------------------------
+/** Clean up all textures. This is necessary when switching resolution etc.
+ */
 void ItemManager::removeTextures()
 {
     for(AllItemTypes::iterator i =m_all_items.begin();
@@ -77,84 +79,99 @@ void ItemManager::removeTextures()
     }
     m_all_items.clear();
 
-    for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
+    for(unsigned int i=0; i<Item::ITEM_LAST-Item::ITEM_FIRST+1; i++)
     {
-        i->second->drop();
+        if(m_item_mesh[i]       ) m_item_mesh[i]->drop();
+        if(m_item_lowres_mesh[i]) m_item_lowres_mesh[i]->drop();
     }
-    for(CI_type i=m_all_low_meshes.begin(); i!=m_all_low_meshes.end(); ++i)
-    {
-        i->second->drop();
-    }
-    m_all_meshes.clear();
-    m_all_low_meshes.clear();
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
+/** Destructor. Cleans up all items and meshes stored.
+ */
 ItemManager::~ItemManager()
-{
-    for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
+{    
+    for(unsigned int i=0; i<Item::ITEM_LAST-Item::ITEM_FIRST+1; i++)
     {
-        i->second->drop();
+        if(m_item_mesh[i]       ) m_item_mesh[i]->drop();
+        if(m_item_lowres_mesh[i]) m_item_lowres_mesh[i]->drop();
     }
-    m_all_meshes.clear();
-    
-    for(CI_type i=m_all_low_meshes.begin(); i!=m_all_low_meshes.end(); ++i)
-    {
-        i->second->drop();
-    }
-    m_all_low_meshes.clear();
 }   // ~ItemManager
 
 //-----------------------------------------------------------------------------
+/** Loads the default item meshes (high- and low-resolution).
+ */
 void ItemManager::loadDefaultItems()
 {
-    // The names must be given in the order of the definition of ItemType
-    // in item.hpp. Note that bubblegum strictly isn't an item,
-    // it is implemented as one, and so loaded here, too.
-    static const std::string item_names[] = {"bonus-box", "banana",
-                                             "nitro-big", "nitro-small",
-                                             "bubblegum", "trigger" };
+    m_item_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
+    m_item_lowres_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
+
+    // A temporary mapping of items to names used in the XML file:
+    std::map<Item::ItemType, std::string> item_names;
+    item_names[Item::ITEM_BANANA     ] = "banana";
+    item_names[Item::ITEM_BONUS_BOX  ] = "bonus-box";
+    item_names[Item::ITEM_BUBBLEGUM  ] = "bubblegum";
+    item_names[Item::ITEM_NITRO_BIG  ] = "nitro-big";
+    item_names[Item::ITEM_NITRO_SMALL] = "nitro-small";
+    item_names[Item::ITEM_TRIGGER    ] = "trigger";
+
     const std::string file_name = file_manager->getDataFile("items.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
     for(unsigned int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
     {
-        const XMLNode *node = root->getNode(item_names[i]);
-        std::string model_filename, lowres_model_filename;
-        if (node)
-        {
-            node->get("model", &model_filename);
-            node->get("lowmodel", &lowres_model_filename);
-        }
-        else
-        {
-            continue;
-        }
-        
-        scene::IMesh *mesh = irr_driver->getAnimatedMesh(model_filename);
-        scene::IMesh *lowres_mesh = NULL;
-        
-        if (lowres_model_filename.size() > 0)
-            lowres_mesh = irr_driver->getMesh(lowres_model_filename);
-        
+        const std::string &name = item_names[(Item::ItemType)i];
+        const XMLNode *node = root->getNode(name);
+        if (!node)  continue;
+
+        std::string model_filename;
+        node->get("model", &model_filename);
+    
+        scene::IMesh *mesh = irr_driver->getAnimatedMesh(model_filename);        
         if(!node || model_filename.size()==0 || !mesh)
         {
-            fprintf(stderr, "Item model '%s' in items.xml could not be loaded - aborting",
-                    item_names[i].c_str());
+            fprintf(stderr, "Item model '%s' in items.xml could not be loaded "
+                            "- aborting", name.c_str());
             exit(-1);
         }
-        std::string shortName =
-            StringUtils::getBasename(StringUtils::removeExtension(model_filename));
-        m_all_meshes[shortName]     = mesh;
-        m_item_mesh[i]              = mesh;
-        m_item_lowres_mesh[i]       = lowres_mesh;
-        mesh->grab();
-        
-        if (lowres_mesh != NULL)
-            m_all_low_meshes[shortName] = lowres_mesh;
-        if (lowres_mesh != NULL) lowres_mesh->grab();
+        mesh->grab();        
+        m_item_mesh[i]            = mesh;
+
+        std::string lowres_model_filename;
+        node->get("lowmodel", &lowres_model_filename);
+        m_item_lowres_mesh[i] = lowres_model_filename.size() == 0
+                              ? NULL
+                              : irr_driver->getMesh(lowres_model_filename);
+
+        if (m_item_lowres_mesh[i]) m_item_lowres_mesh[i]->grab();
     }   // for i
     delete root;
 }   // loadDefaultItems
+
+//-----------------------------------------------------------------------------
+/** Inserts the new item into the items management data structures, if possible
+ *  reusing an existing, unused entry (e.g. due to a removed bubble gum). Then 
+ *  the item is also added to the quad-wise list of items.
+ */
+void ItemManager::insertItem(Item *item)
+{
+    // Find where the item can be stored in the index list: either in a
+    // previously deleted entry, otherwise at the end.
+    int index = -1;
+    for(index=m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
+    
+    if(index==-1) index = m_all_items.size();
+
+    if(index<(int)m_all_items.size())
+        m_all_items[index] = item;
+    else
+        m_all_items.push_back(item);
+    item->setItemId(index);
+
+    // Now insert into the appropriate quad list
+    const Vec3 &xyz = item->getXYZ();
+    int sector = QuadGraph::UNKNOWN_SECTOR;
+    QuadGraph::get()->findRoadSector(xyz, &sector);
+}   // insertItem
 
 //-----------------------------------------------------------------------------
 /** Creates a new item.
@@ -167,15 +184,10 @@ void ItemManager::loadDefaultItems()
 Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz, 
                            const Vec3 &normal, AbstractKart *parent)
 {
-    // Find where the item can be stored in the index list: either in a
-    // previously deleted entry, otherwise at the end.
-    int index = -1;
-    for(index=m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
+    Item* item = new Item(type, xyz, normal, m_item_mesh[type], 
+                          m_item_lowres_mesh[type]);
 
-    if(index==-1) index = m_all_items.size();
-    Item* item;
-    item = new Item(type, xyz, normal, m_item_mesh[type], 
-                    m_item_lowres_mesh[type], index);
+    insertItem(item);
     if(parent != NULL) item->setParent(parent);
     if(m_switch_time>=0)
     {
@@ -183,11 +195,6 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
         item->switchTo(new_type, m_item_mesh[(int)new_type], 
                        m_item_lowres_mesh[(int)new_type]);
     }
-    if(index<(int)m_all_items.size())
-        m_all_items[index] = item;
-    else
-        m_all_items.push_back(item);
-
     return item;
 }   // newItem
 
@@ -198,20 +205,10 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
 Item* ItemManager::newItem(const Vec3& xyz, float distance, 
                            TriggerItemListener* listener)
 {
-    // Find where the item can be stored in the index list: either in a
-    // previously deleted entry, otherwise at the end.
-    int index = -1;
-    for(index=m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
-    
-    if(index==-1) index = m_all_items.size();
     Item* item;
-    item = new Item(xyz, distance, listener, index);
+    item = new Item(xyz, distance, listener);
+    insertItem(item);
 
-    if(index<(int)m_all_items.size())
-        m_all_items[index] = item;
-    else
-        m_all_items.push_back(item);
-    
     return item;
 }   // newItem
 
