@@ -166,7 +166,8 @@ void CutsceneWorld::update(float dt)
     }
     
     
-    float currFrame = m_time * 30.0f; // We assume 30 FPS
+    float currFrame = m_time * 25.0f; // We assume 25 FPS
+    
     const std::vector<Subtitle>& subtitles = m_track->getSubtitles();
     bool foundSubtitle = false;
     for (unsigned int n = 0; n < subtitles.size(); n++)
