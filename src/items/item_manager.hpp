@@ -56,7 +56,7 @@ private:
      *  value is <0, it indicates that the items are not switched atm. */
     float m_switch_time;
 
-    void  ItemManager::insertItem(Item *item);
+    void  insertItem(Item *item);
 
 public:
                    ItemManager();
