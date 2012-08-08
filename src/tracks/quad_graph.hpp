@@ -174,7 +174,7 @@ public:
     // ----------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
     const Quad&  getQuadOfNode(unsigned int j) const
-              { return QuadSet::get()->getQuad(m_all_nodes[j]->getIndex()); }
+          { return QuadSet::get()->getQuad(m_all_nodes[j]->getQuadIndex()); }
     // ----------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
     GraphNode&   getNode(unsigned int j) const{ return *m_all_nodes[j]; }

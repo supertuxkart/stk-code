@@ -151,8 +151,7 @@ public:
     int getPredecessor(unsigned int i) const {return m_predecessor_nodes[i]; }
     // ------------------------------------------------------------------------
     /** Returns the quad_index in the quad_set of this node. */
-    int          getIndex() const { return m_quad_index;                }
-
+    int          getQuadIndex() const { return m_quad_index;                }
     // ------------------------------------------------------------------------
     /** Returns the quad of this graph node. */
     const Quad& getQuad() const {return QuadSet::get()->getQuad(m_quad_index);}

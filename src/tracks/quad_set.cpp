@@ -74,7 +74,7 @@ void QuadSet::getPoint(const XMLNode *xml, const std::string &attribute_name,
 
 }   // getPoint 
 // -----------------------------------------------------------------------------
-/** Loads the set of all quads from the speciified filename.
+/** Loads the set of all quads from the specified filename.
  *  \param filename The absolute filename to load the quad file from.
  */
 void QuadSet::init(const std::string &filename)

@@ -605,7 +605,7 @@ void QuadGraph::computeDistanceFromStart(unsigned int node, float new_distance)
         if(current_distance<new_distance)
         {
             float delta = new_distance - current_distance;
-            updateDistancesForAllSuccessors(gn->getIndex(), delta);
+            updateDistancesForAllSuccessors(gn->getQuadIndex(), delta);
         }
         return;
     }
@@ -622,7 +622,7 @@ void QuadGraph::computeDistanceFromStart(unsigned int node, float new_distance)
         if(gn_next->getDistanceFromStart()==0)
             continue;
 
-        computeDistanceFromStart(gn_next->getIndex(), 
+        computeDistanceFromStart(gn_next->getQuadIndex(), 
                                  new_distance + gn->getDistanceToSuccessor(i));
     }   // for i
 }   // computeDistanceFromStart
