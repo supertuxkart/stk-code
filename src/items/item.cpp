@@ -208,6 +208,7 @@ void Item::reset()
     if (m_node != NULL)
     {
         m_node->setScale(core::vector3df(1,1,1));
+        m_node->setVisible(true);
     }
 }   // reset
 
