@@ -446,9 +446,9 @@ void PresentAI::handleSteering(float dt)
         Vec3 minpos = straight_point;
         float mindist = -1000;
         int mintype=-100;
-        for (unsigned int i = 0; i < item_manager->getNumberOfItems(); i++) 
+        for (unsigned int i=0; i < ItemManager::get()->getNumberOfItems(); i++)
         {
-            const Item *item = item_manager->getItem(i);
+            const Item *item = ItemManager::get()->getItem(i);
             if (item && !item->wasCollected() && 
                    (item->getType() == Item::ITEM_BONUS_BOX || 
                     item->getType() == Item::ITEM_NITRO_BIG || 
@@ -465,7 +465,7 @@ void PresentAI::handleSteering(float dt)
                     mintype = item->getType();
                 }   // if dist < mindist || mindist<-100
             }   // if item && ...
-        }   // for i <item_manager->getNumberOfItems()
+        }   // for i <ItemManager::get()->getNumberOfItems()
         float w = QuadGraph::get()->getNode(m_track_node).getPathWidth();
         w *= w;
         if ((btAngle(straight_point - me, minpos - me) < M_PI / 8 && mindist < w * 8) ||

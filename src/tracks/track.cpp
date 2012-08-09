@@ -123,7 +123,7 @@ void Track::reset()
 {
     m_ambient_color = m_default_ambient_color;
     CheckManager::get()->reset(*this);
-    item_manager->reset();
+    ItemManager::get()->reset();
     m_track_object_manager->reset();
 }   // reset
 
@@ -134,10 +134,10 @@ void Track::reset()
 void Track::cleanup()
 {
     QuadGraph::destroy();
+    ItemManager::destroy();
 
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
     
-    item_manager->cleanup();
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
         delete m_animated_textures[i];
@@ -200,8 +200,6 @@ void Track::cleanup()
     }
     m_detached_cached_meshes.clear();
     
-    QuadGraph::destroy();
-
     if(m_mini_map)      
     {
         assert(m_mini_map->getReferenceCount()==1);
@@ -341,6 +339,8 @@ void Track::loadTrackInfo()
 }   // loadTrackInfo
 
 //-----------------------------------------------------------------------------
+/** Loads all curves from the XML node. 
+ */
 void Track::loadCurves(const XMLNode &node)
 {
     for(unsigned int i=0; i<node.getNumNodes(); i++)
@@ -351,6 +351,12 @@ void Track::loadCurves(const XMLNode &node)
 }   // loadCurves
 
 //-----------------------------------------------------------------------------
+/** Loads all music information for the specified files (which is taken from
+ *  the track.xml file).
+ *  \param filenames List of filenames to load.
+ *  \param music On return contains the music information object for the 
+ *         specified files.
+ */
 void Track::getMusicInformation(std::vector<std::string>&       filenames, 
                                 std::vector<MusicInformation*>& music    )
 {
@@ -427,16 +433,18 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
     }
     else
     {
-	//Check whether the hardware can do nonsquare or non power-of-two textures
-	video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
-	bool nonpower = video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
-	bool nonsquare = video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
+        //Check whether the hardware can do nonsquare or 
+        // non power-of-two textures
+        video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
+        bool nonpower = video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
+        bool nonsquare = 
+            video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
 
-	//Create the minimap resizing it as necessary.
-        m_mini_map=
-            QuadGraph::get()->makeMiniMap(World::getWorld()->getRaceGUI()
-                                          ->getMiniMapSize().getOptimalSize(!nonpower, !nonsquare), 
-                                          "minimap::"+m_ident);
+        //Create the minimap resizing it as necessary.
+        core::dimension2du size = World::getWorld()->getRaceGUI()
+                                 ->getMiniMapSize()
+                                 .getOptimalSize(!nonpower,!nonsquare);
+        m_mini_map = QuadGraph::get()->makeMiniMap(size, "minimap::"+m_ident);
 
     }
 }   // loadQuadGraph
@@ -1070,7 +1078,7 @@ void Track::update(float dt)
         m_animated_textures[i]->update(dt);
     }
     CheckManager::get()->update(dt);
-    item_manager->update(dt);
+    ItemManager::get()->update(dt);
 
 }   // update
 
@@ -1234,6 +1242,8 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
     // the information about the size of the texture to render the mini
     // map to.
     if (!m_is_arena && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
+
+    ItemManager::create();
 
     // Set the default start positions. Node that later the default
     // positions can still be overwritten.
@@ -1750,7 +1760,7 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
     // around.
     //Vec3 normal(0.7071f, 0, 0.7071f);
     Vec3 normal(0, 1, 0);
-    item_manager->newItem(type, loc, normal);
+    ItemManager::get()->newItem(type, loc, normal);
 }   // itemCommand
 
 // ----------------------------------------------------------------------------

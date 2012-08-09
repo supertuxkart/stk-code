@@ -369,7 +369,6 @@ void cmdLineHelp (char* invocation)
     "       --reverse          Play track in reverse (if allowed)\n"
     // TODO: add back "--players" switch
     // "       --players n      Define number of players to between 1 and 4.\n"
-    "       --item STYLE       Use STYLE as your item style.\n"
     "  -f,  --fullscreen       Select fullscreen display.\n"
     "  -w,  --windowed         Windowed display (default).\n"
     "  -s,  --screensize WxH   Set the screen size (e.g. 320x200).\n"
@@ -999,11 +998,6 @@ int handleCmdLine(int argc, char **argv)
                                                     ','));
             i++;
         }
-        else if( !strcmp(argv[i], "--item") && i+1<argc )
-        {
-            item_manager->setUserFilename(argv[i+1]);
-            i++;
-        }
         // these commands are already processed in handleCmdLinePreliminary, 
         // but repeat this just so that we don't get error messages about 
         // unknown commands
@@ -1127,7 +1121,6 @@ void initRest()
     kart_properties_manager = new KartPropertiesManager();
     projectile_manager      = new ProjectileManager    ();
     powerup_manager         = new PowerupManager       ();
-    item_manager            = new ItemManager          ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
     network_manager         = new NetworkManager       ();
@@ -1181,7 +1174,7 @@ void cleanSuperTuxKart()
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
     if(attachment_manager)      delete attachment_manager;
-    if(item_manager)            delete item_manager;
+    ItemManager::removeTextures();
     if(powerup_manager)         delete powerup_manager;   
     if(projectile_manager)      delete projectile_manager;
     if(kart_properties_manager) delete kart_properties_manager;
@@ -1292,7 +1285,7 @@ int main(int argc, char *argv[] )
         }
         Referee::init();
         powerup_manager         -> loadAllPowerups ();
-        item_manager            -> loadDefaultItems();
+        ItemManager::loadDefaultItemMeshes();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(
                                     file_manager->getGUIDir() + "/gift.png") );

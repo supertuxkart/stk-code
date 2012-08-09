@@ -1145,7 +1145,7 @@ void Kart::update(float dt)
     }   // if there is material
 
     // Check if any item was hit.
-    item_manager->checkItemHit(this);
+    ItemManager::get()->checkItemHit(this);
     
     static video::SColor pink(255, 255, 133, 253);
     

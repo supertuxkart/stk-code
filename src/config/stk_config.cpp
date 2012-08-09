@@ -26,7 +26,6 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
-#include "items/item_manager.hpp"
 #include "karts/kart_properties.hpp"
 
 STKConfig* stk_config=0;

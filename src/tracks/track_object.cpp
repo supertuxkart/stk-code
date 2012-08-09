@@ -190,7 +190,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         
         if (trigger_when_near)
         {
-             item_manager->newItem(m_init_xyz, trigger_distance, this);
+            ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
         }
     }
     else

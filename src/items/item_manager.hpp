@@ -20,6 +20,7 @@
 #define HEADER_ITEMMANAGER_HPP
 
 
+#include <assert.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -34,20 +35,34 @@ class Kart;
   */
 class ItemManager : public NoCopy
 {
+    // Some static data and functions to initialise it:
+private:
+    /** Stores all item models. */
+    static std::vector<scene::IMesh *> m_item_mesh;
+    
+    /** Stores all low-resolution item models. */
+    static std::vector<scene::IMesh *> m_item_lowres_mesh;
 
+    /** The instance of ItemManager while a race is on. */
+    static ItemManager *m_item_manager;
+public:
+    static void loadDefaultItemMeshes();
+    static void removeTextures();
+    static void create();
+    static void destroy();
+
+    /** Return an instance of the item manager (it does not automatically
+     *  create one, call create for that). */
+    static ItemManager *get() { 
+        assert(m_item_manager); 
+        return m_item_manager;
+    }   // get
+    
+    // ========================================================================
 private:
     /** The vector of all items of the current track. */
     typedef std::vector<Item*> AllItemTypes;
     AllItemTypes m_all_items;
-
-    /** This stores all item models. */
-    std::vector<scene::IMesh *> m_item_mesh;
-
-    std::vector<scene::IMesh *> m_item_lowres_mesh;
-    
-    /** The filename of item.xml, which can be overwritten from the command line
-     *  in order to select different models. */
-    std::string m_user_filename;
 
     /** What item this item is switched to. */
     std::vector<Item::ItemType> m_switch_to;
@@ -58,10 +73,12 @@ private:
 
     void  insertItem(Item *item);
 
-public:
+    // Make those private so only create/destroy functions can call them.
                    ItemManager();
                   ~ItemManager();
-    void           loadDefaultItems();
+    void           setSwitchItems(const std::vector<int> &switch_items);
+
+public:
     Item*          newItem         (Item::ItemType type, const Vec3& xyz, 
                                     const Vec3 &normal, 
                                     AbstractKart* parent=NULL);
@@ -69,14 +86,10 @@ public:
                                     TriggerItemListener* listener);
     void           update          (float delta);
     void           checkItemHit    (AbstractKart* kart);
-    void           cleanup         ();
     void           reset           ();
-    void           removeTextures  ();
-    void           setUserFilename (char *s) {m_user_filename=s;}
     void           collectedItem   (int item_id, AbstractKart *kart,
                                     int add_info=-1);
     void           switchItems     ();
-    void           setSwitchItems(const std::vector<int> &switch_items);
     // ------------------------------------------------------------------------
     scene::IMesh*  getItemModel    (Item::ItemType type)
                                       {return m_item_mesh[type];}
@@ -87,7 +100,5 @@ public:
     /** Returns a pointer to the n-th item. */
     const Item *   getItem(unsigned int n) const { return m_all_items[n]; };
 };   // ItemManager
-
-extern ItemManager* item_manager;
 
 #endif

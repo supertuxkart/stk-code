@@ -580,7 +580,7 @@ void IrrDriver::applyResolutionSettings()
 
     attachment_manager      -> removeTextures();
     projectile_manager      -> removeTextures();
-    item_manager            -> removeTextures();
+    ItemManager::removeTextures();
     kart_properties_manager -> unloadAllKarts();
     powerup_manager         -> unloadPowerups();
     Referee::cleanup();
@@ -626,7 +626,7 @@ void IrrDriver::applyResolutionSettings()
     }
     
     powerup_manager         -> loadAllPowerups ();
-    item_manager            -> loadDefaultItems();
+    ItemManager::loadDefaultItemMeshes();
     projectile_manager      -> loadData();
     Referee::init();
     GUIEngine::addLoadingIcon( 

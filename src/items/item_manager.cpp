@@ -39,69 +39,31 @@
 
 ItemManager* item_manager;
 
-//-----------------------------------------------------------------------------
-typedef std::map<std::string,scene::IMesh*>::const_iterator CI_type;
+std::vector<scene::IMesh *> ItemManager::m_item_mesh;
+std::vector<scene::IMesh *> ItemManager::m_item_lowres_mesh;
+ItemManager *               ItemManager::m_item_manager = NULL;
 
-ItemManager::ItemManager()
+//-----------------------------------------------------------------------------
+/** Creates one instance of the item manager. */
+void ItemManager::create()
 {
-    m_switch_time = -1.0f;
-    // The actual loading is done in loadDefaultItems
-
-    // Prepare the switch to array, which stores which item should be
-    // switched to what other item. Initialise it with a mapping that
-    // each item is switched to itself, so basically a no-op.
-    m_switch_to.reserve(Item::ITEM_COUNT);
-    for(unsigned int i=Item::ITEM_FIRST; i<Item::ITEM_COUNT; i++)
-        m_switch_to.push_back((Item::ItemType)i);
-    setSwitchItems(stk_config->m_switch_items);
-}   // ItemManager
+    assert(!m_item_manager);
+    m_item_manager = new ItemManager();
+}   // create
 
 //-----------------------------------------------------------------------------
-/** Sets which objects is getting switched to what.
- *  \param switch A mapping of items types to item types for the mapping.
- *         must contain one entry for each item.
- */
-void ItemManager::setSwitchItems(const std::vector<int> &switch_items)
+/** Destroys the one instance of the item manager. */
+void ItemManager::destroy()
 {
-    for(unsigned int i=Item::ITEM_FIRST; i<Item::ITEM_COUNT; i++)
-        m_switch_to[i]=(Item::ItemType)stk_config->m_switch_items[i];
-}   // setSwitchItems
-
-//-----------------------------------------------------------------------------
-/** Clean up all textures. This is necessary when switching resolution etc.
- */
-void ItemManager::removeTextures()
-{
-    for(AllItemTypes::iterator i =m_all_items.begin();
-        i!=m_all_items.end();  i++)
-    {
-        delete *i;
-    }
-    m_all_items.clear();
-
-    for(unsigned int i=0; i<Item::ITEM_LAST-Item::ITEM_FIRST+1; i++)
-    {
-        if(m_item_mesh[i]       ) m_item_mesh[i]->drop();
-        if(m_item_lowres_mesh[i]) m_item_lowres_mesh[i]->drop();
-    }
-}   // removeTextures
-
-//-----------------------------------------------------------------------------
-/** Destructor. Cleans up all items and meshes stored.
- */
-ItemManager::~ItemManager()
-{    
-    for(unsigned int i=0; i<Item::ITEM_LAST-Item::ITEM_FIRST+1; i++)
-    {
-        if(m_item_mesh[i]       ) m_item_mesh[i]->drop();
-        if(m_item_lowres_mesh[i]) m_item_lowres_mesh[i]->drop();
-    }
-}   // ~ItemManager
+    assert(m_item_manager);
+    delete m_item_manager;
+    m_item_manager = NULL;
+}   // destroy
 
 //-----------------------------------------------------------------------------
 /** Loads the default item meshes (high- and low-resolution).
  */
-void ItemManager::loadDefaultItems()
+void ItemManager::loadDefaultItemMeshes()
 {
     m_item_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
     m_item_lowres_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
@@ -145,7 +107,65 @@ void ItemManager::loadDefaultItems()
         if (m_item_lowres_mesh[i]) m_item_lowres_mesh[i]->grab();
     }   // for i
     delete root;
-}   // loadDefaultItems
+}   // loadDefaultItemMeshes
+
+//-----------------------------------------------------------------------------
+/** Clean up all textures. This is necessary when switching resolution etc.
+ */
+void ItemManager::removeTextures()
+{
+    for(unsigned int i=0; i<Item::ITEM_LAST-Item::ITEM_FIRST+1; i++)
+    {
+        if(m_item_mesh[i]       ) m_item_mesh[i]->drop();
+        m_item_mesh[i] = NULL;
+        if(m_item_lowres_mesh[i]) m_item_lowres_mesh[i]->drop();
+        m_item_lowres_mesh[i] = NULL;
+    }
+}   // removeTextures
+
+
+// ============================================================================
+/** Creates a new instance of the item manager. This is done at startup
+ *  of each race. */
+ItemManager::ItemManager()
+{
+    m_switch_time = -1.0f;
+    // The actual loading is done in loadDefaultItems
+
+    // Prepare the switch to array, which stores which item should be
+    // switched to what other item. Initialise it with a mapping that
+    // each item is switched to itself, so basically a no-op.
+    m_switch_to.reserve(Item::ITEM_COUNT);
+    for(unsigned int i=Item::ITEM_FIRST; i<Item::ITEM_COUNT; i++)
+        m_switch_to.push_back((Item::ItemType)i);
+    setSwitchItems(stk_config->m_switch_items);
+}   // ItemManager
+
+//-----------------------------------------------------------------------------
+/** Sets which objects is getting switched to what.
+ *  \param switch A mapping of items types to item types for the mapping.
+ *         must contain one entry for each item.
+ */
+void ItemManager::setSwitchItems(const std::vector<int> &switch_items)
+{
+    for(unsigned int i=Item::ITEM_FIRST; i<Item::ITEM_COUNT; i++)
+        m_switch_to[i]=(Item::ItemType)stk_config->m_switch_items[i];
+}   // setSwitchItems
+
+
+//-----------------------------------------------------------------------------
+/** Destructor. Cleans up all items and meshes stored.
+ */
+ItemManager::~ItemManager()
+{    
+    for(AllItemTypes::iterator i =m_all_items.begin();
+                               i!=m_all_items.end();  i++)
+    {
+        if(*i)
+            delete *i;
+    }
+    m_all_items.clear();
+}   // ~ItemManager
 
 //-----------------------------------------------------------------------------
 /** Inserts the new item into the items management data structures, if possible
@@ -248,23 +268,8 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
 }   // checkItemHit
 
 //-----------------------------------------------------------------------------
-/** Remove all item instances, and the track specific models. This is used
- *  just before a new track is loaded and a race is started.
- */
-void ItemManager::cleanup()
-{
-    for(AllItemTypes::iterator i =m_all_items.begin();
-        i!=m_all_items.end();  i++)
-    {
-        if(*i)
-            delete *i;
-    }
-    m_all_items.clear();
-}   // cleanup
-
-//-----------------------------------------------------------------------------
 /** Resets all items and removes bubble gum that is stuck on the track.
- *  This is done when a race is restarted.
+ *  This is done when a race is (re)started.
  */
 void ItemManager::reset()
 {

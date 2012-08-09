@@ -221,13 +221,13 @@ void Powerup::use()
         break ;
     case PowerupManager::POWERUP_SWITCH:
         {
-        item_manager->switchItems();
-        m_sound_use->position(m_owner->getXYZ());
-        m_sound_use->play();
+            ItemManager::get()->switchItems();
+            m_sound_use->position(m_owner->getXYZ());
+            m_sound_use->play();
 
-        gui->addMessage(getSwapperString(), NULL, 3.0f,
-                        video::SColor(255, 255, 255, 255), false);
-        break;
+            gui->addMessage(getSwapperString(), NULL, 3.0f,
+                            video::SColor(255, 255, 255, 255), false);
+            break;
         }
     case PowerupManager::POWERUP_CAKE:
     case PowerupManager::POWERUP_RUBBERBALL:
@@ -300,7 +300,7 @@ void Powerup::use()
         
         pos.setY(hit_point.getY()-0.05f);
         
-        item_manager->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_owner);
+        ItemManager::get()->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_owner);
         }
         break;
         
