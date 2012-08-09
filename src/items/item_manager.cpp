@@ -116,9 +116,17 @@ void ItemManager::removeTextures()
 {
     for(unsigned int i=0; i<Item::ITEM_LAST-Item::ITEM_FIRST+1; i++)
     {
-        if(m_item_mesh[i]       ) m_item_mesh[i]->drop();
+        if(m_item_mesh[i])
+        {
+            m_item_mesh[i]->drop();
+            irr_driver->removeMeshFromCache(m_item_mesh[i]);
+        }
         m_item_mesh[i] = NULL;
-        if(m_item_lowres_mesh[i]) m_item_lowres_mesh[i]->drop();
+        if(m_item_lowres_mesh[i])
+        {
+            m_item_lowres_mesh[i]->drop();
+            irr_driver->removeMeshFromCache(m_item_lowres_mesh[i]);
+        }
         m_item_lowres_mesh[i] = NULL;
     }
 }   // removeTextures
