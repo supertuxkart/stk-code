@@ -30,6 +30,7 @@ namespace irr
 }
 using namespace irr;
 
+#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
@@ -79,6 +80,8 @@ public:
     };
 
 private:
+    LEAK_CHECK();
+
     /** Item type. */
     ItemType      m_type;
 
