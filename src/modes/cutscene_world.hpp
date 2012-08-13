@@ -48,6 +48,8 @@ class CutsceneWorld : public World
         if (m_time < m_duration - 2.0f) m_duration = m_time + 2.0f;
     }
     
+    std::vector<std::string> m_parts;
+    
 public:
     
     CutsceneWorld();
@@ -58,6 +60,11 @@ public:
     // clock events
     virtual bool isRaceOver() OVERRIDE;
     virtual void terminateRace() OVERRIDE;
+    
+    void setParts(std::vector<std::string> parts)
+    {
+        m_parts = parts;
+    }
     
     // overriding World methods
     virtual void restartRace() OVERRIDE;

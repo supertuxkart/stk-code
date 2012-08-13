@@ -58,6 +58,8 @@ void CutsceneWorld::init()
     
     dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(1.0f);
     
+    getTrack()->startMusic();
+    
     m_duration = -1.0f;
     
     //const btTransform &s = getTrack()->getStartTransform(0);
@@ -252,9 +254,31 @@ void CutsceneWorld::update(float dt)
 
 void CutsceneWorld::enterRaceOverState()
 {
-    race_manager->exitRace();
-    StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-    OverWorld::enterOverWorld();
+    int partId = -1;
+    for (int i=0; i<(int)m_parts.size(); i++)
+    {
+        if (m_parts[i] == race_manager->getTrackName())
+        {
+            partId = i;
+            break;
+        }
+    }
+    
+    if (partId == -1 || partId == (int)m_parts.size() - 1)
+    {
+        race_manager->exitRace();
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        OverWorld::enterOverWorld();
+    }
+    else
+    {
+        // 'exitRace' will destroy this object so get the next part right now
+        std::string next_part = m_parts[partId + 1];
+        
+        race_manager->exitRace();
+        race_manager->startSingleRace(next_part, 999, false);
+    }
+
 }
 
 //-----------------------------------------------------------------------------
