@@ -246,8 +246,8 @@ Controller* World::loadAIController(AbstractKart *kart)
     // For now: instead of random switching, use each
     // robot in turns: switch(m_random.get(NUM_ROBOTS))
 #undef  USE_PRESENT_AI
-#undef  USE_SKIDDING_AI
-#define USE_ALL_AIS
+#define  USE_SKIDDING_AI
+#undef USE_ALL_AIS
 
 #ifdef USE_PRESENT_AI
     int turn = 2;

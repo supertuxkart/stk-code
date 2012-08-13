@@ -42,10 +42,12 @@ class CutsceneWorld : public World
     std::map<float, std::vector<TrackObject*> > m_sounds_to_stop;
     
     float m_duration;
+    bool m_aborted;
     
     void abortCutscene()
     {
         if (m_time < m_duration - 2.0f) m_duration = m_time + 2.0f;
+        m_aborted = true;
     }
     
     std::vector<std::string> m_parts;

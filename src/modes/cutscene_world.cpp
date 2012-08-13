@@ -43,6 +43,7 @@
  */
 CutsceneWorld::CutsceneWorld() : World()
 {
+    m_aborted = false;
     WorldStatus::setClockMode(CLOCK_NONE);
     m_use_highscores = false;
     m_play_racestart_sounds = false;
@@ -264,7 +265,7 @@ void CutsceneWorld::enterRaceOverState()
         }
     }
     
-    if (partId == -1 || partId == (int)m_parts.size() - 1)
+    if (m_aborted || partId == -1 || partId == (int)m_parts.size() - 1)
     {
         race_manager->exitRace();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
