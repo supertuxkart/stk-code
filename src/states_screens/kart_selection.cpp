@@ -872,7 +872,7 @@ public:
         {
             // Random kart
             scene::IMesh* model = 
-                ItemManager::get()->getItemModel(Item::ITEM_BONUS_BOX);
+                ItemManager::getItemModel(Item::ITEM_BONUS_BOX);
             w3->clearModels();
             w3->addModel( model, Vec3(0.0f, -12.0f, 0.0f), 
                                  Vec3(35.0f, 35.0f, 35.0f) );

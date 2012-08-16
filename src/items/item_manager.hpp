@@ -51,6 +51,11 @@ public:
     static void create();
     static void destroy();
 
+    // ------------------------------------------------------------------------
+    /** Returns the mesh for a certain item. */
+    static scene::IMesh* getItemModel(Item::ItemType type)
+                                      {return m_item_mesh[type];}
+    // ------------------------------------------------------------------------
     /** Return an instance of the item manager (it does not automatically
      *  create one, call create for that). */
     static ItemManager *get() { 
@@ -64,6 +69,11 @@ private:
     typedef std::vector<Item*> AllItemTypes;
     AllItemTypes m_all_items;
 
+    /** Stores which items are on which quad. m_items_in_quads[#quads]
+     *  contains all items that are not on a quad. Note that this 
+     *  field is undefined if no QuadGraph exist, e.g. in battle mode. */
+    std::vector< AllItemTypes > *m_items_in_quads;
+
     /** What item this item is switched to. */
     std::vector<Item::ItemType> m_switch_to;
 
@@ -72,6 +82,7 @@ private:
     float m_switch_time;
 
     void  insertItem(Item *item);
+    void  deleteItem(Item *item);
 
     // Make those private so only create/destroy functions can call them.
                    ItemManager();
@@ -87,18 +98,27 @@ public:
     void           update          (float delta);
     void           checkItemHit    (AbstractKart* kart);
     void           reset           ();
-    void           collectedItem   (int item_id, AbstractKart *kart,
+    void           collectedItem   (Item *item, AbstractKart *kart,
                                     int add_info=-1);
     void           switchItems     ();
-    // ------------------------------------------------------------------------
-    scene::IMesh*  getItemModel    (Item::ItemType type)
-                                      {return m_item_mesh[type];}
     // ------------------------------------------------------------------------
     /** Returns the number of items. */
     unsigned int   getNumberOfItems() const { return m_all_items.size(); }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the n-th item. */
-    const Item *   getItem(unsigned int n) const { return m_all_items[n]; };
+    const Item*   getItem(unsigned int n) const { return m_all_items[n]; };
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the n-th item. */
+    Item* getItem(unsigned int n)  { return m_all_items[n]; };
+    // ------------------------------------------------------------------------
+    /** Returns a reference to the array of all items on the specified quad.
+     */
+    const AllItemTypes& getItemsInQuads(unsigned int n) const 
+    {
+        assert(m_items_in_quads);
+        assert(n<(*m_items_in_quads).size());
+        return (*m_items_in_quads)[n];
+    }   // getItemsInQuads
 };   // ItemManager
 
 #endif

@@ -29,6 +29,7 @@
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
@@ -147,6 +148,18 @@ ItemManager::ItemManager()
     for(unsigned int i=Item::ITEM_FIRST; i<Item::ITEM_COUNT; i++)
         m_switch_to.push_back((Item::ItemType)i);
     setSwitchItems(stk_config->m_switch_items);
+
+    if(QuadGraph::get())
+    {
+        m_items_in_quads = new std::vector<AllItemTypes>;
+        // Entries 0 to n-1 are for the quads, entry
+        // n is for all items that are not on a quad.
+        m_items_in_quads->resize(QuadSet::get()->getNumberOfQuads()+1);
+    }
+    else
+    {
+        m_items_in_quads = NULL;
+    }
 }   // ItemManager
 
 //-----------------------------------------------------------------------------
@@ -166,12 +179,15 @@ void ItemManager::setSwitchItems(const std::vector<int> &switch_items)
  */
 ItemManager::~ItemManager()
 {    
+    if(m_items_in_quads)
+        delete m_items_in_quads;
     for(AllItemTypes::iterator i =m_all_items.begin();
                                i!=m_all_items.end();  i++)
     {
         if(*i)
             delete *i;
     }
+
     m_all_items.clear();
 }   // ~ItemManager
 
@@ -195,10 +211,18 @@ void ItemManager::insertItem(Item *item)
         m_all_items.push_back(item);
     item->setItemId(index);
 
-    // Now insert into the appropriate quad list
-    const Vec3 &xyz = item->getXYZ();
-    int sector = QuadGraph::UNKNOWN_SECTOR;
-    QuadGraph::get()->findRoadSector(xyz, &sector);
+    // Now insert into the appropriate quad list, if there is a quad list
+    // (i.e. race mode has a quad graph).
+    if(m_items_in_quads)
+    {
+        const Vec3 &xyz = item->getXYZ();
+        int sector = QuadGraph::UNKNOWN_SECTOR;
+        QuadGraph::get()->findRoadSector(xyz, &sector);
+        if(sector==QuadGraph::UNKNOWN_SECTOR)
+            (*m_items_in_quads)[m_items_in_quads->size()-1].push_back(item);
+        else
+            (*m_items_in_quads)[sector].push_back(item);
+    }   // if m_items_in_quads
 }   // insertItem
 
 //-----------------------------------------------------------------------------
@@ -244,9 +268,8 @@ Item* ItemManager::newItem(const Vec3& xyz, float distance,
 /** Set an item as collected.
  *  This function is called on the server when an item is collected, or on 
  *  the client upon receiving information about collected items.             */
-void ItemManager::collectedItem(int item_id, AbstractKart *kart, int add_info)
+void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
 {
-    Item *item=m_all_items[item_id];
     assert(item);
     item->collected(kart);
     kart->collectedItem(item, add_info);
@@ -261,6 +284,15 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
 {
     // Only do this on the server
     if(network_manager->getMode()==NetworkManager::NW_CLIENT) return;
+    
+    // We could use m_items_in_quads to to check for item hits: take the quad
+    // of the graph node of the kart, and only check items in that quad. But
+    // then we also need to check for any adjacent quads (since an item just
+    // on the order of one quad might get hit from an adjacent quad). Then
+    // it is possible that a quad is that short that we need to test adjacent
+    // of adjacent quads. And check for items outside of the track. 
+    // Since at this stace item detection is by far not a bottle neck,
+    // the original, simple and stable algorithm is left in place.
 
     for(AllItemTypes::iterator i =m_all_items.begin();
         i!=m_all_items.end();  i++)
@@ -270,7 +302,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         // we pass the kart and the position separately.
         if((*i)->hitKart(kart, kart->getXYZ()))
         {
-            collectedItem(i-m_all_items.begin(), kart);
+            collectedItem(*i, kart);
         }   // if hit
     }   // for m_all_items
 }   // checkItemHit
@@ -292,6 +324,10 @@ void ItemManager::reset()
         m_switch_time = -1.0f;
 
     }
+
+    // We can't simply erase items in the list: in this case the indicies
+    // stored in each item are invalid, and lead to incorrect result/crashes
+    // in deleteItem
     AllItemTypes::iterator i=m_all_items.begin();
     while(i!=m_all_items.end())
     {
@@ -302,10 +338,8 @@ void ItemManager::reset()
         }
         if((*i)->canBeUsedUp() || (*i)->getType()==Item::ITEM_BUBBLEGUM)
         {
-            Item *b=*i;
-            AllItemTypes::iterator i_next = m_all_items.erase(i); 
-            delete b;
-            i = i_next;
+            deleteItem( *i );
+            i++;
         }
         else
         {
@@ -346,12 +380,38 @@ void ItemManager::update(float dt)
             (*i)->update(dt);
             if( (*i)->isUsedUp())
             {
-                delete *i;
-                m_all_items[i-m_all_items.begin()] = NULL;
+                deleteItem( *i );
             }   // if usedUp
         }   // if *i
     }   // for m_all_items
 }   // update
+
+//-----------------------------------------------------------------------------
+/** Removes an items from the items-in-quad list, from the list of all
+ *  items, and then frees the item itself.
+ *  \param The item to delete.
+ */
+void ItemManager::deleteItem(Item *item)
+{
+    // First check if the item needs to be removed from the items-in-quad list
+    if(m_items_in_quads)
+    {
+        const Vec3 &xyz = item->getXYZ();
+        int sector = QuadGraph::UNKNOWN_SECTOR;
+        QuadGraph::get()->findRoadSector(xyz, &sector);
+        unsigned int indx = sector==QuadGraph::UNKNOWN_SECTOR
+                          ? m_items_in_quads->size()-1
+                          : sector;
+        AllItemTypes &items = (*m_items_in_quads)[indx];
+        AllItemTypes::iterator it = std::find(items.begin(), items.end(),item);
+        assert(it!=items.end());
+        items.erase(it);
+    }   // if m_items_in_quads
+
+    int index = item->getItemId();
+    m_all_items[index] = NULL;
+    delete item;
+}   // delete item
 
 //-----------------------------------------------------------------------------
 /** Switches all items: boxes become bananas and vice versa for a certain
