@@ -878,17 +878,20 @@ void Kart::collectedItem(Item *item, int add_info)
 float Kart::getActualWheelForce()
 {
     float add_force = m_max_speed->getCurrentAdditionalEngineForce();
-
+    assert(!isnan(add_force));
     const std::vector<float>& gear_ratio=m_kart_properties->getGearSwitchRatio();
     for(unsigned int i=0; i<gear_ratio.size(); i++)
     {
         if(m_speed <= m_kart_properties->getMaxSpeed()*gear_ratio[i])
         {
+            assert(!isnan(m_kart_properties->getMaxPower()));
+            assert(!isnan(m_kart_properties->getGearPowerIncrease()[i]));
             return m_kart_properties->getMaxPower()
                   *m_kart_properties->getGearPowerIncrease()[i]
                   +add_force;
         }
     }
+    assert(!isnan(m_kart_properties->getMaxPower()));
     return m_kart_properties->getMaxPower()+add_force;
 
 }   // getActualWheelForce
@@ -1951,6 +1954,8 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         else   // !m_brake
         {
             // lift the foot from throttle, brakes with 10% engine_power
+            assert(!isnan(m_controls.m_accel));
+            assert(!isnan(engine_power));
             applyEngineForce(-m_controls.m_accel*engine_power*0.1f);
 
             // If not giving power (forward or reverse gear), and speed is low
