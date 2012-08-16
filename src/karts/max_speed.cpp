@@ -48,6 +48,9 @@
 MaxSpeed::MaxSpeed(AbstractKart *kart)
 {
     m_kart = kart;
+    // Initialise m_add_engine_force since it might be queried before
+    // update() is called.
+    m_add_engine_force  = 0;
 }   // MaxSpeed
 
 // ----------------------------------------------------------------------------
