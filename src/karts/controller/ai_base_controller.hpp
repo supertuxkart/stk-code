@@ -21,6 +21,7 @@
 #include "karts/controller/controller.hpp"
 #include "states_screens/state_manager.hpp"
 
+class AIProperties;
 class LinearWorld;
 class QuadGraph;
 class Track;
@@ -60,6 +61,9 @@ protected:
 
     /** Keep a pointer to world. */
     LinearWorld *m_world;
+
+    /** A pointer to the AI properties for this kart. */
+    const AIProperties *m_ai_properties;
 
     /** The current node the kart is on. This can be different from the value
      *  in LinearWorld, since it takes the chosen path of the AI into account

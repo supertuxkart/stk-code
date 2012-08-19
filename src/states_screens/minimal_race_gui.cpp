@@ -368,7 +368,8 @@ void MinimalRaceGUI::drawEnergyMeter(const AbstractKart *kart,
                                      const core::recti &viewport, 
                                      const core::vector2df &scaling)
 {
-    float state = (float)(kart->getEnergy()) / MAX_NITRO;
+    float state = (float)(kart->getEnergy()) 
+                / kart->getKartProperties()->getNitroMax();
     if      (state < 0.0f) state = 0.0f;
     else if (state > 1.0f) state = 1.0f;
     
@@ -396,7 +397,8 @@ void MinimalRaceGUI::drawEnergyMeter(const AbstractKart *kart,
     // ------
     if (race_manager->getCoinTarget() > 0)
     {
-        float coin_target = (float)race_manager->getCoinTarget() / MAX_NITRO;
+        float coin_target = (float)race_manager->getCoinTarget() 
+                          / kart->getKartProperties()->getNitroMax();
         
         const int EMPTY_TOP_PIXELS = 4;
         const int EMPTY_BOTTOM_PIXELS = 3;

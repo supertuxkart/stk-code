@@ -34,8 +34,6 @@ using namespace irr;
 
 class Material;
 
-const int MAX_NITRO = 16;
-
 /**
   * \ingroup karts
   */

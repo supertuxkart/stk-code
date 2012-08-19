@@ -207,6 +207,8 @@ private:
     /** Duration during which the increased maximum speed 
      *  due to nitro fades out. */
     float       m_nitro_fade_out_time;
+    /** Maximum nitro a kart can collect. */
+    float       m_nitro_max;
     /** Square of the maximum distance a swatter can operate. */
     float       m_swatter_distance2;
     /** How long the swatter lasts. */
@@ -294,14 +296,6 @@ private:
     float m_slipstream_duration;
     /** How long the slip stream speed increase will gradually be reduced. */
     float m_slipstream_fade_out_time;
-
-
-    /** Make the AI to steer at slightly different points to make it less
-     *  likely that the AI creates 'trains' - the kart behind getting 
-     *  slipstream. The variation should be a value between 0 (no variation,
-     *  all karts steer to the same driveline points) and 1 (karts will aim
-     *  all the way to the very edge of the drivelines). */
-    float m_ai_steering_variation;
 
     float m_camera_distance;          /**< Distance of normal camera from kart.*/
     float m_camera_forward_up_angle;  /**< Up angle of the camera in relation to
@@ -485,6 +479,9 @@ public:
      *  due to nitro fades out. */
     float getNitroFadeOutTime       () const {return m_nitro_fade_out_time;   }
 
+    /** Returns the maximum amount of nitro a kart can store. */
+    float getNitroMax               () const {return m_nitro_max;             }
+
     /** Returns a shift of the center of mass (lowering the center of mass 
      *  makes the karts more stable. */
     const Vec3&getGravityCenterShift() const {return m_gravity_center_shift;  }
@@ -642,9 +639,6 @@ public:
     /** Returns the angle the camera has relative to the pitch of the kart. */
     float getCameraBackwardUpAngle  () const 
                                           {return m_camera_backward_up_angle; }
-
-    /** Returns AI steering variation value. */
-    float getAISteeringVariation    () const {return m_ai_steering_variation; }
 
     /** Returns the full path where the files for this kart are stored. */
     const std::string& getKartDir   () const {return m_root;                  }

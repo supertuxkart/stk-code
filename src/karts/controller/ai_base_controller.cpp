@@ -34,14 +34,14 @@ AIBaseController::AIBaseController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player) 
                 : Controller(kart, player)
 {
-    m_kart        = kart;
-    m_kart_length = m_kart->getKartLength();
-    m_kart_width  = m_kart->getKartWidth();
+    m_kart         = kart;
+    m_kart_length  = m_kart->getKartLength();
+    m_kart_width   = m_kart->getKartWidth();
 
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
     {
-        m_world       = dynamic_cast<LinearWorld*>(World::getWorld());
-        m_track       = m_world->getTrack();
+        m_world     = dynamic_cast<LinearWorld*>(World::getWorld());
+        m_track     = m_world->getTrack();
         computePath();
     }
     else

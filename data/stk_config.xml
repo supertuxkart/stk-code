@@ -24,9 +24,6 @@
     <points from="5"        points="1"/>
   </grand-prix>
 
-  <!-- A value between 0 and 1, change this to handicap AIs -->
-  <ai acceleration="1.0"  />
-
   <!-- Time in follow-the-leader after which karts are removed.
        The last values applies for all remaining karts. 
        time-per-kart Additional time added to the interval
@@ -144,23 +141,28 @@
 
     <!-- Nitro: engine-force: additional engine power
          consumption: nitro consumption - heavier characters can be set
-         to need more nitro than lighter character.
+             to need more nitro than lighter character.
          small-container: how much energy a small container gives.
          big-container: how much energy a big container gives. 
          max-speed-increase: How much the speed of a kart might exceed
-         its maximum speed (in m/s). 
+             its maximum speed (in m/s). 
          duration: How long the increased speed will be valid after
-         the kart stops using nitro (and the fade-out-time starts).
+             the kart stops using nitro (and the fade-out-time starts).
          fade-out-time: Duration during which the increased maximum
-         speed due to nitro fades out.  -->
+             speed due to nitro fades out. 
+         max: How much nitro a kart can store.
+     -->
     <nitro engine-force="500" consumption="1" small-container="1" big-container="3"
-           max-speed-increase="5" duration="1" fade-out-time="2"/>
+           max-speed-increase="5" duration="1" fade-out-time="2" max="16"/>
 
-    <!-- time is the time a zipper is active. force is the additional 
-         zipper force. speed-gain is the one time additional speed.
-         max-speed-increase is the additional speed allowed on top
-         of the kart-specific maximum kart speed. Fade-out time determines
-         how long it takes for a zipper to fade out (after 'time').  -->
+    <!-- time: Time a zipper is active. 
+         force: Additional zipper force. 
+         speed-gain: One time additional speed.
+         max-speed-increase: Additional speed allowed on top of the 
+             kart-specific maximum kart speed. 
+         fade-out-time: determines how long it takes for a zipper 
+             to fade out (after 'time').
+     -->
     <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
             fade-out-time="1.0"  />
 
@@ -345,13 +347,5 @@
     <explosion time="2" radius="5" 
          invulnerability-time="6" />
 
-    <!-- Kart-specific settings used by the AI.
-         steering-variation: make each kart steer towards slightly
-         different driveline points, so that AI don't create trains.
-         Maximum value should be 1 (steer towards left/right side 
-         of driveline), 0 means exactly towards quad center point.
-         Depending on kart id karts will aim at different points.-->
-    <ai steering-variation="0.0"  />
-    
   </general-kart-defaults>
 </config>

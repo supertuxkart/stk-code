@@ -29,6 +29,7 @@
 #include "items/item.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"
@@ -426,8 +427,8 @@ void PlayerController::handleZipper(bool play_sound)
  */
 void PlayerController::collectedItem(const Item &item, int add_info, float old_energy)
 {
-    if (old_energy < MAX_NITRO &&
-        m_kart->getEnergy() == MAX_NITRO)
+    if (old_energy < m_kart->getKartProperties()->getNitroMax() &&
+        m_kart->getEnergy() == m_kart->getKartProperties()->getNitroMax())
     {
         m_full_sound->play();
     }

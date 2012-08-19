@@ -65,9 +65,8 @@ KartProperties::KartProperties(const std::string &filename)
     // if everything is defined properly.
     m_mass = m_brake_factor = m_engine_power[0] = m_engine_power[1] =
         m_engine_power[2] = m_max_speed[0] = m_max_speed[1] = m_max_speed[2] =
-        m_time_full_steer = m_time_full_steer_ai =
-        m_nitro_consumption = m_nitro_engine_force =
-        m_nitro_small_container = m_nitro_big_container =
+        m_time_full_steer = m_nitro_consumption = m_nitro_engine_force =
+        m_nitro_small_container = m_nitro_big_container = m_nitro_max = 
         m_nitro_max_speed_increase = m_nitro_duration = m_nitro_fade_out_time =
         m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
         m_wheel_damping_compression = m_friction_slip = m_roll_influence =
@@ -92,7 +91,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_camera_distance = m_camera_forward_up_angle = 
         m_camera_backward_up_angle = m_explosion_invulnerability_time =
         m_rescue_time = m_rescue_height = m_explosion_time =
-        m_explosion_radius = m_ai_steering_variation = 
+        m_explosion_radius =
         m_swatter_distance2 = m_swatter_duration = m_squash_slowdown =
         m_squash_duration = m_downward_impulse_factor = UNDEFINED;
 
@@ -141,8 +140,8 @@ void KartProperties::copyFrom(const KartProperties *source)
     // So all pointer variables need to be separately allocated and assigned.
     m_skidding_properties = new SkiddingProperties();
     assert(m_skidding_properties);
-    *m_skidding_properties = *source->m_skidding_properties;    
-}   // copy
+    *m_skidding_properties = *source->m_skidding_properties;
+}   // copyFrom
 
 //-----------------------------------------------------------------------------
 /** Loads the kart properties from a file.
@@ -296,7 +295,7 @@ void KartProperties::getAllData(const XMLNode * root)
         nitro_node->get("engine-force",       &m_nitro_engine_force      );
         nitro_node->get("duration",           &m_nitro_duration          );
         nitro_node->get("fade-out-time",      &m_nitro_fade_out_time     );
-
+        nitro_node->get("max",                &m_nitro_max               );
     }
 
     if(const XMLNode *rescue_node = root->getNode("rescue"))
@@ -314,10 +313,6 @@ void KartProperties::getAllData(const XMLNode * root)
                         &m_explosion_invulnerability_time);
     }
 
-    if(const XMLNode *ai_node = root->getNode("ai"))
-    {
-        ai_node->get("steering-variation",   &m_ai_steering_variation  );
-    }
     if(const XMLNode *skid_node = root->getNode("skid"))
     {
         m_skidding_properties->load(skid_node);
@@ -661,6 +656,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_nitro_engine_force,         "nitro engine-force"            );
     CHECK_NEG(m_nitro_duration,             "nitro duration"                );
     CHECK_NEG(m_nitro_fade_out_time,        "nitro fade-out-time"           );
+    CHECK_NEG(m_nitro_max,                  "nitro max"                     );
     CHECK_NEG(m_swatter_distance2,          "swatter distance"              );
     CHECK_NEG(m_swatter_duration,           "swatter duration"              );
     CHECK_NEG(m_squash_duration,            "squash-duration"               );
@@ -673,7 +669,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_explosion_invulnerability_time, 
                                             "explosion invulnerability-time");
     CHECK_NEG(m_explosion_radius,           "explosion radius"              );
-    CHECK_NEG(m_ai_steering_variation,      "ai steering-variation"         );
 
     m_skidding_properties->checkAllSet(filename);
 }   // checkAllSet
