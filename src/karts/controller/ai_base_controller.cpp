@@ -24,6 +24,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding_properties.hpp"
+#include "karts/controller/ai_properties.hpp"
 #include "modes/linear_world.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -34,9 +35,10 @@ AIBaseController::AIBaseController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player) 
                 : Controller(kart, player)
 {
-    m_kart         = kart;
-    m_kart_length  = m_kart->getKartLength();
-    m_kart_width   = m_kart->getKartWidth();
+    m_kart          = kart;
+    m_kart_length   = m_kart->getKartLength();
+    m_kart_width    = m_kart->getKartWidth();
+    m_ai_properties = m_kart->getKartProperties()->getAIProperties();
 
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
     {
@@ -415,7 +417,7 @@ void AIBaseController::setSteering(float angle, float dt)
     }
     
     // The AI has its own 'time full steer' value (which is the time
-    float max_steer_change = dt/m_kart->getKartProperties()->getTimeFullSteerAI();
+    float max_steer_change = dt/m_ai_properties->m_time_full_steer;
     if(old_steer < steer_fraction)
     {
         m_controls->m_steer = (old_steer+max_steer_change > steer_fraction) 

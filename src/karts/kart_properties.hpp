@@ -36,6 +36,7 @@ using namespace irr;
 #include "race/race_manager.hpp"
 #include "utils/vec3.hpp"
 
+class AIProperties;
 class Material;
 class SkiddingProperties;
 class XMLNode;
@@ -60,6 +61,11 @@ private:
      *  to reduce dependencies (and therefore compile time) when changing
      *  any skidding property. */
     SkiddingProperties *m_skidding_properties;
+
+    /** AI Properties for this kart, as a separate object in order to
+     *  reduce dependencies (and therefore compile time) when changing
+     *  any AI property. */
+     AIProperties *m_ai_properties;
 
     /** The absolute path of the icon texture to use. */
     Material                *m_icon_material;
@@ -118,9 +124,6 @@ private:
                                        *   braking force. */
     float m_time_full_steer;          /**< Time for player karts to reach full
                                        *   steer angle. */
-    float m_time_full_steer_ai;       /**< Time for  AI karts to reach full
-                                       *   steer angle (used to reduce shaking
-                                       *   of karts). */
     /** Stores the speeds at which the turn angle changes. */
     std::vector<float> m_turn_speed;
 
@@ -397,11 +400,6 @@ public:
      *  steering straight. */
     float getTimeFullSteer          () const {return m_time_full_steer;       }
 
-    /** Returns how long the AI should need to steer in a direction. This 
-     *  avoids that the AI has an advantage by being able to change steering 
-     *  to quickly (e.g. counteracting pushes). */
-    float getTimeFullSteerAI        () const {return m_time_full_steer_ai;    }
-
     /** Get braking information. */
     float getBrakeFactor            () const {return m_brake_factor;          }
 
@@ -619,6 +617,9 @@ public:
     /** Returns a pointer to the skidding properties. */
     const SkiddingProperties *getSkiddingProperties() const 
                                                { return m_skidding_properties; }
+
+    /** Returns a pointer to the AI properties. */
+    const AIProperties *getAIProperties() const { return m_ai_properties; }
 
     /** Returns ratio of current speed to max speed at which the gear will
      *  change (for our simualated gears = simple change of engine power). */

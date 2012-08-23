@@ -62,11 +62,12 @@ Skidding::~Skidding()
  */
 void Skidding::reset()
 {
-    m_skid_time       = 0.0f;
-    m_skid_state      = m_skid_visual_time<=0 ? SKID_OLD : SKID_NONE;
-    m_skid_factor     = 1.0f;
-    m_real_steering   = 0.0f;
-    m_visual_rotation = 0.0f;
+    m_skid_time        = 0.0f;
+    m_skid_state       = m_skid_visual_time<=0 ? SKID_OLD : SKID_NONE;
+    m_skid_factor      = 1.0f;
+    m_real_steering    = 0.0f;
+    m_visual_rotation  = 0.0f;
+    m_skid_bonus_ready = false;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -166,6 +167,7 @@ float Skidding::getSteeringWhenSkidding(float steering) const
 void Skidding::update(float dt, bool is_on_ground, 
                       float steering, bool skidding)
 {
+    m_skid_bonus_ready = false;
     if (is_on_ground)
     {
         if((fabs(steering) > 0.001f) && skidding)
@@ -306,7 +308,11 @@ void Skidding::update(float dt, bool is_on_ground,
             unsigned int level = getSkidBonus(&bonus_time, &bonus_speed,
                                               &bonus_force);
             // If at least level 1 bonus is reached, show appropriate gfx
-            if(level>0) m_kart->getKartGFX()->setSkidLevel(level);
+            if(level>0) 
+            {
+                m_skid_bonus_ready = true;
+                m_kart->getKartGFX()->setSkidLevel(level);
+            }
             // If player stops skidding, trigger bonus, and change state to
             // SKID_SHOW_GFX_*
             if(!skidding) 

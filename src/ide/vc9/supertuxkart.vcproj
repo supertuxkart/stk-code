@@ -908,6 +908,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\karts\controller\ai_properties.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\karts\controller\controller.cpp"
 						>
 					</File>
@@ -2103,6 +2107,10 @@
 					>
 					<File
 						RelativePath="..\..\karts\controller\ai_base_controller.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\karts\controller\ai_properties.hpp"
 						>
 					</File>
 					<File

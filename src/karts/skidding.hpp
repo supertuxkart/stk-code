@@ -57,6 +57,10 @@ private:
      *  trigger the skidding bonus. */
     float m_skid_time;
 
+    /** True if the kart has skidded long enough to get a skid bonus if it 
+     *  stopped skidding now. */
+    bool m_skid_bonus_ready;
+
 public:
     /** SKID_OLD: old skidding, will be removed. */
     /** SKID_NONE: Kart is currently not skidding.
@@ -114,6 +118,12 @@ protected:
     SkidState getSkidState() const { return m_skid_state; }
     // ------------------------------------------------------------------------
     float getSteeringWhenSkidding(float steering) const;
+    // ------------------------------------------------------------------------
+    /** Returns if the kart has skidded long enough to get a skid bonus if it 
+     *  stopped skidding now. This function returns false if the kart is
+     *  actually using the skid bonus. */
+    bool getSkidBonusReady() const { return m_skid_bonus_ready; }
+
 };   // Skidding
 
 

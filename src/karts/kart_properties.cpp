@@ -27,6 +27,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
+#include "karts/controller/ai_properties.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/skidding_properties.hpp"
 #include "modes/world.hpp"
@@ -108,11 +109,13 @@ KartProperties::KartProperties(const std::string &filename)
     if (filename != "") 
     {
         m_skidding_properties = NULL;
+        m_ai_properties       = NULL;
         load(filename, "kart");
     }
     else
     {
         m_skidding_properties = new SkiddingProperties();
+        m_ai_properties       = new AIProperties();
     }
 }   // KartProperties
 
@@ -123,6 +126,8 @@ KartProperties::~KartProperties()
     delete m_kart_model;
     if(m_skidding_properties)
         delete m_skidding_properties;
+    if(m_ai_properties)
+        delete m_ai_properties;
 }   // ~KartProperties
 
 //-----------------------------------------------------------------------------
@@ -140,7 +145,10 @@ void KartProperties::copyFrom(const KartProperties *source)
     // So all pointer variables need to be separately allocated and assigned.
     m_skidding_properties = new SkiddingProperties();
     assert(m_skidding_properties);
+    m_ai_properties       = new AIProperties();
+    assert(m_ai_properties);
     *m_skidding_properties = *source->m_skidding_properties;
+    *m_ai_properties       = *source->m_ai_properties;
 }   // copyFrom
 
 //-----------------------------------------------------------------------------
@@ -318,6 +326,11 @@ void KartProperties::getAllData(const XMLNode * root)
         m_skidding_properties->load(skid_node);
     }
 
+    if(const XMLNode *ai_node = root->getNode("ai"))
+    {
+        m_ai_properties->load(ai_node);
+    }
+
     if(const XMLNode *slipstream_node = root->getNode("slipstream"))
     {
         slipstream_node->get("length",       &m_slipstream_length            );
@@ -334,7 +347,6 @@ void KartProperties::getAllData(const XMLNode * root)
     if(const XMLNode *turn_node = root->getNode("turn"))
     {
         turn_node->get("time-full-steer",      &m_time_full_steer     );
-        turn_node->get("time-full-steer-ai",   &m_time_full_steer_ai  );
         turn_node->get("turn-speed",           &m_turn_speed          );
         turn_node->get("turn-radius",          &m_turn_radius_at_speed);
         // For now store the turn radius in turn angle, the correct
@@ -593,7 +605,6 @@ void KartProperties::checkAllSet(const std::string &filename)
 
     CHECK_NEG(m_mass,                       "mass"                          );
     CHECK_NEG(m_time_full_steer,            "turn time-full-steer"          );
-    CHECK_NEG(m_time_full_steer_ai,         "turn time-full-steer-ai"       );
     CHECK_NEG(m_wheel_damping_relaxation,   "wheels damping-relaxation"     );
     CHECK_NEG(m_wheel_damping_compression,  "wheels damping-compression"    );
     CHECK_NEG(m_wheel_radius,               "wheels radius"                 );
@@ -671,6 +682,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_explosion_radius,           "explosion radius"              );
 
     m_skidding_properties->checkAllSet(filename);
+    m_ai_properties->checkAllSet(filename);
 }   // checkAllSet
 
 // ----------------------------------------------------------------------------

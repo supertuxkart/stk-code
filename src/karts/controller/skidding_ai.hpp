@@ -45,6 +45,12 @@ class SkiddingAI : public AIBaseController
 private:
     /** How the AI uses nitro. */
     enum {NITRO_NONE, NITRO_SOME, NITRO_ALL} m_nitro_level;
+
+    /** Determines if the AI should prefer collecting items over avoiding
+     *  items, or avoiding over collecting. */
+    enum {ITEM_COLLECT_NONE, ITEM_COLLECT_PRIORITY, ITEM_AVOID_PRIORITY} 
+          m_item_behaviour;
+
     enum ItemTactic
     {
         IT_TEN_SECONDS, //Fire after 10 seconds have passed, since the item
@@ -135,10 +141,19 @@ private:
 #ifdef DEBUG
     /** For skidding debugging: shows the estimated turn shape. */
     ShowCurve **m_curve;
-#endif
+
+    /** If set an item that the AI should aim for. */
+    const Item *m_item_to_collect;
+
     /** For debugging purpose: a sphere indicating where the AI 
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
+
+    /** For item debugging: set to the item that is selected to 
+     *  be collected. */
+    irr::scene::ISceneNode *m_item_sphere;
+#endif
+
 
     /*Functions called directly from update(). They all represent an action
      *that can be done, and end up setting their respective m_controls
@@ -153,10 +168,17 @@ private:
     void  handleBraking();
     void  handleNitroAndZipper();
     void  computeNearestKarts();
+    void  handleItemCollectionAndAvoidance(Vec3 *aim_point, 
+                                           int last_node);
+    bool  handleSelectedItem(float kart_aim_angle, Vec3 *aim_point, 
+                             int last_node);
+    void  evaluateItems(const Item *item, float kart_aim_angle, 
+                        const Item **item_to_avoid, 
+                        const Item **item_to_collect);
 
     void  checkCrashes(const Vec3& pos);
-    void  findNonCrashingPoint(Vec3 *result);
-    void  findNonCrashingPoint2(Vec3 *result);
+    void  findNonCrashingPoint(Vec3 *result, int *last_node);
+    void  findNonCrashingPoint2(Vec3 *result, int *last_node);
 
     void  determineTrackDirection();
     void  determineTurnRadius(const Vec3 &start,

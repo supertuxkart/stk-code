@@ -200,6 +200,22 @@
           post-skid-rotate-factor="1" jump-time="0.4"
           reduce-turn-min="0.2" reduce-turn-max="0.8"/>
 
+    <!-- Kart-specific settings used by the AI.
+         max-item-angle: Items that would need more than this change in
+           direction are not considered for collection.
+         time-full-steer is the time for the AI to go from neutral steering to
+           extreme left (or right). This can be used to reduce 
+           'shaking' of AI karts caused by changing steering direction
+           too often. It also helps with making it easier to push the
+           AI karts (otherwise micro-corrections make this nearly
+           impossible). A value of 1/maxFPS / 2 will guarantee that
+           the wheel can go from -1 to +1 steering in one frame, 
+           basically  disabling this mechanism.
+    -->
+    <ai max-item-angle="0.7" max-item-angle-high-speed="0.3"
+        time-full-steer="0.1"
+    />
+
     <!-- Slipstream: length: How far behind a kart slipstream works
          collect-time: How many seconds of sstream give  maximum benefit
          use-time: How long the benefit will last.
@@ -235,17 +251,10 @@
          than 23 can only be reached with powerups).
          time-full-steer is the time when a player's input goes from neutral
                          steering to extreme left or right.
-         time-full-steer-ai is the time for the AI to go from neutral steering to
-                         extreme left (or right). This can be used to reduce 
-                         'shaking' of AI karts caused by changing steering direction
-                         too often. It also helps with making it easier to push the
-                         AI karts (otherwise micro-corrections make this nearly
-                         impossible). A value of 1/maxFPS / 2 will guarantee that
-                         the wheel can go from -1 to +1 steering in one frame, 
-                         basically  disabling this mechanism.       -->
+    -->
     <turn turn-speed= "0 10 25 45"
           turn-radius="2.0 7.5 15 25"
-          time-full-steer ="0.2" time-full-steer-ai="0.1"    />
+          time-full-steer ="0.2"  />
 
     <!-- Speed and acceleration related values: power and max-speed (in m/s) 
          have 3 values, one for low, medium, and hard.
