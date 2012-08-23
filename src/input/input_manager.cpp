@@ -133,6 +133,9 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_CONTROL:
         case KEY_RCONTROL:
         case KEY_LCONTROL:
+        case KEY_RMENU:
+        case KEY_LMENU:
+        case KEY_LWIN:
             control_is_pressed = value!=0;
             break;
 
