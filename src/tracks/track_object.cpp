@@ -81,6 +81,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     
     if (xml_node.getName() == "particle-emitter")
     {
+        m_type = "particle-emitter";
         std::string path;
         irr::core::vector3df emitter_origin;
         xml_node.get("kind", &path);
@@ -89,6 +90,8 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         int clip_distance = -1;
         xml_node.get("clip_distance", &clip_distance);
 
+        xml_node.get("conditions", &m_trigger_condition);
+        
         try
         {
             ParticleKind* kind = ParticleKindManager::get()->getParticles( path.c_str() );
@@ -113,6 +116,11 @@ TrackObject::TrackObject(const XMLNode &xml_node)
             {
                 m_node = emitter->getNode(); // FIXME: this leaks
                 m_emitter = emitter;
+            }
+            
+            if (m_trigger_condition.size() > 0)
+            {
+                m_emitter->setCreationRateAbsolute(0.0f);
             }
         }
         catch (std::runtime_error& e)
@@ -423,13 +431,17 @@ void TrackObject::OnAnimationEnd(scene::IAnimatedMeshSceneNode* node)
 // ----------------------------------------------------------------------------
 void TrackObject::update(float dt)
 {
-    
     if (m_sound != NULL)
     {
         // muting when too far is implemented manually since not supported by OpenAL
         // so need to call this every frame to update the muting state if listener
         // moved
         m_sound->position(m_init_xyz);
+    }
+    
+    if (m_emitter != NULL)
+    {
+        m_emitter->update(dt);
     }
 }   // update
 // ----------------------------------------------------------------------------
@@ -473,6 +485,17 @@ void TrackObject::triggerSound(bool loop)
 void TrackObject::stopSound()
 {
     if (m_sound != NULL) m_sound->stop();
+}
+
+// ----------------------------------------------------------------------------
+
+void TrackObject::triggerParticles()
+{
+    if (m_emitter != NULL)
+    {
+        m_emitter->setCreationRateAbsolute(1.0f);
+        m_emitter->setParticleType(m_emitter->getParticlesInfo());
+    }
 }
 
 // ----------------------------------------------------------------------------

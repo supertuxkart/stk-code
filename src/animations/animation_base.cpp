@@ -93,6 +93,8 @@ void AnimationBase::reset()
  */
 void AnimationBase::update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
 {
+    TrackObject::update(dt);
+    
     // Don't do anything if the animation is disabled
     if(!m_playing) return;
     m_current_time += dt;

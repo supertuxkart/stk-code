@@ -156,6 +156,7 @@ public:
     
     void triggerSound(bool loop=false);
     void stopSound();
+    void triggerParticles();
     
     virtual void onTriggerItemApproached(Item* who);
     

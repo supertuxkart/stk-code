@@ -40,6 +40,7 @@ class CutsceneWorld : public World
     
     std::map<float, std::vector<TrackObject*> > m_sounds_to_trigger;
     std::map<float, std::vector<TrackObject*> > m_sounds_to_stop;
+    std::map<float, std::vector<TrackObject*> > m_particles_to_trigger;
     
     float m_duration;
     bool m_aborted;

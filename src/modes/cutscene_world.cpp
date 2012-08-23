@@ -76,7 +76,26 @@ void CutsceneWorld::init()
     TrackObject* curr;
     for_in(curr, objects)
     {
-        if (curr->getType() == "sfx-emitter" && !curr->getTriggerCondition().empty())
+        if (curr->getType() == "particle-emitter" && !curr->getTriggerCondition().empty())
+        {
+            const std::string& condition = curr->getTriggerCondition();
+            
+            if (StringUtils::startsWith(condition, "frame "))
+            {
+                std::string frameStr = condition.substr(6); // remove 'frame ' prefix
+                int frame;
+                
+                if (!StringUtils::fromString(frameStr, frame))
+                {
+                    fprintf(stderr, "[CutsceneWorld] Invalid condition '%s'\n", condition.c_str());
+                    continue;
+                }
+                
+                float FPS = 25.0f; // for now we assume the cutscene is saved at 25 FPS
+                m_particles_to_trigger[frame / FPS].push_back(curr);
+            }
+        }
+        else if (curr->getType() == "sfx-emitter" && !curr->getTriggerCondition().empty())
         {
             const std::string& condition = curr->getTriggerCondition();
             
@@ -153,6 +172,17 @@ const std::string& CutsceneWorld::getIdent() const
  */
 void CutsceneWorld::update(float dt)
 {
+    /*
+    {
+        PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+        TrackObject* curr;
+        for_in(curr, objects)
+        {
+            printf("* %s\n", curr->getType().c_str());
+        }
+    }
+    **/
+    
     m_time += dt;
     
     if (m_time < 2.0f)
@@ -167,7 +197,6 @@ void CutsceneWorld::update(float dt)
     {
         dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(0.0f);
     }
-    
     
     float currFrame = m_time * 25.0f; // We assume 25 FPS
     
@@ -232,9 +261,27 @@ void CutsceneWorld::update(float dt)
         }
      }
      
+     for (std::map<float, std::vector<TrackObject*> >::iterator it = m_particles_to_trigger.begin();
+         it != m_particles_to_trigger.end(); )
+     {
+        if (m_time >= it->first)
+        {
+            std::vector<TrackObject*> objects = it->second;
+            for (unsigned int i = 0; i < objects.size(); i++)
+            {
+                objects[i]->triggerParticles();
+            }
+            m_particles_to_trigger.erase(it++);
+        }
+        else
+        {
+            it++;
+        }
+     }
+     
      for (std::map<float, std::vector<TrackObject*> >::iterator it = m_sounds_to_stop.begin();
          it != m_sounds_to_stop.end(); )
-    {
+     {
         if (m_time >= it->first)
         {
             std::vector<TrackObject*> objects = it->second;
@@ -248,7 +295,7 @@ void CutsceneWorld::update(float dt)
         {
             it++;
         }
-     }
+    } 
 }   // update
 
 //-----------------------------------------------------------------------------
