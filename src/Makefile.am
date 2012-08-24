@@ -217,6 +217,8 @@ supertuxkart_SOURCES = \
  karts/cannon_animation.hpp \
  karts/controller/ai_base_controller.cpp \
  karts/controller/ai_base_controller.hpp \
+ karts/controller/ai_properties.cpp \
+ karts/controller/ai_properties.hpp \
  karts/controller/controller.cpp \
  karts/controller/controller.hpp \
  karts/controller/default_ai_controller.cpp \
