@@ -98,6 +98,7 @@ src/karts/abstract_kart_animation.cpp
 src/karts/abstract_kart.cpp
 src/karts/cannon_animation.cpp
 src/karts/controller/ai_base_controller.cpp
+src/karts/controller/ai_properties.cpp
 src/karts/controller/controller.cpp
 src/karts/controller/default_ai_controller.cpp
 src/karts/controller/end_controller.cpp
@@ -345,6 +346,7 @@ src/karts/abstract_kart_animation.hpp
 src/karts/abstract_kart.hpp
 src/karts/cannon_animation.hpp
 src/karts/controller/ai_base_controller.hpp
+src/karts/controller/ai_properties.hpp
 src/karts/controller/controller.hpp
 src/karts/controller/default_ai_controller.hpp
 src/karts/controller/end_controller.hpp
