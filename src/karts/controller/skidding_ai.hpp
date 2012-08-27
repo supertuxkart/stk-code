@@ -138,12 +138,13 @@ private:
      *  node the kart is on (i.e. if kart is in a left turn, this will be
      *  the last node that is still turning left). */
     unsigned int m_last_direction_node;
-#ifdef DEBUG
-    /** For skidding debugging: shows the estimated turn shape. */
-    ShowCurve **m_curve;
 
     /** If set an item that the AI should aim for. */
     const Item *m_item_to_collect;
+
+#ifdef DEBUG
+    /** For skidding debugging: shows the estimated turn shape. */
+    ShowCurve **m_curve;
 
     /** For debugging purpose: a sphere indicating where the AI 
      *  is targeting at. */

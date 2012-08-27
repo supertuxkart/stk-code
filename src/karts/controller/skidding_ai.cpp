@@ -602,7 +602,6 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
             float item_angle = atan2(xyz.getX() - m_kart->getXYZ().getX(),
                                      xyz.getZ() - m_kart->getXYZ().getZ() );
             float angle = normalizeAngle(kart_aim_angle - item_angle);
-            float d = (m_kart->getXYZ()-item_to_collect->getXYZ()).length();
 
             if(fabsf(angle) < 0.3)
             {
@@ -726,6 +725,7 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
             break;
         case Item::ITEM_TRIGGER: return; break;
 
+        default: assert(false); break;
     }    // switch
 
 
