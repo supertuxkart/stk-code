@@ -188,16 +188,27 @@ ChallengeData::ChallengeData(const std::string& filename)
         if (grand_prix_manager->getGrandPrix(m_gp_id) == NULL) error("gp");
     }
 */
-        
+
+    std::vector<XMLNode*> unlocks;
+    root->getNodes("unlock-kart", unlocks);
+    for (unsigned int n = 0; n < unlocks.size(); n++)
+    {
+        getUnlocks(unlocks[n], "unlock-kart",  ChallengeData::UNLOCK_KART);
+    }
+
+    
+    /*
     const XMLNode* unlock_node = root->getNode("unlock");
+    
     if (unlock_node != NULL)
     {
-        getUnlocks(root.get(), "unlock-track",      ChallengeData::UNLOCK_TRACK);
-        getUnlocks(root.get(), "unlock-gp",         ChallengeData::UNLOCK_GP   );
-        getUnlocks(root.get(), "unlock-mode",       ChallengeData::UNLOCK_MODE );
-        getUnlocks(root.get(), "unlock-difficulty", ChallengeData::UNLOCK_DIFFICULTY);
-        getUnlocks(root.get(), "unlock-kart",       ChallengeData::UNLOCK_KART);
+        getUnlocks(unlock_node, "unlock-track",      ChallengeData::UNLOCK_TRACK);
+        getUnlocks(unlock_node, "unlock-gp",         ChallengeData::UNLOCK_GP   );
+        getUnlocks(unlock_node, "unlock-mode",       ChallengeData::UNLOCK_MODE );
+        getUnlocks(unlock_node, "unlock-difficulty", ChallengeData::UNLOCK_DIFFICULTY);
+        getUnlocks(unlock_node, "unlock-kart",       ChallengeData::UNLOCK_KART);
     }
+    */
     
     core::stringw description;
     //I18N: number of laps to race in a challenge
@@ -283,7 +294,7 @@ void ChallengeData::getUnlocks(const XMLNode *root, const std:: string &type,
                                REWARD_TYPE reward)
 {
     std:: string attrib;
-    root->get(type, &attrib);
+    root->get("value", &attrib);
     
     if (attrib . empty()) return;
 

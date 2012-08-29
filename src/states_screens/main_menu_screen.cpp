@@ -197,7 +197,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setNumKarts( 0 );
         race_manager->setNumPlayers(0);
         race_manager->setNumLocalPlayers(0);
-        race_manager->startSingleRace("introcutscene", 999, false);
+        race_manager->startSingleRace("endcutscene", 999, false);
         
         std::vector<std::string> parts;
         parts.push_back("introcutscene");

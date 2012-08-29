@@ -16,4 +16,7 @@
         <karts number="2"/>
         <requirements position="1"/>
     </easy>
+    
+    <unlock-kart value="gnu"/>
+    <unlock-kart value="nolok"/>
 </challenge>
