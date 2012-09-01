@@ -193,7 +193,7 @@
            but you will always keep on doing a left turn, just more or less. -->
 
     <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
-          visual="1.0" visual-time="0"
+          visual="1.0" visual-time="0.5"
           time-till-bonus="1.0 3.0" 
           bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
           bonus-force="250 350"
