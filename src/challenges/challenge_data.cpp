@@ -154,6 +154,10 @@ ChallengeData::ChallengeData(const std::string& filename)
         if (!karts_node->get("number", &num_karts)) error("karts");
         m_num_karts[d] = num_karts;
         
+        std::string ai_kart_ident;
+        if (karts_node->get("aiIdent", &ai_kart_ident))
+            m_ai_kart_ident[d] = ai_kart_ident;
+        
         const XMLNode* requirements_node = difficulties[d]->getNode("requirements");
         if (requirements_node == NULL) error("<requirements .../>");
 
@@ -362,6 +366,11 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
         race_manager->setDifficulty(d);
         race_manager->setNumKarts(m_num_karts[d]);
         race_manager->setNumLocalPlayers(1);
+    }
+    
+    if (m_ai_kart_ident[d] != "")
+    {
+        race_manager->setAIKartOverride(m_ai_kart_ident[d]);
     }
 }   // setRace
 

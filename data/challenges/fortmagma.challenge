@@ -5,15 +5,15 @@
     <requirements trophies="23"/>
     
     <hard>
-        <karts number="2"/>
+        <karts number="2" aiIdent="nolok"/>
         <requirements position="1"/>
     </hard>
     <medium>
-        <karts number="2"/>
+        <karts number="2" aiIdent="nolok"/>
         <requirements position="1"/>
     </medium>
     <easy>
-        <karts number="2"/>
+        <karts number="2" aiIdent="nolok"/>
         <requirements position="1"/>
     </easy>
     

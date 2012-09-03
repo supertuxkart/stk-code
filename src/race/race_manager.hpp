@@ -265,6 +265,9 @@ private:
     /** The list of default AI karts to use. This is from the command line. */
     std::vector<std::string>         m_default_ai_list;
 
+    /** If set, specifies which kart to use for AI(s) */
+    std::string                      m_ai_kart_override;
+
     /** The list of AI karts to use. This is stored here so that the
      *  same list of AIs is used for all tracks of a GP. */
     std::vector<std::string>         m_ai_kart_list;
@@ -312,6 +315,8 @@ public:
       */
     void         setNumLocalPlayers(unsigned int n);
     
+    void         setAIKartOverride(const std::string& kart) { m_ai_kart_override = kart; }
+    
     /** In case of non GP mode set the track to use.
      *  \param track Pointer to the track to use.
      */
@@ -334,7 +339,7 @@ public:
                                                 { m_major_mode = mode;              }
     void         setMinorMode(MinorRaceModeType mode)
                                                 { m_minor_mode = mode;              }
-    void         setNumKarts(int num)           { m_num_karts = num;                }
+    void         setNumKarts(int num)           { m_num_karts = num; m_ai_kart_override = ""; }
     void         setCoinTarget(int num)         { m_coin_target = num;              }
     
     /** \} */

@@ -243,6 +243,14 @@ void RaceManager::computeRandomKartList()
         kart_properties_manager->getRandomKartList(n, m_player_karts, 
                                                    &m_ai_kart_list   );
 
+    if (m_ai_kart_override != "")
+    {
+        for (int n = 0; n < m_ai_kart_list.size(); n++)
+        {
+            m_ai_kart_list[n] = m_ai_kart_override;
+        }
+    }
+
 }   // computeRandomKartList
 
 //-----------------------------------------------------------------------------
