@@ -173,9 +173,12 @@ private:
                                            int last_node);
     bool  handleSelectedItem(float kart_aim_angle, Vec3 *aim_point, 
                              int last_node);
+    bool  steerToAvoid(const std::vector<const Item *> &items_to_avoid,
+                       const core::line2df &line_to_target,
+                       Vec3 *aim_point);
     void  evaluateItems(const Item *item, float kart_aim_angle, 
-                        const Item **item_to_avoid, 
-                        const Item **item_to_collect);
+                        std::vector<const Item *> *items_to_avoid,
+                        std::vector<const Item *> *items_to_collect);
 
     void  checkCrashes(const Vec3& pos);
     void  findNonCrashingPoint(Vec3 *result, int *last_node);

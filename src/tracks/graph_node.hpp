@@ -113,6 +113,10 @@ private:
       *  left. */
      std::vector<unsigned int> m_last_index_same_direction;
 
+     /** A unit vector pointing from the center to the right side, orthogonal
+      *  to the driving direction. */
+     Vec3 m_right_unit_vector;
+
     /**
       * Sets of checklines you should have activated when you are driving on
       * this node (there is a possibility of more than one set because of
@@ -226,6 +230,8 @@ public:
         *dir = m_direction[succ];  *last = m_last_index_same_direction[succ];
     }
     // ------------------------------------------------------------------------
+    /** Returns a unit vector pointing to the right side of the quad. */
+    const Vec3 &getRightUnitVector() const { return m_right_unit_vector; }
 };   // GraphNode
 
 #endif

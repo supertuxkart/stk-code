@@ -35,8 +35,8 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 {
     assert(type != ITEM_TRIGGER); // use other constructor for that
     
-    initItem(type, xyz);
     m_distance_2        = 0.8f;
+    initItem(type, xyz);
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
     m_original_hpr      = Vec3(0, normal);
     m_original_mesh     = mesh;
@@ -83,6 +83,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
   */
 Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
 {
+    m_distance_2        = distance*distance;
     initItem(ITEM_TRIGGER, xyz);
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
     m_original_hpr      = Vec3(0, 0, 0);
@@ -90,16 +91,16 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
     m_original_lowmesh  = NULL;
     m_node              = NULL;
     m_listener          = trigger;
-    m_distance_2        = distance*distance;
 }   // Item(xyz, distance, trigger)
 
 //-----------------------------------------------------------------------------
-/** Initialises the item.
+/** Initialises the item. Note that m_distance_2 must be defined before calling
+ *  this function, since it pre-computes some values based on this.
  *  \param type Type of the item.
  */
 void Item::initItem(ItemType type, const Vec3 &xyz)
 {
-    m_type   = type;
+    m_type              = type;
     m_xyz               = xyz;
     m_event_handler     = NULL;
     m_item_id           = -1;
@@ -111,6 +112,34 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
     m_disappear_counter = m_type==ITEM_BUBBLEGUM 
                         ? stk_config->m_bubble_gum_counter
                         : -1 ;
+    // Now determine in which quad this item is, and its distance 
+    // from the center within this quad.
+    m_graph_node = QuadGraph::UNKNOWN_SECTOR;
+    QuadGraph::get()->findRoadSector(xyz, &m_graph_node);
+
+    if(m_graph_node==QuadGraph::UNKNOWN_SECTOR)
+    {
+        m_graph_node = -1;
+        m_distance_from_center = 9999.9f;   // is not used
+        m_avoidance_points[0] = NULL;
+        m_avoidance_points[1] = NULL;
+    }
+    else
+    {
+        // Item is on quad graph. Pre-compute the distance from center
+        // of this item, which is used by the AI (mostly for avoiding items)
+        Vec3 distances;
+        QuadGraph::get()->spatialToTrack(&distances, m_xyz, m_graph_node);
+        m_distance_from_center = distances.getX();
+        const GraphNode &gn = QuadGraph::get()->getNode(m_graph_node);
+        const Vec3 right = gn.getRightUnitVector();
+        // Give it 10% more space, since the kart will not always come
+        // parallel to the drive line.
+        Vec3 delta = right * sqrt(m_distance_2) * 1.1f;
+        m_avoidance_points[0] = new Vec3(m_xyz + delta);
+        m_avoidance_points[1] = new Vec3(m_xyz - delta);
+    }
+
 }   // initItem
 
 //-----------------------------------------------------------------------------
@@ -186,6 +215,10 @@ Item::~Item()
         irr_driver->removeNode(m_node);
         m_node->drop();
     }
+    if(m_avoidance_points[0])
+        delete m_avoidance_points[0];
+    if(m_avoidance_points[1])
+        delete m_avoidance_points[1];
 }   // ~Item
 
 //-----------------------------------------------------------------------------

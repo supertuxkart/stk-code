@@ -93,8 +93,7 @@ private:
      *  case of a switch to restore the rotation of a bubble gum
      *  (bubble gums don't rotate, but it will be replaced with
      *  a nitro which rotates, and so overwrites the original 
-     *  rotation).
-    */
+     *  rotation). */
     Vec3 m_original_hpr;
 
     /** True if item was collected & is not displayed. */
@@ -138,8 +137,21 @@ private:
     TriggerItemListener* m_listener;
     
     /** square distance at which item is collected */
-    float m_distance_2;
+    float         m_distance_2;
+
+    /** The graph node this item is on. */
+    int           m_graph_node;
+
+    /** Distance from the center of the quad this item is in. This value is
+     *  >0 if it is to the right of the center, and undefined if this quad
+     *  is not on any quad. */
+    float         m_distance_from_center;
     
+    /** The closest point to the left and right of this item at which it 
+     *  would not be collected. Used by the AI to avoid items. */
+    Vec3          *m_avoidance_points[2];
+
+
     void          initItem(ItemType type, const Vec3 &xyz);
     void          setType(ItemType type);
 
@@ -164,12 +176,32 @@ public:
      *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
      *         kart.hpp does not need to be included here).
      */
-    bool hitKart (const AbstractKart *kart, const Vec3 &xyz) const
+    bool hitKart (const Vec3 &xyz, const AbstractKart *kart=NULL) const
     {
         return (m_event_handler!=kart || m_deactive_time <=0) &&
                (xyz-m_xyz).length2()<m_distance_2;
     }   // hitKart
 
+    // ------------------------------------------------------------------------
+    /** Returns true if the Kart is close enough to hit this item, the item is 
+     *  not deactivated anymore, and it wasn't placed by this kart (this is 
+     *  e.g. used to avoid that a kart hits a bubble gum it just dropped).
+     *  This function only uses the 2d coordinates, and it used by the AI only.
+     *  \param kart Kart to test.
+     *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
+     *         kart.hpp does not need to be included here).
+     */
+protected:
+        friend class SkiddingAI;
+    bool hitKart (const core::vector2df &xyz, const AbstractKart *kart=NULL) const
+    {
+        if(m_event_handler==kart && m_deactive_time >0) return false;
+        float d2 = (m_xyz.getX()-xyz.X)*(m_xyz.getX()-xyz.X) 
+                 + (m_xyz.getZ()-xyz.Y)*(m_xyz.getZ()-xyz.Y);
+        return d2 < m_distance_2;
+    }   // hitKart
+
+public:
     // ------------------------------------------------------------------------
     /** Sets the index of this item in the item manager list. */
     void          setItemId(unsigned int n)  { m_item_id = n; }
@@ -205,6 +237,23 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the XYZ position of the item. */
     const Vec3&   getXYZ() const { return m_xyz; }
+    // ------------------------------------------------------------------------
+    /** Returns the index of the graph node this item is on. */
+    int           getGraphNode() const { return m_graph_node; }
+    // ------------------------------------------------------------------------
+    /** Returns the distance from center: negative means left of center, 
+     *  positive means right of center. */
+    float getDistanceFromCenter() const { return m_distance_from_center; }
+    // ------------------------------------------------------------------------
+    /** Returns a point to the left or right of the item which will not trigger
+     *  a collection of this item.
+     *  \param left If true, return a point to the left, else a point to 
+     *         the right. */
+    const Vec3 *getAvoidancePoint(bool left) const
+    {
+        if(left) return m_avoidance_points[0];
+        return m_avoidance_points[1];
+    }   // getAvoidancePoint
 };   // class Item
 
 #endif

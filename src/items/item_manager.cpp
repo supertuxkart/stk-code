@@ -215,13 +215,15 @@ void ItemManager::insertItem(Item *item)
     // (i.e. race mode has a quad graph).
     if(m_items_in_quads)
     {
-        const Vec3 &xyz = item->getXYZ();
-        int sector = QuadGraph::UNKNOWN_SECTOR;
-        QuadGraph::get()->findRoadSector(xyz, &sector);
-        if(sector==QuadGraph::UNKNOWN_SECTOR)
-            (*m_items_in_quads)[m_items_in_quads->size()-1].push_back(item);
-        else
+        int graph_node = item->getGraphNode();
+        // If the item is on the driveline, store it at the appropriate index
+        if(graph_node > -1)
+        {
+            int sector = QuadGraph::get()->getNode(graph_node).getQuadIndex();
             (*m_items_in_quads)[sector].push_back(item);
+        }
+        else  // otherwise store it in the 'outside' index
+            (*m_items_in_quads)[m_items_in_quads->size()-1].push_back(item);
     }   // if m_items_in_quads
 }   // insertItem
 
@@ -300,7 +302,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         if((!*i) || (*i)->wasCollected()) continue;
         // To allow inlining and avoid including kart.hpp in item.hpp,
         // we pass the kart and the position separately.
-        if((*i)->hitKart(kart, kart->getXYZ()))
+        if((*i)->hitKart(kart->getXYZ(), kart))
         {
             collectedItem(*i, kart);
         }   // if hit

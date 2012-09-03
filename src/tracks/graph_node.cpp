@@ -45,20 +45,26 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
     // of the quad. ATM we always assume that indices 0,1 are the lower end,
     // and 2,3 are the upper end (or the reverse if reverse mode is selected).
     // The width is the average width at the beginning and at the end.
+    m_right_unit_vector = ( quad[0]-quad[1]
+                           +quad[3]-quad[2]) * 0.5f;
+    m_right_unit_vector.normalize();
+
     m_width = (  (quad[1]-quad[0]).length() 
                + (quad[3]-quad[2]).length() ) * 0.5f;
+
     if(QuadGraph::get()->isReverse())
     {
         m_lower_center = (quad[2]+quad[3]) * 0.5f;
         m_upper_center = (quad[0]+quad[1]) * 0.5f;
+        m_right_unit_vector *= -1.0f; 
     }
     else
     {
         m_lower_center = (quad[0]+quad[1]) * 0.5f;
         m_upper_center = (quad[2]+quad[3]) * 0.5f;
     }
-    m_line     = core::line2df(m_lower_center.getX(), m_lower_center.getZ(),
-                               m_upper_center.getX(), m_upper_center.getZ() );
+    m_line     = core::line2df(m_upper_center.getX(), m_upper_center.getZ(),
+                               m_lower_center.getX(), m_lower_center.getZ() );
     // Only this 2d point is needed later
     m_lower_center_2d = core::vector2df(m_lower_center.getX(), 
                                         m_lower_center.getZ() );
