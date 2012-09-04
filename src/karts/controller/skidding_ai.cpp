@@ -128,6 +128,8 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
         setSkiddingFraction(2.0f);
         break;
     }
+    
+    m_superpower = race_manager->getAISuperPower();
 
 #ifdef AI_DEBUG
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1.0f);
@@ -246,6 +248,32 @@ void SkiddingAI::update(float dt)
     // Don't do anything if there is currently a kart animations shown.
     if(m_kart->getKartAnimation())
         return;
+
+    if (m_superpower == RaceManager::SUPERPOWER_NOLOK_BOSS)
+    {
+        if (m_kart->getPowerup()->getType() == NULL ||
+            m_kart->getPowerup()->getType()==PowerupManager::POWERUP_NOTHING)
+        {
+            if (m_kart->getAttachment()->getType() == Attachment::ATTACH_SWATTER)
+            {
+                int r = rand() % 4;
+                if (r < 3)
+                    m_kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 1);
+                else
+                    m_kart->setPowerup(PowerupManager::POWERUP_BOWLING, 1);
+            }
+            else
+            {
+                int r = rand() % 5;
+                if (r == 0 || r == 1)
+                    m_kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 1);
+                else if (r == 2 || r == 3)
+                    m_kart->setPowerup(PowerupManager::POWERUP_SWATTER, 1);
+                else
+                    m_kart->setPowerup(PowerupManager::POWERUP_BOWLING, 1);
+            }
+        }
+    }
 
     // Having a non-moving AI can be useful for debugging, e.g. aiming
     // or slipstreaming.
@@ -985,6 +1013,25 @@ void SkiddingAI::handleItems(const float dt)
         return;
 
     m_time_since_last_shot += dt;
+    
+    if (m_superpower == RaceManager::SUPERPOWER_NOLOK_BOSS)
+    {
+        m_controls->m_look_back = (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_BOWLING);
+        
+        if( m_time_since_last_shot > 3.5f )
+        {
+            m_controls->m_fire = true;
+            if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_SWATTER)
+                m_time_since_last_shot = 3.5f;
+            else
+                m_time_since_last_shot = (rand() % 1000) / 1000.0f * 3.0f - 1.50f; // to make things less predictable :)
+        }
+        else
+        {
+            m_controls->m_fire = false;
+        }
+        return;
+    }
 
     // Tactic 1: wait ten seconds, then use item
     // -----------------------------------------

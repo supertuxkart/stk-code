@@ -108,6 +108,13 @@ public:
         MINOR_MODE_CUTSCENE      = BATTLE_ARENA(1)
     };
 
+
+    enum AISuperPower
+    {
+        SUPERPOWER_NONE = 0,
+        SUPERPOWER_NOLOK_BOSS = 1
+    };
+    
     /** Returns a string identifier for each minor race mode.
      *  \param mode Minor race mode.
      */
@@ -268,6 +275,8 @@ private:
     /** If set, specifies which kart to use for AI(s) */
     std::string                      m_ai_kart_override;
 
+    AISuperPower                     m_ai_superpower;
+
     /** The list of AI karts to use. This is stored here so that the
      *  same list of AIs is used for all tracks of a GP. */
     std::vector<std::string>         m_ai_kart_list;
@@ -317,6 +326,10 @@ public:
     
     void         setAIKartOverride(const std::string& kart) { m_ai_kart_override = kart; }
     
+    void         setAISuperPower(AISuperPower superpower) { m_ai_superpower = superpower; }
+    
+    AISuperPower getAISuperPower() const { return m_ai_superpower; }
+    
     /** In case of non GP mode set the track to use.
      *  \param track Pointer to the track to use.
      */
@@ -339,7 +352,9 @@ public:
                                                 { m_major_mode = mode;              }
     void         setMinorMode(MinorRaceModeType mode)
                                                 { m_minor_mode = mode;              }
-    void         setNumKarts(int num)           { m_num_karts = num; m_ai_kart_override = ""; }
+    void         setNumKarts(int num)           { m_num_karts = num;
+                                                  m_ai_kart_override = "";
+                                                  m_ai_superpower = SUPERPOWER_NONE;}
     void         setCoinTarget(int num)         { m_coin_target = num;              }
     
     /** \} */

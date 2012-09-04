@@ -57,6 +57,7 @@ RaceManager::RaceManager()
     m_difficulty         = RD_HARD;
     m_major_mode         = MAJOR_MODE_SINGLE;
     m_minor_mode         = MINOR_MODE_NORMAL_RACE;
+    m_ai_superpower      = SUPERPOWER_NONE;
     m_track_number       = 0;
     m_coin_target        = 0;
     m_started_from_overworld = false;

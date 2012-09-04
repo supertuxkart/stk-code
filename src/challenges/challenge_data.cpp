@@ -51,6 +51,7 @@ ChallengeData::ChallengeData(const std::string& filename)
         m_position[d]  = -1;
         m_time[d]      = -1.0f;
         m_energy[d]    = -1;
+        m_ai_superpower[d] = RaceManager::SUPERPOWER_NONE;
     }
     
     // we are using auto_ptr to make sure the XML node is released when leaving
@@ -157,6 +158,19 @@ ChallengeData::ChallengeData(const std::string& filename)
         std::string ai_kart_ident;
         if (karts_node->get("aiIdent", &ai_kart_ident))
             m_ai_kart_ident[d] = ai_kart_ident;
+        
+        std::string superPower;
+        if (karts_node->get("superPower", &superPower))
+        {
+            if (superPower == "nolokBoss")
+            {
+                m_ai_superpower[d] = RaceManager::SUPERPOWER_NOLOK_BOSS;
+            }
+            else
+            {
+                fprintf(stderr, "[ChallengeData] WARNING: Unknown AI superpower '%s'\n", superPower.c_str());
+            }
+        }
         
         const XMLNode* requirements_node = difficulties[d]->getNode("requirements");
         if (requirements_node == NULL) error("<requirements .../>");
@@ -371,6 +385,10 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
     if (m_ai_kart_ident[d] != "")
     {
         race_manager->setAIKartOverride(m_ai_kart_ident[d]);
+    }
+    if (m_ai_superpower[d] != RaceManager::SUPERPOWER_NONE)
+    {
+        race_manager->setAISuperPower(m_ai_superpower[d]);
     }
 }   // setRace
 

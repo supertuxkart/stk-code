@@ -22,6 +22,7 @@
 #define HEADER_SKIDDING_AI__HPP
 
 #include "karts/controller/ai_base_controller.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/graph_node.hpp"
 
 class LinearWorld;
@@ -68,6 +69,8 @@ private:
         CrashTypes() : m_road(false), m_kart(-1) {};
         void clear() {m_road = false; m_kart = -1;}
     } m_crashes;
+
+    RaceManager::AISuperPower m_superpower;
 
     /*Difficulty handling variables*/
     /** Chance of a false start. */

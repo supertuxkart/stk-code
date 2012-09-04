@@ -61,6 +61,7 @@ private:
     std::string                    m_ai_kart_ident[RaceManager::DIFFICULTY_COUNT];
     float                          m_time[RaceManager::DIFFICULTY_COUNT];
     int                            m_energy[RaceManager::DIFFICULTY_COUNT];
+    RaceManager::AISuperPower      m_ai_superpower[RaceManager::DIFFICULTY_COUNT];
     std::string                    m_gp_id;
     std::string                    m_track_id;
     std::string                    m_filename;
