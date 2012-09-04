@@ -251,8 +251,7 @@ void SkiddingAI::update(float dt)
 
     if (m_superpower == RaceManager::SUPERPOWER_NOLOK_BOSS)
     {
-        if (m_kart->getPowerup()->getType() == NULL ||
-            m_kart->getPowerup()->getType()==PowerupManager::POWERUP_NOTHING)
+        if (m_kart->getPowerup()->getType()==PowerupManager::POWERUP_NOTHING)
         {
             if (m_kart->getAttachment()->getType() == Attachment::ATTACH_SWATTER)
             {
