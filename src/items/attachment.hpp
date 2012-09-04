@@ -57,6 +57,7 @@ public:
         ATTACH_BOMB,
         ATTACH_ANVIL,
         ATTACH_SWATTER,
+        ATTACH_NOLOKS_SWATTER,
         ATTACH_TINYTUX,
         ATTACH_MAX,
         ATTACH_NOTHING

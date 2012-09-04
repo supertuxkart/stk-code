@@ -47,12 +47,13 @@ struct  initAttachmentType {Attachment::AttachmentType attachment;
 
 initAttachmentType iat[]=
 {
-    {Attachment::ATTACH_PARACHUTE,   "parachute.b3d",   "parachute-attach-icon.png"},
-    {Attachment::ATTACH_BOMB,        "bomb.b3d",        "bomb-attach-icon.png"     },
-    {Attachment::ATTACH_ANVIL,       "anchor.b3d",      "anchor-attach-icon.png"   },
-    {Attachment::ATTACH_SWATTER,     "swatter.b3d",     "swatter-icon.png"         },
-    {Attachment::ATTACH_TINYTUX,     "reset-button.b3d","reset-attach-icon.png"    },
-    {Attachment::ATTACH_MAX,         "",                ""                         },
+    {Attachment::ATTACH_PARACHUTE,      "parachute.b3d",    "parachute-attach-icon.png"},
+    {Attachment::ATTACH_BOMB,           "bomb.b3d",         "bomb-attach-icon.png"     },
+    {Attachment::ATTACH_ANVIL,          "anchor.b3d",       "anchor-attach-icon.png"   },
+    {Attachment::ATTACH_SWATTER,        "swatter.b3d",      "swatter-icon.png"         },
+    {Attachment::ATTACH_NOLOKS_SWATTER, "swatter_nolok.b3d","swatter-icon.png"         },
+    {Attachment::ATTACH_TINYTUX,        "reset-button.b3d", "reset-attach-icon.png"    },
+    {Attachment::ATTACH_MAX,            "",                 ""                         },
 };
 
 //-----------------------------------------------------------------------------

@@ -24,6 +24,13 @@
     Tires by Thomas Oppl, released under CC-BY-SA 3.0
     scene and finishing touches by Marianne Gagnon
 
+* Hammer.jpg
+    by Marianne Gagnon, released under CC-BY-SA 3.0
+    Incorporates image by Philipp Zinger, released under CCBY 3.0
+                 image by Louise Price, released under CC-BY 2.0 (considered a derivate work thus allowing to upgrade the license version),
+                 image by Smoth 007, released under CC-BY-SA 2.0 (considered a derivate work thus allowing to upgrade the license version),
+                 image by Juangonzalez64 released under the public domain
+    
 * swatter
     released under CC-BY-SA 3.0
     by Funto
