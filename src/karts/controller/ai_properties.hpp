@@ -53,6 +53,13 @@ protected:
      *  are more than this away, will not even be considered. */
     float m_max_item_angle_high_speed;
 
+    /** If a good item and a bad item are closer than this distance, a good
+     *  item will be avoided (in order to avoid the bad item). If the items
+     *  are further apart, it is assumed that there is enough time to
+     *  change steering direction.
+     */
+    float m_bad_item_closeness_2;
+
     /** Time for  AI karts to reach full steer angle (used to reduce shaking
      *   of karts). */
     float m_time_full_steer;

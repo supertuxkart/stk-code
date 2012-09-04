@@ -34,6 +34,8 @@ using namespace irr;
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+#include <line2d.h>
+
 class AbstractKart;
 class LODNode;
 class Item;
@@ -182,6 +184,7 @@ public:
                (xyz-m_xyz).length2()<m_distance_2;
     }   // hitKart
 
+private:
     // ------------------------------------------------------------------------
     /** Returns true if the Kart is close enough to hit this item, the item is 
      *  not deactivated anymore, and it wasn't placed by this kart (this is 
@@ -191,15 +194,32 @@ public:
      *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
      *         kart.hpp does not need to be included here).
      */
-protected:
-        friend class SkiddingAI;
-    bool hitKart (const core::vector2df &xyz, const AbstractKart *kart=NULL) const
+    bool hitKart (const core::vector2df &xyz, 
+                  const AbstractKart *kart=NULL) const
     {
         if(m_event_handler==kart && m_deactive_time >0) return false;
         float d2 = (m_xyz.getX()-xyz.X)*(m_xyz.getX()-xyz.X) 
                  + (m_xyz.getZ()-xyz.Y)*(m_xyz.getZ()-xyz.Y);
         return d2 < m_distance_2;
     }   // hitKart
+
+protected:
+    // ------------------------------------------------------------------------
+    // Some convenient functions for the AI only
+    friend class SkiddingAI;
+    /** Returns true if the specified line segment would come close enough
+     *  to this item so that this item would be collected.
+     *  \param line The line segment which is tested if it is close enough
+     *         to this item so that this item would be collected.
+     */
+    bool hitLine(const core::line2df &line, 
+                  const AbstractKart *kart=NULL) const
+    {
+        if(m_event_handler==kart && m_deactive_time >0) return false;
+        core::vector2df p2d = m_xyz.toIrrVector2d();
+        core::vector2df closest = line.getClosestPoint(p2d);
+        return hitKart(closest, kart);
+    }   // hitLine
 
 public:
     // ------------------------------------------------------------------------

@@ -23,15 +23,15 @@
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
 #ifdef DEBUG
    // Enable AeI graphical debugging
-#  undef AI_DEBUG
+#  define AI_DEBUG
    // Shows left and right lines when using new findNonCrashing function
 #  undef AI_DEBUG_NEW_FIND_NON_CRASHING
    // Show the predicted turn circles
 #  undef AI_DEBUG_CIRCLES
    // Show the heading of the kart
-#  undef AI_DEBUG_KART_HEADING
+#  define AI_DEBUG_KART_HEADING
    // Shows line from kart to its aim point
-#  undef AI_DEBUG_KART_AIM
+#  define AI_DEBUG_KART_AIM
 #endif
 
 #include "karts/controller/skidding_ai.hpp"
@@ -561,6 +561,75 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
     float kart_aim_angle = atan2(aim_point->getX()-m_kart->getXYZ().getX(),
                                  aim_point->getZ()-m_kart->getXYZ().getZ());
 
+    // Make sure we have a valid last_node
+    if(last_node==QuadGraph::UNKNOWN_SECTOR)
+        last_node = m_next_node_index[m_track_node];
+
+    int node = m_track_node;
+    float distance = 0;
+    std::vector<const Item *> items_to_collect;
+    std::vector<const Item *> items_to_avoid;
+
+
+    const float max_item_lookahead_distance = 30.f;
+    while(distance < max_item_lookahead_distance)
+    {
+        int q_index= QuadGraph::get()->getNode(node).getQuadIndex();
+        const std::vector<Item *> &items_ahead = 
+            ItemManager::get()->getItemsInQuads(q_index);
+        for(unsigned int i=0; i<items_ahead.size(); i++)
+        {
+            evaluateItems(items_ahead[i],  kart_aim_angle, 
+                          &items_to_avoid, &items_to_collect);
+        }   // for i<items_ahead;
+        distance += QuadGraph::get()->getDistanceToNext(node, 
+                                                      m_successor_index[node]);
+        node = m_next_node_index[node];
+        // Stop when we have reached the last quad
+        if(node==last_node) break;
+    }   // while (distance < max_item_lookahead_distance)
+
+
+
+    core::line2df line_to_target(aim_point->getX(), 
+                                 aim_point->getZ(),
+                                 m_kart->getXYZ().getX(), 
+                                 m_kart->getXYZ().getZ());
+
+
+
+
+
+    // If the kart is aiming for an item, but (suddenly) detects some
+    // clos- by items to avoid, the kart cancels collecting the item if 
+    // this could cause the avoidance item to be collected
+    if(m_item_to_collect && items_to_avoid.size()>0)
+    {
+        for(unsigned int i=0; i< items_to_avoid.size(); i++)
+        {
+            Vec3 d = items_to_avoid[i]->getXYZ()-m_item_to_collect->getXYZ();
+            if( d.length2_2d()>m_ai_properties->m_bad_item_closeness_2)
+                continue;
+            // It could make sense to also test if the bad item would 
+            // actually be hit. But in (at least) one case steering
+            // after collecting m_item_to_collect causes it to then
+            // collect the bad item (it's too close to avoid it at that
+            // time). So for now this test is actually disabled.
+#undef ADDITIONAL_TEST
+#ifdef ADDITIONAL_TEST            
+            core::line2df to_item(m_item_to_collect->getXYZ().toIrrVector2d(),
+                                  m_kart->getXYZ().toIrrVector2d());
+            if(items_to_avoid[i]->hitLine(to_item))
+            {
+                // Since from now on bad items will be tested before good
+                // items, the item will not be picked again as a collection
+                // target (till the bad items behind the kart).
+            }   // hitLine(to_item)
+#endif
+            m_item_to_collect = NULL;
+            break;
+        }   // for i<items_to_avoid.size()
+    }   // if m_item_to_collect && items_to_avoid.size()>0
     // The AI does a much better job of collecting items if after selecting
     // an item it tries to collect this item even if it doesn't fulfill the
     // original conditions to be selected in the first place anymore. 
@@ -590,40 +659,6 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
     }   // m_item_to_collect
 
 
-    // Make sure we have a valid last_node
-    if(last_node==QuadGraph::UNKNOWN_SECTOR)
-        last_node = m_next_node_index[m_track_node];
-
-    int node = m_track_node;
-    float distance = 0;
-    std::vector<const Item *> items_to_collect;
-    std::vector<const Item *> items_to_avoid;
-
-
-    const float max_item_lookahead_distance = 30.f;
-    while(distance < max_item_lookahead_distance)
-    {
-        int q_index= QuadGraph::get()->getNode(node).getQuadIndex();
-        const std::vector<Item *> &items_ahead = 
-            ItemManager::get()->getItemsInQuads(q_index);
-        for(unsigned int i=0; i<items_ahead.size(); i++)
-        {
-            evaluateItems(items_ahead[i],  kart_aim_angle, 
-                          &items_to_avoid, &items_to_collect);
-        }   // for i<items_ahead;
-        distance += QuadGraph::get()->getDistanceToNext(node, 
-                                                      m_successor_index[node]);
-        node = m_next_node_index[node];
-        // Stop when we have reached the last quad
-        if(node==last_node) break;
-    }   // while (distance < max_item_lookahead_distance)
-
-    core::line2df line_to_target(aim_point->getX(), 
-                                 aim_point->getZ(),
-                                 m_kart->getXYZ().getX(), 
-                                 m_kart->getXYZ().getZ());
-
-
     if(items_to_avoid.size()>0)
     {
         // If we need to steer to avoid an item, this takes priority,
@@ -641,11 +676,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
     if(items_to_collect.size()>0)
     {
         const Item *item_to_collect = items_to_collect[0];
-        core::vector2df collect(item_to_collect->getXYZ().getX(),
-                                item_to_collect->getXYZ().getZ());
-        core::vector2df cp = line_to_target.getClosestPoint(collect);
-        Vec3 xyz(cp.X, item_to_collect->getXYZ().getY(), cp.Y);
-        if(item_to_collect->hitKart(xyz, m_kart))
+        if(item_to_collect->hitLine(line_to_target, m_kart))
         {
 #ifdef AI_DEBUG
             m_item_sphere->setVisible(true);
@@ -796,14 +827,10 @@ bool SkiddingAI::steerToAvoid(const std::vector<const Item *> &items_to_avoid,
     }
     if(item_index>-1)
     {
-        core::vector2df point = 
-            items_to_avoid[item_index]->getXYZ().toIrrVector2d();
         // Even though we are on the side, we must make sure 
         // that we don't hit that item
-        core::vector2df close = line_to_target.getClosestPoint(point, true);
-        Vec3 close3d(close.X, m_kart->getXYZ().getY(), close.Y);
         // If we don't hit the item on the side, no more tests are necessary
-        if(!items_to_avoid[item_index]->hitKart(close3d, m_kart))
+        if(!items_to_avoid[item_index]->hitLine(line_to_target, m_kart))
             return false;
 
         // See if we can avoid this item by driving further to the side

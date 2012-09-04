@@ -211,9 +211,15 @@
            impossible). A value of 1/maxFPS / 2 will guarantee that
            the wheel can go from -1 to +1 steering in one frame, 
            basically  disabling this mechanism.
+         bad-item-closeness is the maximum distance between a good and a
+           bad item which can force the AI to abandon a good item in order
+           to avoid hitting a bad item. If the distance is larger, it is
+           assumed that there will be enough time to change steering
+           direction.
     -->
     <ai max-item-angle="0.7" max-item-angle-high-speed="0.3"
         time-full-steer="0.1"
+        bad-item-closeness="6"
     />
 
     <!-- Slipstream: length: How far behind a kart slipstream works

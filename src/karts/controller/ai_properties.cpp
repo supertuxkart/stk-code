@@ -29,6 +29,7 @@ AIProperties::AIProperties()
     m_max_item_angle            = UNDEFINED;
     m_max_item_angle_high_speed = UNDEFINED;
     m_time_full_steer           = UNDEFINED;
+    m_bad_item_closeness_2      = UNDEFINED;
 }   // AIProperties
 
 // ----------------------------------------------------------------------------
@@ -40,6 +41,11 @@ void AIProperties::load(const XMLNode *ai_node)
     ai_node->get("max-item-angle",            &m_max_item_angle           );
     ai_node->get("max-item-angle-high-speed", &m_max_item_angle_high_speed);
     ai_node->get("time-full-steer",           &m_time_full_steer          );
+    ai_node->get("bad-item-closeness",        &m_bad_item_closeness_2     );
+
+    // We actually need the square of the distance later
+    m_bad_item_closeness_2 *= m_bad_item_closeness_2;
+    
 }   // load
 
 // ----------------------------------------------------------------------------
@@ -56,6 +62,7 @@ void AIProperties::checkAllSet(const std::string &filename) const
     CHECK_NEG(m_max_item_angle,            "max-item-angle"           );
     CHECK_NEG(m_max_item_angle_high_speed, "max-item-angle-high-speed");
     CHECK_NEG(m_time_full_steer,           "time-full-steer"          );
+    CHECK_NEG(m_bad_item_closeness_2,      "bad-item-closeness"       );
 
 }   // checkAllSet
 
