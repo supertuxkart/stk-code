@@ -23,15 +23,15 @@
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
 #ifdef DEBUG
    // Enable AeI graphical debugging
-#  define AI_DEBUG
+#  undef AI_DEBUG
    // Shows left and right lines when using new findNonCrashing function
 #  undef AI_DEBUG_NEW_FIND_NON_CRASHING
    // Show the predicted turn circles
 #  undef AI_DEBUG_CIRCLES
    // Show the heading of the kart
-#  define AI_DEBUG_KART_HEADING
+#  undef AI_DEBUG_KART_HEADING
    // Shows line from kart to its aim point
-#  define AI_DEBUG_KART_AIM
+#  undef AI_DEBUG_KART_AIM
 #endif
 
 #include "karts/controller/skidding_ai.hpp"
@@ -611,21 +611,13 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
             if( d.length2_2d()>m_ai_properties->m_bad_item_closeness_2)
                 continue;
             // It could make sense to also test if the bad item would 
-            // actually be hit. But in (at least) one case steering
-            // after collecting m_item_to_collect causes it to then
+            // actually be hit, not only if it is close (which can result
+            // in false positives, i.e. stop collecting an item though
+            // it is not actually necessary). But in (at least) one case 
+            // steering after collecting m_item_to_collect causes it to then
             // collect the bad item (it's too close to avoid it at that
-            // time). So for now this test is actually disabled.
-#undef ADDITIONAL_TEST
-#ifdef ADDITIONAL_TEST            
-            core::line2df to_item(m_item_to_collect->getXYZ().toIrrVector2d(),
-                                  m_kart->getXYZ().toIrrVector2d());
-            if(items_to_avoid[i]->hitLine(to_item))
-            {
-                // Since from now on bad items will be tested before good
-                // items, the item will not be picked again as a collection
-                // target (till the bad items behind the kart).
-            }   // hitLine(to_item)
-#endif
+            // time). So for now here is no additional test, if we see
+            // false positives we can handle it here.
             m_item_to_collect = NULL;
             break;
         }   // for i<items_to_avoid.size()
