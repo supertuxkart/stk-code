@@ -960,7 +960,7 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
         // so 0 means straight ahead in world coordinates!).
         const Vec3 &xyz = item->getXYZ();
         float item_angle = atan2(xyz.getX() - m_kart->getXYZ().getX(),
-            xyz.getZ() - m_kart->getXYZ().getZ());
+                                 xyz.getZ() - m_kart->getXYZ().getZ());
 
         float diff = normalizeAngle(kart_aim_angle-item_angle);
 
@@ -981,14 +981,6 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
         if(fabsf(diff) > max_angle)
             return;
 
-        float steer_direction = normalizeAngle(m_kart->getHeading() 
-                                               - kart_aim_angle     );
-        float item_direction   = normalizeAngle(m_kart->getHeading() 
-                                                - item_angle         );
-        // If we have to steer to the left, and the item is to the right
-        // or vice versa, ignore the item.
-        if(!avoid && (steer_direction * item_direction < 0) )
-            return;
     }   // if !avoid
 
     // Now insert the item into the sorted list of items to avoid 
