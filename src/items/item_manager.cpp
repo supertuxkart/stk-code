@@ -78,6 +78,8 @@ void ItemManager::loadDefaultItemMeshes()
     item_names[Item::ITEM_NITRO_SMALL] = "nitro-small";
     item_names[Item::ITEM_TRIGGER    ] = "trigger";
 
+    item_names[Item::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
+    
     const std::string file_name = file_manager->getDataFile("items.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
     for(unsigned int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
@@ -238,8 +240,14 @@ void ItemManager::insertItem(Item *item)
 Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz, 
                            const Vec3 &normal, AbstractKart *parent)
 {
-    Item* item = new Item(type, xyz, normal, m_item_mesh[type], 
-                          m_item_lowres_mesh[type]);
+    Item::ItemType mesh_type = type;
+    if (type == Item::ITEM_BUBBLEGUM && parent->getIdent() == "nolok")
+    {
+        mesh_type = Item::ITEM_BUBBLEGUM_NOLOK;
+    }
+    
+    Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type], 
+                          m_item_lowres_mesh[mesh_type]);
 
     insertItem(item);
     if(parent != NULL) item->setParent(parent);

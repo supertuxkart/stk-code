@@ -72,6 +72,8 @@ public:
         ITEM_NITRO_BIG,
         ITEM_NITRO_SMALL,
         ITEM_BUBBLEGUM,
+        ITEM_BUBBLEGUM_NOLOK,
+        
         /** An invisible item that can be used to trigger some behavior when
           * approaching a point
           */
