@@ -81,7 +81,11 @@ Swatter::Swatter(AbstractKart *kart, bool was_bomb,
     {
         m_scene_node->setAnimationSpeed(0);   
     }
-    m_swat_sound = sfx_manager->createSoundSource("swatter");
+    
+    if (kart->getIdent() == "nolok")
+        m_swat_sound = sfx_manager->createSoundSource("hammer");
+    else
+        m_swat_sound = sfx_manager->createSoundSource("swatter");
 }   // Swatter
 
 // ----------------------------------------------------------------------------
