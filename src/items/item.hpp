@@ -127,6 +127,9 @@ private:
      *  this case the 'm_deactive_time' will also be set - see below. */ 
     const AbstractKart   *m_event_handler;
 
+    /** Kart that emitted this item if any */
+    const AbstractKart   *m_emitter;
+    
     /** Optionally if item was placed by a kart, a timer can be used to 
      *  temporarly deactivate collision so a kart is not hit by its own item */
     float         m_deactive_time;
@@ -171,6 +174,9 @@ public:
     void          reset();
     void          switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh);
     void          switchBack();
+    
+    const AbstractKart* getEmitter() const { return m_emitter; }
+    
     
     // ------------------------------------------------------------------------
     /** Returns true if the Kart is close enough to hit this item, the item is 

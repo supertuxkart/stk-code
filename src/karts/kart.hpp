@@ -79,6 +79,9 @@ private:
     /** True if kart is flying (for debug purposes only). */
     bool m_flying;
     
+    /** Set when hitting bubblegum */
+    bool m_has_caught_nolok_bubblegum;
+    
     /** Reset position. */
     btTransform  m_reset_transform;
 

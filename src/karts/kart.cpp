@@ -105,6 +105,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_invulnerable_time    = 0.0f;
     m_squash_time          = 0.0f;
     m_shadow_enabled       = false;
+
     m_shadow               = NULL;
     m_collision_particles  = NULL;
     m_slipstream           = NULL;
@@ -118,6 +119,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_stars_effect         = NULL;
     
     m_view_blocked_by_plunger = 0;
+    m_has_caught_nolok_bubblegum = false;
 
     // Initialize custom sound vector (TODO: add back when properly done)
     // m_custom_sounds.resize(SFXManager::NUM_CUSTOMS);
@@ -844,6 +846,8 @@ void Kart::collectedItem(Item *item, int add_info)
             break;
         }
     case Item::ITEM_BUBBLEGUM:
+        m_has_caught_nolok_bubblegum = (item->getEmitter() != NULL && item->getEmitter()->getIdent() == "nolok");
+        
         // slow down
         //m_body->setLinearVelocity(m_body->getLinearVelocity()*0.3f);
         m_bubblegum_time = 1.0f;
@@ -1151,13 +1155,14 @@ void Kart::update(float dt)
     ItemManager::get()->checkItemHit(this);
     
     static video::SColor pink(255, 255, 133, 253);
+    static video::SColor green(255, 61, 87, 23);
     
     // draw skidmarks if relevant (we force pink skidmarks on when hitting a bubblegum)
     if(m_kart_properties->getSkiddingProperties()->hasSkidmarks())
     {
         m_skidmarks->update(dt,
                             m_bubblegum_time > 0,
-                            (m_bubblegum_time > 0 ? &pink : NULL) );
+                            (m_bubblegum_time > 0 ? (m_has_caught_nolok_bubblegum ? &green : &pink) : NULL) );
     }
     
     const bool emergency = getKartAnimation()!=NULL;

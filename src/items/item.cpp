@@ -253,6 +253,7 @@ void Item::reset()
 void Item::setParent(AbstractKart* parent)
 {
     m_event_handler = parent;
+    m_emitter = parent;
     m_deactive_time = 1.5f;
 }   // setParent
 
