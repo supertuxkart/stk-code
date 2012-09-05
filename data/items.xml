@@ -8,5 +8,6 @@
        isn't an item, it is internally 
        handled as one, so list it here    -->
   <bubblegum   model="bubblegum.b3d"       lowmodel="bubblegum-low.b3d"       />
+  <bubblegum-nolok   model="bubblegum-nolok.b3d" lowmodel="bubblegum-nolok-low.b3d"/>
 </items>
 
