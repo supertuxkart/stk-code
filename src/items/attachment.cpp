@@ -378,6 +378,7 @@ void Attachment::update(float dt)
     case ATTACH_MAX:
         break;
     case ATTACH_SWATTER:
+    case ATTACH_NOLOKS_SWATTER:
         // Everything is done in the plugin.
         break;
     case ATTACH_BOMB:

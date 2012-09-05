@@ -91,6 +91,7 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
     m_original_lowmesh  = NULL;
     m_node              = NULL;
     m_listener          = trigger;
+    m_emitter           = NULL;
 }   // Item(xyz, distance, trigger)
 
 //-----------------------------------------------------------------------------
