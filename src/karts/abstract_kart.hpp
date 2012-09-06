@@ -24,6 +24,7 @@
 #include "karts/controller/kart_control.hpp"
 #include "race/race_manager.hpp"
 
+class AbstractKartAnimation;
 class Attachment;
 class btKart;
 class btQuaternion;
@@ -31,7 +32,6 @@ class btUprightConstraint;
 class Camera;
 class Controller;
 class Item;
-class AbstractKartAnimation;
 class KartModel;
 class KartProperties;
 class Material;
@@ -158,7 +158,7 @@ public:
                                                    { return m_kart_animation; }
     // ------------------------------------------------------------------------
     /** Sets a new kart animation. */
-    void setKartAnimation(AbstractKartAnimation *ka);
+    virtual void setKartAnimation(AbstractKartAnimation *ka);
     // ------------------------------------------------------------------------
 
     // ------------------------------------------------------------------------

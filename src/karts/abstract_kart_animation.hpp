@@ -53,12 +53,12 @@ public:
     virtual     ~AbstractKartAnimation();
     virtual void update(float dt);
     // ------------------------------------------------------------------------
+    /** Returns the current animation timer. */
     virtual float getAnimationTimer() const { return m_timer; }
-#ifdef DEBUG
+    // ------------------------------------------------------------------------
     /** To easily allow printing the name of the animation being used atm.
      *  Used in AstractKart in case of an incorrect sequence of calls. */
-    virtual const std::string getName() const { return m_name; }
-#endif
+    virtual const std::string &getName() const { return m_name; }
 
 };   // AbstractKartAnimation
 

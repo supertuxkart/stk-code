@@ -76,12 +76,16 @@ void KartWithStats::setKartAnimation(AbstractKartAnimation *ka)
     // Nothing to count if it's not a new animation
     if(!is_new) return;
 
-    if(dynamic_cast<ExplosionAnimation*>(ka))
+    // We can't use a dynamic cast here, since this function is called from
+    // constructor of AbstractKartAnimation, which is the base class for all
+    // animations. So at this stage ka is only an AbstractKartAnimation, not
+    // any of the derived classes.
+    if(ka && ka->getName()=="ExplosionAnimation")
     {
         m_explosion_count ++;
         m_explosion_time += ka->getAnimationTimer();
     }
-    else if(dynamic_cast<RescueAnimation*>(ka))
+    else if(ka && ka->getName()=="RescueAnimation")
     {
         m_rescue_count ++;
         m_rescue_time += ka->getAnimationTimer();
