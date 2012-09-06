@@ -216,15 +216,12 @@ void ProfileWorld::enterRaceOverState()
 
     // Print race statistics for each individual kart
     float min_t=999999.9f, max_t=0.0, av_t=0.0;
-    printf("name,start_position,end_position,time,");
-    
-    if (m_profile_mode==PROFILE_LAPS) {
-        printf("average_speed,");
-    }
-
-    printf("top_speed,skid_time,rescue_time,rescue_count,brake_count,"
+    printf("name,start_position,end_position,time,average_speed,top_speed,"
+           "skid_time,rescue_time,rescue_count,brake_count,"
            "explosion_time,explosion_count,bonus_count,banana_count,"
            "small_nitro_count,large_nitro_count,bubblegum_count\n");
+
+    std::set<std::string> all_groups;
 
     for ( KartList::size_type i = 0; i < m_karts.size(); ++i)
     {
@@ -235,32 +232,100 @@ void ProfileWorld::enterRaceOverState()
         av_t += kart->getFinishTime();
         printf("%s %s,", kart->getIdent().c_str(), 
                 kart->getController()->getControllerName().c_str());
-        printf("%d,", 1 + (int)i);
-        printf("%d,", kart->getPosition());
-        printf("%4.2f,", kart->getFinishTime());
-        if(m_profile_mode==PROFILE_LAPS)
-        {
-            float distance = race_manager->getNumLaps()
-                           * m_track->getTrackLength();
-            printf("%4.2f,", distance/kart->getFinishTime());
-        }
-        printf("%3.2f,", kart->getTopSpeed());
-        printf("%4.2f,", kart->getSkiddingTime());
-        printf("%4.2f,%d,", kart->getRescueTime(),
-                            kart->getRescueCount());
-        printf("%d,",       kart->getBrakeCount());
-        printf("%4.2f,%d,", kart->getExplosionTime(),
-                            kart->getExplosionCount() );
-        printf("%d,", kart->getBonusCount() );
-        printf("%d,", kart->getBananaCount() );
-        printf("%d,", kart->getSmallNitroCount() );
-        printf("%d,", kart->getLargeNitroCount() );
-        printf("%d", kart->getBubblegumCount() );
-        printf("\n");
+        all_groups.insert(kart->getController()->getControllerName());
+        printf("%d,%d,%4.2f,", 1 + (int)i, kart->getPosition(), kart->getFinishTime());
+        float distance = m_profile_mode==PROFILE_LAPS 
+                       ? race_manager->getNumLaps() : 1;
+        distance *= m_track->getTrackLength();
+        printf("%4.2f,%3.2f,%4.2f,%4.2f,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d\n", 
+               distance/kart->getFinishTime(), kart->getTopSpeed(),
+               kart->getSkiddingTime(), kart->getRescueTime(),
+               kart->getRescueCount(), kart->getBrakeCount(), 
+               kart->getExplosionTime(), kart->getExplosionCount(),
+               kart->getBonusCount(), kart->getBananaCount(), 
+               kart->getSmallNitroCount(), kart->getLargeNitroCount(), 
+               kart->getBubblegumCount() );
     }
 
     // Print group statistics of all karts
     printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_karts.size());
+
+    // Determine maximum length of group name
+    unsigned int max_len=4;   // for 'name' heading
+    for(std::set<std::string>::iterator it = all_groups.begin();
+        it !=all_groups.end(); it++)
+    {
+        if(it->size()>max_len) max_len = it->size();
+    }
+    max_len++;  // increase by 1 for one additional space after the name
+
+    printf("\nname");
+    for(unsigned int j=4; j<max_len; j++)
+        printf(" ");
+    printf("Strt End  Time    AvSp  Top   Skid  Resc Rsc  Brk Expl Exp Itm Ban SNitLNit Bub\n");
+
+    for(std::set<std::string>::iterator it = all_groups.begin();
+        it !=all_groups.end(); it++)
+    {
+        int   count         = 0,    position_gain = 0,    rescue_count = 0;
+        int   brake_count   = 0,    bonus_count   = 0,    banana_count = 0;
+        int   l_nitro_count = 0,    s_nitro_count = 0,    bubble_count = 0;
+        int   expl_count    = 0;
+        float skidding_time = 0.0f, rescue_time   = 0.0f, expl_time    = 0.0f;
+        float av_time       = 0.0f;
+        for ( unsigned int i = 0; i < m_karts.size(); ++i)
+        {
+            KartWithStats* kart = dynamic_cast<KartWithStats*>(m_karts[i]);
+            const std::string &name=kart->getController()->getControllerName();
+            if(name!=*it)
+                continue;
+            count ++;
+            printf("%s", name.c_str());
+            for(unsigned int j=name.size(); j<max_len; j++)
+                printf(" ");
+
+            printf("%4d %3d %6.2f ", 1 + i, kart->getPosition(), 
+                                     kart->getFinishTime());
+            position_gain += 1+i - kart->getPosition();
+
+            float distance = m_profile_mode==PROFILE_LAPS 
+                           ? race_manager->getNumLaps() : 1;
+            distance *= m_track->getTrackLength();
+            printf(" %4.2f %3.2f %6.2f %4.2f %3d %4d %4.2f %3d %3d %3d %3d %3d %3d\n",
+                   distance/kart->getFinishTime(), 
+                   kart->getTopSpeed(),
+                   kart->getSkiddingTime(),        kart->getRescueTime(),
+                   kart->getRescueCount(),         kart->getBrakeCount(),
+                   kart->getExplosionTime(),       kart->getExplosionCount(),
+                   kart->getBonusCount(),          kart->getBananaCount(),
+                   kart->getSmallNitroCount(),     kart->getLargeNitroCount(), 
+                   kart->getBubblegumCount()
+                   );
+            av_time += kart->getFinishTime();
+            skidding_time += kart->getSkiddingTime();
+            rescue_time   += kart->getRescueTime();
+            rescue_count  += kart->getRescueCount();
+            brake_count   += kart->getBrakeCount();
+            bonus_count   += kart->getBonusCount();
+            banana_count  += kart->getBananaCount();
+            l_nitro_count += kart->getLargeNitroCount();
+            s_nitro_count += kart->getSmallNitroCount();
+            bubble_count  += kart->getBubblegumCount();
+            expl_time     += kart->getExplosionTime();
+            expl_count    += kart->getExplosionCount();
+        }    // for i < m_karts.size
+        for(unsigned int j=0; j<max_len + 79; j++)
+            printf("-");
+        printf("\n%s", it->c_str());
+        for(unsigned int j=it->size(); j<max_len; j++)
+            printf(" ");
+        printf("%+4d     %6.2f %13s", position_gain, av_time/count, "");
+
+        printf("%6.2f %4.2f %3d %4d %4.2f %3d %3d %3d %3d %3d %3d\n\n",
+               skidding_time/count, rescue_time/count, rescue_count, 
+               brake_count/count, expl_time, expl_count, bonus_count, 
+               banana_count, s_nitro_count, l_nitro_count, bubble_count);
+    }   // for it !=all_groups.end
 
     main_loop->abort();
 }   // enterRaceOverState
