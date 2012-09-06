@@ -337,6 +337,7 @@ void Kart::reset()
     m_time_last_crash      = 0.0f;
     m_speed                = 0.0f;
     m_view_blocked_by_plunger = 0.0f;
+    m_has_caught_nolok_bubblegum = false;
     
     if(m_terrain_sound)
     {
