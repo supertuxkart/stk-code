@@ -64,7 +64,6 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo)
 CannonAnimation::~CannonAnimation()
 {
     delete m_curve;
-    float epsilon = 0.5f * m_kart->getKartHeight();
 
     btTransform pos;
     pos.setOrigin(m_kart->getXYZ());
