@@ -91,7 +91,6 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
     m_original_lowmesh  = NULL;
     m_node              = NULL;
     m_listener          = trigger;
-    m_emitter           = NULL;
 }   // Item(xyz, distance, trigger)
 
 //-----------------------------------------------------------------------------
@@ -109,6 +108,7 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
     m_original_type     = ITEM_NONE;
     m_deactive_time     = 0;
     m_time_till_return  = 0.0f;  // not strictly necessary, see isCollected()
+    m_emitter           = NULL;
     m_rotate            = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
     m_disappear_counter = m_type==ITEM_BUBBLEGUM 
                         ? stk_config->m_bubble_gum_counter
@@ -254,7 +254,7 @@ void Item::reset()
 void Item::setParent(AbstractKart* parent)
 {
     m_event_handler = parent;
-    m_emitter = parent;
+    m_emitter       = parent;
     m_deactive_time = 1.5f;
 }   // setParent
 
