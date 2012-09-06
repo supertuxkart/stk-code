@@ -61,6 +61,9 @@ private:
     /** How often the kart braked. */
     unsigned int m_brake_count;
 
+    /** How often the kart was off-track. */
+    unsigned int m_off_track_count;
+
     /** How much time was spent in rescue. */
     float        m_rescue_time;
 
@@ -113,6 +116,8 @@ public:
     /** Returns how long a kart was rescued all in all. */
     float getRescueTime() const { return m_rescue_time; }
     // ------------------------------------------------------------------------
+    /** Returns how often the kart was off track. */
+    unsigned int getOffTrackCount() const { return m_off_track_count; }
     // ------------------------------------------------------------------------
 
 };   // KartWithStats

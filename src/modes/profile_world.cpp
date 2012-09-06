@@ -237,14 +237,14 @@ void ProfileWorld::enterRaceOverState()
         float distance = m_profile_mode==PROFILE_LAPS 
                        ? race_manager->getNumLaps() : 1;
         distance *= m_track->getTrackLength();
-        printf("%4.2f,%3.2f,%4.2f,%4.2f,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d\n", 
+        printf("%4.2f,%3.2f,%4.2f,%4.2f,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d,%d\n", 
                distance/kart->getFinishTime(), kart->getTopSpeed(),
                kart->getSkiddingTime(), kart->getRescueTime(),
                kart->getRescueCount(), kart->getBrakeCount(), 
                kart->getExplosionTime(), kart->getExplosionCount(),
                kart->getBonusCount(), kart->getBananaCount(), 
                kart->getSmallNitroCount(), kart->getLargeNitroCount(), 
-               kart->getBubblegumCount() );
+               kart->getBubblegumCount(), kart->getOffTrackCount() );
     }
 
     // Print group statistics of all karts
@@ -262,16 +262,16 @@ void ProfileWorld::enterRaceOverState()
     printf("\nname");
     for(unsigned int j=4; j<max_len; j++)
         printf(" ");
-    printf("Strt End  Time    AvSp  Top   Skid  Resc Rsc  Brk Expl Exp Itm Ban SNitLNit Bub\n");
+    printf("Strt End  Time    AvSp  Top   Skid  Resc Rsc Brake Expl Exp Itm Ban SNitLNit Bub  Off\n");
 
     for(std::set<std::string>::iterator it = all_groups.begin();
         it !=all_groups.end(); it++)
     {
-        int   count         = 0,    position_gain = 0,    rescue_count = 0;
-        int   brake_count   = 0,    bonus_count   = 0,    banana_count = 0;
-        int   l_nitro_count = 0,    s_nitro_count = 0,    bubble_count = 0;
-        int   expl_count    = 0;
-        float skidding_time = 0.0f, rescue_time   = 0.0f, expl_time    = 0.0f;
+        int   count         = 0,    position_gain   = 0,    rescue_count = 0;
+        int   brake_count   = 0,    bonus_count     = 0,    banana_count = 0;
+        int   l_nitro_count = 0,    s_nitro_count   = 0,    bubble_count = 0;
+        int   expl_count    = 0,    off_track_count = 0;
+        float skidding_time = 0.0f, rescue_time     = 0.0f, expl_time    = 0.0f;
         float av_time       = 0.0f;
         for ( unsigned int i = 0; i < m_karts.size(); ++i)
         {
@@ -291,7 +291,7 @@ void ProfileWorld::enterRaceOverState()
             float distance = m_profile_mode==PROFILE_LAPS 
                            ? race_manager->getNumLaps() : 1;
             distance *= m_track->getTrackLength();
-            printf(" %4.2f %3.2f %6.2f %4.2f %3d %4d %4.2f %3d %3d %3d %3d %3d %3d\n",
+            printf(" %4.2f %3.2f %6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d\n",
                    distance/kart->getFinishTime(), 
                    kart->getTopSpeed(),
                    kart->getSkiddingTime(),        kart->getRescueTime(),
@@ -299,32 +299,35 @@ void ProfileWorld::enterRaceOverState()
                    kart->getExplosionTime(),       kart->getExplosionCount(),
                    kart->getBonusCount(),          kart->getBananaCount(),
                    kart->getSmallNitroCount(),     kart->getLargeNitroCount(), 
-                   kart->getBubblegumCount()
+                   kart->getBubblegumCount(),      kart->getOffTrackCount()
                    );
+            printf("nitro %f\n", kart->getEnergy());
             av_time += kart->getFinishTime();
-            skidding_time += kart->getSkiddingTime();
-            rescue_time   += kart->getRescueTime();
-            rescue_count  += kart->getRescueCount();
-            brake_count   += kart->getBrakeCount();
-            bonus_count   += kart->getBonusCount();
-            banana_count  += kart->getBananaCount();
-            l_nitro_count += kart->getLargeNitroCount();
-            s_nitro_count += kart->getSmallNitroCount();
-            bubble_count  += kart->getBubblegumCount();
-            expl_time     += kart->getExplosionTime();
-            expl_count    += kart->getExplosionCount();
+            skidding_time   += kart->getSkiddingTime();
+            rescue_time     += kart->getRescueTime();
+            rescue_count    += kart->getRescueCount();
+            brake_count     += kart->getBrakeCount();
+            bonus_count     += kart->getBonusCount();
+            banana_count    += kart->getBananaCount();
+            l_nitro_count   += kart->getLargeNitroCount();
+            s_nitro_count   += kart->getSmallNitroCount();
+            bubble_count    += kart->getBubblegumCount();
+            expl_time       += kart->getExplosionTime();
+            expl_count      += kart->getExplosionCount();
+            off_track_count += kart->getOffTrackCount();
         }    // for i < m_karts.size
-        for(unsigned int j=0; j<max_len + 79; j++)
+        for(unsigned int j=0; j<max_len + 85; j++)
             printf("-");
         printf("\n%s", it->c_str());
         for(unsigned int j=it->size(); j<max_len; j++)
             printf(" ");
         printf("%+4d     %6.2f %13s", position_gain, av_time/count, "");
 
-        printf("%6.2f %4.2f %3d %4d %4.2f %3d %3d %3d %3d %3d %3d\n\n",
+        printf("%6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d\n\n",
                skidding_time/count, rescue_time/count, rescue_count, 
-               brake_count/count, expl_time, expl_count, bonus_count, 
-               banana_count, s_nitro_count, l_nitro_count, bubble_count);
+               brake_count, expl_time, expl_count, bonus_count, 
+               banana_count, s_nitro_count, l_nitro_count, bubble_count,
+               off_track_count);
     }   // for it !=all_groups.end
 
     main_loop->abort();

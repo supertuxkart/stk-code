@@ -21,6 +21,7 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/rescue_animation.hpp"
 #include "items/item.hpp"
+#include "modes/linear_world.hpp"
 
 KartWithStats::KartWithStats(const std::string& ident, 
                              unsigned int world_kart_id,
@@ -47,6 +48,7 @@ void KartWithStats::reset()
     m_large_nitro_count = 0;
     m_bubblegum_count   = 0;
     m_brake_count       = 0;
+    m_off_track_count   = 0;
     Kart::reset();
 }   // reset
 
@@ -63,6 +65,9 @@ void KartWithStats::update(float dt)
         m_skidding_time += dt;
     if(getControls().m_brake)
         m_brake_count ++;
+    LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
+    if(world && !world->isOnRoad(getWorldKartId()))
+        m_off_track_count ++;
 }   // update
 
 // ----------------------------------------------------------------------------
