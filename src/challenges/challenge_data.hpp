@@ -112,6 +112,7 @@ public:
     void  setId(const std::string& s)          { m_id = s;                 }
     
     const std::string& getTrackId() const      { return m_track_id;        }
+    const std::string& getGPId() const         { return m_gp_id;           }
 
     int   getNumLaps() const                   { return m_num_laps;        }
 

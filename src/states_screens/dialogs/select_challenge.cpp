@@ -25,6 +25,7 @@
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
+#include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/select_challenge.hpp"
 #include "tracks/track_manager.hpp"
@@ -116,8 +117,16 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     medium_label->setText( getLabel(RaceManager::RD_MEDIUM, c->getData()), false );
     expert_label->setText( getLabel(RaceManager::RD_HARD,   c->getData()), false );
     
-    const wchar_t* track_name = track_manager->getTrack(c->getData()->getTrackId())->getName();
-    getWidget<LabelWidget>("title")->setText( track_name, true );
+    if (c->getData()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        const GrandPrixData* gp = grand_prix_manager->getGrandPrix(c->getData()->getGPId());
+        getWidget<LabelWidget>("title")->setText( gp->getName(), true );
+    }
+    else
+    {
+        const wchar_t* track_name = track_manager->getTrack(c->getData()->getTrackId())->getName();
+        getWidget<LabelWidget>("title")->setText( track_name, true );
+    }
 }
 
 // ----------------------------------------------------------------------------

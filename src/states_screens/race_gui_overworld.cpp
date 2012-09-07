@@ -42,6 +42,7 @@ using namespace irr;
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
+#include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -422,20 +423,39 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 break;
             }
             
-            Track* track = track_manager->getTrack(challenge->getTrackId());
-            if (track == NULL)
+            if (challenge->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
             {
-                fprintf(stderr, "[RaceGUIOverworld] ERROR: Cannot find track <%s>, "
-                        "referenced from challenge <%s>\n",
-                        challenge->getTrackId().c_str(),
-                        challenges[n].m_challenge_id.c_str());
-                break;
+                const GrandPrixData* gp = grand_prix_manager->getGrandPrix(challenge->getGPId());
+                
+                if (gp == NULL)
+                {
+                    fprintf(stderr, "[RaceGUIOverworld] ERROR: Cannot find GP <%s>, "
+                            "referenced from challenge <%s>\n",
+                            challenge->getGPId().c_str(),
+                            challenges[n].m_challenge_id.c_str());
+                    break;
+                }
+                
+                gui::ScalableFont* font = GUIEngine::getTitleFont();
+                font->draw(gp->getName(), pos, video::SColor(255,255,255,255),
+                           false, true /* vcenter */, NULL);
             }
-            
-            gui::ScalableFont* font = GUIEngine::getTitleFont();
-            font->draw(track->getName(), pos, video::SColor(255,255,255,255),
-                       false, true /* vcenter */, NULL);
-            
+            else
+            {
+                Track* track = track_manager->getTrack(challenge->getTrackId());
+                if (track == NULL)
+                {
+                    fprintf(stderr, "[RaceGUIOverworld] ERROR: Cannot find track <%s>, "
+                            "referenced from challenge <%s>\n",
+                            challenge->getTrackId().c_str(),
+                            challenges[n].m_challenge_id.c_str());
+                    break;
+                }
+                
+                gui::ScalableFont* font = GUIEngine::getTitleFont();
+                font->draw(track->getName(), pos, video::SColor(255,255,255,255),
+                           false, true /* vcenter */, NULL);
+            }
             
             pos.UpperLeftCorner.Y += GUIEngine::getTitleFontHeight();
             pos.LowerRightCorner.Y = UserConfigParams::m_height;

@@ -950,23 +950,29 @@ bool Track::loadMainTrack(const XMLNode &root)
                 
                 m_challenges.push_back( OverworldChallenge(xyz, challenge) );
                 
-                Track* t = track_manager->getTrack(c->getTrackId());
-                if (t == NULL)
+                if (c->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
                 {
-                    fprintf(stderr, "[WARNING] Cannot find track named <%s>\n", c->getTrackId().c_str());
-                    continue;
+                    
                 }
-                
-                std::string sshot = t->getScreenshotFile();
-                video::ITexture* screenshot = irr_driver->getTexture(sshot);
-                
-                if (screenshot == NULL)
+                else
                 {
-                    fprintf(stderr, "[WARNING] Cannot find track screenshot <%s>\n", sshot.c_str());
-                    continue;
+                    Track* t = track_manager->getTrack(c->getTrackId());
+                    if (t == NULL)
+                    {
+                        fprintf(stderr, "[WARNING] Cannot find track named <%s>\n", c->getTrackId().c_str());
+                        continue;
+                    }
+                    
+                    std::string sshot = t->getScreenshotFile();
+                    video::ITexture* screenshot = irr_driver->getTexture(sshot);
+                    
+                    if (screenshot == NULL)
+                    {
+                        fprintf(stderr, "[WARNING] Cannot find track screenshot <%s>\n", sshot.c_str());
+                        continue;
+                    }
+                    scene_node->getMaterial(0).setTexture(0, screenshot);
                 }
-                
-                scene_node->getMaterial(0).setTexture(0, screenshot);
 
                 // make transparent
                 for (unsigned int m=0; m<a_mesh->getMeshBufferCount(); m++)
