@@ -128,7 +128,37 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
         setSkiddingFraction(2.0f);
         break;
     }
-    
+
+    m_use_new_aim_point_selection = false;
+    setControllerName("Skidding");
+
+    // Use this define in order to compare the impact of collecting items
+#undef COMPARE_AIS
+#ifdef COMPARE_AIS
+    std::string name("");
+    if(m_kart->getWorldKartId() % 1 !=0)
+    {
+        m_item_behaviour = ITEM_COLLECT_NONE;
+        name += "Skidding";
+    }
+    else
+    {
+        m_item_behaviour = ITEM_COLLECT_PRIORITY;
+        name += "Collect";
+    }
+
+    if(m_kart->getWorldKartId() % 1 ==1)
+    {
+        m_use_new_aim_point_selection = true;
+        name += " new";
+    }
+    else
+    {
+        m_use_new_aim_point_selection = false;
+    }
+    setControllerName(name);
+#endif
+
     m_superpower = race_manager->getAISuperPower();
 
 #ifdef AI_DEBUG
@@ -150,8 +180,12 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
                                    irr::video::SColor(128,   0,   0, 128));
 #endif
 #ifdef AI_DEBUG_KART_HEADING
-    m_curve[CURVE_KART]      = new ShowCurve(0.5f, 0.5f, 
-                                   irr::video::SColor(128,   0,   0, 128));
+    irr::video::SColor c;
+    if(m_item_behaviour == ITEM_COLLECT_PRIORITY)
+        c = irr::video::SColor(128,   0,   0, 128);
+    else
+        c = irr::video::SColor(128,   0, 128,   0);
+    m_curve[CURVE_KART]      = new ShowCurve(0.5f, 0.5f, c);
 #endif
 #ifdef AI_DEBUG_NEW_FIND_NON_CRASHING
     m_curve[CURVE_LEFT]      = new ShowCurve(0.5f, 0.5f, 
@@ -162,11 +196,15 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
     m_curve[CURVE_QG]        = new ShowCurve(0.5f, 0.5f, 
                                    irr::video::SColor(128,   0, 128,   0));
 #ifdef AI_DEBUG_KART_AIM
-    m_curve[CURVE_AIM]       = new ShowCurve(0.5f, 0.5f, 
-                                   irr::video::SColor(128,   0,   0, 128));
+    if(m_item_behaviour == ITEM_COLLECT_PRIORITY)
+        c = irr::video::SColor(128,   0,   0, 128);
+    else
+        c = irr::video::SColor(128,   0, 128,   0);
+
+    m_curve[CURVE_AIM]       = new ShowCurve(0.5f, 0.5f, c);
 #endif
 #endif
-    setControllerName("Skidding");
+
 
 }   // SkiddingAI
 
@@ -516,12 +554,12 @@ void SkiddingAI::handleSteering(float dt)
         m_start_kart_crash_direction = 0;
         Vec3 aim_point;
         int last_node = QuadGraph::UNKNOWN_SECTOR;
-#undef NEW_ALGORITHM
-#ifdef NEW_ALGORITHM
-        findNonCrashingPoint2(&aim_point, &last_node);
-#else
-        findNonCrashingPoint(&aim_point, &last_node);
-#endif
+
+        if(m_use_new_aim_point_selection)
+            findNonCrashingPoint2(&aim_point, &last_node);
+        else
+            findNonCrashingPoint(&aim_point, &last_node);
+
 #ifdef AI_DEBUG
         m_debug_sphere->setPosition(aim_point.toIrrVector());
 #endif
@@ -1347,7 +1385,7 @@ void SkiddingAI::handleNitroAndZipper()
     // Don't use nitro if we are braking
     if(m_controls->m_brake) return;
 
-    // Don't use nitro if the kart doesn't have any or is not on ground.
+    // Don't use nitro if the kart is not on ground or has finished the race
     if(!m_kart->isOnGround() || m_kart->hasFinishedRace()) return;
     
     // Don't compute nitro usage if we don't have nitro or are not supposed
@@ -1562,15 +1600,15 @@ void SkiddingAI::findNonCrashingPoint2(Vec3 *result, int *last_node)
     core::line2df right(xz, q[RIGHT_END_POINT].toIrrVector2d());
 
 #if defined(AI_DEBUG) && defined(AI_DEBUG_NEW_FIND_NON_CRASHING)
-    const Vec3 eps(0,0.5f,0);
+    const Vec3 eps1(0,0.5f,0);
     m_curve[CURVE_LEFT]->clear();
-    m_curve[CURVE_LEFT]->addPoint(m_kart->getXYZ()+eps);
-    m_curve[CURVE_LEFT]->addPoint(q[LEFT_END_POINT]+eps);
-    m_curve[CURVE_LEFT]->addPoint(m_kart->getXYZ()+eps);
+    m_curve[CURVE_LEFT]->addPoint(m_kart->getXYZ()+eps1);
+    m_curve[CURVE_LEFT]->addPoint(q[LEFT_END_POINT]+eps1);
+    m_curve[CURVE_LEFT]->addPoint(m_kart->getXYZ()+eps1);
     m_curve[CURVE_RIGHT]->clear();
-    m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps);
-    m_curve[CURVE_RIGHT]->addPoint(q[RIGHT_END_POINT]+eps);
-    m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps);
+    m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps1);
+    m_curve[CURVE_RIGHT]->addPoint(q[RIGHT_END_POINT]+eps1);
+    m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps1);
 #endif
 #ifdef AI_DEBUG_KART_HEADING
     const Vec3 eps(0,0.5f,0);
@@ -1619,7 +1657,7 @@ void SkiddingAI::findNonCrashingPoint2(Vec3 *result, int *last_node)
         }
         *last_node = next_sector;
     }   // while
-    
+
     // Now look for the next curve to find out to which side of the
     // track the AI should aim at
 

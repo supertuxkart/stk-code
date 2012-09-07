@@ -124,7 +124,8 @@ private:
   
     float m_time_since_stuck;
 
-    int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
+    /** Direction of crash: -1 = left, 1 = right, 0 = no crash. */
+    int m_start_kart_crash_direction; 
 
     /** The direction of the track where the kart is on atm. */
     GraphNode::DirectionType m_current_track_direction;
@@ -144,6 +145,9 @@ private:
 
     /** If set an item that the AI should aim for. */
     const Item *m_item_to_collect;
+
+    /** True if the new findNonCrashingPoint2 function should be used. */
+    bool m_use_new_aim_point_selection;
 
 #ifdef DEBUG
     /** For skidding debugging: shows the estimated turn shape. */
