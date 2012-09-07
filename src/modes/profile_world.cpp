@@ -234,8 +234,8 @@ void ProfileWorld::enterRaceOverState()
                 kart->getController()->getControllerName().c_str());
         all_groups.insert(kart->getController()->getControllerName());
         printf("%d,%d,%4.2f,", 1 + (int)i, kart->getPosition(), kart->getFinishTime());
-        float distance = m_profile_mode==PROFILE_LAPS 
-                       ? race_manager->getNumLaps() : 1;
+        float distance = (float)(m_profile_mode==PROFILE_LAPS 
+                                 ? race_manager->getNumLaps() : 1);
         distance *= m_track->getTrackLength();
         printf("%4.2f,%3.2f,%4.2f,%4.2f,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d,%d\n", 
                distance/kart->getFinishTime(), kart->getTopSpeed(),
@@ -288,8 +288,8 @@ void ProfileWorld::enterRaceOverState()
                                      kart->getFinishTime());
             position_gain += 1+i - kart->getPosition();
 
-            float distance = m_profile_mode==PROFILE_LAPS 
-                           ? race_manager->getNumLaps() : 1;
+            float distance = (float)(m_profile_mode==PROFILE_LAPS 
+                                     ? race_manager->getNumLaps() : 1);
             distance *= m_track->getTrackLength();
             printf(" %4.2f %3.2f %6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d\n",
                    distance/kart->getFinishTime(), 
