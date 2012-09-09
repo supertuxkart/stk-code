@@ -329,6 +329,6 @@ void ProfileWorld::enterRaceOverState()
                banana_count, s_nitro_count, l_nitro_count, bubble_count,
                off_track_count);
     }   // for it !=all_groups.end
-
+    delete this;
     main_loop->abort();
 }   // enterRaceOverState
