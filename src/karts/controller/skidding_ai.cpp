@@ -23,7 +23,7 @@
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
 #ifdef DEBUG
    // Enable AeI graphical debugging
-#  undef AI_DEBUG
+#  define AI_DEBUG
    // Shows left and right lines when using new findNonCrashing function
 #  undef AI_DEBUG_NEW_FIND_NON_CRASHING
    // Show the predicted turn circles
@@ -31,7 +31,7 @@
    // Show the heading of the kart
 #  undef AI_DEBUG_KART_HEADING
    // Shows line from kart to its aim point
-#  undef AI_DEBUG_KART_AIM
+#  define AI_DEBUG_KART_AIM
 #endif
 
 #include "karts/controller/skidding_ai.hpp"
@@ -196,12 +196,13 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
     m_curve[CURVE_QG]        = new ShowCurve(0.5f, 0.5f, 
                                    irr::video::SColor(128,   0, 128,   0));
 #ifdef AI_DEBUG_KART_AIM
+    irr::video::SColor c1;
     if(m_item_behaviour == ITEM_COLLECT_PRIORITY)
-        c = irr::video::SColor(128,   0,   0, 128);
+        c1 = irr::video::SColor(128,   0,   0, 128);
     else
-        c = irr::video::SColor(128,   0, 128,   0);
+        c1 = irr::video::SColor(128,   0, 128,   0);
 
-    m_curve[CURVE_AIM]       = new ShowCurve(0.5f, 0.5f, c);
+    m_curve[CURVE_AIM]       = new ShowCurve(0.5f, 0.5f, c1);
 #endif
 #endif
 
@@ -240,6 +241,7 @@ void SkiddingAI::reset()
     m_curve_center               = Vec3(0,0,0);
     m_current_track_direction    = GraphNode::DIR_STRAIGHT;
     m_item_to_collect            = NULL;
+    m_avoid_item_close           = false;
 
     AIBaseController::reset();
     m_track_node               = QuadGraph::UNKNOWN_SECTOR;
@@ -392,11 +394,12 @@ void SkiddingAI::update(float dt)
             handleNitroAndZipper();
     }
     // If we are supposed to use nitro, but have a zipper, 
-    // use the zipper instead
+    // use the zipper instead (unless there are items to avoid cloe by)
     if(m_controls->m_nitro && 
         m_kart->getPowerup()->getType()==PowerupManager::POWERUP_ZIPPER && 
         m_kart->getSpeed()>1.0f && 
-        m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0)
+        m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0 &&
+        !m_avoid_item_close)
     {
         // Make sure that not all AI karts use the zipper at the same
         // time in time trial at start up, so during the first 5 seconds
@@ -626,7 +629,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
         if(node==last_node) break;
     }   // while (distance < max_item_lookahead_distance)
 
-
+    m_avoid_item_close = items_to_avoid.size()>0;
 
     core::line2df line_to_target(aim_point->getX(), 
                                  aim_point->getZ(),
@@ -1396,6 +1399,11 @@ void SkiddingAI::handleNitroAndZipper()
           m_item_tactic==IT_TEN_SECONDS                                    ) )
         return;
 
+    // If there are items to avoid close, and we only have zippers, don't
+    // use them (since this make it harder to avoid items).
+    if(m_avoid_item_close &&
+        (m_kart->getEnergy()==0|| m_nitro_level==NITRO_NONE) )
+        return;
     // If a parachute or anvil is attached, the nitro doesn't give much
     // benefit. Better wait till later.
     const bool has_slowdown_attachment = 
@@ -1459,6 +1467,24 @@ void SkiddingAI::handleNitroAndZipper()
         return;
     }
     
+    if(m_kart->getPowerup()->getType()==PowerupManager::POWERUP_ZIPPER &&
+        m_kart->getSpeed()>1.0f && 
+        m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0)
+    {
+        GraphNode::DirectionType dir;
+        unsigned int last;
+        const GraphNode &gn = QuadGraph::get()->getNode(m_track_node);
+        gn.getDirectionData(m_successor_index[m_track_node], &dir, &last);
+        if(dir==GraphNode::DIR_STRAIGHT)
+        {
+            float diff = QuadGraph::get()->getDistanceFromStart(last)
+                       - QuadGraph::get()->getDistanceFromStart(m_track_node);
+            if(diff<0) diff+=World::getWorld()->getTrack()->getTrackLength();
+            if(diff>m_ai_properties->m_straight_length_for_zipper)
+                m_controls->m_fire = true;
+        }
+        
+    }
 }   // handleNitroAndZipper
 
 //-----------------------------------------------------------------------------

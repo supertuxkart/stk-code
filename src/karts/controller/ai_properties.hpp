@@ -64,6 +64,9 @@ protected:
      *   of karts). */
     float m_time_full_steer;
 
+    /** Minimum length of a straight in order to activate a zipper. */
+    float m_straight_length_for_zipper;
+
 public:
 
          AIProperties();

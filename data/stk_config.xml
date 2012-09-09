@@ -216,10 +216,13 @@
            to avoid hitting a bad item. If the distance is larger, it is
            assumed that there will be enough time to change steering
            direction.
+         straight-length-for-zipper is the minimum length a straight
+           section of the track should have in order to activate a zipper.
     -->
     <ai max-item-angle="0.7" max-item-angle-high-speed="0.3"
         time-full-steer="0.1"
         bad-item-closeness="6"
+        straight-length-for-zipper="35"
     />
 
     <!-- Slipstream: length: How far behind a kart slipstream works

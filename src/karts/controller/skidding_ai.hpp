@@ -146,6 +146,10 @@ private:
     /** If set an item that the AI should aim for. */
     const Item *m_item_to_collect;
 
+    /** True if items to avoid are close by. Used to avoid using zippers
+     *  (which would make it more difficult to avoid items). */
+    bool m_avoid_item_close;
+
     /** True if the new findNonCrashingPoint2 function should be used. */
     bool m_use_new_aim_point_selection;
 
