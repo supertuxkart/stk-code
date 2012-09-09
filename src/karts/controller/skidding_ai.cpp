@@ -23,7 +23,7 @@
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
 #ifdef DEBUG
    // Enable AeI graphical debugging
-#  define AI_DEBUG
+#  undef AI_DEBUG
    // Shows left and right lines when using new findNonCrashing function
 #  undef AI_DEBUG_NEW_FIND_NON_CRASHING
    // Show the predicted turn circles
@@ -31,7 +31,7 @@
    // Show the heading of the kart
 #  undef AI_DEBUG_KART_HEADING
    // Shows line from kart to its aim point
-#  define AI_DEBUG_KART_AIM
+#  undef AI_DEBUG_KART_AIM
 #endif
 
 #include "karts/controller/skidding_ai.hpp"
@@ -136,7 +136,7 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
 #undef COMPARE_AIS
 #ifdef COMPARE_AIS
     std::string name("");
-    if(m_kart->getWorldKartId() % 1 !=0)
+    if(m_kart->getWorldKartId() % 2 ==0)
     {
         m_item_behaviour = ITEM_COLLECT_NONE;
         name += "Skidding";
