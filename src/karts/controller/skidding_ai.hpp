@@ -182,11 +182,12 @@ private:
     void  computeNearestKarts();
     void  handleItemCollectionAndAvoidance(Vec3 *aim_point, 
                                            int last_node);
-    bool  handleSelectedItem(float kart_aim_angle, Vec3 *aim_point, 
-                             int last_node);
+    bool  handleSelectedItem(float kart_aim_angle, Vec3 *aim_point);
     bool  steerToAvoid(const std::vector<const Item *> &items_to_avoid,
                        const core::line2df &line_to_target,
                        Vec3 *aim_point);
+    bool  hitBadItemWhenAimAt(const Item *item, 
+                              const std::vector<const Item *> &items_to_avoid);
     void  evaluateItems(const Item *item, float kart_aim_angle, 
                         std::vector<const Item *> *items_to_avoid,
                         std::vector<const Item *> *items_to_collect);

@@ -23,15 +23,15 @@
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
 #ifdef DEBUG
    // Enable AeI graphical debugging
-#  undef AI_DEBUG
+#  define AI_DEBUG
    // Shows left and right lines when using new findNonCrashing function
 #  undef AI_DEBUG_NEW_FIND_NON_CRASHING
    // Show the predicted turn circles
 #  undef AI_DEBUG_CIRCLES
    // Show the heading of the kart
-#  undef AI_DEBUG_KART_HEADING
+#  define AI_DEBUG_KART_HEADING
    // Shows line from kart to its aim point
-#  undef AI_DEBUG_KART_AIM
+#  define AI_DEBUG_KART_AIM
 #endif
 
 #include "karts/controller/skidding_ai.hpp"
@@ -587,6 +587,50 @@ void SkiddingAI::handleSteering(float dt)
 //-----------------------------------------------------------------------------
 /** Decides if the currently selected aim at point (as determined by 
  *  handleSteering) should be changed in order to collect/avoid an item.
+ *  There are 5 potential phases:
+ *  1) Collect all items close by and sort them by items-to-avoid and 
+ *     items-to-collect. 'Close by' are all items between the current
+ *     graph node the kart is on and the graph node the aim_point is on.
+ *     The function evaluateItems() filters those items: atm all items-to-avoid
+ *     are collected, and all items-to-collect that are not too far away from
+ *     the intended driving direction (i.e. don't require a too sharp steering
+ *     change).
+ *  2) If a pre-selected item (see phase 5) exists, and items-to-avoid which
+ *     might get hit if the pre-selected item is collected, the pre-selected
+ *     item is unselected. This can happens if e.g. items-to-avoid are behind
+ *     the pre-selected items on a different graph node and were therefore not
+ *     evaluated then the now pre-selected item was selected initially.
+ *  3) If a pre-selected item exists, the kart will steer towards it. The AI
+ *     does a much better job of collecting items if after selecting an item
+ *     it tries to collect this item even if it doesn't fulfill the original
+ *     conditions to be selected in the first place anymore. Example: An item
+ *     was selected to be collected because the AI was hitting it anyway. Then
+ *     the aim_point changes, and the selected item is not that close anymore.
+ *     In many cases it is better to keep on aiming for the items (otherwise
+ *     the aiming will not have much benefit and mostly only results in 
+ *     collecting items that are on long straights).
+ *     At this stage because of phase 2) it is certain that no item-to-avoid 
+ *     will be hit. The function handleSelectedItem() evaluates if it is still
+ *     feasible to collect them item (if the kart has already passed the item
+ *     it won't reverse to collect it). If the item is still to be aimed for,
+ *     adjust the aim_point and return.
+ *  4) Make sure to avoid any items-to-avoid. The function steerToAvoid
+ *     selects a new aim point if otherwise an item-to-avoid would be hit.
+ *     If this is the case, aim_point is adjused and control returns to the
+ *     caller.
+ *  5) Try to collect an item-to-collect. Select the closest item to the
+ *     kart (which in case of a row of items will be the item the kart
+ *     is roughly driving towards to anyway). It is then tested if the kart
+ *     would hit any item-to-avoid when driving towards this item - if so
+ *     the driving direction is not changed and the function returns. 
+ *     Otherwise, i.e. no items-to-avoid will be hit, it is evaluated if
+ *     the kart is (atm) going to hit it anyway. In this case, the item is
+ *     selected (see phase 2 and 3). If on the other hand the item is not 
+ *     too far our of the way, aim_point is adjusted to drive towards
+ *     this item (but it is not selected, so the item will be discarded if
+ *     the kart is getting too far away from it). Ideally later as the
+ *     kart is steering towards this item the item will be selected.
+ *
  *  \param aim_point Currently selected point to aim at. If the AI should
  *         try to collect an item, this value will be changed.
  *  \param last_node Index of the graph node on which the aim_point is.
@@ -610,7 +654,8 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
     std::vector<const Item *> items_to_collect;
     std::vector<const Item *> items_to_avoid;
 
-
+    // 1) Filter and sort all items close by
+    // -------------------------------------
     const float max_item_lookahead_distance = 30.f;
     while(distance < max_item_lookahead_distance)
     {
@@ -636,13 +681,11 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
                                  m_kart->getXYZ().getX(), 
                                  m_kart->getXYZ().getZ());
 
-
-
-
-
-    // If the kart is aiming for an item, but (suddenly) detects some
-    // clos- by items to avoid, the kart cancels collecting the item if 
-    // this could cause the avoidance item to be collected
+    // 2) If the kart is aiming for an item, but (suddenly) detects 
+    //    some close-by items to avoid (e.g. behind the item, which was too
+    //    far away to be considered earlier), the kart cancels collecting
+    //    the item if this could cause the item-to-avoid to be collected.
+    // --------------------------------------------------------------------
     if(m_item_to_collect && items_to_avoid.size()>0)
     {
         for(unsigned int i=0; i< items_to_avoid.size(); i++)
@@ -662,17 +705,13 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
             break;
         }   // for i<items_to_avoid.size()
     }   // if m_item_to_collect && items_to_avoid.size()>0
-    // The AI does a much better job of collecting items if after selecting
-    // an item it tries to collect this item even if it doesn't fulfill the
-    // original conditions to be selected in the first place anymore. 
-    // Example: An item was selected to be collected because the AI was 
-    // hitting it anyway. Then the aim_point changes, and the selected item
-    // is not that close anymore. In many cases it is better to keep on
-    // aiming for the items (otherwise the aiming will not have much benefit
-    // and mostly only results in collecting items that are on long straights)
+
+
+    // 3) Steer towards a pre-selected item
+    // -------------------------------------
     if(m_item_to_collect)
     {
-        if(handleSelectedItem(kart_aim_angle, aim_point, last_node))
+        if(handleSelectedItem(kart_aim_angle, aim_point))
         {
             // Still aim at the previsouly selected item.
             *aim_point = m_item_to_collect->getXYZ();
@@ -690,7 +729,8 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
         m_item_to_collect = NULL;
     }   // m_item_to_collect
 
-
+    // 4) Avoid items-to-avoid
+    // -----------------------
     if(items_to_avoid.size()>0)
     {
         // If we need to steer to avoid an item, this takes priority,
@@ -705,63 +745,97 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
         }
     }
 
+    // 5) Try to aim for items-to-collect
+    // ----------------------------------
     if(items_to_collect.size()>0)
     {
         const Item *item_to_collect = items_to_collect[0];
-        if(item_to_collect->hitLine(line_to_target, m_kart))
+        // Test if we would hit a bad item when aiming at this good item.
+        // If so, don't change the aim. In this case it has already been
+        // ensured that we won't hit the bad item (otherwise steerToAVoid
+        // would have detected this earlier).
+        if(!hitBadItemWhenAimAt(item_to_collect, items_to_avoid))
         {
-#ifdef AI_DEBUG
-            m_item_sphere->setVisible(true);
-            m_item_sphere->setPosition(item_to_collect->getXYZ().toIrrVector());
-#endif
-            if(m_ai_debug)
-                printf("[AI] %s selects item type '%d'.\n", 
-                       m_kart->getIdent().c_str(),
-                       item_to_collect->getType());
-            m_item_to_collect = item_to_collect;
-        }
-        else   // kart will not hit item
-        {
-            Vec3 xyz = item_to_collect->getXYZ();
-            float item_angle = atan2(xyz.getX() - m_kart->getXYZ().getX(),
-                                     xyz.getZ() - m_kart->getXYZ().getZ() );
-            float angle = normalizeAngle(kart_aim_angle - item_angle);
-
-            if(fabsf(angle) < 0.3)
+            if(item_to_collect->hitLine(line_to_target, m_kart))
             {
-                *aim_point = item_to_collect->getXYZ();
 #ifdef AI_DEBUG
                 m_item_sphere->setVisible(true);
-                m_item_sphere->setPosition(item_to_collect->getXYZ().toIrrVector());
+                m_item_sphere->setPosition(item_to_collect->getXYZ()
+                                                           .toIrrVector());
 #endif
-                if(m_ai_debug)                
-                    printf("[AI] %s adjusts to hit type %d angle %f.\n",
-                            m_kart->getIdent().c_str(),
-                            item_to_collect->getType(), angle);
-            }
-            else
-            {
                 if(m_ai_debug)
-                    printf("[AI] %s won't hit '%d', angle %f.\n",
-                            m_kart->getIdent().c_str(),
-                            item_to_collect->getType(), angle);
+                    printf("[AI] %s selects item type '%d'.\n", 
+                           m_kart->getIdent().c_str(),
+                           item_to_collect->getType());
+                m_item_to_collect = item_to_collect;
             }
-        }   // kart will not hit item
+            else   // kart will not hit item
+            {
+                Vec3 xyz = item_to_collect->getXYZ();
+                float item_angle = atan2(xyz.getX() - m_kart->getXYZ().getX(),
+                                         xyz.getZ() - m_kart->getXYZ().getZ());
+                float angle = normalizeAngle(kart_aim_angle - item_angle);
 
+                if(fabsf(angle) < 0.3)
+                {
+                    *aim_point = item_to_collect->getXYZ();
+#ifdef AI_DEBUG
+                    m_item_sphere->setVisible(true);
+                    m_item_sphere->setPosition(item_to_collect->getXYZ()
+                                                               .toIrrVector());
+#endif
+                    if(m_ai_debug)                
+                        printf("[AI] %s adjusts to hit type %d angle %f.\n",
+                               m_kart->getIdent().c_str(),
+                               item_to_collect->getType(), angle);
+                }
+                else
+                {
+                    if(m_ai_debug)
+                        printf("[AI] %s won't hit '%d', angle %f.\n",
+                               m_kart->getIdent().c_str(),
+                               item_to_collect->getType(), angle);
+                }
+            }   // kart will not hit item
+        }   // does hit hit bad item
     }   // if item to consider was found
 
 }   // handleItemCollectionAndAvoidance
 
 //-----------------------------------------------------------------------------
-/** This function is called when the AI is trying to hit an item that was 
- *  previously selected to be collected. The AI only evaluates f it's still 
+/** Returns true if the AI would hit any of the listed bad items when trying
+ *  to drive towards the specified item.
+ *  \param item The item the AI is evaluating for collection.
+ *  \param items_to_aovid A list of bad items close by. All of these needs
+ *        to be avoided.
+ *  \return True if it would hit any of the bad items.
+*/
+bool SkiddingAI::hitBadItemWhenAimAt(const Item *item, 
+                              const std::vector<const Item *> &items_to_avoid)
+{
+    core::line2df to_item(m_kart->getXYZ().getX(), m_kart->getXYZ().getZ(),
+                          item->getXYZ().getX(),   item->getXYZ().getZ()   );
+    for(unsigned int i=0; i<items_to_avoid.size(); i++)
+    {
+        if(items_to_avoid[i]->hitLine(to_item, m_kart))
+            return true;
+    }
+    return false;
+}   // hitBadItemWhenAimAt
+
+//-----------------------------------------------------------------------------
+/** This function is called when the AI is trying to hit an item that is 
+ *  pre-selected to be collected. The AI only evaluates if it's still
  *  feasible/useful to try to collect this item, or abandon it (and then 
- *  look for a new item).
+ *  look for a new item). At item is unselected if the kart has passed it 
+ *  (so collecting it would require the kart to reverse).
  *  \pre m_item_to_collect is defined
+ *  \param kart_aim_angle The angle towards the current aim_point.
+ *  \param aim_point The current aim_point.
+ *  \param last_node
  *  \return True if th AI should still aim for the pre-selected item.
  */
-bool SkiddingAI::handleSelectedItem(float kart_aim_angle,
-                                    Vec3 *aim_point, int last_node)
+bool SkiddingAI::handleSelectedItem(float kart_aim_angle, Vec3 *aim_point)
 {
     // If the item is unavailable or has been switched into a bad item
     // stop aiming for it.
@@ -782,10 +856,6 @@ bool SkiddingAI::handleSelectedItem(float kart_aim_angle,
     }
     else
     {
-        // FIXME: use ?? float d = (m_kart->getXYZ() - m_item_to_collect->getXYZ()).length();
-        // printf("angle %f distance %f a/d %f\n",
-        //    angle, d, angle/d);
-        // angle/d < 0.5 or so?
         // Keep on aiming for last selected item
 #ifdef AI_DEBUG
         m_item_sphere->setVisible(true);
