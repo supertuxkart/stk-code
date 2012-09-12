@@ -61,6 +61,17 @@ private:
      *  stopped skidding now. */
     bool m_skid_bonus_ready;
 
+    /** Set to >0 when a graphical jump is to be done. */
+    float m_remaining_jump_time;
+
+    /** A vertical offset used to make the kart do a graphical 'jump' when
+     *  skidding is started. */
+    float m_gfx_jump_offset;
+
+    /** Keeps track of a graphical jump speed (which simulates the physics,
+     *  i.e. gravity is used to reduce the jump speed. */
+    float m_jump_speed;
+
 public:
     /** SKID_OLD: old skidding, will be removed. */
     /** SKID_NONE: Kart is currently not skidding.
@@ -111,11 +122,13 @@ public:
      *  a fraction of the maximum steering angle ( so in [-1, 1]). */
     float getSteeringFraction() { return m_real_steering; }
     // ------------------------------------------------------------------------
+    float getGraphicalJumpOffset() { return m_gfx_jump_offset; }
+    // ------------------------------------------------------------------------
+    /** Returns the skidding state. */
+    SkidState getSkidState() const { return m_skid_state; }
 protected:
     // The AI needs more details about the skidding state
     friend class SkiddingAI;
-    /** Returns the skidding state. */
-    SkidState getSkidState() const { return m_skid_state; }
     // ------------------------------------------------------------------------
     float getSteeringWhenSkidding(float steering) const;
     // ------------------------------------------------------------------------

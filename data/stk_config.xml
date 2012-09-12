@@ -185,6 +185,9 @@
            the chassis of a kart should rotate to match the graphical view. 
            A factor of 1 is identical, a smaller factor will rotate the kart
            less (which might  feel better).   
+         physical-jump-time: Time for a physical jump at the beginning of a skid.
+         graphical-jump-time: Time for a graphics-only jump at the beginning
+           of a skid.
          reduce-turn-min/max: The steering done by the controller (which is in
            [-1,1]) is mapped to [reduce-turn-min, reduce-turn-max] when skidding
            is active (for left turn, right turn will use [-max, -min]). The 
@@ -197,7 +200,8 @@
           time-till-bonus="1.0 3.0" 
           bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
           bonus-force="250 350"
-          post-skid-rotate-factor="1" jump-time="0.4"
+          physical-jump-time="0" graphical-jump-time="0.4"
+          post-skid-rotate-factor="1"
           reduce-turn-min="0.2" reduce-turn-max="0.8"/>
 
     <!-- Kart-specific settings used by the AI.

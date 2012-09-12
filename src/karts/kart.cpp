@@ -2208,6 +2208,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
             - m_vehicle->getWheelInfo(0).m_wheelsRadius
             - (m_kart_model->getWheelGraphicsRadius(0)
                -m_kart_model->getWheelGraphicsPosition(0).getY() );
+    y += m_skidding->getGraphicalJumpOffset();
     center_shift.setY(y);
     
     if (m_controls.m_nitro && isOnGround() &&  m_collected_energy > 0)

@@ -62,12 +62,15 @@ Skidding::~Skidding()
  */
 void Skidding::reset()
 {
-    m_skid_time        = 0.0f;
-    m_skid_state       = m_skid_visual_time<=0 ? SKID_OLD : SKID_NONE;
-    m_skid_factor      = 1.0f;
-    m_real_steering    = 0.0f;
-    m_visual_rotation  = 0.0f;
-    m_skid_bonus_ready = false;
+    m_skid_time           = 0.0f;
+    m_skid_state          = m_skid_visual_time<=0 ? SKID_OLD : SKID_NONE;
+    m_skid_factor         = 1.0f;
+    m_real_steering       = 0.0f;
+    m_visual_rotation     = 0.0f;
+    m_skid_bonus_ready    = false;
+    m_gfx_jump_offset     = 0.0f;
+    m_remaining_jump_time = 0.0f;
+    m_jump_speed          = 0.0f;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -194,6 +197,20 @@ void Skidding::update(float dt, bool is_on_ground,
     if(m_skid_state == SKID_OLD)
         return;
 
+    // If skidding was started and a graphical jump should still
+    // be displayed, update the data
+    if(m_remaining_jump_time>0)
+    {
+        m_jump_speed -= World::getWorld()->getTrack()->getGravity()*dt;
+        m_gfx_jump_offset += m_jump_speed * dt;
+        m_remaining_jump_time -= dt;
+        if(m_remaining_jump_time<0)
+        {
+            m_remaining_jump_time = 0.0f;
+            m_gfx_jump_offset     = 0.0f;
+        }
+    }
+
     // This is only reached if the new skidding is enabled
     // ---------------------------------------------------
 
@@ -242,10 +259,15 @@ void Skidding::update(float dt, bool is_on_ground,
             // Then use this speed to determine the impulse necessary to 
             // reach this speed.
             float v = World::getWorld()->getTrack()->getGravity() 
-                    * 0.5f*m_jump_time;
+                    * 0.5f*m_physical_jump_time;
             btVector3 imp(0, v / m_kart->getBody()->getInvMass(),0);
             m_kart->getVehicle()->getRigidBody()->applyCentralImpulse(imp);
 
+            // Some karts might use a graphical-only jump. Set it up:
+            m_jump_speed = World::getWorld()->getTrack()->getGravity() 
+                         * 0.5f*m_graphical_jump_time;
+            m_remaining_jump_time = m_graphical_jump_time;
+             
 #ifdef SKID_DEBUG
 #define SPEED 20.0f
             updateSteering(steering);
