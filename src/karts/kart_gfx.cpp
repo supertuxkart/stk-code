@@ -244,9 +244,12 @@ void KartGFX::updateTerrain(const ParticleKind *pk)
     float rate           = 0;
     const float speed    = fabsf(m_kart->getSpeed());
     const float skidding = m_kart->getSkidding()->getSkidFactor();
-    if (skidding > 1.0f)
+    // Only create particles when the kart is actually on ground
+    bool on_ground       = m_kart->isOnGround() &&
+                           m_kart->getSkidding()->getGraphicalJumpOffset()==0;
+    if (skidding > 1.0f && on_ground)
         rate = fabsf(m_kart->getControls().m_steer) > 0.8 ? skidding - 1 : 0;
-    else if (speed >= 0.5f)
+    else if (speed >= 0.5f && on_ground)
         rate = speed/m_kart->getKartProperties()->getMaxSpeed();
     else
     {

@@ -122,7 +122,11 @@ public:
      *  a fraction of the maximum steering angle ( so in [-1, 1]). */
     float getSteeringFraction() { return m_real_steering; }
     // ------------------------------------------------------------------------
-    float getGraphicalJumpOffset() { return m_gfx_jump_offset; }
+    /** Returns an additional height offset that is used to show a graphical
+     *  jump when a skid starts. So when this is >0 the wheels appear not to
+     *  touch the ground (though in reality the physical kart does, but also
+     *  see physical jumping implemented in this object). */
+    float getGraphicalJumpOffset() const { return m_gfx_jump_offset; }
     // ------------------------------------------------------------------------
     /** Returns the skidding state. */
     SkidState getSkidState() const { return m_skid_state; }

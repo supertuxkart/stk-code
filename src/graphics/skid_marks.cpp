@@ -22,6 +22,7 @@
 #include "graphics/irr_driver.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
 
 #include <IMeshSceneNode.h>
@@ -79,156 +80,154 @@ void SkidMarks::update(float dt, bool force_skid_marks,
                        video::SColor* custom_color)
 {
     //if the kart is gnu, then dont skid because he floats!
-    if (m_kart.isWheeless() == false)
+    if(m_kart.isWheeless())
+        return;
+
+    float f = dt/stk_config->m_skid_fadeout_time*m_start_alpha;
+    for(unsigned int i=0; i<m_left.size(); i++)
     {
-        float f = dt/stk_config->m_skid_fadeout_time*m_start_alpha;
-        for(unsigned int i=0; i<m_left.size(); i++)
+        m_left[i]->fade(f);
+        m_right[i]->fade(f);
+    }
+
+    if(m_skid_marking)
+    {
+        // Get raycast information
+        // -----------------------
+        const btWheelInfo::RaycastInfo &raycast_right =
+                            m_kart.getVehicle()->getWheelInfo(2).m_raycastInfo;
+        const btWheelInfo::RaycastInfo raycast_left =
+                            m_kart.getVehicle()->getWheelInfo(3).m_raycastInfo;
+        Vec3 delta = raycast_right.m_contactPointWS 
+                   - raycast_left.m_contactPointWS;
+
+        // We were skid marking, but not anymore (either because the
+        // wheels don't touch the ground, or the kart has stopped
+        // skidding). One special case: the physics force both wheels
+        // on one axis to touch the ground. If only one wheel touches
+        // the ground, the 2nd one gets the same raycast result -->
+        // delta is 0, and the behaviour is undefined. In this case
+        // just stop doing skid marks as well.
+        // ---------------------------------------------------------
+        if (!force_skid_marks                                     && 
+            (!raycast_right.m_isInContact                      ||
+              m_kart.getSkidding()->getGraphicalJumpOffset()>0 ||
+              !m_kart.getControls().m_skid                     ||
+              fabsf(m_kart.getControls().m_steer) < 0.001f     ||
+              delta.length2()<0.0001                             ) )
         {
-            m_left[i]->fade(f);
-            m_right[i]->fade(f);
-        }
-
-        if(m_skid_marking)
-        {
-            // Get raycast information
-            // -----------------------
-            const btWheelInfo::RaycastInfo &raycast_right =
-                m_kart.getVehicle()->getWheelInfo(2).m_raycastInfo;
-            const btWheelInfo::RaycastInfo raycast_left =
-                m_kart.getVehicle()->getWheelInfo(3).m_raycastInfo;
-            Vec3 delta = raycast_right.m_contactPointWS 
-                       - raycast_left.m_contactPointWS;
-
-            // We were skid marking, but not anymore (either because the
-            // wheels don't touch the ground, or the kart has stopped
-            // skidding). One special case: the physics force both wheels
-            // on one axis to touch the ground. If only one wheel touches
-            // the ground, the 2nd one gets the same raycast result -->
-            // delta is 0, and the behaviour is undefined. In this case
-            // just stop doing skid marks as well.
-            // ---------------------------------------------------------
-            if (!force_skid_marks                                     && 
-                  (!raycast_right.m_isInContact                  ||
-                    !m_kart.getControls().m_skid                 ||
-                    fabsf(m_kart.getControls().m_steer) < 0.001f ||
-                    delta.length2()<0.0001                         )     )
-            {
-                m_skid_marking = false;
-                // The vertices and indices will not change anymore 
-                // (till these skid mark quads are deleted)
-                m_left[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
-                m_right[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
-                return;
-            }
-            
-            // We are still skid marking, so add the latest quad
-            // -------------------------------------------------
-
-            delta.normalize();
-            delta *= m_width;
-
-            m_left [m_current]->add(raycast_left.m_contactPointWS,
-                                    raycast_left.m_contactPointWS + delta);
-            m_right[m_current]->add(raycast_right.m_contactPointWS-delta,
-                                    raycast_right.m_contactPointWS);
-            // Adjust the boundary box of the mesh to include the
-            // adjusted aabb of its buffers.
-            core::aabbox3df aabb=m_nodes[m_current]->getMesh()
-                                                   ->getBoundingBox();
-            aabb.addInternalBox(m_left[m_current]->getAABB());
-            aabb.addInternalBox(m_right[m_current]->getAABB());
-            m_nodes[m_current]->getMesh()->setBoundingBox(aabb);
+            m_skid_marking = false;
+            // The vertices and indices will not change anymore 
+            // (till these skid mark quads are deleted)
+            m_left[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
+            m_right[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
             return;
         }
 
-        // Currently no skid marking
-        // -------------------------
-        if (!force_skid_marks)
-        {
-            if((!m_kart.getControls().m_skid) ||
-                (fabsf(m_kart.getControls().m_steer) < 0.001f)) 
-                return;   // not skidmarking
-            
-            // not turning enough, don't draw skidmarks if kart is going 
-            // straight ahead this is even stricter for Ai karts, since they 
-            // tend to use LOTS of skidding
-            const float min_skid_angle = 
-                m_kart.getController()->isPlayerController() ? 0.55f : 0.95f;
-            if( fabsf(m_kart.getSteerPercent()) < min_skid_angle) return;
-        }
-        
-        // Start new skid marks
-        // --------------------
-        const btWheelInfo::RaycastInfo &raycast_right =
-            m_kart.getVehicle()->getWheelInfo(2).m_raycastInfo;
-        // No skidmarking if wheels don't have contact
-        if(!raycast_right.m_isInContact) return;
+        // We are still skid marking, so add the latest quad
+        // -------------------------------------------------
 
-        const btWheelInfo::RaycastInfo raycast_left =
-            m_kart.getVehicle()->getWheelInfo(3).m_raycastInfo;
-
-        Vec3 delta = raycast_right.m_contactPointWS 
-                   - raycast_left.m_contactPointWS;
-        // Special case: only one wheel on one axis touches the ground 
-        // --> physics set both wheels to touch the same spot --> delta = 0.
-        // In this case, don't start skidmarks.
-        if(delta.length2()<0.0001) return;
         delta.normalize();
         delta *= m_width;
 
-        SkidMarkQuads *smq_left = 
-            new SkidMarkQuads(raycast_left.m_contactPointWS,
-                              raycast_left.m_contactPointWS + delta,
-                              m_material, m_avoid_z_fighting,
-                              custom_color);
-        scene::SMesh *new_mesh = new scene::SMesh();
-        new_mesh->addMeshBuffer(smq_left);
-
-        SkidMarkQuads *smq_right = 
-            new SkidMarkQuads(raycast_right.m_contactPointWS - delta,
-                              raycast_right.m_contactPointWS,
-                              m_material,
-                              m_avoid_z_fighting,
-                              custom_color);
-        new_mesh->addMeshBuffer(smq_right);
-        scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh);
-    #ifdef DEBUG
-        std::string debug_name = m_kart.getIdent()+" (skid-mark)";
-        new_node->setName(debug_name.c_str());
-    #endif
-
-        // We don't keep a reference to the mesh here, so we have to decrement
-        // the reference count (which is set to 1 when doing "new SMesh()".
-        // The scene node will keep the mesh alive.
-        new_mesh->drop();
-        m_current++;
-        if(m_current>=stk_config->m_max_skidmarks)
-            m_current = 0;
-        if(m_current>=(int)m_left.size())
-        {
-            m_left. push_back (smq_left );
-            m_right.push_back (smq_right);
-            m_nodes.push_back (new_node);
-        }
-        else
-        {
-            irr_driver->removeNode(m_nodes[m_current]);
-            // Not necessary to delete m_nodes: removeNode
-            // deletes the node since its refcount reaches zero.
-            m_left[m_current]->drop();
-            m_right[m_current]->drop();
-
-            m_left  [m_current] = smq_left;
-            m_right [m_current] = smq_right;
-            m_nodes [m_current] = new_node;
-        }
-
-        m_skid_marking = true;
-        // More triangles are added each frame, so for now leave it
-        // to stream.
-        m_left[m_current]->setHardwareMappingHint(scene::EHM_STREAM);
-        m_right[m_current]->setHardwareMappingHint(scene::EHM_STREAM);
+        m_left [m_current]->add(raycast_left.m_contactPointWS,
+                                raycast_left.m_contactPointWS + delta);
+        m_right[m_current]->add(raycast_right.m_contactPointWS-delta,
+                                raycast_right.m_contactPointWS);
+        // Adjust the boundary box of the mesh to include the
+        // adjusted aabb of its buffers.
+        core::aabbox3df aabb=m_nodes[m_current]->getMesh()
+                            ->getBoundingBox();
+        aabb.addInternalBox(m_left[m_current]->getAABB());
+        aabb.addInternalBox(m_right[m_current]->getAABB());
+        m_nodes[m_current]->getMesh()->setBoundingBox(aabb);
+        return;
     }
+
+    // Currently no skid marking
+    // -------------------------
+    if (!force_skid_marks)
+    {
+        if((!m_kart.getControls().m_skid) ||
+            (fabsf(m_kart.getControls().m_steer) < 0.001f)) 
+            return;   // not skidmarking
+
+        // not turning enough, don't draw skidmarks if kart is going 
+        // straight ahead this is even stricter for Ai karts, since they 
+        // tend to use LOTS of skidding
+        const float min_skid_angle = 
+                 m_kart.getController()->isPlayerController() ? 0.55f : 0.95f;
+        if( fabsf(m_kart.getSteerPercent()) < min_skid_angle) return;
+    }
+
+    // Start new skid marks
+    // --------------------
+    const btWheelInfo::RaycastInfo &raycast_right =
+                            m_kart.getVehicle()->getWheelInfo(2).m_raycastInfo;
+    // No skidmarking if wheels don't have contact
+    if(!raycast_right.m_isInContact) return;
+
+    const btWheelInfo::RaycastInfo raycast_left =
+                            m_kart.getVehicle()->getWheelInfo(3).m_raycastInfo;
+
+    Vec3 delta = raycast_right.m_contactPointWS 
+               - raycast_left.m_contactPointWS;
+    // Special case: only one wheel on one axis touches the ground 
+    // --> physics set both wheels to touch the same spot --> delta = 0.
+    // In this case, don't start skidmarks.
+    if(delta.length2()<0.0001) return;
+    delta.normalize();
+    delta *= m_width;
+
+    SkidMarkQuads *smq_left = 
+        new SkidMarkQuads(raycast_left.m_contactPointWS,
+                          raycast_left.m_contactPointWS + delta,
+                          m_material, m_avoid_z_fighting, custom_color);
+    scene::SMesh *new_mesh = new scene::SMesh();
+    new_mesh->addMeshBuffer(smq_left);
+
+    SkidMarkQuads *smq_right = 
+        new SkidMarkQuads(raycast_right.m_contactPointWS - delta,
+                          raycast_right.m_contactPointWS,
+                          m_material, m_avoid_z_fighting, custom_color);
+    new_mesh->addMeshBuffer(smq_right);
+    scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh);
+#ifdef DEBUG
+    std::string debug_name = m_kart.getIdent()+" (skid-mark)";
+    new_node->setName(debug_name.c_str());
+#endif
+
+    // We don't keep a reference to the mesh here, so we have to decrement
+    // the reference count (which is set to 1 when doing "new SMesh()".
+    // The scene node will keep the mesh alive.
+    new_mesh->drop();
+    m_current++;
+    if(m_current>=stk_config->m_max_skidmarks)
+        m_current = 0;
+    if(m_current>=(int)m_left.size())
+    {
+        m_left. push_back (smq_left );
+        m_right.push_back (smq_right);
+        m_nodes.push_back (new_node);
+    }
+    else
+    {
+        irr_driver->removeNode(m_nodes[m_current]);
+        // Not necessary to delete m_nodes: removeNode
+        // deletes the node since its refcount reaches zero.
+        m_left[m_current]->drop();
+        m_right[m_current]->drop();
+
+        m_left  [m_current] = smq_left;
+        m_right [m_current] = smq_right;
+        m_nodes [m_current] = new_node;
+    }
+
+    m_skid_marking = true;
+    // More triangles are added each frame, so for now leave it
+    // to stream.
+    m_left[m_current]->setHardwareMappingHint(scene::EHM_STREAM);
+    m_right[m_current]->setHardwareMappingHint(scene::EHM_STREAM);
 }   // update
 
 //=============================================================================
