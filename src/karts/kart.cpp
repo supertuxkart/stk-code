@@ -965,12 +965,6 @@ void Kart::update(float dt)
         m_stars_effect->update(dt);
     }
 
-    if (isEliminated())
-    {
-        m_kart_animation->update(dt);
-        return;
-    }
-
     if(m_squash_time>0)
     {
         m_squash_time-=dt;
