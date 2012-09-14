@@ -129,6 +129,7 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
         break;
     }
 
+
     m_use_new_aim_point_selection = false;
     setControllerName("Skidding");
 
@@ -160,7 +161,10 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
 #endif
 
     m_superpower = race_manager->getAISuperPower();
-
+    if (m_superpower == RaceManager::SUPERPOWER_NOLOK_BOSS)
+    {
+        m_false_start_probability = 0.0f;
+    }
 #ifdef AI_DEBUG
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1.0f);
     m_item_sphere  = irr_driver->getSceneManager()->addSphereSceneNode(1.0f);
