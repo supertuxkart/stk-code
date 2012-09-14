@@ -299,6 +299,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "about")
     {
+        CreditsScreen::getInstance()->setVictoryMusic(false);
         StateManager::get()->pushScreen(CreditsScreen::getInstance());
     }
     else if (selection == "help")

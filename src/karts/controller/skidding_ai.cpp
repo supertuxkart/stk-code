@@ -293,7 +293,17 @@ void SkiddingAI::update(float dt)
     {
         if (m_kart->getPowerup()->getType()==PowerupManager::POWERUP_NOTHING)
         {
-            if (m_kart->getAttachment()->getType() == Attachment::ATTACH_SWATTER)
+            if (m_kart->getPosition() > 1)
+            {
+                int r = rand() % 5;
+                if (r == 0 || r == 1)
+                    m_kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 1);
+                else if (r == 2 || r == 3)
+                    m_kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 1);
+                else
+                    m_kart->setPowerup(PowerupManager::POWERUP_SWATTER, 1);
+            }
+            else if (m_kart->getAttachment()->getType() == Attachment::ATTACH_SWATTER)
             {
                 int r = rand() % 4;
                 if (r < 3)

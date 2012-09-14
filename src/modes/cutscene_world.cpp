@@ -30,6 +30,7 @@
 #include "karts/kart_properties.hpp"
 #include "modes/overworld.hpp"
 #include "physics/physics.hpp"
+#include "states_screens/credits.hpp"
 #include "states_screens/cutscene_gui.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "tracks/track.hpp"
@@ -314,9 +315,22 @@ void CutsceneWorld::enterRaceOverState()
     
     if (m_aborted || partId == -1 || partId == (int)m_parts.size() - 1)
     {
-        race_manager->exitRace();
-        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-        OverWorld::enterOverWorld();
+        if (m_parts.size() == 1 && m_parts[0] == "endcutscene")
+        {
+            CreditsScreen* credits = CreditsScreen::getInstance();
+            credits->setVictoryMusic(true);
+            MainMenuScreen* mainMenu = MainMenuScreen::getInstance();
+            GUIEngine::Screen* newStack[] = { mainMenu, credits, NULL };
+            race_manager->exitRace();
+            StateManager::get()->resetAndSetStack(newStack);
+            StateManager::get()->pushScreen(credits);
+        }
+        else
+        {
+            race_manager->exitRace();
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            OverWorld::enterOverWorld();
+        }
     }
     else
     {

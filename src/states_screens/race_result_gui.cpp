@@ -30,6 +30,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
+#include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world_with_rank.hpp"
@@ -161,13 +162,44 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             
             std::vector<const ChallengeData*> unlocked = 
                 unlock_manager->getCurrentSlot()->getRecentlyCompletedChallenges();
+            
+            bool gameCompleted = false;
+            for (unsigned int n = 0; n < unlocked.size(); n++)
+            {
+                if (unlocked[n]->getId() == "fortmagma")
+                {
+                    gameCompleted = true;
+                    break;
+                }
+            }
+        
             unlock_manager->getCurrentSlot()->clearUnlocked();
-            FeatureUnlockedCutScene* scene = 
-                FeatureUnlockedCutScene::getInstance();
-            scene->addTrophy(race_manager->getDifficulty());
-            StateManager::get()->popMenu();
-            StateManager::get()->pushScreen(scene);
-            World::deleteWorld();
+            
+            if (gameCompleted)
+            {
+                // clear the race
+                World::deleteWorld();
+                
+                StateManager::get()->enterGameState();
+                race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+                race_manager->setNumKarts( 0 );
+                race_manager->setNumPlayers(0);
+                race_manager->setNumLocalPlayers(0);
+                race_manager->startSingleRace("endcutscene", 999, false);
+                
+                std::vector<std::string> parts;
+                parts.push_back("endcutscene");
+                ((CutsceneWorld*)World::getWorld())->setParts(parts);
+            }
+            else
+            {
+                FeatureUnlockedCutScene* scene = 
+                    FeatureUnlockedCutScene::getInstance();
+                scene->addTrophy(race_manager->getDifficulty());
+                StateManager::get()->popMenu();
+                StateManager::get()->pushScreen(scene);
+                World::deleteWorld();
+            }
             return;
         }
         fprintf(stderr, "Incorrect event '%s' when things are unlocked.\n", 

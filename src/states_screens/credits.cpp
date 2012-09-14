@@ -130,6 +130,7 @@ bool CreditsScreen::getWideLine(std::ifstream& file, core::stringw* out)
 
 CreditsScreen::CreditsScreen() : Screen("credits.stkgui")
 {
+    m_is_victory_music = false;
 }   // CreditsScreen
 
 // ----------------------------------------------------------------------------
