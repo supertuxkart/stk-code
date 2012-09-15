@@ -39,6 +39,8 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
     if(kart->isInvulnerable()) return NULL;
 
     float r = kart->getKartProperties()->getExplosionRadius();
+
+    // Ignore explosion that are too far away.
     if(!direct_hit && pos.distance2(kart->getXYZ())>r*r) return NULL;
 
     return new ExplosionAnimation(kart, pos, direct_hit);
@@ -61,7 +63,6 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
                   : AbstractKartAnimation(kart, "ExplosionAnimation")
  {
     m_xyz = m_kart->getXYZ();
-    // Ignore explosion that are too far away.
 
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
     m_timer     = m_kart->getKartProperties()->getExplosionTime();

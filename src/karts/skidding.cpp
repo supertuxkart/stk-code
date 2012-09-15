@@ -71,6 +71,7 @@ void Skidding::reset()
     m_gfx_jump_offset     = 0.0f;
     m_remaining_jump_time = 0.0f;
     m_jump_speed          = 0.0f;
+    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKID, 0);
 }   // reset
 
 // ----------------------------------------------------------------------------

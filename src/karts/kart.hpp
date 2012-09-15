@@ -346,6 +346,10 @@ public:
      *  skidding related values). */
     virtual const Skidding *getSkidding() const { return m_skidding; }
     // ------------------------------------------------------------------------
+    /** Returns the skidding object for this kart (which can be used to query
+     *  skidding related values) - non-const. */
+    virtual Skidding *getSkidding() { return m_skidding; }
+    // ------------------------------------------------------------------------
     /** Returns the bullet vehicle which represents this kart. */
     virtual btKart    *getVehicle      () const {return m_vehicle;                }
     // ------------------------------------------------------------------------

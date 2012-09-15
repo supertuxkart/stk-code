@@ -182,6 +182,10 @@ public:
      *  skidding related values). */
     virtual const Skidding *getSkidding() const = 0;
     // ------------------------------------------------------------------------
+    /** Returns the skidding object for this kart (which can be used to query
+     *  skidding related values), non-const. */
+    virtual Skidding *getSkidding() = 0;
+    // ------------------------------------------------------------------------
     /** Returns true if the kart is eliminated. */
     virtual bool isEliminated() const = 0;
     // ------------------------------------------------------------------------

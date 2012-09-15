@@ -19,6 +19,7 @@
 #include "karts/abstract_kart_animation.hpp"
 
 #include "karts/abstract_kart.hpp"
+#include "karts/skidding.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
 
@@ -46,6 +47,7 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
     // later).
     kart->setKartAnimation(this);
     World::getWorld()->getPhysics()->removeKart(m_kart);
+    kart->getSkidding()->reset();
 }   // AbstractKartAnimation
 
 // ----------------------------------------------------------------------------
