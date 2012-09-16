@@ -103,6 +103,12 @@ public:
                                          before it is ignored. */
     bool  m_enable_networking;
 
+    /** Disable steering if skidding is stopped. This can help in making 
+     *  skidding more controllable (since otherwise when trying to steer while
+     *  steering is reset to match the graphics it often results in the kart
+     *  crashing). */
+    bool m_disable_steer_while_unskid;
+
     float m_ai_acceleration;         /**<Between 0 and 1, default being 1, can be
                                          used to give a handicap to AIs */
     

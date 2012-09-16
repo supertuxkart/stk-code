@@ -177,6 +177,7 @@ void STKConfig::init_defaults()
     m_smooth_normals           = false;
     m_same_powerup_mode        = POWERUP_MODE_ONLY_IF_SAME;
     m_ai_acceleration          = 1.0f;
+    m_disable_steer_while_unskid = false;
     
     m_score_increase.clear();
     m_leader_intervals.clear();
@@ -250,6 +251,11 @@ void STKConfig::getAllData(const XMLNode * root)
     if (const XMLNode *news_node= root->getNode("news"))
     {
         news_node->get("max-display", &m_max_display_news);
+    }
+
+    if (const XMLNode *steer_node= root->getNode("steer"))
+    {
+        steer_node->get("disable-while-unskid", &m_disable_steer_while_unskid);
     }
 
     if (const XMLNode *music_node = root->getNode("music"))

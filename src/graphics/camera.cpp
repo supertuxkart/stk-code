@@ -411,7 +411,7 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
         break;
     }
 
-}   // get CameraPosition
+}   // getCameraSettings
 
 //-----------------------------------------------------------------------------
 /** Called once per time frame to move the camera to the right position.

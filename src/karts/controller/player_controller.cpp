@@ -22,6 +22,7 @@
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/player.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "input/input_manager.hpp"
@@ -30,6 +31,7 @@
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
+#include "karts/skidding.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"
@@ -227,6 +229,13 @@ void PlayerController::steer(float dt, int steer_val)
         gui_base->clearAllMessages();
         gui_base->addMessage(StringUtils::insertValues(L"steer_val %i", steer_val), m_kart, 1.0f,
                              video::SColor(255, 255, 0, 255), false);
+    }
+
+    if(stk_config->m_disable_steer_while_unskid &&
+       !m_controls->m_skid &&
+       m_kart->getSkidding()->getVisualSkidRotation()!=0)
+    {
+        m_controls->m_steer = 0;
     }
     const float STEER_CHANGE = dt/m_kart->getTimeFullSteer();  // amount the steering is changed
     if (steer_val < 0)
