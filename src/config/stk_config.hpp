@@ -109,6 +109,10 @@ public:
      *  crashing). */
     bool m_disable_steer_while_unskid;
 
+    /** If true the camera will stay behind the kart, potentially making it
+     *  easier to see where the kart is going to after the skid. */
+    bool m_camera_follow_skid;
+
     float m_ai_acceleration;         /**<Between 0 and 1, default being 1, can be
                                          used to give a handicap to AIs */
     

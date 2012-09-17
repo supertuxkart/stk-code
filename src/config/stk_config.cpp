@@ -152,32 +152,33 @@ void STKConfig::load(const std::string &filename)
  */
 void STKConfig::init_defaults()
 {
-    m_anvil_weight             = m_parachute_friction        =
-        m_parachute_time       = m_parachute_done_fraction   =
-        m_parachute_time_other = m_anvil_speed_factor        =
-        m_bomb_time            = m_bomb_time_increase        =
-        m_anvil_time           = m_music_credit_time         =
-        m_delay_finish_time    = m_skid_fadeout_time         =
-        m_near_ground          = m_item_switch_time          = 
-        m_penalty_time         = m_explosion_impulse_objects = UNDEFINED;
-    m_bubble_gum_counter       = -100;
-    m_max_karts                = -100;
-    m_max_history              = -100;
-    m_max_skidmarks            = -100;
-    m_min_kart_version         = -100;
-    m_max_kart_version         = -100;
-    m_min_track_version        = -100;
-    m_max_track_version        = -100;
-    m_max_display_news         = -100;
-    m_replay_delta_angle       = -100;
-    m_replay_delta_pos2        = -100;
-    m_replay_dt                = -100;
-    m_title_music              = NULL;
-    m_enable_networking        = true;
-    m_smooth_normals           = false;
-    m_same_powerup_mode        = POWERUP_MODE_ONLY_IF_SAME;
-    m_ai_acceleration          = 1.0f;
+    m_anvil_weight               = m_parachute_friction        =
+        m_parachute_time         = m_parachute_done_fraction   =
+        m_parachute_time_other   = m_anvil_speed_factor        =
+        m_bomb_time              = m_bomb_time_increase        =
+        m_anvil_time             = m_music_credit_time         =
+        m_delay_finish_time      = m_skid_fadeout_time         =
+        m_near_ground            = m_item_switch_time          = 
+        m_penalty_time           = m_explosion_impulse_objects = UNDEFINED;
+    m_bubble_gum_counter         = -100;
+    m_max_karts                  = -100;
+    m_max_history                = -100;
+    m_max_skidmarks              = -100;
+    m_min_kart_version           = -100;
+    m_max_kart_version           = -100;
+    m_min_track_version          = -100;
+    m_max_track_version          = -100;
+    m_max_display_news           = -100;
+    m_replay_delta_angle         = -100;
+    m_replay_delta_pos2          = -100;
+    m_replay_dt                  = -100;
+    m_title_music                = NULL;
+    m_enable_networking          = true;
+    m_smooth_normals             = false;
+    m_same_powerup_mode          = POWERUP_MODE_ONLY_IF_SAME;
+    m_ai_acceleration            = 1.0f;
     m_disable_steer_while_unskid = false;
+    m_camera_follow_skid         = false;
     
     m_score_increase.clear();
     m_leader_intervals.clear();
@@ -256,6 +257,7 @@ void STKConfig::getAllData(const XMLNode * root)
     if (const XMLNode *steer_node= root->getNode("steer"))
     {
         steer_node->get("disable-while-unskid", &m_disable_steer_while_unskid);
+        steer_node->get("camera-follow-skid",   &m_camera_follow_skid        );
     }
 
     if (const XMLNode *music_node = root->getNode("music"))

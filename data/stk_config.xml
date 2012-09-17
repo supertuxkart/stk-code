@@ -109,9 +109,13 @@
       work anymore - so for now don't enable this. -->
   <networking enable="false"/>
 
-  <!-- Disable steering when stop skidding during the time it takes to
-       adjust the physical body with the graphics. -->
-  <steer disable-while-unskid="true"/>
+  <!-- disable-while-unskid: Disable steering when stop skidding during 
+           the time it takes to adjust the physical body with the graphics.
+       camera-follow-skid: If true the camera will stay behind the kart,
+           potentially making it easier to see where the kart is going to 
+           after a skid. -->
+  <steer disable-while-unskid="false"
+         camera-follow-skid="true"     />
 
   <!-- Default values for all karts
        ============================ -->

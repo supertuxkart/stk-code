@@ -79,7 +79,7 @@ void SkidMarks::reset()
 void SkidMarks::update(float dt, bool force_skid_marks, 
                        video::SColor* custom_color)
 {
-    //if the kart is gnu, then dont skid because he floats!
+    //if the kart is gnu, then don't skid because he floats!
     if(m_kart.isWheeless())
         return;
 
