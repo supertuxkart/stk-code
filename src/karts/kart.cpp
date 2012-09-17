@@ -1775,6 +1775,18 @@ void Kart::updatePhysics(float dt)
     m_skidding->update(dt, isOnGround(), m_controls.m_steer, 
                        m_controls.m_skid);
 
+    if(( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
+         m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) && 
+        m_skidding->getGraphicalJumpOffset()==0)
+    {
+        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING &&!isWheeless())
+            m_skid_sound->play();
+    }
+    else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)
+    {
+        m_skid_sound->stop();
+    }
+
     float steering = getMaxSteerAngle() * m_skidding->getSteeringFraction();
     m_vehicle->setSteeringValue(steering, 0);
     m_vehicle->setSteeringValue(steering, 1);
