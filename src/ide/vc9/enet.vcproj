@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../enet/include"
+				AdditionalIncludeDirectories="../../../lib/enet/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -106,7 +106,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="../../enet/include"
+				AdditionalIncludeDirectories="../../../lib/enet/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -170,7 +170,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="../../enet/include"
+				AdditionalIncludeDirectories="../../../lib/enet/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -231,7 +231,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../enet/include"
+				AdditionalIncludeDirectories="../../../lib/enet/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -278,39 +278,39 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\enet\callbacks.c"
+				RelativePath="../../../lib/enet\callbacks.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\enet\compress.c"
+				RelativePath="../../../lib/enet\compress.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\enet\host.c"
+				RelativePath="../../../lib/enet\host.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\enet\list.c"
+				RelativePath="../../../lib/enet\list.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\enet\packet.c"
+				RelativePath="../../../lib/enet\packet.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\enet\peer.c"
+				RelativePath="../../../lib/enet\peer.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\enet\protocol.c"
+				RelativePath="../../../lib/enet\protocol.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\enet\unix.c"
+				RelativePath="../../../lib/enet\unix.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\enet\win32.c"
+				RelativePath="../../../lib/enet\win32.c"
 				>
 			</File>
 		</Filter>
