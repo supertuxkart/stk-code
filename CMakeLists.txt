@@ -25,17 +25,17 @@ set(STK_INSTALL_DATA_DIR "share/supertuxkart" CACHE
     STRING "Install data folder to this directory, absolute or relative to CMAKE_INSTALL_PREFIX")
 
 # Build the Bullet physics library
-add_subdirectory("${STK_SOURCE_DIR}/bullet")
-include_directories("${STK_SOURCE_DIR}/bullet/src")
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
+include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
 # Build the ENet UDP network library
-add_subdirectory("${STK_SOURCE_DIR}/enet")
-include_directories("${STK_SOURCE_DIR}/enet/include")
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
+include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
 # Build the Wiiuse library
 if(USE_WIIUSE)
-    add_subdirectory("${STK_SOURCE_DIR}/wiiuse")
-    include_directories("${STK_SOURCE_DIR}/wiiuse")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/wiiuse")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse")
 endif()
 
 # Set include paths
