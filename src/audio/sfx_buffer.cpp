@@ -21,10 +21,9 @@
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 
-#include <vorbis/codec.h>
-#include <vorbis/vorbisfile.h>
-
 #if HAVE_OGGVORBIS
+#  include <vorbis/codec.h>
+#  include <vorbis/vorbisfile.h>
 #  ifdef __APPLE__
 #    include <OpenAL/al.h>
 #    include <OpenAL/alc.h>
