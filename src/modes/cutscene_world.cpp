@@ -23,6 +23,8 @@
 
 #include "animations/animation_base.hpp"
 #include "audio/music_manager.hpp"
+#include "challenges/game_slot.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -32,6 +34,7 @@
 #include "physics/physics.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/cutscene_gui.hpp"
+#include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
@@ -324,6 +327,22 @@ void CutsceneWorld::enterRaceOverState()
             race_manager->exitRace();
             StateManager::get()->resetAndSetStack(newStack);
             StateManager::get()->pushScreen(credits);
+        }
+        else if (m_parts.size() > 0 && m_parts[0] == "introcutscene")
+        {
+            GameSlot* slot = unlock_manager->getCurrentSlot();
+            if (slot->isFirstTime())
+            {
+                race_manager->exitRace();
+                StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+                
+                slot->setFirstTime(false);
+                unlock_manager->save();
+                KartSelectionScreen* s = KartSelectionScreen::getInstance();
+                s->setMultiplayer(false);
+                s->setFromOverworld(true);
+                StateManager::get()->pushScreen( s );
+            }
         }
         else
         {
