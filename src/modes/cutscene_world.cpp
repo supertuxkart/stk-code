@@ -328,7 +328,8 @@ void CutsceneWorld::enterRaceOverState()
             StateManager::get()->resetAndSetStack(newStack);
             StateManager::get()->pushScreen(credits);
         }
-        else if (m_parts.size() > 0 && m_parts[0] == "introcutscene")
+        else if (race_manager->getTrackName() == "introcutscene" ||
+                 race_manager->getTrackName() == "introcutscene2")
         {
             GameSlot* slot = unlock_manager->getCurrentSlot();
             if (slot->isFirstTime())
