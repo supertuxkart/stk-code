@@ -27,7 +27,7 @@
 #include <string.h>
 #include <vector>
 
-#include "addons/network_http.hpp"
+#include "addons/inetwork_http.hpp"
 #include "addons/request.hpp"
 #include "addons/zip.hpp"
 #include "graphics/irr_driver.hpp"
