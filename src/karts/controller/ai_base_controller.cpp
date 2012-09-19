@@ -404,7 +404,11 @@ float AIBaseController::normalizeAngle(float angle)
 void AIBaseController::setSteering(float angle, float dt)
 {
     float steer_fraction = angle / m_kart->getMaxSteerAngle();
-    m_controls->m_skid   = doSkid(steer_fraction);
+    if(!doSkid(steer_fraction))
+        m_controls->m_skid = KartControl::SC_NONE;
+    else
+        m_controls->m_skid = steer_fraction > 0 ? KartControl::SC_RIGHT 
+                                                : KartControl::SC_LEFT; 
     float old_steer      = m_controls->m_steer;
 
     if     (steer_fraction >  1.0f) steer_fraction =  1.0f;

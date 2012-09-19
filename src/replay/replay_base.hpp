@@ -52,7 +52,10 @@ protected:
     struct KartReplayEvent
     {
         /** The type of event. */
-        enum KartReplayEventType {KRE_NONE, KRE_SKID_TOGGLE} m_type;
+        enum KartReplayEventType {KRE_NONE, 
+                                  KRE_SKID_LEFT,
+                                  KRE_SKID_MIN = KRE_SKID_LEFT,
+                                  KRE_SKID_RIGHT, KRE_SKID_RELEASE} m_type;
 
         /** Time at which this event happens. */
         float       m_time;

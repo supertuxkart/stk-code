@@ -27,19 +27,29 @@
 class KartControl
 {
 public:
+    /** The current steering value in [-1, 1]. */
     float m_steer;
+    /** Acceleration, in [0, 1]. */
     float m_accel;
+    /** True if the kart brakes. */
     bool  m_brake;
+    /** True if the kart activates nitro. */
     bool  m_nitro;
-    bool  m_skid;
+    /** The skidding control state: SC_NONE: not pressed;
+        SC_NO_DIRECTION: pressed, but no steering;
+        SC_LEFT/RIGHT: pressed in the specified direction. */
+    enum  SkidControl {SC_NONE, SC_NO_DIRECTION, SC_LEFT, SC_RIGHT}  
+          m_skid;
+    /** True if rescue is selected. */
     bool  m_rescue;
+    /** True if fire is selected. */
     bool  m_fire;
+    /** True if the kart looks (and shoots) backwards. */ 
     bool  m_look_back;
 
-    KartControl() : m_steer(0.0f), m_accel(0.0f), m_brake(false),
-                    m_nitro(false), m_skid(false),  m_rescue(false), 
-                    m_fire(false), m_look_back(false)
+    KartControl()
     {
+        reset();
     }
     // ------------------------------------------------------------------------
     /** Construct kart control from a Message (i.e. unserialise)             */
@@ -50,6 +60,19 @@ public:
         char c      = m->getChar();
         setButtonsCompressed(c);
     }   // KartControl(Message*)
+    // ------------------------------------------------------------------------
+    /** Resets all controls. */
+    void reset() 
+    {
+        m_steer     = 0.0f;
+        m_accel     = 0.0f;
+        m_brake     = false;
+        m_nitro     = false;
+        m_skid      = SC_NONE;
+        m_rescue    = false;
+        m_fire      = false;
+        m_look_back = false;
+    }   // reset
     // ------------------------------------------------------------------------
     /** Return the serialised size in bytes.                                 */
     static int getLength() { return 9; }
@@ -74,10 +97,10 @@ public:
     {
         return  (m_brake     ?  1 : 0)
               + (m_nitro     ?  2 : 0)
-              + (m_skid      ?  4 : 0)
-              + (m_rescue    ?  8 : 0)
-              + (m_fire      ? 16 : 0)
-              + (m_look_back ? 32 : 0);
+              + (m_rescue    ?  4 : 0)
+              + (m_fire      ?  8 : 0)
+              + (m_look_back ? 16 : 0)
+              + (m_skid<<5);             // m_skid is in {0,1,2,3}
     }   // getButtonsCompressed
     // ------------------------------------------------------------------------
     /** Sets the buttons from a compressed representation.
@@ -87,10 +110,10 @@ public:
     {
         m_brake     = (c &  1) != 0;
         m_nitro     = (c &  2) != 0;
-        m_skid      = (c &  4) != 0;
-        m_rescue    = (c &  8) != 0;
-        m_fire      = (c & 16) != 0;
-        m_look_back = (c & 32) != 0;
+        m_rescue    = (c &  4) != 0;
+        m_fire      = (c &  8) != 0;
+        m_look_back = (c & 16) != 0;
+        m_skid      = (SkidControl)((c & 96) >> 5);
     }   // setButtonsCompressed
 };
 

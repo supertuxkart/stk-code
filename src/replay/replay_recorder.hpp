@@ -19,6 +19,7 @@
 #ifndef HEADER_REPLAY_RECORDER_HPP
 #define HEADER_REPLAY_RECORDER_HPP
 
+#include "karts/controller/kart_control.hpp"
 #include "replay/replay_base.hpp"
 
 #include <vector>
@@ -40,7 +41,7 @@ private:
     std::vector<unsigned int> m_count_transforms;
 
     /** Stores the last skid state. */
-    std::vector<bool> m_skid_control;
+    std::vector<KartControl::SkidControl> m_skid_control;
 
     std::vector< std::vector<KartReplayEvent> > m_kart_replay_event;
 

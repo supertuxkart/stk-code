@@ -2140,7 +2140,11 @@ bool SkiddingAI::doSkid(float steer_fraction)
 void SkiddingAI::setSteering(float angle, float dt)
 {
     float steer_fraction = angle / m_kart->getMaxSteerAngle();
-    m_controls->m_skid   = doSkid(steer_fraction);
+    if(!doSkid(steer_fraction))
+        m_controls->m_skid = KartControl::SC_NONE;
+    else
+        m_controls->m_skid = steer_fraction > 0 ? KartControl::SC_RIGHT 
+                                                : KartControl::SC_LEFT; 
 
     // Adjust steer fraction in case to be in [-1,1]
     if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
@@ -2163,7 +2167,7 @@ void SkiddingAI::setSteering(float angle, float dt)
     if((ss==Skidding::SKID_ACCUMULATE_LEFT  && steer_fraction>0.2f ) ||
        (ss==Skidding::SKID_ACCUMULATE_RIGHT && steer_fraction<-0.2f)    )
     {
-        m_controls->m_skid = false;
+        m_controls->m_skid = KartControl::SC_NONE;
 #ifdef DEBUG
         if(m_ai_debug)
             printf("[AI] skid : '%s' wrong steering, stop skid.\n",
@@ -2171,19 +2175,20 @@ void SkiddingAI::setSteering(float angle, float dt)
 #endif
     }
 
-    if(m_controls->m_skid && ( ss==Skidding::SKID_ACCUMULATE_LEFT ||
-                               ss==Skidding::SKID_ACCUMULATE_RIGHT  ) )
+    if(m_controls->m_skid!=KartControl::SC_NONE && 
+            ( ss==Skidding::SKID_ACCUMULATE_LEFT ||
+              ss==Skidding::SKID_ACCUMULATE_RIGHT  )  )
     {
         steer_fraction = 
             skidding->getSteeringWhenSkidding(steer_fraction);
         if(fabsf(steer_fraction)>1.8)
         {
 #ifdef DEBUG
-        if(m_ai_debug)
-            printf("[AI] skid: %s steering too much (%f).\n",
-                    m_kart->getIdent().c_str(), steer_fraction);
+            if(m_ai_debug)
+                printf("[AI] skid: %s steering too much (%f).\n",
+                       m_kart->getIdent().c_str(), steer_fraction);
 #endif
-            m_controls->m_skid = false;
+            m_controls->m_skid = KartControl::SC_NONE;
         }
         if(steer_fraction<-1.0f)
             steer_fraction = -1.0f;

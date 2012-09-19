@@ -52,7 +52,7 @@ void ReplayRecorder::init()
 {
     m_transform_events.clear();
     m_transform_events.resize(race_manager->getNumberOfKarts());
-    m_skid_control.resize(race_manager->getNumberOfKarts(), false);
+    m_skid_control.resize(race_manager->getNumberOfKarts());
     m_kart_replay_event.resize(race_manager->getNumberOfKarts());
     for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
     {
@@ -85,7 +85,7 @@ void ReplayRecorder::reset()
  */
 void ReplayRecorder::update(float dt)
 {
-    World *world = World::getWorld();
+    const World *world = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
 
     float time = world->getTime();
@@ -101,9 +101,17 @@ void ReplayRecorder::update(float dt)
         {
             KartReplayEvent kre;
             kre.m_time = World::getWorld()->getTime();
-            kre.m_type = KartReplayEvent::KRE_SKID_TOGGLE;
+            if(kart->getControls().m_skid==KartControl::SC_LEFT)
+                kre.m_type = KartReplayEvent::KRE_SKID_LEFT;
+            else if(kart->getControls().m_skid==KartControl::SC_RIGHT)
+                kre.m_type = KartReplayEvent::KRE_SKID_RIGHT;
+            else
+                kre.m_type = KartReplayEvent::KRE_NONE;
             m_kart_replay_event[i].push_back(kre);
-            m_skid_control[i] = ! m_skid_control[i];
+            if(m_skid_control[i]!=KartControl::SC_NONE)
+                m_skid_control[i] = KartControl::SC_NONE;
+            else
+                m_skid_control[i] = kart->getControls().m_skid;
         }
 #ifdef DEBUG
         m_count ++;

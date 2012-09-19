@@ -169,12 +169,13 @@ float Skidding::getSteeringWhenSkidding(float steering) const
  *  \param skidding  True if the skid button is pressed.
  */
 void Skidding::update(float dt, bool is_on_ground, 
-                      float steering, bool skidding)
+                      float steering, KartControl::SkidControl skidding)
 {
     m_skid_bonus_ready = false;
     if (is_on_ground)
     {
-        if((fabs(steering) > 0.001f) && skidding)
+        if((fabs(steering) > 0.001f) && 
+            (skidding==KartControl::SC_LEFT||skidding==KartControl::SC_RIGHT))
         {
             m_skid_factor +=  m_skid_increase *dt/m_time_till_max_skid;
         }
@@ -237,23 +238,12 @@ void Skidding::update(float dt, bool is_on_ground,
     {
     case SKID_NONE: 
         {
-            // If skidding is pressed while the kart is going straight,
-            // do nothing (till the kart starts to steer in one direction).
-            // Just testing for the sign of steering can result in unexpected
-            // behaviour, e.g. if a player is still turning left, but already
-            // presses right (it will take a few frames for this steering to
-            // actually take place, see player_controller) - the kart would 
-            // skid to the left. So we test for a 'clear enough' steering 
-            // direction. On the other hand, the AI takes care of that (i.e. 
-            // only skids when steering is already in the right direction) -
-            // so we allow the AI to change steering even if steering is
-            // less than 90%.
-            if(!skidding || 
-                  (m_kart->getController()->isPlayerController() && 
-                    fabsf(steering)<0.9f)   ) 
-                   break;
-            m_skid_state = steering > 0 ? SKID_ACCUMULATE_RIGHT
-                                        : SKID_ACCUMULATE_LEFT;
+            if(skidding!=KartControl::SC_LEFT &&
+                skidding!=KartControl::SC_RIGHT)
+                break;
+            m_skid_state = skidding==KartControl::SC_RIGHT 
+                         ? SKID_ACCUMULATE_RIGHT
+                         : SKID_ACCUMULATE_LEFT;
             // Add a little jump to the kart. Determine the vertical speed 
             // necessary for the kart to go 0.5*jump_time up (then it needs
             // the same time to come down again), based on v = gravity * t.
@@ -338,7 +328,7 @@ void Skidding::update(float dt, bool is_on_ground,
             }
             // If player stops skidding, trigger bonus, and change state to
             // SKID_SHOW_GFX_*
-            if(!skidding) 
+            if(skidding == KartControl::SC_NONE)
             {
                 m_skid_state = m_skid_state == SKID_ACCUMULATE_LEFT 
                              ? SKID_SHOW_GFX_LEFT

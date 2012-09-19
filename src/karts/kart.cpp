@@ -354,13 +354,7 @@ void Kart::reset()
     if(m_engine_sound)
         m_engine_sound->stop();
 
-    m_controls.m_steer     = 0.0f;
-    m_controls.m_accel     = 0.0f;
-    m_controls.m_brake     = false;
-    m_controls.m_nitro     = false;
-    m_controls.m_skid      = false;
-    m_controls.m_fire      = false;
-    m_controls.m_look_back = false;
+    m_controls.reset();
     m_slipstream->reset();
     if(m_vehicle)
     {
