@@ -67,6 +67,7 @@ Camera::Camera(int camera_index, AbstractKart* kart)
     m_position_speed = 8.0f;
     m_target_speed   = 10.0f;
     m_rotation_range = 0.4f;
+    m_rotation_range = 0.0f;
     // TODO: Make this per user too if the one above goes that way.
     switch(UserConfigParams::m_camera_style)
     {
@@ -487,8 +488,17 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
     Vec3 relative_position(side_way,
                            fabsf(distance)*tan_up+above_kart,
                            distance);
-    const btTransform &trans=m_kart->getTrans();
-    wanted_position = trans(relative_position);
+    btTransform t=m_kart->getTrans();
+    if(stk_config->m_camera_follow_skid && 
+        m_kart->getSkidding()->getVisualSkidRotation()!=0)
+    {
+        // If the camera should follow the graphical skid, add the
+        // visual rotation to the relative vector:
+        btQuaternion q(m_kart->getSkidding()->getVisualSkidRotation(), 0, 0);
+        t.setBasis(t.getBasis() * btMatrix3x3(q));
+    }
+    wanted_position = t(relative_position);
+
     if (smoothing)
     {
         smoothMoveCamera(dt, wanted_position, wanted_target);
