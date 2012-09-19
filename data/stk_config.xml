@@ -204,7 +204,7 @@
            but you will always keep on doing a left turn, just more or less. -->
 
     <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
-          visual="1.0" visual-time="0.5"
+          visual="1.25" visual-time="0.7"
           time-till-bonus="1.0 3.0" 
           bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
           bonus-force="250 350"
@@ -275,7 +275,7 @@
     -->
     <turn turn-speed= "0 10 25 45"
           turn-radius="2.0 7.5 15 25"
-          time-full-steer ="0.2"  />
+          time-full-steer ="0.05"  />
 
     <!-- Speed and acceleration related values: power and max-speed (in m/s) 
          have 3 values, one for low, medium, and hard.
