@@ -239,14 +239,12 @@ void PlayerController::steer(float dt, int steer_val)
                              video::SColor(255, 255, 0, 255), false);
     }
 
-    static last_steer = 0;
     if(stk_config->m_disable_steer_while_unskid &&
         m_controls->m_skid==KartControl::SC_NONE &&
        m_kart->getSkidding()->getVisualSkidRotation()!=0)
     {
-        m_controls->m_steer = m_kart->getSkidding()->getSteeringWhenSkidding(last_steer);
+        m_controls->m_steer = 0;
     }
-    last_steer = m_kart->getSkidding()->getSteeringFraction();
 
     const float STEER_CHANGE = dt/m_kart->getTimeFullSteer();  // amount the steering is changed
     if (steer_val < 0)
