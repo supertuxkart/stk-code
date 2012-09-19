@@ -58,7 +58,7 @@ using namespace irr::video;
 #ifdef WIN32
 #include <Windows.h>
 #endif
-#if defined(__linux__)
+#if defined(__linux__) && !defined(ANDROID)
 namespace X11
 {
     #include <X11/Xlib.h>
@@ -102,7 +102,7 @@ IrrDriver::~IrrDriver()
 
 // ----------------------------------------------------------------------------
 
-#if defined(__linux__)
+#if defined(__linux__) && !defined(ANDROID)
 /*
 Returns the parent window of "window" (i.e. the ancestor of window
 that is a direct child of the root, or window itself if it is a direct child).
@@ -170,7 +170,7 @@ void IrrDriver::updateConfigIfRelevant()
         {
             printf("Could not retrieve window location\n");
         }
-#elif defined(__linux__)
+#elif defined(__linux__) && !defined(ANDROID)
         using namespace X11;
         const SExposedVideoData& videoData = m_device->getVideoDriver()->getExposedVideoData();
         Display* display = (Display*)videoData.OpenGLLinux.X11Display;
@@ -365,7 +365,7 @@ void IrrDriver::initDevice()
     // Only change video driver settings if we are showing graphics
     if (!ProfileWorld::isNoGraphics())
     {
-#if defined(__linux__)
+#if defined(__linux__) && !defined(ANDROID)
         // Set class hints on Linux, used by Window Managers.
         using namespace X11;
         const SExposedVideoData& videoData = m_video_driver
@@ -533,7 +533,7 @@ bool IrrDriver::moveWindow(const int x, const int y)
         printf("[IrrDriver] WARNING: Could not set window location\n");
         return false;
     }
-#elif defined(__linux__)
+#elif defined(__linux__) && !defined(ANDROID)
     using namespace X11;
 
     // TODO: Actually handle possible failure
