@@ -370,8 +370,8 @@ fi
 # Bullet physics
 # ==============
 AC_DEFINE([BT_NO_PROFILE], [], [Disable bullet internal profiling])
-BULLETTREE="src/bullet"
-bullet_LIBS="-Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath"
+BULLETTREE="lib/bullet"
+bullet_LIBS="-L../lib/bullet/src -lbulletdynamics -lbulletcollision -lbulletmath"
 
 
 # ====
@@ -399,10 +399,10 @@ case "${host}" in
   enet_LIBS="-Lenet -lenet -lws2_32"
   ;;
 *)
-  enet_LIBS="-Lenet -lenet"
+  enet_LIBS="-L../lib/enet -lenet"
   ;;
 esac
-ENETTREE="src/enet"
+ENETTREE="lib/enet"
 
 # ==========================================
 # Check for a known compiler bug, details in 
@@ -453,9 +453,9 @@ AC_CONFIG_FILES([                   \
  doc/Makefile                       \
  src/Makefile                       \
  src/ide/Makefile                   \
- src/bullet/Makefile                \
- src/bullet/src/Makefile            \
- src/enet/Makefile                  \
+ lib/bullet/Makefile                \
+ lib/bullet/src/Makefile            \
+ lib/enet/Makefile                  \
  tools/Makefile                 
 ])
 AC_OUTPUT

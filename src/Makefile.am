@@ -6,7 +6,7 @@ bindir=$(prefix)/games
 bin_PROGRAMS = supertuxkart
 
 AM_CPPFLAGS = -DSUPERTUXKART_DATADIR="\"$(datadir)/games/$(PACKAGE)/\""  \
- -I$(srcdir)/bullet/src/ -I$(srcdir)/enet/include/
+ -I$(srcdir)/../lib/bullet/src/ -I$(srcdir)/../lib/enet/include/
 
 supertuxkart_SOURCES = \
  main.cpp \
