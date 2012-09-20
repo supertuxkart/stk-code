@@ -126,12 +126,14 @@ void Skidding::updateSteering(float steer)
 }   // updateSteering
 
 // ----------------------------------------------------------------------------
-/** Returns the steering value necessary to steer the specified amount in
- *  'steering'. If the kart is not skidding, the return value is just
- *  steering. Otherwise the value will be (depending on current skidding
- *  direction) adjusted to a value 'steering1', so that when the kart 
- *  steers 'steering1', it will de facto steer by the original steering
- *  amount. If it's not possible
+/** Returns the steering value necessary to set in KartControls.m_steer in
+ *  order to actually to steer the specified amount in 'steering'. 
+ *  If the kart is not skidding, the return value is just
+ *  'steering'. Otherwise the return value will be (depending on current 
+ *  skidding direction) 'steering1', so that when the kart 
+ *  steers 'steering1', it will de facto steer by the original 'steering'
+ *  amount. This function might return a result outside of [-1,1] if the
+ *  specified steering can not be reached (e.g. due to skidding)
  */
 float Skidding::getSteeringWhenSkidding(float steering) const
 {
@@ -194,10 +196,12 @@ void Skidding::update(float dt, bool is_on_ground,
     else 
         if(m_skid_factor<1.0f) m_skid_factor = 1.0f;
 
-    updateSteering(steering);
     // FIXME hiker: remove once the new skidding code is finished.
     if(m_skid_state == SKID_OLD)
+    {
+        updateSteering(steering);
         return;
+    }
 
     // If skidding was started and a graphical jump should still
     // be displayed, update the data
@@ -336,6 +340,9 @@ void Skidding::update(float dt, bool is_on_ground,
                 float t = (m_skid_time <= m_skid_visual_time)
                         ? m_skid_time
                         : m_skid_visual_time;
+                if(t>m_skid_revert_visual_time)
+                    t = m_skid_revert_visual_time;
+
                 float vso = getVisualSkidRotation();
                 btVector3 rot(0, vso*m_post_skid_rotate_factor, 0);
                 m_kart->getVehicle()->setTimedRotation(t, rot);
@@ -360,7 +367,7 @@ void Skidding::update(float dt, bool is_on_ground,
     case SKID_SHOW_GFX_LEFT:
     case SKID_SHOW_GFX_RIGHT:
         m_skid_time -= dt;
-        if(m_skid_time<=0) 
+        if(m_skid_time<=0)
         {
             m_skid_time = 0;
             m_kart->getKartGFX()
@@ -368,6 +375,7 @@ void Skidding::update(float dt, bool is_on_ground,
             m_skid_state = SKID_NONE;
         }
     }   // switch
+    updateSteering(steering);
 }   // update
 
 // ----------------------------------------------------------------------------

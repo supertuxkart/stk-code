@@ -182,6 +182,8 @@
            of the kart also determines the direction the kart is driving to
            when skidding is stopped.
          visual-time: How long it takes for the visual skid to reach maximum.
+         revert-visual-time: how long it takes when stopping a skid to revert
+           the visual skid and bring visuals and physics in sync again.
          angular-velocity: Angular velocity to be used for the kart when skidding.
          time-till-bonus: How long a kart needs to skid in order to get a bonus.
          bonus-force: A speedup applied to the kart whick skidded for a while.
@@ -204,7 +206,7 @@
            but you will always keep on doing a left turn, just more or less. -->
 
     <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
-          visual="1.25" visual-time="0.7"
+          visual="1.25" visual-time="0.7" revert-visual-time="0.7"
           time-till-bonus="1.0 3.0" 
           bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
           bonus-force="250 350"

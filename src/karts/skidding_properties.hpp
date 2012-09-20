@@ -50,6 +50,10 @@ protected:
     /** How long it takes for visual skid to reach maximum. */
     float m_skid_visual_time;
 
+    /** How long it takes for the physical and graphical bodies to be 
+     *  in sync again after a skid. */
+    float m_skid_revert_visual_time;
+
     /** Time till maximum skidding is reached. */
     float m_time_till_max_skid;
 

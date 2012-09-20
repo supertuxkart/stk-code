@@ -131,9 +131,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the skidding state. */
     SkidState getSkidState() const { return m_skid_state; }
-protected:
-    // The AI needs more details about the skidding state
-    friend class SkiddingAI;
     // ------------------------------------------------------------------------
     float getSteeringWhenSkidding(float steering) const;
     // ------------------------------------------------------------------------
