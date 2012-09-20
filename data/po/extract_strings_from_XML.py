@@ -16,7 +16,17 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, level=0):
         comment = None
         if e.hasAttribute("I18N"):
            comment = e.getAttribute("I18N")
-         
+        
+        if e.localName == "subtitle" and e.hasAttribute("text") and len(e.getAttribute("text")) > 0:
+               #print "Label=", e.getAttribute("name"), " Comment=", comment
+               line = ""
+               if comment == None:
+                   line += "//I18N: Cutscene subtitle from " + file + "\n_(\"" + e.getAttribute("text") + "\")\n\n"
+               else:
+                   line += "//I18N: Cutscene subtitle from " + file + "\n//I18N: " + comment + "\n_(\"" + e.getAttribute("text") + "\");\n\n"
+               
+               f.write( line.encode( "utf-8" ) )
+        
         if isChallenge or isGP or isKart or isTrack:
            if e.hasAttribute("name") and len(e.getAttribute("name")) > 0:
                #print "Label=", e.getAttribute("name"), " Comment=", comment

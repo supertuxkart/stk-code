@@ -3,7 +3,7 @@
 # ./data/po/update_pot.sh
 
 CPP_FILE_LIST="`find ./src -name '*.cpp' -print` `find ./src -name '*.hpp' -print`"
-XML_FILE_LIST="`find ./data -name 'track.xml' -print` `find ./data -name '*.challenge' -print` `find ./data -name '*.grandprix' -print`"
+XML_FILE_LIST="`find ./data -name 'track.xml' -print` `find ./data -name 'scene.xml' -print` `find ./data -name '*.challenge' -print` `find ./data -name '*.grandprix' -print`"
 OTHER_XML_FILES=`find ./data -name '*.stkgui' -print && find ./data -name '*.challenge' -print && find ./data -name '*.grandprix' -print && find ./data -name 'kart.xml' -print`
 
 echo "--------------------"
