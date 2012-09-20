@@ -124,7 +124,10 @@ void GameSlot::computeActive()
     {
         if (m_points < i->second->getData()->getNumTrophies())
         {
-            m_locked_features[i->second->getData()->getTrackId()] = true;
+            if (i->second->getData()->getTrackId().size() > 0)
+                m_locked_features[i->second->getData()->getTrackId()] = true;
+            else if (i->second->getData()->getGPId().size() > 0)
+                m_locked_features[i->second->getData()->getGPId()] = true;
         }
     }
     
