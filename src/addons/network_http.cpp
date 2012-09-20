@@ -51,8 +51,6 @@
 #  include <unistd.h>
 #endif
 
-INetworkHttp *network_http = NULL;
-
 // ----------------------------------------------------------------------------
 /** Create a thread that handles all network functions independent of the 
  *  main program. NetworkHttp supports only a single thread (i.e. it's not
@@ -633,7 +631,7 @@ int NetworkHttp::progressDownload(void *clientp,
 {
     Request *request = (Request *)clientp;
     
-    NetworkHttp* self = (NetworkHttp*)network_http;
+    NetworkHttp* self = (NetworkHttp*)INetworkHttp::get();
     
     // Check if we are asked to abort the download. If so, signal this
     // back to libcurl by returning a non-zero status.
