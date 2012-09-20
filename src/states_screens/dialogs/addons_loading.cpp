@@ -21,7 +21,7 @@
 #include <pthread.h>
 
 #include "addons/addons_manager.hpp"
-#include "addons/network_http.hpp"
+#include "addons/inetwork_http.hpp"
 #include "addons/request.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
@@ -281,9 +281,9 @@ void AddonsLoading::startDownload()
     std::string file   = m_addon.getZipFileName();
     std::string save   = "tmp/"
                        + StringUtils::getBasename(m_addon.getZipFileName());
-    m_download_request = network_http->downloadFileAsynchron(file, save, 
-                                                 /*priority*/5, 
-                                            /*manage memory*/false);
+    m_download_request = INetworkHttp::get()->downloadFileAsynchron(file, save,
+                                                       /*priority*/5, 
+                                                       /*manage memory*/false);
 }   // startDownload
 
 // ----------------------------------------------------------------------------

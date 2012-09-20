@@ -141,8 +141,7 @@
 
 #include "main_loop.hpp"
 #include "addons/addons_manager.hpp"
-#include "addons/dummy_network_http.hpp"
-#include "addons/network_http.hpp"
+#include "addons/inetwork_http.hpp"
 #include "addons/news_manager.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
@@ -1101,15 +1100,12 @@ void initRest()
     news_manager            = new NewsManager();
     addons_manager          = new AddonsManager();
     
-#ifdef NO_CURL
-    network_http            = new DummyNetworkHttp();
-#else
-    network_http            = new NetworkHttp();
-#endif
+    INetworkHttp::create();
+
     // Note that the network thread must be started after the assignment
     // to network_http (since the thread might use network_http, otherwise
     // a race condition can be introduced resulting in a crash).
-    network_http->startNetworkThread();
+    INetworkHttp::get()->startNetworkThread();
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -1160,14 +1156,14 @@ void cleanSuperTuxKart()
 {
     irr_driver->updateConfigIfRelevant();
     
-    if(network_http)
-        network_http->stopNetworkThread();
+    if(INetworkHttp::get())
+        INetworkHttp::get()->stopNetworkThread();
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
     Referee::cleanup();
     if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
-    if(network_http)            delete network_http;
+    INetworkHttp::destroy();
     if(news_manager)            delete news_manager;
     if(addons_manager)          delete addons_manager;
     if(network_manager)         delete network_manager;
@@ -1305,7 +1301,7 @@ int main(int argc, char *argv[] )
         {
             StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
             if(UserConfigParams::m_internet_status ==
-                NetworkHttp::IPERM_NOT_ASKED)
+                INetworkHttp::IPERM_NOT_ASKED)
             {
                 class ConfirmServer : 
                       public MessageDialog::IConfirmDialogListener
@@ -1313,27 +1309,27 @@ int main(int argc, char *argv[] )
                 public:
                     virtual void onConfirm()
                     {
-                        delete network_http;
+                        INetworkHttp::destroy();
                         UserConfigParams::m_internet_status = 
-                            NetworkHttp::IPERM_ALLOWED;
+                            INetworkHttp::IPERM_ALLOWED;
                         GUIEngine::ModalDialog::dismiss();
-                        network_http = new NetworkHttp();
+                        INetworkHttp::create();
                         // Note that the network thread must be started after
                         // the assignment to network_http (since the thread 
                         // might use network_http, otherwise a race condition 
                         // can be introduced resulting in a crash).
-                        network_http->startNetworkThread();
+                        INetworkHttp::get()->startNetworkThread();
 
                     }   // onConfirm
                     // --------------------------------------------------------
                     virtual void onCancel()
                     {
-                        delete network_http;
+                        INetworkHttp::destroy();
                         UserConfigParams::m_internet_status =
-                            NetworkHttp::IPERM_NOT_ALLOWED;
+                            INetworkHttp::IPERM_NOT_ALLOWED;
                         GUIEngine::ModalDialog::dismiss();
-                        network_http = new NetworkHttp();
-                        network_http->startNetworkThread();
+                        INetworkHttp::create();
+                        INetworkHttp::get()->startNetworkThread();
                     }   // onCancel
                 };   // ConfirmServer
                 

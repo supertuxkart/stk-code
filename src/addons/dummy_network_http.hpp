@@ -21,6 +21,7 @@
 
 
 #include "addons/request.hpp"
+#include "addons/inetwork_http.hpp"
 
 class XMLNode;
 
@@ -28,7 +29,7 @@ class XMLNode;
  * \ingroup addonsgroup
  * Dummy implementation used when curl is not available
  */
-class DummyNetworkHttp
+class DummyNetworkHttp : public INetworkHttp
 {
     
 public:

@@ -20,7 +20,7 @@
 #include <iostream>
 
 #include "addons/addons_manager.hpp"
-#include "addons/network_http.hpp"
+#include "addons/inetwork_http.hpp"
 #include "guiengine/CGUISpriteBank.h"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -306,7 +306,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
         if (!m_reloading)
         {
             m_reloading = true;
-            network_http->insertReInit();
+            INetworkHttp::get()->insertReInit();
             
             GUIEngine::ListWidget* w_list = 
             getWidget<GUIEngine::ListWidget>("list_addons");
@@ -376,7 +376,7 @@ void AddonsScreen::onUpdate(float dt, irr::video::IVideoDriver*)
 {
     if (m_reloading)
     {
-        if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED)
+        if(UserConfigParams::m_internet_status!=INetworkHttp::IPERM_ALLOWED)
         {
             // not allowed to access the net. how did you get to this menu in 
             // the first place??

@@ -2,6 +2,7 @@
 set(STK_SOURCES
 src/addons/addon.cpp
 src/addons/addons_manager.cpp
+src/addons/inetwork_http.cpp
 src/addons/network_http.cpp
 src/addons/news_manager.cpp
 src/addons/request.cpp

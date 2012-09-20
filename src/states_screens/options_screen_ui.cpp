@@ -17,7 +17,7 @@
 
 #include "states_screens/options_screen_ui.hpp"
 
-#include "addons/network_http.hpp"
+#include "addons/inetwork_http.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
@@ -125,7 +125,7 @@ void OptionsScreenUI::init()
     CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
     assert( news != NULL );
     news->setState( UserConfigParams::m_internet_status
-                                            ==NetworkHttp::IPERM_ALLOWED );
+                                            ==INetworkHttp::IPERM_ALLOWED );
     CheckBoxWidget* min_gui = getWidget<CheckBoxWidget>("minimal-racegui");
     assert( min_gui != NULL );
     min_gui->setState( UserConfigParams::m_minimal_race_gui);
@@ -223,19 +223,19 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     {
         CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
         assert( news != NULL );
-        if(network_http)
+        if(INetworkHttp::get())
         {
-            network_http->stopNetworkThread();
-            delete network_http;
+            INetworkHttp::get()->stopNetworkThread();
+            INetworkHttp::destroy();
         }
         UserConfigParams::m_internet_status = 
-            news->getState() ? NetworkHttp::IPERM_ALLOWED
-                             : NetworkHttp::IPERM_NOT_ALLOWED;
-        network_http = new NetworkHttp();
+            news->getState() ? INetworkHttp::IPERM_ALLOWED
+                             : INetworkHttp::IPERM_NOT_ALLOWED;
+        INetworkHttp::create();
         // Note that the network thread must be started after the assignment
         // to network_http (since the thread might use network_http, otherwise
         // a race condition can be introduced resulting in a crash).
-        network_http->startNetworkThread();
+        INetworkHttp::get()->startNetworkThread();
     }
     else if (name=="minimal-racegui")
     {

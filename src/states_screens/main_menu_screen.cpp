@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include "addons/network_http.hpp"
+#include "addons/inetwork_http.hpp"
 #include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
@@ -102,7 +102,7 @@ void MainMenuScreen::init()
     // the key bindings for the first player the default again.
     input_manager->getDeviceList()->clearLatestUsedDevice();
 
-    if (UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED)
+    if (UserConfigParams::m_internet_status!=INetworkHttp::IPERM_ALLOWED)
     {
         IconButtonWidget* w = getWidget<IconButtonWidget>("addons");
         w->setDeactivated();
@@ -140,7 +140,7 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
-        if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED )
+        if(UserConfigParams::m_internet_status!=INetworkHttp::IPERM_ALLOWED )
         {
             addons_icon->setDeactivated();
             addons_icon->resetAllBadges();
@@ -189,7 +189,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     std::string selection = 
         ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     
-    /*
+    
     if (selection == "story")
     {
         StateManager::get()->enterGameState();
@@ -206,8 +206,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         //race_manager->startSingleRace("introcutscene2", 999, false);
         return;
     }
-    */
-    
+
 #if DEBUG_MENU_ITEM
     if (selection == "options")
     {
@@ -300,7 +299,6 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "about")
     {
-        CreditsScreen::getInstance()->setVictoryMusic(false);
         StateManager::get()->pushScreen(CreditsScreen::getInstance());
     }
     else if (selection == "help")
@@ -312,25 +310,12 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         GameSlot* slot = unlock_manager->getCurrentSlot();
         if (slot->isFirstTime())
         {
-            /*
             slot->setFirstTime(false);
             unlock_manager->save();
             KartSelectionScreen* s = KartSelectionScreen::getInstance();
             s->setMultiplayer(false);
             s->setFromOverworld(true);
             StateManager::get()->pushScreen( s );
-            */
-            StateManager::get()->enterGameState();
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-            race_manager->setNumKarts( 0 );
-            race_manager->setNumPlayers(0);
-            race_manager->setNumLocalPlayers(0);
-            race_manager->startSingleRace("introcutscene", 999, false);
-            
-            std::vector<std::string> parts;
-            parts.push_back("introcutscene");
-            parts.push_back("introcutscene2");
-            ((CutsceneWorld*)World::getWorld())->setParts(parts);
         }
         else
         {
@@ -359,7 +344,7 @@ void MainMenuScreen::onDisabledItemClicked(const std::string& item)
 {
     if (item == "addons")
     {
-        if (UserConfigParams::m_internet_status != NetworkHttp::IPERM_ALLOWED)
+        if (UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED)
         {
             new MessageDialog( _("The add-ons module is currently disabled in "
                                  "the Options screen") );

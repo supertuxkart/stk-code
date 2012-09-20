@@ -30,6 +30,11 @@ class XMLNode;
  */
 class INetworkHttp
 {
+
+private:
+    /** The one instance of this object. */
+    static INetworkHttp *m_network_http;
+
 public:
     /** If stk has permission to access the internet (for news
      *  server etc).
@@ -51,9 +56,12 @@ public:
                                                 int   priority = 1,
                                                 bool  manage_memory=true) = 0;
     virtual void          cancelAllDownloads() = 0;
+    static void           create();
+    static INetworkHttp  *get() { return m_network_http; }
+    static void           destroy();
+    
 };   // NetworkHttp
 
-extern INetworkHttp *network_http;
 
 #endif
 
