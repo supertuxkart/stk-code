@@ -1445,6 +1445,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\addons\inetwork_http.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\addons\network_http.cpp"
 					>
 				</File>
