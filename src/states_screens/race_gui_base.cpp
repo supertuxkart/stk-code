@@ -27,7 +27,11 @@
 #  ifdef WIN32
 #    include <windows.h>
 #  endif
-#  include <GL/gl.h>
+#  ifdef ANDROID
+#    include <GLES/gl.h>
+#  else
+#    include <GL/gl.h>
+#  endif
 #endif
 
 #include "audio/music_manager.hpp"
@@ -482,6 +486,7 @@ void RaceGUIBase::renderPlayerView(const AbstractKart *kart)
 
     if (m_lightning > 0.0f)
     {
+#ifndef ANDROID
         GLint glviewport[4];
         glviewport[0] = viewport.UpperLeftCorner.X;
         glviewport[1] = viewport.UpperLeftCorner.Y;
@@ -506,6 +511,7 @@ void RaceGUIBase::renderPlayerView(const AbstractKart *kart)
         glEnd();
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+#endif
     }
 #if 0 // Rainy look, off, TODO: needs to be settable per track
     else
