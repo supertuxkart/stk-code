@@ -190,6 +190,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     
     
+    /*
     if (selection == "story")
     {
         StateManager::get()->enterGameState();
@@ -206,7 +207,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         //race_manager->startSingleRace("introcutscene2", 999, false);
         return;
     }
-
+    */
+    
 #if DEBUG_MENU_ITEM
     if (selection == "options")
     {
@@ -310,12 +312,19 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         GameSlot* slot = unlock_manager->getCurrentSlot();
         if (slot->isFirstTime())
         {
-            slot->setFirstTime(false);
-            unlock_manager->save();
-            KartSelectionScreen* s = KartSelectionScreen::getInstance();
-            s->setMultiplayer(false);
-            s->setFromOverworld(true);
-            StateManager::get()->pushScreen( s );
+            StateManager::get()->enterGameState();
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+            race_manager->setNumKarts( 0 );
+            race_manager->setNumPlayers(0);
+            race_manager->setNumLocalPlayers(0);
+            race_manager->startSingleRace("introcutscene", 999, false);
+            
+            std::vector<std::string> parts;
+            parts.push_back("introcutscene");
+            parts.push_back("introcutscene2");
+            ((CutsceneWorld*)World::getWorld())->setParts(parts);
+            //race_manager->startSingleRace("introcutscene2", 999, false);
+            return;
         }
         else
         {
