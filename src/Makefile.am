@@ -17,6 +17,7 @@ supertuxkart_SOURCES = \
  addons/addons_manager.cpp \
  addons/addons_manager.hpp \
  addons/dummy_network_http.hpp \
+ addons/inetwork_http.cpp \
  addons/inetwork_http.hpp \
  addons/network_http.cpp \
  addons/network_http.hpp \
