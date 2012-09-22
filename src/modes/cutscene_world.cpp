@@ -187,6 +187,16 @@ void CutsceneWorld::update(float dt)
     }
     **/
     
+    if (m_time < 0.0001f)
+    {
+        PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+        TrackObject* curr;
+        for_in(curr, objects)
+        {
+            curr->reset();
+        }
+    }
+    
     m_time += dt;
     
     if (m_time < 2.0f)
@@ -203,6 +213,8 @@ void CutsceneWorld::update(float dt)
     }
     
     float currFrame = m_time * 25.0f; // We assume 25 FPS
+    
+    //printf("Estimated current frame : %f\n", currFrame);
     
     const std::vector<Subtitle>& subtitles = m_track->getSubtitles();
     bool foundSubtitle = false;
