@@ -173,6 +173,12 @@ float Skidding::getSteeringWhenSkidding(float steering) const
 void Skidding::update(float dt, bool is_on_ground, 
                       float steering, KartControl::SkidControl skidding)
 {
+    // If a kart animation is shown, stop all skidding bonuses.
+    if(m_kart->getKartAnimation())
+    {
+        reset();
+        return;
+    }
     m_skid_bonus_ready = false;
     if (is_on_ground)
     {
