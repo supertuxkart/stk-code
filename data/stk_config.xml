@@ -277,7 +277,7 @@
     -->
     <turn turn-speed= "0 10 25 45"
           turn-radius="2.0 7.5 15 25"
-          time-full-steer ="0.05"  />
+          time-full-steer ="0.2"  />
 
     <!-- Speed and acceleration related values: power and max-speed (in m/s) 
          have 3 values, one for low, medium, and hard.
