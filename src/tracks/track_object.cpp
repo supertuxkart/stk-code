@@ -242,6 +242,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
             scene::IAnimatedMeshSceneNode *node =
                 irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_mesh);
             m_node = node;
+            node->setName(model_name.c_str());
             
             m_frame_start = node->getStartFrame();
             xml_node.get("frame-start", &m_frame_start);

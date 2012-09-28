@@ -83,6 +83,8 @@ void AnimationBase::reset()
     {
         curr->reset();
     }
+    
+    TrackObject::reset();
 }   // reset
 
 // ----------------------------------------------------------------------------

@@ -45,6 +45,12 @@ class CutsceneWorld : public World
     float m_duration;
     bool m_aborted;
     
+    /** monkey tricks to get the animations in sync with irrlicht. we reset the time
+     *  after all is loaded and it's running withotu delays
+     */
+    bool m_second_reset;
+    float m_time_at_second_reset;
+    
     void abortCutscene()
     {
         if (m_time < m_duration - 2.0f) m_duration = m_time + 2.0f;

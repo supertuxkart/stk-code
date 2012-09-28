@@ -47,6 +47,7 @@
  */
 CutsceneWorld::CutsceneWorld() : World()
 {
+    m_time_at_second_reset = 0.0f;
     m_aborted = false;
     WorldStatus::setClockMode(CLOCK_NONE);
     m_use_highscores = false;
@@ -59,6 +60,7 @@ CutsceneWorld::CutsceneWorld() : World()
  */
 void CutsceneWorld::init()
 {
+    m_second_reset = false;
     World::init();
     
     dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(1.0f);
@@ -189,6 +191,8 @@ void CutsceneWorld::update(float dt)
     
     if (m_time < 0.0001f)
     {
+        //printf("INITIAL TIME for CutsceneWorld\n");
+        
         PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
         TrackObject* curr;
         for_in(curr, objects)
@@ -196,7 +200,20 @@ void CutsceneWorld::update(float dt)
             curr->reset();
         }
     }
-    
+    else if (m_second_reset)
+    {
+        m_second_reset = false;
+              
+        PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+        TrackObject* curr;
+        for_in(curr, objects)
+        {
+            curr->reset();
+        }
+        
+        m_time_at_second_reset = m_time;
+    }
+
     m_time += dt;
     
     if (m_time < 2.0f)
@@ -212,7 +229,7 @@ void CutsceneWorld::update(float dt)
         dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(0.0f);
     }
     
-    float currFrame = m_time * 25.0f; // We assume 25 FPS
+    float currFrame = (m_time - m_time_at_second_reset)* 25.0f - 1.0f; // We assume 25 FPS. Irrlicht starts at frame 0.
     
     //printf("Estimated current frame : %f\n", currFrame);
     
