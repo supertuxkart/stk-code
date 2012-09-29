@@ -433,6 +433,15 @@ void ItemManager::switchItems()
         i!=m_all_items.end();  i++)
     {
         if(!*i) continue;
+        
+        if ((*i)->getType() == Item::ITEM_BUBBLEGUM || (*i)->getType() == Item::ITEM_BUBBLEGUM_NOLOK)
+        {
+            if (race_manager->getAISuperPower() == RaceManager::SUPERPOWER_NOLOK_BOSS)
+            {
+                continue;
+            }
+        }
+        
         Item::ItemType new_type = m_switch_to[(*i)->getType()];
 
         if(m_switch_time<0)

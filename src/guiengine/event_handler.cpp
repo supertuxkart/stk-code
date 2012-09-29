@@ -605,7 +605,8 @@ void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name,
         }
     }
 
-    getCurrentScreen()->eventCallback(widget, name, playerID);
+    if (getCurrentScreen() != NULL)
+        getCurrentScreen()->eventCallback(widget, name, playerID);
 }
 
 // -----------------------------------------------------------------------------

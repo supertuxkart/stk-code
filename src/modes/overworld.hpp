@@ -79,7 +79,7 @@ public:
     /** Override settings from base class */
     virtual bool useChecklineRequirements() const OVERRIDE { return false; }
     // ------------------------------------------------------------------------    
-    void scheduleReturnToGarage() { m_return_to_garage = true; }
+    void scheduleSelectKart() { m_return_to_garage = true; }
     // ------------------------------------------------------------------------ 
     virtual void moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
     // ------------------------------------------------------------------------

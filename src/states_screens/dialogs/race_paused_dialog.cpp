@@ -46,8 +46,15 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
                                    const float percentHeight) :
     ModalDialog(percentWidth, percentHeight)
 {
-    loadFromFile("race_paused_dialog.stkgui");
-
+    if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
+    {
+        loadFromFile("overworld_dialog.stkgui");
+    }
+    else
+    {
+        loadFromFile("race_paused_dialog.stkgui");
+    }
+    
     World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
 
     IconButtonWidget* back_btn = getWidget<IconButtonWidget>("backbtn");
@@ -81,8 +88,7 @@ void RacePausedDialog::loadedFromFile()
     {
         GUIEngine::RibbonWidget* choice_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
-        const bool success = choice_ribbon->deleteChild("endrace");
-        assert(success);
+        choice_ribbon->deleteChild("endrace");
     }
 }
 
@@ -158,6 +164,12 @@ GUIEngine::EventPropagation
         {
             ModalDialog::dismiss();
             World::getWorld()->endRaceEarly();
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == "selectkart")
+        {
+            dynamic_cast<OverWorld*>(World::getWorld())->scheduleSelectKart();
+            ModalDialog::dismiss();
             return GUIEngine::EVENT_BLOCK;
         }
     }

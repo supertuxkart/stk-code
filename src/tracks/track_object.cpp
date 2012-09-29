@@ -30,6 +30,7 @@
 #include "items/item_manager.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world.hpp"
+#include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "tracks/track.hpp"
 
 #include <IMeshSceneNode.h>
@@ -463,7 +464,8 @@ void TrackObject::onTriggerItemApproached(Item* who)
     {
         if (m_action == "garage")
         {
-            dynamic_cast<OverWorld*>(World::getWorld())->scheduleReturnToGarage();
+            new RacePausedDialog(0.8f, 0.6f);
+            //dynamic_cast<OverWorld*>(World::getWorld())->scheduleSelectKart();
         }
         else
         {
