@@ -870,6 +870,12 @@
     <ClCompile Include="..\..\states_screens\cutscene_gui.cpp">
       <Filter>Source Files\states_screens</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\addons\inetwork_http.cpp">
+      <Filter>Source Files\addons</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\karts\controller\ai_properties.cpp">
+      <Filter>Source Files\karts\controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1657,6 +1663,12 @@
     </ClInclude>
     <ClInclude Include="..\..\states_screens\cutscene_gui.hpp">
       <Filter>Header Files\states_screens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\addons\inetwork_http.hpp">
+      <Filter>Header Files\addons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\controller\ai_properties.hpp">
+      <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

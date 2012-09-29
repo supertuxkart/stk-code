@@ -111,6 +111,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib.release;ws2_32.lib;fribidi.lib;pthreadVC2.lib;libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -169,7 +170,7 @@
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ADDONS_MANAGER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ADDONS_MANAGER;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -179,7 +180,8 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib;ws2_32.lib;fribidi.lib;libpthread.a;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -202,6 +204,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\addons\inetwork_http.cpp" />
     <ClCompile Include="..\..\addons\news_manager.cpp" />
     <ClCompile Include="..\..\addons\request.cpp" />
     <ClCompile Include="..\..\challenges\game_slot.cpp" />
@@ -221,6 +224,7 @@
     <ClCompile Include="..\..\karts\abstract_kart.cpp" />
     <ClCompile Include="..\..\karts\abstract_kart_animation.cpp" />
     <ClCompile Include="..\..\karts\cannon_animation.cpp" />
+    <ClCompile Include="..\..\karts\controller\ai_properties.cpp" />
     <ClCompile Include="..\..\karts\controller\present_ai.cpp" />
     <ClCompile Include="..\..\karts\controller\skidding_ai.cpp" />
     <ClCompile Include="..\..\karts\explosion_animation.cpp" />
@@ -447,6 +451,7 @@
     <ClCompile Include="..\..\tutorial\tutorial_manager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\addons\inetwork_http.hpp" />
     <ClInclude Include="..\..\addons\news_manager.hpp" />
     <ClInclude Include="..\..\addons\request.hpp" />
     <ClInclude Include="..\..\challenges\game_slot.hpp" />
@@ -466,6 +471,7 @@
     <ClInclude Include="..\..\karts\abstract_kart.hpp" />
     <ClInclude Include="..\..\karts\abstract_kart_animation.hpp" />
     <ClInclude Include="..\..\karts\cannon_animation.hpp" />
+    <ClInclude Include="..\..\karts\controller\ai_properties.hpp" />
     <ClInclude Include="..\..\karts\controller\present_ai.hpp" />
     <ClInclude Include="..\..\karts\controller\skidding_ai.hpp" />
     <ClInclude Include="..\..\karts\explosion_animation.hpp" />
