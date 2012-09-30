@@ -900,25 +900,50 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
 
     int   min_sector = UNKNOWN_SECTOR;
     float min_dist_2 = 999999.0f*999999.0f;
-    for(int j=0; j<count; j++)
-    {
-        int next_sector;
-        if(all_sectors) 
-            next_sector = (*all_sectors)[j];
-        else
-            next_sector  = current_sector+1 == (int)getNumNodes() 
-                         ? 0 
-                         : current_sector+1;
 
-        // A first simple test uses the 2d distance to the center of the quad.
-        float dist_2 = m_all_nodes[next_sector]->getDistance2FromPoint(xyz);
-        if(dist_2<min_dist_2)
+    // It is (at least theoretical) possible that a kart is falling and in 
+    // between (or too far below) a driveline point and so it doesn't fulfill
+    // the height condition. So we run the test twice: first with height
+    // condition, then again without the height condition - just to make sure
+    // it always comes back with some kind of quad.
+    for(int phase=0; phase<2; phase++)
+    {
+        for(int j=0; j<count; j++)
         {
-            min_dist_2 = dist_2;
-            min_sector = next_sector;
-        }
-        current_sector = next_sector;
-    }   // for j
+            int next_sector;
+            if(all_sectors) 
+                next_sector = (*all_sectors)[j];
+            else
+                next_sector  = current_sector+1 == (int)getNumNodes() 
+                ? 0 
+                : current_sector+1;
+
+            // A first simple test uses the 2d distance to the center of the quad.
+            float dist_2 = m_all_nodes[next_sector]->getDistance2FromPoint(xyz);
+            if(dist_2<min_dist_2)
+            {
+                const Quad &q = getQuadOfNode(next_sector);
+                float dist    = xyz.getY() - q.getMinHeight();
+                // While negative distances are unlikely, we allow some small
+                // negative numbers in case that the kart is partly in the 
+                // track. Only do the height test in phase==0, in phase==1
+                // accept any point, independent of height.
+                if(phase==1 || (dist < 5.0f && dist>-1.0f) )
+                {
+                    min_dist_2 = dist_2;
+                    min_sector = next_sector;
+                }
+            }
+            current_sector = next_sector;
+        }   // for j
+        // Leave in phase 0 if any sector was found.
+        if(min_sector!=UNKNOWN_SECTOR)
+            return min_sector;
+#ifdef DEBUG
+        printf("findOutOfRoadSector: can't find sector with height for "
+               "%f %f %f\n", xyz.getX(), xyz.getY(), xyz.getZ());
+#endif
+    }   // phase
 
     if(min_sector==UNKNOWN_SECTOR )
     {
