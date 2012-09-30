@@ -1563,7 +1563,10 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
 
     delete root;
 
-    if (UserConfigParams::m_track_debug) QuadGraph::get()->createDebugMesh();
+    if (UserConfigParams::m_track_debug &&
+        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES && 
+        !m_is_cutscene) 
+        QuadGraph::get()->createDebugMesh();
     
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
