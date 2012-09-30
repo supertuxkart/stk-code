@@ -138,7 +138,8 @@ void CutsceneWorld::init()
         
         if (dynamic_cast<AnimationBase*>(curr) != NULL)
         {
-            m_duration = std::max(m_duration, dynamic_cast<AnimationBase*>(curr)->getAnimationDuration());
+            m_duration = std::max(m_duration, 
+                         (double)dynamic_cast<AnimationBase*>(curr)->getAnimationDuration());
         }
     }
     
@@ -176,7 +177,7 @@ const std::string& CutsceneWorld::getIdent() const
 /** Update the world and the track.
  *  \param dt Time step size. 
  */
-void CutsceneWorld::update(float dt)
+void CutsceneWorld::update(double dt)
 {
     /*
     {
@@ -232,18 +233,19 @@ void CutsceneWorld::update(float dt)
     
     if (m_time < 2.0f)
     {
-        dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(1.0f - m_time / 2.0f);
+        dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(1.0f - (float)m_time / 2.0f);
     }
     else if (m_time > m_duration - 2.0f)
     {
-        dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel((m_time - (m_duration - 2.0f)) / 2.0f);
+        dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel((float)(m_time - (m_duration - 2.0f)) / 2.0f);
     }
     else
     {
         dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(0.0f);
     }
     
-    float currFrame = m_time*25.0f - 1.0f; // We assume 25 FPS. Irrlicht starts at frame 0.
+    // We assume 25 FPS. Irrlicht starts at frame 0.
+    float currFrame = (float)(m_time*25.0f - 1.0f); 
     
     //printf("Estimated current frame : %f\n", currFrame);
     
@@ -265,8 +267,8 @@ void CutsceneWorld::update(float dt)
     }
     
     
-    World::update(dt);
-    World::updateTrack(dt);
+    World::update((float)dt);
+    World::updateTrack((float)dt);
     
     PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
     TrackObject* curr;

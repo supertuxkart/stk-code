@@ -116,12 +116,12 @@ public:
             printf("%s {\n", name);
             // 1325966438 is an arbitrary time that is in the past but much after 1970
             // to get smaller numbers in order to not lose the precision of float
-            m_time = getFloatTimeSinceEpoch(1325966438);
+            m_time = (float)getFloatTimeSinceEpoch(1325966438);
         }
         
         ~ScopeProfiler()
         {
-            float f2 = getFloatTimeSinceEpoch(1325966438);
+            float f2 = (float)getFloatTimeSinceEpoch(1325966438);
             printf("} // took %f s\n", (f2 - m_time));
         }
     };
