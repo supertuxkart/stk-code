@@ -91,7 +91,7 @@ protected:
     /**
       * Elasped/remaining time in seconds
       */
-    float           m_time;
+    double          m_time;
     ClockType       m_clock_mode;
 
     bool            m_play_racestart_sounds;

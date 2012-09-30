@@ -222,8 +222,9 @@ void CutsceneWorld::update(float dt)
     {
         // this way of calculating time and  dt is more in line with what irrlicht does and
         // provides better synchronisation
-        float prev_time = m_time;
-        m_time = Time::getFloatTimeSinceEpoch() - m_time_at_second_reset;
+        double prev_time = m_time;
+        double now = Time::getFloatTimeSinceEpoch();
+        m_time = now - m_time_at_second_reset;
         dt = (m_time - prev_time);
     }
     //m_time += dt;
