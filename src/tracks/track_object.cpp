@@ -405,7 +405,7 @@ void TrackObject::reset()
         a_node->setRotation(m_init_hpr);
         a_node->setScale(m_init_scale);
         a_node->setLoopMode(m_is_looped);
-        a_node->setCurrentFrame(a_node->getStartFrame());
+        a_node->setCurrentFrame((float)(a_node->getStartFrame()));
         
         // trick to reset the animation AND also the timer inside it
         a_node->OnAnimate(0);
