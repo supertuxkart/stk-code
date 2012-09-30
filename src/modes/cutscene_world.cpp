@@ -199,11 +199,14 @@ void CutsceneWorld::update(float dt)
         {
             curr->reset();
         }
+        m_time = 0.01f;
+        m_time_at_second_reset = Time::getFloatTimeSinceEpoch();
+        m_second_reset = true;
     }
     else if (m_second_reset)
     {
         m_second_reset = false;
-              
+        
         PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
         TrackObject* curr;
         for_in(curr, objects)
@@ -211,10 +214,20 @@ void CutsceneWorld::update(float dt)
             curr->reset();
         }
         
-        m_time_at_second_reset = m_time;
+        //m_time_at_second_reset = m_time;
+        m_time_at_second_reset = Time::getFloatTimeSinceEpoch();
+        m_time = 0.01f;
     }
+    else
+    {
+        // this way of calculating time and  dt is more in line with what irrlicht does and
+        // provides better synchronisation
+        float prev_time = m_time;
+        m_time = Time::getFloatTimeSinceEpoch() - m_time_at_second_reset;
+        dt = (m_time - prev_time);
+    }
+    //m_time += dt;
 
-    m_time += dt;
     
     if (m_time < 2.0f)
     {
@@ -229,7 +242,7 @@ void CutsceneWorld::update(float dt)
         dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(0.0f);
     }
     
-    float currFrame = (m_time - m_time_at_second_reset)* 25.0f - 1.0f; // We assume 25 FPS. Irrlicht starts at frame 0.
+    float currFrame = m_time*25.0f - 1.0f; // We assume 25 FPS. Irrlicht starts at frame 0.
     
     //printf("Estimated current frame : %f\n", currFrame);
     
