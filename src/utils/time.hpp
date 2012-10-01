@@ -30,6 +30,7 @@
 #endif
 
 #include <string>
+#include "graphics/irr_driver.hpp"
 
 class Time
 {
@@ -48,63 +49,15 @@ public:
     /** In integer seconds  */
     static TimeType getTimeSinceEpoch()
     {
-#ifdef WIN32
-        FILETIME ft;
-        GetSystemTimeAsFileTime(&ft);
-        __int64 t = ft.dwHighDateTime;
-        t <<= 32;
-        t /= 10;
-        // The Unix epoch starts on Jan 1 1970.  Need to subtract 
-        // the difference in seconds from Jan 1 1601.
-#       if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-#           define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
-#       else
-#           define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
-#       endif
-        t -= DELTA_EPOCH_IN_MICROSECS;
- 
-        t |= ft.dwLowDateTime;
-        // Convert to seconds since epoch
-        t /= 1000000UL;
-        return t;
-#else
-        struct timeval tv;
-        if (gettimeofday(&tv, NULL) != 0)
-        {
-            throw std::runtime_error("gettimeofday failed");
-        }
-        return tv.tv_sec;
-#endif
+        return (TimeType)(irr_driver->getDevice()->getTimer()
+                                                 ->getRealTime()/1000.0);
     };   // getTimeSinceEpoch
+
     // ------------------------------------------------------------------------
     /** In floating point seconds  */
     static double getFloatTimeSinceEpoch(long startAt=0)
     {
-#ifdef WIN32
-        FILETIME ft;
-        GetSystemTimeAsFileTime(&ft);
-        __int64 t = ft.dwHighDateTime;
-        t <<= 32;
-        t /= 10;
-        // The Unix epoch starts on Jan 1 1970.  Need to subtract 
-        // the difference in seconds from Jan 1 1601.
-#       if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-#           define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
-#       else
-#           define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
-#       endif
-        t -= DELTA_EPOCH_IN_MICROSECS;
-        
-        t |= ft.dwLowDateTime;
-        // Convert to seconds since epoch
-        double f = (double(t) / 1000000.0);
-        return f;
-#else
-        struct timeval tv;
-        gettimeofday(&tv, NULL);
-        int millis = (tv.tv_sec - startAt)*1000 + tv.tv_usec/1000;
-        return (double)(millis/1000.0);
-#endif
+        return irr_driver->getDevice()->getTimer()->getRealTime()/1000.0;
     };   // getTimeSinceEpoch
     
     class ScopeProfiler
