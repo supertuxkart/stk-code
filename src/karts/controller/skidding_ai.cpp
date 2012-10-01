@@ -1881,7 +1881,7 @@ void SkiddingAI::findNonCrashingPoint(Vec3 *aim_position, int *last_node)
 
             //If we are outside, the previous node is what we are looking for
             if ( distance + m_kart_width * 0.5f 
-                 > QuadGraph::get()->getNode(*last_node).getPathWidth() )
+                 > QuadGraph::get()->getNode(*last_node).getPathWidth()*0.5f )
             {
                 *aim_position = QuadGraph::get()->getQuadOfNode(*last_node)
                                                  .getCenter();
