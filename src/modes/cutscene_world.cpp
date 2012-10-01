@@ -177,7 +177,7 @@ const std::string& CutsceneWorld::getIdent() const
 /** Update the world and the track.
  *  \param dt Time step size. 
  */
-void CutsceneWorld::update(double dt)
+void CutsceneWorld::update(float dt)
 {
     /*
     {

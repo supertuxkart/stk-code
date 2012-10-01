@@ -85,7 +85,7 @@ public:
     virtual const std::string& getIdent() const OVERRIDE;
     
     virtual void kartHit(const int kart_id) OVERRIDE;
-    virtual void update(double dt) OVERRIDE;
+    virtual void update(float dt) OVERRIDE;
 
     virtual void createRaceGUI() OVERRIDE;
     
