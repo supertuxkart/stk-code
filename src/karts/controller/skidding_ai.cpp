@@ -166,8 +166,11 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
         m_false_start_probability = 0.0f;
     }
 #ifdef AI_DEBUG
-    m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1.0f);
-    m_item_sphere  = irr_driver->getSceneManager()->addSphereSceneNode(1.0f);
+    int k = m_kart->getWorldKartId() % 2;
+    video::SColor col_debug(128, k ? 128 : 0, k ? 0 : 128, 0);
+    m_debug_sphere = irr_driver->addSphere(1.0f, col_debug);
+    m_item_sphere  = irr_driver->addSphere(1.0f);
+
 #define CURVE_PREDICT1   0
 #define CURVE_KART       1
 #define CURVE_LEFT       2
@@ -193,12 +196,12 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
 #endif
 #ifdef AI_DEBUG_NEW_FIND_NON_CRASHING
     m_curve[CURVE_LEFT]      = new ShowCurve(0.5f, 0.5f, 
-                                   irr::video::SColor(128, 128,   0,   0));
+                                            video::SColor(128, 128,   0,   0));
     m_curve[CURVE_RIGHT]     = new ShowCurve(0.5f, 0.5f, 
-                                   irr::video::SColor(128,   0, 128,   0));
+                                            video::SColor(128,   0, 128,   0));
 #endif
     m_curve[CURVE_QG]        = new ShowCurve(0.5f, 0.5f, 
-                                   irr::video::SColor(128,   0, 128,   0));
+                                            video::SColor(128,   0, 128,   0));
 #ifdef AI_DEBUG_KART_AIM
     irr::video::SColor c1;
     if(m_item_behaviour == ITEM_COLLECT_PRIORITY)
@@ -209,7 +212,6 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
     m_curve[CURVE_AIM]       = new ShowCurve(0.5f, 0.5f, c1);
 #endif
 #endif
-
 
 }   // SkiddingAI
 
@@ -576,7 +578,6 @@ void SkiddingAI::handleSteering(float dt)
             findNonCrashingPoint2(&aim_point, &last_node);
         else
             findNonCrashingPoint(&aim_point, &last_node);
-
 #ifdef AI_DEBUG
         m_debug_sphere->setPosition(aim_point.toIrrVector());
 #endif
@@ -1680,8 +1681,8 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
  *  left line:
  *
  *      X       The new left line connecting kart to X will be to the right
- *              of the old left line, so the available space for the kart
- *    \      /  (
+ *              of the old left line, so the available area for the kart
+ *    \      /  will be dictated by the new left line.
  *     \    /
  *      kart
  *  Similarly for the right side. This will narrow down the available area
@@ -1770,7 +1771,6 @@ void SkiddingAI::findNonCrashingPoint2(Vec3 *result, int *last_node)
 
     // Now look for the next curve to find out to which side of the
     // track the AI should aim at
-
     *last_node = m_track_node;
     int count = 0;
     while(1)
@@ -1844,7 +1844,7 @@ void SkiddingAI::findNonCrashingPoint(Vec3 *aim_position, int *last_node)
     // The original while(1) loop is replaced with a for loop to avoid
     // infinite loops (which we had once or twice). Usually the number
     // of iterations in the while loop is less than 7.
-    for(unsigned int i=0; i<100; i++)
+    for(unsigned int j=0; j<100; j++)
     {
         // target_sector is the sector at the longest distance that we can 
         // drive to without crashing with the track.
@@ -1863,7 +1863,7 @@ void SkiddingAI::findNonCrashingPoint(Vec3 *aim_position, int *last_node)
         // 20 steps)
         if( steps>1000) steps = 1000;
 
-        //Protection against having vel_normal with nan values
+        // Protection against having vel_normal with nan values
         if(len>0.0f) {
             direction*= 1.0f/len;
         }

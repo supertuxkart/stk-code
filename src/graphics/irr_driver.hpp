@@ -158,6 +158,8 @@ public:
     scene::ISceneNode    *addWaterNode(scene::IMesh *mesh, float wave_height,
                                        float wave_speed, float wave_length);
     scene::IMeshSceneNode*addOctTree(scene::IMesh *mesh);
+    scene::IMeshSceneNode*addSphere(float radius,
+                 const video::SColor &color=video::SColor(128, 255, 255, 255));
     scene::IMeshSceneNode*addMesh(scene::IMesh *mesh,
                                   scene::ISceneNode *parent=NULL);
     PerCameraNode        *addPerCameraMesh(scene::IMesh* mesh, 

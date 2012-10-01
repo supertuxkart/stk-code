@@ -796,6 +796,27 @@ scene::IMeshSceneNode *IrrDriver::addOctTree(scene::IMesh *mesh)
 }   // addOctTree
 
 // ----------------------------------------------------------------------------
+/** Adds a sphere with a given radius and color.
+ *  \param radius The radius of the sphere.
+ *  \param color The color to use (default (0,0,0,0)
+ */
+scene::IMeshSceneNode *IrrDriver::addSphere(float radius,
+                                            const video::SColor &color)
+{
+    scene::IMeshSceneNode *node = m_scene_manager->addSphereSceneNode(radius);
+    node->setMaterialType(video::EMT_SOLID);
+    scene::IMesh *mesh = node->getMesh();
+    mesh->setMaterialFlag(video::EMF_COLOR_MATERIAL, true);
+    video::SMaterial m;
+    m.AmbientColor    = color;
+    m.DiffuseColor    = color;
+    m.EmissiveColor   = color;
+    m.BackfaceCulling = false;
+    mesh->getMeshBuffer(0)->getMaterial() = m;
+    return node;
+}   // addSphere
+
+// ----------------------------------------------------------------------------
 /** Adds a particle scene node.
  */
 scene::IParticleSystemSceneNode *IrrDriver::addParticleNode(bool default_emitter)
