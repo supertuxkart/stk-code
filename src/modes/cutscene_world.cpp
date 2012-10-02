@@ -93,7 +93,8 @@ void CutsceneWorld::init()
                 
                 if (!StringUtils::fromString(frameStr, frame))
                 {
-                    fprintf(stderr, "[CutsceneWorld] Invalid condition '%s'\n", condition.c_str());
+                    fprintf(stderr, "[CutsceneWorld] Invalid condition '%s'\n",
+                                    condition.c_str());
                     continue;
                 }
                 
@@ -112,7 +113,8 @@ void CutsceneWorld::init()
                 
                 if (!StringUtils::fromString(frameStr, frame))
                 {
-                    fprintf(stderr, "[CutsceneWorld] Invalid condition '%s'\n", condition.c_str());
+                    fprintf(stderr, "[CutsceneWorld] Invalid condition '%s'\n",
+                                    condition.c_str());
                     continue;
                 }
                 
@@ -126,7 +128,8 @@ void CutsceneWorld::init()
                 
                 if (!StringUtils::fromString(frameStr, frame))
                 {
-                    fprintf(stderr, "[CutsceneWorld] Invalid condition '%s'\n", condition.c_str());
+                    fprintf(stderr, "[CutsceneWorld] Invalid condition '%s'\n",
+                                    condition.c_str());
                     continue;
                 }
                 
@@ -139,7 +142,8 @@ void CutsceneWorld::init()
         if (dynamic_cast<AnimationBase*>(curr) != NULL)
         {
             m_duration = std::max(m_duration, 
-                         (double)dynamic_cast<AnimationBase*>(curr)->getAnimationDuration());
+                                  (double)dynamic_cast<AnimationBase*>(curr)
+                                                     ->getAnimationDuration());
         }
     }
     
@@ -201,7 +205,7 @@ void CutsceneWorld::update(float dt)
             curr->reset();
         }
         m_time = 0.01f;
-        m_time_at_second_reset = Time::getFloatTimeSinceEpoch();
+        m_time_at_second_reset = Time::getRealTime();
         m_second_reset = true;
     }
     else if (m_second_reset)
@@ -216,7 +220,7 @@ void CutsceneWorld::update(float dt)
         }
         
         //m_time_at_second_reset = m_time;
-        m_time_at_second_reset = Time::getFloatTimeSinceEpoch();
+        m_time_at_second_reset = Time::getRealTime();
         m_time = 0.01f;
     }
     else
@@ -224,35 +228,37 @@ void CutsceneWorld::update(float dt)
         // this way of calculating time and  dt is more in line with what 
         // irrlicht does andprovides better synchronisation
         double prev_time = m_time;
-        double now = Time::getFloatTimeSinceEpoch();
+        double now = Time::getRealTime();
         m_time = now - m_time_at_second_reset;
         dt = (float)(m_time - prev_time);
     }
 
-    
+    float fade;    
     if (m_time < 2.0f)
     {
-        dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(1.0f - (float)m_time / 2.0f);
+        fade = 1.0f - (float)m_time / 2.0f;
     }
     else if (m_time > m_duration - 2.0f)
     {
-        dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel((float)(m_time - (m_duration - 2.0f)) / 2.0f);
+        fade = (float)(m_time - (m_duration - 2.0f)) / 2.0f;
     }
     else
     {
-        dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(0.0f);
+        fade = 0.0f;
     }
+    dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(fade);
     
     // We assume 25 FPS. Irrlicht starts at frame 0.
-    float currFrame = (float)(m_time*25.0f - 1.0f); 
+    float curr_frame = (float)(m_time*25.0f - 1.0f); 
     
-    //printf("Estimated current frame : %f\n", currFrame);
+    //printf("Estimated current frame : %f\n", curr_frame);
     
     const std::vector<Subtitle>& subtitles = m_track->getSubtitles();
     bool foundSubtitle = false;
     for (unsigned int n = 0; n < subtitles.size(); n++)
     {
-        if (currFrame >= subtitles[n].getFrom() && currFrame < subtitles[n].getTo())
+        if (curr_frame >= subtitles[n].getFrom() && 
+            curr_frame < subtitles[n].getTo())
         {
             dynamic_cast<CutsceneGUI*>(m_race_gui)->setSubtitle(subtitles[n].getText());
             foundSubtitle = true;
@@ -284,15 +290,17 @@ void CutsceneWorld::update(float dt)
             m_camera->setRotation(rot2.toIrrVector());
             
             sfx_manager->positionListener(m_camera->getAbsolutePosition(),
-                                          m_camera->getTarget() - m_camera->getAbsolutePosition());
+                                          m_camera->getTarget() - 
+                                            m_camera->getAbsolutePosition());
             
             break;
-            //printf("Camera %f %f %f\n", curr->getNode()->getPosition().X, curr->getNode()->getPosition().Y, curr->getNode()->getPosition().Z);
+            //printf("Camera %f %f %f\n", curr->getNode()->getPosition().X, 
+            //                            curr->getNode()->getPosition().Y, 
+            //                             curr->getNode()->getPosition().Z);
         }
     }
-    
-    for (std::map<float, std::vector<TrackObject*> >::iterator it = m_sounds_to_trigger.begin();
-         it != m_sounds_to_trigger.end(); )
+    std::map<float, std::vector<TrackObject*> >::iterator it;
+    for (it = m_sounds_to_trigger.begin(); it != m_sounds_to_trigger.end(); )
     {
         if (m_time >= it->first)
         {
@@ -308,9 +316,9 @@ void CutsceneWorld::update(float dt)
             it++;
         }
      }
-     
-     for (std::map<float, std::vector<TrackObject*> >::iterator it = m_particles_to_trigger.begin();
-         it != m_particles_to_trigger.end(); )
+
+     for (it = m_particles_to_trigger.begin(); 
+          it != m_particles_to_trigger.end(); )
      {
         if (m_time >= it->first)
         {
@@ -327,8 +335,7 @@ void CutsceneWorld::update(float dt)
         }
      }
      
-     for (std::map<float, std::vector<TrackObject*> >::iterator it = m_sounds_to_stop.begin();
-         it != m_sounds_to_stop.end(); )
+     for (it = m_sounds_to_stop.begin(); it != m_sounds_to_stop.end(); )
      {
         if (m_time >= it->first)
         {
