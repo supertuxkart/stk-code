@@ -2,7 +2,7 @@
 <challenge version="2">
     <track id="islandtrack" laps="3"/>
     <mode major="single" minor="followtheleader"/>
-    <requirements trophies="6"/>
+    <requirements trophies="95"/>
     
     <hard>
         <karts number="5"/>

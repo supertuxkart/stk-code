@@ -2,7 +2,7 @@
 <challenge version="2">
     <track id="snowtuxpeak" laps="3"/>
     <mode major="single" minor="quickrace"/>
-    <requirements trophies="8"/>
+    <requirements trophies="60"/>
     
     <hard>
         <karts number="5"/>

@@ -2,7 +2,7 @@
 <challenge version="2">
     <track id="zengarden" laps="3"/>
     <mode major="single" minor="timetrial"/>
-    <requirements trophies="4"/>
+    <requirements trophies="45"/>
     
     <hard>
         <karts number="2"/>

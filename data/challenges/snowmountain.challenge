@@ -2,7 +2,7 @@
 <challenge version="2">
     <track id="snowmountain" laps="3"/>
     <mode major="single" minor="quickrace"/>
-    <requirements trophies="0"/>
+    <requirements trophies="60"/>
     
     <hard>
         <karts number="5"/>
