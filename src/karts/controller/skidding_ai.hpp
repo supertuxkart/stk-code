@@ -150,8 +150,15 @@ private:
      *  (which would make it more difficult to avoid items). */
     bool m_avoid_item_close;
 
-    /** True if the new findNonCrashingPoint2 function should be used. */
-    bool m_use_new_aim_point_selection;
+    /** Which of the three Point Selection Algorithms (i.e.
+     *  findNoNCrashingPoint* functions) to use:
+     *  the default (which is actually slightly buggy, but so far best one 
+     *              (after handling of 90 degree turns was added)
+     *  the fixed one (which fixes one problem of the buggy algorithm),
+     *  the new algorithm (see findNonCrashingPoint* for details).
+     *  So far the default one has by far the best performance. */
+    enum {PSA_DEFAULT, PSA_FIXED, PSA_NEW}
+          m_point_selection_algorithm;
 
 #ifdef DEBUG
     /** For skidding debugging: shows the estimated turn shape. */
@@ -159,7 +166,7 @@ private:
 
     /** For debugging purpose: a sphere indicating where the AI 
      *  is targeting at. */
-    irr::scene::ISceneNode *m_debug_sphere;
+    irr::scene::ISceneNode *m_debug_sphere[4];
 
     /** For item debugging: set to the item that is selected to 
      *  be collected. */
@@ -193,8 +200,9 @@ private:
                         std::vector<const Item *> *items_to_collect);
 
     void  checkCrashes(const Vec3& pos);
-    void  findNonCrashingPoint(Vec3 *result, int *last_node);
-    void  findNonCrashingPoint2(Vec3 *result, int *last_node);
+    void  findNonCrashingPointFixed(Vec3 *result, int *last_node);
+    void  findNonCrashingPointNew(Vec3 *result, int *last_node);
+    void  findNonCrashingPointDefault(Vec3 *result, int *last_node);
 
     void  determineTrackDirection();
     void  determineTurnRadius(const Vec3 &start,

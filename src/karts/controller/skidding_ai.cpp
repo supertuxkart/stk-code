@@ -128,34 +128,20 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
         setSkiddingFraction(2.0f);
         break;
     }
-
-
-    m_use_new_aim_point_selection = false;
+    m_point_selection_algorithm = PSA_DEFAULT;
     setControllerName("Skidding");
 
     // Use this define in order to compare the impact of collecting items
 #undef COMPARE_AIS
 #ifdef COMPARE_AIS
     std::string name("");
-    if(m_kart->getWorldKartId() % 2 ==0)
+    m_point_selection_algorithm = m_kart->getWorldKartId() % 2
+                                ? PSA_DEFAULT : PSA_FIXED;
+    switch(m_point_selection_algorithm)
     {
-        m_item_behaviour = ITEM_COLLECT_NONE;
-        name += "Skidding";
-    }
-    else
-    {
-        m_item_behaviour = ITEM_COLLECT_PRIORITY;
-        name += "Collect";
-    }
-
-    if(m_kart->getWorldKartId() % 1 ==1)
-    {
-        m_use_new_aim_point_selection = true;
-        name += " new";
-    }
-    else
-    {
-        m_use_new_aim_point_selection = false;
+    case PSA_FIXED   : name = "Fixed";   break;
+    case PSA_NEW     : name = "New";     break;
+    case PSA_DEFAULT : name = "Default"; break;
     }
     setControllerName(name);
 #endif
@@ -166,9 +152,15 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
         m_false_start_probability = 0.0f;
     }
 #ifdef AI_DEBUG
-    int k = m_kart->getWorldKartId() % 2;
-    video::SColor col_debug(128, k ? 128 : 0, k ? 0 : 128, 0);
-    m_debug_sphere = irr_driver->addSphere(1.0f, col_debug);
+    for(unsigned int i=0; i<4; i++)
+    {
+        video::SColor col_debug(128, i==0 ? 128 : 0, 
+                                     i==1 ? 128 : 0,
+                                     i==2 ? 128 : 0);
+        m_debug_sphere[i] = irr_driver->addSphere(1.0f, col_debug);
+        m_debug_sphere[i]->setVisible(false);
+    }
+    m_debug_sphere[m_point_selection_algorithm]->setVisible(true);
     m_item_sphere  = irr_driver->addSphere(1.0f);
 
 #define CURVE_PREDICT1   0
@@ -222,7 +214,8 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
 SkiddingAI::~SkiddingAI()
 {
 #ifdef AI_DEBUG
-    irr_driver->removeNode(m_debug_sphere);
+    for(unsigned int i=0; i<3; i++)
+        irr_driver->removeNode(m_debug_sphere[i]);
     irr_driver->removeNode(m_item_sphere);
     for(unsigned int i=0; i<NUM_CURVES; i++)
     {
@@ -518,6 +511,7 @@ void SkiddingAI::handleSteering(float dt)
     //Reaction to being outside of the road
 	float side_dist = 
 		m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() );
+
     if( fabsf(side_dist)  >
        0.5f* QuadGraph::get()->getNode(m_track_node).getPathWidth()+0.5f )
     {
@@ -525,7 +519,7 @@ void SkiddingAI::handleSteering(float dt)
                                                     .getCenter());
 
 #ifdef AI_DEBUG
-        m_debug_sphere->setPosition(QuadGraph::get()->getQuadOfNode(next)
+        m_debug_sphere[0]->setPosition(QuadGraph::get()->getQuadOfNode(next)
                        .getCenter().toIrrVector());
         std::cout << "- Outside of road: steer to center point." <<
             std::endl;
@@ -574,12 +568,17 @@ void SkiddingAI::handleSteering(float dt)
         Vec3 aim_point;
         int last_node = QuadGraph::UNKNOWN_SECTOR;
 
-        if(m_use_new_aim_point_selection)
-            findNonCrashingPoint2(&aim_point, &last_node);
-        else
-            findNonCrashingPoint(&aim_point, &last_node);
+        switch(m_point_selection_algorithm)
+        {
+        case PSA_FIXED : findNonCrashingPointFixed(&aim_point, &last_node);
+                         break;
+        case PSA_NEW:    findNonCrashingPointNew(&aim_point, &last_node);
+                         break;
+        case PSA_DEFAULT:findNonCrashingPointDefault(&aim_point, &last_node);
+                         break;
+        }
 #ifdef AI_DEBUG
-        m_debug_sphere->setPosition(aim_point.toIrrVector());
+        m_debug_sphere[m_point_selection_algorithm]->setPosition(aim_point.toIrrVector());
 #endif
 #ifdef AI_DEBUG_KART_AIM
         const Vec3 eps(0,0.5f,0);
@@ -1507,7 +1506,8 @@ void SkiddingAI::handleNitroAndZipper()
     // (i.e. more than 2) nitro, use it.
     // -------------------------------------------------
     const unsigned int num_karts = m_world->getCurrentNumKarts();
-    if(m_kart->getPosition()== (int)num_karts && m_kart->getEnergy()>2.0f)
+    if(m_kart->getPosition()== (int)num_karts && 
+        num_karts>1 && m_kart->getEnergy()>2.0f)
     {
         m_controls->m_nitro = true;
         return;
@@ -1697,7 +1697,7 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
  *         driven to in a straight line.
  *  \param last_node The graph node index in which the aim_position is.
 */
-void SkiddingAI::findNonCrashingPoint2(Vec3 *result, int *last_node)
+void SkiddingAI::findNonCrashingPointNew(Vec3 *result, int *last_node)
 {    
     *last_node = m_next_node_index[m_track_node];
     const core::vector2df xz = m_kart->getXYZ().toIrrVector2d();
@@ -1748,6 +1748,8 @@ void SkiddingAI::findNonCrashingPoint2(Vec3 *result, int *last_node)
             m_curve[CURVE_LEFT]->addPoint(m_kart->getXYZ()+eps);
 #endif
         }
+        else
+            break;
 
         // Test if new right point is to the left of the right line. If
         // so, a new right line is defined.
@@ -1766,56 +1768,18 @@ void SkiddingAI::findNonCrashingPoint2(Vec3 *result, int *last_node)
 #endif
             right.end = p;
         }
+        else
+            break;
         *last_node = next_sector;
     }   // while
 
-    // Now look for the next curve to find out to which side of the
-    // track the AI should aim at
-    *last_node = m_track_node;
-    int count = 0;
-    while(1)
-    {
-        GraphNode::DirectionType dir;
-        unsigned int last;
-        unsigned int succ = m_successor_index[*last_node];
-        const GraphNode &gn = QuadGraph::get()->getNode(*last_node);
-        gn.getDirectionData(succ, &dir, &last);
-        if(dir==GraphNode::DIR_LEFT)
-        {
-            core::vector2df diff = left.end - right.end;
-            diff.normalize();
-            diff *= m_kart->getKartWidth()*0.5f;
-            *result = Vec3(left.end.X - diff.X,
-                           m_kart->getXYZ().getY(), 
-                           left.end.Y - diff.Y);
-            return;
-        }
-        else if(dir==GraphNode::DIR_RIGHT)
-        {
-            core::vector2df diff = right.end - left.end;
-            diff.normalize();
-            diff *= m_kart->getKartWidth()*0.5f;
-            *result = Vec3(right.end.X-diff.X, 
-                           m_kart->getXYZ().getY(),
-                           right.end.Y-diff.Y);
-            return;
-        }
+    //Vec3 ppp(0.5f*(left.end.X+right.end.X),
+    //         m_kart->getXYZ().getY(),
+    //         0.5f*(left.end.Y+right.end.Y));
+    //*result = ppp;
 
-        // We are going straight. Determine point to aim for based on the 
-        // direction of the track after the straight section
-
-        *last_node = m_next_node_index[last];
-        count++;
-        if(count>1)
-            printf("That shouldn't happen %d!!!\n", count);
-    }
-    
-    Vec3 ppp(0.5f*(left.end.X+right.end.X),
-             m_kart->getXYZ().getY(),
-             0.5f*(left.end.Y+right.end.Y));
     *result = QuadGraph::get()->getQuadOfNode(*last_node).getCenter();
-    *result = ppp;
-}   // findNonCrashingPoint2
+}   // findNonCrashingPointNew
 
 //-----------------------------------------------------------------------------
 /** Find the sector that at the longest distance from the kart, that can be
@@ -1826,7 +1790,7 @@ void SkiddingAI::findNonCrashingPoint2(Vec3 *result, int *last_node)
  *         driven to in a straight line.
  *  \param last_node The graph node index in which the aim_position is.
  */
-void SkiddingAI::findNonCrashingPoint(Vec3 *aim_position, int *last_node)
+void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
 {    
 #ifdef AI_DEBUG_KART_HEADING
     const Vec3 eps(0,0.5f,0);
@@ -1891,7 +1855,113 @@ void SkiddingAI::findNonCrashingPoint(Vec3 *aim_position, int *last_node)
         *last_node = target_sector;
     }   // for i<100
     *aim_position = QuadGraph::get()->getQuadOfNode(*last_node).getCenter();
-}   // findNonCrashingPoint
+}   // findNonCrashingPointFixed
+
+//-----------------------------------------------------------------------------
+/** This is basically the original AI algorithm. It is clearly buggy:
+ *  1) the test:
+ *     distance + m_kart_width * 0.5f 
+ *              > QuadGraph::get()->getNode(*last_node).getPathWidth() )\
+ *     is incorrect, it should compare with getPathWith*0.5f (since distance
+ *     is the distance from the center, i.e. it is half the path width if
+ *     the point is at the edge).
+ *  2) the test:
+ *     QuadGraph::get()->spatialToTrack(&step_track_coord, step_coord,
+ *                                            *last_node );
+ *     in the for loop tests always against distance from the same 
+ *     graph node (*last_node), while de-fact the loop will test points
+ *     on various graph nodes.
+ *  This results in this algorithm often picking points to aim at that
+ *  would actually force the kart off track. But in reality the kart has
+ *  to turn (and does not immediate in one frame change its direction)
+ *  which takes some time - so it is actually mostly on track.
+ *  Since this algoritm (so far) ends up with by far the best AI behaviour,
+ *  it is for now the default).
+ *  \param aim_position On exit contains the point the AI should aim at.
+ *  \param last_node On exit contais the graph node the AI is aiming at.
+*/ 
+ void SkiddingAI::findNonCrashingPointDefault(Vec3 *aim_position, int *last_node)
+{    
+#ifdef AI_DEBUG_KART_HEADING
+    const Vec3 eps(0,0.5f,0);
+    m_curve[CURVE_KART]->clear();
+    m_curve[CURVE_KART]->addPoint(m_kart->getXYZ()+eps);
+    Vec3 forw(0, 0, 50);
+    m_curve[CURVE_KART]->addPoint(m_kart->getTrans()(forw)+eps);
+#endif
+    *last_node = m_next_node_index[m_track_node];
+    float angle = QuadGraph::get()->getAngleToNext(m_track_node, 
+                                              m_successor_index[m_track_node]);
+    int target_sector;
+
+    Vec3 direction;
+    Vec3 step_track_coord;
+
+    float angle1;
+    // The original while(1) loop is replaced with a for loop to avoid
+    // infinite loops (which we had once or twice). Usually the number
+    // of iterations in the while loop is less than 7.
+    for(unsigned int j=0; j<100; j++)
+    {
+        // target_sector is the sector at the longest distance that we can 
+        // drive to without crashing with the track.
+        target_sector = m_next_node_index[*last_node];
+        angle1 = QuadGraph::get()->getAngleToNext(target_sector, 
+                                                m_successor_index[target_sector]);
+        // In very sharp turns this algorithm tends to aim at off track points,
+        // resulting in hitting a corner. So test for this special case and 
+        // prevent a too-far look-ahead in this case
+        float diff = normalizeAngle(angle1-angle);
+        if(fabsf(diff)>1.5f)
+        {
+            *aim_position = QuadGraph::get()->getQuadOfNode(target_sector)
+                                                 .getCenter();
+            return;
+        }
+
+        //direction is a vector from our kart to the sectors we are testing
+        direction = QuadGraph::get()->getQuadOfNode(target_sector).getCenter()
+                  - m_kart->getXYZ();
+
+        float len=direction.length_2d();
+        unsigned int steps = (unsigned int)( len / m_kart_length );
+        if( steps < 3 ) steps = 3;
+
+        // That shouldn't happen, but since we had one instance of
+        // STK hanging, add an upper limit here (usually it's at most
+        // 20 steps)
+        if( steps>1000) steps = 1000;
+
+        // Protection against having vel_normal with nan values
+        if(len>0.0f) {
+            direction*= 1.0f/len;
+        }
+
+        Vec3 step_coord;
+        //Test if we crash if we drive towards the target sector
+        for(unsigned int i = 2; i < steps; ++i )
+        {
+            step_coord = m_kart->getXYZ()+direction*m_kart_length * float(i);
+
+            QuadGraph::get()->spatialToTrack(&step_track_coord, step_coord,
+                                             *last_node );
+ 
+            float distance = fabsf(step_track_coord[0]);
+
+            //If we are outside, the previous node is what we are looking for
+            if ( distance + m_kart_width * 0.5f 
+                 > QuadGraph::get()->getNode(*last_node).getPathWidth() )
+            {
+                *aim_position = QuadGraph::get()->getQuadOfNode(*last_node)
+                                                 .getCenter();
+                return;
+            }
+        }
+        angle = angle1;
+        *last_node = target_sector;
+    }   // for i<100
+    *aim_position = QuadGraph::get()->getQuadOfNode(*last_node).getCenter();
+}   // findNonCrashingPointDefault
 
 //-----------------------------------------------------------------------------
 /** Determines the direction of the track ahead of the kart: 0 indicates 
