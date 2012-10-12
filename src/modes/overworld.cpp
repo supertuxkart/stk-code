@@ -120,7 +120,7 @@ void OverWorld::update(float dt)
         // so we have to start music 'manually', since we skip all phases.
         World::getWorld()->getTrack()->startMusic();
         
-        if (music_manager->getCurrentMusic() != NULL)
+        if (music_manager->getCurrentMusic() != NULL && UserConfigParams::m_music)
             music_manager->getCurrentMusic()->startMusic();
     }
     LinearWorld::update(dt);
