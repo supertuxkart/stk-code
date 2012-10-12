@@ -324,8 +324,11 @@ void ThreeDAnimation::update(float dt)
         // Now update the position of the bullet body if there is one:
         if(m_body)
         {
-            hpr = DEGREE_TO_RAD*hpr;
-            btQuaternion q(hpr.X, hpr.Y, hpr.Z);
+            Vec3 hpr2(hpr);
+            hpr2.degreeToRad();
+            btQuaternion q;
+            q.setEuler(hpr2.getY(), hpr2.getX(), hpr2.getZ());
+
             Vec3 p(xyz);
             btTransform trans(q,p);
             m_motion_state->setWorldTransform(trans);
