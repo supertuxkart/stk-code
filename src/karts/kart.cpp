@@ -305,6 +305,14 @@ void Kart::reset()
     // Reset animations and wheels
     m_kart_model->reset();
 
+    // undo bubblegum effect
+    if (m_bubblegum_time > 0.0f)
+    {
+        m_bubblegum_time = 0.0f;
+        m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
+                           m_kart_properties->getChassisAngularDamping() );
+    }
+    
     // If the controller was replaced (e.g. replaced by end controller), 
     // restore the original controller. 
     if(m_saved_controller)
