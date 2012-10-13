@@ -1297,6 +1297,18 @@ int main(int argc, char *argv[] )
         if(!handleCmdLine(argc, argv)) exit(0);
 
         addons_manager->checkInstalledAddons();
+
+        // Load addons.xml to get info about addons even when not
+        // allowed to access the internet
+        if (UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED) {
+            std::string xml_file = file_manager->getAddonsFile("addons.xml");
+            if (file_manager->fileExists(xml_file)) {
+                const XMLNode *xml = new XMLNode (xml_file);
+                addons_manager->initOnline(xml);
+            }
+        }
+        
+
         if(!UserConfigParams::m_no_start_screen)
         {
             StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
@@ -1332,7 +1344,7 @@ int main(int argc, char *argv[] )
                         INetworkHttp::get()->startNetworkThread();
                     }   // onCancel
                 };   // ConfirmServer
-                
+
                 new MessageDialog(_("SuperTuxKart may connect to a server "
                     "to download add-ons and notify you of updates. Would you "
                     "like this feature to be enabled? (To change this setting "

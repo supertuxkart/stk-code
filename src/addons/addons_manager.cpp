@@ -203,7 +203,8 @@ void AddonsManager::initOnline(const XMLNode *xml)
 
     m_state.setAtomic(STATE_READY);
 
-    downloadIcons();
+    if (UserConfigParams::m_internet_status == INetworkHttp::IPERM_ALLOWED)
+        downloadIcons();
 }   // initOnline
 
 // ----------------------------------------------------------------------------
@@ -212,9 +213,6 @@ void AddonsManager::initOnline(const XMLNode *xml)
  */
 void AddonsManager::reInit()
 {
-    m_addons_list.lock();
-    m_addons_list.getData().clear();
-    m_addons_list.unlock();
     m_state.setAtomic(STATE_INIT);
 }   // reInit
 

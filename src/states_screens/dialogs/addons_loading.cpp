@@ -84,7 +84,11 @@ void AddonsLoading::beforeAddingWidgets()
     
     if (m_addon.isInstalled())
     {
-        if (m_addon.needsUpdate())
+        /* only keep the button as "update" if allowed to access the net
+         * and  not in error state
+         */
+        if (m_addon.needsUpdate() && !addons_manager->wasError()
+            && UserConfigParams::m_internet_status==INetworkHttp::IPERM_ALLOWED)
             getWidget<IconButtonWidget> ("install")->setText( _("Update") );
         else
             r->removeChildNamed("install");
@@ -359,4 +363,4 @@ void AddonsLoading::doUninstall()
         AddonsScreen::getInstance()->loadList();
         dismiss();
     }
-}   // doInstall
+}   // doUninstall

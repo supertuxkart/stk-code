@@ -110,6 +110,12 @@ void AddonsScreen::init()
     w_list->setIcons(m_icon_bank, (int)(m_icon_height));
     
     m_type = "kart";
+    if (UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED) 
+        getWidget<GUIEngine::ButtonWidget>("reload")->setDeactivated();
+    else
+        getWidget<GUIEngine::ButtonWidget>("reload")->setActivated();
+    
+
 
     // Set the default sort order
     Addon::setSortOrder(Addon::SO_DEFAULT);
@@ -151,6 +157,9 @@ void AddonsScreen::loadList()
             continue;
         if(!UserConfigParams::m_artist_debug_mode &&
             !addon.testStatus(Addon::AS_APPROVED)    )
+            continue;
+        if (!addon.isInstalled() && (addons_manager->wasError()
+                || UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED ))
             continue;
         sorted_list.push_back(&addon);
     }
@@ -390,6 +399,7 @@ void AddonsScreen::onUpdate(float dt, irr::video::IVideoDriver*)
                                  "the add-ons website. Make sure you are "
                                  "connected to the Internet and that "
                                  "SuperTuxKart is not blocked by a firewall"));
+            loadList();
         }
         else if (addons_manager->onlineReady())
         {

@@ -102,14 +102,7 @@ void MainMenuScreen::init()
     // the key bindings for the first player the default again.
     input_manager->getDeviceList()->clearLatestUsedDevice();
 
-    if (UserConfigParams::m_internet_status!=INetworkHttp::IPERM_ALLOWED)
-    {
-        IconButtonWidget* w = getWidget<IconButtonWidget>("addons");
-        w->setDeactivated();
-        w->resetAllBadges();
-        w->setBadge(BAD_BADGE);
-    }
-    else if (!addons_manager->onlineReady())
+    if (addons_manager->isLoading())
     {
         IconButtonWidget* w = getWidget<IconButtonWidget>("addons");
         w->setDeactivated();
@@ -117,7 +110,7 @@ void MainMenuScreen::init()
         w->setBadge(LOADING_BADGE);
     }
 
-    
+
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = news_manager->getNextNewsMessage();
     w->setText(news_text, true);
@@ -140,30 +133,26 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
-        if(UserConfigParams::m_internet_status!=INetworkHttp::IPERM_ALLOWED )
-        {
-            addons_icon->setDeactivated();
-            addons_icon->resetAllBadges();
-            addons_icon->setBadge(BAD_BADGE);
-        }
-        else if (addons_manager->wasError())
-        {
-            addons_icon->setDeactivated();
-            addons_icon->resetAllBadges();
-            addons_icon->setBadge(BAD_BADGE);
-        }
-        else if (addons_manager->onlineReady())
+        if (addons_manager->wasError())
         {
             addons_icon->setActivated();
             addons_icon->resetAllBadges();
+            addons_icon->setBadge(BAD_BADGE);
         }
-        else 
+        else if (addons_manager->isLoading() && UserConfigParams::m_internet_status
+                == INetworkHttp::IPERM_ALLOWED)
         {
             // Addons manager is still initialising/downloading.
             addons_icon->setDeactivated();
             addons_icon->resetAllBadges();
             addons_icon->setBadge(LOADING_BADGE);
         }
+        else 
+        {
+            addons_icon->setActivated();
+            addons_icon->resetAllBadges();
+        }
+        // maybe add a new badge when not allowed to access the net
     }
 
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
