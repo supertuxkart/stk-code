@@ -200,7 +200,7 @@ void OptionsScreenInput2::updateInputButtons()
     actions->renameItem(i++, makeLabel( _("Nitro"), PA_NITRO) );
     
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Sharp Turn"), PA_DRIFT) );
+    actions->renameItem(i++, makeLabel( _("Skidding"), PA_DRIFT) );
     
     //I18N: Key binding name
     actions->renameItem(i++, makeLabel( _("Look Back"), PA_LOOK_BACK) );
