@@ -232,12 +232,29 @@
            direction.
          straight-length-for-zipper is the minimum length a straight
            section of the track should have in order to activate a zipper.
+
+           competitive when ahead of the player, or more competitive
+           when behind the player. 
+
+         skid-probability: Since the AI is usually very good at using
+           skidding, this is used to implement some rubber-banding for
+           the AI: depending on distance to the player, the AI will
+           change the probability of skidding. This attributes takes
+           a space-separated list of "distance:probability" pairs
+           (negative distances meaning the kart is behind the player,
+           a positive number that the AI is ahead of the player).
+           Then list should have at least 2 entries. Depending on
+           the actualy distance the kart has the probability is then
+           linearly interpolated (if the AI is more than the largest
+           distance ahead, the value for the largest distance is used,
+           and similarly if the kart is more than the minimum value
+           behind).
     -->
     <ai max-item-angle="0.7" max-item-angle-high-speed="0.3"
         time-full-steer="0.1"
         bad-item-closeness="6"
         straight-length-for-zipper="35"
-    />
+        rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"/>
 
     <!-- Slipstream: length: How far behind a kart slipstream works
          collect-time: How many seconds of sstream give  maximum benefit

@@ -20,6 +20,7 @@
 #define HEADER_AI_PROPERTIES_HPP
 
 #include <string>
+#include <vector>
 
 class XMLNode;
 
@@ -67,12 +68,19 @@ protected:
     /** Minimum length of a straight in order to activate a zipper. */
     float m_straight_length_for_zipper;
 
+    /** The distances at which the skid probability is specified. */
+    std::vector<float> m_skid_distances;
+
+    /** The skidding probability depending on distance, which is stored
+     *  in m_skid_distances - the two fields must have the same length. */
+    std::vector<float> m_skid_probabilities;
 public:
 
          AIProperties();
     void load(const XMLNode *skid_node);
     void copyFrom(const AIProperties *destination);
     void checkAllSet(const std::string &filename) const;
+    float getSkiddingProbability(float distance) const;
 };   // AIProperties
 
 

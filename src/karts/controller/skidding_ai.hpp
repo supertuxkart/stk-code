@@ -24,6 +24,7 @@
 #include "karts/controller/ai_base_controller.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/graph_node.hpp"
+#include "utils/random_generator.hpp"
 
 class LinearWorld;
 class QuadGraph;
@@ -149,6 +150,15 @@ private:
     /** True if items to avoid are close by. Used to avoid using zippers
      *  (which would make it more difficult to avoid items). */
     bool m_avoid_item_close;
+
+    /** A random number generator to decide if the AI should skid or not. */
+    RandomGenerator m_random_skid;
+
+    /** True if the AI decided to skid in the previous frame. At the 
+     *  beginning of each skid it is randomly decided if the skid is
+     *  to be done or not (to rubber-band the AI). This flag is used
+     *  to decide if a new skid is happening. */
+    bool m_tried_skid_last_frame;
 
     /** Which of the three Point Selection Algorithms (i.e.
      *  findNoNCrashingPoint* functions) to use:

@@ -69,6 +69,7 @@
 #include "items/item_manager.hpp"
 #include "items/powerup.hpp"
 #include "modes/linear_world.hpp"
+#include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/quad_graph.hpp"
@@ -2211,10 +2212,48 @@ void SkiddingAI::setSteering(float angle, float dt)
 {
     float steer_fraction = angle / m_kart->getMaxSteerAngle();
     if(!doSkid(steer_fraction))
+    {
+        m_tried_skid_last_frame = false;
         m_controls->m_skid = KartControl::SC_NONE;
+    }
     else
-        m_controls->m_skid = steer_fraction > 0 ? KartControl::SC_RIGHT 
-                                                : KartControl::SC_LEFT; 
+    {
+        KartControl::SkidControl sc = steer_fraction > 0 
+                                    ? KartControl::SC_RIGHT 
+                                    : KartControl::SC_LEFT; 
+        if(!m_tried_skid_last_frame)
+        {
+            float max_distance = 0.0f;
+            unsigned int n = ProfileWorld::isProfileMode() 
+                         ? 0 : race_manager->getNumPlayers();
+
+            for(unsigned int i=0; i<n; i++)
+            {
+                unsigned int kart_id = 
+                    m_world->getPlayerKart(i)->getWorldKartId();
+                if(m_world->getOverallDistance(kart_id)>max_distance)
+                    max_distance = m_world->getOverallDistance(kart_id);
+            }
+            if(max_distance==0.0f)
+                max_distance = 999999.9f;   // force best driving 
+            float distance = 
+                m_world->getOverallDistance(m_kart->getWorldKartId())
+                     - max_distance;
+            int prob = (int)
+                    (100.0f*m_ai_properties->getSkiddingProbability(distance));
+
+            if(m_random_skid.get(100)>=prob)
+                sc = KartControl::SC_NONE;
+#undef PRINT_SKID_STATS
+#ifdef PRINT_SKID_STATS
+            printf("%s distance %f prob %d skidding %s\n", 
+                   m_kart->getIdent().c_str(), distance, prob, 
+                   sc==0 ? "no" : sc==KartControl::SC_LEFT ? "left" : "right");
+#endif
+        }
+        m_controls->m_skid = sc;
+        m_tried_skid_last_frame = true;
+    }
 
     // Adjust steer fraction in case to be in [-1,1]
     if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
