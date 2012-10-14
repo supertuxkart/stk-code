@@ -65,6 +65,10 @@ private:
         /** During last lap only: estimated finishing time!   */
         float       m_estimated_finish;
 
+        /** How far the kart has travelled (this is (number-of-laps-1) times
+         *  track-length plus distance-along-track). */
+        float       m_overall_distance;
+
         /** Stores the current graph node and track coordinates etc. */
         TrackSector m_current_sector;
 
@@ -78,8 +82,9 @@ private:
             m_lap_start_time   = 0;
             m_time_at_last_lap = 99999.9f;
             m_estimated_finish = -1.0f;
+            m_overall_distance = 0.0f;
             m_current_sector.reset();
-        }
+        }   // reset
         // --------------------------------------------------------------------
         /** Returns a pointer to the current node object. */
         TrackSector *getSector() {return &m_current_sector; }
@@ -141,23 +146,36 @@ public:
     // ------------------------------------------------------------------------    
     /** Returns true if the kart is on a valid driveline quad.
      *  \param kart_index  Index of the kart. */
-    bool          isOnRoad(unsigned int kart_index) const 
-                  { return m_kart_info[kart_index].getSector()->isOnRoad(); }
+    bool isOnRoad(unsigned int kart_index) const 
+    {
+        return m_kart_info[kart_index].getSector()->isOnRoad(); 
+    }   // isOnRoad
     
     // ------------------------------------------------------------------------
-    int           getKartLap(unsigned int kart_index) const
-                  {
-                      if (kart_index < m_kart_info.size())
-                          return m_kart_info[kart_index].m_race_lap;
-                      else
-                          return -1;
-                  }
+    /** Returns the number of laps a kart has completed. 
+     *  \param kart_index World index of the kart. */
+    int getKartLap(unsigned int kart_index) const
+    {
+        assert(kart_index < m_kart_info.size());
+        return m_kart_info[kart_index].m_race_lap;
+    }   // getkartLap
     
+    // ------------------------------------------------------------------------
+    /** Returns the track_sector object for the specified kart.
+     *  \param kart_index World index of the kart. */
     TrackSector& getTrackSector(unsigned int kart_index)
-                  {
-                      return m_kart_info[kart_index].m_current_sector;
-                  }
+    {
+        return m_kart_info[kart_index].m_current_sector;
+    }   // getTrackSector
     
+    // ------------------------------------------------------------------------
+    /** Returns how far the kart has driven so far (i.e. 
+     *  number-of-laps-finished times track-length plus distance-on-track.
+     *  \param kart_index World kart id of the kart. */
+    float getOverallDistance(unsigned int kart_index) const
+    {
+        return m_kart_info[kart_index].m_overall_distance;
+    }   // getOverallDistance
 };   // LinearWorld
 
 #endif

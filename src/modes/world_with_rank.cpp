@@ -88,7 +88,8 @@ bool WorldWithRank::setKartPosition(unsigned int kart_id,
         {
             if (!m_position_used[j])
             {
-                std::cout << "    No kart is yet set at position " << j << std::endl;
+                std::cout << "    No kart is yet set at position " << j+1 
+                          << std::endl;
             }
             else
             {
