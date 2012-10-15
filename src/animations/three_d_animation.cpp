@@ -327,8 +327,14 @@ void ThreeDAnimation::update(float dt)
             Vec3 hpr2(hpr);
             hpr2.degreeToRad();
             btQuaternion q;
-            q.setEuler(hpr2.getY(), hpr2.getX(), hpr2.getZ());
 
+            core::matrix4 mat;
+            mat.setRotationDegrees(hpr);
+
+            irr::core::quaternion tempQuat(mat);
+            q = btQuaternion(-tempQuat.X, -tempQuat.Y, -tempQuat.Z, tempQuat.W);
+            
+            
             Vec3 p(xyz);
             btTransform trans(q,p);
             m_motion_state->setWorldTransform(trans);
