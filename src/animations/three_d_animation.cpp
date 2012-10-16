@@ -122,7 +122,12 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
     {
         m_collision_shape = new btCylinderShapeZ(0.5f*extend);
     }
-    
+    else if(shape=="sphere")
+    {
+        float radius = std::max(extend.getX(), extend.getY());
+        radius = 0.5f*std::max(radius,      extend.getZ());
+        m_collision_shape = new btSphereShape(radius);
+    }
     else if(shape=="exact")
     {
         TriangleMesh* triangle_mesh = new TriangleMesh();
