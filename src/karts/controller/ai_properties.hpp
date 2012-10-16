@@ -19,6 +19,8 @@
 #ifndef HEADER_AI_PROPERTIES_HPP
 #define HEADER_AI_PROPERTIES_HPP
 
+#include "utils/interpolation_array.hpp"
+
 #include <string>
 #include <vector>
 
@@ -68,19 +70,21 @@ protected:
     /** Minimum length of a straight in order to activate a zipper. */
     float m_straight_length_for_zipper;
 
-    /** The distances at which the skid probability is specified. */
-    std::vector<float> m_skid_distances;
-
-    /** The skidding probability depending on distance, which is stored
-     *  in m_skid_distances - the two fields must have the same length. */
-    std::vector<float> m_skid_probabilities;
+    /** The array of (distance, skid_probability) points. */
+    InterpolationArray m_skid_probability;
 public:
 
          AIProperties();
     void load(const XMLNode *skid_node);
     void copyFrom(const AIProperties *destination);
     void checkAllSet(const std::string &filename) const;
-    float getSkiddingProbability(float distance) const;
+    // ------------------------------------------------------------------------
+    /** Returns the skidding probability dependent on the specified distance
+     *  to the first player kart. */
+    float getSkiddingProbability(float distance) const
+    {
+        return m_skid_probability.get(distance);
+    }   // getSkiddingProbability
 };   // AIProperties
 
 

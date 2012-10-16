@@ -44,6 +44,7 @@ using namespace irr;
 #include "utils/no_copy.hpp"
 #include "utils/time.hpp"
 
+class InterpolationArray;
 class Vec3;
 
 /**
@@ -93,6 +94,7 @@ public:
     int get(const std::string &attribute, std::vector<std::string> *value) const;
     int get(const std::string &attribute, std::vector<float> *value) const;
     int get(const std::string &attribute, std::vector<int> *value) const;
+    int get(const std::string &attribute, InterpolationArray *value) const;
     int get(core::vector3df *value) const;
     int getXYZ(core::vector3df *value) const;
     int getXYZ(Vec3 *vaslue) const;

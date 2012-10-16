@@ -34,6 +34,7 @@ using namespace irr;
 #include "karts/kart_model.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
+#include "utils/interpolation_array.hpp"
 #include "utils/vec3.hpp"
 
 class AIProperties;
@@ -124,17 +125,9 @@ private:
                                        *   braking force. */
     float m_time_full_steer;          /**< Time for player karts to reach full
                                        *   steer angle. */
-    /** Stores the speeds at which the turn angle changes. */
-    std::vector<float> m_turn_speed;
 
-    /** Stores the turn angle at the corresponding turn speed. */
-    std::vector<float> m_turn_angle_at_speed;
-
-    /** Stores the turn radius at the corresponding turn speed. */
-    std::vector<float> m_turn_radius_at_speed;
-
-    /** Increase of turn angle with speed. */
-    std::vector<float> m_speed_angle_increase;
+    /** The turn angle depending on speed. */
+    InterpolationArray m_turn_angle_at_speed;
 
     /** If != 0 a bevelled box shape is used by using a point cloud as a 
      *  collision shape. */
@@ -300,17 +293,20 @@ private:
     /** How long the slip stream speed increase will gradually be reduced. */
     float m_slipstream_fade_out_time;
 
-    float m_camera_distance;          /**< Distance of normal camera from kart.*/
-    float m_camera_forward_up_angle;  /**< Up angle of the camera in relation to
-                                           the pitch of the kart when driving 
-                                           forwards.                      */
-    float m_camera_backward_up_angle; /**< Up angle of the camera in relation to
-                                           the pitch of the kart when driving 
-                                           backwards.                      */
+    /** Distance of normal camera from kart. */
+    float m_camera_distance;
+
+    /** Up angle of the camera in relation to the pitch of the kart when 
+     *  driving forwards. */
+    float m_camera_forward_up_angle;
+
+    /** Up angle of the camera in relation to the pitch of the kart when 
+     *  driving backwards. */
+    float m_camera_backward_up_angle;
 
     /** The following two vectors define at what ratio of the maximum speed what
-     * gear is selected.  E.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
-     *                         0.5  means: if speed <=0.5 *maxSpeed --> gear 2 */
+     * gear is selected. E.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
+     *                        0.5  means: if speed <=0.5 *maxSpeed --> gear 2 */
     std::vector<float> m_gear_switch_ratio;
     /** This vector contains the increase in max power (to simulate different
      *  gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1. See
@@ -337,12 +333,20 @@ public:
     void  checkAllSet       (const std::string &filename);
     float getStartupBoost   () const;
 
+    // ------------------------------------------------------------------------
+    /** Returns the (maximum) speed for a given turn radius. 
+     *  \param radius The radius for which the speed needs to be computed. */
+    float getSpeedForTurnRadius(float radius) const {
+        float angle = sin(m_wheel_base / radius);
+        return m_turn_angle_at_speed.getReverse(angle);
+    }   // getSpeedForTurnRadius
+    // ------------------------------------------------------------------------
     /** Returns the maximum steering angle (depending on speed). */
-    float getMaxSteerAngle  (float speed) const;
+    float getMaxSteerAngle(float speed) const { 
+        return m_turn_angle_at_speed.get(speed);
+    }   // getMaxSteerAngle
 
-    /** Returns the (maximum) speed for a given turn radius. */
-    float getSpeedForTurnRadius(float radius) const;
-
+    // ------------------------------------------------------------------------
     /** Returns the material for the kart icons. */
     Material*     getIconMaterial    () const {return m_icon_material;        }
 
@@ -360,7 +364,10 @@ public:
     /** Returns the name of this kart. 
         \note Pass it through fridibi as needed, this is the LTR name
       */
-    const wchar_t* getName() const {return translations->w_gettext(m_name.c_str()); }
+    const wchar_t* getName() const 
+    {
+        return translations->w_gettext(m_name.c_str()); 
+    }
 
     const std::string getNonTranslatedName() const {return m_name;}
 
@@ -547,10 +554,16 @@ public:
 
     /** Returns the increase of maximum speed while a rubber band is 
      *  pulling. */
-    float getRubberBandSpeedIncrease() const {return m_rubber_band_speed_increase;}
+    float getRubberBandSpeedIncrease() const 
+    {
+        return m_rubber_band_speed_increase;
+    }
 
     /** Return the fade out time once a rubber band is removed. */
-    float getRubberBandFadeOutTime  () const {return m_rubber_band_fade_out_time;}
+    float getRubberBandFadeOutTime() const 
+    {
+        return m_rubber_band_fade_out_time;
+    }
 
     /** Returns duration of a plunger in your face. */
     float getPlungerInFaceTime      () const 

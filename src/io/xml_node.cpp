@@ -19,6 +19,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/interpolation_array.hpp"
 #include "utils/vec3.hpp"
 
 #include <stdexcept>
@@ -441,6 +442,53 @@ int XMLNode::get(const std::string &attribute, std::vector<int> *value) const
     }
     return value->size();
 }   // get(vector<int>)
+
+// ----------------------------------------------------------------------------
+/** Reads an InterpolatioARray. The values must be specified as:
+ *  x0:y0 x1:y1 x2:y2 ...
+ *  and the X values must be sorted. The function will abort (exit) with
+ *  an error message in case of incorrectly formed x:y pairs.
+ *  \param attribute Name of the attribute.
+ *  \param value The InterpolationArray.
+ *  \returns 0 in case of an error, !=0 otherwise
+ */
+int XMLNode::get(const std::string &attribute, InterpolationArray *value) const
+{
+    std::string s;
+    if(!get(attribute, &s)) return 0;
+
+    std::vector<std::string> pairs = StringUtils::split(s, ' ');
+    for(unsigned int i=0; i<pairs.size(); i++)
+    {
+        std::vector<std::string> pair = StringUtils::split(pairs[i],':');
+        if(pair.size()!=2)
+        {
+            printf("Incorrect interpolation pair '%s' in '%s'.\n",
+                   pairs[i].c_str(), attribute.c_str());
+            printf("Must be x:y.\n");
+            exit(-1);
+        }
+        float x;
+        if(!StringUtils::fromString(pair[0], x))
+        {
+            printf("Incorrect x in pair '%s' of '%s'.\n", 
+                   pairs[i].c_str(), attribute.c_str());
+            exit(-1);
+        }
+        float y;
+        if(!StringUtils::fromString(pair[1], y))
+        {
+            printf("Incorrect y in pair '%s' in '%s'.\n",
+                  pair[1].c_str(), attribute.c_str());
+            exit(-1);
+        }
+        if(!value->push_back(x, y))
+        {
+            return 0;
+        }
+    }   // for i
+    return 1;
+}   // get(InterpolationArray)
 
 // ----------------------------------------------------------------------------
 /** Interprets the attributes 'x', 'y', 'z'  or 'h', 'p', 'r' as a 3d vector

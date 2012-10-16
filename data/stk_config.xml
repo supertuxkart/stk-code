@@ -280,11 +280,11 @@
     <swatter duration="10" distance="3" squash-duration="5" 
              squash-slowdown="0.5"/>
 
-    <!-- turn-speed and turn-radius define the turn radius of the kart at
-         the given speed. The actual steering  angle is dependent on the
+    <!-- turn-radius defines the turn radius of the kart at
+         a given speed. The actual steering angle is dependent on the
          wheel base of the kart: radius = wheel_base/sin(steering_angle).
-         The values below define that at speed 0 the turn radius is 3, at
-         speed 10 (and up to 25 then) the radius is 15 etc.
+         The values below define that at speed 0 the turn radius is 2, at
+         speed 10 the radius is 7.5 etc.
          The actual turn radius is piece-wise linearly interpolated. This
          allows for tighter turning at lower speeds, and also avoids that
          the kart becomes too hard to control at high speed (speeds of higher
@@ -292,8 +292,7 @@
          time-full-steer is the time when a player's input goes from neutral
                          steering to extreme left or right.
     -->
-    <turn turn-speed= "0 10 25 45"
-          turn-radius="2.0 7.5 15 25"
+    <turn turn-radius="0:2.0 10:7.5 25:15 45:25"
           time-full-steer ="0.2"  />
 
     <!-- Speed and acceleration related values: power and max-speed (in m/s) 
