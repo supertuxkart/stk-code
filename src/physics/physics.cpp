@@ -24,6 +24,7 @@
 #include "karts/rescue_animation.hpp"
 #include "network/race_state.hpp"
 #include "graphics/stars.hpp"
+#include "karts/explosion_animation.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btUprightConstraint.hpp"
 #include "physics/irr_debug_drawer.hpp"
@@ -176,6 +177,11 @@ void Physics::update(float dt)
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 new RescueAnimation(kart);
             }
+            else if (obj->isExplodeKartObject())
+            {
+                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+                ExplosionAnimation::create(kart);
+            }
             continue;
         }
 
@@ -187,6 +193,11 @@ void Physics::update(float dt)
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 new RescueAnimation(kart);
+            }
+            else if (anim->isExplodeKartObject())
+            {
+                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+                ExplosionAnimation::create(kart);
             }
             continue;
 

@@ -79,6 +79,9 @@ private:
 
     /** True if a kart colliding with this object should be rescued. */
     bool                  m_crash_reset;
+    
+    /** True if kart should "explode" when touching this */
+    bool                  m_explode_kart;
 
 public:
                  PhysicalObject (const XMLNode &node);
@@ -101,6 +104,7 @@ public:
     /** Returns true if this object should trigger a rescue in a kart that
      *  hits it. */
     bool isCrashReset() const { return m_crash_reset; }
+    bool isExplodeKartObject () const { return m_explode_kart; }
 };  // PhysicalObject
 
 #endif

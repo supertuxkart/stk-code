@@ -38,8 +38,10 @@
 ThreeDAnimation::ThreeDAnimation(const XMLNode &node)
                : AnimationBase(node)
 {
-    m_crash_reset   = false;
+    m_crash_reset  = false;
+    m_explode_kart = false;
     node.get("reset", &m_crash_reset);
+    node.get("explode", &m_explode_kart);
     
     m_important_animation = (World::getWorld()->getIdent() == IDENT_CUSTSCENE);
     node.get("important", &m_important_animation);

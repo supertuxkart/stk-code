@@ -47,12 +47,14 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
     m_mass         = 1;
     m_radius       = -1;
     m_crash_reset  = false;
-
+    m_explode_kart = false;
+    
     std::string shape;
-    xml_node.get("mass",   &m_mass       );
-    xml_node.get("radius", &m_radius     );
-    xml_node.get("shape",  &shape        );
-    xml_node.get("reset",  &m_crash_reset);
+    xml_node.get("mass",    &m_mass       );
+    xml_node.get("radius",  &m_radius     );
+    xml_node.get("shape",   &shape        );
+    xml_node.get("reset",   &m_crash_reset);
+    xml_node.get("explode", &m_explode_kart);
 
     m_body_type = MP_NONE;
     if     (shape=="cone"  ||
@@ -101,6 +103,7 @@ PhysicalObject::PhysicalObject(const std::string& model,
     m_mass = mass;
     m_radius = radius;
     m_crash_reset  = false;
+    m_explode_kart = false;
 
     m_init_pos.setIdentity();
     btQuaternion q;
