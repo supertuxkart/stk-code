@@ -136,7 +136,7 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
         const Vec3 right = gn.getRightUnitVector();
         // Give it 10% more space, since the kart will not always come
         // parallel to the drive line.
-        Vec3 delta = right * sqrt(m_distance_2) * 1.1f;
+        Vec3 delta = right * sqrt(m_distance_2) * 1.3f;
         m_avoidance_points[0] = new Vec3(m_xyz + delta);
         m_avoidance_points[1] = new Vec3(m_xyz - delta);
     }
