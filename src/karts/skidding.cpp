@@ -81,7 +81,7 @@ void Skidding::reset()
  *  kart skids either left or right, the steering fraction is bound by 
  *  reduce-turn-min and reduce-turn-max.
  */
-void Skidding::updateSteering(float steer)
+void Skidding::updateSteering(float steer, float dt)
 {
     if(m_skid_state==SKID_OLD)
     {
@@ -101,13 +101,21 @@ void Skidding::updateSteering(float steer)
     case SKID_SHOW_GFX_RIGHT:
     case SKID_NONE:
         m_real_steering = steer;
+        if(m_skid_time<m_skid_visual_time && m_skid_time>0)
+        {
+            m_visual_rotation -= m_visual_rotation*dt/m_skid_time;
+        }
         break;
     case SKID_ACCUMULATE_RIGHT:
         {
             float f = (1.0f+steer)*0.5f;   // map [-1,1] --> [0, 1]
             m_real_steering   = m_skid_reduce_turn_min+ 
                                 m_skid_reduce_turn_delta*f;
-            m_visual_rotation = m_skid_visual * m_real_steering;
+            if(m_skid_time < m_skid_visual_time)
+                m_visual_rotation = m_skid_visual*m_real_steering*m_skid_time
+                                  / m_skid_visual_time;
+            else
+                m_visual_rotation = m_skid_visual * m_real_steering;
             break;
         }
     case SKID_ACCUMULATE_LEFT:
@@ -115,14 +123,15 @@ void Skidding::updateSteering(float steer)
             float f = (-1.0f+steer)*0.5f;   // map [-1,1] --> [-1, 0]
             m_real_steering   = -m_skid_reduce_turn_min+
                                  m_skid_reduce_turn_delta*f;
-            m_visual_rotation = m_skid_visual * m_real_steering;
+            if(m_skid_time < m_skid_visual_time)
+                m_visual_rotation = m_skid_visual*m_real_steering*m_skid_time
+                                  / m_skid_visual_time;
+            else
+                m_visual_rotation = m_skid_visual * m_real_steering;
             break;
         }
     }   // switch m_skid_state
 
-    float st = fabsf(m_skid_time);
-    if(st<m_skid_visual_time)
-        m_visual_rotation *= st/m_skid_visual_time;
 }   // updateSteering
 
 // ----------------------------------------------------------------------------
@@ -205,7 +214,7 @@ void Skidding::update(float dt, bool is_on_ground,
     // FIXME hiker: remove once the new skidding code is finished.
     if(m_skid_state == SKID_OLD)
     {
-        updateSteering(steering);
+        updateSteering(steering, dt);
         return;
     }
 
@@ -271,7 +280,7 @@ void Skidding::update(float dt, bool is_on_ground,
              
 #ifdef SKID_DEBUG
 #define SPEED 20.0f
-            updateSteering(steering);
+            updateSteering(steering, dt);
             m_actual_curve->clear();
             m_actual_curve->setVisible(true);
             m_predicted_curve->clear();
@@ -343,11 +352,8 @@ void Skidding::update(float dt, bool is_on_ground,
                 m_skid_state = m_skid_state == SKID_ACCUMULATE_LEFT 
                              ? SKID_SHOW_GFX_LEFT
                              : SKID_SHOW_GFX_RIGHT;
-                float t = (m_skid_time <= m_skid_visual_time)
-                        ? m_skid_time
-                        : m_skid_visual_time;
-                if(t>m_skid_revert_visual_time)
-                    t = m_skid_revert_visual_time;
+                float t = std::min(m_skid_time, m_skid_visual_time);
+                t       = std::min(t,           m_skid_revert_visual_time);
 
                 float vso = getVisualSkidRotation();
                 btVector3 rot(0, vso*m_post_skid_rotate_factor, 0);
@@ -381,7 +387,7 @@ void Skidding::update(float dt, bool is_on_ground,
             m_skid_state = SKID_NONE;
         }
     }   // switch
-    updateSteering(steering);
+    updateSteering(steering, dt);
 }   // update
 
 // ----------------------------------------------------------------------------

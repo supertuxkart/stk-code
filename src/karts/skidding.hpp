@@ -100,7 +100,7 @@ private:
 
     unsigned int getSkidBonus(float *bonus_time, float *bonus_speed, 
                               float *bonus_force) const;
-    void  updateSteering(float steer);
+    void  updateSteering(float steer, float dt);
 public:
          Skidding(Kart *kart, const SkiddingProperties *sp);
         ~Skidding();
