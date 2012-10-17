@@ -141,6 +141,15 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
 
     if(m_mass!=0.0f)  // Don't set velocity for kinematic or static objects
     {
+#ifdef DEBUG
+        // Just to get some additional information if the assert is triggered
+        if(isnan(v.getX()) || isnan(v.getY()) || isnan(v.getZ()))
+        {
+            printf("vel %f %f %f v %f %f %f\n",
+                   velocity.getX(),velocity.getY(),velocity.getZ(),
+                   v.getX(),v.getY(),v.getZ());
+        }
+#endif
         assert(!isnan(v.getX()));
         assert(!isnan(v.getY()));
         assert(!isnan(v.getZ()));
