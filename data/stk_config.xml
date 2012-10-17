@@ -249,12 +249,17 @@
            distance ahead, the value for the largest distance is used,
            and similarly if the kart is more than the minimum value
            behind).
+         speed-cap: Fraction of maximum speed the kart should drive
+           at. Used to slow down karts that are ahead of the player.
+           Note that setting this to a value >1 does NOT increase
+           the speed the kart can drive at!
     -->
     <ai max-item-angle="0.7" max-item-angle-high-speed="0.3"
         time-full-steer="0.1"
         bad-item-closeness="6"
         straight-length-for-zipper="35"
-        rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"/>
+        rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"
+        speed-cap="10:1.0 50:0.8"/>
 
     <!-- Slipstream: length: How far behind a kart slipstream works
          collect-time: How many seconds of sstream give  maximum benefit

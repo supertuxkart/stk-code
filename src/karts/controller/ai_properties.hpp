@@ -72,11 +72,14 @@ protected:
 
     /** The array of (distance, skid_probability) points. */
     InterpolationArray m_skid_probability;
+
+    /** To cap maximum speed if the kart is ahead of the player. */
+    InterpolationArray m_speed_cap;
+
 public:
 
          AIProperties();
     void load(const XMLNode *skid_node);
-    void copyFrom(const AIProperties *destination);
     void checkAllSet(const std::string &filename) const;
     // ------------------------------------------------------------------------
     /** Returns the skidding probability dependent on the specified distance
@@ -85,6 +88,13 @@ public:
     {
         return m_skid_probability.get(distance);
     }   // getSkiddingProbability
+    // ------------------------------------------------------------------------
+    /** Returns the fraction of maximum speed the AI should drive at, depending
+     *  on the distance from the player. */
+    float getSpeedCap(float distance) const
+    {
+        return m_speed_cap.get(distance);
+    }   // getSpeedCap
 };   // AIProperties
 
 

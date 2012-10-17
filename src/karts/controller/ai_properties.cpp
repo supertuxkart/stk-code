@@ -27,6 +27,7 @@ float AIProperties::UNDEFINED = -99.9f;
  */
 AIProperties::AIProperties()
             : m_skid_probability(/*decreasing*/false)
+            , m_speed_cap(/*decreasing*/true)
 {
     m_max_item_angle             = UNDEFINED;
     m_max_item_angle_high_speed  = UNDEFINED;
@@ -47,13 +48,8 @@ void AIProperties::load(const XMLNode *ai_node)
     ai_node->get("bad-item-closeness",        &m_bad_item_closeness_2      );
     ai_node->get("straight-length-for-zipper",&m_straight_length_for_zipper);
     ai_node->get("rb-skid-probability",       &m_skid_probability          );
+    ai_node->get("speed-cap",                 &m_speed_cap                 );
 
-    if(m_skid_probability.size()==0)
-    {
-        printf("No skid probability defined.\n");
-        exit(-1);
-    }
- 
     // We actually need the square of the distance later
     m_bad_item_closeness_2 *= m_bad_item_closeness_2;
     
@@ -76,12 +72,18 @@ void AIProperties::checkAllSet(const std::string &filename) const
     CHECK_NEG(m_bad_item_closeness_2,      "bad-item-closeness"        );
     CHECK_NEG(m_straight_length_for_zipper,"straight-length-for-zipper");
 
-}   // checkAllSet
+    if(m_skid_probability.size()==0)
+    {
+        printf("No skid probability defined.\n");
+        exit(-1);
+    }
+ 
+    if(m_speed_cap.size()==0)
+    {
+        printf("No speed cap defined.\n");
+        exit(-1);
+    }
 
-// ----------------------------------------------------------------------------
-void AIProperties::copyFrom(const AIProperties *destination)
-{
-    *this = *destination;
-}   // copyFrom
+}   // checkAllSet
 
 /* EOF */

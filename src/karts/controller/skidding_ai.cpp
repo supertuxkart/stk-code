@@ -358,6 +358,9 @@ void SkiddingAI::update(float dt)
     // Get information that is needed by more than 1 of the handling funcs
     computeNearestKarts();
 
+    m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI, 
+                        m_ai_properties->getSpeedCap(m_distance_to_player),
+                        /*fade_in_time*/0.0f);
     //Detect if we are going to crash with the track and/or kart
     checkCrashes(m_kart->getXYZ());
     determineTrackDirection();
@@ -1359,22 +1362,37 @@ void SkiddingAI::computeNearestKarts()
     }
 
     m_distance_ahead = m_distance_behind = 9999999.9f;
-    float my_dist = m_world->getDistanceDownTrackForKart(m_kart->getWorldKartId());
+    float my_dist = m_world->getOverallDistance(m_kart->getWorldKartId());
     if(m_kart_ahead)
     {
         m_distance_ahead = 
-            m_world->getDistanceDownTrackForKart(m_kart_ahead->getWorldKartId())
-          - my_dist;
-        if(m_distance_ahead<0.0f)
-            m_distance_ahead += m_track->getTrackLength();
+            m_world->getOverallDistance(m_kart_ahead->getWorldKartId())
+            -my_dist;
     }
     if(m_kart_behind)
     {
         m_distance_behind = my_dist
-            -m_world->getDistanceDownTrackForKart(m_kart_behind->getWorldKartId());
-        if(m_distance_behind<0.0f)
-            m_distance_behind += m_track->getTrackLength();
+            -m_world->getOverallDistance(m_kart_behind->getWorldKartId());
     }
+
+    // Compute distance to nearest player kart
+    m_distance_to_player = 0.0f;
+    unsigned int n = ProfileWorld::isProfileMode() 
+                   ? 0 : race_manager->getNumPlayers();
+    // Initially use m_distance_to_player as 'maximum overall distance'
+    for(unsigned int i=0; i<n; i++)
+    {
+        unsigned int kart_id = 
+            m_world->getPlayerKart(i)->getWorldKartId();
+        if(m_world->getOverallDistance(kart_id)>m_distance_to_player)
+            m_distance_to_player = m_world->getOverallDistance(kart_id);
+    }
+    if(m_distance_to_player==0.0f)
+        m_distance_to_player = 999999.9f;   // force best driving 
+    // Now convert 'maximum overall distance' to distance to player.
+    m_distance_to_player = 
+                m_world->getOverallDistance(m_kart->getWorldKartId())
+                - m_distance_to_player;
 }   // computeNearestKarts
 
 //-----------------------------------------------------------------------------
@@ -2223,22 +2241,9 @@ void SkiddingAI::setSteering(float angle, float dt)
                                     : KartControl::SC_LEFT; 
         if(!m_tried_skid_last_frame)
         {
-            float max_distance = 0.0f;
-            unsigned int n = ProfileWorld::isProfileMode() 
-                         ? 0 : race_manager->getNumPlayers();
-
-            for(unsigned int i=0; i<n; i++)
-            {
-                unsigned int kart_id = 
-                    m_world->getPlayerKart(i)->getWorldKartId();
-                if(m_world->getOverallDistance(kart_id)>max_distance)
-                    max_distance = m_world->getOverallDistance(kart_id);
-            }
-            if(max_distance==0.0f)
-                max_distance = 999999.9f;   // force best driving 
             float distance = 
                 m_world->getOverallDistance(m_kart->getWorldKartId())
-                     - max_distance;
+                - m_distance_to_player;
             int prob = (int)
                     (100.0f*m_ai_properties->getSkiddingProbability(distance));
 

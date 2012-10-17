@@ -1,3 +1,4 @@
+
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
@@ -150,6 +151,9 @@ private:
     /** True if items to avoid are close by. Used to avoid using zippers
      *  (which would make it more difficult to avoid items). */
     bool m_avoid_item_close;
+
+    /** Distance to the player, used for rubber-banding. */
+    float m_distance_to_player;
 
     /** A random number generator to decide if the AI should skid or not. */
     RandomGenerator m_random_skid;
