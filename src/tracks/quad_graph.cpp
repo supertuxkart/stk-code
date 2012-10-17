@@ -533,7 +533,7 @@ void QuadGraph::createDebugMesh()
                /*enable_transparency*/true);
 
     // Now colour the quads red/blue/red ...
-    video::SColor     c( 32, 255, 0, 0);    
+    video::SColor     c( 128, 255, 0, 0);    
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
     for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
     {
@@ -901,8 +901,8 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
     int   min_sector = UNKNOWN_SECTOR;
     float min_dist_2 = 999999.0f*999999.0f;
 
-    // It is (at least theoretical) possible that a kart is falling and in 
-    // between (or too far below) a driveline point and so it doesn't fulfill
+    // If a kart is falling and in between (or too far below) 
+    // a driveline point it might not fulfill
     // the height condition. So we run the test twice: first with height
     // condition, then again without the height condition - just to make sure
     // it always comes back with some kind of quad.
@@ -939,10 +939,6 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
         // Leave in phase 0 if any sector was found.
         if(min_sector!=UNKNOWN_SECTOR)
             return min_sector;
-#ifdef DEBUG
-        printf("findOutOfRoadSector: can't find sector with height for "
-               "%f %f %f\n", xyz.getX(), xyz.getY(), xyz.getZ());
-#endif
     }   // phase
 
     if(min_sector==UNKNOWN_SECTOR )
