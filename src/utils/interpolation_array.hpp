@@ -125,7 +125,7 @@ public:
                 if(y < m_y[i]) continue;
                 return m_x[i-1] + (y-m_y[i-1])/ m_delta[i-1];
             }   // for i < last
-            return m_y[last-1];
+            return m_x[last-1];
         }
         else   // increasing
         {
@@ -138,7 +138,7 @@ public:
                 if(y > m_y[i]) continue;
                 return m_x[i-1] + (y-m_y[i-1]) / m_delta[i-1];
             }   // for i < last
-            return m_y[last-1];
+            return m_x[last-1];
         }   // increasing
     }   // getReverse
 };    // InterpolationArray
