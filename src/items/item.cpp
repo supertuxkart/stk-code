@@ -116,7 +116,13 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
     // Now determine in which quad this item is, and its distance 
     // from the center within this quad.
     m_graph_node = QuadGraph::UNKNOWN_SECTOR;
-    QuadGraph::get()->findRoadSector(xyz, &m_graph_node);
+    QuadGraph* currentQuadGraph = QuadGraph::get();
+
+    // Check that QuadGraph exist ( it might not in battle mode for eg)
+    if (currentQuadGraph != NULL)
+    {
+      QuadGraph::get()->findRoadSector(xyz, &m_graph_node);
+    }
 
     if(m_graph_node==QuadGraph::UNKNOWN_SECTOR)
     {
