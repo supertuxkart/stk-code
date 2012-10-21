@@ -913,7 +913,7 @@ void RaceResultGUI::displayHighScores()
         irr::core::stringw player_name;
           
         // prevent excessive long name
-        int max_characters = 15;
+        unsigned int max_characters = 15;
         float time;
         for (int i = 0; i < scores->getNumberEntries(); i++)
         {
