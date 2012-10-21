@@ -44,6 +44,8 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
      m_center = 0.25f*(p0+p1+p2+p3);
      m_min_height = std::min ( std::min(p0.getY(), p1.getY()),
                                std::min(p2.getY(), p3.getY())  );
+     m_max_height = std::max ( std::max(p0.getY(), p1.getY()),
+                               std::max(p2.getY(), p3.getY())  );
      m_invisible = invisible;
      m_ai_ignore = ai_ignore;
 
@@ -95,7 +97,7 @@ bool Quad::pointInQuad(const Vec3& p) const
     // is taken into account, too. to simplify this test we only compare 
     // with the minimum height of the quad (and not with the actual
     // height of the quad at the point where the kart is).
-    if(p.getY() - m_min_height > 5.0f ||
+    if(p.getY() - m_max_height > 5.0f ||
        p.getY() - m_min_height < -1.0f    )
        return false;
 
