@@ -636,8 +636,8 @@ void LinearWorld::updateRacePosition()
         
         int p = 1 ;
 
-        const int my_id         = kart->getWorldKartId();
-        const float my_distance = m_kart_info[my_id].m_overall_distance;
+        const unsigned int my_id = kart->getWorldKartId();
+        const float my_distance  = m_kart_info[my_id].m_overall_distance;
 
         // Count karts ahead of the current kart, i.e. kart that are 
         // already finished or have covered a larger overall distance.
@@ -648,12 +648,14 @@ void LinearWorld::updateRacePosition()
                 continue; 
 
             // If the other kart has:
-            // - finished the race, or is ahead, or has the same distance
-            // but started earlier, it is ahead --> increase position
-            if(!kart->hasFinishedRace() && m_karts[j]->hasFinishedRace()  ||
-                m_kart_info[j].m_overall_distance > my_distance           ||
-                (m_kart_info[j].m_overall_distance == my_distance &&
-                 m_karts[j]->getInitialPosition()<kart->getInitialPosition() ) )
+            // - finished the race (but this kart hasn't)
+            // - or is ahead
+            // - or has the same distance (very unlikely) but started earlier
+            // it is ahead --> increase position
+            if((!kart->hasFinishedRace() && m_karts[j]->hasFinishedRace()) ||
+                m_kart_info[j].m_overall_distance > my_distance            ||
+               (m_kart_info[j].m_overall_distance == my_distance &&
+                m_karts[j]->getInitialPosition()<kart->getInitialPosition() ) )
             {
                 p++;
             }
