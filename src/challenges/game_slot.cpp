@@ -61,32 +61,32 @@ void GameSlot::computeActive()
             // all features, so unlock the solved ones (and don't try to
             // save the state, since we are currently reading it)
             
-            if (i->second->isSolved(RaceManager::RD_EASY))
+            if (i->second->isSolved(RaceManager::DIFFICULTY_EASY))
             {
-                unlockFeature(i->second, RaceManager::RD_EASY, /*save*/ false);
+                unlockFeature(i->second, RaceManager::DIFFICULTY_EASY, /*save*/ false);
             }
-            if (i->second->isSolved(RaceManager::RD_MEDIUM))
+            if (i->second->isSolved(RaceManager::DIFFICULTY_MEDIUM))
             {
-                unlockFeature(i->second, RaceManager::RD_MEDIUM, /*save*/ false);
+                unlockFeature(i->second, RaceManager::DIFFICULTY_MEDIUM, /*save*/ false);
             }
-            if (i->second->isSolved(RaceManager::RD_HARD))
+            if (i->second->isSolved(RaceManager::DIFFICULTY_HARD))
             {
-                unlockFeature(i->second, RaceManager::RD_HARD, /*save*/ false);
+                unlockFeature(i->second, RaceManager::DIFFICULTY_HARD, /*save*/ false);
             }
             
-            if (i->second->isSolved(RaceManager::RD_HARD))
+            if (i->second->isSolved(RaceManager::DIFFICULTY_HARD))
             {
-                m_points += CHALLENGE_POINTS[RaceManager::RD_HARD];
+                m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD];
                 m_hard_challenges++;
             }
-            else if (i->second->isSolved(RaceManager::RD_MEDIUM))
+            else if (i->second->isSolved(RaceManager::DIFFICULTY_MEDIUM))
             {
-                m_points += CHALLENGE_POINTS[RaceManager::RD_MEDIUM];
+                m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM];
                 m_medium_challenges++;
             }
-            else if (i->second->isSolved(RaceManager::RD_EASY))
+            else if (i->second->isSolved(RaceManager::DIFFICULTY_EASY))
             {
-                m_points += CHALLENGE_POINTS[RaceManager::RD_EASY];
+                m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY];
                 m_easy_challenges++;
             }
         }
@@ -97,25 +97,25 @@ void GameSlot::computeActive()
             lockFeature(i->second);
         }
         
-        if (i->second->isSolved(RaceManager::RD_HARD))
+        if (i->second->isSolved(RaceManager::DIFFICULTY_HARD))
         {
             // challenge beaten at hardest, nothing more to do here
             continue;
         }
-        else if (i->second->isSolved(RaceManager::RD_MEDIUM))
+        else if (i->second->isSolved(RaceManager::DIFFICULTY_MEDIUM))
         {
-            i->second->setActive(RaceManager::RD_HARD);
+            i->second->setActive(RaceManager::DIFFICULTY_HARD);
         }
-        else if (i->second->isSolved(RaceManager::RD_EASY))
+        else if (i->second->isSolved(RaceManager::DIFFICULTY_EASY))
         {
-            i->second->setActive(RaceManager::RD_HARD);
-            i->second->setActive(RaceManager::RD_MEDIUM);
+            i->second->setActive(RaceManager::DIFFICULTY_HARD);
+            i->second->setActive(RaceManager::DIFFICULTY_MEDIUM);
         }
         else
         {
-            i->second->setActive(RaceManager::RD_HARD);
-            i->second->setActive(RaceManager::RD_MEDIUM);
-            i->second->setActive(RaceManager::RD_EASY);
+            i->second->setActive(RaceManager::DIFFICULTY_HARD);
+            i->second->setActive(RaceManager::DIFFICULTY_MEDIUM);
+            i->second->setActive(RaceManager::DIFFICULTY_EASY);
         }
     }   // for i
     

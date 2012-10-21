@@ -60,7 +60,7 @@ DefaultAIController::DefaultAIController(AbstractKart *kart)
 
     switch( race_manager->getDifficulty())
     {
-    case RaceManager::RD_EASY:
+    case RaceManager::DIFFICULTY_EASY:
         m_wait_for_players        = true;
         m_make_use_of_slipstream  = false;
         m_max_handicap_speed      = 0.9f;
@@ -73,7 +73,7 @@ DefaultAIController::DefaultAIController(AbstractKart *kart)
         m_handle_bomb             = false;
         setSkiddingFraction(4.0f);
         break;
-    case RaceManager::RD_MEDIUM:
+    case RaceManager::DIFFICULTY_MEDIUM:
         m_wait_for_players        = true;
         m_make_use_of_slipstream  = false;
         m_max_handicap_speed      = 0.95f;
@@ -86,7 +86,7 @@ DefaultAIController::DefaultAIController(AbstractKart *kart)
         m_handle_bomb             = true;
         setSkiddingFraction(3.0f);
         break;
-    case RaceManager::RD_HARD:
+    case RaceManager::DIFFICULTY_HARD:
         m_wait_for_players        = false;
         m_make_use_of_slipstream  = true;
         m_max_handicap_speed      = 1.0f;
@@ -102,6 +102,8 @@ DefaultAIController::DefaultAIController(AbstractKart *kart)
         m_handle_bomb             = true;
         setSkiddingFraction(2.0f);
         break;
+    case RaceManager::DIFFICULTY_COUNT:
+        assert(0);   // keep the compiler happy
     }
 
 #ifdef AI_DEBUG

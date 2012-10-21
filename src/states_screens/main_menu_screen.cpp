@@ -205,7 +205,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         FeatureUnlockedCutScene* scene = 
             FeatureUnlockedCutScene::getInstance();
         
-        scene->addTrophy(RaceManager::RD_EASY);
+        scene->addTrophy(RaceManager::DIFFICULTY_EASY);
         StateManager::get()->pushScreen(scene);
         
         /*

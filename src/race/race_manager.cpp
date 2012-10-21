@@ -54,7 +54,7 @@ RaceManager* race_manager= NULL;
 RaceManager::RaceManager()
 {
     m_num_karts          = UserConfigParams::m_num_karts;
-    m_difficulty         = RD_HARD;
+    m_difficulty         = DIFFICULTY_HARD;
     m_major_mode         = MAJOR_MODE_SINGLE;
     m_minor_mode         = MINOR_MODE_NORMAL_RACE;
     m_ai_superpower      = SUPERPOWER_NONE;
@@ -451,21 +451,26 @@ void RaceManager::next()
  */
 namespace computeGPRanksData
 {
-class SortData
-{
-public:
-    int m_score;
-    int m_position;
-    float m_race_time;
-    bool operator<(const SortData &a)
+    class SortData
     {
-        return ( (m_score > a.m_score) || 
-               (m_score == a.m_score && m_race_time < a.m_race_time) );
-    }
+    public:
+        int m_score;
+        int m_position;
+        float m_race_time;
+        bool operator<(const SortData &a)
+        {
+            return ( (m_score > a.m_score) || 
+                (m_score == a.m_score && m_race_time < a.m_race_time) );
+        }
 
-};   // SortData
+    };   // SortData
 }   // namespace
 
+// ----------------------------------------------------------------------------    
+/** Sort karts and update the m_gp_rank KartStatus member, in preparation
+ *  for future calls to RaceManager::getKartGPRank or 
+ *  RaceManager::getKartWithGPRank
+ */
 void RaceManager::computeGPRanks()
 {
     // calculate the rank of each kart
@@ -654,13 +659,18 @@ void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld)
 }
 
 //-----------------------------------------------------------------------------
-
-void RaceManager::startSingleRace(const std::string trackIdent, 
+/** \brief Higher-level method to start a GP without having to care about 
+ *  the exact startup sequence.
+ * \param trackIdent Internal name of the track to race on
+ * \param num_laps   Number of laps to race, or -1 if number of laps is 
+ *        not relevant in current mode
+ */
+void RaceManager::startSingleRace(const std::string &track_ident, 
                                   const int num_laps,
                                   bool from_overworld)
 {
     StateManager::get()->enterGameState();
-    setTrack(trackIdent.c_str());
+    setTrack(track_ident.c_str());
 
     if (num_laps != -1) setNumLaps( num_laps );
     

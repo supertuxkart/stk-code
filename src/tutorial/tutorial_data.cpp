@@ -38,7 +38,7 @@ TutorialData::TutorialData(const std::string& filename)
     m_filename    = filename;
     m_major       = RaceManager::MAJOR_MODE_SINGLE;
     m_minor       = RaceManager::MINOR_MODE_NORMAL_RACE;
-    m_difficulty  = RaceManager::RD_EASY;
+    m_difficulty  = RaceManager::DIFFICULTY_EASY;
     m_num_laps    = -1;
     m_num_karts   = -1;
     m_time        = -1.0f;
@@ -259,11 +259,11 @@ void TutorialData::setTrack(std::string track_name)
 void TutorialData::setDifficulty(std::string difficulty)
 {
     if(difficulty == "easy")
-        this->m_difficulty = RaceManager::RD_EASY;
+        this->m_difficulty = RaceManager::DIFFICULTY_EASY;
     else if(difficulty =="medium")
-        this->m_difficulty = RaceManager::RD_MEDIUM;
+        this->m_difficulty = RaceManager::DIFFICULTY_MEDIUM;
     else if(difficulty =="hard")
-        this->m_difficulty = RaceManager::RD_HARD;
+        this->m_difficulty = RaceManager::DIFFICULTY_HARD;
     else
         error("difficulty");
 }

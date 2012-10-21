@@ -146,17 +146,17 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
     core::stringw msg;
     switch (difficulty)
     {
-        case RaceManager::RD_EASY:
+        case RaceManager::DIFFICULTY_EASY:
             msg = _("You completed the easy challenge! This trophy is worth %i points",
-                    CHALLENGE_POINTS[RaceManager::RD_EASY]);
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY]);
             break;
-        case RaceManager::RD_MEDIUM:
+        case RaceManager::DIFFICULTY_MEDIUM:
             msg = _("You completed the intermediate challenge! This trophy is worth %i points",
-                    CHALLENGE_POINTS[RaceManager::RD_MEDIUM]);
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM]);
             break;
-        case RaceManager::RD_HARD:
+        case RaceManager::DIFFICULTY_HARD:
             msg = _("You completed the difficult challenge! This trophy is worth %i points",
-                    CHALLENGE_POINTS[RaceManager::RD_HARD]);
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
             break;
         default:
             assert(false);
@@ -165,13 +165,13 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
     std::string model;
     switch (difficulty)
     {
-        case RaceManager::RD_EASY:
+        case RaceManager::DIFFICULTY_EASY:
             model = file_manager->getModelFile("trophy_bronze.b3d");
             break;
-        case RaceManager::RD_MEDIUM:
+        case RaceManager::DIFFICULTY_MEDIUM:
             model = file_manager->getModelFile("trophy_silver.b3d");
             break;
-        case RaceManager::RD_HARD:
+        case RaceManager::DIFFICULTY_HARD:
             model = file_manager->getModelFile("trophy_gold.b3d");
             break;
         default:

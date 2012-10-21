@@ -43,7 +43,7 @@ void OverWorld::enterOverWorld()
     race_manager->setMinorMode (RaceManager::MINOR_MODE_OVERWORLD);
     race_manager->setNumKarts( 1 );
     race_manager->setTrack( "overworld" );
-    race_manager->setDifficulty(RaceManager::RD_HARD);
+    race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
     
     // Use keyboard 0 by default (FIXME: let player choose?)
     InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);

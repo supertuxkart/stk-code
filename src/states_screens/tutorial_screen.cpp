@@ -176,7 +176,7 @@ void TutorialScreen::eventCallback(GUIEngine::Widget* widget, const std::string&
 
             m_minor = RaceManager::MINOR_MODE_NORMAL_RACE;
             m_major = RaceManager::MAJOR_MODE_SINGLE;
-            m_difficulty = RaceManager::RD_EASY;
+            m_difficulty = RaceManager::DIFFICULTY_EASY;
 
             race_manager->setMinorMode(m_minor);
             race_manager->setMajorMode(m_major);

@@ -56,9 +56,9 @@ public:
     Challenge(ChallengeData* data)
     {
         m_data = data;
-        m_state[RaceManager::RD_EASY]   = CH_INACTIVE;
-        m_state[RaceManager::RD_MEDIUM] = CH_INACTIVE;
-        m_state[RaceManager::RD_HARD]   = CH_INACTIVE;
+        m_state[RaceManager::DIFFICULTY_EASY]   = CH_INACTIVE;
+        m_state[RaceManager::DIFFICULTY_MEDIUM] = CH_INACTIVE;
+        m_state[RaceManager::DIFFICULTY_HARD]   = CH_INACTIVE;
     }
     virtual ~Challenge() {};
     void  load(const XMLNode* config);

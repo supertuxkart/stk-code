@@ -45,7 +45,7 @@ DemoWorld::DemoWorld()
     ProfileWorld::setProfileModeLaps(m_num_laps);
     race_manager->setReverseTrack(false);
     race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
-    race_manager->setDifficulty(RaceManager::RD_HARD);
+    race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
     race_manager->setNumKarts(m_num_karts);
     race_manager->setNumLocalPlayers(1);
     race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);

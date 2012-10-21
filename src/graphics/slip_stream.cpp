@@ -303,7 +303,7 @@ void SlipStream::updateSlipstreamPower()
 {
     // Low level AIs should not do any slipstreaming.
     if(!m_kart->getController()->isPlayerController() &&
-        race_manager->getDifficulty()==RaceManager::RD_EASY) return;
+        race_manager->getDifficulty()==RaceManager::DIFFICULTY_EASY) return;
 
     // See if we are currently using accumulated slipstream credits:
     // -------------------------------------------------------------

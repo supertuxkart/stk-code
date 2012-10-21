@@ -79,18 +79,18 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         
         if (selection == "novice")
         {
-            UserConfigParams::m_difficulty = RaceManager::RD_EASY;
-            race_manager->setDifficulty(RaceManager::RD_EASY);
+            UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_EASY;
+            race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
         }
         else if (selection == "intermediate")
         {
-            UserConfigParams::m_difficulty = RaceManager::RD_MEDIUM;
-            race_manager->setDifficulty(RaceManager::RD_MEDIUM);
+            UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_MEDIUM;
+            race_manager->setDifficulty(RaceManager::DIFFICULTY_MEDIUM);
         }
         else if (selection == "expert")
         {
-            UserConfigParams::m_difficulty = RaceManager::RD_HARD;
-            race_manager->setDifficulty(RaceManager::RD_HARD);
+            UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_HARD;
+            race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
         }
     }
     else if (name == "gamemode")

@@ -770,13 +770,13 @@ int handleCmdLine(int argc, char **argv)
             switch (atoi(argv[i+1]))
             {
             case 1:
-                race_manager->setDifficulty(RaceManager::RD_EASY);
+                race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
                 break;
             case 2:
-                race_manager->setDifficulty(RaceManager::RD_MEDIUM);
+                race_manager->setDifficulty(RaceManager::DIFFICULTY_MEDIUM);
                 break;
             case 3:
-                race_manager->setDifficulty(RaceManager::RD_HARD);
+                race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
                 break;
             }
             i++;
@@ -1432,7 +1432,7 @@ int main(int argc, char *argv[] )
             // Profiling
             // =========
             race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-            race_manager->setDifficulty(RaceManager::RD_HARD);
+            race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
             network_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
         }
