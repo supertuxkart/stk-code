@@ -97,7 +97,6 @@ EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *pla
 
     m_max_handicap_accel = 1.0f;
     m_min_steps          = 2;
-    setSkiddingFraction(1.3f);
 
 #ifdef AI_DEBUG
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);

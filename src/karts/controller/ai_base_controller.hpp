@@ -34,12 +34,6 @@ class Vec3;
 class AIBaseController : public Controller
 {
 private:
-    /** The minimum steering angle at which the AI adds skidding. Lower values
-     *  tend to improve the line the AI is driving. This is used to adjust for
-     *  different AI levels.
-     */
-    float    m_skidding_threshold;
-
     /** Stores the last N times when a collision happened. This is used
     *  to detect when the AI is stuck, i.e. N collisions happened in
     *  a certain period of time. */
@@ -91,7 +85,6 @@ protected:
     float    steerToAngle  (const unsigned int sector, const float angle);
     float    steerToPoint  (const Vec3 &point);
     float    normalizeAngle(float angle);
-    void     setSkiddingFraction(float f);
     void     computePath();
     virtual bool doSkid(float steer_fraction);
     // ------------------------------------------------------------------------

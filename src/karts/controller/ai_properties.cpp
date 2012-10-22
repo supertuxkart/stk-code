@@ -25,15 +25,33 @@ float AIProperties::UNDEFINED = -99.9f;
 
 /** Constructor. Sets all properties to the special UNDEFINED value.
  */
-AIProperties::AIProperties()
+AIProperties::AIProperties(RaceManager::Difficulty difficulty)
             : m_skid_probability(/*decreasing*/false)
             , m_speed_cap(/*decreasing*/true)
 {
+    switch(difficulty)
+    {
+    case RaceManager::DIFFICULTY_EASY:   m_ident="easy";   break;
+    case RaceManager::DIFFICULTY_MEDIUM: m_ident="medium"; break;
+    case RaceManager::DIFFICULTY_HARD:   m_ident="hard";   break;
+    default:                             m_ident="";       break;
+    }
+
     m_max_item_angle             = UNDEFINED;
     m_max_item_angle_high_speed  = UNDEFINED;
     m_time_full_steer            = UNDEFINED;
     m_bad_item_closeness_2       = UNDEFINED;
     m_straight_length_for_zipper = UNDEFINED;
+    m_skidding_threshold         = UNDEFINED;
+    m_min_start_delay            = UNDEFINED;
+    m_max_start_delay            = UNDEFINED;
+    m_false_start_probability    = UNDEFINED;
+    m_make_use_of_slipstream     = false;
+    m_collect_avoid_items        = false;
+    m_handle_bomb                = false;
+    m_item_usage_non_random      = false;
+    m_nitro_usage                = NITRO_NONE;
+
 }   // AIProperties
 
 // ----------------------------------------------------------------------------
@@ -42,6 +60,7 @@ AIProperties::AIProperties()
  */
 void AIProperties::load(const XMLNode *ai_node)
 {
+    ai_node->get("use-slipstream",            &m_make_use_of_slipstream    );
     ai_node->get("max-item-angle",            &m_max_item_angle            );
     ai_node->get("max-item-angle-high-speed", &m_max_item_angle_high_speed );
     ai_node->get("time-full-steer",           &m_time_full_steer           );
@@ -49,7 +68,28 @@ void AIProperties::load(const XMLNode *ai_node)
     ai_node->get("straight-length-for-zipper",&m_straight_length_for_zipper);
     ai_node->get("rb-skid-probability",       &m_skid_probability          );
     ai_node->get("speed-cap",                 &m_speed_cap                 );
+    ai_node->get("non-random-item-usage",     &m_item_usage_non_random     );
+    ai_node->get("collect-avoid-items",       &m_collect_avoid_items       );
+    ai_node->get("handle-bomb",               &m_handle_bomb               );
+    ai_node->get("skidding-threshold",        &m_skidding_threshold        );
+    ai_node->get("false-start-probability",   &m_false_start_probability   );
+    ai_node->get("min-start-delay",           &m_min_start_delay           );
+    ai_node->get("max-start-delay",           &m_max_start_delay           );
 
+    std::string s;
+    ai_node->get("nitro-usage",               &s);
+    if(s=="none")
+        m_nitro_usage = NITRO_NONE;
+    else if(s=="some")
+        m_nitro_usage = NITRO_SOME;
+    else if(s=="all")
+        m_nitro_usage = NITRO_ALL;
+    else
+    {
+        printf("Incorrect nitro-usage '%s' in AI '%s'.\n",s.c_str(),
+               m_ident.c_str());
+        exit(-1);
+    }
     // We actually need the square of the distance later
     m_bad_item_closeness_2 *= m_bad_item_closeness_2;
     
@@ -62,15 +102,21 @@ void AIProperties::load(const XMLNode *ai_node)
  */
 void AIProperties::checkAllSet(const std::string &filename) const
 {
-#define CHECK_NEG(  a,str_a) if(a<=UNDEFINED) {                        \
-        fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
-                str_a,filename.c_str());exit(-1);                      \
+#define CHECK_NEG(  a,str_a) if(a<=UNDEFINED) {                      \
+        fprintf(stderr,"Missing default value for '%s' in '%s' "     \
+                       "'for AI '%s'.\n",                            \
+                str_a,filename.c_str(),                              \
+                m_ident.c_str());exit(-1);                           \
     }
     CHECK_NEG(m_max_item_angle,            "max-item-angle"            );
     CHECK_NEG(m_max_item_angle_high_speed, "max-item-angle-high-speed" );
     CHECK_NEG(m_time_full_steer,           "time-full-steer"           );
     CHECK_NEG(m_bad_item_closeness_2,      "bad-item-closeness"        );
     CHECK_NEG(m_straight_length_for_zipper,"straight-length-for-zipper");
+    CHECK_NEG(m_skidding_threshold,        "skidding-threshold"        );
+    CHECK_NEG(m_false_start_probability,   "false-start-probability"   );
+    CHECK_NEG(m_min_start_delay,           "min-start-delay"           );
+    CHECK_NEG(m_max_start_delay,           "max-start-delay"           );
 
     if(m_skid_probability.size()==0)
     {

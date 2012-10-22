@@ -81,56 +81,8 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
 {
     reset();
 
-    switch( race_manager->getDifficulty())
-    {
-    case RaceManager::DIFFICULTY_EASY:
-        m_wait_for_players        = true;
-        m_make_use_of_slipstream  = false;
-        m_max_handicap_speed      = 0.9f;
-        m_false_start_probability = 0.08f;
-        m_min_start_delay         = 0.3f;
-        m_max_start_delay         = 0.5f;
-        m_min_steps               = 1;
-        m_item_tactic             = IT_TEN_SECONDS;
-        m_nitro_level             = NITRO_NONE;
-        m_item_behaviour          = ITEM_COLLECT_NONE;
-        m_handle_bomb             = false;
-        setSkiddingFraction(4.0f);
-        break;
-    case RaceManager::DIFFICULTY_MEDIUM:
-        m_wait_for_players        = true;
-        m_make_use_of_slipstream  = false;
-        m_max_handicap_speed      = 0.95f;
-        m_false_start_probability = 0.04f;
-        m_min_start_delay         = 0.25f;
-        m_max_start_delay         = 0.4f;
-        m_min_steps               = 1;
-        m_item_tactic             = IT_CALCULATE;
-        m_nitro_level             = NITRO_SOME;
-        m_item_behaviour          = ITEM_COLLECT_NONE;
-        m_handle_bomb             = true;
-        setSkiddingFraction(3.0f);
-        break;
-    case RaceManager::DIFFICULTY_HARD:
-        m_wait_for_players        = false;
-        m_make_use_of_slipstream  = true;
-        m_max_handicap_speed      = 1.0f;
-        m_item_tactic             = IT_CALCULATE;
-        m_false_start_probability = 0.01f;
-        // See http://www.humanbenchmark.com/tests/reactiontime/stats.php
-        // Average reaction time is around 0.215 s, so using .15 as minimum
-        // gives an AI average slightly above the human average
-        m_min_start_delay         = 0.15f;
-        m_max_start_delay         = 0.28f;
-        m_min_steps               = 2;
-        m_nitro_level             = NITRO_ALL;
-        m_item_behaviour          = ITEM_COLLECT_PRIORITY;
-        m_handle_bomb             = true;
-        setSkiddingFraction(2.0f);
-        break;
-    case RaceManager::DIFFICULTY_COUNT:
-        assert(0);   // keep the compiler happy
-    }
+    m_superpower = race_manager->getAISuperPower();
+
     m_point_selection_algorithm = PSA_DEFAULT;
     setControllerName("Skidding");
 
@@ -149,11 +101,6 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
     setControllerName(name);
 #endif
 
-    m_superpower = race_manager->getAISuperPower();
-    if (m_superpower == RaceManager::SUPERPOWER_NOLOK_BOSS)
-    {
-        m_false_start_probability = 0.0f;
-    }
 #ifdef AI_DEBUG
     for(unsigned int i=0; i<4; i++)
     {
@@ -183,10 +130,7 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
 #endif
 #ifdef AI_DEBUG_KART_HEADING
     irr::video::SColor c;
-    if(m_item_behaviour == ITEM_COLLECT_PRIORITY)
-        c = irr::video::SColor(128,   0,   0, 128);
-    else
-        c = irr::video::SColor(128,   0, 128,   0);
+    c = irr::video::SColor(128,   0,   0, 128);
     m_curve[CURVE_KART]      = new ShowCurve(0.5f, 0.5f, c);
 #endif
 #ifdef AI_DEBUG_NEW_FIND_NON_CRASHING
@@ -199,10 +143,7 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
                                             video::SColor(128,   0, 128,   0));
 #ifdef AI_DEBUG_KART_AIM
     irr::video::SColor c1;
-    if(m_item_behaviour == ITEM_COLLECT_PRIORITY)
-        c1 = irr::video::SColor(128,   0,   0, 128);
-    else
-        c1 = irr::video::SColor(128,   0, 128,   0);
+    c1 = irr::video::SColor(128,   0,   0, 128);
 
     m_curve[CURVE_AIM]       = new ShowCurve(0.5f, 0.5f, c1);
 #endif
@@ -370,7 +311,7 @@ void SkiddingAI::update(float dt)
     // Special behaviour if we have a bomb attach: try to hit the kart ahead 
     // of us.
     bool commands_set = false;
-    if(m_handle_bomb && 
+    if(m_ai_properties->m_handle_bomb && 
         m_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB && 
         m_kart_ahead )
     {
@@ -595,7 +536,7 @@ void SkiddingAI::handleSteering(float dt)
 
         // Potentially adjust the point to aim for in order to either
         // aim to collect item, or steer to avoid a bad item.
-        if(m_item_behaviour!=ITEM_COLLECT_NONE)
+        if(m_ai_properties->m_collect_avoid_items)
             handleItemCollectionAndAvoidance(&aim_point, last_node);
 
         steer_angle = steerToPoint(aim_point);
@@ -1176,7 +1117,7 @@ void SkiddingAI::handleItems(const float dt)
 
     // Tactic 1: wait ten seconds, then use item
     // -----------------------------------------
-    if(m_item_tactic==IT_TEN_SECONDS)
+    if(!m_ai_properties->m_item_usage_non_random)
     {
         if( m_time_since_last_shot > 10.0f )
         {
@@ -1424,18 +1365,6 @@ void SkiddingAI::handleAcceleration( const float dt)
     }
     
     m_controls->m_accel = stk_config->m_ai_acceleration;
-    if(!m_wait_for_players)
-        return;
-
-    //Find if any player is ahead of this kart
-    for(unsigned int i = 0; i < race_manager->getNumPlayers(); ++i )
-    {
-        if( m_kart->getPosition() > m_world->getPlayerKart(i)->getPosition() )
-        {
-            m_controls->m_accel = m_max_handicap_speed;
-            return;
-        }
-    }
 
 }   // handleAcceleration
 
@@ -1446,11 +1375,17 @@ void SkiddingAI::handleRaceStart()
     {
         // Each kart starts at a different, random time, and the time is
         // smaller depending on the difficulty.
-        m_start_delay = m_min_start_delay 
-                      + (float) rand() / RAND_MAX * (m_max_start_delay-m_min_start_delay);
+        m_start_delay = m_ai_properties->m_min_start_delay 
+                      + (float) rand() / RAND_MAX 
+                      * (m_ai_properties->m_max_start_delay -
+                         m_ai_properties->m_min_start_delay);
+
+        float false_start_probability = 
+               m_superpower == RaceManager::SUPERPOWER_NOLOK_BOSS
+               ? 0.0f  : m_ai_properties->m_false_start_probability;
 
         // Now check for a false start. If so, add 1 second penalty time.
-        if(rand() < RAND_MAX * m_false_start_probability)
+        if(rand() < RAND_MAX * false_start_probability)
         {
             m_start_delay+=stk_config->m_penalty_time;
             return;
@@ -1499,15 +1434,17 @@ void SkiddingAI::handleNitroAndZipper()
     // Don't compute nitro usage if we don't have nitro or are not supposed
     // to use it, and we don't have a zipper or are not supposed to use
     // it (calculated).
-    if( (m_kart->getEnergy()==0 || m_nitro_level==NITRO_NONE)  &&
+    if( (m_kart->getEnergy()==0 || 
+        m_ai_properties->m_nitro_usage==AIProperties::NITRO_NONE)  &&
         (m_kart->getPowerup()->getType()!=PowerupManager::POWERUP_ZIPPER ||
-          m_item_tactic==IT_TEN_SECONDS                                    ) )
+         !m_ai_properties->m_item_usage_non_random )                         )
         return;
 
     // If there are items to avoid close, and we only have zippers, don't
     // use them (since this make it harder to avoid items).
     if(m_avoid_item_close &&
-        (m_kart->getEnergy()==0|| m_nitro_level==NITRO_NONE) )
+        (m_kart->getEnergy()==0 ||
+         m_ai_properties->m_nitro_usage==AIProperties::NITRO_NONE) )
         return;
     // If a parachute or anvil is attached, the nitro doesn't give much
     // benefit. Better wait till later.
@@ -1538,10 +1475,12 @@ void SkiddingAI::handleNitroAndZipper()
     // anyway. Since the kart is faster with nitro, estimate a 50% time
     // decrease (additionally some nitro will be saved when top speed
     // is reached).
-    if(m_world->getLapForKart(m_kart->getWorldKartId())==race_manager->getNumLaps()-1 &&
-        m_nitro_level == NITRO_ALL)
+    if(m_world->getLapForKart(m_kart->getWorldKartId())
+                        ==race_manager->getNumLaps()-1 &&
+       m_ai_properties->m_nitro_usage == AIProperties::NITRO_ALL)
     {
-        float finish = m_world->getEstimatedFinishTime(m_kart->getWorldKartId());
+        float finish = 
+            m_world->getEstimatedFinishTime(m_kart->getWorldKartId());
         if( 1.5f*m_kart->getEnergy() >= finish - m_world->getTime() )
         {
             m_controls->m_nitro = true;
@@ -1569,7 +1508,8 @@ void SkiddingAI::handleNitroAndZipper()
         m_kart_behind->getSpeed() > m_kart->getSpeed()    )
     {
         // Only prevent overtaking on highest level
-        m_controls->m_nitro = m_nitro_level==NITRO_ALL;
+        m_controls->m_nitro = m_ai_properties->m_nitro_usage
+                              == AIProperties::NITRO_ALL;
         return;
     }
     
@@ -1597,7 +1537,7 @@ void SkiddingAI::handleNitroAndZipper()
 void SkiddingAI::checkCrashes(const Vec3& pos )
 {
     int steps = int( m_kart->getVelocityLC().getZ() / m_kart_length );
-    if( steps < m_min_steps ) steps = m_min_steps;
+    if( steps < 2 ) steps = 2;
 
     // The AI drives significantly better with more steps, so for now
     // add 5 additional steps.
@@ -1613,7 +1553,8 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
     // If slipstream should be handled actively, trigger overtaking the
     // kart which gives us slipstream if slipstream is ready
     const SlipStream *slip=m_kart->getSlipstream();
-    if(m_make_use_of_slipstream && slip->isSlipstreamReady() &&
+    if(m_ai_properties->m_make_use_of_slipstream && 
+        slip->isSlipstreamReady() &&
         slip->getSlipstreamTarget())
     {
         //printf("%s overtaking %s\n", m_kart->getIdent().c_str(),

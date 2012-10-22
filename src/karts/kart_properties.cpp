@@ -106,13 +106,15 @@ KartProperties::KartProperties(const std::string &filename)
     if (filename != "") 
     {
         m_skidding_properties = NULL;
-        m_ai_properties       = NULL;
+        for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
+            m_ai_properties[i]= NULL;
         load(filename, "kart");
     }
     else
     {
         m_skidding_properties = new SkiddingProperties();
-        m_ai_properties       = new AIProperties();
+        for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
+            m_ai_properties[i]= new AIProperties((RaceManager::Difficulty)i);
     }
 }   // KartProperties
 
@@ -123,8 +125,9 @@ KartProperties::~KartProperties()
     delete m_kart_model;
     if(m_skidding_properties)
         delete m_skidding_properties;
-    if(m_ai_properties)
-        delete m_ai_properties;
+    for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
+        if(m_ai_properties[i])
+            delete m_ai_properties[i];
 }   // ~KartProperties
 
 //-----------------------------------------------------------------------------
@@ -138,14 +141,18 @@ void KartProperties::copyFrom(const KartProperties *source)
 {
     *this = *source;
 
-    // After the memcpy the two skidding properties will share pointers.
+    // After the memcpy any pointers will be shared.
     // So all pointer variables need to be separately allocated and assigned.
     m_skidding_properties = new SkiddingProperties();
     assert(m_skidding_properties);
-    m_ai_properties       = new AIProperties();
-    assert(m_ai_properties);
     *m_skidding_properties = *source->m_skidding_properties;
-    *m_ai_properties       = *source->m_ai_properties;
+
+    for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
+    {
+        m_ai_properties[i] = new AIProperties((RaceManager::Difficulty)i);
+        assert(m_ai_properties);
+        *m_ai_properties[i] = *source->m_ai_properties[i];
+    }
 }   // copyFrom
 
 //-----------------------------------------------------------------------------
@@ -317,7 +324,12 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *ai_node = root->getNode("ai"))
     {
-        m_ai_properties->load(ai_node);
+        const XMLNode *easy = ai_node->getNode("easy");
+        m_ai_properties[RaceManager::DIFFICULTY_EASY]->load(easy);
+        const XMLNode *medium = ai_node->getNode("medium");
+        m_ai_properties[RaceManager::DIFFICULTY_MEDIUM]->load(medium);
+        const XMLNode *hard = ai_node->getNode("hard");
+        m_ai_properties[RaceManager::DIFFICULTY_HARD]->load(hard);
     }
 
     if(const XMLNode *slipstream_node = root->getNode("slipstream"))
@@ -649,7 +661,8 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_explosion_radius,           "explosion radius"              );
 
     m_skidding_properties->checkAllSet(filename);
-    m_ai_properties->checkAllSet(filename);
+    for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
+        m_ai_properties[i]->checkAllSet(filename);
 }   // checkAllSet
 
 // ----------------------------------------------------------------------------

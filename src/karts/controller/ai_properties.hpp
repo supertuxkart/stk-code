@@ -19,6 +19,7 @@
 #ifndef HEADER_AI_PROPERTIES_HPP
 #define HEADER_AI_PROPERTIES_HPP
 
+#include "race/race_manager.hpp"
 #include "utils/interpolation_array.hpp"
 
 #include <string>
@@ -76,9 +77,44 @@ protected:
     /** To cap maximum speed if the kart is ahead of the player. */
     InterpolationArray m_speed_cap;
 
+    /** Probability of a false start. Note that Nolok in boss battle will never
+     *  have a false start. */
+    float m_false_start_probability;
+
+    /** Minimum start delay. */
+    float m_min_start_delay;
+
+    /** Maximum start delay. */
+    float m_max_start_delay;
+
+    /** True if the AI should avtively try to make use of slipstream. */
+    bool m_make_use_of_slipstream;
+
+    /** Actively collect and avoid items. */
+    bool m_collect_avoid_items;
+
+    /** If the AI should actively try to pass on a bomb. */
+    bool m_handle_bomb;
+
+    /** True if items should be used better (i.e. non random). */
+    bool m_item_usage_non_random;
+
+    /** How the AI uses nitro. */
+    enum {NITRO_NONE, NITRO_SOME, NITRO_ALL} m_nitro_usage;
+
+    /** TODO: ONLY USE FOR OLD SKIDDING! CAN BE REMOVED once the new skidding
+     *  works as expected.
+     *  The minimum steering angle at which the AI adds skidding. Lower values
+     *  tend to improve the line the AI is driving. This is used to adjust for
+     *  different AI levels. */
+    float    m_skidding_threshold;
+
+    /** An identifier like 'easy', 'medium' or 'hard' for this data set. */
+    std::string m_ident;
+
 public:
 
-         AIProperties();
+         AIProperties(RaceManager::Difficulty difficulty);
     void load(const XMLNode *skid_node);
     void checkAllSet(const std::string &filename) const;
     // ------------------------------------------------------------------------

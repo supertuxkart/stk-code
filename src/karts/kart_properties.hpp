@@ -65,8 +65,9 @@ private:
 
     /** AI Properties for this kart, as a separate object in order to
      *  reduce dependencies (and therefore compile time) when changing
-     *  any AI property. */
-     AIProperties *m_ai_properties;
+     *  any AI property. There is one separate object for each
+     *  difficulty. */
+    AIProperties *m_ai_properties[RaceManager::DIFFICULTY_COUNT];
 
     /** The absolute path of the icon texture to use. */
     Material                *m_icon_material;
@@ -629,10 +630,13 @@ public:
     
     /** Returns a pointer to the skidding properties. */
     const SkiddingProperties *getSkiddingProperties() const 
-                                               { return m_skidding_properties; }
+                                              { return m_skidding_properties; }
 
     /** Returns a pointer to the AI properties. */
-    const AIProperties *getAIProperties() const { return m_ai_properties; }
+    const AIProperties *getAIPropertiesForDifficulty() const 
+    {
+        return m_ai_properties[race_manager->getDifficulty()];
+    }   // getAIProperties
 
     /** Returns ratio of current speed to max speed at which the gear will
      *  change (for our simualated gears = simple change of engine power). */

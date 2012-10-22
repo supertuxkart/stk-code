@@ -215,6 +215,23 @@
           reduce-turn-min="0.2" reduce-turn-max="0.8"/>
 
     <!-- Kart-specific settings used by the AI.
+         use-slipstream: if the AI should try to overtake karts using slipstream.
+         false-start-probability: Probability of a false start.
+         min/max-start-delay: Minimum and maximum start delay.
+           See http://www.humanbenchmark.com/tests/reactiontime/stats.php
+           Average reaction time is around 0.215 s.
+         nitro-usage: "none", "some", "all": if nitro should be used, and
+           how much the AI should try to use it good.
+         non-random-item-usage: If true, use items in a sophisticated way,
+           otherwise use items randomly.
+         collect-avoid-items: if the AI should collect and avoid items,
+           or just ignore them.
+         handle-bomb: If the AI should actively try to pass on a bomb.
+         skidding-threshold: only for old-style skidding: when sharp turn
+           should be triggered. Smaller values means it will sharp turn
+           earlier, resulting in better driving in thight curves.
+
+
          max-item-angle: Items that would need more than this change in
            direction are not considered for collection.
          time-full-steer is the time for the AI to go from neutral steering to
@@ -254,13 +271,50 @@
            Note that setting this to a value >1 does NOT increase
            the speed the kart can drive at!
     -->
-    <ai max-item-angle="0.7" max-item-angle-high-speed="0.3"
-        time-full-steer="0.1"
-        bad-item-closeness="6"
-        straight-length-for-zipper="35"
-        rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"
-        speed-cap="10:1.0 50:0.8"/>
-
+    <ai>
+        <easy   use-slipstream="false"
+                false-start-probability="0.08"
+                min-start-delay="0.3" max-start-delay="0.5"
+                nitro-usage="none"
+                non-random-item-usage="false"
+                collect-avoid-items="false"
+                handle-bomb="false"
+                skidding-threshold="4.0"
+                max-item-angle="0.7" max-item-angle-high-speed="0.3"
+                time-full-steer="0.1"
+                bad-item-closeness="6"
+                straight-length-for-zipper="35"
+                rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"
+                speed-cap="10:1.0 50:0.8"/>
+        <medium use-slipstream="false"
+                false-start-probability="0.04"
+                min-start-delay="0.25" max-start-delay="0.4"
+                nitro-usage="some"
+                non-random-item-usage="false"
+                collect-avoid-items="true"
+                handle-bomb="false"
+                skidding-threshold="3.0"
+                max-item-angle="0.7" max-item-angle-high-speed="0.3"
+                time-full-steer="0.1"
+                bad-item-closeness="6"
+                straight-length-for-zipper="35"
+                rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"
+                speed-cap="10:1.0 50:0.8"/>
+        <hard   use-slipstream="true"
+                false-start-probability="0.01"
+                min-start-delay="0.15" max-start-delay="0.28"
+                nitro-usage="all"
+                non-random-item-usage="false"
+                collect-avoid-items="true"
+                handle-bomb="true"
+                skidding-threshold="2.0"
+                max-item-angle="0.7" max-item-angle-high-speed="0.3"
+                time-full-steer="0.1"
+                bad-item-closeness="6"
+                straight-length-for-zipper="35"
+                rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"
+                speed-cap="10:1.0 50:0.8"/>
+    </ai>
     <!-- Slipstream: length: How far behind a kart slipstream works
          collect-time: How many seconds of sstream give  maximum benefit
          use-time: How long the benefit will last.

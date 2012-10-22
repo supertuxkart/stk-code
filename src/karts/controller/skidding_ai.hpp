@@ -46,21 +46,6 @@ namespace irr
 class SkiddingAI : public AIBaseController
 {
 private:
-    /** How the AI uses nitro. */
-    enum {NITRO_NONE, NITRO_SOME, NITRO_ALL} m_nitro_level;
-
-    /** Determines if the AI should prefer collecting items over avoiding
-     *  items, or avoiding over collecting. */
-    enum {ITEM_COLLECT_NONE, ITEM_COLLECT_PRIORITY, ITEM_AVOID_PRIORITY} 
-          m_item_behaviour;
-
-    enum ItemTactic
-    {
-        IT_TEN_SECONDS, //Fire after 10 seconds have passed, since the item
-                        //was grabbed.
-        IT_CALCULATE //Aim carefully, check for enough space for boosters,
-                     //and that other conditions are meet before firing.
-    };
 
     class CrashTypes
     {
@@ -72,38 +57,7 @@ private:
         void clear() {m_road = false; m_kart = -1;}
     } m_crashes;
 
-    RaceManager::AISuperPower m_superpower;
-
-    /*Difficulty handling variables*/
-    /** Chance of a false start. */
-    float m_false_start_probability;
-    /** The minimum delay time before a AI kart starts. */
-    float m_min_start_delay;
-    /** The maximum delay time before an AI kart starts. */
-    float m_max_start_delay;
-    /** The actual start delay used. */
-    float m_start_delay; 
-  
-    /** Minimum number of steps to check. If 0, the AI doesn't even has check
-     *  around the kart, if 1, it checks around the kart always, and more 
-     *  than that will check the remaining number of steps in front of the 
-     *  kart, always. */
-    int m_min_steps; 
-     /** If true, the acceleration is decreased when the AI is in a better 
-      *  position than all the human players. */
-    bool  m_wait_for_players;
-
-    /** The allowed maximum speed in percent of the kart's maximum speed. */
-    float m_max_handicap_speed; 
-    
-     /** How are items going to be used? */
-    ItemTactic m_item_tactic;
-
-    /** True if the kart should try to pass on a bomb to another kart. */
-    bool m_handle_bomb;
-
-    /** True if the AI should avtively try to make use of slipstream. */
-    bool m_make_use_of_slipstream;
+    RaceManager::AISuperPower m_superpower;    
 
     /*General purpose variables*/
 
@@ -121,6 +75,9 @@ private:
     /** Distance to the kard behind. */
     float m_distance_behind;
 
+    /** The actual start delay used. */
+    float m_start_delay; 
+  
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
   

@@ -74,7 +74,6 @@ PresentAI::PresentAI(AbstractKart *kart)
         m_min_steps               = 1;
         m_nitro_level             = NITRO_NONE;
         m_handle_bomb             = false;
-        setSkiddingFraction(4.0f);
         break;
     case RaceManager::DIFFICULTY_MEDIUM:
         m_wait_for_players        = true;
@@ -87,7 +86,6 @@ PresentAI::PresentAI(AbstractKart *kart)
         m_min_steps               = 1;
         m_nitro_level             = NITRO_SOME;
         m_handle_bomb             = true;
-        setSkiddingFraction(3.0f);
         break;
     case RaceManager::DIFFICULTY_HARD:
         m_wait_for_players        = false;
@@ -103,7 +101,6 @@ PresentAI::PresentAI(AbstractKart *kart)
         m_min_steps               = 2;
         m_nitro_level             = NITRO_ALL;
         m_handle_bomb             = true;
-        setSkiddingFraction(2.0f);
         break;
     case RaceManager::DIFFICULTY_COUNT:
         assert(0);   // keep the compiler happy
