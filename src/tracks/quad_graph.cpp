@@ -731,7 +731,11 @@ void QuadGraph::determineDirection(unsigned int current,
     int prev = next;                           // is now n+1
     next     = getNode(next).getSuccessor(0);  // next is now n+2
 
-    while(1)
+    // If the direction is still the same during a lap the last node
+    // in the same direction is the previous node;
+    int max_step = m_all_nodes.size()-1;
+
+    while(max_step-- != 0)
     {
         // Now compute the angle from n+1 (new current) to n+2 (new next)
         angle_current = angle_next;
