@@ -272,48 +272,51 @@
            the speed the kart can drive at!
     -->
     <ai>
-        <easy   use-slipstream="false"
+        <easy   time-full-steer="0.1"
+                straight-length-for-zipper="35"
+                use-slipstream="false"
                 false-start-probability="0.08"
                 min-start-delay="0.3" max-start-delay="0.5"
                 nitro-usage="none"
                 non-random-item-usage="false"
                 collect-avoid-items="false"
                 handle-bomb="false"
-                skidding-threshold="4.0"
+                speed-cap="5:1.0 20:0.9 50:0.6"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
-                time-full-steer="0.1"
                 bad-item-closeness="6"
+                rb-skid-probability="0:0.0"
+                skidding-threshold="4.0"
+                />
+        <medium time-full-steer="0.1"
                 straight-length-for-zipper="35"
-                rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"
-                speed-cap="10:1.0 50:0.8"/>
-        <medium use-slipstream="false"
+                use-slipstream="false"
                 false-start-probability="0.04"
                 min-start-delay="0.25" max-start-delay="0.4"
                 nitro-usage="some"
-                non-random-item-usage="false"
+                non-random-item-usage="true"
                 collect-avoid-items="true"
                 handle-bomb="false"
-                skidding-threshold="3.0"
+                speed-cap="10:1.0 50:0.8"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
-                time-full-steer="0.1"
                 bad-item-closeness="6"
+                rb-skid-probability="0:0.0"
+                skidding-threshold="3.0"
+                />
+        <hard   time-full-steer="0.1"
                 straight-length-for-zipper="35"
-                rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"
-                speed-cap="10:1.0 50:0.8"/>
-        <hard   use-slipstream="true"
+                use-slipstream="true"
                 false-start-probability="0.01"
                 min-start-delay="0.15" max-start-delay="0.28"
                 nitro-usage="all"
-                non-random-item-usage="false"
+                non-random-item-usage="true"
                 collect-avoid-items="true"
                 handle-bomb="true"
-                skidding-threshold="2.0"
+                speed-cap="20:1.0 50:0.8"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
-                time-full-steer="0.1"
                 bad-item-closeness="6"
-                straight-length-for-zipper="35"
                 rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"
-                speed-cap="10:1.0 50:0.8"/>
+                skidding-threshold="2.0"
+                />
     </ai>
     <!-- Slipstream: length: How far behind a kart slipstream works
          collect-time: How many seconds of sstream give  maximum benefit
@@ -439,7 +442,9 @@
     <!-- Kart-specific plunger and rubber band handling: max-length is
          the maximum length of rubber band before it snaps. force is
          the force a plunger/rubber band applies to the kart(s).
-         duration is the duration a rubber band acts. -->
+         duration is the duration a rubber band acts. 
+         in-face-time determines how long it takes before a plunger 
+           in your face is removed. -->
     <plunger band-max-length="50" band-force="1500" band-duration="1"
           band-speed-increase="7" band-fade-out-time="3"
           in-face-time="4 6 7"/>
