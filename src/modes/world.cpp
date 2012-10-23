@@ -33,11 +33,9 @@
 #include "graphics/hardware_skinning.hpp"
 #include "io/file_manager.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/controller/default_ai_controller.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
-#include "karts/controller/present_ai.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/profile_world.hpp"
@@ -242,38 +240,17 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
 Controller* World::loadAIController(AbstractKart *kart)
 {
     Controller *controller;
-    // const int NUM_ROBOTS = 1;
-    // For now: instead of random switching, use each
-    // robot in turns: switch(m_random.get(NUM_ROBOTS))
-#undef USE_PRESENT_AI
-#define  USE_SKIDDING_AI
-#undef USE_ALL_AIS
-
-#ifdef USE_PRESENT_AI
-    int turn = 2;
-#elif defined(USE_SKIDDING_AI)
-    int turn = 1;
-#elif defined(USE_ALL_AIS)
-    static int turn=0;
-    turn=(turn+1) % 2;   // %2 would switch betwen default and skidding
-#else
-    int turn=0;   // use default AU
-#endif
-
+    int turn=0;
+    // If different AIs should be used, adjust turn (or switch randomly
+    // or dependent on difficulty)
     switch(turn)
     {
         case 0:
-            controller = new DefaultAIController(kart);
-            break;
-        case 1:
             controller = new SkiddingAI(kart);
-            break;
-        case 2:
-            controller = new PresentAI(kart);
             break;
         default:
             fprintf(stderr, "Warning: Unknown robot, using default.\n");
-            controller = new DefaultAIController(kart);
+            controller = new SkiddingAI(kart);
             break;
     }
 

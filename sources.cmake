@@ -101,10 +101,8 @@ src/karts/cannon_animation.cpp
 src/karts/controller/ai_base_controller.cpp
 src/karts/controller/ai_properties.cpp
 src/karts/controller/controller.cpp
-src/karts/controller/default_ai_controller.cpp
 src/karts/controller/end_controller.cpp
 src/karts/controller/player_controller.cpp
-src/karts/controller/present_ai.cpp
 src/karts/controller/skidding_ai.cpp
 src/karts/explosion_animation.cpp
 src/karts/ghost_kart.cpp
@@ -349,11 +347,9 @@ src/karts/cannon_animation.hpp
 src/karts/controller/ai_base_controller.hpp
 src/karts/controller/ai_properties.hpp
 src/karts/controller/controller.hpp
-src/karts/controller/default_ai_controller.hpp
 src/karts/controller/end_controller.hpp
 src/karts/controller/kart_control.hpp
 src/karts/controller/player_controller.hpp
-src/karts/controller/present_ai.hpp
 src/karts/controller/skidding_ai.hpp
 src/karts/explosion_animation.hpp
 src/karts/ghost_kart.hpp

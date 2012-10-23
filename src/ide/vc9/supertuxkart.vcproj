@@ -916,19 +916,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\karts\controller\default_ai_controller.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\karts\controller\end_controller.cpp"
 						>
 					</File>
 					<File
 						RelativePath="..\..\karts\controller\player_controller.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\karts\controller\present_ai.cpp"
 						>
 					</File>
 					<File
@@ -2095,10 +2087,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\karts\controller\present_ai.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\karts\rescue_animation.hpp"
 					>
 				</File>
@@ -2123,10 +2111,6 @@
 					</File>
 					<File
 						RelativePath="..\..\karts\controller\controller.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\karts\controller\default_ai_controller.hpp"
 						>
 					</File>
 					<File
