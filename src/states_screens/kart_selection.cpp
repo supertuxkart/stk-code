@@ -1232,7 +1232,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
         
         m_multiplayer_message = new BubbleWidget();
         m_multiplayer_message->m_properties[PROP_TEXT_ALIGN] = "center";
-        m_multiplayer_message->setText( _("Everyone:\nPress 'Fire' now to "
+        m_multiplayer_message->setText( _("Everyone:\nPress 'Select' now to "
                                           "join the game!") );
         m_multiplayer_message->m_x = 
             (int)(fullarea->m_x + splitWidth + splitWidth*0.2f);
