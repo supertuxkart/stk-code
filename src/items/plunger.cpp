@@ -190,6 +190,8 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
         if(kart)
         {
             kart->blockViewWithPlunger();
+            if (kart->getController()->isPlayerController())
+                sfx_manager->quickSound("plunger");
 
             hit_message += StringUtils::insertValues(getHitString(kart),
                                                      core::stringw(kart->getName()),
