@@ -185,6 +185,7 @@ void SkiddingAI::reset()
     m_current_track_direction    = GraphNode::DIR_STRAIGHT;
     m_item_to_collect            = NULL;
     m_avoid_item_close           = false;
+    m_skid_probability_state     = SKID_PROBAB_NOT_YET;
 
     AIBaseController::reset();
     m_track_node               = QuadGraph::UNKNOWN_SECTOR;
@@ -2172,35 +2173,36 @@ bool SkiddingAI::doSkid(float steer_fraction)
 void SkiddingAI::setSteering(float angle, float dt)
 {
     float steer_fraction = angle / m_kart->getMaxSteerAngle();
+
+    // Use a simple finite state machine to make sure to randomly decide
+    // whether to skid or not only once per skid section. See docs for
+    // m_skid_probability_state for more details.
     if(!doSkid(steer_fraction))
     {
-        m_tried_skid_last_frame = false;
-        m_controls->m_skid = KartControl::SC_NONE;
+        m_skid_probability_state = SKID_PROBAB_NOT_YET;
+        m_controls->m_skid       = KartControl::SC_NONE;
     }
     else
     {
         KartControl::SkidControl sc = steer_fraction > 0 
                                     ? KartControl::SC_RIGHT 
                                     : KartControl::SC_LEFT; 
-        if(!m_tried_skid_last_frame)
+        if(m_skid_probability_state==SKID_PROBAB_NOT_YET)
         {
-            float distance = 
-                m_world->getOverallDistance(m_kart->getWorldKartId())
-                - m_distance_to_player;
-            int prob = (int)
-                    (100.0f*m_ai_properties->getSkiddingProbability(distance));
-
-            if(m_random_skid.get(100)>=prob)
-                sc = KartControl::SC_NONE;
+            int prob = (int)(100.0f*m_ai_properties
+                               ->getSkiddingProbability(m_distance_to_player));
+            m_skid_probability_state = (m_random_skid.get(100)>=prob)
+                                     ? SKID_PROBAB_SKID 
+                                     : SKID_PROBAB_NO_SKID;
 #undef PRINT_SKID_STATS
 #ifdef PRINT_SKID_STATS
             printf("%s distance %f prob %d skidding %s\n", 
                    m_kart->getIdent().c_str(), distance, prob, 
-                   sc==0 ? "no" : sc==KartControl::SC_LEFT ? "left" : "right");
+                   sc= ? "no" : sc==KartControl::SC_LEFT ? "left" : "right");
 #endif
         }
-        m_controls->m_skid = sc;
-        m_tried_skid_last_frame = true;
+        m_controls->m_skid = m_skid_probability_state == SKID_PROBAB_SKID 
+                           ? sc : KartControl::SC_NONE;
     }
 
     // Adjust steer fraction in case to be in [-1,1]

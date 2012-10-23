@@ -115,11 +115,16 @@ private:
     /** A random number generator to decide if the AI should skid or not. */
     RandomGenerator m_random_skid;
 
-    /** True if the AI decided to skid in the previous frame. At the 
-     *  beginning of each skid it is randomly decided if the skid is
-     *  to be done or not (to rubber-band the AI). This flag is used
-     *  to decide if a new skid is happening. */
-    bool m_tried_skid_last_frame;
+    /** This implements a simple finite state machine: it starts in
+     *  NOT_YET. The first time the AI decides to skid, the state is changed
+     *  randomly (dependeng on skid probability) to N_SKID or SKID.
+     *  As long as the AI keeps on deciding the skid, the state remains
+     *  unchanged (so no new random decision is made) till it decides
+     *  not to skid. In which case the state is set to NOT_YET again.
+     *  This guarantees that for each 'skidable' section of the track
+     *  the random decision is only done once. */
+    enum {SKID_PROBAB_NOT_YET, SKID_PROBAB_NO_SKID, SKID_PROBAB_SKID}
+          m_skid_probability_state;
 
     /** Which of the three Point Selection Algorithms (i.e.
      *  findNoNCrashingPoint* functions) to use:
