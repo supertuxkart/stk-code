@@ -45,7 +45,7 @@ ChallengeData::ChallengeData(const std::string& filename)
     m_version      = 0;
     m_num_trophies = 0;
 
-    for (int d=0; d<=RaceManager::DIFFICULTY_COUNT; d++)
+    for (int d=0; d<RaceManager::DIFFICULTY_COUNT; d++)
     {
         m_num_karts[d] = -1;
         m_position[d]  = -1;
