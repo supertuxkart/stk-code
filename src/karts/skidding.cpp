@@ -267,6 +267,9 @@ void Skidding::update(float dt, bool is_on_ground,
             if(skidding!=KartControl::SC_LEFT &&
                 skidding!=KartControl::SC_RIGHT)
                 break;
+            // Don't allow skidding while the kart is (apparently)
+            // still in the air.
+            if(m_remaining_jump_time>0) break;
             m_skid_state = skidding==KartControl::SC_RIGHT 
                          ? SKID_ACCUMULATE_RIGHT
                          : SKID_ACCUMULATE_LEFT;
