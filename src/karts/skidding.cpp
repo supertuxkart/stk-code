@@ -103,7 +103,14 @@ void Skidding::updateSteering(float steer, float dt)
         m_real_steering = steer;
         if(m_skid_time<m_skid_visual_time && m_skid_time>0)
         {
-            m_visual_rotation -= m_visual_rotation*dt/m_skid_time;
+            float f = m_visual_rotation - m_visual_rotation*dt/m_skid_time;
+            // Floating point errors when m_skid_time is very close to 0
+            // can result in visual rotation set to a large number
+            if( (f<0 && m_visual_rotation>0 ) ||
+                (f>0 && m_visual_rotation<0)     )
+                m_visual_rotation = 0;
+            else
+                m_visual_rotation = f;
         }
         break;
     case SKID_ACCUMULATE_RIGHT:
