@@ -124,10 +124,7 @@ void StandardRace::endRaceEarly()
         int kartid = active_players[i];
         int position = getNumKarts() - active_players.size() + 1 + i;
         setKartPosition(kartid, position);
-        m_karts[kartid]->finishedRace(
-                estimateFinishTimeForKart(m_karts[kartid])
-                + worst_time - getTime()
-        );
+        m_karts[kartid]->eliminate();
     } // Finish the active players
     endSetKartPositions();
     setPhase(RESULT_DISPLAY_PHASE);

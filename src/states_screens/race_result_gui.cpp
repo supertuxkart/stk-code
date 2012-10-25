@@ -317,10 +317,17 @@ void RaceResultGUI::determineTableLayout()
             kart->getKartProperties()->getIconMaterial()->getTexture();
         ri->m_kart_icon          = icon;
 
-        const float time         = kart->getFinishTime();
-        if(time > max_finish_time) max_finish_time = time;
-        std::string time_string  = StringUtils::timeToString(time);
-        ri->m_finish_time_string = time_string.c_str();
+        if (kart->isEliminated())
+        {
+            ri->m_finish_time_string = core::stringw(_("Eliminated"));
+        }
+        else
+        {
+            const float time         = kart->getFinishTime();
+            if(time > max_finish_time) max_finish_time = time;
+            std::string time_string  = StringUtils::timeToString(time);
+            ri->m_finish_time_string = time_string.c_str();
+        }
 
         core::dimension2du rect = 
             m_font->getDimension(ri->m_kart_name.c_str());
@@ -661,15 +668,22 @@ void RaceResultGUI::determineGPLayout()
         ri->m_player         = ri->m_is_player_kart 
                              ? kart->getController()->getPlayer() : NULL;
 
-        float time           = race_manager->getOverallTime(kart_id);
-        ri->m_finish_time_string
-                             = StringUtils::timeToString(time).c_str();
+        if (!kart->isEliminated())
+        {
+            float time           = race_manager->getOverallTime(kart_id);
+            ri->m_finish_time_string
+                                 = StringUtils::timeToString(time).c_str();
+        }
+        else
+        {
+            ri->m_finish_time_string = core::stringw(_("Eliminated"));
+        }
         ri->m_start_at       = m_time_between_rows * rank;
         ri->m_x_pos          = (float)UserConfigParams::m_width;
         ri->m_y_pos          = (float)(m_top+rank*m_distance_between_rows);
         int p                = race_manager->getKartPrevScore(kart_id);
         ri->m_current_displayed_points = (float)p;
-        ri->m_new_points     = 
+        ri->m_new_points     =  kart->isEliminated() ? 0 :
             (float)race_manager->getPositionScore(kart->getPosition());
     }
 
