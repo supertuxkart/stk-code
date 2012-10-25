@@ -75,6 +75,9 @@ protected:
     *  feel better). */
     float m_post_skid_rotate_factor;
 
+    /*** Minimum speed a kart must have before it can skid. */
+    float m_min_skid_speed;
+
     /** Time of skidding before you get a bonus boost. It's possible to
     *  define more than one time, i.e. longer skidding gives more bonus. */
     std::vector<float> m_skid_time_till_bonus;

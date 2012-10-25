@@ -38,6 +38,7 @@ SkiddingProperties::SkiddingProperties()
     m_skid_reduce_turn_max    = UNDEFINED;
     m_physical_jump_time      = UNDEFINED;
     m_graphical_jump_time     = UNDEFINED;
+    m_min_skid_speed          = UNDEFINED;
     m_has_skidmarks           = true;
 
     m_skid_bonus_time.clear();
@@ -66,6 +67,7 @@ void SkiddingProperties::load(const XMLNode *skid_node)
     skid_node->get("bonus-force",            &m_skid_bonus_force       );
     skid_node->get("physical-jump-time",     &m_physical_jump_time     );
     skid_node->get("graphical-jump-time",    &m_graphical_jump_time    );
+    skid_node->get("min-speed",              &m_min_skid_speed         );
 }   // load
 
 // ----------------------------------------------------------------------------
@@ -87,6 +89,7 @@ void SkiddingProperties::checkAllSet(const std::string &filename) const
     CHECK_NEG(m_skid_reduce_turn_max,    "skid reduce-turn-max"          );
     CHECK_NEG(m_physical_jump_time,      "skid physical-jump-time"       );
     CHECK_NEG(m_graphical_jump_time,     "skid graphical-jump-time"      );
+    CHECK_NEG(m_min_skid_speed,          "skid min-speed"                );
 
     if(m_skid_time_till_bonus.size()==0)
         fprintf(stderr, "Warning: no skid time declared, can be ignored.\n");

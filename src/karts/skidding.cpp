@@ -199,6 +199,7 @@ void Skidding::update(float dt, bool is_on_ground,
     if (is_on_ground)
     {
         if((fabs(steering) > 0.001f) && 
+            m_kart->getSpeed()>m_min_skid_speed &&
             (skidding==KartControl::SC_LEFT||skidding==KartControl::SC_RIGHT))
         {
             m_skid_factor +=  m_skid_increase *dt/m_time_till_max_skid;
@@ -268,8 +269,10 @@ void Skidding::update(float dt, bool is_on_ground,
                 skidding!=KartControl::SC_RIGHT)
                 break;
             // Don't allow skidding while the kart is (apparently)
-            // still in the air.
-            if(m_remaining_jump_time>0) break;
+            // still in the air, or when the kart is too slow
+            if(m_remaining_jump_time>0 ||
+                m_kart->getSpeed() <m_min_skid_speed) break;
+
             m_skid_state = skidding==KartControl::SC_RIGHT 
                          ? SKID_ACCUMULATE_RIGHT
                          : SKID_ACCUMULATE_LEFT;
