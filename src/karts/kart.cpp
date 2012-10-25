@@ -321,7 +321,6 @@ void Kart::reset()
         m_saved_controller = NULL;
     }
     m_kart_model->setAnimation(KartModel::AF_DEFAULT);
-    m_view_blocked_by_plunger = 0.0;
     m_attachment->clear();
     m_kart_gfx->reset();
     m_skidding->reset();

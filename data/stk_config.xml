@@ -449,7 +449,7 @@
            in your face is removed. -->
     <plunger band-max-length="50" band-force="1500" band-duration="1"
           band-speed-increase="7" band-fade-out-time="3"
-          in-face-time="4 6 7"/>
+          in-face-time="3 4 4.5"/>
 
     <!-- Kart-specific explosion parameters. 
          Time: how long it takes before the kart can drive again (this

@@ -315,14 +315,18 @@ public:
     virtual bool   hasFinishedRace     () const { return m_finished_race;    }
     // ------------------------------------------------------------------------
     /** Returns true if the kart has a plunger attached to its face. */
-    virtual bool   hasViewBlockedByPlunger() const
-                                     { return m_view_blocked_by_plunger > 0; }
+    virtual float  getBlockedByPlungerTime() const
+                                         { return m_view_blocked_by_plunger; }
     // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */
     virtual void   blockViewWithPlunger()   
-                             { m_view_blocked_by_plunger = 
-                                   m_kart_properties->getPlungerInFaceTime();}
+    { 
+        // Avoid that a plunger extends the plunger time
+        if(m_view_blocked_by_plunger<=0)
+            m_view_blocked_by_plunger = 
+                                   m_kart_properties->getPlungerInFaceTime();
+    }   // blockViewWithPlunger
     // -------------------------------------------------------------------------
     /** Returns a bullet transform object located at the kart's position
         and oriented in the direction the kart is going. Can be useful

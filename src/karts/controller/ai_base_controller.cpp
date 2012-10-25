@@ -275,7 +275,7 @@ float AIBaseController::steerToAngle(const unsigned int sector,
     //Desired angle minus current angle equals how many angles to turn
     float steer_angle = angle - m_kart->getHeading();
 
-    if(m_kart->hasViewBlockedByPlunger())
+    if(m_kart->getBlockedByPlungerTime()>0)
         steer_angle += add_angle*0.2f;
     else
         steer_angle += add_angle;
@@ -406,7 +406,7 @@ void AIBaseController::setSteering(float angle, float dt)
     if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
     else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
 
-    if(m_kart->hasViewBlockedByPlunger())
+    if(m_kart->getBlockedByPlungerTime()>0)
     {
         if     (steer_fraction >  0.5f) steer_fraction =  0.5f;
         else if(steer_fraction < -0.5f) steer_fraction = -0.5f;
@@ -437,7 +437,7 @@ void AIBaseController::setSteering(float angle, float dt)
 bool AIBaseController::doSkid(float steer_fraction)
 {
     // Disable skidding when a plunger is in the face
-    if(m_kart->hasViewBlockedByPlunger()) return false;
+    if(m_kart->getBlockedByPlungerTime()>0) return false;
 
     // FIXME: Disable skidding for now if the new skidding
     // code is activated, since the AI can not handle this

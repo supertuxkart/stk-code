@@ -205,36 +205,10 @@ void MinimalRaceGUI::renderPlayerView(const AbstractKart *kart)
     
     const core::recti &viewport    = kart->getCamera()->getViewport();
     core::vector2df scaling = kart->getCamera()->getScaling();
-    //std::cout << "Applied ratio : " << viewport.getWidth()/800.0f << std::endl;
     
     scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
     
-    //std::cout << "Scale : " << scaling.X << ", " << scaling.Y << std::endl;
-
-    if (kart->hasViewBlockedByPlunger())
-    {
-        int offset_y = viewport.UpperLeftCorner.Y;
-        
-        const int screen_width = viewport.LowerRightCorner.X 
-                               - viewport.UpperLeftCorner.X;
-        const int plunger_size = viewport.LowerRightCorner.Y 
-                               - viewport.UpperLeftCorner.Y;
-        int plunger_x = viewport.UpperLeftCorner.X + screen_width/2 
-                      - plunger_size/2;
-        
-        video::ITexture *t=m_plunger_face->getTexture();
-        core::rect<s32> dest(plunger_x,              offset_y, 
-                             plunger_x+plunger_size, offset_y+plunger_size);
-        const core::rect<s32> source(core::position2d<s32>(0,0), 
-                                     t->getOriginalSize());
-                
-        irr_driver->getVideoDriver()->draw2DImage(t, dest, source, 
-                                                  NULL /* clip */, 
-                                                  NULL /* color */, 
-                                                  true /* alpha */);
-    }
-
-    
+    drawPlungerInFace(kart);    
     drawAllMessages     (kart, viewport, scaling);
     if(!World::getWorld()->isRacePhase()) return;
 

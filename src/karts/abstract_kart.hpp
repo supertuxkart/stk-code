@@ -198,7 +198,7 @@ public:
     virtual float getFinishTime() const = 0;
     // ------------------------------------------------------------------------
     /** Returns true if the kart has a plunger attached to its face. */
-    virtual bool hasViewBlockedByPlunger() const = 0;
+    virtual float getBlockedByPlungerTime() const = 0;
     // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */

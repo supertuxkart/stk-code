@@ -174,6 +174,8 @@ void InputManager::handleStaticAction(int key, int value)
                 // a rescue loop: rescue, drive, crash, rescue to same place
                 world->getKart(0)->forceRescue();
 #endif
+                // FIXME: remove after testing the animated plunger
+                world->getLocalPlayerKart(0)->blockViewWithPlunger();
             }
             break;
         case KEY_F2:

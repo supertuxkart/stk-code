@@ -176,7 +176,7 @@ protected:
                                 const core::vector2df &scaling);
     void drawGlobalMusicDescription();
     void drawGlobalReadySetGo  ();
-
+    void drawPlungerInFace(const AbstractKart *kart);
     /** Instructs the base gui to ignore unimportant messages (like
      *  item messages).
      */

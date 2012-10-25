@@ -1356,7 +1356,7 @@ void SkiddingAI::handleAcceleration( const float dt)
         return;
     }
 
-    if(m_kart->hasViewBlockedByPlunger())
+    if(m_kart->getBlockedByPlungerTime()>0)
     {
         if(m_kart->getSpeed() < m_kart->getCurrentMaxSpeed() / 2)
             m_controls->m_accel = 0.05f;
@@ -1424,7 +1424,7 @@ void SkiddingAI::handleNitroAndZipper()
     if(m_kart->getSpeed() > 0.95f*m_kart->getCurrentMaxSpeed())
         return;
     // Don't use nitro when the AI has a plunger in the face!
-    if(m_kart->hasViewBlockedByPlunger()) return;
+    if(m_kart->getBlockedByPlungerTime()>0) return;
     
     // Don't use nitro if we are braking
     if(m_controls->m_brake) return;
@@ -2210,7 +2210,7 @@ void SkiddingAI::setSteering(float angle, float dt)
     else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
 
     // Restrict steering when a plunger is in the face
-    if(m_kart->hasViewBlockedByPlunger())
+    if(m_kart->getBlockedByPlungerTime()>0)
     {
         if     (steer_fraction >  0.5f) steer_fraction =  0.5f;
         else if(steer_fraction < -0.5f) steer_fraction = -0.5f;
