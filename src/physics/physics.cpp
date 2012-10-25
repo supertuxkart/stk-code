@@ -322,7 +322,7 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
         f_right = 1.25f;
     else if(f_right< 0.8f)
         f_right = 0.8f;
-    float f_left = f_right ==0 ? 1.5f : 1/f_right;
+    float f_left = 1/f_right;
 
     // Check if a kart is more 'actively' trying to push another kart
     // by checking its local sidewards velocity
@@ -343,13 +343,13 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
     // More driving towards left --> left kart gets bigger impulse
     if(vel_diff<0)
     {
-        f_left *= vel_left == 0 ? 2.0f : (1.0f - vel_diff/fabsf(vel_left));
+        f_left *= 1.0f - vel_diff/fabsf(vel_left);
         if(f_left > 2.0f)
             f_left = 2.0f;
     }
     else
     {
-        f_right *= vel_right == 0 ? 2.0f : (1.0f + vel_diff/fabsf(vel_right));
+        f_right *= 1.0f + vel_diff/fabsf(vel_right);
         if(f_right > 2.0f)
             f_right = 2.0f;
     }
