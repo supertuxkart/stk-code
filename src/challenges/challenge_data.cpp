@@ -386,6 +386,11 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
         race_manager->setNumLocalPlayers(1);
         race_manager->setCoinTarget(m_energy[d]);
         race_manager->setDifficulty(d);
+
+        if (m_time[d] >= 0.0f)
+        {
+          race_manager->setTimeTarget(m_time[d]);
+        }
     }
     else   // GP
     {

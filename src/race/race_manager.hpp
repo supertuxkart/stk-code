@@ -307,6 +307,8 @@ private:
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
     int                              m_coin_target;
+    bool                             m_has_time_target;
+    float                            m_time_target;
 
     void startNextRace();    // start a next race
 
@@ -360,6 +362,8 @@ public:
      *  doesn't exist */
     int getLocalPlayerGPRank(const int playerID) const;
     
+    bool hasTimeTarget() const { return m_has_time_target; }
+    
     /** Sort karts and update the m_gp_rank KartStatus member, in preparation
       * for future calls to RaceManager::getKartGPRank or 
       *  RaceManager::getKartWithGPRank
@@ -402,9 +406,10 @@ public:
         m_reverse_track.push_back(r_t);
     }
     // ------------------------------------------------------------------------
-    void setMajorMode(MajorRaceModeType mode) { m_major_mode = mode; }
+    void setMajorMode(MajorRaceModeType mode) { m_major_mode = mode;       }
     // ------------------------------------------------------------------------
-    void setMinorMode(MinorRaceModeType mode) { m_minor_mode = mode; }
+    void setMinorMode(MinorRaceModeType mode) { m_minor_mode = mode;
+                                                m_has_time_target = false; }
     // ------------------------------------------------------------------------
     void setNumKarts(int num) 
     {
@@ -413,8 +418,10 @@ public:
         m_ai_superpower = SUPERPOWER_NONE;
     }
     // ------------------------------------------------------------------------
-    void setCoinTarget(int num) { m_coin_target = num; }
-    
+    void setCoinTarget(int num)   { m_coin_target = num;        }
+    // ------------------------------------------------------------------------
+    void setTimeTarget(float num) { m_has_time_target = true;
+                                    m_time_target = num;        }
     /** \} */
     
     // ------------------------------------------------------------------------
@@ -508,6 +515,8 @@ public:
     }
     // ------------------------------------------------------------------------
     int getCoinTarget() const { return m_coin_target; }
+    // ------------------------------------------------------------------------
+    float getTimeTarget() const { return m_time_target; }
     // ------------------------------------------------------------------------
     int getPositionScore(int p) const { return m_score_for_position[p-1]; }
     // ------------------------------------------------------------------------

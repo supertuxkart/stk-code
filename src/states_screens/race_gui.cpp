@@ -246,13 +246,34 @@ void RaceGUI::drawGlobalTimer()
     {
         return;
     }
-        
-    std::string s = StringUtils::timeToString(World::getWorld()->getTime());
-    core::stringw sw(s.c_str());
 
-    static video::SColor time_color = video::SColor(255, 255, 255, 255);
-    
+    core::stringw sw;
+    video::SColor time_color = video::SColor(255, 255, 255, 255);
     int dist_from_right = 10 + m_timer_width;
+
+    float elapsed_time = World::getWorld()->getTime();
+    if (!race_manager->hasTimeTarget())
+    {
+        sw = core::stringw ( 
+            StringUtils::timeToString(elapsed_time).c_str() );
+    }
+    else
+    {
+        float time_target = race_manager->getTimeTarget();
+        if (elapsed_time < time_target)
+        {
+            sw = core::stringw (
+              StringUtils::timeToString(time_target - elapsed_time).c_str());
+        }
+        else
+        {
+            sw = _("Challenge Failed");
+            int string_width = 
+                GUIEngine::getFont()->getDimension(_("Challenge Failed")).Width;
+            dist_from_right = 10 + string_width;
+            time_color = video::SColor(255,255,0,0);
+        }
+    }
     
     core::rect<s32> pos(UserConfigParams::m_width - dist_from_right, 10, 
                         UserConfigParams::m_width                  , 50);
