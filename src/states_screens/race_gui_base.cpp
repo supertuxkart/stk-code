@@ -1030,11 +1030,11 @@ void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart)
     int plunger_x = viewport.UpperLeftCorner.X + screen_width/2 
                   - plunger_size/2;
     int plunger_offset = 0;
-    if(kart->getBlockedByPlungerTime()<3)
+    const float anim_time=3.0f;
+    if(kart->getBlockedByPlungerTime()<anim_time)
     {
         int height = viewport.LowerRightCorner.Y
                    - viewport.UpperLeftCorner.Y;
-        const float anim_time=3.0f;
         // Map remaining plunger time between [anim_time,0] time to [0,1]
         float f = (anim_time - kart->getBlockedByPlungerTime())/anim_time;
         plunger_offset = (int)(f*height*0.5f);
