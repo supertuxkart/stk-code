@@ -82,7 +82,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_plunger_in_face_duration[1] = m_plunger_in_face_duration[2] =
         m_zipper_time = m_zipper_force = m_zipper_speed_gain =
         m_zipper_max_speed_increase = m_zipper_fade_out_time =       
-        m_slipstream_length = m_slipstream_collect_time = 
+        m_slipstream_length = m_slipstream_width = m_slipstream_collect_time =
         m_slipstream_use_time = m_slipstream_add_power =
         m_slipstream_min_speed = m_slipstream_max_speed_increase =
         m_slipstream_duration = m_slipstream_fade_out_time =
@@ -335,6 +335,7 @@ void KartProperties::getAllData(const XMLNode * root)
     if(const XMLNode *slipstream_node = root->getNode("slipstream"))
     {
         slipstream_node->get("length",       &m_slipstream_length            );
+        slipstream_node->get("width",        &m_slipstream_width             );
         slipstream_node->get("collect-time", &m_slipstream_collect_time      );
         slipstream_node->get("use-time",     &m_slipstream_use_time          );
         slipstream_node->get("add-power",    &m_slipstream_add_power         );
@@ -628,6 +629,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_zipper_speed_gain,          "zipper-speed-gain"             );
     CHECK_NEG(m_zipper_max_speed_increase,  "zipper-max-speed-increase"     );
     CHECK_NEG(m_slipstream_length,          "slipstream length"             );
+    CHECK_NEG(m_slipstream_width,           "slipstream width"              );
     CHECK_NEG(m_slipstream_collect_time,    "slipstream collect-time"       );
     CHECK_NEG(m_slipstream_use_time,        "slipstream use-time"           );
     CHECK_NEG(m_slipstream_add_power,       "slipstream add-power"          );

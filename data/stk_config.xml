@@ -321,6 +321,7 @@
                 />
     </ai>
     <!-- Slipstream: length: How far behind a kart slipstream works
+         width: how wide slipstream works furthest away from the kart.
          collect-time: How many seconds of sstream give  maximum benefit
          use-time: How long the benefit will last.
          add-power: Additional power due to sstreaming. 1 = +100%
@@ -331,7 +332,7 @@
          working.
          fade-out-time: How long the slip stream speed increase will 
          gradually be reduced.  -->
-    <slipstream length="10" collect-time="2" use-time="5"
+    <slipstream length="10" width="5" collect-time="2" use-time="5"
                 add-power="3" min-speed="10"
                 max-speed-increase="5" duration="1" fade-out-time="2"/>
 

@@ -278,6 +278,8 @@ private:
 
     /** How far behind a kart slipstreaming is effective. */
     float m_slipstream_length;
+    /** How wide the slipstream area is at the end. */
+    float m_slipstream_width;
     /** Time after which sstream gives a bonus. */
     float m_slipstream_collect_time;
     /** Time slip-stream bonus is effective. */
@@ -589,6 +591,9 @@ public:
 
     /** Returns how far behind a kart slipstreaming works. */
     float getSlipstreamLength       () const {return m_slipstream_length;     }
+
+    /** Returns how wide the slipstream area is at the end. */
+    float getSlipstreamWidth        () const {return m_slipstream_width;      }
 
     /** Returns time after which slipstream has maximum effect. */
     float getSlipstreamCollectTime  () const 

@@ -70,12 +70,13 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
 
     float length = m_kart->getKartProperties()->getSlipstreamLength();
     float kw     = m_kart->getKartWidth();
+    float ew     = m_kart->getKartProperties()->getSlipstreamWidth();
     float kl     = m_kart->getKartLength();
 
     Vec3 p[4];
     p[0]=Vec3(-kw*0.5f, 0, -kl*0.5f       );
-    p[1]=Vec3(-kw*0.5f, 0, -kl*0.5f-length);
-    p[2]=Vec3( kw*0.5f, 0, -kl*0.5f-length);
+    p[1]=Vec3(-ew*0.5f, 0, -kl*0.5f-length);
+    p[2]=Vec3( ew*0.5f, 0, -kl*0.5f-length);
     p[3]=Vec3( kw*0.5f, 0, -kl*0.5f       );
     m_slipstream_original_quad = new Quad(p[0], p[1], p[2], p[3]);
     m_slipstream_quad          = new Quad(p[0], p[1], p[2], p[3]);
