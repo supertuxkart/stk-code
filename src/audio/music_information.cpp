@@ -93,10 +93,12 @@ MusicInformation::MusicInformation(const XMLNode *root,
     root->get("composer",      &s                );
     m_composer = StringUtils::decodeFromHtmlEntities(s);
     root->get("file",          &m_normal_filename);
-    root->get("gain",          &m_adjusted_gain  );
+    root->get("gain",          &m_gain           );
     root->get("tracks",        &m_all_tracks     );
     root->get("fast",          &m_enable_fast    );
     root->get("fast-filename", &m_fast_filename  );
+    
+    m_adjusted_gain = m_gain;
     
     // Get the path from the filename and add it to the ogg filename
     std::string path  = StringUtils::getPath(filename);
