@@ -6,11 +6,11 @@
     
     <hard>
         <karts number="5"/>
-        <requirements position="1" time="137"/>
+        <requirements position="1" time="152"/>
     </hard>
     <medium>
         <karts number="4"/>
-        <requirements time="150"/>
+        <requirements time="175"/>
     </medium>
     <easy>
         <karts number="4"/>
