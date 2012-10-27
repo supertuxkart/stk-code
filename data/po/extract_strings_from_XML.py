@@ -28,6 +28,7 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, level=0):
                f.write( line.encode( "utf-8" ) )
         
         if isChallenge or isGP or isKart or isTrack:
+           if isTrack and e.hasAttribute("internal") and e.getAttribute("internal") == "Y": continue
            if e.hasAttribute("name") and len(e.getAttribute("name")) > 0:
                #print "Label=", e.getAttribute("name"), " Comment=", comment
                line = ""
