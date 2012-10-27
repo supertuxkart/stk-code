@@ -2,7 +2,7 @@
 <supertuxkart_grand_prix name="To the moon and back">
 
     <track id="islandtrack"    laps="3" reverse="false" />
-    <track id="tuxtollway"     laps="2" reverse="false" />
+    <track id="greenvalley"    laps="2" reverse="false" />
     <track id="mansion"        laps="3" reverse="false" />
     <track id="startrack"      laps="3" reverse="false" />
     <track id="city"           laps="2" reverse="false" />
