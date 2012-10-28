@@ -20,6 +20,7 @@
 
 #include <SColor.h>
 
+#include "audio/music_manager.hpp"
 #include "challenges/challenge_data.hpp"
 #include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
@@ -746,3 +747,9 @@ void FeatureUnlockedCutScene::eventCallback(GUIEngine::Widget* widget,
 }   // eventCallback
 
 // -------------------------------------------------------------------------------------
+
+MusicInformation* FeatureUnlockedCutScene::getInGameMenuMusic() const
+{
+    MusicInformation* mi = music_manager->getMusicInformation("race_summary.music");
+    return mi;
+}

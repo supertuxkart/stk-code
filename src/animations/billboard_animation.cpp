@@ -65,7 +65,7 @@ BillboardAnimation::BillboardAnimation(const XMLNode &xml_node)
  *  \param dt Time since last call. */
 void BillboardAnimation::update(float dt)
 {
-    if ( UserConfigParams::m_graphical_effects )
+    //if ( UserConfigParams::m_graphical_effects )
     {
         Vec3 xyz(m_node->getPosition());
         // Rotation doesn't make too much sense for a billboard, 

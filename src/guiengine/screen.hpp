@@ -266,6 +266,11 @@ namespace GUIEngine
          */
         virtual MusicInformation* getMusic() const { return stk_config->m_title_music; }
 
+        /**
+         * \return which music to play at this screen, if accessed in "in-game-menu" mode
+         */
+        virtual MusicInformation* getInGameMenuMusic() const { return NULL; }
+
         virtual int getWidth();
 
         virtual int getHeight();

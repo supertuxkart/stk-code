@@ -217,8 +217,19 @@ void StateManager::onTopMostScreenChanged()
 {
     if (m_game_mode == MENU && GUIEngine::getCurrentScreen() != NULL)
     {
-        music_manager->startMusic(GUIEngine::getCurrentScreen()->getMusic());
+        if (GUIEngine::getCurrentScreen()->getMusic() != NULL)
+        {
+            music_manager->startMusic(GUIEngine::getCurrentScreen()->getMusic());
+        }
     }
+    else if (m_game_mode == INGAME_MENU && GUIEngine::getCurrentScreen() != NULL)
+    {
+        if (GUIEngine::getCurrentScreen()->getInGameMenuMusic() != NULL)
+        {
+            music_manager->startMusic(GUIEngine::getCurrentScreen()->getInGameMenuMusic());
+        }
+    }
+    
 }   // onTopMostScreenChanged
 
 // ----------------------------------------------------------------------------

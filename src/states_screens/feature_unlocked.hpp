@@ -167,6 +167,8 @@ public:
     
     /** override from base class to handle escape press */
     virtual bool onEscapePressed() OVERRIDE;
+    
+    virtual MusicInformation* getInGameMenuMusic() const OVERRIDE;
 };
 
 #endif

@@ -304,7 +304,7 @@ ThreeDAnimation::~ThreeDAnimation()
  */
 void ThreeDAnimation::update(float dt)
 {
-    if ( UserConfigParams::m_graphical_effects || m_important_animation )
+    //if ( UserConfigParams::m_graphical_effects || m_important_animation )
     {
         Vec3 xyz   = m_node->getPosition();
         Vec3 scale = m_node->getScale();
