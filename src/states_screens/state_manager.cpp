@@ -190,7 +190,8 @@ void StateManager::onGameStateChange(GameState new_state)
 {
     if (new_state == GAME)
     {
-        irr_driver->hidePointer();
+        if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_OVERWORLD) 
+            irr_driver->hidePointer();
         input_manager->setMode(InputManager::INGAME);
     }
     else  // menu (including in-game menu)
