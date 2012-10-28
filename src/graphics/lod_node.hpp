@@ -102,6 +102,11 @@ public:
     
     std::vector<scene::ISceneNode*>& getAllNodes() { return m_nodes; }
     
+    //! OnAnimate() is called just before rendering the whole scene.
+		/** This method will be called once per frame, independent
+		of whether the scene node is visible or not. */
+    virtual void OnAnimate(u32 timeMs);
+
     virtual void OnRegisterSceneNode();
     virtual void render();
     

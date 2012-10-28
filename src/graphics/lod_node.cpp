@@ -55,9 +55,37 @@ LODNode::~LODNode()
 
 void LODNode::render()
 {
-    if (isVisible())
-        ISceneNode::OnRegisterSceneNode();
     //ISceneNode::render();
+}
+
+void LODNode::OnAnimate(u32 timeMs)
+{
+    if (isVisible())
+    {
+        // update absolute position
+        updateAbsolutePosition();
+        
+        // Assume all the scene node have the same bouding box
+        // update the less detailed one (it might be the unanimated one)
+        m_nodes[m_detail.size()-1]->OnAnimate(timeMs);
+
+        Box = m_nodes[m_detail.size()-1]->getBoundingBox();
+
+        // If this node has children other than the LOD nodes, animate it
+        core::list<ISceneNode*>::Iterator it;
+        for (it = Children.begin(); it != Children.end(); it++)
+        {
+            if (m_nodes_set.find(*it) == m_nodes_set.end())
+            {
+                assert(*it != NULL);
+                if ((*it)->isVisible())
+                {
+                    (*it)->OnAnimate(timeMs);
+                }
+            }
+        }
+			
+    }
 }
 
 void LODNode::OnRegisterSceneNode()
@@ -77,6 +105,7 @@ void LODNode::OnRegisterSceneNode()
     {
         if (dist < m_detail[n])
         {
+            m_nodes[n]->updateAbsolutePosition();
             m_nodes[n]->OnRegisterSceneNode();
             shown = true;
             break;

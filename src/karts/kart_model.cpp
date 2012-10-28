@@ -228,6 +228,9 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
 
 
         node = irr_driver->addAnimatedMesh(m_mesh);
+        // as animated mesh are not cheap to render use frustum box culling
+        node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
+        
         lod_node->add(50, node, true);
         scene::ISceneNode* static_model = attachModel(false);
         lod_node->add(500, static_model, true);
@@ -242,6 +245,13 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         m_animated_node->setLoopMode(false);
         m_animated_node->grab();
         node = lod_node;
+
+        // Become the owner of the wheels
+        for(unsigned int i=0; i<4; i++)
+        {
+            if(!m_wheel_model[i]) continue;
+            m_wheel_node[i]->setParent(lod_node);
+        }
     }
     else
     {
@@ -259,19 +269,17 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         std::string debug_name = m_model_filename+" (kart-model)";
         node->setName(debug_name.c_str());
 #endif
-    }
-    
-
-    for(unsigned int i=0; i<4; i++)
-    {
-        if(!m_wheel_model[i]) continue;
-        m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], node);
-        m_wheel_node[i]->grab();
-#ifdef DEBUG
-        std::string debug_name = m_wheel_filename[i]+" (wheel)";
-        m_wheel_node[i]->setName(debug_name.c_str());
-#endif
-        m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
+        for(unsigned int i=0; i<4; i++)
+        {
+            if(!m_wheel_model[i]) continue;
+            m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], node);
+            m_wheel_node[i]->grab();
+    #ifdef DEBUG
+            std::string debug_name = m_wheel_filename[i]+" (wheel)";
+            m_wheel_node[i]->setName(debug_name.c_str());
+    #endif
+            m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
+        }
     }
     
     return node;
