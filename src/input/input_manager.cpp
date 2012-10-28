@@ -581,7 +581,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                 return;
             }
             
-            ((Controller*)pk->getController())->action(action, abs(value));
+            Controller* controller = pk->getController();
+            if (controller != NULL) controller->action(action, abs(value));
         }
         // ... when in menus
         else
