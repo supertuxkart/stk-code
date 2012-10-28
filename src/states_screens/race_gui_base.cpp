@@ -1073,7 +1073,9 @@ void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart, float dt)
             else
             {
                 m_plunger_state = PLUNGER_STATE_NOMOVE;
-                m_plunger_speed = core::vector2df(0,0);
+                m_plunger_speed = 
+                    core::vector2df(0, 0.10f*viewport.getHeight()
+                                       /m_plunger_move_time      );
             }
         }   // has not reach fast moving state            
     }
