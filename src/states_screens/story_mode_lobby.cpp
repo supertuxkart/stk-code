@@ -114,6 +114,7 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name
             if (list->getSelectionLabel() == players[n].getName())
             {
                 unlock_manager->setCurrentSlot(players[n].getUniqueID());
+                unlock_manager->updateActiveChallengeList();
                 slot_found = true;
                 break;
             }
@@ -155,6 +156,7 @@ void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& newName)
         if (players[n].getName() == newName)
         {
             unlock_manager->setCurrentSlot(players[n].getUniqueID());
+            unlock_manager->updateActiveChallengeList();
             slot_found = true;
             break;
         }
