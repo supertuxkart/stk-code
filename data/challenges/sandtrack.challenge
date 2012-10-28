@@ -6,7 +6,7 @@
     
     <hard>
         <karts number="1"/>
-        <requirements energy="16" time="130"/>
+        <requirements energy="16" time="120"/>
     </hard>
     <medium>
         <karts number="1"/>
