@@ -133,6 +133,10 @@ void RaceGUIBase::restartRace()
 {
     m_referee_height = 10.0f;
     m_referee->attachToSceneNode();
+    m_plunger_move_time = 0;
+    m_plunger_offset    = core::vector2di(0,0);
+    m_plunger_speed     = core::vector2df(0,0);
+    m_plunger_state     = PLUNGER_STATE_INIT;
 }   // restartRace
 
 //-----------------------------------------------------------------------------
@@ -480,7 +484,7 @@ void RaceGUIBase::preRenderCallback(const AbstractKart &kart)
 }   // preRenderCallback
 
 // ----------------------------------------------------------------------------
-void RaceGUIBase::renderPlayerView(const AbstractKart *kart)
+void RaceGUIBase::renderPlayerView(const AbstractKart *kart, float dt)
 {
     const core::recti &viewport = kart->getCamera()->getViewport();
 
@@ -1015,35 +1019,77 @@ void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
 }   // drawGlobalPlayerIcons
 
 // ----------------------------------------------------------------------------
+
 /** Draws the plunger-in-face if necessary. Does nothing if there is no 
  *  plunger in face atm.
  */
-void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart)
+void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart, float dt)
 {
-    if (kart->getBlockedByPlungerTime()<=0) return;
+    if (kart->getBlockedByPlungerTime()<=0)
+    {
+        m_plunger_state = PLUNGER_STATE_INIT;
+        return;
+    }
 
     const core::recti &viewport = kart->getCamera()->getViewport();
 
     const int screen_width = viewport.LowerRightCorner.X 
                            - viewport.UpperLeftCorner.X;
-    const int plunger_size = (int)(0.6f * screen_width);
-    int plunger_x = viewport.UpperLeftCorner.X + screen_width/2 
-                  - plunger_size/2;
-    int plunger_offset = 0;
-    const float anim_time=3.0f;
-    if(kart->getBlockedByPlungerTime()<anim_time)
+
+    if(m_plunger_state == PLUNGER_STATE_INIT)
     {
-        int height = viewport.LowerRightCorner.Y
-                   - viewport.UpperLeftCorner.Y;
-        // Map remaining plunger time between [anim_time,0] time to [0,1]
-        float f = (anim_time - kart->getBlockedByPlungerTime())/anim_time;
-        plunger_offset = (int)(f*height*0.5f);
+        RandomGenerator random;
+        m_plunger_move_time = 0.1f+random.get(50)/200.0f;
+        m_plunger_offset    = core::vector2di(0,0);
+        m_plunger_state     = PLUNGER_STATE_NOMOVE;
+        m_plunger_speed     = core::vector2df(0, 0);
+        m_plunger_x_target  = random.get(screen_width)- screen_width/2;
     }
 
+    m_plunger_move_time -= dt;
+    if(m_plunger_move_time < dt && m_plunger_state!=PLUNGER_STATE_FAST)
+    {
+        const float fast_time = 0.3f;
+        if(kart->getBlockedByPlungerTime()<fast_time)
+        {
+            m_plunger_state = PLUNGER_STATE_FAST;
+            m_plunger_speed = core::vector2df(m_plunger_x_target/fast_time,
+                                              viewport.getHeight()*0.5f
+                                              /fast_time);
+            m_plunger_move_time = fast_time;
+        }
+        else
+        {
+            RandomGenerator random;
+            m_plunger_move_time = 0.1f+random.get(50)/200.0f;
+            // Plunger is either moving or not moving
+            if(m_plunger_state==PLUNGER_STATE_NOMOVE)
+            {
+                m_plunger_state = PLUNGER_STATE_SLOW;
+                m_plunger_speed = 
+                    core::vector2df(0, 0.05f*viewport.getHeight()
+                                       /m_plunger_move_time      );
+            }
+            else
+            {
+                m_plunger_state = PLUNGER_STATE_NOMOVE;
+                m_plunger_speed = core::vector2df(0,0);
+            }
+        }   // has not reach fast moving state            
+    }
+
+    m_plunger_offset.X += (int)(m_plunger_speed.X * dt);
+    m_plunger_offset.Y += (int)(m_plunger_speed.Y * dt);
+
+    const int plunger_size = (int)(0.6f * screen_width);
     int offset_y = viewport.UpperLeftCorner.Y + viewport.getHeight()/2 
-                 - plunger_size/2 - plunger_offset;
+                 - plunger_size/2 - m_plunger_offset.Y;
+
+    int plunger_x = viewport.UpperLeftCorner.X + screen_width/2 
+                  - plunger_size/2;
 
     video::ITexture *t=m_plunger_face->getTexture();
+    plunger_x += (int)m_plunger_offset.X;
     core::rect<s32> dest(plunger_x,              offset_y, 
                          plunger_x+plunger_size, offset_y+plunger_size);
 

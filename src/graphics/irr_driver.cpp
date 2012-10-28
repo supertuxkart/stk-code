@@ -1584,7 +1584,7 @@ void IrrDriver::update(float dt)
                         PROFILER_PUSH_CPU_MARKER(marker_name, 0x00, 0x00, (i+1)*60);
                     }
                     
-                    rg->renderPlayerView(kart);
+                    rg->renderPlayerView(kart, dt);
                     
                     PROFILER_POP_CPU_MARKER();
                 }

@@ -150,6 +150,26 @@ protected:
     /** Material for the 'plunger in the face' texture. */
     Material        *m_plunger_face;
 
+    /** State of the plunger: the plunger switches between not moving and slow
+     *  moving till the end of the plunger time is nearly reached, in which
+     *  case it changes to fast moving. */
+    enum PlungerState {PLUNGER_STATE_INIT,   PLUNGER_STATE_SLOW, 
+                       PLUNGER_STATE_NOMOVE, PLUNGER_STATE_FAST} 
+                        m_plunger_state;
+
+    /** How long the plunger should stay in the current state. */
+    float m_plunger_move_time;
+
+    /** The x position at which the plunger should end, randomly determined. */
+    int m_plunger_x_target;
+
+    /** Offset of the plunger. */
+    core::vector2di m_plunger_offset;
+
+    /* Speed of the plunger. This gets changed depending on state (not moving,
+     *  slow moving, fast moving). */
+    core::vector2df m_plunger_speed;
+
     /** The size of a single marker in pixels, must be a power of 2. */
     int              m_marker_rendered_size;
 
@@ -176,7 +196,7 @@ protected:
                                 const core::vector2df &scaling);
     void drawGlobalMusicDescription();
     void drawGlobalReadySetGo  ();
-    void drawPlungerInFace(const AbstractKart *kart);
+    void drawPlungerInFace(const AbstractKart *kart, float dt);
     /** Instructs the base gui to ignore unimportant messages (like
      *  item messages).
      */
@@ -198,7 +218,7 @@ public:
     virtual void renderGlobal(float dt);
     virtual void init();
     virtual void restartRace();
-    virtual void renderPlayerView(const AbstractKart *kart);
+    virtual void renderPlayerView(const AbstractKart *kart, float dt);
     virtual void addMessage(const irr::core::stringw &m, 
                             const AbstractKart *kart, float time,
                             const video::SColor &color=

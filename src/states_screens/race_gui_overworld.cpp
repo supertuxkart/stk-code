@@ -175,7 +175,7 @@ void RaceGUIOverworld::renderGlobal(float dt)
  *  collectibles, ...
  *  \param kart Pointer to the kart for which to render the view.
  */
-void RaceGUIOverworld::renderPlayerView(const AbstractKart *kart)
+void RaceGUIOverworld::renderPlayerView(const AbstractKart *kart, float dt)
 {
     if (!m_enabled) return;
     
@@ -194,7 +194,7 @@ void RaceGUIOverworld::renderPlayerView(const AbstractKart *kart)
         
     drawPowerupIcons    (kart, viewport, scaling);
     
-    RaceGUIBase::renderPlayerView(kart);
+    RaceGUIBase::renderPlayerView(kart, dt);
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------

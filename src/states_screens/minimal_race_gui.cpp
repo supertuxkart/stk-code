@@ -199,7 +199,7 @@ void MinimalRaceGUI::renderGlobal(float dt)
  *  collectibles, ...
  *  \param kart Pointer to the kart for which to render the view.
  */
-void MinimalRaceGUI::renderPlayerView(const AbstractKart *kart)
+void MinimalRaceGUI::renderPlayerView(const AbstractKart *kart, float dt)
 {
     if (!m_enabled) return;
     
@@ -208,7 +208,7 @@ void MinimalRaceGUI::renderPlayerView(const AbstractKart *kart)
     
     scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
     
-    drawPlungerInFace(kart);    
+    drawPlungerInFace(kart, dt);
     drawAllMessages     (kart, viewport, scaling);
     if(!World::getWorld()->isRacePhase()) return;
 
@@ -218,7 +218,7 @@ void MinimalRaceGUI::renderPlayerView(const AbstractKart *kart)
     drawEnergyMeter     (kart, viewport, scaling);
     drawRankLap         (info, kart, viewport);
 
-    RaceGUIBase::renderPlayerView(kart);
+    RaceGUIBase::renderPlayerView(kart, dt);
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------
