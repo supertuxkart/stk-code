@@ -1043,7 +1043,10 @@ void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart, float dt)
         m_plunger_offset    = core::vector2di(0,0);
         m_plunger_state     = PLUNGER_STATE_NOMOVE;
         m_plunger_speed     = core::vector2df(0, 0);
-        m_plunger_x_target  = random.get(screen_width)- screen_width/2;
+        float movement_fraction = 0.3f;
+        m_plunger_x_target  = screen_width/2 
+                            + random.get((int)(screen_width*movement_fraction))
+                            - (int)(screen_width*movement_fraction*0.5f);
     }
 
     m_plunger_move_time -= dt;
@@ -1053,9 +1056,9 @@ void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart, float dt)
         if(kart->getBlockedByPlungerTime()<fast_time)
         {
             m_plunger_state = PLUNGER_STATE_FAST;
-            m_plunger_speed = core::vector2df(m_plunger_x_target/fast_time,
-                                              viewport.getHeight()*0.5f
-                                              /fast_time);
+            m_plunger_speed = 
+                core::vector2df((m_plunger_x_target-screen_width/2)/fast_time,
+                                viewport.getHeight()*0.5f/fast_time);
             m_plunger_move_time = fast_time;
         }
         else
@@ -1074,7 +1077,7 @@ void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart, float dt)
             {
                 m_plunger_state = PLUNGER_STATE_NOMOVE;
                 m_plunger_speed = 
-                    core::vector2df(0, 0.10f*viewport.getHeight()
+                    core::vector2df(0, 0.02f*viewport.getHeight()
                                        /m_plunger_move_time      );
             }
         }   // has not reach fast moving state            
