@@ -750,6 +750,6 @@ void FeatureUnlockedCutScene::eventCallback(GUIEngine::Widget* widget,
 
 MusicInformation* FeatureUnlockedCutScene::getInGameMenuMusic() const
 {
-    MusicInformation* mi = music_manager->getMusicInformation("race_summary.music");
+    MusicInformation* mi = music_manager->getMusicInformation("win_theme.music");
     return mi;
 }
