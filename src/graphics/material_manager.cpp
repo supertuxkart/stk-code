@@ -299,6 +299,15 @@ Material *MaterialManager::getMaterial(const std::string& fname,
 }   // getMaterial
 
 
+// ----------------------------------------------------------------------------
+/** Makes all materials permanent. Used for overworld.
+ */
+void MaterialManager::makeMaterialsPermanent()
+{
+    m_shared_material_index = m_materials.size();
+}   // makeMaterialsPermanent
+
+// ----------------------------------------------------------------------------
 bool MaterialManager::hasMaterial(const std::string& fname)
 {
     std::string basename=StringUtils::getBasename(fname);

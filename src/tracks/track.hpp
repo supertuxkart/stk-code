@@ -152,7 +152,7 @@ private:
     std::string              m_screenshot;
     std::vector<MusicInformation*> m_music;
 
-    /** Will only be sued on overworld */
+    /** Will only be used on overworld */
     std::vector<OverworldChallenge> m_challenges;
     
     std::vector<OverworldForceField> m_force_fields;
@@ -188,6 +188,10 @@ private:
     /** A list of all textures loaded by the track, so that they can
      *  be removed from the cache at cleanup time. */
     std::vector<video::ITexture*>   m_all_cached_textures;
+
+    /** True if the materials.xml file is already loaded. This is used
+     * for the overworld to keep its textures loaded. */
+    bool m_materials_loaded;
 
 #ifdef DEBUG
     /** A list of textures that were cached before the track is loaded. 

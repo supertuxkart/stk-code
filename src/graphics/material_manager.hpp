@@ -70,11 +70,11 @@ public:
     bool      pushTempMaterial (const std::string& filename);
     bool      pushTempMaterial (const XMLNode *root, const std::string& filename);
     void      popTempMaterial  ();
-    
+    void      makeMaterialsPermanent();
     bool      hasMaterial(const std::string& fname);
     
     Material* getLatestMaterial() { return m_materials[m_materials.size()-1]; }
-};
+};   // MaterialManager
 
 extern MaterialManager *material_manager;
 

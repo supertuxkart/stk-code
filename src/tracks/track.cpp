@@ -78,6 +78,7 @@ Track::Track(const std::string &filename)
     m_magic_number          = 0x17AC3802;
 #endif
     
+    m_materials_loaded      = false;
     m_filename              = filename;
     m_root                  = StringUtils::getPath(StringUtils::removeExtension(m_filename));
     m_ident                 = StringUtils::getBasename(m_root);
@@ -215,8 +216,13 @@ void Track::cleanup()
     }
     m_sky_textures.clear();
 
-    // remove temporary materials loaded by the material manager
-    material_manager->popTempMaterial();
+    if(m_ident!="overworld")
+    {
+        // remove temporary materials loaded by the material manager
+        material_manager->popTempMaterial();
+    }
+    else
+        material_manager->makeMaterialsPermanent();
 
     if(UserConfigParams::logMemory())
     {
@@ -661,7 +667,6 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 }   // convertTrackToBullet
 
 // ----------------------------------------------------------------------------
-
 /** Loads the main track model (i.e. all other objects contained in the
  *  scene might use raycast on this track model to determine the actual
  *  height of the terrain.
@@ -1221,7 +1226,14 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
     try
     {
         std::string materials_file = m_root+"/materials.xml";
-        material_manager->pushTempMaterial(materials_file);
+        if(m_ident=="overworld")
+        {
+            if(!m_materials_loaded)
+                material_manager->addSharedMaterial(materials_file);
+            m_materials_loaded = true;
+        }
+        else
+            material_manager->pushTempMaterial(materials_file);
     }
     catch (std::exception& e)
     {
