@@ -150,18 +150,16 @@ protected:
     /** Material for the 'plunger in the face' texture. */
     Material        *m_plunger_face;
 
-    /** State of the plunger: the plunger switches between not moving and slow
-     *  moving till the end of the plunger time is nearly reached, in which
-     *  case it changes to fast moving. */
-    enum PlungerState {PLUNGER_STATE_INIT,   PLUNGER_STATE_SLOW, 
-                       PLUNGER_STATE_NOMOVE, PLUNGER_STATE_FAST} 
+    /** State of the plunger: From the 'init' states the plunger switches 
+     *  between two slow moving states ('shakily moving') till the end of
+     *  the plunger time is nearly reached, then it goes to a very fast 
+     *  moving state ('plunger blown off'). */
+    enum PlungerState {PLUNGER_STATE_INIT,   PLUNGER_STATE_SLOW_1, 
+                       PLUNGER_STATE_SLOW_2, PLUNGER_STATE_FAST} 
                         m_plunger_state;
 
     /** How long the plunger should stay in the current state. */
     float m_plunger_move_time;
-
-    /** The x position at which the plunger should end, randomly determined. */
-    int m_plunger_x_target;
 
     /** Offset of the plunger. */
     core::vector2di m_plunger_offset;

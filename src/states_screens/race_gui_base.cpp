@@ -1038,15 +1038,10 @@ void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart, float dt)
 
     if(m_plunger_state == PLUNGER_STATE_INIT)
     {
-        RandomGenerator random;
-        m_plunger_move_time = 0.1f+random.get(50)/200.0f;
+        m_plunger_move_time = 0.0f;
         m_plunger_offset    = core::vector2di(0,0);
-        m_plunger_state     = PLUNGER_STATE_NOMOVE;
+        m_plunger_state     = PLUNGER_STATE_SLOW_2;
         m_plunger_speed     = core::vector2df(0, 0);
-        float movement_fraction = 0.3f;
-        m_plunger_x_target  = screen_width/2 
-                            + random.get((int)(screen_width*movement_fraction))
-                            - (int)(screen_width*movement_fraction*0.5f);
     }
 
     m_plunger_move_time -= dt;
@@ -1055,9 +1050,16 @@ void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart, float dt)
         const float fast_time = 0.3f;
         if(kart->getBlockedByPlungerTime()<fast_time)
         {
+            // First time we reach faste state: select random target point
+            // at top of screen and set speed accordingly
+            RandomGenerator random;
+            float movement_fraction = 0.3f;
+            int plunger_x_target  = screen_width/2 
+                            + random.get((int)(screen_width*movement_fraction))
+                            - (int)(screen_width*movement_fraction*0.5f);
             m_plunger_state = PLUNGER_STATE_FAST;
             m_plunger_speed = 
-                core::vector2df((m_plunger_x_target-screen_width/2)/fast_time,
+                core::vector2df((plunger_x_target-screen_width/2)/fast_time,
                                 viewport.getHeight()*0.5f/fast_time);
             m_plunger_move_time = fast_time;
         }
@@ -1066,16 +1068,16 @@ void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart, float dt)
             RandomGenerator random;
             m_plunger_move_time = 0.1f+random.get(50)/200.0f;
             // Plunger is either moving or not moving
-            if(m_plunger_state==PLUNGER_STATE_NOMOVE)
+            if(m_plunger_state==PLUNGER_STATE_SLOW_1)
             {
-                m_plunger_state = PLUNGER_STATE_SLOW;
+                m_plunger_state = PLUNGER_STATE_SLOW_2;
                 m_plunger_speed = 
                     core::vector2df(0, 0.05f*viewport.getHeight()
                                        /m_plunger_move_time      );
             }
             else
             {
-                m_plunger_state = PLUNGER_STATE_NOMOVE;
+                m_plunger_state = PLUNGER_STATE_SLOW_1;
                 m_plunger_speed = 
                     core::vector2df(0, 0.02f*viewport.getHeight()
                                        /m_plunger_move_time      );
