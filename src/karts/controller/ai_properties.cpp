@@ -28,6 +28,7 @@ float AIProperties::UNDEFINED = -99.9f;
 AIProperties::AIProperties(RaceManager::Difficulty difficulty)
             : m_skid_probability(/*decreasing*/false)
             , m_speed_cap(/*decreasing*/true)
+            , m_collect_item_probability(/*decreasing*/true)
 {
     switch(difficulty)
     {
@@ -65,6 +66,7 @@ void AIProperties::load(const XMLNode *ai_node)
     ai_node->get("max-item-angle-high-speed", &m_max_item_angle_high_speed );
     ai_node->get("time-full-steer",           &m_time_full_steer           );
     ai_node->get("bad-item-closeness",        &m_bad_item_closeness_2      );
+    ai_node->get("collect-item-probability",  &m_collect_item_probability  );
     ai_node->get("straight-length-for-zipper",&m_straight_length_for_zipper);
     ai_node->get("rb-skid-probability",       &m_skid_probability          );
     ai_node->get("speed-cap",                 &m_speed_cap                 );
@@ -127,6 +129,12 @@ void AIProperties::checkAllSet(const std::string &filename) const
     if(m_speed_cap.size()==0)
     {
         printf("No speed cap defined.\n");
+        exit(-1);
+    }
+
+    if(m_collect_item_probability.size()==0)
+    {
+        printf("No collect-item-probability defined.\n");
         exit(-1);
     }
 

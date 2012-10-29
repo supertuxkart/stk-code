@@ -707,17 +707,45 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
         }
     }
 
-    // 5) Try to aim for items-to-collect
+    // 5) We are aiming for a new item. If necessary, determine
+    // randomly if this item sshould actually be collected.
+    // --------------------------------------------------------
+    if(items_to_collect.size()>0)
+    {
+        if(items_to_collect[0] != m_last_item_random)
+        {
+            int p = (int)(100.0f*m_ai_properties->
+                          getItemCollectProbability(m_distance_to_player));
+            m_really_collect_item = m_random_collect_item.get(100)<p;
+            m_last_item_random = items_to_collect[0];
+        }
+        if(!m_really_collect_item)
+        {
+            // The same item was selected previously, but it was randomly
+            // decided not to collect it - so keep on ignoring this item.
+            return;
+        }
+    }
+
+    // Reset the probability if a different (or no) item is selected.
+    if(items_to_collect.size()==0 || items_to_collect[0]!=m_last_item_random)
+        m_last_item_random = NULL;
+
+    // 6) Try to aim for items-to-collect
     // ----------------------------------
     if(items_to_collect.size()>0)
     {
         const Item *item_to_collect = items_to_collect[0];
         // Test if we would hit a bad item when aiming at this good item.
         // If so, don't change the aim. In this case it has already been
-        // ensured that we won't hit the bad item (otherwise steerToAVoid
+        // ensured that we won't hit the bad item (otherwise steerToAvoid
         // would have detected this earlier).
         if(!hitBadItemWhenAimAt(item_to_collect, items_to_avoid))
         {
+            // If the item is hit (with the current steering), it means
+            // it's on a good enough driveline, so make this item a permanent
+            // target. Otherwise only try to get closer (till hopefully this
+            // item s on our driveline)
             if(item_to_collect->hitLine(line_to_target, m_kart))
             {
 #ifdef AI_DEBUG
@@ -731,8 +759,10 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
                            item_to_collect->getType());
                 m_item_to_collect = item_to_collect;
             }
-            else   // kart will not hit item
+            else
             {
+                // Kart will not hit item, try to get closer to this item
+                // so that it can potentially become a permanent target.
                 Vec3 xyz = item_to_collect->getXYZ();
                 float item_angle = atan2(xyz.getX() - m_kart->getXYZ().getX(),
                                          xyz.getZ() - m_kart->getXYZ().getZ());

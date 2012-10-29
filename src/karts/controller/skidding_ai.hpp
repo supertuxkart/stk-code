@@ -126,6 +126,16 @@ private:
     enum {SKID_PROBAB_NOT_YET, SKID_PROBAB_NO_SKID, SKID_PROBAB_SKID}
           m_skid_probability_state;
 
+    /** The last item selected for collection, for which a probability
+     *  was determined. */
+    const Item *m_last_item_random;
+
+    /** True if m_last_item_random was randomly selected to be collected. */
+    bool m_really_collect_item;
+
+    /** A random number generator for collecting items. */
+    RandomGenerator m_random_collect_item;
+
     /** Which of the three Point Selection Algorithms (i.e.
      *  findNoNCrashingPoint* functions) to use:
      *  the default (which is actually slightly buggy, but so far best one 

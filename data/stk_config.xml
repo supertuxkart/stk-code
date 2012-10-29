@@ -272,6 +272,9 @@
            at. Used to slow down karts that are ahead of the player.
            Note that setting this to a value >1 does NOT increase
            the speed the kart can drive at!
+         collect-item-probability: Probability of the AI actually
+           trying to collect an item (if an item is selected for
+           collection in the first place). 
     -->
     <ai>
         <easy   time-full-steer="0.1"
@@ -286,6 +289,7 @@
                 speed-cap="5:1.0 20:0.9 50:0.6"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
                 bad-item-closeness="6"
+                collect-item-probability="0:0"
                 rb-skid-probability="0:0.0"
                 skidding-threshold="4.0"
                 />
@@ -301,6 +305,7 @@
                 speed-cap="10:1.0 50:0.8"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
                 bad-item-closeness="6"
+                collect-item-probability="-10:1.0 0:0"
                 rb-skid-probability="0:0.0"
                 skidding-threshold="3.0"
                 />
@@ -316,6 +321,7 @@
                 speed-cap="20:1.0 50:0.8"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
                 bad-item-closeness="6"
+                collect-item-probability="10:1.0 20:0"
                 rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"
                 skidding-threshold="2.0"
                 />

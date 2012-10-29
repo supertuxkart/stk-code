@@ -77,6 +77,9 @@ protected:
     /** To cap maximum speed if the kart is ahead of the player. */
     InterpolationArray m_speed_cap;
 
+    /** To determine the probability of selecting an item. */
+    InterpolationArray m_collect_item_probability;
+    
     /** Probability of a false start. Note that Nolok in boss battle will never
      *  have a false start. */
     float m_false_start_probability;
@@ -131,6 +134,13 @@ public:
     {
         return m_speed_cap.get(distance);
     }   // getSpeedCap
+    // ------------------------------------------------------------------------
+    /** Returns the probability to collect an item depending on the distance
+     *  to the first player kart. */
+    float getItemCollectProbability(float distance) const
+    {
+        return m_collect_item_probability.get(distance);
+    }   // getItemcollectProbability
 };   // AIProperties
 
 
