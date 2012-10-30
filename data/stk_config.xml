@@ -344,7 +344,7 @@
          working.
          fade-out-time: How long the slip stream speed increase will 
          gradually be reduced.  -->
-    <slipstream length="10" width="5" collect-time="2" use-time="5"
+    <slipstream length="10" width="2" collect-time="2" use-time="5"
                 add-power="3" min-speed="10"
                 max-speed-increase="5" duration="1" fade-out-time="2"/>
 
