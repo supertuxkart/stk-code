@@ -193,6 +193,10 @@ private:
      * for the overworld to keep its textures loaded. */
     bool m_materials_loaded;
 
+    /** True if this track (textures and track data) should be cached. Used
+     *  for the overworld. */
+    bool m_cache_track;
+
 #ifdef DEBUG
     /** A list of textures that were cached before the track is loaded. 
      *  After cleanup of ta track it can be tested which new textures

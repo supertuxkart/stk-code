@@ -99,6 +99,8 @@ Track::Track(const std::string &filename)
     m_sky_dx                = 0.05f;
     m_sky_dy                = 0.0f;
     m_weather_type          = WEATHER_NONE;
+    m_cache_track           = UserConfigParams::m_cache_overworld &&
+                              m_ident=="overworld";
     loadTrackInfo();
 }   // Track
 
@@ -216,13 +218,13 @@ void Track::cleanup()
     }
     m_sky_textures.clear();
 
-    if(m_ident!="overworld")
+    if(m_cache_track)
+        material_manager->makeMaterialsPermanent();
+    else
     {
         // remove temporary materials loaded by the material manager
         material_manager->popTempMaterial();
     }
-    else
-        material_manager->makeMaterialsPermanent();
 
     if(UserConfigParams::logMemory())
     {
@@ -1226,7 +1228,7 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
     try
     {
         std::string materials_file = m_root+"/materials.xml";
-        if(m_ident=="overworld")
+        if(m_cache_track)
         {
             if(!m_materials_loaded)
                 material_manager->addSharedMaterial(materials_file);
