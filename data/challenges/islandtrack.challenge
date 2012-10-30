@@ -6,7 +6,7 @@
     
     <hard>
         <karts number="5"/>
-        <requirements position="2"/>
+        <requirements position="1"/>
     </hard>
     <medium>
         <karts number="4"/>
@@ -14,7 +14,7 @@
     </medium>
     <easy>
         <karts number="3"/>
-        <requirements position="2"/>
+        <requirements position="3"/>
     </easy>
 </challenge>
 
