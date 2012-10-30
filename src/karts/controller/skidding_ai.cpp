@@ -2221,7 +2221,8 @@ void SkiddingAI::setSteering(float angle, float dt)
         {
             int prob = (int)(100.0f*m_ai_properties
                                ->getSkiddingProbability(m_distance_to_player));
-            m_skid_probability_state = (m_random_skid.get(100)>=prob)
+            int r = m_random_skid.get(100);
+            m_skid_probability_state = (r<prob)
                                      ? SKID_PROBAB_SKID 
                                      : SKID_PROBAB_NO_SKID;
 #undef PRINT_SKID_STATS
