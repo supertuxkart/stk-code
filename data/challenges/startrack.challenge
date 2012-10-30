@@ -13,7 +13,7 @@
         <requirements position="2"/>
     </medium>
     <easy>
-        <karts number="6"/>
+        <karts number="5"/>
         <requirements position="2"/>
     </easy>
 </challenge>
