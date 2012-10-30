@@ -26,9 +26,6 @@ float AIProperties::UNDEFINED = -99.9f;
 /** Constructor. Sets all properties to the special UNDEFINED value.
  */
 AIProperties::AIProperties(RaceManager::Difficulty difficulty)
-            : m_skid_probability(/*decreasing*/false)
-            , m_speed_cap(/*decreasing*/true)
-            , m_collect_item_probability(/*decreasing*/true)
 {
     switch(difficulty)
     {

@@ -44,7 +44,6 @@ float KartProperties::UNDEFINED = -99.9f;
  *  defined, it is guaranteed that each kart has well defined physics values).
  */
 KartProperties::KartProperties(const std::string &filename)
-              : m_turn_angle_at_speed(/*decreasing*/true)
 {
     m_icon_material = NULL;
     m_minimap_icon  = NULL;

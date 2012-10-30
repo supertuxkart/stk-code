@@ -40,11 +40,8 @@ private:
     /* Pre-computed (x[i+1]-x[i])/(y[i+1]/-y[i]) . */
     std::vector<float> m_delta;
 
-    /** True if the Y values are decreasing. This flag is important when 
-     *  doing a reverse loopup (find X given Y). */
-    bool m_decreasing;
 public:
-    InterpolationArray(bool decreasing) : m_decreasing(decreasing) {};
+    InterpolationArray() {};
 
     /** Adds the value pair x/y to the list of all points. It is tested
      *  that the x values are added in order.
@@ -114,7 +111,7 @@ public:
     {
         if(m_y.size()==1) return m_x[0];
 
-        if(m_decreasing)
+        if(m_y[1]<m_y[0])   // if decreasing values
         {
             if(y > m_y[0]) return m_x[0];
 
