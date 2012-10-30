@@ -127,6 +127,13 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
         const wchar_t* track_name = track_manager->getTrack(c->getData()->getTrackId())->getName();
         getWidget<LabelWidget>("title")->setText( track_name, true );
     }
+    
+    LabelWidget* typeLbl = getWidget<LabelWidget>("race_type_val");
+    if (c->getData()->getGPId().size() > 0)
+        typeLbl->setText(_("Grand Prix"), false );
+    else
+        typeLbl->setText( RaceManager::getNameOf(c->getData()->getMinorMode()), false );
+    
 }
 
 // ----------------------------------------------------------------------------

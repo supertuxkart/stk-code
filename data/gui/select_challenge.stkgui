@@ -6,6 +6,14 @@
     
     <spacer height="2%" width="1"/>
     
+    <div width="100%" layout="horizontal-row" height="fit">
+        <label id="race_type" text="Type :" I18N="Type of race, in a challenge"/>
+        <spacer width="5" height="1"/>
+        <label id="race_type_val" proportion="1"/>
+    </div>
+    
+    <spacer height="2%" width="1"/>
+    
     <div width="100%" proportion="1" layout="horizontal-row">
         <icon-button id="novice" icon="gui/difficulty_easy.png"
                 I18N="Difficulty" text="Novice" height="100%"/>
