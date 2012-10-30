@@ -41,7 +41,6 @@
 		952997C815B205DE0028301A /* demo_world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952997C115B205DE0028301A /* demo_world.cpp */; };
 		952997C915B205DE0028301A /* game_tutorial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952997C315B205DE0028301A /* game_tutorial.cpp */; };
 		952997CA15B205DE0028301A /* tutorial_race.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952997C515B205DE0028301A /* tutorial_race.cpp */; };
-		952997EC15B206890028301A /* present_ai.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952997E815B206890028301A /* present_ai.cpp */; };
 		952997ED15B206890028301A /* skidding_ai.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952997EA15B206890028301A /* skidding_ai.cpp */; };
 		952997FB15B206D90028301A /* abstract_kart_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952997F315B206D90028301A /* abstract_kart_animation.cpp */; };
 		952997FC15B206D90028301A /* cannon_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952997F515B206D90028301A /* cannon_animation.cpp */; };
@@ -172,7 +171,6 @@
 		956830E01132EC9E00088D14 /* irr_debug_drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956830DE1132EC9E00088D14 /* irr_debug_drawer.cpp */; };
 		956B0A9F1232D2E900767CCD /* bubble_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956B0A9E1232D2E900767CCD /* bubble_widget.cpp */; };
 		956C6ED31128D3FB004336C8 /* controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6EC81128D3FB004336C8 /* controller.cpp */; };
-		956C6ED41128D3FB004336C8 /* default_ai_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ECA1128D3FB004336C8 /* default_ai_controller.cpp */; };
 		956C6ED51128D3FB004336C8 /* end_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ECC1128D3FB004336C8 /* end_controller.cpp */; };
 		956C6ED71128D3FB004336C8 /* player_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ED11128D3FB004336C8 /* player_controller.cpp */; };
 		956F557513527E4B005C291D /* race_gui_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956F557313527E4B005C291D /* race_gui_base.cpp */; };
@@ -215,6 +213,7 @@
 		9586318411B1EC9F00B8B4AF /* grand_prix_lose.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9586318011B1EC9F00B8B4AF /* grand_prix_lose.cpp */; };
 		9586318511B1EC9F00B8B4AF /* grand_prix_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9586318211B1EC9F00B8B4AF /* grand_prix_win.cpp */; };
 		958806E913EB675F005F90FE /* track_sector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958806E713EB675F005F90FE /* track_sector.cpp */; };
+		958949A9163F52FB00957345 /* inetwork_http.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958949A8163F52FB00957345 /* inetwork_http.cpp */; };
 		958BD770117F6AE90095B483 /* music_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958BD76E117F6AE90095B483 /* music_manager.cpp */; };
 		958D8C54104F523000A81934 /* race_paused_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958D8C53104F523000A81934 /* race_paused_dialog.cpp */; };
 		958D924213DA48A70097BC82 /* post_processing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958D924013DA48A70097BC82 /* post_processing.cpp */; };
@@ -497,8 +496,6 @@
 		952997C415B205DE0028301A /* game_tutorial.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = game_tutorial.hpp; path = ../../modes/game_tutorial.hpp; sourceTree = SOURCE_ROOT; };
 		952997C515B205DE0028301A /* tutorial_race.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tutorial_race.cpp; path = ../../modes/tutorial_race.cpp; sourceTree = SOURCE_ROOT; };
 		952997C615B205DE0028301A /* tutorial_race.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tutorial_race.hpp; path = ../../modes/tutorial_race.hpp; sourceTree = SOURCE_ROOT; };
-		952997E815B206890028301A /* present_ai.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = present_ai.cpp; path = ../../karts/controller/present_ai.cpp; sourceTree = SOURCE_ROOT; };
-		952997E915B206890028301A /* present_ai.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = present_ai.hpp; path = ../../karts/controller/present_ai.hpp; sourceTree = SOURCE_ROOT; };
 		952997EA15B206890028301A /* skidding_ai.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skidding_ai.cpp; path = ../../karts/controller/skidding_ai.cpp; sourceTree = SOURCE_ROOT; };
 		952997EB15B206890028301A /* skidding_ai.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skidding_ai.hpp; path = ../../karts/controller/skidding_ai.hpp; sourceTree = SOURCE_ROOT; };
 		952997F315B206D90028301A /* abstract_kart_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = abstract_kart_animation.cpp; path = ../../karts/abstract_kart_animation.cpp; sourceTree = SOURCE_ROOT; };
@@ -627,8 +624,6 @@
 		956B0AA21232D45D00767CCD /* bubble_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bubble_widget.hpp; path = ../../guiengine/widgets/bubble_widget.hpp; sourceTree = SOURCE_ROOT; };
 		956C6EC81128D3FB004336C8 /* controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = controller.cpp; path = ../../karts/controller/controller.cpp; sourceTree = SOURCE_ROOT; };
 		956C6EC91128D3FB004336C8 /* controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = controller.hpp; path = ../../karts/controller/controller.hpp; sourceTree = SOURCE_ROOT; };
-		956C6ECA1128D3FB004336C8 /* default_ai_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = default_ai_controller.cpp; path = ../../karts/controller/default_ai_controller.cpp; sourceTree = SOURCE_ROOT; };
-		956C6ECB1128D3FB004336C8 /* default_ai_controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = default_ai_controller.hpp; path = ../../karts/controller/default_ai_controller.hpp; sourceTree = SOURCE_ROOT; };
 		956C6ECC1128D3FB004336C8 /* end_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = end_controller.cpp; path = ../../karts/controller/end_controller.cpp; sourceTree = SOURCE_ROOT; };
 		956C6ECD1128D3FB004336C8 /* end_controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = end_controller.hpp; path = ../../karts/controller/end_controller.hpp; sourceTree = SOURCE_ROOT; };
 		956C6ECE1128D3FB004336C8 /* kart_control.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = kart_control.hpp; path = ../../karts/controller/kart_control.hpp; sourceTree = SOURCE_ROOT; };
@@ -893,6 +888,7 @@
 		9586318311B1EC9F00B8B4AF /* grand_prix_win.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_win.hpp; path = ../../states_screens/grand_prix_win.hpp; sourceTree = SOURCE_ROOT; };
 		958806E713EB675F005F90FE /* track_sector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_sector.cpp; path = ../../tracks/track_sector.cpp; sourceTree = SOURCE_ROOT; };
 		958806E813EB675F005F90FE /* track_sector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_sector.hpp; path = ../../tracks/track_sector.hpp; sourceTree = SOURCE_ROOT; };
+		958949A8163F52FB00957345 /* inetwork_http.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = inetwork_http.cpp; path = ../../addons/inetwork_http.cpp; sourceTree = SOURCE_ROOT; };
 		958BD76E117F6AE90095B483 /* music_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = music_manager.cpp; path = ../../audio/music_manager.cpp; sourceTree = SOURCE_ROOT; };
 		958BD76F117F6AE90095B483 /* music_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music_manager.hpp; path = ../../audio/music_manager.hpp; sourceTree = SOURCE_ROOT; };
 		958D8C52104F523000A81934 /* race_paused_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_paused_dialog.hpp; path = ../../states_screens/dialogs/race_paused_dialog.hpp; sourceTree = SOURCE_ROOT; };
@@ -1618,6 +1614,7 @@
 		9551B27311DC0D6A002DD140 /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				958949A8163F52FB00957345 /* inetwork_http.cpp */,
 				9538A55E12CD094200CE3220 /* addon.cpp */,
 				9538A55F12CD094200CE3220 /* addon.hpp */,
 				9538E2B512C25D6800172896 /* addons_manager.cpp */,
@@ -1642,16 +1639,12 @@
 			children = (
 				9593A31E16093A7300AB5EEB /* ai_properties.cpp */,
 				9593A31F16093A7300AB5EEB /* ai_properties.hpp */,
-				952997E815B206890028301A /* present_ai.cpp */,
-				952997E915B206890028301A /* present_ai.hpp */,
 				952997EA15B206890028301A /* skidding_ai.cpp */,
 				952997EB15B206890028301A /* skidding_ai.hpp */,
 				957ED47E1163FF18002AB42C /* ai_base_controller.cpp */,
 				957ED47F1163FF18002AB42C /* ai_base_controller.hpp */,
 				956C6EC81128D3FB004336C8 /* controller.cpp */,
 				956C6EC91128D3FB004336C8 /* controller.hpp */,
-				956C6ECA1128D3FB004336C8 /* default_ai_controller.cpp */,
-				956C6ECB1128D3FB004336C8 /* default_ai_controller.hpp */,
 				956C6ECC1128D3FB004336C8 /* end_controller.cpp */,
 				956C6ECD1128D3FB004336C8 /* end_controller.hpp */,
 				956C6ECE1128D3FB004336C8 /* kart_control.hpp */,
@@ -3167,7 +3160,6 @@
 				9574F17C11206881008D202E /* world_status.cpp in Sources */,
 				95634EF21126272C009C145D /* gp_info_dialog.cpp in Sources */,
 				956C6ED31128D3FB004336C8 /* controller.cpp in Sources */,
-				956C6ED41128D3FB004336C8 /* default_ai_controller.cpp in Sources */,
 				956C6ED51128D3FB004336C8 /* end_controller.cpp in Sources */,
 				956C6ED71128D3FB004336C8 /* player_controller.cpp in Sources */,
 				956830E01132EC9E00088D14 /* irr_debug_drawer.cpp in Sources */,
@@ -3256,7 +3248,6 @@
 				952997C815B205DE0028301A /* demo_world.cpp in Sources */,
 				952997C915B205DE0028301A /* game_tutorial.cpp in Sources */,
 				952997CA15B205DE0028301A /* tutorial_race.cpp in Sources */,
-				952997EC15B206890028301A /* present_ai.cpp in Sources */,
 				952997ED15B206890028301A /* skidding_ai.cpp in Sources */,
 				952997FB15B206D90028301A /* abstract_kart_animation.cpp in Sources */,
 				952997FC15B206D90028301A /* cannon_animation.cpp in Sources */,
@@ -3394,6 +3385,7 @@
 				9593A3151609388C00AB5EEB /* unix.c in Sources */,
 				9593A3161609388C00AB5EEB /* win32.c in Sources */,
 				9593A32016093A7300AB5EEB /* ai_properties.cpp in Sources */,
+				958949A9163F52FB00957345 /* inetwork_http.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
