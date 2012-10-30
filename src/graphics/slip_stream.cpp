@@ -302,10 +302,6 @@ bool SlipStream::isSlipstreamReady() const
  */
 void SlipStream::updateSlipstreamPower()
 {
-    // Low level AIs should not do any slipstreaming.
-    if(!m_kart->getController()->isPlayerController() &&
-        race_manager->getDifficulty()==RaceManager::DIFFICULTY_EASY) return;
-
     // See if we are currently using accumulated slipstream credits:
     // -------------------------------------------------------------
     if(m_slipstream_mode==SS_USE)
@@ -344,6 +340,10 @@ void SlipStream::setDebugColor(const video::SColor &color)
  */
 void SlipStream::update(float dt)
 {
+    // Low level AIs should not do any slipstreaming.
+    if(m_kart->getController()->disableSlipstreamBonus())
+        return;
+
     MovingTexture::update(dt);
 
     // Update this karts slipstream quad (even for low level AI which don't

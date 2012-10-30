@@ -450,3 +450,11 @@ bool AIBaseController::doSkid(float steer_fraction)
     // for the old skidding implementation).
     return fabsf(steer_fraction)>=m_ai_properties->m_skidding_threshold;
 }   // doSkid
+// ------------------------------------------------------------------------
+/** Certain AI levels will not receive a slipstream bonus in order to 
+ *  be not as hard.
+ */
+bool AIBaseController::disableSlipstreamBonus() const 
+{
+    return m_ai_properties->disableSlipstreamUsage();
+}   // disableSlipstreamBonus

@@ -48,6 +48,7 @@ AIProperties::AIProperties(RaceManager::Difficulty difficulty)
     m_collect_avoid_items        = false;
     m_handle_bomb                = false;
     m_item_usage_non_random      = false;
+    m_disable_slipstream_usage   = false;
     m_nitro_usage                = NITRO_NONE;
 
 }   // AIProperties
@@ -59,6 +60,7 @@ AIProperties::AIProperties(RaceManager::Difficulty difficulty)
 void AIProperties::load(const XMLNode *ai_node)
 {
     ai_node->get("use-slipstream",            &m_make_use_of_slipstream    );
+    ai_node->get("disable-slipstream-usage",  &m_disable_slipstream_usage  );
     ai_node->get("max-item-angle",            &m_max_item_angle            );
     ai_node->get("max-item-angle-high-speed", &m_max_item_angle_high_speed );
     ai_node->get("time-full-steer",           &m_time_full_steer           );

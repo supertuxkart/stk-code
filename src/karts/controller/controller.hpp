@@ -72,6 +72,7 @@ public:
     virtual void  finishedRace       (float time) = 0;
     virtual bool  isPlayerController () const = 0;
     virtual bool  isNetworkController() const = 0;
+    virtual bool  disableSlipstreamBonus() const = 0;
 	// ---------------------------------------------------------------------------
     /** Sets the controller name for this controller. */
     virtual void setControllerName(const std::string &name) 

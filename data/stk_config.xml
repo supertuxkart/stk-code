@@ -218,6 +218,9 @@
 
     <!-- Kart-specific settings used by the AI.
          use-slipstream: if the AI should try to overtake karts using slipstream.
+         disable-slipstream-usage: even if the AI is not trying to use slipstream,
+           it can get a lot of bonus, esp. on easy since the AI creates trains.
+           Set this to true to make sure AI does not get any slipstream bonus.
          false-start-probability: Probability of a false start.
          min/max-start-delay: Minimum and maximum start delay.
            See http://www.humanbenchmark.com/tests/reactiontime/stats.php
@@ -280,6 +283,7 @@
         <easy   time-full-steer="0.1"
                 straight-length-for-zipper="35"
                 use-slipstream="false"
+                disable-slipstream-usage="true"
                 false-start-probability="0.08"
                 min-start-delay="0.3" max-start-delay="0.5"
                 nitro-usage="none"
@@ -296,6 +300,7 @@
         <medium time-full-steer="0.1"
                 straight-length-for-zipper="35"
                 use-slipstream="false"
+                disable-slipstream-usage="false"
                 false-start-probability="0.04"
                 min-start-delay="0.25" max-start-delay="0.4"
                 nitro-usage="some"
@@ -312,6 +317,7 @@
         <hard   time-full-steer="0.1"
                 straight-length-for-zipper="35"
                 use-slipstream="true"
+                disable-slipstream-usage="false"
                 false-start-probability="0.01"
                 min-start-delay="0.15" max-start-delay="0.28"
                 nitro-usage="all"

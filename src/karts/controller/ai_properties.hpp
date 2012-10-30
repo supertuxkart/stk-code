@@ -93,6 +93,12 @@ protected:
     /** True if the AI should avtively try to make use of slipstream. */
     bool m_make_use_of_slipstream;
 
+    /** Used for low level AI to not give them a slipstream bonus.
+     *  Otherwise they tend to build 'trains' (AIs driving close behing
+     *  each other and get slipstream bonus). Only for making the easy
+     *  AI really easy. */
+    bool m_disable_slipstream_usage;
+
     /** Actively collect and avoid items. */
     bool m_collect_avoid_items;
 
@@ -141,6 +147,9 @@ public:
     {
         return m_collect_item_probability.get(distance);
     }   // getItemcollectProbability
+    // ------------------------------------------------------------------------
+    /** Returns true if this kart should not even get a slipstream bonus. */
+    bool disableSlipstreamUsage() const { return m_disable_slipstream_usage; }
 };   // AIProperties
 
 

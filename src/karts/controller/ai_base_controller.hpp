@@ -110,7 +110,7 @@ public:
     virtual bool isPlayerController() const { return false; }
     virtual void action(PlayerAction action, int value) {};
     virtual void  skidBonusTriggered() {};
-
+    virtual bool  disableSlipstreamBonus() const;
 };   // AIBaseController
 
 #endif

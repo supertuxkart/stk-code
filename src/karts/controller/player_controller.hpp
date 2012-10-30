@@ -70,6 +70,9 @@ public:
     virtual void   crashed           (const AbstractKart *k) {}
     virtual void   crashed           (const Material *m) {}
     // ------------------------------------------------------------------------
+    /** Player will always be able to get a slipstream bonus. */
+    virtual bool  disableSlipstreamBonus() const { return false; }
+    // ------------------------------------------------------------------------
     /** Callback whenever a new lap is triggered. Used by the AI
      *  to trigger a recomputation of the way to use.            */
     virtual void  newLap(int lap) {}
