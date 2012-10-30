@@ -286,7 +286,7 @@
                 non-random-item-usage="false"
                 collect-avoid-items="false"
                 handle-bomb="false"
-                speed-cap="5:1.0 20:0.9 50:0.6"
+                speed-cap="-10:1.0 -5:0.9 5:0.9 20:0.8 50:0.6"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
                 bad-item-closeness="6"
                 collect-item-probability="0:0"
