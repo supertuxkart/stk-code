@@ -5,16 +5,16 @@
     <requirements trophies="0"/>
     
     <hard>
-        <karts number="1"/>
-        <requirements energy="14" time="55"/>
+        <karts number="5"/>
+        <requirements position="1" time="55"/>
     </hard>
     <medium>
-        <karts number="1"/>
-        <requirements energy="10" time="65"/>
+        <karts number="5"/>
+        <requirements position="1" time="65"/>
     </medium>
     <easy>
-        <karts number="1"/>
-        <requirements energy="6" time="80"/>
+        <karts number="5"/>
+        <requirements position="1" time="80"/>
     </easy>
 </challenge>
 
