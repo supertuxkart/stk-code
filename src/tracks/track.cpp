@@ -1178,13 +1178,15 @@ void Track::createWater(const XMLNode &node)
 /** This function load the actual scene, i.e. all parts of the track, 
  *  animations, items, ... It  is called from world during initialisation. 
  *  Track is the first model to be loaded, so at this stage the root scene node 
- * is empty.
+ *  is empty.
+ *  \param parent The actual world.
+ *  \param reverse_track True if the track should be run in reverse.
  *  \param mode_id Which of the modes of a track to use. This determines which
  *         scene, quad, and graph file to load.
  */
 
 void Track::loadTrackModel(World* parent, bool reverse_track, 
-			   unsigned int mode_id               )
+                           unsigned int mode_id               )
 {
     if(!m_reverse_available) 
     {
