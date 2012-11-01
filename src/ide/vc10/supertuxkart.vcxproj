@@ -225,7 +225,6 @@
     <ClCompile Include="..\..\karts\abstract_kart_animation.cpp" />
     <ClCompile Include="..\..\karts\cannon_animation.cpp" />
     <ClCompile Include="..\..\karts\controller\ai_properties.cpp" />
-    <ClCompile Include="..\..\karts\controller\present_ai.cpp" />
     <ClCompile Include="..\..\karts\controller\skidding_ai.cpp" />
     <ClCompile Include="..\..\karts\explosion_animation.cpp" />
     <ClCompile Include="..\..\karts\ghost_kart.cpp" />
@@ -346,7 +345,6 @@
     <ClCompile Include="..\..\karts\moveable.cpp" />
     <ClCompile Include="..\..\karts\controller\ai_base_controller.cpp" />
     <ClCompile Include="..\..\karts\controller\controller.cpp" />
-    <ClCompile Include="..\..\karts\controller\default_ai_controller.cpp" />
     <ClCompile Include="..\..\karts\controller\end_controller.cpp" />
     <ClCompile Include="..\..\karts\controller\player_controller.cpp" />
     <ClCompile Include="..\..\graphics\camera.cpp" />
@@ -472,7 +470,6 @@
     <ClInclude Include="..\..\karts\abstract_kart_animation.hpp" />
     <ClInclude Include="..\..\karts\cannon_animation.hpp" />
     <ClInclude Include="..\..\karts\controller\ai_properties.hpp" />
-    <ClInclude Include="..\..\karts\controller\present_ai.hpp" />
     <ClInclude Include="..\..\karts\controller\skidding_ai.hpp" />
     <ClInclude Include="..\..\karts\explosion_animation.hpp" />
     <ClInclude Include="..\..\karts\ghost_kart.hpp" />
@@ -618,7 +615,6 @@
     <ClInclude Include="..\..\karts\moveable.hpp" />
     <ClInclude Include="..\..\karts\controller\ai_base_controller.hpp" />
     <ClInclude Include="..\..\karts\controller\controller.hpp" />
-    <ClInclude Include="..\..\karts\controller\default_ai_controller.hpp" />
     <ClInclude Include="..\..\karts\controller\end_controller.hpp" />
     <ClInclude Include="..\..\karts\controller\player_controller.hpp" />
     <ClInclude Include="..\..\graphics\camera.hpp" />

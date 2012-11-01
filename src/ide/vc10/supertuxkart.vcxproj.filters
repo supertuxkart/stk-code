@@ -387,9 +387,6 @@
     <ClCompile Include="..\..\karts\controller\controller.cpp">
       <Filter>Source Files\karts\controller</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\karts\controller\default_ai_controller.cpp">
-      <Filter>Source Files\karts\controller</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\karts\controller\end_controller.cpp">
       <Filter>Source Files\karts\controller</Filter>
     </ClCompile>
@@ -864,9 +861,6 @@
     <ClCompile Include="..\..\modes\cutscene_world.cpp">
       <Filter>Source Files\modes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\karts\controller\present_ai.cpp">
-      <Filter>Source Files\karts\controller</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\states_screens\cutscene_gui.cpp">
       <Filter>Source Files\states_screens</Filter>
     </ClCompile>
@@ -1176,9 +1170,6 @@
       <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\controller.hpp">
-      <Filter>Header Files\karts\controller</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\karts\controller\default_ai_controller.hpp">
       <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\end_controller.hpp">
@@ -1657,9 +1648,6 @@
     </ClInclude>
     <ClInclude Include="..\..\modes\cutscene_world.hpp">
       <Filter>Header Files\modes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\karts\controller\present_ai.hpp">
-      <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\cutscene_gui.hpp">
       <Filter>Header Files\states_screens</Filter>
