@@ -1,0 +1,22 @@
+!!ARBfp1.0
+# part of the Irrlicht Engine Shader example.
+# Please note that these example shaders don't do anything really useful. 
+# They only demonstrate that shaders can be used in Irrlicht.
+
+#Input
+ATTRIB inTexCoord = fragment.texcoord;      # texture coordinates
+ATTRIB inColor = fragment.color.primary; # interpolated diffuse color
+
+#Output
+OUTPUT outColor = result.color;
+
+TEMP texelColor;
+TEMP tmp;
+TXP texelColor, inTexCoord, texture, 2D; 
+
+ADD tmp, inColor, inColor; # mulitply with color
+MUL texelColor, texelColor, tmp;  # mulitply with color   
+ADD outColor, texelColor, texelColor;  # make it brighter and store result
+
+END
+
