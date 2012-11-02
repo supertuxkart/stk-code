@@ -395,6 +395,7 @@ namespace irr
 		bool Resized;
 		bool ExternalWindow;
 		CCursorControl* Win32CursorControl;
+		DEVMODE DesktopMode;
 
 		SJoystickWin32Control* JoyControl;
 	};

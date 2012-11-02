@@ -854,23 +854,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_ACTIVATE:
 		// we need to take care for screen changes, e.g. Alt-Tab
 		dev = getDeviceFromHWnd(hWnd);
-		if (dev)
+		if (dev && dev->isFullscreen())
 		{
 			if ((wParam&0xFF)==WA_INACTIVE)
 			{
-				if (dev->isFullscreen())
-					ShowWindow(hWnd,SW_MINIMIZE);
-
+				// If losing focus we minimize the app to show other one
+				ShowWindow(hWnd,SW_MINIMIZE);
+				// and switch back to default resolution
 				dev->switchToFullScreen(true);
 			}
 			else
 			{
-				if (dev->isFullscreen())
-				{
-					SetForegroundWindow(hWnd);
-					ShowWindow(hWnd, SW_RESTORE);
-				}
-
+				// Otherwise we retore the fullscreen Irrlicht app
+				SetForegroundWindow(hWnd);
+				ShowWindow(hWnd, SW_RESTORE);
+				// and set the fullscreen resolution again
 				dev->switchToFullScreen();
 			}
 		}
@@ -927,6 +925,13 @@ CIrrDeviceWin32::CIrrDeviceWin32(const SIrrlichtCreationParameters& params)
 
 	// get handle to exe file
 	HINSTANCE hInstance = GetModuleHandle(0);
+
+	// Store original desktop mode.
+
+	memset(&DesktopMode, 0, sizeof(DesktopMode));
+	DesktopMode.dmSize = sizeof(DesktopMode);
+
+	EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &DesktopMode);
 
 	// create the window if we need to and we do not use the null device
 	if (!CreationParams.WindowId && CreationParams.DriverType != video::EDT_NULL)
@@ -1342,22 +1347,23 @@ bool CIrrDeviceWin32::switchToFullScreen(bool reset)
 	if (!CreationParams.Fullscreen)
 		return true;
 
-	DEVMODE dm;
-	memset(&dm, 0, sizeof(dm));
-	dm.dmSize = sizeof(dm);
-	// use default values from current setting
-	EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dm);
-
 	if (reset)
 	{
 		if (ChangedToFullScreen)
 		{
-			return (ChangeDisplaySettings(&dm,0)==DISP_CHANGE_SUCCESSFUL);
+			return (ChangeDisplaySettings(&DesktopMode,0)==DISP_CHANGE_SUCCESSFUL);
 		}
 		else
 			return true;
 	}
 
+	// use default values from current setting
+
+	DEVMODE dm;
+	memset(&dm, 0, sizeof(dm));
+	dm.dmSize = sizeof(dm);
+
+	EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dm);
 	dm.dmPelsWidth = CreationParams.WindowSize.Width;
 	dm.dmPelsHeight = CreationParams.WindowSize.Height;
 	dm.dmBitsPerPel = CreationParams.Bits;

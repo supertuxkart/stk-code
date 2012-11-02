@@ -1,5 +1,7 @@
 Changes in 1.8 (??.11.2012)
 
+ - Let sphere mesh use full opaque color, just as all the other ones do
+
  - Gcc on Win32 (MinGW) now also works with the _w file access functions when compiled with _IRR_WCHAR_FILESYSTEM. (thx @ alexzk for reporting compile troubles)
 
  - Fix a bunch of off-by one errors in irr::core::string in functions equals_substring_ignore_case, findFirst, findFirstChar, findNext, findLast, findLastChar, replace, remove and removeChars.
