@@ -48,6 +48,11 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
     kart->setKartAnimation(this);
     World::getWorld()->getPhysics()->removeKart(m_kart);
     kart->getSkidding()->reset();
+    if(kart->isSquashed())
+    {
+        // A time of 0 reset the squashing
+        kart->setSquash(0.0f, 0.0f);
+    }
 }   // AbstractKartAnimation
 
 // ----------------------------------------------------------------------------

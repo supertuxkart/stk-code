@@ -526,7 +526,8 @@ btTransform Kart::getAlignedTransform(const float custom_pitch)
                                       : custom_pitch);
 
     btMatrix3x3 m;
-    m.setEulerZYX(pitch, getHeading(), 0.0f);
+    m.setEulerZYX(pitch, getHeading()+m_skidding->getVisualSkidRotation(), 
+                  0.0f);
     trans.setBasis(m);
 
     return trans;
@@ -966,7 +967,7 @@ void Kart::update(float dt)
         m_stars_effect->update(dt);
     }
 
-    if(m_squash_time>0)
+    if(m_squash_time>=0)
     {
         m_squash_time-=dt;
         // If squasing time ends, reset the model
@@ -1213,14 +1214,15 @@ void Kart::showZipperFire()
 //-----------------------------------------------------------------------------
 /** Squashes this kart: it will scale the kart in up direction, and causes
  *  a slowdown while this kart is squashed.
- *  \param time How long the kart will be squashed.
+ *  \param time How long the kart will be squashed. A value of 0 will reset
+ *         the kart to be unsquashed.
  *  \param slowdown Reduction of max speed.
  */
 void Kart::setSquash(float time, float slowdown)
 {
     if (isInvulnerable()) return;
     
-    if(m_attachment->getType()==Attachment::ATTACH_BOMB)
+    if(m_attachment->getType()==Attachment::ATTACH_BOMB && time>0)
     {
         ExplosionAnimation::create(this);
         return;
