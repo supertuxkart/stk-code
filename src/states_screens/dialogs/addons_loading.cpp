@@ -30,6 +30,7 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/addons_screen.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -190,7 +191,7 @@ void AddonsLoading::init()
 // ----------------------------------------------------------------------------
 void AddonsLoading::escapePressed()
 {
-    processEvent("cancel");
+    processEvent("back");
     ModalDialog::dismiss();
 }   // escapePressed
 
@@ -253,7 +254,8 @@ void AddonsLoading::onUpdate(float delta)
         {
             // Avoid displaying '-100%' in case of an error.
             m_progress->setVisible(false);
-            m_back_button->setText(_("Download failed."));
+            dismiss();
+            new MessageDialog( _("Sorry, downloading the add-on failed"));
             return;
         }
         else if(progress>=1.0f)

@@ -529,8 +529,16 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
                      &NetworkHttp::progressDownload);
     curl_easy_setopt(m_curl_session,  CURLOPT_NOPROGRESS, 0);
 
-    // 30 sec to timeout, maybe change the value
-    curl_easy_setopt(m_curl_session, CURLOPT_TIMEOUT, 30);
+    // Timeout
+    // Reduce the connection phase timeout (it's 300 by default).
+    // Add a low speed limit to have a sort of timeout in the
+    // download phase. Being under 10 B/s during a certain time will
+    // probably only happen when no access to the net is available.
+    // The timeout is set to 20s, it should be enough to not produce
+    // false positive error.
+    curl_easy_setopt(m_curl_session, CURLOPT_CONNECTTIMEOUT, 20);
+    curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_LIMIT, 10);
+    curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_TIME, 20);
                 
     CURLcode status = curl_easy_perform(m_curl_session);
     fclose(fout);
