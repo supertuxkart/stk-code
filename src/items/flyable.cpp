@@ -469,8 +469,13 @@ bool Flyable::hit(AbstractKart *kart_hit, PhysicalObject* object)
 // ----------------------------------------------------------------------------
 /** Creates the explosion physical effect, i.e. pushes the karts and ph
  *  appropriately. The corresponding visual/sfx needs to be added manually!
+ *  \param kart_hit If non-NULL a kart that was directly hit.
+ *  \param object If non-NULL a physical item that was hit directly.
+ *  \param secondary_hits True if items that are not directly hit should
+ *         also be affected.
  */
-void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object)
+void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
+                      bool secondary_hits)
 {
     // Apply explosion effect
     // ----------------------
@@ -478,6 +483,12 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object)
     for ( unsigned int i = 0 ; i < world->getNumKarts() ; i++ )
     {
         AbstractKart *kart = world->getKart(i);
+
+        // If no secondary hits should be done, only hit the
+        // direct hit kart.
+        if(!secondary_hits && kart!=kart_hit)
+            continue;
+
         // Handle the actual explosion. The kart that fired a flyable will
         // only be affected if it's a direct hit. This allows karts to use
         // rockets on short distance.
@@ -492,7 +503,7 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object)
             }
         }
     }
-    world->getTrack()->handleExplosion(getXYZ(), object);
+    world->getTrack()->handleExplosion(getXYZ(), object, secondary_hits);
 }   // explode
 
 // ----------------------------------------------------------------------------

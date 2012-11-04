@@ -209,6 +209,6 @@ bool Bowling::hit(AbstractKart* kart, PhysicalObject* obj)
 {
     bool was_real_hit = Flyable::hit(kart, obj);
     if(was_real_hit)
-        explode(kart, obj);
+        explode(kart, obj, /*hit_secondary*/false);
     return was_real_hit;
 }   // hit

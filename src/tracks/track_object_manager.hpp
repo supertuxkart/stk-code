@@ -56,7 +56,8 @@ public:
         ~TrackObjectManager();
     void add(const XMLNode &xml_node);
     void update(float dt);
-    void handleExplosion(const Vec3 &pos, const PhysicalObject *mp);
+    void handleExplosion(const Vec3 &pos, const PhysicalObject *mp,
+                         bool secondary_hits=true);
     void reset();
     void init();
     

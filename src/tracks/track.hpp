@@ -377,7 +377,8 @@ public:
     void               setAmbientColor(const video::SColor &color,
                                        unsigned int k);
     void               handleExplosion(const Vec3 &pos, 
-                                       const PhysicalObject *mp) const;
+                                       const PhysicalObject *mp,
+                                       bool secondary_hits=true) const;
     std::vector< std::vector<float> >     
                        buildHeightMap();
     // ------------------------------------------------------------------------

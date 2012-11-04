@@ -172,7 +172,8 @@ public:
     void                      updateFromServer(const FlyableInfo &f, float dt);
     bool                      isOwnerImmunity(const AbstractKart *kart_hit) const;
     virtual bool              hit(AbstractKart* kart, PhysicalObject* obj=NULL);
-    void                      explode(AbstractKart* kart, PhysicalObject* obj=NULL);
+    void                      explode(AbstractKart* kart, PhysicalObject* obj=NULL,
+                                      bool secondary_hits=true);
     // ------------------------------------------------------------------------
     /** If true the up velocity of the flyable will be adjust so that the 
      *  flyable stays at a height close to the average height.

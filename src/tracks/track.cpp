@@ -1101,10 +1101,12 @@ void Track::update(float dt)
  *  \param pos  Position of the explosion.
  *  \param obj  If the hit was a physical object, this object will be affected
  *              more. Otherwise this is NULL.
- */
-void Track::handleExplosion(const Vec3 &pos, const PhysicalObject *obj) const
+ *  \param secondary_hits True if items that are not directly hit should
+ *         also be affected. */
+void Track::handleExplosion(const Vec3 &pos, const PhysicalObject *obj,
+                            bool secondary_hits) const
 {
-    m_track_object_manager->handleExplosion(pos, obj);
+    m_track_object_manager->handleExplosion(pos, obj, secondary_hits);
 }   // handleExplosion
 
 // ----------------------------------------------------------------------------
