@@ -25,6 +25,7 @@
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 
+#include <algorithm>
 #include <stdio.h>
 #include <string>
 
@@ -171,7 +172,10 @@ void ReplayRecorder::Save()
         fprintf(fd, "model: %s\n", world->getKart(k)->getIdent().c_str());
         fprintf(fd, "size:     %d\n", m_count_transforms[k]);
 
-        for(unsigned int i=0; i<m_count_transforms[k]; i++)
+        unsigned int num_transforms = 
+            std::min((unsigned int)stk_config->m_max_history,
+                      m_count_transforms[k]                   );
+        for(unsigned int i=0; i<num_transforms; i++)
         {
             const TransformEvent *p=&(m_transform_events[k][i]);
             fprintf(fd, "%f  %f %f %f  %f %f %f %f\n",
