@@ -69,3 +69,7 @@ Blender: X right, Y forwards, Z up
 The exporters perform the needed transform, so in Blender you just work
 with XY plane as ground, and things will appear fine in STK (using XZ
 as ground in the code, obviously).
+
+
+
+
