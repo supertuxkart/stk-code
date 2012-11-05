@@ -39,6 +39,9 @@
     based on work by Thomas Oppl, released under CC-BY-SA 3.0
     with modifications by Marianne Gagnon
 
+* tnt-bomb
+    by Fraang, released under CC-BY-SA 3.0
+    
 * village
     released under CC-BY-SA 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
     oak by Julius Krischan Makowka, released un CC-BY-SA 3.0
