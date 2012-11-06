@@ -63,15 +63,18 @@ void GameSlot::computeActive()
             
             if (i->second->isSolved(RaceManager::DIFFICULTY_EASY))
             {
-                unlockFeature(i->second, RaceManager::DIFFICULTY_EASY, /*save*/ false);
+                unlockFeature(i->second, RaceManager::DIFFICULTY_EASY, 
+                              /*save*/ false);
             }
             if (i->second->isSolved(RaceManager::DIFFICULTY_MEDIUM))
             {
-                unlockFeature(i->second, RaceManager::DIFFICULTY_MEDIUM, /*save*/ false);
+                unlockFeature(i->second, RaceManager::DIFFICULTY_MEDIUM, 
+                              /*save*/ false);
             }
             if (i->second->isSolved(RaceManager::DIFFICULTY_HARD))
             {
-                unlockFeature(i->second, RaceManager::DIFFICULTY_HARD, /*save*/ false);
+                unlockFeature(i->second, RaceManager::DIFFICULTY_HARD, 
+                              /*save*/ false);
             }
             
             if (i->second->isSolved(RaceManager::DIFFICULTY_HARD))
@@ -140,7 +143,8 @@ void GameSlot::computeActive()
 
 void GameSlot::lockFeature(Challenge *challenge)
 {
-    const std::vector<ChallengeData::UnlockableFeature>& features = challenge->getData()->getFeatures();
+    const std::vector<ChallengeData::UnlockableFeature>& features = 
+        challenge->getData()->getFeatures();
     
     const unsigned int amount = (unsigned int)features.size();
     for (unsigned int n=0; n<amount; n++)
@@ -150,18 +154,21 @@ void GameSlot::lockFeature(Challenge *challenge)
 }   // lockFeature
 
 //-----------------------------------------------------------------------------
-
-void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d, bool do_save)
+/** Unlocks a feature.
+ *  \param c  The challenge that was fulfilled.
+ *  \param d Difficulty at which the challenge was solved.
+ *  \param do_save If true update the challenge file on disk.
+ */
+void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d, 
+                             bool do_save)
 {
-    const unsigned int amount = (unsigned int)c->getData()->getFeatures().size();
+    const unsigned int amount=(unsigned int)c->getData()->getFeatures().size();
     for (unsigned int n=0; n<amount; n++)
     {
         std::string feature = c->getData()->getFeatures()[n].m_name;
-        std::map<std::string,bool>::iterator p = m_locked_features.find(feature);
+        std::map<std::string,bool>::iterator p=m_locked_features.find(feature);
         if (p == m_locked_features.end())
         {
-            //fprintf(stderr,"Unlocking feature '%s' failed: feature is not locked.\n",
-            //        (feature).c_str());
             return;
         }
         m_locked_features.erase(p);
@@ -176,41 +183,46 @@ void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d, bool do_sa
 }   // unlockFeature
 
 //-----------------------------------------------------------------------------
+/** Set the current challenge (or NULL if no challenge is done).
+ *  \param challenge Pointer to the challenge (or NULL)
+ */
+void GameSlot::setCurrentChallenge(const std::string &challenge_id)
+{
+    m_current_challenge = challenge_id=="" ? NULL 
+                                           : getChallenge(challenge_id);
+}   // setCurrentChallenge
 
-/** This is called when a race is finished. Call all active challenges
+//-----------------------------------------------------------------------------
+/** This is called when a race is finished. See if there is an active
+ *  challenge that was fulfilled.
  */
 void GameSlot::raceFinished()
 {
-    printf("=== Race finished ===\n");
-    
-    std::map<std::string, Challenge*>::const_iterator i;
-    for(i = m_challenges_state.begin(); 
-        i != m_challenges_state.end();  i++)
+    if(m_current_challenge                                           &&
+        m_current_challenge->isActive(race_manager->getDifficulty()) && 
+        m_current_challenge->getData()->isChallengeFulfilled()           )
     {
-        if(i->second->isActive(race_manager->getDifficulty()) && i->second->getData()->raceFinished())
-        {
-            unlockFeature(i->second, race_manager->getDifficulty());
-        }   // if isActive && challenge solved
-    }
-    
-    //race_manager->setCoinTarget(0);  //reset
+        // cast const away so that the challenge can be set to fulfilled.
+        // The 'clean' implementation would involve searching the challenge
+        // in m_challenges_state, which is a bit of an overkill
+        unlockFeature(const_cast<Challenge*>(m_current_challenge), 
+                      race_manager->getDifficulty());
+    }   // if isActive && challenge solved
 }   // raceFinished
 
 //-----------------------------------------------------------------------------
-
+/** This is called when a GP is finished. See if there is an active
+ *  challenge that was fulfilled.
+ */
 void GameSlot::grandPrixFinished()
 {
-    std::map<std::string, Challenge*>::const_iterator i;
-    for(i = m_challenges_state.begin(); 
-        i != m_challenges_state.end();  i++)
+    if(m_current_challenge                                           &&
+        m_current_challenge->isActive(race_manager->getDifficulty()) && 
+        m_current_challenge->getData()->isGPFulfilled()                 )
     {
-        if(i->second->isActive(race_manager->getDifficulty()) &&
-           i->second->getData()->grandPrixFinished())
-        {
-            printf("===== A FEATURE WAS UNLOCKED BECAUSE YOU WON THE GP!! ==\n");
-            unlockFeature(i->second, race_manager->getDifficulty());
-        }
-    }
+        unlockFeature(const_cast<Challenge*>(m_current_challenge), 
+                      race_manager->getDifficulty());
+    }   // if isActive && challenge solved
     
     race_manager->setCoinTarget(0);
 }   // grandPrixFinished
@@ -219,8 +231,9 @@ void GameSlot::grandPrixFinished()
 
 void GameSlot::save(std::ofstream& out)
 {
-    out << "    <gameslot playerID=\"" << m_player_unique_id.c_str() << "\" kart=\""
-        << m_kart_ident.c_str() << "\" firstTime=\"" << (m_first_time ? "true" : "false")
+    out << "    <gameslot playerID=\"" << m_player_unique_id.c_str() 
+        << "\" kart=\""                << m_kart_ident.c_str() 
+        << "\" firstTime=\""           << (m_first_time ? "true" : "false")
         << "\">\n";
     std::map<std::string, Challenge*>::const_iterator i;
     for(i = m_challenges_state.begin(); 

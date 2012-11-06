@@ -15,7 +15,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "states_screens/dialogs/gp_info_dialog.hpp"
+
 #include "audio/sfx_manager.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -24,7 +27,6 @@
 #include "io/file_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/dialogs/gp_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
 #include "tracks/track.hpp"
@@ -185,6 +187,8 @@ void GPInfoDialog::onEnterPressedInternal()
     // Save the gp identifier, since dismiss will delete this object.
     std::string gp_id = m_gp_ident;
     ModalDialog::dismiss();
+    // Disable accidentally unlocking of a challenge
+    unlock_manager->getCurrentSlot()->setCurrentChallenge("");
     race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false);
 }
 

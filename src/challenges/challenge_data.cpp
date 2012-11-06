@@ -413,7 +413,9 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
 }   // setRace
 
 // ----------------------------------------------------------------------------
-bool ChallengeData::raceFinished()
+/** Returns true if this (non-GP) challenge is fulfilled.
+ */
+bool ChallengeData::isChallengeFulfilled() const
 {
     // GP's use the grandPrixFinished() function, so they can't be fulfilled here.
     if(m_major==RaceManager::MAJOR_MODE_GRAND_PRIX) return false;
@@ -451,10 +453,12 @@ bool ChallengeData::raceFinished()
     }
     if (m_time[d] > 0.0f && kart->getFinishTime() > m_time[d]) return false;    // too slow
     return true;
-}   // raceFinished
+}   // isChallengeFulfilled
 
 // ----------------------------------------------------------------------------
-bool ChallengeData::grandPrixFinished()
+/** Returns true if this GP challenge is fulfilled.
+ */
+bool ChallengeData::isGPFulfilled() const
 {
     int d = race_manager->getDifficulty();
     
@@ -476,7 +480,7 @@ bool ChallengeData::grandPrixFinished()
     if (rank != 0) return false;
 
     return true;
-}   // grandPrixFinished
+}   // isGPFulfilled
 
 // ----------------------------------------------------------------------------
 

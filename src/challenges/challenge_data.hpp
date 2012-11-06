@@ -96,8 +96,8 @@ public:
     void         setRace(RaceManager::Difficulty d) const;
     
     virtual void check() const;
-    virtual bool raceFinished();
-    virtual bool grandPrixFinished();
+    virtual bool isChallengeFulfilled() const;
+    virtual bool isGPFulfilled() const;
     /** Returns the version number of this challenge. */
     int          getVersion() const { return m_version; }
     

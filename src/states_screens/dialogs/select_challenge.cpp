@@ -160,6 +160,8 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
             return GUIEngine::EVENT_LET;
         }
         
+        unlock_manager->getCurrentSlot()->setCurrentChallenge(m_challenge_id);
+
         ModalDialog::dismiss();
 
         core::rect<s32> pos(15,

@@ -15,6 +15,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "states_screens/dialogs/track_info_dialog.hpp"
+
+#include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
@@ -29,7 +32,6 @@
 #include "race/highscores.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/dialogs/track_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
 #include "tracks/track.hpp"
@@ -246,6 +248,9 @@ void TrackInfoDialog::onEnterPressedInternal()
                                                   : m_checkbox->getState();
     race_manager->setReverseTrack(reverse_track);
     std::string track_ident = m_track_ident;
+    // Disable accidentally unlocking of a challenge
+    unlock_manager->getCurrentSlot()->setCurrentChallenge("");
+
     ModalDialog::dismiss();
     race_manager->startSingleRace(track_ident, num_laps, false);
 }   // onEnterPressedInternal

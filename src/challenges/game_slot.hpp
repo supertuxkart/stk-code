@@ -57,6 +57,10 @@ class GameSlot
     
     std::map<std::string, Challenge*> m_challenges_state;
     
+    /** A pointer to the current challenge, or NULL 
+     *  if no challenge is active. */
+    const Challenge *m_current_challenge;
+
     friend class UnlockManager;
     
     void computeActive();
@@ -72,8 +76,9 @@ class GameSlot
     
 public:
     
-    // do NOT attempt to pass 'player_unique_id' by reference here. I don't know why (compiler bug
-    // maybe?) but this screws up everything. Better pass by copy.
+    // do NOT attempt to pass 'player_unique_id' by reference here. I don't 
+    // know why (compiler bug maybe?) but this screws up everything. Better 
+    // pass by copy.
     GameSlot(std::string player_unique_id)
     {
         m_player_unique_id = player_unique_id;
@@ -82,16 +87,20 @@ public:
         m_easy_challenges = 0;
         m_medium_challenges = 0;
         m_hard_challenges = 0;
+        m_current_challenge = NULL;
     }
     ~GameSlot();
     
     const std::string& getPlayerID() const { return m_player_unique_id; }
     const std::string& getKartIdent () const { return m_kart_ident;  }
-    void setKartIdent(const std::string& kart_ident) { m_kart_ident = kart_ident; }
+    void setKartIdent(const std::string& kart_ident) 
+    {
+        m_kart_ident = kart_ident; 
+    }
     
     
-    /** Returns the list of recently unlocked features (e.g. call at the end of a
-     race to know if any features were unlocked) */
+    /** Returns the list of recently unlocked features (e.g. call at the end 
+     *  of a race to know if any features were unlocked) */
     const std::vector<const ChallengeData*> 
         getRecentlyCompletedChallenges() {return m_unlocked_features;}
     
@@ -102,23 +111,42 @@ public:
     
     void       lockFeature       (Challenge *challenge);
     
-    void       unlockFeature     (Challenge* c, RaceManager::Difficulty d, bool do_save=true);
+    void       unlockFeature     (Challenge* c, RaceManager::Difficulty d, 
+                                  bool do_save=true);
         
     void       raceFinished      ();
     void       grandPrixFinished ();
     
     void       save              (std::ofstream& file);
+    void       setCurrentChallenge(const std::string &challenge_id);
     
+    /** Returns the number of points accumulated. */
     int        getPoints          () const { return m_points; }
-    
+    // ------------------------------------------------------------------------
+    /** Returns the number of fulfilled challenges at easy level. */
     int        getNumEasyTrophies  () const { return m_easy_challenges;   }
+    // ------------------------------------------------------------------------
+    /* Returns the number of fulfilled challenges at medium level. */
     int        getNumMediumTrophies() const { return m_medium_challenges; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of fulfilled challenges at har level. */
     int        getNumHardTrophies  () const { return m_hard_challenges;   }
-    
+    // ------------------------------------------------------------------------
+    /** Sets if this is the first time the intro is shown. */
     void       setFirstTime(bool ft) { m_first_time = ft;   }
+    // ------------------------------------------------------------------------
+    /** Returns if this is the first time the intro is shown. */
     bool       isFirstTime() const   { return m_first_time; }
-    
-    const Challenge* getChallenge(const std::string& id) { return m_challenges_state[id]; }
-};
+    // ------------------------------------------------------------------------
+    /** Returns a challenge given the challenge id. 
+     */
+    const Challenge* getChallenge(const std::string& id) const
+    {
+        std::map<std::string, Challenge*>::const_iterator it = 
+            m_challenges_state.find(id);
+        assert(it!=m_challenges_state.end());
+        return it->second;
+    }   // getChallenge
+};   // GameSlot
 
 #endif

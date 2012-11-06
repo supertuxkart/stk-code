@@ -184,10 +184,15 @@ void UnlockManager::addChallenge(const std::string& filename)
 }   // addChallenge
 
 //-----------------------------------------------------------------------------
+/** Returns the challenge data for a challenge id, or NULL if no such
+ *  challenge exist.
+ *  \param id Id of the challenge.
+ */
 const ChallengeData* UnlockManager::getChallenge(const std::string& id)
 {
-    if(m_all_challenges.find(id)==m_all_challenges.end()) return NULL;
-    return m_all_challenges[id];
+    AllChallengesType::const_iterator it = m_all_challenges.find(id);
+    if(it==m_all_challenges.end()) return NULL;
+    return it->second;
 }   // getChallenge
 
 //-----------------------------------------------------------------------------
