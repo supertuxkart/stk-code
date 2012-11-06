@@ -48,10 +48,6 @@ if(MSVC)
     set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
 endif()
 
-# Irrlicht
-find_package(Irrlicht 1.8 REQUIRED)
-include_directories(${IRRLICHT_INCLUDE_DIRS})
-
 # OpenAL
 find_package(OpenAL REQUIRED)
 include_directories(${OPENAL_INCLUDE_DIR})
@@ -74,6 +70,18 @@ if(USE_FRIBIDI)
             "Either install fribidi or disable bidi support with -DUSE_FRIBIDI=0 "
             "(if you don't use a right-to-left language then you don't need this).")
     endif()
+endif()
+
+
+# OpenGL
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIR})
+
+if(UNIX AND NOT APPLE)
+    find_library(IRRLICHT_XF86VM_LIBRARY Xxf86vm)
+    mark_as_advanced(IRRLICHT_XF86VM_LIBRARY)
+else()
+    set(IRRLICHT_XF86VM_LIBRARY "")
 endif()
 
 
@@ -153,6 +161,21 @@ else()
     target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
+
+# To invoke irrlicht makefile. Just a few things must be checked before it can be uncommented :
+# 1) make it pass NDEBUG=1
+# 2) make the stdout output visible
+
+#add_custom_target(
+#   stkirrlicht
+#   COMMAND make
+#   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/irrlicht/source/Irrlicht
+#)
+#add_dependencies(supertuxkart stkirrlicht)
+
+include_directories(${PROJECT_SOURCE_DIR}/lib/irrlicht/include)
+
+
 # Common library dependencies
 target_link_libraries(supertuxkart
     bulletdynamics
@@ -162,6 +185,8 @@ target_link_libraries(supertuxkart
     ${CURL_LIBRARIES}
     ${IRRLICHT_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
+    ${PROJECT_SOURCE_DIR}/lib/irrlicht/lib/Linux/libIrrlicht.a
+    ${IRRLICHT_XF86VM_LIBRARY}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES})
 
