@@ -114,7 +114,7 @@
 
 
 //! Maximum number of texture an SMaterial can have, up to 8 are supported by Irrlicht.
-#define _IRR_MATERIAL_MAX_TEXTURES_ 4
+#define _IRR_MATERIAL_MAX_TEXTURES_ 8
 
 //! Define _IRR_COMPILE_WITH_DIRECT3D_8_ and _IRR_COMPILE_WITH_DIRECT3D_9_ to
 //! compile the Irrlicht engine with Direct3D8 and/or DIRECT3D9.
