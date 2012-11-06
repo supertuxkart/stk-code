@@ -85,6 +85,14 @@ else()
 endif()
 
 
+# Irrlicht
+if (APPLE)
+    set(IRRLICHT_LIBRARY "/Library/Frameworks/IrrFramework.framework")
+else()
+    set(IRRLICHT_LIBRARY ${PROJECT_SOURCE_DIR}/lib/irrlicht/lib/Linux/libIrrlicht.a)
+endif()
+
+    
 # Set some compiler options
 if(UNIX)
     add_definitions(-Wall)
@@ -185,7 +193,7 @@ target_link_libraries(supertuxkart
     ${CURL_LIBRARIES}
     ${IRRLICHT_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
-    ${PROJECT_SOURCE_DIR}/lib/irrlicht/lib/Linux/libIrrlicht.a
+    ${IRRLICHT_LIBRARY}
     ${IRRLICHT_XF86VM_LIBRARY}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES})

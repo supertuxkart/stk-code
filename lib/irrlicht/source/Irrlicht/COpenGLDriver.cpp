@@ -21,6 +21,10 @@
 #include <SDL/SDL.h>
 #endif
 
+#ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
+#include "MacOSX/CIrrDeviceMacOSX.h"
+#endif
+
 namespace irr
 {
 namespace video
