@@ -44,6 +44,7 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/rescue_animation.hpp"
+#include "modes/overworld.hpp"
 #include "modes/world.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment.hpp"
@@ -1633,12 +1634,28 @@ void Kart::crashed(const Material *m)
         }
         else if (m->getCollisionReaction() == Material::PUSH_BACK)
         {
-            if (m_bounce_back_time <= 0.0f)
+            if (m_bounce_back_time <= 0.2f) // this variable is sometimes set to 0.1 somewhere else
             {
                 btVector3 push = m_body->getLinearVelocity().normalized();
                 push[1] = 0.1f;
                 m_body->applyCentralImpulse( -4000.0f*push );
                 m_bounce_back_time = 2.0f;
+                
+                core::stringw msg = _("You need more points\nto enter this challenge!");
+                std::vector<core::stringw> parts = StringUtils::split(msg, '\n', false);
+                
+                // For now, until we have scripting, special-case the overworld... (TODO)
+                if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
+                {
+                    sfx_manager->quickSound("forcefield");
+                
+                    for (int n = 0; n < parts.size(); n++)
+                    {
+                        World::getWorld()->getRaceGUI()->addMessage(parts[n], NULL, 4.0f,
+                                                                    video::SColor(255, 255,255,255),
+                                                                    true, true);
+                    }
+                }
             }
         }
     }
