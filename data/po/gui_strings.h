@@ -189,6 +189,10 @@ _("Swatter - will squash karts close by, slowing them down.")
 _("Race Setup")
 
 //I18N: ./data/gui/select_challenge.stkgui
+//I18N: Type of race, in a challenge
+_("Type :");
+
+//I18N: ./data/gui/select_challenge.stkgui
 //I18N: Difficulty
 _("Novice");
 
