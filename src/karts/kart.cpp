@@ -1649,16 +1649,17 @@ void Kart::crashed(const Material *m)
                 {
                     sfx_manager->quickSound("forcefield");
                 
-                    for (int n = 0; n < parts.size(); n++)
+                    for (unsigned int n = 0; n < parts.size(); n++)
                     {
                         World::getWorld()->getRaceGUI()->addMessage(parts[n], NULL, 4.0f,
                                                                     video::SColor(255, 255,255,255),
                                                                     true, true);
-                    }
-                }
-            }
-        }
-    }
+                    }   // for n<parts.size()
+                }   // if world exist
+            }   // if m_bounce_back_time <= 0.2f
+        }   // if (m->getCollisionReaction() == Material::PUSH_BACK)
+    }   // if(m && m->getCollisionReaction() != Material::NORMAL && 
+        //   !getKartAnimation())
     m_controller->crashed(m);
     crashed();
 }   // crashed(Material)
