@@ -28,10 +28,6 @@
 using namespace irr;
 using namespace gui;
 
-#ifdef _MSC_VER
-#	pragma comment(lib, "Irrlicht.lib")
-#endif
-
 const s32 texturesizes[] = {128, 256, 512, 1024, 2048, 4096, 0};
 
 const wchar_t *fileformats[]		 =  { L"bmp", L"ppm", 0 };  // bitmap font formats
