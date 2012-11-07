@@ -78,6 +78,12 @@ void ProjectileManager::update(float dt)
     HitEffects::iterator he = m_active_hit_effects.begin();
     while(he!=m_active_hit_effects.end())
     {
+        // While this shouldn't happen, we had one crash because of this
+        if(!(*he))
+        {
+            HitEffects::iterator next = m_active_hit_effects.erase(he);
+            he = next;
+        }
         // Update this hit effect. If it can be removed, remove it.
         if((*he)->updateAndDelete(dt))
         {
@@ -129,13 +135,13 @@ void ProjectileManager::updateServer(float dt)
 // -----------------------------------------------------------------------------
 /** Updates all rockets and hit effects on the client.
  *  updateClient takes the information in race_state and updates all rockets
- *  (i.e. position, hit effects etc)                                            */
+ *  (i.e. position, hit effects etc)                                          */
 void ProjectileManager::updateClient(float dt)
 {
     unsigned int num_projectiles = race_state->getNumFlyables();
     if(num_projectiles != m_active_projectiles.size())
-        fprintf(stderr, "Warning: num_projectiles %d active %d\n",num_projectiles,
-                (int)m_active_projectiles.size());
+        fprintf(stderr, "Warning: num_projectiles %d active %d\n",
+                num_projectiles, (int)m_active_projectiles.size());
 
     unsigned int indx=0;
     for(Projectiles::iterator i  = m_active_projectiles.begin();
