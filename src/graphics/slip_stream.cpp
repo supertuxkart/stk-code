@@ -133,6 +133,9 @@ void SlipStream::reset()
 {
     m_slipstream_mode = SS_NONE;
     m_slipstream_time = 0;
+
+    // Reset a potential max speed increase
+    m_kart->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SLIPSTREAM, 0, 0, 0, 0);
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -488,22 +491,4 @@ void SlipStream::update(float dt)
     {
         setIntensity(1.0f, m_target_kart);
     }
-    
-
-return;
-    core::vector3df pos = m_kart->getNode()->getPosition();
-    pos.Y = m_kart->getHoT()+0.2f;
-    m_node->setPosition(pos);
-    core::vector3df f = core::vector3df(0, 0, 10) - f;
-    core::vector3df r = f.getHorizontalAngle();
-    m_node->setRotation(r);
-    return;
-
-    const core::quaternion new_rot(m_kart->getNode()->getRotation());
-    const core::quaternion old_rot(m_node->getRotation()            );
-
-    core::quaternion interpo;
-    core::vector3df interp;
-    new_rot.toEuler(interp);
-    m_node->setRotation(interp);
 }   // update

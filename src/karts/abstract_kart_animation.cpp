@@ -18,6 +18,7 @@
 
 #include "karts/abstract_kart_animation.hpp"
 
+#include "graphics/slip_stream.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
@@ -48,6 +49,7 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
     kart->setKartAnimation(this);
     World::getWorld()->getPhysics()->removeKart(m_kart);
     kart->getSkidding()->reset();
+    kart->getSlipstream()->reset();
     if(kart->isSquashed())
     {
         // A time of 0 reset the squashing

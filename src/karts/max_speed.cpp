@@ -87,7 +87,8 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
                                 float engine_force, float duration, 
                                 float fade_out_time)
 {
-    assert(fade_out_time>0.01f);
+    // Allow fade_out_time 0 if add_speed is set to 0.
+    assert(add_speed==0.0f || fade_out_time>0.01f);
     assert(category>=MS_INCREASE_MIN && category <MS_INCREASE_MAX);
     m_speed_increase[category].m_max_add_speed   = add_speed;
     m_speed_increase[category].m_duration        = duration;
