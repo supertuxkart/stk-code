@@ -38,7 +38,7 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
     // short emision time, explosion, not constant flame
     m_remaining_time  = burst_time; 
     m_node            = irr_driver->addParticleNode();
-    
+    m_node->grab();
 #ifdef DEBUG
     m_node->setName("explosion");
 #endif
@@ -77,6 +77,13 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
  */
 Explosion::~Explosion()
 {
+    if(m_node)
+    {
+        m_node->drop();
+        // Remove from scene node by removing from parent.
+        irr_driver->removeNode(m_node);
+        m_node = NULL;
+    }
 }   // ~Explosion
 
 //-----------------------------------------------------------------------------
@@ -125,9 +132,9 @@ bool Explosion::updateAndDelete(float dt)
     }
     else
     {
-        // Sound and animation finished --> remove node
-        irr_driver->removeNode(m_node);
-        m_node = NULL;
+        // Sound and animation finished, node can be removed now.
+        // Returning true will cause this node to be deleted by 
+        // the projectile manager.
         return true;   // finished
     }
 
