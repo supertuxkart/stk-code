@@ -246,22 +246,29 @@ void PlayerController::steer(float dt, int steer_val)
         m_controls->m_steer = 0;
     }
 
-    const float STEER_CHANGE = dt/m_kart->getTimeFullSteer();  // amount the steering is changed
+    
+    // Amount the steering is changed for digital devices.
+    // If the steering is 'back to straight', a different steering
+    // change speed is used.
+    const float STEER_CHANGE = (steer_val<=0 && m_controls->m_steer<0 ||
+                                steer_val>=0 && m_controls->m_steer>0   )
+                          ? dt/m_kart->getKartProperties()->getTimeResetSteer()
+                          : dt/m_kart->getTimeFullSteer();
     if (steer_val < 0)
     {
-      // If we got analog values do not cumulate.
-      if (steer_val > -32767)
-        m_controls->m_steer = -steer_val/32767.0f;
-      else
-        m_controls->m_steer += STEER_CHANGE;
+        // If we got analog values do not cumulate.
+        if (steer_val > -32767)
+            m_controls->m_steer = -steer_val/32767.0f;
+        else
+            m_controls->m_steer += STEER_CHANGE;
     }
     else if(steer_val > 0)
     {
-      // If we got analog values do not cumulate.
-      if (steer_val < 32767)
-        m_controls->m_steer = -steer_val/32767.0f;
-      else
-        m_controls->m_steer -= STEER_CHANGE;
+        // If we got analog values do not cumulate.
+        if (steer_val < 32767)
+            m_controls->m_steer = -steer_val/32767.0f;
+        else
+            m_controls->m_steer -= STEER_CHANGE;
     }
     else
     {   // no key is pressed

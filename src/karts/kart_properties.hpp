@@ -126,6 +126,8 @@ private:
                                        *   braking force. */
     float m_time_full_steer;          /**< Time for player karts to reach full
                                        *   steer angle. */
+    float m_time_reset_steer;         /**< Time for steering to go back to 
+                                           zero from full steer. */
 
     /** The turn angle depending on speed. */
     InterpolationArray m_turn_angle_at_speed;
@@ -410,6 +412,9 @@ public:
      *  steering straight. */
     float getTimeFullSteer          () const {return m_time_full_steer;       }
 
+    /** Returns the time the kart needs to go back to steering straight from
+     *  full steer. */
+    float getTimeResetSteer         () const { return m_time_reset_steer;     }
     /** Get braking information. */
     float getBrakeFactor            () const {return m_brake_factor;          }
 

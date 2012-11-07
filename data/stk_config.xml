@@ -370,7 +370,8 @@
                          steering to extreme left or right.
     -->
     <turn turn-radius="0:2.0 10:7.5 25:15 45:25"
-          time-full-steer ="0.2"  />
+          time-full-steer ="0.2" 
+          time-reset-steer="0.1" />
 
     <!-- Speed and acceleration related values: power and max-speed (in m/s) 
          have 3 values, one for low, medium, and hard.
