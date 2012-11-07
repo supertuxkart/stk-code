@@ -20,7 +20,7 @@ bool testLastFrame()
 	video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager * smgr = device->getSceneManager();
 
-	scene::IAnimatedMesh* mesh = smgr->getMesh("../media/sydney.md2");
+	scene::IAnimatedMesh* mesh = smgr->getMesh("./media/sydney.md2");
 
 	bool result = (mesh != 0);
 	if (mesh)
@@ -31,7 +31,7 @@ bool testLastFrame()
 		{
 			node->setPosition(vector3df(20, 0, 30));
 			node->setMaterialFlag(video::EMF_LIGHTING, false);
-			node->setMaterialTexture(0, driver->getTexture("../media/sydney.bmp"));
+			node->setMaterialTexture(0, driver->getTexture("./media/sydney.bmp"));
 			node->setLoopMode(false);
 
 			(void)smgr->addCameraSceneNode();
@@ -84,7 +84,7 @@ bool testNormals()
 	video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager * smgr = device->getSceneManager();
 
-	scene::IAnimatedMesh* mesh = smgr->getMesh("../media/sydney.md2");
+	scene::IAnimatedMesh* mesh = smgr->getMesh("./media/sydney.md2");
 
 	bool result = (mesh != 0);
 	if (mesh)
@@ -95,7 +95,7 @@ bool testNormals()
 			node->setPosition(vector3df(20, 0, 30));
 			node->setMaterialFlag(video::EMF_LIGHTING, false);
 			node->setDebugDataVisible(scene::EDS_NORMALS);
-			node->setMaterialTexture(0, driver->getTexture("../media/sydney.bmp"));
+			node->setMaterialTexture(0, driver->getTexture("./media/sydney.bmp"));
 			node->setLoopMode(false);
 
 			(void)smgr->addCameraSceneNode();

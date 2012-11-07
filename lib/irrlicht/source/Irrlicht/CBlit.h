@@ -926,30 +926,13 @@ static void executeBlit_TextureBlendColor_32_to_32( const SBlitJob * job )
 */
 static void executeBlit_Color_16_to_16( const SBlitJob * job )
 {
+	const u16 c = video::A8R8G8B8toA1R5G5B5(job->argb);
 	u16 *dst = (u16*) job->dst;
 
-	u16 c0 = video::A8R8G8B8toA1R5G5B5( job->argb );
-	u32 c = c0 | c0 << 16;
-
-	if ( 0 == (job->srcPitch & 3 ) )
+	for ( s32 dy = 0; dy != job->height; ++dy )
 	{
-		for ( s32 dy = 0; dy != job->height; ++dy )
-		{
-			memset32( dst, c, job->srcPitch );
-			dst = (u16*) ( (u8*) (dst) + job->dstPitch );
-		}
-	}
-	else
-	{
-		s32 dx = job->width - 1;
-
-		for ( s32 dy = 0; dy != job->height; ++dy )
-		{
-			memset32( dst, c, job->srcPitch );
-			dst[dx] = c0;
-			dst = (u16*) ( (u8*) (dst) + job->dstPitch );
-		}
-
+		memset16(dst, c, job->srcPitch);
+		dst = (u16*) ( (u8*) (dst) + job->dstPitch );
 	}
 }
 

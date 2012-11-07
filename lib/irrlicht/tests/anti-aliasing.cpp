@@ -29,7 +29,7 @@ static bool testLineRendering(video::E_DRIVER_TYPE type)
 
 	scene::ISceneManager* smgr = device->getSceneManager();
 
-	scene::IAnimatedMesh* mesh = smgr->getMesh("../media/sydney.md2");
+	scene::IAnimatedMesh* mesh = smgr->getMesh("./media/sydney.md2");
 	if (!mesh)
 	{
 		device->closeDevice();
@@ -46,7 +46,7 @@ static bool testLineRendering(video::E_DRIVER_TYPE type)
 	{
 		node->setMaterialFlag(video::EMF_LIGHTING, false);
 		node->setMD2Animation(scene::EMAT_STAND);
-		node->setMaterialTexture( 0, driver->getTexture("../media/sydney.bmp") );
+		node->setMaterialTexture( 0, driver->getTexture("./media/sydney.bmp") );
 	}
 
 	smgr->addCameraSceneNode(0, core::vector3df(0,30,-40), core::vector3df(0,5,0));
@@ -64,7 +64,7 @@ static bool testLineRendering(video::E_DRIVER_TYPE type)
 	device->run();
 	device->drop();
     return result;
-} 
+}
 
 bool antiAliasing()
 {

@@ -40,8 +40,6 @@ IAnimatedMesh* CSTLMeshFileLoader::createMesh(io::IReadFile* file)
 	if (filesize < 6) // we need a header
 		return 0;
 
-	const u32 WORD_BUFFER_LENGTH = 512;
-
 	SMesh* mesh = new SMesh();
 	SMeshBuffer* meshBuffer = new SMeshBuffer();
 	mesh->addMeshBuffer(meshBuffer);
@@ -49,8 +47,6 @@ IAnimatedMesh* CSTLMeshFileLoader::createMesh(io::IReadFile* file)
 
 	core::vector3df vertex[3];
 	core::vector3df normal;
-
-	c8 buffer[WORD_BUFFER_LENGTH];
 
 	bool binary = false;
 	core::stringc token;

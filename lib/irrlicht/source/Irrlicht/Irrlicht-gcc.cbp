@@ -60,8 +60,8 @@
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add option="-W" />
 					<Add option="-Wall" />
+					<Add option="-W" />
 					<Add option="-Wno-unused-parameter" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
@@ -267,7 +267,6 @@
 					<Add option="-Wextra" />
 					<Add option="-Wall" />
 					<Add option="-g" />
-					<Add option="-W" />
 					<Add option="-O0" />
 					<Add option="-Wno-unused-parameter" />
 					<Add option="-fPIC" />
@@ -296,7 +295,6 @@
 				<Compiler>
 					<Add option="-O3" />
 					<Add option="-Wextra" />
-					<Add option="-W" />
 					<Add option="-Wno-unused-parameter" />
 					<Add option="-fPIC" />
 					<Add option="-fno-exceptions" />
@@ -323,7 +321,6 @@
 				<Compiler>
 					<Add option="-O3" />
 					<Add option="-Wextra" />
-					<Add option="-W" />
 					<Add option="-Wno-unused-parameter" />
 					<Add option="-fPIC" />
 					<Add option="-ffast-math" />
@@ -352,7 +349,6 @@
 					<Add option="-Wextra" />
 					<Add option="-Wall" />
 					<Add option="-g" />
-					<Add option="-W" />
 					<Add option="-O0" />
 					<Add option="-Wno-unused-parameter" />
 					<Add option="-fno-exceptions" />
@@ -380,7 +376,6 @@
 				<Compiler>
 					<Add option="-O3" />
 					<Add option="-Wextra" />
-					<Add option="-W" />
 					<Add option="-Wno-unused-parameter" />
 					<Add option="-fno-exceptions" />
 					<Add option="-D_IRR_STATIC_LIB_" />
@@ -406,7 +401,6 @@
 				<Compiler>
 					<Add option="-O3" />
 					<Add option="-Wextra" />
-					<Add option="-W" />
 					<Add option="-Wno-unused-parameter" />
 					<Add option="-ffast-math" />
 					<Add option="-fno-exceptions" />
@@ -628,6 +622,7 @@
 		<Unit filename="CBSPMeshFileLoader.h" />
 		<Unit filename="CBillboardSceneNode.cpp" />
 		<Unit filename="CBillboardSceneNode.h" />
+		<Unit filename="CBlit.h" />
 		<Unit filename="CBoneSceneNode.cpp" />
 		<Unit filename="CBoneSceneNode.h" />
 		<Unit filename="CBurningShader_Raster_Reference.cpp" />

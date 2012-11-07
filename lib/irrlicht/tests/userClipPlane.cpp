@@ -54,6 +54,7 @@ static bool withSphere(video::E_DRIVER_TYPE type)
 	bool result = takeScreenshotAndCompareAgainstReference(driver, "-ucpsphere.png");
 
 	device->closeDevice();
+	device->run();
 	device->drop();
     return result;
 }

@@ -395,6 +395,7 @@ namespace video
 					}
 					break;
 				default:
+					color = 0xffffffff;
 				break;
 			}
 		}

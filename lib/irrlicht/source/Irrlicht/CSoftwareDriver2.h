@@ -238,7 +238,7 @@ namespace video
 					const void* indices, u32 indexCount,
 					E_VERTEX_TYPE vType,scene::E_PRIMITIVE_TYPE pType,
 					E_INDEX_TYPE iType);
-		void VertexCache_get ( s4DVertex ** face );
+		void VertexCache_get ( const s4DVertex ** face );
 		void VertexCache_getbypass ( s4DVertex ** face );
 
 		void VertexCache_fill ( const u32 sourceIndex,const u32 destIndex );

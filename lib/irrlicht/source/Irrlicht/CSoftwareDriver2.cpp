@@ -1490,7 +1490,7 @@ REALINLINE s4DVertex * CBurningVideoDriver::VertexCache_getVertex ( const u32 so
 	fill blockwise on the next 16(Cache_Size) unique vertices in indexlist
 	merge the next 16 vertices with the current
 */
-REALINLINE void CBurningVideoDriver::VertexCache_get ( s4DVertex ** face )
+REALINLINE void CBurningVideoDriver::VertexCache_get(const s4DVertex ** face)
 {
 	SCacheInfo info[VERTEXCACHE_ELEMENT];
 
@@ -1595,7 +1595,8 @@ REALINLINE void CBurningVideoDriver::VertexCache_get ( s4DVertex ** face )
 			face[0] = VertexCache_getVertex ( p[ i0    ] );
 			face[1] = VertexCache_getVertex ( p[ VertexCache.indicesRun + 1] );
 			face[2] = VertexCache_getVertex ( p[ VertexCache.indicesRun + 2] );
-		} break;
+		}
+		break;
 
 		case 2:
 		{
@@ -1603,12 +1604,17 @@ REALINLINE void CBurningVideoDriver::VertexCache_get ( s4DVertex ** face )
 			face[0] = VertexCache_getVertex ( p[ i0    ] );
 			face[1] = VertexCache_getVertex ( p[ VertexCache.indicesRun + 1] );
 			face[2] = VertexCache_getVertex ( p[ VertexCache.indicesRun + 2] );
-		} break;
+		}
+		break;
+
 		case 4:
 			face[0] = VertexCache_getVertex ( VertexCache.indicesRun + 0 );
 			face[1] = VertexCache_getVertex ( VertexCache.indicesRun + 1 );
 			face[2] = VertexCache_getVertex ( VertexCache.indicesRun + 2 );
-			break;
+		break;
+		default:
+			face[0] = face[1] = face[2] = VertexCache_getVertex(VertexCache.indicesRun + 0);
+		break;
 	}
 
 	VertexCache.indicesRun += VertexCache.primitivePitch;
@@ -1759,7 +1765,7 @@ void CBurningVideoDriver::drawVertexPrimitiveList(const void* vertices, u32 vert
 
 	for ( i = 0; i < (u32) primitiveCount; ++i )
 	{
-		VertexCache_get ( (s4DVertex**) face );
+		VertexCache_get(face);
 
 		// if fully outside or outside on same side
 		if ( ( (face[0]->flag | face[1]->flag | face[2]->flag) & VERTEX4D_CLIPMASK )
