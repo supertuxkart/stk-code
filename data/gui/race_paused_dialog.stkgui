@@ -19,7 +19,7 @@
             <icon-button id="restart" width="128" height="128" icon="gui/restart.png"
                     I18N="Race paused button" text="Restart Race" word_wrap="true"/>
 
-            <icon-button id="endrace" width="128" height="128" icon="gui/options_ui.png"
+            <icon-button id="endrace" width="128" height="128" icon="gui/race_giveup.png"
                          I18N="Race paused button" text="Give Up Race" word_wrap="true"/>
 
             <icon-button id="options" width="128" height="128" icon="gui/main_options.png"
