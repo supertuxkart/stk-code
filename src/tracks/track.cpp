@@ -88,7 +88,7 @@ Track::Track(const std::string &filename)
     m_track_mesh            = NULL;
     m_gfx_effect_mesh       = NULL;
     m_internal              = false;
-    m_enable_auto_rescue    = true;
+    m_enable_auto_rescue    = true;  // Below set to false in arenas
     m_enable_push_back      = true;
     m_reverse_available     = true;
     m_is_arena              = false;
@@ -315,6 +315,10 @@ void Track::loadTrackInfo()
     root->get("internal",              &m_internal);
     root->get("reverse",               &m_reverse_available);
     root->get("push-back",             &m_enable_push_back);
+
+    // Make the default for auto-rescue in battle mode to be false
+    if(m_is_arena)
+        m_enable_auto_rescue = false;
     root->get("auto-rescue",           & m_enable_auto_rescue);
     root->get("smooth-normals",        &m_smooth_normals);
     // Reverse is meaningless in arena
