@@ -22,7 +22,8 @@ where '*' is the version of SuperTuxkart you downloaded - eg 0.8.0. Then:
 * Build irrlicht (atm, this will be included in cmake soonish)
   cd lib/irrlicht/source/Irrlicht
   NDEBUG=1 make
-* Compile irrlicht:
+
+* Compile SuperTuxKart:
     mkdir cmake_build 
     cd cmake_build 
     cmake .. 
