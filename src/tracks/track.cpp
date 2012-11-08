@@ -88,9 +88,9 @@ Track::Track(const std::string &filename)
     m_track_mesh            = NULL;
     m_gfx_effect_mesh       = NULL;
     m_internal              = false;
+    m_enable_auto_rescue    = true;
+    m_enable_push_back      = true;
     m_reverse_available     = true;
-    m_all_nodes.clear();
-    m_all_cached_meshes.clear();
     m_is_arena              = false;
     m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
@@ -101,6 +101,8 @@ Track::Track(const std::string &filename)
     m_weather_type          = WEATHER_NONE;
     m_cache_track           = UserConfigParams::m_cache_overworld &&
                               m_ident=="overworld";
+    m_all_nodes.clear();
+    m_all_cached_meshes.clear();
     loadTrackInfo();
 }   // Track
 
@@ -312,6 +314,8 @@ void Track::loadTrackInfo()
     root->get("groups",                &m_groups);
     root->get("internal",              &m_internal);
     root->get("reverse",               &m_reverse_available);
+    root->get("push-back",             &m_enable_push_back);
+    root->get("auto-rescue",           & m_enable_auto_rescue);
     root->get("smooth-normals",        &m_smooth_normals);
     // Reverse is meaningless in arena
     m_reverse_available = !m_is_arena && m_reverse_available;

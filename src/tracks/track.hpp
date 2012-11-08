@@ -233,8 +233,10 @@ private:
     /** The version of this track. A certain STK version will only support
      *  certain track versions. */
     int                      m_version;
+
     /** Far value for cameras for this track. */
     float                    m_camera_far;
+
     /** Whether this is an "internal" track. If so it won't be offered
       * in the track seelction screen
       */
@@ -242,6 +244,16 @@ private:
     
     /** Whether this track should be available in reverse version */
     bool                     m_reverse_available;
+
+    /** If true a player kart will automatically be rescued if it is
+     *  e.g. on a side, .... */
+    bool                     m_enable_auto_rescue;
+
+    /** If true any collision of a kart with the track will push the kart
+     *  towards the nearest driveline. While this is (mostly) nice in tracks
+     *  where a kart is pushed back towards the road, it doesn't work well
+     *  on overworld, where karts have been pushed out of 'bubbles' . */
+    bool                     m_enable_push_back;
 
     /** The type of sky to be used for the track. */
     enum {SKY_NONE, SKY_BOX, 
@@ -501,6 +513,12 @@ public:
     /** Whether this is an "internal" track. If so it won't be offered
      * in the track selection screen. */
     bool isInternal() const { return m_internal; }
+    // ------------------------------------------------------------------------
+    /** Returns true if auto rescue is enabled. */
+    bool isAutoRescueEnabled() const { return m_enable_auto_rescue; }
+    // ------------------------------------------------------------------------
+    /** True if push back of karts towards the track should be enabled. */
+    bool isPushBackEnabled() const { return m_enable_push_back; }
     // ------------------------------------------------------------------------
     /** Returns true if the normals of this track can be smoothed. */
     bool smoothNormals() const { return m_smooth_normals; }        

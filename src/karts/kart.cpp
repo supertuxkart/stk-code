@@ -1082,7 +1082,8 @@ void Kart::update(float dt)
     m_skid_sound->position   ( getXYZ() );
 
     // Check if a kart is (nearly) upside down and not moving much --> automatic rescue
-    if(!getKartAnimation() && fabs(getRoll())>60*DEGREE_TO_RAD && 
+    if(World::getWorld()->getTrack()->isAutoRescueEnabled() &&
+        !getKartAnimation() && fabs(getRoll())>60*DEGREE_TO_RAD && 
                               fabs(getSpeed())<3.0f                )
     {
         new RescueAnimation(this, /*is_auto_rescue*/true);
@@ -1573,7 +1574,8 @@ void Kart::crashed(const Material *m)
     // FIXME: or should we try to add a 'proper' reflection, i.e. an
     // impulse depending on the vector and normal at the hit point?
     const LinearWorld *lw = dynamic_cast<LinearWorld*>(World::getWorld());
-    if(lw && m_vehicle->getCentralImpulseTime()<=0)
+    if(lw && m_vehicle->getCentralImpulseTime()<=0 &&
+        World::getWorld()->getTrack()->isPushBackEnabled())
     {
         int sector = lw->getSectorForKart(this);
         if(sector!=QuadGraph::UNKNOWN_SECTOR)
