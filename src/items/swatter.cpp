@@ -50,7 +50,7 @@
  *  was a bomb attached, it triggers the replace bomb animations.
  *  \param attachment The attachment instance where the swatter is attached to.
  *  \param kart The kart to which the swatter is attached.
- *  \param was_bomb True if the kart had a bomv as attachment.
+ *  \param was_bomb True if the kart had a bomb as attachment.
  *  \param bomb_scene_node The scene node of the bomb (i.e. the previous 
  *         attachment scene node).
  */
@@ -93,6 +93,11 @@ Swatter::Swatter(AbstractKart *kart, bool was_bomb,
  */
 Swatter::~Swatter()
 {
+    if(m_bomb_scene_node)
+    {
+        irr_driver->removeNode(m_bomb_scene_node);
+        m_bomb_scene_node = NULL;
+    }
     if (m_swat_sound)
     {
         sfx_manager->deleteSFX(m_swat_sound);
