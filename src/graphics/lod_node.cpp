@@ -58,6 +58,27 @@ void LODNode::render()
     //ISceneNode::render();
 }
 
+/** Returns the level to use, or -1 if the object is too far
+ *  away.
+ */
+int LODNode::getLevel()
+{
+    // TODO: optimize this, there is no need to check every frame
+    scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
+
+    // Assumes all children are at the same location
+    const int dist = 
+        (int)((getPosition() + m_nodes[0]->getPosition()).getDistanceFromSQ( curr_cam->getPosition() ));
+    
+    for (unsigned int n=0; n<m_detail.size(); n++)
+    {
+        if (dist < m_detail[n])
+          return n;
+    }
+    return -1;
+}  // getLevel
+
+
 void LODNode::OnAnimate(u32 timeMs)
 {
     if (isVisible())
@@ -65,9 +86,10 @@ void LODNode::OnAnimate(u32 timeMs)
         // update absolute position
         updateAbsolutePosition();
         
+        int level = getLevel();
         // Assume all the scene node have the same bouding box
-        // update the less detailed one (it might be the unanimated one)
-        m_nodes[m_detail.size()-1]->OnAnimate(timeMs);
+        if(level>=0)
+            m_nodes[level]->OnAnimate(timeMs);
 
         Box = m_nodes[m_detail.size()-1]->getBoundingBox();
 
@@ -92,29 +114,16 @@ void LODNode::OnRegisterSceneNode()
 {
     if (!isVisible()) return;
     if (m_nodes.size() == 0) return;
-    
-    // TODO: optimize this, there is no need to check every frame
-    scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
 
-    // Assumes all children are at the same location
-    const int dist = 
-        (int)((getPosition() + m_nodes[0]->getPosition()).getDistanceFromSQ( curr_cam->getPosition() ));
-    
     bool shown = false;
-    for (unsigned int n=0; n<m_detail.size(); n++)
+    int level = getLevel();
+    if (level>=0)
     {
-        if (dist < m_detail[n])
-        {
-            m_nodes[n]->updateAbsolutePosition();
-            m_nodes[n]->OnRegisterSceneNode();
-            shown = true;
-            break;
-        }
+        m_nodes[level]->updateAbsolutePosition();
+        m_nodes[level]->OnRegisterSceneNode();
+        shown = true;
     }
-    
-    //printf("m_group_name = %s, m_nodes.size() = %i\n, type is mesh = %i\n", m_group_name.c_str(), (int)m_nodes.size(),
-    //       m_nodes[0]->getType() == scene::ESNT_MESH);
-    
+        
     // support an optional, mostly hard-coded fade-in/out effect for objects with a single level
     if (m_nodes.size() == 1 && (m_nodes[0]->getType() == scene::ESNT_MESH ||
                                 m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH))

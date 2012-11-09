@@ -44,7 +44,7 @@ namespace irr
  * \brief manages smoke particle effects
  * \ingroup graphics
  */
-class LODNode : public scene::ISceneNode // scene::IDummyTransformationSceneNode
+class LODNode : public scene::ISceneNode
 {
 private:
     core::matrix4 RelativeTransformationMatrix;
@@ -57,6 +57,8 @@ private:
     
     std::string m_group_name;
     
+    int getLevel();
+
     enum PreviousVisibility
     {
         FIRST_PASS,
