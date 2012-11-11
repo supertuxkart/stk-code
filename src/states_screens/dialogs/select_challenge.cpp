@@ -37,25 +37,30 @@ using namespace GUIEngine;
 
 core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* c)
 {
-    core::stringw label = _("Number of AI Karts : %i",
-                            c->getNumKarts(difficulty) - 1);
+    core::stringw label;
     
     if (c->getPosition(difficulty) != -1)
     {
-        label.append(L"\n");
-        label.append( _("Required Rank : %i", c->getPosition(difficulty)) );
+        int r = c->getPosition(difficulty);
+        if (c->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER) r--;
+        
+        if (label.size() > 0) label.append(L"\n");
+        label.append( _("Required Rank : %i", r) );
     }
     if (c->getTime(difficulty) > 0)
     {
-        label.append(L"\n");
+        if (label.size() > 0) label.append(L"\n");
         label.append( _("Required Time : %i",
                         StringUtils::timeToString(c->getTime(difficulty)).c_str()) );
     }
     if (c->getEnergy(difficulty) > 0)
     {
-        label.append(L"\n");
+        if (label.size() > 0) label.append(L"\n");
         label.append( _("Required Nitro Points : %i", c->getEnergy(difficulty)) );
     }
+    
+    if (label.size() > 0) label.append(L"\n");
+    label.append(_("Number of AI Karts : %i", c->getNumKarts(difficulty) - 1));
     
     return label;
 }
