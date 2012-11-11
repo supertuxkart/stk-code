@@ -180,6 +180,9 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             if (gameCompleted)
             {
                 // clear the race
+                
+                // kart will no longer be available during cutscene, drop reference
+                StateManager::get()->getActivePlayer(playerID)->setKart(NULL);
                 World::deleteWorld();
                 
                 StateManager::get()->enterGameState();
