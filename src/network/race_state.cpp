@@ -175,8 +175,9 @@ void RaceState::receive(ENetPacket *pkt)
         signed char kart_id2 = getChar();
         if(kart_id2==-1)
         {   // kart - track collision
-            world->getKart(kart_id1)->crashed(NULL);
-            }
+            Vec3 normal(0, 1, 0);   // need to be fixed for online
+            world->getKart(kart_id1)->crashed(NULL, normal);
+        }
         else
         {
             // FIXME: KartKartCollision now takes information about the 

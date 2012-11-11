@@ -1549,7 +1549,7 @@ void Kart::crashed(AbstractKart *k, bool update_attachments)
 /** Kart hits the track with a given material.
  *  \param m Material hit, can be NULL if no specific material exists.
  */
-void Kart::crashed(const Material *m)
+void Kart::crashed(const Material *m, const Vec3 &normal)
 {
 #ifdef DEBUG
     // Simple debug output for people playing without sound.
@@ -1563,19 +1563,32 @@ void Kart::crashed(const Material *m)
         static int counter=0;
         printf("Kart %s hit track: %d material %s.\n", 
                getIdent().c_str(), counter++,
-               m->getTexFname().c_str());
+               m ? m->getTexFname().c_str() : "None");
     }
 #endif
 
+    const LinearWorld *lw = dynamic_cast<LinearWorld*>(World::getWorld());
+    if(getKartProperties()->getTerrainImpulseType()
+                             ==KartProperties::IMPULSE_NORMAL &&
+        m_vehicle->getCentralImpulseTime()<=0                     )
+    {
+        Vec3 impulse = normal;
+        if(impulse.getX() || impulse.getZ())
+            impulse.normalize();
+        else
+            impulse = Vec3(0, 0, -1); // Arbitrary
+        impulse *= m_kart_properties->getCollisionTerrainImpulse();
+        m_bounce_back_time = 0.2f;
+        m_vehicle->setTimedCentralImpulse(0.1f, impulse);
+    }
     // If there is a quad graph, push the kart towards the previous
     // graph node center (we have to use the previous point since the
     // kart might have only now reached the new quad, meaning the kart
     // would be pushed forward).
-    // FIXME: or should we try to add a 'proper' reflection, i.e. an
-    // impulse depending on the vector and normal at the hit point?
-    const LinearWorld *lw = dynamic_cast<LinearWorld*>(World::getWorld());
-    if(lw && m_vehicle->getCentralImpulseTime()<=0 &&
-        World::getWorld()->getTrack()->isPushBackEnabled())
+    else if(getKartProperties()->getTerrainImpulseType()
+                                 ==KartProperties::IMPULSE_TO_DRIVELINE &&
+            lw && m_vehicle->getCentralImpulseTime()<=0 &&
+            World::getWorld()->getTrack()->isPushBackEnabled())
     {
         int sector = lw->getSectorForKart(this);
         if(sector!=QuadGraph::UNKNOWN_SECTOR)

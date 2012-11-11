@@ -456,7 +456,12 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                 const Material *m 
                     = n>=0 ? upA->getPointerTriangleMesh()->getMaterial(n)
                            : NULL;
-                kart->crashed(m);
+                // I assume that the normal needs to be flipped in this case,
+                // but  I can't verify this since it appears that bullet
+                // always has the kart as object A, not B.
+                const btVector3 &normal = -contact_manifold->getContactPoint(0)
+                                                            .m_normalWorldOnB;
+                kart->crashed(m, normal);
             }
         }
         // 2) object a is a kart
@@ -471,7 +476,9 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                 const Material *m 
                     = n>=0 ? upB->getPointerTriangleMesh()->getMaterial(n)
                            : NULL;
-                kart->crashed(m);   // Kart hit track
+                const btVector3 &normal = contact_manifold->getContactPoint(0)
+                                                           .m_normalWorldOnB;
+                kart->crashed(m, normal);   // Kart hit track
             }
             else if(upB->is(UserPointer::UP_FLYABLE))
                 // 2.1 projectile hits kart

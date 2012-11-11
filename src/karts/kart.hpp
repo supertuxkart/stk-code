@@ -257,7 +257,7 @@ public:
     virtual void   setSquash        (float time, float slowdown);
 
     virtual void   crashed          (AbstractKart *k, bool update_attachments);
-    virtual void   crashed          (const Material *m);
+    virtual void   crashed          (const Material *m, const Vec3 &normal);
     virtual float  getHoT           () const;
     virtual void   update           (float dt);
     virtual void   finishedRace(float time);

@@ -379,7 +379,7 @@ public:
      *          other kart hit will be updated (e.g. bombs will be moved). */
     virtual void crashed(AbstractKart *k, bool update_attachments) = 0;
     // ------------------------------------------------------------------------
-    virtual void crashed(const Material *m) = 0;
+    virtual void crashed(const Material *m, const Vec3 &normal) = 0;
     // ------------------------------------------------------------------------
     /** Returns the height of the terrain. we're currently above */
     virtual float getHoT() const = 0;

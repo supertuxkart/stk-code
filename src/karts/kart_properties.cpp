@@ -93,6 +93,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_swatter_distance2 = m_swatter_duration = m_squash_slowdown =
         m_squash_duration = m_downward_impulse_factor = UNDEFINED;
 
+    m_terrain_impulse_type   = IMPULSE_NONE;
     m_gravity_center_shift   = Vec3(UNDEFINED);
     m_bevel_factor           = Vec3(UNDEFINED);
     m_exp_spring_response    = false;
@@ -443,6 +444,21 @@ void KartProperties::getAllData(const XMLNode * root)
         collision_node->get("terrain-impulse", &m_collision_terrain_impulse);
         collision_node->get("restitution",     &m_restitution              );
         collision_node->get("bevel-factor",    &m_bevel_factor             );
+        std::string s;
+        collision_node->get("impulse-type",    &s                          );
+        s = StringUtils::toLowerCase(s);
+        if(s=="none")
+            m_terrain_impulse_type = IMPULSE_NONE;
+        else if(s=="normal")
+            m_terrain_impulse_type = IMPULSE_NORMAL;
+        else if(s=="driveline")
+            m_terrain_impulse_type = IMPULSE_TO_DRIVELINE;
+        else
+        {
+            fprintf(stderr, "Missing or incorrect value for impulse-type: '%s'.\n",
+                            s.c_str());
+            exit(-1);
+        }
     }
 
     //TODO: wheel front right and wheel front left is not loaded, yet is 

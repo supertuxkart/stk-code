@@ -436,6 +436,18 @@
     <upright tolerance="0.2" max-force="30"/>
 
     <!-- collision
+         impulse-type: STK can apply an additional impulse in case of
+           kart-track collision:
+             'none' : no additional impulse
+             'normal': impulse along the normal
+             'driveline': impulse towards the nearest driveline.
+           An impulse towards the driveline works nice when the kart is
+           driving more or less correctly on the track - it pushes the 
+           kart in the right direction. But if the kart is significanlty
+           off track, it has severe problems (since an incorrect
+           driveline point can be selected, pusing the kart in the
+           wrong direction, sometimes even causing a 'zip-along-obstacle'
+           effect.
          impulse: an additional impulse to be applied in a non-frontal
            collision to push two karts away from each other.
          impulse-time: The impulse will be applied over a certain time
@@ -452,7 +464,8 @@
            bevelling, and uses a simple box shape.
            As an example, a value of 1 for x and z will result in a 
            sharp 'arrow' like shape.  -->
-    <collision impulse="3000" impulse-time="0.1" terrain-impulse="8000"
+    <collision impulse-type="normal" 
+               impulse="3000" impulse-time="0.1" terrain-impulse="8000"
                restitution="1.0" bevel-factor="0.5 0.0 0.5" />
 
     <!-- Kart-specific plunger and rubber band handling: max-length is
