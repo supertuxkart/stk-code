@@ -21,7 +21,7 @@
 
 //The AI debugging works best with just 1 AI kart, so set the number of karts
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
-#undef AI_DEBUG
+#define AI_DEBUG
 
 #include "karts/controller/end_controller.hpp"
 
@@ -296,7 +296,7 @@ void EndController::findNonCrashingPoint(Vec3 *result)
 
             //If we are outside, the previous sector is what we are looking for
             if ( distance + m_kart_width * 0.5f 
-                 > QuadGraph::get()->getNode(sector).getPathWidth() )
+                 > QuadGraph::get()->getNode(sector).getPathWidth()*0.5f )
             {
                 *result = QuadGraph::get()->getQuadOfNode(sector).getCenter();
                 return;
