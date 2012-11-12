@@ -686,7 +686,7 @@ void RaceResultGUI::determineGPLayout()
         ri->m_y_pos          = (float)(m_top+rank*m_distance_between_rows);
         int p                = race_manager->getKartPrevScore(kart_id);
         ri->m_current_displayed_points = (float)p;
-        ri->m_new_points     =  kart->isEliminated() ? 0 :
+        ri->m_new_points     = 
             (float)race_manager->getPositionScore(kart->getPosition());
     }
 
