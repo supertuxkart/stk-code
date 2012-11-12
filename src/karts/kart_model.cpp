@@ -531,7 +531,7 @@ void KartModel::update(float rotation_dt, float steer, const float suspension[4]
     {
         if(!m_wheel_node[i]) continue;
 #ifdef DEBUG
-        if(UserConfigParams::m_physics_debug)
+        if(UserConfigParams::m_physics_debug && m_kart)
         {
             // Make wheels that are not touching the ground invisible
             bool wheel_has_contact = 
