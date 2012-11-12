@@ -138,6 +138,8 @@ public:
     /** Returns if this is the first time the intro is shown. */
     bool       isFirstTime() const   { return m_first_time; }
     // ------------------------------------------------------------------------
+    const Challenge *getCurrentChallenge() const { return m_current_challenge; }
+    // ------------------------------------------------------------------------
     /** Returns a challenge given the challenge id. 
      */
     const Challenge* getChallenge(const std::string& id) const

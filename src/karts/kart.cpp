@@ -29,6 +29,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/material_manager.hpp"
@@ -776,9 +777,19 @@ void Kart::finishedRace(float time)
         // in modes that support it, start end animation
         setController(new EndController(this, m_controller->getPlayer(),
                                         m_controller));
-        if(m_race_position<=0.5f*race_manager->getNumberOfKarts() ||
-            m_race_position==1)
-            m_kart_model->setAnimation(KartModel::AF_WIN_START);
+        GameSlot *slot = unlock_manager->getCurrentSlot();
+        const Challenge *challenge = slot->getCurrentChallenge();
+        if(challenge)
+        {
+            if(challenge->getData()->isChallengeFulfilled())
+                m_kart_model->setAnimation(KartModel::AF_WIN_START);
+            else 
+                m_kart_model->setAnimation(KartModel::AF_LOSE_START);
+
+        }
+        else if(m_race_position<=0.5f*race_manager->getNumberOfKarts() ||
+                m_race_position==1)
+                m_kart_model->setAnimation(KartModel::AF_WIN_START);
         else 
             m_kart_model->setAnimation(KartModel::AF_LOSE_START);
         
