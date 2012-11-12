@@ -169,6 +169,8 @@ void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d,
         std::map<std::string,bool>::iterator p=m_locked_features.find(feature);
         if (p == m_locked_features.end())
         {
+            c->setSolved(d);
+            if(do_save) unlock_manager->save();
             return;
         }
         m_locked_features.erase(p);
