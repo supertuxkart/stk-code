@@ -90,7 +90,7 @@ Track::Track(const std::string &filename)
     m_internal              = false;
     m_enable_auto_rescue    = true;  // Below set to false in arenas
     m_enable_push_back      = true;
-    m_reverse_available     = true;
+    m_reverse_available     = false;
     m_is_arena              = false;
     m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
