@@ -663,7 +663,7 @@ namespace StringUtils
 	    // of 9 to versions which are not a RC. We assert that any RC
 	    // is less than 9 to guarantee the ordering.
 	    int release_candidate=9;
-	    if(sscanf(s.substr(s.length()-4, 4).c_str(), "-rc%d", 
+	    if(s.length()>4 && sscanf(s.substr(s.length()-4, 4).c_str(), "-rc%d", 
 			    &release_candidate)==1)
 	    {
 		    s = s.substr(0, s.length()-4);
@@ -681,7 +681,7 @@ namespace StringUtils
 	    }
 	    std::vector<std::string> l = StringUtils::split(s, '.');
 	    while(l.size()<3)
-		    l.push_back(0);
+		    l.push_back("0");
 	    int version = 1000000*atoi(l[0].c_str())
 				    +   10000*atoi(l[1].c_str())
 				    +     100*atoi(l[2].c_str())
