@@ -7,10 +7,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bullet_lib", "bullet_lib.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "enet", "enet.vcxproj", "{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Irrlicht", "..\..\..\lib\irrlicht\source\Irrlicht\Irrlicht10.0.vcxproj", "{E08E042A-6C45-411B-92BE-3CC31331019F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|Win32 = debug|Win32
 		debug|x64 = debug|x64
+		Release - Fast FPU|Win32 = Release - Fast FPU|Win32
+		Release - Fast FPU|x64 = Release - Fast FPU|x64
 		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
 	EndGlobalSection
@@ -19,6 +23,10 @@ Global
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.debug|Win32.Build.0 = debug|Win32
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.debug|x64.ActiveCfg = debug|x64
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.debug|x64.Build.0 = debug|x64
+		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.Release - Fast FPU|Win32.ActiveCfg = Release|Win32
+		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.Release - Fast FPU|Win32.Build.0 = Release|Win32
+		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.Release - Fast FPU|x64.ActiveCfg = Release|x64
+		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.Release - Fast FPU|x64.Build.0 = Release|x64
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.Release|Win32.ActiveCfg = Release|Win32
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.Release|Win32.Build.0 = Release|Win32
 		{B1BC2764-1A43-4800-A654-788B0D05EDA2}.Release|x64.ActiveCfg = Release|x64
@@ -27,6 +35,10 @@ Global
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.debug|Win32.Build.0 = debug|Win32
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.debug|x64.ActiveCfg = debug|x64
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.debug|x64.Build.0 = debug|x64
+		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.Release - Fast FPU|Win32.ActiveCfg = Release|Win32
+		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.Release - Fast FPU|Win32.Build.0 = Release|Win32
+		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.Release - Fast FPU|x64.ActiveCfg = Release|x64
+		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.Release - Fast FPU|x64.Build.0 = Release|x64
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.Release|Win32.ActiveCfg = Release|Win32
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.Release|Win32.Build.0 = Release|Win32
 		{54AA44B9-B07B-49DA-8B1A-05BBFE8AD5D4}.Release|x64.ActiveCfg = Release|x64
@@ -35,10 +47,25 @@ Global
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.debug|Win32.Build.0 = debug|Win32
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.debug|x64.ActiveCfg = debug|x64
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.debug|x64.Build.0 = debug|x64
+		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release - Fast FPU|Win32.ActiveCfg = Release|Win32
+		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release - Fast FPU|Win32.Build.0 = Release|Win32
+		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release - Fast FPU|x64.ActiveCfg = Release|x64
+		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release - Fast FPU|x64.Build.0 = Release|x64
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release|Win32.ActiveCfg = Release|Win32
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release|Win32.Build.0 = Release|Win32
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release|x64.ActiveCfg = Release|x64
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release|x64.Build.0 = Release|x64
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.debug|Win32.ActiveCfg = Static lib - Release|x64
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.debug|x64.ActiveCfg = Static lib - Debug|x64
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.debug|x64.Build.0 = Static lib - Debug|x64
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.Release - Fast FPU|Win32.ActiveCfg = Static lib - Release - Fast FPU|Win32
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.Release - Fast FPU|Win32.Build.0 = Static lib - Release - Fast FPU|Win32
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.Release - Fast FPU|x64.ActiveCfg = Static lib - Debug|x64
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.Release - Fast FPU|x64.Build.0 = Static lib - Debug|x64
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.Release|Win32.ActiveCfg = Static lib - Release|Win32
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.Release|Win32.Build.0 = Static lib - Release|Win32
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.Release|x64.ActiveCfg = Static lib - Release|x64
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.Release|x64.Build.0 = Static lib - Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -79,7 +79,7 @@
     <ClCompile>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";ENABLE_BIDI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";ENABLE_BIDI;ADDONS_MANAGER;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -89,7 +89,7 @@
     <Link>
       <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib.release;ws2_32.lib;fribidi.lib;pthreadVC2.lib;libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)/$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../dependencies/lib;../../../lib/irrlicht/lib/Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -105,7 +105,7 @@
     <ClCompile>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";ENABLE_BIDI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";ENABLE_BIDI;WIN64;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -132,7 +132,7 @@
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ADDONS_MANAGER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <MinimalRebuild>true</MinimalRebuild>
@@ -147,7 +147,7 @@
     <Link>
       <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib;ws2_32.lib;fribidi.lib;pthreadVC2.lib;libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
-      <AdditionalLibraryDirectories>../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../dependencies/lib;../../../lib/irrlicht/lib/Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -169,8 +169,8 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ADDONS_MANAGER;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ADDONS_MANAGER;_WIN64;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -186,7 +186,7 @@
     <Link>
       <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib;ws2_32.lib;fribidi.lib;libpthread.a;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
-      <AdditionalLibraryDirectories>../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../dependencies/lib;../../../lib/irrlicht/lib/Win64-VisualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -713,6 +713,14 @@
     <ClInclude Include="..\..\tutorial\tutorial_manager.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\lib\irrlicht\source\Irrlicht\Irrlicht10.0.vcxproj">
+      <Project>{e08e042a-6c45-411b-92be-3cc31331019f}</Project>
+      <Private>true</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
     <ProjectReference Include="bullet_lib.vcxproj">
       <Project>{54aa44b9-b07b-49da-8b1a-05bbfe8ad5d4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
