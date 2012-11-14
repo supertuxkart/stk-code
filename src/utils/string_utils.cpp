@@ -674,7 +674,7 @@ namespace StringUtils
 		    assert(release_candidate<9);
 	    }
 	    int very_minor=0;
-	    if(s[s.size()-1]>='a' && s[s.size()-1]<='z')
+	    if(s.length()>0 && s[s.size()-1]>='a' && s[s.size()-1]<='z')
 	    {
 		    very_minor = s[s.size()-1]-'a'+1;
 		    s = s.substr(0, s.size()-1);
