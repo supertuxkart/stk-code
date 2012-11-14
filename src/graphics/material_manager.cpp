@@ -171,9 +171,12 @@ void MaterialManager::loadMaterial()
 {
     // Use temp material for reading, but then set the shared
     // material index later, so that these materials are not popped
-    const std::string fname     = "materials.xml";
-    std::string       full_name = file_manager->getTextureFile(fname);
-    addSharedMaterial(full_name);
+    addSharedMaterial(file_manager->getTextureDir()+"materials.xml");
+    std::string deprecated = file_manager->getTextureDir()
+                           + "deprecated/materials.xml";
+    if(file_manager->fileExists(deprecated))
+        addSharedMaterial(deprecated);
+
     // Save index of shared textures
     m_shared_material_index = (int)m_materials.size();
 }   // MaterialManager

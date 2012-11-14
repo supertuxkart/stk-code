@@ -188,7 +188,8 @@ void FileManager::reInit()
     m_file_system->grab();
     TrackManager::addTrackSearchDir(m_root_dir+"/data/tracks");
     KartPropertiesManager::addKartSearchDir(m_root_dir+"/data/karts");
-    pushTextureSearchPath(m_root_dir+"/data/textures/");
+    pushTextureSearchPath(getTextureDir());
+    pushTextureSearchPath(getTextureDir()+"/deprecated");
     pushModelSearchPath  (m_root_dir+"/data/models/"  );
     pushMusicSearchPath  (m_root_dir+"/data/music/"   );
 
@@ -254,6 +255,7 @@ FileManager::~FileManager()
     // =============================
     popMusicSearchPath();
     popModelSearchPath();
+    popTextureSearchPath();
     popTextureSearchPath();
     m_file_system->drop();
     m_file_system = NULL;
@@ -435,6 +437,14 @@ std::string FileManager::getGUIDir() const
 {
     return m_root_dir+"/data/gui/";
 }   // getGUIDir
+
+//-----------------------------------------------------------------------------
+/** Returns the base directory for all textures.
+ */
+std::string FileManager::getTextureDir() const
+{
+    return m_root_dir+"/data/textures/";
+}   // getTextureDir
 
 //-----------------------------------------------------------------------------
 /** Returns the translation directory.

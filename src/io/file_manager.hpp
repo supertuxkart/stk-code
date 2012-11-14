@@ -77,6 +77,7 @@ public:
     XMLNode          *createXMLTree(const std::string &filename);
 
     std::string       getConfigDir() const;
+    std::string       getTextureDir() const;
     bool              checkAndCreateDirectoryP(const std::string &path);
     const std::string &getAddonsDir() const;
     std::string        getAddonsFile(const std::string &name);
