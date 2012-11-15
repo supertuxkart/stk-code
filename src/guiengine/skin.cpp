@@ -1136,6 +1136,8 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget, 
                            const bool pressed, bool focused)
 {
+    if (!widget->isVisible()) return;
+    
     if (!focused)
     {
         IGUIElement* focused_widget = NULL;
@@ -1267,7 +1269,9 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
  */
 void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget, 
                             const bool pressed, bool focused)
-{    
+{
+    if (!widget->isVisible()) return;
+    
     if (pressed)
     {
         Widget* spinner = widget->m_event_handler;

@@ -247,6 +247,8 @@ public:
     ModelViewWidget* m_model_view;
     LabelWidget* m_kart_name;
     
+    KartSelectionScreen* m_parent_screen;
+    
     gui::IGUIStaticText* m_ready_text;
     
     //LabelWidget *getPlayerIDLabel() {return m_player_ID_label;}
@@ -264,6 +266,7 @@ public:
         m_magic_number = 0x33445566;
 #endif
         m_ready_text = NULL;
+        m_parent_screen = parent;
         
         m_associatedPlayer = associatedPlayer;
         x_speed = 1.0f;
@@ -302,7 +305,7 @@ public:
                 m_player_ident_spinner->setBadge(GAMEPAD_BADGE);
             }
         }
-        
+
         if (irrlichtWidgetID == -1)
         {
             m_player_ident_spinner->m_tab_down_root = g_root_id;
@@ -310,13 +313,21 @@ public:
         
         spinnerID = StringUtils::insertValues("@p%i_spinner", m_playerID);
         
-        const int playerAmount = UserConfigParams::m_all_players.size();
-        m_player_ident_spinner->m_properties[PROP_MIN_VALUE] = "0";
-        m_player_ident_spinner->m_properties[PROP_MAX_VALUE] = 
-                                         StringUtils::toString(playerAmount-1);
         m_player_ident_spinner->m_properties[PROP_ID] = spinnerID;
-        m_player_ident_spinner->m_properties[PROP_WRAP_AROUND] = "true";
-
+        if (parent->m_multiplayer)
+        {
+            const int playerAmount = UserConfigParams::m_all_players.size();
+            m_player_ident_spinner->m_properties[PROP_MIN_VALUE] = "0";
+            m_player_ident_spinner->m_properties[PROP_MAX_VALUE] = 
+                                             StringUtils::toString(playerAmount-1);
+            m_player_ident_spinner->m_properties[PROP_WRAP_AROUND] = "true";
+        }
+        else
+        {
+            m_player_ident_spinner->m_properties[PROP_MIN_VALUE] = "0";
+            m_player_ident_spinner->m_properties[PROP_MAX_VALUE] = "0";
+        }
+        
         //m_player_ident_spinner->m_event_handler = this;
         m_children.push_back(m_player_ident_spinner);
         
@@ -509,16 +520,24 @@ public:
         m_model_view->update(0);
         
         m_player_ident_spinner->clearLabels();
-        const int playerAmount = UserConfigParams::m_all_players.size();
-        for (int n=0; n<playerAmount; n++)
+        if (m_parent_screen->m_multiplayer)
         {
-            core::stringw name = UserConfigParams::m_all_players[n].getName();
-            m_player_ident_spinner->addLabel( translations->fribidize(name) );
+            const int playerAmount = UserConfigParams::m_all_players.size();
+            for (int n=0; n<playerAmount; n++)
+            {
+                core::stringw name = UserConfigParams::m_all_players[n].getName();
+                m_player_ident_spinner->addLabel( translations->fribidize(name) );
+            }
+            
+            // select the right player profile in the spinner
+            m_player_ident_spinner->setValue(m_associatedPlayer->getProfile()
+                                                               ->getName()   );
         }
-        
-        // select the right player profile in the spinner
-        m_player_ident_spinner->setValue(m_associatedPlayer->getProfile()
-                                                           ->getName()   );
+        else
+        {
+            m_player_ident_spinner->addLabel( m_associatedPlayer->getProfile()->getName() );
+            m_player_ident_spinner->setVisible(false);
+        }
         
         assert(m_player_ident_spinner->getStringValue() == 
                  m_associatedPlayer->getProfile()->getName());
@@ -720,9 +739,13 @@ public:
                                       .c_str()).c_str() 
                           << std::endl;
             }
-            m_associatedPlayer->setPlayerProfile( 
-                UserConfigParams::m_all_players.get(m_player_ident_spinner
-                                                    ->getValue()) );
+            
+            if (m_parent_screen->m_multiplayer)
+            {
+                m_associatedPlayer->setPlayerProfile( 
+                    UserConfigParams::m_all_players.get(m_player_ident_spinner
+                                                        ->getValue()) );
+            }
         }
 
         return EVENT_LET; // continue propagating the event
@@ -1810,9 +1833,12 @@ bool KartSelectionScreen::validateIdentChoices()
             m_kart_widgets[n].m_player_ident_spinner->markAsCorrect();
             
             // verify internal consistency in debug mode
-            assert( m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
-                   UserConfigParams::m_all_players.get(m_kart_widgets[n]
-                                    .m_player_ident_spinner->getValue()) );
+            if (m_multiplayer)
+            {
+                assert( m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
+                       UserConfigParams::m_all_players.get(m_kart_widgets[n]
+                                        .m_player_ident_spinner->getValue()) );
+            }
         }
     }
     
