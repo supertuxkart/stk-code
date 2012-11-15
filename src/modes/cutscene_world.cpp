@@ -392,7 +392,7 @@ void CutsceneWorld::enterRaceOverState()
                 unlock_manager->save();
                 KartSelectionScreen* s = KartSelectionScreen::getInstance();
                 s->setMultiplayer(false);
-                s->setFromOverworld(true);
+                s->setGoToOverworldNext();
                 StateManager::get()->pushScreen( s );
             }
         }

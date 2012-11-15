@@ -54,6 +54,9 @@ class KartSelectionScreen : public GUIEngine::Screen,
     /** Whether this screen is being visited from overworld or not */
     bool m_from_overworld;
     
+    bool m_go_to_overworld_next;
+    
+    
     KartSelectionScreen();
     
     /** Stores whether any player confirmed their choice; then, some things 
@@ -98,6 +101,8 @@ public:
     
     /** \brief Set whether this screen is being visited from overworld or not */
     void setFromOverworld(bool from_overworld) { m_from_overworld = from_overworld; }
+    
+    void setGoToOverworldNext() { m_go_to_overworld_next = true; }
     
     /** \brief Called when a player hits 'fire'/'select' on his device to 
      *  join the game */

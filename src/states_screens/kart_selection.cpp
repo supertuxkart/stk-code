@@ -947,9 +947,10 @@ public:
 
 KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
 {
-    m_removed_widget      = NULL;
-    m_multiplayer_message = NULL;
-    m_from_overworld      = false;
+    m_removed_widget       = NULL;
+    m_multiplayer_message  = NULL;
+    m_from_overworld       = false;
+    m_go_to_overworld_next = false;
 }   // KartSelectionScreen
 
 // ----------------------------------------------------------------------------
@@ -1601,6 +1602,8 @@ void KartSelectionScreen::eventCallback(Widget* widget,
     }
     else if (name == "back")
     {
+        m_go_to_overworld_next = false; // valid once
+        
         if (m_from_overworld)
         {
             m_from_overworld = false; // valid once
@@ -1638,6 +1641,8 @@ void KartSelectionScreen::setMultiplayer(bool multiplayer)
 
 bool KartSelectionScreen::onEscapePressed()
 {
+    m_go_to_overworld_next = false; // valid once
+    
     if (m_from_overworld)
     {
         m_from_overworld = false; // valid once
@@ -1775,9 +1780,10 @@ void KartSelectionScreen::allPlayersDone()
     }
     
     // ---- Go to next screen or return to overworld
-    if (m_from_overworld)
+    if (m_from_overworld || m_go_to_overworld_next)
     {
         m_from_overworld = false; // valid once
+        m_go_to_overworld_next = false;
         OverWorld::enterOverWorld();
     }
     else
