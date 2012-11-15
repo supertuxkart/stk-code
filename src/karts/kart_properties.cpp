@@ -62,8 +62,7 @@ KartProperties::KartProperties(const std::string &filename)
     // if everything is defined properly.
     m_mass = m_brake_factor = m_engine_power[0] = m_engine_power[1] =
         m_engine_power[2] = m_max_speed[0] = m_max_speed[1] = m_max_speed[2] =
-        m_time_full_steer = m_time_reset_steer = 
-        m_nitro_consumption = m_nitro_engine_force =
+        m_time_reset_steer = m_nitro_consumption = m_nitro_engine_force =
         m_nitro_small_container = m_nitro_big_container = m_nitro_max = 
         m_nitro_max_speed_increase = m_nitro_duration = m_nitro_fade_out_time =
         m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
@@ -601,7 +600,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     }
 
     CHECK_NEG(m_mass,                       "mass"                          );
-    CHECK_NEG(m_time_full_steer,            "turn time-full-steer"          );
     CHECK_NEG(m_time_reset_steer,           "turn time-reset-steer"         );
     CHECK_NEG(m_wheel_damping_relaxation,   "wheels damping-relaxation"     );
     CHECK_NEG(m_wheel_damping_compression,  "wheels damping-compression"    );

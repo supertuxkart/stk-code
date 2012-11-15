@@ -56,8 +56,14 @@ public:
         if(m_y.size()>1)
         {
             const unsigned int last=m_x.size()-1;
-            m_delta.push_back( (m_y[last]-m_y[last-1]) 
-                              /(m_x[last]-m_x[last-1]) );
+            // Avoid division by zero, just set m_delta to a large
+            // value with the right sign
+            if(m_x[last]==m_x[last-1])
+                m_delta.push_back( (m_y[last]-m_y[last-1])
+                                  / 0.001f                 );
+            else
+                m_delta.push_back( (m_y[last]-m_y[last-1]) 
+                                 /(m_x[last]-m_x[last-1])  );
         }
         return 1;
     }   // push_back

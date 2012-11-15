@@ -117,8 +117,10 @@ public:
      *  speed. */
     virtual float getMaxSteerAngle () const = 0;
     // ------------------------------------------------------------------------
-    /** Returns the time till full steering is reached for this kart. */
-    virtual float getTimeFullSteer() const = 0;
+    /** Returns the time till full steering is reached for this kart. 
+     *  This can depend on the current steering value, which must be >= 0.
+     */
+    virtual float getTimeFullSteer(float steer) const = 0;
 
     // ========================================================================
     // Attachment related functions.

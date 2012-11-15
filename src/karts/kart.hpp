@@ -337,9 +337,13 @@ public:
     const video::SColor &getColor() const 
                                         {return m_kart_properties->getColor();}
     // ------------------------------------------------------------------------
-    /** Returns the time till full steering is reached for this kart. */
-    virtual float getTimeFullSteer() const 
-                              { return m_kart_properties->getTimeFullSteer(); }
+    /** Returns the time till full steering is reached for this kart.
+     *  \param steer Current steer value (must be >=0), on which the time till
+     *         full steer depends. */
+    virtual float getTimeFullSteer(float steer) const 
+    { 
+        return m_kart_properties->getTimeFullSteer(steer);
+    }   // getTimeFullSteer
     // ------------------------------------------------------------------------
     /** Returns the maximum steering angle for this kart, which depends on the
      *  speed. */

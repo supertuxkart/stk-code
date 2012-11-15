@@ -119,20 +119,25 @@ private:
                                        *   drawing the dot on the mini map. */
     // Physic properties
     // -----------------
-    float m_mass;                     /**< Weight of kart.  */
-    float m_engine_power[3];          /**< Maximum force from engine for each
-                                       *   difficulty. */
-    float m_brake_factor;             /**< Braking factor * engine_power =
-                                       *   braking force. */
-    float m_time_full_steer;          /**< Time for player karts to reach full
-                                       *   steer angle. */
-    float m_time_reset_steer;         /**< Time for steering to go back to 
-                                           zero from full steer. */
+    /** Weight of kart.  */
+    float m_mass;
+
+    /** Maximum force from engine for eachdifficulty. */
+    float m_engine_power[3];
+
+    /** Braking factor * engine_power braking force. */
+    float m_brake_factor;
+
+    /** Time for player karts to reach full steer angle. */
+    InterpolationArray m_time_full_steer;
+
+    /** Time for steering to go back to zero from full steer. */
+    float m_time_reset_steer;
 
     /** The turn angle depending on speed. */
     InterpolationArray m_turn_angle_at_speed;
 
-    /** If != 0 a bevelled box shape is used by using a point cloud as a 
+    /** If != 0 a bevelled box shape is used by using a point cloud as a
      *  collision shape. */
     Vec3  m_bevel_factor;
 
@@ -421,8 +426,13 @@ public:
                         {return m_engine_power[race_manager->getDifficulty()];}
 
     /** Returns the time the kart needs to fully steer in one direction from 
-     *  steering straight. */
-    float getTimeFullSteer          () const {return m_time_full_steer;       }
+     *  steering straight depending on the current steering value.
+     *  \param steer Current steering value, must be >=0. */
+    float getTimeFullSteer(float steer) const 
+    {
+        assert(steer>=0);
+        return m_time_full_steer.get(steer); 
+    }   // getTimeFullSteer
 
     /** Returns the time the kart needs to go back to steering straight from
      *  full steer. */
