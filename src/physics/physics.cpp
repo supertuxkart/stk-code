@@ -343,13 +343,19 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
     // More driving towards left --> left kart gets bigger impulse
     if(vel_diff<0)
     {
-        f_left *= 1.0f - vel_diff/fabsf(vel_left);
+        // Avoid too large impulse for karts that are driving
+        // slow (and division by zero)
+        if(fabsf(vel_left)>2.0f)
+            f_left *= 1.0f - vel_diff/fabsf(vel_left);
         if(f_left > 2.0f)
             f_left = 2.0f;
     }
     else
     {
-        f_right *= 1.0f + vel_diff/fabsf(vel_right);
+        // Avoid too large impulse for karts that are driving
+        // slow (and division by zero)
+        if(fabsf(vel_right)>2.0f)
+            f_right *= 1.0f + vel_diff/fabsf(vel_right);
         if(f_right > 2.0f)
             f_right = 2.0f;
     }
