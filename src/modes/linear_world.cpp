@@ -142,7 +142,8 @@ void LinearWorld::update(float dt)
     if (m_last_lap_sfx_playing && 
         m_last_lap_sfx->getStatus() != SFXManager::SFX_PLAYING)
     {
-        music_manager->getCurrentMusic()->resetTemporaryVolume();
+        if(music_manager->getCurrentMusic())
+            music_manager->getCurrentMusic()->resetTemporaryVolume();
         m_last_lap_sfx_playing = false;
     }
     
