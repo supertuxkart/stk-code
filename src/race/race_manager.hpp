@@ -682,6 +682,11 @@ public:
         m_kart_last_position_on_overworld = pos;
     }
     // ------------------------------------------------------------------------
+    void clearKartLastPositionOnOverworld()
+    {
+        m_have_kart_last_position_on_overworld = false;
+    }
+    // ------------------------------------------------------------------------
     Vec3 getKartLastPositionOnOverworld()
     { 
         return m_kart_last_position_on_overworld;
