@@ -820,10 +820,12 @@ bool Track::loadMainTrack(const XMLNode &root)
             bool shown = (unlock_manager->getCurrentSlot()->getPoints() < val);
             m_force_fields.push_back(OverworldForceField(xyz, shown, val));
             
-            m_challenges[closest_challenge_id].setForceField(m_force_fields[m_force_fields.size() - 1]);
+            m_challenges[closest_challenge_id].setForceField(
+                                 m_force_fields[m_force_fields.size() - 1]);
             
             core::stringw msg = StringUtils::toWString(val);
-            core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()->getDimension(msg.c_str());
+            core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()
+                                                   ->getDimension(msg.c_str());
             scene::ISceneManager* sm = irr_driver->getSceneManager();
                             
             assert(GUIEngine::getHighresDigitFont() != NULL);
@@ -843,18 +845,19 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else if (condition == "allchallenges")
         {
-            int unlockedChallenges = 0;
+            unsigned int unlocked_challenges = 0;
             GameSlot* slot = unlock_manager->getCurrentSlot();
             for (unsigned int c=0; c<m_challenges.size(); c++)
             {
-                if (slot->getChallenge(m_challenges[c].m_challenge_id)->isSolvedAtAnyDifficulty())
+                if (slot->getChallenge(m_challenges[c].m_challenge_id)
+                        ->isSolvedAtAnyDifficulty())
                 {
-                    unlockedChallenges++;
+                    unlocked_challenges++;
                 }
             }
             
             // allow ONE unsolved challenge : the last one
-            if (unlockedChallenges < m_challenges.size() - 1) continue;
+            if (unlocked_challenges < m_challenges.size() - 1) continue;
         }
         else if (condition.size() > 0)
         {
@@ -869,22 +872,24 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else if (neg_condition == "allchallenges")
         {
-            int unlockedChallenges = 0;
+            unsigned int unlocked_challenges = 0;
             GameSlot* slot = unlock_manager->getCurrentSlot();
             for (unsigned int c=0; c<m_challenges.size(); c++)
             {
-                if (slot->getChallenge(m_challenges[c].m_challenge_id)->isSolvedAtAnyDifficulty())
+                if (slot->getChallenge(m_challenges[c].m_challenge_id)
+                        ->isSolvedAtAnyDifficulty())
                 {
-                    unlockedChallenges++;
+                    unlocked_challenges++;
                 }
             }
             
             // allow ONE unsolved challenge : the last one
-            if (unlockedChallenges >= m_challenges.size() - 1) continue;
+            if (unlocked_challenges >= m_challenges.size() - 1) continue;
         }
         else if (neg_condition.size() > 0)
         {
-            fprintf(stderr, "[Track] WARNING: unknown condition <%s>\n", neg_condition.c_str());
+            fprintf(stderr, "[Track] WARNING: unknown condition <%s>\n", 
+                    neg_condition.c_str());
         }
         
         bool tangent = false;
