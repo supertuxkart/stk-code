@@ -841,6 +841,21 @@ bool Track::loadMainTrack(const XMLNode &root)
             m_all_nodes.push_back(sn);
             if (!shown) continue;
         }
+        else if (condition == "allchallenges")
+        {
+            int unlockedChallenges = 0;
+            GameSlot* slot = unlock_manager->getCurrentSlot();
+            for (unsigned int c=0; c<m_challenges.size(); c++)
+            {
+                if (slot->getChallenge(m_challenges[c].m_challenge_id)->isSolvedAtAnyDifficulty())
+                {
+                    unlockedChallenges++;
+                }
+            }
+            
+            // allow ONE unsolved challenge : the last one
+            if (unlockedChallenges < m_challenges.size() - 1) continue;
+        }
         else if (condition.size() > 0)
         {
             fprintf(stderr, "[Track] WARNING: unknown condition <%s>\n", condition.c_str());
@@ -851,6 +866,21 @@ bool Track::loadMainTrack(const XMLNode &root)
         if (neg_condition == "splatting")
         {
             if (irr_driver->supportsSplatting()) continue;
+        }
+        else if (neg_condition == "allchallenges")
+        {
+            int unlockedChallenges = 0;
+            GameSlot* slot = unlock_manager->getCurrentSlot();
+            for (unsigned int c=0; c<m_challenges.size(); c++)
+            {
+                if (slot->getChallenge(m_challenges[c].m_challenge_id)->isSolvedAtAnyDifficulty())
+                {
+                    unlockedChallenges++;
+                }
+            }
+            
+            // allow ONE unsolved challenge : the last one
+            if (unlockedChallenges >= m_challenges.size() - 1) continue;
         }
         else if (neg_condition.size() > 0)
         {
