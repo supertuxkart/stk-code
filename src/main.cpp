@@ -967,6 +967,8 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( !strcmp(argv[i], "--demo-mode") && i+1<argc)
         {
+            unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
+                                       .getUniqueID()                    );
             float t;
             StringUtils::fromString(argv[i+1], t);
             DemoWorld::enableDemoMode(t);
