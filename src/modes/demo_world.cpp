@@ -18,6 +18,7 @@
 
 #include "modes/demo_world.hpp"
 
+#include "guiengine/modaldialog.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "network/network_manager.hpp"
@@ -101,6 +102,10 @@ void DemoWorld::enterRaceOverState()
  */
 bool DemoWorld::updateIdleTimeAndStartDemo(float dt) 
 {
+    // We get crashes if stk is activated when a modal dialog is open
+    if(GUIEngine::ModalDialog::isADialogActive())
+        return false;
+
     m_current_idle_time += dt; 
     if(m_current_idle_time <= m_max_idle_time)
         return false;
