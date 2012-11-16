@@ -911,6 +911,10 @@ void RaceResultGUI::cleanupGPProgress()
 // ----------------------------------------------------------------------------
 void RaceResultGUI::displayHighScores()
 {
+    // This happens in demo world
+    if(!World::getWorld())
+        return;
+
     Highscores* scores = World::getWorld()->getHighscores();
     // In some case for exemple FTL they will be no highscores
     if (scores != NULL)
