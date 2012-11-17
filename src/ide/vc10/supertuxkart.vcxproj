@@ -131,7 +131,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>

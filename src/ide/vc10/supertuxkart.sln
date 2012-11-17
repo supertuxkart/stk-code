@@ -55,7 +55,8 @@ Global
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release|Win32.Build.0 = Release|Win32
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release|x64.ActiveCfg = Release|x64
 		{B0E92B97-089A-4D5B-BF17-77F1BC5DAEEF}.Release|x64.Build.0 = Release|x64
-		{E08E042A-6C45-411B-92BE-3CC31331019F}.debug|Win32.ActiveCfg = Static lib - Release|x64
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.debug|Win32.ActiveCfg = Static lib - Debug|Win32
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.debug|Win32.Build.0 = Static lib - Debug|Win32
 		{E08E042A-6C45-411B-92BE-3CC31331019F}.debug|x64.ActiveCfg = Static lib - Debug|x64
 		{E08E042A-6C45-411B-92BE-3CC31331019F}.debug|x64.Build.0 = Static lib - Debug|x64
 		{E08E042A-6C45-411B-92BE-3CC31331019F}.Release - Fast FPU|Win32.ActiveCfg = Static lib - Release - Fast FPU|Win32
