@@ -66,9 +66,15 @@ void TriangleMesh::addTriangle(const btVector3 &t1, const btVector3 &t2,
                                const Material* m)
 {
     m_triangleIndex2Material.push_back(m);
-    m_normals.push_back(n1);
-    m_normals.push_back(n2);
-    m_normals.push_back(n3);
+
+    btVector3 normal = (t2-t1).cross(t3-t1);
+    normal.normalize();
+    m_normals.push_back( normal.angle(n1)>stk_config->m_smooth_angle_limit
+                         ? normal : n1                                     );
+    m_normals.push_back( normal.angle(n2)>stk_config->m_smooth_angle_limit
+                         ? normal : n2                                     );
+    m_normals.push_back( normal.angle(n3)>stk_config->m_smooth_angle_limit
+                         ? normal : n3                                     );
     m_mesh.addTriangle(t1, t2, t3);
 }   // addTriangle
 

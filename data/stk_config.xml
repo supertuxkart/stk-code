@@ -39,8 +39,23 @@
        it will be ignored. -->
   <news max-display="10"/>
 
-  <!-- If the normals (for wheel raycasts) should be smoothened -->
-  <physics smooth-normals="true"/>
+  <!-- smooth-normals: If the normals (for wheel raycasts) should be smoothened.
+          This is a global setting, it still needs to be activated for each
+          track individually.
+       smooth-angle-limits: If the angle between the normal of a vertex and
+          the normal of a triangle are larger than this value, the normal
+          of the triangle will be used in interpolating the normals. This
+          has the effect of an edge split modifier - if the flat track and (say)
+          a wall at a 90 egree angle are not separated, the normal at that
+          vertex will be 45 degrees, resulting in completely wrong physics.
+          The angle limit in this case will discard the 45 degrees, and use
+          the normal of the flat triangle (pointing upwards). In the worst
+          case (all three normals discarded, the interpolation will just
+          return the normal of the triangle (i.e. de facto no interpolation),
+          but it helps making smoothing much more useful without fixing tracks.
+      -->
+  <physics smooth-normals="true"
+           smooth-angle-limit="0.65"/>
 
   <!-- The title music. -->
   <music title="main_theme.music"/>

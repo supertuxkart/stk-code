@@ -89,6 +89,10 @@ public:
                                          a history files.                    */
     bool  m_smooth_normals;          /**< If normals for raycasts for wheels
                                          should be interpolated.             */
+    /** If the angle between a normal on a vertex and the normal of the
+     *  triangle are more than this value, the physics will use the normal
+     *  of the triangle in smoothing normal. */
+    float m_smooth_angle_limit;
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
     float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */
     float m_near_ground;             /**<Determines when a kart is not near
