@@ -57,9 +57,6 @@
 * zipper_collect
     by Dakal, released under CC-BY-SA 3.0
 
-* swatter
-    by Funto
-
 * rubber_ball and jump-bomb.jpg
     by Samuncle, released under CC-BY-SA
 
@@ -69,4 +66,7 @@
 * thunderbird texture, bomb texture
     by Fraag, released under CC-BY-SA 3.0
 
+* swatter-icon
+    by Totoplus62, released under CC-0
+    
 Others are GPL, by the original (super)TuxKart team
