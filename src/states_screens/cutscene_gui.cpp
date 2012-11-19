@@ -53,7 +53,7 @@ void CutsceneGUI::renderGlobal(float dt)
         core::rect<s32> r(0, UserConfigParams::m_height - GUIEngine::getFontHeight()*2,
                           UserConfigParams::m_width, UserConfigParams::m_height);
         
-        if (GUIEngine::getFont()->getDimension(m_subtitle.c_str()).Width > UserConfigParams::m_width)
+        if (GUIEngine::getFont()->getDimension(m_subtitle.c_str()).Width > (unsigned int)UserConfigParams::m_width)
         {
             GUIEngine::getSmallFont()->draw(m_subtitle, r,
                                             video::SColor(255,255,255,255), true, true, NULL);        
