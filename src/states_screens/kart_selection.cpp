@@ -255,6 +255,8 @@ public:
     core::stringw deviceName;
     std::string m_kartInternalName;
     
+    bool m_not_updated_yet;
+    
     PlayerKartWidget(KartSelectionScreen* parent, 
                      StateManager::ActivePlayer* associatedPlayer,
                      core::recti area, const int playerID, 
@@ -274,6 +276,7 @@ public:
         w_speed = 1.0f;
         h_speed = 1.0f;
         m_ready = false;
+        m_not_updated_yet = true;
         
         m_irrlicht_widget_ID = irrlichtWidgetID;
 
@@ -604,7 +607,7 @@ public:
         
         player_id_w *= 2;
         player_name_w = 0;
-        
+
         m_model_view->setBadge(OK_BADGE);
     }   // markAsReady
     
@@ -706,6 +709,13 @@ public:
                        kart_name_w,
                        kart_name_h);
         
+        // When coming from the overworld, we must rebuild the preview scene at
+        // least once, since the scene is being cleared by leaving the overworld
+        if (m_not_updated_yet)
+        {
+            m_model_view->clearRttProvider();
+            m_not_updated_yet = false;
+        }
     }   // onUpdate
 
     // -------------------------------------------------------------------------

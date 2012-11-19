@@ -84,6 +84,8 @@ namespace GUIEngine
         
         /** Rotate to 'targetAngle' in degrees at given speed (in degrees per second) */
         void setRotateTo(float targetAngle, float speed);
+        
+        void clearRttProvider();
     };
     
 }

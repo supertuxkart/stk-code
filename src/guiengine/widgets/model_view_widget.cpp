@@ -190,3 +190,9 @@ void ModelViewWidget::elementRemoved()
     m_rtt_provider = NULL;
     IconButtonWidget::elementRemoved();
 }
+
+void ModelViewWidget::clearRttProvider()
+{
+    delete m_rtt_provider;
+    m_rtt_provider = NULL;
+}
