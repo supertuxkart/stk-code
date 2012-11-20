@@ -229,6 +229,11 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             race_manager->exitRace();
             StateManager::get()->resetAndGoToScreen(
                                                 MainMenuScreen::getInstance());
+            
+            if (race_manager->raceWasStartedFromOverworld())
+            {
+                OverWorld::enterOverWorld();
+            }
         }
         else if (!getWidget(name.c_str())->isVisible())
         {
