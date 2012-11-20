@@ -94,6 +94,9 @@ private:
     /** Distance of map from left side of screen. */
     int              m_map_left;
     
+    /** True if this is the first time the renderer is called. */
+    bool             m_is_first_render_call;
+
     /** Distance of map from bottom of screen. */
     int              m_map_bottom;
     

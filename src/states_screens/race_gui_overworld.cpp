@@ -66,6 +66,7 @@ const int COMPLETED_HARD = 4;
 RaceGUIOverworld::RaceGUIOverworld()
 {    
     m_enabled = true;
+    m_is_first_render_call = true;
     m_close_to_a_challenge = false;
     m_trophy1 = irr_driver->getTexture( file_manager->getTextureFile("cup_bronze.png") );
     m_trophy2 = irr_driver->getTexture( file_manager->getTextureFile("cup_silver.png") );
@@ -168,6 +169,7 @@ void RaceGUIOverworld::renderGlobal(float dt)
     drawGlobalMiniMap();
     //irr_driver->getVideoDriver()->enableMaterial2D();
     
+    m_is_first_render_call = false;
 }   // renderGlobal
 
 //-----------------------------------------------------------------------------
@@ -293,9 +295,30 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     World *world = World::getWorld();
     // arenas currently don't have a map.
     if(world->getTrack()->isArena()) return;
-    
+
+    Track* track = world->getTrack();
+    const std::vector<OverworldChallenge>& challenges = 
+                                                     track->getChallengeList();
+
+    // The rophies might be to the left of the minimap on large displays
+    // Adjust the left side of the minimap to take this into account.
+    // This can't be done in the constructor of this object, since at
+    // that time the scene.xml file has not been read (so the challenges
+    // are not defined yet).
+    if(m_is_first_render_call)
+    {
+        float left_most = 0;
+        for (unsigned int n=0; n<challenges.size(); n++)
+        {
+            Vec3 draw_at;
+            track->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
+            if(draw_at.getX()<left_most) left_most = draw_at.getX();
+        }
+        m_map_left -= (int)left_most;
+    }
+
+
     const video::ITexture *mini_map = world->getTrack()->getMiniMap();
-    const core::dimension2du& minimap_size = world->getTrack()->getMiniMapSize();
     
     int upper_y = m_map_bottom - m_map_height;
     int lower_y = m_map_bottom;
@@ -307,9 +330,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
         irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
     }
-    
-    Track* t = world->getTrack();
-    
+        
     Vec3 kart_xyz;
     
     // In the first iteration, only draw AI karts, then only draw
@@ -328,7 +349,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                !=(only_draw_player_kart==1)) continue;
             kart_xyz= kart->getXYZ();
             Vec3 draw_at;
-            t->mapPoint2MiniMap(kart_xyz, &draw_at);
+            track->mapPoint2MiniMap(kart_xyz, &draw_at);
             
             core::rect<s32> source(i    *m_marker_rendered_size,
                                    0, 
@@ -361,14 +382,11 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                                       NULL, NULL, true);
         }   // for i<getNumKarts
     }   // for only_draw_player_kart
-    
-    
-    const std::vector<OverworldChallenge>& challenges = t->getChallengeList();
-    
+        
     for (unsigned int n=0; n<challenges.size(); n++)
     {
         Vec3 draw_at;
-        t->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
+        track->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
         
         //const ChallengeData* c = unlock_manager->getChallenge(challenges[n].m_challenge_id);
        // bool locked = (m_locked_challenges.find(c) != m_locked_challenges.end());
@@ -443,7 +461,6 @@ void RaceGUIOverworld::drawGlobalMiniMap()
             }
             else
             {
-                Track* track = track_manager->getTrack(challenge->getTrackId());
                 if (track == NULL)
                 {
                     fprintf(stderr, "[RaceGUIOverworld] ERROR: Cannot find track <%s>, "
