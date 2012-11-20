@@ -30,7 +30,9 @@
 #include "items/item_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/overworld.hpp"
 #include "states_screens/feature_unlocked.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -288,8 +290,16 @@ void GrandPrixLose::eventCallback(GUIEngine::Widget* widget,
         }
         else
         {
-            // we assume the main menu was pushed before showing this menu
-            StateManager::get()->popMenu();
+            if (race_manager->raceWasStartedFromOverworld())
+            {
+                StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+                OverWorld::enterOverWorld();
+            }
+            else
+            {
+                // we assume the main menu was pushed before showing this menu
+                StateManager::get()->popMenu();
+            }
         }
     }
 }   // eventCallback
