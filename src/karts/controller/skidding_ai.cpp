@@ -186,6 +186,7 @@ void SkiddingAI::reset()
     m_item_to_collect            = NULL;
     m_avoid_item_close           = false;
     m_skid_probability_state     = SKID_PROBAB_NOT_YET;
+    m_last_item_random           = NULL;
 
     AIBaseController::reset();
     m_track_node               = QuadGraph::UNKNOWN_SECTOR;
