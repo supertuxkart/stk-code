@@ -101,6 +101,8 @@ Track::Track(const std::string &filename)
     m_weather_type          = WEATHER_NONE;
     m_cache_track           = UserConfigParams::m_cache_overworld &&
                               m_ident=="overworld";
+    m_minimap_x_scale       = 1.0f;
+    m_minimap_y_scale       = 1.0f;
     m_all_nodes.clear();
     m_all_cached_meshes.clear();
     loadTrackInfo();
@@ -452,19 +454,26 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
         //Check whether the hardware can do nonsquare or 
         // non power-of-two textures
         video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
-        bool nonpower = video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
+        bool nonpower = false; //video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
         bool nonsquare = 
             video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
 
         //Create the minimap resizing it as necessary.
-        core::dimension2du size = World::getWorld()->getRaceGUI()
-                                 ->getMiniMapSize()
+        m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
+        core::dimension2du size = m_mini_map_size
                                  .getOptimalSize(!nonpower,!nonsquare);
         m_mini_map = QuadGraph::get()->makeMiniMap(size, "minimap::"+m_ident);
-
+        m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_mini_map->getSize().Width);
+        m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_mini_map->getSize().Height);
     }
 }   // loadQuadGraph
-
+// -----------------------------------------------------------------------------
+void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
+{
+    QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at);
+    draw_at->setX(draw_at->getX() * m_minimap_x_scale);
+    draw_at->setY(draw_at->getY() * m_minimap_y_scale);
+}
 // -----------------------------------------------------------------------------
 /** Convert the track tree into its physics equivalents.
  *  \param main_track_count The number of meshes that are already converted

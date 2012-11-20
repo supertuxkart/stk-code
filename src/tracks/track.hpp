@@ -350,7 +350,10 @@ private:
 
     /** The texture for the mini map, which is displayed in the race gui. */
     video::ITexture         *m_mini_map;
-
+    core::dimension2du      m_mini_map_size;
+    float                   m_minimap_x_scale;
+    float                   m_minimap_y_scale;
+    
     /** List of all bezier curves in the track - for e.g. camera, ... */
     std::vector<BezierCurve*> m_all_curves;
 
@@ -395,9 +398,11 @@ public:
                        buildHeightMap();
     // ------------------------------------------------------------------------
     /** Returns the texture with the mini map for this track. */
-    const video::ITexture*getMiniMap     () const { return m_mini_map; }
+    const video::ITexture*    getMiniMap    () const { return m_mini_map; }
     // ------------------------------------------------------------------------
-    bool               isArena           () const { return m_is_arena; }
+    const core::dimension2du& getMiniMapSize() const { return m_mini_map_size; }
+    // ------------------------------------------------------------------------
+    bool               isArena              () const { return m_is_arena; }
     // ------------------------------------------------------------------------
     void               loadTrackModel  (World* parent, 
                                         bool reverse_track = false,
@@ -467,8 +472,7 @@ public:
      *  \param draw_at The coordinates in pixel on the mini map of the point,
      *         only the first two coordinates will be used.
      */
-    void               mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
-                          { QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at); }
+    void               mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const;
     // ------------------------------------------------------------------------
     /** Returns the full path of a given file inside this track directory. */
     std::string        getTrackFile(const std::string &s) const 

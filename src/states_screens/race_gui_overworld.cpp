@@ -295,6 +295,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     if(world->getTrack()->isArena()) return;
     
     const video::ITexture *mini_map = world->getTrack()->getMiniMap();
+    const core::dimension2du& minimap_size = world->getTrack()->getMiniMapSize();
     
     int upper_y = m_map_bottom - m_map_height;
     int lower_y = m_map_bottom;
