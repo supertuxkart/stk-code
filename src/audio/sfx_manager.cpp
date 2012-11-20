@@ -57,6 +57,8 @@ SFXManager::SFXManager()
     // The sound manager initialises OpenAL
     m_initialized = music_manager->initialized();
     m_master_gain = UserConfigParams::m_sfx_volume;
+    // Init position, since it can be used before positionListener is called.
+    m_position    = Vec3(0,0,0);
     
     loadSfx();
     if (!sfxAllowed()) return;

@@ -55,7 +55,9 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node)
                             AnimationBase::m_node->getRotation() );
         m_hpr = AnimationBase::m_node->getRotation();
     }
-    
+    else
+        m_hpr = m_init_hpr;
+
     m_body            = NULL;
     m_motion_state    = NULL;
     m_collision_shape = NULL;
