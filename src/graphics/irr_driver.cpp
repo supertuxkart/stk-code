@@ -783,6 +783,7 @@ scene::ISceneNode* IrrDriver::addWaterNode(scene::IMesh *mesh,
                                                      wave_height, wave_speed,
                                                      wave_length);
     out->getMaterial(0).setFlag(EMF_GOURAUD_SHADING, true);
+    welded_mesh->drop();  // The scene node keeps a reference
     return out;
 }   // addWaterNode
 
