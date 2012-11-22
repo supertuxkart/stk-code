@@ -87,6 +87,8 @@ protected:
 
     bool        m_faster_music_active; // true if faster music was activated
 
+    bool        m_stop_music_when_dialog_open;
+
     /** Whether highscores should be used for this kind of race.
      *  True by default, change to false in a child class to disable.
     */

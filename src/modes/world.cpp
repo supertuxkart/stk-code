@@ -95,6 +95,8 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_schedule_unpause   = false;
     m_self_destruct      = false;
     
+    m_stop_music_when_dialog_open = true;
+    
     WorldStatus::setClockMode(CLOCK_CHRONO);
 }   // World
 
@@ -946,7 +948,8 @@ void World::restartRace()
  */
 void World::pause(Phase phase)
 {
-    music_manager->pauseMusic();
+    if (m_stop_music_when_dialog_open)
+        music_manager->pauseMusic();
     sfx_manager->pauseAll();
     
     WorldStatus::pause(phase);
@@ -955,7 +958,8 @@ void World::pause(Phase phase)
 //-----------------------------------------------------------------------------
 void World::unpause()
 {
-    music_manager->resumeMusic() ;
+    if (m_stop_music_when_dialog_open)
+        music_manager->resumeMusic();
     sfx_manager->resumeAll();
     
     WorldStatus::unpause();

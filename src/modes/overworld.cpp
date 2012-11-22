@@ -77,6 +77,7 @@ void OverWorld::enterOverWorld()
 OverWorld::OverWorld() : LinearWorld()
 {
     m_return_to_garage = false;
+    m_stop_music_when_dialog_open = false;
 }
 
 // ----------------------------------------------------------------------------
