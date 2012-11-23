@@ -546,6 +546,10 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
     // Finish time is the time needed for the whole race with
     // the computed average speed computed.
     const float average_speed = kart_info.m_overall_distance/getTime();
+    // Avoid NAN as results when average_speed is low
+    // Instead just set time to 99:59:00
+    if(average_speed<0.1f)
+        return 99*60+59;
     return getTime() + (full_distance - kart_info.m_overall_distance)  
                      / average_speed;
 

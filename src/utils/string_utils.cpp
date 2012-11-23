@@ -471,8 +471,8 @@ namespace StringUtils
         // and an incorrect finishing time is estimated.
         if(int_time<0)
             return std::string("00:00:00");
-        else if(int_time >= 10000*60)  // up to 9999:59.99
-            return std::string("**:**:**");
+        else if(int_time >= 10000*60)  // up to 99:59.99
+            return std::string("99:59:99");
 
         int min        = int_time / 6000;
         int sec        = (int_time-min*6000)/100;
