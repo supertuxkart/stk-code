@@ -76,8 +76,8 @@ KartModel::KartModel(bool is_master)
 
         // default value for kart suspensions. move to config file later 
         // if we find each kart needs custom values
-        m_min_suspension[i] = -1.3f;
-        m_max_suspension[i] = 1.3f;
+        m_min_suspension[i] = -0.59f;
+        m_max_suspension[i] = 0.59f;
         m_dampen_suspension_amplitude[i] = 2.5f;
     }
     m_wheel_filename[0] = "";
@@ -514,15 +514,16 @@ void KartModel::update(float rotation_dt, float steer, const float suspension[4]
         
         // limit amplitude between set limits, first dividing it by a
         // somewhat arbitrary constant to reduce visible wheel movement
-        clamped_suspension[i] = std::min(std::max(suspension[i]/m_dampen_suspension_amplitude[i],
-                                                  m_min_suspension[i]),
-                                                  m_max_suspension[i]);
+        clamped_suspension[i] = suspension[i]/m_dampen_suspension_amplitude[i];
         float ratio = clamped_suspension[i] / suspension_length;
         const int sign = ratio < 0 ? -1 : 1;
         // expanded form of 1 - (1 - x)^2, i.e. making suspension display 
         // quadratic and not linear
         ratio = sign * fabsf(ratio*(2-ratio));
-        clamped_suspension[i] = ratio*suspension_length;
+//        clamped_suspension[i] = ratio*suspension_length;
+        clamped_suspension[i] = std::min(std::max(ratio*suspension_length,
+                                                  m_min_suspension[i]),
+                                                  m_max_suspension[i]);
     }   // for i<4
 
     core::vector3df wheel_steer(0, steer*30.0f, 0);
