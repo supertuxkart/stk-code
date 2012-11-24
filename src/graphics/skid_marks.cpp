@@ -90,31 +90,34 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         m_right[i]->fade(f);
     }
 
+    // Get raycast information
+    // -----------------------
+    const btWheelInfo::RaycastInfo &raycast_right =
+            m_kart.getVehicle()->getWheelInfo(2).m_raycastInfo;
+    const btWheelInfo::RaycastInfo raycast_left =
+            m_kart.getVehicle()->getWheelInfo(3).m_raycastInfo;
+    Vec3 delta = raycast_right.m_contactPointWS 
+               - raycast_left.m_contactPointWS;
+
+    // The kart is making skid marks when it's:
+    // - forced to leave skid marks, or all of:
+    // - in accumulating skidding mode
+    // - not doing the grphical jump
+    // - wheels are in contact with floor, which includes a special case:
+    //   the physics force both wheels on one axis to touch the ground or not.
+    //   If only one wheel touches the ground, the 2nd one gets the same 
+    //   raycast result --> delta is 0, which is considered to be not skidding.
+    const Skidding *skid = m_kart.getSkidding();
+    bool is_skidding = force_skid_marks ||
+                   (  (skid->getSkidState()==Skidding::SKID_ACCUMULATE_LEFT ||
+                       skid->getSkidState()==Skidding::SKID_ACCUMULATE_RIGHT  )
+                     &&  m_kart.getSkidding()->getGraphicalJumpOffset()<=0
+                     &&  raycast_right.m_isInContact
+                     &&  delta.length2()>=0.0001f                              );
+                     
     if(m_skid_marking)
     {
-        // Get raycast information
-        // -----------------------
-        const btWheelInfo::RaycastInfo &raycast_right =
-                            m_kart.getVehicle()->getWheelInfo(2).m_raycastInfo;
-        const btWheelInfo::RaycastInfo raycast_left =
-                            m_kart.getVehicle()->getWheelInfo(3).m_raycastInfo;
-        Vec3 delta = raycast_right.m_contactPointWS 
-                   - raycast_left.m_contactPointWS;
-
-        // We were skid marking, but not anymore (either because the
-        // wheels don't touch the ground, or the kart has stopped
-        // skidding). One special case: the physics force both wheels
-        // on one axis to touch the ground. If only one wheel touches
-        // the ground, the 2nd one gets the same raycast result -->
-        // delta is 0, and the behaviour is undefined. In this case
-        // just stop doing skid marks as well.
-        // ---------------------------------------------------------
-        if (!force_skid_marks                                     && 
-            (!raycast_right.m_isInContact                      ||
-              m_kart.getSkidding()->getGraphicalJumpOffset()>0 ||
-              !m_kart.getControls().m_skid                     ||
-              fabsf(m_kart.getControls().m_steer) < 0.001f     ||
-              delta.length2()<0.0001                             ) )
+        if (!is_skidding)   // end skid marking
         {
             m_skid_marking = false;
             // The vertices and indices will not change anymore 
@@ -146,36 +149,14 @@ void SkidMarks::update(float dt, bool force_skid_marks,
 
     // Currently no skid marking
     // -------------------------
-    if (!force_skid_marks)
-    {
-        if((!m_kart.getControls().m_skid) ||
-            (fabsf(m_kart.getControls().m_steer) < 0.001f)) 
-            return;   // not skidmarking
-
-        // not turning enough, don't draw skidmarks if kart is going 
-        // straight ahead this is even stricter for Ai karts, since they 
-        // tend to use LOTS of skidding
-        const float min_skid_angle = 
-                 m_kart.getController()->isPlayerController() ? 0.55f : 0.95f;
-        if( fabsf(m_kart.getSteerPercent()) < min_skid_angle) return;
-    }
+    if (!is_skidding) return;
 
     // Start new skid marks
     // --------------------
-    const btWheelInfo::RaycastInfo &raycast_right =
-                            m_kart.getVehicle()->getWheelInfo(2).m_raycastInfo;
     // No skidmarking if wheels don't have contact
     if(!raycast_right.m_isInContact) return;
-
-    const btWheelInfo::RaycastInfo raycast_left =
-                            m_kart.getVehicle()->getWheelInfo(3).m_raycastInfo;
-
-    Vec3 delta = raycast_right.m_contactPointWS 
-               - raycast_left.m_contactPointWS;
-    // Special case: only one wheel on one axis touches the ground 
-    // --> physics set both wheels to touch the same spot --> delta = 0.
-    // In this case, don't start skidmarks.
     if(delta.length2()<0.0001) return;
+
     delta.normalize();
     delta *= m_width;
 
