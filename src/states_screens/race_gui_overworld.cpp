@@ -68,6 +68,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_enabled = true;
     m_is_first_render_call = true;
     m_close_to_a_challenge = false;
+    m_current_challenge = NULL;
     m_trophy1 = irr_driver->getTexture( file_manager->getTextureFile("cup_bronze.png") );
     m_trophy2 = irr_driver->getTexture( file_manager->getTextureFile("cup_silver.png") );
     m_trophy3 = irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") );
@@ -300,7 +301,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     const std::vector<OverworldChallenge>& challenges = 
                                                      track->getChallengeList();
 
-    // The rophies might be to the left of the minimap on large displays
+    // The trophies might be to the left of the minimap on large displays
     // Adjust the left side of the minimap to take this into account.
     // This can't be done in the constructor of this object, since at
     // that time the scene.xml file has not been read (so the challenges
@@ -382,7 +383,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                                       NULL, NULL, true);
         }   // for i<getNumKarts
     }   // for only_draw_player_kart
-        
+
+    m_current_challenge = NULL;
     for (unsigned int n=0; n<challenges.size(); n++)
     {
         Vec3 draw_at;
@@ -413,6 +415,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                    lower_y   -(int)(draw_at.getY()+marker_size/2),
                                    m_map_left+(int)(draw_at.getX()+marker_size/2), 
                                    lower_y   -(int)(draw_at.getY()-marker_size/2));
+            m_current_challenge = &(challenges[n]);
         }
         irr_driver->getVideoDriver()->draw2DImage(m_icons[state],
                                                   dest, source, NULL, NULL, true);

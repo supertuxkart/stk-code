@@ -273,43 +273,26 @@ void OverWorld::moveKartAfterRescue(AbstractKart* kart, float angle)
 }   // moveKartAfterRescue
 
 //-----------------------------------------------------------------------------
-
+/** Called when a mouse click happens. If the click happened while the mouse
+ *  was hovering on top of a challenge, the kart will be teleported to
+ *  the challenge.
+ *  \param x,y Mouse coordinates.
+ */
 void OverWorld::onMouseClick(int x, int y)
 {
-    //FIXME: this code is duplicated from RaceGUIOverworld
-    const float scaling = irr_driver->getFrameSize().Height / 420.0f;
-    int marker_challenge_size        = (int)( 12.0f * scaling);
-    int map_left   = 20;
-    int map_bottom = UserConfigParams::m_height-10;
-    
-    Track* t = getTrack();
-    
-    const std::vector<OverworldChallenge>& challenges = t->getChallengeList();
-    
-    for (unsigned int n=0; n<challenges.size(); n++)
+    const OverworldChallenge *challenge = 
+        ((RaceGUIOverworld*)getRaceGUI())->getCurrentChallenge();
+ 
+    if(challenge)
     {
-        Vec3 draw_at;
-        t->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
-        
-        int marker_size = marker_challenge_size;
-        core::position2di mouse = irr_driver->getMouseLocation();
-        core::rect<s32> dest(map_left  +(int)(draw_at.getX()-marker_size/2), 
-                             map_bottom-(int)(draw_at.getY()+marker_size/2),
-                             map_left  +(int)(draw_at.getX()+marker_size/2), 
-                             map_bottom-(int)(draw_at.getY()-marker_size/2));
-        if (dest.isPointInside(mouse))
-        {
-            AbstractKart* kart = getKart(0);
-            const btTransform& s = getClosestStartPoint(challenges[n].m_position.X,
-                                                        challenges[n].m_position.Z);
-            const Vec3 &xyz = s.getOrigin();
-            printf("Kart: %f %f    Challenge : %f %f\n", xyz[0], xyz[2], challenges[n].m_position.X, challenges[n].m_position.Z);
-            float angle = atan2(challenges[n].m_position.X - xyz[0],
-                                challenges[n].m_position.Z - xyz[2]);
-            printf("    --> %f \n", angle);
-            kart->setXYZ(xyz);
-            moveKartAfterRescue(kart, angle);
-            return;
-        }
+        AbstractKart* kart = getKart(0);
+        const btTransform& s = getClosestStartPoint(challenge->m_position.X,
+                                                    challenge->m_position.Z);
+        const Vec3 &xyz = s.getOrigin();
+        float angle = atan2(challenge->m_position.X - xyz[0],
+                            challenge->m_position.Z - xyz[2]);
+        kart->setXYZ(xyz);
+        moveKartAfterRescue(kart, angle);
+        return;
     }    
-}
+}  // onMouseClick

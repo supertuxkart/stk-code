@@ -32,6 +32,7 @@ using namespace irr;
 
 class AbstractKart;
 class ChallengeData;
+struct OverworldChallenge;
 class InputMap;
 class Material;
 class RaceSetup;
@@ -101,6 +102,9 @@ private:
     int              m_map_bottom;
     
     int              m_trophy_points_width;
+
+    /** The current challenge over which the mouse is hovering. */
+    const OverworldChallenge *m_current_challenge;
     
     /* Display informat for one player on the screen. */
     void drawEnergyMeter       (int x, int y, const AbstractKart *kart,
@@ -117,7 +121,16 @@ public:
     ~RaceGUIOverworld();
     virtual void renderGlobal(float dt);
     virtual void renderPlayerView(const AbstractKart *kart, float dt);
-    
+
+    // ------------------------------------------------------------------------
+    /** Returns the currently selected challenge data (or NULL if no is 
+     *  selected). */
+    const OverworldChallenge *getCurrentChallenge() const 
+    {
+        return m_current_challenge;
+    }   // getCurrentChallenge
+
+    // ------------------------------------------------------------------------
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du getMiniMapSize() const 
     { return core::dimension2du(m_map_width, m_map_height); }
