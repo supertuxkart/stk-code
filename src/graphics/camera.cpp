@@ -563,10 +563,8 @@ void Camera::handleEndCamera(float dt)
             // the kart and the kart length are orthogonal to each other
             // --> tan (fov) = kart_length / camera_kart_distance
             // In order to show a little bit of the surrounding of the kart
-            // the kart length is multiplied by 3 (experimentally found, but
-            // this way we have approx one kart length on the left and right
-            // side of the screen for the surroundings)
-            float fov = 3*atan2(m_kart->getKartLength(),
+            // the kart length is multiplied by 6 (experimentally found)
+            float fov = 6*atan2(m_kart->getKartLength(),
                                 (cp-kp.toIrrVector()).getLength());
             m_camera->setFOV(fov);
             m_camera->setTarget(m_kart->getXYZ().toIrrVector());
