@@ -34,15 +34,18 @@
   */
 class GrandPrixData
 {
-    irr::core::stringw m_name;         //!< The name of the grand prix
+    /** The name of the grand prix. */
+    irr::core::stringw m_name;
+
+    /** Internal name of the grand prix, not translated. */
+    std::string m_id;
+
+    /** Original filename, only for error handling needed. */
+    std::string m_filename;
     
-    std::string m_id;                  //!< Internal name of the grand prix, not translated
-    std::string m_filename;            //!< Original filename, only for error handling needed
-    
-    /**
-      * The ident of the tracks in this grand prix in their right order, ident
-      * means the filename of the .track file without .track extension (ie. 'volcano')
-      */
+    /** The ident of the tracks in this grand prix in their right order, ident
+     *  means the filename of the .track file without .track extension 
+     *  (ie. 'volcano'). */
     std::vector<std::string> m_tracks;
     
     /** The number of laps that each track should be raced, in the right order */
@@ -50,6 +53,9 @@ class GrandPrixData
 
     /** Whether the track in question should be done in reverse mode */
     std::vector<bool> m_reversed;
+
+
+    bool m_only_when_nolok_is_unlocked;
 
 public:
 

@@ -227,6 +227,8 @@ void Camera::setMode(Mode mode)
     }
     if(mode==CM_FINAL)
     {
+        if(m_end_cameras.size()>0)
+            m_camera->setPosition(m_end_cameras[0].m_position.toIrrVector());
         m_next_end_camera    = m_end_cameras.size()>1 ? 1 : 0;
         m_current_end_camera = 0;
         m_camera->setFOV(m_fov);
