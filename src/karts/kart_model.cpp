@@ -417,7 +417,20 @@ void KartModel::reset()
 
     // Stop any animations currently being played.
     setAnimation(KartModel::AF_DEFAULT);
+    // Don't force any LOD
+    ((LODNode*)m_kart->getNode())->forceLevelOfDetail(-1);
 }   // reset
+
+// ----------------------------------------------------------------------------
+/** Called when the kart finished the race. It will force the highest LOD
+ *  for the kart, since otherwise the end camera can be far away (due to
+ *  zooming) and show non-animated karts.
+ */
+void KartModel::finishedRace()
+{
+    // Force the animated model, independent of actual camera distance.
+    ((LODNode*)m_kart->getNode())->forceLevelOfDetail(0);
+}   // finishedRace
 
 // ----------------------------------------------------------------------------
 /** Enables- or disables the end animation. 

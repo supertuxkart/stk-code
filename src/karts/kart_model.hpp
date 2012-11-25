@@ -148,6 +148,7 @@ public:
                          const float suspension[4]);
     void          setDefaultPhysicsPosition(const Vec3 &center_shift, 
                                             float wheel_radius);
+    void          finishedRace();
     scene::ISceneNode*
                   attachModel(bool animatedModels);
     // ------------------------------------------------------------------------

@@ -57,6 +57,10 @@ private:
     
     std::string m_group_name;
     
+    /** The normal level of detail can be overwritten. If 
+     *  m_forced_lod is >=0, only this level is be used. */
+    int m_forced_lod;
+
     int getLevel();
 
     enum PreviousVisibility
@@ -95,6 +99,8 @@ public:
       */
     void add(int level, scene::ISceneNode* node, bool reparent);
     
+    void forceLevelOfDetail(int n);
+
     /** Get the highest level of detail node */
     scene::ISceneNode* getFirstNode()
     {
@@ -139,6 +145,7 @@ public:
             m_nodes[n]->setScale(scale);
         }
     }
+
 };
 
 #endif

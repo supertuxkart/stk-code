@@ -33,7 +33,7 @@
   */
 LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
                  scene::ISceneManager* mgr, s32 id)
-    : ISceneNode(parent, mgr, id) //: IDummyTransformationSceneNode(parent, mgr, id)
+    : ISceneNode(parent, mgr, id)
 {
     assert(mgr != NULL);
     assert(parent != NULL);
@@ -47,6 +47,8 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
     // so that only the reference from the parent is active, causing this
     // node to be deleted when it is removed from the parent.
     drop();
+
+    m_forced_lod = -1;
 }
 
 LODNode::~LODNode()
@@ -63,6 +65,10 @@ void LODNode::render()
  */
 int LODNode::getLevel()
 {
+    // If a level is forced, use it
+    if(m_forced_lod>-1)
+        return m_forced_lod;
+
     // TODO: optimize this, there is no need to check every frame
     scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
 
@@ -78,7 +84,16 @@ int LODNode::getLevel()
     return -1;
 }  // getLevel
 
+// ---------------------------------------------------------------------------
+/** Forces the level of detail to be n. If n>number of levels, the most
+ *  detailed level is used. This is used to disable LOD when the end
+ *  camera is activated, since it zooms in to the kart. */
+void LODNode::forceLevelOfDetail(int n)
+{
+    m_forced_lod = (n >=(int)m_detail.size()) ? m_detail.size()-1 : n;
+}   // forceLevelOfDetail
 
+// ----------------------------------------------------------------------------
 void LODNode::OnAnimate(u32 timeMs)
 {
     if (isVisible())

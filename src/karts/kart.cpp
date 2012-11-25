@@ -769,6 +769,7 @@ void Kart::finishedRace(float time)
     m_finished_race = true;
     m_finish_time   = time;
     m_controller->finishedRace(time);
+    m_kart_model->finishedRace();
     race_manager->kartFinishedRace(this, time);
     
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
