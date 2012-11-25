@@ -57,7 +57,9 @@ using irr::core::stringw;
 
 const char* RANDOM_KART_ID = "randomkart";
 const char* ID_DONT_USE = "x";
-const char* ID_LOCKED = "locked";
+// Use '/' as special character to avoid that someone creates
+// a kart called 'locked'
+const char* ID_LOCKED = "locked/";
 
 DEFINE_SCREEN_SINGLETON( KartSelectionScreen );
 
@@ -913,7 +915,8 @@ public:
             m_parent->m_kart_widgets[playerID].m_kart_name
                     ->setText( _("Random Kart"), false );
         }
-        else if (selectionID == ID_LOCKED)
+        // selectionID contains the name of the kart, so check only for substr
+        else if (StringUtils::startsWith(selectionID, ID_LOCKED))
         {
             w3->clearModels();
             w3->addModel(irr_driver->getAnimatedMesh( 
@@ -1465,7 +1468,7 @@ void KartSelectionScreen::playerConfirm(const int playerID)
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert(w != NULL);
     const std::string selection = w->getSelectionIDString(playerID);
-    if (selection == ID_LOCKED)
+    if (StringUtils::startsWith(selection, ID_LOCKED))
     {
         unlock_manager->playLockSound();
         return;
@@ -1771,7 +1774,8 @@ void KartSelectionScreen::allPlayersDone()
             {
                 randomID = random.get(item_count);
                 if (items[randomID].m_code_name != ID_DONT_USE && 
-                    items[randomID].m_code_name != ID_LOCKED)
+                    !StringUtils::startsWith(items[randomID].m_code_name,
+                                             ID_LOCKED))
                 {
                     selected_kart = items[randomID].m_code_name;
                     done = true;
@@ -2044,7 +2048,8 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
                 w->addItem( 
                     _("Locked : solve active challenges to gain access "
                       "to more!"),
-                    ID_LOCKED, prop->getAbsoluteIconFile(), LOCKED_BADGE,
+                    ID_LOCKED+prop->getIdent(),
+                    prop->getAbsoluteIconFile(), LOCKED_BADGE,
                            IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
             }
             else
@@ -2075,7 +2080,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
                 w->addItem( 
                     _("Locked : solve active challenges to gain access "
                       "to more!"),
-                    ID_LOCKED, icon_path, LOCKED_BADGE, 
+                    ID_LOCKED+prop->getIdent(), icon_path, LOCKED_BADGE, 
                     IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
             }
             else
