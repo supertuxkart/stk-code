@@ -85,7 +85,10 @@ void HighscoreManager::loadHighscores()
     try
     {
         if(!root || root->getName()!="highscores")
+        {
+            if(root) delete root;
             throw std::runtime_error("No 'highscore' node found.");
+        }
         
         // check file version
         int v;
@@ -100,6 +103,7 @@ void HighscoreManager::loadHighscores()
             // since we haven't had the chance to load the current scores yet,
             // calling Save() now will generate an empty file with the right format.
             saveHighscores();
+            delete root;
             return;
         }
         
