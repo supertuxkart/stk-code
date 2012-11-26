@@ -142,19 +142,19 @@ public:
     
     /** Call before showing up the screen to make a kart come out of the chest.
         'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
-    // unused for now, maybe will be useful later?
-    //void addUnlockedKart(KartProperties* unlocked_kart, irr::core::stringw msg);
+    void addUnlockedKart(KartProperties* unlocked_kart, irr::core::stringw msg);
     
     /** Call before showing up the screen to make a picture come out of the chest
         'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
-    // unused for now, maybe will be useful later?
-    //void addUnlockedPicture(irr::video::ITexture* picture, float w, float h, irr::core::stringw msg);
+    void addUnlockedPicture(irr::video::ITexture* picture, float w, float h, irr::core::stringw msg);
     
     /** Call before showing up the screen to make a picture slideshow come out of the chest
         'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
-    // unused for now, maybe will be useful later?
-    //void addUnlockedPictures(std::vector<irr::video::ITexture*> pictures,
-    //                         float w, float h, irr::core::stringw msg);
+    void addUnlockedPictures(std::vector<irr::video::ITexture*> pictures,
+                             float w, float h, irr::core::stringw msg);
+    
+    void addUnlockedTrack(const Track* track);
+    void addUnlockedGP(const GrandPrixData* gp);
     
     /** Call before showing up the screen to make whatever the passed challenges unlocked
       * come out of the chest */

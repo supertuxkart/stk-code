@@ -186,7 +186,7 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
 
 // ----------------------------------------------------------------------------
 // unused for now, maybe will be useful later?
-/*
+
 void FeatureUnlockedCutScene::addUnlockedKart(KartProperties* unlocked_kart, 
                                               irr::core::stringw msg)
 {
@@ -221,7 +221,7 @@ void FeatureUnlockedCutScene::addUnlockedPictures(std::vector<irr::video::ITextu
     
     m_unlocked_stuff.push_back( new UnlockedThing(pictures, w, h, msg) );
 }   // addUnlockedPictures
-*/
+
 // ----------------------------------------------------------------------------
 
 const float CAMERA_INITIAL_X = 0.0f;
@@ -456,8 +456,10 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
             // have their own path when they move
             if (unlockedStuffCount > 1)
             {
-                if (n % 2 == 0) pos.X -= 2.2f*dt*float( int((n + 1)/2) );
-                else            pos.X += 2.2f*dt*float( int((n + 1)/2) );
+                if (n == 1) pos.X -= 6.2f*dt*float( int((n + 1)/2) );
+                else if (n > 1) pos.X += 6.2f*dt*(n - 1.0f);
+                
+                //else            pos.X += 6.2f*dt*float( int((n + 1)/2) );
                 //std::cout << "Object " << n << " moving by " << 
                 //  (n % 2 == 0 ? -4.0f : 4.0f)*float( n/2 + 1 ) << std::endl;
             }
@@ -559,7 +561,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
         
         int message_y = h - fontH*3 - MARGIN;
         
-        for (int n=0; n<unlockedStuffCount; n++)
+        for (int n=unlockedStuffCount - 1; n>=0; n--)
         {
             GUIEngine::getFont()->draw(m_unlocked_stuff[n].m_unlock_message,
                                        core::rect< s32 >( 0, message_y, w, message_y + fontH ),
@@ -571,6 +573,52 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
+
+void FeatureUnlockedCutScene::addUnlockedTrack(const Track* track)
+{
+    assert(track != NULL);
+    const std::string sshot = track->getScreenshotFile();
+    core::stringw trackname = track->getName();
+    addUnlockedPicture( irr_driver->getTexture(sshot.c_str()), 4.0f, 3.0f,
+        _("You unlocked track %0", trackname));
+}
+
+void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
+{
+    std::vector<ITexture*> images;
+    if (gp == NULL)
+    {
+        std::cerr << "ERROR: Unlocked GP does not exist???\n";
+        video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
+        images.push_back(WTF_image);
+        return;
+    }
+    else
+    {
+        const std::vector<std::string>& gptracks = gp->getTracks();
+        const int trackAmount = gptracks.size();
+
+        if (trackAmount == 0)
+        {
+            std::cerr << "ERROR: Unlocked GP is empty???\n";
+            video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
+            images.push_back(WTF_image);
+        }
+
+        for (int t=0; t<trackAmount; t++)
+        {
+            Track* track = track_manager->getTrack(gptracks[t]);
+
+            ITexture* tex = irr_driver->getTexture(track  != NULL ?
+                track->getScreenshotFile().c_str() :
+            file_manager->getDataDir() + "gui/main_help.png");
+            images.push_back(tex);
+        }
+    }
+
+    core::stringw gpname = gp->getName();
+    addUnlockedPictures(images, 4.0f, 3.0f, _("You unlocked grand prix %0", gpname));
+}
 
 // unused for now... maybe this could could useful later?
 /*
