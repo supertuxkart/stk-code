@@ -205,11 +205,12 @@ void LinearWorld::update(float dt)
             for(unsigned int j =0; j<kart_amount; j++)
             {
                 printf("kart id=%d, position=%d, finished=%d, laps=%d, "
-                       "distanceDownTrack=%f %s\n",
+                       "distanceDownTrack=%f overallDistance=%f %s\n",
                     j, m_karts[j]->getPosition(),
                     m_karts[j]->hasFinishedRace(),
                     m_kart_info[j].m_race_lap,
                     getDistanceDownTrackForKart(m_karts[j]->getWorldKartId()),
+                    m_kart_info[j].m_overall_distance,
                     (m_karts[j]->getPosition() == m_karts[i]->getPosition() 
                      ? "<--- !!!" : "")                                      );
             }
