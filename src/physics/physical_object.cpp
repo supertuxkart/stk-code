@@ -144,6 +144,31 @@ void PhysicalObject::init()
             
         MeshTools::minMax3D(mesh, &min, &max);
     }
+    else if (m_node->getType()==scene::ESNT_LOD_NODE)
+    {
+        scene::ISceneNode* node = ((LODNode*)m_node)->getAllNodes()[0];
+        if (node->getType() == scene::ESNT_ANIMATED_MESH)
+        {
+            scene::IAnimatedMesh *mesh 
+                = ((scene::IAnimatedMeshSceneNode*)node)->getMesh();
+                
+            MeshTools::minMax3D(mesh, &min, &max);
+        }
+        else if (node->getType()==scene::ESNT_MESH)
+        {
+            scene::IMesh *mesh 
+                = ((scene::IMeshSceneNode*)node)->getMesh();
+                
+            MeshTools::minMax3D(mesh, &min, &max);
+        }
+        else
+        {
+            fprintf(stderr, "[PhysicalObject] Unknown node type\n");
+            max = 1.0f;
+            min = 0.0f;
+            assert(false);
+        }
+    }
     else
     {
         fprintf(stderr, "[PhysicalObject] Unknown node type\n");
