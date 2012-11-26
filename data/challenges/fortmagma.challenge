@@ -16,7 +16,8 @@
         <karts number="2" aiIdent="nolok" superPower="nolokBoss"/>
         <requirements position="1"/>
     </easy>
-    
-    <unlock-kart value="gnu"/>
-    <unlock-kart value="nolok"/>
+
+    <unlock kart="gnu"/>
+    <unlock kart="nolok"/>
+    <unlock track="fortmagma"/>
 </challenge>
