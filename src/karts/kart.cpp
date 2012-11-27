@@ -780,7 +780,10 @@ void Kart::finishedRace(float time)
                                         m_controller));
         GameSlot *slot = unlock_manager->getCurrentSlot();
         const Challenge *challenge = slot->getCurrentChallenge();
-        if(challenge)
+        // In case of a GP challenge don't make the end animation depend
+        // on if the challenge is fulfilled
+        if(challenge && !challenge->getData()->getMajorMode()
+                          ==RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
             if(challenge->getData()->isChallengeFulfilled())
                 m_kart_model->setAnimation(KartModel::AF_WIN_START);
