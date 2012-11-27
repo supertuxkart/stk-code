@@ -140,6 +140,8 @@ public:
     void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                        const int playerID) OVERRIDE;
     
+    void findWhatWasUnlocked(RaceManager::Difficulty difficulty);
+
     /** Call before showing up the screen to make a kart come out of the chest.
         'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
     void addUnlockedKart(KartProperties* unlocked_kart, irr::core::stringw msg);

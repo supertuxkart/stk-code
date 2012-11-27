@@ -503,6 +503,7 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
 
         assert(unlocked.size() > 0);
         scene->addTrophy(race_manager->getDifficulty());
+        scene->findWhatWasUnlocked(race_manager->getDifficulty());
 
         ModalDialog::dismiss();
         

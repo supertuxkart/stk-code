@@ -142,6 +142,28 @@ void FeatureUnlockedCutScene::loadedFromFile()
 
 // ----------------------------------------------------------------------------
 
+void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty difficulty)
+{
+    int pointsBefore = unlock_manager->getCurrentSlot()->getPoints();
+    int pointsNow = pointsBefore + CHALLENGE_POINTS[difficulty];
+    
+    std::vector<std::string> tracks;
+    std::vector<std::string> gps;
+                                        
+    unlock_manager->findWhatWasUnlocked(pointsBefore, pointsNow, tracks, gps);
+    
+    for (unsigned int i = 0; i < tracks.size(); i++)
+    {
+        addUnlockedTrack(track_manager->getTrack(tracks[i]));
+    }
+    for (unsigned int i = 0; i < gps.size(); i++)
+    {
+        addUnlockedGP(grand_prix_manager->getGrandPrix(gps[i]));
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
 {
     core::stringw msg;
@@ -576,12 +598,19 @@ void FeatureUnlockedCutScene::onUpdate(float dt,
 
 void FeatureUnlockedCutScene::addUnlockedTrack(const Track* track)
 {
-    assert(track != NULL);
+    if (track == NULL)
+    {
+        std::cerr << "ERROR: Unlocked track does not exist???\n";
+        return;
+    }
+    
     const std::string sshot = track->getScreenshotFile();
     core::stringw trackname = track->getName();
     addUnlockedPicture( irr_driver->getTexture(sshot.c_str()), 4.0f, 3.0f,
         _("You unlocked track %0", trackname));
 }
+
+// ----------------------------------------------------------------------------
 
 void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
 {
@@ -591,7 +620,6 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
         std::cerr << "ERROR: Unlocked GP does not exist???\n";
         video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
         images.push_back(WTF_image);
-        return;
     }
     else
     {

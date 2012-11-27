@@ -201,6 +201,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 FeatureUnlockedCutScene* scene = 
                     FeatureUnlockedCutScene::getInstance();
                 scene->addTrophy(race_manager->getDifficulty());
+                scene->findWhatWasUnlocked(race_manager->getDifficulty());
                 StateManager::get()->popMenu();
                 World::deleteWorld();
                 StateManager::get()->pushScreen(scene);

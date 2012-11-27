@@ -405,3 +405,20 @@ void UnlockManager::updateActiveChallengeList()
     getCurrentSlot()->computeActive();
 }
 
+//-----------------------------------------------------------------------------
+
+void UnlockManager::findWhatWasUnlocked(int pointsBefore, int pointsNow,
+                                        std::vector<std::string>& tracks,
+                                        std::vector<std::string>& gps)
+{printf("pointsBefore : %i, pointsNow: %i\n", pointsBefore, pointsNow);
+    for (AllChallengesType::iterator it = m_all_challenges.begin();
+         it != m_all_challenges.end(); it++)
+    {
+        ChallengeData* c = it->second;
+        if (c->getNumTrophies() > pointsBefore && c->getNumTrophies() <= pointsNow)
+        {
+            if (c->getTrackId() != "") tracks.push_back(c->getTrackId());
+            else if (c->getGPId() != "") gps.push_back(c->getGPId());
+        }
+    }
+}

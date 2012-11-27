@@ -405,6 +405,7 @@ void GrandPrixWin::eventCallback(GUIEngine::Widget* widget,
             
             assert(unlocked.size() > 0);
             scene->addTrophy(race_manager->getDifficulty());
+            scene->findWhatWasUnlocked(race_manager->getDifficulty());
             
             StateManager::get()->replaceTopMostScreen(scene);
         }
