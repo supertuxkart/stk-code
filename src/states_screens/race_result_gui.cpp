@@ -836,7 +836,7 @@ void RaceResultGUI::enableGPProgress()
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         const std::vector<std::string>& tracks = 
-            race_manager->getGrandPrix()->getTracks();
+            race_manager->getGrandPrix()->getTrackNames();
         size_t currentTrack = race_manager->getTrackNumber();
 
         // Assume 5 is the max amount we can render in any given height
@@ -905,7 +905,7 @@ void RaceResultGUI::displayGPProgress()
 void RaceResultGUI::cleanupGPProgress()
 {
     const std::vector<std::string>& tracks =
-        race_manager->getGrandPrix()->getTracks();
+        race_manager->getGrandPrix()->getTrackNames();
     for(size_t i=0; i<tracks.size(); i++)
     {
         GUIEngine::Widget *trackWidget = getWidget(tracks[i].c_str());

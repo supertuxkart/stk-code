@@ -47,6 +47,15 @@ class GrandPrixData
      *  means the filename of the .track file without .track extension 
      *  (ie. 'volcano'). */
     std::vector<std::string> m_tracks;
+
+    /** This is the list of actually available tracks. In the last GP Fort
+     *  Magma can not be used untill the final challenge. In order to provide
+     *  still 5 tracks/GP, the last GP is only using 4 tracks in story mode,
+     *  but (once nolok is unlocked) Fort Magma is added after that. So this
+     *  list is always re-evaluated depending on the state of Nolok (i.e. if
+     *  nolok is unlocked, Fort Magma is available, otherwise not).
+     *  Mark this member mutable so that getTrackNames can be const. */
+    mutable std::vector<std::string> m_really_available_tracks;
     
     /** The number of laps that each track should be raced, in the right order */
     std::vector<int> m_laps;
@@ -54,9 +63,7 @@ class GrandPrixData
     /** Whether the track in question should be done in reverse mode */
     std::vector<bool> m_reversed;
 
-
-    bool m_only_when_nolok_is_unlocked;
-
+    bool isTrackAvailable(const std::string &id) const;
 public:
 
     /** Load the GrandPrixData from the given filename */
@@ -66,27 +73,25 @@ public:
                        GrandPrixData  (const std::string filename) throw(std::logic_error);
                        GrandPrixData  ()       {}; // empty for initialising
     
-    /** @return the (potentially translated) user-visible name of the Grand Prix (apply fribidi as needed) */
-    const irr::core::stringw getName ()        const { return _LTR(m_name.c_str());    }
-    
-    /** @return the (potentially translated) user-visible description of the Grand Prix */
-    //const irr::core::stringw& getDescription () const { return m_description;   }
+    bool checkConsistency(bool chatty=true) const;
+    const std::vector<std::string>& getTrackNames() const;
+    void getLaps(std::vector<int> *laps) const;
+    void getReverse(std::vector<bool> *reverse) const;
 
+    // ------------------------------------------------------------------------
+    /** @return the (potentially translated) user-visible name of the Grand 
+     *  Prix (apply fribidi as needed) */
+    const irr::core::stringw getName() const { return _LTR(m_name.c_str());    }
+
+    // ------------------------------------------------------------------------
     /** @return the internal name identifier of the Grand Prix (not translated) */
-    const std::string& getId          ()        const { return m_id;            }
+    const std::string& getId() const { return m_id;            }
     
-    const std::string& getFilename    ()        const { return m_filename;      }
-    const std::string& getTrack(size_t track_index) const { assert(track_index >= 0); assert(track_index < m_tracks.size()); 
-                                                       return m_tracks[track_index]; }
-    const std::vector<std::string>& getTracks()  const {return m_tracks;        }
-    const std::vector<int>&         getLaps()    const {return m_laps;          }
-    const std::vector<bool>&        getReverse() const {return m_reversed;      }
-    size_t             getTrackCount()           const {return m_tracks.size(); }
-    const int&         getLaps(size_t lap_index) const {assert(lap_index < m_tracks.size()); 
-                                                        return m_laps[lap_index];}
-    bool               checkConsistency(bool chatty=true) const;
-}
-;   // GrandPrixData
+    // ------------------------------------------------------------------------
+    /** Returns the filename of the grand prix xml file. */
+    const std::string& getFilename() const { return m_filename;  }
+
+};   // GrandPrixData
 
 #endif
 

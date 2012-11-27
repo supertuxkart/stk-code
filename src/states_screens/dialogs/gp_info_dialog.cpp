@@ -72,7 +72,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
 
 
     // ---- Track listings
-    const std::vector<std::string>& tracks = gp->getTracks();
+    const std::vector<std::string>& tracks = gp->getTrackNames();
     const int trackAmount = tracks.size();
 
     int height_of_one_line = (y2 - y1)/(trackAmount+1);
@@ -224,7 +224,7 @@ void GPInfoDialog::onUpdate(float dt)
     
     const GrandPrixData* gp = grand_prix_manager->getGrandPrix(m_gp_ident);
     assert(gp != NULL);
-    const std::vector<std::string>& tracks = gp->getTracks();
+    const std::vector<std::string>& tracks = gp->getTrackNames();
     if (frameAfter >= (int)tracks.size())
     {
         frameAfter = 0;

@@ -19,14 +19,15 @@
 
 #include "race/grand_prix_data.hpp"
 
-#include <iostream>
-#include <stdexcept>
-
+#include "challenges/unlock_manager.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+#include <iostream>
+#include <stdexcept>
 
 GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
 {
@@ -143,5 +144,49 @@ bool GrandPrixData::checkConsistency(bool chatty) const
         
     }   // for i
     return true;
-}
+}   // checkConsistency
+
+
+// ----------------------------------------------------------------------------
+/** Returns true if the track is available. This is used to test if Fort Magma
+ *  is available (this way FortMagma is not used in the last Grand Prix in 
+ *  story mode, but will be available once all challenges are done and nolok
+ *  is unlocked).
+ */
+bool GrandPrixData::isTrackAvailable(const std::string &id) const
+{
+    return id!="fortmagma" || 
+           !unlock_manager->getCurrentSlot()->isLocked("fortmagma");
+}   // isTrackAvailable
+
+// ----------------------------------------------------------------------------
+void GrandPrixData::getLaps(std::vector<int> *laps) const 
+{
+    laps->clear();
+    for(unsigned int i=0; i< m_tracks.size(); i++)
+        if(isTrackAvailable(m_tracks[i]))
+            laps->push_back(m_laps[i]);
+}   // getLaps
+
+// ----------------------------------------------------------------------------
+void GrandPrixData::getReverse(std::vector<bool> *reverse) const 
+{
+    reverse->clear();
+    for(unsigned int i=0; i< m_tracks.size(); i++)
+        if(isTrackAvailable(m_tracks[i]))
+            reverse->push_back(m_reversed[i]);
+}   // getReverse
+
+// ----------------------------------------------------------------------------
+const std::vector<std::string>& GrandPrixData::getTrackNames() const 
+{
+    m_really_available_tracks.clear();
+    for(unsigned int i=0; i< m_tracks.size(); i++)
+    {
+        if(isTrackAvailable(m_tracks[i]))
+            m_really_available_tracks.push_back(m_tracks[i]);
+    }   // for i
+    return m_really_available_tracks;
+}   // getTrackNames
+
 /* EOF */
