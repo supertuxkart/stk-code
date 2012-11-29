@@ -338,8 +338,8 @@ const core::stringw Swatter::getHitString(const AbstractKart *kart) const
     case 0 : return _LTR("%1 thinks %0 is a big fly");
         //I18N: shown when hit by swatter. %1 is the attacker, %0 is the victim.
     case 1 : return _LTR("%1 flattens %0");
-        //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-    case 2 : return _LTR("%0 feels flat today");
+        //I18N: shown when hit by swatter. %s is the victim
+    case 2 : return _LTR("%s feels flat today");
     default: assert(false); return L"";  //  avoid compiler warning
     }
 }
