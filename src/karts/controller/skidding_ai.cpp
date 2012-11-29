@@ -1316,25 +1316,26 @@ void SkiddingAI::computeNearestKarts()
 {
     int my_position    = m_kart->getPosition();
 
-    // See if the kart ahead has changed:
-    if( ( m_kart_ahead && m_kart_ahead->getPosition()+1!=my_position ) ||
-        (!m_kart_ahead && my_position>1                              )    )
+    // If we are not the first, there must be another kart ahead of this kart
+    if( my_position>1 )
     {
         m_kart_ahead = m_world->getKartAtPosition(my_position-1);
         if(m_kart_ahead && 
               ( m_kart_ahead->isEliminated() || m_kart_ahead->hasFinishedRace()))
               m_kart_ahead = NULL;
     }
+    else
+        m_kart_ahead = NULL;
 
-    // See if the kart behind has changed:
-    if( ( m_kart_behind && m_kart_behind->getPosition()-1!=my_position   ) ||
-        (!m_kart_behind && my_position<(int)m_world->getCurrentNumKarts())    )
+    if( my_position<(int)m_world->getCurrentNumKarts())
     {
         m_kart_behind = m_world->getKartAtPosition(my_position+1);
         if(m_kart_behind && 
             (m_kart_behind->isEliminated() || m_kart_behind->hasFinishedRace()))
             m_kart_behind = NULL;
     }
+    else
+        m_kart_behind = NULL;
 
     m_distance_ahead = m_distance_behind = 9999999.9f;
     float my_dist = m_world->getOverallDistance(m_kart->getWorldKartId());
@@ -1351,23 +1352,22 @@ void SkiddingAI::computeNearestKarts()
     }
 
     // Compute distance to nearest player kart
-    m_distance_to_player = 0.0f;
+    float max_overall_distance = 0.0f;
     unsigned int n = ProfileWorld::isProfileMode() 
                    ? 0 : race_manager->getNumPlayers();
-    // Initially use m_distance_to_player as 'maximum overall distance'
     for(unsigned int i=0; i<n; i++)
     {
         unsigned int kart_id = 
             m_world->getPlayerKart(i)->getWorldKartId();
-        if(m_world->getOverallDistance(kart_id)>m_distance_to_player)
-            m_distance_to_player = m_world->getOverallDistance(kart_id);
+        if(m_world->getOverallDistance(kart_id)>max_overall_distance)
+            max_overall_distance = m_world->getOverallDistance(kart_id);
     }
-    if(m_distance_to_player==0.0f)
-        m_distance_to_player = 999999.9f;   // force best driving 
+    if(max_overall_distance==0.0f)
+        max_overall_distance = 999999.9f;   // force best driving 
     // Now convert 'maximum overall distance' to distance to player.
     m_distance_to_player = 
                 m_world->getOverallDistance(m_kart->getWorldKartId())
-                - m_distance_to_player;
+                - max_overall_distance;
 }   // computeNearestKarts
 
 //-----------------------------------------------------------------------------
