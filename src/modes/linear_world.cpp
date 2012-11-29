@@ -101,7 +101,7 @@ void LinearWorld::restartRace()
         m_kart_info[i].getSector()->update(m_karts[i]->getXYZ());
     }   // next kart
 
-    // First all kart infos must be updated before  the kart position can be 
+    // First all kart infos must be updated before the kart position can be 
     // recomputed, since otherwise 'new' (initialised) valued will be compared
     // with old values.
     updateRacePosition();
@@ -161,20 +161,15 @@ void LinearWorld::update(float dt)
         if(kart->getKartAnimation()) continue;
 
         kart_info.getSector()->update(kart->getXYZ());
-        if(kart_info.m_race_lap>=0)
-            kart_info.m_overall_distance = kart_info.m_race_lap 
-                                         * m_track->getTrackLength()
-                         + getDistanceDownTrackForKart(kart->getWorldKartId());
-        else
-            kart_info.m_overall_distance = 0;
-
+        kart_info.m_overall_distance = kart_info.m_race_lap 
+                                     * m_track->getTrackLength()
+                        + getDistanceDownTrackForKart(kart->getWorldKartId());
     }   // for n
 
     // Update all positions. This must be done after _all_ karts have
     // updated their position and laps etc, otherwise inconsistencies
     // (like two karts at same position) can occur.
     // ---------------------------------------------------------------
-    
     WorldWithRank::updateTrack(dt);
     updateRacePosition();
     
@@ -546,7 +541,16 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
     
     // Finish time is the time needed for the whole race with
     // the computed average speed computed.
-    const float average_speed = kart_info.m_overall_distance/getTime();
+    float average_speed = getTime()==0 
+                        ? 1.0f 
+                        : kart_info.m_overall_distance/getTime();
+
+    // Overall distance is negative before the starting line is crossed
+    // for the first time. Unlikely to happen in real races, but will
+    // happen in 0-laps races.
+    if(average_speed<0) 
+        average_speed = 1.0f;
+
     // Avoid NAN as results when average_speed is low
     // Instead just set time to 99:59:00
     if(average_speed<0.1f)
@@ -608,8 +612,10 @@ void LinearWorld::moveKartAfterRescue(AbstractKart* kart)
 }   // moveKartAfterRescue
 
 //-----------------------------------------------------------------------------
-/** Find the position (rank) of every kart
-  */
+/** Find the position (rank) of every kart. ATM it uses a stable O(n^2) 
+ *  algorithm by counting for each kart how many other karts are ahead of
+ *  it.
+ */
 void LinearWorld::updateRacePosition()
 {
     // Mostly for debugging:
