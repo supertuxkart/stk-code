@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-28 09:12+1100\n"
+"POT-Creation-Date: 2012-11-28 19:07-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -40,12 +40,6 @@ msgstr ""
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/cake.cpp:149
 msgid "%0 eats too much of %1's cake"
-msgstr ""
-
-#. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
-#: src/items/swatter.cpp:342
-#, c-format
-msgid "%0 feels flat today"
 msgstr ""
 
 #. I18N: shown when a player receives a plunger in his face
@@ -153,10 +147,16 @@ msgid "%s by %s"
 msgstr ""
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
-#: src/modes/linear_world.cpp:342
+#: src/modes/linear_world.cpp:341
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
+msgstr ""
+
+#. I18N: shown when hit by swatter. %s is the victim
+#: src/items/swatter.cpp:342
+#, c-format
+msgid "%s feels flat today"
 msgstr ""
 
 #: src/items/powerup.cpp:51
@@ -207,8 +207,8 @@ msgstr ""
 #. I18N: for empty highscores entries
 #. I18N: ./data/gui/track_info_dialog.stkgui
 #: src/states_screens/dialogs/track_info_dialog.cpp:226
-#: data/po/gui_strings.h:295 data/po/gui_strings.h:298
-#: data/po/gui_strings.h:301
+#: data/po/gui_strings.h:119 data/po/gui_strings.h:122
+#: data/po/gui_strings.h:125
 msgid "(Empty)"
 msgstr ""
 
@@ -311,7 +311,8 @@ msgstr ""
 #. I18N: track group
 #: src/states_screens/arenas_screen.cpp:80
 #: src/states_screens/tracks_screen.cpp:195
-#: src/states_screens/kart_selection.cpp:1034 data/po/gui_strings.h:570
+#: src/states_screens/kart_selection.cpp:1034
+#: src/states_screens/arenas_screen.cpp:80 data/po/gui_strings.h:762
 msgid "Add-Ons"
 msgstr ""
 
@@ -337,8 +338,9 @@ msgstr ""
 #. I18N: track group
 #: src/states_screens/arenas_screen.cpp:72
 #: src/states_screens/tracks_screen.cpp:187
+#: src/states_screens/options_screen_video.cpp:354
 #: src/states_screens/kart_selection.cpp:1026
-#: src/states_screens/options_screen_video.cpp:354 data/po/gui_strings.h:574
+#: src/states_screens/arenas_screen.cpp:72 data/po/gui_strings.h:766
 msgid "All"
 msgstr ""
 
@@ -842,7 +844,7 @@ msgstr ""
 msgid "Fetch the ball, %0!"
 msgstr ""
 
-#: src/modes/linear_world.cpp:259
+#: src/modes/linear_world.cpp:258
 msgid "Final lap!"
 msgstr ""
 
@@ -964,7 +966,7 @@ msgstr ""
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
 #: src/states_screens/dialogs/select_challenge.cpp:138
-#: data/po/gui_strings.h:187
+#: data/po/gui_strings.h:687
 msgid "Grand Prix"
 msgstr ""
 
@@ -1025,6 +1027,7 @@ msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:934
 #: src/states_screens/dialogs/race_over_dialog.cpp:221
+#: src/states_screens/race_result_gui.cpp:934
 msgid "Highscores"
 msgstr ""
 
@@ -1053,7 +1056,7 @@ msgid ""
 "challenge to unlock it."
 msgstr ""
 
-#: src/input/input_manager.cpp:613
+#: src/input/input_manager.cpp:614
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
 msgstr ""
@@ -1103,13 +1106,14 @@ msgid "Konqi"
 msgstr ""
 
 #. I18N: Shown at the end of a race
+#: src/states_screens/race_gui_overworld.cpp:106
 #: src/states_screens/race_gui.cpp:91
 #: src/states_screens/minimal_race_gui.cpp:107
 #: src/states_screens/race_gui_overworld.cpp:106
 msgid "Lap"
 msgstr ""
 
-#: src/modes/linear_world.cpp:285
+#: src/modes/linear_world.cpp:284
 #, c-format
 msgid "Lap %i"
 msgstr ""
@@ -1145,6 +1149,8 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:935
 #: src/states_screens/kart_selection.cpp:2049
 #: src/states_screens/kart_selection.cpp:2081
+#: src/states_screens/arenas_screen.cpp:220
+#: src/states_screens/arenas_screen.cpp:243
 #: src/states_screens/race_setup_screen.cpp:211
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr ""
@@ -1236,31 +1242,31 @@ msgstr ""
 msgid "New Game"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:496
+#: src/challenges/challenge_data.cpp:513
 #, c-format
 msgid "New Grand Prix '%s' now available"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:500
+#: src/challenges/challenge_data.cpp:517
 #, c-format
 msgid "New difficulty '%s' now available"
 msgstr ""
 
-#: src/modes/linear_world.cpp:348
+#: src/modes/linear_world.cpp:347
 msgid "New fastest lap"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:486
+#: src/challenges/challenge_data.cpp:503
 #, c-format
 msgid "New game mode '%s' now available"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:510
+#: src/challenges/challenge_data.cpp:527
 #, c-format
 msgid "New kart '%s' now available"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:480
+#: src/challenges/challenge_data.cpp:498
 #, c-format
 msgid "New track '%s' now available"
 msgstr ""
@@ -1337,7 +1343,7 @@ msgstr ""
 msgid "Oliver's Math Class"
 msgstr ""
 
-#: src/input/input_manager.cpp:643
+#: src/input/input_manager.cpp:644
 msgid "Only the Game Master may act at this point!"
 msgstr ""
 
@@ -1518,6 +1524,7 @@ msgstr ""
 msgid "Random Track"
 msgstr ""
 
+#: src/states_screens/race_gui_overworld.cpp:107
 #: src/states_screens/race_gui.cpp:92
 #: src/states_screens/minimal_race_gui.cpp:108
 #: src/states_screens/race_gui_overworld.cpp:107
@@ -2008,7 +2015,7 @@ msgstr ""
 msgid "Volume"
 msgstr ""
 
-#: src/modes/linear_world.cpp:822
+#: src/modes/linear_world.cpp:821
 msgid "WRONG WAY!"
 msgstr ""
 
@@ -2116,7 +2123,7 @@ msgid ""
 "You completed the intermediate challenge! This trophy is worth %i points"
 msgstr ""
 
-#: src/karts/kart.cpp:806 src/karts/kart.cpp:826
+#: src/karts/kart.cpp:803 src/karts/kart.cpp:823
 msgid "You finished the race!"
 msgstr ""
 
@@ -2124,7 +2131,7 @@ msgstr ""
 msgid "You have been eliminated!"
 msgstr ""
 
-#: src/karts/kart.cpp:1674
+#: src/karts/kart.cpp:1671
 msgid ""
 "You need more points\n"
 "to enter this challenge!"
@@ -2143,7 +2150,7 @@ msgstr ""
 msgid "You unlocked track %0"
 msgstr ""
 
-#: src/karts/kart.cpp:806 src/karts/kart.cpp:826
+#: src/karts/kart.cpp:803 src/karts/kart.cpp:823
 msgid "You won the race!"
 msgstr ""
 
@@ -2188,6 +2195,7 @@ msgstr ""
 #: src/states_screens/arenas_screen.cpp:78
 #: src/states_screens/tracks_screen.cpp:193
 #: src/states_screens/kart_selection.cpp:1032
+#: src/states_screens/arenas_screen.cpp:78
 msgid "standard"
 msgstr ""
 
