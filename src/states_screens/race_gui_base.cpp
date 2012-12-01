@@ -1030,6 +1030,8 @@ void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart, float dt)
         m_plunger_state = PLUNGER_STATE_INIT;
         return;
     }
+    if(World::getWorld()->getPhase()==World::IN_GAME_MENU_PHASE)
+        return;
 
     const core::recti &viewport = kart->getCamera()->getViewport();
 
