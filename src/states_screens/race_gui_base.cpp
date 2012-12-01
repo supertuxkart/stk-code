@@ -1030,8 +1030,6 @@ void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart, float dt)
         m_plunger_state = PLUNGER_STATE_INIT;
         return;
     }
-    if(World::getWorld()->getPhase()==World::IN_GAME_MENU_PHASE)
-        return;
 
     const core::recti &viewport = kart->getCamera()->getViewport();
 
@@ -1046,49 +1044,52 @@ void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart, float dt)
         m_plunger_speed     = core::vector2df(0, 0);
     }
 
-    m_plunger_move_time -= dt;
-    if(m_plunger_move_time < dt && m_plunger_state!=PLUNGER_STATE_FAST)
+    if(World::getWorld()->getPhase()!=World::IN_GAME_MENU_PHASE)
     {
-        const float fast_time = 0.3f;
-        if(kart->getBlockedByPlungerTime()<fast_time)
+        m_plunger_move_time -= dt;
+        if(m_plunger_move_time < dt && m_plunger_state!=PLUNGER_STATE_FAST)
         {
-            // First time we reach faste state: select random target point
-            // at top of screen and set speed accordingly
-            RandomGenerator random;
-            float movement_fraction = 0.3f;
-            int plunger_x_target  = screen_width/2 
-                            + random.get((int)(screen_width*movement_fraction))
-                            - (int)(screen_width*movement_fraction*0.5f);
-            m_plunger_state = PLUNGER_STATE_FAST;
-            m_plunger_speed = 
-                core::vector2df((plunger_x_target-screen_width/2)/fast_time,
-                                viewport.getHeight()*0.5f/fast_time);
-            m_plunger_move_time = fast_time;
-        }
-        else
-        {
-            RandomGenerator random;
-            m_plunger_move_time = 0.1f+random.get(50)/200.0f;
-            // Plunger is either moving or not moving
-            if(m_plunger_state==PLUNGER_STATE_SLOW_1)
+            const float fast_time = 0.3f;
+            if(kart->getBlockedByPlungerTime()<fast_time)
             {
-                m_plunger_state = PLUNGER_STATE_SLOW_2;
+                // First time we reach faste state: select random target point
+                // at top of screen and set speed accordingly
+                RandomGenerator random;
+                float movement_fraction = 0.3f;
+                int plunger_x_target  = screen_width/2 
+                    + random.get((int)(screen_width*movement_fraction))
+                    - (int)(screen_width*movement_fraction*0.5f);
+                m_plunger_state = PLUNGER_STATE_FAST;
                 m_plunger_speed = 
-                    core::vector2df(0, 0.05f*viewport.getHeight()
-                                       /m_plunger_move_time      );
+                    core::vector2df((plunger_x_target-screen_width/2)/fast_time,
+                    viewport.getHeight()*0.5f/fast_time);
+                m_plunger_move_time = fast_time;
             }
             else
             {
-                m_plunger_state = PLUNGER_STATE_SLOW_1;
-                m_plunger_speed = 
-                    core::vector2df(0, 0.02f*viewport.getHeight()
-                                       /m_plunger_move_time      );
-            }
-        }   // has not reach fast moving state            
-    }
+                RandomGenerator random;
+                m_plunger_move_time = 0.1f+random.get(50)/200.0f;
+                // Plunger is either moving or not moving
+                if(m_plunger_state==PLUNGER_STATE_SLOW_1)
+                {
+                    m_plunger_state = PLUNGER_STATE_SLOW_2;
+                    m_plunger_speed = 
+                        core::vector2df(0, 0.05f*viewport.getHeight()
+                        /m_plunger_move_time      );
+                }
+                else
+                {
+                    m_plunger_state = PLUNGER_STATE_SLOW_1;
+                    m_plunger_speed = 
+                        core::vector2df(0, 0.02f*viewport.getHeight()
+                        /m_plunger_move_time      );
+                }
+            }   // has not reach fast moving state            
+        }
 
-    m_plunger_offset.X += (int)(m_plunger_speed.X * dt);
-    m_plunger_offset.Y += (int)(m_plunger_speed.Y * dt);
+        m_plunger_offset.X += (int)(m_plunger_speed.X * dt);
+        m_plunger_offset.Y += (int)(m_plunger_speed.Y * dt);
+    }
 
     const int plunger_size = (int)(0.6f * screen_width);
     int offset_y = viewport.UpperLeftCorner.Y + viewport.getHeight()/2 
