@@ -149,7 +149,8 @@ void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty diffic
     
     std::vector<std::string> tracks;
     std::vector<std::string> gps;
-                                        
+    
+    unlock_manager->updateActiveChallengeList();
     unlock_manager->findWhatWasUnlocked(pointsBefore, pointsNow, tracks, gps);
     
     for (unsigned int i = 0; i < tracks.size(); i++)
