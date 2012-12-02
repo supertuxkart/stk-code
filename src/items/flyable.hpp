@@ -204,9 +204,6 @@ public:
     PowerupManager::PowerupType
                   getType() const {return m_type;}
     // ------------------------------------------------------------------------
-    /** Returns the sfx that should be played in case of an explosion. */
-    virtual const char*  getExplosionSound() const { return "explosion"; }
-    // ------------------------------------------------------------------------
     /** Sets wether Flyable should update TerrainInfo as part of its update
      *  call, or if the inheriting object will update TerrainInfo itself
      *  (or perhaps not at all if it is not needed). */
