@@ -104,6 +104,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_finished_race        = false;
     m_finish_time          = 0.0f;
     m_bubblegum_time       = 0.0f;
+    m_bubblegum_torque     = 0.0f;
     m_invulnerable_time    = 0.0f;
     m_squash_time          = 0.0f;
     m_shadow_enabled       = false;
@@ -311,6 +312,7 @@ void Kart::reset()
     if (m_bubblegum_time > 0.0f)
     {
         m_bubblegum_time = 0.0f;
+        m_bubblegum_torque = 0.0f;
         m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
                            m_kart_properties->getChassisAngularDamping() );
     }
@@ -336,6 +338,7 @@ void Kart::reset()
     m_eliminated           = false;
     m_finish_time          = 0.0f;
     m_bubblegum_time       = 0.0f;
+    m_bubblegum_torque     = 0.0f;
     m_invulnerable_time    = 0.0f;
     m_squash_time          = 0.0f;
     m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
@@ -868,8 +871,8 @@ void Kart::collectedItem(Item *item, int add_info)
         m_has_caught_nolok_bubblegum = (item->getEmitter() != NULL && item->getEmitter()->getIdent() == "nolok");
         
         // slow down
-        //m_body->setLinearVelocity(m_body->getLinearVelocity()*0.3f);
         m_bubblegum_time = 1.0f;
+        m_bubblegum_torque = rand()%2 ? 500.0f : -500.0f;
         m_body->setDamping(0.8f, 0.8f);
         m_goo_sound->position(getXYZ());
         m_goo_sound->play();
@@ -1003,6 +1006,7 @@ void Kart::update(float dt)
             // undo bubblegum effect
             m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
                                m_kart_properties->getChassisAngularDamping() );
+            m_bubblegum_torque = 0.0f;
         }
     }
     
@@ -1954,7 +1958,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
     if (m_bubblegum_time > 0.0f)
     {
         engine_power = 0.0f;
-        m_body->applyTorque(btVector3(0.0, 500.0f, 0.0));
+        m_body->applyTorque(btVector3(0.0, m_bubblegum_torque, 0.0));
     }
         
     if(m_controls.m_accel)   // accelerating
