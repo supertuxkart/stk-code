@@ -140,6 +140,9 @@ private:
     /** If > 0 then bubble gum effect is on */
     float        m_bubblegum_time;
 
+    /** The torque to apply after hitting a bubble gum. */
+    float        m_bubblegum_torque;
+
     // Bullet physics parameters
     // -------------------------
     btCompoundShape          m_kart_chassis;
