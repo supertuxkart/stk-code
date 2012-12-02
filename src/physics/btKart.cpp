@@ -727,9 +727,10 @@ void btKart::updateFriction(btScalar timeStep)
                 // bullet then tries to offset by applying a backward
                 // impulse - which is a bit too big, causing a impulse
                 // backwards, ... till the kart is shaking backwards and
-                // forwards
+                // forwards. By onlyu applying half of the impulse in cae
+                // of low friction this goes away.
                 if(wheelInfo.m_brake && fabsf(rollingFriction)<10)
-                    rollingFriction=0;
+                    rollingFriction*=0.5f;
             }
 
             m_forwardImpulse[wheel] = rollingFriction;
