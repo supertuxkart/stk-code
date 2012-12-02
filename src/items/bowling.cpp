@@ -16,9 +16,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "items/bowling.hpp"
+
+#include "graphics/hit_sfx.hpp"
 #include "graphics/material.hpp"
 #include "io/xml_node.hpp"
-#include "items/bowling.hpp"
 #include "karts/abstract_kart.hpp"
 #include "utils/random_generator.hpp"
 
@@ -212,3 +214,11 @@ bool Bowling::hit(AbstractKart* kart, PhysicalObject* obj)
         explode(kart, obj, /*hit_secondary*/false);
     return was_real_hit;
 }   // hit
+// ----------------------------------------------------------------------------
+/** Returns the hit effect object to use when this objects hits something.
+ *  \returns The hit effect object, or NULL if no hit effect should be played.
+ */
+HitEffect* Bowling::getHitEffect() const
+{
+    return new HitSFX(getXYZ(), "strike");
+}   // getHitEffect

@@ -46,9 +46,8 @@ public:
     virtual bool updateAndDelete(float dt);
     virtual const core::stringw getHitString(const AbstractKart *kart) const;
     virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
+    virtual HitEffect *getHitEffect() const;
 
-    /** Returns the sfx to use when the bowling ball explodes. */
-    const char* getExplosionSound() const { return "strike"; }
     
 };   // Bowling
 
