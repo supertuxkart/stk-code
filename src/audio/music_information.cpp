@@ -139,9 +139,6 @@ void MusicInformation::startMusic()
     m_time_since_faster  = 0.0f;
     m_mode               = SOUND_NORMAL;
 
-    std::cout << "startMusic : m_normal_filename=<" << m_normal_filename.c_str() << ">, gain="
-              << m_adjusted_gain << "\n";
-    
     if (m_normal_filename== "") return;
 
     // First load the 'normal' music
