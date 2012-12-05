@@ -443,9 +443,9 @@ void CutsceneWorld::restartRace()
 //-----------------------------------------------------------------------------
 /** Returns the data to display in the race gui.
  */
-RaceGUIBase::KartIconDisplayInfo* CutsceneWorld::getKartsDisplayInfo()
+void CutsceneWorld::getKartsDisplayInfo(
+                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
 {
-    return NULL;
 }   // getKartDisplayInfo
 
 //-----------------------------------------------------------------------------

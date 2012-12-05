@@ -41,7 +41,6 @@
  */
 LinearWorld::LinearWorld() : WorldWithRank()
 {
-    m_kart_display_info    = NULL;
     m_last_lap_sfx         = sfx_manager->createSoundSource("last_lap_fanfare");
     m_last_lap_sfx_played  = false;
     m_last_lap_sfx_playing = false;
@@ -62,8 +61,6 @@ void LinearWorld::init()
     m_last_lap_sfx_played           = false;
     m_last_lap_sfx_playing          = false;
     const unsigned int kart_amount  = m_karts.size();
-    
-    m_kart_display_info = new RaceGUIBase::KartIconDisplayInfo[kart_amount];
 
     for(unsigned int n=0; n<kart_amount; n++)
     {
@@ -78,11 +75,6 @@ void LinearWorld::init()
 LinearWorld::~LinearWorld()
 {
     sfx_manager->deleteSFX(m_last_lap_sfx);
-
-    // In case that a track is not found, m_kart_display info was never
-    // initialised.
-    if(m_kart_display_info)
-        delete[] m_kart_display_info;
 }   // ~LinearWorld
 
 //-----------------------------------------------------------------------------
@@ -415,7 +407,8 @@ float LinearWorld::getTimeAtLapForKart(const int kart_id) const
 }   // getTimeAtLapForKart
 
 //-----------------------------------------------------------------------------
-RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
+void LinearWorld::getKartsDisplayInfo(
+                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
 {
     int   laps_of_leader       = -1;
     float time_of_leader       = -1;
@@ -425,7 +418,7 @@ RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     const unsigned int kart_amount = getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
-        RaceGUIBase::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
+        RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         AbstractKart* kart = m_karts[i];
 
         // reset color
@@ -455,7 +448,7 @@ RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     // we now know the best time of the lap. fill the remaining bits of info
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
-        RaceGUIBase::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
+        RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         KartInfo& kart_info = m_kart_info[i];
         AbstractKart* kart = m_karts[i];
 
@@ -503,7 +496,6 @@ RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     }   // next kart
 
 
-    return m_kart_display_info;
 }   // getKartsDisplayInfo
 
 //-----------------------------------------------------------------------------

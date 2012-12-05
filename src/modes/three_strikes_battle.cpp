@@ -62,7 +62,6 @@ void ThreeStrikesBattle::init()
     }
  
     const unsigned int kart_amount = m_karts.size();
-    m_kart_display_info = new RaceGUIBase::KartIconDisplayInfo[kart_amount];
     
     for(unsigned int n=0; n<kart_amount; n++)
     {
@@ -90,8 +89,6 @@ void ThreeStrikesBattle::init()
 ThreeStrikesBattle::~ThreeStrikesBattle()
 {
     m_tires.clearWithoutDeleting();
-    
-    delete[] m_kart_display_info;
 
     irr_driver->grabAllTextures(m_tire);
     // Remove the mesh from the cache so that the mesh is properly
@@ -427,12 +424,13 @@ void ThreeStrikesBattle::restartRace()
 //-----------------------------------------------------------------------------
 /** Returns the data to display in the race gui.
  */
-RaceGUIBase::KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
+void ThreeStrikesBattle::getKartsDisplayInfo(
+                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
 {
     const unsigned int kart_amount = getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
-        RaceGUIBase::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
+        RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         
         // reset color
         rank_info.lap = -1;
@@ -466,9 +464,7 @@ RaceGUIBase::KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
         
         rank_info.m_text = lives;
     }
-    
-    return m_kart_display_info;
-}   // getKartDisplayInfo
+}   // getKartsDisplayInfo
 
 //-----------------------------------------------------------------------------
 /** Moves a kart to its rescue position.

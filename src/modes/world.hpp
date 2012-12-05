@@ -196,11 +196,19 @@ public:
     /** Called when it is needed to know whether this kind of race involves 
      *  counting laps. */
     virtual bool raceHasLaps() = 0;
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
+    /** Returns the number of laps for a given kart. Only valid when
+     *  raceHasLaps() - otherwise STK will abort. */
+    virtual int getKartLaps(unsigned int kart_index) const
+    {
+        assert(false); return -1; // remove compiler warning
+    }   // getKartLaps
+    // ------------------------------------------------------------------------
     /** Called by the code that draws the list of karts on the race GUI
       * to know what needs to be drawn in the current mode. */
-    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo() = 0;
-    // ------------------------------------------------------------------------    
+    virtual void getKartsDisplayInfo(
+                       std::vector<RaceGUIBase::KartIconDisplayInfo> *info)= 0;
+    // ------------------------------------------------------------------------
 
     // Virtual functions
     // =================

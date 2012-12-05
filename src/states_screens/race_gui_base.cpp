@@ -105,6 +105,8 @@ RaceGUIBase::RaceGUIBase()
  */
 void RaceGUIBase::init()
 {
+    m_kart_display_infos.resize(race_manager->getNumberOfKarts());
+
     // While we actually only need the positions for local players,
     // we add all karts, since it's easier to get a world kart id from
     // the kart then the local player id (and it avoids problems in 
@@ -716,8 +718,7 @@ void RaceGUIBase::drawGlobalReadySetGo()
 /** Draw players icons and their times (if defined in the current mode).
  *  Also takes care of icon looking different due to plumber, squashing, ...
  */
-void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
-                                        int bottom_margin)
+void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 {
     int x_base = 10;
     int y_base = 20;
@@ -784,8 +785,9 @@ void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
     int y_icons_limit=UserConfigParams::m_height-bottom_margin-ICON_PLAYER_WIDTH;
     if (race_manager->getNumLocalPlayers() == 3)
         y_icons_limit=UserConfigParams::m_height-ICON_WIDTH;
-    
-    
+
+    world->getKartsDisplayInfo(&m_kart_display_infos);
+
     for(int position = 1; position <= (int)kart_amount ; position++)
     {
         AbstractKart *kart = world->getKartAtPosition(position);
@@ -800,8 +802,9 @@ void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
         if(kart->isEliminated()) continue;
         unsigned int kart_id = kart->getWorldKartId();
         
+        KartIconDisplayInfo &info = m_kart_display_infos[kart_id];
         //x,y is the target position
-        int lap = info[kart_id].lap;
+        int lap = info.lap;
         
         // In battle mode there is no distance along track etc.
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
@@ -865,25 +868,25 @@ void RaceGUIBase::drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
             break;
         }
         
-        if (info[kart_id].m_text.size() > 0)
+        if (m_kart_display_infos[kart_id].m_text.size() > 0)
         {
             video::SColor color = video::SColor(255,
-                                                (int)(255*info[kart_id].r),
-                                                (int)(255*info[kart_id].g), 
-                                                (int)(255*info[kart_id].b)   );
+                                                (int)(255*info.r),
+                                                (int)(255*info.g), 
+                                                (int)(255*info.b)   );
             core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, 
                                 x+ICON_PLAYER_WIDTH, y+5);
-            core::stringw s=info[kart_id].m_text.c_str();
+            core::stringw s=info.m_text.c_str();
             
             font->draw(s.c_str(), pos, color, false, false, NULL, true /* ignore RTL */);
         }
         
-        if (info[kart_id].special_title.size() > 0)
+        if (info.special_title.size() > 0)
         {
             static video::SColor color = video::SColor(255, 255, 0, 0);
             core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, 
                                 x+ICON_PLAYER_WIDTH, y+5);
-            core::stringw s(info[kart_id].special_title.c_str());
+            core::stringw s(info.special_title.c_str());
             font->draw(s.c_str(), pos, color, false, false, NULL, true /* ignore RTL */);
         }
         

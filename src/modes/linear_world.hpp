@@ -95,7 +95,6 @@ private:
     // ------------------------------------------------------------------------
 
 protected:
-    RaceGUIBase::KartIconDisplayInfo* m_kart_display_info;
 
     /** This vector contains an 'KartInfo' struct for every kart in the race.
       * This member is not strictly private but try not to use it directly outside
@@ -128,8 +127,8 @@ public:
     int           getLapForKart(const int kart_id) const;
     float         getTimeAtLapForKart(const int kart_id) const;
 
-    virtual  RaceGUIBase::KartIconDisplayInfo* 
-                  getKartsDisplayInfo() OVERRIDE;
+    virtual  void getKartsDisplayInfo(
+                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     virtual void  moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
     virtual void  restartRace() OVERRIDE;
     virtual void  newLap(unsigned int kart_index) OVERRIDE;
@@ -154,7 +153,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of laps a kart has completed. 
      *  \param kart_index World index of the kart. */
-    int getKartLap(unsigned int kart_index) const
+    int getKartLaps(unsigned int kart_index) const
     {
         assert(kart_index < m_kart_info.size());
         return m_kart_info[kart_index].m_race_lap;

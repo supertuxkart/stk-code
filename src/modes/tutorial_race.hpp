@@ -29,22 +29,18 @@ class TutorialRace : public LinearWorld
 {
 private:
 
-    std::vector <float>  m_leader_intervals;    // time till elimination in follow leader
-
 public:
     
              TutorialRace();
     virtual ~TutorialRace();
-    
-    // clock events
-    virtual void countdownReachedZero();
-    
+        
     // overriding World methods
     virtual void restartRace();
     virtual const std::string& getIdent() const;
     float   getClockStartTime();
     virtual bool useFastMusicNearEnd() const { return false; }
-    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo();
+    virtual void getKartsDisplayInfo(
+                         std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
     
     virtual bool isRaceOver();
     virtual bool raceHasLaps(){ return false; }

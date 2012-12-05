@@ -97,8 +97,7 @@ private:
     void drawSpeedAndEnergy    (const AbstractKart* kart, 
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
-    void drawRankLap           (const KartIconDisplayInfo* info, 
-                                const AbstractKart* kart,
+    void drawRankLap           (const AbstractKart* kart,
                                 const core::recti &viewport);
 
     /** Display items that are shown once only (for all karts). */

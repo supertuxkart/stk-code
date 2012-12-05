@@ -206,7 +206,11 @@ protected:
     
     /** previous position of icons */
     std::vector< core::vector2d<s32> > m_previous_icons_position;
-    
+
+    /** This vector is passed to world to be filled with the current 
+     *  race data information. */
+    std::vector<KartIconDisplayInfo> m_kart_display_infos;
+
 public:
     
     bool m_enabled;
@@ -235,8 +239,7 @@ public:
     /** Set the flag that a lightning should be shown. */
     void doLightning() { m_lightning = 1.0f; }
 
-    void drawGlobalPlayerIcons(const KartIconDisplayInfo* info,
-                               int bottom_margin);
+    void drawGlobalPlayerIcons(int bottom_margin);
 
 };   // RaceGUIBase
 

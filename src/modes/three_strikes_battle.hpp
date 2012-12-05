@@ -41,8 +41,6 @@ private:
     {
         int m_lives;
     };
-
-    RaceGUIBase::KartIconDisplayInfo* m_kart_display_info;
     
     /** This vector contains an 'BattleInfo' struct for every kart in the race.
     */
@@ -96,7 +94,8 @@ public:
 
     //virtual void getDefaultCollectibles(int& collectible_type, int& amount);
     virtual bool useFastMusicNearEnd() const { return false; }
-    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo();
+    virtual void getKartsDisplayInfo(
+                          std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
     virtual bool raceHasLaps(){ return false; }
     virtual void moveKartAfterRescue(AbstractKart* kart);
     

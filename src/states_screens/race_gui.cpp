@@ -168,14 +168,8 @@ void RaceGUI::renderGlobal(float dt)
         drawGlobalMusicDescription();
     }
 
-    // minimap has no mipmaps so disable material2D
-    //irr_driver->getVideoDriver()->enableMaterial2D(false);
-    drawGlobalMiniMap();
-    //irr_driver->getVideoDriver()->enableMaterial2D();
-    
-    KartIconDisplayInfo* info = world->getKartsDisplayInfo();
-    
-    drawGlobalPlayerIcons(info, m_map_height);
+    drawGlobalMiniMap();        
+    drawGlobalPlayerIcons(m_map_height);
 }   // renderGlobal
 
 //-----------------------------------------------------------------------------
@@ -198,11 +192,9 @@ void RaceGUI::renderPlayerView(const AbstractKart *kart, float dt)
     
     if(!World::getWorld()->isRacePhase()) return;
 
-    RaceGUI::KartIconDisplayInfo* info = World::getWorld()->getKartsDisplayInfo();
-
     drawPowerupIcons    (kart, viewport, scaling);
     drawSpeedAndEnergy  (kart, viewport, scaling);
-    drawRankLap         (info, kart, viewport);
+    drawRankLap         (kart, viewport);
 
     RaceGUIBase::renderPlayerView(kart, dt);
 }   // renderPlayerView
@@ -494,8 +486,7 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
 /** Displays the rank and the lap of the kart.
  *  \param info Info object c
 */
-void RaceGUI::drawRankLap(const KartIconDisplayInfo* info,
-                          const AbstractKart* kart,
+void RaceGUI::drawRankLap(const AbstractKart* kart,
                           const core::recti &viewport)
 {
     // Don't display laps or ranks if the kart has already finished the race.
@@ -539,7 +530,7 @@ void RaceGUI::drawRankLap(const KartIconDisplayInfo* info,
     // Don't display laps in follow the leader mode
     if(world->raceHasLaps())
     {
-        const int lap = info[kart->getWorldKartId()].lap;
+        const int lap = world->getKartLaps(kart->getWorldKartId());
     
         // don't display 'lap 0/...'
         if(lap>=0)

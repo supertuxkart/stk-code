@@ -206,9 +206,9 @@ const std::string& FollowTheLeaderRace::getIdent() const
 /** Sets the title for all karts that is displayed in the icon list. In
  *  this mode the title for the first kart is set to 'leader'.
  */
-RaceGUIBase::KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo()
+void FollowTheLeaderRace::getKartsDisplayInfo(
+                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
 {
-    LinearWorld::getKartsDisplayInfo();
-    m_kart_display_info[0].special_title = _("Leader");
-    return m_kart_display_info;
+    LinearWorld::getKartsDisplayInfo(info);
+    (*info)[0].special_title = _("Leader");
 }   // getKartsDisplayInfo

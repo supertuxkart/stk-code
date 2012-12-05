@@ -42,7 +42,8 @@ public:
     virtual const std::string& getIdent() const OVERRIDE;
     virtual float getClockStartTime();
     virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
-    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo() OVERRIDE;
+    virtual void getKartsDisplayInfo(
+                 std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     virtual void init() OVERRIDE;
     
     virtual bool isRaceOver() OVERRIDE;

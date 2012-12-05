@@ -78,7 +78,8 @@ public:
     // overriding World methods
     virtual void restartRace() OVERRIDE;
 
-    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo() OVERRIDE;
+    virtual void getKartsDisplayInfo(
+                 std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     virtual bool raceHasLaps() OVERRIDE { return false; }
     virtual void moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
     

@@ -189,8 +189,7 @@ void MinimalRaceGUI::renderGlobal(float dt)
     // in 3 strikes mode we need to see the lives
     if (world->getIdent() == IDENT_STRIKES)
     {
-        KartIconDisplayInfo* info = world->getKartsDisplayInfo();
-        drawGlobalPlayerIcons(info, m_map_height);
+        drawGlobalPlayerIcons(m_map_height);
     }
 }   // renderGlobal
 
@@ -212,11 +211,9 @@ void MinimalRaceGUI::renderPlayerView(const AbstractKart *kart, float dt)
     drawAllMessages     (kart, viewport, scaling);
     if(!World::getWorld()->isRacePhase()) return;
 
-    MinimalRaceGUI::KartIconDisplayInfo* info = World::getWorld()->getKartsDisplayInfo();
-
     drawPowerupIcons    (kart, viewport, scaling);
     drawEnergyMeter     (kart, viewport, scaling);
-    drawRankLap         (info, kart, viewport);
+    drawRankLap         (kart, viewport);
 
     RaceGUIBase::renderPlayerView(kart, dt);
 }   // renderPlayerView
@@ -418,8 +415,7 @@ void MinimalRaceGUI::drawEnergyMeter(const AbstractKart *kart,
 /** Displays the rank and the lap of the kart.
  *  \param info Info object c
 */
-void MinimalRaceGUI::drawRankLap(const KartIconDisplayInfo* info, 
-                                 const AbstractKart* kart,
+void MinimalRaceGUI::drawRankLap(const AbstractKart* kart,
                                  const core::recti &viewport)
 {
     // Don't display laps or ranks if the kart has already finished the race.
@@ -464,7 +460,7 @@ void MinimalRaceGUI::drawRankLap(const KartIconDisplayInfo* info,
     // Don't display laps in follow the leader mode
     if(world->raceHasLaps())
     {
-        const int lap = info[kart->getWorldKartId()].lap;
+        const int lap = world->getKartLaps(kart->getWorldKartId());
     
         // don't display 'lap 0/...'
         if(lap>=0)
