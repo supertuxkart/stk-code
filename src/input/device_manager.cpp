@@ -45,9 +45,10 @@ DeviceManager::DeviceManager()
 // -----------------------------------------------------------------------------
 bool DeviceManager::initialize()
 {
-    GamepadConfig           *gamepadConfig = NULL;
-    GamePadDevice           *gamepadDevice = NULL;
-    bool created = false;
+    GamepadConfig *gamepadConfig = NULL;
+    GamePadDevice *gamepadDevice = NULL;
+    m_map_fire_to_select         = false;
+    bool created                 = false;
     int numGamepads;
 
 
@@ -373,6 +374,15 @@ bool DeviceManager::translateInput( Input::InputType type,
     {
         case Input::IT_KEYBOARD:
             device = mapKeyboardInput(btnID, mode, player, action);
+            if(!device && m_map_fire_to_select)
+            {
+                device = mapKeyboardInput(btnID, InputManager::INGAME, player,
+                                          action);
+                if(device)
+                {
+                    *action = PA_MENU_SELECT;
+                }
+            }
             break;
         case Input::IT_STICKBUTTON:
         case Input::IT_STICKMOTION:
@@ -388,6 +398,8 @@ bool DeviceManager::translateInput( Input::InputType type,
     {
         m_latest_used_device = device;
     }
+
+    m_map_fire_to_select = false;
     return (device != NULL);
 }   // translateInput
 

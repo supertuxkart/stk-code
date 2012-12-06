@@ -1166,6 +1166,16 @@ void KartSelectionScreen::unloaded()
 }
 
 // ----------------------------------------------------------------------------
+void KartSelectionScreen::filterInput(Input::InputType type, int deviceID,
+                                      int btnID, int axisDir,int value)
+{
+    // This flag will cause that a 'fire' event will be mapped to 'select' (if
+    // 'fire' is not assigned to a GUI event). This is done to support the old
+    // way of player joining by pressing 'fire' instead of 'select'.
+    input_manager->getDeviceList()->mapFireToSelect();
+}   // filterInput
+
+// ----------------------------------------------------------------------------
 // Return true if event was handled successfully
 bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 {

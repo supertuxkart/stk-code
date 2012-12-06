@@ -137,4 +137,8 @@ public:
     /** \brief implement optional callback from parent 
      *  class GUIEngine::Screen */
     virtual bool onEscapePressed() OVERRIDE;
+
+    virtual void filterInput(Input::InputType type,
+                             int deviceID, int btnID,
+                             int axisDir,int value);
 };
