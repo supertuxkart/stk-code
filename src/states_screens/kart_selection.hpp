@@ -138,7 +138,4 @@ public:
      *  class GUIEngine::Screen */
     virtual bool onEscapePressed() OVERRIDE;
 
-    virtual void filterInput(Input::InputType type,
-                             int deviceID, int btnID,
-                             int axisDir,int value);
-};
+};   // KartSelectionScreen

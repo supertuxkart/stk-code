@@ -1130,6 +1130,10 @@ void KartSelectionScreen::init()
         // if kart from config not found, select the first instead
         w->setSelection(0, 0, true);
     }
+    // This flag will cause that a 'fire' event will be mapped to 'select' (if
+    // 'fire' is not assigned to a GUI event). This is done to support the old
+    // way of player joining by pressing 'fire' instead of 'select'.
+    input_manager->getDeviceList()->mapFireToSelect(true);
     
 }   // init
 
@@ -1137,6 +1141,9 @@ void KartSelectionScreen::init()
 
 void KartSelectionScreen::tearDown()
 {
+    // Reset the 'map fire to select' option of the device manager
+    input_manager->getDeviceList()->mapFireToSelect(false);
+
     // if a removed widget is currently shrinking down, remove it upon leaving
     // the screen
     if (m_removed_widget != NULL)
@@ -1164,16 +1171,6 @@ void KartSelectionScreen::unloaded()
     // these pointers are no more valid (have been deleted along other widgets)
     g_dispatcher = NULL;
 }
-
-// ----------------------------------------------------------------------------
-void KartSelectionScreen::filterInput(Input::InputType type, int deviceID,
-                                      int btnID, int axisDir,int value)
-{
-    // This flag will cause that a 'fire' event will be mapped to 'select' (if
-    // 'fire' is not assigned to a GUI event). This is done to support the old
-    // way of player joining by pressing 'fire' instead of 'select'.
-    input_manager->getDeviceList()->mapFireToSelect();
-}   // filterInput
 
 // ----------------------------------------------------------------------------
 // Return true if event was handled successfully

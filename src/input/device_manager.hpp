@@ -156,14 +156,17 @@ public:
 
 	void                clearLatestUsedDevice();
     InputDevice*        getLatestUsedDevice();
+    bool initialize();
+    void serialize();
     
     StateManager::ActivePlayer* getSinglePlayer()       { return m_single_player; }
     void setSinglePlayer(StateManager::ActivePlayer* p) { m_single_player = p;    }
-    void mapFireToSelect() {m_map_fire_to_select = true; }
+    // ------------------------------------------------------------------------
+    /** Sets or reset the 'map fire to select' option.
+     */
+    void mapFireToSelect(bool v) {m_map_fire_to_select = v; }
     
-    bool initialize();
-    void serialize();
-};
+};   // DeviceManager
 
 
 #endif

@@ -374,19 +374,27 @@ bool DeviceManager::translateInput( Input::InputType type,
     {
         case Input::IT_KEYBOARD:
             device = mapKeyboardInput(btnID, mode, player, action);
+            // If the action is not recognised, check if it's a fire key
+            // that should be mapped to select
             if(!device && m_map_fire_to_select)
             {
                 device = mapKeyboardInput(btnID, InputManager::INGAME, player,
                                           action);
-                if(device)
-                {
+                if(device && *action == PA_FIRE)
                     *action = PA_MENU_SELECT;
-                }
             }
             break;
         case Input::IT_STICKBUTTON:
         case Input::IT_STICKMOTION:
-            device = mapGamepadInput(type, deviceID, btnID, axisDir, value, mode, player, action);
+            device = mapGamepadInput(type, deviceID, btnID, axisDir, value, 
+                                     mode, player, action);
+            if(!device && m_map_fire_to_select)
+            {
+                device = mapGamepadInput(type, deviceID, btnID, axisDir, value, 
+                                         InputManager::INGAME, player, action);
+                if(device && *action == PA_FIRE)
+                    *action = PA_MENU_SELECT;
+            }
             break;
         default:
             break;
@@ -399,7 +407,6 @@ bool DeviceManager::translateInput( Input::InputType type,
         m_latest_used_device = device;
     }
 
-    m_map_fire_to_select = false;
     return (device != NULL);
 }   // translateInput
 
