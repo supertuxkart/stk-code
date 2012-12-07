@@ -205,6 +205,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 StateManager::get()->popMenu();
                 World::deleteWorld();
                 StateManager::get()->pushScreen(scene);
+                race_manager->setAIKartOverride("");
             }
             return;
         }
@@ -228,6 +229,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             cleanupGPProgress();
             StateManager::get()->popMenu();
             race_manager->exitRace();
+            race_manager->setAIKartOverride("");
             StateManager::get()->resetAndGoToScreen(
                                                 MainMenuScreen::getInstance());
             
@@ -251,6 +253,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     if(name=="top")                 // Setup new race
     {
         race_manager->exitRace();
+        race_manager->setAIKartOverride("");
         Screen* newStack[] = {MainMenuScreen::getInstance(), 
                               RaceSetupScreen::getInstance(), 
                               NULL};
@@ -263,6 +266,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     else if (name=="bottom")        // Back to main
     {
         race_manager->exitRace();
+        race_manager->setAIKartOverride("");
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
         
         if (race_manager->raceWasStartedFromOverworld())
