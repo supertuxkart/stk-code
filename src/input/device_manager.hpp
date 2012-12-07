@@ -91,6 +91,11 @@ private:
     InputDevice *mapKeyboardInput     ( int btnID, InputManager::InputDriverMode mode,
                                         StateManager::ActivePlayer **player /* out */,
                                         PlayerAction *action /* out */);
+    /** If this is flag is set the next fire event (if the fire key is not 
+     *  mapped to anything else) will be mapped to 'select'. This is used
+     *  in the kart select GUI to support the old way of adding players by
+     *  pressing fire. */
+    bool m_map_fire_to_select;
 
     bool deserialize();
     void shutdown();
@@ -151,14 +156,17 @@ public:
 
 	void                clearLatestUsedDevice();
     InputDevice*        getLatestUsedDevice();
+    bool initialize();
+    void serialize();
     
     StateManager::ActivePlayer* getSinglePlayer()       { return m_single_player; }
     void setSinglePlayer(StateManager::ActivePlayer* p) { m_single_player = p;    }
-
+    // ------------------------------------------------------------------------
+    /** Sets or reset the 'map fire to select' option.
+     */
+    void mapFireToSelect(bool v) {m_map_fire_to_select = v; }
     
-    bool initialize();
-    void serialize();
-};
+};   // DeviceManager
 
 
 #endif
