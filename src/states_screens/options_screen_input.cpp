@@ -284,7 +284,7 @@ void OptionsScreenInput::filterInput(Input::InputType type,
                 }
             }
             
-            if (internal_name.size() > 0)
+            if (internal_name.size() > 0 && abs(value) > Input::MAX_VALUE/2)
             {
                 devices->markItemRed(internal_name.c_str());
                 m_highlights[internal_name] = 0.25f;
