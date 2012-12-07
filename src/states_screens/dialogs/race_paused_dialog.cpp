@@ -121,6 +121,7 @@ GUIEngine::EventPropagation
         {
             ModalDialog::dismiss();
             race_manager->exitRace();
+            race_manager->setAIKartOverride("");
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 
             if (race_manager->raceWasStartedFromOverworld())
