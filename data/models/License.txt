@@ -68,5 +68,8 @@
 
 * swatter-icon
     by Totoplus62, released under CC-0
-    
+  
+* balldimpleddark
+    by Hero, released under CC-BY-SA 3.0
+  
 Others are GPL, by the original (super)TuxKart team
