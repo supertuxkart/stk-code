@@ -173,10 +173,9 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
     
     if (type == Input::IT_STICKMOTION)
     {
-        if (id >= m_axis_count && id != Input::HAT_H_ID && 
-            id != Input::HAT_V_ID) 
-            return false; // this gamepad doesn't even have that many axes
-
+        // this gamepad doesn't even have that many axes
+        if (id >= m_axis_count) return false;
+        
         if (player != NULL)
         {
             // going to negative from positive
@@ -193,7 +192,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
                 resetAxisDirection(id, Input::AD_NEGATIVE, player);
             }
         }
-
+        
         if     (value > 0) m_prevAxisDirections[id] = Input::AD_POSITIVE;
         else if(value < 0) m_prevAxisDirections[id] = Input::AD_NEGATIVE;
 
