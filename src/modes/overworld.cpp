@@ -47,10 +47,10 @@ void OverWorld::enterOverWorld()
     
     // Use keyboard 0 by default (FIXME: let player choose?)
     InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
-    
+
     // Create player and associate player with keyboard
-    StateManager::get()->createActivePlayer( 
-                                            UserConfigParams::m_all_players.get(0), device );
+    StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+                                            device);
     
     if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
     {
