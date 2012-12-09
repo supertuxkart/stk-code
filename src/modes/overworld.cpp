@@ -123,6 +123,7 @@ void OverWorld::update(float dt)
         
         if (music_manager->getCurrentMusic() != NULL && UserConfigParams::m_music)
             music_manager->getCurrentMusic()->startMusic();
+        m_karts[0]->startEngineSFX();
     }
     LinearWorld::update(dt);
     
