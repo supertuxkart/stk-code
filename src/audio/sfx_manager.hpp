@@ -117,7 +117,8 @@ public:
                                           float              gain);
 
     SFXBase*                 createSoundSource(SFXBuffer* info, 
-                                               const bool addToSFXList=true);
+                                               const bool addToSFXList=true,
+                                               const bool owns_buffer=false);
     SFXBase*                 createSoundSource(const std::string &name, 
                                                const bool addToSFXList=true);
     

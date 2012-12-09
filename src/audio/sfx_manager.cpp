@@ -266,7 +266,8 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
  *  \param id Identifier of the sound effect to create.
  */
 SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer, 
-                                       const bool add_to_SFX_list)
+                                       const bool add_to_SFX_list,
+                                       const bool owns_buffer)
 {
     bool positional = false;
 
@@ -282,9 +283,9 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     
 #if HAVE_OGGVORBIS
     assert( alIsBuffer(buffer->getBufferID()) );
-    SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain());
+    SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain(), owns_buffer);
 #else
-    SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain());
+    SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain(), owns_buffer);
 #endif
     
     sfx->volume(m_master_gain);

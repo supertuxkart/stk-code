@@ -55,8 +55,11 @@ private:
      sounds later. */
     float m_gain;
     
+    bool m_owns_buffer;
+    
 public:
-                                  SFXOpenAL(SFXBuffer* buffer, bool positional, float gain);
+                                  SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
+                                            bool owns_buffer = false);
     virtual                      ~SFXOpenAL();
     
     /** Late creation, if SFX was initially disabled */

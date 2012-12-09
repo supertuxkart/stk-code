@@ -35,7 +35,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 
-SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain) : SFXBase()
+SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, bool ownsBuffer) : SFXBase()
 {
     m_soundBuffer = buffer;
     m_soundSource = 0;
@@ -44,6 +44,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain) : SFXBase()
     m_defaultGain = gain;
     m_loop        = false;
     m_gain        = -1.0f;
+    m_owns_buffer = ownsBuffer;
     
     // Don't initialise anything else if the sfx manager was not correctly
     // initialised. First of all the initialisation will not work, and it
@@ -61,6 +62,12 @@ SFXOpenAL::~SFXOpenAL()
     if (m_ok)
     {
         alDeleteSources(1, &m_soundSource);
+    }
+    
+    if (m_owns_buffer && m_soundBuffer != NULL)
+    {
+        m_soundBuffer->unload();
+        delete m_soundBuffer;
     }
 }   // ~SFXOpenAL
 
