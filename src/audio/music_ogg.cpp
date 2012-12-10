@@ -246,17 +246,9 @@ bool MusicOggStream::resumeMusic()
 //-----------------------------------------------------------------------------
 void MusicOggStream::volumeMusic(float gain)
 {
-    if (gain > 1.0f)
-    {
-        gain = 1.0f;
-        fprintf(stderr, "WARNING: MusicOggStream::volumeMusic(%f) is out of acceptable [0, 1] range\n", gain);
-    }
-    if (gain < 0.0f)
-    {
-        gain = 0.0f;
-        fprintf(stderr, "WARNING: MusicOggStream::volumeMusic(%f) is out of acceptable [0, 1] range\n", gain);
-    }
-    
+    if (gain > 1.0f) gain = 1.0f;
+    if (gain < 0.0f) gain = 0.0f;
+
     alSourcef(m_soundSource, AL_GAIN, gain);
 } // volumeMusic
 
