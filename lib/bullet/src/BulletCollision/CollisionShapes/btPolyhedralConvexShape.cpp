@@ -31,6 +31,7 @@ btPolyhedralConvexShape::~btPolyhedralConvexShape()
 {
 	if (m_polyhedron)
 	{
+        m_polyhedron->~btConvexPolyhedron();
 		btAlignedFree(m_polyhedron);
 	}
 }
