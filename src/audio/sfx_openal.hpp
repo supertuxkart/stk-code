@@ -29,6 +29,7 @@
 #endif
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "utils/leak_check.hpp"
 
 /**
   * \brief OpenAL implementation of the abstract SFXBase interface
@@ -78,6 +79,8 @@ public:
     virtual void                  setRolloff(float rolloff);
 
     virtual const SFXBuffer* getBuffer() const { return m_soundBuffer; }
+    
+    LEAK_CHECK()
     
 };   // SFXOpenAL
 

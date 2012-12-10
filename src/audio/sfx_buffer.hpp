@@ -31,6 +31,7 @@ typedef unsigned int ALuint;
 
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
+#include "utils/leak_check.hpp"
 
 #include <string>
 
@@ -101,6 +102,8 @@ public:
     std::string getFileName() const { return m_file;       }
     
     void     setPositional(bool positional) { m_positional = positional; }
+    
+    LEAK_CHECK()
 };
 
 
