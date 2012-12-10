@@ -121,7 +121,8 @@ Rain::~Rain()
 {
     for (int r=0; r<RAIN_RING_COUNT; r++)
     {
-        m_node[r]->remove();
+        m_node[r]->drop();      // drop STK's reference
+        m_node[r]->remove();    // Then remove it from the scene graph.
     }
     
     if (m_lightning && m_thunder_sound != NULL) sfx_manager->deleteSFX(m_thunder_sound);
