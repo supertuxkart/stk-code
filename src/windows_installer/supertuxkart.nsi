@@ -121,6 +121,7 @@ Section "Main Section" SecMain
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
 
     ;Create shortcuts
+    SetShellVarContext all
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\uninstall.ico"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\icon.ico"
