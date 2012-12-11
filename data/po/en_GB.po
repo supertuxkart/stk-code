@@ -1,21 +1,21 @@
-# Danish translation Supertuxkart.
-# Copyright (C) 2009 Joe Hansen.
-# This file is distributed under the same license as the Supertuxkart package.
-# Joe Hansen <joedalton2@yahoo.dk>, 2009.
+# English (United Kingdom) translation for stk
+# Copyright (c) 2012 Rosetta Contributors and Canonical Ltd 2012
+# This file is distributed under the same license as the stk package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Branch irrlicht\n"
-"Report-Msgid-Bugs-To: \n"
+"Project-Id-Version: stk\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-11-28 19:07-0500\n"
-"PO-Revision-Date: 2012-10-31 03:16+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
-"Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
+"PO-Revision-Date: 2012-12-09 12:15+0000\n"
+"Last-Translator: Launchpad Translations Administrators <Unknown>\n"
+"Language-Team: English (United Kingdom) <en_GB@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2012-12-02 23:44+0000\n"
-"X-Generator: Launchpad (build 16319)\n"
+"X-Launchpad-Export-Date: 2012-12-11 00:08+0000\n"
+"X-Generator: Launchpad (build 16341)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
@@ -35,23 +35,23 @@ msgstr ""
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
 msgid "%0 bites %1's bait"
-msgstr "%0 bider på %1s madding"
+msgstr ""
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/cake.cpp:149
 msgid "%0 eats too much of %1's cake"
-msgstr "%0 spiser for meget af %1s kage"
+msgstr ""
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:134
 msgid "%0 gets a fancy mask from %1"
-msgstr "%0 fik en sej maske af %1"
+msgstr ""
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
 #. the victim.
 #: src/items/bowling.cpp:115
 msgid "%0 is bowled over by %1"
-msgstr "%0 er rullet over af %1"
+msgstr ""
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/cake.cpp:151
@@ -67,7 +67,7 @@ msgstr ""
 #. the victim.
 #: src/items/bowling.cpp:109
 msgid "%0 will not go bowling with %1 again"
-msgstr "%0 vil ikke ud at bowle med %1 igen"
+msgstr ""
 
 #. I18N: shown when hit by swatter. %1 is the attacker, %0 is the victim.
 #: src/items/swatter.cpp:340
@@ -110,7 +110,7 @@ msgstr ""
 #: data/po/gui_strings.h:309
 #, c-format
 msgid "%i laps"
-msgstr "%i runder"
+msgstr ""
 
 #. I18N: In results of battle mode; %i is where the rank is inserted;
 #. I18N: the first %s is where the kart name is inserted;
@@ -118,7 +118,7 @@ msgstr "%i runder"
 #: src/states_screens/dialogs/race_over_dialog.cpp:174
 #, c-format
 msgid "%i. %s : survived for %s"
-msgstr "%i. %s : overlevede i %s"
+msgstr ""
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:224
@@ -127,33 +127,31 @@ msgid ""
 "%s\n"
 "by %s"
 msgstr ""
-"%s\n"
-"af %s"
 
 #: src/states_screens/dialogs/addons_loading.cpp:171
 #: src/states_screens/dialogs/addons_loading.cpp:175
 #, c-format
 msgid "%s KB"
-msgstr "%s KB"
+msgstr ""
 
 #: src/states_screens/dialogs/addons_loading.cpp:164
 #, c-format
 msgid "%s MB"
-msgstr "%s MB"
+msgstr ""
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:214
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
-msgstr "%s af %s"
+msgstr ""
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
 #: src/modes/linear_world.cpp:341
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
-msgstr "%s af %s"
+msgstr ""
 
 #. I18N: shown when hit by swatter. %s is the victim
 #: src/items/swatter.cpp:342
@@ -164,7 +162,7 @@ msgstr ""
 #: src/items/powerup.cpp:51
 #, c-format
 msgid "%s is a mighty pirate!"
-msgstr "%s er en stor pirat!"
+msgstr ""
 
 #. I18N: shown when a player is hit by a rubber ball. %1 is the
 #. attacker, %0 is the victim.
@@ -182,7 +180,7 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:594
 #, c-format
 msgid "%s is ready"
-msgstr "%s er klar"
+msgstr ""
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/bowling.cpp:127
@@ -193,7 +191,7 @@ msgstr ""
 #: src/items/powerup.cpp:50
 #, c-format
 msgid "%s pays the next round of grog!"
-msgstr "%s betaler for den næste runde grog!"
+msgstr ""
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/bowling.cpp:129
@@ -204,7 +202,7 @@ msgstr ""
 #: src/modes/world.cpp:861
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr "'%s' er blevet elimineret!"
+msgstr ""
 
 #. I18N: for empty highscores entries
 #. I18N: ./data/gui/track_info_dialog.stkgui
@@ -212,22 +210,22 @@ msgstr "'%s' er blevet elimineret!"
 #: data/po/gui_strings.h:119 data/po/gui_strings.h:122
 #: data/po/gui_strings.h:125
 msgid "(Empty)"
-msgstr "(Tom)"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 #: data/po/gui_strings.h:234
 msgid "(network play is not yet available)"
-msgstr "(netværksspil er endnu ikke tilgængelig)"
+msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:323
 msgid "* A blue item means a conflict with another configuration"
-msgstr "* Et blåt element viser en konflikt med en anden konfiguration"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
 #: data/po/gui_strings.h:632
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr "* Aktuelle nøglebindinger kan ses/ændres i menuindstillinger"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -262,11 +260,11 @@ msgstr ""
 #. I18N: ./data/gui/track_info_dialog.stkgui
 #: data/po/gui_strings.h:292
 msgid "= Highscores ="
-msgstr "= De bedste tider ="
+msgstr ""
 
 #: src/items/powerup.cpp:84
 msgid "A wizard did it!"
-msgstr "En troldmand gjorde det!"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:118
 #: src/states_screens/dialogs/race_over_dialog.cpp:433
@@ -277,12 +275,12 @@ msgstr ""
 #. I18N: Main menu button
 #: data/po/gui_strings.h:535
 msgid "About"
-msgstr "Om"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:191
 msgid "Accelerate"
-msgstr "Accelerér"
+msgstr ""
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:110
@@ -293,7 +291,7 @@ msgstr ""
 #. I18N: In players configuration menu
 #: data/po/gui_strings.h:507
 msgid "Add Player"
-msgstr "Tilføj spiller"
+msgstr ""
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:89
@@ -316,7 +314,7 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:1034
 #: src/states_screens/arenas_screen.cpp:80 data/po/gui_strings.h:762
 msgid "Add-Ons"
-msgstr "Udvidelser"
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:84
 msgid "Add-on name"
@@ -344,13 +342,13 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:1026
 #: src/states_screens/arenas_screen.cpp:72 data/po/gui_strings.h:766
 msgid "All"
-msgstr "Alle"
+msgstr ""
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
 #: data/po/gui_strings.h:191
 msgid "All Tracks"
-msgstr "Alle løb"
+msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:199
 msgid "All blows allowed, so catch weapons and make clever use of them!"
@@ -365,7 +363,7 @@ msgstr ""
 #. I18N: ./data/tracks/jungle/track.xml
 #: data/po/gui_strings.h:17
 msgid "Amazonian Journey"
-msgstr "Amazonarejse"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:673
@@ -430,7 +428,7 @@ msgstr ""
 #. I18N: ./data/tracks/lighthouse/track.xml
 #: data/po/gui_strings.h:41
 msgid "Around the Lighthouse"
-msgstr "Omkring fyrtårnet"
+msgstr ""
 
 #. I18N: shown when anchor applied. %s is the victim.
 #: src/items/powerup.cpp:49
@@ -447,7 +445,7 @@ msgstr ""
 #. I18N: ./data/grandprix/4_atworldsend.grandprix
 #: data/po/gui_strings.h:107 data/po/gui_strings.h:772
 msgid "At World's End"
-msgstr "Ved verdens ende"
+msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -469,7 +467,7 @@ msgstr ""
 #: src/input/binding.cpp:265
 #, c-format
 msgid "Axis %d %s"
-msgstr "Akse %d %s"
+msgstr ""
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-ons screen action
@@ -554,13 +552,11 @@ msgid ""
 "Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
 "backwards."
 msgstr ""
-"Hoppende bold - kommer retur fra vægge. Hvis du kigger bagud, vil den blive "
-"kastet baglæns."
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:194
 msgid "Brake"
-msgstr "Bremse"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:658
@@ -601,12 +597,12 @@ msgstr ""
 #: src/states_screens/dialogs/addons_loading.cpp:229 data/po/gui_strings.h:250
 #: data/po/gui_strings.h:368 data/po/gui_strings.h:376
 msgid "Cancel"
-msgstr "Afbryd"
+msgstr ""
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:198
 msgid "Cancel Remove"
-msgstr "Fortryd fjern"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:232
@@ -621,7 +617,7 @@ msgstr ""
 #. I18N: ./data/tracks/cave/track.xml
 #: data/po/gui_strings.h:20
 msgid "Cave X"
-msgstr "Hule X"
+msgstr ""
 
 #: src/states_screens/feature_unlocked.cpp:573
 msgid "Challenge Completed"
@@ -652,7 +648,7 @@ msgstr ""
 #. I18N: In the help menu
 #: data/po/gui_strings.h:612
 msgid "Collect blue boxes : they will give you weapons or other powerups"
-msgstr "Saml blå bokse : De vil give dig våben og andre forbedringer"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -662,15 +658,11 @@ msgid ""
 "pressing the appropriate key. You can see your current level of nitro in the "
 "bar at the right of the game screen."
 msgstr ""
-"Indsamling af nitro gør at du får hastighedsforbedringer når du ønsker det "
-"ved at trykke på den behørige tast. Du kan se dit aktuelle niveau af nitro i "
-"bjælken til højre for spilområdet."
 
-# In the player info dialog (when deleting)
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:179
 msgid "Confirm Remove"
-msgstr "Bekræft fjern"
+msgstr ""
 
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:72
@@ -704,7 +696,7 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:90 data/po/gui_strings.h:198
 #: data/po/gui_strings.h:383
 msgid "Controls"
-msgstr "Styring"
+msgstr ""
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:194
 msgid "Could not detect any wiimote :/"
@@ -716,12 +708,11 @@ msgstr ""
 msgid "Create a new player"
 msgstr ""
 
-# Kredittekster (fortekster, eftertekster)
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
 #: data/po/gui_strings.h:696
 msgid "Credits"
-msgstr "Rulletekster"
+msgstr ""
 
 #. I18N: custom video settings
 #: src/states_screens/options_screen_video.cpp:332
@@ -764,7 +755,7 @@ msgstr ""
 #: src/states_screens/dialogs/player_info_dialog.cpp:155
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
-msgstr "Ønsker du virkelig at slette spiller »%s« ?"
+msgstr ""
 
 #: src/items/powerup.cpp:68
 msgid "Do you want to fly kites?"
@@ -807,7 +798,7 @@ msgstr ""
 #: src/states_screens/options_screen_video.cpp:349 data/po/gui_strings.h:144
 #: data/po/gui_strings.h:156
 msgid "Enabled"
-msgstr "Slået til"
+msgstr ""
 
 #. I18N: animations setting (all karts are animated)
 #: src/states_screens/dialogs/custom_video_settings.cpp:60
@@ -822,7 +813,7 @@ msgstr ""
 #. I18N: In the 'add new player' dialog
 #: data/po/gui_strings.h:164
 msgid "Enter the new player's name"
-msgstr "Indtast den nye spillers navn"
+msgstr ""
 
 #: src/states_screens/kart_selection.cpp:1272
 msgid ""
@@ -845,7 +836,7 @@ msgstr ""
 #: data/po/gui_strings.h:129 data/po/gui_strings.h:362
 #: data/po/gui_strings.h:757
 msgid "Expert"
-msgstr "Ekspert"
+msgstr ""
 
 #. I18N: shown when a player is hit by a rubber ball. %1 is the
 #. attacker, %0 is the victim.
@@ -860,7 +851,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:197
 msgid "Fire"
-msgstr "Ild"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -887,14 +878,11 @@ msgid ""
 "disqualified every time the counter hits zero. Beware : going in front of "
 "the leader will get you eliminated too!"
 msgstr ""
-"Følg lederen: Gå efter anden pladsen, da den sidste vogn vil blive "
-"diskvalificeret hver gang tælleren rammer nul. Pas på : Kører du foran "
-"lederen vil du også blive elimineret!"
 
 #. I18N: ./data/tracks/fortmagma/track.xml
 #: data/po/gui_strings.h:53
 msgid "Fort Magma"
-msgstr "Fæstning Magma"
+msgstr ""
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:185
 #, c-format
@@ -905,7 +893,7 @@ msgstr ""
 #. I18N: In the video settings
 #: data/po/gui_strings.h:281
 msgid "Fullscreen"
-msgstr "Fuldskærm"
+msgstr ""
 
 #. I18N: warning, this string needs to be SHORT!
 #: src/states_screens/dialogs/race_over_dialog.cpp:260
@@ -928,19 +916,19 @@ msgstr ""
 #: data/po/gui_strings.h:224 data/po/gui_strings.h:600
 #: data/po/gui_strings.h:647 data/po/gui_strings.h:711
 msgid "Game Modes"
-msgstr "Spiltilstande"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for gamepad buttons
 #: src/input/binding.cpp:270
 #, c-format
 msgid "Gamepad button %d"
-msgstr "Gamepadknap %d"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for gamepad hats
 #: src/input/binding.cpp:255 src/input/binding.cpp:260
 #, c-format
 msgid "Gamepad hat %d"
-msgstr "Gamepadhat %d"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
@@ -953,7 +941,7 @@ msgstr "Gamepadhat %d"
 #: data/po/gui_strings.h:216 data/po/gui_strings.h:592
 #: data/po/gui_strings.h:639 data/po/gui_strings.h:703
 msgid "General"
-msgstr "Generelt"
+msgstr ""
 
 #: src/items/powerup.cpp:66
 msgid "Geronimo!!!"
@@ -973,14 +961,14 @@ msgstr ""
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:71
 msgid "Go!"
-msgstr "Kør!"
+msgstr ""
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
 #: src/states_screens/dialogs/select_challenge.cpp:138
 #: data/po/gui_strings.h:687
 msgid "Grand Prix"
-msgstr "Grandprix"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:901
 msgid "Grand Prix progress:"
@@ -1030,7 +1018,7 @@ msgstr ""
 #: data/po/gui_strings.h:339 data/po/gui_strings.h:481
 #: data/po/gui_strings.h:531
 msgid "Help"
-msgstr "Hjælp"
+msgstr ""
 
 #. I18N: ./data/karts/hexley/kart.xml
 #: data/po/gui_strings.h:781
@@ -1067,8 +1055,6 @@ msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
 msgstr ""
-"Hvis du ser en knap med en lås som denne, så skal du gennemføre en "
-"udfordring for at låse den op."
 
 #: src/input/input_manager.cpp:614
 #, c-format
@@ -1090,7 +1076,7 @@ msgstr ""
 #: data/po/gui_strings.h:125 data/po/gui_strings.h:358
 #: data/po/gui_strings.h:753
 msgid "Intermediate"
-msgstr "Mellem"
+msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: Section in the addons menu
@@ -1125,7 +1111,7 @@ msgstr ""
 #: src/states_screens/minimal_race_gui.cpp:107
 #: src/states_screens/race_gui_overworld.cpp:106
 msgid "Lap"
-msgstr "Omgang"
+msgstr ""
 
 #: src/modes/linear_world.cpp:284
 #, c-format
@@ -1141,12 +1127,12 @@ msgstr ""
 #: src/modes/tutorial_race.cpp:193 src/modes/follow_the_leader.cpp:58
 #: src/modes/follow_the_leader.cpp:212
 msgid "Leader"
-msgstr "Leder"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:223
 msgid "Left"
-msgstr "Venstre"
+msgstr ""
 
 #: src/guiengine/engine.cpp:1230
 msgid "Loading"
@@ -1176,7 +1162,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:206
 msgid "Look Back"
-msgstr "Se tilbage"
+msgstr ""
 
 #: src/items/powerup.cpp:83
 msgid "Magic, son. Nothing else in the world smells like that."
@@ -1186,7 +1172,7 @@ msgstr ""
 #. I18N: In the help menu
 #: data/po/gui_strings.h:608
 msgid "Make your rivals bite dust!"
-msgstr "Lad dine rivaler falde omkuld!"
+msgstr ""
 
 #. I18N: if some kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:356
@@ -1213,13 +1199,13 @@ msgstr ""
 #: src/input/binding.cpp:277
 #, c-format
 msgid "Mouse axis %d %s"
-msgstr "Museakse %d %s"
+msgstr ""
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/binding.cpp:273
 #, c-format
 msgid "Mouse button %d"
-msgstr "Museknap %d"
+msgstr ""
 
 #. I18N: ./data/karts/mozilla/kart.xml
 #: data/po/gui_strings.h:778
@@ -1249,7 +1235,7 @@ msgstr ""
 #. I18N: Section in the audio/video settings submenu
 #: data/po/gui_strings.h:140
 msgid "Music"
-msgstr "Musik"
+msgstr ""
 
 #. I18N: ./data/gui/story_mode_new.stkgui
 #: data/po/gui_strings.h:346
@@ -1268,7 +1254,7 @@ msgstr ""
 
 #: src/modes/linear_world.cpp:347
 msgid "New fastest lap"
-msgstr "Ny hurtigste omgang"
+msgstr ""
 
 #: src/challenges/challenge_data.cpp:503
 #, c-format
@@ -1288,7 +1274,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:200
 msgid "Nitro"
-msgstr "Nitro"
+msgstr ""
 
 #. I18N: ./data/karts/nolok/kart.xml
 #: data/po/gui_strings.h:790
@@ -1319,7 +1305,7 @@ msgstr ""
 #: data/po/gui_strings.h:121 data/po/gui_strings.h:354
 #: data/po/gui_strings.h:749
 msgid "Novice"
-msgstr "Novice"
+msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:63
 #, c-format
@@ -1330,7 +1316,7 @@ msgstr ""
 #. I18N: In race setup menu
 #: data/po/gui_strings.h:745
 msgid "Number of AI karts"
-msgstr "Antal AI-vogne"
+msgstr ""
 
 #: src/states_screens/dialogs/message_dialog.cpp:66
 msgid "OK"
@@ -1355,7 +1341,7 @@ msgstr ""
 #. I18N: ./data/tracks/olivermath/track.xml
 #: data/po/gui_strings.h:5
 msgid "Oliver's Math Class"
-msgstr "Olivers matematikklasse"
+msgstr ""
 
 #: src/input/input_manager.cpp:644
 msgid "Only the Game Master may act at this point!"
@@ -1370,7 +1356,7 @@ msgstr ""
 #: data/po/gui_strings.h:335 data/po/gui_strings.h:477
 #: data/po/gui_strings.h:527
 msgid "Options"
-msgstr "Indstillinger"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:670
@@ -1390,12 +1376,12 @@ msgstr ""
 
 #: src/karts/controller/player_controller.cpp:329
 msgid "Penalty time!!"
-msgstr "Straftid!!"
+msgstr ""
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 #: data/po/gui_strings.h:101 data/po/gui_strings.h:766
 msgid "Penguin Playground"
-msgstr "Pingvinlegeplads"
+msgstr ""
 
 #. I18N: ./data/karts/pidgin/kart.xml
 #: data/po/gui_strings.h:808
@@ -1427,7 +1413,7 @@ msgstr ""
 #: src/states_screens/options_screen_audio.cpp:66
 #: src/states_screens/options_screen_video.cpp:89 data/po/gui_strings.h:496
 msgid "Players"
-msgstr "Spillere"
+msgstr ""
 
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:457
@@ -1467,12 +1453,12 @@ msgstr ""
 #. I18N: When configuring input
 #: data/po/gui_strings.h:168 data/po/gui_strings.h:459
 msgid "Press ESC to cancel"
-msgstr "Tryk ESC for at afbryde"
+msgstr ""
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #: data/po/gui_strings.h:451
 msgid "Press a key"
-msgstr "Tryk på en tast"
+msgstr ""
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In key bindings configuration menu
@@ -1484,7 +1470,7 @@ msgstr ""
 #. I18N: In players configuration menu
 #: data/po/gui_strings.h:503
 msgid "Press enter or double-click on a player to edit him/her"
-msgstr "Tryk retur eller dobbeltklik på en spiller for at redigere ham/hende"
+msgstr ""
 
 #: src/states_screens/race_gui_overworld.cpp:492
 msgid "Press fire to start the challenge"
@@ -1509,7 +1495,7 @@ msgstr ""
 #. I18N: Main menu button
 #: data/po/gui_strings.h:539
 msgid "Quit"
-msgstr "Afslut"
+msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:109
 msgid "Race Results"
@@ -1519,7 +1505,7 @@ msgstr ""
 #. I18N: ./data/gui/racesetup.stkgui
 #: data/po/gui_strings.h:113 data/po/gui_strings.h:741
 msgid "Race Setup"
-msgstr "Løbsopsætning"
+msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:382
 msgid "Race in this track again"
@@ -1532,7 +1518,7 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:916
 #: src/states_screens/kart_selection.cpp:2100
 msgid "Random Kart"
-msgstr "Tilfældig vogn"
+msgstr ""
 
 #: src/states_screens/tracks_screen.cpp:354
 msgid "Random Track"
@@ -1554,7 +1540,7 @@ msgstr ""
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:67
 msgid "Ready!"
-msgstr "Klar!"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -1584,12 +1570,12 @@ msgstr ""
 #. I18N: In the player info dialog
 #: src/states_screens/dialogs/player_info_dialog.cpp:125
 msgid "Remove"
-msgstr "Fjern"
+msgstr ""
 
 #. I18N: In the player info dialog
 #: src/states_screens/dialogs/player_info_dialog.cpp:91
 msgid "Rename"
-msgstr "Omdøb"
+msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:59
 #, c-format
@@ -1609,7 +1595,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:209
 msgid "Rescue"
-msgstr "Red"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
@@ -1636,7 +1622,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:226
 msgid "Right"
-msgstr "Højre"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:679
@@ -1663,7 +1649,7 @@ msgstr ""
 #. I18N: ./data/gui/racesetup.stkgui
 #: data/po/gui_strings.h:760
 msgid "Select a game mode"
-msgstr "Vælg en spilstilstand"
+msgstr ""
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: Race paused button
@@ -1680,7 +1666,7 @@ msgstr ""
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:69
 msgid "Set!"
-msgstr "Klar!"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
@@ -1693,7 +1679,7 @@ msgstr ""
 #. I18N: ./data/tracks/sandtrack/track.xml
 #: data/po/gui_strings.h:56
 msgid "Shifting Sands"
-msgstr "Levnede sand"
+msgstr ""
 
 #. I18N: ./data/tracks/city/track.xml
 #: data/po/gui_strings.h:14
@@ -1743,18 +1729,18 @@ msgstr ""
 #. I18N: Section in audio/video settings submenu
 #: data/po/gui_strings.h:152
 msgid "Sound Effects"
-msgstr "Lydeffekter"
+msgstr ""
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #: data/po/gui_strings.h:566
 msgid "Standard"
-msgstr "Standard"
+msgstr ""
 
 #. I18N: ./data/tracks/startrack/track.xml
 #: data/po/gui_strings.h:38
 msgid "Star Track"
-msgstr "Stjernebane"
+msgstr ""
 
 #. I18N: ./data/gui/story_mode_new.stkgui
 #: data/po/gui_strings.h:365
@@ -1768,7 +1754,7 @@ msgstr ""
 #. I18N: ./data/gui/track_info_dialog.stkgui
 #: data/po/gui_strings.h:312
 msgid "Start Race"
-msgstr "Start løb"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:185
@@ -1803,7 +1789,7 @@ msgstr ""
 #: data/po/gui_strings.h:212 data/po/gui_strings.h:588
 #: data/po/gui_strings.h:635 data/po/gui_strings.h:699
 msgid "SuperTuxKart Help"
-msgstr "Hjælp til SuperTuxKart"
+msgstr ""
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: ./data/gui/options_input.stkgui
@@ -1815,7 +1801,7 @@ msgstr "Hjælp til SuperTuxKart"
 #: data/po/gui_strings.h:253 data/po/gui_strings.h:379
 #: data/po/gui_strings.h:428 data/po/gui_strings.h:492
 msgid "SuperTuxKart Options"
-msgstr "Indstillinger i SuperTuxKart"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 #: data/po/gui_strings.h:231
@@ -1872,7 +1858,7 @@ msgstr ""
 #. I18N: ./data/tracks/islandtrack/track.xml
 #: data/po/gui_strings.h:50
 msgid "The Island"
-msgstr "Øen"
+msgstr ""
 
 #: src/items/powerup.cpp:67
 msgid "The Space Shuttle has landed!"
@@ -1892,8 +1878,6 @@ msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
 msgstr ""
-"Filen over de bedste resultater var for gammel,\n"
-"alle de bedste resultater er blevet slettet."
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:151
 msgid "This Grand Prix is broken!"
@@ -1913,7 +1897,6 @@ msgstr ""
 #: data/po/gui_strings.h:726
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
 msgstr ""
-"Tidsprøve: Indeholder ingen forbedringer, så kun dine køreegenskaber tæller!"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:63
 msgid ""
@@ -1932,7 +1915,6 @@ msgstr ""
 #: data/po/gui_strings.h:655
 msgid "To help you win, there are some powerups you can collect :"
 msgstr ""
-"Til at hjælpe dig med at vinde, er der nogle forbedringer du kan indsamle :"
 
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
 #: data/po/gui_strings.h:104 data/po/gui_strings.h:769
@@ -1949,7 +1931,7 @@ msgstr ""
 #: src/states_screens/dialogs/track_info_dialog.cpp:69
 #, c-format
 msgid "Track by %s"
-msgstr "Bane kreeret af %s"
+msgstr ""
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: Section in the addons menu
@@ -2035,7 +2017,7 @@ msgstr ""
 
 #: src/modes/linear_world.cpp:821
 msgid "WRONG WAY!"
-msgstr "FORKERT VEJ!"
+msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:409
 msgid ""
@@ -2055,7 +2037,7 @@ msgstr ""
 #: data/po/gui_strings.h:220 data/po/gui_strings.h:596
 #: data/po/gui_strings.h:643 data/po/gui_strings.h:707
 msgid "Weapons"
-msgstr "Våben"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -2095,7 +2077,7 @@ msgstr ""
 #. I18N: ./data/tracks/xr591/track.xml
 #: data/po/gui_strings.h:29
 msgid "XR591"
-msgstr "XR591"
+msgstr ""
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -2143,7 +2125,7 @@ msgstr ""
 
 #: src/karts/kart.cpp:803 src/karts/kart.cpp:823
 msgid "You finished the race!"
-msgstr "Du afsluttede løbet!"
+msgstr ""
 
 #: src/modes/world.cpp:856
 msgid "You have been eliminated!"
@@ -2170,7 +2152,7 @@ msgstr ""
 
 #: src/karts/kart.cpp:803 src/karts/kart.cpp:823
 msgid "You won the race!"
-msgstr "Du vandt løbet!"
+msgstr ""
 
 #: src/config/user_config.cpp:589
 msgid ""
@@ -2196,7 +2178,7 @@ msgstr ""
 #. I18N: Unbound key binding
 #: src/input/binding.cpp:86
 msgid "[none]"
-msgstr "[ingen]"
+msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
 #: src/states_screens/race_gui_base.cpp:612
@@ -2221,7 +2203,4 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Aputsiaq Niels Janussen https://launchpad.net/~aj\n"
-"  Auria https://launchpad.net/~auria-mg\n"
-"  Marcus Møller https://launchpad.net/~marcusmoller\n"
-"  STK-team https://launchpad.net/~stk"
+"  Michael Torpey https://launchpad.net/~mctorpey"
