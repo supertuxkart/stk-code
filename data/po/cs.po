@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-11-28 19:07-0500\n"
-"PO-Revision-Date: 2012-12-02 13:18+0000\n"
-"Last-Translator: František Zatloukal <Zatloukal.Frantisek@gmail.com>\n"
+"PO-Revision-Date: 2012-12-05 18:43+0000\n"
+"Last-Translator: donny <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2012-12-02 23:44+0000\n"
-"X-Generator: Launchpad (build 16319)\n"
+"X-Launchpad-Export-Date: 2012-12-11 00:08+0000\n"
+"X-Generator: Launchpad (build 16341)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
@@ -26,6 +26,7 @@ msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
 msgstr ""
+" Takoví spratci jako vy,  mě nikdy nemůžou porazit - krále všech motokár!"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
@@ -82,7 +83,7 @@ msgstr "%1 nasadil zvon na obličej hráče %0"
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/cake.cpp:155
 msgid "%1 ruins %0's cakeless diet"
-msgstr ""
+msgstr "%1 nechce, aby %0 držel bezdortovou dietu"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
 #. the victim.
@@ -98,7 +99,7 @@ msgstr "%1 zkouší vlečný paprsek na hráči %0"
 #. I18N: shown when hit by swatter. %1 is the attacker, %0 is the victim.
 #: src/items/swatter.cpp:338
 msgid "%1 thinks %0 is a big fly"
-msgstr ""
+msgstr "%1 si myslí, že %0 je obří moucha"
 
 #. I18N: ./data/gui/track_info_dialog.stkgui
 #. I18N: In the track setup screen (number of laps choice, where %i is the number)
@@ -166,7 +167,7 @@ msgstr "%s je mocný pirát"
 #: src/items/rubber_ball.cpp:305
 #, c-format
 msgid "%s is being bounced around."
-msgstr ""
+msgstr "%s dostal co proto gumovou koulí"
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/bowling.cpp:125
@@ -183,7 +184,7 @@ msgstr "%s je připraven"
 #: src/items/bowling.cpp:127
 #, c-format
 msgid "%s is the world master of the boomerang ball"
-msgstr "%s je mistr světa v hodu bumerangovým míčem"
+msgstr "%s je mistr světa v bumerangovém bowlingu"
 
 #: src/items/powerup.cpp:50
 #, c-format
@@ -222,7 +223,7 @@ msgstr "* Modrá položka znamená konflikt s jiným nastavením"
 #. I18N: in the help screen
 #: data/po/gui_strings.h:632
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr "Nastavení kláves lze vidět/nastavit v menu Možnosti"
+msgstr "Nastavení kláves lze zobrazit/nastavit v menu Možnosti"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -541,7 +542,7 @@ msgstr "Příště více štěstí!"
 #. I18N: ./data/tracks/mansion/track.xml
 #: data/po/gui_strings.h:26
 msgid "Blackhill Mansion"
-msgstr ""
+msgstr "Temný zámek"
 
 #. I18N: ./data/tracks/farm/track.xml
 #: data/po/gui_strings.h:35
@@ -564,13 +565,13 @@ msgstr "Brzda"
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:658
 msgid "BubbleGum - leave a sticky pink puddle behind you."
-msgstr "Žvýkačka - zanech růžové lepkavé překvapení za tebou."
+msgstr "Žvýkačka - nech za sebou růžové lepkavé překvápko"
 
 #. I18N: Cutscene subtitle from ./data/tracks/introcutscene2/scene.xml
 #. I18N: ./data/tracks/introcutscene2/scene.xml
 #: data/po/gui_strings.h:83 data/po/gui_strings.h:86
 msgid "But I'm a fair creature, so I'll make you a deal."
-msgstr ""
+msgstr "Ale já jsem férový, tak ti učiním nabídku."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:661
@@ -587,8 +588,7 @@ msgstr "Server s doplňky je nedostupný"
 #: src/addons/network_http.cpp:347
 msgid "Can't download addons list, check terminal for details."
 msgstr ""
-"Nepodařilo se stáhnout seznam doplňků, pro více detailů zkontrolujte "
-"terminál."
+"Nepodařilo se stáhnout seznam doplňků. Více informací naleznete v terminálu."
 
 #: src/addons/network_http.cpp:357
 msgid "Can't download news file, check terminal for details."
@@ -789,7 +789,7 @@ msgstr "Slon"
 #: src/states_screens/race_result_gui.cpp:331
 #: src/states_screens/race_result_gui.cpp:688
 msgid "Eliminated"
-msgstr ""
+msgstr "Eliminován"
 
 #. I18N: ./data/karts/emule/kart.xml
 #: data/po/gui_strings.h:796
@@ -831,6 +831,8 @@ msgid ""
 "Everyone:\n"
 "Press 'Select' now to join the game!"
 msgstr ""
+"Všichni:\n"
+"Zmáčkněte klávesu 'Vybrat' pro připojení se do hry!"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
@@ -907,7 +909,7 @@ msgstr "Pevnost Magma"
 #: src/states_screens/dialogs/add_device_dialog.cpp:185
 #, c-format
 msgid "Found %d wiimote(s)"
-msgstr "Nalezeno %d wiimote"
+msgstr "Nalezeno %d ovladačů wiimote"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
@@ -1126,7 +1128,7 @@ msgstr "Klávesnice %i"
 #. I18N: ./data/karts/konqi/kart.xml
 #: data/po/gui_strings.h:814
 msgid "Konqi"
-msgstr "Konqui"
+msgstr "Konqi"
 
 #. I18N: Shown at the end of a race
 #: src/states_screens/race_gui_overworld.cpp:106
@@ -1457,12 +1459,14 @@ msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight."
 msgstr ""
+"Zvon - tref protivníkova záda a přitáhne tě, nebo hoď zvon dozadu a "
+"protihráč, kterého trefíš, přijde o výhled"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 #: data/po/gui_strings.h:418
 msgid "Post-processing (motion blur)"
-msgstr ""
+msgstr "Postprocessing (rozmazání pohybu)"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:391
@@ -1592,7 +1596,7 @@ msgstr "Zapamatovat si mě"
 #. I18N: In the video settings
 #: data/po/gui_strings.h:285
 msgid "Remember window location"
-msgstr "Zapamatovat umístění okna"
+msgstr "Zapamatovat si umístění okna"
 
 #. I18N: In the player info dialog
 #: src/states_screens/dialogs/player_info_dialog.cpp:125
@@ -1644,7 +1648,7 @@ msgstr "Restartovat závod"
 #. I18N: Drive the track reverse
 #: data/po/gui_strings.h:305
 msgid "Reverse"
-msgstr "Zvrátit"
+msgstr "Opačný směr"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:226
@@ -1688,7 +1692,7 @@ msgstr "Výběr autíčka"
 #. I18N: In the new story mode game dialog
 #: data/po/gui_strings.h:350
 msgid "Select your identity"
-msgstr ""
+msgstr "Zvol svoji identitu"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:69
@@ -1727,7 +1731,7 @@ msgstr "Velikost: %s"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:203
 msgid "Skidding"
-msgstr ""
+msgstr "Smyk"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the graphics settings
@@ -1869,7 +1873,7 @@ msgstr ""
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:682
 msgid "Swatter - will squash karts close by, slowing them down."
-msgstr ""
+msgstr "Plácačka - rozplácne soupeře nablízku a tím ho zpomalí"
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options_screen_ui.cpp:163
@@ -1886,7 +1890,7 @@ msgstr "Filtrování textur"
 #. I18N: in the help menu
 #: data/po/gui_strings.h:628
 msgid "The 'skidding' key allows you to skid in sharp turns and get a boost."
-msgstr ""
+msgstr "Klávesa 'smyk' ti umožní ostře zatočit a nabrat rychlost."
 
 #. I18N: ./data/tracks/islandtrack/track.xml
 #: data/po/gui_strings.h:50
@@ -1964,7 +1968,7 @@ msgstr "Abyste si usnadnili cestu k výhře, můžete sbírat následující bon
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
 #: data/po/gui_strings.h:104 data/po/gui_strings.h:769
 msgid "To the moon and back"
-msgstr ""
+msgstr "Na měsíc a zpět"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
 #: src/states_screens/race_gui_base.cpp:94
@@ -2231,7 +2235,7 @@ msgstr ""
 #. I18N: ./data/tracks/zengarden/track.xml
 #: data/po/gui_strings.h:65
 msgid "Zen Garden"
-msgstr ""
+msgstr "Japonská zahrada"
 
 #. I18N: Unbound key binding
 #: src/input/binding.cpp:86
@@ -2245,7 +2249,7 @@ msgstr "od"
 
 #: src/states_screens/dialogs/addons_loading.cpp:138
 msgid "featured"
-msgstr ""
+msgstr "oblíbené"
 
 #. I18N: arena group name
 #. I18N: track group name
@@ -2276,6 +2280,8 @@ msgstr ""
 "  Petr Wudi https://launchpad.net/~petr-wudi\n"
 "  Roman Horník https://launchpad.net/~roman.hornik\n"
 "  STK-team https://launchpad.net/~stk\n"
+"  Tadeáš Pařík https://launchpad.net/~pariktadeas\n"
 "  Tomáš Velecký https://launchpad.net/~elektron112\n"
 "  Vojtěch Novotný https://launchpad.net/~tutanp\n"
+"  donny https://launchpad.net/~michal-donat\n"
 "  lelkoun https://launchpad.net/~lelkoun"

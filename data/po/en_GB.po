@@ -1,17 +1,21 @@
+# English (United Kingdom) translation for stk
+# Copyright (c) 2012 Rosetta Contributors and Canonical Ltd 2012
+# This file is distributed under the same license as the stk package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: SuperTuxKart\n"
-"Report-Msgid-Bugs-To: \n"
+"Project-Id-Version: stk\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-11-28 19:07-0500\n"
-"PO-Revision-Date: 2012-10-31 03:18+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
-"Language-Team: \n"
+"PO-Revision-Date: 2012-12-09 12:15+0000\n"
+"Last-Translator: Launchpad Translations Administrators <Unknown>\n"
+"Language-Team: English (United Kingdom) <en_GB@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Launchpad-Export-Date: 2012-12-11 00:08+0000\n"
 "X-Generator: Launchpad (build 16341)\n"
-"X-Poedit-Language: Romanian\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
@@ -276,7 +280,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:191
 msgid "Accelerate"
-msgstr "Accelereaza"
+msgstr ""
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:110
@@ -359,7 +363,7 @@ msgstr ""
 #. I18N: ./data/tracks/jungle/track.xml
 #: data/po/gui_strings.h:17
 msgid "Amazonian Journey"
-msgstr "Calatorie in Amazonia"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:673
@@ -424,7 +428,7 @@ msgstr ""
 #. I18N: ./data/tracks/lighthouse/track.xml
 #: data/po/gui_strings.h:41
 msgid "Around the Lighthouse"
-msgstr "In jurul Farului"
+msgstr ""
 
 #. I18N: shown when anchor applied. %s is the victim.
 #: src/items/powerup.cpp:49
@@ -497,11 +501,11 @@ msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:400
 msgid "Back to the main menu"
-msgstr "Inapoi la meniul principal"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:139
 msgid "Back to the menu"
-msgstr "Inapoi la meniu"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:135
 #: src/states_screens/dialogs/race_over_dialog.cpp:396
@@ -552,7 +556,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:194
 msgid "Brake"
-msgstr "Frana"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:658
@@ -676,11 +680,11 @@ msgstr ""
 #: src/states_screens/race_result_gui.cpp:115 data/po/gui_strings.h:171
 #: data/po/gui_strings.h:462 data/po/gui_strings.h:763
 msgid "Continue"
-msgstr "Continua"
+msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:418
 msgid "Continue Grand Prix"
-msgstr "Continua Grand Prix"
+msgstr ""
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: Section in the settings menu
@@ -708,7 +712,7 @@ msgstr ""
 #. I18N: Title in credits screen
 #: data/po/gui_strings.h:696
 msgid "Credits"
-msgstr "Autori"
+msgstr ""
 
 #. I18N: custom video settings
 #: src/states_screens/options_screen_video.cpp:332
@@ -821,7 +825,7 @@ msgstr ""
 #. I18N: Race paused button
 #: data/po/gui_strings.h:343
 msgid "Exit Race"
-msgstr "Iesire cursa"
+msgstr ""
 
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
@@ -847,7 +851,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:197
 msgid "Fire"
-msgstr "Foc"
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -864,7 +868,7 @@ msgstr ""
 #. I18N: Game mode
 #: src/race/race_manager.hpp:169
 msgid "Follow the Leader"
-msgstr "Urmeaza liderul"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -878,7 +882,7 @@ msgstr ""
 #. I18N: ./data/tracks/fortmagma/track.xml
 #: data/po/gui_strings.h:53
 msgid "Fort Magma"
-msgstr "Fortareata Magma"
+msgstr ""
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:185
 #, c-format
@@ -957,14 +961,14 @@ msgstr ""
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:71
 msgid "Go!"
-msgstr "Start!"
+msgstr ""
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
 #: src/states_screens/dialogs/select_challenge.cpp:138
 #: data/po/gui_strings.h:687
 msgid "Grand Prix"
-msgstr "Grand Prix"
+msgstr ""
 
 #: src/states_screens/race_result_gui.cpp:901
 msgid "Grand Prix progress:"
@@ -1014,7 +1018,7 @@ msgstr ""
 #: data/po/gui_strings.h:339 data/po/gui_strings.h:481
 #: data/po/gui_strings.h:531
 msgid "Help"
-msgstr "Ajutor"
+msgstr ""
 
 #. I18N: ./data/karts/hexley/kart.xml
 #: data/po/gui_strings.h:781
@@ -1025,7 +1029,7 @@ msgstr ""
 #: src/states_screens/dialogs/race_over_dialog.cpp:221
 #: src/states_screens/race_result_gui.cpp:934
 msgid "Highscores"
-msgstr "Cele mai bune rezultate"
+msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:228
 msgid ""
@@ -1107,7 +1111,7 @@ msgstr ""
 #: src/states_screens/minimal_race_gui.cpp:107
 #: src/states_screens/race_gui_overworld.cpp:106
 msgid "Lap"
-msgstr "Runda"
+msgstr ""
 
 #: src/modes/linear_world.cpp:284
 #, c-format
@@ -1123,12 +1127,12 @@ msgstr ""
 #: src/modes/tutorial_race.cpp:193 src/modes/follow_the_leader.cpp:58
 #: src/modes/follow_the_leader.cpp:212
 msgid "Leader"
-msgstr "Lider"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:223
 msgid "Left"
-msgstr "Stanga"
+msgstr ""
 
 #: src/guiengine/engine.cpp:1230
 msgid "Loading"
@@ -1250,7 +1254,7 @@ msgstr ""
 
 #: src/modes/linear_world.cpp:347
 msgid "New fastest lap"
-msgstr "O noua cea mai rapida curba"
+msgstr ""
 
 #: src/challenges/challenge_data.cpp:503
 #, c-format
@@ -1301,7 +1305,7 @@ msgstr ""
 #: data/po/gui_strings.h:121 data/po/gui_strings.h:354
 #: data/po/gui_strings.h:749
 msgid "Novice"
-msgstr "Novice"
+msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:63
 #, c-format
@@ -1316,7 +1320,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/message_dialog.cpp:66
 msgid "OK"
-msgstr "OK"
+msgstr ""
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
 #: data/po/gui_strings.h:110 data/po/gui_strings.h:775
@@ -1337,7 +1341,7 @@ msgstr ""
 #. I18N: ./data/tracks/olivermath/track.xml
 #: data/po/gui_strings.h:5
 msgid "Oliver's Math Class"
-msgstr "Lectia de Matematica a lui Oliver"
+msgstr ""
 
 #: src/input/input_manager.cpp:644
 msgid "Only the Game Master may act at this point!"
@@ -1352,7 +1356,7 @@ msgstr ""
 #: data/po/gui_strings.h:335 data/po/gui_strings.h:477
 #: data/po/gui_strings.h:527
 msgid "Options"
-msgstr "Optiuni"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:670
@@ -1368,16 +1372,16 @@ msgstr ""
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #: data/po/gui_strings.h:315 data/po/gui_strings.h:465
 msgid "Paused"
-msgstr "Pauza"
+msgstr ""
 
 #: src/karts/controller/player_controller.cpp:329
 msgid "Penalty time!!"
-msgstr "Timp de penalizare!"
+msgstr ""
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 #: data/po/gui_strings.h:101 data/po/gui_strings.h:766
 msgid "Penguin Playground"
-msgstr "Curtea Penguinilor"
+msgstr ""
 
 #. I18N: ./data/karts/pidgin/kart.xml
 #: data/po/gui_strings.h:808
@@ -1491,7 +1495,7 @@ msgstr ""
 #. I18N: Main menu button
 #: data/po/gui_strings.h:539
 msgid "Quit"
-msgstr "Iesire"
+msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:109
 msgid "Race Results"
@@ -1505,7 +1509,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/race_over_dialog.cpp:382
 msgid "Race in this track again"
-msgstr "Participa la aceasta pista din nou"
+msgstr ""
 
 #: src/states_screens/arenas_screen.cpp:253
 msgid "Random Arena"
@@ -1536,7 +1540,7 @@ msgstr ""
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:67
 msgid "Ready!"
-msgstr "Pe locuri!"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -1591,7 +1595,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:209
 msgid "Rescue"
-msgstr "Salvare"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the graphics settings
@@ -1607,7 +1611,7 @@ msgstr ""
 #. I18N: Race paused button
 #: data/po/gui_strings.h:327
 msgid "Restart Race"
-msgstr "Reincepe cursa"
+msgstr ""
 
 #. I18N: ./data/gui/track_info_dialog.stkgui
 #. I18N: Drive the track reverse
@@ -1618,7 +1622,7 @@ msgstr ""
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:226
 msgid "Right"
-msgstr "Dreapta"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:679
@@ -1662,7 +1666,7 @@ msgstr ""
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:69
 msgid "Set!"
-msgstr "Pe pozitii!"
+msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
@@ -1670,12 +1674,12 @@ msgstr "Pe pozitii!"
 #: src/states_screens/dialogs/race_over_dialog.cpp:371
 #: data/po/gui_strings.h:323
 msgid "Setup New Race"
-msgstr "Configureaza o noua cursa"
+msgstr ""
 
 #. I18N: ./data/tracks/sandtrack/track.xml
 #: data/po/gui_strings.h:56
 msgid "Shifting Sands"
-msgstr "Nisipuri Miscatoare"
+msgstr ""
 
 #. I18N: ./data/tracks/city/track.xml
 #: data/po/gui_strings.h:14
@@ -1854,7 +1858,7 @@ msgstr ""
 #. I18N: ./data/tracks/islandtrack/track.xml
 #: data/po/gui_strings.h:50
 msgid "The Island"
-msgstr "Insula"
+msgstr ""
 
 #: src/items/powerup.cpp:67
 msgid "The Space Shuttle has landed!"
@@ -1886,7 +1890,7 @@ msgstr ""
 #. I18N: Game mode
 #: src/race/race_manager.hpp:167
 msgid "Time Trial"
-msgstr "Cursa contra timp"
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -2013,7 +2017,7 @@ msgstr ""
 
 #: src/modes/linear_world.cpp:821
 msgid "WRONG WAY!"
-msgstr "DRUM GRESIT!"
+msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:409
 msgid ""
@@ -2121,7 +2125,7 @@ msgstr ""
 
 #: src/karts/kart.cpp:803 src/karts/kart.cpp:823
 msgid "You finished the race!"
-msgstr "Ai terminat cursa!"
+msgstr ""
 
 #: src/modes/world.cpp:856
 msgid "You have been eliminated!"
@@ -2148,7 +2152,7 @@ msgstr ""
 
 #: src/karts/kart.cpp:803 src/karts/kart.cpp:823
 msgid "You won the race!"
-msgstr "Ai castigat cursa!"
+msgstr ""
 
 #: src/config/user_config.cpp:589
 msgid ""
@@ -2199,8 +2203,4 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Alexandru Guduleasa https://launchpad.net/~gulyan89\n"
-"  DimStar https://launchpad.net/~dominique-launchpad-net\n"
-"  Dominique Leuenberger aka DimStar https://launchpad.net/~dimstar\n"
-"  Matus Michael https://launchpad.net/~m-matus\n"
-"  STK-team https://launchpad.net/~stk"
+"  Michael Torpey https://launchpad.net/~mctorpey"

@@ -8,21 +8,21 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-11-28 19:07-0500\n"
-"PO-Revision-Date: 2010-12-13 07:05+0000\n"
-"Last-Translator: STK-team <Unknown>\n"
+"PO-Revision-Date: 2012-12-04 00:49+0000\n"
+"Last-Translator: Benedikt Scheving-Þorsteinsson <thenamminamm@gmail.com>\n"
 "Language-Team: Icelandic <is@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2012-12-02 23:44+0000\n"
-"X-Generator: Launchpad (build 16319)\n"
+"X-Launchpad-Export-Date: 2012-12-11 00:08+0000\n"
+"X-Generator: Launchpad (build 16341)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
 #. N (or nothing) otherwise
 #: src/utils/translation.cpp:260
 msgid "   Is this a RTL language?"
-msgstr "   N"
+msgstr "   Er þetta RTL tungumál?"
 
 #. I18N: Cutscene subtitle from ./data/tracks/introcutscene2/scene.xml
 #. I18N: ./data/tracks/introcutscene2/scene.xml
@@ -31,27 +31,29 @@ msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
 msgstr ""
+" En þið fáránlegar apa drullur munu ekki geta unnið mér - Konungur yfir "
+"kassabílana!"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:47
 msgid "%0 bites %1's bait"
-msgstr "%0 bítur á færi %1"
+msgstr "%0 bítur á færið frá %1"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/cake.cpp:149
 msgid "%0 eats too much of %1's cake"
-msgstr "%0 borðar of mikið af kökum %1"
+msgstr "%0 étur allt of mikið af kökum frá %1"
 
 #. I18N: shown when a player receives a plunger in his face
 #: src/items/plunger.cpp:134
 msgid "%0 gets a fancy mask from %1"
-msgstr "%0 fær fína grímu frá %1"
+msgstr "%0 fær flotta grímu frá %1"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
 #. the victim.
 #: src/items/bowling.cpp:115
 msgid "%0 is bowled over by %1"
-msgstr ""
+msgstr "%1 keirði yfir 0%"
 
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/cake.cpp:151
@@ -67,12 +69,12 @@ msgstr "%0 ætti ekki að leika sér að málsverði %1"
 #. the victim.
 #: src/items/bowling.cpp:109
 msgid "%0 will not go bowling with %1 again"
-msgstr ""
+msgstr "%0 ætlar ekki að fara í keilu með %1 aftur"
 
 #. I18N: shown when hit by swatter. %1 is the attacker, %0 is the victim.
 #: src/items/swatter.cpp:340
 msgid "%1 flattens %0"
-msgstr ""
+msgstr "%1 kremur %0"
 
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:49
@@ -98,12 +100,12 @@ msgstr "%1 hittir %0"
 #. I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
 #: src/items/rubber_band.cpp:51
 msgid "%1 tests a tractor beam on %0"
-msgstr ""
+msgstr "%1 notar aðdráttargeisla á %0"
 
 #. I18N: shown when hit by swatter. %1 is the attacker, %0 is the victim.
 #: src/items/swatter.cpp:338
 msgid "%1 thinks %0 is a big fly"
-msgstr ""
+msgstr "%1 heldur að %0 sé stór fluga"
 
 #. I18N: ./data/gui/track_info_dialog.stkgui
 #. I18N: In the track setup screen (number of laps choice, where %i is the number)
@@ -118,7 +120,7 @@ msgstr "%i hringir"
 #: src/states_screens/dialogs/race_over_dialog.cpp:174
 #, c-format
 msgid "%i. %s : survived for %s"
-msgstr ""
+msgstr "%i. %s : lifaði í %s"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:224
@@ -127,37 +129,39 @@ msgid ""
 "%s\n"
 "by %s"
 msgstr ""
+"%s\n"
+"eftir %s"
 
 #: src/states_screens/dialogs/addons_loading.cpp:171
 #: src/states_screens/dialogs/addons_loading.cpp:175
 #, c-format
 msgid "%s KB"
-msgstr ""
+msgstr "%s KB"
 
 #: src/states_screens/dialogs/addons_loading.cpp:164
 #, c-format
 msgid "%s MB"
-msgstr ""
+msgstr "%s MB"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:214
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
-msgstr ""
+msgstr "%s eftir %s"
 
 #. I18N: as in "fastest lap: 60 seconds by Wilber"
 #: src/modes/linear_world.cpp:341
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
-msgstr ""
+msgstr "%s eftir %s"
 
 #. I18N: shown when hit by swatter. %s is the victim
 #: src/items/swatter.cpp:342
 #, c-format
 msgid "%s feels flat today"
-msgstr ""
+msgstr "%s líður mjög flatur"
 
 #: src/items/powerup.cpp:51
 #, c-format
@@ -169,13 +173,13 @@ msgstr "%s er mikill víkingur!"
 #: src/items/rubber_ball.cpp:305
 #, c-format
 msgid "%s is being bounced around."
-msgstr ""
+msgstr "%s er að skoppast um."
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/bowling.cpp:125
 #, c-format
 msgid "%s is practicing with a blue, big, spheric yo-yo"
-msgstr ""
+msgstr "%s er að æva sig með blátt stórt jó-jó"
 
 #: src/states_screens/kart_selection.cpp:594
 #, c-format
@@ -186,12 +190,12 @@ msgstr "%s er tilbúin/n"
 #: src/items/bowling.cpp:127
 #, c-format
 msgid "%s is the world master of the boomerang ball"
-msgstr ""
+msgstr "%s er heimsmeistari í bjúgverpilsbolta"
 
 #: src/items/powerup.cpp:50
 #, c-format
 msgid "%s pays the next round of grog!"
-msgstr ""
+msgstr "%s greiðir fyrir næstu umferð af mjöð!"
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/bowling.cpp:129
@@ -202,7 +206,7 @@ msgstr "%s ætti frekar að spila gúmmí-pílukast frekar en keilu"
 #: src/modes/world.cpp:861
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr ""
+msgstr "'%s' hefur verið dæmd/ur úr leik."
 
 #. I18N: for empty highscores entries
 #. I18N: ./data/gui/track_info_dialog.stkgui
@@ -225,7 +229,7 @@ msgstr ""
 #. I18N: in the help screen
 #: data/po/gui_strings.h:632
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr ""
+msgstr "* Hægt er að breyta/sjá lyklaborðsskipan í valmyndinni Stillingar"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -247,7 +251,7 @@ msgstr ""
 #. I18N: Game mode
 #: src/race/race_manager.hpp:171
 msgid "3 Strikes Battle"
-msgstr ""
+msgstr "3ja villu keppni"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -260,49 +264,49 @@ msgstr ""
 #. I18N: ./data/gui/track_info_dialog.stkgui
 #: data/po/gui_strings.h:292
 msgid "= Highscores ="
-msgstr ""
+msgstr "= Stigastaflan ="
 
 #: src/items/powerup.cpp:84
 msgid "A wizard did it!"
-msgstr ""
+msgstr "Galdramaður gerði það!"
 
 #: src/states_screens/race_result_gui.cpp:118
 #: src/states_screens/dialogs/race_over_dialog.cpp:433
 msgid "Abort Grand Prix"
-msgstr ""
+msgstr "Hætta Grand Prix"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 #: data/po/gui_strings.h:535
 msgid "About"
-msgstr ""
+msgstr "Um forritið"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:191
 msgid "Accelerate"
-msgstr ""
+msgstr "Auka hraða"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:110
 msgid "Add Keyboard Configuration"
-msgstr ""
+msgstr "Bæta við lýklaborðs stillingu"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In players configuration menu
 #: data/po/gui_strings.h:507
 msgid "Add Player"
-msgstr ""
+msgstr "Bæta við leikmanni"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:89
 msgid "Add Wiimote"
-msgstr ""
+msgstr "Bæta við Wiimote"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
 #: data/po/gui_strings.h:206
 msgid "Add a device"
-msgstr ""
+msgstr "Bæta við tæki"
 
 #. I18N: arena group name
 #. I18N: track group name
@@ -314,17 +318,17 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:1034
 #: src/states_screens/arenas_screen.cpp:80 data/po/gui_strings.h:762
 msgid "Add-Ons"
-msgstr ""
+msgstr "Bætingar"
 
 #: src/states_screens/addons_screen.cpp:84
 msgid "Add-on name"
-msgstr ""
+msgstr "Bæting nafn"
 
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
 #: data/po/gui_strings.h:523
 msgid "Addons"
-msgstr ""
+msgstr "Bætingar"
 
 #. I18N: ./data/karts/adiumy/kart.xml
 #: data/po/gui_strings.h:820
@@ -342,13 +346,13 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:1026
 #: src/states_screens/arenas_screen.cpp:72 data/po/gui_strings.h:766
 msgid "All"
-msgstr ""
+msgstr "Allt"
 
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: Section in track selection screen
 #: data/po/gui_strings.h:191
 msgid "All Tracks"
-msgstr ""
+msgstr "Allar brautir"
 
 #: src/states_screens/race_setup_screen.cpp:199
 msgid "All blows allowed, so catch weapons and make clever use of them!"
@@ -2203,5 +2207,6 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  Benedikt Scheving-Þorsteinsson https://launchpad.net/~nammi-namm\n"
 "  Olafur Skorrdal https://launchpad.net/~skorrdal\n"
 "  STK-team https://launchpad.net/~stk"
