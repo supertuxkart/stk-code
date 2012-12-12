@@ -142,7 +142,7 @@ public:
                  ~KartModel();
     KartModel*    makeCopy();
     void          reset();
-    void          loadInfo(const XMLNode &node, bool xmas_mode);
+    void          loadInfo(const XMLNode &node, bool xmas_mode, bool halloween_mode);
     bool          loadModels(const KartProperties &kart_properties);
     void          update(float rotation_dt, float steer, 
                          const float suspension[4]);

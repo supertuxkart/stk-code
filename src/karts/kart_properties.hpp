@@ -85,6 +85,7 @@ private:
     mutable KartModel       *m_kart_model;
     
     bool                    m_xmas_mode;
+    bool                    m_halloween_mode;
 
     /** List of all groups the kart belongs to. */
     std::vector<std::string> m_groups;

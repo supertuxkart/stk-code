@@ -60,7 +60,8 @@ KartProperties::KartProperties(const std::string &filename)
     struct tm*  timeinfo;
     std::time(&rawtime);
     timeinfo = std::localtime(&rawtime);
-    m_xmas_mode = (timeinfo->tm_mon == 11);  // Xmas mode happens in December
+    m_xmas_mode = (timeinfo->tm_mon == 12-1);  // Xmas mode happens in December
+    m_halloween_mode = (timeinfo->tm_mon == 10-1);    // Halloween mode appears in October
 
     m_groups.clear();
     m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
@@ -287,6 +288,14 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         root->get("xmas-icon-file",         &m_icon_file);
         root->get("xmas-minimap-icon-file", &m_minimap_icon_file);
+    }
+    
+    // Override file paths on Halloween
+    root->get("force-halloween-mode",   &m_halloween_mode);
+    if(m_halloween_mode)
+    {
+        root->get("halloween-icon-file",         &m_icon_file);
+        root->get("halloween-minimap-icon-file", &m_minimap_icon_file);
     }
 
     root->get("shadow-file",       &m_shadow_file      );
@@ -575,7 +584,7 @@ void KartProperties::getAllData(const XMLNode * root)
     }   // if sounds-node exist
 
     if(m_kart_model)
-        m_kart_model->loadInfo(*root, m_xmas_mode);
+        m_kart_model->loadInfo(*root, m_xmas_mode, m_halloween_mode);
 }   // getAllData
 
 // ----------------------------------------------------------------------------
