@@ -97,9 +97,11 @@ KartModel::KartModel(bool is_master)
  *  does not actually load the models (see load()).
  *  \param node  XML object of configuration file.
  */
-void KartModel::loadInfo(const XMLNode &node)
+void KartModel::loadInfo(const XMLNode &node, bool xmas_mode)
 {
     node.get("model-file", &m_model_filename);
+    if(xmas_mode)
+        node.get("xmas-model-file", &m_model_filename);
     if(const XMLNode *animation_node=node.getNode("animations"))
     {
         animation_node->get("left",           &m_animation_frame[AF_LEFT]      );

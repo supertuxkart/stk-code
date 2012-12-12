@@ -78,11 +78,13 @@ private:
     /** The texture to use in the minimap. If not defined, a simple
      *  color dot is used. */
     video::ITexture         *m_minimap_icon;
-
+    
     /** The kart model and wheels. It is mutable since the wheels of the
      *  KartModel can rotate and turn, and animations are played, but otherwise
      *  the kart_properties object is const. */
     mutable KartModel       *m_kart_model;
+    
+    bool                    m_xmas_mode;
 
     /** List of all groups the kart belongs to. */
     std::vector<std::string> m_groups;

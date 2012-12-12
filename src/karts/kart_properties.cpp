@@ -21,6 +21,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <ctime>
 
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
@@ -54,6 +55,12 @@ KartProperties::KartProperties(const std::string &filename)
     m_shadow_scale    = 1.0f;
     m_shadow_x_offset = 0.0f;
     m_shadow_y_offset = 0.0f;
+    
+    time_t      rawtime;
+    struct tm*  timeinfo;
+    std::time(&rawtime);
+    timeinfo = std::localtime(&rawtime);
+    m_xmas_mode = (timeinfo->tm_mon == 11);  // Xmas mode happens in December
 
     m_groups.clear();
     m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
@@ -273,6 +280,14 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("icon-file",         &m_icon_file        );
     
     root->get("minimap-icon-file", &m_minimap_icon_file);
+    
+    // Override file paths on Christmas
+    root->get("force-xmas-mode",   &m_xmas_mode);
+    if(m_xmas_mode) 
+    {
+        root->get("xmas-icon-file",         &m_icon_file);
+        root->get("xmas-minimap-icon-file", &m_minimap_icon_file);
+    }
 
     root->get("shadow-file",       &m_shadow_file      );
     Vec3 c;
@@ -560,7 +575,7 @@ void KartProperties::getAllData(const XMLNode * root)
     }   // if sounds-node exist
 
     if(m_kart_model)
-        m_kart_model->loadInfo(*root);
+        m_kart_model->loadInfo(*root, m_xmas_mode);
 }   // getAllData
 
 // ----------------------------------------------------------------------------
