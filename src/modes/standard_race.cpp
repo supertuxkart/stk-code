@@ -88,10 +88,6 @@ const std::string& StandardRace::getIdent() const
 void StandardRace::endRaceEarly()
 {
     const unsigned int kart_amount = m_karts.size();
-    // Estimate time for current last in race. Will be used to add to
-    // the time of the still active player karts.
-    const float worst_time = 
-        estimateFinishTimeForKart(getKartAtPosition(getNumKarts()));
     std::vector<int> active_players;
     // Required for debugging purposes
     beginSetKartPositions();

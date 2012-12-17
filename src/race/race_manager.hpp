@@ -489,6 +489,7 @@ public:
         case RaceManager::DIFFICULTY_EASY:   return "easy";   break;
         case RaceManager::DIFFICULTY_MEDIUM: return "medium"; break;
         case RaceManager::DIFFICULTY_HARD:   return "hard";   break;
+        default:  assert(false);
         }
         return "";
     }   // getDifficultyAsString

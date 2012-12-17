@@ -46,7 +46,6 @@ void EasterEggHunt::init()
         exit(1);
     }
  
-    const unsigned int kart_amount = m_karts.size();
     m_eggs_collected.resize(m_karts.size(), 0);
     
 }   // EasterEggHunt
@@ -72,7 +71,7 @@ void EasterEggHunt::readData(const std::string &filename)
     if(easter->getName()!="EasterEggHunt")
     {
         printf("Can't load easter egg file '%s' - no EasterEggHunt element.",
-                filename);
+                filename.c_str());
         delete easter;
         return;
     }
