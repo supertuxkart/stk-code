@@ -121,6 +121,7 @@ src/main.cpp
 src/main_loop.cpp
 src/modes/cutscene_world.cpp
 src/modes/demo_world.cpp
+src/modes/easter_egg_hunt.cpp
 src/modes/follow_the_leader.cpp
 src/modes/game_tutorial.cpp
 src/modes/linear_world.cpp
@@ -367,6 +368,7 @@ src/karts/skidding_properties.hpp
 src/main_loop.hpp
 src/modes/cutscene_world.hpp
 src/modes/demo_world.hpp
+src/modes/easter_egg_hunt.hpp
 src/modes/follow_the_leader.hpp
 src/modes/game_tutorial.hpp
 src/modes/linear_world.hpp

@@ -24,6 +24,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "karts/abstract_kart.hpp"
+#include "modes/easter_egg_hunt.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
@@ -109,16 +110,23 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
     m_deactive_time     = 0;
     m_time_till_return  = 0.0f;  // not strictly necessary, see isCollected()
     m_emitter           = NULL;
-    m_rotate            = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
-    m_disappear_counter = m_type==ITEM_BUBBLEGUM 
-                        ? stk_config->m_bubble_gum_counter
-                        : -1 ;
+    m_rotate            = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER) &&
+                          (type!=ITEM_EASTER_EGG);
+    switch(m_type)
+    {
+    case ITEM_BUBBLEGUM: 
+        m_disappear_counter = stk_config->m_bubble_gum_counter; break;
+    case ITEM_EASTER_EGG:
+        m_disappear_counter = -1; break;
+    default:
+        m_disappear_counter = -1;
+    }
     // Now determine in which quad this item is, and its distance 
     // from the center within this quad.
     m_graph_node = QuadGraph::UNKNOWN_SECTOR;
     QuadGraph* currentQuadGraph = QuadGraph::get();
 
-    // Check that QuadGraph exist ( it might not in battle mode for eg)
+    // Check that QuadGraph exist (it might not in battle mode for eg)
     if (currentQuadGraph != NULL)
     {
       QuadGraph::get()->findRoadSector(xyz, &m_graph_node);
@@ -236,9 +244,15 @@ void Item::reset()
     m_collected         = false;
     m_time_till_return  = 0.0f;
     m_deactive_time     = 0.0f;
-    m_disappear_counter = m_type==ITEM_BUBBLEGUM 
-                        ? stk_config->m_bubble_gum_counter
-                        : -1 ;
+    switch(m_type)
+    {
+    case ITEM_BUBBLEGUM: 
+        m_disappear_counter = stk_config->m_bubble_gum_counter; break;
+    case ITEM_EASTER_EGG:
+        m_disappear_counter = -1; break;
+    default:
+        m_disappear_counter = -1;
+    }
     if(m_original_type!=ITEM_NONE)
     {
         setType(m_original_type);
@@ -319,7 +333,18 @@ void Item::collected(const AbstractKart *kart, float t)
 {
     m_collected     = true;
     m_event_handler = kart;
-    if(m_type==ITEM_BUBBLEGUM && m_disappear_counter>0)
+    if(m_type==ITEM_EASTER_EGG)
+    {
+        m_time_till_return=99999;
+        EasterEggHunt *world = dynamic_cast<EasterEggHunt*>(World::getWorld());
+        assert(world);
+        world->collectedEasterEgg(kart);
+        if (m_node != NULL)
+        {
+            m_node->setVisible(false);
+        }
+    }
+    else if(m_type==ITEM_BUBBLEGUM && m_disappear_counter>0)
     {
         m_disappear_counter --;
         // Deactivates the item for a certain amount of time. It is used to

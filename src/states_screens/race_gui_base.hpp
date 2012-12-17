@@ -53,16 +53,16 @@ public:
       */
     struct KartIconDisplayInfo
     {
-        /** text to display next to icon, if any */
+        /** Text to display next to icon, if any. */
         core::stringw m_text;
         
-        /** text color, if any text */
-        float r, g, b;
+        /** Text color, if any text. */
+        video::SColor m_color;
         
-        /** if this kart has a special title, e.g. "leader" in follow-the-leader */
+        /** If this kart has a special title, e.g. "leader" in follow-the-leader. */
         core::stringw special_title;
         
-        /** Current lap of this kart, or -1 if irrelevant */
+        /** Current lap of this kart, or -1 if irrelevant. */
         int lap;
     };   // KartIconDisplayInfo
 

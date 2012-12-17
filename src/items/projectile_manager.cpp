@@ -85,7 +85,7 @@ void ProjectileManager::update(float dt)
             he = next;
         }
         // Update this hit effect. If it can be removed, remove it.
-        if((*he)->updateAndDelete(dt))
+        else if((*he)->updateAndDelete(dt))
         {
             delete *he;
             HitEffects::iterator next = m_active_hit_effects.erase(he);

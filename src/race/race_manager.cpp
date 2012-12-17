@@ -32,6 +32,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
+#include "modes/easter_egg_hunt.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
@@ -394,6 +395,8 @@ void RaceManager::startNextRace()
         World::setWorld(new OverWorld());
     else if(m_minor_mode==MINOR_MODE_CUTSCENE)
         World::setWorld(new CutsceneWorld());
+    else if(m_minor_mode==MINOR_MODE_EASTER_EGG)
+        World::setWorld(new EasterEggHunt());
     else
     { 
         fprintf(stderr,"Could not create given race mode\n"); 

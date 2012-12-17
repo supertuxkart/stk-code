@@ -286,6 +286,9 @@ void TracksScreen::buildTrackList()
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack( n );
+            if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG
+                && !curr->hasEasterEggs())
+                continue;
             if (curr->isArena()) continue;
             if (curr->isInternal()) continue;
             
@@ -313,6 +316,9 @@ void TracksScreen::buildTrackList()
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack( curr_group[n] );
+            if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG
+                && !curr->hasEasterEggs())
+                continue;
             if (curr->isArena()) continue;
             if (curr->isInternal()) continue;
             

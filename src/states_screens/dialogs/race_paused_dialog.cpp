@@ -72,7 +72,7 @@ RacePausedDialog::~RacePausedDialog()
 void RacePausedDialog::loadedFromFile()
 {
     // disable the "restart" button in GPs
-    if (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_SINGLE)
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         GUIEngine::RibbonWidget* choice_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");

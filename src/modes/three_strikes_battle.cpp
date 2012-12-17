@@ -438,24 +438,16 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
         switch(m_kart_info[i].m_lives)
         {
             case 3:
-                rank_info.r = 0.0;
-                rank_info.g = 1.0;
-                rank_info.b = 0.0;
+                rank_info.m_color = video::SColor(255, 0, 255, 0);
                 break;
             case 2:
-                rank_info.r = 1.0;
-                rank_info.g = 0.9f;
-                rank_info.b = 0.0;
+                rank_info.m_color = video::SColor(255, 255, 229, 0);
                 break;
             case 1:
-                rank_info.r = 1.0;
-                rank_info.g = 0.0;
-                rank_info.b = 0.0;
+                rank_info.m_color = video::SColor(255, 255, 0, 0);
                 break;
             case 0:
-                rank_info.r = 0.5;
-                rank_info.g = 0.5;
-                rank_info.b = 0.5;
+                rank_info.m_color = video::SColor(128, 128, 128, 0);
                 break;
         }
         

@@ -73,7 +73,9 @@ public:
         ITEM_NITRO_SMALL,
         ITEM_BUBBLEGUM,
         ITEM_BUBBLEGUM_NOLOK,
-        
+
+        /** For easter egg mode only. */
+        ITEM_EASTER_EGG,
         /** An invisible item that can be used to trigger some behavior when
           * approaching a point
           */

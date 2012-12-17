@@ -42,6 +42,7 @@ static const std::string IDENT_STD      ("STANDARD"        );
 static const std::string IDENT_TTRIAL   ("STD_TIMETRIAL"   );
 static const std::string IDENT_FTL      ("FOLLOW_LEADER"   );
 static const std::string IDENT_STRIKES  ("BATTLE_3_STRIKES");
+static const std::string IDENT_EASTER   ("EASTER_EGG_HUNT");
 static const std::string IDENT_OVERWORLD("OVERWORLD"   );
 static const std::string IDENT_CUSTSCENE("CUTSCENE"   );
 
@@ -94,6 +95,7 @@ public:
     // issues
 #define LINEAR_RACE(ID, COUNT_LAPSES) (1000+ID+100*COUNT_LAPSES)
 #define BATTLE_ARENA(ID) (2000+ID)
+#define EASTER_EGG(ID)   (3000+ID)
 
     // ------------------------------------------------------------------------
     /** Minor variants to the major types of race.
@@ -108,7 +110,9 @@ public:
         MINOR_MODE_OVERWORLD     = LINEAR_RACE(3, false),
         
         MINOR_MODE_3_STRIKES     = BATTLE_ARENA(0),
-        MINOR_MODE_CUTSCENE      = BATTLE_ARENA(1)
+        MINOR_MODE_CUTSCENE      = BATTLE_ARENA(1),
+
+        MINOR_MODE_EASTER_EGG    = EASTER_EGG(0)
     };
 
     // ------------------------------------------------------------------------
@@ -132,6 +136,7 @@ public:
             case MINOR_MODE_TIME_TRIAL:     return IDENT_TTRIAL;
             case MINOR_MODE_FOLLOW_LEADER:  return IDENT_FTL;
             case MINOR_MODE_3_STRIKES:      return IDENT_STRIKES;
+            case MINOR_MODE_EASTER_EGG:     return IDENT_EASTER;
             default: assert(false); 
                      return IDENT_STD;  // stop compiler warning
         }
@@ -149,6 +154,7 @@ public:
             case MINOR_MODE_TIME_TRIAL:     return "/gui/mode_tt.png";
             case MINOR_MODE_FOLLOW_LEADER:  return "/gui/mode_ftl.png";
             case MINOR_MODE_3_STRIKES:      return "/gui/mode_3strikes.png";
+            case MINOR_MODE_EASTER_EGG:     return "/gui/mode_easter.png";
             default: assert(false); return NULL;
         }
     }   // getIconOf
@@ -169,6 +175,7 @@ public:
             case MINOR_MODE_FOLLOW_LEADER:  return _("Follow the Leader");
             //I18N: Game mode
             case MINOR_MODE_3_STRIKES:      return _("3 Strikes Battle");
+            case MINOR_MODE_EASTER_EGG:     return _("Easter Egg Hunt");
             default: assert(false); return NULL;
         }
     }
@@ -182,6 +189,7 @@ public:
             case MINOR_MODE_TIME_TRIAL:     return true;
             case MINOR_MODE_FOLLOW_LEADER:  return true;
             case MINOR_MODE_3_STRIKES:      return false;
+            case MINOR_MODE_EASTER_EGG:     return false;
             default: assert(false); return NULL;
         }
     }
@@ -199,6 +207,7 @@ public:
         else if (name==IDENT_TTRIAL ) return MINOR_MODE_TIME_TRIAL;
         else if (name==IDENT_FTL    ) return MINOR_MODE_FOLLOW_LEADER;
         else if (name==IDENT_STRIKES) return MINOR_MODE_3_STRIKES;
+        else if (name==IDENT_EASTER ) return MINOR_MODE_EASTER_EGG;
 
         assert(0);
         return MINOR_MODE_NONE;
@@ -209,8 +218,10 @@ public:
     
     /** Game difficulty. */
     enum Difficulty     { DIFFICULTY_EASY,
+                          DIFFICULTY_FIRST = DIFFICULTY_EASY,
                           DIFFICULTY_MEDIUM, 
                           DIFFICULTY_HARD,
+                          DIFFICULTY_LAST = DIFFICULTY_HARD,
                           DIFFICULTY_COUNT};
     
     /** Different kart types: A local player, a player connected via network,
@@ -467,7 +478,20 @@ public:
     /** \return whether the track should be reversed */
     bool getReverseTrack() const { return m_reverse_track[m_track_number]; }
     // ------------------------------------------------------------------------
-    Difficulty   getDifficulty() const { return m_difficulty; }
+    /** Returns the difficulty. */
+    Difficulty getDifficulty() const { return m_difficulty; }
+    // ------------------------------------------------------------------------
+    /** Returns the specified difficulty as a string. */
+    std::string getDifficultyAsString(Difficulty diff) const 
+    {
+        switch(diff)
+        {
+        case RaceManager::DIFFICULTY_EASY:   return "easy";   break;
+        case RaceManager::DIFFICULTY_MEDIUM: return "medium"; break;
+        case RaceManager::DIFFICULTY_HARD:   return "hard";   break;
+        }
+        return "";
+    }   // getDifficultyAsString
     // ------------------------------------------------------------------------
     const std::string& getTrackName() const { return m_tracks[m_track_number];}
     // ------------------------------------------------------------------------

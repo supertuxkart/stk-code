@@ -29,10 +29,11 @@
 #include "states_screens/race_setup_screen.hpp"
 
 
-const int CONFIG_CODE_NORMAL = 0;
+const int CONFIG_CODE_NORMAL    = 0;
 const int CONFIG_CODE_TIMETRIAL = 1;
-const int CONFIG_CODE_FTL = 2;
-const int CONFIG_CODE_3STRIKES = 3;
+const int CONFIG_CODE_FTL       = 2;
+const int CONFIG_CODE_3STRIKES  = 3;
+const int CONFIG_CODE_EASTER    = 4;
 
 using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( RaceSetupScreen );
@@ -53,19 +54,19 @@ public:
         // game mode changed!!
         m_parent->onGameModeChanged();
     }
-};
+};   // GameModeRibbonListener
 
 // -----------------------------------------------------------------------------
 
 RaceSetupScreen::RaceSetupScreen() : Screen("racesetup.stkgui")
 {
-}
+}   // RaceSetupScreen
 
 // -----------------------------------------------------------------------------
 
 void RaceSetupScreen::loadedFromFile()
 {
-}
+}   // loadedFromFile
 
 // -----------------------------------------------------------------------------
 
@@ -127,6 +128,13 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
             StateManager::get()->pushScreen( ArenasScreen::getInstance() );
         }
+        else if (selectedMode == IDENT_EASTER)
+        {
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_EASTER_EGG);
+            UserConfigParams::m_game_mode = CONFIG_CODE_EASTER;
+            race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
+            StateManager::get()->pushScreen( TracksScreen::getInstance() );
+        }
         else if (selectedMode == "locked")
         {
             unlock_manager->playLockSound();
@@ -142,7 +150,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
     {
         StateManager::get()->escapePressed();
     }
-}
+}   // eventCallback
 
 // -----------------------------------------------------------------------------
 
@@ -167,7 +175,7 @@ void RaceSetupScreen::onGameModeChanged()
     {
         kartamount->setActivated();
     }
-}
+}   // onGameModeChanged
 
 // -----------------------------------------------------------------------------
 
@@ -228,7 +236,15 @@ void RaceSetupScreen::init()
         name4 += _("Hit others with weapons until they lose all their lives. (Only in multiplayer games)");
         w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
     }
-    
+    {
+        irr::core::stringw name1 = irr::core::stringw(
+           RaceManager::getNameOf(RaceManager::MINOR_MODE_EASTER_EGG)) + L"\n";
+        //FIXME: avoid duplicating descriptions from the help menu!
+        name1 +=  _("Find all Easter Eggs");
+
+        w2->addItem( name1, IDENT_EASTER, 
+                   RaceManager::getIconOf(RaceManager::MINOR_MODE_EASTER_EGG));
+    }
 
     w2->updateItemDisplay();
     
@@ -247,10 +263,13 @@ void RaceSetupScreen::init()
         case CONFIG_CODE_3STRIKES :
             w2->setSelection(IDENT_STRIKES, PLAYER_ID_GAME_MASTER, true);
             break;
+        case CONFIG_CODE_EASTER :
+            w2->setSelection(IDENT_EASTER, PLAYER_ID_GAME_MASTER, true);
+            break;
     }
     
     m_mode_listener = new GameModeRibbonListener(this);
     w2->registerHoverListener(m_mode_listener);
-}
+}   // init
 
 // -----------------------------------------------------------------------------

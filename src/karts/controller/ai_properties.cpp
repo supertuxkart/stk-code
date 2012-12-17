@@ -27,13 +27,7 @@ float AIProperties::UNDEFINED = -99.9f;
  */
 AIProperties::AIProperties(RaceManager::Difficulty difficulty)
 {
-    switch(difficulty)
-    {
-    case RaceManager::DIFFICULTY_EASY:   m_ident="easy";   break;
-    case RaceManager::DIFFICULTY_MEDIUM: m_ident="medium"; break;
-    case RaceManager::DIFFICULTY_HARD:   m_ident="hard";   break;
-    default:                             m_ident="";       break;
-    }
+    m_ident = race_manager->getDifficultyAsString(difficulty);
 
     m_max_item_angle             = UNDEFINED;
     m_max_item_angle_high_speed  = UNDEFINED;

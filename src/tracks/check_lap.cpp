@@ -60,8 +60,12 @@ void CheckLap::reset(const Track &track)
 bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
 {
     float track_length = World::getWorld()->getTrack()->getTrackLength();
-    float current_distance = 
-        ((LinearWorld*)World::getWorld())->getDistanceDownTrackForKart(indx);
+    LinearWorld *lin_world = dynamic_cast<LinearWorld*>(World::getWorld());
+    // Can happen if a non-lap based race mode is used with a scene file that
+    // has check defined.
+    if(!lin_world)
+        return false;
+    float current_distance = lin_world->getDistanceDownTrackForKart(indx);
     bool result =(m_previous_distance[indx]>0.95f*track_length &&
                   current_distance<7.0f);
     if(UserConfigParams::m_check_debug && result)

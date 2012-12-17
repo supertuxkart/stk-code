@@ -227,6 +227,9 @@ private:
     Vec3                     m_aabb_max;
     /** True if this track is an arena. */
     bool                     m_is_arena;
+
+    /** True if this track has easter eggs. */
+    bool                     m_has_easter_eggs;
     
     bool                     m_is_cutscene;
     
@@ -358,8 +361,6 @@ private:
     std::vector<BezierCurve*> m_all_curves;
 
     void loadTrackInfo();
-    void itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
-                     bool drop);
     void loadQuadGraph(unsigned int mode_id, const bool reverse);
     void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
@@ -386,7 +387,9 @@ public:
     void               update(float dt);
     void               reset();
     void               adjustForFog(scene::ISceneNode *node);
-    void               adjustForFog(scene::IMesh* mesh, scene::ISceneNode* parent_scene_node);
+    void               adjustForFog(scene::IMesh* mesh, 
+                                    scene::ISceneNode* parent_scene_node);
+    void               itemCommand(const XMLNode *node);
     const core::vector3df& getSunRotation();
     /** Sets the current ambient color for a kart with index k. */
     void               setAmbientColor(const video::SColor &color,
@@ -394,6 +397,8 @@ public:
     void               handleExplosion(const Vec3 &pos, 
                                        const PhysicalObject *mp,
                                        bool secondary_hits=true) const;
+    void               loadTrackModel  (bool reverse_track = false,
+                                        unsigned int mode_id=0);
     std::vector< std::vector<float> >     
                        buildHeightMap();
     // ------------------------------------------------------------------------
@@ -402,11 +407,11 @@ public:
     // ------------------------------------------------------------------------
     const core::dimension2du& getMiniMapSize() const { return m_mini_map_size; }
     // ------------------------------------------------------------------------
-    bool               isArena              () const { return m_is_arena; }
+    /** Returns true if this track has an arena mode. */
+    bool isArena() const { return m_is_arena; }
     // ------------------------------------------------------------------------
-    void               loadTrackModel  (World* parent, 
-                                        bool reverse_track = false,
-                                        unsigned int mode_id=0);
+    /** Returns true if this track has easter eggs. */
+    bool hasEasterEggs() const { return m_has_easter_eggs; }
     // ------------------------------------------------------------------------
     void               addMusic          (MusicInformation* mi)
                                                   {m_music.push_back(mi);     }

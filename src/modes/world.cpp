@@ -138,7 +138,7 @@ void World::init()
 
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
-    m_track->loadTrackModel(this, race_manager->getReverseTrack());
+    m_track->loadTrackModel(race_manager->getReverseTrack());
 
     for(unsigned int i=0; i<num_karts; i++)
     {

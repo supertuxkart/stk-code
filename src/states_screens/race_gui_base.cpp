@@ -807,14 +807,15 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         int lap = info.lap;
         
         // In battle mode there is no distance along track etc.
-        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+            race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG)
         {
             x = x_base;
             y = previous_y+ICON_PLAYER_WIDTH+2;
         }
         else
         {
-            LinearWorld *linear_world      = (LinearWorld*)(World::getWorld());
+            LinearWorld *linear_world = (LinearWorld*)(World::getWorld());
             
             float distance = linear_world->getDistanceDownTrackForKart(kart_id)
                            + linear_world->getTrack()->getTrackLength()*lap;
@@ -870,15 +871,12 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         
         if (m_kart_display_infos[kart_id].m_text.size() > 0)
         {
-            video::SColor color = video::SColor(255,
-                                                (int)(255*info.r),
-                                                (int)(255*info.g), 
-                                                (int)(255*info.b)   );
             core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, 
                                 x+ICON_PLAYER_WIDTH, y+5);
             core::stringw s=info.m_text.c_str();
             
-            font->draw(s.c_str(), pos, color, false, false, NULL, true /* ignore RTL */);
+            font->draw(s.c_str(), pos, info.m_color, false, false, NULL, 
+                       true /* ignore RTL */);
         }
         
         if (info.special_title.size() > 0)
@@ -887,7 +885,8 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, 
                                 x+ICON_PLAYER_WIDTH, y+5);
             core::stringw s(info.special_title.c_str());
-            font->draw(s.c_str(), pos, color, false, false, NULL, true /* ignore RTL */);
+            font->draw(s.c_str(), pos, info.m_color, false, false, NULL, 
+                       true /* ignore RTL */);
         }
         
         // draw icon

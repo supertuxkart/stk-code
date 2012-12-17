@@ -47,6 +47,7 @@ using namespace irr;
 #include "items/item.hpp"
 #include "items/item_manager.hpp"
 #include "modes/linear_world.hpp"
+#include "modes/easter_egg_hunt.hpp"
 #include "modes/world.hpp"
 #include "physics/physical_object.hpp"
 #include "physics/physics.hpp"
@@ -92,6 +93,7 @@ Track::Track(const std::string &filename)
     m_enable_push_back      = true;
     m_reverse_available     = false;
     m_is_arena              = false;
+    m_has_easter_eggs       = false;
     m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
     m_mini_map              = NULL;
@@ -354,6 +356,9 @@ void Track::loadTrackInfo()
     m_screenshot = m_root+"/"+m_screenshot;
     delete root;
 
+    std::string dir = StringUtils::getPath(m_filename);
+    std::string easter_name = dir+"/easter_eggs.xml";
+    m_has_easter_eggs = file_manager->fileExists(easter_name);
 }   // loadTrackInfo
 
 //-----------------------------------------------------------------------------
@@ -1238,9 +1243,7 @@ void Track::createWater(const XMLNode &node)
  *  \param mode_id Which of the modes of a track to use. This determines which
  *         scene, quad, and graph file to load.
  */
-
-void Track::loadTrackModel(World* parent, bool reverse_track, 
-                           unsigned int mode_id               )
+void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 {
     if(!m_reverse_available) 
     {
@@ -1390,7 +1393,8 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
             createWater(*node);
         }
         else if(name=="banana"      || name=="item" || 
-                name=="small-nitro" || name=="big-nitro")
+                name=="small-nitro" || name=="big-nitro" ||
+                name=="easter-egg"                           )
         {
             // will be handled later
         }
@@ -1420,7 +1424,9 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
         }
         else if(name=="checks")
         {
-            CheckManager::get()->load(*node);
+            // Easter egg hunts don't have laps.
+            if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_EASTER_EGG)
+                CheckManager::get()->load(*node);
         }
         else if (name=="particle-emitter")
         {
@@ -1543,7 +1549,7 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
         }
     //}
     m_track_object_manager->enableFog(m_use_fog);
-    
+
     // Sky dome and boxes support
     // --------------------------
     if(m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
@@ -1573,8 +1579,8 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
     }
     else if(m_sky_type==SKY_COLOR)
     {
-        parent->setClearBackBuffer(true);
-        parent->setClearbackBufferColor(m_sky_color);
+        World::getWorld()->setClearBackBuffer(true);
+        World::getWorld()->setClearbackBufferColor(m_sky_color);
     }
 
     
@@ -1609,25 +1615,12 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *node = root->getNode(i);
-        const std::string name = node->getName();
-        if (name=="banana"      || name=="item" || 
-            name=="small-nitro" || name=="big-nitro")
+        const std::string &name = node->getName();
+        if (name=="banana"      || name=="item"      || 
+            name=="small-nitro" || name=="big-nitro" ||
+            name=="easter-egg"                           )
         {
-            Item::ItemType type;
-            if     (name=="banana"     ) type = Item::ITEM_BANANA;
-            else if(name=="item"       ) type = Item::ITEM_BONUS_BOX;
-            else if(name=="small-nitro") type = Item::ITEM_NITRO_SMALL;
-            else                         type = Item::ITEM_NITRO_BIG;
-            Vec3 xyz;
-            // Set some kind of default in case Z is not defined in the file
-            // (with the new track exporter it always is defined anyway).
-            // Z is the height from which the item is dropped on the track.
-            xyz.setY(1000);
-            node->getXYZ(&xyz);
-            bool drop=true;
-            node->get("drop", &drop);
-            // Height is needed if bit 2 (for z) is not set
-            itemCommand(xyz, type, drop);
+            itemCommand(node);
         }
     }   // for i<root->getNumNodes()
 
@@ -1645,7 +1638,8 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
     {
         printf("WARNING: no check lines found in track '%s'.\n", 
                m_ident.c_str());
-        printf("Lap counting will not work, and start positions might be incorrect.\n");
+        printf("Lap counting will not work, and start positions might be "
+               "incorrect.\n");
     }
 
     if(UserConfigParams::logMemory())
@@ -1654,9 +1648,17 @@ void Track::loadTrackModel(World* parent, bool reverse_track,
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
                 irr_driver->getVideoDriver()->getTextureCount());
 
-    if (World::getWorld()->useChecklineRequirements())
+    World *world = World::getWorld();
+    if (world->useChecklineRequirements())
     {
         QuadGraph::get()->computeChecklineRequirements();
+    }
+
+    EasterEggHunt *easter_world = dynamic_cast<EasterEggHunt*>(world);
+    if(easter_world)
+    {
+        std::string dir = StringUtils::getPath(m_filename);
+        easter_world->readData(dir+"/easter_eggs.xml");
     }
 }   // loadTrackModel
 
@@ -1804,13 +1806,37 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
  *  \param drop True if the item Z position should be determined based on
  *         the track topology.
  */
-void Track::itemCommand(const Vec3 &xyz, Item::ItemType type, 
-                        bool drop)
+void Track::itemCommand(const XMLNode *node)
 {
+    const std::string &name = node->getName();
+
+    Item::ItemType type;
+    if     (name=="banana"     ) type = Item::ITEM_BANANA;
+    else if(name=="item"       ) type = Item::ITEM_BONUS_BOX;
+    else if(name=="small-nitro") type = Item::ITEM_NITRO_SMALL;
+    else if(name=="easter-egg" ) type = Item::ITEM_EASTER_EGG;
+    else                         type = Item::ITEM_NITRO_BIG;
+    Vec3 xyz;
+    // Set some kind of default in case Y is not defined in the file
+    // (with the new track exporter it always is defined anyway).
+    // Y is the height from which the item is dropped on the track.
+    xyz.setY(1000);
+    node->getXYZ(&xyz);
+    bool drop=true;
+    node->get("drop", &drop);
+
     // Some modes (e.g. time trial) don't have any bonus boxes
     if(type==Item::ITEM_BONUS_BOX && 
        !World::getWorld()->haveBonusBoxes()) 
         return;
+
+    // Only do easter eggs in easter egg mode.
+    if(type==Item::ITEM_EASTER_EGG && 
+        !(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG))
+    {
+        printf("Found easter egg in non-easter-egg mode - ignored.\n");
+        return;
+    }
 
     Vec3 loc(xyz);
     // if only 2d coordinates are given, let the item fall from very high

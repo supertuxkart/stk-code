@@ -701,6 +701,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\modes\easter_egg_hunt.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\follow_the_leader.cpp"
 					>
 				</File>
@@ -1884,6 +1888,10 @@
 				</File>
 				<File
 					RelativePath="..\..\modes\demo_world.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\easter_egg_hunt.hpp"
 					>
 				</File>
 				<File

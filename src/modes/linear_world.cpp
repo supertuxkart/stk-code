@@ -422,9 +422,7 @@ void LinearWorld::getKartsDisplayInfo(
         AbstractKart* kart = m_karts[i];
 
         // reset color
-        rank_info.r = 1.0;
-        rank_info.g = 1.0;
-        rank_info.b = 1.0;
+        rank_info.m_color = video::SColor(255, 255, 255, 255);
         rank_info.lap = -1;
 
         if(kart->isEliminated()) continue;
@@ -486,12 +484,15 @@ void LinearWorld::getKartsDisplayInfo(
 
         if(kart_info.m_race_lap>=numLaps)
         {  // kart is finished, display in green
-            rank_info.g = rank_info.b = 0;
+            rank_info.m_color.setGreen(0);
+            rank_info.m_color.setBlue(0);
         }
         else if(kart_info.m_race_lap>=0 && numLaps>1)
         {
-            rank_info.g = rank_info.b =
-                1.0f-(float)kart_info.m_race_lap/((float)numLaps-1.0f);
+            int col = (int)(255*(1.0f-(float)kart_info.m_race_lap
+                                    /((float)numLaps-1.0f)        ));
+            rank_info.m_color.setBlue(col);
+            rank_info.m_color.setGreen(col);
         }
     }   // next kart
 
@@ -561,22 +562,15 @@ void LinearWorld::moveKartAfterRescue(AbstractKart* kart)
 
     info.getSector()->rescue();
     int sector = info.getSector()->getCurrentGraphNode();
-    kart->setXYZ( QuadGraph::get()
-                  ->getQuadOfNode(sector).getCenter());
-
-    btQuaternion heading(btVector3(0.0f, 1.0f, 0.0f),
-                         m_track->getAngle(sector) );
-    kart->setRotation(heading);
 
     // A certain epsilon is added here to the Z coordinate, in case
     // that the drivelines are somewhat under the track. Otherwise, the
     // kart might be placed a little bit under the track, triggering
     // a rescue, ... (experimentally found value)
     float epsilon = 0.5f * kart->getKartHeight();
-
+    const Vec3 &xyz = QuadGraph::get()->getQuadOfNode(sector).getCenter();
     btTransform pos;
-    pos.setOrigin(kart->getXYZ()+btVector3(0, kart->getKartHeight() + epsilon,
-                                           0));
+    pos.setOrigin(xyz+btVector3(0, kart->getKartHeight() + epsilon,0));
     pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
                     m_track->getAngle(sector)));
 
