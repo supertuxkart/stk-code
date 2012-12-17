@@ -403,6 +403,8 @@ CURLcode NetworkHttp::reInit()
 
     std::string news_file = file_manager->getAddonsFile("news.xml");
     file_manager->removeFile(news_file);
+    std::string addons_file = file_manager->getAddonsFile("addons.xml");
+    file_manager->removeFile(addons_file);
     if(UserConfigParams::logAddons())
         printf("[addons] Xml files deleted, re-initialising addon manager.\n");
 
@@ -487,13 +489,13 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
     std::string full_save = 
         file_manager->getAddonsFile(request->getSavePath());
 
-    if(UserConfigParams::logAddons())
-        printf("[addons] Downloading '%s' as '%s'.\n", 
-               request->getURL().c_str(), request->getSavePath().c_str());
     std::string full_url = request->getURL();
     if(full_url.substr(0, 5)!="http:" && full_url.substr(0, 4)!="ftp:")
         full_url = (std::string)UserConfigParams::m_server_addons 
                  + "/" + full_url;
+    if(UserConfigParams::logAddons())
+        printf("[addons] Downloading '%s' as '%s'.\n", 
+               full_url.c_str(), request->getSavePath().c_str());
 
     curl_easy_setopt(m_curl_session, CURLOPT_URL, full_url.c_str());
     std::string uagent = (std::string)"SuperTuxKart/" + STK_VERSION;
