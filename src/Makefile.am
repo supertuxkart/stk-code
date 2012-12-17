@@ -259,6 +259,8 @@ supertuxkart_SOURCES = \
  modes/cutscene_world.hpp \
  modes/demo_world.cpp \
  modes/demo_world.hpp \
+ modes/easter_egg_hunt.cpp \
+ modes/easter_egg_hunt.hpp \
  modes/follow_the_leader.cpp \
  modes/follow_the_leader.hpp \
  modes/game_tutorial.cpp \
