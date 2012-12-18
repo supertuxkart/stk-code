@@ -11,6 +11,7 @@
 
 - (id)initWithDevice:(irr::CIrrDeviceMacOSX *)device
 {
+    _device = nil;
 	self = [super init];
 	if (self) _device = device;
 	return (self);
@@ -53,9 +54,10 @@
 
 - (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)proposedFrameSize
 {
-	if (_device->isResizable())
-		return proposedFrameSize;
-	else
+    //if (_device == nil) return proposedFrameSize;
+	//if (_device->isResizable())
+	//	return proposedFrameSize;
+	//else
 		return [window frame].size;
 }
 
