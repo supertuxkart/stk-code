@@ -128,6 +128,7 @@ src/modes/overworld.cpp
 src/modes/profile_world.cpp
 src/modes/standard_race.cpp
 src/modes/three_strikes_battle.cpp
+src/modes/soccer_world.cpp
 src/modes/tutorial_race.cpp
 src/modes/world.cpp
 src/modes/world_status.cpp

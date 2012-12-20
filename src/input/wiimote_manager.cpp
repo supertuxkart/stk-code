@@ -19,7 +19,7 @@
 #ifdef ENABLE_WIIUSE
 
 #include "input/wiimote_manager.hpp"
-#include "wiiuse/wiiuse.h"
+#include "wiiuse.h"
 #include "graphics/irr_driver.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"

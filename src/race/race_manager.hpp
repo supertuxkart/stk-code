@@ -108,7 +108,8 @@ public:
         MINOR_MODE_OVERWORLD     = LINEAR_RACE(3, false),
         
         MINOR_MODE_3_STRIKES     = BATTLE_ARENA(0),
-        MINOR_MODE_CUTSCENE      = BATTLE_ARENA(1)
+        MINOR_MODE_SOCCER        = BATTLE_ARENA(1),
+        MINOR_MODE_CUTSCENE      = BATTLE_ARENA(2)
     };
 
     // ------------------------------------------------------------------------
