@@ -19,7 +19,7 @@
 #ifdef ENABLE_WIIUSE
 
 #include "input/wiimote_manager.hpp"
-#include "wiiuse/wiiuse.h"
+#include "wiiuse.h"
 #include "graphics/irr_driver.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
@@ -99,12 +99,12 @@ void WiimoteManager::launchDetection(int timeout)
         if (device_manager->getConfigForGamepad(id, name, &gamepadConfig) == true)
         {
             if(UserConfigParams::logMisc()) 
-                printf("creating new configuration.\n");
+                printf("creating new configuration for wiimote.\n");
         }
         else
         {
             if(UserConfigParams::logMisc())
-                printf("using existing configuration.\n");
+                printf("using existing configuration for wiimote.\n");
         }
 
         gamepadConfig->setPlugged();
@@ -165,41 +165,87 @@ void WiimoteManager::translateEvent(wiimote_t *wm, int gamepad_id, irr::SEvent* 
     // Simulate an Irrlicht joystick event;
     resetEvent(event, gamepad_id);
     
+    // --------------------- Wiimote --------------------
     // Send button states
+    if(IS_PRESSED(wm, WIIMOTE_BUTTON_LEFT))
+    {
+        printf("DEBUG: Left\n");
+        event->JoystickEvent.ButtonStates |= (1<<1);
+    }
+    if(IS_PRESSED(wm, WIIMOTE_BUTTON_RIGHT))
+    {
+        printf("DEBUG: Right\n");
+        event->JoystickEvent.ButtonStates |= (1<<2);
+    }
+    if(IS_PRESSED(wm, WIIMOTE_BUTTON_UP))
+    {
+        printf("DEBUG: Up\n");
+        event->JoystickEvent.ButtonStates |= (1<<3);
+    }
+    if(IS_PRESSED(wm, WIIMOTE_BUTTON_DOWN))
+    {
+        printf("DEBUG: Down\n");
+        event->JoystickEvent.ButtonStates |= (1<<4);
+    }
+    
     if(IS_PRESSED(wm, WIIMOTE_BUTTON_A))
     {
         printf("DEBUG: A\n");
-        event->JoystickEvent.ButtonStates |= (1<<1);
+        event->JoystickEvent.ButtonStates |= (1<<5);
     }
     if(IS_PRESSED(wm, WIIMOTE_BUTTON_B))
     {
         printf("DEBUG: B\n");
-        event->JoystickEvent.ButtonStates |= (1<<2);
+        event->JoystickEvent.ButtonStates |= (1<<6);
     }
     if(IS_PRESSED(wm, WIIMOTE_BUTTON_PLUS))
     {
         printf("DEBUG: +\n");
-        event->JoystickEvent.ButtonStates |= (1<<3);
+        event->JoystickEvent.ButtonStates |= (1<<7);
     }
     if(IS_PRESSED(wm, WIIMOTE_BUTTON_MINUS))
     {
         printf("DEBUG: -\n");
-        event->JoystickEvent.ButtonStates |= (1<<4);
+        event->JoystickEvent.ButtonStates |= (1<<8);
     }
     if(IS_PRESSED(wm, WIIMOTE_BUTTON_ONE))
     {
         printf("DEBUG: 1\n");
-        event->JoystickEvent.ButtonStates |= (1<<5);
+        event->JoystickEvent.ButtonStates |= (1<<9);
     }
     if(IS_PRESSED(wm, WIIMOTE_BUTTON_TWO))
     {
         printf("DEBUG: 2\n");
-        event->JoystickEvent.ButtonStates |= (1<<6);
+        event->JoystickEvent.ButtonStates |= (1<<10);
     }
     if(IS_PRESSED(wm, WIIMOTE_BUTTON_HOME))
     {
         printf("DEBUG: Home\n");
-        event->JoystickEvent.ButtonStates |= (1<<7);
+        event->JoystickEvent.ButtonStates |= (1<<11);
+    }
+    
+    // ------------------ Nunchuk ----------------------
+    if (wm->exp.type == EXP_NUNCHUK)
+    {
+        struct nunchuk_t* nc = (nunchuk_t*)&wm->exp.nunchuk;
+
+        if (IS_PRESSED(nc, NUNCHUK_BUTTON_C))
+        {
+            printf("DEBUG: C\n");
+            event->JoystickEvent.ButtonStates |= (1<<12);
+        }
+        if (IS_PRESSED(nc, NUNCHUK_BUTTON_Z))
+        {
+            printf("DEBUG: Z\n");
+            event->JoystickEvent.ButtonStates |= (1<<13);
+        }
+
+        printf("nunchuk roll  = %f\n", nc->orient.roll);
+        printf("nunchuk pitch = %f\n", nc->orient.pitch);
+        printf("nunchuk yaw   = %f\n", nc->orient.yaw);
+
+        printf("nunchuk joystick angle:     %f\n", nc->js.ang);
+        printf("nunchuk joystick magnitude: %f\n", nc->js.mag);
     }
 }
 
