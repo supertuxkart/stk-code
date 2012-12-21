@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef THREE_STRIKES_HPP
-#define THREE_STRIKES_HPP
+#ifndef SOCCER_WORLD_HPP
+#define SOCCER_WORLD_HPP
 
 #include "modes/world_with_rank.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -80,7 +80,7 @@ public:
 
     
     void updateKartRanks();
-};   // SoccerWorlds
+};   // SoccerWorld
 
 
 #endif

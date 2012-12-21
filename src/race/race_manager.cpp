@@ -38,6 +38,7 @@
 #include "modes/standard_race.hpp"
 #include "modes/world.hpp"
 #include "modes/three_strikes_battle.hpp"
+#include "modes/soccer_world.hpp"
 #include "network/network_manager.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
@@ -390,6 +391,8 @@ void RaceManager::startNextRace()
         World::setWorld(new StandardRace());
     else if(m_minor_mode==MINOR_MODE_3_STRIKES)     
         World::setWorld(new ThreeStrikesBattle());
+    else if(m_minor_mode==MINOR_MODE_SOCCER)
+        World::setWorld(new SoccerWorld());
     else if(m_minor_mode==MINOR_MODE_OVERWORLD)     
         World::setWorld(new OverWorld());
     else if(m_minor_mode==MINOR_MODE_CUTSCENE)

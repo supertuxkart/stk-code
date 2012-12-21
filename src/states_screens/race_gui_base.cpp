@@ -806,8 +806,10 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         //x,y is the target position
         int lap = info.lap;
         
-        // In battle mode there is no distance along track etc.
-        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+        // In battle mode and soccer mode there is no distance along track etc.
+        const RaceManager::MinorRaceModeType  minor_mode = race_manager->getMinorMode();
+        if( minor_mode==RaceManager::MINOR_MODE_3_STRIKES ||
+            minor_mode==RaceManager::MINOR_MODE_SOCCER)
         {
             x = x_base;
             y = previous_y+ICON_PLAYER_WIDTH+2;
