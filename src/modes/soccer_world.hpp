@@ -45,43 +45,19 @@ private:
     /** This vector contains an 'SoccerInfo' struct for every kart in the race.
     */
     std::vector<SoccerInfo> m_kart_info;
-
-    /** The mesh of the tire which is displayed when a kart loses a life. */
-    irr::scene::IMesh* m_tire;
-    
-    /** Indicates the number of tires that should be 
-     *  inserted into the track. */
-    int m_insert_tire;
-    
-    /** For tires that are blown away. */
-    core::vector3df m_tire_position;
-    
-    /** The original locations of the tires of a kart. */
-    core::vector3df m_tire_offsets[4];
-
-    /** The radius of the karts original tires. */
-    float m_tire_radius[4];
-
-    /** The directory of the original kart tires. */
-    std::string m_tire_dir;
-
-    /** A rotation to apply to the tires when inserting them. */
-    float m_tire_rotation;
-
-    PtrVector<PhysicalObject, REF> m_tires;
     
 public:
     
     /** Used to show a nice graph when battle is over */
-    struct BattleEvent
+    struct SoccerEvent
     {
         float m_time;
         std::vector<SoccerInfo> m_kart_info;
     };
-    std::vector<BattleEvent> m_battle_events;
+    std::vector<SoccerEvent> m_soccer_events;
     
     SoccerWorld();
-    virtual ~SoccerWorld();
+    virtual ~SoccerWorld() {}
     
     virtual void init();
     
@@ -92,7 +68,6 @@ public:
     // overriding World methods
     virtual void restartRace();
 
-    //virtual void getDefaultCollectibles(int& collectible_type, int& amount);
     virtual bool useFastMusicNearEnd() const { return false; }
     virtual void getKartsDisplayInfo(
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
@@ -101,10 +76,7 @@ public:
     
     virtual const std::string& getIdent() const;
     
-    virtual void kartHit(const int kart_id);
     virtual void update(float dt);
-    
-    virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node);
 
     
     void updateKartRanks();

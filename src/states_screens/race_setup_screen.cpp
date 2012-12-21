@@ -33,6 +33,7 @@ const int CONFIG_CODE_NORMAL = 0;
 const int CONFIG_CODE_TIMETRIAL = 1;
 const int CONFIG_CODE_FTL = 2;
 const int CONFIG_CODE_3STRIKES = 3;
+const int CONFIG_CODE_SOCCER = 4;
 
 using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( RaceSetupScreen );
@@ -124,6 +125,13 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
             UserConfigParams::m_game_mode = CONFIG_CODE_3STRIKES;
+            race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
+            StateManager::get()->pushScreen( ArenasScreen::getInstance() );
+        }
+        else if (selectedMode == IDENT_SOCCER)
+        {
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
+            UserConfigParams::m_game_mode = CONFIG_CODE_SOCCER;
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
             StateManager::get()->pushScreen( ArenasScreen::getInstance() );
         }
@@ -229,6 +237,10 @@ void RaceSetupScreen::init()
         w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
     }
     
+    irr::core::stringw name5 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
+    name5 += _("Push the ball to the opposite cage to score goals. (Only in multiplayer games)");
+    w2->addItem( name5, IDENT_SOCCER, RaceManager::getIconOf(RaceManager::MINOR_MODE_SOCCER));
 
     w2->updateItemDisplay();
     
@@ -246,6 +258,9 @@ void RaceSetupScreen::init()
             break;
         case CONFIG_CODE_3STRIKES :
             w2->setSelection(IDENT_STRIKES, PLAYER_ID_GAME_MASTER, true);
+            break;
+        case CONFIG_CODE_SOCCER :
+            w2->setSelection(IDENT_SOCCER, PLAYER_ID_GAME_MASTER, true);
             break;
     }
     

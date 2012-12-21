@@ -42,6 +42,7 @@ static const std::string IDENT_STD      ("STANDARD"        );
 static const std::string IDENT_TTRIAL   ("STD_TIMETRIAL"   );
 static const std::string IDENT_FTL      ("FOLLOW_LEADER"   );
 static const std::string IDENT_STRIKES  ("BATTLE_3_STRIKES");
+static const std::string IDENT_SOCCER   ("SOCCER"          );
 static const std::string IDENT_OVERWORLD("OVERWORLD"   );
 static const std::string IDENT_CUSTSCENE("CUTSCENE"   );
 
@@ -133,6 +134,7 @@ public:
             case MINOR_MODE_TIME_TRIAL:     return IDENT_TTRIAL;
             case MINOR_MODE_FOLLOW_LEADER:  return IDENT_FTL;
             case MINOR_MODE_3_STRIKES:      return IDENT_STRIKES;
+            case MINOR_MODE_SOCCER:         return IDENT_SOCCER;
             default: assert(false); 
                      return IDENT_STD;  // stop compiler warning
         }
@@ -150,6 +152,7 @@ public:
             case MINOR_MODE_TIME_TRIAL:     return "/gui/mode_tt.png";
             case MINOR_MODE_FOLLOW_LEADER:  return "/gui/mode_ftl.png";
             case MINOR_MODE_3_STRIKES:      return "/gui/mode_3strikes.png";
+            case MINOR_MODE_SOCCER:         return "/gui/mode_soccer.png";
             default: assert(false); return NULL;
         }
     }   // getIconOf
@@ -170,6 +173,8 @@ public:
             case MINOR_MODE_FOLLOW_LEADER:  return _("Follow the Leader");
             //I18N: Game mode
             case MINOR_MODE_3_STRIKES:      return _("3 Strikes Battle");
+            //I18N: Game mode
+            case MINOR_MODE_SOCCER:         return _("Soccer");
             default: assert(false); return NULL;
         }
     }
@@ -183,6 +188,7 @@ public:
             case MINOR_MODE_TIME_TRIAL:     return true;
             case MINOR_MODE_FOLLOW_LEADER:  return true;
             case MINOR_MODE_3_STRIKES:      return false;
+            case MINOR_MODE_SOCCER:         return false;
             default: assert(false); return NULL;
         }
     }
@@ -200,6 +206,7 @@ public:
         else if (name==IDENT_TTRIAL ) return MINOR_MODE_TIME_TRIAL;
         else if (name==IDENT_FTL    ) return MINOR_MODE_FOLLOW_LEADER;
         else if (name==IDENT_STRIKES) return MINOR_MODE_3_STRIKES;
+        else if (name==IDENT_SOCCER)  return MINOR_MODE_SOCCER;
 
         assert(0);
         return MINOR_MODE_NONE;

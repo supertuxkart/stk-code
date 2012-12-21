@@ -39,14 +39,10 @@ SoccerWorld::SoccerWorld() : WorldWithRank()
 {
     WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = false;
-    m_insert_tire = 0;
-    
-    m_tire = irr_driver->getMesh( file_manager->getModelFile("tire.b3d") );
-    irr_driver->grabAllTextures(m_tire);
 }   // SoccerWorld
 
 //-----------------------------------------------------------------------------
-/** Initialises the three strikes battle. It sets up the data structure
+/** Initializes the soccer world. It sets up the data structure
  *  to keep track of points etc. for each kart.
  */
 void SoccerWorld::init()
@@ -65,9 +61,9 @@ void SoccerWorld::init()
     
     for(unsigned int n=0; n<kart_amount; n++)
     {
-        // create the struct that ill hold each player's lives
+        // create the struct that ill hold each player's number of goals
         SoccerInfo info;
-        info.m_goals         = 3;
+        info.m_goals         = 0;
         m_kart_info.push_back(info);
         
         // no positions in this mode
@@ -75,155 +71,19 @@ void SoccerWorld::init()
     }// next kart
     
     
-    BattleEvent evt;
+    SoccerEvent evt;
     evt.m_time = 0.0f;
     evt.m_kart_info = m_kart_info;
-    m_battle_events.push_back(evt);    
+    m_soccer_events.push_back(evt);    
     
 }   // SoccerWorld
-
-//-----------------------------------------------------------------------------
-/** Destructor. Clears all internal data structures, and removes the tire mesh
- *  from the mesh cache.
- */
-SoccerWorld::~SoccerWorld()
-{
-    m_tires.clearWithoutDeleting();
-
-    irr_driver->grabAllTextures(m_tire);
-    // Remove the mesh from the cache so that the mesh is properly
-    // freed once all refernces to it (which will happen once all
-    // karts are being freed, which would have a pointer to this mesh)
-    irr_driver->removeMeshFromCache(m_tire);
-}   // ~SoccerWorld
-
-//-----------------------------------------------------------------------------
-/** Adds two tires to each of the kart. The tires are used to represent 
- *  lifes.
- *  \param kart The pointer to the kart (not used here).
- *  \param node The scene node of this kart.
- */
-void SoccerWorld::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
-{
-    float coord = -kart->getKartLength()*0.5f;
-    
-    scene::IMeshSceneNode* tire_node = irr_driver->addMesh(m_tire, node);
-    tire_node->setPosition(core::vector3df(-0.16f, 0.3f, coord - 0.25f));
-    tire_node->setScale(core::vector3df(0.4f, 0.4f, 0.4f));
-    tire_node->setRotation(core::vector3df(90.0f, 0.0f, 0.0f));
-    tire_node->setName("tire1");
-
-    tire_node = irr_driver->addMesh(m_tire, node);
-    tire_node->setPosition(core::vector3df(0.16f, 0.3f, coord - 0.25f));
-    tire_node->setScale(core::vector3df(0.4f, 0.4f, 0.4f));
-    tire_node->setRotation(core::vector3df(90.0f, 0.0f, 0.0f));
-    tire_node->setName("tire2");
-}   // kartAdded
-
-//-----------------------------------------------------------------------------
-/** Called when a kart is hit. 
- *  \param kart_id The world kart id of the kart that was hit.
- */
-void SoccerWorld::kartHit(const int kart_id)
-{
-    assert(kart_id >= 0);
-    assert(kart_id < (int)m_karts.size());
-    
-    // make kart lose a life
-    m_kart_info[kart_id].m_goals--;
-    
-    // record event
-    BattleEvent evt;
-    evt.m_time = getTime();
-    evt.m_kart_info = m_kart_info;
-    m_battle_events.push_back(evt);   
-    
-    updateKartRanks();
-        
-    // check if kart is 'dead'
-    if (m_kart_info[kart_id].m_goals < 1)
-    {
-        m_karts[kart_id]->finishedRace(WorldStatus::getTime());
-        scene::ISceneNode** wheels = m_karts[kart_id]->getKartModel()
-                                                     ->getWheelNodes();
-        if(wheels[0]) wheels[0]->setVisible(false);
-        if(wheels[1]) wheels[1]->setVisible(false);
-        if(wheels[2]) wheels[2]->setVisible(false);
-        if(wheels[3]) wheels[3]->setVisible(false);
-        eliminateKart(kart_id, /*notify_of_elimination*/ true);
-        m_insert_tire = 4;
-    }
-    
-    const unsigned int NUM_KARTS = getNumKarts();
-    int num_karts_many_lives = 0;
- 
-    for (unsigned int n = 0; n < NUM_KARTS; ++n)
-    {
-        if (m_kart_info[n].m_goals > 1) num_karts_many_lives++;
-    }
-    
-    // when almost over, use fast music
-    if (num_karts_many_lives<=1 && !m_faster_music_active)
-    {
-        music_manager->switchToFastMusic();
-        m_faster_music_active = true;
-    }
-    
-    scene::ISceneNode* kart_node = m_karts[kart_id]->getNode();
-    
-    // FIXME: sorry for this ugly const_cast, irrlicht doesn't seem to allow 
-    // getting a writable list of children, wtf??
-    core::list<scene::ISceneNode*>& children = 
-        const_cast<core::list<scene::ISceneNode*>&>(kart_node->getChildren());
-    for (core::list<scene::ISceneNode*>::Iterator it = children.begin(); 
-                                                  it != children.end(); it++)
-    {
-        scene::ISceneNode* curr = *it;
-
-        if (core::stringc(curr->getName()) == "tire1")
-        {
-            curr->setVisible(m_kart_info[kart_id].m_goals >= 3);
-        }
-        else if (core::stringc(curr->getName()) == "tire2")
-        {
-            curr->setVisible(m_kart_info[kart_id].m_goals >= 2);
-        }
-    }
-    
-    // schedule a tire to be thrown away (but can't do it in this callback
-    // because the caller is currently iterating the list of track objects)
-    m_insert_tire++;
-    core::vector3df wheel_pos(m_karts[kart_id]->getKartWidth()*0.5f, 
-                              0.0f, 0.0f);
-    m_tire_position = kart_node->getPosition() + wheel_pos;
-    m_tire_rotation = 0;
-    if(m_insert_tire > 1)
-    {
-        m_tire_position = kart_node->getPosition();
-        m_tire_rotation = m_karts[kart_id]->getHeading();
-    }
-
-    for(unsigned int i=0; i<4; i++)
-    {
-        m_tire_offsets[i] = m_karts[kart_id]->getKartModel()
-                            ->getWheelGraphicsPosition(i).toIrrVector();
-        m_tire_offsets[i].rotateXZBy(-m_tire_rotation / M_PI * 180 + 180);
-        m_tire_radius[i] = m_karts[kart_id]->getKartModel()
-                                           ->getWheelGraphicsRadius(i);
-    }
- 
-    m_tire_dir = m_karts[kart_id]->getKartProperties()->getKartDir();
-    if(m_insert_tire == 5 && m_karts[kart_id]->isWheeless())
-        m_insert_tire = 0;
-
-}   // kartHit
 
 //-----------------------------------------------------------------------------
 /** Returns the internal identifier for this race.
  */
 const std::string& SoccerWorld::getIdent() const
 {
-    return IDENT_STRIKES;
+    return IDENT_SOCCER;
 }   // getIdent
 
 //-----------------------------------------------------------------------------
@@ -235,59 +95,7 @@ void SoccerWorld::update(float dt)
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
     
-    core::vector3df tire_offset;
-    std::string tire;
-    float scale = 0.5f;
-    float radius = 0.5f;
-    PhysicalObject::bodyTypes tire_model;
-
-    // insert blown away tire(s) now if was requested
-    while (m_insert_tire > 0)
-    {        
-        if(m_insert_tire == 1)
-        {
-            tire_offset = core::vector3df(0.0f, 0.0f, 0.0f);
-            tire = file_manager->getModelFile("tire.b3d");
-            scale = 0.5f;
-            radius = 0.5f;
-            tire_model = PhysicalObject::MP_CYLINDER_Y;
-        }
-        else
-        {
-            scale = 1.0f;
-            tire_model = PhysicalObject::MP_CYLINDER_X;
-            radius = m_tire_radius[m_insert_tire-2];
-            tire_offset = m_tire_offsets[m_insert_tire-2];
-            if     (m_insert_tire == 2)
-                tire = m_tire_dir+"/wheel-rear-left.b3d";
-            else if(m_insert_tire == 3)
-                tire = m_tire_dir+"/wheel-front-left.b3d";
-            else if(m_insert_tire == 4)
-                tire = m_tire_dir+"/wheel-front-right.b3d";
-            else if(m_insert_tire == 5)
-                tire = m_tire_dir+"/wheel-rear-right.b3d";
-        }
-
-        TrackObjectManager* tom = m_track->getTrackObjectManager();        
-        PhysicalObject* obj = 
-            tom->insertObject(tire,
-                              tire_model,
-                              15 /* mass */,
-                              radius /* radius */,
-                              core::vector3df(800.0f,0,m_tire_rotation 
-                                                      / M_PI * 180 + 180) ,
-                              m_tire_position + tire_offset,
-                              core::vector3df(scale,scale,scale) /* scale */);
-        
-        // FIXME: orient the force relative to kart orientation
-        obj->getBody()->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
-
-        m_insert_tire--;
-        if(m_insert_tire == 1)
-            m_insert_tire = 0;
-        
-        m_tires.push_back(obj);
-    }
+    // TODO
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -379,46 +187,20 @@ void SoccerWorld::restartRace()
     
     for(unsigned int n=0; n<kart_amount; n++)
     {
-        m_kart_info[n].m_goals         = 3;
+        m_kart_info[n].m_goals         = 0;
         
         // no positions in this mode
         m_karts[n]->setPosition(-1);
-        
-        scene::ISceneNode* kart_node = m_karts[n]->getNode();
-        
-        // FIXME: sorry for this ugly const_cast, irrlicht doesn't seem to allow getting a writable list of children, wtf??
-        core::list<scene::ISceneNode*>& children = const_cast<core::list<scene::ISceneNode*>&>(kart_node->getChildren());
-        for (core::list<scene::ISceneNode*>::Iterator it = children.begin(); it != children.end(); it++)
-        {
-            scene::ISceneNode* curr = *it;
-            
-            if (core::stringc(curr->getName()) == "tire1")
-            {
-                curr->setVisible(true);
-            }
-            else if (core::stringc(curr->getName()) == "tire2")
-            {
-                curr->setVisible(true);
-            }
-        }
-        
     }// next kart
     
-    // remove old battle events
-    m_battle_events.clear();
+    // remove old soccer events
+    m_soccer_events.clear();
 
-    // add initial battle event
-    BattleEvent evt;
+    // add initial occer event
+    SoccerEvent evt;
     evt.m_time = 0.0f;
     evt.m_kart_info = m_kart_info;
-    m_battle_events.push_back(evt);
-
-    PhysicalObject *obj;
-    for_in(obj, m_tires)
-    {
-        m_track->getTrackObjectManager()->removeObject(obj);
-    }
-    m_tires.clearWithoutDeleting();
+    m_soccer_events.push_back(evt);
 }   // restartRace
 
 //-----------------------------------------------------------------------------
@@ -435,34 +217,14 @@ void SoccerWorld::getKartsDisplayInfo(
         // reset color
         rank_info.lap = -1;
         
-        switch(m_kart_info[i].m_goals)
-        {
-            case 3:
-                rank_info.r = 0.0;
-                rank_info.g = 1.0;
-                rank_info.b = 0.0;
-                break;
-            case 2:
-                rank_info.r = 1.0;
-                rank_info.g = 0.9f;
-                rank_info.b = 0.0;
-                break;
-            case 1:
-                rank_info.r = 1.0;
-                rank_info.g = 0.0;
-                rank_info.b = 0.0;
-                break;
-            case 0:
-                rank_info.r = 0.5;
-                rank_info.g = 0.5;
-                rank_info.b = 0.5;
-                break;
-        }
+        rank_info.r = 0.5;
+        rank_info.g = 0.5;
+        rank_info.b = 0.5;
         
-        char lives[4];
-        sprintf(lives, "%i", m_kart_info[i].m_goals);
+        char goals[4];
+        sprintf(goals, "%i", m_kart_info[i].m_goals);
         
-        rank_info.m_text = lives;
+        rank_info.m_text = goals;
     }
 }   // getKartsDisplayInfo
 
