@@ -286,7 +286,7 @@ void TracksScreen::buildTrackList()
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack( n );
-            if (curr->isArena()) continue;
+            if (curr->isArena() || curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
             
             if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))

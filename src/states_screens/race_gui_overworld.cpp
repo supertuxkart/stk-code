@@ -295,7 +295,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 {
     World *world = World::getWorld();
     // arenas currently don't have a map.
-    if(world->getTrack()->isArena()) return;
+    if(world->getTrack()->isArena() || world->getTrack()->isSoccer()) return;
 
     Track* track = world->getTrack();
     const std::vector<OverworldChallenge>& challenges = 

@@ -215,9 +215,9 @@ void TrackManager::removeTrack(const std::string &ident)
     int index = it - m_tracks.begin();
 
     // Remove the track from all groups it belongs to
-    Group2Indices &group_2_indices = track->isArena() ? m_arena_groups      
-                                                      : m_track_groups;
-    std::vector<std::string> &group_names = track->isArena()
+    Group2Indices &group_2_indices = (track->isArena()||track->isSoccer()) ? m_arena_groups      
+                                                                           : m_track_groups;
+    std::vector<std::string> &group_names = (track->isArena()||track->isSoccer())
                                                       ? m_arena_group_names
                                                       : m_track_group_names;
     const std::vector<std::string>& groups=track->getGroups();
@@ -272,9 +272,9 @@ void TrackManager::updateGroups(const Track* track)
     
     const std::vector<std::string>& new_groups = track->getGroups();    
 
-    Group2Indices &group_2_indices = track->isArena() ? m_arena_groups      
+    Group2Indices &group_2_indices = (track->isArena()||track->isSoccer()) ? m_arena_groups      
                                                       : m_track_groups;
-    std::vector<std::string> &group_names = track->isArena()
+    std::vector<std::string> &group_names = (track->isArena()||track->isSoccer())
                                                       ? m_arena_group_names
                                                       : m_track_group_names;
 
