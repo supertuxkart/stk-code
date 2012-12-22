@@ -116,7 +116,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     // Remove arena tracks and internal tracks like the overworld
     // (outside the if statement above in case that
     // a user requests one of those ;) )
-    while((!track || track->isArena() || track->isInternal())
+    while((!track || track->isArena() || track->isSoccer() || track->isInternal())
             && m_demo_tracks.size() > 0)
     {
         if(!track)

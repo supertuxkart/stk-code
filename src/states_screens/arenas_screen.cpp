@@ -42,7 +42,7 @@ const char* ALL_ARENA_GROUPS_ID = "all";
 
 // -----------------------------------------------------------------------------
 
-ArenasScreen::ArenasScreen() : Screen("arenas.stkgui")
+ArenasScreen::ArenasScreen() : Screen("arenas.stkgui"), m_used_for_soccer(false)
 {
 }
 
@@ -90,8 +90,15 @@ void ArenasScreen::beforeAddingWidget()
     for (unsigned int n=0; n<track_manager->getNumberOfTracks(); n++) //iterate through tracks to find how many are arenas
     {
         Track* temp = track_manager->getTrack(n);
-        if (temp->isArena()){
-            num_of_arenas++;
+        if (m_used_for_soccer)
+        {
+            if(temp->isSoccer())
+                num_of_arenas++;
+        }
+        else
+        {
+            if(temp->isArena())
+                num_of_arenas++;
         }
     }
     
@@ -213,7 +220,14 @@ void ArenasScreen::buildTrackList()
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack(n);
-            if (!curr->isArena()) continue;
+            if (m_used_for_soccer)
+            {
+                if(!curr->isSoccer()) continue;
+            }
+            else
+            {
+                if(!curr->isArena()) continue;
+            }
             
             if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
             {
@@ -236,7 +250,14 @@ void ArenasScreen::buildTrackList()
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack(currArenas[n]);
-            if (!curr->isArena()) continue;
+            if (m_used_for_soccer)
+            {
+                if(!curr->isSoccer()) continue;
+            }
+            else
+            {
+                if(!curr->isArena()) continue;
+            }
             
             if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
             {

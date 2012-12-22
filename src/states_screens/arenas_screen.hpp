@@ -31,6 +31,8 @@ class ArenasScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
 {
     friend class GUIEngine::ScreenSingleton<ArenasScreen>;
     
+    bool    m_used_for_soccer;   // List soccer arenas instead of battle arenas
+    
     ArenasScreen();
     void buildTrackList();
 
@@ -50,6 +52,8 @@ public:
                                const int playerID) OVERRIDE;
 
     void setFocusOnTrack(const std::string& trackName);
+    
+    void setUsedForSoccer(bool used_for_soccer) { m_used_for_soccer=used_for_soccer; }
 };
 
 #endif

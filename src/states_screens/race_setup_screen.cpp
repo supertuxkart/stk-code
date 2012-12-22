@@ -126,6 +126,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
             UserConfigParams::m_game_mode = CONFIG_CODE_3STRIKES;
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
+            ArenasScreen::getInstance()->setUsedForSoccer(false);
             StateManager::get()->pushScreen( ArenasScreen::getInstance() );
         }
         else if (selectedMode == IDENT_SOCCER)
@@ -133,6 +134,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
             UserConfigParams::m_game_mode = CONFIG_CODE_SOCCER;
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
+            ArenasScreen::getInstance()->setUsedForSoccer(true);
             StateManager::get()->pushScreen( ArenasScreen::getInstance() );
         }
         else if (selectedMode == "locked")

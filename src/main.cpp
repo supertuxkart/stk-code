@@ -822,10 +822,9 @@ int handleCmdLine(int argc, char **argv)
                     exit(1);
                 }
                 if (t->isArena())
-                {
-                    race_manager->setMinorMode(
-                                            RaceManager::MINOR_MODE_3_STRIKES);
-                }
+                    race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+                else if(t->isSoccer())
+                    race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
             }
             /*
             else

@@ -227,6 +227,8 @@ private:
     Vec3                     m_aabb_max;
     /** True if this track is an arena. */
     bool                     m_is_arena;
+    /** True if this track is a soccer arena. */
+    bool                     m_is_soccer;
     
     bool                     m_is_cutscene;
     
@@ -403,6 +405,8 @@ public:
     const core::dimension2du& getMiniMapSize() const { return m_mini_map_size; }
     // ------------------------------------------------------------------------
     bool               isArena              () const { return m_is_arena; }
+    // ------------------------------------------------------------------------
+    bool               isSoccer             () const { return m_is_soccer; }
     // ------------------------------------------------------------------------
     void               loadTrackModel  (World* parent, 
                                         bool reverse_track = false,

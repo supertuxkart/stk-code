@@ -260,7 +260,7 @@ void RaceGUI::drawGlobalMiniMap()
 {
     World *world = World::getWorld();
     // arenas currently don't have a map.
-    if(world->getTrack()->isArena()) return;
+    if(world->getTrack()->isArena() || world->getTrack()->isSoccer()) return;
 
     const video::ITexture *mini_map = world->getTrack()->getMiniMap();
     
