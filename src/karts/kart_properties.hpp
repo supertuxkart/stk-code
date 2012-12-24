@@ -86,6 +86,8 @@ private:
 
     /** List of all groups the kart belongs to. */
     std::vector<std::string> m_groups;
+
+    /** Dummy value to detect unset properties. */
     static float UNDEFINED;
 
     /** Version of the .kart file. */
@@ -372,17 +374,21 @@ public:
     /** Returns the material for the kart icons. */
     Material*     getIconMaterial    () const {return m_icon_material;        }
 
+    // ------------------------------------------------------------------------
     /** Returns the texture to use in the minimap, or NULL if not defined. */
     video::ITexture *getMinimapIcon  () const {return m_minimap_icon;         }
 
+    // ------------------------------------------------------------------------
     /** Returns a pointer to the KartModel object. */
     KartModel*    getKartModelCopy   () const 
                                             {return m_kart_model->makeCopy(); }
 
+    // ------------------------------------------------------------------------
     /** Returns a pointer to the main KartModel object. This copy
      *  should not be modified, not attachModel be called on it. */
     const KartModel& getMasterKartModel() const {return *m_kart_model;        }
 
+    // ------------------------------------------------------------------------
     /** Returns the name of this kart. 
         \note Pass it through fridibi as needed, this is the LTR name
       */
@@ -391,40 +397,52 @@ public:
         return translations->w_gettext(m_name.c_str()); 
     }
 
+    // ------------------------------------------------------------------------
     const std::string getNonTranslatedName() const {return m_name;}
 
+    // ------------------------------------------------------------------------
     /** Returns the internal identifier of this kart. */
     const std::string& getIdent      () const {return m_ident;                }
 
+    // ------------------------------------------------------------------------
     /** Returns the shadow texture to use. */
     video::ITexture *getShadowTexture() const {return m_shadow_texture;       }
 
+    // ------------------------------------------------------------------------
     /** Returns the absolute path of the icon file of this kart. */
     const std::string& getAbsoluteIconFile() const      { return m_icon_file; }
 
+    // ------------------------------------------------------------------------
     /** Returns custom sound effects for this kart. */
     const int          getCustomSfxId (SFXManager::CustomSFX type) 
                                        const  {return m_custom_sfx_id[type];  }
 
+    // ------------------------------------------------------------------------
     /** Returns the version of the .kart file. */
     int   getVersion                () const {return m_version;               }
 
+    // ------------------------------------------------------------------------
     /** Returns the dot color to use for this kart in the race gui. */
     const video::SColor &getColor   () const {return m_color;                 }
 
+    // ------------------------------------------------------------------------
     /** Returns the number of edges for the polygon used to draw the dot of
      *  this kart on the mini map of the race gui. */
     int   getShape                  () const {return m_shape;                 }
 
-    /** REturns the list of groups this kart belongs to. */
+    // ------------------------------------------------------------------------
+    /** Returns the list of groups this kart belongs to. */
     const std::vector<std::string>&
                   getGroups         () const {return m_groups;                }
+    // ------------------------------------------------------------------------
     /** Returns the mass of this kart. */
     float getMass                   () const {return m_mass;                  }
+    // ------------------------------------------------------------------------
     /** Returns the maximum engine power depending on difficulty. */
     float getMaxPower               () const 
                         {return m_engine_power[race_manager->getDifficulty()];}
 
+    // ------------------------------------------------------------------------
     /** Returns the time the kart needs to fully steer in one direction from 
      *  steering straight depending on the current steering value.
      *  \param steer Current steering value, must be >=0. */
@@ -434,16 +452,20 @@ public:
         return m_time_full_steer.get(steer); 
     }   // getTimeFullSteer
 
+    // ------------------------------------------------------------------------
     /** Returns the time the kart needs to go back to steering straight from
      *  full steer. */
     float getTimeResetSteer         () const { return m_time_reset_steer;     }
+    // ------------------------------------------------------------------------
     /** Get braking information. */
     float getBrakeFactor            () const {return m_brake_factor;          }
 
+    // ------------------------------------------------------------------------
     /** Get maximum reverse speed ratio. */
     float getMaxSpeedReverseRatio   () const 
                                           {return m_max_speed_reverse_ratio;  }
 
+    // ------------------------------------------------------------------------
     /** Returns the engine type (used to change sfx depending on kart size). */
     const std::string& getEngineSfxType    () const {return m_engine_sfx_type;}
 
@@ -452,140 +474,181 @@ public:
     /** Returns the suspension stiffness. */
     float getSuspensionStiffness    () const {return m_suspension_stiffness;  }
 
+    // ------------------------------------------------------------------------
     /** Returns damping relaxation. */
     float getWheelDampingRelaxation () const 
                                           {return m_wheel_damping_relaxation; }
 
+    // ------------------------------------------------------------------------
     /** Returns the wheel damping compression. */
     float getWheelDampingCompression() const 
                                           {return m_wheel_damping_compression;}
 
+    // ------------------------------------------------------------------------
     /** Returns maximum suspension force. */
     float getMaxSuspensionForce() const {return m_max_suspension_force; }
 
+    // ------------------------------------------------------------------------
     /** Returns friction slip. */
     float getFrictionSlip           () const {return m_friction_slip;         }
 
+    // ------------------------------------------------------------------------
     /** Returns roll influence. */
     float getRollInfluence          () const {return m_roll_influence;        }
 
+    // ------------------------------------------------------------------------
     /** Returns wheel radius. */
     float getWheelRadius            () const {return m_wheel_radius;          }
 
+    // ------------------------------------------------------------------------
     /** Returns the wheel base (distance front to rear axis). */
     float getWheelBase              () const {return m_wheel_base;            }
 
+    // ------------------------------------------------------------------------
     /** Returns linear damping of chassis. */
     float getChassisLinearDamping   () const {return m_chassis_linear_damping;}
 
+    // ------------------------------------------------------------------------
     /** Returns angular damping of chassis. */
     float getChassisAngularDamping  () const 
                                            {return m_chassis_angular_damping; }
 
+    // ------------------------------------------------------------------------
     /** Artifical downward impulse every frame. */
     float getDownwardImpulseFactor() const { return m_downward_impulse_factor;}
 
+    // ------------------------------------------------------------------------
     /** Returns artificial acceleration to keep wheels on track. */
     float getTrackConnectionAccel   () const {return m_track_connection_accel;}
 
+    // ------------------------------------------------------------------------
     /** Returns the maximum speed dependent on the difficult level. */
     float getMaxSpeed               () const {return
                                    m_max_speed[race_manager->getDifficulty()];}
 
+    // ------------------------------------------------------------------------
     /** Returns the nitro consumption. */
     float getNitroConsumption       () const {return m_nitro_consumption;     }
 
+    // ------------------------------------------------------------------------
     /** Returns the amount of nitro for a small container. */
     float getNitroSmallContainer    () const {return m_nitro_small_container; }
 
+    // ------------------------------------------------------------------------
     /** Returns the amount of nitro for a big container. */
     float getNitroBigContainer      () const {return m_nitro_big_container;   }
 
+    // ------------------------------------------------------------------------
     /** Returns the increase of maximum speed due to nitro. */
     float getNitroMaxSpeedIncrease  () const 
                                           {return m_nitro_max_speed_increase; }
 
+    // ------------------------------------------------------------------------
     float getNitroEngineForce       () const {return m_nitro_engine_force;    }
+    // ------------------------------------------------------------------------
     /** Returns how long the increased nitro max speed will be valid after
      *  the kart stops using nitro (and the fade-out-time starts). */
     float getNitroDuration          () const {return m_nitro_duration;        }
 
+    // ------------------------------------------------------------------------
     /** Returns the duration during which the increased maximum speed 
      *  due to nitro fades out. */
     float getNitroFadeOutTime       () const {return m_nitro_fade_out_time;   }
 
+    // ------------------------------------------------------------------------
     /** Returns the maximum amount of nitro a kart can store. */
     float getNitroMax               () const {return m_nitro_max;             }
 
+    // ------------------------------------------------------------------------
     /** Returns a shift of the center of mass (lowering the center of mass 
      *  makes the karts more stable. */
     const Vec3&getGravityCenterShift() const {return m_gravity_center_shift;  }
 
+    // ------------------------------------------------------------------------
     /** Retusn suspension rest length. */
     float getSuspensionRest         () const {return m_suspension_rest;       }
 
+    // ------------------------------------------------------------------------
     /** Returns the amount the suspension can extend. */
     float getSuspensionTravelCM     () const {return m_suspension_travel_cm;  }
 
+    // ------------------------------------------------------------------------
     /** Returns if the spring should be exponentially dampened. */
     bool getExpSpringResponse() const {return m_exp_spring_response; }
 
+    // ------------------------------------------------------------------------
     /** Returns an artificial impulse to push karts away from the terrain 
      *  it hits. */
     float getCollisionTerrainImpulse() const 
                                           {return m_collision_terrain_impulse;}
 
+    // ------------------------------------------------------------------------
     /** Returns what kind of impulse STK should use in case of a kart-track
      *  collision. */
     TerrainImpulseType getTerrainImpulseType() const
                                              { return m_terrain_impulse_type; }
+    // ------------------------------------------------------------------------
     /** Returns the (artificial) collision impulse this kart will apply
      *  to another kart in case of a non-frontal collision. */
     float getCollisionImpulse       () const {return m_collision_impulse;}
 
+    // ------------------------------------------------------------------------
     /** Returns how long the collision impulse should be applied. */
     float getCollisionImpulseTime() const { return m_collision_impulse_time;}
 
+    // ------------------------------------------------------------------------
     /** Returns the restitution factor for this kart. */
     float getRestitution            () const { return m_restitution; }
 
+    // ------------------------------------------------------------------------
     /** Returns the vertical offset when rescuing karts to avoid karts being
      *  rescued in (or under) the track. */
     float getVertRescueOffset       () const {return m_rescue_vert_offset;    }
 
+    // ------------------------------------------------------------------------
     /** Returns the time a kart is rised during a rescue. */
     float getRescueTime             () const {return m_rescue_time;           }
 
+    // ------------------------------------------------------------------------
     /** Returns the height a kart is moved to during a rescue. */
     float getRescueHeight           () const {return m_rescue_height;         }
 
+    // ------------------------------------------------------------------------
     /** Returns the time an explosion animation is shown. */
     float getExplosionTime          () const {return m_explosion_time;        }
 
+    // ------------------------------------------------------------------------
     /** Returns the height of the explosion animation. */
     float getExplosionRadius        () const {return m_explosion_radius;      }
 
+    // ------------------------------------------------------------------------
     /** Returns how long a kart is invulnerable after being hit by an 
         explosion. */
     float getExplosionInvulnerabilityTime() const 
                                    { return m_explosion_invulnerability_time; }
 
+    // ------------------------------------------------------------------------
     /** Returns how much a kart can roll/pitch before the upright constraint
      *  counteracts. */
     float getUprightTolerance       () const {return m_upright_tolerance;     }
 
+    // ------------------------------------------------------------------------
     /** Returns the maximum value of the upright counteracting force. */
     float getUprightMaxForce        () const {return m_upright_max_force;     }
 
+    // ------------------------------------------------------------------------
     /** Returns the maximum length of a rubber band before it breaks. */
     float getRubberBandMaxLength    () const {return m_rubber_band_max_length;}
 
+    // ------------------------------------------------------------------------
     /** Returns force a rubber band has when attached to a kart. */
     float getRubberBandForce        () const {return m_rubber_band_force;     }
 
+    // ------------------------------------------------------------------------
     /** Returns the duration a rubber band is active for. */
     float getRubberBandDuration     () const {return m_rubber_band_duration;  }
 
+    // ------------------------------------------------------------------------
     /** Returns the increase of maximum speed while a rubber band is 
      *  pulling. */
     float getRubberBandSpeedIncrease() const 
@@ -593,126 +656,159 @@ public:
         return m_rubber_band_speed_increase;
     }
 
+    // ------------------------------------------------------------------------
     /** Return the fade out time once a rubber band is removed. */
     float getRubberBandFadeOutTime() const 
     {
         return m_rubber_band_fade_out_time;
     }
 
+    // ------------------------------------------------------------------------
     /** Returns duration of a plunger in your face. */
     float getPlungerInFaceTime      () const 
             {return m_plunger_in_face_duration[race_manager->getDifficulty()];}
 
+    // ------------------------------------------------------------------------
     /** Returns the time a zipper is active. */
     float getZipperTime             () const {return m_zipper_time;           }
 
+    // ------------------------------------------------------------------------
     /** Returns the time a zipper is active. */
     float getZipperFadeOutTime     () const {return m_zipper_fade_out_time;   }
 
+    // ------------------------------------------------------------------------
     /** Returns the additional force added applied to the kart. */
     float getZipperForce            () const { return m_zipper_force;         }
 
+    // ------------------------------------------------------------------------
     /** Returns the initial zipper speed gain. */
     float getZipperSpeedGain        () const { return m_zipper_speed_gain;    }
 
+    // ------------------------------------------------------------------------
     /** Returns the increase of the maximum speed of the kart 
      *  if a zipper is active. */
     float getZipperMaxSpeedIncrease () const 
                                          { return m_zipper_max_speed_increase;}
 
+    // ------------------------------------------------------------------------
     /** Returns how far behind a kart slipstreaming works. */
     float getSlipstreamLength       () const {return m_slipstream_length;     }
 
+    // ------------------------------------------------------------------------
     /** Returns how wide the slipstream area is at the end. */
     float getSlipstreamWidth        () const {return m_slipstream_width;      }
 
+    // ------------------------------------------------------------------------
     /** Returns time after which slipstream has maximum effect. */
     float getSlipstreamCollectTime  () const 
                                           {return m_slipstream_collect_time;  }
 
+    // ------------------------------------------------------------------------
     /** Returns time after which slipstream has maximum effect. */
     float getSlipstreamUseTime      () const {return m_slipstream_use_time;   }
 
+    // ------------------------------------------------------------------------
     /** Returns additional power due to slipstreaming. */
     float getSlipstreamAddPower     () const {return m_slipstream_add_power;  }
 
+    // ------------------------------------------------------------------------
     /** Returns the minimum slipstream speed. */
     float getSlipstreamMinSpeed     () const {return m_slipstream_min_speed;  }
 
+    // ------------------------------------------------------------------------
     /** Returns the increase of the maximum speed of a kart 
      *  due to slipstream. */
     float getSlipstreamMaxSpeedIncrease() const 
                                     { return m_slipstream_max_speed_increase; }
+    // ------------------------------------------------------------------------
     /** Returns how long the higher speed lasts after slipstream 
      *  stopped working. */
     float getSlipstreamDuration     () const { return m_slipstream_duration;  }
 
+    // ------------------------------------------------------------------------
     /** Returns how long the slip stream speed increase will gradually 
      *  be reduced. */
     float getSlipstreamFadeOutTime  () const 
                                          { return m_slipstream_fade_out_time; }
 
+    // ------------------------------------------------------------------------
     /** Returns the scale factor by which the shadow plane
      *  had to be set. */
     float getShadowScale            () const {return m_shadow_scale;          }
     
+    // ------------------------------------------------------------------------
     /** Returns the scale factor by which the shadow plane
      *  had to be set. */
     float getShadowXOffset          () const {return m_shadow_x_offset;       }
     
+    // ------------------------------------------------------------------------
     /** Returns the scale factor by which the shadow plane
      *  had to be set. */
     float getShadowYOffset          () const {return m_shadow_y_offset;       }
     
+    // ------------------------------------------------------------------------
     /** Returns a pointer to the skidding properties. */
     const SkiddingProperties *getSkiddingProperties() const 
                                               { return m_skidding_properties; }
 
+    // ------------------------------------------------------------------------
     /** Returns a pointer to the AI properties. */
     const AIProperties *getAIPropertiesForDifficulty() const 
     {
         return m_ai_properties[race_manager->getDifficulty()];
     }   // getAIProperties
 
+    // ------------------------------------------------------------------------
     /** Returns ratio of current speed to max speed at which the gear will
      *  change (for our simualated gears = simple change of engine power). */
     const std::vector<float>&
           getGearSwitchRatio        () const {return m_gear_switch_ratio;     }
 
+    // ------------------------------------------------------------------------
     /** Returns the power increase depending on gear. */
     const std::vector<float>&
           getGearPowerIncrease      () const {return m_gear_power_increase;   }
 
+    // ------------------------------------------------------------------------
     /** Returns distance between kart and camera. */
     float getCameraDistance         () const {return m_camera_distance;       }
 
+    // ------------------------------------------------------------------------
     /** Returns the angle the camera has relative to the pitch of the kart. */
     float getCameraForwardUpAngle   () const 
                                            {return m_camera_forward_up_angle; }
 
+    // ------------------------------------------------------------------------
     /** Returns the angle the camera has relative to the pitch of the kart. */
     float getCameraBackwardUpAngle  () const 
                                           {return m_camera_backward_up_angle; }
 
+    // ------------------------------------------------------------------------
     /** Returns the full path where the files for this kart are stored. */
     const std::string& getKartDir   () const {return m_root;                  }
 
+    // ------------------------------------------------------------------------
     /** Returns the square of the maximum distance at which a swatter 
      *  can hit karts. */
     float getSwatterDistance2() const { return m_swatter_distance2; }
 
+    // ------------------------------------------------------------------------
     /** Returns how long a swatter will stay attached/ready to be used. */
     float getSwatterDuration() const { return m_swatter_duration; }
 
+    // ------------------------------------------------------------------------
     /** Returns how long a kart remains squashed. */
     float getSquashDuration() const {return m_squash_duration; }
 
+    // ------------------------------------------------------------------------
     /** Returns the slowdown of a kart that is squashed. */
     float getSquashSlowdown() const {return m_squash_slowdown; }
 
+    // ------------------------------------------------------------------------
     /** Returns true if wheels should have random rotation at start. */
     bool hasRandomWheels() const { return m_has_rand_wheels; }
 
+    // ------------------------------------------------------------------------
     /** Returns the bevel factor (!=0 indicates to use a bevelled box). */
     const Vec3 &getBevelFactor() const { return m_bevel_factor; }
 };   // KartProperties
