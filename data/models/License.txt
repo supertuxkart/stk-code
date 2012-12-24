@@ -31,7 +31,7 @@
                  image by Smoth 007, released under CC-BY-SA 2.0 (considered a derivate work thus allowing to upgrade the license version),
                  image by Juangonzalez64 released under the public domain
     
-* swatter
+* swatter, christmas_hat
     released under CC-BY-SA 3.0
     by Funto
 
