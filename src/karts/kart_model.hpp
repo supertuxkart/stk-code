@@ -24,7 +24,8 @@
 #include <IAnimatedMeshSceneNode.h>
 namespace irr
 {
-    namespace scene { class IAnimatedMesh; class IMesh; class ISceneNode; }
+    namespace scene { class IAnimatedMesh; class IMesh; 
+                      class ISceneNode; class IMeshSceneNode; }
 }
 using namespace irr;
 
@@ -78,6 +79,15 @@ private:
      *  to. It is necessary to adjust animations, and it is not used
      *  (i.e. neither read nor written) if animations are disabled. */
     scene::IAnimatedMeshSceneNode *m_animated_node;
+
+    /** The scene node for a hat the driver is wearing. */
+    scene::IMeshSceneNode *m_hat_node;
+
+    /** Offset of the hat relative to the bone called 'head'. */
+    core::vector3df m_hat_offset;
+
+    /** Name of the hat to use for this kart. "" if no hat. */
+    std::string m_hat_name;
 
     /** Value used to indicate undefined entries. */
     static float UNDEFINED;
@@ -199,6 +209,9 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the kart this model is currently used for */
     void  setKart(AbstractKart* k) { m_kart = k; }
+    // ------------------------------------------------------------------------
+    /**  Name of the hat mesh to use. */
+    void setHatMeshName(const std::string &name) {m_hat_name = name; }
     // ------------------------------------------------------------------------
     /** Returns the array of wheel nodes. */
     scene::ISceneNode** getWheelNodes() { return m_wheel_node; }

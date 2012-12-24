@@ -26,6 +26,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/mesh_tools.hpp"
+#include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
@@ -62,10 +63,13 @@ float KartModel::UNDEFINED = -99.9f;
  */
 KartModel::KartModel(bool is_master)
 {
-    m_is_master = is_master;
-    m_kart = NULL;
-    m_mesh = NULL;
-    
+    m_is_master  = is_master;
+    m_kart       = NULL;
+    m_mesh       = NULL;
+    m_hat_name   = "";
+    m_hat_node   = NULL;
+    m_hat_offset = core::vector3df(0,0,0);
+
     for(unsigned int i=0; i<4; i++)
     {
         m_wheel_graphics_position[i] = Vec3(UNDEFINED);
@@ -125,6 +129,16 @@ void KartModel::loadInfo(const XMLNode &node)
         loadWheelInfo(*wheels_node, "rear-right",  2);
         loadWheelInfo(*wheels_node, "rear-left",   3);
     }
+    if(const XMLNode *hat_node=node.getNode("hat"))
+    {
+        if(hat_node->get("offset", &m_hat_offset))
+        {
+            // For now simply hardcode a mesh name if an offset is defined.
+            setHatMeshName("christmas_hat.b3d");
+        }
+    }
+    else
+        m_hat_offset = core::vector3df(0,0,0);
 }   // loadInfo
 
 // ----------------------------------------------------------------------------
@@ -190,6 +204,8 @@ KartModel* KartModel::makeCopy()
     km->m_animation_speed   = m_animation_speed;
     km->m_current_animation = AF_DEFAULT;
     km->m_animated_node     = NULL;
+    km->m_hat_offset        = m_hat_offset;
+    km->m_hat_name          = m_hat_name;
     for(unsigned int i=0; i<4; i++)
     {
         km->m_wheel_model[i]             = m_wheel_model[i];
@@ -235,6 +251,41 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         scene::ISceneNode* static_model = attachModel(false);
         lod_node->add(500, static_model, true);
         m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
+    
+        m_hat_node = NULL;
+        if(m_hat_name.size()>0)
+        {
+            scene::IBoneSceneNode *bone = m_animated_node->getJointNode("Head");
+            if(!bone)
+                bone = m_animated_node->getJointNode("head");
+            if(bone)
+            {
+
+                // Till we have all models fixed, accept Head and head as bone naartme
+                scene::IMesh *hat_mesh = 
+                    irr_driver->getAnimatedMesh(
+                         file_manager->getModelFile(m_hat_name));
+                m_hat_node = irr_driver->addMesh(hat_mesh);
+                bone->addChild(m_hat_node);
+                m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
+                m_animated_node->OnAnimate(0);
+                bone->updateAbsolutePosition();
+
+                // With the hat node attached to the head bone, we have to
+                // reverse the transformation of the bone, so that the hat
+                // is still properly placed. Esp. the hat offset needs
+                // to be rotated.
+                const core::matrix4 mat = bone->getAbsoluteTransformation();
+                core::matrix4 inv;
+                mat.getInverse(inv);
+                core::vector3df rotated_offset;
+                inv.rotateVect(rotated_offset, m_hat_offset);
+                m_hat_node->setPosition(rotated_offset);
+                m_hat_node->setScale(inv.getScale());
+                m_hat_node->setRotation(inv.getRotationDegrees());
+            }   // if bone
+        }   // if(m_hat_name)
+
 #ifdef DEBUG
         std::string debug_name = m_model_filename+" (animated-kart-model)";
         node->setName(debug_name.c_str());
@@ -281,9 +332,9 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
             m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
         }
     }
-    
     return node;
 }   // attachModel
+
 
 // ----------------------------------------------------------------------------
 /** Loads the 3d model and all wheels.
