@@ -72,6 +72,9 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     xml_node.get("interaction", &m_interaction);
     xml_node.get("lod_group", &m_lod_group);
     
+    m_soccer_ball = false;
+    xml_node.get("soccer_ball", &m_soccer_ball);
+    
     std::string type;
     xml_node.get("type",    &type );
 

@@ -65,8 +65,8 @@ CheckStructure::CheckStructure(const XMLNode &node, unsigned int index)
             == m_same_group.end())
         m_same_group.push_back(m_index);
 
-    // As a default, only lap lines and cannons are activated
-    m_active_at_reset= m_check_type==CT_NEW_LAP || m_check_type==CT_CANNON;
+    // As a default, only lap lines, cannons and goals are activated
+    m_active_at_reset= m_check_type==CT_NEW_LAP || m_check_type==CT_CANNON || m_check_type==CT_GOAL;
     node.get("active", &m_active_at_reset);
 }   // CheckStructure
 

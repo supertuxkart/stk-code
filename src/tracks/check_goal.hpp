@@ -21,6 +21,7 @@
 
 #include "animations/animation_base.hpp"
 #include "tracks/check_line.hpp"
+#include "utils/cpp2011.h"
 
 class CheckManager;
 class XMLNode;
@@ -33,9 +34,12 @@ class XMLNode;
  */
 class CheckGoal : public CheckLine
 {
+private:
+    bool    m_first_goal;
 public:
              CheckGoal(const XMLNode &node, unsigned int index);
     virtual ~CheckGoal() {}
+    virtual void update(float dt) OVERRIDE;
     virtual void trigger(unsigned int kart_index);
 };   // CheckLine
 

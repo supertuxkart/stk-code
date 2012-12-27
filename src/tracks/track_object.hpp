@@ -104,6 +104,8 @@ protected:
     
     LODNode*                       m_lod_emitter_node;
     
+    bool                           m_soccer_ball;
+    
 public:
                  TrackObject(const XMLNode &xml_node);
                  TrackObject();
@@ -150,6 +152,8 @@ public:
     const std::string& getLodGroup() const { return m_lod_group; }
     
     const std::string& getType() const { return m_type; }
+    
+    bool isSoccerBall() const { return m_soccer_ball; }
     
     /** Currently used for sound effects only, in cutscenes only atm */
     const std::string& getTriggerCondition() const { return m_trigger_condition; }

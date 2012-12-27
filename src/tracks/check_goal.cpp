@@ -18,9 +18,9 @@
 
 #include "tracks/check_goal.hpp"
 
-#include "animations/animation_base.hpp"
 #include "io/xml_node.hpp"
-#include "karts/abstract_kart.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_object_manager.hpp"
 #include "modes/world.hpp"
 #include <stdio.h>
 
@@ -31,7 +31,41 @@
 CheckGoal::CheckGoal(const XMLNode &node,  unsigned int index) 
            : CheckLine(node, index)
 {
+    m_first_goal = false;
+    node.get("first_goal", &m_first_goal);
 }   // CheckGoal
+
+// ----------------------------------------------------------------------------
+/**
+ * Checks the soccer balls to see if they crossed the line and trigger the goal accordingly.
+ */
+void CheckGoal::update(float dt) OVERRIDE
+{
+    World *world = World::getWorld();
+    assert(world);
+    Track* track = world->getTrack();
+    assert(track);
+    TrackObjectManager* tom = track->getTrackObjectManager();
+    assert(tom);
+    PtrVector<TrackObject>&   objects = tom->getObjects();
+    for(unsigned int i=0; i<objects.size(); i++)
+    {
+        TrackObject* obj = objects.get(i);
+        if(!obj->isSoccerBall())
+            continue;
+        
+        const Vec3 &xyz = obj->getNode()->getPosition();
+        // Only check active goal lines.
+        if(m_is_active[i] && isTriggered(m_previous_position[i], xyz, i))
+        {
+            if(UserConfigParams::m_check_debug)
+                printf("CHECK: Goal check structure %d triggered for object %s.\n",
+                       m_index, obj->getDebugName());
+            trigger(i);
+        }
+        m_previous_position[i] = xyz;
+    }
+}
 
 // ----------------------------------------------------------------------------
 /** Called when the check line is triggered. This function  creates a cannon 
@@ -40,5 +74,5 @@ CheckGoal::CheckGoal(const XMLNode &node,  unsigned int index)
  */
 void CheckGoal::trigger(unsigned int kart_index)
 {
-    printf("*** DEBUG TEST ***\n");
+    printf("*** TODO: GOOOOOOOOOAAAAAAALLLLLL!!!! ***\n");
 }   // CheckGoal
