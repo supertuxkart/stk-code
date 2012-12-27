@@ -213,6 +213,7 @@ src/tinygettext/tinygettext.cpp
 src/tracks/ambient_light_sphere.cpp
 src/tracks/bezier_curve.cpp
 src/tracks/check_cannon.cpp
+src/tracks/check_goal.cpp
 src/tracks/check_lap.cpp
 src/tracks/check_line.cpp
 src/tracks/check_manager.cpp
