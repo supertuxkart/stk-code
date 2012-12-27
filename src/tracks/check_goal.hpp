@@ -19,12 +19,14 @@
 #ifndef HEADER_CHECK_GOAL_HPP
 #define HEADER_CHECK_GOAL_HPP
 
-#include "animations/animation_base.hpp"
-#include "tracks/check_line.hpp"
+#include "tracks/check_structure.hpp"
 #include "utils/cpp2011.h"
+#include <line2d.h>
+using namespace irr;
 
 class CheckManager;
 class XMLNode;
+class Track;
 
 /** 
  *  \brief Implements a simple checkline that will score a point when the
@@ -32,15 +34,22 @@ class XMLNode;
  *
  * \ingroup tracks
  */
-class CheckGoal : public CheckLine
+class CheckGoal : public CheckStructure
 {
 private:
-    bool    m_first_goal;
+    /** Which team is this goal for? */
+    bool            m_first_goal;
+    
+    /** The line that is tested for being crossed. */
+    core::line2df   m_line;
+    
 public:
              CheckGoal(const XMLNode &node, unsigned int index);
     virtual ~CheckGoal() {}
     virtual void update(float dt) OVERRIDE;
     virtual void trigger(unsigned int kart_index);
+    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx) OVERRIDE;
+    virtual void reset(const Track &track) OVERRIDE;
 };   // CheckLine
 
 #endif

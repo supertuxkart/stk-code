@@ -531,7 +531,7 @@ public:
     /** Returns true if the normals of this track can be smoothed. */
     bool smoothNormals() const { return m_smooth_normals; }        
     // ------------------------------------------------------------------------
-    TrackObjectManager* getTrackObjectManager() {return m_track_object_manager;}
+    TrackObjectManager* getTrackObjectManager() const {return m_track_object_manager;}
     
     /** Get list of challenges placed on that world. Works only for overworld. */
     const std::vector<OverworldChallenge>& getChallengeList() const

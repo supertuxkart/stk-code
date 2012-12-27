@@ -41,6 +41,7 @@ class CheckManager;
  *  CT_TOGGLE:    Toggles the specified other check structures (active to 
  *                inactive and vice versa.
  *  CT_CANNON:    A check line that 'shoots' the kart to a specified location.
+ *  CT_GOAL:      A goal line in soccer mode.
  *  Each check structure can be active or inactive. Only lap counters are
  *  initialised to be active, all other check structures are inactive.
  *
