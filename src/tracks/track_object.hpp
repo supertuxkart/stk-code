@@ -135,11 +135,12 @@ public:
         }
         
         m_node = node;
-        if (node->getType() == irr::scene::ESNT_LOD_NODE)
+        
+        if (m_node->getType() == irr::scene::ESNT_LOD_NODE)
         {
-            ((LODNode*)node)->setNodesPosition(m_init_xyz);
-            ((LODNode*)node)->setNodesRotation(m_init_hpr);
-            ((LODNode*)node)->setNodesScale(m_init_scale);
+            ((LODNode*)m_node)->setNodesPosition(m_init_xyz);
+            ((LODNode*)m_node)->setNodesRotation(m_init_hpr);
+            ((LODNode*)m_node)->setNodesScale(m_init_scale);
         }
         else
         {

@@ -21,7 +21,7 @@
 #include "io/xml_node.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
-#include "modes/world.hpp"
+#include "modes/soccer_world.hpp"
 #include <stdio.h>
 
 /** Constructor for a check goal line.
@@ -86,34 +86,14 @@ void CheckGoal::update(float dt) OVERRIDE
  */
 void CheckGoal::trigger(unsigned int kart_index)
 {
-    printf("*** TODO: GOOOOOOOOOAAAAAAALLLLLL!!!! ***\n");
-    
-    /*
-    World *world = World::getWorld();
-    assert(world);
-    Track* track = world->getTrack();
-    assert(track);
-    TrackObjectManager* tom = track->getTrackObjectManager();
-    assert(tom);
-    PtrVector<TrackObject>&   objects = tom->getObjects();
-    for(unsigned int i=0; i<objects.size(); i++)
+    SoccerWorld* world = dynamic_cast<SoccerWorld*>(World::getWorld());
+    if(!world)
     {
-        TrackObject* obj = objects.get(i);
-        if(!obj->isSoccerBall())
-            continue;
-        
-        const Vec3 &xyz = obj->getNode()->getPosition();
-        // Only check active goal lines.
-        if(m_is_active[i] && isTriggered(m_previous_position[i], xyz, i))
-        {
-            if(UserConfigParams::m_check_debug)
-                printf("CHECK: Goal check structure %d triggered for object %s.\n",
-                       m_index, obj->getDebugName());
-            trigger(i);
-        }
-        m_previous_position[i] = xyz;
+        fprintf(stderr, "WARNING: no soccer world found, cannot count the points\n");
+        return;
     }
-    */
+    
+    world->onCheckGoalTriggered(m_first_goal);
 }   // CheckGoal
 
 bool CheckGoal::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)

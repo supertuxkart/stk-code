@@ -50,6 +50,8 @@ void SoccerWorld::init()
     WorldWithRank::init();
     m_display_rank = false;
     
+    m_check_goals_enabled = true;
+    
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
     {
@@ -97,6 +99,32 @@ void SoccerWorld::update(float dt)
     
     // TODO
 }   // update
+
+void SoccerWorld::onCheckGoalTriggered(bool first_goal)
+{
+    // TODO
+    if(m_check_goals_enabled)
+        printf("*** GOOOOOOOOOAAAAAAALLLLLL!!!! (team: %d) ***\n", first_goal ? 0 : 1);
+    
+    //m_check_goals_enabled = false;    // TODO: remove?
+    
+    // Reset original positions for the soccer balls
+    TrackObjectManager* tom = getTrack()->getTrackObjectManager();
+    assert(tom);
+    
+    PtrVector<TrackObject>&   objects = tom->getObjects();
+    for(int i=0; i<objects.size(); i++)
+    {
+        TrackObject* obj = objects.get(i);
+        if(!obj->isSoccerBall())
+            continue;
+        
+        obj->reset();
+    }
+    
+    // TODO: rescue the karts
+    // TODO: score a point
+}
 
 //-----------------------------------------------------------------------------
 /** Updates the ranking of the karts.
@@ -172,6 +200,7 @@ bool SoccerWorld::isRaceOver()
  */
 void SoccerWorld::terminateRace()
 {
+    m_check_goals_enabled = false;
     updateKartRanks();
     WorldWithRank::terminateRace();
 }   // terminateRace
@@ -182,6 +211,8 @@ void SoccerWorld::terminateRace()
 void SoccerWorld::restartRace()
 {
     WorldWithRank::restartRace();
+    
+    m_check_goals_enabled = true;
     
     const unsigned int kart_amount = m_karts.size();
     
