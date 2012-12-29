@@ -48,7 +48,7 @@ private:
     
     /** Whether or not goals can be scored (they are disabled when a point is scored
     and re-enabled when the next game can be played)*/
-    bool m_check_goals_enabled;
+    bool m_can_score_points;
     
 public:
     

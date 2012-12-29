@@ -26,6 +26,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
+#include "karts/rescue_animation.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
@@ -50,7 +51,7 @@ void SoccerWorld::init()
     WorldWithRank::init();
     m_display_rank = false;
     
-    m_check_goals_enabled = true;
+    m_can_score_points = true;
     
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
@@ -103,7 +104,7 @@ void SoccerWorld::update(float dt)
 void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 {
     // TODO
-    if(m_check_goals_enabled)
+    if(m_can_score_points)
         printf("*** GOOOOOOOOOAAAAAAALLLLLL!!!! (team: %d) ***\n", first_goal ? 0 : 1);
     
     //m_check_goals_enabled = false;    // TODO: remove?
@@ -121,6 +122,15 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         
         obj->reset();
     }
+    
+    //for(int i=0 ; i < getNumKarts() ; i++
+    
+    /*if(World::getWorld()->getTrack()->isAutoRescueEnabled() &&
+        !getKartAnimation() && fabs(getRoll())>60*DEGREE_TO_RAD && 
+                              fabs(getSpeed())<3.0f                )
+    {
+        new RescueAnimation(this, true);
+    }*/
     
     // TODO: rescue the karts
     // TODO: score a point
@@ -190,6 +200,7 @@ bool SoccerWorld::isRaceOver()
         return false;
     }
     
+    // TODO
     return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
 }   // isRaceOver
 
@@ -200,7 +211,7 @@ bool SoccerWorld::isRaceOver()
  */
 void SoccerWorld::terminateRace()
 {
-    m_check_goals_enabled = false;
+    m_can_score_points = false;
     updateKartRanks();
     WorldWithRank::terminateRace();
 }   // terminateRace
@@ -212,7 +223,7 @@ void SoccerWorld::restartRace()
 {
     WorldWithRank::restartRace();
     
-    m_check_goals_enabled = true;
+    m_can_score_points = true;
     
     const unsigned int kart_amount = m_karts.size();
     

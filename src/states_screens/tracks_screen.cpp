@@ -314,6 +314,7 @@ void TracksScreen::buildTrackList()
         {
             Track* curr = track_manager->getTrack( curr_group[n] );
             if (curr->isArena()) continue;
+            if (curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
             
             if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
