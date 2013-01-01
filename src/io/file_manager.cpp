@@ -190,6 +190,7 @@ void FileManager::reInit()
     KartPropertiesManager::addKartSearchDir(m_root_dir+"/data/karts");
     pushTextureSearchPath(getTextureDir());
     pushTextureSearchPath(getTextureDir()+"/deprecated");
+    pushTextureSearchPath(m_root_dir+"/data/gui");
     pushModelSearchPath  (m_root_dir+"/data/models/"  );
     pushMusicSearchPath  (m_root_dir+"/data/music/"   );
 
