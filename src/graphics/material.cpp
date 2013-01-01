@@ -318,8 +318,9 @@ public:
 Material::Material(const XMLNode *node, int index, bool deprecated)
 {
     m_deprecated = deprecated;
-    
+
     node->get("name", &m_texname);
+    
     if (m_texname=="")
     {
         throw std::runtime_error("[Material] No texture name specified "
@@ -629,7 +630,7 @@ void Material::init(unsigned int index)
 
 //-----------------------------------------------------------------------------
 void Material::install(bool is_full_path, bool complain_if_not_found)
-{
+{   
     const std::string &full_path = is_full_path 
                                  ? m_texname
                                  : file_manager->getTextureFile(m_texname);
@@ -858,8 +859,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     //            materials.xml, if you want to set flags for all surfaces, see
     //            'MaterialManager::setAllMaterialFlags'
     
-    
-    if (m_deprecated)
+    if (m_deprecated || (m->getTexture(0) != NULL && ((core::stringc)m->getTexture(0)->getName()).find("deprecated") != -1))
     {
         fprintf(stderr, "WARNING: track uses deprecated texture <%s>\n", m_texname.c_str());
     }
