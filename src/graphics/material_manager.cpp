@@ -175,14 +175,14 @@ void MaterialManager::loadMaterial()
     std::string deprecated = file_manager->getTextureDir()
                            + "deprecated/materials.xml";
     if(file_manager->fileExists(deprecated))
-        addSharedMaterial(deprecated);
+        addSharedMaterial(deprecated, true);
 
     // Save index of shared textures
     m_shared_material_index = (int)m_materials.size();
 }   // MaterialManager
 
 //-----------------------------------------------------------------------------
-void MaterialManager::addSharedMaterial(const std::string& filename)
+void MaterialManager::addSharedMaterial(const std::string& filename, bool deprecated)
 {
     // Use temp material for reading, but then set the shared
     // material index later, so that these materials are not popped
@@ -192,7 +192,7 @@ void MaterialManager::addSharedMaterial(const std::string& filename)
         msg<<"FATAL: File '"<<filename<<"' not found\n";
         throw std::runtime_error(msg.str());
     }
-    if(!pushTempMaterial(filename))
+    if(!pushTempMaterial(filename, deprecated))
     {
         std::ostringstream msg;
         msg <<"FATAL: Parsing error in '"<<filename<<"'\n";
@@ -202,7 +202,7 @@ void MaterialManager::addSharedMaterial(const std::string& filename)
 }   // addSharedMaterial
 
 //-----------------------------------------------------------------------------
-bool MaterialManager::pushTempMaterial(const std::string& filename)
+bool MaterialManager::pushTempMaterial(const std::string& filename, bool deprecated)
 {
     XMLNode *root = file_manager->createXMLTree(filename);
     if(!root || root->getName()!="materials")
@@ -210,14 +210,15 @@ bool MaterialManager::pushTempMaterial(const std::string& filename)
         if(root) delete root;
         return true;
     }
-    const bool success = pushTempMaterial(root, filename);
+    const bool success = pushTempMaterial(root, filename, deprecated);
     delete root;
     return success;
 }   // pushTempMaterial
 
 //-----------------------------------------------------------------------------
 bool MaterialManager::pushTempMaterial(const XMLNode *root,
-                                       const std::string& filename)
+                                       const std::string& filename,
+                                       bool deprecated)
 {
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
@@ -230,7 +231,7 @@ bool MaterialManager::pushTempMaterial(const XMLNode *root,
         }
         try
         {
-            m_materials.push_back(new Material(node, m_materials.size()));
+            m_materials.push_back(new Material(node, m_materials.size(), deprecated));
         }
         catch(std::exception& e)
         {

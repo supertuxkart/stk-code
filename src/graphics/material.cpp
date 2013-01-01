@@ -315,8 +315,10 @@ public:
  *  \param node Node containing the parameters for this material.
  *  \param index Index in material_manager.
  */
-Material::Material(const XMLNode *node, int index)
+Material::Material(const XMLNode *node, int index, bool deprecated)
 {
+    m_deprecated = deprecated;
+    
     node->get("name", &m_texname);
     if (m_texname=="")
     {
@@ -556,6 +558,8 @@ Material::Material(const XMLNode *node, int index)
 Material::Material(const std::string& fname, int index, bool is_full_path,
                    bool complain_if_not_found)
 {
+    m_deprecated = false;
+    
     m_texname = fname;
     init(index);
     install(is_full_path, complain_if_not_found);
@@ -853,6 +857,13 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     // !!======== This method is only called for materials that can be found in
     //            materials.xml, if you want to set flags for all surfaces, see
     //            'MaterialManager::setAllMaterialFlags'
+    
+    
+    if (m_deprecated)
+    {
+        fprintf(stderr, "WARNING: track uses deprecated texture <%s>\n", m_texname.c_str());
+    }
+    
     int modes = 0;
     
     if (m_alpha_testing)
