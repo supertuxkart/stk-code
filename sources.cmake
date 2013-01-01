@@ -197,6 +197,7 @@ src/states_screens/race_gui_base.cpp
 src/states_screens/race_gui_overworld.cpp
 src/states_screens/race_result_gui.cpp
 src/states_screens/race_setup_screen.cpp
+src/states_screens/soccer_setup_screen.cpp
 src/states_screens/state_manager.cpp
 src/states_screens/story_mode_lobby.cpp
 src/states_screens/tracks_screen.cpp

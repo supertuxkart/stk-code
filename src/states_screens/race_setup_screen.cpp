@@ -22,6 +22,7 @@
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/arenas_screen.hpp"
+#include "states_screens/soccer_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
 #include "utils/translation.hpp"
@@ -134,8 +135,14 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
             UserConfigParams::m_game_mode = CONFIG_CODE_SOCCER;
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
-            ArenasScreen::getInstance()->setUsedForSoccer(true);
-            StateManager::get()->pushScreen( ArenasScreen::getInstance() );
+            // 1 player -> no need to choose a team or determine when the match ends
+            if(race_manager->getNumLocalPlayers() <= 1)
+            {
+                ArenasScreen::getInstance()->setUsedForSoccer(true);
+                StateManager::get()->pushScreen( ArenasScreen::getInstance() );
+            }
+            else
+                StateManager::get()->pushScreen( SoccerSetupScreen::getInstance() );
         }
         else if (selectedMode == "locked")
         {
