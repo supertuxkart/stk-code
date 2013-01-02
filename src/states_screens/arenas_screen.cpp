@@ -42,7 +42,7 @@ const char* ALL_ARENA_GROUPS_ID = "all";
 
 // -----------------------------------------------------------------------------
 
-ArenasScreen::ArenasScreen() : Screen("arenas.stkgui"), m_used_for_soccer(false)
+ArenasScreen::ArenasScreen() : Screen("arenas.stkgui")
 {
 }
 
@@ -90,7 +90,7 @@ void ArenasScreen::beforeAddingWidget()
     for (unsigned int n=0; n<track_manager->getNumberOfTracks(); n++) //iterate through tracks to find how many are arenas
     {
         Track* temp = track_manager->getTrack(n);
-        if (m_used_for_soccer)
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         {
             if(temp->isSoccer())
                 num_of_arenas++;
@@ -220,7 +220,7 @@ void ArenasScreen::buildTrackList()
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack(n);
-            if (m_used_for_soccer)
+            if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 if(!curr->isSoccer()) continue;
             }
@@ -250,7 +250,7 @@ void ArenasScreen::buildTrackList()
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack(currArenas[n]);
-            if (m_used_for_soccer)
+            if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 if(!curr->isSoccer()) continue;
             }

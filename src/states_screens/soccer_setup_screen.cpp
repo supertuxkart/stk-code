@@ -40,7 +40,6 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, c
 {
     if(name == "continue")
     {
-        ArenasScreen::getInstance()->setUsedForSoccer(true);
         StateManager::get()->pushScreen( ArenasScreen::getInstance() );
     }
     else if (name == "back")

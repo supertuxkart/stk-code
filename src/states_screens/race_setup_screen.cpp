@@ -127,7 +127,6 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
             UserConfigParams::m_game_mode = CONFIG_CODE_3STRIKES;
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
-            ArenasScreen::getInstance()->setUsedForSoccer(false);
             StateManager::get()->pushScreen( ArenasScreen::getInstance() );
         }
         else if (selectedMode == IDENT_SOCCER)
@@ -137,10 +136,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
             // 1 player -> no need to choose a team or determine when the match ends
             if(race_manager->getNumLocalPlayers() <= 1)
-            {
-                ArenasScreen::getInstance()->setUsedForSoccer(true);
                 StateManager::get()->pushScreen( ArenasScreen::getInstance() );
-            }
             else
                 StateManager::get()->pushScreen( SoccerSetupScreen::getInstance() );
         }
