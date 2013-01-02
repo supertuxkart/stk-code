@@ -561,8 +561,15 @@ void LinearWorld::moveKartAfterRescue(AbstractKart* kart)
     KartInfo& info = m_kart_info[kart->getWorldKartId()];
 
     info.getSector()->rescue();
+    // Setting XYZ for the kart is important since otherwise the kart
+    // will not detect the right material again when doing the next
+    // raycast to detect where it is driving on (--> potential rescue loop)
     int sector = info.getSector()->getCurrentGraphNode();
+    kart->setXYZ( QuadGraph::get()->getQuadOfNode(sector).getCenter());
 
+    btQuaternion heading(btVector3(0.0f, 1.0f, 0.0f), 
+                         m_track->getAngle(sector) );
+    kart->setRotation(heading);
     // A certain epsilon is added here to the Z coordinate, in case
     // that the drivelines are somewhat under the track. Otherwise, the
     // kart might be placed a little bit under the track, triggering
