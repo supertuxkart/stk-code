@@ -384,12 +384,12 @@
          than 23 can only be reached with powerups).
          time-full-steer: This is the amount of change in steering depending
            on current steering. So if the steering is between 0 and 0.5,
-           the time-for-steering-change is 0.25. If the current steering is
-           between 0.5 and 1.0, the time-for-steering-change is 0.15.
+           the time-for-steering-change is 0.15. If the current steering is
+           between 0.5 and 1.0, the time-for-steering-change is 0.25.
            The speed is used as dt/time-for-steering-change.
-           In short: steering at less than halfway is somewhat slower,
-           making it easier with a keyboard to get minor changes, but
-           faster when you want to steer more. Overwall with the current
+           In short: steering at less than halfway is somewhat faster,
+           which should avoid oversteering (by pressing the key for too long),
+           but slower when you want to steer more. Overwall with the current
            settings the expected time-to-full-steer is:
            0.5 * 0.25 + 0.5 * 0.15 = 0.2 ... which is overall the same
            time we had previously.
