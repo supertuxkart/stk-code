@@ -20,6 +20,8 @@
         <roundedbox x="2%" y="5%" width="100%" height="50%" layout="vertical-row" id="players-table">
             <!-- Content is added programmatically -->
             <!-- TODO: remove these tests and actually do this in the code -->
+            
+            <!--
             <div layout="horizontal-row" width="100%" height="50" align="center">
                 <spacer proportion="1" />
                 <icon-button id="kart-0" height="100%" icon="karts/beastie/beastie-icon.png"/>
@@ -28,7 +30,6 @@
                 <button id="team-0" I18N="In soccer setup screen" text="Team: blue" width="30%"/>
                 
                 <spacer proportion="1" />
-                
             </div>
             <div layout="horizontal-row" width="100%" height="50" align="center">
                 <spacer proportion="1" />
@@ -38,8 +39,11 @@
                 <button id="team-1" I18N="In soccer setup screen" text="Team: red" width="30%"/>
                 
                 <spacer proportion="1" />
-                
             </div>
+            -->
+            
+            <label proportion="1" height="100%"
+                        I18N="In soccer setup menu" text="TODO" text_align="left" />
             
         </roundedbox>
         

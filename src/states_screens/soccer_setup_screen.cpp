@@ -52,4 +52,29 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, c
 void SoccerSetupScreen::init()
 {
     Screen::init();
+    
+    Widget* players_table = getWidget<Widget>("players-table");
+    assert(players_table != NULL);
+    
+    // BEGIN TODO
+    /*
+    Widget* div = new Widget(WTYPE_DIV);
+    div->m_properties[PROP_LAYOUT] = "horizontal-row";
+            //widget.m_properties[prop_flag] = core::stringc(prop_name).c_str(); else widget.m_properties[prop_flag] = ""
+    div->setParent(players_table->getIrrlichtElement());
+    players_table->getChildren().push_back(div);
+    //players_table->add();
+    */
+    
+/*    LabelWidget* lbl = new LabelWidget();
+    lbl->m_properties[PROP_PROPORTION] = "1";
+    lbl->m_properties[PROP_HEIGHT] = "100%";
+    lbl->setText(L"bouYou", false);
+    lbl->m_properties[PROP_TEXT_ALIGN] = "left";
+            //widget.m_properties[prop_flag] = core::stringc(prop_name).c_str(); else widget.m_properties[prop_flag] = ""
+    //lbl->setParent(players_table->getIrrlichtElement());
+    players_table->getChildren().push_back(lbl);
+    calculateLayout();
+*/
+    // END TODO
 }

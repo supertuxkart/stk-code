@@ -50,6 +50,9 @@ private:
     /** List of all arena groups. */
     Group2Indices                            m_arena_groups;
     
+    /** List of all soccer arena groups. */
+    Group2Indices                            m_soccer_arena_groups;
+    
     /** List of all groups (for both normal tracks and arenas) */
     //std::vector<std::string>                 m_all_group_names;
     
@@ -58,6 +61,9 @@ private:
     
     /** List of the names of all groups containing arenas */
     std::vector<std::string>                 m_arena_group_names;
+    
+    /** List of the names of all groups containing soccer arenas */
+    std::vector<std::string>                 m_soccer_arena_group_names;
 
     /** Flag if this track is available or not. Tracks are set unavailable
      *  if they are not available on all clients (applies only to network mode)
@@ -83,7 +89,10 @@ public:
     
     /** \brief Returns a list of the names of all used arena groups. */
     const std::vector<std::string>&
-                  getAllArenaGroups() const { return m_arena_group_names; }
+                  getAllArenaGroups(bool soccer_arena=false) const
+    {
+        return soccer_arena ? m_soccer_arena_group_names : m_arena_group_names;
+    }
     
     /** Returns the number of tracks. */
     size_t        getNumberOfTracks() const { return m_tracks.size(); }
@@ -111,7 +120,10 @@ public:
     /** Returns a list of all arenas in a given group. 
      *  \param g Name of the group. */
     const std::vector<int>& 
-        getArenasInGroup(const std::string& g) {return m_arena_groups[g];}
+        getArenasInGroup(const std::string& g, bool soccer_arena=false)
+    {
+        return soccer_arena ? m_soccer_arena_groups[g] : m_arena_groups[g];
+    }
     
     /** Returns a list of all track identifiers. */
     std::vector<std::string> getAllTrackIdentifiers();
