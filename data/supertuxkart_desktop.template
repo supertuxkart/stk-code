@@ -6,9 +6,9 @@ GenericName[de_DE]=Ein Kart-Rennspiel
 GenericName[fr_FR]=Un jeu de karting
 GenericName[gl]=Xogo de carreiras con karts
 GenericName[ro_RO]=Un joc de curse cu carturi
-Exec=@STK_INSTALL_BINARY_DIR@/supertuxkart --log=file
+Exec=@PREFIX@/@STK_INSTALL_BINARY_DIR@/supertuxkart --log=file
 Terminal=false
 StartupNotify=false
 Type=Application
-TryExec=@STK_INSTALL_BINARY_DIR@/supertuxkart
+TryExec=@PREFIX@/@STK_INSTALL_BINARY_DIR@/supertuxkart
 Categories=Game;ArcadeGame;
