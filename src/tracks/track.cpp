@@ -1443,6 +1443,21 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         {
             Camera::readEndCamera(*node);
         }
+        else if(name=="light")
+        {
+            core::vector3df pos;
+            node->get("xyz", &pos);
+            
+            video::SColor color;
+            node->get("color", &color);
+            
+            float distance = 25.0f;
+            node->get("distance", &distance);
+            
+            scene::ILightSceneNode* node = irr_driver->getSceneManager()->addLightSceneNode(NULL, pos, color, distance);
+            node->setLightType(video::ELT_POINT);
+            node->enableCastShadow(true);
+        }
         else if(name=="weather")
         {
             std::string weather_particles;
