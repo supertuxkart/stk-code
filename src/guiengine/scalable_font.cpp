@@ -131,6 +131,10 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
                     scale = xml->getAttributeValueAsFloat(L"scale");
                     //std::cout  << "scale = " << scale << std::endl;
                     
+                bool excludeFromMaxHeightCalculation = false;
+                if (xml->getAttributeValue(L"excludeFromMaxHeightCalculation"))
+                    excludeFromMaxHeightCalculation = (core::stringc(xml->getAttributeValue(L"excludeFromMaxHeightCalculation")) == "true");
+                    
                 core::stringw alpha = xml->getAttributeValue(L"hasAlpha");
                 
                 //std::cout << "---- Adding font texture " << fn.c_str() << "; alpha=" << alpha.c_str() << std::endl;
@@ -146,6 +150,7 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
                 info.m_file_name   = fn;
                 info.m_has_alpha   = (alpha == core::stringw("true"));
                 info.m_scale       = scale;
+                info.m_exclude_from_max_height_calculation = excludeFromMaxHeightCalculation;
                 
                 
 #ifdef DEBUG
@@ -280,19 +285,30 @@ void ScalableFont::setScale(const float scale)
 
 void ScalableFont::setMaxHeight()
 {
-    // FIXME: should consider per-texture scaling
     MaxHeight = 0;
     s32 t;
 
-    core::array< core::rect<s32> >& p = SpriteBank->getPositions();
+    core::array< core::rect<s32> >& p  = SpriteBank->getPositions();
+    core::array< SGUISprite >& sprites = SpriteBank->getSprites();
 
     for (u32 i=0; i<p.size(); ++i)
     {
         t = p[i].getHeight();
+        
+        // FIXME: consider fallback fonts
+        int texID = sprites[i].Frames[0].textureNumber;
+        
+        const TextureInfo& info = (*(m_texture_files.find(texID))).second;
+        if (info.m_exclude_from_max_height_calculation) continue;
+        
+        float char_scale = info.m_scale;
+        t *= char_scale;
+        
         if (t>MaxHeight)
             MaxHeight = t;
     }
 
+    MaxHeight = MaxHeight*m_scale;
 }
 
 

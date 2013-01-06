@@ -45,6 +45,7 @@ class ScalableFont : public IGUIFontBitmap
         irr::core::stringc m_file_name;
         bool m_has_alpha;
         float m_scale;
+        bool m_exclude_from_max_height_calculation;
         
         TextureInfo()
         {
