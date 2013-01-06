@@ -148,7 +148,8 @@ void GamePadDevice::resetAxisDirection(const int axis,
         Binding& bind = m_configuration->getBinding(n);
         if(bind.getType() == Input::IT_STICKMOTION &&
            bind.getId() == axis &&
-           bind.getDirection()== direction)
+           bind.getDirection()== direction &&
+           pk->getController() != NULL)
         {
             ((PlayerController*)(pk->getController()))
                                                   ->action((PlayerAction)n, 0);
