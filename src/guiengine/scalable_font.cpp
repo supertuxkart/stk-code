@@ -302,13 +302,13 @@ void ScalableFont::setMaxHeight()
         if (info.m_exclude_from_max_height_calculation) continue;
         
         float char_scale = info.m_scale;
-        t *= char_scale;
+        t = (int)(t*char_scale);
         
         if (t>MaxHeight)
             MaxHeight = t;
     }
 
-    MaxHeight = MaxHeight*m_scale;
+    MaxHeight = (int)(MaxHeight*m_scale);
 }
 
 
