@@ -27,6 +27,7 @@
 #  include "tinygettext/tinygettext.hpp"
 
 #  define _(String, ...)        (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__)))
+#undef _C
 #  define _C(Ctx, String, ...)  (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String, Ctx), ##__VA_ARGS__)))
 #  define _LTR(String, ...)     (StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__))
 #  define gettext_noop(String)  (String)
