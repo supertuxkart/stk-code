@@ -191,7 +191,7 @@ void RaceSetupScreen::init()
         
     // Avoid negative numbers (which can happen if e.g. the number of karts
     // in a previous race was lower than the number of players now.
-    int num_ai = race_manager->getNumberOfKarts()-race_manager->getNumLocalPlayers();
+    int num_ai = UserConfigParams::m_num_karts-race_manager->getNumLocalPlayers();
     if(num_ai<0) num_ai = 0;
     kartamount->setValue(num_ai);
     kartamount->setMax(stk_config->m_max_karts - race_manager->getNumLocalPlayers() );
