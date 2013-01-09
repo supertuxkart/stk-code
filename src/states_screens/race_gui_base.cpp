@@ -720,6 +720,11 @@ void RaceGUIBase::drawGlobalReadySetGo()
  */
 void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 {
+    // For now, don't draw player icons when in soccer mode
+    const RaceManager::MinorRaceModeType  minor_mode = race_manager->getMinorMode();
+    if(minor_mode == RaceManager::MINOR_MODE_SOCCER)
+        return;
+    
     int x_base = 10;
     int y_base = 20;
     unsigned int y_space = UserConfigParams::m_height - bottom_margin - y_base;
@@ -806,10 +811,8 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         //x,y is the target position
         int lap = info.lap;
         
-        // In battle mode and soccer mode there is no distance along track etc.
-        const RaceManager::MinorRaceModeType  minor_mode = race_manager->getMinorMode();
-        if( minor_mode==RaceManager::MINOR_MODE_3_STRIKES ||
-            minor_mode==RaceManager::MINOR_MODE_SOCCER)
+        // In battle mode mode there is no distance along track etc.
+        if( minor_mode==RaceManager::MINOR_MODE_3_STRIKES )
         {
             x = x_base;
             y = previous_y+ICON_PLAYER_WIDTH+2;

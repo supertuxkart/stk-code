@@ -39,6 +39,14 @@ class Powerup;
 class Skidding;
 class SlipStream;
 
+enum SoccerTeam
+{
+    SOCCER_TEAM_NONE=-1,
+    SOCCER_TEAM_RED=0,
+    SOCCER_TEAM_BLUE,
+    NB_SOCCER_TEAMS
+};
+
 /** An abstract interface for the actual karts. Some functions are actually
  *  implemented here in order to allow inlining. 
  * \ingroup karts
@@ -75,6 +83,8 @@ protected:
     /** A kart animation object to handle rescue, explosion etc. */
     AbstractKartAnimation *m_kart_animation;
 
+    SoccerTeam  m_soccer_team;
+    
 public:
                    AbstractKart(const std::string& ident, 
                                 int world_kart_id,
@@ -267,6 +277,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the initial position of this kart. */
     virtual int getInitialPosition() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns the current soccer team */
+    SoccerTeam  getSoccerTeam() const          {return m_soccer_team;}
+    // ------------------------------------------------------------------------
+    /** Sets the current soccer team */
+    void        setSoccerTeam(SoccerTeam team) { m_soccer_team = team; }
     // ------------------------------------------------------------------------
     /** True if the wheels are touching the ground. */
     virtual bool isOnGround() const = 0;

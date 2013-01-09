@@ -21,6 +21,7 @@
 
 #include "modes/world_with_rank.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "karts/abstract_kart.hpp"
 
 #include <IMesh.h>
 
@@ -37,28 +38,15 @@ class PhysicalObject;
 class SoccerWorld : public WorldWithRank
 {
 private:
-    struct SoccerInfo
-    {
-        int m_goals;
-    };
-    
-    /** This vector contains an 'SoccerInfo' struct for every kart in the race.
-    */
-    std::vector<SoccerInfo> m_kart_info;
+    /** Number of goals each team scored
+     */
+    int m_team_goals[NB_SOCCER_TEAMS];
     
     /** Whether or not goals can be scored (they are disabled when a point is scored
     and re-enabled when the next game can be played)*/
     bool m_can_score_points;
     
 public:
-    
-    /** Used to show a nice graph when battle is over */
-    struct SoccerEvent
-    {
-        float m_time;
-        std::vector<SoccerInfo> m_kart_info;
-    };
-    std::vector<SoccerEvent> m_soccer_events;
     
     SoccerWorld();
     virtual ~SoccerWorld() {}
@@ -83,7 +71,9 @@ public:
     virtual void update(float dt);
 
     void onCheckGoalTriggered(bool first_goal);
-    void updateKartRanks();
+    
+private:
+    void initKartList();
 };   // SoccerWorld
 
 

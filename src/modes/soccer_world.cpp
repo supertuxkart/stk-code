@@ -52,6 +52,7 @@ void SoccerWorld::init()
     m_display_rank = false;
     
     m_can_score_points = true;
+    memset(m_team_goals, 0, sizeof(m_team_goals));
     
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
@@ -60,24 +61,7 @@ void SoccerWorld::init()
         exit(1);
     }
  
-    const unsigned int kart_amount = m_karts.size();
-    
-    for(unsigned int n=0; n<kart_amount; n++)
-    {
-        // create the struct that ill hold each player's number of goals
-        SoccerInfo info;
-        info.m_goals         = 0;
-        m_kart_info.push_back(info);
-        
-        // no positions in this mode
-        m_karts[n]->setPosition(-1);
-    }// next kart
-    
-    
-    SoccerEvent evt;
-    evt.m_time = 0.0f;
-    evt.m_kart_info = m_kart_info;
-    m_soccer_events.push_back(evt);    
+    initKartList();
     
 }   // SoccerWorld
 
@@ -137,59 +121,6 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 }
 
 //-----------------------------------------------------------------------------
-/** Updates the ranking of the karts.
- */
-void SoccerWorld::updateKartRanks()
-{
-    beginSetKartPositions();
-    // sort karts by their times then give each one its position.
-    // in battle-mode, long time = good (meaning he survived longer)
-    
-    const unsigned int NUM_KARTS = getNumKarts();
-    
-    int *karts_list = new int[NUM_KARTS];
-    for( unsigned int n = 0; n < NUM_KARTS; ++n ) karts_list[n] = n;
-    
-    bool sorted=false;
-    do
-    {
-        sorted = true;
-        for( unsigned int n = 0; n < NUM_KARTS-1; ++n )
-        {
-            const int this_karts_time = 
-                  m_karts[karts_list[n]]->hasFinishedRace() 
-                ? (int)m_karts[karts_list[n]]->getFinishTime()
-                : (int)WorldStatus::getTime();
-            const int next_karts_time = 
-                   m_karts[karts_list[n+1]]->hasFinishedRace()
-                ? (int)m_karts[karts_list[n+1]]->getFinishTime()
-                : (int)WorldStatus::getTime();
-            
-            // Swap if next kart survived longer or has more lives
-            bool swap = next_karts_time > this_karts_time ||
-                        m_kart_info[karts_list[n+1]].m_goals 
-                        > m_kart_info[karts_list[n]].m_goals;
-
-            if(swap)
-            {
-                int tmp = karts_list[n+1];
-                karts_list[n+1] = karts_list[n];
-                karts_list[n] = tmp;
-                sorted = false;
-                break;
-            } 
-        }   // for n = 0; n < NUM_KARTS-1
-    } while(!sorted);
-    
-    for( unsigned int n = 0; n < NUM_KARTS; ++n )
-    {
-        setKartPosition(karts_list[n], n+1);
-    }
-    delete [] karts_list;
-    endSetKartPositions();
-}   // updateKartRank
-
-//-----------------------------------------------------------------------------
 /** The battle is over if only one kart is left, or no player kart.
  */
 bool SoccerWorld::isRaceOver()
@@ -212,7 +143,6 @@ bool SoccerWorld::isRaceOver()
 void SoccerWorld::terminateRace()
 {
     m_can_score_points = false;
-    updateKartRanks();
     WorldWithRank::terminateRace();
 }   // terminateRace
 
@@ -224,25 +154,10 @@ void SoccerWorld::restartRace()
     WorldWithRank::restartRace();
     
     m_can_score_points = true;
+    memset(m_team_goals, 0, sizeof(m_team_goals));
     
-    const unsigned int kart_amount = m_karts.size();
-    
-    for(unsigned int n=0; n<kart_amount; n++)
-    {
-        m_kart_info[n].m_goals         = 0;
-        
-        // no positions in this mode
-        m_karts[n]->setPosition(-1);
-    }// next kart
-    
-    // remove old soccer events
-    m_soccer_events.clear();
+    initKartList();
 
-    // add initial occer event
-    SoccerEvent evt;
-    evt.m_time = 0.0f;
-    evt.m_kart_info = m_kart_info;
-    m_soccer_events.push_back(evt);
 }   // restartRace
 
 //-----------------------------------------------------------------------------
@@ -259,14 +174,25 @@ void SoccerWorld::getKartsDisplayInfo(
         // reset color
         rank_info.lap = -1;
         
-        rank_info.r = 0.5;
-        rank_info.g = 0.5;
-        rank_info.b = 0.5;
-        
-        char goals[4];
-        sprintf(goals, "%i", m_kart_info[i].m_goals);
-        
-        rank_info.m_text = goals;
+        AbstractKart* kart = getKart(i);
+        switch(kart->getSoccerTeam())
+        {
+        case SOCCER_TEAM_BLUE:
+            rank_info.r = 0.0f;
+            rank_info.g = 0.0f;
+            rank_info.b = 0.7f;
+            break;
+        case SOCCER_TEAM_RED:
+            rank_info.r = 0.9f;
+            rank_info.g = 0.0f;
+            rank_info.b = 0.0f;
+            break;
+        default:
+            assert(false && "Soccer team not set to blue or red");
+            rank_info.r = 0.0f;
+            rank_info.g = 0.0f;
+            rank_info.b = 0.0f;
+        }
     }
 }   // getKartsDisplayInfo
 
@@ -351,3 +277,52 @@ void SoccerWorld::moveKartAfterRescue(AbstractKart* kart)
                 (kart->getIdent().c_str()), m_track->getIdent().c_str());
     }
 }   // moveKartAfterRescue
+
+/** Set position and team for the karts */
+void SoccerWorld::initKartList()
+{
+    const unsigned int kart_amount = m_karts.size();
+    
+    // Set kart positions, ordering them by team
+    for(unsigned int n=0; n<kart_amount; n++)
+    {
+        m_karts[n]->setPosition(-1);
+    }
+    // TODO: remove
+/*
+    const unsigned int kart_amount = m_karts.size();
+    
+    int team_karts_amount[NB_SOCCER_TEAMS];
+    memset(team_karts_amount, 0, sizeof(team_karts_amount));
+    
+    {
+        // Set the kart teams if they haven't been already set by the setup screen
+        // (happens when the setup screen is skipped, with 1 player)
+        SoccerTeam    round_robin_team = SOCCER_TEAM_RED;
+        for(unsigned int n=0; n<kart_amount; n++)
+        {
+            if(m_karts[n]->getSoccerTeam() == SOCCER_TEAM_NONE)
+                m_karts[n]->setSoccerTeam(round_robin_team);
+            
+            team_karts_amount[m_karts[n]->getSoccerTeam()]++;
+            
+            round_robin_team = (round_robin_team==SOCCER_TEAM_RED ?
+                                SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
+        }// next kart
+    }
+    
+    // Compute start positions for each team
+    int team_cur_position[NB_SOCCER_TEAMS];
+    team_cur_position[0] = 1;
+    for(int i=1 ; i < (int)NB_SOCCER_TEAMS ; i++)
+        team_cur_position[i] = team_karts_amount[i-1] + team_cur_position[i-1];
+    
+    // Set kart positions, ordering them by team
+    for(unsigned int n=0; n<kart_amount; n++)
+    {
+        SoccerTeam  team = m_karts[n]->getSoccerTeam();
+        m_karts[n]->setPosition(team_cur_position[team]);
+        team_cur_position[team]++;
+    }// next kart
+*/
+}

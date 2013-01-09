@@ -6,7 +6,7 @@
 
         <header width="80%" text="Race Setup" align="center" text_align="center" />
         
-        <spacer proportion="1" width="25"/>
+        <spacer height="25" width="25"/>
         
         <div layout="horizontal-row" width="100%" height="50" align="center">
             <bright proportion="1" height="100%"
@@ -15,41 +15,16 @@
             <spinner id="goalamount" proportion="1" height="100%" min_value="1" max_value="30" wrap_around="true"/>
         </div>
         
-        <spacer proportion="1" width="25" />
+        <spacer height="15" width="25"/>
         
-        <roundedbox x="2%" y="5%" width="100%" height="50%" layout="vertical-row" id="players-table">
-            <!-- Content is added programmatically -->
-            <!-- TODO: remove these tests and actually do this in the code -->
-            
-            <!--
-            <div layout="horizontal-row" width="100%" height="50" align="center">
-                <spacer proportion="1" />
-                <icon-button id="kart-0" height="100%" icon="karts/beastie/beastie-icon.png"/>
-                <label proportion="1" height="100%"
-                        I18N="In soccer setup menu" text="funto" text_align="left" />
-                <button id="team-0" I18N="In soccer setup screen" text="Team: blue" width="30%"/>
-                
-                <spacer proportion="1" />
-            </div>
-            <div layout="horizontal-row" width="100%" height="50" align="center">
-                <spacer proportion="1" />
-                <icon-button id="kart-1" height="100%" icon="karts/tux/tuxicon.png"/>
-                <label proportion="1" height="100%"
-                        I18N="In soccer setup menu" text="bouYou" text_align="left" />
-                <button id="team-1" I18N="In soccer setup screen" text="Team: red" width="30%"/>
-                
-                <spacer proportion="1" />
-            </div>
-            -->
-            
-            <label proportion="1" height="100%"
-                        I18N="In soccer setup menu" text="TODO" text_align="left" />
-            
-        </roundedbox>
-        
-        <spacer proportion="1" width="25" />
+        <div id="central_div" layout="horizontal-row" width="100%" proportion="1" align="center">
+			<roundedbox x="2%" y="5%" proportion="1" layout="horizontal-row" height="100%">
+				<!-- Content is added programmatically -->
+			</roundedbox>
+        </div>
         
         <button id="continue" I18N="In soccer setup screen" text="Continue" align="center" width="60%"/>
+
     </div>
 
 </stkgui>
