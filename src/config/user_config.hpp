@@ -586,6 +586,12 @@ namespace UserConfigParams
                                                "Ignore all messages with this "
                                                "id and lower") );
 
+    PARAM_PREFIX IntUserConfigParam         m_last_important_message_id
+            PARAM_DEFAULT(  IntUserConfigParam(-1, "last_important_message_id", 
+                                               &m_addon_group,
+                                               "Don't show important message "
+                                               "with this or a lower id again") );
+
     PARAM_PREFIX IntUserConfigParam        m_internet_status
             PARAM_DEFAULT(  IntUserConfigParam(0, "enable_internet",
                                                &m_addon_group,

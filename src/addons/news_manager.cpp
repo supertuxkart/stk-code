@@ -109,6 +109,8 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
         node->get("content", &news);
         int id=-1;
         node->get("id", &id);
+        bool important=false;
+        node->get("important", &important);
 
         std::string cond;
         node->get("condition", &cond);
@@ -125,7 +127,7 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
             if(id>UserConfigParams::m_ignore_message_id)
 #endif
             {
-                NewsMessage n(core::stringw(news.c_str()), id);
+                NewsMessage n(core::stringw(news.c_str()), id, important);
                 m_news.getData().push_back(n);
             }
         }   // m_news.lock()
@@ -165,6 +167,40 @@ void NewsManager::addNewsMessage(const core::stringw &s)
     m_news.getData().push_back(n);
     m_news.unlock();
 }   // addNewsMessage
+// ----------------------------------------------------------------------------
+/** Returns the  important message with the smallest id that has not been 
+ *  shown, or NULL if no important (not shown before) message exists atm. The
+ *  user config is updated to store the last important message id shown. 
+ */
+const core::stringw NewsManager::getImportantMessage()
+{
+    int index = -1;
+    m_news.lock();
+    for(unsigned int i=0; i<m_news.getData().size(); i++)
+    {
+        const NewsMessage &m = m_news.getData()[i];
+        // 
+        if(m.isImportant() && 
+           m.getMessageId()>UserConfigParams::m_last_important_message_id  &&
+            (index == -1 || 
+            m.getMessageId() < m_news.getData()[index].getMessageId() )     )
+        {
+            index = i;
+        }   // if new unshown important message with smaller message id
+    }
+    core::stringw message("");
+    if(index>=0)
+    {
+        const NewsMessage &m = m_news.getData()[index];
+        message = m.getNews();
+        UserConfigParams::m_last_important_message_id = m.getMessageId();
+
+    }
+    m_news.unlock();
+
+    return message;
+}   // getImportantMessage
+
 // ----------------------------------------------------------------------------
 /** Returns the next loaded news message. It will 'wrap around', i.e.
  *  if there is only one message it will be returned over and over again.

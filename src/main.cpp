@@ -1387,6 +1387,18 @@ int main(int argc, char *argv[] )
             StateManager::get()->enterGameState();
         }
 
+
+        // If an important news message exists it is shown in a popup dialog.
+        const core::stringw important_message = 
+                                           news_manager->getImportantMessage();
+        if(important_message!="")
+        {
+            new MessageDialog(important_message,
+                              MessageDialog::MESSAGE_DIALOG_OK,
+                              NULL, true);
+        }   // if important_message
+
+
         // Replay a race
         // =============
         if(history->replayHistory())

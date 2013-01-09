@@ -39,19 +39,23 @@ private:
     // a message id and a display count.
     class NewsMessage
     {
-        // The actual news message
+        /** The actual news message. */
         core::stringw m_news;
-        // A message id used to store some information in the
-        // user config file.
+        /** A message id used to store some information in the
+         *  user config file. */
         int           m_message_id;
-        // Counts how often a message has been displayed.
+        /** Counts how often a message has been displayed. */
         int           m_display_count;
+        /** True if this is an important (i.e. popup) message. */
+        bool          m_important;
+
     public:
-        NewsMessage(const core::stringw &m, int id)
+        NewsMessage(const core::stringw &m, int id, bool important=false)
         {
             m_news          = m;
             m_message_id    = id;
             m_display_count = 0;
+            m_important     = important;
         }   // NewsMessage
         /** Returns the news message. */
         const core::stringw& getNews() const {return m_news;}
@@ -63,6 +67,8 @@ private:
         int getDisplayCount() const {return m_display_count; }
         /** Sets the display count for this message. */
         void setDisplayCount(int n) {m_display_count = n; }
+        /** Returns if this is an important message. */
+        bool isImportant() const { return m_important; }
     };   // NewsMessage
 
     mutable Synchronised< std::vector<NewsMessage> > m_news;
@@ -90,6 +96,8 @@ public:
                  ~NewsManager();
     const core::stringw
                   getNextNewsMessage();
+    const core::stringw 
+                  getImportantMessage();
     void          init();
     void          addNewsMessage(const core::stringw &s);
 
