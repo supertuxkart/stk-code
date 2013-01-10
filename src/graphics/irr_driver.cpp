@@ -42,6 +42,7 @@
 #include "physics/physics.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/profiler.hpp"
 
@@ -577,12 +578,12 @@ void IrrDriver::applyResolutionSettings()
                                                      UserConfigParams::m_prev_width,
                                                      UserConfigParams::m_prev_height) );
     m_video_driver->endScene();
-
-    attachment_manager      -> removeTextures();
-    projectile_manager      -> removeTextures();
+    track_manager->removeAllCachedData();
+    attachment_manager->removeTextures();
+    projectile_manager->removeTextures();
     ItemManager::removeTextures();
     kart_properties_manager -> unloadAllKarts();
-    powerup_manager         -> unloadPowerups();
+    powerup_manager-> unloadPowerups();
     Referee::cleanup();
     ParticleKindManager::get()->cleanup();
     delete input_manager;
@@ -625,9 +626,9 @@ void IrrDriver::applyResolutionSettings()
         material_manager->addSharedMaterial(materials_file);
     }
     
-    powerup_manager         -> loadAllPowerups ();
+    powerup_manager->loadAllPowerups ();
     ItemManager::loadDefaultItemMeshes();
-    projectile_manager      -> loadData();
+    projectile_manager->loadData();
     Referee::init();
     GUIEngine::addLoadingIcon( 
         irr_driver->getTexture(file_manager->getGUIDir() + "/gift.png") );
@@ -635,11 +636,13 @@ void IrrDriver::applyResolutionSettings()
     file_manager->popTextureSearchPath();
 
     KartPropertiesManager::addKartSearchDir(file_manager->getAddonsFile("karts"));
-    kart_properties_manager -> loadAllKarts();
+    kart_properties_manager->loadAllKarts();
     
-    attachment_manager      -> loadModels();
-    GUIEngine::addLoadingIcon( irr_driver->getTexture(file_manager->getGUIDir() + "/banana.png") );
-    
+    attachment_manager->loadModels();
+    GUIEngine::addLoadingIcon(irr_driver->getTexture(file_manager->getGUIDir()
+                                                     + "/banana.png") );
+    // No need to reload cached track data (track_manager->cleanAllCachedData
+    // above) - this happens dynamically when the tracks are loaded.
     GUIEngine::reshowCurrentScreen();
     
 }   // applyResolutionSettings

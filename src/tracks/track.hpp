@@ -380,6 +380,7 @@ public:
                        Track             (const std::string &filename);
                       ~Track             ();
     void               cleanup           ();
+    void               removeCachedData  ();
     void               startMusic        () const;
     
     bool               setTerrainHeight(Vec3 *pos) const;

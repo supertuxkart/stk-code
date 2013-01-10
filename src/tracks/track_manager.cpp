@@ -75,6 +75,15 @@ Track* TrackManager::getTrack(const std::string& ident) const
 }   // getTrack
 
 //-----------------------------------------------------------------------------
+/** Removes all cached data from all tracks. This is called when the screen
+ *  resolution is changed and all textures need to be bound again.
+ */
+void TrackManager::removeAllCachedData()
+{
+    for(Tracks::const_iterator i = m_tracks.begin(); i != m_tracks.end(); ++i)
+        (*i)->removeCachedData();
+}   // removeAllCachedData
+//-----------------------------------------------------------------------------
 /** Sets all tracks that are not in the list a to be unavailable. This is used
  *  by the network manager upon receiving the list of available tracks from
  *  a client.

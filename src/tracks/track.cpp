@@ -124,6 +124,15 @@ Track::~Track()
 }   // ~Track
 
 //-----------------------------------------------------------------------------
+/** Removes all cached data structures. This is called before the resolution
+ *  is changed.
+ */
+void Track::removeCachedData()
+{
+    m_materials_loaded = false;
+}   // cleanCachedData
+
+//-----------------------------------------------------------------------------
 /** Prepates the track for a new race. This function must be called after all
  *  karts are created, since the check objects allocate data structures 
  *  depending on the number of karts.
