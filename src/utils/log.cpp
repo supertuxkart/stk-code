@@ -62,7 +62,6 @@ void Log::setTerminalColor(LogLevel level)
     case LL_FATAL:   color = TERM_RED       << 4 | TERM_WHITE;     break;
     }   // switch
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),color);
-#elif defined(__APPLE__)
 #else
     enum TermAttr
     {
@@ -97,7 +96,9 @@ void Log::setTerminalColor(LogLevel level)
 }   // setTerminalColor
 
 // ----------------------------------------------------------------------------
-/** Resets the terminal color to the default.
+/** Resets the terminal color to the default, and adds a new line (if a new
+ *  line is added as part of the message, a potential change of background
+ *  color will also affect the next row).
  */
 void Log::resetTerminalColor()
 {
@@ -111,8 +112,6 @@ void Log::resetTerminalColor()
 #ifdef WIN32
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 
                             /*TERM_BLACK*/0 << 4 | /*TERM_LIGHTGRAY*/7);
-    printf("\n");
-#elif defined(__APPLE__)
     printf("\n");
 #else
     printf("%c[0;;m\n", 0x1B);

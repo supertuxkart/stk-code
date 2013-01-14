@@ -108,12 +108,7 @@ namespace MemoryLeaks
      *  about those objects. */
     void checkForLeaks()
     {   
-        Log::verbose("LeackCheck", "checking for leaks... ");
         Log::debug("LeackCheck", "checking for leaks... ");
-        Log::info("LeackCheck", "checking for leaks... ");
-        Log::warn("LeackCheck", "checking for leaks... ");
-        Log::error("LeackCheck", "checking for leaks... ");
-        Log::fatal("LeackCheck", "checking for leaks... ");
         g_all_objects.lock();
         if (g_all_objects.getData().size()>0)
         {
