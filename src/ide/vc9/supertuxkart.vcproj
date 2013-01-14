@@ -641,6 +641,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\utils\log.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\profiler.cpp"
 					>
 				</File>
@@ -1497,10 +1501,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\tinygettext\log.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\tinygettext\plural_forms.cpp"
 					>
 				</File>
@@ -1510,6 +1510,10 @@
 				</File>
 				<File
 					RelativePath="..\..\tinygettext\stk_file_system.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\tgt_log.cpp"
 					>
 				</File>
 				<File
@@ -1776,6 +1780,10 @@
 				</File>
 				<File
 					RelativePath="..\..\utils\leak_check.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\log.hpp"
 					>
 				</File>
 				<File
@@ -2703,10 +2711,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\tinygettext\log.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\tinygettext\log_stream.hpp"
 					>
 				</File>
@@ -2720,6 +2724,10 @@
 				</File>
 				<File
 					RelativePath="..\..\tinygettext\stk_file_system.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\tgt_log.hpp"
 					>
 				</File>
 				<File

@@ -40,6 +40,7 @@
 
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 #include "utils/utf8.h"
 
 
@@ -186,13 +187,14 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             char c[1024];
             GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, 
                            c, 1024);
-            printf("[translate] GetLocaleInfo langname returns '%s'.\n", c);
+            Log::verbose("[translate] GetLocaleInfo langname returns '%s'.\n", 
+                         c);
             if(c[0])
             {
                 language = c;
                 GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO3166CTRYNAME, 
                                c, 1024);
-                printf("[translate] GetLocaleInfo tryname returns '%s'.\n", c);
+                Log::verbose("[translate] GetLocaleInfo tryname returns '%s'.\n", c);
                 if(c[0]) language += std::string("_")+c;
             }   // if c[0]
 #endif
@@ -202,7 +204,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         
     if (language != "")
     {
-        std::cout << "[translate] Env var LANGUAGE = '"<<language<<"'\n";
+        Log::verbose("[translate] Env var LANGUAGE = '%s'.\n",
+                     language.c_str());
 
         if (language.find(":") != std::string::npos)
         {
@@ -214,9 +217,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 l = Language::from_env(langs[curr]);
                 if (l)
                 {
-                    std::cout <<  "[translate] Env var LANGUAGE = '"
-                              << language << "', which corresponds to '"
-                              << l.get_name() << "'\n",
+                    Log::verbose("[translate] Language '%s'.\n",
+                                 l.get_name().c_str());
                     m_dictionary = m_dictionary_manager.get_dictionary(l);
                     break;
                 }
@@ -231,9 +233,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         }
         else
         {
-            std::cout << "[translate] Env var LANGUAGE = '" << language 
-                      << "', which corresponds to '" 
-                      << Language::from_env(language).get_name() << "'\n";
+            Log::verbose("[translate] Language '%s'.\n",
+                          Language::from_env(language).get_name().c_str());
             
             m_current_language_name = Language::from_env(language).get_name() ;
 

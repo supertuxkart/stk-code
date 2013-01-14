@@ -62,6 +62,7 @@
 #include "graphics/material_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
 
@@ -71,7 +72,7 @@
 
 bool macSetBundlePathIfRelevant(std::string& data_dir)
 {
-    printf("[FileManager] checking whether we are using an app bundle... ");
+    Log::debug("FileManager", "Checking whether we are using an app bundle... ");
     // the following code will enable STK to find its data when placed in an 
     // app bundle on mac OS X.
     // returns true if path is set, returns false if path was not set
@@ -89,14 +90,14 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
     std::string contents = std::string(path) + std::string("/Contents");
     if(contents.find(".app") != std::string::npos)
     {
-        printf("yes\n");
+        Log::debug("FileManager", "yes\n");
         // executable is inside an app bundle, use app bundle-relative paths
         data_dir = contents + std::string("/Resources/");
         return true;
     }
     else
     {
-        printf("no\n");
+        Log::debug("FileManager", "no\n");
         return false;
     }
 }
@@ -163,8 +164,8 @@ FileManager::FileManager(char *argv[])
 #endif
     // We can't use _() here, since translations will only be initalised
     // after the filemanager (to get the path to the tranlsations from it)
-    fprintf(stderr, "[FileManager] Data files will be fetched from: '%s'\n",
-            m_root_dir.c_str() );
+    Log::info("FileManager", "Data files will be fetched from: '%s'",
+              m_root_dir.c_str());
     checkAndCreateConfigDir();
     checkAndCreateAddonsDir();
 }  // FileManager
@@ -224,15 +225,15 @@ FileManager::~FileManager()
         if(StringUtils::getExtension(*i)!="zip" &&
            StringUtils::getExtension(*i)!="part"    ) 
         {
-            printf("[addons] Warning: unexpected tmp file '%s' found.\n",
-                   full_path.c_str());
+            Log::warn("FileManager", "Unexpected tmp file '%s' found.",
+                       full_path.c_str());
             continue;
         }
         if(isDirectory(full_path))
         {
             // Gee, a .zip file which is a directory - stay away from it
-            printf("[addons] '%s' is a directory and will not be deleted.\n",
-                    full_path.c_str());
+            Log::warn("FileManager", "'%s' is a directory and will not be deleted.",
+                      full_path.c_str());
             continue;
         }
         struct stat mystat;
@@ -241,13 +242,13 @@ FileManager::~FileManager()
         if(current - mystat.st_ctime <24*3600)
         {
             if(UserConfigParams::logAddons())
-                printf("[addons] '%s' is less than 24h old "
-                       "and will not be deleted.\n",
-                        full_path.c_str());
+                Log::verbose("FileManager", "'%s' is less than 24h old "
+                             "and will not be deleted.",
+                             full_path.c_str());
             continue;
         }
         if(UserConfigParams::logAddons())
-            printf("[addons] Deleting tmp file'%s'.\n",full_path.c_str());
+            Log::verbose("FileManager", "Deleting tmp file'%s'.",full_path.c_str());
         removeFile(full_path);
 
     }   // for i in all files in tmp
@@ -282,7 +283,7 @@ XMLNode *FileManager::createXMLTree(const std::string &filename)
     {
         if (UserConfigParams::logMisc())
         {
-            fprintf(stderr, "[FileManager::createXMLTree] %s\n", e.what());
+            Log::error("FileManager", "createXMLTree: %s\n", e.what());
         }
         return NULL;
     }
@@ -495,7 +496,7 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
     if(m_file_system->existFile(io::path(path.c_str())))
         return true;
 
-    std::cout << "[FileManager] Creating directory \"" << path << "\"\n";
+    Log::info("FileManager", "Creating directory '%s'.", path.c_str());
     
     // Otherwise try to create the directory:
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -532,7 +533,7 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
         {
             if (!checkAndCreateDirectory(current_path))
             {
-                fprintf(stderr, "[FileManager] Can't create dir '%s'",
+                Log::error("FileManager", "Can't create dir '%s'",
                         current_path.c_str());
                 break;
             }
@@ -557,7 +558,9 @@ void FileManager::checkAndCreateConfigDir()
     }
     else
     {
+
 #if defined(WIN32) || defined(__CYGWIN__)
+
         // Try to use the APPDATA directory to store config files and highscore
         // lists. If not defined, used the current directory.
         if(getenv("APPDATA")!=NULL)
@@ -576,7 +579,9 @@ void FileManager::checkAndCreateConfigDir()
 
         m_config_dir += "/";
         m_config_dir += CONFIGDIR;
+
 #elif defined(__APPLE__)
+
         if (getenv("HOME")!=NULL)
         {
             m_config_dir = getenv("HOME");
@@ -592,7 +597,9 @@ void FileManager::checkAndCreateConfigDir()
         m_config_dir += "/Library/Application Support/";
         const std::string CONFIGDIR("SuperTuxKart");
         m_config_dir += CONFIGDIR;
-#  else
+
+#else
+
         // Remaining unix variants. Use the new standards for config directory
         // i.e. either XDG_CONFIG_HOME or $HOME/.config
         if (getenv("XDG_CONFIG_HOME")!=NULL){
@@ -619,16 +626,19 @@ void FileManager::checkAndCreateConfigDir()
             }
         }
         m_config_dir += "/supertuxkart";
+
 #endif
+
     }   // if(getenv("SUPERTUXKART_SAVEDIR") && checkAndCreateDirectory(...))
 
 
     if(!checkAndCreateDirectory(m_config_dir))
     {
-        std::cerr << "[FileManager] Can not  create config dir '" 
-                  << m_config_dir << "', falling back to '.'.\n";
+        Log::warn("FileManager", "Can not  create config dir '%s', "
+                  "falling back to '.'.", m_config_dir.c_str());
         m_config_dir = ".";
     }
+    Log::info("FileManager", "User directory is '%s'.", m_config_dir.c_str());
     return;
 }   // checkAndCreateConfigDir
 
@@ -655,15 +665,15 @@ void FileManager::checkAndCreateAddonsDir()
         m_addons_dir = getenv("XDG_DATA_HOME");
         dir_ok = checkAndCreateDirectory(m_addons_dir);
         if(!dir_ok)
-            std::cerr << "[FileManager] Cannot create $XDG_DATA_HOME.\n";
+            Log::warn("FileManager", "Cannot create $XDG_DATA_HOME.");
 
         // Do an additional test here, e.g. in case that XDG_DATA_HOME is '/' 
         // and since dir_ok is set, it would not test any of the other options
         // like $HOME/.local/share
         dir_ok = checkAndCreateDirectory(m_addons_dir+"/supertuxkart");
         if(!dir_ok)
-            std::cerr 
-               << "[FileManager] Cannot create $XDG_DATA_HOME/supertuxkart.\n";
+            Log::warn("FileManager", "Cannot create "
+                      "$XDG_DATA_HOME/supertuxkart.");
     }
 
     if(!dir_ok && getenv("HOME"))
@@ -674,7 +684,7 @@ void FileManager::checkAndCreateAddonsDir()
         // This tests for ".local" and then for ".local/share"
         dir_ok = checkAndCreateDirectoryP(m_addons_dir);
         if(!dir_ok)
-            std::cerr << "[FileManager] Cannot create $HOME/.local/share.\n";
+            Log::warn("FileManager", "Cannot create $HOME/.local/share.");
     }
     if(!dir_ok && getenv("HOME"))
     {
@@ -683,12 +693,12 @@ void FileManager::checkAndCreateAddonsDir()
         m_addons_dir += "/.stkaddons";
         dir_ok = checkAndCreateDirectory(m_addons_dir);
         if(!dir_ok)
-            std::cerr << "[FileManager] Cannot create $HOME/.stkaddons.\n";
+            Log::warn("FileManager", "Cannot create $HOME/.stkaddons.");
     }
 
     if(!dir_ok)
     {
-        std::cerr << "[FileManager] Falling back to use '.'.";
+        Log::warn("FileManager", "Falling back to use '.'.");
         m_addons_dir = ".";
     }
 
@@ -697,8 +707,8 @@ void FileManager::checkAndCreateAddonsDir()
     if(!dir_ok)
     {
         // If the directory can not be created, abort
-        std::cerr << " [FileManager] Cannot create directory '"
-                  << m_addons_dir<<"', falling back to use '.'.\n";
+        Log::error("FileManager", "Cannot create directory '%s', "
+                   "falling back to use '.'.", m_addons_dir.c_str());
         m_addons_dir=".";
 
     }
@@ -708,25 +718,22 @@ void FileManager::checkAndCreateAddonsDir()
 
     if(!checkAndCreateDirectory(m_addons_dir))
     {
-        fprintf(stderr, 
-                "[FileManager] Can not create add-ons dir '%s', "
-                "falling back to '.'.\n", m_addons_dir.c_str());
+        Log::error("FileManager", "Can not create add-ons dir '%s', "
+                   "falling back to '.'.", m_addons_dir.c_str());
         m_addons_dir = ".";
     }
-    std::cout << "[FileManager] Addons files will be stored in '"
-              << m_addons_dir << "'.\n";
+    Log::info("FileManager", "Addons files will be stored in '%s'.",
+               m_addons_dir.c_str());
 
     if (!checkAndCreateDirectory(m_addons_dir + "/icons/"))
     {
-        fprintf(stderr, 
-                "[FileManager] Failed to create add-ons icon dir at '%s'\n",
-                (m_addons_dir + "/icons/").c_str());
+        Log::error("FileManager", "Failed to create add-ons icon dir at '%s'.",
+                   (m_addons_dir + "/icons/").c_str());
     }
     if (!checkAndCreateDirectory(m_addons_dir + "/tmp/"))
     {
-        fprintf(stderr, 
-                "[FileManager] Failed to create add-ons tmp dir at '%s'\n",
-                (m_addons_dir + "/tmp/").c_str());
+        Log::error("FileManager", "Failed to create add-ons tmp dir at '%s'.",
+                   (m_addons_dir + "/tmp/").c_str());
     }
 }   // checkAndCreateAddonsDir
 
@@ -861,7 +868,6 @@ void FileManager::listFiles(std::set<std::string>& result,
 #else
     std::string path = is_full_path ? dir + "/" : m_root_dir+"/"+dir + "/";
 #endif
-    //printf("******* Path : %s \n", path.c_str());
 
     if(!isDirectory(path)) return;
 
@@ -869,7 +875,7 @@ void FileManager::listFiles(std::set<std::string>& result,
 
     if(!m_file_system->changeWorkingDirectoryTo( path.c_str() ))
     {
-        printf("FileManager::listFiles : Could not change CWD!\n");
+        Log::error("FileManager", "listFiles : Could not change CWD!\n");
         return;
     }
     irr::io::IFileList* files = m_file_system->createFileList();
@@ -897,7 +903,7 @@ void FileManager::checkAndCreateDirForAddons(std::string addons_name,
     bool success = checkAndCreateDirectory(path);
     if(!success)
     {
-        std::cout << "There is a problem with the addons dir." << std::endl;
+        Log::warn("FileManager", "There is a problem with the addons dir.");
         return;
     }
     checkAndCreateDirectory(path+"/"+addons_name);
@@ -931,7 +937,8 @@ bool FileManager::removeDirectory(const std::string &name) const
     {
         if((*i)=="." || (*i)=="..") continue;
         if(UserConfigParams::logMisc())
-            printf("Deleting directory '%s'.\n", (*i).c_str());
+            Log::verbose("FileManager", "Deleting directory '%s'.", 
+                         (*i).c_str());
         std::string full_path=name+"/"+*i;
         if(isDirectory(full_path))
         {

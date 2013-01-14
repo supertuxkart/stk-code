@@ -27,6 +27,7 @@
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
 #include "karts/kart_properties.hpp"
+#include "utils/log.hpp"
 
 STKConfig* stk_config=0;
 float STKConfig::UNDEFINED = -99.9f;
@@ -79,9 +80,8 @@ void STKConfig::load(const std::string &filename)
 
     catch(std::exception& err)
     {
-        fprintf(stderr, "FATAL ERROR while reading StkConfig '%s':\n", filename.c_str());
-        fprintf(stderr, "    %s", err.what());
-        fprintf(stderr, "\n");
+        Log::error("StkConfig", "FATAL ERROR while reading '%s':", filename.c_str());
+        Log::fatal("StkConfig", "    %s", err.what());
         exit(1);
     }
     delete root;
@@ -89,25 +89,25 @@ void STKConfig::load(const std::string &filename)
     // Check that all necessary values are indeed set
     // -----------------------------------------------
 
-#define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                         \
-        fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
-                strA,filename.c_str());exit(-1);                       \
+#define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                   \
+        Log::fatal("StkConfig", "Missing default value for '%s' in '%s'.",    \
+                   strA,filename.c_str());exit(-1);              \
     }
 
     if(m_score_increase.size()==0 || (int)m_score_increase.size()!=m_max_karts)
     {
-        fprintf(stderr,"Not or not enough scores defined in stk_config");
+        Log::fatal("StkConfig", "Not or not enough scores defined in stk_config");
         exit(-1);
     }
     if(m_leader_intervals.size()==0)
     {
-        fprintf(stderr,"No follow leader interval(s) defined in stk_config");
+        Log::fatal("StkConfig", "No follow leader interval(s) defined in stk_config");
         exit(-1);
     }
     
     if(m_switch_items.size()!=Item::ITEM_LAST-Item::ITEM_FIRST+1)
     {
-        fprintf(stderr,"Wrong number of item switches defined in stk_config");
+        Log::fatal("StkConfig", "Wrong number of item switches defined in stk_config");
         exit(-1);
     }
 
@@ -225,8 +225,8 @@ void STKConfig::getAllData(const XMLNode * root)
             if(points<0 || from<0 || from>to||
                (int)m_score_increase.size()!=from-1)
             {
-                fprintf(stderr, "Incorrect GP point specification:\n");
-                fprintf(stderr, "from: %d  to: %d  points: %d\n", 
+                Log::error("StkConfig", "Incorrect GP point specification:");
+                Log::fatal("StkConfig", "from: %d  to: %d  points: %d", 
                         from, to, points);
                 exit(-1);
             }
@@ -272,8 +272,7 @@ void STKConfig::getAllData(const XMLNode * root)
         m_title_music = MusicInformation::create(file_manager->getDataDir()
                                                  + "/music/" + title_music  );
         if(!m_title_music)
-            fprintf(stderr, "Cannot load title music : %s\n", 
-                    title_music.c_str());
+            Log::error("StkConfig", "Cannot load title music : %s", title_music.c_str());
     }
 
     if(const XMLNode *history_node = root->getNode("history"))
@@ -328,7 +327,7 @@ void STKConfig::getAllData(const XMLNode * root)
             m_same_powerup_mode = POWERUP_MODE_ONLY_IF_SAME;
         else
         {
-            printf("Invalid item mode '%s' - ignored.\n",
+            Log::warn("StkConfig", "Invalid item mode '%s' - ignored.",
                     s.c_str());
         }
     }

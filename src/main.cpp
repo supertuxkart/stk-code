@@ -183,6 +183,7 @@
 #include "tutorial/tutorial_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/leak_check.hpp"
+#include "utils/log.hpp"
 #include "utils/translation.hpp"
 
 // ============================================================================
@@ -431,6 +432,7 @@ void cmdLineHelp (char* invocation)
  */
 int handleCmdLinePreliminary(int argc, char **argv)
 {
+    int n;
     for(int i=1; i<argc; i++)
     {
         if(argv[i][0] != '-') continue;
@@ -476,7 +478,15 @@ int handleCmdLinePreliminary(int argc, char **argv)
         {
             UserConfigParams::m_log_errors=true;
         } 
-
+        else if( !strcmp(argv[i], "--log=nocolor"))
+        {
+            Log::disableColor();
+            printf("Colours disabled.\n");
+        } 
+        else if(sscanf(argv[i], "--log=%d",&n)==1)
+        {
+            Log::setLogLevel(n);
+        }
         else if ( !strcmp(argv[i], "--debug=all") )
         {
             UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
@@ -1013,7 +1023,9 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--debug=misc"   )                       ) {}
         else if( !strcmp(argv[i], "--debug=all"    )                       ) {}
         else if( !strcmp(argv[i], "--log=terminal" )                       ) {}
+        else if( !strcmp(argv[i], "--log=nocolor"  )                       ) {}
         else if( !strcmp(argv[i], "--log=file"     )                       ) {}
+        else if(  sscanf(argv[i], "--log=%d",&n    )==1                    ) {}
         else if( !strcmp(argv[i], "--screensize") || 
                  !strcmp(argv[i], "-s")            )                     {i++;}
         else if( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}

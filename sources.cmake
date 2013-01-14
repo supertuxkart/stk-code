@@ -204,10 +204,10 @@ src/tinygettext/dictionary.cpp
 src/tinygettext/dictionary_manager.cpp
 src/tinygettext/iconv.cpp
 src/tinygettext/language.cpp
-src/tinygettext/log.cpp
 src/tinygettext/plural_forms.cpp
 src/tinygettext/po_parser.cpp
 src/tinygettext/stk_file_system.cpp
+src/tinygettext/tgt_log.cpp
 src/tinygettext/tinygettext.cpp
 src/tracks/ambient_light_sphere.cpp
 src/tracks/bezier_curve.cpp
@@ -233,6 +233,7 @@ src/tutorial/tutorial_data.cpp
 src/tutorial/tutorial_manager.cpp
 src/utils/constants.cpp
 src/utils/leak_check.cpp
+src/utils/log.cpp
 src/utils/profiler.cpp
 src/utils/random_generator.cpp
 src/utils/string_utils.cpp
@@ -464,11 +465,11 @@ src/tinygettext/dictionary_manager.hpp
 src/tinygettext/file_system.hpp
 src/tinygettext/iconv.hpp
 src/tinygettext/language.hpp
-src/tinygettext/log.hpp
 src/tinygettext/log_stream.hpp
 src/tinygettext/plural_forms.hpp
 src/tinygettext/po_parser.hpp
 src/tinygettext/stk_file_system.hpp
+src/tinygettext/tgt_log.hpp
 src/tinygettext/tinygettext.hpp
 src/tracks/ambient_light_sphere.hpp
 src/tracks/bezier_curve.hpp
@@ -496,6 +497,7 @@ src/utils/aligned_array.hpp
 src/utils/constants.hpp
 src/utils/interpolation_array.hpp
 src/utils/leak_check.hpp
+src/utils/log.hpp
 src/utils/no_copy.hpp
 src/utils/profiler.hpp
 src/utils/ptr_vector.hpp

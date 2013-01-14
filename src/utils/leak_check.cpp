@@ -18,6 +18,7 @@
 
 #include "utils/leak_check.hpp"
 
+#include "utils/log.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -107,19 +108,25 @@ namespace MemoryLeaks
      *  about those objects. */
     void checkForLeaks()
     {   
-        std::cout << "checking for leaks... " << std::endl;
+        Log::verbose("LeackCheck", "checking for leaks... ");
+        Log::debug("LeackCheck", "checking for leaks... ");
+        Log::info("LeackCheck", "checking for leaks... ");
+        Log::warn("LeackCheck", "checking for leaks... ");
+        Log::error("LeackCheck", "checking for leaks... ");
+        Log::fatal("LeackCheck", "checking for leaks... ");
         g_all_objects.lock();
         if (g_all_objects.getData().size()>0)
         {
-            std::cout << "leaks detected!!" << std::endl;
-            std::cout << "\n\n* * * * WARNING * * * * WARNING * * * * "
-                         "MEMORY LEAK! * * * *\n" << std::endl;
-            std::cout << "LEAK CHECK: " << g_all_objects.getData().size() 
-                      << " watched objects leaking" << std::endl;
+            Log::error("LeackCheck", "leaks detected!!");
+            Log::error("LeackCheck", "\n\n* * * * WARNING * * * * WARNING * * * * "
+                       "MEMORY LEAK! * * * *");
+            Log::error("LeackCheck", "%d watched objects leaking.",
+                       g_all_objects.getData().size());
+
         }
         else
         {
-            std::cout << "ok (no watched class left leaking)" << std::endl;
+            Log::debug("LeackCheck", "ok (no watched class left leaking)");
         }
         
         std::set<AllocatedObject*>::iterator it;

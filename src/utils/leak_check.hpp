@@ -22,6 +22,8 @@
 
 #ifdef DEBUG
 
+#include "utils/log.hpp"
+
 #include <stdio.h>
 
 namespace MemoryLeaks
@@ -53,7 +55,7 @@ class LeakCheck : public MemoryLeaks::AllocatedObject\
 {  public:\
 virtual void print() const\
 { \
-printf("Undeleted object at %s : %i\n",  __FILE__, __LINE__);\
+    Log::error("LeakCheck", "Undeleted object at %s : %i\n",  __FILE__, __LINE__); \
 } \
 virtual ~LeakCheck() {} \
 }; \
