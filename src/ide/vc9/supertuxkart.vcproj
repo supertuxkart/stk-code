@@ -733,7 +733,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\modes\tutorial_race.cpp"
+					RelativePath="..\..\modes\tutorial_world.cpp"
 					>
 				</File>
 				<File
@@ -1368,10 +1368,6 @@
 					RelativePath="..\..\states_screens\tracks_screen.cpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\states_screens\tutorial_screen.cpp"
-					>
-				</File>
 				<Filter
 					Name="dialogs"
 					>
@@ -1462,22 +1458,6 @@
 				</File>
 				<File
 					RelativePath="..\..\addons\zip.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="tutorial"
-				>
-				<File
-					RelativePath="..\..\tutorial\tutorial.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\tutorial\tutorial_data.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\tutorial\tutorial_manager.cpp"
 					>
 				</File>
 			</Filter>
@@ -1927,7 +1907,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\modes\tutorial_race.hpp"
+					RelativePath="..\..\modes\tutorial_world.hpp"
 					>
 				</File>
 				<File
@@ -2570,10 +2550,6 @@
 					RelativePath="..\..\states_screens\tracks_screen.hpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\states_screens\tutorial_screen.hpp"
-					>
-				</File>
 				<Filter
 					Name="dialogs"
 					>
@@ -2668,22 +2644,6 @@
 				</File>
 				<File
 					RelativePath="..\..\addons\zip.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="tutorial"
-				>
-				<File
-					RelativePath="..\..\tutorial\tutorial.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\tutorial\tutorial_data.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\tutorial\tutorial_manager.hpp"
 					>
 				</File>
 			</Filter>
