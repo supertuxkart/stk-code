@@ -27,6 +27,7 @@
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
 /** A simple factory to create music information files without raising
@@ -44,8 +45,9 @@ MusicInformation *MusicInformation::create(const std::string &filename)
     if (!root) return NULL;
     if(root->getName()!="music")
     {
-        fprintf(stderr, "Music file '%s' does not contain music node.\n",
-                filename.c_str());
+        Log::error("MusicInformation", 
+                   "Music file '%s' does not contain music node.\n",
+                   filename.c_str());
         delete root;
         return NULL;
     }
@@ -55,9 +57,10 @@ MusicInformation *MusicInformation::create(const std::string &filename)
        !root->get("file",     &s)    )
 
     {
-        fprintf(stderr, "One of 'title', 'composer' or 'file' attribute "
-                        "is missing in the music XML file '%s'!\n",
-                filename.c_str());
+        Log::error("MusicInformation", 
+                    "One of 'title', 'composer' or 'file' attribute "
+                    "is missing in the music XML file '%s'!\n",
+                    filename.c_str());
         delete root;
         return NULL;
     }
@@ -145,8 +148,8 @@ void MusicInformation::startMusic()
     // -----------------------------
     if (StringUtils::getExtension(m_normal_filename) != "ogg")
     {
-        fprintf(stderr, "WARNING: music file %s is not found or file format is not recognized.\n", 
-                m_normal_filename.c_str());
+        Log::warn("MusicInformation", "Music file %s is not found or file "
+                  "format is not recognized.\n", m_normal_filename.c_str());
         return;
     }
     
@@ -162,8 +165,9 @@ void MusicInformation::startMusic()
     {
         delete m_normal_music;
         m_normal_music = NULL;
-        fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", 
-                m_normal_filename.c_str());
+        Log::warn("MusicInformation", "Unable to load music %s, "
+                  "not supported or not found.\n", 
+                  m_normal_filename.c_str());
         return;
     }
     m_normal_music->volumeMusic(m_adjusted_gain);
@@ -180,8 +184,8 @@ void MusicInformation::startMusic()
 
     if(StringUtils::getExtension(m_fast_filename)!="ogg")
     {
-        fprintf(stderr, 
-                "WARNING: music file %s format not recognized, fast music is ignored\n", 
+        Log::warn( 
+                "Music file %s format not recognized, fast music is ignored\n",
                 m_fast_filename.c_str());
         return;
     }
@@ -196,8 +200,8 @@ void MusicInformation::startMusic()
     {
         delete m_fast_music;
         m_fast_music=0;
-        fprintf(stderr, "WARNING: Unabled to load fast music %s, not supported or not found.\n", 
-                m_fast_filename.c_str());
+        Log::warn("MusicInformation", "Unabled to load fast music %s, not "
+                  "supported or not found.\n", m_fast_filename.c_str());
         return;
     }
     m_fast_music->volumeMusic(m_adjusted_gain);
@@ -287,9 +291,7 @@ void MusicInformation::resumeMusic()
 
 //-----------------------------------------------------------------------------
 void MusicInformation::volumeMusic(float gain)
-{
-    // printf("Setting master volume %f\n", gain);
-    
+{    
     m_adjusted_gain = m_gain * gain;
     if (m_normal_music != NULL) m_normal_music->volumeMusic(m_adjusted_gain);
     if (m_fast_music   != NULL) m_fast_music->volumeMusic(m_adjusted_gain);
