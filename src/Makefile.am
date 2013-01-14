@@ -275,8 +275,8 @@ supertuxkart_SOURCES = \
  modes/standard_race.hpp \
  modes/three_strikes_battle.cpp \
  modes/three_strikes_battle.hpp \
- modes/tutorial_race.cpp \
- modes/tutorial_race.hpp \
+ modes/tutorial_world.cpp \
+ modes/tutorial_world.hpp \
  modes/world.cpp \
  modes/world.hpp \
  modes/world_status.cpp \
@@ -431,8 +431,6 @@ supertuxkart_SOURCES = \
  states_screens/story_mode_lobby.hpp \
  states_screens/tracks_screen.cpp \
  states_screens/tracks_screen.hpp \
- states_screens/tutorial_screen.cpp \
- states_screens/tutorial_screen.hpp \
  tinygettext/dictionary.cpp \
  tinygettext/dictionary.hpp \
  tinygettext/dictionary_manager.cpp \
@@ -442,8 +440,6 @@ supertuxkart_SOURCES = \
  tinygettext/iconv.hpp \
  tinygettext/language.cpp \
  tinygettext/language.hpp \
- tinygettext/log.cpp \
- tinygettext/log.hpp \
  tinygettext/log_stream.hpp \
  tinygettext/plural_forms.cpp \
  tinygettext/plural_forms.hpp \
@@ -451,6 +447,8 @@ supertuxkart_SOURCES = \
  tinygettext/po_parser.hpp \
  tinygettext/stk_file_system.cpp \
  tinygettext/stk_file_system.hpp \
+ tinygettext/tgt_log.cpp \
+ tinygettext/tgt_log.hpp \
  tinygettext/tinygettext.cpp \
  tinygettext/tinygettext.hpp \
  tracks/ambient_light_sphere.cpp \
@@ -491,17 +489,13 @@ supertuxkart_SOURCES = \
  tracks/track_object_manager.hpp \
  tracks/track_sector.cpp \
  tracks/track_sector.hpp \
- tutorial/tutorial.cpp \
- tutorial/tutorial.hpp \
- tutorial/tutorial_data.cpp \
- tutorial/tutorial_data.hpp \
- tutorial/tutorial_manager.hpp \
- tutorial/tutorial_manager.cpp \
  utils/aligned_array.hpp \
  utils/constants.hpp \
  utils/constants.cpp \
  utils/leak_check.cpp \
  utils/leak_check.hpp \
+ utils/log.cpp \
+ utils/log.hpp \
  utils/no_copy.hpp \
  utils/profiler.cpp \
  utils/profiler.hpp \
