@@ -228,9 +228,6 @@ src/tracks/track_manager.cpp
 src/tracks/track_object.cpp
 src/tracks/track_object_manager.cpp
 src/tracks/track_sector.cpp
-src/tutorial/tutorial.cpp
-src/tutorial/tutorial_data.cpp
-src/tutorial/tutorial_manager.cpp
 src/utils/constants.cpp
 src/utils/leak_check.cpp
 src/utils/log.cpp
@@ -490,9 +487,6 @@ src/tracks/track_manager.hpp
 src/tracks/track_object.hpp
 src/tracks/track_object_manager.hpp
 src/tracks/track_sector.hpp
-src/tutorial/tutorial_data.hpp
-src/tutorial/tutorial.hpp
-src/tutorial/tutorial_manager.hpp
 src/utils/aligned_array.hpp
 src/utils/constants.hpp
 src/utils/interpolation_array.hpp

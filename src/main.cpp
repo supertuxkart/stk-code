@@ -180,7 +180,6 @@
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
-#include "tutorial/tutorial_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
@@ -298,8 +297,8 @@ void gamepadVisualisation()
             
             for (int b=0; b<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; b++)
             {
-                position2di pos(btn_x + b*BTN_SIZE, btn_y);
-                dimension2di size(BTN_SIZE, BTN_SIZE);
+                core::position2di pos(btn_x + b*BTN_SIZE, btn_y);
+                core::dimension2di size(BTN_SIZE, BTN_SIZE);
                 
                 if (g.m_button_state[b])
                 {
@@ -320,15 +319,15 @@ void gamepadVisualisation()
             {
                 const float rate = g.m_axis[a] / 32767.0f;
                 
-                position2di pos(axis_x, axis_y + a*axis_h);
-                dimension2di size(axis_w, axis_h);
+                core::position2di pos(axis_x, axis_y + a*axis_h);
+                core::dimension2di size(axis_w, axis_h);
                 
                 const bool deadzone = (abs(g.m_axis[a]) < DEADZONE_JOYSTICK);
                 
-                core::recti fillbar(position2di(axis_x + axis_w/2, 
-                                                axis_y + a*axis_h),
-                                    dimension2di( (int)(axis_w/2*rate), 
-                                                  axis_h)               );
+                core::recti fillbar(core::position2di(axis_x + axis_w/2, 
+                                                      axis_y + a*axis_h),
+                                    core::dimension2di( (int)(axis_w/2*rate), 
+                                                        axis_h)               );
                 fillbar.repair(); // dimension may be negative
                 driver->draw2DRectangle (deadzone ? video::SColor(255,255,0,0)
                                                   : video::SColor(255,0,255,0),
