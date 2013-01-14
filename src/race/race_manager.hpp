@@ -108,6 +108,7 @@ public:
         MINOR_MODE_TIME_TRIAL    = LINEAR_RACE(1, true),
         MINOR_MODE_FOLLOW_LEADER = LINEAR_RACE(2, false),
         MINOR_MODE_OVERWORLD     = LINEAR_RACE(3, false),
+        MINOR_MODE_TUTORIAL      = LINEAR_RACE(4, false),
         
         MINOR_MODE_3_STRIKES     = BATTLE_ARENA(0),
         MINOR_MODE_CUTSCENE      = BATTLE_ARENA(1),
@@ -575,6 +576,13 @@ public:
         if (id >= 2000) return true;
         else            return false;
     }   // isBattleMode
+    
+    // ------------------------------------------------------------------------
+    
+    bool isTutorialMode()
+    {
+        return m_minor_mode == MINOR_MODE_TUTORIAL;
+    }
     
     // ------------------------------------------------------------------------
     /** \brief Returns true if the current mode has laps. */

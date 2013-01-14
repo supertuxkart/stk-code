@@ -44,7 +44,6 @@
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/tutorial_screen.hpp"
 
 #if DEBUG_MENU_ITEM
 #include "states_screens/feature_unlocked.hpp"
@@ -125,6 +124,12 @@ void MainMenuScreen::init()
     r = getWidget<RibbonWidget>("menu_toprow");
     r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     DemoWorld::resetIdleTime();
+    
+#if _IRR_MATERIAL_MAX_TEXTURES_ < 8
+    getWidget<IconButtonWidget>("logo")->setImage("gui/logo_broken.png",
+        IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
+#endif
+
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -177,7 +182,6 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     // ---- A ribbon icon was clicked
     std::string selection = 
         ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-    
     
     /*
     if (selection == "story")
@@ -296,6 +300,40 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     {
         StateManager::get()->pushScreen(HelpScreen1::getInstance());
     }
+    else if (selection == "startTutorial")
+    {    
+        race_manager->setNumLocalPlayers(1);
+        race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
+        race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
+        race_manager->setNumKarts( 1 );
+        race_manager->setTrack( "tutorial" );
+        race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
+        
+        // Use keyboard 0 by default (FIXME: let player choose?)
+        InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+
+        // Create player and associate player with keyboard
+        StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+                                                device);
+        
+        if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+        {
+            fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', will revert to default\n",
+                    UserConfigParams::m_default_kart.c_str());
+            UserConfigParams::m_default_kart.revertToDefaults();
+        }
+        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+        
+        // ASSIGN should make sure that only input from assigned devices
+        // is read.
+        input_manager->getDeviceList()->setAssignMode(ASSIGN);
+        input_manager->getDeviceList()
+            ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
+        
+        StateManager::get()->enterGameState();
+        network_manager->setupPlayerKartInfo();
+        race_manager->startNew(false);
+    }
     else if (selection == "story")
     {
         GameSlot* slot = unlock_manager->getCurrentSlot();
@@ -319,10 +357,6 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         {
             OverWorld::enterOverWorld();
         }
-    }
-    else if (selection == "tutorial")
-    {
-        StateManager::get()->pushScreen(TutorialScreen::getInstance());
     }
     else if (selection == "addons")
     {

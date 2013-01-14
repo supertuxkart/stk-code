@@ -467,6 +467,76 @@ void TrackObject::onTriggerItemApproached(Item* who)
             new RacePausedDialog(0.8f, 0.6f);
             //dynamic_cast<OverWorld*>(World::getWorld())->scheduleSelectKart();
         }
+        else if (m_action == "tutorial_drive")
+        {
+            World::getWorld()->getRaceGUI()->clearAllMessages();
+            World::getWorld()->getRaceGUI()->addMessage(_("Drive with the arrow keys"), NULL, 5.0f,
+                                                        video::SColor(255, 255,255,255),
+                                                        false, true);
+        }
+        else if (m_action == "tutorial_bananas")
+        {
+            World::getWorld()->getRaceGUI()->clearAllMessages();
+            World::getWorld()->getRaceGUI()->addMessage(_("Avoid bananas!"), NULL, 5.0f,
+                                                        video::SColor(255, 255,255,255),
+                                                        false, true);
+        }
+        else if (m_action == "tutorial_giftboxes")
+        {
+            World::getWorld()->getRaceGUI()->clearAllMessages();
+            core::stringw  msg = _("Collect gift boxes, and fire the weapon with <spacebar> to blow away these boxes!");
+            std::vector<core::stringw> parts = StringUtils::split(msg, '\n', false);
+            
+            for (unsigned int i = 0; i < parts.size(); i++)
+            {
+                World::getWorld()->getRaceGUI()->addMessage(parts[i], NULL, 7.0f,
+                                                            video::SColor(255, 255,255,255),
+                                                            false, false);
+            }
+        }
+        else if (m_action == "tutorial_nitro_collect")
+        {
+            World::getWorld()->getRaceGUI()->clearAllMessages();
+            World::getWorld()->getRaceGUI()->addMessage(_("Collect nitro bottles (we will use them after the curve)"), NULL, 5.0f,
+                                                        video::SColor(255, 255,255,255),
+                                                        false, false);
+        }
+        else if (m_action == "tutorial_nitro_use")
+        {
+            World::getWorld()->getRaceGUI()->clearAllMessages();
+            World::getWorld()->getRaceGUI()->addMessage(_("Use the nitro you collected by pressing the <N> key!"), NULL, 5.0f,
+                                                        video::SColor(255, 255,255,255),
+                                                        false, false);
+        }
+        else if (m_action == "tutorial_rescue")
+        {
+            World::getWorld()->getRaceGUI()->clearAllMessages();
+            World::getWorld()->getRaceGUI()->addMessage(_("Oops! When you're in trouble, press <backspace> to be rescued"), NULL, 5.0f,
+                                                        video::SColor(255, 255,255,255),
+                                                        false, false);
+        }
+        else if (m_action == "tutorial_skidding")
+        {
+            World::getWorld()->getRaceGUI()->clearAllMessages();
+
+            World::getWorld()->getRaceGUI()->addMessage(_("Skidding for a short while can help you turn faster to take sharp turns"), NULL, 10.0f,
+                                                        video::SColor(255, 255,255,255),
+                                                        false, false);
+            World::getWorld()->getRaceGUI()->addMessage(_("Accelerate and press the <V> key while turning to skid."), NULL, 10.0f,
+                                                        video::SColor(255, 255,255,255),
+                                                        false, false);
+        }
+        else if (m_action == "tutorial_skidding2")
+        {
+            World::getWorld()->getRaceGUI()->clearAllMessages();
+
+            World::getWorld()->getRaceGUI()->addMessage(_("you will receive a bonus speedup as a reward!"), NULL, 10.0f,
+                                                        video::SColor(255, 255,255,255),
+                                                        false, false);
+            World::getWorld()->getRaceGUI()->addMessage(_("If you manage to skid for several seconds,"), NULL, 10.0f,
+                                                        video::SColor(255, 255,255,255),
+                                                        false, false);
+        }
         else
         {
             fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",

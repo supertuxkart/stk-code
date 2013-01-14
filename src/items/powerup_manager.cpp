@@ -136,6 +136,7 @@ void PowerupManager::loadAllPowerups()
     loadWeights(*root, "end33",   POSITION_END33      );
     loadWeights(*root, "last" ,   POSITION_LAST       );
     loadWeights(*root, "battle" , POSITION_BATTLE_MODE);
+    loadWeights(*root, "tuto",    POSITION_TUTORIAL_MODE);
     
     delete root;
     
@@ -320,6 +321,7 @@ PowerupManager::PositionClass
                                                      unsigned int position)
 {
     if(race_manager->isBattleMode()) return POSITION_BATTLE_MODE;
+    if(race_manager->isTutorialMode()) return POSITION_TUTORIAL_MODE;
     if(position==1)         return POSITION_FIRST;
     if(position==num_karts) return POSITION_LAST;
 
@@ -350,8 +352,9 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
 {
     // Positions start with 1, while the index starts with 0 - so subtract 1
     PositionClass pos_class = 
-        race_manager->isBattleMode() ? POSITION_BATTLE_MODE 
-                                     : m_position_to_class[pos-1];
+        (race_manager->isBattleMode() ? POSITION_BATTLE_MODE :
+         (race_manager->isTutorialMode() ? POSITION_TUTORIAL_MODE :
+                                     m_position_to_class[pos-1]));
 
     int random = rand()%m_powerups_for_position[pos_class].size();
     int i=m_powerups_for_position[pos_class][random];

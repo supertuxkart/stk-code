@@ -37,6 +37,7 @@
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/standard_race.hpp"
+#include "modes/tutorial_world.hpp"
 #include "modes/world.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "network/network_manager.hpp"
@@ -389,6 +390,8 @@ void RaceManager::startNextRace()
     else if(m_minor_mode==MINOR_MODE_NORMAL_RACE || 
             m_minor_mode==MINOR_MODE_TIME_TRIAL)
         World::setWorld(new StandardRace());
+    else if(m_minor_mode==MINOR_MODE_TUTORIAL)
+        World::setWorld(new TutorialWorld());
     else if(m_minor_mode==MINOR_MODE_3_STRIKES)     
         World::setWorld(new ThreeStrikesBattle());
     else if(m_minor_mode==MINOR_MODE_OVERWORLD)     
