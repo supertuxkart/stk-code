@@ -24,25 +24,75 @@
 #include <pthread.h>
 #include "IEventReceiver.h"
 
-extern const int    MAX_WIIMOTES;
 extern const int    WIIMOTE_AXES;
 extern const int    WIIMOTE_BUTTONS;
 
-struct wiimote_t;
+#define MAX_WIIMOTES  4
 
+struct wiimote_t;
+class GamePadDevice;
+class GamepadConfig;
+
+/** Wiimote device class */
+class Wiimote
+{
+private:
+    /** Handle to the corresponding WiiUse wiimote handle */
+    wiimote_t*      m_wiimote_handle;
+    
+    /** Index of this element the arrays of wiimotes */
+    int             m_wiimote_id;
+    
+    /** Corresponding gamepad managed by the DeviceManager */
+    GamePadDevice*  m_gamepad_device;
+    
+    /** Corresponding Irrlicht gamepad event */
+    irr::SEvent     m_irr_event;
+    
+    /** Event used for reading and writing the Irrlicht events */
+    pthread_mutex_t m_event_mutex;
+    
+    /** Whether the wiimote received a "disconnected" event */
+    bool            m_connected;
+    
+public:
+    Wiimote();
+    ~Wiimote();
+    
+    /** Resets internal state and creates the corresponding gamepad device */
+    void        init(wiimote_t* wiimote_handle, int wiimote_id, GamepadConfig* gamepad_config);
+    
+    /** To be called when the wiimote becomes unused */
+    void        cleanup();
+    
+    /** Called from the update thread: updates the Irrlicht event from the wiimote state */
+    void        updateIrrEvent();
+    
+    /** Thread-safe reading of the last updated event */
+    irr::SEvent getIrrEvent();
+    
+    wiimote_t*  getWiimoteHandle() const        {return m_wiimote_handle;}
+    
+    bool        isConnected() const             {return m_connected;}
+    void        setConnected(bool connected)    {m_connected=connected;}
+};
+
+/** Wiimote manager: handles wiimote connection, disconnection,
+ *  gamepad configuration and input handling
+ */
 class WiimoteManager
 {
 private:
-    wiimote_t**     m_wiimotes;
+    Wiimote         m_wiimotes[MAX_WIIMOTES];
+    
+    /** WiiUse wiimote handles */
+    wiimote_t**     m_all_wiimote_handles;
     int             m_nb_wiimotes;
     
-    int             m_initial_nb_gamepads;  // Wiimotes are attributed the IDs following
-                                            // the "normal" gamepads - that's a bit of a hack...
-    
+    /** Wiimote state update thread */
     pthread_t       m_thread;
-    pthread_mutex_t m_mutex;
-    int             m_write_id;
-    irr::SEvent     m_irr_events[2];
+    
+    /** Shut the update thread? */
     bool            m_shut;
 
 public:
@@ -56,10 +106,7 @@ public:
     int  getNbWiimotes() const   {return m_nb_wiimotes;}
     
 private:
-    void translateEvent(wiimote_t* wm, int gamepad_id, irr::SEvent* event);
-    int  getGamepadId(int wiimote_id) const {return wiimote_id + m_initial_nb_gamepads;}
-    void resetEvent(irr::SEvent* event, int gamepad_id);
-    
+    /** Wiimotes update thread */
     void threadFunc();
     static void* threadFuncWrapper(void* data);
 };

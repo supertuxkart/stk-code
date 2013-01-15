@@ -27,21 +27,208 @@
 
 WiimoteManager*  wiimote_manager;
 
-const int    MAX_WIIMOTES = 2;
-const int    WIIMOTE_AXES = 2;
-const int    WIIMOTE_BUTTONS = 13;
+const int    WIIMOTE_AXES        = 1;  // only use one axis, for turning
+const int    WIIMOTE_BUTTONS     = 12;  // A, B, left, right, top, bottom, 1, 2, (+), (-), home
+
+/** Irrlicht device IDs for the wiimotes start at this value */
+static const int    WIIMOTE_START_IRR_ID = 32;
+
+// ============================ Helper functions ============================
+// -----------------------------------------------------------------------------
+static int wiimoteIdToIrrId(int wiimote_id)
+{
+    return wiimote_id + WIIMOTE_START_IRR_ID;
+}
 
 // -----------------------------------------------------------------------------
+static void resetIrrEvent(irr::SEvent* event, int irr_id)
+{
+    event->EventType = irr::EET_JOYSTICK_INPUT_EVENT;
+    for(int i=0 ; i < SEvent::SJoystickEvent::NUMBER_OF_AXES ; i++)
+        event->JoystickEvent.Axis[i] = 0;
+    event->JoystickEvent.Joystick = irr_id;
+    event->JoystickEvent.POV = 65535;
+    event->JoystickEvent.ButtonStates = 0;
+}
+
+// -----------------------------------------------------------------------------
+static void setWiimoteBindings(GamepadConfig* gamepad_config)
+{
+    // TODO!!
+    gamepad_config->setBinding(PA_STEER_LEFT,   Input::IT_STICKMOTION, 0, Input::AD_NEGATIVE);
+    gamepad_config->setBinding(PA_STEER_RIGHT,  Input::IT_STICKMOTION, 0, Input::AD_POSITIVE);
+    gamepad_config->setBinding(PA_ACCEL,        Input::IT_STICKMOTION, 1, Input::AD_NEGATIVE);
+    gamepad_config->setBinding(PA_BRAKE,        Input::IT_STICKMOTION, 1, Input::AD_POSITIVE);
+    gamepad_config->setBinding(PA_FIRE,         Input::IT_STICKBUTTON, 0);
+    gamepad_config->setBinding(PA_NITRO,        Input::IT_STICKBUTTON, 1);
+    gamepad_config->setBinding(PA_DRIFT,        Input::IT_STICKBUTTON, 2);
+    gamepad_config->setBinding(PA_RESCUE,       Input::IT_STICKBUTTON, 3);
+    gamepad_config->setBinding(PA_LOOK_BACK,    Input::IT_STICKBUTTON, 4);
+    gamepad_config->setBinding(PA_PAUSE_RACE,   Input::IT_STICKBUTTON, 5);
+
+    gamepad_config->setBinding(PA_MENU_UP,      Input::IT_STICKMOTION, 1, Input::AD_NEGATIVE);
+    gamepad_config->setBinding(PA_MENU_DOWN,    Input::IT_STICKMOTION, 1, Input::AD_POSITIVE);
+    gamepad_config->setBinding(PA_MENU_LEFT,    Input::IT_STICKMOTION, 0, Input::AD_NEGATIVE);
+    gamepad_config->setBinding(PA_MENU_RIGHT,   Input::IT_STICKMOTION, 0, Input::AD_POSITIVE);
+    gamepad_config->setBinding(PA_MENU_SELECT,  Input::IT_STICKBUTTON, 0);
+    gamepad_config->setBinding(PA_MENU_CANCEL,  Input::IT_STICKBUTTON, 3);
+}
+
+// ============================ Wiimote device implementation ============================
+Wiimote::Wiimote()
+{
+    m_wiimote_handle = NULL;
+    m_wiimote_id = -1;
+    m_gamepad_device = NULL;
+    resetIrrEvent(&m_irr_event, 0);
+    m_connected = false;
+    
+    pthread_mutex_init(&m_event_mutex, NULL);
+}
+
+Wiimote::~Wiimote()
+{
+    pthread_mutex_destroy(&m_event_mutex);
+}
+
+// -----------------------------------------------------------------------------
+/** Resets internal state and creates the corresponding gamepad device */
+void Wiimote::init(wiimote_t* wiimote_handle, int wiimote_id, GamepadConfig* gamepad_config)
+{
+    m_wiimote_handle    = wiimote_handle;
+    m_wiimote_id        = wiimote_id;
+    int irr_id = wiimoteIdToIrrId(wiimote_id);
+    resetIrrEvent(&m_irr_event, irr_id);
+    
+    m_connected = true;
+    
+    // Create the corresponding gamepad device
+    
+    core::stringc gamepad_name = core::stringc("Wiimote ") + StringUtils::toString(wiimote_id).c_str();
+
+    DeviceManager* device_manager = input_manager->getDeviceList();
+    gamepad_config->setPlugged();
+    m_gamepad_device = new GamePadDevice(irr_id,
+                                         gamepad_name.c_str(),
+                                         WIIMOTE_AXES,
+                                         WIIMOTE_BUTTONS,
+                                         gamepad_config );
+    device_manager->addGamepad(m_gamepad_device);
+}
+
+// -----------------------------------------------------------------------------
+/** Called from the update thread: updates the Irrlicht event from the wiimote state */
+void Wiimote::updateIrrEvent()
+{
+    pthread_mutex_lock(&m_event_mutex);
+    
+    // Simulate an Irrlicht joystick event
+    resetIrrEvent(&m_irr_event, wiimoteIdToIrrId(m_wiimote_id));
+    
+    // --------------------- Wiimote --------------------
+    // Send button states
+    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_LEFT))
+    {
+        printf("DEBUG: Left\n");
+        m_irr_event.JoystickEvent.ButtonStates |= (1<<1);
+    }
+    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_RIGHT))
+    {
+        printf("DEBUG: Right\n");
+        m_irr_event.JoystickEvent.ButtonStates |= (1<<2);
+    }
+    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_UP))
+    {
+        printf("DEBUG: Up\n");
+        m_irr_event.JoystickEvent.ButtonStates |= (1<<3);
+    }
+    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_DOWN))
+    {
+        printf("DEBUG: Down\n");
+        m_irr_event.JoystickEvent.ButtonStates |= (1<<4);
+    }
+    
+    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_A))
+    {
+        printf("DEBUG: A\n");
+        m_irr_event.JoystickEvent.ButtonStates |= (1<<5);
+    }
+    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_B))
+    {
+        printf("DEBUG: B\n");
+        m_irr_event.JoystickEvent.ButtonStates |= (1<<6);
+    }
+    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_PLUS))
+    {
+        printf("DEBUG: +\n");
+        m_irr_event.JoystickEvent.ButtonStates |= (1<<7);
+    }
+    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_MINUS))
+    {
+        printf("DEBUG: -\n");
+        m_irr_event.JoystickEvent.ButtonStates |= (1<<8);
+    }
+    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_ONE))
+    {
+        printf("DEBUG: 1\n");
+        m_irr_event.JoystickEvent.ButtonStates |= (1<<9);
+    }
+    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_TWO))
+    {
+        printf("DEBUG: 2\n");
+        m_irr_event.JoystickEvent.ButtonStates |= (1<<10);
+    }
+    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_HOME))
+    {
+        printf("DEBUG: Home\n");
+        m_irr_event.JoystickEvent.ButtonStates |= (1<<11);
+    }
+    
+    // ------------------ Nunchuk ----------------------
+/*    if (m_wiimote_handle->exp.type == EXP_NUNCHUK)
+    {
+        struct nunchuk_t* nc = (nunchuk_t*)&m_wiimote_handle->exp.nunchuk;
+
+        if (IS_PRESSED(nc, NUNCHUK_BUTTON_C))
+        {
+            printf("DEBUG: C\n");
+            m_irr_event.JoystickEvent.ButtonStates |= (1<<12);
+        }
+        if (IS_PRESSED(nc, NUNCHUK_BUTTON_Z))
+        {
+            printf("DEBUG: Z\n");
+            m_irr_event.JoystickEvent.ButtonStates |= (1<<13);
+        }
+
+        printf("nunchuk roll  = %f\n", nc->orient.roll);
+        printf("nunchuk pitch = %f\n", nc->orient.pitch);
+        printf("nunchuk yaw   = %f\n", nc->orient.yaw);
+
+        printf("nunchuk joystick angle:     %f\n", nc->js.ang);
+        printf("nunchuk joystick magnitude: %f\n", nc->js.mag);
+    }
+*/
+    pthread_mutex_unlock(&m_event_mutex);
+}
+
+irr::SEvent Wiimote::getIrrEvent()
+{
+    irr::SEvent event;
+    
+    pthread_mutex_lock(&m_event_mutex);
+    event = m_irr_event;
+    pthread_mutex_unlock(&m_event_mutex);
+    
+    return event;
+}
+
+// ============================ Wiimote manager implementation ============================
 WiimoteManager::WiimoteManager()
 {
-    m_wiimotes = NULL;
+    m_all_wiimote_handles = NULL;
     m_nb_wiimotes = 0;
-    m_initial_nb_gamepads = 0;
     
-    resetEvent(&m_irr_events[0], -1);
-    resetEvent(&m_irr_events[1], -1);
     m_shut = false;
-    m_write_id = 0;
 }
 
 // -----------------------------------------------------------------------------
@@ -57,77 +244,62 @@ WiimoteManager::~WiimoteManager()
   */
 void WiimoteManager::launchDetection(int timeout)
 {
+    // Stop WiiUse, remove wiimotes, gamepads, gamepad configs.
     cleanup();
     
-    m_wiimotes =  wiiuse_init(MAX_WIIMOTES);
+    m_all_wiimote_handles =  wiiuse_init(MAX_WIIMOTES);
     
     // Detect wiimotes
-    int nb_found_wiimotes = wiiuse_find(m_wiimotes, MAX_WIIMOTES, timeout);
+    int nb_found_wiimotes = wiiuse_find(m_all_wiimote_handles, MAX_WIIMOTES, timeout);
+    
+    // Couldn't find any wiimote?
+    if(nb_found_wiimotes == 0)
+        return;
     
     // Try to connect to all found wiimotes
-    m_nb_wiimotes = wiiuse_connect(m_wiimotes, nb_found_wiimotes);
+    m_nb_wiimotes = wiiuse_connect(m_all_wiimote_handles, nb_found_wiimotes);
     
+    // Couldn't connect to any wiimote?
+    if(m_nb_wiimotes == 0)
+        return;
+    
+    // ---------------------------------------------------
+    // Create or find a GamepadConfig for all wiimotes
+    DeviceManager* device_manager = input_manager->getDeviceList();
+    GamepadConfig* gamepad_config = NULL;
+    
+    device_manager->getConfigForGamepad(WIIMOTE_START_IRR_ID, "Wiimote", &gamepad_config);
+    setWiimoteBindings(gamepad_config);
+    
+    // Initialize all Wiimotes, which in turn create their associated GamePadDevices
+    for(int i=0 ; i < m_nb_wiimotes ; i++)
+    {
+        m_wiimotes[i].init(m_all_wiimote_handles[i], i, gamepad_config);
+    } // end for
+    
+    // ---------------------------------------------------
     // Set the LEDs and rumble for 0.2s
     int leds[] = {WIIMOTE_LED_1, WIIMOTE_LED_2, WIIMOTE_LED_3, WIIMOTE_LED_4};
     for(int i=0 ; i < m_nb_wiimotes ; i++)
     {
-        wiiuse_set_leds(m_wiimotes[i], leds[i]);
-        wiiuse_rumble(m_wiimotes[i], 1);
+        wiimote_t*  wiimote_handle = m_wiimotes[i].getWiimoteHandle();
+        wiiuse_set_leds(wiimote_handle, leds[i]);
+        wiiuse_rumble(wiimote_handle, 1);
     }
     
     irr_driver->getDevice()->sleep(200);
 
     for(int i=0 ; i < m_nb_wiimotes ; i++)
-        wiiuse_rumble(m_wiimotes[i], 0);
-    
-    // ---------------------------------------------------
-    
-    // Create GamePadDevice for each physical gamepad and find a GamepadConfig to match
-    DeviceManager* device_manager = input_manager->getDeviceList();
-    GamepadConfig* gamepadConfig = NULL;
-    GamePadDevice* gamepadDevice = NULL;
-    
-    m_initial_nb_gamepads = device_manager->getGamePadAmount();
-    
-    for(int i=0 ; i < m_nb_wiimotes ; i++)
     {
-        int id = getGamepadId(i);
-        
-        core::stringc name = core::stringc("Wiimote ") + StringUtils::toString(i).c_str();
-        
-        // Returns true if new configuration was created
-        if (device_manager->getConfigForGamepad(id, name, &gamepadConfig) == true)
-        {
-            if(UserConfigParams::logMisc()) 
-                printf("creating new configuration for wiimote.\n");
-        }
-        else
-        {
-            if(UserConfigParams::logMisc())
-                printf("using existing configuration for wiimote.\n");
-        }
-
-        gamepadConfig->setPlugged();
-        gamepadDevice = new GamePadDevice(id, 
-                                          name.c_str(),
-                                          WIIMOTE_AXES,
-                                          WIIMOTE_BUTTONS,
-                                          gamepadConfig );
-        device_manager->addGamepad(gamepadDevice);
-    } // end for
-    
-    // ---------------------------------------------------
-    // Create the update thread
-    if(m_nb_wiimotes > 0)
-    {
-        m_write_id = 0;
-        m_shut = false;
-        resetEvent(&m_irr_events[0], getGamepadId(0));
-        resetEvent(&m_irr_events[1], getGamepadId(0));
-        
-        pthread_mutex_init(&m_mutex, NULL);
-        pthread_create(&m_thread, NULL, &threadFuncWrapper, this);
+        wiimote_t*  wiimote_handle = m_wiimotes[i].getWiimoteHandle();
+        wiiuse_rumble(wiimote_handle, 0);
     }
+    
+    // ---------------------------------------------------
+    // Launch the update thread
+    m_shut = false;
+    
+    pthread_create(&m_thread, NULL, &threadFuncWrapper, this);
 }
 
 // -----------------------------------------------------------------------------
@@ -135,144 +307,65 @@ void WiimoteManager::cleanup()
 {
     if(m_nb_wiimotes > 0)
     {
+        // Remove all configs associated to the wiimotes (linked gamepad devices are removed automatically)
+        DeviceManager* device_manager = input_manager->getDeviceList();
+        for(int i=0 ; i < m_nb_wiimotes ; i++)
+        {
+            int irr_id = wiimoteIdToIrrId(i);
+            GamePadDevice*  gamepad_device = device_manager->getGamePadFromIrrID(irr_id);
+            assert(gamepad_device);
+            
+            DeviceConfig*  gamepad_config = gamepad_device->getConfiguration();
+            assert(gamepad_config);
+            
+            device_manager->deleteConfig(gamepad_config);
+        }
+        
+        // Shut the update thread
         m_shut = true;
         pthread_join(m_thread, NULL);
-        pthread_mutex_destroy(&m_mutex);
         
-        wiiuse_cleanup(m_wiimotes, MAX_WIIMOTES);
-        m_wiimotes = NULL;
-        m_nb_wiimotes = 0;
+        // Cleanup WiiUse
+        wiiuse_cleanup(m_all_wiimote_handles, MAX_WIIMOTES);
     }
+    
+    // Reset
+    m_all_wiimote_handles = NULL;
+    m_nb_wiimotes  = 0;
+    m_shut         = false;
 }
 
 // -----------------------------------------------------------------------------
 void WiimoteManager::update()
 {
-    if(m_nb_wiimotes > 0)
+    for(int i=0 ; i < MAX_WIIMOTES ; i++)
     {
-        pthread_mutex_lock(&m_mutex);
-        int read_id = !m_write_id;
-        irr::SEvent event = m_irr_events[read_id];
-        pthread_mutex_unlock(&m_mutex);
-        
-        input_manager->input(event);
+        if(m_wiimotes[i].isConnected())
+        {
+            irr::SEvent event = m_wiimotes[i].getIrrEvent();
+            input_manager->input(event);
+        }
     }
 }
 
 // -----------------------------------------------------------------------------
-void WiimoteManager::translateEvent(wiimote_t *wm, int gamepad_id, irr::SEvent* event)
-{
-    // Simulate an Irrlicht joystick event;
-    resetEvent(event, gamepad_id);
-    
-    // --------------------- Wiimote --------------------
-    // Send button states
-    if(IS_PRESSED(wm, WIIMOTE_BUTTON_LEFT))
-    {
-        printf("DEBUG: Left\n");
-        event->JoystickEvent.ButtonStates |= (1<<1);
-    }
-    if(IS_PRESSED(wm, WIIMOTE_BUTTON_RIGHT))
-    {
-        printf("DEBUG: Right\n");
-        event->JoystickEvent.ButtonStates |= (1<<2);
-    }
-    if(IS_PRESSED(wm, WIIMOTE_BUTTON_UP))
-    {
-        printf("DEBUG: Up\n");
-        event->JoystickEvent.ButtonStates |= (1<<3);
-    }
-    if(IS_PRESSED(wm, WIIMOTE_BUTTON_DOWN))
-    {
-        printf("DEBUG: Down\n");
-        event->JoystickEvent.ButtonStates |= (1<<4);
-    }
-    
-    if(IS_PRESSED(wm, WIIMOTE_BUTTON_A))
-    {
-        printf("DEBUG: A\n");
-        event->JoystickEvent.ButtonStates |= (1<<5);
-    }
-    if(IS_PRESSED(wm, WIIMOTE_BUTTON_B))
-    {
-        printf("DEBUG: B\n");
-        event->JoystickEvent.ButtonStates |= (1<<6);
-    }
-    if(IS_PRESSED(wm, WIIMOTE_BUTTON_PLUS))
-    {
-        printf("DEBUG: +\n");
-        event->JoystickEvent.ButtonStates |= (1<<7);
-    }
-    if(IS_PRESSED(wm, WIIMOTE_BUTTON_MINUS))
-    {
-        printf("DEBUG: -\n");
-        event->JoystickEvent.ButtonStates |= (1<<8);
-    }
-    if(IS_PRESSED(wm, WIIMOTE_BUTTON_ONE))
-    {
-        printf("DEBUG: 1\n");
-        event->JoystickEvent.ButtonStates |= (1<<9);
-    }
-    if(IS_PRESSED(wm, WIIMOTE_BUTTON_TWO))
-    {
-        printf("DEBUG: 2\n");
-        event->JoystickEvent.ButtonStates |= (1<<10);
-    }
-    if(IS_PRESSED(wm, WIIMOTE_BUTTON_HOME))
-    {
-        printf("DEBUG: Home\n");
-        event->JoystickEvent.ButtonStates |= (1<<11);
-    }
-    
-    // ------------------ Nunchuk ----------------------
-    if (wm->exp.type == EXP_NUNCHUK)
-    {
-        struct nunchuk_t* nc = (nunchuk_t*)&wm->exp.nunchuk;
-
-        if (IS_PRESSED(nc, NUNCHUK_BUTTON_C))
-        {
-            printf("DEBUG: C\n");
-            event->JoystickEvent.ButtonStates |= (1<<12);
-        }
-        if (IS_PRESSED(nc, NUNCHUK_BUTTON_Z))
-        {
-            printf("DEBUG: Z\n");
-            event->JoystickEvent.ButtonStates |= (1<<13);
-        }
-
-        printf("nunchuk roll  = %f\n", nc->orient.roll);
-        printf("nunchuk pitch = %f\n", nc->orient.pitch);
-        printf("nunchuk yaw   = %f\n", nc->orient.yaw);
-
-        printf("nunchuk joystick angle:     %f\n", nc->js.ang);
-        printf("nunchuk joystick magnitude: %f\n", nc->js.mag);
-    }
-}
-
-void WiimoteManager::resetEvent(irr::SEvent* event, int gamepad_id)
-{
-    event->EventType = irr::EET_JOYSTICK_INPUT_EVENT;
-    for(int i=0 ; i < SEvent::SJoystickEvent::NUMBER_OF_AXES ; i++)
-        event->JoystickEvent.Axis[i] = 0;
-    event->JoystickEvent.Joystick = (u8)(gamepad_id);
-    event->JoystickEvent.POV = 65535;
-    event->JoystickEvent.ButtonStates = 0;
-}
-
+/** Thread update method - wiimotes state is updated in another thread to avoid latency problems */
 void WiimoteManager::threadFunc()
 {
     while(!m_shut)
     {
-        if(wiiuse_poll(m_wiimotes, MAX_WIIMOTES))
+        if(wiiuse_poll(m_all_wiimote_handles, MAX_WIIMOTES))
         {
             for (int i=0; i < MAX_WIIMOTES; ++i)
             {
-                int gamepad_id = getGamepadId(i);
-                        
-                switch (m_wiimotes[i]->event)
+                if(!m_wiimotes[i].isConnected())
+                    continue;
+                
+                switch (m_all_wiimote_handles[i]->event)
                 {
                 case WIIUSE_EVENT:
-                    translateEvent(m_wiimotes[i], gamepad_id, &m_irr_events[m_write_id]);
+                    m_wiimotes[i].updateIrrEvent();
+                    //translateEvent(m_all_wiimote_handles[i], &m_irr_events[m_write_id]);  // TODO
                     //printf("DEBUG: wiimote event\n");
                     break;
     
@@ -283,6 +376,7 @@ void WiimoteManager::threadFunc()
                 case WIIUSE_DISCONNECT:
                 case WIIUSE_UNEXPECTED_DISCONNECT:
                     //printf("DEBUG: wiimote disconnected\n");
+                    m_wiimotes[i].setConnected(false);
                     break;
     
                 case WIIUSE_READ_DATA:
@@ -310,11 +404,6 @@ void WiimoteManager::threadFunc()
                     break;
                 }
             }
-            
-            pthread_mutex_lock(&m_mutex);
-            m_write_id = !m_write_id;   // swap buffers (no need to swap them if wiiuse_poll()
-                                        // did not find anything)
-            pthread_mutex_unlock(&m_mutex);
         }
         
         irr_driver->getDevice()->sleep(1);  // 'cause come on, the whole CPU is not ours :)
