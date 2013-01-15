@@ -139,29 +139,35 @@ FileManager::FileManager(char *argv[])
     // to define the working directory when debugging, it works automatically.
     if(m_file_system->existFile(argv[0]))
         exe_path = m_file_system->getFileDir(argv[0]);
-
+    if(exe_path.size()==0 || exe_path[exe_path.size()-1]!='/')
+        exe_path += "/";
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
-        m_root_dir= getenv ( "SUPERTUXKART_DATADIR" ) ;
+        m_root_dir = std::string(getenv("SUPERTUXKART_DATADIR"))+"/" ;
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( m_root_dir ) ) { /* nothing to do */ }
 #endif
     else if(m_file_system->existFile("data/stk_config.xml"))
-        m_root_dir = "." ;
+        m_root_dir = "" ;
     else if(m_file_system->existFile("../data/stk_config.xml"))
-        m_root_dir = ".." ;
+        m_root_dir = "../" ;
     else if(m_file_system->existFile(exe_path+"/data/stk_config.xml"))
         m_root_dir = exe_path.c_str();
     else if(m_file_system->existFile(exe_path+"/../data/stk_config.xml"))
     {
         m_root_dir = exe_path.c_str();
-        m_root_dir += "/..";
+        m_root_dir += "/../";
     }
     else
+    {
 #ifdef SUPERTUXKART_DATADIR
-        m_root_dir = SUPERTUXKART_DATADIR ;
+        m_root_dir = SUPERTUXKART_DATADIR;
+        if(m_root_dir.size()==0 || m_root_dir[m_root_dir.size()-1]!='/')
+            m_root_dir+='/';
+
 #else
-        m_root_dir = "/usr/local/share/games/supertuxkart" ;
+        m_root_dir = "/usr/local/share/games/supertuxkart/";
 #endif
+    }
     // We can't use _() here, since translations will only be initalised
     // after the filemanager (to get the path to the tranlsations from it)
     Log::info("FileManager", "Data files will be fetched from: '%s'",
@@ -187,13 +193,13 @@ void FileManager::reInit()
 {
     m_file_system  = irr_driver->getDevice()->getFileSystem();
     m_file_system->grab();
-    TrackManager::addTrackSearchDir(m_root_dir+"/data/tracks");
-    KartPropertiesManager::addKartSearchDir(m_root_dir+"/data/karts");
+    TrackManager::addTrackSearchDir(m_root_dir+"data/tracks");
+    KartPropertiesManager::addKartSearchDir(m_root_dir+"data/karts");
     pushTextureSearchPath(getTextureDir());
     pushTextureSearchPath(getTextureDir()+"/deprecated");
-    pushTextureSearchPath(m_root_dir+"/data/gui");
-    pushModelSearchPath  (m_root_dir+"/data/models/"  );
-    pushMusicSearchPath  (m_root_dir+"/data/music/"   );
+    pushTextureSearchPath(m_root_dir+"data/gui");
+    pushModelSearchPath  (m_root_dir+"data/models/"  );
+    pushMusicSearchPath  (m_root_dir+"data/music/"   );
 
     // Add more paths from the STK_MUSIC_PATH environment variable
     if(getenv("SUPERTUXKART_MUSIC_PATH")!=NULL)
@@ -429,7 +435,7 @@ std::string FileManager::getModelFile(const std::string& file_name) const
  */
 std::string FileManager::getDataDir() const
 {
-    return m_root_dir+"/data/";
+    return m_root_dir+"data/";
 }   // getDataDir
 
 //-----------------------------------------------------------------------------
@@ -437,7 +443,7 @@ std::string FileManager::getDataDir() const
  */
 std::string FileManager::getGUIDir() const
 {
-    return m_root_dir+"/data/gui/";
+    return m_root_dir+"data/gui/";
 }   // getGUIDir
 
 //-----------------------------------------------------------------------------
@@ -445,7 +451,7 @@ std::string FileManager::getGUIDir() const
  */
 std::string FileManager::getTextureDir() const
 {
-    return m_root_dir+"/data/textures/";
+    return m_root_dir+"data/textures/";
 }   // getTextureDir
 
 //-----------------------------------------------------------------------------
@@ -453,7 +459,7 @@ std::string FileManager::getTextureDir() const
  */
 std::string FileManager::getTranslationDir() const
 {
-    return m_root_dir+"/data/po";
+    return m_root_dir+"data/po";
 }   // getTranslationDir
 
 //-----------------------------------------------------------------------------
@@ -471,7 +477,7 @@ std::vector<std::string> FileManager::getMusicDirs() const
  */
 std::string FileManager::getDataFile(const std::string& file_name) const
 {
-    return m_root_dir+"/data/"+file_name;
+    return m_root_dir+"data/"+file_name;
 }   // getDataFile
 //-----------------------------------------------------------------------------
 /** Returns the full path of graphical effect file
@@ -479,7 +485,7 @@ std::string FileManager::getDataFile(const std::string& file_name) const
  */
 std::string FileManager::getGfxFile(const std::string& file_name) const
 {
-    return m_root_dir+"/data/gfx/"+file_name;
+    return m_root_dir+"data/gfx/"+file_name;
 }
 //-----------------------------------------------------------------------------
 /** If the directory specified in path does not exist, it is created. This
@@ -795,7 +801,7 @@ std::string FileManager::getMusicFile(const std::string& file_name) const
  */
 std::string FileManager::getSFXFile(const std::string& file_name) const
 {
-    return m_root_dir+"/data/sfx/"+file_name;
+    return m_root_dir+"data/sfx/"+file_name;
 }   // getSFXFile
 
 //-----------------------------------------------------------------------------
@@ -804,7 +810,7 @@ std::string FileManager::getSFXFile(const std::string& file_name) const
  */
 std::string FileManager::getFontFile(const std::string& file_name) const
 {
-    return m_root_dir+"/data/fonts/"+file_name;
+    return m_root_dir+"data/fonts/"+file_name;
 }   // getFontFile
 
 //-----------------------------------------------------------------------------
