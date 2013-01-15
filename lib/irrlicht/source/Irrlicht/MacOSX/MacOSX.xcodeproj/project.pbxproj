@@ -1340,7 +1340,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		09022C620EA0E97F00CD54EE /* GUIEditor_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GUIEditor_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		09022C620EA0E97F00CD54EE /* GUIEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GUIEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		09022C680EA0EA9D00CD54EE /* CGUIAttribute.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CGUIAttribute.h; path = ../../../tools/GUIEditor/CGUIAttribute.h; sourceTree = SOURCE_ROOT; };
 		09022C690EA0EA9D00CD54EE /* CGUIAttributeEditor.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CGUIAttributeEditor.cpp; path = ../../../tools/GUIEditor/CGUIAttributeEditor.cpp; sourceTree = SOURCE_ROOT; };
 		09022C6A0EA0EA9D00CD54EE /* CGUIAttributeEditor.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CGUIAttributeEditor.h; path = ../../../tools/GUIEditor/CGUIAttributeEditor.h; sourceTree = SOURCE_ROOT; };
@@ -1430,7 +1430,7 @@
 		093973BD0E0458B200E0C987 /* CSceneNodeAnimatorCameraFPS.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CSceneNodeAnimatorCameraFPS.h; sourceTree = "<group>"; };
 		093973BE0E0458B200E0C987 /* CSceneNodeAnimatorCameraMaya.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = CSceneNodeAnimatorCameraMaya.cpp; sourceTree = "<group>"; };
 		093973BF0E0458B200E0C987 /* CSceneNodeAnimatorCameraMaya.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CSceneNodeAnimatorCameraMaya.h; sourceTree = "<group>"; };
-		0946CCB40EC99BBE00D945A5 /* MouseAndJoystick_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MouseAndJoystick_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0946CCB40EC99BBE00D945A5 /* MouseAndJoystick.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MouseAndJoystick.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0946CCCA0EC99C6E00D945A5 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = 19.MouseAndJoystick/main.cpp; sourceTree = "<group>"; };
 		0968401E0D0F1A2300333EFD /* CB3DMeshFileLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = CB3DMeshFileLoader.cpp; sourceTree = "<group>"; };
 		0968401F0D0F1A2300333EFD /* CB3DMeshFileLoader.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CB3DMeshFileLoader.h; sourceTree = "<group>"; };
@@ -1476,10 +1476,10 @@
 		096F8E3C0EA2EFBA00907EC5 /* COBJMeshWriter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = COBJMeshWriter.h; sourceTree = "<group>"; };
 		09C638700D4F1A69000B6A18 /* CLWOMeshFileLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = CLWOMeshFileLoader.cpp; sourceTree = "<group>"; };
 		09C638710D4F1A69000B6A18 /* CLWOMeshFileLoader.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CLWOMeshFileLoader.h; sourceTree = "<group>"; };
-		09F649030D2CDED9001E0599 /* HelloWorld_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HelloWorld_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		09F649030D2CDED9001E0599 /* HelloWorld.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HelloWorld.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		09F6492E0D2CE038001E0599 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = 15.LoadIrrFile/main.cpp; sourceTree = "<group>"; };
-		09F6493E0D2CE03E001E0599 /* LoadIrrFile_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoadIrrFile_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		09F649650D2CE206001E0599 /* Quake3Shader_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Quake3Shader_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		09F6493E0D2CE03E001E0599 /* LoadIrrFile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoadIrrFile.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		09F649650D2CE206001E0599 /* Quake3Shader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Quake3Shader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		09F649730D2CE2D0001E0599 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = 16.Quake3MapShader/main.cpp; sourceTree = "<group>"; };
 		0E2E3C431103B1B5002DE8D7 /* jaricom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jaricom.c; sourceTree = "<group>"; };
 		0E2E3C441103B1B5002DE8D7 /* jcarith.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jcarith.c; sourceTree = "<group>"; };
@@ -1512,8 +1512,8 @@
 		0E2E3C841103B53C002DE8D7 /* pwd2key.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pwd2key.cpp; path = aesGladman/pwd2key.cpp; sourceTree = "<group>"; };
 		0E2E3C851103B53C002DE8D7 /* sha1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sha1.cpp; path = aesGladman/sha1.cpp; sourceTree = "<group>"; };
 		0E2E3C861103B53C002DE8D7 /* sha2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sha2.cpp; path = aesGladman/sha2.cpp; sourceTree = "<group>"; };
-		0E2E3CFC1103E294002DE8D7 /* SplitScreen_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SplitScreen_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		0E2E3D3C1103E3F4002DE8D7 /* ManagedLights_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ManagedLights_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0E2E3CFC1103E294002DE8D7 /* SplitScreen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SplitScreen.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0E2E3D3C1103E3F4002DE8D7 /* ManagedLights.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ManagedLights.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E2E3D681103E6C6002DE8D7 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0E2E3D791103E6E4002DE8D7 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0E2E3E1B1103F773002DE8D7 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -1856,7 +1856,7 @@
 		4C53E18D0A484C2C0014E966 /* uncompr.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = uncompr.c; sourceTree = "<group>"; };
 		4C53E1920A484C2C0014E966 /* zutil.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = zutil.c; sourceTree = "<group>"; };
 		4C53E24D0A4850120014E966 /* libIrrlicht.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libIrrlicht.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		4C53E2520A4850550014E966 /* Quake3Map_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Quake3Map_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C53E2520A4850550014E966 /* Quake3Map.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Quake3Map.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C53E26D0A4850D60014E966 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		4C53E26E0A4850D60014E966 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		4C53E6F10A485CD80014E966 /* jcapimin.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = jcapimin.c; sourceTree = "<group>"; };
@@ -1903,18 +1903,18 @@
 		4C53E73A0A485CD80014E966 /* jquant2.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = jquant2.c; sourceTree = "<group>"; };
 		4C53E73B0A485CD80014E966 /* jutils.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = jutils.c; sourceTree = "<group>"; };
 		4C6DC9B60A48715A0017A6E5 /* inflate.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = inflate.c; sourceTree = "<group>"; };
-		4CA25B980A485D9800B4E469 /* CustomSceneNode_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CustomSceneNode_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CA25B9A0A485D9800B4E469 /* MeshViewer_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MeshViewer_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CA25B9C0A485D9800B4E469 /* RenderToTexture_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RenderToTexture_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CA25B9E0A485D9800B4E469 /* UserInterface_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UserInterface_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CA25BA00A485D9800B4E469 /* PerPixelLighting_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerPixelLighting_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CA25BA20A485D9800B4E469 /* Demo_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CA25BA40A485D9800B4E469 /* Movement_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Movement_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CA25BA60A485D9800B4E469 /* Shaders_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shaders_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CA25BA80A485D9800B4E469 /* SpecialFx_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpecialFx_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CA25BAA0A485D9800B4E469 /* TerrainRendering_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TerrainRendering_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CA25BAC0A485D9800B4E469 /* 2DGraphics_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = 2DGraphics_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CA25BAE0A485D9800B4E469 /* Collision_dbg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Collision_dbg.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CA25B980A485D9800B4E469 /* CustomSceneNode.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CustomSceneNode.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CA25B9A0A485D9800B4E469 /* MeshViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MeshViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CA25B9C0A485D9800B4E469 /* RenderToTexture.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RenderToTexture.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CA25B9E0A485D9800B4E469 /* UserInterface.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UserInterface.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CA25BA00A485D9800B4E469 /* PerPixelLighting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerPixelLighting.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CA25BA20A485D9800B4E469 /* Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CA25BA40A485D9800B4E469 /* Movement.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Movement.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CA25BA60A485D9800B4E469 /* Shaders.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shaders.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CA25BA80A485D9800B4E469 /* SpecialFx.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpecialFx.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CA25BAA0A485D9800B4E469 /* TerrainRendering.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TerrainRendering.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CA25BAC0A485D9800B4E469 /* 2DGraphics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = 2DGraphics.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CA25BAE0A485D9800B4E469 /* Collision.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Collision.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CC36B0D0A6B61DB0076C4B2 /* CSphereSceneNode.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = CSphereSceneNode.cpp; sourceTree = "<group>"; };
 		4CC36B0E0A6B61DB0076C4B2 /* CSphereSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CSphereSceneNode.h; sourceTree = "<group>"; };
 		4CFA7BDC0A88735900B03626 /* CImageLoaderBMP.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 2; path = CImageLoaderBMP.cpp; sourceTree = "<group>"; };
@@ -3635,26 +3635,26 @@
 			isa = PBXGroup;
 			children = (
 				4C53E24D0A4850120014E966 /* libIrrlicht.a */,
-				0946CCB40EC99BBE00D945A5 /* MouseAndJoystick_dbg.app */,
-				09022C620EA0E97F00CD54EE /* GUIEditor_dbg.app */,
-				4C53E2520A4850550014E966 /* Quake3Map_dbg.app */,
-				4CA25B980A485D9800B4E469 /* CustomSceneNode_dbg.app */,
-				4CA25BA40A485D9800B4E469 /* Movement_dbg.app */,
-				4CA25B9E0A485D9800B4E469 /* UserInterface_dbg.app */,
-				4CA25BAC0A485D9800B4E469 /* 2DGraphics_dbg.app */,
-				4CA25BAE0A485D9800B4E469 /* Collision_dbg.app */,
-				4CA25BA80A485D9800B4E469 /* SpecialFx_dbg.app */,
-				4CA25B9A0A485D9800B4E469 /* MeshViewer_dbg.app */,
-				4CA25BA60A485D9800B4E469 /* Shaders_dbg.app */,
-				4CA25BA00A485D9800B4E469 /* PerPixelLighting_dbg.app */,
-				4CA25B9C0A485D9800B4E469 /* RenderToTexture_dbg.app */,
-				4CA25BAA0A485D9800B4E469 /* TerrainRendering_dbg.app */,
-				4CA25BA20A485D9800B4E469 /* Demo_dbg.app */,
-				09F6493E0D2CE03E001E0599 /* LoadIrrFile_dbg.app */,
-				09F649650D2CE206001E0599 /* Quake3Shader_dbg.app */,
-				09F649030D2CDED9001E0599 /* HelloWorld_dbg.app */,
-				0E2E3CFC1103E294002DE8D7 /* SplitScreen_dbg.app */,
-				0E2E3D3C1103E3F4002DE8D7 /* ManagedLights_dbg.app */,
+				0946CCB40EC99BBE00D945A5 /* MouseAndJoystick.app */,
+				09022C620EA0E97F00CD54EE /* GUIEditor.app */,
+				4C53E2520A4850550014E966 /* Quake3Map.app */,
+				4CA25B980A485D9800B4E469 /* CustomSceneNode.app */,
+				4CA25BA40A485D9800B4E469 /* Movement.app */,
+				4CA25B9E0A485D9800B4E469 /* UserInterface.app */,
+				4CA25BAC0A485D9800B4E469 /* 2DGraphics.app */,
+				4CA25BAE0A485D9800B4E469 /* Collision.app */,
+				4CA25BA80A485D9800B4E469 /* SpecialFx.app */,
+				4CA25B9A0A485D9800B4E469 /* MeshViewer.app */,
+				4CA25BA60A485D9800B4E469 /* Shaders.app */,
+				4CA25BA00A485D9800B4E469 /* PerPixelLighting.app */,
+				4CA25B9C0A485D9800B4E469 /* RenderToTexture.app */,
+				4CA25BAA0A485D9800B4E469 /* TerrainRendering.app */,
+				4CA25BA20A485D9800B4E469 /* Demo.app */,
+				09F6493E0D2CE03E001E0599 /* LoadIrrFile.app */,
+				09F649650D2CE206001E0599 /* Quake3Shader.app */,
+				09F649030D2CDED9001E0599 /* HelloWorld.app */,
+				0E2E3CFC1103E294002DE8D7 /* SplitScreen.app */,
+				0E2E3D3C1103E3F4002DE8D7 /* ManagedLights.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3994,7 +3994,7 @@
 			);
 			name = GUIEditor;
 			productName = DemoApp;
-			productReference = 09022C620EA0E97F00CD54EE /* GUIEditor_dbg.app */;
+			productReference = 09022C620EA0E97F00CD54EE /* GUIEditor.app */;
 			productType = "com.apple.product-type.application";
 		};
 		0946CCA30EC99BBE00D945A5 /* 19.MouseAndJoystick */ = {
@@ -4012,7 +4012,7 @@
 			);
 			name = 19.MouseAndJoystick;
 			productName = DemoApp;
-			productReference = 0946CCB40EC99BBE00D945A5 /* MouseAndJoystick_dbg.app */;
+			productReference = 0946CCB40EC99BBE00D945A5 /* MouseAndJoystick.app */;
 			productType = "com.apple.product-type.application";
 		};
 		09F648F40D2CDED9001E0599 /* 01.HelloWorld */ = {
@@ -4030,7 +4030,7 @@
 			);
 			name = 01.HelloWorld;
 			productName = DemoApp;
-			productReference = 09F649030D2CDED9001E0599 /* HelloWorld_dbg.app */;
+			productReference = 09F649030D2CDED9001E0599 /* HelloWorld.app */;
 			productType = "com.apple.product-type.application";
 		};
 		09F6492F0D2CE03E001E0599 /* 15.LoadIrrFile */ = {
@@ -4048,7 +4048,7 @@
 			);
 			name = 15.LoadIrrFile;
 			productName = DemoApp;
-			productReference = 09F6493E0D2CE03E001E0599 /* LoadIrrFile_dbg.app */;
+			productReference = 09F6493E0D2CE03E001E0599 /* LoadIrrFile.app */;
 			productType = "com.apple.product-type.application";
 		};
 		09F649560D2CE206001E0599 /* 16.Quake3Shader */ = {
@@ -4066,7 +4066,7 @@
 			);
 			name = 16.Quake3Shader;
 			productName = DemoApp;
-			productReference = 09F649650D2CE206001E0599 /* Quake3Shader_dbg.app */;
+			productReference = 09F649650D2CE206001E0599 /* Quake3Shader.app */;
 			productType = "com.apple.product-type.application";
 		};
 		0E2E3CEB1103E294002DE8D7 /* 18.SplitScreen */ = {
@@ -4084,7 +4084,7 @@
 			);
 			name = 18.SplitScreen;
 			productName = DemoApp;
-			productReference = 0E2E3CFC1103E294002DE8D7 /* SplitScreen_dbg.app */;
+			productReference = 0E2E3CFC1103E294002DE8D7 /* SplitScreen.app */;
 			productType = "com.apple.product-type.application";
 		};
 		0E2E3D2C1103E3F4002DE8D7 /* 20.ManagedLights */ = {
@@ -4102,7 +4102,7 @@
 			);
 			name = 20.ManagedLights;
 			productName = DemoApp;
-			productReference = 0E2E3D3C1103E3F4002DE8D7 /* ManagedLights_dbg.app */;
+			productReference = 0E2E3D3C1103E3F4002DE8D7 /* ManagedLights.app */;
 			productType = "com.apple.product-type.application";
 		};
 		959726FC12C18FFB00BF73D3 /* IrrFramework */ = {
@@ -4138,7 +4138,7 @@
 			);
 			name = 06.2DGraphics;
 			productName = DemoApp;
-			productReference = 4CA25BAC0A485D9800B4E469 /* 2DGraphics_dbg.app */;
+			productReference = 4CA25BAC0A485D9800B4E469 /* 2DGraphics.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B81CFE82097FDDE20057C06F /* 07.Collision */ = {
@@ -4156,7 +4156,7 @@
 			);
 			name = 07.Collision;
 			productName = DemoApp;
-			productReference = 4CA25BAE0A485D9800B4E469 /* Collision_dbg.app */;
+			productReference = 4CA25BAE0A485D9800B4E469 /* Collision.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B81CFEA4097FDE900057C06F /* 11.PerPixelLightning */ = {
@@ -4174,7 +4174,7 @@
 			);
 			name = 11.PerPixelLightning;
 			productName = DemoApp;
-			productReference = 4CA25BA00A485D9800B4E469 /* PerPixelLighting_dbg.app */;
+			productReference = 4CA25BA00A485D9800B4E469 /* PerPixelLighting.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B81CFEC2097FDF020057C06F /* 12.TerrainRendering */ = {
@@ -4192,7 +4192,7 @@
 			);
 			name = 12.TerrainRendering;
 			productName = DemoApp;
-			productReference = 4CA25BAA0A485D9800B4E469 /* TerrainRendering_dbg.app */;
+			productReference = 4CA25BAA0A485D9800B4E469 /* TerrainRendering.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B81CFEE8097FE05F0057C06F /* 08.SpecialFx */ = {
@@ -4210,7 +4210,7 @@
 			);
 			name = 08.SpecialFx;
 			productName = DemoApp;
-			productReference = 4CA25BA80A485D9800B4E469 /* SpecialFx_dbg.app */;
+			productReference = 4CA25BA80A485D9800B4E469 /* SpecialFx.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B81CFF07097FE13E0057C06F /* 05.UserInterface */ = {
@@ -4228,7 +4228,7 @@
 			);
 			name = 05.UserInterface;
 			productName = DemoApp;
-			productReference = 4CA25B9E0A485D9800B4E469 /* UserInterface_dbg.app */;
+			productReference = 4CA25B9E0A485D9800B4E469 /* UserInterface.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B81CFF1E097FE1E00057C06F /* 03.CustomSceneNode */ = {
@@ -4246,7 +4246,7 @@
 			);
 			name = 03.CustomSceneNode;
 			productName = DemoApp;
-			productReference = 4CA25B980A485D9800B4E469 /* CustomSceneNode_dbg.app */;
+			productReference = 4CA25B980A485D9800B4E469 /* CustomSceneNode.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B81CFF33097FE25F0057C06F /* 02.Quake3Map */ = {
@@ -4264,7 +4264,7 @@
 			);
 			name = 02.Quake3Map;
 			productName = DemoApp;
-			productReference = 4C53E2520A4850550014E966 /* Quake3Map_dbg.app */;
+			productReference = 4C53E2520A4850550014E966 /* Quake3Map.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B81CFF4A097FE3050057C06F /* 10.Shaders */ = {
@@ -4282,7 +4282,7 @@
 			);
 			name = 10.Shaders;
 			productName = DemoApp;
-			productReference = 4CA25BA60A485D9800B4E469 /* Shaders_dbg.app */;
+			productReference = 4CA25BA60A485D9800B4E469 /* Shaders.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B81CFF78097FE3DC0057C06F /* 04.Movement */ = {
@@ -4300,7 +4300,7 @@
 			);
 			name = 04.Movement;
 			productName = DemoApp;
-			productReference = 4CA25BA40A485D9800B4E469 /* Movement_dbg.app */;
+			productReference = 4CA25BA40A485D9800B4E469 /* Movement.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B81CFF91097FE45E0057C06F /* 09.MeshViewer */ = {
@@ -4318,7 +4318,7 @@
 			);
 			name = 09.MeshViewer;
 			productName = DemoApp;
-			productReference = 4CA25B9A0A485D9800B4E469 /* MeshViewer_dbg.app */;
+			productReference = 4CA25B9A0A485D9800B4E469 /* MeshViewer.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B81CFFAF097FE5F80057C06F /* 13.RenderToTexture */ = {
@@ -4336,7 +4336,7 @@
 			);
 			name = 13.RenderToTexture;
 			productName = DemoApp;
-			productReference = 4CA25B9C0A485D9800B4E469 /* RenderToTexture_dbg.app */;
+			productReference = 4CA25B9C0A485D9800B4E469 /* RenderToTexture.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B8DEF35C0950229200FDEA7E /* Demo */ = {
@@ -4354,7 +4354,7 @@
 			);
 			name = Demo;
 			productName = DemoApp;
-			productReference = 4CA25BA20A485D9800B4E469 /* Demo_dbg.app */;
+			productReference = 4CA25BA20A485D9800B4E469 /* Demo.app */;
 			productType = "com.apple.product-type.application";
 		};
 		D2AAC07D0554694100DB518D /* libIrrlicht.a */ = {
