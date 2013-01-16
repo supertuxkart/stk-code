@@ -30,6 +30,7 @@
 #include "states_screens/dialogs/select_challenge.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/log.hpp"
 
 using namespace GUIEngine;
 
@@ -160,8 +161,8 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         
         if (challenge == NULL)
         {
-            fprintf(stderr, "[RaceGUIOverworld] ERROR: Cannot find challenge <%s>\n",
-                    m_challenge_id.c_str());
+            Log::error("SelectChallenge", "Cannot find challenge <%s>\n",
+                       m_challenge_id.c_str());
             return GUIEngine::EVENT_LET;
         }
         
@@ -218,7 +219,8 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         }
         else
         {
-            fprintf(stderr, "ERROR: unknown widget <%s>\n", eventSource.c_str());
+            Log::error("SelectChallenge", "Unknown widget <%s>\n", 
+                        eventSource.c_str());
             //assert(false);
             return GUIEngine::EVENT_LET;
         }
