@@ -52,26 +52,56 @@ static void resetIrrEvent(irr::SEvent* event, int irr_id)
 }
 
 // -----------------------------------------------------------------------------
+struct WiimoteAction
+{
+    int         button_id;
+    int         wiimote_action_id;
+    const char* wiimote_action_name;
+};
+
+static WiimoteAction wiimote_actions[] = {
+    {0,  WIIMOTE_BUTTON_LEFT,   "WIIMOTE_BUTTON_LEFT"},
+    {1,  WIIMOTE_BUTTON_RIGHT,  "WIIMOTE_BUTTON_RIGHT"},
+    {2,  WIIMOTE_BUTTON_UP,     "WIIMOTE_BUTTON_UP"},
+    {3,  WIIMOTE_BUTTON_DOWN,   "WIIMOTE_BUTTON_DOWN"},
+    {4,  WIIMOTE_BUTTON_A,      "WIIMOTE_BUTTON_A"},
+    {5,  WIIMOTE_BUTTON_B,      "WIIMOTE_BUTTON_B"},
+    {6,  WIIMOTE_BUTTON_PLUS,   "WIIMOTE_BUTTON_PLUS"},
+    {7,  WIIMOTE_BUTTON_MINUS,  "WIIMOTE_BUTTON_MINUS"},
+    {8,  WIIMOTE_BUTTON_ONE,    "WIIMOTE_BUTTON_ONE"},
+    {9,  WIIMOTE_BUTTON_TWO,    "WIIMOTE_BUTTON_TWO"},
+    {10, WIIMOTE_BUTTON_HOME,   "WIIMOTE_BUTTON_HOME"},
+};
+
+static int getButtonId(int wiimote_action_id)
+{
+    for(unsigned int i=0 ; i < sizeof(wiimote_actions)/sizeof(WiimoteAction) ; i++)
+        if(wiimote_actions[i].wiimote_action_id == wiimote_action_id)
+            return wiimote_actions[i].button_id;
+    assert(false && "shouldn't happen");
+    return -1;
+}
+
+// -----------------------------------------------------------------------------
 static void setWiimoteBindings(GamepadConfig* gamepad_config)
 {
-    // TODO!!
     gamepad_config->setBinding(PA_STEER_LEFT,   Input::IT_STICKMOTION, 0, Input::AD_NEGATIVE);
     gamepad_config->setBinding(PA_STEER_RIGHT,  Input::IT_STICKMOTION, 0, Input::AD_POSITIVE);
-    gamepad_config->setBinding(PA_ACCEL,        Input::IT_STICKMOTION, 1, Input::AD_NEGATIVE);
-    gamepad_config->setBinding(PA_BRAKE,        Input::IT_STICKMOTION, 1, Input::AD_POSITIVE);
-    gamepad_config->setBinding(PA_FIRE,         Input::IT_STICKBUTTON, 0);
-    gamepad_config->setBinding(PA_NITRO,        Input::IT_STICKBUTTON, 1);
-    gamepad_config->setBinding(PA_DRIFT,        Input::IT_STICKBUTTON, 2);
-    gamepad_config->setBinding(PA_RESCUE,       Input::IT_STICKBUTTON, 3);
-    gamepad_config->setBinding(PA_LOOK_BACK,    Input::IT_STICKBUTTON, 4);
-    gamepad_config->setBinding(PA_PAUSE_RACE,   Input::IT_STICKBUTTON, 5);
+    gamepad_config->setBinding(PA_ACCEL,        Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_TWO));
+    gamepad_config->setBinding(PA_BRAKE,        Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_ONE));
+    gamepad_config->setBinding(PA_FIRE,         Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_RIGHT));
+    gamepad_config->setBinding(PA_NITRO,        Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_UP));
+    gamepad_config->setBinding(PA_DRIFT,        Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_B));
+    gamepad_config->setBinding(PA_RESCUE,       Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_PLUS));
+    gamepad_config->setBinding(PA_LOOK_BACK,    Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_DOWN));
+    gamepad_config->setBinding(PA_PAUSE_RACE,   Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_MINUS));
 
-    gamepad_config->setBinding(PA_MENU_UP,      Input::IT_STICKMOTION, 1, Input::AD_NEGATIVE);
-    gamepad_config->setBinding(PA_MENU_DOWN,    Input::IT_STICKMOTION, 1, Input::AD_POSITIVE);
-    gamepad_config->setBinding(PA_MENU_LEFT,    Input::IT_STICKMOTION, 0, Input::AD_NEGATIVE);
-    gamepad_config->setBinding(PA_MENU_RIGHT,   Input::IT_STICKMOTION, 0, Input::AD_POSITIVE);
-    gamepad_config->setBinding(PA_MENU_SELECT,  Input::IT_STICKBUTTON, 0);
-    gamepad_config->setBinding(PA_MENU_CANCEL,  Input::IT_STICKBUTTON, 3);
+    gamepad_config->setBinding(PA_MENU_UP,      Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_RIGHT));
+    gamepad_config->setBinding(PA_MENU_DOWN,    Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_LEFT));
+    gamepad_config->setBinding(PA_MENU_LEFT,    Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_UP));
+    gamepad_config->setBinding(PA_MENU_RIGHT,   Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_DOWN));
+    gamepad_config->setBinding(PA_MENU_SELECT,  Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_TWO));
+    gamepad_config->setBinding(PA_MENU_CANCEL,  Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_ONE));
 }
 
 // ============================ Wiimote device implementation ============================
@@ -127,61 +157,18 @@ void Wiimote::updateIrrEvent()
     
     // --------------------- Wiimote --------------------
     // Send button states
-    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_LEFT))
+    for(unsigned int i=0 ; i < sizeof(wiimote_actions)/sizeof(WiimoteAction) ; i++)
     {
-        printf("DEBUG: Left\n");
-        m_irr_event.JoystickEvent.ButtonStates |= (1<<1);
-    }
-    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_RIGHT))
-    {
-        printf("DEBUG: Right\n");
-        m_irr_event.JoystickEvent.ButtonStates |= (1<<2);
-    }
-    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_UP))
-    {
-        printf("DEBUG: Up\n");
-        m_irr_event.JoystickEvent.ButtonStates |= (1<<3);
-    }
-    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_DOWN))
-    {
-        printf("DEBUG: Down\n");
-        m_irr_event.JoystickEvent.ButtonStates |= (1<<4);
-    }
-    
-    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_A))
-    {
-        printf("DEBUG: A\n");
-        m_irr_event.JoystickEvent.ButtonStates |= (1<<5);
-    }
-    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_B))
-    {
-        printf("DEBUG: B\n");
-        m_irr_event.JoystickEvent.ButtonStates |= (1<<6);
-    }
-    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_PLUS))
-    {
-        printf("DEBUG: +\n");
-        m_irr_event.JoystickEvent.ButtonStates |= (1<<7);
-    }
-    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_MINUS))
-    {
-        printf("DEBUG: -\n");
-        m_irr_event.JoystickEvent.ButtonStates |= (1<<8);
-    }
-    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_ONE))
-    {
-        printf("DEBUG: 1\n");
-        m_irr_event.JoystickEvent.ButtonStates |= (1<<9);
-    }
-    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_TWO))
-    {
-        printf("DEBUG: 2\n");
-        m_irr_event.JoystickEvent.ButtonStates |= (1<<10);
-    }
-    if(IS_PRESSED(m_wiimote_handle, WIIMOTE_BUTTON_HOME))
-    {
-        printf("DEBUG: Home\n");
-        m_irr_event.JoystickEvent.ButtonStates |= (1<<11);
+        if(IS_PRESSED(m_wiimote_handle, wiimote_actions[i].wiimote_action_id))
+        {
+            /*
+            printf("wiimote %d: pressed button %s -> button id: %d\n",
+                   m_wiimote_id,
+                   wiimote_actions[i].wiimote_action_name,
+                   wiimote_actions[i].button_id);
+            */
+            m_irr_event.JoystickEvent.ButtonStates |= (1<<(wiimote_actions[i].button_id));
+        }
     }
     
     // ------------------ Nunchuk ----------------------
