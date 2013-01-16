@@ -33,6 +33,7 @@
 #include "modes/world.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -189,9 +190,9 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     }
     catch(std::exception& err)
     {
-        fprintf(stderr, "Error while parsing KartProperties '%s':\n",
-                filename.c_str());
-        fprintf(stderr, "%s\n", err.what());
+        Log::error("KartProperties", "Error while parsing KartProperties '%s':\n",
+                   filename.c_str());
+        Log::error("KartProperties", "%s\n", err.what());
     }
     if(root) delete root;
 
@@ -363,8 +364,9 @@ void KartProperties::getAllData(const XMLNode * root)
         if( engine_node->get("power", &v))
         {
             if(v.size()!=3)
-                printf("Incorrect engine-power specifications for kart '%s'\n",
-                getIdent().c_str());
+                Log::warn("KartProperties", 
+                          "Incorrect engine-power specifications for kart '%s'\n",
+                          getIdent().c_str());
             else
             {
                 m_engine_power[0] = v[0];
@@ -376,8 +378,9 @@ void KartProperties::getAllData(const XMLNode * root)
         if( engine_node->get("max-speed", &v))
         {
             if(v.size()!=3)
-                printf("Incorrect max-speed specifications for kart '%s'\n",
-                getIdent().c_str());
+                Log::error("KartProperties", 
+                           "Incorrect max-speed specifications for kart '%s'\n",
+                            getIdent().c_str());
             else
             {
                 m_max_speed[0] = v[0];
@@ -454,8 +457,9 @@ void KartProperties::getAllData(const XMLNode * root)
             m_terrain_impulse_type = IMPULSE_TO_DRIVELINE;
         else
         {
-            fprintf(stderr, "Missing or incorrect value for impulse-type: '%s'.\n",
-                            s.c_str());
+            Log::fatal("KartProperties", 
+                       "Missing or incorrect value for impulse-type: '%s'.\n",
+                       s.c_str());
             exit(-1);
         }
     }
@@ -475,7 +479,8 @@ void KartProperties::getAllData(const XMLNode * root)
         plunger_node->get("in-face-time",    &v);
         if(v.size()!=3)
         {
-            fprintf(stderr, "[KartProperties] ERROR: Invalid plunger in-face-time specification.");
+            Log::error("KartProperties", 
+                       "Invalid plunger in-face-time specification.");
         }
         else
         {
@@ -530,8 +535,8 @@ void KartProperties::getAllData(const XMLNode * root)
         else if (s == "small") m_engine_sfx_type = "engine_small";
         else
         {
-            std::cerr << "[KartProperties::getAllData()] WARNING : Kart " << m_name.c_str()
-                      << " has invalid engine : " << s << "\n";
+            Log::warn("KartProperties", "Kart '%s' has invalid engine '%s'.",
+                       m_name.c_str(), s.c_str());
             m_engine_sfx_type = "engine_small";
         }
 
@@ -573,30 +578,37 @@ void KartProperties::checkAllSet(const std::string &filename)
 {
     if(m_gear_switch_ratio.size()==0)
     {
-        fprintf(stderr,"Missing default value for 'gear-switch-ratio' in '%s'.\n",
-                filename.c_str());
+        Log::fatal("KartProperties",
+                   "Missing default value for 'gear-switch-ratio' in '%s'.\n",
+                   filename.c_str());
         exit(-1);
     }
     if(m_gear_power_increase.size()==0)
     {
-        fprintf(stderr,"Missing default value for 'gear-power-increase' in '%s'.\n",
+        Log::error("KartProperties", 
+                   "Missing default value for 'gear-power-increase' in '%s'.\n",
                 filename.c_str());
         exit(-1);
     }
     if(m_gear_switch_ratio.size()!=m_gear_power_increase.size())    {
-        fprintf(stderr,"Number of entries for 'gear-switch-ratio' and 'gear-power-increase\n");
-        fprintf(stderr,"in '%s' must be equal.\n", filename.c_str());
+        Log::error("KartProperties", 
+                   "Number of entries for 'gear-switch-ratio' and "
+                   "'gear-power-increase\n");
+        Log::fatal("KartProperties", "in '%s' must be equal.\n", 
+                    filename.c_str());
         exit(-1);
     }
     if(m_startup_boost.size()!=m_startup_times.size())
     {
-        fprintf(stderr, "Number of entried for 'startup times' and 'startup-boost\n");
-        fprintf(stderr, "must be identical.\n");
+        Log::error("KartProperties", 
+                 "Number of entried for 'startup times' and 'startup-boost\n");
+        Log::fatal("KartProperties", "must be identical.\n");
         exit(-1);
     }
-#define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                         \
-        fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
-                strA,filename.c_str());exit(-1);                       \
+#define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                      \
+        Log::fatal("KartProperties",                                \
+                    "Missing default value for '%s' in '%s'.\n",    \
+                    strA,filename.c_str());exit(-1);                \
     }
 
     CHECK_NEG(m_mass,                       "mass"                          );
