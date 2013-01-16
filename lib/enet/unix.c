@@ -4,6 +4,10 @@
 */
 #ifndef WIN32
 
+#ifdef sun
+#include <sys/filio.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
