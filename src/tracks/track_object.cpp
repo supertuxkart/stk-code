@@ -27,6 +27,7 @@
 #include "graphics/particle_kind_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world.hpp"
@@ -469,13 +470,23 @@ void TrackObject::onTriggerItemApproached(Item* who)
         }
         else if (m_action == "tutorial_drive")
         {
+            m_action = "__disabled__";
             World::getWorld()->getRaceGUI()->clearAllMessages();
-            World::getWorld()->getRaceGUI()->addMessage(_("Drive with the arrow keys"), NULL, 5.0f,
+            
+            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+            DeviceConfig* config = device->getConfiguration();
+            irr::core::stringw accel = config->getBindingAsString(PA_ACCEL);
+            irr::core::stringw left = config->getBindingAsString(PA_STEER_LEFT);
+            irr::core::stringw right = config->getBindingAsString(PA_STEER_RIGHT);
+            
+            World::getWorld()->getRaceGUI()->addMessage(_("Accelerate with <%s> and steer with <%s> and <%s>",
+                                                        accel, left, right), NULL, 5.0f,
                                                         video::SColor(255, 255,255,255),
                                                         false, true);
         }
         else if (m_action == "tutorial_bananas")
         {
+            m_action = "__disabled__";
             World::getWorld()->getRaceGUI()->clearAllMessages();
             World::getWorld()->getRaceGUI()->addMessage(_("Avoid bananas!"), NULL, 5.0f,
                                                         video::SColor(255, 255,255,255),
@@ -483,8 +494,13 @@ void TrackObject::onTriggerItemApproached(Item* who)
         }
         else if (m_action == "tutorial_giftboxes")
         {
+            m_action = "__disabled__";
+            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+            DeviceConfig* config = device->getConfiguration();
+            irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
+            
             World::getWorld()->getRaceGUI()->clearAllMessages();
-            core::stringw  msg = _("Collect gift boxes, and fire the weapon with <spacebar> to blow away these boxes!");
+            core::stringw  msg = _("Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!", fire);
             std::vector<core::stringw> parts = StringUtils::split(msg, '\n', false);
             
             for (unsigned int i = 0; i < parts.size(); i++)
@@ -496,38 +512,56 @@ void TrackObject::onTriggerItemApproached(Item* who)
         }
         else if (m_action == "tutorial_nitro_collect")
         {
+            m_action = "__disabled__";
             World::getWorld()->getRaceGUI()->clearAllMessages();
-            World::getWorld()->getRaceGUI()->addMessage(_("Collect nitro bottles (we will use them after the curve)"), NULL, 5.0f,
-                                                        video::SColor(255, 255,255,255),
+            World::getWorld()->getRaceGUI()->addMessage(_("Collect nitro bottles (we will use them after the curve)"),
+                                                        NULL, 5.0f, video::SColor(255, 255,255,255),
                                                         false, false);
         }
         else if (m_action == "tutorial_nitro_use")
         {
+            m_action = "__disabled__";
+            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+            DeviceConfig* config = device->getConfiguration();
+            irr::core::stringw nitro = config->getBindingAsString(PA_NITRO);
+            
             World::getWorld()->getRaceGUI()->clearAllMessages();
-            World::getWorld()->getRaceGUI()->addMessage(_("Use the nitro you collected by pressing the <N> key!"), NULL, 5.0f,
-                                                        video::SColor(255, 255,255,255),
+            World::getWorld()->getRaceGUI()->addMessage(_("Use the nitro you collected by pressing <%s>!", nitro),
+                                                        NULL, 5.0f, video::SColor(255, 255,255,255),
                                                         false, false);
         }
         else if (m_action == "tutorial_rescue")
         {
+            m_action = "__disabled__";
+            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+            DeviceConfig* config = device->getConfiguration();
+            irr::core::stringw rescue = config->getBindingAsString(PA_RESCUE);
+            
             World::getWorld()->getRaceGUI()->clearAllMessages();
-            World::getWorld()->getRaceGUI()->addMessage(_("Oops! When you're in trouble, press <backspace> to be rescued"), NULL, 5.0f,
-                                                        video::SColor(255, 255,255,255),
+            World::getWorld()->getRaceGUI()->addMessage(_("Oops! When you're in trouble, press <%s> to be rescued", rescue),
+                                                        NULL, 5.0f, video::SColor(255, 255,255,255),
                                                         false, false);
         }
         else if (m_action == "tutorial_skidding")
         {
+            m_action = "__disabled__";
             World::getWorld()->getRaceGUI()->clearAllMessages();
 
-            World::getWorld()->getRaceGUI()->addMessage(_("Skidding for a short while can help you turn faster to take sharp turns"), NULL, 10.0f,
-                                                        video::SColor(255, 255,255,255),
+            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+            DeviceConfig* config = device->getConfiguration();
+            irr::core::stringw skid = config->getBindingAsString(PA_DRIFT);
+            
+            
+            World::getWorld()->getRaceGUI()->addMessage(_("Skidding for a short while can help you turn faster to take sharp turns"),
+                                                        NULL, 10.0f, video::SColor(255, 255,255,255),
                                                         false, false);
-            World::getWorld()->getRaceGUI()->addMessage(_("Accelerate and press the <V> key while turning to skid."), NULL, 10.0f,
-                                                        video::SColor(255, 255,255,255),
+            World::getWorld()->getRaceGUI()->addMessage(_("Accelerate and press the <%s> key while turning to skid.", skid),
+                                                        NULL, 10.0f, video::SColor(255, 255,255,255),
                                                         false, false);
         }
         else if (m_action == "tutorial_skidding2")
         {
+            m_action = "__disabled__";
             World::getWorld()->getRaceGUI()->clearAllMessages();
 
             World::getWorld()->getRaceGUI()->addMessage(_("you will receive a bonus speedup as a reward!"), NULL, 10.0f,
@@ -537,6 +571,9 @@ void TrackObject::onTriggerItemApproached(Item* who)
                                                         video::SColor(255, 255,255,255),
                                                         false, false);
         }
+        else if (m_action == "__disabled__")
+        {
+        }   
         else
         {
             fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",
