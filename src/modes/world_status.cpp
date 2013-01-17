@@ -169,7 +169,9 @@ void WorldStatus::update(const float dt)
             m_auxiliary_timer += dt;
             
             // In artist debug mode, when without opponents, skip the ready/set/go counter faster
-            if (UserConfigParams::m_artist_debug_mode && race_manager->getNumberOfKarts() == 1)
+            if (UserConfigParams::m_artist_debug_mode &&
+                race_manager->getNumberOfKarts() == 1 &&
+                race_manager->getTrackName() != "tutorial")
                 m_auxiliary_timer += dt*6;
             return;
         case SET_PHASE  :
@@ -187,7 +189,9 @@ void WorldStatus::update(const float dt)
             m_auxiliary_timer += dt;
             
             // In artist debug mode, when without opponents, skip the ready/set/go counter faster
-            if (UserConfigParams::m_artist_debug_mode && race_manager->getNumberOfKarts() == 1)
+            if (UserConfigParams::m_artist_debug_mode &&
+                race_manager->getNumberOfKarts() == 1  &&
+                race_manager->getTrackName() != "tutorial")
                 m_auxiliary_timer += dt*6;
             return;
         case GO_PHASE  :

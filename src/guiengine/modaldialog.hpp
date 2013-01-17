@@ -39,6 +39,12 @@ namespace GUIEngine
     class TextBoxWidget;
     class ButtonWidget;
     
+    enum ModalDialogLocation
+    {
+        MODAL_DIALOG_LOCATION_CENTER = 0,
+        MODAL_DIALOG_LOCATION_BOTTOM = 1
+    };
+    
     /**
      * \brief Abstract base class representing a modal dialog.
      * Only once instance at a time (if you create a 2nd the first will be destroyed).
@@ -52,6 +58,9 @@ namespace GUIEngine
         /** Because C++ doesn't support constructor delegation... */
         void doInit(const float percentWidth, const float percentHeight);
         
+        ModalDialogLocation m_dialog_location;
+        
+        
     protected:
         irr::gui::IGUIWindow* m_irrlicht_window;
         irr::core::rect< irr::s32 > m_area;
@@ -61,7 +70,8 @@ namespace GUIEngine
         /**
          * \brief Creates a modal dialog with given percentage of screen width and height
          */
-        ModalDialog(const float percentWidth, const float percentHeight);
+        ModalDialog(const float percentWidth, const float percentHeight,
+                    ModalDialogLocation location = MODAL_DIALOG_LOCATION_CENTER);
 
         /** \brief Load a XML file to create the dialog from
           * \note  This method automatically calls Widget::add() on each widget

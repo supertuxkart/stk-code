@@ -13,6 +13,7 @@ endif()
 
 option(USE_WIIUSE "Support for wiimote input devices" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
+option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
 
 set(STK_SOURCE_DIR "src")
 set(STK_DATA_DIR "${PROJECT_SOURCE_DIR}/data")
@@ -72,6 +73,9 @@ if(USE_FRIBIDI)
     endif()
 endif()
 
+if(USE_CPP2011)
+    add_definitions("-std=gnu++11")
+endif()
 
 # OpenGL
 find_package(OpenGL REQUIRED)

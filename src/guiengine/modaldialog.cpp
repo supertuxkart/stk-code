@@ -46,8 +46,10 @@ using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
 
-ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
+ModalDialog::ModalDialog(const float percentWidth, const float percentHeight,
+                         ModalDialogLocation location)
 {
+    m_dialog_location = location;
     doInit(percentWidth, percentHeight);
 }
 
@@ -100,13 +102,27 @@ void ModalDialog::doInit(const float percentWidth, const float percentHeight)
     assert((unsigned int)w <= frame_size.Width);
     assert((unsigned int)h <= frame_size.Height);
     
-    m_area = core::rect< s32 >( core::position2d< s32 >(frame_size.Width/2 - w/2, frame_size.Height/2 - h/2),
-                               core::dimension2d< s32 >(w, h) );
+    if (m_dialog_location == MODAL_DIALOG_LOCATION_CENTER)
+    {
+        m_area = core::rect<s32>(core::position2d<s32>(frame_size.Width/2 - w/2,
+                                                       frame_size.Height/2 - h/2),
+                                 core::dimension2d<s32>(w, h));
+    }
+    else if (m_dialog_location == MODAL_DIALOG_LOCATION_BOTTOM)
+    {
+        m_area = core::rect<s32>(core::position2d<s32>(frame_size.Width/2 - w/2,
+                                                       frame_size.Height - h - 15),
+                                 core::dimension2d<s32>(w, h));        
+    }
+    else
+    {
+        assert(false);
+    }
     
     if (modalWindow != NULL) delete modalWindow;
     modalWindow = this;
     
-    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow   ( m_area, true /* modal */ );
+    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area, true /* modal */);
     
     GUIEngine::getSkin()->m_dialog = true;
     GUIEngine::getSkin()->m_dialog_size = 0.0f;

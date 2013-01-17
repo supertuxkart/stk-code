@@ -87,7 +87,7 @@ public:
     MessageDialog(irr::core::stringw msg);
 
     
-    ~MessageDialog() { if (m_own_listener) delete m_listener; m_listener = NULL; }
+    ~MessageDialog();
     
     virtual void onEnterPressedInternal();
     virtual void onUpdate(float dt);

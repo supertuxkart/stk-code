@@ -21,6 +21,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "modes/world.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -44,9 +45,27 @@ MessageDialog::MessageDialog(irr::core::stringw msg) :
 
 // ------------------------------------------------------------------------------------------------------
 
+MessageDialog::~MessageDialog()
+{
+    if (m_own_listener) delete m_listener; m_listener = NULL;
+    
+    if (StateManager::get()->getGameState() == GUIEngine::GAME)
+    {
+        World::getWorld()->scheduleUnpause();
+    }
+}
+
+// ------------------------------------------------------------------------------------------------------
+
 void MessageDialog::doInit(irr::core::stringw msg, MessageDialogType type,
                            IConfirmDialogListener* listener, bool own_listener)
 {
+    if (StateManager::get()->getGameState() == GUIEngine::GAME)
+    {
+        World::getWorld()->schedulePause(World::IN_GAME_MENU_PHASE);
+    }
+    
+    
     loadFromFile("confirm_dialog.stkgui");
 
     m_listener = listener;
