@@ -33,6 +33,9 @@ const int    WIIMOTE_BUTTONS     = 12;  // A, B, left, right, top, bottom, 1, 2,
 /** Irrlicht device IDs for the wiimotes start at this value */
 static const int    WIIMOTE_START_IRR_ID = 32;
 
+static const float  WIIMOTE_ABS_MAX_ANGLE = 80.0f;
+static const float  JOYSTICK_ABS_MAX_ANGLE = 32767.0f;
+
 // ============================ Helper functions ============================
 // -----------------------------------------------------------------------------
 static int wiimoteIdToIrrId(int wiimote_id)
@@ -144,6 +147,11 @@ void Wiimote::init(wiimote_t* wiimote_handle, int wiimote_id, GamepadConfig* gam
                                          WIIMOTE_BUTTONS,
                                          gamepad_config );
     device_manager->addGamepad(m_gamepad_device);
+    
+    // Enable accelerometer reporting
+    // TODO: this should only be done when needed (i.e when racing)
+    // so as to avoid wasting wiimote batteries.
+    wiiuse_motion_sensing(m_wiimote_handle, 1);
 }
 
 // -----------------------------------------------------------------------------
@@ -155,18 +163,25 @@ void Wiimote::updateIrrEvent()
     // Simulate an Irrlicht joystick event
     resetIrrEvent(&m_irr_event, wiimoteIdToIrrId(m_wiimote_id));
     
-    // --------------------- Wiimote --------------------
+    // --------------------- Wiimote accelerometers --------------------
+    //printf("yaw: %f\n", m_wiimote_handle->orient.yaw);
+    //printf("pitch: %f\n", m_wiimote_handle->orient.pitch);
+    //printf("roll: %f\n", m_wiimote_handle->orient.roll);
+    const float wiimote_to_joystick = -JOYSTICK_ABS_MAX_ANGLE / WIIMOTE_ABS_MAX_ANGLE;
+    const float angle = wiimote_to_joystick * m_wiimote_handle->orient.pitch;
+    m_irr_event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_X] =
+            (irr::s16)(irr::core::clamp(angle, -JOYSTICK_ABS_MAX_ANGLE, +JOYSTICK_ABS_MAX_ANGLE));
+    
+    // --------------------- Wiimote buttons --------------------
     // Send button states
     for(unsigned int i=0 ; i < sizeof(wiimote_actions)/sizeof(WiimoteAction) ; i++)
     {
         if(IS_PRESSED(m_wiimote_handle, wiimote_actions[i].wiimote_action_id))
         {
-            /*
-            printf("wiimote %d: pressed button %s -> button id: %d\n",
-                   m_wiimote_id,
-                   wiimote_actions[i].wiimote_action_name,
-                   wiimote_actions[i].button_id);
-            */
+            //printf("wiimote %d: pressed button %s -> button id: %d\n",
+            //       m_wiimote_id,
+            //       wiimote_actions[i].wiimote_action_name,
+            //       wiimote_actions[i].button_id);
             m_irr_event.JoystickEvent.ButtonStates |= (1<<(wiimote_actions[i].button_id));
         }
     }
@@ -352,7 +367,6 @@ void WiimoteManager::threadFunc()
                 {
                 case WIIUSE_EVENT:
                     m_wiimotes[i].updateIrrEvent();
-                    //translateEvent(m_all_wiimote_handles[i], &m_irr_events[m_write_id]);  // TODO
                     //printf("DEBUG: wiimote event\n");
                     break;
     
