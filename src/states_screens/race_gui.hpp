@@ -90,6 +90,8 @@ private:
     int              m_timer_width;
         
     
+    bool             m_is_tutorial;
+    
     /* Display informat for one player on the screen. */
     void drawEnergyMeter       (int x, int y, const AbstractKart *kart,
                                 const core::recti &viewport, 

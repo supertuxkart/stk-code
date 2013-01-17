@@ -81,6 +81,8 @@ RaceGUI::RaceGUI()
         m_map_left = UserConfigParams::m_width - m_map_width;
     }
 
+    m_is_tutorial = (race_manager->getTrackName() == "tutorial");
+
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
     createMarkerTexture();
@@ -161,15 +163,20 @@ void RaceGUI::renderGlobal(float dt)
     if(!world->isRacePhase()) return;
     if (!m_enabled) return;
 
-    drawGlobalTimer();
-    if(world->getPhase() == WorldStatus::GO_PHASE ||
-       world->getPhase() == WorldStatus::MUSIC_PHASE)
-    {
-        drawGlobalMusicDescription();
-    }
 
-    drawGlobalMiniMap();        
-    drawGlobalPlayerIcons(m_map_height);
+    if (!m_is_tutorial)
+    {
+        drawGlobalTimer();
+        if(world->getPhase() == WorldStatus::GO_PHASE ||
+           world->getPhase() == WorldStatus::MUSIC_PHASE)
+        {
+            drawGlobalMusicDescription();
+        }
+    }
+    
+    drawGlobalMiniMap();
+
+    if (!m_is_tutorial) drawGlobalPlayerIcons(m_map_height);
 }   // renderGlobal
 
 //-----------------------------------------------------------------------------
@@ -194,7 +201,9 @@ void RaceGUI::renderPlayerView(const AbstractKart *kart, float dt)
 
     drawPowerupIcons    (kart, viewport, scaling);
     drawSpeedAndEnergy  (kart, viewport, scaling);
-    drawRankLap         (kart, viewport);
+    
+    if (!m_is_tutorial)
+        drawRankLap     (kart, viewport);
 
     RaceGUIBase::renderPlayerView(kart, dt);
 }   // renderPlayerView

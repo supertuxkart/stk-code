@@ -182,7 +182,8 @@ void World::init()
 
 void World::createRaceGUI()
 {
-    if(UserConfigParams::m_minimal_race_gui)
+    if(UserConfigParams::m_minimal_race_gui &&
+       race_manager->getTrackName() != "tutorial")
 		m_race_gui = new MinimalRaceGUI();
 	else
 		m_race_gui = new RaceGUI();
