@@ -128,7 +128,7 @@ FileManager::FileManager(char *argv[])
     chdir( buffer );
 #endif
 
-    m_file_system  = io::createFileSystem();
+    m_file_system  = irr_driver->getDevice()->getFileSystem();
     m_file_system->grab();
     m_is_full_path = false;
 
