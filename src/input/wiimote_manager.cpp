@@ -167,8 +167,18 @@ void Wiimote::updateIrrEvent()
     //printf("yaw: %f\n", m_wiimote_handle->orient.yaw);
     //printf("pitch: %f\n", m_wiimote_handle->orient.pitch);
     //printf("roll: %f\n", m_wiimote_handle->orient.roll);
-    const float wiimote_to_joystick = -JOYSTICK_ABS_MAX_ANGLE / WIIMOTE_ABS_MAX_ANGLE;
-    const float angle = wiimote_to_joystick * m_wiimote_handle->orient.pitch;
+    
+    // --- Linear response version ---
+    //const float wiimote_to_joystick = -JOYSTICK_ABS_MAX_ANGLE / WIIMOTE_ABS_MAX_ANGLE;
+    //const float angle = wiimote_to_joystick * m_wiimote_handle->orient.pitch;
+    
+    // --- Quadratic response version ---
+    const float normalized_angle = -m_wiimote_handle->orient.pitch / WIIMOTE_ABS_MAX_ANGLE;    // around [-1, 1]
+    const float normalized_angle_2 = normalized_angle * normalized_angle;   // change the response curve to be
+                                                                            // less sensitive with values near 0
+    const float sign = normalized_angle >= 0.0f ? 1.0f : -1.0f;
+    const float angle = sign * normalized_angle_2 * JOYSTICK_ABS_MAX_ANGLE;
+    
     m_irr_event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_X] =
             (irr::s16)(irr::core::clamp(angle, -JOYSTICK_ABS_MAX_ANGLE, +JOYSTICK_ABS_MAX_ANGLE));
     

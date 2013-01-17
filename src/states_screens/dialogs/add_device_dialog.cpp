@@ -16,7 +16,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "states_screens/dialogs/add_device_dialog.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
 
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
@@ -174,6 +173,7 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent
 #ifdef ENABLE_WIIUSE
     else if (eventSource == "addwiimote")
     {
+        //new MessageDialog( _("Press the buttons 1+2 of your wiimote..."), MessageDialog::MESSAGE_DIALOG_OK, this, false);
         //new MessageDialog( _("Press the buttons 1+2 of your wiimote..."));
         
         wiimote_manager->launchDetection(5);
@@ -202,3 +202,9 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent
 }   // processEvent
 
 // ----------------------------------------------------------------------------
+
+void AddDeviceDialog::onConfirm()
+{
+    ModalDialog::dismiss();
+    printf("TEST\n");
+}
