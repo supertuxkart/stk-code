@@ -23,6 +23,7 @@
 #include "guiengine/widget.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "utils/log.hpp"
 
 #include <IGUIEnvironment.h>
 
@@ -119,7 +120,11 @@ void ModalDialog::doInit(const float percentWidth, const float percentHeight)
         assert(false);
     }
     
-    if (modalWindow != NULL) delete modalWindow;
+    if (modalWindow != NULL)
+    {
+        delete modalWindow;
+        Log::warn("GUIEngine", "Showing a modal dialog while the previous one is still open. Destroying the previous dialog.");
+    }
     modalWindow = this;
     
     m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area, true /* modal */);
