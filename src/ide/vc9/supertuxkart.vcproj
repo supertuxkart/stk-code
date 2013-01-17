@@ -1427,6 +1427,10 @@
 						RelativePath="..\..\states_screens\dialogs\track_info_dialog.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\tutorial_message_dialog.cpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -2607,6 +2611,10 @@
 					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\track_info_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\tutorial_message_dialog.hpp"
 						>
 					</File>
 				</Filter>
