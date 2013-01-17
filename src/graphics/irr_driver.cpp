@@ -44,6 +44,7 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 #include "utils/profiler.hpp"
 
 #include <irrlicht.h>
@@ -121,7 +122,7 @@ X11::Window get_toplevel_parent(X11::Display* display, X11::Window window)
          if (0 == X11::XQueryTree(display, window, &root,
                    &parent, &children, &num_children))
          {
-             fprintf(stderr, "XQueryTree error\n");
+             Log::fatal("irr_driver", "XQueryTree error\n");
              abort(); //change to whatever error handling you prefer
          }
          if (children) { //must test for null
@@ -137,13 +138,16 @@ X11::Window get_toplevel_parent(X11::Display* display, X11::Window window)
 }
 #endif
 
+// ----------------------------------------------------------------------------
 
 void IrrDriver::updateConfigIfRelevant()
 {
-        if (!UserConfigParams::m_fullscreen && UserConfigParams::m_remember_window_location)
+        if (!UserConfigParams::m_fullscreen && 
+             UserConfigParams::m_remember_window_location)
     {
 #ifdef WIN32
-        const SExposedVideoData& videoData = m_device->getVideoDriver()->getExposedVideoData();
+        const SExposedVideoData& videoData = m_device->getVideoDriver()
+                                                     ->getExposedVideoData();
         // this should work even if using DirectX in theory because the HWnd is
         // always third pointer in the struct, no matter which union is used
         HWND window = (HWND)videoData.OpenGLWin32.HWnd;
@@ -158,7 +162,8 @@ void IrrDriver::updateConfigIfRelevant()
             // corresponding edge.
             if(x<0) x = 0;
             if(y<0) y = 0;
-            printf("Retrieved window location for config : %i %i\n", x, y);
+            Log::verbose("irr_driver", 
+                       "Retrieved window location for config : %i %i\n", x, y);
             
             if (UserConfigParams::m_window_x != x || UserConfigParams::m_window_y != y)
             {
@@ -169,17 +174,20 @@ void IrrDriver::updateConfigIfRelevant()
         }
         else
         {
-            printf("Could not retrieve window location\n");
+            Log::warn("irr_driver", "Could not retrieve window location\n");
         }
 #elif defined(__linux__) && !defined(ANDROID)
         using namespace X11;
-        const SExposedVideoData& videoData = m_device->getVideoDriver()->getExposedVideoData();
+        const SExposedVideoData& videoData = 
+            m_device->getVideoDriver()->getExposedVideoData();
         Display* display = (Display*)videoData.OpenGLLinux.X11Display;
         XWindowAttributes xwa;
-        XGetWindowAttributes(display, get_toplevel_parent(display, videoData.OpenGLLinux.X11Window), &xwa);
+        XGetWindowAttributes(display, get_toplevel_parent(display, 
+                                       videoData.OpenGLLinux.X11Window), &xwa);
         int wx = xwa.x;
         int wy = xwa.y;
-        printf("Retrieved window location for config : %i %i\n", wx, wy);
+        Log::verbose("irr_driver", 
+                     "Retrieved window location for config : %i %i\n", wx, wy);
         
         
         if (UserConfigParams::m_window_x != wx || UserConfigParams::m_window_y != wy)
@@ -237,18 +245,23 @@ void IrrDriver::initDevice()
 		    // mode. So we use this to print a warning to the user.
             if(m_device->getDebugName())
             {
-                printf("!!!!! Performance warning: Irrlicht compiled with debug mode.!!!!!\n");
-                printf("!!!!! This can have a significant performance impact         !!!!!\n");
+                Log::warn("irr_driver", 
+                          "!!!!! Performance warning: Irrlicht compiled with "
+                          "debug mode.!!!!!\n");
+                Log::warn("irr_driver",
+                          "!!!!! This can have a significant performance "
+                          "impact         !!!!!\n");
             }
 
         } // end if firstTime
         
-        const core::dimension2d<u32> ssize = m_device->getVideoModeList()->getDesktopResolution();
+        const core::dimension2d<u32> ssize = m_device->getVideoModeList()
+                                                     ->getDesktopResolution();
         if (UserConfigParams::m_width > (int)ssize.Width ||
             UserConfigParams::m_height > (int)ssize.Height)
         {
-            fprintf(stderr, "[IrrDriver] The window size specified in "
-                            "user config is larger than your screen!");
+            Log::warn("irr_driver", "The window size specified in "
+                      "user config is larger than your screen!");
             UserConfigParams::m_width = 800;
             UserConfigParams::m_height = 600;
         }
@@ -293,8 +306,8 @@ void IrrDriver::initDevice()
             for (int bits=32; bits>15; bits -=8)
             {
                 if(UserConfigParams::logMisc())
-                    printf("[IrrDriver] Trying to create device with "
-                           "%i bits\n", bits);
+                    Log::verbose("irr_driver", "Trying to create device with "
+                                 "%i bits\n", bits);
                 SIrrlichtCreationParameters params;
                 params.DriverType = type;
                 params.Stencilbuffer = false;
@@ -319,8 +332,10 @@ void IrrDriver::initDevice()
                     params.AntiAlias = 8;
                     break;
                 default:
-                    fprintf(stderr, "[IrrDriver] WARNING: Invalid value for anti-alias setting : %i\n",
-                            (int)UserConfigParams::m_antialiasing);
+                    Log::error("irr_driver",
+                               "[IrrDriver] WARNING: Invalid value for "
+                               "anti-alias setting : %i\n",
+                               (int)UserConfigParams::m_antialiasing);
                 }
                 
                 m_device = createDeviceEx(params);
@@ -348,14 +363,15 @@ void IrrDriver::initDevice()
                                     );
             if (m_device)
             {
-                fprintf(stderr, "An invalid resolution was set in the config file, reverting to saner values\n");
+                Log::verbose("irr_driver", "An invalid resolution was set in "
+                             "the config file, reverting to saner values\n");
             }
         }
     }
     
     if(!m_device)
     {
-        fprintf(stderr, "Couldn't initialise irrlicht device. Quitting.\n");
+        Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
         exit(-1);
     }
 
@@ -477,7 +493,7 @@ video::E_DRIVER_TYPE IrrDriver::getEngineDriverType( int index )
     }
 
     // Ouput which render will be tried.
-    printf("[IrrDriver] Trying %s rendering.\n", rendererName.c_str());
+    Log::verbose("irr_driver", "Trying %s rendering.\n", rendererName.c_str());
 
     return type;
 }
@@ -531,7 +547,7 @@ bool IrrDriver::moveWindow(const int x, const int y)
     }
     else
     {
-        printf("[IrrDriver] WARNING: Could not set window location\n");
+        Log::warn("irr_driver", "Could not set window location\n");
         return false;
     }
 #elif defined(__linux__) && !defined(ANDROID)
@@ -574,9 +590,9 @@ void IrrDriver::applyResolutionSettings()
     // garbage during switch
     m_video_driver->beginScene(true, true, video::SColor(255,100,101,140));
     m_video_driver->draw2DRectangle( SColor(255, 0, 0, 0),
-                                     core::rect<s32>(0, 0,
-                                                     UserConfigParams::m_prev_width,
-                                                     UserConfigParams::m_prev_height) );
+                            core::rect<s32>(0, 0,
+                                            UserConfigParams::m_prev_width,
+                                            UserConfigParams::m_prev_height) );
     m_video_driver->endScene();
     track_manager->removeAllCachedData();
     attachment_manager->removeTextures();
@@ -658,7 +674,8 @@ void IrrDriver::cancelResChange()
     // This will trigger calling applyResolutionSettings in update(). This is 
     // necessary to avoid that the old screen is deleted, while it is
     // still active (i.e. sending out events which triggered the change
-    // of resolution    // Setting this flag will trigger a call to applyResolutionSetting()
+    // of resolution    
+    // Setting this flag will trigger a call to applyResolutionSetting()
     // in the next update call. This avoids the problem that changeResolution
     // is actually called from the gui, i.e. the event loop, i.e. while the
     // old device is active - so we can't delete this device (which we must
@@ -675,7 +692,8 @@ void IrrDriver::cancelResChange()
 void IrrDriver::printRenderStats()
 {
     io::IAttributes * attr = m_scene_manager->getParameters();
-    printf("[%ls], FPS:%3d Tri:%.03fm Cull %d/%d nodes (%d,%d,%d)\n",
+    Log::verbose("irr_driver", 
+           "[%ls], FPS:%3d Tri:%.03fm Cull %d/%d nodes (%d,%d,%d)\n",
            m_video_driver->getName(),
            m_video_driver->getFPS (),
            (f32) m_video_driver->getPrimitiveCountDrawn( 0 ) * ( 1.f / 1000000.f ),
@@ -704,8 +722,9 @@ scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
                                          /*ignoreCase*/false, 
                                          /*ignorePath*/true, io::EFAT_ZIP))
         {
-            fprintf(stderr, "[IrrDriver::getMesh] Failed to open zip file <%s>\n",
-                    filename.c_str());
+            Log::error("irr_driver",
+                       "getMesh: Failed to open zip file <%s>\n",
+                       filename.c_str());
             return NULL;
         }
         
@@ -740,7 +759,8 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
     IAnimatedMesh* am = getAnimatedMesh(filename);
     if (am == NULL)
     {
-        fprintf(stderr, "ERROR: cannot load mesh <%s>\n", filename.c_str());
+        Log::error("irr_driver", "Cannot load mesh <%s>\n",
+                   filename.c_str());
         return NULL;
     }
     return am->getMesh(0);
@@ -781,7 +801,8 @@ scene::ISceneNode* IrrDriver::addWaterNode(scene::IMesh *mesh,
                                            float wave_length)
 {
     mesh->setMaterialFlag(EMF_GOURAUD_SHADING, true);
-    scene::IMesh* welded_mesh = m_scene_manager->getMeshManipulator()->createMeshWelded(mesh);
+    scene::IMesh* welded_mesh = m_scene_manager->getMeshManipulator()
+                                               ->createMeshWelded(mesh);
     scene::ISceneNode* out = m_scene_manager->addWaterSurfaceSceneNode(welded_mesh,
                                                      wave_height, wave_speed,
                                                      wave_length);
@@ -1152,8 +1173,9 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
 
     if (complain_if_not_found && out == NULL)
     {
-        printf("[IrrDriver] Texture '%s' not found; Put a breakpoint at line %s:%i to debug!\n",
-               filename.c_str(), __FILE__, __LINE__);
+        Log::error("irr_driver",  "Texture '%s' not found; Put a breakpoint "
+                   "at line %s:%i to debug!\n",
+                   filename.c_str(), __FILE__, __LINE__);
     }
     
     return out;
@@ -1242,9 +1264,9 @@ ITexture* IrrDriver::applyMask(video::ITexture* texture,
         return NULL;
     }
     
-    //printf("* Adding '%s'\n", texture->getName().getPath().c_str());
-    ITexture *t = m_video_driver->addTexture(StringUtils::getBasename(texture->getName().getPath().c_str()).c_str(),
-                                             img, NULL);
+    std::string base = 
+        StringUtils::getBasename(texture->getName().getPath().c_str());
+    ITexture *t = m_video_driver->addTexture(base.c_str(),img, NULL);
     img->drop();
     mask->drop();
     return t;
@@ -1317,11 +1339,13 @@ void IrrDriver::displayFPS()
     
     if (UserConfigParams::m_artist_debug_mode)
     {
-        sprintf(buffer, "FPS: %i/%i/%i - %.2f/%.2f/%.2f KTris", min, fps, max, low, kilotris, high);
+        sprintf(buffer, "FPS: %i/%i/%i - %.2f/%.2f/%.2f KTris", 
+                min, fps, max, low, kilotris, high);
     }
     else
     {
-        sprintf(buffer, "FPS: %i/%i/%i - %i KTris", min, fps, max, (int)round(kilotris));
+        sprintf(buffer, "FPS: %i/%i/%i - %i KTris", min, fps, max, 
+                (int)round(kilotris));
     }
     
     core::stringw fpsString = buffer;
@@ -1332,13 +1356,15 @@ void IrrDriver::displayFPS()
 
 #ifdef DEBUG
 
-void drawJoint(bool drawline, bool drawname, irr::scene::ISkinnedMesh::SJoint* joint,
+void drawJoint(bool drawline, bool drawname, 
+               irr::scene::ISkinnedMesh::SJoint* joint,
                ISkinnedMesh* mesh, int id)
 {
     //if (joint->PositionKeys.size() == 0) return;
     
     irr::scene::ISkinnedMesh::SJoint* parent = NULL;
-    const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = mesh->getAllJoints();
+    const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints 
+        = mesh->getAllJoints();
     for (unsigned int j=0; j<joints.size(); j++)
     {
         if (joints[j]->Children.linear_search(joint) != -1)
@@ -1414,7 +1440,8 @@ void drawJoint(bool drawline, bool drawname, irr::scene::ISkinnedMesh::SJoint* j
                 break;
         }
         
-        // This code doesn't quite work. 0.25 is used so that the bone is not way too long (not sure why I need to manually size it down)
+        // This code doesn't quite work. 0.25 is used so that the bone is not 
+        // way too long (not sure why I need to manually size it down)
         // and the rotation of the bone is often rather off
         core::vector3df v(0.0f, 0.25f, 0.0f);
         //joint->GlobalMatrix.rotateVect(v);
@@ -1443,12 +1470,16 @@ void drawJoint(bool drawline, bool drawname, irr::scene::ISkinnedMesh::SJoint* j
     
     if (drawname)
     {
-        irr_driver->getVideoDriver()->setTransform(video::ETS_WORLD, core::IdentityMatrix);
+        irr_driver->getVideoDriver()->setTransform(video::ETS_WORLD, 
+                                                   core::IdentityMatrix);
         
-        core::vector2di textpos = irr_driver->getSceneManager()->getSceneCollisionManager()->getScreenCoordinatesFrom3DPosition(jointpos);
+        core::vector2di textpos = 
+            irr_driver->getSceneManager()->getSceneCollisionManager()
+            ->getScreenCoordinatesFrom3DPosition(jointpos);
         
         GUIEngine::getSmallFont()->draw( stringw(joint->Name.c_str()),
-                                   core::rect<s32>(textpos, core::dimension2d<s32>(500,50)),
+                                   core::rect<s32>(textpos, 
+                                               core::dimension2d<s32>(500,50)),
                                    color, false, false );
     }
 }
@@ -1478,7 +1509,7 @@ void IrrDriver::update(float dt)
     {
         // Print a dividing line so that it's easier to see which events
         // get received in which order in the one frame.
-        printf("-------------------------------------\n");
+        Log::debug("irr_driver", "-------------------------------------\n");
     }
     
     World *world = World::getWorld();
@@ -1546,7 +1577,8 @@ void IrrDriver::update(float dt)
                     {
                         std::ostringstream oss;
                         oss << "drawAll() for kart " << i << std::flush;
-                        PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (i+1)*60, 0x00, 0x00);
+                        PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (i+1)*60,
+                                                 0x00, 0x00);
                     }
                     #endif
                             
@@ -1621,7 +1653,8 @@ void IrrDriver::update(float dt)
     {
         IMesh* mesh = debug_meshes[n]->getMesh();
         ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
-        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = smesh->getAllJoints();
+        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = 
+            smesh->getAllJoints();
 
         for (unsigned int j=0; j<joints.size(); j++)
         {
@@ -1647,7 +1680,8 @@ void IrrDriver::update(float dt)
         
         
         ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
-        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = smesh->getAllJoints();
+        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = 
+            smesh->getAllJoints();
 
         for (unsigned int j=0; j<joints.size(); j++)
         {
@@ -1681,19 +1715,23 @@ void IrrDriver::update(float dt)
             if (World::getWorld() == NULL) trackName = "menu";
             
             #if defined(WIN32)
-            std::string path = StringUtils::insertValues("C:\\Temp\\supertuxkart %s %s.png",
-                                                         trackName, timeBuffer);
+            std::string path = 
+                StringUtils::insertValues("C:\\Temp\\supertuxkart %s %s.png",
+                                          trackName, timeBuffer);
             #else
             std::string path = StringUtils::insertValues("/tmp/supertuxkart %s %s.png",
                                                          trackName, timeBuffer);
             #endif
             
-            if (irr_driver->getVideoDriver()->writeImageToFile(image, io::path(path.c_str()), 0))
+            if (irr_driver->getVideoDriver()
+                          ->writeImageToFile(image, io::path(path.c_str()), 0))
             {
-                RaceGUIBase* base = (World::getWorld() == NULL ? NULL : World::getWorld()->getRaceGUI());
+                RaceGUIBase* base = !World::getWorld() ? NULL : 
+                                                       World::getWorld()->getRaceGUI();
                 if (base != NULL)
                 {
-                    base->addMessage(core::stringw(("Screenshot saved to\n" + path).c_str()), NULL,
+                    base->addMessage(core::stringw(("Screenshot saved to\n" + 
+                                                     path).c_str()), NULL,
                                      2.0f, video::SColor(255,255,255,255), true, false);
                 }
             }
@@ -1702,8 +1740,11 @@ void IrrDriver::update(float dt)
                 RaceGUIBase* base = World::getWorld()->getRaceGUI();
                 if (base != NULL)
                 {
-                    base->addMessage(core::stringw(("FAILED saving screenshot to\n" + path + "\n:(").c_str()),
-                                     NULL, 2.0f, video::SColor(255,255,255,255), true, false);
+                    base->addMessage(
+                        core::stringw(("FAILED saving screenshot to\n" + path + 
+                                       "\n:(").c_str()),
+                                     NULL, 2.0f, video::SColor(255,255,255,255), 
+                                     true, false);
                 }
             }
             image->drop();
