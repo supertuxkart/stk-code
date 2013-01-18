@@ -379,6 +379,8 @@ supertuxkart_SOURCES = \
  states_screens/dialogs/story_mode_new.cpp \
  states_screens/dialogs/track_info_dialog.cpp \
  states_screens/dialogs/track_info_dialog.hpp \
+ states_screens/dialogs/tutorial_message_dialog.cpp \
+ states_screens/dialogs/tutorial_message_dialog.hpp \
  states_screens/dialogs/addons_loading.cpp \
  states_screens/dialogs/addons_loading.hpp \
  states_screens/feature_unlocked.cpp \
