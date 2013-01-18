@@ -32,8 +32,8 @@ class Log
 {
 public:
     /** The various log levels used in STK. */
-    enum LogLevel { LL_VERBOSE, 
-                    LL_DEBUG,
+    enum LogLevel { LL_DEBUG,
+                    LL_VERBOSE, 
                     LL_INFO,
                     LL_WARN,
                     LL_ERROR,

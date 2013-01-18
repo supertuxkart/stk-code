@@ -136,8 +136,13 @@ void Log::printMessage(int level, const char *component, const char *format,
     android_LogPriority alp;
     switch (level)
     {
-    case LL_VERBOSE: alp = ANDROID_LOG_VERBOSE; break;
-    case LL_DEBUG:   alp = ANDROID_LOG_DEBUG;   break;
+        // STK is using the levels slightly different from android
+        // (debug lowest, verbose above it; while android reverses
+        // this order. So to get the same behaviour (e.g. filter
+        // out debug message, but still get verbose, we swap
+        // the order here.
+    case LL_VERBOSE: alp = ANDROID_LOG_DEBUG;   break;
+    case LL_DEBUG:   alp = ANDROID_LOG_VERBOSE; break;
     case LL_INFO:    alp = ANDROID_LOG_INFO;    break;
     case LL_WARN :   alp = ANDROID_LOG_WARN;    break;
     case LL_ERROR:   alp = ANDROID_LOG_ERROR;   break;
