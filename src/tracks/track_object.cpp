@@ -33,6 +33,7 @@
 #include "modes/world.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "tracks/track.hpp"
 
 #include <IMeshSceneNode.h>
@@ -549,6 +550,19 @@ void TrackObject::onTriggerItemApproached(Item* who)
 
             new TutorialMessageDialog(_("Note that if you manage to skid for several seconds, you will receive a bonus speedup as a reward!"),
                                     true);
+        }
+        else if (m_action == "tutorial_endmessage")
+        {
+            m_action = "__disabled__";
+            World::getWorld()->getRaceGUI()->clearAllMessages();
+
+            new TutorialMessageDialog(_("You are now ready to race. Good luck!"),
+                                      true);
+        }
+        else if (m_action == "tutorial_exit")
+        {
+            World::getWorld()->scheduleExitRace();
+            return;
         }
         else if (m_action == "__disabled__")
         {

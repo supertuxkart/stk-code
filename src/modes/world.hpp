@@ -136,6 +136,8 @@ protected:
      *  switch. */
     bool m_schedule_unpause;
     
+    bool m_schedule_exit_race;
+    
     Phase m_scheduled_pause_phase;
     
     /** Set when the world needs to be deleted but you can't do it immediately
@@ -247,6 +249,7 @@ public:
     Highscores     *getHighscores() const;
     void            schedulePause(Phase phase);
     void            scheduleUnpause();
+    void            scheduleExitRace() { m_schedule_exit_race = true; }
     void            updateWorld(float dt);
     void            handleExplosion(const Vec3 &xyz, AbstractKart *kart_hit,
                                     PhysicalObject *object);

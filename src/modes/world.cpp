@@ -38,6 +38,7 @@
 #include "karts/controller/skidding_ai.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
@@ -51,10 +52,11 @@
 #include "replay/replay_recorder.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "states_screens/race_gui_base.hpp"
-#include "states_screens/race_gui.hpp"
-#include "states_screens/state_manager.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/minimal_race_gui.hpp"
+#include "states_screens/race_gui.hpp"
 #include "states_screens/race_result_gui.hpp"
+#include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
@@ -93,6 +95,7 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_clear_back_buffer  = false;
     m_schedule_pause     = false;
     m_schedule_unpause   = false;
+    m_schedule_exit_race = false;
     m_self_destruct      = false;
     
     m_stop_music_when_dialog_open = true;
@@ -623,6 +626,18 @@ void World::updateWorld(float dt)
     if( (!isFinishPhase()) && isRaceOver())
     {
         enterRaceOverState();
+    }
+    
+    if (m_schedule_exit_race)
+    {
+        race_manager->exitRace();
+        race_manager->setAIKartOverride("");
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        
+        if (race_manager->raceWasStartedFromOverworld())
+        {
+            OverWorld::enterOverWorld();
+        }
     }
 }   // updateWorld
 
