@@ -73,11 +73,6 @@ public:
     
     void removeObject(PhysicalObject* who);
     
-    void manualInsertObject(TrackObject* obj)
-    {
-        m_all_objects.push_back(obj);
-    }
-    
     void assingLodNodes(const std::vector<LODNode*>& lod);
     
           PtrVector<TrackObject>& getObjects()       { return m_all_objects; }

@@ -280,7 +280,7 @@ void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes)
         obj->setNode( lod_nodes[n] );
         queue.erase( queue.end() - 1 );
         
-        manualInsertObject( obj );
+        m_all_objects.push_back(obj);
     }
     
     m_lod_objects.clear();
