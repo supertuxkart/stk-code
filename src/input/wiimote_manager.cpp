@@ -319,19 +319,16 @@ void WiimoteManager::cleanup()
 {
     if(m_nb_wiimotes > 0)
     {
-        // Remove all configs associated to the wiimotes (linked gamepad devices are removed automatically)
         DeviceManager* device_manager = input_manager->getDeviceList();
-        for(int i=0 ; i < m_nb_wiimotes ; i++)
-        {
-            int irr_id = wiimoteIdToIrrId(i);
-            GamePadDevice*  gamepad_device = device_manager->getGamePadFromIrrID(irr_id);
-            assert(gamepad_device);
-            
-            DeviceConfig*  gamepad_config = gamepad_device->getConfiguration();
-            assert(gamepad_config);
-            
-            device_manager->deleteConfig(gamepad_config);
-        }
+        
+        GamePadDevice*  first_gamepad_device = device_manager->getGamePadFromIrrID(WIIMOTE_START_IRR_ID);
+        assert(first_gamepad_device);
+        
+        DeviceConfig*  gamepad_config = first_gamepad_device->getConfiguration();
+        assert(gamepad_config);
+        
+        // Remove the wiimote configuration -> automatically removes all linked gamepad devices;
+        device_manager->deleteConfig(gamepad_config);
         
         // Shut the update thread
         m_shut = true;
