@@ -24,9 +24,11 @@
 #include "guiengine/widgets/button_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/options_screen_players.hpp"
 #include "states_screens/options_screen_input.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/cpp2011.h"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 #include "input/wiimote_manager.hpp"
@@ -150,7 +152,36 @@ void AddDeviceDialog::onEnterPressedInternal()
 }   // onEnterPressedInternal
 
 // ----------------------------------------------------------------------------
+#ifdef ENABLE_WIIUSE
+class WiimoteDialogListener : public MessageDialog::IConfirmDialogListener
+{
+public:
+    virtual void onConfirm() OVERRIDE
+    {
+        ModalDialog::dismiss();
+        
+        wiimote_manager->launchDetection(5);
+        
+        int nb_wiimotes = wiimote_manager->getNbWiimotes();
+        if(nb_wiimotes > 0)
+        {
+            core::stringw msg = StringUtils::insertValues(
+                _("Found %d wiimote(s)"),
+                core::stringw(nb_wiimotes));
+            
+            new MessageDialog( msg );
+            
+            ((OptionsScreenInput*)GUIEngine::getCurrentScreen())->rebuildDeviceList();
+        }
+        else
+        {
+            new MessageDialog( _("Could not detect any wiimote :/") );
+        }
+    }
+};
+#endif
 
+// ----------------------------------------------------------------------------
 GUIEngine::EventPropagation AddDeviceDialog::processEvent
                                                (const std::string& eventSource)
 {
@@ -173,38 +204,12 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent
 #ifdef ENABLE_WIIUSE
     else if (eventSource == "addwiimote")
     {
-        //new MessageDialog( _("Press the buttons 1+2 of your wiimote..."), MessageDialog::MESSAGE_DIALOG_OK, this, false);
-        //new MessageDialog( _("Press the buttons 1+2 of your wiimote..."));
-        
-        wiimote_manager->launchDetection(5);
-        
-        int nb_wiimotes = wiimote_manager->getNbWiimotes();
-        if(nb_wiimotes > 0)
-        {
-            core::stringw msg = StringUtils::insertValues(
-                _("Found %d wiimote(s)"),
-                core::stringw(nb_wiimotes));
-            
-            new MessageDialog( msg );
-            
-            ((OptionsScreenInput*)GUIEngine::getCurrentScreen())->rebuildDeviceList();
-        }
-        else
-        {
-            new MessageDialog( _("Could not detect any wiimote :/") );
-        }
-        
+        new MessageDialog( _("Press the buttons 1+2 simultaneously on your wiimote to put "
+                             "it in discovery mode, then click on OK."),
+                           MessageDialog::MESSAGE_DIALOG_CONFIRM, new WiimoteDialogListener(), true);
         return GUIEngine::EVENT_BLOCK;
     }
 #endif
     
     return GUIEngine::EVENT_LET;
 }   // processEvent
-
-// ----------------------------------------------------------------------------
-
-void AddDeviceDialog::onConfirm()
-{
-    ModalDialog::dismiss();
-    printf("TEST\n");
-}

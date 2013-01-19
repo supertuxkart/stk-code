@@ -21,16 +21,13 @@
 
 #include "config/player.hpp"
 #include "guiengine/modaldialog.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
-#include "utils/cpp2011.h"
 
 /**
   * \brief Dialog that warns the user about the potential problems of
   *        creating multiple keyboard configs.
   * \ingroup states_screens
   */
-class AddDeviceDialog : public GUIEngine::ModalDialog,
-                        public MessageDialog::IConfirmDialogListener
+class AddDeviceDialog : public GUIEngine::ModalDialog
 {
 public:
 
@@ -38,8 +35,6 @@ public:
     
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
-    virtual void onConfirm() OVERRIDE;
 };
   
 
