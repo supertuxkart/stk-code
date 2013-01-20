@@ -29,12 +29,21 @@ MovingTexture::MovingTexture(core::matrix4 *matrix, const XMLNode &node)
 {
     m_dx = 0.0f;
     m_dy = 0.0f;
+    m_dt = 0.0f;
+    m_count = 0.0f;
+
     core::vector3df v = m_matrix->getTranslation();
     m_x = v.X;
     m_y = v.Y;
 
+    // by default the animation by step is disabled
+    m_isAnimatedByStep = false;
+
     node.get("dx", &m_dx);
     node.get("dy", &m_dy);
+    node.get("dt", &m_dt);
+    
+    node.get("animByStep", &m_isAnimatedByStep);
 }   // MovingTexture
 
 //-----------------------------------------------------------------------------
@@ -47,6 +56,9 @@ MovingTexture::MovingTexture(core::matrix4 *matrix, const XMLNode &node)
 MovingTexture::MovingTexture(core::matrix4 *matrix, float dx, float dy)
              : m_matrix(matrix)
 {
+    // by default the animation by step is disabled
+    m_isAnimatedByStep = false;
+
     m_dx = dx;
     m_dy = dy;
     core::vector3df v = m_matrix->getTranslation();
@@ -57,6 +69,9 @@ MovingTexture::MovingTexture(core::matrix4 *matrix, float dx, float dy)
 //-----------------------------------------------------------------------------
 MovingTexture::MovingTexture(float dx, float dy)
 {
+    // by default the animation by step is disabled
+    m_isAnimatedByStep = false;
+
     m_dx     = dx;
     m_dy     = dy;
     m_x      = 0;
@@ -86,12 +101,30 @@ void MovingTexture::reset()
  */
 void MovingTexture::update(float dt)
 {
-    m_x = m_x + dt*m_dx;
-    m_y = m_y + dt*m_dy;
-    if(m_x>1.0f) m_x = fmod(m_x, 1.0f);
-    if(m_y>1.0f) m_y = fmod(m_y, 1.0f);
 
-    m_matrix->setTextureTranslate(m_x, m_y);
+    if (m_isAnimatedByStep)
+    {
+        m_count += dt;
+        if(m_count > m_dt)
+        {
+            m_count -= m_dt;
+
+            m_x = m_x + 1.0f*m_dx;
+            m_y = m_y + 1.0f*m_dy;
+            if(m_x>1.0f) m_x = fmod(m_x, 1.0f);
+            if(m_y>1.0f) m_y = fmod(m_y, 1.0f);
+
+            m_matrix->setTextureTranslate(m_x, m_y);
+        }
+    }
+    else
+    {
+        m_x = m_x + dt*m_dx;
+        m_y = m_y + dt*m_dy;
+        if(m_x>1.0f) m_x = fmod(m_x, 1.0f);
+        if(m_y>1.0f) m_y = fmod(m_y, 1.0f);
+        m_matrix->setTextureTranslate(m_x, m_y);
+    }
 }   // update
 
 
