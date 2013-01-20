@@ -970,18 +970,21 @@ void RaceResultGUI::displayHighScores()
                 const std::string &icon_path = prop->getAbsoluteIconFile();
                 video::ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
 
-                core::recti source_rect(core::vector2di(0,0),
-                    kart_icon_texture->getSize());
+                if (kart_icon_texture != NULL)
+                {
+                    core::recti source_rect(core::vector2di(0,0),
+                        kart_icon_texture->getSize());
 
-                core::recti dest_rect(current_x, current_y,
-                    current_x+m_width_icon, current_y+m_width_icon);
+                    core::recti dest_rect(current_x, current_y,
+                        current_x+m_width_icon, current_y+m_width_icon);
 
-                irr_driver->getVideoDriver()->draw2DImage(
-                    kart_icon_texture, dest_rect,
-                    source_rect, NULL, NULL,
-                    true);
+                    irr_driver->getVideoDriver()->draw2DImage(
+                        kart_icon_texture, dest_rect,
+                        source_rect, NULL, NULL,
+                        true);
 
-                current_x += m_width_icon + m_width_column_space;
+                    current_x += m_width_icon + m_width_column_space;
+                }
             }
 
             // draw the player name
