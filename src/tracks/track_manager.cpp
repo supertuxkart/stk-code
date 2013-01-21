@@ -148,7 +148,7 @@ void TrackManager::loadTrackList()
             subdir != dirs.end(); subdir++)
         {
             if(*subdir=="." || *subdir=="..") continue;
-            loadTrack(dir+*subdir);
+            loadTrack(dir+*subdir+"/");
         }   // for dir in dirs
     }   // for i <m_track_search_path.size()
 }  // loadTrackList
@@ -160,10 +160,9 @@ void TrackManager::loadTrackList()
  */
 bool TrackManager::loadTrack(const std::string& dirname)
 {
-    std::string config_file = dirname+"/track.xml";
-    FILE *f=fopen(config_file.c_str(),"r");
-    if(!f) return false;
-    fclose(f);
+    std::string config_file = dirname+"track.xml";
+    if(!file_manager->fileExists(config_file))
+        return false;
 
     Track *track;
     

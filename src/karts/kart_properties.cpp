@@ -172,7 +172,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     m_kart_model  = new KartModel(/*is_master*/true);
 
     const XMLNode * root = 0;
-    m_root  = StringUtils::getPath(filename);
+    m_root  = StringUtils::getPath(filename)+"/";
     m_ident = StringUtils::getBasename(StringUtils::getPath(filename));
     try
     {
@@ -202,14 +202,14 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 
 
     // Load material
-    std::string materials_file = m_root+"/materials.xml";
+    std::string materials_file = m_root+"materials.xml";
     file_manager->pushModelSearchPath  (m_root);
     file_manager->pushTextureSearchPath(m_root);
 
     // addShared makes sure that these textures/material infos stay in memory
     material_manager->addSharedMaterial(materials_file);
 
-    m_icon_file = m_root+"/"+m_icon_file;
+    m_icon_file = m_root+m_icon_file;
 
     // Make permanent is important, since otherwise icons can get deleted
     // (e.g. when freeing temp. materials from a track, the last icon
@@ -218,7 +218,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
                                                     /*is_full+path*/true, 
                                                     /*make_permanent*/true);
     if(m_minimap_icon_file!="")
-        m_minimap_icon = irr_driver->getTexture(m_root+"/"+m_minimap_icon_file);
+        m_minimap_icon = irr_driver->getTexture(m_root+m_minimap_icon_file);
     else
         m_minimap_icon = NULL;
 

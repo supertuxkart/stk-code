@@ -81,8 +81,12 @@ Track::Track(const std::string &filename)
     
     m_materials_loaded      = false;
     m_filename              = filename;
-    m_root                  = StringUtils::getPath(StringUtils::removeExtension(m_filename));
+    m_root                  = 
+        StringUtils::getPath(StringUtils::removeExtension(m_filename));
     m_ident                 = StringUtils::getBasename(m_root);
+    // The directory should always have a '/' at the end, but getBasename 
+    // above returns "" if a "/" is at the end, so we add the "/" here.
+    m_root                 += "/";
     m_designer              = "";
     m_screenshot            = "";
     m_version               = 0;
@@ -362,11 +366,11 @@ void Track::loadTrackInfo()
     if(xml_node) loadCurves(*xml_node);
 
     // Set the correct paths
-    m_screenshot = m_root+"/"+m_screenshot;
+    m_screenshot = m_root+m_screenshot;
     delete root;
 
     std::string dir = StringUtils::getPath(m_filename);
-    std::string easter_name = dir+"/easter_eggs.xml";
+    std::string easter_name = dir+"easter_eggs.xml";
     m_has_easter_eggs = file_manager->fileExists(easter_name);
 }   // loadTrackInfo
 
@@ -394,7 +398,7 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
 {
     for(int i=0; i<(int)filenames.size(); i++)
     {
-        std::string full_path = m_root+"/"+filenames[i];
+        std::string full_path = m_root+filenames[i];
         MusicInformation* mi = music_manager->getMusicInformation(full_path);
         if(!mi)
         {
@@ -438,8 +442,8 @@ void Track::startMusic() const
  */
 void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
 {
-    QuadGraph::create(m_root+"/"+m_all_modes[mode_id].m_quad_name,
-                      m_root+"/"+m_all_modes[mode_id].m_graph_name,
+    QuadGraph::create(m_root+m_all_modes[mode_id].m_quad_name,
+                      m_root+m_all_modes[mode_id].m_graph_name,
                       reverse);
 
     QuadGraph::get()->setupPaths();
@@ -718,7 +722,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     const XMLNode *track_node= root.getNode("track");
     std::string model_name;
     track_node->get("model", &model_name);
-    std::string full_path = m_root+"/"+model_name;
+    std::string full_path = m_root+model_name;
     scene::IMesh *mesh = irr_driver->getMesh(full_path);
     if(!mesh)
     {
@@ -921,7 +925,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         scene::ISceneNode* scene_node;
         model_name="";
         n->get("model", &model_name);
-        full_path = m_root+"/"+model_name;
+        full_path = m_root+model_name;
         
         // a special challenge orb object for overworld
         std::string challenge;
@@ -1183,7 +1187,7 @@ void Track::createWater(const XMLNode &node)
 {
     std::string model_name;
     node.get("model", &model_name);
-    std::string full_path = m_root+"/"+model_name;
+    std::string full_path = m_root+model_name;
 
     scene::IMesh *mesh = irr_driver->getMesh(full_path);
     if (mesh == NULL) return;
@@ -1295,7 +1299,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // First read the temporary materials.dat file if it exists
     try
     {
-        std::string materials_file = m_root+"/materials.xml";
+        std::string materials_file = m_root+"materials.xml";
         if(m_cache_track)
         {
             if(!m_materials_loaded)
@@ -1312,7 +1316,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     // Start building the scene graph
-    std::string path = m_root+"/"+m_all_modes[mode_id].m_scene;
+    std::string path = m_root+m_all_modes[mode_id].m_scene;
     XMLNode *root    = file_manager->createXMLTree(path);
 
     // Make sure that we have a track (which is used for raycasts to 
@@ -1682,7 +1686,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     if(easter_world)
     {
         std::string dir = StringUtils::getPath(m_filename);
-        easter_world->readData(dir+"/easter_eggs.xml");
+        easter_world->readData(dir+"easter_eggs.xml");
     }
 }   // loadTrackModel
 

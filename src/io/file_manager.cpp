@@ -850,7 +850,7 @@ bool FileManager::isDirectory(const std::string &path) const
 {
     struct stat mystat;
     std::string s(path);
-    // At least on windows stat returns an error if there is 
+    // At least on windows stat returns an error if there is
     // a '/' at the end of the path.
     if(s[s.size()-1]=='/')
         s.erase(s.end()-1, s.end());
@@ -873,11 +873,7 @@ void FileManager::listFiles(std::set<std::string>& result,
 {
     result.clear();
 
-#if defined(WIN32)
-    std::string path = is_full_path ? dir : m_root_dir+"/"+dir;
-#else
-    std::string path = is_full_path ? dir + "/" : m_root_dir+"/"+dir + "/";
-#endif
+    std::string path = is_full_path ? dir : m_root_dir+dir;
 
 #ifndef ANDROID
     if(!isDirectory(path))

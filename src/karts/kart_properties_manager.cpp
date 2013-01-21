@@ -169,7 +169,7 @@ void KartPropertiesManager::loadAllKarts(bool loading_icon)
         for(std::set<std::string>::const_iterator subdir=result.begin();
             subdir!=result.end(); subdir++)
         {
-            const bool loaded = loadKart(*dir+"/"+*subdir);
+            const bool loaded = loadKart(*dir+*subdir);
             
             if (loaded && loading_icon)
             {
@@ -189,9 +189,8 @@ void KartPropertiesManager::loadAllKarts(bool loading_icon)
 bool KartPropertiesManager::loadKart(const std::string &dir)
 {
     std::string config_filename=dir+"/kart.xml";
-    FILE *f=fopen(config_filename.c_str(), "r");
-    if(!f) return false;
-    fclose(f);
+    if(!file_manager->fileExists(config_filename))
+    	return false;
 
     KartProperties* kart_properties;
     try
