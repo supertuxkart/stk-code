@@ -631,7 +631,7 @@ void IrrDriver::applyResolutionSettings()
     input_manager->setMode(InputManager::MENU);
     
     GUIEngine::addLoadingIcon( 
-        irr_driver->getTexture(file_manager->getGUIDir()+"/options_video.png")
+        irr_driver->getTexture(file_manager->getGUIDir()+"options_video.png")
         );
     
     file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
@@ -647,7 +647,7 @@ void IrrDriver::applyResolutionSettings()
     projectile_manager->loadData();
     Referee::init();
     GUIEngine::addLoadingIcon( 
-        irr_driver->getTexture(file_manager->getGUIDir() + "/gift.png") );
+        irr_driver->getTexture(file_manager->getGUIDir() + "gift.png") );
     
     file_manager->popTextureSearchPath();
 
@@ -656,7 +656,7 @@ void IrrDriver::applyResolutionSettings()
     
     attachment_manager->loadModels();
     GUIEngine::addLoadingIcon(irr_driver->getTexture(file_manager->getGUIDir()
-                                                     + "/banana.png") );
+                                                     + "banana.png") );
     // No need to reload cached track data (track_manager->cleanAllCachedData
     // above) - this happens dynamically when the tracks are loaded.
     GUIEngine::reshowCurrentScreen();

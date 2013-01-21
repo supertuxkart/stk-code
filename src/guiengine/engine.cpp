@@ -1201,7 +1201,7 @@ namespace GUIEngine
         
         g_skin->drawBgImage();
         ITexture* loading = 
-            irr_driver->getTexture(file_manager->getGUIDir()+"/loading.png");
+            irr_driver->getTexture(file_manager->getGUIDir()+"loading.png");
         
         const int texture_w = loading->getSize().Width;
         const int texture_h = loading->getSize().Height;
