@@ -143,12 +143,12 @@ void TrackManager::loadTrackList()
         // Then see if a subdir of this dir contains tracks
         // ------------------------------------------------
         std::set<std::string> dirs;
-        file_manager->listFiles(dirs, dir, /*is_ileull_path*/ true);
+        file_manager->listFiles(dirs, dir, /*is_full_path*/ true);
         for(std::set<std::string>::iterator subdir = dirs.begin(); 
             subdir != dirs.end(); subdir++)
         {
             if(*subdir=="." || *subdir=="..") continue;
-            loadTrack(dir+"/"+*subdir);
+            loadTrack(dir+*subdir);
         }   // for dir in dirs
     }   // for i <m_track_search_path.size()
 }  // loadTrackList

@@ -55,9 +55,9 @@ OptionsScreenInput::OptionsScreenInput() : Screen("options_input.stkgui")
 
 void OptionsScreenInput::loadedFromFile()
 {    
-    video::ITexture* icon1 = irr_driver->getTexture( file_manager->getGUIDir() + "/keyboard.png" );
-    video::ITexture* icon2 = irr_driver->getTexture( file_manager->getGUIDir() + "/gamepad.png" );
-    video::ITexture* icon3 = irr_driver->getTexture( file_manager->getGUIDir() + "/gamepad_off.png" );
+    video::ITexture* icon1 = irr_driver->getTexture( file_manager->getGUIDir() + "keyboard.png" );
+    video::ITexture* icon2 = irr_driver->getTexture( file_manager->getGUIDir() + "gamepad.png" );
+    video::ITexture* icon3 = irr_driver->getTexture( file_manager->getGUIDir() + "gamepad_off.png" );
 
     m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv() );
     m_icon_bank->addTextureAsSprite(icon1);    

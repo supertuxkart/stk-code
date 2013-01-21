@@ -69,7 +69,7 @@ void OptionsScreenUI::loadedFromFile()
     skinSelector->clearLabels();
     
     std::set<std::string> skinFiles;
-    file_manager->listFiles(skinFiles /* out */, file_manager->getGUIDir() + "/skins",
+    file_manager->listFiles(skinFiles /* out */, file_manager->getGUIDir() + "skins",
                             true /* is full path */, true /* make full path */ );
     
     for (std::set<std::string>::iterator it = skinFiles.begin(); it != skinFiles.end(); it++)

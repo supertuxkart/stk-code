@@ -1135,9 +1135,9 @@ void initRest()
     highscore_manager       = new HighscoreManager     ();
     network_manager         = new NetworkManager       ();
     KartPropertiesManager::addKartSearchDir(
-                 file_manager->getAddonsFile("karts"));
+                 file_manager->getAddonsFile("karts/"));
     track_manager->addTrackSearchDir(
-                 file_manager->getAddonsFile("tracks"));
+                 file_manager->getAddonsFile("tracks/"));
 
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
@@ -1270,7 +1270,7 @@ int main(int argc, char *argv[] )
         main_loop = new MainLoop();
         material_manager        -> loadMaterial    ();
         GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                           file_manager->getGUIDir() + "/options_video.png") );
+                           file_manager->getGUIDir() + "options_video.png") );
         kart_properties_manager -> loadAllKarts    ();
         unlock_manager          = new UnlockManager();
         //m_tutorial_manager      = new TutorialManager();
@@ -1298,14 +1298,14 @@ int main(int argc, char *argv[] )
         ItemManager::loadDefaultItemMeshes();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                                    file_manager->getGUIDir() + "/gift.png") );
+                                    file_manager->getGUIDir() + "gift.png") );
 
         file_manager->popTextureSearchPath();
 
         attachment_manager      -> loadModels      ();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(
-            file_manager->getGUIDir() + "/banana.png") );
+            file_manager->getGUIDir() + "banana.png") );
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);

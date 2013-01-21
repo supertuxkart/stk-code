@@ -193,11 +193,11 @@ void FileManager::reInit()
 {
     m_file_system  = irr_driver->getDevice()->getFileSystem();
     m_file_system->grab();
-    TrackManager::addTrackSearchDir(m_root_dir+"data/tracks");
-    KartPropertiesManager::addKartSearchDir(m_root_dir+"data/karts");
+    TrackManager::addTrackSearchDir(m_root_dir+"data/tracks/");
+    KartPropertiesManager::addKartSearchDir(m_root_dir+"data/karts/");
     pushTextureSearchPath(getTextureDir());
-    pushTextureSearchPath(getTextureDir()+"/deprecated");
-    pushTextureSearchPath(m_root_dir+"data/gui");
+    pushTextureSearchPath(getTextureDir()+"/deprecated/");
+    pushTextureSearchPath(m_root_dir+"data/gui/");
     pushModelSearchPath  (m_root_dir+"data/models/"  );
     pushMusicSearchPath  (m_root_dir+"data/music/"   );
 
@@ -397,7 +397,7 @@ bool FileManager::findFile(std::string& full_path,
         i = search_path.rbegin();
         i != search_path.rend(); ++i)
     {
-        full_path = *i + "/" + file_name;
+        full_path = *i + file_name;
         if(m_file_system->existFile(full_path.c_str())) return true;
     }
     full_path="";
@@ -459,7 +459,7 @@ std::string FileManager::getTextureDir() const
  */
 std::string FileManager::getTranslationDir() const
 {
-    return m_root_dir+"data/po";
+    return m_root_dir+"data/po/";
 }   // getTranslationDir
 
 //-----------------------------------------------------------------------------
@@ -849,8 +849,12 @@ std::string FileManager::getTutorialFile(const std::string &file_name) const
 bool FileManager::isDirectory(const std::string &path) const
 {
     struct stat mystat;
-
-    if(stat(path.c_str(), &mystat) < 0) return false;
+    std::string s(path);
+    // At least on windows stat returns an error if there is 
+    // a '/' at the end of the path.
+    if(s[s.size()-1]=='/')
+        s.erase(s.end()-1, s.end());
+    if(stat(s.c_str(), &mystat) < 0) return false;
     return S_ISDIR(mystat.st_mode);
 }   // isDirectory
 
@@ -875,7 +879,10 @@ void FileManager::listFiles(std::set<std::string>& result,
     std::string path = is_full_path ? dir + "/" : m_root_dir+"/"+dir + "/";
 #endif
 
-    if(!isDirectory(path)) return;
+#ifndef ANDROID
+    if(!isDirectory(path))
+    	return;
+#endif
 
     io::path previous_cwd = m_file_system->getWorkingDirectory();
 

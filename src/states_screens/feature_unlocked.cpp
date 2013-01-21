@@ -227,7 +227,7 @@ void FeatureUnlockedCutScene::addUnlockedPicture(irr::video::ITexture* picture,
     {
         std::cerr << "[FeatureUnlockedCutScene::addUnlockedPicture] WARNING: unlockable has no picture : "
                   << core::stringc(msg.c_str()).c_str() << "\n";
-        picture = irr_driver->getTexture(file_manager->getGUIDir() + "/main_help.png");
+        picture = irr_driver->getTexture(file_manager->getGUIDir() + "main_help.png");
 
     }
 
@@ -619,7 +619,7 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
     if (gp == NULL)
     {
         std::cerr << "ERROR: Unlocked GP does not exist???\n";
-        video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
+        video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "main_help.png");
         images.push_back(WTF_image);
     }
     else
@@ -630,7 +630,7 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
         if (trackAmount == 0)
         {
             std::cerr << "ERROR: Unlocked GP is empty???\n";
-            video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
+            video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "main_help.png");
             images.push_back(WTF_image);
         }
 
@@ -681,7 +681,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
                     if (gp == NULL)
                     {
                         std::cerr << "ERROR: Unlocked GP does not exist???\n";
-                        video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
+                        video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "main_help.png");
                         images.push_back(WTF_image);
                     }
                     else
@@ -692,7 +692,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
                         if (trackAmount == 0)
                         {
                             std::cerr << "ERROR: Unlocked GP is empty???\n";
-                            video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
+                            video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "main_help.png");
                             images.push_back(WTF_image);
                         }
 
@@ -732,7 +732,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
 
                         video::ITexture* tex = 
                             irr_driver->getTexture(file_manager->getGUIDir() + 
-                                                   "/main_help.png"            );
+                                                   "main_help.png"            );
                         addUnlockedPicture(tex, 1.0f, 0.75f,
                             L"???" );
                     }
@@ -751,7 +751,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
                     //TODO : implement difficulty reward
                     std::cerr << "OK, I see you unlocked a difficulty, but this is not supported yet\n";
 
-                    video::ITexture* tex = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
+                    video::ITexture* tex = irr_driver->getTexture( file_manager->getGUIDir() + "main_help.png");
                     addUnlockedPicture( tex, 1.0f, 0.75f,
                         unlockedFeatures[i].getUnlockedMessage() );
                     break;
@@ -830,3 +830,4 @@ MusicInformation* FeatureUnlockedCutScene::getInGameMenuMusic() const
     MusicInformation* mi = music_manager->getMusicInformation("win_theme.music");
     return mi;
 }
+

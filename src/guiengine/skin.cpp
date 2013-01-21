@@ -30,6 +30,7 @@
 #include "guiengine/widgets.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/log.hpp"
 
 using namespace GUIEngine;
 using namespace irr;
@@ -61,14 +62,14 @@ namespace SkinConfig
         
         if (node->get("type", &type) == 0)
         {
-            std::cerr << "Error in skin : All elements must have a type\n";
+            Log::error("skin", "All elements must have a type\n");
             return;
         }
         node->get("state", &state);
         
         if (node->get("image", &image) == 0)
         {
-            std::cerr << "Error in skin : All elements must have an image\n";
+            Log::error("skin", "All elements must have an image\n");
             return;
         }
         
@@ -96,7 +97,7 @@ namespace SkinConfig
         
         // call last since it calculates coords considering all other 
         // parameters
-        std:: string full_path = file_manager->getGUIDir() + "/skins/" + image;
+        std:: string full_path = file_manager->getGUIDir() + "skins/" + image;
         new_param.setTexture( irr_driver->getTexture(full_path) );
         
         if (areas.size() > 0)
@@ -126,7 +127,7 @@ namespace SkinConfig
         
         if(node->get("type", &type) == 0)
         {
-            std::cerr << "Error in skin : All elements must have a type\n";
+        	Log::error("skin", "All elements must have a type\n");
             return;
         }
         node->get("state", &state);
@@ -152,8 +153,8 @@ namespace SkinConfig
         XMLNode* root = file_manager->createXMLTree(file);
         if(!root)
         {
-            std::cerr << "Could not read XML file " << file.c_str() 
-                      << std::endl;
+            Log::error("skin", "Could not read XML file '%s'.",
+            		   file.c_str());
             throw std::runtime_error("Invalid skin file");
         }
         
@@ -172,8 +173,8 @@ namespace SkinConfig
             }
             else
             {
-                std::cerr << "Unknown node in XML file : " << node->getName()
-                          << std::endl;
+                Log::error("skin", "Unknown node in XML file '%s'.",
+                		   node->getName().c_str());
             }
         }// nend for
         
@@ -208,7 +209,7 @@ void BoxRenderParams::setTexture(ITexture* image)
 {
     if (image == NULL)
     {
-        fprintf(stderr, "/!\\ WARNING: missing image in skin\n");
+        Log::error("skin", "/!\\ WARNING: missing image in skin\n");
         return;
     }
     
@@ -288,7 +289,7 @@ X##_yflip.LowerRightCorner.Y =  y1;}
 Skin::Skin(IGUISkin* fallback_skin)
 {
     std::string skin_name = file_manager->getGUIDir();
-    skin_name += "/skins/";
+    skin_name += "skins/";
     skin_name += UserConfigParams::m_skin_file.c_str();
     
     try
@@ -302,7 +303,7 @@ Skin::Skin(IGUISkin* fallback_skin)
         UserConfigParams::m_skin_file.revertToDefaults();
         
         skin_name = file_manager->getGUIDir();
-        skin_name += "/skins/";
+        skin_name += "skins/";
         skin_name += UserConfigParams::m_skin_file.c_str();
         SkinConfig::loadFromFile( skin_name );
     }
@@ -392,7 +393,6 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
         w->m_skin_y = dest.UpperLeftCorner.Y;
         w->m_skin_w = dest.getWidth();
         w->m_skin_h = dest.getHeight();
-        //std::cout << "widget moved, calculating again\n";
     }
 
     const ITexture* source              = params.getImage();
@@ -1207,11 +1207,6 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
             center.Y + (int)(((int)rect.UpperLeftCorner.Y 
                             - (int)center.Y)*texture_size);
         
-        //std::cout << "y is " << center.Y << " + (" << rect.UpperLeftCorner.Y
-        // << " - " << center.Y << ")*" << texture_size << " = " 
-        //  << center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*
-        // texture_size) << std::endl;
-        
         sized_rect.LowerRightCorner.X = 
             center.X + (int)(((int)rect.LowerRightCorner.X 
                             - (int)center.X)*texture_size);
@@ -1276,9 +1271,6 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
     {
         Widget* spinner = widget->m_event_handler;
         int areas = 0;
-        
-        //std::cout << "drawing spinner child " 
-        // << widget->m_properties[PROP_ID].c_str() << std::endl;
         
         if (widget->m_properties[PROP_ID] == "left") 
             areas = BoxRenderParams::LEFT;
@@ -1365,28 +1357,12 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
             center.Y + (int)(((int)rect.UpperLeftCorner.Y 
                             - (int)center.Y)*texture_size);
         
-        //std::cout << "y is " << center.Y << " + (" << rect.UpperLeftCorner.Y
-        // << " - " << center.Y << ")*" << texture_size << " = " 
-        //  << center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)
-        // *texture_size) << std::endl;
-        
         sized_rect.LowerRightCorner.X =
             center.X + (int)(((int)rect.LowerRightCorner.X 
                             - (int)center.X)*texture_size);
         sized_rect.LowerRightCorner.Y =
             center.Y + (int)(((int)rect.LowerRightCorner.Y 
                             - (int)center.Y)*texture_size);
-        
-        /*
-        std::cout << texture_size << " : " << rect.UpperLeftCorner.X 
-        << ", " << rect.UpperLeftCorner.Y << " : " <<
-                rect.LowerRightCorner.X << ", " << rect.LowerRightCorner.Y 
-                << " ---> " <<
-                sized_rect.UpperLeftCorner.X << ", " 
-                << sized_rect.UpperLeftCorner.Y << " : " <<
-                sized_rect.LowerRightCorner.X << ", " 
-                << sized_rect.LowerRightCorner.Y << std::endl;
-         */
     }
     
     IconButtonWidget* icon_widget = (IconButtonWidget*) widget;
@@ -1775,17 +1751,6 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     
     const bool focused = 
         GUIEngine::isFocusedForPlayer(widget, PLAYER_ID_GAME_MASTER);
-
-    /*
-    std::cout << "Skin  (3D Pane) : " << (widget == NULL ? "NULL!!" : 
-    widget->m_properties[PROP_ID].c_str())
-              << std::endl;
-    if (widget == NULL) std::cout << "Null widget: ID=" << id << " type=" 
-    << element->getTypeName() <<
-        " x=" << rect.UpperLeftCorner.X <<
-        " y=" << rect.UpperLeftCorner.Y << 
-        " w=" << rect.getWidth() << " h=" << rect.getHeight() << std::endl;
-    */
     
     if (widget == NULL) return;
     
@@ -2157,7 +2122,6 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
 void Skin::draw3DMenuPane (IGUIElement *element, const core::recti &rect, 
                            const core::recti *clip)
 {
-    //printf("draw menu pane\n");
 }   // draw3DMenuPane
 
 // -----------------------------------------------------------------------------
@@ -2166,7 +2130,6 @@ void Skin::draw3DTabBody (IGUIElement *element, bool border, bool background,
                           const core::recti &rect, const core::recti *clip, 
                           s32 tabHeight, gui::EGUI_ALIGNMENT alignment)
 {
-    //printf("draw tab body\n");
 }   // draw3DTabBody
 
 // -----------------------------------------------------------------------------
@@ -2175,7 +2138,6 @@ void Skin::draw3DTabButton (IGUIElement *element, bool active,
                             const core::recti &rect, const core::recti *clip, 
                             gui::EGUI_ALIGNMENT alignment)
 {
-    //printf("draw tab button\n");
 }   // draw3DTabButton
 
 // -----------------------------------------------------------------------------
@@ -2336,14 +2298,11 @@ void Skin::setIcon (EGUI_DEFAULT_ICON icon, u32 index)
 void Skin::setSize (EGUI_DEFAULT_SIZE which, s32 texture_size)
 {
     m_fallback_skin->setSize(which, texture_size);
-    //printf("setting size\n");
 }   // setSize 
 
 // -----------------------------------------------------------------------------
 
 void Skin::setSpriteBank (IGUISpriteBank *bank)
 {
-    //printf("setting sprite bank\n");
     m_fallback_skin->setSpriteBank(bank);
-    //this->m_bank = bank;
 }   // setSpriteBank
