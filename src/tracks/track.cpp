@@ -61,6 +61,7 @@ using namespace irr;
 #include "tracks/quad_set.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -247,7 +248,8 @@ void Track::cleanup()
 
     if(UserConfigParams::logMemory())
     {
-        printf("[memory] After cleaning '%s': mesh cache %d texture cache %d\n",
+        Log::debug("track", 
+              "[memory] After cleaning '%s': mesh cache %d texture cache %d\n",
                 getIdent().c_str(),
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
                 irr_driver->getVideoDriver()->getTextureCount());
@@ -263,7 +265,7 @@ void Track::cleanup()
                 m_old_mesh_buffers.erase(p);
             else
             {
-                printf("[memory] Leaked mesh buffer '%s'.\n", 
+                Log::debug("track", "[memory] Leaked mesh buffer '%s'.\n", 
                        name.getInternalName().c_str());
             }   // if name not found
         }   // for i < cache size
@@ -281,7 +283,7 @@ void Track::cleanup()
             }
             else
             {
-                printf("[memory] Leaked texture '%s'.\n", 
+                Log::debug("track", "[memory] Leaked texture '%s'.\n", 
                     t->getName().getInternalName().c_str());
             }
         }
@@ -416,9 +418,9 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
         if(mi)
             m_music.push_back(mi);
         else
-            fprintf(stderr,
-                    "Music information file '%s' not found - ignored.\n",
-                    filenames[i].c_str());
+            Log::warn("track",
+                      "Music information file '%s' not found - ignored.\n",
+                      filenames[i].c_str());
 
     }   // for i in filenames
 
@@ -456,13 +458,11 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
 
     if(QuadGraph::get()->getNumNodes()==0)
     {
-        fprintf(stderr, 
-                "[Track] WARNING: No graph nodes defined for track '%s'\n",
+        Log::warn("track", "No graph nodes defined for track '%s'\n",
                 m_filename.c_str());
         if (race_manager->getNumberOfKarts() > 1)
         {
-            fprintf(stderr, 
-                "[Track] FATAL: I can handle the lack of driveline in single"
+            Log::fatal("track", "I can handle the lack of driveline in single"
                 "kart mode, but not with AIs\n");
             exit(-1);
         }
@@ -510,7 +510,8 @@ void Track::createPhysicsModel(unsigned int main_track_count)
 
     if (m_track_mesh == NULL)
     {
-        fprintf(stderr, "ERROR: m_track_mesh == NULL, cannot createPhysicsModel\n");
+        Log::error("track", 
+                   "m_track_mesh == NULL, cannot createPhysicsModel\n");
         return;
     }
 
@@ -536,7 +537,8 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         node = ((LODNode*)node)->getFirstNode();
         if (node == NULL)
         {
-            fprintf(stderr, "[Track] WARNING: this track contains an empty LOD group : '%s'\n",
+            Log::warn("track", 
+                      "This track contains an empty LOD group : '%s'\n",
                     ((LODNode*)node)->getGroupName().c_str());
             return;
         }
@@ -578,7 +580,8 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         default:
             int type_as_int = node->getType();
             char* type = (char*)&type_as_int;
-            printf("[Track::convertTrackToBullet] Unknown scene node type : %c%c%c%c.\n",
+            Log::debug("track",
+                "[convertTrackToBullet] Unknown scene node type : %c%c%c%c.\n",
                    type[0], type[1], type[2], type[3]);
             return;
     }   // switch node->getType()
@@ -599,7 +602,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
             mb->getVertexType() != video::EVT_2TCOORDS &&
             mb->getVertexType() != video::EVT_TANGENTS)
         {
-            fprintf(stderr, "WARNING: Tracl::convertTrackToBullet: Ignoring type '%d'!\n", 
+            Log::warn("track", "convertTrackToBullet: Ignoring type '%d'!\n",
                 mb->getVertexType());
             continue;
         }
@@ -726,8 +729,9 @@ bool Track::loadMainTrack(const XMLNode &root)
     scene::IMesh *mesh = irr_driver->getMesh(full_path);
     if(!mesh)
     {
-        fprintf(stderr, "Warning: Main track model '%s' in '%s' not found, aborting.\n",
-                track_node->getName().c_str(), model_name.c_str());
+        Log::fatal("track", 
+                   "Main track model '%s' in '%s' not found, aborting.\n",
+                   track_node->getName().c_str(), model_name.c_str());
         exit(-1);
     }
 
@@ -794,7 +798,8 @@ bool Track::loadMainTrack(const XMLNode &root)
         // Only "object" entries are allowed now inside of the model tag
         if(n->getName()!="static-object")
         {
-            fprintf(stderr, "Incorrect tag '%s' inside <model> of scene file - ignored\n",
+            Log::error("track",  
+                "Incorrect tag '%s' inside <model> of scene file - ignored\n",
                     n->getName().c_str());
             continue;
         }
@@ -835,11 +840,12 @@ bool Track::loadMainTrack(const XMLNode &root)
             assert(closest_challenge_id >= 0);
             assert(closest_challenge_id < (int)m_challenges.size());
             
-            const ChallengeData* challenge = unlock_manager->getChallenge(m_challenges[closest_challenge_id].m_challenge_id);
+            const std::string &s = m_challenges[closest_challenge_id].m_challenge_id;
+            const ChallengeData* challenge = unlock_manager->getChallenge(s);
             if (challenge == NULL)
             {
-                fprintf(stderr, "[Track] WARNING: Cannot find challenge named '%s'\n",
-                        m_challenges[closest_challenge_id].m_challenge_id.c_str());
+                Log::error("track", "Cannot find challenge named '%s'\n",
+                    m_challenges[closest_challenge_id].m_challenge_id.c_str());
                 continue;
             }
             
@@ -888,7 +894,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else if (condition.size() > 0)
         {
-            fprintf(stderr, "[Track] WARNING: unknown condition <%s>\n", condition.c_str());
+            Log::error("track", "Unknown condition <%s>\n", condition.c_str());
         }
         
         std::string neg_condition;
@@ -915,8 +921,8 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else if (neg_condition.size() > 0)
         {
-            fprintf(stderr, "[Track] WARNING: unknown condition <%s>\n", 
-                    neg_condition.c_str());
+            Log::error("track", "Unknown condition <%s>\n", 
+                       neg_condition.c_str());
         }
         
         bool tangent = false;
@@ -986,8 +992,8 @@ bool Track::loadMainTrack(const XMLNode &root)
             scene::IMesh *a_mesh = irr_driver->getMesh(full_path);
             if(!a_mesh)
             {
-                fprintf(stderr, "Warning: object model '%s' not found, ignored.\n",
-                        full_path.c_str());
+                Log::error("track", "Object model '%s' not found, ignored.\n",
+                           full_path.c_str());
                 continue;
             }
 
@@ -1020,7 +1026,8 @@ bool Track::loadMainTrack(const XMLNode &root)
                 const ChallengeData* c = unlock_manager->getChallenge(challenge);
                 if (c == NULL)
                 {
-                    fprintf(stderr, "[WARNING] Cannot find challenge named <%s>\n", challenge.c_str());
+                    Log::error("track", "Cannot find challenge named <%s>\n",
+                               challenge.c_str());
                     scene_node->remove();
                     continue;
                 }
@@ -1036,7 +1043,8 @@ bool Track::loadMainTrack(const XMLNode &root)
                     Track* t = track_manager->getTrack(c->getTrackId());
                     if (t == NULL)
                     {
-                        fprintf(stderr, "[WARNING] Cannot find track named <%s>\n", c->getTrackId().c_str());
+                        Log::error("track", "Cannot find track named <%s>\n", 
+                                   c->getTrackId().c_str());
                         continue;
                     }
                     
@@ -1045,7 +1053,9 @@ bool Track::loadMainTrack(const XMLNode &root)
                     
                     if (screenshot == NULL)
                     {
-                        fprintf(stderr, "[WARNING] Cannot find track screenshot <%s>\n", sshot.c_str());
+                        Log::error("track", 
+                                   "Cannot find track screenshot <%s>", 
+                                   sshot.c_str());
                         continue;
                     }
                     scene_node->getMaterial(0).setTexture(0, screenshot);
@@ -1098,7 +1108,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     }
     if (m_track_mesh == NULL)
     {
-        fprintf(stderr, "ERROR: m_track_mesh == NULL, cannot loadMainTrack\n");
+        Log::fatal("track", "m_track_mesh == NULL, cannot loadMainTrack\n");
         exit(-1);
     }
  
@@ -1125,9 +1135,9 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
         texture_node->get("name", &name);
         if(name=="") 
         {
-            fprintf(stderr, 
-                    "Animated texture: no texture name specified for track '%s'\n",
-                    m_ident.c_str());
+            Log::error("track",
+                "Animated texture: no texture name specified for track '%s'\n",
+                 m_ident.c_str());
             continue;
         }
 
@@ -1221,8 +1231,8 @@ void Track::createWater(const XMLNode &node)
     
     if(!mesh || !scene_node)
     {
-        fprintf(stderr, "Warning: Water model '%s' in '%s' not found, ignored.\n",
-                node.getName().c_str(), model_name.c_str());
+        Log::error("track", "Water model '%s' in '%s' not found, ignored.\n",
+                    node.getName().c_str(), model_name.c_str());
         return;
     }
     
@@ -1266,12 +1276,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     assert(m_all_cached_meshes.size()==0);
     if(UserConfigParams::logMemory())
     {
-        printf("[memory] Before loading '%s': mesh cache %d texture cache %d\n",
+        Log::debug("[memory] Before loading '%s': mesh cache %d "
+                   "texture cache %d\n",
             getIdent().c_str(),
             irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
             irr_driver->getVideoDriver()->getTextureCount());
 #ifdef DEBUG
-        scene::IMeshCache *cache = irr_driver->getSceneManager()->getMeshCache();
+        scene::IMeshCache *cache = 
+            irr_driver->getSceneManager()->getMeshCache();
         m_old_mesh_buffers.clear();
         for(unsigned int i=0; i<cache->getMeshCount(); i++)
         {
@@ -1491,13 +1503,13 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
                 }
                 else
                 {
-                    fprintf(stderr, "[Track] ERROR: Unknown weather type : '%s'\n", weather_type.c_str());
+                    Log::error("track", "Unknown weather type : '%s'", 
+                               weather_type.c_str());
                 }
             }
             else
             {
-                fprintf(stderr, 
-                        "[Track] ERROR: Warning: bad weather node found - ignored.\n");
+                Log::error("track", "Bad weather node found - ignored.\n");
                 continue;
             }
         }
@@ -1524,8 +1536,9 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
         else
         {
-            fprintf(stderr, "Warning: while loading track '%s', element '%s' was met but is unknown.\n",
-                    m_ident.c_str(), node->getName().c_str());
+            Log::warn("track", "While loading track '%s', element '%s' was "
+                      "met but is unknown.",
+                      m_ident.c_str(), node->getName().c_str());
         }
 
     }   // for i<root->getNumNodes()
@@ -1664,15 +1677,15 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     if(CheckManager::get()->getCheckStructureCount()==0  &&
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES && !m_is_cutscene)
     {
-        printf("WARNING: no check lines found in track '%s'.\n", 
-               m_ident.c_str());
-        printf("Lap counting will not work, and start positions might be "
-               "incorrect.\n");
+        Log::warn("track", "No check lines found in track '%s'.", 
+                  m_ident.c_str());
+        Log::warn("track", "Lap counting will not work, and start "
+                  "positions might be incorrect.");
     }
 
     if(UserConfigParams::logMemory())
-        printf("[memory] After loading  '%s': mesh cache %d texture cache %d\n",
-                getIdent().c_str(),
+        Log::debug("track", "[memory] After loading  '%s': mesh cache %d "
+                   "texture cache %d\n", getIdent().c_str(),
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
                 irr_driver->getVideoDriver()->getTextureCount());
 
@@ -1786,7 +1799,8 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         }
         else
         {
-            printf("Sky-dome texture '%s' not found - ignored.\n", s.c_str());
+            Log::error("track", "Sky-dome texture '%s' not found - ignored.", 
+                        s.c_str());
         }
     }   // if sky-dome
     else if(xml_node.getName()=="sky-box")
@@ -1804,15 +1818,16 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
             }
             else
             {
-                printf("Sky-box texture '%s' not found - ignored.\n",
-                       v[i].c_str());
+                Log::error("track","Sky-box texture '%s' not found - ignored.",
+                           v[i].c_str());
             }
         }   // for i<v.size()
         if(m_sky_textures.size()!=6)
         {
-            fprintf(stderr, "A skybox needs 6 textures, but %d are specified\n",
-                    (int)m_sky_textures.size());
-            fprintf(stderr, "in '%s'.\n", filename.c_str());
+            Log::error("track", 
+                       "A skybox needs 6 textures, but %d are specified",
+                       (int)m_sky_textures.size());
+            Log::error("track", "in '%s'.", filename.c_str());
 
         }
         else
@@ -1862,7 +1877,8 @@ void Track::itemCommand(const XMLNode *node)
     if(type==Item::ITEM_EASTER_EGG && 
         !(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG))
     {
-        printf("Found easter egg in non-easter-egg mode - ignored.\n");
+        Log::warn("track", 
+                  "Found easter egg in non-easter-egg mode - ignored.\n");
         return;
     }
 
@@ -1881,9 +1897,10 @@ void Track::itemCommand(const XMLNode *node)
         bool drop_success = setTerrainHeight(&loc);
         if(!drop_success)
         {
-            printf("Item at position (%f,%f,%f) can not be dropped\n",
-                loc.getX(), loc.getY(), loc.getZ());
-            printf("onto terrain - position unchanged.\n");
+            Log::warn("track", 
+                      "Item at position (%f,%f,%f) can not be dropped",
+                      loc.getX(), loc.getY(), loc.getZ());
+            Log::warn("track", "onto terrain - position unchanged.");
         }
 #endif
     }
@@ -1952,36 +1969,7 @@ std::vector< std::vector<float> > Track::buildHeightMap()
             z += z_step;
             
             out[i][j] = hitpoint.getY();
-            
-            /*
-            if (out[i][j] < -50)
-            {
-                printf(" ");
-            }
-            else if (out[i][j] < -25)
-            {
-                printf("`");
-            }
-            else if (out[i][j] < 0)
-            {
-                printf("-");
-            }
-            else if (out[i][j] < 25)
-            {
-                printf(":");
-            }
-            else if (out[i][j] < 50)
-            {
-                printf("!");
-            }
-            else if (out[i][j] < 100)
-            {
-                printf("#");
-            }
-             */
-        }
-        
-        //printf("\n");
+        }   // j<HEIGHT_MAP_RESOLUTION
         x += x_step;
     }
     
