@@ -24,6 +24,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
 int                   Referee::m_st_first_start_frame  = 1;
@@ -46,19 +47,19 @@ void Referee::init()
     const std::string filename=file_manager->getModelFile("referee.xml");
     if(filename=="")
     {
-        printf("Can't find referee.xml, aborting.\n");
+        Log::fatal("referee", "Can't find referee.xml, aborting.");
         exit(-1);
     }
     XMLNode *node = file_manager->createXMLTree(filename);
     if(!node)
     {
-        printf("Can't read XML file referee.xml, aborting.\n");
+        Log::fatal("referee", "Can't read XML file referee.xml, aborting.");
         exit(-1);
     }
     if(node->getName()!="referee")
     {
-        printf("The file referee.xml does not contain a referee"
-               "node, aborting.\n");
+        Log::fatal("referee", "The file referee.xml does not contain a referee"
+               "node, aborting.");
         exit(-1);
     }
     std::string model_filename;
@@ -68,7 +69,7 @@ void Referee::init()
                      file_manager->getModelFile(model_filename) );
     if(!m_st_referee_mesh)
     {
-        printf("Can't find referee model '%s', aborting.\n", 
+        Log::fatal("referee", "Can't find referee model '%s', aborting.",
                model_filename.c_str());
         exit(-1);
     }
@@ -102,12 +103,12 @@ void Referee::init()
     node->get("colors", &colors);
 
     if(colors.size()>3)
-        printf("Too many colors for referee defined, "
-               "only first three will be used.\n");
+        Log::warn("referee", "Too many colors for referee defined, "
+                             "only first three will be used.");
     if(colors.size()<3)
     {
-        printf("Not enough colors for referee defined, "
-               "only first three will be used, aborting.\n");
+        Log::fatal("referee",
+                   "Not enough colors for referee defined, aborting.");
         exit(-1);
     }
     for(unsigned int i=0; i<3; i++)
@@ -115,8 +116,9 @@ void Referee::init()
         std::string full_path = file_manager->getTextureFile(colors[i]);
         if(full_path.size()==0)
         {
-            printf("Can't find texture '%s' for referee, aborting.\n",
-                   colors[i].c_str());
+            Log::fatal("referee",
+                       "Can't find texture '%s' for referee, aborting.",
+                       colors[i].c_str());
             exit(-1);
         }
         m_st_traffic_lights[i] = irr_driver->getTexture(full_path);

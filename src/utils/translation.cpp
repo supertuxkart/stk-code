@@ -187,14 +187,15 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             char c[1024];
             GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, 
                            c, 1024);
-            Log::verbose("translation", "GetLocaleInfo langname returns '%s'.\n",
+            Log::verbose("translation", "GetLocaleInfo langname returns '%s'.",
                          c);
             if(c[0])
             {
                 language = c;
                 GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO3166CTRYNAME, 
                                c, 1024);
-                Log::verbose("translation", "GetLocaleInfo tryname returns '%s'.\n", c);
+                Log::verbose("translation", 
+                             "GetLocaleInfo tryname returns '%s'.", c);
                 if(c[0]) language += std::string("_")+c;
             }   // if c[0]
 #endif
@@ -204,7 +205,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         
     if (language != "")
     {
-        Log::verbose("translation", "Env var LANGUAGE = '%s'.\n",
+        Log::verbose("translation", "Env var LANGUAGE = '%s'.",
                      language.c_str());
 
         if (language.find(":") != std::string::npos)
@@ -217,7 +218,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 l = Language::from_env(langs[curr]);
                 if (l)
                 {
-                    Log::verbose("translation", "Language '%s'.\n",
+                    Log::verbose("translation", "Language '%s'.",
                                  l.get_name().c_str());
                     m_dictionary = m_dictionary_manager.get_dictionary(l);
                     break;
@@ -233,7 +234,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         }
         else
         {
-            Log::verbose("translation", "Language '%s'.\n",
+            Log::verbose("translation", "Language '%s'.",
                           Language::from_env(language).get_name().c_str());
             
             m_current_language_name = Language::from_env(language).get_name() ;
