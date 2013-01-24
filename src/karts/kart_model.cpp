@@ -342,7 +342,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
 bool KartModel::loadModels(const KartProperties &kart_properties)
 {
     assert(m_is_master);
-    std::string  full_path = kart_properties.getKartDir()+"/"+m_model_filename;
+    std::string  full_path = kart_properties.getKartDir()+m_model_filename;
     m_mesh                 = irr_driver->getAnimatedMesh(full_path);
     if(!m_mesh)
     {
@@ -384,7 +384,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         // For kart models without wheels.
         if(m_wheel_filename[i]=="") continue;
         std::string full_wheel = 
-            kart_properties.getKartDir()+"/"+m_wheel_filename[i];
+            kart_properties.getKartDir()+m_wheel_filename[i];
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
         // Grab all textures. This is done for the master only, so
         // the destructor will only free the textures if a master
