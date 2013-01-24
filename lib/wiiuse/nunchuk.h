@@ -40,14 +40,20 @@
 extern "C" {
 #endif
 
-int nunchuk_handshake(struct wiimote_t* wm, struct nunchuk_t* nc, byte* data, unsigned short len);
 
-void nunchuk_disconnected(struct nunchuk_t* nc);
+	/** @defgroup internal_nunchuk Internal: Nunchuk */
+	/** @{ */
+	int nunchuk_handshake(struct wiimote_t* wm, struct nunchuk_t* nc, byte* data, unsigned short len);
 
-void nunchuk_event(struct nunchuk_t* nc, byte* msg);
+	void nunchuk_disconnected(struct nunchuk_t* nc);
+
+	void nunchuk_event(struct nunchuk_t* nc, byte* msg);
+
+	void nunchuk_pressed_buttons(struct nunchuk_t* nc, byte now);
+	/** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // NUNCHUK_H_INCLUDED
+#endif /* NUNCHUK_H_INCLUDED */

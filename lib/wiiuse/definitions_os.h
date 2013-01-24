@@ -26,30 +26,26 @@
  *
  */
 
+
 /**
  *	@file
- *	@brief Handles device I/O.
+ *	@brief Operating system related definitions.
+ *
+ *	This file is an attempt to separate operating system
+ *	dependent functions and choose what should be used
+ *	at compile time.
  */
 
-#ifndef IO_H_INCLUDED
-#define IO_H_INCLUDED
+#ifndef DEFINITIONS_OS_H_INCLUDED
+#define DEFINITIONS_OS_H_INCLUDED
 
-#include "wiiuse_internal.h"
-
-#ifdef __cplusplus
-extern "C" {
+#ifdef _MSC_VER
+	#include <float.h>
+	/* windows with visual c */
+	#define isnan(x)		(_isnan(x))
+	#define isinf(x)		(!_finite(x))
+	/* disable warnings I don't care about */
+	/*#pragma warning(disable:4273)	*/	/* inconsistent dll linkage			*/
 #endif
 
-	/** @defgroup internal_io Internal: Device I/O */
-	/** @{ */
-	void wiiuse_handshake(struct wiimote_t* wm, byte* data, uint16_t len);
-
-	void wiiuse_wait_report(struct wiimote_t *wm, int report, byte *buffer, int bufferLength);
-	void wiiuse_read_data_sync(struct wiimote_t *wm, byte memory, unsigned addr, unsigned short size, byte *data);
-	/** @} */
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* IO_H_INCLUDED */
+#endif /* DEFINITIONS_OS_H_INCLUDED */

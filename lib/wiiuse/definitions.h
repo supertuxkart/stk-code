@@ -35,31 +35,43 @@
 #define DEFINITIONS_H_INCLUDED
 
 /* this is wiiuse - used to distinguish from third party programs using wiiuse.h */
-#include "os.h"
+#include <stdio.h>
+#include "definitions_os.h"
+/** @addtogroup internal_general */
+/** @{ */
 
 #define WIIMOTE_PI			3.14159265f
 
-//#define WITH_WIIUSE_DEBUG
+/* #define WITH_WIIUSE_DEBUG */
+
+extern FILE* logtarget[];
+
+#define OUTF_ERROR logtarget[0]
+#define OUTF_WARNING logtarget[1]
+#define OUTF_INFO logtarget[2]
+#define OUTF_DEBUG logtarget[3]
 
 /* Error output macros */
-#define WIIUSE_ERROR(fmt, ...)		fprintf(stderr, "[ERROR] " fmt "\n", ##__VA_ARGS__)
+#define WIIUSE_ERROR(fmt, ...)		do { if (OUTF_ERROR) fprintf(OUTF_ERROR, "[ERROR] " fmt "\n", ##__VA_ARGS__); } while(0)
 
 /* Warning output macros */
-#define WIIUSE_WARNING(fmt, ...)	fprintf(stderr, "[WARNING] " fmt "\n",	##__VA_ARGS__)
+#define WIIUSE_WARNING(fmt, ...)	do { if (OUTF_WARNING) fprintf(OUTF_WARNING, "[WARNING] " fmt "\n",	##__VA_ARGS__); } while(0)
 
 /* Information output macros */
-#define WIIUSE_INFO(fmt, ...)		fprintf(stderr, "[INFO] " fmt "\n", ##__VA_ARGS__)
+#define WIIUSE_INFO(fmt, ...)		do { if (OUTF_INFO) fprintf(OUTF_INFO, "[INFO] " fmt "\n", ##__VA_ARGS__); } while(0)
 
 #ifdef WITH_WIIUSE_DEBUG
-	#ifdef WIN32
-		#define WIIUSE_DEBUG(fmt, ...)		do {																				\
-												char* file = __FILE__;															\
-												int i = strlen(file) - 1;														\
-												for (; i && (file[i] != '\\'); --i);											\
-												fprintf(stderr, "[DEBUG] %s:%i: " fmt "\n", file+i+1, __LINE__, ##__VA_ARGS__);	\
+	#ifdef WIIUSE_WIN32
+		#define WIIUSE_DEBUG(fmt, ...)		do {																					\
+												if (OUTF_DEBUG) {																	\
+													char* file = __FILE__;															\
+													int i = strlen(file) - 1;														\
+													for (; i && (file[i] != '\\'); --i);											\
+													fprintf(OUTF_DEBUG, "[DEBUG] %s:%i: " fmt "\n", file+i+1, __LINE__, ##__VA_ARGS__);	\
+												}																					\
 											} while (0)
 	#else
-		#define WIIUSE_DEBUG(fmt, ...)	fprintf(stderr, "[DEBUG] " __FILE__ ":%i: " fmt "\n", __LINE__, ##__VA_ARGS__)
+		#define WIIUSE_DEBUG(fmt, ...)	do { if (OUTF_DEBUG) fprintf(OUTF_DEBUG, "[DEBUG] " __FILE__ ":%i: " fmt "\n", __LINE__, ##__VA_ARGS__); } while (0)
 	#endif
 #else
 	#define WIIUSE_DEBUG(fmt, ...)
@@ -69,11 +81,12 @@
 #define RAD_TO_DEGREE(r)	((r * 180.0f) / WIIMOTE_PI)
 #define DEGREE_TO_RAD(d)	(d * (WIIMOTE_PI / 180.0f))
 
-/* Convert to big endian */
-#define BIG_ENDIAN_LONG(i)				(htonl(i))
-#define BIG_ENDIAN_SHORT(i)				(htons(i))
-
 #define absf(x)						((x >= 0) ? (x) : (x * -1.0f))
 #define diff_f(x, y)				((x >= y) ? (absf(x - y)) : (absf(y - x)))
 
-#endif // DEFINITIONS_H_INCLUDED
+#define WCONST
+
+
+/** @} */
+
+#endif /* DEFINITIONS_H_INCLUDED */

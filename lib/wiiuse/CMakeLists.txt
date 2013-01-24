@@ -11,4 +11,7 @@ add_library(wiiuse
 	ir.c
 	nunchuk.c
 	wiiuse.c
+	wiiboard.c
+	motion_plus.c
+	util.c
 )

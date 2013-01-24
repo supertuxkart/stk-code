@@ -49,14 +49,18 @@
 extern "C" {
 #endif
 
-int guitar_hero_3_handshake(struct wiimote_t* wm, struct guitar_hero_3_t* gh3, byte* data, unsigned short len);
 
-void guitar_hero_3_disconnected(struct guitar_hero_3_t* gh3);
+	/** @defgroup internal_gh3 Internal: Guitar Hero 3 controller */
+	/** @{ */
+	int guitar_hero_3_handshake(struct wiimote_t* wm, struct guitar_hero_3_t* gh3, byte* data, unsigned short len);
 
-void guitar_hero_3_event(struct guitar_hero_3_t* gh3, byte* msg);
+	void guitar_hero_3_disconnected(struct guitar_hero_3_t* gh3);
+
+	void guitar_hero_3_event(struct guitar_hero_3_t* gh3, byte* msg);
+	/** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // GUITAR_HERO_3_H_INCLUDED
+#endif /* GUITAR_HERO_3_H_INCLUDED */

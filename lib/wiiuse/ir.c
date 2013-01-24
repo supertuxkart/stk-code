@@ -31,18 +31,11 @@
  *	@brief Handles IR data.
  */
 
-#include <stdio.h>
-#include <math.h>
-
-#ifndef WIN32
-	#include <unistd.h>
-#endif
-
-#include "definitions.h"
-#include "wiiuse_internal.h"
 #include "ir.h"
 
-static int get_ir_sens(struct wiimote_t* wm, char** block1, char** block2);
+#include <math.h>                       /* for atanf, cos, sin, sqrt */
+
+static int get_ir_sens(struct wiimote_t* wm, const byte** block1, const byte** block2);
 static void interpret_ir_data(struct wiimote_t* wm);
 static void fix_rotated_ir_dots(struct ir_dot_t* dot, float ang);
 static void get_ir_dot_avg(struct ir_dot_t* dot, int* x, int* y);
@@ -52,6 +45,35 @@ static int ir_correct_for_bounds(int* x, int* y, enum aspect_t aspect, int offse
 static void ir_convert_to_vres(int* x, int* y, enum aspect_t aspect, int vx, int vy);
 
 
+/* ir block data */
+static const byte WM_IR_BLOCK1_LEVEL1[] = "\x02\x00\x00\x71\x01\x00\x64\x00\xfe";
+static const byte WM_IR_BLOCK2_LEVEL1[] = "\xfd\x05";
+static const byte WM_IR_BLOCK1_LEVEL2[] = "\x02\x00\x00\x71\x01\x00\x96\x00\xb4";
+static const byte WM_IR_BLOCK2_LEVEL2[] = "\xb3\x04";
+static const byte WM_IR_BLOCK1_LEVEL3[] = "\x02\x00\x00\x71\x01\x00\xaa\x00\x64";
+static const byte WM_IR_BLOCK2_LEVEL3[] = "\x63\x03";
+static const byte WM_IR_BLOCK1_LEVEL4[] = "\x02\x00\x00\x71\x01\x00\xc8\x00\x36";
+static const byte WM_IR_BLOCK2_LEVEL4[] = "\x35\x03";
+static const byte WM_IR_BLOCK1_LEVEL5[] = "\x07\x00\x00\x71\x01\x00\x72\x00\x20";
+static const byte WM_IR_BLOCK2_LEVEL5[] = "\x1f\x03";
+
+void wiiuse_set_ir_mode(struct wiimote_t *wm) {
+	byte buf = 0x00;
+
+	if (!wm) {
+		return;
+	}
+	if (!WIIMOTE_IS_SET(wm, WIIMOTE_STATE_IR)) {
+		return;
+	}
+
+	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_EXP)) {
+		buf = WM_IR_TYPE_BASIC;
+	} else {
+		buf = WM_IR_TYPE_EXTENDED;
+	}
+	wiiuse_write_data(wm, WM_REG_IR_MODENUM, &buf, 1);
+}
 /**
  *	@brief	Set if the wiimote should track IR targets.
  *
@@ -60,12 +82,13 @@ static void ir_convert_to_vres(int* x, int* y, enum aspect_t aspect, int vx, int
  */
 void wiiuse_set_ir(struct wiimote_t* wm, int status) {
 	byte buf;
-	char* block1 = NULL;
-	char* block2 = NULL;
+	const byte* block1 = NULL;
+	const byte* block2 = NULL;
 	int ir_level;
 
-	if (!wm)
+	if (!wm) {
 		return;
+	}
 
 	/*
 	 *	Wait for the handshake to finish first.
@@ -74,8 +97,10 @@ void wiiuse_set_ir(struct wiimote_t* wm, int status) {
 	 *	again to actually enable IR.
 	 */
 	if (!WIIMOTE_IS_SET(wm, WIIMOTE_STATE_HANDSHAKE_COMPLETE)) {
-		WIIUSE_DEBUG("Tried to enable IR, will wait until handshake finishes.");
-		WIIMOTE_ENABLE_STATE(wm, WIIMOTE_STATE_IR);
+		if (status) {
+			WIIUSE_DEBUG("Tried to enable IR, will wait until handshake finishes.");
+			WIIMOTE_ENABLE_STATE(wm, WIIMOTE_STATE_IR);
+		} /* else ignoring request to turn off, since it's turned off by default */
 		return;
 	}
 
@@ -90,13 +115,15 @@ void wiiuse_set_ir(struct wiimote_t* wm, int status) {
 
 	if (status) {
 		/* if already enabled then stop */
-		if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_IR))
+		if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_IR)) {
 			return;
+		}
 		WIIMOTE_ENABLE_STATE(wm, WIIMOTE_STATE_IR);
 	} else {
 		/* if already disabled then stop */
-		if (!WIIMOTE_IS_SET(wm, WIIMOTE_STATE_IR))
+		if (!WIIMOTE_IS_SET(wm, WIIMOTE_STATE_IR)) {
 			return;
+		}
 		WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_IR);
 	}
 
@@ -116,28 +143,21 @@ void wiiuse_set_ir(struct wiimote_t* wm, int status) {
 	wiiuse_write_data(wm, WM_REG_IR, &buf, 1);
 
 	/* wait for the wiimote to catch up */
-	#ifndef WIN32
-		usleep(50000);
-	#else
-		Sleep(50);
-	#endif
+	wiiuse_millisleep(50);
 
 	/* write sensitivity blocks */
 	wiiuse_write_data(wm, WM_REG_IR_BLOCK1, (byte*)block1, 9);
 	wiiuse_write_data(wm, WM_REG_IR_BLOCK2, (byte*)block2, 2);
 
 	/* set the IR mode */
-	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_EXP))
+	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_EXP)) {
 		buf = WM_IR_TYPE_BASIC;
-	else
+	} else {
 		buf = WM_IR_TYPE_EXTENDED;
+	}
 	wiiuse_write_data(wm, WM_REG_IR_MODENUM, &buf, 1);
 
-	#ifndef WIN32
-		usleep(50000);
-	#else
-		Sleep(50);
-	#endif
+	wiiuse_millisleep(50);
 
 	/* set the wiimote report type */
 	wiiuse_set_report_type(wm);
@@ -155,7 +175,7 @@ void wiiuse_set_ir(struct wiimote_t* wm, int status) {
  *
  *	@return Returns the sensitivity level.
  */
-static int get_ir_sens(struct wiimote_t* wm, char** block1, char** block2) {
+static int get_ir_sens(struct wiimote_t* wm, const byte** block1, const byte** block2) {
 	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_IR_SENS_LVL1)) {
 		*block1 = WM_IR_BLOCK1_LEVEL1;
 		*block2 = WM_IR_BLOCK2_LEVEL1;
@@ -191,10 +211,12 @@ static int get_ir_sens(struct wiimote_t* wm, char** block1, char** block2) {
  *	@param status	1 to enable, 0 to disable.
  */
 void wiiuse_set_ir_vres(struct wiimote_t* wm, unsigned int x, unsigned int y) {
-	if (!wm)	return;
+	if (!wm)	{
+		return;
+	}
 
-	wm->ir.vres[0] = (x-1);
-	wm->ir.vres[1] = (y-1);
+	wm->ir.vres[0] = (x - 1);
+	wm->ir.vres[1] = (y - 1);
 }
 
 
@@ -204,7 +226,9 @@ void wiiuse_set_ir_vres(struct wiimote_t* wm, unsigned int x, unsigned int y) {
  *	@param wm		Pointer to a wiimote_t structure.
  */
 void wiiuse_set_ir_position(struct wiimote_t* wm, enum ir_position_t pos) {
-	if (!wm)	return;
+	if (!wm)	{
+		return;
+	}
 
 	wm->ir.pos = pos;
 
@@ -213,20 +237,22 @@ void wiiuse_set_ir_position(struct wiimote_t* wm, enum ir_position_t pos) {
 		case WIIUSE_IR_ABOVE:
 			wm->ir.offset[0] = 0;
 
-			if (wm->ir.aspect == WIIUSE_ASPECT_16_9)
-				wm->ir.offset[1] = WM_ASPECT_16_9_Y/2 - 70;
-			else if (wm->ir.aspect == WIIUSE_ASPECT_4_3)
-				wm->ir.offset[1] = WM_ASPECT_4_3_Y/2 - 100;
+			if (wm->ir.aspect == WIIUSE_ASPECT_16_9) {
+				wm->ir.offset[1] = WM_ASPECT_16_9_Y / 2 - 70;
+			} else if (wm->ir.aspect == WIIUSE_ASPECT_4_3) {
+				wm->ir.offset[1] = WM_ASPECT_4_3_Y / 2 - 100;
+			}
 
 			return;
 
 		case WIIUSE_IR_BELOW:
 			wm->ir.offset[0] = 0;
 
-			if (wm->ir.aspect == WIIUSE_ASPECT_16_9)
-				wm->ir.offset[1] = -WM_ASPECT_16_9_Y/2 + 100;
-			else if (wm->ir.aspect == WIIUSE_ASPECT_4_3)
-				wm->ir.offset[1] = -WM_ASPECT_4_3_Y/2 + 70;
+			if (wm->ir.aspect == WIIUSE_ASPECT_16_9) {
+				wm->ir.offset[1] = -WM_ASPECT_16_9_Y / 2 + 100;
+			} else if (wm->ir.aspect == WIIUSE_ASPECT_4_3) {
+				wm->ir.offset[1] = -WM_ASPECT_4_3_Y / 2 + 70;
+			}
 
 			return;
 
@@ -243,7 +269,9 @@ void wiiuse_set_ir_position(struct wiimote_t* wm, enum ir_position_t pos) {
  *	@param aspect	Either WIIUSE_ASPECT_16_9 or WIIUSE_ASPECT_4_3
  */
 void wiiuse_set_aspect_ratio(struct wiimote_t* wm, enum aspect_t aspect) {
-	if (!wm)	return;
+	if (!wm)	{
+		return;
+	}
 
 	wm->ir.aspect = aspect;
 
@@ -270,19 +298,25 @@ void wiiuse_set_aspect_ratio(struct wiimote_t* wm, enum aspect_t aspect) {
  *	If the level is > 5, then level will be set to 5.
  */
 void wiiuse_set_ir_sensitivity(struct wiimote_t* wm, int level) {
-	char* block1 = NULL;
-	char* block2 = NULL;
+	const byte* block1 = NULL;
+	const byte* block2 = NULL;
 
-	if (!wm)	return;
+	if (!wm)	{
+		return;
+	}
 
-	if (level > 5)		level = 5;
-	if (level < 1)		level = 1;
+	if (level > 5) {
+		level = 5;
+	}
+	if (level < 1) {
+		level = 1;
+	}
 
 	WIIMOTE_DISABLE_STATE(wm, (WIIMOTE_STATE_IR_SENS_LVL1 |
-								WIIMOTE_STATE_IR_SENS_LVL2 |
-								WIIMOTE_STATE_IR_SENS_LVL3 |
-								WIIMOTE_STATE_IR_SENS_LVL4 |
-								WIIMOTE_STATE_IR_SENS_LVL5));
+	                           WIIMOTE_STATE_IR_SENS_LVL2 |
+	                           WIIMOTE_STATE_IR_SENS_LVL3 |
+	                           WIIMOTE_STATE_IR_SENS_LVL4 |
+	                           WIIMOTE_STATE_IR_SENS_LVL5));
 
 	switch (level) {
 		case 1:
@@ -307,8 +341,8 @@ void wiiuse_set_ir_sensitivity(struct wiimote_t* wm, int level) {
 	/* set the new sensitivity */
 	get_ir_sens(wm, &block1, &block2);
 
-	wiiuse_write_data(wm, WM_REG_IR_BLOCK1, (byte*)block1, 9);
-	wiiuse_write_data(wm, WM_REG_IR_BLOCK2, (byte*)block2, 2);
+	wiiuse_write_data(wm, WM_REG_IR_BLOCK1, block1, 9);
+	wiiuse_write_data(wm, WM_REG_IR_BLOCK2, block2, 2);
 
 	WIIUSE_DEBUG("Set IR sensitivity to level %i (unid %i)", level, wm->unid);
 }
@@ -338,9 +372,9 @@ void calculate_basic_ir(struct wiimote_t* wm, byte* data) {
 
 	/* set each IR spot to visible if spot is in range */
 	for (i = 0; i < 4; ++i) {
-		if (dot[i].ry == 1023)
+		if (dot[i].ry == 1023) {
 			dot[i].visible = 0;
-		else {
+		} else {
 			dot[i].visible = 1;
 			dot[i].size = 0;		/* since we don't know the size, set it as 0 */
 		}
@@ -361,16 +395,17 @@ void calculate_extended_ir(struct wiimote_t* wm, byte* data) {
 	int i;
 
 	for (i = 0; i < 4; ++i) {
-		dot[i].rx = 1023 - (data[3*i] | ((data[(3*i)+2] & 0x30) << 4));
-		dot[i].ry = data[(3*i)+1] | ((data[(3*i)+2] & 0xC0) << 2);
+		dot[i].rx = 1023 - (data[3 * i] | ((data[(3 * i) + 2] & 0x30) << 4));
+		dot[i].ry = data[(3 * i) + 1] | ((data[(3 * i) + 2] & 0xC0) << 2);
 
-		dot[i].size = data[(3*i)+2] & 0x0F;
+		dot[i].size = data[(3 * i) + 2] & 0x0F;
 
 		/* if in range set to visible */
-		if (dot[i].ry == 1023)
+		if (dot[i].ry == 1023) {
 			dot[i].visible = 0;
-		else
+		} else {
 			dot[i].visible = 1;
+		}
 	}
 
 	interpret_ir_data(wm);
@@ -388,147 +423,150 @@ static void interpret_ir_data(struct wiimote_t* wm) {
 	float roll = 0.0f;
 	int last_num_dots = wm->ir.num_dots;
 
-	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_ACC))
+	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_ACC)) {
 		roll = wm->orient.roll;
+	}
 
 	/* count visible dots */
 	wm->ir.num_dots = 0;
 	for (i = 0; i < 4; ++i) {
-		if (dot[i].visible)
+		if (dot[i].visible) {
 			wm->ir.num_dots++;
+		}
 	}
 
 	switch (wm->ir.num_dots) {
-		case 0:
-		{
-			wm->ir.state = 0;
+		case 0: {
+				wm->ir.state = 0;
 
-			/* reset the dot ordering */
-			for (i = 0; i < 4; ++i)
-				dot[i].order = 0;
-
-			wm->ir.x = 0;
-			wm->ir.y = 0;
-			wm->ir.z = 0.0f;
-
-			return;
-		}
-		case 1:
-		{
-			fix_rotated_ir_dots(wm->ir.dot, roll);
-
-			if (wm->ir.state < 2) {
-				/*
-				 *	Only 1 known dot, so use just that.
-				 */
+				/* reset the dot ordering */
 				for (i = 0; i < 4; ++i) {
-					if (dot[i].visible) {
-						wm->ir.x = dot[i].x;
-						wm->ir.y = dot[i].y;
-
-						wm->ir.ax = wm->ir.x;
-						wm->ir.ay = wm->ir.y;
-
-						/*	can't calculate yaw because we don't have the distance */
-						//wm->orient.yaw = calc_yaw(&wm->ir);
-
-						ir_convert_to_vres(&wm->ir.x, &wm->ir.y, wm->ir.aspect, wm->ir.vres[0], wm->ir.vres[1]);
-						break;
-					}
+					dot[i].order = 0;
 				}
-			} else {
-				/*
-				 *	Only see 1 dot but know theres 2.
-				 *	Try to estimate where the other one
-				 *	should be and use that.
-				 */
-				for (i = 0; i < 4; ++i) {
-					if (dot[i].visible) {
-						int ox = 0;
-						int x, y;
 
-						if (dot[i].order == 1)
-							/* visible is the left dot - estimate where the right is */
-							ox = dot[i].x + wm->ir.distance;
-						else if (dot[i].order == 2)
-							/* visible is the right dot - estimate where the left is */
-							ox = dot[i].x - wm->ir.distance;
-
-						x = ((signed int)dot[i].x + ox) / 2;
-						y = dot[i].y;
-
-						wm->ir.ax = x;
-						wm->ir.ay = y;
-						wm->orient.yaw = calc_yaw(&wm->ir);
-
-						if (ir_correct_for_bounds(&x, &y, wm->ir.aspect, wm->ir.offset[0], wm->ir.offset[1])) {
-							ir_convert_to_vres(&x, &y, wm->ir.aspect, wm->ir.vres[0], wm->ir.vres[1]);
-							wm->ir.x = x;
-							wm->ir.y = y;
-						}
-
-						break;
-					}
-				}
-			}
-
-			break;
-		}
-		case 2:
-		case 3:
-		case 4:
-		{
-			/*
-			 *	Two (or more) dots known and seen.
-			 *	Average them together to estimate the true location.
-			 */
-			int x, y;
-			wm->ir.state = 2;
-
-			fix_rotated_ir_dots(wm->ir.dot, roll);
-
-			/* if there is at least 1 new dot, reorder them all */
-			if (wm->ir.num_dots > last_num_dots) {
-				reorder_ir_dots(dot);
 				wm->ir.x = 0;
 				wm->ir.y = 0;
+				wm->ir.z = 0.0f;
+
+				return;
 			}
+		case 1: {
+				fix_rotated_ir_dots(wm->ir.dot, roll);
 
-			wm->ir.distance = ir_distance(dot);
-			wm->ir.z = 1023 - wm->ir.distance;
+				if (wm->ir.state < 2) {
+					/*
+					 *	Only 1 known dot, so use just that.
+					 */
+					for (i = 0; i < 4; ++i) {
+						if (dot[i].visible) {
+							wm->ir.x = dot[i].x;
+							wm->ir.y = dot[i].y;
 
-			get_ir_dot_avg(wm->ir.dot, &x, &y);
+							wm->ir.ax = wm->ir.x;
+							wm->ir.ay = wm->ir.y;
 
-			wm->ir.ax = x;
-			wm->ir.ay = y;
-			wm->orient.yaw = calc_yaw(&wm->ir);
+							/*	can't calculate yaw because we don't have the distance */
+							/* wm->orient.yaw = calc_yaw(&wm->ir); */
 
-			if (ir_correct_for_bounds(&x, &y, wm->ir.aspect, wm->ir.offset[0], wm->ir.offset[1])) {
-				ir_convert_to_vres(&x, &y, wm->ir.aspect, wm->ir.vres[0], wm->ir.vres[1]);
-				wm->ir.x = x;
-				wm->ir.y = y;
+							ir_convert_to_vres(&wm->ir.x, &wm->ir.y, wm->ir.aspect, wm->ir.vres[0], wm->ir.vres[1]);
+							break;
+						}
+					}
+				} else {
+					/*
+					 *	Only see 1 dot but know theres 2.
+					 *	Try to estimate where the other one
+					 *	should be and use that.
+					 */
+					for (i = 0; i < 4; ++i) {
+						if (dot[i].visible) {
+							int ox = 0;
+							int x, y;
+
+							if (dot[i].order == 1)
+								/* visible is the left dot - estimate where the right is */
+							{
+								ox = (int32_t)(dot[i].x + wm->ir.distance);
+							} else if (dot[i].order == 2)
+								/* visible is the right dot - estimate where the left is */
+							{
+								ox = (int32_t)(dot[i].x - wm->ir.distance);
+							}
+
+							x = ((signed int)dot[i].x + ox) / 2;
+							y = dot[i].y;
+
+							wm->ir.ax = x;
+							wm->ir.ay = y;
+							wm->orient.yaw = calc_yaw(&wm->ir);
+
+							if (ir_correct_for_bounds(&x, &y, wm->ir.aspect, wm->ir.offset[0], wm->ir.offset[1])) {
+								ir_convert_to_vres(&x, &y, wm->ir.aspect, wm->ir.vres[0], wm->ir.vres[1]);
+								wm->ir.x = x;
+								wm->ir.y = y;
+							}
+
+							break;
+						}
+					}
+				}
+
+				break;
 			}
+		case 2:
+		case 3:
+		case 4: {
+				/*
+				 *	Two (or more) dots known and seen.
+				 *	Average them together to estimate the true location.
+				 */
+				int x, y;
+				wm->ir.state = 2;
 
-			break;
-		}
-		default:
-		{
-			break;
-		}
+				fix_rotated_ir_dots(wm->ir.dot, roll);
+
+				/* if there is at least 1 new dot, reorder them all */
+				if (wm->ir.num_dots > last_num_dots) {
+					reorder_ir_dots(dot);
+					wm->ir.x = 0;
+					wm->ir.y = 0;
+				}
+
+				wm->ir.distance = ir_distance(dot);
+				wm->ir.z = 1023 - wm->ir.distance;
+
+				get_ir_dot_avg(wm->ir.dot, &x, &y);
+
+				wm->ir.ax = x;
+				wm->ir.ay = y;
+				wm->orient.yaw = calc_yaw(&wm->ir);
+
+				if (ir_correct_for_bounds(&x, &y, wm->ir.aspect, wm->ir.offset[0], wm->ir.offset[1])) {
+					ir_convert_to_vres(&x, &y, wm->ir.aspect, wm->ir.vres[0], wm->ir.vres[1]);
+					wm->ir.x = x;
+					wm->ir.y = y;
+				}
+
+				break;
+			}
+		default: {
+				break;
+			}
 	}
 
-	#ifdef WITH_WIIUSE_DEBUG
+#ifdef WITH_WIIUSE_DEBUG
 	{
-	int ir_level;
-	WIIUSE_GET_IR_SENSITIVITY(wm, &ir_level);
-	WIIUSE_DEBUG("IR sensitivity: %i", ir_level);
-	WIIUSE_DEBUG("IR visible dots: %i", wm->ir.num_dots);
-	for (i = 0; i < 4; ++i)
-		if (dot[i].visible)
-			WIIUSE_DEBUG("IR[%i][order %i] (%.3i, %.3i) -> (%.3i, %.3i)", i, dot[i].order, dot[i].rx, dot[i].ry, dot[i].x, dot[i].y);
-	WIIUSE_DEBUG("IR[absolute]: (%i, %i)", wm->ir.x, wm->ir.y);
+		int ir_level;
+		WIIUSE_GET_IR_SENSITIVITY(wm, &ir_level);
+		WIIUSE_DEBUG("IR sensitivity: %i", ir_level);
+		WIIUSE_DEBUG("IR visible dots: %i", wm->ir.num_dots);
+		for (i = 0; i < 4; ++i)
+			if (dot[i].visible) {
+				WIIUSE_DEBUG("IR[%i][order %i] (%.3i, %.3i) -> (%.3i, %.3i)", i, dot[i].order, dot[i].rx, dot[i].ry, dot[i].x, dot[i].y);
+			}
+		WIIUSE_DEBUG("IR[absolute]: (%i, %i)", wm->ir.x, wm->ir.y);
 	}
-	#endif
+#endif
 }
 
 
@@ -560,8 +598,8 @@ static void fix_rotated_ir_dots(struct ir_dot_t* dot, float ang) {
 		return;
 	}
 
-	s = sin(DEGREE_TO_RAD(ang));
-	c = cos(DEGREE_TO_RAD(ang));
+	s = sinf(DEGREE_TO_RAD(ang));
+	c = cosf(DEGREE_TO_RAD(ang));
 
 	/*
 	 *	[ cos(theta)  -sin(theta) ][ ir->rx ]
@@ -569,17 +607,18 @@ static void fix_rotated_ir_dots(struct ir_dot_t* dot, float ang) {
 	 */
 
 	for (i = 0; i < 4; ++i) {
-		if (!dot[i].visible)
+		if (!dot[i].visible) {
 			continue;
+		}
 
-		x = dot[i].rx - (1024/2);
-		y = dot[i].ry - (768/2);
+		x = dot[i].rx - (1024 / 2);
+		y = dot[i].ry - (768 / 2);
 
-		dot[i].x = (c * x) + (-s * y);
-		dot[i].y = (s * x) + (c * y);
+		dot[i].x = (uint32_t)((c * x) + (-s * y));
+		dot[i].y = (uint32_t)((s * x) + (c * y));
 
-		dot[i].x += (1024/2);
-		dot[i].y += (768/2);
+		dot[i].x += (1024 / 2);
+		dot[i].y += (768 / 2);
 	}
 }
 
@@ -619,19 +658,22 @@ static void reorder_ir_dots(struct ir_dot_t* dot) {
 	int i, j, order;
 
 	/* reset the dot ordering */
-	for (i = 0; i < 4; ++i)
+	for (i = 0; i < 4; ++i) {
 		dot[i].order = 0;
+	}
 
 	for (order = 1; order < 5; ++order) {
 		i = 0;
 
 		for (; !dot[i].visible || dot[i].order; ++i)
-		if (i > 4)
-			return;
+			if (i >= 3) {
+				return;
+			}
 
 		for (j = 0; j < 4; ++j) {
-			if (dot[j].visible && !dot[j].order && (dot[j].x < dot[i].x))
+			if (dot[j].visible && !dot[j].order && (dot[j].x < dot[i].x)) {
 				i = j;
+			}
 		}
 
 		dot[i].order = order;
@@ -649,21 +691,25 @@ static float ir_distance(struct ir_dot_t* dot) {
 	int xd, yd;
 
 	for (i1 = 0; i1 < 4; ++i1)
-		if (dot[i1].visible)
+		if (dot[i1].visible) {
 			break;
-	if (i1 == 4)
+		}
+	if (i1 == 4) {
 		return 0.0f;
+	}
 
-	for (i2 = i1+1; i2 < 4; ++i2)
-		if (dot[i2].visible)
+	for (i2 = i1 + 1; i2 < 4; ++i2)
+		if (dot[i2].visible) {
 			break;
-	if (i2 == 4)
+		}
+	if (i2 == 4) {
 		return 0.0f;
+	}
 
 	xd = dot[i2].x - dot[i1].x;
 	yd = dot[i2].y - dot[i1].y;
 
-	return sqrt(xd*xd + yd*yd);
+	return sqrtf(xd * xd + yd * yd);
 }
 
 
@@ -697,10 +743,9 @@ static int ir_correct_for_bounds(int* x, int* y, enum aspect_t aspect, int offse
 	y0 = ((768 - ys) / 2) + offset_y;
 
 	if ((*x >= x0)
-		&& (*x <= (x0 + xs))
-		&& (*y >= y0)
-		&& (*y <= (y0 + ys)))
-	{
+	        && (*x <= (x0 + xs))
+	        && (*y >= y0)
+	        && (*y <= (y0 + ys))) {
 		*x -= offset_x;
 		*y -= offset_y;
 
@@ -725,11 +770,11 @@ static void ir_convert_to_vres(int* x, int* y, enum aspect_t aspect, int vx, int
 		ys = WM_ASPECT_4_3_Y;
 	}
 
-	*x -= ((1024-xs)/2);
-	*y -= ((768-ys)/2);
+	*x -= ((1024 - xs) / 2);
+	*y -= ((768 - ys) / 2);
 
-	*x = (*x / (float)xs) * vx;
-	*y = (*y / (float)ys) * vy;
+	*x = (int)((*x / (float)xs) * vx);
+	*y = (int)((*y / (float)ys) * vy);
 }
 
 
@@ -741,8 +786,8 @@ static void ir_convert_to_vres(int* x, int* y, enum aspect_t aspect, int vx, int
 float calc_yaw(struct ir_t* ir) {
 	float x;
 
-	x = ir->ax - 512;
+	x = (float)(ir->ax - 512);
 	x = x * (ir->z / 1024.0f);
 
-	return RAD_TO_DEGREE( atanf(x / ir->z) );
+	return RAD_TO_DEGREE(atanf(x / ir->z));
 }

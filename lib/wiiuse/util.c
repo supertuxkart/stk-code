@@ -1,11 +1,7 @@
 /*
  *	wiiuse
  *
- *	Written By:
- *		Michael Laforest	< para >
- *		Email: < thepara (--AT--) g m a i l [--DOT--] com >
- *
- *	Copyright 2006-2007
+ *  Copyright 2011 Iowa State University Virtual Reality Applications Center
  *
  *	This file is part of wiiuse.
  *
@@ -28,28 +24,26 @@
 
 /**
  *	@file
- *	@brief Handles device I/O.
+ *	@brief Provides platform-specific utility functions.
  */
 
-#ifndef IO_H_INCLUDED
-#define IO_H_INCLUDED
 
 #include "wiiuse_internal.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifdef WIIUSE_WIN32
 
-	/** @defgroup internal_io Internal: Device I/O */
-	/** @{ */
-	void wiiuse_handshake(struct wiimote_t* wm, byte* data, uint16_t len);
+#include <windows.h>
 
-	void wiiuse_wait_report(struct wiimote_t *wm, int report, byte *buffer, int bufferLength);
-	void wiiuse_read_data_sync(struct wiimote_t *wm, byte memory, unsigned addr, unsigned short size, byte *data);
-	/** @} */
-
-#ifdef __cplusplus
+void wiiuse_millisleep(int durationMilliseconds) {
+	Sleep(durationMilliseconds);
 }
-#endif
 
-#endif /* IO_H_INCLUDED */
+#else /* not win32 - assuming posix */
+
+#include <unistd.h>                     /* for usleep */
+
+void wiiuse_millisleep(int durationMilliseconds) {
+	usleep(durationMilliseconds * 1000);
+}
+
+#endif /* ifdef WIIUSE_WIN32 */

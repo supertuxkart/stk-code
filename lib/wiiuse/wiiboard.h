@@ -28,11 +28,11 @@
 
 /**
  *	@file
- *	@brief Handles device I/O.
+ *	@brief Wii balance board expansion device.
  */
 
-#ifndef IO_H_INCLUDED
-#define IO_H_INCLUDED
+#ifndef WII_BOARD_H_INCLUDED
+#define WII_BOARD_H_INCLUDED
 
 #include "wiiuse_internal.h"
 
@@ -40,16 +40,16 @@
 extern "C" {
 #endif
 
-	/** @defgroup internal_io Internal: Device I/O */
+	/** @defgroup internal_wiiboard Internal: Wii Balance Board */
 	/** @{ */
-	void wiiuse_handshake(struct wiimote_t* wm, byte* data, uint16_t len);
+	int wii_board_handshake(struct wiimote_t* wm, struct wii_board_t* wb, byte* data, uint16_t len);
 
-	void wiiuse_wait_report(struct wiimote_t *wm, int report, byte *buffer, int bufferLength);
-	void wiiuse_read_data_sync(struct wiimote_t *wm, byte memory, unsigned addr, unsigned short size, byte *data);
+	void wii_board_disconnected(struct wii_board_t* wb);
+
+	void wii_board_event(struct wii_board_t* wb, byte* msg);
 	/** @} */
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* IO_H_INCLUDED */
+#endif

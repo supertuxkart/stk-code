@@ -35,18 +35,11 @@
  *	motion sensing.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#ifdef WIN32
-	#include <float.h>
-#endif
-
-#include "definitions.h"
-#include "wiiuse_internal.h"
-#include "ir.h"
 #include "dynamics.h"
+
+#include <math.h>                       /* for atan2f, atanf, sqrt */
+#include <stdlib.h>                     /* for abs */
+
 
 /**
  *	@brief Calculate the roll, pitch, yaw.
@@ -84,12 +77,21 @@ void calculate_orientation(struct accel_t* ac, struct vec3b_t* accel, struct ori
 	z = ((float)accel->z - (float)ac->cal_zero.z) / zg;
 
 	/* make sure x,y,z are between -1 and 1 for the tan functions */
-	if (x < -1.0f)			x = -1.0f;
-	else if (x > 1.0f)		x = 1.0f;
-	if (y < -1.0f)			y = -1.0f;
-	else if (y > 1.0f)		y = 1.0f;
-	if (z < -1.0f)			z = -1.0f;
-	else if (z > 1.0f)		z = 1.0f;
+	if (x < -1.0f) {
+		x = -1.0f;
+	} else if (x > 1.0f) {
+		x = 1.0f;
+	}
+	if (y < -1.0f) {
+		y = -1.0f;
+	} else if (y > 1.0f) {
+		y = 1.0f;
+	}
+	if (z < -1.0f) {
+		z = -1.0f;
+	} else if (z > 1.0f) {
+		z = 1.0f;
+	}
 
 	/* if it is over 1g then it is probably accelerating and not reliable */
 	if (abs(accel->x - ac->cal_zero.x) <= ac->cal_g.x) {
@@ -137,6 +139,18 @@ void calculate_gforce(struct accel_t* ac, struct vec3b_t* accel, struct gforce_t
 	gforce->z = ((float)accel->z - (float)ac->cal_zero.z) / zg;
 }
 
+static float applyCalibration(float inval, float minval, float maxval, float centerval) {
+	float ret;
+	/* We don't use the exact ranges but the ranges + 1 in case we get bad calibration data - avoid div0 */
+	if (inval == centerval) {
+		ret = 0;
+	} else if (inval < centerval) {
+		ret = (inval - centerval) / (centerval - minval + 1);
+	} else {
+		ret = (inval - centerval) / (maxval - centerval + 1);
+	}
+	return ret;
+}
 
 /**
  *	@brief Calculate the angle and magnitude of a joystick.
@@ -154,7 +168,7 @@ void calc_joystick_state(struct joystick_t* js, float x, float y) {
 	 *	Then the range from the min to the center and the center to the max
 	 *	may be different.
 	 *	Because of this, depending on if the current x or y value is greater
-	 *	or less than the assoicated axis center value, it needs to be interpolated
+	 *	or less than the associated axis center value, it needs to be interpolated
 	 *	between the center and the minimum or maxmimum rather than between
 	 *	the minimum and maximum.
 	 *
@@ -164,65 +178,50 @@ void calc_joystick_state(struct joystick_t* js, float x, float y) {
 	 *	The range is therefore -1 to 1, 0 being the exact center rather than
 	 *	the middle of min and max.
 	 */
-	if (x == js->center.x)
-		rx = 0;
-	else if (x >= js->center.x)
-		rx = ((float)(x - js->center.x) / (float)(js->max.x - js->center.x));
-	else
-		rx = ((float)(x - js->min.x) / (float)(js->center.x - js->min.x)) - 1.0f;
-
-	if (y == js->center.y)
-		ry = 0;
-	else if (y >= js->center.y)
-		ry = ((float)(y - js->center.y) / (float)(js->max.y - js->center.y));
-	else
-		ry = ((float)(y - js->min.y) / (float)(js->center.y - js->min.y)) - 1.0f;
-
+	rx = applyCalibration(x, js->min.x, js->max.x, js->center.x);
+	ry = applyCalibration(y, js->min.y, js->max.y, js->center.y);
 	/* calculate the joystick angle and magnitude */
-	ang = RAD_TO_DEGREE(atanf(ry / rx));
-	ang -= 90.0f;
-	if (rx < 0.0f)
-		ang -= 180.0f;
-	js->ang = absf(ang);
-	js->mag = (float) sqrt((rx * rx) + (ry * ry));
+	ang = RAD_TO_DEGREE(atan2f(ry, rx));
+	js->ang = ang + 180.0f;
+	js->mag = sqrtf((rx * rx) + (ry * ry));
 }
 
 
 void apply_smoothing(struct accel_t* ac, struct orient_t* orient, int type) {
 	switch (type) {
-		case SMOOTH_ROLL:
-		{
-			/* it's possible last iteration was nan or inf, so set it to 0 if that happened */
-			if (isnan(ac->st_roll) || isinf(ac->st_roll))
-				ac->st_roll = 0.0f;
+		case SMOOTH_ROLL: {
+				/* it's possible last iteration was nan or inf, so set it to 0 if that happened */
+				if (isnan(ac->st_roll) || isinf(ac->st_roll)) {
+					ac->st_roll = 0.0f;
+				}
 
-			/*
-			 *	If the sign changes (which will happen if going from -180 to 180)
-			 *	or from (-1 to 1) then don't smooth, just use the new angle.
-			 */
-			if (((ac->st_roll < 0) && (orient->roll > 0)) || ((ac->st_roll > 0) && (orient->roll < 0))) {
-				ac->st_roll = orient->roll;
-			} else {
-				orient->roll = ac->st_roll + (ac->st_alpha * (orient->a_roll - ac->st_roll));
-				ac->st_roll = orient->roll;
+				/*
+				 *	If the sign changes (which will happen if going from -180 to 180)
+				 *	or from (-1 to 1) then don't smooth, just use the new angle.
+				 */
+				if (((ac->st_roll < 0) && (orient->roll > 0)) || ((ac->st_roll > 0) && (orient->roll < 0))) {
+					ac->st_roll = orient->roll;
+				} else {
+					orient->roll = ac->st_roll + (ac->st_alpha * (orient->a_roll - ac->st_roll));
+					ac->st_roll = orient->roll;
+				}
+
+				return;
 			}
 
-			return;
-		}
+		case SMOOTH_PITCH: {
+				if (isnan(ac->st_pitch) || isinf(ac->st_pitch)) {
+					ac->st_pitch = 0.0f;
+				}
 
-		case SMOOTH_PITCH:
-		{
-			if (isnan(ac->st_pitch) || isinf(ac->st_pitch))
-				ac->st_pitch = 0.0f;
+				if (((ac->st_pitch < 0) && (orient->pitch > 0)) || ((ac->st_pitch > 0) && (orient->pitch < 0))) {
+					ac->st_pitch = orient->pitch;
+				} else {
+					orient->pitch = ac->st_pitch + (ac->st_alpha * (orient->a_pitch - ac->st_pitch));
+					ac->st_pitch = orient->pitch;
+				}
 
-			if (((ac->st_pitch < 0) && (orient->pitch > 0)) || ((ac->st_pitch > 0) && (orient->pitch < 0))) {
-				ac->st_pitch = orient->pitch;
-			} else {
-				orient->pitch = ac->st_pitch + (ac->st_alpha * (orient->a_pitch - ac->st_pitch));
-				ac->st_pitch = orient->pitch;
+				return;
 			}
-
-			return;
-		}
 	}
 }

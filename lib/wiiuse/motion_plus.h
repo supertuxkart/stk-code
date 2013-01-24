@@ -2,12 +2,14 @@
  *	wiiuse
  *
  *	Written By:
- *		Michael Laforest	< para >
- *		Email: < thepara (--AT--) g m a i l [--DOT--] com >
+ *		Michal Wiedenbauer	< shagkur >
+ *		Dave Murphy			< WinterMute >
+ *		Hector Martin		< marcan >
+ * 		Radu Andries		<admiral0>
  *
- *	Copyright 2006-2007
+ *	Copyright 2009
  *
- *	This file is part of wiiuse.
+ *	This file is part of wiiuse and fWIIne.
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -25,14 +27,13 @@
  *	$Header$
  *
  */
-
 /**
- *	@file
- *	@brief Handles device I/O.
- */
+*	@file
+*	@brief Motion plus extension
+*/
 
-#ifndef IO_H_INCLUDED
-#define IO_H_INCLUDED
+#ifndef MOTION_PLUS_H_INCLUDED
+#define MOTION_PLUS_H_INCLUDED
 
 #include "wiiuse_internal.h"
 
@@ -40,16 +41,20 @@
 extern "C" {
 #endif
 
-	/** @defgroup internal_io Internal: Device I/O */
+	/** @defgroup internal_mp Internal: MotionPlus */
 	/** @{ */
-	void wiiuse_handshake(struct wiimote_t* wm, byte* data, uint16_t len);
+	void motion_plus_disconnected(struct motion_plus_t* mp);
 
-	void wiiuse_wait_report(struct wiimote_t *wm, int report, byte *buffer, int bufferLength);
-	void wiiuse_read_data_sync(struct wiimote_t *wm, byte memory, unsigned addr, unsigned short size, byte *data);
+	void motion_plus_event(struct motion_plus_t* mp, int exp_type, byte* msg);
+
+	void wiiuse_motion_plus_handshake(struct wiimote_t *wm, byte *data, unsigned short len);
+
+	void wiiuse_probe_motion_plus(struct wiimote_t *wm);
+
 	/** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* IO_H_INCLUDED */
+#endif

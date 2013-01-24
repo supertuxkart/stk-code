@@ -35,29 +35,41 @@
  *	of the API.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#ifndef WIN32
-	#include <unistd.h>
-#else
-	#include <Winsock2.h>
-#endif
-
-#include "definitions.h"
 #include "wiiuse_internal.h"
-#include "events.h"
-#include "io.h"
+#include "io.h"                         /* for wiiuse_handshake, etc */
+#include "os.h"							/* for wiiuse_os_* */
+
+#include <stdio.h>                      /* for printf, FILE */
+#include <stdlib.h>                     /* for malloc, free */
+#include <string.h>                     /* for memcpy, memset */
 
 static int g_banner = 0;
+static const char g_wiiuse_version_string[] = WIIUSE_VERSION;
 
 /**
- *	@breif Returns the version of the library.
+ *	@brief Returns the version of the library.
  */
 const char* wiiuse_version() {
-	return WIIUSE_VERSION;
+	return g_wiiuse_version_string;
 }
 
+/**
+ *	@brief Output FILE stream for each wiiuse_loglevel.
+ */
+FILE* logtarget[4];
+
+/**
+ *	@brief Specify an alternate FILE stream for a log level.
+ *
+ *	@param loglevel The loglevel, for which the output should be set.
+ *
+ *	@param logfile A valid, writeable <code>FILE*</code>, or 0, if output should be disabled.
+ *
+ *  The default <code>FILE*</code> for all loglevels is <code>stderr</code>
+ */
+void wiiuse_set_output(enum wiiuse_loglevel loglevel, FILE *logfile) {
+	logtarget[(int)loglevel] = logfile;
+}
 
 /**
  *	@brief Clean up wiimote_t array created by wiiuse_init()
@@ -65,13 +77,15 @@ const char* wiiuse_version() {
 void wiiuse_cleanup(struct wiimote_t** wm, int wiimotes) {
 	int i = 0;
 
-	if (!wm)
+	if (!wm) {
 		return;
+	}
 
 	WIIUSE_INFO("wiiuse clean up...");
 
 	for (; i < wiimotes; ++i) {
 		wiiuse_disconnect(wm[i]);
+		wiiuse_cleanup_platform_fields(wm[i]);
 		free(wm[i]);
 	}
 
@@ -106,14 +120,20 @@ struct wiimote_t** wiiuse_init(int wiimotes) {
 	 *	to call this function again it won't be intrusive.
 	 */
 	if (!g_banner) {
-		printf(	"wiiuse v" WIIUSE_VERSION " loaded.\n"
-				"  By: Michael Laforest <thepara[at]gmail{dot}com>\n"
-				"  http://wiiuse.net  http://wiiuse.sf.net\n");
+		printf("wiiuse v" WIIUSE_VERSION " loaded.\n"
+		       "  Fork at http://github.com/rpavlik/wiiuse\n"
+		       "  Original By: Michael Laforest <thepara[at]gmail{dot}com> http://wiiuse.net\n");
 		g_banner = 1;
 	}
 
-	if (!wiimotes)
+	logtarget[0] = stderr;
+	logtarget[1] = stderr;
+	logtarget[2] = stderr;
+	logtarget[3] = stderr;
+
+	if (!wiimotes) {
 		return NULL;
+	}
 
 	wm = malloc(sizeof(struct wiimote_t*) * wiimotes);
 
@@ -121,19 +141,8 @@ struct wiimote_t** wiiuse_init(int wiimotes) {
 		wm[i] = malloc(sizeof(struct wiimote_t));
 		memset(wm[i], 0, sizeof(struct wiimote_t));
 
-		wm[i]->unid = i+1;
-
-		#ifndef WIN32
-			wm[i]->bdaddr = *BDADDR_ANY;
-			wm[i]->out_sock = -1;
-			wm[i]->in_sock = -1;
-		#else
-			wm[i]->dev_handle = 0;
-			wm[i]->stack = WIIUSE_STACK_UNKNOWN;
-			wm[i]->normal_timeout = WIIMOTE_DEFAULT_TIMEOUT;
-			wm[i]->exp_timeout = WIIMOTE_EXP_TIMEOUT;
-			wm[i]->timeout = wm[i]->normal_timeout;
-		#endif
+		wm[i]->unid = i + 1;
+		wiiuse_init_platform_fields(wm[i]);
 
 		wm[i]->state = WIIMOTE_INIT_STATES;
 		wm[i]->flags = WIIUSE_INIT_FLAGS;
@@ -141,6 +150,7 @@ struct wiimote_t** wiiuse_init(int wiimotes) {
 		wm[i]->event = WIIUSE_NONE;
 
 		wm[i]->exp.type = EXP_NONE;
+		wm[i]->expansion_state = 0;
 
 		wiiuse_set_aspect_ratio(wm[i], WIIUSE_ASPECT_4_3);
 		wiiuse_set_ir_position(wm[i], WIIUSE_IR_ABOVE);
@@ -161,7 +171,9 @@ struct wiimote_t** wiiuse_init(int wiimotes) {
  *	@param wm	Pointer to a wiimote_t structure.
  */
 void wiiuse_disconnected(struct wiimote_t* wm) {
-	if (!wm)	return;
+	if (!wm)	{
+		return;
+	}
 
 	WIIUSE_INFO("Wiimote disconnected [id %i].", wm->unid);
 
@@ -169,21 +181,15 @@ void wiiuse_disconnected(struct wiimote_t* wm) {
 	WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_CONNECTED);
 
 	/* reset a bunch of stuff */
-	#ifndef WIN32
-		wm->out_sock = -1;
-		wm->in_sock = -1;
-	#else
-		wm->dev_handle = 0;
-	#endif
-
 	wm->leds = 0;
 	wm->state = WIIMOTE_INIT_STATES;
 	wm->read_req = NULL;
+#ifndef WIIUSE_SYNC_HANDSHAKE
 	wm->handshake_state = 0;
+#endif
 	wm->btns = 0;
 	wm->btns_held = 0;
 	wm->btns_released = 0;
-	memset(wm->event_buf, 0, sizeof(wm->event_buf));
 
 	wm->event = WIIUSE_DISCONNECT;
 }
@@ -198,8 +204,9 @@ void wiiuse_disconnected(struct wiimote_t* wm) {
 void wiiuse_rumble(struct wiimote_t* wm, int status) {
 	byte buf;
 
-	if (!wm || !WIIMOTE_IS_CONNECTED(wm))
+	if (!wm || !WIIMOTE_IS_CONNECTED(wm)) {
 		return;
+	}
 
 	/* make sure to keep the current lit leds */
 	buf = wm->leds;
@@ -211,11 +218,13 @@ void wiiuse_rumble(struct wiimote_t* wm, int status) {
 	} else {
 		WIIUSE_DEBUG("Stopping rumble...");
 		WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_RUMBLE);
+		buf &= ~(0x01);
 	}
 
 	/* preserve IR state */
-	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_IR))
+	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_IR)) {
 		buf |= 0x04;
+	}
 
 	wiiuse_send(wm, WM_CMD_RUMBLE, &buf, 1);
 }
@@ -227,7 +236,9 @@ void wiiuse_rumble(struct wiimote_t* wm, int status) {
  *	@param wm		Pointer to a wiimote_t structure.
  */
 void wiiuse_toggle_rumble(struct wiimote_t* wm) {
-	if (!wm)	return;
+	if (!wm)	{
+		return;
+	}
 
 	wiiuse_rumble(wm, !WIIMOTE_IS_SET(wm, WIIMOTE_STATE_RUMBLE));
 }
@@ -244,15 +255,17 @@ void wiiuse_toggle_rumble(struct wiimote_t* wm) {
 void wiiuse_set_leds(struct wiimote_t* wm, int leds) {
 	byte buf;
 
-	if (!wm || !WIIMOTE_IS_CONNECTED(wm))
+	if (!wm || !WIIMOTE_IS_CONNECTED(wm)) {
 		return;
+	}
 
 	/* remove the lower 4 bits because they control rumble */
 	wm->leds = (leds & 0xF0);
 
 	/* make sure if the rumble is on that we keep it on */
-	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_RUMBLE))
+	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_RUMBLE)) {
 		wm->leds |= 0x01;
+	}
 
 	buf = wm->leds;
 
@@ -271,10 +284,11 @@ void wiiuse_set_leds(struct wiimote_t* wm, int leds) {
  *	by default.
  */
 void wiiuse_motion_sensing(struct wiimote_t* wm, int status) {
-	if (status)
+	if (status) {
 		WIIMOTE_ENABLE_STATE(wm, WIIMOTE_STATE_ACC);
-	else
+	} else {
 		WIIMOTE_DISABLE_STATE(wm, WIIMOTE_STATE_ACC);
+	}
 
 	wiiuse_set_report_type(wm);
 }
@@ -296,34 +310,46 @@ int wiiuse_set_report_type(struct wiimote_t* wm) {
 	byte buf[2];
 	int motion, exp, ir;
 
-	if (!wm || !WIIMOTE_IS_CONNECTED(wm))
+	if (!wm || !WIIMOTE_IS_CONNECTED(wm)) {
 		return 0;
+	}
 
 	buf[0] = (WIIMOTE_IS_FLAG_SET(wm, WIIUSE_CONTINUOUS) ? 0x04 : 0x00);	/* set to 0x04 for continuous reporting */
 	buf[1] = 0x00;
 
 	/* if rumble is enabled, make sure we keep it */
-	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_RUMBLE))
+	if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_RUMBLE)) {
 		buf[0] |= 0x01;
+	}
 
 	motion = WIIMOTE_IS_SET(wm, WIIMOTE_STATE_ACC);
 	exp = WIIMOTE_IS_SET(wm, WIIMOTE_STATE_EXP);
 	ir = WIIMOTE_IS_SET(wm, WIIMOTE_STATE_IR);
 
-	if (motion && ir && exp)	buf[1] = WM_RPT_BTN_ACC_IR_EXP;
-	else if (motion && exp)		buf[1] = WM_RPT_BTN_ACC_EXP;
-	else if (motion && ir)		buf[1] = WM_RPT_BTN_ACC_IR;
-	else if (ir && exp)			buf[1] = WM_RPT_BTN_IR_EXP;
-	else if (ir)				buf[1] = WM_RPT_BTN_ACC_IR;
-	else if (exp)				buf[1] = WM_RPT_BTN_EXP;
-	else if (motion)			buf[1] = WM_RPT_BTN_ACC;
-	else						buf[1] = WM_RPT_BTN;
+	if (motion && ir && exp)	{
+		buf[1] = WM_RPT_BTN_ACC_IR_EXP;
+	} else if (motion && exp) {
+		buf[1] = WM_RPT_BTN_ACC_EXP;
+	} else if (motion && ir) {
+		buf[1] = WM_RPT_BTN_ACC_IR;
+	} else if (ir && exp) {
+		buf[1] = WM_RPT_BTN_IR_EXP;
+	} else if (ir) {
+		buf[1] = WM_RPT_BTN_ACC_IR;
+	} else if (exp) {
+		buf[1] = WM_RPT_BTN_EXP;
+	} else if (motion) {
+		buf[1] = WM_RPT_BTN_ACC;
+	} else {
+		buf[1] = WM_RPT_BTN;
+	}
 
 	WIIUSE_DEBUG("Setting report type: 0x%x", buf[1]);
 
 	exp = wiiuse_send(wm, WM_CMD_REPORT_TYPE, buf, 2);
-	if (exp <= 0)
+	if (exp <= 0) {
 		return exp;
+	}
 
 	return buf[1];
 }
@@ -346,16 +372,21 @@ int wiiuse_set_report_type(struct wiimote_t* wm) {
  *	to a pending list and be sent out when the previous
  *	finishes.
  */
-int wiiuse_read_data_cb(struct wiimote_t* wm, wiiuse_read_cb read_cb, byte* buffer, unsigned int addr, unsigned short len) {
+int wiiuse_read_data_cb(struct wiimote_t* wm, wiiuse_read_cb read_cb, byte* buffer, unsigned int addr, uint16_t len) {
 	struct read_req_t* req;
 
-	if (!wm || !WIIMOTE_IS_CONNECTED(wm))
+	if (!wm || !WIIMOTE_IS_CONNECTED(wm)) {
 		return 0;
-	if (!buffer || !len || !read_cb)
+	}
+	if (!buffer || !len) {
 		return 0;
+	}
 
 	/* make this request structure */
 	req = (struct read_req_t*)malloc(sizeof(struct read_req_t));
+	if (req == NULL) {
+		return 0;
+	}
 	req->cb = read_cb;
 	req->buf = buffer;
 	req->addr = addr;
@@ -375,7 +406,9 @@ int wiiuse_read_data_cb(struct wiimote_t* wm, wiiuse_read_cb read_cb, byte* buff
 		wiiuse_send_next_pending_read_request(wm);
 	} else {
 		struct read_req_t* nptr = wm->read_req;
-		for (; nptr->next; nptr = nptr->next);
+		for (; nptr->next; nptr = nptr->next) {
+			;
+		}
 		nptr->next = req;
 
 		WIIUSE_DEBUG("Added pending data read request.");
@@ -401,42 +434,8 @@ int wiiuse_read_data_cb(struct wiimote_t* wm, wiiuse_read_cb read_cb, byte* buff
  *	to a pending list and be sent out when the previous
  *	finishes.
  */
-int wiiuse_read_data(struct wiimote_t* wm, byte* buffer, unsigned int addr, unsigned short len) {
-	struct read_req_t* req;
-
-	if (!wm || !WIIMOTE_IS_CONNECTED(wm))
-		return 0;
-	if (!buffer || !len)
-		return 0;
-
-	/* make this request structure */
-	req = (struct read_req_t*)malloc(sizeof(struct read_req_t));
-	req->cb = NULL;
-	req->buf = buffer;
-	req->addr = addr;
-	req->size = len;
-	req->wait = len;
-	req->dirty = 0;
-	req->next = NULL;
-
-	/* add this to the request list */
-	if (!wm->read_req) {
-		/* root node */
-		wm->read_req = req;
-
-		WIIUSE_DEBUG("Data read request can be sent out immediately.");
-
-		/* send the request out immediately */
-		wiiuse_send_next_pending_read_request(wm);
-	} else {
-		struct read_req_t* nptr = wm->read_req;
-		for (; nptr->next; nptr = nptr->next);
-		nptr->next = req;
-
-		WIIUSE_DEBUG("Added pending data read request.");
-	}
-
-	return 1;
+int wiiuse_read_data(struct wiimote_t* wm, byte* buffer, unsigned int addr, uint16_t len) {
+	return wiiuse_read_data_cb(wm, NULL, buffer, addr, len);
 }
 
 
@@ -453,22 +452,27 @@ void wiiuse_send_next_pending_read_request(struct wiimote_t* wm) {
 	byte buf[6];
 	struct read_req_t* req;
 
-	if (!wm || !WIIMOTE_IS_CONNECTED(wm))
+	if (!wm || !WIIMOTE_IS_CONNECTED(wm)) {
 		return;
-	if (!wm->read_req)	return;
+	}
+	if (!wm->read_req)	{
+		return;
+	}
 
 	/* skip over dirty ones since they have already been read */
 	req = wm->read_req;
-	while (req && req->dirty)
+	while (req && req->dirty) {
 		req = req->next;
-	if (!req)
+	}
+	if (!req) {
 		return;
+	}
 
 	/* the offset is in big endian */
-	*(int*)(buf) = BIG_ENDIAN_LONG(req->addr);
+	to_big_endian_uint32_t(buf, req->addr);
 
 	/* the length is in big endian */
-	*(short*)(buf + 4) = BIG_ENDIAN_SHORT(req->size);
+	to_big_endian_uint16_t(buf + 4, req->size);
 
 	WIIUSE_DEBUG("Request read at address: 0x%x  length: %i", req->addr, req->size);
 	wiiuse_send(wm, WM_CMD_READ_DATA, buf, 6);
@@ -485,8 +489,9 @@ void wiiuse_send_next_pending_read_request(struct wiimote_t* wm) {
 void wiiuse_status(struct wiimote_t* wm) {
 	byte buf = 0;
 
-	if (!wm || !WIIMOTE_IS_CONNECTED(wm))
+	if (!wm || !WIIMOTE_IS_CONNECTED(wm)) {
 		return;
+	}
 
 	WIIUSE_DEBUG("Requested wiimote status.");
 
@@ -505,10 +510,17 @@ void wiiuse_status(struct wiimote_t* wm) {
  */
 struct wiimote_t* wiiuse_get_by_id(struct wiimote_t** wm, int wiimotes, int unid) {
 	int i = 0;
+	if (!wm) {
+		return NULL;
+	}
 
 	for (; i < wiimotes; ++i) {
-		if (wm[i]->unid == unid)
+		if (!wm[i]) {
+			continue;
+		}
+		if (wm[i]->unid == unid) {
 			return wm[i];
+		}
 	}
 
 	return NULL;
@@ -523,104 +535,168 @@ struct wiimote_t* wiiuse_get_by_id(struct wiimote_t** wm, int wiimotes, int unid
  *	@param data			The data to be written to the memory location.
  *	@param len			The length of the block to be written.
  */
-int wiiuse_write_data(struct wiimote_t* wm, unsigned int addr, byte* data, byte len) {
+int wiiuse_write_data(struct wiimote_t* wm, unsigned int addr, const byte* data, byte len) {
 	byte buf[21] = {0};		/* the payload is always 23 */
 
-	if (!wm || !WIIMOTE_IS_CONNECTED(wm))
+	byte * bufPtr = buf;
+	if (!wm || !WIIMOTE_IS_CONNECTED(wm)) {
 		return 0;
-	if (!data || !len)
+	}
+	if (!data || !len) {
 		return 0;
+	}
 
 	WIIUSE_DEBUG("Writing %i bytes to memory location 0x%x...", len, addr);
 
-	#ifdef WITH_WIIUSE_DEBUG
+#ifdef WITH_WIIUSE_DEBUG
 	{
 		int i = 0;
 		printf("Write data is: ");
-		for (; i < len; ++i)
+		for (; i < len; ++i) {
 			printf("%x ", data[i]);
+		}
 		printf("\n");
 	}
-	#endif
+#endif
 
 	/* the offset is in big endian */
-	*(int*)(buf) = BIG_ENDIAN_LONG(addr);
+	buffer_big_endian_uint32_t(&bufPtr, (uint32_t)addr);
 
 	/* length */
-	*(byte*)(buf + 4) = len;
+	buffer_big_endian_uint8_t(&bufPtr, len);
 
 	/* data */
-	memcpy(buf + 5, data, len);
+	memcpy(bufPtr, data, len);
 
 	wiiuse_send(wm, WM_CMD_WRITE_DATA, buf, 21);
 	return 1;
 }
 
+/**
+ *	@brief	Write data to the wiimote (callback version).
+ *
+ *	@param wm			Pointer to a wiimote_t structure.
+ *	@param addr			The address to write to.
+ *	@param data			The data to be written to the memory location.
+ *	@param len			The length of the block to be written.
+ *	@param cb			Function pointer to call when the data arrives from the wiimote.
+ *
+ *	The library can only handle one data read request at a time
+ *	because it must keep track of the buffer and other
+ *	events that are specific to that request.  So if a request
+ *	has already been made, subsequent requests will be added
+ *	to a pending list and be sent out when the previous
+ *	finishes.
+ */
+int wiiuse_write_data_cb(struct wiimote_t *wm, unsigned int addr, byte *data, byte len, wiiuse_write_cb write_cb) {
+	struct data_req_t* req;
+
+	if (!wm || !WIIMOTE_IS_CONNECTED(wm)) {
+		return 0;
+	}
+	if (!data || !len) {
+		return 0;
+	}
+
+	req = (struct data_req_t*)malloc(sizeof(struct data_req_t));
+	req->cb = write_cb;
+	req->len = len;
+	memcpy(req->data, data, req->len);
+	req->state = REQ_READY;
+	req->addr = addr;/* BIG_ENDIAN_LONG(addr); */
+	req->next = NULL;
+	/* add this to the request list */
+	if (!wm->data_req) {
+		/* root node */
+		wm->data_req = req;
+
+		WIIUSE_DEBUG("Data write request can be sent out immediately.");
+
+		/* send the request out immediately */
+		wiiuse_send_next_pending_write_request(wm);
+	} else {
+		struct data_req_t* nptr = wm->data_req;
+		WIIUSE_DEBUG("chaud2fois");
+		for (; nptr->next; nptr = nptr->next) {
+			;
+		}
+		nptr->next = req;
+
+		WIIUSE_DEBUG("Added pending data write request.");
+	}
+
+	return 1;
+}
+
+/**
+ *	@brief Send the next pending data write request to the wiimote.
+ *
+ *	@param wm		Pointer to a wiimote_t structure.
+ *
+ *	@see wiiuse_write_data()
+ *
+ *	This function is not part of the wiiuse API.
+ */
+void wiiuse_send_next_pending_write_request(struct wiimote_t* wm) {
+	struct data_req_t* req;
+
+	if (!wm || !WIIMOTE_IS_CONNECTED(wm)) {
+		return;
+	}
+	req = wm->data_req;
+	if (!req) {
+		return;
+	}
+	if (!req->data || !req->len) {
+		return;
+	}
+	if (req->state != REQ_READY) {
+		return;
+	}
+
+	wiiuse_write_data(wm, req->addr, req->data, req->len);
+
+	req->state = REQ_SENT;
+	return;
+}
 
 /**
  *	@brief	Send a packet to the wiimote.
  *
  *	@param wm			Pointer to a wiimote_t structure.
  *	@param report_type	The report type to send (WIIMOTE_CMD_LED, WIIMOTE_CMD_RUMBLE, etc). Found in wiiuse.h
- *	@param msg			The payload.
+ *	@param msg			The payload. Might be changed by the callee.
  *	@param len			Length of the payload in bytes.
  *
  *	This function should replace any write()s directly to the wiimote device.
  */
 int wiiuse_send(struct wiimote_t* wm, byte report_type, byte* msg, int len) {
-	byte buf[32];		/* no payload is better than this */
-	int rumble = 0;
-
-	#ifndef WIN32
-		buf[0] = WM_SET_REPORT | WM_BT_OUTPUT;
-		buf[1] = report_type;
-	#else
-		buf[0] = report_type;
-	#endif
-
 	switch (report_type) {
 		case WM_CMD_LED:
 		case WM_CMD_RUMBLE:
-		case WM_CMD_CTRL_STATUS:
-		{
-			/* Rumble flag for: 0x11, 0x13, 0x14, 0x15, 0x19 or 0x1a */
-			if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_RUMBLE))
-				rumble = 1;
-			break;
-		}
+		case WM_CMD_CTRL_STATUS: {
+				/* Rumble flag for: 0x11, 0x13, 0x14, 0x15, 0x19 or 0x1a */
+				if (WIIMOTE_IS_SET(wm, WIIMOTE_STATE_RUMBLE)) {
+					msg[0] |= 0x01;
+				}
+				break;
+			}
 		default:
 			break;
 	}
 
-	#ifndef WIN32
-		memcpy(buf+2, msg, len);
-		if (rumble)
-			buf[2] |= 0x01;
-	#else
-		memcpy(buf+1, msg, len);
-		if (rumble)
-			buf[1] |= 0x01;
-	#endif
-
-	#ifdef WITH_WIIUSE_DEBUG
+#ifdef WITH_WIIUSE_DEBUG
 	{
-		int x = 2;
-		printf("[DEBUG] (id %i) SEND: (%x) %.2x ", wm->unid, buf[0], buf[1]);
-		#ifndef WIN32
-		for (; x < len+2; ++x)
-		#else
-		for (; x < len+1; ++x)
-		#endif
-			printf("%.2x ", buf[x]);
+		int x;
+		printf("[DEBUG] (id %i) SEND: (%.2x) %.2x ", wm->unid, report_type, msg[0]);
+		for (x = 1; x < len; ++x) {
+			printf("%.2x ", msg[x]);
+		}
 		printf("\n");
 	}
-	#endif
+#endif
 
-	#ifndef WIN32
-		return wiiuse_io_write(wm, buf, len+2);
-	#else
-		return wiiuse_io_write(wm, buf, len+1);
-	#endif
+	return wiiuse_os_write(wm, report_type, msg, len);
 }
 
 
@@ -637,7 +713,9 @@ int wiiuse_send(struct wiimote_t* wm, byte report_type, byte* msg, int len) {
  *	Flags are defined in wiiuse.h.
  */
 int wiiuse_set_flags(struct wiimote_t* wm, int enable, int disable) {
-	if (!wm)	return 0;
+	if (!wm)	{
+		return 0;
+	}
 
 	/* remove mutually exclusive flags */
 	enable &= ~disable;
@@ -666,15 +744,18 @@ int wiiuse_set_flags(struct wiimote_t* wm, int enable, int disable) {
 float wiiuse_set_smooth_alpha(struct wiimote_t* wm, float alpha) {
 	float old;
 
-	if (!wm)	return 0.0f;
+	if (!wm)	{
+		return 0.0f;
+	}
 
 	old = wm->accel_calib.st_alpha;
 
 	wm->accel_calib.st_alpha = alpha;
 
 	/* if there is a nunchuk set that too */
-	if (wm->exp.type == EXP_NUNCHUK)
+	if (wm->exp.type == EXP_NUNCHUK) {
 		wm->exp.nunchuk.accel_calib.st_alpha = alpha;
+	}
 
 	return old;
 }
@@ -688,14 +769,17 @@ float wiiuse_set_smooth_alpha(struct wiimote_t* wm, float alpha) {
  *	@param type		The type of bluetooth stack to use.
  */
 void wiiuse_set_bluetooth_stack(struct wiimote_t** wm, int wiimotes, enum win_bt_stack_t type) {
-	#ifdef WIN32
+#ifdef WIIUSE_WIN32
 	int i;
 
-	if (!wm)	return;
+	if (!wm)	{
+		return;
+	}
 
-	for (i = 0; i < wiimotes; ++i)
+	for (i = 0; i < wiimotes; ++i) {
 		wm[i]->stack = type;
-	#endif
+	}
+#endif
 }
 
 
@@ -706,11 +790,13 @@ void wiiuse_set_bluetooth_stack(struct wiimote_t** wm, int wiimotes, enum win_bt
  *	@param threshold	The decimal place that should be considered a significant change.
  *
  *	If threshold is 0.01, and any angle changes by 0.01 then a significant change
- *	has occured and the event callback will be invoked.  If threshold is 1 then
+ *	has occurred and the event callback will be invoked.  If threshold is 1 then
  *	the angle has to change by a full degree to generate an event.
  */
 void wiiuse_set_orient_threshold(struct wiimote_t* wm, float threshold) {
-	if (!wm)	return;
+	if (!wm)	{
+		return;
+	}
 
 	wm->orient_threshold = threshold;
 }
@@ -723,7 +809,9 @@ void wiiuse_set_orient_threshold(struct wiimote_t* wm, float threshold) {
  *	@param threshold	The decimal place that should be considered a significant change.
  */
 void wiiuse_set_accel_threshold(struct wiimote_t* wm, int threshold) {
-	if (!wm)	return;
+	if (!wm)	{
+		return;
+	}
 
 	wm->accel_threshold = threshold;
 }
@@ -735,9 +823,13 @@ void wiiuse_set_accel_threshold(struct wiimote_t* wm, int threshold) {
  *	@param wm			Pointer to a wiimote_t structure.
  */
 void wiiuse_resync(struct wiimote_t* wm) {
-	if (!wm)	return;
+	if (!wm)	{
+		return;
+	}
 
+#ifndef WIIUSE_SYNC_HANDSHAKE
 	wm->handshake_state = 0;
+#endif
 	wiiuse_handshake(wm, NULL, 0);
 }
 
@@ -751,14 +843,16 @@ void wiiuse_resync(struct wiimote_t* wm) {
  *	@param exp_timeout		The timeout in millisecondsd to wait for an expansion handshake.
  */
 void wiiuse_set_timeout(struct wiimote_t** wm, int wiimotes, byte normal_timeout, byte exp_timeout) {
-	#ifdef WIN32
+#ifdef WIIUSE_WIN32
 	int i;
 
-	if (!wm)	return;
+	if (!wm)	{
+		return;
+	}
 
 	for (i = 0; i < wiimotes; ++i) {
 		wm[i]->normal_timeout = normal_timeout;
 		wm[i]->exp_timeout = exp_timeout;
 	}
-	#endif
+#endif
 }

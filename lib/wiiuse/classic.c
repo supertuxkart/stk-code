@@ -31,19 +31,12 @@
  *	@brief Classic controller expansion device.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#ifdef WIN32
-	#include <Winsock2.h>
-#endif
-
-#include "definitions.h"
-#include "wiiuse_internal.h"
-#include "dynamics.h"
-#include "events.h"
 #include "classic.h"
+#include "dynamics.h"                   /* for calc_joystick_state */
+#include "events.h"                     /* for handshake_expansion */
+
+#include <stdlib.h>                     /* for malloc */
+#include <string.h>                     /* for memset */
 
 static void classic_ctrl_pressed_buttons(struct classic_ctrl_t* cc, short now);
 
@@ -56,9 +49,8 @@ static void classic_ctrl_pressed_buttons(struct classic_ctrl_t* cc, short now);
  *
  *	@return	Returns 1 if handshake was successful, 0 if not.
  */
+#define HANDSHAKE_BYTES_USED 12
 int classic_ctrl_handshake(struct wiimote_t* wm, struct classic_ctrl_t* cc, byte* data, unsigned short len) {
-	int i;
-	int offset = 0;
 
 	cc->btns = 0;
 	cc->btns_held = 0;
@@ -66,11 +58,7 @@ int classic_ctrl_handshake(struct wiimote_t* wm, struct classic_ctrl_t* cc, byte
 	cc->r_shoulder = 0;
 	cc->l_shoulder = 0;
 
-	/* decrypt data */
-	for (i = 0; i < len; ++i)
-		data[i] = (data[i] ^ 0x17) + 0x17;
-
-	if (data[offset] == 0xFF) {
+	if (data[0] == 0xFF || len < HANDSHAKE_BYTES_USED) {
 		/*
 		 *	Sometimes the data returned here is not correct.
 		 *	This might happen because the wiimote is lagging
@@ -81,40 +69,41 @@ int classic_ctrl_handshake(struct wiimote_t* wm, struct classic_ctrl_t* cc, byte
 		 *	but since the next 16 bytes are the same, just use
 		 *	those.
 		 */
-		if (data[offset + 16] == 0xFF) {
+		if (len < 17 || len < HANDSHAKE_BYTES_USED + 16 || data[16] == 0xFF) {
 			/* get the calibration data */
-			byte* handshake_buf = malloc(EXP_HANDSHAKE_LEN * sizeof(byte));
+			byte* handshake_buf = (byte *)malloc(EXP_HANDSHAKE_LEN * sizeof(byte));
 
 			WIIUSE_DEBUG("Classic controller handshake appears invalid, trying again.");
 			wiiuse_read_data_cb(wm, handshake_expansion, handshake_buf, WM_EXP_MEM_CALIBR, EXP_HANDSHAKE_LEN);
 
 			return 0;
-		} else
-			offset += 16;
+		} else {
+			data += 16;
+		}
 	}
 
 
 	/* joystick stuff */
-	cc->ljs.max.x = data[0 + offset] / 4;
-	cc->ljs.min.x = data[1 + offset] / 4;
-	cc->ljs.center.x = data[2 + offset] / 4;
-	cc->ljs.max.y = data[3 + offset] / 4;
-	cc->ljs.min.y = data[4 + offset] / 4;
-	cc->ljs.center.y = data[5 + offset] / 4;
+	cc->ljs.max.x = data[0] / 4;
+	cc->ljs.min.x = data[1] / 4;
+	cc->ljs.center.x = data[2] / 4;
+	cc->ljs.max.y = data[3] / 4;
+	cc->ljs.min.y = data[4] / 4;
+	cc->ljs.center.y = data[5] / 4;
 
-	cc->rjs.max.x = data[6 + offset] / 8;
-	cc->rjs.min.x = data[7 + offset] / 8;
-	cc->rjs.center.x = data[8 + offset] / 8;
-	cc->rjs.max.y = data[9 + offset] / 8;
-	cc->rjs.min.y = data[10 + offset] / 8;
-	cc->rjs.center.y = data[11 + offset] / 8;
+	cc->rjs.max.x = data[6] / 8;
+	cc->rjs.min.x = data[7] / 8;
+	cc->rjs.center.x = data[8] / 8;
+	cc->rjs.max.y = data[9] / 8;
+	cc->rjs.min.y = data[10] / 8;
+	cc->rjs.center.y = data[11] / 8;
 
 	/* handshake done */
 	wm->exp.type = EXP_CLASSIC;
 
-	#ifdef WIN32
+#ifdef WIIUSE_WIN32
 	wm->timeout = WIIMOTE_DEFAULT_TIMEOUT;
-	#endif
+#endif
 
 	return 1;
 }
@@ -138,14 +127,10 @@ void classic_ctrl_disconnected(struct classic_ctrl_t* cc) {
  *	@param msg		The message specified in the event packet.
  */
 void classic_ctrl_event(struct classic_ctrl_t* cc, byte* msg) {
-	int i, lx, ly, rx, ry;
+	int lx, ly, rx, ry;
 	byte l, r;
 
-	/* decrypt data */
-	for (i = 0; i < 6; ++i)
-		msg[i] = (msg[i] ^ 0x17) + 0x17;
-
-	classic_ctrl_pressed_buttons(cc, BIG_ENDIAN_SHORT(*(short*)(msg + 4)));
+	classic_ctrl_pressed_buttons(cc, from_big_endian_uint16_t(msg + 4));
 
 	/* left/right buttons */
 	l = (((msg[2] & 0x60) >> 2) | ((msg[3] & 0xE0) >> 5));
@@ -164,8 +149,8 @@ void classic_ctrl_event(struct classic_ctrl_t* cc, byte* msg) {
 	rx = ((msg[0] & 0xC0) >> 3) | ((msg[1] & 0xC0) >> 5) | ((msg[2] & 0x80) >> 7);
 	ry = (msg[2] & 0x1F);
 
-	calc_joystick_state(&cc->ljs, lx, ly);
-	calc_joystick_state(&cc->rjs, rx, ry);
+	calc_joystick_state(&cc->ljs, (float)lx, (float)ly);
+	calc_joystick_state(&cc->rjs, (float)rx, (float)ry);
 }
 
 
