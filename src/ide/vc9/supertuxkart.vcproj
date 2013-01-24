@@ -298,7 +298,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include"
+				AdditionalIncludeDirectories="../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;../../../lib/;../../../lib/wiiuse/"
 				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ENABLE_WIIUSE;_IRR_STATIC_LIB_"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
