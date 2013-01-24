@@ -20,6 +20,7 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
+#include "utils/log.hpp"
 #include "utils/translation.hpp"
 
 #include <iostream>
@@ -56,20 +57,23 @@ void IconButtonWidget::add()
     {
         if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
         {
-            m_texture = irr_driver->getTexture(m_properties[PROP_ICON].c_str());
+            m_texture = irr_driver->getTexture(m_properties[PROP_ICON]);
         }
         else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
         {
-            m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +
-                                                m_properties[PROP_ICON]).c_str());
+            std::string file = file_manager->getDataDir() +
+                                                m_properties[PROP_ICON];
+            m_texture = irr_driver->getTexture(file);
         }
     }
     
     if (m_texture == NULL)
     {
-        std::cerr << "IconButtonWidget::add() : error, cannot find texture "
-                  << m_properties[PROP_ICON].c_str() << std::endl;
-        m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/gui/main_help.png").c_str());
+        Log::error("icon_button",
+                    "add() : error, cannot find texture '%s'.",
+                   m_properties[PROP_ICON].c_str());
+        std::string file = file_manager->getDataDir() + "gui/main_help.png";
+        m_texture = irr_driver->getTexture(file);
     }
     m_texture_w = m_texture->getSize().Width;
     m_texture_h = m_texture->getSize().Height;
@@ -78,12 +82,14 @@ void IconButtonWidget::add()
     {
         if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
         {
-            m_highlight_texture = irr_driver->getTexture(m_properties[PROP_FOCUS_ICON].c_str());
+            m_highlight_texture = 
+                irr_driver->getTexture(m_properties[PROP_FOCUS_ICON]);
         }
         else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
         {
-            m_highlight_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +
-                                                          m_properties[PROP_FOCUS_ICON]).c_str());
+            m_highlight_texture = 
+                irr_driver->getTexture(file_manager->getDataDir() +
+                                       m_properties[PROP_FOCUS_ICON]);
         }
         
     }
@@ -95,8 +101,6 @@ void IconButtonWidget::add()
     if (m_scale_mode == SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO)
     {
         useAspectRatio = (float)m_texture_w / (float)m_texture_h;
-        //std::cout << "m_texture_h=" << m_texture_h << "; m_texture_w="<< m_texture_w
-        //          << "; useAspectRatio=" << useAspectRatio << std::endl;
     }
     else if (m_scale_mode == SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO)
     {
@@ -133,10 +137,9 @@ void IconButtonWidget::add()
     const stringw& message = getText();
     if (message.size() > 0)
     {
-        //std::cout << "Adding label of icon widget, m_properties[PROP_EXTEND_LABEL] = "
-        //          << m_properties[PROP_EXTEND_LABEL] << std::endl;
-        const int label_extra_size = ( m_properties[PROP_EXTEND_LABEL].size() == 0 ?
-                                       0 : atoi(m_properties[PROP_EXTEND_LABEL].c_str()) );
+        const int label_extra_size = 
+            ( m_properties[PROP_EXTEND_LABEL].size() == 0 ?
+               0 : atoi(m_properties[PROP_EXTEND_LABEL].c_str()) );
         
         const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
         
@@ -202,17 +205,20 @@ void IconButtonWidget::setImage(const char* path_to_texture, IconPathType pathTy
     
     if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
     {
-        m_texture = irr_driver->getTexture(m_properties[PROP_ICON].c_str());
+        m_texture = irr_driver->getTexture(m_properties[PROP_ICON]);
     }
     else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
     {
-        m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" + m_properties[PROP_ICON]).c_str());
+        std::string file = file_manager->getDataDir() + m_properties[PROP_ICON];
+        m_texture = irr_driver->getTexture(file);
     }
     
     if (!m_texture)
     {
-        fprintf(stderr, "Texture '%s' not found!\n",  m_properties[PROP_ICON].c_str());
-        m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/gui/main_help.png").c_str());
+        Log::error("icon_button", "Texture '%s' not found!\n",  
+                   m_properties[PROP_ICON].c_str());
+        std::string file = file_manager->getDataDir() + "gui/main_help.png";
+        m_texture = irr_driver->getTexture(file);
     }
 
     m_texture_w = m_texture->getSize().Width;
@@ -232,8 +238,10 @@ void IconButtonWidget::setImage(ITexture* texture)
     }
     else
     {
-        fprintf(stderr, "[IconButtonWidget::setImage] invoked with NULL image pointer\n");
-        m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/gui/main_help.png").c_str());
+        Log::error("icon_button", 
+                   "setImage invoked with NULL image pointer\n");
+        std::string file = file_manager->getDataDir() + "gui/main_help.png";
+        m_texture = irr_driver->getTexture(file);
     }
 }
 // -----------------------------------------------------------------------------
@@ -247,7 +255,8 @@ void IconButtonWidget::setLabel(stringw new_label)
     const int max_w = m_label->getAbsolutePosition().getWidth();
     
     if (!word_wrap &&
-        (int)GUIEngine::getFont()->getDimension(new_label.c_str()).Width > max_w + 4) // arbitrarily allow for 4 pixels
+        (int)GUIEngine::getFont()->getDimension(new_label.c_str()).Width 
+                    > max_w + 4) // arbitrarily allow for 4 pixels
     {
         m_label->setOverrideFont( GUIEngine::getSmallFont() );
     }
