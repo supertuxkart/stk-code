@@ -9,9 +9,11 @@ add_library(wiiuse
 	io_nix.c
 	io_win.c
 	ir.c
-	nunchuk.c
-	wiiuse.c
-	wiiboard.c
 	motion_plus.c
+	nunchuk.c
+	os_nix.c
+	os_win.c
 	util.c
+	wiiboard.c
+	wiiuse.c
 )
