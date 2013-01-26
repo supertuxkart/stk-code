@@ -52,8 +52,6 @@ AbstractKart::AbstractKart(const std::string& ident,
     m_kart_width  = m_kart_model->getWidth();
     m_kart_height = m_kart_model->getHeight();
     m_kart_length = m_kart_model->getLength();
-    
-    m_soccer_team = SOCCER_TEAM_NONE;
 }   // AbstractKart
 
 // ----------------------------------------------------------------------------
@@ -73,7 +71,6 @@ void AbstractKart::reset()
         delete m_kart_animation;
         m_kart_animation = NULL;
     }
-    m_soccer_team = SOCCER_TEAM_NONE;
 }   // reset
 
 // ----------------------------------------------------------------------------

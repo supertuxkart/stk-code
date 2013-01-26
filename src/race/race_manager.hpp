@@ -349,6 +349,10 @@ public:
       */
     void setLocalKartInfo(unsigned int player_id, const std::string& kart);
     
+    /** Sets additional information for a player to indicate which soccer team it belong to
+    */
+    void setLocalKartSoccerTeam(unsigned int player_id, SoccerTeam team);
+    
     /** Sets the number of local players playing on this computer (including
       * split screen).
       * \param n Number of local players.

@@ -144,6 +144,16 @@ void RaceManager::setLocalKartInfo(unsigned int player_id,
 }   // setLocalKartInfo
 
 //-----------------------------------------------------------------------------
+/** Sets additional information for a player to indicate which soccer team it belong to
+*/
+void RaceManager::setLocalKartSoccerTeam(unsigned int player_id, SoccerTeam team)
+{
+    assert(0<=player_id && player_id <m_local_player_karts.size());
+    
+    m_local_player_karts[player_id].setSoccerTeam(team);
+}
+
+//-----------------------------------------------------------------------------
 /** Returns a pointer to the kart which has a given GP rank.
  *  \param n The rank (1 to number of karts) to look for.
  */

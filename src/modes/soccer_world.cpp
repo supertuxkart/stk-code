@@ -166,6 +166,8 @@ void SoccerWorld::restartRace()
 void SoccerWorld::getKartsDisplayInfo(
                            std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
 {
+    // TODO!!
+    /*
     const unsigned int kart_amount = getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
@@ -194,6 +196,7 @@ void SoccerWorld::getKartsDisplayInfo(
             rank_info.b = 0.0f;
         }
     }
+    */
 }   // getKartsDisplayInfo
 
 //-----------------------------------------------------------------------------

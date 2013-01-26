@@ -62,84 +62,93 @@ void SoccerSetupScreen::beforeAddingWidget()
 {
     Widget* central_div = getWidget<Widget>("central_div");
     
-    /*
-    const unsigned int kart_amount = m_karts.size();
+    // Compute some dimensions
+    const core::dimension2d<u32>    vs_size = GUIEngine::getTitleFont()->getDimension( L"VS" );
+    const int vs_width = (int)vs_size.Width;
+    const int vs_height = (int)vs_size.Height;
+    const int nb_columns = 2;   // two karts maximum per column
+    const int kart_area_width = (central_div->m_w - vs_width) / 2; // size of one half of the screen
+    const int kart_view_size = kart_area_width/nb_columns;  // Size (width and height) of a kart view
+    const int center_x = central_div->m_x + central_div->m_w/2;
+    const int center_y = central_div->m_y + central_div->m_h/2;
     
-    int team_karts_amount[NB_SOCCER_TEAMS];
-    memset(team_karts_amount, 0, sizeof(team_karts_amount));
-    
+    // Choose kart teams + count
+    int nb_players = race_manager->getNumLocalPlayers();
+    int nb_karts_per_team[2] = {0,0};
+    for(int i=0 ; i < nb_players ; i++)
     {
-        // Set the kart teams if they haven't been already set by the setup screen
-        // (happens when the setup screen is skipped, with 1 player)
-        SoccerTeam    round_robin_team = SOCCER_TEAM_RED;
-        for(unsigned int n=0; n<kart_amount; n++)
-        {
-            if(m_karts[n]->getSoccerTeam() == SOCCER_TEAM_NONE)
-                m_karts[n]->setSoccerTeam(round_robin_team);
-            
-            team_karts_amount[m_karts[n]->getSoccerTeam()]++;
-            
-            round_robin_team = (round_robin_team==SOCCER_TEAM_RED ?
-                                SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
-        }// next kart
+        SoccerTeam  team = i&1 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED;
+        nb_karts_per_team[team]++;
+        race_manager->setLocalKartSoccerTeam(i, team);
     }
     
-    // Compute start positions for each team
-    int team_cur_position[NB_SOCCER_TEAMS];
-    team_cur_position[0] = 1;
-    for(int i=1 ; i < (int)NB_SOCCER_TEAMS ; i++)
-        team_cur_position[i] = team_karts_amount[i-1] + team_cur_position[i-1];
-    
-    // Set kart positions, ordering them by team
-    for(unsigned int n=0; n<kart_amount; n++)
-    {
-        SoccerTeam  team = m_karts[n]->getSoccerTeam();
-        m_karts[n]->setPosition(team_cur_position[team]);
-        team_cur_position[team]++;
-    }// next kart    
-    */
-    
-    // BEGIN TEST
-    ModelViewWidget*    kart_view = new ModelViewWidget();
-    kart_view->m_x = central_div->m_x + 10;
-    kart_view->m_y = central_div->m_y + 10;
-    kart_view->m_w = 200;
-    kart_view->m_h = 200;
-    kart_view->clearModels();
-    
-    const std::string default_kart = UserConfigParams::m_default_kart;
-    const KartProperties* props = 
-        kart_properties_manager->getKart(default_kart);
-    const KartModel &kart_model = props->getMasterKartModel();
-    
-    kart_view->addModel( kart_model.getModel(), Vec3(0,0,0),
-                            Vec3(35.0f, 35.0f, 35.0f),
-                            kart_model.getBaseFrame() );
-    kart_view->addModel( kart_model.getWheelModel(0), 
-                            kart_model.getWheelGraphicsPosition(0) );
-    kart_view->addModel( kart_model.getWheelModel(1), 
-                            kart_model.getWheelGraphicsPosition(1) );
-    kart_view->addModel( kart_model.getWheelModel(2),
-                            kart_model.getWheelGraphicsPosition(2) );
-    kart_view->addModel( kart_model.getWheelModel(3),
-                            kart_model.getWheelGraphicsPosition(3) );
-    kart_view->setRotateContinuously( 35.0f );
-    
-    kart_view->update(0);
-    
-    central_div->getChildren().push_back(kart_view);
-    // END TEST
+    // Compute some other dimensions/positions
+    // - number of rows displayed for each team = ceil(nb_karts_per_team[i] / nb_columns)
+    const int nb_rows_per_team[2] = { (nb_karts_per_team[0] + nb_columns) / nb_columns,
+                                      (nb_karts_per_team[1] + nb_columns) / nb_columns};
+    // - where to start vertically
+    const int start_y[2] = {center_y - nb_rows_per_team[0] * kart_view_size / 2,
+                            center_y - nb_rows_per_team[1] * kart_view_size / 2};
+    // - center of each half-screen
+    const int center_x_per_team[2] = {  ( central_div->m_x                  + (center_x - vs_width) ) / 2,
+                                        ( central_div->m_x+central_div->m_w + (center_x + vs_width) ) / 2,
+                                     };
     
     // Add "VS" label at the center of the rounded box
     m_label_vs = new LabelWidget(true, false);
-    
-    core::dimension2d<u32>  vs_size = GUIEngine::getTitleFont()->getDimension( L"VS" );
-    m_label_vs->m_x = central_div->m_x + central_div->m_w/2 - vs_size.Width/2;
-    m_label_vs->m_y = central_div->m_y + central_div->m_h/2 - vs_size.Height/2;
-    m_label_vs->m_w = vs_size.Width;
-    m_label_vs->m_h = vs_size.Height;
+    m_label_vs->m_x = center_x - vs_width/2;
+    m_label_vs->m_y = center_y - vs_height/2;
+    m_label_vs->m_w = vs_width;
+    m_label_vs->m_h = vs_height;
     
     central_div->getChildren().push_back(m_label_vs);
+    
+    // Add the 3D views for the karts
+    int cur_kart_per_team[2] = {0,0};   // counters
+    for(int i=0 ; i < nb_players ; i++)
+    {
+        const RemoteKartInfo&   kart_info   = race_manager->getLocalKartInfo(i);
+        const SoccerTeam        team        = kart_info.getSoccerTeam();
+        const std::string&      kart_name   = kart_info.getKartName();
+        
+        const KartProperties*   props       = kart_properties_manager->getKart(kart_name);
+        const KartModel&        kart_model  = props->getMasterKartModel();
+        
+        // Compute the position
+        const int cur_row = cur_kart_per_team[team] / nb_columns;
+        const int pos_y = start_y[team] + cur_row*kart_view_size;
+        
+        const int cur_col = cur_kart_per_team[team] % nb_columns;
+        const int nb_karts_in_this_row = (nb_karts_per_team[team] - cur_row*nb_columns) % nb_columns;
+        const int pos_x = center_x_per_team[team] + cur_col*kart_view_size - nb_karts_in_this_row*kart_view_size/2;
+        cur_kart_per_team[team]++;
+        
+        // Add the view
+        ModelViewWidget*    kart_view = new ModelViewWidget();
+        kart_view->m_x = pos_x;
+        kart_view->m_y = pos_y;
+        kart_view->m_w = kart_view_size;
+        kart_view->m_h = kart_view_size;
+        kart_view->clearModels();
+        
+        // Add the kart model
+        kart_view->addModel( kart_model.getModel(), Vec3(0,0,0),
+                                Vec3(35.0f, 35.0f, 35.0f),
+                                kart_model.getBaseFrame() );
+        kart_view->addModel( kart_model.getWheelModel(0), 
+                                kart_model.getWheelGraphicsPosition(0) );
+        kart_view->addModel( kart_model.getWheelModel(1), 
+                                kart_model.getWheelGraphicsPosition(1) );
+        kart_view->addModel( kart_model.getWheelModel(2),
+                                kart_model.getWheelGraphicsPosition(2) );
+        kart_view->addModel( kart_model.getWheelModel(3),
+                                kart_model.getWheelGraphicsPosition(3) );
+        kart_view->setRotateContinuously( 35.0f );
+        
+        kart_view->update(0);
+        
+        central_div->getChildren().push_back(kart_view);
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -157,82 +166,4 @@ void SoccerSetupScreen::init()
     
     // "VS" (needs to be done here for the Irrlicht element to be here)
     m_label_vs->setText("VS", true);
-    /*
-    Widget* players_table = getWidget<Widget>("players-table");
-    assert(players_table != NULL);
-    
-    manualAddWidget(new TeamViewWidget(this));
-    */
-    
-    /*// ----- Kart model view
-        m_model_view = new ModelViewWidget();
-        
-        m_model_view->m_x = model_x;
-        m_model_view->m_y = model_y;
-        m_model_view->m_w = model_w;
-        m_model_view->m_h = model_h;
-        m_model_view->m_properties[PROP_ID] = 
-            StringUtils::insertValues("@p%i_model", m_playerID);
-        //m_model_view->setParent(this);
-        m_children.push_back(m_model_view);
-        
-        // Init kart model
-        const std::string default_kart = UserConfigParams::m_default_kart;
-        const KartProperties* props = 
-            kart_properties_manager->getKart(default_kart);
-                
-        if(!props)
-        {            
-            // If the default kart can't be found (e.g. previously a addon 
-            // kart was used, but the addon package was removed), use the
-            // first kart as a default. This way we don't have to hardcode
-            // any kart names.
-            int id = kart_properties_manager->getKartByGroup(kartGroup, 0);
-            if (id == -1)
-            {
-                props = kart_properties_manager->getKartById(0);
-            }
-            else
-            {
-                props = kart_properties_manager->getKartById(id);
-            }
-            
-            if(!props)
-            {
-                fprintf(stderr, 
-                        "[KartSelectionScreen] WARNING: Can't find default "
-                        "kart '%s' nor any other kart.\n",
-                        default_kart.c_str());
-                exit(-1);
-            }
-        }
-        m_kartInternalName = props->getIdent();
-
-        const KartModel &kart_model = props->getMasterKartModel();
-        
-        m_model_view->addModel( kart_model.getModel(), Vec3(0,0,0),
-                                Vec3(35.0f, 35.0f, 35.0f),
-                                kart_model.getBaseFrame() );
-        m_model_view->addModel( kart_model.getWheelModel(0), 
-                                kart_model.getWheelGraphicsPosition(0) );
-        m_model_view->addModel( kart_model.getWheelModel(1), 
-                                kart_model.getWheelGraphicsPosition(1) );
-        m_model_view->addModel( kart_model.getWheelModel(2),
-                                kart_model.getWheelGraphicsPosition(2) );
-        m_model_view->addModel( kart_model.getWheelModel(3),
-                                kart_model.getWheelGraphicsPosition(3) );
-        m_model_view->setRotateContinuously( 35.0f );
-        
-        // ---- Kart name label
-        m_kart_name = new LabelWidget();
-        m_kart_name->setText(props->getName(), false);
-        m_kart_name->m_properties[PROP_TEXT_ALIGN] = "center";
-        m_kart_name->m_properties[PROP_ID] = 
-            StringUtils::insertValues("@p%i_kartname", m_playerID);
-        m_kart_name->m_x = kart_name_x;
-        m_kart_name->m_y = kart_name_y;
-        m_kart_name->m_w = kart_name_w;
-        m_kart_name->m_h = kart_name_h;
-        //m_kart_name->setParent(this);
-        m_children.push_back(m_kart_name);*/
 }
