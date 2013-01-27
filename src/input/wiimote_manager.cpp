@@ -97,7 +97,7 @@ static void setWiimoteBindings(GamepadConfig* gamepad_config)
     gamepad_config->setBinding(PA_DRIFT,        Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_B));
     gamepad_config->setBinding(PA_RESCUE,       Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_PLUS));
     gamepad_config->setBinding(PA_LOOK_BACK,    Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_DOWN));
-    gamepad_config->setBinding(PA_PAUSE_RACE,   Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_MINUS));
+    gamepad_config->setBinding(PA_PAUSE_RACE,   Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_HOME));
 
     gamepad_config->setBinding(PA_MENU_UP,      Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_RIGHT));
     gamepad_config->setBinding(PA_MENU_DOWN,    Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_LEFT));
@@ -147,11 +147,6 @@ void Wiimote::init(wiimote_t* wiimote_handle, int wiimote_id, GamepadConfig* gam
                                          WIIMOTE_BUTTONS,
                                          gamepad_config );
     device_manager->addGamepad(m_gamepad_device);
-    
-    // Enable accelerometer reporting
-    // TODO: this should only be done when needed (i.e when racing)
-    // so as to avoid wasting wiimote batteries.
-    wiiuse_motion_sensing(m_wiimote_handle, 1);
 }
 
 // -----------------------------------------------------------------------------
@@ -369,6 +364,13 @@ void WiimoteManager::threadFunc()
             {
                 if(!m_wiimotes[i].isConnected())
                     continue;
+                
+                // Enable accelerometer reporting
+                // TODO: this should only be done when needed (i.e when racing)
+                // so as to avoid wasting wiimote batteries.
+                // TODO: this should only be done once, but there have been reports that it didn't
+                // work for some people -> need to find a better fix
+                wiiuse_motion_sensing(m_wiimotes[i].getWiimoteHandle(), 1);
                 
                 switch (m_all_wiimote_handles[i]->event)
                 {
