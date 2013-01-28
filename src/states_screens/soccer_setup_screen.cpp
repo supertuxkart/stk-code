@@ -34,6 +34,10 @@
 using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( SoccerSetupScreen );
 
+#define KART_CONTINUOUS_ROTATION_SPEED      35.f
+#define KART_CONFIRMATION_ROTATION_SPEED    100.f
+#define KART_CONFIRMATION_TARGET_ANGLE      10.f
+
 // -----------------------------------------------------------------------------
 
 SoccerSetupScreen::SoccerSetupScreen() : Screen("soccer_setup.stkgui")
@@ -110,7 +114,7 @@ void SoccerSetupScreen::beforeAddingWidget()
                                 kart_model.getWheelGraphicsPosition(2) );
         kart_view->addModel( kart_model.getWheelModel(3),
                                 kart_model.getWheelGraphicsPosition(3) );
-        kart_view->setRotateContinuously( 35.0f );
+        kart_view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );
         
         kart_view->update(0);
         
@@ -158,10 +162,10 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
                                                                Input::InputType type,
                                                                int playerId)
 {
-    if(areAllKartsConfirmed())
-        return EVENT_LET;
-    
+    GUIEngine::EventPropagation result = EVENT_LET;
     SoccerTeam  team_switch = SOCCER_TEAM_NONE;
+    int nb_players = m_kart_view_info.size();
+    
     switch(action)
     {
     case PA_MENU_LEFT:
@@ -172,24 +176,29 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
         break;
     case PA_MENU_SELECT:
     {
-        int nb_players = m_kart_view_info.size();
+        // Confirm team selection
         for(int i=0 ; i < nb_players ; i++)
         {
             if(m_kart_view_info[i].local_player_id == playerId)
             {
                 m_kart_view_info[i].confirmed = true;
-                m_kart_view_info[i].view->setRotateContinuously( 0.0f );
-                
-                if(areAllKartsConfirmed())
-                {
-                    ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
-                    bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-                    bt_continue->setActivated();
-                    
-                    for(int i=0 ; i < nb_players ; i++)
-                        race_manager->setLocalKartSoccerTeam(m_kart_view_info[i].local_player_id,
-                                                             m_kart_view_info[i].team);
-                }
+                m_kart_view_info[i].view->setRotateTo( KART_CONFIRMATION_TARGET_ANGLE, KART_CONFIRMATION_ROTATION_SPEED );
+                result = EVENT_BLOCK;
+                break;
+            }
+        }
+    }
+    case PA_MENU_CANCEL:
+    {
+        // Un-confirm team selection
+        // TODO: shouldn't trigger quitting the screen...
+        for(int i=0 ; i < nb_players ; i++)
+        {
+            if(m_kart_view_info[i].local_player_id == playerId)
+            {
+                m_kart_view_info[i].confirmed = false;
+                m_kart_view_info[i].view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );
+                result = EVENT_BLOCK;
                 break;
             }
         }
@@ -199,22 +208,39 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
         break;
     }
     
-    if(team_switch != SOCCER_TEAM_NONE)
+    if(team_switch != SOCCER_TEAM_NONE) // A player wants to change its team?
     {
         // Find the corresponding kart view, update its team and update the layout
-        int nb_players = m_kart_view_info.size();
         for(int i=0 ; i < nb_players ; i++)
         {
             if(m_kart_view_info[i].local_player_id == playerId)
             {
+                // Player has already confirmed -> can't change
+                if(m_kart_view_info[i].confirmed)
+                    break;
                 m_kart_view_info[i].team = team_switch;
                 updateKartViewsLayout();
+                result = EVENT_BLOCK;
                 break;
             }
         }
     }
     
-    return EVENT_BLOCK;
+    // Update "continue" button state
+    ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
+    if(areAllKartsConfirmed())
+    {
+        bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        bt_continue->setActivated();
+        
+        for(int i=0 ; i < nb_players ; i++)
+            race_manager->setLocalKartSoccerTeam(m_kart_view_info[i].local_player_id,
+                                                 m_kart_view_info[i].team);
+    }
+    else
+        bt_continue->setDeactivated();
+    
+    return result;
 }
 
 bool SoccerSetupScreen::areAllKartsConfirmed() const
