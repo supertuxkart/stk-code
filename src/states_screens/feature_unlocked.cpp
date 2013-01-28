@@ -715,7 +715,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
                 {
                     const RaceManager::MinorRaceModeType mode =
                         RaceManager::getModeIDFromInternalName(unlockedFeatures[i].m_name);
-                    const std::string icon = file_manager->getDataDir() + "/" + RaceManager::getIconOf(mode);
+                    const std::string icon = file_manager->getDataDir() + RaceManager::getIconOf(mode);
                     addUnlockedPicture( irr_driver->getTexture(icon.c_str()), 0.8f, 0.8f,
                         unlockedFeatures[i].getUnlockedMessage() );
                     break;
@@ -830,4 +830,3 @@ MusicInformation* FeatureUnlockedCutScene::getInGameMenuMusic() const
     MusicInformation* mi = music_manager->getMusicInformation("win_theme.music");
     return mi;
 }
-

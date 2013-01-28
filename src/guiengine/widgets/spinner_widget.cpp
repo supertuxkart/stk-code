@@ -196,7 +196,7 @@ ITexture* SpinnerWidget::getTexture()
 {
     assert(m_graphical);
     std::ostringstream icon_stream;
-    icon_stream << file_manager->getDataDir() << "/" << m_properties[PROP_ICON];
+    icon_stream << file_manager->getDataDir() << m_properties[PROP_ICON];
     std::string imagefile = StringUtils::insertValues(icon_stream.str(), m_value);
     ITexture* texture = irr_driver->getTexture(imagefile);
     return texture;
@@ -338,7 +338,7 @@ void SpinnerWidget::setValue(const int new_value)
     if (m_graphical)
     {
         std::ostringstream icon;
-        icon << file_manager->getDataDir() << "/"  << m_properties[PROP_ICON];
+        icon << file_manager->getDataDir() << m_properties[PROP_ICON];
         std::string imagefile = StringUtils::insertValues(icon.str(), m_value);
         ((IGUIImage*)(m_children[1].m_element))->setImage(irr_driver->getTexture(imagefile));
     }

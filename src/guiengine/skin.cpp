@@ -2160,7 +2160,7 @@ ITexture* Skin::getImage(const char* name)
     else
     {
         return irr_driver->getTexture(
-                            file_manager->getDataDir() + "/gui/main_help.png");
+                            file_manager->getDataDir() + "gui/main_help.png");
     }
 }   // getImage
 

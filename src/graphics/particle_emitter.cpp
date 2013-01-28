@@ -378,7 +378,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         }
         else
         {
-            m_node->setMaterialTexture(0, irr_driver->getTexture((file_manager->getDataDir() + "/gui/main_help.png").c_str()));
+            m_node->setMaterialTexture(0, irr_driver->getTexture((file_manager->getDataDir() + "gui/main_help.png").c_str()));
         }
         
 
