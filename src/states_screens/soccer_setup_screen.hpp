@@ -19,8 +19,9 @@
 #define HEADER_SOCCER_SETUP_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "network/remote_kart_info.hpp"
 
-namespace GUIEngine { class Widget; class LabelWidget; }
+namespace GUIEngine { class Widget; class LabelWidget; class ModelViewWidget; }
 
 /**
   * \brief Screen with soccer setup options
@@ -34,6 +35,18 @@ class SoccerSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSing
     
     /** The "VS" text at the center of the screen */
     GUIEngine::LabelWidget* m_label_vs;
+    
+    struct KartViewInfo
+    {
+        GUIEngine::ModelViewWidget* view;
+        bool                        confirmed;
+        int                         local_player_id;
+        SoccerTeam                  team;
+        
+        KartViewInfo() : view(NULL), confirmed(false), local_player_id(-1), team(SOCCER_TEAM_NONE) {}
+    };
+
+    AlignedArray<KartViewInfo>  m_kart_view_info;
     
 public:
     
@@ -49,6 +62,17 @@ public:
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual GUIEngine::EventPropagation filterActions( PlayerAction action,
+                                                       int deviceID,
+                                                       const unsigned int value,
+                                                       Input::InputType type,
+                                                       int playerId) OVERRIDE;
+    
+private:
+    bool areAllKartsConfirmed() const;
+    void updateKartViewsLayout();
 };
 
 #endif // HEADER_SOCCER_SETUP_SCREEN_HPP
