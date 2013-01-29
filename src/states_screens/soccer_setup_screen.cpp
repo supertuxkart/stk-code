@@ -35,7 +35,7 @@ using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( SoccerSetupScreen );
 
 #define KART_CONTINUOUS_ROTATION_SPEED      35.f
-#define KART_CONFIRMATION_ROTATION_SPEED    100.f
+#define KART_CONFIRMATION_ROTATION_SPEED    4.f
 #define KART_CONFIRMATION_TARGET_ANGLE      10.f
 
 // -----------------------------------------------------------------------------
@@ -199,6 +199,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
                 break;
             }
         }
+        break;
     }
     case PA_MENU_CANCEL:
     {
@@ -214,8 +215,8 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
                 break;
             }
         }
-    }
         break;
+    }
     default:
         break;
     }

@@ -133,11 +133,11 @@ void ModelViewWidget::update(float delta)
         
         if (distance_with_positive_rotation < distance_with_negative_rotation) 
         {
-            angle += delta*(3.0f + std::min(distance_with_positive_rotation, distance_with_negative_rotation)*2.0f);
+            angle += m_rotation_speed * delta*(3.0f + std::min(distance_with_positive_rotation, distance_with_negative_rotation)*2.0f);
         }
         else
         {
-            angle -= delta*(3.0f + std::min(distance_with_positive_rotation, distance_with_negative_rotation)*2.0f);
+            angle -= m_rotation_speed * delta*(3.0f + std::min(distance_with_positive_rotation, distance_with_negative_rotation)*2.0f);
         }
         if (angle > 360) angle -= 360;
         if (angle < 0) angle += 360;
