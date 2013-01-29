@@ -33,9 +33,6 @@ class SoccerSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSing
 
     SoccerSetupScreen();
     
-    /** The "VS" text at the center of the screen */
-    GUIEngine::LabelWidget* m_label_vs;
-    
     struct KartViewInfo
     {
         GUIEngine::ModelViewWidget* view;
@@ -62,6 +59,9 @@ public:
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual GUIEngine::EventPropagation filterActions( PlayerAction action,

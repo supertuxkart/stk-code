@@ -21,6 +21,7 @@
 			<roundedbox x="2%" y="5%" proportion="1" layout="horizontal-row" height="100%">
 				<!-- Content is added programmatically -->
 			</roundedbox>
+            <header id="vs" text="VS"/>
         </div>
         
         <button id="continue" I18N="In soccer setup screen" text="Continue" align="center" width="60%"/>

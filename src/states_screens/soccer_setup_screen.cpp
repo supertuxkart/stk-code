@@ -76,13 +76,11 @@ void SoccerSetupScreen::beforeAddingWidget()
     const int center_y = central_div->m_y + central_div->m_h/2;
     
     // Add "VS" label at the center of the rounded box
-    m_label_vs = new LabelWidget(true, false);
-    m_label_vs->m_x = center_x - vs_width/2;
-    m_label_vs->m_y = center_y - vs_height/2;
-    m_label_vs->m_w = vs_width;
-    m_label_vs->m_h = vs_height;
-    
-    central_div->getChildren().push_back(m_label_vs);
+    LabelWidget*    label_vs = getWidget<LabelWidget>("vs");
+    label_vs->m_x = center_x - vs_width/2;
+    label_vs->m_y = center_y - vs_height/2;
+    label_vs->m_w = vs_width;
+    label_vs->m_h = vs_height;
     
     // Add the 3D views for the karts
     int nb_players = race_manager->getNumLocalPlayers();
@@ -147,12 +145,26 @@ void SoccerSetupScreen::init()
     bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     bt_continue->setDeactivated();
     
-    // "VS" (needs to be done here for the Irrlicht element to be here)
-    m_label_vs->setText("VS", true);
-    
     // We need players to be able to choose their teams
     input_manager->getDeviceList()->setAssignMode(ASSIGN);
     input_manager->setMasterPlayerOnly(false);
+}
+
+// -----------------------------------------------------------------------------
+void SoccerSetupScreen::tearDown()
+{
+    Widget* central_div = getWidget<Widget>("central_div");
+    
+    // Remove all ModelViewWidgets we created manually
+    PtrVector<Widget>&  children = central_div->getChildren();
+    for(int i = children.size()-1 ; i >= 0 ; i--)
+    {
+        if(children[i].getType() == WTYPE_MODEL_VIEW)
+            children.erase(i);
+    }
+    m_kart_view_info.clear();
+    
+    Screen::tearDown();
 }
 
 // -----------------------------------------------------------------------------
@@ -263,7 +275,8 @@ void SoccerSetupScreen::updateKartViewsLayout()
     Widget* central_div = getWidget<Widget>("central_div");
     
     // Compute/get some dimensions
-    const int vs_width = m_label_vs->m_w;
+    LabelWidget*    label_vs = getWidget<LabelWidget>("vs");
+    const int vs_width = label_vs->m_w;
     const int nb_columns = 2;   // two karts maximum per column
     const int kart_area_width = (central_div->m_w - vs_width) / 2; // size of one half of the screen
     const int kart_view_size = kart_area_width/nb_columns;  // Size (width and height) of a kart view
