@@ -42,7 +42,9 @@
 #ifdef _MSC_VER
 	#include <float.h>
 	/* windows with visual c */
-	#define isnan(x)		(_isnan(x))
+#   ifndef isnan
+	    #define isnan(x)		(_isnan(x))
+#   endif
 	#define isinf(x)		(!_finite(x))
 	/* disable warnings I don't care about */
 	/*#pragma warning(disable:4273)	*/	/* inconsistent dll linkage			*/

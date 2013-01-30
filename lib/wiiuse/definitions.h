@@ -78,8 +78,8 @@ extern FILE* logtarget[];
 #endif
 
 /* Convert between radians and degrees */
-#define RAD_TO_DEGREE(r)	((r * 180.0f) / WIIMOTE_PI)
-#define DEGREE_TO_RAD(d)	(d * (WIIMOTE_PI / 180.0f))
+#define WIIUSE_RAD_TO_DEGREE(r)	((r * 180.0f) / WIIMOTE_PI)
+#define WIIUSE_DEGREE_TO_RAD(d)	(d * (WIIMOTE_PI / 180.0f))
 
 #define absf(x)						((x >= 0) ? (x) : (x * -1.0f))
 #define diff_f(x, y)				((x >= y) ? (absf(x - y)) : (absf(y - x)))
