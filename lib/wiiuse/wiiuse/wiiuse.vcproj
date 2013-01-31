@@ -63,7 +63,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalDependencies="setupapi.lib hid.lib"
-				OutputFile="$(ProjectName).lib"
+				OutputFile="../../../dependencies/lib/$(ProjectName).lib"
 				AdditionalLibraryDirectories="C:\WinDDK\lib\win7\i386"
 			/>
 			<Tool
