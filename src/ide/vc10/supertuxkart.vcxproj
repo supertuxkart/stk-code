@@ -30,7 +30,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -104,19 +105,19 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";ENABLE_BIDI;WIN64;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib.release;ws2_32.lib;fribidi.lib;pthreadVC2.lib;libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib;ws2_32.lib;libfribidi.lib;pthreadVC2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)/$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../lib/irrlicht/lib/Win64-visualStudio;../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -184,7 +185,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib;ws2_32.lib;fribidi.lib;libpthread.a;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib;ws2_32.lib;libfribidi.lib;pthreadVC2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
       <AdditionalLibraryDirectories>../../../dependencies/lib;../../../lib/irrlicht/lib/Win64-VisualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -271,8 +272,10 @@
     <ClCompile Include="..\..\challenges\unlock_manager.cpp" />
     <ClCompile Include="..\..\modes\cutscene_world.cpp" />
     <ClCompile Include="..\..\modes\demo_world.cpp" />
+    <ClCompile Include="..\..\modes\easter_egg_hunt.cpp" />
     <ClCompile Include="..\..\modes\game_tutorial.cpp" />
     <ClCompile Include="..\..\modes\overworld.cpp" />
+    <ClCompile Include="..\..\modes\tutorial_world.cpp" />
     <ClCompile Include="..\..\physics\btKartRaycast.cpp" />
     <ClCompile Include="..\..\replay\replay_base.cpp" />
     <ClCompile Include="..\..\replay\replay_play.cpp" />
@@ -280,6 +283,7 @@
     <ClCompile Include="..\..\states_screens\cutscene_gui.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\custom_video_settings.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\select_challenge.cpp" />
+    <ClCompile Include="..\..\states_screens\dialogs\tutorial_message_dialog.cpp" />
     <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp" />
     <ClCompile Include="..\..\states_screens\options_screen_ui.cpp" />
     <ClCompile Include="..\..\states_screens\race_gui_base.cpp" />
@@ -289,16 +293,17 @@
     <ClCompile Include="..\..\tinygettext\dictionary_manager.cpp" />
     <ClCompile Include="..\..\tinygettext\iconv.cpp" />
     <ClCompile Include="..\..\tinygettext\language.cpp" />
-    <ClCompile Include="..\..\tinygettext\log.cpp" />
     <ClCompile Include="..\..\tinygettext\plural_forms.cpp" />
     <ClCompile Include="..\..\tinygettext\po_parser.cpp" />
     <ClCompile Include="..\..\tinygettext\stk_file_system.cpp" />
+    <ClCompile Include="..\..\tinygettext\tgt_log.cpp" />
     <ClCompile Include="..\..\tinygettext\tinygettext.cpp" />
     <ClCompile Include="..\..\tracks\check_cannon.cpp" />
     <ClCompile Include="..\..\tracks\lod_node_loader.cpp" />
     <ClCompile Include="..\..\tracks\track_sector.cpp" />
     <ClCompile Include="..\..\utils\constants.cpp" />
     <ClCompile Include="..\..\utils\leak_check.cpp" />
+    <ClCompile Include="..\..\utils\log.cpp" />
     <ClCompile Include="..\..\utils\profiler.cpp" />
     <ClCompile Include="..\..\utils\random_generator.cpp" />
     <ClCompile Include="..\..\utils\string_utils.cpp" />
@@ -315,7 +320,6 @@
     <ClCompile Include="..\..\modes\profile_world.cpp" />
     <ClCompile Include="..\..\modes\standard_race.cpp" />
     <ClCompile Include="..\..\modes\three_strikes_battle.cpp" />
-    <ClCompile Include="..\..\modes\tutorial_race.cpp" />
     <ClCompile Include="..\..\modes\world.cpp" />
     <ClCompile Include="..\..\modes\world_status.cpp" />
     <ClCompile Include="..\..\modes\world_with_rank.cpp" />
@@ -428,7 +432,6 @@
     <ClCompile Include="..\..\states_screens\race_setup_screen.cpp" />
     <ClCompile Include="..\..\states_screens\state_manager.cpp" />
     <ClCompile Include="..\..\states_screens\tracks_screen.cpp" />
-    <ClCompile Include="..\..\states_screens\tutorial_screen.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\add_device_dialog.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\addons_loading.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\confirm_resolution_dialog.cpp" />
@@ -444,9 +447,6 @@
     <ClCompile Include="..\..\addons\addons_manager.cpp" />
     <ClCompile Include="..\..\addons\network_http.cpp" />
     <ClCompile Include="..\..\addons\zip.cpp" />
-    <ClCompile Include="..\..\tutorial\tutorial.cpp" />
-    <ClCompile Include="..\..\tutorial\tutorial_data.cpp" />
-    <ClCompile Include="..\..\tutorial\tutorial_manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\addons\inetwork_http.hpp" />
@@ -507,8 +507,10 @@
     <ClInclude Include="..\..\challenges\unlock_manager.hpp" />
     <ClInclude Include="..\..\modes\cutscene_world.hpp" />
     <ClInclude Include="..\..\modes\demo_world.hpp" />
+    <ClInclude Include="..\..\modes\easter_egg_hunt.hpp" />
     <ClInclude Include="..\..\modes\game_tutorial.hpp" />
     <ClInclude Include="..\..\modes\overworld.hpp" />
+    <ClInclude Include="..\..\modes\tutorial_world.hpp" />
     <ClInclude Include="..\..\network\character_confirm_message.hpp" />
     <ClInclude Include="..\..\network\character_info_message.hpp" />
     <ClInclude Include="..\..\network\character_selected_message.hpp" />
@@ -535,6 +537,7 @@
     <ClInclude Include="..\..\states_screens\cutscene_gui.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\custom_video_settings.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\select_challenge.hpp" />
+    <ClInclude Include="..\..\states_screens\dialogs\tutorial_message_dialog.hpp" />
     <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp" />
     <ClInclude Include="..\..\states_screens\options_screen_ui.hpp" />
     <ClInclude Include="..\..\states_screens\race_gui_overworld.hpp" />
@@ -544,18 +547,20 @@
     <ClInclude Include="..\..\tinygettext\file_system.hpp" />
     <ClInclude Include="..\..\tinygettext\iconv.hpp" />
     <ClInclude Include="..\..\tinygettext\language.hpp" />
-    <ClInclude Include="..\..\tinygettext\log.hpp" />
     <ClInclude Include="..\..\tinygettext\log_stream.hpp" />
     <ClInclude Include="..\..\tinygettext\plural_forms.hpp" />
     <ClInclude Include="..\..\tinygettext\po_parser.hpp" />
     <ClInclude Include="..\..\tinygettext\stk_file_system.hpp" />
+    <ClInclude Include="..\..\tinygettext\tgt_log.hpp" />
     <ClInclude Include="..\..\tinygettext\tinygettext.hpp" />
     <ClInclude Include="..\..\tracks\check_cannon.hpp" />
     <ClInclude Include="..\..\tracks\lod_node_loader.hpp" />
     <ClInclude Include="..\..\tracks\track_sector.hpp" />
     <ClInclude Include="..\..\utils\constants.hpp" />
     <ClInclude Include="..\..\utils\cpp2011.h" />
+    <ClInclude Include="..\..\utils\interpolation_array.hpp" />
     <ClInclude Include="..\..\utils\leak_check.hpp" />
+    <ClInclude Include="..\..\utils\log.hpp" />
     <ClInclude Include="..\..\utils\no_copy.hpp" />
     <ClInclude Include="..\..\utils\profiler.hpp" />
     <ClInclude Include="..\..\utils\ptr_vector.hpp" />
@@ -582,7 +587,6 @@
     <ClInclude Include="..\..\modes\profile_world.hpp" />
     <ClInclude Include="..\..\modes\standard_race.hpp" />
     <ClInclude Include="..\..\modes\three_strikes_battle.hpp" />
-    <ClInclude Include="..\..\modes\tutorial_race.hpp" />
     <ClInclude Include="..\..\modes\world.hpp" />
     <ClInclude Include="..\..\modes\world_status.hpp" />
     <ClInclude Include="..\..\modes\world_with_rank.hpp" />
@@ -692,7 +696,6 @@
     <ClInclude Include="..\..\states_screens\race_setup_screen.hpp" />
     <ClInclude Include="..\..\states_screens\state_manager.hpp" />
     <ClInclude Include="..\..\states_screens\tracks_screen.hpp" />
-    <ClInclude Include="..\..\states_screens\tutorial_screen.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\add_device_dialog.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\addons_loading.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\confirm_resolution_dialog.hpp" />
@@ -708,9 +711,6 @@
     <ClInclude Include="..\..\addons\addons_manager.hpp" />
     <ClInclude Include="..\..\addons\network_http.hpp" />
     <ClInclude Include="..\..\addons\zip.hpp" />
-    <ClInclude Include="..\..\tutorial\tutorial.hpp" />
-    <ClInclude Include="..\..\tutorial\tutorial_data.hpp" />
-    <ClInclude Include="..\..\tutorial\tutorial_manager.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\lib\irrlicht\source\Irrlicht\Irrlicht10.0.vcxproj">

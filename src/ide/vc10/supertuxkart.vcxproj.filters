@@ -74,9 +74,6 @@
     <Filter Include="Header Files\addons">
       <UniqueIdentifier>{5c9f42c5-1a5b-476b-998f-f84384767684}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\tutorial">
-      <UniqueIdentifier>{27c4a91b-95c9-4da5-adb2-b7ef92940b31}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\tinygettext">
       <UniqueIdentifier>{8da5c73a-5884-4e8d-818a-20521a66e611}</UniqueIdentifier>
     </Filter>
@@ -149,9 +146,6 @@
     </Filter>
     <Filter Include="Source Files\addons">
       <UniqueIdentifier>{376d4c71-33a2-4def-949e-31bcb5b72812}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\tutorial">
-      <UniqueIdentifier>{d7906217-8c6c-419e-94e3-898456598704}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\tinygettext">
       <UniqueIdentifier>{5faa19dc-78e6-438e-a2a0-6a489961f098}</UniqueIdentifier>
@@ -295,9 +289,6 @@
       <Filter>Source Files\modes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\modes\three_strikes_battle.cpp">
-      <Filter>Source Files\modes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\modes\tutorial_race.cpp">
       <Filter>Source Files\modes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\modes\world.cpp">
@@ -636,9 +627,6 @@
     <ClCompile Include="..\..\states_screens\tracks_screen.cpp">
       <Filter>Source Files\states_screens</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\states_screens\tutorial_screen.cpp">
-      <Filter>Source Files\states_screens</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\states_screens\dialogs\add_device_dialog.cpp">
       <Filter>Source Files\states_screens\dialogs</Filter>
     </ClCompile>
@@ -684,15 +672,6 @@
     <ClCompile Include="..\..\addons\zip.cpp">
       <Filter>Source Files\addons</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\tutorial\tutorial.cpp">
-      <Filter>Source Files\tutorial</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial\tutorial_data.cpp">
-      <Filter>Source Files\tutorial</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial\tutorial_manager.cpp">
-      <Filter>Source Files\tutorial</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\graphics\particle_kind_manager.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>
@@ -720,9 +699,6 @@
     <ClCompile Include="..\..\tinygettext\language.cpp">
       <Filter>Source Files\tinygettext</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\tinygettext\log.cpp">
-      <Filter>Source Files\tinygettext</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tinygettext\plural_forms.cpp">
       <Filter>Source Files\tinygettext</Filter>
     </ClCompile>
@@ -743,9 +719,6 @@
     </ClCompile>
     <ClCompile Include="..\..\guiengine\widgets\CGUIEditBox.cpp">
       <Filter>Source Files\guiengine\widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\states_screens\race_gui_base.cpp">
-      <Filter>Header Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\addons\news_manager.cpp">
       <Filter>Source Files\addons</Filter>
@@ -869,6 +842,24 @@
     </ClCompile>
     <ClCompile Include="..\..\karts\controller\ai_properties.cpp">
       <Filter>Source Files\karts\controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\states_screens\race_gui_base.cpp">
+      <Filter>Source Files\states_screens</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tinygettext\tgt_log.cpp">
+      <Filter>Source Files\tinygettext</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\states_screens\dialogs\tutorial_message_dialog.cpp">
+      <Filter>Source Files\states_screens\dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\utils\log.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\modes\easter_egg_hunt.cpp">
+      <Filter>Source Files\modes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\modes\tutorial_world.cpp">
+      <Filter>Source Files\modes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1071,9 +1062,6 @@
       <Filter>Header Files\modes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modes\three_strikes_battle.hpp">
-      <Filter>Header Files\modes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\modes\tutorial_race.hpp">
       <Filter>Header Files\modes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modes\world.hpp">
@@ -1403,9 +1391,6 @@
     <ClInclude Include="..\..\states_screens\tracks_screen.hpp">
       <Filter>Header Files\states_screens</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\states_screens\tutorial_screen.hpp">
-      <Filter>Header Files\states_screens</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\add_device_dialog.hpp">
       <Filter>Header Files\states_screens\dialogs</Filter>
     </ClInclude>
@@ -1451,15 +1436,6 @@
     <ClInclude Include="..\..\addons\zip.hpp">
       <Filter>Header Files\addons</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial\tutorial.hpp">
-      <Filter>Header Files\tutorial</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial\tutorial_data.hpp">
-      <Filter>Header Files\tutorial</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial\tutorial_manager.hpp">
-      <Filter>Header Files\tutorial</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\graphics\particle_kind_manager.hpp">
       <Filter>Header Files\graphics</Filter>
     </ClInclude>
@@ -1488,9 +1464,6 @@
       <Filter>Header Files\tinygettext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tinygettext\language.hpp">
-      <Filter>Header Files\tinygettext</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tinygettext\log.hpp">
       <Filter>Header Files\tinygettext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tinygettext\log_stream.hpp">
@@ -1657,6 +1630,24 @@
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\ai_properties.hpp">
       <Filter>Header Files\karts\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\utils\interpolation_array.hpp">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tinygettext\tgt_log.hpp">
+      <Filter>Header Files\tinygettext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\states_screens\dialogs\tutorial_message_dialog.hpp">
+      <Filter>Header Files\states_screens\dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\utils\log.hpp">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modes\tutorial_world.hpp">
+      <Filter>Header Files\modes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modes\easter_egg_hunt.hpp">
+      <Filter>Header Files\modes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
