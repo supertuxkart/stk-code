@@ -236,6 +236,7 @@ void RaceSetupScreen::init()
         name4 += _("Hit others with weapons until they lose all their lives. (Only in multiplayer games)");
         w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
     }
+#ifdef ENABLE_EASTER_EGG_MODE
     {
         irr::core::stringw name1 = irr::core::stringw(
            RaceManager::getNameOf(RaceManager::MINOR_MODE_EASTER_EGG)) + L"\n";
@@ -245,7 +246,7 @@ void RaceSetupScreen::init()
         w2->addItem( name1, IDENT_EASTER, 
                    RaceManager::getIconOf(RaceManager::MINOR_MODE_EASTER_EGG));
     }
-
+#endif
     w2->updateItemDisplay();
     
     // restore saved game mode
