@@ -171,7 +171,6 @@ src/states_screens/dialogs/gp_info_dialog.cpp
 src/states_screens/dialogs/message_dialog.cpp
 src/states_screens/dialogs/player_info_dialog.cpp
 src/states_screens/dialogs/press_a_key_dialog.cpp
-src/states_screens/dialogs/race_over_dialog.cpp
 src/states_screens/dialogs/race_paused_dialog.cpp
 src/states_screens/dialogs/select_challenge.cpp
 src/states_screens/dialogs/story_mode_new.cpp
@@ -429,7 +428,6 @@ src/states_screens/dialogs/gp_info_dialog.hpp
 src/states_screens/dialogs/message_dialog.hpp
 src/states_screens/dialogs/player_info_dialog.hpp
 src/states_screens/dialogs/press_a_key_dialog.hpp
-src/states_screens/dialogs/race_over_dialog.hpp
 src/states_screens/dialogs/race_paused_dialog.hpp
 src/states_screens/dialogs/select_challenge.hpp
 src/states_screens/dialogs/story_mode_new.hpp

@@ -27,7 +27,6 @@
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "network/network_manager.hpp"
-#include "states_screens/dialogs/race_over_dialog.hpp"
 
 #include <irrlicht.h>
 
@@ -233,19 +232,9 @@ void WorldStatus::update(const float dt)
             break;
         }
         case RESULT_DISPLAY_PHASE : 
-            {
-                // Wait for the race over GUI/modal dialog to appear
-                // Previously the in race race over results are shown,
-                // and getCurrent() returns NULL.
-                RaceOverDialog *m = 
-                    dynamic_cast<RaceOverDialog*>(GUIEngine::ModalDialog
-                                                          ::getCurrent());
-                if( m && m->menuIsFinished() )
-                {
-                    m_phase = FINISH_PHASE;
-                }
+        {
             break;
-            }
+        }
         case FINISH_PHASE:
             // Nothing to do here.
             break;
