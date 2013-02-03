@@ -36,7 +36,6 @@
 #include "modes/overworld.hpp"
 #include "modes/world_with_rank.hpp"
 #include "race/highscores.hpp"
-#include "states_screens/dialogs/race_over_dialog.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"
