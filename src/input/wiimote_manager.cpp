@@ -33,7 +33,6 @@ const int    WIIMOTE_BUTTONS     = 12;  // A, B, left, right, top, bottom, 1, 2,
 /** Irrlicht device IDs for the wiimotes start at this value */
 static const int    WIIMOTE_START_IRR_ID = 32;
 
-static const float  WIIMOTE_ABS_MAX_ANGLE = 80.0f;
 static const float  JOYSTICK_ABS_MAX_ANGLE = 32767.0f;
 
 // ============================ Helper functions ============================
@@ -164,16 +163,19 @@ void Wiimote::updateIrrEvent()
     //printf("roll: %f\n", m_wiimote_handle->orient.roll);
     
     // --- Linear response version ---
-    //const float wiimote_to_joystick = -JOYSTICK_ABS_MAX_ANGLE / WIIMOTE_ABS_MAX_ANGLE;
+    //const float wiimote_to_joystick = -JOYSTICK_ABS_MAX_ANGLE / float(UserConfigParams::m_wiimote_max);
     //const float angle = wiimote_to_joystick * m_wiimote_handle->orient.pitch;
     
     // --- Quadratic response version ---
-    const float normalized_angle = -m_wiimote_handle->orient.pitch / WIIMOTE_ABS_MAX_ANGLE;    // around [-1, 1]
-    const float normalized_angle_2 = normalized_angle * normalized_angle;   // change the response curve to be
-                                                                            // less sensitive with values near 0
+	const float normalized_angle = -m_wiimote_handle->orient.pitch / UserConfigParams::m_wiimote_max;
+	// Shape the curve that determines steering depending on wiimote angle. 
+	// Linear might be too sensitive around 0, while quadratic is not sensitive
+	// enough - blend between those curves using weight w
+	float w = UserConfigParams::m_wiimote_weight;
+    const float normalized_angle_2 =    w  * normalized_angle * normalized_angle
+		                           + (1-w) * fabsf(normalized_angle);
     const float sign = normalized_angle >= 0.0f ? 1.0f : -1.0f;
     const float angle = sign * normalized_angle_2 * JOYSTICK_ABS_MAX_ANGLE;
-    
     m_irr_event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_X] =
             (irr::s16)(irr::core::clamp(angle, -JOYSTICK_ABS_MAX_ANGLE, +JOYSTICK_ABS_MAX_ANGLE));
     

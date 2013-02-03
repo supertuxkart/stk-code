@@ -333,7 +333,21 @@ namespace UserConfigParams
             PARAM_DEFAULT( StringUserConfigParam("all", "last_kart_group", 
                                                  "Last selected kart group") );
 
-    // ---- GP start order
+    // ---- Wiimote data
+    PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
+        PARAM_DEFAULT( GroupUserConfigParam("WiiMote", 
+                                            "Settings for the wiimote") );
+    PARAM_PREFIX FloatUserConfigParam         m_wiimote_max
+            PARAM_DEFAULT( FloatUserConfigParam(80.0f, "wiimote-max",
+            &m_wiimote_group,
+            "At what angle (0-128) maximum steering is reached.") );
+
+	PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight
+            PARAM_DEFAULT( FloatUserConfigParam(0.5f, "wiimote-weight",
+            &m_wiimote_group,
+			"A weight applied to map the wiimote angle to steering angle: 0=fully linear, 1-fully quadratic") );
+
+	// ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
             PARAM_DEFAULT( GroupUserConfigParam("GpStartOrder",
                                                 "Order karts start in GP") );
