@@ -208,7 +208,12 @@ if(USE_FRIBIDI)
 endif()
 
 if(USE_WIIUSE)
-    target_link_libraries(supertuxkart wiiuse bluetooth)
+    if(APPLE)
+        find_library(BLUETOOTH_LIBRARY NAMES IOBluetooth PATHS /Developer/Library/Frameworks/IOBluetooth.framework)
+        target_link_libraries(supertuxkart wiiuse ${BLUETOOTH_LIBRARY})
+    else()
+        target_link_libraries(supertuxkart wiiuse bluetooth)
+    endif()
     add_definitions(-DENABLE_WIIUSE)
 endif()
 
