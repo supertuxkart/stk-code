@@ -440,7 +440,6 @@
     <ClCompile Include="..\..\states_screens\dialogs\message_dialog.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\player_info_dialog.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\press_a_key_dialog.cpp" />
-    <ClCompile Include="..\..\states_screens\dialogs\race_over_dialog.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\race_paused_dialog.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\track_info_dialog.cpp" />
     <ClCompile Include="..\..\addons\addon.cpp" />
@@ -704,7 +703,6 @@
     <ClInclude Include="..\..\states_screens\dialogs\message_dialog.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\player_info_dialog.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\press_a_key_dialog.hpp" />
-    <ClInclude Include="..\..\states_screens\dialogs\race_over_dialog.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\race_paused_dialog.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\track_info_dialog.hpp" />
     <ClInclude Include="..\..\addons\addon.hpp" />
