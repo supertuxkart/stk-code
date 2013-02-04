@@ -150,7 +150,6 @@
 		9551CBD60FC1BB7600DB481B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4231E0E26E44800692113 /* Cocoa.framework */; };
 		9551CBD70FC1BB7600DB481B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		9551CBDA0FC1BB9200DB481B /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9551CBD90FC1BB9200DB481B /* AGL.framework */; };
-		9551DB34104CABFC001C53E5 /* race_over_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9551DB33104CABFC001C53E5 /* race_over_dialog.cpp */; };
 		9552C1FB1231249000347B6C /* world_with_rank.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9552C1F91231249000347B6C /* world_with_rank.cpp */; };
 		9553823A10FD4FEC00737979 /* constants.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9553823910FD4FEC00737979 /* constants.cpp */; };
 		9554C4A611F1188000906416 /* race_result_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9554C4A411F1188000906416 /* race_result_gui.cpp */; };
@@ -384,6 +383,29 @@
 		95D2343F1078227A00625256 /* feature_unlocked.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D2343E1078227A00625256 /* feature_unlocked.cpp */; };
 		95D2C43013D6605600E84032 /* rubber_ball.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D2C42E13D6605600E84032 /* rubber_ball.cpp */; };
 		95D69A7415226E4700D598D8 /* abstract_kart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D69A7215226E4700D598D8 /* abstract_kart.cpp */; };
+		95D71F8B16BF380900C0F691 /* classic.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F6416BF380900C0F691 /* classic.c */; };
+		95D71F8C16BF380900C0F691 /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 95D71F6616BF380900C0F691 /* CMakeLists.txt */; };
+		95D71F8D16BF380900C0F691 /* dynamics.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F6916BF380900C0F691 /* dynamics.c */; };
+		95D71F8E16BF380900C0F691 /* events.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F6B16BF380900C0F691 /* events.c */; };
+		95D71F8F16BF380900C0F691 /* guitar_hero_3.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F6D16BF380900C0F691 /* guitar_hero_3.c */; };
+		95D71F9016BF380900C0F691 /* io.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F6F16BF380900C0F691 /* io.c */; };
+		95D71F9216BF380900C0F691 /* io_win.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F7216BF380900C0F691 /* io_win.c */; };
+		95D71F9316BF380900C0F691 /* ir.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F7316BF380900C0F691 /* ir.c */; };
+		95D71F9416BF380900C0F691 /* motion_plus.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F7516BF380900C0F691 /* motion_plus.c */; };
+		95D71F9516BF380900C0F691 /* nunchuk.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F7716BF380900C0F691 /* nunchuk.c */; };
+		95D71F9616BF380900C0F691 /* os_mac.m in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F7C16BF380900C0F691 /* os_mac.m */; };
+		95D71F9716BF380900C0F691 /* os_mac_find.m in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F7D16BF380900C0F691 /* os_mac_find.m */; };
+		95D71F9816BF380900C0F691 /* os_mac_interface.m in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F7E16BF380900C0F691 /* os_mac_interface.m */; };
+		95D71F9916BF380900C0F691 /* os_nix.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F7F16BF380900C0F691 /* os_nix.c */; };
+		95D71F9A16BF380900C0F691 /* os_win.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F8016BF380900C0F691 /* os_win.c */; };
+		95D71F9B16BF380900C0F691 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 95D71F8116BF380900C0F691 /* README */; };
+		95D71F9C16BF380900C0F691 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F8216BF380900C0F691 /* util.c */; };
+		95D71F9D16BF380900C0F691 /* wiiboard.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F8316BF380900C0F691 /* wiiboard.c */; };
+		95D71F9E16BF380900C0F691 /* wiiuse.vcproj in Resources */ = {isa = PBXBuildFile; fileRef = 95D71F8616BF380900C0F691 /* wiiuse.vcproj */; };
+		95D71F9F16BF380900C0F691 /* wiiuse.c in Sources */ = {isa = PBXBuildFile; fileRef = 95D71F8716BF380900C0F691 /* wiiuse.c */; };
+		95D71FA916BF3A4F00C0F691 /* IOBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95D71FA816BF3A4F00C0F691 /* IOBluetooth.framework */; };
+		95D71FB216BF3A9E00C0F691 /* wiimote_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D71FB016BF3A9E00C0F691 /* wiimote_manager.cpp */; };
+		95D71FB716BF3C7800C0F691 /* tutorial_message_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D71FB516BF3C7800C0F691 /* tutorial_message_dialog.cpp */; };
 		95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950CE0FE473CA002E10AD /* stk_config.cpp */; };
 		95D950D30FE473CA002E10AD /* user_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950D00FE473CA002E10AD /* user_config.cpp */; };
 		95DFC5021106933B00A043A9 /* slip_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95DFC5001106933B00A043A9 /* slip_stream.cpp */; };
@@ -584,8 +606,6 @@
 		9551C9F80FC1B87600DB481B /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = SOURCE_ROOT; wrapsLines = 1; };
 		9551CA100FC1BB6400DB481B /* SuperTuxKart-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SuperTuxKart-Info.plist"; sourceTree = SOURCE_ROOT; };
 		9551CBD90FC1BB9200DB481B /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
-		9551DB32104CABFC001C53E5 /* race_over_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_over_dialog.hpp; path = ../../states_screens/dialogs/race_over_dialog.hpp; sourceTree = SOURCE_ROOT; };
-		9551DB33104CABFC001C53E5 /* race_over_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_over_dialog.cpp; path = ../../states_screens/dialogs/race_over_dialog.cpp; sourceTree = SOURCE_ROOT; };
 		9552C1F91231249000347B6C /* world_with_rank.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = world_with_rank.cpp; path = ../../modes/world_with_rank.cpp; sourceTree = SOURCE_ROOT; };
 		9552C1FA1231249000347B6C /* world_with_rank.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = world_with_rank.hpp; path = ../../modes/world_with_rank.hpp; sourceTree = SOURCE_ROOT; };
 		9553823910FD4FEC00737979 /* constants.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = constants.cpp; path = ../../utils/constants.cpp; sourceTree = SOURCE_ROOT; };
@@ -1399,6 +1419,47 @@
 		95D2C42F13D6605600E84032 /* rubber_ball.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = rubber_ball.hpp; path = ../../items/rubber_ball.hpp; sourceTree = SOURCE_ROOT; };
 		95D69A7215226E4700D598D8 /* abstract_kart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = abstract_kart.cpp; path = ../../karts/abstract_kart.cpp; sourceTree = SOURCE_ROOT; };
 		95D69A7315226E4700D598D8 /* abstract_kart.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = abstract_kart.hpp; path = ../../karts/abstract_kart.hpp; sourceTree = SOURCE_ROOT; };
+		95D71F6416BF380900C0F691 /* classic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = classic.c; path = ../../../lib/wiiuse/classic.c; sourceTree = SOURCE_ROOT; };
+		95D71F6516BF380900C0F691 /* classic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = classic.h; path = ../../../lib/wiiuse/classic.h; sourceTree = SOURCE_ROOT; };
+		95D71F6616BF380900C0F691 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CMakeLists.txt; path = ../../../lib/wiiuse/CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		95D71F6716BF380900C0F691 /* definitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = definitions.h; path = ../../../lib/wiiuse/definitions.h; sourceTree = SOURCE_ROOT; };
+		95D71F6816BF380900C0F691 /* definitions_os.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = definitions_os.h; path = ../../../lib/wiiuse/definitions_os.h; sourceTree = SOURCE_ROOT; };
+		95D71F6916BF380900C0F691 /* dynamics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dynamics.c; path = ../../../lib/wiiuse/dynamics.c; sourceTree = SOURCE_ROOT; };
+		95D71F6A16BF380900C0F691 /* dynamics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dynamics.h; path = ../../../lib/wiiuse/dynamics.h; sourceTree = SOURCE_ROOT; };
+		95D71F6B16BF380900C0F691 /* events.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = events.c; path = ../../../lib/wiiuse/events.c; sourceTree = SOURCE_ROOT; };
+		95D71F6C16BF380900C0F691 /* events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = events.h; path = ../../../lib/wiiuse/events.h; sourceTree = SOURCE_ROOT; };
+		95D71F6D16BF380900C0F691 /* guitar_hero_3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = guitar_hero_3.c; path = ../../../lib/wiiuse/guitar_hero_3.c; sourceTree = SOURCE_ROOT; };
+		95D71F6E16BF380900C0F691 /* guitar_hero_3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = guitar_hero_3.h; path = ../../../lib/wiiuse/guitar_hero_3.h; sourceTree = SOURCE_ROOT; };
+		95D71F6F16BF380900C0F691 /* io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = io.c; path = ../../../lib/wiiuse/io.c; sourceTree = SOURCE_ROOT; };
+		95D71F7016BF380900C0F691 /* io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = io.h; path = ../../../lib/wiiuse/io.h; sourceTree = SOURCE_ROOT; };
+		95D71F7216BF380900C0F691 /* io_win.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = io_win.c; path = ../../../lib/wiiuse/io_win.c; sourceTree = SOURCE_ROOT; };
+		95D71F7316BF380900C0F691 /* ir.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ir.c; path = ../../../lib/wiiuse/ir.c; sourceTree = SOURCE_ROOT; };
+		95D71F7416BF380900C0F691 /* ir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ir.h; path = ../../../lib/wiiuse/ir.h; sourceTree = SOURCE_ROOT; };
+		95D71F7516BF380900C0F691 /* motion_plus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = motion_plus.c; path = ../../../lib/wiiuse/motion_plus.c; sourceTree = SOURCE_ROOT; };
+		95D71F7616BF380900C0F691 /* motion_plus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = motion_plus.h; path = ../../../lib/wiiuse/motion_plus.h; sourceTree = SOURCE_ROOT; };
+		95D71F7716BF380900C0F691 /* nunchuk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nunchuk.c; path = ../../../lib/wiiuse/nunchuk.c; sourceTree = SOURCE_ROOT; };
+		95D71F7816BF380900C0F691 /* nunchuk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nunchuk.h; path = ../../../lib/wiiuse/nunchuk.h; sourceTree = SOURCE_ROOT; };
+		95D71F7916BF380900C0F691 /* os.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = os.h; path = ../../../lib/wiiuse/os.h; sourceTree = SOURCE_ROOT; };
+		95D71F7B16BF380900C0F691 /* os_mac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = os_mac.h; path = ../../../lib/wiiuse/os_mac/os_mac.h; sourceTree = SOURCE_ROOT; };
+		95D71F7C16BF380900C0F691 /* os_mac.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = os_mac.m; path = ../../../lib/wiiuse/os_mac/os_mac.m; sourceTree = SOURCE_ROOT; };
+		95D71F7D16BF380900C0F691 /* os_mac_find.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = os_mac_find.m; path = ../../../lib/wiiuse/os_mac/os_mac_find.m; sourceTree = SOURCE_ROOT; };
+		95D71F7E16BF380900C0F691 /* os_mac_interface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = os_mac_interface.m; path = ../../../lib/wiiuse/os_mac/os_mac_interface.m; sourceTree = SOURCE_ROOT; };
+		95D71F7F16BF380900C0F691 /* os_nix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = os_nix.c; path = ../../../lib/wiiuse/os_nix.c; sourceTree = SOURCE_ROOT; };
+		95D71F8016BF380900C0F691 /* os_win.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = os_win.c; path = ../../../lib/wiiuse/os_win.c; sourceTree = SOURCE_ROOT; };
+		95D71F8116BF380900C0F691 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README; path = ../../../lib/wiiuse/README; sourceTree = SOURCE_ROOT; };
+		95D71F8216BF380900C0F691 /* util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = util.c; path = ../../../lib/wiiuse/util.c; sourceTree = SOURCE_ROOT; };
+		95D71F8316BF380900C0F691 /* wiiboard.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = wiiboard.c; path = ../../../lib/wiiuse/wiiboard.c; sourceTree = SOURCE_ROOT; };
+		95D71F8416BF380900C0F691 /* wiiboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wiiboard.h; path = ../../../lib/wiiuse/wiiboard.h; sourceTree = SOURCE_ROOT; };
+		95D71F8616BF380900C0F691 /* wiiuse.vcproj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = wiiuse.vcproj; path = ../../../lib/wiiuse/wiiuse/wiiuse.vcproj; sourceTree = SOURCE_ROOT; };
+		95D71F8716BF380900C0F691 /* wiiuse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = wiiuse.c; path = ../../../lib/wiiuse/wiiuse.c; sourceTree = SOURCE_ROOT; };
+		95D71F8816BF380900C0F691 /* wiiuse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wiiuse.h; path = ../../../lib/wiiuse/wiiuse.h; sourceTree = SOURCE_ROOT; };
+		95D71F8916BF380900C0F691 /* wiiuse_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wiiuse_internal.h; path = ../../../lib/wiiuse/wiiuse_internal.h; sourceTree = SOURCE_ROOT; };
+		95D71F8A16BF380900C0F691 /* wiiuse_msvcstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wiiuse_msvcstdint.h; path = ../../../lib/wiiuse/wiiuse_msvcstdint.h; sourceTree = SOURCE_ROOT; };
+		95D71FA816BF3A4F00C0F691 /* IOBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOBluetooth.framework; path = /System/Library/Frameworks/IOBluetooth.framework; sourceTree = "<absolute>"; };
+		95D71FB016BF3A9E00C0F691 /* wiimote_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wiimote_manager.cpp; path = ../../input/wiimote_manager.cpp; sourceTree = SOURCE_ROOT; };
+		95D71FB116BF3A9E00C0F691 /* wiimote_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = wiimote_manager.hpp; path = ../../input/wiimote_manager.hpp; sourceTree = SOURCE_ROOT; };
+		95D71FB516BF3C7800C0F691 /* tutorial_message_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tutorial_message_dialog.cpp; path = ../../states_screens/dialogs/tutorial_message_dialog.cpp; sourceTree = SOURCE_ROOT; };
+		95D71FB616BF3C7800C0F691 /* tutorial_message_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tutorial_message_dialog.hpp; path = ../../states_screens/dialogs/tutorial_message_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		95D950CD0FE473CA002E10AD /* player.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = player.hpp; path = ../../config/player.hpp; sourceTree = SOURCE_ROOT; };
 		95D950CE0FE473CA002E10AD /* stk_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stk_config.cpp; path = ../../config/stk_config.cpp; sourceTree = SOURCE_ROOT; };
 		95D950CF0FE473CA002E10AD /* stk_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = stk_config.hpp; path = ../../config/stk_config.hpp; sourceTree = SOURCE_ROOT; };
@@ -1465,6 +1526,7 @@
 				9551C9F30FC1B7EE00DB481B /* Vorbis.framework in Frameworks */,
 				954E486A11B19C4100B1DF63 /* fribidi.framework in Frameworks */,
 				9538E2E912C2682B00172896 /* IrrFramework.framework in Frameworks */,
+				95D71FA916BF3A4F00C0F691 /* IOBluetooth.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1482,6 +1544,7 @@
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 				9551CA100FC1BB6400DB481B /* SuperTuxKart-Info.plist */,
 				9507E9B60FC1CCE900BD2B92 /* stk.icns */,
+				95D71FA816BF3A4F00C0F691 /* IOBluetooth.framework */,
 			);
 			name = STK_XCode;
 			sourceTree = "<group>";
@@ -1870,9 +1933,9 @@
 		958330C110122B4A00C5137E /* states_screens */ = {
 			isa = PBXGroup;
 			children = (
+				95833236101243ED00C5137E /* dialogs */,
 				9529980115B2070C0028301A /* cutscene_gui.cpp */,
 				9529980215B2070C0028301A /* cutscene_gui.hpp */,
-				95833236101243ED00C5137E /* dialogs */,
 				9551B26D11DC0D4D002DD140 /* addons_screen.cpp */,
 				9551B26E11DC0D4D002DD140 /* addons_screen.hpp */,
 				956541B910DD5F0A00C83E99 /* arenas_screen.cpp */,
@@ -1953,8 +2016,6 @@
 				9583323A101243ED00C5137E /* player_info_dialog.hpp */,
 				9583323B101243ED00C5137E /* press_a_key_dialog.cpp */,
 				9583323C101243ED00C5137E /* press_a_key_dialog.hpp */,
-				9551DB33104CABFC001C53E5 /* race_over_dialog.cpp */,
-				9551DB32104CABFC001C53E5 /* race_over_dialog.hpp */,
 				958D8C53104F523000A81934 /* race_paused_dialog.cpp */,
 				958D8C52104F523000A81934 /* race_paused_dialog.hpp */,
 				9543D59D14D38831000B0888 /* select_challenge.cpp */,
@@ -1963,6 +2024,8 @@
 				95E5C334148C19F500AD3FCC /* story_mode_new.hpp */,
 				9583323D101243ED00C5137E /* track_info_dialog.cpp */,
 				9583323E101243ED00C5137E /* track_info_dialog.hpp */,
+				95D71FB516BF3C7800C0F691 /* tutorial_message_dialog.cpp */,
+				95D71FB616BF3C7800C0F691 /* tutorial_message_dialog.hpp */,
 			);
 			name = dialogs;
 			path = ../../states_screens/dialogs;
@@ -1999,6 +2062,7 @@
 		9593A10C1609384700AB5EEB /* Lib */ = {
 			isa = PBXGroup;
 			children = (
+				95D71F6316BF380900C0F691 /* wiiuse */,
 				9593A2CE1609388C00AB5EEB /* enet */,
 				9593A10D1609386100AB5EEB /* bullet */,
 			);
@@ -2488,6 +2552,8 @@
 		95A118280F77EA3100B18B3D /* input */ = {
 			isa = PBXGroup;
 			children = (
+				95D71FB016BF3A9E00C0F691 /* wiimote_manager.cpp */,
+				95D71FB116BF3A9E00C0F691 /* wiimote_manager.hpp */,
 				9528CC221291E7A10078A5EF /* binding.cpp */,
 				9528CC231291E7A10078A5EF /* binding.hpp */,
 				95A1187A0F78024E00B18B3D /* device_manager.cpp */,
@@ -2859,6 +2925,68 @@
 			path = ../../utils/utf8;
 			sourceTree = SOURCE_ROOT;
 		};
+		95D71F6316BF380900C0F691 /* wiiuse */ = {
+			isa = PBXGroup;
+			children = (
+				95D71F6416BF380900C0F691 /* classic.c */,
+				95D71F6516BF380900C0F691 /* classic.h */,
+				95D71F6616BF380900C0F691 /* CMakeLists.txt */,
+				95D71F6716BF380900C0F691 /* definitions.h */,
+				95D71F6816BF380900C0F691 /* definitions_os.h */,
+				95D71F6916BF380900C0F691 /* dynamics.c */,
+				95D71F6A16BF380900C0F691 /* dynamics.h */,
+				95D71F6B16BF380900C0F691 /* events.c */,
+				95D71F6C16BF380900C0F691 /* events.h */,
+				95D71F6D16BF380900C0F691 /* guitar_hero_3.c */,
+				95D71F6E16BF380900C0F691 /* guitar_hero_3.h */,
+				95D71F6F16BF380900C0F691 /* io.c */,
+				95D71F7016BF380900C0F691 /* io.h */,
+				95D71F7216BF380900C0F691 /* io_win.c */,
+				95D71F7316BF380900C0F691 /* ir.c */,
+				95D71F7416BF380900C0F691 /* ir.h */,
+				95D71F7516BF380900C0F691 /* motion_plus.c */,
+				95D71F7616BF380900C0F691 /* motion_plus.h */,
+				95D71F7716BF380900C0F691 /* nunchuk.c */,
+				95D71F7816BF380900C0F691 /* nunchuk.h */,
+				95D71F7916BF380900C0F691 /* os.h */,
+				95D71F7A16BF380900C0F691 /* os_mac */,
+				95D71F7F16BF380900C0F691 /* os_nix.c */,
+				95D71F8016BF380900C0F691 /* os_win.c */,
+				95D71F8116BF380900C0F691 /* README */,
+				95D71F8216BF380900C0F691 /* util.c */,
+				95D71F8316BF380900C0F691 /* wiiboard.c */,
+				95D71F8416BF380900C0F691 /* wiiboard.h */,
+				95D71F8516BF380900C0F691 /* wiiuse */,
+				95D71F8716BF380900C0F691 /* wiiuse.c */,
+				95D71F8816BF380900C0F691 /* wiiuse.h */,
+				95D71F8916BF380900C0F691 /* wiiuse_internal.h */,
+				95D71F8A16BF380900C0F691 /* wiiuse_msvcstdint.h */,
+			);
+			name = wiiuse;
+			path = ../../../lib/wiiuse;
+			sourceTree = SOURCE_ROOT;
+		};
+		95D71F7A16BF380900C0F691 /* os_mac */ = {
+			isa = PBXGroup;
+			children = (
+				95D71F7B16BF380900C0F691 /* os_mac.h */,
+				95D71F7C16BF380900C0F691 /* os_mac.m */,
+				95D71F7D16BF380900C0F691 /* os_mac_find.m */,
+				95D71F7E16BF380900C0F691 /* os_mac_interface.m */,
+			);
+			name = os_mac;
+			path = ../../../lib/wiiuse/os_mac;
+			sourceTree = SOURCE_ROOT;
+		};
+		95D71F8516BF380900C0F691 /* wiiuse */ = {
+			isa = PBXGroup;
+			children = (
+				95D71F8616BF380900C0F691 /* wiiuse.vcproj */,
+			);
+			name = wiiuse;
+			path = ../../../lib/wiiuse/wiiuse;
+			sourceTree = SOURCE_ROOT;
+		};
 		95D950CC0FE473CA002E10AD /* config */ = {
 			isa = PBXGroup;
 			children = (
@@ -2976,6 +3104,9 @@
 				9593A30F1609388C00AB5EEB /* missing in Resources */,
 				9593A3131609388C00AB5EEB /* README in Resources */,
 				9593A3141609388C00AB5EEB /* tutorial.txt in Resources */,
+				95D71F8C16BF380900C0F691 /* CMakeLists.txt in Resources */,
+				95D71F9B16BF380900C0F691 /* README in Resources */,
+				95D71F9E16BF380900C0F691 /* wiiuse.vcproj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3116,7 +3247,6 @@
 				952A154E103F66D600B1895D /* skid_marks.cpp in Sources */,
 				952A1554103F68D000B1895D /* profile_world.cpp in Sources */,
 				9524739610497C75000C197E /* dynamic_ribbon_widget.cpp in Sources */,
-				9551DB34104CABFC001C53E5 /* race_over_dialog.cpp in Sources */,
 				958D8C54104F523000A81934 /* race_paused_dialog.cpp in Sources */,
 				95C77D631069589B0080838E /* ambient_light_sphere.cpp in Sources */,
 				95C77D66106958A50080838E /* check_line.cpp in Sources */,
@@ -3365,6 +3495,25 @@
 				95B0E8B016A4DC390037391C /* tgt_log.cpp in Sources */,
 				95B0E8B716A4DC9E0037391C /* easter_egg_hunt.cpp in Sources */,
 				95B0E8B816A4DC9E0037391C /* tutorial_world.cpp in Sources */,
+				95D71F8B16BF380900C0F691 /* classic.c in Sources */,
+				95D71F8D16BF380900C0F691 /* dynamics.c in Sources */,
+				95D71F8E16BF380900C0F691 /* events.c in Sources */,
+				95D71F8F16BF380900C0F691 /* guitar_hero_3.c in Sources */,
+				95D71F9016BF380900C0F691 /* io.c in Sources */,
+				95D71F9216BF380900C0F691 /* io_win.c in Sources */,
+				95D71F9316BF380900C0F691 /* ir.c in Sources */,
+				95D71F9416BF380900C0F691 /* motion_plus.c in Sources */,
+				95D71F9516BF380900C0F691 /* nunchuk.c in Sources */,
+				95D71F9616BF380900C0F691 /* os_mac.m in Sources */,
+				95D71F9716BF380900C0F691 /* os_mac_find.m in Sources */,
+				95D71F9816BF380900C0F691 /* os_mac_interface.m in Sources */,
+				95D71F9916BF380900C0F691 /* os_nix.c in Sources */,
+				95D71F9A16BF380900C0F691 /* os_win.c in Sources */,
+				95D71F9C16BF380900C0F691 /* util.c in Sources */,
+				95D71F9D16BF380900C0F691 /* wiiboard.c in Sources */,
+				95D71F9F16BF380900C0F691 /* wiiuse.c in Sources */,
+				95D71FB216BF3A9E00C0F691 /* wiimote_manager.cpp in Sources */,
+				95D71FB716BF3C7800C0F691 /* tutorial_message_dialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
