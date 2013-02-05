@@ -76,6 +76,11 @@ private:
     /** Index of the current news message that is being displayed. */
     int             m_current_news_message;
 
+    /** A single string that concatenats all news messages, separated
+     *  by "  +++  ". Using this to display the news message avoids
+     *  the delay between messages. */
+    core::stringw   m_all_news_messages;
+
     /** Stores the news message display count from the user config file. 
     */
     std::vector<int> m_saved_display_count;
@@ -87,9 +92,7 @@ private:
     void          checkRedirect(const XMLNode *xml);
     void          updateNews(const XMLNode *xml,
                              const std::string &filename);
-    void          updateUserConfigFile() const;
     bool          conditionFulfilled(const std::string &cond);
-    void          updateMessageDisplayCount();
 
 public:
                   NewsManager();

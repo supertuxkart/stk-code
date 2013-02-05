@@ -91,6 +91,9 @@ void NewsManager::checkRedirect(const XMLNode *xml)
  */
 void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
 {
+
+    m_all_news_messages = "";
+    const core::stringw message_divider="  +++  ";
     // This function is also called in case of a reinit, so
     // we have to delete existing news messages here first.
     m_news.lock();
@@ -105,7 +108,7 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
     {
         const XMLNode *node = xml->getNode(i);
         if(node->getName()!="message") continue;
-        std::string news;
+        core::stringw news;
         node->get("content", &news);
         int id=-1;
         node->get("id", &id);
@@ -119,15 +122,15 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
         m_news.lock();
         {
 
+            if(!important)
+                m_all_news_messages += m_all_news_messages.size()>0 
+                                    ?  message_divider + news
+                                    : news;
+            else
             // Define this if news messages should be removed
             // after being shown a certain number of times.
-#undef NEWS_MESSAGE_REMOVAL
-#ifdef NEWS_MESSAGE_REMOVAL
-            // Only add the news if it's not supposed to be ignored.
-            if(id>UserConfigParams::m_ignore_message_id)
-#endif
             {
-                NewsMessage n(core::stringw(news.c_str()), id, important);
+                NewsMessage n(news, id, important);
                 m_news.getData().push_back(n);
             }
         }   // m_news.lock()
@@ -146,13 +149,10 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
         NewsMessage n(_("Can't access stkaddons server..."), -1);
         m_news.lock();
         m_news.getData().push_back(n);
+
+        m_all_news_messages="";
         m_news.unlock();
     }
-#ifdef NEWS_MESSAGE_REMOVAL
-    else
-        updateMessageDisplayCount();
-#endif
-    
 }   // updateNews
 
 // ----------------------------------------------------------------------------
@@ -213,42 +213,24 @@ const core::stringw NewsManager::getNextNewsMessage()
     if(m_error_message.size()>0)
         return _(m_error_message.c_str());
 
+    m_news.lock();
+    if(m_all_news_messages.size()>0)
+    {
+        // Copy the news message while it is locked.
+        core::stringw anm = m_all_news_messages;
+        m_news.unlock();
+        return anm;
+    }
+
     if(m_news.getData().size()==0)
+    {
+        // Lock 
+        m_news.unlock();
         return "";
+    }
 
     core::stringw m("");
-    m_news.lock();
     {
-        // Check if we have a message that was finished being
-        // displayed --> increase display count.
-        if(m_current_news_message>-1)
-        {
-#ifdef NEWS_MESSAGE_REMOVAL
-            NewsMessage &n = m_news.getData()[m_current_news_message];
-            n.increaseDisplayCount();
-#endif
-
-            // If the message is being displayed often enough,
-            // ignore it from now on.
-#ifdef NEWS_MESSAGE_REMOVAL
-            if(n.getDisplayCount()>stk_config->m_max_display_news)
-            {
-                // Messages have sequential numbers, so we only store
-                // the latest message id (which is the current one)
-                UserConfigParams::m_ignore_message_id = n.getMessageId();
-                m_news.getData().erase(m_news.getData().begin()
-                                       +m_current_news_message  );
-
-            }
-#endif
-            updateUserConfigFile();
-            // 
-            if(m_news.getData().size()==0)
-            {
-                m_news.unlock();
-                return "";
-            }
-        }
         m_current_news_message++;
         if(m_current_news_message >= (int)m_news.getData().size())
             m_current_news_message = 0;            
@@ -258,32 +240,6 @@ const core::stringw NewsManager::getNextNewsMessage()
     m_news.unlock();
     return _(m.c_str());
 }   // getNextNewsMessage
-
-// ----------------------------------------------------------------------------
-/** Saves the information about which message was being displayed how often
- *  to the user config file. It dnoes not actually save the user config
- *  file, this is left to the main program (user config is saved at
- *  the exit of the program).
- *  Note that this function assumes that m_news is already locked!
- */
-void NewsManager::updateUserConfigFile() const
-{
-#ifdef NEWS_MESSAGE_REMOVAL
-    std::ostringstream o;
-    for(unsigned int i=0; i<m_news.getData().size(); i++)
-    {
-        const NewsMessage &n=m_news.getData()[i];
-        o << n.getMessageId()    << ":"
-          << n.getDisplayCount() << " ";
-    }
-    UserConfigParams::m_display_count = o.str();
-#else
-    // Always set them to be empty to avoid any
-    // invalid data that might create a problem later.
-    UserConfigParams::m_display_count     = "";
-    UserConfigParams::m_ignore_message_id = -1;
-#endif
-}   // updateUserConfigFile
 
 // ----------------------------------------------------------------------------
 /** Checks if the given condition list are all fulfilled.
@@ -361,33 +317,3 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
 }   // conditionFulfilled
 
 // ----------------------------------------------------------------------------
-/** Reads the information about which message was dislpayed how often from
- *  the user config file.
- */
-void NewsManager::updateMessageDisplayCount()
-{
-#ifdef NEWS_MESSAGE_REMOVAL
-    m_news.lock();
-    std::vector<std::string> pairs = 
-        StringUtils::split(UserConfigParams::m_display_count,' ');
-    for(unsigned int i=0; i<pairs.size(); i++)
-    {
-        std::vector<std::string> v = StringUtils::split(pairs[i], ':');
-        int id, count;
-        StringUtils::fromString(v[0], id);
-        StringUtils::fromString(v[1], count);
-        // Search all downloaded messages for this id. 
-        for(unsigned int j=0; j<m_news.getData().size(); j++)
-        {
-            if(m_news.getData()[j].getMessageId()!=id)
-                continue;
-            m_news.getData()[j].setDisplayCount(count);
-            if(count>stk_config->m_max_display_news)
-                m_news.getData().erase(m_news.getData().begin()+j);
-            break;
-        }   // for j <m_news.getData().size()
-    }
-    m_news.unlock();
-#endif
-}   // updateMessageDisplayCount
-
