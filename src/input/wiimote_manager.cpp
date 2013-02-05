@@ -19,20 +19,25 @@
 #ifdef ENABLE_WIIUSE
 
 #include "input/wiimote_manager.hpp"
-#include "wiiuse.h"
+
 #include "graphics/irr_driver.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
+
+#include "wiiuse.h"
 
 WiimoteManager*  wiimote_manager;
 
 const int    WIIMOTE_AXES        = 1;  // only use one axis, for turning
 const int    WIIMOTE_BUTTONS     = 12;  // A, B, left, right, top, bottom, 1, 2, (+), (-), home
 
-/** Irrlicht device IDs for the wiimotes start at this value */
-static const int    WIIMOTE_START_IRR_ID = 32;
+bool WiimoteManager::m_enabled      = false;
 
+/** Irrlicht device IDs for the wiimotes start at this value */
+static const int    WIIMOTE_START_IRR_ID   = 32;
 static const float  JOYSTICK_ABS_MAX_ANGLE = 32767.0f;
 
 // ============================ Helper functions ============================
@@ -40,7 +45,7 @@ static const float  JOYSTICK_ABS_MAX_ANGLE = 32767.0f;
 static int wiimoteIdToIrrId(int wiimote_id)
 {
     return wiimote_id + WIIMOTE_START_IRR_ID;
-}
+}   // wiimoteIdToIrrId
 
 // -----------------------------------------------------------------------------
 static void resetIrrEvent(irr::SEvent* event, int irr_id)
@@ -51,7 +56,7 @@ static void resetIrrEvent(irr::SEvent* event, int irr_id)
     event->JoystickEvent.Joystick = irr_id;
     event->JoystickEvent.POV = 65535;
     event->JoystickEvent.ButtonStates = 0;
-}
+}   // resetIrrEvent
 
 // -----------------------------------------------------------------------------
 struct WiimoteAction
@@ -59,7 +64,7 @@ struct WiimoteAction
     int         button_id;
     int         wiimote_action_id;
     const char* wiimote_action_name;
-};
+};   // struct WiimoteAction
 
 static WiimoteAction wiimote_actions[] = {
     {0,  WIIMOTE_BUTTON_LEFT,   "WIIMOTE_BUTTON_LEFT"},
@@ -73,7 +78,7 @@ static WiimoteAction wiimote_actions[] = {
     {8,  WIIMOTE_BUTTON_ONE,    "WIIMOTE_BUTTON_ONE"},
     {9,  WIIMOTE_BUTTON_TWO,    "WIIMOTE_BUTTON_TWO"},
     {10, WIIMOTE_BUTTON_HOME,   "WIIMOTE_BUTTON_HOME"},
-};
+};   // wiimote_actions
 
 static int getButtonId(int wiimote_action_id)
 {
@@ -82,7 +87,7 @@ static int getButtonId(int wiimote_action_id)
             return wiimote_actions[i].button_id;
     assert(false && "shouldn't happen");
     return -1;
-}
+}  // getButtonId
 
 // -----------------------------------------------------------------------------
 static void setWiimoteBindings(GamepadConfig* gamepad_config)
@@ -104,7 +109,7 @@ static void setWiimoteBindings(GamepadConfig* gamepad_config)
     gamepad_config->setBinding(PA_MENU_RIGHT,   Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_DOWN));
     gamepad_config->setBinding(PA_MENU_SELECT,  Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_TWO));
     gamepad_config->setBinding(PA_MENU_CANCEL,  Input::IT_STICKBUTTON, getButtonId(WIIMOTE_BUTTON_ONE));
-}
+}   // setWiimoteBindings
 
 // ============================ Wiimote device implementation ============================
 Wiimote::Wiimote()
@@ -116,12 +121,13 @@ Wiimote::Wiimote()
     m_connected = false;
     
     pthread_mutex_init(&m_event_mutex, NULL);
-}
+}   // Wiimote
 
+// ----------------------------------------------------------------------------
 Wiimote::~Wiimote()
 {
     pthread_mutex_destroy(&m_event_mutex);
-}
+}   // ~Wiimote
 
 // -----------------------------------------------------------------------------
 /** Resets internal state and creates the corresponding gamepad device */
@@ -146,7 +152,7 @@ void Wiimote::init(wiimote_t* wiimote_handle, int wiimote_id, GamepadConfig* gam
                                          WIIMOTE_BUTTONS,
                                          gamepad_config );
     device_manager->addGamepad(m_gamepad_device);
-}
+}   // init
 
 // -----------------------------------------------------------------------------
 /** Called from the update thread: updates the Irrlicht event from the wiimote state */
@@ -218,8 +224,9 @@ void Wiimote::updateIrrEvent()
     }
 */
     pthread_mutex_unlock(&m_event_mutex);
-}
+}   // updateIrrEvent
 
+// ----------------------------------------------------------------------------
 irr::SEvent Wiimote::getIrrEvent()
 {
     irr::SEvent event;
@@ -229,7 +236,7 @@ irr::SEvent Wiimote::getIrrEvent()
     pthread_mutex_unlock(&m_event_mutex);
     
     return event;
-}
+}   // getIrrEvent
 
 // ============================ Wiimote manager implementation ============================
 WiimoteManager::WiimoteManager()
@@ -238,13 +245,13 @@ WiimoteManager::WiimoteManager()
     m_nb_wiimotes = 0;
     
     m_shut = false;
-}
+}   // WiimoteManager
 
 // -----------------------------------------------------------------------------
 WiimoteManager::~WiimoteManager()
 {
     cleanup();
-}
+}   // ~WiimoteManager
 
 // -----------------------------------------------------------------------------
 /**
@@ -309,7 +316,7 @@ void WiimoteManager::launchDetection(int timeout)
     m_shut = false;
     
     pthread_create(&m_thread, NULL, &threadFuncWrapper, this);
-}
+}   // launchDetection
 
 // -----------------------------------------------------------------------------
 void WiimoteManager::cleanup()
@@ -339,7 +346,7 @@ void WiimoteManager::cleanup()
     m_all_wiimote_handles = NULL;
     m_nb_wiimotes  = 0;
     m_shut         = false;
-}
+}   // cleanup
 
 // -----------------------------------------------------------------------------
 void WiimoteManager::update()
@@ -352,7 +359,7 @@ void WiimoteManager::update()
             input_manager->input(event);
         }
     }
-}
+}   // update
 
 // -----------------------------------------------------------------------------
 /** Thread update method - wiimotes state is updated in another thread to avoid latency problems */
@@ -420,12 +427,56 @@ void WiimoteManager::threadFunc()
         
         irr_driver->getDevice()->sleep(1);  // 'cause come on, the whole CPU is not ours :)
     } // end while
-}
+}   // threadFunc
 
+// ----------------------------------------------------------------------------
+/** This is the start function of a separate thread used to poll the wiimotes.
+ *  It receives the wiimote manager as parameter when the thread is created.
+ *  \param data Pointer to the wiimote manager.
+ */
 void* WiimoteManager::threadFuncWrapper(void *data)
 {
     ((WiimoteManager*)data)->threadFunc();
     return NULL;
-}
+}   // threadFuncWrapper
 
+// ----------------------------------------------------------------------------
+/** Shows a simple popup menu asking the user to connect all wiimotes.
+ */
+int WiimoteManager::askUserToConnectWiimotes()
+{
+	new MessageDialog( 
+		_("Press the buttons 1+2 simultaneously on your wiimote to put "
+		  "it in discovery mode, then click on OK."),
+		MessageDialog::MESSAGE_DIALOG_CONFIRM, 
+		new WiimoteDialogListener(), true);
+
+	return getNbWiimotes();
+}   // askUserToConnectWiimotes
+
+// ============================================================================
+/** Calles when the user clicks on OK, i.e. all wiimotes are in discovery 
+ *  mode.
+ */
+void WiimoteManager::WiimoteDialogListener::onConfirm() OVERRIDE
+{
+	GUIEngine::ModalDialog::dismiss();
+
+	wiimote_manager->launchDetection(5);
+
+	int nb_wiimotes = wiimote_manager->getNbWiimotes();
+	if(nb_wiimotes > 0)
+	{
+		core::stringw msg = StringUtils::insertValues(
+			_("Found %d wiimote(s)"),
+			core::stringw(nb_wiimotes));
+
+		new MessageDialog( msg );
+
+	}
+	else
+	{
+		new MessageDialog( _("Could not detect any wiimote :/") );
+	}
+}   // WiimoteDialogListeneronConfirm
 #endif // ENABLE_WIIUSE

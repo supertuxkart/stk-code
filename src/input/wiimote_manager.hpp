@@ -21,8 +21,11 @@
 
 #ifdef ENABLE_WIIUSE
 
-#include <pthread.h>
+#include "states_screens/dialogs/message_dialog.hpp"
+#include "utils/cpp2011.h"
 #include "IEventReceiver.h"
+
+#include <pthread.h>
 
 extern const int    WIIMOTE_AXES;
 extern const int    WIIMOTE_BUTTONS;
@@ -30,8 +33,11 @@ extern const int    WIIMOTE_BUTTONS;
 #define MAX_WIIMOTES  4
 
 struct wiimote_t;
-class GamePadDevice;
 class GamepadConfig;
+class GamePadDevice;
+class WiimoteManager;
+
+extern WiimoteManager* wiimote_manager;
 
 /** Wiimote device class */
 class Wiimote
@@ -58,7 +64,7 @@ private:
 public:
     Wiimote();
     ~Wiimote();
-    
+
     /** Resets internal state and creates the corresponding gamepad device */
     void        init(wiimote_t* wiimote_handle, int wiimote_id, GamepadConfig* gamepad_config);
     
@@ -95,9 +101,18 @@ private:
     /** Shut the update thread? */
     bool            m_shut;
 
+	/** True if wii is enabled via command line option. */
+	static bool     m_enabled;
+
 public:
     WiimoteManager();
     ~WiimoteManager();
+    
+	/** Sets the wiimote to be enabled. */
+	static void enable() { m_enabled = true; }
+
+	/** Returns if the wii was enabled on the command line. */
+	static bool  isEnabled() { return m_enabled; }
     
     void launchDetection(int timeout);
     void update();
@@ -109,9 +124,24 @@ private:
     /** Wiimotes update thread */
     void threadFunc();
     static void* threadFuncWrapper(void* data);
+
+public:
+	/** A simple listener to allow the user to connect wiimotes. It
+	 *  will display a feedback windows (# wiimotes connected or 'no wiimotes
+	 *  found').
+	 */
+	class WiimoteDialogListener : public MessageDialog::IConfirmDialogListener
+	{
+	public:
+		virtual void onConfirm() OVERRIDE;
+	};   // class WiimoteDialoListener
+
+	/** Shows a dialog allowing the user to connect wiimotes.
+	 *  \return Number of wiimotes connected.
+	 */
+	int askUserToConnectWiimotes();
 };
 
-extern WiimoteManager* wiimote_manager;
 
 #endif
 

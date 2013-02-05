@@ -152,34 +152,6 @@ void AddDeviceDialog::onEnterPressedInternal()
 }   // onEnterPressedInternal
 
 // ----------------------------------------------------------------------------
-#ifdef ENABLE_WIIUSE
-class WiimoteDialogListener : public MessageDialog::IConfirmDialogListener
-{
-public:
-    virtual void onConfirm() OVERRIDE
-    {
-        ModalDialog::dismiss();
-        
-        wiimote_manager->launchDetection(5);
-        
-        int nb_wiimotes = wiimote_manager->getNbWiimotes();
-        if(nb_wiimotes > 0)
-        {
-            core::stringw msg = StringUtils::insertValues(
-                _("Found %d wiimote(s)"),
-                core::stringw(nb_wiimotes));
-            
-            new MessageDialog( msg );
-            
-            ((OptionsScreenInput*)GUIEngine::getCurrentScreen())->rebuildDeviceList();
-        }
-        else
-        {
-            new MessageDialog( _("Could not detect any wiimote :/") );
-        }
-    }
-};
-#endif
 
 // ----------------------------------------------------------------------------
 GUIEngine::EventPropagation AddDeviceDialog::processEvent
@@ -204,9 +176,11 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent
 #ifdef ENABLE_WIIUSE
     else if (eventSource == "addwiimote")
     {
-        new MessageDialog( _("Press the buttons 1+2 simultaneously on your wiimote to put "
-                             "it in discovery mode, then click on OK."),
-                           MessageDialog::MESSAGE_DIALOG_CONFIRM, new WiimoteDialogListener(), true);
+        // Remove the previous modal dialog to avoid a warning
+        GUIEngine::ModalDialog::dismiss();
+		if(wiimote_manager->askUserToConnectWiimotes() > 0)
+            ((OptionsScreenInput*)GUIEngine::getCurrentScreen())->rebuildDeviceList();
+
         return GUIEngine::EVENT_BLOCK;
     }
 #endif

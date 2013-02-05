@@ -567,8 +567,8 @@ int handleCmdLinePreliminary(int argc, char **argv)
             }
             else
             {
-            	Log::fatal("main", "Error: --screensize argument must be "
-                		           "given as WIDTHxHEIGHT\n");
+                Log::fatal("main", "Error: --screensize argument must be "
+                                   "given as WIDTHxHEIGHT\n");
                 exit(EXIT_FAILURE);
             }
         }
@@ -648,7 +648,7 @@ int handleCmdLine(int argc, char **argv)
                 const KartProperties *km = 
                     kart_properties_manager->getKartById(i);
                  Log::info("main", "%s:\t%swidth: %f length: %f height: %f "
-                		           "mesh-buffer count %d\n",
+                                   "mesh-buffer count %d\n",
                         km->getIdent().c_str(),
                         (km->getIdent().size()<7) ? "\t" : "",
                         km->getMasterKartModel().getWidth(),
@@ -804,7 +804,7 @@ int handleCmdLine(int argc, char **argv)
                     break;
             default:
                 Log::warn("main", "Invalid race type '%d' - ignored.\n",
-                		  atoi(argv[i+1]));
+                          atoi(argv[i+1]));
             }
             i++;
         }
@@ -828,7 +828,7 @@ int handleCmdLine(int argc, char **argv)
                 if (t == NULL)
                 {
                     Log::warn("main", "Can't find track named <%s>\n",
-                    		  argv[i+1]);
+                              argv[i+1]);
                 }
                 else if (t->isArena())
                 {
@@ -870,7 +870,7 @@ int handleCmdLine(int argc, char **argv)
             if(UserConfigParams::m_num_karts > stk_config->m_max_karts)
             {
                 Log::warn("main",
-                		  "Number of karts reset to maximum number %d\n",
+                          "Number of karts reset to maximum number %d\n",
                                   stk_config->m_max_karts);
                 UserConfigParams::m_num_karts = stk_config->m_max_karts;
             }
@@ -1009,6 +1009,12 @@ int handleCmdLine(int argc, char **argv)
                                                     ','));
             i++;
         }
+#ifdef ENABLE_WIIUSE
+        else if( !strcmp(argv[i], "--wii"))
+        {
+            WiimoteManager::enable();
+        }
+#endif
         // these commands are already processed in handleCmdLinePreliminary, 
         // but repeat this just so that we don't get error messages about 
         // unknown commands
@@ -1245,8 +1251,8 @@ int main(int argc, char *argv[] )
             std::string logoutfile = file_manager->getLogFile("stdout.log");
             std::string logerrfile = file_manager->getLogFile("stderr.log");
             Log::verbose("main", "Error messages and other text output will "
-            		     "be logged to %s and %s\n", logoutfile.c_str(),
-            		     logerrfile.c_str());
+                         "be logged to %s and %s\n", logoutfile.c_str(),
+                         logerrfile.c_str());
             if(freopen (logoutfile.c_str(),"w",stdout)!=stdout)
             {
                 Log::error("main", "Can not open log file '%s'. Writing to "
@@ -1255,7 +1261,7 @@ int main(int argc, char *argv[] )
             if(freopen (logerrfile.c_str(),"w",stderr)!=stderr)
             {
                 Log::error("main", "Can not open log file '%s'. Writing to "
-                		   "stderr instead.\n", logerrfile.c_str());
+                           "stderr instead.\n", logerrfile.c_str());
             }
         }
 
@@ -1322,10 +1328,16 @@ int main(int argc, char *argv[] )
             }
         }
         
-
         if(!UserConfigParams::m_no_start_screen)
         {
             StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
+#ifdef ENABLE_WIIUSE
+            // Show a dialog to allow connection of wiimotes. */
+            if(WiimoteManager::isEnabled())
+            {
+                wiimote_manager->askUserToConnectWiimotes();
+            }
+#endif
             if(UserConfigParams::m_internet_status ==
                 INetworkHttp::IPERM_NOT_ASKED)
             {
@@ -1383,8 +1395,8 @@ int main(int argc, char *argv[] )
             if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
             {
                 Log::warn("main", "Kart '%s' is unknown so will use the "
-                		  "default kart.\n",
-                		  UserConfigParams::m_default_kart.c_str());
+                          "default kart.\n",
+                          UserConfigParams::m_default_kart.c_str());
                 race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart.getDefaultValue());
             }
             else
