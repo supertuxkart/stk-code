@@ -458,7 +458,7 @@ int WiimoteManager::askUserToConnectWiimotes()
 /** Calles when the user clicks on OK, i.e. all wiimotes are in discovery 
  *  mode.
  */
-void WiimoteManager::WiimoteDialogListener::onConfirm() OVERRIDE
+void WiimoteManager::WiimoteDialogListener::onConfirm()
 {
 	GUIEngine::ModalDialog::dismiss();
 
