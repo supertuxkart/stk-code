@@ -173,7 +173,11 @@ void Wiimote::updateIrrEvent()
     //const float angle = wiimote_to_joystick * m_wiimote_handle->orient.pitch;
     
     // --- Quadratic response version ---
-	const float normalized_angle = -m_wiimote_handle->orient.pitch / UserConfigParams::m_wiimote_max;
+	float normalized_angle = -m_wiimote_handle->orient.pitch / UserConfigParams::m_wiimote_max;
+    if(normalized_angle<-1.0f)
+        normalized_angle = -1.0f;
+    else if(normalized_angle>1.0f)
+        normalized_angle = 1.0f;
 	// Shape the curve that determines steering depending on wiimote angle. 
 	// Linear might be too sensitive around 0, while quadratic is not sensitive
 	// enough - blend between those curves using weight w
