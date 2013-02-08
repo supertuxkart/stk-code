@@ -83,6 +83,13 @@ private:
     /** True if kart should "explode" when touching this */
     bool                  m_explode_kart;
 
+    /** True if object should be reset to its initial position if it's
+     *  too low (see m_reset_height). */
+    bool                  m_reset_when_too_low;
+
+    /** If m_reset_when_too_low this object is set back to its start
+     *  position if its height is below this value. */
+    float                 m_reset_height;
 public:
                  PhysicalObject (const XMLNode &node);
     

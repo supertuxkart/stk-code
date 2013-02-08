@@ -40,13 +40,15 @@ using namespace irr;
 PhysicalObject::PhysicalObject(const XMLNode &xml_node)
               : TrackObject(xml_node)
 {
-    m_shape        = NULL;
-    m_body         = NULL;
-    m_motion_state = NULL;
-    m_mass         = 1;
-    m_radius       = -1;
-    m_crash_reset  = false;
-    m_explode_kart = false;
+    m_shape              = NULL;
+    m_body               = NULL;
+    m_motion_state       = NULL;
+    m_reset_when_too_low = false;
+    m_reset_height       = 0;
+    m_mass               = 1;
+    m_radius             = -1;
+    m_crash_reset        = false;
+    m_explode_kart       = false;
     
     std::string shape;
     xml_node.get("mass",    &m_mass       );
@@ -54,6 +56,8 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
     xml_node.get("shape",   &shape        );
     xml_node.get("reset",   &m_crash_reset);
     xml_node.get("explode", &m_explode_kart);
+    m_reset_when_too_low = 
+        xml_node.get("reset-when-below", &m_reset_height) == 1;
 
     m_body_type = MP_NONE;
     if     (shape=="cone"  ||
@@ -263,7 +267,7 @@ void PhysicalObject::update(float dt)
     m_motion_state->getWorldTransform(t);
 
     Vec3 xyz = t.getOrigin();
-    if(xyz.getY()<-100)
+    if(m_reset_when_too_low && xyz.getY()<m_reset_height)
     {
         m_body->setCenterOfMassTransform(m_init_pos);
         m_body->setLinearVelocity (btVector3(0,0,0));
