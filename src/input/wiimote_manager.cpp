@@ -384,7 +384,15 @@ void WiimoteManager::threadFunc()
                 // TODO: this should only be done once, but there have been reports that it didn't
                 // work for some people -> need to find a better fix
                 wiiuse_motion_sensing(m_wiimotes[i].getWiimoteHandle(), 1);
-                
+                /*
+                if(WIIUSE_USING_EXP(m_wiimotes[i].getWiimoteHandle()))
+                {
+                    if(WIIUSE_USING_EXP(wm))
+                        wiiuse_set_motion_plus(m_wiimotes[i].getWiimoteHandle(), 2); // nunchuck pass-through
+                    else
+                        wiiuse_set_motion_plus(m_wiimotes[i].getWiimoteHandle(), 1); // standalone
+                }
+                */
                 switch (m_all_wiimote_handles[i]->event)
                 {
                 case WIIUSE_EVENT:

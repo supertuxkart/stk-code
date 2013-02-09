@@ -133,8 +133,9 @@ void KartModel::loadInfo(const XMLNode &node)
     {
         if(hat_node->get("offset", &m_hat_offset))
         {
-            // For now simply hardcode a mesh name if an offset is defined.
-            setHatMeshName("christmas_hat.b3d");
+            // Xmas mode handling :)
+            if(UserConfigParams::m_xmas_enabled)
+                setHatMeshName("christmas_hat.b3d");
         }
     }
     else

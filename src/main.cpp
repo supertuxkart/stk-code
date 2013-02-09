@@ -125,11 +125,11 @@
 #  ifdef _MSC_VER
 #    include <io.h>
 #    include <direct.h>
-#    include <time.h>
 #  endif
 #else
 #  include <unistd.h>
 #endif
+#include <time.h>
 #include <stdexcept>
 #include <cstdio>
 #include <string>
@@ -468,6 +468,17 @@ int handleCmdLinePreliminary(int argc, char **argv)
         else if ( !strcmp(argv[i], "--debug=misc") )
         {
             UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
+        }
+        else if ( sscanf(argv[i], "--xmas=%d", &n) )
+        {
+            if (n)
+            {
+                UserConfigParams::m_xmas_enabled = true;
+            }
+            else
+            {
+                UserConfigParams::m_xmas_enabled = false;
+            }
         }
         else if( !strcmp(argv[i], "--log=terminal"))
         {
@@ -1028,6 +1039,7 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--debug=flyable")                       ) {}
         else if( !strcmp(argv[i], "--debug=misc"   )                       ) {}
         else if( !strcmp(argv[i], "--debug=all"    )                       ) {}
+        else if ( sscanf(argv[i], "--xmas=%d", &n) )                         {}
         else if( !strcmp(argv[i], "--log=terminal" )                       ) {}
         else if( !strcmp(argv[i], "--log=nocolor"  )                       ) {}
         else if( !strcmp(argv[i], "--log=file"     )                       ) {}
@@ -1226,6 +1238,14 @@ bool ShowDumpResults(const wchar_t* dump_path,
 }
 #endif
 
+static bool checkXmasTime()
+{
+    time_t      rawtime;
+    struct tm*  timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    return (timeinfo->tm_mon == 12-1);  // Xmas mode happens in December
+}
 
 int main(int argc, char *argv[] )
 {
@@ -1241,6 +1261,9 @@ int main(int argc, char *argv[] )
         // not have) other managers initialised:
         initUserConfig(argv); // argv passed so config file can be
                               // found more reliably
+        
+        UserConfigParams::m_xmas_enabled = checkXmasTime();
+        
         handleCmdLinePreliminary(argc, argv);
 
         initRest();

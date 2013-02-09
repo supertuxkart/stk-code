@@ -455,6 +455,9 @@ namespace UserConfigParams
     
     /** True if hardware skinning should be enabled */
     PARAM_PREFIX bool m_hw_skinning_enabled  PARAM_DEFAULT( false );
+    
+    /** True if Christmas Mode should be enabled */
+    PARAM_PREFIX bool m_xmas_enabled  PARAM_DEFAULT( false );
 
     // not saved to file
 
