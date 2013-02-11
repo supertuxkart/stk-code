@@ -725,6 +725,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\modes\soccer_world.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\standard_race.cpp"
 					>
 				</File>
@@ -1089,6 +1093,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\tracks\check_goal.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\check_lap.cpp"
 					>
 				</File>
@@ -1354,6 +1362,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\race_setup_screen.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\soccer_setup_screen.cpp"
 					>
 				</File>
 				<File
@@ -1899,6 +1911,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\modes\soccer_world.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\standard_race.hpp"
 					>
 				</File>
@@ -2243,6 +2259,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\tracks\check_goal.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\check_lap.hpp"
 					>
 				</File>
@@ -2536,6 +2556,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\race_setup_screen.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\soccer_setup_screen.hpp"
 					>
 				</File>
 				<File
