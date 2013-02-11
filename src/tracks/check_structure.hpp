@@ -41,6 +41,7 @@ class CheckManager;
  *  CT_TOGGLE:    Toggles the specified other check structures (active to 
  *                inactive and vice versa.
  *  CT_CANNON:    A check line that 'shoots' the kart to a specified location.
+ *  CT_GOAL:      A goal line in soccer mode.
  *  Each check structure can be active or inactive. Only lap counters are
  *  initialised to be active, all other check structures are inactive.
  *
@@ -54,7 +55,8 @@ public:
      *            the state that check structure is in)
      *  TOGGLE:   Switches (inverts) the state of another check structure.
      *  NEW_LAP:  On crossing a new lap is counted.
-	 *  CANNON:   Causes the kart to be shot to a specified point.
+     *  CANNON:   Causes the kart to be shot to a specified point.
+     *  GOAL:     Causes a point to be scored when a soccer ball crosses its line
      *  AMBIENT_SPHERE: Modifies the ambient color.
      *  A combination of an activate and new_lap line are used to
      *  avoid shortcuts: a new_lap line is deactivated after crossing it, and
@@ -62,7 +64,7 @@ public:
      *  enabling you to count the lap again.
      */
     enum CheckType {CT_NEW_LAP, CT_ACTIVATE, CT_TOGGLE, CT_CANNON,
-		            CT_AMBIENT_SPHERE};
+		            CT_GOAL, CT_AMBIENT_SPHERE};
 
 protected:
     /** Stores the previous position of all karts. This is needed to detect
@@ -75,13 +77,13 @@ protected:
     /** True if this check structure should be activated at a reset. */
     bool              m_active_at_reset;
 
-private:
-    /** The type of this checkline. */
-    CheckType         m_check_type;
-
     /** Stores the index of this check structure. This is only used for
      *  debugging (use --check-debug option). */
     unsigned int      m_index;
+    
+private:
+    /** The type of this checkline. */
+    CheckType         m_check_type;
 
     /** Contains the indices of the corresponding check structures that 
      *  get their state changed (activated or switched). */

@@ -605,7 +605,7 @@ public:
         
         sfx_manager->quickSound( "wee" );
         
-        m_model_view->setRotateTo(30.0f, 150.0f);
+        m_model_view->setRotateTo(30.0f, 1.0f);
         
         player_id_w *= 2;
         player_name_w = 0;

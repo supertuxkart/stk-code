@@ -127,6 +127,7 @@ src/modes/game_tutorial.cpp
 src/modes/linear_world.cpp
 src/modes/overworld.cpp
 src/modes/profile_world.cpp
+src/modes/soccer_world.cpp
 src/modes/standard_race.cpp
 src/modes/three_strikes_battle.cpp
 src/modes/tutorial_world.cpp
@@ -197,6 +198,7 @@ src/states_screens/race_gui.cpp
 src/states_screens/race_gui_overworld.cpp
 src/states_screens/race_result_gui.cpp
 src/states_screens/race_setup_screen.cpp
+src/states_screens/soccer_setup_screen.cpp
 src/states_screens/state_manager.cpp
 src/states_screens/story_mode_lobby.cpp
 src/states_screens/tracks_screen.cpp
@@ -212,6 +214,7 @@ src/tinygettext/tinygettext.cpp
 src/tracks/ambient_light_sphere.cpp
 src/tracks/bezier_curve.cpp
 src/tracks/check_cannon.cpp
+src/tracks/check_goal.cpp
 src/tracks/check_lap.cpp
 src/tracks/check_line.cpp
 src/tracks/check_manager.cpp

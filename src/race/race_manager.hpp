@@ -43,6 +43,7 @@ static const std::string IDENT_TTRIAL   ("STD_TIMETRIAL"   );
 static const std::string IDENT_FTL      ("FOLLOW_LEADER"   );
 static const std::string IDENT_STRIKES  ("BATTLE_3_STRIKES");
 static const std::string IDENT_EASTER   ("EASTER_EGG_HUNT");
+static const std::string IDENT_SOCCER   ("SOCCER"          );
 static const std::string IDENT_OVERWORLD("OVERWORLD"   );
 static const std::string IDENT_CUSTSCENE("CUTSCENE"   );
 
@@ -111,8 +112,8 @@ public:
         MINOR_MODE_TUTORIAL      = LINEAR_RACE(4, false),
         
         MINOR_MODE_3_STRIKES     = BATTLE_ARENA(0),
-        MINOR_MODE_CUTSCENE      = BATTLE_ARENA(1),
-
+        MINOR_MODE_SOCCER        = BATTLE_ARENA(1),
+        MINOR_MODE_CUTSCENE      = BATTLE_ARENA(2),
         MINOR_MODE_EASTER_EGG    = EASTER_EGG(0)
     };
 
@@ -138,6 +139,7 @@ public:
             case MINOR_MODE_FOLLOW_LEADER:  return IDENT_FTL;
             case MINOR_MODE_3_STRIKES:      return IDENT_STRIKES;
             case MINOR_MODE_EASTER_EGG:     return IDENT_EASTER;
+            case MINOR_MODE_SOCCER:         return IDENT_SOCCER;
             default: assert(false); 
                      return IDENT_STD;  // stop compiler warning
         }
@@ -156,6 +158,7 @@ public:
             case MINOR_MODE_FOLLOW_LEADER:  return "/gui/mode_ftl.png";
             case MINOR_MODE_3_STRIKES:      return "/gui/mode_3strikes.png";
             case MINOR_MODE_EASTER_EGG:     return "/gui/mode_easter.png";
+            case MINOR_MODE_SOCCER:         return "/gui/mode_soccer.png";
             default: assert(false); return NULL;
         }
     }   // getIconOf
@@ -176,7 +179,10 @@ public:
             case MINOR_MODE_FOLLOW_LEADER:  return _("Follow the Leader");
             //I18N: Game mode
             case MINOR_MODE_3_STRIKES:      return _("3 Strikes Battle");
+            //I18N: Game mode
             case MINOR_MODE_EASTER_EGG:     return _("Easter Egg Hunt");
+            //I18N: Game mode
+            case MINOR_MODE_SOCCER:         return _("Soccer");
             default: assert(false); return NULL;
         }
     }
@@ -191,6 +197,7 @@ public:
             case MINOR_MODE_FOLLOW_LEADER:  return true;
             case MINOR_MODE_3_STRIKES:      return false;
             case MINOR_MODE_EASTER_EGG:     return false;
+            case MINOR_MODE_SOCCER:         return false;
             default: assert(false); return NULL;
         }
     }
@@ -209,6 +216,7 @@ public:
         else if (name==IDENT_FTL    ) return MINOR_MODE_FOLLOW_LEADER;
         else if (name==IDENT_STRIKES) return MINOR_MODE_3_STRIKES;
         else if (name==IDENT_EASTER ) return MINOR_MODE_EASTER_EGG;
+        else if (name==IDENT_SOCCER)  return MINOR_MODE_SOCCER;
 
         assert(0);
         return MINOR_MODE_NONE;
@@ -352,6 +360,10 @@ public:
       * \param kart       Kart name this player is using.
       */
     void setLocalKartInfo(unsigned int player_id, const std::string& kart);
+    
+    /** Sets additional information for a player to indicate which soccer team it belong to
+    */
+    void setLocalKartSoccerTeam(unsigned int player_id, SoccerTeam team);
     
     /** Sets the number of local players playing on this computer (including
       * split screen).

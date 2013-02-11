@@ -40,6 +40,7 @@
 #include "modes/tutorial_world.hpp"
 #include "modes/world.hpp"
 #include "modes/three_strikes_battle.hpp"
+#include "modes/soccer_world.hpp"
 #include "network/network_manager.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
@@ -143,6 +144,16 @@ void RaceManager::setLocalKartInfo(unsigned int player_id,
                                                   StateManager::get()->getActivePlayerProfile(player_id)->getName(),
                                                   network_manager->getMyHostId());
 }   // setLocalKartInfo
+
+//-----------------------------------------------------------------------------
+/** Sets additional information for a player to indicate which soccer team it belong to
+*/
+void RaceManager::setLocalKartSoccerTeam(unsigned int player_id, SoccerTeam team)
+{
+    assert(0<=player_id && player_id <m_local_player_karts.size());
+    
+    m_local_player_karts[player_id].setSoccerTeam(team);
+}
 
 //-----------------------------------------------------------------------------
 /** Returns a pointer to the kart which has a given GP rank.
@@ -394,6 +405,8 @@ void RaceManager::startNextRace()
         World::setWorld(new TutorialWorld());
     else if(m_minor_mode==MINOR_MODE_3_STRIKES)     
         World::setWorld(new ThreeStrikesBattle());
+    else if(m_minor_mode==MINOR_MODE_SOCCER)
+        World::setWorld(new SoccerWorld());
     else if(m_minor_mode==MINOR_MODE_OVERWORLD)     
         World::setWorld(new OverWorld());
     else if(m_minor_mode==MINOR_MODE_CUTSCENE)

@@ -99,6 +99,7 @@ Track::Track(const std::string &filename)
     m_reverse_available     = false;
     m_is_arena              = false;
     m_has_easter_eggs       = false;
+    m_is_soccer             = false;
     m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
     m_mini_map              = NULL;
@@ -328,6 +329,7 @@ void Track::loadTrackInfo()
     getMusicInformation(filenames, m_music);
     root->get("screenshot",            &m_screenshot);
     root->get("gravity",               &m_gravity);
+    root->get("soccer",                &m_is_soccer);
     root->get("arena",                 &m_is_arena);
     root->get("cutscene",              &m_is_cutscene);
     root->get("groups",                &m_groups);
@@ -335,13 +337,14 @@ void Track::loadTrackInfo()
     root->get("reverse",               &m_reverse_available);
     root->get("push-back",             &m_enable_push_back);
 
-    // Make the default for auto-rescue in battle mode to be false
-    if(m_is_arena)
+    // Make the default for auto-rescue in battle mode and soccer mode to be false
+    if(m_is_arena || m_is_soccer)
         m_enable_auto_rescue = false;
     root->get("auto-rescue",           & m_enable_auto_rescue);
     root->get("smooth-normals",        &m_smooth_normals);
     // Reverse is meaningless in arena
-    m_reverse_available = !m_is_arena && m_reverse_available;
+    if(m_is_arena || m_is_soccer)
+        m_reverse_available = false;
 
     
     for(unsigned int i=0; i<root->getNumNodes(); i++)
@@ -1345,7 +1348,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
-    if (!m_is_arena && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
+    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
 
     ItemManager::create();
 
@@ -1364,7 +1367,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         default_start->get("upwards-distance",   &upwards_distance  );
         default_start->get("karts-per-row",      &karts_per_row     );
     }
-    if(!m_is_arena && !m_is_cutscene)
+    if(!m_is_arena && !m_is_soccer && !m_is_cutscene)
     {
         m_start_transforms.resize(race_manager->getNumberOfKarts());
         QuadGraph::get()->setDefaultStartPositions(&m_start_transforms,

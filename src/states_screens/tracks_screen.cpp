@@ -289,7 +289,7 @@ void TracksScreen::buildTrackList()
             if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG
                 && !curr->hasEasterEggs())
                 continue;
-            if (curr->isArena()) continue;
+            if (curr->isArena() || curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
             
             if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
@@ -320,6 +320,7 @@ void TracksScreen::buildTrackList()
                 && !curr->hasEasterEggs())
                 continue;
             if (curr->isArena()) continue;
+            if (curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
             
             if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))

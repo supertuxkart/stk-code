@@ -104,6 +104,8 @@ protected:
     
     LODNode*                       m_lod_emitter_node;
     
+    bool                           m_soccer_ball;
+    
 public:
                  TrackObject(const XMLNode &xml_node);
                  TrackObject();
@@ -133,11 +135,12 @@ public:
         }
         
         m_node = node;
-        if (node->getType() == irr::scene::ESNT_LOD_NODE)
+        
+        if (m_node->getType() == irr::scene::ESNT_LOD_NODE)
         {
-            ((LODNode*)node)->setNodesPosition(m_init_xyz);
-            ((LODNode*)node)->setNodesRotation(m_init_hpr);
-            ((LODNode*)node)->setNodesScale(m_init_scale);
+            ((LODNode*)m_node)->setNodesPosition(m_init_xyz);
+            ((LODNode*)m_node)->setNodesRotation(m_init_hpr);
+            ((LODNode*)m_node)->setNodesScale(m_init_scale);
         }
         else
         {
@@ -150,6 +153,8 @@ public:
     const std::string& getLodGroup() const { return m_lod_group; }
     
     const std::string& getType() const { return m_type; }
+    
+    bool isSoccerBall() const { return m_soccer_ball; }
     
     /** Currently used for sound effects only, in cutscenes only atm */
     const std::string& getTriggerCondition() const { return m_trigger_condition; }

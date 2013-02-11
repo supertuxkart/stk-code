@@ -63,7 +63,8 @@ void ArenasScreen::beforeAddingWidget()
     
     tabs->clearAllChildren();
     
-    const std::vector<std::string>& groups = track_manager->getAllArenaGroups();
+    bool soccer_mode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    const std::vector<std::string>& groups = track_manager->getAllArenaGroups(soccer_mode);
     const int group_amount = groups.size();
     
     if (group_amount > 1)
@@ -90,8 +91,15 @@ void ArenasScreen::beforeAddingWidget()
     for (unsigned int n=0; n<track_manager->getNumberOfTracks(); n++) //iterate through tracks to find how many are arenas
     {
         Track* temp = track_manager->getTrack(n);
-        if (temp->isArena()){
-            num_of_arenas++;
+        if (soccer_mode)
+        {
+            if(temp->isSoccer())
+                num_of_arenas++;
+        }
+        else
+        {
+            if(temp->isArena())
+                num_of_arenas++;
         }
     }
     
@@ -130,6 +138,8 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
         {
             RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
             assert( tabs != NULL );
+            
+            bool soccer_mode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
 
             std::vector<int> curr_group;
             if (tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER) == ALL_ARENA_GROUPS_ID)
@@ -137,7 +147,7 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
                 const std::vector<std::string>& groups = track_manager->getAllArenaGroups();
                 for (unsigned int i = 0; i < groups.size(); i++)
                 {
-                    const std::vector<int>& tmp_group = track_manager->getArenasInGroup(groups[i]);
+                    const std::vector<int>& tmp_group = track_manager->getArenasInGroup(groups[i], soccer_mode);
                     // Append to our main vector
                     curr_group.insert(curr_group.end(), tmp_group.begin(), tmp_group.end());
                 }
@@ -145,7 +155,7 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
             else
             {
                 curr_group = track_manager->getArenasInGroup(
-                        tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER) );
+                        tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER), soccer_mode );
             }
             
             RandomGenerator random;
@@ -206,6 +216,8 @@ void ArenasScreen::buildTrackList()
     assert( tabs != NULL );
     const std::string curr_group_name = tabs->getSelectionIDString(0);
     
+    bool soccer_mode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    
     if (curr_group_name == ALL_ARENA_GROUPS_ID)
     {
         const int trackAmount = track_manager->getNumberOfTracks();
@@ -213,7 +225,14 @@ void ArenasScreen::buildTrackList()
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack(n);
-            if (!curr->isArena()) continue;
+            if (soccer_mode)
+            {
+                if(!curr->isSoccer()) continue;
+            }
+            else
+            {
+                if(!curr->isArena()) continue;
+            }
             
             if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
             {
@@ -230,13 +249,20 @@ void ArenasScreen::buildTrackList()
     }
     else
     {
-        const std::vector<int>& currArenas = track_manager->getArenasInGroup(curr_group_name);
+        const std::vector<int>& currArenas = track_manager->getArenasInGroup(curr_group_name, soccer_mode);
         const int trackAmount = currArenas.size();
 
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack(currArenas[n]);
-            if (!curr->isArena()) continue;
+            if (soccer_mode)
+            {
+                if(!curr->isSoccer()) continue;
+            }
+            else
+            {
+                if(!curr->isArena()) continue;
+            }
             
             if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
             {

@@ -63,7 +63,7 @@ namespace GUIEngine
         LEAK_CHECK()
         
         ModelViewWidget();
-        ~ModelViewWidget();
+        virtual ~ModelViewWidget();
         
         void add();
         void clearModels();

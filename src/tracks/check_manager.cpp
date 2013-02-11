@@ -24,6 +24,7 @@
 #include "io/xml_node.hpp"
 #include "tracks/ambient_light_sphere.hpp"
 #include "tracks/check_cannon.hpp"
+#include "tracks/check_goal.hpp"
 #include "tracks/check_lap.hpp"
 #include "tracks/check_line.hpp"
 #include "tracks/check_structure.hpp"
@@ -48,10 +49,14 @@ void CheckManager::load(const XMLNode &node)
         {
             m_all_checks.push_back(new CheckLap(*check_node, i));
         }
-		else if(type=="cannon")
-		{
-			m_all_checks.push_back(new CheckCannon(*check_node, i));
-		}
+        else if(type=="cannon")
+        {
+            m_all_checks.push_back(new CheckCannon(*check_node, i));
+        }
+        else if(type=="goal")
+        {
+            m_all_checks.push_back(new CheckGoal(*check_node, i));
+        }
         else if(type=="check-sphere")
         {
             AmbientLightSphere *cs = new AmbientLightSphere(*check_node,

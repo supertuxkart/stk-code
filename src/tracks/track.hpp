@@ -227,9 +227,10 @@ private:
     Vec3                     m_aabb_max;
     /** True if this track is an arena. */
     bool                     m_is_arena;
-
     /** True if this track has easter eggs. */
     bool                     m_has_easter_eggs;
+    /** True if this track is a soccer arena. */
+    bool                     m_is_soccer;
     
     bool                     m_is_cutscene;
     
@@ -413,6 +414,11 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this track has easter eggs. */
     bool hasEasterEggs() const { return m_has_easter_eggs; }
+    bool               isSoccer             () const { return m_is_soccer; }
+    // ------------------------------------------------------------------------
+    void               loadTrackModel  (World* parent, 
+                                        bool reverse_track = false,
+                                        unsigned int mode_id=0);
     // ------------------------------------------------------------------------
     void               addMusic          (MusicInformation* mi)
                                                   {m_music.push_back(mi);     }
@@ -533,7 +539,7 @@ public:
     /** Returns true if the normals of this track can be smoothed. */
     bool smoothNormals() const { return m_smooth_normals; }        
     // ------------------------------------------------------------------------
-    TrackObjectManager* getTrackObjectManager() {return m_track_object_manager;}
+    TrackObjectManager* getTrackObjectManager() const {return m_track_object_manager;}
     
     /** Get list of challenges placed on that world. Works only for overworld. */
     const std::vector<OverworldChallenge>& getChallengeList() const

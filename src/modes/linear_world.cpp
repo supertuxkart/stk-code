@@ -57,6 +57,7 @@ void LinearWorld::init()
     WorldWithRank::init();
     
     assert(!m_track->isArena());
+    assert(!m_track->isSoccer());
     
     m_last_lap_sfx_played           = false;
     m_last_lap_sfx_playing          = false;

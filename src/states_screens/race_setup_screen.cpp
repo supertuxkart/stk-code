@@ -22,18 +22,21 @@
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/arenas_screen.hpp"
+#include "states_screens/soccer_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
 #include "utils/translation.hpp"
 
 #include "states_screens/race_setup_screen.hpp"
 
+#define ENABLE_SOCCER_MODE
 
 const int CONFIG_CODE_NORMAL    = 0;
 const int CONFIG_CODE_TIMETRIAL = 1;
 const int CONFIG_CODE_FTL       = 2;
 const int CONFIG_CODE_3STRIKES  = 3;
 const int CONFIG_CODE_EASTER    = 4;
+const int CONFIG_CODE_SOCCER    = 5;
 
 using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( RaceSetupScreen );
@@ -134,6 +137,17 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             UserConfigParams::m_game_mode = CONFIG_CODE_EASTER;
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
             StateManager::get()->pushScreen( TracksScreen::getInstance() );
+        }
+        else if (selectedMode == IDENT_SOCCER)
+        {
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
+            UserConfigParams::m_game_mode = CONFIG_CODE_SOCCER;
+            race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
+            // 1 player -> no need to choose a team or determine when the match ends
+            if(race_manager->getNumLocalPlayers() <= 1)
+                StateManager::get()->pushScreen( ArenasScreen::getInstance() );
+            else
+                StateManager::get()->pushScreen( SoccerSetupScreen::getInstance() );
         }
         else if (selectedMode == "locked")
         {
@@ -236,6 +250,16 @@ void RaceSetupScreen::init()
         name4 += _("Hit others with weapons until they lose all their lives. (Only in multiplayer games)");
         w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
     }
+    
+#ifdef ENABLE_SOCCER_MODE
+    {
+        irr::core::stringw name5 = irr::core::stringw(
+            RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
+        name5 += _("Push the ball to the opposite cage to score goals. (Only in multiplayer games)");
+        w2->addItem( name5, IDENT_SOCCER, RaceManager::getIconOf(RaceManager::MINOR_MODE_SOCCER));
+    }
+#endif
+    
 #ifdef ENABLE_EASTER_EGG_MODE
     {
         irr::core::stringw name1 = irr::core::stringw(
@@ -247,6 +271,7 @@ void RaceSetupScreen::init()
                    RaceManager::getIconOf(RaceManager::MINOR_MODE_EASTER_EGG));
     }
 #endif
+    
     w2->updateItemDisplay();
     
     // restore saved game mode
@@ -266,6 +291,9 @@ void RaceSetupScreen::init()
             break;
         case CONFIG_CODE_EASTER :
             w2->setSelection(IDENT_EASTER, PLAYER_ID_GAME_MASTER, true);
+            break;
+        case CONFIG_CODE_SOCCER :
+            w2->setSelection(IDENT_SOCCER, PLAYER_ID_GAME_MASTER, true);
             break;
     }
     
