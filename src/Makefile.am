@@ -271,6 +271,8 @@ supertuxkart_SOURCES = \
  modes/overworld.hpp \
  modes/profile_world.cpp \
  modes/profile_world.hpp \
+ modes/soccer_world.cpp \
+ modes/soccer_world.hpp \
  modes/standard_race.cpp \
  modes/standard_race.hpp \
  modes/three_strikes_battle.cpp \
@@ -425,6 +427,8 @@ supertuxkart_SOURCES = \
  states_screens/race_result_gui.hpp \
  states_screens/race_setup_screen.cpp \
  states_screens/race_setup_screen.hpp \
+ states_screens/soccer_setup_screen.cpp \
+ states_screens/soccer_setup_screen.hpp \
  states_screens/state_manager.cpp  \
  states_screens/state_manager.hpp \
  states_screens/story_mode_lobby.cpp \
@@ -457,6 +461,8 @@ supertuxkart_SOURCES = \
  tracks/bezier_curve.hpp \
  tracks/check_cannon.cpp \
  tracks/check_cannon.hpp \
+ tracks/check_goal.cpp \
+ tracks/check_goal.hpp \
  tracks/check_lap.cpp \
  tracks/check_lap.hpp \
  tracks/check_line.cpp \
