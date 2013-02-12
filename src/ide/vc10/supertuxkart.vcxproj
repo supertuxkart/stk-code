@@ -275,6 +275,7 @@
     <ClCompile Include="..\..\modes\easter_egg_hunt.cpp" />
     <ClCompile Include="..\..\modes\game_tutorial.cpp" />
     <ClCompile Include="..\..\modes\overworld.cpp" />
+    <ClCompile Include="..\..\modes\soccer_world.cpp" />
     <ClCompile Include="..\..\modes\tutorial_world.cpp" />
     <ClCompile Include="..\..\physics\btKartRaycast.cpp" />
     <ClCompile Include="..\..\replay\replay_base.cpp" />
@@ -288,6 +289,7 @@
     <ClCompile Include="..\..\states_screens\options_screen_ui.cpp" />
     <ClCompile Include="..\..\states_screens\race_gui_base.cpp" />
     <ClCompile Include="..\..\states_screens\race_gui_overworld.cpp" />
+    <ClCompile Include="..\..\states_screens\soccer_setup_screen.cpp" />
     <ClCompile Include="..\..\states_screens\story_mode_lobby.cpp" />
     <ClCompile Include="..\..\tinygettext\dictionary.cpp" />
     <ClCompile Include="..\..\tinygettext\dictionary_manager.cpp" />
@@ -299,6 +301,7 @@
     <ClCompile Include="..\..\tinygettext\tgt_log.cpp" />
     <ClCompile Include="..\..\tinygettext\tinygettext.cpp" />
     <ClCompile Include="..\..\tracks\check_cannon.cpp" />
+    <ClCompile Include="..\..\tracks\check_goal.cpp" />
     <ClCompile Include="..\..\tracks\lod_node_loader.cpp" />
     <ClCompile Include="..\..\tracks\track_sector.cpp" />
     <ClCompile Include="..\..\utils\constants.cpp" />
@@ -509,6 +512,7 @@
     <ClInclude Include="..\..\modes\easter_egg_hunt.hpp" />
     <ClInclude Include="..\..\modes\game_tutorial.hpp" />
     <ClInclude Include="..\..\modes\overworld.hpp" />
+    <ClInclude Include="..\..\modes\soccer_world.hpp" />
     <ClInclude Include="..\..\modes\tutorial_world.hpp" />
     <ClInclude Include="..\..\network\character_confirm_message.hpp" />
     <ClInclude Include="..\..\network\character_info_message.hpp" />
@@ -540,6 +544,7 @@
     <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp" />
     <ClInclude Include="..\..\states_screens\options_screen_ui.hpp" />
     <ClInclude Include="..\..\states_screens\race_gui_overworld.hpp" />
+    <ClInclude Include="..\..\states_screens\soccer_setup_screen.hpp" />
     <ClInclude Include="..\..\states_screens\story_mode_lobby.hpp" />
     <ClInclude Include="..\..\tinygettext\dictionary.hpp" />
     <ClInclude Include="..\..\tinygettext\dictionary_manager.hpp" />
@@ -553,6 +558,7 @@
     <ClInclude Include="..\..\tinygettext\tgt_log.hpp" />
     <ClInclude Include="..\..\tinygettext\tinygettext.hpp" />
     <ClInclude Include="..\..\tracks\check_cannon.hpp" />
+    <ClInclude Include="..\..\tracks\check_goal.hpp" />
     <ClInclude Include="..\..\tracks\lod_node_loader.hpp" />
     <ClInclude Include="..\..\tracks\track_sector.hpp" />
     <ClInclude Include="..\..\utils\constants.hpp" />

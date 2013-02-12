@@ -858,6 +858,15 @@
     <ClCompile Include="..\..\modes\tutorial_world.cpp">
       <Filter>Source Files\modes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\modes\soccer_world.cpp">
+      <Filter>Source Files\modes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\states_screens\soccer_setup_screen.cpp">
+      <Filter>Source Files\states_screens</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tracks\check_goal.cpp">
+      <Filter>Source Files\tracks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1642,6 +1651,15 @@
     </ClInclude>
     <ClInclude Include="..\..\modes\easter_egg_hunt.hpp">
       <Filter>Header Files\modes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modes\soccer_world.hpp">
+      <Filter>Header Files\modes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\states_screens\soccer_setup_screen.hpp">
+      <Filter>Header Files\states_screens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tracks\check_goal.hpp">
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
