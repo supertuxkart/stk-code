@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     
     <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
@@ -37,8 +38,6 @@
                              I18N="Main menu button"  text="Options" label_location="hover"/>
                 <icon-button id="help" width="64" height="64" icon="gui/main_help.png"  extend_label="50"
                              I18N="Main menu button" text="Help" label_location="hover"/>
-                <icon-button id="startTutorial" width="64" height="64" icon="gui/main_help.png" extend_label="150"
-                             I18N="Main menu button" text="Tutorial" label_location="hover"/>
                 <icon-button id="about" width="64" height="64" icon="gui/main_about.png"  extend_label="50"
                              I18N="Main menu button" text="About" label_location="hover"/>
                 <icon-button id="quit" width="64" height="64" icon="gui/main_quit.png"  extend_label="50"
