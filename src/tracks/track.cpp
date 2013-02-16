@@ -885,6 +885,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             GameSlot* slot = unlock_manager->getCurrentSlot();
             for (unsigned int c=0; c<m_challenges.size(); c++)
             {
+                if (m_challenges[c].m_challenge_id == "tutorial") continue;
                 if (slot->getChallenge(m_challenges[c].m_challenge_id)
                         ->isSolvedAtAnyDifficulty())
                 {
@@ -912,6 +913,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             GameSlot* slot = unlock_manager->getCurrentSlot();
             for (unsigned int c=0; c<m_challenges.size(); c++)
             {
+                if (m_challenges[c].m_challenge_id == "tutorial") continue;
                 if (slot->getChallenge(m_challenges[c].m_challenge_id)
                         ->isSolvedAtAnyDifficulty())
                 {
@@ -1026,42 +1028,50 @@ bool Track::loadMainTrack(const XMLNode &root)
             // for challenge orbs, a bit more work to do
             if (challenge.size() > 0)
             {
-                const ChallengeData* c = unlock_manager->getChallenge(challenge);
-                if (c == NULL)
+                const ChallengeData* c = NULL;
+                
+                if (challenge != "tutorial")
                 {
-                    Log::error("track", "Cannot find challenge named <%s>\n",
-                               challenge.c_str());
-                    scene_node->remove();
-                    continue;
+                    c = unlock_manager->getChallenge(challenge);
+                    if (c == NULL)
+                    {
+                        Log::error("track", "Cannot find challenge named <%s>\n",
+                                   challenge.c_str());
+                        scene_node->remove();
+                        continue;
+                    }
                 }
                 
                 m_challenges.push_back( OverworldChallenge(xyz, challenge) );
                 
-                if (c->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+                if (c != NULL && c->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
                 {
                     
                 }
                 else
                 {
-                    Track* t = track_manager->getTrack(c->getTrackId());
-                    if (t == NULL)
+                    if (challenge != "tutorial")
                     {
-                        Log::error("track", "Cannot find track named <%s>\n", 
-                                   c->getTrackId().c_str());
-                        continue;
+                        Track* t = track_manager->getTrack(c->getTrackId());
+                        if (t == NULL)
+                        {
+                            Log::error("track", "Cannot find track named <%s>\n", 
+                                       c->getTrackId().c_str());
+                            continue;
+                        }
+                        
+                        std::string sshot = t->getScreenshotFile();
+                        video::ITexture* screenshot = irr_driver->getTexture(sshot);
+                        
+                        if (screenshot == NULL)
+                        {
+                            Log::error("track", 
+                                       "Cannot find track screenshot <%s>", 
+                                       sshot.c_str());
+                            continue;
+                        }
+                        scene_node->getMaterial(0).setTexture(0, screenshot);
                     }
-                    
-                    std::string sshot = t->getScreenshotFile();
-                    video::ITexture* screenshot = irr_driver->getTexture(sshot);
-                    
-                    if (screenshot == NULL)
-                    {
-                        Log::error("track", 
-                                   "Cannot find track screenshot <%s>", 
-                                   sshot.c_str());
-                        continue;
-                    }
-                    scene_node->getMaterial(0).setTexture(0, screenshot);
                 }
 
                 // make transparent

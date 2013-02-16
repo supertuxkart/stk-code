@@ -179,12 +179,20 @@ void OverWorld::onFirePressed(Controller* who)
     
     for (unsigned int n=0; n<challenges.size(); n++)
     {
-        if (challenges[n].getForceField().m_is_locked) continue;
+        if (challenges[n].isForceFieldSet() && challenges[n].getForceField().m_is_locked) continue;
         
         if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < CHALLENGE_DISTANCE_SQUARED)
         {
-            race_manager->setKartLastPositionOnOverworld(kart_xyz);
-            new SelectChallengeDialog(0.8f, 0.8f, challenges[n].m_challenge_id);
+            if (challenges[n].m_challenge_id == "tutorial")
+            {
+                scheduleTutorial();
+                return;
+            }
+            else
+            {
+                race_manager->setKartLastPositionOnOverworld(kart_xyz);
+                new SelectChallengeDialog(0.8f, 0.8f, challenges[n].m_challenge_id);
+            }
         } // end if
     } // end for
 }

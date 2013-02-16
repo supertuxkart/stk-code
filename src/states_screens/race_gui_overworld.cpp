@@ -387,6 +387,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     m_current_challenge = NULL;
     for (unsigned int n=0; n<challenges.size(); n++)
     {
+        if (challenges[n].m_challenge_id == "tutorial") continue;
+        
         Vec3 draw_at;
         track->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
         
@@ -423,18 +425,28 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     
     
     // ---- Draw nearby challenge if any
+    core::rect<s32> pos(15,
+                        10, 
+                        15 + UserConfigParams::m_width/2,
+                        10 + GUIEngine::getTitleFontHeight());
+                        
     m_close_to_a_challenge = false;
     for (unsigned int n=0; n<challenges.size(); n++)
     {
-        if (challenges[n].getForceField().m_is_locked) continue;
+        if (challenges[n].m_challenge_id != "tutorial" &&
+            challenges[n].getForceField().m_is_locked) continue;
 
         if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < CHALLENGE_DISTANCE_SQUARED)
         {
             m_close_to_a_challenge = true;
-            core::rect<s32> pos(15,
-                                10, 
-                                15 + UserConfigParams::m_width/2,
-                                10 + GUIEngine::getTitleFontHeight());
+            
+            if (challenges[n].m_challenge_id == "tutorial")
+            {
+                gui::ScalableFont* font = GUIEngine::getTitleFont();
+                font->draw(_("Tutorial"), pos, video::SColor(255,255,255,255),
+                           false, true /* vcenter */, NULL);
+                continue;
+            }
             
             const ChallengeData* challenge = unlock_manager->getChallenge(challenges[n].m_challenge_id);
             

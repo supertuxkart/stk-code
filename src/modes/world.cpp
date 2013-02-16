@@ -32,6 +32,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/hardware_skinning.hpp"
 #include "io/file_manager.hpp"
+#include "input/device_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
@@ -97,6 +98,7 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_schedule_unpause   = false;
     m_schedule_exit_race = false;
     m_self_destruct      = false;
+    m_schedule_tutorial  = false;
     
     m_stop_music_when_dialog_open = true;
     
@@ -632,11 +634,50 @@ void World::updateWorld(float dt)
     {
         race_manager->exitRace();
         race_manager->setAIKartOverride("");
+        
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
         
-        if (race_manager->raceWasStartedFromOverworld())
+        if (m_schedule_tutorial)
         {
-            OverWorld::enterOverWorld();
+            race_manager->setNumLocalPlayers(1);
+            race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
+            race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
+            race_manager->setNumKarts( 1 );
+            race_manager->setTrack( "tutorial" );
+            race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
+            
+            // Use keyboard 0 by default (FIXME: let player choose?)
+            InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+
+            // Create player and associate player with keyboard
+            StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+                                                    device);
+            
+            if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+            {
+                fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', will revert to default\n",
+                        UserConfigParams::m_default_kart.c_str());
+                UserConfigParams::m_default_kart.revertToDefaults();
+            }
+            race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+            
+            // ASSIGN should make sure that only input from assigned devices
+            // is read.
+            input_manager->getDeviceList()->setAssignMode(ASSIGN);
+            input_manager->getDeviceList()
+                ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
+            
+            StateManager::get()->enterGameState();
+            network_manager->setupPlayerKartInfo();
+            race_manager->startNew(false);
+        }
+        else
+        {
+            if (race_manager->raceWasStartedFromOverworld())
+            {
+                OverWorld::enterOverWorld();
+            }
+            
         }
     }
 }   // updateWorld

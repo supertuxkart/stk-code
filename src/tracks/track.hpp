@@ -111,6 +111,7 @@ public:
         return m_force_field;
     }
     
+    bool isForceFieldSet() const { return m_force_field_set; }
     
     const OverworldForceField& getForceField() const
     {

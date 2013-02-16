@@ -449,7 +449,6 @@ void IrrDriver::initDevice()
     // so let's decide ourselves...)
     m_device->getCursorControl()->setVisible(true);
     m_pointer_shown = true;
-    
 }   // initDevice
 
 //-----------------------------------------------------------------------------

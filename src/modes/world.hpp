@@ -138,6 +138,8 @@ protected:
     
     bool m_schedule_exit_race;
     
+    bool m_schedule_tutorial;
+    
     Phase m_scheduled_pause_phase;
     
     /** Set when the world needs to be deleted but you can't do it immediately
@@ -250,6 +252,8 @@ public:
     void            schedulePause(Phase phase);
     void            scheduleUnpause();
     void            scheduleExitRace() { m_schedule_exit_race = true; }
+    void            scheduleTutorial() { m_schedule_exit_race = true;
+                                         m_schedule_tutorial = true; }
     void            updateWorld(float dt);
     void            handleExplosion(const Vec3 &xyz, AbstractKart *kart_hit,
                                     PhysicalObject *object);
