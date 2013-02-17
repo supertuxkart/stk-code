@@ -23,6 +23,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "graphics/material.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -225,17 +226,8 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         }
         else if (name == "bottom")        // Abort
         {
-            cleanupGPProgress();
-            StateManager::get()->popMenu();
-            race_manager->exitRace();
-            race_manager->setAIKartOverride("");
-            StateManager::get()->resetAndGoToScreen(
-                                                MainMenuScreen::getInstance());
-            
-            if (race_manager->raceWasStartedFromOverworld())
-            {
-                OverWorld::enterOverWorld();
-            }
+            new MessageDialog(_("Do you really want to abort the Grand Prix?"),
+                              MessageDialog::MESSAGE_DIALOG_CONFIRM, this, false);
         }
         else if (!getWidget(name.c_str())->isVisible())
         {
@@ -280,6 +272,24 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     }
     return;
 }   // eventCallback
+
+//-----------------------------------------------------------------------------
+
+void RaceResultGUI::onConfirm()
+{
+    GUIEngine::ModalDialog::dismiss();
+    cleanupGPProgress();
+    StateManager::get()->popMenu();
+    race_manager->exitRace();
+    race_manager->setAIKartOverride("");
+    StateManager::get()->resetAndGoToScreen(
+                                        MainMenuScreen::getInstance());
+    
+    if (race_manager->raceWasStartedFromOverworld())
+    {
+        OverWorld::enterOverWorld();
+    }
+}
 
 //-----------------------------------------------------------------------------
 /** This determines the layout, i.e. the size of all columns, font size etc.

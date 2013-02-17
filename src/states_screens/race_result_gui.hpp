@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "guiengine/screen.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 
 namespace irr
@@ -43,7 +44,8 @@ class SFXBase;
   */
 class RaceResultGUI : public RaceGUIBase, 
                       public GUIEngine::Screen,
-                      public GUIEngine::ScreenSingleton<RaceResultGUI>
+                      public GUIEngine::ScreenSingleton<RaceResultGUI>,
+                      public MessageDialog::IConfirmDialogListener
 {
 private:
     /** Timer variable for animations. */
@@ -250,6 +252,7 @@ public:
     void setHighscore(const std::string &kart, 
                       StateManager::ActivePlayer* player, int rank, int time);
     
+    virtual void onConfirm();
 };   // RaceResultGUI
 
 #endif
