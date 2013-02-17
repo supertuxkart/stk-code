@@ -438,6 +438,13 @@ bool ChallengeData::isChallengeFulfilled() const
     }
     // too slow
     if (m_time[d] > 0.0f && kart->getFinishTime() > m_time[d]) return false;
+    
+    if (m_ai_superpower[d] != RaceManager::SUPERPOWER_NONE &&
+        race_manager->getAISuperPower() != m_ai_superpower[d])
+    {
+        return false;
+    }
+    
     return true;
 }   // isChallengeFulfilled
 
