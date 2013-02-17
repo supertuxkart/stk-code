@@ -117,7 +117,7 @@ public:
     void       raceFinished      ();
     void       grandPrixFinished ();
     
-    void       save              (std::ofstream& file);
+    void       save              (std::ofstream& file, const std::string& name);
     void       setCurrentChallenge(const std::string &challenge_id);
     
     /** Returns the number of points accumulated. */

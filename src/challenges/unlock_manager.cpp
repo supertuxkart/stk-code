@@ -275,7 +275,17 @@ void UnlockManager::save()
     std::map<std::string, GameSlot*>::iterator it;
     for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)
     {
-        it->second->save(challenge_file);
+        std::string name = "unknown player";
+        for (int i = 0; i < UserConfigParams::m_all_players.size(); i++)
+        {
+            if (UserConfigParams::m_all_players[i].getUniqueID() == it->second->getPlayerID())
+            {
+                name = core::stringc(UserConfigParams::m_all_players[i].getName().c_str()).c_str();
+                break;
+            }
+        }
+        
+        it->second->save(challenge_file, name);
     }
     
     challenge_file << "</challenges>\n\n";

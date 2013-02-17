@@ -231,12 +231,12 @@ void GameSlot::grandPrixFinished()
 
 //-----------------------------------------------------------------------------
 
-void GameSlot::save(std::ofstream& out)
+void GameSlot::save(std::ofstream& out, const std::string& name)
 {
     out << "    <gameslot playerID=\"" << m_player_unique_id.c_str() 
         << "\" kart=\""                << m_kart_ident.c_str() 
         << "\" firstTime=\""           << (m_first_time ? "true" : "false")
-        << "\">\n";
+        << "\"> <!-- " << name.c_str() << " -->\n";
     std::map<std::string, Challenge*>::const_iterator i;
     for(i = m_challenges_state.begin(); 
         i != m_challenges_state.end();  i++)
