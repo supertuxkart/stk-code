@@ -885,7 +885,11 @@ bool Track::loadMainTrack(const XMLNode &root)
             GameSlot* slot = unlock_manager->getCurrentSlot();
             for (unsigned int c=0; c<m_challenges.size(); c++)
             {
-                if (m_challenges[c].m_challenge_id == "tutorial") continue;
+                if (m_challenges[c].m_challenge_id == "tutorial")
+                {
+                    unlocked_challenges++;
+                    continue;
+                }
                 if (slot->getChallenge(m_challenges[c].m_challenge_id)
                         ->isSolvedAtAnyDifficulty())
                 {
@@ -913,7 +917,11 @@ bool Track::loadMainTrack(const XMLNode &root)
             GameSlot* slot = unlock_manager->getCurrentSlot();
             for (unsigned int c=0; c<m_challenges.size(); c++)
             {
-                if (m_challenges[c].m_challenge_id == "tutorial") continue;
+                if (m_challenges[c].m_challenge_id == "tutorial")
+                {
+                    unlocked_challenges++;
+                    continue;
+                }
                 if (slot->getChallenge(m_challenges[c].m_challenge_id)
                         ->isSolvedAtAnyDifficulty())
                 {
