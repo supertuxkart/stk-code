@@ -169,7 +169,11 @@ KartModel::~KartModel()
         }
     }
 
-    if(m_is_master && m_mesh != NULL)
+    m_mesh->drop();
+
+    // If there is only one copy left, it's the copy in irrlicht's
+    // mesh cache, so it can be remove.
+    if(m_is_master && m_mesh != NULL && m_mesh->getReferenceCount()==1)
     {
         irr_driver->dropAllTextures(m_mesh);
         irr_driver->removeMeshFromCache(m_mesh);
@@ -351,6 +355,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
                full_path.c_str(), kart_properties.getIdent().c_str());
         return false;
     }
+    m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
 
     Vec3 min, max;
