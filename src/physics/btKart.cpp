@@ -251,6 +251,7 @@ btScalar btKart::rayCast(btWheelInfo& wheel)
         param = rayResults.m_distFraction;
         depth = raylen * rayResults.m_distFraction;
         wheel.m_raycastInfo.m_contactNormalWS  = rayResults.m_hitNormalInWorld;
+        wheel.m_raycastInfo.m_contactNormalWS.normalize();
         wheel.m_raycastInfo.m_isInContact = true;
         ///@todo for driving on dynamic/movable objects!;
         wheel.m_raycastInfo.m_groundObject = &getFixedBody();
