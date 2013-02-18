@@ -375,7 +375,7 @@ void Track::loadTrackInfo()
     delete root;
 
     std::string dir = StringUtils::getPath(m_filename);
-    std::string easter_name = dir+"easter_eggs.xml";
+    std::string easter_name = dir+"/easter_eggs.xml";
     m_has_easter_eggs = file_manager->fileExists(easter_name);
 }   // loadTrackInfo
 
@@ -1719,7 +1719,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     if(easter_world)
     {
         std::string dir = StringUtils::getPath(m_filename);
-        easter_world->readData(dir+"easter_eggs.xml");
+        easter_world->readData(dir+"/easter_eggs.xml");
     }
 }   // loadTrackModel
 
