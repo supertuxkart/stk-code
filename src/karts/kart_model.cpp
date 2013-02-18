@@ -169,14 +169,16 @@ KartModel::~KartModel()
         }
     }
 
-    m_mesh->drop();
-
-    // If there is only one copy left, it's the copy in irrlicht's
-    // mesh cache, so it can be remove.
-    if(m_is_master && m_mesh != NULL && m_mesh->getReferenceCount()==1)
+    if(m_is_master)
     {
-        irr_driver->dropAllTextures(m_mesh);
-        irr_driver->removeMeshFromCache(m_mesh);
+        m_mesh->drop();
+        // If there is only one copy left, it's the copy in irrlicht's
+        // mesh cache, so it can be remove.
+        if(m_mesh && m_mesh->getReferenceCount()==1)
+        {
+            irr_driver->dropAllTextures(m_mesh);
+            irr_driver->removeMeshFromCache(m_mesh);
+        }
     }
 
 #ifdef DEBUG
