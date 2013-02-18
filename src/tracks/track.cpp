@@ -541,8 +541,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         if (node == NULL)
         {
             Log::warn("track", 
-                      "This track contains an empty LOD group : '%s'\n",
-                    ((LODNode*)node)->getGroupName().c_str());
+                      "This track contains an empty LOD group.");
             return;
         }
     }
