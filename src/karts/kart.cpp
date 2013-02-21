@@ -1061,6 +1061,15 @@ void Kart::update(float dt)
         // This one keeps the kart pointing "100% as launched" instead,
         // like in ski jump sports, too boring but also works.
         //m_body->setAngularVelocity(btVector3(0,0,0));
+        // When the kart is jumping, linear damping reduces the falling speed
+        // of a kart so much that it can appear to be in slow motion. So 
+        // disable linear damping if a kart is in the air
+        m_body->setDamping(0, m_kart_properties->getChassisAngularDamping());
+    }
+    else
+    {
+        m_body->setDamping(m_kart_properties->getChassisLinearDamping(), 
+                           m_kart_properties->getChassisAngularDamping());
     }
 
     //m_wheel_rotation gives the rotation around the X-axis
