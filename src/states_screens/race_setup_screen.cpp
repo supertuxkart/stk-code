@@ -259,7 +259,8 @@ void RaceSetupScreen::init()
         w2->addItem( name5, IDENT_SOCCER, RaceManager::getIconOf(RaceManager::MINOR_MODE_SOCCER));
     }
 #endif
-    
+
+#define ENABLE_EASTER_EGG_MODE
 #ifdef ENABLE_EASTER_EGG_MODE
     {
         irr::core::stringw name1 = irr::core::stringw(
