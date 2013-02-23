@@ -174,7 +174,6 @@ src/states_screens/dialogs/player_info_dialog.cpp
 src/states_screens/dialogs/press_a_key_dialog.cpp
 src/states_screens/dialogs/race_paused_dialog.cpp
 src/states_screens/dialogs/select_challenge.cpp
-src/states_screens/dialogs/story_mode_new.cpp
 src/states_screens/dialogs/track_info_dialog.cpp
 src/states_screens/dialogs/tutorial_message_dialog.cpp
 src/states_screens/feature_unlocked.cpp
@@ -374,6 +373,7 @@ src/modes/game_tutorial.hpp
 src/modes/linear_world.hpp
 src/modes/overworld.hpp
 src/modes/profile_world.hpp
+src/modes/soccer_world.hpp
 src/modes/standard_race.hpp
 src/modes/three_strikes_battle.hpp
 src/modes/tutorial_world.hpp
@@ -433,7 +433,6 @@ src/states_screens/dialogs/player_info_dialog.hpp
 src/states_screens/dialogs/press_a_key_dialog.hpp
 src/states_screens/dialogs/race_paused_dialog.hpp
 src/states_screens/dialogs/select_challenge.hpp
-src/states_screens/dialogs/story_mode_new.hpp
 src/states_screens/dialogs/track_info_dialog.hpp
 src/states_screens/dialogs/tutorial_message_dialog.hpp
 src/states_screens/feature_unlocked.hpp
@@ -457,6 +456,7 @@ src/states_screens/race_gui.hpp
 src/states_screens/race_gui_overworld.hpp
 src/states_screens/race_result_gui.hpp
 src/states_screens/race_setup_screen.hpp
+src/states_screens/soccer_setup_screen.hpp
 src/states_screens/state_manager.hpp
 src/states_screens/story_mode_lobby.hpp
 src/states_screens/tracks_screen.hpp
@@ -474,6 +474,7 @@ src/tinygettext/tinygettext.hpp
 src/tracks/ambient_light_sphere.hpp
 src/tracks/bezier_curve.hpp
 src/tracks/check_cannon.hpp
+src/tracks/check_goal.hpp
 src/tracks/check_lap.hpp
 src/tracks/check_line.hpp
 src/tracks/check_manager.hpp
