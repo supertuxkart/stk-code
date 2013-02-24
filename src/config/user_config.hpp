@@ -342,10 +342,25 @@ namespace UserConfigParams
             &m_wiimote_group,
             "At what angle (0-128) maximum steering is reached.") );
 
-	PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight
-            PARAM_DEFAULT( FloatUserConfigParam(0.5f, "wiimote-weight",
+	PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_linear
+            PARAM_DEFAULT( FloatUserConfigParam(0.5f, "wiimote-weight-linear",
             &m_wiimote_group,
-			"A weight applied to map the wiimote angle to steering angle: 0=fully linear, 1-fully quadratic") );
+			"A weight applied to the linear component of mapping wiimote angle to steering angle"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_square
+            PARAM_DEFAULT( FloatUserConfigParam(0.5f, "wiimote-weight-square",
+            &m_wiimote_group,
+			"A weight applied to the square component of mapping wiimote angle to steering angle"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_asin
+            PARAM_DEFAULT( FloatUserConfigParam(0.0f, "wiimote-weight-asin",
+            &m_wiimote_group,
+			"A weight applied to the asin component of mapping wiimote angle to steering angle"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_sin
+            PARAM_DEFAULT( FloatUserConfigParam(0.0f, "wiimote-weight-sin",
+            &m_wiimote_group,
+			"A weight applied to the sin component of mapping wiimote angle to steering angle"));
 
 	// ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order

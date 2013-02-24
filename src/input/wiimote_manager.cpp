@@ -178,14 +178,21 @@ void Wiimote::updateIrrEvent()
         normalized_angle = -1.0f;
     else if(normalized_angle>1.0f)
         normalized_angle = 1.0f;
+
 	// Shape the curve that determines steering depending on wiimote angle. 
-	// Linear might be too sensitive around 0, while quadratic is not sensitive
-	// enough - blend between those curves using weight w
-	float w = UserConfigParams::m_wiimote_weight;
-    const float normalized_angle_2 =    w  * normalized_angle * normalized_angle
-		                           + (1-w) * fabsf(normalized_angle);
+	// The wiimote value is already normalized to be in [-1,1]. Now use a
+    // weighted linear combination to compute the steering value used in game.
+    float w1 = UserConfigParams::m_wiimote_weight_linear;
+    float w2 = UserConfigParams::m_wiimote_weight_square;
+    float wa = UserConfigParams::m_wiimote_weight_asin;
+    float ws = UserConfigParams::m_wiimote_weight_sin;
+
     const float sign = normalized_angle >= 0.0f ? 1.0f : -1.0f;
-    const float angle = sign * normalized_angle_2 * JOYSTICK_ABS_MAX_ANGLE;
+    const float normalized_angle_2 = w1 * normalized_angle
+                                   + w2 * sign*normalized_angle * normalized_angle
+		                           + wa * asin(normalized_angle)*(2.0f/M_PI)
+                                   + ws * sin(normalized_angle*(M_PI/2.0f));
+    const float angle = normalized_angle_2 * JOYSTICK_ABS_MAX_ANGLE;
     m_irr_event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_X] =
             (irr::s16)(irr::core::clamp(angle, -JOYSTICK_ABS_MAX_ANGLE, +JOYSTICK_ABS_MAX_ANGLE));
     
