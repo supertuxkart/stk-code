@@ -1600,7 +1600,13 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
                              ==KartProperties::IMPULSE_NORMAL &&
         m_vehicle->getCentralImpulseTime()<=0                     )
     {
-        Vec3 impulse = normal;
+        // Restrict impule to plane defined by gravity (i.e. X/Z plane).
+        // This avoids the problem that karts can be pushed up, e.g. above
+        // a fence.
+        btVector3 gravity = m_body->getGravity();
+        gravity.normalize();
+        // Cast necessary since otherwise to operator- (vec3/btvector) exists
+        Vec3 impulse =  (btVector3)normal - gravity* btDot(normal, gravity);
         if(impulse.getX() || impulse.getZ())
             impulse.normalize();
         else
