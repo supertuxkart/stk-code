@@ -183,7 +183,7 @@ KartModel::~KartModel()
 
 #ifdef DEBUG
 #if SKELETON_DEBUG
-    irr_driver->debug_meshes.clear();
+    irr_driver->clearDebugMeshes();
 #endif
 #endif
     
@@ -297,7 +297,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         std::string debug_name = m_model_filename+" (animated-kart-model)";
         node->setName(debug_name.c_str());
 #if SKELETON_DEBUG
-        irr_driver->debug_meshes.push_back(m_animated_node);
+        irr_driber->addDebugMesh(m_animated_node);
 #endif
 #endif        
         m_animated_node->setLoopMode(false);

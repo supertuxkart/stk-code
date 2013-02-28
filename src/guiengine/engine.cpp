@@ -804,6 +804,26 @@ namespace GUIEngine
     }   // clear
 
     // ------------------------------------------------------------------------
+    /** Updates all widgets that need to be updated.
+     *  \param dt Time step size.
+     */
+    void update(float dt)
+    {
+        // Just to mark the begin/end scene block
+        GUIEngine::GameState state = StateManager::get()->getGameState();
+        if (state != GUIEngine::GAME)
+        {
+            // This code needs to go outside beginScene() / endScene() since
+            // the model view widget will do off-screen rendering there
+            GUIEngine::Widget* widget;
+            for_in (widget, GUIEngine::needsUpdate)
+            {
+                widget->update(dt);
+            }
+        }
+        
+    }
+    // ------------------------------------------------------------------------
     
     void cleanForGame()
     {

@@ -1353,14 +1353,66 @@ void IrrDriver::displayFPS()
     font->draw( fpsString.c_str(), core::rect< s32 >(100,0,400,50), fpsColor, false );
 }   // updateFPS
 
+// ----------------------------------------------------------------------------
 #ifdef DEBUG
-
-void drawJoint(bool drawline, bool drawname, 
-               irr::scene::ISkinnedMesh::SJoint* joint,
-               ISkinnedMesh* mesh, int id)
+void IrrDriver::drawDebugMeshes()
 {
-    //if (joint->PositionKeys.size() == 0) return;
+    for (unsigned int n=0; n<m_debug_meshes.size(); n++)
+    {
+        IMesh* mesh = m_debug_meshes[n]->getMesh();
+        ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
+        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = 
+            smesh->getAllJoints();
+
+        for (unsigned int j=0; j<joints.size(); j++)
+        {
+            drawJoint( false, true, joints[j], smesh, j);
+        }
+    }
     
+    video::SColor color(255,255,255,255);
+    video::SMaterial material;
+    material.Thickness = 2;
+    material.AmbientColor = color;
+    material.DiffuseColor = color;
+    material.EmissiveColor= color;
+    material.BackfaceCulling = false;
+    material.setFlag(video::EMF_LIGHTING, false);
+    getVideoDriver()->setMaterial(material);
+    getVideoDriver()->setTransform(video::ETS_WORLD, core::IdentityMatrix);
+
+    for (unsigned int n=0; n<m_debug_meshes.size(); n++)
+    {
+        IMesh* mesh = m_debug_meshes[n]->getMesh();
+        
+        
+        ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
+        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = 
+            smesh->getAllJoints();
+
+        for (unsigned int j=0; j<joints.size(); j++)
+        {
+            IMesh* mesh = m_debug_meshes[n]->getMesh();
+            ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
+            
+            drawJoint(true, false, joints[j], smesh, j);
+        }
+    }
+}   // drawDebugMeshes
+
+// ----------------------------------------------------------------------------
+/** Draws a joing for debugging skeletons.
+ *  \param drawline If true draw a line to the parent.
+ *  \param drawname If true draw the name of the joint.
+ *  \param joint The joint to draw.
+ *  \param mesh The mesh whose skeleton is drawn (only used to get
+ *         all joints to find the parent).
+ *  \param id Index, which (%4) determines the color to use.
+ */
+void IrrDriver::drawJoint(bool drawline, bool drawname, 
+                          irr::scene::ISkinnedMesh::SJoint* joint,
+                          ISkinnedMesh* mesh, int id)
+{    
     irr::scene::ISkinnedMesh::SJoint* parent = NULL;
     const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints 
         = mesh->getAllJoints();
@@ -1490,6 +1542,14 @@ void drawJoint(bool drawline, bool drawname,
  */
 void IrrDriver::update(float dt)
 {
+    // User aborted (e.g. closed window)
+    // =================================
+    if (!m_device->run())
+    {
+        main_loop->abort();
+        return;
+    }
+
     // If the resolution should be switched, do it now. This will delete the 
     // old device and create a new one. 
     if (m_resolution_changing!=RES_CHANGE_NONE)
@@ -1499,19 +1559,19 @@ void IrrDriver::update(float dt)
         new ConfirmResolutionDialog();
         m_resolution_changing = RES_CHANGE_NONE;
     }
-    
-    if (!m_device->run())
-    {
-        main_loop->abort();
-    }
-    if (UserConfigParams::m_gamepad_debug)
-    {
-        // Print a dividing line so that it's easier to see which events
-        // get received in which order in the one frame.
-        Log::debug("irr_driver", "-------------------------------------\n");
-    }
-    
+        
     World *world = World::getWorld();
+
+    // Handle cut scenes (which do not have any karts in it)
+    // =====================================================
+    if (world && world->getNumKarts() == 0)
+    {
+        m_video_driver->beginScene(/*backBuffer clear*/false, /*zBuffer*/true,
+                                   world->getClearColor());
+        m_scene_manager->drawAll();
+        m_video_driver->endScene();
+        return;
+    }
     
     const bool inRace = world!=NULL;
     
@@ -1525,34 +1585,14 @@ void IrrDriver::update(float dt)
         // Start the RTT for post-processing.
         // We do this before beginScene() because we want to capture the glClear()
         // because of tracks that do not have skyboxes (generally add-on tracks)
-        m_post_processing.beginCapture();
-        
-        m_video_driver->beginScene(back_buffer_clear,
-                                               true, world->getClearColor());
+        m_post_processing.beginCapture();        
     }
-    else
+
+    m_video_driver->beginScene(back_buffer_clear, /*zBuffer*/ true, 
+                               world ? world->getClearColor() 
+                                     : video::SColor(255,100,101,140));
+
     {
-        m_video_driver->beginScene(back_buffer_clear,
-                                   true, video::SColor(255,100,101,140));
-    }
-    
-    {
-        PROFILER_PUSH_CPU_MARKER("Update GUI widgets", 0x7F, 0x7F, 0x00);
-        
-        // Just to mark the begin/end scene block
-        GUIEngine::GameState state = StateManager::get()->getGameState();
-        if (state != GUIEngine::GAME)
-        {
-            // This code needs to go outside beginScene() / endScene() since
-            // the model view widget will do off-screen rendering there
-            GUIEngine::Widget* widget;
-            for_in (widget, GUIEngine::needsUpdate)
-            {
-                widget->update(dt);
-            }
-        }
-        
-        PROFILER_POP_CPU_MARKER();
 
         if (inRace)
         {
@@ -1561,11 +1601,6 @@ void IrrDriver::update(float dt)
             RaceGUIBase *rg = world->getRaceGUI();
             if (rg) rg->update(dt);
             
-            // No kart, this must be a cutscene
-            if (world->getNumKarts() == 0)
-            {
-                m_scene_manager->drawAll();
-            }
             
             for(unsigned int i=0; i<world->getNumKarts(); i++)
             {
@@ -1648,48 +1683,8 @@ void IrrDriver::update(float dt)
     }   // just to mark the begin/end scene block
     
 #ifdef DEBUG
-    for (unsigned int n=0; n<debug_meshes.size(); n++)
-    {
-        IMesh* mesh = debug_meshes[n]->getMesh();
-        ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
-        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = 
-            smesh->getAllJoints();
+    drawDebugMeshes();
 
-        for (unsigned int j=0; j<joints.size(); j++)
-        {
-            //drawJoint(debug_meshes[n]->getFrameNr(), joints[j]);
-            drawJoint( false, true, joints[j], smesh, j);
-        }
-    }
-    
-    video::SColor color(255,255,255,255);
-    video::SMaterial material;
-    material.Thickness = 2;
-    material.AmbientColor = color;
-    material.DiffuseColor = color;
-    material.EmissiveColor= color;
-    material.BackfaceCulling = false;
-    material.setFlag(video::EMF_LIGHTING, false);
-    getVideoDriver()->setMaterial(material);
-    getVideoDriver()->setTransform(video::ETS_WORLD, core::IdentityMatrix);
-
-    for (unsigned int n=0; n<debug_meshes.size(); n++)
-    {
-        IMesh* mesh = debug_meshes[n]->getMesh();
-        
-        
-        ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
-        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = 
-            smesh->getAllJoints();
-
-        for (unsigned int j=0; j<joints.size(); j++)
-        {
-            IMesh* mesh = debug_meshes[n]->getMesh();
-            ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
-            
-            drawJoint(true, false, joints[j], smesh, j);
-        }
-    }
 #endif
     
     m_video_driver->endScene();

@@ -306,6 +306,13 @@ void PlayerController::skidBonusTriggered()
  */
 void PlayerController::update(float dt)
 {
+    if (UserConfigParams::m_gamepad_debug)
+    {
+        // Print a dividing line so that it's easier to see which events
+        // get received in which order in the one frame.
+        Log::debug("irr_driver", "-------------------------------------\n");
+    }
+
     // Don't do steering if it's replay. In position only replay it doesn't 
     // matter, but if it's physics replay the gradual steering causes 
     // incorrect results, since the stored values are already adjusted.

@@ -155,7 +155,10 @@ void MainLoop::run()
             #ifdef ENABLE_WIIUSE
                 wiimote_manager->update();
             #endif
-            
+            PROFILER_PUSH_CPU_MARKER("Update GUI widgets", 0x7F, 0x7F, 0x00);
+            GUIEngine::update(dt);
+            PROFILER_POP_CPU_MARKER();
+
             PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
             irr_driver->update(dt);
             PROFILER_POP_CPU_MARKER();

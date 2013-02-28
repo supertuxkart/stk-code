@@ -34,7 +34,8 @@
 #include <vector2d.h>
 #include <dimension2d.h>
 #include <SColor.h>
-#include <IrrlichtDevice.h>
+#include "IrrlichtDevice.h"
+#include "ISkinnedMesh.h"
 namespace irr
 {
     namespace scene { class ISceneManager; class IMesh; class IAnimatedMeshSceneNode; class IAnimatedMesh;
@@ -108,6 +109,17 @@ private:
     void                 createListOfVideoModes();
 
     bool                 m_request_screenshot;
+    
+#ifdef DEBUG
+    /** Used to visualise skeletons. */
+    std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
+
+    void drawDebugMeshes();
+    void drawJoint(bool drawline, bool drawname, 
+                   irr::scene::ISkinnedMesh::SJoint* joint,
+                   irr::scene::ISkinnedMesh* mesh, int id);
+
+#endif
     
 public:
                           IrrDriver();
@@ -218,7 +230,17 @@ public:
     bool supportsSplatting();
     
     void requestScreenshot();
-    
+#ifdef DEBUG
+    /** Removes debug meshes. */
+    void clearDebugMesh() { m_debug_meshes.clear(); }
+    // ------------------------------------------------------------------------
+    /** Adds a debug mesh to be displaed. */
+    void addDebugMesh(scene::IAnimatedMeshSceneNode *node) 
+    { 
+        m_debug_meshes.push_back(node); 
+    }   // addDebugMesh
+
+#endif
     // --------------------- RTT --------------------
     /**
       * Class that provides RTT (currently, only when no other 3D rendering 
@@ -284,10 +306,6 @@ public:
         void tearDownRTTScene();
         
     };
-    
-#ifdef DEBUG
-    std::vector<irr::scene::IAnimatedMeshSceneNode*> debug_meshes;
-#endif
     
 
 };   // IrrDriver

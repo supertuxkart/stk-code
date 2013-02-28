@@ -199,6 +199,8 @@ namespace GUIEngine
       * \note Do not use directly. Use a state manager instead to get higher-level functionnality.
       */
     void clear();
+
+    void update(float dt);
     
     /** \brief like GUIEngine::clear, but to be called before going into game */
     void cleanForGame();

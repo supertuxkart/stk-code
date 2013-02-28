@@ -1640,7 +1640,6 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
     else if(m_sky_type==SKY_COLOR)
     {
-        World::getWorld()->setClearBackBuffer(true);
         World::getWorld()->setClearbackBufferColor(m_sky_color);
     }
 

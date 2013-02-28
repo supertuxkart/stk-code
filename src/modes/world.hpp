@@ -299,12 +299,12 @@ public:
     /** Returns the color to clear the back buffer. */
     const irr::video::SColor& getClearColor() const { return m_clear_color; }
     // ------------------------------------------------------------------------
-    /** Forces clearing of the back buffer. */
-    void setClearBackBuffer(bool enabled) { m_clear_back_buffer = enabled; }
-    // ------------------------------------------------------------------------
     /** Sets the color to use when clearing the back buffer. */
     void setClearbackBufferColor(irr::video::SColor color) 
-                                          { m_clear_color = color; }
+    { 
+        m_clear_color       = color; 
+        m_clear_back_buffer = true; 
+    }
     // ------------------------------------------------------------------------
     /** Override if you want to know when a kart presses fire */
     virtual void onFirePressed(Controller* who) {}
