@@ -153,7 +153,7 @@ bool Swatter::updateAndTestFinished(float dt)
 
             // Is the target too near?
             float dist_to_target2 = 
-                (m_target->getXYZ()- m_scene_node->getAbsolutePosition())
+                (m_target->getXYZ()- Vec3(m_scene_node->getAbsolutePosition()))
                 .length2();
             float min_dist2 
                  = m_kart->getKartProperties()->getSwatterDistance2();
@@ -248,7 +248,7 @@ void Swatter::pointToTarget()
     else
     {
         Vec3 swatter_to_target = m_target->getXYZ() 
-                               -m_scene_node->getAbsolutePosition();
+                               -Vec3(m_scene_node->getAbsolutePosition());
         float dy = -swatter_to_target.getZ();
         float dx = swatter_to_target.getX();
         float angle = SWAT_ANGLE_OFFSET + (atan2(dy, dx)-m_kart->getHeading())
