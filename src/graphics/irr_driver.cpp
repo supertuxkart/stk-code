@@ -1537,6 +1537,70 @@ void IrrDriver::drawJoint(bool drawline, bool drawname,
 #endif
 
 // ----------------------------------------------------------------------------
+/** Requess a screenshot from irrlicht, and save it in a file.
+ */
+void IrrDriver::doScreenShot()
+{
+    m_request_screenshot = false;
+
+    video::IImage* image = m_video_driver->createScreenShot();
+    if(!image)
+    {
+        Log::error("IrrDriver", "Could not create screen shot.");
+        return;
+    }
+
+    // Screenshot was successful.
+    time_t rawtime;
+    time ( &rawtime );
+    tm* timeInfo = localtime( &rawtime );
+    char timeBuffer[256];
+    sprintf(timeBuffer, "%i.%02i.%02i %02i.%02i.%02i",
+            timeInfo->tm_year + 1900, timeInfo->tm_mon, 
+            timeInfo->tm_mday, timeInfo->tm_hour, 
+            timeInfo->tm_min, timeInfo->tm_sec);
+
+    std::string trackName = race_manager->getTrackName();
+    if (World::getWorld() == NULL) trackName = "menu";
+
+#if defined(WIN32)
+    std::string path = 
+        StringUtils::insertValues("C:\\Temp\\supertuxkart %s %s.png",
+                                  trackName, timeBuffer);
+#else
+    std::string path = 
+        StringUtils::insertValues("/tmp/supertuxkart %s %s.png",
+                                  trackName, timeBuffer);
+#endif
+
+    if (irr_driver->getVideoDriver()->writeImageToFile(image, path.c_str(), 0))
+    {
+        RaceGUIBase* base = World::getWorld() 
+                          ? World::getWorld()->getRaceGUI()
+                          : NULL;
+        if (base)
+        {
+            base->addMessage(
+                      core::stringw(("Screenshot saved to\n" + path).c_str()),
+                      NULL, 2.0f, video::SColor(255,255,255,255), true, false);
+        }   // if base
+    }
+    else
+    {
+        RaceGUIBase* base = World::getWorld()->getRaceGUI();
+        if (base)
+        {
+            base->addMessage(
+                core::stringw(("FAILED saving screenshot to\n" + path + 
+                              "\n:(").c_str()),
+                NULL, 2.0f, video::SColor(255,255,255,255), 
+                true, false);
+        }   // if base
+    }   // if failed writing screenshot file
+    image->drop();
+}   // doScreenShot
+
+// ----------------------------------------------------------------------------
 /** Update, called once per frame.
  *  \param dt Time since last update
  */
@@ -1592,158 +1656,82 @@ void IrrDriver::update(float dt)
                                world ? world->getClearColor() 
                                      : video::SColor(255,100,101,140));
 
+    if (inRace)
     {
+        irr_driver->getVideoDriver()->enableMaterial2D();
 
-        if (inRace)
+        RaceGUIBase *rg = world->getRaceGUI();
+        if (rg) rg->update(dt);
+
+
+        for(unsigned int i=0; i<world->getNumKarts(); i++)
         {
-            irr_driver->getVideoDriver()->enableMaterial2D();
-
-            RaceGUIBase *rg = world->getRaceGUI();
-            if (rg) rg->update(dt);
-            
-            
-            for(unsigned int i=0; i<world->getNumKarts(); i++)
-            {
-                AbstractKart *kart=world->getKart(i);
-                if(kart->getCamera()) 
-                {
-                    #ifdef ENABLE_PROFILER
-                    {
-                        std::ostringstream oss;
-                        oss << "drawAll() for kart " << i << std::flush;
-                        PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (i+1)*60,
-                                                 0x00, 0x00);
-                    }
-                    #endif
-                            
-                    kart->getCamera()->activate();
-                    rg->preRenderCallback(*kart);
-                    m_scene_manager->drawAll();
-                    
-                    PROFILER_POP_CPU_MARKER();
-                    
-                    // Note that drawAll must be called before rendering
-                    // the bullet debug view, since otherwise the camera
-                    // is not set up properly. This is only used for 
-                    // the bullet debug view.
-                    if (UserConfigParams::m_artist_debug_mode)
-                        World::getWorld()->getPhysics()->draw();
-                }   // if kart->Camera
-            }   // for i<world->getNumKarts()
-            
-            // Stop capturing for the post-processing
-            m_post_processing.endCapture();
-            
-            // Render the post-processed scene
-            m_post_processing.render();
-            
-            // To draw the race gui we set the viewport back to the full
-            // screen. 
-            m_video_driver->setViewPort(core::recti(0, 0,
-                UserConfigParams::m_width,
-                UserConfigParams::m_height));
-
-            for(unsigned int i=0; i<world->getNumKarts(); i++)
-            {
-                AbstractKart *kart = world->getKart(i);
-                if(kart->getCamera())
-                {
-                    {
-                        char marker_name[100];
-                        sprintf(marker_name, "renderPlayerView() for kart %d", i);
-                        PROFILER_PUSH_CPU_MARKER(marker_name, 0x00, 0x00, (i+1)*60);
-                    }
-                    
-                    rg->renderPlayerView(kart, dt);
-                    
-                    PROFILER_POP_CPU_MARKER();
-                }
-            }  // for i<getNumKarts
-        }
-        else
-        {
-            // render 3D stuff in cutscenes too
+            // We can't loop over player karts, since in profile/demo
+            // mode a non-player kart will have a camera
+            AbstractKart *kart=world->getKart(i);
+            if(!kart->getCamera()) continue;
+#ifdef ENABLE_PROFILER
+            std::ostringstream oss;
+            oss << "drawAll() for kart " << i << std::flush;
+            PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (i+1)*60,
+                                     0x00, 0x00);
+#endif
+            kart->getCamera()->activate();
+            rg->preRenderCallback(*kart);   // adjusts start referee
             m_scene_manager->drawAll();
-        }
-        
-        // The render and displayFPS calls interfere with bullet debug
-        // rendering, so they can not be called.
-        //FIXME   if(!inRace || !UserConfigParams::m_bullet_debug)
-        {
-            // Either render the gui, or the global elements of the race gui.
-            GUIEngine::render(dt);
-        }
-        
-        // Render the profiler
-        if(UserConfigParams::m_profiler_enabled)
-        {
-            PROFILER_DRAW();
-        }
 
-    }   // just to mark the begin/end scene block
+            PROFILER_POP_CPU_MARKER();
+
+            // Note that drawAll must be called before rendering
+            // the bullet debug view, since otherwise the camera
+            // is not set up properly. This is only used for 
+            // the bullet debug view.
+            if (UserConfigParams::m_artist_debug_mode)
+                World::getWorld()->getPhysics()->draw();
+        }   // for i<world->getNumKarts()
+
+        // Stop capturing for the post-processing
+        m_post_processing.endCapture();
+
+        // Render the post-processed scene
+        m_post_processing.render();
+
+        // Set the viewport back to the full screen for race gui
+        m_video_driver->setViewPort(core::recti(0, 0,
+                                                UserConfigParams::m_width,
+                                                UserConfigParams::m_height));
+
+        for(unsigned int i=0; i<world->getNumKarts(); i++)
+        {
+            AbstractKart *kart = world->getKart(i);
+            if(!kart->getCamera()) continue;
+            char marker_name[100];
+            sprintf(marker_name, "renderPlayerView() for kart %d", i);
+
+            PROFILER_PUSH_CPU_MARKER(marker_name, 0x00, 0x00, (i+1)*60);
+            rg->renderPlayerView(kart, dt);
+
+            PROFILER_POP_CPU_MARKER();
+        }  // for i<getNumKarts
+    }
+
+    // Either render the gui, or the global elements of the race gui.
+    GUIEngine::render(dt);
+
+    // Render the profiler
+    if(UserConfigParams::m_profiler_enabled)
+    {
+        PROFILER_DRAW();
+    }
+
     
 #ifdef DEBUG
     drawDebugMeshes();
-
 #endif
     
     m_video_driver->endScene();
-    
-    
-    if (m_request_screenshot)
-    {
-        m_request_screenshot = false;
         
-        video::IImage* image = m_video_driver->createScreenShot();
-        if (image)
-        {
-            time_t rawtime;
-            time ( &rawtime );
-            tm* timeInfo = localtime( &rawtime );
-            char timeBuffer[256];
-            sprintf(timeBuffer, "%i.%02i.%02i %02i.%02i.%02i",
-                    timeInfo->tm_year + 1900, timeInfo->tm_mon, timeInfo->tm_mday,
-                    timeInfo->tm_hour, timeInfo->tm_min, timeInfo->tm_sec);
-            
-            std::string trackName = race_manager->getTrackName();
-            if (World::getWorld() == NULL) trackName = "menu";
-            
-            #if defined(WIN32)
-            std::string path = 
-                StringUtils::insertValues("C:\\Temp\\supertuxkart %s %s.png",
-                                          trackName, timeBuffer);
-            #else
-            std::string path = StringUtils::insertValues("/tmp/supertuxkart %s %s.png",
-                                                         trackName, timeBuffer);
-            #endif
-            
-            if (irr_driver->getVideoDriver()
-                          ->writeImageToFile(image, io::path(path.c_str()), 0))
-            {
-                RaceGUIBase* base = !World::getWorld() ? NULL : 
-                                                       World::getWorld()->getRaceGUI();
-                if (base != NULL)
-                {
-                    base->addMessage(core::stringw(("Screenshot saved to\n" + 
-                                                     path).c_str()), NULL,
-                                     2.0f, video::SColor(255,255,255,255), true, false);
-                }
-            }
-            else
-            {
-                RaceGUIBase* base = World::getWorld()->getRaceGUI();
-                if (base != NULL)
-                {
-                    base->addMessage(
-                        core::stringw(("FAILED saving screenshot to\n" + path + 
-                                       "\n:(").c_str()),
-                                     NULL, 2.0f, video::SColor(255,255,255,255), 
-                                     true, false);
-                }
-            }
-            image->drop();
-        }
-    }
+    if (m_request_screenshot) doScreenShot();
     
     getPostProcessing()->update(dt);
     

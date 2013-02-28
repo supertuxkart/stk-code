@@ -118,9 +118,9 @@ private:
     void drawJoint(bool drawline, bool drawname, 
                    irr::scene::ISkinnedMesh::SJoint* joint,
                    irr::scene::ISkinnedMesh* mesh, int id);
-
 #endif
     
+    void doScreenShot();
 public:
                           IrrDriver();
                          ~IrrDriver();
