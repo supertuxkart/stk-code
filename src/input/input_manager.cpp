@@ -159,8 +159,11 @@ void InputManager::handleStaticAction(int key, int value)
             kart->flyDown();
             break;
         }
+        case KEY_SNAPSHOT:
         case KEY_PRINT:
-            if (value != 0)
+            // on windows we don't get a press event, only release.  So
+            // save on release only (to avoid saving twice on other platforms)
+            if (value ==0 )  
                 irr_driver->requestScreenshot();
             break;
             
