@@ -912,16 +912,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             IGPUProgrammingServices* gpu = 
             irr_driver->getVideoDriver()->getGPUProgrammingServices();
             s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                                                                         (file_manager->getDataDir() + 
-                                                                          "shaders/spheremap.vert").c_str(), 
-                                                                         "main",
-                                                                         video::EVST_VS_2_0,
-                                                                         (file_manager->getDataDir() + 
-                                                                          "shaders/spheremap.frag").c_str(), 
-                                                                         "main",
-                                                                         video::EPST_PS_2_0,
-                                                                         m_shaders[SPHERE_MAP],
-                                                                         video::EMT_SOLID_2_LAYER );
+                     (file_manager->getShaderDir() + "spheremap.vert").c_str(),
+                     "main", video::EVST_VS_2_0,
+                     (file_manager->getShaderDir() + "spheremap.frag").c_str(),
+                     "main", video::EPST_PS_2_0,
+                     m_shaders[SPHERE_MAP], video::EMT_SOLID_2_LAYER );
             m->MaterialType = (E_MATERIAL_TYPE)material_type;
         }
         else
@@ -1020,21 +1015,20 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 }
             }
             
-            const char* vertex_shader = "shaders/normalmap.vert";
-            const char* pixel_shader  = "shaders/normalmap.frag";
+            const char* vertex_shader = "normalmap.vert";
+            const char* pixel_shader  = "normalmap.frag";
 
             // Material and shaders
             IGPUProgrammingServices* gpu = 
                 video_driver->getGPUProgrammingServices();
             s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                                   (file_manager->getDataDir() + vertex_shader).c_str(),
-                                   "main",
-                                   video::EVST_VS_2_0,
-                                   (file_manager->getDataDir() + pixel_shader).c_str(), 
-                                   "main",
-                                   video::EPST_PS_2_0,
-                                   m_shaders[with_lightmap ? NORMAL_MAP_WITH_LIGHTMAP : NORMAL_MAP],
-                                   video::EMT_SOLID_2_LAYER );
+                        (file_manager->getShaderDir() + vertex_shader).c_str(),
+                        "main", video::EVST_VS_2_0,
+                        (file_manager->getShaderDir() + pixel_shader).c_str(), 
+                        "main", video::EPST_PS_2_0,
+                        m_shaders[with_lightmap ? NORMAL_MAP_WITH_LIGHTMAP 
+                                                : NORMAL_MAP],
+                        video::EMT_SOLID_2_LAYER );
             m->MaterialType = (E_MATERIAL_TYPE)material_type;
             m->Lighting = false;
             m->ZWriteEnable = true;
@@ -1092,16 +1086,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         IGPUProgrammingServices* gpu = 
             irr_driver->getVideoDriver()->getGPUProgrammingServices();
         s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                                                                     (file_manager->getDataDir() + 
-                                                                      "shaders/splatting.vert").c_str(), 
-                                                                     "main",
-                                                                     video::EVST_VS_2_0,
-                                                                     (file_manager->getDataDir() + 
-                                                                      "shaders/splatting.frag").c_str(), 
-                                                                     "main",
-                                                                     video::EPST_PS_2_0,
-                                                                     m_shaders[SPLATTING],
-                                                                     video::EMT_SOLID_2_LAYER );
+                    (file_manager->getShaderDir() + "splatting.vert").c_str(),
+                    "main",video::EVST_VS_2_0,
+                    (file_manager->getShaderDir() + "splatting.frag").c_str(), 
+                    "main",video::EPST_PS_2_0,
+                    m_shaders[SPLATTING], video::EMT_SOLID_2_LAYER );
         m->MaterialType = (E_MATERIAL_TYPE)material_type;
     }
     
@@ -1120,17 +1109,13 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             // Material and shaders
             IGPUProgrammingServices* gpu = video_driver->getGPUProgrammingServices();
             s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                                         (file_manager->getDataDir() + "shaders/bubble.vert").c_str(),
-                                         "main",
-                                         video::EVST_VS_2_0,
-                                         (file_manager->getDataDir() + "shaders/bubble.frag").c_str(), 
-                                         "main",
-                                         video::EPST_PS_2_0,
-                                         m_bubble_provider[mb],
-                                         (m_alpha_blending ?
-                                              video::EMT_TRANSPARENT_ALPHA_CHANNEL :
-                                              video::EMT_SOLID)
-                                     );
+                       (file_manager->getShaderDir() + "bubble.vert").c_str(),
+                       "main", video::EVST_VS_2_0,
+                       (file_manager->getShaderDir() + "bubble.frag").c_str(),
+                       "main", video::EPST_PS_2_0,
+                       m_bubble_provider[mb],
+                       (m_alpha_blending ? video::EMT_TRANSPARENT_ALPHA_CHANNEL 
+                                         : video::EMT_SOLID)                 );
             m->MaterialType = (E_MATERIAL_TYPE)material_type;
             
             // alpha blending and bubble shading can work together so when both are enabled
@@ -1160,8 +1145,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(2, irr_driver->getTexture(file_manager->getTextureFile("waternormals2.jpg")));
                           
             bool fog = World::getWorld()->getTrack()->isFogEnabled();
-            const char* vertex_shader = (fog ? "shaders/water_fog.vert" : "shaders/water.vert");
-            const char* pixel_shader  = (fog ? "shaders/water_fog.frag" : "shaders/water.frag");
+            const char* vertex_shader = (fog ? "water_fog.vert" : "water.vert");
+            const char* pixel_shader  = (fog ? "water_fog.frag" : "water.frag");
             
             ((WaterShaderProvider*)m_shaders[WATER_SHADER])->enableFog(fog);
             
@@ -1169,14 +1154,12 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             IGPUProgrammingServices* gpu = 
                 irr_driver->getVideoDriver()->getGPUProgrammingServices();
             s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                                                      (file_manager->getDataDir() + vertex_shader).c_str(),
-                                                      "main",
-                                                      video::EVST_VS_2_0,
-                                                      (file_manager->getDataDir() + pixel_shader).c_str(), 
-                                                      "main",
-                                                      video::EPST_PS_2_0,
-                                                      m_shaders[WATER_SHADER],
-                                                      video::EMT_SOLID_2_LAYER );
+                        (file_manager->getShaderDir() + vertex_shader).c_str(),
+                        "main", video::EVST_VS_2_0,
+                        (file_manager->getShaderDir() + pixel_shader ).c_str(),
+                        "main", video::EPST_PS_2_0,
+                        m_shaders[WATER_SHADER],
+                        video::EMT_SOLID_2_LAYER                             );
             m->MaterialType = (E_MATERIAL_TYPE)material_type;
         }
         modes++;

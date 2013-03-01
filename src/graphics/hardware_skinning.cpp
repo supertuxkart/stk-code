@@ -15,8 +15,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/irr_driver.hpp"
 #include "graphics/hardware_skinning.hpp"
+
+#include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
+
 #include <IAnimatedMeshSceneNode.h>
 #include <IAnimatedMesh.h>
 #include <ISkinnedMesh.h>
@@ -36,16 +39,11 @@ void HardwareSkinning::prepareNode(scene::IAnimatedMeshSceneNode *node)
     
     // Compile the shaders and associate the callback
     s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                                        "../data/shaders/skinning.vert", "main", video::EVST_VS_2_0,
-                                        "",                              "main", video::EPST_PS_2_0,
-                                        callback, video::EMT_SOLID);
-    
-    /*s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                                        "../data/shaders/skinning.vert", "main", video::EVST_VS_2_0,
-                                        "../data/shaders/skinning.frag", "main", video::EPST_PS_2_0,
-                                        callback, video::EMT_SOLID);
-    */
-    
+                        (file_manager->getShaderDir()+"skinning.vert").c_str(),
+                        "main", video::EVST_VS_2_0, "",
+                        "main", video::EPST_PS_2_0,
+                        callback, video::EMT_SOLID);
+
     // Drop
     callback->drop();
     
