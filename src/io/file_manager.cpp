@@ -597,10 +597,8 @@ void FileManager::checkAndCreateConfigDir()
         }
         else
             m_config_dir = ".";
-        const std::string CONFIGDIR("supertuxkart");
 
-        m_config_dir += "/";
-        m_config_dir += CONFIGDIR;
+        m_config_dir += "/supertuxkart";
 
 #elif defined(__APPLE__)
 
@@ -653,12 +651,14 @@ void FileManager::checkAndCreateConfigDir()
 
     }   // if(getenv("SUPERTUXKART_SAVEDIR") && checkAndCreateDirectory(...))
 
+    if(m_config_dir.size()>0 && *m_config_dir.rbegin()!='/')
+        m_config_dir += "/";
 
     if(!checkAndCreateDirectory(m_config_dir))
     {
         Log::warn("FileManager", "Can not  create config dir '%s', "
                   "falling back to '.'.", m_config_dir.c_str());
-        m_config_dir = ".";
+        m_config_dir = "./";
     }
     Log::info("FileManager", "User directory is '%s'.", m_config_dir.c_str());
     return;
@@ -672,34 +672,34 @@ void FileManager::checkAndCreateConfigDir()
 void FileManager::checkAndCreateAddonsDir()
 {
 #if defined(WIN32) || defined(__CYGWIN__)
-    m_addons_dir  = m_config_dir+"/addons";
+    m_addons_dir  = m_config_dir+"addons/";
 #elif defined(__APPLE__)
     m_addons_dir  = getenv("HOME");
-    m_addons_dir += "/Library/Application Support/SuperTuxKart/Addons";
+    m_addons_dir += "/Library/Application Support/SuperTuxKart/Addons/";
 #else
     m_addons_dir = checkAndCreateLinuxDir("XDG_DATA_HOME", "supertuxkart", 
                                           ".local/share", ".stkaddons");
-    m_addons_dir += "/addons";    
+    m_addons_dir += "addons/";    
 #endif
 
     if(!checkAndCreateDirectory(m_addons_dir))
     {
         Log::error("FileManager", "Can not create add-ons dir '%s', "
                    "falling back to '.'.", m_addons_dir.c_str());
-        m_addons_dir = ".";
+        m_addons_dir = "./";
     }
     Log::info("FileManager", "Addons files will be stored in '%s'.",
                m_addons_dir.c_str());
 
-    if (!checkAndCreateDirectory(m_addons_dir + "/icons/"))
+    if (!checkAndCreateDirectory(m_addons_dir + "icons/"))
     {
         Log::error("FileManager", "Failed to create add-ons icon dir at '%s'.",
-                   (m_addons_dir + "/icons/").c_str());
+                   (m_addons_dir + "icons/").c_str());
     }
-    if (!checkAndCreateDirectory(m_addons_dir + "/tmp/"))
+    if (!checkAndCreateDirectory(m_addons_dir + "tmp/"))
     {
         Log::error("FileManager", "Failed to create add-ons tmp dir at '%s'.",
-                   (m_addons_dir + "/tmp/").c_str());
+                   (m_addons_dir + "tmp/").c_str());
     }
 
 }   // checkAndCreateAddonsDir
@@ -711,10 +711,10 @@ void FileManager::checkAndCreateAddonsDir()
 void FileManager::checkAndCreateScreenshotDir()
 {
 #if defined(WIN32) || defined(__CYGWIN__)
-    m_screenshot_dir  = m_config_dir+"/screenshots";
+    m_screenshot_dir  = m_config_dir+"screenshots/";
 #elif defined(__APPLE__)
     m_screenshot_dir  = getenv("HOME");
-    m_screenshot_dir += "/Library/Application Support/SuperTuxKart/Screenshots";
+    m_screenshot_dir += "/Library/Application Support/SuperTuxKart/Screenshots/";
 #else
     m_screenshot_dir = checkAndCreateLinuxDir("XDG_CACHE_HOME", "supertuxkart", ".cache/", ".");
     m_screenshot_dir += "screenshots/";
