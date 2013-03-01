@@ -46,13 +46,18 @@ private:
     /** Handle to irrlicht's file systems. */
     io::IFileSystem  *m_file_system;
 
-    bool              m_is_full_path;
     /** Directory where user config files are stored. */
     std::string       m_config_dir;
+
     /** Directory where addons are stored. */
     std::string       m_addons_dir;
+
     /** Root data directory. */
     std::string       m_root_dir;
+
+    /** Directory to store screenshots in. */
+    std::string       m_screenshot_dir;
+
     std::vector<std::string>    
                       m_texture_search_path,
                       m_model_search_path,
@@ -68,6 +73,14 @@ private:
     void              checkAndCreateConfigDir();
     bool              isDirectory(const std::string &path) const;
     void              checkAndCreateAddonsDir();
+    void              checkAndCreateScreenshotDir();
+#if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
+    std::string       checkAndCreateLinuxDir(const char *env_name,
+                                             const char *dir_name,
+                                             const char *fallback1,
+                                             const char *fallback2=NULL);
+#endif
+
 public:
                       FileManager(char *argv[]);
                      ~FileManager();
@@ -78,6 +91,8 @@ public:
 
     std::string       getConfigDir() const;
     std::string       getTextureDir() const;
+    std::string       getShaderDir() const;
+    std::string       getScreenshotDir() const;
     bool              checkAndCreateDirectoryP(const std::string &path);
     const std::string &getAddonsDir() const;
     std::string        getAddonsFile(const std::string &name);

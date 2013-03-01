@@ -130,7 +130,6 @@ FileManager::FileManager(char *argv[])
 
     m_file_system  = irr_driver->getDevice()->getFileSystem();
     m_file_system->grab();
-    m_is_full_path = false;
 
     irr::io::path exe_path;
 
@@ -174,7 +173,8 @@ FileManager::FileManager(char *argv[])
               m_root_dir.c_str());
     checkAndCreateConfigDir();
     checkAndCreateAddonsDir();
-}  // FileManager
+    checkAndCreateScreenshotDir();
+    }  // FileManager
 
  //-----------------------------------------------------------------------------
 /** Remove the dummy file system (which is called from IrrDriver before
@@ -455,6 +455,22 @@ std::string FileManager::getTextureDir() const
 }   // getTextureDir
 
 //-----------------------------------------------------------------------------
+/** Returns the directory in which the shaders are stored.
+ */
+std::string FileManager::getShaderDir() const
+{
+    return m_root_dir+"data/shaders/";
+}   // getShaderDir
+
+//-----------------------------------------------------------------------------
+/** Returns the directory in which screenshots should be stored.
+ */
+std::string FileManager::getScreenshotDir() const
+{
+    return m_screenshot_dir;
+}   // getScreenshotDir
+
+//-----------------------------------------------------------------------------
 /** Returns the translation directory.
  */
 std::string FileManager::getTranslationDir() const
@@ -661,65 +677,9 @@ void FileManager::checkAndCreateAddonsDir()
     m_addons_dir  = getenv("HOME");
     m_addons_dir += "/Library/Application Support/SuperTuxKart/Addons";
 #else
-    // Remaining unix variants. Use the new standards for config directory
-    // i.e. either XDG_CONFIG_HOME or $HOME/.local/share
-
-    bool dir_ok = false;
-
-    if (getenv("XDG_DATA_HOME")!=NULL)
-    {
-        m_addons_dir = getenv("XDG_DATA_HOME");
-        dir_ok = checkAndCreateDirectory(m_addons_dir);
-        if(!dir_ok)
-            Log::warn("FileManager", "Cannot create $XDG_DATA_HOME.");
-
-        // Do an additional test here, e.g. in case that XDG_DATA_HOME is '/' 
-        // and since dir_ok is set, it would not test any of the other options
-        // like $HOME/.local/share
-        dir_ok = checkAndCreateDirectory(m_addons_dir+"/supertuxkart");
-        if(!dir_ok)
-            Log::warn("FileManager", "Cannot create "
-                      "$XDG_DATA_HOME/supertuxkart.");
-    }
-
-    if(!dir_ok && getenv("HOME"))
-    {
-        // Use ~/.local/share :
-        m_addons_dir  = getenv("HOME");
-        m_addons_dir += "/.local/share";
-        // This tests for ".local" and then for ".local/share"
-        dir_ok = checkAndCreateDirectoryP(m_addons_dir);
-        if(!dir_ok)
-            Log::warn("FileManager", "Cannot create $HOME/.local/share.");
-    }
-    if(!dir_ok && getenv("HOME"))
-    {
-        // Use ~/.stkaddons
-        m_addons_dir  = getenv("HOME");
-        m_addons_dir += "/.stkaddons";
-        dir_ok = checkAndCreateDirectory(m_addons_dir);
-        if(!dir_ok)
-            Log::warn("FileManager", "Cannot create $HOME/.stkaddons.");
-    }
-
-    if(!dir_ok)
-    {
-        Log::warn("FileManager", "Falling back to use '.'.");
-        m_addons_dir = ".";
-    }
-
-    m_addons_dir += "/supertuxkart";
-    dir_ok = checkAndCreateDirectory(m_addons_dir);
-    if(!dir_ok)
-    {
-        // If the directory can not be created, abort
-        Log::error("FileManager", "Cannot create directory '%s', "
-                   "falling back to use '.'.", m_addons_dir.c_str());
-        m_addons_dir=".";
-
-    }
-    m_addons_dir += "/addons";
-    
+    m_addons_dir = checkAndCreateLinuxDir("XDG_DATA_HOME", "supertuxkart", 
+                                          ".local/share", ".stkaddons");
+    m_addons_dir += "/addons";    
 #endif
 
     if(!checkAndCreateDirectory(m_addons_dir))
@@ -741,7 +701,120 @@ void FileManager::checkAndCreateAddonsDir()
         Log::error("FileManager", "Failed to create add-ons tmp dir at '%s'.",
                    (m_addons_dir + "/tmp/").c_str());
     }
+
 }   // checkAndCreateAddonsDir
+
+// ----------------------------------------------------------------------------
+/** Creates the directories for screenshots. This will set m_screenshot_dir 
+ *  with the appropriate path.
+ */
+void FileManager::checkAndCreateScreenshotDir()
+{
+#if defined(WIN32) || defined(__CYGWIN__)
+    m_screenshot_dir  = m_config_dir+"/screenshots";
+#elif defined(__APPLE__)
+    m_screenshot_dir  = getenv("HOME");
+    m_screenshot_dir += "/Library/Application Support/SuperTuxKart/Screenshots";
+#else
+    m_screenshot_dir = checkAndCreateLinuxDir("XDG_CACHE_HOME", "supertuxkart", ".cache/", ".");
+    m_screenshot_dir += "screenshots/";
+#endif
+
+    if(!checkAndCreateDirectory(m_screenshot_dir))
+    {
+        Log::error("FileManager", "Can not create screenshot directory '%s', "
+                   "falling back to '.'.", m_screenshot_dir.c_str());
+        m_screenshot_dir = ".";
+    }
+    Log::info("FileManager", "Screenshots will be stored in '%s'.",
+               m_screenshot_dir.c_str());
+
+}   // checkAndCreateScreenshotDir
+
+// ----------------------------------------------------------------------------
+#if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
+
+/** Find a directory to use for remaining unix variants. Use the new standards
+ *  for config directory based on XDG_* environment variables, or a 
+ *  subdirectory under $HOME, trying two different fallbacks. It will also
+ *  check if the directory 'dirname' can be created (to avoid problems that
+ *  e.g. $env_name is '/', which exists, but can not be written to.
+ *  \param env_name  Name of the environment variable to test first.
+ *  \param dir_name  Name of the directory to create
+ *  \param fallback1 Subdirectory under $HOME to use if the environment
+ *         variable is not defined or can not be created.
+ *  \param fallback2 Subdirectory under $HOME to use if the environment
+ *         variable and fallback1 are not defined or can not be created.
+ */
+std::string FileManager::checkAndCreateLinuxDir(const char *env_name,
+                                                const char *dir_name,
+                                                const char *fallback1,
+                                                const char *fallback2)
+{
+    bool dir_ok = false;
+    std::string dir;
+
+    if (getenv(env_name)!=NULL)
+    {
+        dir = getenv(env_name);
+        dir_ok = checkAndCreateDirectory(dir);
+        if(!dir_ok)
+            Log::warn("FileManager", "Cannot create $%s.", env_name);
+
+        if(dir[dir.size()-1]!='/') dir += "/";
+        // Do an additional test here, e.g. in case that XDG_DATA_HOME is '/' 
+        // and since dir_ok is set, it would not test any of the other options
+        // like $HOME/.local/share
+        dir_ok = checkAndCreateDirectory(dir+dir_name);
+        if(!dir_ok)
+            Log::warn("FileManager", "Cannot create $%s/%s.", dir.c_str(), 
+                      dir_name);
+    }
+
+    if(!dir_ok && getenv("HOME"))
+    {
+        // Use ~/.local/share :
+        dir  = getenv("HOME");
+        if(dir.size()>0 && dir[dir.size()-1]!='/') dir += "/";
+        dir += fallback1;
+        // This will create each individual subdirectory if 
+        // dir_name contains "/".
+        dir_ok = checkAndCreateDirectoryP(dir);
+        if(!dir_ok)
+            Log::warn("FileManager", "Cannot create $HOME/%s.", 
+                      fallback1);
+    }
+    if(!dir_ok && fallback2 && getenv("HOME"))
+    {
+        dir  = getenv("HOME");
+        if(dir.size()>0 && dir[dir.size()-1]!='/') dir += "/";
+        dir += fallback2;
+        dir_ok = checkAndCreateDirectory(dir);
+        if(!dir_ok)
+            Log::warn("FileManager", "Cannot create $HOME/%s.", 
+                      fallback2);
+    }
+
+    if(!dir_ok)
+    {
+        Log::warn("FileManager", "Falling back to use '.'.");
+        dir = "./";
+    }
+
+    if(dir.size()>0 && dir[dir.size()-1]!='/') dir += "/";
+    dir += dir_name;
+    dir_ok = checkAndCreateDirectory(dir);
+    if(!dir_ok)
+    {
+        // If the directory can not be created
+        Log::error("FileManager", "Cannot create directory '%s', "
+                   "falling back to use '.'.", dir.c_str());
+        dir="./";
+    }
+    if(dir.size()>0 && dir[dir.size()-1]!='/') dir += "/";
+    return dir;
+}   // checkAndCreateLinuxDir
+#endif
 
 //-----------------------------------------------------------------------------
 /** Returns the directory for addon files. */
@@ -877,7 +950,7 @@ void FileManager::listFiles(std::set<std::string>& result,
 
 #ifndef ANDROID
     if(!isDirectory(path))
-    	return;
+        return;
 #endif
 
     io::path previous_cwd = m_file_system->getWorkingDirectory();

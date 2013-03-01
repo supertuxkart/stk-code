@@ -1554,24 +1554,15 @@ void IrrDriver::doScreenShot()
     time_t rawtime;
     time ( &rawtime );
     tm* timeInfo = localtime( &rawtime );
-    char timeBuffer[256];
-    sprintf(timeBuffer, "%i.%02i.%02i %02i.%02i.%02i",
+    char time_buffer[256];
+    sprintf(time_buffer, "%i.%02i.%02i %02i.%02i.%02i",
             timeInfo->tm_year + 1900, timeInfo->tm_mon, 
             timeInfo->tm_mday, timeInfo->tm_hour, 
             timeInfo->tm_min, timeInfo->tm_sec);
 
-    std::string trackName = race_manager->getTrackName();
-    if (World::getWorld() == NULL) trackName = "menu";
-
-#if defined(WIN32)
-    std::string path = 
-        StringUtils::insertValues("C:\\Temp\\supertuxkart %s %s.png",
-                                  trackName, timeBuffer);
-#else
-    std::string path = 
-        StringUtils::insertValues("/tmp/supertuxkart %s %s.png",
-                                  trackName, timeBuffer);
-#endif
+    std::string track_name = race_manager->getTrackName();
+    if (World::getWorld() == NULL) track_name = "menu";
+    std::string path = file_manager->getScreenshotDir()+track_name+"-"+time_buffer+".png";
 
     if (irr_driver->getVideoDriver()->writeImageToFile(image, path.c_str(), 0))
     {

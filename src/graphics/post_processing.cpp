@@ -73,8 +73,8 @@ void PostProcessing::init(video::IVideoDriver* video_driver)
         // Material and shaders
         IGPUProgrammingServices* gpu = video_driver->getGPUProgrammingServices();
         s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                    (file_manager->getDataDir() + "shaders/motion_blur.vert").c_str(), "main", video::EVST_VS_2_0,
-                    (file_manager->getDataDir() + "shaders/motion_blur.frag").c_str(), "main", video::EPST_PS_2_0,
+                    (file_manager->getShaderDir() + "motion_blur.vert").c_str(), "main", video::EVST_VS_2_0,
+                    (file_manager->getShaderDir() + "motion_blur.frag").c_str(), "main", video::EPST_PS_2_0,
                     this, video::EMT_SOLID);
         m_material.MaterialType = (E_MATERIAL_TYPE)material_type;
         m_material.setTexture(0, m_render_target);
