@@ -15,13 +15,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
 
-#include <IGPUProgrammingServices.h>
-#include <IMaterialRendererServices.h>
 #include "post_processing.hpp"
-#include "irr_driver.hpp"
+
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "race/race_manager.hpp"
+#include "utils/log.hpp"
+
+#include <IGPUProgrammingServices.h>
+#include <IMaterialRendererServices.h>
 
 #define MOTION_BLUR_FACTOR (1.0f/15.0f)
 #define MOTION_BLUR_OFFSET 20.0f
@@ -32,12 +35,14 @@ using namespace scene;
 PostProcessing::PostProcessing()
 {
     m_boost_amount = 0.0f;
-}
+}   // PostProcessing
 
+// ----------------------------------------------------------------------------
 PostProcessing::~PostProcessing()
 {
-}
+}   // ~PostProcessing
 
+// ----------------------------------------------------------------------------
 /** Initialization */
 void PostProcessing::init(video::IVideoDriver* video_driver)
 {
@@ -54,36 +59,45 @@ void PostProcessing::init(video::IVideoDriver* video_driver)
     bool nonsquare = video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
     bool nonpower = video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
     if (!nonpower) {
-        fprintf(stdout, "WARNING: Only power of two textures are supported.\n");
+        Log::warn("PostProcessing", 
+                  "Only power of two textures are supported.");
     }
     if (!nonsquare) {
-        fprintf(stdout, "WARNING: Only square textures are supported.\n");
+        Log::warn("PostProcessing", "Only square textures are supported.");
     }
     // Initialization
     if(m_supported)
     {
         // Render target
-        m_render_target = video_driver->addRenderTargetTexture(video_driver->getScreenSize().getOptimalSize(!nonpower, !nonsquare), "postprocess");
+        core::dimension2du opt = video_driver->getScreenSize()
+                                .getOptimalSize(!nonpower, !nonsquare);
+        m_render_target = 
+            video_driver->addRenderTargetTexture(opt, "postprocess");
         if(!m_render_target)
         {
-            fprintf(stderr, "Couldn't create the render target for post-processing, disabling it\n");
+            Log::warn("PostProcessing", "Couldn't create the render target "
+                      "for post-processing, disabling it.");
             UserConfigParams::m_postprocess_enabled = false;
         }
         
         // Material and shaders
-        IGPUProgrammingServices* gpu = video_driver->getGPUProgrammingServices();
+        IGPUProgrammingServices* gpu = 
+            video_driver->getGPUProgrammingServices();
         s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                    (file_manager->getShaderDir() + "motion_blur.vert").c_str(), "main", video::EVST_VS_2_0,
-                    (file_manager->getShaderDir() + "motion_blur.frag").c_str(), "main", video::EPST_PS_2_0,
-                    this, video::EMT_SOLID);
+                   (file_manager->getShaderDir() + "motion_blur.vert").c_str(),
+                   "main", video::EVST_VS_2_0,
+                   (file_manager->getShaderDir() + "motion_blur.frag").c_str(),
+                   "main", video::EPST_PS_2_0,
+                   this, video::EMT_SOLID);
         m_material.MaterialType = (E_MATERIAL_TYPE)material_type;
         m_material.setTexture(0, m_render_target);
         m_material.Wireframe = false;
         m_material.Lighting = false;
         m_material.ZWriteEnable = false;
     }
-}
+}   // init
 
+// ----------------------------------------------------------------------------
 /** Termination */
 void PostProcessing::shut()
 {
@@ -91,8 +105,9 @@ void PostProcessing::shut()
         return;
     
     // TODO: do we have to delete/drop anything?
-}
+}   // shut
 
+// ----------------------------------------------------------------------------
 /** Setup the render target */
 void PostProcessing::beginCapture()
 {
@@ -110,8 +125,9 @@ void PostProcessing::beginCapture()
     
     m_used_pp_this_frame = true;
     irr_driver->getVideoDriver()->setRenderTarget(m_render_target, true, true);
-}
+}   // beginCapture
 
+// ----------------------------------------------------------------------------
 /** Restore the framebuffer render target */
 void PostProcessing::endCapture()
 {
@@ -121,10 +137,12 @@ void PostProcessing::endCapture()
     
     if (m_used_pp_this_frame)
     {
-        irr_driver->getVideoDriver()->setRenderTarget(video::ERT_FRAME_BUFFER, true, true, 0);
+        irr_driver->getVideoDriver()->setRenderTarget(video::ERT_FRAME_BUFFER, 
+                                                      true, true, 0);
     }
-}
+}   // endCapture
 
+// ----------------------------------------------------------------------------
 void PostProcessing::update(float dt)
 {
     if (m_boost_amount > 0.0f)
@@ -132,8 +150,9 @@ void PostProcessing::update(float dt)
         m_boost_amount -= dt*3.5f;
         if (m_boost_amount < 0.0f) m_boost_amount = 0.0f;
     }
-}
+}   // update
 
+// ----------------------------------------------------------------------------
 /** Render the post-processed scene */
 void PostProcessing::render()
 {
@@ -146,7 +165,8 @@ void PostProcessing::render()
         return;
     }
     
-    // Draw the fullscreen quad while applying the corresponding post-processing shaders
+    // Draw the fullscreen quad while applying the corresponding 
+    // post-processing shaders
     video::IVideoDriver*    video_driver = irr_driver->getVideoDriver();
     video::S3DVertex        vertices[6];
     
@@ -155,28 +175,27 @@ void PostProcessing::render()
     vertices[1] = irr::video::S3DVertex(-1.0f, 1.0f,0.0f,0,0,1, white, 0.0f,0.0f);
     vertices[2] = irr::video::S3DVertex( 1.0f, 1.0f,0.0f,0,0,1, white, 1.0f,0.0f);
     vertices[3] = irr::video::S3DVertex( 1.0f,-1.0f,0.0f,0,0,1, white, 1.0f,1.0f);
-    vertices[4] = irr::video::S3DVertex(-1.0f,-1.0f,0.0f,0,0,1, white, 0.0f,1.0f);
-    vertices[5] = irr::video::S3DVertex( 1.0f, 1.0f,0.0f,0,0,1, white, 1.0f,0.0f);
-    
-    u16 indices[6] = {0, 1, 2, 3, 4, 5};
+
+    u16 indices[6] = {0, 1, 2, 3, 0, 2};
     
     video_driver->setMaterial(m_material);
-    video_driver->drawIndexedTriangleList(&vertices[0], 6, &indices[0], 2);
-}
+    video_driver->drawIndexedTriangleList(&vertices[0], 4, &indices[0], 2);
+}   // render
 
+// ----------------------------------------------------------------------------
 /** Set the boost amount according to the speed of the camera */
 void PostProcessing::giveBoost()
 {
     m_boost_amount = 2.5f;
-    //printf("setCameraSpeed(%f)\n", cam_speed);
-    //m_boost_amount = core::clamp(MOTION_BLUR_FACTOR * (cam_speed - MOTION_BLUR_OFFSET), 0.0f, 1.0f);
-}
+}   // giveBoost
 
-/** Implement IShaderConstantsSetCallback. Shader constants setter for post-processing */
-void PostProcessing::OnSetConstants(video::IMaterialRendererServices *services, s32 user_data)
+// ----------------------------------------------------------------------------
+/** Implement IShaderConstantsSetCallback. Shader constants setter for 
+ *  post-processing */
+void PostProcessing::OnSetConstants(video::IMaterialRendererServices *services,
+                                    s32 user_data)
 {
     services->setPixelShaderConstant("boost_amount", &m_boost_amount, 1);
-    const float texunit = 0.0f;
-    services->setPixelShaderConstant("color_buffer", &texunit, 1);  // Irrlicht knows this is actually a GLint and makes
-                                                                   // the conversion
-}
+    const int texunit = 0;
+    services->setPixelShaderConstant("color_buffer", &texunit, 1);
+}   // OnSetConstants
