@@ -37,6 +37,7 @@
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 #include "utils/translation.hpp"
 
 /** The constructor for a player kart.
