@@ -9,6 +9,8 @@ main_*.png icons, hourglass, back, back_addons, next_addons, package.png
 
 mode_tt, released under Creative-Commons BY-SA 3, incorporatings artwork from yeKcim and onyum.com
 
+tutorial.png    by Totoplus62, released under CC-BY-SA 3.0
+
 Logo and Logo_slim : under CC-BY-SA 3.0+ by 'rastapax'
 
 difficulty_*.png icons, released under Creative-Commons BY-SA 3, By Conso (Constantin Pelikan)
