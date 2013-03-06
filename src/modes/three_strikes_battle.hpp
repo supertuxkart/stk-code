@@ -101,7 +101,7 @@ public:
     
     virtual const std::string& getIdent() const;
     
-    virtual void kartHit(const int kart_id);
+    virtual void kartHit(const unsigned int kart_id);
     virtual void update(float dt);
     
     virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node);

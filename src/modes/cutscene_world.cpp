@@ -162,14 +162,6 @@ CutsceneWorld::~CutsceneWorld()
 }   // ~CutsceneWorld
 
 //-----------------------------------------------------------------------------
-/** Called when a kart is hit. 
- *  \param kart_id The world kart id of the kart that was hit.
- */
-void CutsceneWorld::kartHit(const int kart_id)
-{
-}
-
-//-----------------------------------------------------------------------------
 /** Returns the internal identifier for this race.
  */
 const std::string& CutsceneWorld::getIdent() const

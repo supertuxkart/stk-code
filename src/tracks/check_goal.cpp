@@ -59,7 +59,7 @@ void CheckGoal::update(float dt)
     assert(tom);
     
     PtrVector<TrackObject>&   objects = tom->getObjects();
-    int ball_index = 0;
+    unsigned int ball_index = 0;
     for(int i=0; i<objects.size(); i++)
     {
         TrackObject* obj = objects.get(i);
@@ -96,7 +96,8 @@ void CheckGoal::trigger(unsigned int kart_index)
     world->onCheckGoalTriggered(m_first_goal);
 }   // CheckGoal
 
-bool CheckGoal::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
+bool CheckGoal::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+                            unsigned int indx)
 {
     core::vector2df cross_point;
     

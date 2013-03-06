@@ -82,7 +82,7 @@ void AmbientLightSphere::update(float dt)
  *                  additional data.
  */
 bool AmbientLightSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
-                                     int indx)
+                                     unsigned int indx)
 {
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {

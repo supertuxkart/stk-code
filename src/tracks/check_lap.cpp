@@ -57,7 +57,8 @@ void CheckLap::reset(const Track &track)
  *  \param indx     Index of the kart, can be used to store kart specific
  *                  additional data.
  */
-bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
+bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+                           unsigned int indx)
 {
     float track_length = World::getWorld()->getTrack()->getTrackLength();
     LinearWorld *lin_world = dynamic_cast<LinearWorld*>(World::getWorld());

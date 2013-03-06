@@ -149,7 +149,8 @@ void CheckLine::changeDebugColor(bool is_active)
  *  \param indx     Index of the kart, can be used to store kart specific
  *                  additional data.
  */
-bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
+bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+                            unsigned int indx)
 {
     core::vector2df p=new_pos.toIrrVector2d();
     bool sign = m_line.getPointOrientation(p)>=0;

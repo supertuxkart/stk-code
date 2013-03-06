@@ -53,7 +53,7 @@ public:
     virtual      ~AmbientLightSphere() {};
     virtual void  update(float dt);
     virtual bool  isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
-                              int indx);
+                              unsigned int indx);
 };   // AmbientLightSphere
 
 #endif

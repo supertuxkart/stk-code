@@ -56,7 +56,8 @@ CheckSphere::CheckSphere(const XMLNode &node, unsigned int index)
  *  \param kart_id     Index of the kart, can be used to store kart specific
  *                  additional data.
  */
-bool CheckSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int kart_id)
+bool CheckSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+                              unsigned int kart_id)
 {
     float old_dist2   = (old_pos-m_center_point).length2();
     float new_dist2   = (new_pos-m_center_point).length2();

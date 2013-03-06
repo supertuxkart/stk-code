@@ -124,10 +124,9 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
 /** Called when a kart is hit. 
  *  \param kart_id The world kart id of the kart that was hit.
  */
-void ThreeStrikesBattle::kartHit(const int kart_id)
+void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
 {
-    assert(kart_id >= 0);
-    assert(kart_id < (int)m_karts.size());
+    assert(kart_id < m_karts.size());
     
     // make kart lose a life
     m_kart_info[kart_id].m_lives--;

@@ -40,7 +40,7 @@ public:
                  CheckLap(const XMLNode &node, unsigned int index);
     virtual     ~CheckLap() {};
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
-                             int indx);
+                             unsigned int indx);
     virtual void reset(const Track &track);
 };   // CheckLine
 
