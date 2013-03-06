@@ -110,7 +110,7 @@ AbstractKart *ProfileWorld::createKart(const std::string &kart_ident, int index,
                                                /*world kart id*/ index, 
                                                /*position*/ index+1,
                                                init_pos);
-    new_kart->init(RaceManager::KT_AI, /*is_first_kart*/false);
+    new_kart->init(RaceManager::KT_AI);
     Controller *controller = loadAIController(new_kart);
     new_kart->setController(controller);
 
@@ -118,7 +118,8 @@ AbstractKart *ProfileWorld::createKart(const std::string &kart_ident, int index,
     // karts can be seen.
     if (index == (int)race_manager->getNumberOfKarts()-1)
     {
-        new_kart->setCamera(new Camera(index, new_kart));
+        // The camera keeps track of all cameras and will free them
+        Camera::createCamera(new_kart);
     }
     return new_kart;
 }   // createKart

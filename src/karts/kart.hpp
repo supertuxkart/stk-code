@@ -38,7 +38,6 @@ class btKart;
 class btUprightConstraint;
 
 class Attachment;
-class Camera;
 class Controller;
 class Item;
 class AbstractKartAnimation;
@@ -46,7 +45,6 @@ class KartGFX;
 class MaxSpeed;
 class ParticleEmitter;
 class ParticleKind;
-class Rain;
 class SFXBase;
 class Shadow;
 class Skidding;
@@ -110,14 +108,6 @@ private:
     /** For stars rotating around head effect */
     Stars *m_stars_effect;
     
-
-protected:       // Used by the AI atm    
-    /** The camera for each kart. Not all karts have cameras (e.g. AI karts
-     *  usually don't), but there are exceptions: e.g. after the end of a
-     *  race an AI kart is replacing the kart for a player.
-     */
-    Camera      *m_camera;
-    
 private:
     /** True if the kart hasn't moved since 'ready-set-go' - used to 
      *  determine startup boost. */
@@ -174,8 +164,6 @@ private:
     /** Handles all slipstreaming. */
     SlipStream      *m_slipstream;
     
-    Rain            *m_rain;
-
     /** Rotation compared to the start position, same for all wheels */
     float           m_wheel_rotation;
 
@@ -221,14 +209,13 @@ private:
     void          updateNitro(float dt);
     float         getActualWheelForce();
     void          crashed();
-    void          loadData(RaceManager::KartType type, bool is_first_kart,
-                           bool animatedModel);
+    void          loadData(RaceManager::KartType type, bool animatedModel);
     
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform);
     virtual       ~Kart();
-    virtual void   init(RaceManager::KartType type, bool is_first_kart);
+    virtual void   init(RaceManager::KartType type);
     virtual void   updateGraphics(float dt, const Vec3& off_xyz,  
                                   const btQuaternion& off_rotation);
     virtual void   createPhysics    ();
@@ -289,18 +276,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a points to this kart's graphical effects. */
     KartGFX*       getKartGFX()                   { return m_kart_gfx;        }
-    // ------------------------------------------------------------------------
-    /** Returns the camera of this kart (or NULL if no camera is attached
-     *  to this kart). */
-    virtual Camera* getCamera         ()       {return m_camera;}
-    // ------------------------------------------------------------------------
-    /** Returns the camera of this kart (or NULL if no camera is attached
-     *  to this kart) - const version. */
-    virtual const Camera*  getCamera  () const {return m_camera;}
-    // ------------------------------------------------------------------------
-    /** Sets the camera for this kart. Takes ownership of the camera and
-     *  will delete it. */
-    virtual void setCamera(Camera *camera);
     // ------------------------------------------------------------------------
     /** Returns the remaining collected energy. */
     virtual float  getEnergy           () const { return m_collected_energy; }

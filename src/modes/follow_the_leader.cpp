@@ -125,7 +125,19 @@ void FollowTheLeaderRace::countdownReachedZero()
         }
         // Time doesn't make any sense in FTL (and it is not displayed)
         kart->finishedRace(-1.0f);
-    }
+
+        // Move any camera for this kart to the leader, facing backwards, 
+        // so that the eliminated player has something to watch.
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+        {
+            Camera *camera = Camera::getCamera(i);
+            if(camera->getKart()==kart)
+            {
+                camera->setMode(Camera::CM_LEADER_MODE);
+                camera->setKart(getKart(0));
+            }
+        }   // for i<number of cameras
+    }   // if kart to eliminate exists
     
     // almost over, use fast music
     if(getCurrentNumKarts()==3)

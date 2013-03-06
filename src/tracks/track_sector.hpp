@@ -22,7 +22,6 @@
 #include "utils/vec3.hpp"
 
 class Track;
-class Kart;
 
 /** This object keeps track of which sector an object is on. A sector is
  *  actually just the graph node (it's called sector to better distinguish

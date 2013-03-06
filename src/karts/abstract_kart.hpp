@@ -29,7 +29,6 @@ class Attachment;
 class btKart;
 class btQuaternion;
 class btUprightConstraint;
-class Camera;
 class Controller;
 class Item;
 class KartModel;
@@ -81,7 +80,7 @@ public:
                                 int position, const btTransform& init_transform);
     virtual       ~AbstractKart();
     virtual void   reset();
-    virtual void   init(RaceManager::KartType type, bool is_first_kart) = 0;
+    virtual void   init(RaceManager::KartType type) = 0;
     // ========================================================================
     // Functions related to controlling the kart
     // ------------------------------------------------------------------------
@@ -279,18 +278,6 @@ public:
     // ------------------------------------------------------------------------
     /** Activates a slipstream effect, atm that is display some nitro. */
     virtual void setSlipstreamEffect(float f) = 0;
-    // ------------------------------------------------------------------------
-    /** Sets the camera for this kart. Takes ownership of the camera and
-     *  will delete it. */
-    virtual void setCamera(Camera *camera) = 0;
-    // ------------------------------------------------------------------------
-    /** Returns the camera of this kart (or NULL if no camera is attached
-     *  to this kart). */
-    virtual Camera* getCamera() = 0;
-    // ------------------------------------------------------------------------
-    /** Returns the camera of this kart (or NULL if no camera is attached
-     *  to this kart). */
-    virtual const Camera* getCamera() const = 0;
     // ------------------------------------------------------------------------
     /** Plays a beep sfx. */
     virtual void beep() = 0;

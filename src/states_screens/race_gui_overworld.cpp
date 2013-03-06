@@ -178,13 +178,14 @@ void RaceGUIOverworld::renderGlobal(float dt)
  *  collectibles, ...
  *  \param kart Pointer to the kart for which to render the view.
  */
-void RaceGUIOverworld::renderPlayerView(const AbstractKart *kart, float dt)
+void RaceGUIOverworld::renderPlayerView(const Camera *camera, float dt)
 {
     if (!m_enabled) return;
+    const AbstractKart *kart = camera->getKart();
+    if(!kart) return;
     
-    const core::recti &viewport    = kart->getCamera()->getViewport();
-    
-    core::vector2df scaling = kart->getCamera()->getScaling();
+    const core::recti &viewport = camera->getViewport();
+    core::vector2df scaling     = camera->getScaling();
     //std::cout << "Applied ratio : " << viewport.getWidth()/800.0f << std::endl;
     
     scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
@@ -197,7 +198,7 @@ void RaceGUIOverworld::renderPlayerView(const AbstractKart *kart, float dt)
         
     drawPowerupIcons    (kart, viewport, scaling);
     
-    RaceGUIBase::renderPlayerView(kart, dt);
+    RaceGUIBase::renderPlayerView(camera, dt);
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------

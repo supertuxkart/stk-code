@@ -211,7 +211,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     int position           = index+1;
     btTransform init_pos   = m_track->getStartTransform(index);
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos);
-    new_kart->init(race_manager->getKartType(index), (local_player_id == 0));
+    new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
     switch(kart_type)
     {
@@ -303,6 +303,8 @@ World::~World()
         delete m_karts[i];
 
     m_karts.clear();
+    Camera::removeAllCameras();
+
     projectile_manager->cleanup();
     // In case that the track is not found, m_physics is still undefined.
     if(m_physics)
@@ -553,13 +555,15 @@ void World::resetAllKarts()
         // Now store the current (i.e. in rest) suspension length for each
         // kart, so that the karts can visualise the suspension. 
         (*i)->setSuspensionLength();
-        // Initialise the camera (if available), now that the correct
-        // kart position is set
-        if((*i)->getCamera())
-            (*i)->getCamera()->setInitialTransform();
         // Update the kart transforms with the newly computed position
         // after all karts are reset
         (*i)->setTrans((*i)->getBody()->getWorldTransform());
+    }
+
+    // Initialise the cameras, now that the correct kart positions are set
+    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+    {
+        Camera::getCamera(i)->setInitialTransform();
     }
 }   // resetAllKarts
 
@@ -723,6 +727,11 @@ void World::update(float dt)
         if(!m_karts[i]->isEliminated()) m_karts[i]->update(dt) ;
     }
 
+    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+    {
+        Camera::getCamera(i)->update(dt);
+    }
+
     projectile_manager->update(dt);
     
     PROFILER_POP_CPU_MARKER();
@@ -881,53 +890,43 @@ AbstractKart *World::getPlayerKart(unsigned int n) const
  */
 AbstractKart *World::getLocalPlayerKart(unsigned int n) const
 {
-    int count=-1;
-    const int kart_count = m_karts.size();
-    for(int i=0; i<kart_count; i++)
-    {
-        if(m_karts[i]->getCamera() && 
-            (m_karts[i]->getController()->isPlayerController() ||
-            ProfileWorld::isProfileMode()                          ) )
-        {
-            count++;
-            if(count == (int)n) return m_karts[i];
-        }
-    }
-    return NULL;
+    if(n>=Camera::getNumCameras()) return NULL;
+    return Camera::getCamera(n)->getKart();
 }   // getLocalPlayerKart
 
 //-----------------------------------------------------------------------------
 /** Remove (eliminate) a kart from the race */
-void World::eliminateKart(int kart_number, bool notify_of_elimination)
+void World::eliminateKart(int kart_id, bool notify_of_elimination)
 {
-    AbstractKart *kart = m_karts[kart_number];
+    AbstractKart *kart = m_karts[kart_id];
     
-    // Display a message about the eliminated kart in the race gui
+    // Display a message about the eliminated kart in the race guia
     if (notify_of_elimination)
     {
-        for (KartList::iterator i = m_karts.begin(); i != m_karts.end();  i++ )
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
-            if(!(*i)->getCamera()) continue;
-            if(*i==kart)
-            {
-                m_race_gui->addMessage(_("You have been eliminated!"), *i, 
+            Camera *camera = Camera::getCamera(i);
+            if(camera->getKart()==kart)
+                m_race_gui->addMessage(_("You have been eliminated!"), kart,
                                        2.0f);
-            }
             else
-            {
                 m_race_gui->addMessage(_("'%s' has been eliminated.",
-                                       core::stringw(kart->getName())), *i, 
+                                       core::stringw(kart->getName())), 
+                                       camera->getKart(),
                                        2.0f);
-            }
-        }   // for i in kart
-    }
+        }  // for i < number of cameras
+    }   // if notify_of_elimination
     
     if(kart->getController()->isPlayerController())
     {
-        // Change the camera so that it will be attached to the leader
-        // and facing backwards.
-        Camera* camera=kart->getCamera();
-        camera->setMode(Camera::CM_LEADER_MODE);
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+        {
+            // Change the camera so that it will be attached to the leader
+            // and facing backwards.
+            Camera *camera = Camera::getCamera(i);
+            if(camera->getKart()==kart)
+                camera->setMode(Camera::CM_LEADER_MODE);
+        }
         m_eliminated_players++;
     }
 
@@ -981,6 +980,12 @@ void World::restartRace()
     {
         (*i)->reset();
     }
+
+    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+    {
+        Camera::getCamera(i)->reset();
+    }
+
     if(ReplayPlay::get())
         ReplayPlay::get()->reset();
     resetAllKarts();

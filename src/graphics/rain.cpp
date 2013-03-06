@@ -41,11 +41,12 @@ const float TEXTURE_X_TILES[RAIN_RING_COUNT] = { 2.0f, 2.5f, 3.5f, 5.0f, 8.0f };
 const float TEXTURE_Y_TILES[RAIN_RING_COUNT] = { 8.0f, 7.0f, 6.0f, 4.0f, 4.0f };
 
 
-Rain::Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent, bool lightning)
+Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent)
 {
-    m_lightning = lightning;
+    m_lightning = camera->getIndex()==0;
     
-    if (lightning) m_thunder_sound = sfx_manager->createSoundSource("thunder");
+    if (m_lightning) 
+        m_thunder_sound = sfx_manager->createSoundSource("thunder");
     
     Material* m = material_manager->getMaterial("rain.png");
     assert(m != NULL);
@@ -108,7 +109,9 @@ Rain::Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent,
         mesh->addMeshBuffer(buffer);
         mesh->recalculateBoundingBox();
         
-        m_node[r] = irr_driver->addPerCameraMesh(mesh, camera, parent);
+        m_node[r] = irr_driver->addPerCameraMesh(mesh, 
+                                                 camera->getCameraSceneNode(),
+                                                 parent);
         mesh->drop();
         
         buffer->drop();

@@ -23,6 +23,7 @@
 
 #include "karts/controller/ai_base_controller.hpp"
 
+class Camera;
 class LinearWorld;
 class QuadGraph;
 class Track;
@@ -61,6 +62,9 @@ private:
     float m_crash_time;
 
     float m_time_since_stuck;
+
+    /** Stores a pointer to the original controller. */
+    Controller *m_previous_controller;
 
     /** For debugging purpose: a sphere indicating where the AI 
      *  is targeting at. */

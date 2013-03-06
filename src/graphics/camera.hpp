@@ -21,23 +21,26 @@
 #ifndef HEADER_CAMERA_HPP
 #define HEADER_CAMERA_HPP
 
+#include "io/xml_node.hpp"
+#include "utils/no_copy.hpp"
+#include "utils/aligned_array.hpp"
+#include "utils/leak_check.hpp"
+#include "utils/vec3.hpp"
+
+#include "SColor.h"
+#include "vector2d.h"
+#include "rect.h"
+
 #include <vector>
 
-#include <SColor.h>
-#include <vector2d.h>
-#include <rect.h>
 namespace irr
 {
     namespace scene { class ICameraSceneNode; }
 }
 using namespace irr;
 
-#include "io/xml_node.hpp"
-#include "utils/no_copy.hpp"
-#include "utils/aligned_array.hpp"
-#include "utils/vec3.hpp"
-
 class AbstractKart;
+class Rain;
 
 /**
   * \brief Handles the game camera
@@ -91,6 +94,11 @@ private:
      *  since in profile mode the camera might change its owner. */
     AbstractKart   *m_kart;
 
+    /** A pointer to the original kart the camera was pointing at when it
+     *  was created. Used when restarting a race (since the camera might
+     *  get attached to another kart if a kart is elimiated). */
+    AbstractKart   *m_original_kart;
+
     /** The list of viewports for this cameras. */
     core::recti     m_viewport;
 
@@ -112,7 +120,14 @@ private:
     /* Whether we should use the pre-0.7 camera style or the
      * modern style. Should default to modern. */
     Style           m_camera_style;
-    
+
+    /** List of all cameras. */
+    static std::vector<Camera*> m_all_cameras;
+
+    /** Used to show rain graphical effects. */
+    Rain *m_rain;
+
+
     /** A class that stores information about the different end cameras
      *  which can be specified in the scene.xml file. */
     class EndCameraInformation
@@ -190,9 +205,41 @@ private:
                            bool *smoothing);
     void positionCamera(float dt, float above_kart, float cam_angle,
                         float side_way, float distance, float smoothing);
+
+         Camera(int camera_index, AbstractKart* kart);
+        ~Camera();
 public:
-         Camera            (int camera_index, AbstractKart* kart);
-        ~Camera            ();
+    LEAK_CHECK()
+
+    /** Returns the number of cameras used. */
+    static unsigned int getNumCameras() { return m_all_cameras.size(); }
+
+    // ------------------------------------------------------------------------
+    /** Returns a camera. */
+    static Camera *getCamera(unsigned int n) { return m_all_cameras[n]; }
+
+    // ------------------------------------------------------------------------
+    /** Remove all cameras. */
+    static void removeAllCameras() 
+    { 
+        for(unsigned int i=0; i<m_all_cameras.size(); i++)
+            delete m_all_cameras[i];
+        m_all_cameras.clear();
+    }   // removeAllCameras
+
+    // ------------------------------------------------------------------------
+    /** Creates a camera and adds it to the list of all cameras. Also the 
+     *  camera index (which determines which viewport to use in split screen)
+     *  is set.
+     */
+    static Camera* createCamera(AbstractKart* kart)
+    {
+        Camera *c = new Camera(m_all_cameras.size(), kart);
+        m_all_cameras.push_back(c);
+        return c;
+    }   // createCamera
+    // ------------------------------------------------------------------------
+
     static void readEndCamera(const XMLNode &root);
     static void clearEndCameras();
     void setMode           (Mode mode_);    /** Set the camera to the given mode */
@@ -203,7 +250,15 @@ public:
     void setInitialTransform();
     void activate();
     void update            (float dt);
-    void changeOwner       (AbstractKart *new_kart);
+    void setKart           (AbstractKart *new_kart);
+
+    // ------------------------------------------------------------------------
+    /** Returns the kart to which this camera is attached. */
+    const AbstractKart* getKart() const { return m_kart; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the kart to which this camera is attached. */
+    AbstractKart* getKart() { return m_kart; }
 
     // ------------------------------------------------------------------------
     /** Sets the ambient light for this camera. */

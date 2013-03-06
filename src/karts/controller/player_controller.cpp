@@ -56,14 +56,14 @@ PlayerController::PlayerController(AbstractKart *kart,
     m_player       = player;
     m_player->setKart(kart);
     m_penalty_time = 0.0f;
-    kart->setCamera(new Camera(player_index, kart));
-    kart->getCamera()->setMode(Camera::CM_NORMAL);
-
-    m_bzzt_sound  = sfx_manager->createSoundSource( "bzzt" );
-    m_wee_sound   = sfx_manager->createSoundSource( "wee"  );
-    m_ugh_sound   = sfx_manager->createSoundSource( "ugh"  );
-    m_grab_sound  = sfx_manager->createSoundSource( "grab_collectable" );
-    m_full_sound  = sfx_manager->createSoundSource( "energy_bar_full" );
+    // Keep a pointer to the camera to remove the need to search for
+    // the right camera once per frame later.
+    m_camera       = Camera::createCamera(kart);
+    m_bzzt_sound   = sfx_manager->createSoundSource( "bzzt" );
+    m_wee_sound    = sfx_manager->createSoundSource( "wee"  );
+    m_ugh_sound    = sfx_manager->createSoundSource( "ugh"  );
+    m_grab_sound   = sfx_manager->createSoundSource( "grab_collectable" );
+    m_full_sound   = sfx_manager->createSoundSource( "energy_bar_full" );
 
     reset();
 }   // PlayerController
@@ -365,17 +365,17 @@ void PlayerController::update(float dt)
 
     // look backward when the player requests or
     // if automatic reverse camera is active
-    if (m_kart->getCamera()->getMode() != Camera::CM_FINAL)
+    if (m_camera->getMode() != Camera::CM_FINAL)
     {
         if (m_controls->m_look_back || (UserConfigParams::m_reverse_look_threshold>0 && 
             m_kart->getSpeed()<-UserConfigParams::m_reverse_look_threshold))
         {
-            m_kart->getCamera()->setMode(Camera::CM_REVERSE);
+            m_camera->setMode(Camera::CM_REVERSE);
         }
         else
         {
-            if (m_kart->getCamera()->getMode() == Camera::CM_REVERSE)
-                m_kart->getCamera()->setMode(Camera::CM_NORMAL);
+            if (m_camera->getMode() == Camera::CM_REVERSE)
+                m_camera->setMode(Camera::CM_NORMAL);
         }
     }
 
@@ -422,9 +422,12 @@ void PlayerController::setPosition(int p)
 //-----------------------------------------------------------------------------
 /** Called when a kart finishes race.
  *  /param time Finishing time for this kart.
- */
+ d*/
 void PlayerController::finishedRace(float time)
 {
+    // This will implicitely trigger setting the first end camera to be active
+    m_camera->setMode(Camera::CM_FINAL);
+
 }   // finishedRace
 
 //-----------------------------------------------------------------------------

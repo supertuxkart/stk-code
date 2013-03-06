@@ -182,8 +182,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
         exit(-2);
     }
     m_ghost_karts.push_back(new GhostKart(std::string(s)));
-    m_ghost_karts[m_ghost_karts.size()-1].init(RaceManager::KT_GHOST, 
-        /*is_first_kart*/false);
+    m_ghost_karts[m_ghost_karts.size()-1].init(RaceManager::KT_GHOST);
 
     fgets(s, 1023, fd);
     unsigned int size;

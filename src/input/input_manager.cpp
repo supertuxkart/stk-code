@@ -118,15 +118,7 @@ void InputManager::handleStaticAction(int key, int value)
             if(!ProfileWorld::isProfileMode() || !world) break;
             int kart_id = key - KEY_KEY_1;
             if(kart_id<0 || kart_id>=(int)world->getNumKarts()) break;
-            for(unsigned int i=0; i<world->getNumKarts(); i++)
-            {
-                if(world->getKart(i)->getCamera())
-                {
-                    world->getKart(i)->getCamera()
-                                     ->changeOwner(world->getKart(kart_id));
-
-                }
-            }
+            Camera::getCamera(0)->setKart(world->getKart(kart_id));
             break;
         }
 #endif

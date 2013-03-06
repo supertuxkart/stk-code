@@ -36,7 +36,6 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/rain.hpp"
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
@@ -83,7 +82,6 @@
  *  \param ident  The identifier for the kart model to use.
  *  \param position The position (or rank) for this kart (between 1 and
  *         number of karts). This is used to determine the start position.
- *  \param is_first_kart   Indicates whether this is the first *player* kart
  *  \param init_transform  The initial position and rotation for this kart.
  */
 Kart::Kart (const std::string& ident, unsigned int world_kart_id, 
@@ -113,11 +111,9 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_collision_particles  = NULL;
     m_slipstream           = NULL;
     m_skidmarks            = NULL;
-    m_camera               = NULL;
     m_controller           = NULL;
     m_saved_controller     = NULL;
     m_flying               = false;
-    m_rain                 = NULL;
     m_sky_particles_emitter= NULL;
     m_stars_effect         = NULL;
     
@@ -161,8 +157,9 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
 // -----------------------------------------------------------------------------
 /** This is a second initialisation phase, necessary since in the constructor
  *  virtual functions are not called for any superclasses.
- */
-void Kart::init(RaceManager::KartType type, bool is_first_kart)
+ *  \param type Type of the kart.
+*/
+void Kart::init(RaceManager::KartType type)
 {
     // In multiplayer mode, sounds are NOT positional
     if (race_manager->getNumLocalPlayers() > 1)
@@ -201,7 +198,7 @@ void Kart::init(RaceManager::KartType type, bool is_first_kart)
     {
         animations = false;
     }
-    loadData(type, is_first_kart, animations);
+    loadData(type, animations);
 
     m_kart_gfx = new KartGFX(this);
     m_skidding = new Skidding(this, 
@@ -242,7 +239,6 @@ Kart::~Kart()
     if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
     if(m_collision_particles)    delete m_collision_particles;
     if(m_slipstream)             delete m_slipstream;
-    if(m_rain)                   delete m_rain;
     if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
     if(m_attachment)             delete m_attachment;
     if (m_stars_effect)          delete m_stars_effect;
@@ -273,7 +269,6 @@ Kart::~Kart()
         delete m_controller;
     if(m_saved_controller)
         delete m_saved_controller;
-    if (m_camera) delete m_camera;
 }   // ~Kart
 
 //-----------------------------------------------------------------------------
@@ -299,12 +294,6 @@ void Kart::reset()
     m_max_speed->reset();
     m_powerup->reset();
 
-    if (m_camera)
-    {
-        m_camera->reset();
-        m_camera->setInitialTransform();
-    }
-    
     // Reset animations and wheels
     m_kart_model->reset();
 
@@ -800,9 +789,6 @@ void Kart::finishedRace(float time)
         else 
             m_kart_model->setAnimation(KartModel::AF_LOSE_START);
         
-        // Not all karts have a camera
-        if (m_camera) m_camera->setMode(Camera::CM_FINAL);
-        
         RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if(m)
         {
@@ -820,9 +806,6 @@ void Kart::finishedRace(float time)
         else if(m_race_position>=0.7f*race_manager->getNumberOfKarts())
             m_kart_model->setAnimation(KartModel::AF_LOSE_START);
             
-        // Not all karts have a camera
-        if (m_camera) m_camera->setMode(Camera::CM_REVERSE);
-        
         RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if(m)
         {
@@ -1015,8 +998,6 @@ void Kart::update(float dt)
 
     if(!history->replayHistory())
         m_controller->update(dt);
-    if(m_camera)
-        m_camera->update(dt);
 
     // if its view is blocked by plunger, decrease remaining time
     if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= dt;
@@ -1082,16 +1063,6 @@ void Kart::update(float dt)
 
     m_attachment->update(dt);
 
-    //smoke drawing control point
-    if (UserConfigParams::m_graphical_effects)
-    {
-        if (m_rain)
-        {
-            m_rain->setPosition( getCamera()->getCameraSceneNode()->getPosition() );
-            m_rain->update(dt);
-        }
-    }  // UserConfigParams::m_graphical_effects
-    
     m_kart_gfx->update(dt);
     if (m_collision_particles) m_collision_particles->update(dt);
     
@@ -1377,17 +1348,22 @@ void Kart::handleMaterialGFX()
     // has the 'below surface' flag set. Detect if there is a surface 
     // on top of the kart.
     // --------------------------------------------------------------
-    if (m_camera && m_camera->getMode() != Camera::CM_FINAL)
+    if (m_controller->isPlayerController() && !hasFinishedRace())
     {
-        if (material && material->hasFallingEffect() && !m_flying)
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
-            m_camera->setMode(Camera::CM_FALLING);
-        }
-        else if (m_camera->getMode() != Camera::CM_NORMAL && 
-                 m_camera->getMode() != Camera::CM_REVERSE)
-        {
-            m_camera->setMode(Camera::CM_NORMAL);
-        }
+            Camera *camera = Camera::getCamera(i);
+
+            if (material && material->hasFallingEffect() && !m_flying)
+            {
+                Camera::getCamera(i)->setMode(Camera::CM_FALLING);
+            }   
+            else if (camera->getMode() != Camera::CM_NORMAL && 
+                     camera->getMode() != Camera::CM_REVERSE)
+            {
+                camera->setMode(Camera::CM_NORMAL);
+            }
+        }   // for i in all cameras for this kart
     }   // camera != final camera
     
     if (!UserConfigParams::m_graphical_effects)
@@ -1443,30 +1419,6 @@ void Kart::handleMaterialGFX()
     }
 
 }   // handleMaterialGFX
-
-//-----------------------------------------------------------------------------
-/** Sets or reset the camera attached to a kart. In profile mode even AI karts
- *  can have a camera attached.
- *  \params camera The camera to attach to this kart (or NULL if no camera
- *          is to be used
- */
-void Kart::setCamera(Camera *camera)
-{
-    m_camera = camera;
-    if(!camera)
-        return;
-
-#ifdef DEBUG
-    m_camera->getCameraSceneNode()
-            ->setName((getIdent() + "'s camera").c_str());
-#endif
-    
-    // Handle camera-specific nodes for now if in multiplayer
-    if (m_rain && race_manager->getNumLocalPlayers() > 1)
-    {
-        m_rain->setCamera( camera->getCameraSceneNode() );
-    }
-}   // setCamera
 
 //-----------------------------------------------------------------------------
 /** Sets zipper time, and apply one time additional speed boost. It can be 
@@ -2149,9 +2101,10 @@ void Kart::updateFlying()
 // ----------------------------------------------------------------------------
 /** Attaches the right model, creates the physics and loads all special 
  *  effects (particle systems etc.)
+ *  \param type Type of the kart.
+ *  \param is_animated_model True if the model is animated.
  */
-void Kart::loadData(RaceManager::KartType type, bool is_first_kart, 
-                    bool is_animated_model)
+void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 {
 
     m_node = m_kart_model->attachModel(is_animated_model);
@@ -2185,14 +2138,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_first_kart,
         //        of the heightmap being calculated and kept in memory
         m_sky_particles_emitter->addHeightMapAffector(track);
     }
-    
-    if (UserConfigParams::m_weather_effects && track->getWeatherType() == WEATHER_RAIN &&
-        type == RaceManager::KT_PLAYER)
-    {
-        // camera not yet available at this point
-        m_rain = new Rain(NULL, NULL, is_first_kart);
-    }
-        
+            
     Vec3 position(0, getKartHeight()*0.35f, -getKartLength()*0.35f);
         
     m_slipstream = new SlipStream(this);

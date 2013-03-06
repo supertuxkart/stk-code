@@ -151,6 +151,35 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
         if(wheels[2]) wheels[2]->setVisible(false);
         if(wheels[3]) wheels[3]->setVisible(false);
         eliminateKart(kart_id, /*notify_of_elimination*/ true);
+        // Find a camera of the kart with the most lives ("leader"), and 
+        // attach all cameras for this kart to the leader.
+        int max_lives = 0;
+        AbstractKart *leader = NULL;
+        for(unsigned int i=0; i<getNumKarts(); i++)
+        {
+            AbstractKart * const kart = getKart(i);
+            if(kart->isEliminated() || kart->hasFinishedRace() ||
+                kart->getWorldKartId()==kart_id) continue;
+            if(m_kart_info[i].m_lives > max_lives)
+            {
+                leader = kart;
+                max_lives = m_kart_info[i].m_lives;
+            }
+        }
+        // leader could be 0 if the last two karts hit each other in
+        // the same frame
+        if(leader)
+        {
+            for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+            {
+                Camera *camera = Camera::getCamera(i);
+                if(camera->getKart()->getWorldKartId()==kart_id)
+                {
+                    camera->setMode(Camera::CM_NORMAL);
+                    camera->setKart(leader);
+                }
+            }   // for in < number of cameras
+        }   // if leader
         m_insert_tire = 4;
     }
     

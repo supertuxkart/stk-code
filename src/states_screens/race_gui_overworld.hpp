@@ -120,7 +120,7 @@ public:
     RaceGUIOverworld();
     ~RaceGUIOverworld();
     virtual void renderGlobal(float dt);
-    virtual void renderPlayerView(const AbstractKart *kart, float dt);
+    virtual void renderPlayerView(const Camera *camera, float dt);
 
     // ------------------------------------------------------------------------
     /** Returns the currently selected challenge data (or NULL if no is 

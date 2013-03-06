@@ -474,21 +474,22 @@ void RaceGUIBase::update(float dt)
  *  is used here to display the referee during the ready-set-go phase.
  *  \param kart The kart whose view is rendered next.
  */
-void RaceGUIBase::preRenderCallback(const AbstractKart &kart)
+void RaceGUIBase::preRenderCallback(const Camera *camera)
 {
-    if(m_referee)
+    if(m_referee && camera->getKart())
     {
-        Vec3 xyz = m_referee_pos[kart.getWorldKartId()];
+        unsigned int world_id = camera->getKart()->getWorldKartId();
+        Vec3 xyz = m_referee_pos[world_id];
         xyz.setY(xyz.getY()+m_referee_height);
         m_referee->setPosition(xyz);
-        m_referee->setRotation(m_referee_rotation[kart.getWorldKartId()]);
+        m_referee->setRotation(m_referee_rotation[world_id]);
     }
 }   // preRenderCallback
 
 // ----------------------------------------------------------------------------
-void RaceGUIBase::renderPlayerView(const AbstractKart *kart, float dt)
+void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
 {
-    const core::recti &viewport = kart->getCamera()->getViewport();
+    const core::recti &viewport = camera->getViewport();
 
     if (m_lightning > 0.0f)
     {
@@ -1030,15 +1031,16 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 /** Draws the plunger-in-face if necessary. Does nothing if there is no 
  *  plunger in face atm.
  */
-void RaceGUIBase::drawPlungerInFace(const AbstractKart *kart, float dt)
+void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
 {
+    const AbstractKart *kart = camera->getKart();
     if (kart->getBlockedByPlungerTime()<=0)
     {
         m_plunger_state = PLUNGER_STATE_INIT;
         return;
     }
 
-    const core::recti &viewport = kart->getCamera()->getViewport();
+    const core::recti &viewport = camera->getViewport();
 
     const int screen_width = viewport.LowerRightCorner.X 
                            - viewport.UpperLeftCorner.X;

@@ -43,6 +43,10 @@ private:
 
     float          m_penalty_time;
 
+    /** The camera attached to the kart for this controller. The camera
+     *  object is managed in the Camera class, so no need to free it. */
+    Camera        *m_camera;
+
     SFXBase       *m_bzzt_sound;
     SFXBase       *m_wee_sound;
     SFXBase       *m_ugh_sound;
@@ -62,20 +66,21 @@ public:
                                       float previous_energy=0);
     virtual void   skidBonusTriggered();
     virtual void   setPosition       (int p);
-    virtual void   finishedRace      (float time);
     virtual bool   isPlayerController() const {return true;}
     virtual bool   isNetworkController() const { return false; }
     virtual void   reset             ();
     void           resetInputState   ();
+    virtual void   finishedRace      (float time);
     virtual void   crashed           (const AbstractKart *k) {}
     virtual void   crashed           (const Material *m) {}
     // ------------------------------------------------------------------------
+    /** Callback whenever a new lap is triggered. Used by the AI
+     *  to trigger a recomputation of the way to use, not used for players. */
+    virtual void  newLap(int lap) {}
+    // ------------------------------------------------------------------------
     /** Player will always be able to get a slipstream bonus. */
     virtual bool  disableSlipstreamBonus() const { return false; }
-    // ------------------------------------------------------------------------
-    /** Callback whenever a new lap is triggered. Used by the AI
-     *  to trigger a recomputation of the way to use.            */
-    virtual void  newLap(int lap) {}
-};
+
+};   // PlayerController
 
 #endif

@@ -88,6 +88,9 @@ protected:
     void     computePath();
     virtual bool doSkid(float steer_fraction);
     // ------------------------------------------------------------------------
+    /** Nothing special to do when the race is finished. */
+    virtual void raceFinished() {};
+    // ------------------------------------------------------------------------
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */
     bool     isStuck() const { return m_stuck_trigger_rescue; }

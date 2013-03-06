@@ -19,6 +19,7 @@
 #ifndef HEADER_RAIN_HPP
 #define HEADER_RAIN_HPP
 
+class Camera;
 class PerCameraNode;
 
 #include <vector3d.h>
@@ -47,7 +48,7 @@ class Rain
     SFXBase* m_thunder_sound;
     
 public:
-    Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent, bool lightning);
+    Rain(Camera* camera, irr::scene::ISceneNode* parent);
     ~Rain();
     
     void update(float dt);

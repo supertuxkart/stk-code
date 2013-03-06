@@ -114,9 +114,12 @@ ExplosionAnimation::~ExplosionAnimation()
     {
         m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-        if(m_kart->getCamera() &&
-            m_kart->getCamera()->getMode() != Camera::CM_FINAL)
-            m_kart->getCamera()->setMode(Camera::CM_NORMAL);
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+        {
+            Camera *camera = Camera::getCamera(i);
+            if(camera->getMode() != Camera::CM_FINAL)
+                camera->setMode(Camera::CM_NORMAL);
+        }
     }
 }   // ~KartAnimation
 

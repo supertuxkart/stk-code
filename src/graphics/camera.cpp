@@ -28,6 +28,7 @@
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/rain.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
@@ -39,16 +40,20 @@
 #include "utils/aligned_array.hpp"
 #include "utils/constants.hpp"
 
-#include <ICameraSceneNode.h>
-#include <ISceneManager.h>
+#include "ICameraSceneNode.h"
+#include "ISceneManager.h"
 
 AlignedArray<Camera::EndCameraInformation> Camera::m_end_cameras;
+std::vector<Camera*>                       Camera::m_all_cameras;
 
-Camera::Camera(int camera_index, AbstractKart* kart)
+// ============================================================================
+Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
 {
-    m_mode     = CM_NORMAL;
-    m_index    = camera_index;
-    m_camera   = irr_driver->addCameraSceneNode();
+    m_mode          = CM_NORMAL;
+    m_index         = camera_index;
+    m_rain          = NULL;
+    m_original_kart = kart;
+    m_camera        = irr_driver->addCameraSceneNode();
     
 #ifdef DEBUG
     m_camera->setName(core::stringc("Camera for ") + kart->getKartProperties()->getName());
@@ -56,7 +61,7 @@ Camera::Camera(int camera_index, AbstractKart* kart)
     
     setupCamera();
     m_distance = kart->getKartProperties()->getCameraDistance();
-    m_kart     = kart;
+    setKart(kart);
     m_ambient_light = World::getWorld()->getTrack()->getDefaultAmbientColor();
 
     // TODO: Put these values into a config file
@@ -83,6 +88,7 @@ Camera::Camera(int camera_index, AbstractKart* kart)
  */
 Camera::~Camera()
 {
+    if(m_rain) delete m_rain;
     irr_driver->removeCameraSceneNode(m_camera);
 }   // ~Camera
 
@@ -90,12 +96,16 @@ Camera::~Camera()
 /** Changes the owner of this camera to the new kart.
  *  \param new_kart The new kart to use this camera.
  */
-void Camera::changeOwner(AbstractKart *new_kart)
+void Camera::setKart(AbstractKart *new_kart)
 {
-    m_kart->setCamera(NULL);
     m_kart = new_kart;
-    new_kart->setCamera(this);
-}   // changeOwner
+#ifdef DEBUG
+    std::string name = new_kart->getIdent()+"'s camera";
+    if(new_kart)
+        getCameraSceneNode()->setName(name.c_str() );
+#endif
+
+}   // setKart
 
 //-----------------------------------------------------------------------------
 /** This function clears all end camera data structure. This is necessary
@@ -203,7 +213,14 @@ void Camera::setupCamera()
     m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
     m_camera->setFarValue(World::getWorld()->getTrack()->getCameraFar());
-    }   // setupCamera
+
+    if (UserConfigParams::m_weather_effects && 
+        World::getWorld()->getTrack()->getWeatherType() == WEATHER_RAIN)
+    {
+        m_rain = new Rain(this, NULL);
+    }
+
+}   // setupCamera
 
 // ----------------------------------------------------------------------------
 /** Sets the mode of the camera.
@@ -252,6 +269,7 @@ Camera::Mode Camera::getMode()
 */
 void Camera::reset()
 {
+    m_kart = m_original_kart;
     setMode(CM_NORMAL);
     setInitialTransform();
 }   // reset
@@ -422,6 +440,16 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
  */
 void Camera::update(float dt)
 {
+    if (UserConfigParams::m_graphical_effects)
+    {
+        if (m_rain)
+        {
+            m_rain->setPosition( getCameraSceneNode()->getPosition() );
+            m_rain->update(dt);
+        }
+    }  // UserConfigParams::m_graphical_effects
+    
+
     // The following settings give a debug camera which shows the track from
     // high above the kart straight down.
     if(UserConfigParams::m_camera_debug)

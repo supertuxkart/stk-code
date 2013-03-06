@@ -54,6 +54,7 @@ EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *pla
                              Controller *prev_controller) 
              : AIBaseController(kart, player)
 {
+    m_previous_controller = prev_controller;
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
     {
         // Overwrite the random selected default path from AIBaseController
@@ -150,9 +151,10 @@ void EndController::reset()
  */
 void  EndController::newLap(int lap)
 {
-    // This will implicitely trigger setting the first end camera to be active.
-    if(m_kart->getCamera())
-        m_kart->getCamera()->setMode(Camera::CM_FINAL);
+    // Forward the call to the original controller. This will implicitely 
+    // trigger setting the first end camera to be active if the controller
+    // is a player controller.
+    m_previous_controller->newLap(lap);
 }   // newLap
 
 //-----------------------------------------------------------------------------

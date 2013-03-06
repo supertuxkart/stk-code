@@ -1655,20 +1655,18 @@ void IrrDriver::update(float dt)
         if (rg) rg->update(dt);
 
 
-        for(unsigned int i=0; i<world->getNumKarts(); i++)
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
-            // We can't loop over player karts, since in profile/demo
-            // mode a non-player kart will have a camera
-            AbstractKart *kart=world->getKart(i);
-            if(!kart->getCamera()) continue;
+            Camera *camera = Camera::getCamera(i);
+
 #ifdef ENABLE_PROFILER
             std::ostringstream oss;
             oss << "drawAll() for kart " << i << std::flush;
             PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (i+1)*60,
                                      0x00, 0x00);
 #endif
-            kart->getCamera()->activate();
-            rg->preRenderCallback(*kart);   // adjusts start referee
+            camera->activate();
+            rg->preRenderCallback(camera);   // adjusts start referee
             m_scene_manager->drawAll();
 
             PROFILER_POP_CPU_MARKER();
@@ -1692,15 +1690,14 @@ void IrrDriver::update(float dt)
                                                 UserConfigParams::m_width,
                                                 UserConfigParams::m_height));
 
-        for(unsigned int i=0; i<world->getNumKarts(); i++)
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
-            AbstractKart *kart = world->getKart(i);
-            if(!kart->getCamera()) continue;
+            Camera *camera = Camera::getCamera(i);
             char marker_name[100];
             sprintf(marker_name, "renderPlayerView() for kart %d", i);
 
             PROFILER_PUSH_CPU_MARKER(marker_name, 0x00, 0x00, (i+1)*60);
-            rg->renderPlayerView(kart, dt);
+            rg->renderPlayerView(camera, dt);
 
             PROFILER_POP_CPU_MARKER();
         }  // for i<getNumKarts

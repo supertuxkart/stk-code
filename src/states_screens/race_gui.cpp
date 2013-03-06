@@ -184,15 +184,17 @@ void RaceGUI::renderGlobal(float dt)
  *  collectibles, ...
  *  \param kart Pointer to the kart for which to render the view.
  */
-void RaceGUI::renderPlayerView(const AbstractKart *kart, float dt)
+void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 {
     if (!m_enabled) return;
     
-    const core::recti &viewport = kart->getCamera()->getViewport();
+    const core::recti &viewport = camera->getViewport();
     
-    core::vector2df scaling = kart->getCamera()->getScaling();
+    core::vector2df scaling = camera->getScaling();
+    const AbstractKart *kart = camera->getKart();
+    if(!kart) return;
     
-    drawPlungerInFace(kart, dt);
+    drawPlungerInFace(camera, dt);
     
     scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
     drawAllMessages     (kart, viewport, scaling);
@@ -205,7 +207,7 @@ void RaceGUI::renderPlayerView(const AbstractKart *kart, float dt)
     if (!m_is_tutorial)
         drawRankLap     (kart, viewport);
 
-    RaceGUIBase::renderPlayerView(kart, dt);
+    RaceGUIBase::renderPlayerView(camera, dt);
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------

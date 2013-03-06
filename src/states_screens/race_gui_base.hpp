@@ -36,6 +36,7 @@ using namespace irr;
 #include "utils/vec3.hpp"
 
 class AbstractKart;
+class Camera;
 class Material;
 class Referee;
 
@@ -194,7 +195,7 @@ protected:
                                 const core::vector2df &scaling);
     void drawGlobalMusicDescription();
     void drawGlobalReadySetGo  ();
-    void drawPlungerInFace(const AbstractKart *kart, float dt);
+    void drawPlungerInFace(const Camera *camera, float dt);
     /** Instructs the base gui to ignore unimportant messages (like
      *  item messages).
      */
@@ -220,7 +221,7 @@ public:
     virtual void renderGlobal(float dt);
     virtual void init();
     virtual void restartRace();
-    virtual void renderPlayerView(const AbstractKart *kart, float dt);
+    virtual void renderPlayerView(const Camera *camera, float dt);
     virtual void addMessage(const irr::core::stringw &m, 
                             const AbstractKart *kart, float time,
                             const video::SColor &color=
@@ -228,7 +229,7 @@ public:
                             bool important=true,
                             bool big_font=false);
     virtual void update(float dt);
-    virtual void preRenderCallback(const AbstractKart &kart);
+    virtual void preRenderCallback(const Camera *camera);
     // ------------------------------------------------------------------------
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du 

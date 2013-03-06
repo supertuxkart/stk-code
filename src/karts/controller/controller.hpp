@@ -69,7 +69,6 @@ public:
     virtual void  crashed            (const AbstractKart *k) = 0;
     virtual void  crashed            (const Material *m) = 0;
     virtual void  setPosition        (int p) = 0;
-    virtual void  finishedRace       (float time) = 0;
     virtual bool  isPlayerController () const = 0;
     virtual bool  isNetworkController() const = 0;
     virtual bool  disableSlipstreamBonus() const = 0;
@@ -98,6 +97,10 @@ public:
     virtual void  newLap(int lap) = 0;
     // ------------------------------------------------------------------------
     virtual void  skidBonusTriggered() = 0;
+    // ------------------------------------------------------------------------
+    /** Called whan this controller's kart finishes the last lap. */
+    virtual void  finishedRace(float time) = 0;
+    // ------------------------------------------------------------------------
 };   // Controller
 
 #endif

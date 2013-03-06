@@ -111,7 +111,7 @@ public:
          RaceGUI();
         ~RaceGUI();
     virtual void renderGlobal(float dt);
-    virtual void renderPlayerView(const AbstractKart *kart, float dt);
+    virtual void renderPlayerView(const Camera *camera, float dt);
         
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du getMiniMapSize() const 

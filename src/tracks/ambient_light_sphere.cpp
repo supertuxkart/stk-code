@@ -48,10 +48,11 @@ void AmbientLightSphere::update(float dt)
     CheckStructure::update(dt);
 
     World *world = World::getWorld();
-    for(unsigned int i=0; i<world->getNumKarts(); i++)
+    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
-        AbstractKart *kart=world->getKart(i);
-        if(!kart->getCamera()) continue;
+        Camera *camera = Camera::getCamera(i);
+        const AbstractKart *kart=camera->getKart();
+        if(!kart) continue;
         if(isInside(i))
         {
             float d2=getDistance2ForKart(i);
@@ -67,7 +68,7 @@ void AmbientLightSphere::update(float dt)
                 const video::SColor &def = track->getDefaultAmbientColor();
                 color = m_ambient_color.getInterpolated(def, f);
             }
-            kart->getCamera()->setAmbientLight(color);
+            camera->setAmbientLight(color);
         }   // if active
     }   // for i<num_karts
 }   // update
@@ -83,6 +84,10 @@ void AmbientLightSphere::update(float dt)
 bool AmbientLightSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
                                      int indx)
 {
-    if(!World::getWorld()->getKart(indx)->getCamera()) return false;
-    return CheckSphere::isTriggered(old_pos, new_pos, indx);
+    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+    {
+        if(Camera::getCamera(i)->getKart()->getWorldKartId()==indx)
+            return CheckSphere::isTriggered(old_pos, new_pos, indx);
+    }
+    return false;
 }   // isTriggered
