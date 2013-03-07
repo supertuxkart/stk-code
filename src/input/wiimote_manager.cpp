@@ -38,7 +38,7 @@ bool WiimoteManager::m_enabled      = false;
 
 /** Irrlicht device IDs for the wiimotes start at this value */
 static const int    WIIMOTE_START_IRR_ID   = 32;
-static const float  JOYSTICK_ABS_MAX_ANGLE = 32767.0f;
+static const float  JOYSTICK_ABS_MAX_ANGLE = 32766.0f;
 
 // ============================ Helper functions ============================
 // -----------------------------------------------------------------------------
