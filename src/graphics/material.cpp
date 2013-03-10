@@ -1159,7 +1159,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                         (file_manager->getShaderDir() + pixel_shader ).c_str(),
                         "main", video::EPST_PS_2_0,
                         m_shaders[WATER_SHADER],
-                        video::EMT_SOLID_2_LAYER                             );
+                        video::EMT_TRANSPARENT_ALPHA_CHANNEL);
             m->MaterialType = (E_MATERIAL_TYPE)material_type;
         }
         modes++;
