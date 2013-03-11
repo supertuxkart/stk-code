@@ -31,6 +31,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -327,6 +328,8 @@ void AddonsLoading::doInstall()
         AddonsScreen::getInstance()->loadList();
         dismiss();
     }
+    
+    track_manager->loadTrackList();
 }   // doInstall
 
 // ----------------------------------------------------------------------------
