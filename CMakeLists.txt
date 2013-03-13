@@ -39,6 +39,11 @@ if(USE_WIIUSE)
     include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse")
 endif()
 
+# Build the irrlicht library
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
+include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
+
+
 # Set include paths
 include_directories(${STK_SOURCE_DIR})
 
@@ -88,13 +93,6 @@ else()
     set(IRRLICHT_XF86VM_LIBRARY "")
 endif()
 
-
-# Irrlicht
-if (APPLE)
-    set(IRRLICHT_LIBRARY "/Library/Frameworks/IrrFramework.framework")
-else()
-    set(IRRLICHT_LIBRARY ${PROJECT_SOURCE_DIR}/lib/irrlicht/lib/Linux/libIrrlicht.a)
-endif()
 
     
 # Set some compiler options
@@ -185,8 +183,6 @@ endif()
 #)
 #add_dependencies(supertuxkart stkirrlicht)
 
-include_directories(${PROJECT_SOURCE_DIR}/lib/irrlicht/include)
-
 
 # Common library dependencies
 target_link_libraries(supertuxkart
@@ -194,10 +190,9 @@ target_link_libraries(supertuxkart
     bulletcollision
     bulletmath
     enet
+    stkirrlicht
     ${CURL_LIBRARIES}
-    ${IRRLICHT_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
-    ${IRRLICHT_LIBRARY}
     ${IRRLICHT_XF86VM_LIBRARY}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES})

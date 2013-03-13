@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 // we don't need the FILE* interface
-#define BZ_NO_STDIO
+//#define BZ_NO_STDIO
 
 #define BZ_RUN               0
 #define BZ_FLUSH             1
