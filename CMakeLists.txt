@@ -1,6 +1,6 @@
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
-set(PROJECT_VERSION "0.7.3")
+set(PROJECT_VERSION "0.8.1")
 
 cmake_minimum_required(VERSION 2.8.1)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
@@ -153,7 +153,7 @@ if(APPLE)
         MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/ide/Xcode/SuperTuxKart-Info.plist)
 
     add_custom_command(TARGET supertuxkart PRE_BUILD
-        COMMAND ln -s ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources)
+        COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources)
 else()
     find_library(PTHREAD_LIBRARY NAMES pthread pthreadVC2 PATHS ${PROJECT_SOURCE_DIR}/dependencies/lib)
     mark_as_advanced(PTHREAD_LIBRARY)

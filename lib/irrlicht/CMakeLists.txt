@@ -6,13 +6,16 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/
                     ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/zlib
                     ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/bzip2)
 
+if(APPLE)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/MacOSX ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht)
+endif()
+
 add_definitions(-Wall -pipe -fexpensive-optimizations -I/usr/X11R6/include -DIRRLICHT_EXPORTS=1 -DNDEBUG=1)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -O3  -fno-exceptions -fno-rtti -fstrict-aliasing")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPNG_THREAD_UNSAFE_OK -DPNG_NO_MMX_CODE -DPNG_NO_MNG_FEATURES")
 
-
-add_library(stkirrlicht
+set(IRRLICHT_SOURCES
 source/Irrlicht/CTRStencilShadow.cpp
 source/Irrlicht/CGUIListBox.cpp
 source/Irrlicht/CZBuffer.cpp
@@ -774,3 +777,26 @@ source/Irrlicht/libpng/pnginfo.h
 source/Irrlicht/libpng/pnglibconf.h
 source/Irrlicht/libpng/pngstruct.h
 )
+
+if(APPLE)
+    set(IRRLICHT_SOURCES
+        ${IRRLICHT_SOURCES}
+        source/Irrlicht/MacOSX/AppDelegate.mm
+        source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm
+        source/Irrlicht/MacOSX/OSXClipboard.mm)
+    
+    #list(APPEND CMAKE_C_SOURCE_FILE_EXTENSIONS mm)
+    #set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS cpp)
+    
+    set_source_files_properties(source/Irrlicht/MacOSX/AppDelegate.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3  -fno-rtti")
+    set_source_files_properties(source/Irrlicht/MacOSX/AppDelegate.mm PROPERTIES LANGUAGE C)
+    
+    set_source_files_properties(source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3  -fno-rtti")
+    set_source_files_properties(source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm PROPERTIES LANGUAGE C)
+    
+    set_source_files_properties(source/Irrlicht/MacOSX/OSXClipboard.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3 -fno-rtti")
+    set_source_files_properties(source/Irrlicht/MacOSX/OSXClipboard.mm PROPERTIES LANGUAGE C)
+endif()
+
+add_library(stkirrlicht ${IRRLICHT_SOURCES})
+
