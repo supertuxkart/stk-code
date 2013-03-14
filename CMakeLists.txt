@@ -54,13 +54,34 @@ if(MSVC)
     set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
 endif()
 
+if(APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -F/Library/Frameworks")
+endif()
+
 # OpenAL
-find_package(OpenAL REQUIRED)
-include_directories(${OPENAL_INCLUDE_DIR})
+if(APPLE)
+    # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
+    # unix-style installs of Vorbis/Ogg/OpenAL/etc. they will be picked up over our frameworks. This is blocking when I make releases :
+    # the mac I use to make STK releases does have other installs of vorbis/ogg/etc. which aren't compatible with STK, so letting
+    # CMake pick the library it wants essentially means I can't build.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -framework OpenAL")
+    set(OPENAL_LIBRARY)
+else()
+    find_package(OpenAL REQUIRED)
+    include_directories(${OPENAL_INCLUDE_DIR})
+endif()
 
 # OggVorbis
-find_package(OggVorbis REQUIRED)
-include_directories(${OGGVORBIS_INCLUDE_DIRS})
+if(APPLE)
+    # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
+    # unix-style installs of Vorbis/Ogg/OpenAL/etc. they will be picked up over our frameworks. This is blocking when I make releases :
+    # the mac I use to make STK releases does have other installs of vorbis/ogg/etc. which aren't compatible with STK, so letting
+    # CMake pick the library it wants essentially means I can't build.
+    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -I/Library/Frameworks/Ogg.framework/Versions/A/Headers -I/Library/Frameworks/Vorbis.framework/Versions/A/Headers")
+else()
+    find_package(OggVorbis REQUIRED)
+    include_directories(${OGGVORBIS_INCLUDE_DIRS})
+endif()
 
 # CURL
 find_package(CURL REQUIRED)
@@ -196,6 +217,15 @@ target_link_libraries(supertuxkart
     ${IRRLICHT_XF86VM_LIBRARY}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES})
+
+if(APPLE)
+    # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
+    # unix-style installs of Vorbis/Ogg/OpenAL/etc. they will be picked up over our frameworks. This is blocking when I make releases :
+    # the mac I use to make STK releases does have other installs of vorbis/ogg/etc. which aren't compatible with STK, so letting
+    # CMake pick the library it wants essentially means I can't build.
+    set_target_properties(supertuxkart PROPERTIES LINK_FLAGS "-F/Library/Frameworks -framework OpenAL -framework Ogg -framework Vorbis")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/Library/Frameworks/OpenAL.framework/Versions/A/Headers")
+endif()
 
 if(USE_FRIBIDI)
     target_link_libraries(supertuxkart ${FRIBIDI_LIBRARIES})
