@@ -24,6 +24,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/per_camera_node.hpp"
+#include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -94,13 +95,29 @@ IrrDriver::IrrDriver()
  */
 IrrDriver::~IrrDriver()
 {
-    m_post_processing.shut();
+    // Note that we can not simply delete m_post_processing here: 
+    // m_post_processing uses a material that has a reference to
+    // m_post_processing (for a callback). So when the material is 
+    // removed it will try to drop the ref count of its callback object, 
+    // which is m_post_processing, and which was already deleted. So 
+    // instead we just decrease the ref count here. When the material 
+    // is deleted, it will trigger the actual deletion of
+    // PostProcessing when decreasing the refcount of its callback object.
+    m_post_processing->drop();
     assert(m_device != NULL);
     
     m_device->drop();
     m_device = NULL;
     m_modes.clear();
 }   // ~IrrDriver
+
+// ----------------------------------------------------------------------------
+/** Called before a race is started, after all cameras are set up.
+ */
+void IrrDriver::reset()
+{
+    m_post_processing->reset();
+}   // reset
 
 // ----------------------------------------------------------------------------
 
@@ -443,7 +460,7 @@ void IrrDriver::initDevice()
     //m_video_driver->enableMaterial2D();
     
     // Initialize post-processing if supported
-    m_post_processing.init(m_video_driver);
+    m_post_processing = new PostProcessing(m_video_driver);
     
     // set cursor visible by default (what's the default is not too clearly documented,
     // so let's decide ourselves...)
@@ -492,7 +509,7 @@ video::E_DRIVER_TYPE IrrDriver::getEngineDriverType( int index )
     }
 
     // Ouput which render will be tried.
-    Log::verbose("irr_driver", "Trying %s rendering.\n", rendererName.c_str());
+    Log::verbose("irr_driver", "Trying %s rendering.", rendererName.c_str());
 
     return type;
 }
@@ -1640,7 +1657,7 @@ void IrrDriver::update(float dt)
         // Start the RTT for post-processing.
         // We do this before beginScene() because we want to capture the glClear()
         // because of tracks that do not have skyboxes (generally add-on tracks)
-        m_post_processing.beginCapture();        
+        m_post_processing->beginCapture();        
     }
 
     m_video_driver->beginScene(back_buffer_clear, /*zBuffer*/ true, 
@@ -1680,10 +1697,10 @@ void IrrDriver::update(float dt)
         }   // for i<world->getNumKarts()
 
         // Stop capturing for the post-processing
-        m_post_processing.endCapture();
+        m_post_processing->endCapture();
 
         // Render the post-processed scene
-        m_post_processing.render();
+        m_post_processing->render();
 
         // Set the viewport back to the full screen for race gui
         m_video_driver->setViewPort(core::recti(0, 0,
@@ -1740,7 +1757,10 @@ void IrrDriver::requestScreenshot()
 }
 
 // ----------------------------------------------------------------------------
-// Irrlicht Event handler.
+/** This is not really used to process events, it's only used to shut down 
+ *  irrLicht's chatty logging until the event handler is ready to take 
+ *  the task.
+ */
 bool IrrDriver::OnEvent(const irr::SEvent &event)
 {
     //TODO: ideally we wouldn't use this object to STFU irrlicht's chatty 

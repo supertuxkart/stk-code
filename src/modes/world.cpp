@@ -30,6 +30,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/hardware_skinning.hpp"
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
@@ -181,6 +182,9 @@ void World::init()
         rg->init();
         rg->clearAllMessages();
     }
+
+    // Reset all data structures that depend on number of karts.
+    irr_driver->reset();
 }   // init
 
 //-----------------------------------------------------------------------------

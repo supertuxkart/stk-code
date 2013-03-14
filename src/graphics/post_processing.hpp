@@ -18,8 +18,11 @@
 #ifndef HEADER_POST_PROCESSING_HPP
 #define HEADER_POST_PROCESSING_HPP
 
-#include <IShaderConstantSetCallBack.h>
-#include <SMaterial.h>
+#include "IShaderConstantSetCallBack.h"
+#include "S3DVertex.h"
+#include "SMaterial.h"
+
+#include <vector>
 
 namespace irr
 {
@@ -33,40 +36,56 @@ using namespace irr;
 class PostProcessing : public video::IShaderConstantSetCallBack
 {
 private:
-    video::ITexture            *m_render_target;
-    video::SMaterial            m_material;
-    bool                        m_supported;
+    video::ITexture    *m_render_target;
+    /** Material to be used when blurring is used. */
+    video::SMaterial    m_blur_material;
+
+    bool                m_supported;
     
     /** Boost amount, used to tune the motion blur. Must be in the range 0.0 to 1.0 */
-    float                       m_boost_amount;
-    
-    bool                        m_used_pp_this_frame;
+    std::vector<float>  m_boost_amount;
+
+    /** The center of blurring, in texture coordinates [0,1]).*/
+    std::vector<core::vector2df> m_center;
+
+    /** The center to which the blurring is aimed at, in [0,1]. */
+    std::vector<core::vector2df> m_direction;
+
+    /** True if any of the cameras is using post processing. */
+    bool                m_used_pp_this_frame;
+
+    /** Currently active camera during post-processing, needed in the
+     *  OnSetConstants callback. */
+    unsigned int        m_current_camera;
+
+
+    struct Quad { video::S3DVertex v0, v1, v2, v3; };
+
+    /** The vertices for the rectangle used for each camera. This includes
+     *  the vertex position, normal, and texture coordinate. */
+    std::vector<Quad> m_vertices;
     
 public:
-    PostProcessing();
-    virtual ~PostProcessing();
-    
-    /** Initialization/termination management */
-    void            init(video::IVideoDriver* video_driver);
-    void            shut();
-    
+                 PostProcessing(video::IVideoDriver* video_driver);
+    virtual     ~PostProcessing();
+        
+    void         reset();
     /** Those should be called around the part where we render the scene to be post-processed */
-    void            beginCapture();
-    void            endCapture();
-    
-    void            update(float dt);
+    void         beginCapture();
+    void         endCapture();
+    void         update(float dt);
 
     /** Render the post-processed scene */
-    void            render();
+    void         render();
     
     /** Is the hardware able to use post-processing? */
-    inline bool     isSupported() const                 {return m_supported;}
+    inline bool  isSupported() const                 {return m_supported;}
     
     /** Use motion blur for a short time */
-    void            giveBoost();
+    void         giveBoost(unsigned int cam_index);
     
     /** Implement IShaderConstantsSetCallback. Shader constants setter for post-processing */
-    virtual void    OnSetConstants(video::IMaterialRendererServices *services, s32 user_data);
+    virtual void OnSetConstants(video::IMaterialRendererServices *services, s32 user_data);
 };
 
 #endif // HEADER_POST_PROCESSING_HPP

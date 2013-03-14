@@ -44,7 +44,6 @@ namespace irr
 }
 using namespace irr;
 
-#include "post_processing.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
@@ -53,6 +52,7 @@ using namespace irr;
 class AbstractKart;
 class Camera;
 class PerCameraNode;
+class PostProcessing;
 
 /**
   * \brief class that creates the irrLicht device and offers higher-level 
@@ -72,8 +72,8 @@ private:
     video::IVideoDriver        *m_video_driver;
     /** Irrlicht race font. */
     gui::IGUIFont              *m_race_font;
-    /** Post-processing */
-    PostProcessing              m_post_processing;
+    /** Post-processing. */
+    PostProcessing             *m_post_processing;
     
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
@@ -122,40 +122,18 @@ private:
     
     void doScreenShot();
 public:
-                          IrrDriver();
-                         ~IrrDriver();
-    void                  initDevice();
-    
-    void                  updateConfigIfRelevant();
-    
+         IrrDriver();
+        ~IrrDriver();
+    void initDevice();
+    void reset();
+    void updateConfigIfRelevant();
     void setAllMaterialFlags(scene::IMesh *mesh) const;
-
-    /** Returns a list of all video modes supports by the graphics card. */
-    const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
-    /** Returns the frame size. */
-    const core::dimension2d<u32>& getFrameSize() const 
-                       { return m_video_driver->getCurrentRenderTargetSize(); }
-    /** Returns the irrlicht device. */
-    IrrlichtDevice       *getDevice()       const { return m_device;        }
-    /** Returns the irrlicht video driver. */
-    video::IVideoDriver  *getVideoDriver()  const { return m_video_driver;  }
-    /** Returns the irrlicht scene manager. */
-    scene::ISceneManager *getSceneManager() const { return m_scene_manager; }
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
-    /** Returns the gui environment, used to add widgets to a screen. */
-    gui::IGUIEnvironment *getGUI() const { return m_gui_env; }
-    //irr::gui::IGUIFont   *getRaceFont() const { return m_race_font; }
-    
     video::ITexture      *applyMask(video::ITexture* texture, 
-                                    const std::string& mask_path);
-    
-    void                  displayFPS();
-    /** this is not really used to process events, it's only used to shut down irrLicht's
-      * chatty logging until the event handler is ready to take the task
-      */
-    bool                  OnEvent(const irr::SEvent &event);
-    
+                                    const std::string& mask_path);    
+    void displayFPS();
+    bool                  OnEvent(const irr::SEvent &event);    
     void                  setAmbientLight(const video::SColor &light);
     video::ITexture      *getTexture(const std::string &filename,
                                      bool is_premul=false,
@@ -198,7 +176,6 @@ public:
     void                  removeCameraSceneNode(scene::ICameraSceneNode *camera);
     void                  removeCamera(Camera *camera);
     void                  update(float dt);
-    
     /** Call to change resolution */
     void                  changeResolution(const int w, const int h, const bool fullscreen);
   /** Call this to roll back to the previous resolution if a resolution switch attempt goes bad */
@@ -212,11 +189,8 @@ public:
     core::position2di     getMouseLocation();
     
     void                  printRenderStats();
-    /** Returns the current real time, which might not be 0 at start of the
-     *  application. Value in msec.
-     */
-    unsigned int getRealTime() {return m_device->getTimer()->getRealTime(); }
-    
+    bool                  supportsSplatting();
+    void                  requestScreenshot();
 
     void draw2dTriangle(const core::vector2df &a, const core::vector2df &b,
                         const core::vector2df &c, 
@@ -224,12 +198,36 @@ public:
                         const video::SColor *ca=NULL,  
                         const video::SColor *cb=NULL,
                         const video::SColor *cc=NULL);
+
     
-    inline PostProcessing* getPostProcessing()  {return &m_post_processing;}
-    
-    bool supportsSplatting();
-    
-    void requestScreenshot();
+
+    // ------------------------------------------------------------------------
+    /** Returns a list of all video modes supports by the graphics card. */
+    const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
+    // ------------------------------------------------------------------------
+    /** Returns the frame size. */
+    const core::dimension2d<u32>& getFrameSize() const 
+                       { return m_video_driver->getCurrentRenderTargetSize(); }
+    // ------------------------------------------------------------------------
+    /** Returns the irrlicht device. */
+    IrrlichtDevice       *getDevice()       const { return m_device;        }
+    // ------------------------------------------------------------------------
+    /** Returns the irrlicht video driver. */
+    video::IVideoDriver  *getVideoDriver()  const { return m_video_driver;  }
+    // ------------------------------------------------------------------------
+    /** Returns the irrlicht scene manager. */
+    scene::ISceneManager *getSceneManager() const { return m_scene_manager; }
+    // ------------------------------------------------------------------------
+    /** Returns the gui environment, used to add widgets to a screen. */
+    gui::IGUIEnvironment *getGUI() const { return m_gui_env; }    
+    // ------------------------------------------------------------------------
+    /** Returns the current real time, which might not be 0 at start of the
+     *  application. Value in msec. */
+    unsigned int getRealTime() {return m_device->getTimer()->getRealTime(); }
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the post processing object. */
+    inline PostProcessing* getPostProcessing()  {return m_post_processing;}
+    // ------------------------------------------------------------------------
 #ifdef DEBUG
     /** Removes debug meshes. */
     void clearDebugMesh() { m_debug_meshes.clear(); }
