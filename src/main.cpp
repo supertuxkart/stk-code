@@ -579,26 +579,26 @@ int handleCmdLinePreliminary(int argc, char **argv)
             else
             {
                 Log::fatal("main", "Error: --screensize argument must be "
-                                   "given as WIDTHxHEIGHT\n");
+                                   "given as WIDTHxHEIGHT");
                 exit(EXIT_FAILURE);
             }
         }
         else if (strcmp(argv[i], "--version") == 0 || 
                  strcmp(argv[i], "-v"       ) == 0    )
         {
-            Log::info("main", "==============================\n");
-            Log::info("main", "SuperTuxKart, %s.\n", STK_VERSION ) ;
+            Log::info("main", "==============================");
+            Log::info("main", "SuperTuxKart, %s.", STK_VERSION ) ;
 #ifdef SVNVERSION
-            Log::info("main", "SuperTuxKart, SVN revision number '%s'.\n",
+            Log::info("main", "SuperTuxKart, SVN revision number '%s'.",
                       SVNVERSION ) ;
 #endif
             
             // IRRLICHT_VERSION_SVN
-            Log::info("main", "Irrlicht version %i.%i.%i (%s)\n",
+            Log::info("main", "Irrlicht version %i.%i.%i (%s)",
                       IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
                       IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
             
-            Log::info("main", "==============================\n");
+            Log::info("main", "==============================");
         }   // --verbose or -v
     }
     return 0;
@@ -659,7 +659,7 @@ int handleCmdLine(int argc, char **argv)
                 const KartProperties *km = 
                     kart_properties_manager->getKartById(i);
                  Log::info("main", "%s:\t%swidth: %f length: %f height: %f "
-                                   "mesh-buffer count %d\n",
+                                   "mesh-buffer count %d",
                         km->getIdent().c_str(),
                         (km->getIdent().size()<7) ? "\t" : "",
                         km->getMasterKartModel().getWidth(),
@@ -755,23 +755,23 @@ int handleCmdLine(int argc, char **argv)
                     {
                         race_manager->setLocalKartInfo(0, argv[i+1]);
                     }
-                    Log::verbose("main", "You chose to use kart '%s'.\n",
+                    Log::verbose("main", "You chose to use kart '%s'.",
                                  argv[i+1] ) ;
                     i++;
                 }
                 else
                 {
-                    Log::warn("main", "Kart '%s' not found, ignored.\n",
+                    Log::warn("main", "Kart '%s' not found, ignored.",
                               argv[i+1]);
                 }
             }
             /*
             else
             {
-                Log::warn("main", "Kart %s has not been unlocked yet. \n",
+                Log::warn("main", "Kart %s has not been unlocked yet.",
                           argv[i+1]);
                 Log::warn("main",
-                          "Use --list-karts to list available karts.\n\n");
+                          "Use --list-karts to list available karts.");
                 return 0;
             }
              */
@@ -814,7 +814,7 @@ int handleCmdLine(int argc, char **argv)
                         ->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
                     break;
             default:
-                Log::warn("main", "Invalid race type '%d' - ignored.\n",
+                Log::warn("main", "Invalid race type '%d' - ignored.",
                           atoi(argv[i+1]));
             }
             i++;
@@ -832,13 +832,13 @@ int handleCmdLine(int argc, char **argv)
             //if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
             {
                 race_manager->setTrack(argv[i+1]);
-                Log::verbose("main", "You choose to start in track: %s.\n",
+                Log::verbose("main", "You choose to start in track \"%s\".",
                              argv[i+1] );
                 
                 Track* t = track_manager->getTrack(argv[i+1]);
                 if (t == NULL)
                 {
-                    Log::warn("main", "Can't find track named <%s>\n",
+                    Log::warn("main", "Can't find track named \"%s\".",
                               argv[i+1]);
                 }
                 else if (t->isArena())
@@ -849,10 +849,10 @@ int handleCmdLine(int argc, char **argv)
             /*
             else
             {
-                Log::warn("main", "Track %s has not been unlocked yet. \n",
+                Log::warn("main", "Track %s has not been unlocked yet.",
                          argv[i+1]);
                 Log::warn("main", "Use --list-tracks to list available "
-                                  "tracks.\n\n");
+                                  "tracks.");
                 return 0;
             }
              */
@@ -866,7 +866,7 @@ int handleCmdLine(int argc, char **argv)
             
             if (gp == NULL)
             {
-                Log::warn("main", "There is no GP named '%s'\n", argv[i+1]);
+                Log::warn("main", "There is no GP named '%s'.", argv[i+1]);
                 return 0;
             }
             
@@ -880,36 +880,36 @@ int handleCmdLine(int argc, char **argv)
             if(UserConfigParams::m_num_karts > stk_config->m_max_karts)
             {
                 Log::warn("main",
-                          "Number of karts reset to maximum number %d\n",
+                          "Number of karts reset to maximum number %d.",
                                   stk_config->m_max_karts);
                 UserConfigParams::m_num_karts = stk_config->m_max_karts;
             }
             race_manager->setNumKarts( UserConfigParams::m_num_karts );
-            Log::verbose("main", "%d karts will be used.\n",
+            Log::verbose("main", "%d karts will be used.",
                          (int)UserConfigParams::m_num_karts);
             i++;
         }
         else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") )
         {
 
-            Log::info("main", "  Available tracks:\n" );
+            Log::info("main", "  Available tracks:" );
             for (size_t i = 0; i != track_manager->getNumberOfTracks(); i++)
             {
                 const Track *track = track_manager->getTrack(i);
                 // FIXME: crashes
                 //if (!unlock_manager->getCurrentSlot()->isLocked(track->getIdent()))
                 //{
-                    Log::info("main", "\t%14s: %ls\n",
+                    Log::info("main", "\t%14s: %ls",
                               track->getIdent().c_str(),
                               track->getName());
                 //}
             }
 
-            Log::info("main", "Use --track N to choose track.\n\n");
+            Log::info("main", "Use --track N to choose track.");
         }
         else if( !strcmp(argv[i], "--list-karts") )
         {
-            Log::info("main", "  Available karts:\n" );
+            Log::info("main", "  Available karts:");
             for (unsigned int i = 0; 
                  NULL != kart_properties_manager->getKartById(i); i++)
             {
@@ -918,11 +918,10 @@ int handleCmdLine(int argc, char **argv)
                 // FIXME: crashes
                 //if (!unlock_manager->getCurrentSlot()->isLocked(KP->getIdent()))
                 //{
-                    Log::info("main", "\t%10s: %ls\n", KP->getIdent().c_str(),
+                    Log::info("main", "\t%10s: %ls", KP->getIdent().c_str(),
                              KP->getName());
                 //}
             }
-            Log::info("main", "\n" );
         }
         else if (    !strcmp(argv[i], "--no-start-screen")
                      || !strcmp(argv[i], "-N")                )
@@ -937,21 +936,21 @@ int handleCmdLine(int argc, char **argv)
         }
         else if ( !strcmp(argv[i], "--laps") && i+1<argc )
         {
-            Log::verbose("main", "You choose to have %d laps.\n",
+            Log::verbose("main", "You choose to have %d laps.",
                          atoi(argv[i+1]) );
             race_manager->setNumLaps(atoi(argv[i+1]));
             i++;
         }
         else if( sscanf(argv[i], "--profile-laps=%d",  &n)==1)
         {
-            Log::verbose("main", "Profiling %d laps\n",n);
+            Log::verbose("main", "Profiling %d laps.",n);
             UserConfigParams::m_no_start_screen = true;
             ProfileWorld::setProfileModeLaps(n);
             race_manager->setNumLaps(n);
         }
         else if( sscanf(argv[i], "--profile-time=%d",  &n)==1)
         {
-            Log::verbose("main", "Profiling: %d seconds.\n", n);
+            Log::verbose("main", "Profiling: %d seconds.", n);
             UserConfigParams::m_no_start_screen = true;
             ProfileWorld::setProfileModeTime((float)n);
             race_manager->setNumLaps(999999); // profile end depends on time
@@ -1055,7 +1054,7 @@ int handleCmdLine(int argc, char **argv)
 #endif
         else
         {
-            Log::error("main", "Invalid parameter: %s.\n\n", argv[i] );
+            Log::error("main", "Invalid parameter: %s.\n", argv[i] );
             cmdLineHelp(argv[0]);
             return 0;
         }
@@ -1273,17 +1272,17 @@ int main(int argc, char *argv[] )
             std::string logoutfile = file_manager->getLogFile("stdout.log");
             std::string logerrfile = file_manager->getLogFile("stderr.log");
             Log::verbose("main", "Error messages and other text output will "
-                         "be logged to %s and %s\n", logoutfile.c_str(),
+                         "be logged to %s and %s.", logoutfile.c_str(),
                          logerrfile.c_str());
             if(freopen (logoutfile.c_str(),"w",stdout)!=stdout)
             {
                 Log::error("main", "Can not open log file '%s'. Writing to "
-                                "stdout instead.\n", logoutfile.c_str());
+                                "stdout instead.", logoutfile.c_str());
             }
             if(freopen (logerrfile.c_str(),"w",stderr)!=stderr)
             {
                 Log::error("main", "Can not open log file '%s'. Writing to "
-                           "stderr instead.\n", logerrfile.c_str());
+                           "stderr instead.", logerrfile.c_str());
             }
         }
 
@@ -1417,7 +1416,7 @@ int main(int argc, char *argv[] )
             if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
             {
                 Log::warn("main", "Kart '%s' is unknown so will use the "
-                          "default kart.\n",
+                          "default kart.",
                           UserConfigParams::m_default_kart.c_str());
                 race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart.getDefaultValue());
             }
@@ -1468,7 +1467,7 @@ int main(int argc, char *argv[] )
         if(!network_manager->initialiseConnections())
         {
             Log::error("main", "Problems initialising network connections,\n"
-                            "Running in non-network mode.\n");
+                            "Running in non-network mode.");
         }
         // On the server start with the network information page for now
         if(network_manager->getMode()==NetworkManager::NW_SERVER)
@@ -1503,8 +1502,8 @@ int main(int argc, char *argv[] )
     }  // try
     catch (std::exception &e)
     {
-        Log::error("main", "Exception caught : %s\n",e.what());
-        Log::error("main", "Aborting SuperTuxKart\n");
+        Log::error("main", "Exception caught : %s.",e.what());
+        Log::error("main", "Aborting SuperTuxKart.");
     }
 
     /* Program closing...*/
