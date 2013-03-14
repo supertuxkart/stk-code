@@ -18,6 +18,8 @@ set(WIIUSE_SOURCES
 
 
 if(APPLE)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch i386")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch i386 -F/Library/Frameworks")
     set(WIIUSE_SOURCES ${WIIUSE_SOURCES}
         os_mac/os_mac_find.m
         os_mac/os_mac_interface.m

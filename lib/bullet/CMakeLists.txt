@@ -2,6 +2,11 @@
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
+if(APPLE)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch i386")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch i386 -F/Library/Frameworks")
+endif()
+
 # libbulletmath
 add_library(bulletmath
 	src/LinearMath/btAabbUtil2.h           src/LinearMath/btMotionState.h
