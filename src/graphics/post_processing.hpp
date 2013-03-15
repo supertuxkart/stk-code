@@ -42,8 +42,10 @@ private:
 
     bool                m_supported;
     
-    /** Boost amount, used to tune the motion blur. Must be in the range 0.0 to 1.0 */
-    std::vector<float>  m_boost_amount;
+    /** Boost time, how long the boost should be displayed. This also
+     *  affects the strength of the effect: longer boost time will
+     *  have a stronger effect. */
+    std::vector<float>  m_boost_time;
 
     /** The center of blurring, in texture coordinates [0,1]).*/
     std::vector<core::vector2df> m_center;

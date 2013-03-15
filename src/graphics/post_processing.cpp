@@ -100,17 +100,18 @@ PostProcessing::~PostProcessing()
 void PostProcessing::reset()
 {
     unsigned int n = Camera::getNumCameras();
-    m_boost_amount.resize(n);
+    m_boost_time.resize(n);
     m_vertices.resize(n);
     m_center.resize(n);
     m_direction.resize(n);
 
     for(unsigned int i=0; i<n; i++)
     {
-        m_boost_amount[i] = 0.0f;
+        m_boost_time[i] = 0.0f;
         
         const core::recti &vp = Camera::getCamera(i)->getViewport();
-        // Map viewport to [-1,1] x [-1,1]
+        // Map viewport to [-1,1] x [-1,1]. First define the coordinates
+        // left, right, top, bottom:
         float right  = vp.LowerRightCorner.X < UserConfigParams::m_width 
                      ? 0.0f : 1.0f;
         float left   = vp.UpperLeftCorner.X  > 0.0f ? 0.0f : -1.0f;
@@ -118,10 +119,14 @@ void PostProcessing::reset()
         float bottom = vp.LowerRightCorner.Y < UserConfigParams::m_height
                      ? 0.0f : -1.0f;
 
+        // Use left etc to define 4 vertices on which the rendered screen
+        // will be displayed:
         m_vertices[i].v0.Pos = core::vector3df(left,  bottom, 0);
         m_vertices[i].v1.Pos = core::vector3df(left,  top,    0);
         m_vertices[i].v2.Pos = core::vector3df(right, top,    0);
         m_vertices[i].v3.Pos = core::vector3df(right, bottom, 0);
+        // Define the texture coordinates of each vertex, which must 
+        // be in [0,1]x[0,1]
         m_vertices[i].v0.TCoords  = core::vector2df(left  ==-1.0f ? 0.0f : 0.5f,
                                                     bottom==-1.0f ? 0.0f : 0.5f);
         m_vertices[i].v1.TCoords  = core::vector2df(left  ==-1.0f ? 0.0f : 0.5f,
@@ -130,6 +135,7 @@ void PostProcessing::reset()
                                                     top   == 1.0f ? 1.0f : 0.5f);
         m_vertices[i].v3.TCoords  = core::vector2df(right == 0.0f ? 0.5f : 1.0f,
                                                     bottom==-1.0f ? 0.0f : 0.5f);
+        // Set normal and color:
         core::vector3df normal(0,0,1);
         m_vertices[i].v0.Normal = m_vertices[i].v1.Normal = 
         m_vertices[i].v2.Normal = m_vertices[i].v3.Normal = normal;
@@ -145,7 +151,7 @@ void PostProcessing::reset()
                          - m_vertices[i].v0.TCoords.Y;
         m_center[i].Y=m_vertices[i].v0.TCoords.Y + 0.2f*tex_height;
         m_direction[i].X = m_center[i].X;
-        m_direction[i].Y = m_vertices[i].v0.TCoords.Y + 0.2f*tex_height;
+        m_direction[i].Y = m_vertices[i].v0.TCoords.Y + 0.7f*tex_height;
     }  // for i <number of cameras
 }   // reset
 
@@ -159,8 +165,8 @@ void PostProcessing::beginCapture()
         return;
 
     bool any_boost = false;
-    for(unsigned int i=0; i<m_boost_amount.size(); i++)
-        any_boost |= m_boost_amount[i]>0.0f;
+    for(unsigned int i=0; i<m_boost_time.size(); i++)
+        any_boost |= m_boost_time[i]>0.0f;
     
     // Don't capture the input when we have no post-processing to add
     // it will be faster and this ay we won't lose anti-aliasing
@@ -191,18 +197,21 @@ void PostProcessing::endCapture()
 /** Set the boost amount according to the speed of the camera */
 void PostProcessing::giveBoost(unsigned int camera_index)
 {
-    m_boost_amount[camera_index] = 2.5f;
+    m_boost_time[camera_index] = 0.75f;
 }   // giveBoost
 
 // ----------------------------------------------------------------------------
+/** Updates the boost times for all cameras, called once per frame.
+ *  \param dt Time step size.
+ */
 void PostProcessing::update(float dt)
 {
-    for(unsigned int i=0; i<m_boost_amount.size(); i++)
+    for(unsigned int i=0; i<m_boost_time.size(); i++)
     {
-        if (m_boost_amount[i] > 0.0f)
+        if (m_boost_time[i] > 0.0f)
         {
-            m_boost_amount[i] -= dt*3.5f;
-            if (m_boost_amount[i] < 0.0f) m_boost_amount[i] = 0.0f;
+            m_boost_time[i] -= dt;
+            if (m_boost_time[i] < 0.0f) m_boost_time[i] = 0.0f;
         }
     }
 }   // update
@@ -245,10 +254,18 @@ void PostProcessing::OnSetConstants(video::IMaterialRendererServices *services,
     float max_tex_height = m_vertices[m_current_camera].v1.TCoords.Y;
     services->setPixelShaderConstant("max_tex_height", &max_tex_height, 1);
 
-    float boost_amount = m_boost_amount[m_current_camera] * 0.2f;
+    // Scale the boost time to get a usable boost amount:
+    float boost_amount = m_boost_time[m_current_camera] * 0.7f;
     
-    if(m_boost_amount.size()>1)
+    // Especially for single screen the top of the screen is less blurred
+    // in the fragment shader by multiplying the blurr factor by
+    // (max_tex_height - texcoords.t), where max_tex_height is the maximum
+    // texture coordinate (1.0 or 0.5). In split screen this factor is too
+    // small (half the value compared with non-split screen), so we
+    // multiply this by 2.
+    if(m_boost_time.size()>1)
         boost_amount *= 2.0f;
+
     services->setPixelShaderConstant("boost_amount", &boost_amount, 1);
     services->setPixelShaderConstant("center",    
                                      &(m_center[m_current_camera].X), 2);
