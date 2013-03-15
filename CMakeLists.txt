@@ -199,18 +199,6 @@ else()
 endif()
 
 
-# To invoke irrlicht makefile. Just a few things must be checked before it can be uncommented :
-# 1) make it pass NDEBUG=1
-# 2) make the stdout output visible
-
-#add_custom_target(
-#   stkirrlicht
-#   COMMAND make
-#   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/irrlicht/source/Irrlicht
-#)
-#add_dependencies(supertuxkart stkirrlicht)
-
-
 # Common library dependencies
 target_link_libraries(supertuxkart
     bulletdynamics
