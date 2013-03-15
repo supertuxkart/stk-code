@@ -211,11 +211,6 @@ void InputManager::handleStaticAction(int key, int value)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 10000);
-                if(world->getCurrentNumPlayers()>1)
-                {
-                    kart = world->getLocalPlayerKart(1);
-                    kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 10000);
-                }
             }
             break;
         
