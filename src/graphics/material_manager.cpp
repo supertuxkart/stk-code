@@ -119,6 +119,20 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
         mb->getMaterial().FogEnable = World::getWorld()->getTrack()->isFogEnabled();
     }
     
+    
+    // Modify lightmap materials so that vertex colors are taken into account.
+    // But disable lighting because we assume all lighting is already part
+    // of the lightmap
+    if (mb->getMaterial().MaterialType == video::EMT_LIGHTMAP)
+    {
+        mb->getMaterial().MaterialType = video::EMT_LIGHTMAP_LIGHTING;
+        mb->getMaterial().AmbientColor  = video::SColor(255, 255, 255, 255);
+        mb->getMaterial().DiffuseColor  = video::SColor(255, 255, 255, 255);
+        mb->getMaterial().EmissiveColor = video::SColor(255, 255, 255, 255);
+        mb->getMaterial().SpecularColor = video::SColor(255, 255, 255, 255);
+    }
+    
+    
     //if (UserConfigParams::m_fullscreen_antialiasing)
     //    mb->getMaterial().AntiAliasing = video::EAAM_LINE_SMOOTH;
     

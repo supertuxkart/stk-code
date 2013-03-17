@@ -864,6 +864,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         fprintf(stderr, "WARNING: track uses deprecated texture <%s>\n", m_texname.c_str());
     }
     
+    
     int modes = 0;
     
     if (m_alpha_testing)
@@ -1092,6 +1093,19 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                     "main",video::EPST_PS_2_0,
                     m_shaders[SPLATTING], video::EMT_SOLID_2_LAYER );
         m->MaterialType = (E_MATERIAL_TYPE)material_type;
+    }
+    
+    
+    // Modify lightmap materials so that vertex colors are taken into account.
+    // But disable lighting because we assume all lighting is already part
+    // of the lightmap
+    if (m->MaterialType == video::EMT_LIGHTMAP)
+    {
+        m->MaterialType = video::EMT_LIGHTMAP_LIGHTING;
+        m->AmbientColor  = video::SColor(255, 255, 255, 255);
+        m->DiffuseColor  = video::SColor(255, 255, 255, 255);
+        m->EmissiveColor = video::SColor(255, 255, 255, 255);
+        m->SpecularColor = video::SColor(255, 255, 255, 255);
     }
     
     if (m_graphical_effect == GE_BUBBLE && mb != NULL)
