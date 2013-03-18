@@ -80,7 +80,8 @@ private:
         SPLATTING,
         WATER_SHADER,
         SPHERE_MAP,
-        SHADER_COUNT
+        SHADER_COUNT,
+        SPLATTING_LIGHTMAP
     };
     
     video::ITexture *m_texture;
@@ -221,6 +222,8 @@ private:
     
     /** If m_splatting is true, indicates the fourth splatting texture */
     std::string      m_splatting_texture_4;
+    
+    std::string      m_splatting_lightmap;
     
     irr::video::IShaderConstantSetCallBack* m_shaders[SHADER_COUNT];
 

@@ -179,13 +179,15 @@ class SplattingProvider : public video::IShaderConstantSetCallBack
 {
     core::vector3df m_light_direction;
     bool m_light_dir_calculated;
+    bool m_lightmap;
     
 public:
     LEAK_CHECK()
     
-    SplattingProvider()
+    SplattingProvider(bool lightmap)
     {
         m_light_dir_calculated = false;
+        m_lightmap = lightmap;
     }
     
     virtual void OnSetConstants(
@@ -212,6 +214,12 @@ public:
         
         s32 tex_detail3 = 5;
         services->setPixelShaderConstant("tex_detail3", &tex_detail3, 1);
+        
+        if (m_lightmap)
+        {
+            s32 tex_lightmap = 6;
+            services->setPixelShaderConstant("tex_lightmap", &tex_lightmap, 1);
+        }
         
         services->setVertexShaderConstant("lightdir", &m_light_direction.X, 3);
     }
@@ -500,6 +508,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         node->get("splatting-texture-2", &m_splatting_texture_2);
         node->get("splatting-texture-3", &m_splatting_texture_3);
         node->get("splatting-texture-4", &m_splatting_texture_4);
+        node->get("splatting-lightmap", &m_splatting_lightmap);
     }
     
     node->get("water-shader", &m_water_shader);
@@ -1080,21 +1089,52 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             }
             m->setTexture(5, tex);
             
-            if (m_shaders[SPLATTING] == NULL)
+            if (m_splatting_lightmap.size() > 0)
             {
-                m_shaders[SPLATTING] = new SplattingProvider();
+                tex = irr_driver->getTexture(m_splatting_lightmap);
             }
+            m->setTexture(6, tex);
+            
+            if (m_splatting_lightmap.size() > 0)
+            {
+                if (m_shaders[SPLATTING_LIGHTMAP] == NULL)
+                {
+                    m_shaders[SPLATTING_LIGHTMAP] = new SplattingProvider(true);
+                }
+            }
+            else
+            {
+                if (m_shaders[SPLATTING] == NULL)
+                {
+                    m_shaders[SPLATTING] = new SplattingProvider(false);
+                }
+            }
+
             
             // Material and shaders
             IGPUProgrammingServices* gpu = 
                 irr_driver->getVideoDriver()->getGPUProgrammingServices();
-            s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
+                
+            if (m_splatting_lightmap.size() > 0)
+            {
+                s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
+                            (file_manager->getShaderDir() + "splatting_lightmap.vert").c_str(),
+                            "main",video::EVST_VS_2_0,
+                            (file_manager->getShaderDir() + "splatting_lightmap.frag").c_str(), 
+                            "main",video::EPST_PS_2_0,
+                            m_shaders[SPLATTING_LIGHTMAP], video::EMT_SOLID );
+                m->MaterialType = (E_MATERIAL_TYPE)material_type;
+            }
+            else
+            {
+                s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
                         (file_manager->getShaderDir() + "splatting.vert").c_str(),
                         "main",video::EVST_VS_2_0,
                         (file_manager->getShaderDir() + "splatting.frag").c_str(), 
                         "main",video::EPST_PS_2_0,
                         m_shaders[SPLATTING], video::EMT_SOLID );
-            m->MaterialType = (E_MATERIAL_TYPE)material_type;
+                m->MaterialType = (E_MATERIAL_TYPE)material_type;
+            }
         }
         else
         {
