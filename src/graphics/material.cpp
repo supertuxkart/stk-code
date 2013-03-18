@@ -198,19 +198,19 @@ public:
             m_light_direction = -World::getWorld()->getTrack()->getSunRotation().rotationToDirection();
         }
         
-        s32 tex_layout = 0;
+        s32 tex_layout = 1;
         services->setPixelShaderConstant("tex_layout", &tex_layout, 1);
         
-        s32 tex_detail0 = 1;
+        s32 tex_detail0 = 2;
         services->setPixelShaderConstant("tex_detail0", &tex_detail0, 1);
         
-        s32 tex_detail1 = 2;
+        s32 tex_detail1 = 3;
         services->setPixelShaderConstant("tex_detail1", &tex_detail1, 1);
 
-        s32 tex_detail2 = 3;
+        s32 tex_detail2 = 4;
         services->setPixelShaderConstant("tex_detail2", &tex_detail2, 1);
         
-        s32 tex_detail3 = 4;
+        s32 tex_detail3 = 5;
         services->setPixelShaderConstant("tex_detail3", &tex_detail3, 1);
         
         services->setVertexShaderConstant("lightdir", &m_light_direction.X, 3);
@@ -1055,44 +1055,51 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->SpecularColor.set(0,0,0,0);
         modes++;
     }
-    if (m_splatting && irr_driver->supportsSplatting())
+    if (m_splatting)
     {
-        ITexture* tex = irr_driver->getTexture(m_splatting_texture_1);
-        m->setTexture(1, tex);
-        
-        if (m_splatting_texture_2.size() > 0)
+        if (irr_driver->supportsSplatting())
         {
-            tex = irr_driver->getTexture(m_splatting_texture_2);
+            ITexture* tex = irr_driver->getTexture(m_splatting_texture_1);
+            m->setTexture(2, tex);
+            
+            if (m_splatting_texture_2.size() > 0)
+            {
+                tex = irr_driver->getTexture(m_splatting_texture_2);
+            }
+            m->setTexture(3, tex);
+            
+            if (m_splatting_texture_3.size() > 0)
+            {
+                tex = irr_driver->getTexture(m_splatting_texture_3);
+            }
+            m->setTexture(4, tex);
+            
+            if (m_splatting_texture_4.size() > 0)
+            {
+                tex = irr_driver->getTexture(m_splatting_texture_4);
+            }
+            m->setTexture(5, tex);
+            
+            if (m_shaders[SPLATTING] == NULL)
+            {
+                m_shaders[SPLATTING] = new SplattingProvider();
+            }
+            
+            // Material and shaders
+            IGPUProgrammingServices* gpu = 
+                irr_driver->getVideoDriver()->getGPUProgrammingServices();
+            s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
+                        (file_manager->getShaderDir() + "splatting.vert").c_str(),
+                        "main",video::EVST_VS_2_0,
+                        (file_manager->getShaderDir() + "splatting.frag").c_str(), 
+                        "main",video::EPST_PS_2_0,
+                        m_shaders[SPLATTING], video::EMT_SOLID );
+            m->MaterialType = (E_MATERIAL_TYPE)material_type;
         }
-        m->setTexture(2, tex);
-        
-        if (m_splatting_texture_3.size() > 0)
+        else
         {
-            tex = irr_driver->getTexture(m_splatting_texture_3);
+            m->MaterialType = video::EMT_SOLID;
         }
-        m->setTexture(3, tex);
-        
-        if (m_splatting_texture_4.size() > 0)
-        {
-            tex = irr_driver->getTexture(m_splatting_texture_4);
-        }
-        m->setTexture(4, tex);
-        
-        if (m_shaders[SPLATTING] == NULL)
-        {
-            m_shaders[SPLATTING] = new SplattingProvider();
-        }
-        
-        // Material and shaders
-        IGPUProgrammingServices* gpu = 
-            irr_driver->getVideoDriver()->getGPUProgrammingServices();
-        s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                    (file_manager->getShaderDir() + "splatting.vert").c_str(),
-                    "main",video::EVST_VS_2_0,
-                    (file_manager->getShaderDir() + "splatting.frag").c_str(), 
-                    "main",video::EPST_PS_2_0,
-                    m_shaders[SPLATTING], video::EMT_SOLID_2_LAYER );
-        m->MaterialType = (E_MATERIAL_TYPE)material_type;
     }
     
     
