@@ -117,8 +117,8 @@ private:
 
     /** This implements a simple finite state machine: it starts in
      *  NOT_YET. The first time the AI decides to skid, the state is changed
-     *  randomly (dependeng on skid probability) to N_SKID or SKID.
-     *  As long as the AI keeps on deciding the skid, the state remains
+     *  randomly (depending on skid probability) to NO_SKID or SKID.
+     *  As long as the AI keeps on deciding to skid, the state remains
      *  unchanged (so no new random decision is made) till it decides
      *  not to skid. In which case the state is set to NOT_YET again.
      *  This guarantees that for each 'skidable' section of the track
@@ -136,13 +136,17 @@ private:
     /** A random number generator for collecting items. */
     RandomGenerator m_random_collect_item;
 
-    /** Which of the three Point Selection Algorithms (i.e.
-     *  findNoNCrashingPoint* functions) to use:
-     *  the default (which is actually slightly buggy, but so far best one 
-     *              (after handling of 90 degree turns was added)
-     *  the fixed one (which fixes one problem of the buggy algorithm),
-     *  the new algorithm (see findNonCrashingPoint* for details).
-     *  So far the default one has by far the best performance. */
+    /** \brief Determines the algorithm to use to select the point-to-aim-for
+     *  There are three different Point Selection Algorithms:
+     *  1. findNonCrashingPoint() is the default (which is actually slightly 
+     *     buggy, but so far best one (after handling of 90 degree turns was 
+     *     added)
+     *  2. findNonCrashingPointFixed() which fixes the bugs of the default
+     *     algorithm
+     *  3. findNonCrashingPointNew()
+     *
+     *  So far the default one has by far the best performance, even though
+     *  it has bugs. */
     enum {PSA_DEFAULT, PSA_FIXED, PSA_NEW}
           m_point_selection_algorithm;
 
@@ -188,7 +192,7 @@ private:
     void  checkCrashes(const Vec3& pos);
     void  findNonCrashingPointFixed(Vec3 *result, int *last_node);
     void  findNonCrashingPointNew(Vec3 *result, int *last_node);
-    void  findNonCrashingPointDefault(Vec3 *result, int *last_node);
+    void  findNonCrashingPoint(Vec3 *result, int *last_node);
 
     void  determineTrackDirection();
     void  determineTurnRadius(const Vec3 &start,
