@@ -34,7 +34,7 @@ void main()
 	
 	// If no motion blur is needed, don't do any of the blur computation,
 	// just return the color from the texture.
-	if(boost_amount==0)
+	if(boost_amount==0.0)
 	{
 		gl_FragColor = vec4(color, 1.0);
 		return;
