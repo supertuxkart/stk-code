@@ -76,52 +76,6 @@
 #include <cstdio>
 #include <iostream>
 
-/** 
-\brief This is the actual racing AI.
-
-The main entry point, called once per frame for each AI, is update().
-After handling some standard cases (race start, AI being rescued)
-the AI does the following steps:
-- compute nearest karts (one ahead and one behind)
-- check if the kart is about to crash with another kart or the
-  track. This is done by simply testing a certain number of timesteps
-  ahead and estimating the future position of any kart by using 
-  current_position  + velocity * time
-  (so turns are not taken into account). It also checks if the kart
-  would be outside the quad graph, which indicates a 'collision with
-  track' (though technically this only means the kart would be off track).
-  This information is stored in the m_crashes data structure.
-- Determine track direction (straight, left, or right), which the
-  function determineTrackDirection stores in m_current_track_direction
-- If the kart has a bomb attached, it will try to hit the kart ahead,
-  using nitro if necessary. The kart will aim at the target kart,
-  nothing els is done (idea: if the kart has a plunger, fire it).
-- Otherwise, the AI will:
-  - set acceleration (handleAcceleration)
-  - decide where to steer to (handleSteering): it will first check if it
-    is outside of the track, and if so, steer towards the center of the
-    next quad. If it was detected that the AI is going to hit another
-    kart, it will try to avoid this. Otherwise it will aim at the center
-    of the quad furthest away so that a straight line from the current
-    position to this center is on track (see findNonCrashingPoint).
-    There are actually three different implementations of this, but the
-    (somewhat buggy) default one results in reality with the best AI
-    behaviour.
-  - decide if to try to collect or avoid items (handeItems).
-    It considers all items on quads between the current quad of the kart
-    and the quad the AI is aiming at (see handleSteering). If it finds
-    an item to collect, it pre-selects this items, which means it will
-    not select another item for collection until this pre-selected item
-    is clearly uncollectable (gone or too far out of the way). This avoids
-    problems that the AI is between two items it can collects, and keeps
-    switching between both items, at the end missing both.
-  - detects if the AI is stuck and needs rescue (handleRescue)
-  - decides if it needs to brake (handlebraking)
-  - decides if nitro or zipper should be used
-- Finally, it checks if it has a zipper but selected to use nitro, and
-  under certain circumstances will use zipper instead of nitro.
-
-*/
 SkiddingAI::SkiddingAI(AbstractKart *kart) 
                    : AIBaseController(kart)
 {
@@ -269,8 +223,8 @@ const irr::core::stringw& SkiddingAI::getNamePostfix() const
 
 //-----------------------------------------------------------------------------
 /** Returns the pre-computed successor of a graph node.
- *  \parameter index The index of the graph node for which the successor
- *              is searched.
+ *  \param index The index of the graph node for which the successor
+ *               is searched.
  */
 unsigned int SkiddingAI::getNextSector(unsigned int index)
 {
@@ -1746,13 +1700,13 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
  *  tested: New left/right lines are computed. If the new left line is to 
  *  the right of the old left line, the new left line becomes the current 
  *  left line:
-  
-      \    X       The new left line connecting kart to X will be to the right
-       \        / of the old left line, so the available area for the kart
-        \      /  will be dictated by the new left line.
-         \    /
-          kart
-  
+ *
+ *            X      The new left line connecting kart to X will be to the right
+ *        \        / of the old left line, so the available area for the kart
+ *         \      /  will be dictated by the new left line.
+ *          \    /
+ *           kart
+ *
  *  Similarly for the right side. This will narrow down the available area
  *  the kart can aim at, till finally the left and right line overlap.
  *  All points between the connection of the two end points of the left and 
@@ -1936,8 +1890,9 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
  *     is the distance from the center, i.e. it is half the path width if
  *     the point is at the edge).
  *  2. the test:
- *     QuadGraph::get()->spatialToTrack(&step_track_coord, step_coord,
- *                                            *last_node );
+ *
+ *         QuadGraph::get()->spatialToTrack(&step_track_coord, step_coord,
+ *                                          *last_node );
  *     in the for loop tests always against distance from the same 
  *     graph node (*last_node), while de-fact the loop will test points
  *     on various graph nodes.
@@ -2391,11 +2346,11 @@ void SkiddingAI::setSteering(float angle, float dt)
  *  2. Determine the line going through the first point and is orthogonal
  *     to the given tangent.
  *  3. The intersection of these two lines is the center of the circle.
- *  \param start First point.
- *  \param tangent Tangent at first point.
- *  \param end Second point on circle.
- *  \return center Center point of the circle.
- *  \return radius Radius of the circle.
+ *  \param[in] start First point.
+ *  \param[in] tangent Tangent at first point.
+ *  \param[in] end Second point on circle.
+ *  \param[out] center Center point of the circle.
+ *  \param[out] radius Radius of the circle.
  */
 void  SkiddingAI::determineTurnRadius(const Vec3 &start,
                                       const Vec3 &tangent,
