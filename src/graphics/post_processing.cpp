@@ -33,7 +33,6 @@ using namespace video;
 using namespace scene;
 
 PostProcessing::PostProcessing(video::IVideoDriver* video_driver)
- : m_vertices(NULL)
 {
     // Check if post-processing is supported on this hardware
     m_supported = false;
@@ -233,7 +232,6 @@ void PostProcessing::render()
     for(m_current_camera=0; m_current_camera<Camera::getNumCameras(); 
         m_current_camera++)
     {
-        Camera *camera = Camera::getCamera(m_current_camera);
         // Draw the fullscreen quad while applying the corresponding 
         // post-processing shaders
         video::IVideoDriver*    video_driver = irr_driver->getVideoDriver();
