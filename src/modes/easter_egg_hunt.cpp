@@ -27,7 +27,7 @@
 EasterEggHunt::EasterEggHunt() : WorldWithRank()
 {
     WorldStatus::setClockMode(CLOCK_CHRONO);
-    m_use_highscores = false;
+    m_use_highscores = true;
     m_eggs_found     = 0;
 }   // EasterEggHunt
 
@@ -76,6 +76,7 @@ void EasterEggHunt::readData(const std::string &filename)
         return;
     }
 
+    // Search for the closest difficulty set of egg.
     const XMLNode *data = NULL;
     std::string difficulty_name;
     RaceManager::Difficulty diff = race_manager->getDifficulty();
@@ -94,9 +95,6 @@ void EasterEggHunt::readData(const std::string &filename)
         return;
     }
 
-    m_time_limit = 9999;
-    data->get("time-limit", &m_time_limit);
-
     m_number_of_eggs = 0;
     for(unsigned int i=0; i<data->getNumNodes(); i++)
     {
@@ -113,7 +111,7 @@ void EasterEggHunt::readData(const std::string &filename)
 
     delete easter;
 
-    WorldStatus::setClockMode(CLOCK_CHRONO, m_time_limit);
+    WorldStatus::setClockMode(CLOCK_CHRONO);
 
 }   // readEasterEggInfo
 

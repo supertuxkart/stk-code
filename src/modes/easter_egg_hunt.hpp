@@ -37,9 +37,6 @@ private:
     /** Keeps track of how many eggs each kart has found. */
     std::vector<int>  m_eggs_collected;
 
-    /** A time limit for the hunt. */
-    float m_time_limit;
-
     /** Overall number of easter eggs. */
     int   m_number_of_eggs;
 
