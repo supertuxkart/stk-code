@@ -85,6 +85,12 @@ Track::Track(const std::string &filename)
     m_root                  = 
         StringUtils::getPath(StringUtils::removeExtension(m_filename));
     m_ident                 = StringUtils::getBasename(m_root);
+    // If this is an addon track, add "addon_" to the identifier - just in 
+    // case that an addon track has the same directory name (and therefore
+    // identifier) as an included track.
+    if(StringUtils::startsWith(filename, file_manager->getAddonsDir()))
+        m_ident = "addon_"+m_ident;
+
     // The directory should always have a '/' at the end, but getBasename 
     // above returns "" if a "/" is at the end, so we add the "/" here.
     m_root                 += "/";

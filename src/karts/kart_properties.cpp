@@ -174,6 +174,11 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     const XMLNode * root = 0;
     m_root  = StringUtils::getPath(filename)+"/";
     m_ident = StringUtils::getBasename(StringUtils::getPath(filename));
+    // If this is an addon kart, add "addon_" to the identifier - just in 
+    // case that an addon kart has the same directory name (and therefore
+    // identifier) as an included kart.
+    if(StringUtils::startsWith(filename, file_manager->getAddonsDir()))
+        m_ident = "addon_"+m_ident;
     try
     {
         root = new XMLNode(filename);
