@@ -246,7 +246,7 @@ ChallengeData::ChallengeData(const std::string& filename)
             getUnlocks(s, ChallengeData::UNLOCK_DIFFICULTY);
         else
         {
-            fprintf(stderr, "[ChallengeData] unkown unlock entry.\n");
+            fprintf(stderr, "[ChallengeData] unknown unlock entry.\n");
             fprintf(stderr, 
                     "Must be one of kart, track, gp, mode, difficulty.\n");
             exit(-1);

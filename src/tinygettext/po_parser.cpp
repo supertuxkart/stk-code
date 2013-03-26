@@ -173,7 +173,7 @@ POParser::get_string(unsigned int skip)
   else
   {
     if (pedantic)
-      warning("keyword and string must be seperated by a single space");
+      warning("keyword and string must be separated by a single space");
 
     for(;;)
     {

@@ -243,7 +243,7 @@ const core::stringw NewsManager::getNextNewsMessage()
 
 // ----------------------------------------------------------------------------
 /** Checks if the given condition list are all fulfilled.
- *  The conditions must be seperated by ";", and each condition
+ *  The conditions must be separated by ";", and each condition
  *  must be of the form "type comp version".
  *  Type must be 'stkversion'
  *  comp must be one of "<", "=", ">"
