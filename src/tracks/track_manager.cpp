@@ -260,7 +260,7 @@ void TrackManager::removeTrack(const std::string &ident)
     // Adjust all indices of tracks with an index number higher than
     // the removed track, since they have been moved down. This must
     // be done for all tracks and all arenas
-    for(unsigned int i=0; i<2; i++)  // i=0: soccer arenas, i=0: arenas, i=1: tracks
+    for(unsigned int i=0; i<3; i++)  // i=0: soccer arenas, i=1: arenas, i=2: tracks
     {
         Group2Indices &g2i = (i==0 ? m_soccer_arena_groups :
                                (i==1 ? m_arena_groups :
