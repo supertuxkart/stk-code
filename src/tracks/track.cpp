@@ -26,6 +26,7 @@
 
 using namespace irr;
 
+#include "addons/addon.hpp"
 #include "audio/music_manager.hpp"
 #include "challenges/challenge.hpp"
 #include "challenges/unlock_manager.hpp"
@@ -88,8 +89,8 @@ Track::Track(const std::string &filename)
     // If this is an addon track, add "addon_" to the identifier - just in 
     // case that an addon track has the same directory name (and therefore
     // identifier) as an included track.
-    if(StringUtils::startsWith(filename, file_manager->getAddonsDir()))
-        m_ident = "addon_"+m_ident;
+    if(Addon::isAddon(filename))
+        m_ident = Addon::createAddonId(m_ident);
 
     // The directory should always have a '/' at the end, but getBasename 
     // above returns "" if a "/" is at the end, so we add the "/" here.

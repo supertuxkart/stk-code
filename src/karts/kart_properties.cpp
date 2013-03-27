@@ -18,10 +18,7 @@
 
 #include "karts/kart_properties.hpp"
 
-#include <iostream>
-#include <stdexcept>
-#include <string>
-
+#include "addons/addon.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -36,6 +33,11 @@
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+#include <iostream>
+#include <stdexcept>
+#include <string>
+
 
 float KartProperties::UNDEFINED = -99.9f;
 
@@ -177,8 +179,8 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // If this is an addon kart, add "addon_" to the identifier - just in 
     // case that an addon kart has the same directory name (and therefore
     // identifier) as an included kart.
-    if(StringUtils::startsWith(filename, file_manager->getAddonsDir()))
-        m_ident = "addon_"+m_ident;
+    if(Addon::isAddon(filename))
+        m_ident = Addon::createAddonId(m_ident);
     try
     {
         root = new XMLNode(filename);

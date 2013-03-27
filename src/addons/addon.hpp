@@ -24,11 +24,12 @@
   * Handles add-ons that can be downloaded
   */
 
+#include "io/file_manager.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/time.hpp"
+
 #include <assert.h>
 #include <string>
-
-#include "io/file_manager.hpp"
-#include "utils/time.hpp"
 
 class XMLNode;
 
@@ -57,12 +58,33 @@ public:
                      SO_DATE       // Sorted by date, newest first
     };
 
+    // ------------------------------------------------------------------------
+    /** A static function that checks if the given ID is an addon. This is
+     *  done by testing if the directory name is in the addons directory. 
+     */
+    static bool isAddon(const std::string &directory)
+    {
+        return StringUtils::startsWith(directory,file_manager->getAddonsDir());
+    }   // isAddon
+
+    // ------------------------------------------------------------------------
+    /** Create an addon id by adding a 'addon_' prefix to the given id. */
+    static std::string createAddonId(const std::string &id)
+    {
+        return "addon_"+id;
+    }   // createAddonId
+    // ------------------------------------------------------------------------
+
 private:
     /** The name to be displayed. */
     core::stringw m_name;
     /** Internal id for this addon, which is the name in lower case.
-     *  This is used to create a subdirectory for this addon. */
+     *  This is the name of the subdirectory for this addon with an 'addon_'
+     *  prefix. */
     std::string m_id;
+    /** The directory name (i.d. the internal id without 'addon_' prefix. */
+    std::string m_dir_name;
+
     /** The name of the designer of the addon. */
     core::stringw m_designer;
     /** The (highest) revision number available online. */
@@ -241,7 +263,7 @@ public:
     /** Returns the directory in which this addon is installed. */
     std::string getDataDir() const 
     {
-        return file_manager->getAddonsFile(getTypeDirectory()+getId());
+        return file_manager->getAddonsFile(getTypeDirectory()+m_dir_name);
     }   // getDataDir
     // ------------------------------------------------------------------------
     /** Compares two addons according to the sort order currently defined.

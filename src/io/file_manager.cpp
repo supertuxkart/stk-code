@@ -829,7 +829,7 @@ const std::string &FileManager::getAddonsDir() const
  */
 std::string FileManager::getAddonsFile(const std::string &name)
 {
-    return getAddonsDir()+"/"+name;
+    return getAddonsDir()+name;
 }   // getAddonsFile
 
 //-----------------------------------------------------------------------------

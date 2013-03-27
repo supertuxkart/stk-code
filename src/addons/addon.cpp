@@ -66,9 +66,10 @@ Addon::Addon(const XMLNode &xml)
     std::string designer;
 
     xml.get("name",               &name                );    
-    m_name = StringUtils::decodeFromHtmlEntities(name);
-    m_id   = StringUtils::toLowerCase(name);
-    xml.get("id",                 &m_id                );
+    m_name     = StringUtils::decodeFromHtmlEntities(name);
+    m_dir_name = StringUtils::toLowerCase(name);
+    xml.get("id",                 &m_dir_name          );
+    m_id = createAddonId(m_dir_name);
     xml.get("designer",           &designer            );
     xml.get("status",             &m_status            );
     
@@ -116,6 +117,7 @@ Addon::Addon(const XMLNode &xml)
 void Addon::copyInstallData(const Addon &addon)
 {
     m_description   = addon.m_description;
+    m_dir_name      = addon.m_dir_name;
     m_revision      = addon.m_revision;
     m_zip_file      = addon.m_zip_file;
     m_icon_url      = addon.m_icon_url;
@@ -139,10 +141,11 @@ void Addon::copyInstallData(const Addon &addon)
  */
 void Addon::writeXML(std::ofstream *out_stream)
 {
+    // We write m_dir_name as 'id' to stay backwards compatible
     (*out_stream) << "  <"                       << m_type 
                   << " name=\""
                   << StringUtils::encodeToHtmlEntities(m_name)
-                  << "\" id=\""                  << m_id 
+                  << "\" id=\""                  << m_dir_name
                   << "\" designer=\""
                   << StringUtils::encodeToHtmlEntities(m_designer)
                   << "\" status=\""              << m_status
