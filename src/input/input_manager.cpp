@@ -225,8 +225,9 @@ void InputManager::handleStaticAction(int key, int value)
                     const int count = World::getWorld()->getNumKarts();
                     for (int n=0; n<count; n++)
                     {
-                        World::getWorld()->getKart(n)->getNode()
-                            ->setVisible(gui->m_enabled);
+                        if(World::getWorld()->getKart(n)->getController()->isPlayerController())
+                            World::getWorld()->getKart(n)->getNode()
+                                ->setVisible(gui->m_enabled);
                     }
                 }
                 else
