@@ -379,8 +379,7 @@ int AddonsManager::getAddonIndex(const std::string &id) const
 bool AddonsManager::install(const Addon &addon)
 {
     bool success=true;
-    const std::string &id = addon.getId();
-    file_manager->checkAndCreateDirForAddons(id, addon.getTypeDirectory());
+    file_manager->checkAndCreateDirForAddons(addon.getDataDir());
 
     //extract the zip in the addons folder called like the addons name    
     std::string base_name = StringUtils::getBasename(addon.getZipFileName());

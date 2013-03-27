@@ -96,8 +96,7 @@ public:
     bool              checkAndCreateDirectoryP(const std::string &path);
     const std::string &getAddonsDir() const;
     std::string        getAddonsFile(const std::string &name);
-    void checkAndCreateDirForAddons(std::string addons_name,
-                                    std::string addons_type);
+    void checkAndCreateDirForAddons(const std::string &dir);
     bool removeFile(const std::string &name) const;
     bool removeDirectory(const std::string &name) const;
     std::string getDataDir       () const;

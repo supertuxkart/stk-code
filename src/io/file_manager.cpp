@@ -978,17 +978,14 @@ void FileManager::listFiles(std::set<std::string>& result,
  *  \param addons_type The type, which is used as a subdirectory. E.g.:
  *         'karts' (m_addons_dir/karts/name will be created).
  */
-void FileManager::checkAndCreateDirForAddons(std::string addons_name, 
-                                             std::string addons_type)
+void FileManager::checkAndCreateDirForAddons(const std::string &dir)
 {
-    std::string path = getAddonsFile(addons_type);
-    bool success = checkAndCreateDirectory(path);
+    bool success = checkAndCreateDirectory(dir);
     if(!success)
     {
         Log::warn("FileManager", "There is a problem with the addons dir.");
         return;
     }
-    checkAndCreateDirectory(path+"/"+addons_name);
 }   // checkAndCreateDirForAddons
 
 // ----------------------------------------------------------------------------
