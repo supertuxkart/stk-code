@@ -41,7 +41,7 @@ namespace irr
 }
 
 /**
- * \brief manages smoke particle effects
+ * \brief manages level-of-detail
  * \ingroup graphics
  */
 class LODNode : public scene::ISceneNode
