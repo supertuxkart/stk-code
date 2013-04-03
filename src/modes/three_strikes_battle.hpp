@@ -90,7 +90,7 @@ public:
     virtual void terminateRace();
     
     // overriding World methods
-    virtual void restartRace();
+    virtual void reset();
 
     //virtual void getDefaultCollectibles(int& collectible_type, int& amount);
     virtual bool useFastMusicNearEnd() const { return false; }

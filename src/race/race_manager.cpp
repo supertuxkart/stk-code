@@ -419,7 +419,17 @@ void RaceManager::startNextRace()
         assert(0); 
     }
     
+    // A second constructor phase is necessary in order to be able to
+    // call functions which are overwritten (otherwise polymorphism 
+    // will fail and the results will be incorrect . Also in init() functions
+    // can be called that use World::getWorld(). 
     World::getWorld()->init();
+
+    // Now initialise all values that need to be reset from race to race
+    // Calling this here reduces code duplication in init and restartRace()
+    // functions.
+    World::getWorld()->reset();
+
     // Save the current score and set last time to zero. This is necessary
     // if someone presses esc after finishing a gp, and selects restart:
     // The race is rerun, and the points and scores get reset ... but if
@@ -659,7 +669,7 @@ void RaceManager::rerunRace()
         m_kart_status[i].m_score         = m_kart_status[i].m_last_score;
         m_kart_status[i].m_overall_time -= m_kart_status[i].m_last_time;
     }
-    World::getWorld()->restartRace();
+    World::getWorld()->reset();
 }   // rerunRace
 
 //-----------------------------------------------------------------------------

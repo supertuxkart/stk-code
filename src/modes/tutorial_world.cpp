@@ -10,7 +10,8 @@ void TutorialWorld::moveKartAfterRescue(AbstractKart* kart)
     
     // find closest point to drop kart on
     World *world = World::getWorld();
-    const int start_spots_amount = world->getTrack()->getNumberOfStartPositions();
+    const int start_spots_amount = 
+        world->getTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
     
     const float currentKart_x = kart->getXYZ().getX();
@@ -23,7 +24,8 @@ void TutorialWorld::moveKartAfterRescue(AbstractKart* kart)
 
     //position kart from same height as in World::resetAllKarts
     btTransform pos;
-    pos.setOrigin(kart->getXYZ()+btVector3(0, 0.5f*kart->getKartHeight(), 0.0f));
+    pos.setOrigin( kart->getXYZ()
+                  +btVector3(0, 0.5f*kart->getKartHeight(), 0.0f));
     pos.setRotation( btQuaternion(btVector3(0.0f, 1.0f, 0.0f), angle) );
 
     kart->getBody()->setCenterOfMassTransform(pos);
@@ -34,24 +36,28 @@ void TutorialWorld::moveKartAfterRescue(AbstractKart* kart)
     if (kart_over_ground)
     {
         //add vertical offset so that the kart starts off above the track
-        float vertical_offset = kart->getKartProperties()->getVertRescueOffset() *
-                                kart->getKartHeight();
+        float vertical_offset = 
+              kart->getKartProperties()->getVertRescueOffset()
+            * kart->getKartHeight();
         kart->getBody()->translate(btVector3(0, vertical_offset, 0));
     }
     else
     {
-        fprintf(stderr, "WARNING: invalid position after rescue for kart %s on track %s.\n",
+        fprintf(stderr, "WARNING: invalid position after rescue for kart %s"
+                         "on track %s.\n",
                 (kart->getIdent().c_str()), m_track->getIdent().c_str());
     }
 }   // moveKartAfterRescue
 
 // -----------------------------------------------------------------------------
 
-btTransform TutorialWorld::getClosestStartPoint(float currentKart_x, float currentKart_z)
+btTransform TutorialWorld::getClosestStartPoint(float currentKart_x,
+                                                float currentKart_z)
 {
     // find closest point to drop kart on
     World *world = World::getWorld();
-    const int start_spots_amount = world->getTrack()->getNumberOfStartPositions();
+    const int start_spots_amount = 
+        world->getTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
     
     
@@ -77,4 +83,4 @@ btTransform TutorialWorld::getClosestStartPoint(float currentKart_x, float curre
     
     assert(closest_id != -1);
     return world->getTrack()->getStartTransform(closest_id);
-}
+}   // getClosestStartPoint

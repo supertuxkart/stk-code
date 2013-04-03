@@ -158,14 +158,14 @@ bool EasterEggHunt::isRaceOver()
 //-----------------------------------------------------------------------------
 /** Called then a battle is restarted.
  */
-void EasterEggHunt::restartRace()
+void EasterEggHunt::reset()
 {
-    WorldWithRank::restartRace();
+    WorldWithRank::reset();
     
     for(unsigned int i=0; i<m_eggs_collected.size(); i++)
         m_eggs_collected[i] = 0;
     m_eggs_found = 0;
-}   // restartRace
+}   // reset
 
 //-----------------------------------------------------------------------------
 /** Returns the data to display in the race gui.

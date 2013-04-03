@@ -130,7 +130,7 @@ public:
     virtual  void getKartsDisplayInfo(
                   std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     virtual void  moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
-    virtual void  restartRace() OVERRIDE;
+    virtual void  reset() OVERRIDE;
     virtual void  newLap(unsigned int kart_index) OVERRIDE;
     
     // ------------------------------------------------------------------------    

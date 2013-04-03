@@ -164,17 +164,28 @@ void World::init()
     if(ReplayPlay::get())
         ReplayPlay::get()->Load();
 
-    resetAllKarts();
-    // Note: track reset must be called after all karts exist, since check
-    // objects need to allocate data structures depending on the number
-    // of karts.
-    m_track->reset();
-
-    if(!history->replayHistory()) history->initRecording();
-    if(ReplayRecorder::get()) ReplayRecorder::get()->init();
     network_manager->worldLoaded();
     
     powerup_manager->updateWeightsForRace(num_karts);
+}   // init
+
+//-----------------------------------------------------------------------------
+/** This function is called before a race is started (i.e. either after 
+ *  calling init() when starting a race for the first time, or after
+ *  restarting a race, in which case no init() is called.
+ */
+void World::reset()
+{
+    // If m_saved_race_gui is set, it means that the restart was done
+    // when the race result gui was being shown. In this case restore the 
+    // race gui (note that the race result gui is cached and so never really
+    // destroyed).
+    if(m_saved_race_gui)
+    {
+        m_race_gui       = m_saved_race_gui;
+        m_saved_race_gui = NULL;
+    }
+
     // erase messages left over
     RaceGUIBase* rg = getRaceGUI();
     if (rg)
@@ -183,9 +194,52 @@ void World::init()
         rg->clearAllMessages();
     }
 
+    m_race_gui->restartRace();
+    m_race_gui->clearAllMessages();
+
+    m_schedule_pause = false;
+    m_schedule_unpause = false;
+    
+    WorldStatus::reset();
+    m_faster_music_active = false;
+    m_eliminated_karts    = 0;
+    m_eliminated_players  = 0;
+    
+    for ( KartList::iterator i = m_karts.begin(); i != m_karts.end() ; ++i )
+    {
+        (*i)->reset();
+    }
+
+    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+    {
+        Camera::getCamera(i)->reset();
+    }
+
+    if(ReplayPlay::get())
+        ReplayPlay::get()->reset();
+
+    resetAllKarts();
+    // Note: track reset must be called after all karts exist, since check
+    // objects need to allocate data structures depending on the number
+    // of karts.
+    m_track->reset();
+
+    // Start music from beginning
+    music_manager->stopMusic();
+
+    // Enable SFX again
+    sfx_manager->resumeAll();
+
+    projectile_manager->cleanup();
+    race_manager->reset();
+    // Make sure to overwrite the data from the previous race.
+    if(!history->replayHistory()) history->initRecording();
+    if(ReplayRecorder::get()) ReplayRecorder::get()->init();
+
     // Reset all data structures that depend on number of karts.
     irr_driver->reset();
-}   // init
+
+}   // reset
 
 //-----------------------------------------------------------------------------
 
@@ -955,59 +1009,6 @@ void World::getDefaultCollectibles(int *collectible_type, int *amount )
     *collectible_type = PowerupManager::POWERUP_NOTHING;
     *amount = 0;
 }   // getDefaultCollectibles
-
-//-----------------------------------------------------------------------------
-void World::restartRace()
-{
-    // If m_saved_race_gui is set, it means that the restart was done
-    // when the race result gui was being shown. In this case restore the 
-    // race gui (note that the race result gui is cached and so never really
-    // destroyed).
-    if(m_saved_race_gui)
-    {
-        m_race_gui       = m_saved_race_gui;
-        m_saved_race_gui = NULL;
-    }
-
-    m_race_gui->restartRace();
-    m_race_gui->clearAllMessages();
-
-    m_schedule_pause = false;
-    m_schedule_unpause = false;
-    
-    WorldStatus::reset();
-    m_faster_music_active = false;
-    m_eliminated_karts    = 0;
-    m_eliminated_players  = 0;
-    
-    for ( KartList::iterator i = m_karts.begin(); i != m_karts.end() ; ++i )
-    {
-        (*i)->reset();
-    }
-
-    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
-    {
-        Camera::getCamera(i)->reset();
-    }
-
-    if(ReplayPlay::get())
-        ReplayPlay::get()->reset();
-    resetAllKarts();
-
-    // Start music from beginning
-    music_manager->stopMusic();
-    m_track->reset();
-
-    // Enable SFX again
-    sfx_manager->resumeAll();
-
-    projectile_manager->cleanup();
-    race_manager->reset();
-    // Make sure to overwrite the data from the previous race.
-    if(!history->replayHistory()) history->initRecording();
-    if(ReplayRecorder::get()) ReplayRecorder::get()->init();
-
-}   // restartRace
 
 //-----------------------------------------------------------------------------
 /** Pauses the music (and then pauses WorldStatus).

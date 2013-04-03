@@ -218,7 +218,7 @@ public:
     // =================
     virtual void    init();
     virtual void    terminateRace() OVERRIDE;
-    virtual void    restartRace();
+    virtual void    reset();
     virtual void    pause(Phase phase) OVERRIDE;
     virtual void    unpause() OVERRIDE;
     virtual void    getDefaultCollectibles(int *collectible_type, 

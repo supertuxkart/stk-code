@@ -79,11 +79,9 @@ LinearWorld::~LinearWorld()
 }   // ~LinearWorld
 
 //-----------------------------------------------------------------------------
-void LinearWorld::restartRace()
+void LinearWorld::reset()
 {
-    WorldWithRank::restartRace();
-    //if(m_last_lap_sfx->getStatus()== SFXManager::SFX_PLAYING)
-    //    m_last_lap_sfx->stop();
+    WorldWithRank::reset();
     m_last_lap_sfx_played = false;
     m_last_lap_sfx_playing = false;
 
@@ -119,7 +117,7 @@ void LinearWorld::restartRace()
     }
 #endif
     
-}   // restartRace
+}   // reset
 
 //-----------------------------------------------------------------------------
 /** General update function called once per frame. This updates the kart
@@ -343,9 +341,9 @@ void LinearWorld::newLap(unsigned int kart_index)
 }   // newLap
 
 //-----------------------------------------------------------------------------
-/** Gets the sector a kart is on. This return UNKNOWN_SECTOR if the kart_id
- *  is larger than the current kart info. This is necessary in the case that
- *  a collision with the track happens during resetAllKarts: at this time 
+/** Gets the sector a kart is on. This function returns UNKNOWN_SECTOR if the 
+ *  kart_id is larger than the current kart info. This is necessary in the case
+ *  that a collision with the track happens during resetAllKarts: at this time 
  *  m_kart_info is not initialised (and has size 0), so it would trigger this
  *  assert. While this normally does not happen, it is useful for track 
  *  designers that STK does not crash.

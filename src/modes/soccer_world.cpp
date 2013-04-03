@@ -50,20 +50,27 @@ void SoccerWorld::init()
 {
     WorldWithRank::init();
     m_display_rank = false;
-    
-    m_can_score_points = true;
-    memset(m_team_goals, 0, sizeof(m_team_goals));
-    
+        
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
     {
         fprintf(stderr, "No AI exists for this game mode\n");
         exit(1);
     }
- 
-    initKartList();
+}   // init
+
+//-----------------------------------------------------------------------------
+/** Called then a battle is restarted.
+ */
+void SoccerWorld::reset()
+{
+    WorldWithRank::reset();
     
-}   // SoccerWorld
+    m_can_score_points = true;
+    memset(m_team_goals, 0, sizeof(m_team_goals));
+    
+    initKartList();
+}   // reset
 
 //-----------------------------------------------------------------------------
 /** Returns the internal identifier for this race.
@@ -118,7 +125,7 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
     
     // TODO: rescue the karts
     // TODO: score a point
-}
+}   // onCheckGoalTriggered
 
 //-----------------------------------------------------------------------------
 /** The battle is over if only one kart is left, or no player kart.
@@ -145,20 +152,6 @@ void SoccerWorld::terminateRace()
     m_can_score_points = false;
     WorldWithRank::terminateRace();
 }   // terminateRace
-
-//-----------------------------------------------------------------------------
-/** Called then a battle is restarted.
- */
-void SoccerWorld::restartRace()
-{
-    WorldWithRank::restartRace();
-    
-    m_can_score_points = true;
-    memset(m_team_goals, 0, sizeof(m_team_goals));
-    
-    initKartList();
-
-}   // restartRace
 
 //-----------------------------------------------------------------------------
 /** Returns the data to display in the race gui.

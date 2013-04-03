@@ -74,9 +74,6 @@ public:
     {
         m_parts = parts;
     }
-    
-    // overriding World methods
-    virtual void restartRace() OVERRIDE;
 
     virtual void getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;

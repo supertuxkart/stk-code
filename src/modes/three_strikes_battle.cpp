@@ -67,19 +67,9 @@ void ThreeStrikesBattle::init()
     {
         // create the struct that ill hold each player's lives
         BattleInfo info;
-        info.m_lives         = 3;
         m_kart_info.push_back(info);
-        
-        // no positions in this mode
-        m_karts[n]->setPosition(-1);
-    }// next kart
-    
-    
-    BattleEvent evt;
-    evt.m_time = 0.0f;
-    evt.m_kart_info = m_kart_info;
-    m_battle_events.push_back(evt);    
-    
+    }   // next kart
+    m_kart_info.resize(kart_amount);
 }   // ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
@@ -96,6 +86,59 @@ ThreeStrikesBattle::~ThreeStrikesBattle()
     // karts are being freed, which would have a pointer to this mesh)
     irr_driver->removeMeshFromCache(m_tire);
 }   // ~ThreeStrikesBattle
+
+//-----------------------------------------------------------------------------
+/** Called when a battle is restarted.
+ */
+void ThreeStrikesBattle::reset()
+{
+    WorldWithRank::reset();
+    
+    const unsigned int kart_amount = m_karts.size();
+    
+    for(unsigned int n=0; n<kart_amount; n++)
+    {
+        m_kart_info[n].m_lives  = 3;
+        
+        // no positions in this mode
+        m_karts[n]->setPosition(-1);
+        
+        scene::ISceneNode* kart_node = m_karts[n]->getNode();
+        
+        // FIXME: sorry for this ugly const_cast, irrlicht doesn't seem to allow getting a writable list of children, wtf??
+        core::list<scene::ISceneNode*>& children = const_cast<core::list<scene::ISceneNode*>&>(kart_node->getChildren());
+        for (core::list<scene::ISceneNode*>::Iterator it = children.begin(); it != children.end(); it++)
+        {
+            scene::ISceneNode* curr = *it;
+            
+            if (core::stringc(curr->getName()) == "tire1")
+            {
+                curr->setVisible(true);
+            }
+            else if (core::stringc(curr->getName()) == "tire2")
+            {
+                curr->setVisible(true);
+            }
+        }
+        
+    }// next kart
+    
+    // remove old battle events
+    m_battle_events.clear();
+
+    // add initial battle event
+    BattleEvent evt;
+    evt.m_time = 0.0f;
+    evt.m_kart_info = m_kart_info;
+    m_battle_events.push_back(evt);
+
+    PhysicalObject *obj;
+    for_in(obj, m_tires)
+    {
+        m_track->getTrackObjectManager()->removeObject(obj);
+    }
+    m_tires.clearWithoutDeleting();
+}   // reset
 
 //-----------------------------------------------------------------------------
 /** Adds two tires to each of the kart. The tires are used to represent 
@@ -395,59 +438,6 @@ void ThreeStrikesBattle::terminateRace()
     updateKartRanks();
     WorldWithRank::terminateRace();
 }   // terminateRace
-
-//-----------------------------------------------------------------------------
-/** Called then a battle is restarted.
- */
-void ThreeStrikesBattle::restartRace()
-{
-    WorldWithRank::restartRace();
-    
-    const unsigned int kart_amount = m_karts.size();
-    
-    for(unsigned int n=0; n<kart_amount; n++)
-    {
-        m_kart_info[n].m_lives         = 3;
-        
-        // no positions in this mode
-        m_karts[n]->setPosition(-1);
-        
-        scene::ISceneNode* kart_node = m_karts[n]->getNode();
-        
-        // FIXME: sorry for this ugly const_cast, irrlicht doesn't seem to allow getting a writable list of children, wtf??
-        core::list<scene::ISceneNode*>& children = const_cast<core::list<scene::ISceneNode*>&>(kart_node->getChildren());
-        for (core::list<scene::ISceneNode*>::Iterator it = children.begin(); it != children.end(); it++)
-        {
-            scene::ISceneNode* curr = *it;
-            
-            if (core::stringc(curr->getName()) == "tire1")
-            {
-                curr->setVisible(true);
-            }
-            else if (core::stringc(curr->getName()) == "tire2")
-            {
-                curr->setVisible(true);
-            }
-        }
-        
-    }// next kart
-    
-    // remove old battle events
-    m_battle_events.clear();
-
-    // add initial battle event
-    BattleEvent evt;
-    evt.m_time = 0.0f;
-    evt.m_kart_info = m_kart_info;
-    m_battle_events.push_back(evt);
-
-    PhysicalObject *obj;
-    for_in(obj, m_tires)
-    {
-        m_track->getTrackObjectManager()->removeObject(obj);
-    }
-    m_tires.clearWithoutDeleting();
-}   // restartRace
 
 //-----------------------------------------------------------------------------
 /** Returns the data to display in the race gui.

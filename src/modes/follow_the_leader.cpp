@@ -47,11 +47,9 @@ FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
 }
 
 //-----------------------------------------------------------------------------
-FollowTheLeaderRace::~FollowTheLeaderRace()
-{
-}
-
-//-----------------------------------------------------------------------------
+/** Called immediately after the constructor. Here functions that use
+ *  World::getWorld() as well as overridden functions.
+ */
 void FollowTheLeaderRace::init()
 {
     LinearWorld::init();
@@ -62,6 +60,26 @@ void FollowTheLeaderRace::init()
 #pragma mark -
 #pragma mark clock events
 #endif
+//-----------------------------------------------------------------------------
+FollowTheLeaderRace::~FollowTheLeaderRace()
+{
+}
+
+//-----------------------------------------------------------------------------
+/** Called just before a race is started.
+ */
+void FollowTheLeaderRace::reset()
+{
+    LinearWorld::reset();
+    m_leader_intervals.clear();
+    m_leader_intervals    = stk_config->m_leader_intervals;
+    for(unsigned int i=0; i<m_leader_intervals.size(); i++)
+        m_leader_intervals[i] += 
+            stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
+    WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, 
+                              m_leader_intervals[0]);
+}   // reset
+
 //-----------------------------------------------------------------------------
 /** Returns the original time at which the countdown timer started. This is
  *  used by the race_gui to display the music credits in FTL mode correctly.
@@ -192,19 +210,6 @@ bool FollowTheLeaderRace::isRaceOver()
 {
     return getCurrentNumKarts()==2 || getCurrentNumPlayers()==0;
 }   // isRaceOver
-
-//-----------------------------------------------------------------------------
-void FollowTheLeaderRace::restartRace()
-{
-    LinearWorld::restartRace();
-    m_leader_intervals.clear();
-    m_leader_intervals    = stk_config->m_leader_intervals;
-    for(unsigned int i=0; i<m_leader_intervals.size(); i++)
-        m_leader_intervals[i] += 
-            stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
-    WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, 
-                              m_leader_intervals[0]);
-}   // restartRace
 
 //-----------------------------------------------------------------------------
 /** Returns the internal identifier for this kind of race. 

@@ -34,10 +34,6 @@
 WorldStatus::WorldStatus()
 {
     m_clock_mode        = CLOCK_CHRONO;
-    m_time              = 0.0f;
-    m_auxiliary_timer   = 0.0f;
-    m_phase             = UserConfigParams::m_race_now ? RACE_PHASE : SETUP_PHASE;
-    m_previous_phase    = UNDEFINED_PHASE;  // initialise it just in case
     
     m_prestart_sound    = sfx_manager->createSoundSource("pre_start_race");
     m_start_sound       = sfx_manager->createSoundSource("start_race");

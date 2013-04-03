@@ -38,7 +38,7 @@ public:
     virtual void countdownReachedZero() OVERRIDE;
     
     // overriding World methods
-    virtual void restartRace() OVERRIDE;
+    virtual void reset() OVERRIDE;
     virtual const std::string& getIdent() const OVERRIDE;
     virtual float getClockStartTime();
     virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }

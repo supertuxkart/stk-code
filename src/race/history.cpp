@@ -131,7 +131,7 @@ void History::updateReplay(float dt)
         m_current = 0;
         // Note that for physics replay all physics parameters
         // need to be reset, e.g. velocity, ...
-        world->restartRace();
+        world->reset();
     }
     unsigned int num_karts = world->getNumKarts();
     for(unsigned k=0; k<num_karts; k++)

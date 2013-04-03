@@ -51,7 +51,7 @@ public:
     virtual bool isRaceOver();
     
     // overriding World methods
-    virtual void restartRace();
+    virtual void reset();
 
     virtual bool raceHasLaps(){ return false; }
     virtual void moveKartAfterRescue(AbstractKart* kart);

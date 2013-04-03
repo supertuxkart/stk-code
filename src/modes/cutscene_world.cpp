@@ -425,14 +425,6 @@ void CutsceneWorld::terminateRace()
 }   // terminateRace
 
 //-----------------------------------------------------------------------------
-/** Called then a battle is restarted.
- */
-void CutsceneWorld::restartRace()
-{
-    World::restartRace();
-}   // restartRace
-
-//-----------------------------------------------------------------------------
 /** Returns the data to display in the race gui.
  */
 void CutsceneWorld::getKartsDisplayInfo(

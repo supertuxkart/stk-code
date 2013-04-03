@@ -58,7 +58,7 @@ public:
     virtual void terminateRace();
     
     // overriding World methods
-    virtual void restartRace();
+    virtual void reset();
 
     virtual bool useFastMusicNearEnd() const { return false; }
     virtual void getKartsDisplayInfo(

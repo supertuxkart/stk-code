@@ -57,12 +57,12 @@ public:
     
     virtual void  update(float delta) OVERRIDE;
     
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     /** Returns if this race mode has laps. */
     virtual bool  raceHasLaps() OVERRIDE { return false; }
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     virtual void checkForWrongDirection(unsigned int i) OVERRIDE;
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     /** The overworld is not a race per se so it's never over */
     virtual bool    isRaceOver() OVERRIDE { return false; }
     // ------------------------------------------------------------------------
@@ -75,12 +75,12 @@ public:
     // ------------------------------------------------------------------------
     /** Override base class method */
     virtual void onFirePressed(Controller* who) OVERRIDE;
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     /** Override settings from base class */
     virtual bool useChecklineRequirements() const OVERRIDE { return false; }
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     void scheduleSelectKart() { m_return_to_garage = true; }
-    // ------------------------------------------------------------------------ 
+    // ------------------------------------------------------------------------
     virtual void moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void onMouseClick(int x, int y) OVERRIDE;
