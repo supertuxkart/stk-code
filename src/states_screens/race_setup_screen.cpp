@@ -209,6 +209,7 @@ void RaceSetupScreen::init()
     if(num_ai<0) num_ai = 0;
     kartamount->setValue(num_ai);
     kartamount->setMax(stk_config->m_max_karts - race_manager->getNumLocalPlayers() );
+    race_manager->setNumKarts(num_ai +  race_manager->getNumLocalPlayers());
     
     DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
     assert( w2 != NULL );
