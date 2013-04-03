@@ -59,17 +59,8 @@ void ThreeStrikesBattle::init()
     {
         fprintf(stderr, "No AI exists for this game mode\n");
         exit(1);
-    }
- 
-    const unsigned int kart_amount = m_karts.size();
-    
-    for(unsigned int n=0; n<kart_amount; n++)
-    {
-        // create the struct that ill hold each player's lives
-        BattleInfo info;
-        m_kart_info.push_back(info);
-    }   // next kart
-    m_kart_info.resize(kart_amount);
+    }   
+    m_kart_info.resize(m_karts.size());
 }   // ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------

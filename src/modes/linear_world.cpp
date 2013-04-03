@@ -63,22 +63,23 @@ void LinearWorld::init()
     m_last_lap_sfx_playing          = false;
     const unsigned int kart_amount  = m_karts.size();
 
-    for(unsigned int n=0; n<kart_amount; n++)
-    {
-        KartInfo info;
-        info.getSector()->update(m_karts[n]->getXYZ());
-        m_kart_info.push_back(info);
-    }   // next kart
-
+    // The values are initialised in reset()
+    m_kart_info.resize(m_karts.size());
 }   // init
 
 //-----------------------------------------------------------------------------
+/** The destructor frees al data structures.
+ */
 LinearWorld::~LinearWorld()
 {
     sfx_manager->deleteSFX(m_last_lap_sfx);
 }   // ~LinearWorld
 
 //-----------------------------------------------------------------------------
+/** Called before a race is started (or restarted). It resets the data 
+ *  structures that keep track of position and distance long track of 
+ *  all karts.
+ */
 void LinearWorld::reset()
 {
     WorldWithRank::reset();
@@ -102,7 +103,8 @@ void LinearWorld::reset()
     //       be used everywhere
 #define assertExpr( ARG1, OP, ARG2 ) if (!(ARG1 OP ARG2)) \
         { \
-            std::cerr << "Failed assert " << #ARG1 << #OP << #ARG2 << " @ " << __FILE__ << ":" << __LINE__ \
+            std::cerr << "Failed assert " << #ARG1 << #OP << #ARG2 << " @ " \
+                      << __FILE__ << ":" << __LINE__ \
                       << "; values are (" << ARG1 << #OP << ARG2 << ")\n"; \
             assert(false); \
         }
@@ -266,7 +268,8 @@ void LinearWorld::newLap(unsigned int kart_index)
             }
         }
     }
-    else if (raceHasLaps() && kart_info.m_race_lap > 0 && kart_info.m_race_lap+1 < lap_count)
+    else if (raceHasLaps() && kart_info.m_race_lap > 0 && 
+             kart_info.m_race_lap+1 < lap_count)
     {
         m_race_gui->addMessage(_("Lap %i", kart_info.m_race_lap+1),
                                kart, 3.0f, video::SColor(255, 210, 100, 50), 
@@ -769,7 +772,7 @@ void LinearWorld::updateRacePosition()
                     continue;
                 }
                 if(m_kart_info[j].m_overall_distance == my_distance &&
-                    m_karts[j]->getInitialPosition()<kart->getInitialPosition() )
+                   m_karts[j]->getInitialPosition()<kart->getInitialPosition())
                 {
                     p++;
                     std::cout << "    " << p << " : " << m_karts[j]->getIdent()
