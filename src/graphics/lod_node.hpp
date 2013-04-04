@@ -23,6 +23,7 @@
 #include <matrix4.h>
 #include <ISceneNode.h>
 #include <vector>
+#include <string>
 
 namespace irr
 {
