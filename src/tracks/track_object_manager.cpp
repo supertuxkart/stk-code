@@ -258,6 +258,7 @@ TrackObject* TrackObjectManager::insertObject(const std::string& model,
     */
     assert(false);
     // TODO
+    return NULL;
 }
 
 // ----------------------------------------------------------------------------

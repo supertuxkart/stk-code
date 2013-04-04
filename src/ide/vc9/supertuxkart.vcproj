@@ -1346,10 +1346,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\animations\billboard_animation.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\animations\ipo.cpp"
 					>
 				</File>
@@ -2533,10 +2529,6 @@
 				>
 				<File
 					RelativePath="..\..\animations\animation_base.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\animations\billboard_animation.hpp"
 					>
 				</File>
 				<File

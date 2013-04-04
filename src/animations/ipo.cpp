@@ -22,6 +22,12 @@
 
 #include <string.h>
 
+#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
+#  define isnan _isnan
+#else
+#  include <math.h>
+#endif
+
 const std::string Ipo::m_all_channel_names[IPO_MAX] =
                 {"LocX", "LocY", "LocZ", "LocXYZ",
                  "RotX", "RotY", "RotZ",
