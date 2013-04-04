@@ -8,7 +8,6 @@ src/addons/news_manager.cpp
 src/addons/request.cpp
 src/addons/zip.cpp
 src/animations/animation_base.cpp
-src/animations/billboard_animation.cpp
 src/animations/ipo.cpp
 src/animations/three_d_animation.cpp
 src/audio/music_information.cpp
@@ -248,7 +247,6 @@ src/addons/news_manager.hpp
 src/addons/request.hpp
 src/addons/zip.hpp
 src/animations/animation_base.hpp
-src/animations/billboard_animation.hpp
 src/animations/ipo.hpp
 src/animations/three_d_animation.hpp
 src/audio/dummy_sfx.hpp
