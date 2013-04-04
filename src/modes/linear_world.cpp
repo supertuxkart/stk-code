@@ -61,7 +61,6 @@ void LinearWorld::init()
     
     m_last_lap_sfx_played           = false;
     m_last_lap_sfx_playing          = false;
-    const unsigned int kart_amount  = m_karts.size();
 
     // The values are initialised in reset()
     m_kart_info.resize(m_karts.size());
