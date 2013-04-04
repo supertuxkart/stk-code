@@ -29,6 +29,12 @@ using namespace irr;
 #include "animations/animation_base.hpp"
 #include "physics/user_pointer.hpp"
 
+namespace irr
+{
+    namespace scene { class IAnimatedMesh; class ISceneNode; class IMesh; }
+}
+
+class TrackObject;
 class BezierCurve;
 class XMLNode;
 
@@ -38,21 +44,8 @@ class XMLNode;
 class ThreeDAnimation : public AnimationBase
 {
 private:
-    /** The bullet collision shape for the physics. */
-    btCollisionShape     *m_collision_shape;
-
-    /** The bullet rigid body. */
-    btRigidBody          *m_body;
-
-    /** Motion state of the physical object. */
-    btMotionState        *m_motion_state;
-
-    /** A user pointer to connect a bullet body with this object. */
-    UserPointer           m_user_pointer;
-
-    /** Non-null only if the shape is exact */
-    TriangleMesh         *m_triangle_mesh;
-
+    TrackObject          *m_object;
+    
     /** True if a collision with this object should trigger 
      *  rescuing a kart. */
     bool                  m_crash_reset;
@@ -71,10 +64,10 @@ private:
       */
     bool                  m_important_animation;
 
-    void createPhysicsBody(const std::string &shape);
+    //scene::ISceneNode*    m_node;
 
 public:
-                 ThreeDAnimation(const XMLNode &node);
+                 ThreeDAnimation(const XMLNode &node, TrackObject* object);
     virtual     ~ThreeDAnimation();
     virtual void update(float dt);
     // ------------------------------------------------------------------------

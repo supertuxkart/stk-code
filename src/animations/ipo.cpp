@@ -440,7 +440,8 @@ void Ipo::reset()
  *  \param scale The scale that needs to be updated (can be NULL)
  */
 void Ipo::update(float time, Vec3 *xyz, Vec3 *hpr,Vec3 *scale)
-{        
+{
+    assert(!isnan(time));
     switch(m_ipo_data->m_channel)
     {
     case Ipo::IPO_LOCX   : if(xyz)   xyz  ->setX(get(time, 0)); break;
@@ -474,6 +475,8 @@ void Ipo::update(float time, Vec3 *xyz, Vec3 *hpr,Vec3 *scale)
  */
 float Ipo::get(float time, unsigned int index) const
 {
+    assert(!isnan(time));
+    
     // Avoid crash in case that only one point is given for this IPO.
     if(m_next_n==0) 
         return m_ipo_data->m_points[0][index];
@@ -489,5 +492,7 @@ float Ipo::get(float time, unsigned int index) const
     while(m_next_n<m_ipo_data->m_points.size()-1 && 
          time >=m_ipo_data->m_points[m_next_n].getW())
         m_next_n++;
-    return m_ipo_data->get(time, index, m_next_n-1);
+    float rval = m_ipo_data->get(time, index, m_next_n-1);
+    assert(!isnan(rval));
+    return rval;
 }   // get

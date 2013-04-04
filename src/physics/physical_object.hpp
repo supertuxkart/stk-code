@@ -26,22 +26,35 @@
 #include "physics/user_pointer.hpp"
 #include "tracks/track_object.hpp"
 #include "utils/vec3.hpp"
+#include "utils/leak_check.hpp"
 
 class XMLNode;
 
 /**
   * \ingroup physics
   */
-class PhysicalObject : public TrackObject
+class PhysicalObject
 {
 public:
     /** The supported collision shapes. */
     enum bodyTypes {MP_NONE, 
                     MP_CONE_Y, MP_CONE_X, MP_CONE_Z,
                     MP_CYLINDER_Y, MP_CYLINDER_X, MP_CYLINDER_Z,
-                    MP_BOX, MP_SPHERE};
+                    MP_BOX, MP_SPHERE, MP_EXACT};
 
 private:
+
+    /** The initial XYZ position of the object. */
+    core::vector3df       m_init_xyz;
+
+    /** The initial hpr of the object. */
+    core::vector3df       m_init_hpr;
+
+    /** The initial scale of the object. */
+    core::vector3df       m_init_scale;
+    
+    scene::ISceneNode*    m_node;
+    
     /** The shape of this object. */
     bodyTypes             m_body_type;
 
@@ -90,20 +103,31 @@ private:
     /** If m_reset_when_too_low this object is set back to its start
      *  position if its height is below this value. */
     float                 m_reset_height;
-public:
-                 PhysicalObject (const XMLNode &node);
     
+    bool                  m_kinetic;
+    
+    /** Non-null only if the shape is exact */
+    TriangleMesh         *m_triangle_mesh;
+
+public:
+                 PhysicalObject(bool kinetic, const XMLNode &node,
+                                scene::ISceneNode* scenenode);
+    
+    /*
                  PhysicalObject(const std::string& model,
                                 bodyTypes shape, float mass, float radius,
                                 const core::vector3df& hpr,
                                 const core::vector3df& pos,
                                 const core::vector3df& scale);
+    */
     
     virtual     ~PhysicalObject (); 
     virtual void reset          ();
     virtual void handleExplosion(const Vec3& pos, bool directHit);
     void         update         (float dt);
     void         init           ();
+    bool         isKinetic      () const { return m_kinetic; }
+    
     // ------------------------------------------------------------------------
     /** Returns the rigid body of this physical object. */
     btRigidBody *getBody        ()          { return m_body; }
@@ -112,6 +136,10 @@ public:
      *  hits it. */
     bool isCrashReset() const { return m_crash_reset; }
     bool isExplodeKartObject () const { return m_explode_kart; }
+    
+    void move(const Vec3& xyz, const core::vector3df& hpr);
+    
+    LEAK_CHECK()
 };  // PhysicalObject
 
 #endif

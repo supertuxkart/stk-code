@@ -19,7 +19,9 @@
 #ifndef THREE_STRIKES_HPP
 #define THREE_STRIKES_HPP
 
+
 #include "modes/world_with_rank.hpp"
+#include "tracks/track_object.hpp"
 #include "states_screens/race_gui_base.hpp"
 
 #include <IMesh.h>
@@ -68,7 +70,7 @@ private:
     /** A rotation to apply to the tires when inserting them. */
     float m_tire_rotation;
 
-    PtrVector<PhysicalObject, REF> m_tires;
+    PtrVector<TrackObject, REF> m_tires;
     
 public:
     

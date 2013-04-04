@@ -20,7 +20,6 @@
 
 #include "animations/ipo.hpp"
 #include "config/user_config.hpp"
-#include "animations/billboard_animation.hpp"
 #include "animations/three_d_animation.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
@@ -52,6 +51,8 @@ void TrackObjectManager::add(const XMLNode &xml_node)
 {
     try
     {
+        m_all_objects.push_back(new TrackObject(xml_node));
+        /*
         std::string groupname;
         xml_node.get("lod_group", &groupname);
         bool is_lod = !groupname.empty();
@@ -67,11 +68,12 @@ void TrackObjectManager::add(const XMLNode &xml_node)
         {
             if (is_lod)
             {
-                m_lod_objects[groupname].push_back(new PhysicalObject(xml_node));
+                assert(false); // TODO
+                //_lod_objects[groupname].push_back(new TrackObject(xml_node));
             }
             else
             {
-                m_all_objects.push_back(new PhysicalObject(xml_node));
+                m_all_objects.push_back(new TrackObject(xml_node));
             }
         }
         else if(type=="animation")
@@ -106,6 +108,7 @@ void TrackObjectManager::add(const XMLNode &xml_node)
             fprintf(stderr, "Unknown track object: '%s' - ignored.\n", 
                     type.c_str());
         }
+         */
     }
     catch (std::exception& e)
     {
@@ -153,8 +156,8 @@ void TrackObjectManager::handleExplosion(const Vec3 &pos, const PhysicalObject *
     TrackObject* curr;
     for_in (curr, m_all_objects)
     {
-        if(secondary_hits || mp==curr)
-            curr->handleExplosion(pos, mp == curr);
+        if(secondary_hits || mp == curr->getPhysics())
+            curr->handleExplosion(pos, mp == curr->getPhysics());
     }
 }   // handleExplosion
 
@@ -228,27 +231,33 @@ void TrackObjectManager::enableFog(bool enable)
     TrackObject* curr;
     for_in (curr, m_all_objects)
     {
-        if (curr->getNode() != NULL)
+        TrackObjectPresentationMesh* meshPresentation =
+            curr->getPresentation<TrackObjectPresentationMesh>();
+        if (meshPresentation!= NULL)
         {
-            adjustForFog(curr->getNode(), enable);
+            adjustForFog(meshPresentation->getNode(), enable);
         }
     }
 }   // enableFog
 
 // ----------------------------------------------------------------------------
 
-PhysicalObject* TrackObjectManager::insertObject(const std::string& model,
+TrackObject* TrackObjectManager::insertObject(const std::string& model,
                                                  PhysicalObject::bodyTypes shape,
                                                  float mass, float radius,
                                                  const core::vector3df& hpr,
                                                  const core::vector3df& pos,
                                                  const core::vector3df& scale)
 {
+    /*
     PhysicalObject* object = new PhysicalObject(model, shape, mass, radius, 
                                                 hpr, pos, scale);
     object->init();
     m_all_objects.push_back(object);
     return object;
+    */
+    assert(false);
+    // TODO
 }
 
 // ----------------------------------------------------------------------------
@@ -256,7 +265,7 @@ PhysicalObject* TrackObjectManager::insertObject(const std::string& model,
  *  track objects, and then frees the object.
  *  \param obj The physical object to remove.
  */
-void TrackObjectManager::removeObject(PhysicalObject* obj)
+void TrackObjectManager::removeObject(TrackObject* obj)
 {
     m_all_objects.remove(obj);
     delete obj;
@@ -277,7 +286,7 @@ void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes)
         std::vector<TrackObject*>& queue = m_lod_objects[ lod_nodes[n]->getGroupName() ];
         assert( queue.size() > 0 );
         TrackObject* obj = queue[ queue.size() - 1 ];
-        obj->setNode( lod_nodes[n] );
+        obj->getPresentation<TrackObjectPresentationMesh>()->setNode( lod_nodes[n] );
         queue.erase( queue.end() - 1 );
         
         m_all_objects.push_back(obj);

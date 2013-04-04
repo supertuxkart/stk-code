@@ -24,11 +24,13 @@
 using namespace irr;
 
 #include "graphics/irr_driver.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
+#include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
@@ -37,8 +39,9 @@ using namespace irr;
 #include <IMeshSceneNode.h>
 
 // ----------------------------------------------------------------------------
-PhysicalObject::PhysicalObject(const XMLNode &xml_node)
-              : TrackObject(xml_node)
+
+PhysicalObject::PhysicalObject(bool kinetic, const XMLNode &xml_node,
+                               scene::ISceneNode* scenenode)
 {
     m_shape              = NULL;
     m_body               = NULL;
@@ -49,6 +52,12 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
     m_radius             = -1;
     m_crash_reset        = false;
     m_explode_kart       = false;
+    
+    m_node = scenenode;
+    
+    m_init_xyz   = scenenode->getPosition();
+    m_init_hpr   = scenenode->getRotation();
+    m_init_scale = scenenode->getScale();
     
     std::string shape;
     xml_node.get("mass",    &m_mass       );
@@ -71,36 +80,31 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
 
     else if(shape=="box"    ) m_body_type = MP_BOX;
     else if(shape=="sphere" ) m_body_type = MP_SPHERE;
+    else if(shape=="exact")   m_body_type = MP_EXACT;
+
     else fprintf(stderr, "Unknown shape type : %s\n", shape.c_str());
-        
+
     m_init_pos.setIdentity();
-    Vec3 hpr(m_init_hpr);
-    hpr.degreeToRad();
+    Vec3 radHpr(m_init_hpr);
+    radHpr.degreeToRad();
     btQuaternion q;
-    q.setEuler(hpr.getY(), hpr.getX(), hpr.getZ());
+    q.setEuler(radHpr.getY(),radHpr.getX(), radHpr.getZ());
     m_init_pos.setRotation(q);
     Vec3 init_xyz(m_init_xyz);
     m_init_pos.setOrigin(init_xyz);
-
-    if (m_node == NULL)
-    {
-        std::string model_name;
-        xml_node.get("model",   &model_name );
-        fprintf(stderr, 
-                "[PhysicalObject] WARNING, could not locate model '%s'\n", 
-                model_name.c_str());
-    }
     
+    m_kinetic = kinetic;
+    
+    init();
 }   // PhysicalObject
 
 // ----------------------------------------------------------------------------
-
+/*
 PhysicalObject::PhysicalObject(const std::string& model,
                                bodyTypes shape, float mass, float radius,
                                const core::vector3df& hpr,
                                const core::vector3df& pos,
                                const core::vector3df& scale)
-        : TrackObject(pos, hpr, scale, model)
 {
     m_body_type = shape;
     m_mass = mass;
@@ -114,15 +118,47 @@ PhysicalObject::PhysicalObject(const std::string& model,
     m_init_pos.setRotation(q);
     m_init_pos.setOrigin(btVector3(pos.X, pos.Y, pos.Z));
 }
-                               
+*/
+
 // ----------------------------------------------------------------------------
 PhysicalObject::~PhysicalObject()
 {
     World::getWorld()->getPhysics()->removeBody(m_body);
     delete m_body;
     delete m_motion_state;
-    delete m_shape;
+    
+    // If an exact shape was used, the collision shape pointer
+    // here is a copy of the collision shape pointer in the
+    // triangle mesh. In order to avoid double-freeing this
+    // pointer, we don't free the pointer in this case.
+    if (!m_triangle_mesh)
+        delete m_shape;
+    
+    if (m_triangle_mesh)
+    {
+        delete m_triangle_mesh;
+    }
 }  // ~PhysicalObject
+
+// ----------------------------------------------------------------------------
+
+void PhysicalObject::move(const Vec3& xyz, const core::vector3df& hpr)
+{
+    Vec3 hpr2(hpr);
+    hpr2.degreeToRad();
+    btQuaternion q;
+
+    core::matrix4 mat;
+    mat.setRotationDegrees(hpr);
+
+    irr::core::quaternion tempQuat(mat);
+    q = btQuaternion(-tempQuat.X, -tempQuat.Y, -tempQuat.Z, tempQuat.W);
+    
+    
+    Vec3 p(xyz);
+    btTransform trans(q,p);
+    m_motion_state->setWorldTransform(trans);
+}
 
 // ----------------------------------------------------------------------------
 /** Additional initialisation after loading of the model is finished.
@@ -187,57 +223,197 @@ void PhysicalObject::init()
     m_graphical_offset = -0.5f*(max+min);
     switch (m_body_type)
     {
-    case MP_CONE_Y: {
-                    if(m_radius<0) m_radius = 0.5f*extend.length_2d();
-                    m_shape = new btConeShape(m_radius, extend.getY());
-                    break;
-                    }
-    case MP_CONE_X: {
-                    if(m_radius<0) 
-                        m_radius = 0.5f*sqrt(extend.getY()*extend.getY() +
-                                             extend.getZ()*extend.getZ());
-                    m_shape = new btConeShapeX(m_radius, extend.getY());
-                    break;
-                    }
-    case MP_CONE_Z: {
-                    if(m_radius<0)
-                        m_radius = 0.5f*sqrt(extend.getX()*extend.getX() +
-                                             extend.getY()*extend.getY());
-                    m_shape = new btConeShapeZ(m_radius, extend.getY());
-                    break;
-                    }
-    case MP_CYLINDER_Y: {
-                    if(m_radius<0) m_radius = 0.5f*extend.length_2d();
-                    m_shape = new btCylinderShape(0.5f*extend);
-                    break;
-                    }
-    case MP_CYLINDER_X: {
-                    if(m_radius<0) 
-                        m_radius = 0.5f*sqrt(extend.getY()*extend.getY() +
-                                             extend.getZ()*extend.getZ());
-                    m_shape = new btCylinderShapeX(0.5f*extend);
-                    break;
-                    }
-    case MP_CYLINDER_Z: {
-                    if(m_radius<0)
-                        m_radius = 0.5f*sqrt(extend.getX()*extend.getX() +
-                                             extend.getY()*extend.getY());
-                    m_shape = new btCylinderShapeZ(0.5f*extend);
-                    break;
-                    }
-    case MP_BOX:    m_shape = new btBoxShape(0.5*extend);
-                    break;
-    case MP_SPHERE: {
-                    if(m_radius<0)
+    case MP_CONE_Y:
+    {
+        if (m_radius < 0) m_radius = 0.5f*extend.length_2d();
+        m_shape = new btConeShape(m_radius, extend.getY());
+        break;
+    }
+    case MP_CONE_X:
+    {
+        if (m_radius < 0) 
+            m_radius = 0.5f*sqrt(extend.getY()*extend.getY() +
+                                 extend.getZ()*extend.getZ());
+        m_shape = new btConeShapeX(m_radius, extend.getY());
+        break;
+    }
+    case MP_CONE_Z:
+    {
+        if (m_radius < 0)
+            m_radius = 0.5f*sqrt(extend.getX()*extend.getX() +
+                                 extend.getY()*extend.getY());
+        m_shape = new btConeShapeZ(m_radius, extend.getY());
+        break;
+    }
+    case MP_CYLINDER_Y:
+    {
+        if (m_radius < 0) m_radius = 0.5f*extend.length_2d();
+        m_shape = new btCylinderShape(0.5f*extend);
+        break;
+    }
+    case MP_CYLINDER_X:
+    {
+        if (m_radius < 0) 
+            m_radius = 0.5f*sqrt(extend.getY()*extend.getY() +
+                                 extend.getZ()*extend.getZ());
+        m_shape = new btCylinderShapeX(0.5f*extend);
+        break;
+    }
+    case MP_CYLINDER_Z:
+    {
+        if (m_radius < 0)
+            m_radius = 0.5f*sqrt(extend.getX()*extend.getX() +
+                                 extend.getY()*extend.getY());
+        m_shape = new btCylinderShapeZ(0.5f*extend);
+        break;
+    }
+    case MP_SPHERE:
+    {
+        if(m_radius<0)
+        {
+            m_radius =      std::max(extend.getX(), extend.getY());
+            m_radius = 0.5f*std::max(m_radius,      extend.getZ());
+        }
+        m_shape = new btSphereShape(m_radius);
+        break;
+    }
+    case MP_EXACT:
+    {
+        TriangleMesh* triangle_mesh = new TriangleMesh();
+        
+        // In case of readonly materials we have to get the material from
+        // the mesh, otherwise from the node. This is esp. important for
+        // water nodes, which only have the material defined in the node,
+        // but not in the mesh at all!
+        bool is_readonly_material = false;
+        
+        scene::IMesh* mesh = NULL;
+        switch (m_node->getType())
+        {
+            case scene::ESNT_MESH          :
+            case scene::ESNT_WATER_SURFACE :
+            case scene::ESNT_OCTREE        :
+                mesh = ((scene::IMeshSceneNode*)m_node)->getMesh();
+                is_readonly_material = 
+                    ((scene::IMeshSceneNode*)m_node)->isReadOnlyMaterials();
+                break;
+            case scene::ESNT_ANIMATED_MESH :
+                // for now just use frame 0
+                mesh = ((scene::IAnimatedMeshSceneNode*)m_node)->getMesh()->getMesh(0);
+                is_readonly_material = 
+                    ((scene::IAnimatedMeshSceneNode*)m_node)->isReadOnlyMaterials();
+                break;
+            default:
+                fprintf(stderr, "[3DAnimation] Unknown object type, cannot create exact collision body!\n");
+                return;
+        }   // switch node->getType()
+        
+        
+        //core::matrix4 mat;
+        //mat.setRotationDegrees(hpr);
+        //mat.setTranslation(pos);
+        //core::matrix4 mat_scale;
+        
+        // Note that we can't simply call mat.setScale, since this would
+        // overwrite the elements on the diagonal, making any rotation incorrect.
+        //mat_scale.setScale(scale);
+        //mat *= mat_scale;
+        
+        for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
+        {
+            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+            // FIXME: take translation/rotation into account
+            if (mb->getVertexType() != video::EVT_STANDARD &&
+                mb->getVertexType() != video::EVT_2TCOORDS)
+            {
+                fprintf(stderr, "WARNING: ThreeDAnimation::createPhysicsBody: Ignoring type '%d'!\n", 
+                        mb->getVertexType());
+                continue;
+            }
+            
+            // Handle readonly materials correctly: mb->getMaterial can return 
+            // NULL if the node is not using readonly materials. E.g. in case
+            // of a water scene node, the mesh (which is the animated copy of
+            // the original mesh) does not contain any material information,
+            // the material is only available in the node.
+            const video::SMaterial &irrMaterial = 
+                is_readonly_material ? mb->getMaterial()
+                : m_node->getMaterial(i);
+            video::ITexture* t=irrMaterial.getTexture(0);
+            
+            const Material* material=0;
+            TriangleMesh *tmesh = triangle_mesh;
+            if(t)
+            {
+                std::string image = std::string(core::stringc(t->getName()).c_str());
+                material=material_manager->getMaterial(StringUtils::getBasename(image));
+                if(material->isIgnore()) 
+                    continue;
+            } 
+            
+            u16 *mbIndices = mb->getIndices();
+            Vec3 vertices[3];
+            Vec3 normals[3];
+            
+            if (mb->getVertexType() == video::EVT_STANDARD)
+            {
+                irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
+                for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
+                {
+                    for(unsigned int k=0; k<3; k++)
                     {
-                        m_radius =      std::max(extend.getX(), extend.getY());
-                        m_radius = 0.5f*std::max(m_radius,      extend.getZ());
-                    }
-                    m_shape = new btSphereShape(m_radius);
-                    break;
-                    }
-    case MP_NONE:   fprintf(stderr, "WARNING: Uninitialised moving shape\n");
-                    break;
+                        int indx=mbIndices[j+k];
+                        core::vector3df v = mbVertices[indx].Pos;
+                        //mat.transformVect(v);
+                        vertices[k]=v;
+                        normals[k]=mbVertices[indx].Normal;
+                    }   // for k
+                    if(tmesh) tmesh->addTriangle(vertices[0], vertices[1], 
+                                                 vertices[2], normals[0],
+                                                 normals[1],  normals[2],
+                                                 material                 );
+                }   // for j
+            }
+            else
+            {
+                if (mb->getVertexType() == video::EVT_2TCOORDS)
+                {
+                    irr::video::S3DVertex2TCoords* mbVertices = (video::S3DVertex2TCoords*)mb->getVertices();
+                    for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
+                    {
+                        for(unsigned int k=0; k<3; k++)
+                        {
+                            int indx=mbIndices[j+k];
+                            core::vector3df v = mbVertices[indx].Pos;
+                            //mat.transformVect(v);
+                            vertices[k]=v;
+                            normals[k]=mbVertices[indx].Normal;
+                        }   // for k
+                        if(tmesh) tmesh->addTriangle(vertices[0], vertices[1], 
+                                                     vertices[2], normals[0],
+                                                     normals[1],  normals[2],
+                                                     material                 );
+                    }   // for j
+                    
+                }
+            }
+
+        }   // for i<getMeshBufferCount
+        triangle_mesh->createCollisionShape();
+        m_shape = &triangle_mesh->getCollisionShape();
+        m_triangle_mesh = triangle_mesh;
+
+        break;
+    }
+    case MP_NONE:  
+    default:
+        fprintf(stderr, "WARNING: Uninitialised moving shape\n");
+        // intended fall-through
+    case MP_BOX:
+    {
+        m_shape = new btBoxShape(0.5*extend);
+        break;
+    }
     }
 
     // 2. Create the rigid object
@@ -258,11 +434,19 @@ void PhysicalObject::init()
     m_body->setUserPointer(&m_user_pointer);
 
     World::getWorld()->getPhysics()->addBody(m_body);
+    
+    if (!m_kinetic)
+    {
+        m_body->setCollisionFlags( m_body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+        m_body->setActivationState(DISABLE_DEACTIVATION);
+    }
 }   // init
 
 // ----------------------------------------------------------------------------
 void PhysicalObject::update(float dt)
 {
+    if (!m_kinetic) return;
+    
     btTransform t;
     m_motion_state->getWorldTransform(t);
 

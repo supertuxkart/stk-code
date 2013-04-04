@@ -747,6 +747,14 @@ void World::updateWorld(float dt)
 #define MEASURE_FPS 0
 
 //-----------------------------------------------------------------------------
+
+void World::scheduleTutorial()
+{
+    m_schedule_exit_race = true;
+    m_schedule_tutorial = true;
+}
+
+//-----------------------------------------------------------------------------
 /** Updates the physics, all karts, the track, and projectile manager.
  *  \param dt Time step size.
  */

@@ -100,6 +100,9 @@ public:
     int getXYZ(Vec3 *vaslue) const;
     int getHPR(core::vector3df *value) const;
     int getHPR(Vec3 *value) const;
+    
+    bool hasChildNamed(const char* name) const;
+    
     /** Handy functions to test the bit pattern returned by get(vector3df*).*/
     static bool hasX(int b) { return (b&1)==1; }
     static bool hasY(int b) { return (b&2)==2; }

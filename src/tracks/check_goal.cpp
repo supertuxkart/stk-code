@@ -66,12 +66,12 @@ void CheckGoal::update(float dt)
         if(!obj->isSoccerBall())
             continue;
         
-        const Vec3 &xyz = obj->getNode()->getPosition();
+        const Vec3 &xyz = obj->getPresentation<TrackObjectPresentationMesh>()->getNode()->getPosition();
         if(isTriggered(m_previous_position[ball_index], xyz, ball_index))
         {
             if(UserConfigParams::m_check_debug)
                 printf("CHECK: Goal check structure %d triggered for object %s.\n",
-                       m_index, obj->getDebugName());
+                       m_index, obj->getPresentation<TrackObjectPresentationMesh>()->getNode()->getDebugName());
             trigger(ball_index);
         }
         m_previous_position[ball_index] = xyz;
@@ -122,7 +122,7 @@ void CheckGoal::reset(const Track &track)
         if(!obj->isSoccerBall())
             continue;
         
-        const Vec3 &xyz = obj->getNode()->getPosition();
+        const Vec3 &xyz = obj->getPresentation<TrackObjectPresentationMesh>()->getNode()->getPosition();
         
         m_previous_position.push_back(xyz);
     }

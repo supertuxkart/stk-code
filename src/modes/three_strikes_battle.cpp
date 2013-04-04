@@ -123,7 +123,7 @@ void ThreeStrikesBattle::reset()
     evt.m_kart_info = m_kart_info;
     m_battle_events.push_back(evt);
 
-    PhysicalObject *obj;
+    TrackObject *obj;
     for_in(obj, m_tires)
     {
         m_track->getTrackObjectManager()->removeObject(obj);
@@ -330,6 +330,8 @@ void ThreeStrikesBattle::update(float dt)
                 tire = m_tire_dir+"/wheel-rear-right.b3d";
         }
 
+// TODO: add back tires
+#if 0
         TrackObjectManager* tom = m_track->getTrackObjectManager();        
         PhysicalObject* obj = 
             tom->insertObject(tire,
@@ -349,6 +351,7 @@ void ThreeStrikesBattle::update(float dt)
             m_insert_tire = 0;
         
         m_tires.push_back(obj);
+#endif
     }
 }   // update
 

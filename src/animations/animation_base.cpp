@@ -27,7 +27,6 @@
 #include <algorithm>
 
 AnimationBase::AnimationBase(const XMLNode &node)
-             : TrackObject(node)
 {
     float fps=25;
     node.get("fps", &fps);
@@ -43,12 +42,12 @@ AnimationBase::AnimationBase(const XMLNode &node)
     {
         m_playing = false;
     }
-
+    reset();
 }   // AnimationBase
 // ----------------------------------------------------------------------------
 /** Special constructor which takes one IPO (or curve). This is used by the
  */
-AnimationBase::AnimationBase(Ipo *ipo) : TrackObject()
+AnimationBase::AnimationBase(Ipo *ipo)
 {
     m_anim_type    = ATT_CYCLIC_ONCE;
     m_playing      = true;
@@ -83,8 +82,6 @@ void AnimationBase::reset()
     {
         curr->reset();
     }
-    
-    TrackObject::reset();
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -95,11 +92,13 @@ void AnimationBase::reset()
  */
 void AnimationBase::update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
 {
-    TrackObject::update(dt);
+    assert(!isnan(m_current_time));
     
     // Don't do anything if the animation is disabled
     if(!m_playing) return;
     m_current_time += dt;
+
+    assert(!isnan(m_current_time));
 
     Ipo* curr;
     for_in (curr, m_all_ipos)

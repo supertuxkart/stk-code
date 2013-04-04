@@ -30,7 +30,6 @@
 // Note that ipo.hpp is included here in order that PtrVector<Ipo> can call
 // the proper destructor!
 #include "animations/ipo.hpp"
-#include "tracks/track_object.hpp"
 #include "utils/ptr_vector.hpp"
 
 #include <algorithm>
@@ -41,7 +40,7 @@ class XMLNode;
   * \brief A base class for all animations.
   * \ingroup animations
   */
-class AnimationBase : public TrackObject
+class AnimationBase
 {
 private:
     /** Two types of animations: cyclic ones that play all the time, and

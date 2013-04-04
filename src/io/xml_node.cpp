@@ -589,3 +589,12 @@ int XMLNode::getHPR(Vec3 *value) const
 }   // getHPR Vec3
 
 // ----------------------------------------------------------------------------
+
+bool XMLNode::hasChildNamed(const char* name) const
+{
+    for (unsigned int i = 0; i < m_nodes.size(); i++)
+    {
+        if (m_nodes[i]->getName() == name) return true;
+    }
+    return false;
+}

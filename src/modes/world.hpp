@@ -252,8 +252,7 @@ public:
     void            schedulePause(Phase phase);
     void            scheduleUnpause();
     void            scheduleExitRace() { m_schedule_exit_race = true; }
-    void            scheduleTutorial() { m_schedule_exit_race = true;
-                                         m_schedule_tutorial = true; }
+    void            scheduleTutorial();
     void            updateWorld(float dt);
     void            handleExplosion(const Vec3 &xyz, AbstractKart *kart_hit,
                                     PhysicalObject *object);

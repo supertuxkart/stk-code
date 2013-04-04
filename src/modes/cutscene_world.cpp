@@ -22,6 +22,7 @@
 #include <ISceneManager.h>
 
 #include "animations/animation_base.hpp"
+#include "animations/three_d_animation.hpp"
 #include "audio/music_manager.hpp"
 #include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
@@ -82,9 +83,10 @@ void CutsceneWorld::init()
     TrackObject* curr;
     for_in(curr, objects)
     {
-        if (curr->getType() == "particle-emitter" && !curr->getTriggerCondition().empty())
+        if (curr->getType() == "particle-emitter" &&
+            !curr->getPresentation<TrackObjectPresentationParticles>()->getTriggerCondition().empty())
         {
-            const std::string& condition = curr->getTriggerCondition();
+            const std::string& condition = curr->getPresentation<TrackObjectPresentationParticles>()->getTriggerCondition();
             
             if (StringUtils::startsWith(condition, "frame "))
             {
@@ -102,9 +104,9 @@ void CutsceneWorld::init()
                 m_particles_to_trigger[frame / FPS].push_back(curr);
             }
         }
-        else if (curr->getType() == "sfx-emitter" && !curr->getTriggerCondition().empty())
+        else if (curr->getType() == "sfx-emitter" && !curr->getPresentation<TrackObjectPresentationSound>()->getTriggerCondition().empty())
         {
-            const std::string& condition = curr->getTriggerCondition();
+            const std::string& condition = curr->getPresentation<TrackObjectPresentationSound>()->getTriggerCondition();
             
             if (StringUtils::startsWith(condition, "frame "))
             {
@@ -135,15 +137,14 @@ void CutsceneWorld::init()
                 
                 float FPS = 25.0f; // for now we assume the cutscene is saved at 25 FPS
                 m_sounds_to_stop[frame / FPS].push_back(curr);
-                curr->triggerSound(true);
+                curr->getPresentation<TrackObjectPresentationSound>()->triggerSound(true);
             }
         }
         
-        if (dynamic_cast<AnimationBase*>(curr) != NULL)
+        if (curr->getAnimator() != NULL)
         {
             m_duration = std::max(m_duration, 
-                                  (double)dynamic_cast<AnimationBase*>(curr)
-                                                     ->getAnimationDuration());
+                                  (double)curr->getAnimator()->getAnimationDuration());
         }
     }
     
@@ -273,10 +274,11 @@ void CutsceneWorld::update(float dt)
     {
         if (curr->getType() == "cutscene_camera")
         {
-            m_camera->setPosition(curr->getNode()->getPosition());
+            scene::ISceneNode* anchorNode = curr->getPresentation<TrackObjectPresentationEmpty>()->getNode();
+            m_camera->setPosition(anchorNode->getPosition());
             m_camera->updateAbsolutePosition();
             
-            core::vector3df rot = curr->getNode()->getRotation();
+            core::vector3df rot = anchorNode->getRotation();
             Vec3 rot2(rot);
             rot2.setPitch(rot2.getPitch() + 90.0f);
             m_camera->setRotation(rot2.toIrrVector());
@@ -299,7 +301,7 @@ void CutsceneWorld::update(float dt)
             std::vector<TrackObject*> objects = it->second;
             for (unsigned int i = 0; i < objects.size(); i++)
             {
-                objects[i]->triggerSound();
+                objects[i]->getPresentation<TrackObjectPresentationSound>()->triggerSound(false);
             }
             m_sounds_to_trigger.erase(it++);
         }
@@ -317,7 +319,7 @@ void CutsceneWorld::update(float dt)
             std::vector<TrackObject*> objects = it->second;
             for (unsigned int i = 0; i < objects.size(); i++)
             {
-                objects[i]->triggerParticles();
+                objects[i]->getPresentation<TrackObjectPresentationParticles>()->triggerParticles();
             }
             m_particles_to_trigger.erase(it++);
         }
@@ -334,7 +336,7 @@ void CutsceneWorld::update(float dt)
             std::vector<TrackObject*> objects = it->second;
             for (unsigned int i = 0; i < objects.size(); i++)
             {
-                objects[i]->stopSound();
+                objects[i]->getPresentation<TrackObjectPresentationSound>()->stopSound();
             }
             m_sounds_to_stop.erase(it++);
         }
