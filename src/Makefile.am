@@ -29,8 +29,6 @@ supertuxkart_SOURCES = \
  addons/zip.hpp \
  animations/animation_base.hpp \
  animations/animation_base.cpp \
- animations/billboard_animation.cpp \
- animations/billboard_animation.hpp \
  animations/ipo.cpp \
  animations/ipo.hpp \
  animations/three_d_animation.cpp \
@@ -263,8 +261,6 @@ supertuxkart_SOURCES = \
  modes/easter_egg_hunt.hpp \
  modes/follow_the_leader.cpp \
  modes/follow_the_leader.hpp \
- modes/game_tutorial.cpp \
- modes/game_tutorial.hpp \
  modes/linear_world.cpp \
  modes/linear_world.hpp \
  modes/overworld.cpp \
