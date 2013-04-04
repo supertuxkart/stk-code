@@ -1641,6 +1641,7 @@ void IrrDriver::update(float dt)
         m_video_driver->beginScene(/*backBuffer clear*/false, /*zBuffer*/true,
                                    world->getClearColor());
         m_scene_manager->drawAll();
+        GUIEngine::render(dt);
         m_video_driver->endScene();
         return;
     }
