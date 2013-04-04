@@ -72,6 +72,11 @@ private:
     static World *m_world;
 
 protected:
+
+#ifdef DEBUG
+    int m_magic_number;
+#endif
+
     /** The list of all karts. */
     KartList                  m_karts;
     RandomGenerator           m_random;

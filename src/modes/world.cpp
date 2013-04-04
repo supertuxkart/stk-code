@@ -89,6 +89,11 @@ World* World::m_world = NULL;
  */
 World::World() : WorldStatus(), m_clear_color(255,100,101,140)
 {
+    
+#ifdef DEBUG
+    m_magic_number = 0xB01D6543;
+#endif
+
     m_physics            = NULL;
     m_race_gui           = NULL;
     m_saved_race_gui     = NULL;
@@ -370,6 +375,11 @@ World::~World()
 
     music_manager->stopMusic();
     m_world = NULL;
+    
+#ifdef DEBUG
+    m_magic_number = 0xDEADBEEF;
+#endif
+
 }   // ~World
 
 //-----------------------------------------------------------------------------
@@ -664,6 +674,11 @@ void World::scheduleUnpause()
  */
 void World::updateWorld(float dt)
 {
+#ifdef DEBUG
+    assert(m_magic_number == 0xB01D6543);
+#endif
+
+
     if (m_schedule_pause)
     {
         pause(m_scheduled_pause_phase);
@@ -691,55 +706,57 @@ void World::updateWorld(float dt)
     {
         enterRaceOverState();
     }
-    
-    if (m_schedule_exit_race)
+    else
     {
-        race_manager->exitRace();
-        race_manager->setAIKartOverride("");
-        
-        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-        
-        if (m_schedule_tutorial)
+        if (m_schedule_exit_race)
         {
-            race_manager->setNumLocalPlayers(1);
-            race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-            race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
-            race_manager->setNumKarts( 1 );
-            race_manager->setTrack( "tutorial" );
-            race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
+            race_manager->exitRace();
+            race_manager->setAIKartOverride("");
             
-            // Use keyboard 0 by default (FIXME: let player choose?)
-            InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            
+            if (m_schedule_tutorial)
+            {
+                race_manager->setNumLocalPlayers(1);
+                race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
+                race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
+                race_manager->setNumKarts( 1 );
+                race_manager->setTrack( "tutorial" );
+                race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
+                
+                // Use keyboard 0 by default (FIXME: let player choose?)
+                InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
-            // Create player and associate player with keyboard
-            StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
-                                                    device);
-            
-            if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
-            {
-                fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', will revert to default\n",
-                        UserConfigParams::m_default_kart.c_str());
-                UserConfigParams::m_default_kart.revertToDefaults();
+                // Create player and associate player with keyboard
+                StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+                                                        device);
+                
+                if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+                {
+                    fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', will revert to default\n",
+                            UserConfigParams::m_default_kart.c_str());
+                    UserConfigParams::m_default_kart.revertToDefaults();
+                }
+                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+                
+                // ASSIGN should make sure that only input from assigned devices
+                // is read.
+                input_manager->getDeviceList()->setAssignMode(ASSIGN);
+                input_manager->getDeviceList()
+                    ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
+                
+                StateManager::get()->enterGameState();
+                network_manager->setupPlayerKartInfo();
+                race_manager->startNew(false);
             }
-            race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
-            
-            // ASSIGN should make sure that only input from assigned devices
-            // is read.
-            input_manager->getDeviceList()->setAssignMode(ASSIGN);
-            input_manager->getDeviceList()
-                ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
-            
-            StateManager::get()->enterGameState();
-            network_manager->setupPlayerKartInfo();
-            race_manager->startNew(false);
-        }
-        else
-        {
-            if (race_manager->raceWasStartedFromOverworld())
+            else
             {
-                OverWorld::enterOverWorld();
+                if (race_manager->raceWasStartedFromOverworld())
+                {
+                    OverWorld::enterOverWorld();
+                }
+                
             }
-            
         }
     }
 }   // updateWorld
@@ -760,6 +777,11 @@ void World::scheduleTutorial()
  */
 void World::update(float dt)
 {
+#ifdef DEBUG
+    assert(m_magic_number == 0xB01D6543);
+#endif
+
+
     PROFILER_PUSH_CPU_MARKER("World::update()", 0x00, 0x7F, 0x00);
     
 #if MEASURE_FPS
@@ -801,6 +823,10 @@ void World::update(float dt)
     projectile_manager->update(dt);
     
     PROFILER_POP_CPU_MARKER();
+    
+#ifdef DEBUG
+    assert(m_magic_number == 0xB01D6543);
+#endif
 }   // update
 
 // ----------------------------------------------------------------------------
