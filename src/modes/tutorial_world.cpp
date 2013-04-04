@@ -4,6 +4,13 @@
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"
 
+TutorialWorld::TutorialWorld()
+{
+    m_stop_music_when_dialog_open = false;
+}
+
+// -----------------------------------------------------------------------------
+
 void TutorialWorld::moveKartAfterRescue(AbstractKart* kart)
 {
     float angle = 0;
@@ -47,6 +54,7 @@ void TutorialWorld::moveKartAfterRescue(AbstractKart* kart)
                          "on track %s.\n",
                 (kart->getIdent().c_str()), m_track->getIdent().c_str());
     }
+
 }   // moveKartAfterRescue
 
 // -----------------------------------------------------------------------------

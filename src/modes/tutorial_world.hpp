@@ -9,6 +9,9 @@ class TutorialWorld : public StandardRace
 private:
     btTransform getClosestStartPoint(float currentKart_x, float currentKart_z);
 public:
+
+    TutorialWorld();
+    
     virtual void moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
 };
 
