@@ -46,6 +46,15 @@ private:
     /** The fastest lap time. */
     float       m_fastest_lap;
 
+    /** The track length returned by Track::getLength() only covers the 
+     *  distance from start line to finish line, i.e. it does not include
+     *  the distance the karts actually start behind the start line (the
+     *  karts would have a negative distance till they reach the start line
+     *  for the first time). This values stores the additional distance by
+     *  which the track length must be increased, which is important to
+     *  get valid finish times estimates. */
+    float       m_distance_increase;
+
     // ------------------------------------------------------------------------
     /** Some additional info that needs to be kept for each kart
      * in this kind of race.

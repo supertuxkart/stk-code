@@ -92,6 +92,26 @@ void LinearWorld::reset()
         m_kart_info[i].getSector()->update(m_karts[i]->getXYZ());
     }   // next kart
 
+    // At the moment the last kart would be the one that is furthest away
+    // from the start line, i.e. it would determine the amount by which 
+    // the track length must be extended (to avoid negative numbers in
+    // estimateFinishTimeForKart()). On the other hand future game modes
+    // might not follow this rule, so check the distance for all karts here:
+    m_distance_increase = m_track->getTrackLength();
+    for(unsigned int i=0; i<kart_amount; i++)
+    {
+        m_distance_increase = std::min(m_distance_increase, 
+                                       getDistanceDownTrackForKart(i));
+    }
+    // Track length - minimum distance is how much the track length must
+    // be increased to avoid negative values in estimateFinishTimeForKart
+    // Increase this value somewhat in case that a kart drivess/slides 
+    // backwards a little bit at start.
+    m_distance_increase = m_track->getTrackLength() - m_distance_increase 
+                        + 5.0f;
+
+    if(m_distance_increase<0) m_distance_increase = 1.0f;  // shouldn't happen
+
     // First all kart infos must be updated before the kart position can be 
     // recomputed, since otherwise 'new' (initialised) valued will be compared
     // with old values.
@@ -504,9 +524,27 @@ void LinearWorld::getKartsDisplayInfo(
 /** Estimate the arrival time of any karts that haven't arrived yet by using 
  *  their average speed up to now and the distance still to race. This 
  *  approach guarantees that the order of the karts won't change anymore 
- *  (karts ahead will have a higher average speed and therefore finish the 
- *  race earlier than karts further behind), so the position doesn't have to
- *  be updated to get the correct scoring.
+ *  (karts ahead will have covered more distance and have therefore a higher 
+ *  average speed and therefore finish the race earlier than karts further 
+ *  behind), so the position doesn't have to be updated to get the correct 
+ *  scoring.
+ *  As so often the devil is in the details: a kart that hasn't crossed the
+ *  starting line has a negative distance (when it is crossing the start line
+ *  its distance becomes 0), which can result in a negative average speed 
+ *  (and therefore incorrect estimates). This is partly taken care of by
+ *  adding m_distance_increase to the distance covered by a kart. The value
+ *  of m_distance_increase is a bit more than the distance the last kart
+ *  has from the start line at start time. This guarantees that the distance
+ *  used in computing the average speed is positive in most cases. Only 
+ *  exception is if a kart is driving backwards on purpose. While this 
+ *  shouldn't happen (the AI doesn't do it, and if it's a player the game
+ *  won't finish so the time estimation won't be called and so the incorrect
+ *  result won't be displayed), this is still taken care of: if the average
+ *  speed is negative, the estimated arrival time of the kart is set to
+ *  99:00 plus kart position. This means that even in this case all karts
+ *  will have a different arrival time.
+ *  \pre The position of the karts are set according to the distance they
+ *       have covered.
  *  \param kart The kart for which to estimate the finishing times.
  */
 float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
@@ -515,10 +553,12 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
 
     float full_distance = race_manager->getNumLaps()
                         * m_track->getTrackLength();
+
     if(full_distance == 0)
-        full_distance = 1;  // For 0 lap races avoid warning below
+        full_distance = 1.0f;   // For 0 lap races avoid warning below
+
 #ifdef DEBUG
-    if(full_distance < kart_info.m_overall_distance)
+    if(kart_info.m_overall_distance > full_distance)
     {
         printf("WARNING: full distance < distance covered for kart '%s':\n",
                kart->getIdent().c_str());
@@ -530,28 +570,39 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
     // Return the current time plus initial position to spread arrival
     // times a bit. This code should generally not be used at all, it's
     // just here to avoid invalid finishing times.
-    if(full_distance < kart_info.m_overall_distance)
+    if(kart_info.m_overall_distance > full_distance)
         return getTime() + kart->getInitialPosition();
     
     // Finish time is the time needed for the whole race with
-    // the computed average speed computed.
+    // the computed average speed computed. The distance is always positive
+    // due to the way m_distance_increase was computed, so average speed
+    // is also always positive.
     float average_speed = getTime()==0 
                         ? 1.0f 
-                        : kart_info.m_overall_distance/getTime();
+                        : (m_distance_increase + kart_info.m_overall_distance)
+                          / getTime();
+    
+    // Avoid NAN or invalid results when average_speed is very low
+    // or negative (which can happen if a kart drives backwards and 
+    // m_overall distance becomes smaller than -m_distance_increase).
+    // In this case set the time to 99 minutes, offset by kart
+    // position (to spread arrival times for all karts that arrive
+    // even later). This works for up to 60 karts (otherwise the
+    // time displayed would become too long: 100:xx:yy).
+    if(average_speed<0.01f)
+        return 99*60.0f + kart->getPosition();
 
-    // Overall distance is negative before the starting line is crossed
-    // for the first time. Unlikely to happen in real races, but will
-    // happen in 0-laps races.
-    if(average_speed<0) 
-        average_speed = 1.0f;
+    float est_time = getTime() + (full_distance - kart_info.m_overall_distance)
+                                 / average_speed;
 
-    // Avoid NAN as results when average_speed is low
-    // Instead just set time to 99:59:00
-    if(average_speed<0.1f)
-        return 99*60+59;
-    return getTime() + (full_distance - kart_info.m_overall_distance)  
-                     / average_speed;
+    // Avoid times > 99:00 - in this case use kart position to spread
+    // arrival time so that each kart has a unique value. The pre-condition
+    // guarantees that this works correctly (higher position -> less distance
+    // covered -> later arrival time).
+    if(est_time>99*60.0f)
+        return 99*60.0f + kart->getPosition();
 
+    return est_time;
 }   // estimateFinishTimeForKart
 
 //-----------------------------------------------------------------------------
