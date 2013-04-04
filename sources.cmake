@@ -123,7 +123,6 @@ src/modes/cutscene_world.cpp
 src/modes/demo_world.cpp
 src/modes/easter_egg_hunt.cpp
 src/modes/follow_the_leader.cpp
-src/modes/game_tutorial.cpp
 src/modes/linear_world.cpp
 src/modes/overworld.cpp
 src/modes/profile_world.cpp
@@ -369,7 +368,6 @@ src/modes/cutscene_world.hpp
 src/modes/demo_world.hpp
 src/modes/easter_egg_hunt.hpp
 src/modes/follow_the_leader.hpp
-src/modes/game_tutorial.hpp
 src/modes/linear_world.hpp
 src/modes/overworld.hpp
 src/modes/profile_world.hpp
