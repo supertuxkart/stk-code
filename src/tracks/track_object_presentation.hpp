@@ -210,7 +210,7 @@ public:
  * \ingroup tracks
  * A track object representation that consists of a particle emitter
  */
-class TrackObjectPresentationParticles : public TrackObjectPresentation
+class TrackObjectPresentationParticles : public TrackObjectPresentationSceneNode
 {
 private:
     ParticleEmitter* m_emitter;
@@ -222,8 +222,7 @@ public:
     virtual ~TrackObjectPresentationParticles();
     
     virtual void update(float dt) OVERRIDE;
-    virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
-                      const core::vector3df& scale) OVERRIDE;
+
     std::string& getTriggerCondition() { return m_trigger_condition; }
     
     void triggerParticles();

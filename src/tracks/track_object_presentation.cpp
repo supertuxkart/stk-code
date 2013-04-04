@@ -37,6 +37,7 @@
 #include <IMeshSceneNode.h>
 #include <ICameraSceneNode.h>
 #include <IBillboardSceneNode.h>
+#include <IParticleSystemSceneNode.h>
 
 // ----------------------------------------------------------------------------
 
@@ -410,7 +411,7 @@ TrackObjectPresentationBillboard::~TrackObjectPresentationBillboard()
 
 
 TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode& xml_node) :
-    TrackObjectPresentation(xml_node)
+    TrackObjectPresentationSceneNode(xml_node)
 {
     m_emitter = NULL;
     m_lod_emitter_node = NULL;
@@ -434,7 +435,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode
         }
         ParticleEmitter* emitter = new ParticleEmitter( kind, emitter_origin );
         
-        /*
+        
         if (clip_distance > 0)
         {
             scene::ISceneManager* sm = irr_driver->getSceneManager();
@@ -445,12 +446,12 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode
             m_node = lod;
             m_lod_emitter_node = lod;
             m_emitter = emitter;
-        }*/
-        //else
-        //{
-            //m_node = emitter->getNode(); // FIXME: this leaks
+        }
+        else
+        {
+            m_node = emitter->getNode();
             m_emitter = emitter;
-        //}
+        }
         
         if (m_trigger_condition.size() > 0)
         {
@@ -491,12 +492,6 @@ void TrackObjectPresentationParticles::triggerParticles()
         m_emitter->setCreationRateAbsolute(1.0f);
         m_emitter->setParticleType(m_emitter->getParticlesInfo());
     }
-}
-
-void TrackObjectPresentationParticles::move(const core::vector3df& xyz, const core::vector3df& hpr,
-                                            const core::vector3df& scale)
-{
-    if (m_emitter != NULL) m_emitter->setPosition(xyz);
 }
 
 // ----------------------------------------------------------------------------
