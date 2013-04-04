@@ -20,15 +20,8 @@
 #define HEADER_TRACK_OBJECT_HPP
 
 #include <vector3d.h>
-#include <IAnimatedMeshSceneNode.h>
-namespace irr
-{
-    namespace scene { class IAnimatedMesh; class ISceneNode; }
-}
-using namespace irr;
 
 #include "items/item.hpp"
-#include "graphics/lod_node.hpp"
 #include "tracks/track_object_presentation.hpp"
 #include "utils/cpp2011.h"
 #include "utils/no_copy.hpp"
@@ -36,8 +29,6 @@ using namespace irr;
 #include <string>
 
 class XMLNode;
-class SFXBase;
-class ParticleEmitter;
 class PhysicalObject;
 class ThreeDAnimation;
 

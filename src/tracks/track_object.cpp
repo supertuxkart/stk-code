@@ -19,33 +19,13 @@
 #include "tracks/track_object.hpp"
 
 #include "animations/three_d_animation.hpp"
-#include "audio/sfx_base.hpp"
-#include "audio/sfx_buffer.hpp"
-#include "audio/sfx_manager.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/lod_node.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/particle_emitter.hpp"
-#include "graphics/particle_kind_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
-#include "modes/overworld.hpp"
-#include "modes/world.hpp"
 #include "physics/physical_object.hpp"
-#include "states_screens/dialogs/tutorial_message_dialog.hpp"
-#include "states_screens/dialogs/race_paused_dialog.hpp"
-#include "states_screens/main_menu_screen.hpp"
-#include "tracks/track.hpp"
-
-#include <IMeshSceneNode.h>
-#include <ISceneManager.h>
-#include <IParticleSystemSceneNode.h>
-#include <ICameraSceneNode.h>
-#include <IBillboardSceneNode.h>
-
-
+#include "race/race_manager.hpp"
 
 
 /** A track object: any additional object on the track. This object implements
