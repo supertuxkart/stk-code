@@ -178,6 +178,7 @@ TrackObject::~TrackObject()
 {
     delete m_presentation;
     delete m_animator;
+    delete m_rigid_body;
 }   // ~TrackObject
 
 // ----------------------------------------------------------------------------

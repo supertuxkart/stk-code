@@ -132,6 +132,8 @@ public:
     const core::vector3df& getPosition() const;
     const core::vector3df& getRotation() const;
     const core::vector3df& getScale() const;
+    
+    LEAK_CHECK()
 };   // TrackObject
 
 #endif
