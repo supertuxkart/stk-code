@@ -1254,6 +1254,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\tracks\track_object_presentation.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\track_sector.cpp"
 					>
 				</File>
@@ -2409,6 +2413,10 @@
 				</File>
 				<File
 					RelativePath="..\..\tracks\track_object_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\track_object_presentation.hpp"
 					>
 				</File>
 				<File
