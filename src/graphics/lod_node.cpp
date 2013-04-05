@@ -270,6 +270,7 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     
     node->grab();
     node->remove();
+    node->setPosition(core::vector3df(0,0,0));
     m_detail.push_back(level*level);
     m_nodes.push_back(node);
     m_nodes_set.insert(node);
@@ -279,4 +280,6 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
         HardwareSkinning::prepareNode((scene::IAnimatedMeshSceneNode*)node);
     
     node->drop();
+    
+    node->updateAbsolutePosition();
 }

@@ -49,7 +49,7 @@ protected:
     /** Temporary storage for LOD objects whose XML node was read but whose
       * scene node is not yet ready
       */
-    std::map<std::string, std::vector<TrackObject*> > m_lod_objects;
+    std::map<std::string, std::vector<const XMLNode*> > m_lod_objects;
     
 public:
          TrackObjectManager();

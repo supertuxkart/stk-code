@@ -99,6 +99,19 @@ public:
     virtual ~TrackObjectPresentationEmpty();
 };
 
+
+/**
+ * \ingroup tracks
+ * A track object representation that consists of a level-of-detail scene node
+ */
+class TrackObjectPresentationLOD : public TrackObjectPresentationSceneNode
+{
+public:
+
+    TrackObjectPresentationLOD(const XMLNode& xml_node, LODNode* lod_node);
+    virtual ~TrackObjectPresentationLOD();
+};
+
 /**
  * \ingroup tracks
  * A track object representation that consists of a mesh scene node.
@@ -124,33 +137,6 @@ public:
     virtual ~TrackObjectPresentationMesh();
     
     virtual void reset() OVERRIDE;
-    
-    
-    /** 2-step construction */
-    void setNode(scene::ISceneNode* node)
-    {
-        //assert(m_node == NULL);
-        if (m_node != NULL)
-        {
-            m_node->remove();
-        }
-        
-        m_node = node;
-        
-        if (m_node->getType() == irr::scene::ESNT_LOD_NODE)
-        {
-            ((LODNode*)m_node)->setNodesPosition(m_init_xyz);
-            ((LODNode*)m_node)->setNodesRotation(m_init_hpr);
-            ((LODNode*)m_node)->setNodesScale(m_init_scale);
-        }
-        else
-        {
-            m_node->setPosition(m_init_xyz);
-            m_node->setRotation(m_init_hpr);
-            m_node->setScale(m_init_scale);
-        }
-    }
-
 };
 
 /**

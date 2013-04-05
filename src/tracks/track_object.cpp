@@ -38,6 +38,20 @@
  */
 TrackObject::TrackObject(const XMLNode &xml_node)
 {
+    init(xml_node, NULL);
+}
+
+// ----------------------------------------------------------------------------
+
+TrackObject::TrackObject(const XMLNode &xml_node, LODNode* lod_node)
+{
+    init(xml_node, lod_node);
+}
+
+// ----------------------------------------------------------------------------
+
+void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
+{
     m_init_xyz   = core::vector3df(0,0,0);
     m_init_hpr   = core::vector3df(0,0,0);
     m_init_scale = core::vector3df(1,1,1);
@@ -65,7 +79,12 @@ TrackObject::TrackObject(const XMLNode &xml_node)
     m_type = type;
 
 
-    if (xml_node.getName() == "particle-emitter")
+    if (lod_node != NULL)
+    {
+        m_type = "lod";
+        m_presentation = new TrackObjectPresentationLOD(xml_node, lod_node);
+    }
+    else if (xml_node.getName() == "particle-emitter")
     {
         m_type = "particle-emitter";
         m_presentation = new TrackObjectPresentationParticles(xml_node);
@@ -100,7 +119,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
         {
             m_rigid_body = new PhysicalObject(type == "movable",
                                               xml_node,
-                                              mesh_presentation->getNode());
+                                              this);
         }
     }
     
@@ -165,10 +184,10 @@ void TrackObject::update(float dt)
 // ----------------------------------------------------------------------------
 
 void TrackObject::move(const core::vector3df& xyz, const core::vector3df& hpr,
-                       const core::vector3df& scale)
+                       const core::vector3df& scale, bool updateRigidBody)
 {
     if (m_presentation != NULL) m_presentation->move(xyz, hpr, scale);
-    if (m_rigid_body != NULL) m_rigid_body->move(xyz, hpr);
+    if (updateRigidBody && m_rigid_body != NULL) m_rigid_body->move(xyz, hpr);
 }
 
 // ----------------------------------------------------------------------------

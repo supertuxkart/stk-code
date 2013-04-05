@@ -78,9 +78,11 @@ protected:
     
     ThreeDAnimation*               m_animator;
     
+    void init(const XMLNode &xml_node, LODNode* lodNode);
     
 public:
                  TrackObject(const XMLNode &xml_node);
+                 TrackObject(const XMLNode &xml_node, LODNode* lodNode);
                  TrackObject();
                  
                  /*
@@ -111,7 +113,8 @@ public:
     const core::vector3df getInitRotation() const { return m_init_hpr; }
     const core::vector3df getInitScale() const { return m_init_scale; }
     
-    void move(const core::vector3df& xyz, const core::vector3df& hpr, const core::vector3df& scale);
+    void move(const core::vector3df& xyz, const core::vector3df& hpr,
+              const core::vector3df& scale, bool updateRigidBody);
 
     template<typename T>
     T* getPresentation() { return dynamic_cast<T*>(m_presentation); }

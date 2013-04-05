@@ -51,7 +51,20 @@ void TrackObjectManager::add(const XMLNode &xml_node)
 {
     try
     {
-        m_all_objects.push_back(new TrackObject(xml_node));
+        std::string groupname;
+        xml_node.get("lod_group", &groupname);
+        bool is_lod = !groupname.empty();
+        
+        if (is_lod)
+        {
+            printf("Adding lod obj to group <%s>\n", groupname.c_str());
+            m_lod_objects[groupname].push_back(&xml_node);
+        }
+        else
+        {
+            m_all_objects.push_back(new TrackObject(xml_node));
+        }
+        
         /*
         std::string groupname;
         xml_node.get("lod_group", &groupname);
@@ -284,10 +297,11 @@ void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes)
 {
     for (unsigned int n=0; n<lod_nodes.size(); n++)
     {
-        std::vector<TrackObject*>& queue = m_lod_objects[ lod_nodes[n]->getGroupName() ];
+        std::vector<const XMLNode*>& queue = m_lod_objects[ lod_nodes[n]->getGroupName() ];
         assert( queue.size() > 0 );
-        TrackObject* obj = queue[ queue.size() - 1 ];
-        obj->getPresentation<TrackObjectPresentationMesh>()->setNode( lod_nodes[n] );
+        const XMLNode* xml = queue[ queue.size() - 1 ];
+        
+        TrackObject* obj = new TrackObject(*xml, lod_nodes[n]);
         queue.erase( queue.end() - 1 );
         
         m_all_objects.push_back(obj);

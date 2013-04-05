@@ -145,6 +145,10 @@ void LodNodeLoader::done(Track* track,
             if (group.size() > 0)
             {
                 LODNode* lod_node = new LODNode(groupname, sroot, sm);
+                lod_node->setPosition(xyz);
+                lod_node->setRotation(hpr);
+                lod_node->setScale(scale);
+                lod_node->updateAbsolutePosition();
                 for (unsigned int m=0; m<group.size(); m++)
                 {
                     full_path = directory + "/" + group[m].second.m_model_file;
@@ -172,9 +176,9 @@ void LodNodeLoader::done(Track* track,
                     cache.push_back(a_mesh);
                     irr_driver->grabAllTextures(a_mesh);
                     scene::IMeshSceneNode* scene_node = irr_driver->addMesh(a_mesh);
-                    scene_node->setPosition(xyz);
-                    scene_node->setRotation(hpr);
-                    scene_node->setScale(scale);
+                    //scene_node->setPosition(xyz);
+                    //scene_node->setRotation(hpr);
+                    //scene_node->setScale(scale);
                     
                     track->handleAnimatedTextures( scene_node, *group[m].second.m_xml );
                     

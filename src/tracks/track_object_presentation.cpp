@@ -112,6 +112,21 @@ TrackObjectPresentationEmpty::~TrackObjectPresentationEmpty()
 
 // ----------------------------------------------------------------------------
 
+TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node, LODNode* lod_node) :
+    TrackObjectPresentationSceneNode(xml_node)
+{
+    m_node = lod_node;
+    m_node->setPosition(m_init_xyz);
+    m_node->setRotation(m_init_hpr);
+    m_node->setScale(m_init_scale);
+}
+
+TrackObjectPresentationLOD::~TrackObjectPresentationLOD()
+{
+    irr_driver->removeNode(m_node);
+}
+// ----------------------------------------------------------------------------
+
 TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node, bool enabled) :
     TrackObjectPresentationSceneNode(xml_node)
 {
@@ -225,7 +240,6 @@ void TrackObjectPresentationMesh::reset()
         }
     }
 }
-
 
 
 // ----------------------------------------------------------------------------

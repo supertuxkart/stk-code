@@ -53,7 +53,7 @@ private:
     /** The initial scale of the object. */
     core::vector3df       m_init_scale;
     
-    scene::ISceneNode*    m_node;
+    TrackObject          *m_object;
     
     /** The shape of this object. */
     bodyTypes             m_body_type;
@@ -111,7 +111,7 @@ private:
 
 public:
                  PhysicalObject(bool kinetic, const XMLNode &node,
-                                scene::ISceneNode* scenenode);
+                                TrackObject* object);
     
     /*
                  PhysicalObject(const std::string& model,

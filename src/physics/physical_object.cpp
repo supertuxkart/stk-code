@@ -41,7 +41,7 @@ using namespace irr;
 // ----------------------------------------------------------------------------
 
 PhysicalObject::PhysicalObject(bool kinetic, const XMLNode &xml_node,
-                               scene::ISceneNode* scenenode)
+                               TrackObject* object)
 {
     m_shape              = NULL;
     m_body               = NULL;
@@ -53,11 +53,11 @@ PhysicalObject::PhysicalObject(bool kinetic, const XMLNode &xml_node,
     m_crash_reset        = false;
     m_explode_kart       = false;
     
-    m_node = scenenode;
+    m_object = object;
     
-    m_init_xyz   = scenenode->getPosition();
-    m_init_hpr   = scenenode->getRotation();
-    m_init_scale = scenenode->getScale();
+    m_init_xyz   = object->getPosition();
+    m_init_hpr   = object->getRotation();
+    m_init_scale = object->getScale();
     
     std::string shape;
     xml_node.get("mass",    &m_mass       );
@@ -169,24 +169,26 @@ void PhysicalObject::init()
     // -------------------------------
     Vec3 min, max;
     
+    TrackObjectPresentationSceneNode* presentation =
+        m_object->getPresentation<TrackObjectPresentationSceneNode>();
     
-    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
+    if (presentation->getNode()->getType() == scene::ESNT_ANIMATED_MESH)
     {
         scene::IAnimatedMesh *mesh 
-            = ((scene::IAnimatedMeshSceneNode*)m_node)->getMesh();
+            = ((scene::IAnimatedMeshSceneNode*)presentation->getNode())->getMesh();
             
         MeshTools::minMax3D(mesh, &min, &max);
     }
-    else if (m_node->getType()==scene::ESNT_MESH)
+    else if (presentation->getNode()->getType()==scene::ESNT_MESH)
     {
         scene::IMesh *mesh 
-            = ((scene::IMeshSceneNode*)m_node)->getMesh();
+            = ((scene::IMeshSceneNode*)presentation->getNode())->getMesh();
             
         MeshTools::minMax3D(mesh, &min, &max);
     }
-    else if (m_node->getType()==scene::ESNT_LOD_NODE)
+    else if (presentation->getNode()->getType()==scene::ESNT_LOD_NODE)
     {
-        scene::ISceneNode* node = ((LODNode*)m_node)->getAllNodes()[0];
+        scene::ISceneNode* node = ((LODNode*)presentation->getNode())->getAllNodes()[0];
         if (node->getType() == scene::ESNT_ANIMATED_MESH)
         {
             scene::IAnimatedMesh *mesh 
@@ -288,20 +290,20 @@ void PhysicalObject::init()
         bool is_readonly_material = false;
         
         scene::IMesh* mesh = NULL;
-        switch (m_node->getType())
+        switch (presentation->getNode()->getType())
         {
             case scene::ESNT_MESH          :
             case scene::ESNT_WATER_SURFACE :
             case scene::ESNT_OCTREE        :
-                mesh = ((scene::IMeshSceneNode*)m_node)->getMesh();
+                mesh = ((scene::IMeshSceneNode*)presentation->getNode())->getMesh();
                 is_readonly_material = 
-                    ((scene::IMeshSceneNode*)m_node)->isReadOnlyMaterials();
+                    ((scene::IMeshSceneNode*)presentation->getNode())->isReadOnlyMaterials();
                 break;
             case scene::ESNT_ANIMATED_MESH :
                 // for now just use frame 0
-                mesh = ((scene::IAnimatedMeshSceneNode*)m_node)->getMesh()->getMesh(0);
+                mesh = ((scene::IAnimatedMeshSceneNode*)presentation->getNode())->getMesh()->getMesh(0);
                 is_readonly_material = 
-                    ((scene::IAnimatedMeshSceneNode*)m_node)->isReadOnlyMaterials();
+                    ((scene::IAnimatedMeshSceneNode*)presentation->getNode())->isReadOnlyMaterials();
                 break;
             default:
                 fprintf(stderr, "[3DAnimation] Unknown object type, cannot create exact collision body!\n");
@@ -338,7 +340,7 @@ void PhysicalObject::init()
             // the material is only available in the node.
             const video::SMaterial &irrMaterial = 
                 is_readonly_material ? mb->getMaterial()
-                : m_node->getMaterial(i);
+                : presentation->getNode()->getMaterial(i);
             video::ITexture* t=irrMaterial.getTexture(0);
             
             const Material* material=0;
@@ -461,10 +463,13 @@ void PhysicalObject::update(float dt)
     // Offset the graphical position correctly:
     xyz += t.getBasis()*m_graphical_offset;
 
-    m_node->setPosition(xyz.toIrrVector());
+    //m_node->setPosition(xyz.toIrrVector());
     Vec3 hpr;
     hpr.setHPR(t.getRotation());
-    m_node->setRotation(hpr.toIrrHPR());
+    //m_node->setRotation(hpr.toIrrHPR());
+    
+    core::vector3df scale(1,1,1);
+    m_object->move(xyz.toIrrVector(), hpr.toIrrVector(), scale, false);
     return;
 }   // update
 
