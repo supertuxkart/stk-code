@@ -74,7 +74,7 @@ private:
 protected:
 
 #ifdef DEBUG
-    int m_magic_number;
+    unsigned int m_magic_number;
 #endif
 
     /** The list of all karts. */
