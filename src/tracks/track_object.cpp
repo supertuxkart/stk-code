@@ -50,6 +50,35 @@ TrackObject::TrackObject(const XMLNode &xml_node, LODNode* lod_node)
 
 // ----------------------------------------------------------------------------
 
+TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
+                         const core::vector3df& scale, const char* interaction,
+                         TrackObjectPresentation* presentation,
+                         bool kinetic, const PhysicalObject::Settings* physicsSettings)
+{
+    m_init_xyz   = xyz;
+    m_init_hpr   = hpr;
+    m_init_scale = scale;
+    m_enabled    = true;
+    m_presentation = NULL;
+    m_animator = NULL;
+    m_rigid_body = NULL;
+    m_interaction = interaction;
+    
+    m_presentation = presentation;
+    
+    if (m_interaction != "ghost" && m_interaction != "none" && physicsSettings != NULL)
+    {
+        m_rigid_body = new PhysicalObject(kinetic,
+                                          *physicsSettings,
+                                          this);
+    }
+    
+    reset();
+}
+
+
+// ----------------------------------------------------------------------------
+
 void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
 {
     m_init_xyz   = core::vector3df(0,0,0);
@@ -117,9 +146,9 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
         
         if (m_interaction != "ghost" && m_interaction != "none")
         {
-            m_rigid_body = new PhysicalObject(type == "movable",
-                                              xml_node,
-                                              this);
+            m_rigid_body = PhysicalObject::fromXML(type == "movable",
+                                                   xml_node,
+                                                   this);
         }
     }
     

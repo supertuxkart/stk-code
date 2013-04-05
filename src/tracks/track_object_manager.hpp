@@ -64,12 +64,7 @@ public:
     /** Enable or disable fog on objects */
     void enableFog(bool enable);
 
-    TrackObject* insertObject(const std::string& model,
-                                 PhysicalObject::bodyTypes shape, 
-                                 float mass, float radius,
-                                 const core::vector3df& hpr,
-                                 const core::vector3df& pos,
-                                 const core::vector3df& scale);
+    void insertObject(TrackObject* object);
     
     void removeObject(TrackObject* who);
     

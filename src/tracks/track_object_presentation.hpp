@@ -42,6 +42,17 @@ protected:
 public:
 
     TrackObjectPresentation(const XMLNode& xml_node);
+    
+    TrackObjectPresentation(
+        const core::vector3df& xyz,
+        const core::vector3df& hpr,
+        const core::vector3df& scale)
+    {
+        m_init_xyz = xyz;
+        m_init_hpr = hpr;
+        m_init_scale = scale;
+    }
+    
     virtual ~TrackObjectPresentation() {}
     
     virtual void reset() {}
@@ -74,6 +85,15 @@ public:
         m_node = NULL;
     }
 
+    TrackObjectPresentationSceneNode(
+        const core::vector3df& xyz,
+        const core::vector3df& hpr,
+        const core::vector3df& scale) :
+        TrackObjectPresentation(xyz, hpr, scale)
+    {
+        m_node = NULL;
+    }
+    
     virtual const core::vector3df& getPosition() const OVERRIDE;
     virtual const core::vector3df& getRotation() const OVERRIDE;
     virtual const core::vector3df& getScale() const OVERRIDE;
@@ -132,8 +152,15 @@ private:
     /** End frame of the animation to be played. */
     unsigned int            m_frame_end;
     
+    void init(const XMLNode* xml_node, bool enabled);
+    
 public:
     TrackObjectPresentationMesh(const XMLNode& xml_node, bool enabled);
+    
+    TrackObjectPresentationMesh(
+        const std::string& model_file, const core::vector3df& xyz,
+        const core::vector3df& hpr, const core::vector3df& scale);
+
     virtual ~TrackObjectPresentationMesh();
     
     virtual void reset() OVERRIDE;

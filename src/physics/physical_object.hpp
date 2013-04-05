@@ -24,11 +24,11 @@
 #include "btBulletDynamicsCommon.h"
 
 #include "physics/user_pointer.hpp"
-#include "tracks/track_object.hpp"
 #include "utils/vec3.hpp"
 #include "utils/leak_check.hpp"
 
 class XMLNode;
+class TrackObject;
 
 /**
   * \ingroup physics
@@ -41,7 +41,18 @@ public:
                     MP_CONE_Y, MP_CONE_X, MP_CONE_Z,
                     MP_CYLINDER_Y, MP_CYLINDER_X, MP_CYLINDER_Z,
                     MP_BOX, MP_SPHERE, MP_EXACT};
-
+                    
+    struct Settings
+    {
+        float mass;
+        float radius;
+        PhysicalObject::bodyTypes body_type;
+        bool crash_reset;
+        bool knock_kart;
+        bool reset_when_too_low;
+        float reset_height;
+    };
+    
 private:
 
     /** The initial XYZ position of the object. */
@@ -110,8 +121,11 @@ private:
     TriangleMesh         *m_triangle_mesh;
 
 public:
-                 PhysicalObject(bool kinetic, const XMLNode &node,
-                                TrackObject* object);
+                    PhysicalObject(bool kinetic, const Settings& settings,
+                                   TrackObject* object);
+    
+    static PhysicalObject* fromXML(bool kinetic, const XMLNode &node,
+                                   TrackObject* object);
     
     /*
                  PhysicalObject(const std::string& model,

@@ -301,7 +301,7 @@ void ThreeStrikesBattle::update(float dt)
     std::string tire;
     float scale = 0.5f;
     float radius = 0.5f;
-    PhysicalObject::bodyTypes tire_model;
+    PhysicalObject::bodyTypes body_shape;
 
     // insert blown away tire(s) now if was requested
     while (m_insert_tire > 0)
@@ -312,12 +312,12 @@ void ThreeStrikesBattle::update(float dt)
             tire = file_manager->getModelFile("tire.b3d");
             scale = 0.5f;
             radius = 0.5f;
-            tire_model = PhysicalObject::MP_CYLINDER_Y;
+            body_shape = PhysicalObject::MP_CYLINDER_Y;
         }
         else
         {
             scale = 1.0f;
-            tire_model = PhysicalObject::MP_CYLINDER_X;
+            body_shape = PhysicalObject::MP_CYLINDER_X;
             radius = m_tire_radius[m_insert_tire-2];
             tire_offset = m_tire_offsets[m_insert_tire-2];
             if     (m_insert_tire == 2)
@@ -330,28 +330,36 @@ void ThreeStrikesBattle::update(float dt)
                 tire = m_tire_dir+"/wheel-rear-right.b3d";
         }
 
-// TODO: add back tires
-#if 0
-        TrackObjectManager* tom = m_track->getTrackObjectManager();        
-        PhysicalObject* obj = 
-            tom->insertObject(tire,
-                              tire_model,
-                              15 /* mass */,
-                              radius /* radius */,
-                              core::vector3df(800.0f,0,m_tire_rotation 
-                                                      / M_PI * 180 + 180) ,
-                              m_tire_position + tire_offset,
-                              core::vector3df(scale,scale,scale) /* scale */);
+
+        core::vector3df tire_xyz = m_tire_position + tire_offset;
+        core::vector3df tire_hpr = core::vector3df(800.0f,0,
+                                                   m_tire_rotation / M_PI * 180 + 180);
+        core::vector3df tire_scale(scale,scale,scale);
         
+        PhysicalObject::Settings physicsSettings;
+        physicsSettings.body_type = PhysicalObject::MP_CYLINDER_Y;
+        physicsSettings.crash_reset = false;
+        physicsSettings.knock_kart = false;
+        physicsSettings.mass = 15.0f;
+        physicsSettings.radius = radius;
+        physicsSettings.reset_when_too_low = false;
+        
+        TrackObjectPresentationMesh* tire_presentation =
+            new TrackObjectPresentationMesh(tire, tire_xyz, tire_hpr, tire_scale);
+        
+        TrackObject* tire = new TrackObject(tire_xyz, tire_hpr, tire_scale,
+                                            "movable", tire_presentation, true /* kinetic */,
+                                            &physicsSettings);
+        getTrack()->getTrackObjectManager()->insertObject(tire);
+
         // FIXME: orient the force relative to kart orientation
-        obj->getBody()->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
+        tire->getPhysics()->getBody()->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
 
         m_insert_tire--;
         if(m_insert_tire == 1)
             m_insert_tire = 0;
         
-        m_tires.push_back(obj);
-#endif
+        m_tires.push_back(tire);
     }
 }   // update
 

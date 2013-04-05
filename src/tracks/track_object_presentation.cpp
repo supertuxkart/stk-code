@@ -55,7 +55,6 @@ TrackObjectPresentation::TrackObjectPresentation(const XMLNode& xml_node)
 
 // ----------------------------------------------------------------------------
 
-
 const core::vector3df& TrackObjectPresentationSceneNode::getPosition() const
 {
     return m_node->getPosition();
@@ -139,11 +138,12 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     xml_node.get("model",   &model_name  );
     
     std::string full_path = 
-            World::getWorld()->getTrack()->getTrackFile(model_name);
-        
-    bool animated = (UserConfigParams::m_graphical_effects ||
-                     World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+        World::getWorld()->getTrack()->getTrackFile(model_name);
     
+    bool animated = (UserConfigParams::m_graphical_effects ||
+                 World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+
+
     if (file_manager->fileExists(full_path))
     {
         if (animated)
@@ -156,7 +156,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
         }
     }
     
-    if(!m_mesh)
+    if (!m_mesh)
     {
         // If the model isn't found in the track directory, look 
         // in STK's model directory.
@@ -168,7 +168,47 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
             throw std::runtime_error("Model '" + model_name + "' cannot be found");
         }
     }
+    
+    init(&xml_node, enabled);
+}
 
+TrackObjectPresentationMesh::TrackObjectPresentationMesh(
+        const std::string& model_file, const core::vector3df& xyz,
+        const core::vector3df& hpr, const core::vector3df& scale) :
+        TrackObjectPresentationSceneNode(xyz, hpr, scale)
+{
+    m_is_looped  = false;
+    m_mesh       = NULL;
+    m_node       = NULL;
+    
+    bool animated = (UserConfigParams::m_graphical_effects ||
+             World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+
+    if (file_manager->fileExists(model_file))
+    {
+        if (animated)
+        {
+            m_mesh = irr_driver->getAnimatedMesh(model_file);
+        }
+        else
+        {
+            m_mesh = irr_driver->getMesh(model_file);
+        }
+    }
+    
+    if (!m_mesh)
+    {
+        throw std::runtime_error("Model '" + model_file + "' cannot be found");
+    }
+    
+    init(NULL, true);
+}
+
+void TrackObjectPresentationMesh::init(const XMLNode* xml_node, bool enabled)
+{
+    bool animated = (UserConfigParams::m_graphical_effects ||
+             World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+    
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
     
@@ -179,10 +219,12 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
         m_node = node;
         
         m_frame_start = node->getStartFrame();
-        xml_node.get("frame-start", &m_frame_start);
+        if (xml_node != NULL)
+            xml_node->get("frame-start", &m_frame_start);
 
         m_frame_end = node->getEndFrame();
-        xml_node.get("frame-end", &m_frame_end);
+        if (xml_node != NULL)
+            xml_node->get("frame-end", &m_frame_end);
     }
     else
     {
@@ -190,10 +232,10 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
         m_frame_start = 0;
         m_frame_end = 0;
     }
-#ifdef DEBUG
-    std::string debug_name = model_name+" (track-object)";
-    m_node->setName(debug_name.c_str());
-#endif
+//#ifdef DEBUG
+//    std::string debug_name = model_name+" (track-object)";
+//    m_node->setName(debug_name.c_str());
+//#endif
 
     if(!enabled)
         m_node->setVisible(false);

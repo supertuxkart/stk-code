@@ -32,6 +32,7 @@ using namespace irr;
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_object.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
@@ -40,7 +41,49 @@ using namespace irr;
 
 // ----------------------------------------------------------------------------
 
-PhysicalObject::PhysicalObject(bool kinetic, const XMLNode &xml_node,
+PhysicalObject* PhysicalObject::fromXML(bool kinetic, const XMLNode &xml_node,
+                                        TrackObject* object)
+{
+    PhysicalObject::Settings settings;
+    
+    settings.reset_height = 0;
+    settings.mass         = 1;
+    settings.radius       = -1;
+    settings.crash_reset  = false;
+    settings.knock_kart   = false;
+    
+    std::string shape;
+    xml_node.get("mass",    &settings.mass       );
+    xml_node.get("radius",  &settings.radius     );
+    xml_node.get("shape",   &shape               );
+    xml_node.get("reset",   &settings.crash_reset);
+    xml_node.get("explode", &settings.knock_kart );
+    
+    settings.reset_when_too_low = 
+        xml_node.get("reset-when-below", &settings.reset_height) == 1;
+
+    settings.body_type = MP_NONE;
+    if     (shape=="cone"  ||
+            shape=="coneY"    ) settings.body_type = MP_CONE_Y;
+    else if(shape=="coneX"    ) settings.body_type = MP_CONE_X;
+    else if(shape=="coneZ"    ) settings.body_type = MP_CONE_Z;
+    else if(shape=="cylinder"||
+            shape=="cylinderY") settings.body_type = MP_CYLINDER_Y;
+    else if(shape=="cylinderX") settings.body_type = MP_CYLINDER_X;
+    else if(shape=="cylinderZ") settings.body_type = MP_CYLINDER_Z;
+
+    else if(shape=="box"    ) settings.body_type = MP_BOX;
+    else if(shape=="sphere" ) settings.body_type = MP_SPHERE;
+    else if(shape=="exact")   settings.body_type = MP_EXACT;
+
+    else fprintf(stderr, "Unknown shape type : %s\n", shape.c_str());
+
+    return new PhysicalObject(kinetic, settings, object);
+}   // PhysicalObject
+
+// ----------------------------------------------------------------------------
+
+PhysicalObject::PhysicalObject(bool kinetic, const PhysicalObject::Settings& settings,
                                TrackObject* object)
 {
     m_shape              = NULL;
@@ -59,30 +102,13 @@ PhysicalObject::PhysicalObject(bool kinetic, const XMLNode &xml_node,
     m_init_hpr   = object->getRotation();
     m_init_scale = object->getScale();
     
-    std::string shape;
-    xml_node.get("mass",    &m_mass       );
-    xml_node.get("radius",  &m_radius     );
-    xml_node.get("shape",   &shape        );
-    xml_node.get("reset",   &m_crash_reset);
-    xml_node.get("explode", &m_explode_kart);
-    m_reset_when_too_low = 
-        xml_node.get("reset-when-below", &m_reset_height) == 1;
-
-    m_body_type = MP_NONE;
-    if     (shape=="cone"  ||
-            shape=="coneY"    ) m_body_type = MP_CONE_Y;
-    else if(shape=="coneX"    ) m_body_type = MP_CONE_X;
-    else if(shape=="coneZ"    ) m_body_type = MP_CONE_Z;
-    else if(shape=="cylinder"||
-            shape=="cylinderY") m_body_type = MP_CYLINDER_Y;
-    else if(shape=="cylinderX") m_body_type = MP_CYLINDER_X;
-    else if(shape=="cylinderZ") m_body_type = MP_CYLINDER_Z;
-
-    else if(shape=="box"    ) m_body_type = MP_BOX;
-    else if(shape=="sphere" ) m_body_type = MP_SPHERE;
-    else if(shape=="exact")   m_body_type = MP_EXACT;
-
-    else fprintf(stderr, "Unknown shape type : %s\n", shape.c_str());
+    m_mass = settings.mass;
+    m_radius = settings.radius;
+    m_body_type = settings.body_type;
+    m_crash_reset = settings.crash_reset;
+    m_explode_kart = settings.knock_kart;
+    m_reset_when_too_low = settings.reset_when_too_low;
+    m_reset_height = settings.reset_height;
 
     m_init_pos.setIdentity();
     Vec3 radHpr(m_init_hpr);

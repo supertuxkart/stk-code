@@ -32,6 +32,7 @@
 #include "physics/physical_object.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/bezier_curve.hpp"
+#include "tracks/track_object.hpp"
 #include "utils/constants.hpp"
 #include <ISceneManager.h>
 #include <IMeshSceneNode.h>
