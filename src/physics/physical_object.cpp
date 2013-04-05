@@ -152,7 +152,7 @@ void PhysicalObject::move(const Vec3& xyz, const core::vector3df& hpr)
     mat.setRotationDegrees(hpr);
 
     irr::core::quaternion tempQuat(mat);
-    q = btQuaternion(-tempQuat.X, -tempQuat.Y, -tempQuat.Z, tempQuat.W);
+    q = btQuaternion(tempQuat.X, tempQuat.Y, tempQuat.Z, tempQuat.W);
     
     
     Vec3 p(xyz);
