@@ -95,6 +95,7 @@ PhysicalObject::PhysicalObject(bool kinetic, const PhysicalObject::Settings& set
     m_radius             = -1;
     m_crash_reset        = false;
     m_explode_kart       = false;
+    m_triangle_mesh      = NULL;
     
     m_object = object;
     
