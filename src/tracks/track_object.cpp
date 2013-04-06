@@ -108,12 +108,7 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     m_type = type;
 
 
-    if (lod_node != NULL)
-    {
-        m_type = "lod";
-        m_presentation = new TrackObjectPresentationLOD(xml_node, lod_node);
-    }
-    else if (xml_node.getName() == "particle-emitter")
+    if (xml_node.getName() == "particle-emitter")
     {
         m_type = "particle-emitter";
         m_presentation = new TrackObjectPresentationParticles(xml_node);
@@ -139,10 +134,15 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     }
     else
     {
-        TrackObjectPresentationMesh* mesh_presentation =
-            new TrackObjectPresentationMesh(xml_node, m_enabled);
-        
-        m_presentation = mesh_presentation;
+        if (lod_node != NULL)
+        {
+            m_type = "lod";
+            m_presentation = new TrackObjectPresentationLOD(xml_node, lod_node);
+        }
+        else
+        {
+            m_presentation = new TrackObjectPresentationMesh(xml_node, m_enabled);
+        }
         
         if (m_interaction != "ghost" && m_interaction != "none")
         {
