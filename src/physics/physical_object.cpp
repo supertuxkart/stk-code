@@ -496,7 +496,7 @@ void PhysicalObject::update(float dt)
     //m_node->setRotation(hpr.toIrrHPR());
     
     core::vector3df scale(1,1,1);
-    m_object->move(xyz.toIrrVector(), hpr.toIrrVector(), scale, false);
+    m_object->move(xyz.toIrrVector(), hpr.toIrrVector()*RAD_TO_DEGREE, scale, false);
     return;
 }   // update
 
