@@ -32,6 +32,7 @@ float Bowling::m_st_force_to_target;
 Bowling::Bowling(AbstractKart *kart) 
         : Flyable(kart, PowerupManager::POWERUP_BOWLING, 50.0f /* mass */)
 {
+    m_has_hit_kart = false;
     float y_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f;
     
     // if the kart is looking backwards, release from the back
@@ -188,7 +189,7 @@ bool Bowling::updateAndDelete(float dt)
             if(vlen==0.0f) {
                 v = btVector3(.5f, .0, 0.5f);  // avoid 0 div.
             }
-            m_body->setLinearVelocity(v*m_speed/sqrt(vlen));
+ //           m_body->setLinearVelocity(v*(m_speed/sqrt(vlen)));
         }   // vlen < 0.8*m_speed*m_speed
     }   // hat< m_max_height  
     
@@ -211,7 +212,10 @@ bool Bowling::hit(AbstractKart* kart, PhysicalObject* obj)
 {
     bool was_real_hit = Flyable::hit(kart, obj);
     if(was_real_hit)
+    {
+        m_has_hit_kart = kart != NULL;
         explode(kart, obj, /*hit_secondary*/false);
+    }
     return was_real_hit;
 }   // hit
 // ----------------------------------------------------------------------------
@@ -220,5 +224,7 @@ bool Bowling::hit(AbstractKart* kart, PhysicalObject* obj)
  */
 HitEffect* Bowling::getHitEffect() const
 {
-    return new HitSFX(getXYZ(), "strike");
+    if(m_has_hit_kart)
+        return new HitSFX(getXYZ(), "strike");
+    return NULL;
 }   // getHitEffect

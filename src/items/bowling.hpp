@@ -40,6 +40,11 @@ private:
     static float m_st_max_distance_squared;
     static float m_st_force_to_target;
     
+    /** If a bowling ball has hit something, this flag is set to indicate
+     *  if a kart was hit or not. The sound effect is only played if a
+     *  kart was hit. */
+    bool m_has_hit_kart;
+
 public:
     Bowling(AbstractKart* kart);
     static  void init(const XMLNode &node, scene::IMesh *bowling);
