@@ -1573,7 +1573,7 @@ void IrrDriver::doScreenShot()
     tm* timeInfo = localtime( &rawtime );
     char time_buffer[256];
     sprintf(time_buffer, "%i.%02i.%02i %02i.%02i.%02i",
-            timeInfo->tm_year + 1900, timeInfo->tm_mon, 
+            timeInfo->tm_year + 1900, timeInfo->tm_mon+1, 
             timeInfo->tm_mday, timeInfo->tm_hour, 
             timeInfo->tm_min, timeInfo->tm_sec);
 
