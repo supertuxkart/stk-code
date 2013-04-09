@@ -27,6 +27,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v90</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -75,6 +76,7 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</LinkIncremental>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(ProjectName)_d</TargetName>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">C:\Program Files\Microsoft SDKs\Windows\v7.0A\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -273,7 +275,6 @@
     <ClCompile Include="..\..\modes\cutscene_world.cpp" />
     <ClCompile Include="..\..\modes\demo_world.cpp" />
     <ClCompile Include="..\..\modes\easter_egg_hunt.cpp" />
-    <ClCompile Include="..\..\modes\game_tutorial.cpp" />
     <ClCompile Include="..\..\modes\overworld.cpp" />
     <ClCompile Include="..\..\modes\soccer_world.cpp" />
     <ClCompile Include="..\..\modes\tutorial_world.cpp" />
@@ -303,6 +304,7 @@
     <ClCompile Include="..\..\tracks\check_cannon.cpp" />
     <ClCompile Include="..\..\tracks\check_goal.cpp" />
     <ClCompile Include="..\..\tracks\lod_node_loader.cpp" />
+    <ClCompile Include="..\..\tracks\track_object_presentation.cpp" />
     <ClCompile Include="..\..\tracks\track_sector.cpp" />
     <ClCompile Include="..\..\utils\constants.cpp" />
     <ClCompile Include="..\..\utils\leak_check.cpp" />
@@ -410,7 +412,6 @@
     <ClCompile Include="..\..\config\stk_config.cpp" />
     <ClCompile Include="..\..\config\user_config.cpp" />
     <ClCompile Include="..\..\animations\animation_base.cpp" />
-    <ClCompile Include="..\..\animations\billboard_animation.cpp" />
     <ClCompile Include="..\..\animations\ipo.cpp" />
     <ClCompile Include="..\..\animations\three_d_animation.cpp" />
     <ClCompile Include="..\..\states_screens\addons_screen.cpp" />
@@ -510,7 +511,6 @@
     <ClInclude Include="..\..\modes\cutscene_world.hpp" />
     <ClInclude Include="..\..\modes\demo_world.hpp" />
     <ClInclude Include="..\..\modes\easter_egg_hunt.hpp" />
-    <ClInclude Include="..\..\modes\game_tutorial.hpp" />
     <ClInclude Include="..\..\modes\overworld.hpp" />
     <ClInclude Include="..\..\modes\soccer_world.hpp" />
     <ClInclude Include="..\..\modes\tutorial_world.hpp" />
@@ -560,6 +560,7 @@
     <ClInclude Include="..\..\tracks\check_cannon.hpp" />
     <ClInclude Include="..\..\tracks\check_goal.hpp" />
     <ClInclude Include="..\..\tracks\lod_node_loader.hpp" />
+    <ClInclude Include="..\..\tracks\track_object_presentation.hpp" />
     <ClInclude Include="..\..\tracks\track_sector.hpp" />
     <ClInclude Include="..\..\utils\constants.hpp" />
     <ClInclude Include="..\..\utils\cpp2011.h" />
@@ -675,7 +676,6 @@
     <ClInclude Include="..\..\config\stk_config.hpp" />
     <ClInclude Include="..\..\config\user_config.hpp" />
     <ClInclude Include="..\..\animations\animation_base.hpp" />
-    <ClInclude Include="..\..\animations\billboard_animation.hpp" />
     <ClInclude Include="..\..\animations\ipo.hpp" />
     <ClInclude Include="..\..\animations\three_d_animation.hpp" />
     <ClInclude Include="..\..\states_screens\addons_screen.hpp" />

@@ -552,9 +552,6 @@
     <ClCompile Include="..\..\animations\animation_base.cpp">
       <Filter>Source Files\animations</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\animations\billboard_animation.cpp">
-      <Filter>Source Files\animations</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\animations\ipo.cpp">
       <Filter>Source Files\animations</Filter>
     </ClCompile>
@@ -813,9 +810,6 @@
     <ClCompile Include="..\..\modes\demo_world.cpp">
       <Filter>Source Files\modes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\modes\game_tutorial.cpp">
-      <Filter>Source Files\modes</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\config\player.cpp">
       <Filter>Source Files\config</Filter>
     </ClCompile>
@@ -865,6 +859,9 @@
       <Filter>Source Files\states_screens</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tracks\check_goal.cpp">
+      <Filter>Source Files\tracks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tracks\track_object_presentation.cpp">
       <Filter>Source Files\tracks</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1319,9 +1316,6 @@
     <ClInclude Include="..\..\animations\animation_base.hpp">
       <Filter>Header Files\animations</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\animations\billboard_animation.hpp">
-      <Filter>Header Files\animations</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\animations\ipo.hpp">
       <Filter>Header Files\animations</Filter>
     </ClInclude>
@@ -1607,9 +1601,6 @@
     <ClInclude Include="..\..\modes\demo_world.hpp">
       <Filter>Header Files\modes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\modes\game_tutorial.hpp">
-      <Filter>Header Files\modes</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tracks\check_cannon.hpp">
       <Filter>Header Files\tracks</Filter>
     </ClInclude>
@@ -1659,6 +1650,9 @@
       <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\check_goal.hpp">
+      <Filter>Header Files\tracks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tracks\track_object_presentation.hpp">
       <Filter>Header Files\tracks</Filter>
     </ClInclude>
   </ItemGroup>
