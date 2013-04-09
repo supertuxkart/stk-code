@@ -43,10 +43,12 @@ unsigned int plural3_pl(int n) { return static_cast<unsigned int>(n==1 ? 0 : n%1
 unsigned int plural3_sl(int n) { return static_cast<unsigned int>(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3); }
 unsigned int plural4_ar(int n) { return static_cast<unsigned int>( n==1 ? 0 : n==2 ? 1 : n>=3 && n<=10 ? 2 : 3 ); }
 
+typedef std::map<std::string, class PluralForms> tPluralForms;
+
 PluralForms
 PluralForms::from_string(const std::string& str)
 {
-  static std::map<std::string, class PluralForms> plural_forms;
+  static tPluralForms plural_forms;
     
   if (plural_forms.empty())
   {
@@ -73,7 +75,7 @@ PluralForms::from_string(const std::string& str)
     if (!isspace(str[i]))
       space_less_str += str[i];
   
-  std::map<std::string, class PluralForms>::const_iterator it= plural_forms.find(space_less_str);
+  tPluralForms::const_iterator it= plural_forms.find(space_less_str);
   if (it != plural_forms.end())
   {
     return it->second;
