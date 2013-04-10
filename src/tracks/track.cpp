@@ -856,8 +856,9 @@ bool Track::loadMainTrack(const XMLNode &root)
             const ChallengeData* challenge = unlock_manager->getChallenge(s);
             if (challenge == NULL)
             {
-                Log::error("track", "Cannot find challenge named '%s'\n",
-                    m_challenges[closest_challenge_id].m_challenge_id.c_str());
+                if (s != "tutorial")
+                    Log::error("track", "Cannot find challenge named '%s'\n",
+                        m_challenges[closest_challenge_id].m_challenge_id.c_str());
                 continue;
             }
             

@@ -446,6 +446,14 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
                 font->draw(_("Tutorial"), pos, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);
+                            
+                core::rect<s32> pos2(0,
+                                     UserConfigParams::m_height - GUIEngine::getFontHeight()*2,
+                                     UserConfigParams::m_width,
+                                     UserConfigParams::m_height);
+                GUIEngine::getFont()->draw(_("Press fire to play the tutorial"), pos2,
+                                           video::SColor(255,255,150,60),
+                                           true, true /* vcenter */, NULL);
                 continue;
             }
             
