@@ -1646,6 +1646,17 @@ void IrrDriver::update(float dt)
         m_video_driver->endScene();
         return;
     }
+    else if (GUIEngine::getCurrentScreen() != NULL &&
+             GUIEngine::getCurrentScreen()->needs3D())
+    {
+        //printf("Screen that needs 3D\n");
+        m_video_driver->beginScene(/*backBuffer clear*/false, /*zBuffer*/true,
+                                   video::SColor(0,0,0,255));
+        m_scene_manager->drawAll();
+        GUIEngine::render(dt);
+        m_video_driver->endScene();
+        return;
+    }
     
     const bool inRace = world!=NULL;
     
