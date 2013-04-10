@@ -1109,6 +1109,7 @@ bool Track::loadMainTrack(const XMLNode &root)
                 LODNode* lod_node = new LODNode("challenge_orb",
                                                 irr_driver->getSceneManager()->getRootSceneNode(),
                                                 irr_driver->getSceneManager());
+                lod_node->setPosition(xyz);
                 lod_node->add(50, scene_node, true /* reparent */);
                                 
                 m_all_nodes.push_back( lod_node );
