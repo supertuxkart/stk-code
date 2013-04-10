@@ -47,7 +47,13 @@ TrackObjectPresentation::TrackObjectPresentation(const XMLNode& xml_node)
     m_init_hpr   = core::vector3df(0,0,0);
     m_init_scale = core::vector3df(1,1,1);
 
-    xml_node.get("xyz",     &m_init_xyz  );
+    
+    if (!xml_node.get("xyz",     &m_init_xyz  ))
+    {
+        // support for old deprecated syntax
+        xml_node.getXYZ(&m_init_xyz);
+    }
+    
     xml_node.get("hpr",     &m_init_hpr  );
     xml_node.get("scale",   &m_init_scale);
 }
@@ -57,16 +63,19 @@ TrackObjectPresentation::TrackObjectPresentation(const XMLNode& xml_node)
 
 const core::vector3df& TrackObjectPresentationSceneNode::getPosition() const
 {
+    if (m_node == NULL) return m_init_xyz;
     return m_node->getPosition();
 }
 
 const core::vector3df& TrackObjectPresentationSceneNode::getRotation() const
 {
+    if (m_node == NULL) return m_init_hpr;
     return m_node->getRotation();
 }
 
 const core::vector3df& TrackObjectPresentationSceneNode::getScale() const 
 {
+    if (m_node == NULL) return m_init_scale;
     return m_node->getScale();
 }
 
@@ -74,20 +83,23 @@ const core::vector3df& TrackObjectPresentationSceneNode::getScale() const
 void TrackObjectPresentationSceneNode::move(const core::vector3df& xyz, const core::vector3df& hpr,
                                             const core::vector3df& scale)
 {
+    if (m_node == NULL) return;
+    
     m_node->setPosition(xyz);
     m_node->setRotation(hpr);
     m_node->setScale(scale);
-    
-    //if (dynamic_cast<TrackObjectPresentationMesh*>(this) != NULL)
 }
 
 void TrackObjectPresentationSceneNode::setEnable(bool enabled)
 {
-    m_node->setVisible(enabled);
+    if (m_node != NULL)
+        m_node->setVisible(enabled);
 }
 
 void TrackObjectPresentationSceneNode::reset()
 {
+    if (m_node == NULL) return;
+    
     m_node->setPosition(m_init_xyz);
     m_node->setRotation(m_init_hpr);
     m_node->setScale(m_init_scale);
@@ -473,9 +485,10 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode
     m_lod_emitter_node = NULL;
     
     std::string path;
-    irr::core::vector3df emitter_origin;
     xml_node.get("kind", &path);
-    xml_node.getXYZ(&emitter_origin);
+    
+    //irr::core::vector3df emitter_origin;
+    //xml_node.getXYZ(&emitter_origin);
 
     int clip_distance = -1;
     xml_node.get("clip_distance", &clip_distance);
@@ -489,7 +502,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode
         {
             throw std::runtime_error(path + " could not be loaded");
         }
-        ParticleEmitter* emitter = new ParticleEmitter( kind, emitter_origin );
+        ParticleEmitter* emitter = new ParticleEmitter( kind, m_init_xyz );
         
         
         if (clip_distance > 0)

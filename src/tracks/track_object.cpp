@@ -141,6 +141,7 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
         }
         else
         {
+            m_type = "mesh";
             m_presentation = new TrackObjectPresentationMesh(xml_node, m_enabled);
         }
         
