@@ -1,7 +1,7 @@
 # data/
 
 SUBDIRS    = challenges fonts gfx gui karts models music po sfx textures tracks \
-             grandprix tutorials shaders
+             grandprix shaders
 
 pkgdatadir = $(datadir)/games/$(PACKAGE)/data
 

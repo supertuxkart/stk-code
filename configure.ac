@@ -449,7 +449,6 @@ AC_CONFIG_FILES([                   \
  data/sfx/Makefile                  \
  data/textures/Makefile             \
  data/tracks/Makefile               \
- data/tutorials/Makefile            \
  doc/Makefile                       \
  src/Makefile                       \
  src/ide/Makefile                   \
