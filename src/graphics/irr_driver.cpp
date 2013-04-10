@@ -567,6 +567,7 @@ bool IrrDriver::moveWindow(const int x, const int y)
         return false;
     }
 #elif defined(__linux__) && !defined(ANDROID)
+    const SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
     using namespace X11;
 
     // TODO: Actually handle possible failure
