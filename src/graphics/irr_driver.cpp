@@ -549,8 +549,8 @@ core::position2di IrrDriver::getMouseLocation()
  */
 bool IrrDriver::moveWindow(const int x, const int y)
 {
-    const SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
 #ifdef WIN32
+    const SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
     // this should work even if using DirectX in theory,
     // because the HWnd is always third pointer in the struct,
     // no matter which union is used
