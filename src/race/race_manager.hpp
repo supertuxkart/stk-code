@@ -230,7 +230,8 @@ public:
                           DIFFICULTY_FIRST = DIFFICULTY_EASY,
                           DIFFICULTY_MEDIUM, 
                           DIFFICULTY_HARD,
-                          DIFFICULTY_LAST = DIFFICULTY_HARD,
+                          DIFFICULTY_BEST,
+                          DIFFICULTY_LAST = DIFFICULTY_BEST,
                           DIFFICULTY_COUNT};
     
     /** Different kart types: A local player, a player connected via network,
@@ -502,6 +503,7 @@ public:
         case RaceManager::DIFFICULTY_EASY:   return "easy";   break;
         case RaceManager::DIFFICULTY_MEDIUM: return "medium"; break;
         case RaceManager::DIFFICULTY_HARD:   return "hard";   break;
+        case RaceManager::DIFFICULTY_BEST:   return "best";   break;
         default:  assert(false);
         }
         return "";

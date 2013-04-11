@@ -347,6 +347,23 @@
                 rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"
                 skidding-threshold="2.0"
                 />
+        <best   time-full-steer="0.1"
+                straight-length-for-zipper="35"
+                use-slipstream="true"
+                disable-slipstream-usage="false"
+                false-start-probability="0.0"
+                min-start-delay="0.15" max-start-delay="0.2"
+                nitro-usage="all"
+                non-random-item-usage="true"
+                collect-avoid-items="true"
+                handle-bomb="true"
+                speed-cap="0:1.0"
+                max-item-angle="0.7" max-item-angle-high-speed="0.3"
+                bad-item-closeness="6"
+                collect-item-probability="0:1.0"
+                rb-skid-probability="0:1.0"
+                skidding-threshold="2.0"
+                />
     </ai>
     <!-- Slipstream: length: How far behind a kart slipstream works
          width: how wide slipstream works furthest away from the kart.
@@ -402,7 +419,7 @@
          have 3 values, one for low, medium, and hard.
          brake-factor: Value used when braking. max-speed-reverse-ratio is
          the percentage of max speed for reverse gear. -->
-    <engine power="450 475 500"  max-speed="17 21 23" brake-factor="11.0"
+    <engine power="450 475 500 510"  max-speed="17 21 23 25" brake-factor="11.0"
             max-speed-reverse-ratio="0.3"/>
 
     <!-- Simulated gears: switch-ratio defines at what ratio of the maximum
@@ -501,7 +518,7 @@
            in your face is removed. -->
     <plunger band-max-length="50" band-force="1500" band-duration="1"
           band-speed-increase="7" band-fade-out-time="3"
-          in-face-time="3 4 4.5"/>
+          in-face-time="3 4 4.5 4.5"/>
 
     <!-- Kart-specific explosion parameters. 
          Time: how long it takes before the kart can drive again (this

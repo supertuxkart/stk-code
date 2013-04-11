@@ -96,6 +96,11 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_HARD;
             race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
         }
+        else if (selection == "best")
+        {
+            UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_BEST;
+            race_manager->setDifficulty(RaceManager::DIFFICULTY_BEST);
+        }
     }
     else if (name == "gamemode")
     {

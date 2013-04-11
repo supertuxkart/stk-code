@@ -786,18 +786,12 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--mode") && i+1<argc ))
         {
-            switch (atoi(argv[i+1]))
-            {
-            case 1:
-                race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
-                break;
-            case 2:
-                race_manager->setDifficulty(RaceManager::DIFFICULTY_MEDIUM);
-                break;
-            case 3:
-                race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
-                break;
-            }
+            int n = atoi(argv[i+1]);
+            if(n<0 || n>RaceManager::DIFFICULTY_LAST)
+                Log::warn("main", "Invalid difficulty '%s' - ignored.\n",
+                          argv[i+1]);
+            else
+                race_manager->setDifficulty(RaceManager::Difficulty(n));
             i++;
         }
         else if( (!strcmp(argv[i], "--type") && i+1<argc ))

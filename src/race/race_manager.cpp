@@ -56,6 +56,8 @@ RaceManager* race_manager= NULL;
  */
 RaceManager::RaceManager()
 {
+    // Several code depends on this, e.g. kart_properties
+    assert(DIFFICULTY_FIRST == 0);
     m_num_karts          = UserConfigParams::m_num_karts;
     m_difficulty         = DIFFICULTY_HARD;
     m_major_mode         = MAJOR_MODE_SINGLE;

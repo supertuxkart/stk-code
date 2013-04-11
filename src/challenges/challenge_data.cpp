@@ -160,13 +160,14 @@ ChallengeData::ChallengeData(const std::string& filename)
     difficulties[1] = root->getNode("medium");
     difficulties[2] = root->getNode("hard");
 
+    // Note that the challenges can only be done in three difficulties
     if (difficulties[0] == NULL || difficulties[1] == NULL ||
         difficulties[2] == NULL)
     {
         error("<easy> or <medium> or <hard>");
     }
     
-    for (int d=0; d<RaceManager::DIFFICULTY_COUNT; d++)
+    for (int d=0; d<=RaceManager::DIFFICULTY_HARD; d++)
     {
         const XMLNode* karts_node = difficulties[d]->getNode("karts");
         if (karts_node == NULL) error("<karts .../>");
@@ -220,15 +221,7 @@ ChallengeData::ChallengeData(const std::string& filename)
         if (requirements_node->get("energy", &energy)) m_energy[d] = energy;
 
     }
-    
-    // TODO: add gp support
-/*
-    else   // GP
-    {
-        if (!root->get("gp",   &m_gp_id ))                     error("gp");
-        if (grand_prix_manager->getGrandPrix(m_gp_id) == NULL) error("gp");
-    }
-*/
+
     std::vector<XMLNode*> unlocks;
     root->getNodes("unlock", unlocks);
     for(unsigned int i=0; i<unlocks.size(); i++)

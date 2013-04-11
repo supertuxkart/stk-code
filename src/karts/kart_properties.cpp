@@ -63,8 +63,7 @@ KartProperties::KartProperties(const std::string &filename)
 
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
-    m_mass = m_brake_factor = m_engine_power[0] = m_engine_power[1] =
-        m_engine_power[2] = m_max_speed[0] = m_max_speed[1] = m_max_speed[2] =
+    m_mass = m_brake_factor =
         m_time_reset_steer = m_nitro_consumption = m_nitro_engine_force =
         m_nitro_small_container = m_nitro_big_container = m_nitro_max = 
         m_nitro_max_speed_increase = m_nitro_duration = m_nitro_fade_out_time =
@@ -72,16 +71,13 @@ KartProperties::KartProperties(const std::string &filename)
         m_wheel_damping_compression = m_friction_slip = m_roll_influence =
         m_wheel_radius = m_chassis_linear_damping = m_max_suspension_force =
         m_chassis_angular_damping = m_suspension_rest =
-        m_max_speed_reverse_ratio = 
-        m_rescue_vert_offset = m_upright_tolerance = 
-        m_collision_terrain_impulse = m_collision_impulse = m_restitution =
-        m_collision_impulse_time = 
+        m_max_speed_reverse_ratio = m_rescue_vert_offset = 
+        m_upright_tolerance = m_collision_terrain_impulse = 
+        m_collision_impulse = m_restitution = m_collision_impulse_time = 
         m_upright_max_force = m_suspension_travel_cm =
-        m_track_connection_accel =
-        m_rubber_band_max_length = m_rubber_band_force =
-        m_rubber_band_duration = m_rubber_band_speed_increase = 
-        m_rubber_band_fade_out_time = m_plunger_in_face_duration[0] =
-        m_plunger_in_face_duration[1] = m_plunger_in_face_duration[2] =
+        m_track_connection_accel = m_rubber_band_max_length = 
+        m_rubber_band_force = m_rubber_band_duration = 
+        m_rubber_band_speed_increase = m_rubber_band_fade_out_time = 
         m_zipper_time = m_zipper_force = m_zipper_speed_gain =
         m_zipper_max_speed_increase = m_zipper_fade_out_time =       
         m_slipstream_length = m_slipstream_width = m_slipstream_collect_time =
@@ -94,6 +90,11 @@ KartProperties::KartProperties(const std::string &filename)
         m_explosion_radius =
         m_swatter_distance2 = m_swatter_duration = m_squash_slowdown =
         m_squash_duration = m_downward_impulse_factor = UNDEFINED;
+
+    m_engine_power.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
+    m_max_speed.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
+    m_plunger_in_face_duration.resize(RaceManager::DIFFICULTY_COUNT, 
+                                      UNDEFINED);
 
     m_terrain_impulse_type   = IMPULSE_NONE;
     m_gravity_center_shift   = Vec3(UNDEFINED);
@@ -338,6 +339,8 @@ void KartProperties::getAllData(const XMLNode * root)
         m_ai_properties[RaceManager::DIFFICULTY_MEDIUM]->load(medium);
         const XMLNode *hard = ai_node->getNode("hard");
         m_ai_properties[RaceManager::DIFFICULTY_HARD]->load(hard);
+        const XMLNode *best = ai_node->getNode("best");
+        m_ai_properties[RaceManager::DIFFICULTY_BEST]->load(best);
     }
 
     if(const XMLNode *slipstream_node = root->getNode("slipstream"))
@@ -367,34 +370,22 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         engine_node->get("brake-factor", &m_brake_factor);
         engine_node->get("max-speed-reverse-ratio", &m_max_speed_reverse_ratio);
-        std::vector<float> v;
-        if( engine_node->get("power", &v))
+        engine_node->get("power", &m_engine_power);
+        if(m_engine_power.size()!=RaceManager::DIFFICULTY_COUNT)
         {
-            if(v.size()!=3)
-                Log::warn("KartProperties", 
-                          "Incorrect engine-power specifications for kart '%s'\n",
-                          getIdent().c_str());
-            else
-            {
-                m_engine_power[0] = v[0];
-                m_engine_power[1] = v[1];
-                m_engine_power[2] = v[2];
-            }
-        }   // if engine-power
-        v.clear();
-        if( engine_node->get("max-speed", &v))
+            Log::fatal("KartProperties", 
+                       "Incorrect engine-power specifications for kart '%s'\n",
+                       getIdent().c_str());
+            exit(-1);
+        }
+        engine_node->get("max-speed", &m_max_speed);
+        if(m_max_speed.size()!=RaceManager::DIFFICULTY_COUNT)
         {
-            if(v.size()!=3)
-                Log::error("KartProperties", 
-                           "Incorrect max-speed specifications for kart '%s'\n",
-                            getIdent().c_str());
-            else
-            {
-                m_max_speed[0] = v[0];
-                m_max_speed[1] = v[1];
-                m_max_speed[2] = v[2];
-            }
-        }   // if max-speed
+            Log::fatal("KartProperties", 
+                       "Incorrect max-speed specifications for kart '%s'\n",
+                       getIdent().c_str());
+            exit(-1);
+        }
     }   // if getNode("engine")
 
     if(const XMLNode *gear_node = root->getNode("gear"))
@@ -482,18 +473,12 @@ void KartProperties::getAllData(const XMLNode * root)
         plunger_node->get("band-duration",      &m_rubber_band_duration      );
         plunger_node->get("band-speed-increase",&m_rubber_band_speed_increase);
         plunger_node->get("band-fade-out-time", &m_rubber_band_fade_out_time );
-        std::vector<float> v;
-        plunger_node->get("in-face-time",    &v);
-        if(v.size()!=3)
+        plunger_node->get("in-face-time", &m_plunger_in_face_duration);
+        if(m_plunger_in_face_duration.size()!=RaceManager::DIFFICULTY_COUNT)
         {
-            Log::error("KartProperties", 
+            Log::fatal("KartProperties", 
                        "Invalid plunger in-face-time specification.");
-        }
-        else
-        {
-            m_plunger_in_face_duration[0] = v[0];
-            m_plunger_in_face_duration[1] = v[1];
-            m_plunger_in_face_duration[2] = v[2];
+            exit(-1);
         }
     }
 
@@ -629,12 +614,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_chassis_angular_damping, "stability chassis-angular-damping");
     CHECK_NEG(m_downward_impulse_factor, "stability downward-impulse-factor");
     CHECK_NEG(m_track_connection_accel,  "stability track-connection-accel" );
-    CHECK_NEG(m_engine_power[0],            "engine power[0]"               );
-    CHECK_NEG(m_engine_power[1],            "engine power[1]"               );
-    CHECK_NEG(m_engine_power[2],            "engine power[2]"               );
-    CHECK_NEG(m_max_speed[0],               "engine maximum-speed[0]"       );
-    CHECK_NEG(m_max_speed[1],               "engine maximum-speed[1]"       );
-    CHECK_NEG(m_max_speed[2],               "engine maximum-speed[2]"       );
     CHECK_NEG(m_max_speed_reverse_ratio,    "engine max-speed-reverse-ratio");
     CHECK_NEG(m_brake_factor,               "engine brake-factor"           );
     CHECK_NEG(m_suspension_stiffness,       "suspension stiffness"          );
@@ -650,9 +629,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_bevel_factor.getZ(),        "collision bevel-factor"        );
     CHECK_NEG(m_upright_tolerance,          "upright tolerance"             );
     CHECK_NEG(m_upright_max_force,          "upright max-force"             );
-    CHECK_NEG(m_plunger_in_face_duration[0],"plunger in-face-time[0]"       );
-    CHECK_NEG(m_plunger_in_face_duration[1],"plunger in-face-time[1]"       );
-    CHECK_NEG(m_plunger_in_face_duration[2],"plunger in-face-time[2]"       );
     CHECK_NEG(m_rubber_band_max_length,     "plunger band-max-length"       );
     CHECK_NEG(m_rubber_band_force,          "plunger band-force"            );
     CHECK_NEG(m_rubber_band_duration,       "plunger band-duration"         );
@@ -696,6 +672,14 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_explosion_invulnerability_time, 
                                             "explosion invulnerability-time");
     CHECK_NEG(m_explosion_radius,           "explosion radius"              );
+
+    for(unsigned int i=RaceManager::DIFFICULTY_FIRST;
+        i<=RaceManager::DIFFICULTY_LAST; i++)
+    {
+        CHECK_NEG(m_max_speed[i], "engine maximum-speed[0]");
+        CHECK_NEG(m_engine_power[i], "engine power" );
+        CHECK_NEG(m_plunger_in_face_duration[i],"plunger in-face-time");
+    }
 
     m_skidding_properties->checkAllSet(filename);
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)

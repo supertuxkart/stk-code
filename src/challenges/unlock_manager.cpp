@@ -130,8 +130,10 @@ void UnlockManager::readAllChallengesInDirs(const std::vector<std::string>* all_
                 }
                 catch (std::runtime_error& ex)
                 {
-                    std::cerr << "\n/!\\ An error occurred while loading challenge file '" << filename << "' : "
-                              << ex.what() << " : challenge will be ignored.\n\n"; 
+                    Log::warn("unlock_manager", "An error occurred while "
+                              "loading challenge file '%s' : %s.\n"
+                              "Challenge will be ignored.",
+                              filename.c_str(), ex.what());
                     continue;
                 }
                 addOrFreeChallenge(new_challenge);
@@ -174,9 +176,10 @@ void UnlockManager::addChallenge(const std::string& filename)
     }
     catch (std::runtime_error& ex)
     {
-        std::cerr << "\n/!\\ An error occurred while loading challenge file '" << filename << "' : "
-                  << ex.what() << " : challenge will be ignored.\n\n"; 
-        if (new_challenge != NULL) delete new_challenge;
+        Log::warn("unlock_manager", "An error occurred while loading "
+                   "challenge file '%s' : %s challenge will be ignored.",
+                   filename.c_str(), ex.what());
+        if (new_challenge) delete new_challenge;
         return;
     }
     addOrFreeChallenge(new_challenge);
@@ -204,9 +207,8 @@ void UnlockManager::load()
     XMLNode* root = file_manager->createXMLTree(filename);
     if(!root || root->getName() != "challenges")
     {
-        std::cerr << "Challenge file '" << filename << "' will be created." 
-                  << std::endl;
-        
+        Log::info("unlock_manager", "Challenge file '%s' will be created.",
+                  filename.c_str());
         createSlotsIfNeeded();
         save();
         
@@ -221,7 +223,8 @@ void UnlockManager::load()
         std::string player_id;
         if (!xml_game_slots[n]->get("playerID", &player_id))
         {
-            fprintf(stderr, "[UnlockManager] WARNING: Found game slot without a player ID attached. Discarding it\n");
+            Log::warn("unlock_manager", "Found game slot without "
+                      "a player ID attached. Discarding it.");
             continue;
         }
         
@@ -265,7 +268,9 @@ void UnlockManager::save()
 
     if (!challenge_file.is_open())
     {
-        std::cerr << "Failed to open " << filename << " for writing, challenges won't be saved\n";
+        Log::warn("unlock_manager", 
+                  "Failed to open '%s' for writing, challenges won't be saved\n",
+                  filename.c_str());
         return;
     }
 
@@ -417,7 +422,7 @@ void UnlockManager::updateActiveChallengeList()
 
 //-----------------------------------------------------------------------------
 
-void UnlockManager::findWhatWasUnlocked(int pointsBefore, int pointsNow,
+void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
                                         std::vector<std::string>& tracks,
                                         std::vector<std::string>& gps)
 {
@@ -425,7 +430,8 @@ void UnlockManager::findWhatWasUnlocked(int pointsBefore, int pointsNow,
          it != m_all_challenges.end(); it++)
     {
         ChallengeData* c = it->second;
-        if (c->getNumTrophies() > pointsBefore && c->getNumTrophies() <= pointsNow)
+        if (c->getNumTrophies() > points_before && 
+            c->getNumTrophies() <= points_now      )
         {
             if (c->getTrackId() != "")
             {

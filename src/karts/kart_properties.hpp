@@ -125,7 +125,7 @@ private:
     float m_mass;
 
     /** Maximum force from engine for eachdifficulty. */
-    float m_engine_power[3];
+    std::vector<float> m_engine_power;
 
     /** Braking factor * engine_power braking force. */
     float m_brake_factor;
@@ -194,7 +194,7 @@ private:
     /** Fade out time when the rubber band is removed. */
     float       m_rubber_band_fade_out_time;
      /**Duration of plunger in face depending on difficulty. */
-    float       m_plunger_in_face_duration[3];
+    std::vector<float>  m_plunger_in_face_duration;
     /** Wheel base of the kart. */
     float       m_wheel_base;
     /** Nitro consumption. */
@@ -255,7 +255,9 @@ private:
     /** Angular damping to prevent it from turning too easily. */
     float m_chassis_angular_damping;
 
-    float m_max_speed[3];
+    /** The maximum speed at each difficulty. */
+    std::vector<float> m_max_speed;
+
     float m_max_speed_reverse_ratio;
 
     /** Shift of center of gravity. */
