@@ -567,9 +567,7 @@ bool IrrDriver::moveWindow(const int x, const int y)
         return false;
     }
 #elif defined(__linux__) && !defined(ANDROID)
-    const SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
     using namespace X11;
-
     const SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
     // TODO: Actually handle possible failure
     XMoveWindow((Display*)videoData.OpenGLLinux.X11Display,
