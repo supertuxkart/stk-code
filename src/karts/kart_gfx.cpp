@@ -41,6 +41,12 @@ KartGFX::KartGFX(const AbstractKart *kart)
 
     m_kart = kart;
 
+    Vec3 rear_left(-(kart->getKartWidth()+0.20)*0.35f, (kart->getKartHeight()-0.6)*0.35f,
+                       -kart->getKartLength()*0.35f);
+
+    Vec3 rear_right((kart->getKartWidth()+0.20)*0.35f, (kart->getKartHeight()-0.6)*0.35f,
+                       -kart->getKartLength()*0.35f);
+
     Vec3 rear_center(0, kart->getKartHeight()*0.35f, 
                        -kart->getKartLength()*0.35f);
 
@@ -49,9 +55,10 @@ KartGFX::KartGFX(const AbstractKart *kart)
     addEffect(KGFX_NITRO,   "nitro.xml",       rear_center);
     addEffect(KGFX_ZIPPER,  "zipper_fire.xml", rear_center);
     addEffect(KGFX_TERRAIN, "smoke.xml",       Vec3(0,0,0));
-    addEffect(KGFX_SKID1,   "skid1.xml",       rear_center);
-    addEffect(KGFX_SKID2,   "skid2.xml",       rear_center);
-
+    addEffect(KGFX_SKID1L,   "skid1.xml",       rear_left);
+    addEffect(KGFX_SKID1R,   "skid1.xml",       rear_right);
+    addEffect(KGFX_SKID2L,   "skid2.xml",       rear_left);
+    addEffect(KGFX_SKID2R,   "skid2.xml",       rear_right);
 }   // KartGFX
 
 // ----------------------------------------------------------------------------
@@ -86,7 +93,7 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
         //kind    = new ParticleKind(file_manager->getGfxFile(file_name));
         // Skid2 is only used to store the emitter type, and a wheeless
         // kart has no terrain effects.
-        if(type==KGFX_SKID2 || (type==KGFX_TERRAIN && m_kart->isWheeless()) )
+        if(type==KGFX_SKID2L || type==KGFX_SKID2R || (type==KGFX_TERRAIN && m_kart->isWheeless()) )
             emitter = NULL;
         else if(type==KGFX_TERRAIN)
             // Terrain is NOT a child of the kart, since bullet returns the
@@ -107,9 +114,9 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
     }
     assert((int)m_all_emitters.size()==type);
     m_all_emitters.push_back(emitter);
-    if(type==KGFX_SKID1)
+    if(type==KGFX_SKID1L or type==KGFX_SKID1R)
         m_skid_kind1 = kind;
-    else if (type==KGFX_SKID2)
+    else if (type==KGFX_SKID2L or type==KGFX_SKID2R)
         m_skid_kind2 = kind;
 }   // addEffect
 
@@ -139,11 +146,14 @@ void KartGFX::setSkidLevel(const unsigned int level)
     assert(level >= 1);
     assert(level <= 2);
     const ParticleKind *pk = level==1 ? m_skid_kind1 : m_skid_kind2;
-    if(m_all_emitters[KGFX_SKID1])
-        m_all_emitters[KGFX_SKID1]->setParticleType(pk);
+    if(m_all_emitters[KGFX_SKID1L])
+        m_all_emitters[KGFX_SKID1L]->setParticleType(pk);
+    if(m_all_emitters[KGFX_SKID1R])
+        m_all_emitters[KGFX_SKID1R]->setParticleType(pk);
     // Relative 0 means it will emitt the minimum rate, i.e. the rate
     // set to indicate that the bonus is now available.
-    setCreationRateRelative(KartGFX::KGFX_SKID, 0.0f);
+    setCreationRateRelative(KartGFX::KGFX_SKIDL, 0.0f);
+    setCreationRateRelative(KartGFX::KGFX_SKIDR, 0.0f);
 }   // setSkidLevel
 
 // ----------------------------------------------------------------------------

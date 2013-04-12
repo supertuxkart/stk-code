@@ -42,9 +42,12 @@ public:
     enum KartGFXType { KGFX_NITRO=0,
                        KGFX_ZIPPER,
                        KGFX_TERRAIN,
-                       KGFX_SKID,
-                       KGFX_SKID1=KGFX_SKID,
-                       KGFX_SKID2,
+                       KGFX_SKIDL,
+                       KGFX_SKIDR,
+                       KGFX_SKID1L = KGFX_SKIDL,
+                       KGFX_SKID1R = KGFX_SKIDR,
+                       KGFX_SKID2L,
+                       KGFX_SKID2R,
                        KGFX_COUNT};
 
 private:

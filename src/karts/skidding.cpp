@@ -71,7 +71,8 @@ void Skidding::reset()
     m_gfx_jump_offset     = 0.0f;
     m_remaining_jump_time = 0.0f;
     m_jump_speed          = 0.0f;
-    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKID, 0);
+    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
+    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -376,16 +377,21 @@ void Skidding::update(float dt, bool is_on_ground,
                 if(bonus_time>0)
                 {
                     m_kart->getKartGFX()
-                          ->setCreationRateRelative(KartGFX::KGFX_SKID, 1.0f);
+                          ->setCreationRateRelative(KartGFX::KGFX_SKIDL, 1.0f);
+                    m_kart->getKartGFX()
+                          ->setCreationRateRelative(KartGFX::KGFX_SKIDR, 1.0f);
                     m_kart->m_max_speed->
                         instantSpeedIncrease(MaxSpeed::MS_INCREASE_SKIDDING,
                                              bonus_speed, bonus_speed,
                                              bonus_force, bonus_time, 
                                              /*fade-out-time*/ 1.0f);
                 }
-                else
+                else {
                     m_kart->getKartGFX()
-                          ->setCreationRateAbsolute(KartGFX::KGFX_SKID, 0);
+                          ->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
+                    m_kart->getKartGFX()
+                          ->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
+            }
             }
             break;
         }   // case
@@ -396,7 +402,9 @@ void Skidding::update(float dt, bool is_on_ground,
         {
             m_skid_time = 0;
             m_kart->getKartGFX()
-                  ->setCreationRateAbsolute(KartGFX::KGFX_SKID, 0);
+                  ->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
+            m_kart->getKartGFX()
+                  ->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
             m_skid_state = SKID_NONE;
         }
     }   // switch
