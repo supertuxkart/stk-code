@@ -41,10 +41,10 @@ KartGFX::KartGFX(const AbstractKart *kart)
 
     m_kart = kart;
 
-    Vec3 rear_left(-(kart->getKartWidth()+0.20)*0.35f, (kart->getKartHeight()-0.6)*0.35f,
+    Vec3 rear_left(-(kart->getKartWidth()+0.20f)*0.35f, (kart->getKartHeight()-0.6f)*0.35f,
                        -kart->getKartLength()*0.35f);
 
-    Vec3 rear_right((kart->getKartWidth()+0.20)*0.35f, (kart->getKartHeight()-0.6)*0.35f,
+    Vec3 rear_right((kart->getKartWidth()+0.20f)*0.35f, (kart->getKartHeight()-0.6f)*0.35f,
                        -kart->getKartLength()*0.35f);
 
     Vec3 rear_center(0, kart->getKartHeight()*0.35f, 
@@ -114,9 +114,9 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
     }
     assert((int)m_all_emitters.size()==type);
     m_all_emitters.push_back(emitter);
-    if(type==KGFX_SKID1L or type==KGFX_SKID1R)
+    if(type==KGFX_SKID1L || type==KGFX_SKID1R)
         m_skid_kind1 = kind;
-    else if (type==KGFX_SKID2L or type==KGFX_SKID2R)
+    else if (type==KGFX_SKID2L || type==KGFX_SKID2R)
         m_skid_kind2 = kind;
 }   // addEffect
 
