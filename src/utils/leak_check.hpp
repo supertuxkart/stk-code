@@ -20,11 +20,11 @@
 #ifndef HEADER_LEAK_CHECK_HPP
 #define HEADER_LEAK_CHECK_HPP
 
-#ifdef DEBUG
-
 #include "utils/log.hpp"
 
 #include <stdio.h>
+
+#ifdef DEBUG
 
 namespace MemoryLeaks
 {
