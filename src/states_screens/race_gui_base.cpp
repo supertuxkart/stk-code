@@ -120,8 +120,6 @@ void RaceGUIBase::init()
         m_referee_rotation.push_back(hpr);
     }
 
-    m_referee = new Referee();
-
     // Do everything else required at a race restart as well, esp. 
     // resetting the height of the referee.
     restartRace();
@@ -133,6 +131,12 @@ void RaceGUIBase::init()
  */
 void RaceGUIBase::restartRace()
 {
+    //fixes multiple referee problem.
+    //create a referee only if it is not created, uses the existing referee for multiple restarts
+    if(m_referee == NULL)
+    {
+         m_referee = new Referee();
+    }
     m_referee_height = 10.0f;
     m_referee->attachToSceneNode();
     m_plunger_move_time = 0;
