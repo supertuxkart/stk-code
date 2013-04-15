@@ -127,10 +127,15 @@ void GameSlot::computeActive()
     {
         if (m_points < i->second->getData()->getNumTrophies())
         {
-            if (i->second->getData()->getTrackId().size() > 0)
+            if (i->second->getData()->isSingleRace())
                 m_locked_features[i->second->getData()->getTrackId()] = true;
-            else if (i->second->getData()->getGPId().size() > 0)
+            else if (i->second->getData()->isGrandPrix())
                 m_locked_features[i->second->getData()->getGPId()] = true;
+            else
+            {
+                // FIXME when more challenge types are implemented.
+                assert(false);
+            }
         }
     }
     

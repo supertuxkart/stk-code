@@ -181,6 +181,9 @@ public:
     /** Returns if this challenge is a grand prix. */
     bool isGrandPrix() const { return m_mode == CM_GRAND_PRIX; }
     // ------------------------------------------------------------------------    
+    /** Returns if this challenge is a grand prix. */
+    bool isSingleRace() const { return m_mode == CM_SINGLE_RACE; }
+    // ------------------------------------------------------------------------    
     /** Returns the challenge mode of this challenge. */
     ChallengeModeType getMode() const { return m_mode; }
     // ------------------------------------------------------------------------
