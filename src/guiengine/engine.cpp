@@ -669,6 +669,7 @@ namespace GUIEngine
         IGUIEnvironment* g_env;
         Skin* g_skin = NULL;
         ScalableFont* g_font;
+        ScalableFont* g_large_font;
         ScalableFont* g_title_font;
         ScalableFont* g_small_font;
         ScalableFont* g_digit_font;
@@ -680,6 +681,7 @@ namespace GUIEngine
         Widget* g_focus_for_player[MAX_PLAYER_COUNT];
         
         int font_height;
+        int large_font_height;
         int small_font_height;
         int title_font_height;
     }
@@ -789,6 +791,12 @@ namespace GUIEngine
     int getSmallFontHeight()
     {
         return Private::small_font_height;
+    }   // getSmallFontHeight
+    
+    // ------------------------------------------------------------------------
+    int getLargeFontHeight()
+    {
+        return Private::large_font_height;
     }   // getSmallFontHeight
     
     // ------------------------------------------------------------------------
@@ -1022,6 +1030,14 @@ namespace GUIEngine
         
         Private::font_height = g_font->getDimension( L"X" ).Height;
         
+
+        ScalableFont* sfont_larger = sfont->getHollowCopy();
+        sfont_larger->setScale(normal_text_scale*1.4f);
+        sfont_larger->setKerningHeight(-5);
+        g_large_font = sfont_larger;
+
+        Private::large_font_height = g_large_font->getDimension( L"X" ).Height;
+
         ScalableFont* sfont_smaller = sfont->getHollowCopy();
         sfont_smaller->setScale(normal_text_scale*0.8f);
         sfont_smaller->setKerningHeight(-5);

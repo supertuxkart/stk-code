@@ -22,7 +22,7 @@ title_font, by Marianne Gagnon (Auria), released under CC-BY-SA 3+
 
 screen*.png, by Marianne Gagnon (Auria), including elements from the public domain Tango icon set
 
-Gauge and bar by Dakal, released under CC-BY-SA 3
+Gauge and bar by Totoplus62, released under CC-BY-SA 3
 
 ====
 

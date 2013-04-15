@@ -101,7 +101,8 @@ RaceGUI::RaceGUI()
     
     m_timer_width = font->getDimension(L"99:99:99").Width;
 
-    font = (race_manager->getNumLocalPlayers() > 2 ? GUIEngine::getSmallFont() : GUIEngine::getFont());
+    font = (race_manager->getNumLocalPlayers() > 2 ? GUIEngine::getSmallFont()
+                                                   : GUIEngine::getFont());
     
     int w;
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
@@ -260,7 +261,8 @@ void RaceGUI::drawGlobalTimer()
     }
         
     gui::ScalableFont* font = GUIEngine::getFont();
-    font->draw(sw.c_str(), pos, time_color, false, false, NULL, true /* ignore RTL */);
+    font->draw(sw.c_str(), pos, time_color, false, false, NULL, 
+               true /* ignore RTL */);
     
 }   // drawGlobalTimer
 
@@ -282,8 +284,10 @@ void RaceGUI::drawGlobalMiniMap()
     {
         core::rect<s32> dest(m_map_left,               upper_y, 
                              m_map_left + m_map_width, lower_y);
-        core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
-        irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
+        core::rect<s32> source(core::position2di(0, 0), 
+                               mini_map->getOriginalSize());
+        irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source,
+                                                  NULL, NULL, true);
     }
     
     for(unsigned int i=0; i<world->getNumKarts(); i++)
@@ -323,57 +327,197 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                               const core::recti &viewport, 
                               const core::vector2df &scaling)
 {
+    float minRatio         = std::min(scaling.X, scaling.Y);
+    const int GAUGEWIDTH   = 78;
+    int gauge_width        = (int)(GAUGEWIDTH*minRatio);
+    int gauge_height       = (int)(GAUGEWIDTH*minRatio);
+    
     float state = (float)(kart->getEnergy()) 
                 / kart->getKartProperties()->getNitroMax();
     if (state < 0.0f) state = 0.0f;
     else if (state > 1.0f) state = 1.0f;
+
+    core::vector2df offset;
+    offset.X = (float)(x-gauge_width) - 9.0f*scaling.X;
+    offset.Y = (float)y-30.0f*scaling.Y;
     
-    int h = (int)(viewport.getHeight()/3);
-    int w = h/4; // gauge image is so 1:4
-    
-    y -= h;
-    
-    x    -= w;
-    
+
     // Background
-    irr_driver->getVideoDriver()->draw2DImage(m_gauge_empty, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
-                                              core::rect<s32>(0, 0, 64, 256) /* source rect */,
-                                              NULL /* clip rect */, NULL /* colors */,
+    irr_driver->getVideoDriver()->draw2DImage(m_gauge_empty, 
+                                core::rect<s32>((int)offset.X,
+                                                (int) offset.Y-gauge_height,
+                                                (int) offset.X + gauge_width, 
+                                                (int)offset.Y) /* dest rect */,
+                             core::rect<s32>(0, 0, 256, 256) /* source rect */,
+                             NULL /* clip rect */, NULL /* colors */,
                                               true /* alpha */);
-    
+  
     // Target
+    
     if (race_manager->getCoinTarget() > 0)
     {
         float coin_target = (float)race_manager->getCoinTarget() 
                           / kart->getKartProperties()->getNitroMax();
+
+        video::S3DVertex vertices[5];
+        unsigned int count=2;
+
+        // There are three different polygons used, depending on 
+        // the target. Consider the nitro-display texture:
+        //
+        //   ----E-x--D       (position of v,w,x vary depending on  
+        //            |        nitro)
+        //       A    w 
+        //            |
+        //   -B--v----C
+        // For nitro state <= r1 the triangle ABv is used, with v between B and C.
+        // For nitro state <= r2 the quad ABCw is used, with w between C and D.
+        // For nitro state >  r2 the poly ABCDx is used, with x between D and E.
+
+        vertices[0].TCoords = core::vector2df(0.3f, 0.4f);
+        vertices[0].Pos     = core::vector3df(offset.X+0.3f*gauge_width, 
+                                              offset.Y-(1-0.4f)*gauge_height, 0);
+        vertices[1].TCoords = core::vector2df(0, 1.0f);
+        vertices[1].Pos     = core::vector3df(offset.X, offset.Y, 0);
+        // The targets at which different polygons must be used.
+
+        const float r1 = 0.4f;
+        const float r2 = 0.65f;
+        if(state<=r1)
+        {
+            count   = 3;
+            float f = coin_target/r1;
+            vertices[2].TCoords = core::vector2df(0.08f + (1.0f-0.08f)*f, 1.0f);
+            vertices[2].Pos =  core::vector3df(offset.X + (0.08f*gauge_width)
+                                                + (1.0f - 0.08f)*f*gauge_width,
+                                               offset.Y,0);
+                }
+        else if(state<=r2)
+        {
+            count   = 4;
+            float f = (coin_target - r1)/(r2-r1);
+            vertices[2].TCoords = core::vector2df(1.0f, 1.0f);
+            vertices[2].Pos     = core::vector3df(offset.X + gauge_width, 
+                                                  offset.Y, 0);
+            vertices[3].TCoords = core::vector2df(1.0f, (1.0f-f));
+            vertices[3].Pos = core::vector3df(offset.X + gauge_width, 
+                                              offset.Y-f*gauge_height,0);
+        }
+        else
+        {
+            count   = 5;
+            float f = (coin_target - r2)/(1-r2);
+            vertices[2].TCoords = core::vector2df(1.0, 1.0f);
+            vertices[2].Pos     = core::vector3df(offset.X + gauge_width, 
+                                                  offset.Y, 0);
+            vertices[3].TCoords = core::vector2df(1.0,0);
+            vertices[3].Pos     = core::vector3df(offset.X + gauge_width,
+                                                  offset.Y-gauge_height, 0);
+            vertices[4].TCoords = core::vector2df(1.0f - f*(1-0.61f), 0);
+            vertices[4].Pos     = core::vector3df(offset.X + gauge_width 
+                                                   - (1.0f-0.61f)*f*gauge_width,
+                                                   offset.Y-gauge_height, 0);
+        }
+        short int index[5]={0};
+        for(unsigned int i=0; i<count; i++)
+        {
+            index[i]=count-i-1;
+            vertices[i].Color = video::SColor(255, 255, 255, 255);
+        }
         
-        const int EMPTY_TOP_PIXELS = 4;
-        const int EMPTY_BOTTOM_PIXELS = 3;
-        int y1 = y + (int)(EMPTY_TOP_PIXELS + 
-                             (h - EMPTY_TOP_PIXELS - EMPTY_BOTTOM_PIXELS)
-                            *(1.0f - coin_target)                        );
-        if (state >= 1.0f) y1 = y;
-        
-        core::rect<s32> clip(x, y1, x + w, y + h);
-        irr_driver->getVideoDriver()->draw2DImage(m_gauge_goal, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
-                                                  core::rect<s32>(0, 0, 64, 256) /* source rect */,
-                                                  &clip, NULL /* colors */, true /* alpha */);
+        video::SMaterial m;
+        m.setTexture(0, m_gauge_goal);
+        m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+        irr_driver->getVideoDriver()->setMaterial(m);
+        irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
+        index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
+             
     }
     
+    
+
     // Filling (current state)
-    if (state > 0.0f)
+
+    if(state <=0) return; //Nothing to do
+
+    if (state > 0.0f) 
     {
-        const int EMPTY_TOP_PIXELS = 4;
-        const int EMPTY_BOTTOM_PIXELS = 3;
-        int y1 = y + (int)(EMPTY_TOP_PIXELS 
-                           + (h - EMPTY_TOP_PIXELS - EMPTY_BOTTOM_PIXELS)
-                              *(1.0f - state)                             );
-        if (state >= 1.0f) y1 = y;
+        video::S3DVertex vertices[5];
+        unsigned int count=2;
+
+        // There are three different polygons used, depending on 
+        // the nitro state. Consider the nitro-display texture:
+        //
+        //   ----E-x--D       (position of v,w,x vary depending on  
+        //            |        nitro)
+        //       A    w 
+        //            |
+        //   -B--v----C
+        // For nitro state <= r1 the triangle ABv is used, with v between B and C.
+        // For nitro state <= r2 the quad ABCw is used, with w between C and D.
+        // For nitro state >  r2 the poly ABCDx is used, with x between D and E.
+
+        vertices[0].TCoords = core::vector2df(0.3f, 0.4f);
+        vertices[0].Pos     = core::vector3df(offset.X+0.3f*gauge_width, 
+                                              offset.Y-(1-0.4f)*gauge_height, 0);
+        vertices[1].TCoords = core::vector2df(0, 1.0f);
+        vertices[1].Pos     = core::vector3df(offset.X, offset.Y, 0);
+        // The states at which different polygons must be used.
+
+        const float r1 = 0.4f;
+        const float r2 = 0.65f;
+        if(state<=r1)
+        {
+            count   = 3;
+            float f = state/r1;
+            vertices[2].TCoords = core::vector2df(0.08f + (1.0f-0.08f)*f, 1.0f);
+            vertices[2].Pos = core::vector3df(offset.X + (0.08f*gauge_width) 
+                                                       + (1.0f - 0.08f)
+                                                         *f*gauge_width, 
+                                              offset.Y,0);
+                }
+        else if(state<=r2)
+        {
+            count   = 4;
+            float f = (state - r1)/(r2-r1);
+            vertices[2].TCoords = core::vector2df(1.0f, 1.0f);
+            vertices[2].Pos     = core::vector3df(offset.X + gauge_width,
+                                                  offset.Y, 0);
+            vertices[3].TCoords = core::vector2df(1.0f, (1.0f-f));
+            vertices[3].Pos = core::vector3df(offset.X + gauge_width,
+                                              offset.Y-f*gauge_height,0);
+        }
+        else
+        {
+            count   = 5;
+            float f = (state - r2)/(1-r2);
+            vertices[2].TCoords = core::vector2df(1.0, 1.0f);
+            vertices[2].Pos     = core::vector3df(offset.X + gauge_width, 
+                                                  offset.Y, 0);
+            vertices[3].TCoords = core::vector2df(1.0,0);
+            vertices[3].Pos = core::vector3df(offset.X + gauge_width,
+                                              offset.Y-gauge_height, 0);
+            vertices[4].TCoords = core::vector2df(1.0f - f*(1-0.61f), 0);
+            vertices[4].Pos     = 
+                core::vector3df(offset.X + gauge_width - (1.0f-0.61f)*f*gauge_width,
+                                offset.Y-gauge_height, 0);
+        }
+        short int index[5]={0};
+        for(unsigned int i=0; i<count; i++)
+        {
+            index[i]=count-i-1;
+            vertices[i].Color = video::SColor(255, 255, 255, 255);
+        }
         
-        core::rect<s32> clip(x, y1, x + w, y + h);
-        irr_driver->getVideoDriver()->draw2DImage(m_gauge_full, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
-                                                  core::rect<s32>(0, 0, 64, 256) /* source rect */,
-                                                  &clip, NULL /* colors */, true /* alpha */);
+                
+        video::SMaterial m;
+        m.setTexture(0, m_gauge_full);
+        m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+        irr_driver->getVideoDriver()->setMaterial(m);
+        irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
+        index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
+        
+
     }
     
     
@@ -390,16 +534,17 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
     int meter_width        = (int)(SPEEDWIDTH*minRatio);
     int meter_height       = (int)(SPEEDWIDTH*minRatio);
 
-    drawEnergyMeter(viewport.LowerRightCorner.X, 
-                    (int)(viewport.LowerRightCorner.Y - meter_height*0.75f), 
+    drawEnergyMeter(viewport.LowerRightCorner.X , 
+                    (int)(viewport.LowerRightCorner.Y), 
                     kart, viewport, scaling);
     
-    // First draw the meter (i.e. the background which contains the numbers etc.
+    // First draw the meter (i.e. the background )
     // -------------------------------------------------------------------------
     
+    
     core::vector2df offset;
-    offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 15.0f*scaling.X;
-    offset.Y = viewport.LowerRightCorner.Y-10*scaling.Y;
+    offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 24.0f*scaling.X;
+    offset.Y = viewport.LowerRightCorner.Y-10.0f*scaling.Y;
     
     video::IVideoDriver *video = irr_driver->getVideoDriver();
     const core::rect<s32> meter_pos((int)offset.X,
@@ -409,11 +554,12 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
     video::ITexture *meter_texture = m_speed_meter_icon->getTexture();
     const core::rect<s32> meter_texture_coords(core::position2d<s32>(0,0), 
                                                meter_texture->getOriginalSize());
-    video->draw2DImage(meter_texture, meter_pos, meter_texture_coords, NULL, NULL, true);
-
+    video->draw2DImage(meter_texture, meter_pos, meter_texture_coords, NULL, 
+                       NULL, true);
+    
     const float speed =  kart->getSpeed();
     if(speed <=0) return;  // Nothing to do if speed is negative.
-
+    
     // Draw the actual speed bar (if the speed is >0)
     // ----------------------------------------------
     float speed_ratio = speed/KILOMETERS_PER_HOUR/110.0f;
@@ -427,57 +573,54 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
     // There are three different polygons used, depending on 
     // the speed ratio. Consider the speed-display texture:
     //
-    //   C----x----D       (position of v,w,x,y vary depending on  
-    //   |         |        speed)
-    //   w         y
-    //   |         |
-    //   B----A----E
-    // For speed ratio <= r1 the triangle ABw is used, with w between B and C.
-    // For speed ratio <= r2 the quad ABCx is used, with x between C and D.
-    // For speed ratio >  r2 the poly ABCDy is used, with y between D and E.
+    //   D----x----D       (position of v,w,x vary depending on  
+    //   |                 speed)
+    //   w    A    
+    //   |         
+    //   C--v-B----E
+    // For speed ratio <= r1 the triangle ABv is used, with v between B and C.
+    // For speed ratio <= r2 the quad ABCw is used, with w between C and D.
+    // For speed ratio >  r2 the poly ABCDx is used, with x between D and E.
 
-    vertices[0].TCoords = core::vector2df(0.5f, 1.0f);
-    vertices[0].Pos     = core::vector3df(offset.X+meter_width/2, offset.Y, 0);
-    vertices[1].TCoords = core::vector2df(0, 1.0f);
-    vertices[1].Pos     = core::vector3df(offset.X, offset.Y, 0);
+    vertices[0].TCoords = core::vector2df(0.7f, 0.5f);
+    vertices[0].Pos     = core::vector3df(offset.X+0.7f*meter_width, 
+                                          offset.Y-0.5f*meter_height, 0);
+    vertices[1].TCoords = core::vector2df(0.52f, 1.0f);
+    vertices[1].Pos     = core::vector3df(offset.X+0.52f*meter_width, offset.Y, 0);
     // The speed ratios at which different triangles must be used.
     // These values should be adjusted in case that the speed display
     // is not linear enough. Mostly the speed values are below 0.7, it
     // needs some zipper to get closer to 1.
-    const float r1 = 0.4f;
-    const float r2 = 0.8f;
+    const float r1 = 0.2f;
+    const float r2 = 0.6f;
     if(speed_ratio<=r1)
     {
         count   = 3;
         float f = speed_ratio/r1;
-        vertices[2].TCoords = core::vector2df(0, 1.0f-f);
-        vertices[2].Pos = core::vector3df(offset.X, offset.Y-f*meter_height,0);
+        vertices[2].TCoords = core::vector2df(0.52f*(1-f), 1.0f);
+        vertices[2].Pos = core::vector3df(offset.X+ (0.52f*(1.0f-f)*meter_width),
+                                          offset.Y,0);
     }
     else if(speed_ratio<=r2)
     {
         count   = 4;
         float f = (speed_ratio - r1)/(r2-r1);
-        vertices[2].TCoords = core::vector2df(0,0);
-        vertices[2].Pos = core::vector3df(offset.X, offset.Y-meter_height, 0);
-        vertices[3].TCoords = core::vector2df(f, 0);
-        vertices[3].Pos     = core::vector3df(offset.X+f*meter_width,
-                                              offset.Y-meter_height,
-                                              0);
+        vertices[2].TCoords = core::vector2df(0, 1.0f);
+        vertices[2].Pos     = core::vector3df(offset.X, offset.Y, 0);
+        vertices[3].TCoords = core::vector2df(0, (1-f));
+        vertices[3].Pos = core::vector3df(offset.X, offset.Y-f*meter_height,0);
     }
     else
     {
         count   = 5;
         float f = (speed_ratio - r2)/(1-r2);
-        vertices[2].TCoords = core::vector2df(0,0);
-        vertices[2].Pos = core::vector3df(offset.X, offset.Y-meter_height, 0);
-        vertices[3].TCoords = core::vector2df(1, 0);
-        vertices[3].Pos     = core::vector3df(offset.X+meter_width,
-                                              offset.Y-meter_height,
-                                              0);
-        vertices[4].TCoords = core::vector2df(1.0f, f);
-        vertices[4].Pos     = core::vector3df(offset.X+meter_width,
-                                              offset.Y - (1-f)*meter_height,
-                                              0);
+        vertices[2].TCoords = core::vector2df(0, 1.0f);
+        vertices[2].Pos     = core::vector3df(offset.X, offset.Y, 0);
+        vertices[3].TCoords = core::vector2df(0,0);
+        vertices[3].Pos = core::vector3df(offset.X, offset.Y-meter_height, 0);
+        vertices[4].TCoords = core::vector2df(f, 0);
+        vertices[4].Pos     = core::vector3df(offset.X+f*meter_width,
+                                              offset.Y-meter_height, 0);
     }
     short int index[5];
     for(unsigned int i=0; i<count; i++)
@@ -491,7 +634,25 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
     irr_driver->getVideoDriver()->setMaterial(m);
     irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
-} // drawSpeed
+
+
+    // Draw Speed in Numbers
+
+    core::recti pos;
+    pos.UpperLeftCorner.X=(int)(offset.X + 0.5f*meter_width);
+    pos.UpperLeftCorner.Y=(int)(offset.Y - 0.62f*meter_height);
+    pos.LowerRightCorner.X=(int)(offset.X + 0.8f*meter_width);
+    pos.LowerRightCorner.Y=(int)(offset.X - 0.5f*meter_height);
+    
+    gui::ScalableFont* font = GUIEngine::getLargeFont();
+
+    static video::SColor color = video::SColor(255, 255, 255, 255);
+    char str[256];
+    sprintf(str, "%d", (int)(speed*10));
+    
+    font->draw(core::stringw(str).c_str(), pos, color);
+
+} 
 
 //-----------------------------------------------------------------------------
 /** Displays the rank and the lap of the kart.
@@ -517,7 +678,9 @@ void RaceGUI::drawRankLap(const AbstractKart* kart,
                             - m_rank_lap_width - 10;
     pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
 
-    gui::ScalableFont* font = (race_manager->getNumLocalPlayers() > 2 ? GUIEngine::getSmallFont() : GUIEngine::getFont());
+    gui::ScalableFont* font = (race_manager->getNumLocalPlayers() > 2
+                            ? GUIEngine::getSmallFont()
+                            : GUIEngine::getFont());
     int font_height         = (int)(font->getDimension(L"X").Height);
     static video::SColor color = video::SColor(255, 255, 255, 255);
     WorldWithRank *world    = (WorldWithRank*)(World::getWorld());

@@ -83,6 +83,7 @@ namespace GUIEngine
         extern Skin* g_skin;
         extern irr::gui::ScalableFont* g_small_font;
         extern irr::gui::ScalableFont* g_font;
+        extern irr::gui::ScalableFont* g_large_font;
         extern irr::gui::ScalableFont* g_title_font;
         extern irr::gui::ScalableFont* g_digit_font;
 
@@ -134,6 +135,11 @@ namespace GUIEngine
       * \return the "normal" font (useful for text)
       */
     inline irr::gui::ScalableFont*    getFont()          { return Private::g_font;           }
+
+    /**
+      * \return the "large" font (useful for text)
+      */
+    inline irr::gui::ScalableFont*    getLargeFont()     { return Private::g_large_font;     }
     
     /**
      * \return the "high-res digits" font (useful for big numbers)
