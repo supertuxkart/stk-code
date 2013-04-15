@@ -100,9 +100,11 @@ void Camera::setKart(AbstractKart *new_kart)
 {
     m_kart = new_kart;
 #ifdef DEBUG
-    std::string name = new_kart->getIdent()+"'s camera";
     if(new_kart)
+    {
+        std::string name = new_kart->getIdent()+"'s camera";
         getCameraSceneNode()->setName(name.c_str() );
+    }
 #endif
 
 }   // setKart
