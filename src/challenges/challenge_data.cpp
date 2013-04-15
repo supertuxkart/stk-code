@@ -37,7 +37,7 @@ ChallengeData::ChallengeData(const std::string& filename)
 #endif
 {
     m_filename     = filename;
-    m_major        = RaceManager::MAJOR_MODE_SINGLE;
+    m_mode         = CM_SINGLE_RACE;
     m_minor        = RaceManager::MINOR_MODE_NORMAL_RACE;
     m_num_laps     = -1;
     m_track_id     = "";
@@ -92,9 +92,11 @@ ChallengeData::ChallengeData(const std::string& filename)
     mode_node->get("major", &mode);
 
     if(mode=="grandprix")
-        m_major = RaceManager::MAJOR_MODE_GRAND_PRIX;
+        m_mode = CM_GRAND_PRIX;
     else if(mode=="single")
-        m_major = RaceManager::MAJOR_MODE_SINGLE;
+        m_mode = CM_SINGLE_RACE;
+    else if(mode=="any")
+        m_mode = CM_ANY;
     else
         error("major");
 
@@ -111,12 +113,12 @@ ChallengeData::ChallengeData(const std::string& filename)
     const XMLNode* track_node = root->getNode("track");
     const XMLNode* gp_node = root->getNode("grandprix");
     
-    if (m_major == RaceManager::MAJOR_MODE_SINGLE && track_node == NULL)
+    if (m_mode == CM_SINGLE_RACE && track_node == NULL)
     {
         throw std::runtime_error("Challenge file " + filename + 
                                  " has no <track> node!");
     }
-    if (m_major == RaceManager::MAJOR_MODE_GRAND_PRIX && gp_node == NULL)
+    if (m_mode == CM_GRAND_PRIX && gp_node == NULL)
     {
         throw std::runtime_error("Challenge file " + filename + 
                                  " has no <grandprix> node!");
@@ -201,8 +203,8 @@ ChallengeData::ChallengeData(const std::string& filename)
 
         int position = -1;
         if (!requirements_node->get("position", &position) &&
-            (m_minor==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-             m_major==RaceManager::MAJOR_MODE_GRAND_PRIX))
+            (m_minor == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
+             m_mode  == CM_GRAND_PRIX))
         {
             error("position");
         }
@@ -227,16 +229,16 @@ ChallengeData::ChallengeData(const std::string& filename)
     for(unsigned int i=0; i<unlocks.size(); i++)
     {
         std::string s;
-            if(unlocks[i]->get("kart", &s))
-            getUnlocks(s, ChallengeData::UNLOCK_KART);
+        if(unlocks[i]->get("kart", &s))
+            setUnlocks(s, ChallengeData::UNLOCK_KART);
         else if(unlocks[i]->get("track", &s))
-            getUnlocks(s, ChallengeData::UNLOCK_TRACK);
+            addUnlockTrackReward(s);
         else if(unlocks[i]->get("gp", &s))
-            getUnlocks(s, ChallengeData::UNLOCK_GP);
+            setUnlocks(s, ChallengeData::UNLOCK_GP);
         else if(unlocks[i]->get("mode", &s))
-            getUnlocks(s, ChallengeData::UNLOCK_MODE);
+            setUnlocks(s, ChallengeData::UNLOCK_MODE);
         else if(unlocks[i]->get("difficulty", &s))
-            getUnlocks(s, ChallengeData::UNLOCK_DIFFICULTY);
+            setUnlocks(s, ChallengeData::UNLOCK_DIFFICULTY);
         else
         {
             fprintf(stderr, "[ChallengeData] unknown unlock entry.\n");
@@ -276,7 +278,7 @@ void ChallengeData::error(const char *id) const
  */
 void ChallengeData::check() const
 {
-    if(m_major==RaceManager::MAJOR_MODE_SINGLE)
+    if(m_mode==CM_SINGLE_RACE)
     {
         try
         {
@@ -287,7 +289,7 @@ void ChallengeData::check() const
             error("track");
         }
     }
-    else if(m_major==RaceManager::MAJOR_MODE_GRAND_PRIX)
+    else if(m_mode==CM_GRAND_PRIX)
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(m_gp_id);
         
@@ -304,15 +306,18 @@ void ChallengeData::check() const
 }   // check
 
 // ----------------------------------------------------------------------------
-
-void ChallengeData::getUnlocks(const std::string &id, REWARD_TYPE reward)
+/** Adds all rewards for fulfilling this challenge.
+ *  \param id Name of track or gp or kart or mode or difficulty reward.
+ *  \param reward Type of reward (track, gp, mode, difficulty, kart).
+ */
+void ChallengeData::setUnlocks(const std::string &id, RewardType reward)
 {
     if (id.empty()) return;
 
     switch(reward)
     {
-    case UNLOCK_TRACK:      addUnlockTrackReward(id);
-                            break;
+    case UNLOCK_TRACK:      assert (false);
+        break;
             
     case UNLOCK_GP:         addUnlockGPReward(id);
                             break;
@@ -346,12 +351,22 @@ void ChallengeData::getUnlocks(const std::string &id, REWARD_TYPE reward)
                             break;
                             }
     }   // switch
-}   // getUnlocks
+}   // setUnlocks
+
 // ----------------------------------------------------------------------------
 void ChallengeData::setRace(RaceManager::Difficulty d) const
 {
-    race_manager->setMajorMode(m_major);
-    if(m_major==RaceManager::MAJOR_MODE_SINGLE)
+    if(m_mode==CM_GRAND_PRIX)
+        race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
+    else if(m_mode==CM_SINGLE_RACE)
+        race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    else
+    {
+        Log::error("challenge_data", "Invalid mode %d in setRace.", m_mode);
+        assert(false);
+    }
+
+    if(m_mode==CM_SINGLE_RACE)
     {
         race_manager->setMinorMode(m_minor);
         race_manager->setTrack(m_track_id);
@@ -366,7 +381,7 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
           race_manager->setTimeTarget(m_time[d]);
         }
     }
-    else   // GP
+    else if(m_mode==CM_GRAND_PRIX)
     {
         race_manager->setMinorMode(m_minor);
         const GrandPrixData *gp = grand_prix_manager->getGrandPrix(m_gp_id);
@@ -393,7 +408,7 @@ bool ChallengeData::isChallengeFulfilled() const
 {
     // GP's use the grandPrixFinished() function, 
     // so they can't be fulfilled here.
-    if(m_major==RaceManager::MAJOR_MODE_GRAND_PRIX) return false;
+    if(m_mode==CM_GRAND_PRIX) return false;
 
     // Single races
     // ------------

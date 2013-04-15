@@ -39,7 +39,10 @@ class XMLWriter;
 class ChallengeData;
 
 /**
-  * \brief The state of a challenge for one player
+  * \brief The state of a challenge for one player.
+  *  Each Challenge has one ChallengeData associcated, which stores
+  *  the actual data about the challenge.
+  *    
   * \ingroup challenges
   */
 class Challenge : public NoCopy
@@ -61,24 +64,46 @@ public:
         m_state[RaceManager::DIFFICULTY_HARD]   = CH_INACTIVE;
     }
     virtual ~Challenge() {};
-    void  load(const XMLNode* config);
-    void  save(std::ofstream& writer);
+    void load(const XMLNode* config);
+    void save(std::ofstream& writer);
+    void setSolved(RaceManager::Difficulty d);
 
     // ------------------------------------------------------------------------
-    bool  isSolved(RaceManager::Difficulty d) const {return m_state[d]==CH_SOLVED;  }
+    /** Returns if this challenge was solved at the specified difficulty.
+     */
+    bool isSolved(RaceManager::Difficulty d) const 
+    {
+        return m_state[d]==CH_SOLVED;
+    }   // isSolved
     // ------------------------------------------------------------------------
-    bool  isSolvedAtAnyDifficulty()           const {return m_state[0]==CH_SOLVED ||
-                                                            m_state[1]==CH_SOLVED ||
-                                                            m_state[2]==CH_SOLVED;  }
+    /** Returns true if this challenge was solved at any difficult.
+     */
+    bool isSolvedAtAnyDifficulty() const 
+    {
+        return m_state[0]==CH_SOLVED || m_state[1]==CH_SOLVED ||
+                m_state[2]==CH_SOLVED;  
+    }   // isSolvedAtAnyDifficulty
     // ------------------------------------------------------------------------
-    bool  isActive(RaceManager::Difficulty d) const {return m_state[d]==CH_ACTIVE;  }
+    /** True if this challenge is active at the given difficulty.
+     */
+    bool isActive(RaceManager::Difficulty d) const 
+    {
+        return m_state[d]==CH_ACTIVE;  
+    }   // isActive
     // ------------------------------------------------------------------------
-    void  setSolved(RaceManager::Difficulty d);
+    /** Sets this challenge to be active.
+     */
+    void setActive(RaceManager::Difficulty d)
+    {
+        m_state[d] = CH_ACTIVE;
+    }   // setActive
     // ------------------------------------------------------------------------
-    void  setActive(RaceManager::Difficulty d)      {m_state[d] = CH_ACTIVE;        }
+    /** Returns a pointer to the actual Challenge data.
+     */
+    ChallengeData* getData() { return m_data; }
     // ------------------------------------------------------------------------
-    
-    ChallengeData*        getData()       { return m_data; }
-    const ChallengeData*  getData() const { return m_data; }
-};
+    /** Returns a pointer to the actual Challenge data.
+     */
+    const ChallengeData* getData() const { return m_data; }
+};   // Challenge
 #endif

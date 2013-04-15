@@ -1062,7 +1062,7 @@ bool Track::loadMainTrack(const XMLNode &root)
                 
                 m_challenges.push_back( OverworldChallenge(xyz, challenge) );
                 
-                if (c != NULL && c->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+                if (c && c->isGrandPrix())
                 {
                     
                 }

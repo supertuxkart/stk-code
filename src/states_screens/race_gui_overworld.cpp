@@ -466,9 +466,10 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 break;
             }
             
-            if (challenge->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+            if (challenge->isGrandPrix())
             {
-                const GrandPrixData* gp = grand_prix_manager->getGrandPrix(challenge->getGPId());
+                const GrandPrixData* gp = 
+                    grand_prix_manager->getGrandPrix(challenge->getGPId());
                 
                 if (gp == NULL)
                 {

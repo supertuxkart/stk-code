@@ -123,7 +123,7 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     medium_label->setText( getLabel(RaceManager::DIFFICULTY_MEDIUM, c->getData()), false );
     expert_label->setText( getLabel(RaceManager::DIFFICULTY_HARD,   c->getData()), false );
     
-    if (c->getData()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    if (c->getData()->isGrandPrix())
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(c->getData()->getGPId());
         getWidget<LabelWidget>("title")->setText( gp->getName(), true );
@@ -135,7 +135,7 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     }
     
     LabelWidget* typeLbl = getWidget<LabelWidget>("race_type_val");
-    if (c->getData()->getGPId().size() > 0)
+    if (c->getData()->isGrandPrix())
         typeLbl->setText(_("Grand Prix"), false );
     else
         typeLbl->setText( RaceManager::getNameOf(c->getData()->getMinorMode()), false );
