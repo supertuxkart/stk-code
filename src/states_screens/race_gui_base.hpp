@@ -220,7 +220,7 @@ public:
     virtual      ~RaceGUIBase();
     virtual void renderGlobal(float dt);
     virtual void init();
-    virtual void restartRace();
+    virtual void reset();
     virtual void renderPlayerView(const Camera *camera, float dt);
     virtual void addMessage(const irr::core::stringw &m, 
                             const AbstractKart *kart, float time,

@@ -109,13 +109,14 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_stop_music_when_dialog_open = true;
     
     WorldStatus::setClockMode(CLOCK_CHRONO);
+
 }   // World
 
 // ----------------------------------------------------------------------------
-/** This function is called after instanciating. This can't be moved to the 
- *  contructor as child classes must be instanciated, otherwise polymorphism 
- *  will fail and the results will be incorrect . Also in init() functions
- *  can be called that use World::getWorld(). 
+/** This function is called after instanciating. The code here can't be moved 
+ *  to the contructor as child classes must be instanciated, otherwise 
+ *  polymorphism will fail and the results will be incorrect . Also in init() 
+ *  functions can be called that use World::getWorld(). 
  */
 void World::init()
 {
@@ -128,7 +129,10 @@ void World::init()
     
     // Create the race gui before anything else is attached to the scene node
     // (which happens when the track is loaded). This allows the race gui to
-    // do any rendering on texture.
+    // do any rendering on texture. Note that this function can NOT be called
+    // in the World constuctor, since it might be overwritten by a the game
+    // mode class, which would not have been constructed at the time that this
+    // constructor is called, so the wrong race gui would be created.
     createRaceGUI();
 
     // Grab the track file
@@ -165,7 +169,10 @@ void World::init()
         m_track->adjustForFog(newkart->getNode());
         
     }  // for i
-    
+
+    // Must be called after all karts are created
+    m_race_gui->init();
+
     if(ReplayPlay::get())
         ReplayPlay::get()->Load();
 
@@ -190,17 +197,6 @@ void World::reset()
         m_race_gui       = m_saved_race_gui;
         m_saved_race_gui = NULL;
     }
-
-    // erase messages left over
-    RaceGUIBase* rg = getRaceGUI();
-    if (rg)
-    {
-        rg->init();
-        rg->clearAllMessages();
-    }
-
-    m_race_gui->restartRace();
-    m_race_gui->clearAllMessages();
 
     m_schedule_pause = false;
     m_schedule_unpause = false;
@@ -228,6 +224,9 @@ void World::reset()
     // objects need to allocate data structures depending on the number
     // of karts.
     m_track->reset();
+
+    // Reset the race gui.
+    m_race_gui->reset();
 
     // Start music from beginning
     music_manager->stopMusic();
