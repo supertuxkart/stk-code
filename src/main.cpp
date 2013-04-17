@@ -738,10 +738,10 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
-            // This doesn't work anymore because now we support multiple players
-            // and currently do not know which player profile to use since it
-            // wasn't selected yet
-            //if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
+            unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
+                                           .getUniqueID()                    );
+
+            if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
             {
                 const KartProperties *prop = 
                     kart_properties_manager->getKart(argv[i+1]);
@@ -766,16 +766,14 @@ int handleCmdLine(int argc, char **argv)
                               argv[i+1]);
                 }
             }
-            /*
-            else
+            else   // kart locked
             {
-                Log::warn("main", "Kart %s has not been unlocked yet.",
+                Log::warn("main", "Kart '%s' has not been unlocked yet.",
                           argv[i+1]);
                 Log::warn("main",
                           "Use --list-karts to list available karts.");
                 return 0;
-            }
-             */
+            }   // if kart locked
         }
         else if( sscanf(argv[i], "--ai=%1023s", s)==1)
         {
@@ -821,19 +819,18 @@ int handleCmdLine(int argc, char **argv)
         else if( (!strcmp(argv[i], "--track") || !strcmp(argv[i], "-t"))
                  && i+1<argc                                              )
         {
-            // This doesn't work anymore because now we support multiple players
-            // and currently do not know which player profile to use since it
-            // wasn't selected yet
-            //if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
+            unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
+                                           .getUniqueID()                    );
+            if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
             {
                 race_manager->setTrack(argv[i+1]);
-                Log::verbose("main", "You choose to start in track \"%s\".",
+                Log::verbose("main", "You choose to start in track '%s'.",
                              argv[i+1] );
                 
                 Track* t = track_manager->getTrack(argv[i+1]);
                 if (t == NULL)
                 {
-                    Log::warn("main", "Can't find track named \"%s\".",
+                    Log::warn("main", "Can't find track named '%s'.",
                               argv[i+1]);
                 }
                 else if (t->isArena())
@@ -841,16 +838,14 @@ int handleCmdLine(int argc, char **argv)
                 else if(t->isSoccer())
                     race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
             }
-            /*
             else
             {
-                Log::warn("main", "Track %s has not been unlocked yet.",
+                Log::warn("main", "Track '%s' has not been unlocked yet.",
                          argv[i+1]);
                 Log::warn("main", "Use --list-tracks to list available "
                                   "tracks.");
                 return 0;
             }
-             */
             i++;
         }
         else if( (!strcmp(argv[i], "--gp")) && i+1<argc)
@@ -888,15 +883,21 @@ int handleCmdLine(int argc, char **argv)
         {
 
             Log::info("main", "  Available tracks:" );
+            unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
+                                           .getUniqueID()                    );
+
             for (size_t i = 0; i != track_manager->getNumberOfTracks(); i++)
             {
                 const Track *track = track_manager->getTrack(i);
-                // FIXME: crashes
-                //if (!unlock_manager->getCurrentSlot()->isLocked(track->getIdent()))
-                //{
-                    Log::info("main", "\t%14s: %ls",
+                std::string locked="";
+                if ( unlock_manager->getCurrentSlot()
+                                   ->isLocked(track->getIdent()) )
+                {
+                    locked=" (locked)";
+                }
+                Log::info("main", "%-18s: %ls %s",
                               track->getIdent().c_str(),
-                              track->getName());
+                              track->getName(), locked.c_str());
                 //}
             }
 
@@ -908,16 +909,18 @@ int handleCmdLine(int argc, char **argv)
         {
             Log::info("main", "  Available karts:");
             for (unsigned int i = 0; 
-                 NULL != kart_properties_manager->getKartById(i); i++)
+                 i < kart_properties_manager->getNumberOfKarts(); i++)
             {
                 const KartProperties* KP =
                     kart_properties_manager->getKartById(i);
-                // FIXME: crashes
-                //if (!unlock_manager->getCurrentSlot()->isLocked(KP->getIdent()))
-                //{
-                    Log::info("main", "\t%10s: %ls", KP->getIdent().c_str(),
-                             KP->getName());
-                //}
+                unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
+                                              .getUniqueID()                    );
+                std::string locked = "";
+                if (unlock_manager->getCurrentSlot()->isLocked(KP->getIdent()))
+                    locked="(locked)";
+
+                Log::info("main", " %-10s: %ls %s", KP->getIdent().c_str(),
+                         KP->getName(), locked.c_str());
             }
 
             exit(0);
