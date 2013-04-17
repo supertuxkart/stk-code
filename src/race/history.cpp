@@ -176,12 +176,14 @@ void History::Save()
     }
 
     World *world   = World::getWorld();
-    int  num_karts = world->getNumKarts();
+    const int num_karts = world->getNumKarts();
     fprintf(fd, "Version:  %s\n",   STK_VERSION);
     fprintf(fd, "numkarts: %d\n",   num_karts);
     fprintf(fd, "numplayers: %d\n", race_manager->getNumPlayers());
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
     fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
+
+    assert(num_karts > 0);
 
     int k;
     for(k=0; k<num_karts; k++)

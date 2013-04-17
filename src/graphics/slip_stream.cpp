@@ -175,7 +175,9 @@ void SlipStream::createMesh(const video::SMaterial &material)
     // Loop through all given radius to determine the number 
     // of segments to create.
     unsigned int num_circles=0;
-    while(radius[num_circles]) num_circles++;
+    while(radius[num_circles]>0.0f) num_circles++;
+
+    assert(num_circles > 0);
 
     // Length is distance of last circle to distance of first circle:
     m_length = distance[num_circles-1] - distance[0];

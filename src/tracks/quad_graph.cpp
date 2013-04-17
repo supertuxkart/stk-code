@@ -728,7 +728,6 @@ void QuadGraph::determineDirection(unsigned int current,
     if(fabsf(rel_angle)<max_straight_angle)
         rel_angle = 0;
 
-    int prev = next;                           // is now n+1
     next     = getNode(next).getSuccessor(0);  // next is now n+2
 
     // If the direction is still the same during a lap the last node
@@ -752,7 +751,6 @@ void QuadGraph::determineDirection(unsigned int current,
             break;
         rel_angle = new_rel_angle;
 
-        prev = next;
         next = getNode(next).getSuccessor(0);
     }    // while(1)
 

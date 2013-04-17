@@ -154,7 +154,7 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
 {
     core::vector2df p=new_pos.toIrrVector2d();
     bool sign = m_line.getPointOrientation(p)>=0;
-    bool result=sign!=m_previous_sign[indx];
+    bool result;
     // If the sign has changed, i.e. the infinite line was crossed somewhere,
     // check if the finite line was actually crossed:
     if(sign!=m_previous_sign[indx] &&
