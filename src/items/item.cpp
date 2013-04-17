@@ -174,8 +174,8 @@ void Item::setType(ItemType type)
  */
 void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
 {
-    // triggers should not be switched
-    if (m_type == ITEM_TRIGGER) return;
+    // triggers and easter eggs should not be switched
+    if (m_type == ITEM_TRIGGER || m_type == ITEM_EASTER_EGG) return;
     
     m_original_type = m_type;
     setType(type);
