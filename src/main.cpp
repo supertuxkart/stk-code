@@ -517,7 +517,8 @@ int handleCmdLinePreliminary(int argc, char **argv)
             KartPropertiesManager::addKartSearchDir(argv[i+1]);
             i++;
         }
-        else if( !strcmp(argv[i], "--no-graphics") )
+        else if( !strcmp(argv[i], "--no-graphics") || !strncmp(argv[i], "--list-", 7) ||
+                 !strcmp(argv[i], "-l" ))
         {
             ProfileWorld::disableGraphics();
         }
@@ -900,6 +901,8 @@ int handleCmdLine(int argc, char **argv)
             }
 
             Log::info("main", "Use --track N to choose track.");
+
+            exit(0);
         }
         else if( !strcmp(argv[i], "--list-karts") )
         {
@@ -916,6 +919,8 @@ int handleCmdLine(int argc, char **argv)
                              KP->getName());
                 //}
             }
+
+            exit(0);
         }
         else if (    !strcmp(argv[i], "--no-start-screen")
                      || !strcmp(argv[i], "-N")                )
