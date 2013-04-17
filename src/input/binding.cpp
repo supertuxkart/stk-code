@@ -20,6 +20,7 @@
 #include "input/binding.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "utils/log.hpp"
 
 /** Convert thjis binding to XML attributes. The full XML node is actually 
  *  written by device_config, so we only have to add the attributes here.

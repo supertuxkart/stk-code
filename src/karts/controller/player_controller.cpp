@@ -234,7 +234,7 @@ void PlayerController::steer(float dt, int steer_val)
 {
     if(UserConfigParams::m_gamepad_debug)
     {
-        printf("steering: steer_val %d ", steer_val);
+        Log::debug("PlayerController", "steering: steer_val %d ", steer_val);
         RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
         gui_base->clearAllMessages();
         gui_base->addMessage(StringUtils::insertValues(L"steer_val %i", steer_val), m_kart, 1.0f,
@@ -287,7 +287,7 @@ void PlayerController::steer(float dt, int steer_val)
     }   // no key is pressed
     if(UserConfigParams::m_gamepad_debug)
     {
-        printf("  set to: %f\n", m_controls->m_steer);
+        Log::debug("PlayerController", "  set to: %f\n", m_controls->m_steer);
     }
 
     m_controls->m_steer = std::min(1.0f, std::max(-1.0f, m_controls->m_steer));
@@ -312,7 +312,7 @@ void PlayerController::update(float dt)
     {
         // Print a dividing line so that it's easier to see which events
         // get received in which order in the one frame.
-        Log::debug("irr_driver", "-------------------------------------\n");
+        Log::debug("PlayerController", "irr_driver", "-------------------------------------\n");
     }
 
     // Don't do steering if it's replay. In position only replay it doesn't 
