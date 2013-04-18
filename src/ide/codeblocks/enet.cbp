@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="Debug/libenet" prefix_auto="1" extension_auto="1" />
+				<Option output="Debug\libenet" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="Debug" />
 				<Option type="2" />
@@ -18,14 +18,17 @@
 					<Add option="-Wno-ignored-qualifiers" />
 					<Add option="-DDEBUG" />
 					<Add option="-DHAS_SOCKLEN_T" />
-					<Add directory="../../enet/include" />
+					<Add directory="..\..\enet\include" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="../../enet/include" />
+					<Add directory="..\..\enet\include" />
 				</ResourceCompiler>
+				<Linker>
+					<Add library="winmm" />
+				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="Release/libenet" prefix_auto="1" extension_auto="1" />
+				<Option output="Release\libenet" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="Release" />
 				<Option type="2" />
@@ -36,49 +39,56 @@
 					<Add option="-Wno-ignored-qualifiers" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DHAS_SOCKLEN_T" />
-					<Add directory="../../enet/include" />
+					<Add directory="..\..\enet\include" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="../../enet/include" />
+					<Add directory="..\..\enet\include" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="winmm" />
 				</Linker>
 			</Target>
 		</Build>
-		<Unit filename="../../enet/callbacks.c">
+		<Compiler>
+			<Add directory="..\..\..\lib\enet\include\" />
+		</Compiler>
+		<Unit filename="..\..\..\lib\enet\callbacks.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../enet/host.c">
+		<Unit filename="..\..\..\lib\enet\compress.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../enet/list.c">
+		<Unit filename="..\..\..\lib\enet\host.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../enet/packet.c">
+		<Unit filename="..\..\..\lib\enet\include\enet\callbacks.h" />
+		<Unit filename="..\..\..\lib\enet\include\enet\enet.h" />
+		<Unit filename="..\..\..\lib\enet\include\enet\list.h" />
+		<Unit filename="..\..\..\lib\enet\include\enet\protocol.h" />
+		<Unit filename="..\..\..\lib\enet\include\enet\time.h" />
+		<Unit filename="..\..\..\lib\enet\include\enet\types.h" />
+		<Unit filename="..\..\..\lib\enet\include\enet\unix.h" />
+		<Unit filename="..\..\..\lib\enet\include\enet\utility.h" />
+		<Unit filename="..\..\..\lib\enet\include\enet\win32.h" />
+		<Unit filename="..\..\..\lib\enet\list.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../enet/peer.c">
+		<Unit filename="..\..\..\lib\enet\packet.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../enet/protocol.c">
+		<Unit filename="..\..\..\lib\enet\peer.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../enet/unix.c">
+		<Unit filename="..\..\..\lib\enet\protocol.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../enet/win32.c">
+		<Unit filename="..\..\..\lib\enet\unix.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../include/enet/callbacks.h" />
-		<Unit filename="../include/enet/enet.h" />
-		<Unit filename="../include/enet/list.h" />
-		<Unit filename="../include/enet/protocol.h" />
-		<Unit filename="../include/enet/time.h" />
-		<Unit filename="../include/enet/types.h" />
-		<Unit filename="../include/enet/unix.h" />
-		<Unit filename="../include/enet/utility.h" />
-		<Unit filename="../include/enet/win32.h" />
+		<Unit filename="..\..\..\lib\enet\win32.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />
