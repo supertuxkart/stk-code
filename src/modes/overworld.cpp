@@ -48,14 +48,6 @@ OverWorld::OverWorld() : LinearWorld()
 void OverWorld::init()
 {
     LinearWorld::init();
-    
-        
-    if (race_manager->haveKartLastPositionOnOverworld())
-    {
-        AbstractKart* kart = m_karts[0];
-        kart->setXYZ(race_manager->getKartLastPositionOnOverworld());
-        moveKartAfterRescue(kart);
-    }
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -102,7 +94,11 @@ void OverWorld::enterOverWorld()
     StateManager::get()->enterGameState();
     network_manager->setupPlayerKartInfo();
     race_manager->startNew(false);
-    
+    if(race_manager->haveKartLastPositionOnOverworld()){
+			OverWorld *ow = (OverWorld*)World::getWorld();
+			ow->getKart(0)->setXYZ(race_manager->getKartLastPositionOnOverworld());
+			ow->moveKartAfterRescue(ow->getKart(0));
+		}
     irr_driver->showPointer(); // User should be able to click on the minimap
 }   // enterOverWorld
 
