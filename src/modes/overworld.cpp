@@ -78,9 +78,9 @@ void OverWorld::enterOverWorld()
     
     if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))
     {
-        fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', "
-                        "will revert to default\n",
-                UserConfigParams::m_default_kart.c_str());
+        Log::warn("overworld", "cannot find kart '%s', "
+                "will revert to default\n", UserConfigParams::m_default_kart.c_str());
+
         UserConfigParams::m_default_kart.revertToDefaults();
     }
     race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
@@ -100,6 +100,7 @@ void OverWorld::enterOverWorld()
 			ow->moveKartAfterRescue(ow->getKart(0));
 		}
     irr_driver->showPointer(); // User should be able to click on the minimap
+
 }   // enterOverWorld
 
 //-----------------------------------------------------------------------------
@@ -124,7 +125,6 @@ void OverWorld::update(float dt)
         m_karts[0]->startEngineSFX();
     }
     LinearWorld::update(dt);
-    
     const unsigned int kart_amount  = m_karts.size();
 
     // isn't it cool, on the overworld nitro is free!
@@ -185,6 +185,7 @@ void OverWorld::onFirePressed(Controller* who)
         if ( (kart_xyz - Vec3(challenges[n].m_position)).length2_2d() 
               < CHALLENGE_DISTANCE_SQUARED)
         {
+
             if (challenges[n].m_challenge_id == "tutorial")
             {
                 scheduleTutorial();
@@ -284,9 +285,9 @@ void OverWorld::moveKartAfterRescue(AbstractKart* kart, float angle)
     }
     else
     {
-        fprintf(stderr, "WARNING: invalid position after rescue for kart %s "
-                        "on track %s.\n",
-                (kart->getIdent().c_str()), m_track->getIdent().c_str());
+
+        Log::warn("overworld", "invalid position after rescue for kart %s "
+        						"on track %s.\n", (kart->getIdent().c_str()), m_track->getIdent().c_str());
     }
 }   // moveKartAfterRescue
 
