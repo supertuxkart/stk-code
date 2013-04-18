@@ -249,24 +249,44 @@ public:
     }   // erase
 
     // ------------------------------------------------------------------------
-    void insertionSort(unsigned int start=0)
+    void insertionSort(unsigned int start=0, bool desc = false)
     {
-        // We should not used unsigned ints here, because if the vector is 
-        // empty j needs to be compared against -1
-        for(int j=(int)start; j<(int)m_contents_vector.size()-1; j++)
+        if (!desc)
         {
-            if(*(m_contents_vector[j])<*(m_contents_vector[j+1])) continue;
-            // Now search the proper place for m_contents_vector[j+1] 
-            // in the sorted section contentsVectot[start:j]
-            TYPE* t=m_contents_vector[j+1];
-            unsigned int i = j+1;
-            do
+            // We should not used unsigned ints here, because if the vector is 
+            // empty j needs to be compared against -1
+            for(int j=(int)start; j<(int)m_contents_vector.size()-1; j++)
             {
-                m_contents_vector[i] = m_contents_vector[i-1];
-                i--;
-            } while (i>start && *t<*(m_contents_vector[i-1]));
-            m_contents_vector[i]=t;
+                if(*(m_contents_vector[j])<*(m_contents_vector[j+1])) continue;
+                // Now search the proper place for m_contents_vector[j+1] 
+                // in the sorted section contentsVectot[start:j]
+                TYPE* t=m_contents_vector[j+1];
+                unsigned int i = j+1;
+                do
+                {
+                    m_contents_vector[i] = m_contents_vector[i-1];
+                    i--;
+                } while (i>start && *t<*(m_contents_vector[i-1]));
+                m_contents_vector[i]=t;
+            }
         }
+        else
+        {
+            for(int j=(int)start; j<(int)m_contents_vector.size()-1; j++)
+             {
+                 if(*(m_contents_vector[j])>*(m_contents_vector[j+1])) continue;
+                 // Now search the proper place for m_contents_vector[j+1] 
+                 // in the sorted section contentsVectot[start:j]
+                 TYPE* t=m_contents_vector[j+1];
+                 unsigned int i = j+1;
+                 do
+                 {
+                     m_contents_vector[i] = m_contents_vector[i-1];
+                     i--;
+                 } while (i>start && *t>*(m_contents_vector[i-1]));
+                 m_contents_vector[i]=t;
+             }
+         }
     }   // insertionSort
 
 

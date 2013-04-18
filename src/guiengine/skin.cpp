@@ -1504,8 +1504,14 @@ void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
     
     if (isSelected)
     {
-        ITexture* img = 
-            SkinConfig::m_render_params["list_sort_up::neutral"].getImage();
+        /** \brief img sets the icon for the column according to sort order **/
+        ITexture* img;
+        if (((ListWidget*)widget->m_event_handler)->m_sort_desc)
+            img = 
+                SkinConfig::m_render_params["list_sort_down::neutral"].getImage();
+        else
+            img = 
+                SkinConfig::m_render_params["list_sort_up::neutral"].getImage();
         core::recti destRect(rect.UpperLeftCorner,
                              core::dimension2di(rect.getHeight(), 
                                                 rect.getHeight()));

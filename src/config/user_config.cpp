@@ -570,6 +570,13 @@ bool operator<(const PlayerProfile &a, const PlayerProfile &b)
 }   // operator<
 
 // -----------------------------------------------------------------------------
+/** \brief Needed for toggling sort order **/
+bool operator>(const PlayerProfile &a, const PlayerProfile &b)
+{
+    return a.getUseFrequency() < b.getUseFrequency();
+}   // operator>
+
+// -----------------------------------------------------------------------------
 /** Load configuration values from file. */
 bool UserConfig::loadConfig()
 {

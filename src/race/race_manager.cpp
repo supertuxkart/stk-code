@@ -493,7 +493,14 @@ namespace computeGPRanksData
             return ( (m_score > a.m_score) || 
                 (m_score == a.m_score && m_race_time < a.m_race_time) );
         }
-
+        
+        // --------------------------------------------------------------------
+        bool operator>(const SortData &a)
+        {
+            return ( (m_score < a.m_score) || 
+                (m_score == a.m_score && m_race_time > a.m_race_time) );
+        }
+         
     };   // SortData
 }   // namespace
 

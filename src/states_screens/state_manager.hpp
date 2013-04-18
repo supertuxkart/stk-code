@@ -62,7 +62,7 @@ public:
 
     /**
       * Represents a player that is currently playing.
-      * Ties toghether :
+      * Ties together :
       *   - a player's identity (and thus his/her highscores)
       *   - which input device is used by which player
       *  (we're very flexible on this; ActivePlayer #1

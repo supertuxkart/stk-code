@@ -39,6 +39,7 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_icons = NULL;
     m_listener = NULL;
     m_selected_column = NULL;
+    m_sort_desc = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -371,6 +372,9 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
         int col = originator[ (m_properties[PROP_ID] + "_column_").size() ] - '0';
 
         m_selected_column = m_header_elements.get(col);
+        
+        /** \brief Allows sort icon to change depending on sort order **/
+        m_sort_desc = !m_sort_desc;
         /*
         for (int n=0; n<m_header_elements.size(); n++)
         {

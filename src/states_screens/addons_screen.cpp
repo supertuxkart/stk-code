@@ -93,6 +93,8 @@ void AddonsScreen::init()
     
     m_reloading = false;
     
+    m_sort_desc = true;
+    
 	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
 
     GUIEngine::getFont()->setTabStop(0.66f);
@@ -163,7 +165,7 @@ void AddonsScreen::loadList()
             continue;
         sorted_list.push_back(&addon);
     }
-    sorted_list.insertionSort(/*start=*/0);
+    sorted_list.insertionSort(/*start=*/0, m_sort_desc);
 
     GUIEngine::ListWidget* w_list = 
         getWidget<GUIEngine::ListWidget>("list_addons");
@@ -298,6 +300,8 @@ void AddonsScreen::onColumnClicked(int column_id)
     case 1: Addon::setSortOrder(Addon::SO_DATE); break;
     default: assert(0);
     }   // switch
+    /** \brief Toggle the sort order after column click **/
+    m_sort_desc = !m_sort_desc;
     loadList();
 }   // onColumnClicked
 

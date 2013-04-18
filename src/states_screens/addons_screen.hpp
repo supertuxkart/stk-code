@@ -67,6 +67,9 @@ private:
     
     bool             m_reloading;
     
+    /** \brief To check (and set) if sort order is descending **/
+    bool             m_sort_desc;
+    
 public:
 
     /** Load the addons into the main list.*/

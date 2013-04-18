@@ -821,7 +821,7 @@ std::string FileManager::checkAndCreateLinuxDir(const char *env_name,
 const std::string &FileManager::getAddonsDir() const
 {
     return m_addons_dir;
-}   // getADdonsDir
+}   // getAddonsDir
 
 //-----------------------------------------------------------------------------
 /** Returns the full path of a file in the addons directory.

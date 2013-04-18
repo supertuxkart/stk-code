@@ -67,6 +67,9 @@ namespace GUIEngine
         
         ButtonWidget* m_selected_column;
         
+        /** \brief whether this list is sorted in descending order */
+        bool m_sort_desc;
+        
         struct Column
         {
             irr::core::stringw m_text;
