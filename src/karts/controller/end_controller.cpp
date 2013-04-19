@@ -49,6 +49,7 @@
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 
 EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *player,
                              Controller *prev_controller) 
@@ -214,8 +215,7 @@ void EndController::handleSteering(float dt)
         const int next = m_next_node_index[m_track_node];
         target_point = QuadGraph::get()->getQuadOfNode(next).getCenter();
 #ifdef AI_DEBUG
-        std::cout << "- Outside of road: steer to center point." <<
-            std::endl;
+        Log::debug("end_controller.cpp", "- Outside of road: steer to center point.\n");
 #endif
     }
     else

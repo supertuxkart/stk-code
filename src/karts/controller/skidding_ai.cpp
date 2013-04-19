@@ -59,6 +59,7 @@
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 
 #ifdef AI_DEBUG
 #  include "irrlicht.h"
@@ -490,8 +491,7 @@ void SkiddingAI::handleSteering(float dt)
 #ifdef AI_DEBUG
         m_debug_sphere[0]->setPosition(QuadGraph::get()->getQuadOfNode(next)
                        .getCenter().toIrrVector());
-        std::cout << "- Outside of road: steer to center point." <<
-            std::endl;
+        Log::debug("skidding_ai","-Outside of road: steer to center point.\n");
 #endif
     }
     //If we are going to crash against a kart, avoid it if it doesn't
@@ -525,9 +525,9 @@ void SkiddingAI::handleSteering(float dt)
         }
 
 #ifdef AI_DEBUG
-        std::cout << "- Velocity vector crashes with kart and doesn't " <<
-            "crashes with road : steer 90 degrees away from kart." <<
-            std::endl;
+        Log::debug("skidding_ai",  "- Velocity vector crashes with kart "
+                   "and doesn't crashes with road : steer 90 " 
+                   "degrees away from kart.\n");
 #endif
 
     }
@@ -1621,8 +1621,9 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
         slip->isSlipstreamReady() &&
         slip->getSlipstreamTarget())
     {
-        //printf("%s overtaking %s\n", m_kart->getIdent().c_str(),
-        //    m_kart->getSlipstreamKart()->getIdent().c_str());
+        //Log::debug("skidding_ai", "%s overtaking %s\n",
+        //           m_kart->getIdent().c_str(),
+        //           m_kart->getSlipstreamKart()->getIdent().c_str());
         // FIXME: we might define a minimum distance, and if the target kart
         // is too close break first - otherwise the AI hits the kart when
         // trying to overtake it, actually speeding the other kart up.

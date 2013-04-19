@@ -19,6 +19,7 @@
 #include "karts/controller/ai_properties.hpp"
 
 #include "io/xml_node.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
 float AIProperties::UNDEFINED = -99.9f;
