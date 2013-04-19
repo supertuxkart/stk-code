@@ -8,7 +8,7 @@ if(APPLE)
 endif()
 
 # libbulletmath
-add_library(bulletmath
+add_library(bulletmath STATIC
 	src/LinearMath/btAabbUtil2.h           src/LinearMath/btMotionState.h
 	src/LinearMath/btAlignedAllocator.cpp  src/LinearMath/btPoolAllocator.h
 	src/LinearMath/btAlignedAllocator.h    src/LinearMath/btQuadWord.h
@@ -37,7 +37,7 @@ add_library(bulletmath
 # quite low anyway.
 
 # libbulletcollision
-add_library(bulletcollision
+add_library(bulletcollision STATIC
 	src/BulletCollision/BroadphaseCollision/btAxisSweep3.cpp
 	src/BulletCollision/BroadphaseCollision/btAxisSweep3.h
 	src/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h
@@ -254,7 +254,7 @@ add_library(bulletcollision
 	)
 	
 # libbulletdynamics
-add_library(bulletdynamics
+add_library(bulletdynamics STATIC
 	src/BulletDynamics/Character/btCharacterControllerInterface.h
 	src/BulletDynamics/Character/btKinematicCharacterController.cpp
 	src/BulletDynamics/Character/btKinematicCharacterController.h

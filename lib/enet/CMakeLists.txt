@@ -9,7 +9,7 @@ endif()
 
 add_definitions(-DHAS_SOCKLEN_T)
 
-add_library(enet
+add_library(enet STATIC
 	callbacks.c
 	compress.c
 	host.c
