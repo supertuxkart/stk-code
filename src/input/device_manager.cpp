@@ -97,6 +97,9 @@ bool DeviceManager::initialize()
     {
         core::stringc name = m_irrlicht_gamepads[id].Name.c_str();
         
+        // Some linux systems report a disk accelerometer as a gamepad, skip that
+        if (name.find("LIS3LV02DL") != -1) continue;
+        
 #ifdef WIN32
         // On Windows, unless we use DirectInput, all gamepads are given the 
         // same name ('microsoft pc-joystick driver'). This makes configuration
