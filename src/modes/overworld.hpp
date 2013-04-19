@@ -47,10 +47,6 @@ protected:
 
 public:
                   OverWorld();
-   /** call just after instanciating. can't be moved to the contructor as child
-       classes must be instanciated, otherwise polymorphism will fail and the
-       results will be incorrect */
-    virtual void  init() OVERRIDE;
     virtual      ~OverWorld();
 
     static void enterOverWorld();

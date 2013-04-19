@@ -37,7 +37,7 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
     XMLNode* root = file_manager->createXMLTree(file_manager->getDataDir()+filename);
     if (!root)
     {
-        fprintf(stderr, "/!\\ Error while trying to read grandprix file '%s'\n", filename.c_str());
+        Log::error("GrandPrixData","Error while trying to read grandprix file '%s'\n", filename.c_str());
         throw std::logic_error("File not found");
     }
     
@@ -48,7 +48,7 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
         std::string temp_name;
         if (root->get("name", &temp_name) == 0)
         {
-            fprintf(stderr, "/!\\ Error while trying to read grandprix file '%s' : "
+             Log::error("GrandPrixData", "Error while trying to read grandprix file '%s' : "
                     "missing 'name' attribute\n", filename.c_str());
             delete root;
             throw std::logic_error("File contents are incomplete or corrupt");
@@ -58,7 +58,7 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
     }
     else
     {
-        fprintf(stderr, "/!\\ Error while trying to read grandprix file '%s' : "
+        Log::error("GrandPrixData", "Error while trying to read grandprix file '%s' : "
                 "Root node has an unexpected name\n", filename.c_str());
         delete root;
         throw std::logic_error("File contents are incomplete or corrupt");
@@ -84,7 +84,7 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
 
             if (!idFound || !lapFound)
             {
-                fprintf(stderr, "/!\\ Error while trying to read grandprix file '%s' : "
+                Log::error("GrandPrixData", "Error while trying to read grandprix file '%s' : "
                                 "<track> tag does not have idi and laps reverse attributes. \n",
                                 filename.c_str());
                 delete root;
@@ -118,7 +118,7 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
     // sanity checks
     if  (!foundName)
     {
-        fprintf(stderr, "/!\\ Error while trying to read grandprix file '%s' : "
+        Log::error("GrandPrixData", "Error while trying to read grandprix file '%s' : "
                 "missing 'name' attribute\n", filename.c_str());
         throw std::logic_error("File contents are incomplete or corrupt");
     }
@@ -135,9 +135,9 @@ bool GrandPrixData::checkConsistency(bool chatty) const
         {
             if (chatty)
             {
-                fprintf(stderr, "Grand Prix '%ls': Track '%s' does not exist!\n",
+                Log::error("GrandPrixData", "Grand Prix '%ls': Track '%s' does not exist!\n",
                                 m_name.c_str(), m_tracks[i].c_str());
-                fprintf(stderr, "This Grand Prix will not be available.\n");
+                Log::error("GrandPrixData", "This Grand Prix will not be available.\n");
             }
             return false;
         }

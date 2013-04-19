@@ -112,8 +112,8 @@ void RaceManager::setDefaultAIKartList(const std::vector<std::string>& ai_list)
         const KartProperties *kp = kart_properties_manager->getKart(name);
         if(!kp)
         {
-            printf("Kart '%s' is unknown and therefore ignored.\n",
-                   name.c_str());
+            Log::warn("RaceManager", "Kart '%s' is unknown and therefore ignored.",
+                      name.c_str());
             continue;
         }
         // This doesn't work anymore, since this is called when
@@ -311,7 +311,7 @@ void RaceManager::startNew(bool from_overworld)
         init_gp_rank ++;
         if(UserConfigParams::m_ftl_debug)
         {
-            printf("[ftl] rank %d ai-kart %s\n", init_gp_rank, 
+            Log::debug("RaceManager", "[ftl] rank %d ai-kart %s", init_gp_rank,
                    m_ai_kart_list[i].c_str());
         }
     }
@@ -329,7 +329,7 @@ void RaceManager::startNew(bool from_overworld)
                                            ) );
         if(UserConfigParams::m_ftl_debug)
         {
-            printf("[ftl] rank %d kart %s\n", init_gp_rank, 
+            Log::debug("RaceManager", "[ftl] rank %d kart %s", init_gp_rank,
                 m_player_karts[i].getKartName().c_str());
         }
         init_gp_rank ++;
@@ -338,6 +338,7 @@ void RaceManager::startNew(bool from_overworld)
     // Then start the race with the first track
     // ========================================
     m_track_number = 0;
+
     startNextRace();
 }   // startNew
 
@@ -417,7 +418,7 @@ void RaceManager::startNextRace()
         World::setWorld(new EasterEggHunt());
     else
     { 
-        fprintf(stderr,"Could not create given race mode\n"); 
+        Log::error("RaceManager", "Could not create given race mode.");
         assert(0); 
     }
     
@@ -448,7 +449,7 @@ void RaceManager::startNextRace()
 //-----------------------------------------------------------------------------
 
 void RaceManager::next()
-{    
+{
     World::deleteWorld();
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
@@ -529,9 +530,9 @@ void RaceManager::computeGPRanks()
         m_kart_status[0].m_gp_rank = -1;
         if(UserConfigParams::m_ftl_debug)
         {
-            printf("[ftl] kart '%s' has position %d.\n",
-                World::getWorld()->getKart(0)->getIdent().c_str(),
-                sd->m_position);
+            Log::debug("Race Manager","[ftl] kart '%s' has position %d.",
+                       World::getWorld()->getKart(0)->getIdent().c_str(),
+                       sd->m_position);
         }
     }
     for (unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id)
@@ -543,7 +544,7 @@ void RaceManager::computeGPRanks()
         sort_data.push_back(sd);
         if(UserConfigParams::m_ftl_debug)
         {
-            printf("[ftl] kart '%s' has position %d score %d.\n",
+            Log::debug("Race Manager","[ftl] kart '%s' has position %d score %d.",
                 World::getWorld()->getKart(kart_id)->getIdent().c_str(),
                 sd->m_position, sd->m_score);
         }
@@ -552,20 +553,17 @@ void RaceManager::computeGPRanks()
     sort_data.insertionSort(start);
     for (unsigned int i=start; i < NUM_KARTS; ++i)
     {
-        //printf("setting kart %s to rank %i\n", 
-        //    m_kart_status[position[i]].m_ident.c_str(), i-start);
         if(UserConfigParams::m_ftl_debug)
         {
             const AbstractKart *kart =
                 World::getWorld()->getKart(sort_data[i].m_position);
-            printf("[ftl] kart '%s' has now position %d.\n",
+            Log::debug("Race Manager","[ftl] kart '%s' has now position %d.",
                 kart->getIdent().c_str(), 
                 i-start);
         }
 
         m_kart_status[sort_data[i].m_position].m_gp_rank = i - start;
     }
-    // printf("kart %s has rank %i\n", 0, m_kart_status[0].m_gp_rank);
 }   // computeGPRanks
 
 //-----------------------------------------------------------------------------
@@ -579,7 +577,6 @@ void RaceManager::exitRace(bool delete_world)
         unlock_manager->getCurrentSlot()->grandPrixFinished();
         
         StateManager::get()->resetAndGoToScreen( MainMenuScreen::getInstance() );
-        
 
         bool someHumanPlayerWon = false;
         const unsigned int kartStatusCount = m_kart_status.size();

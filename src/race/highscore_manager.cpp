@@ -75,7 +75,7 @@ void HighscoreManager::loadHighscores()
         saveHighscores();
         if(m_can_write)
         {
-            fprintf(stderr, "New highscore file '%s' created.\n", 
+            Log::error("Highscore Manager", "New highscore file '%s' created.\n",
                     m_filename.c_str());
         }
         delete root;
@@ -95,8 +95,7 @@ void HighscoreManager::loadHighscores()
         int v;
         if (!root->get("version", &v) || v<(int)CURRENT_HSCORE_FILE_VERSION)
         {
-            fprintf(stderr, 
-                    "Highscore file format too old, a new one will be created.\n");
+            Log::error("Highscore Manager", "Highscore file format too old, a new one will be created.\n");
             irr::core::stringw warning = 
                 _("The highscore file was too old,\nall highscores have been erased.");
             user_config->setWarning( warning );
@@ -120,23 +119,23 @@ void HighscoreManager::loadHighscores()
             }
             catch (std::logic_error& e)
             {
-                fprintf(stderr, "Invalid highscore entry will be skipped : %s\n", e.what());
+                Log::error("Highscore Manager", "Invalid highscore entry will be skipped : %s\n", e.what());
                 continue;
             }
             m_all_scores.push_back(highscores);
         }   // next entry
         
         if(UserConfigParams::logMisc())
-            fprintf(stderr, "Highscores will be saved in '%s'.\n",
+            Log::error("Highscore Manager", "Highscores will be saved in '%s'.\n",
                     m_filename.c_str());
     }
     catch(std::exception& err)
     {
-        fprintf(stderr, "Error while parsing highscore file '%s':\n", 
+        Log::error("Highscore Manager", "Error while parsing highscore file '%s':\n",
                 m_filename.c_str());
-        fprintf(stderr, "%s", err.what());
-        fprintf(stderr, "\n");
-        fprintf(stderr, "No old highscores will be available.\n");
+        Log::error("Highscore Manager", "%s", err.what());
+        Log::error("Highscore Manager", "\n");
+        Log::error("Highscore Manager", "No old highscores will be available.\n");
     }
     if(root)
         delete root;
@@ -163,7 +162,7 @@ void HighscoreManager::saveHighscores()
     }
     catch(std::exception &e)
     {
-        printf("Problems saving highscores in '%s'\n", m_filename.c_str());
+        Log::error("Highscore Manager","Problems saving highscores in '%s'\n", m_filename.c_str());
         puts(e.what());
         m_can_write=false;
     }

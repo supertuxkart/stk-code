@@ -38,17 +38,7 @@ OverWorld::OverWorld() : LinearWorld()
 {
     m_return_to_garage = false;
     m_stop_music_when_dialog_open = false;
-}
-
-// ----------------------------------------------------------------------------
-/** Actually initialises the world, i.e. creates all data structures to
- *  for all karts etc. In init functions can be called that use
- *  World::getWorld().
- */
-void OverWorld::init()
-{
-    LinearWorld::init();
-}   // init
+}   // Overworld
 
 //-----------------------------------------------------------------------------
 OverWorld::~OverWorld()
@@ -79,7 +69,8 @@ void OverWorld::enterOverWorld()
     if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))
     {
         Log::warn("overworld", "cannot find kart '%s', "
-                "will revert to default\n", UserConfigParams::m_default_kart.c_str());
+                  "will revert to default\n", 
+                  UserConfigParams::m_default_kart.c_str());
 
         UserConfigParams::m_default_kart.revertToDefaults();
     }
@@ -185,7 +176,6 @@ void OverWorld::onFirePressed(Controller* who)
         if ( (kart_xyz - Vec3(challenges[n].m_position)).length2_2d() 
               < CHALLENGE_DISTANCE_SQUARED)
         {
-
             if (challenges[n].m_challenge_id == "tutorial")
             {
                 scheduleTutorial();
@@ -285,9 +275,9 @@ void OverWorld::moveKartAfterRescue(AbstractKart* kart, float angle)
     }
     else
     {
-
-        Log::warn("overworld", "invalid position after rescue for kart %s "
-        						"on track %s.\n", (kart->getIdent().c_str()), m_track->getIdent().c_str());
+        Log::warn("overworld", "Invalid position after rescue for kart %s "
+        						"on track %s.", (kart->getIdent().c_str()), 
+                                m_track->getIdent().c_str());
     }
 }   // moveKartAfterRescue
 
@@ -301,7 +291,7 @@ void OverWorld::onMouseClick(int x, int y)
 {
     const OverworldChallenge *challenge = 
         ((RaceGUIOverworld*)getRaceGUI())->getCurrentChallenge();
- 
+
     if(challenge)
     {
         AbstractKart* kart = getKart(0);

@@ -57,7 +57,7 @@ void ThreeStrikesBattle::init()
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
     {
-        fprintf(stderr, "No AI exists for this game mode\n");
+        Log::error("Three Strikes Battle", "No AI exists for this game mode");
         exit(1);
     }   
     m_kart_info.resize(m_karts.size());
@@ -161,7 +161,6 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
 void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
 {
     assert(kart_id < m_karts.size());
-    
     // make kart lose a life
     m_kart_info[kart_id].m_lives--;
     
@@ -172,7 +171,6 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
     m_battle_events.push_back(evt);   
     
     updateKartRanks();
-        
     // check if kart is 'dead'
     if (m_kart_info[kart_id].m_lives < 1)
     {
