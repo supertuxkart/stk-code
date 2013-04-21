@@ -52,10 +52,10 @@ Global
 		{E08E042A-6C45-411B-92BE-3CC31331019F}.debug|Win32.Build.0 = Static lib - Debug|Win32
 		{E08E042A-6C45-411B-92BE-3CC31331019F}.Release|Win32.ActiveCfg = Static lib - Release|Win32
 		{E08E042A-6C45-411B-92BE-3CC31331019F}.Release|Win32.Build.0 = Static lib - Release|Win32
-		{E08E042A-6C45-411B-92BE-3CC31331019F}.wiiuse-debug|Win32.ActiveCfg = Static lib - Release|Win32
-		{E08E042A-6C45-411B-92BE-3CC31331019F}.wiiuse-debug|Win32.Build.0 = Static lib - Release|Win32
-		{E08E042A-6C45-411B-92BE-3CC31331019F}.wiiuse-release|Win32.ActiveCfg = wiiuse-release|Win32
-		{E08E042A-6C45-411B-92BE-3CC31331019F}.wiiuse-release|Win32.Build.0 = wiiuse-release|Win32
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.wiiuse-debug|Win32.ActiveCfg = wiiuse-release|Win32
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.wiiuse-debug|Win32.Build.0 = wiiuse-release|Win32
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.wiiuse-release|Win32.ActiveCfg = Static lib - Release|Win32
+		{E08E042A-6C45-411B-92BE-3CC31331019F}.wiiuse-release|Win32.Build.0 = Static lib - Release|Win32
 		{FE4FCEBF-B53D-4B8A-81B0-F9AB059C8C83}.debug|Win32.ActiveCfg = Debug|Win32
 		{FE4FCEBF-B53D-4B8A-81B0-F9AB059C8C83}.Release|Win32.ActiveCfg = Release|Win32
 		{FE4FCEBF-B53D-4B8A-81B0-F9AB059C8C83}.wiiuse-debug|Win32.ActiveCfg = Debug|Win32

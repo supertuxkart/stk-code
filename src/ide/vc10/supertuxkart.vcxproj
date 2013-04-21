@@ -81,7 +81,7 @@
     <ClCompile>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";ENABLE_BIDI;ADDONS_MANAGER;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_OGGVORBIS;NDEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";ENABLE_BIDI;ADDONS_MANAGER;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -94,7 +94,7 @@
       <AdditionalLibraryDirectories>../../../dependencies/lib;../../../lib/irrlicht/lib/Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -107,7 +107,7 @@
     <ClCompile>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";ENABLE_BIDI;WIN64;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_OGGVORBIS;NDEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";ENABLE_BIDI;WIN64;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
@@ -121,7 +121,7 @@
       <AdditionalLibraryDirectories>../../../lib/irrlicht/lib/Win64-visualStudio;../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -134,7 +134,7 @@
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <MinimalRebuild>true</MinimalRebuild>
@@ -157,7 +157,7 @@
       <MapFileName>
       </MapFileName>
       <MapExports>false</MapExports>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <LinkTimeCodeGeneration>
       </LinkTimeCodeGeneration>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -172,7 +172,7 @@
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ADDONS_MANAGER;_WIN64;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ADDONS_MANAGER;_WIN64;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -196,7 +196,7 @@
       <MapFileName>
       </MapFileName>
       <MapExports>false</MapExports>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <LinkTimeCodeGeneration>
       </LinkTimeCodeGeneration>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>

@@ -1268,7 +1268,9 @@ int main(int argc, char *argv[] )
 
         initRest();
 
+#ifndef WIN32
         if (UserConfigParams::m_log_errors)
+#endif
         {
              //Enable logging of stdout and stderr to logfile
             std::string logoutfile = file_manager->getLogFile("stdout.log");
@@ -1539,3 +1541,10 @@ int main(int argc, char *argv[] )
     return 0 ;
 }
 
+#ifdef WIN32
+//routine for running under windows
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
+{
+    return main(__argc, __argv);
+}
+#endif
