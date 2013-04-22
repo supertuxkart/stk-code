@@ -78,23 +78,43 @@ void EasterEggHunt::readData(const std::string &filename)
 
     // Search for the closest difficulty set of egg.
     const XMLNode *data = NULL;
-    std::string difficulty_name;
-    RaceManager::Difficulty diff = race_manager->getDifficulty();
-    for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
+    RaceManager::Difficulty difficulty     = race_manager->getDifficulty();
+    RaceManager::Difficulty act_difficulty = RaceManager::DIFFICULTY_COUNT;
+    for(int i=difficulty; i<=RaceManager::DIFFICULTY_LAST; i++)
     {
-        difficulty_name = race_manager->getDifficultyAsString(diff);
-        data = easter->getNode(difficulty_name);
-        if(data) break;
-        diff = (RaceManager::Difficulty)(diff+1);
-        if(diff==RaceManager::DIFFICULTY_LAST)
-            diff = RaceManager::DIFFICULTY_FIRST;
+        std::string diff_name= 
+            race_manager->getDifficultyAsString((RaceManager::Difficulty)i);
+        const XMLNode * cur_data = easter->getNode(diff_name);
+        if (cur_data)
+        {
+            data = cur_data;
+            act_difficulty = (RaceManager::Difficulty)i;
+            break;
+        }
     }
+    // If there is no data for an equal or harder placement, 
+    // check for the most difficult placement that is easier:
+    if(!data)
+    {
+        for(int i=difficulty-1; i>=RaceManager::DIFFICULTY_FIRST; i--)
+        {
+            std::string diff_name= 
+               race_manager->getDifficultyAsString((RaceManager::Difficulty)i);
+            const XMLNode * cur_data = easter->getNode(diff_name);
+            if (cur_data)
+            {
+                data = cur_data;
+                act_difficulty = (RaceManager::Difficulty)i;
+                break;
+            }
+        }   // for i 
+    }   // if !data
+
     if(!data)
     {
         delete easter;
         return;
     }
-
     m_number_of_eggs = 0;
     for(unsigned int i=0; i<data->getNumNodes(); i++)
     {
@@ -102,7 +122,8 @@ void EasterEggHunt::readData(const std::string &filename)
         if(egg->getName()!="easter-egg")
         {
             printf("Unknown node '%s' in easter egg level '%s' - ignored.\n",
-                    egg->getName().c_str(), difficulty_name.c_str());
+                   egg->getName().c_str(), 
+                   race_manager->getDifficultyAsString(act_difficulty).c_str());
             continue;
         }
         World::getTrack()->itemCommand(egg);
