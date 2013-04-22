@@ -980,7 +980,8 @@ void FileManager::listFiles(std::set<std::string>& result,
  */
 void FileManager::checkAndCreateDirForAddons(const std::string &dir)
 {
-    bool success = checkAndCreateDirectory(dir);
+    // Tries to create directory recursively
+    bool success = checkAndCreateDirectoryP(dir);
     if(!success)
     {
         Log::warn("FileManager", "There is a problem with the addons dir.");
