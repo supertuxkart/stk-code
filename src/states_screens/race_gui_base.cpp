@@ -83,6 +83,7 @@ RaceGUIBase::RaceGUIBase()
                                                             /*permanent*/true);
     const std::string &guid = file_manager->getGUIDir();
     m_gauge_full            = irr_driver->getTexture(guid+"gauge_full.png" );
+    m_gauge_full_bright     = irr_driver->getTexture(guid+"gauge_full_bright.png" );
     m_gauge_empty           = irr_driver->getTexture(guid+"gauge_empty.png");
     m_gauge_goal            = irr_driver->getTexture(guid+"gauge_goal.png" );
 

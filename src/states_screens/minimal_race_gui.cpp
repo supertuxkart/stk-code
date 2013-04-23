@@ -97,10 +97,6 @@ MinimalRaceGUI::MinimalRaceGUI()
 
     createMarkerTexture();
     
-    m_gauge_full      = irr_driver->getTexture( file_manager->getGUIDir() + "gauge_full.png" );
-    m_gauge_empty     = irr_driver->getTexture( file_manager->getGUIDir() + "gauge_empty.png" );
-    m_gauge_goal      = irr_driver->getTexture( file_manager->getGUIDir() + "gauge_goal.png" );
-
     // Translate strings only one in constructor to avoid calling
     // gettext in each frame.
     //I18N: Shown at the end of a race
@@ -406,9 +402,11 @@ void MinimalRaceGUI::drawEnergyMeter(const AbstractKart *kart,
                               mirrored ? 256 :   0,
                               64,
                               mirrored ?   0 : 256);
-        irr_driver->getVideoDriver()->draw2DImage(m_gauge_full, dest,
-                                                  tex_c,
-                                                  &clip, NULL /* colors */, true /* alpha */);
+        video::ITexture *gauge = kart->getControls().m_nitro
+                              ? m_gauge_full_bright : m_gauge_full;
+        irr_driver->getVideoDriver()->draw2DImage(gauge, dest, tex_c,
+                                                  &clip, NULL /* colors */, 
+                                                  true /* alpha */);
     }
     
     

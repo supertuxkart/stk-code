@@ -511,7 +511,10 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         
                 
         video::SMaterial m;
-        m.setTexture(0, m_gauge_full);
+        if(kart->getControls().m_nitro)
+            m.setTexture(0, m_gauge_full_bright);
+        else
+            m.setTexture(0, m_gauge_full);
         m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
         irr_driver->getVideoDriver()->setMaterial(m);
         irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
