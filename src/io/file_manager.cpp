@@ -167,14 +167,23 @@ FileManager::FileManager(char *argv[])
         m_root_dir = "/usr/local/share/games/supertuxkart/";
 #endif
     }
+    checkAndCreateConfigDir();
+    checkAndCreateAddonsDir();
+    checkAndCreateScreenshotDir();
+
+#ifdef WIN32
+    redirectOutput();
+#endif
     // We can't use _() here, since translations will only be initalised
     // after the filemanager (to get the path to the tranlsations from it)
     Log::info("FileManager", "Data files will be fetched from: '%s'",
               m_root_dir.c_str());
-    checkAndCreateConfigDir();
-    checkAndCreateAddonsDir();
-    checkAndCreateScreenshotDir();
-    }  // FileManager
+    Log::info("FileManager", "User directory is '%s'.", m_config_dir.c_str());
+    Log::info("FileManager", "Addons files will be stored in '%s'.",
+               m_addons_dir.c_str());
+    Log::info("FileManager", "Screenshots will be stored in '%s'.",
+               m_screenshot_dir.c_str());
+}  // FileManager
 
  //-----------------------------------------------------------------------------
 /** Remove the dummy file system (which is called from IrrDriver before
@@ -660,7 +669,6 @@ void FileManager::checkAndCreateConfigDir()
                   "falling back to '.'.", m_config_dir.c_str());
         m_config_dir = "./";
     }
-    Log::info("FileManager", "User directory is '%s'.", m_config_dir.c_str());
     return;
 }   // checkAndCreateConfigDir
 
@@ -688,8 +696,6 @@ void FileManager::checkAndCreateAddonsDir()
                    "falling back to '.'.", m_addons_dir.c_str());
         m_addons_dir = "./";
     }
-    Log::info("FileManager", "Addons files will be stored in '%s'.",
-               m_addons_dir.c_str());
 
     if (!checkAndCreateDirectory(m_addons_dir + "icons/"))
     {
@@ -726,8 +732,6 @@ void FileManager::checkAndCreateScreenshotDir()
                    "falling back to '.'.", m_screenshot_dir.c_str());
         m_screenshot_dir = ".";
     }
-    Log::info("FileManager", "Screenshots will be stored in '%s'.",
-               m_screenshot_dir.c_str());
 
 }   // checkAndCreateScreenshotDir
 
@@ -815,6 +819,30 @@ std::string FileManager::checkAndCreateLinuxDir(const char *env_name,
     return dir;
 }   // checkAndCreateLinuxDir
 #endif
+
+//-----------------------------------------------------------------------------
+/** Redirects output to go into files in the user's config directory
+ *  instead of to the console.
+ */
+void FileManager::redirectOutput()
+{
+    //Enable logging of stdout and stderr to logfile
+    std::string logoutfile = getLogFile("stdout.log");
+    std::string logerrfile = getLogFile("stderr.log");
+    Log::verbose("main", "Error messages and other text output will "
+                         "be logged to %s and %s.", logoutfile.c_str(),
+                 logerrfile.c_str());
+    if(freopen (logoutfile.c_str(),"w",stdout)!=stdout)
+    {
+        Log::error("main", "Can not open log file '%s'. Writing to "
+                           "stdout instead.", logoutfile.c_str());
+    }
+    if(freopen (logerrfile.c_str(),"w",stderr)!=stderr)
+    {
+        Log::error("main", "Can not open log file '%s'. Writing to "
+                           "stderr instead.", logerrfile.c_str());
+    }
+}   // redirectOutput
 
 //-----------------------------------------------------------------------------
 /** Returns the directory for addon files. */

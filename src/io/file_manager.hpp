@@ -120,18 +120,32 @@ public:
                                   bool is_full_path=false,
                                   bool make_full_path=false) const;
 
-    bool       fileExists           (const std::string& path)
-        { return m_file_system->existFile(path.c_str()); }
 
     void       pushTextureSearchPath(const std::string& path);
     void       pushModelSearchPath  (const std::string& path);
-    void       pushMusicSearchPath  (const std::string& path)
-                                    { m_music_search_path.push_back(path);  }
     void       popTextureSearchPath ();
     void       popModelSearchPath   ();
-    void       popMusicSearchPath   () {m_music_search_path.pop_back();     }
+    void       redirectOutput();
+    // ------------------------------------------------------------------------
+    /** Adds a directory to the music search path (or stack).
+     */
+    void pushMusicSearchPath(const std::string& path)
+    {
+        m_music_search_path.push_back(path);  
+    }   // pushMusicSearchPath
+    // ------------------------------------------------------------------------
+    /** Removes the last added directory from the music search path.
+     */
+    void popMusicSearchPath() {m_music_search_path.pop_back(); }
+    // ------------------------------------------------------------------------
+    /** Returns true if the specified file exists.
+     */
+    bool fileExists(const std::string& path)
+    { 
+        return m_file_system->existFile(path.c_str()); 
+    }   // fileExists
 
-};
+};   // FileManager
 
 extern FileManager* file_manager;
 

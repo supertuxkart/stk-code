@@ -1214,6 +1214,18 @@ void cleanSuperTuxKart()
     if(music_manager)           delete music_manager;
     delete ParticleKindManager::get();
     if(stk_config)              delete stk_config;
+
+#ifndef WIN32
+    if (user_config && UserConfigParams::m_log_errors) //close logfiles
+    {
+#endif
+        fclose(stderr);
+        fclose(stdout);
+#ifndef WIN32
+    }
+#endif
+
+
     if(user_config)             delete user_config;
     if(unlock_manager)          delete unlock_manager;
     if(translations)            delete translations;
@@ -1268,27 +1280,13 @@ int main(int argc, char *argv[] )
 
         initRest();
 
+        // Windows 32 always redirects output
 #ifndef WIN32
         if (UserConfigParams::m_log_errors)
-#endif
         {
-             //Enable logging of stdout and stderr to logfile
-            std::string logoutfile = file_manager->getLogFile("stdout.log");
-            std::string logerrfile = file_manager->getLogFile("stderr.log");
-            Log::verbose("main", "Error messages and other text output will "
-                         "be logged to %s and %s.", logoutfile.c_str(),
-                         logerrfile.c_str());
-            if(freopen (logoutfile.c_str(),"w",stdout)!=stdout)
-            {
-                Log::error("main", "Can not open log file '%s'. Writing to "
-                                "stdout instead.", logoutfile.c_str());
-            }
-            if(freopen (logerrfile.c_str(),"w",stderr)!=stderr)
-            {
-                Log::error("main", "Can not open log file '%s'. Writing to "
-                           "stderr instead.", logerrfile.c_str());
-            }
+            file_manager->redirectOutput();
         }
+#endif
 
         input_manager = new InputManager ();
         
@@ -1525,12 +1523,6 @@ int main(int argc, char *argv[] )
 #endif
     
     if(input_manager) delete input_manager; // if early crash avoid delete NULL
-
-    if (user_config && UserConfigParams::m_log_errors) //close logfiles
-    {
-        fclose(stderr);
-        fclose(stdout);
-    }
 
     cleanSuperTuxKart();
 
