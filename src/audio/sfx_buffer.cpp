@@ -91,7 +91,7 @@ bool SFXBuffer::load()
     
     if (!loadVorbisBuffer(m_file, m_buffer))
     {
-        fprintf(stderr, "Could not load sound effect %s\n", m_file.c_str());
+        Log::error("SFXBuffer", "Could not load sound effect %s\n", m_file.c_str());
         // TODO: free al buffer here?
         return false;
     }
@@ -133,7 +133,7 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
     
     if (alIsBuffer(buffer) == AL_FALSE)
     {
-        printf("Error, bad OpenAL buffer");
+        Log::error("SFXBuffer", "Error, bad OpenAL buffer");
         return false;
     }
     
@@ -141,14 +141,14 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
     
     if(!file)
     {
-        fprintf(stderr, "[SFXBuffer] LoadVorbisBuffer() - couldn't open file!\n");
+        Log::error("SFXBuffer", "[SFXBuffer] LoadVorbisBuffer() - couldn't open file!\n");
         return false;
     }
     
     if (ov_open_callbacks(file, &oggFile, NULL, 0,  OV_CALLBACKS_NOCLOSE) != 0)
     {
         fclose(file);
-        fprintf(stderr, "[SFXBuffer] LoadVorbisBuffer() - ov_open_callbacks() failed, file isn't vorbis?\n");
+        Log::error("SFXBuffer", "[SFXBuffer] LoadVorbisBuffer() - ov_open_callbacks() failed, file isn't vorbis?\n");
         return false;
     }
     
@@ -160,7 +160,7 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
     if(!data)
     {
         ov_clear(&oggFile);
-        fprintf(stderr, "[SFXBuffer] loadVorbisBuffer() - Error : LoadVorbisBuffer() - couldn't allocate decode buffer\n");
+        Log::error("SFXBuffer", "[SFXBuffer] loadVorbisBuffer() - Error : LoadVorbisBuffer() - couldn't allocate decode buffer\n");
         return false;
     }
     

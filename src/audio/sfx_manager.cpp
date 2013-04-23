@@ -203,7 +203,7 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
     }
 
     if (UserConfigParams::logMisc()) 
-        printf("Loading SFX %s\n", sfx_file.c_str());
+        Log::debug("SFXManager", "Loading SFX %s\n", sfx_file.c_str());
     
     if (buffer->load()) return buffer;
     
@@ -221,7 +221,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
 
     if (node->get("filename", &filename) == 0)
     {
-        fprintf(stderr, 
+        Log::error("SFXManager", 
                 "/!\\ The 'filename' attribute is mandatory in the SFX XML file!\n");
         return NULL;
     }
@@ -237,7 +237,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
      */
     if(m_all_sfx_types.find(sfx_name)!=m_all_sfx_types.end())
     {
-        fprintf(stderr, 
+        Log::error("SFXManager", 
                 "There is already a sfx named '%s' installed - new one is ignored.\n",
                 sfx_name.c_str());
         return NULL;
@@ -301,7 +301,7 @@ void SFXManager::dump()
 {
     for(int n=0; n<(int)m_all_sfx.size(); n++)
     {
-        printf("Sound %i : %s \n", n, m_all_sfx[n]->getBuffer()->getFileName().c_str());
+        Log::debug("SFXManager", "Sound %i : %s \n", n, m_all_sfx[n]->getBuffer()->getFileName().c_str());
     }
 }
 
@@ -312,7 +312,7 @@ SFXBase* SFXManager::createSoundSource(const std::string &name,
     std::map<std::string, SFXBuffer*>::iterator i = m_all_sfx_types.find(name);
     if ( i == m_all_sfx_types.end() )
     {
-        fprintf( stderr, "SFXManager::createSoundSource could not find the requested sound effect : '%s'\n", name.c_str());
+        Log::error("SFXManager", "SFXManager::createSoundSource could not find the requested sound effect : '%s'\n", name.c_str());
         return NULL;
     }
     
@@ -340,7 +340,7 @@ void SFXManager::deleteSFXMapping(const std::string &name)
 
     if (i == m_all_sfx_types.end())
     {
-        fprintf(stderr, "SFXManager::deleteSFXMapping : Warning: sfx not found in list.\n");
+        Log::warn("SFXManager", "SFXManager::deleteSFXMapping : Warning: sfx not found in list.\n");
         return;
     }
     (*i).second->unload();
@@ -363,7 +363,7 @@ void SFXManager::deleteSFX(SFXBase *sfx)
 
     if(i==m_all_sfx.end())
     {
-        fprintf(stderr, "SFXManager::deleteSFX : Warning: sfx not found in list.\n");
+        Log::warn("SFXManager", "SFXManager::deleteSFX : Warning: sfx not found in list.\n");
         return;
     }
     
@@ -418,7 +418,7 @@ bool SFXManager::checkError(const std::string &context)
 
     if(error != AL_NO_ERROR)
     {
-        fprintf(stdout, "SFXOpenAL OpenAL error while %s: %s\n",
+        Log::error("SFXManager", "SFXOpenAL OpenAL error while %s: %s\n",
             context.c_str(), SFXManager::getErrorString(error).c_str());
         return false;
     }

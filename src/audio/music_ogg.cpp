@@ -45,7 +45,7 @@ MusicOggStream::MusicOggStream()
 MusicOggStream::~MusicOggStream()
 {
     if(stopMusic() == false)
-        fprintf(stderr, "WARNING: problems while stopping music.\n");
+        Log::warn("MusicOgg", "problems while stopping music.\n");
 }   // ~MusicOggStream
 
 //-----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ bool MusicOggStream::load(const std::string& filename)
 
     if(!m_oggFile)
     {
-        printf("Loading Music: %s failed (fopen returned NULL)\n", m_fileName.c_str());
+        Log::error("MusicOgg", "Loading Music: %s failed (fopen returned NULL)\n", m_fileName.c_str());
         return false;
     }
     
@@ -98,7 +98,7 @@ bool MusicOggStream::load(const std::string& filename)
                 errorMessage = "Unknown Error";
         }
         
-        printf("Loading Music: %s failed : ov_open returned error code %i (%s)\n",
+        Log::error("MusicOgg", "Loading Music: %s failed : ov_open returned error code %i (%s)\n",
                m_fileName.c_str(), result, errorMessage);
         return false;
     }
@@ -308,14 +308,16 @@ void MusicOggStream::update()
         alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
         if (state != AL_PLAYING)
         {
-            fprintf(stderr,"WARNING: Music not playing when it should be. Source state: %d\n", state);
+            Log::warn("MusicOgg", "Music not playing when it should be. "
+                      "Source state: %d\n", state);
             alGetSourcei(m_soundSource, AL_BUFFERS_PROCESSED, &processed);
             alSourcePlay(m_soundSource);
         }
     }
     else
     {
-        fprintf(stderr,"WARNING: Attempt to stream music into buffer failed twice in a row.\n");
+        Log::warn("MusicOgg", "Attempt to stream music into buffer failed "
+                              "twice in a row.\n");
     }
 }   // update
 
@@ -358,7 +360,7 @@ bool MusicOggStream::check(const char* what)
 
     if (error != AL_NO_ERROR)
     {
-        fprintf(stderr, "[MusicOggStream] OpenAL error at %s : %s (%i)\n", what, SFXManager::getErrorString(error).c_str(), error);
+        Log::error("MusicOgg", "[MusicOggStream] OpenAL error at %s : %s (%i)\n", what, SFXManager::getErrorString(error).c_str(), error);
         return false;
     }
 
