@@ -1002,7 +1002,8 @@ void Kart::update(float dt)
     if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= dt;
 
     // Decrease remaining invulnerability time
-    if(m_invulnerable_time>0){
+    if(m_invulnerable_time>0)
+    {
         m_invulnerable_time-=dt;
     }
 
