@@ -72,7 +72,8 @@
 * balldimpleddark
     by Hero, released under CC-BY-SA 3.0
 
-* rubber_ball-icon
+* rubber_ball-icon, plunger icon, cake icon
     by Totoplus62, released under CC-BY-SA 3.0
+    
     
 Others are GPL, by the original (super)TuxKart team
