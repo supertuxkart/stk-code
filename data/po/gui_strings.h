@@ -55,9 +55,6 @@ _("Shifting Sands")
 //I18N: ./data/tracks/stadium/track.xml
 _("The Stadium")
 
-//I18N: ./data/tracks/mensa/track.xml
-_("OSM Südstadt test")
-
 //I18N: ./data/tracks/farm/track.xml
 _("Bovine Barnyard")
 
@@ -284,6 +281,10 @@ _("Intermediate");
 //I18N: ./data/gui/racesetup.stkgui
 //I18N: Difficulty
 _("Expert");
+
+//I18N: ./data/gui/racesetup.stkgui
+//I18N: Difficulty
+_("Iron man");
 
 //I18N: ./data/gui/racesetup.stkgui
 _("Select a game mode")
