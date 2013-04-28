@@ -126,7 +126,7 @@ void AddonsManager::initOnline(const XMLNode *xml)
                 if(file_manager->fileExists(full_path))
                 {
                     if(UserConfigParams::logAddons())
-                        printf("[addons] Removing cached icon '%s'.\n", 
+                        Log::warn("[addons] Removing cached icon '%s'.\n", 
                                addon.getIconBasename().c_str());
                     file_manager->removeFile(full_path);
                 }
@@ -185,7 +185,7 @@ void AddonsManager::initOnline(const XMLNode *xml)
         // This addon is not on the server anymore, and not installed. Remove
         // it from the list. 
         if(UserConfigParams::logAddons())
-            printf(
+            Log::warn(
                 "[addons] Removing '%s' which is not on the server anymore.\n",
                 m_addons_list.getData()[i].getId().c_str() );
         std::string icon = m_addons_list.getData()[i].getIconBasename();
@@ -243,7 +243,7 @@ void AddonsManager::checkInstalledAddons()
         if(n<0) continue;
         if(!m_addons_list.getData()[n].isInstalled())
         {
-            printf("[addons] Marking '%s' as being installed.\n", 
+            Log::info("[addons] Marking '%s' as being installed.\n", 
                    kp->getIdent().c_str());
             m_addons_list.getData()[n].setInstalled(true);
             something_was_changed = true;
@@ -262,7 +262,7 @@ void AddonsManager::checkInstalledAddons()
         if(n<0) continue;
         if(!m_addons_list.getData()[n].isInstalled())
         {
-            printf("[addons] Marking '%s' as being installed.\n", 
+            Log::info("[addons] Marking '%s' as being installed.\n", 
                    track->getIdent().c_str());
             m_addons_list.getData()[n].setInstalled(true);
             something_was_changed = true;
