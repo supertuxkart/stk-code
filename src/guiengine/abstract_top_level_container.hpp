@@ -18,11 +18,13 @@
 #ifndef __TOP_LEVEL_CONT_HPP__
 #define __TOP_LEVEL_CONT_HPP__
 
-#include <cstring> // for NULL
-#include <typeinfo> // for typeid
-#include "utils/ptr_vector.hpp"
 
 #include "guiengine/widget.hpp"
+#include "utils/ptr_vector.hpp"
+
+#include <cstring> // for NULL
+#include <typeinfo> // for typeid
+
 
 namespace GUIEngine
 {
@@ -39,7 +41,7 @@ namespace GUIEngine
     {
     protected:
         /** the widgets in this screen */
-        PtrVector<Widget, HOLD> m_widgets;
+        PtrVector<Widget, HOLD>  m_widgets;
         
         /**
          *  AbstractTopLevelContainer is generally able to determine its first
@@ -47,7 +49,7 @@ namespace GUIEngine
          *  kart selection) you can help it by providing the first widget 
          *  manually.
          */
-        Widget* m_first_widget;
+        Widget*                  m_first_widget;
         
         /**
          *  AbstractTopLevelContainer is generally able to determine its last
@@ -55,27 +57,31 @@ namespace GUIEngine
          *  kart selection) you can help it by providing the first widget 
          *  manually.
          */
-        Widget* m_last_widget;
-        
-        void addWidgetsRecursively(PtrVector<Widget>& widgets, 
-                                   Widget* parent=NULL);
+        Widget*                  m_last_widget;
+
+                void         addWidgetsRecursively(PtrVector<Widget>& widgets, 
+                                    Widget* parent=NULL);
 
     public:
-        AbstractTopLevelContainer();
-        virtual ~AbstractTopLevelContainer() {}
-        
-        virtual int getWidth() = 0;
-        virtual int getHeight() = 0;
+                             AbstractTopLevelContainer();
+        virtual              ~AbstractTopLevelContainer() {}
+       
+        virtual int          getWidth() = 0;
+        virtual int          getHeight() = 0;
         
         /** \return an object by name, or NULL if not found */
-        Widget* getWidget(const char* name);
+                Widget*      getWidget(const char* name);
         
         /** \return an object by irrlicht ID, or NULL if not found */
-        Widget* getWidget(const int id);
+                Widget*      getWidget(const int id);
         
-        /** \return an object by name, casted to specified type, or NULL if
+        /** This function searches and returns a widget by name, cast as specified type,
+		 *  if that widget is found and the type is correct.
+		 *  \param name The name of the widget to find
+		 *  \return an object by name, casted to specified type, or NULL if
          *  not found/wrong type */
-        template <typename T> T* getWidget(const char* name)
+        template <typename T>
+		        T*           getWidget(const char* name)
         {
             Widget* out = getWidget(name);
             T* outCasted = dynamic_cast<T*>( out );
@@ -89,17 +95,17 @@ namespace GUIEngine
             return outCasted;
         }
         
-        static Widget* getWidget(const char* name, 
-                                 PtrVector<Widget>* within_vector);
-        static Widget* getWidget(const int id,
-                                 PtrVector<Widget>* within_vector);
+        static  Widget*      getWidget(const char* name, 
+                                       PtrVector<Widget>* within_vector);
+        static  Widget*      getWidget(const int id,
+                                       PtrVector<Widget>* within_vector);
       
-        Widget* getFirstWidget(PtrVector<Widget>* within_vector=NULL);
-        Widget* getLastWidget(PtrVector<Widget>* within_vector=NULL);
+                Widget*      getFirstWidget(PtrVector<Widget>* within_vector=NULL);
+                Widget*      getLastWidget(PtrVector<Widget>* within_vector=NULL);
+
+                void         elementsWereDeleted(PtrVector<Widget>* within_vector = NULL);
         
-        void elementsWereDeleted(PtrVector<Widget>* within_vector = NULL);
-        
-        bool isMyChild(Widget* widget) const;
+                bool         isMyChild(Widget* widget) const;
     };   // AbstractTopLevelContainer
     
 }   // namespace GUIEngine

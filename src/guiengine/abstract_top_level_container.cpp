@@ -22,18 +22,20 @@
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "utils/ptr_vector.hpp"
+
 #include <iostream>
 
 #include <IGUIElement.h>
 
 using namespace GUIEngine;
 
-using namespace irr;
 using namespace core;
+using namespace gui;
+using namespace io;
+using namespace irr;
 using namespace scene;
 using namespace video;
-using namespace io;
-using namespace gui;
+
 
 AbstractTopLevelContainer::AbstractTopLevelContainer()
 {
@@ -41,6 +43,12 @@ AbstractTopLevelContainer::AbstractTopLevelContainer()
     m_last_widget = NULL;
 }
 
+// ----------------------------------------------------------------------------
+
+/** This function adds a list of widgets recursively, effectively creating the hierarchy
+ *  of widgets.
+ *  \param widgets The vector of widgets to add
+ *  \param parent The parent widget of the vector of widgets */
 void AbstractTopLevelContainer::addWidgetsRecursively(
                                                     PtrVector<Widget>& widgets,
                                                     Widget* parent)
@@ -81,12 +89,16 @@ void AbstractTopLevelContainer::addWidgetsRecursively(
             widgets[n].add();
         }
         
-    } // next widget
+    } // for n in all widgets
     
 }   // addWidgetsRecursively
 
 // ----------------------------------------------------------------------------
 
+/** This function checks recursively if a widget is a child of a vector of widgets
+ *  \param within The vector of widgets that may contain the widget
+ *  \param widget The widget that needs to be checked if it is in within
+ *  \return True if the widget is in within, false otherwise */
 bool isMyChildHelperFunc(const PtrVector<Widget>* within, const Widget* widget)
 {
     if (within->size() == 0) return false;
@@ -108,13 +120,21 @@ bool isMyChildHelperFunc(const PtrVector<Widget>* within, const Widget* widget)
     return false;
 }
 
+// ----------------------------------------------------------------------------
+
+/** This function checks if a widget is a child of the container.
+ *  \param widget The widget that needs to be checked if it is a child
+ *  \return True if the widget is a child, false otherwise */
 bool AbstractTopLevelContainer::isMyChild(Widget* widget) const
 {
     return isMyChildHelperFunc(&m_widgets, widget);
 }
 
+// ----------------------------------------------------------------------------
 
-
+/** This function returns a widget by name if that widget is found.
+ *  \param name The name of the widget to find
+ *  \return The result of the search, or NULL if the object is not found */
 Widget* AbstractTopLevelContainer::getWidget(const char* name)
 {
     return getWidget(name, &m_widgets);
@@ -122,6 +142,9 @@ Widget* AbstractTopLevelContainer::getWidget(const char* name)
 
 // -----------------------------------------------------------------------------
 
+/** This function returns a widget by irrlicht ID if that widget is found.
+ *  \param id The irrlicht ID of the widget to find
+ *  \return The result of the search, or NULL if the object is not found */
 Widget* AbstractTopLevelContainer::getWidget(const int id)
 {
     return getWidget(id, &m_widgets);
@@ -129,6 +152,10 @@ Widget* AbstractTopLevelContainer::getWidget(const int id)
 
 // -----------------------------------------------------------------------------
 
+/** This function returns a widget by name if that widget is found in within_vector.
+ *  \param name The name of the widget to find
+ *  \param within_vector The vector of widgets to look in
+ *  \return The result of the search, or NULL if the object is not found */
 Widget* AbstractTopLevelContainer::getWidget(const char* name, 
                                              PtrVector<Widget>* within_vector)
 {
@@ -145,13 +172,17 @@ Widget* AbstractTopLevelContainer::getWidget(const char* name,
             Widget* el = getWidget(name, &(widget.m_children));
             if(el != NULL) return el;
         }
-    } // next
+    } // for n in all widgets
     
     return NULL;
 }   // getWidget
 
 // -----------------------------------------------------------------------------
 
+/** This function returns a widget by irrlicht ID if that widget is found.
+ *  \param id The irrlicht ID of the widget to find
+ *  \param within_vector The vector to look into
+ *  \return The result of the search, or NULL if the object is not found */
 Widget* AbstractTopLevelContainer::getWidget(const int id, 
                                              PtrVector<Widget>* within_vector)
 {
@@ -173,13 +204,16 @@ Widget* AbstractTopLevelContainer::getWidget(const int id,
             Widget* el = getWidget(id, &(widget.m_children));
             if(el != NULL) return el;
         }
-    } // next
+    } // for n in all widgets
     
     return NULL;
 }   // getWidget
 
 // -----------------------------------------------------------------------------
 
+/** This function returns the first widget found in within_vector.
+ *  \param within_vector The vector to look into
+ *  \return The result of the search, or NULL if the object is not found */
 Widget* AbstractTopLevelContainer::getFirstWidget(
                                               PtrVector<Widget>* within_vector)
 {
@@ -211,12 +245,15 @@ Widget* AbstractTopLevelContainer::getFirstWidget(
         }
         
         return item;
-    }
+    } // for i in all widgets of within_vector
     return NULL;
 }   // getFirstWidget
 
 // -----------------------------------------------------------------------------
 
+/** This function returns the last widget found in within_vector.
+ *  \param within_vector The vector to look into
+ *  \return The result of the search, or NULL if the object is not found */
 Widget* AbstractTopLevelContainer::getLastWidget(
                                               PtrVector<Widget>* within_vector)
 {
@@ -248,15 +285,16 @@ Widget* AbstractTopLevelContainer::getLastWidget(
         }
         
         return item;
-    }
+    }  // for i in all widgets of within_vector
     return NULL;
 }   // getLastWidget
 
 // ----------------------------------------------------------------------------
 
-/**
- * Called when screen is removed. This means all irrlicht widgets this object has pointers
- * to are now gone. Set all references to NULL to avoid problems.
+/** This function is called when screen is removed. This means all irrlicht 
+ *   widgets this object has pointers to are now gone. All references are set
+ *   to NULL to avoid problems.
+ *   \param within_vector The vector of widgets to clear
  */
 void AbstractTopLevelContainer::elementsWereDeleted(PtrVector<Widget>* within_vector)
 {
