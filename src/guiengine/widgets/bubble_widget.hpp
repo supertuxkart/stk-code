@@ -52,6 +52,9 @@ namespace GUIEngine
         /** For the skin to create the zooming effect */
         float m_zoom;
         
+        /** Will add/replace text in the bubble. If it doesn't fit, the text will get shrinked. **/
+        void replaceText();
+
     public:
         
         LEAK_CHECK()
@@ -63,6 +66,10 @@ namespace GUIEngine
         virtual EventPropagation focused(const int playerID);
         
         void updateSize();
+
+        void setText(const irr::core::stringw &s);
+
+
     };
 
 }

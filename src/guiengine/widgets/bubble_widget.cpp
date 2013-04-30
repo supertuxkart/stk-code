@@ -44,14 +44,7 @@ void BubbleWidget::add()
 {    
     m_shrinked_size = rect<s32>(m_x, m_y, m_x + m_w - BUBBLE_MARGIN_ON_RIGHT, m_y + m_h);
     stringw message = getText();
-    
-    EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
-    if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
-    else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
-    else if (translations->isRTLLanguage())             align = EGUIA_LOWERRIGHT;
-    
-    EGUI_ALIGNMENT valign = EGUIA_CENTER ; //TODO: make label v-align configurable through XML file?
-    
+
     m_shrinked_size.LowerRightCorner.Y -= BOTTOM_MARGIN;
     
     IGUIStaticText* irrwidget;
@@ -64,6 +57,30 @@ void BubbleWidget::add()
     irrwidget->setRightToLeft( translations->isRTLLanguage() );
 #endif
     
+
+    m_element = irrwidget;
+    replaceText();
+    m_id = m_element->getID();
+
+    m_element->setTabOrder(m_id);
+    m_element->setTabStop(true);
+
+    m_element->setNotClipped(true);
+    irrwidget->setDrawBorder(true);
+}
+
+void BubbleWidget::replaceText()
+{
+    IGUIStaticText* irrwidget = (IGUIStaticText*) m_element;
+    stringw message = getText();
+
+    EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
+    if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
+    else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
+    else if (translations->isRTLLanguage())             align = EGUIA_LOWERRIGHT;
+
+    EGUI_ALIGNMENT valign = EGUIA_CENTER ; //TODO: make label v-align configurable through XML file?
+
     // find expanded bubble size
     int text_height = irrwidget->getTextHeight();
 
@@ -96,17 +113,16 @@ void BubbleWidget::add()
         }
     }
     m_shrinked_text = message;
-    
-    m_element = irrwidget;
     irrwidget->setTextAlignment( align, valign );
-    
-    m_id = m_element->getID();
-    
-    m_element->setTabOrder(m_id);
-    m_element->setTabStop(true);
-    
-    m_element->setNotClipped(true);
-    irrwidget->setDrawBorder(true);
+}
+
+void BubbleWidget::setText(const irr::core::stringw &s)
+{
+    Widget::setText(s);
+    //If add() has already been called (and thus m_element is set) we need to replace the text.
+    if(m_element != NULL){
+        replaceText();
+    }
 }
 
 void BubbleWidget::updateSize()

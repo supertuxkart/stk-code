@@ -83,7 +83,7 @@ void AddonsLoading::beforeAddingWidgets()
 
     
     RibbonWidget* r = getWidget<RibbonWidget>("actions");
-    
+
     if (m_addon.isInstalled())
     {
         /* only keep the button as "update" if allowed to access the net
@@ -91,7 +91,7 @@ void AddonsLoading::beforeAddingWidgets()
          */
         if (m_addon.needsUpdate() && !addons_manager->wasError()
             && UserConfigParams::m_internet_status==INetworkHttp::IPERM_ALLOWED)
-            getWidget<IconButtonWidget> ("install")->setText( _("Update") );
+            getWidget<IconButtonWidget> ("install")->setLabel( _("Update") );
         else
             r->removeChildNamed("install");
     }
@@ -227,7 +227,7 @@ GUIEngine::EventPropagation
             m_progress->setValue(0);
             m_progress->setVisible(true);
             // Change the 'back' button into a 'cancel' button.
-            m_back_button->setText(_("Cancel"));
+            m_back_button->setLabel(_("Cancel"));
             
             RibbonWidget* r = getWidget<RibbonWidget>("actions");
             r->setVisible(false);
@@ -261,7 +261,7 @@ void AddonsLoading::onUpdate(float delta)
         }
         else if(progress>=1.0f)
         {
-            m_back_button->setText(_("Back"));
+            m_back_button->setLabel(_("Back"));
             // No sense to update state text, since it all
             // happens before the GUI is refrehsed.
             doInstall();
@@ -309,7 +309,7 @@ void AddonsLoading::doInstall()
         core::stringw msg = StringUtils::insertValues(
             _("Problems installing the addon '%s'."),
             core::stringw(m_addon.getName().c_str()));
-        m_back_button->setText(msg.c_str());
+        getWidget<BubbleWidget>("description")->setText(msg.c_str());
     }
 
     if(error)
@@ -319,7 +319,7 @@ void AddonsLoading::doInstall()
         RibbonWidget* r = getWidget<RibbonWidget>("actions");
         r->setVisible(true);
         
-        m_install_button->setText(_("Try again"));
+        m_install_button->setLabel(_("Try again"));
     }
     else
     {
@@ -349,7 +349,7 @@ void AddonsLoading::doUninstall()
         core::stringw msg = StringUtils::insertValues(
                                                       _("Problems removing the addon '%s'."),
                                                       core::stringw(m_addon.getName().c_str()));
-        m_back_button->setText(msg.c_str());
+        getWidget<BubbleWidget>("description")->setText(msg.c_str());
     }
     
     if(error)
@@ -359,7 +359,7 @@ void AddonsLoading::doUninstall()
         RibbonWidget* r = getWidget<RibbonWidget>("actions");
         r->setVisible(true);
         
-        m_install_button->setText(_("Try again"));
+        m_install_button->setLabel(_("Try again"));
     }
     else
     {
