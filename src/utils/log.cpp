@@ -192,7 +192,7 @@ void Log::openOutputFiles(const std::string &logout)
     if (!m_file_stdout)
     {
         Log::error("main", "Can not open log file '%s'. Writing to "
-                           "stdout instead.", logout);
+                           "stdout instead.", logout.c_str());
     }
     else
     {
