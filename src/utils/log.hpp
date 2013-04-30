@@ -21,6 +21,8 @@
 #define HEADER_LOG_HPP
 
 #include <stdarg.h>
+#include <stdio.h>
+#include <string>
 
 #ifdef __GNUC__
 #  define VALIST __gnuc_va_list
@@ -48,12 +50,15 @@ private:
     /** If set this will disable coloring of log messages. */
     static bool     m_no_colors;
 
+    /** The file where stdout output will be written */
+    static FILE* m_file_stdout;
+
     static void setTerminalColor(LogLevel level);
     static void resetTerminalColor();
 
 public:
 
-    static void printMessage(int level, const char *component, 
+    static void printMessage(int level, const char *component,
                              const char *format, VALIST va_list);
     // ------------------------------------------------------------------------
     /** A simple macro to define the various log functions. */
@@ -73,9 +78,13 @@ public:
     LOG(error,   LL_ERROR);
     LOG(fatal,   LL_FATAL);
 
+    static void openOutputFiles(const std::string &logout);
+
+    static void closeOutputFiles();
+
     // ------------------------------------------------------------------------
     /** Defines the minimum log level to be displayed. */
-    static void setLogLevel(int n) 
+    static void setLogLevel(int n)
     {
         if(n<0 || n>LL_FATAL)
         {

@@ -411,9 +411,9 @@ void cmdLineHelp (char* invocation)
     //"       --port=n           Port number to use.\n"
     //"       --numclients=n     Number of clients to wait for (server "
     //                          "only).\n"
-    "       --log=terminal     Write messages to screen.\n"
-    "       --log=file         Write messages/warning to log files "
-                              "stdout.log/stderr.log.\n"
+    "       --no-console       Does not write messages in the console but to\n"
+    "                          stdout.log/stderr.log.\n"
+    "       --console          Write messages in the console and files\n"
     "  -h,  --help             Show this help.\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
@@ -480,19 +480,19 @@ int handleCmdLinePreliminary(int argc, char **argv)
                 UserConfigParams::m_xmas_enabled = false;
             }
         }
-        else if( !strcmp(argv[i], "--log=terminal"))
+        else if( !strcmp(argv[i], "--no-console"))
         {
-            UserConfigParams::m_log_errors=false;
+            UserConfigParams::m_log_errors_to_console=false;
         }
-        else if( !strcmp(argv[i], "--log=file"))
+        else if( !strcmp(argv[i], "--console"))
         {
-            UserConfigParams::m_log_errors=true;
-        } 
+            UserConfigParams::m_log_errors_to_console=true;
+        }
         else if( !strcmp(argv[i], "--log=nocolor"))
         {
             Log::disableColor();
             Log::verbose("main", "Colours disabled.\n");
-        } 
+        }
         else if(sscanf(argv[i], "--log=%d",&n)==1)
         {
             Log::setLogLevel(n);
@@ -1040,11 +1040,11 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--debug=misc"   )                       ) {}
         else if( !strcmp(argv[i], "--debug=all"    )                       ) {}
         else if ( sscanf(argv[i], "--xmas=%d", &n) )                         {}
-        else if( !strcmp(argv[i], "--log=terminal" )                       ) {}
         else if( !strcmp(argv[i], "--log=nocolor"  )                       ) {}
-        else if( !strcmp(argv[i], "--log=file"     )                       ) {}
         else if(  sscanf(argv[i], "--log=%d",&n    )==1                    ) {}
-        else if( !strcmp(argv[i], "--screensize") || 
+        else if( !strcmp(argv[i], "--no-console"   )                       ) {}
+        else if( !strcmp(argv[i], "--console"      )                       ) {}
+        else if( !strcmp(argv[i], "--screensize") ||
                  !strcmp(argv[i], "-s")            )                     {i++;}
         else if( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}
         else if( !strcmp(argv[i], "--windowed")   || !strcmp(argv[i], "-w")) {}
@@ -1216,8 +1216,9 @@ void cleanSuperTuxKart()
     if(stk_config)              delete stk_config;
 
 #ifndef WIN32
-    if (user_config && UserConfigParams::m_log_errors) //close logfiles
+    if (user_config) //close logfiles
     {
+        Log::closeOutputFiles();
 #endif
         fclose(stderr);
         fclose(stdout);
@@ -1262,34 +1263,31 @@ static bool checkXmasTime()
 int main(int argc, char *argv[] )
 {
 #ifdef BREAKPAD
-    google_breakpad::ExceptionHandler eh(L"C:\\Temp", NULL, ShowDumpResults, 
+    google_breakpad::ExceptionHandler eh(L"C:\\Temp", NULL, ShowDumpResults,
                                          NULL, google_breakpad::ExceptionHandler::HANDLER_ALL);
 #endif
     srand(( unsigned ) time( 0 ));
-    
+
     try {
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
         // not have) other managers initialised:
         initUserConfig(argv); // argv passed so config file can be
                               // found more reliably
-        
+
         UserConfigParams::m_xmas_enabled = checkXmasTime();
-        
+
         handleCmdLinePreliminary(argc, argv);
 
         initRest();
 
         // Windows 32 always redirects output
 #ifndef WIN32
-        if (UserConfigParams::m_log_errors)
-        {
-            file_manager->redirectOutput();
-        }
+        file_manager->redirectOutput();
 #endif
 
         input_manager = new InputManager ();
-        
+
 #ifdef ENABLE_WIIUSE
         wiimote_manager = new WiimoteManager();
 #endif

@@ -832,16 +832,7 @@ void FileManager::redirectOutput()
     Log::verbose("main", "Error messages and other text output will "
                          "be logged to %s and %s.", logoutfile.c_str(),
                  logerrfile.c_str());
-    if(freopen (logoutfile.c_str(),"w",stdout)!=stdout)
-    {
-        Log::error("main", "Can not open log file '%s'. Writing to "
-                           "stdout instead.", logoutfile.c_str());
-    }
-    if(freopen (logerrfile.c_str(),"w",stderr)!=stderr)
-    {
-        Log::error("main", "Can not open log file '%s'. Writing to "
-                           "stderr instead.", logerrfile.c_str());
-    }
+    Log::openOutputFiles(logoutfile);
 }   // redirectOutput
 
 //-----------------------------------------------------------------------------

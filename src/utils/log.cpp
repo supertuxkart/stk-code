@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 
+#include <cstdio>
 #include <stdio.h>
 
 #ifdef ANDROID
@@ -32,9 +33,10 @@
 
 Log::LogLevel Log::m_min_log_level = Log::LL_VERBOSE;
 bool          Log::m_no_colors     = false;
+FILE*         Log::m_file_stdout   = NULL;
 
 // ----------------------------------------------------------------------------
-/** Selects background/foreground colors for the message depending on 
+/** Selects background/foreground colors for the message depending on
  *  log level. It is only called if messages are not redirected to a file.
  *  \param level The level for which to set the color.
  */
@@ -151,18 +153,58 @@ void Log::printMessage(int level, const char *component, const char *format,
     }
     __android_log_vprint(alp, "SuperTuxKart", format, va_list);
 #else
-    // If not logged to file, set colours
-    if(!UserConfigParams::m_log_errors)
+    // If logged to console, set colours
+    if(UserConfigParams::m_log_errors_to_console)
         setTerminalColor((LogLevel)level);
 
-    static const char *names[] = {"verbose", "debug  ", "info   ", 
+    static const char *names[] = {"verbose", "debug  ", "info   ",
                                   "warn   ", "error  ", "fatal  "};
-    printf("[%s] %s: ", names[level], component);
-    vprintf(format, va_list);
 
-    if(!UserConfigParams::m_log_errors)
+    // If we don't have a console file, write to stdout and hope for the best
+    if(!m_file_stdout ||
+        UserConfigParams::m_log_errors_to_console) // log to console & file
+    {
+        printf("[%s] %s: ", names[level], component);
+        vprintf(format, va_list); 
+        printf("\n");
+    }
+    if(m_file_stdout)
+    {
+        fprintf (m_file_stdout, "[%s] %s: ", names[level], component);
+        vfprintf(m_file_stdout, format, va_list);
+        fprintf (m_file_stdout, "\n");
+    }
+
+    if(UserConfigParams::m_log_errors_to_console)
         resetTerminalColor();
 #endif
-
-
 }   // printMessage
+
+
+// ----------------------------------------------------------------------------
+/** This function opens the files that will contain the output.
+ *  \param logout : name of the file that will contain stdout output
+ *  \param logerr : name of the file that will contain stderr output
+ */
+void Log::openOutputFiles(const std::string &logout)
+{
+    m_file_stdout = fopen(logout.c_str(), "w");
+    if (!m_file_stdout)
+    {
+        Log::error("main", "Can not open log file '%s'. Writing to "
+                           "stdout instead.", logout);
+    }
+    else
+    {
+        // Disable buffering so that messages are seen asap
+        setvbuf(m_file_stdout, NULL, _IONBF, 0);
+    }
+} // closeOutputFiles
+
+// ----------------------------------------------------------------------------
+/** Function to close output files */
+void Log::closeOutputFiles()
+{
+    fclose(m_file_stdout);
+} // closeOutputFiles
+
