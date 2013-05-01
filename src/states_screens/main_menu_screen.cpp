@@ -355,6 +355,15 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else
         {
+            const std::string default_kart = UserConfigParams::m_default_kart;
+            if (slot->isLocked(default_kart))
+            {
+                KartSelectionScreen *next = KartSelectionScreen::getInstance();
+                next->setGoToOverworldNext();
+                next->setMultiplayer(false);
+                StateManager::get()->resetAndGoToScreen(next);
+                return;
+            }
             OverWorld::enterOverWorld();
         }
     }
