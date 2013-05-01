@@ -153,10 +153,6 @@ void Log::printMessage(int level, const char *component, const char *format,
     }
     __android_log_vprint(alp, "SuperTuxKart", format, va_list);
 #else
-    // If logged to console, set colours
-    if(UserConfigParams::m_log_errors_to_console)
-        setTerminalColor((LogLevel)level);
-
     static const char *names[] = {"verbose", "debug  ", "info   ",
                                   "warn   ", "error  ", "fatal  "};
 
@@ -164,9 +160,10 @@ void Log::printMessage(int level, const char *component, const char *format,
     if(!m_file_stdout ||
         UserConfigParams::m_log_errors_to_console) // log to console & file
     {
+        setTerminalColor((LogLevel)level);
         printf("[%s] %s: ", names[level], component);
         vprintf(format, va_list); 
-        printf("\n");
+        resetTerminalColor();  // this prints a \n
     }
     if(m_file_stdout)
     {
@@ -175,8 +172,6 @@ void Log::printMessage(int level, const char *component, const char *format,
         fprintf (m_file_stdout, "\n");
     }
 
-    if(UserConfigParams::m_log_errors_to_console)
-        resetTerminalColor();
 #endif
 }   // printMessage
 
