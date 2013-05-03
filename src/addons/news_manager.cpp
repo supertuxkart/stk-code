@@ -260,8 +260,8 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
         std::vector<std::string> cond = StringUtils::split(cond_list[i],' ');
         if(cond.size()!=3)
         {
-            printf("Invalid condition '%s' - assumed to be true.\n", 
-                   cond_list[i].c_str());
+            Log::warn("NewsManager", "Invalid condition '%s' - assumed to "
+                                     "be true.", cond_list[i].c_str());
             continue;
         }
         // Check for stkversion comparisons
@@ -285,8 +285,8 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
                 if(stk_version<=news_version) return false;
                 continue;
             }
-            printf("Invalid comparison in condition '%s' - assumed true.\n",
-                   cond_list[i].c_str());
+            Log::warn("NewsManager", "Invalid comparison in condition '%s' - "
+                                     "assumed true.", cond_list[i].c_str());
         }
         // Check for addons not installed
         // ==============================
@@ -307,8 +307,8 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
         }
         else
         {
-            printf("Invalid condition '%s' - assumed to be true.\n", 
-                   cond_list[i].c_str());
+            Log::warn("NewsManager", "Invalid condition '%s' - assumed to "
+                                     "be true.", cond_list[i].c_str());
             continue;
         }
 

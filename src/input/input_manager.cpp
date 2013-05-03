@@ -702,8 +702,9 @@ EventPropagation InputManager::input(const SEvent& event)
 
             if (UserConfigParams::m_gamepad_debug)
             {
-                printf("axis motion: gamepad_id=%d axis=%d value=%d\n",
-                       event.JoystickEvent.Joystick, axis_id, value);
+                Log::info("InputManager", 
+                          "axis motion: gamepad_id=%d axis=%d value=%d",
+                          event.JoystickEvent.Joystick, axis_id, value);
             }
 
             dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, 
@@ -749,7 +750,8 @@ EventPropagation InputManager::input(const SEvent& event)
             {
                 if (UserConfigParams::m_gamepad_debug)
                 {
-                    printf("button %i, status=%i\n", i, isButtonPressed);
+                    Log::info("InputManager", "button %i, status=%i",
+                              i, isButtonPressed);
                 }
                 
                 dispatchInput(Input::IT_STICKBUTTON, 
