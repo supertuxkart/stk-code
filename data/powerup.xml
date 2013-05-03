@@ -26,6 +26,8 @@
         target-max-angle: Once the ball is aiming for its
                     target, it can at most change the angle
                     this much per second(!).
+        time-between-balls:  Reduces the frequency with which rubber 
+                    balls are found to 1 every 'timer' seconds.
         min-interpolation-distance: how far the control
                     points (which are center of squads)
                     must be from each other. A large value
@@ -61,6 +63,7 @@
         early-target-factor="1"
         target-distance="15"  target-max-angle = "90"
         min-interpolation-distance="5"
+        time-between-balls="15"
         squash-slowdown="0.5" squash-duration="2"
         delete-time="5.0"     max-height-difference="10" />
   <item name="parachute"      icon="parachute-icon.png"

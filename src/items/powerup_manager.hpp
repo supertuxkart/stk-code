@@ -112,6 +112,9 @@ private:
     /** Maximum turn angle for steering of homing powerups. */
     float         m_all_max_turn_angle[POWERUP_MAX];
 
+    /** Last time the bouncing ball was collected */
+    float         m_rubber_ball_collect_time;
+
     /** The mesh for each model (if the powerup has a model), e.g. a switch
         has none. */
     irr::scene::IMesh *m_all_meshes[POWERUP_MAX];
@@ -160,6 +163,8 @@ public:
     float         getMaxTurnAngle (int type) const {return m_all_max_turn_angle[type];}
     const btVector3& 
                   getExtend       (int type) const {return m_all_extends[type];}
+    float         getBallCollectTime() const {return m_rubber_ball_collect_time;}
+    void          setBallCollectTime(float time) {m_rubber_ball_collect_time=time;}   
 
 };
 

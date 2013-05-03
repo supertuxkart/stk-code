@@ -243,6 +243,9 @@ void World::reset()
     // Reset all data structures that depend on number of karts.
     irr_driver->reset();
 
+    //Reset the Rubber Ball Collect Time to some negative value.
+    powerup_manager->setBallCollectTime(-100);
+
 }   // reset
 
 //-----------------------------------------------------------------------------

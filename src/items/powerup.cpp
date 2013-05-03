@@ -25,6 +25,7 @@
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
+#include "items/rubber_ball.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
@@ -408,9 +409,27 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
     int position = m_owner->getPosition();
     
     unsigned int n=1;
-    PowerupManager::PowerupType new_powerup = 
-        powerup_manager->getRandomPowerup(position, &n);
+    PowerupManager::PowerupType new_powerup;
+    
+    // Check if rubber ball is the current power up held by the kart. If so, 
+    // reset the bBallCollectTime to 0 before giving new powerup.
+    if(m_type == PowerupManager::POWERUP_RUBBERBALL) 
+        powerup_manager->setBallCollectTime(0);
+    
+    // Check if two bouncing balls are collected less than getRubberBallTimer()
+    //seconds apart. If yes, then call getRandomPowerup again. If no, then break.
+    for(int i=0; i<20; i++)
+    {
+        new_powerup = powerup_manager->getRandomPowerup(position, &n);
+        if(new_powerup != PowerupManager::POWERUP_RUBBERBALL || 
+            ( World::getWorld()->getTime() - powerup_manager->getBallCollectTime()) >
+              RubberBall::getTimeBetweenRubberBalls() ) 
+            break;
+    }
 
+    if(new_powerup == PowerupManager::POWERUP_RUBBERBALL)
+        powerup_manager->setBallCollectTime(World::getWorld()->getTime()); 
+    
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).
     if(m_type == PowerupManager::POWERUP_NOTHING ||
