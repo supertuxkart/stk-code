@@ -1,9 +1,9 @@
-* bowling.ac, plunger.ac, cake.ac, bomb.ac, anchor.ac
+* plunger model, cake model, bomb model, anchor model
     created by MiniBjorn (c) 2008
     released under Creative Commons Attribution-Share Alike 3.0
     [http://creativecommons.org/licenses/by-sa/3.0/]
 
-* bubblegum.ac, nitrotank-big.ac, nitrotank-small.ac, giftbox.ac
+* bubblegum model, nitrotank-big model, nitrotank-small model, giftbox model
     created by MiniBjorn (c) 2008
     released under Creative Commons Attribution-Share Alike 3.0
     [http://creativecommons.org/licenses/by-sa/3.0/]
@@ -72,7 +72,7 @@
 * balldimpleddark
     by Hero, released under CC-BY-SA 3.0
 
-* rubber_ball-icon, plunger icon, cake icon
+* rubber_ball-icon, plunger icon, cake icon, bowling ball texture and icon
     by Totoplus62, released under CC-BY-SA 3.0
     
     
