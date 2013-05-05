@@ -279,6 +279,12 @@ void SkiddingAI::update(float dt)
                 else
                     m_kart->setPowerup(PowerupManager::POWERUP_BOWLING, 1);
             }
+            
+            // also give him some free nitro
+            if (m_kart->getPosition() > 1)
+                m_kart->setEnergy(m_kart->getEnergy() + 7);
+            else
+                m_kart->setEnergy(m_kart->getEnergy() + 4);
         }
     }
 
