@@ -1260,6 +1260,10 @@ static bool checkXmasTime()
     return (timeinfo->tm_mon == 12-1);  // Xmas mode happens in December
 }
 
+#if defined(DEBUG) && defined(WIN32) && !defined(__CYGWIN__)
+#pragma comment(linker, "/SUBSYSTEM:console")
+#endif
+
 int main(int argc, char *argv[] )
 {
 #ifdef BREAKPAD
