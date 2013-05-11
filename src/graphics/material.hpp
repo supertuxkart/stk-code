@@ -54,7 +54,9 @@ public:
                           /** Water splash effect. This is set on the seabed material. */
                           GE_WATER,
                           /** Effect where the UV texture is moved in a wave pattern */
-                          GE_BUBBLE};
+                          GE_BUBBLE,
+                          /** Effect that makes grass wave as in the wind */
+                          GE_GRASS};
 
     enum ParticleConditions
     {
@@ -81,7 +83,8 @@ private:
         WATER_SHADER,
         SPHERE_MAP,
         SHADER_COUNT,
-        SPLATTING_LIGHTMAP
+        SPLATTING_LIGHTMAP,
+        GRASS_SHADER
     };
     
     video::ITexture *m_texture;

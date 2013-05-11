@@ -168,6 +168,59 @@ public:
     }
 };
 
+//-----------------------------------------------------------------------------
+
+class GrassShaderProvider : public video::IShaderConstantSetCallBack
+{    
+    bool m_fog;
+    float m_angle;
+    
+public:
+    LEAK_CHECK()
+    
+    void enableFog(bool enable)
+    {
+        m_fog = enable;
+    }
+    
+    
+    GrassShaderProvider()
+    {
+        m_fog = false;
+        m_angle = 0.0f;
+    }
+    
+    virtual void OnSetConstants(irr::video::IMaterialRendererServices *services,
+                                s32 userData)
+    {
+        m_angle += GUIEngine::getLatestDt()*0.4f;
+        if (m_angle > M_PI*2) m_angle -= M_PI*2;
+        services->setVertexShaderConstant("angle", &m_angle, 1);
+        
+        int fog = (m_fog ? 1 : 0);
+        services->setVertexShaderConstant("fog", &fog, 1);
+        
+        s32 tex = 0;
+        services->setVertexShaderConstant("tex", &tex, 1);
+        
+        if (m_fog)
+        {
+            Track* t = World::getWorld()->getTrack();
+            
+            float fogStart = t->getFogStart();
+            services->setPixelShaderConstant("fogFrom", &fogStart, 1);
+            
+            float fogEnd = t->getFogEnd();
+            services->setPixelShaderConstant("fogTo", &fogEnd, 1);
+            
+            video::SColor fogColor = t->getFogColor();
+            float fogColorVec[] = {fogColor.getRed()/255.0f,
+                                   fogColor.getGreen()/255.0f,
+                                   fogColor.getBlue()/255.0f, 1.0f};
+            services->setVertexShaderConstant("fogColor", fogColorVec, 4);
+        }
+    }
+};
 
 //-----------------------------------------------------------------------------
 
@@ -474,6 +527,10 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     else if (s == "bubble")
     {
         m_graphical_effect = GE_BUBBLE;
+    }
+    else if (s == "grass")
+    {
+        m_graphical_effect = GE_GRASS;
     }
     else if (s == "none")
     {
@@ -1220,6 +1277,36 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                         (file_manager->getShaderDir() + pixel_shader ).c_str(),
                         "main", video::EPST_PS_2_0,
                         m_shaders[WATER_SHADER],
+                        video::EMT_TRANSPARENT_ALPHA_CHANNEL);
+            m->MaterialType = (E_MATERIAL_TYPE)material_type;
+        }
+        modes++;
+    }
+    
+    if (m_graphical_effect == GE_GRASS)
+    {
+        IVideoDriver* video_driver = irr_driver->getVideoDriver();
+        if (UserConfigParams::m_pixel_shaders &&
+            video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
+            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
+        {
+            if (m_shaders[GRASS_SHADER] == NULL)
+            {
+                m_shaders[GRASS_SHADER] = new GrassShaderProvider();
+            }
+            
+            bool fog = World::getWorld()->getTrack()->isFogEnabled();
+            ((GrassShaderProvider*)m_shaders[GRASS_SHADER])->enableFog(fog);
+            
+            // Material and shaders
+            IGPUProgrammingServices* gpu = 
+                irr_driver->getVideoDriver()->getGPUProgrammingServices();
+            s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
+                        (file_manager->getShaderDir() + "grass.vert").c_str(),
+                        "main", video::EVST_VS_2_0,
+                        (file_manager->getShaderDir() + "grass.frag").c_str(),
+                        "main", video::EPST_PS_2_0,
+                        m_shaders[GRASS_SHADER],
                         video::EMT_TRANSPARENT_ALPHA_CHANNEL);
             m->MaterialType = (E_MATERIAL_TYPE)material_type;
         }
