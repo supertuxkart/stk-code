@@ -131,6 +131,9 @@ private:
     /** Particles to show on touch */
     std::string      m_collision_particles;
     
+    float            m_grass_speed;
+    float            m_grass_amplitude;
+    
     /** If the property should be ignored in the physics. Example would be
      *  plants that a kart can just drive through. */
     bool             m_ignore;

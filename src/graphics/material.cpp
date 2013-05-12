@@ -174,26 +174,31 @@ class GrassShaderProvider : public video::IShaderConstantSetCallBack
 {    
     bool m_fog;
     float m_angle;
+    float m_amplitude;
+    float m_speed;
     
 public:
     LEAK_CHECK()
+    
+        
+    GrassShaderProvider(float amplitude, float speed)
+    {
+        m_fog = false;
+        m_angle = 0.0f;
+        m_amplitude = amplitude;
+        m_speed = speed;
+    }
+    
     
     void enableFog(bool enable)
     {
         m_fog = enable;
     }
     
-    
-    GrassShaderProvider()
-    {
-        m_fog = false;
-        m_angle = 0.0f;
-    }
-    
     virtual void OnSetConstants(irr::video::IMaterialRendererServices *services,
                                 s32 userData)
     {
-        m_angle += GUIEngine::getLatestDt()*0.4f;
+        m_angle += GUIEngine::getLatestDt()*m_speed;
         if (m_angle > M_PI*2) m_angle -= M_PI*2;
         services->setVertexShaderConstant("angle", &m_angle, 1);
         
@@ -202,6 +207,8 @@ public:
         
         s32 tex = 0;
         services->setVertexShaderConstant("tex", &tex, 1);
+        
+        services->setVertexShaderConstant("amplitude", &m_amplitude, 1);
         
         if (m_fog)
         {
@@ -531,6 +538,10 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     else if (s == "grass")
     {
         m_graphical_effect = GE_GRASS;
+        m_grass_speed = 0.4f;
+        m_grass_amplitude = 0.25f;
+        node->get("grass-speed", &m_grass_speed);
+        node->get("grass-amplitude", &m_grass_amplitude);
     }
     else if (s == "none")
     {
@@ -1292,7 +1303,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         {
             if (m_shaders[GRASS_SHADER] == NULL)
             {
-                m_shaders[GRASS_SHADER] = new GrassShaderProvider();
+                m_shaders[GRASS_SHADER] = new GrassShaderProvider(m_grass_speed, m_grass_amplitude);
             }
             
             bool fog = World::getWorld()->getTrack()->isFogEnabled();
