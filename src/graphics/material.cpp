@@ -1321,7 +1321,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             bool fog = World::getWorld()->getTrack()->isFogEnabled();
             ((GrassShaderProvider*)m_shaders[GRASS_SHADER])->enableFog(fog);
 
-            grass_shaders_times[grass_shaders_times_index] = 0.0f;
+            grass_shaders_times[grass_shaders_times_index] = (rand() % 500)/500.0f * M_PI * 2.0f;
 
             // Material and shaders
             IGPUProgrammingServices* gpu = 
