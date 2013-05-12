@@ -170,6 +170,11 @@ public:
 
 //-----------------------------------------------------------------------------
 
+// FIXME: refactor this hack to get per-instance properties, and apply the
+//        clean fix to all shaders why we're at it......
+std::map<int, float> grass_shaders_times;
+int grass_shaders_times_index = 0;
+
 class GrassShaderProvider : public video::IShaderConstantSetCallBack
 {    
     bool m_fog;
@@ -195,12 +200,19 @@ public:
         m_fog = enable;
     }
     
-    virtual void OnSetConstants(irr::video::IMaterialRendererServices *services,
-                                s32 userData)
+    void update(float dt)
     {
         m_angle += GUIEngine::getLatestDt()*m_speed;
         if (m_angle > M_PI*2) m_angle -= M_PI*2;
-        services->setVertexShaderConstant("angle", &m_angle, 1);
+    }
+    
+    virtual void OnSetConstants(irr::video::IMaterialRendererServices *services,
+                                s32 userData)
+    {
+        grass_shaders_times[userData] += GUIEngine::getLatestDt()*m_speed;
+        if (grass_shaders_times[userData] > M_PI*2) grass_shaders_times[userData] -= M_PI*2;
+        
+        services->setVertexShaderConstant("angle", &grass_shaders_times[userData], 1);
         
         int fog = (m_fog ? 1 : 0);
         services->setVertexShaderConstant("fog", &fog, 1);
@@ -538,7 +550,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     else if (s == "grass")
     {
         m_graphical_effect = GE_GRASS;
-        m_grass_speed = 0.4f;
+        m_grass_speed = 1.5f;
         m_grass_amplitude = 0.25f;
         node->get("grass-speed", &m_grass_speed);
         node->get("grass-amplitude", &m_grass_amplitude);
@@ -1303,12 +1315,14 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         {
             if (m_shaders[GRASS_SHADER] == NULL)
             {
-                m_shaders[GRASS_SHADER] = new GrassShaderProvider(m_grass_speed, m_grass_amplitude);
+                m_shaders[GRASS_SHADER] = new GrassShaderProvider(m_grass_amplitude, m_grass_speed);
             }
             
             bool fog = World::getWorld()->getTrack()->isFogEnabled();
             ((GrassShaderProvider*)m_shaders[GRASS_SHADER])->enableFog(fog);
-            
+
+            grass_shaders_times[grass_shaders_times_index] = 0.0f;
+
             // Material and shaders
             IGPUProgrammingServices* gpu = 
                 irr_driver->getVideoDriver()->getGPUProgrammingServices();
@@ -1318,8 +1332,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                         (file_manager->getShaderDir() + "grass.frag").c_str(),
                         "main", video::EPST_PS_2_0,
                         m_shaders[GRASS_SHADER],
-                        video::EMT_TRANSPARENT_ALPHA_CHANNEL);
+                        video::EMT_TRANSPARENT_ALPHA_CHANNEL,
+                        grass_shaders_times_index);
             m->MaterialType = (E_MATERIAL_TYPE)material_type;
+            
+            grass_shaders_times_index++;
         }
         modes++;
     }
