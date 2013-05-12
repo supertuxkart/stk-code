@@ -20,6 +20,7 @@
 #include "modes/world.hpp"
 
 #include "LinearMath/btQuaternion.h"
+#include "utils/log.hpp"
 
 GhostKart::GhostKart(const std::string& ident)
              : Kart(ident, /*world kart id*/99999, 
@@ -78,7 +79,7 @@ void GhostKart::update(float dt)
     while(m_next_event < m_replay_events.size() &&
           m_replay_events[m_next_event].m_time <= t)
     {
-        printf("Handling event %d\n", m_next_event);
+        Log::debug("Ghost_Kart", "Handling event %d", m_next_event);
         // Handle the next event now
         m_next_event++;
     }

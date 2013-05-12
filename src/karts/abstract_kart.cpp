@@ -24,6 +24,7 @@
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "utils/log.hpp"
 
 /** Creates a kart. 
  *  \param ident The identifier of the kart.
@@ -104,12 +105,13 @@ void AbstractKart::setKartAnimation(AbstractKartAnimation *ka)
 #ifdef DEBUG
     if( ( (ka!=NULL) ^ (m_kart_animation!=NULL) ) ==0)
     {
-        if(ka) printf("Setting kart animation to '%s'.\n", 
-                      ka->getName().c_str());
-        else   printf("Setting kart animation to NULL.\n");
-        if(m_kart_animation) printf("Current kart animation is '%s'.\n", 
-                                   m_kart_animation->getName().c_str());
-        else                 printf("Current kart animation is NULL.\n");
+        if(ka) Log::debug("Abstract_Kart", "Setting kart animation to '%s'.", 
+                          ka->getName().c_str());
+        else   Log::debug("Abstract_Kart", "Setting kart animation to NULL.");
+        if(m_kart_animation) Log::info("Abstract_Kart", "Current kart"
+                                       "animation is '%s'.\n",
+                                        m_kart_animation->getName().c_str());
+        else   Log::debug("Abstract_Kart", "Current kart animation is NULL.");
     }
 #endif
     // Make sure that the either the current animation is NULL and a new (!=0)

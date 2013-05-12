@@ -31,6 +31,7 @@
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
 KartPropertiesManager *kart_properties_manager=0;
@@ -209,9 +210,9 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
     if (kart_properties->getVersion() < stk_config->m_min_kart_version ||
         kart_properties->getVersion() > stk_config->m_max_kart_version)
     {
-        fprintf(stderr, "[KartPropertiesManager] Warning: kart '%s' is not "
-                        "supported by this binary, ignored.\n",
-                kart_properties->getIdent().c_str());
+        Log::warn("Kart_Properties_Manager", "Warning: kart '%s' is not "
+                  "supported by this binary, ignored.",
+                  kart_properties->getIdent().c_str());
         delete kart_properties;
         return false;
     }
@@ -302,9 +303,9 @@ void KartPropertiesManager::setUnavailableKarts(std::vector<std::string> karts)
         {
             m_kart_available[i] = false;
             
-            fprintf(stderr,
-                    "Kart '%s' not available on all clients, disabled.\n",
-                    m_karts_properties[i].getIdent().c_str());
+            Log::error("Kart_Properties_Manager",
+                       "Kart '%s' not available on all clients, disabled.",
+                       m_karts_properties[i].getIdent().c_str());
         }   // kart not in list
     }   // for i in m_kart_properties
     

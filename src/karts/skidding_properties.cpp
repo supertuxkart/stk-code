@@ -19,6 +19,7 @@
 #include "karts/skidding_properties.hpp"
 
 #include "io/xml_node.hpp"
+#include "utils/log.hpp"
 
 #include <string.h>
 
@@ -73,9 +74,10 @@ void SkiddingProperties::load(const XMLNode *skid_node)
 // ----------------------------------------------------------------------------
 void SkiddingProperties::checkAllSet(const std::string &filename) const
 {
-#define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                         \
-        fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
-                strA,filename.c_str());exit(-1);                       \
+#define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                            \
+        Log::error("Skidding_Properties", "Missing default value for '%s'"\
+                   "in '%s'.",                                            \
+                   strA,filename.c_str());exit(-1);                       \
     }
     CHECK_NEG(m_skid_increase,           "skid increase"                 );
     CHECK_NEG(m_skid_decrease,           "skid decrease"                 );
@@ -92,30 +94,32 @@ void SkiddingProperties::checkAllSet(const std::string &filename) const
     CHECK_NEG(m_min_skid_speed,          "skid min-speed"                );
 
     if(m_skid_time_till_bonus.size()==0)
-        fprintf(stderr, "Warning: no skid time declared, can be ignored.\n");
+        Log::error("Skidding_Properties", "Warning: no skid time declared,"
+                   "can be ignored.");
     if(m_skid_time_till_bonus.size()!=m_skid_bonus_speed.size())
     {
-        fprintf(stderr, "Warning: skid time-till-bonus and bonus-speed\n");
-        fprintf(stderr, "         must have same number of elements.\n");
+        Log::error("Skidding_Properties", "Warning: skid time-till-bonus"
+                   "and bonus-speed\n must have same number of elements.");
         exit(-1);
     }
     if(m_skid_time_till_bonus.size()!=m_skid_bonus_time.size())
     {
-        fprintf(stderr, "Warning: skid time-till-bonus and bonus-time must\n");
-        fprintf(stderr, "         have same number of elements.\n");
+        Log::error("Skidding_Properties", "Warning: skid time-till-bonus"
+                   "and bonus-time must\n have same number of elements.");
         exit(-1);
     }
     if(m_skid_time_till_bonus.size()!=m_skid_bonus_force.size())
     {
-        fprintf(stderr, "Warning: skid time-till-bonus and bonus-force must\n");
-        fprintf(stderr, "         have same number of elements.\n");
+        Log::error("Skidding_Properties", "Warning: skid time-till-bonus"
+                   "and bonus-force must\n have same number of elements.");
         exit(-1);
     }
     for(unsigned int i=0; i<m_skid_time_till_bonus.size()-1; i++)
     {
         if(m_skid_time_till_bonus[i]>=m_skid_time_till_bonus[i+1])
         {
-            fprintf(stderr, "Warning: skid time-till-bonus not sorted.\n");
+            Log::error("Skidding_Properties", "Warning: skid time-till-bonus"
+                       "not sorted.");
             exit(-1);
         }
     }   // for i

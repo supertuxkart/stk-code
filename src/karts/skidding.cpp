@@ -29,6 +29,7 @@
 #include "modes/world.hpp"
 #include "physics/btKart.hpp"
 #include "tracks/track.hpp"
+#include "utils/log.hpp"
 
 /** Constructor of the skidding object.
  */
@@ -320,7 +321,7 @@ void Skidding::update(float dt, bool is_on_ground,
                 Vec3 xyz(real_x, 0.2f, sqrt(r*r-(r-x)*(r-x))*(1.0f+SPEED/150.0f)
                           *(1+(angle/m_kart->getKartProperties()->getMaxSteerAngle(SPEED)-0.6f)*0.1f));
                 Vec3 xyz1=m_kart->getTrans()(xyz);
-                printf("predict %f %f %f speed %f angle %f\n", 
+                Log::debug("Skidding", "predict %f %f %f speed %f angle %f", 
                     xyz1.getX(), xyz1.getY(), xyz1.getZ(),
                     m_kart->getSpeed(), angle);
                 m_predicted_curve->addPoint(xyz);
@@ -344,7 +345,7 @@ void Skidding::update(float dt, bool is_on_ground,
             }
 
             m_actual_curve->addPoint(m_kart->getXYZ());
-            printf("actual %f %f %f turn %f speed %f angle %f\n",
+            Log::debug("Skidding", "actual %f %f %f turn %f speed %f angle %f",
                 m_kart->getXYZ().getX(),m_kart->getXYZ().getY(),m_kart->getXYZ().getZ(),
                 m_real_steering, m_kart->getSpeed(), 
                 m_kart->getKartProperties()->getMaxSteerAngle(m_kart->getSpeed()));

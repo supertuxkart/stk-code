@@ -32,6 +32,7 @@
 #include "karts/kart_properties.hpp"
 #include "physics/btKart.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 
 #define SKELETON_DEBUG 0
 
@@ -353,8 +354,9 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     m_mesh                 = irr_driver->getAnimatedMesh(full_path);
     if(!m_mesh)
     {
-        printf("Problems loading mesh '%s' - kart '%s' will not be available\n",
-               full_path.c_str(), kart_properties.getIdent().c_str());
+        Log::error("Kart_Model", "Problems loading mesh '%s' - kart '%s' will"
+                   "not be available.",
+                   full_path.c_str(), kart_properties.getIdent().c_str());
         return false;
     }
     m_mesh->grab();
@@ -419,9 +421,10 @@ void KartModel::loadWheelInfo(const XMLNode &node,
         // stk_config file is read (which has no model information).
         if(m_model_filename!="")
         {
-            fprintf(stderr, "Missing wheel information '%s' for model '%s'.\n",
-                wheel_name.c_str(), m_model_filename.c_str());
-            fprintf(stderr, "This can be ignored, but the wheels will not rotate.\n");
+            Log::error("Kart_Model", "Missing wheel information '%s' for model"
+                       "'%s'.", wheel_name.c_str(), m_model_filename.c_str());
+            Log::error("Kart_Model", "This can be ignored, but the wheels will"
+                       "not rotate.");
         }
         return;
     }
@@ -548,7 +551,7 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
     if(m_current_animation==AF_DEFAULT ||
         m_animation_frame[m_current_animation]<=-1)
     {
-        printf("OnAnimationEnd for '%s': current %d frame %d\n",
+        Log::debug("Kart_Model", "OnAnimationEnd for '%s': current %d frame %d",
                m_model_filename.c_str(),
                m_current_animation, m_animation_frame[m_current_animation]);
         assert(false);
