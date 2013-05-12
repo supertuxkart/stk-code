@@ -706,10 +706,7 @@ void Material::init(unsigned int index)
     m_alpha_to_coverage         = false;
     m_splatting                 = false;
     
-    for (int n=0; n<SHADER_COUNT; n++)
-    {
-        m_shaders[n] = NULL;
-    }
+    m_shaders.resize(SHADER_COUNT, NULL);
     
     for (int n=0; n<EMIT_KINDS_COUNT; n++)
     {
@@ -768,9 +765,9 @@ Material::~Material()
             irr_driver->removeTexture(m_texture);
     }
     
-    for (int n=0; n<SHADER_COUNT; n++)
+    for (unsigned int n=0; n<m_shaders.size(); n++)
     {
-        if (m_shaders[n] != NULL)
+        if (m_shaders[n])
         {
             m_shaders[n]->drop();
         }
@@ -994,9 +991,9 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
             video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
         {
-            if (m_shaders[SPHERE_MAP] == NULL)
+            if (m_shaders[SHADER_SPHERE_MAP] == NULL)
             {
-                m_shaders[SPHERE_MAP] = new SphereMapProvider();
+                m_shaders[SHADER_SPHERE_MAP] = new SphereMapProvider();
             }
             // Material and shaders
             IGPUProgrammingServices* gpu = 
@@ -1006,7 +1003,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                      "main", video::EVST_VS_2_0,
                      (file_manager->getShaderDir() + "spheremap.frag").c_str(),
                      "main", video::EPST_PS_2_0,
-                     m_shaders[SPHERE_MAP], video::EMT_SOLID_2_LAYER );
+                     m_shaders[SHADER_SPHERE_MAP], video::EMT_SOLID_2_LAYER );
             m->MaterialType = (E_MATERIAL_TYPE)material_type;
         }
         else
@@ -1092,16 +1089,17 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             
             if (with_lightmap)
             {
-                if (m_shaders[NORMAL_MAP_WITH_LIGHTMAP] == NULL)
+                if (m_shaders[SHADER_NORMAL_MAP_WITH_LIGHTMAP] == NULL)
                 {
-                    m_shaders[NORMAL_MAP_WITH_LIGHTMAP] = new NormalMapProvider(true);
+                    m_shaders[SHADER_NORMAL_MAP_WITH_LIGHTMAP] = 
+                                                   new NormalMapProvider(true);
                 }
             }
             else
             {
-                if (m_shaders[NORMAL_MAP] == NULL)
+                if (m_shaders[SHADER_NORMAL_MAP] == NULL)
                 {
-                    m_shaders[NORMAL_MAP] = new NormalMapProvider(false);
+                    m_shaders[SHADER_NORMAL_MAP] = new NormalMapProvider(false);
                 }
             }
             
@@ -1116,8 +1114,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                         "main", video::EVST_VS_2_0,
                         (file_manager->getShaderDir() + pixel_shader).c_str(), 
                         "main", video::EPST_PS_2_0,
-                        m_shaders[with_lightmap ? NORMAL_MAP_WITH_LIGHTMAP 
-                                                : NORMAL_MAP],
+                        m_shaders[with_lightmap ? SHADER_NORMAL_MAP_WITH_LIGHTMAP
+                                                : SHADER_NORMAL_MAP],
                         video::EMT_SOLID_2_LAYER );
             m->MaterialType = (E_MATERIAL_TYPE)material_type;
             m->Lighting = false;
@@ -1177,16 +1175,17 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             
             if (m_splatting_lightmap.size() > 0)
             {
-                if (m_shaders[SPLATTING_LIGHTMAP] == NULL)
+                if (m_shaders[SHADER_SPLATTING_LIGHTMAP] == NULL)
                 {
-                    m_shaders[SPLATTING_LIGHTMAP] = new SplattingProvider(true);
+                    m_shaders[SHADER_SPLATTING_LIGHTMAP] = 
+                                          new SplattingProvider(true);
                 }
             }
             else
             {
-                if (m_shaders[SPLATTING] == NULL)
+                if (m_shaders[SHADER_SPLATTING] == NULL)
                 {
-                    m_shaders[SPLATTING] = new SplattingProvider(false);
+                    m_shaders[SHADER_SPLATTING] = new SplattingProvider(false);
                 }
             }
 
@@ -1198,21 +1197,26 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             if (m_splatting_lightmap.size() > 0)
             {
                 s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                            (file_manager->getShaderDir() + "splatting_lightmap.vert").c_str(),
+                            (file_manager->getShaderDir() 
+                                + "splatting_lightmap.vert").c_str(),
                             "main",video::EVST_VS_2_0,
-                            (file_manager->getShaderDir() + "splatting_lightmap.frag").c_str(), 
+                            (file_manager->getShaderDir() 
+                                + "splatting_lightmap.frag").c_str(), 
                             "main",video::EPST_PS_2_0,
-                            m_shaders[SPLATTING_LIGHTMAP], video::EMT_SOLID );
+                            m_shaders[SHADER_SPLATTING_LIGHTMAP], 
+                            video::EMT_SOLID );
                 m->MaterialType = (E_MATERIAL_TYPE)material_type;
             }
             else
             {
                 s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                        (file_manager->getShaderDir() + "splatting.vert").c_str(),
+                        (file_manager->getShaderDir() 
+                            + "splatting.vert").c_str(),
                         "main",video::EVST_VS_2_0,
-                        (file_manager->getShaderDir() + "splatting.frag").c_str(), 
+                        (file_manager->getShaderDir() 
+                            + "splatting.frag").c_str(), 
                         "main",video::EPST_PS_2_0,
-                        m_shaders[SPLATTING], video::EMT_SOLID );
+                        m_shaders[SHADER_SPLATTING], video::EMT_SOLID );
                 m->MaterialType = (E_MATERIAL_TYPE)material_type;
             }
         }
@@ -1276,10 +1280,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
             video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
         {
-            if (m_shaders[WATER_SHADER] == NULL)
+            if (m_shaders[SHADER_WATER] == NULL)
             {
-                m_shaders[WATER_SHADER] = new WaterShaderProvider(m_water_shader_speed_1,
-                                                                  m_water_shader_speed_2);
+                m_shaders[SHADER_WATER] = 
+                    new WaterShaderProvider(m_water_shader_speed_1,
+                                            m_water_shader_speed_2);
             }
             
             m->setTexture(1, irr_driver->getTexture(file_manager->getTextureFile("waternormals.jpg")));
@@ -1289,7 +1294,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             const char* vertex_shader = (fog ? "water_fog.vert" : "water.vert");
             const char* pixel_shader  = (fog ? "water_fog.frag" : "water.frag");
             
-            ((WaterShaderProvider*)m_shaders[WATER_SHADER])->enableFog(fog);
+            ((WaterShaderProvider*)m_shaders[SHADER_WATER])->enableFog(fog);
             
             // Material and shaders
             IGPUProgrammingServices* gpu = 
@@ -1299,7 +1304,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                         "main", video::EVST_VS_2_0,
                         (file_manager->getShaderDir() + pixel_shader ).c_str(),
                         "main", video::EPST_PS_2_0,
-                        m_shaders[WATER_SHADER],
+                        m_shaders[SHADER_WATER],
                         video::EMT_TRANSPARENT_ALPHA_CHANNEL);
             m->MaterialType = (E_MATERIAL_TYPE)material_type;
         }
@@ -1313,13 +1318,14 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
             video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
         {
-            if (m_shaders[GRASS_SHADER] == NULL)
+            if (m_shaders[SHADER_GRASS] == NULL)
             {
-                m_shaders[GRASS_SHADER] = new GrassShaderProvider(m_grass_amplitude, m_grass_speed);
+                m_shaders[SHADER_GRASS] = 
+                    new GrassShaderProvider(m_grass_amplitude, m_grass_speed);
             }
             
             bool fog = World::getWorld()->getTrack()->isFogEnabled();
-            ((GrassShaderProvider*)m_shaders[GRASS_SHADER])->enableFog(fog);
+            ((GrassShaderProvider*)m_shaders[SHADER_GRASS])->enableFog(fog);
 
             grass_shaders_times[grass_shaders_times_index] = (rand() % 500)/500.0f * M_PI * 2.0f;
 
@@ -1331,7 +1337,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                         "main", video::EVST_VS_2_0,
                         (file_manager->getShaderDir() + "grass.frag").c_str(),
                         "main", video::EPST_PS_2_0,
-                        m_shaders[GRASS_SHADER],
+                        m_shaders[SHADER_GRASS],
                         video::EMT_TRANSPARENT_ALPHA_CHANNEL,
                         grass_shaders_times_index);
             m->MaterialType = (E_MATERIAL_TYPE)material_type;

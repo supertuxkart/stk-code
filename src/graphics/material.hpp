@@ -21,8 +21,9 @@
 
 #include "utils/no_copy.hpp"
 
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
 
 #include <IShaderConstantSetCallBack.h>
 
@@ -77,14 +78,14 @@ private:
     
     enum Shaders
     {
-        NORMAL_MAP,
-        NORMAL_MAP_WITH_LIGHTMAP,
-        SPLATTING,
-        WATER_SHADER,
-        SPHERE_MAP,
-        SHADER_COUNT,
-        SPLATTING_LIGHTMAP,
-        GRASS_SHADER
+        SHADER_NORMAL_MAP,
+        SHADER_NORMAL_MAP_WITH_LIGHTMAP,
+        SHADER_SPLATTING,
+        SHADER_WATER,
+        SHADER_SPHERE_MAP,
+        SHADER_SPLATTING_LIGHTMAP,
+        SHADER_GRASS,
+        SHADER_COUNT
     };
     
     video::ITexture *m_texture;
@@ -231,7 +232,7 @@ private:
     
     std::string      m_splatting_lightmap;
     
-    irr::video::IShaderConstantSetCallBack* m_shaders[SHADER_COUNT];
+    std::vector<irr::video::IShaderConstantSetCallBack*> m_shaders;
 
     /** Only used if bubble effect is enabled */
     std::map<scene::IMeshBuffer*, BubbleEffectProvider*> m_bubble_provider;
