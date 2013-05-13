@@ -358,12 +358,6 @@ void PlayerController::update(float dt)
         return;
     }
 
-    if (m_controls->m_fire && !m_kart->getKartAnimation())
-    {
-        if (m_kart->getPowerup()->getType()==PowerupManager::POWERUP_NOTHING) 
-            m_kart->beep();
-    }
-
     // look backward when the player requests or
     // if automatic reverse camera is active
     if (m_camera->getMode() != Camera::CM_FINAL)

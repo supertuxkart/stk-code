@@ -379,7 +379,12 @@ void Powerup::use()
         break;
 
     case PowerupManager::POWERUP_NOTHING:
-    default :              break ;
+        {
+            if(!m_owner->getKartAnimation())
+                m_owner->beep();
+        }
+        break;
+    default : break;
     }
 
     if ( m_number <= 0 )
