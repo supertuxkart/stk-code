@@ -56,7 +56,8 @@ public:
                           GE_BUBBLE,
                           /** Effect that makes grass wave as in the wind */
                           GE_GRASS,
-                          GE_WATER_SHADER};
+                          GE_WATER_SHADER,
+                          GE_SPHERE_MAP};
 
     enum ParticleConditions
     {
@@ -157,7 +158,6 @@ private:
     unsigned int     m_clamp_tex;
     
     bool             m_lighting;
-    bool             m_sphere_map;
     bool             m_smooth_reflection_shader;
     bool             m_alpha_testing;
     bool             m_alpha_blending;
@@ -259,7 +259,7 @@ public:
     bool  isIgnore           () const { return m_ignore;             }
     /** Returns true if this material is a zipper. */
     bool  isZipper           () const { return m_zipper;             }
-    bool  isSphereMap        () const { return m_sphere_map;         }
+    bool  isSphereMap        () const { return m_graphical_effect == GE_SPHERE_MAP; }
     /** Returns if this material should trigger a rescue if a kart
      *  is driving on it. */
     bool  isDriveReset       () const { return m_drive_reset;        }

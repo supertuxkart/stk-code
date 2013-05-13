@@ -433,7 +433,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
                s.c_str());
     node->get("alpha",            &m_alpha_blending    );
     node->get("light",            &m_lighting          );
-    node->get("sphere",           &m_sphere_map        );
+
     node->get("smooth-reflection",&m_smooth_reflection_shader);
     node->get("high-adhesion",    &m_high_tire_adhesion);
     node->get("reset",            &m_drive_reset       );
@@ -564,6 +564,10 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         node->get("water-shader-speed-1", &m_water_shader_speed_1);
         node->get("water-shader-speed-2", &m_water_shader_speed_2);
     }
+    else if (s == "spheremap")
+    {
+        m_graphical_effect = GE_SPHERE_MAP;
+    }
     else if (s == "none")
     {
     }
@@ -577,6 +581,15 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     {
         m_graphical_effect = GE_NONE;
     }
+    
+        
+    bool sphere_map = false;
+    node->get("sphere",           &sphere_map          );
+    if (sphere_map)
+    {
+        m_graphical_effect = GE_SPHERE_MAP;
+    }
+    
     
     if (node->get("compositing", &s))
     {
@@ -682,7 +695,6 @@ void Material::init(unsigned int index)
     m_alpha_blending            = false;
     m_lighting                  = true;
     m_backface_culling          = true;
-    m_sphere_map                = false;
     m_smooth_reflection_shader  = false;
     m_high_tire_adhesion        = false;
     m_below_surface             = false;
@@ -1034,7 +1046,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             }
         }
     }
-    if (m_sphere_map) 
+    if (m_graphical_effect == GE_SPHERE_MAP) 
     {
         m->MaterialType = video::EMT_SPHERE_MAP;
 
