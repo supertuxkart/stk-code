@@ -52,12 +52,11 @@ class Material : public NoCopy
 {
 public:
     enum GraphicalEffect {GE_NONE,
-                          /** Water splash effect. This is set on the seabed material. */
-                          GE_WATER,
                           /** Effect where the UV texture is moved in a wave pattern */
                           GE_BUBBLE,
                           /** Effect that makes grass wave as in the wind */
-                          GE_GRASS};
+                          GE_GRASS,
+                          GE_WATER_SHADER};
 
     enum ParticleConditions
     {
@@ -101,6 +100,8 @@ private:
      *  up to find the position of the actual water surface. */
     bool             m_below_surface;
 
+    bool             m_water_splash;
+
     /** If a kart is falling over a material with this flag set, it
      *  will trigger the special camera fall effect. */
     bool             m_falling_effect;
@@ -115,15 +116,13 @@ private:
     /** If a kart is rescued when driving on this surface. */
     bool             m_drive_reset;
     
-    /** If the water shader (simulating wave effects and reflexions) is enabled */
-    bool             m_water_shader;
     
     /** Speed of the 'main' wave in the water shader. Only used if
-        m_water_shader is true */
+        m_graphical_effect == WATER_SHADER */
     float            m_water_shader_speed_1;
     
     /** Speed of the 'secondary' waves in the water shader. Only used if
-     m_water_shader is true */
+        m_graphical_effect == WATER_SHADER */
     float            m_water_shader_speed_2;
     
     /** If a kart is rescued when crashing into this surface. */

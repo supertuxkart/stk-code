@@ -479,7 +479,9 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     node->get("disable-z-write",  &m_disable_z_write   );
     node->get("fog",              &m_fog               );
     
-    node->get("mask",             &m_mask);
+    node->get("mask",             &m_mask              );
+    
+    node->get("water-splash",     &m_water_splash      );
     
     if (m_collision_reaction != NORMAL)
     {
@@ -541,7 +543,8 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     
     if (s == "water")
     {
-        m_graphical_effect = GE_WATER;
+        // For backwards compatibility only, eventually remove
+        m_water_splash = true;
     }
     else if (s == "bubble")
     {
@@ -554,6 +557,12 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         m_grass_amplitude = 0.25f;
         node->get("grass-speed", &m_grass_speed);
         node->get("grass-amplitude", &m_grass_amplitude);
+    }
+    else if (s == "water_shader")
+    {
+        m_graphical_effect = GE_WATER_SHADER;
+        node->get("water-shader-speed-1", &m_water_shader_speed_1);
+        node->get("water-shader-speed-2", &m_water_shader_speed_2);
     }
     else if (s == "none")
     {
@@ -591,9 +600,12 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         node->get("splatting-lightmap", &m_splatting_lightmap);
     }
     
-    node->get("water-shader", &m_water_shader);
-    if (m_water_shader)
+    bool water_shader = false;
+    node->get("water-shader", &water_shader);
+    if (water_shader)
     {
+        // BACKWARDS COMPATIBILITY, eventually remove
+        m_graphical_effect = GE_WATER_SHADER;
         node->get("water-shader-speed-1", &m_water_shader_speed_1);
         node->get("water-shader-speed-2", &m_water_shader_speed_2);
     }
@@ -681,7 +693,6 @@ void Material::init(unsigned int index)
     m_collision_reaction        = NORMAL;
     m_add                       = false;
     m_disable_z_write           = false;
-    m_water_shader              = false;
     m_water_shader_speed_1      = 6.6667f;
     m_water_shader_speed_2      = 4.0f;
     m_fog                       = true;
@@ -705,6 +716,7 @@ void Material::init(unsigned int index)
     m_is_heightmap              = false;
     m_alpha_to_coverage         = false;
     m_splatting                 = false;
+    m_water_splash              = false;
     
     m_shaders.resize(SHADER_COUNT, NULL);
     
@@ -1273,7 +1285,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     }
     
     
-    if (m_water_shader)
+    if (m_graphical_effect == GE_WATER_SHADER)
     {
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (UserConfigParams::m_pixel_shaders &&
@@ -1344,7 +1356,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             
             grass_shaders_times_index++;
         }
-        modes++;
     }
     
     if (modes > 1)
