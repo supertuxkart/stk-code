@@ -57,7 +57,8 @@ public:
                           /** Effect that makes grass wave as in the wind */
                           GE_GRASS,
                           GE_WATER_SHADER,
-                          GE_SPHERE_MAP};
+                          GE_SPHERE_MAP,
+                          GE_SPLATTING};
 
     enum ParticleConditions
     {
@@ -213,9 +214,6 @@ private:
     float            m_zipper_engine_force;
 
     std::string      m_mask;
-    
-    /** Whether to use splatting */
-    bool             m_splatting;
     
     /** If m_splatting is true, indicates the first splatting texture */
     std::string      m_splatting_texture_1;

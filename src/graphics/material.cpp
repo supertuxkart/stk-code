@@ -568,6 +568,15 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     {
         m_graphical_effect = GE_SPHERE_MAP;
     }
+    else if (s == "splatting")
+    {
+        m_graphical_effect = GE_SPLATTING;
+        node->get("splatting-texture-1", &m_splatting_texture_1);
+        node->get("splatting-texture-2", &m_splatting_texture_2);
+        node->get("splatting-texture-3", &m_splatting_texture_3);
+        node->get("splatting-texture-4", &m_splatting_texture_4);
+        node->get("splatting-lightmap", &m_splatting_lightmap);
+    }
     else if (s == "none")
     {
     }
@@ -603,15 +612,6 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
                     s.c_str());
     }
     
-    node->get("splatting", &m_splatting);
-    if (m_splatting)
-    {
-        node->get("splatting-texture-1", &m_splatting_texture_1);
-        node->get("splatting-texture-2", &m_splatting_texture_2);
-        node->get("splatting-texture-3", &m_splatting_texture_3);
-        node->get("splatting-texture-4", &m_splatting_texture_4);
-        node->get("splatting-lightmap", &m_splatting_lightmap);
-    }
     
     bool water_shader = false;
     node->get("water-shader", &water_shader);
@@ -727,7 +727,6 @@ void Material::init(unsigned int index)
     m_parallax_map              = false;
     m_is_heightmap              = false;
     m_alpha_to_coverage         = false;
-    m_splatting                 = false;
     m_water_splash              = false;
     
     m_shaders.resize(SHADER_COUNT, NULL);
@@ -1166,7 +1165,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->SpecularColor.set(0,0,0,0);
         modes++;
     }
-    if (m_splatting)
+    if (m_graphical_effect == GE_SPLATTING)
     {
         if (irr_driver->supportsSplatting())
         {
