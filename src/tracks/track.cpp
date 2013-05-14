@@ -1406,30 +1406,24 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
                                                    upwards_distance);
     }
     
-    unsigned int main_track_count = m_all_nodes.size();
     unsigned int start_position_counter = 0;
 
     // we need to check for fog before loading the main track model
-    for(unsigned int i=0; i<root->getNumNodes(); i++)
+    if(const XMLNode *node = root->getNode("sun"))
     {
-        const XMLNode *node = root->getNode(i);
-        const std::string name = node->getName();
-        
-        if(name=="sun")
-        {
-            node->get("xyz",           &m_sun_position );
-            node->get("ambient",       &m_default_ambient_color);
-            node->get("sun-specular",  &m_sun_specular_color);
-            node->get("sun-diffuse",   &m_sun_diffuse_color);
-            node->get("fog",           &m_use_fog);
-            node->get("fog-color",     &m_fog_color);
-            node->get("fog-density",   &m_fog_density);
-            node->get("fog-start",     &m_fog_start);
-            node->get("fog-end",       &m_fog_end);
-        }
+        node->get("xyz",           &m_sun_position );
+        node->get("ambient",       &m_default_ambient_color);
+        node->get("sun-specular",  &m_sun_specular_color);
+        node->get("sun-diffuse",   &m_sun_diffuse_color);
+        node->get("fog",           &m_use_fog);
+        node->get("fog-color",     &m_fog_color);
+        node->get("fog-density",   &m_fog_density);
+        node->get("fog-start",     &m_fog_start);
+        node->get("fog-end",       &m_fog_end);
     }
     
     loadMainTrack(*root);
+    unsigned int main_track_count = m_all_nodes.size();
     
     LodNodeLoader lod_loader;
     
