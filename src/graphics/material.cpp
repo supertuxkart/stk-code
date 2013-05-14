@@ -494,49 +494,6 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         }
     }
     
-    bool use_normal_map = false;
-    node->get("use-normal-map",  &use_normal_map);
-    
-    if (use_normal_map)
-    {
-        if (node->get("normal-map",  &m_normal_map_tex))
-        {
-            m_normal_map = true;
-        }
-        else
-        {
-            fprintf(stderr, "[Material] WARNING: could not find normal map image in materials.xml\n");
-        }
-        
-        node->get("normal-light-map", &m_normal_map_shader_lightmap);
-        
-        // not supported by irrlicht
-        //m_normal_map_uv2 = false;
-        //node->get("normal-map-uv2",  &m_normal_map_uv2);
-
-        
-        // TODO: add support for parallax maps?
-        /*
-        else if (node->get("normal-heightmap",  &m_normal_map_tex))
-        {
-            m_is_heightmap = true;
-            m_normal_map = true;
-        }
-        else if (node->get("parallax-map",  &m_normal_map_tex))
-        {
-            m_parallax_map = true;
-            m_parallax_height = 0.2f;
-            node->get("parallax-height", &m_parallax_height);
-        }
-        else if (node->get("parallax-heightmap",  &m_normal_map_tex))
-        {
-            m_is_heightmap = true;
-            m_parallax_map = true;
-            m_parallax_height = 0.2f;
-            node->get("parallax-height", &m_parallax_height);
-        }
-         */
-    }
     
     s="";
     node->get("graphical-effect", &s);
@@ -563,6 +520,34 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         m_graphical_effect = GE_WATER_SHADER;
         node->get("water-shader-speed-1", &m_water_shader_speed_1);
         node->get("water-shader-speed-2", &m_water_shader_speed_2);
+    }
+    else if (s == "normal_map")
+    {
+        m_graphical_effect = GE_NORMAL_MAP;
+        node->get("normal-map",  &m_normal_map_tex);
+        node->get("normal-light-map", &m_normal_map_shader_lightmap);
+        
+        // TODO: add support for parallax and height maps?
+        /*
+        else if (node->get("normal-heightmap",  &m_normal_map_tex))
+        {
+            m_is_heightmap = true;
+            m_normal_map = true;
+        }
+        else if (node->get("parallax-map",  &m_normal_map_tex))
+        {
+            m_parallax_map = true;
+            m_parallax_height = 0.2f;
+            node->get("parallax-height", &m_parallax_height);
+        }
+        else if (node->get("parallax-heightmap",  &m_normal_map_tex))
+        {
+            m_is_heightmap = true;
+            m_parallax_map = true;
+            m_parallax_height = 0.2f;
+            node->get("parallax-height", &m_parallax_height);
+        }
+         */
     }
     else if (s == "spheremap")
     {
@@ -591,7 +576,27 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         m_graphical_effect = GE_NONE;
     }
     
+    
+    // BACKWARDS COMPATIBILITY, remove eventually
+    bool use_normal_map = false;
+    node->get("use-normal-map",  &use_normal_map);
+    
+    if (use_normal_map)
+    {
+        if (node->get("normal-map",  &m_normal_map_tex))
+        {
+            m_graphical_effect = GE_NORMAL_MAP;
+        }
+        else
+        {
+            fprintf(stderr, "[Material] WARNING: could not find normal map image in materials.xml\n");
+        }
         
+        node->get("normal-light-map", &m_normal_map_shader_lightmap);
+    }
+    
+    
+    // BACKWARDS COMPATIBILITY, remove eventually
     bool sphere_map = false;
     node->get("sphere",           &sphere_map          );
     if (sphere_map)
@@ -722,8 +727,6 @@ void Material::init(unsigned int index)
     m_zipper_max_speed_increase = -1.0f;
     m_zipper_speed_gain         = -1.0f;
     m_zipper_engine_force       = -1.0f;
-    m_normal_map                = false;
-    //m_normal_map_uv2            = false;
     m_parallax_map              = false;
     m_is_heightmap              = false;
     m_alpha_to_coverage         = false;
@@ -1087,7 +1090,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                                                       video::EAS_VERTEX_COLOR);
         modes++;
     }
-    if (m_normal_map)
+    if (m_graphical_effect == GE_NORMAL_MAP)
     {
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (UserConfigParams::m_pixel_shaders &&

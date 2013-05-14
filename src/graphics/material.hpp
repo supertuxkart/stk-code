@@ -58,7 +58,8 @@ public:
                           GE_GRASS,
                           GE_WATER_SHADER,
                           GE_SPHERE_MAP,
-                          GE_SPLATTING};
+                          GE_SPLATTING,
+                          GE_NORMAL_MAP};
 
     enum ParticleConditions
     {
@@ -146,7 +147,6 @@ private:
     ParticleKind*    m_particles_effects[EMIT_KINDS_COUNT];
     
     /** For normal maps */
-    bool             m_normal_map;
     std::string      m_normal_map_tex;
     std::string      m_normal_map_shader_lightmap;
     
@@ -335,7 +335,7 @@ public:
         *zipper_engine_force       = m_zipper_engine_force;
     }   // getZipperParameter
 
-    bool isNormalMap() const { return m_normal_map; }
+    bool isNormalMap() const { return m_graphical_effect == GE_NORMAL_MAP; }
     
     void onMadeVisible(scene::IMeshBuffer* who);
     void onHidden(scene::IMeshBuffer* who);
