@@ -376,6 +376,17 @@ void WiimoteManager::update()
 /** Thread update method - wiimotes state is updated in another thread to avoid latency problems */
 void WiimoteManager::threadFunc()
 {
+    // Enable accelerometer reporting
+    // TODO: this should only be done when needed (i.e when racing)
+    // so as to avoid wasting wiimote batteries.
+    // TODO: this should only be done once, but there have been reports that it didn't
+    // work for some people -> need to find a better fix
+    for (int i=0; i < MAX_WIIMOTES; ++i)
+    {
+        if(m_wiimotes[i].isConnected())
+            wiiuse_motion_sensing(m_wiimotes[i].getWiimoteHandle(), 1);
+    }
+        
     while(!m_shut)
     {
         if(wiiuse_poll(m_all_wiimote_handles, MAX_WIIMOTES))
@@ -385,12 +396,6 @@ void WiimoteManager::threadFunc()
                 if(!m_wiimotes[i].isConnected())
                     continue;
                 
-                // Enable accelerometer reporting
-                // TODO: this should only be done when needed (i.e when racing)
-                // so as to avoid wasting wiimote batteries.
-                // TODO: this should only be done once, but there have been reports that it didn't
-                // work for some people -> need to find a better fix
-                wiiuse_motion_sensing(m_wiimotes[i].getWiimoteHandle(), 1);
                 /*
                 if(WIIUSE_USING_EXP(m_wiimotes[i].getWiimoteHandle()))
                 {
