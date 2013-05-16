@@ -622,6 +622,10 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_gamepad_debug=true;
         }
+        else if (!strcmp(argv[i], "--wiimote-debug"))
+        {
+            UserConfigParams::m_wiimote_debug = true;
+        }
         else if (!strcmp(argv[i], "--tutorial-debug"))
         {
             UserConfigParams::m_tutorial_debug = true;

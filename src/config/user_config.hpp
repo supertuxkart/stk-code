@@ -425,7 +425,11 @@ namespace UserConfigParams
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
     PARAM_PREFIX bool m_gamepad_debug PARAM_DEFAULT( false );
+
+    /** Wiimote debugging. */
+    PARAM_PREFIX bool m_wiimote_debug PARAM_DEFAULT( false );
     
+    /** Debug gamepads  by visualising their values. */
     PARAM_PREFIX bool m_gamepad_visualisation PARAM_DEFAULT( false );
     
     /** If material debugging (printing terrain specific slowdown) 
