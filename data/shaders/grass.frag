@@ -15,6 +15,7 @@ void main()
         if (coord.z > fogTo)
         {
             gl_FragColor = fogColor;
+            gl_FragColor.a = color.a;
         }
         else if (coord.z > fogFrom)
         {
