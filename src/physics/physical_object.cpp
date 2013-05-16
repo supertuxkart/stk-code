@@ -462,13 +462,14 @@ void PhysicalObject::init()
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
 
-    World::getWorld()->getPhysics()->addBody(m_body);
-    
     if (!m_kinetic)
     {
         m_body->setCollisionFlags( m_body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
         m_body->setActivationState(DISABLE_DEACTIVATION);
     }
+
+    World::getWorld()->getPhysics()->addBody(m_body);
+    
 }   // init
 
 // ----------------------------------------------------------------------------
