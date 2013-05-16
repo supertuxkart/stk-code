@@ -124,18 +124,19 @@ void RaceResultGUI::enableAllButtons()
     {
         // Normal race
         // -----------
-        top->setText( _("Setup New Race") );
-        top->setVisible(true);
 
         middle->setText( _("Restart") );
         middle->setVisible(true);
 
         if (race_manager->raceWasStartedFromOverworld())
         {
-            bottom->setText( _("Back to track selection") );
+            top->setVisible(false);
+            bottom->setText( _("Back to challenge selection") );
         }
         else
         {
+            top->setText( _("Setup New Race") );
+            top->setVisible(true);
             bottom->setText( _("Back to the menu") );
         }
         bottom->setVisible(true);
