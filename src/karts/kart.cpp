@@ -1070,6 +1070,16 @@ void Kart::update(float dt)
     
     updatePhysics(dt);
 
+    if(m_controls.m_fire && !m_kart_animation)
+    {
+        // use() needs to be called even if there currently is no collecteable
+        // since use() can test if something needs to be switched on/off.
+        m_powerup->use() ;
+        World::getWorld()->onFirePressed(getController());
+    }
+    // Reset the fire button
+    m_controls.m_fire = 0;
+
     /* (TODO: add back when properly done)
     for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
     {
@@ -1192,19 +1202,6 @@ void Kart::update(float dt)
         m_shadow_enabled = true;
     }
 }   // update
-
-//-----------------------------------------------------------------------------
-void Kart::onFirePressed()
-{
-        // On a client fiering is done upon receiving the command from the server.
-    if (network_manager->getMode()!=NetworkManager::NW_CLIENT
-        && !getKartAnimation())
-    {
-        // use() needs to be called even if there currently is no collecteable
-        // since use() can test if something needs to be switched on/off.
-        m_powerup->use() ;
-    }
-}
 
 //-----------------------------------------------------------------------------
 /** Show fire to go with a zipper.

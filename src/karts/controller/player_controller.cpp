@@ -195,13 +195,7 @@ void PlayerController::action(PlayerAction action, int value)
         break;
     case PA_FIRE:
     {
-        bool wasFirePressed = m_controls->m_fire;
         m_controls->m_fire = (value!=0);
-        if (m_controls->m_fire && !wasFirePressed)
-        {
-            World::getWorld()->onFirePressed(this);
-            m_kart->onFirePressed();
-        }
         break;
     }
     case PA_LOOK_BACK:

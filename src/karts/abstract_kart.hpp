@@ -381,8 +381,6 @@ public:
         e.g. to calculate the starting point and direction of projectiles. */
     virtual btTransform getAlignedTransform(const float customPitch=-1) = 0;
     // -------------------------------------------------------------------------
-    virtual void onFirePressed() = 0;
-    // -------------------------------------------------------------------------
     /** Set a text that is displayed on top of a kart.
      */
     virtual void setOnScreenText(const wchar_t *text) = 0;
