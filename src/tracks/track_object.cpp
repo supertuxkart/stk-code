@@ -35,25 +35,24 @@
  * \param xml_node The xml node from which the initial data is taken. This is
  *                 for now: initial position, initial rotation, name of the
  *                 model, enable/disable status, timer information.
+ * \param lod_node Lod node (defaults to NULL).
  */
-TrackObject::TrackObject(const XMLNode &xml_node)
-{
-    init(xml_node, NULL);
-}
-
-// ----------------------------------------------------------------------------
-
 TrackObject::TrackObject(const XMLNode &xml_node, LODNode* lod_node)
 {
     init(xml_node, lod_node);
 }
 
 // ----------------------------------------------------------------------------
-
+/**
+ * \param is_dynamic Only if interaction == 'movable', i.e. the object is
+ *        affected by physics
+ * \param physics_settings If interaction != 'ghost'
+ */
 TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
                          const core::vector3df& scale, const char* interaction,
                          TrackObjectPresentation* presentation,
-                         bool kinetic, const PhysicalObject::Settings* physicsSettings)
+                         bool is_dynamic, 
+                         const PhysicalObject::Settings* physics_settings)
 {
     m_init_xyz   = xyz;
     m_init_hpr   = hpr;
@@ -66,16 +65,16 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     
     m_presentation = presentation;
     
-    if (m_interaction != "ghost" && m_interaction != "none" && physicsSettings != NULL)
+    if (m_interaction != "ghost" && m_interaction != "none" && 
+        physics_settings )
     {
-        m_rigid_body = new PhysicalObject(kinetic,
-                                          *physicsSettings,
+        m_rigid_body = new PhysicalObject(is_dynamic,
+                                          *physics_settings,
                                           this);
     }
     
     reset();
-}
-
+}   // TrackObject
 
 // ----------------------------------------------------------------------------
 
@@ -142,7 +141,8 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
         else
         {
             m_type = "mesh";
-            m_presentation = new TrackObjectPresentationMesh(xml_node, m_enabled);
+            m_presentation = new TrackObjectPresentationMesh(xml_node, 
+                                                             m_enabled);
         }
         
         if (m_interaction != "ghost" && m_interaction != "none")
@@ -161,14 +161,6 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     
     reset();
 }   // TrackObject
-
-// ----------------------------------------------------------------------------
-
-TrackObject::TrackObject()
-{
-    m_presentation = NULL;
-    m_animator = NULL;
-}   // TrackObject()
 
 // ----------------------------------------------------------------------------
 

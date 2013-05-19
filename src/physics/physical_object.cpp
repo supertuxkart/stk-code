@@ -41,7 +41,8 @@ using namespace irr;
 
 // ----------------------------------------------------------------------------
 
-PhysicalObject* PhysicalObject::fromXML(bool kinetic, const XMLNode &xml_node,
+PhysicalObject* PhysicalObject::fromXML(bool is_dynamic, 
+                                        const XMLNode &xml_node,
                                         TrackObject* object)
 {
     PhysicalObject::Settings settings;
@@ -78,12 +79,13 @@ PhysicalObject* PhysicalObject::fromXML(bool kinetic, const XMLNode &xml_node,
 
     else fprintf(stderr, "Unknown shape type : %s\n", shape.c_str());
 
-    return new PhysicalObject(kinetic, settings, object);
-}   // PhysicalObject
+    return new PhysicalObject(is_dynamic, settings, object);
+}   // fromXML
 
 // ----------------------------------------------------------------------------
 
-PhysicalObject::PhysicalObject(bool kinetic, const PhysicalObject::Settings& settings,
+PhysicalObject::PhysicalObject(bool is_dynamic, 
+                               const PhysicalObject::Settings& settings,
                                TrackObject* object)
 {
     m_shape              = NULL;
@@ -120,32 +122,10 @@ PhysicalObject::PhysicalObject(bool kinetic, const PhysicalObject::Settings& set
     Vec3 init_xyz(m_init_xyz);
     m_init_pos.setOrigin(init_xyz);
     
-    m_kinetic = kinetic;
+    m_is_dynamic = is_dynamic;
     
     init();
 }   // PhysicalObject
-
-// ----------------------------------------------------------------------------
-/*
-PhysicalObject::PhysicalObject(const std::string& model,
-                               bodyTypes shape, float mass, float radius,
-                               const core::vector3df& hpr,
-                               const core::vector3df& pos,
-                               const core::vector3df& scale)
-{
-    m_body_type = shape;
-    m_mass = mass;
-    m_radius = radius;
-    m_crash_reset  = false;
-    m_explode_kart = false;
-
-    m_init_pos.setIdentity();
-    btQuaternion q;
-    q.setEuler(hpr.Y, hpr.X, hpr.Z);
-    m_init_pos.setRotation(q);
-    m_init_pos.setOrigin(btVector3(pos.X, pos.Y, pos.Z));
-}
-*/
 
 // ----------------------------------------------------------------------------
 PhysicalObject::~PhysicalObject()
@@ -185,7 +165,7 @@ void PhysicalObject::move(const Vec3& xyz, const core::vector3df& hpr)
     Vec3 p(xyz);
     btTransform trans(q,p);
     m_motion_state->setWorldTransform(trans);
-}
+}   // move
 
 // ----------------------------------------------------------------------------
 /** Additional initialisation after loading of the model is finished.
@@ -215,7 +195,8 @@ void PhysicalObject::init()
     }
     else if (presentation->getNode()->getType()==scene::ESNT_LOD_NODE)
     {
-        scene::ISceneNode* node = ((LODNode*)presentation->getNode())->getAllNodes()[0];
+        scene::ISceneNode* node = 
+            ((LODNode*)presentation->getNode())->getAllNodes()[0];
         if (node->getType() == scene::ESNT_ANIMATED_MESH)
         {
             scene::IAnimatedMesh *mesh 
@@ -322,31 +303,27 @@ void PhysicalObject::init()
             case scene::ESNT_MESH          :
             case scene::ESNT_WATER_SURFACE :
             case scene::ESNT_OCTREE        :
-                mesh = ((scene::IMeshSceneNode*)presentation->getNode())->getMesh();
-                is_readonly_material = 
-                    ((scene::IMeshSceneNode*)presentation->getNode())->isReadOnlyMaterials();
-                break;
+                {
+                    scene::IMeshSceneNode *node = 
+                        (scene::IMeshSceneNode*)presentation->getNode();
+                    mesh = node->getMesh();
+                    is_readonly_material = node->isReadOnlyMaterials();
+                    break;
+                }
             case scene::ESNT_ANIMATED_MESH :
-                // for now just use frame 0
-                mesh = ((scene::IAnimatedMeshSceneNode*)presentation->getNode())->getMesh()->getMesh(0);
-                is_readonly_material = 
-                    ((scene::IAnimatedMeshSceneNode*)presentation->getNode())->isReadOnlyMaterials();
-                break;
+                {
+                    // for now just use frame 0
+                    scene::IAnimatedMeshSceneNode *node = 
+                      (scene::IAnimatedMeshSceneNode*)presentation->getNode();
+                    mesh = node->getMesh()->getMesh(0);
+                    is_readonly_material = node->isReadOnlyMaterials();
+                    break;
+                }
             default:
-                fprintf(stderr, "[3DAnimation] Unknown object type, cannot create exact collision body!\n");
+                Log::warn("PhysicalObject", "Unknown object type, "
+                                        "cannot create exact collision body!");
                 return;
         }   // switch node->getType()
-        
-        
-        //core::matrix4 mat;
-        //mat.setRotationDegrees(hpr);
-        //mat.setTranslation(pos);
-        //core::matrix4 mat_scale;
-        
-        // Note that we can't simply call mat.setScale, since this would
-        // overwrite the elements on the diagonal, making any rotation incorrect.
-        //mat_scale.setScale(scale);
-        //mat *= mat_scale;
         
         for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
         {
@@ -355,8 +332,9 @@ void PhysicalObject::init()
             if (mb->getVertexType() != video::EVT_STANDARD &&
                 mb->getVertexType() != video::EVT_2TCOORDS)
             {
-                fprintf(stderr, "WARNING: ThreeDAnimation::createPhysicsBody: Ignoring type '%d'!\n", 
-                        mb->getVertexType());
+                Log::warn("PhysicalObject", 
+                          "createPhysicsBody: Ignoring type '%d'!", 
+                          mb->getVertexType());
                 continue;
             }
             
@@ -374,8 +352,10 @@ void PhysicalObject::init()
             TriangleMesh *tmesh = triangle_mesh;
             if(t)
             {
-                std::string image = std::string(core::stringc(t->getName()).c_str());
-                material=material_manager->getMaterial(StringUtils::getBasename(image));
+                std::string image = 
+                              std::string(core::stringc(t->getName()).c_str());
+                material = material_manager
+                         ->getMaterial(StringUtils::getBasename(image));
                 if(material->isIgnore()) 
                     continue;
             } 
@@ -386,7 +366,8 @@ void PhysicalObject::init()
             
             if (mb->getVertexType() == video::EVT_STANDARD)
             {
-                irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
+                irr::video::S3DVertex* mbVertices =
+                                          (video::S3DVertex*)mb->getVertices();
                 for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
                 {
                     for(unsigned int k=0; k<3; k++)
@@ -407,7 +388,8 @@ void PhysicalObject::init()
             {
                 if (mb->getVertexType() == video::EVT_2TCOORDS)
                 {
-                    irr::video::S3DVertex2TCoords* mbVertices = (video::S3DVertex2TCoords*)mb->getVertices();
+                    irr::video::S3DVertex2TCoords* mbVertices = 
+                        (video::S3DVertex2TCoords*)mb->getVertices();
                     for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
                     {
                         for(unsigned int k=0; k<3; k++)
@@ -462,9 +444,10 @@ void PhysicalObject::init()
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
 
-    if (!m_kinetic)
+    if (!m_is_dynamic)
     {
-        m_body->setCollisionFlags( m_body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+        m_body->setCollisionFlags(   m_body->getCollisionFlags() 
+                                   | btCollisionObject::CF_KINEMATIC_OBJECT);
         m_body->setActivationState(DISABLE_DEACTIVATION);
     }
 
@@ -475,7 +458,7 @@ void PhysicalObject::init()
 // ----------------------------------------------------------------------------
 void PhysicalObject::update(float dt)
 {
-    if (!m_kinetic) return;
+    if (!m_is_dynamic) return;
     
     btTransform t;
     m_motion_state->getWorldTransform(t);
@@ -497,7 +480,8 @@ void PhysicalObject::update(float dt)
     //m_node->setRotation(hpr.toIrrHPR());
     
     core::vector3df scale(1,1,1);
-    m_object->move(xyz.toIrrVector(), hpr.toIrrVector()*RAD_TO_DEGREE, scale, false);
+    m_object->move(xyz.toIrrVector(), hpr.toIrrVector()*RAD_TO_DEGREE, 
+                   scale, false);
     return;
 }   // update
 

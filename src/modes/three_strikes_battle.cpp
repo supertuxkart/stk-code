@@ -346,7 +346,8 @@ void ThreeStrikesBattle::update(float dt)
             new TrackObjectPresentationMesh(tire, tire_xyz, tire_hpr, tire_scale);
         
         TrackObject* tire = new TrackObject(tire_xyz, tire_hpr, tire_scale,
-                                            "movable", tire_presentation, true /* kinetic */,
+                                            "movable", tire_presentation, 
+                                            true /* is_dynamic */,
                                             &physicsSettings);
         getTrack()->getTrackObjectManager()->insertObject(tire);
 

@@ -115,32 +115,26 @@ private:
      *  position if its height is below this value. */
     float                 m_reset_height;
     
-    bool                  m_kinetic;
+    /** If this body is a bullet dynamic body, i.e. affected by physics
+     *  or not (static (not moving) or kinematic (animated outside
+     *  of physics). */
+    bool                  m_is_dynamic;
     
     /** Non-null only if the shape is exact */
     TriangleMesh         *m_triangle_mesh;
 
 public:
-                    PhysicalObject(bool kinetic, const Settings& settings,
+                    PhysicalObject(bool is_dynamic, const Settings& settings,
                                    TrackObject* object);
     
-    static PhysicalObject* fromXML(bool kinetic, const XMLNode &node,
+    static PhysicalObject* fromXML(bool is_dynamic, const XMLNode &node,
                                    TrackObject* object);
-    
-    /*
-                 PhysicalObject(const std::string& model,
-                                bodyTypes shape, float mass, float radius,
-                                const core::vector3df& hpr,
-                                const core::vector3df& pos,
-                                const core::vector3df& scale);
-    */
-    
+
     virtual     ~PhysicalObject (); 
     virtual void reset          ();
     virtual void handleExplosion(const Vec3& pos, bool directHit);
     void         update         (float dt);
     void         init           ();
-    bool         isKinetic      () const { return m_kinetic; }
     
     // ------------------------------------------------------------------------
     /** Returns the rigid body of this physical object. */

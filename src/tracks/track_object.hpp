@@ -81,18 +81,15 @@ protected:
     void init(const XMLNode &xml_node, LODNode* lodNode);
     
 public:
-                 TrackObject(const XMLNode &xml_node);
-                 TrackObject(const XMLNode &xml_node, LODNode* lodNode);
-                 TrackObject();
+                 TrackObject(const XMLNode &xml_node, LODNode* lodNode=NULL);
                  
-                 /**
-                  * @param kinetic         Only if interaction == 'movable'
-                  * @param physicsSettings If interaction != 'ghost'
-                  */
-                 TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
-                             const core::vector3df& scale, const char* interaction,
+                 TrackObject(const core::vector3df& xyz,
+                             const core::vector3df& hpr,
+                             const core::vector3df& scale,
+                             const char* interaction,
                              TrackObjectPresentation* presentation,
-                             bool kinetic, const PhysicalObject::Settings* physicsSettings);
+                             bool is_dynamic, 
+                             const PhysicalObject::Settings* physicsSettings);
                 ~TrackObject();
     virtual void update(float dt);
     virtual void reset();
