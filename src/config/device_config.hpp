@@ -159,21 +159,28 @@ class GamepadConfig : public DeviceConfig
 {
     
 private:
-    
+    /** Number of axis this device has. */
     int         m_axis_count;
+
+    /** Number of buttons this device has. */
     int         m_button_count;
     
 public:
     
     irr::core::stringw toString     ();
-    int         getAxisCount()      const { return m_axis_count; };
-    int         getButtonCount()    const { return m_button_count; };
+
     void        serialize           (std::ofstream& stream);
     void        setDefaultBinds     ();
     GamepadConfig           (irr::io::IrrXMLReader* xml);
-    GamepadConfig           (const std::string      name,
-                             const int              axis_count,
-                             const int              btnCount);
+    GamepadConfig           (const std::string     &name,
+                             const int              axis_count=0,
+                             const int              button_ount=0);
+    // ------------------------------------------------------------------------
+    /** Sets the number of buttons this device has. */
+    void setNumberOfButtons(int count) { m_button_count = count; }
+    // ------------------------------------------------------------------------
+    /** Sets the number of axis this device has. */
+    void setNumberOfAxis(int count) { m_axis_count = count; }    
     //        ~GamepadConfig();  
 };
 

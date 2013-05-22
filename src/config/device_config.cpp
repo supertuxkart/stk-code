@@ -310,14 +310,15 @@ void GamepadConfig::setDefaultBinds ()
 
 //------------------------------------------------------------------------------
 
-GamepadConfig::GamepadConfig   ( const std::string      name,
+GamepadConfig::GamepadConfig   ( const std::string     &name,
                                  const int              axis_count,
-                                 const int              btnCount ) : DeviceConfig( DEVICE_CONFIG_TYPE_GAMEPAD )
+                                 const int              button_count ) 
+             : DeviceConfig( DEVICE_CONFIG_TYPE_GAMEPAD )
 {
-    m_name = name;
-    m_axis_count = axis_count;
-    m_button_count = btnCount;
-    m_plugged = 0;
+    m_name         = name;
+    m_axis_count   = axis_count;
+    m_button_count = button_count;
+    m_plugged      = 0;
     setDefaultBinds();
 }
 

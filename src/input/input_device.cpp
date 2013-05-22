@@ -75,7 +75,7 @@ bool KeyboardDevice::processAndMapInput(const int id,
 
 
 GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, 
-                             const int axis_count, const int btnAmount, 
+                             const int axis_count, const int button_count, 
                              GamepadConfig *configuration)
 {
     m_type                  = DT_GAMEPAD;
@@ -86,7 +86,7 @@ GamePadDevice::GamePadDevice(const int irrIndex, const std::string name,
     m_prevAxisDirections    = new Input::AxisDirection[axis_count];
     m_prevAxisValue         = new int[axis_count];
     m_axis_ok               = new bool[axis_count];
-    m_button_count          = btnAmount;
+    m_button_count          = button_count;
     m_index                 = irrIndex;
     m_name                  = name;
     

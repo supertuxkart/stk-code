@@ -1626,6 +1626,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\input\wiimote.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\input\wiimote_manager.cpp"
 					>
 				</File>
@@ -2477,6 +2481,10 @@
 				</File>
 				<File
 					RelativePath="..\..\input\input_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\wiimote.hpp"
 					>
 				</File>
 				<File

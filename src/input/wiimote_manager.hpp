@@ -21,14 +21,13 @@
 
 #ifdef ENABLE_WIIUSE
 
+#include "input/wiimote.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/cpp2011.h"
+
 #include "IEventReceiver.h"
 
 #include <pthread.h>
-
-extern const int    WIIMOTE_AXES;
-extern const int    WIIMOTE_BUTTONS;
 
 #define MAX_WIIMOTES  4
 
@@ -39,49 +38,6 @@ class WiimoteManager;
 
 extern WiimoteManager* wiimote_manager;
 
-/** Wiimote device class */
-class Wiimote
-{
-private:
-    /** Handle to the corresponding WiiUse wiimote handle */
-    wiimote_t*      m_wiimote_handle;
-    
-    /** Index of this element the arrays of wiimotes */
-    int             m_wiimote_id;
-    
-    /** Corresponding gamepad managed by the DeviceManager */
-    GamePadDevice*  m_gamepad_device;
-    
-    /** Corresponding Irrlicht gamepad event */
-    irr::SEvent     m_irr_event;
-    
-    /** Event used for reading and writing the Irrlicht events */
-    pthread_mutex_t m_event_mutex;
-    
-    /** Whether the wiimote received a "disconnected" event */
-    bool            m_connected;
-    
-public:
-    Wiimote();
-    ~Wiimote();
-
-    /** Resets internal state and creates the corresponding gamepad device */
-    void        init(wiimote_t* wiimote_handle, int wiimote_id, GamepadConfig* gamepad_config);
-    
-    /** To be called when the wiimote becomes unused */
-    void        cleanup();
-    
-    /** Called from the update thread: updates the Irrlicht event from the wiimote state */
-    void        updateIrrEvent();
-    
-    /** Thread-safe reading of the last updated event */
-    irr::SEvent getIrrEvent();
-    
-    wiimote_t*  getWiimoteHandle() const        {return m_wiimote_handle;}
-    
-    bool        isConnected() const             {return m_connected;}
-    void        setConnected(bool connected)    {m_connected=connected;}
-};
 
 /** Wiimote manager: handles wiimote connection, disconnection,
  *  gamepad configuration and input handling
@@ -89,20 +45,31 @@ public:
 class WiimoteManager
 {
 private:
-    Wiimote         m_wiimotes[MAX_WIIMOTES];
+    /** List of all connected wiimotes. */
+    std::vector<Wiimote*> m_wiimotes;
     
     /** WiiUse wiimote handles */
     wiimote_t**     m_all_wiimote_handles;
-    int             m_nb_wiimotes;
+    int             m_number_wiimotes;
     
+    // While the wiimote code can technically work without threading,
+    // its too slow (high latency), but it is useful for debugging.
+#define WIIMOTE_THREADING
+#ifdef WIIMOTE_THREADING
     /** Wiimote state update thread */
     pthread_t       m_thread;
     
     /** Shut the update thread? */
     bool            m_shut;
+#endif
 
 	/** True if wii is enabled via command line option. */
 	static bool     m_enabled;
+
+    /** Wiimotes update thread */
+    void threadFunc();
+    static void* threadFuncWrapper(void* data);
+    void            setWiimoteBindings(GamepadConfig* gamepad_config);
 
 public:
     WiimoteManager();
@@ -117,15 +84,9 @@ public:
     void launchDetection(int timeout);
     void update();
     void cleanup();
-    
-    int  getNbWiimotes() const   {return m_nb_wiimotes;}
-    
-private:
-    /** Wiimotes update thread */
-    void threadFunc();
-    static void* threadFuncWrapper(void* data);
 
-public:
+    void enableAccelerometer(bool state);
+    
 	/** A simple listener to allow the user to connect wiimotes. It
 	 *  will display a feedback windows (# wiimotes connected or 'no wiimotes
 	 *  found').
@@ -140,7 +101,11 @@ public:
 	 *  \return Number of wiimotes connected.
 	 */
 	int askUserToConnectWiimotes();
-};
+    // ------------------------------------------------------------------------
+    /** Returns the number of wiimotes connected. */
+    unsigned int  getNumberOfWiimotes() const   {return m_wiimotes.size();}
+    
+};   // class WiimoteManager
 
 
 #endif

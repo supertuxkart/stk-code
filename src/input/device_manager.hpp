@@ -56,6 +56,8 @@ private:
     PtrVector<GamePadDevice, HOLD>     m_gamepads;
     PtrVector<KeyboardConfig, HOLD>    m_keyboard_configs;
     PtrVector<GamepadConfig, HOLD>     m_gamepad_configs;
+
+    /** The list of all joysticks that were found and activated. */
     core::array<SJoystickInfo>          m_irrlicht_gamepads;
     InputDevice*                        m_latest_used_device;
     PlayerAssignMode                    m_assign_mode;

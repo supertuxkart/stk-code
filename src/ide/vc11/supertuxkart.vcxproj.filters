@@ -864,6 +864,9 @@
     <ClCompile Include="..\..\tracks\track_object_presentation.cpp">
       <Filter>Source Files\tracks</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\input\wiimote.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1654,6 +1657,9 @@
     </ClInclude>
     <ClInclude Include="..\..\tracks\track_object_presentation.hpp">
       <Filter>Header Files\tracks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\input\wiimote.hpp">
+      <Filter>Header Files\input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

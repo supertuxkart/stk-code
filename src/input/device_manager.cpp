@@ -49,7 +49,6 @@ bool DeviceManager::initialize()
     GamePadDevice *gamepadDevice = NULL;
     m_map_fire_to_select         = false;
     bool created                 = false;
-    int numGamepads;
 
 
     // Shutdown in case the device manager is being re-initialized
@@ -83,19 +82,19 @@ bool DeviceManager::initialize()
             printf("Initializing gamepad support.\n");
 
     irr_driver->getDevice()->activateJoysticks(m_irrlicht_gamepads);
-    numGamepads = m_irrlicht_gamepads.size();    
+    int num_gamepads = m_irrlicht_gamepads.size();    
     if(UserConfigParams::logMisc())
     {
         printf("Irrlicht reports %d gamepads are attached to the system.\n", 
-               numGamepads);
+               num_gamepads);
     }
 
     
     
     // Create GamePadDevice for each physical gamepad and find a GamepadConfig to match
-    for (int id = 0; id < numGamepads; id++)
+    for (int id = 0; id < num_gamepads; id++)
     {
-        core::stringc name = m_irrlicht_gamepads[id].Name.c_str();
+        core::stringc name = m_irrlicht_gamepads[id].Name;
         
         // Some linux systems report a disk accelerometer as a gamepad, skip that
         if (name.find("LIS3LV02DL") != -1) continue;
@@ -103,9 +102,9 @@ bool DeviceManager::initialize()
 #ifdef WIN32
         // On Windows, unless we use DirectInput, all gamepads are given the 
         // same name ('microsoft pc-joystick driver'). This makes configuration
-	// totally useless, so append an ID to the name. We can't test for the
-	// name, since the name is even translated.
-	name = name + " " + StringUtils::toString(id).c_str();
+        // totally useless, so append an ID to the name. We can't test for the
+        // name, since the name is even translated.
+        name = name + " " + StringUtils::toString(id).c_str();
 #endif
         
         if (UserConfigParams::logMisc())
@@ -180,10 +179,12 @@ GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
 
 // -----------------------------------------------------------------------------
 /**
- * Check if we already have a config object for gamepad 'irr_id' as reported by irrLicht
- * If no, create one. Returns true if new configuration was created, otherwise false.
+ * Check if we already have a config object for gamepad 'irr_id' as reported by
+ * irrLicht, If no, create one. Returns true if new configuration was created, 
+ *  otherwise false.
  */
-bool DeviceManager::getConfigForGamepad(const int irr_id, const core::stringc& name, GamepadConfig **config)
+bool DeviceManager::getConfigForGamepad(const int irr_id, const core::stringc& name, 
+                                        GamepadConfig **config)
 {
     bool found = false;
     bool configCreated = false;
@@ -210,9 +211,8 @@ bool DeviceManager::getConfigForGamepad(const int irr_id, const core::stringc& n
 #ifdef ENABLE_WIIUSE
         else    // Wiimotes have a higher ID and do not refer to m_irrlicht_gamepads
         {
-            *config = new GamepadConfig( name.c_str(), 
-                                         WIIMOTE_AXES, 
-                                         WIIMOTE_BUTTONS );
+            // The Wiimote manager will set number of buttons and axis
+            *config = new GamepadConfig(name.c_str());
         }
 #endif
 
@@ -430,7 +430,7 @@ InputDevice* DeviceManager::getLatestUsedDevice()
 // -----------------------------------------------------------------------------
 void DeviceManager::clearLatestUsedDevice()
 {
-	m_latest_used_device = NULL;
+    m_latest_used_device = NULL;
 }   // clearLatestUsedDevice
 
 // -----------------------------------------------------------------------------
