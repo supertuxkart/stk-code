@@ -153,7 +153,7 @@
     <Link>
       <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib;ws2_32.lib;fribidi.lib;pthreadVC2.lib;libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
-      <AdditionalLibraryDirectories>../../../dependencies/lib;../../../lib/irrlicht/lib/Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../lib/irrlicht/lib/Win32-visualstudio;../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
