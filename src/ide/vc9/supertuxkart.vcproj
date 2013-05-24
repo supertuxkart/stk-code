@@ -1334,6 +1334,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\config\saved_grand_prix.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\config\stk_config.cpp"
 					>
 				</File>
@@ -2529,6 +2533,10 @@
 				</File>
 				<File
 					RelativePath="..\..\config\player.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\config\saved_grand_prix.hpp"
 					>
 				</File>
 				<File

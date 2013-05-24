@@ -183,7 +183,8 @@ GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
  * irrLicht, If no, create one. Returns true if new configuration was created, 
  *  otherwise false.
  */
-bool DeviceManager::getConfigForGamepad(const int irr_id, const core::stringc& name, 
+bool DeviceManager::getConfigForGamepad(const int irr_id,
+                                        const core::stringc& name,
                                         GamepadConfig **config)
 {
     bool found = false;

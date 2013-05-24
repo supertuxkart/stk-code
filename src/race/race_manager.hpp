@@ -242,6 +242,8 @@ private:
 
     bool m_started_from_overworld;
 
+public:
+
     /** This data structure accumulates kart data and race result data from
      *  each race. */
     struct KartStatus
@@ -282,6 +284,7 @@ private:
                 {}
         
     };   // KartStatus
+private:
 
     /** The kart status data for each kart. */
     std::vector<KartStatus>          m_kart_status;
@@ -657,7 +660,7 @@ public:
       * \note Deletes the world.
       */
     void exitRace(bool delete_world=true);
-    
+
     /**
       * \brief Higher-level method to start a GP without having to care about
       *  the exact startup sequence

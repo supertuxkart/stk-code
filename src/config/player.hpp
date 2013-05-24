@@ -35,7 +35,10 @@ class PlayerProfile : public NoCopy
 {
 protected:
     
-    /** For saving to config file. */
+    /**
+     * For saving to config file.
+     * WARNING : m_player_group has to be declared before the other userconfigparams!
+     */
     GroupUserConfigParam  m_player_group;
     
     WStringUserConfigParam m_name;

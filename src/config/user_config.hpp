@@ -49,14 +49,16 @@ using irr::core::stringc;
 using irr::core::stringw;
 
 #include "graphics/camera.hpp"
+#include "io/xml_writer.hpp"
 #include "utils/constants.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/time.hpp"
 
+class PlayerProfile;
+class SavedGrandPrix;
 class XMLNode;
 class XMLWriter;
-class PlayerProfile;
 
 /**
  *  The base of a set of small utilities to enable quickly adding/removing 
@@ -71,6 +73,7 @@ protected:
 public:
     virtual     ~UserConfigParam();
     virtual void write(XMLWriter& stream) const = 0;
+    virtual void writeInner(XMLWriter& stream, int level = 0) const;
     virtual void findYourDataInAChildOf(const XMLNode* node) = 0;
     virtual void findYourDataInAnAttributeOf(const XMLNode* node) = 0;
     virtual irr::core::stringw toString() const = 0;
@@ -79,14 +82,22 @@ public:
 // ============================================================================
 class GroupUserConfigParam : public UserConfigParam
 {
-    std::vector<UserConfigParam*> m_children;
+    std::vector<UserConfigParam*> m_attributes;
+    std::vector<GroupUserConfigParam*> m_children;
 public:
     GroupUserConfigParam(const char* name, const char* comment=NULL);
+    GroupUserConfigParam(const char* param_name,
+                       GroupUserConfigParam* group,
+                       const char* comment = NULL);
     void write(XMLWriter& stream) const;
+    void writeInner(XMLWriter& stream, int level = 0) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
     void addChild(UserConfigParam* child);
+    void addChild(GroupUserConfigParam* child);
+    void clearChildren();
+
     irr::core::stringw toString() const;
 };   // GroupUserConfigParam
 
@@ -654,6 +665,9 @@ namespace UserConfigParams
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
     
     PARAM_PREFIX PtrVector<PlayerProfile>   m_all_players;
+
+    /** List of all saved GPs. */
+    PARAM_PREFIX PtrVector<SavedGrandPrix>   m_saved_grand_prix_list;
 
     /** Some constants to bitmask to enable various messages to be printed. */
     enum { LOG_MEMORY  = 0x0001,
