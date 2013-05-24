@@ -104,7 +104,7 @@ void QuadGraph::load(const std::string &filename)
         }
         else
         {
-            fprintf(stderr, "[QuadGraph] No node in driveline graph\n");
+            Log::error("Quad Graph", "No node in driveline graph.");
             m_lap_length = 10.0f;
         }
         
@@ -176,7 +176,7 @@ void QuadGraph::load(const std::string &filename)
         }   // edge
         else
         {
-            fprintf(stderr, "Incorrect specification in '%s': '%s' ignored\n",
+            Log::error("Quad Graph", "Incorrect specification in '%s': '%s' ignored.",
                     filename.c_str(), xml_node->getName().c_str());
             continue;
         }   // incorrect specification
@@ -777,7 +777,7 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
 {
     if(sector == UNKNOWN_SECTOR )
     {
-        fprintf(stderr, "WARNING: UNKNOWN_SECTOR in spatialToTrack().\n");
+        Log::warn("Quad Graph", "UNKNOWN_SECTOR in spatialToTrack().");
         return;
     }
 
@@ -945,7 +945,7 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
 
     if(min_sector==UNKNOWN_SECTOR )
     {
-        printf("unknown sector found.\n");
+        Log::info("Quad Grap", "unknown sector found.");
     }
     return min_sector;
 }   // findOutOfRoadSector
@@ -1032,8 +1032,8 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     
     if (texture == NULL)
     {
-        fprintf(stderr, "[QuadGraph::makeMiniMap] WARNING: RTT does not appear to work,"
-                        "mini-map will not be available\n");
+        Log::error("Quad Graph", "[makeMiniMap] WARNING: RTT does not appear to work,"
+                        "mini-map will not be available.");
     }
     
     return texture;
