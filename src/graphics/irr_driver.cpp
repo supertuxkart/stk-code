@@ -1876,6 +1876,7 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
             irr_driver->getSceneManager()->addMeshSceneNode(mesh.get(0), NULL);
         node->setPosition( mesh_location[0].toIrrVector() );
         node->setScale( mesh_scale[0].toIrrVector() );
+        node->setMaterialFlag(video::EMF_FOG_ENABLE, false);
         m_rtt_main_node = node;
     }
     else
@@ -1887,6 +1888,7 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         node->setFrameLoop(model_frames[0], model_frames[0]);
         node->setAnimationSpeed(0);
         node->setScale( mesh_scale[0].toIrrVector() );
+        node->setMaterialFlag(video::EMF_FOG_ENABLE, false);
         
         m_rtt_main_node = node;
     }
