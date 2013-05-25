@@ -59,6 +59,8 @@ supertuxkart_SOURCES = \
  challenges/unlock_manager.hpp \
  config/player.cpp \
  config/player.hpp \
+ config/saved_grand_prix.cpp \
+ config/saved_grand_prix.hpp \
  config/stk_config.cpp \
  config/stk_config.hpp \
  config/user_config.cpp \
