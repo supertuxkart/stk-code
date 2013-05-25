@@ -383,7 +383,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
         const float r1 = 0.4f;
         const float r2 = 0.65f;
-        if(state<=r1)
+        if(coin_target<=r1)
         {
             count   = 3;
             float f = coin_target/r1;
@@ -392,7 +392,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                                                 + (1.0f - 0.08f)*f*gauge_width,
                                                offset.Y,0);
                 }
-        else if(state<=r2)
+        else if(coin_target<=r2)
         {
             count   = 4;
             float f = (coin_target - r1)/(r2-r1);
