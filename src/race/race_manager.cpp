@@ -336,26 +336,27 @@ void RaceManager::startNew(bool from_overworld)
         init_gp_rank ++;
     }
 
-
-    //We look if Player 1 has a saved version of this GP.
-    SavedGrandPrix* gp = SavedGrandPrix::getSavedGP( StateManager::get()
-                                                     ->getActivePlayerProfile(0)
-                                                      ->getUniqueID(),
-                                                     m_grand_prix.getId(),
-                                                     m_difficulty,
-                                                     m_num_karts,
-                                                     m_player_karts.size());
-
-    // Start the race with the appropriate track
-    // =========================================
-    if(gp != NULL)
+    m_track_number = 0;
+    if(m_major_mode==MAJOR_MODE_GRAND_PRIX)
     {
-        m_track_number = gp->getNextTrack();
-        gp->loadKarts(m_kart_status);
-    }
-    else
-        m_track_number = 0;
+        //We look if Player 1 has a saved version of this GP.
+        // =================================================
+        SavedGrandPrix* gp = SavedGrandPrix::getSavedGP( StateManager::get()
+                                                         ->getActivePlayerProfile(0)
+                                                         ->getUniqueID(),
+                                                         m_grand_prix.getId(),
+                                                         m_difficulty,
+                                                         m_num_karts,
+                                                         m_player_karts.size());
 
+        // Start the race with the appropriate track
+        // =========================================
+        if(gp != NULL)
+        {
+            m_track_number = gp->getNextTrack();
+            gp->loadKarts(m_kart_status);
+        }
+    }
     startNextRace();
 }   // startNew
 
