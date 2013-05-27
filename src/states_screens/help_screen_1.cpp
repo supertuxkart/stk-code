@@ -19,6 +19,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/list_widget.hpp" 
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
@@ -106,7 +107,17 @@ void HelpScreen1::init()
 {
     Screen::init();
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
+	ButtonWidget* tutorial = getWidget<ButtonWidget>("startTutorial");
     
+	if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+	{
+		tutorial->setDeactivated();
+	}
+	else
+	{
+		tutorial->setActivated();
+	}
+
     if (w != NULL)  w->select( "page1", PLAYER_ID_GAME_MASTER );
 }   //init
 
