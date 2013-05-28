@@ -157,7 +157,7 @@ void Wiimote::printDebugInfo() const
         {WIIMOTE_BUTTON_HOME,   "WIIMOTE_BUTTON_HOME" },
     };   // wiimote_actions
 
-    const int count = sizeof(wiimote_actions)/sizeof(WiimoteAction);
+    const unsigned int count = sizeof(wiimote_actions)/sizeof(WiimoteAction);
     for(unsigned int i=0 ; i<count; i++)
     {
         if(IS_PRESSED(m_wiimote_handle, wiimote_actions[i].wiimote_action_id))

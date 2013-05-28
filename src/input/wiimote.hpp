@@ -78,7 +78,7 @@ public:
     // -----------------------------------------------------------------------------
     /** Returns the irrlicht id for this wiimote. The wiimote ids have a higher
     *  index than any gamepad reported by irrlicht.*/
-    int Wiimote::getIrrId() { return m_wiimote_id + WIIMOTE_START_IRR_ID; }
+    int getIrrId() { return m_wiimote_id + WIIMOTE_START_IRR_ID; }
 
 };   // class Wiimote
 
