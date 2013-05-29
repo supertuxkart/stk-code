@@ -31,6 +31,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/state_manager.hpp" 
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -56,7 +57,8 @@ AddonsLoading::AddonsLoading(const float w, const float h,
     m_progress         = getWidget<ProgressBarWidget>("progress");
     m_install_button   = getWidget<IconButtonWidget> ("install" );
     m_back_button      = getWidget<IconButtonWidget> ("back"  );
-    
+    m_back_button->setFocusForPlayer( PLAYER_ID_GAME_MASTER ); 
+
     if(m_progress)
         m_progress->setVisible(false);
     
