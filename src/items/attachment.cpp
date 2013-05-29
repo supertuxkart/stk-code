@@ -32,6 +32,7 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
+#include "modes/world.hpp" 
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
 #include "utils/constants.hpp"
@@ -317,7 +318,8 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
         }
         else  // only this kart has a bomb, move it to the other
         {
-            if(getPreviousOwner()!=other)
+            // if there are only two karts, let them switch bomb from one to other
+            if (getPreviousOwner() != other || World::getWorld()->getNumKarts() <= 2)
             {
                 // Don't move if this bomb was from other kart originally
                 other->getAttachment()->set(ATTACH_BOMB,
@@ -330,7 +332,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
         }
     }   // type==BOMB
     else if(attachment_other->getType()==Attachment::ATTACH_BOMB &&
-            attachment_other->getPreviousOwner()!=m_kart)
+            (attachment_other->getPreviousOwner()!=m_kart || World::getWorld()->getNumKarts() <= 2))
     {
         set(ATTACH_BOMB, other->getAttachment()->getTimeLeft()+
                          stk_config->m_bomb_time_increase, other);
