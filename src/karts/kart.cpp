@@ -1352,10 +1352,11 @@ void Kart::handleMaterialGFX()
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
             Camera *camera = Camera::getCamera(i);
+            if(camera->getKart()!=this) continue;
 
             if (material && material->hasFallingEffect() && !m_flying)
             {
-                Camera::getCamera(i)->setMode(Camera::CM_FALLING);
+                camera->setMode(Camera::CM_FALLING);
             }
             else if (camera->getMode() != Camera::CM_NORMAL &&
                      camera->getMode() != Camera::CM_REVERSE)
