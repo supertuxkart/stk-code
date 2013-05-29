@@ -53,9 +53,9 @@ KartPropertiesManager::~KartPropertiesManager()
 
 //-----------------------------------------------------------------------------
 /** Adds a directory from which karts are loaded. The kart manager checks if
- *  either this directory itself contains a kart, and if any subdirectory 
+ *  either this directory itself contains a kart, and if any subdirectory
  *  contains a kart.
- *  \param dir The directory to add. 
+ *  \param dir The directory to add.
  */
 void KartPropertiesManager::addKartSearchDir(const std::string &s)
 {
@@ -75,7 +75,7 @@ void KartPropertiesManager::unloadAllKarts()
 
 //-----------------------------------------------------------------------------
 /** Reloads all karts, i.e. reloads the meshes and textures. This is used
- *  when changing the screen resolution. 
+ *  when changing the screen resolution.
  */
 void KartPropertiesManager::reLoadAllKarts()
 {
@@ -108,7 +108,7 @@ void KartPropertiesManager::removeKart(const std::string &ident)
     for (unsigned int i=0; i<groups.size(); i++)
     {
         std::vector<int> ::iterator it;
-        it = std::find(m_groups_2_indices[groups[i]].begin(), 
+        it = std::find(m_groups_2_indices[groups[i]].begin(),
                        m_groups_2_indices[groups[i]].end(),   index);
         // Since we are iterating over all groups the kart belongs to,
         // there must be an entry found
@@ -121,7 +121,7 @@ void KartPropertiesManager::removeKart(const std::string &ident)
         {
             m_groups_2_indices.erase(groups[i]);
             std::vector<std::string>::iterator its;
-            its = std::find(m_all_groups.begin(), m_all_groups.end(), 
+            its = std::find(m_all_groups.begin(), m_all_groups.end(),
                             groups[i]);
             assert(its!=m_all_groups.end());
             m_all_groups.erase(its);
@@ -129,11 +129,11 @@ void KartPropertiesManager::removeKart(const std::string &ident)
     }   // for i in all groups the kart belongs to
 
 
-    // Adjust the indices of all kart properties in the 'group name to 
+    // Adjust the indices of all kart properties in the 'group name to
     // kart property index' mapping: all kart properties with an index
     // greater than index were moved one position further to the beginning
     std::map<std::string, std::vector<int> >::iterator it_gr;
-    for(it_gr=m_groups_2_indices.begin(); it_gr != m_groups_2_indices.end(); 
+    for(it_gr=m_groups_2_indices.begin(); it_gr != m_groups_2_indices.end();
         it_gr++)
     {
         for(unsigned int i=0; i<(*it_gr).second.size(); i++)
@@ -145,7 +145,7 @@ void KartPropertiesManager::removeKart(const std::string &ident)
 
     delete kp;
 
-    // Only used for networking and it is safe to just clear it. 
+    // Only used for networking and it is safe to just clear it.
     // If a networking game is started it will be initialised properly.
     m_selected_karts.clear();
 }   // removeKart
@@ -171,7 +171,7 @@ void KartPropertiesManager::loadAllKarts(bool loading_icon)
             subdir!=result.end(); subdir++)
         {
             const bool loaded = loadKart(*dir+*subdir);
-            
+
             if (loaded && loading_icon)
             {
                 GUIEngine::addLoadingIcon(irr_driver->getTexture(
@@ -204,7 +204,7 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
                   << "' : " << err.what() << std::endl;
         return false;
     }
-    
+
     // If the version of the kart file is not supported,
     // ignore this .kart file
     if (kart_properties->getVersion() < stk_config->m_min_kart_version ||
@@ -216,7 +216,7 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
         delete kart_properties;
         return false;
     }
-    
+
     m_karts_properties.push_back(kart_properties);
     m_kart_available.push_back(true);
     const std::vector<std::string>& groups=kart_properties->getGroups();
@@ -237,7 +237,7 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
  *  \return Index of kart (between 0 and number of karts - 1).
  */
 const int KartPropertiesManager::getKartId(const std::string &ident) const
-{    
+{
     for (int i=0; i<m_karts_properties.size(); i++)
     {
         if (m_karts_properties[i].getIdent() == ident)
@@ -286,7 +286,7 @@ std::vector<std::string> KartPropertiesManager::getAllAvailableKarts() const
 }   // getAllAvailableKarts
 
 //-----------------------------------------------------------------------------
-/** Marks all karts except the ones listed in the string vector to be 
+/** Marks all karts except the ones listed in the string vector to be
  *  unavailable. This function is used on a client when receiving the list of
  *  karts from a client to mark all other karts as unavailable.
  *  \param karts List of karts that are available on a client.
@@ -297,31 +297,31 @@ void KartPropertiesManager::setUnavailableKarts(std::vector<std::string> karts)
     {
         if (!m_kart_available[i]) continue;
 
-        if (std::find(karts.begin(), karts.end(), 
+        if (std::find(karts.begin(), karts.end(),
                       m_karts_properties[i].getIdent())
             == karts.end())
         {
             m_kart_available[i] = false;
-            
+
             Log::error("Kart_Properties_Manager",
                        "Kart '%s' not available on all clients, disabled.",
                        m_karts_properties[i].getIdent().c_str());
         }   // kart not in list
     }   // for i in m_kart_properties
-    
+
 }   // setUnavailableKarts
 //-----------------------------------------------------------------------------
 /** Returns the (global) index of the n-th kart of a given group. If there is
   * no such kart, -1 is returned.
   */
-int KartPropertiesManager::getKartByGroup(const std::string& group, 
+int KartPropertiesManager::getKartByGroup(const std::string& group,
                                           int n) const
 {
     int count=0;
     for (int i=0; i<m_karts_properties.size(); i++)
     {
         std::vector<std::string> groups = m_karts_properties[i].getGroups();
-        if (std::find(groups.begin(), groups.end(), group) == groups.end()) 
+        if (std::find(groups.begin(), groups.end(), group) == groups.end())
             continue;
         if (count == n) return i;
         count = count + 1;
@@ -339,7 +339,7 @@ bool KartPropertiesManager::testAndSetKart(int kartid)
 
 //-----------------------------------------------------------------------------
 /** Returns true if a kart is available to be selected. A kart is available to
- *  be selected if it is available on all clients (i.e. m_kart_available is 
+ *  be selected if it is available on all clients (i.e. m_kart_available is
  *  true), not yet selected, and not locked.
  */
 bool KartPropertiesManager::kartAvailable(int kartid)
@@ -407,12 +407,12 @@ void KartPropertiesManager::getRandomKartList(int count,
                                             RemoteKartInfoList& existing_karts,
                                             std::vector<std::string> *ai_list)
 {
-    // First: set up flags (based on global kart 
+    // First: set up flags (based on global kart
     // index) for which karts are already used
     // -----------------------------------------
     std::vector<bool> used;
     used.resize(getNumberOfKarts(), false);
-    
+
     std::vector<std::string> random_kart_queue;
     for (unsigned int i=0; i<existing_karts.size(); i++)
     {
@@ -424,9 +424,9 @@ void KartPropertiesManager::getRandomKartList(int count,
         catch (std::runtime_error& ex)
         {
             (void)ex;
-            std::cerr << 
+            std::cerr <<
                 "[KartPropertiesManager] getRandomKartList : WARNING, "
-                "can't find kart '" 
+                "can't find kart '"
                 << existing_karts[i].getKartName() << "'\n";
         }
     }
@@ -440,9 +440,9 @@ void KartPropertiesManager::getRandomKartList(int count,
         catch (std::runtime_error &ex)
         {
             (void)ex;
-            std::cerr <<  
+            std::cerr <<
                 "[KartPropertiesManager] getRandomKartList : WARNING, "
-                "can't find kart '" 
+                "can't find kart '"
                 << (*ai_list)[i] << "'\n";
         }
     }
@@ -453,51 +453,51 @@ void KartPropertiesManager::getRandomKartList(int count,
         if (count > 0 && random_kart_queue.size() == 0)
         {
             random_kart_queue.clear();
-            std::vector<int> karts_in_group = 
+            std::vector<int> karts_in_group =
                 getKartsInGroup(UserConfigParams::m_last_used_kart_group);
-            
+
             assert(karts_in_group.size() > 0);
-            
+
             // first try not to use a kart already used by a player
             for (unsigned int i=0; i<karts_in_group.size(); i++)
             {
                 const KartProperties &kp=m_karts_properties[karts_in_group[i]];
-                if (!used[karts_in_group[i]]                 && 
+                if (!used[karts_in_group[i]]                 &&
                     m_kart_available[karts_in_group[i]]      &&
                     !unlock_manager->getCurrentSlot()->isLocked(kp.getIdent())   )
                 {
                     random_kart_queue.push_back(kp.getIdent());
                 }
             }
-            
+
             // if we really need to, reuse the same kart as the player
             if (random_kart_queue.size() == 0)
             {
                 for (unsigned int i=0; i<karts_in_group.size(); i++)
                 {
-                    const KartProperties &kp = 
+                    const KartProperties &kp =
                         m_karts_properties[karts_in_group[i]];
                     random_kart_queue.push_back(kp.getIdent());
                 }
             }
-            
+
             assert(random_kart_queue.size() > 0);
-            
-            std::random_shuffle(random_kart_queue.begin(), 
+
+            std::random_shuffle(random_kart_queue.begin(),
                                 random_kart_queue.end()   );
         }
-        
+
         while (count > 0 && random_kart_queue.size() > 0)
         {
             ai_list->push_back(random_kart_queue.back());
             random_kart_queue.pop_back();
             count --;
         }
-        
+
     } while (count > 0);
-    
+
     // There should always be enough karts
     assert(count==0);
-}   // getRandomKartList    
+}   // getRandomKartList
 
 /* EOF */

@@ -27,11 +27,11 @@
 #include "modes/world.hpp"
 
 
-/** Constructor for a check cannon. 
+/** Constructor for a check cannon.
  *  \param node XML node containing the parameters for this checkline.
  *  \param index Index of this check structure in the check manager.
  */
-CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index) 
+CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
            : CheckLine(node, index)
 {
     core::vector3df p1, p2;
@@ -42,8 +42,8 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
         exit(-1);
     }
     m_target.setLine(p1, p2);
-    m_curve = new Ipo(*(node.getNode("curve")), 
-                      /*fps*/25, 
+    m_curve = new Ipo(*(node.getNode("curve")),
+                      /*fps*/25,
                       /*reverse*/race_manager->getReverseTrack());
 #ifdef DEBUG
     if(UserConfigParams::m_track_debug)
@@ -70,7 +70,7 @@ CheckCannon::~CheckCannon()
 }   // ~CheckCannon
 
 // ----------------------------------------------------------------------------
-/** Called when the check line is triggered. This function  creates a cannon 
+/** Called when the check line is triggered. This function  creates a cannon
  *  animation object and attaches it to the kart.
  *  \param kart_index The index of the kart that triggered the check line.
  */

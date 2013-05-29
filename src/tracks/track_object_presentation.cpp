@@ -47,13 +47,13 @@ TrackObjectPresentation::TrackObjectPresentation(const XMLNode& xml_node)
     m_init_hpr   = core::vector3df(0,0,0);
     m_init_scale = core::vector3df(1,1,1);
 
-    
+
     if (!xml_node.get("xyz",     &m_init_xyz  ))
     {
         // support for old deprecated syntax
         xml_node.getXYZ(&m_init_xyz);
     }
-    
+
     xml_node.get("hpr",     &m_init_hpr  );
     xml_node.get("scale",   &m_init_scale);
 }
@@ -73,7 +73,7 @@ const core::vector3df& TrackObjectPresentationSceneNode::getRotation() const
     return m_node->getRotation();
 }
 
-const core::vector3df& TrackObjectPresentationSceneNode::getScale() const 
+const core::vector3df& TrackObjectPresentationSceneNode::getScale() const
 {
     if (m_node == NULL) return m_init_scale;
     return m_node->getScale();
@@ -84,7 +84,7 @@ void TrackObjectPresentationSceneNode::move(const core::vector3df& xyz, const co
                                             const core::vector3df& scale)
 {
     if (m_node == NULL) return;
-    
+
     m_node->setPosition(xyz);
     m_node->setRotation(hpr);
     m_node->setScale(scale);
@@ -99,7 +99,7 @@ void TrackObjectPresentationSceneNode::setEnable(bool enabled)
 void TrackObjectPresentationSceneNode::reset()
 {
     if (m_node == NULL) return;
-    
+
     m_node->setPosition(m_init_xyz);
     m_node->setRotation(m_init_hpr);
     m_node->setScale(m_init_scale);
@@ -144,14 +144,14 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     m_is_looped  = false;
     m_mesh       = NULL;
     m_node       = NULL;
-    
+
     xml_node.get("looped",  &m_is_looped );
     std::string model_name;
     xml_node.get("model",   &model_name  );
-    
-    std::string full_path = 
+
+    std::string full_path =
         World::getWorld()->getTrack()->getTrackFile(model_name);
-    
+
     bool animated = (UserConfigParams::m_graphical_effects ||
                  World::getWorld()->getIdent() == IDENT_CUSTSCENE);
 
@@ -167,20 +167,20 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
             m_mesh = irr_driver->getMesh(full_path);
         }
     }
-    
+
     if (!m_mesh)
     {
-        // If the model isn't found in the track directory, look 
+        // If the model isn't found in the track directory, look
         // in STK's model directory.
         full_path = file_manager->getModelFile(model_name);
         m_mesh    = irr_driver->getAnimatedMesh(full_path);
-        
+
         if(!m_mesh)
         {
             throw std::runtime_error("Model '" + model_name + "' cannot be found");
         }
     }
-    
+
     init(&xml_node, enabled);
 }
 
@@ -192,7 +192,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_is_looped  = false;
     m_mesh       = NULL;
     m_node       = NULL;
-    
+
     bool animated = (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUSTSCENE);
 
@@ -207,12 +207,12 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
             m_mesh = irr_driver->getMesh(model_file);
         }
     }
-    
+
     if (!m_mesh)
     {
         throw std::runtime_error("Model '" + model_file + "' cannot be found");
     }
-    
+
     init(NULL, true);
 }
 
@@ -220,16 +220,16 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, bool enabled)
 {
     bool animated = (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUSTSCENE);
-    
+
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
-    
+
     if (animated)
     {
         scene::IAnimatedMeshSceneNode *node =
             irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_mesh);
         m_node = node;
-        
+
         m_frame_start = node->getStartFrame();
         if (xml_node != NULL)
             xml_node->get("frame-start", &m_frame_start);
@@ -261,7 +261,7 @@ TrackObjectPresentationMesh::~TrackObjectPresentationMesh()
 {
     if (m_node)
         irr_driver->removeNode(m_node);
-    
+
     if(m_mesh)
     {
         irr_driver->dropAllTextures(m_mesh);
@@ -283,11 +283,11 @@ void TrackObjectPresentationMesh::reset()
         a_node->setScale(m_init_scale);
         a_node->setLoopMode(m_is_looped);
         a_node->setCurrentFrame((float)(a_node->getStartFrame()));
-        
+
         // trick to reset the animation AND also the timer inside it
         a_node->OnAnimate(0);
         a_node->OnAnimate(0);
-        
+
         if(m_is_looped)
         {
             a_node->setFrameLoop(m_frame_start, m_frame_end);
@@ -304,40 +304,40 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_no
 {
     m_sound = NULL;
     m_xyz = m_init_xyz;
-    
+
     std::string sound;
     xml_node.get("sound", &sound);
-    
+
     float rolloff = 0.5;
     xml_node.get("rolloff",  &rolloff );
     float volume = 1.0;
     xml_node.get("volume",   &volume );
-    
+
     bool trigger_when_near = false;
     xml_node.get("play-when-near", &trigger_when_near);
-    
+
     float trigger_distance = 1.0f;
     xml_node.get("distance", &trigger_distance);
 
     xml_node.get("conditions", &m_trigger_condition);
-    
+
     float max_dist = 390.0f;
     xml_node.get("max_dist", &max_dist );
-    
+
     // first try track dir, then global dir
     std::string soundfile = file_manager->getModelFile(sound);
     if (!file_manager->fileExists(soundfile))
     {
         soundfile = file_manager->getSFXFile(sound);
     }
-    
+
     SFXBuffer* buffer = new SFXBuffer(soundfile,
                                       true /* positional */,
                                       rolloff,
                                       max_dist,
                                       volume);
     buffer->load();
-    
+
     m_sound = sfx_manager->createSoundSource(buffer, true, true);
     if (m_sound != NULL)
     {
@@ -350,10 +350,10 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_no
     }
     else
     {
-        fprintf(stderr, 
+        fprintf(stderr,
              "[TrackObject] Sound emitter object could not be created\n");
     }
-    
+
     if (trigger_when_near)
     {
         ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
@@ -424,19 +424,19 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(const XMLNode
     xml_node.get("texture", &texture_name);
     xml_node.get("width",   &width       );
     xml_node.get("height",  &height      );
-    
+
     m_fade_out_when_close = false;
     xml_node.get("fadeout", &m_fade_out_when_close);
-    
+
     if (m_fade_out_when_close)
     {
         xml_node.get("start",  &m_fade_out_start);
         xml_node.get("end",    &m_fade_out_end  );
     }
-    
-    video::ITexture *texture = 
+
+    video::ITexture *texture =
         irr_driver->getTexture(file_manager->getTextureFile(texture_name));
-    m_node = irr_driver->addBillboard(core::dimension2df(width, height), 
+    m_node = irr_driver->addBillboard(core::dimension2df(width, height),
                                                        texture);
     Material *stk_material = material_manager->getMaterial(texture_name);
     stk_material->setMaterialProperties(&(m_node->getMaterial(0)), NULL);
@@ -452,7 +452,7 @@ void TrackObjectPresentationBillboard::update(float dt)
         const float dist =  m_node->getPosition().getDistanceFrom( curr_cam->getPosition() );
 
         scene::IBillboardSceneNode* node = (scene::IBillboardSceneNode*)m_node;
-        
+
         if (dist < m_fade_out_start)
         {
             node->setColor(video::SColor(0, 255, 255, 255));
@@ -483,10 +483,10 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode
 {
     m_emitter = NULL;
     m_lod_emitter_node = NULL;
-    
+
     std::string path;
     xml_node.get("kind", &path);
-    
+
     //irr::core::vector3df emitter_origin;
     //xml_node.getXYZ(&emitter_origin);
 
@@ -494,7 +494,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode
     xml_node.get("clip_distance", &clip_distance);
 
     xml_node.get("conditions", &m_trigger_condition);
-    
+
     try
     {
         ParticleKind* kind = ParticleKindManager::get()->getParticles( path.c_str() );
@@ -503,8 +503,8 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode
             throw std::runtime_error(path + " could not be loaded");
         }
         ParticleEmitter* emitter = new ParticleEmitter( kind, m_init_xyz );
-        
-        
+
+
         if (clip_distance > 0)
         {
             scene::ISceneManager* sm = irr_driver->getSceneManager();
@@ -521,7 +521,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode
             m_node = emitter->getNode();
             m_emitter = emitter;
         }
-        
+
         if (m_trigger_condition.size() > 0)
         {
             m_emitter->setCreationRateAbsolute(0.0f);
@@ -571,14 +571,14 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(const
 {
     float trigger_distance = 1.0f;
     xml_node.get("distance", &trigger_distance);
-    
+
     xml_node.get("action", &m_action);
 
     if (m_action.size() == 0)
     {
         fprintf(stderr, "[TrackObject] WARNING: action-trigger has no action defined\n");
     }
-    
+
     ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
 }
 
@@ -595,13 +595,13 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         {
             m_action = "__disabled__";
             //World::getWorld()->getRaceGUI()->clearAllMessages();
-            
+
             InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
             DeviceConfig* config = device->getConfiguration();
             irr::core::stringw accel = config->getBindingAsString(PA_ACCEL);
             irr::core::stringw left = config->getBindingAsString(PA_STEER_LEFT);
             irr::core::stringw right = config->getBindingAsString(PA_STEER_RIGHT);
-            
+
             new TutorialMessageDialog(_("Accelerate with <%s> and steer with <%s> and <%s>", accel, left, right),
                                       false);
         }
@@ -609,7 +609,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     else if (m_action == "tutorial_bananas")
     {
         m_action = "__disabled__";
-        
+
         new TutorialMessageDialog(_("Avoid bananas!"), true);
     }
     else if (m_action == "tutorial_giftboxes")
@@ -618,14 +618,14 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
-        
+
         new TutorialMessageDialog(_("Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!", fire),
                                 true);
     }
     else if (m_action == "tutorial_nitro_collect")
     {
         m_action = "__disabled__";
-        
+
         new TutorialMessageDialog(_("Collect nitro bottles (we will use them after the curve)"),
                                   true);
     }
@@ -635,7 +635,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw nitro = config->getBindingAsString(PA_NITRO);
-        
+
         new TutorialMessageDialog(_("Use the nitro you collected by pressing <%s>!", nitro),
                                  true);
     }
@@ -645,7 +645,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw rescue = config->getBindingAsString(PA_RESCUE);
-        
+
         new TutorialMessageDialog(_("Oops! When you're in trouble, press <%s> to be rescued", rescue),
                                   false);
     }
@@ -657,8 +657,8 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw skid = config->getBindingAsString(PA_DRIFT);
-        
-        
+
+
         new TutorialMessageDialog(_("Accelerate and press the <%s> key while turning to skid. Skidding for a short while can help you turn faster to take sharp turns.", skid),
                                  true);
     }
@@ -685,7 +685,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     }
     else if (m_action == "__disabled__")
     {
-    }   
+    }
     else
     {
         fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",

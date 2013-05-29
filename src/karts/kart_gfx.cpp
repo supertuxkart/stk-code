@@ -47,7 +47,7 @@ KartGFX::KartGFX(const AbstractKart *kart)
     Vec3 rear_right((kart->getKartWidth()+0.20f)*0.35f, (kart->getKartHeight()-0.6f)*0.35f,
                        -kart->getKartLength()*0.35f);
 
-    Vec3 rear_center(0, kart->getKartHeight()*0.35f, 
+    Vec3 rear_center(0, kart->getKartHeight()*0.35f,
                        -kart->getKartLength()*0.35f);
 
     // Create all effects. Note that they must be created
@@ -81,7 +81,7 @@ KartGFX::~KartGFX()
  *  \param file_name The file name of the particle specification.
  *  \param position Where on the kart the particles should be emitted.
  */
-void KartGFX::addEffect(KartGFXType type, const std::string &file_name, 
+void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
                         const Vec3 &position)
 {
     const ParticleKind *kind    = NULL;
@@ -183,8 +183,8 @@ void KartGFX::setXYZ(const KartGFXType type, const Vec3 &xyz)
 }   // setXYZ
 
 // ----------------------------------------------------------------------------
-/** Sets the absolute creation rate for the specified particle type. 
- *  \param type The particle effect for which to set the 
+/** Sets the absolute creation rate for the specified particle type.
+ *  \param type The particle effect for which to set the
  *         creation rate (in particles per seconds).
  *  \param f The new creation rate.
  */
@@ -196,9 +196,9 @@ void KartGFX::setCreationRateAbsolute(KartGFXType type, float f)
 
 // ----------------------------------------------------------------------------
 /** Sets the creation rate for the specified particle type relative to the
- *  given minimum and maximum particle rate. If a negative value is 
+ *  given minimum and maximum particle rate. If a negative value is
  *  specified, the creation rate will be set to 0 (absolute).
- *  \param type The particle effect for which to set the 
+ *  \param type The particle effect for which to set the
  *         creation rate (<0 means no more particles).
  *  \param f The new relative creation rate.
  */
@@ -214,9 +214,9 @@ void KartGFX::setCreationRateRelative(KartGFXType type, float f)
 }   // setCreationRateRelative
 
 // ----------------------------------------------------------------------------
-/** Resize the area from which the particles are emitted: the emitter box 
- *  should spread from last frame's position to the current position if 
- *  we want the particles to be emitted in a smooth, continuous flame and not 
+/** Resize the area from which the particles are emitted: the emitter box
+ *  should spread from last frame's position to the current position if
+ *  we want the particles to be emitted in a smooth, continuous flame and not
  *  in blobs.
  *  \param type The particle effect for which to resize the emitting box.
  *  \param speed Current speed of the kart.
@@ -229,8 +229,8 @@ void KartGFX::resizeBox(KartGFXType type, float speed, float dt)
 }   // resizeBox
 
 // ----------------------------------------------------------------------------
-/** If necessary defines a new particle type for the terrain emitter. Then 
- *  adjusts the location of the terrain emitter to be in synch with the 
+/** If necessary defines a new particle type for the terrain emitter. Then
+ *  adjusts the location of the terrain emitter to be in synch with the
  *  current wheel position, and defines the emission rate depending on speed,
  *  steering, and skidding.
  *  \param pk Particle type to use.
@@ -241,7 +241,7 @@ void KartGFX::updateTerrain(const ParticleKind *pk)
     if(!pe) return;
 
     pe->setParticleType(pk);
- 
+
     const btWheelInfo &wi = m_kart->getVehicle()
                                   ->getWheelInfo(2+m_wheel_toggle);
     Vec3 xyz = wi.m_raycastInfo.m_contactPointWS;

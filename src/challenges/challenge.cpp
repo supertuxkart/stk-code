@@ -55,23 +55,23 @@ void Challenge::load(const XMLNode* challengesNode)
 
     if (easy != NULL)
     {
-        bool finished = false;    
+        bool finished = false;
         easy->get("solved", &finished);
-        
+
         if (finished) m_state[0] = CH_SOLVED;
     }
     if (medium != NULL)
     {
-        bool finished = false;    
+        bool finished = false;
         medium->get("solved", &finished);
-        
+
         if (finished) m_state[1] = CH_SOLVED;
     }
     if (hard != NULL)
     {
-        bool finished = false;    
+        bool finished = false;
         hard->get("solved", &finished);
-        
+
         if (finished) m_state[2] = CH_SOLVED;
     }
 }   // load

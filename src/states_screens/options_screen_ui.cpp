@@ -59,19 +59,19 @@ OptionsScreenUI::OptionsScreenUI() : Screen("options_ui.stkgui")
 void OptionsScreenUI::loadedFromFile()
 {
     m_inited = false;
-    
+
     GUIEngine::SpinnerWidget* skinSelector = getWidget<GUIEngine::SpinnerWidget>("skinchoice");
     assert( skinSelector != NULL );
-    
+
     skinSelector->m_properties[PROP_WRAP_AROUND] = "true";
-    
+
     m_skins.clear();
     skinSelector->clearLabels();
-    
+
     std::set<std::string> skinFiles;
     file_manager->listFiles(skinFiles /* out */, file_manager->getGUIDir() + "skins",
                             true /* is full path */, true /* make full path */ );
-    
+
     for (std::set<std::string>::iterator it = skinFiles.begin(); it != skinFiles.end(); it++)
     {
         if ( (*it).find(".stkskin") != std::string::npos )
@@ -79,7 +79,7 @@ void OptionsScreenUI::loadedFromFile()
             m_skins.push_back( *it );
         }
     }
-    
+
     if (m_skins.size() == 0)
     {
         std::cerr << "WARNING: could not find a single skin, make sure that "
@@ -87,7 +87,7 @@ void OptionsScreenUI::loadedFromFile()
         skinSelector->setDeactivated();
         return;
     }
-    
+
     const int skinCount = m_skins.size();
     for (int n=0; n<skinCount; n++)
     {
@@ -98,7 +98,7 @@ void OptionsScreenUI::loadedFromFile()
     skinSelector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
     skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skinCount-1);
 
-    
+
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -108,12 +108,12 @@ void OptionsScreenUI::init()
     Screen::init();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
     if (ribbon != NULL)  ribbon->select( "tab_ui", PLAYER_ID_GAME_MASTER );
-    
+
     ribbon->getRibbonChildren()[0].setTooltip( _("Graphics") );
     ribbon->getRibbonChildren()[1].setTooltip( _("Audio") );
     ribbon->getRibbonChildren()[3].setTooltip( _("Players") );
     ribbon->getRibbonChildren()[4].setTooltip( _("Controls") );
-    
+
     GUIEngine::SpinnerWidget* skinSelector = getWidget<GUIEngine::SpinnerWidget>("skinchoice");
     assert( skinSelector != NULL );
 
@@ -134,14 +134,14 @@ void OptionsScreenUI::init()
     else
         min_gui->setActivated();
 
-    
+
     // --- select the right skin in the spinner
     bool currSkinFound = false;
     const int skinCount = m_skins.size();
     for (int n=0; n<skinCount; n++)
     {
         const std::string skinFileName = StringUtils::getBasename(m_skins[n]);
-        
+
         if (UserConfigParams::m_skin_file.c_str() == skinFileName)
         {
             skinSelector->setValue(n);
@@ -155,13 +155,13 @@ void OptionsScreenUI::init()
         skinSelector->setValue(0);
         GUIEngine::reloadSkin();
     }
-    
+
     // --- language
     ListWidget* list_widget = getWidget<ListWidget>("language");
-    
+
     // I18N: in the language choice, to select the same language as the OS
     list_widget->addItem("system", _("System Language"));
-    
+
     const std::vector<std::string>* lang_list = translations->getLanguageList();
     const int amount = lang_list->size();
     for (int n=0; n<amount; n++)
@@ -171,9 +171,9 @@ void OptionsScreenUI::init()
         list_widget->addItem(code_name, core::stringw(code_name.c_str()) + " (" +
                              nice_name.c_str() + ")");
     }
-        
+
     list_widget->setSelectionID( list_widget->getItemID(UserConfigParams::m_language) );
-    
+
     // Forbid changing language while in-game, since this crashes (changing the language involves
     // tearing down and rebuilding the menu stack. not good when in-game)
     if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
@@ -184,7 +184,7 @@ void OptionsScreenUI::init()
     {
         list_widget->setActivated();
     }
-    
+
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -194,7 +194,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     if (name == "options_choice")
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
-        
+
         if (selection == "tab_audio") StateManager::get()->replaceTopMostScreen(OptionsScreenAudio::getInstance());
         else if (selection == "tab_video") StateManager::get()->replaceTopMostScreen(OptionsScreenVideo::getInstance());
         else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
@@ -208,7 +208,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     {
         GUIEngine::SpinnerWidget* skinSelector = getWidget<GUIEngine::SpinnerWidget>("skinchoice");
         assert( skinSelector != NULL );
-        
+
         const core::stringw selectedSkin = skinSelector->getStringValue();
         UserConfigParams::m_skin_file = core::stringc(selectedSkin.c_str()).c_str() + std::string(".stkskin");
         GUIEngine::reloadSkin();
@@ -228,7 +228,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
             INetworkHttp::get()->stopNetworkThread();
             INetworkHttp::destroy();
         }
-        UserConfigParams::m_internet_status = 
+        UserConfigParams::m_internet_status =
             news->getState() ? INetworkHttp::IPERM_ALLOWED
                              : INetworkHttp::IPERM_NOT_ALLOWED;
         INetworkHttp::create();
@@ -241,16 +241,16 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     {
         CheckBoxWidget* min_gui = getWidget<CheckBoxWidget>("minimal-racegui");
         assert( min_gui != NULL );
-        UserConfigParams::m_minimal_race_gui = 
+        UserConfigParams::m_minimal_race_gui =
             !UserConfigParams::m_minimal_race_gui;
     }
     else if (name == "language")
     {
         ListWidget* list_widget = getWidget<ListWidget>("language");
         std::string selection = list_widget->getSelectionInternalName();
-        
+
         delete translations;
-        
+
         if (selection == "system")
         {
 #ifdef WIN32
@@ -268,20 +268,20 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
             setenv("LANGUAGE", selection.c_str(), 1);
 #endif
         }
-        
+
         translations = new Translations();
         GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
-        
+
         GUIEngine::getFont()->updateRTL();
         GUIEngine::getTitleFont()->updateRTL();
         GUIEngine::getSmallFont()->updateRTL();
-        
+
         UserConfigParams::m_language = selection.c_str();
         user_config->saveConfig();
-        
+
         GUIEngine::getStateManager()->pushScreen(OptionsScreenUI::getInstance());
     }
-    
+
 }   // eventCallback
 
 // -----------------------------------------------------------------------------

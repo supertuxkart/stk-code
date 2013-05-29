@@ -56,37 +56,37 @@ void ArenasScreen::loadedFromFile()
 
 void ArenasScreen::beforeAddingWidget()
 {
-    
+
     // Dynamically add tabs
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     assert( tabs != NULL );
-    
+
     tabs->clearAllChildren();
-    
+
     bool soccer_mode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     const std::vector<std::string>& groups = track_manager->getAllArenaGroups(soccer_mode);
     const int group_amount = groups.size();
-    
+
     if (group_amount > 1)
     {
         //I18N: name of the tab that will show arenas from all groups
         tabs->addTextChild( _("All"), ALL_ARENA_GROUPS_ID );
     }
-    
+
     // Make group names being picked up by gettext
 #define FOR_GETTEXT_ONLY(x)
     //I18N: arena group name
     FOR_GETTEXT_ONLY( _("standard") )
     //I18N: arena group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
-    
+
     // add others after
     for (int n=0; n<group_amount; n++)
     {
         // try to translate the group name
         tabs->addTextChild( _(groups[n].c_str()), groups[n] );
     }
-    
+
     int num_of_arenas=0;
     for (unsigned int n=0; n<track_manager->getNumberOfTracks(); n++) //iterate through tracks to find how many are arenas
     {
@@ -102,7 +102,7 @@ void ArenasScreen::beforeAddingWidget()
                 num_of_arenas++;
         }
     }
-    
+
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
     tracks_widget->setItemCountHint(num_of_arenas); //set the item hint to that number to prevent weird formatting
@@ -117,7 +117,7 @@ void ArenasScreen::init()
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
     // select something by default for the game master
     assert( w != NULL );
-    w->setSelection(w->getItems()[0].m_code_name, PLAYER_ID_GAME_MASTER, true); 
+    w->setSelection(w->getItems()[0].m_code_name, PLAYER_ID_GAME_MASTER, true);
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -125,7 +125,7 @@ void ArenasScreen::init()
 void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "tracks")
-    { 
+    {
         DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
         if (w2 == NULL) return;
 
@@ -133,12 +133,12 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
         if (UserConfigParams::logGUI())
             std::cout << "Clicked on arena " << selection.c_str() << std::endl;
 
-        
+
         if (selection == "random_track")
         {
             RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
             assert( tabs != NULL );
-            
+
             bool soccer_mode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
 
             std::vector<int> curr_group;
@@ -157,20 +157,20 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
                 curr_group = track_manager->getArenasInGroup(
                         tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER), soccer_mode );
             }
-            
+
             RandomGenerator random;
             const int randomID = random.get(curr_group.size());
-            
+
             Track* clickedTrack = track_manager->getTrack( curr_group[randomID] );
             if (clickedTrack != NULL)
             {
                 ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
-                
+
                 new TrackInfoDialog(selection, clickedTrack->getIdent(), clickedTrack->getName(),
                                     screenshot, 0.8f, 0.7f);
             }
-            
-        }    
+
+        }
         else if (selection == "locked")
         {
             unlock_manager->playLockSound();
@@ -189,7 +189,7 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
                                     screenshot, 0.8f, 0.7f);
             }   // clickedTrack !=  NULL
         }   // if random_track
-        
+
     }
     else if (name == "trackgroups")
     {
@@ -199,7 +199,7 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
     {
         StateManager::get()->escapePressed();
     }
-    
+
 }   // eventCallback
 
 // ------------------------------------------------------------------------------------------------------
@@ -208,20 +208,20 @@ void ArenasScreen::buildTrackList()
 {
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( w != NULL );
-    
+
     // Re-build track list everytime (accounts for locking changes, etc.)
     w->clearItems();
-    
+
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     assert( tabs != NULL );
     const std::string curr_group_name = tabs->getSelectionIDString(0);
-    
+
     bool soccer_mode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
-    
+
     if (curr_group_name == ALL_ARENA_GROUPS_ID)
     {
         const int trackAmount = track_manager->getNumberOfTracks();
-        
+
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack(n);
@@ -233,7 +233,7 @@ void ArenasScreen::buildTrackList()
             {
                 if(!curr->isArena()) continue;
             }
-            
+
             if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
             {
                 w->addItem( _("Locked : solve active challenges to gain access to more!"),
@@ -245,7 +245,7 @@ void ArenasScreen::buildTrackList()
                            IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
             }
         }
-        
+
     }
     else
     {
@@ -263,7 +263,7 @@ void ArenasScreen::buildTrackList()
             {
                 if(!curr->isArena()) continue;
             }
-            
+
             if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
             {
                 w->addItem( _("Locked : solve active challenges to gain access to more!"),
@@ -277,8 +277,8 @@ void ArenasScreen::buildTrackList()
         }
     }
     w->addItem(_("Random Arena"), "random_track", "/gui/track_random.png");
-    w->updateItemDisplay();  
-    
+    w->updateItemDisplay();
+
     assert(w->getItems().size() > 0);
 }
 
@@ -288,8 +288,8 @@ void ArenasScreen::setFocusOnTrack(const std::string& trackName)
 {
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( w != NULL );
-    
-    w->setSelection(trackName, PLAYER_ID_GAME_MASTER, true); 
+
+    w->setSelection(trackName, PLAYER_ID_GAME_MASTER, true);
 }   // setFOxuOnTrack
 
 // ------------------------------------------------------------------------------------------------------

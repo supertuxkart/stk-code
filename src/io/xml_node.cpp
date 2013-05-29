@@ -27,7 +27,7 @@
 XMLNode::XMLNode(io::IXMLReader *xml)
 {
     m_file_name = "[unknown]";
-    
+
     while(xml->getNodeType()!=io::EXN_ELEMENT && xml->read());
     readXML(xml);
 }   // XMLNode
@@ -39,24 +39,24 @@ XMLNode::XMLNode(io::IXMLReader *xml)
 XMLNode::XMLNode(const std::string &filename)
 {
     m_file_name = filename;
-    
+
     io::IXMLReader *xml = file_manager->createXMLReader(filename);
-    
+
     if (xml == NULL)
     {
         throw std::runtime_error("Cannot find file "+filename);
     }
-    
+
     bool is_first_element = true;
     while(xml->read())
     {
-        switch (xml->getNodeType()) 
+        switch (xml->getNodeType())
         {
         case io::EXN_ELEMENT:
             {
                 if(!is_first_element)
                 {
-                    fprintf(stderr, 
+                    fprintf(stderr,
                             "More than one root element in '%s' - ignored.\n",
                             filename.c_str());
                 }
@@ -101,13 +101,13 @@ void XMLNode::readXML(io::IXMLReader *xml)
     }   // for i
 
     // If no children, we are done
-    if(xml->isEmptyElement()) 
+    if(xml->isEmptyElement())
         return;
 
     /** Read all children elements. */
     while(xml->read())
     {
-        switch (xml->getNodeType()) 
+        switch (xml->getNodeType())
         {
         case io::EXN_ELEMENT:
             {
@@ -227,9 +227,9 @@ int XMLNode::get(const std::string &attribute, Vec3 *value) const
                 s.c_str(), m_file_name.c_str());
         return 0;
     }
-    
+
     float x, y, z;
-    
+
     if (StringUtils::parseString<float>(v[0], &x) &&
         StringUtils::parseString<float>(v[1], &y) &&
         StringUtils::parseString<float>(v[2], &z) )
@@ -244,7 +244,7 @@ int XMLNode::get(const std::string &attribute, Vec3 *value) const
                 s.c_str(), m_file_name.c_str());
         return 0;
     }
-    
+
     return 1;
 }   // get(Vec3)
 
@@ -298,7 +298,7 @@ int XMLNode::get(const std::string &attribute, int32_t *value) const
                 s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
         return 0;
     }
-    
+
     return 1;
 }   // get(int32_t)
 
@@ -314,7 +314,7 @@ int XMLNode::get(const std::string &attribute, int64_t *value) const
                 s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
         return 0;
     }
-    
+
     return 1;
 }   // get(int64_t)
 
@@ -324,14 +324,14 @@ int XMLNode::get(const std::string &attribute, uint32_t *value) const
 {
     std::string s;
     if(!get(attribute, &s)) return 0;
-    
+
     if (!StringUtils::parseString<unsigned int>(s, value))
     {
         fprintf(stderr, "[XMLNode] WARNING: Expected uint but found '%s' for attribute '%s' of node '%s' in file %s\n",
                 s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
         return 0;
     }
-    
+
     return 1;
 }   // get(uint32_t)
 
@@ -340,14 +340,14 @@ int XMLNode::get(const std::string &attribute, float *value) const
 {
     std::string s;
     if(!get(attribute, &s)) return 0;
-    
+
     if (!StringUtils::parseString<float>(s, value))
     {
         fprintf(stderr, "[XMLNode] WARNING: Expected float but found '%s' for attribute '%s' of node '%s' in file %s\n",
                 s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
         return 0;
     }
-        
+
     return 1;
 }   // get(int)
 
@@ -355,7 +355,7 @@ int XMLNode::get(const std::string &attribute, float *value) const
 int XMLNode::get(const std::string &attribute, bool *value) const
 {
     std::string s;
-    
+
     // FIXME: for some reason, missing attributes don't trigger that if???
     if(!get(attribute, &s)) return 0;
     *value = s[0]=='T' || s[0]=='t' || s[0]=='Y' || s[0]=='y' ||
@@ -370,7 +370,7 @@ int XMLNode::get(const std::string &attribute, bool *value) const
  *  \param attribute Name of the attribute.
  *  \param value Value of the attribute.
  */
-int XMLNode::get(const std::string &attribute, 
+int XMLNode::get(const std::string &attribute,
                  std::vector<std::string> *value) const
 {
     std::string s;
@@ -387,7 +387,7 @@ int XMLNode::get(const std::string &attribute,
  *  \param attribute Name of the attribute.
  *  \param value Value of the attribute.
  */
-int XMLNode::get(const std::string &attribute, 
+int XMLNode::get(const std::string &attribute,
                  std::vector<float> *value) const
 {
     std::string s;
@@ -395,7 +395,7 @@ int XMLNode::get(const std::string &attribute,
 
     std::vector<std::string> v = StringUtils::split(s,' ');
     value->clear();
-    
+
     const unsigned int count = v.size();
     for (unsigned int i=0; i<count; i++)
     {
@@ -406,7 +406,7 @@ int XMLNode::get(const std::string &attribute,
                     v[i].c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
             return 0;
         }
-        
+
         value->push_back(curr);
     }
     return value->size();
@@ -426,7 +426,7 @@ int XMLNode::get(const std::string &attribute, std::vector<int> *value) const
 
     std::vector<std::string> v = StringUtils::split(s,' ');
     value->clear();
-    
+
     const unsigned int count = v.size();
     for (unsigned int i=0; i<count; i++)
     {
@@ -437,7 +437,7 @@ int XMLNode::get(const std::string &attribute, std::vector<int> *value) const
                     v[i].c_str(), attribute.c_str(), m_name.c_str());
             return 0;
         }
-        
+
         value->push_back(val);
     }
     return value->size();
@@ -471,7 +471,7 @@ int XMLNode::get(const std::string &attribute, InterpolationArray *value) const
         float x;
         if(!StringUtils::fromString(pair[0], x))
         {
-            printf("Incorrect x in pair '%s' of '%s'.\n", 
+            printf("Incorrect x in pair '%s' of '%s'.\n",
                    pairs[i].c_str(), attribute.c_str());
             exit(-1);
         }
@@ -494,7 +494,7 @@ int XMLNode::get(const std::string &attribute, InterpolationArray *value) const
 /** Interprets the attributes 'x', 'y', 'z'  or 'h', 'p', 'r' as a 3d vector
  *  and set the corresponding elements of value. Not all values need to be
  *  defined as attributes (and the correspnding elements of the vector will
- *  not be changed). It returns a bit field for each defined value, i.e. if x 
+ *  not be changed). It returns a bit field for each defined value, i.e. if x
  *  and y are defined, 3 is returned.
  *  \param value Vector to return the values in.
  */
@@ -513,10 +513,10 @@ int XMLNode::get(core::vector3df *value) const
 }   // core::vector3df
 
 // ----------------------------------------------------------------------------
-/** Interprets the attributes 'x', 'y', 'z' as a 3d vector and set the 
- *  corresponding elements of value. Not all values need to be defined as 
- *  attributes (and the correspnding elements of the vector will not be 
- *  changed). It returns a bit field for each defined value, i.e. if x 
+/** Interprets the attributes 'x', 'y', 'z' as a 3d vector and set the
+ *  corresponding elements of value. Not all values need to be defined as
+ *  attributes (and the correspnding elements of the vector will not be
+ *  changed). It returns a bit field for each defined value, i.e. if x
  *  and y are defined, 3 is returned.
  *  \param value Vector to return the values in.
  */
@@ -532,10 +532,10 @@ int XMLNode::getXYZ(core::vector3df *value) const
 }   // getXYZ vector3df
 
 // ----------------------------------------------------------------------------
-/** Interprets the attributes 'x', 'y', 'z' as a 3d vector and set the 
- *  corresponding elements of value. Not all values need to be defined as 
- *  attributes (and the correspnding elements of the vector will not be 
- *  changed). It returns a bit field for each defined value, i.e. if x 
+/** Interprets the attributes 'x', 'y', 'z' as a 3d vector and set the
+ *  corresponding elements of value. Not all values need to be defined as
+ *  attributes (and the correspnding elements of the vector will not be
+ *  changed). It returns a bit field for each defined value, i.e. if x
  *  and y are defined, 3 is returned.
  *  \param value Vector to return the values in.
  */
@@ -551,10 +551,10 @@ int XMLNode::getXYZ(Vec3 *value) const
 }   // getXYZ Vec3
 
 // ----------------------------------------------------------------------------
-/** Interprets the attributes 'h', 'p', 'r' as a 3d vector and set the 
- *  corresponding elements of value. Not all values need to be defined as 
- *  attributes (and the correspnding elements of the vector will not be 
- *  changed). It returns a bit field for each defined value, i.e. if x and y 
+/** Interprets the attributes 'h', 'p', 'r' as a 3d vector and set the
+ *  corresponding elements of value. Not all values need to be defined as
+ *  attributes (and the correspnding elements of the vector will not be
+ *  changed). It returns a bit field for each defined value, i.e. if x and y
  *  are defined, 3 is returned.
  *  \param value Vector to return the values in.
  */
@@ -570,10 +570,10 @@ int XMLNode::getHPR(core::vector3df *value) const
 }   // getHPR vector3df
 
 // ----------------------------------------------------------------------------
-/** Interprets the attributes 'h', 'p', 'r' as a 3d vector and set the 
- *  corresponding elements of value. Not all values need to be defined as 
- *  attributes (and the correspnding elements of the vector will not be 
- *  changed). It returns a bit field for each defined value, i.e. if x and y 
+/** Interprets the attributes 'h', 'p', 'r' as a 3d vector and set the
+ *  corresponding elements of value. Not all values need to be defined as
+ *  attributes (and the correspnding elements of the vector will not be
+ *  changed). It returns a bit field for each defined value, i.e. if x and y
  *  are defined, 3 is returned.
  *  \param value Vector to return the values in.
  */

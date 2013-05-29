@@ -65,33 +65,33 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
         {
             const std::string selection = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
             if(UserConfigParams::logGUI())
-                std::cout << "Clicked on track " << selection.c_str() 
+                std::cout << "Clicked on track " << selection.c_str()
                           << std::endl;
-            
+
             UserConfigParams::m_last_track = selection;
-            
+
             if (selection == "random_track")
             {
                 RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
                 assert( tabs != NULL );
-                
+
                 if (m_random_track_list.empty()) return;
-                                
+
                 std::string track = m_random_track_list.front();
                 m_random_track_list.pop_front();
                 m_random_track_list.push_back(track);
                 Track* clickedTrack = track_manager->getTrack( track );
 
-                
+
                 if (clickedTrack != NULL)
                 {
                     ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
-                    
+
                     new TrackInfoDialog(selection, clickedTrack->getIdent(),
                                         translations->fribidize(clickedTrack->getName()),
                                         screenshot, 0.8f, 0.7f);
                 }
-                
+
             }
             else if (selection == "locked")
             {
@@ -106,7 +106,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 if (clickedTrack != NULL)
                 {
                     ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
-                    
+
                     new TrackInfoDialog(selection, clickedTrack->getIdent(),
                                         translations->fribidize(clickedTrack->getName()),
                                         screenshot, 0.8f, 0.7f);
@@ -120,7 +120,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
         if (gps_widget != NULL)
         {
             std::string selection = gps_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-            
+
             if (selection == "locked")
             {
                 unlock_manager->playLockSound();
@@ -156,32 +156,32 @@ void TracksScreen::beforeAddingWidget()
     // Dynamically add tabs
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     assert( tabs != NULL );
-    
+
     tabs->clearAllChildren();
-    
+
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
     const int group_amount = groups.size();
-    
+
     if (group_amount > 1)
     {
         //I18N: name of the tab that will show tracks from all groups
         tabs->addTextChild( _("All"), ALL_TRACK_GROUPS_ID );
     }
-    
+
     // Make group names being picked up by gettext
 #define FOR_GETTEXT_ONLY(x)
     //I18N: track group name
     FOR_GETTEXT_ONLY( _("standard") )
     //I18N: track group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
-    
+
     // add others after
     for (int n=0; n<group_amount; n++)
     {
         // try to translate the group name
         tabs->addTextChild( _(groups[n].c_str()), groups[n] );
     }
-    
+
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
     tracks_widget->setItemCountHint( track_manager->getNumberOfTracks() );
@@ -193,21 +193,21 @@ void TracksScreen::init()
 {
     DynamicRibbonWidget* gps_widget = this->getWidget<DynamicRibbonWidget>("gps");
     assert( gps_widget != NULL );
-    
+
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
-    
+
     // Reset GP list everytime (accounts for locking changes, etc.)
     gps_widget->clearItems();
-    
+
     // Build GP list
     const int gpAmount = grand_prix_manager->getNumberOfGrandPrix();
     for (int n=0; n<gpAmount; n++)
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(n);
-        
+
         const std::vector<std::string> &tracks = gp->getTrackNames();
-        
+
         std::vector<std::string> sshot_files;
         for (unsigned int t=0; t<tracks.size(); t++)
         {
@@ -228,7 +228,7 @@ void TracksScreen::init()
                       << "' does not contain any valid track.\n";
             sshot_files.push_back("gui/main_help.png");
         }
-        
+
         if (unlock_manager->getCurrentSlot()->isLocked(gp->getId()))
         {
             gps_widget->addAnimatedItem(_("Locked!"),
@@ -243,15 +243,15 @@ void TracksScreen::init()
         }
     }
     gps_widget->updateItemDisplay();
-    
-    
+
+
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     assert( tabs != NULL );
     tabs->select(UserConfigParams::m_last_used_track_group, PLAYER_ID_GAME_MASTER);
 
-    
+
     buildTrackList();
-    
+
     // select something for the game master
     // FIXME: 'setSelection' will not scroll up to the passed track, so if given track
     //         is not visible with current scrolling this fails
@@ -268,21 +268,21 @@ void TracksScreen::buildTrackList()
 {
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
-    
+
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     assert( tabs != NULL );
-    
+
     // Reset track list everytime (accounts for locking changes, etc.)
     tracks_widget->clearItems();
     m_random_track_list.clear();
-    
+
     const std::string curr_group_name = tabs->getSelectionIDString(0);
-    
+
     // Build track list
     if (curr_group_name == ALL_TRACK_GROUPS_ID)
     {
         const int trackAmount = track_manager->getNumberOfTracks();
-        
+
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack( n );
@@ -291,7 +291,7 @@ void TracksScreen::buildTrackList()
                 continue;
             if (curr->isArena() || curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
-            
+
             if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
@@ -306,13 +306,13 @@ void TracksScreen::buildTrackList()
                 m_random_track_list.push_back(curr->getIdent());
             }
         }
-        
+
     }
     else
     {
         const std::vector<int>& curr_group = track_manager->getTracksInGroup( curr_group_name );
         const int trackAmount = curr_group.size();
-        
+
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack( curr_group[n] );
@@ -322,7 +322,7 @@ void TracksScreen::buildTrackList()
             if (curr->isArena()) continue;
             if (curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
-            
+
             if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
@@ -338,11 +338,11 @@ void TracksScreen::buildTrackList()
             }
         }
     }
-    
+
     tracks_widget->addItem(_("Random Track"), "random_track", "/gui/track_random.png",
                            0 /* no badge */, IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
-    
-    tracks_widget->updateItemDisplay(); 
+
+    tracks_widget->updateItemDisplay();
     std::random_shuffle( m_random_track_list.begin(), m_random_track_list.end() );
 }
 
@@ -352,9 +352,9 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
 {
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
-    
+
     // only the game master can select tracks, so it's safe to use 'PLAYER_ID_GAME_MASTER'
-    tracks_widget->setSelection(trackName, PLAYER_ID_GAME_MASTER, true); 
+    tracks_widget->setSelection(trackName, PLAYER_ID_GAME_MASTER, true);
 }
 
 // -----------------------------------------------------------------------------
@@ -363,9 +363,9 @@ void TracksScreen::setFocusOnGP(const std::string& gpName)
 {
     DynamicRibbonWidget* gps_widget = this->getWidget<DynamicRibbonWidget>("gps");
     assert( gps_widget != NULL );
-    
+
     // only the game master can select tracks/GPs, so it's safe to use 'PLAYER_ID_GAME_MASTER'
-    gps_widget->setSelection(gpName, PLAYER_ID_GAME_MASTER, true); 
+    gps_widget->setSelection(gpName, PLAYER_ID_GAME_MASTER, true);
 }
 
 // -----------------------------------------------------------------------------

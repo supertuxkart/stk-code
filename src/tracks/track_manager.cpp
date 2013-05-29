@@ -48,9 +48,9 @@ TrackManager::~TrackManager()
 
 //-----------------------------------------------------------------------------
 /** Adds a directory from which tracks are loaded. The track manager checks if
- *  either this directory itself contains a track, and if any subdirectory 
+ *  either this directory itself contains a track, and if any subdirectory
  *  contains a track.
- *  \param dir The directory to add. 
+ *  \param dir The directory to add.
  */
 void TrackManager::addTrackSearchDir(const std::string &dir)
 {
@@ -69,9 +69,9 @@ Track* TrackManager::getTrack(const std::string& ident) const
         if ((*i)->getIdent() == ident)
             return *i;
     }
-    
+
     return NULL;
-    
+
 }   // getTrack
 
 //-----------------------------------------------------------------------------
@@ -98,7 +98,7 @@ void TrackManager::setUnavailableTracks(const std::vector<std::string> &tracks)
         if (std::find(tracks.begin(), tracks.end(), id)==tracks.end())
         {
             m_track_avail[i-m_tracks.begin()] = false;
-            fprintf(stderr, 
+            fprintf(stderr,
                     "Track '%s' not available on all clients, disabled.\n",
                     id.c_str());
         }   // if id not in tracks
@@ -133,7 +133,7 @@ void TrackManager::loadTrackList()
     m_soccer_arena_groups.clear();
     m_track_avail.clear();
     m_tracks.clear();
-    
+
     for(unsigned int i=0; i<m_track_search_path.size(); i++)
     {
         const std::string &dir = m_track_search_path[i];
@@ -141,12 +141,12 @@ void TrackManager::loadTrackList()
         // First test if the directory itself contains a track:
         // ----------------------------------------------------
         if(loadTrack(dir)) continue;  // track found, no more tests
-        
+
         // Then see if a subdir of this dir contains tracks
         // ------------------------------------------------
         std::set<std::string> dirs;
         file_manager->listFiles(dirs, dir, /*is_full_path*/ true);
-        for(std::set<std::string>::iterator subdir = dirs.begin(); 
+        for(std::set<std::string>::iterator subdir = dirs.begin();
             subdir != dirs.end(); subdir++)
         {
             if(*subdir=="." || *subdir=="..") continue;
@@ -167,7 +167,7 @@ bool TrackManager::loadTrack(const std::string& dirname)
         return false;
 
     Track *track;
-    
+
     try
     {
         track = new Track(config_file);
@@ -178,7 +178,7 @@ bool TrackManager::loadTrack(const std::string& dirname)
                 dirname.c_str(), e.what());
         return false;
     }
-    
+
     if (track->getVersion()<stk_config->m_min_track_version ||
         track->getVersion()>stk_config->m_max_track_version)
     {
@@ -211,10 +211,10 @@ void TrackManager::removeTrack(const std::string &ident)
         assert(false);
         return;
     }
-    
+
     if (track->isInternal()) return;
-    
-    std::vector<Track*>::iterator it = std::find(m_tracks.begin(), 
+
+    std::vector<Track*>::iterator it = std::find(m_tracks.begin(),
                                                  m_tracks.end(), track);
     if (it == m_tracks.end())
     {
@@ -229,12 +229,12 @@ void TrackManager::removeTrack(const std::string &ident)
             (track->isArena() ? m_arena_groups :
              (track->isSoccer() ? m_soccer_arena_groups :
                m_track_groups));
-    
+
     std::vector<std::string> &group_names =
             (track->isArena() ? m_arena_group_names :
              (track->isSoccer() ? m_soccer_arena_group_names :
                m_track_group_names));
-    
+
     const std::vector<std::string>& groups=track->getGroups();
     for(unsigned int i=0; i<groups.size(); i++)
     {
@@ -244,13 +244,13 @@ void TrackManager::removeTrack(const std::string &ident)
         assert(j!=indices.end());
         indices.erase(j);
 
-        // If the track was the last member of a group, 
+        // If the track was the last member of a group,
         // completely remove the group
         if(indices.size()==0)
         {
             group_2_indices.erase(groups[i]);
             std::vector<std::string>::iterator it_g;
-            it_g = std::find(group_names.begin(), group_names.end(), 
+            it_g = std::find(group_names.begin(), group_names.end(),
                              groups[i]);
             assert(it_g!=group_names.end());
             group_names.erase(it_g);
@@ -286,14 +286,14 @@ void TrackManager::removeTrack(const std::string &ident)
 void TrackManager::updateGroups(const Track* track)
 {
     if (track->isInternal()) return;
-    
-    const std::vector<std::string>& new_groups = track->getGroups();    
+
+    const std::vector<std::string>& new_groups = track->getGroups();
 
     Group2Indices &group_2_indices =
             (track->isArena() ? m_arena_groups :
              (track->isSoccer() ? m_soccer_arena_groups :
                m_track_groups));
-    
+
     std::vector<std::string> &group_names =
             (track->isArena() ? m_arena_group_names :
              (track->isSoccer() ? m_soccer_arena_group_names :
@@ -302,7 +302,7 @@ void TrackManager::updateGroups(const Track* track)
     const unsigned int groups_amount = new_groups.size();
     for(unsigned int i=0; i<groups_amount; i++)
     {
-        bool group_exists = group_2_indices.find(new_groups[i]) 
+        bool group_exists = group_2_indices.find(new_groups[i])
                                                       != group_2_indices.end();
         if(!group_exists)
             group_names.push_back(new_groups[i]);

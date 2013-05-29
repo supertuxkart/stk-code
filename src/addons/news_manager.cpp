@@ -72,8 +72,8 @@ void NewsManager::checkRedirect(const XMLNode *xml)
     {
         if(UserConfigParams::logAddons())
         {
-            std::cout << "[Addons] Current server: " 
-                      << (std::string)UserConfigParams::m_server_addons 
+            std::cout << "[Addons] Current server: "
+                      << (std::string)UserConfigParams::m_server_addons
                       << std::endl
                       << "[Addons] New server: " << new_server << std::endl;
         }
@@ -85,8 +85,8 @@ void NewsManager::checkRedirect(const XMLNode *xml)
 /** Updates the 'news' string to be displayed in the main menu.
  *  \param xml The XML data from the news file.
  *  \param filename The filename of the news xml file. Only needed
- *         in case of an error (e.g. the file might be corrupted) 
- *         - the file will be deleted so that on next start of stk it 
+ *         in case of an error (e.g. the file might be corrupted)
+ *         - the file will be deleted so that on next start of stk it
  *         will be updated again.
  */
 void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
@@ -123,7 +123,7 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
         {
 
             if(!important)
-                m_all_news_messages += m_all_news_messages.size()>0 
+                m_all_news_messages += m_all_news_messages.size()>0
                                     ?  message_divider + news
                                     : news;
             else
@@ -168,9 +168,9 @@ void NewsManager::addNewsMessage(const core::stringw &s)
     m_news.unlock();
 }   // addNewsMessage
 // ----------------------------------------------------------------------------
-/** Returns the  important message with the smallest id that has not been 
+/** Returns the  important message with the smallest id that has not been
  *  shown, or NULL if no important (not shown before) message exists atm. The
- *  user config is updated to store the last important message id shown. 
+ *  user config is updated to store the last important message id shown.
  */
 const core::stringw NewsManager::getImportantMessage()
 {
@@ -179,10 +179,10 @@ const core::stringw NewsManager::getImportantMessage()
     for(unsigned int i=0; i<m_news.getData().size(); i++)
     {
         const NewsMessage &m = m_news.getData()[i];
-        // 
-        if(m.isImportant() && 
+        //
+        if(m.isImportant() &&
            m.getMessageId()>UserConfigParams::m_last_important_message_id  &&
-            (index == -1 || 
+            (index == -1 ||
             m.getMessageId() < m_news.getData()[index].getMessageId() )     )
         {
             index = i;
@@ -224,7 +224,7 @@ const core::stringw NewsManager::getNextNewsMessage()
 
     if(m_news.getData().size()==0)
     {
-        // Lock 
+        // Lock
         m_news.unlock();
         return "";
     }
@@ -233,7 +233,7 @@ const core::stringw NewsManager::getNextNewsMessage()
     {
         m_current_news_message++;
         if(m_current_news_message >= (int)m_news.getData().size())
-            m_current_news_message = 0;            
+            m_current_news_message = 0;
 
         m = m_news.getData()[m_current_news_message].getNews();
     }

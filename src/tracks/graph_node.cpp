@@ -29,7 +29,7 @@
 /** Constructor. Saves the quad index which belongs to this graph node.
  *  \param index Index of the quad to use for this node (in QuadSet).
  */
-GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index) 
+GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
 {
     if (quad_index >= QuadSet::get()->getNumberOfQuads())
     {
@@ -41,7 +41,7 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
     m_distance_from_start = -1.0f;
 
     const Quad &quad      = QuadSet::get()->getQuad(m_quad_index);
-    // The following values should depend on the actual orientation 
+    // The following values should depend on the actual orientation
     // of the quad. ATM we always assume that indices 0,1 are the lower end,
     // and 2,3 are the upper end (or the reverse if reverse mode is selected).
     // The width is the average width at the beginning and at the end.
@@ -49,14 +49,14 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
                            +quad[3]-quad[2]) * 0.5f;
     m_right_unit_vector.normalize();
 
-    m_width = (  (quad[1]-quad[0]).length() 
+    m_width = (  (quad[1]-quad[0]).length()
                + (quad[3]-quad[2]).length() ) * 0.5f;
 
     if(QuadGraph::get()->isReverse())
     {
         m_lower_center = (quad[2]+quad[3]) * 0.5f;
         m_upper_center = (quad[0]+quad[1]) * 0.5f;
-        m_right_unit_vector *= -1.0f; 
+        m_right_unit_vector *= -1.0f;
     }
     else
     {
@@ -66,7 +66,7 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
     m_line     = core::line2df(m_upper_center.getX(), m_upper_center.getZ(),
                                m_lower_center.getX(), m_lower_center.getZ() );
     // Only this 2d point is needed later
-    m_lower_center_2d = core::vector2df(m_lower_center.getX(), 
+    m_lower_center_2d = core::vector2df(m_lower_center.getX(),
                                         m_lower_center.getZ() );
 
 }   // GraphNode
@@ -87,8 +87,8 @@ void GraphNode::addSuccessor(unsigned int to)
     const Quad &next_quad = QuadGraph::get()->getQuadOfNode(to);
 
     // Note that the first predecessor is (because of the way the quad graph
-    // is exported) the most 'natural' one, i.e. the one on the main 
-    // driveline. 
+    // is exported) the most 'natural' one, i.e. the one on the main
+    // driveline.
     gn.m_predecessor_nodes.push_back(m_node_index);
 
     Vec3 d = m_lower_center - QuadGraph::get()->getNode(to).m_lower_center;
@@ -101,7 +101,7 @@ void GraphNode::addSuccessor(unsigned int to)
 
 // ----------------------------------------------------------------------------
 /** If this node has more than one successor, it will set up a vector that
- *  contains the direction to use when a certain graph node X should be 
+ *  contains the direction to use when a certain graph node X should be
  *  reached.
  */
 void GraphNode::setupPathsToNode()
@@ -111,7 +111,7 @@ void GraphNode::setupPathsToNode()
     const unsigned int num_nodes = QuadGraph::get()->getNumNodes();
     m_path_to_node.resize(num_nodes);
 
-    // Initialise each graph node with -1, indicating that 
+    // Initialise each graph node with -1, indicating that
     // it hasn't been reached yet.
     for(unsigned int i=0; i<num_nodes; i++)
         m_path_to_node[i] = -1;
@@ -121,10 +121,10 @@ void GraphNode::setupPathsToNode()
     // recursion below.
     m_path_to_node[m_node_index] = 0;
 
-    // A simple depth first search is used to determine which successor to 
+    // A simple depth first search is used to determine which successor to
     // use to reach a certain graph node. Using Dijkstra's algorithm  would
     // give the shortest way to reach a certain node, but the shortest way
-    // might involve some shortcuts which are hidden, and should therefore 
+    // might involve some shortcuts which are hidden, and should therefore
     // not be used.
     for(unsigned int i=0; i<getNumberOfSuccessors(); i++)
     {
@@ -143,14 +143,14 @@ void GraphNode::setupPathsToNode()
 
 // ----------------------------------------------------------------------------
 /** This function marks that the successor n should be used to reach this
- *  node. It then recursively (depth first) does the same for all its 
- *  successors. Depth-first 
- *  \param n The successor which should be used in m_path_node to reach 
+ *  node. It then recursively (depth first) does the same for all its
+ *  successors. Depth-first
+ *  \param n The successor which should be used in m_path_node to reach
  *         this node.
  *  \param path_to_node The path-to-node data structure of the node for
  *         which the paths are currently determined.
  */
-void GraphNode::markAllSuccessorsToUse(unsigned int n, 
+void GraphNode::markAllSuccessorsToUse(unsigned int n,
                                        PathToNodeVector *path_to_node)
 {
     // End recursion if the path to this node has already been found.
@@ -165,7 +165,7 @@ void GraphNode::markAllSuccessorsToUse(unsigned int n,
 }   // markAllSuccesorsToUse
 
 // ----------------------------------------------------------------------------
-void GraphNode::setDirectionData(unsigned int successor, DirectionType dir, 
+void GraphNode::setDirectionData(unsigned int successor, DirectionType dir,
                                  unsigned int last_node_index)
 {
     if(m_direction.size()<successor+1)
@@ -179,7 +179,7 @@ void GraphNode::setDirectionData(unsigned int successor, DirectionType dir,
 
 // ----------------------------------------------------------------------------
 /** Returns the distance a point has from this quad in forward and sidewards
- *  direction, i.e. how far forwards the point is from the beginning of the 
+ *  direction, i.e. how far forwards the point is from the beginning of the
  *  quad, and how far to the side from the line connecting the center points
  *  is it. All these computations are done in 2D only.
  *  \param xyz The coordinates of the point.
@@ -194,7 +194,7 @@ void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
         result->setX( (closest-xyz2d).getLength());   // to the right
     else
         result->setX(-(closest-xyz2d).getLength());   // to the left
-    result->setZ( m_distance_from_start + 
+    result->setZ( m_distance_from_start +
                   (closest-m_lower_center_2d).getLength());
 }   // getDistances
 

@@ -41,27 +41,27 @@ irr::core::stringw DeviceConfig::getBindingAsString (const PlayerAction action) 
 irr::core::stringw DeviceConfig::getMappingIdString (const PlayerAction action) const
 {
     irr::core::stringw returnString = "";
-    
+
     if ((action < PA_COUNT) && (action >= 0))
     {
         const Input::InputType type = m_bindings[action].getType();
         const int id = m_bindings[action].getId();
         const Input::AxisDirection dir = m_bindings[action].getDirection();
-        
+
         switch (type)
         {
             case Input::IT_KEYBOARD:
                 returnString += "keyb_";
                 returnString += id;
                 break;
-                
+
             case Input::IT_STICKMOTION:
                 returnString += "stkmo_";
                 returnString += id;
                 returnString += "$";
                 returnString += dir;
                 break;
-                
+
             case Input::IT_STICKBUTTON:
                 returnString += "stkbt_";
                 returnString += id;
@@ -73,12 +73,12 @@ irr::core::stringw DeviceConfig::getMappingIdString (const PlayerAction action) 
                 returnString += "$";
                 returnString += dir;
                 break;
-                
+
             case Input::IT_MOUSEBUTTON:
                 returnString += "mousebtn_";
                 returnString += id;
                 break;
-                
+
             default:
                 assert(false);
                 returnString += type;
@@ -88,7 +88,7 @@ irr::core::stringw DeviceConfig::getMappingIdString (const PlayerAction action) 
                 returnString += dir;
         }
     }
-    
+
     return returnString;
 }
 
@@ -110,7 +110,7 @@ irr::core::stringw DeviceConfig::toString ()
 
 //------------------------------------------------------------------------------
 
-void DeviceConfig::setBinding ( const PlayerAction      action, 
+void DeviceConfig::setBinding ( const PlayerAction      action,
                                 const Input::InputType  type,
                                 const int               id,
                                 Input::AxisDirection    direction,
@@ -151,7 +151,7 @@ bool DeviceConfig::doGetAction(Input::InputType    type,
                                PlayerAction*       action /* out */ )
 {
     if (!m_enabled) return false;
-    
+
     bool success = false;
     int  n;
 
@@ -162,9 +162,9 @@ bool DeviceConfig::doGetAction(Input::InputType    type,
 
             if (type == Input::IT_STICKMOTION)
             {
-                if ( ((m_bindings[n].getDirection() == Input::AD_POSITIVE) 
+                if ( ((m_bindings[n].getDirection() == Input::AD_POSITIVE)
                        && (value > 0))                                      ||
-                     ((m_bindings[n].getDirection() == Input::AD_NEGATIVE) 
+                     ((m_bindings[n].getDirection() == Input::AD_NEGATIVE)
                        && (value < 0))                                        )
                 {
                     success = true;
@@ -176,7 +176,7 @@ bool DeviceConfig::doGetAction(Input::InputType    type,
                 success = true;
                *action = (PlayerAction)n;
             }
-        } 
+        }
     } // end for n
 
     return success;
@@ -222,7 +222,7 @@ bool DeviceConfig::deserializeAction(irr::io::IrrXMLReader* xml)
     }
     if(binding_id==-1)
     {
-        printf("WARNING: DeviceConfig::deserializeAction : action '%s' is unknown\n", 
+        printf("WARNING: DeviceConfig::deserializeAction : action '%s' is unknown\n",
                name_string);
         return false;
     }
@@ -257,7 +257,7 @@ void KeyboardConfig::setDefaultBinds()
     setBinding(PA_FIRE,        Input::IT_KEYBOARD, KEY_SPACE);
     setBinding(PA_LOOK_BACK,   Input::IT_KEYBOARD, KEY_KEY_B);
     setBinding(PA_PAUSE_RACE,  Input::IT_KEYBOARD, KEY_ESCAPE);
-    
+
     setBinding(PA_MENU_UP,     Input::IT_KEYBOARD, KEY_UP);
     setBinding(PA_MENU_DOWN,   Input::IT_KEYBOARD, KEY_DOWN);
     setBinding(PA_MENU_LEFT,   Input::IT_KEYBOARD, KEY_LEFT);
@@ -312,7 +312,7 @@ void GamepadConfig::setDefaultBinds ()
 
 GamepadConfig::GamepadConfig   ( const std::string     &name,
                                  const int              axis_count,
-                                 const int              button_count ) 
+                                 const int              button_count )
              : DeviceConfig( DEVICE_CONFIG_TYPE_GAMEPAD )
 {
     m_name         = name;
@@ -331,11 +331,11 @@ GamepadConfig::GamepadConfig(irr::io::IrrXMLReader* xml) : DeviceConfig( DEVICE_
     {
         printf("ERROR: Unnamed joystick in config file\n");
     }
-    else 
+    else
     {
         m_name = name_string;
     }
-    
+
     const char* enabled_string = xml->getAttributeValue("enabled");
     if (enabled_string != NULL)
     {
@@ -345,7 +345,7 @@ GamepadConfig::GamepadConfig(irr::io::IrrXMLReader* xml) : DeviceConfig( DEVICE_
     {
         m_enabled = true;
     }
-    
+
     m_plugged = 0;
     setDefaultBinds();
 }

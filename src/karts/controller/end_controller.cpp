@@ -52,7 +52,7 @@
 #include "utils/log.hpp"
 
 EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *player,
-                             Controller *prev_controller) 
+                             Controller *prev_controller)
              : AIBaseController(kart, player)
 {
     m_previous_controller = prev_controller;
@@ -76,10 +76,10 @@ EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *pla
         const unsigned int look_ahead=10;
         // Now compute for each node in the graph the list of the next 'look_ahead'
         // graph nodes. This is the list of node that is tested in checkCrashes.
-        // If the look_ahead is too big, the AI can skip loops (see 
+        // If the look_ahead is too big, the AI can skip loops (see
         // QuadGraph::findRoadSector for details), if it's too short the AI won't
         // find too good a driveline. Note that in general this list should
-        // be computed recursively, but since the AI for now is using only 
+        // be computed recursively, but since the AI for now is using only
         // (randomly picked) path this is fine
         for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
         {
@@ -94,7 +94,7 @@ EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *pla
         }
     }   // if not battle mode
 
-    // Reset must be called after QuadGraph::get() etc. is set up        
+    // Reset must be called after QuadGraph::get() etc. is set up
     reset();
 
     m_max_handicap_accel = 1.0f;
@@ -152,7 +152,7 @@ void EndController::reset()
  */
 void  EndController::newLap(int lap)
 {
-    // Forward the call to the original controller. This will implicitely 
+    // Forward the call to the original controller. This will implicitely
     // trigger setting the first end camera to be active if the controller
     // is a player controller.
     m_previous_controller->newLap(lap);
@@ -256,7 +256,7 @@ void EndController::handleRescue(const float DELTA)
  *  and return the position of that edge.
  */
 void EndController::findNonCrashingPoint(Vec3 *result)
-{    
+{
     unsigned int sector = m_next_node_index[m_track_node];
     int target_sector;
 
@@ -293,11 +293,11 @@ void EndController::findNonCrashingPoint(Vec3 *result)
 
             QuadGraph::get()->spatialToTrack(&step_track_coord, step_coord,
                                                    sector );
- 
+
             distance = fabsf(step_track_coord[0]);
 
             //If we are outside, the previous sector is what we are looking for
-            if ( distance + m_kart_width * 0.5f 
+            if ( distance + m_kart_width * 0.5f
                  > QuadGraph::get()->getNode(sector).getPathWidth()*0.5f )
             {
                 *result = QuadGraph::get()->getQuadOfNode(sector).getCenter();

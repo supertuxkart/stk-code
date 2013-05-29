@@ -40,12 +40,12 @@
 ThreeDAnimation::ThreeDAnimation(const XMLNode &node, TrackObject* object) : AnimationBase(node)
 {
     m_object = object;
-    
+
     m_crash_reset  = false;
     m_explode_kart = false;
     node.get("reset", &m_crash_reset);
     node.get("explode", &m_explode_kart);
-    
+
     m_important_animation = (World::getWorld()->getIdent() == IDENT_CUSTSCENE);
     node.get("important", &m_important_animation);
 
@@ -53,7 +53,7 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node, TrackObject* object) : Ani
     setInitialTransform(object->getInitXYZ(),
                         object->getInitRotation() );
     m_hpr = object->getInitRotation();
-    
+
     assert(!isnan(m_hpr.getX()));
     assert(!isnan(m_hpr.getY()));
     assert(!isnan(m_hpr.getZ()));
@@ -75,13 +75,13 @@ void ThreeDAnimation::update(float dt)
     {
         Vec3 xyz   = m_object->getPosition();
         Vec3 scale = m_object->getScale();
-        
+
         AnimationBase::update(dt, &xyz, &m_hpr, &scale);     //updates all IPOs
         //m_node->setPosition(xyz.toIrrVector());
         //m_node->setScale(scale.toIrrVector());
-        
+
         // Note that the rotation order of irrlicht is different from the one
-        // in blender. So in order to reproduce the blender IPO rotations 
+        // in blender. So in order to reproduce the blender IPO rotations
         // correctly, we have to get the rotations around each axis and combine
         // them in the right order for irrlicht
         core::matrix4 m;

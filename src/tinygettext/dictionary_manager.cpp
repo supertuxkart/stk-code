@@ -82,7 +82,7 @@ DictionaryManager::get_dictionary()
 {
   if (current_dict)
   {
-    return *current_dict; 
+    return *current_dict;
   }
   else
   {
@@ -105,7 +105,7 @@ DictionaryManager::get_dictionary(const Language& language)
   //log_debug << "...normalized as \"" << lang << "\"" << std::endl;
   assert(language);
 
-  Dictionaries::iterator i = dictionaries.find(language); 
+  Dictionaries::iterator i = dictionaries.find(language);
   if (i != dictionaries.end())
   {
     return *i->second;
@@ -139,7 +139,7 @@ DictionaryManager::get_dictionary(const Language& language)
           else
           {
             int score = Language::match(language, po_language);
-                          
+
             if (score > best_score)
             {
               best_score = score;
@@ -148,11 +148,11 @@ DictionaryManager::get_dictionary(const Language& language)
           }
         }
       }
-              
+
       if (!best_filename.empty())
       {
         std::string pofile = *p + "/" + best_filename;
-        try 
+        try
         {
           std::auto_ptr<std::istream> in = filesystem->open_file(pofile);
           if (!in.get())
@@ -164,7 +164,7 @@ DictionaryManager::get_dictionary(const Language& language)
             POParser::parse(pofile, *in, *dict);
           }
         }
-        catch(std::exception& e) 
+        catch(std::exception& e)
         {
           log_error << "error: failure parsing: " << pofile << std::endl;
           log_error << e.what() << "" << std::endl;
@@ -192,7 +192,7 @@ DictionaryManager::get_languages()
 
     for(std::vector<std::string>::iterator file = files.begin(); file != files.end(); ++file)
     {
-      if (has_suffix(*file, ".po")) 
+      if (has_suffix(*file, ".po"))
       {
         languages.insert(Language::from_env(file->substr(0, file->size()-3)));
       }
@@ -251,10 +251,10 @@ DictionaryManager::set_filesystem(std::auto_ptr<FileSystem> filesystem_)
 }
 // ----------------------------------------------------------------------------
 /** This function converts a .po filename (e.g. zh_TW.po) into a language
- *  specification (zh_TW). On case insensitive file systems (think windows) 
- *  the filename and therefore the country specification is lower case 
- *  (zh_tw). It Converts the lower case characters of the country back to 
- *  upper case, otherwise tinygettext does not identify the country 
+ *  specification (zh_TW). On case insensitive file systems (think windows)
+ *  the filename and therefore the country specification is lower case
+ *  (zh_tw). It Converts the lower case characters of the country back to
+ *  upper case, otherwise tinygettext does not identify the country
  *  correctly.
  */
 std::string DictionaryManager::convertFilename2Language(const std::string &s_in) const

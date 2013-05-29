@@ -43,12 +43,12 @@ PostProcessing::PostProcessing(video::IVideoDriver* video_driver)
     {
         m_supported = true;
     }
-    
+
     //Check which texture dimensions are supported on this hardware
     bool nonsquare = video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
     bool nonpower = video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
     if (!nonpower) {
-        Log::warn("PostProcessing", 
+        Log::warn("PostProcessing",
                   "Only power of two textures are supported.");
     }
     if (!nonsquare) {
@@ -60,7 +60,7 @@ PostProcessing::PostProcessing(video::IVideoDriver* video_driver)
         // Render target
         core::dimension2du opt = video_driver->getScreenSize()
                                 .getOptimalSize(!nonpower, !nonsquare);
-        m_render_target = 
+        m_render_target =
             video_driver->addRenderTargetTexture(opt, "postprocess");
         if(!m_render_target)
         {
@@ -68,9 +68,9 @@ PostProcessing::PostProcessing(video::IVideoDriver* video_driver)
                       "for post-processing, disabling it.");
             UserConfigParams::m_postprocess_enabled = false;
         }
-        
+
         // Material and shaders
-        IGPUProgrammingServices* gpu = 
+        IGPUProgrammingServices* gpu =
             video_driver->getGPUProgrammingServices();
         s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
                    (file_manager->getShaderDir() + "motion_blur.vert").c_str(),
@@ -95,7 +95,7 @@ PostProcessing::~PostProcessing()
 
 // ----------------------------------------------------------------------------
 /** Initialises post processing at the (re-)start of a race. This sets up
- *  the vertices, normals and texture coordinates for each 
+ *  the vertices, normals and texture coordinates for each
  */
 void PostProcessing::reset()
 {
@@ -108,11 +108,11 @@ void PostProcessing::reset()
     for(unsigned int i=0; i<n; i++)
     {
         m_boost_time[i] = 0.0f;
-        
+
         const core::recti &vp = Camera::getCamera(i)->getViewport();
         // Map viewport to [-1,1] x [-1,1]. First define the coordinates
         // left, right, top, bottom:
-        float right  = vp.LowerRightCorner.X < UserConfigParams::m_width 
+        float right  = vp.LowerRightCorner.X < UserConfigParams::m_width
                      ? 0.0f : 1.0f;
         float left   = vp.UpperLeftCorner.X  > 0.0f ? 0.0f : -1.0f;
         float top    = vp.UpperLeftCorner.Y  > 0.0f ? 0.0f : 1.0f;
@@ -125,7 +125,7 @@ void PostProcessing::reset()
         m_vertices[i].v1.Pos = core::vector3df(left,  top,    0);
         m_vertices[i].v2.Pos = core::vector3df(right, top,    0);
         m_vertices[i].v3.Pos = core::vector3df(right, bottom, 0);
-        // Define the texture coordinates of each vertex, which must 
+        // Define the texture coordinates of each vertex, which must
         // be in [0,1]x[0,1]
         m_vertices[i].v0.TCoords  = core::vector2df(left  ==-1.0f ? 0.0f : 0.5f,
                                                     bottom==-1.0f ? 0.0f : 0.5f);
@@ -137,10 +137,10 @@ void PostProcessing::reset()
                                                     bottom==-1.0f ? 0.0f : 0.5f);
         // Set normal and color:
         core::vector3df normal(0,0,1);
-        m_vertices[i].v0.Normal = m_vertices[i].v1.Normal = 
+        m_vertices[i].v0.Normal = m_vertices[i].v1.Normal =
         m_vertices[i].v2.Normal = m_vertices[i].v3.Normal = normal;
         video::SColor white(0xFF, 0xFF, 0xFF, 0xFF);
-        m_vertices[i].v0.Color  = m_vertices[i].v1.Color  = 
+        m_vertices[i].v0.Color  = m_vertices[i].v1.Color  =
         m_vertices[i].v2.Color  = m_vertices[i].v3.Color  = white;
 
         m_center[i].X=(m_vertices[i].v0.TCoords.X
@@ -167,15 +167,15 @@ void PostProcessing::beginCapture()
     bool any_boost = false;
     for(unsigned int i=0; i<m_boost_time.size(); i++)
         any_boost |= m_boost_time[i]>0.0f;
-    
+
     // Don't capture the input when we have no post-processing to add
     // it will be faster and this ay we won't lose anti-aliasing
-    if(!any_boost) 
+    if(!any_boost)
     {
         m_used_pp_this_frame = false;
         return;
     }
-    
+
     m_used_pp_this_frame = true;
     irr_driver->getVideoDriver()->setRenderTarget(m_render_target, true, true);
 }   // beginCapture
@@ -188,7 +188,7 @@ void PostProcessing::endCapture()
     if(!m_supported || !UserConfigParams::m_postprocess_enabled ||
         !m_used_pp_this_frame)
         return;
-    
+
     irr_driver->getVideoDriver()->setRenderTarget(video::ERT_FRAME_BUFFER,
                                                   true, true, 0);
 }   // endCapture
@@ -222,7 +222,7 @@ void PostProcessing::render()
 {
     if(!m_supported || !UserConfigParams::m_postprocess_enabled)
         return;
-    
+
     if (!m_used_pp_this_frame)
     {
         return;
@@ -230,10 +230,10 @@ void PostProcessing::render()
 
     u16 indices[6] = {0, 1, 2, 3, 0, 2};
 
-    for(m_current_camera=0; m_current_camera<Camera::getNumCameras(); 
+    for(m_current_camera=0; m_current_camera<Camera::getNumCameras();
         m_current_camera++)
     {
-        // Draw the fullscreen quad while applying the corresponding 
+        // Draw the fullscreen quad while applying the corresponding
         // post-processing shaders
         video::IVideoDriver*    video_driver = irr_driver->getVideoDriver();
         video_driver->setMaterial(m_blur_material);
@@ -244,7 +244,7 @@ void PostProcessing::render()
 }   // render
 
 // ----------------------------------------------------------------------------
-/** Implement IShaderConstantsSetCallback. Shader constants setter for 
+/** Implement IShaderConstantsSetCallback. Shader constants setter for
  *  post-processing */
 void PostProcessing::OnSetConstants(video::IMaterialRendererServices *services,
                                     s32 user_data)
@@ -255,7 +255,7 @@ void PostProcessing::OnSetConstants(video::IMaterialRendererServices *services,
 
     // Scale the boost time to get a usable boost amount:
     float boost_amount = m_boost_time[m_current_camera] * 0.7f;
-    
+
     // Especially for single screen the top of the screen is less blurred
     // in the fragment shader by multiplying the blurr factor by
     // (max_tex_height - texcoords.t), where max_tex_height is the maximum
@@ -266,9 +266,9 @@ void PostProcessing::OnSetConstants(video::IMaterialRendererServices *services,
         boost_amount *= 2.0f;
 
     services->setPixelShaderConstant("boost_amount", &boost_amount, 1);
-    services->setPixelShaderConstant("center",    
+    services->setPixelShaderConstant("center",
                                      &(m_center[m_current_camera].X), 2);
-    services->setPixelShaderConstant("direction", 
+    services->setPixelShaderConstant("direction",
                                      &(m_direction[m_current_camera].X), 2);
 
     // Use a radius of 0.15 when showing a single kart, otherwise (2-4 karts

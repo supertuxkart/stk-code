@@ -27,8 +27,8 @@
 
 /** This class handles maximum speed for karts. Several factors can influence
  *  the maximum speed a kart can drive, some will decrease the maximum speed,
- *  some will increase the maximum speed. 
- *  Slowdowns are specified in fraction of the (kart specific) maximum speed 
+ *  some will increase the maximum speed.
+ *  Slowdowns are specified in fraction of the (kart specific) maximum speed
  *  of that kart. The following categories are defined:
  *  - terrain-specific slow downs
  *  - AI related slow down (low level AIs might drive slower than player)
@@ -54,7 +54,7 @@ MaxSpeed::MaxSpeed(AbstractKart *kart)
 }   // MaxSpeed
 
 // ----------------------------------------------------------------------------
-/** Reset to prepare for a restart. It just overwrites each entry with a 
+/** Reset to prepare for a restart. It just overwrites each entry with a
  *  newly constructed values, i.e. values that don't cause any slowdown
  *  or speedup.
  */
@@ -84,7 +84,7 @@ void MaxSpeed::reset()
  *  \param fade_out_time How long the maximum speed will fade out linearly.
  */
 void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
-                                float engine_force, float duration, 
+                                float engine_force, float duration,
                                 float fade_out_time)
 {
     // Allow fade_out_time 0 if add_speed is set to 0.
@@ -98,7 +98,7 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
 }   // increaseMaxSpeed
 
 // ----------------------------------------------------------------------------
-/** This adjusts the top speed using increaseMaxSpeed, but additionally 
+/** This adjusts the top speed using increaseMaxSpeed, but additionally
  *  causes an instant speed boost, which can be smaller than add-max-speed.
  *  (e.g. a zipper can give an instant boost of 5 m/s, but over time would
  *  allow the speed to go up by 10 m/s). Note that bullet does not restrict
@@ -111,22 +111,22 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
  *  \param duration Duration of the increased speed.
  *  \param fade_out_time How long the maximum speed will fade out linearly.
  */
-void MaxSpeed::instantSpeedIncrease(unsigned int category, 
+void MaxSpeed::instantSpeedIncrease(unsigned int category,
                                    float add_max_speed, float speed_boost,
-                                   float engine_force, float duration, 
+                                   float engine_force, float duration,
                                    float fade_out_time)
 {
-    increaseMaxSpeed(category, add_max_speed, engine_force, duration, 
+    increaseMaxSpeed(category, add_max_speed, engine_force, duration,
                      fade_out_time);
-    // This will result in all max speed settings updated, but no 
+    // This will result in all max speed settings updated, but no
     // changes to any slow downs since dt=0
     update(0);
-    float speed = std::min(m_kart->getSpeed()+ speed_boost, 
+    float speed = std::min(m_kart->getSpeed()+ speed_boost,
                            MaxSpeed::getCurrentMaxSpeed() );
 
     m_kart->getVehicle()->instantSpeedIncreaseTo(speed);
 
-}  
+}
 // instantSpeedIncrease
 
 // ----------------------------------------------------------------------------
@@ -158,7 +158,7 @@ void MaxSpeed::SpeedIncrease::update(float dt)
  *  \param max_speed_fraction Fraction of top speed to allow only.
  *  \param fade_in_time How long till maximum speed is capped.
  */
-void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction, 
+void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction,
                            float fade_in_time)
 {
     assert(category>=MS_DECREASE_MIN && category <MS_DECREASE_MAX);
@@ -167,7 +167,7 @@ void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction,
 }   // setSlowdown
 
 // ----------------------------------------------------------------------------
-/** Handles the speed increase for a certain category. 
+/** Handles the speed increase for a certain category.
  *  \param dt Time step size.
  */
 void MaxSpeed::SpeedDecrease::update(float dt)
@@ -203,7 +203,7 @@ float MaxSpeed::getSpeedIncreaseTimeLeft(unsigned int category)
 void MaxSpeed::update(float dt)
 {
 
-    // First compute the minimum max-speed fraction, which 
+    // First compute the minimum max-speed fraction, which
     // determines the overall decrease of maximum speed.
     // ---------------------------------------------------
     float f = 1.0f;

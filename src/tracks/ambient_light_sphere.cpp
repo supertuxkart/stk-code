@@ -31,8 +31,8 @@
 /** Constructor for a checksphere.
  *  \param node XML node containing the parameters for this checkline.
  */
-AmbientLightSphere::AmbientLightSphere(const XMLNode &node, 
-                                       unsigned int index) 
+AmbientLightSphere::AmbientLightSphere(const XMLNode &node,
+                                       unsigned int index)
                   : CheckSphere(node, index)
 {
     m_ambient_color = video::SColor(255, 0, 255, 0);   // green
@@ -81,7 +81,7 @@ void AmbientLightSphere::update(float dt)
  *  \param indx     Index of the kart, can be used to store kart specific
  *                  additional data.
  */
-bool AmbientLightSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+bool AmbientLightSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                                      unsigned int indx)
 {
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)

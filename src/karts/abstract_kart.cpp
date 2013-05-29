@@ -26,14 +26,14 @@
 #include "karts/kart_properties_manager.hpp"
 #include "utils/log.hpp"
 
-/** Creates a kart. 
+/** Creates a kart.
  *  \param ident The identifier of the kart.
  *  \param world_kart_id  The world index of this kart.
  *  \param position The start position of the kart (1<=position<=n).
  *  \param init_transform The start position of the kart.
  */
-AbstractKart::AbstractKart(const std::string& ident, 
-                           int world_kart_id, int position, 
+AbstractKart::AbstractKart(const std::string& ident,
+                           int world_kart_id, int position,
                            const btTransform& init_transform)
              : Moveable()
 {
@@ -41,12 +41,12 @@ AbstractKart::AbstractKart(const std::string& ident,
     m_kart_properties = kart_properties_manager->getKart(ident);
     m_kart_animation  = NULL;
     assert(m_kart_properties != NULL);
-    
+
     // We have to take a copy of the kart model, since otherwise
     // the animations will be mixed up (i.e. different instances of
     // the same model will set different animation frames).
     // Technically the mesh in m_kart_model needs to be grab'ed and
-    // released when the kart is deleted, but since the original 
+    // released when the kart is deleted, but since the original
     // kart_model is stored in the kart_properties all the time,
     // there is no risk of a mesh being deleted to early.
     m_kart_model  = m_kart_properties->getKartModelCopy();
@@ -76,9 +76,9 @@ void AbstractKart::reset()
 
 // ----------------------------------------------------------------------------
 /** Returns a name to be displayed for this kart. */
-const wchar_t* AbstractKart::getName() const 
-{ 
-    return m_kart_properties->getName(); 
+const wchar_t* AbstractKart::getName() const
+{
+    return m_kart_properties->getName();
 }   // getName;
 // ----------------------------------------------------------------------------
 /** Returns a unique identifier for this kart (name of the directory the
@@ -88,24 +88,24 @@ const std::string& AbstractKart::getIdent() const
     return m_kart_properties->getIdent();
 }   // getIdent
 // ----------------------------------------------------------------------------
-bool AbstractKart::isWheeless() const 
+bool AbstractKart::isWheeless() const
 {
     return m_kart_model->getWheelModel(0)==NULL;
 }   // isWheeless
 
 // ----------------------------------------------------------------------------
-/** Sets a new kart animation. This function should either be called to 
- *  remove an existing kart animation (ka=NULL), or to set a new kart 
+/** Sets a new kart animation. This function should either be called to
+ *  remove an existing kart animation (ka=NULL), or to set a new kart
  *  animation, in which case the current kart animation must be NULL.
  *  \param ka The new kart animation, or NULL if the current kart animation
  *            is to be stopped.
  */
-void AbstractKart::setKartAnimation(AbstractKartAnimation *ka) 
+void AbstractKart::setKartAnimation(AbstractKartAnimation *ka)
 {
 #ifdef DEBUG
     if( ( (ka!=NULL) ^ (m_kart_animation!=NULL) ) ==0)
     {
-        if(ka) Log::debug("Abstract_Kart", "Setting kart animation to '%s'.", 
+        if(ka) Log::debug("Abstract_Kart", "Setting kart animation to '%s'.",
                           ka->getName().c_str());
         else   Log::debug("Abstract_Kart", "Setting kart animation to NULL.");
         if(m_kart_animation) Log::info("Abstract_Kart", "Current kart"
@@ -118,5 +118,5 @@ void AbstractKart::setKartAnimation(AbstractKartAnimation *ka)
     // is set, or there is a current animation, then it must be set to 0. This
     // makes sure that the calling logic of this function is correct.
     assert( (ka!=NULL) ^ (m_kart_animation!=NULL) );
-    m_kart_animation = ka; 
+    m_kart_animation = ka;
 }   // setKartAnimation

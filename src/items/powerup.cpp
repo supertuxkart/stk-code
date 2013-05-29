@@ -89,8 +89,8 @@ const wchar_t* getSwapperString()
 }   // getSwapperString
 
 //-----------------------------------------------------------------------------
-/** Constructor, stores the kart to which this powerup belongs. 
- *  \param kart The kart to which this powerup belongs. 
+/** Constructor, stores the kart to which this powerup belongs.
+ *  \param kart The kart to which this powerup belongs.
  */
 Powerup::Powerup(AbstractKart* kart)
 {
@@ -114,7 +114,7 @@ void Powerup::reset()
 {
     m_type = PowerupManager::POWERUP_NOTHING;
     m_number = 0;
-    
+
     int type, number;
     World::getWorld()->getDefaultCollectibles( &type, &number );
     set( (PowerupManager::PowerupType)type, number );
@@ -136,13 +136,13 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
     }
     m_type=type;
     m_number=n;
-    
+
     if(m_sound_use != NULL)
     {
         sfx_manager->deleteSFX(m_sound_use);
         m_sound_use = NULL;
     }
-    
+
     switch (m_type)
     {
         // No sound effect when arming the glove
@@ -151,27 +151,27 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
 
         case PowerupManager::POWERUP_ZIPPER:
             break ;
-            
+
         case PowerupManager::POWERUP_BOWLING:
             m_sound_use = sfx_manager->createSoundSource("bowling_roll");
             break ;
-            
+
         case PowerupManager::POWERUP_ANVIL:
             m_sound_use = sfx_manager->createSoundSource("anvil");
             break;
-            
+
         case PowerupManager::POWERUP_PARACHUTE:
             m_sound_use = sfx_manager->createSoundSource("parachute");
             break;
-            
+
         case PowerupManager::POWERUP_BUBBLEGUM:
             m_sound_use = sfx_manager->createSoundSource("goo");
             break ;
-            
+
         case PowerupManager::POWERUP_SWITCH:
             m_sound_use = sfx_manager->createSoundSource("swap");
             break;
-            
+
         case PowerupManager::POWERUP_NOTHING:
         case PowerupManager::POWERUP_CAKE:
         case PowerupManager::POWERUP_PLUNGER:
@@ -179,7 +179,7 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
             m_sound_use = sfx_manager->createSoundSource("shoot");
             break ;
     }
-    
+
 }  // set
 
 //-----------------------------------------------------------------------------
@@ -199,25 +199,25 @@ Material *Powerup::getIcon() const
 void Powerup::use()
 {
     // Play custom kart sound when collectible is used
-    if (m_type != PowerupManager::POWERUP_NOTHING && 
+    if (m_type != PowerupManager::POWERUP_NOTHING &&
         m_type != PowerupManager::POWERUP_SWATTER &&
-        m_type != PowerupManager::POWERUP_ZIPPER) 
+        m_type != PowerupManager::POWERUP_ZIPPER)
         m_owner->playCustomSFX(SFXManager::CUSTOM_SHOOT);
 
     // FIXME - for some collectibles, set() is never called
     if(m_sound_use == NULL)
     {
         //if (m_type == POWERUP_SWITCH) m_sound_use = sfx_manager->newSFX(SFXManager::SOUND_SWAP);
-        //else                          
+        //else
         m_sound_use = sfx_manager->createSoundSource("shoot");
     }
-    
+
     m_number--;
     World *world = World::getWorld();
     RaceGUIBase* gui = world->getRaceGUI();
     switch (m_type)
     {
-    case PowerupManager::POWERUP_ZIPPER:   
+    case PowerupManager::POWERUP_ZIPPER:
         m_owner->handleZipper(NULL, true);
         break ;
     case PowerupManager::POWERUP_SWITCH:
@@ -234,15 +234,15 @@ void Powerup::use()
     case PowerupManager::POWERUP_RUBBERBALL:
     case PowerupManager::POWERUP_BOWLING:
     case PowerupManager::POWERUP_PLUNGER:
-        
+
         m_sound_use->position(m_owner->getXYZ());
-        
+
         // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
         // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
         if (race_manager->getNumLocalPlayers() > 1)
         {
             // player karts played at full volume; AI karts much dimmer
-            
+
             if (m_owner->getController()->isPlayerController())
             {
                 m_sound_use->volume( 1.0f );
@@ -252,7 +252,7 @@ void Powerup::use()
                 m_sound_use->volume( std::min(0.5f, 1.0f / race_manager->getNumberOfKarts()) );
             }
         }
-        
+
         m_sound_use->play();
         projectile_manager->newProjectile(m_owner, world->getTrack(), m_type);
         break ;
@@ -276,16 +276,16 @@ void Powerup::use()
         if(!material_hit)
             return;
         normal.normalize();
-        
+
         // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
         // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
         if (race_manager->getNumLocalPlayers() > 1)
         {
             const int np = race_manager->getNumLocalPlayers();
             const int nai = race_manager->getNumberOfKarts() - np;
-            
+
             // player karts played at full volume; AI karts much dimmer
-            
+
             if (m_owner->getController()->isPlayerController())
             {
                 m_sound_use->volume( 1.0f );
@@ -295,18 +295,18 @@ void Powerup::use()
                 m_sound_use->volume( 1.0f / nai );
             }
         }
-        
+
         m_sound_use->position(m_owner->getXYZ());
         m_sound_use->play();
-        
+
         pos.setY(hit_point.getY()-0.05f);
-        
+
         ItemManager::get()->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_owner);
         }
         break;
-        
+
     case PowerupManager::POWERUP_ANVIL:
-        
+
         //Attach an anvil(twice as good as the one given
         //by the bananas) to the kart in the 1st position.
         for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
@@ -316,11 +316,11 @@ void Powerup::use()
             if(kart == m_owner) continue;
             if(kart->getPosition() == 1)
             {
-                kart->getAttachment()->set(Attachment::ATTACH_ANVIL, 
+                kart->getAttachment()->set(Attachment::ATTACH_ANVIL,
                                            stk_config->m_anvil_time);
                 kart->updateWeight();
                 kart->adjustSpeed(stk_config->m_anvil_speed_factor*0.5f);
-                
+
                 // should we position the sound at the kart that is hit,
                 // or the kart "throwing" the anvil? Ideally it should be both.
                 // Meanwhile, don't play it near AI karts since they obviously
@@ -329,7 +329,7 @@ void Powerup::use()
                     m_sound_use->position(kart->getXYZ());
                 else
                     m_sound_use->position(m_owner->getXYZ());
-                
+
                 m_sound_use->play();
 
                 irr::core::stringw anchor_message;
@@ -355,7 +355,7 @@ void Powerup::use()
                 if(m_owner->getPosition() > kart->getPosition())
                 {
                     kart->getAttachment()
-                        ->set(Attachment::ATTACH_PARACHUTE, 
+                        ->set(Attachment::ATTACH_PARACHUTE,
                               stk_config->m_parachute_time_other);
 
                     if(kart->getController()->isPlayerController())
@@ -404,37 +404,37 @@ void Powerup::use()
  *         for servers so that the clients can be informed which item
  *         was collected.
  *  \param add_info Additional information. This is used for network games
- *         so that the server can overwrite which item is collectted 
+ *         so that the server can overwrite which item is collectted
  *         (otherwise a random choice is done).
  */
 void Powerup::hitBonusBox(const Item &item, int add_info)
 {
-    // Position can be -1 in case of a battle mode (which doesn't have 
+    // Position can be -1 in case of a battle mode (which doesn't have
     // positions), but this case is properly handled in getRandomPowerup.
     int position = m_owner->getPosition();
-    
+
     unsigned int n=1;
     PowerupManager::PowerupType new_powerup;
-    
-    // Check if rubber ball is the current power up held by the kart. If so, 
+
+    // Check if rubber ball is the current power up held by the kart. If so,
     // reset the bBallCollectTime to 0 before giving new powerup.
-    if(m_type == PowerupManager::POWERUP_RUBBERBALL) 
+    if(m_type == PowerupManager::POWERUP_RUBBERBALL)
         powerup_manager->setBallCollectTime(0);
-    
+
     // Check if two bouncing balls are collected less than getRubberBallTimer()
     //seconds apart. If yes, then call getRandomPowerup again. If no, then break.
     for(int i=0; i<20; i++)
     {
         new_powerup = powerup_manager->getRandomPowerup(position, &n);
-        if(new_powerup != PowerupManager::POWERUP_RUBBERBALL || 
+        if(new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
             ( World::getWorld()->getTime() - powerup_manager->getBallCollectTime()) >
-              RubberBall::getTimeBetweenRubberBalls() ) 
+              RubberBall::getTimeBetweenRubberBalls() )
             break;
     }
 
     if(new_powerup == PowerupManager::POWERUP_RUBBERBALL)
-        powerup_manager->setBallCollectTime(World::getWorld()->getTime()); 
-    
+        powerup_manager->setBallCollectTime(World::getWorld()->getTime());
+
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).
     if(m_type == PowerupManager::POWERUP_NOTHING ||
@@ -450,7 +450,7 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
             new_powerup==m_type)
         {
             m_number+=n;
-            if(m_number > MAX_POWERUPS) 
+            if(m_number > MAX_POWERUPS)
                 m_number = MAX_POWERUPS;
         }
     }

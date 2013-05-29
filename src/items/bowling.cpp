@@ -29,14 +29,14 @@ float Bowling::m_st_max_distance_squared;
 float Bowling::m_st_force_to_target;
 
 // -----------------------------------------------------------------------------
-Bowling::Bowling(AbstractKart *kart) 
+Bowling::Bowling(AbstractKart *kart)
         : Flyable(kart, PowerupManager::POWERUP_BOWLING, 50.0f /* mass */)
 {
     m_has_hit_kart = false;
     float y_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f;
-    
+
     // if the kart is looking backwards, release from the back
-    if( kart->getControls().m_look_back ) 
+    if( kart->getControls().m_look_back )
     {
         y_offset   = -y_offset;
         m_speed    = -m_speed*2;
@@ -52,9 +52,9 @@ Bowling::Bowling(AbstractKart *kart)
     }
 
     createPhysics(y_offset, btVector3(0.0f, 0.0f, m_speed*2),
-                  new btSphereShape(0.5f*m_extend.getY()), 
+                  new btSphereShape(0.5f*m_extend.getY()),
                   1.0f /*restitution*/,
-                  -70.0f /*gravity*/, 
+                  -70.0f /*gravity*/,
                   true /*rotates*/);
     // Even if the ball is fired backwards, m_speed must be positive,
     // otherwise the ball can start to vibrate when energy is added.
@@ -63,15 +63,15 @@ Bowling::Bowling(AbstractKart *kart)
     // this would disable gravity.
     setAdjustUpVelocity(false);
 
-    // unset no_contact_response flags, so that the ball 
+    // unset no_contact_response flags, so that the ball
     // will bounce off the track
     int flag = getBody()->getCollisionFlags();
     flag = flag & (~ btCollisionObject::CF_NO_CONTACT_RESPONSE);
     getBody()->setCollisionFlags(flag);
-    
+
     // should not live forever, auto-destruct after 20 seconds
     m_max_lifespan = 20;
-    
+
 }   // Bowling
 
 // -----------------------------------------------------------------------------
@@ -85,15 +85,15 @@ void Bowling::init(const XMLNode &node, scene::IMesh *bowling)
     m_st_max_distance         = 20.0f;
     m_st_max_distance_squared = 20.0f * 20.0f;
     m_st_force_to_target      = 10.0f;
- 
+
     node.get("max-distance",    &m_st_max_distance   );
     m_st_max_distance_squared = m_st_max_distance*m_st_max_distance;
-    
+
     node.get("force-to-target", &m_st_force_to_target);
 }   // init
 
 // ----------------------------------------------------------------------------
-/** Picks a random message to be displayed when a kart is hit by a bowling 
+/** Picks a random message to be displayed when a kart is hit by a bowling
  *  ball. This function picks a different message if a kart hit itself.
  *  \param kart The kart that was hit.
  *  \returns The string to display.
@@ -163,7 +163,7 @@ bool Bowling::updateAndDelete(float dt)
             m_body->applyCentralForce(direction);
         }
     }
-    
+
     // Bowling balls lose energy (e.g. when hitting the track), so increase
     // the speed if the ball is too slow, but only if it's not too high (if
     // the ball is too high, it is 'pushed down', which can reduce the
@@ -191,8 +191,8 @@ bool Bowling::updateAndDelete(float dt)
             }
  //           m_body->setLinearVelocity(v*(m_speed/sqrt(vlen)));
         }   // vlen < 0.8*m_speed*m_speed
-    }   // hat< m_max_height  
-    
+    }   // hat< m_max_height
+
     if(vlen<0.1)
     {
         hit(NULL);
@@ -201,11 +201,11 @@ bool Bowling::updateAndDelete(float dt)
     return false;
 }   // updateAndDelete
 // -----------------------------------------------------------------------------
-/** Callback from the physics in case that a kart or physical object is hit. 
+/** Callback from the physics in case that a kart or physical object is hit.
  *  The bowling ball triggers an explosion when hit.
  *  \param kart The kart hit (NULL if no kart was hit).
  *  \param object The object that was hit (NULL if none).
- *  \returns True if there was actually a hit (i.e. not owner, and target is 
+ *  \returns True if there was actually a hit (i.e. not owner, and target is
  *           not immune), false otherwise.
  */
 bool Bowling::hit(AbstractKart* kart, PhysicalObject* obj)

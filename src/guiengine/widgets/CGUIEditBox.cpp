@@ -44,7 +44,7 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
 	CurrentTextRect(0,0,1,1), FrameRect(rectangle)
 {
     m_rtl = is_rtl;
-    
+
 	#ifdef _DEBUG
 	setDebugName("CGUIEditBox");
 	#endif
@@ -311,7 +311,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				}
 			}
 			break;
-                
+
 		case KEY_KEY_V:
 			if ( !isEnabled() )
 				break;
@@ -432,7 +432,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
             textChanged = true;
             return true;
             */
-            
+
 	case KEY_END:
 		if (!m_rtl)
         {
@@ -862,7 +862,7 @@ void CGUIEditBox::draw()
                         OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
                         false, true, &localClipRect);
                 }
-                
+
 				// draw mark and marked text
 				if (focus && MarkBegin != MarkEnd && i >= hlineStart && i < hlineStart + hlineCount)
 				{
@@ -933,12 +933,12 @@ void CGUIEditBox::draw()
 			//CurrentTextRect.UpperLeftCorner.X += charcursorpos;
 
             setTextRect(0);
-            
+
             core::rect< s32 > caret_rect = CurrentTextRect;
             caret_rect.UpperLeftCorner.X += charcursorpos - 1;
             caret_rect.LowerRightCorner.X = caret_rect.UpperLeftCorner.X + 2;
             irr_driver->getVideoDriver()->draw2DRectangle( video::SColor(255,0,0,0), caret_rect );
-            
+
             /*
 			font->draw(L"_", CurrentTextRect,
 				OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),

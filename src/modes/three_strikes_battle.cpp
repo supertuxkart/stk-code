@@ -40,7 +40,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
     WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = false;
     m_insert_tire = 0;
-    
+
     m_tire = irr_driver->getMesh( file_manager->getModelFile("tire.b3d") );
     irr_driver->grabAllTextures(m_tire);
 }   // ThreeStrikesBattle
@@ -53,13 +53,13 @@ void ThreeStrikesBattle::init()
 {
     WorldWithRank::init();
     m_display_rank = false;
-    
+
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
     {
         Log::error("Three Strikes Battle", "No AI exists for this game mode");
         exit(1);
-    }   
+    }
     m_kart_info.resize(m_karts.size());
 }   // ThreeStrikesBattle
 
@@ -84,24 +84,24 @@ ThreeStrikesBattle::~ThreeStrikesBattle()
 void ThreeStrikesBattle::reset()
 {
     WorldWithRank::reset();
-    
+
     const unsigned int kart_amount = m_karts.size();
-    
+
     for(unsigned int n=0; n<kart_amount; n++)
     {
         m_kart_info[n].m_lives  = 3;
-        
+
         // no positions in this mode
         m_karts[n]->setPosition(-1);
-        
+
         scene::ISceneNode* kart_node = m_karts[n]->getNode();
-        
+
         // FIXME: sorry for this ugly const_cast, irrlicht doesn't seem to allow getting a writable list of children, wtf??
         core::list<scene::ISceneNode*>& children = const_cast<core::list<scene::ISceneNode*>&>(kart_node->getChildren());
         for (core::list<scene::ISceneNode*>::Iterator it = children.begin(); it != children.end(); it++)
         {
             scene::ISceneNode* curr = *it;
-            
+
             if (core::stringc(curr->getName()) == "tire1")
             {
                 curr->setVisible(true);
@@ -111,9 +111,9 @@ void ThreeStrikesBattle::reset()
                 curr->setVisible(true);
             }
         }
-        
+
     }// next kart
-    
+
     // remove old battle events
     m_battle_events.clear();
 
@@ -132,7 +132,7 @@ void ThreeStrikesBattle::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-/** Adds two tires to each of the kart. The tires are used to represent 
+/** Adds two tires to each of the kart. The tires are used to represent
  *  lifes.
  *  \param kart The pointer to the kart (not used here).
  *  \param node The scene node of this kart.
@@ -140,7 +140,7 @@ void ThreeStrikesBattle::reset()
 void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
 {
     float coord = -kart->getKartLength()*0.5f;
-    
+
     scene::IMeshSceneNode* tire_node = irr_driver->addMesh(m_tire, node);
     tire_node->setPosition(core::vector3df(-0.16f, 0.3f, coord - 0.25f));
     tire_node->setScale(core::vector3df(0.4f, 0.4f, 0.4f));
@@ -155,7 +155,7 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
 }   // kartAdded
 
 //-----------------------------------------------------------------------------
-/** Called when a kart is hit. 
+/** Called when a kart is hit.
  *  \param kart_id The world kart id of the kart that was hit.
  */
 void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
@@ -163,13 +163,13 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
     assert(kart_id < m_karts.size());
     // make kart lose a life
     m_kart_info[kart_id].m_lives--;
-    
+
     // record event
     BattleEvent evt;
     evt.m_time = getTime();
     evt.m_kart_info = m_kart_info;
-    m_battle_events.push_back(evt);   
-    
+    m_battle_events.push_back(evt);
+
     updateKartRanks();
     // check if kart is 'dead'
     if (m_kart_info[kart_id].m_lives < 1)
@@ -182,7 +182,7 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
         if(wheels[2]) wheels[2]->setVisible(false);
         if(wheels[3]) wheels[3]->setVisible(false);
         eliminateKart(kart_id, /*notify_of_elimination*/ true);
-        // Find a camera of the kart with the most lives ("leader"), and 
+        // Find a camera of the kart with the most lives ("leader"), and
         // attach all cameras for this kart to the leader.
         int max_lives = 0;
         AbstractKart *leader = NULL;
@@ -213,29 +213,29 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
         }   // if leader
         m_insert_tire = 4;
     }
-    
+
     const unsigned int NUM_KARTS = getNumKarts();
     int num_karts_many_lives = 0;
- 
+
     for (unsigned int n = 0; n < NUM_KARTS; ++n)
     {
         if (m_kart_info[n].m_lives > 1) num_karts_many_lives++;
     }
-    
+
     // when almost over, use fast music
     if (num_karts_many_lives<=1 && !m_faster_music_active)
     {
         music_manager->switchToFastMusic();
         m_faster_music_active = true;
     }
-    
+
     scene::ISceneNode* kart_node = m_karts[kart_id]->getNode();
-    
-    // FIXME: sorry for this ugly const_cast, irrlicht doesn't seem to allow 
+
+    // FIXME: sorry for this ugly const_cast, irrlicht doesn't seem to allow
     // getting a writable list of children, wtf??
-    core::list<scene::ISceneNode*>& children = 
+    core::list<scene::ISceneNode*>& children =
         const_cast<core::list<scene::ISceneNode*>&>(kart_node->getChildren());
-    for (core::list<scene::ISceneNode*>::Iterator it = children.begin(); 
+    for (core::list<scene::ISceneNode*>::Iterator it = children.begin();
                                                   it != children.end(); it++)
     {
         scene::ISceneNode* curr = *it;
@@ -249,11 +249,11 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
             curr->setVisible(m_kart_info[kart_id].m_lives >= 2);
         }
     }
-    
+
     // schedule a tire to be thrown away (but can't do it in this callback
     // because the caller is currently iterating the list of track objects)
     m_insert_tire++;
-    core::vector3df wheel_pos(m_karts[kart_id]->getKartWidth()*0.5f, 
+    core::vector3df wheel_pos(m_karts[kart_id]->getKartWidth()*0.5f,
                               0.0f, 0.0f);
     m_tire_position = kart_node->getPosition() + wheel_pos;
     m_tire_rotation = 0;
@@ -271,7 +271,7 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
         m_tire_radius[i] = m_karts[kart_id]->getKartModel()
                                            ->getWheelGraphicsRadius(i);
     }
- 
+
     m_tire_dir = m_karts[kart_id]->getKartProperties()->getKartDir();
     if(m_insert_tire == 5 && m_karts[kart_id]->isWheeless())
         m_insert_tire = 0;
@@ -288,13 +288,13 @@ const std::string& ThreeStrikesBattle::getIdent() const
 
 //-----------------------------------------------------------------------------
 /** Update the world and the track.
- *  \param dt Time step size. 
+ *  \param dt Time step size.
  */
 void ThreeStrikesBattle::update(float dt)
 {
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
-    
+
     core::vector3df tire_offset;
     std::string tire;
     float scale = 0.5f;
@@ -303,7 +303,7 @@ void ThreeStrikesBattle::update(float dt)
 
     // insert blown away tire(s) now if was requested
     while (m_insert_tire > 0)
-    {        
+    {
         if(m_insert_tire == 1)
         {
             tire_offset = core::vector3df(0.0f, 0.0f, 0.0f);
@@ -333,7 +333,7 @@ void ThreeStrikesBattle::update(float dt)
         core::vector3df tire_hpr = core::vector3df(800.0f,0,
                                                    m_tire_rotation / M_PI * 180 + 180);
         core::vector3df tire_scale(scale,scale,scale);
-        
+
         PhysicalObject::Settings physicsSettings;
         physicsSettings.body_type = PhysicalObject::MP_CYLINDER_Y;
         physicsSettings.crash_reset = false;
@@ -341,12 +341,12 @@ void ThreeStrikesBattle::update(float dt)
         physicsSettings.mass = 15.0f;
         physicsSettings.radius = radius;
         physicsSettings.reset_when_too_low = false;
-        
+
         TrackObjectPresentationMesh* tire_presentation =
             new TrackObjectPresentationMesh(tire, tire_xyz, tire_hpr, tire_scale);
-        
+
         TrackObject* tire = new TrackObject(tire_xyz, tire_hpr, tire_scale,
-                                            "movable", tire_presentation, 
+                                            "movable", tire_presentation,
                                             true /* is_dynamic */,
                                             &physicsSettings);
         getTrack()->getTrackObjectManager()->insertObject(tire);
@@ -357,7 +357,7 @@ void ThreeStrikesBattle::update(float dt)
         m_insert_tire--;
         if(m_insert_tire == 1)
             m_insert_tire = 0;
-        
+
         m_tires.push_back(tire);
     }
 }   // update
@@ -370,30 +370,30 @@ void ThreeStrikesBattle::updateKartRanks()
     beginSetKartPositions();
     // sort karts by their times then give each one its position.
     // in battle-mode, long time = good (meaning he survived longer)
-    
+
     const unsigned int NUM_KARTS = getNumKarts();
-    
+
     int *karts_list = new int[NUM_KARTS];
     for( unsigned int n = 0; n < NUM_KARTS; ++n ) karts_list[n] = n;
-    
+
     bool sorted=false;
     do
     {
         sorted = true;
         for( unsigned int n = 0; n < NUM_KARTS-1; ++n )
         {
-            const int this_karts_time = 
-                  m_karts[karts_list[n]]->hasFinishedRace() 
+            const int this_karts_time =
+                  m_karts[karts_list[n]]->hasFinishedRace()
                 ? (int)m_karts[karts_list[n]]->getFinishTime()
                 : (int)WorldStatus::getTime();
-            const int next_karts_time = 
+            const int next_karts_time =
                    m_karts[karts_list[n+1]]->hasFinishedRace()
                 ? (int)m_karts[karts_list[n+1]]->getFinishTime()
                 : (int)WorldStatus::getTime();
-            
+
             // Swap if next kart survived longer or has more lives
             bool swap = next_karts_time > this_karts_time ||
-                        m_kart_info[karts_list[n+1]].m_lives 
+                        m_kart_info[karts_list[n+1]].m_lives
                         > m_kart_info[karts_list[n]].m_lives;
 
             if(swap)
@@ -403,10 +403,10 @@ void ThreeStrikesBattle::updateKartRanks()
                 karts_list[n] = tmp;
                 sorted = false;
                 break;
-            } 
+            }
         }   // for n = 0; n < NUM_KARTS-1
     } while(!sorted);
-    
+
     for( unsigned int n = 0; n < NUM_KARTS; ++n )
     {
         setKartPosition(karts_list[n], n+1);
@@ -425,7 +425,7 @@ bool ThreeStrikesBattle::isRaceOver()
     {
         return false;
     }
-    
+
     return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
 }   // isRaceOver
 
@@ -450,10 +450,10 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
-        
+
         // reset color
         rank_info.lap = -1;
-        
+
         switch(m_kart_info[i].m_lives)
         {
             case 3:
@@ -469,10 +469,10 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
                 rank_info.m_color = video::SColor(128, 128, 128, 0);
                 break;
         }
-        
+
         char lives[4];
         sprintf(lives, "%i", m_kart_info[i].m_lives);
-        
+
         rank_info.m_text = lives;
     }
 }   // getKartsDisplayInfo
@@ -487,23 +487,23 @@ void ThreeStrikesBattle::moveKartAfterRescue(AbstractKart* kart)
     World *world = World::getWorld();
     const int start_spots_amount = world->getTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
-    
+
     float largest_accumulated_distance_found = -1;
     int furthest_id_found = -1;
-    
+
     const float kart_x = kart->getXYZ().getX();
     const float kart_z = kart->getXYZ().getZ();
 
     for(int n=0; n<start_spots_amount; n++)
     {
-        // no need for the overhead to compute exact distance with sqrt(), 
+        // no need for the overhead to compute exact distance with sqrt(),
         // so using the 'manhattan' heuristic which will do fine enough.
         const btTransform &s = world->getTrack()->getStartTransform(n);
         const Vec3 &v=s.getOrigin();
         float accumulatedDistance = .0f;
         bool spawnPointClear = true;
-                
-        for(unsigned int k=0; k<getCurrentNumKarts(); k++) 
+
+        for(unsigned int k=0; k<getCurrentNumKarts(); k++)
         {
             const AbstractKart *currentKart = World::getWorld()->getKart(k);
             const float currentKart_x = currentKart->getXYZ().getX();
@@ -528,7 +528,7 @@ void ThreeStrikesBattle::moveKartAfterRescue(AbstractKart* kart)
             largest_accumulated_distance_found = accumulatedDistance;
         }
     }
-    
+
     assert(furthest_id_found != -1);
     const btTransform &s = world->getTrack()->getStartTransform(furthest_id_found);
     const Vec3 &xyz = s.getOrigin();

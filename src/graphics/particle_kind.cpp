@@ -51,30 +51,30 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     m_fade_away_end    = -1.0f;
     m_force_lost_to_gravity_time = 1000;
     m_emission_decay_rate = 0;
-    
-    
+
+
     // ----- Read XML file
-    
+
     //std::cout << "==== READING " << file << " ====\n";
-    
+
     XMLNode* xml = file_manager->createXMLTree(file);
-    
+
     if (xml == NULL)
     {
         throw std::runtime_error("[ParticleKind] Cannot find file " + file);
     }
-    
+
     if (xml->getName() != "particles")
     {
         delete xml;
         throw std::runtime_error("[ParticleKind] No <particles> main node in " + file);
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     std::string emitterShape = "point";
     xml->get("emitter", &emitterShape);
-    
+
     if (emitterShape == "point")
     {
         m_shape = EMITTER_POINT;
@@ -82,7 +82,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     else if (emitterShape == "box")
     {
         m_shape = EMITTER_BOX;
-        
+
         xml->get("box_x", &m_box_x);
         xml->get("box_y", &m_box_y);
         xml->get("box_z", &m_box_z);
@@ -92,37 +92,37 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
         fprintf(stderr, "[ParticleKind] <particles> main node has unknown value for attribute 'emitter'\n");
         m_shape = EMITTER_POINT;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     const XMLNode* spreading = xml->getNode("spreading");
     spreading->get("angle", &m_angle_spread);
-    
+
     //std::cout << "m_spread_factor = " << m_spread_factor << "\n";
-    
+
     // ------------------------------------------------------------------------
 
     const XMLNode* velocity = xml->getNode("velocity");
     velocity->get("x", &m_velocity_x);
     velocity->get("y", &m_velocity_y);
     velocity->get("z", &m_velocity_z);
-    
+
     // ------------------------------------------------------------------------
     // old deperecated way
     const XMLNode* material = xml->getNode("material");
     if (material != NULL)
     {
         material->get("file", &m_material_file);
-        
+
         if (m_material_file.size() == 0)
         {
             delete xml;
             throw std::runtime_error("[ParticleKind] <material> tag has invalid 'file' attribute");
         }
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     const XMLNode* rate = xml->getNode("rate");
     if (rate != NULL)
     {
@@ -130,85 +130,85 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
         rate->get("max", &m_max_rate);
         rate->get("decay_rate", &m_emission_decay_rate);
     }
-    
+
     //std::cout << "m_min_rate = " << m_min_rate << "\n";
     //std::cout << "m_max_rate = " << m_max_rate << "\n";
 
     // ------------------------------------------------------------------------
-    
+
     const XMLNode* lifetime = xml->getNode("lifetime");
     if (lifetime != NULL)
     {
         lifetime->get("min", &m_lifetime_min);
         lifetime->get("max", &m_lifetime_max);
     }
-    
+
     //std::cout << "m_lifetime_min = " << m_lifetime_min << "\n";
     //std::cout << "m_lifetime_max = " << m_lifetime_max << "\n";
-    
+
     // ------------------------------------------------------------------------
-    
+
     const XMLNode* size = xml->getNode("size");
     if (size != NULL)
     {
         size->get("min", &m_min_size);
         size->get("max", &m_max_size);
     }
-    
+
     //std::cout << "m_particle_size = " << m_particle_size << "\n";
     //std::cout << "m_min_size = " << m_min_size << "\n";
     //std::cout << "m_max_size = " << m_max_size << "\n";
-    
+
     // ------------------------------------------------------------------------
-    
+
     const XMLNode* color = xml->getNode("color");
     if (color != NULL)
     {
         color->get("min", &m_min_start_color);
         color->get("max", &m_max_start_color);
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     const XMLNode* fadeout = xml->getNode("fadeout");
     if (fadeout != NULL)
     {
         fadeout->get("time", &m_fadeout_time);
     }
-        
+
     //std::cout << "m_fadeout_time = " << m_fadeout_time << "\n";
-    
+
     // ------------------------------------------------------------------------
-    
+
     const XMLNode* gravity = xml->getNode("gravity");
     if (gravity != NULL)
     {
         gravity->get("strength",        &m_gravity_strength);
         gravity->get("only-force-time", &m_force_lost_to_gravity_time);
     }
-        
+
     // ------------------------------------------------------------------------
-    
+
     const XMLNode* fadeaway = xml->getNode("fade-away");
     if (fadeaway != NULL)
     {
         fadeaway->get("start", &m_fade_away_start);
         fadeaway->get("end",   &m_fade_away_end);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
-    
+
     const XMLNode* materials = xml->getNode("materials");
     if (materials != NULL)
     {
         material_manager->pushTempMaterial(materials, file);
         m_material_file = material_manager->getLatestMaterial()->getTexFname();
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
-    
+
     delete xml;
 }
 

@@ -58,7 +58,7 @@ void AddonsScreen::loadedFromFile()
                                                  + "/no-package-featured.png");
     video::ITexture* icon6 = irr_driver->getTexture( file_manager->getGUIDir()
                                                     + "/loading.png");
-    
+
     m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
     m_icon_installed     = m_icon_bank->addTextureAsSprite(icon1);
     m_icon_not_installed = m_icon_bank->addTextureAsSprite(icon2);
@@ -66,8 +66,8 @@ void AddonsScreen::loadedFromFile()
     m_icon_bank->addTextureAsSprite(icon5);
     m_icon_loading = m_icon_bank->addTextureAsSprite(icon6);
     m_icon_needs_update  = m_icon_bank->addTextureAsSprite(icon3);
-    
-    GUIEngine::ListWidget* w_list = 
+
+    GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->setColumnListener(this);
 }   // loadedFromFile
@@ -77,7 +77,7 @@ void AddonsScreen::loadedFromFile()
 
 void AddonsScreen::beforeAddingWidget()
 {
-    GUIEngine::ListWidget* w_list = 
+    GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("list_addons");
     assert(w_list != NULL);
     w_list->clearColumns();
@@ -90,33 +90,33 @@ void AddonsScreen::beforeAddingWidget()
 void AddonsScreen::init()
 {
     Screen::init();
-    
+
     m_reloading = false;
-    
+
     m_sort_desc = true;
-    
+
 	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
 
     GUIEngine::getFont()->setTabStop(0.66f);
-    
+
     if(UserConfigParams::logAddons())
         std::cout << "[addons] Using directory <" + file_manager->getAddonsDir()
               << ">\n";
-    
-    GUIEngine::ListWidget* w_list = 
+
+    GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("list_addons");
-    
+
     m_icon_height = getHeight()/8.0f;
     // 128 is the height of the image file
-    m_icon_bank->setScale(m_icon_height/128.0f); 
+    m_icon_bank->setScale(m_icon_height/128.0f);
     w_list->setIcons(m_icon_bank, (int)(m_icon_height));
-    
+
     m_type = "kart";
-    if (UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED) 
+    if (UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED)
         getWidget<GUIEngine::ButtonWidget>("reload")->setDeactivated();
     else
         getWidget<GUIEngine::ButtonWidget>("reload")->setActivated();
-    
+
 
 
     // Set the default sort order
@@ -167,7 +167,7 @@ void AddonsScreen::loadList()
     }
     sorted_list.insertionSort(/*start=*/0, m_sort_desc);
 
-    GUIEngine::ListWidget* w_list = 
+    GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->clear();
 
@@ -179,11 +179,11 @@ void AddonsScreen::loadList()
         if(!UserConfigParams::m_artist_debug_mode &&
             !addon->testStatus(Addon::AS_APPROVED)    )
             continue;
-        
+
         // Get the right icon to display
         int icon;
         if(addon->isInstalled())
-            icon = addon->needsUpdate() ? m_icon_needs_update 
+            icon = addon->needsUpdate() ? m_icon_needs_update
                                         : m_icon_installed;
 	    else
         	icon = m_icon_not_installed;
@@ -192,12 +192,12 @@ void AddonsScreen::loadList()
         if (addon->getDesigner().size()==0)
             s = (addon->getName()+L"\t" +
                     core::stringc(addon->getDateAsString().c_str())).c_str();
-        
+
         gui::IGUIFont* font = GUIEngine::getFont();
-        
-        // first column is 0.666% of the list's width. 
+
+        // first column is 0.666% of the list's width.
         // and icon width == icon height.
-        const unsigned int available_width = (int)(w_list->m_w*0.6666f 
+        const unsigned int available_width = (int)(w_list->m_w*0.6666f
                                                    - m_icon_height);
         if (font->getDimension(s.c_str()).Width > available_width)
         {
@@ -216,29 +216,29 @@ void AddonsScreen::loadList()
                 s = _C("addons", "%s by %s", addon->getName().c_str(),
                         addon->getDesigner().c_str());
             }
-            
+
             // check if text is too long to fit
             if (font->getDimension(s.c_str()).Width >  available_width)
             {
                 // start by splitting on 2 lines
-                
+
                 //I18N: as in: The Old Island by Johannes Sjolund
                 s = _("%s\nby %s",addon->getName().c_str(),
                       addon->getDesigner().c_str());
-                
+
                 core::stringw final_string;
-                
+
                 // then check if each line is now short enough.
-                std::vector<irr::core::stringw> lines = 
+                std::vector<irr::core::stringw> lines =
                     StringUtils::split(s, '\n');
                 for (unsigned int n=0; n<lines.size(); n++)
                 {
-                    if (font->getDimension(lines[n].c_str()).Width 
+                    if (font->getDimension(lines[n].c_str()).Width
                           > available_width)
                     {
                         // arg, still too long! cut the text so that it fits.
                         core::stringw line = lines[n];
-                        
+
                         // leave a margin of 14 pixels to account for the "..."
                         // that will be appended
                         int split_at = font->getCharacterFromPos(line.c_str(),
@@ -254,25 +254,25 @@ void AddonsScreen::loadList()
                         final_string.append(lines[n]);
                     }
                 }   // for nlines.size()
-                
+
                 s = final_string;
             }   // if
             s.append("\t");
             s.append(addon->getDateAsString().c_str());
         }
-        
+
         // we have no icon for featured+updateme, so if an add-on is updatable
         // forget about the featured icon
-        if (addon->testStatus(Addon::AS_FEATURED) && 
+        if (addon->testStatus(Addon::AS_FEATURED) &&
             icon != m_icon_needs_update)
         {
             icon += 2;
         }
-        
+
         w_list->addItem(addon->getId(), s.c_str(), icon);
 
         // Highlight if it's not approved in artists debug mode.
-        if(UserConfigParams::m_artist_debug_mode && 
+        if(UserConfigParams::m_artist_debug_mode &&
             !addon->testStatus(Addon::AS_APPROVED))
         {
             w_list->markItemRed(addon->getId(), true);
@@ -281,13 +281,13 @@ void AddonsScreen::loadList()
 
 	getWidget<GUIEngine::RibbonWidget>("category")->setActivated();
 	if(m_type == "kart")
-    	getWidget<GUIEngine::RibbonWidget>("category")->select("tab_kart", 
+    	getWidget<GUIEngine::RibbonWidget>("category")->select("tab_kart",
                                                         PLAYER_ID_GAME_MASTER);
 	else if(m_type == "track")
-    	getWidget<GUIEngine::RibbonWidget>("category")->select("tab_track", 
+    	getWidget<GUIEngine::RibbonWidget>("category")->select("tab_track",
                                                         PLAYER_ID_GAME_MASTER);
     else
-    	getWidget<GUIEngine::RibbonWidget>("category")->select("tab_update", 
+    	getWidget<GUIEngine::RibbonWidget>("category")->select("tab_update",
                                                         PLAYER_ID_GAME_MASTER);
 }   // loadList
 
@@ -306,7 +306,7 @@ void AddonsScreen::onColumnClicked(int column_id)
 }   // onColumnClicked
 
 // ----------------------------------------------------------------------------
-void AddonsScreen::eventCallback(GUIEngine::Widget* widget, 
+void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
                                  const std::string& name, const int playerID)
 {
     if (name == "back")
@@ -320,11 +320,11 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
         {
             m_reloading = true;
             INetworkHttp::get()->insertReInit();
-            
-            GUIEngine::ListWidget* w_list = 
+
+            GUIEngine::ListWidget* w_list =
             getWidget<GUIEngine::ListWidget>("list_addons");
             w_list->clear();
-            
+
             w_list->addItem("spacer", L"");
             w_list->addItem("loading",
                             _("Please wait while addons are updated"),
@@ -334,7 +334,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
 
     else if (name == "list_addons")
     {
-        GUIEngine::ListWidget* list = 
+        GUIEngine::ListWidget* list =
             getWidget<GUIEngine::ListWidget>("list_addons");
         std::string id = list->getSelectionInternalName();
 
@@ -377,7 +377,7 @@ void AddonsScreen::setLastSelected()
 {
     if(m_selected_index>-1)
     {
-        GUIEngine::ListWidget* list = 
+        GUIEngine::ListWidget* list =
             getWidget<GUIEngine::ListWidget>("list_addons");
         list->setSelectionID(m_selected_index);
     }
@@ -391,7 +391,7 @@ void AddonsScreen::onUpdate(float dt, irr::video::IVideoDriver*)
     {
         if(UserConfigParams::m_internet_status!=INetworkHttp::IPERM_ALLOWED)
         {
-            // not allowed to access the net. how did you get to this menu in 
+            // not allowed to access the net. how did you get to this menu in
             // the first place??
             loadList();
             m_reloading = false;

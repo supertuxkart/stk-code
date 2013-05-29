@@ -68,7 +68,7 @@ void EnterPlayerNameDialog::onTextUpdated()
 {
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     LabelWidget* lbl = getWidget<LabelWidget>("preview");
-    
+
     lbl->setText( core::stringw(translations->fribidize(textCtrl->getText())), false );
 }
 */
@@ -151,7 +151,7 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
 
 void EnterPlayerNameDialog::onUpdate(float dt)
 {
-    // It's unsafe to delete from inside the event handler so we do it here 
+    // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
         TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");

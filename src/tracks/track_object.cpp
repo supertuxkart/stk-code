@@ -30,7 +30,7 @@
 
 /** A track object: any additional object on the track. This object implements
  *  a graphics-only representation, i.e. there is no physical representation.
- *  Derived classes can implement a physical representation (see 
+ *  Derived classes can implement a physical representation (see
  *  physics/physical_object) or animations.
  * \param xml_node The xml node from which the initial data is taken. This is
  *                 for now: initial position, initial rotation, name of the
@@ -51,7 +51,7 @@ TrackObject::TrackObject(const XMLNode &xml_node, LODNode* lod_node)
 TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
                          const core::vector3df& scale, const char* interaction,
                          TrackObjectPresentation* presentation,
-                         bool is_dynamic, 
+                         bool is_dynamic,
                          const PhysicalObject::Settings* physics_settings)
 {
     m_init_xyz   = xyz;
@@ -62,17 +62,17 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     m_animator = NULL;
     m_rigid_body = NULL;
     m_interaction = interaction;
-    
+
     m_presentation = presentation;
-    
-    if (m_interaction != "ghost" && m_interaction != "none" && 
+
+    if (m_interaction != "ghost" && m_interaction != "none" &&
         physics_settings )
     {
         m_rigid_body = new PhysicalObject(is_dynamic,
                                           *physics_settings,
                                           this);
     }
-    
+
     reset();
 }   // TrackObject
 
@@ -86,9 +86,9 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     m_enabled    = true;
     m_presentation = NULL;
     m_animator = NULL;
-    
+
     m_rigid_body = NULL;
-    
+
     xml_node.get("xyz",     &m_init_xyz  );
     xml_node.get("hpr",     &m_init_hpr  );
     xml_node.get("scale",   &m_init_scale);
@@ -97,10 +97,10 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     m_interaction = "static";
     xml_node.get("interaction", &m_interaction);
     xml_node.get("lod_group", &m_lod_group);
-    
+
     m_soccer_ball = false;
     xml_node.get("soccer_ball", &m_soccer_ball);
-    
+
     std::string type;
     xml_node.get("type",    &type );
 
@@ -141,10 +141,10 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
         else
         {
             m_type = "mesh";
-            m_presentation = new TrackObjectPresentationMesh(xml_node, 
+            m_presentation = new TrackObjectPresentationMesh(xml_node,
                                                              m_enabled);
         }
-        
+
         if (m_interaction != "ghost" && m_interaction != "none")
         {
             m_rigid_body = PhysicalObject::fromXML(type == "movable",
@@ -152,13 +152,13 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
                                                    this);
         }
     }
-    
-    
+
+
     if (type == "animation" || xml_node.hasChildNamed("curve"))
     {
         m_animator = new ThreeDAnimation(xml_node, this);
     }
-    
+
     reset();
 }   // TrackObject
 
@@ -180,11 +180,11 @@ TrackObject::~TrackObject()
 void TrackObject::reset()
 {
     if (m_presentation != NULL) m_presentation->reset();
-    
+
     if (m_animator != NULL) m_animator->reset();
 }   // reset
 // ----------------------------------------------------------------------------
-/** Enables or disables this object. This affects the visibility, i.e. 
+/** Enables or disables this object. This affects the visibility, i.e.
  *  disabled objects will not be displayed anymore.
  *  \param mode Enable (true) or disable (false) this object.
  */
@@ -197,9 +197,9 @@ void TrackObject::setEnable(bool mode)
 void TrackObject::update(float dt)
 {
     if (m_presentation != NULL) m_presentation->update(dt);
-    
+
     if (m_rigid_body != NULL) m_rigid_body->update(dt);
-    
+
     if (m_animator != NULL) m_animator->update(dt);
 }   // update
 

@@ -39,10 +39,10 @@ void RaceState::serialise()
     // ---------------------------
     unsigned int num_karts = World::getWorld()->getCurrentNumKarts();
     KartControl c;
-    // Send the number of karts and for each kart the compressed 
+    // Send the number of karts and for each kart the compressed
     // control structure, xyz,hpr, and speed (which is necessary to
     // display the speed, and e.g. to determine when a parachute is detached)
-    len += 1 + num_karts*(KartControl::getLength() 
+    len += 1 + num_karts*(KartControl::getLength()
                           + getVec3Length()+getQuaternionLength()
                           + getFloatLength()) ;
 
@@ -180,9 +180,9 @@ void RaceState::receive(ENetPacket *pkt)
         }
         else
         {
-            // FIXME: KartKartCollision now takes information about the 
+            // FIXME: KartKartCollision now takes information about the
             // collision points. This either needs to be added as the third
-            // parameter, or perhaps the outcome of the collision (the 
+            // parameter, or perhaps the outcome of the collision (the
             // impulse) could be added.
             world->getPhysics()->KartKartCollision(
                 world->getKart(kart_id1), Vec3(0,0,0),

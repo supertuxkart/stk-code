@@ -42,7 +42,7 @@ HighscoreManager::HighscoreManager()
 HighscoreManager::~HighscoreManager()
 {
     saveHighscores();
-    for(type_all_scores::iterator i  = m_all_scores.begin(); 
+    for(type_all_scores::iterator i  = m_all_scores.begin();
                                   i != m_all_scores.end();  i++)
         delete *i;
 }   // ~HighscoreManager
@@ -57,7 +57,7 @@ void HighscoreManager::setFilename()
         m_filename = getenv("SUPERTUXKART_HIGHSCOREDIR")
                    + std::string("/highscore.xml");
     }
-    else 
+    else
     {
         m_filename=file_manager->getHighscoreFile("highscore.xml");
     }
@@ -90,16 +90,16 @@ void HighscoreManager::loadHighscores()
             root = NULL;
             throw std::runtime_error("No 'highscore' node found.");
         }
-        
+
         // check file version
         int v;
         if (!root->get("version", &v) || v<(int)CURRENT_HSCORE_FILE_VERSION)
         {
             Log::error("Highscore Manager", "Highscore file format too old, a new one will be created.\n");
-            irr::core::stringw warning = 
+            irr::core::stringw warning =
                 _("The highscore file was too old,\nall highscores have been erased.");
             user_config->setWarning( warning );
-            
+
             // since we haven't had the chance to load the current scores yet,
             // calling Save() now will generate an empty file with the right format.
             saveHighscores();
@@ -107,7 +107,7 @@ void HighscoreManager::loadHighscores()
             root = NULL;
             return;
         }
-        
+
         // read all entries one by one and store them in 'm_all_scores'
         for(unsigned int i=0; i<root->getNumNodes(); i++)
         {
@@ -124,7 +124,7 @@ void HighscoreManager::loadHighscores()
             }
             m_all_scores.push_back(highscores);
         }   // next entry
-        
+
         if(UserConfigParams::logMisc())
             Log::error("Highscore Manager", "Highscores will be saved in '%s'.\n",
                     m_filename.c_str());
@@ -176,7 +176,7 @@ void HighscoreManager::saveHighscores()
  */
 Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType highscore_type,
                                             int num_karts,
-                                            const RaceManager::Difficulty difficulty, 
+                                            const RaceManager::Difficulty difficulty,
                                             const std::string trackName,
                                             const int number_of_laps,
                                             const bool reverse)
@@ -184,7 +184,7 @@ Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType high
     Highscores *highscores = 0;
 
     // See if we already have a record for this type
-    for(type_all_scores::iterator i  = m_all_scores.begin(); 
+    for(type_all_scores::iterator i  = m_all_scores.begin();
                                   i != m_all_scores.end();  i++)
     {
         if((*i)->matches(highscore_type, num_karts, difficulty, trackName,

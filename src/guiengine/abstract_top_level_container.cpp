@@ -54,7 +54,7 @@ void AbstractTopLevelContainer::addWidgetsRecursively(
                                                     Widget* parent)
 {
     const unsigned short widgets_amount = widgets.size();
-    
+
     // ------- add widgets
     for (int n=0; n<widgets_amount; n++)
     {
@@ -72,25 +72,25 @@ void AbstractTopLevelContainer::addWidgetsRecursively(
                 widgets[n].getType() != WTYPE_ICON_BUTTON &&
                 widgets[n].getType() != WTYPE_SPACER)
             {
-                std::cerr << "/!\\ Warning /!\\ : widget " 
+                std::cerr << "/!\\ Warning /!\\ : widget "
                           << widgets[n].m_properties[PROP_ID].c_str()
-                          << " of type " << widgets[n].getType() 
+                          << " of type " << widgets[n].getType()
                           << " has no dimensions" << std::endl;
             }
-            
+
             if (widgets[n].m_x == -1 || widgets[n].m_y == -1)
             {
-                std::cerr << "/!\\ Warning /!\\ : widget " 
+                std::cerr << "/!\\ Warning /!\\ : widget "
                           << widgets[n].m_properties[PROP_ID].c_str()
                           << " of type " << widgets[n].getType()
                           << " has no position" << std::endl;
             }
-            
+
             widgets[n].add();
         }
-        
+
     } // for n in all widgets
-    
+
 }   // addWidgetsRecursively
 
 // ----------------------------------------------------------------------------
@@ -102,12 +102,12 @@ void AbstractTopLevelContainer::addWidgetsRecursively(
 bool isMyChildHelperFunc(const PtrVector<Widget>* within, const Widget* widget)
 {
     if (within->size() == 0) return false;
-    
+
     if (within->contains(widget))
     {
         return true;
     }
-    
+
     const int count = within->size();
     for (int n=0; n<count; n++)
     {
@@ -116,7 +116,7 @@ bool isMyChildHelperFunc(const PtrVector<Widget>* within, const Widget* widget)
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -156,24 +156,24 @@ Widget* AbstractTopLevelContainer::getWidget(const int id)
  *  \param name The name of the widget to find
  *  \param within_vector The vector of widgets to look in
  *  \return The result of the search, or NULL if the object is not found */
-Widget* AbstractTopLevelContainer::getWidget(const char* name, 
+Widget* AbstractTopLevelContainer::getWidget(const char* name,
                                              PtrVector<Widget>* within_vector)
 {
     const unsigned short widgets_amount = within_vector->size();
-    
+
     for(int n=0; n<widgets_amount; n++)
     {
         Widget& widget = (*within_vector)[n];
-        
+
         if (widget.m_properties[PROP_ID] == name) return &widget;
-        
+
         if (widget.searchInsideMe() && widget.m_children.size() > 0)
         {
             Widget* el = getWidget(name, &(widget.m_children));
             if(el != NULL) return el;
         }
     } // for n in all widgets
-    
+
     return NULL;
 }   // getWidget
 
@@ -183,29 +183,29 @@ Widget* AbstractTopLevelContainer::getWidget(const char* name,
  *  \param id The irrlicht ID of the widget to find
  *  \param within_vector The vector to look into
  *  \return The result of the search, or NULL if the object is not found */
-Widget* AbstractTopLevelContainer::getWidget(const int id, 
+Widget* AbstractTopLevelContainer::getWidget(const int id,
                                              PtrVector<Widget>* within_vector)
 {
     const unsigned short widgets_amount = within_vector->size();
-    
+
     for (int n=0; n<widgets_amount; n++)
     {
         Widget& widget = (*within_vector)[n];
-        
-        if (widget.m_element != NULL && 
+
+        if (widget.m_element != NULL &&
             widget.getIrrlichtElement()->getID() == id) return &widget;
-        
+
         if (widget.searchInsideMe() && widget.getChildren().size() > 0)
         {
-            // std::cout << "widget = <" 
+            // std::cout << "widget = <"
             //           << widget.m_properties[PROP_ID].c_str()
-            //           << ">  widget.m_children.size()=" 
+            //           << ">  widget.m_children.size()="
             // << widget.m_children.size() << std::endl;
             Widget* el = getWidget(id, &(widget.m_children));
             if(el != NULL) return el;
         }
     } // for n in all widgets
-    
+
     return NULL;
 }   // getWidget
 
@@ -219,12 +219,12 @@ Widget* AbstractTopLevelContainer::getFirstWidget(
 {
     if (m_first_widget != NULL) return m_first_widget;
     if (within_vector == NULL) within_vector = &m_widgets;
-    
+
     for (int i = 0; i < within_vector->size(); i++)
     {
         if (!within_vector->get(i)->m_focusable) continue;
-        
-        // if container, also checks children 
+
+        // if container, also checks children
         // (FIXME: don't hardcode which types to avoid descending into)
         if (within_vector->get(i)->m_children.size() > 0 &&
             within_vector->get(i)->getType() != WTYPE_RIBBON &&
@@ -233,17 +233,17 @@ Widget* AbstractTopLevelContainer::getFirstWidget(
             Widget* w = getFirstWidget(&within_vector->get(i)->m_children);
             if (w != NULL) return w;
         }
-        
+
         Widget* item = within_vector->get(i);
         if (item->getIrrlichtElement() == NULL ||
             item->getIrrlichtElement()->getTabOrder() == -1 ||
-             /* non-tabbing items are given such IDs */ 
+             /* non-tabbing items are given such IDs */
             item->getIrrlichtElement()->getTabOrder() >= 1000 ||
             !item->m_focusable)
         {
             continue;
         }
-        
+
         return item;
     } // for i in all widgets of within_vector
     return NULL;
@@ -259,11 +259,11 @@ Widget* AbstractTopLevelContainer::getLastWidget(
 {
     if (m_last_widget != NULL) return m_last_widget;
     if (within_vector == NULL) within_vector = &m_widgets;
-    
+
     for (int i = within_vector->size()-1; i >= 0; i--)
     {
         if (!within_vector->get(i)->m_focusable) continue;
-        
+
         // if container, also checks children
         if (within_vector->get(i)->getChildren().size() > 0 &&
             within_vector->get(i)->getType() != WTYPE_RIBBON &&
@@ -272,10 +272,10 @@ Widget* AbstractTopLevelContainer::getLastWidget(
             Widget* w = getLastWidget(&within_vector->get(i)->m_children);
             if (w != NULL) return w;
         }
-        
+
         Widget* item = within_vector->get(i);
         IGUIElement* elem = item->getIrrlichtElement();
-        
+
         if (elem == NULL ||
             elem->getTabOrder() == -1 ||
             !Widget::isFocusableId(elem->getTabOrder()) ||
@@ -283,7 +283,7 @@ Widget* AbstractTopLevelContainer::getLastWidget(
         {
             continue;
         }
-        
+
         return item;
     }  // for i in all widgets of within_vector
     return NULL;
@@ -291,7 +291,7 @@ Widget* AbstractTopLevelContainer::getLastWidget(
 
 // ----------------------------------------------------------------------------
 
-/** This function is called when screen is removed. This means all irrlicht 
+/** This function is called when screen is removed. This means all irrlicht
  *   widgets this object has pointers to are now gone. All references are set
  *   to NULL to avoid problems.
  *   \param within_vector The vector of widgets to clear
@@ -300,13 +300,13 @@ void AbstractTopLevelContainer::elementsWereDeleted(PtrVector<Widget>* within_ve
 {
     if (within_vector == NULL) within_vector = &m_widgets;
     const unsigned short widgets_amount = within_vector->size();
-    
+
     for (int n=0; n<widgets_amount; n++)
     {
         Widget& widget = (*within_vector)[n];
-        
+
         widget.elementRemoved();
-        
+
         if (widget.m_children.size() > 0)
         {
             elementsWereDeleted( &(widget.m_children) );

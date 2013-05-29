@@ -28,17 +28,17 @@
  *  \param node XML node containing the parameters for this goal line.
  *  \param index Index of this check structure in the check manager.
  */
-CheckGoal::CheckGoal(const XMLNode &node,  unsigned int index) 
+CheckGoal::CheckGoal(const XMLNode &node,  unsigned int index)
            : CheckStructure(node, index)
 {
     // Determine the team for this goal
     m_first_goal = false;
     node.get("first_goal", &m_first_goal);
-    
+
     Vec3 p1, p2;
     node.get("p1", &p1);
     node.get("p2", &p2);
-    
+
     m_line.setLine( core::vector2df(p1.getX(), p1.getZ()),
                     core::vector2df(p2.getX(), p2.getZ()) );
 }   // CheckGoal
@@ -51,13 +51,13 @@ void CheckGoal::update(float dt)
 {
     World *world = World::getWorld();
     assert(world);
-    
+
     Track* track = world->getTrack();
     assert(track);
-    
+
     TrackObjectManager* tom = track->getTrackObjectManager();
     assert(tom);
-    
+
     PtrVector<TrackObject>&   objects = tom->getObjects();
     unsigned int ball_index = 0;
     for(int i=0; i<objects.size(); i++)
@@ -65,7 +65,7 @@ void CheckGoal::update(float dt)
         TrackObject* obj = objects.get(i);
         if(!obj->isSoccerBall())
             continue;
-        
+
         const Vec3 &xyz = obj->getPresentation<TrackObjectPresentationMesh>()->getNode()->getPosition();
         if(isTriggered(m_previous_position[ball_index], xyz, ball_index))
         {
@@ -80,7 +80,7 @@ void CheckGoal::update(float dt)
 }
 
 // ----------------------------------------------------------------------------
-/** Called when the check line is triggered. This function  creates a cannon 
+/** Called when the check line is triggered. This function  creates a cannon
  *  animation object and attaches it to the kart.
  *  \param kart_index The index of the kart that triggered the check line.
  */
@@ -92,38 +92,38 @@ void CheckGoal::trigger(unsigned int kart_index)
         fprintf(stderr, "WARNING: no soccer world found, cannot count the points\n");
         return;
     }
-    
+
     world->onCheckGoalTriggered(m_first_goal);
 }   // CheckGoal
 
-bool CheckGoal::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+bool CheckGoal::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                             unsigned int indx)
 {
     core::vector2df cross_point;
-    
+
     // Check if the finite line was actually crossed:
-    return m_line.intersectWith(core::line2df(old_pos.toIrrVector2d(), 
-                                              new_pos.toIrrVector2d()), 
+    return m_line.intersectWith(core::line2df(old_pos.toIrrVector2d(),
+                                              new_pos.toIrrVector2d()),
                                 cross_point);
-    
+
 }   // isTriggered
 
 void CheckGoal::reset(const Track &track)
 {
     const TrackObjectManager* tom = track.getTrackObjectManager();
     assert(tom);
-    
+
     m_previous_position.clear();
-    
+
     const PtrVector<TrackObject>&   objects = tom->getObjects();
     for(int i=0; i<objects.size(); i++)
     {
         const TrackObject* obj = objects.get(i);
         if(!obj->isSoccerBall())
             continue;
-        
+
         const Vec3 &xyz = obj->getPresentation<TrackObjectPresentationMesh>()->getNode()->getPosition();
-        
+
         m_previous_position.push_back(xyz);
     }
 }   // reset

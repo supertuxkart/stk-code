@@ -41,22 +41,22 @@ BubbleWidget::BubbleWidget() : Widget(WTYPE_BUBBLE)
 // ----------------------------------------------------------------------------
 
 void BubbleWidget::add()
-{    
+{
     m_shrinked_size = rect<s32>(m_x, m_y, m_x + m_w - BUBBLE_MARGIN_ON_RIGHT, m_y + m_h);
     stringw message = getText();
 
     m_shrinked_size.LowerRightCorner.Y -= BOTTOM_MARGIN;
-    
+
     IGUIStaticText* irrwidget;
     irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), m_shrinked_size,
                                                       false, true /* word wrap */, m_parent,
                                                       (m_focusable ? getNewID() : getNewNoFocusID()));
     irrwidget->setTextRestrainedInside(false);
-    
+
 #if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
     irrwidget->setRightToLeft( translations->isRTLLanguage() );
 #endif
-    
+
 
     m_element = irrwidget;
     replaceText();
@@ -91,7 +91,7 @@ void BubbleWidget::replaceText()
     {
         m_expanded_size.UpperLeftCorner.Y  -= additionalNeededSize/2 + 10;
         m_expanded_size.LowerRightCorner.Y += additionalNeededSize/2 + 10;
-        
+
         // reduce text to fit in the available space if it's too long
         if (translations->isRTLLanguage())
         {
@@ -128,19 +128,19 @@ void BubbleWidget::setText(const irr::core::stringw &s)
 void BubbleWidget::updateSize()
 {
     core::rect<s32> currsize = m_shrinked_size;
-    
+
     const int y1_top    = m_shrinked_size.UpperLeftCorner.Y;
     const int y1_bottom = m_shrinked_size.LowerRightCorner.Y;
-    
+
     const int y2_top    = m_expanded_size.UpperLeftCorner.Y;
     const int y2_bottom = m_expanded_size.LowerRightCorner.Y;
-    
+
     currsize.UpperLeftCorner.Y  = (int)(y1_top + (y2_top - y1_top)*m_zoom);
-    currsize.LowerRightCorner.Y = (int)(y1_bottom 
+    currsize.LowerRightCorner.Y = (int)(y1_bottom
                                         +(y2_bottom - y1_bottom)*m_zoom);
 
     m_element->setRelativePosition(currsize);
-    
+
     if (m_zoom > 0.5f)
     {
         getIrrlichtElement<IGUIStaticText>()->setText(getText().c_str());
@@ -159,10 +159,10 @@ EventPropagation BubbleWidget::focused(const int playerID)
     {
         // bring element to top (with a hack because irrlicht does not appear to offer a built-in way to do this)
         m_element->grab();
-        
+
         IGUIElement* parent = m_parent;
         if (parent == NULL) parent = GUIEngine::getGUIEnv()->getRootGUIElement();
-        
+
         parent->removeChild(m_element);
         parent->addChild(m_element);
         m_element->drop();

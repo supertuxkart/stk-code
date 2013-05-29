@@ -65,7 +65,7 @@ std::set<scene::IMeshBuffer*> g_processed;
 
 //-----------------------------------------------------------------------------
 
-Material* MaterialManager::getMaterialFor(video::ITexture* t, 
+Material* MaterialManager::getMaterialFor(video::ITexture* t,
                                           scene::IMeshBuffer *mb)
 {
     assert(t != NULL);
@@ -78,7 +78,7 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
             return m_materials[i];
         }
     }   // for i
-    
+
     return NULL;
 }
 
@@ -88,7 +88,7 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
  *  \param t Pointer to the texture.
  *  \param mb Pointer to the mesh buffer.
 */
-void MaterialManager::setAllMaterialFlags(video::ITexture* t, 
+void MaterialManager::setAllMaterialFlags(video::ITexture* t,
                                           scene::IMeshBuffer *mb)
 {
     Material* mat = getMaterialFor(t, mb);
@@ -97,7 +97,7 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
         mat->setMaterialProperties(&(mb->getMaterial()), mb);
         return;
     }
-        
+
     // This material does not appear in materials.xml. Set some common flags...
     if (UserConfigParams::m_anisotropic > 0)
     {
@@ -110,16 +110,16 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
     else if (UserConfigParams::m_trilinear)
     {
         mb->getMaterial().setFlag(video::EMF_TRILINEAR_FILTER, true);
-    }    
-    
+    }
+
     mb->getMaterial().ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
-    
+
     if (World::getWorld() != NULL && World::getWorld()->getTrack() != NULL)
     {
         mb->getMaterial().FogEnable = World::getWorld()->getTrack()->isFogEnabled();
     }
-    
-    
+
+
     // Modify lightmap materials so that vertex colors are taken into account.
     // But disable lighting because we assume all lighting is already part
     // of the lightmap
@@ -131,16 +131,16 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
         mb->getMaterial().EmissiveColor = video::SColor(255, 255, 255, 255);
         mb->getMaterial().SpecularColor = video::SColor(255, 255, 255, 255);
     }
-    
-    
+
+
     //if (UserConfigParams::m_fullscreen_antialiasing)
     //    mb->getMaterial().AntiAliasing = video::EAAM_LINE_SMOOTH;
-    
+
 }   // setAllMaterialFlags
 
 //-----------------------------------------------------------------------------
 
-void MaterialManager::adjustForFog(video::ITexture* t, 
+void MaterialManager::adjustForFog(video::ITexture* t,
                                    scene::IMeshBuffer *mb,
                                    scene::ISceneNode* parent,
                                    bool use_fog) const
@@ -274,14 +274,14 @@ void MaterialManager::popTempMaterial()
  *  material permanent, make_permanent must be set to true. This is used for
  *  the powerup_manager, since not all icons for the powerups are listed in the
  *  materials.dat file, causing the missing ones to be temporary only (and
- *  then get deleted after one race, causing the powerup_manager to have 
+ *  then get deleted after one race, causing the powerup_manager to have
  *  invalid pointers.
  *  \param fname  Name of the material.
  *  \param is_full_path True if the name includes the path (defaults to false)
- *  \param make_permanent True if this material should be kept in memory 
+ *  \param make_permanent True if this material should be kept in memory
  *                        (defaults to false)
  */
-Material *MaterialManager::getMaterial(const std::string& fname, 
+Material *MaterialManager::getMaterial(const std::string& fname,
                                        bool is_full_path,
                                        bool make_permanent,
                                        bool complain_if_not_found)
@@ -289,7 +289,7 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     if(fname=="")
     {
         // This happens while reading the stk_config file, which contains
-        // kart_properties information (but no icon file): since at this 
+        // kart_properties information (but no icon file): since at this
         // stage loadMaterial() hasn't been called, an exception can be
         // triggered here (as it happened with visual c++), when
         // m_materials[0] is accessed.
@@ -308,7 +308,7 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     // Add the new material
     Material* m=new Material(fname, m_materials.size(), is_full_path, complain_if_not_found);
     m_materials.push_back(m);
-    if(make_permanent) 
+    if(make_permanent)
     {
         assert(m_shared_material_index==(int)m_materials.size()-1);
         m_shared_material_index = (int)m_materials.size();
@@ -329,7 +329,7 @@ void MaterialManager::makeMaterialsPermanent()
 bool MaterialManager::hasMaterial(const std::string& fname)
 {
     std::string basename=StringUtils::getBasename(fname);
-    
+
     // Search backward so that temporary (track) textures are found first
     for(int i = (int)m_materials.size()-1; i>=0; i-- )
     {

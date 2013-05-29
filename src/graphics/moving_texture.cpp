@@ -21,7 +21,7 @@
 
 /** Constructor for an animated texture.
  *  \param matrix The texture matrix to modify.
- *  \param node An XML node containing dx and dy attributes to set the 
+ *  \param node An XML node containing dx and dy attributes to set the
  *         speed of the animation.
  */
 MovingTexture::MovingTexture(core::matrix4 *matrix, const XMLNode &node)
@@ -42,7 +42,7 @@ MovingTexture::MovingTexture(core::matrix4 *matrix, const XMLNode &node)
     node.get("dx", &m_dx);
     node.get("dy", &m_dy);
     node.get("dt", &m_dt);
-    
+
     node.get("animByStep", &m_isAnimatedByStep);
 }   // MovingTexture
 

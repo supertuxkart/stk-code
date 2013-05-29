@@ -30,7 +30,7 @@ QuadSet *QuadSet::m_quad_set = NULL;
 /** Constructor, loads the quad set from a file. Assigns a pointer
  *  to this instance to m_quad_set, so that it can be accessed using get().
  */
-QuadSet::QuadSet() 
+QuadSet::QuadSet()
 {
     m_quad_set = this;
 }   // QuadSet
@@ -49,12 +49,12 @@ QuadSet::~QuadSet()
 }   // ~QuadSet
 
 // -----------------------------------------------------------------------------}
-/** This function interprets a point specification as an attribute in the 
+/** This function interprets a point specification as an attribute in the
     xml quadset file. It understands two different specifications:
     p1="n:p"      : get point p from square n (n, p integers)
     p1="p1,p2,p3" : make a 3d point out of these 3 floating point values
 */
-void QuadSet::getPoint(const XMLNode *xml, const std::string &attribute_name, 
+void QuadSet::getPoint(const XMLNode *xml, const std::string &attribute_name,
                        Vec3* result) const
 {
     std::string s;
@@ -66,13 +66,13 @@ void QuadSet::getPoint(const XMLNode *xml, const std::string &attribute_name,
         int n=atoi(l[0].c_str());
         int p=atoi(l[1].c_str());
         *result=(*m_all_quads[n])[p];
-    } 
+    }
     else
     {
         xml->get(attribute_name, result);
     }
 
-}   // getPoint 
+}   // getPoint
 // -----------------------------------------------------------------------------
 /** Loads the set of all quads from the specified filename.
  *  \param filename The absolute filename to load the quad file from.
@@ -83,7 +83,7 @@ void QuadSet::init(const std::string &filename)
     m_max = Vec3(-99999, -99999, -99999);
 
     XMLNode *xml = file_manager->createXMLTree(filename);
-    if(!xml || xml->getName()!="quads") 
+    if(!xml || xml->getName()!="quads")
     {
         fprintf(stderr, "[QuadSet::load] ERROR : QuadSet '%s' not found.\n", filename.c_str());
         return;
@@ -100,7 +100,7 @@ void QuadSet::init(const std::string &filename)
 
         // Note that it's not easy to do the reading of the parameters here
         // in quad, since the specification in the xml can contain references
-        // to previous points. E.g.:  
+        // to previous points. E.g.:
         // <quad p0="40:3" p1="40:2" p2="25.396030 0.770338 64.796539" ...
         Vec3 p0, p1, p2, p3;
         getPoint(xml_node, "p0", &p0);

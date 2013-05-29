@@ -36,7 +36,7 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
                      : HitSFX(coord, explosion_sound)
 {
     // short emision time, explosion, not constant flame
-    m_remaining_time  = burst_time; 
+    m_remaining_time  = burst_time;
     m_node            = irr_driver->addParticleNode();
     m_node->grab();
 #ifdef DEBUG
@@ -48,9 +48,9 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
     m->setMaterialProperties(&(m_node->getMaterial(0)), NULL);
     m_node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR );
 
-    scene::IParticleEmitter* em = 
+    scene::IParticleEmitter* em =
         m_node->createSphereEmitter(core::vector3df(0.0f,0.0f,0.0f), 0.5f,
-              /* velocity in m/ms */core::vector3df(0.0f,0.005f,0.0f), 
+              /* velocity in m/ms */core::vector3df(0.0f,0.005f,0.0f),
                                      600, 900, // min max particles per sec
                                      video::SColor(0, 0, 0, 0), // min colour
                                      video::SColor(0, 0, 0, 0), // max colour
@@ -60,13 +60,13 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
                                              *1000.0f), // max max life ms
                                      90, // max angle
                                      // min and max start size
-                                     core::dimension2df(0.3f, 0.3f), 
+                                     core::dimension2df(0.3f, 0.3f),
                                      core::dimension2df(0.75f, 0.75f)
                                      );
     m_node->setEmitter(em); // this grabs the emitter
     em->drop(); // so we can drop it here without deleting it
 
-    scene::IParticleAffector* scale_affector = 
+    scene::IParticleAffector* scale_affector =
         m_node->createScaleParticleAffector(core::dimension2df(3.0f, 3.0f));
     m_node->addAffector(scale_affector); // same goes for the affector
     scale_affector->drop();
@@ -98,26 +98,26 @@ bool Explosion::updateAndDelete(float dt)
     HitSFX::updateAndDelete(dt);
 
     m_remaining_time -= dt;
-    
+
     if (m_remaining_time < 0.0f && m_remaining_time >= -explosion_time)
     {
-        
+
         const int intensity = (int)(255-(m_remaining_time/-explosion_time)*255);
         m_node->getMaterial(0).AmbientColor.setGreen(intensity);
         m_node->getMaterial(0).DiffuseColor.setGreen(intensity);
         m_node->getMaterial(0).EmissiveColor.setGreen(intensity);
-        
+
         m_node->getMaterial(0).AmbientColor.setBlue(intensity);
         m_node->getMaterial(0).DiffuseColor.setBlue(intensity);
         m_node->getMaterial(0).EmissiveColor.setBlue(intensity);
-        
+
         m_node->getMaterial(0).AmbientColor.setRed(intensity);
         m_node->getMaterial(0).DiffuseColor.setRed(intensity);
         m_node->getMaterial(0).EmissiveColor.setRed(intensity);
-         
+
     }
-    
-    
+
+
     // Do nothing more if the animation is still playing
     if (m_remaining_time>0) return false;
 
@@ -133,7 +133,7 @@ bool Explosion::updateAndDelete(float dt)
     else
     {
         // Sound and animation finished, node can be removed now.
-        // Returning true will cause this node to be deleted by 
+        // Returning true will cause this node to be deleted by
         // the projectile manager.
         return true;   // finished
     }

@@ -22,7 +22,7 @@
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 
-/** Creates a message containing the finishing time and rank of each kart. 
+/** Creates a message containing the finishing time and rank of each kart.
  *  This message is serialised so that it can be sent.
  */
 RaceResultMessage::RaceResultMessage() : Message(MT_RACE_RESULT)
@@ -39,11 +39,11 @@ RaceResultMessage::RaceResultMessage() : Message(MT_RACE_RESULT)
 }   // RaceResultMessage
 
 // ----------------------------------------------------------------------------
-/** De-serialises a race result message and sets the appropriate results in 
+/** De-serialises a race result message and sets the appropriate results in
  *  the kart and the race manager.
  *  \param pkt The enet message paket.
  */
-RaceResultMessage::RaceResultMessage(ENetPacket* pkt) 
+RaceResultMessage::RaceResultMessage(ENetPacket* pkt)
                  : Message(pkt, MT_RACE_RESULT)
 {
     World *world = World::getWorld();

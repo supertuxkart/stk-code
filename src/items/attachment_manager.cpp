@@ -24,7 +24,7 @@
 
 AttachmentManager *attachment_manager = 0;
 
-struct  initAttachmentType {Attachment::AttachmentType attachment; 
+struct  initAttachmentType {Attachment::AttachmentType attachment;
                             const char *file;
                             const char *icon_file;};
 
@@ -34,14 +34,14 @@ struct  initAttachmentType {Attachment::AttachmentType attachment;
               friction only becomes important at higher speeds.
    Anvil:     It increases the weight of the kart.But this will NOT have any
               effect on karts already driving at highest speed: the accelerating
-       force is independent of the mass, so it is 0 at highest speed 
+       force is independent of the mass, so it is 0 at highest speed
        (engine force = air- plus system-force) and only this value gets
-       divided by the mass later --> at highest speed there would be no 
-       effect when the mass is changed, only at lower speeds the acting 
+       divided by the mass later --> at highest speed there would be no
+       effect when the mass is changed, only at lower speeds the acting
        acceleration will be lower.Reducing the power slows the kart down,
-       but doesn't give the feeling of a sudden weight increase. 
+       but doesn't give the feeling of a sudden weight increase.
        Therefore the anvil will reduce by a certain factor (see physics
-       parameters) once when it is attached. Together with the mass 
+       parameters) once when it is attached. Together with the mass
        increase (lower acceleration) it's sufficient negative.
 */
 
@@ -97,7 +97,7 @@ void AttachmentManager::loadModels()
             m_all_icons[iat[i].attachment] =
                 material_manager->getMaterial(full_icon_path,
                                               /* full_path */     true,
-                                              /*make_permanent */ true); 
+                                              /*make_permanent */ true);
         }
 
     }   // for

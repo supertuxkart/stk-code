@@ -34,15 +34,15 @@
 WorldStatus::WorldStatus()
 {
     m_clock_mode        = CLOCK_CHRONO;
-    
+
     m_prestart_sound    = sfx_manager->createSoundSource("pre_start_race");
     m_start_sound       = sfx_manager->createSoundSource("start_race");
     m_track_intro_sound = sfx_manager->createSoundSource("track_intro");
 
     music_manager->stopMusic();
-    
+
     m_play_racestart_sounds = true;
-    
+
     IrrlichtDevice *device = irr_driver->getDevice();
     if (device->getTimer()->isStopped()) device->getTimer()->start();
 }   // WorldStatus
@@ -60,7 +60,7 @@ void WorldStatus::reset()
     m_previous_phase  = UNDEFINED_PHASE;
     // Just in case that the game is reset during the intro phase
     m_track_intro_sound->stop();
-    
+
     IrrlichtDevice *device = irr_driver->getDevice();
     if (device->getTimer()->isStopped()) device->getTimer()->start();
 }   // reset
@@ -98,12 +98,12 @@ void WorldStatus::enterRaceOverState()
     // Don't enter race over if it's already race over
     if(    m_phase == DELAY_FINISH_PHASE
         || m_phase == RESULT_DISPLAY_PHASE
-        || m_phase == FINISH_PHASE          ) 
+        || m_phase == FINISH_PHASE          )
         return;
-    
+
     m_phase = DELAY_FINISH_PHASE;
     m_auxiliary_timer = 0.0f;
-    
+
 }   // enterRaceOverState
 
 //-----------------------------------------------------------------------------
@@ -130,7 +130,7 @@ void WorldStatus::update(const float dt)
         // tilt way too much. A separate setup phase for the first frame
         // simplifies this handling
         case SETUP_PHASE:
-            m_auxiliary_timer = 0.0f;  
+            m_auxiliary_timer = 0.0f;
             m_phase = TRACK_INTRO_PHASE;
             if (UserConfigParams::m_music && m_play_racestart_sounds)
             {
@@ -159,10 +159,10 @@ void WorldStatus::update(const float dt)
             if(m_auxiliary_timer>1.0)
             {
                 if (m_play_racestart_sounds) m_prestart_sound->play();
-                m_phase=SET_PHASE;   
+                m_phase=SET_PHASE;
             }
             m_auxiliary_timer += dt;
-            
+
             // In artist debug mode, when without opponents, skip the ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode &&
                 race_manager->getNumberOfKarts() == 1 &&
@@ -170,19 +170,19 @@ void WorldStatus::update(const float dt)
                 m_auxiliary_timer += dt*6;
             return;
         case SET_PHASE  :
-            if(m_auxiliary_timer>2.0) 
+            if(m_auxiliary_timer>2.0)
             {
                 // set phase is over, go to the next one
-                m_phase=GO_PHASE;  
+                m_phase=GO_PHASE;
                 if (m_play_racestart_sounds) m_start_sound->play();
-                
+
                 World::getWorld()->getTrack()->startMusic();
-                
+
                 // event
                 onGo();
             }
             m_auxiliary_timer += dt;
-            
+
             // In artist debug mode, when without opponents, skip the ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode &&
                 race_manager->getNumberOfKarts() == 1  &&
@@ -190,17 +190,17 @@ void WorldStatus::update(const float dt)
                 m_auxiliary_timer += dt*6;
             return;
         case GO_PHASE  :
-            
+
             if (m_auxiliary_timer>2.5f && music_manager->getCurrentMusic())
                 music_manager->startMusic(music_manager->getCurrentMusic());
-            
-            if(m_auxiliary_timer>3.0f)    // how long to display the 'go' message  
+
+            if(m_auxiliary_timer>3.0f)    // how long to display the 'go' message
             {
                 m_phase=MUSIC_PHASE;
             }
-            
+
             m_auxiliary_timer += dt;
-            
+
             // In artist debug mode, when without opponents, skip the ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode && race_manager->getNumberOfKarts() == 1)
                 m_auxiliary_timer += dt*6;
@@ -208,17 +208,17 @@ void WorldStatus::update(const float dt)
         case MUSIC_PHASE:
             // how long to display the 'music' message
             if(m_auxiliary_timer>stk_config->m_music_credit_time)
-                m_phase=RACE_PHASE;  
+                m_phase=RACE_PHASE;
             m_auxiliary_timer += dt;
             break;
         case RACE_PHASE:
             // Nothing to do for race phase, switch to delay finish phase
-            // happens when 
+            // happens when
             break;
         case DELAY_FINISH_PHASE :
         {
             m_auxiliary_timer += dt;
-            
+
             // Change to next phase if delay is over
             if(m_auxiliary_timer > stk_config->m_delay_finish_time)
             {
@@ -227,7 +227,7 @@ void WorldStatus::update(const float dt)
             }
             break;
         }
-        case RESULT_DISPLAY_PHASE : 
+        case RESULT_DISPLAY_PHASE :
         {
             break;
         }
@@ -236,7 +236,7 @@ void WorldStatus::update(const float dt)
             break;
         default: break;
     }
-    
+
     switch(m_clock_mode)
     {
         case CLOCK_CHRONO:
@@ -249,15 +249,15 @@ void WorldStatus::update(const float dt)
                 m_time = 0.0f;
                 break;
             }
-            
+
             m_time -= dt;
-            
+
             if(m_time <= 0.0)
             {
                 // event
                 countdownReachedZero();
             }
-                
+
             break;
         default: break;
     }

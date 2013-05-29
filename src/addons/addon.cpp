@@ -60,29 +60,29 @@ Addon::Addon(const XMLNode &xml)
         xml.get("arena",          &is_arena            );
         if(is_arena) m_type="arena";
     }
-    
+
     std::string name;
     std::string description;
     std::string designer;
 
-    xml.get("name",               &name                );    
+    xml.get("name",               &name                );
     m_name     = StringUtils::decodeFromHtmlEntities(name);
     m_dir_name = StringUtils::toLowerCase(name);
     xml.get("id",                 &m_dir_name          );
     m_id = createAddonId(m_dir_name);
     xml.get("designer",           &designer            );
     xml.get("status",             &m_status            );
-    
+
     int64_t tmp;
     xml.get("date",               &tmp                 );
     m_date = tmp;
-    
+
     xml.get("installed",          &m_installed         );
     xml.get("installed-revision", &m_installed_revision);
     xml.get("revision",           &m_revision          );
     xml.get("file",               &m_zip_file          );
     xml.get("description",        &description         );
-    
+
     m_description = StringUtils::decodeFromHtmlEntities(description);
     m_designer    = StringUtils::decodeFromHtmlEntities(designer);
 
@@ -111,7 +111,7 @@ Addon::Addon(const XMLNode &xml)
 };   // Addon(const XML&)
 
 // ----------------------------------------------------------------------------
-/** Copies the installation data (like description, revision, icon) from the 
+/** Copies the installation data (like description, revision, icon) from the
  *  downloaded online list to this entry.
 */
 void Addon::copyInstallData(const Addon &addon)
@@ -135,14 +135,14 @@ void Addon::copyInstallData(const Addon &addon)
 }   // copyInstallData
 
 // ----------------------------------------------------------------------------
-/** Writes information about an installed addon (it is only called for 
+/** Writes information about an installed addon (it is only called for
  *  installed addons).
  *  \param out_stream Output stream to write to.
  */
 void Addon::writeXML(std::ofstream *out_stream)
 {
     // We write m_dir_name as 'id' to stay backwards compatible
-    (*out_stream) << "  <"                       << m_type 
+    (*out_stream) << "  <"                       << m_type
                   << " name=\""
                   << StringUtils::encodeToHtmlEntities(m_name)
                   << "\" id=\""                  << m_dir_name
@@ -150,11 +150,11 @@ void Addon::writeXML(std::ofstream *out_stream)
                   << StringUtils::encodeToHtmlEntities(m_designer)
                   << "\" status=\""              << m_status
                   << "\" date=\""                << m_date
-                  << "\" installed=\""         
+                  << "\" installed=\""
                   << (m_installed ? "true" : "false" )
                   << "\" installed-revision=\""  << m_installed_revision
                   << "\" size=\""                << m_size
-                  << "\" icon-revision=\""       << m_icon_revision 
+                  << "\" icon-revision=\""       << m_icon_revision
                   << "\" icon-name=\"" << m_icon_basename
                   << "\"/>\n";
 }   // writeXML

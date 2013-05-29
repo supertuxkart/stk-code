@@ -53,8 +53,8 @@ float         Flyable::m_st_force_updown[PowerupManager::POWERUP_MAX];
 Vec3          Flyable::m_st_extend      [PowerupManager::POWERUP_MAX];
 // ----------------------------------------------------------------------------
 
-Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type, 
-                 float mass) 
+Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
+                 float mass)
        : Moveable(), TerrainInfo()
 {
     // get the appropriate data from the static fields
@@ -88,7 +88,7 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
 
 // ----------------------------------------------------------------------------
 /** Creates a bullet physics body for the flyable item.
- *  \param forw_offset How far ahead of the kart the flyable should be 
+ *  \param forw_offset How far ahead of the kart the flyable should be
  *         positioned. Necessary to avoid exploding a rocket inside of the
  *         firing kart.
  *  \param velocity Initial velocity of the flyable.
@@ -97,11 +97,11 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
  *  \param rotates True if the item should rotate, otherwise the angular factor
  *         is set to 0 preventing rotations from happening.
  *  \param turn_around True if the item is fired backwards.
- *  \param custom_direction If defined the initial heading for this item, 
+ *  \param custom_direction If defined the initial heading for this item,
  *         otherwise the kart's heading will be used.
  */
 void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
-                            btCollisionShape *shape, 
+                            btCollisionShape *shape,
                             float restitution, const float gravity,
                             const bool rotates, const bool turn_around,
                             const btTransform* custom_direction)
@@ -156,17 +156,17 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
         m_body->setLinearVelocity(v);
         if(!rotates) m_body->setAngularFactor(0.0f);   // prevent rotations
     }
-    m_body->setCollisionFlags(m_body->getCollisionFlags() | 
+    m_body->setCollisionFlags(m_body->getCollisionFlags() |
                               btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
 }   // createPhysics
 
 // -----------------------------------------------------------------------------
-/** Initialises the static members of this class for a certain type with 
+/** Initialises the static members of this class for a certain type with
  *  default values and with settings from powerup.xml.
  *  \param The xml node containing settings.
  *  \param model The mesh to use.
- *  \param type The type of flyable. 
+ *  \param type The type of flyable.
  */
 void Flyable::init(const XMLNode &node, scene::IMesh *model,
                    PowerupManager::PowerupType type)
@@ -182,11 +182,11 @@ void Flyable::init(const XMLNode &node, scene::IMesh *model,
     core::vector3df scale(1.0f, 1.0f, 1.0f);
     if(node.get("scale",        &scale))
     {
-        irr::scene::IMeshManipulator *mani = 
+        irr::scene::IMeshManipulator *mani =
             irr_driver->getVideoDriver()->getMeshManipulator();
         mani->scale(model, scale);
     }
-    
+
     // Store the size of the model
     Vec3 min, max;
     MeshTools::minMax3D(model, &min, &max);
@@ -203,14 +203,14 @@ Flyable::~Flyable()
 
 //-----------------------------------------------------------------------------
 /** Returns information on what is the closest kart and at what distance it is.
- *  All 3 parameters first are of type 'out'. 'inFrontOf' can be set if you 
- *  wish to know the closest kart in front of some karts (will ignore those 
+ *  All 3 parameters first are of type 'out'. 'inFrontOf' can be set if you
+ *  wish to know the closest kart in front of some karts (will ignore those
  *  behind). Useful e.g. for throwing projectiles in front only.
  */
 
-void Flyable::getClosestKart(const AbstractKart **minKart, 
-                             float *minDistSquared, Vec3 *minDelta, 
-                             const AbstractKart* inFrontOf, 
+void Flyable::getClosestKart(const AbstractKart **minKart,
+                             float *minDistSquared, Vec3 *minDelta,
+                             const AbstractKart* inFrontOf,
                              const bool backwards) const
 {
     btTransform trans_projectile = (inFrontOf != NULL ? inFrontOf->getTrans()
@@ -225,7 +225,7 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
         AbstractKart *kart = world->getKart(i);
         // If a kart has star effect shown, the kart is immune, so
         // it is not considered a target anymore.
-        if(kart->isEliminated() || kart == m_owner || 
+        if(kart->isEliminated() || kart == m_owner ||
             kart->isInvulnerable()                 ||
             kart->getKartAnimation()                   ) continue;
         btTransform t=kart->getTrans();
@@ -233,7 +233,7 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
         Vec3 delta      = t.getOrigin()-trans_projectile.getOrigin();
         // the Y distance is added again because karts above or below should//
         // not be prioritized when aiming
-        float distance2 = delta.length2() + abs(t.getOrigin().getY() 
+        float distance2 = delta.length2() + abs(t.getOrigin().getY()
                         - trans_projectile.getOrigin().getY())*2;
 
         if(inFrontOf != NULL)
@@ -254,7 +254,7 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
             float s = sqrt(v.length2() * to_target.length2());
             float c = to_target.dot(v)/s;
             // Original test was: fabsf(acos(c))>1,  which is the same as
-            // c<cos(1) (acos returns values in [0, pi] anyway) 
+            // c<cos(1) (acos returns values in [0, pi] anyway)
             if(c<0.54) continue;
         }
 
@@ -269,7 +269,7 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
 }   // getClosestKart
 
 //-----------------------------------------------------------------------------
-/** Returns information on the parameters needed to hit a target kart moving 
+/** Returns information on the parameters needed to hit a target kart moving
  *  at constant velocity and direction for a given speed in the XZ-plane.
  *  \param origin Location of the kart shooting the item.
  *  \param target_kart Which kart to target.
@@ -280,11 +280,11 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
  *  \param fire_angle Returns the angle to fire the item at.
  *  \param up_velocity Returns the upwards velocity to use for the item.
  */
-void Flyable::getLinearKartItemIntersection (const Vec3 &origin, 
+void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
                                              const AbstractKart *target_kart,
-                                             float item_XZ_speed, 
+                                             float item_XZ_speed,
                                              float gravity, float forw_offset,
-                                             float *fire_angle, 
+                                             float *fire_angle,
                                              float *up_velocity)
 {
     Vec3 relative_target_kart_loc = target_kart->getXYZ() - origin;
@@ -299,12 +299,12 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
     float gy = target_direction.getY();
 
     //Projected onto X-Z plane
-    float target_kart_speed = target_direction.length_2d() 
+    float target_kart_speed = target_direction.length_2d()
                             * target_kart->getSpeed();
 
     float target_kart_heading = target_kart->getHeading();
 
-    float dist = -(target_kart_speed / item_XZ_speed) 
+    float dist = -(target_kart_speed / item_XZ_speed)
                * (dx * cosf(target_kart_heading) -
                   dz * sinf(target_kart_heading)   );
 
@@ -314,9 +314,9 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
                                               :  acosf(fire_th));
 
     float time = 0.0f;
-    float a = item_XZ_speed     * sinf (fire_th) 
+    float a = item_XZ_speed     * sinf (fire_th)
             + target_kart_speed * sinf (target_kart_heading);
-    float b = item_XZ_speed     * cosf (fire_th) 
+    float b = item_XZ_speed     * cosf (fire_th)
             + target_kart_speed * cosf (target_kart_heading);
 
     if (fabsf(a) > fabsf(b)) time = fabsf (dx / a);
@@ -331,7 +331,7 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
     time -= forw_offset / sqrt(a*a+b*b);
 
     *fire_angle = fire_th;
-    *up_velocity = (0.5f * time * gravity) + (dy / time) 
+    *up_velocity = (0.5f * time * gravity) + (dy / time)
                  + (gy * target_kart->getSpeed());
 }   // getLinearKartItemIntersection
 
@@ -344,7 +344,7 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
 bool Flyable::updateAndDelete(float dt)
 {
     m_time_since_thrown += dt;
-    if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan) 
+    if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan)
         hit(NULL);
 
     if(m_has_hit_something) return true;
@@ -355,7 +355,7 @@ bool Flyable::updateAndDelete(float dt)
     const Vec3 *min, *max;
     World::getWorld()->getTrack()->getAABB(&min, &max);
 
-    // I have seen that the bullet AABB can be slightly different from the 
+    // I have seen that the bullet AABB can be slightly different from the
     // one computed here - I assume due to minor floating point errors
     // (e.g. 308.25842 instead of 308.25845). To avoid a crash with a bullet
     // assertion (see bug 3058932) I add an epsilon here - but admittedly
@@ -374,7 +374,7 @@ bool Flyable::updateAndDelete(float dt)
         return true;
     }
 
-    // Add the position offset so that the flyable can adjust its position 
+    // Add the position offset so that the flyable can adjust its position
     // (usually to do the raycast from a slightly higher position to avoid
     // problems finding the terrain in steep uphill sections).
     if(m_do_terrain_info)
@@ -436,10 +436,10 @@ bool Flyable::isOwnerImmunity(const AbstractKart* kart_hit) const
 }   // isOwnerImmunity
 
 // ----------------------------------------------------------------------------
-/** Callback from the physics in case that a kart or physical object is hit. 
+/** Callback from the physics in case that a kart or physical object is hit.
  *  \param kart The kart hit (NULL if no kart was hit).
  *  \param object The object that was hit (NULL if none).
- *  \return True if there was actually a hit (i.e. not owner, and target is 
+ *  \return True if there was actually a hit (i.e. not owner, and target is
  *          not immune), false otherwise.
  */
 bool Flyable::hit(AbstractKart *kart_hit, PhysicalObject* object)
@@ -461,7 +461,7 @@ bool Flyable::hit(AbstractKart *kart_hit, PhysicalObject* object)
     }
 
     m_has_hit_something=true;
-    
+
     return true;
 
 }   // hit

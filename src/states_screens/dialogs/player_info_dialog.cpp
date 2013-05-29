@@ -105,7 +105,7 @@ void PlayerInfoDialog::showRegularDialog()
         widget->m_properties[PROP_ID] = "cancel";
         widget->setText( _("Cancel") );
 
-        const int textWidth = 
+        const int textWidth =
             font->getDimension(widget->getText().c_str()).Width + 40;
 
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
@@ -124,7 +124,7 @@ void PlayerInfoDialog::showRegularDialog()
         //I18N: In the player info dialog
         widget->setText( _("Remove"));
 
-        const int textWidth = 
+        const int textWidth =
             font->getDimension(widget->getText().c_str()).Width + 40;
 
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
@@ -150,7 +150,7 @@ void PlayerInfoDialog::showConfirmDialog()
     const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
 
-    irr::core::stringw message = 
+    irr::core::stringw message =
         //I18N: In the player info dialog (when deleting)
         _("Do you really want to delete player '%s' ?", m_player->getName());
 
@@ -178,7 +178,7 @@ void PlayerInfoDialog::showConfirmDialog()
         //I18N: In the player info dialog (when deleting)
         widget->setText( _("Confirm Remove") );
 
-        const int textWidth = 
+        const int textWidth =
             font->getDimension(widget->getText().c_str()).Width + 40;
 
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
@@ -197,7 +197,7 @@ void PlayerInfoDialog::showConfirmDialog()
         //I18N: In the player info dialog (when deleting)
         widget->setText( _("Cancel Remove") );
 
-        const int textWidth = 
+        const int textWidth =
             font->getDimension( widget->getText().c_str() ).Width + 40;
 
         widget->m_x = m_area.getWidth()/2 - textWidth/2;

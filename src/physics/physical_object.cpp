@@ -41,26 +41,26 @@ using namespace irr;
 
 // ----------------------------------------------------------------------------
 
-PhysicalObject* PhysicalObject::fromXML(bool is_dynamic, 
+PhysicalObject* PhysicalObject::fromXML(bool is_dynamic,
                                         const XMLNode &xml_node,
                                         TrackObject* object)
 {
     PhysicalObject::Settings settings;
-    
+
     settings.reset_height = 0;
     settings.mass         = 1;
     settings.radius       = -1;
     settings.crash_reset  = false;
     settings.knock_kart   = false;
-    
+
     std::string shape;
     xml_node.get("mass",    &settings.mass       );
     xml_node.get("radius",  &settings.radius     );
     xml_node.get("shape",   &shape               );
     xml_node.get("reset",   &settings.crash_reset);
     xml_node.get("explode", &settings.knock_kart );
-    
-    settings.reset_when_too_low = 
+
+    settings.reset_when_too_low =
         xml_node.get("reset-when-below", &settings.reset_height) == 1;
 
     settings.body_type = MP_NONE;
@@ -84,7 +84,7 @@ PhysicalObject* PhysicalObject::fromXML(bool is_dynamic,
 
 // ----------------------------------------------------------------------------
 
-PhysicalObject::PhysicalObject(bool is_dynamic, 
+PhysicalObject::PhysicalObject(bool is_dynamic,
                                const PhysicalObject::Settings& settings,
                                TrackObject* object)
 {
@@ -98,13 +98,13 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_crash_reset        = false;
     m_explode_kart       = false;
     m_triangle_mesh      = NULL;
-    
+
     m_object = object;
-    
+
     m_init_xyz   = object->getPosition();
     m_init_hpr   = object->getRotation();
     m_init_scale = object->getScale();
-    
+
     m_mass = settings.mass;
     m_radius = settings.radius;
     m_body_type = settings.body_type;
@@ -121,9 +121,9 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_init_pos.setRotation(q);
     Vec3 init_xyz(m_init_xyz);
     m_init_pos.setOrigin(init_xyz);
-    
+
     m_is_dynamic = is_dynamic;
-    
+
     init();
 }   // PhysicalObject
 
@@ -133,14 +133,14 @@ PhysicalObject::~PhysicalObject()
     World::getWorld()->getPhysics()->removeBody(m_body);
     delete m_body;
     delete m_motion_state;
-    
+
     // If an exact shape was used, the collision shape pointer
     // here is a copy of the collision shape pointer in the
     // triangle mesh. In order to avoid double-freeing this
     // pointer, we don't free the pointer in this case.
     if (!m_triangle_mesh)
         delete m_shape;
-    
+
     if (m_triangle_mesh)
     {
         delete m_triangle_mesh;
@@ -160,8 +160,8 @@ void PhysicalObject::move(const Vec3& xyz, const core::vector3df& hpr)
 
     irr::core::quaternion tempQuat(mat);
     q = btQuaternion(tempQuat.X, tempQuat.Y, tempQuat.Z, tempQuat.W);
-    
-    
+
+
     Vec3 p(xyz);
     btTransform trans(q,p);
     m_motion_state->setWorldTransform(trans);
@@ -175,40 +175,40 @@ void PhysicalObject::init()
     // 1. Determine size of the object
     // -------------------------------
     Vec3 min, max;
-    
+
     TrackObjectPresentationSceneNode* presentation =
         m_object->getPresentation<TrackObjectPresentationSceneNode>();
-    
+
     if (presentation->getNode()->getType() == scene::ESNT_ANIMATED_MESH)
     {
-        scene::IAnimatedMesh *mesh 
+        scene::IAnimatedMesh *mesh
             = ((scene::IAnimatedMeshSceneNode*)presentation->getNode())->getMesh();
-            
+
         MeshTools::minMax3D(mesh, &min, &max);
     }
     else if (presentation->getNode()->getType()==scene::ESNT_MESH)
     {
-        scene::IMesh *mesh 
+        scene::IMesh *mesh
             = ((scene::IMeshSceneNode*)presentation->getNode())->getMesh();
-            
+
         MeshTools::minMax3D(mesh, &min, &max);
     }
     else if (presentation->getNode()->getType()==scene::ESNT_LOD_NODE)
     {
-        scene::ISceneNode* node = 
+        scene::ISceneNode* node =
             ((LODNode*)presentation->getNode())->getAllNodes()[0];
         if (node->getType() == scene::ESNT_ANIMATED_MESH)
         {
-            scene::IAnimatedMesh *mesh 
+            scene::IAnimatedMesh *mesh
                 = ((scene::IAnimatedMeshSceneNode*)node)->getMesh();
-                
+
             MeshTools::minMax3D(mesh, &min, &max);
         }
         else if (node->getType()==scene::ESNT_MESH)
         {
-            scene::IMesh *mesh 
+            scene::IMesh *mesh
                 = ((scene::IMeshSceneNode*)node)->getMesh();
-                
+
             MeshTools::minMax3D(mesh, &min, &max);
         }
         else
@@ -241,7 +241,7 @@ void PhysicalObject::init()
     }
     case MP_CONE_X:
     {
-        if (m_radius < 0) 
+        if (m_radius < 0)
             m_radius = 0.5f*sqrt(extend.getY()*extend.getY() +
                                  extend.getZ()*extend.getZ());
         m_shape = new btConeShapeX(m_radius, extend.getY());
@@ -263,7 +263,7 @@ void PhysicalObject::init()
     }
     case MP_CYLINDER_X:
     {
-        if (m_radius < 0) 
+        if (m_radius < 0)
             m_radius = 0.5f*sqrt(extend.getY()*extend.getY() +
                                  extend.getZ()*extend.getZ());
         m_shape = new btCylinderShapeX(0.5f*extend);
@@ -290,13 +290,13 @@ void PhysicalObject::init()
     case MP_EXACT:
     {
         TriangleMesh* triangle_mesh = new TriangleMesh();
-        
+
         // In case of readonly materials we have to get the material from
         // the mesh, otherwise from the node. This is esp. important for
         // water nodes, which only have the material defined in the node,
         // but not in the mesh at all!
         bool is_readonly_material = false;
-        
+
         scene::IMesh* mesh = NULL;
         switch (presentation->getNode()->getType())
         {
@@ -304,7 +304,7 @@ void PhysicalObject::init()
             case scene::ESNT_WATER_SURFACE :
             case scene::ESNT_OCTREE        :
                 {
-                    scene::IMeshSceneNode *node = 
+                    scene::IMeshSceneNode *node =
                         (scene::IMeshSceneNode*)presentation->getNode();
                     mesh = node->getMesh();
                     is_readonly_material = node->isReadOnlyMaterials();
@@ -313,7 +313,7 @@ void PhysicalObject::init()
             case scene::ESNT_ANIMATED_MESH :
                 {
                     // for now just use frame 0
-                    scene::IAnimatedMeshSceneNode *node = 
+                    scene::IAnimatedMeshSceneNode *node =
                       (scene::IAnimatedMeshSceneNode*)presentation->getNode();
                     mesh = node->getMesh()->getMesh(0);
                     is_readonly_material = node->isReadOnlyMaterials();
@@ -324,7 +324,7 @@ void PhysicalObject::init()
                                         "cannot create exact collision body!");
                 return;
         }   // switch node->getType()
-        
+
         for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
         {
             scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
@@ -332,38 +332,38 @@ void PhysicalObject::init()
             if (mb->getVertexType() != video::EVT_STANDARD &&
                 mb->getVertexType() != video::EVT_2TCOORDS)
             {
-                Log::warn("PhysicalObject", 
-                          "createPhysicsBody: Ignoring type '%d'!", 
+                Log::warn("PhysicalObject",
+                          "createPhysicsBody: Ignoring type '%d'!",
                           mb->getVertexType());
                 continue;
             }
-            
-            // Handle readonly materials correctly: mb->getMaterial can return 
+
+            // Handle readonly materials correctly: mb->getMaterial can return
             // NULL if the node is not using readonly materials. E.g. in case
             // of a water scene node, the mesh (which is the animated copy of
             // the original mesh) does not contain any material information,
             // the material is only available in the node.
-            const video::SMaterial &irrMaterial = 
+            const video::SMaterial &irrMaterial =
                 is_readonly_material ? mb->getMaterial()
                 : presentation->getNode()->getMaterial(i);
             video::ITexture* t=irrMaterial.getTexture(0);
-            
+
             const Material* material=0;
             TriangleMesh *tmesh = triangle_mesh;
             if(t)
             {
-                std::string image = 
+                std::string image =
                               std::string(core::stringc(t->getName()).c_str());
                 material = material_manager
                          ->getMaterial(StringUtils::getBasename(image));
-                if(material->isIgnore()) 
+                if(material->isIgnore())
                     continue;
-            } 
-            
+            }
+
             u16 *mbIndices = mb->getIndices();
             Vec3 vertices[3];
             Vec3 normals[3];
-            
+
             if (mb->getVertexType() == video::EVT_STANDARD)
             {
                 irr::video::S3DVertex* mbVertices =
@@ -378,7 +378,7 @@ void PhysicalObject::init()
                         vertices[k]=v;
                         normals[k]=mbVertices[indx].Normal;
                     }   // for k
-                    if(tmesh) tmesh->addTriangle(vertices[0], vertices[1], 
+                    if(tmesh) tmesh->addTriangle(vertices[0], vertices[1],
                                                  vertices[2], normals[0],
                                                  normals[1],  normals[2],
                                                  material                 );
@@ -388,7 +388,7 @@ void PhysicalObject::init()
             {
                 if (mb->getVertexType() == video::EVT_2TCOORDS)
                 {
-                    irr::video::S3DVertex2TCoords* mbVertices = 
+                    irr::video::S3DVertex2TCoords* mbVertices =
                         (video::S3DVertex2TCoords*)mb->getVertices();
                     for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
                     {
@@ -400,12 +400,12 @@ void PhysicalObject::init()
                             vertices[k]=v;
                             normals[k]=mbVertices[indx].Normal;
                         }   // for k
-                        if(tmesh) tmesh->addTriangle(vertices[0], vertices[1], 
+                        if(tmesh) tmesh->addTriangle(vertices[0], vertices[1],
                                                      vertices[2], normals[0],
                                                      normals[1],  normals[2],
                                                      material                 );
                     }   // for j
-                    
+
                 }
             }
 
@@ -416,7 +416,7 @@ void PhysicalObject::init()
 
         break;
     }
-    case MP_NONE:  
+    case MP_NONE:
     default:
         fprintf(stderr, "WARNING: Uninitialised moving shape\n");
         // intended fall-through
@@ -435,9 +435,9 @@ void PhysicalObject::init()
     m_motion_state = new btDefaultMotionState(m_init_pos);
     btVector3 inertia;
     m_shape->calculateLocalInertia(m_mass, inertia);
-    btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state, 
+    btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state,
                                                   m_shape, inertia);
-    
+
     // Make sure that the cones stop rolling by defining angular friction != 0.
     info.m_angularDamping = 0.5f;
     m_body = new btRigidBody(info);
@@ -446,20 +446,20 @@ void PhysicalObject::init()
 
     if (!m_is_dynamic)
     {
-        m_body->setCollisionFlags(   m_body->getCollisionFlags() 
+        m_body->setCollisionFlags(   m_body->getCollisionFlags()
                                    | btCollisionObject::CF_KINEMATIC_OBJECT);
         m_body->setActivationState(DISABLE_DEACTIVATION);
     }
 
     World::getWorld()->getPhysics()->addBody(m_body);
-    
+
 }   // init
 
 // ----------------------------------------------------------------------------
 void PhysicalObject::update(float dt)
 {
     if (!m_is_dynamic) return;
-    
+
     btTransform t;
     m_motion_state->getWorldTransform(t);
 
@@ -478,9 +478,9 @@ void PhysicalObject::update(float dt)
     Vec3 hpr;
     hpr.setHPR(t.getRotation());
     //m_node->setRotation(hpr.toIrrHPR());
-    
+
     core::vector3df scale(1,1,1);
-    m_object->move(xyz.toIrrVector(), hpr.toIrrVector()*RAD_TO_DEGREE, 
+    m_object->move(xyz.toIrrVector(), hpr.toIrrVector()*RAD_TO_DEGREE,
                    scale, false);
     return;
 }   // update
@@ -492,12 +492,12 @@ void PhysicalObject::reset()
     m_body->setAngularVelocity(btVector3(0,0,0));
     m_body->setLinearVelocity(btVector3(0,0,0));
     m_body->activate();
-}   // reset 
+}   // reset
 
 // ----------------------------------------------------------------------------
 void PhysicalObject::handleExplosion(const Vec3& pos, bool direct_hit)
 {
-    
+
     if(direct_hit)
     {
         btVector3 impulse(0.0f, 0.0f, stk_config->m_explosion_impulse_objects);

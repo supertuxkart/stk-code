@@ -21,8 +21,8 @@
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
 
-RaceInfoMessage::RaceInfoMessage(const std::vector<RemoteKartInfo>& kart_info) 
-               : Message(Message::MT_RACE_INFO) 
+RaceInfoMessage::RaceInfoMessage(const std::vector<RemoteKartInfo>& kart_info)
+               : Message(Message::MT_RACE_INFO)
 {
     const GrandPrixData *cup=NULL;
     int len = 2*getCharLength()  // major, difficulty

@@ -54,7 +54,7 @@ WiimoteManager::~WiimoteManager()
 
 // -----------------------------------------------------------------------------
 /**
- * Launch wiimote detection and add the corresponding gamepad devices to the 
+ * Launch wiimote detection and add the corresponding gamepad devices to the
  * device manager.
  * TODO: this should be done in a separate thread, to not block the UI...
  */
@@ -62,44 +62,44 @@ void WiimoteManager::launchDetection(int timeout)
 {
     // Stop WiiUse, remove wiimotes, gamepads, gamepad configs.
     cleanup();
-    
+
     m_all_wiimote_handles =  wiiuse_init(MAX_WIIMOTES);
-    
+
     // Detect wiimotes
     int nb_found_wiimotes = wiiuse_find(m_all_wiimote_handles, MAX_WIIMOTES, timeout);
-    
+
     // Couldn't find any wiimote?
     if(nb_found_wiimotes == 0)
         return;
-    
+
     // Try to connect to all found wiimotes
     int nb_wiimotes = wiiuse_connect(m_all_wiimote_handles, nb_found_wiimotes);
-    
+
     // Couldn't connect to any wiimote?
     if(nb_wiimotes == 0)
         return;
-    
+
     // ---------------------------------------------------
     // Create or find a GamepadConfig for all wiimotes
     DeviceManager* device_manager = input_manager->getDeviceList();
     GamepadConfig* gamepad_config = NULL;
-    
-    device_manager->getConfigForGamepad(WIIMOTE_START_IRR_ID, "Wiimote", 
+
+    device_manager->getConfigForGamepad(WIIMOTE_START_IRR_ID, "Wiimote",
                                         &gamepad_config);
     int num_buttons = (int)( log((float)WIIMOTE_BUTTON_ALL) / log(2.0f))+1;
     gamepad_config->setNumberOfButtons(num_buttons);
     gamepad_config->setNumberOfAxis(1);
 
     setWiimoteBindings(gamepad_config);
-    
-    // Initialize all Wiimotes, which in turn create their 
+
+    // Initialize all Wiimotes, which in turn create their
     // associated GamePadDevices
     for(int i=0 ; i < nb_wiimotes ; i++)
     {
-        m_wiimotes.push_back(new Wiimote(m_all_wiimote_handles[i], i, 
+        m_wiimotes.push_back(new Wiimote(m_all_wiimote_handles[i], i,
                                          gamepad_config              ));
     } // end for
-    
+
     // ---------------------------------------------------
     // Set the LEDs and rumble for 0.2s
     int leds[] = {WIIMOTE_LED_1, WIIMOTE_LED_2, WIIMOTE_LED_3, WIIMOTE_LED_4};
@@ -109,7 +109,7 @@ void WiimoteManager::launchDetection(int timeout)
         wiiuse_set_leds(wiimote_handle, leds[i]);
         wiiuse_rumble(wiimote_handle, 1);
     }
-    
+
     irr_driver->getDevice()->sleep(200);
 
     for(unsigned int i=0 ; i < m_wiimotes.size(); i++)
@@ -117,7 +117,7 @@ void WiimoteManager::launchDetection(int timeout)
         wiimote_t*  wiimote_handle = m_wiimotes[i]->getWiimoteHandle();
         wiiuse_rumble(wiimote_handle, 0);
     }
-    
+
     // TODO: only enable accelerometer during race
     enableAccelerometer(true);
 
@@ -169,19 +169,19 @@ void WiimoteManager::cleanup()
     if(m_wiimotes.size() > 0)
     {
         DeviceManager* device_manager = input_manager->getDeviceList();
-        
-        GamePadDevice* first_gamepad_device = 
+
+        GamePadDevice* first_gamepad_device =
                      device_manager->getGamePadFromIrrID(WIIMOTE_START_IRR_ID);
         assert(first_gamepad_device);
-        
-        DeviceConfig*  gamepad_config = 
+
+        DeviceConfig*  gamepad_config =
                                       first_gamepad_device->getConfiguration();
         assert(gamepad_config);
-        
-        // Remove the wiimote configuration -> automatically removes all 
+
+        // Remove the wiimote configuration -> automatically removes all
         // linked gamepad devices;
         device_manager->deleteConfig(gamepad_config);
-        
+
         // Shut the update thread
 #ifdef WIIMOTE_THREADING
         m_shut = true;
@@ -190,7 +190,7 @@ void WiimoteManager::cleanup()
         // Cleanup WiiUse
         wiiuse_cleanup(m_all_wiimote_handles, MAX_WIIMOTES);
     }
-    
+
     for(unsigned int i=0; i<m_wiimotes.size(); i++)
         delete m_wiimotes[i];
     m_wiimotes.clear();
@@ -228,11 +228,11 @@ void WiimoteManager::enableAccelerometer(bool state)
 }   // enableAccelerometer
 
 // ----------------------------------------------------------------------------
-/** Thread update method - wiimotes state is updated in another thread to 
+/** Thread update method - wiimotes state is updated in another thread to
  *  avoid latency problems */
 void WiimoteManager::threadFunc()
 {
-#ifdef WIIMOTE_THREADING 
+#ifdef WIIMOTE_THREADING
     while(!m_shut)
 #endif
     {
@@ -283,7 +283,7 @@ void WiimoteManager::threadFunc()
                 }
             }
         }
-        
+
         irr_driver->getDevice()->sleep(1);  // 'cause come on, the whole CPU is not ours :)
     } // end while
 }   // threadFunc
@@ -304,17 +304,17 @@ void* WiimoteManager::threadFuncWrapper(void *data)
  */
 int WiimoteManager::askUserToConnectWiimotes()
 {
-	new MessageDialog( 
+	new MessageDialog(
 		_("Press the buttons 1+2 simultaneously on your wiimote to put "
 		  "it in discovery mode, then click on OK."),
-		MessageDialog::MESSAGE_DIALOG_CONFIRM, 
+		MessageDialog::MESSAGE_DIALOG_CONFIRM,
 		new WiimoteDialogListener(), true);
 
 	return getNumberOfWiimotes();
 }   // askUserToConnectWiimotes
 
 // ============================================================================
-/** Calles when the user clicks on OK, i.e. all wiimotes are in discovery 
+/** Calles when the user clicks on OK, i.e. all wiimotes are in discovery
  *  mode.
  */
 void WiimoteManager::WiimoteDialogListener::onConfirm()

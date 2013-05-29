@@ -31,7 +31,7 @@
 History* history = 0;
 
 //-----------------------------------------------------------------------------
-/** Initialises the history object and sets the mode to none. 
+/** Initialises the history object and sets the mode to none.
  */
 History::History()
 {
@@ -73,8 +73,8 @@ void History::allocateMemory(int number_of_frames)
 }   // allocateMemory
 
 //-----------------------------------------------------------------------------
-/** Depending on mode either saves the data for the current time step, or 
- *  replays the data. 
+/** Depending on mode either saves the data for the current time step, or
+ *  replays the data.
  *  /param dt Time step.
  */
 void History::update(float dt)
@@ -210,9 +210,9 @@ void History::Save()
                     m_all_controls[index+k].getButtonsCompressed(),
                     m_all_xyz[index+k].getX(), m_all_xyz[index+k].getY(),
                     m_all_xyz[index+k].getZ(),
-                    m_all_rotations[index+k].getX(), 
+                    m_all_rotations[index+k].getX(),
                     m_all_rotations[index+k].getY(),
-                    m_all_rotations[index+k].getZ(), 
+                    m_all_rotations[index+k].getZ(),
                     m_all_rotations[index+k].getW()  );
         }   // for i
         index=(index+num_karts)%(num_karts*m_size);
@@ -244,13 +244,13 @@ void History::Load()
         fprintf(stderr, "ERROR: could not open history.dat\n");
         exit(-2);
     }
-    
+
     if (fgets(s, 1023, fd) == NULL)
     {
         fprintf(stderr, "ERROR: could not read history.dat\n");
         exit(-2);
     }
-    
+
     if (sscanf(s,"Version: %1023s",s1)!=1)
     {
         fprintf(stderr, "ERROR: no Version information found in history file (bogus history file)\n");
@@ -264,13 +264,13 @@ void History::Load()
             fprintf(stderr, "         STK version is '%s'\n",STK_VERSION);
         }
     }
-    
+
     if (fgets(s, 1023, fd) == NULL)
     {
         fprintf(stderr, "ERROR: could not read history.dat\n");
         exit(-2);
     }
-    
+
     unsigned int num_karts;
     if(sscanf(s, "numkarts: %d",&num_karts)!=1)
     {

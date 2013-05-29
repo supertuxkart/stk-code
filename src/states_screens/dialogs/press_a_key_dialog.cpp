@@ -50,7 +50,7 @@ GUIEngine::EventPropagation PressAKeyDialog::processEvent(const std::string& eve
         OptionsScreenInput2::getInstance()->gotSensedInput(simulatedInput);
         return GUIEngine::EVENT_BLOCK;
     }
-    
+
     return GUIEngine::EVENT_LET;
 }
 

@@ -50,7 +50,7 @@ void SoccerWorld::init()
 {
     WorldWithRank::init();
     m_display_rank = false;
-        
+
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
     {
@@ -65,10 +65,10 @@ void SoccerWorld::init()
 void SoccerWorld::reset()
 {
     WorldWithRank::reset();
-    
+
     m_can_score_points = true;
     memset(m_team_goals, 0, sizeof(m_team_goals));
-    
+
     initKartList();
 }   // reset
 
@@ -82,13 +82,13 @@ const std::string& SoccerWorld::getIdent() const
 
 //-----------------------------------------------------------------------------
 /** Update the world and the track.
- *  \param dt Time step size. 
+ *  \param dt Time step size.
  */
 void SoccerWorld::update(float dt)
 {
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
-    
+
     // TODO
 }   // update
 
@@ -97,32 +97,32 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
     // TODO
     if(m_can_score_points)
         printf("*** GOOOOOOOOOAAAAAAALLLLLL!!!! (team: %d) ***\n", first_goal ? 0 : 1);
-    
+
     //m_check_goals_enabled = false;    // TODO: remove?
-    
+
     // Reset original positions for the soccer balls
     TrackObjectManager* tom = getTrack()->getTrackObjectManager();
     assert(tom);
-    
+
     PtrVector<TrackObject>&   objects = tom->getObjects();
     for(int i=0; i<objects.size(); i++)
     {
         TrackObject* obj = objects.get(i);
         if(!obj->isSoccerBall())
             continue;
-        
+
         obj->reset();
     }
-    
+
     //for(int i=0 ; i < getNumKarts() ; i++
-    
+
     /*if(World::getWorld()->getTrack()->isAutoRescueEnabled() &&
-        !getKartAnimation() && fabs(getRoll())>60*DEGREE_TO_RAD && 
+        !getKartAnimation() && fabs(getRoll())>60*DEGREE_TO_RAD &&
                               fabs(getSpeed())<3.0f                )
     {
         new RescueAnimation(this, true);
     }*/
-    
+
     // TODO: rescue the karts
     // TODO: score a point
 }   // onCheckGoalTriggered
@@ -137,7 +137,7 @@ bool SoccerWorld::isRaceOver()
     {
         return false;
     }
-    
+
     // TODO
     return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
 }   // isRaceOver
@@ -165,10 +165,10 @@ void SoccerWorld::getKartsDisplayInfo(
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
-        
+
         // reset color
         rank_info.lap = -1;
-        
+
         AbstractKart* kart = getKart(i);
         switch(kart->getSoccerTeam())
         {
@@ -202,23 +202,23 @@ void SoccerWorld::moveKartAfterRescue(AbstractKart* kart)
     World *world = World::getWorld();
     const int start_spots_amount = world->getTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
-    
+
     float largest_accumulated_distance_found = -1;
     int furthest_id_found = -1;
-    
+
     const float kart_x = kart->getXYZ().getX();
     const float kart_z = kart->getXYZ().getZ();
 
     for(int n=0; n<start_spots_amount; n++)
     {
-        // no need for the overhead to compute exact distance with sqrt(), 
+        // no need for the overhead to compute exact distance with sqrt(),
         // so using the 'manhattan' heuristic which will do fine enough.
         const btTransform &s = world->getTrack()->getStartTransform(n);
         const Vec3 &v=s.getOrigin();
         float accumulatedDistance = .0f;
         bool spawnPointClear = true;
-                
-        for(unsigned int k=0; k<getCurrentNumKarts(); k++) 
+
+        for(unsigned int k=0; k<getCurrentNumKarts(); k++)
         {
             const AbstractKart *currentKart = World::getWorld()->getKart(k);
             const float currentKart_x = currentKart->getXYZ().getX();
@@ -243,7 +243,7 @@ void SoccerWorld::moveKartAfterRescue(AbstractKart* kart)
             largest_accumulated_distance_found = accumulatedDistance;
         }
     }
-    
+
     assert(furthest_id_found != -1);
     const btTransform &s = world->getTrack()->getStartTransform(furthest_id_found);
     const Vec3 &xyz = s.getOrigin();
@@ -278,7 +278,7 @@ void SoccerWorld::moveKartAfterRescue(AbstractKart* kart)
 void SoccerWorld::initKartList()
 {
     const unsigned int kart_amount = m_karts.size();
-    
+
     // Set kart positions, ordering them by team
     for(unsigned int n=0; n<kart_amount; n++)
     {
@@ -287,10 +287,10 @@ void SoccerWorld::initKartList()
     // TODO: remove
 /*
     const unsigned int kart_amount = m_karts.size();
-    
+
     int team_karts_amount[NB_SOCCER_TEAMS];
     memset(team_karts_amount, 0, sizeof(team_karts_amount));
-    
+
     {
         // Set the kart teams if they haven't been already set by the setup screen
         // (happens when the setup screen is skipped, with 1 player)
@@ -299,20 +299,20 @@ void SoccerWorld::initKartList()
         {
             if(m_karts[n]->getSoccerTeam() == SOCCER_TEAM_NONE)
                 m_karts[n]->setSoccerTeam(round_robin_team);
-            
+
             team_karts_amount[m_karts[n]->getSoccerTeam()]++;
-            
+
             round_robin_team = (round_robin_team==SOCCER_TEAM_RED ?
                                 SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
         }// next kart
     }
-    
+
     // Compute start positions for each team
     int team_cur_position[NB_SOCCER_TEAMS];
     team_cur_position[0] = 1;
     for(int i=1 ; i < (int)NB_SOCCER_TEAMS ; i++)
         team_cur_position[i] = team_karts_amount[i-1] + team_cur_position[i-1];
-    
+
     // Set kart positions, ordering them by team
     for(unsigned int n=0; n<kart_amount; n++)
     {

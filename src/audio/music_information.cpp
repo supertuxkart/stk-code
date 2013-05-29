@@ -45,7 +45,7 @@ MusicInformation *MusicInformation::create(const std::string &filename)
     if (!root) return NULL;
     if(root->getName()!="music")
     {
-        Log::error("MusicInformation", 
+        Log::error("MusicInformation",
                    "Music file '%s' does not contain music node.\n",
                    filename.c_str());
         delete root;
@@ -57,7 +57,7 @@ MusicInformation *MusicInformation::create(const std::string &filename)
        !root->get("file",     &s)    )
 
     {
-        Log::error("MusicInformation", 
+        Log::error("MusicInformation",
                     "One of 'title', 'composer' or 'file' attribute "
                     "is missing in the music XML file '%s'!\n",
                     filename.c_str());
@@ -70,7 +70,7 @@ MusicInformation *MusicInformation::create(const std::string &filename)
 }   // create()
 
 // ----------------------------------------------------------------------------
-MusicInformation::MusicInformation(const XMLNode *root, 
+MusicInformation::MusicInformation(const XMLNode *root,
                                    const std::string &filename)
 {
     m_title           = "";
@@ -100,9 +100,9 @@ MusicInformation::MusicInformation(const XMLNode *root,
     root->get("tracks",        &m_all_tracks     );
     root->get("fast",          &m_enable_fast    );
     root->get("fast-filename", &m_fast_filename  );
-    
+
     m_adjusted_gain = m_gain;
-    
+
     // Get the path from the filename and add it to the ogg filename
     std::string path  = StringUtils::getPath(filename);
     m_normal_filename = path + "/" + m_normal_filename;
@@ -112,7 +112,7 @@ MusicInformation::MusicInformation(const XMLNode *root,
     {
         m_fast_filename = path + "/" + m_fast_filename;
     }
-    
+
     assert(m_normal_filename.size() > 0);
 
 }   // MusicInformation
@@ -152,21 +152,21 @@ void MusicInformation::startMusic()
                   "format is not recognized.\n", m_normal_filename.c_str());
         return;
     }
-    
+
     if (m_normal_music != NULL) delete m_normal_music;
-    
+
 #if HAVE_OGGVORBIS
     m_normal_music = new MusicOggStream();
 #else
     m_normal_music = new MusicDummy();
 #endif
-    
+
     if((m_normal_music->load(m_normal_filename)) == false)
     {
         delete m_normal_music;
         m_normal_music = NULL;
         Log::warn("MusicInformation", "Unable to load music %s, "
-                  "not supported or not found.\n", 
+                  "not supported or not found.\n",
                   m_normal_filename.c_str());
         return;
     }
@@ -176,7 +176,7 @@ void MusicInformation::startMusic()
     // Then (if available) load the music for the last track
     // -----------------------------------------------------
     if (m_fast_music != NULL) delete m_fast_music;
-    if (m_fast_filename == "") 
+    if (m_fast_filename == "")
     {
         m_fast_music = NULL;
         return;   // no fast music
@@ -184,12 +184,12 @@ void MusicInformation::startMusic()
 
     if(StringUtils::getExtension(m_fast_filename)!="ogg")
     {
-        Log::warn( 
+        Log::warn(
                 "Music file %s format not recognized, fast music is ignored\n",
                 m_fast_filename.c_str());
         return;
     }
-    
+
 #if HAVE_OGGVORBIS
     m_fast_music = new MusicOggStream();
 #else
@@ -262,7 +262,7 @@ void MusicInformation::update(float dt)
 //-----------------------------------------------------------------------------
 void MusicInformation::stopMusic()
 {
-    if (m_normal_music != NULL)  
+    if (m_normal_music != NULL)
     {
         m_normal_music->stopMusic();
         delete m_normal_music;
@@ -291,7 +291,7 @@ void MusicInformation::resumeMusic()
 
 //-----------------------------------------------------------------------------
 void MusicInformation::volumeMusic(float gain)
-{    
+{
     m_adjusted_gain = m_gain * gain;
     if (m_normal_music != NULL) m_normal_music->volumeMusic(m_adjusted_gain);
     if (m_fast_music   != NULL) m_fast_music->volumeMusic(m_adjusted_gain);
@@ -307,7 +307,7 @@ void MusicInformation::setTemporaryVolume(float gain)
 
 //-----------------------------------------------------------------------------
 void MusicInformation::switchToFastMusic()
-{    
+{
     if(!m_enable_fast) return;
     m_time_since_faster = 0.0f;
     if(m_fast_music)
@@ -317,7 +317,7 @@ void MusicInformation::switchToFastMusic()
     }
     else
     {
-        // FIXME: for now this music is too annoying, 
+        // FIXME: for now this music is too annoying,
         m_mode = SOUND_FASTER;
     }
 }   // switchToFastMusic

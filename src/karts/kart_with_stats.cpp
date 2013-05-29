@@ -23,7 +23,7 @@
 #include "items/item.hpp"
 #include "modes/linear_world.hpp"
 
-KartWithStats::KartWithStats(const std::string& ident, 
+KartWithStats::KartWithStats(const std::string& ident,
                              unsigned int world_kart_id,
                              int position, const btTransform& init_transform)
              : Kart(ident, world_kart_id, position,
@@ -36,7 +36,7 @@ KartWithStats::KartWithStats(const std::string& ident,
  */
 void KartWithStats::reset()
 {
-    m_top_speed         = 0.0f; 
+    m_top_speed         = 0.0f;
     m_explosion_time    = 0.0f;
     m_explosion_count   = 0;
     m_skidding_time     = 0.0f;
@@ -53,7 +53,7 @@ void KartWithStats::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
-/** This function is called each timestep, and it collects most of the 
+/** This function is called each timestep, and it collects most of the
  *  statistics for this kart.
  *  \param dt Time step size.
  */
@@ -74,7 +74,7 @@ void KartWithStats::update(float dt)
 /** Overloading setKartAnimation with a kind of listener function in order
  *  to gather statistics about rescues and explosions.
  */
-void KartWithStats::setKartAnimation(AbstractKartAnimation *ka) 
+void KartWithStats::setKartAnimation(AbstractKartAnimation *ka)
 {
     bool is_new = !getKartAnimation() && !isInvulnerable();
     Kart::setKartAnimation(ka);

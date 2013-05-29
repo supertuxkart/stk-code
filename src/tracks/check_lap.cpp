@@ -28,10 +28,10 @@
 
 /** Constructor for a lap line.
  *  \param check_manager Pointer to the check manager, which is needed when
- *         resetting e.g. new lap counters. 
+ *         resetting e.g. new lap counters.
  *  \param node XML node containing the parameters for this checkline.
  */
-CheckLap::CheckLap(const XMLNode &node, unsigned int index) 
+CheckLap::CheckLap(const XMLNode &node, unsigned int index)
          : CheckStructure(node, index)
 {
     // Note that when this is called the karts have not been allocated
@@ -57,7 +57,7 @@ void CheckLap::reset(const Track &track)
  *  \param indx     Index of the kart, can be used to store kart specific
  *                  additional data.
  */
-bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                            unsigned int indx)
 {
     float track_length = World::getWorld()->getTrack()->getTrackLength();
@@ -76,6 +76,6 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                 m_previous_distance[indx], current_distance);
     }
     m_previous_distance[indx] = current_distance;
-    
+
     return result;
 }   // isTriggered

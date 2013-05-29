@@ -52,18 +52,18 @@
 #endif
 
 // ----------------------------------------------------------------------------
-/** Create a thread that handles all network functions independent of the 
+/** Create a thread that handles all network functions independent of the
  *  main program. NetworkHttp supports only a single thread (i.e. it's not
  *  possible to download two addons at the same time), which makes handling
  *  and synchronisation a lot easier (otherwise all objects using this object
  *  would need an additional handle to get the right data back).
- *  This separate thread is running in NetworkHttp::mainLoop, and is being 
+ *  This separate thread is running in NetworkHttp::mainLoop, and is being
  *  waken up if a command is issued (e.g. using downloadFileAsynchronous).
  *  While UserConfigParams are modified, they can't (easily) be saved here,
  *  since the user might trigger another save in the menu (potentially
  *  ending up with an corrupted file).
  */
-NetworkHttp::NetworkHttp() : 
+NetworkHttp::NetworkHttp() :
                              m_current_request(NULL),
                              m_abort(false),
                              m_thread_id(NULL)
@@ -83,14 +83,14 @@ NetworkHttp::NetworkHttp() :
     Request *request = new Request(Request::HC_INIT, 9999);
     m_all_requests.lock();
     m_all_requests.getData().push(request);
-    m_all_requests.unlock();    
+    m_all_requests.unlock();
 }   // NetworkHttp
 
 // ---------------------------------------------------------------------------
 /** Start the actual network thread. This can not be done as part of
  *  the constructor, since the assignment to the global network_http
  *  variable has not been assigned at that stage, and the thread might
- *  use network_http - a very subtle race condition. So the thread can 
+ *  use network_http - a very subtle race condition. So the thread can
  *  only be started after the assignment (in main) has been done.
  */
 void NetworkHttp::startNetworkThread()
@@ -106,7 +106,7 @@ void NetworkHttp::startNetworkThread()
     //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
     m_thread_id.setAtomic(new pthread_t());
-    int error = pthread_create(m_thread_id.getData(), &attr, 
+    int error = pthread_create(m_thread_id.getData(), &attr,
                                &NetworkHttp::mainLoop, this);
     if(error)
     {
@@ -121,7 +121,7 @@ void NetworkHttp::startNetworkThread()
 
 // ---------------------------------------------------------------------------
 /** The actual main loop, which is started as a separate thread from the
- *  constructor. After testing for a new server, fetching news, the list 
+ *  constructor. After testing for a new server, fetching news, the list
  *  of packages to download, it will wait for commands to be issued.
  *  \param obj: A pointer to this object, passed on by pthread_create
  */
@@ -146,26 +146,26 @@ void *NetworkHttp::mainLoop(void *obj)
             if(UserConfigParams::logAddons())
                 printf("[addons] No request, sleeping.\n");
 
-            pthread_cond_wait(&me->m_cond_request, 
+            pthread_cond_wait(&me->m_cond_request,
                               me->m_all_requests.getMutex());
             empty = me->m_all_requests.getData().empty();
         }
-        // Get the first (=highest priority) request and remove it from the 
+        // Get the first (=highest priority) request and remove it from the
         // queue. Only this code actually removes requests from the queue,
-        // so it is certain that even 
+        // so it is certain that even
         me->m_current_request = me->m_all_requests.getData().top();
         me->m_all_requests.getData().pop();
         if(UserConfigParams::logAddons())
         {
             if(me->m_current_request->getCommand()==Request::HC_DOWNLOAD_FILE)
                 printf("[addons] Executing download '%s' to '%s' priority %d.\n",
-                       me->m_current_request->getURL().c_str(), 
+                       me->m_current_request->getURL().c_str(),
                        me->m_current_request->getSavePath().c_str(),
                        me->m_current_request->getPriority());
             else
                 printf("[addons] Executing command '%d' priority %d.\n",
-                       me->m_current_request->getCommand(), 
-                       me->m_current_request->getPriority()); 
+                       me->m_current_request->getCommand(),
+                       me->m_current_request->getPriority());
         }
         if(me->m_current_request->getCommand()==Request::HC_QUIT)
         {
@@ -178,7 +178,7 @@ void *NetworkHttp::mainLoop(void *obj)
         CURLcode status=CURLE_OK;
         switch(me->m_current_request->getCommand())
         {
-        case Request::HC_INIT: 
+        case Request::HC_INIT:
              status = me->init();
              break;
         case Request::HC_REINIT:
@@ -187,7 +187,7 @@ void *NetworkHttp::mainLoop(void *obj)
         case Request::HC_DOWNLOAD_FILE:
              status = me->downloadFileInternal(me->m_current_request);
              break;
-        case Request::HC_QUIT: 
+        case Request::HC_QUIT:
              assert(false);    // quit is checked already
              break;
         default:
@@ -224,7 +224,7 @@ void *NetworkHttp::mainLoop(void *obj)
 // ---------------------------------------------------------------------------
 /** This function inserts a high priority request to quit into the request
  *  queue of the network thead, and also aborts any ongoing download.
- *  Separating this allows more time for the thread to finish cleanly, 
+ *  Separating this allows more time for the thread to finish cleanly,
  *  before it gets cancelled in the destructor.
  */
 void NetworkHttp::stopNetworkThread()
@@ -296,7 +296,7 @@ CURLcode NetworkHttp::init()
               "news.xml", "news.xml");
     CURLcode status = download ? downloadFileInternal(&r)
                                : CURLE_OK;
-    if(download && 
+    if(download &&
         status==CURLE_COULDNT_RESOLVE_HOST)
     {
         // Assume that the server address is wrong. And retry
@@ -326,7 +326,7 @@ CURLcode NetworkHttp::init()
             UserConfigParams::m_server_addons.revertToDefaults();
             status = downloadFileInternal(&r);
             if(status==CURLE_OK)
-                UserConfigParams::m_news_last_updated = 
+                UserConfigParams::m_news_last_updated =
                     Time::getTimeSinceEpoch();
             delete xml;
             xml = new XMLNode(xml_file);
@@ -376,7 +376,7 @@ CURLcode NetworkHttp::init()
  */
 void NetworkHttp::insertReInit()
 {
-    Request *request = new Request(Request::HC_REINIT, 9999, 
+    Request *request = new Request(Request::HC_REINIT, 9999,
                                    /*manage_memory*/true);
 
     if(UserConfigParams::logAddons())
@@ -409,7 +409,7 @@ CURLcode NetworkHttp::reInit()
         printf("[addons] Xml files deleted, re-initialising addon manager.\n");
 
     return init();
-    
+
 }   // reInit
 
 // ----------------------------------------------------------------------------
@@ -432,7 +432,7 @@ CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
     if(include)
     {
         include->get("file",  &addon_list_url);
-        
+
         int64_t tmp;
         include->get("mtime", &tmp);
         mtime = tmp;
@@ -455,7 +455,7 @@ CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
 
     Request r(Request::HC_DOWNLOAD_FILE, 9999, false,
               addon_list_url, "addons.xml");
-    CURLcode status = download ? downloadFileInternal(&r) 
+    CURLcode status = download ? downloadFileInternal(&r)
                                : CURLE_OK;
     if(status==CURLE_OK)
     {
@@ -478,7 +478,7 @@ CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
 }   // loadAddonsList
 
 // ----------------------------------------------------------------------------
-/** Download a file. The file name isn't absolute, the server in the config 
+/** Download a file. The file name isn't absolute, the server in the config
  *  will be added to file. The file is downloaded with a ".part" extention,
  *  and the file is renamed after it was downloaded successfully.
  *  \param request The request object containing the url and the path where
@@ -486,15 +486,15 @@ CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
  */
 CURLcode NetworkHttp::downloadFileInternal(Request *request)
 {
-    std::string full_save = 
+    std::string full_save =
         file_manager->getAddonsFile(request->getSavePath());
 
     std::string full_url = request->getURL();
     if(full_url.substr(0, 5)!="http:" && full_url.substr(0, 4)!="ftp:")
-        full_url = (std::string)UserConfigParams::m_server_addons 
+        full_url = (std::string)UserConfigParams::m_server_addons
                  + "/" + full_url;
     if(UserConfigParams::logAddons())
-        printf("[addons] Downloading '%s' as '%s'.\n", 
+        printf("[addons] Downloading '%s' as '%s'.\n",
                full_url.c_str(), request->getSavePath().c_str());
 
     curl_easy_setopt(m_curl_session, CURLOPT_URL, full_url.c_str());
@@ -516,7 +516,7 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
     curl_easy_setopt(m_curl_session, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSDATA, request);
     FILE * fout = fopen((full_save+".part").c_str(), "wb");
-        
+
     if(!fout)
     {
         printf("[addons] Can't open '%s' for writing, ignored.\n",
@@ -526,8 +526,8 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
     //from and out
     curl_easy_setopt(m_curl_session,  CURLOPT_WRITEDATA,     fout  );
     curl_easy_setopt(m_curl_session,  CURLOPT_WRITEFUNCTION, fwrite);
-    
-    curl_easy_setopt(m_curl_session,  CURLOPT_PROGRESSFUNCTION, 
+
+    curl_easy_setopt(m_curl_session,  CURLOPT_PROGRESSFUNCTION,
                      &NetworkHttp::progressDownload);
     curl_easy_setopt(m_curl_session,  CURLOPT_NOPROGRESS, 0);
 
@@ -541,14 +541,14 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
     curl_easy_setopt(m_curl_session, CURLOPT_CONNECTTIMEOUT, 20);
     curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_LIMIT, 10);
     curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_TIME, 20);
-                
+
     CURLcode status = curl_easy_perform(m_curl_session);
     fclose(fout);
     if(status==CURLE_OK)
     {
         if(UserConfigParams::logAddons())
             printf("[addons] Download successful.\n");
-        // The behaviour of rename is unspecified if the target 
+        // The behaviour of rename is unspecified if the target
         // file should already exist - so remove it.
         file_manager->removeFile(full_save);
         int ret = rename((full_save+".part").c_str(), full_save.c_str());
@@ -567,26 +567,26 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
         printf("[addons] Problems downloading file - return code %d.\n",
                status);
     }
-    
+
     request->setProgress( (status==CURLE_OK) ? 1.0f : -1.0f );
     return status;
 }   // downloadFileInternal
 
 // ----------------------------------------------------------------------------
-/** Signals to the progress function to request any ongoing download to be 
- *  cancelled. This function can also be called if there is actually no 
- *  download atm. The function progressDownload checks m_abort and will 
+/** Signals to the progress function to request any ongoing download to be
+ *  cancelled. This function can also be called if there is actually no
+ *  download atm. The function progressDownload checks m_abort and will
  *  return a non-zero value which causes libcurl to abort. */
-void NetworkHttp::cancelAllDownloads() 
-{ 
+void NetworkHttp::cancelAllDownloads()
+{
     if(UserConfigParams::logAddons())
         printf("[addons] Requesting cancellation of download.\n");
-    m_abort.setAtomic(true); 
+    m_abort.setAtomic(true);
 }   // cancelAllDownload
 
 // ----------------------------------------------------------------------------
-/** External interface to download a file asynchronously. This will wake up 
- *  the thread and schedule it to download the file. The calling program has 
+/** External interface to download a file asynchronously. This will wake up
+ *  the thread and schedule it to download the file. The calling program has
  *  to poll using getProgress() to find out if the download has finished.
  *  \param url The file from the server to download.
  *  \param save The name to save the downloaded file under. Defaults to
@@ -601,12 +601,12 @@ Request *NetworkHttp::downloadFileAsynchron(const std::string &url,
     // Limit priorities to 99 so that important system requests
     // (init and quit) will have highest priority.
     assert(priority<=99);
-    Request *request = new Request(Request::HC_DOWNLOAD_FILE, priority, 
+    Request *request = new Request(Request::HC_DOWNLOAD_FILE, priority,
                                    manage_memory,
                                    url, (save!="") ? save : url          );
 
     if(UserConfigParams::logAddons())
-        printf("[addons] Download asynchron '%s' as '%s'.\n", 
+        printf("[addons] Download asynchron '%s' as '%s'.\n",
                request->getURL().c_str(), request->getSavePath().c_str());
     insertRequest(request);
     return request;
@@ -630,20 +630,20 @@ void NetworkHttp::insertRequest(Request *request)
 
 // ----------------------------------------------------------------------------
 /** Callback function from curl: inform about progress.
- *  \param clientp 
+ *  \param clientp
  *  \param download_total Total size of data to download.
  *  \param download_now   How much has been downloaded so far.
  *  \param upload_total   Total amount of upload.
  *  \param upload_now     How muc has been uploaded so far.
  */
-int NetworkHttp::progressDownload(void *clientp, 
-                                  double download_total, double download_now, 
+int NetworkHttp::progressDownload(void *clientp,
+                                  double download_total, double download_now,
                                   double upload_total,   double upload_now)
 {
     Request *request = (Request *)clientp;
-    
+
     NetworkHttp* self = (NetworkHttp*)INetworkHttp::get();
-    
+
     // Check if we are asked to abort the download. If so, signal this
     // back to libcurl by returning a non-zero status.
     if(self->m_abort.getAtomic() || request->isCancelled() )
@@ -652,7 +652,7 @@ int NetworkHttp::progressDownload(void *clientp,
         {
             if(self->m_abort.getAtomic())
             {
-                // Reset abort flag so that the next download will work 
+                // Reset abort flag so that the next download will work
                 // as expected.
                 self->m_abort.setAtomic(false);
                 printf("[addons] Global abort of downloads.\n");
@@ -669,11 +669,11 @@ int NetworkHttp::progressDownload(void *clientp,
     if(download_now < download_total)
     {
         f = (float)download_now / (float)download_total;
-        // In case of floating point rouding errors make sure that 
+        // In case of floating point rouding errors make sure that
         // 1.0 is only reached when downloadFileInternal is finished
         if (f>=1.0f) f=0.99f;
     }
-    else 
+    else
     {
         // Don't set progress to 1.0f; this is done in loadFileInternal
         // after checking curls return code!

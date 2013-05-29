@@ -48,8 +48,8 @@ void Log::setTerminalColor(LogLevel level)
 #ifdef WIN32
     enum TermColor
     {
-        TERM_BLACK,    TERM_BLUE,         TERM_GREEN,      TERM_CYAN, 
-        TERM_RED,      TERM_MAGENTA,      TERM_BROWN,      TERM_LIGHTGRAY, 
+        TERM_BLACK,    TERM_BLUE,         TERM_GREEN,      TERM_CYAN,
+        TERM_RED,      TERM_MAGENTA,      TERM_BROWN,      TERM_LIGHTGRAY,
         TERM_DARKGRAY, TERM_LIGHTBLUE,    TERM_LIGHTGREEN, TERM_LIGHTCYAN,
         TERM_LIGHTRED, TERM_LIGHTMAGENTA, TERM_YELLOW,     TERM_WHITE
     };
@@ -89,7 +89,7 @@ void Log::setTerminalColor(LogLevel level)
 
     }
     if(attr==TERM_RESET)
-        printf("%c[%dm", 0x1B,attr);  // not necessary, but 
+        printf("%c[%dm", 0x1B,attr);  // not necessary, but
     else
     {
         printf("%c[%d;%dm", 0x1B,attr, front_color+30);
@@ -104,7 +104,7 @@ void Log::setTerminalColor(LogLevel level)
  */
 void Log::resetTerminalColor()
 {
-    if(m_no_colors) 
+    if(m_no_colors)
     {
         printf("\n");
         return;
@@ -112,7 +112,7 @@ void Log::resetTerminalColor()
 
 
 #ifdef WIN32
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
                             /*TERM_BLACK*/0 << 4 | /*TERM_LIGHTGRAY*/7);
     printf("\n");
 #else
@@ -122,12 +122,12 @@ void Log::resetTerminalColor()
 
 // ----------------------------------------------------------------------------
 /** This actually prints the log message. If log messages are not redirected
- *  to a file, it tries to select a terminal colour. 
+ *  to a file, it tries to select a terminal colour.
  *  \param level Log level of the message to print.
  *  \param format A printf-like format string.
  *  \param va_list The values to be printed for the format.
  */
-void Log::printMessage(int level, const char *component, const char *format, 
+void Log::printMessage(int level, const char *component, const char *format,
                        VALIST va_list)
 {
     assert(level>=0 && level <=LL_FATAL);
@@ -162,7 +162,7 @@ void Log::printMessage(int level, const char *component, const char *format,
     {
         setTerminalColor((LogLevel)level);
         printf("[%s] %s: ", names[level], component);
-        vprintf(format, va_list); 
+        vprintf(format, va_list);
         resetTerminalColor();  // this prints a \n
     }
     if(m_file_stdout)

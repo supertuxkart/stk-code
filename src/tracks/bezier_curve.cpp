@@ -37,7 +37,7 @@ BezierCurve::BezierCurve(const XMLNode &node)
 Vec3 BezierCurve::getXYZ(float t) const
 {
     unsigned int i=int(t);   // FIXME: have to figure out which point we want here
-    if(i>=(unsigned int)m_all_data.size()-1) 
+    if(i>=(unsigned int)m_all_data.size()-1)
         return m_all_data[i].m_control_point;
 
     const BezierData &p0 = m_all_data[i];

@@ -83,12 +83,12 @@ void Profiler::pushCpuMarker(const char* name, const video::SColor& color)
     // Don't do anything when frozen
     if(m_freeze_state == FROZEN || m_freeze_state == WAITING_FOR_UNFREEZE)
         return;
-    
+
     ThreadInfo& ti = getThreadInfo();
     MarkerStack& markers_stack = ti.markers_stack[m_write_id];
     double  start = _getTimeMilliseconds() - m_time_last_sync;
     size_t  layer = markers_stack.size();
-    
+
     // Add to the stack of current markers
     markers_stack.push(Marker(start, -1.0, name, color, layer));
 }
@@ -100,13 +100,13 @@ void Profiler::popCpuMarker()
     // Don't do anything when frozen
     if(m_freeze_state == FROZEN || m_freeze_state == WAITING_FOR_UNFREEZE)
         return;
-    
+
     ThreadInfo&	ti = getThreadInfo();
     assert(ti.markers_stack[m_write_id].size() > 0);
-    
+
     MarkerStack& markers_stack = ti.markers_stack[m_write_id];
     MarkerList&  markers_done  = ti.markers_done[m_write_id];
-    
+
     // Update the date of end of the marker
     Marker&     marker = markers_stack.top();
     marker.end = _getTimeMilliseconds() - m_time_last_sync;
@@ -123,7 +123,7 @@ void Profiler::synchronizeFrame()
     // Don't do anything when frozen
     if(m_freeze_state == FROZEN)
         return;
-    
+
     // Avoid using several times _getTimeMilliseconds(), which would yield different results
     double now = _getTimeMilliseconds();
 
@@ -151,7 +151,7 @@ void Profiler::synchronizeFrame()
 
         // Finish the markers in the stack of the previous frame
         // and start them for the next frame.
-        
+
         // For each marker in the old stack:
         while(!old_markers_stack.empty())
         {
@@ -168,11 +168,11 @@ void Profiler::synchronizeFrame()
             old_markers_stack.pop();
         }
     }
-    
+
     // Remember the date of last synchronization
     m_time_between_sync = now - m_time_last_sync;
     m_time_last_sync = now;
-    
+
     // Freeze/unfreeze as needed
     if(m_freeze_state == WAITING_FOR_FREEZE)
         m_freeze_state = FROZEN;
@@ -186,12 +186,12 @@ void Profiler::draw()
 {
     video::IVideoDriver*    driver = irr_driver->getVideoDriver();
     std::stack<Marker>      hovered_markers;
-    
+
     drawBackground();
-    
+
     // Force to show the pointer
     irr_driver->showPointer();
-    
+
     int read_id = !m_write_id;
 
     // Compute some values for drawing (unit: pixels, but we keep floats for reducing errors accumulation)
@@ -204,7 +204,7 @@ void Profiler::draw()
     size_t nb_thread_infos = m_thread_infos.size();
 
     const double factor = profiler_width / TIME_DRAWN_MS;
-    
+
     // Get the mouse pos
     core::vector2di mouse_pos = GUIEngine::EventHandler::get()->getMousePos();
 
@@ -213,7 +213,7 @@ void Profiler::draw()
     {
         // Draw all markers
         MarkerList& markers = m_thread_infos[i].markers_done[read_id];
-        
+
         if(markers.empty())
             continue;
 
@@ -226,30 +226,30 @@ void Profiler::draw()
                                 (s32)( y_offset + i*line_height ),
                                 (s32)( x_offset + factor*m.end ),
                                 (s32)( y_offset + (i+1)*line_height ));
-            
+
             // Reduce vertically the size of the markers according to their layer
             pos.UpperLeftCorner.Y  += m.layer;
             pos.LowerRightCorner.Y -= m.layer;
-            
+
             driver->draw2DRectangle(m.color, pos);
-            
+
             // If the mouse cursor is over the marker, get its information
             if(pos.isPointInside(mouse_pos))
                 hovered_markers.push(m);
         }
     }
-    
+
     // Draw the end of the frame
     {
         s32 x_sync = (s32)(x_offset + factor*m_time_between_sync);
         s32 y_up_sync = (s32)(MARGIN_Y*screen_size.Height);
         s32 y_down_sync = (s32)( (MARGIN_Y + (2+nb_thread_infos)*LINE_HEIGHT)*screen_size.Height );
-        
+
         driver->draw2DLine(core::vector2di(x_sync, y_up_sync),
                            core::vector2di(x_sync, y_down_sync),
                            video::SColor(0xFF, 0x00, 0x00, 0x00));
     }
-    
+
     // Draw the hovered markers' names
     gui::ScalableFont* font = GUIEngine::getFont();
     if(font)
@@ -273,7 +273,7 @@ void Profiler::onClick(const core::vector2di& mouse_pos)
 {
     video::IVideoDriver*            driver = irr_driver->getVideoDriver();
     const core::dimension2d<u32>&   screen_size = driver->getScreenSize();
-    
+
     core::rect<s32>background_rect((int)(MARGIN_X                      * screen_size.Width),
                                    (int)(MARGIN_Y                      * screen_size.Height),
                                    (int)((1.0-MARGIN_X)                * screen_size.Width),
@@ -281,17 +281,17 @@ void Profiler::onClick(const core::vector2di& mouse_pos)
 
     if(!background_rect.isPointInside(mouse_pos))
         return;
-    
+
     switch(m_freeze_state)
     {
     case UNFROZEN:
         m_freeze_state = WAITING_FOR_FREEZE;
         break;
-    
+
     case FROZEN:
         m_freeze_state = WAITING_FOR_UNFREEZE;
         break;
-        
+
     case WAITING_FOR_FREEZE:
     case WAITING_FOR_UNFREEZE:
         // the user should not be that quick, and we prefer avoiding to introduce

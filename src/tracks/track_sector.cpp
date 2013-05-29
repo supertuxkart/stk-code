@@ -52,12 +52,12 @@ void TrackSector::update(const Vec3 &xyz)
 
     QuadGraph::get()->findRoadSector(xyz, &m_current_graph_node);
     m_on_road = m_current_graph_node != QuadGraph::UNKNOWN_SECTOR;
-    
+
     // If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
     // the road, so we have to use search for the closest graph node.
     if(m_current_graph_node == QuadGraph::UNKNOWN_SECTOR)
     {
-        m_current_graph_node = 
+        m_current_graph_node =
             QuadGraph::get()->findOutOfRoadSector(xyz,
                                                   prev_sector);
     }
@@ -67,7 +67,7 @@ void TrackSector::update(const Vec3 &xyz)
         // of the required checklines
         const std::vector<int>& checkline_requirements =
             QuadGraph::get()->getNode(m_current_graph_node).getChecklineRequirements();
-        
+
         if (checkline_requirements.size() == 0)
         {
             m_last_valid_graph_node = m_current_graph_node;
@@ -75,25 +75,25 @@ void TrackSector::update(const Vec3 &xyz)
         else
         {
             bool has_prerequisite = false;
-            
+
             for (unsigned int i=0; i<checkline_requirements.size(); i++)
-            {                
+            {
                 if (m_last_triggered_checkline == checkline_requirements[i])
                 {
-                    has_prerequisite = true;                    
+                    has_prerequisite = true;
                     m_last_valid_graph_node = m_current_graph_node;
                     break;
                 }
             }
-            
+
             // TODO: show a message when we detect a user cheated.
-            
+
         }
     }
-    
-    // Now determine the 'track' coords, i.e. ow far from the start of the 
+
+    // Now determine the 'track' coords, i.e. ow far from the start of the
     // track, and how far to the left or right of the center driveline.
-    QuadGraph::get()->spatialToTrack(&m_current_track_coords, xyz, 
+    QuadGraph::get()->spatialToTrack(&m_current_track_coords, xyz,
                                      m_current_graph_node);
 }   // update
 
@@ -104,7 +104,7 @@ void TrackSector::rescue()
         m_current_graph_node = m_last_valid_graph_node;
 
     // Using the predecessor has the additional advantage (besides punishing
-    // the player a bit more) that it makes it less likely to fall in a 
+    // the player a bit more) that it makes it less likely to fall in a
     // rescue loop since the kart moves back on each attempt. At this stage
     // STK does not keep track of where the kart is coming from, so always
     // use the first predecessor, which is the one on the main driveline.

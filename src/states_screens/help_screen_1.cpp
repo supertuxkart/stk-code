@@ -19,7 +19,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "guiengine/widget.hpp"
-#include "guiengine/widgets/list_widget.hpp" 
+#include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
@@ -59,14 +59,14 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
         race_manager->setNumKarts( 1 );
         race_manager->setTrack( "tutorial" );
         race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
-        
+
         // Use keyboard 0 by default (FIXME: let player choose?)
         InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
         // Create player and associate player with keyboard
         StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
                                                 device);
-        
+
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
         {
             fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', will revert to default\n",
@@ -74,13 +74,13 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
             UserConfigParams::m_default_kart.revertToDefaults();
         }
         race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
-        
+
         // ASSIGN should make sure that only input from assigned devices
         // is read.
         input_manager->getDeviceList()->setAssignMode(ASSIGN);
         input_manager->getDeviceList()
             ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
-        
+
         StateManager::get()->enterGameState();
         network_manager->setupPlayerKartInfo();
         race_manager->startNew(false);
@@ -88,7 +88,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
     else if (name == "category")
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
-        
+
         //if (selection == "page1") StateManager::get()->replaceTopMostScreen(Help1Screen::getInstance());
         //else
         if (selection == "page2") StateManager::get()->replaceTopMostScreen(HelpScreen2::getInstance());
@@ -108,7 +108,7 @@ void HelpScreen1::init()
     Screen::init();
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
 	ButtonWidget* tutorial = getWidget<ButtonWidget>("startTutorial");
-    
+
 	if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
 	{
 		tutorial->setDeactivated();

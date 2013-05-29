@@ -58,58 +58,58 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
 
     const bool has_laps       = race_manager->modeHasLaps();
     const bool has_highscores = race_manager->modeHasHighscores();
-    
+
     m_track_ident = trackIdent;
     m_ribbon_item = ribbonItem;
 
     getWidget<LabelWidget>("name")->setText(trackName.c_str(), false);
-    
+
     Track* track = track_manager->getTrack(trackIdent);
     //I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
     getWidget<LabelWidget>("author")->setText( _("Track by %s", track->getDesigner().c_str()), false );
 
-    
+
     // ---- Track screenshot
     Widget* screenshot_div = getWidget("screenshot_div");
     IconButtonWidget* screenshotWidget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
                                                               false /* tab stop */, false /* focusable */);
     // images are saved squared, but must be stretched to 4:
     screenshotWidget->setCustomAspectRatio(4.0f / 3.0f);
-    
+
     screenshotWidget->m_x = screenshot_div->m_x;
     screenshotWidget->m_y = screenshot_div->m_y;
     screenshotWidget->m_w = screenshot_div->m_w;
     screenshotWidget->m_h = screenshot_div->m_h;
-    
+
     // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
-    screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png"; 
+    screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png";
     screenshotWidget->setParent(m_irrlicht_window);
     screenshotWidget->add();
-    
+
     if (screenshot != NULL)
     {
         screenshotWidget->setImage(screenshot);
     }
     m_widgets.push_back(screenshotWidget);
-    
+
 
     // ---- Lap count m_spinner
     if (has_laps)
     {
         m_spinner = getWidget<SpinnerWidget>("lapcountspinner");
-        
+
         m_spinner->m_properties[PROP_ID] = "lapcountspinner";
         if (UserConfigParams::m_artist_debug_mode)
         {
             m_spinner->setMin(0);
         }
-        
+
         //I18N: In the track setup screen (number of laps choice, where %i is the number)
         //m_spinner->setText( _("%i laps") );
         m_spinner->setValue( UserConfigParams::m_num_laps );
         //m_spinner->getIrrlichtElement()->setTabStop(true);
         //m_spinner->getIrrlichtElement()->setTabGroup(false);
-        
+
         const int num_laps = m_spinner->getValue();
         race_manager->setNumLaps(num_laps);
     }
@@ -119,7 +119,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
         m_spinner = NULL;
     }
 
-    
+
     // Reverse track
     const bool reverse_available = track->reverseAvailable();
     if (reverse_available)
@@ -134,7 +134,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
         m_checkbox = NULL;
         race_manager->setReverseTrack(false);
     }
-    
+
     // ---- High Scores
     if (has_highscores)
     {
@@ -154,15 +154,15 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
         getWidget<IconButtonWidget>("iconscore1")->setVisible(false);
         getWidget<IconButtonWidget>("iconscore2")->setVisible(false);
         getWidget<IconButtonWidget>("iconscore3")->setVisible(false);
-        
+
         getWidget<LabelWidget>("highscores")->setVisible(false);
         getWidget<LabelWidget>("highscore1")->setVisible(false);
         getWidget<LabelWidget>("highscore2")->setVisible(false);
         getWidget<LabelWidget>("highscore3")->setVisible(false);
     }
-    
+
     getWidget<ButtonWidget>("start")->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
-    
+
 }   // TrackInfoDialog
 
 // ------------------------------------------------------------------------------------------------------
@@ -176,7 +176,7 @@ TrackInfoDialog::~TrackInfoDialog()
     {
         ((TracksScreen*)curr_screen)->setFocusOnTrack(m_ribbon_item);
     }
-    
+
 }   // ~TrackInfoDialog
 
 // ------------------------------------------------------------------------------------------------------
@@ -186,7 +186,7 @@ void TrackInfoDialog::updateHighScores()
     std::string game_mode_ident = RaceManager::getIdentOf( race_manager->getMinorMode() );
     const Highscores::HighscoreType type = "HST_" + game_mode_ident;
 
-    Highscores* highscores = 
+    Highscores* highscores =
         highscore_manager->getHighscores(type,
                                          race_manager->getNumberOfKarts(),
                                          race_manager->getDifficulty(),
@@ -194,23 +194,23 @@ void TrackInfoDialog::updateHighScores()
                                          race_manager->getNumLaps(),
                                          race_manager->getReverseTrack()  );
     const int amount = highscores->getNumberEntries();
-    
+
     std::string kart_name;
     core::stringw name;
     float time;
-    
+
     // fill highscore entries
     for (int n=0; n<HIGHSCORE_COUNT; n++)
-    {        
+    {
         irr::core::stringw line;
-        
+
         // Check if this entry is filled or still empty
         if (n < amount)
-        {            
+        {
             highscores->getEntry(n, kart_name, name, &time);
-                        
+
             std::string time_string = StringUtils::timeToString(time);
-            
+
             const KartProperties* prop = kart_properties_manager->getKart(kart_name);
             if (prop != NULL)
             {
@@ -224,27 +224,27 @@ void TrackInfoDialog::updateHighScores()
         {
             //I18N: for empty highscores entries
             line = _("(Empty)");
-            
+
             ITexture* no_kart_texture = irr_driver->getTexture(
                     (file_manager->getGUIDir() + "random_kart.png").c_str() ) ;
             m_kart_icons[n]->setImage(no_kart_texture);
 
         }
-        
+
         m_highscore_entries[n]->setText( line.c_str(), false );
-        
-    }    
+
+    }
 }   // updateHighScores
 
 // ------------------------------------------------------------------------------------------------------
 
 void TrackInfoDialog::onEnterPressedInternal()
 {
-    
+
     // Create a copy of member variables we still need, since they will
     // not be accessible after dismiss:
     const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
-    const bool reverse_track = m_checkbox == NULL ? false 
+    const bool reverse_track = m_checkbox == NULL ? false
                                                   : m_checkbox->getState();
     race_manager->setReverseTrack(reverse_track);
     std::string track_ident = m_track_ident;
@@ -255,7 +255,7 @@ void TrackInfoDialog::onEnterPressedInternal()
     race_manager->startSingleRace(track_ident, num_laps, false);
 }   // onEnterPressedInternal
 
-// ------------------------------------------------------------------------------------------------------   
+// ------------------------------------------------------------------------------------------------------
 
 GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eventSource)
 {
@@ -282,7 +282,7 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eve
         UserConfigParams::m_num_laps = num_laps;
         updateHighScores();
     }
-    
+
     return GUIEngine::EVENT_LET;
 }   // processEvent
 

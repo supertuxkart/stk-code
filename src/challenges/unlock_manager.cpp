@@ -48,9 +48,9 @@ UnlockManager::UnlockManager()
     unlock_manager = this;
 
     m_current_game_slot = "";
-    
+
     m_locked_sound = sfx_manager->createSoundSource("locked");
-    
+
 
     // Read challenges from .../data/challenges
     // ----------------------------------------
@@ -59,7 +59,7 @@ UnlockManager::UnlockManager()
     for(std::set<std::string>::iterator i  = result.begin();
                                         i != result.end()  ; i++)
     {
-        if (StringUtils::hasSuffix(*i, ".challenge")) 
+        if (StringUtils::hasSuffix(*i, ".challenge"))
             addChallenge(file_manager->getDataFile("challenges/"+*i));
     }   // for i
 
@@ -85,20 +85,20 @@ UnlockManager::UnlockManager()
 UnlockManager::~UnlockManager()
 {
     save();
-    
-    for(AllChallengesType::iterator i =m_all_challenges.begin(); 
+
+    for(AllChallengesType::iterator i =m_all_challenges.begin();
         i!=m_all_challenges.end();  i++)
     {
         delete i->second;
     }
-    
-    
+
+
     std::map<std::string, GameSlot*>::iterator it;
     for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)
     {
         delete it->second;
     }
-    
+
     // sfx_manager is destroyed before UnlockManager is, so SFX will be already deleted
     // sfx_manager->deleteSFX(m_locked_sound);
 }   // ~UnlockManager
@@ -112,14 +112,14 @@ void UnlockManager::readAllChallengesInDirs(const std::vector<std::string>* all_
     {
         std::set<std::string> all_files;
         file_manager->listFiles(all_files, *dir, /*is_full_path*/ true);
-        
-        for(std::set<std::string>::iterator file = all_files.begin(); 
+
+        for(std::set<std::string>::iterator file = all_files.begin();
             file != all_files.end(); file++)
         {
             if (!StringUtils::hasSuffix(*file,".challenge")) continue;
-            
+
             std::string filename = *dir + "/" + *file;
-            
+
             FILE* f = fopen(filename.c_str(), "r");
             if (f)
             {
@@ -139,13 +139,13 @@ void UnlockManager::readAllChallengesInDirs(const std::vector<std::string>* all_
                 }
                 addOrFreeChallenge(new_challenge);
             }   // if file
-            
+
         }   // for file in files
     }   // for dir in all_track_dirs
 }
 
 //-----------------------------------------------------------------------------
-/** If a challenge is supported by this binary (i.e. has an appropriate 
+/** If a challenge is supported by this binary (i.e. has an appropriate
  *  challenge version number), add this challenge to the set of all challenges,
  *  otherwise free the memory for this challenge.
  *  \param c The challenge that is either stored or freed.
@@ -184,7 +184,7 @@ void UnlockManager::addChallenge(const std::string& filename)
         return;
     }
     addOrFreeChallenge(new_challenge);
-    
+
 }   // addChallenge
 
 //-----------------------------------------------------------------------------
@@ -212,11 +212,11 @@ void UnlockManager::load()
                   filename.c_str());
         createSlotsIfNeeded();
         save();
-        
+
         if (root) delete root;
         return;
     }
-    
+
     std::vector<XMLNode*> xml_game_slots;
     root->getNodes("gameslot", xml_game_slots);
     for (unsigned int n=0; n<xml_game_slots.size(); n++)
@@ -228,34 +228,34 @@ void UnlockManager::load()
                       "a player ID attached. Discarding it.");
             continue;
         }
-        
+
         GameSlot* slot = new GameSlot(player_id);
-        
+
         std::string kart_id;
         xml_game_slots[n]->get("kart", &kart_id);
         slot->setKartIdent(kart_id);
-        
+
         m_game_slots[player_id] = slot;
-        
+
         bool first_time = true;
         xml_game_slots[n]->get("firstTime", &first_time);
         slot->setFirstTime(first_time);
-        
-        for(AllChallengesType::iterator i = m_all_challenges.begin(); 
+
+        for(AllChallengesType::iterator i = m_all_challenges.begin();
             i!=m_all_challenges.end();  i++)
         {
             ChallengeData* curr = i->second;
             Challenge* state = new Challenge(curr);
-            
+
             slot->m_challenges_state[curr->getId()] = state;
             state->load(xml_game_slots[n]);
         }
         slot->computeActive();
     }
-    
+
     bool something_changed = createSlotsIfNeeded();
     if (something_changed) save();
-    
+
     delete root;
 }   // load
 
@@ -264,12 +264,12 @@ void UnlockManager::load()
 void UnlockManager::save()
 {
     std::string filename = file_manager->getChallengeFile("challenges.xml");
-    
+
     std::ofstream challenge_file(filename.c_str(), std::ios::out);
 
     if (!challenge_file.is_open())
     {
-        Log::warn("unlock_manager", 
+        Log::warn("unlock_manager",
                   "Failed to open '%s' for writing, challenges won't be saved\n",
                   filename.c_str());
         return;
@@ -277,7 +277,7 @@ void UnlockManager::save()
 
     challenge_file << "<?xml version=\"1.0\"?>\n";
     challenge_file << "<challenges>\n";
-    
+
     std::map<std::string, GameSlot*>::iterator it;
     for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)
     {
@@ -290,10 +290,10 @@ void UnlockManager::save()
                 break;
             }
         }
-        
+
         it->second->save(challenge_file, name);
     }
-    
+
     challenge_file << "</challenges>\n\n";
     challenge_file.close();
 }   // save
@@ -305,13 +305,13 @@ void UnlockManager::save()
 bool UnlockManager::createSlotsIfNeeded()
 {
     bool something_changed = false;
-    
+
     // make sure all players have at least one game slot associated
     PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
     for (int n=0; n<players.size(); n++)
     {
         bool exists = false;
-        
+
         std::map<std::string, GameSlot*>::iterator it;
         for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)
         {
@@ -322,24 +322,24 @@ bool UnlockManager::createSlotsIfNeeded()
                 break;
             }
         }
-        
+
         if (!exists)
         {
             GameSlot* slot = new GameSlot(players[n].getUniqueID());
-            for(AllChallengesType::iterator i = m_all_challenges.begin(); 
+            for(AllChallengesType::iterator i = m_all_challenges.begin();
                 i!=m_all_challenges.end();  i++)
             {
                 ChallengeData* cd = i->second;
                 slot->m_challenges_state[cd->getId()] = new Challenge(cd);
             }
             slot->computeActive();
-            
+
             m_game_slots[players[n].getUniqueID()] = slot;
-            
+
             something_changed = true;
         }
     }
-    
+
     return something_changed;
 } // UnlockManager::createSlotsIfNeeded
 
@@ -431,7 +431,7 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
          it != m_all_challenges.end(); it++)
     {
         ChallengeData* c = it->second;
-        if (c->getNumTrophies() > points_before && 
+        if (c->getNumTrophies() > points_before &&
             c->getNumTrophies() <= points_now      )
         {
             if (c->getTrackId() != "")

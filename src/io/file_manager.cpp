@@ -73,14 +73,14 @@
 bool macSetBundlePathIfRelevant(std::string& data_dir)
 {
     Log::debug("FileManager", "Checking whether we are using an app bundle... ");
-    // the following code will enable STK to find its data when placed in an 
+    // the following code will enable STK to find its data when placed in an
     // app bundle on mac OS X.
     // returns true if path is set, returns false if path was not set
     char path[1024];
     CFBundleRef main_bundle = CFBundleGetMainBundle(); assert(main_bundle);
-    CFURLRef main_bundle_URL = CFBundleCopyBundleURL(main_bundle); 
+    CFURLRef main_bundle_URL = CFBundleCopyBundleURL(main_bundle);
     assert(main_bundle_URL);
-    CFStringRef cf_string_ref = CFURLCopyFileSystemPath(main_bundle_URL, 
+    CFStringRef cf_string_ref = CFURLCopyFileSystemPath(main_bundle_URL,
                                                         kCFURLPOSIXPathStyle);
     assert(cf_string_ref);
     CFStringGetCString(cf_string_ref, path, 1024, kCFStringEncodingASCII);
@@ -118,7 +118,7 @@ FileManager::FileManager(char *argv[])
 {
 #ifdef __APPLE__
     // irrLicht's createDevice method has a nasty habit of messing the CWD.
-    // since the code above may rely on it, save it to be able to restore 
+    // since the code above may rely on it, save it to be able to restore
     // it after.
     char buffer[256];
     getcwd(buffer, 256);
@@ -229,7 +229,7 @@ FileManager::~FileManager()
     std::set<std::string> allfiles;
     std::string tmp=getAddonsFile("tmp");
     listFiles(allfiles, tmp, /*fullpath*/true);
-    for(std::set<std::string>::iterator i=allfiles.begin(); 
+    for(std::set<std::string>::iterator i=allfiles.begin();
         i!=allfiles.end(); i++)
     {
         if((*i)=="." || (*i)=="..") continue;
@@ -238,7 +238,7 @@ FileManager::~FileManager()
         // other files.
         std::string full_path=tmp+"/"+*i;
         if(StringUtils::getExtension(*i)!="zip" &&
-           StringUtils::getExtension(*i)!="part"    ) 
+           StringUtils::getExtension(*i)!="part"    )
         {
             Log::warn("FileManager", "Unexpected tmp file '%s' found.",
                        full_path.c_str());
@@ -328,7 +328,7 @@ void FileManager::pushModelSearchPath(const std::string& path)
                                   /*ignorePaths*/false,
                                   io::EFAT_FOLDER);
     // A later added file archive should be searched first (so that
-    // track specific models are found before models in data/models). 
+    // track specific models are found before models in data/models).
     // This is not necessary if this is the first member, or if the
     // addFileArchive call did not add this file systems (this can
     // happen if the file archive has been added prevously, which
@@ -356,7 +356,7 @@ void FileManager::pushTextureSearchPath(const std::string& path)
                                   io::EFAT_FOLDER);
     // A later added file archive should be searched first (so that
     // e.g. track specific textures are found before textures in
-    // data/textures). 
+    // data/textures).
     // This is not necessary if this is the first member, or if the
     // addFileArchive call did not add this file systems (this can
     // happen if the file archive has been added previously, which
@@ -402,7 +402,7 @@ bool FileManager::findFile(std::string& full_path,
                       const std::string& file_name,
                       const std::vector<std::string>& search_path) const
 {
-    for(std::vector<std::string>::const_reverse_iterator 
+    for(std::vector<std::string>::const_reverse_iterator
         i = search_path.rbegin();
         i != search_path.rend(); ++i)
     {
@@ -414,7 +414,7 @@ bool FileManager::findFile(std::string& full_path,
 }   // findFile
 
 //-----------------------------------------------------------------------------
-/** Returns the full path of a texture file name by searching for this 
+/** Returns the full path of a texture file name by searching for this
  *  file in all texture search paths.
  *  \param file_name Name of the texture file to search.
  *  \return The full path for the texture, or "" if the texture was not found.
@@ -427,7 +427,7 @@ std::string FileManager::getTextureFile(const std::string& file_name) const
 }   // getTextureFile
 
 //-----------------------------------------------------------------------------
-/** Returns the full path of a model file name by searching for this 
+/** Returns the full path of a model file name by searching for this
  *  file in all model search paths.
  *  \param file_name Name of the model file to search.
  *  \return The full path for the model, or "" if the model was not found.
@@ -517,7 +517,7 @@ std::string FileManager::getGfxFile(const std::string& file_name) const
  *  function does not support recursive operations, so if a directory "a/b"
  *  is tested, and "a" does not exist, this function will fail.
  *  \params path Directory to test.
- *  \return  True if the directory exists or could be created, 
+ *  \return  True if the directory exists or could be created,
  *           false otherwise.
  */
 bool FileManager::checkAndCreateDirectory(const std::string &path)
@@ -528,7 +528,7 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
         return true;
 
     Log::info("FileManager", "Creating directory '%s'.", path.c_str());
-    
+
     // Otherwise try to create the directory:
 #if defined(WIN32) && !defined(__CYGWIN__)
     bool error = _mkdir(path.c_str()) != 0;
@@ -539,7 +539,7 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
 }   // checkAndCreateDirectory
 
 //-----------------------------------------------------------------------------
-/** If the directory specified in path does not exist, it is created 
+/** If the directory specified in path does not exist, it is created
  *  recursively (mkdir -p style).
  *  \params path Directory to test.
  *  \return  True if the directory exists or could be created, false otherwise.
@@ -550,9 +550,9 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
     // (using access/_access internally):
     if(m_file_system->existFile(io::path(path.c_str())))
         return true;
-    
+
     std::cout << "[FileManager] Creating directory(ies) '" << path << "'.\n";
-    
+
     std::vector<std::string> split = StringUtils::split(path,'/');
     std::string current_path = "";
     for (unsigned int i=0; i<split.size(); i++)
@@ -576,13 +576,13 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
 }   // checkAndCreateDirectory
 
 //-----------------------------------------------------------------------------
-/** Checks if the config directory exists, and it not, tries to create it. 
+/** Checks if the config directory exists, and it not, tries to create it.
  *  It will set m_config_dir to the path to which user-specific config files
  *  are stored.
  */
 void FileManager::checkAndCreateConfigDir()
 {
-    if(getenv("SUPERTUXKART_SAVEDIR") && 
+    if(getenv("SUPERTUXKART_SAVEDIR") &&
         checkAndCreateDirectory(getenv("SUPERTUXKART_SAVEDIR")) )
     {
         m_config_dir = getenv("SUPERTUXKART_SAVEDIR");
@@ -617,9 +617,9 @@ void FileManager::checkAndCreateConfigDir()
         }
         else
         {
-            std::cerr << 
+            std::cerr <<
                 "[FileManager] No home directory, this should NOT happen!\n";
-            // Fall back to system-wide app data (rather than 
+            // Fall back to system-wide app data (rather than
             // user-specific data), but should not happen anyway.
             m_config_dir = "";
         }
@@ -636,7 +636,7 @@ void FileManager::checkAndCreateConfigDir()
         }
         else if (!getenv("HOME"))
         {
-            std::cerr 
+            std::cerr
                 << "[FileManager] No home directory, this should NOT happen "
                 << "- trying '.' for config files!\n";
             m_config_dir = ".";
@@ -648,8 +648,8 @@ void FileManager::checkAndCreateConfigDir()
             if(!checkAndCreateDirectory(m_config_dir))
             {
                 // If $HOME/.config can not be created:
-                std::cerr << "[FileManager] Cannot create directory '" 
-                          << m_config_dir <<"', falling back to use '" 
+                std::cerr << "[FileManager] Cannot create directory '"
+                          << m_config_dir <<"', falling back to use '"
                           << getenv("HOME")<< "'.\n";
                 m_config_dir = getenv("HOME");
             }
@@ -673,7 +673,7 @@ void FileManager::checkAndCreateConfigDir()
 }   // checkAndCreateConfigDir
 
 // ----------------------------------------------------------------------------
-/** Creates the directories for the addons data. This will set m_addons_dir 
+/** Creates the directories for the addons data. This will set m_addons_dir
  *  with the appropriate path, and also create the subdirectories in this
  *  directory.
  */
@@ -685,9 +685,9 @@ void FileManager::checkAndCreateAddonsDir()
     m_addons_dir  = getenv("HOME");
     m_addons_dir += "/Library/Application Support/SuperTuxKart/Addons/";
 #else
-    m_addons_dir = checkAndCreateLinuxDir("XDG_DATA_HOME", "supertuxkart", 
+    m_addons_dir = checkAndCreateLinuxDir("XDG_DATA_HOME", "supertuxkart",
                                           ".local/share", ".stkaddons");
-    m_addons_dir += "addons/";    
+    m_addons_dir += "addons/";
 #endif
 
     if(!checkAndCreateDirectory(m_addons_dir))
@@ -711,7 +711,7 @@ void FileManager::checkAndCreateAddonsDir()
 }   // checkAndCreateAddonsDir
 
 // ----------------------------------------------------------------------------
-/** Creates the directories for screenshots. This will set m_screenshot_dir 
+/** Creates the directories for screenshots. This will set m_screenshot_dir
  *  with the appropriate path.
  */
 void FileManager::checkAndCreateScreenshotDir()
@@ -739,7 +739,7 @@ void FileManager::checkAndCreateScreenshotDir()
 #if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
 
 /** Find a directory to use for remaining unix variants. Use the new standards
- *  for config directory based on XDG_* environment variables, or a 
+ *  for config directory based on XDG_* environment variables, or a
  *  subdirectory under $HOME, trying two different fallbacks. It will also
  *  check if the directory 'dirname' can be created (to avoid problems that
  *  e.g. $env_name is '/', which exists, but can not be written to.
@@ -766,12 +766,12 @@ std::string FileManager::checkAndCreateLinuxDir(const char *env_name,
             Log::warn("FileManager", "Cannot create $%s.", env_name);
 
         if(dir[dir.size()-1]!='/') dir += "/";
-        // Do an additional test here, e.g. in case that XDG_DATA_HOME is '/' 
+        // Do an additional test here, e.g. in case that XDG_DATA_HOME is '/'
         // and since dir_ok is set, it would not test any of the other options
         // like $HOME/.local/share
         dir_ok = checkAndCreateDirectory(dir+dir_name);
         if(!dir_ok)
-            Log::warn("FileManager", "Cannot create $%s/%s.", dir.c_str(), 
+            Log::warn("FileManager", "Cannot create $%s/%s.", dir.c_str(),
                       dir_name);
     }
 
@@ -781,11 +781,11 @@ std::string FileManager::checkAndCreateLinuxDir(const char *env_name,
         dir  = getenv("HOME");
         if(dir.size()>0 && dir[dir.size()-1]!='/') dir += "/";
         dir += fallback1;
-        // This will create each individual subdirectory if 
+        // This will create each individual subdirectory if
         // dir_name contains "/".
         dir_ok = checkAndCreateDirectoryP(dir);
         if(!dir_ok)
-            Log::warn("FileManager", "Cannot create $HOME/%s.", 
+            Log::warn("FileManager", "Cannot create $HOME/%s.",
                       fallback1);
     }
     if(!dir_ok && fallback2 && getenv("HOME"))
@@ -795,7 +795,7 @@ std::string FileManager::checkAndCreateLinuxDir(const char *env_name,
         dir += fallback2;
         dir_ok = checkAndCreateDirectory(dir);
         if(!dir_ok)
-            Log::warn("FileManager", "Cannot create $HOME/%s.", 
+            Log::warn("FileManager", "Cannot create $HOME/%s.",
                       fallback2);
     }
 
@@ -926,7 +926,7 @@ std::string FileManager::getChallengeFile(const std::string &file_name) const
 }   // getChallengeFile
 
 //-----------------------------------------------------------------------------
-/** Returns the full path of the tutorial file. 
+/** Returns the full path of the tutorial file.
  *  \param file_name Name of the tutorial file to return.
  */
 std::string FileManager::getTutorialFile(const std::string &file_name) const
@@ -959,8 +959,8 @@ bool FileManager::isDirectory(const std::string &path) const
  *         otherwise m_root_dir is used.
  *  \param make_full_path If set to true, all listed files will be full paths.
  */
-void FileManager::listFiles(std::set<std::string>& result, 
-                            const std::string& dir, bool is_full_path, 
+void FileManager::listFiles(std::set<std::string>& result,
+                            const std::string& dir, bool is_full_path,
                             bool make_full_path) const
 {
     result.clear();
@@ -1036,7 +1036,7 @@ bool FileManager::removeDirectory(const std::string &name) const
     {
         if((*i)=="." || (*i)=="..") continue;
         if(UserConfigParams::logMisc())
-            Log::verbose("FileManager", "Deleting directory '%s'.", 
+            Log::verbose("FileManager", "Deleting directory '%s'.",
                          (*i).c_str());
         std::string full_path=name+"/"+*i;
         if(isDirectory(full_path))

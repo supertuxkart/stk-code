@@ -32,10 +32,10 @@ XMLWriter::XMLWriter(const char* dest) : m_base(dest, std::ios::out | std::ios::
     {
         throw std::runtime_error("Failed to open file for writing : " + std::string(dest));
     }
-    
+
     // FIXME: make sure to properly handle endianness
     wchar_t BOM = 0xFEFF; // UTF-16 BOM is 0xFEFF; UTF-32 BOM is 0x0000FEFF. So this works in either case
-    
+
     m_base.write((char *) &BOM, sizeof(wchar_t));
 }
 

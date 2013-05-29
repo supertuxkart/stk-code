@@ -21,7 +21,7 @@
 #include <IMeshBuffer.h>
 
 void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
-    
+
     Vec3 extend;
     *min = Vec3( 999999.9f);
     *max = Vec3(-999999.9f);
@@ -56,7 +56,7 @@ void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
         }
         else
         {
-            fprintf(stderr, "Tools::minMax3D: Ignoring type '%d'!\n", 
+            fprintf(stderr, "Tools::minMax3D: Ignoring type '%d'!\n",
                     mb->getVertexType());
         }
     }  // for i<getMeshBufferCount

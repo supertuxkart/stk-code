@@ -51,7 +51,7 @@ public:
         m_parent = parent;
     }
 
-    virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID, 
+    virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID,
                                     const irr::core::stringw& selectionText, const int playerID)
     {
         // game mode changed!!
@@ -80,7 +80,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
         assert(w != NULL);
         const std::string& selection = w->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        
+
         if (selection == "novice")
         {
             UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_EASY;
@@ -106,7 +106,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
     {
         DynamicRibbonWidget* w = dynamic_cast<DynamicRibbonWidget*>(widget);
         const std::string& selectedMode = w->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        
+
         if (selectedMode == IDENT_STD)
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
@@ -177,13 +177,13 @@ void RaceSetupScreen::onGameModeChanged()
 {
     DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
     assert( w2 != NULL );
-    
+
     std::string gamemode_str = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     if (gamemode_str == "locked") return;
-    
-    RaceManager::MinorRaceModeType gamemode = 
+
+    RaceManager::MinorRaceModeType gamemode =
         RaceManager::getModeIDFromInternalName(gamemode_str);
-    
+
     // deactivate the AI karts count widget for modes for which we have no AI
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
     if (!RaceManager::hasAI(gamemode))
@@ -204,10 +204,10 @@ void RaceSetupScreen::init()
     RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
     assert( w != NULL );
     w->setSelection( UserConfigParams::m_difficulty, PLAYER_ID_GAME_MASTER );
-    
+
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
     kartamount->setActivated();
-        
+
     // Avoid negative numbers (which can happen if e.g. the number of karts
     // in a previous race was lower than the number of players now.
     int num_ai = UserConfigParams::m_num_karts-race_manager->getNumLocalPlayers();
@@ -215,7 +215,7 @@ void RaceSetupScreen::init()
     kartamount->setValue(num_ai);
     kartamount->setMax(stk_config->m_max_karts - race_manager->getNumLocalPlayers() );
     race_manager->setNumKarts(num_ai +  race_manager->getNumLocalPlayers());
-    
+
     DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
     assert( w2 != NULL );
     w2->clearItems();
@@ -225,15 +225,15 @@ void RaceSetupScreen::init()
         RaceManager::getNameOf(RaceManager::MINOR_MODE_NORMAL_RACE)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name1 +=  _("All blows allowed, so catch weapons and make clever use of them!");
-    
+
     w2->addItem( name1, IDENT_STD, RaceManager::getIconOf(RaceManager::MINOR_MODE_NORMAL_RACE));
-    
+
     irr::core::stringw name2 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_TIME_TRIAL)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name2 += _("Contains no powerups, so only your driving skills matter!");
     w2->addItem( name2, IDENT_TTRIAL, RaceManager::getIconOf(RaceManager::MINOR_MODE_TIME_TRIAL));
-    
+
     if (unlock_manager->getCurrentSlot()->isLocked(IDENT_FTL))
     {
         w2->addItem( _("Locked : solve active challenges to gain access to more!"),
@@ -247,7 +247,7 @@ void RaceSetupScreen::init()
         name3 += _("Keep up with the leader kart but don't overtake it!");
         w2->addItem(name3, IDENT_FTL, RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
     }
-    
+
     if (race_manager->getNumLocalPlayers() > 1 || UserConfigParams::m_artist_debug_mode)
     {
         irr::core::stringw name4 = irr::core::stringw(
@@ -256,7 +256,7 @@ void RaceSetupScreen::init()
         name4 += _("Hit others with weapons until they lose all their lives. (Only in multiplayer games)");
         w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
     }
-    
+
 #ifdef ENABLE_SOCCER_MODE
     {
         irr::core::stringw name5 = irr::core::stringw(
@@ -274,13 +274,13 @@ void RaceSetupScreen::init()
         //FIXME: avoid duplicating descriptions from the help menu!
         name1 +=  _("Find all Easter Eggs");
 
-        w2->addItem( name1, IDENT_EASTER, 
+        w2->addItem( name1, IDENT_EASTER,
                    RaceManager::getIconOf(RaceManager::MINOR_MODE_EASTER_EGG));
     }
 #endif
-    
+
     w2->updateItemDisplay();
-    
+
     // restore saved game mode
     switch (UserConfigParams::m_game_mode)
     {
@@ -303,7 +303,7 @@ void RaceSetupScreen::init()
             w2->setSelection(IDENT_SOCCER, PLAYER_ID_GAME_MASTER, true);
             break;
     }
-    
+
     m_mode_listener = new GameModeRibbonListener(this);
     w2->registerHoverListener(m_mode_listener);
 }   // init

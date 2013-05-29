@@ -45,7 +45,7 @@ TerrainInfo::TerrainInfo(const Vec3 &pos)
 }   // TerrainInfo
 //-----------------------------------------------------------------------------
 /** Update the terrain information based on the latest position.
- *  \param Position from which to start the rayast from. 
+ *  \param Position from which to start the rayast from.
  */
 void TerrainInfo::update(const Vec3& pos)
 {
@@ -59,14 +59,14 @@ void TerrainInfo::update(const Vec3& pos)
 
 // -----------------------------------------------------------------------------
 /** Does a raycast upwards from the given position
-If the raycast indicated that the kart is 'under something' (i.e. a 
+If the raycast indicated that the kart is 'under something' (i.e. a
  *  specially marked terrain), to another raycast up to detect under whic
  *  mesh the kart is. This is using the special gfx effect mesh only.
- *  This is used e.g. to detect if a kart is under water, and then to 
+ *  This is used e.g. to detect if a kart is under water, and then to
  *  get the proper position for water effects. Note that the TerrainInfo
  *  objects keeps track of the previous raycast position.
  */
-bool TerrainInfo::getSurfaceInfo(const Vec3 &from, Vec3 *position, 
+bool TerrainInfo::getSurfaceInfo(const Vec3 &from, Vec3 *position,
                                  const Material **material)
 {
     Vec3 to=from+Vec3(0, 10000, 0);

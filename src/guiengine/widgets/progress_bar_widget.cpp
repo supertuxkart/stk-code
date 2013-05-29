@@ -42,7 +42,7 @@ void ProgressBarWidget::add()
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     stringw&  message = m_text;
     m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewNoFocusID(), message.c_str(), L"");
-    
+
     m_id = m_element->getID();
     m_element->setTabStop(false);
     m_element->setTabGroup(false);

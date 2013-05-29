@@ -31,15 +31,15 @@ using namespace GUIEngine;
 
 TutorialMessageDialog::TutorialMessageDialog(irr::core::stringw msg, bool stopGame) :
     ModalDialog(0.85f, 0.25f, MODAL_DIALOG_LOCATION_BOTTOM)
-{    
+{
     m_stop_game = stopGame;
-    
+
     if (stopGame && StateManager::get()->getGameState() == GUIEngine::GAME)
     {
         World::getWorld()->schedulePause(World::IN_GAME_MENU_PHASE);
     }
-    
-    
+
+
     loadFromFile("tutorial_message_dialog.stkgui");
 
 
@@ -75,7 +75,7 @@ GUIEngine::EventPropagation TutorialMessageDialog::processEvent(const std::strin
         ModalDialog::dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
-    
+
     return GUIEngine::EVENT_LET;
 }
 

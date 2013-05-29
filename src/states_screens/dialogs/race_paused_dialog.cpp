@@ -42,7 +42,7 @@ using namespace irr::gui;
 
 // ----------------------------------------------------------------------------
 
-RacePausedDialog::RacePausedDialog(const float percentWidth, 
+RacePausedDialog::RacePausedDialog(const float percentWidth,
                                    const float percentHeight) :
     ModalDialog(percentWidth, percentHeight)
 {
@@ -54,7 +54,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
     {
         loadFromFile("race_paused_dialog.stkgui");
     }
-    
+
     World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
 
     IconButtonWidget* back_btn = getWidget<IconButtonWidget>("backbtn");
@@ -100,7 +100,7 @@ void RacePausedDialog::onEnterPressedInternal()
 
 // ----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation 
+GUIEngine::EventPropagation
            RacePausedDialog::processEvent(const std::string& eventSource)
 {
     GUIEngine::RibbonWidget* chocie_ribbon =
@@ -114,7 +114,7 @@ GUIEngine::EventPropagation
     }
     else if (eventSource == "choiceribbon")
     {
-        const std::string& selection = 
+        const std::string& selection =
             chocie_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection == "exit")
@@ -156,7 +156,7 @@ GUIEngine::EventPropagation
             ModalDialog::dismiss();
             World::getWorld()->scheduleUnpause();
             race_manager->exitRace();
-            Screen* newStack[] = {MainMenuScreen::getInstance(), 
+            Screen* newStack[] = {MainMenuScreen::getInstance(),
                                   RaceSetupScreen::getInstance(), NULL};
             StateManager::get()->resetAndSetStack( newStack );
             return GUIEngine::EVENT_BLOCK;

@@ -23,7 +23,7 @@
 #include "utils/log.hpp"
 
 GhostKart::GhostKart(const std::string& ident)
-             : Kart(ident, /*world kart id*/99999, 
+             : Kart(ident, /*world kart id*/99999,
                     /*position*/-1, btTransform())
 {
     m_current_transform = 0;
@@ -42,9 +42,9 @@ void GhostKart::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
-/** Sets the next time and transform. The current time and transform becomes 
+/** Sets the next time and transform. The current time and transform becomes
  *  the previous time and transform.
- *  \param 
+ *  \param
  */
 void GhostKart::addTransform(float time, const btTransform &trans)
 {
@@ -93,7 +93,7 @@ void GhostKart::updateTransform(float t, float dt)
 {
 
     // Find (if necessary) the next index to use
-    while(m_current_transform+1 < m_all_times.size() && 
+    while(m_current_transform+1 < m_all_times.size() &&
           t>=m_all_times[m_current_transform+1])
     {
           m_current_transform ++;
@@ -105,9 +105,9 @@ void GhostKart::updateTransform(float t, float dt)
     }
 
     float f =(t - m_all_times[m_current_transform])
-           / (  m_all_times[m_current_transform+1] 
+           / (  m_all_times[m_current_transform+1]
               - m_all_times[m_current_transform]  );
-    setXYZ((1-f)*m_all_transform[m_current_transform  ].getOrigin() 
+    setXYZ((1-f)*m_all_transform[m_current_transform  ].getOrigin()
            + f  *m_all_transform[m_current_transform+1].getOrigin() );
     const btQuaternion q = m_all_transform[m_current_transform].getRotation()
                           .slerp(m_all_transform[m_current_transform+1]

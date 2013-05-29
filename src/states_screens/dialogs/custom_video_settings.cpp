@@ -51,7 +51,7 @@ void CustomVideoSettingsialog::beforeAddingWidgets()
 {
     getWidget<CheckBoxWidget>("anim_gfx")->setState( UserConfigParams::m_graphical_effects );
     getWidget<CheckBoxWidget>("weather_gfx")->setState( UserConfigParams::m_weather_effects );
-    
+
     SpinnerWidget* kart_anim = getWidget<SpinnerWidget>("steering_animations");
     kart_anim->addLabel( _("Disabled") ); // 0
     //I18N: animations setting (only karts with human players are animated)
@@ -82,7 +82,7 @@ void CustomVideoSettingsialog::beforeAddingWidgets()
     antialias->addLabel( L"x4" );         // 2
     antialias->addLabel( L"x8" );         // 3
     antialias->setValue( UserConfigParams::m_antialiasing );
-    
+
     getWidget<CheckBoxWidget>("postprocessing")->setState( UserConfigParams::m_postprocess_enabled );
     getWidget<CheckBoxWidget>("pixelshaders")->setState( UserConfigParams::m_pixel_shaders );
 }
@@ -101,11 +101,11 @@ GUIEngine::EventPropagation CustomVideoSettingsialog::processEvent(const std::st
             getWidget<SpinnerWidget>("antialiasing")->getValue();
         UserConfigParams::m_postprocess_enabled      =
             getWidget<CheckBoxWidget>("postprocessing")->getState();
-        UserConfigParams::m_show_steering_animations = 
+        UserConfigParams::m_show_steering_animations =
             getWidget<SpinnerWidget>("steering_animations")->getValue();
-        UserConfigParams::m_pixel_shaders = 
+        UserConfigParams::m_pixel_shaders =
             getWidget<CheckBoxWidget>("pixelshaders")->getState();
-        
+
         switch (getWidget<SpinnerWidget>("filtering")->getValue())
         {
             case 0:
@@ -133,14 +133,14 @@ GUIEngine::EventPropagation CustomVideoSettingsialog::processEvent(const std::st
                 UserConfigParams::m_trilinear   = true;
                 break;
         }
-        
+
         user_config->saveConfig();
-        
+
         ModalDialog::dismiss();
         OptionsScreenVideo::getInstance()->updateGfxSlider();
         return GUIEngine::EVENT_BLOCK;
     }
-    
+
     return GUIEngine::EVENT_LET;
 }
 

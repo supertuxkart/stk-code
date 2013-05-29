@@ -69,7 +69,7 @@ bool NetworkManager::initialiseConnections()
 NetworkManager::~NetworkManager()
 {
      if(m_mode==NW_SERVER || m_mode==NW_CLIENT) enet_host_destroy(m_host);
-     enet_deinitialize(); 
+     enet_deinitialize();
 }   // ~NetworkManager
 
 // -----------------------------------------------------------------------------
@@ -79,14 +79,14 @@ bool NetworkManager::initServer()
      address.host = ENET_HOST_ANY;
      address.port = UserConfigParams::m_server_port;
 
-     m_host = enet_host_create (& address     /* the address to bind the server host to */, 
+     m_host = enet_host_create (& address     /* the address to bind the server host to */,
                                 stk_config->m_max_karts /* number of connections */,
                                 0             /* channel limit */,
                                 0             /* incoming bandwidth */,
                                 0             /* outgoing bandwidth */     );
     if (m_host == NULL)
     {
-        fprintf (stderr, 
+        fprintf (stderr,
                  "An error occurred while trying to create an ENet server host.\n"
                  "Progressing in non-network mode\n");
         m_mode = NW_NONE;
@@ -101,7 +101,7 @@ bool NetworkManager::initServer()
 }   // initServer
 
 // -----------------------------------------------------------------------------
-/** Initialises the client. This function tries to connect to the server. 
+/** Initialises the client. This function tries to connect to the server.
  */
 bool NetworkManager::initClient()
 {
@@ -110,10 +110,10 @@ bool NetworkManager::initClient()
                                0    /* channel limit */,
                                0    /* downstream bandwidth unlimited   */,
                                0    /*  upstream bandwidth unlimited    */ );
-    
+
     if (m_host == NULL)
     {
-        fprintf (stderr, 
+        fprintf (stderr,
             "An error occurred while trying to create an ENet client host.\n");
         return false;
     }
@@ -127,14 +127,14 @@ bool NetworkManager::initClient()
 
     /* Initiate the connection, allocating the two channels 0 and 1. */
     peer = enet_host_connect (m_host, &address, 2, 0);
-    
+
     if (peer == NULL)
     {
-        fprintf(stderr, 
+        fprintf(stderr,
                 "No available peers for initiating an ENet connection.\n");
         return false;
     }
-    
+
     /* Wait up to 5 seconds for the connection attempt to succeed. */
     if (enet_host_service (m_host, & event, 5000) <= 0 ||
         event.type != ENET_EVENT_TYPE_CONNECT)
@@ -153,7 +153,7 @@ bool NetworkManager::initClient()
 }  // initClient
 
 // ----------------------------------------------------------------------------
-/** Switches the network manager to client mode. This function sets the state 
+/** Switches the network manager to client mode. This function sets the state
  *  to waiting_for_chars (so that the message from the server containing all
  *  available characters can be received).
  */
@@ -255,7 +255,7 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
             if(menu)
                 menu->updateAvailableCharacters();
              */
-            
+
             // Broadcast the information about a selected kart to all clients
             CharacterConfirmMessage ccm(ki.getKartName(), hostid);
             broadcastToClients(ccm);
@@ -315,7 +315,7 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
             m_state = NS_CHARACTER_SELECT;
             break;
         }
-    case NS_CHARACTER_SELECT:  
+    case NS_CHARACTER_SELECT:
         {
             CharacterConfirmMessage m(event->packet);
             kart_properties_manager->selectKartName(m.getKartName());
@@ -352,7 +352,7 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
         }   // wait for kart confirmation
     case NS_WAIT_FOR_RACE_DATA:
         {
-            // It is possible that character confirm messages arrive at the 
+            // It is possible that character confirm messages arrive at the
             // client when it has already left the character selection screen.
             // In this case the messages can simply be ignored.
             if(Message::peekType(event->packet)==Message::MT_CHARACTER_CONFIRM)
@@ -390,7 +390,7 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
             m_state = NS_RACE_RESULT_BARRIER_OVER;
             break;
         }
-    default: 
+    default:
         {
             printf("received unknown message: type %d\n",
                 Message::peekType(event->packet));
@@ -419,8 +419,8 @@ void NetworkManager::update(float dt)
     {
     case ENET_EVENT_TYPE_CONNECT:    handleNewConnection(&event); break;
     case ENET_EVENT_TYPE_RECEIVE:
-          if(m_mode==NW_SERVER) 
-              handleMessageAtServer(&event);    
+          if(m_mode==NW_SERVER)
+              handleMessageAtServer(&event);
           else
               handleMessageAtClient(&event);
           break;
@@ -433,14 +433,14 @@ void NetworkManager::update(float dt)
 void NetworkManager::broadcastToClients(Message &m)
 {
     enet_host_broadcast(m_host, 0, m.getPacket());
-    enet_host_flush(m_host); 
+    enet_host_flush(m_host);
 }   // broadcastToClients
 
 // ----------------------------------------------------------------------------
 void NetworkManager::sendToServer(Message &m)
 {
     enet_peer_send(m_server, 0, m.getPacket());
-    enet_host_flush(m_host); 
+    enet_host_flush(m_host);
 }   // sendToServer
 
 // ----------------------------------------------------------------------------
@@ -457,7 +457,7 @@ void NetworkManager::initCharacterDataStructures()
         m_state = NS_WAIT_FOR_AVAILABLE_CHARACTERS;
     }
     else   // Server or no network
-    {   
+    {
         if(m_mode==NW_SERVER)
         {
             // server: create message with all valid characters
@@ -467,42 +467,42 @@ void NetworkManager::initCharacterDataStructures()
                 CharacterInfoMessage m(i);
                 enet_peer_send(m_clients[i], 0, m.getPacket());
             }
-            enet_host_flush(m_host); 
+            enet_host_flush(m_host);
         }
         // For server and no network:
         // ==========================
-        // Prepare the data structures to receive and 
+        // Prepare the data structures to receive and
         // store information from all clients.
         m_num_local_players.clear();
         // Server (hostid 0) is not included in the num_clients count.  So to
-        // be able to use the hostid as index, we have to allocate one 
+        // be able to use the hostid as index, we have to allocate one
         // additional element.
         m_num_local_players.resize(m_num_clients+1, -1);
         m_num_local_players[0] = race_manager->getNumLocalPlayers();
         m_kart_info.clear();
         m_num_all_players = 0;
         // use barrier count to see if we had at least one message from each host
-        m_barrier_count      = 0;  
+        m_barrier_count      = 0;
         m_state              = NS_CHARACTER_SELECT;
     }
 
 }   // switchTocharacterSelection
 
 // ----------------------------------------------------------------------------
-/** Called on the client to send the data about the selected kart to the 
+/** Called on the client to send the data about the selected kart to the
  *  server and wait for confirmation.
  *  \param player_id Local id of the player which selected the kart.
  *  \param kart_id Identifier of the selected kart. this is used to wait till
  *                 a message about this kart is received back from the server.
  */
-void NetworkManager::sendCharacterSelected(int player_id, 
+void NetworkManager::sendCharacterSelected(int player_id,
                                            const std::string &kart_id)
 {
     if(m_mode==NW_SERVER)
     {
         CharacterConfirmMessage ccm(kart_id, getMyHostId());
         broadcastToClients(ccm);
-    } 
+    }
     else if(m_mode==NW_CLIENT)
     {
         CharacterSelectedMessage m(player_id);
@@ -548,14 +548,14 @@ void NetworkManager::setupPlayerKartInfo()
 
     // Set the player kart information
     race_manager->setNumPlayers(m_kart_info.size());
-    
+
     // Set the global player ID for each player
     for(unsigned int i=0; i<m_kart_info.size(); i++)
     {
         m_kart_info[i].setGlobalPlayerId(i);
         race_manager->setPlayerKart(i, m_kart_info[i]);
     }
-    
+
     // Compute the id of the first kart from each host
     m_kart_id_offset.resize(m_num_clients+1);
     m_kart_id_offset[0]=0;
@@ -623,7 +623,7 @@ void NetworkManager::receiveUpdates()
         int result = enet_host_service (m_host, &event, 0);
         if(result<0)
         {
-            fprintf(stderr, m_mode==NW_SERVER 
+            fprintf(stderr, m_mode==NW_SERVER
                             ? "Error while waiting for client control - chaos will reign.\n"
                             : "Error while waiting for server update - chaos will reign.\n");
             correct=false;
@@ -704,7 +704,7 @@ void NetworkManager::sendRaceResults()
 
 // ----------------------------------------------------------------------------
 /** Changes the mode to wait in a barrier for all clients and the server to
- *  acknowledge the result screen. The server waits for a message from all 
+ *  acknowledge the result screen. The server waits for a message from all
  *  clients, upon which it sends a message to all clients. The clients wait
  *  for this message before continuing.
  */

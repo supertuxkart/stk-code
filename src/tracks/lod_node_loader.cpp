@@ -47,13 +47,13 @@ bool LodNodeLoader::check(const XMLNode* xml)
 {
     float lod_distance = -1.0f;
     xml->get("lod_distance", &lod_distance);
-    
+
     bool lod_instance = false;
     xml->get("lod_instance", &lod_instance);
-    
+
     std::string lodgroup;
     xml->get("lod_group", &lodgroup);
-    
+
     bool tangent = false;
     xml->get("tangents", &tangent);
 
@@ -67,7 +67,7 @@ bool LodNodeLoader::check(const XMLNode* xml)
         {
             std::string model_name;
             xml->get("model", &model_name);
-            
+
             lod_groups[lodgroup][(int)lod_distance] = LodModel(xml, model_name, tangent);
         }
         return true;
@@ -92,13 +92,13 @@ void LodNodeLoader::done(Track* track,
 {
     scene::ISceneManager* sm = irr_driver->getSceneManager();
     scene::ISceneNode* sroot = sm->getRootSceneNode();
-    
+
     // Creating LOD nodes is more complicated than one might have hoped, on the C++ side;
     // but it was done this way to minimize the work needed on the side of the artists
-    
+
     // 1. Sort LOD groups (highest detail first, lowest detail last)
     std::map<std::string, std::vector< std::pair<int, LodModel> > > sorted_lod_groups;
-    
+
     std::map<std::string, std::map<int, LodModel> >::iterator it;
     for (it = lod_groups.begin(); it != lod_groups.end(); it++)
     {
@@ -109,30 +109,30 @@ void LodNodeLoader::done(Track* track,
             sorted_lod_groups[it->first].push_back( std::pair<int, LodModel>(it2->first, it2->second) );
         }
         std::sort( sorted_lod_groups[it->first].begin(), sorted_lod_groups[it->first].end(), PairCompare );
-        
+
         //printf("Group '%s' :\n", it->first.c_str());
         //for (unsigned int x=0; x<sorted_lod_groups[it->first].size(); x++)
         //{
         //    printf("  - (%i) %s\n", sorted_lod_groups[it->first][x].first, sorted_lod_groups[it->first][x].second.c_str());
         //}
     }
-    
+
     // 2. Read the XML nodes and instanciate LOD scene nodes where relevant
     std::string groupname;
     std::map< std::string, std::vector< const XMLNode* > >::iterator it3;
     for (it3 = lod_instances.begin(); it3 != lod_instances.end(); it3++)
     {
         std::vector< std::pair<int, LodModel> >& group = sorted_lod_groups[it3->first];
-        
+
         std::vector< const XMLNode* >& v = it3->second;
         for (unsigned int n=0; n<v.size(); n++)
         {
             const XMLNode* node = v[n];
-            
+
             groupname = "";
             node->get("lod_group", &groupname);
             //if (model_name != sorted_lod_groups[it3->first][0].second) continue;
-            
+
             core::vector3df xyz(0,0,0);
             node->get("xyz", &xyz);
             core::vector3df hpr(0,0,0);
@@ -141,7 +141,7 @@ void LodNodeLoader::done(Track* track,
             node->get("scale", &scale);
 
             std::string full_path;
-            
+
             if (group.size() > 0)
             {
                 LODNode* lod_node = new LODNode(groupname, sroot, sm);
@@ -152,7 +152,7 @@ void LodNodeLoader::done(Track* track,
                 for (unsigned int m=0; m<group.size(); m++)
                 {
                     full_path = directory + "/" + group[m].second.m_model_file;
-                    
+
                     // TODO: check whether the mesh contains animations or not?
                     scene::IMesh *a_mesh = irr_driver->getMesh(full_path);
                     if(!a_mesh)
@@ -161,7 +161,7 @@ void LodNodeLoader::done(Track* track,
                                 full_path.c_str());
                         continue;
                     }
-                    
+
                     if (group[m].second.m_tangent)
                     {
                         scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
@@ -171,7 +171,7 @@ void LodNodeLoader::done(Track* track,
                         irr_driver->setAllMaterialFlags(a_mesh);
 
                     }
-                    
+
                     a_mesh->grab();
                     cache.push_back(a_mesh);
                     irr_driver->grabAllTextures(a_mesh);
@@ -179,12 +179,12 @@ void LodNodeLoader::done(Track* track,
                     //scene_node->setPosition(xyz);
                     //scene_node->setRotation(hpr);
                     //scene_node->setScale(scale);
-                    
+
                     track->handleAnimatedTextures( scene_node, *group[m].second.m_xml );
-                    
+
                     lod_node->add( group[m].first, scene_node, true );
                 }
-                
+
 #ifdef DEBUG
                 std::string debug_name = groupname+" (LOD track-object)";
                 lod_node->setName(debug_name.c_str());

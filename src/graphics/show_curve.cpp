@@ -27,8 +27,8 @@
 
 /** ShowCurve constructor. It just creates an empty scene node.
  */
-ShowCurve::ShowCurve(float width, float height, 
-                     const irr::video::SColor &color) 
+ShowCurve::ShowCurve(float width, float height,
+                     const irr::video::SColor &color)
          : m_width(width), m_height(height)
 {
     m_color = color;
@@ -61,7 +61,7 @@ void ShowCurve::addEmptyMesh()
     m.DiffuseColor    = m_color;
     m.EmissiveColor   = m_color;
     m.BackfaceCulling = false;
-    m_mesh            = irr_driver->createQuadMesh(&m, 
+    m_mesh            = irr_driver->createQuadMesh(&m,
                                                    /*create_one_quad*/ false);
     m_buffer          = m_mesh->getMeshBuffer(0);
     assert(m_buffer->getVertexType()==video::EVT_STANDARD);
@@ -119,7 +119,7 @@ void ShowCurve::addPoint(const Vec3 &pnt)
     indices = m_buffer->getIndices();
 
     // index = first newly added index
-    unsigned int index = m_buffer->getIndexCount()-24;   
+    unsigned int index = m_buffer->getIndexCount()-24;
     for(unsigned int i=0; i<4; i++)
     {
         indices[index  ] = n-4 + i;

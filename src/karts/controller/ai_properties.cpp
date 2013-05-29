@@ -82,14 +82,14 @@ void AIProperties::load(const XMLNode *ai_node)
         m_nitro_usage = NITRO_ALL;
     else
     {
-        Log::error("AIProperties", 
+        Log::error("AIProperties",
                 "Incorrect nitro-usage '%s' in AI '%s'.\n",s.c_str(),
                 m_ident.c_str());
         exit(-1);
     }
     // We actually need the square of the distance later
     m_bad_item_closeness_2 *= m_bad_item_closeness_2;
-    
+
 }   // load
 
 // ----------------------------------------------------------------------------
@@ -120,7 +120,7 @@ void AIProperties::checkAllSet(const std::string &filename) const
         Log::error("AIProperties", "No skid probability defined.\n");
         exit(-1);
     }
- 
+
     if(m_speed_cap.size()==0)
     {
         Log::error("AIProperties", "No speed cap defined.\n");

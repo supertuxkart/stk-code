@@ -48,10 +48,10 @@ float RubberBall::m_time_between_balls;
 RubberBall::RubberBall(AbstractKart *kart)
           : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
             TrackSector()
-{    
-    // For debugging purpose: pre-fix each debugging line with the id of 
+{
+    // For debugging purpose: pre-fix each debugging line with the id of
     // the ball so that it's easy to collect all debug output for one
-    // particular ball only. 
+    // particular ball only.
     m_next_id++;
     m_id = m_next_id;
 
@@ -59,13 +59,13 @@ RubberBall::RubberBall(AbstractKart *kart)
     // has to do it earlier than that.
     setDoTerrainInfo(false);
     float forw_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f+5.0f;
-    
+
     createPhysics(forw_offset, btVector3(0.0f, 0.0f, m_speed*2),
-                  new btSphereShape(0.5f*m_extend.getY()), 
-                  -70.0f /*gravity*/, 
+                  new btSphereShape(0.5f*m_extend.getY()),
+                  -70.0f /*gravity*/,
                   true /*rotates*/);
 
-    // Do not adjust the up velocity 
+    // Do not adjust the up velocity
     setAdjustUpVelocity(false);
     m_max_lifespan       = 9999;
     m_target             = NULL;
@@ -79,7 +79,7 @@ RubberBall::RubberBall(AbstractKart *kart)
     m_ping_sfx           = sfx_manager->createSoundSource("ball_bounce");
     // Just init the previoux coordinates with some value that's not getXYZ()
     m_previous_xyz       = m_owner->getXYZ();
-    m_previous_height    = 2.0f;  // 
+    m_previous_height    = 2.0f;  //
     // A negative value indicates that the timer is not active
     m_delete_timer       = -1.0f;
     m_tunnel_count       = 0;
@@ -105,9 +105,9 @@ RubberBall::~RubberBall()
 
 // ----------------------------------------------------------------------------
 /** Sets up the control points for the interpolation. The parameter contains
- *  the coordinates of the first control points (i.e. a control point that 
- *  influences the direction the ball is flying only, not the actual 
- *  coordinates - see details about Catmull-Rom splines). This function will 
+ *  the coordinates of the first control points (i.e. a control point that
+ *  influences the direction the ball is flying only, not the actual
+ *  coordinates - see details about Catmull-Rom splines). This function will
  *  then set the 2nd control point to be the current coordinates of the ball,
  *  and find two more appropriate control points for a smooth movement.
  *  \param xyz Coordinates of the first control points.
@@ -117,12 +117,12 @@ void RubberBall::initializeControlPoints(const Vec3 &xyz)
     m_control_points[0]     = xyz;
     m_control_points[1]     = getXYZ();
     m_last_aimed_graph_node = getSuccessorToHitTarget(getCurrentGraphNode());
-    // This call defined m_control_points[3], but also sets a new 
+    // This call defined m_control_points[3], but also sets a new
     // m_last_aimed_graph_node, which is further away from the current point,
-    // which avoids the problem that the ball might go too quickly to the 
+    // which avoids the problem that the ball might go too quickly to the
     // left or right when firing the ball off track.
     getNextControlPoint();
-    m_control_points[2]     = 
+    m_control_points[2]     =
         QuadGraph::get()->getQuadOfNode(m_last_aimed_graph_node).getCenter();
 
     // This updates m_last_aimed_graph_node, and sets m_control_points[3]
@@ -141,18 +141,18 @@ void RubberBall::computeTarget()
     // FIXME: what does the rubber ball do in case of battle mode??
     if(!world) return;
 
-    for(unsigned int p = race_manager->getFinishedKarts()+1; 
+    for(unsigned int p = race_manager->getFinishedKarts()+1;
                      p < world->getNumKarts()+1; p++)
     {
         m_target = world->getKartAtPosition(p);
         if(!m_target->isEliminated() && !m_target->hasFinishedRace())
         {
-            // If the firing kart itself is the first kart (that is 
+            // If the firing kart itself is the first kart (that is
             // still driving), prepare to remove the rubber ball
             if(m_target==m_owner && m_delete_timer < 0)
             {
 #ifdef PRINT_BALL_REMOVE_INFO
-                Log::debug("RubberBall", 
+                Log::debug("RubberBall",
                            "ball %d removed because owner is target.", m_id);
 #endif
                 m_delete_timer = m_st_delete_time;
@@ -190,7 +190,7 @@ unsigned int RubberBall::getSuccessorToHitTarget(unsigned int node_index,
     // FIXME: what does the rubber ball do in case of battle mode??
     if(lin_world)
     {
-        unsigned int sect = 
+        unsigned int sect =
             lin_world->getSectorForKart(m_target);
         succ = QuadGraph::get()->getNode(node_index).getSuccessorToReach(sect);
     }
@@ -203,7 +203,7 @@ unsigned int RubberBall::getSuccessorToHitTarget(unsigned int node_index,
 // ----------------------------------------------------------------------------
 /** Determines the next control points to aim at. The control points must not
  *  be too close to each other (since otherwise  the interpolation is still
- *  not smooth enough), so keep on picking graph nodes till the distance 
+ *  not smooth enough), so keep on picking graph nodes till the distance
  *  between the currently aimed at graph node and the next one is above a
  *  certain threshold. It uses getSuccessorToHitTarget to determine which
  *  graph node to select.
@@ -227,14 +227,14 @@ void RubberBall::getNextControlPoint()
 
     m_last_aimed_graph_node = next;
     m_length_cp_2_3         = dist;
-    const Quad &quad        = 
+    const Quad &quad        =
         QuadGraph::get()->getQuadOfNode(m_last_aimed_graph_node);
     m_control_points[3]     = quad.getCenter();
 }   // getNextControlPoint
 
 // ----------------------------------------------------------------------------
 /** Initialises this object with data from the power.xml file (this is a static
- *  function). 
+ *  function).
  *  \param node XML Node
  *  \param rubberball The rubber ball mesh
  */
@@ -259,7 +259,7 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
                   "No squash-duration specified for rubber ball.");
     if(!node.get("squash-slowdown", &m_st_squash_slowdown))
         Log::warn("powerup", "No squash-slowdown specified for rubber ball.");
-    if(!node.get("min-interpolation-distance", 
+    if(!node.get("min-interpolation-distance",
                  &m_st_min_interpolation_distance))
         Log::warn("powerup", "No min-interpolation-distance specified "
                              "for rubber ball.");
@@ -272,7 +272,7 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
         Log::warn("powerup", "No target-max-angle specified for rubber ball.");
     m_st_target_max_angle *= DEGREE_TO_RAD;
     if(!node.get("max-height-difference", &m_st_max_height_difference))
-        Log::warn("powerup", 
+        Log::warn("powerup",
                   "No max-height-difference specified for rubber ball.");
     if(!node.get("fast-ping-distance", &m_st_fast_ping_distance))
         Log::warn("powerup",
@@ -282,16 +282,16 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
                    "Ping-distance is smaller than target distance.\n"
                    "That should not happen, but is ignored for now.");
     if(!node.get("early-target-factor", &m_st_early_target_factor))
-        Log::warn("powerup", 
+        Log::warn("powerup",
                   "No early-target-factor specified for rubber ball.");
     if(!node.get("time-between-balls", &m_time_between_balls))
-        Log::warn("powerup", 
+        Log::warn("powerup",
                   "No time-between-balls specified for rubber ball.");
     Flyable::init(node, rubberball, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
 
 // ----------------------------------------------------------------------------
-/** Picks a random message to be displayed when a kart is hit by the 
+/** Picks a random message to be displayed when a kart is hit by the
  *  rubber ball.
  *  \param The kart that was hit (ignored here).
  *  \returns The string to display.
@@ -302,10 +302,10 @@ const core::stringw RubberBall::getHitString(const AbstractKart *kart) const
     RandomGenerator r;
     switch (r.get(COUNT))
     {
-        //I18N: shown when a player is hit by a rubber ball. %1 is the 
+        //I18N: shown when a player is hit by a rubber ball. %1 is the
         // attacker, %0 is the victim.
         case 0: return _LTR("%s is being bounced around.");
-        //I18N: shown when a player is hit by a rubber ball. %1 is the 
+        //I18N: shown when a player is hit by a rubber ball. %1 is the
         // attacker, %0 is the victim.
         case 1: return _LTR("Fetch the ball, %0!");
         default:assert(false); return L"";   // avoid compiler warning
@@ -313,7 +313,7 @@ const core::stringw RubberBall::getHitString(const AbstractKart *kart) const
 }   // getHitString
 
 // ----------------------------------------------------------------------------
-/** Updates the rubber ball. 
+/** Updates the rubber ball.
  *  \param dt Time step size.
  *  \returns True if the rubber ball should be removed.
  */
@@ -337,7 +337,7 @@ bool RubberBall::updateAndDelete(float dt)
     computeTarget();
     updateDistanceToTarget();
 
-    // Determine the new position. This new position is only temporary, 
+    // Determine the new position. This new position is only temporary,
     // since it still needs to be adjusted for the height of the terrain.
     Vec3 next_xyz;
     if(m_aiming_at_target)
@@ -357,10 +357,10 @@ bool RubberBall::updateAndDelete(float dt)
     float vertical_offset = close_to_ground ? 4.0f : 2.0f;
     // Note that at this stage getHoT still reports the height at
     // the previous location (since TerrainInfo wasn't updated). On
-    // the other hand, we can't update TerrainInfo without having 
+    // the other hand, we can't update TerrainInfo without having
     // at least a good estimation of the height.
     next_xyz.setY(getHoT() + vertical_offset);
-    // Update height of terrain (which isn't done as part of 
+    // Update height of terrain (which isn't done as part of
     // Flyable::update for rubber balls.
     TerrainInfo::update(next_xyz);
 
@@ -373,7 +373,7 @@ bool RubberBall::updateAndDelete(float dt)
                 m_id, next_xyz.getX(), next_xyz.getY(), next_xyz.getZ(), height, new_y, getHoT());
 
     // No need to check for terrain height if the ball is low to the ground
-    if(height > 0.5f)  
+    if(height > 0.5f)
     {
         float terrain_height = getMaxTerrainHeight(vertical_offset)
                              - m_extend.getY();
@@ -437,7 +437,7 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
         core::vector2df old_2d(old_vec.getX(), old_vec.getZ());
         if(old_2d.getLengthSQ()==0.0f) old_2d.Y = 1.0f;
         old_2d.normalize();
-        old_2d.rotateBy(  RAD_TO_DEGREE * dt 
+        old_2d.rotateBy(  RAD_TO_DEGREE * dt
                                        * (angle > 0 ?  m_st_target_max_angle
                                                     : -m_st_target_max_angle));
         next_xyz->setX(getXYZ().getX() + old_2d.X*dt*m_speed);
@@ -449,7 +449,7 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
 // ----------------------------------------------------------------------------
 /** Uses Hermite splines (Catmull-Rom) to interpolate the position of the
  *  ball between the control points. If the next point would be outside of
- *  the spline between control_points[1] and [2], a new control point is 
+ *  the spline between control_points[1] and [2], a new control point is
  *  added.
  *  \param next_xyz Returns the new position.
  *  \param The time step size.
@@ -472,10 +472,10 @@ void RubberBall::interpolate(Vec3 *next_xyz, float dt)
         m_t -= 1.0f;
     }
 
-    *next_xyz = 0.5f * ((-  m_control_points[0] + 3*m_control_points[1] 
+    *next_xyz = 0.5f * ((-  m_control_points[0] + 3*m_control_points[1]
                          -3*m_control_points[2] +   m_control_points[3] )
                         *m_t*m_t*m_t
-                      + ( 2*m_control_points[0] -5*m_control_points[1] 
+                      + ( 2*m_control_points[0] -5*m_control_points[1]
                          +4*m_control_points[2] -  m_control_points[3])*m_t*m_t
                       + (-  m_control_points[0] +  m_control_points[2])*m_t
                       +   2*m_control_points[1]                              );
@@ -483,9 +483,9 @@ void RubberBall::interpolate(Vec3 *next_xyz, float dt)
 
 // ----------------------------------------------------------------------------
 /** Checks if the line from the previous ball position to the new position
- *  hits something, which indicates that the ball is tunneling through. If 
+ *  hits something, which indicates that the ball is tunneling through. If
  *  this happens, the ball position is adjusted so that it is just before
- *  the hit point. If tunneling happens four frames in a row the ball is 
+ *  the hit point. If tunneling happens four frames in a row the ball is
  *  considered stuck and explodes (e.g. the ball might try to tunnel through
  *  a wall to get to a 'close' target. In this case the ball would not
  *  move much anymore and be stuck).
@@ -501,12 +501,12 @@ bool RubberBall::checkTunneling()
 
     if(material)
     {
-        // If there are three consecutive tunnelling 
+        // If there are three consecutive tunnelling
         m_tunnel_count++;
-        if(m_tunnel_count > 3) 
+        if(m_tunnel_count > 3)
         {
 #ifdef PRINT_BALL_REMOVE_INFO
-            Log::debug("RubberBall", 
+            Log::debug("RubberBall",
                        "Ball %d nearly tunneled at %f %f %f -> %f %f %f",
                         m_id, m_previous_xyz.getX(),m_previous_xyz.getY(),
                         m_previous_xyz.getZ(),
@@ -529,15 +529,15 @@ bool RubberBall::checkTunneling()
 }   // checkTunneling
 
 // ----------------------------------------------------------------------------
-/** Updates the height of the rubber ball, and if necessary also adjusts the 
- *  maximum height of the ball depending on distance from the target. The 
+/** Updates the height of the rubber ball, and if necessary also adjusts the
+ *  maximum height of the ball depending on distance from the target. The
  *  height is decreased when the ball is getting closer to the target so it
  *  hops faster and faster. This function modifies m_current_max_height.
  *  \return Returns the new height of the ball.
  */
 float RubberBall::updateHeight()
 {
-    // When the ball hits the floor, we adjust maximum height and 
+    // When the ball hits the floor, we adjust maximum height and
     // interval so that the ball bounces faster when it is getting
     // closer to the target.
     if(m_height_timer>m_interval)
@@ -553,7 +553,7 @@ float RubberBall::updateHeight()
         {
             // Some experimental formulas
             m_current_max_height = 0.5f*sqrt(m_distance_to_target);
-            // If the ball just missed the target, m_distance_to_target 
+            // If the ball just missed the target, m_distance_to_target
             // can be huge (close to track length) due to the order in
             // which a lost target is detected. Avoid this by clamping
             // m_current_max_height.
@@ -587,13 +587,13 @@ float RubberBall::updateHeight()
 }   // updateHeight
 
 // ----------------------------------------------------------------------------
-/** Returns the maximum height of the terrain at the current point. While 
+/** Returns the maximum height of the terrain at the current point. While
  *  generall the height is arbitrary (a skybox is not part of the physics and
- *  will therefore not be detected), it is important that a rubber ball does 
+ *  will therefore not be detected), it is important that a rubber ball does
  *  not end up on top of a tunnel.
  *  \param vertical_offset A vertical offset which is added to the current
  *         position of the kart in order to avoid tunneling effects (it could
- *         happen that the raycast down find the track since it uses the 
+ *         happen that the raycast down find the track since it uses the
  *         vertical offset, while the raycast up would hit under the track
  *         if the vertical offset is not used).
  *  \returns The height (Y coordinate) of the next terrain element found by
@@ -621,7 +621,7 @@ void RubberBall::updateDistanceToTarget()
     const LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
     if(!world) return;   // FIXME battle mode
 
-    float target_distance = 
+    float target_distance =
         world->getDistanceDownTrackForKart(m_target->getWorldKartId());
     float ball_distance = getDistanceFromStart();
 
@@ -638,12 +638,12 @@ void RubberBall::updateDistanceToTarget()
 
     float height_diff = fabsf(m_target->getXYZ().getY() - getXYZ().getY());
 
-    if(m_distance_to_target < m_st_fast_ping_distance && 
+    if(m_distance_to_target < m_st_fast_ping_distance &&
         height_diff < m_st_max_height_difference)
     {
         m_fast_ping = true;
     }
-    if(m_distance_to_target < m_st_target_distance && 
+    if(m_distance_to_target < m_st_target_distance &&
         height_diff < m_st_max_height_difference)
     {
         m_aiming_at_target = true;
@@ -653,7 +653,7 @@ void RubberBall::updateDistanceToTarget()
     {
         // It appears that we have lost the target. It was within
         // the target distance, and now it isn't. That means either
-        // the original target escaped, or perhaps that there is a 
+        // the original target escaped, or perhaps that there is a
         // new target. If the new distance is nearly the full track
         // length, assume that the rubber ball has overtaken the
         // original target, and start deleting it.
@@ -666,9 +666,9 @@ void RubberBall::updateDistanceToTarget()
 #endif
 
         }
-        
+
         // Otherwise (target disappeared, e.g. has finished the race or
-        // was eliminated) we have to reset the control points, since 
+        // was eliminated) we have to reset the control points, since
         // it's likely that the ball is (after some time going directly
         // towards the target) far outside of the old control points.
 
@@ -688,7 +688,7 @@ void RubberBall::updateDistanceToTarget()
  *  hit earlier will only be flattened.
  *  \params kart The kart hit (NULL if no kart was hit).
  *  \params object The object that was hit (NULL if none).
- *  \returns True if 
+ *  \returns True if
  */
 bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
 {

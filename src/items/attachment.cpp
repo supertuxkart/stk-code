@@ -68,7 +68,7 @@ Attachment::~Attachment()
 {
     if(m_node)
         irr_driver->removeNode(m_node);
-    
+
     if (m_bomb_sound)
     {
         sfx_manager->deleteSFX(m_bomb_sound);
@@ -77,7 +77,7 @@ Attachment::~Attachment()
 }   // ~Attachment
 
 //-----------------------------------------------------------------------------
-/** Sets the attachment a kart has. This will also handle animation to be 
+/** Sets the attachment a kart has. This will also handle animation to be
  *  played, e.g. when a swatter replaces a bomb.
  *  \param type The type of the new attachment.
  *  \param time How long this attachment should stay with the kart.
@@ -86,17 +86,17 @@ Attachment::~Attachment()
  *         can be passed back to the previous owner). NULL if a no
  *         previous owner exists.
  */
-void Attachment::set(AttachmentType type, float time, 
+void Attachment::set(AttachmentType type, float time,
                      AbstractKart *current_kart)
 {
     bool was_bomb = (m_type == ATTACH_BOMB);
     scene::ISceneNode* bomb_scene_node = NULL;
     if (was_bomb && type == ATTACH_SWATTER)
     {
-        // let's keep the bomb node, and create a new one for 
+        // let's keep the bomb node, and create a new one for
         // the new attachment
         bomb_scene_node = m_node;
-        
+
         m_node = irr_driver->addAnimatedMesh(
                      attachment_manager->getMesh(Attachment::ATTACH_BOMB));
 #ifdef DEBUG
@@ -107,10 +107,10 @@ void Attachment::set(AttachmentType type, float time,
         m_node->setParent(m_kart->getNode());
         m_node->setVisible(false);
     }
-    
+
     clear();
-    
-    // If necessary create the appropriate plugin which encapsulates 
+
+    // If necessary create the appropriate plugin which encapsulates
     // the associated behavior
     switch(type)
     {
@@ -139,12 +139,12 @@ void Attachment::set(AttachmentType type, float time,
         m_node->setAnimationSpeed(0);
         m_node->setCurrentFrame(0);
     }
-    
+
     m_type             = type;
     m_time_left        = time;
     m_previous_owner   = current_kart;
     m_node->setRotation(core::vector3df(0, 0, 0));
-    
+
     // A parachute can be attached as result of the usage of an item. In this
     // case we have to save the current kart speed so that it can be detached
     // by slowing down.
@@ -152,8 +152,8 @@ void Attachment::set(AttachmentType type, float time,
     {
         m_initial_speed = m_kart->getSpeed();
         // if going very slowly or backwards, braking won't remove parachute
-        if(m_initial_speed <= 1.5) m_initial_speed = 1.5; 
-        
+        if(m_initial_speed <= 1.5) m_initial_speed = 1.5;
+
         if (UserConfigParams::m_graphical_effects)
         {
             // .blend was created @25 (<10 real, slow computer), make it faster
@@ -182,15 +182,15 @@ void Attachment::clear()
         sfx_manager->deleteSFX(m_bomb_sound);
         m_bomb_sound = NULL;
     }
-    
-    m_type=ATTACH_NOTHING; 
-    
+
+    m_type=ATTACH_NOTHING;
+
     m_time_left=0.0;
     m_node->setVisible(false);
     m_node->setPosition(core::vector3df());
     m_node->setRotation(core::vector3df());
 
-    // Resets the weight of the kart if the previous attachment affected it 
+    // Resets the weight of the kart if the previous attachment affected it
     // (e.g. anvil). This must be done *after* setting m_type to
     // ATTACH_NOTHING in order to reset the physics parameters.
     m_kart->updateWeight();
@@ -206,16 +206,16 @@ void Attachment::clear()
 void Attachment::hitBanana(Item *item, int new_attachment)
 {
     float leftover_time   = 0.0f;
-    
+
     bool add_a_new_item = true;
-    
+
     if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
         ExplosionAnimation::create(m_kart);
         return;
     }
-    
+
     switch(getType())   // If there already is an attachment, make it worse :)
     {
     case ATTACH_BOMB:
@@ -227,20 +227,20 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         projectile_manager->addHitEffect(he);
         ExplosionAnimation::create(m_kart);
         clear();
-        if(new_attachment==-1) 
+        if(new_attachment==-1)
             new_attachment = m_random.get(3);
-        // Disable the banana on which the kart just is for more than the 
-        // default time. This is necessary to avoid that a kart lands on the 
-        // same banana again once the explosion animation is finished, giving 
+        // Disable the banana on which the kart just is for more than the
+        // default time. This is necessary to avoid that a kart lands on the
+        // same banana again once the explosion animation is finished, giving
         // the kart the same penalty twice.
-        float f = std::max(item->getDisableTime(), 
+        float f = std::max(item->getDisableTime(),
                          m_kart->getKartProperties()->getExplosionTime()+2.0f);
         item->setDisableTime(f);
         break;
         }
     case ATTACH_ANVIL:
-        // if the kart already has an anvil, attach a new anvil, 
-        // and increase the overall time 
+        // if the kart already has an anvil, attach a new anvil,
+        // and increase the overall time
         new_attachment = 2;
         leftover_time  = m_time_left;
         break;
@@ -256,7 +256,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         if(new_attachment==-1)
             new_attachment = m_random.get(3);
     }   // switch
-    
+
     // Save the information about the attachment in the race state
     // so that the clients can be updated.
     if(network_manager->getMode()==NetworkManager::NW_SERVER)
@@ -270,17 +270,17 @@ void Attachment::hitBanana(Item *item, int new_attachment)
     {
         switch (new_attachment)
         {
-        case 0: 
+        case 0:
             set( ATTACH_PARACHUTE,stk_config->m_parachute_time+leftover_time);
             m_initial_speed = m_kart->getSpeed();
 
-            // if going very slowly or backwards, 
+            // if going very slowly or backwards,
             // braking won't remove parachute
             if(m_initial_speed <= 1.5) m_initial_speed = 1.5;
             break ;
         case 1:
             set( ATTACH_BOMB, stk_config->m_bomb_time+leftover_time);
-                
+
             // if ( m_kart == m_kart[0] )
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
             break ;
@@ -367,7 +367,7 @@ void Attachment::update(float dt)
         // Partly handled in Kart::updatePhysics
         // Otherwise: disable if a certain percantage of
         // initial speed was lost
-        if(m_kart->getSpeed() <= 
+        if(m_kart->getSpeed() <=
             m_initial_speed*stk_config->m_parachute_done_fraction)
         {
             m_time_left = -1;
@@ -382,7 +382,7 @@ void Attachment::update(float dt)
         // Everything is done in the plugin.
         break;
     case ATTACH_BOMB:
-            
+
         if (m_bomb_sound) m_bomb_sound->position(m_kart->getXYZ());
 
         // Mesh animation frames are 1 to 61 frames (60 steps)
@@ -390,7 +390,7 @@ void Attachment::update(float dt)
         // If longer times needed, it should be a surprise "oh! bomb activated!"
         if(m_time_left <= (m_node->getEndFrame() - m_node->getStartFrame()-1))
         {
-            m_node->setCurrentFrame(m_node->getEndFrame() 
+            m_node->setCurrentFrame(m_node->getEndFrame()
                                     - m_node->getStartFrame()-1-m_time_left);
         }
         if(m_time_left<=0.0)
@@ -400,7 +400,7 @@ void Attachment::update(float dt)
                 he->setPlayerKartHit();
             projectile_manager->addHitEffect(he);
             ExplosionAnimation::create(m_kart);
-            
+
             if (m_bomb_sound)
             {
                 m_bomb_sound->stop();

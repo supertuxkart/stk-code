@@ -104,7 +104,7 @@ void STKConfig::load(const std::string &filename)
         Log::fatal("StkConfig", "No follow leader interval(s) defined in stk_config");
         exit(-1);
     }
-    
+
     if(m_switch_items.size()!=Item::ITEM_LAST-Item::ITEM_FIRST+1)
     {
         Log::fatal("StkConfig", "Wrong number of item switches defined in stk_config");
@@ -159,7 +159,7 @@ void STKConfig::init_defaults()
         m_bomb_time              = m_bomb_time_increase        =
         m_anvil_time             = m_music_credit_time         =
         m_delay_finish_time      = m_skid_fadeout_time         =
-        m_near_ground            = m_item_switch_time          = 
+        m_near_ground            = m_item_switch_time          =
         m_smooth_angle_limit     =
         m_penalty_time           = m_explosion_impulse_objects = UNDEFINED;
     m_bubble_gum_counter         = -100;
@@ -181,7 +181,7 @@ void STKConfig::init_defaults()
     m_ai_acceleration            = 1.0f;
     m_disable_steer_while_unskid = false;
     m_camera_follow_skid         = false;
-    
+
     m_score_increase.clear();
     m_leader_intervals.clear();
     m_switch_items.clear();
@@ -226,7 +226,7 @@ void STKConfig::getAllData(const XMLNode * root)
                (int)m_score_increase.size()!=from-1)
             {
                 Log::error("StkConfig", "Incorrect GP point specification:");
-                Log::fatal("StkConfig", "from: %d  to: %d  points: %d", 
+                Log::fatal("StkConfig", "from: %d  to: %d  points: %d",
                         from, to, points);
                 exit(-1);
             }
@@ -246,7 +246,7 @@ void STKConfig::getAllData(const XMLNode * root)
         physics_node->get("smooth-normals",     &m_smooth_normals    );
         physics_node->get("smooth-angle-limit", &m_smooth_angle_limit);
     }
-    
+
     if (const XMLNode *startup_node= root->getNode("startup"))
     {
         startup_node->get("penalty", &m_penalty_time );
@@ -268,7 +268,7 @@ void STKConfig::getAllData(const XMLNode * root)
         std::string title_music;
         music_node->get("title", &title_music);
         assert(title_music.size() > 0);
-        
+
         m_title_music = MusicInformation::create(file_manager->getDataDir()
                                                  + "/music/" + title_music  );
         if(!m_title_music)
@@ -293,7 +293,7 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *credits_node= root->getNode("credits"))
         credits_node->get("music", &m_music_credit_time);
 
-    
+
     if(const XMLNode *anvil_node= root->getNode("anvil"))
     {
         anvil_node->get("weight",       &m_anvil_weight      );
@@ -352,7 +352,7 @@ void STKConfig::getAllData(const XMLNode * root)
     {
         ai_node->get("acceleration", &m_ai_acceleration);
     }
-    
+
     if(const XMLNode *networking_node= root->getNode("networking"))
         networking_node->get("enable", &m_enable_networking);
 
@@ -386,7 +386,7 @@ void STKConfig::getAllData(const XMLNode * root)
 void  STKConfig::getAllScores(std::vector<int> *all_scores, int num_karts)
 {
     if (num_karts == 0) return;
-    
+
     assert(num_karts <= m_max_karts);
     all_scores->resize(num_karts);
     (*all_scores)[num_karts-1] = 1;  // last position gets one point

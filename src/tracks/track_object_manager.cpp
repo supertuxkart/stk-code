@@ -54,7 +54,7 @@ void TrackObjectManager::add(const XMLNode &xml_node)
         std::string groupname;
         xml_node.get("lod_group", &groupname);
         bool is_lod = !groupname.empty();
-        
+
         if (is_lod)
         {
             printf("Adding lod obj to group <%s>\n", groupname.c_str());
@@ -64,15 +64,15 @@ void TrackObjectManager::add(const XMLNode &xml_node)
         {
             m_all_objects.push_back(new TrackObject(xml_node));
         }
-        
+
         /*
         std::string groupname;
         xml_node.get("lod_group", &groupname);
         bool is_lod = !groupname.empty();
-            
+
         std::string type;
         xml_node.get("type", &type);
-        
+
         if (xml_node.getName() == "particle-emitter")
         {
             m_all_objects.push_back(new ThreeDAnimation(xml_node));
@@ -118,7 +118,7 @@ void TrackObjectManager::add(const XMLNode &xml_node)
         }
         else
         {
-            fprintf(stderr, "Unknown track object: '%s' - ignored.\n", 
+            fprintf(stderr, "Unknown track object: '%s' - ignored.\n",
                     type.c_str());
         }
          */
@@ -194,8 +194,8 @@ void TrackObjectManager::update(float dt)
  */
 void adjustForFog(scene::ISceneNode *node, bool enable)
 {
-    if (node->getType() == scene::ESNT_MESH   || 
-        node->getType() == scene::ESNT_OCTREE || 
+    if (node->getType() == scene::ESNT_MESH   ||
+        node->getType() == scene::ESNT_OCTREE ||
         node->getType() == scene::ESNT_ANIMATED_MESH)
     {
         scene::IMesh* mesh;
@@ -205,7 +205,7 @@ void adjustForFog(scene::ISceneNode *node, bool enable)
         else {
             mesh = ((scene::IMeshSceneNode*)node)->getMesh();
         }
-        
+
         unsigned int n = mesh->getMeshBufferCount();
         for (unsigned int i=0; i<n; i++)
         {
@@ -215,7 +215,7 @@ void adjustForFog(scene::ISceneNode *node, bool enable)
             {
                 video::ITexture* t = irr_material.getTexture(j);
                 if (t) material_manager->adjustForFog(t, mb, node, enable);
-                
+
             }   // for j<MATERIAL_MAX_TEXTURES
         }  // for i<getMeshBufferCount()
     }
@@ -223,10 +223,10 @@ void adjustForFog(scene::ISceneNode *node, bool enable)
     {
         node->setMaterialFlag(video::EMF_FOG_ENABLE, enable);
     }
-    
+
     if (node->getType() == scene::ESNT_LOD_NODE)
     {
-        std::vector<scene::ISceneNode*>& 
+        std::vector<scene::ISceneNode*>&
             subnodes = ((LODNode*)node)->getAllNodes();
         for (unsigned int n=0; n<subnodes.size(); n++)
         {
@@ -286,12 +286,12 @@ void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes)
         std::vector<const XMLNode*>& queue = m_lod_objects[ lod_nodes[n]->getGroupName() ];
         assert( queue.size() > 0 );
         const XMLNode* xml = queue[ queue.size() - 1 ];
-        
+
         TrackObject* obj = new TrackObject(*xml, lod_nodes[n]);
         queue.erase( queue.end() - 1 );
-        
+
         m_all_objects.push_back(obj);
     }
-    
+
     m_lod_objects.clear();
 }

@@ -26,13 +26,13 @@
 #include "tracks/track.hpp"
 
 /** A static create function that does only create an explosion if
- *  the explosion happens to be close enough to affect the kart. 
+ *  the explosion happens to be close enough to affect the kart.
  *  Otherwise, NULL is returned.
  *  \param kart The kart that is exploded.
  *  \param pos The position where the explosion happened.
  *  \param direct_hit If the kart was hit directly.
  */
-ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart, 
+ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
                                                const Vec3 &pos,
                                                bool direct_hit)
 {
@@ -48,7 +48,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
 
 // ----------------------------------------------------------------------------
 /** A static create function that does only create an explosion if
- *  the explosion happens to be close enough to affect the kart. 
+ *  the explosion happens to be close enough to affect the kart.
  *  Otherwise, NULL is returned. */
 ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart)
 {
@@ -57,8 +57,8 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart)
 }   // create
 
 // ----------------------------------------------------------------------------
-ExplosionAnimation::ExplosionAnimation(AbstractKart *kart, 
-                                       const Vec3 &explosion_position, 
+ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
+                                       const Vec3 &explosion_position,
                                        bool direct_hit)
                   : AbstractKartAnimation(kart, "ExplosionAnimation")
  {
@@ -74,7 +74,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     // half of the explosion time here.
     // Velocity after t seconds is:
     // v(t) = m_velocity + t*gravity
-    // Since v(explosion_time*0.5) = 0, the following forumla computes 
+    // Since v(explosion_time*0.5) = 0, the following forumla computes
     // the right initial velocity for a kart to land back after
     // the specified time.
     m_velocity = 0.5f * m_timer * World::getWorld()->getTrack()->getGravity();
@@ -100,7 +100,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     }
 
     m_kart->getAttachment()->clear();
- 
+
  };   // ExplosionAnimation
 
 //-----------------------------------------------------------------------------

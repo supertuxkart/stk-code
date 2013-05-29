@@ -27,7 +27,7 @@
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
-#include "items/bowling.hpp" 
+#include "items/bowling.hpp"
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
 #include "items/rubber_ball.hpp"
@@ -78,7 +78,7 @@ void PowerupManager::unloadPowerups()
     {
         if(m_all_meshes[(PowerupType)i])
             m_all_meshes[(PowerupType)i]->drop();
-        
+
         //FIXME: I'm not sure if this is OK or if I need to ->drop(), or delete them, or...
         m_all_icons[i]  = (Material*)NULL;
     }
@@ -89,13 +89,13 @@ void PowerupManager::unloadPowerups()
  *  \param name Name of the powerup to look up.
  *  \return The type, or POWERUP_NOTHING if the name is not found
  */
-PowerupManager::PowerupType 
+PowerupManager::PowerupType
     PowerupManager::getPowerupType(const std::string &name) const
 {
     // Must match the order of PowerupType in powerup_manager.hpp!!
     static std::string powerup_names[] = {
-        "",            /* Nothing */ 
-        "bubblegum", "cake", "bowling", "zipper", "plunger", "switch", 
+        "",            /* Nothing */
+        "bubblegum", "cake", "bowling", "zipper", "plunger", "switch",
         "swatter", "rubber-ball", "parachute", "anchor"
     };
 
@@ -137,23 +137,23 @@ void PowerupManager::loadAllPowerups()
     loadWeights(*root, "last" ,   POSITION_LAST       );
     loadWeights(*root, "battle" , POSITION_BATTLE_MODE);
     loadWeights(*root, "tuto",    POSITION_TUTORIAL_MODE);
-    
+
     delete root;
-    
+
 }  // loadAllPowerups
 
 //-----------------------------------------------------------------------------
 /** Loads the data for one particular powerup. For bowling ball, plunger, and
- *  cake static members in the appropriate classes are called to store 
+ *  cake static members in the appropriate classes are called to store
  *  additional information for those objects.
  *  \param type The type of the powerup.
  *  \param node The XML node with the data for this powerup.
  */
 void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
 {
-    std::string icon_file(""); 
+    std::string icon_file("");
     node.get("icon", &icon_file);
-    
+
 #ifdef DEBUG
     if (icon_file.size() == 0)
     {
@@ -161,16 +161,16 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
         assert(false);
     }
 #endif
-    
+
     m_all_icons[type] = material_manager->getMaterial(icon_file,
                                   /* full_path */     false,
-                                  /*make_permanent */ true); 
+                                  /*make_permanent */ true);
 
 
     assert(m_all_icons[type] != NULL);
     assert(m_all_icons[type]->getTexture() != NULL);
-    
-    std::string model(""); 
+
+    std::string model("");
     node.get("model", &model);
     if(model.size()>0)
     {
@@ -191,11 +191,11 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
     }
     // Load special attributes for certain powerups
     switch (type) {
-        case POWERUP_BOWLING:          
+        case POWERUP_BOWLING:
              Bowling::init(node, m_all_meshes[type]);    break;
-        case POWERUP_PLUNGER:          
+        case POWERUP_PLUNGER:
              Plunger::init(node, m_all_meshes[type]);    break;
-        case POWERUP_CAKE: 
+        case POWERUP_CAKE:
              Cake::init(node, m_all_meshes[type]);       break;
         case POWERUP_RUBBERBALL:
              RubberBall::init(node, m_all_meshes[type]); break;
@@ -206,7 +206,7 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
 // ----------------------------------------------------------------------------
 /** Loads a weight list specified in powerup.xml. The different position
  *  classes must be loaded in the right order
- *  \param root The root node of powerup.xml 
+ *  \param root The root node of powerup.xml
  *  \param class_name The name of the position class to load.
  *  \param position_class The class for which the weights are read.
  */
@@ -245,7 +245,7 @@ void PowerupManager::loadWeights(const XMLNode &root,
 
     if(weight_list.size()!=2*(int)POWERUP_LAST)
     {
-        printf("Incorrect number of weights found in class '%s':\n", 
+        printf("Incorrect number of weights found in class '%s':\n",
                class_name.c_str());
         printf("%d instead of %d - probabilities will be incorrect.\n",
                (int)weight_list.size(), (int)POWERUP_LAST);
@@ -286,8 +286,8 @@ void PowerupManager::updateWeightsForRace(unsigned int num_karts)
         m_powerups_for_position[pos_class].clear();
         for(unsigned int i= POWERUP_FIRST; i<=2*POWERUP_LAST; i++)
         {
-            PowerupType type = 
-                (PowerupType) ((i<=POWERUP_LAST) ? i 
+            PowerupType type =
+                (PowerupType) ((i<=POWERUP_LAST) ? i
                                                  : i+POWERUP_FIRST);
             unsigned int w =m_weights[pos_class][i-POWERUP_FIRST];
             // The 'global' powerups (i.e. powerups that affect
@@ -309,15 +309,15 @@ void PowerupManager::updateWeightsForRace(unsigned int num_karts)
 }   // updateWeightsForRace
 
 // ----------------------------------------------------------------------------
-/** Determines the position class for a given position. If the race is a 
+/** Determines the position class for a given position. If the race is a
  *  battle mode (in which case we don't have a position), always return
  *  'POSITION_BATTLE_MODE' (and in this case only position 1 will be used
  *  for all karts).
  *  \param num_karts  Number of karts in the race.
  *  \param position The position for which to determine the position class.
  */
-PowerupManager::PositionClass 
-               PowerupManager::convertPositionToClass(unsigned int num_karts, 
+PowerupManager::PositionClass
+               PowerupManager::convertPositionToClass(unsigned int num_karts,
                                                      unsigned int position)
 {
     if(race_manager->isBattleMode()) return POSITION_BATTLE_MODE;
@@ -326,7 +326,7 @@ PowerupManager::PositionClass
     if(position==num_karts) return POSITION_LAST;
 
     // Now num_karts must be >2, since position <=num_players
-    
+
     unsigned int third = (unsigned int)floor((float)(num_karts-1)/3.0f);
     // 1 < Position <= 1+third is top33
     if(position <= 1 + third) return POSITION_TOP33;
@@ -351,7 +351,7 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
                                                              unsigned int *n)
 {
     // Positions start with 1, while the index starts with 0 - so subtract 1
-    PositionClass pos_class = 
+    PositionClass pos_class =
         (race_manager->isBattleMode() ? POSITION_BATTLE_MODE :
          (race_manager->isTutorialMode() ? POSITION_TUTORIAL_MODE :
                                      m_position_to_class[pos-1]));

@@ -38,7 +38,7 @@
 
 
 // -----------------------------------------------------------------------------
-Plunger::Plunger(AbstractKart *kart) 
+Plunger::Plunger(AbstractKart *kart)
        : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
 {
     const float gravity = 0.0f;
@@ -51,7 +51,7 @@ Plunger::Plunger(AbstractKart *kart)
     m_reverse_mode = kart->getControls().m_look_back;
 
     // find closest kart in front of the current one
-    const AbstractKart *closest_kart=0;   
+    const AbstractKart *closest_kart=0;
     Vec3        direction;
     float       kart_dist_2;
     getClosestKart(&closest_kart, &kart_dist_2, &direction,
@@ -74,21 +74,21 @@ Plunger::Plunger(AbstractKart *kart)
                                        &fire_angle, &up_velocity);
 
         btTransform trans = kart->getTrans();
-    
+
         trans.setRotation(btQuaternion(btVector3(0, 1, 0), fire_angle));
 
         m_initial_velocity = btVector3(0.0f, up_velocity, plunger_speed);
 
         createPhysics(forward_offset, m_initial_velocity,
-                      new btCylinderShape(0.5f*m_extend), 
-                      0.5f /* restitution */ , gravity, 
+                      new btCylinderShape(0.5f*m_extend),
+                      0.5f /* restitution */ , gravity,
                       /* rotates */false , /*turn around*/false, &trans);
     }
     else
     {
         createPhysics(forward_offset, btVector3(pitch, 0.0f, plunger_speed),
-                      new btCylinderShape(0.5f*m_extend), 
-                      0.5f /* restitution */, gravity, 
+                      new btCylinderShape(0.5f*m_extend),
+                      0.5f /* restitution */, gravity,
                       false /* rotates */, m_reverse_mode, &kart_transform);
     }
 
@@ -174,7 +174,7 @@ bool Plunger::updateAndDelete(float dt)
  *  till the rubber band expires.
  *  \param kart Pointer to the kart hit (NULL if not a kart).
  *  \param obj  Pointer to PhysicalObject object if hit (NULL otherwise).
- *  \returns True if there was actually a hit (i.e. not owner, and target is 
+ *  \returns True if there was actually a hit (i.e. not owner, and target is
  *           not immune), false otherwise.
  */
 bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
@@ -237,7 +237,7 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
         }
     }
 
-    // Rubber band attached. 
+    // Rubber band attached.
     return false;
 }   // hit
 

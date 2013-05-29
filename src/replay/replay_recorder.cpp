@@ -172,14 +172,14 @@ void ReplayRecorder::Save()
         fprintf(fd, "model: %s\n", world->getKart(k)->getIdent().c_str());
         fprintf(fd, "size:     %d\n", m_count_transforms[k]);
 
-        unsigned int num_transforms = 
+        unsigned int num_transforms =
             std::min((unsigned int)stk_config->m_max_history,
                       m_count_transforms[k]                   );
         for(unsigned int i=0; i<num_transforms; i++)
         {
             const TransformEvent *p=&(m_transform_events[k][i]);
             fprintf(fd, "%f  %f %f %f  %f %f %f %f\n",
-                    p->m_time, 
+                    p->m_time,
                     p->m_transform.getOrigin().getX(),
                     p->m_transform.getOrigin().getY(),
                     p->m_transform.getOrigin().getZ(),

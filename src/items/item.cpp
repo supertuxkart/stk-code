@@ -35,7 +35,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, scene::IMesh* lowres_mesh)
 {
     assert(type != ITEM_TRIGGER); // use other constructor for that
-    
+
     m_distance_2        = 0.8f;
     initItem(type, xyz);
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
@@ -43,12 +43,12 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_original_mesh     = mesh;
     m_original_lowmesh  = lowres_mesh;
     m_listener          = NULL;
-    
+
     LODNode* lodnode    = new LODNode("item",
                                       irr_driver->getSceneManager()->getRootSceneNode(),
                                       irr_driver->getSceneManager());
     scene::IMeshSceneNode* meshnode = irr_driver->addMesh(mesh);
-    
+
     if (lowres_mesh != NULL)
     {
         lodnode->add(35, meshnode, true);
@@ -56,12 +56,12 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
         lodnode->add(100, meshnode, true);
     }
     else
-    { 
+    {
         lodnode->add(100, meshnode, true);
     }
-    
+
     m_node              = lodnode;
-    
+
     //m_node             = irr_driver->addMesh(mesh);
 #ifdef DEBUG
     std::string debug_name("item: ");
@@ -114,14 +114,14 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
                           (type!=ITEM_EASTER_EGG);
     switch(m_type)
     {
-    case ITEM_BUBBLEGUM: 
+    case ITEM_BUBBLEGUM:
         m_disappear_counter = stk_config->m_bubble_gum_counter; break;
     case ITEM_EASTER_EGG:
         m_disappear_counter = -1; break;
     default:
         m_disappear_counter = -1;
     }
-    // Now determine in which quad this item is, and its distance 
+    // Now determine in which quad this item is, and its distance
     // from the center within this quad.
     m_graph_node = QuadGraph::UNKNOWN_SECTOR;
     QuadGraph* currentQuadGraph = QuadGraph::get();
@@ -176,10 +176,10 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
 {
     // triggers and easter eggs should not be switched
     if (m_type == ITEM_TRIGGER || m_type == ITEM_EASTER_EGG) return;
-    
+
     m_original_type = m_type;
     setType(type);
-    
+
     scene::ISceneNode* node = m_node->getAllNodes()[0];
     ((scene::IMeshSceneNode*)node)->setMesh(mesh);
     if (lowmesh != NULL)
@@ -187,7 +187,7 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
         node = m_node->getAllNodes()[1];
         ((scene::IMeshSceneNode*)node)->setMesh(lowmesh);
     }
-    
+
     World::getWorld()->getTrack()->adjustForFog(m_node);
 }   // switchTo
 
@@ -198,16 +198,16 @@ void Item::switchBack()
 {
     // triggers should not be switched
     if (m_type == ITEM_TRIGGER) return;
-    
+
     // If the item is not switched, do nothing. This can happen if a bubble
     // gum is dropped while items are switched - when switching back, this
     // bubble gum has no original type.
     if(m_original_type==ITEM_NONE)
         return;
-    
+
     setType(m_original_type);
     m_original_type = ITEM_NONE;
-    
+
     scene::ISceneNode* node = m_node->getAllNodes()[0];
     ((scene::IMeshSceneNode*)node)->setMesh(m_original_mesh);
     if (m_original_lowmesh != NULL)
@@ -215,7 +215,7 @@ void Item::switchBack()
         node = m_node->getAllNodes()[1];
         ((scene::IMeshSceneNode*)node)->setMesh(m_original_lowmesh);
     }
-    
+
     World::getWorld()->getTrack()->adjustForFog(m_node);
     m_node->setRotation(m_original_hpr.toIrrHPR());
 }   // switchBack
@@ -246,7 +246,7 @@ void Item::reset()
     m_deactive_time     = 0.0f;
     switch(m_type)
     {
-    case ITEM_BUBBLEGUM: 
+    case ITEM_BUBBLEGUM:
         m_disappear_counter = stk_config->m_bubble_gum_counter; break;
     case ITEM_EASTER_EGG:
         m_disappear_counter = -1; break;
@@ -258,7 +258,7 @@ void Item::reset()
         setType(m_original_type);
         m_original_type = ITEM_NONE;
     }
-    
+
     if (m_node != NULL)
     {
         m_node->setScale(core::vector3df(1,1,1));
@@ -286,14 +286,14 @@ void Item::setParent(AbstractKart* parent)
 void Item::update(float dt)
 {
     if(m_deactive_time > 0) m_deactive_time -= dt;
-    
+
     if(m_collected)
     {
         m_time_till_return -= dt;
         if(m_time_till_return<0)
         {
             m_collected=false;
-            
+
             if (m_node != NULL)
             {
                 m_node->setScale(core::vector3df(1,1,1));
@@ -311,14 +311,14 @@ void Item::update(float dt)
     }   // if collected
     else
     {   // not m_collected
-        
+
         if(!m_rotate || m_node == NULL) return;
         // have it rotate
         Vec3 rotation(0, dt*M_PI, 0);
         core::vector3df r = m_node->getRotation();
         r.Y += dt*180.0f;
         if(r.Y>360.0f) r.Y -= 360.0f;
-        
+
         m_node->setRotation(r);
         return;
     }   // not m_collected
@@ -326,7 +326,7 @@ void Item::update(float dt)
 
 //-----------------------------------------------------------------------------
 /** Is called when the item is hit by a kart.  It sets the flag that the item
- *  has been collected, and the time to return to the parameter. 
+ *  has been collected, and the time to return to the parameter.
  *  \param t Time till the object reappears (defaults to 2 seconds).
  */
 void Item::collected(const AbstractKart *kart, float t)
@@ -351,7 +351,7 @@ void Item::collected(const AbstractKart *kart, float t)
         // prevent bubble gum from hitting a kart over and over again (in each
         // frame) by giving it time to drive away.
         m_deactive_time = 0.5f;
-        // Set the time till reappear to -1 seconds --> the item will 
+        // Set the time till reappear to -1 seconds --> the item will
         // reappear immediately.
         m_time_till_return = -1;
     }
@@ -365,12 +365,12 @@ void Item::collected(const AbstractKart *kart, float t)
             m_node->setVisible(false);
         }
     }
-    
+
     if (m_listener != NULL)
     {
         m_listener->onTriggerItemApproached(this);
     }
-    
+
     if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
     {
         m_time_till_return *= 3;

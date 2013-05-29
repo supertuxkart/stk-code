@@ -52,10 +52,10 @@ using namespace irr;
  *  created, so only the race manager can be accessed safely.
  */
 MinimalRaceGUI::MinimalRaceGUI()
-{    
+{
     m_enabled = true;
-    
-    // Ignore item messages. 
+
+    // Ignore item messages.
     ignoreUnimportantMessages();
 
     // Originally m_map_height was 100, and we take 480 as minimum res
@@ -67,7 +67,7 @@ MinimalRaceGUI::MinimalRaceGUI()
     m_map_width             = (int)(200.0f * scaling);
     m_map_height            = (int)(200.0f * scaling);
 
-    // The location of the minimap varies with number of 
+    // The location of the minimap varies with number of
     // splitscreen players:
     switch(race_manager->getNumLocalPlayers())
     {
@@ -89,20 +89,20 @@ MinimalRaceGUI::MinimalRaceGUI()
              m_map_bottom = UserConfigParams::m_height/2 + m_map_height/2;
              break;
     }
-    
+
     // Minimap is also rendered bigger via OpenGL, so find power-of-two again
     const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
     m_map_rendered_width    = map_texture;
     m_map_rendered_height   = map_texture;
 
     createMarkerTexture();
-    
+
     // Translate strings only one in constructor to avoid calling
     // gettext in each frame.
     //I18N: Shown at the end of a race
     m_string_lap      = _("Lap");
     m_string_rank     = _("Rank");
-     
+
     // Scaled fonts don't look good atm.
     m_font_scale      = 1.0f; //race_manager->getNumLocalPlayers()==1 ? 1.2f : 1.0f;
 
@@ -110,7 +110,7 @@ MinimalRaceGUI::MinimalRaceGUI()
 
     // Determine maximum length of the rank/lap text, in order to
     // align those texts properly on the right side of the viewport.
-    gui::ScalableFont* font = GUIEngine::getFont(); 
+    gui::ScalableFont* font = GUIEngine::getFont();
     float old_scale = font->getScale();
     font->setScale(m_font_scale);
     m_lap_width             = font->getDimension(m_string_lap.c_str()).Width;
@@ -129,7 +129,7 @@ MinimalRaceGUI::MinimalRaceGUI()
         w = font->getDimension(L" 9/9").Width;
     m_lap_width += w;
     font->setScale(old_scale);
-        
+
 }   // MinimalRaceGUI
 
 //-----------------------------------------------------------------------------
@@ -138,7 +138,7 @@ MinimalRaceGUI::~MinimalRaceGUI()
 }   // ~MinimalRaceGUI
 
 //-----------------------------------------------------------------------------
-/** Render all global parts of the race gui, i.e. things that are only 
+/** Render all global parts of the race gui, i.e. things that are only
  *  displayed once even in splitscreen.
  *  \param dt Timestep sized.
  */
@@ -146,21 +146,21 @@ void MinimalRaceGUI::renderGlobal(float dt)
 {
     RaceGUIBase::renderGlobal(dt);
     cleanupMessages(dt);
-    
-    // Special case : when 3 players play, use 4th window to display such 
+
+    // Special case : when 3 players play, use 4th window to display such
     // stuff (but we must clear it)
-    if (race_manager->getNumLocalPlayers() == 3 && 
+    if (race_manager->getNumLocalPlayers() == 3 &&
         !GUIEngine::ModalDialog::isADialogActive())
     {
         static video::SColor black = video::SColor(255,0,0,0);
         irr_driver->getVideoDriver()
             ->draw2DRectangle(black,
-                              core::rect<s32>(UserConfigParams::m_width/2, 
+                              core::rect<s32>(UserConfigParams::m_width/2,
                                               UserConfigParams::m_height/2,
-                                              UserConfigParams::m_width, 
+                                              UserConfigParams::m_width,
                                               UserConfigParams::m_height));
     }
-    
+
     World *world = World::getWorld();
     assert(world != NULL);
     if(world->getPhase() >= WorldStatus::READY_PHASE &&
@@ -181,7 +181,7 @@ void MinimalRaceGUI::renderGlobal(float dt)
     }
 
     drawGlobalMiniMap();
-    
+
     // in 3 strikes mode we need to see the lives
     if (world->getIdent() == IDENT_STRIKES)
     {
@@ -190,19 +190,19 @@ void MinimalRaceGUI::renderGlobal(float dt)
 }   // renderGlobal
 
 //-----------------------------------------------------------------------------
-/** Render the details for a single player, i.e. speed, energy, 
+/** Render the details for a single player, i.e. speed, energy,
  *  collectibles, ...
  *  \param kart Pointer to the kart for which to render the view.
  */
 void MinimalRaceGUI::renderPlayerView(const Camera *camera, float dt)
 {
     if (!m_enabled) return;
-    
+
     const core::recti &viewport = camera->getViewport();
     core::vector2df scaling     = camera->getScaling();
-    
+
     scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
-    
+
     const AbstractKart *kart = camera->getKart();
     if(!kart) return;
 
@@ -223,7 +223,7 @@ void MinimalRaceGUI::renderPlayerView(const Camera *camera, float dt)
 void MinimalRaceGUI::drawGlobalTimer()
 {
     assert(World::getWorld() != NULL);
-    
+
     if(!World::getWorld()->shouldDrawTimer()) return;
     std::string s = StringUtils::timeToString(World::getWorld()->getTime());
     core::stringw sw(s.c_str());
@@ -234,16 +234,16 @@ void MinimalRaceGUI::drawGlobalTimer()
     {
     case 1: x = 10; y=0; break;
     case 2: x = 10; y=0; break;
-    case 3: x = UserConfigParams::m_width   - m_timer_width-10; 
+    case 3: x = UserConfigParams::m_width   - m_timer_width-10;
             y = UserConfigParams::m_height/2; break;
-    case 4: x = UserConfigParams::m_width/2 - m_timer_width/2; 
+    case 4: x = UserConfigParams::m_width/2 - m_timer_width/2;
             y = 0;       break;
-    }   // switch        
+    }   // switch
 
-    core::rect<s32> pos(x,                         y, 
+    core::rect<s32> pos(x,                         y,
                         UserConfigParams::m_width, y+50);
-    
-    
+
+
     gui::ScalableFont* font = GUIEngine::getFont();
     float old_scale = font->getScale();
     font->setScale(m_font_scale);
@@ -261,22 +261,22 @@ void MinimalRaceGUI::drawGlobalMiniMap()
     if(world->getTrack()->isArena() || world->getTrack()->isSoccer()) return;
 
     const video::ITexture *mini_map = world->getTrack()->getMiniMap();
-    
+
     int upper_y = m_map_bottom - m_map_height;
     int lower_y = m_map_bottom;
-    
+
     if (mini_map != NULL)
     {
-        core::rect<s32> dest(m_map_left,               upper_y, 
+        core::rect<s32> dest(m_map_left,               upper_y,
                              m_map_left + m_map_width, lower_y);
         core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
         irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
     }
-    
+
     // In the first iteration, only draw AI karts, then only draw
     // player karts. This guarantees that player kart icons are always
     // on top of AI kart icons.
-    for(unsigned int only_draw_player_kart=0; only_draw_player_kart<=1; 
+    for(unsigned int only_draw_player_kart=0; only_draw_player_kart<=1;
         only_draw_player_kart++)
     {
         for(unsigned int i=0; i<world->getNumKarts(); i++)
@@ -285,22 +285,22 @@ void MinimalRaceGUI::drawGlobalMiniMap()
             if(kart->isEliminated()) continue;   // don't draw eliminated kart
             // Make sure to only draw AI kart icons first, then
             // only player karts.
-            if(kart->getController()->isPlayerController() 
+            if(kart->getController()->isPlayerController()
                 !=(only_draw_player_kart==1)) continue;
             const Vec3& xyz = kart->getXYZ();
             Vec3 draw_at;
             world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
 
             core::rect<s32> source(i    *m_marker_rendered_size,
-                0, 
-                (i+1)*m_marker_rendered_size, 
+                0,
+                (i+1)*m_marker_rendered_size,
                 m_marker_rendered_size);
-            int marker_half_size = (kart->getController()->isPlayerController() 
-                ? m_marker_player_size 
+            int marker_half_size = (kart->getController()->isPlayerController()
+                ? m_marker_player_size
                 : m_marker_ai_size                        )>>1;
-            core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size), 
+            core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size),
                 lower_y   -(int)(draw_at.getY()+marker_half_size),
-                m_map_left+(int)(draw_at.getX()+marker_half_size), 
+                m_map_left+(int)(draw_at.getX()+marker_half_size),
                 lower_y   -(int)(draw_at.getY()-marker_half_size));
 
             // Highlight the player icons with some backgorund image.
@@ -319,7 +319,7 @@ void MinimalRaceGUI::drawGlobalMiniMap()
                     NULL, colors, true);
             }   // if isPlayerController
 
-            irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source, 
+            irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source,
                 NULL, NULL, true);
         }   // for i<getNumKarts
     }   // for only_draw_player_kart
@@ -335,17 +335,17 @@ void MinimalRaceGUI::drawGlobalMiniMap()
  *  \param scaling Scaling applied (in case of split screen)
  */
 void MinimalRaceGUI::drawEnergyMeter(const AbstractKart *kart,
-                                     const core::recti &viewport, 
+                                     const core::recti &viewport,
                                      const core::vector2df &scaling)
 {
-    float state = (float)(kart->getEnergy()) 
+    float state = (float)(kart->getEnergy())
                 / kart->getKartProperties()->getNitroMax();
     if      (state < 0.0f) state = 0.0f;
     else if (state > 1.0f) state = 1.0f;
-    
+
     int h = (int)(viewport.getHeight()/3);
     int w = h/4; // gauge image is so 1:4
-    
+
     // In split screen mode of 3 or 4 players, the players on
     // the left side will have the energy meter on the left side
     int mirrored = race_manager->getNumLocalPlayers()>=3 &&
@@ -353,10 +353,10 @@ void MinimalRaceGUI::drawEnergyMeter(const AbstractKart *kart,
 
     int x = mirrored ? 0 : viewport.LowerRightCorner.X - w;
     int y = viewport.UpperLeftCorner.Y + viewport.getHeight()/2- h/2;
-    
+
     // Background
     // ----------
-    core::rect<s32> dest(x+mirrored*w, y+mirrored*h, 
+    core::rect<s32> dest(x+mirrored*w, y+mirrored*h,
                          x+(1-mirrored)*w, y+(1-mirrored)*h);
 
     irr_driver->getVideoDriver()->draw2DImage(m_gauge_empty, dest,
@@ -367,29 +367,29 @@ void MinimalRaceGUI::drawEnergyMeter(const AbstractKart *kart,
     // ------
     if (race_manager->getCoinTarget() > 0)
     {
-        float coin_target = (float)race_manager->getCoinTarget() 
+        float coin_target = (float)race_manager->getCoinTarget()
                           / kart->getKartProperties()->getNitroMax();
-        
+
         const int EMPTY_TOP_PIXELS = 4;
         const int EMPTY_BOTTOM_PIXELS = 3;
-        int y1 = y + (int)(EMPTY_TOP_PIXELS + 
+        int y1 = y + (int)(EMPTY_TOP_PIXELS +
                              (h - EMPTY_TOP_PIXELS - EMPTY_BOTTOM_PIXELS)
                             *(1.0f - coin_target)                        );
         if (state >= 1.0f) y1 = y;
-        
+
         core::rect<s32> clip(x, y1, x + w, y + h);
         irr_driver->getVideoDriver()->draw2DImage(m_gauge_goal, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
                                                   core::rect<s32>(0, 0, 64, 256) /* source rect */,
                                                   &clip, NULL /* colors */, true /* alpha */);
     }
-    
+
     // Filling (current state)
     // -----------------------
     if (state > 0.0f)
     {
         const int EMPTY_TOP_PIXELS = 4;
         const int EMPTY_BOTTOM_PIXELS = 3;
-        int y1 = y + (int)(EMPTY_TOP_PIXELS 
+        int y1 = y + (int)(EMPTY_TOP_PIXELS
                            + (h - EMPTY_TOP_PIXELS - EMPTY_BOTTOM_PIXELS)
                               *(1.0f - state)                             );
         if (state >= 1.0f) y1 = y;
@@ -405,11 +405,11 @@ void MinimalRaceGUI::drawEnergyMeter(const AbstractKart *kart,
         video::ITexture *gauge = kart->getControls().m_nitro
                               ? m_gauge_full_bright : m_gauge_full;
         irr_driver->getVideoDriver()->draw2DImage(gauge, dest, tex_c,
-                                                  &clip, NULL /* colors */, 
+                                                  &clip, NULL /* colors */,
                                                   true /* alpha */);
     }
-    
-    
+
+
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
@@ -424,8 +424,8 @@ void MinimalRaceGUI::drawRankLap(const AbstractKart* kart,
 
     core::recti pos;
 
-    gui::ScalableFont* font = (race_manager->getNumLocalPlayers() > 2 
-                            ? GUIEngine::getSmallFont() 
+    gui::ScalableFont* font = (race_manager->getNumLocalPlayers() > 2
+                            ? GUIEngine::getSmallFont()
                             : GUIEngine::getFont());
     float scale = font->getScale();
     font->setScale(m_font_scale);
@@ -453,16 +453,16 @@ void MinimalRaceGUI::drawRankLap(const AbstractKart* kart,
         }
 
         char str[256];
-        sprintf(str, "%d/%d", kart->getPosition(), 
+        sprintf(str, "%d/%d", kart->getPosition(),
                 world->getCurrentNumKarts());
         font->draw(str, pos, color);
     }
-    
+
     // Don't display laps in follow the leader mode
     if(world->raceHasLaps())
     {
         const int lap = world->getKartLaps(kart->getWorldKartId());
-    
+
         // don't display 'lap 0/...'
         if(lap>=0)
         {

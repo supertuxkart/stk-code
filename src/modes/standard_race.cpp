@@ -34,7 +34,7 @@ StandardRace::StandardRace() : LinearWorld()
  */
 bool StandardRace::isRaceOver()
 {
-    // The race is over if all players have finished the race. Remaining 
+    // The race is over if all players have finished the race. Remaining
     // times for AI opponents will be estimated in enterRaceOverState
     return race_manager->allPlayerFinished();
 }   // isRaceOver
@@ -61,14 +61,14 @@ bool StandardRace::haveBonusBoxes()
 }   // haveBonusBoxes
 
 //-----------------------------------------------------------------------------
-/** Returns an identifier for this race. 
+/** Returns an identifier for this race.
  */
 const std::string& StandardRace::getIdent() const
 {
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
         return IDENT_TTRIAL;
     else
-        return IDENT_STD;    
+        return IDENT_STD;
 }   // getIdent
 
 //-----------------------------------------------------------------------------

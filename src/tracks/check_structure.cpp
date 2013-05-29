@@ -79,13 +79,13 @@ void CheckStructure::reset(const Track &track)
 {
     m_previous_position.clear();
     m_is_active.clear();
-    
+
     World *world = World::getWorld();
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         const Vec3 &xyz = world->getKart(i)->getXYZ();
         m_previous_position.push_back(xyz);
-        
+
         // Activate all checkline
         m_is_active.push_back(m_active_at_reset);
     }   // for i<getNumKarts
@@ -122,24 +122,24 @@ void CheckStructure::update(float dt)
  *  \param int kart_index For which the status should be changed.
  *  \param change_state How to change the state (active, deactivate, toggle).
  */
-void CheckStructure::changeStatus(const std::vector<int> indices, 
+void CheckStructure::changeStatus(const std::vector<int> indices,
                                   int kart_index,
                                   ChangeState change_state)
 {
-    bool update_debug_colors = 
+    bool update_debug_colors =
         UserConfigParams::m_check_debug &&
         kart_index == (int)World::getWorld()->getPlayerKart(0)->getWorldKartId();
 
     for(unsigned int i=0; i<indices.size(); i++)
     {
-        CheckStructure *cs = 
+        CheckStructure *cs =
             CheckManager::get()->getCheckStructure(indices[i]);
         if (cs == NULL) continue;
-        
+
         switch(change_state)
         {
-        case CS_DEACTIVATE: 
-            cs->m_is_active[kart_index] = false; 
+        case CS_DEACTIVATE:
+            cs->m_is_active[kart_index] = false;
             if(UserConfigParams::m_check_debug)
             {
                 printf("CHECK: Deactivating %d for %s.\n",
@@ -159,9 +159,9 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
         case CS_TOGGLE:
             if(UserConfigParams::m_check_debug)
             {
-                // At least on gcc 4.3.2 we can't simply print 
+                // At least on gcc 4.3.2 we can't simply print
                 // cs->m_is_active[kart_index] ("cannot pass objects of
-                // non-POD type 'struct std::_Bit_reference' through '...'; 
+                // non-POD type 'struct std::_Bit_reference' through '...';
                 // call will abort at runtime"). So we use this somewhat
                 // unusual but portable construct.
                 printf("CHECK: Toggling %d for %s from %d.\n",
@@ -169,14 +169,14 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
                        World::getWorld()->getKart(kart_index)->getIdent().c_str(),
                        cs->m_is_active[kart_index]==true);
             }
-            cs->m_is_active[kart_index] = !cs->m_is_active[kart_index]; 
+            cs->m_is_active[kart_index] = !cs->m_is_active[kart_index];
         }   // switch
         if(update_debug_colors)
         {
             cs->changeDebugColor(cs->m_is_active[kart_index]);
         }
     }   // for i<indices.size()
-    
+
     /*
     printf("--------\n");
     for (int n=0; n<CheckManager::get()->getCheckStructureCount(); n++)
@@ -189,7 +189,7 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
 
     }
     */
-    
+
 }   //changeStatus
 
 // ----------------------------------------------------------------------------
@@ -197,36 +197,36 @@ void CheckStructure::changeStatus(const std::vector<int> indices,
  *  a lap to be counted, animation to be started etc.
  */
 void CheckStructure::trigger(unsigned int kart_index)
-{    
+{
     World* w = World::getWorld();
     LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
     if (lw != NULL)
     {
         lw->getTrackSector(kart_index).setLastTriggeredCheckline(m_index);
     }
-    
+
     switch(m_check_type)
     {
-    case CT_NEW_LAP : 
-        World::getWorld()->newLap(kart_index); 
+    case CT_NEW_LAP :
+        World::getWorld()->newLap(kart_index);
         if(UserConfigParams::m_check_debug)
         {
             printf("CHECK: %s new lap %d triggered\n",
                    World::getWorld()->getKart(kart_index)->getIdent().c_str(),
                    m_index);
         }
-        changeStatus(m_check_structures_to_change_state, 
-                     kart_index, CS_ACTIVATE);
-        break;
-    case CT_ACTIVATE: 
         changeStatus(m_check_structures_to_change_state,
                      kart_index, CS_ACTIVATE);
         break;
-    case CT_TOGGLE:   
+    case CT_ACTIVATE:
+        changeStatus(m_check_structures_to_change_state,
+                     kart_index, CS_ACTIVATE);
+        break;
+    case CT_TOGGLE:
         changeStatus(m_check_structures_to_change_state,
                      kart_index, CS_TOGGLE);
         break;
-    default: 
+    default:
         break;
     }   // switch m_check_type
     changeStatus(m_same_group, kart_index, CS_DEACTIVATE);

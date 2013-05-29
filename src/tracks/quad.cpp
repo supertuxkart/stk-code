@@ -53,7 +53,7 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
 
 // ----------------------------------------------------------------------------
 /** Sets the vertices in a irrlicht vertex array to the 4 points of this quad.
- *  \param v The vertex array in which to set the vertices. 
+ *  \param v The vertex array in which to set the vertices.
  *  \param color The color to use for this quad.
  */
 void Quad::getVertices(video::S3DVertex *v, const video::SColor &color) const
@@ -66,7 +66,7 @@ void Quad::getVertices(video::S3DVertex *v, const video::SColor &color) const
     v[2].Pos = m_p[2].toIrrVector()+eps;
     v[3].Pos = m_p[3].toIrrVector()+eps;
 
-    core::triangle3df tri(m_p[0].toIrrVector(), m_p[1].toIrrVector(), 
+    core::triangle3df tri(m_p[0].toIrrVector(), m_p[1].toIrrVector(),
                           m_p[2].toIrrVector());
     core::vector3df normal = tri.getNormal();
     normal.normalize();
@@ -74,7 +74,7 @@ void Quad::getVertices(video::S3DVertex *v, const video::SColor &color) const
     v[1].Normal = normal;
     v[2].Normal = normal;
 
-    core::triangle3df tri1(m_p[0].toIrrVector(), m_p[2].toIrrVector(), 
+    core::triangle3df tri1(m_p[0].toIrrVector(), m_p[2].toIrrVector(),
                            m_p[3].toIrrVector());
     core::vector3df normal1 = tri1.getNormal();
     normal1.normalize();
@@ -87,14 +87,14 @@ void Quad::getVertices(video::S3DVertex *v, const video::SColor &color) const
 }   // setVertices
 
 // ----------------------------------------------------------------------------
-bool Quad::pointInQuad(const Vec3& p) const 
+bool Quad::pointInQuad(const Vec3& p) const
 {
     // In case that a kart can validly run too high over one driveline
     // and it should not be considered to be on that driveline. Example:
-    // a kart is driving over a bridge, slightly off the bridge 
+    // a kart is driving over a bridge, slightly off the bridge
     // driveline. It must be avoided that the kart is then considered
     // to be on the driveline under the brige. So the vertical distance
-    // is taken into account, too. to simplify this test we only compare 
+    // is taken into account, too. to simplify this test we only compare
     // with the minimum height of the quad (and not with the actual
     // height of the quad at the point where the kart is).
     if(p.getY() - m_max_height > 5.0f ||
@@ -128,9 +128,9 @@ void Quad::transform(const btTransform &t, Quad *result) const
     result->m_p[1] = t(m_p[1]);
     result->m_p[2] = t(m_p[2]);
     result->m_p[3] = t(m_p[3]);
-    result->m_min_height = std::min ( std::min(result->m_p[0].getY(), 
+    result->m_min_height = std::min ( std::min(result->m_p[0].getY(),
                                                result->m_p[1].getY()),
-                                      std::min(result->m_p[2].getY(), 
+                                      std::min(result->m_p[2].getY(),
                                                result->m_p[3].getY())  );
 }   // transform
 

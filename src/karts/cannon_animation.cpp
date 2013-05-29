@@ -32,7 +32,7 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo)
 {
     m_curve  = new AnimationBase(ipo);
     m_timer  = ipo->getEndTime();
-    
+
     // Compute the delta between the kart position and the start of the curve.
     // This delta is rotated with the kart and added to the interpolated curve
     // position to get the actual kart position during the animation.
@@ -54,7 +54,7 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo)
     btMatrix3x3 m(q);
     m_delta = m * m_delta;
 
-    // The previous call to m_curve->update will set the internal timer 
+    // The previous call to m_curve->update will set the internal timer
     // of the curve to dt. Reset it to 0 to make sure the timer is in
     // synch with the timer of the CanonAnimation
     m_curve->reset();
@@ -67,7 +67,7 @@ CannonAnimation::~CannonAnimation()
 
     btTransform pos;
     pos.setOrigin(m_kart->getXYZ());
-    pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 
+    pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
                                  m_kart->getHeading()        ));
 
     m_kart->getBody()->setCenterOfMassTransform(pos);

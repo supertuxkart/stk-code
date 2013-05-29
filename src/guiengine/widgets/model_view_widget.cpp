@@ -29,17 +29,17 @@ ModelViewWidget::ModelViewWidget() :
     m_type = WTYPE_MODEL_VIEW;
     m_rtt_provider = NULL;
     m_rotation_mode = ROTATE_OFF;
-    
+
     // so that the base class doesn't complain there is no icon defined
     m_properties[PROP_ICON]="gui/main_help.png";
-    
+
     m_rtt_unsupported = false;
 }
 // -----------------------------------------------------------------------------
 ModelViewWidget::~ModelViewWidget()
 {
     GUIEngine::needsUpdate.remove(this);
-    
+
     delete m_rtt_provider;
     m_rtt_provider = NULL;
 }
@@ -48,18 +48,18 @@ void ModelViewWidget::add()
 {
     // so that the base class doesn't complain there is no icon defined
     m_properties[PROP_ICON]="gui/main_help.png";
-    
+
     IconButtonWidget::add();
 
     /*
      FIXME: remove this unclean thing, I think irrlicht provides this feature:
         virtual void IGUIElement::OnPostRender (u32 timeMs)
-        \brief animate the element and its children. 
+        \brief animate the element and its children.
      */
     GUIEngine::needsUpdate.push_back(this);
-    
+
     angle = 0;
-    
+
 }   // add
 
 // -----------------------------------------------------------------------------
@@ -69,7 +69,7 @@ void ModelViewWidget::clearModels()
     m_model_location.clear();
     m_model_scale.clear();
     m_model_frames.clear();
-    
+
     delete m_rtt_provider;
     m_rtt_provider = NULL;
 }
@@ -78,22 +78,22 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
                                const Vec3& scale, const int frame)
 {
     if(!mesh) return;
-    
+
     m_models.push_back(mesh);
     m_model_location.push_back(location);
     m_model_scale.push_back(scale);
     m_model_frames.push_back(frame);
-    
+
     /*
      ((IGUIMeshViewer*)m_element)->setMesh( mesh );
-     
+
      video::SMaterial mat = mesh->getMeshBuffer(0)->getMaterial(); //mesh_view->getMaterial();
      mat.setFlag(EMF_LIGHTING , false);
      //mat.setFlag(EMF_GOURAUD_SHADING, false);
      //mat.setFlag(EMF_NORMALIZE_NORMALS, true);
      ((IGUIMeshViewer*)m_element)->setMaterial(mat);
      */
-    
+
     delete m_rtt_provider;
     m_rtt_provider = NULL;
 }
@@ -101,7 +101,7 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
 void ModelViewWidget::update(float delta)
 {
     if (m_rtt_unsupported) return;
-    
+
     if (m_rotation_mode == ROTATE_CONTINUOUSLY)
     {
         angle += delta*m_rotation_speed;
@@ -116,7 +116,7 @@ void ModelViewWidget::update(float delta)
 
         int distance_with_positive_rotation;
         int distance_with_negative_rotation;
-        
+
         if (angle < m_rotation_target)
         {
             distance_with_positive_rotation = (int)(m_rotation_target - angle);
@@ -127,11 +127,11 @@ void ModelViewWidget::update(float delta)
             distance_with_positive_rotation = (int)(angle_distance_from_end + m_rotation_target);
             distance_with_negative_rotation = (int)(angle - m_rotation_target);
         }
-        
+
         //std::cout << "distance_with_positive_rotation=" << distance_with_positive_rotation <<
         //" distance_with_negative_rotation=" << distance_with_negative_rotation << " angle="<< angle  <<std::endl;
-        
-        if (distance_with_positive_rotation < distance_with_negative_rotation) 
+
+        if (distance_with_positive_rotation < distance_with_negative_rotation)
         {
             angle += m_rotation_speed * delta*(3.0f + std::min(distance_with_positive_rotation, distance_with_negative_rotation)*2.0f);
         }
@@ -145,7 +145,7 @@ void ModelViewWidget::update(float delta)
         // stop rotating when target reached
         if (fabsf(angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
     }
-    
+
     if (m_rtt_provider == NULL)
     {
         std::string name = "model view ";
@@ -153,7 +153,7 @@ void ModelViewWidget::update(float delta)
         m_rtt_provider = new IrrDriver::RTTProvider(core::dimension2d< u32 >(512, 512), name, false);
         m_rtt_provider->setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
     }
-    
+
     m_texture = m_rtt_provider->renderToTexture(angle);
     if (m_texture != NULL)
     {

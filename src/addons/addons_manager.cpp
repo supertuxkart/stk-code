@@ -74,7 +74,7 @@ AddonsManager::~AddonsManager()
  *  downloaded list of available addons. This is called by network_http before
  *  it goes into command-receiving mode, so we can't use any asynchronous calls
  *  here (though this is being called from a separate thread , so the
- *  main GUI is not blocked anyway). This function will update the state 
+ *  main GUI is not blocked anyway). This function will update the state
  *  variable
  */
 void AddonsManager::initOnline(const XMLNode *xml)
@@ -120,13 +120,13 @@ void AddonsManager::initOnline(const XMLNode *xml)
             {
                 // If the version is too old (e.g. after an update of stk)
                 // remove a cached icon.
-                std::string full_path = 
+                std::string full_path =
                     file_manager->getAddonsFile("icons/"
                                                 +addon.getIconBasename());
                 if(file_manager->fileExists(full_path))
                 {
                     if(UserConfigParams::logAddons())
-                        Log::warn("[addons] Removing cached icon '%s'.\n", 
+                        Log::warn("[addons] Removing cached icon '%s'.\n",
                                addon.getIconBasename().c_str());
                     file_manager->removeFile(full_path);
                 }
@@ -137,7 +137,7 @@ void AddonsManager::initOnline(const XMLNode *xml)
             if(index>=0)
             {
                 Addon& tmplist_addon = m_addons_list.getData()[index];
-                
+
                 // Only copy the data if a newer revision is found (ignore unapproved
                 // revisions unless player is in the mode to see them)
                 if (tmplist_addon.getRevision() < addon.getRevision() &&
@@ -157,7 +157,7 @@ void AddonsManager::initOnline(const XMLNode *xml)
         }
         else
         {
-            fprintf(stderr, 
+            fprintf(stderr,
                     "[addons] Found invalid node '%s' while downloading addons.\n",
                     node->getName().c_str());
             fprintf(stderr, "[addons] Ignored.\n");
@@ -183,7 +183,7 @@ void AddonsManager::initOnline(const XMLNode *xml)
             continue;
         }
         // This addon is not on the server anymore, and not installed. Remove
-        // it from the list. 
+        // it from the list.
         if(UserConfigParams::logAddons())
             Log::warn(
                 "[addons] Removing '%s' which is not on the server anymore.\n",
@@ -227,7 +227,7 @@ void AddonsManager::checkInstalledAddons()
     bool something_was_changed = false;
 
     // Lock the whole addons list to make sure a consistent view is
-    // written back to disk. The network thread might still be 
+    // written back to disk. The network thread might still be
     // downloading icons and modify content
     m_addons_list.lock();
 
@@ -243,7 +243,7 @@ void AddonsManager::checkInstalledAddons()
         if(n<0) continue;
         if(!m_addons_list.getData()[n].isInstalled())
         {
-            Log::info("[addons] Marking '%s' as being installed.\n", 
+            Log::info("[addons] Marking '%s' as being installed.\n",
                    kp->getIdent().c_str());
             m_addons_list.getData()[n].setInstalled(true);
             something_was_changed = true;
@@ -262,7 +262,7 @@ void AddonsManager::checkInstalledAddons()
         if(n<0) continue;
         if(!m_addons_list.getData()[n].isInstalled())
         {
-            Log::info("[addons] Marking '%s' as being installed.\n", 
+            Log::info("[addons] Marking '%s' as being installed.\n",
                    track->getIdent().c_str());
             m_addons_list.getData()[n].setInstalled(true);
             something_was_changed = true;
@@ -274,7 +274,7 @@ void AddonsManager::checkInstalledAddons()
 }   // checkInstalledAddons
 
 // ----------------------------------------------------------------------------
-/** Download all necessary icons (i.e. icons that are either missing or have 
+/** Download all necessary icons (i.e. icons that are either missing or have
  *  been updated since they were downloaded).
  */
 void AddonsManager::downloadIcons()
@@ -284,7 +284,7 @@ void AddonsManager::downloadIcons()
         Addon &addon            = m_addons_list.getData()[i];
         const std::string &icon = addon.getIconBasename();
         const std::string &icon_full
-                                = file_manager->getAddonsFile("icons/"+icon); 
+                                = file_manager->getAddonsFile("icons/"+icon);
         if(addon.iconNeedsUpdate() ||
             !file_manager->fileExists(icon_full))
         {
@@ -299,11 +299,11 @@ void AddonsManager::downloadIcons()
                 continue;
             }
             std::string save        = "icons/"+icon;
-            Request *r = INetworkHttp::get()->downloadFileAsynchron(url, save, 
+            Request *r = INetworkHttp::get()->downloadFileAsynchron(url, save,
                                                             /*priority*/1,
                                                            /*manage_mem*/true);
             if (r != NULL)
-                r->setAddonIconNotification(&addon);            
+                r->setAddonIconNotification(&addon);
         }
         else
             m_addons_list.getData()[i].setIconReady();
@@ -342,7 +342,7 @@ void AddonsManager::loadInstalledAddons()
 }   // loadInstalledAddons
 
 // ----------------------------------------------------------------------------
-/** Returns an addon with a given id. Raises an assertion if the id is not 
+/** Returns an addon with a given id. Raises an assertion if the id is not
  *  found!
  *  \param id The id to search for.
  */
@@ -370,8 +370,8 @@ int AddonsManager::getAddonIndex(const std::string &id) const
 }   // getAddonIndex
 
 // ----------------------------------------------------------------------------
-/** Installs or updates (i.e. = install on top of an existing installation) an 
- *  addon. It checks for the directories and then unzips the file (which must 
+/** Installs or updates (i.e. = install on top of an existing installation) an
+ *  addon. It checks for the directories and then unzips the file (which must
  *  already have been downloaded).
  *  \param addon Addon data for the addon to install.
  *  \return true if installation was successful.
@@ -381,16 +381,16 @@ bool AddonsManager::install(const Addon &addon)
     bool success=true;
     file_manager->checkAndCreateDirForAddons(addon.getDataDir());
 
-    //extract the zip in the addons folder called like the addons name    
+    //extract the zip in the addons folder called like the addons name
     std::string base_name = StringUtils::getBasename(addon.getZipFileName());
     std::string from      = file_manager->getAddonsFile("tmp/"+base_name);
     std::string to        = addon.getDataDir();
-    
+
     success = extract_zip(from, to);
     if (!success)
     {
         // TODO: show a message in the interface
-        std::cerr << "[addons] Failed to unzip '" << from << "' to '" 
+        std::cerr << "[addons] Failed to unzip '" << from << "' to '"
                   << to << "'\n";
         std::cerr << "[addons] Zip file will not be removed.\n";
         return false;
@@ -405,15 +405,15 @@ bool AddonsManager::install(const Addon &addon)
     int index = getAddonIndex(addon.getId());
     assert(index>=0 && index < (int)m_addons_list.getData().size());
     m_addons_list.getData()[index].setInstalled(true);
-    
+
     if(addon.getType()=="kart")
     {
         // We have to remove the mesh of the kart since otherwise it remains
-        // cashed (if a kart is updated), and will therefore be found again 
-        // when reloading the karts. This is important on one hand since we 
+        // cashed (if a kart is updated), and will therefore be found again
+        // when reloading the karts. This is important on one hand since we
         // reload all karts (this function is easily available) and existing
         // karts will not reload their meshes.
-        const KartProperties *prop = 
+        const KartProperties *prop =
             kart_properties_manager->getKart(addon.getId());
         // If the model already exist, first remove the old kart
         if(prop)
@@ -425,7 +425,7 @@ bool AddonsManager::install(const Addon &addon)
         Track *track = track_manager->getTrack(addon.getId());
         if(track)
             track_manager->removeTrack(addon.getId());
-        
+
         try
         {
             track_manager->loadTrack(addon.getDataDir());
@@ -447,7 +447,7 @@ bool AddonsManager::install(const Addon &addon)
  */
 bool AddonsManager::uninstall(const Addon &addon)
 {
-    std::cout << "[addons] Uninstalling <" 
+    std::cout << "[addons] Uninstalling <"
               << core::stringc(addon.getName()).c_str() << ">\n";
 
     // addon is a const reference, and to avoid removing the const, we
@@ -478,7 +478,7 @@ bool AddonsManager::uninstall(const Addon &addon)
 }   // uninstall
 
 // ----------------------------------------------------------------------------
-/** Saves the information about installed addons and cached icons to 
+/** Saves the information about installed addons and cached icons to
  *  addons_installed.xml. If this is not called, information about downloaded
  *  icons is lost (and will trigger a complete redownload when STK is started
  *  next time).

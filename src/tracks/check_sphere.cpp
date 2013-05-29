@@ -27,10 +27,10 @@
 
 /** Constructor for a checksphere.
  *  \param check_manager Pointer to the check manager, which is needed when
- *         resetting e.g. new lap counters. 
+ *         resetting e.g. new lap counters.
  *  \param node XML node containing the parameters for this checkline.
  */
-CheckSphere::CheckSphere(const XMLNode &node, unsigned int index) 
+CheckSphere::CheckSphere(const XMLNode &node, unsigned int index)
            : CheckStructure(node, index)
 {
     m_radius2     = 1;
@@ -48,15 +48,15 @@ CheckSphere::CheckSphere(const XMLNode &node, unsigned int index)
 }   // CheckSphere
 
 // ----------------------------------------------------------------------------
-/** True if going from old_pos to new_pos enters or leaves this sphere. This 
- *  function is called from update (of the checkline structure). It also 
+/** True if going from old_pos to new_pos enters or leaves this sphere. This
+ *  function is called from update (of the checkline structure). It also
  *  updates the flag about which karts are inside
  *  \param old_pos  Position in previous frame.
  *  \param new_pos  Position in current frame.
  *  \param kart_id     Index of the kart, can be used to store kart specific
  *                  additional data.
  */
-bool CheckSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+bool CheckSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                               unsigned int kart_id)
 {
     float old_dist2   = (old_pos-m_center_point).length2();

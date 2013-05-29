@@ -141,7 +141,7 @@ unsigned int CheckManager::getLapLineIndex() const
 
         if (dynamic_cast<CheckLap*>(c) != NULL) return i;
     }
-    fprintf(stderr, 
+    fprintf(stderr,
            "No check-lap structure found! This can cause incorrect kart\n");
     fprintf(stderr,
            "ranking when crossing the line, but can otherwise be ignored.\n");
@@ -156,12 +156,12 @@ unsigned int CheckManager::getLapLineIndex() const
 }   // getLapLineIndex
 
 // ----------------------------------------------------------------------------
-/** Returns the check line index that is triggered when going from 'from' 
+/** Returns the check line index that is triggered when going from 'from'
  *  to 'to'. If no check line is triggered, -1 will be returned.
  *  \param from Coordinates to start from.
  *  \param to Coordinates to go to.
  */
-int CheckManager::getChecklineTriggering(const Vec3 &from, 
+int CheckManager::getChecklineTriggering(const Vec3 &from,
                                          const Vec3 &to) const
 {
     for (unsigned int i=0; i<getCheckStructureCount(); i++)

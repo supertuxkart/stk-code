@@ -37,8 +37,8 @@ KartControlMessage::KartControlMessage()
     }
 }   // KartControlMessage
 // ----------------------------------------------------------------------------
-/** Receives a kart control message. 
- *  \param kart_id_offset is the global id of the first kart on the host from 
+/** Receives a kart control message.
+ *  \param kart_id_offset is the global id of the first kart on the host from
  *         which this packet was received.
  */
 KartControlMessage::KartControlMessage(ENetPacket* pkt, int kart_id_offset,

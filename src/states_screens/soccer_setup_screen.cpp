@@ -67,31 +67,31 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, c
 void SoccerSetupScreen::beforeAddingWidget()
 {
     Widget* central_div = getWidget<Widget>("central_div");
-    
+
     // Compute some dimensions
     const core::dimension2d<u32>    vs_size = GUIEngine::getTitleFont()->getDimension( L"VS" );
     const int vs_width = (int)vs_size.Width;
     const int vs_height = (int)vs_size.Height;
     const int center_x = central_div->m_x + central_div->m_w/2;
     const int center_y = central_div->m_y + central_div->m_h/2;
-    
+
     // Add "VS" label at the center of the rounded box
     LabelWidget*    label_vs = getWidget<LabelWidget>("vs");
     label_vs->m_x = center_x - vs_width/2;
     label_vs->m_y = center_y - vs_height/2;
     label_vs->m_w = vs_width;
     label_vs->m_h = vs_height;
-    
+
     // Add the 3D views for the karts
     int nb_players = race_manager->getNumLocalPlayers();
     for(int i=0 ; i < nb_players ; i++)
     {
         const RemoteKartInfo&   kart_info   = race_manager->getLocalKartInfo(i);
         const std::string&      kart_name   = kart_info.getKartName();
-        
+
         const KartProperties*   props       = kart_properties_manager->getKart(kart_name);
         const KartModel&        kart_model  = props->getMasterKartModel();
-        
+
         // Add the view
         ModelViewWidget*    kart_view = new ModelViewWidget();
         kart_view->m_x = 0;
@@ -99,25 +99,25 @@ void SoccerSetupScreen::beforeAddingWidget()
         kart_view->m_w = 200;
         kart_view->m_h = 200;   // these values will be overriden by updateKartViewsLayout() anyway
         kart_view->clearModels();
-        
+
         // Add the kart model
         kart_view->addModel( kart_model.getModel(), Vec3(0,0,0),
                                 Vec3(35.0f, 35.0f, 35.0f),
                                 kart_model.getBaseFrame() );
-        kart_view->addModel( kart_model.getWheelModel(0), 
+        kart_view->addModel( kart_model.getWheelModel(0),
                                 kart_model.getWheelGraphicsPosition(0) );
-        kart_view->addModel( kart_model.getWheelModel(1), 
+        kart_view->addModel( kart_model.getWheelModel(1),
                                 kart_model.getWheelGraphicsPosition(1) );
         kart_view->addModel( kart_model.getWheelModel(2),
                                 kart_model.getWheelGraphicsPosition(2) );
         kart_view->addModel( kart_model.getWheelModel(3),
                                 kart_model.getWheelGraphicsPosition(3) );
         kart_view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );
-        
+
         kart_view->update(0);
-        
+
         central_div->getChildren().push_back(kart_view);
-        
+
         // Record info about it for further update
         KartViewInfo    info;
         info.view            = kart_view;
@@ -126,7 +126,7 @@ void SoccerSetupScreen::beforeAddingWidget()
         info.team            = i&1 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED;
         m_kart_view_info.push_back(info);
     }
-    
+
     // Update layout
     updateKartViewsLayout();
 }
@@ -135,16 +135,16 @@ void SoccerSetupScreen::beforeAddingWidget()
 void SoccerSetupScreen::init()
 {
     Screen::init();
-    
+
     // TODO: remember in config.xml the last number of goals
     SpinnerWidget*  goalamount = getWidget<SpinnerWidget>("goalamount");
     goalamount->setValue(3);
-    
+
     // Set focus on "continue"
     ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
     bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     bt_continue->setDeactivated();
-    
+
     // We need players to be able to choose their teams
     input_manager->getDeviceList()->setAssignMode(ASSIGN);
     input_manager->setMasterPlayerOnly(false);
@@ -154,7 +154,7 @@ void SoccerSetupScreen::init()
 void SoccerSetupScreen::tearDown()
 {
     Widget* central_div = getWidget<Widget>("central_div");
-    
+
     // Remove all ModelViewWidgets we created manually
     PtrVector<Widget>&  children = central_div->getChildren();
     for(int i = children.size()-1 ; i >= 0 ; i--)
@@ -163,7 +163,7 @@ void SoccerSetupScreen::tearDown()
             children.erase(i);
     }
     m_kart_view_info.clear();
-    
+
     Screen::tearDown();
 }
 
@@ -177,7 +177,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
     GUIEngine::EventPropagation result = EVENT_LET;
     SoccerTeam  team_switch = SOCCER_TEAM_NONE;
     int nb_players = m_kart_view_info.size();
-    
+
     switch(action)
     {
     case PA_MENU_LEFT:
@@ -220,7 +220,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
     default:
         break;
     }
-    
+
     if(team_switch != SOCCER_TEAM_NONE) // A player wants to change its team?
     {
         // Find the corresponding kart view, update its team and update the layout
@@ -238,21 +238,21 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
             }
         }
     }
-    
+
     // Update "continue" button state
     ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
     if(areAllKartsConfirmed())
     {
         bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
         bt_continue->setActivated();
-        
+
         for(int i=0 ; i < nb_players ; i++)
             race_manager->setLocalKartSoccerTeam(m_kart_view_info[i].local_player_id,
                                                  m_kart_view_info[i].team);
     }
     else
         bt_continue->setDeactivated();
-    
+
     return result;
 }
 
@@ -274,7 +274,7 @@ bool SoccerSetupScreen::areAllKartsConfirmed() const
 void SoccerSetupScreen::updateKartViewsLayout()
 {
     Widget* central_div = getWidget<Widget>("central_div");
-    
+
     // Compute/get some dimensions
     LabelWidget*    label_vs = getWidget<LabelWidget>("vs");
     const int vs_width = label_vs->m_w;
@@ -283,13 +283,13 @@ void SoccerSetupScreen::updateKartViewsLayout()
     const int kart_view_size = kart_area_width/nb_columns;  // Size (width and height) of a kart view
     const int center_x = central_div->m_x + central_div->m_w/2;
     const int center_y = central_div->m_y + central_div->m_h/2;
-    
+
     // Count the number of karts per team
     int nb_players = m_kart_view_info.size();
     int nb_karts_per_team[2] = {0,0};
     for(int i=0 ; i < nb_players ; i++)
         nb_karts_per_team[m_kart_view_info[i].team]++;
-    
+
     // - number of rows displayed for each team = ceil(nb_karts_per_team[i] / nb_columns)
     const int nb_rows_per_team[2] = { (nb_karts_per_team[0] + nb_columns - 1) / nb_columns,
                                       (nb_karts_per_team[1] + nb_columns - 1) / nb_columns};
@@ -300,25 +300,25 @@ void SoccerSetupScreen::updateKartViewsLayout()
     const int center_x_per_team[2] = {  ( central_div->m_x                  + (center_x - vs_width) ) / 2,
                                         ( central_div->m_x+central_div->m_w + (center_x + vs_width) ) / 2,
                                      };
-    
+
     // Update the layout of the 3D views for the karts
     int cur_kart_per_team[2] = {0,0};   // counters
     for(int i=0 ; i < nb_players ; i++)
     {
         const KartViewInfo& view_info = m_kart_view_info[i];
         const SoccerTeam    team = view_info.team;
-        
+
         // Compute the position
         const int cur_row = cur_kart_per_team[team] / nb_columns;
         const int pos_y = start_y[team] + cur_row*kart_view_size;
-        
+
         const int cur_col = cur_kart_per_team[team] % nb_columns;
         int nb_karts_in_this_row = (nb_karts_per_team[team] - cur_row*nb_columns) % nb_columns;
         if(nb_karts_in_this_row == 0)
             nb_karts_in_this_row = nb_columns;  // TODO: not sure of the computation here...
         const int pos_x = center_x_per_team[team] + cur_col*kart_view_size - nb_karts_in_this_row*kart_view_size/2;
         cur_kart_per_team[team]++;
-        
+
         // Move the view
         view_info.view->move(pos_x, pos_y, kart_view_size, kart_view_size);
     }

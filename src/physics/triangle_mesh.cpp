@@ -35,7 +35,7 @@ TriangleMesh::TriangleMesh() : m_mesh()
     m_body             = NULL;
     m_motion_state     = NULL;
     // FIXME: on VS in release mode this statement actually overwrites
-    // part of the data of m_mesh, causing a crash later. Debugging 
+    // part of the data of m_mesh, causing a crash later. Debugging
     // shows that apparently m_collision_shape is at the same address
     // as m_mesh->m_use32bitIndices and m_use4componentVertices
     // (and m_mesh->m_weldingThreshold at m_normals
@@ -59,10 +59,10 @@ TriangleMesh::~TriangleMesh()
  *  \param n1,n2,n3 Normals at the corresponding points.
  *  \param m Material used for this triangle
  */
-void TriangleMesh::addTriangle(const btVector3 &t1, const btVector3 &t2, 
-                               const btVector3 &t3, 
+void TriangleMesh::addTriangle(const btVector3 &t1, const btVector3 &t2,
+                               const btVector3 &t3,
                                const btVector3 &n1, const btVector3 &n2,
-                               const btVector3 &n3, 
+                               const btVector3 &n3,
                                const Material* m)
 {
     m_triangleIndex2Material.push_back(m);
@@ -103,11 +103,11 @@ void TriangleMesh::createCollisionShape(bool create_collision_object, const char
         fseek(f, 0, SEEK_END);
         long pos = ftell(f);
         fseek(f, 0, SEEK_SET);
-                
+
         void* bytes = btAlignedAlloc(pos, 16);
         fread(bytes, pos, 1, f);
         fclose(f);
-        
+
         btOptimizedBvh* bhv = btOptimizedBvh::deSerializeInPlace(bytes, pos, !IS_LITTLE_ENDIAN);
         if (bhv == NULL)
         {
@@ -123,7 +123,7 @@ void TriangleMesh::createCollisionShape(bool create_collision_object, const char
         // Do *NOT* free the bytes, 'deSerializeInPlace' makes the btOptimizedBvh object
         // directly at this memory location
         //free(bytes);
-        
+
     }
     else
     {
@@ -136,15 +136,15 @@ void TriangleMesh::createCollisionShape(bool create_collision_object, const char
         char* buffer = (char*)btAlignedAlloc(ssize, 16);
         bool success = bvh->serialize(buffer, ssize, !IS_LITTLE_ENDIAN);
         printf("serialization success = %i\n", success);
-        
+
         std::ofstream fileout("/tmp/btOptimizedBvh");
         fileout.write(buffer, ssize);
         fileout.close();
-        
+
         btAlignedFree(buffer);
          */
     }
-    
+
     m_collision_shape = bhv_triangle_mesh;
     m_collision_shape->setUserPointer(&m_user_pointer);
     if(create_collision_object)
@@ -154,8 +154,8 @@ void TriangleMesh::createCollisionShape(bool create_collision_object, const char
         bt.setIdentity();
         m_collision_object->setWorldTransform(bt);
     }
-    
-    
+
+
 }   // createCollisionShape
 
 // -----------------------------------------------------------------------------
@@ -179,22 +179,22 @@ void TriangleMesh::createPhysicalBody(btCollisionObject::CollisionFlags flags,
     btTransform startTransform;
     startTransform.setIdentity();
     m_motion_state = new btDefaultMotionState(startTransform);
-    btRigidBody::btRigidBodyConstructionInfo info(0.0f, m_motion_state, 
+    btRigidBody::btRigidBodyConstructionInfo info(0.0f, m_motion_state,
                                                   m_collision_shape);
     m_body=new btRigidBody(info);
     World::getWorld()->getPhysics()->addBody(m_body);
 
     m_body->setUserPointer(&m_user_pointer);
-    m_body->setCollisionFlags(m_body->getCollisionFlags()  | 
+    m_body->setCollisionFlags(m_body->getCollisionFlags()  |
                               flags                        |
                               btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 }   // createPhysicalBody
 
 // ----------------------------------------------------------------------------
-/** Removes the created body and/or collision object from the physics world. 
- *  This is used when creating a temporary rigid body of the main track to get 
- *  bullet raycasts. Then the main track is removed, and the track (main track 
- *  including all additional objects which were loaded later) is converted 
+/** Removes the created body and/or collision object from the physics world.
+ *  This is used when creating a temporary rigid body of the main track to get
+ *  bullet raycasts. Then the main track is removed, and the track (main track
+ *  including all additional objects which were loaded later) is converted
  *  again.
  */
 void TriangleMesh::removeAll()
@@ -230,7 +230,7 @@ btVector3 TriangleMesh::getInterpolatedNormal(unsigned int index,
     btVector3 n1, n2, n3;
     getNormals(index, &n1, &n2, &n3);
 
-    // Compute the Barycentric coordinates of position inside  triangle 
+    // Compute the Barycentric coordinates of position inside  triangle
     // p1, p2, p3.
     btVector3 edge1 = p2 - p1;
     btVector3 edge2 = p3 - p1;
@@ -277,7 +277,7 @@ btVector3 TriangleMesh::getInterpolatedNormal(unsigned int index,
  *          variable will be set.
  */
 bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
-                           btVector3 *xyz, const Material **material, 
+                           btVector3 *xyz, const Material **material,
                            btVector3 *normal) const
 {
     if(!m_collision_shape)
@@ -306,7 +306,7 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
         const Material* m_material;
         const TriangleMesh *m_this;
         // --------------------------------------------------------------------
-        MaterialRayResult(const btVector3 &p1, const btVector3 &p2, 
+        MaterialRayResult(const btVector3 &p1, const btVector3 &p2,
                           const TriangleMesh *me)
                         : btCollisionWorld::ClosestRayResultCallback(p1,p2)
         {
@@ -315,9 +315,9 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
         }   // MaterialRayResult
         // --------------------------------------------------------------------
         virtual btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult,
-                                         bool normalInWorldSpace) 
+                                         bool normalInWorldSpace)
         {
-            m_material = 
+            m_material =
                 m_this->getMaterial(rayResult.m_localShapeInfo->m_triangleIndex);
             return btCollisionWorld::ClosestRayResultCallback
                     ::addSingleResult(rayResult, normalInWorldSpace);
@@ -329,10 +329,10 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
 
     // If this is a rigid body, m_collision_object is NULL, and the
     // rigid body is the actual collision object.
-    btCollisionWorld::rayTestSingle(trans_from, trans_to, 
-                                    m_collision_object ? m_collision_object 
+    btCollisionWorld::rayTestSingle(trans_from, trans_to,
+                                    m_collision_object ? m_collision_object
                                                        : m_body,
-                                    m_collision_shape, world_trans, 
+                                    m_collision_shape, world_trans,
                                     ray_callback);
     if(ray_callback.hasHit())
     {

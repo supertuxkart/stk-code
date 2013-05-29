@@ -30,15 +30,15 @@
 namespace tinygettext {
 
 #ifndef tinygettext_ICONV_CONST
-#  define tinygettext_ICONV_CONST 
+#  define tinygettext_ICONV_CONST
 #endif
 
-IConv::IConv() 
+IConv::IConv()
   : to_charset(),
     from_charset(),
     cd(0)
 {}
- 
+
 IConv::IConv(const std::string& from_charset_, const std::string& to_charset_)
   : to_charset(),
     from_charset(),
@@ -46,13 +46,13 @@ IConv::IConv(const std::string& from_charset_, const std::string& to_charset_)
 {
   set_charsets(from_charset_, to_charset_);
 }
- 
+
 IConv::~IConv()
 {
   if (cd)
     tinygettext_iconv_close(cd);
 }
- 
+
 void
 IConv::set_charsets(const std::string& from_charset_, const std::string& to_charset_)
 {
@@ -111,8 +111,8 @@ IConv::convert(const std::string& text)
     // a std::string
     tinygettext_ICONV_CONST char* inbuf = const_cast<char*>(&text[0]);
     std::string result(outbytesleft, 'X');
-    char* outbuf = &result[0]; 
-  
+    char* outbuf = &result[0];
+
     // Try to convert the text.
     size_t ret = tinygettext_iconv(cd, (const char**)&inbuf, &inbytesleft, &outbuf, &outbytesleft);
     if (ret == static_cast<size_t>(-1))

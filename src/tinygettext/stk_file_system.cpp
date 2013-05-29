@@ -43,7 +43,7 @@ StkFileSystem::open_directory(const std::string& pathname)
   }
   return files;
 }
-  
+
 std::auto_ptr<std::istream>
 StkFileSystem::open_file(const std::string& filename)
 {

@@ -72,11 +72,11 @@ void SkidMarks::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-/** Either adds to an existing skid mark quad, or (if the kart is skidding) 
+/** Either adds to an existing skid mark quad, or (if the kart is skidding)
  *  starts a new skid mark quad.
  *  \param dt Time step.
  */
-void SkidMarks::update(float dt, bool force_skid_marks, 
+void SkidMarks::update(float dt, bool force_skid_marks,
                        video::SColor* custom_color)
 {
     //if the kart is gnu, then don't skid because he floats!
@@ -96,7 +96,7 @@ void SkidMarks::update(float dt, bool force_skid_marks,
             m_kart.getVehicle()->getWheelInfo(2).m_raycastInfo;
     const btWheelInfo::RaycastInfo raycast_left =
             m_kart.getVehicle()->getWheelInfo(3).m_raycastInfo;
-    Vec3 delta = raycast_right.m_contactPointWS 
+    Vec3 delta = raycast_right.m_contactPointWS
                - raycast_left.m_contactPointWS;
 
     // The kart is making skid marks when it's:
@@ -105,7 +105,7 @@ void SkidMarks::update(float dt, bool force_skid_marks,
     // - not doing the grphical jump
     // - wheels are in contact with floor, which includes a special case:
     //   the physics force both wheels on one axis to touch the ground or not.
-    //   If only one wheel touches the ground, the 2nd one gets the same 
+    //   If only one wheel touches the ground, the 2nd one gets the same
     //   raycast result --> delta is 0, which is considered to be not skidding.
     const Skidding *skid = m_kart.getSkidding();
     bool is_skidding = force_skid_marks ||
@@ -114,13 +114,13 @@ void SkidMarks::update(float dt, bool force_skid_marks,
                      &&  m_kart.getSkidding()->getGraphicalJumpOffset()<=0
                      &&  raycast_right.m_isInContact
                      &&  delta.length2()>=0.0001f                              );
-                     
+
     if(m_skid_marking)
     {
         if (!is_skidding)   // end skid marking
         {
             m_skid_marking = false;
-            // The vertices and indices will not change anymore 
+            // The vertices and indices will not change anymore
             // (till these skid mark quads are deleted)
             m_left[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
             m_right[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
@@ -160,14 +160,14 @@ void SkidMarks::update(float dt, bool force_skid_marks,
     delta.normalize();
     delta *= m_width;
 
-    SkidMarkQuads *smq_left = 
+    SkidMarkQuads *smq_left =
         new SkidMarkQuads(raycast_left.m_contactPointWS,
                           raycast_left.m_contactPointWS + delta,
                           m_material, m_avoid_z_fighting, custom_color);
     scene::SMesh *new_mesh = new scene::SMesh();
     new_mesh->addMeshBuffer(smq_left);
 
-    SkidMarkQuads *smq_right = 
+    SkidMarkQuads *smq_right =
         new SkidMarkQuads(raycast_right.m_contactPointWS - delta,
                           raycast_right.m_contactPointWS,
                           m_material, m_avoid_z_fighting, custom_color);
@@ -214,7 +214,7 @@ void SkidMarks::update(float dt, bool force_skid_marks,
 //=============================================================================
 SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
                                         const Vec3 &right,
-                                        video::SMaterial *material, 
+                                        video::SMaterial *material,
                                         float z_offset,
                                         video::SColor* custom_color)
                          : scene::SMeshBuffer()
@@ -227,11 +227,11 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
                                    SkidMarks::m_start_grey,
                                    SkidMarks::m_start_grey,
                                    SkidMarks::m_start_grey));
-    
+
     Material   = *material;
     m_aabb     = core::aabbox3df(left.toIrrVector());
     add(left, right);
-    
+
 
 }   // SkidMarkQuads
 
@@ -272,12 +272,12 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left,
     m_aabb.addInternalPoint(left.toIrrVector() );
     m_aabb.addInternalPoint(right.toIrrVector());
     setBoundingBox(m_aabb);
-    
+
     setDirty();
 }   // add
 
 // ----------------------------------------------------------------------------
-/** Fades the current skid marks. 
+/** Fades the current skid marks.
  *  \param f fade factor.
  */
 void SkidMarks::SkidMarkQuads::fade(float f)
@@ -306,5 +306,5 @@ void SkidMarks::SkidMarkQuads::fade(float f)
  */
 void SkidMarks::adjustFog(bool enabled)
 {
-    m_material->FogEnable = enabled; 
+    m_material->FogEnable = enabled;
 }

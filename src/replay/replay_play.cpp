@@ -88,21 +88,21 @@ void ReplayPlay::Load()
     FILE *fd = openReplayFile(/*writeable*/false);
     if(!fd)
     {
-        printf("Can't read '%s', ghost replay disabled.\n", 
+        printf("Can't read '%s', ghost replay disabled.\n",
                getReplayFilename().c_str());
         destroy();
         return;
     }
 
     printf("Reading replay file '%s'.\n", getReplayFilename().c_str());
-    
+
     if (fgets(s, 1023, fd) == NULL)
     {
-        fprintf(stderr, "ERROR: could not read '%s'.\n", 
+        fprintf(stderr, "ERROR: could not read '%s'.\n",
                 getReplayFilename().c_str());
         exit(-2);
     }
-    
+
     unsigned int version;
     if (sscanf(s,"Version: %d", &version)!=1)
     {
@@ -117,14 +117,14 @@ void ReplayPlay::Load()
         fprintf(stderr, "         STK version is '%d'\n",getReplayVersion());
         fprintf(stderr, "         We try to proceed, but it may fail.\n");
     }
-    
+
     if (fgets(s, 1023, fd) == NULL)
     {
-        fprintf(stderr, "ERROR: could not read '%s'.\n", 
+        fprintf(stderr, "ERROR: could not read '%s'.\n",
                 getReplayFilename().c_str());
         exit(-2);
     }
-    
+
     int  n;
     if(sscanf(s, "difficulty: %d",&n)!=1)
     {
@@ -134,7 +134,7 @@ void ReplayPlay::Load()
 
     if(race_manager->getDifficulty()!=(RaceManager::Difficulty)n)
         printf("Warning, difficulty of replay is '%d', "
-               "while '%d' is selected.\n", 
+               "while '%d' is selected.\n",
                race_manager->getDifficulty(), n);
 
     fgets(s, 1023, fd);
@@ -203,14 +203,14 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
         // Check for EV_TRANSFORM event:
         // -----------------------------
         if(sscanf(s, "%f  %f %f %f  %f %f %f %f\n",
-            &time, 
+            &time,
             &x, &y, &z,
             &rx, &ry, &rz, &rw
             )==8)
         {
             btQuaternion q(rx, ry, rz, rw);
             btVector3 xyz(x, y, z);
-            m_ghost_karts[m_ghost_karts.size()-1].addTransform(time, 
+            m_ghost_karts[m_ghost_karts.size()-1].addTransform(time,
                                                           btTransform(q, xyz));
         }
         else

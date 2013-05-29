@@ -37,12 +37,12 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
 {
     assert(mgr != NULL);
     assert(parent != NULL);
-    
+
     m_group_name = group_name;
-    
+
     m_previous_visibility = FIRST_PASS;
-    
-    // At this stage refcount is two: one because of the object being 
+
+    // At this stage refcount is two: one because of the object being
     // created, and once because it is a child of the parent. Drop once,
     // so that only the reference from the parent is active, causing this
     // node to be deleted when it is removed from the parent.
@@ -73,9 +73,9 @@ int LODNode::getLevel()
     scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
 
     // Assumes all children are at the same location
-    const int dist = 
+    const int dist =
         (int)((getPosition() + m_nodes[0]->getPosition()).getDistanceFromSQ( curr_cam->getPosition() ));
-    
+
     for (unsigned int n=0; n<m_detail.size(); n++)
     {
         if (dist < m_detail[n])
@@ -100,7 +100,7 @@ void LODNode::OnAnimate(u32 timeMs)
     {
         // update absolute position
         updateAbsolutePosition();
-        
+
         int level = getLevel();
         // Assume all the scene node have the same bouding box
         if(level>=0)
@@ -121,7 +121,7 @@ void LODNode::OnAnimate(u32 timeMs)
                 }
             }
         }
-			
+
     }
 }
 
@@ -138,15 +138,15 @@ void LODNode::OnRegisterSceneNode()
         m_nodes[level]->OnRegisterSceneNode();
         shown = true;
     }
-        
+
     // support an optional, mostly hard-coded fade-in/out effect for objects with a single level
     if (m_nodes.size() == 1 && (m_nodes[0]->getType() == scene::ESNT_MESH ||
                                 m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH))
     {
         if (m_previous_visibility == WAS_HIDDEN && shown)
-        {            
+        {
             scene::IMesh* mesh;
-            
+
             if (m_nodes[0]->getType() == scene::ESNT_MESH)
             {
                 scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
@@ -160,13 +160,13 @@ void LODNode::OnRegisterSceneNode()
                 assert(node != NULL);
                 mesh = node->getMesh();
             }
-            
+
             for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
             {
                 scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
                 video::ITexture* t = mb->getMaterial().getTexture(0);
                 if (t == NULL) continue;
-                
+
                 Material* m = material_manager->getMaterialFor(t, mb);
                 if (m != NULL)
                 {
@@ -175,9 +175,9 @@ void LODNode::OnRegisterSceneNode()
             }
         }
         else if (m_previous_visibility == WAS_SHOWN && !shown)
-        {           
+        {
             scene::IMesh* mesh;
-            
+
             if (m_nodes[0]->getType() == scene::ESNT_MESH)
             {
                 scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
@@ -191,7 +191,7 @@ void LODNode::OnRegisterSceneNode()
                 assert(node != NULL);
                 mesh = node->getMesh();
             }
-            
+
             for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
             {
                 scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
@@ -205,9 +205,9 @@ void LODNode::OnRegisterSceneNode()
             }
         }
         else if (m_previous_visibility == FIRST_PASS && !shown)
-        {            
+        {
             scene::IMesh* mesh;
-            
+
             if (m_nodes[0]->getType() == scene::ESNT_MESH)
             {
                 scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
@@ -221,7 +221,7 @@ void LODNode::OnRegisterSceneNode()
                 assert(node != NULL);
                 mesh = node->getMesh();
             }
-            
+
             for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
             {
                 scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
@@ -233,14 +233,14 @@ void LODNode::OnRegisterSceneNode()
                     m->isInitiallyHidden(mb);
                 }
             }
-        }        
+        }
     }
-    
-    m_previous_visibility = (shown ? WAS_SHOWN : WAS_HIDDEN); 
-    
+
+    m_previous_visibility = (shown ? WAS_SHOWN : WAS_HIDDEN);
+
     // If this node has children other than the LOD nodes, draw them
     core::list<ISceneNode*>::Iterator it;
-    
+
     for (it = Children.begin(); it != Children.end(); it++)
     {
         if (m_nodes_set.find(*it) == m_nodes_set.end())
@@ -265,9 +265,9 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
         assert(m_detail.back()<level*level);
         m_detail[m_detail.size() - 1] += (int)(((rand()%1000)-500)/500.0f*(m_detail[m_detail.size() - 1]*0.2f));
     }
-    
+
     assert(node != NULL);
-    
+
     node->grab();
     node->remove();
     node->setPosition(core::vector3df(0,0,0));
@@ -275,11 +275,11 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     m_nodes.push_back(node);
     m_nodes_set.insert(node);
     node->setParent(this);
-    
+
     if(UserConfigParams::m_hw_skinning_enabled && node->getType() == scene::ESNT_ANIMATED_MESH)
         HardwareSkinning::prepareNode((scene::IAnimatedMeshSceneNode*)node);
-    
+
     node->drop();
-    
+
     node->updateAbsolutePosition();
 }

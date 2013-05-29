@@ -24,7 +24,7 @@
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
 
-AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart, 
+AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
                                              const std::string &name)
 {
     m_timer = 0;

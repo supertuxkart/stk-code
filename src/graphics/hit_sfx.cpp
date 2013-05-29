@@ -25,12 +25,12 @@
 /** Creates a sound effect when something was hit. */
 HitSFX::HitSFX(const Vec3& coord, const char* explosion_sound)
              : HitEffect()
-{    
+{
     m_sfx = sfx_manager->createSoundSource( explosion_sound );
     m_sfx->position(coord);
-    
-    // in multiplayer mode, sounds are NOT positional (because we have 
-    // multiple listeners) so the sounds of all AIs are constantly heard. 
+
+    // in multiplayer mode, sounds are NOT positional (because we have
+    // multiple listeners) so the sounds of all AIs are constantly heard.
     // Therefore reduce volume of sounds.
     float vol = race_manager->getNumLocalPlayers() > 1 ? 0.5f : 1.0f;
     m_sfx->volume(vol);
@@ -44,7 +44,7 @@ HitSFX::~HitSFX()
 {
     if (m_sfx->getStatus() == SFXManager::SFX_PLAYING)
         m_sfx->stop();
-        
+
     sfx_manager->deleteSFX(m_sfx);
 }   // ~HitEffect
 

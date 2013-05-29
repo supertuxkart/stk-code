@@ -46,15 +46,15 @@ void StoryModeLobbyScreen::loadedFromFile()
 void StoryModeLobbyScreen::init()
 {
     Screen::init();
-    
+
     CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
     cb->setState(false);
-    
+
     ListWidget* list = getWidget<ListWidget>("gameslots");
     list->clear();
-    
+
     PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-    
+
     if (UserConfigParams::m_default_player.toString().size() > 0)
     {
         for (int n=0; n<players.size(); n++)
@@ -67,20 +67,20 @@ void StoryModeLobbyScreen::init()
             }
         }
     }
-    
+
     for (int n=0; n<players.size(); n++)
     {
         if (players[n].isGuestAccount()) continue;
-        
+
         // FIXME: we're using a trunacted ascii version of the player name as
         //        identifier, let's hope this causes no issues...
         list->addItem(core::stringc(players[n].getName().c_str()).c_str(),
                       players[n].getName() );
     }
-    
+
     list->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     list->setSelectionID(0);
-    
+
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -105,9 +105,9 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name
     else if (name == "gameslots")
     {
         ListWidget* list = getWidget<ListWidget>("gameslots");
-        
+
         bool slot_found = false;
-        
+
         PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
         for (int n=0; n<players.size(); n++)
         {
@@ -119,7 +119,7 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name
                 break;
             }
         }
-        
+
         if (!slot_found)
         {
             fprintf(stderr, "[StoryModeLobbyScreen] ERROR: cannot find player corresponding to slot '%s'\n",
@@ -133,7 +133,7 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name
                 UserConfigParams::m_default_player = list->getSelectionLabel();
             }
         }
-            
+
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
     }
 }   // eventCallback
@@ -149,7 +149,7 @@ void StoryModeLobbyScreen::unloaded()
 void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& newName)
 {
     bool slot_found = false;
-    
+
     PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
     for (int n=0; n<players.size(); n++)
     {
@@ -161,13 +161,13 @@ void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& newName)
             break;
         }
     }
-    
+
     if (!slot_found)
     {
         fprintf(stderr, "[StoryModeLobbyScreen] ERROR: cannot find player corresponding to slot '%s'\n",
                 core::stringc(newName.c_str()).c_str());
     }
-    
+
     StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 }
 

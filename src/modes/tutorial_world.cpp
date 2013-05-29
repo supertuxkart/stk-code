@@ -14,13 +14,13 @@ TutorialWorld::TutorialWorld()
 void TutorialWorld::moveKartAfterRescue(AbstractKart* kart)
 {
     float angle = 0;
-    
+
     // find closest point to drop kart on
     World *world = World::getWorld();
-    const int start_spots_amount = 
+    const int start_spots_amount =
         world->getTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
-    
+
     const float currentKart_x = kart->getXYZ().getX();
     const float currentKart_z = kart->getXYZ().getZ();
 
@@ -43,7 +43,7 @@ void TutorialWorld::moveKartAfterRescue(AbstractKart* kart)
     if (kart_over_ground)
     {
         //add vertical offset so that the kart starts off above the track
-        float vertical_offset = 
+        float vertical_offset =
               kart->getKartProperties()->getVertRescueOffset()
             * kart->getKartHeight();
         kart->getBody()->translate(btVector3(0, vertical_offset, 0));
@@ -64,31 +64,31 @@ btTransform TutorialWorld::getClosestStartPoint(float currentKart_x,
 {
     // find closest point to drop kart on
     World *world = World::getWorld();
-    const int start_spots_amount = 
+    const int start_spots_amount =
         world->getTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
-    
-    
+
+
     int closest_id = -1;
     float closest_distance = 999999999.0f;
 
     for (int n=0; n<start_spots_amount; n++)
     {
-        // no need for the overhead to compute exact distance with sqrt(), 
+        // no need for the overhead to compute exact distance with sqrt(),
         // so using the 'manhattan' heuristic which will do fine enough.
         const btTransform &s = world->getTrack()->getStartTransform(n);
         const Vec3 &v = s.getOrigin();
-                
+
         float absDistance = fabs(currentKart_x - v.getX()) +
                     fabs(currentKart_z - v.getZ());
-        
+
         if (absDistance < closest_distance)
         {
             closest_distance = absDistance;
             closest_id = n;
         }
     }
-    
+
     assert(closest_id != -1);
     return world->getTrack()->getStartTransform(closest_id);
 }   // getClosestStartPoint

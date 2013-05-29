@@ -33,16 +33,16 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
 {
     m_filename = filename;
     m_id       = StringUtils::getBasename(StringUtils::removeExtension(filename));
-    
+
     XMLNode* root = file_manager->createXMLTree(file_manager->getDataDir()+filename);
     if (!root)
     {
         Log::error("GrandPrixData","Error while trying to read grandprix file '%s'\n", filename.c_str());
         throw std::logic_error("File not found");
     }
-    
+
     bool foundName = false;
-    
+
     if (root->getName() == "supertuxkart_grand_prix")
     {
         std::string temp_name;
@@ -54,7 +54,7 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
             throw std::logic_error("File contents are incomplete or corrupt");
         }
         m_name = temp_name.c_str();
-        foundName = true;                
+        foundName = true;
     }
     else
     {
@@ -64,19 +64,19 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
         throw std::logic_error("File contents are incomplete or corrupt");
     }
 
-    
+
     const int amount = root->getNumNodes();
     for (int i=0; i<amount; i++)
     {
         const XMLNode* node = root->getNode(i);
-        
+
         // read a track entry
         if (node->getName() == "track")
         {
             std::string trackID;
             int numLaps;
             bool reversed = false;
-            
+
             const int idFound      = node->get("id",      &trackID  );
             const int lapFound     = node->get("laps",    &numLaps  );
             // Will stay false if not found
@@ -90,7 +90,7 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
                 delete root;
                 throw std::logic_error("File contents are incomplete or corrupt");
             }
-            
+
             // Make sure the track really is reversible
             Track* t = track_manager->getTrack(trackID);
             if (t != NULL && reversed)
@@ -101,7 +101,7 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
             m_tracks.push_back(trackID);
             m_laps.push_back(numLaps);
             m_reversed.push_back(reversed);
-            
+
             assert(m_tracks.size() == m_laps.size()    );
             assert(m_laps.size()   == m_reversed.size());
         }
@@ -112,7 +112,7 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
             throw std::runtime_error("Unknown node in sfx XML file");
         }
     }// nend for
-    
+
     delete root;
 
     // sanity checks
@@ -141,7 +141,7 @@ bool GrandPrixData::checkConsistency(bool chatty) const
             }
             return false;
         }
-        
+
     }   // for i
     return true;
 }   // checkConsistency
@@ -149,18 +149,18 @@ bool GrandPrixData::checkConsistency(bool chatty) const
 
 // ----------------------------------------------------------------------------
 /** Returns true if the track is available. This is used to test if Fort Magma
- *  is available (this way FortMagma is not used in the last Grand Prix in 
+ *  is available (this way FortMagma is not used in the last Grand Prix in
  *  story mode, but will be available once all challenges are done and nolok
  *  is unlocked).
  */
 bool GrandPrixData::isTrackAvailable(const std::string &id) const
 {
-    return id!="fortmagma" || 
+    return id!="fortmagma" ||
            !unlock_manager->getCurrentSlot()->isLocked("fortmagma");
 }   // isTrackAvailable
 
 // ----------------------------------------------------------------------------
-void GrandPrixData::getLaps(std::vector<int> *laps) const 
+void GrandPrixData::getLaps(std::vector<int> *laps) const
 {
     laps->clear();
     for(unsigned int i=0; i< m_tracks.size(); i++)
@@ -169,7 +169,7 @@ void GrandPrixData::getLaps(std::vector<int> *laps) const
 }   // getLaps
 
 // ----------------------------------------------------------------------------
-void GrandPrixData::getReverse(std::vector<bool> *reverse) const 
+void GrandPrixData::getReverse(std::vector<bool> *reverse) const
 {
     reverse->clear();
     for(unsigned int i=0; i< m_tracks.size(); i++)
@@ -178,7 +178,7 @@ void GrandPrixData::getReverse(std::vector<bool> *reverse) const
 }   // getReverse
 
 // ----------------------------------------------------------------------------
-const std::vector<std::string>& GrandPrixData::getTrackNames() const 
+const std::vector<std::string>& GrandPrixData::getTrackNames() const
 {
     m_really_available_tracks.clear();
     for(unsigned int i=0; i< m_tracks.size(); i++)

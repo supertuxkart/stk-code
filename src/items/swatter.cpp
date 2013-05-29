@@ -51,10 +51,10 @@
  *  \param attachment The attachment instance where the swatter is attached to.
  *  \param kart The kart to which the swatter is attached.
  *  \param was_bomb True if the kart had a bomb as attachment.
- *  \param bomb_scene_node The scene node of the bomb (i.e. the previous 
+ *  \param bomb_scene_node The scene node of the bomb (i.e. the previous
  *         attachment scene node).
  */
-Swatter::Swatter(AbstractKart *kart, bool was_bomb, 
+Swatter::Swatter(AbstractKart *kart, bool was_bomb,
                  scene::ISceneNode* bomb_scene_node)
        : AttachmentPlugin(kart)
 {
@@ -63,14 +63,14 @@ Swatter::Swatter(AbstractKart *kart, bool was_bomb,
     m_removing_bomb    = was_bomb;
     m_bomb_scene_node  = bomb_scene_node;
     m_swat_bomb_frame  = 0.0f;
-    
+
     // Setup the node
     m_scene_node = kart->getAttachment()->getNode();
     m_scene_node->setPosition(SWAT_POS_OFFSET);
-    
+
     if (m_removing_bomb)
     {
-        m_scene_node->setMesh(irr_driver->getAnimatedMesh( 
+        m_scene_node->setMesh(irr_driver->getAnimatedMesh(
                         file_manager->getModelFile("swatter_anim2.b3d") ) );
         m_scene_node->setRotation(core::vector3df(0.0, -180.0, 0.0));
         m_scene_node->setAnimationSpeed(0.9f);
@@ -79,9 +79,9 @@ Swatter::Swatter(AbstractKart *kart, bool was_bomb,
     }
     else
     {
-        m_scene_node->setAnimationSpeed(0);   
+        m_scene_node->setAnimationSpeed(0);
     }
-    
+
     if (kart->getIdent() == "nolok")
         m_swat_sound = sfx_manager->createSoundSource("hammer");
     else
@@ -116,9 +116,9 @@ bool Swatter::updateAndTestFinished(float dt)
     {
         m_swat_bomb_frame += dt*25.0f;
         m_scene_node->setRotation(core::vector3df(0.0, -180.0, 0.0));
-        
+
         m_scene_node->setCurrentFrame(m_swat_bomb_frame);
-        
+
         if (m_swat_bomb_frame >= 32.5f && m_bomb_scene_node != NULL)
         {
             m_bomb_scene_node->setPosition(m_bomb_scene_node->getPosition() +
@@ -126,7 +126,7 @@ bool Swatter::updateAndTestFinished(float dt)
             m_bomb_scene_node->setRotation(m_bomb_scene_node->getRotation() +
                                       core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
         }
-        
+
         if (m_swat_bomb_frame >= m_scene_node->getEndFrame())
         {
             return true;
@@ -139,10 +139,10 @@ bool Swatter::updateAndTestFinished(float dt)
                 m_bomb_scene_node = NULL;
             }
         }   // bom_frame > 35
-        
+
         return false;
     }   // if removing bomb
-    
+
     switch(m_animation_phase)
     {
     case SWATTER_AIMING:
@@ -152,10 +152,10 @@ bool Swatter::updateAndTestFinished(float dt)
             if(!m_target) break;
 
             // Is the target too near?
-            float dist_to_target2 = 
+            float dist_to_target2 =
                 (m_target->getXYZ()- Vec3(m_scene_node->getAbsolutePosition()))
                 .length2();
-            float min_dist2 
+            float min_dist2
                  = m_kart->getKartProperties()->getSwatterDistance2();
             if(dist_to_target2 < min_dist2)
             {
@@ -179,7 +179,7 @@ bool Swatter::updateAndTestFinished(float dt)
             // Did we just finish the first part of the movement?
             if(current_frame >= middle_frame)
             {
-                // Squash the karts and items around and 
+                // Squash the karts and items around and
                 // change the current phase
                 squashThingsAround();
                 m_animation_phase = SWATTER_FROM_TARGET;
@@ -206,7 +206,7 @@ void Swatter::onAnimationEnd()
 }   // onAnimationEnd
 
 // ----------------------------------------------------------------------------
-/** Determine the nearest kart or item and update the current target 
+/** Determine the nearest kart or item and update the current target
  *  accordingly.
  */
 void Swatter::chooseTarget()
@@ -225,7 +225,7 @@ void Swatter::chooseTarget()
         // don't squash an already hurt kart
         if (kart->isInvulnerable() || kart->isSquashed())
             continue;
-        
+
         float dist2 = (kart->getXYZ()-m_kart->getXYZ()).length2();
         if(dist2<min_dist2)
         {
@@ -237,7 +237,7 @@ void Swatter::chooseTarget()
 }
 
 // ----------------------------------------------------------------------------
-/** If there is a current target, point in its direction, otherwise adopt the 
+/** If there is a current target, point in its direction, otherwise adopt the
  *  default position. */
 void Swatter::pointToTarget()
 {
@@ -247,7 +247,7 @@ void Swatter::pointToTarget()
     }
     else
     {
-        Vec3 swatter_to_target = m_target->getXYZ() 
+        Vec3 swatter_to_target = m_target->getXYZ()
                                -Vec3(m_scene_node->getAbsolutePosition());
         float dy = -swatter_to_target.getZ();
         float dx = swatter_to_target.getX();
@@ -259,7 +259,7 @@ void Swatter::pointToTarget()
 }   // pointToTarget
 
 // ----------------------------------------------------------------------------
-/** Squash karts or items that are around the end position (determined using 
+/** Squash karts or items that are around the end position (determined using
  *  a joint) of the swatter.
  */
 void Swatter::squashThingsAround()
@@ -277,7 +277,7 @@ void Swatter::squashThingsAround()
 
     m_swat_sound->position(swatter_pos);
     m_swat_sound->play();
-    
+
     // Squash karts around
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
@@ -288,13 +288,13 @@ void Swatter::squashThingsAround()
         // don't swat an already hurt kart
         if (kart->isInvulnerable() || kart->isSquashed())
             continue;
-        
+
         float dist2 = (kart->getXYZ()-swatter_pos).length2();
 
         if(dist2 >= min_dist2) continue;   // too far away, ignore this kart
 
         kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
-        
+
         RaceGUIBase* gui = World::getWorld()->getRaceGUI();
         irr::core::stringw hit_message =
             StringUtils::insertValues(getHitString(kart),
@@ -304,7 +304,7 @@ void Swatter::squashThingsAround()
         if(hit_message.size()>0)
             gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f,
                             video::SColor(255, 255, 255, 255), false);
-        
+
         if (kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
         {   // make bomb explode
             kart->getAttachment()->update(10000);
@@ -323,7 +323,7 @@ void Swatter::squashThingsAround()
 
 
 // ----------------------------------------------------------------------------
-/** Picks a random message to be displayed when a kart is hit by a swatter 
+/** Picks a random message to be displayed when a kart is hit by a swatter
  *  \param kart The kart that was hit.
  *  \returns The string to display.
  */

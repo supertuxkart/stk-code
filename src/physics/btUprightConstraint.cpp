@@ -9,10 +9,10 @@ use of this software.
 Permission is granted to anyone to use this software for any purpose,
 including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
- 
+
 1. The origin of this software must not be misrepresented; you must not claim
-   that you wrote the original software. If you use this software in a 
-   product, an acknowledgment in the product documentation would be 
+   that you wrote the original software. If you use this software in a
+   product, an acknowledgment in the product documentation would be
    appreciated but is not required.
 2. Altered source versions must be plainly marked as such, and must not be
    misrepresented as being the original software.
@@ -39,11 +39,11 @@ void btUprightConstraint::solveAngularLimit(
             btScalar timeStep, btScalar jacDiagABInv,
             btRigidBody * body0 )
 {
-    
+
     // Work out if limit is violated
     if(limit->m_angle>=m_loLimit && limit->m_angle<=m_hiLimit) return;
 
-    limit->m_currentLimitError = (limit->m_angle<m_loLimit) 
+    limit->m_currentLimitError = (limit->m_angle<m_loLimit)
                                ? limit->m_angle - m_loLimit
                                : limit->m_angle - m_hiLimit;
 
@@ -56,7 +56,7 @@ void btUprightConstraint::solveAngularLimit(
     // current velocity difference
     btVector3 angularVelocity       = body0->getAngularVelocity();
     btScalar  axisAngularVelocity   = limit->m_axis.dot( angularVelocity );
- 
+
      // correction velocity
     btScalar motorVelocity          = m_limitSoftness*(targetVelocity
                                     - m_damping*axisAngularVelocity);
@@ -71,7 +71,7 @@ void btUprightConstraint::solveAngularLimit(
 
     if (unclippedMotorImpulse>0.0f)
     {
-        clippedMotorImpulse = unclippedMotorImpulse > maxMotorForce 
+        clippedMotorImpulse = unclippedMotorImpulse > maxMotorForce
                             ? maxMotorForce : unclippedMotorImpulse;
     }
     else
@@ -101,7 +101,7 @@ void btUprightConstraint::solveAngularLimit(
 //!
 //!
 
-btUprightConstraint::btUprightConstraint(const Kart* kart, 
+btUprightConstraint::btUprightConstraint(const Kart* kart,
                                          const btTransform& frameInA)
                    : btTypedConstraint(D6_CONSTRAINT_TYPE, *(kart->getBody()))
                    , m_frameInA(frameInA)
@@ -120,7 +120,7 @@ btUprightConstraint::btUprightConstraint(const Kart* kart,
     m_limit[ 1 ].m_axis             = btVector3( 0, 0, 1 );
     setLimit( SIMD_PI * 0.4f );
 }   // btUprightConstraint
- 
+
 //!
 //!
 //!

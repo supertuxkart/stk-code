@@ -68,7 +68,7 @@ AnimationBase::AnimationBase(Ipo *ipo)
  *  \param xyz Position of the object.
  *  \param hpr Rotation of the object.
  */
-void AnimationBase::setInitialTransform(const Vec3 &xyz, 
+void AnimationBase::setInitialTransform(const Vec3 &xyz,
                                         const Vec3 &hpr)
 {
     Ipo* curr;
@@ -100,7 +100,7 @@ void AnimationBase::reset()
 void AnimationBase::update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
 {
     assert(!isnan(m_current_time));
-    
+
     // Don't do anything if the animation is disabled
     if(!m_playing) return;
     m_current_time += dt;

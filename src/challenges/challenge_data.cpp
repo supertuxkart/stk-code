@@ -53,15 +53,15 @@ ChallengeData::ChallengeData(const std::string& filename)
         m_energy[d]    = -1;
         m_ai_superpower[d] = RaceManager::SUPERPOWER_NONE;
     }
-    
+
     // we are using auto_ptr to make sure the XML node is released when leaving
     // the scope
     std::auto_ptr<XMLNode> root(new XMLNode( filename ));
-    
+
     if(root.get() == NULL || root->getName()!="challenge")
     {
         std::ostringstream msg;
-        msg << "Couldn't load challenge '" << filename 
+        msg << "Couldn't load challenge '" << filename
             << "': no challenge node.";
         throw std::runtime_error(msg.str());
     }
@@ -69,25 +69,25 @@ ChallengeData::ChallengeData(const std::string& filename)
     setId(StringUtils::removeExtension(StringUtils::getBasename(filename)));
 
     root->get("version", &m_version);
-    // No need to get the rest of the data if this challenge 
+    // No need to get the rest of the data if this challenge
     // is not supported anyway (id is needed for warning message)
     if(!unlock_manager->isSupportedVersion(*this))
     {
         fprintf(stderr, "[ChallengeData] WARNING: challenge <%s> is older "
-                "or newer than this version of STK, will be ignored.\n", 
+                "or newer than this version of STK, will be ignored.\n",
                 filename.c_str());
         return;
     }
-    
-    
-    
+
+
+
     const XMLNode* mode_node = root->getNode("mode");
     if (mode_node == NULL)
     {
-        throw std::runtime_error("Challenge file " + filename + 
+        throw std::runtime_error("Challenge file " + filename +
                                  " has no <mode> node!");
     }
-    
+
     std::string mode;
     mode_node->get("major", &mode);
 
@@ -109,21 +109,21 @@ ChallengeData::ChallengeData(const std::string& filename)
         m_minor = RaceManager::MINOR_MODE_FOLLOW_LEADER;
     else
         error("minor");
-        
+
     const XMLNode* track_node = root->getNode("track");
     const XMLNode* gp_node = root->getNode("grandprix");
-    
+
     if (m_mode == CM_SINGLE_RACE && track_node == NULL)
     {
-        throw std::runtime_error("Challenge file " + filename + 
+        throw std::runtime_error("Challenge file " + filename +
                                  " has no <track> node!");
     }
     if (m_mode == CM_GRAND_PRIX && gp_node == NULL)
     {
-        throw std::runtime_error("Challenge file " + filename + 
+        throw std::runtime_error("Challenge file " + filename +
                                  " has no <grandprix> node!");
     }
-    
+
     if (track_node != NULL)
     {
         if (!track_node->get("id",  &m_track_id ))
@@ -134,8 +134,8 @@ ChallengeData::ChallengeData(const std::string& filename)
         {
             error("track");
         }
-        
-        if (!track_node->get("laps", &m_num_laps) && 
+
+        if (!track_node->get("laps", &m_num_laps) &&
             m_minor != RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
             error("laps");
@@ -148,11 +148,11 @@ ChallengeData::ChallengeData(const std::string& filename)
             error("grandprix");
         }
     }
-    
+
     const XMLNode* requirements_node = root->getNode("requirements");
     if (requirements_node == NULL)
     {
-        throw std::runtime_error("Challenge file " + filename + 
+        throw std::runtime_error("Challenge file " + filename +
                                  " has no <requirements> node!");
     }
     requirements_node->get("trophies", &m_num_trophies);
@@ -168,20 +168,20 @@ ChallengeData::ChallengeData(const std::string& filename)
     {
         error("<easy> or <medium> or <hard>");
     }
-    
+
     for (int d=0; d<=RaceManager::DIFFICULTY_HARD; d++)
     {
         const XMLNode* karts_node = difficulties[d]->getNode("karts");
         if (karts_node == NULL) error("<karts .../>");
-        
+
         int num_karts = -1;
         if (!karts_node->get("number", &num_karts)) error("karts");
         m_num_karts[d] = num_karts;
-        
+
         std::string ai_kart_ident;
         if (karts_node->get("aiIdent", &ai_kart_ident))
             m_ai_kart_ident[d] = ai_kart_ident;
-        
+
         std::string superPower;
         if (karts_node->get("superPower", &superPower))
         {
@@ -191,13 +191,13 @@ ChallengeData::ChallengeData(const std::string& filename)
             }
             else
             {
-                fprintf(stderr, 
+                fprintf(stderr,
                         "[ChallengeData] WARNING: Unknown A superpower '%s'\n",
                         superPower.c_str());
             }
         }
-        
-        const XMLNode* requirements_node = 
+
+        const XMLNode* requirements_node =
                                    difficulties[d]->getNode("requirements");
         if (requirements_node == NULL) error("<requirements .../>");
 
@@ -212,10 +212,10 @@ ChallengeData::ChallengeData(const std::string& filename)
         {
             m_position[d] = position;
         }
-        
+
         int time = -1;
         if (requirements_node->get("time", &time)) m_time[d] = (float)time;
-        
+
         if (m_time[d] < 0 && m_position[d] < 0) error("position/time");
 
         // This is optional
@@ -242,20 +242,20 @@ ChallengeData::ChallengeData(const std::string& filename)
         else
         {
             fprintf(stderr, "[ChallengeData] unknown unlock entry.\n");
-            fprintf(stderr, 
+            fprintf(stderr,
                     "Must be one of kart, track, gp, mode, difficulty.\n");
             exit(-1);
         }
     }
-    
+
     core::stringw description;
     if (track_node != NULL)
     {
         //I18N: number of laps to race in a challenge
         description += _("Laps : %i", m_num_laps);
         description += core::stringw(L"\n");
-    }    
-    
+    }
+
     m_challenge_description = description;
 }   // ChallengeData
 
@@ -263,17 +263,17 @@ ChallengeData::ChallengeData(const std::string& filename)
 void ChallengeData::error(const char *id) const
 {
     std::ostringstream msg;
-    msg << "Undefined or incorrect value for '" << id 
+    msg << "Undefined or incorrect value for '" << id
         << "' in challenge file '" << m_filename << "'.";
-    
+
     printf("ChallengeData : %s\n", msg.str().c_str());
-    
+
     throw std::runtime_error(msg.str());
 }   // error
 
 // ----------------------------------------------------------------------------
 /** Checks if this challenge is valid, i.e. contains a valid track or a valid
- *  GP. If incorrect data are found, STK is aborted with an error message. 
+ *  GP. If incorrect data are found, STK is aborted with an error message.
  *  (otherwise STK aborts when trying to do this challenge, which is worse).
  */
 void ChallengeData::check() const
@@ -292,7 +292,7 @@ void ChallengeData::check() const
     else if(m_mode==CM_GRAND_PRIX)
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(m_gp_id);
-        
+
         if (gp == NULL)
         {
             error("gp");
@@ -318,14 +318,14 @@ void ChallengeData::setUnlocks(const std::string &id, RewardType reward)
     {
     case UNLOCK_TRACK:      assert (false);
         break;
-            
+
     case UNLOCK_GP:         addUnlockGPReward(id);
                             break;
-            
+
     case UNLOCK_MODE:       {
                             const RaceManager::MinorRaceModeType mode =
                                 RaceManager::getModeIDFromInternalName(id);
-                            addUnlockModeReward(id, 
+                            addUnlockModeReward(id,
                                                 RaceManager::getNameOf(mode));
                             break;
                             }
@@ -337,7 +337,7 @@ void ChallengeData::setUnlocks(const std::string &id, RewardType reward)
                             break;
                             }
     case UNLOCK_KART:       {
-                            const KartProperties* prop = 
+                            const KartProperties* prop =
                                 kart_properties_manager->getKart(id);
                             if (prop == NULL)
                             {
@@ -390,7 +390,7 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
         race_manager->setNumKarts(m_num_karts[d]);
         race_manager->setNumLocalPlayers(1);
     }
-    
+
     if (m_ai_kart_ident[d] != "")
     {
         race_manager->setAIKartOverride(m_ai_kart_ident[d]);
@@ -406,7 +406,7 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
  */
 bool ChallengeData::isChallengeFulfilled() const
 {
-    // GP's use the grandPrixFinished() function, 
+    // GP's use the grandPrixFinished() function,
     // so they can't be fulfilled here.
     if(m_mode==CM_GRAND_PRIX) return false;
 
@@ -414,9 +414,9 @@ bool ChallengeData::isChallengeFulfilled() const
     // ------------
     World *world = World::getWorld();
     std::string track_name = world->getTrack()->getIdent();
-    
+
     int d = race_manager->getDifficulty();
-    
+
     AbstractKart* kart = world->getPlayerKart(0);
 
     if (kart->isEliminated()                                    ) return false;
@@ -424,35 +424,35 @@ bool ChallengeData::isChallengeFulfilled() const
     if ((int)world->getNumKarts() < m_num_karts[d]              ) return false;
     if (m_energy[d] > 0   && kart->getEnergy() < m_energy[d]    ) return false;
     if (m_position[d] > 0 && kart->getPosition() > m_position[d]) return false;
-    
+
     // Follow the leader
     // -----------------
     if(m_minor==RaceManager::MINOR_MODE_FOLLOW_LEADER)
     {
-        // All possible conditions were already checked, so: 
+        // All possible conditions were already checked, so:
         // must have been successful
         return true;
     }
     // Quickrace / Timetrial
     // ---------------------
-    // FIXME - encapsulate this better, each race mode needs to be able 
+    // FIXME - encapsulate this better, each race mode needs to be able
     // to specify its own challenges and deal with them
     LinearWorld* lworld = dynamic_cast<LinearWorld*>(world);
     if(lworld != NULL)
     {
         // wrong number of laps
-        if(lworld->getLapForKart( kart->getWorldKartId() ) != m_num_laps) 
+        if(lworld->getLapForKart( kart->getWorldKartId() ) != m_num_laps)
             return false;
     }
     // too slow
     if (m_time[d] > 0.0f && kart->getFinishTime() > m_time[d]) return false;
-    
+
     if (m_ai_superpower[d] != RaceManager::SUPERPOWER_NONE &&
         race_manager->getAISuperPower() != m_ai_superpower[d])
     {
         return false;
     }
-    
+
     return true;
 }   // isChallengeFulfilled
 
@@ -462,7 +462,7 @@ bool ChallengeData::isChallengeFulfilled() const
 bool ChallengeData::isGPFulfilled() const
 {
     int d = race_manager->getDifficulty();
-    
+
     // Note that we have to call race_manager->getNumKarts, since there
     // is no world objects to query at this stage.
     if (race_manager->getMajorMode()  != RaceManager::MAJOR_MODE_GRAND_PRIX  ||
@@ -473,14 +473,14 @@ bool ChallengeData::isGPFulfilled() const
 
     // check if the player came first.
     const int rank = race_manager->getLocalPlayerGPRank(0);
-    
+
     if (rank != 0) return false;
 
     return true;
 }   // isGPFulfilled
 
 // ----------------------------------------------------------------------------
-const irr::core::stringw 
+const irr::core::stringw
                    ChallengeData::UnlockableFeature::getUnlockedMessage() const
 {
     switch (m_type)
@@ -488,11 +488,11 @@ const irr::core::stringw
         case UNLOCK_TRACK:
         {    // {} avoids compiler warning
             const Track* track = track_manager->getTrack(m_name);
-            
+
             // shouldn't happen but let's avoid crashes as much as possible...
             if (track == NULL) return irr::core::stringw( L"????" );
-            
-            return _("New track '%s' now available", 
+
+            return _("New track '%s' now available",
                      core::stringw(track->getName()));
             break;
         }
@@ -503,10 +503,10 @@ const irr::core::stringw
         case UNLOCK_GP:
         {
             const GrandPrixData* gp = grand_prix_manager->getGrandPrix(m_name);
-            
+
             // shouldn't happen but let's avoid crashes as much as possible...
             if (gp == NULL) return irr::core::stringw( L"????" );
-            
+
             const irr::core::stringw& gp_user_name = gp->getName();
             return _("New Grand Prix '%s' now available", gp_user_name);
         }
@@ -516,13 +516,13 @@ const irr::core::stringw
         }
         case UNLOCK_KART:
         {
-            const KartProperties* kp = 
+            const KartProperties* kp =
             kart_properties_manager->getKart(m_name);
-            
+
             // shouldn't happen but let's avoid crashes as much as possible...
             if (kp == NULL) return irr::core::stringw( L"????" );
-            
-            return _("New kart '%s' now available", 
+
+            return _("New kart '%s' now available",
                       core::stringw(kp->getName()));
         }
         default:
@@ -533,19 +533,19 @@ const irr::core::stringw
 
 //-----------------------------------------------------------------------------
 /** Sets that the given track will be unlocked if this challenge
- *  is unlocked. 
+ *  is unlocked.
  *  \param track_name Name of the track to unlock.
  */
 void ChallengeData::addUnlockTrackReward(const std::string &track_name)
 {
-    
+
     if (track_manager->getTrack(track_name) == NULL)
     {
         throw std::runtime_error(
             StringUtils::insertValues("Challenge refers to unknown track <%s>",
                                       track_name.c_str()));
     }
-    
+
     UnlockableFeature feature;
     feature.m_name = track_name;
     feature.m_type = UNLOCK_TRACK;
@@ -556,7 +556,7 @@ void ChallengeData::addUnlockTrackReward(const std::string &track_name)
 
 void ChallengeData::addUnlockModeReward(const std::string &internal_mode_name,
                                       const irr::core::stringw &user_mode_name)
-{    
+{
     UnlockableFeature feature;
     feature.m_name = internal_mode_name;
     feature.m_type = UNLOCK_MODE;
@@ -571,21 +571,21 @@ void ChallengeData::addUnlockGPReward(const std::string &gp_name)
     {
         throw std::runtime_error(
             StringUtils::insertValues(
-                           "Challenge refers to unknown Grand Prix <%s>", 
+                           "Challenge refers to unknown Grand Prix <%s>",
                            gp_name.c_str()));
     }
-    
+
     UnlockableFeature feature;
-    
+
     feature.m_name = gp_name.c_str();
-    
+
     feature.m_type = UNLOCK_GP;
     m_feature.push_back(feature);
 }   // addUnlockGPReward
 
 //-----------------------------------------------------------------------------
 
-void ChallengeData::addUnlockDifficultyReward(const std::string &internal_name, 
+void ChallengeData::addUnlockDifficultyReward(const std::string &internal_name,
                                            const irr::core::stringw &user_name)
 {
     UnlockableFeature feature;
@@ -596,7 +596,7 @@ void ChallengeData::addUnlockDifficultyReward(const std::string &internal_name,
 }   // addUnlockDifficultyReward
 
 //-----------------------------------------------------------------------------
-void ChallengeData::addUnlockKartReward(const std::string &internal_name, 
+void ChallengeData::addUnlockKartReward(const std::string &internal_name,
                                         const irr::core::stringw &user_name)
 {
     try
@@ -610,7 +610,7 @@ void ChallengeData::addUnlockKartReward(const std::string &internal_name,
             StringUtils::insertValues("Challenge refers to unknown kart <%s>",
                                        internal_name.c_str()));
     }
-    
+
     UnlockableFeature feature;
     feature.m_name = internal_name;
     feature.m_type = UNLOCK_KART;

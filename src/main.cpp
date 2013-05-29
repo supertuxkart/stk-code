@@ -50,14 +50,14 @@
  tracks -> animations
  physics -> animations
  }
- \enddot 
- 
+ \enddot
+
  Note that this graph is only an approximation because the real one would be
  much too complicated :)
- 
- 
+
+
  \section Modules
- 
+
  \li \ref addonsgroup :
    Handles add-ons that can be downloaded.
  \li \ref animations :
@@ -191,36 +191,36 @@
 
 void gamepadVisualisation()
 {
-    
+
     core::array<SJoystickInfo>          irrlicht_gamepads;
     irr_driver->getDevice()->activateJoysticks(irrlicht_gamepads);
 
-        
+
     struct Gamepad
     {
         s16   m_axis[SEvent::SJoystickEvent::NUMBER_OF_AXES];
         bool  m_button_state[SEvent::SJoystickEvent::NUMBER_OF_BUTTONS];
     };
-    
+
     #define GAMEPAD_COUNT 8 // const won't work
-    
+
     class EventReceiver : public IEventReceiver
     {
     public:
         Gamepad m_gamepads[GAMEPAD_COUNT];
-        
+
         EventReceiver()
         {
             for (int n=0; n<GAMEPAD_COUNT; n++)
             {
                 Gamepad& g = m_gamepads[n];
-                for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_AXES; i++) 
+                for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_AXES; i++)
                     g.m_axis[i] = 0;
                 for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; i++)
                     g.m_button_state[i] = false;
             }
         }
-        
+
         virtual bool OnEvent (const irr::SEvent &event)
         {
             switch (event.EventType)
@@ -229,27 +229,27 @@ void gamepadVisualisation()
                 {
                     const SEvent::SJoystickEvent& evt = event.JoystickEvent;
                     if (evt.Joystick >= GAMEPAD_COUNT) return true;
-                    
+
                     Gamepad& g = m_gamepads[evt.Joystick];
                     for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_AXES;i++)
                     {
                         g.m_axis[i] = evt.Axis[i];
                     }
-                    for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; 
+                    for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS;
                          i++)
                     {
                         g.m_button_state[i] = evt.IsButtonPressed(i);
                     }
                     break;
                 }
-                
+
                 case EET_KEY_INPUT_EVENT:
                 {
                     const SEvent::SKeyInput& evt = event.KeyInput;
-                    
+
                     if (evt.PressedDown)
                     {
-                        if (evt.Key == KEY_RETURN || evt.Key == KEY_ESCAPE || 
+                        if (evt.Key == KEY_RETURN || evt.Key == KEY_ESCAPE ||
                             evt.Key == KEY_SPACE)
                         {
                             exit(0);
@@ -257,7 +257,7 @@ void gamepadVisualisation()
                     }
 
                 }
-                
+
                 default:
                     // don't care about others
                     break;
@@ -265,23 +265,23 @@ void gamepadVisualisation()
             return true;
         }
     };
-    
+
     EventReceiver* events = new EventReceiver();
     irr_driver->getDevice()->setEventReceiver(events);
-    
+
     while (true)
     {
         if (!irr_driver->getDevice()->run()) break;
-        
+
         video::IVideoDriver* driver = irr_driver->getVideoDriver();
         const core::dimension2du size = driver ->getCurrentRenderTargetSize();
-        
+
         driver->beginScene(true, true, video::SColor(255,0,0,0));
-        
+
         for (int n=0; n<GAMEPAD_COUNT; n++)
         {
             Gamepad& g = events->m_gamepads[n];
-            
+
             const int MARGIN = 10;
             const int x = (n & 1 ? size.Width/2 + MARGIN : MARGIN );
             const int w = size.Width/2 - MARGIN*2;
@@ -292,41 +292,41 @@ void gamepadVisualisation()
 
             const int btn_y = y + 5;
             const int btn_x = x + 5;
-            const int BTN_SIZE = 
+            const int BTN_SIZE =
                 (w - 10)/SEvent::SJoystickEvent::NUMBER_OF_BUTTONS;
-            
+
             for (int b=0; b<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; b++)
             {
                 core::position2di pos(btn_x + b*BTN_SIZE, btn_y);
                 core::dimension2di size(BTN_SIZE, BTN_SIZE);
-                
+
                 if (g.m_button_state[b])
                 {
                     driver->draw2DRectangle (video::SColor(255,255,0,0),
                                              core::recti(pos, size));
                 }
-                
+
                 driver->draw2DRectangleOutline( core::recti(pos, size) );
             }
-                        
+
             const int axis_y = btn_y + BTN_SIZE + 5;
             const int axis_x = btn_x;
             const int axis_w = w - 10;
-            const int axis_h = (h - BTN_SIZE - 15) 
+            const int axis_h = (h - BTN_SIZE - 15)
                             / SEvent::SJoystickEvent::NUMBER_OF_AXES;
-            
+
             for (int a=0; a<SEvent::SJoystickEvent::NUMBER_OF_AXES; a++)
             {
                 const float rate = g.m_axis[a] / 32767.0f;
-                
+
                 core::position2di pos(axis_x, axis_y + a*axis_h);
                 core::dimension2di size(axis_w, axis_h);
-                
+
                 const bool deadzone = (abs(g.m_axis[a]) < DEADZONE_JOYSTICK);
-                
-                core::recti fillbar(core::position2di(axis_x + axis_w/2, 
+
+                core::recti fillbar(core::position2di(axis_x + axis_w/2,
                                                       axis_y + a*axis_h),
-                                    core::dimension2di( (int)(axis_w/2*rate), 
+                                    core::dimension2di( (int)(axis_w/2*rate),
                                                         axis_h)               );
                 fillbar.repair(); // dimension may be negative
                 driver->draw2DRectangle (deadzone ? video::SColor(255,255,0,0)
@@ -335,7 +335,7 @@ void gamepadVisualisation()
                 driver->draw2DRectangleOutline( core::recti(pos, size) );
             }
         }
-        
+
         driver->endScene();
     }
 }
@@ -360,7 +360,7 @@ void cmdLineHelp (char* invocation)
     "  -l,  --list-tracks      Show available tracks.\n"
     "  -k,  --numkarts NUM     Number of karts on the racetrack.\n"
     "       --kart NAME        Use kart number NAME (see --list-karts).\n"
-    "       --ai=a,b,...       Use the karts a, b, ... for the AI.\n" 
+    "       --ai=a,b,...       Use the karts a, b, ... for the AI.\n"
     "       --list-karts       Show available karts.\n"
     "       --laps N           Define number of laps to N.\n"
     "       --mode N           N=1 novice, N=2 driver, N=3 racer.\n"
@@ -527,14 +527,14 @@ int handleCmdLinePreliminary(int argc, char **argv)
         {
             // Check that current res is not blacklisted
             std::ostringstream o;
-            o << UserConfigParams::m_width << "x" 
+            o << UserConfigParams::m_width << "x"
               << UserConfigParams::m_height;
             std::string res = o.str();
             if (std::find(UserConfigParams::m_blacklist_res.begin(),
-                          UserConfigParams::m_blacklist_res.end(),res) 
+                          UserConfigParams::m_blacklist_res.end(),res)
                              == UserConfigParams::m_blacklist_res.end())
                 UserConfigParams::m_fullscreen = true;
-            else 
+            else
                 Log::warn("main", "Resolution %s has been blacklisted, so it "
                           "is not available!\n", res.c_str());
         }
@@ -559,14 +559,14 @@ int handleCmdLinePreliminary(int argc, char **argv)
                 std::ostringstream o;
                 o << width << "x" << height;
                 std::string res = o.str();
-                if (!UserConfigParams::m_fullscreen || 
-                    std::find(UserConfigParams::m_blacklist_res.begin(), 
-                              UserConfigParams::m_blacklist_res.end(),res) == 
+                if (!UserConfigParams::m_fullscreen ||
+                    std::find(UserConfigParams::m_blacklist_res.begin(),
+                              UserConfigParams::m_blacklist_res.end(),res) ==
                                   UserConfigParams::m_blacklist_res.end())
                 {
-                    UserConfigParams::m_prev_width = 
+                    UserConfigParams::m_prev_width =
                         UserConfigParams::m_width = width;
-                    UserConfigParams::m_prev_height = 
+                    UserConfigParams::m_prev_height =
                         UserConfigParams::m_height = height;
                     Log::verbose("main", "You choose to use %dx%d.\n",
                              (int)UserConfigParams::m_width,
@@ -584,7 +584,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
                 exit(EXIT_FAILURE);
             }
         }
-        else if (strcmp(argv[i], "--version") == 0 || 
+        else if (strcmp(argv[i], "--version") == 0 ||
                  strcmp(argv[i], "-v"       ) == 0    )
         {
             Log::info("main", "==============================");
@@ -593,12 +593,12 @@ int handleCmdLinePreliminary(int argc, char **argv)
             Log::info("main", "SuperTuxKart, SVN revision number '%s'.",
                       SVNVERSION ) ;
 #endif
-            
+
             // IRRLICHT_VERSION_SVN
             Log::info("main", "Irrlicht version %i.%i.%i (%s)",
                       IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
                       IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
-            
+
             Log::info("main", "==============================");
         }   // --verbose or -v
     }
@@ -646,22 +646,22 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_ftl_debug = true;
         }
-        else if(UserConfigParams::m_artist_debug_mode && 
+        else if(UserConfigParams::m_artist_debug_mode &&
                !strcmp(argv[i], "--camera-debug"))
         {
             UserConfigParams::m_camera_debug=1;
         }
-        else if(UserConfigParams::m_artist_debug_mode && 
+        else if(UserConfigParams::m_artist_debug_mode &&
                !strcmp(argv[i], "--physics-debug"))
         {
             UserConfigParams::m_physics_debug=1;
         }
         else if(!strcmp(argv[i], "--kartsize-debug"))
         {
-            for(unsigned int i=0; 
+            for(unsigned int i=0;
                 i<kart_properties_manager->getNumberOfKarts(); i++)
             {
-                const KartProperties *km = 
+                const KartProperties *km =
                     kart_properties_manager->getKartById(i);
                  Log::info("main", "%s:\t%swidth: %f length: %f height: %f "
                                    "mesh-buffer count %d",
@@ -674,7 +674,7 @@ int handleCmdLine(int argc, char **argv)
                           ->getMeshBufferCount());
             }
         }
-        else if(UserConfigParams::m_artist_debug_mode && 
+        else if(UserConfigParams::m_artist_debug_mode &&
                 !strcmp(argv[i], "--check-debug"))
         {
             UserConfigParams::m_check_debug=true;
@@ -747,14 +747,14 @@ int handleCmdLine(int argc, char **argv)
 
             if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
             {
-                const KartProperties *prop = 
+                const KartProperties *prop =
                     kart_properties_manager->getKart(argv[i+1]);
                 if(prop)
                 {
                     UserConfigParams::m_default_kart = argv[i+1];
-                    
-                    // if a player was added with -N, change its kart. 
-                    // Otherwise, nothing to do, kart choice will be picked 
+
+                    // if a player was added with -N, change its kart.
+                    // Otherwise, nothing to do, kart choice will be picked
                     // up upon player creation.
                     if (StateManager::get()->activePlayerCount() > 0)
                     {
@@ -830,7 +830,7 @@ int handleCmdLine(int argc, char **argv)
                 race_manager->setTrack(argv[i+1]);
                 Log::verbose("main", "You choose to start in track '%s'.",
                              argv[i+1] );
-                
+
                 Track* t = track_manager->getTrack(argv[i+1]);
                 if (t == NULL)
                 {
@@ -855,15 +855,15 @@ int handleCmdLine(int argc, char **argv)
         else if( (!strcmp(argv[i], "--gp")) && i+1<argc)
         {
             race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
-            const GrandPrixData *gp = 
+            const GrandPrixData *gp =
                 grand_prix_manager->getGrandPrix(argv[i+1]);
-            
+
             if (gp == NULL)
             {
                 Log::warn("main", "There is no GP named '%s'.", argv[i+1]);
                 return 0;
             }
-            
+
             race_manager->setGrandPrix(*gp);
             i++;
         }
@@ -912,7 +912,7 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--list-karts") )
         {
             Log::info("main", "  Available karts:");
-            for (unsigned int i = 0; 
+            for (unsigned int i = 0;
                  i < kart_properties_manager->getNumberOfKarts(); i++)
             {
                 const KartProperties* KP =
@@ -1001,7 +1001,7 @@ int handleCmdLine(int argc, char **argv)
             // is 0. So set a more useful default for demo mode.
             DemoWorld::setNumLaps(2);
             i++;
-        } 
+        }
         else if( !strcmp(argv[i], "--demo-laps") && i+1<argc)
         {
             // Note that we use a separate setting for demo mode to avoid the
@@ -1020,7 +1020,7 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( !strcmp(argv[i], "--demo-tracks") && i+1<argc)
         {
-            DemoWorld::setTracks(StringUtils::split(std::string(argv[i+1]), 
+            DemoWorld::setTracks(StringUtils::split(std::string(argv[i+1]),
                                                     ','));
             i++;
         }
@@ -1030,8 +1030,8 @@ int handleCmdLine(int argc, char **argv)
             WiimoteManager::enable();
         }
 #endif
-        // these commands are already processed in handleCmdLinePreliminary, 
-        // but repeat this just so that we don't get error messages about 
+        // these commands are already processed in handleCmdLinePreliminary,
+        // but repeat this just so that we don't get error messages about
         // unknown commands
         else if( !strcmp(argv[i], "--stk-config")&& i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--trackdir")  && i+1<argc ) { i++; }
@@ -1070,7 +1070,7 @@ int handleCmdLine(int argc, char **argv)
                                        .getUniqueID()                    );
     if(ProfileWorld::isProfileMode())
     {
-        UserConfigParams::m_sfx = false;  // Disable sound effects 
+        UserConfigParams::m_sfx = false;  // Disable sound effects
         UserConfigParams::m_music = false;// and music when profiling
     }
 
@@ -1086,7 +1086,7 @@ void initUserConfig(char *argv[])
     file_manager            = new FileManager(argv);
     user_config             = new UserConfig();     // needs file_manager
     const bool config_ok    = user_config->loadConfig();
-    
+
     if (UserConfigParams::m_language.toString() != "system")
     {
 #ifdef WIN32
@@ -1097,17 +1097,17 @@ void initUserConfig(char *argv[])
         setenv("LANGUAGE", UserConfigParams::m_language.c_str(), 1);
 #endif
     }
-    
+
     translations            = new Translations();   // needs file_manager
     stk_config              = new STKConfig();      // in case of --stk-config
                                                     // command line parameters
-    
+
     if (!config_ok || UserConfigParams::m_all_players.size() == 0)
     {
         user_config->addDefaultPlayer();
         user_config->saveConfig();
     }
-    
+
 }   // initUserConfig
 
 //=============================================================================
@@ -1117,17 +1117,17 @@ void initRest()
 
     // Now create the actual non-null device in the irrlicht driver
     irr_driver->initDevice();
-    
+
     // Init GUI
     IrrlichtDevice* device = irr_driver->getDevice();
     video::IVideoDriver* driver = device->getVideoDriver();
-    
+
     if (UserConfigParams::m_gamepad_visualisation)
     {
         gamepadVisualisation();
         exit(0);
     }
-    
+
     GUIEngine::init(device, driver, StateManager::get());
 
     // This only initialises the non-network part of the addons manager. The
@@ -1135,7 +1135,7 @@ void initRest()
     // separate thread running in network http.
     news_manager            = new NewsManager();
     addons_manager          = new AddonsManager();
-    
+
     INetworkHttp::create();
 
     // Note that the network thread must be started after the assignment
@@ -1191,7 +1191,7 @@ void initRest()
 void cleanSuperTuxKart()
 {
     irr_driver->updateConfigIfRelevant();
-    
+
     if(INetworkHttp::get())
         INetworkHttp::get()->stopNetworkThread();
     //delete in reverse order of what they were created in.
@@ -1207,7 +1207,7 @@ void cleanSuperTuxKart()
     if(highscore_manager)       delete highscore_manager;
     if(attachment_manager)      delete attachment_manager;
     ItemManager::removeTextures();
-    if(powerup_manager)         delete powerup_manager;   
+    if(powerup_manager)         delete powerup_manager;
     if(projectile_manager)      delete projectile_manager;
     if(kart_properties_manager) delete kart_properties_manager;
     if(track_manager)           delete track_manager;
@@ -1236,7 +1236,7 @@ void cleanSuperTuxKart()
     if(translations)            delete translations;
     if(file_manager)            delete file_manager;
     if(irr_driver)              delete irr_driver;
-    
+
     StateManager::deallocate();
     GUIEngine::EventHandler::deallocate();
 }   // cleanSuperTuxKart
@@ -1248,7 +1248,7 @@ bool ShowDumpResults(const wchar_t* dump_path,
                      void* context,
                      EXCEPTION_POINTERS* exinfo,
                      MDRawAssertionInfo* assertion,
-                     bool succeeded) 
+                     bool succeeded)
 {
     wprintf(L"Path: %s id %s.\n", dump_path, minidump_id);
     return succeeded;
@@ -1314,10 +1314,10 @@ int main(int argc, char *argv[] )
         projectile_manager      -> loadData        ();
 
         // Both item_manager and powerup_manager load models and therefore
-        // textures from the model directory. To avoid reading the 
+        // textures from the model directory. To avoid reading the
         // materials.xml twice, we do this here once for both:
         file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
-        const std::string materials_file = 
+        const std::string materials_file =
             file_manager->getModelFile("materials.xml");
         if(materials_file!="")
         {
@@ -1356,7 +1356,7 @@ int main(int argc, char *argv[] )
                 addons_manager->initOnline(xml);
             }
         }
-        
+
         if(!UserConfigParams::m_no_start_screen)
         {
             StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
@@ -1370,20 +1370,20 @@ int main(int argc, char *argv[] )
             if(UserConfigParams::m_internet_status ==
                 INetworkHttp::IPERM_NOT_ASKED)
             {
-                class ConfirmServer : 
+                class ConfirmServer :
                       public MessageDialog::IConfirmDialogListener
                 {
                 public:
                     virtual void onConfirm()
                     {
                         INetworkHttp::destroy();
-                        UserConfigParams::m_internet_status = 
+                        UserConfigParams::m_internet_status =
                             INetworkHttp::IPERM_ALLOWED;
                         GUIEngine::ModalDialog::dismiss();
                         INetworkHttp::create();
                         // Note that the network thread must be started after
-                        // the assignment to network_http (since the thread 
-                        // might use network_http, otherwise a race condition 
+                        // the assignment to network_http (since the thread
+                        // might use network_http, otherwise a race condition
                         // can be introduced resulting in a crash).
                         INetworkHttp::get()->startNetworkThread();
 
@@ -1410,7 +1410,7 @@ int main(int argc, char *argv[] )
                     new ConfirmServer(), true);
             }
         }
-        else 
+        else
         {
             InputDevice *device;
 
@@ -1418,9 +1418,9 @@ int main(int argc, char *argv[] )
             device = input_manager->getDeviceList()->getKeyboard(0);
 
             // Create player and associate player with keyboard
-            StateManager::get()->createActivePlayer( 
+            StateManager::get()->createActivePlayer(
                     UserConfigParams::m_all_players.get(0), device );
-            
+
             if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
             {
                 Log::warn("main", "Kart '%s' is unknown so will use the "
@@ -1433,7 +1433,7 @@ int main(int argc, char *argv[] )
                 // Set up race manager appropriately
                 race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
             }
-            
+
             // ASSIGN should make sure that only input from assigned devices
             // is read.
             input_manager->getDeviceList()->setAssignMode(ASSIGN);
@@ -1444,7 +1444,7 @@ int main(int argc, char *argv[] )
 
 
         // If an important news message exists it is shown in a popup dialog.
-        const core::stringw important_message = 
+        const core::stringw important_message =
                                            news_manager->getImportantMessage();
         if(important_message!="")
         {
@@ -1522,12 +1522,12 @@ int main(int argc, char *argv[] )
         if (UserConfigParams::m_crashed) UserConfigParams::m_crashed = false;
         user_config->saveConfig();
     }
-    
+
 #ifdef ENABLE_WIIUSE
     if(wiimote_manager)
         delete wiimote_manager;
 #endif
-    
+
     if(input_manager) delete input_manager; // if early crash avoid delete NULL
 
     cleanSuperTuxKart();
@@ -1535,7 +1535,7 @@ int main(int argc, char *argv[] )
 #ifdef DEBUG
     MemoryLeaks::checkForLeaks();
 #endif
-    
+
     return 0 ;
 }
 

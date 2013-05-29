@@ -22,7 +22,7 @@
 #include <vector>
 
 namespace tinygettext {
-
+
 struct LanguageSpec {
   /** Language code: "de", "en", ... */
   const char* language;
@@ -36,7 +36,7 @@ struct LanguageSpec {
   /** Language name: "German", "English", "French", ... */
   const char* name;
 };
-
+
 /** Language Definitions */
 //*{
 LanguageSpec languages[] = {
@@ -282,7 +282,7 @@ LanguageSpec languages[] = {
   { NULL, 0,    0, NULL                          }
 };
 //*}
-
+
 std::string
 resolve_language_alias(const std::string& name)
 {
@@ -351,7 +351,7 @@ resolve_language_alias(const std::string& name)
     name_lowercase[i] = static_cast<char>(tolower(name[i]));
 
   Aliases::iterator i = language_aliases.find(name_lowercase);
-  if (i != language_aliases.end()) 
+  if (i != language_aliases.end())
   {
     return i->second;
   }
@@ -360,7 +360,7 @@ resolve_language_alias(const std::string& name)
     return name;
   }
 }
-
+
 Language
 Language::from_spec(const std::string& language, const std::string& country, const std::string& modifier)
 {
@@ -371,7 +371,7 @@ Language::from_spec(const std::string& language, const std::string& country, con
     for(int i = 0; languages[i].language != NULL; ++i)
       language_map[languages[i].language].push_back(&languages[i]);
   }
-  
+
   std::map<std::string, std::vector<LanguageSpec*> >::iterator i = language_map.find(language);
   if (i != language_map.end())
   {
@@ -382,7 +382,7 @@ Language::from_spec(const std::string& language, const std::string& country, con
     tmpspec.country  = country.c_str();
     tmpspec.modifier = modifier.c_str();
     Language tmplang(&tmpspec);
-      
+
     LanguageSpec* best_match = 0;
     int best_match_score = 0;
     for(std::vector<LanguageSpec*>::iterator j = lst.begin(); j != lst.end(); ++j)
@@ -444,7 +444,7 @@ Language::from_env(const std::string& env)
 
   return from_spec(language, country, modifier);
 }
-
+
 Language::Language(LanguageSpec* language_spec_)
   : language_spec(language_spec_)
 {
@@ -470,7 +470,7 @@ Language::match(const Language& lhs, const Language& rhs)
       { 7, 6, 3 }, // country wildcard
       { 4, 2, 1 }, // country miss
     };
-  
+
     int c;
     if (lhs.get_country() == rhs.get_country())
       c = 0;
@@ -478,7 +478,7 @@ Language::match(const Language& lhs, const Language& rhs)
       c = 1;
     else
       c = 2;
-  
+
     int m;
     if (lhs.get_modifier() == rhs.get_modifier())
       m = 0;
@@ -564,7 +564,7 @@ Language::operator!=(const Language& rhs)
 {
   return language_spec != rhs.language_spec;
 }
-
+
 } // namespace tinygettext
 
 /* EOF */

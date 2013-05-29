@@ -27,17 +27,17 @@
 
 
 
-Wiimote::Wiimote(wiimote_t* wiimote_handle, int wiimote_id, 
+Wiimote::Wiimote(wiimote_t* wiimote_handle, int wiimote_id,
                   GamepadConfig* gamepad_config)
 {
     m_wiimote_handle    = wiimote_handle;
     m_wiimote_id        = wiimote_id;
     resetIrrEvent();
-    
+
     m_connected = true;
-    
-    // Create the corresponding gamepad device    
-    irr::core::stringc gamepad_name = irr::core::stringc("Wiimote ") + 
+
+    // Create the corresponding gamepad device
+    irr::core::stringc gamepad_name = irr::core::stringc("Wiimote ") +
                                      StringUtils::toString(wiimote_id).c_str();
 
     gamepad_config->setPlugged();
@@ -72,7 +72,7 @@ void Wiimote::resetIrrEvent()
 }   // resetIrrEvent
 
 // -----------------------------------------------------------------------------
-/** Called from the update thread: takes the wiimote state and 
+/** Called from the update thread: takes the wiimote state and
  */
 void Wiimote::update()
 {
@@ -80,8 +80,8 @@ void Wiimote::update()
     if(UserConfigParams::m_wiimote_debug)
     {
         Log::verbose("wiimote", "pitch: %f yaw %f roll %f",
-                     m_wiimote_handle->orient.pitch, 
-                     m_wiimote_handle->orient.yaw, 
+                     m_wiimote_handle->orient.pitch,
+                     m_wiimote_handle->orient.yaw,
                      m_wiimote_handle->orient.roll);
     }
 #endif
@@ -92,7 +92,7 @@ void Wiimote::update()
     else if(normalized_angle>1.0f)
         normalized_angle = 1.0f;
 
-	// Shape the curve that determines steering depending on wiimote angle. 
+	// Shape the curve that determines steering depending on wiimote angle.
 	// The wiimote value is already normalized to be in [-1,1]. Now use a
     // weighted linear combination to compute the steering value used in game.
     float w1 = UserConfigParams::m_wiimote_weight_linear;
@@ -114,8 +114,8 @@ void Wiimote::update()
 
         irr::SEvent::SJoystickEvent &ev = m_irr_event.getData().JoystickEvent;
         ev.Axis[SEvent::SJoystickEvent::AXIS_X] =
-                 (irr::s16)(irr::core::clamp(angle, -JOYSTICK_ABS_MAX_ANGLE, 
-                                                    +JOYSTICK_ABS_MAX_ANGLE));    
+                 (irr::s16)(irr::core::clamp(angle, -JOYSTICK_ABS_MAX_ANGLE,
+                                                    +JOYSTICK_ABS_MAX_ANGLE));
         // --------------------- Wiimote buttons --------------------
         // Copy the wiimote button structure, but mask out the non-button
         // bits (4 bits of the button structure are actually bits for the
@@ -163,14 +163,14 @@ void Wiimote::printDebugInfo() const
         if(IS_PRESSED(m_wiimote_handle, wiimote_actions[i].wiimote_action_id))
         {
             Log::verbose("wiimote", "%d: pressed button %s -> button id: %d",
-                m_wiimote_id, wiimote_actions[i].wiimote_action_name, 
+                m_wiimote_id, wiimote_actions[i].wiimote_action_name,
                 i);
         }
     }   // for i < count
 }   // printDebugInfo
 
 // ----------------------------------------------------------------------------
-/** Thread-safe reading of the last updated event 
+/** Thread-safe reading of the last updated event
  */
 irr::SEvent Wiimote::getIrrEvent()
 {

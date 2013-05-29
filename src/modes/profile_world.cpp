@@ -39,7 +39,7 @@ bool  ProfileWorld::m_no_graphics = false;
 ProfileWorld::ProfileWorld()
 {
     race_manager->setNumLocalPlayers(0);
-    // Set number of laps so that the end of the race can be detected by 
+    // Set number of laps so that the end of the race can be detected by
     // quering the number of finished karts from the race manager (in laps
     // based profiling) - in case of time based profiling, the number of
     // laps is set to 99999.
@@ -50,7 +50,7 @@ ProfileWorld::ProfileWorld()
     m_num_triangles    = 0;
     m_num_culls        = 0;
     m_num_solid        = 0;
-    m_num_transparent  = 0; 
+    m_num_transparent  = 0;
     m_num_trans_effect = 0;
     m_num_calls        = 0;
 }   // ProfileWorld
@@ -100,14 +100,14 @@ void ProfileWorld::setProfileModeLaps(int laps)
  *         this player globally (i.e. including network players).
  *  \param init_pos The start XYZ coordinates.
  */
-AbstractKart *ProfileWorld::createKart(const std::string &kart_ident, int index, 
+AbstractKart *ProfileWorld::createKart(const std::string &kart_ident, int index,
                                        int local_player_id, int global_player_id,
                                        RaceManager::KartType type)
 {
     btTransform init_pos   = m_track->getStartTransform(index);
 
-    Kart *new_kart         = new KartWithStats(kart_ident, 
-                                               /*world kart id*/ index, 
+    Kart *new_kart         = new KartWithStats(kart_ident,
+                                               /*world kart id*/ index,
                                                /*position*/ index+1,
                                                init_pos);
     new_kart->init(RaceManager::KT_AI);
@@ -153,7 +153,7 @@ void ProfileWorld::update(float dt)
     m_frame_count++;
     video::IVideoDriver *driver = irr_driver->getVideoDriver();
     io::IAttributes   *attr = irr_driver->getSceneManager()->getParameters();
-    m_num_triangles    += (int)(driver->getPrimitiveCountDrawn( 0 ) 
+    m_num_triangles    += (int)(driver->getPrimitiveCountDrawn( 0 )
                         * ( 1.f / 1000.f ));
     m_num_calls        += attr->getAttributeAsInt("calls");
     m_num_culls        += attr->getAttributeAsInt("culled" );
@@ -190,11 +190,11 @@ void ProfileWorld::enterRaceOverState()
     for (unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
     {
         // ---------- update rank ------
-        if (m_karts[i]->hasFinishedRace() || m_karts[i]->isEliminated()) 
+        if (m_karts[i]->hasFinishedRace() || m_karts[i]->isEliminated())
             continue;
         m_karts[i]->finishedRace(estimateFinishTimeForKart(m_karts[i]));
     }
-    
+
     // Print framerate statistics
     float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
     printf("Number of frames: %d time %f, Average FPS: %f\n",
@@ -231,20 +231,20 @@ void ProfileWorld::enterRaceOverState()
         max_t = std::max(max_t, kart->getFinishTime());
         min_t = std::min(min_t, kart->getFinishTime());
         av_t += kart->getFinishTime();
-        printf("%s %s,", kart->getIdent().c_str(), 
+        printf("%s %s,", kart->getIdent().c_str(),
                 kart->getController()->getControllerName().c_str());
         all_groups.insert(kart->getController()->getControllerName());
         printf("%d,%d,%4.2f,", 1 + (int)i, kart->getPosition(), kart->getFinishTime());
-        float distance = (float)(m_profile_mode==PROFILE_LAPS 
+        float distance = (float)(m_profile_mode==PROFILE_LAPS
                                  ? race_manager->getNumLaps() : 1);
         distance *= m_track->getTrackLength();
-        printf("%4.2f,%3.2f,%4.2f,%4.2f,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d,%d\n", 
+        printf("%4.2f,%3.2f,%4.2f,%4.2f,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d,%d\n",
                distance/kart->getFinishTime(), kart->getTopSpeed(),
                kart->getSkiddingTime(), kart->getRescueTime(),
-               kart->getRescueCount(), kart->getBrakeCount(), 
+               kart->getRescueCount(), kart->getBrakeCount(),
                kart->getExplosionTime(), kart->getExplosionCount(),
-               kart->getBonusCount(), kart->getBananaCount(), 
-               kart->getSmallNitroCount(), kart->getLargeNitroCount(), 
+               kart->getBonusCount(), kart->getBananaCount(),
+               kart->getSmallNitroCount(), kart->getLargeNitroCount(),
                kart->getBubblegumCount(), kart->getOffTrackCount() );
     }
 
@@ -285,21 +285,21 @@ void ProfileWorld::enterRaceOverState()
             for(unsigned int j=name.size(); j<max_len; j++)
                 printf(" ");
 
-            printf("%4d %3d %6.2f ", 1 + i, kart->getPosition(), 
+            printf("%4d %3d %6.2f ", 1 + i, kart->getPosition(),
                                      kart->getFinishTime());
             position_gain += 1+i - kart->getPosition();
 
-            float distance = (float)(m_profile_mode==PROFILE_LAPS 
+            float distance = (float)(m_profile_mode==PROFILE_LAPS
                                      ? race_manager->getNumLaps() : 1);
             distance *= m_track->getTrackLength();
             printf(" %4.2f %3.2f %6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d\n",
-                   distance/kart->getFinishTime(), 
+                   distance/kart->getFinishTime(),
                    kart->getTopSpeed(),
                    kart->getSkiddingTime(),        kart->getRescueTime(),
                    kart->getRescueCount(),         kart->getBrakeCount(),
                    kart->getExplosionTime(),       kart->getExplosionCount(),
                    kart->getBonusCount(),          kart->getBananaCount(),
-                   kart->getSmallNitroCount(),     kart->getLargeNitroCount(), 
+                   kart->getSmallNitroCount(),     kart->getLargeNitroCount(),
                    kart->getBubblegumCount(),      kart->getOffTrackCount()
                    );
             printf("nitro %f\n", kart->getEnergy());
@@ -325,8 +325,8 @@ void ProfileWorld::enterRaceOverState()
         printf("%+4d     %6.2f %13s", position_gain, av_time/count, "");
 
         printf("%6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d\n\n",
-               skidding_time/count, rescue_time/count, rescue_count, 
-               brake_count, expl_time, expl_count, bonus_count, 
+               skidding_time/count, rescue_time/count, rescue_count,
+               brake_count, expl_time, expl_count, bonus_count,
                banana_count, s_nitro_count, l_nitro_count, bubble_count,
                off_track_count);
     }   // for it !=all_groups.end

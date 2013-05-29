@@ -24,9 +24,9 @@
 Request::Request(HttpCommands command, int priority, bool manage_memory)
        : m_progress(0)
 {
-    m_command       = command; 
+    m_command       = command;
     m_priority      = priority;
-    m_url           = ""; 
+    m_url           = "";
     m_full_path     = "";
     m_manage_memory = manage_memory;
     m_icon_addon    = NULL;

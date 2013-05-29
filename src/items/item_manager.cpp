@@ -79,7 +79,7 @@ void ItemManager::loadDefaultItemMeshes()
     item_names[Item::ITEM_TRIGGER    ] = "trigger";
     item_names[Item::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
     item_names[Item::ITEM_EASTER_EGG ] = "easter-egg";
-    
+
     const std::string file_name = file_manager->getDataFile("items.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
     for(unsigned int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
@@ -90,15 +90,15 @@ void ItemManager::loadDefaultItemMeshes()
 
         std::string model_filename;
         node->get("model", &model_filename);
-    
-        scene::IMesh *mesh = irr_driver->getAnimatedMesh(model_filename);        
+
+        scene::IMesh *mesh = irr_driver->getAnimatedMesh(model_filename);
         if(!node || model_filename.size()==0 || !mesh)
         {
             fprintf(stderr, "Item model '%s' in items.xml could not be loaded "
                             "- aborting", name.c_str());
             exit(-1);
         }
-        mesh->grab();        
+        mesh->grab();
         m_item_mesh[i]            = mesh;
 
         std::string lowres_model_filename;
@@ -180,7 +180,7 @@ void ItemManager::setSwitchItems(const std::vector<int> &switch_items)
 /** Destructor. Cleans up all items and meshes stored.
  */
 ItemManager::~ItemManager()
-{    
+{
     if(m_items_in_quads)
         delete m_items_in_quads;
     for(AllItemTypes::iterator i =m_all_items.begin();
@@ -195,7 +195,7 @@ ItemManager::~ItemManager()
 
 //-----------------------------------------------------------------------------
 /** Inserts the new item into the items management data structures, if possible
- *  reusing an existing, unused entry (e.g. due to a removed bubble gum). Then 
+ *  reusing an existing, unused entry (e.g. due to a removed bubble gum). Then
  *  the item is also added to the quad-wise list of items.
  */
 void ItemManager::insertItem(Item *item)
@@ -204,7 +204,7 @@ void ItemManager::insertItem(Item *item)
     // previously deleted entry, otherwise at the end.
     int index = -1;
     for(index=m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
-    
+
     if(index==-1) index = m_all_items.size();
 
     if(index<(int)m_all_items.size())
@@ -237,7 +237,7 @@ void ItemManager::insertItem(Item *item)
  *  \param parent In case of a dropped item used to avoid that a kart
  *         is affected by its own items.
  */
-Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz, 
+Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
                            const Vec3 &normal, AbstractKart *parent)
 {
     Item::ItemType mesh_type = type;
@@ -245,8 +245,8 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
     {
         mesh_type = Item::ITEM_BUBBLEGUM_NOLOK;
     }
-    
-    Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type], 
+
+    Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
                           m_item_lowres_mesh[mesh_type]);
 
     insertItem(item);
@@ -254,7 +254,7 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
     if(m_switch_time>=0)
     {
         Item::ItemType new_type = m_switch_to[item->getType()];
-        item->switchTo(new_type, m_item_mesh[(int)new_type], 
+        item->switchTo(new_type, m_item_mesh[(int)new_type],
                        m_item_lowres_mesh[(int)new_type]);
     }
     return item;
@@ -264,7 +264,7 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
 /** Creates a new trigger item.
  *  \param xyz  Position of the item.
  */
-Item* ItemManager::newItem(const Vec3& xyz, float distance, 
+Item* ItemManager::newItem(const Vec3& xyz, float distance,
                            TriggerItemListener* listener)
 {
     Item* item;
@@ -276,7 +276,7 @@ Item* ItemManager::newItem(const Vec3& xyz, float distance,
 
 //-----------------------------------------------------------------------------
 /** Set an item as collected.
- *  This function is called on the server when an item is collected, or on 
+ *  This function is called on the server when an item is collected, or on
  *  the client upon receiving information about collected items.             */
 void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
 {
@@ -288,19 +288,19 @@ void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
 //-----------------------------------------------------------------------------
 /** Checks if any item was collected by the given kart. This function calls
  *  collectedItem if an item was collected.
- *  \param kart Pointer to the kart. 
+ *  \param kart Pointer to the kart.
  */
 void  ItemManager::checkItemHit(AbstractKart* kart)
 {
     // Only do this on the server
     if(network_manager->getMode()==NetworkManager::NW_CLIENT) return;
-    
+
     // We could use m_items_in_quads to to check for item hits: take the quad
     // of the graph node of the kart, and only check items in that quad. But
     // then we also need to check for any adjacent quads (since an item just
     // on the order of one quad might get hit from an adjacent quad). Then
     // it is possible that a quad is that short that we need to test adjacent
-    // of adjacent quads. And check for items outside of the track. 
+    // of adjacent quads. And check for items outside of the track.
     // Since at this stace item detection is by far not a bottle neck,
     // the original, simple and stable algorithm is left in place.
 
@@ -326,7 +326,7 @@ void ItemManager::reset()
     // If items are switched, switch them back first.
     if(m_switch_time>=0)
     {
-        for(AllItemTypes::iterator i =m_all_items.begin(); 
+        for(AllItemTypes::iterator i =m_all_items.begin();
                                    i!=m_all_items.end(); i++)
         {
             if(*i) (*i)->switchBack();
@@ -341,7 +341,7 @@ void ItemManager::reset()
     AllItemTypes::iterator i=m_all_items.begin();
     while(i!=m_all_items.end())
     {
-        if(!*i) 
+        if(!*i)
         {
             i++;
             continue;
@@ -376,7 +376,7 @@ void ItemManager::update(float dt)
         {
             for(AllItemTypes::iterator i =m_all_items.begin();
                 i!=m_all_items.end();  i++)
-            {   
+            {
                 if(*i) (*i)->switchBack();
             }   // for m_all_items
         }   // m_switch_time < 0
@@ -433,7 +433,7 @@ void ItemManager::switchItems()
         i!=m_all_items.end();  i++)
     {
         if(!*i) continue;
-        
+
         if ((*i)->getType() == Item::ITEM_BUBBLEGUM || (*i)->getType() == Item::ITEM_BUBBLEGUM_NOLOK)
         {
             if (race_manager->getAISuperPower() == RaceManager::SUPERPOWER_NOLOK_BOSS)
@@ -441,7 +441,7 @@ void ItemManager::switchItems()
                 continue;
             }
         }
-        
+
         Item::ItemType new_type = m_switch_to[(*i)->getType()];
 
         if(m_switch_time<0)

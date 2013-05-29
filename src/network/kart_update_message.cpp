@@ -27,7 +27,7 @@ KartUpdateMessage::KartUpdateMessage()
     World *world = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
 
-    // Send the number of karts and for each kart the compressed 
+    // Send the number of karts and for each kart the compressed
     // control structure (3 ints) and xyz,hpr (4 floats: quaternion:
     allocate(getCharLength()+
              num_karts*(KartControl::getLength() + getVec3Length()

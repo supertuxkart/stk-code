@@ -39,23 +39,23 @@ void CheckBoxWidget::add()
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     //stringw& message = m_text;
     //m_element = GUIEngine::getGUIEnv()->addCheckBox(true /* checked */, widget_size, NULL, ++id_counter, message.c_str());
-    
+
     m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), L"");
     m_id = m_element->getID();
     m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
 }
 // -----------------------------------------------------------------------------
-EventPropagation CheckBoxWidget::transmitEvent(Widget* w, 
-                                               const std::string& originator, 
+EventPropagation CheckBoxWidget::transmitEvent(Widget* w,
+                                               const std::string& originator,
                                                const int playerID)
 {
     assert(m_magic_number == 0xCAFEC001);
 
-    
+
     /* toggle */
     m_state = !m_state;
-    
+
     /* notify main event handler */
     return EVENT_LET;
 }

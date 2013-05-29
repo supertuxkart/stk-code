@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Joerg Henrichs 
+//  Copyright (C) 2011 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -80,7 +80,7 @@ void Referee::init()
     MeshTools::minMax3D(m_st_referee_mesh, &min, &max);
     Vec3 offset_from_center = -0.5f*(max+min);
     offset_from_center.setY(0);
-    scene::IMeshManipulator *mani = 
+    scene::IMeshManipulator *mani =
         irr_driver->getVideoDriver()->getMeshManipulator();
 
     core::matrix4 translate(core::matrix4::EM4CONST_IDENTITY);
@@ -94,7 +94,7 @@ void Referee::init()
     node->get("scale",              &m_st_scale             );
     node->get("start-rotation",     &m_st_start_rotation    );
 
-    float angle_to_kart = atan2(m_st_start_offset.getX(), 
+    float angle_to_kart = atan2(m_st_start_offset.getX(),
                                 m_st_start_offset.getZ())
                         * RAD_TO_DEGREE;
     m_st_start_rotation.setY(m_st_start_rotation.getY()+angle_to_kart);
@@ -141,7 +141,7 @@ void Referee::init()
         {
             irrMaterial.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
         }
-        
+
     }
 
     delete node;
@@ -175,7 +175,7 @@ Referee::Referee()
     m_scene_node->grab();
     m_scene_node->setRotation(m_st_start_rotation.toIrrVector());
     m_scene_node->setScale(m_st_scale.toIrrVector());
-    m_scene_node->setFrameLoop(m_st_first_start_frame, 
+    m_scene_node->setFrameLoop(m_st_first_start_frame,
                                m_st_last_start_frame);
 }   // Referee
 
@@ -199,7 +199,7 @@ Referee::Referee(const AbstractKart &kart)
     m_scene_node->grab();
     m_scene_node->setScale(m_st_scale.toIrrVector());
     m_scene_node->setPosition(core::vector3df(0, kart.getKartHeight() + 0.4f, 0));
-    m_scene_node->setFrameLoop(m_st_first_rescue_frame, 
+    m_scene_node->setFrameLoop(m_st_first_rescue_frame,
                                m_st_last_rescue_frame);
 }   // Referee
 
@@ -244,7 +244,7 @@ void Referee::selectReadySetGo(int rsg)
     if(m_st_traffic_buffer<0) return;
     video::SMaterial &m = m_scene_node->getMesh()->getMeshBuffer(m_st_traffic_buffer)->getMaterial();
     m.setTexture(0, m_st_traffic_lights[rsg]);
-    
+
     // disable lighting, we need to see the traffic light even if facing away
     // from the sun
     m.AmbientColor  = video::SColor(255, 255, 255, 255);

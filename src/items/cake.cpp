@@ -47,7 +47,7 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
     m_speed *= kart->getSpeed() / 23.0f;
 
     //when going backwards, decrease speed of cake by less
-    if (kart->getSpeed() < 0) m_speed /= 3.6f; 
+    if (kart->getSpeed() < 0) m_speed /= 3.6f;
 
     m_speed += 16.0f;
 
@@ -63,7 +63,7 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
     const AbstractKart *closest_kart=NULL;
     Vec3        direction;
     float       kart_dist_squared;
-    getClosestKart(&closest_kart, &kart_dist_squared, &direction, 
+    getClosestKart(&closest_kart, &kart_dist_squared, &direction,
                    kart /* search in front of this kart */, backwards);
 
     // aim at this kart if 1) it's not too far, 2) if the aimed kart's speed
@@ -84,11 +84,11 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 
         // apply transformation to the bullet object (without pitch)
         trans.setRotation(btQuaternion(btVector3(0,1,0), fire_angle));
-        
+
         m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
 
         createPhysics(forward_offset, m_initial_velocity,
-                      new btCylinderShape(0.5f*m_extend), 
+                      new btCylinderShape(0.5f*m_extend),
                       0.5f /* restitution */, -m_gravity,
                       true /* rotation */, false /* backwards */, &trans);
     }
@@ -98,11 +98,11 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
         // kart is too far to be hit. so throw the projectile in a generic way,
         // straight ahead, without trying to hit anything in particular
         trans = kart->getAlignedTransform(pitch);
-        
+
         m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
 
         createPhysics(forward_offset, m_initial_velocity,
-                      new btCylinderShape(0.5f*m_extend), 
+                      new btCylinderShape(0.5f*m_extend),
                       0.5f /* restitution */, -m_gravity,
                       true /* rotation */, backwards, &trans);
     }
@@ -157,11 +157,11 @@ const core::stringw Cake::getHitString(const AbstractKart *kart) const
     }
 }   // getHitString
 // ----------------------------------------------------------------------------
-/** Callback from the physics in case that a kart or physical object is hit. 
+/** Callback from the physics in case that a kart or physical object is hit.
  *  The cake triggers an explosion when hit.
  *  \param kart The kart hit (NULL if no kart was hit).
  *  \param object The object that was hit (NULL if none).
- *  \returns True if there was actually a hit (i.e. not owner, and target is 
+ *  \returns True if there was actually a hit (i.e. not owner, and target is
  *           not immune), false otherwise.
  */
 bool Cake::hit(AbstractKart* kart, PhysicalObject* obj)

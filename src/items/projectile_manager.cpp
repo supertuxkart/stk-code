@@ -51,7 +51,7 @@ void ProjectileManager::cleanup()
     {
         delete *i;
     }
-    
+
     m_active_projectiles.clear();
     for(HitEffects::iterator i  = m_active_hit_effects.begin();
         i != m_active_hit_effects.end(); ++i)
@@ -113,7 +113,7 @@ void ProjectileManager::updateServer(float dt)
         if(network_manager->getMode()!=NetworkManager::NW_NONE)
         {
             race_state->setFlyableInfo(p-m_active_projectiles.begin(),
-                                       FlyableInfo((*p)->getXYZ(), 
+                                       FlyableInfo((*p)->getXYZ(),
                                                    (*p)->getRotation(),
                                                    can_be_deleted)     );
         }
@@ -149,7 +149,7 @@ void ProjectileManager::updateClient(float dt)
     {
         const FlyableInfo &f = race_state->getFlyable(indx);
         (*i)->updateFromServer(f, dt);
-        if(f.m_exploded) 
+        if(f.m_exploded)
         {
             (*i)->hit(NULL);
         }
@@ -161,12 +161,12 @@ Flyable *ProjectileManager::newProjectile(AbstractKart *kart, Track* track,
                                           PowerupManager::PowerupType type)
 {
     Flyable *f;
-    switch(type) 
+    switch(type)
     {
         case PowerupManager::POWERUP_BOWLING:    f = new Bowling(kart);  break;
         case PowerupManager::POWERUP_PLUNGER:    f = new Plunger(kart);  break;
         case PowerupManager::POWERUP_CAKE:       f = new Cake(kart);     break;
-        case PowerupManager::POWERUP_RUBBERBALL: f = new RubberBall(kart); 
+        case PowerupManager::POWERUP_RUBBERBALL: f = new RubberBall(kart);
                                                                          break;
         default:              return NULL;
     }

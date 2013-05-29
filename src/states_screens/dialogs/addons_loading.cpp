@@ -31,7 +31,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
-#include "states_screens/state_manager.hpp" 
+#include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -50,18 +50,18 @@ AddonsLoading::AddonsLoading(const float w, const float h,
     m_addon            = *(addons_manager->getAddon(id));
     m_icon_shown       = false;
     m_download_request = NULL;
-    
+
     loadFromFile("addons_loading.stkgui");
-    
+
     m_icon             = getWidget<IconButtonWidget> ("icon"    );
     m_progress         = getWidget<ProgressBarWidget>("progress");
     m_install_button   = getWidget<IconButtonWidget> ("install" );
     m_back_button      = getWidget<IconButtonWidget> ("back"  );
-    m_back_button->setFocusForPlayer( PLAYER_ID_GAME_MASTER ); 
+    m_back_button->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
 
     if(m_progress)
         m_progress->setVisible(false);
-    
+
 }   // AddonsLoading
 
 // ----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ void AddonsLoading::beforeAddingWidgets()
     m_progress         = getWidget<ProgressBarWidget>("progress");
     m_back_button      = getWidget<IconButtonWidget> ("back"    );
 
-    
+
     RibbonWidget* r = getWidget<RibbonWidget>("actions");
 
     if (m_addon.isInstalled())
@@ -101,7 +101,7 @@ void AddonsLoading::beforeAddingWidgets()
     {
         r->removeChildNamed("uninstall");
     }
-    
+
     getWidget<LabelWidget>("name")->setText(m_addon.getName().c_str(), false);
     getWidget<BubbleWidget>("description")
         ->setText(m_addon.getDescription().c_str());
@@ -123,7 +123,7 @@ void AddonsLoading::beforeAddingWidgets()
         if (!m_addon.testStatus(Addon::AS_APPROVED))
             l.push_back("NOT APPROVED");
 
-        // Note that an approved addon should never have alpha, beta, or 
+        // Note that an approved addon should never have alpha, beta, or
         // RC status - and only one of those should be used
         if(m_addon.testStatus(Addon::AS_ALPHA))
             l.push_back("alpha");
@@ -200,7 +200,7 @@ void AddonsLoading::escapePressed()
 
 // ----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation 
+GUIEngine::EventPropagation
                     AddonsLoading::processEvent(const std::string& event_source)
 {
     if(event_source == "back")
@@ -210,7 +210,7 @@ GUIEngine::EventPropagation
         if(m_download_request)
         {
             assert(m_download_request);
-            // In case of a cancel we can't free the memory, since 
+            // In case of a cancel we can't free the memory, since
             // network_http will potentially update the request. So in
             // order to avoid a memory leak, we let network_http free
             // the request.
@@ -230,10 +230,10 @@ GUIEngine::EventPropagation
             m_progress->setVisible(true);
             // Change the 'back' button into a 'cancel' button.
             m_back_button->setLabel(_("Cancel"));
-            
+
             RibbonWidget* r = getWidget<RibbonWidget>("actions");
             r->setVisible(false);
-            
+
             startDownload();
         }
         return GUIEngine::EVENT_BLOCK;
@@ -291,7 +291,7 @@ void AddonsLoading::startDownload()
     std::string save   = "tmp/"
                        + StringUtils::getBasename(m_addon.getZipFileName());
     m_download_request = INetworkHttp::get()->downloadFileAsynchron(file, save,
-                                                       /*priority*/5, 
+                                                       /*priority*/5,
                                                        /*manage memory*/false);
 }   // startDownload
 
@@ -303,7 +303,7 @@ void AddonsLoading::doInstall()
     delete m_download_request;
     m_download_request = NULL;
     bool error=false;
-    
+
     assert(!m_addon.isInstalled() || m_addon.needsUpdate());
     error = !addons_manager->install(m_addon);
     if(error)
@@ -317,10 +317,10 @@ void AddonsLoading::doInstall()
     if(error)
     {
         m_progress->setVisible(false);
-        
+
         RibbonWidget* r = getWidget<RibbonWidget>("actions");
         r->setVisible(true);
-        
+
         m_install_button->setLabel(_("Try again"));
     }
     else
@@ -330,7 +330,7 @@ void AddonsLoading::doInstall()
         AddonsScreen::getInstance()->loadList();
         dismiss();
     }
-    
+
     track_manager->loadTrackList();
 }   // doInstall
 
@@ -353,14 +353,14 @@ void AddonsLoading::doUninstall()
                                                       core::stringw(m_addon.getName().c_str()));
         getWidget<BubbleWidget>("description")->setText(msg.c_str());
     }
-    
+
     if(error)
     {
         m_progress->setVisible(false);
-        
+
         RibbonWidget* r = getWidget<RibbonWidget>("actions");
         r->setVisible(true);
-        
+
         m_install_button->setLabel(_("Try again"));
     }
     else

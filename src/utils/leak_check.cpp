@@ -6,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License along
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -40,24 +40,24 @@
 
 namespace MemoryLeaks
 {
-    /** A set with all currently allocated objects. */ 
+    /** A set with all currently allocated objects. */
     Synchronised< std::set<AllocatedObject*> > g_all_objects;
-    
+
     // ------------------------------------------------------------------------
     AllocatedObject::AllocatedObject()
-    {        
-#if (GET_STACK_TRACE == 1) && defined(__APPLE__)    
+    {
+#if (GET_STACK_TRACE == 1) && defined(__APPLE__)
         const int max_size = 32;
         void* callstack[max_size];
         m_stack_size = backtrace(callstack, max_size);
-        
+
         m_stack = backtrace_symbols(callstack, m_stack_size);
 #else
         m_stack = NULL;
 #endif
         addObject(this);
     }   // AllocatedObject
-    
+
     // ------------------------------------------------------------------------
     AllocatedObject::~AllocatedObject()
     {
@@ -69,7 +69,7 @@ namespace MemoryLeaks
     void AllocatedObject::print() const
     {
         //m_object->print();
-        
+
         if (m_stack == NULL)
         {
             printf("    (No stack information available)\n");
@@ -81,9 +81,9 @@ namespace MemoryLeaks
                 printf("    %s\n", m_stack[i]);
             }
         }
-        
+
     }   // print
-    
+
     // ========================================================================
     /** Adds an object to the sets of all allocated objects. */
     void addObject(AllocatedObject* obj)
@@ -102,12 +102,12 @@ namespace MemoryLeaks
         g_all_objects.unlock();
         //delete obj;
     }   // removeObject
-    
+
     // ------------------------------------------------------------------------
     /** Checks if any objects are still allocated, and if so print information
      *  about those objects. */
     void checkForLeaks()
-    {   
+    {
         Log::debug("LeackCheck", "checking for leaks... ");
         g_all_objects.lock();
         if (g_all_objects.getData().size()>0)
@@ -123,16 +123,16 @@ namespace MemoryLeaks
         {
             Log::debug("LeackCheck", "ok (no watched class left leaking)");
         }
-        
+
         std::set<AllocatedObject*>::iterator it;
-        for (it  = g_all_objects.getData().begin(); 
+        for (it  = g_all_objects.getData().begin();
              it != g_all_objects.getData().end();   ++it)
         {
             (*it)->print();
         }
         g_all_objects.unlock();
     }   // checkForLeaks
-    
+
 }   // namespace MemoryLeaks
 
 #endif

@@ -52,10 +52,10 @@ MusicOggStream::~MusicOggStream()
 bool MusicOggStream::load(const std::string& filename)
 {
     if (isPlaying()) stopMusic();
-    
+
     m_error = true;
     m_fileName = filename;
-    if(m_fileName=="") return false;  
+    if(m_fileName=="") return false;
 
     m_oggFile = fopen(m_fileName.c_str(), "rb");
 
@@ -64,18 +64,18 @@ bool MusicOggStream::load(const std::string& filename)
         Log::error("MusicOgg", "Loading Music: %s failed (fopen returned NULL)\n", m_fileName.c_str());
         return false;
     }
-    
+
 #if defined( WIN32 ) || defined( WIN64 )
     const int result = ov_open_callbacks((void *)m_oggFile, &m_oggStream, NULL, 0, OV_CALLBACKS_DEFAULT);
 #else
     const int result = ov_open(m_oggFile, &m_oggStream, NULL, 0);
 #endif
-    
+
     if (result < 0)
     {
         fclose(m_oggFile);
-        
-        
+
+
         const char* errorMessage;
         switch (result)
         {
@@ -97,12 +97,12 @@ bool MusicOggStream::load(const std::string& filename)
             default:
                 errorMessage = "Unknown Error";
         }
-        
+
         Log::error("MusicOgg", "Loading Music: %s failed : ov_open returned error code %i (%s)\n",
                m_fileName.c_str(), result, errorMessage);
         return false;
     }
-    
+
     m_vorbisInfo = ov_info(&m_oggStream, -1);
 
     if (m_vorbisInfo->channels == 1) nb_channels = AL_FORMAT_MONO16;
@@ -153,7 +153,7 @@ bool MusicOggStream::release()
 
     pauseMusic();
     m_fileName= "";
-    
+
     empty();
     alDeleteSources(1, &m_soundSource);
     check("alDeleteSources");
@@ -165,7 +165,7 @@ bool MusicOggStream::release()
 
     m_soundSource = -1;
     m_playing = false;
-    
+
     return true;
 }   // release
 
@@ -194,10 +194,10 @@ bool MusicOggStream::playMusic()
 bool MusicOggStream::isPlaying()
 {
     return m_playing;
-    
+
     /*
     if (m_soundSource == -1) return false;
-    
+
     ALenum state;
     alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
 
@@ -231,7 +231,7 @@ bool MusicOggStream::pauseMusic()
 bool MusicOggStream::resumeMusic()
 {
     m_playing = true;
-    
+
     if (m_fileName == "")
     {
         // nothing is loaded
@@ -333,7 +333,7 @@ bool MusicOggStream::streamIntoBuffer(ALuint buffer)
 
     while(size < m_buffer_size)
     {
-        result = ov_read(&m_oggStream, pcm + size, m_buffer_size - size, 
+        result = ov_read(&m_oggStream, pcm + size, m_buffer_size - size,
                          isBigEndian, 2, 1, &portion);
 
         if(result > 0)

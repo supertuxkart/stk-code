@@ -35,7 +35,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name) :
     m_magic_number = 0xABCD1234;
 #endif
     int64_t unique_id = generateUniqueId(core::stringc(name.c_str()).c_str());
-    
+
     std::ostringstream tostring;
     tostring << std::hex << unique_id;
     m_unique_id = tostring.str();

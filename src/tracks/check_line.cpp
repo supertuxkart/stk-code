@@ -29,11 +29,11 @@
 #include <algorithm>
 #include <string>
 
-/** Constructor for a checkline. 
+/** Constructor for a checkline.
  *  \param node XML node containing the parameters for this checkline.
  *  \param index Index of this check structure in the check manager.
  */
-CheckLine::CheckLine(const XMLNode &node,  unsigned int index) 
+CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
          : CheckStructure(node, index)
 {
     // Note that when this is called the karts have not been allocated
@@ -42,7 +42,7 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
     std::string p1_string("p1");
     std::string p2_string("p2");
 
-    // In case of a cannon in a reverse track, we have to use the target line 
+    // In case of a cannon in a reverse track, we have to use the target line
     // as check line
     if(getType()==CT_CANNON && race_manager->getReverseTrack())
     {
@@ -72,27 +72,27 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
         material.setFlag(video::EMF_BACK_FACE_CULLING, false);
         material.setFlag(video::EMF_LIGHTING, false);
         material.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
-        scene::IMesh *mesh = irr_driver->createQuadMesh(&material, 
+        scene::IMesh *mesh = irr_driver->createQuadMesh(&material,
                                                         /*create mesh*/true);
         scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
         assert(buffer->getVertexType()==video::EVT_STANDARD);
-        irr::video::S3DVertex* vertices 
+        irr::video::S3DVertex* vertices
             = (video::S3DVertex*)buffer->getVertices();
-        vertices[0].Pos = core::vector3df(p1.X, 
-                                          m_min_height-m_under_min_height, 
+        vertices[0].Pos = core::vector3df(p1.X,
+                                          m_min_height-m_under_min_height,
                                           p1.Y);
-        vertices[1].Pos = core::vector3df(p2.X, 
-                                          m_min_height-m_under_min_height, 
+        vertices[1].Pos = core::vector3df(p2.X,
+                                          m_min_height-m_under_min_height,
                                           p2.Y);
-        vertices[2].Pos = core::vector3df(p2.X, 
-                                          m_min_height+m_over_min_height, 
+        vertices[2].Pos = core::vector3df(p2.X,
+                                          m_min_height+m_over_min_height,
                                           p2.Y);
-        vertices[3].Pos = core::vector3df(p1.X, 
-                                          m_min_height+m_over_min_height, 
+        vertices[3].Pos = core::vector3df(p1.X,
+                                          m_min_height+m_over_min_height,
                                           p1.Y);
         for(unsigned int i=0; i<4; i++)
         {
-            vertices[i].Color = m_active_at_reset 
+            vertices[i].Color = m_active_at_reset
                               ? video::SColor(0, 255, 0, 0)
                               : video::SColor(0, 128, 128, 128);
         }
@@ -112,7 +112,7 @@ CheckLine::~CheckLine()
 {
     if(m_debug_node)
         irr_driver->removeNode(m_debug_node);
-        
+
 }   // CheckLine
 // ----------------------------------------------------------------------------
 void CheckLine::reset(const Track &track)
@@ -132,7 +132,7 @@ void CheckLine::changeDebugColor(bool is_active)
 
     scene::IMesh *mesh         = m_debug_node->getMesh();
     scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
-    irr::video::S3DVertex* vertices 
+    irr::video::S3DVertex* vertices
                                = (video::S3DVertex*)buffer->getVertices();
     for(unsigned int i=0; i<4; i++)
     {
@@ -149,7 +149,7 @@ void CheckLine::changeDebugColor(bool is_active)
  *  \param indx     Index of the kart, can be used to store kart specific
  *                  additional data.
  */
-bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                             unsigned int indx)
 {
     core::vector2df p=new_pos.toIrrVector2d();
@@ -158,8 +158,8 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     // If the sign has changed, i.e. the infinite line was crossed somewhere,
     // check if the finite line was actually crossed:
     if(sign!=m_previous_sign[indx] &&
-        m_line.intersectWith(core::line2df(old_pos.toIrrVector2d(), 
-                                           new_pos.toIrrVector2d()), 
+        m_line.intersectWith(core::line2df(old_pos.toIrrVector2d(),
+                                           new_pos.toIrrVector2d()),
                              m_cross_point) )
     {
         // Now check the minimum height: the kart position must be within a
@@ -167,7 +167,7 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
         // between -1 and 4 units (negative numbers are unlikely, but help
         // in case that the kart is 'somewhat' inside of the track, or the
         // checklines are a bit off in Z direction.
-        result = new_pos.getY()-m_min_height<m_over_min_height   && 
+        result = new_pos.getY()-m_min_height<m_over_min_height   &&
                  new_pos.getY()-m_min_height>-m_under_min_height;
         if(UserConfigParams::m_check_debug && !result)
         {

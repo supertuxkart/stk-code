@@ -86,10 +86,10 @@ const int MIN_SUPPORTED_HEIGHT = 600;
 const int MIN_SUPPORTED_WIDTH  = 800;
 
 // ----------------------------------------------------------------------------
-/** The constructor creates the irrlicht device. It first creates a NULL 
- *  device. This is necessary to handle the Chicken/egg problem with irrlicht: 
+/** The constructor creates the irrlicht device. It first creates a NULL
+ *  device. This is necessary to handle the Chicken/egg problem with irrlicht:
  *  access to the file system is given from the device, but we can't create the
- *  device before reading the user_config file (for resolution, fullscreen). 
+ *  device before reading the user_config file (for resolution, fullscreen).
  *  So we create a dummy device here to begin with, which is then later (once
  *  the real device exists) changed in initDevice().
  */
@@ -105,17 +105,17 @@ IrrDriver::IrrDriver()
  */
 IrrDriver::~IrrDriver()
 {
-    // Note that we can not simply delete m_post_processing here: 
+    // Note that we can not simply delete m_post_processing here:
     // m_post_processing uses a material that has a reference to
-    // m_post_processing (for a callback). So when the material is 
-    // removed it will try to drop the ref count of its callback object, 
-    // which is m_post_processing, and which was already deleted. So 
-    // instead we just decrease the ref count here. When the material 
+    // m_post_processing (for a callback). So when the material is
+    // removed it will try to drop the ref count of its callback object,
+    // which is m_post_processing, and which was already deleted. So
+    // instead we just decrease the ref count here. When the material
     // is deleted, it will trigger the actual deletion of
     // PostProcessing when decreasing the refcount of its callback object.
     m_post_processing->drop();
     assert(m_device != NULL);
-    
+
     m_device->drop();
     m_device = NULL;
     m_modes.clear();
@@ -169,7 +169,7 @@ X11::Window get_toplevel_parent(X11::Display* display, X11::Window window)
 
 void IrrDriver::updateConfigIfRelevant()
 {
-        if (!UserConfigParams::m_fullscreen && 
+        if (!UserConfigParams::m_fullscreen &&
              UserConfigParams::m_remember_window_location)
     {
 #ifdef WIN32
@@ -184,14 +184,14 @@ void IrrDriver::updateConfigIfRelevant()
         {
             int x = (int)placement.rcNormalPosition.left;
             int y = (int)placement.rcNormalPosition.top;
-            // If the windows position is saved, it must be a non-negative 
+            // If the windows position is saved, it must be a non-negative
             // number. So if the window is partly off screen, move it to the
             // corresponding edge.
             if(x<0) x = 0;
             if(y<0) y = 0;
-            Log::verbose("irr_driver", 
+            Log::verbose("irr_driver",
                        "Retrieved window location for config : %i %i\n", x, y);
-            
+
             if (UserConfigParams::m_window_x != x || UserConfigParams::m_window_y != y)
             {
                 UserConfigParams::m_window_x = x;
@@ -205,18 +205,18 @@ void IrrDriver::updateConfigIfRelevant()
         }
 #elif defined(__linux__) && !defined(ANDROID)
         using namespace X11;
-        const SExposedVideoData& videoData = 
+        const SExposedVideoData& videoData =
             m_device->getVideoDriver()->getExposedVideoData();
         Display* display = (Display*)videoData.OpenGLLinux.X11Display;
         XWindowAttributes xwa;
-        XGetWindowAttributes(display, get_toplevel_parent(display, 
+        XGetWindowAttributes(display, get_toplevel_parent(display,
                                        videoData.OpenGLLinux.X11Window), &xwa);
         int wx = xwa.x;
         int wy = xwa.y;
-        Log::verbose("irr_driver", 
+        Log::verbose("irr_driver",
                      "Retrieved window location for config : %i %i\n", wx, wy);
-        
-        
+
+
         if (UserConfigParams::m_window_x != wx || UserConfigParams::m_window_y != wy)
         {
             UserConfigParams::m_window_x = wx;
@@ -246,7 +246,7 @@ void IrrDriver::createListOfVideoModes()
         {
             const int w = modes->getVideoModeResolution(i).Width;
             const int h = modes->getVideoModeResolution(i).Height;
-            if (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) 
+            if (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH)
                 continue;
 
             VideoMode mode(w, h);
@@ -256,7 +256,7 @@ void IrrDriver::createListOfVideoModes()
 }   // createListOfVideoModes
 
 // ----------------------------------------------------------------------------
-/** This creates the actualy OpenGL device. This is called 
+/** This creates the actualy OpenGL device. This is called
  */
 void IrrDriver::initDevice()
 {
@@ -268,11 +268,11 @@ void IrrDriver::initDevice()
         if(m_modes.size()==0)
         {
             createListOfVideoModes();
-		    // The debug name is only set if irrlicht is compiled in debug 
+		    // The debug name is only set if irrlicht is compiled in debug
 		    // mode. So we use this to print a warning to the user.
             if(m_device->getDebugName())
             {
-                Log::warn("irr_driver", 
+                Log::warn("irr_driver",
                           "!!!!! Performance warning: Irrlicht compiled with "
                           "debug mode.!!!!!\n");
                 Log::warn("irr_driver",
@@ -281,7 +281,7 @@ void IrrDriver::initDevice()
             }
 
         } // end if firstTime
-        
+
         const core::dimension2d<u32> ssize = m_device->getVideoModeList()
                                                      ->getDesktopResolution();
         if (UserConfigParams::m_width > (int)ssize.Width ||
@@ -301,16 +301,16 @@ void IrrDriver::initDevice()
         // (apparently sent for this NULL device) is later received by
         // the actual window, causing it to immediately quit.
         // Following advise on the irrlicht forums I added the following
-        // two calles - the first one didn't make a difference (but 
+        // two calles - the first one didn't make a difference (but
         // certainly can't hurt), but the second one apparenlty solved
         // the problem for now.
         m_device->clearSystemMessages();
-        m_device->run(); 
+        m_device->run();
         // Clear the pointer stored in the file manager
         file_manager->dropFileSystem();
         m_device->drop();
         m_device  = NULL;
-    
+
         int num_drivers = 5;
 
         // Test if user has chosen a driver or if we should try all to find
@@ -342,7 +342,7 @@ void IrrDriver::initDevice()
                 params.EventReceiver = this;
                 params.Fullscreen    = UserConfigParams::m_fullscreen;
                 params.Vsync         = UserConfigParams::m_vsync;
-                params.WindowSize    = 
+                params.WindowSize    =
                     core::dimension2du(UserConfigParams::m_width,
                                        UserConfigParams::m_height);
                 switch ((int)UserConfigParams::m_antialiasing)
@@ -364,21 +364,21 @@ void IrrDriver::initDevice()
                                "anti-alias setting : %i\n",
                                (int)UserConfigParams::m_antialiasing);
                 }
-                
+
                 m_device = createDeviceEx(params);
-            
+
                 if(m_device) break;
             }   // for bits=32, 24, 16
             if(m_device) break;
         }   // for edt_types
-    
+
         // if still no device, try with a standard 800x600 window size, maybe
         // size is the problem
         if(!m_device)
         {
             UserConfigParams::m_width  = 800;
             UserConfigParams::m_height = 600;
-        
+
             m_device = createDevice(video::EDT_OPENGL,
                         core::dimension2du(UserConfigParams::m_width,
                                            UserConfigParams::m_height ),
@@ -395,7 +395,7 @@ void IrrDriver::initDevice()
             }
         }
     }
-    
+
     if(!m_device)
     {
         Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
@@ -447,7 +447,7 @@ void IrrDriver::initDevice()
             moveWindow(UserConfigParams::m_window_x,
                        UserConfigParams::m_window_y);
         } // If reinstating window location
-    } // If showing graphics 
+    } // If showing graphics
 
     // Stores the new file system pointer.
     file_manager->reInit();
@@ -462,16 +462,16 @@ void IrrDriver::initDevice()
         //material2D.TextureLayer[n].TextureWrap = ETC_CLAMP_TO_EDGE;
         material2D.TextureLayer[n].TextureWrapU = ETC_CLAMP_TO_EDGE;
         material2D.TextureLayer[n].TextureWrapV = ETC_CLAMP_TO_EDGE;
-        
+
         //material2D.TextureLayer[n].LODBias = 16;
         material2D.UseMipMaps = true;
     }
     material2D.AntiAliasing=video::EAAM_FULL_BASIC;
     //m_video_driver->enableMaterial2D();
-    
+
     // Initialize post-processing if supported
     m_post_processing = new PostProcessing(m_video_driver);
-    
+
     // set cursor visible by default (what's the default is not too clearly documented,
     // so let's decide ourselves...)
     m_device->getCursorControl()->setVisible(true);
@@ -588,14 +588,14 @@ bool IrrDriver::moveWindow(const int x, const int y)
 }
 //-----------------------------------------------------------------------------
 
-void IrrDriver::changeResolution(const int w, const int h, 
+void IrrDriver::changeResolution(const int w, const int h,
                                  const bool fullscreen)
 {
     // update user config values
     UserConfigParams::m_prev_width = UserConfigParams::m_width;
     UserConfigParams::m_prev_height = UserConfigParams::m_height;
     UserConfigParams::m_prev_fullscreen = UserConfigParams::m_fullscreen;
-    
+
     UserConfigParams::m_width = w;
     UserConfigParams::m_height = h;
     UserConfigParams::m_fullscreen = fullscreen;
@@ -612,7 +612,7 @@ void IrrDriver::changeResolution(const int w, const int h,
 
 void IrrDriver::applyResolutionSettings()
 {
-    // show black before resolution switch so we don't see OpenGL's buffer 
+    // show black before resolution switch so we don't see OpenGL's buffer
     // garbage during switch
     m_video_driver->beginScene(true, true, video::SColor(255,100,101,140));
     m_video_driver->draw2DRectangle( SColor(255, 0, 0, 0),
@@ -631,62 +631,62 @@ void IrrDriver::applyResolutionSettings()
     delete input_manager;
     GUIEngine::clear();
     GUIEngine::cleanUp();
-    
+
     m_device->closeDevice();
     m_device->clearSystemMessages();
-    m_device->run(); 
+    m_device->run();
 
     delete material_manager;
     material_manager = NULL;
 
     // ---- Reinit
-    // FIXME: this load sequence is (mostly) duplicated from main.cpp!! 
+    // FIXME: this load sequence is (mostly) duplicated from main.cpp!!
     // That's just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
-    
+
     // initDevice will drop the current device.
     initDevice();
-    
+
     // Re-init GUI engine
     GUIEngine::init(m_device, m_video_driver, StateManager::get());
-    
+
     //material_manager->reInit();
     material_manager = new MaterialManager();
     material_manager->loadMaterial();
     input_manager = new InputManager ();
     input_manager->setMode(InputManager::MENU);
-    
-    GUIEngine::addLoadingIcon( 
+
+    GUIEngine::addLoadingIcon(
         irr_driver->getTexture(file_manager->getGUIDir()+"options_video.png")
         );
-    
+
     file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
-    const std::string materials_file = 
+    const std::string materials_file =
         file_manager->getModelFile("materials.xml");
     if (materials_file != "")
     {
         material_manager->addSharedMaterial(materials_file);
     }
-    
+
     powerup_manager->loadAllPowerups ();
     ItemManager::loadDefaultItemMeshes();
     projectile_manager->loadData();
     Referee::init();
-    GUIEngine::addLoadingIcon( 
+    GUIEngine::addLoadingIcon(
         irr_driver->getTexture(file_manager->getGUIDir() + "gift.png") );
-    
+
     file_manager->popTextureSearchPath();
 
     KartPropertiesManager::addKartSearchDir(file_manager->getAddonsFile("karts"));
     kart_properties_manager->loadAllKarts();
-    
+
     attachment_manager->loadModels();
     GUIEngine::addLoadingIcon(irr_driver->getTexture(file_manager->getGUIDir()
                                                      + "banana.png") );
     // No need to reload cached track data (track_manager->cleanAllCachedData
     // above) - this happens dynamically when the tracks are loaded.
     GUIEngine::reshowCurrentScreen();
-    
+
 }   // applyResolutionSettings
 
 // ----------------------------------------------------------------------------
@@ -697,10 +697,10 @@ void IrrDriver::cancelResChange()
     UserConfigParams::m_height = UserConfigParams::m_prev_height;
     UserConfigParams::m_fullscreen = UserConfigParams::m_prev_fullscreen;
 
-    // This will trigger calling applyResolutionSettings in update(). This is 
+    // This will trigger calling applyResolutionSettings in update(). This is
     // necessary to avoid that the old screen is deleted, while it is
     // still active (i.e. sending out events which triggered the change
-    // of resolution    
+    // of resolution
     // Setting this flag will trigger a call to applyResolutionSetting()
     // in the next update call. This avoids the problem that changeResolution
     // is actually called from the gui, i.e. the event loop, i.e. while the
@@ -711,14 +711,14 @@ void IrrDriver::cancelResChange()
 }   // cancelResChange
 
 // ----------------------------------------------------------------------------
-/** Prints statistics about rendering, e.g. number of drawn and culled 
+/** Prints statistics about rendering, e.g. number of drawn and culled
  *  triangles etc. Note that printing this information will also slow
  *  down STK.
  */
 void IrrDriver::printRenderStats()
 {
     io::IAttributes * attr = m_scene_manager->getParameters();
-    Log::verbose("irr_driver", 
+    Log::verbose("irr_driver",
            "[%ls], FPS:%3d Tri:%.03fm Cull %d/%d nodes (%d,%d,%d)\n",
            m_video_driver->getName(),
            m_video_driver->getFPS (),
@@ -739,13 +739,13 @@ void IrrDriver::printRenderStats()
 scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
 {
     scene::IAnimatedMesh *m  = NULL;
-    
+
     if (StringUtils::getExtension(filename) == "b3dz")
     {
         // compressed file
         io::IFileSystem* file_system = getDevice()->getFileSystem();
-        if (!file_system->addFileArchive(filename.c_str(), 
-                                         /*ignoreCase*/false, 
+        if (!file_system->addFileArchive(filename.c_str(),
+                                         /*ignoreCase*/false,
                                          /*ignorePath*/true, io::EFAT_ZIP))
         {
             Log::error("irr_driver",
@@ -753,9 +753,9 @@ scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
                        filename.c_str());
             return NULL;
         }
-        
+
         // Get the recently added archive
-        io::IFileArchive* zip_archive = 
+        io::IFileArchive* zip_archive =
         file_system->getFileArchive(file_system->getFileArchiveCount()-1);
         io::IReadFile* content = zip_archive->createAndOpenFile(0);
         m = m_scene_manager->getMesh(content);
@@ -767,11 +767,11 @@ scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
     {
         m = m_scene_manager->getMesh(filename.c_str());
     }
-    
+
     if(!m) return NULL;
-    
+
     setAllMaterialFlags(m);
-    
+
     return m;
 }   // getAnimatedMesh
 
@@ -808,7 +808,7 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
         {
             video::ITexture* t=irr_material.getTexture(j);
             if(t) material_manager->setAllMaterialFlags(t, mb);
-            
+
         }   // for j<MATERIAL_MAX_TEXTURES
         material_manager->setAllUntexturedMaterialFlags(mb);
     }  // for i<getMeshBufferCount()
@@ -888,11 +888,11 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
 
 // ----------------------------------------------------------------------------
 
-PerCameraNode *IrrDriver::addPerCameraMesh(scene::IMesh* mesh, 
+PerCameraNode *IrrDriver::addPerCameraMesh(scene::IMesh* mesh,
                                            scene::ICameraSceneNode* camera,
                                            scene::ISceneNode *parent)
 {
-    return new PerCameraNode((parent ? parent 
+    return new PerCameraNode((parent ? parent
                                      : m_scene_manager->getRootSceneNode()),
                              m_scene_manager, -1, camera, mesh);
 }   // addMesh
@@ -902,10 +902,10 @@ PerCameraNode *IrrDriver::addPerCameraMesh(scene::IMesh* mesh,
 /** Adds a billboard node to scene.
  */
 scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
-                                           video::ITexture *texture, 
+                                           video::ITexture *texture,
                                            scene::ISceneNode* parent)
 {
-    scene::IBillboardSceneNode* node = 
+    scene::IBillboardSceneNode* node =
         m_scene_manager->addBillboardSceneNode(parent, size);
     assert(node->getMaterialCount() > 0);
     node->setMaterialTexture(0, texture);
@@ -960,11 +960,11 @@ scene::IMesh *IrrDriver::createQuadMesh(const video::SMaterial *material,
  *  \param w Width of the quad.
  *  \param h Height of the quad.
  */
-scene::IMesh *IrrDriver::createTexturedQuadMesh(const video::SMaterial *material, 
+scene::IMesh *IrrDriver::createTexturedQuadMesh(const video::SMaterial *material,
                                                 const double w, const double h)
 {
     scene::SMeshBuffer *buffer = new scene::SMeshBuffer();
-    
+
     const float w_2 = (float)w/2.0f;
     const float h_2 = (float)h/2.0f;
 
@@ -972,36 +972,36 @@ scene::IMesh *IrrDriver::createTexturedQuadMesh(const video::SMaterial *material
     v1.Pos    = core::vector3df(-w_2,-h_2,0);
     v1.Normal = core::vector3df(0, 0, -1.0f);
     v1.TCoords = core::vector2d<f32>(1,1);
-    
+
     video::S3DVertex v2;
     v2.Pos    = core::vector3df(w_2,-h_2,0);
     v2.Normal = core::vector3df(0, 0, -1.0f);
     v2.TCoords = core::vector2d<f32>(0,1);
-    
+
     video::S3DVertex v3;
     v3.Pos    = core::vector3df(w_2,h_2,0);
     v3.Normal = core::vector3df(0, 0, -1.0f);
     v3.TCoords = core::vector2d<f32>(0,0);
-    
+
     video::S3DVertex v4;
     v4.Pos    = core::vector3df(-w_2,h_2,0);
     v4.Normal = core::vector3df(0, 0, -1.0f);
     v4.TCoords = core::vector2d<f32>(1,0);
-    
-    
+
+
     // Add the vertices
     // ----------------
     buffer->Vertices.push_back(v1);
     buffer->Vertices.push_back(v2);
     buffer->Vertices.push_back(v3);
     buffer->Vertices.push_back(v4);
-    
+
     // Define the indices for the triangles
     // ------------------------------------
     buffer->Indices.push_back(0);
     buffer->Indices.push_back(1);
     buffer->Indices.push_back(2);
-    
+
     buffer->Indices.push_back(0);
     buffer->Indices.push_back(2);
     buffer->Indices.push_back(3);
@@ -1049,7 +1049,7 @@ scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *
 {
     return m_scene_manager->addAnimatedMeshSceneNode(mesh, NULL, -1,
                                                      core::vector3df(0,0,0),
-                                                     core::vector3df(0,0,0), 
+                                                     core::vector3df(0,0,0),
                                                      core::vector3df(1,1,1),
                                                      /*addIfMeshIsZero*/true);
 }   // addAnimatedMesh
@@ -1088,10 +1088,10 @@ scene::ISceneNode *IrrDriver::addSkyDome(video::ITexture *texture,
  *  \param front: Texture for the front plane of the box.
  *  \param back: Texture for the back plane of the box.
  */
-scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> 
+scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*>
                                         &texture)
 {
-    return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1], 
+    return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
                                                texture[4], texture[5]);
 }   // addSkyBox
@@ -1142,14 +1142,14 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
     {
         // FIXME: can't we just do this externally, and just use the
         // modified textures??
-        video::IImage* img = 
+        video::IImage* img =
             m_video_driver->createImageFromFile(filename.c_str());
         // PNGs are non premul, but some are used for premul tasks, so convert
         // http://home.comcast.net/~tom_forsyth/blog.wiki.html#[[Premultiplied%20alpha]]
         // FIXME check param, not name
         if(is_premul &&
             StringUtils::hasSuffix(filename.c_str(), ".png") &&
-            (img->getColorFormat() == irr::video::ECF_A8R8G8B8) && 
+            (img->getColorFormat() == irr::video::ECF_A8R8G8B8) &&
             img->lock())
         {
             core::dimension2d<u32> dim = img->getDimension();
@@ -1171,7 +1171,7 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
         // Other formats can be premul, but the tasks can be non premul
         // So divide to get the separate RGBA (only possible if alpha!=0)
         else if(is_prediv &&
-            (img->getColorFormat() == irr::video::ECF_A8R8G8B8) && 
+            (img->getColorFormat() == irr::video::ECF_A8R8G8B8) &&
             img->lock())
         {
             core::dimension2d<u32> dim = img->getDimension();
@@ -1203,7 +1203,7 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
                    "at line %s:%i to debug!\n",
                    filename.c_str(), __FILE__, __LINE__);
     }
-    
+
     return out;
 }   // getTexture
 
@@ -1256,18 +1256,18 @@ void IrrDriver::dropAllTextures(const scene::IMesh *mesh)
 }   // dropAllTextures
 
 // ----------------------------------------------------------------------------
-ITexture* IrrDriver::applyMask(video::ITexture* texture, 
+ITexture* IrrDriver::applyMask(video::ITexture* texture,
                                const std::string& mask_path)
 {
-    video::IImage* img = 
-        m_video_driver->createImage(texture, core::position2d<s32>(0,0), 
+    video::IImage* img =
+        m_video_driver->createImage(texture, core::position2d<s32>(0,0),
                                     texture->getSize());
 
-    video::IImage* mask = 
+    video::IImage* mask =
         m_video_driver->createImageFromFile(mask_path.c_str());
-    
+
     if (img == NULL || mask == NULL) return NULL;
-    
+
     if (img->lock() && mask->lock())
     {
         core::dimension2d<u32> dim = img->getDimension();
@@ -1281,7 +1281,7 @@ ITexture* IrrDriver::applyMask(video::ITexture* texture,
                 img->setPixel(x, y, col, false);
             }   // for y
         }   // for x
-        
+
         mask->unlock();
         img->unlock();
     }
@@ -1289,8 +1289,8 @@ ITexture* IrrDriver::applyMask(video::ITexture* texture,
     {
         return NULL;
     }
-    
-    std::string base = 
+
+    std::string base =
         StringUtils::getBasename(texture->getName().getPath().c_str());
     ITexture *t = m_video_driver->addTexture(base.c_str(),img, NULL);
     img->drop();
@@ -1322,22 +1322,22 @@ void IrrDriver::displayFPS()
     if (no_trust)
     {
         no_trust--;
-        
+
         static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
-        font->draw( L"FPS: ...", core::rect< s32 >(100,0,400,50), fpsColor, 
+        font->draw( L"FPS: ...", core::rect< s32 >(100,0,400,50), fpsColor,
                     false );
-        
+
         return;
     }
 
-    // Ask for current frames per second and last number of triangles 
+    // Ask for current frames per second and last number of triangles
     // processed (trimed to thousands)
     const int fps         = m_video_driver->getFPS();
     const float kilotris  = m_video_driver->getPrimitiveCountDrawn(0)
                                 * (1.f / 1000.f);
 
     // Min and max info tracking, per mode, so user can check game vs menus
-    bool current_state     = StateManager::get()->getGameState() 
+    bool current_state     = StateManager::get()->getGameState()
                                == GUIEngine::GAME;
     static bool prev_state = false;
     static int min         = 999; // Absurd values for start will print first time
@@ -1362,18 +1362,18 @@ void IrrDriver::displayFPS()
     if (high < kilotris) high = kilotris;
 
     static char buffer[64];
-    
+
     if (UserConfigParams::m_artist_debug_mode)
     {
-        sprintf(buffer, "FPS: %i/%i/%i - %.2f/%.2f/%.2f KTris", 
+        sprintf(buffer, "FPS: %i/%i/%i - %.2f/%.2f/%.2f KTris",
                 min, fps, max, low, kilotris, high);
     }
     else
     {
-        sprintf(buffer, "FPS: %i/%i/%i - %i KTris", min, fps, max, 
+        sprintf(buffer, "FPS: %i/%i/%i - %i KTris", min, fps, max,
                 (int)round(kilotris));
     }
-    
+
     core::stringw fpsString = buffer;
 
     static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
@@ -1388,7 +1388,7 @@ void IrrDriver::drawDebugMeshes()
     {
         IMesh* mesh = m_debug_meshes[n]->getMesh();
         ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
-        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = 
+        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints =
             smesh->getAllJoints();
 
         for (unsigned int j=0; j<joints.size(); j++)
@@ -1396,7 +1396,7 @@ void IrrDriver::drawDebugMeshes()
             drawJoint( false, true, joints[j], smesh, j);
         }
     }
-    
+
     video::SColor color(255,255,255,255);
     video::SMaterial material;
     material.Thickness = 2;
@@ -1411,17 +1411,17 @@ void IrrDriver::drawDebugMeshes()
     for (unsigned int n=0; n<m_debug_meshes.size(); n++)
     {
         IMesh* mesh = m_debug_meshes[n]->getMesh();
-        
-        
+
+
         ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
-        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints = 
+        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints =
             smesh->getAllJoints();
 
         for (unsigned int j=0; j<joints.size(); j++)
         {
             IMesh* mesh = m_debug_meshes[n]->getMesh();
             ISkinnedMesh* smesh = static_cast<ISkinnedMesh*>(mesh);
-            
+
             drawJoint(true, false, joints[j], smesh, j);
         }
     }
@@ -1436,12 +1436,12 @@ void IrrDriver::drawDebugMeshes()
  *         all joints to find the parent).
  *  \param id Index, which (%4) determines the color to use.
  */
-void IrrDriver::drawJoint(bool drawline, bool drawname, 
+void IrrDriver::drawJoint(bool drawline, bool drawname,
                           irr::scene::ISkinnedMesh::SJoint* joint,
                           ISkinnedMesh* mesh, int id)
-{    
+{
     irr::scene::ISkinnedMesh::SJoint* parent = NULL;
-    const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints 
+    const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints
         = mesh->getAllJoints();
     for (unsigned int j=0; j<joints.size(); j++)
     {
@@ -1451,12 +1451,12 @@ void IrrDriver::drawJoint(bool drawline, bool drawname,
             break;
         }
     }
-    
+
     core::vector3df jointpos = joint->GlobalMatrix.getTranslation();
 
     SColor color(255, 255,255,255);
     if (parent == NULL) color = SColor(255,0,255,0);
-    
+
     switch (id % 4)
     {
         case 0:
@@ -1472,21 +1472,21 @@ void IrrDriver::drawJoint(bool drawline, bool drawname,
             color = SColor(255,0,255,255);
             break;
     }
-    
+
 
     if (parent)
     {
         core::vector3df parentpos = parent->GlobalMatrix.getTranslation();
-        
+
         jointpos = joint->GlobalMatrix.getTranslation();
-        
+
         if (drawline)
         {
             irr_driver->getVideoDriver()->draw3DLine(jointpos,
                                                      parentpos,
                                                      color);
         }
-            
+
     }
     else
     {
@@ -1517,8 +1517,8 @@ void IrrDriver::drawJoint(bool drawline, bool drawname,
                 color = SColor(255,0,255,255);
                 break;
         }
-        
-        // This code doesn't quite work. 0.25 is used so that the bone is not 
+
+        // This code doesn't quite work. 0.25 is used so that the bone is not
         // way too long (not sure why I need to manually size it down)
         // and the rotation of the bone is often rather off
         core::vector3df v(0.0f, 0.25f, 0.0f);
@@ -1529,7 +1529,7 @@ void IrrDriver::drawJoint(bool drawline, bool drawname,
                                                  jointpos + v,
                                                  color);
     }
-    
+
     switch ((id + 1) % 4)
     {
         case 0:
@@ -1545,18 +1545,18 @@ void IrrDriver::drawJoint(bool drawline, bool drawname,
             color = SColor(255,0,255,255);
             break;
     }
-    
+
     if (drawname)
     {
-        irr_driver->getVideoDriver()->setTransform(video::ETS_WORLD, 
+        irr_driver->getVideoDriver()->setTransform(video::ETS_WORLD,
                                                    core::IdentityMatrix);
-        
-        core::vector2di textpos = 
+
+        core::vector2di textpos =
             irr_driver->getSceneManager()->getSceneCollisionManager()
             ->getScreenCoordinatesFrom3DPosition(jointpos);
-        
+
         GUIEngine::getSmallFont()->draw( stringw(joint->Name.c_str()),
-                                   core::rect<s32>(textpos, 
+                                   core::rect<s32>(textpos,
                                                core::dimension2d<s32>(500,50)),
                                    color, false, false );
     }
@@ -1583,8 +1583,8 @@ void IrrDriver::doScreenShot()
     tm* timeInfo = localtime( &rawtime );
     char time_buffer[256];
     sprintf(time_buffer, "%i.%02i.%02i_%02i.%02i.%02i",
-            timeInfo->tm_year + 1900, timeInfo->tm_mon+1, 
-            timeInfo->tm_mday, timeInfo->tm_hour, 
+            timeInfo->tm_year + 1900, timeInfo->tm_mon+1,
+            timeInfo->tm_mday, timeInfo->tm_hour,
             timeInfo->tm_min, timeInfo->tm_sec);
 
     std::string track_name = race_manager->getTrackName();
@@ -1593,7 +1593,7 @@ void IrrDriver::doScreenShot()
 
     if (irr_driver->getVideoDriver()->writeImageToFile(image, path.c_str(), 0))
     {
-        RaceGUIBase* base = World::getWorld() 
+        RaceGUIBase* base = World::getWorld()
                           ? World::getWorld()->getRaceGUI()
                           : NULL;
         if (base)
@@ -1609,9 +1609,9 @@ void IrrDriver::doScreenShot()
         if (base)
         {
             base->addMessage(
-                core::stringw(("FAILED saving screenshot to\n" + path + 
+                core::stringw(("FAILED saving screenshot to\n" + path +
                               "\n:(").c_str()),
-                NULL, 2.0f, video::SColor(255,255,255,255), 
+                NULL, 2.0f, video::SColor(255,255,255,255),
                 true, false);
         }   // if base
     }   // if failed writing screenshot file
@@ -1632,8 +1632,8 @@ void IrrDriver::update(float dt)
         return;
     }
 
-    // If the resolution should be switched, do it now. This will delete the 
-    // old device and create a new one. 
+    // If the resolution should be switched, do it now. This will delete the
+    // old device and create a new one.
     if (m_resolution_changing!=RES_CHANGE_NONE)
     {
         applyResolutionSettings();
@@ -1641,7 +1641,7 @@ void IrrDriver::update(float dt)
         new ConfirmResolutionDialog();
         m_resolution_changing = RES_CHANGE_NONE;
     }
-        
+
     World *world = World::getWorld();
 
     // Handle cut scenes (which do not have any karts in it)
@@ -1666,24 +1666,24 @@ void IrrDriver::update(float dt)
         m_video_driver->endScene();
         return;
     }
-    
+
     const bool inRace = world!=NULL;
-    
+
     // With bullet debug view we have to clear the back buffer, but
     // that's not necessary for non-debug
     bool back_buffer_clear = inRace && (world->getPhysics()->isDebug() ||
                                         world->clearBackBuffer()         );
-    
+
     if (inRace)
     {
         // Start the RTT for post-processing.
         // We do this before beginScene() because we want to capture the glClear()
         // because of tracks that do not have skyboxes (generally add-on tracks)
-        m_post_processing->beginCapture();        
+        m_post_processing->beginCapture();
     }
 
-    m_video_driver->beginScene(back_buffer_clear, /*zBuffer*/ true, 
-                               world ? world->getClearColor() 
+    m_video_driver->beginScene(back_buffer_clear, /*zBuffer*/ true,
+                               world ? world->getClearColor()
                                      : video::SColor(255,100,101,140));
 
     if (inRace)
@@ -1712,7 +1712,7 @@ void IrrDriver::update(float dt)
 
             // Note that drawAll must be called before rendering
             // the bullet debug view, since otherwise the camera
-            // is not set up properly. This is only used for 
+            // is not set up properly. This is only used for
             // the bullet debug view.
             if (UserConfigParams::m_artist_debug_mode)
                 World::getWorld()->getPhysics()->draw();
@@ -1751,23 +1751,23 @@ void IrrDriver::update(float dt)
         PROFILER_DRAW();
     }
 
-    
+
 #ifdef DEBUG
     drawDebugMeshes();
 #endif
-    
+
     m_video_driver->endScene();
-        
+
     if (m_request_screenshot) doScreenShot();
-    
+
     getPostProcessing()->update(dt);
-    
+
     // Enable this next print statement to get render information printed
     // E.g. number of triangles rendered, culled etc. The stats is only
     // printed while the race is running and not while the in-game menu
     // is shown. This way the output can be studied by just opening the
     // menu.
-    //if(World::getWorld() && World::getWorld()->isRacePhase()) 
+    //if(World::getWorld() && World::getWorld()->isRacePhase())
     //    printRenderStats();
 }   // update
 
@@ -1779,14 +1779,14 @@ void IrrDriver::requestScreenshot()
 }
 
 // ----------------------------------------------------------------------------
-/** This is not really used to process events, it's only used to shut down 
- *  irrLicht's chatty logging until the event handler is ready to take 
+/** This is not really used to process events, it's only used to shut down
+ *  irrLicht's chatty logging until the event handler is ready to take
  *  the task.
  */
 bool IrrDriver::OnEvent(const irr::SEvent &event)
 {
-    //TODO: ideally we wouldn't use this object to STFU irrlicht's chatty 
-    //      debugging, we'd just create the EventHandler earlier so it 
+    //TODO: ideally we wouldn't use this object to STFU irrlicht's chatty
+    //      debugging, we'd just create the EventHandler earlier so it
     //      can act upon it
     switch (event.EventType)
     {
@@ -1803,7 +1803,7 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
     default:
         return false;
     }   // switch
-    
+
     return false;
 }   // OnEvent
 
@@ -1826,25 +1826,25 @@ bool IrrDriver::supportsSplatting()
 
 // ----------------------------------------------------------------------------
 /** Begins a rendering to a texture.
- *  \param dimension The size of the texture. 
+ *  \param dimension The size of the texture.
  *  \param name Name of the texture.
  *  \param persistent_texture Whether the created RTT texture should persist in
  *                            memory after the RTTProvider is deleted
  */
-IrrDriver::RTTProvider::RTTProvider(const core::dimension2du &dimension, 
+IrrDriver::RTTProvider::RTTProvider(const core::dimension2du &dimension,
                                     const std::string &name, bool persistent_texture)
 {
     m_persistent_texture = persistent_texture;
     m_video_driver = irr_driver->getVideoDriver();
-    m_render_target_texture = 
-        m_video_driver->addRenderTargetTexture(dimension, 
+    m_render_target_texture =
+        m_video_driver->addRenderTargetTexture(dimension,
                                                name.c_str(),
                                                video::ECF_A8R8G8B8);
     if (m_render_target_texture != NULL)
     {
         m_video_driver->setRenderTarget(m_render_target_texture);
     }
-    
+
     m_rtt_main_node = NULL;
     m_camera        = NULL;
     m_light         = NULL;
@@ -1854,25 +1854,25 @@ IrrDriver::RTTProvider::RTTProvider(const core::dimension2du &dimension,
 IrrDriver::RTTProvider::~RTTProvider()
 {
     tearDownRTTScene();
-    
+
     if (!m_persistent_texture)
         irr_driver->removeTexture(m_render_target_texture);
 }   // ~RTTProvider
 
 // ----------------------------------------------------------------------------
 /** Sets up a given vector of meshes for render-to-texture. Ideal to embed a 3D
- *  object inside the GUI. If there are multiple meshes, the first mesh is 
- *  considered to be the root, and all following meshes will have their 
+ *  object inside the GUI. If there are multiple meshes, the first mesh is
+ *  considered to be the root, and all following meshes will have their
  *  locations relative to the location of the first mesh.
  */
-void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh, 
+void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
                                            AlignedArray<Vec3>& mesh_location,
                                            AlignedArray<Vec3>& mesh_scale,
                                            const std::vector<int>& model_frames)
-{         
+{
     if (model_frames[0] == -1)
     {
-        scene::ISceneNode* node = 
+        scene::ISceneNode* node =
             irr_driver->getSceneManager()->addMeshSceneNode(mesh.get(0), NULL);
         node->setPosition( mesh_location[0].toIrrVector() );
         node->setScale( mesh_scale[0].toIrrVector() );
@@ -1889,10 +1889,10 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         node->setAnimationSpeed(0);
         node->setScale( mesh_scale[0].toIrrVector() );
         node->setMaterialFlag(video::EMF_FOG_ENABLE, false);
-        
+
         m_rtt_main_node = node;
     }
-        
+
     assert(m_rtt_main_node != NULL);
     assert(mesh.size() == (int)mesh_location.size());
     assert(mesh.size() == (int)model_frames.size());
@@ -1902,8 +1902,8 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     {
         if (model_frames[n] == -1)
         {
-            scene::ISceneNode* node = 
-                irr_driver->getSceneManager()->addMeshSceneNode(mesh.get(n), 
+            scene::ISceneNode* node =
+                irr_driver->getSceneManager()->addMeshSceneNode(mesh.get(n),
                                                                 m_rtt_main_node);
             node->setPosition( mesh_location[n].toIrrVector() );
             node->updateAbsolutePosition();
@@ -1911,9 +1911,9 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         }
         else
         {
-            scene::IAnimatedMeshSceneNode* node = 
+            scene::IAnimatedMeshSceneNode* node =
                 irr_driver->getSceneManager()
-                   ->addAnimatedMeshSceneNode((IAnimatedMesh*)mesh.get(n), 
+                   ->addAnimatedMeshSceneNode((IAnimatedMesh*)mesh.get(n),
                                               m_rtt_main_node             );
             node->setPosition( mesh_location[n].toIrrVector() );
             node->setFrameLoop(model_frames[n], model_frames[n]);
@@ -1924,42 +1924,42 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         }
     }
 
-    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 120, 
+    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 120,
                                                                  120, 120) );
-    
+
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
     m_light = irr_driver->getSceneManager()
         ->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f),
                             10000.0f /* radius */);
     m_light->getLightData().DiffuseColor
         = irr::video::SColorf(0.5f, 0.5f, 0.5f, 0.5f);
-    m_light->getLightData().SpecularColor 
+    m_light->getLightData().SpecularColor
         = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-    
+
     m_rtt_main_node->setMaterialFlag(EMF_GOURAUD_SHADING , true);
     m_rtt_main_node->setMaterialFlag(EMF_LIGHTING, true);
-    
+
     const int materials = m_rtt_main_node->getMaterialCount();
     for (int n=0; n<materials; n++)
     {
         m_rtt_main_node->getMaterial(n).setFlag(EMF_LIGHTING, true);
-        
+
          // set size of specular highlights
         m_rtt_main_node->getMaterial(n).Shininess = 100.0f;
-        m_rtt_main_node->getMaterial(n).SpecularColor.set(255,50,50,50); 
+        m_rtt_main_node->getMaterial(n).SpecularColor.set(255,50,50,50);
         m_rtt_main_node->getMaterial(n).DiffuseColor.set(255,150,150,150);
-        
+
         m_rtt_main_node->getMaterial(n).setFlag(EMF_GOURAUD_SHADING , true);
     }
-    
+
     m_camera =  irr_driver->getSceneManager()->addCameraSceneNode();
-    
+
     m_camera->setPosition( core::vector3df(0.0, 20.0f, 70.0f) );
     m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
     m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
     m_camera->setFOV( DEGREE_TO_RAD*50.0f );
     m_camera->updateAbsolutePosition();
-    
+
     // Detach the note from the scene so we can render it independently
     m_rtt_main_node->setVisible(false);
     m_light->setVisible(false);
@@ -1972,7 +1972,7 @@ void IrrDriver::RTTProvider::tearDownRTTScene()
     if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
     if (m_light != NULL) m_light->remove();
     if (m_camera != NULL) m_camera->remove();
-    
+
     m_rtt_main_node = NULL;
     m_camera = NULL;
     m_light = NULL;
@@ -1991,16 +1991,16 @@ ITexture* IrrDriver::RTTProvider::renderToTexture(float angle,
 {
     // m_render_target_texture will be NULL if RTT doesn't work on this computer
     if (m_render_target_texture == NULL) return NULL;
-    
+
     // Rendering a 2d only model (using direct opengl rendering)
     // does not work if setRenderTarget is called here again.
     // And rendering 3d only works if it is called here :(
     if(!is_2d_render)
-        m_video_driver->setRenderTarget(m_render_target_texture);  
-    
+        m_video_driver->setRenderTarget(m_render_target_texture);
+
     if (angle != -1 && m_rtt_main_node != NULL)
         m_rtt_main_node->setRotation( core::vector3df(0, angle, 0) );
-    
+
     if (m_rtt_main_node == NULL)
     {
         irr_driver->getSceneManager()->drawAll();
@@ -2013,7 +2013,7 @@ ITexture* IrrDriver::RTTProvider::renderToTexture(float angle,
         m_rtt_main_node->setVisible(false);
         m_light->setVisible(false);
     }
-    
+
     m_video_driver->setRenderTarget(0, false, false);
     return m_render_target_texture;
 }

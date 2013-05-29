@@ -38,16 +38,16 @@ void EasterEggHunt::init()
 {
     WorldWithRank::init();
     m_display_rank = false;
-    
+
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
     {
         fprintf(stderr, "No AI exists for this game mode\n");
         exit(1);
     }
- 
+
     m_eggs_collected.resize(m_karts.size(), 0);
-    
+
 }   // EasterEggHunt
 
 //-----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ void EasterEggHunt::readData(const std::string &filename)
     RaceManager::Difficulty act_difficulty = RaceManager::DIFFICULTY_COUNT;
     for(int i=difficulty; i<=RaceManager::DIFFICULTY_LAST; i++)
     {
-        std::string diff_name= 
+        std::string diff_name=
             race_manager->getDifficultyAsString((RaceManager::Difficulty)i);
         const XMLNode * cur_data = easter->getNode(diff_name);
         if (cur_data)
@@ -92,13 +92,13 @@ void EasterEggHunt::readData(const std::string &filename)
             break;
         }
     }
-    // If there is no data for an equal or harder placement, 
+    // If there is no data for an equal or harder placement,
     // check for the most difficult placement that is easier:
     if(!data)
     {
         for(int i=difficulty-1; i>=RaceManager::DIFFICULTY_FIRST; i--)
         {
-            std::string diff_name= 
+            std::string diff_name=
                race_manager->getDifficultyAsString((RaceManager::Difficulty)i);
             const XMLNode * cur_data = easter->getNode(diff_name);
             if (cur_data)
@@ -107,7 +107,7 @@ void EasterEggHunt::readData(const std::string &filename)
                 act_difficulty = (RaceManager::Difficulty)i;
                 break;
             }
-        }   // for i 
+        }   // for i
     }   // if !data
 
     if(!data)
@@ -122,7 +122,7 @@ void EasterEggHunt::readData(const std::string &filename)
         if(egg->getName()!="easter-egg")
         {
             printf("Unknown node '%s' in easter egg level '%s' - ignored.\n",
-                   egg->getName().c_str(), 
+                   egg->getName().c_str(),
                    race_manager->getDifficultyAsString(act_difficulty).c_str());
             continue;
         }
@@ -145,7 +145,7 @@ const std::string& EasterEggHunt::getIdent() const
 }   // getIdent
 
 //-----------------------------------------------------------------------------
-/** Called when a kart has collected an egg. 
+/** Called when a kart has collected an egg.
  *  \param kart The kart that collected an egg.
  */
 void EasterEggHunt::collectedEasterEgg(const AbstractKart *kart)
@@ -156,7 +156,7 @@ void EasterEggHunt::collectedEasterEgg(const AbstractKart *kart)
 
 //-----------------------------------------------------------------------------
 /** Update the world and the track.
- *  \param dt Time step size. 
+ *  \param dt Time step size.
  */
 void EasterEggHunt::update(float dt)
 {
@@ -182,7 +182,7 @@ bool EasterEggHunt::isRaceOver()
 void EasterEggHunt::reset()
 {
     WorldWithRank::reset();
-    
+
     for(unsigned int i=0; i<m_eggs_collected.size(); i++)
         m_eggs_collected[i] = 0;
     m_eggs_found = 0;
@@ -200,7 +200,7 @@ void EasterEggHunt::getKartsDisplayInfo(
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         std::ostringstream o;
         //I18n: number of collected eggs / overall number of eggs
-        rank_info.m_text = StringUtils::insertValues(_("Eggs: %d / %d"), 
+        rank_info.m_text = StringUtils::insertValues(_("Eggs: %d / %d"),
                                                     m_eggs_collected[i],
                                                     m_number_of_eggs);
         rank_info.m_color = video::SColor(255, 255, 255, 255);

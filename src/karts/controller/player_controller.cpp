@@ -48,9 +48,9 @@
  *  \param init_pos The start coordinates and heading of the kart.
  *  \param player_index  Index of the player kart.
  */
-PlayerController::PlayerController(AbstractKart *kart, 
-                                   StateManager::ActivePlayer *player, 
-                                   unsigned int player_index)      
+PlayerController::PlayerController(AbstractKart *kart,
+                                   StateManager::ActivePlayer *player,
+                                   unsigned int player_index)
                 : Controller(kart)
 {
     assert(player != NULL);
@@ -97,7 +97,7 @@ void PlayerController::reset()
 
 // ----------------------------------------------------------------------------
 /** Resets the state of control keys. This is used after the in-game menu to
- *  avoid that any keys pressed at the time the menu is opened are still 
+ *  avoid that any keys pressed at the time the menu is opened are still
  *  considered to be pressed.
  */
 void PlayerController::resetInputState()
@@ -113,9 +113,9 @@ void PlayerController::resetInputState()
 
 // ----------------------------------------------------------------------------
 /** This function interprets a kart action and value, and set the corresponding
- *  entries in the kart control data structure. This function handles esp. 
+ *  entries in the kart control data structure. This function handles esp.
  *  cases like 'press left, press right, release right' - in this case after
- *  releasing right, the steering must switch to left again. Similarly it 
+ *  releasing right, the steering must switch to left again. Similarly it
  *  handles 'press left, press right, release left' (in which case still
  *  right must be selected). Similarly for braking and acceleration.
  * \param action  The action to be executed.
@@ -215,7 +215,7 @@ void PlayerController::action(PlayerAction action, int value)
     case PA_PAUSE_RACE:
         if (value != 0) StateManager::get()->escapePressed();
         break;
-    default: 
+    default:
        break;
     }
 
@@ -242,7 +242,7 @@ void PlayerController::steer(float dt, int steer_val)
         m_controls->m_steer = 0;
     }
 
-    
+
     // Amount the steering is changed for digital devices.
     // If the steering is 'back to straight', a different steering
     // change speed is used.
@@ -309,8 +309,8 @@ void PlayerController::update(float dt)
         Log::debug("PlayerController", "irr_driver", "-------------------------------------\n");
     }
 
-    // Don't do steering if it's replay. In position only replay it doesn't 
-    // matter, but if it's physics replay the gradual steering causes 
+    // Don't do steering if it's replay. In position only replay it doesn't
+    // matter, but if it's physics replay the gradual steering causes
     // incorrect results, since the stored values are already adjusted.
     if (!history->replayHistory())
         steer(dt, m_steer_val);
@@ -356,7 +356,7 @@ void PlayerController::update(float dt)
     // if automatic reverse camera is active
     if (m_camera->getMode() != Camera::CM_FINAL)
     {
-        if (m_controls->m_look_back || (UserConfigParams::m_reverse_look_threshold>0 && 
+        if (m_controls->m_look_back || (UserConfigParams::m_reverse_look_threshold>0 &&
             m_kart->getSpeed()<-UserConfigParams::m_reverse_look_threshold))
         {
             m_camera->setMode(Camera::CM_REVERSE);
@@ -379,7 +379,7 @@ void PlayerController::update(float dt)
         new RescueAnimation(m_kart);
         m_controls->m_rescue=false;
     }
-    if (m_kart->getKartAnimation() && 
+    if (m_kart->getKartAnimation() &&
         m_kart->getAttachment()->getType() != Attachment::ATTACH_TINYTUX)
     {
         m_bzzt_sound->play();
@@ -444,9 +444,9 @@ void PlayerController::handleZipper(bool play_sound)
 /** Called when a kart hits an item.
  *  \param item Item that was collected.
  *  \param add_info Additional info to be used then handling the item. If
- *                  this is -1 (default), the item type is selected 
- *                  randomly. Otherwise it contains the powerup or 
- *                  attachment for the kart. This is used in network mode to 
+ *                  this is -1 (default), the item type is selected
+ *                  randomly. Otherwise it contains the powerup or
+ *                  attachment for the kart. This is used in network mode to
  *                  let the server determine the powerup/attachment for
  *                  the clients.
  */
@@ -480,7 +480,7 @@ void PlayerController::collectedItem(const Item &item, int add_info, float old_e
             break;
         default:
             m_grab_sound->play();
-            break; 
+            break;
         }
     }
 }   // collectedItem

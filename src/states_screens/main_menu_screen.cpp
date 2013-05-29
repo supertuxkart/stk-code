@@ -71,7 +71,7 @@ MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 // ----------------------------------------------------------------------------
 
 void MainMenuScreen::loadedFromFile()
-{  
+{
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     w->setScrollSpeed(15);
 }   // loadedFromFile
@@ -81,7 +81,7 @@ void MainMenuScreen::loadedFromFile()
 void MainMenuScreen::init()
 {
     Screen::init();
-    
+
     // reset in case we're coming back from a race
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
@@ -94,7 +94,7 @@ void MainMenuScreen::init()
     // to select all other settings - then if the next time the kart
     // selection screen comes up, the default device will still be
     // the 2nd player. So if the first player presses 'select', it
-    // will instead add a second player (so basically the key 
+    // will instead add a second player (so basically the key
     // binding for the second player become the default, so pressing
     // select will add a new player). See bug 3090931
     // To avoid this, we will clean the last used device, making
@@ -114,7 +114,7 @@ void MainMenuScreen::init()
     const core::stringw &news_text = news_manager->getNextNewsMessage();
     w->setText(news_text, true);
     w->update(0.01f);
-    
+
     RibbonWidget* r = getWidget<RibbonWidget>("menu_bottomrow");
     // FIXME: why do I need to do this manually
     ((IconButtonWidget*)r->getChildren().get(0))->unfocused(PLAYER_ID_GAME_MASTER, NULL);
@@ -124,7 +124,7 @@ void MainMenuScreen::init()
     r = getWidget<RibbonWidget>("menu_toprow");
     r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     DemoWorld::resetIdleTime();
-    
+
 #if _IRR_MATERIAL_MAX_TEXTURES_ < 8
     getWidget<IconButtonWidget>("logo")->setImage("gui/logo_broken.png",
         IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
@@ -152,7 +152,7 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
             addons_icon->resetAllBadges();
             addons_icon->setBadge(LOADING_BADGE);
         }
-        else 
+        else
         {
             addons_icon->setActivated();
             addons_icon->resetAllBadges();
@@ -171,18 +171,18 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 
 // ----------------------------------------------------------------------------
 
-void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, 
+void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                    const int playerID)
 {
     // most interesting stuff is in the ribbons, so start there
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
-    
+
     if (ribbon == NULL) return; // what's that event??
-    
+
     // ---- A ribbon icon was clicked
-    std::string selection = 
+    std::string selection =
         ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-    
+
     /*
     if (selection == "story")
     {
@@ -192,7 +192,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setNumPlayers(0);
         race_manager->setNumLocalPlayers(0);
         race_manager->startSingleRace("endcutscene", 999, false);
-        
+
         std::vector<std::string> parts;
         parts.push_back("introcutscene");
         parts.push_back("introcutscene2");
@@ -201,26 +201,26 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         return;
     }
     */
-    
+
 #if DEBUG_MENU_ITEM
     if (selection == "options")
     {
         // The DEBUG item
-        FeatureUnlockedCutScene* scene = 
+        FeatureUnlockedCutScene* scene =
             FeatureUnlockedCutScene::getInstance();
-        
+
         scene->addTrophy(RaceManager::DIFFICULTY_EASY);
         StateManager::get()->pushScreen(scene);
-        
+
         /*
         static int i = 1;
         i++;
-        
+
         if (i % 4 == 0)
         {
             // the passed kart will not be modified, that's why I allow myself
             // to use const_cast
-            scene->addUnlockedKart( 
+            scene->addUnlockedKart(
                                    const_cast<KartProperties*>(
                                         kart_properties_manager->getKart("tux")
                                                               ),
@@ -301,21 +301,21 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         StateManager::get()->pushScreen(HelpScreen1::getInstance());
     }
     else if (selection == "startTutorial")
-    {    
+    {
         race_manager->setNumLocalPlayers(1);
         race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
         race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
         race_manager->setNumKarts( 1 );
         race_manager->setTrack( "tutorial" );
         race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
-        
+
         // Use keyboard 0 by default (FIXME: let player choose?)
         InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
         // Create player and associate player with keyboard
         StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
                                                 device);
-        
+
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
         {
             fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', will revert to default\n",
@@ -323,13 +323,13 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             UserConfigParams::m_default_kart.revertToDefaults();
         }
         race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
-        
+
         // ASSIGN should make sure that only input from assigned devices
         // is read.
         input_manager->getDeviceList()->setAssignMode(ASSIGN);
         input_manager->getDeviceList()
             ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
-        
+
         StateManager::get()->enterGameState();
         network_manager->setupPlayerKartInfo();
         race_manager->startNew(false);
@@ -345,7 +345,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             race_manager->setNumPlayers(0);
             race_manager->setNumLocalPlayers(0);
             race_manager->startSingleRace("introcutscene", 999, false);
-            
+
             std::vector<std::string> parts;
             parts.push_back("introcutscene");
             parts.push_back("introcutscene2");

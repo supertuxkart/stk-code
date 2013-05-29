@@ -58,7 +58,7 @@ const wchar_t* getPlungerString()
  *  root(!) of the graph. It's easier this way to get the right coordinates
  *  than attaching it to the plunger or kart, and trying to find the other
  *  coordinate.
- *  \param plunger Pointer to the plunger (non const, since the rubber band 
+ *  \param plunger Pointer to the plunger (non const, since the rubber band
  *                 can trigger an explosion)
  *  \param kart    Reference to the kart.
  */
@@ -165,7 +165,7 @@ void RubberBand::update(float dt)
     {
         float force = m_owner->getKartProperties()->getRubberBandForce();
         Vec3 diff   = m_end_position-k;
-        
+
         // detach rubber band if kart gets very close to hit point
         if(m_attached_state==RB_TO_TRACK && diff.length2() < 10*10)
         {
@@ -175,13 +175,13 @@ void RubberBand::update(float dt)
             m_plunger->setKeepAlive(0.0f);
             return;
         }
-        
+
         diff.normalize();   // diff can't be zero here
         m_owner->getBody()->applyCentralForce(diff*force);
         m_owner->increaseMaxSpeed(MaxSpeed::MS_INCREASE_RUBBER,
             m_owner->getKartProperties()->getRubberBandSpeedIncrease(),
-            /*engine_force*/ 0.0f, 
-            /*duration*/0.1f, 
+            /*engine_force*/ 0.0f,
+            /*duration*/0.1f,
             m_owner->getKartProperties()->getRubberBandFadeOutTime());
         if(m_attached_state==RB_TO_KART)
             m_hit_kart->getBody()->applyCentralForce(diff*(-force));
@@ -208,7 +208,7 @@ void RubberBand::checkForHit(const Vec3 &k, const Vec3 &p)
         m_owner->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = 0;
 
     // Do the raycast
-    World::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(k, p, 
+    World::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(k, p,
                                                                 ray_callback);
     // Reset collision groups
     m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_plunger_group;

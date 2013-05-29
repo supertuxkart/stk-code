@@ -27,7 +27,7 @@ ReplayBase::ReplayBase()
 }   // ReplayBaese
 // -----------------------------------------------------------------------------
 /** Opens a replay file (depending on the track name, which is taken from
- *  the race manager). 
+ *  the race manager).
  *  \param writeable True if the file should be opened for writing.
  *  \return A FILE *, or NULL if the file could not be opened.
  */

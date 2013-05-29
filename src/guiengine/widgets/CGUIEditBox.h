@@ -21,7 +21,7 @@ using namespace gui;
 	public:
 
         LEAK_CHECK()
-        
+
 		//! constructor
 		CGUIEditBox(const wchar_t* text, bool border, IGUIEnvironment* environment,
 			IGUIElement* parent, s32 id, const core::rect<s32>& rectangle, bool is_rtl);
@@ -118,7 +118,7 @@ using namespace gui;
         virtual irr::gui::IGUIFont* getOverrideFont() const { return NULL; }
         virtual irr::gui::IGUIFont* getActiveFont() const { return NULL; }
         virtual void setDrawBackground(bool) { }
-        
+
 	protected:
 		//! Breaks the single text line.
 		void breakText();
@@ -155,7 +155,7 @@ using namespace gui;
 		u32 Max;
 
         bool m_rtl;
-        
+
 		bool WordWrap, MultiLine, AutoScroll, PasswordBox;
 		wchar_t PasswordChar;
 		EGUI_ALIGNMENT HAlign, VAlign;

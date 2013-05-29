@@ -59,11 +59,11 @@ SFXManager::SFXManager()
     m_master_gain = UserConfigParams::m_sfx_volume;
     // Init position, since it can be used before positionListener is called.
     m_position    = Vec3(0,0,0);
-    
+
     loadSfx();
     if (!sfxAllowed()) return;
     setMasterSFXVolume( UserConfigParams::m_sfx_volume );
-    
+
 }  // SoundManager
 
 //-----------------------------------------------------------------------------
@@ -87,7 +87,7 @@ SFXManager::~SFXManager()
         }
     }
     m_quick_sounds.clear();
-    
+
     // ---- clear m_all_sfx_types
     {
         std::map<std::string, SFXBuffer*>::iterator i = m_all_sfx_types.begin();
@@ -100,7 +100,7 @@ SFXManager::~SFXManager()
         m_all_sfx_types.clear();
     }
     m_all_sfx_types.clear();
-    
+
     sfx_manager = NULL;
 }   // ~SFXManager
 
@@ -117,9 +117,9 @@ void SFXManager::soundToggled(const bool on)
             SFXBuffer* buffer = (*i).second;
             buffer->load();
         }
-        
+
         resumeAll();
-        
+
         const int sfx_amount = m_all_sfx.size();
         for (int n=0; n<sfx_amount; n++)
         {
@@ -136,7 +136,7 @@ void SFXManager::soundToggled(const bool on)
 
 bool SFXManager::sfxAllowed()
 {
-    if(!UserConfigParams::m_sfx || !m_initialized) 
+    if(!UserConfigParams::m_sfx || !m_initialized)
         return false;
     else
         return true;
@@ -153,12 +153,12 @@ void SFXManager::loadSfx()
     {
         std::cerr << "Could not read sounf effects XML file " << sfx_config_name.c_str() << std::endl;
     }
-    
+
     const int amount = root->getNumNodes();
     for (int i=0; i<amount; i++)
     {
         const XMLNode* node = root->getNode(i);
-        
+
         if (node->getName() == "sfx")
         {
             loadSingleSfx(node);
@@ -169,7 +169,7 @@ void SFXManager::loadSfx()
             throw std::runtime_error("Unknown node in sfx XML file");
         }
     }// nend for
-    
+
     delete root;
    }   // loadSfx
 
@@ -192,21 +192,21 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
 {
 
     SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff, max_width, gain);
-    
+
     m_all_sfx_types[sfx_name] = buffer;
-    
-    if (!m_initialized) 
+
+    if (!m_initialized)
     {
         // Keep the buffer even if SFX is disabled, in case
         // SFX is enabled back later
         return NULL;
     }
 
-    if (UserConfigParams::logMisc()) 
+    if (UserConfigParams::logMisc())
         Log::debug("SFXManager", "Loading SFX %s\n", sfx_file.c_str());
-    
+
     if (buffer->load()) return buffer;
-    
+
     return NULL;
 } // addSingleSFX
 
@@ -221,23 +221,23 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
 
     if (node->get("filename", &filename) == 0)
     {
-        Log::error("SFXManager", 
+        Log::error("SFXManager",
                 "/!\\ The 'filename' attribute is mandatory in the SFX XML file!\n");
         return NULL;
     }
-    
+
     std::string sfx_name = StringUtils::removeExtension(filename);
     /*
     if (node->get("name", &sfx_name) == 0)
     {
-        fprintf(stderr, 
+        fprintf(stderr,
                 "/!\\ The 'name' attribute is mandatory in the SFX XML file!\n");
         return;
     }
      */
     if(m_all_sfx_types.find(sfx_name)!=m_all_sfx_types.end())
     {
-        Log::error("SFXManager", 
+        Log::error("SFXManager",
                 "There is already a sfx named '%s' installed - new one is ignored.\n",
                 sfx_name.c_str());
         return NULL;
@@ -247,7 +247,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
     // to load terrain specific sfx.
     const std::string full_path = (path == "") ? file_manager->getSFXFile(filename)
                                                : path;
-    
+
     SFXBuffer tmpbuffer(full_path, node);
 
     return addSingleSfx(sfx_name, full_path,
@@ -255,7 +255,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
                         tmpbuffer.getRolloff(),
                         tmpbuffer.getMaxDist(),
                         tmpbuffer.getGain());
-    
+
 }   // loadSingleSfx
 
 //----------------------------------------------------------------------------
@@ -265,7 +265,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
  *  call deleteSFX().
  *  \param id Identifier of the sound effect to create.
  */
-SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer, 
+SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
                                        const bool add_to_SFX_list,
                                        const bool owns_buffer)
 {
@@ -280,18 +280,18 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     //       buffer->getFileName().c_str(), (unsigned int)buffer,
     //       positional,
     //       race_manager->getNumLocalPlayers(), buffer->isPositional());
-    
+
 #if HAVE_OGGVORBIS
     assert( alIsBuffer(buffer->getBufferID()) );
     SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain(), owns_buffer);
 #else
     SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain(), owns_buffer);
 #endif
-    
+
     sfx->volume(m_master_gain);
-    
+
     if (add_to_SFX_list) m_all_sfx.push_back(sfx);
-        
+
     return sfx;
 }   // createSoundSource
 
@@ -306,7 +306,7 @@ void SFXManager::dump()
 }
 
 //----------------------------------------------------------------------------
-SFXBase* SFXManager::createSoundSource(const std::string &name, 
+SFXBase* SFXManager::createSoundSource(const std::string &name,
                                        const bool addToSFXList)
 {
     std::map<std::string, SFXBuffer*>::iterator i = m_all_sfx_types.find(name);
@@ -315,7 +315,7 @@ SFXBase* SFXManager::createSoundSource(const std::string &name,
         Log::error("SFXManager", "SFXManager::createSoundSource could not find the requested sound effect : '%s'\n", name.c_str());
         return NULL;
     }
-    
+
     return createSoundSource( i->second, addToSFXList );
 }  // createSoundSource
 
@@ -344,7 +344,7 @@ void SFXManager::deleteSFXMapping(const std::string &name)
         return;
     }
     (*i).second->unload();
-    
+
     m_all_sfx_types.erase(i);
 
 }   // deleteSFXMapping
@@ -366,7 +366,7 @@ void SFXManager::deleteSFX(SFXBase *sfx)
         Log::warn("SFXManager", "SFXManager::deleteSFX : Warning: sfx not found in list.\n");
         return;
     }
-    
+
     delete sfx;
 
     m_all_sfx.erase(i);
@@ -395,18 +395,18 @@ void SFXManager::resumeAll()
 {
     // ignore unpausing if sound is disabled
     if (!sfxAllowed()) return;
-    
+
     for (std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
         i!=m_all_sfx.end(); i++)
     {
         SFXStatus status = (*i)->getStatus();
-        // Initial happens when 
+        // Initial happens when
         if (status==SFX_PAUSED) (*i)->resume();
     }   // for i in m_all_sfx
 }   // resumeAll
 
 //-----------------------------------------------------------------------------
-/** Returns whether or not an openal error has occurred. If so, an error 
+/** Returns whether or not an openal error has occurred. If so, an error
  *  message is printed containing the given context.
  *  \param context Context to specify in the error message.
  */
@@ -445,7 +445,7 @@ void SFXManager::setMasterSFXVolume(float gain)
             (*i)->volume(m_master_gain);
         }   // for i in m_all_sfx
     }
-    
+
     // quick SFX
     {
         std::map<std::string, SFXBase*>::iterator i = m_quick_sounds.begin();
@@ -454,7 +454,7 @@ void SFXManager::setMasterSFXVolume(float gain)
             (*i).second->volume(m_master_gain);
         }
     }
-    
+
 }   // setMasterSFXVolume
 
 //-----------------------------------------------------------------------------
@@ -482,19 +482,19 @@ void SFXManager::positionListener(const Vec3 &position, const Vec3 &front)
 {
 #if HAVE_OGGVORBIS
     if (!UserConfigParams::m_sfx || !m_initialized) return;
-    
+
     m_position = position;
-    
+
     //forward vector
-    m_listenerVec[0] = front.getX(); 
+    m_listenerVec[0] = front.getX();
     m_listenerVec[1] = front.getY();
-    m_listenerVec[2] = front.getZ(); 
-    
+    m_listenerVec[2] = front.getZ();
+
     //up vector
-    m_listenerVec[3] = 0; 
+    m_listenerVec[3] = 0;
     m_listenerVec[4] = 0;
     m_listenerVec[5] = 1;
-    
+
     alListener3f(AL_POSITION, position.getX(), position.getY(), position.getZ());
     alListenerfv(AL_ORIENTATION, m_listenerVec);
 #endif
@@ -511,7 +511,7 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
 {
     if (!sfxAllowed()) return NULL;
     std::map<std::string, SFXBase*>::iterator sound = m_quick_sounds.find(sound_type);
-    
+
     if (sound == m_quick_sounds.end())
     {
         // sound not yet in our local list of quick sounds

@@ -27,20 +27,20 @@
 
 // -----------------------------------------------------------------------------
 Highscores::Highscores(const HighscoreType highscore_type,
-                       int num_karts, 
+                       int num_karts,
                        const RaceManager::Difficulty difficulty,
-                       const std::string trackName, 
+                       const std::string trackName,
                        const int number_of_laps,
                        const bool reverse)
 {
-    m_track           = trackName; 
+    m_track           = trackName;
     m_highscore_type  = highscore_type;
     m_number_of_karts = num_karts;
     m_difficulty      = difficulty;
     m_number_of_laps  = number_of_laps;
     m_reverse         = reverse;
-    
-    for(int i=0; i<HIGHSCORE_LEN; i++) 
+
+    for(int i=0; i<HIGHSCORE_LEN; i++)
     {
         m_name[i]      = "";
         m_kart_name[i] = "";
@@ -50,20 +50,20 @@ Highscores::Highscores(const HighscoreType highscore_type,
 // -----------------------------------------------------------------------------
 Highscores::Highscores(const XMLNode &node)
 {
-    m_track           = ""; 
+    m_track           = "";
     m_highscore_type  = "HST_UNDEFINED";
     m_number_of_karts = -1;
     m_difficulty      = -1;
     m_number_of_laps  = -1;
     m_reverse         = false;
-    
-    for(int i=0; i<HIGHSCORE_LEN; i++) 
+
+    for(int i=0; i<HIGHSCORE_LEN; i++)
     {
         m_name[i]      = "";
         m_kart_name[i] = "";
         m_time[i]      = -9.9f;
     }
-    
+
     readEntry(node);
 }   // Highscores
 
@@ -79,13 +79,13 @@ void Highscores::readEntry(const XMLNode &node)
     node.get("number-of-laps", &m_number_of_laps      );
     node.get("reverse",        &m_reverse             );
 
-    for(unsigned int i=0; i<node.getNumNodes(); i++) 
+    for(unsigned int i=0; i<node.getNumNodes(); i++)
     {
         const XMLNode *entry = node.getNode(i);
         entry->get("time",     &m_time[i]            );
         entry->get("name",     &m_name[i]            );
         entry->get("kartname", &m_kart_name[i]       );
-        
+
         // a non-empty entry needs a non-empty kart name.
         if (!(m_time[i] <= 0.0f || m_kart_name[i].size() > 0))
         {
@@ -120,7 +120,7 @@ void Highscores::writeEntry(XMLWriter &writer)
     writer << L"             number-of-laps=\"" << m_number_of_laps          << "\"\n";
     writer << L"             reverse       =\"" << m_reverse                 << "\">\n";
 
-    for(int i=0; i<HIGHSCORE_LEN; i++) 
+    for(int i=0; i<HIGHSCORE_LEN; i++)
     {
         if (m_time[i] > 0.0f)
         {
@@ -149,7 +149,7 @@ int Highscores::matches(HighscoreType highscore_type,
 }   // matches
 
 // -----------------------------------------------------------------------------
-/** Inserts the data into the highscore list. 
+/** Inserts the data into the highscore list.
  *  If the new entry is fast enough to
  *  be in the highscore list, the new position (1-HIGHSCORE_LEN) is returned,
  *  otherwise a 0.
@@ -181,7 +181,7 @@ int Highscores::addData(const std::string& kart_name,
         }
     }//next score slot
 
-    if(position>=0) 
+    if(position>=0)
     {
         m_track               = race_manager->getTrackName();
         m_number_of_karts     = race_manager->getNumberOfKarts();
@@ -221,7 +221,7 @@ void Highscores::getEntry(int number, std::string &kart_name,
     kart_name = m_kart_name[number];
     name      = m_name[number];
     *time     = m_time[number];
-    
+
 }   // getEntry
 
 // -----------------------------------------------------------------------------

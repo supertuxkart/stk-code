@@ -59,11 +59,11 @@ void Moveable::setNode(scene::ISceneNode *n)
 //-----------------------------------------------------------------------------
 /** Updates the graphics model. Mainly set the graphical position to be the
  *  same as the physics position, but uses offsets to position and rotation
- *  for special gfx effects (e.g. skidding will turn the karts more). 
+ *  for special gfx effects (e.g. skidding will turn the karts more).
  *  \param offset_xyz Offset to be added to the position.
  *  \param rotation Additional rotation.
  */
-void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,  
+void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
                               const btQuaternion& rotation)
 {
     Vec3 xyz=getXYZ()+offset_xyz;
@@ -148,14 +148,14 @@ void Moveable::update(float dt)
  */
 void Moveable::createBody(float mass, btTransform& trans,
                           btCollisionShape *shape,
-                          float restitution) 
+                          float restitution)
 {
     btVector3 inertia;
     shape->calculateLocalInertia(mass, inertia);
     m_transform = trans;
     m_motion_state = new KartMotionState(trans);
 
-    btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state, 
+    btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state,
                                                   shape, inertia);
     info.m_restitution = restitution;
 
@@ -165,13 +165,13 @@ void Moveable::createBody(float mass, btTransform& trans,
     if(mass==0)
     {
         // Create a kinematic object
-        m_body->setCollisionFlags(m_body->getCollisionFlags() | 
+        m_body->setCollisionFlags(m_body->getCollisionFlags() |
                                   btCollisionObject::CF_KINEMATIC_OBJECT );
         m_body->setActivationState(DISABLE_DEACTIVATION);
     }
 
     // The value of user_pointer must be set from the actual class, otherwise this
-    // is only a pointer to moveable, not to (say) kart, and virtual 
+    // is only a pointer to moveable, not to (say) kart, and virtual
     // functions are not called correctly. So only init the pointer to zero.
     m_user_pointer.zero();
     m_body->setUserPointer(&m_user_pointer);

@@ -31,7 +31,7 @@ using namespace GUIEngine;
 
 MessageDialog::MessageDialog(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool own_listener) :
     ModalDialog(0.6f, 0.6f)
-{    
+{
     doInit(msg, type, listener, own_listener);
 }
 
@@ -48,7 +48,7 @@ MessageDialog::MessageDialog(irr::core::stringw msg) :
 MessageDialog::~MessageDialog()
 {
     if (m_own_listener) delete m_listener; m_listener = NULL;
-    
+
     if (StateManager::get()->getGameState() == GUIEngine::GAME)
     {
         World::getWorld()->scheduleUnpause();
@@ -64,13 +64,13 @@ void MessageDialog::doInit(irr::core::stringw msg, MessageDialogType type,
     {
         World::getWorld()->schedulePause(World::IN_GAME_MENU_PHASE);
     }
-    
-    
+
+
     loadFromFile("confirm_dialog.stkgui");
 
     m_listener = listener;
     m_own_listener = own_listener;
-    
+
     LabelWidget* message = getWidget<LabelWidget>("title");
     message->setText( msg.c_str(), false );
 
@@ -98,7 +98,7 @@ void MessageDialog::onEnterPressedInternal()
 
 GUIEngine::EventPropagation MessageDialog::processEvent(const std::string& eventSource)
 {
-    
+
     if (eventSource == "cancel")
     {
         if (m_listener == NULL)
@@ -109,7 +109,7 @@ GUIEngine::EventPropagation MessageDialog::processEvent(const std::string& event
         {
             m_listener->onCancel();
         }
-        
+
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "confirm")
@@ -122,10 +122,10 @@ GUIEngine::EventPropagation MessageDialog::processEvent(const std::string& event
         {
             m_listener->onConfirm();
         }
-        
+
         return GUIEngine::EVENT_BLOCK;
     }
-    
+
     return GUIEngine::EVENT_LET;
 }
 

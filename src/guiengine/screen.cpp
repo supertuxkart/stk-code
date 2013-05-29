@@ -39,7 +39,7 @@ using namespace GUIEngine;
 #include <assert.h>
 
 // -----------------------------------------------------------------------------
-/** 
+/**
  * \brief          Creates a screen populated by the widgets described
  *                 in a STK GUI file.
  * \param filename Name of the XML file describing the screen.
@@ -116,7 +116,7 @@ void Screen::tearDown()
 void Screen::loadFromFile()
 {
     assert(m_magic_number == 0xCAFEC001);
-    
+
     IXMLReader* xml = file_manager->createXMLReader( (file_manager->getGUIDir() + m_filename).c_str() );
     if (xml == NULL)
     {
@@ -124,14 +124,14 @@ void Screen::loadFromFile()
         assert(false);
         return;
     }
-    
+
     parseScreenFileDiv(xml, m_widgets);
     m_loaded = true;
     calculateLayout();
-    
+
     // invoke callback so that the class deriving from Screen is aware of this event
     loadedFromFile();
-    
+
     delete xml;
 }   // loadFromFile
 
@@ -148,10 +148,10 @@ void Screen::unload()
     {
         assert(w->m_magic_number == 0xCAFEC001);
     }
-    
+
     m_loaded = false;
     m_widgets.clearAndDeleteAll();
-    
+
     // invoke callback so that the class deriving from Screen is aware of this event
     unloaded();
 }   // unload
@@ -180,11 +180,11 @@ void Screen::addWidgets()
 {
     assert(m_magic_number == 0xCAFEC001);
     if (!m_loaded) loadFromFile();
-    
+
     addWidgetsRecursively( m_widgets );
 
     //std::cout << "*****ScreenAddWidgets " << m_filename.c_str() << " : focusing the first widget*****\n";
-    
+
     // select the first widget (for first players only; if other players need some focus the Screen must provide it).
     Widget* w = getFirstWidget();
     //std::cout << "First widget is " << (w == NULL ? "null" : w->m_properties[PROP_ID].c_str()) << std::endl;

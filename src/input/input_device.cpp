@@ -48,20 +48,20 @@ KeyboardDevice::KeyboardDevice()
 
 // ----------------------------------------------------------------------------
 
-bool KeyboardDevice::processAndMapInput(const int id, 
+bool KeyboardDevice::processAndMapInput(const int id,
                                         InputManager::InputDriverMode mode,
                                         PlayerAction* action /* out */)
 {
     if (mode == InputManager::INGAME)
     {
-        return m_configuration->getGameAction(Input::IT_KEYBOARD, id, 0, 
+        return m_configuration->getGameAction(Input::IT_KEYBOARD, id, 0,
                                               action);
     }
     else
     {
         // bindings can only be accessed in game and menu modes
         assert(mode == InputManager::MENU);
-        return m_configuration->getMenuAction(Input::IT_KEYBOARD, id, 0, 
+        return m_configuration->getMenuAction(Input::IT_KEYBOARD, id, 0,
                                               action);
     }
 }   // processAndMapInput
@@ -74,8 +74,8 @@ bool KeyboardDevice::processAndMapInput(const int id,
 #endif
 
 
-GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, 
-                             const int axis_count, const int button_count, 
+GamePadDevice::GamePadDevice(const int irrIndex, const std::string name,
+                             const int axis_count, const int button_count,
                              GamepadConfig *configuration)
 {
     m_type                  = DT_GAMEPAD;
@@ -89,7 +89,7 @@ GamePadDevice::GamePadDevice(const int irrIndex, const std::string name,
     m_button_count          = button_count;
     m_index                 = irrIndex;
     m_name                  = name;
-    
+
     for (int i = 0; i < axis_count; i++)
     {
         m_prevAxisDirections[i] = Input::AD_NEUTRAL;
@@ -129,8 +129,8 @@ void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
 
 // ----------------------------------------------------------------------------
 
-void GamePadDevice::resetAxisDirection(const int axis, 
-                                       Input::AxisDirection direction, 
+void GamePadDevice::resetAxisDirection(const int axis,
+                                       Input::AxisDirection direction,
                                        StateManager::ActivePlayer* player)
 {
     // ignore this while in menus
@@ -142,7 +142,7 @@ void GamePadDevice::resetAxisDirection(const int axis,
         fprintf(stderr, "Error, trying to reset axis for an unknown player\n");
         return;
     }
-    
+
     for(int n=0; n<PA_COUNT; n++)
     {
         Binding& bind = m_configuration->getBinding(n);
@@ -161,22 +161,22 @@ void GamePadDevice::resetAxisDirection(const int axis,
 
 // ----------------------------------------------------------------------------
 
-bool GamePadDevice::processAndMapInput(Input::InputType type, const int id, 
+bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
                                        const int value,
                                        InputManager::InputDriverMode mode,
                                        StateManager::ActivePlayer* player,
                                        PlayerAction* action /* out */)
 {
     if (!m_configuration->isEnabled()) return false;
-    
+
     bool success = false;
     if(m_prevAxisDirections == NULL) return false; // device not open
-    
+
     if (type == Input::IT_STICKMOTION)
     {
         // this gamepad doesn't even have that many axes
         if (id >= m_axis_count) return false;
-        
+
         if (player != NULL)
         {
             // going to negative from positive
@@ -186,14 +186,14 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
                 resetAxisDirection(id, Input::AD_POSITIVE, player);
             }
             // going to positive from negative
-            else if (value > 0 && 
+            else if (value > 0 &&
                      m_prevAxisDirections[id] == Input::AD_NEGATIVE)
             {
                 //  set negative id to 0
                 resetAxisDirection(id, Input::AD_NEGATIVE, player);
             }
         }
-        
+
         if     (value > 0) m_prevAxisDirections[id] = Input::AD_POSITIVE;
         else if(value < 0) m_prevAxisDirections[id] = Input::AD_NEGATIVE;
 
@@ -210,7 +210,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
                 m_axis_ok[id] = true;
             }
         }
-        
+
         // check if within deadzone
         if(value > -m_deadzone && value < m_deadzone && player != NULL)
         {
@@ -236,11 +236,11 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
 
             return false;
         }
-        
+
         // If axis did not send proper values yet, ignore it.
         if (!m_axis_ok[id]) return false;
     }
-    
+
     if (m_configuration != NULL)
     {
         if (mode == InputManager::INGAME)

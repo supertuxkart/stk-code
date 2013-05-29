@@ -44,56 +44,56 @@ const float TEXTURE_Y_TILES[RAIN_RING_COUNT] = { 8.0f, 7.0f, 6.0f, 4.0f, 4.0f };
 Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent)
 {
     m_lightning = camera->getIndex()==0;
-    
-    if (m_lightning) 
+
+    if (m_lightning)
         m_thunder_sound = sfx_manager->createSoundSource("thunder");
-    
+
     Material* m = material_manager->getMaterial("rain.png");
     assert(m != NULL);
-    
+
     RandomGenerator g;
     m_next_lightning = (float)g.get(35);
-    
+
     for (int r=0; r<RAIN_RING_COUNT; r++)
     {
         m_x[r] = r/(float)RAIN_RING_COUNT;
         m_y[r] = r/(float)RAIN_RING_COUNT;
-        
+
         scene::SMeshBuffer *buffer = new scene::SMeshBuffer();
-        
+
         buffer->Material.setTexture(0, m->getTexture());
         m->setMaterialProperties(&buffer->Material, NULL);
         buffer->Material.ZWriteEnable = false;
         buffer->Material.BackfaceCulling = false;
-        
+
         m_materials.push_back(&buffer->Material);
-        
+
         video::S3DVertex v;
         v.Color.set(255,255,255,255);
-        
+
         // create a cylinder mesh
         const int VERTICES = 17;
-        
+
         for (int vid=0; vid<VERTICES*2; vid+=2)
         {
             const float ratio = float(vid) / float(VERTICES-1);
             const float angle = ratio * 2.0f * M_PI;
-            
+
             v.Pos.X = cos(angle)*RAIN_RADIUS[r];
             v.Pos.Y = RAIN_Y_TO;
             v.Pos.Z = sin(angle)*RAIN_RADIUS[r];
-            
+
             // offset the X coord in texturing so you don't see textures from
             // the different rings lining up
             v.TCoords.X = ratio*TEXTURE_X_TILES[r] + r/3.0f;
             v.TCoords.Y = TEXTURE_Y_TILES[r];
             buffer->Vertices.push_back(v);
-            
+
             v.Pos.Y =  RAIN_Y_FROM;
-            
+
             v.TCoords.Y = 0.0f;
             buffer->Vertices.push_back(v);
-            
+
             if (vid > 0)
             {
                 buffer->Indices.push_back(vid-2);
@@ -108,12 +108,12 @@ Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent)
         scene::SMesh* mesh = new scene::SMesh();
         mesh->addMeshBuffer(buffer);
         mesh->recalculateBoundingBox();
-        
-        m_node[r] = irr_driver->addPerCameraMesh(mesh, 
+
+        m_node[r] = irr_driver->addPerCameraMesh(mesh,
                                                  camera->getCameraSceneNode(),
                                                  parent);
         mesh->drop();
-        
+
         buffer->drop();
     }
 }   // Rain
@@ -127,7 +127,7 @@ Rain::~Rain()
         m_node[r]->drop();      // drop STK's reference
         m_node[r]->remove();    // Then remove it from the scene graph.
     }
-    
+
     if (m_lightning && m_thunder_sound != NULL) sfx_manager->deleteSFX(m_thunder_sound);
 }
 
@@ -142,16 +142,16 @@ void Rain::update(float dt)
         m_y[m] = m_y[m] + dt*RAIN_DY;
         if (m_x[m] > 1.0f) m_x[m] = fmod(m_x[m], 1.0f);
         if (m_y[m] > 1.0f) m_y[m] = fmod(m_y[m], 1.0f);
-        
+
         core::matrix4& matrix = m_node[m]->getChild()->getMaterial(0).getTextureMatrix(0);
 
         matrix.setTextureTranslate(m_x[m], m_y[m]);
     }
-    
+
     if (m_lightning)
     {
         m_next_lightning -= dt;
-        
+
         if (m_next_lightning < 0.0f)
         {
             RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
@@ -160,12 +160,12 @@ void Rain::update(float dt)
                 gui_base->doLightning();
                 if (m_thunder_sound) m_thunder_sound->play();
             }
-            
+
             RandomGenerator g;
             m_next_lightning = 35 + (float)g.get(35);
         }
     }
-    
+
 }   // update
 
 // ----------------------------------------------------------------------------

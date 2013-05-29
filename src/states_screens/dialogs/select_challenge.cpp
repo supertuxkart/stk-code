@@ -39,12 +39,12 @@ using namespace GUIEngine;
 core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* c)
 {
     core::stringw label;
-    
+
     if (c->getPosition(difficulty) != -1)
     {
         int r = c->getPosition(difficulty);
         if (c->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER) r--;
-        
+
         if (label.size() > 0) label.append(L"\n");
         label.append( _("Required Rank : %i", r) );
     }
@@ -59,10 +59,10 @@ core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* 
         if (label.size() > 0) label.append(L"\n");
         label.append( _("Required Nitro Points : %i", c->getEnergy(difficulty)) );
     }
-    
+
     if (label.size() > 0) label.append(L"\n");
     label.append(_("Number of AI Karts : %i", c->getNumKarts(difficulty) - 1));
-    
+
     return label;
 }
 
@@ -77,7 +77,7 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     loadFromFile("select_challenge.stkgui");
     m_challenge_id = challenge_id;
     World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
-    
+
     switch (UserConfigParams::m_difficulty)
     {
         case 0:
@@ -99,14 +99,14 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
         btn->setImage(file_manager->getTextureFile("cup_bronze.png").c_str(),
                      IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     }
-    
+
     if (c->isSolved(RaceManager::DIFFICULTY_MEDIUM))
     {
         IconButtonWidget* btn = getWidget<IconButtonWidget>("intermediate");
         btn->setImage(file_manager->getTextureFile("cup_silver.png").c_str(),
                      IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     }
-    
+
     if (c->isSolved(RaceManager::DIFFICULTY_HARD))
     {
         IconButtonWidget* btn = getWidget<IconButtonWidget>("expert");
@@ -114,15 +114,15 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
                      IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     }
 
-    
+
     LabelWidget* novice_label = getWidget<LabelWidget>("novice_label");
     LabelWidget* medium_label = getWidget<LabelWidget>("intermediate_label");
     LabelWidget* expert_label = getWidget<LabelWidget>("difficult_label");
-    
+
     novice_label->setText( getLabel(RaceManager::DIFFICULTY_EASY,   c->getData()), false );
     medium_label->setText( getLabel(RaceManager::DIFFICULTY_MEDIUM, c->getData()), false );
     expert_label->setText( getLabel(RaceManager::DIFFICULTY_HARD,   c->getData()), false );
-    
+
     if (c->getData()->isGrandPrix())
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(c->getData()->getGPId());
@@ -133,13 +133,13 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
         const wchar_t* track_name = track_manager->getTrack(c->getData()->getTrackId())->getName();
         getWidget<LabelWidget>("title")->setText( track_name, true );
     }
-    
+
     LabelWidget* typeLbl = getWidget<LabelWidget>("race_type_val");
     if (c->getData()->isGrandPrix())
         typeLbl->setText(_("Grand Prix"), false );
     else
         typeLbl->setText( RaceManager::getNameOf(c->getData()->getMinorMode()), false );
-    
+
 }
 
 // ----------------------------------------------------------------------------
@@ -158,49 +158,49 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         eventSource == "expert")
     {
         const ChallengeData* challenge = unlock_manager->getChallenge(m_challenge_id);
-        
+
         if (challenge == NULL)
         {
             Log::error("SelectChallenge", "Cannot find challenge <%s>\n",
                        m_challenge_id.c_str());
             return GUIEngine::EVENT_LET;
         }
-        
+
         unlock_manager->getCurrentSlot()->setCurrentChallenge(m_challenge_id);
 
         ModalDialog::dismiss();
 
         core::rect<s32> pos(15,
-                            10, 
+                            10,
                             15 + UserConfigParams::m_width/2,
                             10 + GUIEngine::getTitleFontHeight());
-        
+
         race_manager->exitRace();
         //StateManager::get()->resetActivePlayers();
-        
+
         // Use latest used device
         InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
         assert(device != NULL);
-        
+
         // Set up race manager appropriately
         race_manager->setNumLocalPlayers(1);
         race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
         race_manager->setReverseTrack(false);
-        
+
         //int id = StateManager::get()->createActivePlayer( unlock_manager->getCurrentPlayer(), device );
         input_manager->getDeviceList()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
-        
+
         // ASSIGN should make sure that only input from assigned devices is read.
         input_manager->getDeviceList()->setAssignMode(ASSIGN);
-        
+
         // Go straight to the race
-        StateManager::get()->enterGameState();                
-        
+        StateManager::get()->enterGameState();
+
         // Initialise global data - necessary even in local games to avoid
-        // many if tests in other places (e.g. if network_game call 
+        // many if tests in other places (e.g. if network_game call
         // network_manager else call race_manager).
         network_manager->initCharacterDataStructures();
-        
+
         // Launch challenge
         if (eventSource == "novice")
         {
@@ -219,21 +219,21 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         }
         else
         {
-            Log::error("SelectChallenge", "Unknown widget <%s>\n", 
+            Log::error("SelectChallenge", "Unknown widget <%s>\n",
                         eventSource.c_str());
             //assert(false);
             return GUIEngine::EVENT_LET;
         }
-        
+
         // Sets up kart info, including random list of kart for AI
         network_manager->setupPlayerKartInfo();
         race_manager->startNew(true);
-        
-        irr_driver->hidePointer(); 
-        
+
+        irr_driver->hidePointer();
+
         return GUIEngine::EVENT_BLOCK;
     }
-    
+
     return GUIEngine::EVENT_LET;
 }
 

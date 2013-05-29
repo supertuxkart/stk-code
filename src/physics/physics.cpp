@@ -84,7 +84,7 @@ Physics::~Physics()
  */
 void Physics::addKart(const AbstractKart *kart)
 {
-	const btCollisionObjectArray &all_objs = 
+	const btCollisionObjectArray &all_objs =
 		m_dynamics_world->getCollisionObjectArray();
 	for(unsigned int i=0; i<(unsigned int)all_objs.size(); i++)
 	{
@@ -159,9 +159,9 @@ void Physics::update(float dt)
             AbstractKart *b=p->getUserPointer(1)->getPointerKart();
             race_state->addCollision(a->getWorldKartId(),
                                      b->getWorldKartId());
-            KartKartCollision(p->getUserPointer(0)->getPointerKart(), 
+            KartKartCollision(p->getUserPointer(0)->getPointerKart(),
                               p->getContactPointCS(0),
-                              p->getUserPointer(1)->getPointerKart(), 
+                              p->getUserPointer(1)->getPointerKart(),
                               p->getContactPointCS(1)                );
             continue;
         }  // if kart-kart collision
@@ -256,26 +256,26 @@ void Physics::update(float dt)
 bool Physics::projectKartDownwards(const AbstractKart *k)
 {
     btVector3 hell(0, -10000, 0);
-    return k->getVehicle()->projectVehicleToSurface(hell, 
+    return k->getVehicle()->projectVehicleToSurface(hell,
                                                     /*allow translation*/true);
 } //projectKartsDownwards
 
 //-----------------------------------------------------------------------------
-/** Handles the special case of two karts colliding with each other, which 
- *  means that bombs must be passed on. If both karts have a bomb, they'll 
- *  explode immediately. This function is called from physics::update() on the 
- *  server and if no networking is used, and from race_state on the client to 
+/** Handles the special case of two karts colliding with each other, which
+ *  means that bombs must be passed on. If both karts have a bomb, they'll
+ *  explode immediately. This function is called from physics::update() on the
+ *  server and if no networking is used, and from race_state on the client to
  *  replay what happened on the server.
  *  \param kart_a First kart involved in the collision.
- *  \param contact_point_a Location of collision at first kart (in kart 
+ *  \param contact_point_a Location of collision at first kart (in kart
  *         coordinates).
  *  \param kart_b Second kart involved in the collision.
  *  \param contact_point_b Location of collision at second kart (in kart
  *         coordinates).
  */
-void Physics::KartKartCollision(AbstractKart *kart_a, 
+void Physics::KartKartCollision(AbstractKart *kart_a,
                                 const Vec3 &contact_point_a,
-                                AbstractKart *kart_b, 
+                                AbstractKart *kart_b,
                                 const Vec3 &contact_point_b)
 {
     // Only one kart needs to handle the attachments, it will
@@ -286,12 +286,12 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
     AbstractKart *left_kart, *right_kart;
 
     // Determine which kart is pushed to the left, and which one to the
-    // right. Ideally the sign of the X coordinate of the local conact point 
+    // right. Ideally the sign of the X coordinate of the local conact point
     // could decide the direction (negative X --> was hit on left side, gets
     // push to right), but that can lead to both karts being pushed in the
     // same direction (front left of kart hits rear left).
     // So we just use a simple test (which does the right thing in ideal
-    // crashes, but avoids pushing both karts in corner cases 
+    // crashes, but avoids pushing both karts in corner cases
     // - pun intended ;) ).
     if(contact_point_a.getX() < contact_point_b.getX())
     {
@@ -307,12 +307,12 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
     // Add a scaling factor depending on the mass (avoid div by zero).
     // The value of f_right is applied to the right kart, and f_left
     // to the left kart. f_left = 1 / f_right
-    float f_right =  right_kart->getKartProperties()->getMass() > 0 
-                     ? left_kart->getKartProperties()->getMass() 
+    float f_right =  right_kart->getKartProperties()->getMass() > 0
+                     ? left_kart->getKartProperties()->getMass()
                        / right_kart->getKartProperties()->getMass()
                      : 1.5f;
     // Add a scaling factor depending on speed (avoid div by 0)
-    f_right *= right_kart->getSpeed() > 0 
+    f_right *= right_kart->getSpeed() > 0
                ? left_kart->getSpeed()
                   / right_kart->getSpeed()
                : 1.5f;
@@ -329,7 +329,7 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
     float vel_left  = left_kart->getVelocityLC().getX();
     float vel_right = right_kart->getVelocityLC().getX();
 
-    // Use the difference in speed to determine which kart gets a 
+    // Use the difference in speed to determine which kart gets a
     // ramming bonus. Normally vel_right and vel_left will have
     // a different sign: right kart will be driving to the left,
     // and left kart to the right (both pushing at each other).
@@ -402,7 +402,7 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
  *  actual physics timestep. This list only stores a collision if it's not
  *  already in the list, so a collisions which is reported more than once is
  *  nevertheless only handled once.
- *  The list of collision 
+ *  The list of collision
  *  Parameters: see bullet documentation for details.
  */
 btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
@@ -410,16 +410,16 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                              btTypedConstraint** constraints,
                              int numConstraints,
                              const btContactSolverInfo& info,
-                             btIDebugDraw* debugDrawer, 
-                             btStackAlloc* stackAlloc, 
+                             btIDebugDraw* debugDrawer,
+                             btStackAlloc* stackAlloc,
                              btDispatcher* dispatcher)
 {
     btScalar returnValue=
-        btSequentialImpulseConstraintSolver::solveGroup(bodies, numBodies, 
+        btSequentialImpulseConstraintSolver::solveGroup(bodies, numBodies,
                                                         manifold, numManifolds,
                                                         constraints,
                                                         numConstraints, info,
-                                                        debugDrawer, 
+                                                        debugDrawer,
                                                         stackAlloc,
                                                         dispatcher);
     int currentNumManifolds = m_dispatcher->getNumManifolds();
@@ -430,12 +430,12 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
     std::vector<Moveable*> rocketsToExplode;
     for(int i=0; i<currentNumManifolds; i++)
     {
-        btPersistentManifold* contact_manifold = 
+        btPersistentManifold* contact_manifold =
             m_dynamics_world->getDispatcher()->getManifoldByIndexInternal(i);
 
-        btCollisionObject* objA = 
+        btCollisionObject* objA =
             static_cast<btCollisionObject*>(contact_manifold->getBody0());
-        btCollisionObject* objB = 
+        btCollisionObject* objB =
             static_cast<btCollisionObject*>(contact_manifold->getBody1());
 
         unsigned int num_contacts = contact_manifold->getNumContacts();
@@ -459,7 +459,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                 AbstractKart *kart=upB->getPointerKart();
                 race_state->addCollision(kart->getWorldKartId());
                 int n = contact_manifold->getContactPoint(0).m_index0;
-                const Material *m 
+                const Material *m
                     = n>=0 ? upA->getPointerTriangleMesh()->getMaterial(n)
                            : NULL;
                 // I assume that the normal needs to be flipped in this case,
@@ -479,7 +479,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                 AbstractKart *kart = upA->getPointerKart();
                 race_state->addCollision(kart->getWorldKartId());
                 int n = contact_manifold->getContactPoint(0).m_index1;
-                const Material *m 
+                const Material *m
                     = n>=0 ? upB->getPointerTriangleMesh()->getMaterial(n)
                            : NULL;
                 const btVector3 &normal = contact_manifold->getContactPoint(0)
@@ -544,7 +544,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                     upA, contact_manifold->getContactPoint(0).m_localPointA,
                     upB, contact_manifold->getContactPoint(0).m_localPointB);
         }
-        else 
+        else
             assert("Unknown user pointer");           // 4) Should never happen
     }   // for i<numManifolds
 
@@ -568,7 +568,7 @@ void Physics::draw()
     material.BackfaceCulling = false;
     material.setFlag(video::EMF_LIGHTING, false);
     irr_driver->getVideoDriver()->setMaterial(material);
-    irr_driver->getVideoDriver()->setTransform(video::ETS_WORLD, 
+    irr_driver->getVideoDriver()->setTransform(video::ETS_WORLD,
                                                core::IdentityMatrix);
     m_dynamics_world->debugDrawWorld();
     return;

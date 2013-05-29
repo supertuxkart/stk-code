@@ -19,13 +19,13 @@ STKModifiedSpriteBank::STKModifiedSpriteBank(IGUIEnvironment* env) :
     Environment(env), Driver(0)
 {
     m_magic_number = 0xCAFEC001;
-    
+
     #ifdef _DEBUG
     setDebugName("STKModifiedSpriteBank");
     #endif
 
     m_scale = 1.0f;
-    
+
     if (Environment)
     {
         Driver = Environment->getVideoDriver();
@@ -45,7 +45,7 @@ STKModifiedSpriteBank::~STKModifiedSpriteBank()
     // drop video driver
     if (Driver)
         Driver->drop();
-    
+
     m_magic_number = 0xDEADBEEF;
 }   // ~STKModifiedSpriteBank
 
@@ -54,9 +54,9 @@ core::array< core::rect<s32> >& STKModifiedSpriteBank::getPositions()
 {
     assert( m_magic_number == 0xCAFEC001 );
     copy.clear();
-    
+
     //FIXME: terribly unefficient, CGUIListBox will call this once for every
-    //       item xD but I have no choice, short of re-implementing 
+    //       item xD but I have no choice, short of re-implementing
     //       IGUIListBox too
 
     for (int n=0; n<(int)Rectangles.size(); n++)
@@ -67,7 +67,7 @@ core::array< core::rect<s32> >& STKModifiedSpriteBank::getPositions()
                                        core::dimension2d<s32>(w,h) )
                        );
     }
-    
+
     return copy;
 }   // getPositions
 
@@ -148,7 +148,7 @@ s32 STKModifiedSpriteBank::addTextureAsSprite(video::ITexture* texture)
     u32 textureIndex = getTextureCount() - 1;
 
     u32 rectangleIndex = Rectangles.size();
-    Rectangles.push_back( core::rect<s32>(0,0, 
+    Rectangles.push_back( core::rect<s32>(0,0,
                                           texture->getOriginalSize().Width,
                                           texture->getOriginalSize().Height) );
 
@@ -167,7 +167,7 @@ s32 STKModifiedSpriteBank::addTextureAsSprite(video::ITexture* texture)
 
 // ----------------------------------------------------------------------------
 //! draws a sprite in 2d with scale and color
-void STKModifiedSpriteBank::draw2DSprite(u32 index, 
+void STKModifiedSpriteBank::draw2DSprite(u32 index,
         const core::position2di& pos,
         const core::rect<s32>* clip, const video::SColor& color,
         u32 starttime, u32 currenttime, bool loop, bool center)
@@ -184,11 +184,11 @@ void STKModifiedSpriteBank::draw2DSprite(u32 index,
         if (loop)
             frame = f % Sprites[index].Frames.size();
         else
-            frame = (f >= Sprites[index].Frames.size()) 
+            frame = (f >= Sprites[index].Frames.size())
                   ? Sprites[index].Frames.size()-1 : f;
     }
 
-    const video::ITexture* tex = 
+    const video::ITexture* tex =
         Textures[Sprites[index].Frames[frame].textureNumber];
     if (!tex)
         return;
@@ -200,24 +200,24 @@ void STKModifiedSpriteBank::draw2DSprite(u32 index,
     const core::rect<s32>& r = Rectangles[rn];
 
     const core::dimension2d<s32>& dim = r.getSize();
-    
-    core::rect<s32> dest( pos, 
-                          core::dimension2d<s32>((int)(dim.Width*m_scale), 
+
+    core::rect<s32> dest( pos,
+                          core::dimension2d<s32>((int)(dim.Width*m_scale),
                                                  (int)(dim.Height*m_scale)) );
     if (center)
     {
         dest -= dest.getSize() / 2;
     }
-    
+
     /*
-        draw2DImage  (const video::ITexture  *texture, 
+        draw2DImage  (const video::ITexture  *texture,
                       const core::rect<  s32  > &destRect,
-                      const core::rect<  s32  > &sourceRect, 
+                      const core::rect<  s32  > &sourceRect,
                       const core::rect<  s32  > *clipRect=0,
                       const video::SColor  *const colors=0,
                       bool useAlphaChannelOfTexture=false)=0
      */
-    Driver->draw2DImage(tex, dest, r /* source rect */, clip, 
+    Driver->draw2DImage(tex, dest, r /* source rect */, clip,
                         NULL /* colors */, true);
 
 }   // draw2DSprite
@@ -287,7 +287,7 @@ void STKModifiedSpriteBank::draw2DSpriteBatch(const core::array<u32>& indices,
 
     for(u32 i = 0;i < drawBatches.size();i++)
     {
-        if(!drawBatches[i].positions.empty() && 
+        if(!drawBatches[i].positions.empty() &&
             !drawBatches[i].sourceRects.empty())
             Driver->draw2DImageBatch(Textures[i], drawBatches[i].positions,
                 drawBatches[i].sourceRects, clip, color, true);

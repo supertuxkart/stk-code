@@ -54,7 +54,7 @@ DemoWorld::DemoWorld()
 }   // DemoWorld
 
 //-----------------------------------------------------------------------------
-/** Destructor. Resets the flag that the next race is a demo mode. 
+/** Destructor. Resets the flag that the next race is a demo mode.
  */
 DemoWorld::~DemoWorld()
 {
@@ -100,13 +100,13 @@ void DemoWorld::enterRaceOverState()
  *  \param dt Time step size, which is added to the idle time.
  *  \return true if a demo is started.
  */
-bool DemoWorld::updateIdleTimeAndStartDemo(float dt) 
+bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
 {
     // We get crashes if stk is activated when a modal dialog is open
     if(GUIEngine::ModalDialog::isADialogActive())
         return false;
 
-    m_current_idle_time += dt; 
+    m_current_idle_time += dt;
     if(m_current_idle_time <= m_max_idle_time)
         return false;
 
@@ -120,7 +120,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
             && m_demo_tracks.size() > 0)
     {
         if(!track)
-            printf("Invalid demo track identifier '%s'.\n", 
+            printf("Invalid demo track identifier '%s'.\n",
                    m_demo_tracks[0].c_str());
         m_demo_tracks.erase(m_demo_tracks.begin());
         track = track_manager->getTrack(m_demo_tracks[0]);
@@ -140,7 +140,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
 
     // Use keyboard 0 by default in --no-start-screen
     device = input_manager->getDeviceList()->getKeyboard(0);
-    StateManager::get()->createActivePlayer( 
+    StateManager::get()->createActivePlayer(
         UserConfigParams::m_all_players.get(0), device );
     // ASSIGN should make sure that only input from assigned devices
     // is read.
@@ -153,6 +153,6 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     race_manager->startSingleRace(m_demo_tracks[0], m_num_laps, false);
     m_demo_tracks.push_back(m_demo_tracks[0]);
     m_demo_tracks.erase(m_demo_tracks.begin());
-    
+
     return true;
 }   // updateIdleTimeAndStartDemo
