@@ -412,7 +412,7 @@ void cmdLineHelp (char* invocation)
     //"       --numclients=n     Number of clients to wait for (server "
     //                          "only).\n"
     "       --no-console       Does not write messages in the console but to\n"
-    "                          stdout.log/stderr.log.\n"
+    "                          stdout.log.\n"
     "       --console          Write messages in the console and files\n"
     "  -h,  --help             Show this help.\n"
     "\n"
