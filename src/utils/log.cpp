@@ -156,6 +156,14 @@ void Log::printMessage(int level, const char *component, const char *format,
     static const char *names[] = {"verbose", "debug  ", "info   ",
                                   "warn   ", "error  ", "fatal  "};
 
+    // Using a va_list twice produces undefined results, ie crash.
+    // So make a copy if we're going to use it twice.
+    VALIST copy;
+    if (m_file_stdout && UserConfigParams::m_log_errors_to_console)
+    {
+        va_copy(copy, va_list);
+    }
+
     // If we don't have a console file, write to stdout and hope for the best
     if(!m_file_stdout ||
         UserConfigParams::m_log_errors_to_console) // log to console & file
@@ -168,8 +176,9 @@ void Log::printMessage(int level, const char *component, const char *format,
     if(m_file_stdout)
     {
         fprintf (m_file_stdout, "[%s] %s: ", names[level], component);
-        vfprintf(m_file_stdout, format, va_list);
+        vfprintf(m_file_stdout, format, copy);
         fprintf (m_file_stdout, "\n");
+        va_end(copy);
     }
 
 #endif
