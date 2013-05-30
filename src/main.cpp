@@ -521,6 +521,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
                  !strcmp(argv[i], "-l" ))
         {
             ProfileWorld::disableGraphics();
+            UserConfigParams::m_log_errors_to_console=true;
         }
 #if !defined(WIN32) && !defined(__CYGWIN)
         else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
