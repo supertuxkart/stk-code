@@ -894,15 +894,15 @@ int handleCmdLine(int argc, char **argv)
             for (size_t i = 0; i != track_manager->getNumberOfTracks(); i++)
             {
                 const Track *track = track_manager->getTrack(i);
-                std::string locked="";
+                const char * locked = "";
                 if ( unlock_manager->getCurrentSlot()
                                    ->isLocked(track->getIdent()) )
                 {
-                    locked=" (locked)";
+                    locked = " (locked)";
                 }
                 Log::info("main", "%-18s: %ls %s",
                               track->getIdent().c_str(),
-                              track->getName(), locked.c_str());
+                              track->getName(), locked);
                 //}
             }
 
@@ -920,12 +920,12 @@ int handleCmdLine(int argc, char **argv)
                     kart_properties_manager->getKartById(i);
                 unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
                                               .getUniqueID()                    );
-                std::string locked = "";
+                const char * locked = "";
                 if (unlock_manager->getCurrentSlot()->isLocked(KP->getIdent()))
-                    locked="(locked)";
+                    locked = "(locked)";
 
                 Log::info("main", " %-10s: %ls %s", KP->getIdent().c_str(),
-                         KP->getName(), locked.c_str());
+                         KP->getName(), locked);
             }
 
             exit(0);
