@@ -98,7 +98,7 @@ namespace GUIEngine
          *  by the number of rows in the grid (mostly used by dynamic ribbon 
          *  widgets, but the base ribbon needs to know about filler items)
          */
-        static const char* NO_ITEM_ID;
+        static const char NO_ITEM_ID[];
         
         /** Contains which element within the ribbon is currently focused by
          *  player 0 (used by the skin to show mouse hovers over items that 

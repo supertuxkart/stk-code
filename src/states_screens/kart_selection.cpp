@@ -55,11 +55,11 @@ InputDevice* player_1_device = NULL;
 using namespace GUIEngine;
 using irr::core::stringw;
 
-const char* RANDOM_KART_ID = "randomkart";
-const char* ID_DONT_USE = "x";
+static const char RANDOM_KART_ID[] = "randomkart";
+static const char ID_DONT_USE[] = "x";
 // Use '/' as special character to avoid that someone creates
 // a kart called 'locked'
-const char* ID_LOCKED = "locked/";
+static const char ID_LOCKED[] = "locked/";
 
 DEFINE_SCREEN_SINGLETON( KartSelectionScreen );
 

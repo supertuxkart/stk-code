@@ -29,7 +29,7 @@
 using namespace GUIEngine;
 
 
-const char* RACE_STATE_NAME = "race";
+static const char RACE_STATE_NAME[] = "race";
 
 AbstractStateManager::AbstractStateManager()
 {

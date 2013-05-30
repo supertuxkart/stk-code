@@ -41,7 +41,7 @@ using namespace irr::gui;
 #  define round(x)  (floor(x+0.5f))
 #endif
 
-const char* RibbonWidget::NO_ITEM_ID = "?";
+const char RibbonWidget::NO_ITEM_ID[] = "?";
 
 
 // ----------------------------------------------------------------------------

@@ -37,7 +37,7 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::video;
 
-const char* ALL_TRACK_GROUPS_ID = "all";
+static const char ALL_TRACK_GROUPS_ID[] = "all";
 
 DEFINE_SCREEN_SINGLETON( TracksScreen );
 

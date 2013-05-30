@@ -45,7 +45,7 @@ struct  initAttachmentType {Attachment::AttachmentType attachment;
        increase (lower acceleration) it's sufficient negative.
 */
 
-initAttachmentType iat[]=
+static const initAttachmentType iat[]=
 {
     {Attachment::ATTACH_PARACHUTE,      "parachute.b3d",    "parachute-attach-icon.png"},
     {Attachment::ATTACH_BOMB,           "bomb.b3d",         "bomb-attach-icon.png"     },

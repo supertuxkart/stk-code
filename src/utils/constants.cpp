@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "utils/constants.hpp"
+
 // for code that needs to know about endianness so do a simple test.
 // 0 : little endian
 // 1 : big endian
@@ -24,6 +26,6 @@ static const int endianness_test = 0x01000000;
 static const char* endianness_test_ptr = (const char*)&endianness_test;
 
 // in little-endian, byte 0 will be 0. in big endian, byte 0 will be 1
-bool IS_LITTLE_ENDIAN = (endianness_test_ptr[0] == 0);
+const bool IS_LITTLE_ENDIAN = (endianness_test_ptr[0] == 0);
 
-const char* STK_VERSION = "svn";
+const char STK_VERSION[] = "svn";

@@ -32,8 +32,8 @@
 
 #define INPUT_MODE_DEBUG 0
 
-const char* INPUT_FILE_NAME    = "input.xml";
-const int   INPUT_FILE_VERSION = 1;
+static const char  INPUT_FILE_NAME[]  = "input.xml";
+static const int   INPUT_FILE_VERSION = 1;
 
 DeviceManager::DeviceManager()
 {

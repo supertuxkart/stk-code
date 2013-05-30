@@ -37,7 +37,7 @@ using namespace irr::video;
 
 DEFINE_SCREEN_SINGLETON( ArenasScreen );
 
-const char* ALL_ARENA_GROUPS_ID = "all";
+static const char ALL_ARENA_GROUPS_ID[] = "all";
 
 
 // -----------------------------------------------------------------------------
