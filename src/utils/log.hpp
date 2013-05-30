@@ -30,6 +30,10 @@
 #  define VALIST char*
 #endif
 
+#if defined(_WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
+#  define va_copy(dest, src) dest = src
+#endif
+
 class Log
 {
 public:
