@@ -170,7 +170,7 @@ KartModel::~KartModel()
         }
     }
 
-    if(m_is_master)
+    if(m_is_master && m_mesh)
     {
         m_mesh->drop();
         // If there is only one copy left, it's the copy in irrlicht's
