@@ -50,8 +50,6 @@
 #include <IGUIImage.h>
 #include <IGUIButton.h>
 
-InputDevice* player_1_device = NULL;
-
 using namespace GUIEngine;
 using irr::core::stringw;
 
@@ -71,7 +69,7 @@ class PlayerKartWidget;
     turn moves the selection to the appropriate spinner. "tabbing roots" are
     used to make navigation back down possible. (FIXME: maybe find a cleaner
     way?) */
-int g_root_id;
+static int g_root_id;
 
 class FocusDispatcher : public Widget
 {
@@ -134,7 +132,7 @@ public:
     virtual EventPropagation focused(const int playerID);
 };   // FocusDispatcher
 
-FocusDispatcher* g_dispatcher = NULL;
+static FocusDispatcher* g_dispatcher = NULL;
 
 // ============================================================================
 

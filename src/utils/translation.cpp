@@ -59,7 +59,7 @@ const bool REMOVE_BOM = false;
 /** The list of available languages; this is global so that it is cached (and remains
     even if the translations object is deleted and re-created) */
 typedef std::vector<std::string> LanguageList;
-LanguageList g_language_list;
+static LanguageList g_language_list;
 
 // Note : this method is not static because 'g_language_list' is initialized
 //        the first time Translations is constructed (despite being a global)

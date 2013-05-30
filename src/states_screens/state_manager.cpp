@@ -34,7 +34,7 @@
 
 using namespace GUIEngine;
 
-StateManager* state_manager_singleton = NULL;
+static StateManager* state_manager_singleton = NULL;
 
 StateManager* StateManager::get()
 {

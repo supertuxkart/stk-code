@@ -318,7 +318,7 @@ void EventHandler::processGUIAction(const PlayerAction action,
 
 // -----------------------------------------------------------------------------
 
-EventHandler* event_handler_singleton = NULL;
+static EventHandler* event_handler_singleton = NULL;
 
 EventHandler* EventHandler::get()
 {

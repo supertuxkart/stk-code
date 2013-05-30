@@ -38,8 +38,6 @@
 #include <IMesh.h>
 #include <IAnimatedMesh.h>
 
-ItemManager* item_manager;
-
 std::vector<scene::IMesh *> ItemManager::m_item_mesh;
 std::vector<scene::IMesh *> ItemManager::m_item_lowres_mesh;
 ItemManager *               ItemManager::m_item_manager = NULL;
