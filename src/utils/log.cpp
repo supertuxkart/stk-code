@@ -159,7 +159,7 @@ void Log::printMessage(int level, const char *component, const char *format,
     // Using a va_list twice produces undefined results, ie crash.
     // So make a copy if we're going to use it twice.
     VALIST copy;
-    if (m_file_stdout && UserConfigParams::m_log_errors_to_console)
+    if (m_file_stdout)
     {
         va_copy(copy, va_list);
     }
