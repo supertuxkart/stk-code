@@ -128,7 +128,7 @@ void Log::resetTerminalColor()
  *  \param va_list The values to be printed for the format.
  */
 void Log::printMessage(int level, const char *component, const char *format,
-                       VALIST va_list)
+                       VALIST args)
 {
     assert(level>=0 && level <=LL_FATAL);
 
@@ -151,7 +151,7 @@ void Log::printMessage(int level, const char *component, const char *format,
     case LL_FATAL:   alp = ANDROID_LOG_FATAL;   break;
     default:         alp = ANDROID_LOG_FATAL;
     }
-    __android_log_vprint(alp, "SuperTuxKart", format, va_list);
+    __android_log_vprint(alp, "SuperTuxKart", format, args);
 #else
     static const char *names[] = {"verbose", "debug  ", "info   ",
                                   "warn   ", "error  ", "fatal  "};
@@ -161,7 +161,7 @@ void Log::printMessage(int level, const char *component, const char *format,
     VALIST copy;
     if (m_file_stdout)
     {
-        va_copy(copy, va_list);
+        va_copy(copy, args);
     }
 
     // If we don't have a console file, write to stdout and hope for the best
@@ -169,7 +169,7 @@ void Log::printMessage(int level, const char *component, const char *format,
         UserConfigParams::m_log_errors_to_console) // log to console & file
     {
         VALIST out;
-        va_copy(out, va_list);
+        va_copy(out, args);
 
         setTerminalColor((LogLevel)level);
         printf("[%s] %s: ", names[level], component);
