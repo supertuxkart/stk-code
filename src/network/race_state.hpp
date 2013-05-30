@@ -31,7 +31,7 @@
 #include "network/message.hpp"
 #include "utils/aligned_array.hpp"
 
-/** This class stores the state information of a (single) race, e.g. the 
+/** This class stores the state information of a (single) race, e.g. the
     position and orientation of karts, collisions that have happened etc.
     It is used for the network version to update the clients with the
     'official' state information from the server.
@@ -49,10 +49,10 @@ private:
     /** Collision information. This vector stores information about which
      *  kart collided with which kart or track (kartid=-1)                 */
     std::vector<signed char> m_collision_info;
-        
+
     public:
         /** Initialise the global race state. */
-        RaceState() : Message(MT_RACE_STATE) 
+        RaceState() : Message(MT_RACE_STATE)
         {
             m_kart_controls.resize(World::getWorld()->getNumKarts());
         }   // RaceState()
@@ -65,8 +65,8 @@ private:
         /** Collects information about collision in which at least one kart was
          *  involved. Other collision (e.g. projectiles, moving physics) are
          *  not needed on the client, so it's not stored at all. If a kart
-         *  track collision happens, the second kart id is -1 (necessary to 
-         *  play back sound effects). A simple int vector is used to store the 
+         *  track collision happens, the second kart id is -1 (necessary to
+         *  play back sound effects). A simple int vector is used to store the
          *  pair of collision, so the first collision is using the index 0 and
          *  1; the second one 2 and 3 etc.
          *  \param kartId1 World id of the kart involved in the collision.
@@ -86,11 +86,11 @@ private:
             m_flyable_info[n] = fi;
         }
         // --------------------------------------------------------------------
-        /** Stores the current kart control (at the time kart->update() is 
+        /** Stores the current kart control (at the time kart->update() is
          *  called. This allows modifications of kart->m_control during the
          *  update (e.g. see in kart::update() how firing is handled).
          */
-        void storeKartControls(const AbstractKart& kart) 
+        void storeKartControls(const AbstractKart& kart)
         {
             m_kart_controls[kart.getWorldKartId()] = kart.getControls();
         }   // storeKartControls
@@ -99,7 +99,7 @@ private:
         void receive(ENetPacket *pkt);
         void clear();      // Removes all currently stored information
         unsigned int getNumFlyables() const {return m_flyable_info.size(); }
-        const FlyableInfo 
+        const FlyableInfo
                     &getFlyable(unsigned int i) const {return m_flyable_info[i];}
     };   // RaceState
 

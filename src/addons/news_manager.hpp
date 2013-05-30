@@ -81,7 +81,7 @@ private:
      *  the delay between messages. */
     core::stringw   m_all_news_messages;
 
-    /** Stores the news message display count from the user config file. 
+    /** Stores the news message display count from the user config file.
     */
     std::vector<int> m_saved_display_count;
 
@@ -99,7 +99,7 @@ public:
                  ~NewsManager();
     const core::stringw
                   getNextNewsMessage();
-    const core::stringw 
+    const core::stringw
                   getImportantMessage();
     void          init();
     void          addNewsMessage(const core::stringw &s);

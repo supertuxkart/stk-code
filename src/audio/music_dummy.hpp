@@ -39,7 +39,7 @@ public:
     virtual void updateFaster(float percent, float pitch)  {}
     virtual void update      ()                            {}
     virtual bool isPlaying   ()                            { return false; }
-    
+
     virtual     ~MusicDummy  () {}
 };
 

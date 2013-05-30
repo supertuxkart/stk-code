@@ -53,7 +53,7 @@ private:
     Moveable          *m_target;
 
     SFXBase           *m_swat_sound;
-    
+
     /** True if the swatter is removing an attached bomb. */
     bool               m_removing_bomb;
 
@@ -63,12 +63,12 @@ private:
     /** The scene node where a bomb is saved (in case that the swatter
      *  replaces a bomb. */
     scene::ISceneNode *m_bomb_scene_node;
-    
+
     /** For some reason the built-in animation system doesn't work correctly here?? */
     float              m_swat_bomb_frame;
-    
+
     const core::stringw getHitString(const AbstractKart *kart) const;
-    
+
 public:
              Swatter(AbstractKart *kart, bool was_bomb,
                      scene::ISceneNode* bomb_scene_node);
@@ -84,14 +84,14 @@ public:
     // ------------------------------------------------------------------------
     virtual void onAnimationEnd();
     // ------------------------------------------------------------------------
-    
+
 private:
     /** Determine the nearest kart or item and update the current target accordingly */
     void    chooseTarget();
-    
+
     /** If there is a current target, point to it, otherwise adopt the default position */
     void    pointToTarget();
-    
+
     /** Squash karts or items that are around the end position (determined using a joint) of the swatter */
     void    squashThingsAround();
 };   // Swatter

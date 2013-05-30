@@ -70,12 +70,12 @@ public:
 
     // ------------------------------------------------------------------------
     /** Creates a new instance of the replay object. */
-    static void create() { 
+    static void create() {
         assert(!m_replay_recorder);
-        m_replay_recorder = new ReplayRecorder(); 
+        m_replay_recorder = new ReplayRecorder();
     }
     // ------------------------------------------------------------------------
-    /** Returns the instance of the replay object. Returns NULL if no 
+    /** Returns the instance of the replay object. Returns NULL if no
      *  recorder is available, i.e. recording can be disabled. */
     static ReplayRecorder *get() { return m_replay_recorder; }
     // ------------------------------------------------------------------------

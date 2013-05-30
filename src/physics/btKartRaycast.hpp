@@ -4,8 +4,8 @@
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
  * provided that the above copyright notice appear in all copies.
- * Erwin Coumans makes no representations about the suitability 
- * of this software for any purpose.  
+ * Erwin Coumans makes no representations about the suitability
+ * of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
 */
 #ifndef BTKARTRAYCAST_HPP
@@ -24,7 +24,7 @@ class btKartRaycaster : public btVehicleRaycaster
 {
 private:
 	btDynamicsWorld*	m_dynamicsWorld;
-    /** True if the normals should be smoothed. Not all tracks support this, 
+    /** True if the normals should be smoothed. Not all tracks support this,
     *  so this flag is set depending on track when constructing this object. */
     bool                m_smooth_normals;
 public:
@@ -33,7 +33,7 @@ public:
 	{
 	}
 
-	virtual void* castRay(const btVector3& from,const btVector3& to, 
+	virtual void* castRay(const btVector3& from,const btVector3& to,
                           btVehicleRaycasterResult& result);
 
 };

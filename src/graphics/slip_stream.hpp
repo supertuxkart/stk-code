@@ -63,7 +63,7 @@ private:
 
     /** The time a kart was in slipstream. */
     float         m_slipstream_time;
-    
+
     /** Slipstream mode: either nothing happening, or the kart is collecting
      *  'slipstream credits', or the kart is using accumulated credits. */
     enum         {SS_NONE, SS_COLLECT, SS_USE} m_slipstream_mode;
@@ -72,7 +72,7 @@ private:
      *  This value is current area, i.e. takes the kart position into account. */
     Quad         *m_slipstream_quad;
 
-    /** This is slipstream area if the kart is at 0,0,0 without rotation. From 
+    /** This is slipstream area if the kart is at 0,0,0 without rotation. From
      *  this value m_slipstream_area is computed by applying the kart transform. */
     Quad         *m_slipstream_original_quad;
 

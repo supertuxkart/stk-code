@@ -62,7 +62,7 @@ public:
     virtual bool resumeMusic();
     virtual void volumeMusic (float gain);
     virtual bool isPlaying();
-    
+
 protected:
     bool empty();
     bool check(const char* what);
@@ -79,7 +79,7 @@ private:
     bool            m_error;
 
     bool            m_playing;
-    
+
     ALuint m_soundBuffers[2];
     ALuint m_soundSource;
     ALenum nb_channels;

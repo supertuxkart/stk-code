@@ -28,7 +28,7 @@ public:
     STKDynamicsWorld(btDispatcher*             dispatcher,
                      btBroadphaseInterface*    pairCache,
                      btConstraintSolver*       constraintSolver,
-                     btCollisionConfiguration* collisionConfiguration) 
+                     btCollisionConfiguration* collisionConfiguration)
 
                    : btDiscreteDynamicsWorld(dispatcher, pairCache,
                                              constraintSolver,
@@ -36,7 +36,7 @@ public:
     {
     }
 
-    /** Resets m_localTime to 0. This allows more precise replay of 
+    /** Resets m_localTime to 0. This allows more precise replay of
      *  physics, which is important for replaying histories. */
     virtual void resetLocalTime() { m_localTime = 0; }
 

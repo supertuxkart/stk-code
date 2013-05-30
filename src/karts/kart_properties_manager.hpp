@@ -70,9 +70,9 @@ public:
     const KartProperties*    getKartById            (int i) const;
     const KartProperties*    getKart(const std::string &ident) const;
     const int                getKartId(const std::string &ident) const;
-    int                      getKartByGroup(const std::string& group, 
+    int                      getKartByGroup(const std::string& group,
                                            int i) const;
-    
+
     bool                     loadKart               (const std::string &dir);
     void                     loadAllKarts           (bool loading_icon = true);
     void                     unloadAllKarts         ();
@@ -84,7 +84,7 @@ public:
     void                     setUnavailableKarts(std::vector<std::string>);
     void                     selectKartName(const std::string &kart_name);
     bool                     testAndSetKart(int kartid);
-    void                     getRandomKartList(int count, 
+    void                     getRandomKartList(int count,
                                            RemoteKartInfoList& existing_karts,
                                            std::vector<std::string> *ai_list);
     // ------------------------------------------------------------------------
@@ -104,7 +104,7 @@ public:
     void selectKart(int kartid) { m_selected_karts.push_back(kartid); }
     // ------------------------------------------------------------------------
     /** Returns all directories from which karts were loaded. */
-    const std::vector<std::string>* getAllKartDirs() const 
+    const std::vector<std::string>* getAllKartDirs() const
                                     { return &m_all_kart_dirs; }
     // ------------------------------------------------------------------------
     /** Returns the number of karts. */

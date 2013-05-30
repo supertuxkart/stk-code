@@ -45,11 +45,11 @@ namespace irr
     namespace scene { class ISceneNode; }
 }
 
-/** 
+/**
  *  \brief base class for all game modes
  *  This class is responsible for running the actual race. A world is created
  *  by the race manager on the start of each race (so a new world is created
- *  for each race of a Grand Prix). It creates the 
+ *  for each race of a Grand Prix). It creates the
  *  physics, loads the track, creates all karts, and initialises the race
  *  specific managers (ItemManager, ProjectilManager, highscores, ...).
  *  It uses the information from the race manager to get information like
@@ -98,13 +98,13 @@ protected:
      *  True by default, change to false in a child class to disable.
     */
     bool        m_use_highscores;
-        
-    void  updateHighscores  (int* best_highscore_rank, int* best_finish_time, 
+
+    void  updateHighscores  (int* best_highscore_rank, int* best_finish_time,
                              std::string* highscore_who,
                              StateManager::ActivePlayer** best_player);
     void  resetAllKarts     ();
     void  eliminateKart     (int kart_number, bool notifyOfElimination=true);
-    Controller* 
+    Controller*
           loadAIController  (AbstractKart *kart);
 
     virtual AbstractKart *createKart(const std::string &kart_ident, int index,
@@ -116,7 +116,7 @@ protected:
     /** Pointer to the race GUI. The race GUI is handled by world. */
     RaceGUIBase *m_race_gui;
 
-    /** The actual race gui needs to be saved when the race result gui is 
+    /** The actual race gui needs to be saved when the race result gui is
         displayed since it is still needed in case of a restart, and it
         can't simply be created again (since it assumes that it can render
         to texture without having any scene nodes, but in case of a restart
@@ -124,34 +124,34 @@ protected:
     RaceGUIBase *m_saved_race_gui;
 
     bool     m_clear_back_buffer;
-    
+
     irr::video::SColor m_clear_color;
-    
-    /** Pausing/unpausing are not done immediately, but at next udpdate. The 
-     *  use of this is when switching between screens : if we leave a screen 
-     *  that paused the game, only to go to another screen that pauses back 
-     *  the game, this mechanism prevents the game from moving on between 
+
+    /** Pausing/unpausing are not done immediately, but at next udpdate. The
+     *  use of this is when switching between screens : if we leave a screen
+     *  that paused the game, only to go to another screen that pauses back
+     *  the game, this mechanism prevents the game from moving on between
      *  the switch. */
     bool m_schedule_pause;
-    
+
     /** Pausing/unpausing are not done immediately, but at next udpdate. The
-     *  use of this is when switching between screens : if we leave a screen 
-     *  that paused the game, only to go to another screen that pauses back 
+     *  use of this is when switching between screens : if we leave a screen
+     *  that paused the game, only to go to another screen that pauses back
      *  the game, this mechanism prevents the game from moving on between the
      *  switch. */
     bool m_schedule_unpause;
-    
+
     bool m_schedule_exit_race;
-    
+
     bool m_schedule_tutorial;
-    
+
     Phase m_scheduled_pause_phase;
-    
+
     /** Set when the world needs to be deleted but you can't do it immediately
      * because you are e.g. within World::update()
      */
     bool m_self_destruct;
-    
+
     virtual void  onGo();
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool  isRaceOver() = 0;
@@ -161,15 +161,15 @@ protected:
     // ------------------------------------------------------------------------
     /** Used for AI karts that are still racing when all player kart finished.
      *  Generally it should estimate the arrival time for those karts, but as
-     *  a default (useful for battle mode and ftl races) we just use the 
-     *  current time for this (since this is a good value for karts still 
+     *  a default (useful for battle mode and ftl races) we just use the
+     *  current time for this (since this is a good value for karts still
      *  around at the end of a race, and other criteria (number of lives,
      *  race position) will be used to determine the final order.
      */
     virtual float estimateFinishTimeForKart(AbstractKart* kart)
                                         {return getTime(); }
 
-    
+
 public:
                     World();
     virtual        ~World();
@@ -179,11 +179,11 @@ public:
     /** Returns a pointer to the (singleton) world object. */
     static World*   getWorld() { return m_world; }
     // ------------------------------------------------------------------------
-    /** Delete the )singleton) world object, if it exists, and sets the 
-      * singleton pointer to NULL. It's harmless to call this if the world 
+    /** Delete the )singleton) world object, if it exists, and sets the
+      * singleton pointer to NULL. It's harmless to call this if the world
       *  has been deleted already. */
     static void     deleteWorld() { delete m_world; m_world = NULL; }
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     /** Sets the pointer to the world object. This is only used by
      *  the race_manager.*/
     static void     setWorld(World *world) {m_world = world; }
@@ -194,15 +194,15 @@ public:
 
     /** Each game mode should have a unique identifier. Override
       * this method in child classes to provide it. */
-    virtual const std::string& 
+    virtual const std::string&
                     getIdent() const = 0;
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     /** Since each mode will have a different way of deciding where a rescued
-     *  kart is dropped, this method will be called and each mode can implement 
+     *  kart is dropped, this method will be called and each mode can implement
      *  it. */
     virtual void moveKartAfterRescue(AbstractKart* kart) = 0;
-    // ------------------------------------------------------------------------    
-    /** Called when it is needed to know whether this kind of race involves 
+    // ------------------------------------------------------------------------
+    /** Called when it is needed to know whether this kind of race involves
      *  counting laps. */
     virtual bool raceHasLaps() = 0;
     // ------------------------------------------------------------------------
@@ -226,7 +226,7 @@ public:
     virtual void    reset();
     virtual void    pause(Phase phase) OVERRIDE;
     virtual void    unpause() OVERRIDE;
-    virtual void    getDefaultCollectibles(int *collectible_type, 
+    virtual void    getDefaultCollectibles(int *collectible_type,
                                            int *amount );
     virtual void    endRaceEarly() { return; }
 
@@ -236,12 +236,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if this mode should use fast music (if available). */
     virtual bool useFastMusicNearEnd() const { return true; }
-    // ------------------------------------------------------------------------    
-    /** If you want to do something to karts or their graphics at the start 
+    // ------------------------------------------------------------------------
+    /** If you want to do something to karts or their graphics at the start
      *  of the race, override this. */
     virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node) {}
-    // ------------------------------------------------------------------------    
-    /** Called whenever a kart starts a new lap. Meaningless (and won't be 
+    // ------------------------------------------------------------------------
+    /** Called whenever a kart starts a new lap. Meaningless (and won't be
      *  called) in non-laped races.
      */
     virtual void newLap(unsigned int kart_index) {}
@@ -293,7 +293,7 @@ public:
      *  whether the game mode wants a timer drawn. */
     virtual bool shouldDrawTimer() const
                     { return isRacePhase() && getClockMode() != CLOCK_NONE; }
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     /** \return whether this world can generate/have highscores */
     bool useHighScores() const { return m_use_highscores; }
     // ------------------------------------------------------------------------
@@ -304,10 +304,10 @@ public:
     const irr::video::SColor& getClearColor() const { return m_clear_color; }
     // ------------------------------------------------------------------------
     /** Sets the color to use when clearing the back buffer. */
-    void setClearbackBufferColor(irr::video::SColor color) 
-    { 
-        m_clear_color       = color; 
-        m_clear_back_buffer = true; 
+    void setClearbackBufferColor(irr::video::SColor color)
+    {
+        m_clear_color       = color;
+        m_clear_back_buffer = true;
     }
     // ------------------------------------------------------------------------
     /** Override if you want to know when a kart presses fire */
@@ -320,7 +320,7 @@ public:
     void delayedSelfDestruct();
     // ------------------------------------------------------------------------
     virtual void escapePressed();
-    
+
 };   // World
 
 #endif

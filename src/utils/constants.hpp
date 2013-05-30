@@ -30,7 +30,7 @@
 
 /*
   For convenience - here are some multipliers for other units.
- 
+
   eg  30 * MILES_PER_HOUR  is 30mph expressed in m/sec
 */
 

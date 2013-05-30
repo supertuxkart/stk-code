@@ -24,7 +24,7 @@
 
 
 
-/** 
+/**
  * \brief Dummy sound when ogg or openal aren't available
  * \ingroup audio
  */
@@ -33,10 +33,10 @@ class DummySFX : public SFXBase
 public:
                        DummySFX(SFXBuffer* buffer, bool positional, float gain) {}
     virtual           ~DummySFX()                     {}
-    
+
     /** Late creation, if SFX was initially disabled */
     virtual bool       init() { return true; }
-    
+
     virtual void       position(const Vec3 &position) {}
     virtual void       setLoop(bool status)           {}
     virtual void       play()                         {}
@@ -48,9 +48,9 @@ public:
     virtual SFXManager::SFXStatus  getStatus()        { return SFXManager::SFX_STOPPED; }
     virtual void       onSoundEnabledBack()           {}
     virtual void       setRolloff(float rolloff)      {}
-    
+
     virtual const SFXBuffer* getBuffer() const        { return NULL; }
-    
+
 };   // DummySFX
 
 

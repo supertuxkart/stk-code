@@ -41,22 +41,22 @@ private:
     /** Number of goals each team scored
      */
     int m_team_goals[NB_SOCCER_TEAMS];
-    
+
     /** Whether or not goals can be scored (they are disabled when a point is scored
     and re-enabled when the next game can be played)*/
     bool m_can_score_points;
-    
+
 public:
-    
+
     SoccerWorld();
     virtual ~SoccerWorld() {}
-    
+
     virtual void init();
-    
+
     // clock events
     virtual bool isRaceOver();
     virtual void terminateRace();
-    
+
     // overriding World methods
     virtual void reset();
 
@@ -65,13 +65,13 @@ public:
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
     virtual bool raceHasLaps(){ return false; }
     virtual void moveKartAfterRescue(AbstractKart* kart);
-    
+
     virtual const std::string& getIdent() const;
-    
+
     virtual void update(float dt);
 
     void onCheckGoalTriggered(bool first_goal);
-    
+
 private:
     void initKartList();
 };   // SoccerWorld

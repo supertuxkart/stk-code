@@ -61,7 +61,7 @@ private:
 
     /** Material to use for the skid marks. */
     video::SMaterial  *m_material;
-    
+
     // ------------------------------------------------------------------------
     class SkidMarkQuads : public scene::SMeshBuffer, public NoCopy
     {
@@ -76,11 +76,11 @@ private:
         /** For culling, we need the overall radius of the skid marks. We
          *  approximate this by maintaining an axis-aligned boundary box. */
         core::aabbox3df m_aabb;
-        
+
         video::SColor   m_start_color;
-        
+
     public:
-            SkidMarkQuads (const Vec3 &left, const Vec3 &right, 
+            SkidMarkQuads (const Vec3 &left, const Vec3 &right,
                            video::SMaterial *material, float z_offset,
                            video::SColor* custom_color = NULL);
         void add          (const Vec3 &left,
@@ -104,12 +104,12 @@ private:
 public:
          SkidMarks(const AbstractKart& kart, float width=0.2f);
         ~SkidMarks();
-    void update (float dt, bool force_skid_marks=false, 
-                 video::SColor* custom_color = NULL); 
+    void update (float dt, bool force_skid_marks=false,
+                 video::SColor* custom_color = NULL);
     void reset();
-    
+
     void adjustFog(bool enabled);
-    
+
 };   // SkidMarks
 
 #endif

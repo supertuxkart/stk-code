@@ -87,7 +87,7 @@ protected:
     SFXBase    *m_prestart_sound;
     /** The third sound to be played in ready, set, go. */
     SFXBase    *m_start_sound;
-    
+
     /**
       * Elasped/remaining time in seconds
       */
@@ -113,7 +113,7 @@ private:
 public:
              WorldStatus();
     virtual ~WorldStatus();
-    
+
     void     reset();
     void     update(const float dt);
     void     setTime(const float time);
@@ -121,12 +121,12 @@ public:
     virtual void unpause();
     virtual void enterRaceOverState();
     virtual void terminateRace();
-    
+
     // ------------------------------------------------------------------------
     // Note: GO_PHASE is both: start phase and race phase
     bool     isStartPhase() const  { return m_phase<GO_PHASE;               }
     // ------------------------------------------------------------------------
-    bool     isRacePhase()  const  { return m_phase>=GO_PHASE && 
+    bool     isRacePhase()  const  { return m_phase>=GO_PHASE &&
                                             m_phase<FINISH_PHASE;           }
     // ------------------------------------------------------------------------
     /** While the race menu is being displayed, m_phase is limbo, and
@@ -137,7 +137,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current race phase. */
     const Phase getPhase() const  { return m_phase;                        }
-    
+
     // ------------------------------------------------------------------------
     /** Sets the current race phase. Canbe used to e.g. avoid the count down
      *  etc. */
@@ -156,7 +156,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current race time. */
     float   getTime() const      { return (float)m_time; }
-    
+
     // ------------------------------------------------------------------------
     /** Will be called to notify your derived class that the clock,
      *  which is in COUNTDOWN mode, has reached zero. */
@@ -165,7 +165,7 @@ public:
     // ------------------------------------------------------------------------
     /** Called when the race actually starts. */
     virtual void onGo() {};
-    
+
 };   // WorldStatus
 
 

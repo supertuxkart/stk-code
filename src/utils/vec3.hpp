@@ -39,9 +39,9 @@ private:
 public:
     /** Convert an irrlicht vector3df into the internal (bullet) format.
      *  Irrlicht's and STK's axis are different (STK: Z up, irrlicht: Y up).
-     *  We might want to change this as well, makes it easier to work with 
+     *  We might want to change this as well, makes it easier to work with
      *  bullet and irrlicht together, without having to swap indices (bullet
-     *  can handle any axis ordering). Note that toIrrVector swaps the 
+     *  can handle any axis ordering). Note that toIrrVector swaps the
      *  axis as well (so a vector3df can be stored in and restored from
      *  a vec3).
      */
@@ -57,7 +57,7 @@ public:
     inline Vec3(float x, float y, float z) : btVector3(x,y,z)            {}
     // ------------------------------------------------------------------------
     /** Creates a 3d vector from three scalars. */
-    inline Vec3(float x, float y, float z, float w) : btVector3(x,y,z) 
+    inline Vec3(float x, float y, float z, float w) : btVector3(x,y,z)
                                                      { setW(w);           }
     // ------------------------------------------------------------------------
     /** Initialises a 3d vector from one scalar value, which is used to
@@ -67,7 +67,7 @@ public:
     /** Sets the heading, and computes pitch and roll dependent
      *  on the normal it is displayed on.
      *  \param heading The heading to set.
-     *  \param normal The normal from which pitch and roll should be 
+     *  \param normal The normal from which pitch and roll should be
      *         computed. */
     inline Vec3(float heading, const Vec3& normal)
     {
@@ -108,7 +108,7 @@ public:
     /** Sets the roll of a vector that is used to store a rotation. */
     inline const void      setRoll(float f)         { m_floats[2] = f;    }
     // ------------------------------------------------------------------------
-    /** Converts a vec3 into an irrlicht vector (which is a simple type 
+    /** Converts a vec3 into an irrlicht vector (which is a simple type
      *  cast). */
     const core::vector3df& toIrrVector() const
     {
@@ -142,14 +142,14 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the rotation given by the quaternion as HPR vector. */
     Vec3& operator=(const btQuaternion& q) {setHPR(q); return *this;}
-    
+
     // ------------------------------------------------------------------------
     /** Operator== of btQuadWord also compares m_floats[3], which is not
      *  useful (and wrong in certain circumstances). */
     bool operator==(const Vec3& other) const
     {
-        return ((m_floats[2]==other.m_floats[2]) && 
-                (m_floats[1]==other.m_floats[1]) && 
+        return ((m_floats[2]==other.m_floats[2]) &&
+                (m_floats[1]==other.m_floats[1]) &&
                 (m_floats[0]==other.m_floats[0])   );
     }
 
@@ -158,7 +158,7 @@ public:
      *  useful (and wrong in certain circumstances). */
     bool operator!=(const Vec3& other) const
     {
-        return ((m_floats[2]!=other.m_floats[2]) || 
+        return ((m_floats[2]!=other.m_floats[2]) ||
                 (m_floats[1]!=other.m_floats[1]) ||
                 (m_floats[0]!=other.m_floats[0])   );
     }
@@ -173,11 +173,11 @@ public:
     float length2_2d() const     { return m_floats[0]*m_floats[0]
                                         + m_floats[2]*m_floats[2]; }
     // ------------------------------------------------------------------------
-    /** Returns the length of this vector in the plane, i.e. the vector is 
+    /** Returns the length of this vector in the plane, i.e. the vector is
      *  used as a 2d vector. */
     // ------------------------------------------------------------------------
     /** Returns the length of the vector using only the x/z coordinates. */
-    float length_2d() const {return sqrt(  m_floats[0]*m_floats[0] 
+    float length_2d() const {return sqrt(  m_floats[0]*m_floats[0]
                                          + m_floats[2]*m_floats[2]);}
     // ------------------------------------------------------------------------
     /** Sets this = max(this, a) componentwise.

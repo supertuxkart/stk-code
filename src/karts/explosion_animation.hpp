@@ -22,11 +22,11 @@
 #include "karts/abstract_kart_animation.hpp"
 #include "utils/vec3.hpp"
 
-/** 
+/**
  * \brief This class is a 'mixin' for kart, and handles the animated explosion.
  *  I.e. it will throw the kart a certain amount in the air, rotate it
  *  randomly, and after the specified time period let it land at the
- *  same spot where it was hit, therefore avoiding any problems of 
+ *  same spot where it was hit, therefore avoiding any problems of
  *  karts being pushed on wrong parts of the track, and making explosion
  *  more 'fair' (it can't happen that one explosion give you actually
  *  a benefit by pushing you forwards.

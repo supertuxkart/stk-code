@@ -38,16 +38,16 @@ private:
     Material             *m_all_icons [Attachment::ATTACH_MAX];
 public:
                AttachmentManager() {};
-              ~AttachmentManager(); 
+              ~AttachmentManager();
     void       removeTextures   ();
     void       loadModels       ();
     // ------------------------------------------------------------------------
     /** Returns the mest for a certain attachment.
      *  \param type Type of the attachment needed. */
-    scene::IAnimatedMesh *getMesh(Attachment::AttachmentType type) const 
+    scene::IAnimatedMesh *getMesh(Attachment::AttachmentType type) const
         {return m_attachments[type]; }
     // ------------------------------------------------------------------------
-    /** Returns the icon to display in the race gui if a kart 
+    /** Returns the icon to display in the race gui if a kart
      *  has an attachment. */
     const Material* getIcon (int type) const {return m_all_icons [type]; }
     // ------------------------------------------------------------------------

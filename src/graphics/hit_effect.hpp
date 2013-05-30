@@ -26,7 +26,7 @@ class Vec3;
 /**
  *  \ingroup graphics
  *  A small interface for effects to be used when  a kart is hit. That
- *  includes a sound effect only, or a graphical effect (like an 
+ *  includes a sound effect only, or a graphical effect (like an
  *  explosion).
  */
 class HitEffect: public NoCopy

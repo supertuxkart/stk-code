@@ -78,18 +78,18 @@ public:
         SFX_INITIAL = 3
     };
 
-private:        
-    
+private:
+
     /** Listener position */
     Vec3 m_position;
-    
+
     /** The buffers and info for all sound effects. These are shared among all
      *  instances of SFXOpenal. */
     std::map<std::string, SFXBuffer*> m_all_sfx_types;
-    
+
     /** The actual instances (sound sources) */
     std::vector<SFXBase*> m_all_sfx;
-    
+
     /** To play non-positional sounds without having to create a new object for each */
     static std::map<std::string, SFXBase*> m_quick_sounds;
 
@@ -101,7 +101,7 @@ private:
 
     void                      loadSfx();
 
-    bool                      loadVorbisBuffer(const std::string &name, 
+    bool                      loadVorbisBuffer(const std::string &name,
                                                ALuint buffer);
 public:
                              SFXManager();
@@ -116,12 +116,12 @@ public:
                                           float              max_width,
                                           float              gain);
 
-    SFXBase*                 createSoundSource(SFXBuffer* info, 
+    SFXBase*                 createSoundSource(SFXBuffer* info,
                                                const bool addToSFXList=true,
                                                const bool owns_buffer=false);
-    SFXBase*                 createSoundSource(const std::string &name, 
+    SFXBase*                 createSoundSource(const std::string &name,
                                                const bool addToSFXList=true);
-    
+
     void                     deleteSFX(SFXBase *sfx);
     void                     deleteSFXMapping(const std::string &name);
     void                     pauseAll();
@@ -129,19 +129,19 @@ public:
     bool                     soundExist(const std::string &name);
     void                     setMasterSFXVolume(float gain);
     float                    getMasterSFXVolume() const { return m_master_gain; }
-    
+
     static bool              checkError(const std::string &context);
     static const std::string getErrorString(int err);
-    
+
     void                     positionListener(const Vec3 &position, const Vec3 &front);
     SFXBase*                 quickSound(const std::string &soundName);
-    
+
     /** Called when sound was muted/unmuted */
     void                     soundToggled(const bool newValue);
-    
+
     /** Prints the list of currently loaded sounds to stdout. Useful to debug audio leaks */
     void dump();
-    
+
     Vec3 getListenerPos() const { return m_position; }
 
 };

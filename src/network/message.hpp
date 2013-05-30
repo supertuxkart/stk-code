@@ -31,19 +31,19 @@ using std::memcpy;
 
 #include "utils/vec3.hpp"
 
-// sjl: when a message is received, need to work out what kind of message it 
+// sjl: when a message is received, need to work out what kind of message it
 // is and therefore what to do with it
 
-/** Base class to serialises/deserialises messages. 
+/** Base class to serialises/deserialises messages.
  *  This is the base class for all messages being exchange between client
  *  and server. It handles the interface to enet, and adds a message type
- *  (which is checked via an assert to help finding bugs by receiving a 
+ *  (which is checked via an assert to help finding bugs by receiving a
  *  message of an incorrect type). It also takes care of endianess (though
- *  floats are converted via a byte swap, too - so it must be guaranteed 
+ *  floats are converted via a byte swap, too - so it must be guaranteed
  *  that the float representation between all machines is identical).
  */
 class Message
-{ 
+{
 public:
     /** Contains all tags used in identifying a message. */
     enum MessageType {MT_CONNECT=1, MT_CHARACTER_INFO, MT_CHARACTER_CONFIRM,
@@ -62,31 +62,31 @@ private:
 public:
     void         addInt(int data);
     void         addShort(short data);
-    void         addString(const std::string &data); 
+    void         addString(const std::string &data);
     void         addStringVector(const std::vector<std::string>& vs);
     void         addUInt(unsigned int data)      { addInt(*(int*)&data);  }
-    void         addFloat(const float data);    
+    void         addFloat(const float data);
     void         addBool(bool data)              { addChar(data?1:0);     }
     void         addChar(char data)              { addCharArray((char*)&data,1);}
-    void         addCharArray(char *c, unsigned int n=1) 
+    void         addCharArray(char *c, unsigned int n=1)
                                                  { assert((int)(m_pos+n)<=m_data_size);
                                                    memcpy(m_data+m_pos,c,n);
                                                    m_pos+=n;              }
 #ifndef WIN32          // on windows size_t is unsigned int
     void         addSizeT(size_t data)           { addInt((int)data);     }
 #endif
-    void         addIntArray(int *d, unsigned int n) 
-                                                 { for(unsigned int i=0; 
+    void         addIntArray(int *d, unsigned int n)
+                                                 { for(unsigned int i=0;
                                                        i<n; i++)
                                                        addInt(d[i]);      }
     void         addVec3(const Vec3& v)          { addFloat(v.getX());
-                                                   addFloat(v.getY()); 
+                                                   addFloat(v.getY());
                                                    addFloat(v.getZ());    }
-    void         addQuaternion(const btQuaternion& q) { addFloat(q.getX()); 
+    void         addQuaternion(const btQuaternion& q) { addFloat(q.getX());
                                                    addFloat(q.getY());
-                                                   addFloat(q.getZ()); 
+                                                   addFloat(q.getZ());
                                                    addFloat(q.getW());    }
-    int          getInt(); 
+    int          getInt();
     bool         getBool()                       { return getChar()==1;   }
     short        getShort();
     float        getFloat();
@@ -98,16 +98,16 @@ public:
     void         getCharArray(char *c, int n=1) {memcpy(c,m_data+m_pos,n);
                                                   m_pos+=n;
                                                   return;                 }
-    Vec3         getVec3()                       { Vec3 v; 
-                                                   v.setX(getFloat()); 
+    Vec3         getVec3()                       { Vec3 v;
+                                                   v.setX(getFloat());
                                                    v.setY(getFloat());
-                                                   v.setZ(getFloat()); 
+                                                   v.setZ(getFloat());
                                                    return v;              }
-    btQuaternion getQuaternion()                 { btQuaternion q; 
+    btQuaternion getQuaternion()                 { btQuaternion q;
                                                    q.setX(getFloat());
                                                    q.setY(getFloat());
                                                    q.setZ(getFloat());
-                                                   q.setW(getFloat()); 
+                                                   q.setW(getFloat());
                                                    return q;               }
     static int   getIntLength()             { return sizeof(int);     }
     static int   getUIntLength()            { return sizeof(int);     }
@@ -125,15 +125,15 @@ public:
 
 public:
                  Message(MessageType m);
-                 Message(ENetPacket *pkt, MessageType m);  
-    void         receive(ENetPacket *pkt, MessageType m);  
+                 Message(ENetPacket *pkt, MessageType m);
+    void         receive(ENetPacket *pkt, MessageType m);
                 ~Message();
     void         clear();
     void         allocate(int size);
     MessageType  getType() const   { return m_type; }
     ENetPacket*  getPacket() const { assert(m_data_size>-1); return m_pkt;   }
     /** Return the type of a message without unserialising the message */
-    static MessageType peekType(ENetPacket *pkt) 
+    static MessageType peekType(ENetPacket *pkt)
                                    { return (MessageType)pkt->data[0];}
 
 };   // Message

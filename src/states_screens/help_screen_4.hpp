@@ -29,21 +29,21 @@ namespace GUIEngine { class Widget; }
 class HelpScreen4 : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<HelpScreen4>
 {
     friend class GUIEngine::ScreenSingleton<HelpScreen4>;
-    
+
     HelpScreen4();
-    
+
 public:
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                                const int playerID) OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
-    
+
 };
 
 #endif

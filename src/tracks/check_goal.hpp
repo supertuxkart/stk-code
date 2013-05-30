@@ -28,7 +28,7 @@ class CheckManager;
 class XMLNode;
 class Track;
 
-/** 
+/**
  *  \brief Implements a simple checkline that will score a point when the
  *         soccer ball crosses it.
  *
@@ -39,16 +39,16 @@ class CheckGoal : public CheckStructure
 private:
     /** Which team is this goal for? */
     bool            m_first_goal;
-    
+
     /** The line that is tested for being crossed. */
     core::line2df   m_line;
-    
+
 public:
              CheckGoal(const XMLNode &node, unsigned int index);
     virtual ~CheckGoal() {}
     virtual void update(float dt) OVERRIDE;
     virtual void trigger(unsigned int kart_index);
-    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              unsigned int indx) OVERRIDE;
     virtual void reset(const Track &track) OVERRIDE;
 };   // CheckLine

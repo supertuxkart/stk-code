@@ -30,7 +30,7 @@ namespace irr
 }
 using namespace irr;
 
-/** 
+/**
  * \brief This class is used to enable a shadow for a kart.
  * For now it uses a simple texture to simulate the shadow, real time shadows might
  * be added later.

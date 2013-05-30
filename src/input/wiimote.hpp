@@ -39,25 +39,25 @@ private:
 
     /** Handle to the corresponding WiiUse wiimote handle */
     wiimote_t*      m_wiimote_handle;
-    
+
     /** Index of this element the arrays of wiimotes */
     int             m_wiimote_id;
-    
+
     /** Corresponding gamepad managed by the DeviceManager */
     GamePadDevice*  m_gamepad_device;
-    
+
     /** Corresponding Irrlicht gamepad event */
     Synchronised<irr::SEvent> m_irr_event;
-        
+
     /** Whether the wiimote received a "disconnected" event */
     bool            m_connected;
-    
+
     void resetIrrEvent();
     void printDebugInfo() const;
 
 public:
     /** Resets internal state and creates the corresponding gamepad device */
-    Wiimote(wiimote_t* wiimote_handle, int wiimote_id, 
+    Wiimote(wiimote_t* wiimote_handle, int wiimote_id,
                      GamepadConfig* gamepad_config);
     ~Wiimote();
 

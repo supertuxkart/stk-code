@@ -63,7 +63,7 @@ public:
     int             getNum       () const {return m_number;}
     // ------------------------------------------------------------------------
     /** Returns the type of this powerup. */
-    PowerupManager::PowerupType     
+    PowerupManager::PowerupType
                     getType      () const {return m_type;  }
     // ------------------------------------------------------------------------
 };

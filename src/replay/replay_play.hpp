@@ -37,7 +37,7 @@ private:
 
     /** Points to the next free entry. */
     unsigned int m_next;
-    
+
     /** All ghost karts. */
     PtrVector<GhostKart>    m_ghost_karts;
 

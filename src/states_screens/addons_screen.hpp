@@ -32,7 +32,7 @@ namespace GUIEngine { class Widget; }
   * \brief Addons screen
   * \ingroup states_screens
   */
-class AddonsScreen : public GUIEngine::Screen, 
+class AddonsScreen : public GUIEngine::Screen,
                      public GUIEngine::ScreenSingleton<AddonsScreen>,
                      public GUIEngine::IListWidgetHeaderListener
 {
@@ -50,7 +50,7 @@ private:
     int              m_icon_not_installed;
     /** Icon for 'loading' */
     int              m_icon_loading;
-    
+
     irr::gui::STKModifiedSpriteBank
                     *m_icon_bank;
     GUIEngine::LabelWidget
@@ -64,12 +64,12 @@ private:
     int              m_selected_index;
 
     float            m_icon_height;
-    
+
     bool             m_reloading;
-    
+
     /** \brief To check (and set) if sort order is descending **/
     bool             m_sort_desc;
-    
+
 public:
 
     /** Load the addons into the main list.*/
@@ -79,19 +79,19 @@ public:
     virtual void loadedFromFile() OVERRIDE;
 
     virtual void unloaded() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                                const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
-    
+
     virtual void onColumnClicked(int columnId);
 
     virtual void init() OVERRIDE;
     virtual void tearDown() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
 

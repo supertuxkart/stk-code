@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 
+//  Copyright (C) 2006
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -33,108 +33,108 @@ class KartHoverListener;
   * \brief screen where players can choose their kart
   * \ingroup states_screens
   */
-class KartSelectionScreen : public GUIEngine::Screen, 
+class KartSelectionScreen : public GUIEngine::Screen,
                          public GUIEngine::ScreenSingleton<KartSelectionScreen>
 {
     friend class KartHoverListener;
     friend class PlayerNameSpinner;
     friend class FocusDispatcher;
-    
-    /** Contains the custom widget shown for every player. (ref only since 
-     *  we're adding them to a Screen, and the Screen will take ownership 
+
+    /** Contains the custom widget shown for every player. (ref only since
+     *  we're adding them to a Screen, and the Screen will take ownership
      *  of these widgets)
      */
     PtrVector<PlayerKartWidget, REF> m_kart_widgets;
-    
+
     friend class GUIEngine::ScreenSingleton<KartSelectionScreen>;
     friend class PlayerKartWidget;
-    
+
     bool m_multiplayer;
-    
+
     /** Whether this screen is being visited from overworld or not */
     bool m_from_overworld;
-    
+
     bool m_go_to_overworld_next;
-    
-    
+
+
     KartSelectionScreen();
-    
-    /** Stores whether any player confirmed their choice; then, some things 
+
+    /** Stores whether any player confirmed their choice; then, some things
       * are "frozen", for instance the selected kart group tab
       */
     bool m_game_master_confirmed;
-    
+
     PlayerKartWidget* m_removed_widget;
-    
+
     /** Message shown in multiplayer mode */
     GUIEngine::BubbleWidget* m_multiplayer_message;
-    
+
     /** Called when all players selected their kart */
     void allPlayersDone();
-    
-    /** Called when number/order of karts changed, so that all will keep 
+
+    /** Called when number/order of karts changed, so that all will keep
      *  an up-to-date ID */
     void renumberKarts();
 
-    /** Checks identities chosen by players, making sure no duplicates are 
+    /** Checks identities chosen by players, making sure no duplicates are
       * used.
       * \return Whether all choices are ok
       */
     bool validateIdentChoices();
-    
+
     /** Checks karts chosen by players, making sure no duplicates are used.
       * \return Whether all choices are ok
       */
     bool validateKartChoices();
-    
+
     /** Fill the ribbon with the karts from the currently selected group */
     void setKartsFromCurrentGroup();
-    
+
     void playerConfirm(const int playerID);
-    
+
 public:
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
-    
+
     void setMultiplayer(bool multiplayer);
-    
+
     /** \brief Set whether this screen is being visited from overworld or not */
     void setFromOverworld(bool from_overworld) { m_from_overworld = from_overworld; }
-    
+
     void setGoToOverworldNext() { m_go_to_overworld_next = true; }
-    
-    /** \brief Called when a player hits 'fire'/'select' on his device to 
+
+    /** \brief Called when a player hits 'fire'/'select' on his device to
      *  join the game */
     bool playerJoin(InputDevice* device, bool firstPlayer);
-    
+
     /**
-      * \brief Called when a player hits 'rescue'/'cancel' on his device 
+      * \brief Called when a player hits 'rescue'/'cancel' on his device
       *  to leave the game
       * \return true if event was handled succesfully
       */
     bool playerQuit(StateManager::ActivePlayer* player);
-    
+
      /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
-    
+
     virtual void beforeAddingWidget() OVERRIDE;
-    
+
      /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                                const int playerID) OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
 
-    /** \brief implement optional callback from parent 
+    /** \brief implement optional callback from parent
      *  class GUIEngine::Screen */
     virtual void unloaded() OVERRIDE;
-    
-    /** \brief implement optional callback from parent 
+
+    /** \brief implement optional callback from parent
      *  class GUIEngine::Screen */
     virtual bool onEscapePressed() OVERRIDE;
 

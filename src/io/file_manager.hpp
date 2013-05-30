@@ -58,7 +58,7 @@ private:
     /** Directory to store screenshots in. */
     std::string       m_screenshot_dir;
 
-    std::vector<std::string>    
+    std::vector<std::string>
                       m_texture_search_path,
                       m_model_search_path,
                       m_music_search_path;
@@ -131,7 +131,7 @@ public:
      */
     void pushMusicSearchPath(const std::string& path)
     {
-        m_music_search_path.push_back(path);  
+        m_music_search_path.push_back(path);
     }   // pushMusicSearchPath
     // ------------------------------------------------------------------------
     /** Removes the last added directory from the music search path.
@@ -141,8 +141,8 @@ public:
     /** Returns true if the specified file exists.
      */
     bool fileExists(const std::string& path)
-    { 
-        return m_file_system->existFile(path.c_str()); 
+    {
+        return m_file_system->existFile(path.c_str());
     }   // fileExists
 
 };   // FileManager

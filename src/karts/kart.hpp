@@ -52,8 +52,8 @@ class SkidMarks;
 class SlipStream;
 class Stars;
 
-/** The main kart class. All type of karts are of this object, but with 
- *  different controllers. The controllers are what turn a kart into a 
+/** The main kart class. All type of karts are of this object, but with
+ *  different controllers. The controllers are what turn a kart into a
  *  player kart (i.e. the controller handle input), or an AI kart (the
  *  controller runs the AI code to set steering etc).
  *  Kart has two base classes: the most important one is moveable (which
@@ -76,17 +76,17 @@ private:
 
     /** True if kart is flying (for debug purposes only). */
     bool m_flying;
-    
+
     /** Set when hitting bubblegum */
     bool m_has_caught_nolok_bubblegum;
-    
+
     /** Reset position. */
     btTransform  m_reset_transform;
 
     /** This object handles all skidding. */
     Skidding *m_skidding;
 
-    /** The main controller of this object, used for driving. This 
+    /** The main controller of this object, used for driving. This
      *  controller is used to run the kart. It will be replaced
      *  with an end kart controller when the kart finishes the race. */
     Controller  *m_controller;
@@ -107,18 +107,18 @@ private:
 
     /** For stars rotating around head effect */
     Stars *m_stars_effect;
-    
+
 private:
-    /** True if the kart hasn't moved since 'ready-set-go' - used to 
+    /** True if the kart hasn't moved since 'ready-set-go' - used to
      *  determine startup boost. */
     bool         m_has_started;
 
     /**<Maximum engine rpm's for the current gear*/
     float        m_max_gear_rpm;
 
-    /** A short time after a collision acceleration is disabled to allow 
+    /** A short time after a collision acceleration is disabled to allow
      *  the karts to bounce back*/
-    float        m_bounce_back_time;   
+    float        m_bounce_back_time;
 
     /** Time a kart is invulnerable. */
     float        m_invulnerable_time;
@@ -126,7 +126,7 @@ private:
     /** How long a kart is being squashed. If this is >0
      *  the kart is squashed. */
     float        m_squash_time;
-    
+
     /** If > 0 then bubble gum effect is on */
     float        m_bubblegum_time;
 
@@ -148,13 +148,13 @@ private:
     // -----------------
     /** The shadow of a kart. */
     Shadow          *m_shadow;
-    
+
     /** If a kart is flying, the shadow is disabled (since it is
      *  stuck to the kart, i.e. the shadow would be flying, too). */
     bool             m_shadow_enabled;
-    
+
     ParticleEmitter *m_sky_particles_emitter;
-    
+
     /** All particle effects. */
     KartGFX         *m_kart_gfx;
 
@@ -163,14 +163,14 @@ private:
 
     /** Handles all slipstreaming. */
     SlipStream      *m_slipstream;
-    
+
     /** Rotation compared to the start position, same for all wheels */
     float           m_wheel_rotation;
 
     /** Rotation change in the last time delta, same for all wheels */
     float           m_wheel_rotation_dt;
-    
-    /** For each wheel it stores the suspension length after the karts are at 
+
+    /** For each wheel it stores the suspension length after the karts are at
      *  the start position, i.e. the suspension will be somewhat compressed.
      *  The bullet suspensionRestLength is the value when the suspension is not
      *  at all compressed. */
@@ -182,7 +182,7 @@ private:
     float           m_finish_time;
     bool            m_finished_race;
 
-    /** When a kart has its view blocked by the plunger, this variable will be 
+    /** When a kart has its view blocked by the plunger, this variable will be
      *  > 0 the number it contains is the time left before removing plunger. */
     float         m_view_blocked_by_plunger;
     float         m_speed;
@@ -210,13 +210,13 @@ private:
     float         getActualWheelForce();
     void          crashed();
     void          loadData(RaceManager::KartType type, bool animatedModel);
-    
+
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
-    virtual void   updateGraphics(float dt, const Vec3& off_xyz,  
+    virtual void   updateGraphics(float dt, const Vec3& off_xyz,
                                   const btQuaternion& off_rotation);
     virtual void   createPhysics    ();
     virtual void   updateWeight     ();
@@ -226,13 +226,13 @@ public:
 
     virtual void flyUp();
     virtual void flyDown();
-    
+
     virtual void   startEngineSFX   ();
     virtual void   adjustSpeed      (float f);
     virtual void   increaseMaxSpeed(unsigned int category, float add_speed,
-                                    float engine_force, float duration, 
+                                    float engine_force, float duration,
                                     float fade_out_time);
-    virtual void   setSlowdown(unsigned int category, float max_speed_fraction, 
+    virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
                                float fade_in_time);
     virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;
     virtual void  collectedItem(Item *item, int random_attachment);
@@ -242,7 +242,7 @@ public:
     virtual float getTerrainPitch(float heading) const;
 
     virtual void   reset            ();
-    virtual void   handleZipper     (const Material *m=NULL, 
+    virtual void   handleZipper     (const Material *m=NULL,
                                      bool play_sound=false);
     virtual void   setSquash        (float time, float slowdown);
 
@@ -298,11 +298,11 @@ public:
     // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */
-    virtual void   blockViewWithPlunger()   
-    { 
+    virtual void   blockViewWithPlunger()
+    {
         // Avoid that a plunger extends the plunger time
         if(m_view_blocked_by_plunger<=0)
-            m_view_blocked_by_plunger = 
+            m_view_blocked_by_plunger =
                                    m_kart_properties->getPlungerInFaceTime();
     }   // blockViewWithPlunger
     // -------------------------------------------------------------------------
@@ -312,14 +312,14 @@ public:
     virtual btTransform getAlignedTransform(const float customPitch=-1);
     // -------------------------------------------------------------------------
     /** Returns the color used for this kart. */
-    const video::SColor &getColor() const 
+    const video::SColor &getColor() const
                                         {return m_kart_properties->getColor();}
     // ------------------------------------------------------------------------
     /** Returns the time till full steering is reached for this kart.
      *  \param steer Current steer value (must be >=0), on which the time till
      *         full steer depends. */
-    virtual float getTimeFullSteer(float steer) const 
-    { 
+    virtual float getTimeFullSteer(float steer) const
+    {
         return m_kart_properties->getTimeFullSteer(steer);
     }   // getTimeFullSteer
     // ------------------------------------------------------------------------
@@ -340,7 +340,7 @@ public:
     virtual btKart    *getVehicle      () const {return m_vehicle;                }
     // ------------------------------------------------------------------------
     /** Returns the upright constraint for this kart. */
-    virtual btUprightConstraint *getUprightConstraint() const 
+    virtual btUprightConstraint *getUprightConstraint() const
                                                   {return m_uprightConstraint;}
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */

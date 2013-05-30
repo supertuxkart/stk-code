@@ -45,7 +45,7 @@ private:
 public:
   Log(log_callback_t callback);
   ~Log();
-  
+
   std::ostream& get();
 };
 

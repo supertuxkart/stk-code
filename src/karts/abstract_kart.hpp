@@ -39,7 +39,7 @@ class Skidding;
 class SlipStream;
 
 /** An abstract interface for the actual karts. Some functions are actually
- *  implemented here in order to allow inlining. 
+ *  implemented here in order to allow inlining.
  * \ingroup karts
  */
 class AbstractKart : public Moveable
@@ -75,7 +75,7 @@ protected:
     AbstractKartAnimation *m_kart_animation;
 
 public:
-                   AbstractKart(const std::string& ident, 
+                   AbstractKart(const std::string& ident,
                                 int world_kart_id,
                                 int position, const btTransform& init_transform);
     virtual       ~AbstractKart();
@@ -100,7 +100,7 @@ public:
     // Access to the kart properties.
     // ------------------------------------------------------------------------
     /** Returns the kart properties of this kart. */
-    const KartProperties* getKartProperties() const 
+    const KartProperties* getKartProperties() const
                             { return m_kart_properties; }
     // ------------------------------------------------------------------------
     /** Sets the kart properties. */
@@ -116,7 +116,7 @@ public:
      *  speed. */
     virtual float getMaxSteerAngle () const = 0;
     // ------------------------------------------------------------------------
-    /** Returns the time till full steering is reached for this kart. 
+    /** Returns the time till full steering is reached for this kart.
      *  This can depend on the current steering value, which must be >= 0.
      */
     virtual float getTimeFullSteer(float steer) const = 0;
@@ -155,7 +155,7 @@ public:
      *  animation is being shown. */
     AbstractKartAnimation *getKartAnimation() { return m_kart_animation; }
     // ------------------------------------------------------------------------
-    const AbstractKartAnimation *getKartAnimation() const 
+    const AbstractKartAnimation *getKartAnimation() const
                                                    { return m_kart_animation; }
     // ------------------------------------------------------------------------
     /** Sets a new kart animation. */
@@ -167,7 +167,7 @@ public:
     /** Returns the index of this kart in world. */
     unsigned int   getWorldKartId() const         { return m_world_kart_id;   }
     // ------------------------------------------------------------------------
-    /** Saves the old controller in m_saved_controller and stores a new 
+    /** Saves the old controller in m_saved_controller and stores a new
      *  controller. The save controller is needed in case of a reset.
      *  \param controller The new controller to use (atm it's always an
      *         end controller). */
@@ -223,7 +223,7 @@ public:
      *  bonus and maluses that are currently applied. */
     virtual float getCurrentMaxSpeed() const = 0;
     // ------------------------------------------------------------------------
-    /** Returns how much increased speed time is left over in the given 
+    /** Returns how much increased speed time is left over in the given
      *  category. Not pure abstract, since there is no need to implement this
      *  e.g. in Ghost.
      *  \param category Which category to report on. */
@@ -237,14 +237,14 @@ public:
      *  \param fade_out_time How long the maximum speed will fade out linearly.
      */
     virtual void increaseMaxSpeed(unsigned int category, float add_speed,
-                                  float engine_force, float duration, 
+                                  float engine_force, float duration,
                                   float fade_out_time) = 0;
     // ------------------------------------------------------------------------
     /** Defines a slowdown, which is in fraction of top speed.
      *  \param category The category for which the speed is increased.
      *  \param max_speed_fraction Fraction of top speed to allow only.
      *  \param fade_in_time How long till maximum speed is capped. */
-    virtual void setSlowdown(unsigned int category, float max_speed_fraction, 
+    virtual void setSlowdown(unsigned int category, float max_speed_fraction,
                              float fade_in_time) = 0;
     // ------------------------------------------------------------------------
     /** Returns the remaining collected energy. */
@@ -282,20 +282,20 @@ public:
     /** Plays a beep sfx. */
     virtual void beep() = 0;
     // ------------------------------------------------------------------------
-    /** This function will play a particular character voice for this kart.  
-     *  It returns whether or not a character voice sample exists for the 
-     *  particular event.  If there is no voice sample, a default can be 
+    /** This function will play a particular character voice for this kart.
+     *  It returns whether or not a character voice sample exists for the
+     *  particular event.  If there is no voice sample, a default can be
      *  played instead. */
     virtual bool playCustomSFX(unsigned int type) = 0;
     // ------------------------------------------------------------------------
     /** Show fire to go with a zipper. */
     virtual void showZipperFire() = 0;
     // ------------------------------------------------------------------------
-    /** Sets zipper time, and apply one time additional speed boost. It can be 
+    /** Sets zipper time, and apply one time additional speed boost. It can be
      *  used with a specific material, in which case the zipper parmaters are
      *  taken from this material (parameters that are <0 will be using the
      *  kart-specific values from kart-properties. */
-    virtual void handleZipper(const Material *m=NULL, 
+    virtual void handleZipper(const Material *m=NULL,
                               bool play_sound=false) = 0;
     // ------------------------------------------------------------------------
     /** Returns true if this kart has finished the race. */
@@ -329,14 +329,14 @@ public:
     /** Returns true if the kart is 'resting', i.e. (nearly) not moving. */
     virtual bool isInRest() const = 0;
     // ------------------------------------------------------------------------
-    /** Starts the engine sound effect. Called once the track intro phase is 
+    /** Starts the engine sound effect. Called once the track intro phase is
      *  over. */
     virtual void startEngineSFX() = 0;
     // ------------------------------------------------------------------------
-    /** Stores the current suspension length. This function is called from 
-     *  world after all karts are in resting position (see 
-     *  World::resetAllKarts), so that the default suspension rest length can 
-     *  be stored. This is then used later to move the wheels depending on 
+    /** Stores the current suspension length. This function is called from
+     *  world after all karts are in resting position (see
+     *  World::resetAllKarts), so that the default suspension rest length can
+     *  be stored. This is then used later to move the wheels depending on
      *  actual suspension, so that when a kart is in rest, the wheels are at
      *  the position at which they were modelled. */
     virtual void setSuspensionLength() = 0;

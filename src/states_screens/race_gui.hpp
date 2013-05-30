@@ -55,12 +55,12 @@ private:
     // -------------------------
     /** The mini map of the track. */
     video::ITexture *m_mini_map;
-        
-    /** The size of a single marker on the screen for AI karts, 
+
+    /** The size of a single marker on the screen for AI karts,
      *  need not be a power of 2. */
     int              m_marker_ai_size;
 
-    /** The size of a single marker on the screen or player karts, 
+    /** The size of a single marker on the screen or player karts,
      *  need not be a power of 2. */
     int              m_marker_player_size;
 
@@ -69,7 +69,7 @@ private:
 
     /** The height of the rendered mini map in pixels, must be a power of 2. */
     int              m_map_rendered_height;
-    
+
     /** Width of the map in pixels on the screen, need not be a power of 2. */
     int              m_map_width;
 
@@ -81,22 +81,22 @@ private:
 
     /** Distance of map from bottom of screen. */
     int              m_map_bottom;
-    
+
     /** Maximum string length of 'rank', 'lap', '99/99'. Used to position
      *  the rank/lap text correctly close to the right border. */
     int              m_rank_lap_width;
 
     /** Maximum string length for the timer */
     int              m_timer_width;
-        
-    
+
+
     bool             m_is_tutorial;
-    
+
     /* Display informat for one player on the screen. */
     void drawEnergyMeter       (int x, int y, const AbstractKart *kart,
-                                const core::recti &viewport, 
+                                const core::recti &viewport,
                                 const core::vector2df &scaling);
-    void drawSpeedAndEnergy    (const AbstractKart* kart, 
+    void drawSpeedAndEnergy    (const AbstractKart* kart,
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
     void drawRankLap           (const AbstractKart* kart,
@@ -105,18 +105,18 @@ private:
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
     void drawGlobalTimer       ();
-    
+
 public:
 
          RaceGUI();
         ~RaceGUI();
     virtual void renderGlobal(float dt);
     virtual void renderPlayerView(const Camera *camera, float dt);
-        
+
     /** Returns the size of the texture on which to render the minimap to. */
-    virtual const core::dimension2du getMiniMapSize() const 
+    virtual const core::dimension2du getMiniMapSize() const
                   { return core::dimension2du(m_map_width, m_map_height); }
-    
+
 };   // RaceGUI
 
 #endif

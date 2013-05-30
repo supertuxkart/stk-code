@@ -28,8 +28,8 @@
 #include "LinearMath/btMotionState.h"
 
 /** This is a very simple motion state implementation for bullet, which does
- *  not support any transformation from physics transform to graphics 
- *  transform. 
+ *  not support any transformation from physics transform to graphics
+ *  transform.
  * \ingroup physics
  */
 
@@ -40,8 +40,8 @@ private:
 
 public:
     /** Constructor.
-     *  \param start_trans An optional start transformation. Defaults to 
-     *         identity. 
+     *  \param start_trans An optional start transformation. Defaults to
+     *         identity.
      */
     KartMotionState(const btTransform& start_trans = btTransform::getIdentity())
         : m_center_of_mass(start_trans)
@@ -51,7 +51,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the current world transform.
-     *  \param center_of_mass The btTransform object that stores the current 
+     *  \param center_of_mass The btTransform object that stores the current
      *         transformation.
      */
     virtual void getWorldTransform(btTransform& center_of_mass) const

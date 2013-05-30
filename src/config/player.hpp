@@ -34,54 +34,54 @@ using namespace irr;
 class PlayerProfile : public NoCopy
 {
 protected:
-    
+
     /**
      * For saving to config file.
      * WARNING : m_player_group has to be declared before the other userconfigparams!
      */
     GroupUserConfigParam  m_player_group;
-    
+
     WStringUserConfigParam m_name;
-    
+
     BoolUserConfigParam   m_is_guest_account;
-        
+
 #ifdef DEBUG
     unsigned int m_magic_number;
 #endif
-    
+
     IntUserConfigParam    m_use_frequency;
 
     /** Profile names can change, so rather than try to make sure all renames are done everywhere,
      *  assign a unique ID to each profiler. Will save much headaches.
      */
     StringUserConfigParam m_unique_id;
-    
+
     int64_t generateUniqueId(const char* playerName);
-    
+
 public:
-    
+
     /**
       * Constructor to create a new player that didn't exist before
       */
     PlayerProfile(const core::stringw& name);
-    
+
     /**
       * Constructor to deserialize a player that was saved to a XML file
       * (...UserConfigParam classes will automagically take care of serializing all
       * create players to the user's config file)
       */
     PlayerProfile(const XMLNode* node);
-    
-    
+
+
     ~PlayerProfile()
     {
         #ifdef DEBUG
         m_magic_number = 0xDEADBEEF;
         #endif
     }
-    
+
     void setName(const core::stringw& name)
-    { 
+    {
         #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
         #endif
@@ -89,7 +89,7 @@ public:
     }
 
     core::stringw getName() const
-    { 
+    {
         #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
         #endif
@@ -97,22 +97,22 @@ public:
     }
 
     bool isGuestAccount() const
-    { 
+    {
         #ifdef DEBUG
-        assert(m_magic_number == 0xABCD1234); 
+        assert(m_magic_number == 0xABCD1234);
         #endif
         return m_is_guest_account;
     }
-    
+
     int getUseFrequency() const
     {
         if (m_is_guest_account) return -1;
         else return m_use_frequency;
     }
-    
-    
+
+
     void incrementUseFrequency();
- 
+
     // please do NOT try to optimise this to return a reference, I don't know why,
     // maybe compiler bug, but hell breaks loose when you do that
     std::string getUniqueID() const

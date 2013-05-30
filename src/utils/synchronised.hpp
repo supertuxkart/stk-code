@@ -31,7 +31,7 @@ private:
     /** The mutex to protect this variable with. */
     mutable pthread_mutex_t  m_mutex;
     /** The actual data to be used. */
-    TYPE                     m_data;                        
+    TYPE                     m_data;
 public:
     // ------------------------------------------------------------------------
     /** Initialise the data and the mutex with default constructors. */
@@ -57,8 +57,8 @@ public:
     }   // ~Synchronised
 
     // ------------------------------------------------------------------------
-    /** Sets the value of this variable using a mutex. 
-     *  \param v Value to be set. 
+    /** Sets the value of this variable using a mutex.
+     *  \param v Value to be set.
      */
     void setAtomic(const TYPE &v)
     {
@@ -68,9 +68,9 @@ public:
     }   // set
 
     // ------------------------------------------------------------------------
-    /** Returns a copy of this variable. 
+    /** Returns a copy of this variable.
      */
-    TYPE getAtomic() const 
+    TYPE getAtomic() const
     {
         TYPE v;
         pthread_mutex_lock(&m_mutex);
@@ -99,12 +99,12 @@ public:
      */
     void lock() { pthread_mutex_lock(&m_mutex); }
     // ------------------------------------------------------------------------
-    /** Unlocks the mutex. 
+    /** Unlocks the mutex.
      */
     void unlock() {pthread_mutex_unlock(&m_mutex); }
     // ------------------------------------------------------------------------
     /** Gives access to the mutex, which can then be used in other pthread
-     *  calls (e.g. pthread_cond_wait). 
+     *  calls (e.g. pthread_cond_wait).
      */
     pthread_mutex_t* getMutex() { return &m_mutex; }
 private:

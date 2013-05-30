@@ -29,14 +29,14 @@ using namespace irr;
 class XMLNode;
 class CheckManager;
 
-/** 
+/**
  *  \brief Implements a simple checkline.
- *  It's a finite line with 2 endpoints in 2d 
- *  and a minimum height (i.e. the minimum Y coordinate of the two points). 
+ *  It's a finite line with 2 endpoints in 2d
+ *  and a minimum height (i.e. the minimum Y coordinate of the two points).
  *  If a kart crosses the line (in the projection on the 2d plane) and has an
  *  appropriate height, the checkline will be triggered. This allows for very
- *  easy checking of checklines, and should be sufficient for most check 
- *  structure. 
+ *  easy checking of checklines, and should be sufficient for most check
+ *  structure.
  *
  * \ingroup tracks
  */
@@ -56,7 +56,7 @@ private:
      *  points are set from the 2d points and the min height. */
     Vec3            m_left_point, m_right_point;
 
-    /** Stores the sign (i.e. side) of the previous line to save some 
+    /** Stores the sign (i.e. side) of the previous line to save some
      *  computations. True if the value is >=0, i.e. the point is on
      *  or to the right of the line. */
     std::vector<bool> m_previous_sign;
@@ -74,7 +74,7 @@ private:
 public:
                  CheckLine(const XMLNode &node, unsigned int index);
     virtual     ~CheckLine();
-    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              unsigned int indx);
     virtual void reset(const Track &track);
     virtual void changeDebugColor(bool is_active);

@@ -90,7 +90,7 @@ public:
     scene::IAnimatedMeshSceneNode* getSceneNode() { return m_scene_node; }
     // ------------------------------------------------------------------------
     /** Moves the referee to the specified position. */
-    void        setPosition(const Vec3 &xyz) 
+    void        setPosition(const Vec3 &xyz)
                 {m_scene_node->setPosition(xyz.toIrrVector()); }
     // ------------------------------------------------------------------------
     /** Sets the rotation of the scene node (in degrees).
@@ -105,7 +105,7 @@ public:
      *  start of a race. */
     static const Vec3& getStartOffset() {return m_st_start_offset; }
     // ------------------------------------------------------------------------
-    /** Returns the rotation of the mesh so that it faces the kart (when 
+    /** Returns the rotation of the mesh so that it faces the kart (when
      *  applied to a kart with heading 0). */
     static const Vec3& getStartRotation() {return m_st_start_rotation; }
 };   // Referee

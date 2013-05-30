@@ -15,8 +15,8 @@
  */
 
 /*
- *  I made this class to work like a regular vector, except that 
- *  m_contents_vector are placed* one the heap so third-party 
+ *  I made this class to work like a regular vector, except that
+ *  m_contents_vector are placed* one the heap so third-party
  *  m_contents_vector can keep pointers to them.
  */
 
@@ -47,14 +47,14 @@ public:
     }   // PtrVector
 
     // ------------------------------------------------------------------------
-    
+
     ~PtrVector()
     {
         if(type == HOLD) clearAndDeleteAll();
     }   // ~PtrVector
-    
+
     // ------------------------------------------------------------------------
-    
+
     void push_back(TYPE* t)
     {
         m_contents_vector.push_back(t);
@@ -202,7 +202,7 @@ public:
             if(pointer == obj)
             {
 #ifdef USE_ALIGNED
-                const unsigned int amount = 
+                const unsigned int amount =
                     (unsigned int)m_contents_vector.size();
                 for(unsigned int i=n; i<amount-1; i++)
                 {
@@ -231,7 +231,7 @@ public:
             if((void*)pointer == obj)
             {
 #ifdef USE_ALIGNED
-                const unsigned int amount = 
+                const unsigned int amount =
                     (unsigned int)m_contents_vector.size();
                 for(unsigned int i=n; i<amount-1; i++)
                 {
@@ -253,12 +253,12 @@ public:
     {
         if (!desc)
         {
-            // We should not used unsigned ints here, because if the vector is 
+            // We should not used unsigned ints here, because if the vector is
             // empty j needs to be compared against -1
             for(int j=(int)start; j<(int)m_contents_vector.size()-1; j++)
             {
                 if(*(m_contents_vector[j])<*(m_contents_vector[j+1])) continue;
-                // Now search the proper place for m_contents_vector[j+1] 
+                // Now search the proper place for m_contents_vector[j+1]
                 // in the sorted section contentsVectot[start:j]
                 TYPE* t=m_contents_vector[j+1];
                 unsigned int i = j+1;
@@ -275,7 +275,7 @@ public:
             for(int j=(int)start; j<(int)m_contents_vector.size()-1; j++)
              {
                  if(*(m_contents_vector[j])>*(m_contents_vector[j+1])) continue;
-                 // Now search the proper place for m_contents_vector[j+1] 
+                 // Now search the proper place for m_contents_vector[j+1]
                  // in the sorted section contentsVectot[start:j]
                  TYPE* t=m_contents_vector[j+1];
                  unsigned int i = j+1;

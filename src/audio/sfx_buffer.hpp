@@ -45,64 +45,64 @@ class XMLNode;
 class SFXBuffer
 {
 private:
-    
+
     /** Whether the contents of the file was loaded */
     bool m_loaded;
-    
+
     /** The file that contains the OGG audio data */
     std::string m_file;
-    
+
     ALuint   m_buffer;
     bool     m_positional;
     float    m_rolloff;
     float    m_gain;
     float    m_max_dist;
-    
+
     bool loadVorbisBuffer(const std::string &name, ALuint buffer);
-    
+
 public:
-    
+
     SFXBuffer(const  std::string& file,
               bool   positional,
               float  rolloff,
               float  max_width,
               float  gain);
-    
+
     SFXBuffer(const std::string& file,
               const XMLNode* node);
-    
+
     ~SFXBuffer()
     {
     }
-    
+
     /**
       * \brief load the buffer from file into OpenAL.
       * \note If this buffer is already loaded, this call does nothing and returns false
       * \return whether loading was successful
       */
     bool     load();
-    
+
     /**
       * \brief Frees the loaded buffer
       * Cannot appear in destructor because copy-constructors may be used,
       * and the OpenAL source must not be deleted on a copy
       */
     void     unload();
-    
+
     /** \return whether this buffer was loaded from disk */
     bool     isLoaded()       const { return m_loaded; }
-    
+
     /** Only returns a valid buffer if isLoaded() returned true */
     ALuint   getBufferID()    const { return m_buffer; }
-    
+
     bool     isPositional()   const { return m_positional; }
     float    getRolloff()     const { return m_rolloff;    }
     float    getGain()        const { return m_gain;       }
     float    getMaxDist()     const { return m_max_dist;   }
     std::string getFileName() const { return m_file;       }
-    
+
     void     setPositional(bool positional) { m_positional = positional; }
-    
+
     LEAK_CHECK()
 };
 

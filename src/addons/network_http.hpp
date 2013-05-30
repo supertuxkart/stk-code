@@ -45,8 +45,8 @@ class NetworkHttp : public INetworkHttp
 private:
 
     /** The list of pointes to all requests. */
-    Synchronised< std::priority_queue<Request*, 
-                                      std::vector<Request*>, 
+    Synchronised< std::priority_queue<Request*,
+                                      std::vector<Request*>,
                                       Request::Compare >     >  m_all_requests;
 
     /** The current requested being worked on. */
@@ -79,7 +79,7 @@ public:
     void          startNetworkThread();
     void          stopNetworkThread();
     void          insertReInit();
-    Request      *downloadFileAsynchron(const std::string &url, 
+    Request      *downloadFileAsynchron(const std::string &url,
                                         const std::string &save = "",
                                         int   priority = 1,
                                         bool  manage_memory=true);

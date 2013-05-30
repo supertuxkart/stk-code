@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013 the SuperTuxKart team 
+//  Copyright (C) 2011-2013 the SuperTuxKart team
 //  Copyright (C) 2013      Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
@@ -42,7 +42,7 @@ private:
     video::SMaterial    m_blur_material;
 
     bool                m_supported;
-    
+
     /** Boost time, how long the boost should be displayed. This also
      *  affects the strength of the effect: longer boost time will
      *  have a stronger effect. */
@@ -67,11 +67,11 @@ private:
     /** The vertices for the rectangle used for each camera. This includes
      *  the vertex position, normal, and texture coordinate. */
     std::vector<Quad> m_vertices;
-    
+
 public:
                  PostProcessing(video::IVideoDriver* video_driver);
     virtual     ~PostProcessing();
-        
+
     void         reset();
     /** Those should be called around the part where we render the scene to be post-processed */
     void         beginCapture();
@@ -80,13 +80,13 @@ public:
 
     /** Render the post-processed scene */
     void         render();
-    
+
     /** Is the hardware able to use post-processing? */
     inline bool  isSupported() const                 {return m_supported;}
-    
+
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);
-    
+
     /** Implement IShaderConstantsSetCallback. Shader constants setter for post-processing */
     virtual void OnSetConstants(video::IMaterialRendererServices *services, s32 user_data);
 };

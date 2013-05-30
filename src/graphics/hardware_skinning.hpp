@@ -39,11 +39,11 @@ class HWSkinningCallback : public video::IShaderConstantSetCallBack
 private:
     //const video::SMaterial *m_used_material;
     scene::IAnimatedMeshSceneNode* m_node;
-    
+
 public:
     HWSkinningCallback(scene::IAnimatedMeshSceneNode* node);
     virtual ~HWSkinningCallback();
-    
+
 /*    virtual void OnSetMaterial(const video::SMaterial& material)
     {
         m_used_material=&material;

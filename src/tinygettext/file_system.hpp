@@ -25,7 +25,7 @@
 
 namespace tinygettext {
 
-class FileSystem 
+class FileSystem
 {
 public:
   virtual ~FileSystem() {}

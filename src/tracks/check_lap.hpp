@@ -24,7 +24,7 @@
 class XMLNode;
 class CheckManager;
 
-/** 
+/**
  *  \brief Implements a simple lap test. A new lap is detected
  *  when the distance along the track reduces by a certain amount
  *  of time.
@@ -39,7 +39,7 @@ private:
 public:
                  CheckLap(const XMLNode &node, unsigned int index);
     virtual     ~CheckLap() {};
-    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              unsigned int indx);
     virtual void reset(const Track &track);
 };   // CheckLine

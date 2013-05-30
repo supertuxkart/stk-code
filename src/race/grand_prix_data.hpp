@@ -42,9 +42,9 @@ class GrandPrixData
 
     /** Original filename, only for error handling needed. */
     std::string m_filename;
-    
+
     /** The ident of the tracks in this grand prix in their right order, ident
-     *  means the filename of the .track file without .track extension 
+     *  means the filename of the .track file without .track extension
      *  (ie. 'volcano'). */
     std::vector<std::string> m_tracks;
 
@@ -56,7 +56,7 @@ class GrandPrixData
      *  nolok is unlocked, Fort Magma is available, otherwise not).
      *  Mark this member mutable so that getTrackNames can be const. */
     mutable std::vector<std::string> m_really_available_tracks;
-    
+
     /** The number of laps that each track should be raced, in the right order */
     std::vector<int> m_laps;
 
@@ -72,21 +72,21 @@ public:
 #endif
                        GrandPrixData  (const std::string filename) throw(std::logic_error);
                        GrandPrixData  ()       {}; // empty for initialising
-    
+
     bool checkConsistency(bool chatty=true) const;
     const std::vector<std::string>& getTrackNames() const;
     void getLaps(std::vector<int> *laps) const;
     void getReverse(std::vector<bool> *reverse) const;
 
     // ------------------------------------------------------------------------
-    /** @return the (potentially translated) user-visible name of the Grand 
+    /** @return the (potentially translated) user-visible name of the Grand
      *  Prix (apply fribidi as needed) */
     const irr::core::stringw getName() const { return _LTR(m_name.c_str());    }
 
     // ------------------------------------------------------------------------
     /** @return the internal name identifier of the Grand Prix (not translated) */
     const std::string& getId() const { return m_id;            }
-    
+
     // ------------------------------------------------------------------------
     /** Returns the filename of the grand prix xml file. */
     const std::string& getFilename() const { return m_filename;  }

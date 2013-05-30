@@ -27,7 +27,7 @@ class Ipo;
 class ShowCurve;
 class XMLNode;
 
-/** 
+/**
  *  \brief Implements a simple checkline that will cause a kart to be
  *         shot to a specified point.
  *

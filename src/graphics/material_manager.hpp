@@ -50,15 +50,15 @@ public:
               MaterialManager();
              ~MaterialManager();
     void      loadMaterial     ();
-    Material* getMaterialFor(video::ITexture* t, 
+    Material* getMaterialFor(video::ITexture* t,
                              scene::IMeshBuffer *mb);
-    void      setAllMaterialFlags(video::ITexture* t, 
+    void      setAllMaterialFlags(video::ITexture* t,
                                   scene::IMeshBuffer *mb);
-    void      adjustForFog(video::ITexture* t, 
+    void      adjustForFog(video::ITexture* t,
                            scene::IMeshBuffer *mb,
                            scene::ISceneNode* parent,
                            bool use_fog) const;
-    
+
     void      setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const;
 
     int       addEntity        (Material *m);
@@ -72,7 +72,7 @@ public:
     void      popTempMaterial  ();
     void      makeMaterialsPermanent();
     bool      hasMaterial(const std::string& fname);
-    
+
     Material* getLatestMaterial() { return m_materials[m_materials.size()-1]; }
 };   // MaterialManager
 

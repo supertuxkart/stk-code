@@ -48,7 +48,7 @@ namespace StringUtils
         oss << any ;
         return oss.str();
     }
-    
+
     template <class T>
     irr::core::stringw toWString (const T& any)
     {
@@ -86,26 +86,26 @@ namespace StringUtils
 
     std::string                     toUpperCase(const std::string&);
     std::string                     toLowerCase(const std::string&);
-    std::vector<std::string>        split(const std::string& s, char c, 
+    std::vector<std::string>        split(const std::string& s, char c,
                                           bool keepSplitChar=false);
-    std::vector<irr::core::stringw> split(const irr::core::stringw& s, 
+    std::vector<irr::core::stringw> split(const irr::core::stringw& s,
                                           char c, bool keepSplitChar=false);
     std::vector<std::string>         splitPath(const std::string& path);
-    
+
     // ------------------------------------------------------------------------
-    /** 
-     *  Replaces the first %s or %i/%d in the string with the first value 
+    /**
+     *  Replaces the first %s or %i/%d in the string with the first value
      *  converted to a string), the 2nd %s or %d with the second value etc.
      *  So this is basically a simplified s(n)printf replacement, but doesn't
      *  do any fancy formatting (and no type checks either - so you can print
      *  a string into a %d field). This is basically a replacement for
      *  sprintf (and similar functions), mostly meant for strings that are
-     *  translated (otherwise just use ostringstream) - since e.g. a 
-     *  translated string like _("Player %s - chose your kart") would 
+     *  translated (otherwise just use ostringstream) - since e.g. a
+     *  translated string like _("Player %s - chose your kart") would
      *  be broken into two strings:
      *  << _("Player ") << name << _(" - chose your kart")
      *  and this is in the best case very confusing for translators (which get
-     *  to see two strings instead of one sentence, see xgettext manual 
+     *  to see two strings instead of one sentence, see xgettext manual
      *  for why this is a bad idea)
      *  In order to accomodate translations even more, you can use formats %0, %1, %2, etc...
      *  where %0 is replaced by the first argument, %1 by the second argument, etc...
@@ -115,19 +115,19 @@ namespace StringUtils
      *  \param all_vals Value(s) to replace all %s or %d with.
      */
     std::string insertValues(const std::string &s, std::vector<std::string>& all_vals);
-    
+
     /** This no-op is useful when using variadic arguments, so that we may support the case with 0 variadic arguments */
     template <class T1>
     T1 insertValues(const T1& s) { return s; }
-    
+
     // ------------------------------------------------------------------------
     /** Same as above but for wide-strings */
     irr::core::stringw insertValues(const irr::core::stringw &s, std::vector<irr::core::stringw>& all_vals);
-    
+
     // ------------------------------------------------------------------------
     // Note: the order in which the templates are specified is important, since
     // otherwise some compilers will not find the right template to use.
-    
+
     template <class T1, class T2, class T3, class T4, class T5, class T6>
     std::string insertValues(const std::string &s, const T1 &v1,
                              const T2 &v2, const T3 &v3, const T4 &v4,
@@ -143,7 +143,7 @@ namespace StringUtils
         dummy << v6; all_vals.push_back(dummy.str());
         return insertValues(s, all_vals);
     }
-    
+
     template <class T1, class T2, class T3, class T4, class T5>
     std::string insertValues(const std::string &s, const T1 &v1,
                              const T2 &v2, const T3 &v3, const T4 &v4,
@@ -158,7 +158,7 @@ namespace StringUtils
         dummy << v5; all_vals.push_back(dummy.str());
         return insertValues(s, all_vals);
     }
-    
+
     template <class T1, class T2, class T3, class T4>
     std::string insertValues(const std::string &s, const T1 &v1,
                              const T2 &v2, const T3 &v3, const T4 &v4)
@@ -171,7 +171,7 @@ namespace StringUtils
         dummy << v4; all_vals.push_back(dummy.str());
         return insertValues(s, all_vals);
     }
-    
+
     /** Shortcut insert_values taking three values, see above for
      *  full docs.
      *  \param s String in which all %s or %d are replaced.
@@ -188,7 +188,7 @@ namespace StringUtils
         dummy << v3; all_vals.push_back(dummy.str());
         return insertValues(s, all_vals);
     }
-    
+
     // ------------------------------------------------------------------------
     // Note: the order in which the templates are specified is important, since
     // otherwise some compilers will not find the right template to use.
@@ -205,7 +205,7 @@ namespace StringUtils
         std::ostringstream dummy;
         dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
         dummy << v2; all_vals.push_back(dummy.str()); dummy.str("");
-        
+
         return insertValues(s, all_vals);
     }
     // ------------------------------------------------------------------------
@@ -220,10 +220,10 @@ namespace StringUtils
         std::vector<std::string> all_vals;
         std::ostringstream dummy;
         dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
-        
+
         return insertValues(s, all_vals);
     }
-    
+
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */
     template <class T1, class T2, class T3, class T4, class T5, class T6>
@@ -232,16 +232,16 @@ namespace StringUtils
                                     const T5 &v5, const T6 &v6)
     {
         std::vector<irr::core::stringw> all_vals;
-        all_vals.push_back( irr::core::stringw(v1) ); 
-        all_vals.push_back( irr::core::stringw(v2) ); 
-        all_vals.push_back( irr::core::stringw(v3) ); 
-        all_vals.push_back( irr::core::stringw(v4) ); 
-        all_vals.push_back( irr::core::stringw(v5) ); 
-        all_vals.push_back( irr::core::stringw(v6) ); 
+        all_vals.push_back( irr::core::stringw(v1) );
+        all_vals.push_back( irr::core::stringw(v2) );
+        all_vals.push_back( irr::core::stringw(v3) );
+        all_vals.push_back( irr::core::stringw(v4) );
+        all_vals.push_back( irr::core::stringw(v5) );
+        all_vals.push_back( irr::core::stringw(v6) );
         return insertValues(s, all_vals);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */
     template <class T1, class T2, class T3, class T4, class T5>
@@ -250,14 +250,14 @@ namespace StringUtils
                                     const T5 &v5)
     {
         std::vector<irr::core::stringw> all_vals;
-        all_vals.push_back( irr::core::stringw(v1) ); 
-        all_vals.push_back( irr::core::stringw(v2) ); 
-        all_vals.push_back( irr::core::stringw(v3) ); 
-        all_vals.push_back( irr::core::stringw(v4) ); 
-        all_vals.push_back( irr::core::stringw(v5) ); 
+        all_vals.push_back( irr::core::stringw(v1) );
+        all_vals.push_back( irr::core::stringw(v2) );
+        all_vals.push_back( irr::core::stringw(v3) );
+        all_vals.push_back( irr::core::stringw(v4) );
+        all_vals.push_back( irr::core::stringw(v5) );
         return insertValues(s, all_vals);
     }
-    
+
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */
     template <class T1, class T2, class T3, class T4>
@@ -265,13 +265,13 @@ namespace StringUtils
                                     const T2 &v2, const T3 &v3, const T4 &v4)
     {
         std::vector<irr::core::stringw> all_vals;
-        all_vals.push_back( irr::core::stringw(v1) ); 
-        all_vals.push_back( irr::core::stringw(v2) ); 
-        all_vals.push_back( irr::core::stringw(v3) ); 
-        all_vals.push_back( irr::core::stringw(v4) ); 
+        all_vals.push_back( irr::core::stringw(v1) );
+        all_vals.push_back( irr::core::stringw(v2) );
+        all_vals.push_back( irr::core::stringw(v3) );
+        all_vals.push_back( irr::core::stringw(v4) );
         return insertValues(s, all_vals);
     }
-    
+
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */
     template <class T1, class T2, class T3>
@@ -280,12 +280,12 @@ namespace StringUtils
     {
         std::vector<irr::core::stringw> all_vals;
         irr::core::stringw dummy;
-        all_vals.push_back( irr::core::stringw(v1) ); 
-        all_vals.push_back( irr::core::stringw(v2) ); 
-        all_vals.push_back( irr::core::stringw(v3) ); 
+        all_vals.push_back( irr::core::stringw(v1) );
+        all_vals.push_back( irr::core::stringw(v2) );
+        all_vals.push_back( irr::core::stringw(v3) );
         return insertValues(s, all_vals);
     }
-        
+
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */
     template <class T1, class T2>
@@ -293,21 +293,21 @@ namespace StringUtils
                              const T2 &v2)
     {
         std::vector<irr::core::stringw> all_vals;
-        all_vals.push_back( irr::core::stringw(v1) ); 
-        all_vals.push_back( irr::core::stringw(v2) ); 
+        all_vals.push_back( irr::core::stringw(v1) );
+        all_vals.push_back( irr::core::stringw(v2) );
         return insertValues(s, all_vals);
     }
-    
+
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */
     template <class T1>
     irr::core::stringw insertValues(const irr::core::stringw &s, const T1 &v1)
     {
         std::vector<irr::core::stringw> all_vals;
-        all_vals.push_back( irr::core::stringw(v1) ); 
+        all_vals.push_back( irr::core::stringw(v1) );
         return insertValues(s, all_vals);
     }
-    
+
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */
     template <class T1, class T2, class T3, class T4, class T5>
@@ -318,7 +318,7 @@ namespace StringUtils
         irr::core::stringw s(chars);
         return insertValues(s, v1, v2, v3, v4, v5);
     }
-    
+
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */
     template <class T1, class T2, class T3>
@@ -328,7 +328,7 @@ namespace StringUtils
         irr::core::stringw s(chars);
         return insertValues(s, v1, v2, v3);
     }
-    
+
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */
     template <class T1, class T2>
@@ -338,7 +338,7 @@ namespace StringUtils
         irr::core::stringw s(chars);
         return insertValues(s, v1, v2);
     }
-    
+
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */
     template <class T1>
@@ -347,7 +347,7 @@ namespace StringUtils
         irr::core::stringw s(chars);
         return insertValues(s, v1);
     }
-    
+
     // ------------------------------------------------------------------------
     /** Like the other ones above but for C strings */
     template <class T1, class T2, class T3>
@@ -357,7 +357,7 @@ namespace StringUtils
         std::string s(chars);
         return insertValues(s, v1, v2, v3);
     }
-    
+
     // ------------------------------------------------------------------------
     /** Like the other ones above but for C strings */
     template <class T1, class T2>
@@ -367,7 +367,7 @@ namespace StringUtils
         std::string s(chars);
         return insertValues(s, v1, v2);
     }
-    
+
     // ------------------------------------------------------------------------
     /** Like the other ones above but for C strings */
     template <class T1>
@@ -382,7 +382,7 @@ namespace StringUtils
     {
         std::istringstream conv(input);
         conv >> *output;
-        
+
         // check reading worked correctly and everything was read
         if (conv.fail() || !conv.eof())
         {
@@ -396,7 +396,7 @@ namespace StringUtils
     {
         return parseString(input.c_str(), output);
     }
-    
+
     /**
       * \param other string in which to replace stuff
       * \param from  pattern to remove from the string
@@ -404,11 +404,11 @@ namespace StringUtils
       * \return      a string with all occurrences of \c from replaced by occurrences of \c to
       */
     std::string replace(const std::string& other, const std::string& from, const std::string& to);
-    
+
     irr::core::stringw decodeFromHtmlEntities(const std::string& input);
-    
+
     std::string encodeToHtmlEntities(const irr::core::stringw &output);
-    
+
     /** Compute a simple hash of a string */
     unsigned int simpleHash(const char* input);
 } // namespace StringUtils

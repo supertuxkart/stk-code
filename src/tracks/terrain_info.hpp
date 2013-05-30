@@ -45,12 +45,12 @@ public:
     virtual ~TerrainInfo() {};
 
     virtual void update(const Vec3 &pos);
-    bool     getSurfaceInfo(const Vec3 &from, Vec3 *position, 
+    bool     getSurfaceInfo(const Vec3 &from, Vec3 *position,
                             const Material **m);
 
     // ------------------------------------------------------------------------
     /** Returns the height of the terrain. we're currently above */
-    float getHoT()                       const {return m_hit_point.getY(); }    
+    float getHoT()                       const {return m_hit_point.getY(); }
     // ------------------------------------------------------------------------
     /** Returns the current material the kart is on. */
     const Material *getMaterial()        const {return m_material;     }

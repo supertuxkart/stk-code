@@ -26,7 +26,7 @@ class CheckManager;
 
 /** This class implements a check sphere that is used to change the ambient
  *  light if a kart is inside this sphere. Besides a normal radius this
- *  sphere also has a 2nd 'inner' radius: player karts inside the inner 
+ *  sphere also has a 2nd 'inner' radius: player karts inside the inner
  *  radius will have the full new ambient light, karts outside the default
  *  light, and karts in between will mix the light dependent on distance.
  *
@@ -47,13 +47,13 @@ private:
 public:
                  CheckSphere(const XMLNode &node, unsigned int index);
     virtual     ~CheckSphere() {};
-    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              unsigned int kart_id);
     // ------------------------------------------------------------------------
     /** Returns if kart indx is currently inside of the sphere. */
     bool isInside(int index) const            { return m_is_inside[index]; }
     // -------------------------------------------------------------------------
-    /** Returns the squared distance of kart index from the enter of 
+    /** Returns the squared distance of kart index from the enter of
      *  this sphere. */
     float getDistance2ForKart(int index) const { return m_distance2[index];}
     // -------------------------------------------------------------------------

@@ -56,7 +56,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Sets the keep-alive value. Setting it to 0 will remove the plunger
-     *  at the next update - which is used if the rubber band snaps. 
+     *  at the next update - which is used if the rubber band snaps.
      */
     void         setKeepAlive(float t) {m_keep_alive = t;}
     // ------------------------------------------------------------------------

@@ -59,7 +59,7 @@ private:
 
     /** An offset that is added when doing the raycast for terrain. This
      *  is useful in case that the position of the object is just under
-     *  the terrain (perhaps due to floating point errors), and would 
+     *  the terrain (perhaps due to floating point errors), and would
      *  otherwise result in an invalid terrain. */
     Vec3              m_position_offset;
 
@@ -74,8 +74,8 @@ protected:
     AbstractKart*     m_owner;
 
     /** Type of the powerup. */
-    PowerupManager::PowerupType       
-                      m_type; 
+    PowerupManager::PowerupType
+                      m_type;
 
     /** Collision shape of this Flyable. */
     btCollisionShape *m_shape;
@@ -124,25 +124,25 @@ protected:
     /** Size of the model. */
     static Vec3       m_st_extend[PowerupManager::POWERUP_MAX];
 
-    /** Time since thrown. used so a kart can't hit himself when trying 
+    /** Time since thrown. used so a kart can't hit himself when trying
      *  something, and also to put some time limit to some collectibles */
     float             m_time_since_thrown;
 
-    /** Set to something > -1 if this flyable should auto-destrcut after 
+    /** Set to something > -1 if this flyable should auto-destrcut after
      *  a while. */
     float             m_max_lifespan;
 
-    /** If set to true, the kart that throwns this flyable can't collide 
+    /** If set to true, the kart that throwns this flyable can't collide
      *  with it for a short time. */
     bool              m_owner_has_temporary_immunity;
 
-    void              getClosestKart(const AbstractKart **minKart, 
+    void              getClosestKart(const AbstractKart **minKart,
                                      float *minDistSquared,
-                                     Vec3 *minDelta, 
+                                     Vec3 *minDelta,
                                      const AbstractKart* inFrontOf=NULL,
                                      const bool backwards=false) const;
 
-    void getLinearKartItemIntersection(const Vec3 &origin, 
+    void getLinearKartItemIntersection(const Vec3 &origin,
                                        const AbstractKart *target_kart,
                                        float item_XY_velocity, float gravity,
                                        float forw_offset,
@@ -152,15 +152,15 @@ protected:
     /** init bullet for moving objects like projectiles */
     void              createPhysics(float y_offset,
                                     const Vec3 &velocity,
-                                    btCollisionShape *shape, 
+                                    btCollisionShape *shape,
                                     float restitution,
                                     const float gravity=0.0f,
-                                    const bool rotates=false, 
+                                    const bool rotates=false,
                                     const bool turn_around=false,
                                     const btTransform* customDirection=NULL);
 public:
 
-                 Flyable     (AbstractKart* kart, 
+                 Flyable     (AbstractKart* kart,
                               PowerupManager::PowerupType type,
                               float mass=1.0f);
     virtual     ~Flyable     ();
@@ -175,7 +175,7 @@ public:
     void                      explode(AbstractKart* kart, PhysicalObject* obj=NULL,
                                       bool secondary_hits=true);
     // ------------------------------------------------------------------------
-    /** If true the up velocity of the flyable will be adjust so that the 
+    /** If true the up velocity of the flyable will be adjust so that the
      *  flyable stays at a height close to the average height.
      *  \param f True if the up velocity should be adjusted. */
     void         setAdjustUpVelocity(bool f) { m_adjust_up_velocity = f; }

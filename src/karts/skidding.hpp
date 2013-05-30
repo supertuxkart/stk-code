@@ -58,7 +58,7 @@ private:
      *  trigger the skidding bonus. */
     float m_skid_time;
 
-    /** True if the kart has skidded long enough to get a skid bonus if it 
+    /** True if the kart has skidded long enough to get a skid bonus if it
      *  stopped skidding now. */
     bool m_skid_bonus_ready;
 
@@ -82,8 +82,8 @@ public:
      *  SKID_SHOW_GFX_LEFT: Shows the gfx, while the bonus is active,
      *             and the kart was turning left.
      *  SKID_SHOW_GFX_RIGHT: Similar for turning right. */
-    enum SkidState {SKID_OLD, SKID_NONE, SKID_ACCUMULATE_LEFT, 
-                    SKID_ACCUMULATE_RIGHT, SKID_SHOW_GFX_LEFT, 
+    enum SkidState {SKID_OLD, SKID_NONE, SKID_ACCUMULATE_LEFT,
+                    SKID_ACCUMULATE_RIGHT, SKID_SHOW_GFX_LEFT,
                     SKID_SHOW_GFX_RIGHT} ;
 
 private:
@@ -98,7 +98,7 @@ private:
     ShowCurve *m_actual_curve;
 #endif
 
-    unsigned int getSkidBonus(float *bonus_time, float *bonus_speed, 
+    unsigned int getSkidBonus(float *bonus_time, float *bonus_speed,
                               float *bonus_force) const;
     void  updateSteering(float steer, float dt);
 public:
@@ -134,7 +134,7 @@ public:
     // ------------------------------------------------------------------------
     float getSteeringWhenSkidding(float steering) const;
     // ------------------------------------------------------------------------
-    /** Returns if the kart has skidded long enough to get a skid bonus if it 
+    /** Returns if the kart has skidded long enough to get a skid bonus if it
      *  stopped skidding now. This function returns false if the kart is
      *  actually using the skid bonus. */
     bool getSkidBonusReady() const { return m_skid_bonus_ready; }

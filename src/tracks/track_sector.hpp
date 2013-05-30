@@ -73,7 +73,7 @@ public:
     bool isOnRoad() const { return m_on_road; }
     // ------------------------------------------------------------------------
     void setLastTriggeredCheckline(int i) { m_last_triggered_checkline = i; }
-    
+
 };   // TrackSector
 
 #endif

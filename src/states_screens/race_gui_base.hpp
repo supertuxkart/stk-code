@@ -41,7 +41,7 @@ class Material;
 class Referee;
 
 /**
-  * \brief An abstract base class for the two race guis (race_gui and 
+  * \brief An abstract base class for the two race guis (race_gui and
   *  race_result gui)
   * \ingroup states_screens
   */
@@ -56,13 +56,13 @@ public:
     {
         /** Text to display next to icon, if any. */
         core::stringw m_text;
-        
+
         /** Text color, if any text. */
         video::SColor m_color;
-        
+
         /** If this kart has a special title, e.g. "leader" in follow-the-leader. */
         core::stringw special_title;
-        
+
         /** Current lap of this kart, or -1 if irrelevant. */
         int lap;
     };   // KartIconDisplayInfo
@@ -89,17 +89,17 @@ private:
         /** Important msgs are displayed in the middle of the screen. */
         bool                m_important;
         bool                m_big_font;
-        
+
         // -----------------------------------------------------
         // std::vector needs standard copy-ctor and std-assignment op.
         // let compiler create defaults .. they'll do the job, no
         // deep copies here ..
-        TimedMessage(const irr::core::stringw &message, 
+        TimedMessage(const irr::core::stringw &message,
                      const AbstractKart *kart, float time,
                      const video::SColor &color, const bool important,
                      bool big_font)
         {
-            m_message        = message; 
+            m_message        = message;
             m_kart           = kart;
             m_remaining_time = ( time < 0.0f ) ? -1.0f : time;
             m_color          = color;
@@ -131,7 +131,7 @@ private:
 
     /** Translated string 'Top %d' displayed every frame. */
     core::stringw    m_string_top;
-    
+
     /** The position of the referee for all karts. */
     std::vector<Vec3> m_referee_pos;
 
@@ -139,7 +139,7 @@ private:
     std::vector<Vec3> m_referee_rotation;
 
     /** The height of the referee. This is used to make the referee fly
-     *  into view. This is the same Y-offset for all karts, so only a 
+     *  into view. This is the same Y-offset for all karts, so only a
      *  single value needs to be used. */
     float m_referee_height;
 
@@ -151,12 +151,12 @@ protected:
     /** Material for the 'plunger in the face' texture. */
     Material        *m_plunger_face;
 
-    /** State of the plunger: From the 'init' states the plunger switches 
+    /** State of the plunger: From the 'init' states the plunger switches
      *  between two slow moving states ('shakily moving') till the end of
-     *  the plunger time is nearly reached, then it goes to a very fast 
+     *  the plunger time is nearly reached, then it goes to a very fast
      *  moving state ('plunger blown off'). */
-    enum PlungerState {PLUNGER_STATE_INIT,   PLUNGER_STATE_SLOW_1, 
-                       PLUNGER_STATE_SLOW_2, PLUNGER_STATE_FAST} 
+    enum PlungerState {PLUNGER_STATE_INIT,   PLUNGER_STATE_SLOW_1,
+                       PLUNGER_STATE_SLOW_2, PLUNGER_STATE_FAST}
                         m_plunger_state;
 
     /** How long the plunger should stay in the current state. */
@@ -184,18 +184,18 @@ protected:
 
     /** The frame around player karts in the mini map. */
     Material         *m_icons_frame;
-    
+
     void cleanupMessages(const float dt);
     void createMarkerTexture();
-    void createRegularPolygon(unsigned int n, float radius, 
+    void createRegularPolygon(unsigned int n, float radius,
                               const core::vector2df &center,
                               const video::SColor &color,
                               video::S3DVertex *v, unsigned short int *index);
     void drawAllMessages       (const AbstractKart* kart,
-                                const core::recti &viewport, 
+                                const core::recti &viewport,
                                 const core::vector2df &scaling);
     void drawPowerupIcons      (const AbstractKart* kart,
-                                const core::recti &viewport, 
+                                const core::recti &viewport,
                                 const core::vector2df &scaling);
     void drawGlobalMusicDescription();
     void drawGlobalReadySetGo  ();
@@ -204,20 +204,20 @@ protected:
      *  item messages).
      */
     void ignoreUnimportantMessages() { m_ignore_unimportant_messages = true; }
-    
+
     /** Distance on track to begin showing overlap in drawGlobalPlayerIcons */
     float            m_dist_show_overlap;///can be zero
     float            m_icons_inertia;///can be zero
-    
+
     /** previous position of icons */
     std::vector< core::vector2d<s32> > m_previous_icons_position;
 
-    /** This vector is passed to world to be filled with the current 
+    /** This vector is passed to world to be filled with the current
      *  race data information. */
     std::vector<KartIconDisplayInfo> m_kart_display_infos;
 
 public:
-    
+
     bool m_enabled;
 
                   RaceGUIBase();
@@ -226,7 +226,7 @@ public:
     virtual void init();
     virtual void reset();
     virtual void renderPlayerView(const Camera *camera, float dt);
-    virtual void addMessage(const irr::core::stringw &m, 
+    virtual void addMessage(const irr::core::stringw &m,
                             const AbstractKart *kart, float time,
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
@@ -236,7 +236,7 @@ public:
     virtual void preRenderCallback(const Camera *camera);
     // ------------------------------------------------------------------------
     /** Returns the size of the texture on which to render the minimap to. */
-    virtual const core::dimension2du 
+    virtual const core::dimension2du
                   getMiniMapSize() const = 0;
     // ------------------------------------------------------------------------
     virtual void clearAllMessages() { m_messages.clear(); }

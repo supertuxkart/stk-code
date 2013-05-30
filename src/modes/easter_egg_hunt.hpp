@@ -45,23 +45,23 @@ private:
 public:
              EasterEggHunt();
     virtual ~EasterEggHunt();
-    
+
     virtual void init();
-    
+
     virtual bool isRaceOver();
-    
+
     // overriding World methods
     virtual void reset();
 
     virtual bool raceHasLaps(){ return false; }
     virtual void moveKartAfterRescue(AbstractKart* kart);
-    
+
     virtual const std::string& getIdent() const;
-    
+
     virtual void update(float dt);
     virtual void getKartsDisplayInfo(
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
-        
+
     void updateKartRanks();
     void collectedEasterEgg(const AbstractKart *kart);
     void readData(const std::string &filename);

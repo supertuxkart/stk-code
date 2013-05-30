@@ -35,25 +35,25 @@ class StoryModeLobbyScreen : public GUIEngine::Screen, public EnterPlayerNameDia
     public GUIEngine::ScreenSingleton<StoryModeLobbyScreen>
 {
     StoryModeLobbyScreen();
-    
+
 public:
     friend class GUIEngine::ScreenSingleton<StoryModeLobbyScreen>;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
-        
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown();
-    
+
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded();
-    
+
     /** \brief implement callback from EnterPlayerNameDialog::INewPlayerListener */
     virtual void onNewPlayerWithName(const irr::core::stringw& newName);
 };

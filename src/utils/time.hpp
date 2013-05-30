@@ -79,14 +79,14 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns a time based on an arbitrary 'epoch' (e.g. could be start
-     *  time of the application, 1.1.1970, ...). 
-     *  The value is a double precision floating point value in seconds. 
+     *  time of the application, 1.1.1970, ...).
+     *  The value is a double precision floating point value in seconds.
      */
     static double getRealTime(long startAt=0)
     {
         return irr_driver->getDevice()->getTimer()->getRealTime()/1000.0;
     };   // getTimeSinceEpoch
-    
+
     class ScopeProfiler
     {
         float m_time;
@@ -96,14 +96,14 @@ public:
             printf("%s {\n", name);
             m_time = (float)getRealTime();
         }
-        
+
         ~ScopeProfiler()
         {
             float f2 = (float)getRealTime();
             printf("} // took %f s\n", (f2 - m_time));
         }
     };
-    
+
 };   // namespace time
 #endif
 

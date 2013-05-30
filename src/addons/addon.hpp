@@ -60,7 +60,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** A static function that checks if the given ID is an addon. This is
-     *  done by testing if the directory name is in the addons directory. 
+     *  done by testing if the directory name is in the addons directory.
      */
     static bool isAddon(const std::string &directory)
     {
@@ -131,7 +131,7 @@ public:
          /** Initialises the object from an XML node. */
          Addon(const XMLNode &xml);
     // ------------------------------------------------------------------------
-    /** Sets the sort order used in the comparison function. It is static, so 
+    /** Sets the sort order used in the comparison function. It is static, so
      *  that each instance can access the sort order. */
     static void setSortOrder(SortOrder so) { m_sort_order = so; }
     // ------------------------------------------------------------------------
@@ -166,7 +166,7 @@ public:
     /** Returns the name of the addon. */
     const core::stringw& getDescription() const { return m_description; }
     // ------------------------------------------------------------------------
-    /** Returns the date (in seconds since epoch) when the addon was 
+    /** Returns the date (in seconds since epoch) when the addon was
      *  uploaded. */
     Time::TimeType getDate() const { return m_date; }
     // ------------------------------------------------------------------------
@@ -179,8 +179,8 @@ public:
     /** Returns the installed revision number of an addon. */
     int   getInstalledRevision() const { return m_installed_revision; }
     // ------------------------------------------------------------------------
-    /** Returns the latest revision number of this addon. 
-    *  m_revision>m_installed_revision if a newer revision is available 
+    /** Returns the latest revision number of this addon.
+    *  m_revision>m_installed_revision if a newer revision is available
     *  online. */
     int   getRevision() const { return m_revision; }
     // ------------------------------------------------------------------------
@@ -212,7 +212,7 @@ public:
     }   // iconNeedsUpdate
     // ------------------------------------------------------------------------
     /** Marks this addon to be installed. If the addon is marked as being
-     *  installed, it also updates the installed revision number to be the 
+     *  installed, it also updates the installed revision number to be the
      *  same as currently available revision number. */
     void setInstalled(bool state)
     {
@@ -221,28 +221,28 @@ public:
             m_installed_revision = m_revision;
     }   // setInstalled
     // ------------------------------------------------------------------------
-    /** Returns true if the icon of this addon was downloaded and is ready 
+    /** Returns true if the icon of this addon was downloaded and is ready
      *  to be displayed. */
     bool iconReady() const { return m_icon_ready; }
     // ------------------------------------------------------------------------
     /** Marks that the icon for this addon can be displayed. */
-    void setIconReady() 
-    { 
+    void setIconReady()
+    {
         m_icon_revision = m_revision;
-        m_icon_ready=true; 
+        m_icon_ready=true;
     }   // setIconReady
     // ------------------------------------------------------------------------
     /** Returns the size of the compressed package. */
     int getSize() const { return m_size; }
     // ------------------------------------------------------------------------
-    /** Returns the directory in which this type of addons is stored (in a 
+    /** Returns the directory in which this type of addons is stored (in a
      *  separate subdirectory). A kart is stored in .../karts/X and tracks in
      *  .../tracks/X. If further types are added here, make sure that the
      *  name return ends with a "/".
      */
     std::string getTypeDirectory() const
     {
-        if(m_type=="kart") 
+        if(m_type=="kart")
             return "karts/";
         else if(m_type=="track")
             return "tracks/";
@@ -261,7 +261,7 @@ public:
     bool testStatus(AddonStatus n) const {return (m_status & n) !=0; }
     // ------------------------------------------------------------------------
     /** Returns the directory in which this addon is installed. */
-    std::string getDataDir() const 
+    std::string getDataDir() const
     {
         return file_manager->getAddonsFile(getTypeDirectory()+m_dir_name);
     }   // getDataDir
@@ -273,10 +273,10 @@ public:
     {
         switch(m_sort_order)
         {
-            case SO_DEFAULT: 
-                if(testStatus(AS_FEATURED) && 
+            case SO_DEFAULT:
+                if(testStatus(AS_FEATURED) &&
                     !a.testStatus(AS_FEATURED))  return true;
-                if(!testStatus(AS_FEATURED) && 
+                if(!testStatus(AS_FEATURED) &&
                     a.testStatus(AS_FEATURED))  return false;
             // Otherwise fall through to name comparison!
             case SO_NAME:
@@ -300,10 +300,10 @@ public:
     {
         switch(m_sort_order)
         {
-            case SO_DEFAULT: 
-                if(testStatus(AS_FEATURED) && 
+            case SO_DEFAULT:
+                if(testStatus(AS_FEATURED) &&
                     !a.testStatus(AS_FEATURED))  return true;
-                if(!testStatus(AS_FEATURED) && 
+                if(!testStatus(AS_FEATURED) &&
                     a.testStatus(AS_FEATURED))  return false;
             // Otherwise fall through to name comparison!
             case SO_NAME:

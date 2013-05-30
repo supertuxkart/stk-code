@@ -65,19 +65,19 @@ public:
     {
         EMIT_ON_DRIVE = 0,
         EMIT_ON_SKID,
-        
+
         EMIT_KINDS_COUNT
     };
-    
+
     enum CollisionReaction
     {
         NORMAL,
         RESCUE,
         PUSH_BACK
     };
-    
+
 private:
-    
+
     enum Shaders
     {
         SHADER_NORMAL_MAP,
@@ -89,7 +89,7 @@ private:
         SHADER_GRASS,
         SHADER_COUNT
     };
-    
+
     video::ITexture *m_texture;
     unsigned int     m_index;
     std::string      m_texname;
@@ -118,46 +118,46 @@ private:
     bool             m_zipper;
     /** If a kart is rescued when driving on this surface. */
     bool             m_drive_reset;
-    
-    
+
+
     /** Speed of the 'main' wave in the water shader. Only used if
         m_graphical_effect == WATER_SHADER */
     float            m_water_shader_speed_1;
-    
+
     /** Speed of the 'secondary' waves in the water shader. Only used if
         m_graphical_effect == WATER_SHADER */
     float            m_water_shader_speed_2;
-    
+
     /** If a kart is rescued when crashing into this surface. */
     CollisionReaction m_collision_reaction;
-    
+
     /** Particles to show on touch */
     std::string      m_collision_particles;
-    
+
     float            m_grass_speed;
     float            m_grass_amplitude;
-    
+
     /** If the property should be ignored in the physics. Example would be
      *  plants that a kart can just drive through. */
     bool             m_ignore;
     bool             m_add;
-    
+
     bool             m_fog;
-        
+
     ParticleKind*    m_particles_effects[EMIT_KINDS_COUNT];
-    
+
     /** For normal maps */
     std::string      m_normal_map_tex;
     std::string      m_normal_map_shader_lightmap;
-    
+
     //bool             m_normal_map_uv2; //!< Whether to use a second UV layer for normal map
     bool             m_is_heightmap;
     bool             m_parallax_map;
     float            m_parallax_height;
-    
+
     /** Texture clamp bitmask */
     unsigned int     m_clamp_tex;
-    
+
     bool             m_lighting;
     bool             m_smooth_reflection_shader;
     bool             m_alpha_testing;
@@ -166,7 +166,7 @@ private:
 
     /** True if backface culliing should be enabled. */
     bool             m_backface_culling;
-    
+
     /** Set to true to disable writing to the Z buffer. Usually to be used with alpha blending */
     bool             m_disable_z_write;
 
@@ -178,7 +178,7 @@ private:
     bool             m_lightmap;
     /** True if (additive) lightmapping is enabled for this material. */
     bool             m_additive_lightmap;
-    
+
     bool             m_high_tire_adhesion;
     /** How much the top speed is reduced per second. */
     float            m_slowdown_time;
@@ -200,50 +200,50 @@ private:
      *  if a zipper is used. If this value is <0 the kart specific value will
      *  be used. */
     float            m_zipper_max_speed_increase;
-    /** Time a zipper stays activated. If this value is <0 the kart specific 
+    /** Time a zipper stays activated. If this value is <0 the kart specific
      *  value will be used. */
     float            m_zipper_duration;
-    /** A one time additional speed gain - the kart will instantly add this 
+    /** A one time additional speed gain - the kart will instantly add this
      *  amount of speed to its current speed. If this value is <0 the kart
      *  specific value will be used. */
     float            m_zipper_speed_gain;
-    /**  Time it takes for the zipper advantage to fade out. If this value 
+    /**  Time it takes for the zipper advantage to fade out. If this value
      *  is <0 the kart specific value will be used. */
     float            m_zipper_fade_out_time;
     /** Additional engine force. */
     float            m_zipper_engine_force;
 
     std::string      m_mask;
-    
+
     /** If m_splatting is true, indicates the first splatting texture */
     std::string      m_splatting_texture_1;
-    
+
     /** If m_splatting is true, indicates the second splatting texture */
     std::string      m_splatting_texture_2;
-    
+
     /** If m_splatting is true, indicates the third splatting texture */
-    std::string      m_splatting_texture_3;   
-    
+    std::string      m_splatting_texture_3;
+
     /** If m_splatting is true, indicates the fourth splatting texture */
     std::string      m_splatting_texture_4;
-    
+
     std::string      m_splatting_lightmap;
-    
+
     std::vector<irr::video::IShaderConstantSetCallBack*> m_shaders;
 
     /** Only used if bubble effect is enabled */
     std::map<scene::IMeshBuffer*, BubbleEffectProvider*> m_bubble_provider;
-    
+
     bool  m_deprecated;
-    
+
     void  init    (unsigned int index);
     void  install (bool is_full_path=false, bool complain_if_not_found=true);
     void  initCustomSFX(const XMLNode *sfx);
     void  initParticlesEffect(const XMLNode *node);
-    
+
 public:
           Material(const XMLNode *node, int index, bool deprecated);
-          Material(const std::string& fname, int index, 
+          Material(const std::string& fname, int index,
                    bool is_full_path=false,
                    bool complain_if_not_found=true);
          ~Material ();
@@ -251,7 +251,7 @@ public:
     void  setSFXSpeed(SFXBase *sfx, float speed) const;
     void  setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb);
     void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, bool use_fog) const;
-    
+
     /** Returns the ITexture associated with this material. */
     video::ITexture *getTexture() const   { return m_texture;        }
     bool  isIgnore           () const { return m_ignore;             }
@@ -264,16 +264,16 @@ public:
     /** Returns if this material should trigger a rescue if a kart
      *  crashes against it. */
     CollisionReaction  getCollisionReaction() const { return m_collision_reaction; }
-    
+
     std::string getCrashResetParticles() const { return m_collision_particles; }
-    
+
     bool  highTireAdhesion   () const { return m_high_tire_adhesion; }
-    const std::string& 
+    const std::string&
           getTexFname        () const { return m_texname;            }
     int   getIndex           () const { return m_index;              }
-    
+
     bool  isTransparent      () const { return m_alpha_testing || m_alpha_blending || m_add; }
-    
+
     // ------------------------------------------------------------------------
     /** Returns true if this materials need pre-multiply of alpha. */
     bool isPreMul() const {return m_adjust_image==ADJ_PREMUL; }
@@ -299,7 +299,7 @@ public:
     bool isBelowSurface      () const { return m_below_surface; }
     // ------------------------------------------------------------------------
     /** Returns true if this material is a surface, i.e. it is going to be
-     *  ignored for the physics, but the information is needed e.g. for 
+     *  ignored for the physics, but the information is needed e.g. for
      *  gfx. See m_below_surface for more details. */
     bool isSurface          () const { return m_surface; }
     // ------------------------------------------------------------------------
@@ -307,15 +307,15 @@ public:
      *  terrain. The string will be "" if no special sfx exists. */
     const std::string &
          getSFXName          () const { return m_sfx_name; }
-    
+
     bool isFogEnabled() const { return m_fog; }
-    
+
     /**
       * \brief Get the kind of particles that are to be used on this material, in the given conditions
       * \return The particles to use, or NULL if none
       */
     const ParticleKind* getParticlesWhen(ParticleConditions cond) const { return m_particles_effects[cond]; }
-    
+
     // ------------------------------------------------------------------------
     /** Returns true if a kart falling over this kind of material triggers
      *  the special falling camera. */
@@ -336,7 +336,7 @@ public:
     }   // getZipperParameter
 
     bool isNormalMap() const { return m_graphical_effect == GE_NORMAL_MAP; }
-    
+
     void onMadeVisible(scene::IMeshBuffer* who);
     void onHidden(scene::IMeshBuffer* who);
     void isInitiallyHidden(scene::IMeshBuffer* who);

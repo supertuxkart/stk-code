@@ -31,13 +31,13 @@ class AbstractKart;
 class Item;
 class SFXBase;
 
-/** This objects is permanently available in a kart and stores information 
+/** This objects is permanently available in a kart and stores information
  *  about addons. If a kart has no attachment, this object will have the
  *  attachment type ATTACH_NOTHING. This way other tests for attachment
  *  in STK do not have to additionally test if there is an attachment, all
  *  tests for a type will always be valid.
  *  Certain attachments need additional coding, this is supported by
- *  a 'plugin' mechanism: This attachment will forward certain calls to 
+ *  a 'plugin' mechanism: This attachment will forward certain calls to
  *  (see attachment_pluging abstract class). Compared to normal subclassing
  *  (i.e. replacing the attachment object each time an attachment changes)
  *  this has less overhead (since the attachment class always creates
@@ -78,7 +78,7 @@ private:
 
     /** Scene node of the attachment, which will be attached to the kart's
      *  scene node. */
-    scene::IAnimatedMeshSceneNode 
+    scene::IAnimatedMeshSceneNode
                      *m_node;
 
     /** Used by bombs so that it's not passed back to previous owner. */
@@ -90,7 +90,7 @@ private:
 
     /** Pseudo random number generator. */
     RandomGenerator   m_random;
-    
+
     /** Ticking sound for the bomb */
     SFXBase          *m_bomb_sound;
 
@@ -101,7 +101,7 @@ public:
     void  hitBanana(Item *item, int new_attachment=-1);
     void  update (float dt);
     void  handleCollisionWithKart(AbstractKart *other);
-    void  set (AttachmentType type, float time, 
+    void  set (AttachmentType type, float time,
                AbstractKart *previous_kart=NULL);
 
     // ------------------------------------------------------------------------
@@ -122,7 +122,7 @@ public:
     AbstractKart* getPreviousOwner() const { return m_previous_owner; }
     // ------------------------------------------------------------------------
     /** Returns additional weight for the kart. */
-    float weightAdjust() const { 
+    float weightAdjust() const {
         return m_type==ATTACH_ANVIL ? stk_config->m_anvil_weight : 0.0f; }
     // ------------------------------------------------------------------------
     /** Return the currently associated scene node (used by e.g the swatter) */

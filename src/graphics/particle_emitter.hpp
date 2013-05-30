@@ -46,14 +46,14 @@ class Track;
 class ParticleEmitter : public NoCopy
 {
 private:
-    
+
     /** Irrlicht's particle systems. */
     scene::IParticleSystemSceneNode *m_node;
-    
+
     Vec3                             m_position;
-    
+
     scene::ISceneNode*               m_parent;
-    
+
     /** The emitters. Access to these is needed to adjust the number of
      *  particles per second. */
     scene::IParticleEmitter         *m_emitter;
@@ -61,23 +61,23 @@ private:
 #if VISUALIZE_BOX_EMITTER
     std::vector<scene::ISceneNode*> m_visualisation;
 #endif
-    
+
     const ParticleKind              *m_particle_type;
-    
+
     unsigned int m_magic_number;
-    
+
     /** Decay of emission rate, in particles per second */
     int m_emission_decay_rate;
-    
+
     /** The irrlicht emitter contains this info, but as an int. We want it as a float */
     float m_min_rate, m_max_rate;
-    
-    
+
+
 public:
-    
+
     LEAK_CHECK()
-    
-    ParticleEmitter             (const ParticleKind* type, 
+
+    ParticleEmitter             (const ParticleKind* type,
                                  const Vec3 &position,
                                  scene::ISceneNode* parent = NULL);
     virtual     ~ParticleEmitter();
@@ -85,22 +85,22 @@ public:
     void         setCreationRateAbsolute(float fraction);
     void         setCreationRateRelative(float f);
     int          getCreationRate();
-    
+
     void         setPosition(const Vec3 &pos);
-    
+
     const ParticleKind* getParticlesInfo() const { return m_particle_type; }
-    
+
     void         setParticleType(const ParticleKind* p);
-    
+
     void         resizeBox(float size);
-    
+
     void         clearParticles();
-    
+
     scene::IParticleSystemSceneNode* getNode() { return m_node; }
-    
+
     /** call this if the node was freed otherwise */
     void         unsetNode() { m_node = NULL; }
-    
+
     void         addHeightMapAffector(Track* t);
 };
 #endif

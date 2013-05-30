@@ -49,13 +49,13 @@ public:
 
      CutsceneGUI();
     ~CutsceneGUI();
-    
+
     void setFadeLevel(float level) { m_fade_level = level; }
     void setSubtitle(const core::stringw& subtitle) { m_subtitle = subtitle; }
-    
+
     virtual void renderGlobal(float dt);
     virtual void renderPlayerView(const AbstractKart *kart);
-    
+
     virtual const core::dimension2du getMiniMapSize() const OVERRIDE
     {
         return core::dimension2du(1,1);

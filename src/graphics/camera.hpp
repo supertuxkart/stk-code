@@ -71,7 +71,7 @@ private:
     /** Camera's mode. */
     Mode            m_mode;
 
-    /** The index of this camera which is the index of the kart it is 
+    /** The index of this camera which is the index of the kart it is
      *  attached to. */
     unsigned int    m_index;
 
@@ -134,9 +134,9 @@ private:
     {
     public:
         /** The camera type:
-            EC_STATIC_FOLLOW_KART A static camera that always points at the 
+            EC_STATIC_FOLLOW_KART A static camera that always points at the
                                   kart.
-            EC_AHEAD_OF_KART      A camera that flies ahead of the kart 
+            EC_AHEAD_OF_KART      A camera that flies ahead of the kart
                                   always pointing at the kart.
         */
         typedef enum {EC_STATIC_FOLLOW_KART,
@@ -144,7 +144,7 @@ private:
         EndCameraType m_type;
 
         /** Position of the end camera. */
-        Vec3    m_position;  
+        Vec3    m_position;
 
         /** Distance to kart by which this camera is activated. */
         float   m_distance2;
@@ -162,7 +162,7 @@ private:
                 m_type = EC_AHEAD_OF_KART;
             else
             {
-                fprintf(stderr, 
+                fprintf(stderr,
                         "Invalid camera type '%s' - camera is ignored.\n",
                         s.c_str());
                  return false;
@@ -179,12 +179,12 @@ private:
          *  \param xyz Position to test for distance.
          *  \returns True if xyz is close enough to this camera.
          */
-        bool    isReached(const Vec3 &xyz) 
+        bool    isReached(const Vec3 &xyz)
                 { return (xyz-m_position).length2() < m_distance2; }
     };   // EndCameraInformation
     // ------------------------------------------------------------------------
 
-    /** List of all end camera information. This information is shared 
+    /** List of all end camera information. This information is shared
      *  between all cameras, so it's static. */
     static AlignedArray<EndCameraInformation> m_end_cameras;
 
@@ -200,7 +200,7 @@ private:
     void computeNormalCameraPosition(Vec3 *wanted_position,
                                      Vec3 *wanted_target);
     void handleEndCamera(float dt);
-    void getCameraSettings(float *above_kart, float *cam_angle, 
+    void getCameraSettings(float *above_kart, float *cam_angle,
                            float *side_way, float *distance,
                            bool *smoothing);
     void positionCamera(float dt, float above_kart, float cam_angle,
@@ -220,15 +220,15 @@ public:
 
     // ------------------------------------------------------------------------
     /** Remove all cameras. */
-    static void removeAllCameras() 
-    { 
+    static void removeAllCameras()
+    {
         for(unsigned int i=0; i<m_all_cameras.size(); i++)
             delete m_all_cameras[i];
         m_all_cameras.clear();
     }   // removeAllCameras
 
     // ------------------------------------------------------------------------
-    /** Creates a camera and adds it to the list of all cameras. Also the 
+    /** Creates a camera and adds it to the list of all cameras. Also the
      *  camera index (which determines which viewport to use in split screen)
      *  is set.
      */
@@ -275,7 +275,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the scaling in x/y direction for this camera. */
     const core::vector2df& getScaling() const {return m_scaling; }
-    
+
     // ------------------------------------------------------------------------
     /** Returns the camera scene node. */
     scene::ICameraSceneNode *getCameraSceneNode() { return m_camera; }

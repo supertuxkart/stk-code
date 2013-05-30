@@ -34,8 +34,8 @@ public:
 
 	//! adds a mesh to the buffers with the given offset
 	/** \Return: Returns an array of ID numbers */
-	core::array<s32> addMesh(IMesh* mesh, 
-		core::vector3df pos = core::vector3df(0,0,0), 
+	core::array<s32> addMesh(IMesh* mesh,
+		core::vector3df pos = core::vector3df(0,0,0),
 		core::vector3df rot = core::vector3df(0,0,0),
 		core::vector3df scale = core::vector3df(1,1,1));
 
@@ -46,7 +46,7 @@ public:
 	//! adds a mesh buffer with the given transformation
 	/** \Return: Returns the ID of this mesh buffer */
 	s32 addMeshBuffer(IMeshBuffer* buffer,
-		core::vector3df pos = core::vector3df(0,0,0), 
+		core::vector3df pos = core::vector3df(0,0,0),
 		core::vector3df rot = core::vector3df(0,0,0),
 		core::vector3df scale = core::vector3df(1,1,1));
 
@@ -57,13 +57,13 @@ public:
 	//! updates bouding box from internal buffers
 	void recalculateBoundingBox();
 
-	//! Moves a mesh, 
-	/** mesh buffers in clean destination buffers will be moved immediately, 
+	//! Moves a mesh,
+	/** mesh buffers in clean destination buffers will be moved immediately,
 	ones in dirty buffers will be left until the next update */
 	core::array<bool> moveMesh(const core::array<s32>& bufferIDs, const core::matrix4 &newMatrix);
 
 	//! Moves a mesh buffer
-	/** if the destination buffer is clean it will be moved immediately, 
+	/** if the destination buffer is clean it will be moved immediately,
 	if a member of a dirty buffer, it will be left until the next update */
 	bool moveMeshBuffer(const s32 id, const core::matrix4 &newMatrix);
 
@@ -85,13 +85,13 @@ public:
 	//! Returns pointer to a mesh buffer.
 	/** \param nr: Zero based index of the mesh buffer. The maximum value is
 	getMeshBufferCount() - 1;
-	\return Returns the pointer to the mesh buffer or 
+	\return Returns the pointer to the mesh buffer or
 	NULL if there is no such mesh buffer. */
 	virtual IMeshBuffer* getMeshBuffer(u32 nr) const;
 
 	//! Returns pointer to a mesh buffer which fits a material
 	/** \param material: material to search for
-	\return Returns the pointer to the mesh buffer or 
+	\return Returns the pointer to the mesh buffer or
 	NULL if there is no such mesh buffer. */
 	virtual IMeshBuffer* getMeshBuffer( const video::SMaterial &material) const;
 
@@ -124,8 +124,8 @@ private:
 
 	struct SBufferReference
 	{
-		SBufferReference() 
-		  : SourceBuffer(0), DestReference(0), FirstVertex(0), VertexCount(0), 
+		SBufferReference()
+		  : SourceBuffer(0), DestReference(0), FirstVertex(0), VertexCount(0),
 			FirstIndex(0), IndexCount(0), Initialized(false) { }
 
 		IMeshBuffer* SourceBuffer;

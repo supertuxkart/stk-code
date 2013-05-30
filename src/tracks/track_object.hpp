@@ -42,7 +42,7 @@ class ThreeDAnimation;
 class TrackObject : public NoCopy
 {
 //public:
-    // The different type of track objects: physical objects, graphical 
+    // The different type of track objects: physical objects, graphical
     // objects (without a physical representation) - the latter might be
     // eye candy (to reduce work for physics), ...
     //enum TrackObjectType {TO_PHYSICAL, TO_GRAPHICAL};
@@ -69,42 +69,42 @@ protected:
     std::string                    m_lod_group;
 
     std::string                    m_interaction;
-    
+
     std::string                    m_type;
-    
+
     bool                           m_soccer_ball;
-    
+
     PhysicalObject*                m_rigid_body;
-    
+
     ThreeDAnimation*               m_animator;
-    
+
     void init(const XMLNode &xml_node, LODNode* lodNode);
-    
+
 public:
                  TrackObject(const XMLNode &xml_node, LODNode* lodNode=NULL);
-                 
+
                  TrackObject(const core::vector3df& xyz,
                              const core::vector3df& hpr,
                              const core::vector3df& scale,
                              const char* interaction,
                              TrackObjectPresentation* presentation,
-                             bool is_dynamic, 
+                             bool is_dynamic,
                              const PhysicalObject::Settings* physicsSettings);
                 ~TrackObject();
     virtual void update(float dt);
     virtual void reset();
-    /** To finish object constructions. Called after the track model 
+    /** To finish object constructions. Called after the track model
      *  is ready. */
     virtual void init() {};
     /** Called when an explosion happens. As a default does nothing, will
      *  e.g. be overwritten by physical objects etc. */
     virtual void handleExplosion(const Vec3& pos, bool directHit) {};
     void         setEnable(bool mode);
-    
+
     const std::string& getLodGroup() const { return m_lod_group; }
-    
+
     const std::string& getType() const { return m_type; }
-    
+
     bool isSoccerBall() const { return m_soccer_ball; }
 
     const PhysicalObject* getPhysics() const { return m_rigid_body; }
@@ -113,7 +113,7 @@ public:
     const core::vector3df getInitXYZ() const { return m_init_xyz; }
     const core::vector3df getInitRotation() const { return m_init_hpr; }
     const core::vector3df getInitScale() const { return m_init_scale; }
-    
+
     void move(const core::vector3df& xyz, const core::vector3df& hpr,
               const core::vector3df& scale, bool updateRigidBody);
 
@@ -122,14 +122,14 @@ public:
 
     template<typename T>
     const T* getPresentation() const { return dynamic_cast<T*>(m_presentation); }
-    
+
     ThreeDAnimation* getAnimator() { return m_animator; }
     const ThreeDAnimation* getAnimator() const { return m_animator; }
-    
+
     const core::vector3df& getPosition() const;
     const core::vector3df& getRotation() const;
     const core::vector3df& getScale() const;
-    
+
     LEAK_CHECK()
 };   // TrackObject
 

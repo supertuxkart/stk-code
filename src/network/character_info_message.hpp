@@ -29,7 +29,7 @@ class CharacterInfoMessage : public Message
 {
 // Add the remote host id to this message (to avoid sending this separately)
 public:
-    CharacterInfoMessage(int hostid) : Message(Message::MT_CHARACTER_INFO) 
+    CharacterInfoMessage(int hostid) : Message(Message::MT_CHARACTER_INFO)
     {
         std::vector<std::string> all_karts =
                                kart_properties_manager->getAllAvailableKarts();

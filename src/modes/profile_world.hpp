@@ -59,7 +59,7 @@ private:
     long long    m_num_solid;
 
     /** Number of transparent triangles drawn. */
-    long long    m_num_transparent; 
+    long long    m_num_transparent;
 
     /** Number of transparent effect triangles drawn. */
     long long    m_num_trans_effect;

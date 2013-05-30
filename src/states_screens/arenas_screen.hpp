@@ -30,21 +30,21 @@ namespace GUIEngine { class Widget; }
 class ArenasScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<ArenasScreen>
 {
     friend class GUIEngine::ScreenSingleton<ArenasScreen>;
-    
+
     ArenasScreen();
     void buildTrackList();
 
 public:
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
-        
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                                const int playerID) OVERRIDE;

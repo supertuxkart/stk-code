@@ -65,7 +65,7 @@ private:
          * is included, it's always 'a'. If only two karts are reported
          * the first kart pointer is the smaller one. */
         CollisionPair(const UserPointer *a, const btVector3 &contact_point_a,
-                      const UserPointer *b, const btVector3 &contact_point_b) 
+                      const UserPointer *b, const btVector3 &contact_point_b)
         {
             if(a->is(UserPointer::UP_KART) &&
                b->is(UserPointer::UP_KART) && a>b) {
@@ -85,15 +85,15 @@ private:
             return (p.m_up[0]==m_up[0] && p.m_up[1]==m_up[1]);
         }   // operator==
         // --------------------------------------------------------------------
-        const UserPointer *getUserPointer(unsigned int n) const 
+        const UserPointer *getUserPointer(unsigned int n) const
         {
             assert(n>=0 && n<=1);
             return m_up[n];
         }   // getUserPointer
         // --------------------------------------------------------------------
-        /** Returns the contact point of the collision in 
+        /** Returns the contact point of the collision in
          *  car (local) coordinates. */
-        const Vec3 &getContactPointCS(unsigned int n) const 
+        const Vec3 &getContactPointCS(unsigned int n) const
         {
             assert(n>=0 && n<=1);
             return m_contact_point[n];
@@ -103,7 +103,7 @@ private:
     // ========================================================================
     // This class is the list of collision objects, where each collision
     // pair is stored as most once.
-    class CollisionList : public std::vector<CollisionPair> 
+    class CollisionList : public std::vector<CollisionPair>
     {
     private:
         void push_back(CollisionPair p) {
@@ -143,7 +143,7 @@ private:
     btCollisionDispatcher           *m_dispatcher;
     btBroadphaseInterface           *m_axis_sweep;
     btDefaultCollisionConfiguration *m_collision_conf;
-    CollisionList                    m_all_collisions;   
+    CollisionList                    m_all_collisions;
 
 public:
           Physics          ();

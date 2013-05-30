@@ -32,12 +32,12 @@ class XMLWriter
 {
     std::ofstream m_base;
 public:
-    
+
     XMLWriter(const char* dest);
-    
+
     XMLWriter& operator<< (const irr::core::stringw& txt);
     XMLWriter& operator<< (const wchar_t* txt);
-    
+
     template<typename T>
     XMLWriter& operator<< (const T t)
     {
@@ -46,9 +46,9 @@ public:
         (*this) << tmp;
         return *this;
     }
-    
+
     void close();
-    
+
     bool is_open() { return m_base.is_open(); }
 };
 

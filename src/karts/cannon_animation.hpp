@@ -22,8 +22,8 @@
 #include "karts/abstract_kart_animation.hpp"
 #include "utils/vec3.hpp"
 
-/** This animation shoots the kart to a specified point on the track. 
- * 
+/** This animation shoots the kart to a specified point on the track.
+ *
  * \ingroup karts
  */
 
@@ -34,8 +34,8 @@ class Ipo;
 class CannonAnimation: public AbstractKartAnimation
 {
 protected:
-    /** This is the difference between the position of the kart when the 
-     *  cannon line is crossed and the curve interpolation at t=0. This 
+    /** This is the difference between the position of the kart when the
+     *  cannon line is crossed and the curve interpolation at t=0. This
      *  is added to each interpolated curve value to give the final
      *  kart position (so the kart moves relative to the curve). */
     Vec3           m_delta;
@@ -51,6 +51,6 @@ public:
              CannonAnimation(AbstractKart *kart, Ipo *ipo);
     virtual ~CannonAnimation();
     virtual void  update(float dt);
-    
+
 };   // CannonAnimation
 #endif

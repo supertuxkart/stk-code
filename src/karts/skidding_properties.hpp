@@ -40,7 +40,7 @@ class SkiddingProperties
 public:
     //LEAK_CHECK();
 protected:
-    /** Skidding is multiplied by this when skidding 
+    /** Skidding is multiplied by this when skidding
     *  to increase to m_skid_increase. */
     float m_skid_increase;
 
@@ -50,7 +50,7 @@ protected:
     /** How long it takes for visual skid to reach maximum. */
     float m_skid_visual_time;
 
-    /** How long it takes for the physical and graphical bodies to be 
+    /** How long it takes for the physical and graphical bodies to be
      *  in sync again after a skid. */
     float m_skid_revert_visual_time;
 
@@ -70,7 +70,7 @@ protected:
     float m_graphical_jump_time;
 
     /** This factor is used to determine how much the chassis of a kart
-    *  should rotate to match the graphical view. A factor of 1 is 
+    *  should rotate to match the graphical view. A factor of 1 is
     *  identical, a smaller factor will rotate the kart less (which might
     *  feel better). */
     float m_post_skid_rotate_factor;
@@ -86,7 +86,7 @@ protected:
     *  define more than one speed, i.e. longer skidding gives more bonus. */
     std::vector<float> m_skid_bonus_speed;
 
-    /** How long the bonus will last. It's possible to define more than one 
+    /** How long the bonus will last. It's possible to define more than one
     *   time, i.e. longer skidding gives more bonus. */
     std::vector<float> m_skid_bonus_time;
 
@@ -97,12 +97,12 @@ protected:
     std::vector<float> m_skid_bonus_force;
 
     /** A factor is used to reduce the amount of steering while skidding. This
-     *  is the minimum factor used (i.e. resulting in the largest turn 
+     *  is the minimum factor used (i.e. resulting in the largest turn
      *  radius). */
     float m_skid_reduce_turn_min;
 
     /** A factor is used to reduce the amount of steering while skidding. This
-     *  is the maximum factor used (i.e. resulting in the smallest turn 
+     *  is the maximum factor used (i.e. resulting in the smallest turn
      *  radius). */
     float m_skid_reduce_turn_max;
 
@@ -137,14 +137,14 @@ public:
     float getSkidVisualTime         () const {return m_skid_visual_time;      }
 
     // ------------------------------------------------------------------------
-    /** Returns a factor to be used to determine how much the chassis of a 
-     *  kart should rotate to match the graphical view. A factor of 1 is 
+    /** Returns a factor to be used to determine how much the chassis of a
+     *  kart should rotate to match the graphical view. A factor of 1 is
      *  identical, a smaller factor will rotate the kart less (which might
      *  feel better). */
     float getPostSkidRotateFactor  () const {return m_post_skid_rotate_factor;}
 
     // ------------------------------------------------------------------------
-    /** Returns the factor by which to recude the amount of steering while 
+    /** Returns the factor by which to recude the amount of steering while
         skidding. */
     float getSkidReduceTurnMin     () const { return m_skid_reduce_turn_min;  }
     // ------------------------------------------------------------------------
@@ -154,10 +154,10 @@ public:
     int getNumberOfBonusTimes() const      { return m_skid_bonus_time.size(); }
     // ------------------------------------------------------------------------
     /** Returns how long a kart must skid in order to reach the specified
-     *  bonus level. 
+     *  bonus level.
      *  param n Bonus level (0<=n<m_skid_bonus_time.size())
      */
-    float getTimeTillBonus(unsigned int n) const 
+    float getTimeTillBonus(unsigned int n) const
                                           { return m_skid_time_till_bonus[n]; }
     // ------------------------------------------------------------------------
 

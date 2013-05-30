@@ -41,43 +41,43 @@ const int CHALLENGE_POINTS[] = { 8, 9, 10 };
 class GameSlot
 {
     std::string m_kart_ident;
-    
+
     /** Profile names can change, so rather than try to make sure all renames
      *  are done everywhere, assign a unique ID to each profiler.
      *  Will save much headaches.
      */
     std::string m_player_unique_id;
-    
+
     /** Contains whether each feature of the challenge is locked or unlocked */
     std::map<std::string, bool>   m_locked_features;
-    
+
     /** Recently unlocked features (they are waiting here
       * until they are shown to the user) */
     std::vector<const ChallengeData*> m_unlocked_features;
-    
+
     std::map<std::string, Challenge*> m_challenges_state;
-    
-    /** A pointer to the current challenge, or NULL 
+
+    /** A pointer to the current challenge, or NULL
      *  if no challenge is active. */
     const Challenge *m_current_challenge;
 
     friend class UnlockManager;
-    
+
     void computeActive();
-    
+
     int m_points;
-    
+
     /** Set to false after the initial stuff (intro, select kart, etc.) */
     bool m_first_time;
-    
+
     int m_easy_challenges;
     int m_medium_challenges;
     int m_hard_challenges;
-    
+
 public:
-    
-    // do NOT attempt to pass 'player_unique_id' by reference here. I don't 
-    // know why (compiler bug maybe?) but this screws up everything. Better 
+
+    // do NOT attempt to pass 'player_unique_id' by reference here. I don't
+    // know why (compiler bug maybe?) but this screws up everything. Better
     // pass by copy.
     GameSlot(std::string player_unique_id)
     {
@@ -90,36 +90,36 @@ public:
         m_current_challenge = NULL;
     }
     ~GameSlot();
-    
+
     const std::string& getPlayerID() const { return m_player_unique_id; }
     const std::string& getKartIdent () const { return m_kart_ident;  }
-    void setKartIdent(const std::string& kart_ident) 
+    void setKartIdent(const std::string& kart_ident)
     {
-        m_kart_ident = kart_ident; 
+        m_kart_ident = kart_ident;
     }
-    
-    
-    /** Returns the list of recently unlocked features (e.g. call at the end 
+
+
+    /** Returns the list of recently unlocked features (e.g. call at the end
      *  of a race to know if any features were unlocked) */
-    const std::vector<const ChallengeData*> 
+    const std::vector<const ChallengeData*>
         getRecentlyCompletedChallenges() {return m_unlocked_features;}
-    
+
     /** Clear the list of recently unlocked challenges */
     void       clearUnlocked     () {m_unlocked_features.clear(); }
-    
+
     bool       isLocked          (const std::string& feature);
-    
+
     void       lockFeature       (Challenge *challenge);
-    
-    void       unlockFeature     (Challenge* c, RaceManager::Difficulty d, 
+
+    void       unlockFeature     (Challenge* c, RaceManager::Difficulty d,
                                   bool do_save=true);
-        
+
     void       raceFinished      ();
     void       grandPrixFinished ();
-    
+
     void       save              (std::ofstream& file, const std::string& name);
     void       setCurrentChallenge(const std::string &challenge_id);
-    
+
     /** Returns the number of points accumulated. */
     int        getPoints          () const { return m_points; }
     // ------------------------------------------------------------------------
@@ -140,11 +140,11 @@ public:
     // ------------------------------------------------------------------------
     const Challenge *getCurrentChallenge() const { return m_current_challenge; }
     // ------------------------------------------------------------------------
-    /** Returns a challenge given the challenge id. 
+    /** Returns a challenge given the challenge id.
      */
     const Challenge* getChallenge(const std::string& id) const
     {
-        std::map<std::string, Challenge*>::const_iterator it = 
+        std::map<std::string, Challenge*>::const_iterator it =
             m_challenges_state.find(id);
         assert(it!=m_challenges_state.end());
         return it->second;

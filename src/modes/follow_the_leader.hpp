@@ -30,13 +30,13 @@ private:
     std::vector<float>  m_leader_intervals;    // time till elimination in follow leader
 
 public:
-    
+
              FollowTheLeaderRace();
     virtual ~FollowTheLeaderRace();
-    
+
     // clock events
     virtual void countdownReachedZero() OVERRIDE;
-    
+
     // overriding World methods
     virtual void reset() OVERRIDE;
     virtual const std::string& getIdent() const OVERRIDE;
@@ -45,10 +45,10 @@ public:
     virtual void getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     virtual void init() OVERRIDE;
-    
+
     virtual bool isRaceOver() OVERRIDE;
     virtual bool raceHasLaps() OVERRIDE { return false; }
-    
+
 };   // FollowTheLeader
 
 

@@ -36,30 +36,30 @@ struct Input;
 class OptionsScreenInput : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenInput>
 {
     OptionsScreenInput();
-    
+
     void updateInputButtons(DeviceConfig* config);
     void buildDeviceList();
-    
+
     irr::gui::STKModifiedSpriteBank* m_icon_bank;
-    
+
     std::map<std::string, float> m_highlights;
-    
+
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenInput>;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
-    
+
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded();
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
-    
-    /** 
+
+    /**
      * \brief invoke if the list of devices changed after the creation of this screen.
      * This will cause the displayed list to be updated accordingly with the data in the device manager.
      */
@@ -71,7 +71,7 @@ public:
                              int btnID,
                              int axisDir,
                              int value);
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt, irr::video::IVideoDriver* drv);
 };

@@ -45,15 +45,15 @@ class ThreeDAnimation : public AnimationBase
 {
 private:
     TrackObject          *m_object;
-    
-    /** True if a collision with this object should trigger 
+
+    /** True if a collision with this object should trigger
      *  rescuing a kart. */
     bool                  m_crash_reset;
-    
-    /** True if a collision with this object should trigger 
+
+    /** True if a collision with this object should trigger
      *  "exploding" a kart. */
     bool                  m_explode_kart;
-    
+
     /** We have to store the rotation value as computed in blender, since
      *  irrlicht uses a different order, so for rotation animations we
      *  can not use the value returned by getRotation from a scene node. */
@@ -71,7 +71,7 @@ public:
     virtual     ~ThreeDAnimation();
     virtual void update(float dt);
     // ------------------------------------------------------------------------
-    /** Returns true if a collision with this object should 
+    /** Returns true if a collision with this object should
      * trigger a rescue. */
     bool isCrashReset() const { return m_crash_reset; }
     bool isExplodeKartObject() const { return m_explode_kart; }

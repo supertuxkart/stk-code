@@ -42,7 +42,7 @@ class ChallengeData;
   * \brief The state of a challenge for one player.
   *  Each Challenge has one ChallengeData associcated, which stores
   *  the actual data about the challenge.
-  *    
+  *
   * \ingroup challenges
   */
 class Challenge : public NoCopy
@@ -52,9 +52,9 @@ private:
           CH_ACTIVE,                   // challenge possible, but not yet solved
           CH_SOLVED}                   // challenge was solved
     m_state[RaceManager::DIFFICULTY_COUNT];
-    
+
     ChallengeData* m_data;
-    
+
 public:
     Challenge(ChallengeData* data)
     {
@@ -71,24 +71,24 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if this challenge was solved at the specified difficulty.
      */
-    bool isSolved(RaceManager::Difficulty d) const 
+    bool isSolved(RaceManager::Difficulty d) const
     {
         return m_state[d]==CH_SOLVED;
     }   // isSolved
     // ------------------------------------------------------------------------
     /** Returns true if this challenge was solved at any difficult.
      */
-    bool isSolvedAtAnyDifficulty() const 
+    bool isSolvedAtAnyDifficulty() const
     {
         return m_state[0]==CH_SOLVED || m_state[1]==CH_SOLVED ||
-                m_state[2]==CH_SOLVED;  
+                m_state[2]==CH_SOLVED;
     }   // isSolvedAtAnyDifficulty
     // ------------------------------------------------------------------------
     /** True if this challenge is active at the given difficulty.
      */
-    bool isActive(RaceManager::Difficulty d) const 
+    bool isActive(RaceManager::Difficulty d) const
     {
-        return m_state[d]==CH_ACTIVE;  
+        return m_state[d]==CH_ACTIVE;
     }   // isActive
     // ------------------------------------------------------------------------
     /** Sets this challenge to be active.

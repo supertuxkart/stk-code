@@ -72,11 +72,11 @@ public:
     virtual void update(float dt, Vec3 *xyz=NULL, Vec3 *hpr=NULL,
                                   Vec3 *scale=NULL);
     /** This needs to be implemented by the inheriting classes. It is called
-     *  once per frame from the track. It has a dummy implementation that 
-     *  just asserts so that this class can be instantiated in 
+     *  once per frame from the track. It has a dummy implementation that
+     *  just asserts so that this class can be instantiated in
      *  CannonAnimation. */
     virtual void update(float dt) {assert(false); };
-    void         setInitialTransform(const Vec3 &xyz, 
+    void         setInitialTransform(const Vec3 &xyz,
                                      const Vec3 &hpr);
     void         reset();
     // ------------------------------------------------------------------------
@@ -84,17 +84,17 @@ public:
     void         setPlaying(bool playing) {m_playing = playing; }
 
     // ------------------------------------------------------------------------
-    
+
     float getAnimationDuration() const
     {
         float duration = -1;
-        
+
         const Ipo* currIpo;
         for_in (currIpo, m_all_ipos)
         {
             duration = std::max(duration, currIpo->getEndTime());
         }
-        
+
         return duration;
     }
 

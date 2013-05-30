@@ -38,22 +38,22 @@ class CreditsSection;
  * \brief Screen where STK credits are shown
  * \ingroup states_screens
  */
-class CreditsScreen : public GUIEngine::Screen, 
+class CreditsScreen : public GUIEngine::Screen,
                       public GUIEngine::ScreenSingleton<CreditsScreen>
 {
     float m_time_element;
-    
+
     PtrVector<CreditsSection, HOLD> m_sections;
     CreditsSection* getCurrentSection();
-    
+
     int m_x, m_y, m_w, m_h;
     core::rect< s32 > m_section_rect;
-    
+
     int m_curr_section;
     int m_curr_element;
-    
+
     float time_before_next_step;
-    
+
     friend class GUIEngine::ScreenSingleton<CreditsScreen>;
     CreditsScreen();
     bool getWideLine(std::ifstream& file, core::stringw* out);
@@ -61,29 +61,29 @@ class CreditsScreen : public GUIEngine::Screen,
     bool m_is_victory_music;
 
 public:
-    
-    
+
+
     void setArea(const int x, const int y, const int w, const int h);
-    
+
     // start from beginning again
     void reset();
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
-    
-    /** \brief implement optional callback from parent class 
+
+    /** \brief implement optional callback from parent class
      *  GUIEngine::Screen */
     void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     void init() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name, 
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                        const int playerID) OVERRIDE;
-    
+
     void setVictoryMusic(bool isVictory) { m_is_victory_music = isVictory; }
-    
+
     virtual MusicInformation* getMusic() const
     {
         if (m_is_victory_music)

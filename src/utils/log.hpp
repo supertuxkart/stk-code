@@ -39,7 +39,7 @@ class Log
 public:
     /** The various log levels used in STK. */
     enum LogLevel { LL_DEBUG,
-                    LL_VERBOSE, 
+                    LL_VERBOSE,
                     LL_INFO,
                     LL_WARN,
                     LL_ERROR,
@@ -96,14 +96,14 @@ public:
                  n, LL_VERBOSE, LL_FATAL);
             return;
         }
-        m_min_log_level = (LogLevel)n; 
+        m_min_log_level = (LogLevel)n;
     }    // setLogLevel
 
     // ------------------------------------------------------------------------
     /** Disable coloring of log messages. */
-    static void disableColor() 
+    static void disableColor()
     {
-        m_no_colors = true; 
+        m_no_colors = true;
     }   // disableColor
 };   // Log
 #endif

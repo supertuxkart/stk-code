@@ -28,8 +28,8 @@
 
 /** \defgroup karts */
 
-/** A ghost kart. It does not have a phsyics representation. It gets two 
- *  transforms from the replay objects at two consecutive time steps, 
+/** A ghost kart. It does not have a phsyics representation. It gets two
+ *  transforms from the replay objects at two consecutive time steps,
  *  and will interpolate between those positions depending on the current
  *  time
  */
@@ -44,13 +44,13 @@ private:
 
     std::vector<ReplayBase::KartReplayEvent> m_replay_events;
 
-    /** Pointer to the last index in m_all_times that is smaller than 
+    /** Pointer to the last index in m_all_times that is smaller than
      *  the current world time. */
     unsigned int m_current_transform;
 
     /** Index of the next kart replay event. */
     unsigned int m_next_event;
-    
+
     void         updateTransform(float t, float dt);
 public:
                  GhostKart(const std::string& ident);

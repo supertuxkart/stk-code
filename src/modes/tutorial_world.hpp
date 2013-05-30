@@ -11,7 +11,7 @@ private:
 public:
 
     TutorialWorld();
-    
+
     virtual void moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
 };
 

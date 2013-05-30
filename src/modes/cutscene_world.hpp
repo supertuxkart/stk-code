@@ -37,39 +37,39 @@ class TrackObject;
 class CutsceneWorld : public World
 {
     scene::ICameraSceneNode* m_camera;
-    
+
     std::map<float, std::vector<TrackObject*> > m_sounds_to_trigger;
     std::map<float, std::vector<TrackObject*> > m_sounds_to_stop;
     std::map<float, std::vector<TrackObject*> > m_particles_to_trigger;
-    
+
     double m_duration;
     bool m_aborted;
-    
+
     /** monkey tricks to get the animations in sync with irrlicht. we reset the time
      *  after all is loaded and it's running withotu delays
      */
     bool m_second_reset;
     double m_time_at_second_reset;
-    
+
     void abortCutscene()
     {
         if (m_time < m_duration - 2.0f) m_duration = m_time + 2.0f;
         m_aborted = true;
     }
-    
+
     std::vector<std::string> m_parts;
-    
+
 public:
-    
+
     CutsceneWorld();
     virtual ~CutsceneWorld();
-    
+
     virtual void init() OVERRIDE;
-    
+
     // clock events
     virtual bool isRaceOver() OVERRIDE;
     virtual void terminateRace() OVERRIDE;
-    
+
     void setParts(std::vector<std::string> parts)
     {
         m_parts = parts;
@@ -79,13 +79,13 @@ public:
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     virtual bool raceHasLaps() OVERRIDE { return false; }
     virtual void moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
-    
+
     virtual const std::string& getIdent() const OVERRIDE;
-    
+
     virtual void update(float dt) OVERRIDE;
 
     virtual void createRaceGUI() OVERRIDE;
-    
+
     virtual void enterRaceOverState() OVERRIDE;
 
     virtual void onFirePressed(Controller* who) OVERRIDE { abortCutscene(); }

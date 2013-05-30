@@ -43,21 +43,21 @@ private:
     {
         int m_lives;
     };
-    
+
     /** This vector contains an 'BattleInfo' struct for every kart in the race.
     */
     std::vector<BattleInfo> m_kart_info;
 
     /** The mesh of the tire which is displayed when a kart loses a life. */
     irr::scene::IMesh* m_tire;
-    
-    /** Indicates the number of tires that should be 
+
+    /** Indicates the number of tires that should be
      *  inserted into the track. */
     int m_insert_tire;
-    
+
     /** For tires that are blown away. */
     core::vector3df m_tire_position;
-    
+
     /** The original locations of the tires of a kart. */
     core::vector3df m_tire_offsets[4];
 
@@ -71,9 +71,9 @@ private:
     float m_tire_rotation;
 
     PtrVector<TrackObject, REF> m_tires;
-    
+
 public:
-    
+
     /** Used to show a nice graph when battle is over */
     struct BattleEvent
     {
@@ -81,16 +81,16 @@ public:
         std::vector<BattleInfo> m_kart_info;
     };
     std::vector<BattleEvent> m_battle_events;
-    
+
     ThreeStrikesBattle();
     virtual ~ThreeStrikesBattle();
-    
+
     virtual void init();
-    
+
     // clock events
     virtual bool isRaceOver();
     virtual void terminateRace();
-    
+
     // overriding World methods
     virtual void reset();
 
@@ -100,15 +100,15 @@ public:
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
     virtual bool raceHasLaps(){ return false; }
     virtual void moveKartAfterRescue(AbstractKart* kart);
-    
+
     virtual const std::string& getIdent() const;
-    
+
     virtual void kartHit(const unsigned int kart_id);
     virtual void update(float dt);
-    
+
     virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node);
 
-    
+
     void updateKartRanks();
 };   // ThreeStrikesBattles
 

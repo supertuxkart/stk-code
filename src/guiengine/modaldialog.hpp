@@ -38,13 +38,13 @@ namespace GUIEngine
     class Widget;
     class TextBoxWidget;
     class ButtonWidget;
-    
+
     enum ModalDialogLocation
     {
         MODAL_DIALOG_LOCATION_CENTER = 0,
         MODAL_DIALOG_LOCATION_BOTTOM = 1
     };
-    
+
     /**
      * \brief Abstract base class representing a modal dialog.
      * Only once instance at a time (if you create a 2nd the first will be destroyed).
@@ -57,16 +57,16 @@ namespace GUIEngine
     private:
         /** Because C++ doesn't support constructor delegation... */
         void doInit(const float percentWidth, const float percentHeight);
-        
+
         ModalDialogLocation m_dialog_location;
-        
-        
+
+
     protected:
         irr::gui::IGUIWindow* m_irrlicht_window;
         irr::core::rect< irr::s32 > m_area;
-        
+
         InputManager::InputDriverMode m_previous_mode;
-    
+
         /**
          * \brief Creates a modal dialog with given percentage of screen width and height
          */
@@ -80,57 +80,57 @@ namespace GUIEngine
 
         virtual void onEnterPressedInternal();
         void clearWindow();
-                
+
         /** \brief Callback invoked when the dialog was loaded from the XML file (if the constructor
           *        that takes a XML file as argument is used)
           */
         virtual void loadedFromFile() {}
-        
+
     public:
         LEAK_CHECK()
-        
+
         virtual ~ModalDialog();
-        
+
         /** Returns whether to block event propagation (usually, you will want to block events you processed) */
         virtual EventPropagation processEvent(const std::string& eventSource){ return EVENT_LET; }
-        
+
         irr::gui::IGUIWindow* getIrrlichtElement()
         {
             return m_irrlicht_window;
         }
-        
+
         static void dismiss();
         static void onEnterPressed();
         static ModalDialog* getCurrent();
         static bool isADialogActive();
-        
+
         /** Override to change what happens on escape pressed */
         virtual void escapePressed() { dismiss(); }
-        
+
         /** Override to be notified of updates */
         virtual void onUpdate(float dt) { }
-        
+
         /**
          * \brief Optional callback invoked very early, before widgets have been added (contrast with
          *        init(), which is invoked afer widgets were added)
          */
         virtual void beforeAddingWidgets() {}
-        
+
         /** \brief Optional callback invoked after widgets have been add()ed */
         virtual void init() {}
-        
+
         /**
           * \brief Implementing callback from AbstractTopLevelContainer
           */
         virtual int getWidth()  { return m_area.getWidth(); }
-        
+
         /**
           * \brief Implementing callback from AbstractTopLevelContainer
           */
         virtual int getHeight() { return m_area.getHeight(); }
-        
+
         bool isMyIrrChild(irr::gui::IGUIElement* widget) const { return m_irrlicht_window->isMyChild(widget); }
-    };  
-    
+    };
+
 }
 #endif

@@ -37,7 +37,7 @@ namespace irr
         const int ESNT_PER_CAMERA_NODE = MAKE_IRR_ID('p','c','a','m');
     }
 }
-        
+
 /**
  * \brief manages smoke particle effects
  * \ingroup graphics
@@ -50,31 +50,31 @@ private:
 
     scene::ICameraSceneNode* m_camera;
     scene::ISceneNode* m_child;
-    
+
 public:
-    
+
     PerCameraNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
                   scene::ICameraSceneNode* camera, scene::IMesh* mesh);
     virtual     ~PerCameraNode();
-    
+
     //! returns the axis aligned bounding box of this node
     virtual const core::aabbox3d<f32>& getBoundingBox() const { return Box; }
-    
+
     //! Returns a reference to the current relative transformation matrix.
     //! This is the matrix, this scene node uses instead of scale, translation
     //! and rotation.
     virtual core::matrix4& getRelativeTransformationMatrix() { return RelativeTransformationMatrix; }
-    
+
     //! Returns the relative transformation of the scene node.
     virtual core::matrix4 getRelativeTransformation() const { return RelativeTransformationMatrix; }
-    
+
     void setCamera(scene::ICameraSceneNode* camera);
-    
+
     virtual void OnRegisterSceneNode();
     virtual void render();
-    
+
     virtual scene::ESCENE_NODE_TYPE getType() const { return (scene::ESCENE_NODE_TYPE)scene::ESNT_PER_CAMERA_NODE; }
-    
+
     scene::ISceneNode* getChild() { return m_child; }
 };
 

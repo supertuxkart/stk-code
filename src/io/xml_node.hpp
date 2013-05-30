@@ -60,20 +60,20 @@ private:
     std::map<std::string, core::stringw> m_attributes;
     /** List of all sub nodes. */
     std::vector<XMLNode *>               m_nodes;
-    
+
     void readXML(io::IXMLReader *xml);
-    
+
     std::string                          m_file_name;
-    
+
 public:
          LEAK_CHECK();
          XMLNode(io::IXMLReader *xml);
-    
+
          /** \throw runtime_error if the file is not found */
          XMLNode(const std::string &filename);
-    
+
         ~XMLNode();
-        
+
     const std::string &getName() const {return m_name; }
     const XMLNode     *getNode(const std::string &name) const;
     const void         getNodes(const std::string &s, std::vector<XMLNode*>& out) const;
@@ -100,9 +100,9 @@ public:
     int getXYZ(Vec3 *vaslue) const;
     int getHPR(core::vector3df *value) const;
     int getHPR(Vec3 *value) const;
-    
+
     bool hasChildNamed(const char* name) const;
-    
+
     /** Handy functions to test the bit pattern returned by get(vector3df*).*/
     static bool hasX(int b) { return (b&1)==1; }
     static bool hasY(int b) { return (b&2)==2; }

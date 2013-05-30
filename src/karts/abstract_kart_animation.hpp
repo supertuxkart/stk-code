@@ -27,7 +27,7 @@
 class AbstractKart;
 
 /** The base class for all kart animation, like rescue, explosion, or cannon.
- *  Kart animations are done by removing the physics body from the physics 
+ *  Kart animations are done by removing the physics body from the physics
  *  world, and instead modifying the rotation and position of the kart
  *  directly. They are registered with the kart, and only one can be
  *  used at the same time. The memory is handled by the kart object, so
@@ -48,7 +48,7 @@ protected:
     float m_timer;
 
 public:
-                 AbstractKartAnimation(AbstractKart *kart, 
+                 AbstractKartAnimation(AbstractKart *kart,
                                        const std::string &name);
     virtual     ~AbstractKartAnimation();
     virtual void update(float dt);

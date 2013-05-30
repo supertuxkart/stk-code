@@ -45,16 +45,16 @@ private:
     stringw                  m_title;
     std::string              m_normal_filename;
     std::string              m_fast_filename;
-    std::vector<std::string> m_all_tracks;      
+    std::vector<std::string> m_all_tracks;
     //int                      m_numLoops;
-    
+
     /** If faster music is enabled at all (either separate file or using
      *  the pitch shift approach). */
-    bool                     m_enable_fast;    
-                                                
+    bool                     m_enable_fast;
+
     float                    m_gain;
     float                    m_adjusted_gain;
-    
+
     /** Either time for fading faster music in, or time to change pitch. */
     float                    m_faster_time;
     /** Maximum pitch for faster music. */
@@ -66,15 +66,15 @@ private:
           SOUND_FADING,     //!< normal music fading out, faster fading in
           SOUND_FASTER,     //!< change pitch of normal music
           SOUND_FAST}       //!< playing faster music or max pitch reached
-                             m_mode; 
+                             m_mode;
     float                    m_time_since_faster;
 
-    // The constructor is private so that the 
+    // The constructor is private so that the
     // static create function must be used.
     MusicInformation (const XMLNode *root, const std::string &filename);
 public:
     LEAK_CHECK()
-    
+
 #if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
 #pragma warning(disable:4290)
 #endif
@@ -94,10 +94,10 @@ public:
     void               pauseMusic       ();
     void               resumeMusic      ();
     void               volumeMusic      (float gain);
-    
+
     void               setTemporaryVolume(float gain);
     void               resetTemporaryVolume() { volumeMusic(m_adjusted_gain); }
-    
+
     void               switchToFastMusic();
     bool               isPlaying() const;
 };   // MusicInformation

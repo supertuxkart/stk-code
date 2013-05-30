@@ -23,9 +23,9 @@
 #include <assert.h>
 #include <vector>
 
-/** This class manages a set of (x_i,y_i) points, x_i must be sorted. 
- *  Those values are then used to linearly interpolate the y value for a 
- *  given x. If x is less than the minimum x_0, y_0 is returned, if x is 
+/** This class manages a set of (x_i,y_i) points, x_i must be sorted.
+ *  Those values are then used to linearly interpolate the y value for a
+ *  given x. If x is less than the minimum x_0, y_0 is returned, if x is
  *  more than the maximum x_n, y_n is returned.
  */
 class InterpolationArray
@@ -62,7 +62,7 @@ public:
                 m_delta.push_back( (m_y[last]-m_y[last-1])
                                   / 0.001f                 );
             else
-                m_delta.push_back( (m_y[last]-m_y[last-1]) 
+                m_delta.push_back( (m_y[last]-m_y[last-1])
                                  /(m_x[last]-m_x[last-1])  );
         }
         return 1;
@@ -78,14 +78,14 @@ public:
     float getY(unsigned int i) const { return m_y[i]; }
     // ------------------------------------------------------------------------
     /** Sets the Y value for a specified point. */
-    void setY(unsigned int i, float y) 
+    void setY(unsigned int i, float y)
     {
-        m_y[i] = y; 
+        m_y[i] = y;
         if(i>0)
-            m_delta[i-1] = (m_y[i]-m_y[i-1]) 
+            m_delta[i-1] = (m_y[i]-m_y[i-1])
                           /(m_x[i]-m_x[i-1]);
         if(i<m_y.size()-1)
-            m_delta[i] = (m_y[i+1]-m_y[i]) 
+            m_delta[i] = (m_y[i+1]-m_y[i])
                         /(m_x[i+1]-m_x[i]);
     }
     // ------------------------------------------------------------------------

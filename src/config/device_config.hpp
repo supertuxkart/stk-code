@@ -47,22 +47,22 @@ enum DeviceConfigType
 class DeviceConfig : public NoCopy
 {
 protected:
-    
+
     Binding  m_bindings[PA_COUNT];
     int      m_plugged;  //!< How many devices connected to the system which uses this config?
-    
+
     bool     m_enabled;  //!< If set to false, this device will be ignored. Currently for gamepads only
 
     std::string m_name;
-    
+
     DeviceConfigType m_type;
-    
+
     DeviceConfig(DeviceConfigType type)
     {
         m_type = type;
         m_enabled = true;
     }
-    
+
     /**
       * \brief internal helper method for DeviceConfig::getGameAction and DeviceConfig::getMenuAction
       */
@@ -72,62 +72,62 @@ protected:
                      const PlayerAction  firstActionToCheck,
                      const PlayerAction  lastActionToCheck,
                      PlayerAction*       action /* out */ );
-    
+
 public:
-    
+
     std::string        getName           () const { return m_name; };
     irr::core::stringw toString          ();
     DeviceConfigType   getType           () const { return m_type; }
-    
+
     /** Get a user-readable string describing the bound action */
     irr::core::stringw getBindingAsString(const PlayerAction action) const;
-    
+
     /** Get an internal unique string describing the bound action */
     irr::core::stringw getMappingIdString (const PlayerAction action) const;
-    
+
     void        serialize           (std::ofstream& stream);
     bool        deserializeAction   (irr::io::IrrXMLReader* xml);
-    
+
     void        setBinding          (const PlayerAction     action,
                                      const Input::InputType type,
                                      const int              id,
                                      Input::AxisDirection   direction = Input::AD_NEUTRAL,
                                      wchar_t                character=0);
-    
+
     void        setPlugged          () { m_plugged++; }
     bool        isPlugged           () const { return m_plugged > 0; }
     int         getNumberOfDevices  () const { return m_plugged;     }
-    
+
     /**
       * \brief              Searches for a game actions associated with the given input event
       * \note               Don't call this directly unless you are KeyboardDevice or GamepadDevice
       * \param[out] action  the result, only set if method returned true
       * \return             whether finding an action associated to this input was successful
       */
-    bool        getGameAction       (Input::InputType       type, 
+    bool        getGameAction       (Input::InputType       type,
                                      const int              id,
                                      const int              value,
                                      PlayerAction*          action /* out */);
-    
+
     /**
       * \brief              Searches for a game actions associated with the given input event
       * \note Don't call this directly unless you are KeyboardDevice or GamepadDevice
       * \param[out] action  the result, only set if method returned true
       * \return             whether finding an action associated to this input was successful
       */
-    bool        getMenuAction       (Input::InputType       type, 
+    bool        getMenuAction       (Input::InputType       type,
                                      const int              id,
                                      const int              value,
                                      PlayerAction*          action /* out */);
-    
+
     Binding&    getBinding          (int i) {return m_bindings[i];}
-    
+
     bool hasBindingFor(const int buttonID) const;
     bool hasBindingFor(const int buttonID, PlayerAction from, PlayerAction to) const;
-    
+
     /** At this time only relevant for gamepads, keyboards are always enabled */
     bool isEnabled() const { return m_enabled; }
-    
+
     void setEnabled(bool newValue) { m_enabled = newValue; }
 };
 
@@ -141,10 +141,10 @@ class KeyboardConfig : public DeviceConfig
 {
 
 public:
-    
+
     void        setDefaultBinds     ();
     void        serialize           (std::ofstream& stream);
-    
+
     KeyboardConfig                  ();
 };
 
@@ -157,16 +157,16 @@ public:
   */
 class GamepadConfig : public DeviceConfig
 {
-    
+
 private:
     /** Number of axis this device has. */
     int         m_axis_count;
 
     /** Number of buttons this device has. */
     int         m_button_count;
-    
+
 public:
-    
+
     irr::core::stringw toString     ();
 
     void        serialize           (std::ofstream& stream);
@@ -180,8 +180,8 @@ public:
     void setNumberOfButtons(int count) { m_button_count = count; }
     // ------------------------------------------------------------------------
     /** Sets the number of axis this device has. */
-    void setNumberOfAxis(int count) { m_axis_count = count; }    
-    //        ~GamepadConfig();  
+    void setNumberOfAxis(int count) { m_axis_count = count; }
+    //        ~GamepadConfig();
 };
 
 #endif

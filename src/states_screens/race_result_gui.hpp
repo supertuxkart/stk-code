@@ -42,7 +42,7 @@ class SFXBase;
   * \brief Displays the results (while the end animation is shown).
   * \ingroup states_screens
   */
-class RaceResultGUI : public RaceGUIBase, 
+class RaceResultGUI : public RaceGUIBase,
                       public GUIEngine::Screen,
                       public GUIEngine::ScreenSingleton<RaceResultGUI>,
                       public MessageDialog::IConfirmDialogListener
@@ -57,7 +57,7 @@ private:
         OLD_GP_TABLE:    Scroll new table into place, sorted by previous
                          GP ranks
         INCREASE_POINTS: The overall points are added up
-        RESORT_TABLE:    Resort the table so that it is now sorted by 
+        RESORT_TABLE:    Resort the table so that it is now sorted by
                          GP points.
         WAIT_TILL_END    Some delay to wait for end, after a period it
                          wii automatically end. */
@@ -94,7 +94,7 @@ private:
         /** New overall points after this race. */
         int              m_new_overall_points;
         /** When updating the number of points in the display, this is the
-            currently displayed number of points. This is a floating point number 
+            currently displayed number of points. This is a floating point number
             since it stores the increments during increasing the points. */
         float            m_current_displayed_points;
         /** The kart icons. */
@@ -156,8 +156,8 @@ private:
     /** The overall width of the table. */
     unsigned int               m_table_width;
 
-    /** GP Progress text */ 
-    unsigned int               m_gp_progress_x; 
+    /** GP Progress text */
+    unsigned int               m_gp_progress_x;
 
     /** The font to use. */
     gui::ScalableFont         *m_font;
@@ -170,28 +170,28 @@ private:
     bool                       m_was_monospace;
 
     SFXBase*                   m_finish_sound;
-    
+
     /** For highscores */
     std::string m_highscore_who;
-    
+
     /** For highscores */
     StateManager::ActivePlayer* m_highscore_player;
-    
+
     /** For highscores */
     int m_highscore_rank;
-    
+
     /** For highscores */
     int m_highscore_time;
-    
+
     unsigned int m_width_all_points;
-    
-    void displayOneEntry(unsigned int x, unsigned int y, 
+
+    void displayOneEntry(unsigned int x, unsigned int y,
                          unsigned int n, bool display_points);
     void determineTableLayout();
     void determineGPLayout();
     void enableAllButtons();
     void enableGPProgress();
-    void displayGPProgress(); 
+    void displayGPProgress();
     void cleanupGPProgress();
     void displayHighScores();
 public:
@@ -205,17 +205,17 @@ public:
     virtual void init() OVERRIDE;
     virtual void tearDown() OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
-    virtual GUIEngine::EventPropagation 
+    virtual GUIEngine::EventPropagation
                  filterActions(PlayerAction action, int deviceID, const unsigned int value,
                                Input::InputType type, int playerId) OVERRIDE;
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name, 
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                        const int playerID) OVERRIDE;
 
 
     friend class GUIEngine::ScreenSingleton<RaceResultGUI>;
 
     /** Should not be called anymore.  */
-    const core::dimension2du getMiniMapSize() const 
+    const core::dimension2du getMiniMapSize() const
                   { assert(false); return core::dimension2du(0, 0); }
 
     /** No kart specific view needs to be rendered in the result gui. */
@@ -227,21 +227,21 @@ public:
      *  called (e.g. 'new lap' message if the end controller is used for more
      *  than one lap). So do nothing in this case.
     */
-    virtual void addMessage(const irr::core::stringw &m, 
-                            const AbstractKart *kart, 
-                            float time, 
+    virtual void addMessage(const irr::core::stringw &m,
+                            const AbstractKart *kart,
+                            float time,
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
                             bool important=true) { }
 
     /** Should not be called anymore. */
     virtual void clearAllMessages() {assert(false); }
-    
+
     void nextPhase();
-    
+
     /** Show no highscore */
     void clearHighscores();
-    
+
     /**
       * To call if the user got a new highscore
       * \param kart identity of the kart that made the highscore
@@ -249,9 +249,9 @@ public:
       * \param rank Highscore rank (first highscore, second highscore, etc.). This is not the race rank
       * \param time Finish time in seconds
       */
-    void setHighscore(const std::string &kart, 
+    void setHighscore(const std::string &kart,
                       StateManager::ActivePlayer* player, int rank, int time);
-    
+
     virtual void onConfirm();
 };   // RaceResultGUI
 

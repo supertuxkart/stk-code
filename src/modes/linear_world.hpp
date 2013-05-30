@@ -40,13 +40,13 @@ private:
 
     /** Last lap sfx should only be played once. */
     bool         m_last_lap_sfx_played;
-    
+
     bool         m_last_lap_sfx_playing;
 
     /** The fastest lap time. */
     float       m_fastest_lap;
 
-    /** The track length returned by Track::getLength() only covers the 
+    /** The track length returned by Track::getLength() only covers the
      *  distance from start line to finish line, i.e. it does not include
      *  the distance the karts actually start behind the start line (the
      *  karts would have a negative distance till they reach the start line
@@ -136,33 +136,33 @@ public:
     virtual void  moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
     virtual void  reset() OVERRIDE;
     virtual void  newLap(unsigned int kart_index) OVERRIDE;
-    
-    // ------------------------------------------------------------------------    
+
+    // ------------------------------------------------------------------------
     /** Returns if this race mode has laps. */
     virtual bool  raceHasLaps() OVERRIDE { return true; }
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     /** Returns if this race mode has bonus items. */
     virtual bool  haveBonusBoxes() OVERRIDE { return true; }
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     /** Override settings from base class */
     virtual bool useChecklineRequirements() const OVERRIDE { return true; }
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     /** Returns true if the kart is on a valid driveline quad.
      *  \param kart_index  Index of the kart. */
-    bool isOnRoad(unsigned int kart_index) const 
+    bool isOnRoad(unsigned int kart_index) const
     {
-        return m_kart_info[kart_index].getSector()->isOnRoad(); 
+        return m_kart_info[kart_index].getSector()->isOnRoad();
     }   // isOnRoad
-    
+
     // ------------------------------------------------------------------------
-    /** Returns the number of laps a kart has completed. 
+    /** Returns the number of laps a kart has completed.
      *  \param kart_index World index of the kart. */
     int getKartLaps(unsigned int kart_index) const
     {
         assert(kart_index < m_kart_info.size());
         return m_kart_info[kart_index].m_race_lap;
     }   // getkartLap
-    
+
     // ------------------------------------------------------------------------
     /** Returns the track_sector object for the specified kart.
      *  \param kart_index World index of the kart. */
@@ -170,9 +170,9 @@ public:
     {
         return m_kart_info[kart_index].m_current_sector;
     }   // getTrackSector
-    
+
     // ------------------------------------------------------------------------
-    /** Returns how far the kart has driven so far (i.e. 
+    /** Returns how far the kart has driven so far (i.e.
      *  number-of-laps-finished times track-length plus distance-on-track.
      *  \param kart_index World kart id of the kart. */
     float getOverallDistance(unsigned int kart_index) const

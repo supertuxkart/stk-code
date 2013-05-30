@@ -103,7 +103,7 @@ public:
     /** Enable replaying a history, enabled from the command line. */
     void  doReplayHistory(HistoryReplayMode m) {m_replay_mode = m;           }
     // ------------------------------------------------------------------------
-    /** Returns true if the physics should not be simulated in replay mode. 
+    /** Returns true if the physics should not be simulated in replay mode.
      *  I.e. either no replay mode, or physics replay mode. */
     bool dontDoPhysics   () const { return m_replay_mode == HISTORY_POSITION;}
 };

@@ -35,7 +35,7 @@ class KartProperties;
 class MusicInformation;
 class XMLNode;
 
-/** 
+/**
  * \brief Global STK configuration information.
  * Parameters here can be tuned without recompilation, but the user shouldn't actually modify
  * them. It also includes the list of default kart physics parameters which are used for
@@ -46,7 +46,7 @@ class STKConfig : public NoCopy
 {
 protected:
     /** Default kart properties. */
-    KartProperties  *m_default_kart_properties; 
+    KartProperties  *m_default_kart_properties;
 
 public:
     /** What to do if a kart already has a powerup when it hits a bonus box:
@@ -54,9 +54,9 @@ public:
      *  - SAME: give it one more item of the type it currently has.
      *  - ONLY_IF_SAME: only give it one more item if the randomly chosen item
      *          has the same type as the currently held item. */
-    enum {POWERUP_MODE_NEW, 
-          POWERUP_MODE_SAME, 
-          POWERUP_MODE_ONLY_IF_SAME} 
+    enum {POWERUP_MODE_NEW,
+          POWERUP_MODE_SAME,
+          POWERUP_MODE_ONLY_IF_SAME}
           m_same_powerup_mode;
 
     static float UNDEFINED;
@@ -78,7 +78,7 @@ public:
                                           before they disappear.             */
     float m_explosion_impulse_objects;/**<Impulse of explosion on moving
                                           objects, e.g. road cones, ...      */
-    float m_penalty_time;            /**< Penalty time when starting too 
+    float m_penalty_time;            /**< Penalty time when starting too
                                           early.                             */
     float m_delay_finish_time;       /**<Delay after a race finished before
                                          the results are displayed.          */
@@ -107,7 +107,7 @@ public:
                                          before it is ignored. */
     bool  m_enable_networking;
 
-    /** Disable steering if skidding is stopped. This can help in making 
+    /** Disable steering if skidding is stopped. This can help in making
      *  skidding more controllable (since otherwise when trying to steer while
      *  steering is reset to match the graphics it often results in the kart
      *  crashing). */
@@ -119,11 +119,11 @@ public:
 
     float m_ai_acceleration;         /**<Between 0 and 1, default being 1, can be
                                          used to give a handicap to AIs */
-    
+
     std::vector<float>
           m_leader_intervals;        /**<Interval in follow the leader till
                                          last kart is reomved.               */
-    float m_leader_time_per_kart;    /**< Additional time to each leader 
+    float m_leader_time_per_kart;    /**< Additional time to each leader
                                           interval for each additional kart. */
     std::vector<int> m_switch_items; /**< How to switch items.               */
     /** The number of points a kart on position X has more than the

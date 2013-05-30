@@ -32,44 +32,44 @@ class SoccerSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSing
     friend class GUIEngine::ScreenSingleton<SoccerSetupScreen>;
 
     SoccerSetupScreen();
-    
+
     struct KartViewInfo
     {
         GUIEngine::ModelViewWidget* view;
         bool                        confirmed;
         int                         local_player_id;
         SoccerTeam                  team;
-        
+
         KartViewInfo() : view(NULL), confirmed(false), local_player_id(-1), team(SOCCER_TEAM_NONE) {}
     };
 
     AlignedArray<KartViewInfo>  m_kart_view_info;
-    
+
 public:
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                                const int playerID) OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual GUIEngine::EventPropagation filterActions( PlayerAction action,
                                                        int deviceID,
                                                        const unsigned int value,
                                                        Input::InputType type,
                                                        int playerId) OVERRIDE;
-    
+
 private:
     bool areAllKartsConfirmed() const;
     void updateKartViewsLayout();

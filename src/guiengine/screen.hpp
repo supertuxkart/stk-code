@@ -96,7 +96,7 @@ namespace GUIEngine
     class Screen : public AbstractTopLevelContainer
     {
     private:
-        /** True if the race (if it is running) should be paused when this 
+        /** True if the race (if it is running) should be paused when this
          *  screen is shown. The RaceResultGUI uses this to leave the race
          *  running while it is being shown. */
         bool m_pause_race;
@@ -180,7 +180,7 @@ namespace GUIEngine
          */
         void setNeeds3D(bool needs3D) { m_render_3d = needs3D; }
 
-        /** 
+        /**
          * \brief Callback invoked when loading this menu.
          *
          * \pre   Children widgets of this menu have been created by the time
@@ -216,7 +216,7 @@ namespace GUIEngine
           */
         virtual void beforeAddingWidget() {}
 
-        /** 
+        /**
           * \brief Callback invoked when entering this menu (after the
           *        widgets have been added).
           *
@@ -227,7 +227,7 @@ namespace GUIEngine
           */
         virtual void init();
 
-        /** 
+        /**
           * \brief Callback invoked before leaving this menu.
           *
           * \note  The same instance of your object may be entered/left more
@@ -237,7 +237,7 @@ namespace GUIEngine
           */
         virtual void tearDown();
 
-        /** 
+        /**
           * \brief  Called when escape is pressed.
           * \return true if the screen should be closed,
           *         false if you handled the press another way
@@ -283,7 +283,7 @@ namespace GUIEngine
                                                int deviceID,
                                                const unsigned int value,
                                                Input::InputType type,
-                                               int playerId) 
+                                               int playerId)
             { return EVENT_LET; }
 
         /** Callback you can use if you want to know when the user pressed

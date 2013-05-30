@@ -39,18 +39,18 @@ class TrackObjectManager
 {
 protected:
     /**
-      * The different type of track objects: physical objects, graphical 
+      * The different type of track objects: physical objects, graphical
       * objects (without a physical representation) - the latter might be
       * eye candy (to reduce work for physics), ...
       */
     enum TrackObjectType {TO_PHYSICAL, TO_GRAPHICAL};
     PtrVector<TrackObject> m_all_objects;
-    
+
     /** Temporary storage for LOD objects whose XML node was read but whose
       * scene node is not yet ready
       */
     std::map<std::string, std::vector<const XMLNode*> > m_lod_objects;
-    
+
 public:
          TrackObjectManager();
         ~TrackObjectManager();
@@ -60,19 +60,19 @@ public:
                          bool secondary_hits=true);
     void reset();
     void init();
-    
+
     /** Enable or disable fog on objects */
     void enableFog(bool enable);
 
     void insertObject(TrackObject* object);
-    
+
     void removeObject(TrackObject* who);
-    
+
     void assingLodNodes(const std::vector<LODNode*>& lod);
-    
+
           PtrVector<TrackObject>& getObjects()       { return m_all_objects; }
     const PtrVector<TrackObject>& getObjects() const { return m_all_objects; }
-    
+
 };   // class TrackObjectManager
 
 #endif

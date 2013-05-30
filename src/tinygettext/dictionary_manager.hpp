@@ -45,7 +45,7 @@ private:
 
   std::string charset;
   bool        use_fuzzy;
-  
+
   Language    current_language;
   Dictionary* current_dict;
 
@@ -58,7 +58,7 @@ private:
 #ifdef DEBUG
     unsigned int m_magic_number;
 #endif
-    
+
 public:
   DictionaryManager(const std::string& charset_ = "UTF-8");
   ~DictionaryManager();

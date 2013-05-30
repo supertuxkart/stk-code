@@ -25,7 +25,7 @@ class KartControlMessage : public Message
 {
 public:
     KartControlMessage();
-    KartControlMessage(ENetPacket* pkt, int kart_id_offset, 
+    KartControlMessage(ENetPacket* pkt, int kart_id_offset,
                        int num_local_players);
 };   // KartUpdateMessage
 #endif

@@ -31,15 +31,15 @@
 
 class QuadGraph;
 
-/** 
-  * \brief This class stores a node of the graph, i.e. a list of successor 
+/**
+  * \brief This class stores a node of the graph, i.e. a list of successor
   *  edges.
   * \ingroup tracks
   */
-class GraphNode 
+class GraphNode
 {
-public:    
-    /** To indiciate in which direction the track is going: 
+public:
+    /** To indiciate in which direction the track is going:
      *  straight, left, right. The undefined direction is used by the
      *  AI only. */
     enum         DirectionType {DIR_STRAIGHT, DIR_LEFT, DIR_RIGHT,
@@ -69,7 +69,7 @@ private:
     /** Distance from the start to the beginning of this quad. */
     float m_distance_from_start;
 
-    /** Width of the track, which is the average of the width at the 
+    /** Width of the track, which is the average of the width at the
      *  beginning and at the end. FIXME: for now the width is independent
      *  of the orientation (e.g. a quad used more than once might once
      *  be used from top to bottom, one from left to right, so it should
@@ -90,7 +90,7 @@ private:
      /** A vector from the center of the quad to the right edge. */
      Vec3 m_center_to_right;
 
-     /** Line between lower and upper center, saves computation in 
+     /** Line between lower and upper center, saves computation in
       *  getDistanceFromLine() later. The line is 2d only since otherwise
       *  taller karts would have a larger distance from the center. It also
       *  saves computation, and it is only needed to determine the distance
@@ -106,7 +106,7 @@ private:
 
      /** The direction for each of the successors. */
      std::vector<DirectionType>  m_direction;
-     
+
      /** Stores for each successor the index of the last graph node that
       *  has the same direction (i.e. if index 0 curves left, this vector
       *  will store the index of the last graph node that is still turning
@@ -123,8 +123,8 @@ private:
       * alternate ways)
       */
     std::vector< int > m_checkline_requirements;
-    
-    void markAllSuccessorsToUse(unsigned int n, 
+
+    void markAllSuccessorsToUse(unsigned int n,
                                 PathToNodeVector *m_path_to_node);
 
 public:
@@ -134,22 +134,22 @@ public:
     float        getDistance2FromPoint(const Vec3 &xyz);
     void         setupPathsToNode();
     void         setChecklineRequirements(int latest_checkline);
-    void         setDirectionData(unsigned int successor, DirectionType dir, 
+    void         setDirectionData(unsigned int successor, DirectionType dir,
                                   unsigned int last_node_index);
     // ------------------------------------------------------------------------
     /** Returns the number of successors. */
-    unsigned int getNumberOfSuccessors() const 
+    unsigned int getNumberOfSuccessors() const
                              { return (unsigned int)m_successor_nodes.size(); }
     // ------------------------------------------------------------------------
     /** Returns the i-th successor node. */
-    unsigned int getSuccessor(unsigned int i)  const 
+    unsigned int getSuccessor(unsigned int i)  const
                                { return m_successor_nodes[i];                 }
     // ------------------------------------------------------------------------
     /** Returns the number of predecessors. */
     unsigned int getNumberOfPredecessors() const
                            { return (unsigned int)m_predecessor_nodes.size(); }
     // ------------------------------------------------------------------------
-    /** Returns a predecessor for this node. Note that the first predecessor 
+    /** Returns a predecessor for this node. Note that the first predecessor
      *  is the most 'natural' one, i.e. the one on the main driveline.
      */
     int getPredecessor(unsigned int i) const {return m_predecessor_nodes[i]; }
@@ -161,10 +161,10 @@ public:
     const Quad& getQuad() const {return QuadSet::get()->getQuad(m_quad_index);}
     // ------------------------------------------------------------------------
     /** Returns the i-th. point of a quad. ATM this just returns the vertices
-     *  from the quads, but if necessary this method will also consider 
-     *  rotated quads. So index 0 will always be lower left point, then 
+     *  from the quads, but if necessary this method will also consider
+     *  rotated quads. So index 0 will always be lower left point, then
      *  counterclockwise. */
-    const Vec3& operator[](int i) const 
+    const Vec3& operator[](int i) const
                              {return QuadSet::get()->getQuad(m_quad_index)[i];}
     // ------------------------------------------------------------------------
     /** Returns the distance to the j-th. successor. */
@@ -177,7 +177,7 @@ public:
                                { return m_angle_to_next[j];              }
     // ------------------------------------------------------------------------
     /** Returns the distance from start. */
-    float        getDistanceFromStart() const  
+    float        getDistanceFromStart() const
                                { return m_distance_from_start;           }
     // ------------------------------------------------------------------------
     /** Sets the distance from start for this node. */
@@ -193,11 +193,11 @@ public:
     const Vec3& getUpperCenter() const {return m_upper_center;}
     // ------------------------------------------------------------------------
     /** Returns the center point of this graph node. */
-    const Vec3  getCenter()      const 
+    const Vec3  getCenter()      const
                             {return (m_upper_center + m_lower_center) / 2.0f;}
     // ------------------------------------------------------------------------
     /** Returns the length of the quad of this node. */
-    float       getNodeLength() const 
+    float       getNodeLength() const
                 {return (m_lower_center-m_upper_center).length();}
     // ------------------------------------------------------------------------
     /** Returns true if the index-successor of this node is one that the AI
@@ -213,20 +213,20 @@ public:
      *  \param n Index of the graph node to reach.
      */
     int getSuccessorToReach(unsigned int n)
-    {  
+    {
         // If we have a path to node vector, use its information, otherwise
         // (i.e. there is only one successor anyway) use this one successor.
         return m_path_to_node.size()>0 ? m_path_to_node[n] : 0;
     }   // getSuccesorToReach
     // ------------------------------------------------------------------------
     /** Returns the checkline requirements of this graph node. */
-    const std::vector<int>& getChecklineRequirements() const 
+    const std::vector<int>& getChecklineRequirements() const
                                            { return m_checkline_requirements; }
     // ------------------------------------------------------------------------
     /** Returns the direction in which the successor n is. */
     void getDirectionData(unsigned int succ, DirectionType *dir,
-                          unsigned int *last) const 
-    { 
+                          unsigned int *last) const
+    {
         *dir = m_direction[succ];  *last = m_last_index_same_direction[succ];
     }
     // ------------------------------------------------------------------------

@@ -35,14 +35,14 @@
 class OverWorld : public LinearWorld
 {
 protected:
-    
+
     /** Override from base class */
     virtual void  createRaceGUI();
-    
+
     bool m_return_to_garage;
-    
+
     void moveKartAfterRescue(AbstractKart* kart, float angle);
-    
+
     btTransform getClosestStartPoint(float currentKart_x, float currentKart_z);
 
 public:
@@ -50,9 +50,9 @@ public:
     virtual      ~OverWorld();
 
     static void enterOverWorld();
-    
+
     virtual void  update(float delta) OVERRIDE;
-    
+
     // ------------------------------------------------------------------------
     /** Returns if this race mode has laps. */
     virtual bool  raceHasLaps() OVERRIDE { return false; }
@@ -63,7 +63,7 @@ public:
     virtual bool    isRaceOver() OVERRIDE { return false; }
     // ------------------------------------------------------------------------
     /** Implement base class method */
-    virtual const std::string& 
+    virtual const std::string&
                     getIdent() const OVERRIDE { return IDENT_OVERWORLD; }
     // ------------------------------------------------------------------------
     /** Override base class method */

@@ -42,7 +42,7 @@ protected:
 public:
 
     TrackObjectPresentation(const XMLNode& xml_node);
-    
+
     TrackObjectPresentation(
         const core::vector3df& xyz,
         const core::vector3df& hpr,
@@ -52,19 +52,19 @@ public:
         m_init_hpr = hpr;
         m_init_scale = scale;
     }
-    
+
     virtual ~TrackObjectPresentation() {}
-    
+
     virtual void reset() {}
     virtual void setEnable(bool enabled) {}
     virtual void update(float dt) {}
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
                       const core::vector3df& scale) {}
-    
+
     virtual const core::vector3df& getPosition() const { return m_init_xyz; }
     virtual const core::vector3df& getRotation() const { return m_init_hpr; }
     virtual const core::vector3df& getScale() const { return m_init_scale; }
-    
+
     LEAK_CHECK()
 };
 
@@ -93,7 +93,7 @@ public:
     {
         m_node = NULL;
     }
-    
+
     virtual const core::vector3df& getPosition() const OVERRIDE;
     virtual const core::vector3df& getRotation() const OVERRIDE;
     virtual const core::vector3df& getScale() const OVERRIDE;
@@ -101,7 +101,7 @@ public:
                       const core::vector3df& scale) OVERRIDE;
     virtual void setEnable(bool enabled) OVERRIDE;
     virtual void reset() OVERRIDE;
-    
+
     scene::ISceneNode* getNode() { return m_node; }
     const scene::ISceneNode* getNode() const { return m_node; }
 };
@@ -139,10 +139,10 @@ public:
 class TrackObjectPresentationMesh : public TrackObjectPresentationSceneNode
 {
 private:
-    /** The mesh used here. It needs to be stored so that it can be 
+    /** The mesh used here. It needs to be stored so that it can be
      *  removed from irrlicht's mesh cache when it is deleted. */
     scene::IMesh                  *m_mesh;
-    
+
     /** True if it is a looped animation. */
     bool                    m_is_looped;
 
@@ -151,18 +151,18 @@ private:
 
     /** End frame of the animation to be played. */
     unsigned int            m_frame_end;
-    
+
     void init(const XMLNode* xml_node, bool enabled);
-    
+
 public:
     TrackObjectPresentationMesh(const XMLNode& xml_node, bool enabled);
-    
+
     TrackObjectPresentationMesh(
         const std::string& model_file, const core::vector3df& xyz,
         const core::vector3df& hpr, const core::vector3df& scale);
 
     virtual ~TrackObjectPresentationMesh();
-    
+
     virtual void reset() OVERRIDE;
 };
 
@@ -180,9 +180,9 @@ private:
 
     /** Currently used for sound effects only, in cutscenes only atm */
     std::string  m_trigger_condition;
-    
+
     core::vector3df m_xyz;
-    
+
 public:
 
     TrackObjectPresentationSound(const XMLNode& xml_node);
@@ -191,10 +191,10 @@ public:
     virtual void update(float dt) OVERRIDE;
     void triggerSound(bool loop);
     void stopSound();
-    
+
     /** Currently used for sound effects only, in cutscenes only atm */
     const std::string& getTriggerCondition() const { return m_trigger_condition; }
-    
+
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
                       const core::vector3df& scale) OVERRIDE;
 };
@@ -229,15 +229,15 @@ private:
     ParticleEmitter* m_emitter;
     LODNode* m_lod_emitter_node;
     std::string m_trigger_condition;
-    
+
 public:
     TrackObjectPresentationParticles(const XMLNode& xml_node);
     virtual ~TrackObjectPresentationParticles();
-    
+
     virtual void update(float dt) OVERRIDE;
 
     std::string& getTriggerCondition() { return m_trigger_condition; }
-    
+
     void triggerParticles();
 };
 
@@ -252,13 +252,13 @@ private:
 
     /** For action trigger objects */
     std::string m_action;
-    
+
 public:
 
-    
+
     TrackObjectPresentationActionTrigger(const XMLNode& xml_node);
     virtual ~TrackObjectPresentationActionTrigger() {}
-    
+
     virtual void onTriggerItemApproached(Item* who) OVERRIDE;
 };
 

@@ -52,7 +52,7 @@ protected:
     struct KartReplayEvent
     {
         /** The type of event. */
-        enum KartReplayEventType {KRE_NONE, 
+        enum KartReplayEventType {KRE_NONE,
                                   KRE_SKID_LEFT,
                                   KRE_SKID_MIN = KRE_SKID_LEFT,
                                   KRE_SKID_RIGHT, KRE_SKID_RELEASE} m_type;
@@ -69,7 +69,7 @@ protected:
     const std::string &getReplayFilename() const { return m_filename;}
     // ----------------------------------------------------------------------
     /** Returns the version number of the replay file. This is used to check
-     *  that a loaded replay file can still be understood by this 
+     *  that a loaded replay file can still be understood by this
      *  executable. */
     unsigned int getReplayVersion() const { return 1; }
 };   // ReplayBase

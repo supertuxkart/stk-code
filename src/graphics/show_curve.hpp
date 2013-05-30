@@ -33,7 +33,7 @@ using namespace irr;
 
 /** This class is used for debugging. It allows to show an arbitrary curve
  *  in the race. The curve is shown as a 'tunnel', i.e. in the constructor
- *  you can specify the width and height of this tunnel. Each point then 
+ *  you can specify the width and height of this tunnel. Each point then
  *  adds 4 vertices: point + (+- width/2, +- height2, 0). That's not
  *  exact (if the curve is not parallel to the z axis), but good enough for
  *  debugging.
@@ -64,7 +64,7 @@ private:
 
     void addEmptyMesh();
 public:
-         ShowCurve(float width, float height, 
+         ShowCurve(float width, float height,
                    const irr::video::SColor &color = video::SColor(77, 0, 179, 0));
         ~ShowCurve();
     void addPoint(const Vec3 &pnt);

@@ -40,10 +40,10 @@ const int MULTIPLIER_MOUSE     =  750;
 struct Input
 {
     static const int MAX_VALUE = 32768;
-    
+
     static const int HAT_H_ID = 100;
     static const int HAT_V_ID = 101;
-    
+
     enum AxisDirection
     {
         AD_NEGATIVE,
@@ -70,12 +70,12 @@ struct Input
     wchar_t   m_character;
 
     Input()
-        : m_type(IT_NONE), m_device_id(0), m_button_id(0), 
+        : m_type(IT_NONE), m_device_id(0), m_button_id(0),
           m_axis_direction(0), m_character(0)
     {
         // Nothing to do.
     }
-    
+
     /** Creates an Input instance which represents an arbitrary way of getting
      * game input using a type specifier and 3 integers.
      *
@@ -93,19 +93,19 @@ struct Input
      * IT_MOUSEMOTION: id0 - axis index (0 -> X, 1 -> Y). Mouse wheel is
      * represented as buttons!
      * IT_MOUSEBUTTON: id0 - button number (1 -> left, 2 -> middle, 3 -> right,
-     * ...) 
+     * ...)
      *
      * Note: For joystick bindings that are actice in the menu the joystick's
      * index should be zero. The binding will react to all joysticks connected
      * to the system.
      */
-    Input(InputType ntype, int deviceID , int btnID = 0, int axisDirection= 0) 
-        : m_type(ntype), m_device_id(deviceID), m_button_id(btnID), 
+    Input(InputType ntype, int deviceID , int btnID = 0, int axisDirection= 0)
+        : m_type(ntype), m_device_id(deviceID), m_button_id(btnID),
           m_axis_direction(axisDirection)
     {
         // Nothing to do.
     }
-    
+
 };   // struct Input
 
 /**
@@ -115,7 +115,7 @@ struct Input
 enum PlayerAction
 {
     PA_BEFORE_FIRST = -1,
-    
+
     PA_STEER_LEFT = 0,
     PA_STEER_RIGHT,
     PA_ACCEL,
@@ -126,14 +126,14 @@ enum PlayerAction
     PA_FIRE,
     PA_LOOK_BACK,
     PA_PAUSE_RACE,
-    
+
     PA_MENU_UP,
     PA_MENU_DOWN,
     PA_MENU_LEFT,
     PA_MENU_RIGHT,
     PA_MENU_SELECT,
     PA_MENU_CANCEL,
-    
+
     PA_COUNT
 };
 
@@ -146,7 +146,7 @@ const PlayerAction PA_LAST_MENU_ACTION = PA_MENU_CANCEL;
   * \brief  human-readable strings for each PlayerAction
   * \ingroup input
   */
-static std::string KartActionStrings[PA_COUNT] = {std::string("steerLeft"), 
+static std::string KartActionStrings[PA_COUNT] = {std::string("steerLeft"),
                                                   std::string("steerRight"),
                                                   std::string("accel"),
                                                   std::string("brake"),

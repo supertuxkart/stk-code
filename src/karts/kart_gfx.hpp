@@ -19,7 +19,7 @@
 #ifndef HEADER_KART_GFX_HPP
 #define HEADER_KART_GFX_HPP
 
-/** \defgroup karts 
+/** \defgroup karts
  *  This class implements all particle effects for a kart. */
 
 #include <vector>
@@ -33,9 +33,9 @@ class Vec3;
 class KartGFX
 {
 public:
-    /** All particle effects supported by this object. 
+    /** All particle effects supported by this object.
      *  Nitro, zipper, terrain, and skidding effects.  Two different
-     *  skid types are supported, but only one emitter node will be 
+     *  skid types are supported, but only one emitter node will be
      *  created. So KGFX_SKID1/2 store the two types, and KGFX_SKID
      *  = KGFX_SKID1 stores the actual emitter node. KGFX_COUNT
      *  is the number of entries and must therefore be last. */
@@ -66,7 +66,7 @@ private:
     /** Used to alternate particle effects from the rear wheels. */
     int         m_wheel_toggle;
 
-    void addEffect(KartGFXType type, const std::string &file_name, 
+    void addEffect(KartGFXType type, const std::string &file_name,
                    const Vec3 &position);
 
 public:

@@ -30,8 +30,8 @@ public:
      *  Increase due to zipper, slipstream, nitro, rubber band,
      *  skidding usage. */
     enum  {MS_INCREASE_MIN,
-           MS_INCREASE_ZIPPER = MS_INCREASE_MIN, 
-           MS_INCREASE_SLIPSTREAM, 
+           MS_INCREASE_ZIPPER = MS_INCREASE_MIN,
+           MS_INCREASE_SLIPSTREAM,
            MS_INCREASE_NITRO,
            MS_INCREASE_RUBBER,
            MS_INCREASE_SKIDDING,
@@ -40,8 +40,8 @@ public:
     /** The categories to use for decreasing the speed of a kart:
      *  Decrease due to terrain, different AI levels and end controller. */
     enum {MS_DECREASE_MIN,
-          MS_DECREASE_TERRAIN = MS_DECREASE_MIN, 
-          MS_DECREASE_AI, 
+          MS_DECREASE_TERRAIN = MS_DECREASE_MIN,
+          MS_DECREASE_AI,
           MS_DECREASE_SQUASH,
           MS_DECREASE_MAX};
 
@@ -64,7 +64,7 @@ private:
         float m_max_add_speed;
         /** How long this speed will apply. This is used as a timer internally,
          *  to the duration will be decreased. When the duration is <0, the
-         *  fade out time starts, and duration will go down to 
+         *  fade out time starts, and duration will go down to
          *  -m_fade_out_time before this speed increase stops. */
         float m_duration;
         /** The fadeout time. */
@@ -74,7 +74,7 @@ private:
         /** Additional engine force. */
         float m_engine_force;
 
-        /** The constructor initialised the values with a no-increase 
+        /** The constructor initialised the values with a no-increase
          *  entry, i.e. an entry that does affect top speed at all. */
         SpeedIncrease()
         {
@@ -96,8 +96,8 @@ private:
         float getTimeLeft() const      {return m_duration;       }
         // --------------------------------------------------------------------
         /** Returns the additional engine force for this speed increase. */
-        float getEngineForce() const 
-        { 
+        float getEngineForce() const
+        {
             return m_duration > 0 ? m_engine_force : 0;
         }
     };   // SpeedIncrease
@@ -111,7 +111,7 @@ private:
         float m_max_speed_fraction;
         /** How long it should take for the full slowdown to take effect. */
         float m_fade_in_time;
-        /** The current slowdown fraction, taking the fade-in time 
+        /** The current slowdown fraction, taking the fade-in time
          *  into account. */
         float m_current_fraction;
 
@@ -125,31 +125,31 @@ private:
         }   // SpeedDecrease
         void update(float dt);
         // --------------------------------------------------------------------
-        /** Returns the current slowdown fracftion, taking a 'fade in' 
+        /** Returns the current slowdown fracftion, taking a 'fade in'
          *  into account. */
         float getSlowdownFraction() const {return m_current_fraction;}
     };   // SpeedDecrease
 
     // ------------------------------------------------------------------------
-    /** Stores all speed decrease related information 
+    /** Stores all speed decrease related information
      *  for each possible category. */
     SpeedDecrease  m_speed_decrease[MS_DECREASE_MAX];
 
-    /** Stores all speed increase related information 
+    /** Stores all speed increase related information
      *  for each possible category. */
     SpeedIncrease  m_speed_increase[MS_INCREASE_MAX];
 
 public:
           MaxSpeed(AbstractKart *kart);
- 
+
     void  increaseMaxSpeed(unsigned int category, float add_speed,
                            float engine_force, float duration,
                            float fade_out_time);
-    void  instantSpeedIncrease(unsigned int category, 
+    void  instantSpeedIncrease(unsigned int category,
                                float add_speed, float speed_boost,
-                               float engine_force, float duration, 
+                               float engine_force, float duration,
                                float fade_out_time/*=1.0f*/);
-    void  setSlowdown(unsigned int category, float max_speed_fraction, 
+    void  setSlowdown(unsigned int category, float max_speed_fraction,
                       float fade_in_time);
     float getSpeedIncreaseTimeLeft(unsigned int category);
     void  update(float dt);

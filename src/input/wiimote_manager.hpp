@@ -47,18 +47,18 @@ class WiimoteManager
 private:
     /** List of all connected wiimotes. */
     std::vector<Wiimote*> m_wiimotes;
-    
+
     /** WiiUse wiimote handles */
     wiimote_t**     m_all_wiimote_handles;
     int             m_number_wiimotes;
-    
+
     // While the wiimote code can technically work without threading,
     // its too slow (high latency), but it is useful for debugging.
 #define WIIMOTE_THREADING
 #ifdef WIIMOTE_THREADING
     /** Wiimote state update thread */
     pthread_t       m_thread;
-    
+
     /** Shut the update thread? */
     bool            m_shut;
 #endif
@@ -74,19 +74,19 @@ private:
 public:
     WiimoteManager();
     ~WiimoteManager();
-    
+
 	/** Sets the wiimote to be enabled. */
 	static void enable() { m_enabled = true; }
 
 	/** Returns if the wii was enabled on the command line. */
 	static bool  isEnabled() { return m_enabled; }
-    
+
     void launchDetection(int timeout);
     void update();
     void cleanup();
 
     void enableAccelerometer(bool state);
-    
+
 	/** A simple listener to allow the user to connect wiimotes. It
 	 *  will display a feedback windows (# wiimotes connected or 'no wiimotes
 	 *  found').
@@ -104,7 +104,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of wiimotes connected. */
     unsigned int  getNumberOfWiimotes() const   {return m_wiimotes.size();}
-    
+
 };   // class WiimoteManager
 
 

@@ -42,37 +42,37 @@ class OptionsScreenInput2 : public GUIEngine::Screen,
                         public MessageDialog::IConfirmDialogListener
 {
     OptionsScreenInput2();
-    
+
     void updateInputButtons();
 
-    bool conflictsBetweenKbdConfig(PlayerAction action, PlayerAction from, 
+    bool conflictsBetweenKbdConfig(PlayerAction action, PlayerAction from,
                                    PlayerAction to);
 
     DeviceConfig* m_config;
-    
-    irr::core::stringw makeLabel(const irr::core::stringw &translatedName, 
+
+    irr::core::stringw makeLabel(const irr::core::stringw &translatedName,
                                  PlayerAction action) const;
 
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenInput2>;
-    
+
     void setDevice(DeviceConfig* config) { m_config = config; }
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, 
+    virtual void eventCallback(GUIEngine::Widget* widget,
                                const std::string& name, const int playerID) OVERRIDE;
-    
-    /** \brief implement optional callback from parent class 
+
+    /** \brief implement optional callback from parent class
      *  GUIEngine::Screen */
     virtual void unloaded() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
-    
-    /** \brief implement optional callback from parent class 
+
+    /** \brief implement optional callback from parent class
      *  GUIEngine::Screen */
     virtual bool onEscapePressed() OVERRIDE;
 
@@ -81,7 +81,7 @@ public:
       * Updates the input bindings accordingly with the sensed input.
       */
     void gotSensedInput(const Input& sensedInput);
-    
+
     /** \brief Implement IConfirmDialogListener callback */
     virtual void onConfirm() OVERRIDE;
 };

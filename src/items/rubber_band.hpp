@@ -43,7 +43,7 @@ private:
           RB_TO_TRACK}           /**< Rubber band is attached to track.      */
                         m_attached_state;
     /** True if plunger was fired backwards. */
-    bool                m_is_backward; 
+    bool                m_is_backward;
     /** If rubber band is attached to track, the coordinates. */
     Vec3                m_hit_position;
     /** The plunger the rubber band is attached to. */
@@ -60,7 +60,7 @@ private:
 
     /** The kart a plunger might have hit. */
     AbstractKart       *m_hit_kart;
-    /** Stores the end of the rubber band (i.e. the side attached to the 
+    /** Stores the end of the rubber band (i.e. the side attached to the
      *  plunger. */
     Vec3                m_end_position;
 

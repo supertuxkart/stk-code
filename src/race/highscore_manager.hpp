@@ -38,7 +38,7 @@ private:
     static const unsigned int CURRENT_HSCORE_FILE_VERSION = 3;
     typedef std::vector<Highscores*> type_all_scores;
     type_all_scores m_all_scores;
-    
+
     std::string m_filename;
     bool        m_can_write;
 
@@ -50,9 +50,9 @@ public:
                ~HighscoreManager();
     void        saveHighscores();
     Highscores *getHighscores(const Highscores::HighscoreType highscore_type,
-                              int num_karts, 
-                              const RaceManager::Difficulty difficulty, 
-                              const std::string trackName, 
+                              int num_karts,
+                              const RaceManager::Difficulty difficulty,
+                              const std::string trackName,
                               const int number_of_laps,
                               const bool reverse);
 };   // HighscoreManager

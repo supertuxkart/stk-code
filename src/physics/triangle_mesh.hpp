@@ -27,7 +27,7 @@
 
 class Material;
 
-/** 
+/**
  * \brief A special class to store a triangle mesh with a separate material per triangle.
  * \ingroup physics
  */
@@ -47,7 +47,7 @@ private:
 public:
          TriangleMesh();
         ~TriangleMesh();
-    void addTriangle(const btVector3 &t1, const btVector3 &t2, 
+    void addTriangle(const btVector3 &t1, const btVector3 &t2,
                      const btVector3 &t3, const btVector3 &n1,
                      const btVector3 &n2, const btVector3 &n3,
                      const Material* m);
@@ -60,20 +60,20 @@ public:
     btVector3 getInterpolatedNormal(unsigned int index,
                                     const btVector3 &position) const;
     // ------------------------------------------------------------------------
-    const Material* getMaterial(int n) const 
+    const Material* getMaterial(int n) const
                                           {return m_triangleIndex2Material[n];}
     // ------------------------------------------------------------------------
-    const btCollisionShape &getCollisionShape() const 
+    const btCollisionShape &getCollisionShape() const
                                           { return *m_collision_shape; }
     // ------------------------------------------------------------------------
     btCollisionShape &getCollisionShape() { return *m_collision_shape; }
     // ------------------------------------------------------------------------
     bool castRay(const btVector3 &from, const btVector3 &to,
-                 btVector3 *xyz, const Material **material, 
+                 btVector3 *xyz, const Material **material,
                  btVector3 *normal=NULL) const;
     // ------------------------------------------------------------------------
     /** Returns the points of the 'indx' triangle.
-     *  \param indx Index of the triangle to get. 
+     *  \param indx Index of the triangle to get.
      *  \param p1,p2,p3 On return the three points of the triangle. */
     void getTriangle(unsigned int indx, btVector3 *p1, btVector3 *p2,
                      btVector3 *p3) const

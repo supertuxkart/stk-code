@@ -41,29 +41,29 @@ private:
     bool refreshPlayerList();
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenPlayers>;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                                const int playerID) OVERRIDE;
-    
+
     /**
      * \brief Adds a new player (if 'player' is NULL) or renames an existing player (if 'player' is not NULL)
      * \return  whether adding was successful (can fail e.g. if trying to add a duplicate)
      */
     bool renamePlayer(const irr::core::stringw& newName,  PlayerProfile* player=NULL);
     void deletePlayer(PlayerProfile* player);
-    
+
     void selectPlayer(const irr::core::stringw& name);
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE;
-    
+
     /** \brief implement callback from EnterPlayerNameDialog::INewPlayerListener */
     virtual void onNewPlayerWithName(const irr::core::stringw& newName);
 };

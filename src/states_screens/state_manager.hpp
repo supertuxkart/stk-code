@@ -48,16 +48,16 @@ namespace GUIEngine
 const static int PLAYER_ID_GAME_MASTER = 0;
 
 /**
-  * \brief A concrete scene manager, derived from GUIEngine's 
+  * \brief A concrete scene manager, derived from GUIEngine's
   * AbastractSceneManager
   * \ingroup states_screens
   */
 class StateManager : public GUIEngine::AbstractStateManager
 {
-    
+
     void updateActivePlayerIDs();
 
-    
+
 public:
 
     /**
@@ -71,126 +71,126 @@ public:
     class ActivePlayer
     {
         friend class StateManager;
-        
+
         PlayerProfile *m_player;
         InputDevice   *m_device;
-    
+
         /** Pointer to the kart of this player, only valid during the game. */
         AbstractKart  *m_kart;
-        
+
         /** ID of this player within the list of active players */
         int m_id;
-        
+
         ActivePlayer(PlayerProfile* player, InputDevice* device);
-        
+
 #ifdef DEBUG
         unsigned int m_magic_number;
 #endif
-        
+
     public:
-    
+
         ~ActivePlayer();
-        
+
 #ifdef DEBUG
         bool ok()
         {
             return (m_magic_number == 0xAC1EF1AE);
         }   // ok
 #endif
-        // -------------------------------------------------------------------- 
+        // --------------------------------------------------------------------
         /** \return the identity of this active player */
-        PlayerProfile* getProfile() 
-        { 
-#ifdef DEBUG
-			assert(m_magic_number == 0xAC1EF1AE); 
-#endif
-			return m_player; 
-        }   // getProfile
-        
-        // -------------------------------------------------------------------- 
-        /** \return the identity of this active player */
-        const PlayerProfile* getConstProfile() const 
+        PlayerProfile* getProfile()
         {
 #ifdef DEBUG
-			assert(m_magic_number == 0xAC1EF1AE); 
+			assert(m_magic_number == 0xAC1EF1AE);
 #endif
-			return m_player; 
+			return m_player;
+        }   // getProfile
+
+        // --------------------------------------------------------------------
+        /** \return the identity of this active player */
+        const PlayerProfile* getConstProfile() const
+        {
+#ifdef DEBUG
+			assert(m_magic_number == 0xAC1EF1AE);
+#endif
+			return m_player;
         }   // getConstProfile
 
-        // -------------------------------------------------------------------- 
+        // --------------------------------------------------------------------
         /** Call to change the identity of this player (useful when player is
          *  selecting his identity) */
         void setPlayerProfile(PlayerProfile* player);
-        
-        // -------------------------------------------------------------------- 
+
+        // --------------------------------------------------------------------
         /** ID of this player within the list of active players */
-        int getID() const 
+        int getID() const
         {
 #ifdef DEBUG
-			assert(m_magic_number == 0xAC1EF1AE); 
+			assert(m_magic_number == 0xAC1EF1AE);
 #endif
-			return m_id; 
+			return m_id;
         }   // getID
-        // -------------------------------------------------------------------- 
-        
-        /** \return Which input device this player is using, or NULL if none 
+        // --------------------------------------------------------------------
+
+        /** \return Which input device this player is using, or NULL if none
          *  is set yet */
-        InputDevice* getDevice() const 
-        { 
-#ifdef DEBUG
-			assert(m_magic_number == 0xAC1EF1AE);
-#endif
-			return m_device; 
-        }   // getDevice
-         
-        // -------------------------------------------------------------------- 
-        void setDevice(InputDevice* device);
-        
-        // -------------------------------------------------------------------- 
-        /** Sets the kart for this player. */
-        void setKart(AbstractKart *kart) 
+        InputDevice* getDevice() const
         {
 #ifdef DEBUG
 			assert(m_magic_number == 0xAC1EF1AE);
 #endif
-			m_kart = kart; 
+			return m_device;
+        }   // getDevice
+
+        // --------------------------------------------------------------------
+        void setDevice(InputDevice* device);
+
+        // --------------------------------------------------------------------
+        /** Sets the kart for this player. */
+        void setKart(AbstractKart *kart)
+        {
+#ifdef DEBUG
+			assert(m_magic_number == 0xAC1EF1AE);
+#endif
+			m_kart = kart;
         }   // setKart
-        
-        // -------------------------------------------------------------------- 
+
+        // --------------------------------------------------------------------
         /** \return the kart of this player. Only valid while world exists. */
         AbstractKart* getKart()
-        { 
+        {
 #ifdef DEBUG
-			assert(m_magic_number == 0xAC1EF1AE); 
+			assert(m_magic_number == 0xAC1EF1AE);
 #endif
-            return m_kart; 
+            return m_kart;
         }   // getKart
 
     };   // ActivePlayer
 
     // ========================================================================
-    const PtrVector<ActivePlayer, HOLD>& getActivePlayers() 
+    const PtrVector<ActivePlayer, HOLD>& getActivePlayers()
                                  { return m_active_players; }
     ActivePlayer* getActivePlayer(const int id);
-    
+
     /** \return    the PlayerProfile of a given ActivePlayer.
       * \param id  the ID of the active player for whichyou want the profile
       */
     const PlayerProfile* getActivePlayerProfile(const int id);
-    
+
     int createActivePlayer(PlayerProfile *profile, InputDevice *device);
     void removeActivePlayer(int id);
 
     int activePlayerCount();
     void resetActivePlayers();
-    
+
     /** \return whether to reduce FPS at the moment
-      * \note   this can be useful to avoid being too CPU/GPU intensive in 
-      *         parts of the game that don't require high framerates, like 
+      * \note   this can be useful to avoid being too CPU/GPU intensive in
+      *         parts of the game that don't require high framerates, like
       *         menus
       */
     bool throttleFPS();
-    
+
     /** \brief implementing callback from base class AbstractStateManager */
     void escapePressed();
 
@@ -199,14 +199,14 @@ public:
 
     /** \brief implementing callback from base class AbstractStateManager */
     virtual void onStackEmptied();
-    
+
     /** \brief implementing callback from base class AbstractStateManager */
     virtual void onTopMostScreenChanged();
-    
+
     // singleton
     static StateManager* get();
     static void deallocate();
-    
+
 private:
     /**
      * A list of all currently playing players.

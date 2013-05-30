@@ -79,14 +79,14 @@ private:
         /** Stores the inital rotation of the object. */
         Vec3 m_initial_hpr;
     private:
-        float  getCubicBezier(float t, float p0, float p1, 
+        float  getCubicBezier(float t, float p0, float p1,
                               float p2, float p3) const;
-          void approximateBezier(float t0, float t1, 
+          void approximateBezier(float t0, float t1,
                                  const Vec3 &p0, const Vec3 &p1,
                                  const Vec3 &h0, const Vec3 &h2,
                                  unsigned int rec_level = 0);
     public:
-               IpoData(const XMLNode &curve, float fps, bool reverse); 
+               IpoData(const XMLNode &curve, float fps, bool reverse);
         void   readCurve(const XMLNode &node, bool reverse);
         void   readIPO(const XMLNode &node, float fps, bool reverse);
         float  approximateLength(float t0, float t1,
@@ -118,7 +118,7 @@ public:
              Ipo(const XMLNode &curve, float fps=25, bool reverse=false);
     virtual ~Ipo();
     Ipo     *clone();
-    void     update(float time, Vec3 *xyz=NULL, Vec3 *hpr=NULL, 
+    void     update(float time, Vec3 *xyz=NULL, Vec3 *hpr=NULL,
                                 Vec3 *scale=NULL);
     float    get(float time, unsigned int index) const;
     void     setInitialTransform(const Vec3 &xyz, const Vec3 &hpr);
@@ -128,7 +128,7 @@ public:
     /** Returns the raw data points for this IPO. */
     const std::vector<Vec3>& getPoints() const { return m_ipo_data->m_points; }
     // ------------------------------------------------------------------------
-    /** Returns the last specified time (i.e. not considering any extend 
+    /** Returns the last specified time (i.e. not considering any extend
      *  types). */
     float getEndTime() const { return m_ipo_data->m_end_time; }
 };   // Ipo

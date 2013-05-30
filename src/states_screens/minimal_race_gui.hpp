@@ -70,12 +70,12 @@ private:
     // -------------------------
     /** The mini map of the track. */
     video::ITexture *m_mini_map;
-    
-    /** The size of a single marker on the screen for AI karts, 
+
+    /** The size of a single marker on the screen for AI karts,
      *  need not be a power of 2. */
     int              m_marker_ai_size;
 
-    /** The size of a single marker on the screen or player karts, 
+    /** The size of a single marker on the screen or player karts,
      *  need not be a power of 2. */
     int              m_marker_player_size;
 
@@ -84,7 +84,7 @@ private:
 
     /** The height of the rendered mini map in pixels, must be a power of 2. */
     int              m_map_rendered_height;
-    
+
     /** Width of the map in pixels on the screen, need not be a power of 2. */
     int              m_map_width;
 
@@ -99,29 +99,29 @@ private:
 
     /** Used to display messages without overlapping */
     int              m_max_font_height;
-    
+
     /** previous position of icons */
     std::vector< core::vector2d<s32> > m_previous_icons_position;
-    
+
     /* Display informat for one player on the screen. */
     void drawEnergyMeter       (const AbstractKart *kart,
-                                const core::recti &viewport, 
+                                const core::recti &viewport,
                                 const core::vector2df &scaling);
     void drawRankLap           (const AbstractKart* kart,
                                 const core::recti &viewport);
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
     void drawGlobalTimer       ();
-    
+
 public:
 
          MinimalRaceGUI();
         ~MinimalRaceGUI();
     virtual void renderGlobal(float dt);
     virtual void renderPlayerView(const Camera *camera, float dt);
-        
+
     /** Returns the size of the texture on which to render the minimap to. */
-    virtual const core::dimension2du getMiniMapSize() const 
+    virtual const core::dimension2du getMiniMapSize() const
                   { return core::dimension2du(m_map_width, m_map_height); }
 };   // MinimalRaceGUI
 

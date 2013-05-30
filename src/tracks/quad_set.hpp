@@ -43,7 +43,7 @@ private:
     /** Pointer to the one instance of a quad set. */
     static QuadSet     *m_quad_set;
 
-    void getPoint(const XMLNode *xml, const std::string &attribute_name, 
+    void getPoint(const XMLNode *xml, const std::string &attribute_name,
                   Vec3 *result) const;
          QuadSet();
         ~QuadSet();
@@ -73,15 +73,15 @@ public:
     const Quad&  getQuad(int n) const {return *(m_all_quads[n]); }
     // ------------------------------------------------------------------------
     /** Return the minimum and maximum coordinates of this quad set. */
-    void         getBoundingBox(Vec3 *min, Vec3 *max) 
+    void         getBoundingBox(Vec3 *min, Vec3 *max)
                                { *min=m_min; *max=m_max;   }
     // ------------------------------------------------------------------------
     /** Returns the number of quads. */
-    unsigned int getNumberOfQuads() const 
+    unsigned int getNumberOfQuads() const
                                 {return (unsigned int)m_all_quads.size(); }
     // ------------------------------------------------------------------------
     /** Returns the center of quad n. */
-    const Vec3&  getCenterOfQuad(int n) const 
+    const Vec3&  getCenterOfQuad(int n) const
                                 {return m_all_quads[n]->getCenter();      }
     // ------------------------------------------------------------------------
     /** Returns the n-th. quad. */

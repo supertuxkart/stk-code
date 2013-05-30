@@ -73,7 +73,7 @@ private:
 public:
     LEAK_CHECK()
 
-          Request(HttpCommands command, int priority, 
+          Request(HttpCommands command, int priority,
                   bool manage_memory=true);
           Request(HttpCommands command, int priority, bool manage_memory,
                   const std::string &url, const std::string &save);

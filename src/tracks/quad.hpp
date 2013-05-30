@@ -33,13 +33,13 @@ class btTransform;
 /**
   * \ingroup tracks
   */
-class Quad 
+class Quad
 {
 private:
     /** The four points of a quad. */
     Vec3 m_p[4];
 
-    /** The center of all four points, which is used by the AI. 
+    /** The center of all four points, which is used by the AI.
      *  This saves some computations at runtime. */
     Vec3 m_center;
 
@@ -79,6 +79,6 @@ public:
     // ------------------------------------------------------------------------
     /** True if this quad should be ignored by the AI. */
     bool        letAIIgnore() const { return m_ai_ignore; }
-    
+
 };   // class Quad
 #endif

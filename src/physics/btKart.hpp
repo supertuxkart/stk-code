@@ -4,8 +4,8 @@
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
  * provided that the above copyright notice appear in all copies.
- * Erwin Coumans makes no representations about the suitability 
- * of this software for any purpose.  
+ * Erwin Coumans makes no representations about the suitability
+ * of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
 */
 #ifndef BT_KART_HPP
@@ -23,7 +23,7 @@ class btVehicleTuning;
 class Kart;
 struct btWheelContactPoint;
 
-/** rayCast vehicle, very special constraint that turn a rigidbody into a 
+/** rayCast vehicle, very special constraint that turn a rigidbody into a
  *  vehicle.
  */
 class btKart : public btActionInterface
@@ -42,7 +42,7 @@ public:
              m_maxSuspensionForce(btScalar(6000.))
         {
         }   // btVehicleTuning
-        
+
         btScalar    m_suspensionStiffness;
         btScalar    m_suspensionCompression;
         btScalar    m_suspensionDamping;
@@ -76,22 +76,22 @@ private:
      *  the first frame that the zipper is active). */
     btScalar            m_zipper_velocity;
 
-    /** The angular velocity to be applied when the kart skids. 
+    /** The angular velocity to be applied when the kart skids.
      *  0 means no skidding. */
     btScalar            m_skid_angular_velocity;
 
     /** True if the kart is currently skidding. This is used to detect
      *  the end of skidding (i.e. m_skid_angular_velocity=0 and
-     *  m_is_skidding=true), and triggers adjusting of the velocity 
+     *  m_is_skidding=true), and triggers adjusting of the velocity
      *  direction. */
     bool                m_is_skidding;
-    
+
     /** Sliding (skidding) will only be permited when this is true. Also check
-     *  the friction parameter in the wheels since friction directly affects 
+     *  the friction parameter in the wheels since friction directly affects
      *  skidding.
      */
     bool                m_allow_sliding;
-    
+
     /** An additional impulse that is applied for a certain amount of time. */
     btVector3           m_additional_impulse;
 
@@ -117,8 +117,8 @@ private:
     /** Index of the forward axis. */
     int                 m_indexForwardAxis;
 
-    /** The STK kart object which uses this vehicle. This is mostly used to 
-     *  get access to the kart properties, which also define physics 
+    /** The STK kart object which uses this vehicle. This is mostly used to
+     *  get access to the kart properties, which also define physics
      *  properties. */
     Kart               *m_kart;
 
@@ -129,11 +129,11 @@ private:
 
 public:
 
-    /** Constructor to create a car from an existing rigidbody. 
-     *  \param chassis The rigid body to use as chassis. 
+    /** Constructor to create a car from an existing rigidbody.
+     *  \param chassis The rigid body to use as chassis.
      *  \param raycaster The raycast object to use.
      *  \paran kart The STK kart object that uses this vehicle
-     *         (this is used to get access to the kart properties). 
+     *         (this is used to get access to the kart properties).
      */
                        btKart(btRigidBody* chassis,
                               btVehicleRaycaster* raycaster,
@@ -149,14 +149,14 @@ public:
     void               setSteeringValue(btScalar steering,int wheel);
     void               applyEngineForce(btScalar force, int wheel);
     const btTransform& getWheelTransformWS( int wheelIndex ) const;
-    void               updateWheelTransform(int wheelIndex, 
+    void               updateWheelTransform(int wheelIndex,
                                             bool interpolatedTransform=true);
     btWheelInfo&       addWheel(const btVector3& connectionPointCS0,
                                 const btVector3& wheelDirectionCS0,
                                 const btVector3& wheelAxleCS,
                                 btScalar suspensionRestLength,
                                 btScalar wheelRadius,
-                                const btVehicleTuning& tuning, 
+                                const btVehicleTuning& tuning,
                                 bool isFrontWheel);
     const btWheelInfo& getWheelInfo(int index) const;
     btWheelInfo&       getWheelInfo(int index);
@@ -174,7 +174,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** btActionInterface interface. */
-    virtual void updateAction(btCollisionWorld* collisionWorld, 
+    virtual void updateAction(btCollisionWorld* collisionWorld,
                               btScalar step)
     {
         (void) collisionWorld;
@@ -187,7 +187,7 @@ public:
     /** Returns the chassis (rigid) body. */
     inline btRigidBody* getRigidBody() { return m_chassisBody; }
     // ------------------------------------------------------------------------
-    /** Returns the chassis (rigid) body. */    
+    /** Returns the chassis (rigid) body. */
     const btRigidBody* getRigidBody() const { return m_chassisBody; }
     // ------------------------------------------------------------------------
     /** Returns the index of the right axis. */
@@ -211,7 +211,7 @@ public:
     // ------------------------------------------------------------------------
     int getUserConstraintId() const { return m_userConstraintId; }
     // ------------------------------------------------------------------------
-    /** Sets the angular velocity to be used when skidding 
+    /** Sets the angular velocity to be used when skidding
      *  (0 means no skidding). */
     void setSkidAngularVelocity(float v) {m_skid_angular_velocity = v; }
     // ------------------------------------------------------------------------

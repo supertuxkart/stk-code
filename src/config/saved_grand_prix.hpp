@@ -54,7 +54,7 @@ private:
     };   // SavedGPKart
 
 protected:
-    
+
     /**
      * For saving to config file.
      * WARNING : m_savedgp_group has to be declared before the other userconfigparams!
@@ -95,7 +95,7 @@ public:
     void setKarts(const std::vector<RaceManager::KartStatus> &kart_list);
     void clearKarts();
     void loadKarts(std::vector<RaceManager::KartStatus> & kart_list);
-    
+
     // ------------------------------------------------------------------------
     /** Returns the player id for this saved GP. */
     const std::string getPlayerID() const { return m_player_id; }
@@ -137,9 +137,9 @@ public:
     /** Finds the right SavedGrandPrix given the specified data, or
      *  NULL if no matching GP was found.
      */
-    static SavedGrandPrix* getSavedGP(const std::string &player, 
-                                const std::string &gpid, 
-                                int difficulty, int total_karts, 
+    static SavedGrandPrix* getSavedGP(const std::string &player,
+                                const std::string &gpid,
+                                int difficulty, int total_karts,
                                 int player_karts)
     {
         for (int n=0; n<UserConfigParams::m_saved_grand_prix_list.size(); n++)

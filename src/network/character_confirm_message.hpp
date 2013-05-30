@@ -24,10 +24,10 @@
 #include "network/message.hpp"
 
 
-/** This message is from the server to all clients to inform them about a 
+/** This message is from the server to all clients to inform them about a
  *  newly selected character. This means that this character is not available
  *  anymore. The message contains the hostid of the client who selected this
- *  character (0 in case of server), so that this message acts as a 
+ *  character (0 in case of server), so that this message acts as a
  *  confirmation for the corresponding client (or a reject if the message has
  *  a different hostid, meaning that another client selected the character
  *  earlier).
@@ -45,7 +45,7 @@ public:
      *  \param host_id Id of the host who selected this character.
      */
     CharacterConfirmMessage(const std::string &kart_name, int host_id)
-        : Message(Message::MT_CHARACTER_CONFIRM) 
+        : Message(Message::MT_CHARACTER_CONFIRM)
     {
         allocate(getStringLength(kart_name) + getCharLength());
         addString(kart_name);
@@ -53,7 +53,7 @@ public:
     }   // CharacterConfirmMessage
 
     // ------------------------------------------------------------------------
-    /** Unpacks a character confirm message. 
+    /** Unpacks a character confirm message.
      *  \param pkt Received enet packet.
      */
     CharacterConfirmMessage(ENetPacket* pkt):Message(pkt, MT_CHARACTER_CONFIRM)

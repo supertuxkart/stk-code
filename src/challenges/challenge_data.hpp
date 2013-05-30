@@ -48,11 +48,11 @@ public:
     class UnlockableFeature
     {
     public:
-        
+
         std::string        m_name; // internal name
         irr::core::stringw m_user_name; // not all types of feature have one
         RewardType         m_type;
-        
+
         const irr::core::stringw getUnlockedMessage() const;
     };   // UnlockableFeature
     // ------------------------------------------------------------------------
@@ -69,8 +69,8 @@ private:
      *  a race challenge). */
     enum ChallengeModeType
     {
-        CM_GRAND_PRIX, 
-        CM_SINGLE_RACE, 
+        CM_GRAND_PRIX,
+        CM_SINGLE_RACE,
         CM_ANY
     };
 
@@ -105,29 +105,29 @@ private:
 
     /** Number of trophies required to access this challenge */
     int m_num_trophies;
-    
+
     irr::core::stringw m_challenge_description;
-    
+
 public:
 #ifdef WIN32
                  ChallengeData(const std::string& filename);
 #else
                  ChallengeData(const std::string& filename) throw(std::runtime_error);
 #endif
-    
+
     virtual      ~ChallengeData() {}
-    
+
     /** sets the right parameters in RaceManager to try this challenge */
     void         setRace(RaceManager::Difficulty d) const;
-    
+
     virtual void check() const;
     virtual bool isChallengeFulfilled() const;
     virtual bool isGPFulfilled() const;
     void  addUnlockTrackReward(const std::string &track_name);
-    void  addUnlockModeReward(const std::string &internal_mode_name, 
+    void  addUnlockModeReward(const std::string &internal_mode_name,
                               const irr::core::stringw &user_mode_name);
     void  addUnlockGPReward(const std::string &gp_name);
-    void  addUnlockDifficultyReward(const std::string &internal_name, 
+    void  addUnlockDifficultyReward(const std::string &internal_name,
                                     const irr::core::stringw &user_name);
     void  addUnlockKartReward(const std::string &internal_name,
                               const irr::core::stringw &user_name);
@@ -135,13 +135,13 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the version number of this challenge. */
     int  getVersion() const { return m_version; }
-    
+
     // ------------------------------------------------------------------------
-    /** Returns the list of unlockable features for this challenge. 
+    /** Returns the list of unlockable features for this challenge.
      */
     const std::vector<UnlockableFeature>&
         getFeatures() const { return m_feature; }
-    
+
     // ------------------------------------------------------------------------
     /** Returns the id of the challenge. */
     const std::string &getId() const { return m_id; }
@@ -149,21 +149,21 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the id of this challenge. */
     void  setId(const std::string& s) { m_id = s; }
-    
+
     // ------------------------------------------------------------------------
     /** Returns the track associated with this challenge. */
-    const std::string& getTrackId() const 
-    { 
+    const std::string& getTrackId() const
+    {
         assert(m_mode==CM_SINGLE_RACE);
-        return m_track_id; 
+        return m_track_id;
     }   // getTrackId
 
     // ------------------------------------------------------------------------
     /** Returns the id of the grand prix associated with this challenge. */
-    const std::string& getGPId() const 
-    { 
+    const std::string& getGPId() const
+    {
         assert(m_mode==CM_GRAND_PRIX);
-        return m_gp_id; 
+        return m_gp_id;
     }   // getGPId
 
     // ------------------------------------------------------------------------
@@ -177,26 +177,26 @@ public:
     // ------------------------------------------------------------------------
     /** Get number of required trophies to start this challenge */
     int getNumTrophies() const { return m_num_trophies; }
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     /** Returns if this challenge is a grand prix. */
     bool isGrandPrix() const { return m_mode == CM_GRAND_PRIX; }
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     /** Returns if this challenge is a grand prix. */
     bool isSingleRace() const { return m_mode == CM_SINGLE_RACE; }
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     /** Returns the challenge mode of this challenge. */
     ChallengeModeType getMode() const { return m_mode; }
     // ------------------------------------------------------------------------
     /** Returns the minor mode of this challenge. */
     RaceManager::MinorRaceModeType getMinorMode()  const { return m_minor; }
     // ------------------------------------------------------------------------
-    /** Returns the description of this challenge. 
+    /** Returns the description of this challenge.
      */
-    const irr::core::stringw& getChallengeDescription() const 
+    const irr::core::stringw& getChallengeDescription() const
     {
         return m_challenge_description;
     }   // getChallengeDescription
-    
+
     // ------------------------------------------------------------------------
     /** Returns the minimum position the player must have in order to win.
      */
@@ -208,8 +208,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of karts to use.
      */
-    int getNumKarts(RaceManager::Difficulty difficulty) const 
-    { 
+    int getNumKarts(RaceManager::Difficulty difficulty) const
+    {
         return m_num_karts[difficulty];
     }   // getNumKarts
     // ------------------------------------------------------------------------
@@ -223,17 +223,17 @@ public:
     /** Return the energy that a kart must at least have at the end of a race.
      */
     int getEnergy(RaceManager::Difficulty difficulty) const
-    { 
+    {
         return m_energy[difficulty];
     }   // getEnergy
     // ------------------------------------------------------------------------
     /** Returns the name of the AI to use (used for boss challenge).
      */
     const std::string& getAIKartIdent(RaceManager::Difficulty difficulty) const
-    { 
-        return m_ai_kart_ident[difficulty]; 
+    {
+        return m_ai_kart_ident[difficulty];
     }
-    
+
 };   // ChallengeData
 
 #endif   // HEADER_CHALLENGE_DATA_HPP

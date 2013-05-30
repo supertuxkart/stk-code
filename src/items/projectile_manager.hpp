@@ -45,7 +45,7 @@ private:
     typedef std::vector<Flyable*>   Projectiles;
     typedef std::vector<HitEffect*> HitEffects;
 
-    /** The list of all active projectiles, i.e. projectiles which are 
+    /** The list of all active projectiles, i.e. projectiles which are
      *  currently moving on the track. */
     Projectiles      m_active_projectiles;
 
@@ -66,9 +66,9 @@ public:
     void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();
     // ------------------------------------------------------------------------
-    /** Adds a special hit effect to be shown. 
+    /** Adds a special hit effect to be shown.
      *  \param hit_effect The hit effect to be added. */
-    void             addHitEffect(HitEffect *hit_effect) 
+    void             addHitEffect(HitEffect *hit_effect)
                                 { m_active_hit_effects.push_back(hit_effect); }
 };
 

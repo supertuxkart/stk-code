@@ -29,31 +29,31 @@ class Attachment;
   *  This is the base class for a plugin into an attachment. Plugins are
   *  used to handle attachment specific data so that the attachment class
   *  that is used in every kart isn't overloaded. It could be done by
-  *  inheriting from Attachment, but then every time an attachment is 
+  *  inheriting from Attachment, but then every time an attachment is
   *  changed, we could delete and create a new SceneNode. To avoid this
   *  overhead, we use plugins to encapsulate additional code for some
   *  plugins.
   */
 class AttachmentPlugin
 {
-protected:    
+protected:
     /** Kart the attachment is attached to. */
     AbstractKart *m_kart;
 
 public:
     /** Constructor for a plugin. */
-    AttachmentPlugin(AbstractKart *kart) 
+    AttachmentPlugin(AbstractKart *kart)
     {
         m_kart       = kart;
     }
-    
+
     virtual ~AttachmentPlugin() {}
-    
+
     // ------------------------------------------------------------------------
     /** Updates a plugin. This is called once each time frame. If the
      *  function returns true, the attachment is discarded. */
     virtual bool updateAndTestFinished(float dt) = 0;
-    
+
     // ------------------------------------------------------------------------
     /** Called when the animation of the Attachment's node is done. */
     virtual void onAnimationEnd() {}

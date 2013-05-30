@@ -31,13 +31,13 @@ class XMLNode;
  */
 class DummyNetworkHttp : public INetworkHttp
 {
-    
+
 public:
     virtual ~DummyNetworkHttp() {}
     virtual void          startNetworkThread() {}
     virtual void          stopNetworkThread() {}
     virtual void          insertReInit() {}
-    virtual Request      *downloadFileAsynchron(const std::string &url, 
+    virtual Request      *downloadFileAsynchron(const std::string &url,
                                                 const std::string &save = "",
                                                 int   priority = 1,
                                                 bool  manage_memory=true) { return NULL; }

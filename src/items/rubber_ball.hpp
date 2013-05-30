@@ -43,10 +43,10 @@ private:
 
     /** A class variable to store the default interval size. */
     static float m_st_interval;
-    
+
     /** A class variable to store the default squash duration. */
     static float m_st_squash_duration;
-    
+
     /** A class variable to store the default squash slowdown. */
     static float m_st_squash_slowdown;
 
@@ -62,7 +62,7 @@ private:
     static float m_st_max_height_difference;
 
     /** Distance between ball and target at which the ball will start to
-     *  bounce faster (which makes more 'ping' sfx for the driver to 
+     *  bounce faster (which makes more 'ping' sfx for the driver to
      *  hear it coming closer, but also higher probability to hit the
      *  target and not fly over it). */
     static float m_st_fast_ping_distance;
@@ -86,10 +86,10 @@ private:
      *  that there are not too many rubber balls on the track in races with many
      *  karts. */
     static float m_time_between_balls;
-    
+
     /** This factor is used to influence how much the rubber ball should aim
      *  at its target early. It used the 'distance to center of track' of its
-     *  target, and adjusts the interpolation control points to be more or 
+     *  target, and adjusts the interpolation control points to be more or
      *  less at the same (relative) distance from center. If the factor is
      *  1, the rubber ball will aim to be at the same relative distance,
      *  if the factor is 0, the rubber ball will aim directly at the
@@ -110,7 +110,7 @@ private:
      *  m_control_points[3]. */
     int          m_last_aimed_graph_node;
 
-    /** Keep the last two, current, and next aiming points 
+    /** Keep the last two, current, and next aiming points
      *  for interpolation. */
     Vec3         m_control_points[4];
 
@@ -132,8 +132,8 @@ private:
     float        m_length_cp_2_3;
 
     /** The parameter for the spline, m_t in [0,1]. This is not directly
-     *  related to the time, since depending on the distance between 
-     *  the two control points different increments must be used for m_t. 
+     *  related to the time, since depending on the distance between
+     *  the two control points different increments must be used for m_t.
      *  For example, if the distance is 10 m, and assuming a speed of
      *  10 m/s for the ball, then each second must add '1' to m_t. If
      *  the distance on the other hand is 200 m, then 10/200 = 1/20 per
@@ -149,13 +149,13 @@ private:
     /** How long it takes from one bounce of the ball to the next. */
     float        m_interval;
 
-    /** This flag is set if the target is within the fast ping distance. It 
+    /** This flag is set if the target is within the fast ping distance. It
      *  will cause the rubber ball to decrese the jump height and intervall. */
     bool         m_fast_ping;
 
-    /** Distance to target. This is measured in terms of 'distance along 
-     *  track', but also takes the 3d distance and height difference into 
-     *  account (in case that the target is on a different part of the 
+    /** Distance to target. This is measured in terms of 'distance along
+     *  track', but also takes the 3d distance and height difference into
+     *  account (in case that the target is on a different part of the
      *  track) */
     float        m_distance_to_target;
 
@@ -169,7 +169,7 @@ private:
      *  it indicates that the ball is targeting another kart atm. */
     float        m_delete_timer;
 
-    /** The current maximum height of the ball. This value will be 
+    /** The current maximum height of the ball. This value will be
      *  reduced if the ball gets closer to the target. */
     float        m_current_max_height;
 
@@ -179,7 +179,7 @@ private:
      *  used to keep track of the state of this ball. */
     bool         m_aiming_at_target;
 
-    /** This variable counts how often a ball tunneled (in consecutive 
+    /** This variable counts how often a ball tunneled (in consecutive
      *  frames). If a ball tunnels a certain number of times, it is
      *  considered stuck and will be removed. */
     unsigned int m_tunnel_count;
@@ -189,10 +189,10 @@ private:
 
     /** Sound effect to be played when a ball hits a kart. */
     SFXBase     *m_hit_sfx;
-    
+
     void         computeTarget();
     void         updateDistanceToTarget();
-    unsigned int getSuccessorToHitTarget(unsigned int node_index, 
+    unsigned int getSuccessorToHitTarget(unsigned int node_index,
                                          float *f=NULL);
     void         getNextControlPoint();
     float        updateHeight();

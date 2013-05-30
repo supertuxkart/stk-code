@@ -41,7 +41,7 @@ class Explosion : public HitSFX
 private:
     float          m_remaining_time;
     scene::IParticleSystemSceneNode   *m_node;
-    
+
 public:
          Explosion(const Vec3& coord, const char* explosion_sound);
         ~Explosion();

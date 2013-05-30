@@ -47,23 +47,23 @@ const int CHALLENGE_DISTANCE_SQUARED = 20;
 class RaceGUIOverworld : public RaceGUIBase
 {
 private:
-    
+
     Material        *m_speed_meter_icon;
     Material        *m_speed_bar_icon;
-    
+
     bool             m_close_to_a_challenge;
-    
+
     /** Translated string 'lap' displayed every frame. */
     core::stringw    m_string_lap;
-    
+
     /** Translated string 'rank' displayed every frame. */
     core::stringw    m_string_rank;
-    
+
     // Minimap related variables
     // -------------------------
     /** The mini map of the track. */
     video::ITexture *m_mini_map;
-    
+
     video::ITexture *m_trophy1;
     video::ITexture *m_trophy2;
     video::ITexture *m_trophy3;
@@ -71,70 +71,70 @@ private:
     video::ITexture *m_open_challenge;
 
     video::ITexture* m_icons[5];
-    
-    /** The size of a single marker on the screen for AI karts, 
+
+    /** The size of a single marker on the screen for AI karts,
      *  need not be a power of 2. */
     int              m_marker_challenge_size;
-    
-    /** The size of a single marker on the screen or player karts, 
+
+    /** The size of a single marker on the screen or player karts,
      *  need not be a power of 2. */
     int              m_marker_player_size;
-    
+
     /** The width of the rendered mini map in pixels, must be a power of 2. */
     int              m_map_rendered_width;
-    
+
     /** The height of the rendered mini map in pixels, must be a power of 2. */
     int              m_map_rendered_height;
-    
+
     /** Width of the map in pixels on the screen, need not be a power of 2. */
     int              m_map_width;
-    
+
     /** Height of the map in pixels on the screen, need not be a power of 2. */
     int              m_map_height;
-    
+
     /** Distance of map from left side of screen. */
     int              m_map_left;
-    
+
     /** True if this is the first time the renderer is called. */
     bool             m_is_first_render_call;
 
     /** Distance of map from bottom of screen. */
     int              m_map_bottom;
-    
+
     int              m_trophy_points_width;
 
     /** The current challenge over which the mouse is hovering. */
     const OverworldChallenge *m_current_challenge;
-    
+
     /* Display informat for one player on the screen. */
     void drawEnergyMeter       (int x, int y, const AbstractKart *kart,
-                                const core::recti &viewport, 
+                                const core::recti &viewport,
                                 const core::vector2df &scaling);
-    
+
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
     void drawTrophyPoints      ();
-    
+
 public:
-    
+
     RaceGUIOverworld();
     ~RaceGUIOverworld();
     virtual void renderGlobal(float dt);
     virtual void renderPlayerView(const Camera *camera, float dt);
 
     // ------------------------------------------------------------------------
-    /** Returns the currently selected challenge data (or NULL if no is 
+    /** Returns the currently selected challenge data (or NULL if no is
      *  selected). */
-    const OverworldChallenge *getCurrentChallenge() const 
+    const OverworldChallenge *getCurrentChallenge() const
     {
         return m_current_challenge;
     }   // getCurrentChallenge
 
     // ------------------------------------------------------------------------
     /** Returns the size of the texture on which to render the minimap to. */
-    virtual const core::dimension2du getMiniMapSize() const 
+    virtual const core::dimension2du getMiniMapSize() const
     { return core::dimension2du(m_map_width, m_map_height); }
-    
+
 };   // RaceGUI
 
 #endif

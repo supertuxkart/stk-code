@@ -42,24 +42,24 @@ class Translations
 private:
     tinygettext::DictionaryManager m_dictionary_manager;
     tinygettext::Dictionary        m_dictionary;
-    
+
     irr::core::stringw m_converted_string;
     bool m_rtl;
-    
+
     std::string m_current_language_name;
-    
+
 public:
                        Translations();
-    
+
     const wchar_t     *w_gettext(const wchar_t* original, const char* context=NULL);
     const wchar_t     *w_gettext(const char* original, const char* context=NULL);
-    
+
     bool               isRTLLanguage() const;
     const wchar_t*     fribidize(const wchar_t* in_ptr);
     const wchar_t*     fribidize(const irr::core::stringw &str) { return fribidize(str.c_str()); }
 
     const std::vector<std::string>* getLanguageList() const;
-    
+
     std::string        getCurrentLanguageName();
 };   // Translations
 

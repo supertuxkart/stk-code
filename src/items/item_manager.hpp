@@ -39,7 +39,7 @@ class ItemManager : public NoCopy
 private:
     /** Stores all item models. */
     static std::vector<scene::IMesh *> m_item_mesh;
-    
+
     /** Stores all low-resolution item models. */
     static std::vector<scene::IMesh *> m_item_lowres_mesh;
 
@@ -58,11 +58,11 @@ public:
     // ------------------------------------------------------------------------
     /** Return an instance of the item manager (it does not automatically
      *  create one, call create for that). */
-    static ItemManager *get() { 
-        assert(m_item_manager); 
+    static ItemManager *get() {
+        assert(m_item_manager);
         return m_item_manager;
     }   // get
-    
+
     // ========================================================================
 private:
     /** The vector of all items of the current track. */
@@ -70,7 +70,7 @@ private:
     AllItemTypes m_all_items;
 
     /** Stores which items are on which quad. m_items_in_quads[#quads]
-     *  contains all items that are not on a quad. Note that this 
+     *  contains all items that are not on a quad. Note that this
      *  field is undefined if no QuadGraph exist, e.g. in battle mode. */
     std::vector< AllItemTypes > *m_items_in_quads;
 
@@ -90,10 +90,10 @@ private:
     void           setSwitchItems(const std::vector<int> &switch_items);
 
 public:
-    Item*          newItem         (Item::ItemType type, const Vec3& xyz, 
-                                    const Vec3 &normal, 
+    Item*          newItem         (Item::ItemType type, const Vec3& xyz,
+                                    const Vec3 &normal,
                                     AbstractKart* parent=NULL);
-    Item*          newItem         (const Vec3& xyz, float distance, 
+    Item*          newItem         (const Vec3& xyz, float distance,
                                     TriggerItemListener* listener);
     void           update          (float delta);
     void           checkItemHit    (AbstractKart* kart);
@@ -113,7 +113,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a reference to the array of all items on the specified quad.
      */
-    const AllItemTypes& getItemsInQuads(unsigned int n) const 
+    const AllItemTypes& getItemsInQuads(unsigned int n) const
     {
         assert(m_items_in_quads);
         assert(n<(*m_items_in_quads).size());

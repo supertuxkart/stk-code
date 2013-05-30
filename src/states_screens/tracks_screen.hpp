@@ -30,30 +30,30 @@ namespace GUIEngine { class Widget; }
 class TracksScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<TracksScreen>
 {
     friend class GUIEngine::ScreenSingleton<TracksScreen>;
-    
+
     TracksScreen();
-    
+
     /** adds the tracks from the current track group into the tracks ribbon */
     void buildTrackList();
-    
+
     std::deque<std::string> m_random_track_list;
-    
+
 public:
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                                const int playerID) OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
 
-    
+
     void setFocusOnTrack(const std::string& trackName);
     void setFocusOnGP(const std::string& gpName);
 

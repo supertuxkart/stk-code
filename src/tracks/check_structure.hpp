@@ -28,17 +28,17 @@ class XMLNode;
 class Track;
 class CheckManager;
 
-/** 
+/**
  * \brief Virtual base class for a check structure.
  *
  *  A check structure has a certain ype:
  *  CT_NEW_LAP  : triggering this check structure will cause a new lap to be
  *                counted. If this type is triggered, it will set itselt to
  *                inactive (which means it is not possible to count several
- *                laps by driving over the starting line forwardws and 
+ *                laps by driving over the starting line forwardws and
  *                backwards)
  *  CT_ACTIVATE:  Activates the specified other check structures.
- *  CT_TOGGLE:    Toggles the specified other check structures (active to 
+ *  CT_TOGGLE:    Toggles the specified other check structures (active to
  *                inactive and vice versa.
  *  CT_CANNON:    A check line that 'shoots' the kart to a specified location.
  *  CT_GOAL:      A goal line in soccer mode.
@@ -50,7 +50,7 @@ class CheckManager;
 class CheckStructure
 {
 public:
-    /** Different types of check structures: 
+    /** Different types of check structures:
      *  ACTIVATE: Activates another check structure (independent of
      *            the state that check structure is in)
      *  TOGGLE:   Switches (inverts) the state of another check structure.
@@ -80,12 +80,12 @@ protected:
     /** Stores the index of this check structure. This is only used for
      *  debugging (use --check-debug option). */
     unsigned int      m_index;
-    
+
 private:
     /** The type of this checkline. */
     CheckType         m_check_type;
 
-    /** Contains the indices of the corresponding check structures that 
+    /** Contains the indices of the corresponding check structures that
      *  get their state changed (activated or switched). */
     std::vector<int> m_check_structures_to_change_state;
 
@@ -113,7 +113,7 @@ public:
      *  \param indx     Index of the kart, can be used to store kart specific
      *                  additional data.
      */
-    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
+    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              unsigned int indx)=0;
     virtual void trigger(unsigned int kart_index);
     virtual void reset(const Track &track);

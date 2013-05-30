@@ -31,7 +31,7 @@ class Kart;
 class DemoWorld : public ProfileWorld
 {
 private:
-    /** True if demo mode should be aborted, e.g. because a key was 
+    /** True if demo mode should be aborted, e.g. because a key was
      *  pressed. */
     bool   m_abort;
 
@@ -70,7 +70,7 @@ public:
     // ------------------------------------------------------------------------
     static void setTracks(const std::vector<std::string> &tracks);
     // ------------------------------------------------------------------------
-    /** Enables demo mode after the specified amount of time (default 1 
+    /** Enables demo mode after the specified amount of time (default 1
      *  second).
      *  \param time The idle time after which demo mode should be started. */
     static void enableDemoMode(float time=1.0f) { m_max_idle_time = time; }

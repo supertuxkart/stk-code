@@ -43,29 +43,29 @@ private:
     bool         m_ok;
     bool         m_positional;
     float        m_defaultGain;
-    
+
     /** The OpenAL source contains this info, but if audio is disabled initially then
         the sound source won't be created and we'll be left with no clue when enabling
         sounds later */
     bool m_loop;
-    
+
     /** Contains a volume if set through the "volume" method, or a negative number if
      this method was not called.
      The OpenAL source contains this info, but if audio is disabled initially then
      the sound source won't be created and we'll be left with no clue when enabling
      sounds later. */
     float m_gain;
-    
+
     bool m_owns_buffer;
-    
+
 public:
                                   SFXOpenAL(SFXBuffer* buffer, bool positional, float gain,
                                             bool owns_buffer = false);
     virtual                      ~SFXOpenAL();
-    
+
     /** Late creation, if SFX was initially disabled */
     virtual bool                  init();
-    
+
     virtual void                  play();
     virtual void                  setLoop(bool status);
     virtual void                  stop();
@@ -79,9 +79,9 @@ public:
     virtual void                  setRolloff(float rolloff);
 
     virtual const SFXBuffer* getBuffer() const { return m_soundBuffer; }
-    
+
     LEAK_CHECK()
-    
+
 };   // SFXOpenAL
 
 #endif
