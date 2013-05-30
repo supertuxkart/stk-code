@@ -168,10 +168,15 @@ void Log::printMessage(int level, const char *component, const char *format,
     if(!m_file_stdout ||
         UserConfigParams::m_log_errors_to_console) // log to console & file
     {
+        VALIST out;
+        va_copy(out, va_list);
+
         setTerminalColor((LogLevel)level);
         printf("[%s] %s: ", names[level], component);
-        vprintf(format, va_list);
+        vprintf(format, out);
         resetTerminalColor();  // this prints a \n
+
+        va_end(out);
     }
     if(m_file_stdout)
     {
