@@ -1538,7 +1538,7 @@ int main(int argc, char *argv[] )
 #endif
 
     return 0 ;
-}
+}   // main
 
 #ifdef WIN32
 //routine for running under windows

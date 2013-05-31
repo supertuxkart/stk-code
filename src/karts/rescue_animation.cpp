@@ -82,7 +82,7 @@ RescueAnimation::~RescueAnimation()
             Camera *camera = Camera::getCamera(i);
             if(camera && camera->getKart()==m_kart &&
                 camera->getMode() != Camera::CM_FINAL)
-            camera->setMode(Camera::CM_NORMAL);
+                camera->setMode(Camera::CM_NORMAL);
         }
     }
 }   // ~RescueAnimation
