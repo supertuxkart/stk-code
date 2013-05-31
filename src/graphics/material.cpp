@@ -1014,8 +1014,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (UserConfigParams::m_pixel_shaders &&
-            video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
-            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
+            video_driver->queryFeature(video::EVDF_ARB_GLSL))
         {
             if (m_shaders[SHADER_SPHERE_MAP] == NULL)
             {
@@ -1094,8 +1093,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (UserConfigParams::m_pixel_shaders &&
-            video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
-            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
+            video_driver->queryFeature(video::EVDF_ARB_GLSL))
         {
             ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
             if (m_is_heightmap)
@@ -1269,8 +1267,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (UserConfigParams::m_pixel_shaders &&
-            video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
-            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
+            video_driver->queryFeature(video::EVDF_ARB_GLSL))
         {
             if (m_bubble_provider.find(mb) == m_bubble_provider.end())
             {
@@ -1303,8 +1300,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (UserConfigParams::m_pixel_shaders &&
-            video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
-            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
+            video_driver->queryFeature(video::EVDF_ARB_GLSL))
         {
             if (m_shaders[SHADER_WATER] == NULL)
             {
@@ -1341,8 +1337,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (UserConfigParams::m_pixel_shaders &&
-            video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
-            video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0))
+            video_driver->queryFeature(video::EVDF_ARB_GLSL))
         {
             if (m_shaders[SHADER_GRASS] == NULL)
             {

@@ -38,7 +38,6 @@ PostProcessing::PostProcessing(video::IVideoDriver* video_driver)
     // Check if post-processing is supported on this hardware
     m_supported = false;
     if( video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
-        video_driver->queryFeature(video::EVDF_PIXEL_SHADER_2_0) &&
         video_driver->queryFeature(video::EVDF_RENDER_TO_TARGET))
     {
         m_supported = true;
