@@ -572,7 +572,6 @@ int handleCmdLinePreliminary(int argc, char **argv)
             {
                 Log::fatal("main", "Error: --screensize argument must be "
                                    "given as WIDTHxHEIGHT");
-                exit(EXIT_FAILURE);
             }
         }
         else if (strcmp(argv[i], "--version") == 0 ||

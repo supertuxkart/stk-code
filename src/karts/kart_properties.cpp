@@ -376,7 +376,6 @@ void KartProperties::getAllData(const XMLNode * root)
             Log::fatal("KartProperties",
                        "Incorrect engine-power specifications for kart '%s'\n",
                        getIdent().c_str());
-            exit(-1);
         }
         engine_node->get("max-speed", &m_max_speed);
         if(m_max_speed.size()!=RaceManager::DIFFICULTY_COUNT)
@@ -384,7 +383,6 @@ void KartProperties::getAllData(const XMLNode * root)
             Log::fatal("KartProperties",
                        "Incorrect max-speed specifications for kart '%s'\n",
                        getIdent().c_str());
-            exit(-1);
         }
     }   // if getNode("engine")
 
@@ -458,7 +456,6 @@ void KartProperties::getAllData(const XMLNode * root)
             Log::fatal("KartProperties",
                        "Missing or incorrect value for impulse-type: '%s'.\n",
                        s.c_str());
-            exit(-1);
         }
     }
 
@@ -478,7 +475,6 @@ void KartProperties::getAllData(const XMLNode * root)
         {
             Log::fatal("KartProperties",
                        "Invalid plunger in-face-time specification.");
-            exit(-1);
         }
     }
 
@@ -573,14 +569,12 @@ void KartProperties::checkAllSet(const std::string &filename)
         Log::fatal("KartProperties",
                    "Missing default value for 'gear-switch-ratio' in '%s'.\n",
                    filename.c_str());
-        exit(-1);
     }
     if(m_gear_power_increase.size()==0)
     {
-        Log::error("KartProperties",
+        Log::fatal("KartProperties",
                    "Missing default value for 'gear-power-increase' in '%s'.\n",
                 filename.c_str());
-        exit(-1);
     }
     if(m_gear_switch_ratio.size()!=m_gear_power_increase.size())    {
         Log::error("KartProperties",
@@ -588,19 +582,17 @@ void KartProperties::checkAllSet(const std::string &filename)
                    "'gear-power-increase\n");
         Log::fatal("KartProperties", "in '%s' must be equal.\n",
                     filename.c_str());
-        exit(-1);
     }
     if(m_startup_boost.size()!=m_startup_times.size())
     {
         Log::error("KartProperties",
                  "Number of entried for 'startup times' and 'startup-boost\n");
         Log::fatal("KartProperties", "must be identical.\n");
-        exit(-1);
     }
 #define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                      \
         Log::fatal("KartProperties",                                \
                     "Missing default value for '%s' in '%s'.\n",    \
-                    strA,filename.c_str());exit(-1);                \
+                    strA,filename.c_str());                \
     }
 
     CHECK_NEG(m_mass,                       "mass"                          );

@@ -474,7 +474,6 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
         {
             Log::fatal("track", "I can handle the lack of driveline in single"
                 "kart mode, but not with AIs\n");
-            exit(-1);
         }
     }
     else
@@ -744,7 +743,6 @@ bool Track::loadMainTrack(const XMLNode &root)
         Log::fatal("track",
                    "Main track model '%s' in '%s' not found, aborting.\n",
                    track_node->getName().c_str(), model_name.c_str());
-        exit(-1);
     }
 
     // The mesh as returned does not have all mesh buffers with the same
@@ -1141,7 +1139,6 @@ bool Track::loadMainTrack(const XMLNode &root)
     if (m_track_mesh == NULL)
     {
         Log::fatal("track", "m_track_mesh == NULL, cannot loadMainTrack\n");
-        exit(-1);
     }
 
     m_gfx_effect_mesh->createCollisionShape();

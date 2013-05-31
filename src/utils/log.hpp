@@ -74,6 +74,8 @@ public:
         va_start(args, format);               \
         printMessage(LEVEL, component, format, args);    \
         va_end(args);                         \
+\
+        if (LEVEL == LL_FATAL) exit(1);       \
     }
     LOG(verbose, LL_VERBOSE);
     LOG(debug,   LL_DEBUG);

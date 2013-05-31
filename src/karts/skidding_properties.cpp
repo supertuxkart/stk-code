@@ -75,9 +75,9 @@ void SkiddingProperties::load(const XMLNode *skid_node)
 void SkiddingProperties::checkAllSet(const std::string &filename) const
 {
 #define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                            \
-        Log::error("Skidding_Properties", "Missing default value for '%s'"\
+        Log::fatal("Skidding_Properties", "Missing default value for '%s'"\
                    "in '%s'.",                                            \
-                   strA,filename.c_str());exit(-1);                       \
+                   strA,filename.c_str());                       \
     }
     CHECK_NEG(m_skid_increase,           "skid increase"                 );
     CHECK_NEG(m_skid_decrease,           "skid decrease"                 );
@@ -98,29 +98,25 @@ void SkiddingProperties::checkAllSet(const std::string &filename) const
                    "can be ignored.");
     if(m_skid_time_till_bonus.size()!=m_skid_bonus_speed.size())
     {
-        Log::error("Skidding_Properties", "Warning: skid time-till-bonus"
+        Log::fatal("Skidding_Properties", "Warning: skid time-till-bonus"
                    "and bonus-speed\n must have same number of elements.");
-        exit(-1);
     }
     if(m_skid_time_till_bonus.size()!=m_skid_bonus_time.size())
     {
-        Log::error("Skidding_Properties", "Warning: skid time-till-bonus"
+        Log::fatal("Skidding_Properties", "Warning: skid time-till-bonus"
                    "and bonus-time must\n have same number of elements.");
-        exit(-1);
     }
     if(m_skid_time_till_bonus.size()!=m_skid_bonus_force.size())
     {
-        Log::error("Skidding_Properties", "Warning: skid time-till-bonus"
+        Log::fatal("Skidding_Properties", "Warning: skid time-till-bonus"
                    "and bonus-force must\n have same number of elements.");
-        exit(-1);
     }
     for(unsigned int i=0; i<m_skid_time_till_bonus.size()-1; i++)
     {
         if(m_skid_time_till_bonus[i]>=m_skid_time_till_bonus[i+1])
         {
-            Log::error("Skidding_Properties", "Warning: skid time-till-bonus"
+            Log::fatal("Skidding_Properties", "Warning: skid time-till-bonus"
                        "not sorted.");
-            exit(-1);
         }
     }   // for i
 

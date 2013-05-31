@@ -150,7 +150,6 @@ X11::Window get_toplevel_parent(X11::Display* display, X11::Window window)
                    &parent, &children, &num_children))
          {
              Log::fatal("irr_driver", "XQueryTree error\n");
-             abort(); //change to whatever error handling you prefer
          }
          if (children) { //must test for null
              X11::XFree(children);
@@ -379,7 +378,6 @@ void IrrDriver::initDevice()
     if(!m_device)
     {
         Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
-        exit(-1);
     }
 
     m_scene_manager = m_device->getSceneManager();

@@ -82,7 +82,6 @@ void STKConfig::load(const std::string &filename)
     {
         Log::error("StkConfig", "FATAL ERROR while reading '%s':", filename.c_str());
         Log::fatal("StkConfig", "    %s", err.what());
-        exit(1);
     }
     delete root;
 
@@ -91,24 +90,21 @@ void STKConfig::load(const std::string &filename)
 
 #define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                   \
         Log::fatal("StkConfig", "Missing default value for '%s' in '%s'.",    \
-                   strA,filename.c_str());exit(-1);              \
+                   strA,filename.c_str());              \
     }
 
     if(m_score_increase.size()==0 || (int)m_score_increase.size()!=m_max_karts)
     {
         Log::fatal("StkConfig", "Not or not enough scores defined in stk_config");
-        exit(-1);
     }
     if(m_leader_intervals.size()==0)
     {
         Log::fatal("StkConfig", "No follow leader interval(s) defined in stk_config");
-        exit(-1);
     }
 
     if(m_switch_items.size()!=Item::ITEM_LAST-Item::ITEM_FIRST+1)
     {
         Log::fatal("StkConfig", "Wrong number of item switches defined in stk_config");
-        exit(-1);
     }
 
     CHECK_NEG(m_max_karts,                 "<karts max=..."             );
@@ -228,7 +224,6 @@ void STKConfig::getAllData(const XMLNode * root)
                 Log::error("StkConfig", "Incorrect GP point specification:");
                 Log::fatal("StkConfig", "from: %d  to: %d  points: %d",
                         from, to, points);
-                exit(-1);
             }
             for(int j=from; j<=to; j++)
                 m_score_increase.push_back(points);

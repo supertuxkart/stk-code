@@ -48,19 +48,16 @@ void Referee::init()
     if(filename=="")
     {
         Log::fatal("referee", "Can't find referee.xml, aborting.");
-        exit(-1);
     }
     XMLNode *node = file_manager->createXMLTree(filename);
     if(!node)
     {
         Log::fatal("referee", "Can't read XML file referee.xml, aborting.");
-        exit(-1);
     }
     if(node->getName()!="referee")
     {
         Log::fatal("referee", "The file referee.xml does not contain a referee"
                "node, aborting.");
-        exit(-1);
     }
     std::string model_filename;
     node->get("model", &model_filename);
@@ -71,7 +68,6 @@ void Referee::init()
     {
         Log::fatal("referee", "Can't find referee model '%s', aborting.",
                model_filename.c_str());
-        exit(-1);
     }
 
     // Translate the mesh so that the x/z middle point
@@ -109,7 +105,6 @@ void Referee::init()
     {
         Log::fatal("referee",
                    "Not enough colors for referee defined, aborting.");
-        exit(-1);
     }
     for(unsigned int i=0; i<3; i++)
     {
@@ -119,7 +114,6 @@ void Referee::init()
             Log::fatal("referee",
                        "Can't find texture '%s' for referee, aborting.",
                        colors[i].c_str());
-            exit(-1);
         }
         m_st_traffic_lights[i] = irr_driver->getTexture(full_path);
     }
