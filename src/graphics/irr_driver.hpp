@@ -99,7 +99,6 @@ private:
     std::vector<VideoMode> m_modes;
 
     void                  setupViewports();
-    video::E_DRIVER_TYPE  getEngineDriverType(int index);
 
     /** Whether the mouse cursor is currently shown */
     bool                  m_pointer_shown;

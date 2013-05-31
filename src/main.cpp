@@ -374,10 +374,6 @@ void cmdLineHelp (char* invocation)
     "  -v,  --version          Show version of SuperTuxKart.\n"
     "       --trackdir DIR     A directory from which additional tracks are "
                               "loaded.\n"
-    "       --renderer NUM     Choose the renderer. Valid renderers are:\n"
-    "                            Default: 0, OpenGL: 1, Direct3D9: 2, \n"
-    "                            Direct3D8: 3, Software: 4, \n"
-    "                            Burning's Software: 5, Null device: 6\n"
     "       --animations=n     Play karts' animations (All: 2, Humans only: 1,"
                               " Nobody: 0).\n"
     "       --gfx=n            Play other graphical effects like impact stars "
@@ -544,12 +540,6 @@ int handleCmdLinePreliminary(int argc, char **argv)
             UserConfigParams::m_fullscreen = false;
         }
 #endif
-        else if( !strcmp(argv[i], "--renderer") && (i+1 < argc)  )
-        {
-            Log::verbose("main", "You chose renderer %i\n", atoi(argv[i+1]));
-            UserConfigParams::m_renderer = atoi(argv[i+1]);
-            i++;
-        }
         else if ( (!strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
              && i+1<argc)
         {
@@ -1037,7 +1027,6 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--stk-config")&& i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--trackdir")  && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--kartdir")   && i+1<argc ) { i++; }
-        else if( !strcmp(argv[i], "--renderer")  && i+1<argc ) { i++; }
         else if( !strcmp(argv[i], "--debug=memory" )                       ) {}
         else if( !strcmp(argv[i], "--debug=addons" )                       ) {}
         else if( !strcmp(argv[i], "--debug=gui"    )                       ) {}

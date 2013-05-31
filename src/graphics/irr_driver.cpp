@@ -311,66 +311,46 @@ void IrrDriver::initDevice()
         m_device->drop();
         m_device  = NULL;
 
-        int num_drivers = 5;
+        SIrrlichtCreationParameters params;
 
-        // Test if user has chosen a driver or if we should try all to find
-        // a working one.
-        if( UserConfigParams::m_renderer != 0 ) num_drivers = 1;
-
-        // ---- open device
-        // Try different drivers: start with opengl, then DirectX
-        for(int driver_type=0; driver_type<num_drivers; driver_type++)
+        // Try 32 and, upon failure, 24 then 16 bit per pixels
+        for (int bits=32; bits>15; bits -=8)
         {
+            if(UserConfigParams::logMisc())
+                Log::verbose("irr_driver", "Trying to create device with "
+                             "%i bits\n", bits);
 
-            video::E_DRIVER_TYPE type;
-
-            // Test if user has chosen a driver or if we should try all to find a
-            // woring one.
-            type = getEngineDriverType(
-                UserConfigParams::m_renderer ? UserConfigParams::m_renderer
-                                             : driver_type                  );
-            // Try 32 and, upon failure, 24 then 16 bit per pixels
-            for (int bits=32; bits>15; bits -=8)
+            params.DriverType = EDT_OPENGL;
+            params.Stencilbuffer = false;
+            params.Bits          = bits;
+            params.EventReceiver = this;
+            params.Fullscreen    = UserConfigParams::m_fullscreen;
+            params.Vsync         = UserConfigParams::m_vsync;
+            params.WindowSize    =
+                core::dimension2du(UserConfigParams::m_width,
+                                   UserConfigParams::m_height);
+            switch ((int)UserConfigParams::m_antialiasing)
             {
-                if(UserConfigParams::logMisc())
-                    Log::verbose("irr_driver", "Trying to create device with "
-                                 "%i bits\n", bits);
-                SIrrlichtCreationParameters params;
-                params.DriverType = type;
-                params.Stencilbuffer = false;
-                params.Bits          = bits;
-                params.EventReceiver = this;
-                params.Fullscreen    = UserConfigParams::m_fullscreen;
-                params.Vsync         = UserConfigParams::m_vsync;
-                params.WindowSize    =
-                    core::dimension2du(UserConfigParams::m_width,
-                                       UserConfigParams::m_height);
-                switch ((int)UserConfigParams::m_antialiasing)
-                {
-                case 0:
-                    break;
-                case 1:
-                    params.AntiAlias = 2;
-                    break;
-                case 2:
-                    params.AntiAlias = 4;
-                    break;
-                case 3:
-                    params.AntiAlias = 8;
-                    break;
-                default:
-                    Log::error("irr_driver",
-                               "[IrrDriver] WARNING: Invalid value for "
-                               "anti-alias setting : %i\n",
-                               (int)UserConfigParams::m_antialiasing);
-                }
+            case 0:
+                break;
+            case 1:
+                params.AntiAlias = 2;
+                break;
+            case 2:
+                params.AntiAlias = 4;
+                break;
+            case 3:
+                params.AntiAlias = 8;
+                break;
+            default:
+                Log::error("irr_driver",
+                           "[IrrDriver] WARNING: Invalid value for "
+                           "anti-alias setting : %i\n",
+                           (int)UserConfigParams::m_antialiasing);
+            }
+        }   // for bits=32, 24, 16
 
-                m_device = createDeviceEx(params);
-
-                if(m_device) break;
-            }   // for bits=32, 24, 16
-            if(m_device) break;
-        }   // for edt_types
+        m_device = createDeviceEx(params);
 
         // if still no device, try with a standard 800x600 window size, maybe
         // size is the problem
@@ -477,53 +457,6 @@ void IrrDriver::initDevice()
     m_device->getCursorControl()->setVisible(true);
     m_pointer_shown = true;
 }   // initDevice
-
-//-----------------------------------------------------------------------------
-video::E_DRIVER_TYPE IrrDriver::getEngineDriverType( int index )
-{
-    video::E_DRIVER_TYPE type;
-    std::string rendererName = "";
-
-    // Choose the driver type.
-    switch(index)
-    {
-        // TODO Change default renderer dependen on operating system?
-        // Direct3D9 for Windows and OpenGL for Unix like systems?
-        case 0:
-            type = video::EDT_OPENGL;
-            rendererName = "OpenGL";
-            break;
-        case 1:
-            type = video::EDT_OPENGL;
-            rendererName = "OpenGL";
-            break;
-        case 2:
-            type = video::EDT_DIRECT3D9;
-            rendererName = "Direct3D9";
-            break;
-        case 3:
-            type = video::EDT_DIRECT3D8;
-            rendererName = "Direct3D8";
-            break;
-        case 4:
-            type = video::EDT_SOFTWARE;
-            rendererName = "Software";
-            break;
-        case 5:
-            type = video::EDT_BURNINGSVIDEO;
-            rendererName = "Burning's Video Software";
-            break;
-        default:
-            type = video::EDT_NULL;
-            rendererName = "Null Device";
-    }
-
-    // Ouput which render will be tried.
-    Log::verbose("irr_driver", "Trying %s rendering.", rendererName.c_str());
-
-    return type;
-}
-
 
 //-----------------------------------------------------------------------------
 void IrrDriver::showPointer()
