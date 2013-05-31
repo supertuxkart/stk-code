@@ -112,6 +112,7 @@ Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent)
         m_node[r] = irr_driver->addPerCameraMesh(mesh,
                                                  camera->getCameraSceneNode(),
                                                  parent);
+        m_node[r]->setAutomaticCulling(0);
         mesh->drop();
 
         buffer->drop();
