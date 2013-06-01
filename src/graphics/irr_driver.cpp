@@ -202,7 +202,7 @@ void IrrDriver::updateConfigIfRelevant()
         }
 #elif defined(__linux__) && !defined(ANDROID)
         using namespace X11;
-        const SExposedVideoData& videoData =
+        const video::SExposedVideoData& videoData =
             m_device->getVideoDriver()->getExposedVideoData();
         Display* display = (Display*)videoData.OpenGLLinux.X11Display;
         XWindowAttributes xwa;
@@ -388,7 +388,7 @@ void IrrDriver::initDevice()
 #if defined(__linux__) && !defined(ANDROID)
         // Set class hints on Linux, used by Window Managers.
         using namespace X11;
-        const SExposedVideoData& videoData = m_video_driver
+        const video::SExposedVideoData& videoData = m_video_driver
                                                 ->getExposedVideoData();
         XClassHint* classhint = XAllocClassHint();
         classhint->res_name = (char*)"SuperTuxKart";
@@ -508,7 +508,7 @@ bool IrrDriver::moveWindow(const int x, const int y)
     }
 #elif defined(__linux__) && !defined(ANDROID)
     using namespace X11;
-    const SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
+    const video::SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
     // TODO: Actually handle possible failure
     XMoveWindow((Display*)videoData.OpenGLLinux.X11Display,
                 videoData.OpenGLLinux.X11Window,
