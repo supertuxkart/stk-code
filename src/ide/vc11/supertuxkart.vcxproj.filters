@@ -867,6 +867,9 @@
     <ClCompile Include="..\..\input\wiimote.cpp">
       <Filter>Source Files\input</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\config\saved_grand_prix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
