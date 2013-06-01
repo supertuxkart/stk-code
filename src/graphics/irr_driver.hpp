@@ -103,6 +103,9 @@ private:
     /** Whether the mouse cursor is currently shown */
     bool                  m_pointer_shown;
 
+    /** Supports GLSL */
+    bool                  m_glsl;
+
     /** Internal method that applies the resolution in user settings. */
     void                 applyResolutionSettings();
     void                 createListOfVideoModes();
@@ -226,6 +229,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a pointer to the post processing object. */
     inline PostProcessing* getPostProcessing()  {return m_post_processing;}
+    // ------------------------------------------------------------------------
+
+    inline bool isGLSL() const { return m_glsl; }
     // ------------------------------------------------------------------------
 #ifdef DEBUG
     /** Removes debug meshes. */

@@ -381,6 +381,17 @@ void IrrDriver::initDevice()
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
+    m_glsl          = m_video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
+                      m_video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
+
+    if (m_glsl)
+    {
+        Log::info("irr_driver", "GLSL supported.");
+    }
+    else
+    {
+        Log::warn("irr_driver", "Too old GPU; using the fixed pipeline.");
+    }
 
     // Only change video driver settings if we are showing graphics
     if (!ProfileWorld::isNoGraphics())
@@ -1741,9 +1752,7 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
 
 bool IrrDriver::supportsSplatting()
 {
-    return UserConfigParams::m_pixel_shaders &&
-           m_video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
-           m_video_driver->queryFeature(video::EVDF_MULTITEXTURE );
+    return UserConfigParams::m_pixel_shaders && m_glsl;
 }
 
 // ----------------------------------------------------------------------------
