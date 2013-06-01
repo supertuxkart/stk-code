@@ -1079,7 +1079,7 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
         // FIXME check param, not name
         if(is_premul &&
             StringUtils::hasSuffix(filename.c_str(), ".png") &&
-            (img->getColorFormat() == irr::video::ECF_A8R8G8B8) &&
+            (img->getColorFormat() == video::ECF_A8R8G8B8) &&
             img->lock())
         {
             core::dimension2d<u32> dim = img->getDimension();
@@ -1101,7 +1101,7 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
         // Other formats can be premul, but the tasks can be non premul
         // So divide to get the separate RGBA (only possible if alpha!=0)
         else if(is_prediv &&
-            (img->getColorFormat() == irr::video::ECF_A8R8G8B8) &&
+            (img->getColorFormat() == video::ECF_A8R8G8B8) &&
             img->lock())
         {
             core::dimension2d<u32> dim = img->getDimension();
@@ -1344,7 +1344,7 @@ void IrrDriver::drawDebugMeshes()
 
 
         scene::ISkinnedMesh* smesh = static_cast<scene::ISkinnedMesh*>(mesh);
-        const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints =
+        const core::array< scene::ISkinnedMesh::SJoint * >& joints =
             smesh->getAllJoints();
 
         for (unsigned int j=0; j<joints.size(); j++)
@@ -1367,11 +1367,11 @@ void IrrDriver::drawDebugMeshes()
  *  \param id Index, which (%4) determines the color to use.
  */
 void IrrDriver::drawJoint(bool drawline, bool drawname,
-                          irr::scene::ISkinnedMesh::SJoint* joint,
+                          scene::ISkinnedMesh::SJoint* joint,
                           scene::ISkinnedMesh* mesh, int id)
 {
-    irr::scene::ISkinnedMesh::SJoint* parent = NULL;
-    const core::array< irr::scene::ISkinnedMesh::SJoint * >& joints
+    scene::ISkinnedMesh::SJoint* parent = NULL;
+    const core::array< scene::ISkinnedMesh::SJoint * >& joints
         = mesh->getAllJoints();
     for (unsigned int j=0; j<joints.size(); j++)
     {
@@ -1861,9 +1861,9 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         ->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f),
                             10000.0f /* radius */);
     m_light->getLightData().DiffuseColor
-        = irr::video::SColorf(0.5f, 0.5f, 0.5f, 0.5f);
+        = video::SColorf(0.5f, 0.5f, 0.5f, 0.5f);
     m_light->getLightData().SpecularColor
-        = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+        = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
 
     m_rtt_main_node->setMaterialFlag(video::EMF_GOURAUD_SHADING , true);
     m_rtt_main_node->setMaterialFlag(video::EMF_LIGHTING, true);
