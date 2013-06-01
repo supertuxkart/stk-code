@@ -444,6 +444,9 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
         next_xyz->setZ(getXYZ().getZ() + old_2d.Y*dt*m_speed);
     }   // if fabsf(angle) > m_st_target_angle_max*dt
 
+    assert(!isnan((*next_xyz)[0]));
+    assert(!isnan((*next_xyz)[1]));
+    assert(!isnan((*next_xyz)[2]));
 }   // moveTowardsTarget
 
 // ----------------------------------------------------------------------------
@@ -479,6 +482,10 @@ void RubberBall::interpolate(Vec3 *next_xyz, float dt)
                          +4*m_control_points[2] -  m_control_points[3])*m_t*m_t
                       + (-  m_control_points[0] +  m_control_points[2])*m_t
                       +   2*m_control_points[1]                              );
+                      
+    assert(!isnan((*next_xyz)[0]));
+    assert(!isnan((*next_xyz)[1]));
+    assert(!isnan((*next_xyz)[2]));
 }   // interpolate
 
 // ----------------------------------------------------------------------------
