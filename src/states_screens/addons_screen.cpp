@@ -379,7 +379,7 @@ void AddonsScreen::setLastSelected()
     {
         GUIEngine::ListWidget* list =
             getWidget<GUIEngine::ListWidget>("list_addons");
-		list->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        list->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
         list->setSelectionID(m_selected_index);
     }
 }   // setLastSelected
