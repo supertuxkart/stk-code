@@ -37,6 +37,7 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 
+#include <ISceneManager.h>
 #include <ISceneNode.h>
 
 #include <map>
@@ -280,6 +281,17 @@ void InputManager::handleStaticAction(int key, int value)
                 control_is_pressed)
                 UserConfigParams::m_profiler_enabled =
                                          !UserConfigParams::m_profiler_enabled;
+            break;
+        case KEY_HOME:
+            if (value)
+            {
+                video::SOverrideMaterial &mat =
+                    irr_driver->getVideoDriver()->getOverrideMaterial();
+
+                mat.Material.Wireframe ^= 1;
+                mat.EnableFlags = video::EMF_WIREFRAME;
+                mat.EnablePasses = scene::ESNRP_SOLID | scene::ESNRP_TRANSPARENT;
+            }
             break;
         default:
             break;
