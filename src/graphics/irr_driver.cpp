@@ -1589,7 +1589,7 @@ void IrrDriver::update(float dt)
     // =====================================================
     if (world && world->getNumKarts() == 0)
     {
-        m_video_driver->beginScene(/*backBuffer clear*/false, /*zBuffer*/true,
+        m_video_driver->beginScene(/*backBuffer clear*/true, /*zBuffer*/true,
                                    world->getClearColor());
         m_scene_manager->drawAll();
         GUIEngine::render(dt);
@@ -1600,7 +1600,7 @@ void IrrDriver::update(float dt)
              GUIEngine::getCurrentScreen()->needs3D())
     {
         //printf("Screen that needs 3D\n");
-        m_video_driver->beginScene(/*backBuffer clear*/false, /*zBuffer*/true,
+        m_video_driver->beginScene(/*backBuffer clear*/true, /*zBuffer*/true,
                                    video::SColor(0,0,0,255));
         m_scene_manager->drawAll();
         GUIEngine::render(dt);
@@ -1610,11 +1610,6 @@ void IrrDriver::update(float dt)
 
     const bool inRace = world!=NULL;
 
-    // With bullet debug view we have to clear the back buffer, but
-    // that's not necessary for non-debug
-    bool back_buffer_clear = inRace && (world->getPhysics()->isDebug() ||
-                                        world->clearBackBuffer()         );
-
     if (inRace)
     {
         // Start the RTT for post-processing.
@@ -1623,7 +1618,7 @@ void IrrDriver::update(float dt)
         m_post_processing->beginCapture();
     }
 
-    m_video_driver->beginScene(back_buffer_clear, /*zBuffer*/ true,
+    m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
                                world ? world->getClearColor()
                                      : video::SColor(255,100,101,140));
 

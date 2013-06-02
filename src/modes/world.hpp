@@ -123,8 +123,6 @@ protected:
         there are scene nodes). */
     RaceGUIBase *m_saved_race_gui;
 
-    bool     m_clear_back_buffer;
-
     irr::video::SColor m_clear_color;
 
     /** Pausing/unpausing are not done immediately, but at next udpdate. The
@@ -297,9 +295,6 @@ public:
     /** \return whether this world can generate/have highscores */
     bool useHighScores() const { return m_use_highscores; }
     // ------------------------------------------------------------------------
-    /** Returns if this mode needs to clear the back buffer. */
-    bool clearBackBuffer() const { return m_clear_back_buffer; }
-    // ------------------------------------------------------------------------
     /** Returns the color to clear the back buffer. */
     const irr::video::SColor& getClearColor() const { return m_clear_color; }
     // ------------------------------------------------------------------------
@@ -307,7 +302,6 @@ public:
     void setClearbackBufferColor(irr::video::SColor color)
     {
         m_clear_color       = color;
-        m_clear_back_buffer = true;
     }
     // ------------------------------------------------------------------------
     /** Override if you want to know when a kart presses fire */
