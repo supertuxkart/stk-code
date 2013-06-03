@@ -211,6 +211,7 @@
     <ClCompile Include="..\..\addons\request.cpp" />
     <ClCompile Include="..\..\challenges\game_slot.cpp" />
     <ClCompile Include="..\..\config\player.cpp" />
+    <ClCompile Include="..\..\config\saved_grand_prix.cpp" />
     <ClCompile Include="..\..\graphics\hardware_skinning.cpp" />
     <ClCompile Include="..\..\graphics\hit_sfx.cpp" />
     <ClCompile Include="..\..\graphics\lod_node.cpp" />
@@ -456,6 +457,7 @@
     <ClInclude Include="..\..\addons\news_manager.hpp" />
     <ClInclude Include="..\..\addons\request.hpp" />
     <ClInclude Include="..\..\challenges\game_slot.hpp" />
+    <ClInclude Include="..\..\config\saved_grand_prix.hpp" />
     <ClInclude Include="..\..\graphics\hardware_skinning.hpp" />
     <ClInclude Include="..\..\graphics\hit_effect.hpp" />
     <ClInclude Include="..\..\graphics\hit_sfx.hpp" />
