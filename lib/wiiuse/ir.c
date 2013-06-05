@@ -598,8 +598,8 @@ static void fix_rotated_ir_dots(struct ir_dot_t* dot, float ang) {
 		return;
 	}
 
-	s = sinf(WIIUSE_DEGREE_TO_RAD(ang));
-	c = cosf(WIIUSE_DEGREE_TO_RAD(ang));
+	s = sinf(DEGREE_TO_RAD(ang));
+	c = cosf(DEGREE_TO_RAD(ang));
 
 	/*
 	 *	[ cos(theta)  -sin(theta) ][ ir->rx ]
@@ -709,7 +709,7 @@ static float ir_distance(struct ir_dot_t* dot) {
 	xd = dot[i2].x - dot[i1].x;
 	yd = dot[i2].y - dot[i1].y;
 
-	return sqrtf((float)(xd * xd + yd * yd));
+	return sqrtf(xd * xd + yd * yd);
 }
 
 
@@ -789,5 +789,5 @@ float calc_yaw(struct ir_t* ir) {
 	x = (float)(ir->ax - 512);
 	x = x * (ir->z / 1024.0f);
 
-	return WIIUSE_RAD_TO_DEGREE(atanf(x / ir->z));
+	return RAD_TO_DEGREE(atanf(x / ir->z));
 }

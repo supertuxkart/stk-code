@@ -49,6 +49,7 @@
 #include <sys/time.h>                   /* for struct timeval */
 #include <unistd.h>                     /* for close, write */
 #include <errno.h>
+#include <stdbool.h>
 
 static int wiiuse_os_connect_single(struct wiimote_t* wm, char* address);
 
@@ -99,13 +100,30 @@ int wiiuse_os_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
 
 	/* display discovered devices */
 	for (i = 0; (i < found_devices) && (found_wiimotes < max_wiimotes); ++i) {
-		if ((scan_info[i].dev_class[0] == WM_DEV_CLASS_0) &&
-		        (scan_info[i].dev_class[1] == WM_DEV_CLASS_1) &&
-		        (scan_info[i].dev_class[2] == WM_DEV_CLASS_2)) {
+		bool is_wiimote_regular =   (scan_info[i].dev_class[0] == WM_DEV_CLASS_0) &&
+									(scan_info[i].dev_class[1] == WM_DEV_CLASS_1) &&
+									(scan_info[i].dev_class[2] == WM_DEV_CLASS_2);
+		
+		bool is_wiimote_plus =      (scan_info[i].dev_class[0] == WM_PLUS_DEV_CLASS_0) &&
+									(scan_info[i].dev_class[1] == WM_PLUS_DEV_CLASS_1) &&
+									(scan_info[i].dev_class[2] == WM_PLUS_DEV_CLASS_2);
+		if (is_wiimote_regular || is_wiimote_plus) {
 			/* found a device */
 			ba2str(&scan_info[i].bdaddr, wm[found_wiimotes]->bdaddr_str);
+			
+			const char* str_type;
+			if(is_wiimote_regular)
+			{
+				wm[found_wiimotes]->type = WIIUSE_WIIMOTE_REGULAR;
+				str_type = " (regular wiimote)";
+			}
+			else if(is_wiimote_plus)
+			{
+				wm[found_wiimotes]->type = WIIUSE_WIIMOTE_MOTION_PLUS_INSIDE;
+				str_type = " (motion plus inside)";
+			}
 
-			WIIUSE_INFO("Found wiimote (%s) [id %i].", wm[found_wiimotes]->bdaddr_str, wm[found_wiimotes]->unid);
+			WIIUSE_INFO("Found wiimote (type: %s) (%s) [id %i].", str_type, wm[found_wiimotes]->bdaddr_str, wm[found_wiimotes]->unid);
 
 			wm[found_wiimotes]->bdaddr = scan_info[i].bdaddr;
 			WIIMOTE_ENABLE_STATE(wm[found_wiimotes], WIIMOTE_STATE_DEV_FOUND);

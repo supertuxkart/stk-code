@@ -90,7 +90,7 @@ int wiiuse_os_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
 
 		/* get the size of the data block required */
 		i = SetupDiGetDeviceInterfaceDetail(device_info, &device_data, NULL, 0, &len, NULL);
-		detail_data = (SP_DEVICE_INTERFACE_DETAIL_DATA*)malloc(len);
+		detail_data = (SP_DEVICE_INTERFACE_DETAIL_DATA_A*)malloc(len);
 		detail_data->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
 
 		/* query the data for this device */
@@ -115,7 +115,7 @@ int wiiuse_os_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
 			/* this is a wiimote */
 			wm[found]->dev_handle = dev;
 
-			wm[found]->hid_overlap.hEvent = CreateEvent(NULL, 1, 1, L"");
+			wm[found]->hid_overlap.hEvent = CreateEvent(NULL, 1, 1, "");
 			wm[found]->hid_overlap.Offset = 0;
 			wm[found]->hid_overlap.OffsetHigh = 0;
 

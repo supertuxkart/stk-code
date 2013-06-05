@@ -159,6 +159,8 @@ struct wiimote_t** wiiuse_init(int wiimotes) {
 		wm[i]->accel_threshold = 5;
 
 		wm[i]->accel_calib.st_alpha = WIIUSE_DEFAULT_SMOOTH_ALPHA;
+		
+		wm[i]->type = WIIUSE_WIIMOTE_REGULAR;
 	}
 
 	return wm;

@@ -225,6 +225,7 @@ void wiiuse_handshake(struct wiimote_t* wm, byte* data, uint16_t len) {
 	}
 
 	/* step 1 - calibration of accelerometers */
+	if(wm->type != WIIUSE_WIIMOTE_MOTION_PLUS_INSIDE)	// MotionPlus Inside wiimotes don't answer to that
 	{
 		struct accel_t* accel = &wm->accel_calib;
 
