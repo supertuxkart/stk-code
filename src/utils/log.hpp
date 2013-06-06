@@ -67,16 +67,16 @@ public:
                              const char *format, VALIST va_list);
     // ------------------------------------------------------------------------
     /** A simple macro to define the various log functions. */
-#define LOG(NAME, LEVEL)                      \
+#define LOG(NAME, LEVEL)                                             \
     static void NAME(const char *component, const char *format, ...) \
-    {                                         \
-        if(LEVEL < m_min_log_level) return;   \
-        va_list args;                         \
-        va_start(args, format);               \
-        printMessage(LEVEL, component, format, args);    \
-        va_end(args);                         \
-\
-        if (LEVEL == LL_FATAL) exit(1);       \
+    {                                                                \
+        if(LEVEL < m_min_log_level) return;                          \
+        va_list args;                                                \
+        va_start(args, format);                                      \
+        printMessage(LEVEL, component, format, args);                \
+        va_end(args);                                                \
+                                                                     \
+        if (LEVEL == LL_FATAL) exit(1);                              \
     }
     LOG(verbose, LL_VERBOSE);
     LOG(debug,   LL_DEBUG);
