@@ -542,7 +542,7 @@ void ThreeStrikesBattle::moveKartAfterRescue(AbstractKart* kart)
     kart->getBody()->setCenterOfMassTransform(pos);
 
     //project kart to surface of track
-    bool kart_over_ground = m_physics->projectKartDownwards(kart);
+    bool kart_over_ground = m_track->findGround(kart);
 
     if (kart_over_ground)
     {

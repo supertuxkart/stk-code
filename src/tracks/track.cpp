@@ -47,6 +47,8 @@ using namespace irr;
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
 #include "items/item_manager.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/world.hpp"
@@ -2004,3 +2006,65 @@ const core::vector3df& Track::getSunRotation()
 {
     return m_sun->getRotation();
 }
+//-----------------------------------------------------------------------------
+/** Determines if the kart is over ground.
+ *  Used in setting the starting positions of all the karts.
+ *  \param k The kart to project downward.
+ *  \return True of the kart is on terrain.
+ */
+
+bool Track::findGround(AbstractKart *kart)
+{
+    btVector3 to(kart->getXYZ());
+    to.setY(-100000.f);
+
+    // Material and hit point are not needed;
+    const Material *m;
+    Vec3 hit_point, normal;
+    bool over_ground = m_track_mesh->castRay(kart->getXYZ(), to, &hit_point, 
+                                             &m, &normal);
+    const Vec3 &xyz = kart->getXYZ();
+    if(!over_ground || !m)
+    {
+        Log::warn("physics", "Kart at (%f %f %f) can not be dropped.",
+                  xyz.getX(),xyz.getY(),xyz.getZ());
+        return false;
+    }
+
+    // Check if the material the kart is about to be placed on would trigger
+    // a reset. If so, this is not a valid position.
+    if(m->isDriveReset())
+    {
+        Log::warn("physics","Kart at (%f %f %f) over reset terrain '%s'",
+                   xyz.getX(),xyz.getY(),xyz.getZ(),
+            m->getTexFname().c_str());
+        return false;
+    }
+
+    // See if the kart is too high above the ground - it would drop
+    // too long.
+    if(xyz.getY() - hit_point.getY() > 5)
+    {
+        Log::warn("physics", 
+                  "Kart at (%f %f %f) is too high above ground at (%f %f %f)",
+                  xyz.getX(),xyz.getY(),xyz.getZ(),
+                  hit_point.getX(),hit_point.getY(),hit_point.getZ());
+        return false;
+    }
+
+
+        btTransform t = kart->getBody()->getCenterOfMassTransform();
+        // The computer offset is slightly too large, it should take
+        // the default suspension rest insteat of suspension rest (i.e. the
+        // length of the suspension with the weight of the kart resting on
+        // it). On the other hand this initial bouncing looks nice imho
+        // - so I'll leave it in for now.
+        float offset = kart->getKartProperties()->getSuspensionRest() +
+                       kart->getKartProperties()->getWheelRadius();
+        t.setOrigin(hit_point+Vec3(0, offset, 0) );
+        kart->getBody()->setCenterOfMassTransform(t);
+        kart->setTrans(t);
+
+    return true;
+}   // findGround
+

@@ -164,7 +164,6 @@ public:
     void  nextDebugMode    () {m_debug_drawer->nextDebugMode(); }
     /** Returns true if the debug drawer is enabled. */
     bool  isDebug() const     {return m_debug_drawer->debugEnabled(); }
-    bool  projectKartDownwards(const AbstractKart *k);
     virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies,
                                 btPersistentManifold** manifold,int numManifolds,
                                 btTypedConstraint** constraints,int numConstraints,

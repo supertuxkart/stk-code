@@ -249,18 +249,6 @@ void Physics::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-/** Project all karts downwards onto the surface below.
- *  Used in setting the starting positions of all the karts.
- */
-
-bool Physics::projectKartDownwards(const AbstractKart *k)
-{
-    btVector3 hell(0, -10000, 0);
-    return k->getVehicle()->projectVehicleToSurface(hell,
-                                                    /*allow translation*/true);
-} //projectKartsDownwards
-
-//-----------------------------------------------------------------------------
 /** Handles the special case of two karts colliding with each other, which
  *  means that bombs must be passed on. If both karts have a bomb, they'll
  *  explode immediately. This function is called from physics::update() on the

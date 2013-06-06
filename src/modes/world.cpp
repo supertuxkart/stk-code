@@ -496,7 +496,8 @@ void World::resetAllKarts()
                 pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
                                 m_track->getAngle(quad))                 );
                 kart->getBody()->setCenterOfMassTransform(pos);
-                bool kart_over_ground = m_physics->projectKartDownwards(kart);
+
+                bool kart_over_ground = m_track->findGround(kart);
                 if(kart_over_ground)
                 {
                     const Vec3 &xyz = kart->getTrans().getOrigin()
@@ -541,7 +542,7 @@ void World::resetAllKarts()
         btVector3 up_offset(0, 0.5f * ((*i)->getKartHeight()), 0);
         (*i)->getVehicle()->getRigidBody()->translate (up_offset);
 
-        bool kart_over_ground = m_physics->projectKartDownwards(*i);
+        bool kart_over_ground = m_track->findGround(*i);
 
         if (!kart_over_ground)
         {
