@@ -111,9 +111,12 @@ int wiiuse_os_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
 		attr.Size = sizeof(attr);
 		i = HidD_GetAttributes(dev, &attr);
 
-		if ((attr.VendorID == WM_VENDOR_ID) && (attr.ProductID == WM_PRODUCT_ID)) {
+		if ((attr.VendorID == WM_VENDOR_ID) && (attr.ProductID == WM_PRODUCT_ID || attr.ProductID == WM_PLUS_PRODUCT_ID)) {
 			/* this is a wiimote */
 			wm[found]->dev_handle = dev;
+
+			if(attr.ProductID == WM_PLUS_PRODUCT_ID)
+				wm[found]->type = WIIUSE_WIIMOTE_MOTION_PLUS_INSIDE;
 
 			wm[found]->hid_overlap.hEvent = CreateEvent(NULL, 1, 1, "");
 			wm[found]->hid_overlap.Offset = 0;

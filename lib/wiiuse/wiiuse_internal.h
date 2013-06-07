@@ -165,6 +165,7 @@
 #endif
 #define WM_VENDOR_ID				0x057E
 #define WM_PRODUCT_ID				0x0306
+#define WM_PLUS_PRODUCT_ID				0x0330
 
 /* controller status stuff */
 #define WM_MAX_BATTERY_CODE			0xC8
