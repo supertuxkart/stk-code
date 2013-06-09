@@ -284,7 +284,6 @@ irr::core::stringw TimeUserConfigParam::toString() const
     // we can't use an irrlicht's stringw directly. Since it's only a
     // number, we can use std::string, and convert to stringw
 
-    std::string tmp;
     std::ostringstream o;
     o<<m_value;
     return core::stringw(o.str().c_str());

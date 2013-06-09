@@ -352,7 +352,7 @@ void cmdLineHelp (char* invocation)
     "  -N,  --no-start-screen  Immediately start race without showing a "
                               "menu.\n"
     "  -R,  --race-now         Same as -N but also skip the ready-set-go phase"
-                              "and the music.\n"
+                              " and the music.\n"
     "  -t,  --track NAME       Start at track NAME (see --list-tracks).\n"
     "       --gp NAME          Start the specified Grand Prix.\n"
     "       --stk-config FILE  use ./data/FILE instead of "
@@ -432,8 +432,6 @@ int handleCmdLinePreliminary(int argc, char **argv)
     {
         if(argv[i][0] != '-') continue;
         if (!strcmp(argv[i], "--help" ) ||
-            !strcmp(argv[i], "-help"  ) ||
-            !strcmp(argv[i], "--help" ) ||
             !strcmp(argv[i], "-help"  ) ||
             !strcmp(argv[i], "-h"     )     )
         {
@@ -828,9 +826,23 @@ int handleCmdLine(int argc, char **argv)
                               argv[i+1]);
                 }
                 else if (t->isArena())
+                {
+                    //if it's arena, don't create ai karts
+                    const std::vector<std::string> l;
+                    race_manager->setDefaultAIKartList(l);
+                    // Add 1 for the player kart
+                    race_manager->setNumKarts(1);
                     race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+                }
                 else if(t->isSoccer())
+                {
+                    //if it's soccer, don't create ai karts
+                    const std::vector<std::string> l;
+                    race_manager->setDefaultAIKartList(l);
+                    // Add 1 for the player kart
+                    race_manager->setNumKarts(1);
                     race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
+                }
             }
             else
             {
@@ -932,17 +944,33 @@ int handleCmdLine(int argc, char **argv)
         }
         else if ( !strcmp(argv[i], "--laps") && i+1<argc )
         {
-            Log::verbose("main", "You choose to have %d laps.",
-                         atoi(argv[i+1]) );
-            race_manager->setNumLaps(atoi(argv[i+1]));
-            i++;
+            int laps = atoi(argv[i+1]);
+            if (laps < 0)
+            {
+                Log::error("main", "Invalid number of laps: %s.\n", argv[i+1] );
+                return 0;
+            }
+            else
+            {
+                Log::verbose("main", "You choose to have %d laps.", laps);
+                race_manager->setNumLaps(laps);
+                i++;
+            }
         }
         else if( sscanf(argv[i], "--profile-laps=%d",  &n)==1)
         {
-            Log::verbose("main", "Profiling %d laps.",n);
-            UserConfigParams::m_no_start_screen = true;
-            ProfileWorld::setProfileModeLaps(n);
-            race_manager->setNumLaps(n);
+            if (n < 0)
+            {
+                Log::error("main", "Invalid number of profile-laps: %i.\n", n );
+                return 0;
+            }
+            else
+            {
+                Log::verbose("main", "Profiling %d laps.",n);
+                UserConfigParams::m_no_start_screen = true;
+                ProfileWorld::setProfileModeLaps(n);
+                race_manager->setNumLaps(n);
+            }
         }
         else if( sscanf(argv[i], "--profile-time=%d",  &n)==1)
         {

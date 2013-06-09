@@ -439,8 +439,8 @@ void QuadGraph::createMesh(bool show_invisible,
         // Swap the colours from red to blue and back
         if(!track_color)
         {
-            c.setRed (i%2 ? 255 : 0);
-            c.setBlue(i%2 ? 0 : 255);
+            c.setRed ((i%2) ? 255 : 0);
+            c.setBlue((i%2) ? 0 : 255);
         }
         // Transfer the 4 points of the current quad to the list of vertices
         m_all_nodes[count]->getQuad().getVertices(new_v+4*i, c);
@@ -538,8 +538,8 @@ void QuadGraph::createDebugMesh()
     for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
     {
         // Swap the colours from red to blue and back
-        c.setRed (i%2 ? 255 : 0);
-        c.setBlue(i%2 ? 0 : 255);
+        c.setRed ((i%2) ? 255 : 0);
+        c.setBlue((i%2) ? 0 : 255);
         v[i].Color = c;
     }
     m_node = irr_driver->addMesh(m_mesh);

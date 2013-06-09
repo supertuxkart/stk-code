@@ -415,7 +415,6 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
     // more than one object, and/or more than once with each object (if there
     // is more than one collision point). So keep a list of rockets that will
     // be exploded after the collisions
-    std::vector<Moveable*> rocketsToExplode;
     for(int i=0; i<currentNumManifolds; i++)
     {
         btPersistentManifold* contact_manifold =

@@ -854,7 +854,7 @@ void Kart::collectedItem(Item *item, int add_info)
 
         // slow down
         m_bubblegum_time = 1.0f;
-        m_bubblegum_torque = rand()%2 ? 500.0f : -500.0f;
+        m_bubblegum_torque = (rand()%2) ? 500.0f : -500.0f;
         m_body->setDamping(0.8f, 0.8f);
         m_goo_sound->position(getXYZ());
         m_goo_sound->play();
