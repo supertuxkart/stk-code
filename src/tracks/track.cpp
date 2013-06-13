@@ -1237,14 +1237,20 @@ void Track::createWater(const XMLNode &node)
     float wave_speed   = 300.0f;
     float wave_length  = 10.0f;
     node.get("height", &wave_height);
-    node.get("speed",  &wave_speed);
+    float time;
+    if(node.get("time", &time))
+    {
+        wave_speed = time * 1000.0f/(2.0f*M_PI);
+    }
+    else
+        node.get("speed",  &wave_speed);
     if(wave_speed==0)
     {
         // A speed of 0 results in a division by zero, so avoid this.
         // The actual time for a wave from one maximum to the next is
         // given by 2*M_PI*speed/1000.
         Log::warn("Track", 
-                  "Wave-speed is 0, resetting it to the default of 300.");
+                  "Wave-speed or time is 0, resetting it to the default.");
         wave_speed =300.0f;
     }
     node.get("length", &wave_length);
