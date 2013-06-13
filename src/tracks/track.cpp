@@ -1238,6 +1238,15 @@ void Track::createWater(const XMLNode &node)
     float wave_length  = 10.0f;
     node.get("height", &wave_height);
     node.get("speed",  &wave_speed);
+    if(wave_speed==0)
+    {
+        // A speed of 0 results in a division by zero, so avoid this.
+        // The actual time for a wave from one maximum to the next is
+        // given by 2*M_PI*speed/1000.
+        Log::warn("Track", 
+                  "Wave-speed is 0, resetting it to the default of 300.");
+        wave_speed =300.0f;
+    }
     node.get("length", &wave_length);
     scene::ISceneNode* scene_node = NULL;
 
