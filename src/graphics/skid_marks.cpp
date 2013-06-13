@@ -108,12 +108,12 @@ void SkidMarks::update(float dt, bool force_skid_marks,
     //   If only one wheel touches the ground, the 2nd one gets the same
     //   raycast result --> delta is 0, which is considered to be not skidding.
     const Skidding *skid = m_kart.getSkidding();
-    bool is_skidding = force_skid_marks ||
+    bool is_skidding = raycast_right.m_isInContact &&
+                   ( force_skid_marks ||
                    (  (skid->getSkidState()==Skidding::SKID_ACCUMULATE_LEFT ||
                        skid->getSkidState()==Skidding::SKID_ACCUMULATE_RIGHT  )
                      &&  m_kart.getSkidding()->getGraphicalJumpOffset()<=0
-                     &&  raycast_right.m_isInContact
-                     &&  delta.length2()>=0.0001f                              );
+                     &&  delta.length2()>=0.0001f                              ) );
 
     if(m_skid_marking)
     {
