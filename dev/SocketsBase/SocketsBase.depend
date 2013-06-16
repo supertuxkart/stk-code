@@ -1,0 +1,124 @@
+# depslib dependency file v1.0
+1371430952 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/main.cpp
+	<iostream>
+	<enet/enet.h>
+	"client_network_manager.hpp"
+	"server_network_manager.hpp"
+	"protocol_manager.hpp"
+	"protocols/get_public_address.hpp"
+	<stdio.h>
+	<string.h>
+
+1371308465 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/client.cpp
+	"client.hpp"
+	<string.h>
+
+1371308471 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/client.hpp
+	"stk_peer.h"
+	<enet/enet.h>
+
+1371308808 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/stk_peer.h
+
+1371342078 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/client_network_manager.cpp
+	"client_network_manager.hpp"
+	<stdio.h>
+
+1371312921 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/client_network_manager.hpp
+	"network_manager.hpp"
+
+1371431127 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/network_manager.hpp
+	"stk_peer.hpp"
+	"stk_host.hpp"
+	<vector>
+	"protocol_listener.hpp"
+
+1370655017 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/server.hpp
+	"stk_peer.h"
+	<enet/enet.h>
+
+1371431262 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/network_manager.cpp
+	"network_manager.hpp"
+	<stdio.h>
+
+1370655140 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/server.cpp
+	"server.hpp"
+	<string.h>
+
+1371340734 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/server_network_manager.cpp
+	"server_network_manager.hpp"
+	<enet/enet.h>
+	<stdio.h>
+	<string.h>
+	<pthread.h>
+
+1371340658 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/server_network_manager.hpp
+	"network_manager.hpp"
+
+1371345329 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/stk_peer.cpp
+	"stk_peer.hpp"
+	<stdio.h>
+	<string.h>
+
+1371342227 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/stk_peer.hpp
+	"stk_host.hpp"
+	<enet/enet.h>
+
+1371431149 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/stk_host.hpp
+	<enet/enet.h>
+
+1371430709 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/stk_host.cpp
+	"stk_host.hpp"
+	"network_manager.hpp"
+	<stdio.h>
+	<string.h>
+	<pthread.h>
+
+1371429449 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/protocol_listener.hpp
+	<vector>
+	<stdint.h>
+
+1371344039 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/http_functions.cpp
+	"http_functions.hpp"
+	<iostream>
+	<string>
+	<curl/curl.h>
+
+1371343994 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/http_functions.hpp
+	<string>
+
+1371428907 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/protocol_manager.hpp
+	"protocol_listener.hpp"
+
+1371346908 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/packet.cpp
+	"packet.hpp"
+
+1371427096 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/packet.hpp
+	<string>
+	<vector>
+
+1371429400 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/protocol.cpp
+	"protocol.hpp"
+
+1371429637 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/protocol.hpp
+	"protocol_listener.hpp"
+	<stdint.h>
+
+1371342576 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/protocol_listener.cpp
+	"protocol_listener.hpp"
+
+1371429738 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/protocol_manager.cpp
+	"protocol_manager.hpp"
+	"protocol.hpp"
+	<assert.h>
+
+1371431357 source:/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/protocols/get_public_address.cpp
+	"get_public_address.hpp"
+	"../network_manager.hpp"
+	<time.h>
+	<stdlib.h>
+	<assert.h>
+	<stdio.h>
+
+1371427140 /home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/protocols/get_public_address.hpp
+	"../protocol.hpp"
+
