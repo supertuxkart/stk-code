@@ -33,9 +33,12 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Linker>
-			<Add option="-lenet" />
 			<Add option="-lpthread" />
+			<Add option="-lcurl" />
+			<Add library="../../lib/enet/build/libenet.a" />
 		</Linker>
+		<Unit filename="callback_object.cpp" />
+		<Unit filename="callback_object.hpp" />
 		<Unit filename="client_network_manager.cpp" />
 		<Unit filename="client_network_manager.hpp" />
 		<Unit filename="http_functions.cpp" />
@@ -43,11 +46,8 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="network_manager.cpp" />
 		<Unit filename="network_manager.hpp" />
-		<Unit filename="packet.cpp" />
-		<Unit filename="packet.hpp" />
 		<Unit filename="protocol.cpp" />
 		<Unit filename="protocol.hpp" />
-		<Unit filename="protocol_listener.cpp" />
 		<Unit filename="protocol_listener.hpp" />
 		<Unit filename="protocol_manager.cpp" />
 		<Unit filename="protocol_manager.hpp" />

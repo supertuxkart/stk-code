@@ -37,7 +37,7 @@ void NetworkManager::sendRawPacket(uint8_t* data, int length, unsigned int dstIp
 }
 uint8_t* NetworkManager::receiveRawPacket()
 {
-    return instance->getHost()->receiveRawPacket();
+    return instance->getHost()->receiveRawPacket(0,0);
 }
 void NetworkManager::receptionCallback(char* data)
 {

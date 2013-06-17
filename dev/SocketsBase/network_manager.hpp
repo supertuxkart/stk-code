@@ -5,7 +5,7 @@
 #include "stk_host.hpp"
 #include <vector>
 
-#include "protocol_listener.hpp"
+#include "protocol_manager.hpp"
 
 class NetworkManager 
 {

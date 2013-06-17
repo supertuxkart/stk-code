@@ -25,12 +25,11 @@ int main()
     std::string answer;
     cout << "host or client:";
     answer = "client";
-    //cin >> answer;
+    cin >> answer;
     if (answer == "client")
     {
         ClientNetworkManager clt;
         clt.run();
-        clt.connect(0x0100007f, 7000); // addr in little endian, real address is 7f 00 00 01 (127.0.0.1)
         
         protocolListener = new ProtocolManager();
         
@@ -39,9 +38,11 @@ int main()
         pthread_create(thrd, NULL, foo, NULL);
         
         // start a retreive stun addr protocol
-        Protocol* prt = new GetPublicAddress();
+        Protocol* prt = new GetPublicAddress(NULL);
         protocolListener->runProtocol(prt);
 
+        clt.connect(0x0100007f, 7000); // addr in little endian, real address is 7f 00 00 01 (127.0.0.1)
+        
         std::string buffer;
         while (1)
         {

@@ -1,7 +1,10 @@
 #include "protocol_manager.hpp"
 
 #include "protocol.hpp"
+
 #include <assert.h>
+#include <stdio.h>
+
 
 ProtocolManager::ProtocolManager() 
 {
@@ -23,6 +26,7 @@ void ProtocolManager::runProtocol(Protocol* protocol)
     protocol->setListener(this);
     protocol->setup();
     protocol->start();
+    printf("*** PROTOCOL MANAGER *** - A new protocol has been started. There are %i protocols running.\n", m_protocols.size());
 }
 void ProtocolManager::stopProtocol(Protocol* protocol)
 {
@@ -40,6 +44,7 @@ void ProtocolManager::protocolTerminated(Protocol* protocol)
             offset++;
         }
     }
+    printf("*** PROTOCOL MANAGER *** - A protocol has been terminated. There are %i protocols running.\n", m_protocols.size());
 }
 
 void ProtocolManager::update()

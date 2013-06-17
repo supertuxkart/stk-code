@@ -1,7 +1,8 @@
 #ifndef PROTOCOL_HPP
 #define PROTOCOL_HPP
 
-#include "protocol_listener.hpp"
+#include "protocol_manager.hpp"
+#include "callback_object.hpp"
 
 #include <stdint.h>
 
@@ -13,10 +14,12 @@ enum PROTOCOL_TYPE
 class Protocol
 {
     public:
-        Protocol();
-        virtual ~Protocol();
+        Protocol(CallbackObject* callbackObject);
+        virtual ~Protocol(); 
         
         virtual void messageReceived(uint8_t* data) = 0;
+        
+        void setListener(ProtocolManager* listener);
         
         virtual void setup() = 0;
         virtual void start() = 0;
@@ -24,8 +27,9 @@ class Protocol
         
         PROTOCOL_TYPE getProtocolType();
     protected:
-        ProtocolListener* m_listener;
+        ProtocolManager* m_listener;
         PROTOCOL_TYPE m_type;
+        CallbackObject* m_callbackObject;
 };
 
 #endif // PROTOCOL_HPP

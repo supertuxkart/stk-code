@@ -24,13 +24,16 @@ class STKHost
         void setupClient(int peerCount, int channelLimit, uint32_t maxIncomingBandwidth, uint32_t maxOutgoingBandwidth);
         
         void startListening();
+        void stopListening();
         
         void sendRawPacket(uint8_t* data, int length, unsigned int dstIp, unsigned short dstPort);
         uint8_t* receiveRawPacket();
+        uint8_t* receiveRawPacket(unsigned int dstIp, unsigned short dstPort);
         void broadcastPacket(char* data);
         
     protected:
         ENetHost* m_host;
+        pthread_t* m_listeningThread;
         
 };
 

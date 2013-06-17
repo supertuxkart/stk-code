@@ -6,7 +6,7 @@
 class GetPublicAddress : public Protocol
 {
     public:
-        GetPublicAddress();
+        GetPublicAddress(CallbackObject* callbackObject);
         virtual ~GetPublicAddress();
         
         virtual void messageReceived(uint8_t* data);

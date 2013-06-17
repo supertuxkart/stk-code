@@ -18,7 +18,7 @@ int stunRand()
     return rand();
 }
 
-GetPublicAddress::GetPublicAddress() : Protocol()
+GetPublicAddress::GetPublicAddress(CallbackObject* callbackObject) : Protocol(callbackObject)
 {
     m_type = GET_PUBLIC_ADDRESS;
 }
@@ -82,6 +82,7 @@ void GetPublicAddress::update()
         bytes[19] = (uint8_t)(m_stunTransactionID[2]);
         bytes[20] = '\0'; 
         
+        printf("Querrying STUN server 132.177.123.6\n");
         unsigned int dst = 132*256*256*256+177*256*256+123*256+6;
         NetworkManager::setManualSocketsMode(true);
         NetworkManager::sendRawPacket(bytes, 20, dst, 3478);
@@ -90,7 +91,6 @@ void GetPublicAddress::update()
     if (m_state == TEST_SENT)
     {
         uint8_t* data = NetworkManager::receiveRawPacket();
-        NetworkManager::setManualSocketsMode(false); 
         assert(data);
         
         // check that the stun response is a response, contains the magic cookie and the transaction ID
@@ -99,7 +99,9 @@ void GetPublicAddress::update()
                 data[4] ==  (uint8_t)(m_stunMagicCookie>>24)        &&
                 data[5] ==  (uint8_t)(m_stunMagicCookie>>16)        &&
                 data[6] ==  (uint8_t)(m_stunMagicCookie>>8)         &&
-                data[7] ==  (uint8_t)(m_stunMagicCookie)            &&
+                data[7] ==  (uint8_t)(m_stunMagicCookie))
+        {
+            if(
                 data[8] ==  (uint8_t)(m_stunTransactionID[0]>>24)   &&
                 data[9] ==  (uint8_t)(m_stunTransactionID[0]>>16)   &&
                 data[10] == (uint8_t)(m_stunTransactionID[0]>>8 )   &&
@@ -112,14 +114,70 @@ void GetPublicAddress::update()
                 data[17] == (uint8_t)(m_stunTransactionID[2]>>16)   &&
                 data[18] == (uint8_t)(m_stunTransactionID[2]>>8 )   &&
                 data[19] == (uint8_t)(m_stunTransactionID[2]    ))
-        {
-            printf("the stun server responded with a valid answer\n");
-            int messageSize = data[2]*256+data[3];
-            printf("the answer is %i bytes long\n", messageSize);
-            
-            // parse the stun message now:
+            {
+                printf("The STUN server responded with a valid answer\n");
+                int messageSize = data[2]*256+data[3];
+                
+                // parse the stun message now:
+                bool finish = false;
+                uint8_t* attributes = data+20;
+                if (messageSize == 0)
+                {
+                    printf("STUN answer does not contain any information.\n");
+                    finish = true;
+                }
+                if (messageSize < 4) // cannot even read the size
+                {
+                    printf("STUN message is not valid.\n");
+                    finish = true;
+                }
+                uint16_t port;
+                uint32_t address;
+                bool valid = false; 
+                while(!finish)
+                {
+                    int type = attributes[0]*256+attributes[1];
+                    int size = attributes[2]*256+attributes[3];
+                    switch(type)
+                    {
+                        case 0:
+                        case 1:
+                            assert(size == 8);
+                            assert(attributes[5] = 0x01); // IPv4 only
+                            port = attributes[6]*256+attributes[7]; 
+                            address = (attributes[8]<<24 & 0xFF000000)+(attributes[9]<<16 & 0x00FF0000)+(attributes[10]<<8 & 0x0000FF00)+(attributes[11] & 0x000000FF);
+                            finish = true;
+                            valid = true;
+                            continue;
+                            break;
+                        default: 
+                            break;
+                    }
+                    attributes = attributes + 4 + size;
+                    messageSize -= 4 + size;
+                    if (messageSize == 0)
+                        finish = true;
+                    if (messageSize < 4) // cannot even read the size
+                    {
+                        printf("STUN message is not valid.\n");
+                        finish = true;
+                    }
+                }
+                // finished parsing, we know our public transport address
+                if (valid)
+                {
+                    printf("The public address has been found : %i.%i.%i.%i:%i\n", address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
+                    m_state = ADDRESS_KNOWN;
+                    NetworkManager::setManualSocketsMode(false); 
+                }
+                else 
+                    m_state = NOTHING_DONE; // need to re-send the stun request
+            }
+            else 
+            {
+                m_state = NOTHING_DONE; // need to re-send the stun request
+            }
         }
-        m_state = ADDRESS_KNOWN;
     }
     if (m_state == ADDRESS_KNOWN)
     {
