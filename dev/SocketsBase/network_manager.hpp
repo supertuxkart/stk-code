@@ -13,10 +13,12 @@ class NetworkManager
         NetworkManager();
         virtual ~NetworkManager();
         
-        virtual void run() = 0;
+        virtual void run() = 0; 
         
+        static void setManualSocketsMode(bool manual);
         static void sendRawPacket(uint8_t* data, int length, unsigned int dstIp, unsigned short dstPort);
         static uint8_t* receiveRawPacket();
+        
         static void receptionCallback(char* data);
         virtual void packetReceived(char* data) = 0;
         

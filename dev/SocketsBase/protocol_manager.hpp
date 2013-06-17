@@ -1,9 +1,12 @@
 #ifndef PROTOCOL_MANAGER_HPP
 #define PROTOCOL_MANAGER_HPP
 
-#include "protocol_listener.hpp"
+#include <vector>
+#include <stdint.h>
 
-class ProtocolManager : public ProtocolListener
+class Protocol;
+
+class ProtocolManager
 {
     public:
         ProtocolManager();
@@ -13,9 +16,14 @@ class ProtocolManager : public ProtocolListener
         
         virtual void runProtocol(Protocol* protocol);
         virtual void stopProtocol(Protocol* protocol);
-        
+        virtual void protocolTerminated(Protocol* protocol);
+         
         virtual void update();
+        
+        virtual int runningProtocolsCount();
+        
     protected:
+        std::vector<Protocol*> m_protocols;
         std::vector<uint8_t*> m_messagesToProcess;
 };
 

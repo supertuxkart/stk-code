@@ -15,7 +15,7 @@ NetworkManager::NetworkManager()
     printf("New Network Manager created.\n");
 }
 
-NetworkManager::~NetworkManager()
+NetworkManager::~NetworkManager() 
 {
 }
 
@@ -23,6 +23,13 @@ void NetworkManager::run()
 {
 }
 
+void NetworkManager::setManualSocketsMode(bool manual)
+{
+    if (manual)
+        instance->getHost()->stopListening();
+    else
+        instance->getHost()->startListening();
+}
 
 void NetworkManager::sendRawPacket(uint8_t* data, int length, unsigned int dstIp, unsigned short dstPort)
 {

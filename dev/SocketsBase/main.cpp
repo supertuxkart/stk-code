@@ -24,7 +24,8 @@ int main()
 {
     std::string answer;
     cout << "host or client:";
-    cin >> answer;
+    answer = "client";
+    //cin >> answer;
     if (answer == "client")
     {
         ClientNetworkManager clt;
@@ -33,19 +34,27 @@ int main()
         
         protocolListener = new ProtocolManager();
         
+        
         pthread_t* thrd = (pthread_t*)(malloc(sizeof(pthread_t)));
         pthread_create(thrd, NULL, foo, NULL);
         
         // start a retreive stun addr protocol
         Protocol* prt = new GetPublicAddress();
         protocolListener->runProtocol(prt);
-        
-        char buffer[256];
+
+        std::string buffer;
         while (1)
         {
-            gets(buffer);
-            if (strlen(buffer) == 0) { continue; }
-            clt.sendPacket(buffer);
+            cin >> buffer;
+            if (buffer == "protocolsCount")
+            {
+                cout << protocolListener->runningProtocolsCount() << " protocols are running." << endl;
+                continue;
+            }
+            if (buffer.size() == 0) { continue; }
+            char buffer2[256];
+            strcpy(buffer2, buffer.c_str());
+            clt.sendPacket(buffer2);
         }
     }
     else if (answer == "host")

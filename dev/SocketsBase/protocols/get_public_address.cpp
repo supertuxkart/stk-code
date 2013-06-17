@@ -29,12 +29,7 @@ GetPublicAddress::~GetPublicAddress()
 
 void GetPublicAddress::messageReceived(uint8_t* data)
 {
-    assert(data);
-    if (m_state == TEST_SENT && sizeof(data) >= 20)
-    {
-        
-        m_state = ADDRESS_KNOWN;
-    }
+
 }
 
 void GetPublicAddress::setup()
@@ -45,7 +40,7 @@ void GetPublicAddress::setup()
 void GetPublicAddress::start()
 {
 }
-
+    
 void GetPublicAddress::update()
 {
     if (m_state == NOTHING_DONE)
@@ -85,14 +80,19 @@ void GetPublicAddress::update()
         bytes[17] = (uint8_t)(m_stunTransactionID[2]>>16);
         bytes[18] = (uint8_t)(m_stunTransactionID[2]>>8);
         bytes[19] = (uint8_t)(m_stunTransactionID[2]);
-        bytes[20] = '\0';
+        bytes[20] = '\0'; 
         
         unsigned int dst = 132*256*256*256+177*256*256+123*256+6;
+        NetworkManager::setManualSocketsMode(true);
         NetworkManager::sendRawPacket(bytes, 20, dst, 3478);
         m_state = TEST_SENT;
-        
+    }
+    if (m_state == TEST_SENT)
+    {
         uint8_t* data = NetworkManager::receiveRawPacket();
+        NetworkManager::setManualSocketsMode(false); 
         assert(data);
+        
         // check that the stun response is a response, contains the magic cookie and the transaction ID
         if (    data[0] == 0b01 &&
                 data[1] == 0b01 &&
@@ -113,9 +113,17 @@ void GetPublicAddress::update()
                 data[18] == (uint8_t)(m_stunTransactionID[2]>>8 )   &&
                 data[19] == (uint8_t)(m_stunTransactionID[2]    ))
         {
-            printf("the stun server reponded a valid answer\n");
+            printf("the stun server responded with a valid answer\n");
             int messageSize = data[2]*256+data[3];
             printf("the answer is %i bytes long\n", messageSize);
+            
+            // parse the stun message now:
         }
+        m_state = ADDRESS_KNOWN;
+    }
+    if (m_state == ADDRESS_KNOWN)
+    {
+        // return the information and terminate the protocol
+        m_listener->protocolTerminated(this);
     }
 }
