@@ -1,6 +1,7 @@
 #include "get_public_address.hpp"
 
 #include "../network_manager.hpp"
+#include "connect_to_server.hpp"
 
 #include <time.h>
 #include <stdlib.h>
@@ -85,12 +86,13 @@ void GetPublicAddress::update()
         printf("Querrying STUN server 132.177.123.6\n");
         unsigned int dst = 132*256*256*256+177*256*256+123*256+6;
         NetworkManager::setManualSocketsMode(true);
-        NetworkManager::sendRawPacket(bytes, 20, dst, 3478);
+        NetworkManager::getHost()->sendRawPacket(bytes, 20, dst, 3478);
         m_state = TEST_SENT;
     }
     if (m_state == TEST_SENT)
     {
-        uint8_t* data = NetworkManager::receiveRawPacket();
+        unsigned int dst = 132*256*256*256+177*256*256+123*256+6;
+        uint8_t* data = NetworkManager::getHost()->receiveRawPacket(dst, 3478);
         assert(data);
         
         // check that the stun response is a response, contains the magic cookie and the transaction ID
@@ -169,6 +171,9 @@ void GetPublicAddress::update()
                     printf("The public address has been found : %i.%i.%i.%i:%i\n", address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
                     m_state = ADDRESS_KNOWN;
                     NetworkManager::setManualSocketsMode(false); 
+                    ConnectToServer* cbObj = static_cast<ConnectToServer*>(m_callbackObject);
+                    cbObj->setSelfAddress(address, port);
+                    m_listener->runProtocol(cbObj);
                 }
                 else 
                     m_state = NOTHING_DONE; // need to re-send the stun request

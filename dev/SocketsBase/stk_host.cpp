@@ -120,11 +120,11 @@ uint8_t* STKHost::receiveRawPacket(unsigned int dstIp, unsigned short dstPort)
     int len = recvfrom(m_host->socket, buffer, 2048, 0, &addr, &fromlen);
     
     int i = 0;
-    while(len < 0 
-            && (uint8_t)(addr.sa_data[2]) != (dstIp>>24&0xff) 
+    while(len < 0 || (
+               (uint8_t)(addr.sa_data[2]) != (dstIp>>24&0xff) 
             && (uint8_t)(addr.sa_data[3]) != (dstIp>>16&0xff) 
             && (uint8_t)(addr.sa_data[4]) != (dstIp>>8&0xff) 
-            && (uint8_t)(addr.sa_data[5]) != (dstIp&0xff)) // wait to receive the message because enet sockets are non-blocking
+            && (uint8_t)(addr.sa_data[5]) != (dstIp&0xff))) // wait to receive the message because enet sockets are non-blocking
     {
         i++;
         len = recvfrom(m_host->socket, buffer, 2048, 0, &addr, &fromlen);

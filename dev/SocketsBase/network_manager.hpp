@@ -17,12 +17,11 @@ class NetworkManager
         
         static void setManualSocketsMode(bool manual);
         static void sendRawPacket(uint8_t* data, int length, unsigned int dstIp, unsigned short dstPort);
-        static uint8_t* receiveRawPacket();
         
         static void receptionCallback(char* data);
         virtual void packetReceived(char* data) = 0;
         
-        STKHost* getHost();
+        static STKHost* getHost();
     protected:
         std::vector<STKPeer*> m_peers;
         STKHost* m_localhost;

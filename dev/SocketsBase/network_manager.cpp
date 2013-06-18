@@ -31,14 +31,6 @@ void NetworkManager::setManualSocketsMode(bool manual)
         instance->getHost()->startListening();
 }
 
-void NetworkManager::sendRawPacket(uint8_t* data, int length, unsigned int dstIp, unsigned short dstPort)
-{
-    instance->getHost()->sendRawPacket(data, length, dstIp, dstPort);
-}
-uint8_t* NetworkManager::receiveRawPacket()
-{
-    return instance->getHost()->receiveRawPacket(0,0);
-}
 void NetworkManager::receptionCallback(char* data)
 {
     instance->packetReceived(data);
@@ -46,5 +38,5 @@ void NetworkManager::receptionCallback(char* data)
 
 STKHost* NetworkManager::getHost()
 {
-    return m_localhost;
+    return instance->m_localhost;
 }

@@ -5,6 +5,9 @@
 #include "server_network_manager.hpp"
 #include "protocol_manager.hpp"
 #include "protocols/get_public_address.hpp"
+#include "http_functions.hpp"
+#include "protocols/connect_to_server.hpp"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -22,23 +25,40 @@ void* foo(void* data)
 
 int main()
 {
+    HTTP::init();
+    
     std::string answer;
     cout << "host or client:";
     answer = "client";
     cin >> answer;
     if (answer == "client")
     {
+        /// NICKNAME :
+        std::string nickname;
+        cout << "Nickname=";
+        std::cin >> nickname;
+        /// PASSWORD :
+        std::string password;
+        cout << "Password=";
+        std::cin >> password;
+        ConnectToServer* connectionProtocol = new ConnectToServer(NULL);
+        connectionProtocol->setPassword(password);
+        connectionProtocol->setUsername(nickname);
+    
+    
         ClientNetworkManager clt;
         clt.run();
         
         protocolListener = new ProtocolManager();
         
-        
         pthread_t* thrd = (pthread_t*)(malloc(sizeof(pthread_t)));
         pthread_create(thrd, NULL, foo, NULL);
         
         // start a retreive stun addr protocol
-        Protocol* prt = new GetPublicAddress(NULL);
+        Protocol* prt = new GetPublicAddress(connectionProtocol);
+        prt->setListener(protocolListener);
+        connectionProtocol->setListener(protocolListener);
+        
         protocolListener->runProtocol(prt);
 
         clt.connect(0x0100007f, 7000); // addr in little endian, real address is 7f 00 00 01 (127.0.0.1)
