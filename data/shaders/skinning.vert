@@ -32,8 +32,9 @@ void main()
 		vertTran += JointTransform[index - 1];
 		
 	ecPos = gl_ModelViewMatrix * vertTran * gl_Vertex;
-	
-	normal = normalize(gl_NormalMatrix * mat3(vertTran) * gl_Normal);
+
+	normal = (vertTran * vec4(gl_Normal, 0.0)).xyz;
+	normal = normalize(gl_NormalMatrix * normal);
 	
 	gl_FrontColor = vec4(0,0,0,0);
 	for(int i = 0;i < MAX_LIGHT_NUM;i++)
