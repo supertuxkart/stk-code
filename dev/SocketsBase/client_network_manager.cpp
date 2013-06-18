@@ -37,5 +37,7 @@ void ClientNetworkManager::packetReceived(char* data)
 }
 void ClientNetworkManager::sendPacket(char* data)
 {
+    if (m_peers.size() > 1)
+        printf("Ambiguous send of data\n");
     m_peers[0]->sendPacket(data);
 }

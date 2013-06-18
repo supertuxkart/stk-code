@@ -92,14 +92,14 @@ void GetPublicAddress::update()
         bytes[20] = '\0'; 
         
         printf("Querrying STUN server 132.177.123.6\n");
-        unsigned int dst = 132*256*256*256+177*256*256+123*256+6;
+        unsigned int dst = (132<<24)+(177<<16)+(123<<8)+6;
         NetworkManager::setManualSocketsMode(true);
         NetworkManager::getHost()->sendRawPacket(bytes, 20, dst, 3478);
         m_state = TEST_SENT;
     }
     if (m_state == TEST_SENT)
     {
-        unsigned int dst = 132*256*256*256+177*256*256+123*256+6;
+        unsigned int dst = (132<<24)+(177<<16)+(123<<8)+6;
         uint8_t* data = NetworkManager::getHost()->receiveRawPacket(dst, 3478);
         assert(data);
         
@@ -181,7 +181,7 @@ void GetPublicAddress::update()
                     NetworkManager::setManualSocketsMode(false); 
                     ConnectToServer* cbObj = static_cast<ConnectToServer*>(m_callbackObject);
                     cbObj->setSelfAddress(address, port);
-                    m_listener->runProtocol(cbObj);
+                    m_listener->startProtocol(cbObj);
                 }
                 else 
                     m_state = NOTHING_DONE; // need to re-send the stun request

@@ -6,8 +6,9 @@
 #include <vector>
 
 #include "protocol_manager.hpp"
+#include "callback_object.hpp"
 
-class NetworkManager 
+class NetworkManager : public CallbackObject
 {
     public:
         NetworkManager();

@@ -22,9 +22,12 @@ class ConnectToServer : public Protocol, public CallbackObject
         void setPassword(std::string password);
         void setHostName(std::string hostName);
         
+        bool connected;
     protected:
         uint32_t m_ownPublicIp;
         uint16_t m_ownPublicPort;
+        uint32_t m_serverIp;
+        uint16_t m_serverPort;
         std::string m_hostName;
         std::string m_username;
         std::string m_password;

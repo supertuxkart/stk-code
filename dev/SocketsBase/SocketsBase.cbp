@@ -31,6 +31,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add directory="../../src" />
 		</Compiler>
 		<Linker>
 			<Add option="-lpthread" />
@@ -48,13 +49,16 @@
 		<Unit filename="network_manager.hpp" />
 		<Unit filename="protocol.cpp" />
 		<Unit filename="protocol.hpp" />
-		<Unit filename="protocol_listener.hpp" />
 		<Unit filename="protocol_manager.cpp" />
 		<Unit filename="protocol_manager.hpp" />
 		<Unit filename="protocols/connect_to_server.cpp" />
 		<Unit filename="protocols/connect_to_server.hpp" />
 		<Unit filename="protocols/get_public_address.cpp" />
 		<Unit filename="protocols/get_public_address.hpp" />
+		<Unit filename="protocols/hide_public_address.cpp" />
+		<Unit filename="protocols/hide_public_address.hpp" />
+		<Unit filename="protocols/show_public_address.cpp" />
+		<Unit filename="protocols/show_public_address.hpp" />
 		<Unit filename="server_network_manager.cpp" />
 		<Unit filename="server_network_manager.hpp" />
 		<Unit filename="singleton.hpp" />
@@ -62,6 +66,7 @@
 		<Unit filename="stk_host.hpp" />
 		<Unit filename="stk_peer.cpp" />
 		<Unit filename="stk_peer.hpp" />
+		<Unit filename="time.hpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

@@ -4,7 +4,9 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <cstdlib>
 
+#define RAND_MAX 65536
 
 ProtocolManager::ProtocolManager() 
 {
@@ -20,16 +22,18 @@ void ProtocolManager::messageReceived(uint8_t* data)
     m_messagesToProcess.push_back(data); 
 }
 
-void ProtocolManager::runProtocol(Protocol* protocol)
+int ProtocolManager::startProtocol(Protocol* protocol)
 {
     ProtocolInfo protocolInfo;
-    protocolInfo.paused = false;
+    protocolInfo.state = PROTOCOL_STATE_RUNNING;
+    assignProtocolId(protocolInfo);
     protocolInfo.protocol = protocol;
     m_protocols.push_back(protocolInfo);
     protocol->setListener(this);
     protocol->setup();
     protocol->start();
     printf("*** PROTOCOL MANAGER *** - A new protocol has been started. There are %ld protocols running.\n", m_protocols.size());
+    return protocolInfo.id;
 }
 void ProtocolManager::stopProtocol(Protocol* protocol)
 {
@@ -39,9 +43,9 @@ void ProtocolManager::pauseProtocol(Protocol* protocol)
 {
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
-        if (m_protocols[i].protocol == protocol)
+        if (m_protocols[i].protocol == protocol && m_protocols[i].state == PROTOCOL_STATE_RUNNING)
         {
-            m_protocols[i].paused = true;
+            m_protocols[i].state = PROTOCOL_STATE_PAUSED;
             m_protocols[i].protocol->pause();
         }
     }
@@ -50,9 +54,9 @@ void ProtocolManager::unpauseProtocol(Protocol* protocol)
 {
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
-        if (m_protocols[i].protocol == protocol && m_protocols[i].paused == true)
+        if (m_protocols[i].protocol == protocol && m_protocols[i].state == PROTOCOL_STATE_PAUSED)
         {
-            m_protocols[i].paused = false;
+            m_protocols[i].state = PROTOCOL_STATE_RUNNING;
             m_protocols[i].protocol->unpause();
         }
     }
@@ -90,7 +94,7 @@ void ProtocolManager::update()
     // now update all protocols
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
-        if (m_protocols[i].paused == false)
+        if (m_protocols[i].state == PROTOCOL_STATE_RUNNING)
             m_protocols[i].protocol->update();
     }
 }
@@ -99,4 +103,22 @@ int ProtocolManager::runningProtocolsCount()
 {
     return m_protocols.size();
 }
+
+void ProtocolManager::assignProtocolId(ProtocolInfo& protocolInfo)
+{
+    uint32_t newId;
+    bool exists;
+    do
+    {
+        newId = (rand()<<16)+rand();
+        exists = false;
+        for (unsigned int i = 0; i < m_protocols.size(); i++)
+        {
+            if (m_protocols[i].id == newId)
+                exists = true;
+        }
+    } while (exists);
+    protocolInfo.id = newId;
+}
+
 

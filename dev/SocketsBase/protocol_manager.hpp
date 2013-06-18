@@ -6,12 +6,20 @@
 
 class Protocol;
 
+enum PROTOCOL_STATE
+{
+    PROTOCOL_STATE_RUNNING,
+    PROTOCOL_STATE_PAUSED,
+    PROTOCOL_STATE_TERMINATED
+};
+
 class ProtocolManager
 {
     typedef struct
     {
-        bool paused;
+        PROTOCOL_STATE state;
         Protocol* protocol;
+        uint32_t id;
     } ProtocolInfo;
     public:
         ProtocolManager();
@@ -19,7 +27,7 @@ class ProtocolManager
         
         virtual void messageReceived(uint8_t* data);
         
-        virtual void runProtocol(Protocol* protocol);
+        virtual int  startProtocol(Protocol* protocol);
         virtual void stopProtocol(Protocol* protocol);
         virtual void pauseProtocol(Protocol* protocol);
         virtual void unpauseProtocol(Protocol* protocol);
@@ -30,6 +38,8 @@ class ProtocolManager
         virtual int runningProtocolsCount();
         
     protected:
+        void assignProtocolId(ProtocolInfo& protocolInfo);
+    
         std::vector<ProtocolInfo> m_protocols;
         std::vector<uint8_t*> m_messagesToProcess;
 };

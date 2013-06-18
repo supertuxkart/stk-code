@@ -28,7 +28,7 @@ void ServerNetworkManager::start()
     m_localhost = new STKHost();
     m_localhost->setupServer(STKHost::HOST_ANY, 7000, 32, 2, 0, 0);
     m_localhost->startListening();
-    printf("Server now setup.\n");
+    printf("Server now setup, listening on port 7000.\n");
 }
 
 void ServerNetworkManager::packetReceived(char* data)
