@@ -41,6 +41,14 @@ void GetPublicAddress::setup()
 void GetPublicAddress::start()
 {
 }
+
+void GetPublicAddress::pause()
+{
+}
+
+void GetPublicAddress::unpause()
+{
+}
     
 void GetPublicAddress::update()
 {

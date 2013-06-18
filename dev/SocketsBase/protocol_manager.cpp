@@ -22,29 +22,54 @@ void ProtocolManager::messageReceived(uint8_t* data)
 
 void ProtocolManager::runProtocol(Protocol* protocol)
 {
-    m_protocols.push_back(protocol);
+    ProtocolInfo protocolInfo;
+    protocolInfo.paused = false;
+    protocolInfo.protocol = protocol;
+    m_protocols.push_back(protocolInfo);
     protocol->setListener(this);
     protocol->setup();
     protocol->start();
-    printf("*** PROTOCOL MANAGER *** - A new protocol has been started. There are %i protocols running.\n", m_protocols.size());
+    printf("*** PROTOCOL MANAGER *** - A new protocol has been started. There are %ld protocols running.\n", m_protocols.size());
 }
 void ProtocolManager::stopProtocol(Protocol* protocol)
 {
     
+}
+void ProtocolManager::pauseProtocol(Protocol* protocol)
+{
+    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    {
+        if (m_protocols[i].protocol == protocol)
+        {
+            m_protocols[i].paused = true;
+            m_protocols[i].protocol->pause();
+        }
+    }
+}
+void ProtocolManager::unpauseProtocol(Protocol* protocol)
+{
+    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    {
+        if (m_protocols[i].protocol == protocol && m_protocols[i].paused == true)
+        {
+            m_protocols[i].paused = false;
+            m_protocols[i].protocol->unpause();
+        }
+    }
 }
 void ProtocolManager::protocolTerminated(Protocol* protocol)
 {
     int offset = 0;
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
-        if (m_protocols[i-offset] == protocol)
+        if (m_protocols[i-offset].protocol == protocol)
         {
-            delete m_protocols[i];
+            delete m_protocols[i].protocol;
             m_protocols.erase(m_protocols.begin()+(i-offset), m_protocols.begin()+(i-offset)+1);
             offset++;
         }
     }
-    printf("*** PROTOCOL MANAGER *** - A protocol has been terminated. There are %i protocols running.\n", m_protocols.size());
+    printf("*** PROTOCOL MANAGER *** - A protocol has been terminated. There are %ld protocols running.\n", m_protocols.size());
 }
 
 void ProtocolManager::update()
@@ -57,15 +82,16 @@ void ProtocolManager::update()
         PROTOCOL_TYPE searchedProtocol = (PROTOCOL_TYPE)(data[0]);
         for (unsigned int i = 0; i < m_protocols.size() ; i++)
         {
-            if (m_protocols[i]->getProtocolType() == searchedProtocol)
-                m_protocols[i]->messageReceived(data+1);
+            if (m_protocols[i].protocol->getProtocolType() == searchedProtocol) // pass data to them even when paused
+                m_protocols[i].protocol->messageReceived(data+1);
         }
         m_messagesToProcess.pop_back();
     }
     // now update all protocols
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
-        m_protocols[i]->update();
+        if (m_protocols[i].paused == false)
+            m_protocols[i].protocol->update();
     }
 }
 

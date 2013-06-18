@@ -23,6 +23,8 @@ class Protocol
         
         virtual void setup() = 0;
         virtual void start() = 0;
+        virtual void pause() = 0;
+        virtual void unpause() = 0;
         virtual void update() = 0;
         
         PROTOCOL_TYPE getProtocolType();

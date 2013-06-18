@@ -41,9 +41,14 @@ int main()
         std::string password;
         cout << "Password=";
         std::cin >> password;
+        /// HOST NICKNAME : 
+        std::string hostNickname;
+        cout << "Nickname=";
+        std::cin >> hostNickname;
         ConnectToServer* connectionProtocol = new ConnectToServer(NULL);
         connectionProtocol->setPassword(password);
         connectionProtocol->setUsername(nickname);
+        connectionProtocol->setHostName(hostNickname);
     
     
         ClientNetworkManager clt;

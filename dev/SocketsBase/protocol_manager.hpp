@@ -8,6 +8,11 @@ class Protocol;
 
 class ProtocolManager
 {
+    typedef struct
+    {
+        bool paused;
+        Protocol* protocol;
+    } ProtocolInfo;
     public:
         ProtocolManager();
         virtual ~ProtocolManager();
@@ -16,6 +21,8 @@ class ProtocolManager
         
         virtual void runProtocol(Protocol* protocol);
         virtual void stopProtocol(Protocol* protocol);
+        virtual void pauseProtocol(Protocol* protocol);
+        virtual void unpauseProtocol(Protocol* protocol);
         virtual void protocolTerminated(Protocol* protocol);
          
         virtual void update();
@@ -23,7 +30,7 @@ class ProtocolManager
         virtual int runningProtocolsCount();
         
     protected:
-        std::vector<Protocol*> m_protocols;
+        std::vector<ProtocolInfo> m_protocols;
         std::vector<uint8_t*> m_messagesToProcess;
 };
 
