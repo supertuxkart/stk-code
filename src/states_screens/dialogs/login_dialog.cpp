@@ -50,6 +50,12 @@ LoginDialog::LoginDialog(const float w, const float h) :
 
 // -----------------------------------------------------------------------------
 
+LoginDialog::~LoginDialog()
+{
+}
+
+// -----------------------------------------------------------------------------
+
 GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSource)
 {
     if (eventSource == "cancel")
@@ -89,10 +95,9 @@ void LoginDialog::onEnterPressedInternal()
         }
     }
 
-
     if (size > 0 && nonEmptyChars > 0)
     {
-        Log::info("Login Dialog","Username : '%s'",username.c_str());
+        Log::info("Login Dialog","Username : %ls", username.c_str());
         // It's unsafe to delete from inside the event handler so we do it
         // in onUpdate (which checks for m_self_destroy)
         m_self_destroy = true;
