@@ -38,6 +38,7 @@
 #include "modes/overworld.hpp"
 #include "modes/demo_world.hpp"
 #include "network/network_manager.hpp"
+#include "states_screens/online_screen.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/help_screen_1.hpp"
@@ -366,6 +367,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             }
             OverWorld::enterOverWorld();
         }
+    }
+    else if (selection == "online")
+    {
+        StateManager::get()->pushScreen(OnlineScreen::getInstance());
     }
     else if (selection == "addons")
     {
