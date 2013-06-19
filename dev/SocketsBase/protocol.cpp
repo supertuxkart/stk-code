@@ -1,8 +1,9 @@
 #include "protocol.hpp"
 
-Protocol::Protocol(CallbackObject* callbackObject)
+Protocol::Protocol(CallbackObject* callbackObject, PROTOCOL_TYPE type)
 {
     m_callbackObject = callbackObject;
+    m_type = type;
 }
 
 Protocol::~Protocol()

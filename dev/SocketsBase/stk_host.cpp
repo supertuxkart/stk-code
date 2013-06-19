@@ -17,7 +17,7 @@ void* STKHost::receive_data(void* self)
             printf("message received\n");
             switch (event.type) {
                 case ENET_EVENT_TYPE_RECEIVE:
-                    //NetworkManager::receptionCallback((char*) event.packet->data);
+                    NetworkManager::getInstance()->packetReceived((char*) event.packet->data);
                     break;
                 case ENET_EVENT_TYPE_DISCONNECT:
                     printf("Somebody is now disconnected.\n");

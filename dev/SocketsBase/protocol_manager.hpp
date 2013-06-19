@@ -24,12 +24,9 @@ class ProtocolManager : public Singleton<ProtocolManager>
         uint32_t id;
     } ProtocolInfo;
     public:
-        static ProtocolManager* getInstance()
-        {
-            return Singleton<ProtocolManager>::getInstance<ProtocolManager>();
-        }
         
         virtual void messageReceived(uint8_t* data);
+        virtual void sendMessage(std::string message);
         
         virtual int  startProtocol(Protocol* protocol);
         virtual void stopProtocol(Protocol* protocol);

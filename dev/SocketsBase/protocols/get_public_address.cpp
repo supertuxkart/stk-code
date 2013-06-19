@@ -23,7 +23,6 @@ int stunRand()
 
 GetPublicAddress::GetPublicAddress(CallbackObject* callbackObject) : Protocol(callbackObject)
 {
-    m_type = GET_PUBLIC_ADDRESS;
 }
 
 GetPublicAddress::~GetPublicAddress()

@@ -15,10 +15,13 @@ class ClientNetworkManager : public NetworkManager
         
         virtual void run();
         
-        void connect(uint32_t ip, uint16_t port);
+        bool connect(uint32_t ip, uint16_t port);
+        bool connectToHost(std::string serverNickname);
         
         virtual void packetReceived(char* data);
         virtual void sendPacket(char* data);
+        
+        STKPeer* getPeer();
         
     protected:
         ClientNetworkManager();

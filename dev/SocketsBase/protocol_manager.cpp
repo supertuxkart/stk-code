@@ -22,6 +22,12 @@ void ProtocolManager::messageReceived(uint8_t* data)
     m_messagesToProcess.push_back(data); 
 }
 
+void ProtocolManager::sendMessage(std::string message)
+{
+    std::string newMessage = " " + message; // add one byte
+    newMessage[0] = (char)(0);
+}
+
 int ProtocolManager::startProtocol(Protocol* protocol)
 {
     ProtocolInfo protocolInfo;

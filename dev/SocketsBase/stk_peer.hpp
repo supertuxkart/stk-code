@@ -14,7 +14,9 @@ class STKPeer
         
         virtual void sendPacket(char* data);
         
-        void connectToServer(STKHost* host, uint32_t ip, uint16_t port, uint32_t channelCount, uint32_t data);
+        bool connectToServer(STKHost* host, uint32_t ip, uint16_t port, uint32_t channelCount, uint32_t data);
+        
+        bool isConnected();
     protected:
         ENetPeer* m_peer;
 };

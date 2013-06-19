@@ -26,38 +26,27 @@ int main()
     cin >> answer;
     if (answer == "client")
     {
-        ClientNetworkManager::getInstance();
-        NetworkManager::getInstance()->packetReceived("test");
-        /// NICKNAME :
+        ClientNetworkManager::getInstance()->run();
+        
         std::string nickname;
-        cout << "Nickname=";
-        std::cin >> nickname;
-        /// PASSWORD :
         std::string password;
-        cout << "Password=";
-        std::cin >> password;
-        /// HOST NICKNAME : 
         std::string hostNickname;
-        cout << "Host Nickname=";
-        std::cin >> hostNickname;
         
-        NetworkInterface::getInstance()->initNetwork(false);
+        //NetworkManager::getInstance()->run();
         
-        NetworkInterface::getInstance()->setLogin(nickname, password);
-        NetworkInterface::getInstance()->connectToHost(hostNickname);
-       
+        NetworkManager::getInstance()->setLogin(nickname, password);
+        bool connected = false;
         //clt.connect(0x0100007f, 7000); // addr in little endian, real address is 7f 00 00 01 (127.0.0.1)
         std::string buffer;
         while (1)
         {
             cin >> buffer;
-            if (buffer == "cmd=protocolsCount")
+            if (buffer == "cmd=connect")
             {
-                //cout << protocolListener->runningProtocolsCount() << " protocols are running." << endl;
+                cout << "Host Nickname=";
+                std::cin >> hostNickname;
+                connected = ClientNetworkManager::getInstance()->connectToHost(hostNickname);
                 continue;
-            }
-            if (buffer == "cmd=hideAddress")
-            {
             }
             if (buffer == "cmd=login")
             {
@@ -65,11 +54,13 @@ int main()
                 std::cin >> nickname;
                 std::cout << "Password=";
                 std::cin >> password;
+                NetworkManager::getInstance()->setLogin(nickname, password);
             }
             if (buffer.size() == 0) { continue; }
             char buffer2[256];
             strcpy(buffer2, buffer.c_str());
-            //NetworkInterface::getInstance()->sendPacket(buffer2);
+            if (connected)
+                ClientNetworkManager::getInstance()->sendPacket(buffer2);
         }
         
         
@@ -77,8 +68,9 @@ int main()
     }
     else if (answer == "host")
     {
-        NetworkInterface::getInstance()->initNetwork(true);
-        
+        //NetworkInterface::getInstance()->initNetwork(true);
+        ServerNetworkManager::getInstance()->run();
+        ServerNetworkManager::getInstance()->start();
         //GetPublicAddress
         
         while(1){}
