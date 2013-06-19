@@ -30,21 +30,21 @@
   */
 class OnlineUser
 {
-private:
+    private:
 
-protected:
+    protected:
 
-    std::string m_username;
+        std::string m_username;
 
-public:
+    public:
 
-    /**
-      * Constructor
-      */
-    OnlineUser(const std::string &username);
+        /**
+          * Constructor
+          */
+        OnlineUser(const std::string &username);
 
-    /** Returns the username. */
-    std::string getUserName() const { return m_username; }
+        /** Returns the username. */
+        std::string getUserName() const { return m_username; }
 
 };   // class OnlineUser
 

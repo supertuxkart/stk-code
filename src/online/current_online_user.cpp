@@ -22,6 +22,8 @@
 #include <sstream>
 #include <stdlib.h>
 #include <assert.h>
+#include "online/http_connector.hpp"
+#include "config/user_config.hpp"
 
 static CurrentOnlineUser* user_singleton = NULL;
 
@@ -47,11 +49,17 @@ CurrentOnlineUser::CurrentOnlineUser(){
 
 // ============================================================================
 
-bool CurrentOnlineUser::logIn(const std::string &username, const std::string &password)
+bool CurrentOnlineUser::signIn(const std::string &username, const std::string &password)
 {
     assert(m_is_signed_in == false);
+    HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+    HTTPConnector::Parameters parameters;
+    parameters["action"] = "signin";
+    parameters["user"] = username;
+    std::string result = connector->getPage(parameters);
+    printf("Result: %s\n", result.c_str());
     //Sign in
-    if(/*succes*/true)
+    if(/*succes*/false)
     {
         m_user = new OnlineUser(username);
         m_is_signed_in = true;

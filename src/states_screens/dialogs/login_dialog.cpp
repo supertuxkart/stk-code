@@ -28,6 +28,7 @@
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
+#include "online/current_online_user.hpp"
 
 using namespace GUIEngine;
 using namespace irr;
@@ -94,16 +95,24 @@ void LoginDialog::onEnterPressedInternal()
             nonEmptyChars++;
         }
     }
-
+    std::string msg;
     if (size > 0 && nonEmptyChars > 0)
     {
         Log::info("Login Dialog","Username : %ls", username.c_str());
-        m_self_destroy = true;
+        if(CurrentOnlineUser::get()->signIn(core::stringc(username.c_str()).c_str(), ""))
+        {
+            m_self_destroy = true;
+        }else{
+            msg = "Signing in failed.";
+            m_self_destroy = false;
+        }
+
     } // if valid name
     else
+        msg = "Invalid username.";
     {
         LabelWidget* label = getWidget<LabelWidget>("title");
-        label->setText(_("Not a valid username"), false);
+        label->setText(_(msg.c_str()), false);
         sfx_manager->quickSound( "anvil" );
     }
 }

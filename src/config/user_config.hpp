@@ -603,6 +603,13 @@ namespace UserConfigParams
         PARAM_DEFAULT( WStringUserConfigParam(L"", "default_player",
                                               "Which player to use by default (if empty, will prompt)") );
 
+    // ---- Online multiplayer related
+
+    PARAM_PREFIX StringUserConfigParam      m_server_multiplayer
+            PARAM_DEFAULT( StringUserConfigParam("http://api.stkaddons.net/",
+                                                 "server_multiplayer",
+                                                "The server used for online multiplayer."));
+
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
         PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews",

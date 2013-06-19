@@ -16,29 +16,32 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HTTP_FUNCTIONS_HPP
-#define HTTP_FUNCTIONS_HPP
+#ifndef HTTP_CONNECTOR_HPP
+#define HTTP_CONNECTOR_HPP
 
 #include <string>
 #include "io/xml_node.hpp"
+#include <curl/curl.h>
 
 /**
-  * \brief HTTP functions to connect with the server
+  * \brief Class to connect with a server over HTTP
   * \ingroup online
   */
-
-namespace HTTP
+class HTTPConnector
 {
+    protected:
+        CURL *curl;
+        CURLcode res;
 
-void init();
-void shutdown();
+    public:
+        typedef std::map <std::string, std::string> Parameters;
+        HTTPConnector(const std::string &url);
+        ~HTTPConnector();
+        std::string getPage(Parameters & post_parameters);
+        XMLNode * getXMLFromPage(Parameters & post_parameters);
+}; //class HTTPConnector
 
-std::string getPage(std::string url);
-XMLNode * getXMLFromPage(std::string url);
 
-
-}
-
-#endif // HTTP_FUNCTIONS_HPP
+#endif // HTTP_CONNECTOR_HPP
 
 /*EOF*/

@@ -32,21 +32,21 @@
   */
 class CurrentOnlineUser
 {
-private:
+    private:
 
-protected:
-    std::string m_token;
-    bool m_is_signed_in;
-    OnlineUser * m_user;
-    CurrentOnlineUser();
+    protected:
+        std::string m_token;
+        bool m_is_signed_in;
+        OnlineUser * m_user;
+        CurrentOnlineUser();
 
-public:
-    // singleton
-    static CurrentOnlineUser* get();
-    static void deallocate();
-    bool logIn(const std::string &username, const std::string &password);
-    /** Returns the username if signed in. */
-    std::string getUserName() const;
+    public:
+        // singleton
+        static CurrentOnlineUser* get();
+        static void deallocate();
+        bool signIn(const std::string &username, const std::string &password);
+        /** Returns the username if signed in. */
+        std::string getUserName() const;
 
 };   // class CurrentOnlineUser
 
