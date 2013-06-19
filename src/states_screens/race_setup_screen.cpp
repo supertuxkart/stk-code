@@ -98,8 +98,19 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         }
         else if (selection == "best")
         {
-            UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_BEST;
-            race_manager->setDifficulty(RaceManager::DIFFICULTY_BEST);
+            if (unlock_manager->getCurrentSlot()->isLocked("difficulty_best"))
+            {
+                unlock_manager->playLockSound();
+                UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_HARD;
+                race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
+                w->setSelection(2, PLAYER_ID_GAME_MASTER);
+                w->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            }
+            else
+            {
+                UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_BEST;
+                race_manager->setDifficulty(RaceManager::DIFFICULTY_BEST);
+            }
         }
     }
     else if (name == "gamemode")
@@ -169,6 +180,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
     {
         StateManager::get()->escapePressed();
     }
+    
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
@@ -203,8 +215,17 @@ void RaceSetupScreen::init()
     Screen::init();
     RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
     assert( w != NULL );
-    w->setSelection( UserConfigParams::m_difficulty, PLAYER_ID_GAME_MASTER );
 
+    if (UserConfigParams::m_difficulty == RaceManager::DIFFICULTY_BEST &&
+        unlock_manager->getCurrentSlot()->isLocked("difficulty_best"))
+    {
+        w->setSelection(RaceManager::DIFFICULTY_HARD, PLAYER_ID_GAME_MASTER);
+    }
+    else
+    {
+        w->setSelection( UserConfigParams::m_difficulty, PLAYER_ID_GAME_MASTER );
+    }
+    
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
     kartamount->setActivated();
 
@@ -306,6 +327,18 @@ void RaceSetupScreen::init()
 
     m_mode_listener = new GameModeRibbonListener(this);
     w2->registerHoverListener(m_mode_listener);
+    
+    
+    if (unlock_manager->getCurrentSlot()->isLocked("difficulty_best"))
+    {
+        RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
+        assert(w != NULL);
+        
+        int index = w->findItemNamed("best");
+        Widget* hardestWidget = &w->getChildren()[index];
+        hardestWidget->setBadge(LOCKED_BADGE);
+        hardestWidget->setDeactivated();
+    }
 }   // init
 
 // -----------------------------------------------------------------------------
