@@ -189,12 +189,12 @@ void AddonsLoading::init()
     {
         flags->getIrrlichtElement<IGUIStaticText>()->setOverrideFont(GUIEngine::getSmallFont());
     }
-}
+}   // init
 
 // ----------------------------------------------------------------------------
 void AddonsLoading::escapePressed()
 {
-    processEvent("back");
+    stopDownload();
     ModalDialog::dismiss();
 }   // escapePressed
 
@@ -203,45 +203,42 @@ void AddonsLoading::escapePressed()
 GUIEngine::EventPropagation
                     AddonsLoading::processEvent(const std::string& event_source)
 {
-    if(event_source == "back")
-    {
-        // Cancel a download only if we are installing/upgrading one
-        // (and not uninstalling an installed one):
-        if(m_download_request)
-        {
-            assert(m_download_request);
-            // In case of a cancel we can't free the memory, since
-            // network_http will potentially update the request. So in
-            // order to avoid a memory leak, we let network_http free
-            // the request.
-            m_download_request->setManageMemory(true);
-            m_download_request->cancel();
-        }
-        dismiss();
-        return GUIEngine::EVENT_BLOCK;
-    }
-    else if(event_source == "install")
-    {
-        // Only display the progress bar etc. if we are
-        // not uninstalling an addon.
-        if(!m_addon.isInstalled() || m_addon.needsUpdate())
-        {
-            m_progress->setValue(0);
-            m_progress->setVisible(true);
-            // Change the 'back' button into a 'cancel' button.
-            m_back_button->setLabel(_("Cancel"));
+    GUIEngine::RibbonWidget* actions_ribbon =
+            getWidget<GUIEngine::RibbonWidget>("actions");
 
-            RibbonWidget* r = getWidget<RibbonWidget>("actions");
-            r->setVisible(false);
-
-            startDownload();
-        }
-        return GUIEngine::EVENT_BLOCK;
-    }
-    else if (event_source == "uninstall")
+    if (event_source == "actions")
     {
-        doUninstall();
-        return GUIEngine::EVENT_BLOCK;
+        const std::string& selection =
+                actions_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        
+        if(selection == "back")
+        {
+            stopDownload();
+            dismiss();
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if(selection == "install")
+        {
+            // Only display the progress bar etc. if we are
+            // not uninstalling an addon.
+            if(!m_addon.isInstalled() || m_addon.needsUpdate())
+            {
+                m_progress->setValue(0);
+                m_progress->setVisible(true);
+                // Change the 'back' button into a 'cancel' button.
+                m_back_button->setLabel(_("Cancel"));
+
+                actions_ribbon->setVisible(false);
+
+                startDownload();
+            }
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == "uninstall")
+        {
+            doUninstall();
+            return GUIEngine::EVENT_BLOCK;
+        }
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
@@ -294,6 +291,26 @@ void AddonsLoading::startDownload()
                                                        /*priority*/5,
                                                        /*manage memory*/false);
 }   // startDownload
+
+// ----------------------------------------------------------------------------
+/** This function is called when the user click on 'Back', 'Cancel' or press
+ *  escape.
+ **/
+void AddonsLoading::stopDownload()
+{
+    // Cancel a download only if we are installing/upgrading one
+    // (and not uninstalling an installed one):
+    if(m_download_request)
+    {
+        // In case of a cancel we can't free the memory, since
+        // network_http will potentially update the request. So in
+        // order to avoid a memory leak, we let network_http free
+        // the request.
+        m_download_request->setManageMemory(true);
+        m_download_request->cancel();
+    };
+}   // startDownload
+
 
 // ----------------------------------------------------------------------------
 /** Called when the asynchronous download of the addon finished.
