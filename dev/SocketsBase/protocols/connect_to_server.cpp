@@ -98,8 +98,6 @@ void ConnectToServer::update()
     else if (m_state == PEER_ADDRESS_RETREIVED)
     {
         // we know the distant address:port, just need to connect.
-        ClientNetworkManager* networkManager = static_cast<ClientNetworkManager*>(m_callbackObject);
-        networkManager->connect(m_serverIp, m_serverPort);
         m_state = CONNECTED;
         connected = true;
     }

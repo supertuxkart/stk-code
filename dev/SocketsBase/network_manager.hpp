@@ -6,28 +6,24 @@
 #include <vector>
 
 #include "protocol_manager.hpp"
-#include "callback_object.hpp"
+#include "singleton.hpp"
 
-class NetworkManager : public CallbackObject
+class NetworkManager : public Singleton<NetworkManager>
 {
+    friend class Singleton<NetworkManager>;
     public:
+        virtual void run() = 0; 
+        
+        virtual void setManualSocketsMode(bool manual);
+        virtual void packetReceived(char* data) = 0;
+        
+        STKHost* getHost();
+    protected:
         NetworkManager();
         virtual ~NetworkManager();
         
-        virtual void run() = 0; 
-        
-        static void setManualSocketsMode(bool manual);
-        static void sendRawPacket(uint8_t* data, int length, unsigned int dstIp, unsigned short dstPort);
-        
-        static void receptionCallback(char* data);
-        virtual void packetReceived(char* data) = 0;
-        
-        static STKHost* getHost();
-    protected:
         std::vector<STKPeer*> m_peers;
         STKHost* m_localhost;
-        
-        static NetworkManager* instance;
 };
 
 #endif // NETWORKMANAGER_HPP

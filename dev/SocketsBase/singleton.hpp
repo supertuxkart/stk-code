@@ -8,20 +8,26 @@ class Singleton
 {
     protected:
         Singleton () { }
-        ~Singleton () { std::cout << "destroying singleton." << std::endl; }
+        virtual ~Singleton () { std::cout << "destroying singleton." << std::endl; delete m_singleton; }
 
     public:
-        static T *getInstance ()
+        template<typename S>
+        static S *getInstance ()
         {
-            if (NULL == m_singleton)
+            if (m_singleton == NULL)
+                m_singleton = new S;
+            
+            S* result = (dynamic_cast<S*> (m_singleton));
+            if (result == NULL)
             {
-                std::cout << "creating singleton." << std::endl;
-                m_singleton = new T;
+                std::cout << "BE CAREFUL : Reallocating singleton" << std::endl;
+                m_singleton = new S;
             }
-            else
-            {
-            }
-            return (static_cast<T*> (m_singleton));
+            return (dynamic_cast<S*> (m_singleton));
+        }
+        static T *getInstance()
+        {
+            return (dynamic_cast<T*> (m_singleton));
         }
 
         static void kill ()

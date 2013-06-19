@@ -6,9 +6,12 @@
 
 class ClientNetworkManager : public NetworkManager
 {
+    friend class Singleton<NetworkManager>;
     public:
-        ClientNetworkManager();
-        virtual ~ClientNetworkManager();
+        static ClientNetworkManager* getInstance()
+        {
+            return Singleton<NetworkManager>::getInstance<ClientNetworkManager>();
+        }
         
         virtual void run();
         
@@ -18,7 +21,8 @@ class ClientNetworkManager : public NetworkManager
         virtual void sendPacket(char* data);
         
     protected:
-    
+        ClientNetworkManager();
+        virtual ~ClientNetworkManager();
 };
 
 #endif // CLIENT_NETWORK_MANAGER_HPP

@@ -1,6 +1,7 @@
 #include "get_public_address.hpp"
 
 #include "../network_manager.hpp"
+#include "../client_network_manager.hpp"
 #include "connect_to_server.hpp"
 #include "../network_interface.hpp"
 
@@ -82,14 +83,14 @@ void GetPublicAddress::update()
         
         printf("__GetPublicAddress> Querrying STUN server 132.177.123.6\n");
         unsigned int dst = (132<<24)+(177<<16)+(123<<8)+6;
-        NetworkManager::setManualSocketsMode(true);
-        NetworkManager::getHost()->sendRawPacket(bytes, 20, dst, 3478);
+        ClientNetworkManager::getInstance()->setManualSocketsMode(true);
+        ClientNetworkManager::getInstance()->getHost()->sendRawPacket(bytes, 20, dst, 3478);
         m_state = TEST_SENT;
     }
     if (m_state == TEST_SENT)
     {
         unsigned int dst = (132<<24)+(177<<16)+(123<<8)+6;
-        uint8_t* data = NetworkManager::getHost()->receiveRawPacket(dst, 3478);
+        uint8_t* data = ClientNetworkManager::getInstance()->getHost()->receiveRawPacket(dst, 3478);
         assert(data);
         
         // check that the stun response is a response, contains the magic cookie and the transaction ID
@@ -167,7 +168,7 @@ void GetPublicAddress::update()
                 {
                     printf("__The public address has been found : %i.%i.%i.%i:%i\n", address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
                     m_state = ADDRESS_KNOWN;
-                    NetworkManager::setManualSocketsMode(false); 
+                    ClientNetworkManager::getInstance()->setManualSocketsMode(false); 
                     TransportAddress* addr = static_cast<TransportAddress*>(m_callbackObject);
                     addr->ip = address;
                     addr->port = port;

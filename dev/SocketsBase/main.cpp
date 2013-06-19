@@ -17,6 +17,7 @@ using namespace std;
 
 int main()
 {
+
     HTTP::init();
     
     std::string answer;
@@ -25,6 +26,8 @@ int main()
     cin >> answer;
     if (answer == "client")
     {
+        ClientNetworkManager::getInstance();
+        NetworkManager::getInstance()->packetReceived("test");
         /// NICKNAME :
         std::string nickname;
         cout << "Nickname=";

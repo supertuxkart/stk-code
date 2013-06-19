@@ -6,9 +6,12 @@
 
 class ServerNetworkManager : public NetworkManager
 {
+    friend class Singleton<NetworkManager>;
     public:
-        ServerNetworkManager();
-        virtual ~ServerNetworkManager();
+        static ServerNetworkManager* getInstance()
+        {
+            return Singleton<NetworkManager>::getInstance<ServerNetworkManager>();
+        }
         
         virtual void run();
         
@@ -17,6 +20,8 @@ class ServerNetworkManager : public NetworkManager
         virtual void packetReceived(char* data);
         virtual void sendPacket(char* data);
     protected:
+        ServerNetworkManager();
+        virtual ~ServerNetworkManager();
     
 };
 

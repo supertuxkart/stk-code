@@ -24,8 +24,10 @@ class ProtocolManager : public Singleton<ProtocolManager>
         uint32_t id;
     } ProtocolInfo;
     public:
-        ProtocolManager();
-        virtual ~ProtocolManager();
+        static ProtocolManager* getInstance()
+        {
+            return Singleton<ProtocolManager>::getInstance<ProtocolManager>();
+        }
         
         virtual void messageReceived(uint8_t* data);
         
@@ -41,8 +43,12 @@ class ProtocolManager : public Singleton<ProtocolManager>
         virtual PROTOCOL_STATE getProtocolState(uint32_t id);
         
     protected:
+        // protected functions
+        ProtocolManager();
+        virtual ~ProtocolManager();
         void assignProtocolId(ProtocolInfo& protocolInfo);
-    
+        
+        // protected members
         std::vector<ProtocolInfo> m_protocols;
         std::vector<uint8_t*> m_messagesToProcess;
 };
