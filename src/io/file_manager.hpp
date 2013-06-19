@@ -88,6 +88,7 @@ public:
     void              dropFileSystem();
     io::IXMLReader   *createXMLReader(const std::string &filename);
     XMLNode          *createXMLTree(const std::string &filename);
+    XMLNode          *createXMLTreeFromString(const std::string & content);
 
     std::string       getConfigDir() const;
     std::string       getTextureDir() const;

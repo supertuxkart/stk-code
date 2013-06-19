@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) Glenn De Jonghe
+//  Copyright (C) 2013 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -98,8 +98,6 @@ void LoginDialog::onEnterPressedInternal()
     if (size > 0 && nonEmptyChars > 0)
     {
         Log::info("Login Dialog","Username : %ls", username.c_str());
-        // It's unsafe to delete from inside the event handler so we do it
-        // in onUpdate (which checks for m_self_destroy)
         m_self_destroy = true;
     } // if valid name
     else

@@ -1,3 +1,4 @@
+//
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2013 Glenn De Jonghe
 //
@@ -15,46 +16,40 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef HEADER_CURRENT_ONLINE_USER_HPP
+#define HEADER_CURRENT_ONLINE_USER_HPP
 
-#ifndef HEADER_LOGIN_DIALOG_HPP
-#define HEADER_LOGIN_DIALOG_HPP
+#include <string>
 
-#include <irrString.h>
+#include "online/online_user.hpp"
 
-#include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets/text_box_widget.hpp"
-/*
-namespace GUIEngine
-{
-    class TextBoxWidget;
-    class ButtonWidget;
-    class LabelWidget;
-}*/
+
+// ============================================================================
 
 /**
- * \brief Dialog that allows a user to sign in
- * \ingroup states_screens
- */
-class LoginDialog : public GUIEngine::ModalDialog
+  * \brief Class that represents an online registered user
+  * \ingroup online
+  */
+class CurrentOnlineUser
 {
-
 private:
-    
-    bool m_self_destroy;
-    
-public:
-    
-    /**
-     * Creates a modal dialog with given percentage of screen width and height
-     */
-    LoginDialog(const float percentWidth, const float percentHeight);
-    ~LoginDialog();
 
-    void onEnterPressedInternal();
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
-    virtual void onUpdate(float dt);
-    //virtual void onTextUpdated();
-};
+protected:
+    std::string m_token;
+    bool m_is_signed_in;
+    OnlineUser * m_user;
+    CurrentOnlineUser();
+
+public:
+    // singleton
+    static CurrentOnlineUser* get();
+    static void deallocate();
+    bool logIn(const std::string &username, const std::string &password);
+    /** Returns the username if signed in. */
+    std::string getUserName() const;
+
+};   // class CurrentOnlineUser
 
 #endif
+
+/*EOF*/

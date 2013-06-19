@@ -143,6 +143,9 @@ src/network/network_manager.cpp
 src/network/race_info_message.cpp
 src/network/race_result_message.cpp
 src/network/race_state.cpp
+src/online/current_online_user.cpp
+src/online/http_functions.cpp
+src/online/online_user.cpp
 src/physics/btKart.cpp
 src/physics/btKartRaycast.cpp
 src/physics/btUprightConstraint.cpp
@@ -402,6 +405,9 @@ src/network/race_start_message.hpp
 src/network/race_state.hpp
 src/network/remote_kart_info.hpp
 src/network/world_loaded_message.hpp
+src/online/current_online_user.hpp
+src/online/http_functions.hpp
+src/online/online_user.hpp
 src/physics/btKart.hpp
 src/physics/btKartRaycast.hpp
 src/physics/btUprightConstraint.hpp

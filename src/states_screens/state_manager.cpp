@@ -202,7 +202,7 @@ void StateManager::onGameStateChange(GameState new_state)
 
         if (new_state == MENU)
         {
-            Screen* screen = GUIEngine::getCurrentScreen();
+            GUIEngine::Screen* screen = GUIEngine::getCurrentScreen();
             if (screen != NULL)
             {
                 music_manager->startMusic(
