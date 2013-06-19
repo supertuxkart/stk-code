@@ -3,6 +3,7 @@
 #include "../http_functions.hpp"
 #include "../time.hpp"
 #include "../client_network_manager.hpp"
+#include "show_public_address.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,32 +19,18 @@ ConnectToServer::~ConnectToServer()
 {
 }
 
-void ConnectToServer::setup()
-{
-}
-
 void ConnectToServer::messageReceived(uint8_t* data)
 {
 
 }
 
-void ConnectToServer::start()
+void ConnectToServer::setup()
 {
     if (m_ownPublicIp == 0 || m_ownPublicPort == 0 || m_username == "" || m_password == "" || m_hostName == "")
     {
         printf("You have to set the public ip:port, username:password and the host nickname before starting this protocol.\n");
         m_listener->protocolTerminated(this);
     }
-}
-
-void ConnectToServer::pause()
-{
-    m_listener->pauseProtocol(this); // need to be sure that the protocol manager knows
-}
-
-void ConnectToServer::unpause()
-{
-    m_listener->unpauseProtocol(this); // need to be sure that the protocol manager knows
 }
 
 void ConnectToServer::update()
@@ -64,6 +51,8 @@ void ConnectToServer::update()
             m_state = NOTHING;
             pause();
         }
+        ShowPublicAddress* showAddr = new ShowPublicAddress(NULL);
+        showAddr->setUsername(m_username);
     }
     else if (m_state == ADDRESS_KNOWN_ONLINE)
     {

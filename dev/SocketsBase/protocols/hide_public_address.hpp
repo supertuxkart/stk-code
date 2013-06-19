@@ -12,15 +12,12 @@ class HidePublicAddress : public Protocol
         
         virtual void messageReceived(uint8_t* data);
         virtual void setup();
-        virtual void start();
-        virtual void pause();
-        virtual void unpause();
         virtual void update();
         
-        virtual void setNickname(std::string nickname);
+        virtual void setUsername(std::string username);
         virtual void setPassword(std::string password);
     protected:
-        std::string m_nickname;
+        std::string m_username;
         std::string m_password;
         
         enum STATE

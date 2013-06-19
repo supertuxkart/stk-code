@@ -22,9 +22,8 @@ class Protocol
         void setListener(ProtocolManager* listener);
         
         virtual void setup() = 0;
-        virtual void start() = 0;
-        virtual void pause() = 0;
-        virtual void unpause() = 0;
+        virtual void pause();
+        virtual void unpause();
         virtual void update() = 0;
         
         PROTOCOL_TYPE getProtocolType();

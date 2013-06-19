@@ -12,16 +12,17 @@ class ShowPublicAddress : public Protocol
         
         virtual void messageReceived(uint8_t* data);
         virtual void setup();
-        virtual void start();
-        virtual void pause();
-        virtual void unpause();
         virtual void update();
         
-        virtual void setNickname(std::string nickname);
+        virtual void setUsername(std::string username);
         virtual void setPassword(std::string password);
+        virtual void setPublicAddress(uint32_t ip, uint16_t port);
+        
     protected:
-        std::string m_nickname;
+        std::string m_username;
         std::string m_password;
+        uint32_t m_publicIp;
+        uint16_t m_publicPort;
         
         enum STATE
         {

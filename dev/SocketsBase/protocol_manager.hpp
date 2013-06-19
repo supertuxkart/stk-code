@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stdint.h>
+#include "singleton.hpp"
 
 class Protocol;
 
@@ -13,8 +14,9 @@ enum PROTOCOL_STATE
     PROTOCOL_STATE_TERMINATED
 };
 
-class ProtocolManager
+class ProtocolManager : public Singleton<ProtocolManager>
 {
+    friend class Singleton<ProtocolManager>;
     typedef struct
     {
         PROTOCOL_STATE state;
@@ -36,6 +38,7 @@ class ProtocolManager
         virtual void update();
         
         virtual int runningProtocolsCount();
+        virtual PROTOCOL_STATE getProtocolState(uint32_t id);
         
     protected:
         void assignProtocolId(ProtocolInfo& protocolInfo);

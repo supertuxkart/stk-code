@@ -16,8 +16,9 @@ class ClientNetworkManager : public NetworkManager
         
         virtual void packetReceived(char* data);
         virtual void sendPacket(char* data);
+        
     protected:
-    private:
+    
 };
 
 #endif // CLIENT_NETWORK_MANAGER_HPP

@@ -12,9 +12,6 @@ class ConnectToServer : public Protocol, public CallbackObject
         
         virtual void messageReceived(uint8_t* data);
         virtual void setup();
-        virtual void start();
-        virtual void pause();
-        virtual void unpause();
         virtual void update();
         
         void setSelfAddress(uint32_t ip, uint16_t port);

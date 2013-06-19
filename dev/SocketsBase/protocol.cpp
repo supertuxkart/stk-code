@@ -9,6 +9,16 @@ Protocol::~Protocol()
 {
 }
 
+void Protocol::pause()
+{
+    m_listener->pauseProtocol(this);
+}
+void Protocol::unpause()
+{
+    m_listener->unpauseProtocol(this);
+}
+
+
 void Protocol::setListener(ProtocolManager* listener)
 {
     m_listener = listener; 

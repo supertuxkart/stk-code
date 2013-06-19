@@ -31,8 +31,7 @@ int ProtocolManager::startProtocol(Protocol* protocol)
     m_protocols.push_back(protocolInfo);
     protocol->setListener(this);
     protocol->setup();
-    protocol->start();
-    printf("*** PROTOCOL MANAGER *** - A new protocol has been started. There are %ld protocols running.\n", m_protocols.size());
+    printf("__ProtocolManager> A new protocol with id=%ud been started. There are %ld protocols running.\n", protocolInfo.id, m_protocols.size());
     return protocolInfo.id;
 }
 void ProtocolManager::stopProtocol(Protocol* protocol)
@@ -73,7 +72,7 @@ void ProtocolManager::protocolTerminated(Protocol* protocol)
             offset++;
         }
     }
-    printf("*** PROTOCOL MANAGER *** - A protocol has been terminated. There are %ld protocols running.\n", m_protocols.size());
+    printf("__ProtocolManager> A protocol has been terminated. There are %ld protocols running.\n", m_protocols.size());
 }
 
 void ProtocolManager::update()
@@ -102,6 +101,16 @@ void ProtocolManager::update()
 int ProtocolManager::runningProtocolsCount()
 {
     return m_protocols.size();
+}
+
+PROTOCOL_STATE ProtocolManager::getProtocolState(uint32_t id)
+{
+    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    {
+        if (m_protocols[i].id == id)
+            return m_protocols[i].state;
+    }
+    return PROTOCOL_STATE_TERMINATED;
 }
 
 void ProtocolManager::assignProtocolId(ProtocolInfo& protocolInfo)

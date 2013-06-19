@@ -20,7 +20,6 @@ class Singleton
             }
             else
             {
-                std::cout << "singleton already created!" << std::endl;
             }
             return (static_cast<T*> (m_singleton));
         }
@@ -38,6 +37,6 @@ class Singleton
         static T *m_singleton;
 };
 
-template <typename T> T *Singleton<T>::_singleton = NULL;
+template <typename T> T *Singleton<T>::m_singleton = NULL;
 
 #endif // SINGLETON_HPP
