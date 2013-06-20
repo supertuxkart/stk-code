@@ -54,7 +54,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 
 XMLNode * HTTPConnector::getXMLFromPage(Parameters & post_parameters)
 {
-    return NULL;
+    return file_manager->createXMLTreeFromString(getPage(post_parameters));
 }
 
 std::string HTTPConnector::getPage(Parameters & post_parameters)

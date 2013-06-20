@@ -51,18 +51,19 @@ CurrentOnlineUser::CurrentOnlineUser(){
 
 bool CurrentOnlineUser::signIn(const stringw &username, const stringw &password)
 {
-    return false; //FIXME : only temporary
     assert(m_is_signed_in == false);
+    /*
     HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
     HTTPConnector::Parameters parameters;
     parameters["action"] = "signin";
     parameters["user"] = username;
-    std::string result = connector->getPage(parameters);
-    printf("Result: %s\n", result.c_str());
+    const XMLNode * result = connector->getXMLFromPage(parameters);*/
+
     //Sign in
-    if(/*succes*/false)
+    if(/*succes*/true)
     {
         m_user = new OnlineUser(username);
+        m_token = "0000"; //of course this should come from the server eventualy.
         m_is_signed_in = true;
     }
     else
