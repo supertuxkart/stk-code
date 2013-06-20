@@ -105,15 +105,6 @@ source/Irrlicht/COBJMeshWriter.cpp
 source/Irrlicht/CGUIScrollBar.cpp
 source/Irrlicht/CAttributes.cpp
 source/Irrlicht/CTRTextureGouraudAdd.cpp
-source/Irrlicht/aesGladman/hmac.cpp
-source/Irrlicht/aesGladman/sha1.cpp
-source/Irrlicht/aesGladman/sha2.cpp
-source/Irrlicht/aesGladman/fileenc.cpp
-source/Irrlicht/aesGladman/prng.cpp
-source/Irrlicht/aesGladman/aescrypt.cpp
-source/Irrlicht/aesGladman/pwd2key.cpp
-source/Irrlicht/aesGladman/aeskey.cpp
-source/Irrlicht/aesGladman/aestab.cpp
 source/Irrlicht/CGUIStaticText.cpp
 source/Irrlicht/CSceneNodeAnimatorCollisionResponse.cpp
 source/Irrlicht/CGUIFont.cpp
@@ -655,27 +646,6 @@ include/IGUIFileOpenDialog.h
 include/IBoneSceneNode.h
 include/IShaderConstantSetCallBack.h
 include/ITexture.h
-
-
-source/Irrlicht/lzma/LzmaDec.c
-source/Irrlicht/lzma/Types.h
-source/Irrlicht/lzma/LzmaDec.h
-
-
-source/Irrlicht/bzip2/mk251.c
-source/Irrlicht/bzip2/unzcrash.c
-source/Irrlicht/bzip2/spewG.c
-source/Irrlicht/bzip2/decompress.c
-source/Irrlicht/bzip2/bzcompress.c
-source/Irrlicht/bzip2/bzlib.c
-source/Irrlicht/bzip2/huffman.c
-source/Irrlicht/bzip2/bzip2recover.c
-source/Irrlicht/bzip2/bzip2.c
-source/Irrlicht/bzip2/crctable.c
-source/Irrlicht/bzip2/randtable.c
-source/Irrlicht/bzip2/blocksort.c
-source/Irrlicht/bzip2/bzlib_private.h
-source/Irrlicht/bzip2/bzlib.h
 
 
 source/Irrlicht/zlib/infback.c
