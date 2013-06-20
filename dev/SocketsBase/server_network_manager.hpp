@@ -16,6 +16,7 @@ class ServerNetworkManager : public NetworkManager
         virtual void run();
         
         void start();
+        bool connectToPeer(std::string peerUsername);
         
         virtual void packetReceived(char* data);
         virtual void sendPacket(char* data);

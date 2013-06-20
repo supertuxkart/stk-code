@@ -40,6 +40,18 @@ void NetworkManager::run()
     pthread_create(m_protocolManagerUpdateThread, NULL, protocolManagerUpdate, ProtocolManager::getInstance());
 }
 
+bool NetworkManager::connect(uint32_t ip, uint16_t port)
+{
+    if (peerExists(ip, port))
+        return isConnectedTo(ip, port);
+        
+    STKPeer* peer = new STKPeer();
+    bool success = peer->connectToHost(m_localhost, ip, port, 2, 0);
+    if (success)
+        m_peers.push_back(peer);
+    return success;
+}
+
 void NetworkManager::setManualSocketsMode(bool manual)
 {
     if (manual)
@@ -58,6 +70,26 @@ void NetworkManager::setPublicAddress(uint32_t ip, uint16_t port)
 {
     m_publicAddress.ip = ip;
     m_publicAddress.port = port;
+}
+
+bool NetworkManager::peerExists(uint32_t ip, uint16_t port)
+{
+    for (unsigned int i = 0; i < m_peers.size(); i++)
+        if (m_peers[i]->getAddress() == ip && m_peers[i]->getPort() == port)
+            return true;
+    return m_localhost->peerExists(ip, port);
+}
+
+bool NetworkManager::isConnectedTo(uint32_t ip, uint16_t port)
+{
+    for (unsigned int i = 0; i < m_peers.size(); i++)
+    {
+        if (m_peers[i]->getAddress() == ip && m_peers[i]->getPort() == port && m_peers[i]->isConnected())
+        {
+            return true;
+        }
+    }
+    return m_localhost->isConnectedTo(ip, port);
 }
 
 STKHost* NetworkManager::getHost()

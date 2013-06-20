@@ -31,6 +31,8 @@ class STKHost
         uint8_t* receiveRawPacket(unsigned int dstIp, unsigned short dstPort);
         void broadcastPacket(char* data);
         
+        bool peerExists(uint32_t ip, uint16_t port);
+        bool isConnectedTo(uint32_t ip, uint16_t port);
     protected:
         ENetHost* m_host;
         pthread_t* m_listeningThread;

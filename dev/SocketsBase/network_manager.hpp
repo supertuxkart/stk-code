@@ -16,6 +16,7 @@ class NetworkManager : public Singleton<NetworkManager>
         virtual void run(); 
         
         // network management functions
+        virtual bool connect(uint32_t ip, uint16_t port);
         virtual void setManualSocketsMode(bool manual);
         virtual void packetReceived(char* data) = 0;
 
@@ -24,6 +25,8 @@ class NetworkManager : public Singleton<NetworkManager>
         void setPublicAddress(uint32_t ip, uint16_t port);
         
         // getters
+        virtual bool peerExists(uint32_t ip, uint16_t port);
+        virtual bool isConnectedTo(uint32_t ip, uint16_t port);
         STKHost* getHost();
     protected:
         NetworkManager();

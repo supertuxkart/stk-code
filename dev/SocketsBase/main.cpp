@@ -40,7 +40,7 @@ int main()
         std::string buffer;
         while (1)
         {
-            cin >> buffer;
+            getline(std::cin, buffer);
             if (buffer == "cmd=connect")
             {
                 cout << "Host Nickname=";
@@ -68,12 +68,49 @@ int main()
     }
     else if (answer == "host")
     {
+        std::string nickname;
+        std::string password;
+        std::cout << "Username=";
+        std::cin >> nickname;
+        std::cout << "Password=";
+        std::cin >> password;
         //NetworkInterface::getInstance()->initNetwork(true);
+        ServerNetworkManager::getInstance()->setLogin(nickname, password);
         ServerNetworkManager::getInstance()->run();
         ServerNetworkManager::getInstance()->start();
         //GetPublicAddress
         
-        while(1){}
+        std::string buffer;
+        while (1)
+        {
+            getline(std::cin, buffer);
+            if (buffer == "cmd=connect")
+            {
+                std::string peer;
+                std::cout << "Peer nickname=";
+                std::cin >> peer;
+                ServerNetworkManager::getInstance()->connectToPeer(peer);
+                continue;
+            }
+            if (buffer == "cmd=talkto")
+            {
+                uint32_t peer;
+                std::cout << "Peer ip=";
+                std::cin >> peer;
+                uint32_t port;
+                std::cout << "Peer port=";
+                std::cin >> port;
+                ServerNetworkManager::getInstance()->setManualSocketsMode(true);
+                char msg[] = "test";
+                ServerNetworkManager::getInstance()->getHost()->sendRawPacket((uint8_t*)(msg), sizeof(msg), peer, port);
+                ServerNetworkManager::getInstance()->setManualSocketsMode(false);
+                continue;
+            }
+            if (buffer.size() == 0) { continue; }
+            char buffer2[256];
+            strcpy(buffer2, buffer.c_str());
+            
+        }
     }
     return 0;
 }

@@ -12,7 +12,7 @@ STKPeer::~STKPeer()
 {
 }
 
-bool STKPeer::connectToServer(STKHost* host, uint32_t ip, uint16_t port, uint32_t channelCount, uint32_t data)
+bool STKPeer::connectToHost(STKHost* host, uint32_t ip, uint16_t port, uint32_t channelCount, uint32_t data)
 {
     ENetAddress  address;
     address.host = ip;
@@ -34,6 +34,16 @@ void STKPeer::sendPacket(char* data)
     
     ENetPacket* packet = enet_packet_create(data, strlen(data)+1,ENET_PACKET_FLAG_RELIABLE);
     enet_peer_send(m_peer, 0, packet);
+}
+
+uint32_t STKPeer::getAddress()
+{
+    return m_peer->address.host;
+}
+
+uint16_t STKPeer::getPort()
+{
+    return m_peer->address.port;
 }
 
 bool STKPeer::isConnected()

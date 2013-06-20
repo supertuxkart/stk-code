@@ -17,6 +17,7 @@ void* STKHost::receive_data(void* self)
             printf("message received\n");
             switch (event.type) {
                 case ENET_EVENT_TYPE_RECEIVE:
+                    printf("Sender : %ld", event.peer->address.host);
                     NetworkManager::getInstance()->packetReceived((char*) event.packet->data);
                     break;
                 case ENET_EVENT_TYPE_DISCONNECT:
@@ -46,11 +47,11 @@ STKHost::~STKHost()
 
 void STKHost::setupServer(uint32_t address, uint16_t port, int peerCount, int channelLimit, uint32_t maxIncomingBandwidth, uint32_t maxOutgoingBandwidth)
 {
-    ENetAddress addr;
-    addr.host = address;
-    addr.port = port;
+    ENetAddress* addr = (ENetAddress*)(malloc(sizeof(ENetAddress)));
+    addr->host = address;
+    addr->port = port;
 
-    m_host = enet_host_create(&addr, peerCount, channelLimit, maxIncomingBandwidth, maxOutgoingBandwidth);
+    m_host = enet_host_create(addr, peerCount, channelLimit, maxIncomingBandwidth, maxOutgoingBandwidth);
     if (m_host == NULL)
     {
         fprintf (stderr, "An error occurred while trying to create an ENet server host.\n");
@@ -144,4 +145,27 @@ void STKHost::broadcastPacket(char* data)
 {
     ENetPacket* packet = enet_packet_create(data, strlen(data)+1,ENET_PACKET_FLAG_RELIABLE);
     enet_host_broadcast(m_host, 0, packet);
+}
+
+bool STKHost::peerExists(uint32_t ip, uint16_t port)
+{
+    for (unsigned int i = 0; i < m_host->peerCount; i++)
+    {
+        if (m_host->peers[i].address.host == ip && m_host->peers[i].address.port == port)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+bool STKHost::isConnectedTo(uint32_t ip, uint16_t port)
+{
+    for (unsigned int i = 0; i < m_host->peerCount; i++)
+    {
+        if (m_host->peers[i].address.host == ip && m_host->peers[i].address.port == port && m_host->peers[i].state == ENET_PEER_STATE_CONNECTED)
+        {
+            return true;
+        }
+    }
+    return false;
 }

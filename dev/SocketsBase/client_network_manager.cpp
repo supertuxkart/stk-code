@@ -30,15 +30,6 @@ void ClientNetworkManager::run()
     NetworkManager::run();
 }
 
-bool ClientNetworkManager::connect(uint32_t ip, uint16_t port)
-{
-    STKPeer* peer = new STKPeer();
-    bool success = peer->connectToServer(m_localhost, ip, port, 2, 0);
-    if (success)
-        m_peers.push_back(peer);
-    return success;
-}
-
 bool ClientNetworkManager::connectToHost(std::string serverNickname)
 {
     printf("_NetworkInterface>Starting the connection to host protocol\n");

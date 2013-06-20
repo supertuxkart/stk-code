@@ -43,8 +43,8 @@ void ConnectToServer::update()
             currentTime += 3600;
         if (currentTime > target)
         {
-            ClientNetworkManager::getInstance()->connect(m_serverIp, m_serverPort);
-            if (ClientNetworkManager::getInstance()->getPeer()->isConnected())
+            NetworkManager::getInstance()->connect(m_serverIp, m_serverPort);
+            if (NetworkManager::getInstance()->isConnectedTo(m_serverIp, m_serverPort))
             {   
                 m_state = DONE;
                 return;

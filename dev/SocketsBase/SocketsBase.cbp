@@ -38,13 +38,13 @@
 			<Add option="-lcurl" />
 			<Add library="../../lib/enet/build/libenet.a" />
 		</Linker>
-		<Unit filename="callback_object.cpp" />
-		<Unit filename="callback_object.hpp" />
 		<Unit filename="client_network_manager.cpp" />
 		<Unit filename="client_network_manager.hpp" />
 		<Unit filename="http_functions.cpp" />
 		<Unit filename="http_functions.hpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="network_interface.cpp" />
+		<Unit filename="network_interface.hpp" />
 		<Unit filename="network_manager.cpp" />
 		<Unit filename="network_manager.hpp" />
 		<Unit filename="protocol.cpp" />
@@ -53,6 +53,8 @@
 		<Unit filename="protocol_manager.hpp" />
 		<Unit filename="protocols/connect_to_server.cpp" />
 		<Unit filename="protocols/connect_to_server.hpp" />
+		<Unit filename="protocols/get_peer_address.cpp" />
+		<Unit filename="protocols/get_peer_address.hpp" />
 		<Unit filename="protocols/get_public_address.cpp" />
 		<Unit filename="protocols/get_public_address.hpp" />
 		<Unit filename="protocols/hide_public_address.cpp" />
@@ -66,7 +68,9 @@
 		<Unit filename="stk_host.hpp" />
 		<Unit filename="stk_peer.cpp" />
 		<Unit filename="stk_peer.hpp" />
+		<Unit filename="time.cpp" />
 		<Unit filename="time.hpp" />
+		<Unit filename="types.hpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
