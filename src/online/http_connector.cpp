@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <memory.h>
 #include "io/file_manager.hpp"
+#include "utils/string_utils.hpp"
 
 
 HTTPConnector::HTTPConnector(const std::string &url){
@@ -69,7 +70,9 @@ std::string HTTPConnector::getPage(Parameters & post_parameters)
        postString.append("=");
        postString.append(iter->second);
     }
-    curl_easy_setopt(this->curl, CURLOPT_POSTFIELDS, postString.c_str());
+    core::stringc postString2 = postString.c_str();
+    printf("Sending: %s\n", postString2.c_str());
+    curl_easy_setopt(this->curl, CURLOPT_POSTFIELDS, postString2.c_str());
     std::string readBuffer;
     curl_easy_setopt(this->curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(this->curl, CURLOPT_FILE, &readBuffer);
@@ -78,6 +81,8 @@ std::string HTTPConnector::getPage(Parameters & post_parameters)
     {
         Log::error("online/http_functions", "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
         printf("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+    }else{
+        printf("Retrieved: %s\n", readBuffer.c_str());
     }
     return readBuffer; 
 }
