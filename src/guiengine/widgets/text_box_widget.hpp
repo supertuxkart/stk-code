@@ -68,6 +68,7 @@ namespace GUIEngine
         void clearListeners();
         
         irr::core::stringw getText() const;
+        void setPasswordBox(bool passwordBox, wchar_t passwordChar = L'*');
         
         virtual void elementRemoved();
     };

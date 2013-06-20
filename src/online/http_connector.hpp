@@ -22,6 +22,8 @@
 #include <string>
 #include "io/xml_node.hpp"
 #include <curl/curl.h>
+#include <irrString.h>
+using namespace irr;
 
 /**
   * \brief Class to connect with a server over HTTP
@@ -34,7 +36,7 @@ class HTTPConnector
         CURLcode res;
 
     public:
-        typedef std::map <std::string, std::string> Parameters;
+        typedef std::map<core::stringw, core::stringw> Parameters;
         HTTPConnector(const std::string &url);
         ~HTTPConnector();
         std::string getPage(Parameters & post_parameters);

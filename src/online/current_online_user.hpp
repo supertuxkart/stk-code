@@ -19,9 +19,10 @@
 #ifndef HEADER_CURRENT_ONLINE_USER_HPP
 #define HEADER_CURRENT_ONLINE_USER_HPP
 
-#include <string>
-
 #include "online/online_user.hpp"
+#include <string>
+#include <irrString.h>
+using namespace irr;
 
 
 // ============================================================================
@@ -44,9 +45,10 @@ class CurrentOnlineUser
         // singleton
         static CurrentOnlineUser* get();
         static void deallocate();
-        bool signIn(const std::string &username, const std::string &password);
+        bool signIn(const core::stringw &username, const core::stringw &password);
         /** Returns the username if signed in. */
-        std::string getUserName() const;
+        core::stringw getUserName() const;
+        bool isSignedIn(){ return m_is_signed_in; }
 
 };   // class CurrentOnlineUser
 

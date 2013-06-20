@@ -28,7 +28,9 @@
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
+#include "utils/string_utils.hpp"
 #include "online/current_online_user.hpp"
+
 
 using namespace GUIEngine;
 using namespace irr;
@@ -42,11 +44,13 @@ LoginDialog::LoginDialog(const float w, const float h) :
     m_self_destroy = false;
     loadFromFile("login_dialog.stkgui");
 
-    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("username");
+    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("password");
+    assert(textCtrl != NULL);
+    textCtrl->setPasswordBox(true,L'*');
+
+    textCtrl = getWidget<TextBoxWidget>("username");
     assert(textCtrl != NULL);
     textCtrl->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-
-    //if (translations->isRTLLanguage()) textCtrl->addListener(this);
 }
 
 // -----------------------------------------------------------------------------
@@ -62,6 +66,36 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
     if (eventSource == "cancel")
     {
         dismiss();
+        return GUIEngine::EVENT_BLOCK;
+    }
+    else if(eventSource == "signin")
+    {
+        // ---- See if we can accept the input
+        TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("username");
+        const stringw username = textCtrl->getText().trim();
+        if (!StringUtils::notEmpty(username)){
+            getWidget<LabelWidget>("errormsg")->setText(_("Username was empty"), false);
+            sfx_manager->quickSound( "anvil" );
+            return GUIEngine::EVENT_BLOCK;
+        }
+        textCtrl = getWidget<TextBoxWidget>("password");
+        const stringw password = textCtrl->getText().trim();
+        if (!StringUtils::notEmpty(password)){
+            getWidget<LabelWidget>("errormsg")->setText(_("Password was empty"), false);
+            sfx_manager->quickSound( "anvil" );
+            return GUIEngine::EVENT_BLOCK;
+        }
+
+        if(CurrentOnlineUser::get()->signIn(username, password))
+        {
+            m_self_destroy = true;
+        }
+        else
+        {
+            getWidget<LabelWidget>("errormsg")->setText(_("Signing in went wrong."), false);
+            sfx_manager->quickSound( "anvil" );
+            m_self_destroy = false;
+        }
         return GUIEngine::EVENT_BLOCK;
     }
     return GUIEngine::EVENT_LET;
@@ -81,40 +115,7 @@ void LoginDialog::onEnterPressedInternal()
         return;
     }
 
-    // ---- Otherwise, see if we can accept the new name
-    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("username");
-    stringw username = textCtrl->getText().trim();
-    const int size = username.size();
 
-    // sanity check
-    int nonEmptyChars = 0;
-    for (int n=0; n<size; n++)
-    {
-        if (username[n] != L' ')
-        {
-            nonEmptyChars++;
-        }
-    }
-    std::string msg;
-    if (size > 0 && nonEmptyChars > 0)
-    {
-        Log::info("Login Dialog","Username : %ls", username.c_str());
-        if(CurrentOnlineUser::get()->signIn(core::stringc(username.c_str()).c_str(), ""))
-        {
-            m_self_destroy = true;
-        }else{
-            msg = "Signing in failed.";
-            m_self_destroy = false;
-        }
-
-    } // if valid name
-    else
-        msg = "Invalid username.";
-    {
-        LabelWidget* label = getWidget<LabelWidget>("title");
-        label->setText(_(msg.c_str()), false);
-        sfx_manager->quickSound( "anvil" );
-    }
 }
 
 // -----------------------------------------------------------------------------

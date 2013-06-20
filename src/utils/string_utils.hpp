@@ -41,6 +41,8 @@ namespace StringUtils
     std::string removeExtension(const std::string& filename);
     std::string getExtension(const std::string& filename);
 
+    bool notEmpty(const irr::core::stringw& input);
+
     template <class T>
     std::string toString (const T& any)
     {

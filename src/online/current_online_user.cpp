@@ -49,8 +49,9 @@ CurrentOnlineUser::CurrentOnlineUser(){
 
 // ============================================================================
 
-bool CurrentOnlineUser::signIn(const std::string &username, const std::string &password)
+bool CurrentOnlineUser::signIn(const stringw &username, const stringw &password)
 {
+    return false; //FIXME : only temporary
     assert(m_is_signed_in == false);
     HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
     HTTPConnector::Parameters parameters;
@@ -73,7 +74,7 @@ bool CurrentOnlineUser::signIn(const std::string &username, const std::string &p
 
 // ============================================================================
 
-std::string CurrentOnlineUser::getUserName() const
+core::stringw CurrentOnlineUser::getUserName() const
 {
     if(m_is_signed_in){
         assert(m_user != NULL);
