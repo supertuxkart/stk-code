@@ -61,22 +61,26 @@ XMLNode * HTTPConnector::getXMLFromPage(Parameters & post_parameters)
 std::string HTTPConnector::getPage(Parameters & post_parameters)
 {
     Parameters::iterator iter;
-    core::stringw postString;
+    std::string postString;
     for (iter = post_parameters.begin(); iter != post_parameters.end(); ++iter)
     {
        if(iter != post_parameters.begin())
            postString.append("&");
-       postString.append(iter->first);
+       char * escaped = curl_easy_escape(this->curl , iter->first.c_str(), iter->first.size());
+       postString.append(escaped);
+       curl_free(escaped);
        postString.append("=");
-       postString.append(iter->second);
+       escaped = curl_easy_escape(this->curl , iter->second.c_str(), iter->second.size());
+       postString.append(escaped);
+       curl_free(escaped);
     }
-    core::stringc postString2 = postString.c_str();
-    printf("Sending: %s\n", postString2.c_str());
-    curl_easy_setopt(this->curl, CURLOPT_POSTFIELDS, postString2.c_str());
+    printf("Sending: %s\n", postString.c_str());
+    curl_easy_setopt(this->curl, CURLOPT_POSTFIELDS, postString.c_str());
     std::string readBuffer;
     curl_easy_setopt(this->curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(this->curl, CURLOPT_FILE, &readBuffer);
     res = curl_easy_perform(this->curl);
+
     if(res != CURLE_OK)
     {
         Log::error("online/http_functions", "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
@@ -84,7 +88,7 @@ std::string HTTPConnector::getPage(Parameters & post_parameters)
     }else{
         printf("Retrieved: %s\n", readBuffer.c_str());
     }
-    return readBuffer; 
+    return readBuffer;
 }
 
 

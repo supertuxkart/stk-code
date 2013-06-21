@@ -85,8 +85,8 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
             sfx_manager->quickSound( "anvil" );
             return GUIEngine::EVENT_BLOCK;
         }
-
-        if(CurrentOnlineUser::get()->signIn(username, password))
+        ;
+        if(CurrentOnlineUser::get()->signIn(core::stringc(username.c_str()).c_str(), core::stringc(password.c_str()).c_str()))
         {
             m_self_destroy = true;
         }
