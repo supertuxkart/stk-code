@@ -51,3 +51,7 @@ bool STKPeer::isConnected()
     printf("PEER STATE %i\n", m_peer->state);
     return (m_peer->state == ENET_PEER_STATE_CONNECTED);
 }
+bool STKPeer::operator==(ENetPeer* peer)
+{
+    return peer==m_peer;
+}

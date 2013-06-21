@@ -1,9 +1,11 @@
 #ifndef PROTOCOL_MANAGER_HPP
 #define PROTOCOL_MANAGER_HPP
 
+#include "singleton.hpp"
+#include "event.hpp"
+
 #include <vector>
 #include <stdint.h>
-#include "singleton.hpp"
 
 class Protocol;
 
@@ -25,7 +27,7 @@ class ProtocolManager : public Singleton<ProtocolManager>
     } ProtocolInfo;
     public:
         
-        virtual void messageReceived(uint8_t* data);
+        virtual void notifyEvent(Event* event);
         virtual void sendMessage(std::string message);
         
         virtual int  startProtocol(Protocol* protocol);
@@ -47,7 +49,11 @@ class ProtocolManager : public Singleton<ProtocolManager>
         
         // protected members
         std::vector<ProtocolInfo> m_protocols;
-        std::vector<uint8_t*> m_messagesToProcess;
+        std::vector<std::string> m_messagesToProcess;
+        
+        // mutexes:
+        pthread_mutex_t m_messagesMutex;
+        pthread_mutex_t m_protocolsMutex;
 };
 
 #endif // PROTOCOL_MANAGER_HPP

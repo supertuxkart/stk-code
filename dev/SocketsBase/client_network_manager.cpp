@@ -69,7 +69,7 @@ bool ClientNetworkManager::connectToHost(std::string serverNickname)
     {
     } 
     bool success = false;
-    if (m_peers[0]->isConnected())
+    if (m_localhost->isConnectedTo(addr.ip, addr.port))
     {
        success = true;
         printf("_NetworkInterface> CONNECTION SUCCES : YOU ARE NOW CONNECTED TO A SERVER.\n");

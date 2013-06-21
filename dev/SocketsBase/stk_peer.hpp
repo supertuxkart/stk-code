@@ -10,6 +10,7 @@ class STKPeer
         STKPeer();
         virtual ~STKPeer();
         
+        
         static void* receive_data(void* self);
         
         virtual void sendPacket(char* data);
@@ -20,6 +21,7 @@ class STKPeer
         
         uint32_t getAddress();
         uint16_t getPort();
+        bool operator==(ENetPeer* peer);
     protected:
         ENetPeer* m_peer;
 };

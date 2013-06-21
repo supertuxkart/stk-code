@@ -8,6 +8,7 @@
 #include "protocol_manager.hpp"
 #include "singleton.hpp"
 #include "types.hpp"
+#include "event.hpp"
 
 class NetworkManager : public Singleton<NetworkManager>
 {
@@ -18,6 +19,7 @@ class NetworkManager : public Singleton<NetworkManager>
         // network management functions
         virtual bool connect(uint32_t ip, uint16_t port);
         virtual void setManualSocketsMode(bool manual);
+        virtual void notifyEvent(Event* event);
         virtual void packetReceived(char* data) = 0;
 
         // raw data management
@@ -28,6 +30,7 @@ class NetworkManager : public Singleton<NetworkManager>
         virtual bool peerExists(uint32_t ip, uint16_t port);
         virtual bool isConnectedTo(uint32_t ip, uint16_t port);
         STKHost* getHost();
+        std::vector<STKPeer*> getPeers();
     protected:
         NetworkManager();
         virtual ~NetworkManager();

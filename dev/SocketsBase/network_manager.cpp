@@ -60,6 +60,26 @@ void NetworkManager::setManualSocketsMode(bool manual)
         m_localhost->startListening();
 }
 
+void NetworkManager::notifyEvent(Event* event)
+{
+    printf("EVENT received\n");
+    switch (event->type) 
+    {
+        case EVENT_TYPE_MESSAGE:
+            printf("Message, Sender : %ld\n", event->peer->getAddress());
+            break;
+        case EVENT_TYPE_DISCONNECTED:
+            printf("Somebody is now disconnected.\n");
+            printf("Disconnected host: %i.%i.%i.%i:%i\n", event->peer->getAddress()>>24&0xff, event->peer->getAddress()>>16&0xff, event->peer->getAddress()>>8&0xff, event->peer->getAddress()&0xff,event->peer->getPort());
+            break;
+        case EVENT_TYPE_CONNECTED:
+            printf("A client has just connected.\n");
+            break;
+    }
+    ProtocolManager::getInstance()->notifyEvent(event);
+    delete event; // event won't be use again
+}
+
 void NetworkManager::setLogin(std::string username, std::string password)
 {
     m_playerLogin.username = username;
@@ -74,25 +94,20 @@ void NetworkManager::setPublicAddress(uint32_t ip, uint16_t port)
 
 bool NetworkManager::peerExists(uint32_t ip, uint16_t port)
 {
-    for (unsigned int i = 0; i < m_peers.size(); i++)
-        if (m_peers[i]->getAddress() == ip && m_peers[i]->getPort() == port)
-            return true;
     return m_localhost->peerExists(ip, port);
 }
 
 bool NetworkManager::isConnectedTo(uint32_t ip, uint16_t port)
 {
-    for (unsigned int i = 0; i < m_peers.size(); i++)
-    {
-        if (m_peers[i]->getAddress() == ip && m_peers[i]->getPort() == port && m_peers[i]->isConnected())
-        {
-            return true;
-        }
-    }
     return m_localhost->isConnectedTo(ip, port);
 }
 
 STKHost* NetworkManager::getHost()
 {
     return m_localhost;
+}
+
+std::vector<STKPeer*> NetworkManager::getPeers()
+{
+    return m_peers;
 }

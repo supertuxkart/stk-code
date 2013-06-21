@@ -29,4 +29,5 @@ class PlayerLogin : public CallbackObject
     std::string password;
 };
 
+
 #endif // TYPES_HPP

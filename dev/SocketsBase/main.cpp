@@ -31,6 +31,10 @@ int main()
         std::string nickname;
         std::string password;
         std::string hostNickname;
+        std::cout << "Username=";
+        std::cin >> nickname;
+        std::cout << "Password=";
+        std::cin >> password;
         
         //NetworkManager::getInstance()->run();
         

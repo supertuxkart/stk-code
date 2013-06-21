@@ -14,22 +14,8 @@ void* STKHost::receive_data(void* self)
     while (1) 
     {
         while (enet_host_service(host, &event, 0) != 0) {
-            printf("message received\n");
-            switch (event.type) {
-                case ENET_EVENT_TYPE_RECEIVE:
-                    printf("Sender : %ld", event.peer->address.host);
-                    NetworkManager::getInstance()->packetReceived((char*) event.packet->data);
-                    break;
-                case ENET_EVENT_TYPE_DISCONNECT:
-                    printf("Somebody is now disconnected.\n");
-                    printf("Disconnected host: %i.%i.%i.%i:%i\n", event.peer->address.host>>24&0xff, event.peer->address.host>>16&0xff, event.peer->address.host>>8&0xff, event.peer->address.host&0xff,event.peer->address.port);
-                    break;
-                case ENET_EVENT_TYPE_CONNECT:
-                    printf("A client has just connected.\n");
-                    break;
-                case ENET_EVENT_TYPE_NONE:
-                    break;
-            }
+            Event* evt = new Event(&event);
+            NetworkManager::getInstance()->notifyEvent(evt);
         }
     }
     return NULL;
