@@ -24,7 +24,7 @@
 
 
 // ============================================================================
-OnlineUser::OnlineUser(const std::string &username)
+OnlineUser::OnlineUser(const irr::core::stringw &username)
 {
     m_username = username;
 }   // OnlineUser

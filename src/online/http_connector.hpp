@@ -36,7 +36,7 @@ class HTTPConnector
         CURLcode res;
 
     public:
-        typedef std::map<std::string, std::string> Parameters;
+        typedef std::map<std::string, core::stringw> Parameters;
         HTTPConnector(const std::string &url);
         ~HTTPConnector();
         std::string getPage(Parameters & post_parameters);

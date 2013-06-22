@@ -24,6 +24,7 @@
 #include <assert.h>
 #include "online/http_connector.hpp"
 #include "config/user_config.hpp"
+#include "utils/string_utils.hpp"
 
 static CurrentOnlineUser* user_singleton = NULL;
 
@@ -48,8 +49,39 @@ CurrentOnlineUser::CurrentOnlineUser(){
 }
 
 // ============================================================================
+// Register
+bool CurrentOnlineUser::signUp(const irr::core::stringw &username, const irr::core::stringw &password, irr::core::stringw &msg){
+    assert(m_is_signed_in == false);
+    HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+    HTTPConnector::Parameters parameters;
+    parameters["action"] = "register";
+    parameters["user"] = username;
+    parameters["password"] = password;
+    const XMLNode * result = connector->getXMLFromPage(parameters);
+    std::string rec_success;
+    if(result->get("success", &rec_success))
+    {
+        if(rec_success == "yes")
+        {
+            msg = "Registered!";
+            return true;
+        }
+        else
+        {
+            msg = "Registering went wrong!";
+        }
+    }
+    else
+    {
+        msg = "Registering went wrong!2";
+    }
+    return false;
+}
 
-bool CurrentOnlineUser::signIn(const std::string &username, const std::string &password)
+
+// ============================================================================
+
+bool CurrentOnlineUser::signIn(const irr::core::stringw &username, const irr::core::stringw &password, irr::core::stringw &msg)
 {
     assert(m_is_signed_in == false);
     HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
@@ -58,12 +90,17 @@ bool CurrentOnlineUser::signIn(const std::string &username, const std::string &p
     parameters["user"] = username;
     parameters["password"] = password;
     const XMLNode * result = connector->getXMLFromPage(parameters);
-    std::string token;
-    bool succes = result->get("token", &token);
-    if(succes)
+    return false;
+    std::string rec_token;
+    irr::core::stringw rec_username;
+    std::string rec_userid;
+
+    if(result->get("token", &rec_token) && result->get("username", &rec_username) && result->get("userid", &rec_userid))
     {
-        m_user = new OnlineUser(username);
-        m_token = token;
+        long userid;
+        StringUtils::fromString<long>(rec_userid, userid);
+        m_user = new OnlineUser("");
+        m_token = rec_token;
         m_is_signed_in = true;
     }
     else
@@ -75,7 +112,7 @@ bool CurrentOnlineUser::signIn(const std::string &username, const std::string &p
 
 // ============================================================================
 
-std::string CurrentOnlineUser::getUserName() const
+irr::core::stringw CurrentOnlineUser::getUserName() const
 {
     if(m_is_signed_in){
         assert(m_user != NULL);

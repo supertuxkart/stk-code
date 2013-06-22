@@ -21,6 +21,7 @@
 
 #include "online/online_user.hpp"
 #include <string>
+#include <irrString.h>
 
 
 // ============================================================================
@@ -43,9 +44,10 @@ class CurrentOnlineUser
         // singleton
         static CurrentOnlineUser* get();
         static void deallocate();
-        bool signIn(const std::string &username, const std::string &password);
+        bool signIn(const irr::core::stringw &username, const irr::core::stringw &password, irr::core::stringw &msg);
+        bool signUp(const irr::core::stringw &username, const irr::core::stringw &password, irr::core::stringw &msg);
         /** Returns the username if signed in. */
-        std::string getUserName() const;
+        irr::core::stringw getUserName() const;
         bool isSignedIn(){ return m_is_signed_in; }
 
 };   // class CurrentOnlineUser

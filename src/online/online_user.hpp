@@ -19,7 +19,7 @@
 #ifndef HEADER_ONLINE_USER_HPP
 #define HEADER_ONLINE_USER_HPP
 
-#include <string>
+#include <irrString.h>
 
 // ============================================================================
 
@@ -33,17 +33,17 @@ class OnlineUser
 
     protected:
 
-        std::string m_username;
+        irr::core::stringw m_username;
 
     public:
 
         /**
           * Constructor
           */
-        OnlineUser(const std::string &username);
+        OnlineUser(const irr::core::stringw &username);
 
         /** Returns the username. */
-        std::string getUserName() const { return m_username; }
+        irr::core::stringw getUserName() const { return m_username; }
 
 };   // class OnlineUser
 
