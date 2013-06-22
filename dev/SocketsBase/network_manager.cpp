@@ -45,10 +45,8 @@ bool NetworkManager::connect(uint32_t ip, uint16_t port)
     if (peerExists(ip, port))
         return isConnectedTo(ip, port);
         
-    STKPeer* peer = new STKPeer();
-    bool success = peer->connectToHost(m_localhost, ip, port, 2, 0);
-    if (success)
-        m_peers.push_back(peer);
+    bool success = STKPeer::connectToHost(m_localhost, ip, port, 2, 0);
+    
     return success;
 }
 
@@ -74,6 +72,8 @@ void NetworkManager::notifyEvent(Event* event)
             break;
         case EVENT_TYPE_CONNECTED:
             printf("A client has just connected.\n");
+            // create the new peer:
+            m_peers.push_back(event->peer);
             break;
     }
     ProtocolManager::getInstance()->notifyEvent(event);

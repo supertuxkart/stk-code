@@ -10,8 +10,8 @@
 
 ProtocolManager::ProtocolManager() 
 {
-    m_messagesMutex = PTHREAD_MUTEX_INITIALIZER;
-    m_protocolsMutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_init(&m_messagesMutex, NULL);
+    pthread_mutex_init(&m_protocolsMutex, NULL);
 }
 
 ProtocolManager::~ProtocolManager()
@@ -36,18 +36,18 @@ void ProtocolManager::sendMessage(std::string message)
 
 int ProtocolManager::startProtocol(Protocol* protocol)
 {
-    
     ProtocolInfo protocolInfo;
     protocolInfo.state = PROTOCOL_STATE_RUNNING;
     assignProtocolId(protocolInfo);
     protocolInfo.protocol = protocol;
+    printf("__ProtocolManager> A new protocol with id=%u has been started. There are %ld protocols running.\n", protocolInfo.id, m_protocols.size()+1);
+    
     pthread_mutex_lock(&m_protocolsMutex);
     m_protocols.push_back(protocolInfo);
     pthread_mutex_unlock(&m_protocolsMutex);
+    
     protocol->setListener(this);
     protocol->setup();
-    printf("__ProtocolManager> A new protocol with id=%ud been started. There are %ld protocols running.\n", protocolInfo.id, m_protocols.size());
-    
     
     return protocolInfo.id;
 }
@@ -91,8 +91,8 @@ void ProtocolManager::protocolTerminated(Protocol* protocol)
             pthread_mutex_lock(&m_protocolsMutex);
             delete m_protocols[i].protocol;
             m_protocols.erase(m_protocols.begin()+(i-offset), m_protocols.begin()+(i-offset)+1);
-            offset++;
             pthread_mutex_unlock(&m_protocolsMutex);
+            offset++;
         }
     }
     printf("__ProtocolManager> A protocol has been terminated. There are %ld protocols running.\n", m_protocols.size());

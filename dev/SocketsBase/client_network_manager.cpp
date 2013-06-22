@@ -16,7 +16,7 @@ ClientNetworkManager::~ClientNetworkManager()
 {
 }
 
-void ClientNetworkManager::run()
+void ClientNetworkManager::run() 
 {
     if (enet_initialize() != 0) 
     {
@@ -78,7 +78,6 @@ bool ClientNetworkManager::connectToHost(std::string serverNickname)
     {
         printf("_NetworkInterface> We are NOT connected to the server.\n");
     }
-    
     // step 5 : hide our public address
     HidePublicAddress* hpa = new HidePublicAddress(NULL);
     hpa->setPassword(m_playerLogin.password);
@@ -88,6 +87,7 @@ bool ClientNetworkManager::connectToHost(std::string serverNickname)
     {
     }
     printf("_NetworkInterface> The public address is now hidden online.\n"); 
+    
     return success;
 }
 

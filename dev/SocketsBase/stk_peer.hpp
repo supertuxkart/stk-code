@@ -6,6 +6,7 @@
 
 class STKPeer
 {
+    friend class Event;
     public:
         STKPeer();
         virtual ~STKPeer();
@@ -15,7 +16,7 @@ class STKPeer
         
         virtual void sendPacket(char* data);
         
-        bool connectToHost(STKHost* host, uint32_t ip, uint16_t port, uint32_t channelCount, uint32_t data);
+        static bool connectToHost(STKHost* host, uint32_t ip, uint16_t port, uint32_t channelCount, uint32_t data);
         
         bool isConnected();
         

@@ -43,9 +43,11 @@ void ConnectToServer::update()
             currentTime += 3600;
         if (currentTime > target)
         {
+            printf("DOING AN UPDATE BECAUSE IT IS TIME TO DO IT.\n");
             NetworkManager::getInstance()->connect(m_serverIp, m_serverPort);
             if (NetworkManager::getInstance()->isConnectedTo(m_serverIp, m_serverPort))
             {   
+                printf("NetworkManager sayon THAT YOU ARE CONNECTED, BIATCHHH\n");
                 m_state = DONE;
                 return;
             }
@@ -55,6 +57,7 @@ void ConnectToServer::update()
     }
     else if (m_state == DONE)
     {
+        printf("STATE IS KNOWN AS DONE\n");
         m_listener->protocolTerminated(this);
     }
 }

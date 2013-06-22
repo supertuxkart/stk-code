@@ -16,6 +16,7 @@ void* STKHost::receive_data(void* self)
         while (enet_host_service(host, &event, 0) != 0) {
             Event* evt = new Event(&event);
             NetworkManager::getInstance()->notifyEvent(evt);
+            //NetworkManager::getInstance()->packetReceived((char*)(event.data));
         }
     }
     return NULL;

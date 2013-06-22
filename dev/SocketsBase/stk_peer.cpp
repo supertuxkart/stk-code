@@ -18,13 +18,13 @@ bool STKPeer::connectToHost(STKHost* host, uint32_t ip, uint16_t port, uint32_t 
     address.host = ip;
     address.port = port;
     
-    m_peer = enet_host_connect(host->m_host, &address, 2, 0);
-    if (m_peer == NULL) 
+    ENetPeer* peer = enet_host_connect(host->m_host, &address, 2, 0);
+    if (peer == NULL) 
     {
         printf("Could not try to connect to server.\n");
         return false;
     }
-    printf("Connecting to %i.%i.%i.%i:%i.\n", (m_peer->address.host>>0)&0xff,(m_peer->address.host>>8)&0xff,(m_peer->address.host>>16)&0xff,(m_peer->address.host>>24)&0xff,m_peer->address.port);
+    printf("Connecting to %i.%i.%i.%i:%i.\n", (peer->address.host>>0)&0xff,(peer->address.host>>8)&0xff,(peer->address.host>>16)&0xff,(peer->address.host>>24)&0xff,peer->address.port);
     return true;
 }
 
