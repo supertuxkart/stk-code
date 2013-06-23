@@ -51,6 +51,8 @@ private:
     float m_kart_width;
     /** Height of the kart, copy of the data from KartModel. */
     float m_kart_height;
+    /** The position of all four wheels in the 3d model */
+    const Vec3* m_wheel_graphics_position;
 
     /** Index of kart in world. */
     unsigned int m_world_kart_id;
@@ -147,6 +149,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this kart has no wheels. */
     bool isWheeless() const;
+    // ------------------------------------------------------------------------
+    /** Returns the position of a wheel relative to the kart.
+     *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear
+     *           right, 3 = rear left.  */
+    const Vec3& getWheelGraphicsPosition(int i) const
+                {assert(i>=0 && i<4); return m_wheel_graphics_position[i];}
 
     // ========================================================================
     // Emergency animation related functions.

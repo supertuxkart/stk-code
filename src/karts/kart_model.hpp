@@ -181,6 +181,11 @@ public:
     const Vec3& getWheelGraphicsPosition(int i) const
                 {assert(i>=0 && i<4); return m_wheel_graphics_position[i];}
     // ------------------------------------------------------------------------
+    /** Returns the position of wheels relative to the kart.
+     */
+    const Vec3* getWheelsGraphicsPosition() const
+                {return m_wheel_graphics_position;}
+    // ------------------------------------------------------------------------
     /** Returns the position of a wheel relative to the kart for the physics.
      *  The physics wheels can be attached at a different place to make the
      *  karts more stable.

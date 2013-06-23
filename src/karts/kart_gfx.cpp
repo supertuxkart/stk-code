@@ -40,12 +40,18 @@ KartGFX::KartGFX(const AbstractKart *kart)
     }
 
     m_kart = kart;
-
+    /*
+    // FIXME Old Positioning system Maybe usefull for another effect
     Vec3 rear_left(-(kart->getKartWidth()+0.20f)*0.35f, (kart->getKartHeight()-0.6f)*0.35f,
                        -kart->getKartLength()*0.35f);
 
     Vec3 rear_right((kart->getKartWidth()+0.20f)*0.35f, (kart->getKartHeight()-0.6f)*0.35f,
                        -kart->getKartLength()*0.35f);
+    */
+    Vec3 rear_left(kart->getWheelGraphicsPosition(3).toIrrVector().X, (kart->getKartHeight()-0.6f)*0.35f,
+                        kart->getWheelGraphicsPosition(3).toIrrVector().Z);
+    Vec3 rear_right(kart->getWheelGraphicsPosition(2).toIrrVector().X, (kart->getKartHeight()-0.6f)*0.35f,
+                        kart->getWheelGraphicsPosition(2).toIrrVector().Z);
 
     Vec3 rear_center(0, kart->getKartHeight()*0.35f,
                        -kart->getKartLength()*0.35f);
