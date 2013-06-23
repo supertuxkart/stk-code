@@ -41,6 +41,8 @@ public:
      *  is the number of entries and must therefore be last. */
     enum KartGFXType { KGFX_NITRO1=0,
                        KGFX_NITRO2,
+                       KGFX_NITROSMOKE1,
+                       KGFX_NITROSMOKE2,
                        KGFX_ZIPPER,
                        KGFX_TERRAIN,
                        KGFX_SKIDL,

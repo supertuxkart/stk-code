@@ -2243,14 +2243,21 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         if(f>1.0f) f = 1.0f;
         m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO1, f);
         m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO2, f);
+        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITROSMOKE1, f);
+        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITROSMOKE2, f);
     }
     else
     {
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO1, 0);
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO2, 0);
+        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
+        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
+        
     }
     m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO1, getSpeed(), dt);
     m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO2, getSpeed(), dt);
+    m_kart_gfx->resizeBox(KartGFX::KGFX_NITROSMOKE1, getSpeed(), dt);
+    m_kart_gfx->resizeBox(KartGFX::KGFX_NITROSMOKE2, getSpeed(), dt);
 
     m_kart_gfx->resizeBox(KartGFX::KGFX_ZIPPER, getSpeed(), dt);
 

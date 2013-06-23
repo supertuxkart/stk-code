@@ -72,6 +72,8 @@ KartGFX::KartGFX(const AbstractKart *kart)
     // in the order of KartGFXType.
     addEffect(KGFX_NITRO1,   "nitro.xml",   rear_nitro_right);
     addEffect(KGFX_NITRO2,   "nitro.xml",   rear_nitro_left);
+    addEffect(KGFX_NITROSMOKE1,   "nitro-smoke.xml",   rear_nitro_left);
+    addEffect(KGFX_NITROSMOKE2,   "nitro-smoke.xml",   rear_nitro_right);
     addEffect(KGFX_ZIPPER,  "zipper_fire.xml", rear_center);
     addEffect(KGFX_TERRAIN, "smoke.xml",       Vec3(0,0,0));
     addEffect(KGFX_SKID1L,   "skid1.xml",       rear_left);
