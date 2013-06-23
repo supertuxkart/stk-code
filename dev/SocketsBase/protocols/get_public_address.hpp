@@ -9,7 +9,7 @@ class GetPublicAddress : public Protocol
         GetPublicAddress(CallbackObject* callbackObject);
         virtual ~GetPublicAddress();
         
-        virtual void messageReceived(uint8_t* data);
+        virtual void notifyEvent(Event* event);
          
         virtual void setup();
         virtual void update();

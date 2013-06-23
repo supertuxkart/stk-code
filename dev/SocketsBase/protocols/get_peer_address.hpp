@@ -9,7 +9,7 @@ class GetPeerAddress : public Protocol
         GetPeerAddress(CallbackObject* callbackObject);
         virtual ~GetPeerAddress();
         
-        virtual void messageReceived(uint8_t* data);
+        virtual void notifyEvent(Event* event);
         virtual void setup();
         virtual void update();
         

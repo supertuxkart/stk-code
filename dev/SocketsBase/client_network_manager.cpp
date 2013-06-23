@@ -71,7 +71,7 @@ bool ClientNetworkManager::connectToHost(std::string serverNickname)
     bool success = false;
     if (m_localhost->isConnectedTo(addr.ip, addr.port))
     {
-       success = true;
+        success = true;
         printf("_NetworkInterface> CONNECTION SUCCES : YOU ARE NOW CONNECTED TO A SERVER.\n");
     }
     else 

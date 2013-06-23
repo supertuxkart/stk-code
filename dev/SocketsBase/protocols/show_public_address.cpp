@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-ShowPublicAddress::ShowPublicAddress(CallbackObject* callbackObject) : Protocol(callbackObject)
+ShowPublicAddress::ShowPublicAddress(CallbackObject* callbackObject) : Protocol(callbackObject, PROTOCOL_SILENT)
 {
 }
 
@@ -12,7 +12,7 @@ ShowPublicAddress::~ShowPublicAddress()
 {
 }
 
-void ShowPublicAddress::messageReceived(uint8_t* data)
+void ShowPublicAddress::notifyEvent(Event* event)
 {
 }
 

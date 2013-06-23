@@ -41,7 +41,7 @@ Event::Event(ENetEvent* event)
     }
     if (peer == NULL)
     {
-        printf("The peer still does not exist in %i peers\n", peers.size());
+        printf("The peer still does not exist in %u peers\n", peers.size());
         STKPeer* newPeer = new STKPeer();
         newPeer->m_peer = event->peer;
         peer = newPeer;

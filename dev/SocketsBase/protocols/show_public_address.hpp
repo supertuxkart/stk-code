@@ -10,7 +10,7 @@ class ShowPublicAddress : public Protocol
         ShowPublicAddress(CallbackObject* callbackObject);
         virtual ~ShowPublicAddress();
         
-        virtual void messageReceived(uint8_t* data);
+        virtual void notifyEvent(Event* event);
         virtual void setup();
         virtual void update();
         

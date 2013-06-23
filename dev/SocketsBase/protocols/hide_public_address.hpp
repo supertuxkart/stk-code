@@ -10,7 +10,7 @@ class HidePublicAddress : public Protocol
         HidePublicAddress(CallbackObject* callbackObject);
         virtual ~HidePublicAddress();
         
-        virtual void messageReceived(uint8_t* data);
+        virtual void notifyEvent(Event* event);
         virtual void setup();
         virtual void update();
         

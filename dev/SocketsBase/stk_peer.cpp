@@ -10,6 +10,8 @@ STKPeer::STKPeer()
 
 STKPeer::~STKPeer()
 {
+    if (m_peer)
+        delete m_peer;
 }
 
 bool STKPeer::connectToHost(STKHost* host, uint32_t ip, uint16_t port, uint32_t channelCount, uint32_t data)

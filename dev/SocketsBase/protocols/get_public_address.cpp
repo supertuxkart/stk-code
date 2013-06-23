@@ -21,7 +21,7 @@ int stunRand()
     return rand();
 }
 
-GetPublicAddress::GetPublicAddress(CallbackObject* callbackObject) : Protocol(callbackObject)
+GetPublicAddress::GetPublicAddress(CallbackObject* callbackObject) : Protocol(callbackObject, PROTOCOL_SILENT)
 {
 }
 
@@ -29,7 +29,7 @@ GetPublicAddress::~GetPublicAddress()
 {
 }
 
-void GetPublicAddress::messageReceived(uint8_t* data)
+void GetPublicAddress::notifyEvent(Event* event)
 {
 
 }

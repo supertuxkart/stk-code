@@ -8,18 +8,18 @@
 
 enum PROTOCOL_TYPE
 {
-    PROTOCOL_NOT_CONCERNED = 0,
-    PROTOCOL_CONNECTION = 1
-
+    PROTOCOL_NONE = 0,
+    PROTOCOL_CONNECTION = 1,
+    PROTOCOL_SILENT = 0xffff // used for protocols that do not subscribe to any network event.
 };
 
 class Protocol
 {
     public:
-        Protocol(CallbackObject* callbackObject, PROTOCOL_TYPE type = PROTOCOL_NOT_CONCERNED);
+        Protocol(CallbackObject* callbackObject, PROTOCOL_TYPE type);
         virtual ~Protocol(); 
         
-        virtual void messageReceived(uint8_t* data) = 0;
+        virtual void notifyEvent(Event* event) = 0;
         
         void setListener(ProtocolManager* listener);
         

@@ -44,10 +44,8 @@ bool NetworkManager::connect(uint32_t ip, uint16_t port)
 {
     if (peerExists(ip, port))
         return isConnectedTo(ip, port);
-        
-    bool success = STKPeer::connectToHost(m_localhost, ip, port, 2, 0);
     
-    return success;
+    return STKPeer::connectToHost(m_localhost, ip, port, 2, 0);
 }
 
 void NetworkManager::setManualSocketsMode(bool manual)
@@ -64,20 +62,30 @@ void NetworkManager::notifyEvent(Event* event)
     switch (event->type) 
     {
         case EVENT_TYPE_MESSAGE:
-            printf("Message, Sender : %ld\n", event->peer->getAddress());
+            printf("Message, Sender : %u, message = \"%s\"\n", event->peer->getAddress(), event->data.c_str());
             break;
         case EVENT_TYPE_DISCONNECTED:
-            printf("Somebody is now disconnected.\n");
+            printf("Somebody is now disconnected. There are now %lu peers.\n", m_peers.size());
             printf("Disconnected host: %i.%i.%i.%i:%i\n", event->peer->getAddress()>>24&0xff, event->peer->getAddress()>>16&0xff, event->peer->getAddress()>>8&0xff, event->peer->getAddress()&0xff,event->peer->getPort());
+            // remove the peer:
+            for (unsigned int i = 0; i < m_peers.size(); i++)
+            {
+                if (m_peers[i] == event->peer)
+                {
+                    delete m_peers[i];
+                    m_peers.erase(m_peers.begin()+i, m_peers.begin()+i+1);
+                    break;
+                }
+            }
+            printf("ERROR : the peer that has been disconnected was not registered by the Network Manager.\n");
             break;
         case EVENT_TYPE_CONNECTED:
-            printf("A client has just connected.\n");
+            printf("A client has just connected. There are now %lu peers.\n", m_peers.size() + 1);
             // create the new peer:
             m_peers.push_back(event->peer);
             break;
     }
     ProtocolManager::getInstance()->notifyEvent(event);
-    delete event; // event won't be use again
 }
 
 void NetworkManager::setLogin(std::string username, std::string password)

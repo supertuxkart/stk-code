@@ -6,31 +6,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-ConnectToServer::ConnectToServer(CallbackObject* callbackObject) : Protocol(callbackObject)
+ConnectToServer::ConnectToServer(CallbackObject* callbackObject) : Protocol(callbackObject, PROTOCOL_CONNECTION)
 {
     m_serverIp = 0;
     m_serverPort = 0;
+    m_state = NONE;
 }
 
 ConnectToServer::~ConnectToServer()
 {
 }
 
-void ConnectToServer::messageReceived(uint8_t* data)
+void ConnectToServer::notifyEvent(Event* event)
 {
-    printf("data received\n");
-    printf("%s", data);
-    m_state = NONE; // we received a message, we are connected
+    if (event->type == EVENT_TYPE_CONNECTED && event->peer->getAddress() == m_serverIp && event->peer->getPort() == m_serverPort)
+    {
+        printf("The Connect To Server protocol has received an event notifying that he's connected to the peer. The peer sent \"%s\"\n", event->data.c_str());
+        m_state = DONE; // we received a message, we are connected
+    }
 }
 
 void ConnectToServer::setup()
 {
+    m_state = NONE;
     if (m_serverIp == 0 || m_serverPort == 0 )
     {
         printf("You have to set the server's public ip:port of the server.\n");
         m_listener->protocolTerminated(this);
     }
-    m_state = NONE;
 }
 
 void ConnectToServer::update()
@@ -43,11 +46,9 @@ void ConnectToServer::update()
             currentTime += 3600;
         if (currentTime > target)
         {
-            printf("DOING AN UPDATE BECAUSE IT IS TIME TO DO IT.\n");
             NetworkManager::getInstance()->connect(m_serverIp, m_serverPort);
             if (NetworkManager::getInstance()->isConnectedTo(m_serverIp, m_serverPort))
             {   
-                printf("NetworkManager sayon THAT YOU ARE CONNECTED, BIATCHHH\n");
                 m_state = DONE;
                 return;
             }
@@ -57,7 +58,6 @@ void ConnectToServer::update()
     }
     else if (m_state == DONE)
     {
-        printf("STATE IS KNOWN AS DONE\n");
         m_listener->protocolTerminated(this);
     }
 }

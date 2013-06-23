@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-GetPeerAddress::GetPeerAddress(CallbackObject* callbackObject) : Protocol(callbackObject)
+GetPeerAddress::GetPeerAddress(CallbackObject* callbackObject) : Protocol(callbackObject, PROTOCOL_SILENT)
 {
 }
 
@@ -14,7 +14,7 @@ GetPeerAddress::~GetPeerAddress()
 {
 }
 
-void GetPeerAddress::messageReceived(uint8_t* data)
+void GetPeerAddress::notifyEvent(Event* event)
 {
 }
 

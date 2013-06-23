@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-HidePublicAddress::HidePublicAddress(CallbackObject* callbackObject) : Protocol(callbackObject)
+HidePublicAddress::HidePublicAddress(CallbackObject* callbackObject) : Protocol(callbackObject, PROTOCOL_SILENT)
 {
 }
 
@@ -12,7 +12,7 @@ HidePublicAddress::~HidePublicAddress()
 {
 }
 
-void HidePublicAddress::messageReceived(uint8_t* data)
+void HidePublicAddress::notifyEvent(Event* event)
 {
 }
 

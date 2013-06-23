@@ -49,10 +49,10 @@ class ProtocolManager : public Singleton<ProtocolManager>
         
         // protected members
         std::vector<ProtocolInfo> m_protocols;
-        std::vector<std::string> m_messagesToProcess;
+        std::vector<Event*> m_eventsToProcess;
         
         // mutexes:
-        pthread_mutex_t m_messagesMutex;
+        pthread_mutex_t m_eventsMutex;
         pthread_mutex_t m_protocolsMutex;
 };
 
