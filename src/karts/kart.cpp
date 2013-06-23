@@ -2241,11 +2241,16 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         // The speed of the kart can be higher (due to powerups) than
         // the normal maximum speed of the kart.
         if(f>1.0f) f = 1.0f;
-        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO, f);
+        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO1, f);
+        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO2, f);
     }
     else
-        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO, 0);
-    m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO, getSpeed(), dt);
+    {
+        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO1, 0);
+        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO2, 0);
+    }
+    m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO1, getSpeed(), dt);
+    m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO2, getSpeed(), dt);
 
     m_kart_gfx->resizeBox(KartGFX::KGFX_ZIPPER, getSpeed(), dt);
 

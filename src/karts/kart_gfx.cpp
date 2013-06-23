@@ -41,12 +41,14 @@ KartGFX::KartGFX(const AbstractKart *kart)
 
     m_kart = kart;
     /*
-    // FIXME Old Positioning system Maybe usefull for another effect
+    // FIXME Old Positioning system Maybe usefull for a future effect
     Vec3 rear_left(-(kart->getKartWidth()+0.20f)*0.35f, (kart->getKartHeight()-0.6f)*0.35f,
                        -kart->getKartLength()*0.35f);
 
     Vec3 rear_right((kart->getKartWidth()+0.20f)*0.35f, (kart->getKartHeight()-0.6f)*0.35f,
                        -kart->getKartLength()*0.35f);
+    
+    
     */
     Vec3 rear_left(kart->getWheelGraphicsPosition(3).toIrrVector().X, (kart->getKartHeight()-0.6f)*0.35f,
                         kart->getWheelGraphicsPosition(3).toIrrVector().Z);
@@ -56,9 +58,20 @@ KartGFX::KartGFX(const AbstractKart *kart)
     Vec3 rear_center(0, kart->getKartHeight()*0.35f,
                        -kart->getKartLength()*0.35f);
 
+    // FIXME Used to match the emitter as seen in blender
+    float delta = 0.6;
+    Vec3 rear_nitro_right(kart->getNitroEmitterPosition(0).toIrrVector().X,
+                          kart->getNitroEmitterPosition(0).toIrrVector().Y,
+                          kart->getNitroEmitterPosition(0).toIrrVector().Z + delta);
+
+    Vec3 rear_nitro_left(kart->getNitroEmitterPosition(1).toIrrVector().X,
+                          kart->getNitroEmitterPosition(1).toIrrVector().Y,
+                          kart->getNitroEmitterPosition(1).toIrrVector().Z + delta);
+
     // Create all effects. Note that they must be created
     // in the order of KartGFXType.
-    addEffect(KGFX_NITRO,   "nitro.xml",       rear_center);
+    addEffect(KGFX_NITRO1,   "nitro.xml",   rear_nitro_right);
+    addEffect(KGFX_NITRO2,   "nitro.xml",   rear_nitro_left);
     addEffect(KGFX_ZIPPER,  "zipper_fire.xml", rear_center);
     addEffect(KGFX_TERRAIN, "smoke.xml",       Vec3(0,0,0));
     addEffect(KGFX_SKID1L,   "skid1.xml",       rear_left);
