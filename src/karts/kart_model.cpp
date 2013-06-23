@@ -132,11 +132,16 @@ void KartModel::loadInfo(const XMLNode &node)
     }
 
     // FIXME fallback for karts that don't have nitro emitter
+    /*
     m_nitro_emitter_position[0] = Vec3 (0, m_kart_height*0.35f,
                                           -m_kart_length*0.35f);
 
     m_nitro_emitter_position[1] = Vec3 (0, m_kart_height*0.35f,
-                                          -m_kart_length*0.35f);
+                                          -m_kart_length*0.35f); */
+    
+    m_nitro_emitter_position[0] = Vec3 (0,0.1,0);
+
+    m_nitro_emitter_position[1] = Vec3 (0,0.1,0);
 
     if(const XMLNode *nitroEmitter_node=node.getNode("nitro-emitter"))
     {
