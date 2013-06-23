@@ -57,7 +57,7 @@ void TrackObjectManager::add(const XMLNode &xml_node)
 
         if (is_lod)
         {
-            printf("Adding lod obj to group <%s>\n", groupname.c_str());
+            //printf("Adding lod obj to group <%s>\n", groupname.c_str());
             m_lod_objects[groupname].push_back(&xml_node);
         }
         else
