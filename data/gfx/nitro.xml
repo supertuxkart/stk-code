@@ -19,7 +19,10 @@
     
     <!-- Size of the particles -->
     <size      min="0.1"
-               max="0.25"         />
+               max="0.25"         
+               x-increase-factor="1.2"
+               y-increase-factor="1.2"
+               />
     
     <color     min="255 255 255"
                max="255 255 255"  />
