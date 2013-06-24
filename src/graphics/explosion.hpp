@@ -30,6 +30,7 @@ using namespace irr;
 
 class Vec3;
 class SFXBase;
+class ParticleEmitter;
 
 const float explosion_time = 1.5f;
 
@@ -39,8 +40,8 @@ const float explosion_time = 1.5f;
 class Explosion : public HitSFX
 {
 private:
-    float          m_remaining_time;
-    scene::IParticleSystemSceneNode   *m_node;
+    float            m_remaining_time;
+    ParticleEmitter* m_emitter;
 
 public:
          Explosion(const Vec3& coord, const char* explosion_sound);
