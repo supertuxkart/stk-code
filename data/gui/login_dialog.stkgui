@@ -1,41 +1,37 @@
 <stkgui>
 
-<div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
-
-
-    <label id="title" width="100%" height="fit" text_align="center" word_wrap="true"
-           I18N="In the login dialog' dialog" text="Sign in" proportion="1" />
-
-    <spacer height="25" width="10" />
-
-    <div width="95%" height="fit" layout="horizontal-row" >
-        <label proportion="1" text_align="center" I18N="In the login form" text="Username"/>
-        <div proportion="2" height="fit" layout="horizontal-row" >
-            <textbox id="username" width="100%" I18N="In the login dialog" align="center"/>
+    <div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
+    
+        <header id="title" width="96%" proportion="2" text_align="center" word_wrap="true"
+       I18N="In the login dialog' dialog" text="Sign in"/>
+    
+        <spacer proportion="2">
+        
+        <div width="95%" proportion="3" layout="horizontal-row" >
+            <label proportion="1" text_align="center" I18N="In the login form" text="Username"/>
+            <textbox proportion="2" id="username" I18N="In the login dialog"/>
         </div>
-    </div>
-    
-    <spacer height="20" width="20" />
-    
-    <div width="95%" height="fit" layout="horizontal-row" >
-        <label proportion="1" text_align="center" I18N="In the login form" text="Password"/>
-        <div proportion="2" height="fit" layout="horizontal-row" >
-            <textbox id="password" width="100%" I18N="In the login dialog" align="center"/>
+        
+        <spacer proportion="1">
+        
+        <div width="95%" proportion="3" layout="horizontal-row" >
+            <label proportion="1" text_align="center" I18N="In the login form" text="Password"/>
+            <textbox proportion="2" id="password" I18N="In the login dialog"/>
         </div>
+        
+        
+        <label id="info" proportion="1" width="96%" text_align="center" word_wrap="true"
+           I18N="In the login dialog' dialog" text=""/>
+           
+        <spacer proportion="1">
+        
+        <div id="options" width="fit" proportion="3" align="center" layout="horizontal-row">
+            <button id="signin" height="100%" proportion="4" I18N="In the login dialog" text="Sign In"/>
+            <spacer proportion="1" height="100%">       
+            <button id="cancel" height="100%" proportion="4" I18N="In the login dialog" text="Cancel"/>
+        </div>
+        
+    
     </div>
-    
-    <spacer height="20" width="20" />
-    
-    <label id="errormsg" width="100%" height="fit" text_align="center" word_wrap="true"
-       I18N="In the login dialog' dialog" text="" proportion="1" />
-       
-    <spacer height="20" width="20" />
-    
-    <button id="signin" height="fit" I18N="In the login dialog" text="Sign In" align="center"/>
-    <button id="cancel" height="fit" I18N="In the login dialog" text="Cancel" align="center"/>
-    
-    <spacer height="15" width="20" />
-
-</div>
 
 </stkgui>

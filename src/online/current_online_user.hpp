@@ -30,22 +30,32 @@
   * \brief Class that represents an online registered user
   * \ingroup online
   */
-class CurrentOnlineUser
+class CurrentOnlineUser : public OnlineUser
 {
     private:
 
     protected:
         std::string m_token;
         bool m_is_signed_in;
-        OnlineUser * m_user;
         CurrentOnlineUser();
 
     public:
         // singleton
         static CurrentOnlineUser* get();
         static void deallocate();
-        bool signIn(const irr::core::stringw &username, const irr::core::stringw &password, irr::core::stringw &msg);
-        bool signUp(const irr::core::stringw &username, const irr::core::stringw &password, irr::core::stringw &msg);
+        // Login
+        bool signIn(    const irr::core::stringw &username,
+                        const irr::core::stringw &password,
+                        irr::core::stringw &info);
+        // Register
+        bool signUp(    const irr::core::stringw &username,
+                        const irr::core::stringw &password,
+                        const irr::core::stringw &password_ver,
+                        const irr::core::stringw &email,
+                        bool terms,
+                        irr::core::stringw &msg);
+        // Logout - Best to be followed by CurrentOnlineUser::deallocate
+        bool signOut();
         /** Returns the username if signed in. */
         irr::core::stringw getUserName() const;
         bool isSignedIn(){ return m_is_signed_in; }

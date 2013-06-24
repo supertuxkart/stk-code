@@ -72,23 +72,19 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
     else if(eventSource == "signin")
     {
         // ---- See if we can accept the input
-        TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("username");
-        const stringw username = textCtrl->getText().trim();
-        textCtrl = getWidget<TextBoxWidget>("password");
-        const stringw password = textCtrl->getText().trim();
-        stringw msg = "";
-        if(CurrentOnlineUser::get()->signUp(username,password,msg))
+        const stringw username = getWidget<TextBoxWidget>("username")->getText().trim();
+        const stringw password = getWidget<TextBoxWidget>("password")->getText().trim();
+        stringw info = "";
+        if(CurrentOnlineUser::get()->signIn(username,password,info))
         {
-            //m_self_destroy = true;
-            m_self_destroy = false;
+            m_self_destroy = true;
         }
         else
         {
-
             sfx_manager->quickSound( "anvil" );
             m_self_destroy = false;
         }
-        getWidget<LabelWidget>("errormsg")->setText(msg, false);
+        getWidget<LabelWidget>("info")->setText(info, false);
         return GUIEngine::EVENT_BLOCK;
     }
     return GUIEngine::EVENT_LET;
@@ -118,16 +114,7 @@ void LoginDialog::onUpdate(float dt)
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
-        TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("username");
-        stringw playerName = textCtrl->getText().trim();
-
-        // irrLicht is too stupid to remove focus from deleted widgets
-        // so do it by hand
-        GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
-
-
         ModalDialog::dismiss();
-
     }
 }

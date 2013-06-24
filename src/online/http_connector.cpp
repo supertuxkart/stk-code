@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <memory.h>
 #include "io/file_manager.hpp"
-#include "utils/string_utils.hpp"
 
 
 HTTPConnector::HTTPConnector(const std::string &url){
@@ -53,24 +52,25 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
     return size * nmemb;
 }
 
-XMLNode * HTTPConnector::getXMLFromPage(Parameters & post_parameters)
+XMLNode * HTTPConnector::getXMLFromPage()
 {
-    return file_manager->createXMLTreeFromString(getPage(post_parameters));
+    return file_manager->createXMLTreeFromString(getPage());
 }
 
-std::string HTTPConnector::getPage(Parameters & post_parameters)
+std::string HTTPConnector::getPage()
 {
 
     Parameters::iterator iter;
     std::string postString = "";
-    for (iter = post_parameters.begin(); iter != post_parameters.end(); ++iter)
+    for (iter = m_parameters.begin(); iter != m_parameters.end(); ++iter)
     {
-       if(iter != post_parameters.begin())
+       if(iter != m_parameters.begin())
            postString.append("&");
-       postString.append(iter->first);
+       char * escaped = curl_easy_escape(this->curl , iter->first.c_str(), iter->first.size());
+       postString.append(escaped);
+       curl_free(escaped);
        postString.append("=");
-       core::stringc converted = core::stringc(iter->second.c_str());
-       char * escaped = curl_easy_escape(this->curl , converted.c_str(), converted.size());
+       escaped = curl_easy_escape(this->curl , iter->second.c_str(), iter->second.size());
        postString.append(escaped);
        curl_free(escaped);
     }
@@ -82,12 +82,11 @@ std::string HTTPConnector::getPage(Parameters & post_parameters)
     res = curl_easy_perform(this->curl);
     if(res != CURLE_OK)
     {
-        Log::error("online/http_functions", "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        //FIXME Log::error("online/http_functions", "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
         printf("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
     }else{
         printf("Retrieved: %s\n", readBuffer.c_str());
     }
+    m_parameters.clear();
     return readBuffer;
 }
-
-

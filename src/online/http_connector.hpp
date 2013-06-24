@@ -23,7 +23,7 @@
 #include "io/xml_node.hpp"
 #include <curl/curl.h>
 #include <irrString.h>
-using namespace irr;
+#include "utils/string_utils.hpp"
 
 /**
   * \brief Class to connect with a server over HTTP
@@ -34,13 +34,33 @@ class HTTPConnector
     protected:
         CURL *curl;
         CURLcode res;
+        typedef std::map<std::string, std::string> Parameters;
+        Parameters m_parameters;
 
     public:
-        typedef std::map<std::string, core::stringw> Parameters;
+
         HTTPConnector(const std::string &url);
         ~HTTPConnector();
-        std::string getPage(Parameters & post_parameters);
-        XMLNode * getXMLFromPage(Parameters & post_parameters);
+
+        //Execute
+        std::string getPage();
+        XMLNode * getXMLFromPage();
+
+        //Setting parameters to be send with the next request
+        void setParameter(const std::string & name, const std::string &value){
+            printf("template3");
+            m_parameters[name] = value;
+        };
+        void setParameter(const std::string & name, const irr::core::stringw &value){
+            printf("template2");
+            m_parameters[name] = irr::core::stringc(value.c_str()).c_str();
+        }
+        template <typename T>
+        void setParameter(const std::string & name, const T& value){
+            printf("template1");
+            m_parameters[name] = StringUtils::toString(value);
+        }
+
 }; //class HTTPConnector
 
 
