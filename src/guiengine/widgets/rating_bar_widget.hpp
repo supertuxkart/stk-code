@@ -51,7 +51,7 @@ namespace GUIEngine
         void setRating(float rating) { m_rating = rating; };
         
         /** Get the current value of the widget. */
-        int getRating() {return m_rating; };
+        float getRating() {return m_rating; };
         
         /** Change the number of star of the widget. */
         void setStarNumber(int star_number) { m_star_number = star_number; };
