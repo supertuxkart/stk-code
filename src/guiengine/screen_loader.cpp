@@ -175,6 +175,10 @@ void Screen::parseScreenFileDiv(irr::io::IXMLReader* xml, PtrVector<Widget>& app
                 {
                     append_to.push_back(new TextBoxWidget());
                 }
+                else if (wcscmp(L"ratingbar", xml->getNodeName()) == 0)
+                {
+                    append_to.push_back(new RatingBarWidget());
+                }
                 else
                 {
                     std::cerr << "/!\\ Warning /!\\ : unknown tag found in STK GUI file  : '"

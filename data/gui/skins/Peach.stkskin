@@ -210,4 +210,7 @@ when the border that intersect at this corner are enabled.
 <color type="text_field" state="neutral" a="255" r="215" g="215" b="215" />
 <color type="text_field" state="focused" a="255" r="138" g="138" b="138" />
 
+<!-- Rating star image -->
+<element type="rating" state="neutral" image="peach/rating_star.png" />
+
 </skin>

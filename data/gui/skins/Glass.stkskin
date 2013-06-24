@@ -211,4 +211,7 @@ when the border that intersect at this corner are enabled.
 <color type="text_field" state="neutral" a="255" r="215" g="215" b="215" />
 <color type="text_field" state="focused" a="255" r="0" g="150" b="0" />
 
+<!-- Rating star image -->
+<element type="rating" state="neutral" image="glass/rating_star.png" />
+
 </skin>

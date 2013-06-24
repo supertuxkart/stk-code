@@ -16,8 +16,8 @@
                 <label id="size"     width="100%" text=""/>
                 <label id="revision" width="100%" text=""/>
             </div>
-            <div width="50%" height="100%" layout="vertical-row" >
-                <label id="rating"   width="100%" text=""/>
+            <div width="50%" height="32" layout="vertical-row" >
+                <ratingbar id="rating" height="32" width="100%" /> 
             </div>
         </div>
         <spacer height="10"/>

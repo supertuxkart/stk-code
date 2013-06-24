@@ -806,6 +806,60 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
 }   // drawProgress
 
 // ----------------------------------------------------------------------------
+/**
+ * @param focused whether this element is focus by the master player (focus
+ * for other players is not supported)
+ */
+void Skin::drawRatingBar(Widget *w, const core::recti &rect,
+                        const bool pressed, const bool focused)
+{
+    static const int step_number = 3; // Harcoded number of step.
+    
+    const ITexture *texture = SkinConfig::m_render_params["rating::neutral"].getImage();
+    const int texture_w = texture->getSize().Width / 4;
+    const int texture_h = texture->getSize().Height;
+    const float aspect_ratio = 1.0f;
+    
+    RatingBarWidget *ratingBar = (RatingBarWidget*)w;
+    const int star_number = ratingBar->getStarNumber();
+
+    int star_h = rect.getHeight();
+    int star_w = (int)(aspect_ratio * star_h);
+
+    if (rect.getWidth() < star_w * star_number)
+    {
+        const float scale_factor = rect.getWidth() / (float)(star_w * star_number);
+        star_w = (int)(star_w * scale_factor);
+        star_h = (int)(star_h * scale_factor);
+    }
+    
+    // center horizontally and vertically
+    const int x_from = rect.UpperLeftCorner.X + (rect.getWidth() - star_w) / 2; 
+    const int y_from = rect.UpperLeftCorner.Y + (rect.getHeight() - star_h) / 2;
+
+    for (int i = 0; i < star_number; i++)
+    {
+        core::recti star_rect = rect;
+
+        star_rect.UpperLeftCorner.X  = x_from + i * star_w;
+        star_rect.UpperLeftCorner.Y  = y_from;
+        star_rect.LowerRightCorner.X = x_from + (i + 1) * star_w;
+        star_rect.LowerRightCorner.Y = y_from + star_h;
+        
+        int step = ratingBar->getStepOfStar(i, step_number);
+        
+        const core::recti source_area(texture_w * step, 0, 
+                                      texture_w * (step + 1), texture_h);
+
+        GUIEngine::getDriver()->draw2DImage(texture,
+                                            star_rect, source_area,
+                                            0 /* no clipping */, 0,
+                                            true /* alpha */);
+    }
+
+}   // drawRatingBar
+
+// ----------------------------------------------------------------------------
 SColor Skin::getColor(const std::string &name)
 {
     return SkinConfig::m_colors[name];
@@ -1809,6 +1863,10 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     else if(type == WTYPE_CHECKBOX)
     {
         drawCheckBox(rect, widget, focused);
+    }
+    else if(type == WTYPE_RATINGBAR)
+    {
+        drawRatingBar(widget, rect, pressed, focused);
     }
 
 

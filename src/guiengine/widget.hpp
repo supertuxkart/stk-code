@@ -52,7 +52,8 @@ namespace GUIEngine
         WTYPE_MODEL_VIEW,
         WTYPE_LIST,
         WTYPE_TEXTBOX,
-        WTYPE_PROGRESS
+        WTYPE_PROGRESS,
+        WTYPE_RATINGBAR
     };
 
     enum BadgeType
