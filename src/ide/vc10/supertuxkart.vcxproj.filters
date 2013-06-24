@@ -870,6 +870,9 @@
     <ClCompile Include="..\..\config\saved_grand_prix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\guiengine\widgets\rating_bar_widget.cpp">
+      <Filter>Source Files\guiengine\widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1666,6 +1669,9 @@
     </ClInclude>
     <ClInclude Include="..\..\config\saved_grand_prix.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\guiengine\widgets\rating_bar_widget.hpp">
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

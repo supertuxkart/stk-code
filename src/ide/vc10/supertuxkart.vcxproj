@@ -222,6 +222,7 @@
     <ClCompile Include="..\..\graphics\referee.cpp" />
     <ClCompile Include="..\..\graphics\show_curve.cpp" />
     <ClCompile Include="..\..\guiengine\widgets\CGUIEditBox.cpp" />
+    <ClCompile Include="..\..\guiengine\widgets\rating_bar_widget.cpp" />
     <ClCompile Include="..\..\input\wiimote.cpp" />
     <ClCompile Include="..\..\items\rubber_ball.cpp" />
     <ClCompile Include="..\..\items\swatter.cpp" />
@@ -469,6 +470,7 @@
     <ClInclude Include="..\..\graphics\referee.hpp" />
     <ClInclude Include="..\..\graphics\show_curve.hpp" />
     <ClInclude Include="..\..\guiengine\widgets\CGUIEditBox.h" />
+    <ClInclude Include="..\..\guiengine\widgets\rating_bar_widget.hpp" />
     <ClInclude Include="..\..\input\wiimote.hpp" />
     <ClInclude Include="..\..\items\rubber_ball.hpp" />
     <ClInclude Include="..\..\items\swatter.hpp" />
