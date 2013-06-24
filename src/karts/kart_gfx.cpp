@@ -59,7 +59,7 @@ KartGFX::KartGFX(const AbstractKart *kart)
                        -kart->getKartLength()*0.35f);
 
     // FIXME Used to match the emitter as seen in blender
-    float delta = 0.6;
+    const float delta = 0.6f;
     Vec3 rear_nitro_right(kart->getNitroEmitterPosition(0).toIrrVector().X,
                           kart->getNitroEmitterPosition(0).toIrrVector().Y,
                           kart->getNitroEmitterPosition(0).toIrrVector().Z + delta);
