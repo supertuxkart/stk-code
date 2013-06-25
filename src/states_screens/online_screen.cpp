@@ -119,7 +119,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
 
     if (selection == "login")
     {
-        new LoginDialog(0.8f, 0.7f);
+        new LoginDialog(0.6f, 0.7f);
     }
 }   // eventCallback
 

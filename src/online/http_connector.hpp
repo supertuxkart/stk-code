@@ -48,16 +48,13 @@ class HTTPConnector
 
         //Setting parameters to be send with the next request
         void setParameter(const std::string & name, const std::string &value){
-            printf("template3");
             m_parameters[name] = value;
         };
         void setParameter(const std::string & name, const irr::core::stringw &value){
-            printf("template2");
             m_parameters[name] = irr::core::stringc(value.c_str()).c_str();
         }
         template <typename T>
         void setParameter(const std::string & name, const T& value){
-            printf("template1");
             m_parameters[name] = StringUtils::toString(value);
         }
 
