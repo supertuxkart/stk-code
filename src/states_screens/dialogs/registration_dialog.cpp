@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/dialogs/login_dialog.hpp"
+#include "states_screens/dialogs/registration_dialog.hpp"
 
 #include <IGUIEnvironment.h>
 
@@ -29,7 +29,6 @@
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 #include "online/current_online_user.hpp"
-#include "states_screens/dialogs/registration_dialog.hpp"
 
 
 using namespace GUIEngine;
@@ -38,35 +37,35 @@ using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
 
-LoginDialog::LoginDialog(const float w, const float h, const core::stringw& msg) :
+RegistrationDialog::RegistrationDialog(const float w, const float h) :
         ModalDialog(w,h)
 {
     m_self_destroy = false;
-    loadFromFile("online/login_dialog.stkgui");
+    loadFromFile("online/registration_info.stkgui");
 
     TextBoxWidget* textBox = getWidget<TextBoxWidget>("password");
+    assert(textBox != NULL);
+    textBox->setPasswordBox(true,L'*');
+
+    textBox = getWidget<TextBoxWidget>("password_confirm");
     assert(textBox != NULL);
     textBox->setPasswordBox(true,L'*');
 
     textBox = getWidget<TextBoxWidget>("username");
     assert(textBox != NULL);
     textBox->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-
-    LabelWidget * info = getWidget<LabelWidget>("info");
-    assert(info != NULL);
-    info->setText(msg, false);
 }
 
 // -----------------------------------------------------------------------------
 
-LoginDialog::~LoginDialog()
+RegistrationDialog::~RegistrationDialog()
 {
 }
 
 
 // -----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation RegistrationDialog::processEvent(const std::string& eventSource)
 {
     if (eventSource == "cancel")
     {
@@ -91,18 +90,12 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
         getWidget<LabelWidget>("info")->setText(info, false);
         return GUIEngine::EVENT_BLOCK;
     }
-    else if(eventSource == "signup")
-    {
-        m_self_destroy = true;
-        new RegistrationDialog(0.6f, 0.9f);
-        return GUIEngine::EVENT_BLOCK;
-    }
     return GUIEngine::EVENT_LET;
 }
 
 // -----------------------------------------------------------------------------
 
-void LoginDialog::onEnterPressedInternal()
+void RegistrationDialog::onEnterPressedInternal()
 {
     // ---- Cancel button pressed
     const int playerID = PLAYER_ID_GAME_MASTER;
@@ -119,7 +112,7 @@ void LoginDialog::onEnterPressedInternal()
 
 // -----------------------------------------------------------------------------
 
-void LoginDialog::onUpdate(float dt)
+void RegistrationDialog::onUpdate(float dt)
 {
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)

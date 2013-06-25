@@ -22,7 +22,6 @@
 #include <string>
 #include <iostream>
 
-#include "addons/inetwork_http.hpp"
 #include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
@@ -33,20 +32,11 @@
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
-#include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
-#include "modes/cutscene_world.hpp"
-#include "modes/overworld.hpp"
-#include "modes/demo_world.hpp"
-#include "network/network_manager.hpp"
 #include "states_screens/online_screen.hpp"
-#include "states_screens/addons_screen.hpp"
-#include "states_screens/credits.hpp"
-#include "states_screens/help_screen_1.hpp"
-#include "states_screens/kart_selection.hpp"
-#include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "modes/demo_world.hpp"
+#include "utils/translation.hpp"
 
 #include "states_screens/dialogs/login_dialog.hpp"
 
@@ -56,7 +46,7 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 
 // ----------------------------------------------------------------------------
 
-OnlineScreen::OnlineScreen() : Screen("online.stkgui")
+OnlineScreen::OnlineScreen() : Screen("online/online.stkgui")
 {
 }   // OnlineScreen
 
@@ -119,7 +109,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
 
     if (selection == "login")
     {
-        new LoginDialog(0.6f, 0.7f);
+        new LoginDialog(0.6f, 0.6f, _("Not yet an account? Press register beneath!"));
     }
 }   // eventCallback
 

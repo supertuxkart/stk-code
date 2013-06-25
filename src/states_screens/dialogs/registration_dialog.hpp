@@ -16,8 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef HEADER_LOGIN_DIALOG_HPP
-#define HEADER_LOGIN_DIALOG_HPP
+#ifndef HEADER_REGISTRATION_DIALOG_HPP
+#define HEADER_REGISTRATION_DIALOG_HPP
 
 #include <irrString.h>
 
@@ -25,10 +25,10 @@
 #include "guiengine/widgets/text_box_widget.hpp"
 
 /**
- * \brief Dialog that allows a user to sign in
+ * \brief Dialog that allows a user to register
  * \ingroup states_screens
  */
-class LoginDialog : public GUIEngine::ModalDialog
+class RegistrationDialog : public GUIEngine::ModalDialog
 {
 
 private:
@@ -40,8 +40,8 @@ public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    LoginDialog(const float percentWidth, const float percentHeight, const core::stringw& msg);
-    ~LoginDialog();
+    RegistrationDialog(const float percentWidth, const float percentHeight);
+    ~RegistrationDialog();
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);

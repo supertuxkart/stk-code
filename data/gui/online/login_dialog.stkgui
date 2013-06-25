@@ -1,6 +1,6 @@
 <stkgui>
 
-    <div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
+    <div x="2%" y="5%" width="96%" height="90%" layout="vertical-row" >
     
         <header id="title" width="96%" proportion="2" text_align="center" word_wrap="true"
        I18N="In the login dialog' dialog" text="Sign in"/>
@@ -9,29 +9,28 @@
         
         <div width="80%" align="center" layout="vertical-row" proportion="4">
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label proportion="1" text_align="left" I18N="In the login form" text="Username"/>
+                <label proportion="1" text_align="left" I18N="In the login dialog" text="Username"/>
                 <textbox proportion="2" id="username" I18N="In the login dialog"/>
             </div>
             
             <spacer height="20" width="20">
             
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label proportion="1" text_align="left" I18N="In the login form" text="Password"/>
+                <label proportion="1" text_align="left" I18N="In the login dialog" text="Password"/>
                 <textbox proportion="2" id="password" I18N="In the login dialog"/>
             </div>
         </div>     
         
-        <label id="info" proportion="2" width="90%" align="center" text_align="center" word_wrap="true"
-           I18N="In the login dialog' dialog" text=""/>
+        <label id="info" proportion="2" width="90%" align="center" text_align="center" word_wrap="true" dialog" text=""/>
            
         <spacer height="20" width="50"> 
         
-        <div id="options" width="fit" height="fit" align="center" layout="horizontal-row">
-            <button id="signin" height="100%" align="center" width="fit" I18N="In the login dialog" text="Sign In"/>
+        <div id="options" width="fit" proportion="2" align="center" layout="horizontal-row">
+            <button id="signin" height="fit" align="center" width="fit" I18N="In the login dialog" text="Sign In"/>
             <spacer height="50" width="50">
-            <button id="signup" height="100%" align="center" width="fit" I18N="In the login dialog" text="Register"/>
+            <button id="signup" height="fit" align="center" width="fit" I18N="In the login dialog" text="Register"/>
             <spacer height="50" width="50">      
-            <button id="cancel" height="100%" align="center" width="fit" I18N="In the login dialog" text="Cancel"/>
+            <button id="cancel" height="fit" align="center" width="fit" I18N="In the login dialog" text="Cancel"/>
         </div>
         
     

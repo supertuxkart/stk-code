@@ -177,6 +177,7 @@ src/states_screens/dialogs/message_dialog.cpp
 src/states_screens/dialogs/player_info_dialog.cpp
 src/states_screens/dialogs/press_a_key_dialog.cpp
 src/states_screens/dialogs/race_paused_dialog.cpp
+src/states_screens/dialogs/registration_dialog.cpp
 src/states_screens/dialogs/select_challenge.cpp
 src/states_screens/dialogs/track_info_dialog.cpp
 src/states_screens/dialogs/tutorial_message_dialog.cpp
@@ -442,6 +443,7 @@ src/states_screens/dialogs/message_dialog.hpp
 src/states_screens/dialogs/player_info_dialog.hpp
 src/states_screens/dialogs/press_a_key_dialog.hpp
 src/states_screens/dialogs/race_paused_dialog.hpp
+src/states_screens/dialogs/registration_dialog.hpp
 src/states_screens/dialogs/select_challenge.hpp
 src/states_screens/dialogs/track_info_dialog.hpp
 src/states_screens/dialogs/tutorial_message_dialog.hpp
@@ -516,5 +518,6 @@ src/utils/string_utils.hpp
 src/utils/synchronised.hpp
 src/utils/time.hpp
 src/utils/translation.hpp
+src/utils/types.hpp
 src/utils/vec3.hpp
 )
