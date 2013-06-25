@@ -44,7 +44,7 @@ private:
     ParticleEmitter* m_emitter;
 
 public:
-         Explosion(const Vec3& coord, const char* explosion_sound);
+         Explosion(const Vec3& coord, const char* explosion_sound, const char * particle_file );
         ~Explosion();
     bool updateAndDelete(float delta_t);
     bool hasEnded () { return  m_remaining_time <= -explosion_time;  }

@@ -34,14 +34,14 @@
 const float burst_time = 0.1f;
 
 /** Creates an explosion effect. */
-Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
+Explosion::Explosion(const Vec3& coord, const char* explosion_sound, const char * particle_file)
                      : HitSFX(coord, explosion_sound)
 {
     // short emision time, explosion, not constant flame
     m_remaining_time  = burst_time;
     
     ParticleKindManager* pkm = ParticleKindManager::get();
-    ParticleKind* particles = pkm->getParticles("explosion.xml");
+    ParticleKind* particles = pkm->getParticles(particle_file);
     m_emitter = new ParticleEmitter(particles, coord,  NULL);
 }   // Explosion
 

@@ -512,7 +512,7 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
  */
 HitEffect* Flyable::getHitEffect() const
 {
-    return new Explosion(getXYZ(), "explosion");
+    return new Explosion(getXYZ(), "explosion", "explosion_cake.xml");
 }   // getHitEffect
 
 /* EOF */
