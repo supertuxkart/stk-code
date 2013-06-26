@@ -185,3 +185,13 @@ void LabelWidget::setScrollSpeed(float speed)
     m_scroll_speed  = speed;
 }   // setScrollSpeed
 
+// ----------------------------------------------------------------------------
+
+void LabelWidget::setColor(const irr::video::SColor& color)
+{
+    m_color = color;
+    m_has_color = true;
+    if (m_element != NULL)
+        ((IGUIStaticText*)m_element)->setOverrideColor(m_color);
+}
+

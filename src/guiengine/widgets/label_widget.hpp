@@ -61,11 +61,7 @@ namespace GUIEngine
                 
         /** Sets the color of the widget. 
          *  \param color The color to use for this widget. */
-        void     setColor(const irr::video::SColor& color)
-        {
-            m_color     = color;
-            m_has_color = true;
-        }   // setColor
+        void     setColor(const irr::video::SColor& color);
         
         /** \brief Callback from base class Widget */
         virtual void update(float dt);
