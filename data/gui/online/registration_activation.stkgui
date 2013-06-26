@@ -16,7 +16,7 @@
         <spacer height="20" width="50"> 
         
         <div id="options" width="fit" proportion="1" align="center" layout="horizontal-row">
-            <button id="activate" height="fit" align="center" width="fit" I18N="In the registration dialog" text="Activate"/>
+            <button id="next" height="fit" align="center" width="fit" I18N="In the registration dialog" text="Activate"/>
             <spacer height="50" width="50">
             <button id="cancel" height="fit" align="center" width="fit" I18N="In the registration dialog" text="Close"/>
         </div>

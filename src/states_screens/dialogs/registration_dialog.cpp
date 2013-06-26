@@ -42,25 +42,20 @@ RegistrationDialog::RegistrationDialog(const float w, const float h, const Phase
         ModalDialog(w,h)
 {
     m_self_destroy = false;
+    m_show_registration_info = false;
+    m_show_registration_terms = false;
+    m_show_registration_activation = false;
     m_username = "";
     m_email = "";
     m_email_confirm = "";
     m_password = "";
     m_password_confirm = "";
     m_agreement = false;
-    //Left the agreement phase out as an option, defaults to the first phase.
-    switch (phase)
-    {
-        case Info:
-            showRegistrationInfo();
-            break;
-        case Activation:
-            showRegistrationActivation();
-            break;
-        default:
-            showRegistrationInfo();
-            break;
-    }
+    //If not asked for the Activation phase, default to the Info phase.
+    if (phase == Activation)
+        m_show_registration_activation = true;
+    else
+        m_show_registration_info = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -72,6 +67,7 @@ RegistrationDialog::~RegistrationDialog()
 // -----------------------------------------------------------------------------
 
 void RegistrationDialog::showRegistrationInfo(){
+    m_show_registration_info = false;
     clearWindow();
     m_phase = Info;
     loadFromFile("online/registration_info.stkgui");
@@ -109,13 +105,15 @@ void RegistrationDialog::showRegistrationInfo(){
 // -----------------------------------------------------------------------------
 
 void RegistrationDialog::showRegistrationTerms(){
+    m_show_registration_terms = false;
     clearWindow();
     m_phase = Terms;
     loadFromFile("online/registration_terms.stkgui");
     CheckBoxWidget * checkbox = getWidget<CheckBoxWidget>("accepted");
     assert(checkbox != NULL);
     checkbox->setState(false);
-    ButtonWidget * submitButton = getWidget<ButtonWidget>("submit");
+    checkbox->setFocusForPlayer(PLAYER_ID_GAME_MASTER); //FIXME set focus on the terms
+    ButtonWidget * submitButton = getWidget<ButtonWidget>("next");
     assert(submitButton != NULL);
     submitButton->setDeactivated();
 }
@@ -123,6 +121,7 @@ void RegistrationDialog::showRegistrationTerms(){
 // -----------------------------------------------------------------------------
 
 void RegistrationDialog::showRegistrationActivation(){
+    m_show_registration_activation = false;
     clearWindow();
     m_phase = Activation;
     loadFromFile("online/registration_activation.stkgui");
@@ -140,7 +139,6 @@ bool RegistrationDialog::processInfoEvent(const std::string& eventSource){
             m_password_confirm =  getWidget<TextBoxWidget>("password_confirm")->getText().trim();
             m_email = getWidget<TextBoxWidget>("email")->getText().trim();
             m_email_confirm = getWidget<TextBoxWidget>("email_confirm")->getText().trim();
-
             //FIXME More validation of registration information (Though all validation should happen at the server too!)
             if (m_password != m_password_confirm)
             {
@@ -169,7 +167,7 @@ bool RegistrationDialog::processInfoEvent(const std::string& eventSource){
             }
             else
             {
-                showRegistrationTerms();
+                m_show_registration_terms = true;
             }
             return true;
         }
@@ -182,13 +180,11 @@ bool RegistrationDialog::processInfoEvent(const std::string& eventSource){
 bool RegistrationDialog::processTermsEvent(const std::string& eventSource){
     if (m_phase == Terms)
     {
-        if (eventSource == "submit")
+        if (eventSource == "next")
         {
-            if (getWidget<CheckBoxWidget>("accepted")->getState())
-            {
-                m_agreement = true;
-                showRegistrationActivation();
-            }
+            assert(getWidget<CheckBoxWidget>("accepted")->getState());
+            m_agreement = true;
+            m_show_registration_activation = true;
             return true;
         }
         else if (eventSource == "accepted")
@@ -196,7 +192,7 @@ bool RegistrationDialog::processTermsEvent(const std::string& eventSource){
             CheckBoxWidget * checkbox = getWidget<CheckBoxWidget>("accepted");
             bool new_state = !checkbox->getState();
             checkbox->setState(new_state);
-            ButtonWidget * submitButton = getWidget<ButtonWidget>("submit");
+            ButtonWidget * submitButton = getWidget<ButtonWidget>("next");
             if(new_state)
                 submitButton->setActivated();
             else
@@ -205,7 +201,7 @@ bool RegistrationDialog::processTermsEvent(const std::string& eventSource){
         }
         else if (eventSource == "previous")
         {
-            showRegistrationInfo();
+            m_show_registration_info = true;
             return true;
         }
     }
@@ -217,7 +213,7 @@ bool RegistrationDialog::processTermsEvent(const std::string& eventSource){
 bool RegistrationDialog::processActivationEvent(const std::string& eventSource){
     if (m_phase == Activation)
     {
-        if (eventSource == "activate")
+        if (eventSource == "next")
         {
             //FIXME : activate
             m_self_destroy = true;
@@ -237,7 +233,7 @@ GUIEngine::EventPropagation RegistrationDialog::processEvent(const std::string& 
         m_self_destroy = true;
         return GUIEngine::EVENT_BLOCK;
     }
-    else if (processInfoEvent(eventSource) or processTermsEvent(eventSource) or processActivationEvent(eventSource))
+    else if (processInfoEvent(eventSource) || processTermsEvent(eventSource) || processActivationEvent(eventSource))
     {
         return GUIEngine::EVENT_BLOCK;
     }
@@ -248,17 +244,22 @@ GUIEngine::EventPropagation RegistrationDialog::processEvent(const std::string& 
 
 void RegistrationDialog::onEnterPressedInternal()
 {
-    // ---- Cancel button pressed
+    //If enter was pressed while "cancel" nor "previous" was selected, then interpret as "next" press.
     const int playerID = PLAYER_ID_GAME_MASTER;
-    ButtonWidget* cancelButton = getWidget<ButtonWidget>("cancel");
-    if (GUIEngine::isFocusedForPlayer(cancelButton, playerID))
+    bool interpret_as_next = true;
+    ButtonWidget* button = getWidget<ButtonWidget>("cancel");
+    assert(button != NULL);
+    interpret_as_next = interpret_as_next && !GUIEngine::isFocusedForPlayer(button, playerID);
+    if (interpret_as_next && m_phase == Terms)
     {
-        std::string fakeEvent = "cancel";
-        processEvent(fakeEvent);
-        return;
+        button = getWidget<ButtonWidget>("previous");
+        assert(button != NULL);
+        interpret_as_next = interpret_as_next && !GUIEngine::isFocusedForPlayer(button, playerID);
     }
-
-
+    if (interpret_as_next)
+    {
+        processEvent("next");
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -271,4 +272,10 @@ void RegistrationDialog::onUpdate(float dt)
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
         ModalDialog::dismiss();
     }
+    if (m_show_registration_info)
+        showRegistrationInfo();
+    if (m_show_registration_terms)
+        showRegistrationTerms();
+    if (m_show_registration_activation)
+        showRegistrationActivation();
 }

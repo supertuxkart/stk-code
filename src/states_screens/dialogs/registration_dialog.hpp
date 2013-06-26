@@ -37,7 +37,7 @@ public:
         Activation = 3
     };
 
-    RegistrationDialog(const float percentWidth, const float percentHeight, const Phase phase);
+    RegistrationDialog(const float percentWidth, const float percentHeight, const Phase phase = Info);
     ~RegistrationDialog();
 
     void onEnterPressedInternal();
@@ -48,6 +48,9 @@ public:
 private:
     Phase m_phase;
     bool m_self_destroy;
+    bool m_show_registration_info;
+    bool m_show_registration_terms;
+    bool m_show_registration_activation;
 
     //Saved user input :
     irr::core::stringw m_username;

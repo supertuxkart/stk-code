@@ -21,7 +21,7 @@
         <div id="options" width="fit" proportion="1" align="center" layout="horizontal-row">
             <button id="previous" height="fit" align="center" width="fit" I18N="In the registration dialog" text="Previous"/>
             <spacer height="50" width="50">
-            <button id="submit" height="fit" align="center" width="fit" I18N="In the registration dialog" text="Submit"/>
+            <button id="next" height="fit" align="center" width="fit" I18N="In the registration dialog" text="Submit"/>
             <spacer height="50" width="50">
             <button id="cancel" height="fit" align="center" width="fit" I18N="In the registration dialog" text="Cancel"/>
         </div>

@@ -105,17 +105,17 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
 
 void LoginDialog::onEnterPressedInternal()
 {
-    // ---- Cancel button pressed
+    //If enter was pressed while "cancel" nor "signup" was selected, then interpret as "signin" press.
     const int playerID = PLAYER_ID_GAME_MASTER;
     ButtonWidget* cancelButton = getWidget<ButtonWidget>("cancel");
-    if (GUIEngine::isFocusedForPlayer(cancelButton, playerID))
+    assert(cancelButton != NULL);
+    ButtonWidget* registerButton = getWidget<ButtonWidget>("signup");
+    assert(registerButton != NULL);
+    if (!GUIEngine::isFocusedForPlayer(cancelButton, playerID)          &&
+        !GUIEngine::isFocusedForPlayer(registerButton, playerID))
     {
-        std::string fakeEvent = "cancel";
-        processEvent(fakeEvent);
-        return;
+        processEvent("signin");
     }
-
-
 }
 
 // -----------------------------------------------------------------------------
@@ -130,7 +130,7 @@ void LoginDialog::onUpdate(float dt)
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
         ModalDialog::dismiss();
         if (m_open_registration_dialog)
-            new RegistrationDialog(0.8f, 0.9f, RegistrationDialog::Info);
+            new RegistrationDialog(0.8f, 0.9f);
     }
 
 }
