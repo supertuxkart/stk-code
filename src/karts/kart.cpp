@@ -337,6 +337,7 @@ void Kart::reset()
     m_bounce_back_time     = 0.0f;
     m_time_last_crash      = 0.0f;
     m_speed                = 0.0f;
+    m_current_lean         = 0.0f;
     m_view_blocked_by_plunger = 0.0f;
     m_has_caught_nolok_bubblegum = false;
 
@@ -2261,13 +2262,67 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     m_kart_gfx->resizeBox(KartGFX::KGFX_ZIPPER, getSpeed(), dt);
 
-    Moveable::updateGraphics(dt, center_shift,
-                             btQuaternion(m_skidding->getVisualSkidRotation(),
-                                          0, 0));
+    // Note that we compare with maximum speed of the kart, not
+    // maximum speed including terrain effects. This avoids that
+    // leaning might get less if a kart gets a special that increases
+    // its maximum speed, but not the current speed (by much). On the
+    // other hand, that ratio can often be greater than 1.
+    float speed_frac = m_speed / m_kart_properties->getMaxSpeed();
+    if(speed_frac>1.0f)
+        speed_frac = 1.0f;
+    else if (speed_frac < 0.0f)  // no leaning when backwards driving
+        speed_frac = 0.0f;
 
-    /*
+    const float steer_frac = m_skidding->getSteeringFraction();
+
+    const float roll_speed = m_kart_properties->getLeanSpeed();
+    if(speed_frac > 0.8f && fabsf(steer_frac)>0.5f)
+    {
+        // Use steering ^ 7, which means less effect at lower
+        // steering
+        const float f = m_skidding->getSteeringFraction();
+        const float f2 = f*f;
+        const float max_lean = -m_kart_properties->getMaxLean()
+                             * f2*f2*f2*f
+                             * speed_frac;
+        if(max_lean>0)
+        {
+            m_current_lean += dt* roll_speed;
+            if(m_current_lean > max_lean)
+                m_current_lean = max_lean;
+        }
+        else if(max_lean<0)
+        {
+            m_current_lean -= dt*roll_speed;
+            if(m_current_lean < max_lean)
+                m_current_lean = max_lean;
+        }
+    }
+    else if(m_current_lean!=0.0f)
+    {
+        // Disable any potential roll factor that is still applied
+        // --------------------------------------------------------
+        if(m_current_lean>0)
+        {
+            m_current_lean -= dt * roll_speed;
+            if(m_current_lean < 0.0f)
+                m_current_lean = 0.0f;
+        }
+        else
+        {
+            m_current_lean += dt * roll_speed;
+            if(m_current_lean>0.0f)
+                m_current_lean = 0.0f;
+        }
+    }
+
+    float heading = m_skidding->getVisualSkidRotation();
+    Moveable::updateGraphics(dt, center_shift,
+                             btQuaternion(heading, 0, m_current_lean));
+
+#ifdef XX
     // cheap wheelie effect
-    if (m_zipper_fire && m_zipper_fire->getCreationRate() > 0.0f)
+    if (m_controls.m_nitro)
     {
         m_node->updateAbsolutePosition();
         m_kart_model->getWheelNodes()[0]->updateAbsolutePosition();
@@ -2275,8 +2330,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
         core::vector3df rot = m_node->getRotation();
 
-        float ratio = float(m_zipper_fire->getCreationRate())
-                   /float(m_zipper_fire->getParticlesInfo()->getMaxRate());
+        float ratio = 0.8f;  //float(m_zipper_fire->getCreationRate())
+                //   /float(m_zipper_fire->getParticlesInfo()->getMaxRate());
 
         const float a = (13.4f - ratio*13.0f);
         float dst = -45.0f*sin((a*a)/180.f*M_PI);
@@ -2290,7 +2345,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
         m_node->setPosition(m_node->getPosition() + core::vector3df(0,wheel_y_after - wheel_y,0));
     }
-     */
+#endif
+
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------

@@ -225,6 +225,14 @@ private:
      *  is max_speed*m_squash_slowdown. */
     float       m_squash_slowdown;
 
+    /** The maximum roll a kart graphics should show when driving in a fast
+     *  curve. This is read in as degrees, but stored in radians. */
+     float      m_max_lean;
+
+     /** The speed with which the roll (when leaning in a curve) changes
+      *  (in radians/second). */
+     float      m_lean_speed;
+     
     /** Engine sound effect. */
     std::string m_engine_sfx_type;
 
@@ -806,6 +814,13 @@ public:
     /** Returns the slowdown of a kart that is squashed. */
     float getSquashSlowdown() const {return m_squash_slowdown; }
 
+    // ------------------------------------------------------------------------
+    /** The maximum leaning a kart should show (In radians). */
+    float getMaxLean() const { return m_max_lean; }
+
+    // ------------------------------------------------------------------------
+    /** The speed with which a kart should lean (in radians/s). */
+    float getLeanSpeed() const { return m_lean_speed; }
     // ------------------------------------------------------------------------
     /** Returns true if wheels should have random rotation at start. */
     bool hasRandomWheels() const { return m_has_rand_wheels; }

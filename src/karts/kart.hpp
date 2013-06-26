@@ -108,7 +108,6 @@ private:
     /** For stars rotating around head effect */
     Stars *m_stars_effect;
 
-private:
     /** True if the kart hasn't moved since 'ready-set-go' - used to
      *  determine startup boost. */
     bool         m_has_started;
@@ -126,6 +125,9 @@ private:
     /** How long a kart is being squashed. If this is >0
      *  the kart is squashed. */
     float        m_squash_time;
+
+    /** Current leaning of the kart. */
+    float        m_current_lean;
 
     /** If > 0 then bubble gum effect is on */
     float        m_bubblegum_time;

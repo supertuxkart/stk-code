@@ -87,7 +87,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_camera_distance = m_camera_forward_up_angle =
         m_camera_backward_up_angle = m_explosion_invulnerability_time =
         m_rescue_time = m_rescue_height = m_explosion_time =
-        m_explosion_radius =
+        m_explosion_radius = m_max_lean = m_lean_speed =
         m_swatter_distance2 = m_swatter_duration = m_squash_slowdown =
         m_squash_duration = m_downward_impulse_factor = UNDEFINED;
 
@@ -500,6 +500,14 @@ void KartProperties::getAllData(const XMLNode * root)
         }
     }
 
+    if(const XMLNode *lean_node= root->getNode("lean"))
+    {
+        lean_node->get("max",   &m_max_lean  );
+        lean_node->get("speed", &m_lean_speed);
+        m_max_lean   *= DEGREE_TO_RAD;
+        m_lean_speed *= DEGREE_TO_RAD;
+    }
+
     if(const XMLNode *camera_node= root->getNode("camera"))
     {
         camera_node->get("distance", &m_camera_distance);
@@ -654,8 +662,10 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_nitro_max,                  "nitro max"                     );
     CHECK_NEG(m_swatter_distance2,          "swatter distance"              );
     CHECK_NEG(m_swatter_duration,           "swatter duration"              );
-    CHECK_NEG(m_squash_duration,            "squash-duration"               );
-    CHECK_NEG(m_squash_slowdown,            "squash-slowdown"               );
+    CHECK_NEG(m_squash_duration,            "swatter squash-duration"       );
+    CHECK_NEG(m_squash_slowdown,            "swatter squash-slowdown"       );
+    CHECK_NEG(m_max_lean,                   "lean max"                      );
+    CHECK_NEG(m_lean_speed,                 "lean speed"                    );
 
     CHECK_NEG(m_rescue_height,              "rescue height"                 );
     CHECK_NEG(m_rescue_time,                "rescue time"                   );
