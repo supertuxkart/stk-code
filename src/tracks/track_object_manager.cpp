@@ -21,7 +21,6 @@
 #include "animations/ipo.hpp"
 #include "config/user_config.hpp"
 #include "animations/three_d_animation.hpp"
-#include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/xml_node.hpp"

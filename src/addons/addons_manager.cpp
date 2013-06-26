@@ -30,7 +30,6 @@
 #include "addons/inetwork_http.hpp"
 #include "addons/request.hpp"
 #include "addons/zip.hpp"
-#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/kart_properties.hpp"

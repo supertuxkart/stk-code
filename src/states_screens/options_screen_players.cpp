@@ -20,7 +20,6 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player.hpp"
 #include "config/device_config.hpp"
-#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"

@@ -28,7 +28,6 @@ using namespace video;
 using namespace io;
 using namespace gui;
 
-#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"

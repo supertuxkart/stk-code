@@ -21,7 +21,6 @@
 #include <stdio.h>
 
 #include "audio/sfx_base.hpp"
-#include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"

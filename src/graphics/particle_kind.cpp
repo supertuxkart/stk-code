@@ -20,7 +20,6 @@
 
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
