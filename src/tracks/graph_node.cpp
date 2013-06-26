@@ -18,7 +18,6 @@
 
 #include "tracks/quad_graph.hpp"
 
-#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "tracks/quad_graph.hpp"

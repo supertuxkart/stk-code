@@ -19,7 +19,6 @@
 #include "animations/animation_base.hpp"
 
 #include "animations/ipo.hpp"
-#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 

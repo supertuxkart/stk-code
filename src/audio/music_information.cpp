@@ -23,7 +23,6 @@
 
 #include "audio/music_dummy.hpp"
 #include "audio/music_ogg.hpp"
-#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"

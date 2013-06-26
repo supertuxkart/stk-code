@@ -23,7 +23,6 @@
 using irr::core::stringw;
 using irr::core::stringc;
 
-#include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"

@@ -25,7 +25,6 @@
 #  include <unistd.h>
 #endif
 
-#include "config/user_config.hpp"
 #include "config/player.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/state_manager.hpp"

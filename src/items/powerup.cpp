@@ -20,7 +20,6 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
-#include "config/user_config.hpp"
 #include "config/stk_config.hpp"
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"
