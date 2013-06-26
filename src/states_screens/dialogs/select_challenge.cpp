@@ -137,6 +137,8 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     LabelWidget* typeLbl = getWidget<LabelWidget>("race_type_val");
     if (c->getData()->isGrandPrix())
         typeLbl->setText(_("Grand Prix"), false );
+    else if (c->getData()->getEnergy(RaceManager::DIFFICULTY_EASY) > 0)
+        typeLbl->setText(_("Nitro challenge"), false );
     else
         typeLbl->setText( RaceManager::getNameOf(c->getData()->getMinorMode()), false );
 
