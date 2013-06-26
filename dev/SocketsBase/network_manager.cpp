@@ -1,3 +1,21 @@
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2013 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include "network_manager.hpp"
 
 #include "protocols/hide_public_address.hpp"
@@ -23,10 +41,9 @@ void* protocolManagerUpdate(void* data)
 
 NetworkManager::NetworkManager()
 {
-    m_publicAddress.ip = 0;
-    m_publicAddress.port = 0;
-    m_networkManager = NULL;
-    m_protocolManagerUpdateThread = NULL;
+    m_public_address.ip = 0;
+    m_public_address.port = 0;
+    m_protocol_manager_update_thread = NULL;
 }
 
 NetworkManager::~NetworkManager() 
@@ -36,16 +53,16 @@ NetworkManager::~NetworkManager()
 void NetworkManager::run()
 {
     ProtocolManager::getInstance<ProtocolManager>();
-    m_protocolManagerUpdateThread = (pthread_t*)(malloc(sizeof(pthread_t)));
-    pthread_create(m_protocolManagerUpdateThread, NULL, protocolManagerUpdate, ProtocolManager::getInstance());
+    m_protocol_manager_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
+    pthread_create(m_protocol_manager_update_thread, NULL, protocolManagerUpdate, ProtocolManager::getInstance());
 }
 
-bool NetworkManager::connect(uint32_t ip, uint16_t port)
+bool NetworkManager::connect(TransportAddress peer)
 {
-    if (peerExists(ip, port))
-        return isConnectedTo(ip, port);
+    if (peerExists(peer))
+        return isConnectedTo(peer);
     
-    return STKPeer::connectToHost(m_localhost, ip, port, 2, 0);
+    return STKPeer::connectToHost(m_localhost, peer, 2, 0);
 }
 
 void NetworkManager::setManualSocketsMode(bool manual)
@@ -90,24 +107,23 @@ void NetworkManager::notifyEvent(Event* event)
 
 void NetworkManager::setLogin(std::string username, std::string password)
 {
-    m_playerLogin.username = username;
-    m_playerLogin.password = password;
+    m_player_login.username = username;
+    m_player_login.password = password;
 }
 
-void NetworkManager::setPublicAddress(uint32_t ip, uint16_t port)
+void NetworkManager::setPublicAddress(TransportAddress addr)
 {
-    m_publicAddress.ip = ip;
-    m_publicAddress.port = port;
+    m_public_address = addr;
 }
 
-bool NetworkManager::peerExists(uint32_t ip, uint16_t port)
+bool NetworkManager::peerExists(TransportAddress peer)
 {
-    return m_localhost->peerExists(ip, port);
+    return m_localhost->peerExists(peer);
 }
 
-bool NetworkManager::isConnectedTo(uint32_t ip, uint16_t port)
+bool NetworkManager::isConnectedTo(TransportAddress peer)
 {
-    return m_localhost->isConnectedTo(ip, port);
+    return m_localhost->isConnectedTo(peer);
 }
 
 STKHost* NetworkManager::getHost()

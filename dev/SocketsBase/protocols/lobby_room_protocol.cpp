@@ -16,32 +16,35 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef GET_PEER_ADDRESS_HPP
-#define GET_PEER_ADDRESS_HPP
+#include "lobby_room_protocol.hpp"
 
-#include "protocol.hpp"
+#include <stdio.h>
 
-class GetPeerAddress : public Protocol
+LobbyRoomProtocol::LobbyRoomProtocol(CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_LOBBY_ROOM)
 {
-    public:
-        GetPeerAddress(CallbackObject* callback_object);
-        virtual ~GetPeerAddress();
-        
-        virtual void notifyEvent(Event* event);
-        virtual void setup();
-        virtual void update();
-        
-        void setPeerName(std::string peer_name);
-    protected:
-        std::string m_peer_name;
-        
-        enum STATE 
-        {
-            NONE,
-            DONE
-        };
-        STATE m_state;
-        
-};
+}
 
-#endif // GET_PEER_ADDRESS_HPP
+LobbyRoomProtocol::~LobbyRoomProtocol()
+{
+}
+
+void LobbyRoomProtocol::notifyEvent(Event* event) 
+{
+    if (event->type == EVENT_TYPE_MESSAGE)
+    {
+        printf("Message from %u : \"%s\"\n", event->peer->getAddress(), event->data.c_str());
+    }
+}
+
+void LobbyRoomProtocol::setup()
+{
+}
+
+void LobbyRoomProtocol::update()
+{
+}
+
+void LobbyRoomProtocol::sendMessage(std::string message)
+{
+    
+}

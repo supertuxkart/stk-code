@@ -16,38 +16,32 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef SHOW_PUBLIC_ADDRESS_HPP
-#define SHOW_PUBLIC_ADDRESS_HPP
+#ifndef LOBBY_ROOM_PROTOCOL_HPP
+#define LOBBY_ROOM_PROTOCOL_HPP
 
 #include "protocol.hpp"
-#include <string>
 
-class ShowPublicAddress : public Protocol
+/*!
+ * \class LobbyRoomProtocol
+ * \brief Class used while the game is being prepared.
+ * This protocol starts when a server opens a game, or when a client joins a game.
+ * It is used to exchange data about the race settings, like kart selection.
+ */
+class LobbyRoomProtocol : public Protocol
 {
     public:
-        ShowPublicAddress(CallbackObject* callback_object);
-        virtual ~ShowPublicAddress();
+        LobbyRoomProtocol(CallbackObject* callback_object);
+        virtual ~LobbyRoomProtocol();
         
         virtual void notifyEvent(Event* event);
+        
         virtual void setup();
+        
         virtual void update();
         
-        virtual void setUsername(std::string username);
-        virtual void setPassword(std::string password);
-        virtual void setPublicAddress(uint32_t ip, uint16_t port);
+        void sendMessage(std::string message);
         
     protected:
-        std::string m_username;
-        std::string m_password;
-        uint32_t m_public_ip;
-        uint16_t m_public_port;
-        
-        enum STATE
-        {
-            NONE,
-            DONE
-        };
-        STATE m_state;
 };
 
-#endif // HIDE_PUBLIC_ADDRESS_HPP
+#endif // LOBBY_ROOM_PROTOCOL_HPP

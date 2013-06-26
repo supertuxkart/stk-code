@@ -44,6 +44,8 @@
 		<Unit filename="event.hpp" />
 		<Unit filename="http_functions.cpp" />
 		<Unit filename="http_functions.hpp" />
+		<Unit filename="lobby_room_protocol.cpp" />
+		<Unit filename="lobby_room_protocol.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="network_interface.cpp" />
 		<Unit filename="network_interface.hpp" />

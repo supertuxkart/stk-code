@@ -1,3 +1,21 @@
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2013 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include "stk_host.hpp"
 
 #include "network_manager.hpp"
@@ -6,6 +24,8 @@
 #include <string.h>
 #include <pthread.h>
 #include <arpa/inet.h>
+
+// ----------------------------------------------------------------------------
 
 void* STKHost::receive_data(void* self)
 {
@@ -21,61 +41,86 @@ void* STKHost::receive_data(void* self)
     return NULL;
 }
 
+// ----------------------------------------------------------------------------
+
 STKHost::STKHost()
 {
     m_host = NULL;
-    m_listeningThread = (pthread_t*)(malloc(sizeof(pthread_t)));
+    m_listening_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
 }
+
+// ----------------------------------------------------------------------------
 
 STKHost::~STKHost()
 {
 }
 
-void STKHost::setupServer(uint32_t address, uint16_t port, int peerCount, int channelLimit, uint32_t maxIncomingBandwidth, uint32_t maxOutgoingBandwidth)
+// ----------------------------------------------------------------------------
+
+void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count, 
+                            int channel_limit, uint32_t max_incoming_bandwidth, 
+                            uint32_t max_outgoing_bandwidth)
 {
     ENetAddress* addr = (ENetAddress*)(malloc(sizeof(ENetAddress)));
     addr->host = address;
     addr->port = port;
 
-    m_host = enet_host_create(addr, peerCount, channelLimit, maxIncomingBandwidth, maxOutgoingBandwidth);
+    m_host = enet_host_create(addr, peer_count, channel_limit, 
+                            max_incoming_bandwidth, max_outgoing_bandwidth);
     if (m_host == NULL)
     {
-        fprintf (stderr, "An error occurred while trying to create an ENet server host.\n");
+        fprintf (stderr, "An error occurred while trying to create an ENet \
+                          server host.\n");
         exit (EXIT_FAILURE);
     }
 }
 
-void STKHost::setupClient(int peerCount, int channelLimit, uint32_t maxIncomingBandwidth, uint32_t maxOutgoingBandwidth)
+// ----------------------------------------------------------------------------
+
+void STKHost::setupClient(int peer_count, int channel_limit, 
+                            uint32_t max_incoming_bandwidth,
+                            uint32_t max_outgoing_bandwidth)
 {
-    m_host = enet_host_create(NULL, peerCount, channelLimit, maxIncomingBandwidth, maxOutgoingBandwidth);
+    m_host = enet_host_create(NULL, peer_count, channel_limit, 
+                            max_incoming_bandwidth, max_outgoing_bandwidth);
     if (m_host == NULL)
     {
-        fprintf (stderr, "An error occurred while trying to create an ENet client host.\n");
+        fprintf (stderr, "An error occurred while trying to create an ENet \
+                          client host.\n");
         exit (EXIT_FAILURE);
     }
 }
+
+// ----------------------------------------------------------------------------
 
 void STKHost::startListening()
 {
-    pthread_create(m_listeningThread, NULL, &STKHost::receive_data, this);
+    pthread_create(m_listening_thread, NULL, &STKHost::receive_data, this);
 }
+
+// ----------------------------------------------------------------------------
+
 void STKHost::stopListening()
 {
-    pthread_cancel(*m_listeningThread);
+    pthread_cancel(*m_listening_thread);
 }
 
-void STKHost::sendRawPacket(uint8_t* data, int length, unsigned int dstIp, unsigned short dstPort)
+// ----------------------------------------------------------------------------
+
+void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
 {
     struct sockaddr_in to;
-    int toLen = sizeof(to);
-    memset(&to,0,toLen);
+    int to_len = sizeof(to);
+    memset(&to,0,to_len);
 
     to.sin_family = AF_INET;
-    to.sin_port = htons(dstPort);
-    to.sin_addr.s_addr = htonl(dstIp);
+    to.sin_port = htons(dst.port);
+    to.sin_addr.s_addr = htonl(dst.ip);
     
-    sendto(m_host->socket, data, length, 0,(sockaddr*)&to, toLen);
+    sendto(m_host->socket, data, length, 0,(sockaddr*)&to, to_len);
 }
+
+// ----------------------------------------------------------------------------
 
 uint8_t* STKHost::receiveRawPacket() 
 {
@@ -85,7 +130,8 @@ uint8_t* STKHost::receiveRawPacket()
     
     int len = recv(m_host->socket,buffer,2048, 0);
     int i = 0;
-    while(len < 0) // wait to receive the message because enet sockets are non-blocking
+    // wait to receive the message because enet sockets are non-blocking
+    while(len < 0) 
     {
         i++;
         len = recv(m_host->socket,buffer,2048, 0);
@@ -94,27 +140,31 @@ uint8_t* STKHost::receiveRawPacket()
     printf("Packet received after %i milliseconds\n", i);
     return buffer;
 }
-uint8_t* STKHost::receiveRawPacket(unsigned int dstIp, unsigned short dstPort) 
+
+// ----------------------------------------------------------------------------
+
+uint8_t* STKHost::receiveRawPacket(TransportAddress sender) 
 {
     uint8_t* buffer; // max size needed normally (only used for stun)
     buffer = (uint8_t*)(malloc(sizeof(uint8_t)*2048));
     memset(buffer, 0, 2048);
     
-    socklen_t fromlen;
+    socklen_t from_len;
     struct sockaddr addr;
     
-    fromlen = sizeof(addr);
-    int len = recvfrom(m_host->socket, buffer, 2048, 0, &addr, &fromlen);
+    from_len = sizeof(addr);
+    int len = recvfrom(m_host->socket, buffer, 2048, 0, &addr, &from_len);
     
     int i = 0;
+     // wait to receive the message because enet sockets are non-blocking
     while(len < 0 || (
-               (uint8_t)(addr.sa_data[2]) != (dstIp>>24&0xff) 
-            && (uint8_t)(addr.sa_data[3]) != (dstIp>>16&0xff) 
-            && (uint8_t)(addr.sa_data[4]) != (dstIp>>8&0xff) 
-            && (uint8_t)(addr.sa_data[5]) != (dstIp&0xff))) // wait to receive the message because enet sockets are non-blocking
+               (uint8_t)(addr.sa_data[2]) != (sender.ip>>24&0xff) 
+            && (uint8_t)(addr.sa_data[3]) != (sender.ip>>16&0xff) 
+            && (uint8_t)(addr.sa_data[4]) != (sender.ip>>8&0xff) 
+            && (uint8_t)(addr.sa_data[5]) != (sender.ip&0xff)))
     {
         i++;
-        len = recvfrom(m_host->socket, buffer, 2048, 0, &addr, &fromlen);
+        len = recvfrom(m_host->socket, buffer, 2048, 0, &addr, &from_len);
         usleep(1000); // wait 1 millisecond between two checks
     }
     if (addr.sa_family == AF_INET)
@@ -127,28 +177,39 @@ uint8_t* STKHost::receiveRawPacket(unsigned int dstIp, unsigned short dstPort)
     return buffer;
 }
 
+// ----------------------------------------------------------------------------
+
 void STKHost::broadcastPacket(char* data)
 {
-    ENetPacket* packet = enet_packet_create(data, strlen(data)+1,ENET_PACKET_FLAG_RELIABLE);
+    ENetPacket* packet = enet_packet_create(data, strlen(data)+1,
+                                            ENET_PACKET_FLAG_RELIABLE);
     enet_host_broadcast(m_host, 0, packet);
 }
 
-bool STKHost::peerExists(uint32_t ip, uint16_t port)
+// ----------------------------------------------------------------------------
+
+bool STKHost::peerExists(TransportAddress peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == ip && m_host->peers[i].address.port == port)
+        if (m_host->peers[i].address.host == peer.ip && 
+            m_host->peers[i].address.port == peer.port)
         {
             return true;
         }
     }
     return false;
 }
-bool STKHost::isConnectedTo(uint32_t ip, uint16_t port)
+
+// ----------------------------------------------------------------------------
+
+bool STKHost::isConnectedTo(TransportAddress peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == ip && m_host->peers[i].address.port == port && m_host->peers[i].state == ENET_PEER_STATE_CONNECTED)
+        if (m_host->peers[i].address.host == peer.ip && 
+            m_host->peers[i].address.port == peer.port && 
+            m_host->peers[i].state == ENET_PEER_STATE_CONNECTED)
         {
             return true;
         }

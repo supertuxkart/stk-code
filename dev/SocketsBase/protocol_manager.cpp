@@ -1,3 +1,21 @@
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2013 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include "protocol_manager.hpp"
 
 #include "protocol.hpp"
@@ -10,8 +28,11 @@
 
 ProtocolManager::ProtocolManager() 
 {
-    pthread_mutex_init(&m_eventsMutex, NULL);
-    pthread_mutex_init(&m_protocolsMutex, NULL);
+    pthread_mutex_init(&m_events_mutex, NULL);
+    pthread_mutex_init(&m_protocols_mutex, NULL);
+    pthread_mutex_init(&m_requests_mutex, NULL);
+    pthread_mutex_init(&m_id_mutex, NULL);
+    m_next_protocol_id = 0;
 }
 
 ProtocolManager::~ProtocolManager()
@@ -20,9 +41,9 @@ ProtocolManager::~ProtocolManager()
 
 void ProtocolManager::notifyEvent(Event* event)
 {
-    pthread_mutex_lock(&m_eventsMutex);
-    m_eventsToProcess.push_back(event); 
-    pthread_mutex_unlock(&m_eventsMutex);
+    pthread_mutex_lock(&m_events_mutex);
+    m_events_to_process.push_back(event); // add the event to the queue
+    pthread_mutex_unlock(&m_events_mutex);
 }
 
 void ProtocolManager::sendMessage(std::string message)
@@ -31,60 +52,116 @@ void ProtocolManager::sendMessage(std::string message)
     newMessage[0] = (char)(0);
 }
 
-int ProtocolManager::startProtocol(Protocol* protocol)
+int ProtocolManager::requestStart(Protocol* protocol)
 {
-    ProtocolInfo protocolInfo;
-    protocolInfo.state = PROTOCOL_STATE_RUNNING;
-    assignProtocolId(protocolInfo);
-    protocolInfo.protocol = protocol;
-    printf("__ProtocolManager> A new protocol with id=%u has been started. There are %ld protocols running.\n", protocolInfo.id, m_protocols.size()+1);
+    // create the request
+    ProtocolRequest req;
+    ProtocolInfo info;
+    info.protocol = protocol;
+    info.state = PROTOCOL_STATE_RUNNING;
+    assignProtocolId(&info); // assign a unique id to the protocol.
+    req.protocol_info = info;
+    req.type = PROTOCOL_REQUEST_START;
+    // add it to the request stack
+    pthread_mutex_lock(&m_requests_mutex);
+    m_requests.push_back(req);
+    pthread_mutex_unlock(&m_requests_mutex);
     
-    pthread_mutex_lock(&m_protocolsMutex);
-    m_protocols.push_back(protocolInfo);
-    pthread_mutex_unlock(&m_protocolsMutex);
-    
-    protocol->setListener(this);
-    protocol->setup();
-    
-    return protocolInfo.id;
+    return info.id;
 }
-void ProtocolManager::stopProtocol(Protocol* protocol)
+
+void ProtocolManager::requestStop(Protocol* protocol)
+{
+    // create the request
+    ProtocolRequest req;
+    req.protocol_info.protocol = protocol;
+    req.type = PROTOCOL_REQUEST_STOP;
+    // add it to the request stack
+    pthread_mutex_lock(&m_requests_mutex);
+    m_requests.push_back(req);
+    pthread_mutex_unlock(&m_requests_mutex);
+}
+
+void ProtocolManager::requestPause(Protocol* protocol)
+{
+    // create the request
+    ProtocolRequest req;
+    req.protocol_info.protocol = protocol;
+    req.type = PROTOCOL_REQUEST_PAUSE;
+    // add it to the request stack
+    pthread_mutex_lock(&m_requests_mutex);
+    m_requests.push_back(req);
+    pthread_mutex_unlock(&m_requests_mutex);
+}
+
+void ProtocolManager::requestUnpause(Protocol* protocol)
+{
+    // create the request
+    ProtocolRequest req;
+    req.protocol_info.protocol = protocol;
+    req.type = PROTOCOL_REQUEST_UNPAUSE;
+    // add it to the request stack
+    pthread_mutex_lock(&m_requests_mutex);
+    m_requests.push_back(req);
+    pthread_mutex_unlock(&m_requests_mutex);
+}
+
+void ProtocolManager::requestTerminate(Protocol* protocol)
+{
+    // create the request
+    ProtocolRequest req;
+    req.protocol_info.protocol = protocol;
+    req.type = PROTOCOL_REQUEST_TERMINATE;
+    // add it to the request stack
+    pthread_mutex_lock(&m_requests_mutex);
+    m_requests.push_back(req);
+    pthread_mutex_unlock(&m_requests_mutex);
+}
+
+void ProtocolManager::startProtocol(ProtocolInfo protocol)
+{
+    printf("__ProtocolManager> A new protocol with id=%u has been started. There are %ld protocols running.\n", protocol.id, m_protocols.size()+1);
+    // add the protocol to the protocol vector so that it's updated
+    pthread_mutex_lock(&m_protocols_mutex);
+    m_protocols.push_back(protocol);
+    pthread_mutex_unlock(&m_protocols_mutex);
+    // setup the protocol and notify it that it's started
+    protocol.protocol->setListener(this);
+    protocol.protocol->setup();
+}
+void ProtocolManager::stopProtocol(ProtocolInfo protocol)
 {
     
 }
-void ProtocolManager::pauseProtocol(Protocol* protocol)
+void ProtocolManager::pauseProtocol(ProtocolInfo protocol)
 {
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
-        if (m_protocols[i].protocol == protocol && m_protocols[i].state == PROTOCOL_STATE_RUNNING)
+        if (m_protocols[i].protocol == protocol.protocol && m_protocols[i].state == PROTOCOL_STATE_RUNNING)
         {
-            pthread_mutex_lock(&m_protocolsMutex);
             m_protocols[i].state = PROTOCOL_STATE_PAUSED;
             m_protocols[i].protocol->pause();
-            pthread_mutex_unlock(&m_protocolsMutex);
         }
     }
 }
-void ProtocolManager::unpauseProtocol(Protocol* protocol)
+void ProtocolManager::unpauseProtocol(ProtocolInfo protocol)
 {
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
-        if (m_protocols[i].protocol == protocol && m_protocols[i].state == PROTOCOL_STATE_PAUSED)
+        if (m_protocols[i].protocol == protocol.protocol && m_protocols[i].state == PROTOCOL_STATE_PAUSED)
         {
-            pthread_mutex_lock(&m_protocolsMutex);
             m_protocols[i].state = PROTOCOL_STATE_RUNNING;
             m_protocols[i].protocol->unpause();
-            pthread_mutex_unlock(&m_protocolsMutex);
         }
     }
 }
-void ProtocolManager::protocolTerminated(Protocol* protocol)
+void ProtocolManager::protocolTerminated(ProtocolInfo protocol)
 {
-    pthread_mutex_lock(&m_protocolsMutex);
+    pthread_mutex_lock(&m_protocols_mutex); // be sure that noone accesses the protocols vector while we erase a protocol
     int offset = 0;
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
-        if (m_protocols[i-offset].protocol == protocol)
+        if (m_protocols[i-offset].protocol == protocol.protocol)
         {
             delete m_protocols[i].protocol;
             m_protocols.erase(m_protocols.begin()+(i-offset), m_protocols.begin()+(i-offset)+1);
@@ -92,17 +169,17 @@ void ProtocolManager::protocolTerminated(Protocol* protocol)
         }
     }
     printf("__ProtocolManager> A protocol has been terminated. There are %ld protocols running.\n", m_protocols.size());
-    pthread_mutex_unlock(&m_protocolsMutex);
+    pthread_mutex_unlock(&m_protocols_mutex);
 }
 
 void ProtocolManager::update()
 {
     // before updating, notice protocols that they have received information
-    pthread_mutex_lock(&m_eventsMutex); // secure threads
-    int size = m_eventsToProcess.size();
+    pthread_mutex_lock(&m_events_mutex); // secure threads
+    int size = m_events_to_process.size();
     for (int i = 0; i < size; i++)
     {
-        Event* event = m_eventsToProcess.back();
+        Event* event = m_events_to_process.back();
         
         PROTOCOL_TYPE searchedProtocol = PROTOCOL_NONE;
         if (event->data.size() > 0)
@@ -113,15 +190,44 @@ void ProtocolManager::update()
                 m_protocols[i].protocol->notifyEvent(event);
         }
         delete event;
-        m_eventsToProcess.pop_back();
+        m_events_to_process.pop_back();
     }
-    pthread_mutex_unlock(&m_eventsMutex); // release the mutex
+    pthread_mutex_unlock(&m_events_mutex); // release the mutex
+    
     // now update all protocols
+    pthread_mutex_lock(&m_protocols_mutex);
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
         if (m_protocols[i].state == PROTOCOL_STATE_RUNNING)
             m_protocols[i].protocol->update();
     }
+    pthread_mutex_unlock(&m_protocols_mutex); 
+    
+    // process queued events for protocols
+    pthread_mutex_lock(&m_requests_mutex);
+    for (unsigned int i = 0; i < m_requests.size(); i++)
+    {
+        switch (m_requests[i].type)
+        {
+            case PROTOCOL_REQUEST_START:
+                startProtocol(m_requests[i].protocol_info);
+                break;
+            case PROTOCOL_REQUEST_STOP:
+                stopProtocol(m_requests[i].protocol_info);
+                break;
+            case PROTOCOL_REQUEST_PAUSE:
+                pauseProtocol(m_requests[i].protocol_info);
+                break;
+            case PROTOCOL_REQUEST_UNPAUSE:
+                unpauseProtocol(m_requests[i].protocol_info);
+                break;
+            case PROTOCOL_REQUEST_TERMINATE:
+                protocolTerminated(m_requests[i].protocol_info);
+                break;
+        }
+    }
+    m_requests.clear();
+    pthread_mutex_unlock(&m_requests_mutex);
 }
 
 int ProtocolManager::runningProtocolsCount()
@@ -133,30 +239,49 @@ PROTOCOL_STATE ProtocolManager::getProtocolState(uint32_t id)
 {
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
-        if (m_protocols[i].id == id)
-        {
-            PROTOCOL_STATE state = m_protocols[i].state;
-            return state;
-        }
+        if (m_protocols[i].id == id) // we know a protocol with that id
+            return m_protocols[i].state; // return its state
     }
-    return PROTOCOL_STATE_TERMINATED;
+    // the protocol isn't running right now
+    for (unsigned int i = 0; i < m_requests.size(); i++)
+    {
+        if (m_requests[i].protocol_info.id == id) // the protocol is going to be started
+            return PROTOCOL_STATE_RUNNING; // we can say it's running
+    }
+    return PROTOCOL_STATE_TERMINATED; // else, it's already finished 
 }
 
-void ProtocolManager::assignProtocolId(ProtocolInfo& protocolInfo)
+PROTOCOL_STATE ProtocolManager::getProtocolState(Protocol* protocol)
 {
-    uint32_t newId;
-    bool exists;
-    do
+    for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
-        newId = (rand()<<16)+rand();
-        exists = false;
-        for (unsigned int i = 0; i < m_protocols.size(); i++)
-        {
-            if (m_protocols[i].id == newId)
-                exists = true;
-        }
-    } while (exists);
-    protocolInfo.id = newId;
+        if (m_protocols[i].protocol == protocol) // the protocol is known
+            return m_protocols[i].state; // return its state
+    }
+    for (unsigned int i = 0; i < m_requests.size(); i++)
+    {
+        if (m_requests[i].protocol_info.protocol == protocol) // the protocol is going to be started
+            return PROTOCOL_STATE_RUNNING; // we can say it's running
+    }
+    return PROTOCOL_STATE_TERMINATED; // we don't know this protocol at all, it's finished
+}
+
+int ProtocolManager::getProtocolID(Protocol* protocol)
+{
+    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    {
+        if (m_protocols[i].protocol == protocol)
+            return m_protocols[i].id;
+    }
+    return 0;
+}
+
+void ProtocolManager::assignProtocolId(ProtocolInfo* protocol_info)
+{
+    pthread_mutex_lock(&m_id_mutex);
+    protocol_info->id = m_next_protocol_id;
+    m_next_protocol_id++;
+    pthread_mutex_unlock(&m_id_mutex);
 }
 
 

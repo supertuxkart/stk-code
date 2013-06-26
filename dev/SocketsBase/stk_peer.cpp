@@ -1,3 +1,21 @@
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2013 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include "stk_peer.hpp"
 
 #include <stdio.h>
@@ -14,13 +32,13 @@ STKPeer::~STKPeer()
         delete m_peer;
 }
 
-bool STKPeer::connectToHost(STKHost* host, uint32_t ip, uint16_t port, uint32_t channelCount, uint32_t data)
+bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host, uint32_t channel_count, uint32_t data)
 {
     ENetAddress  address;
-    address.host = ip;
-    address.port = port;
+    address.host = host.ip;
+    address.port = host.port;
     
-    ENetPeer* peer = enet_host_connect(host->m_host, &address, 2, 0);
+    ENetPeer* peer = enet_host_connect(localhost->m_host, &address, 2, 0);
     if (peer == NULL) 
     {
         printf("Could not try to connect to server.\n");

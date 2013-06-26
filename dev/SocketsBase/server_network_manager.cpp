@@ -1,3 +1,21 @@
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2013 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include "server_network_manager.hpp"
 
 #include "protocols/get_public_address.hpp"
@@ -39,34 +57,35 @@ void ServerNetworkManager::start()
     
     printf("_NetworkInterface>Starting the global protocol\n");
     // step 1 : retreive public address
-    int id = ProtocolManager::getInstance()->startProtocol(new GetPublicAddress(&m_publicAddress));
-    while (ProtocolManager::getInstance()->getProtocolState(id) != PROTOCOL_STATE_TERMINATED )
+    Protocol* protocol = new GetPublicAddress(&m_public_address);
+    ProtocolManager::getInstance()->requestStart(protocol);
+    while (ProtocolManager::getInstance()->getProtocolState(protocol) != PROTOCOL_STATE_TERMINATED )
     {
     }
     printf("_NetworkInterface> The public address is known.\n"); 
     
     // step 2 : show the public address for others (here, the server)
     ShowPublicAddress* spa = new ShowPublicAddress(NULL);
-    spa->setPassword(m_playerLogin.password);
-    spa->setUsername(m_playerLogin.username);
-    spa->setPublicAddress(m_publicAddress.ip, m_publicAddress.port);
-    id = ProtocolManager::getInstance()->startProtocol(spa);
-    while (ProtocolManager::getInstance()->getProtocolState(id) != PROTOCOL_STATE_TERMINATED )
+    spa->setPassword(m_player_login.password);
+    spa->setUsername(m_player_login.username);
+    spa->setPublicAddress(m_public_address.ip, m_public_address.port);
+    ProtocolManager::getInstance()->requestStart(spa);
+    while (ProtocolManager::getInstance()->getProtocolState(spa) != PROTOCOL_STATE_TERMINATED )
     {
     }
     printf("_NetworkInterface> The public address is being shown online.\n"); 
 }
 
-bool ServerNetworkManager::connectToPeer(std::string peerUsername)
+bool ServerNetworkManager::connectToPeer(std::string peer_username)
 {
     printf("_NetworkInterface>Starting the connection to host protocol\n");
     
     // step 3 : get the peer's addres.
     TransportAddress addr;
     GetPeerAddress* gpa = new GetPeerAddress(&addr);
-    gpa->setPeerName(peerUsername);
-    uint32_t id = ProtocolManager::getInstance()->startProtocol(gpa);
-    while (ProtocolManager::getInstance()->getProtocolState(id) != PROTOCOL_STATE_TERMINATED )
+    gpa->setPeerName(peer_username);
+    ProtocolManager::getInstance()->requestStart(gpa);
+    while (ProtocolManager::getInstance()->getProtocolState(gpa) != PROTOCOL_STATE_TERMINATED )
     {
     }
     printf("_NetworkInterface> The public address of the peer is known.\n"); 
@@ -74,12 +93,12 @@ bool ServerNetworkManager::connectToPeer(std::string peerUsername)
     // step 2 : connect to the peer
     ConnectToServer* cts = new ConnectToServer(NULL);
     cts->setServerAddress(addr.ip, addr.port);
-    id = ProtocolManager::getInstance()->startProtocol(cts);
-    while (ProtocolManager::getInstance()->getProtocolState(id) != PROTOCOL_STATE_TERMINATED )
+    ProtocolManager::getInstance()->requestStart(cts);
+    while (ProtocolManager::getInstance()->getProtocolState(cts) != PROTOCOL_STATE_TERMINATED )
     {
     } 
     bool success = false;
-    if (isConnectedTo(addr.ip, addr.port))
+    if (isConnectedTo(addr))
     {
         success = true;
         printf("_NetworkInterface> CONNECTION SUCCES : YOU ARE NOW CONNECTED TO A PEER.\n");
