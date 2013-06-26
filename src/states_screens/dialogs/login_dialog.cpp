@@ -42,6 +42,7 @@ LoginDialog::LoginDialog(const float w, const float h, const core::stringw& msg)
         ModalDialog(w,h)
 {
     m_self_destroy = false;
+    m_open_registration_dialog = false;
     loadFromFile("online/login_dialog.stkgui");
 
     TextBoxWidget* textBox = getWidget<TextBoxWidget>("password");
@@ -70,7 +71,7 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
 {
     if (eventSource == "cancel")
     {
-        dismiss();
+        m_self_destroy = true;
         return GUIEngine::EVENT_BLOCK;
     }
     else if(eventSource == "signin")
@@ -86,15 +87,15 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
         else
         {
             sfx_manager->quickSound( "anvil" );
-            m_self_destroy = false;
+            LabelWidget * infoLabel = getWidget<LabelWidget>("info");
+            infoLabel->setColor(irr::video::SColor(255, 255, 0, 0));
+            infoLabel->setText(info, false);
         }
-        getWidget<LabelWidget>("info")->setText(info, false);
         return GUIEngine::EVENT_BLOCK;
     }
     else if(eventSource == "signup")
     {
-        m_self_destroy = true;
-        new RegistrationDialog(0.6f, 0.9f);
+        m_open_registration_dialog = true;
         return GUIEngine::EVENT_BLOCK;
     }
     return GUIEngine::EVENT_LET;
@@ -121,10 +122,15 @@ void LoginDialog::onEnterPressedInternal()
 
 void LoginDialog::onUpdate(float dt)
 {
+    //If we want to open the registration dialog, we need to close this one first
+    m_open_registration_dialog && (m_self_destroy = true);
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
         ModalDialog::dismiss();
+        if (m_open_registration_dialog)
+            new RegistrationDialog(0.8f, 0.9f, RegistrationDialog::Info);
     }
+
 }

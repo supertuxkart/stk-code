@@ -22,32 +22,48 @@
 #include <irrString.h>
 
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets/text_box_widget.hpp"
-
 /**
  * \brief Dialog that allows a user to register
  * \ingroup states_screens
  */
 class RegistrationDialog : public GUIEngine::ModalDialog
 {
-
-private:
-    
-    bool m_self_destroy;
-    
 public:
     
-    /**
-     * Creates a modal dialog with given percentage of screen width and height
-     */
-    RegistrationDialog(const float percentWidth, const float percentHeight);
+    enum Phase
+    {
+        Info = 1,
+        Terms = 2,
+        Activation = 3
+    };
+
+    RegistrationDialog(const float percentWidth, const float percentHeight, const Phase phase);
     ~RegistrationDialog();
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     
     virtual void onUpdate(float dt);
-    //virtual void onTextUpdated();
+
+private:
+    Phase m_phase;
+    bool m_self_destroy;
+
+    //Saved user input :
+    irr::core::stringw m_username;
+    irr::core::stringw m_password;
+    irr::core::stringw m_password_confirm;
+    irr::core::stringw m_email;
+    irr::core::stringw m_email_confirm;
+    bool m_agreement;
+
+    void showRegistrationInfo();
+    void showRegistrationTerms();
+    void showRegistrationActivation();
+    bool processInfoEvent(const std::string& eventSource);
+    bool processTermsEvent(const std::string& eventSource);
+    bool processActivationEvent(const std::string& eventSource);
+
 };
 
 #endif

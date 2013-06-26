@@ -34,6 +34,7 @@ class LoginDialog : public GUIEngine::ModalDialog
 private:
     
     bool m_self_destroy;
+    bool m_open_registration_dialog;
     
 public:
     
