@@ -1,0 +1,31 @@
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+      
+    <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
+
+        <icon id="logo" align="center" proportion="5" width="100%" icon="gui/logo.png"/>
+        
+        <buttonbar id="menu_toprow" proportion="3" width="75%" align="center">
+            <icon-button id="signin" width="128" height="128"
+                         icon="gui/menu_race.png" focus_icon="gui/menu_race_focus.png"
+                         I18N="Online menu button" text="Sign in"/>
+        </buttonbar>
+        
+        <spacer width="10" height="7%"/>
+    
+        <bottombar width="100%" height="10%" layout="horizontal-row">
+
+            <spacer proportion="3" height="10" />                         
+            
+            <buttonbar id="menu_bottomrow" x="0" y="0" width="20%" height="100%" align="center">
+                <icon-button id="signin" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                             I18N="Main menu button" text="Log In" label_location="hover"/>
+                <icon-button id="signout" width="64" height="64" icon="gui/main_quit.png"  extend_label="50"
+                             I18N="Main menu button" text="Log Out" label_location="hover"/>
+            </buttonbar>
+            
+        </bottombar>
+        
+    </div>
+
+</stkgui>

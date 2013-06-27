@@ -46,7 +46,7 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 
 // ----------------------------------------------------------------------------
 
-OnlineScreen::OnlineScreen() : Screen("online/online.stkgui")
+OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 {
 }   // OnlineScreen
 
@@ -95,22 +95,26 @@ void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 
 // ----------------------------------------------------------------------------
 
-void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
-                                   const int playerID)
+void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    // most interesting stuff is in the ribbons, so start there
+    if (name == "back")
+    {
+        StateManager::get()->escapePressed();
+    }
+
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
-
     if (ribbon == NULL) return; // what's that event??
+    std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-    // ---- A ribbon icon was clicked
-    std::string selection =
-        ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-
-    if (selection == "login")
+    if (selection == "signin")
     {
         new LoginDialog(0.6f, 0.6f, _("Not yet an account? Press register beneath!"));
     }
+    else if (selection == "signout")
+    {
+        new LoginDialog(0.6f, 0.6f, _("Not yet an account? Press register beneath!"));
+    }
+
 }   // eventCallback
 
 // ----------------------------------------------------------------------------

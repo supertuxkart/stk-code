@@ -58,56 +58,60 @@ bool CurrentOnlineUser::signUp( const irr::core::stringw &username,
                                 const irr::core::stringw &password_ver,
                                 const irr::core::stringw &email,
                                 bool terms,
-                                irr::core::stringw &msg){
+                                irr::core::stringw &info)
+{
     assert(m_is_signed_in == false);
     HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
     connector->setParameter("action",std::string("register"));
-    connector->setParameter("user",username);
+    connector->setParameter("username",username);
     connector->setParameter("password",password);
 
     const XMLNode * result = connector->getXMLFromPage();
     std::string rec_success;
+
+    bool success = false;
     if(result->get("success", &rec_success))
     {
-        if(rec_success == "yes")
-        {
-            msg = "Registered!";
-            return true;
-        }
-        else
-        {
-            msg = "Registering went wrong!";
-        }
+        success = (rec_success == "yes");
+        assert(result->get("info", &info));
     }
     else
     {
-        msg = "Registering went wrong!2";
+        info = _("Server error");
     }
-    return false;
+    return success;
 }
 
 
 // ============================================================================
 
-bool CurrentOnlineUser::signIn(const irr::core::stringw &username, const irr::core::stringw &password, irr::core::stringw &info)
+bool CurrentOnlineUser::signIn( const irr::core::stringw &username,
+                                const irr::core::stringw &password,
+                                irr::core::stringw &info)
 {
     assert(m_is_signed_in == false);
     HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
     connector->setParameter("action",std::string("connect"));
-    connector->setParameter("user",username);
+    connector->setParameter("username",username);
     connector->setParameter("password",password);
-    info = "Temporary error so that testers do not have to connect to the server.";
-    return false; //FIXME
     const XMLNode * result = connector->getXMLFromPage();
     std::string rec_success = "";
-    if(result->get("success", &rec_success) && rec_success =="yes")
+    if(result->get("success", &rec_success))
     {
-        assert(result->get("token", &m_token));
-        assert(result->get("username", &m_name));
-        assert(result->get("userid", &m_id));
-        m_is_signed_in = true;
+        if (rec_success =="yes")
+        {
+            assert(result->get("token", &m_token));
+            assert(result->get("username", &m_name));
+            assert(result->get("userid", &m_id));
+            m_is_signed_in = true;
+        }
+        result->get("info", &info);
     }
-    result->get("info", &info);
+    else
+    {
+        info = _("Server error");
+    }
+
     return m_is_signed_in;
 }
 // ============================================================================
@@ -120,15 +124,17 @@ bool CurrentOnlineUser::signOut(){
 
     const XMLNode * result = connector->getXMLFromPage();
     std::string rec_success = "";
-    if(result->get("success", &rec_success) && rec_success =="yes")
+    if(result->get("success", &rec_success))
     {
-        m_token = "";
-        m_name = "";
-        m_id = 0;
-        m_is_signed_in = false;
+        if (rec_success =="yes")
+        {
+            m_token = "";
+            m_name = "";
+            m_id = 0;
+            m_is_signed_in = false;
+        }
     }
-    //result->get("info", &info);
-    return m_is_signed_in;
+    return !m_is_signed_in;
 }
 
 // ============================================================================

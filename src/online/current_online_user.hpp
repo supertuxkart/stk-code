@@ -53,7 +53,7 @@ class CurrentOnlineUser : public OnlineUser
                         const irr::core::stringw &password_ver,
                         const irr::core::stringw &email,
                         bool terms,
-                        irr::core::stringw &msg);
+                        irr::core::stringw &info);
         // Logout - Best to be followed by CurrentOnlineUser::deallocate
         bool signOut();
         /** Returns the username if signed in. */

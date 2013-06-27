@@ -28,11 +28,11 @@ HTTPConnector::HTTPConnector(const std::string &url){
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
     if(!curl)
-        printf("Error while loading cURL library.\n");
+        Log::error("online/http_functions", "Error while loading cURL library.");
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     if (url.substr(0, 5)!="http:")
     {
-        printf("Invalid URL");
+        Log::error("online/http_functions", "Invalid URL.");
     }
 }
 
@@ -74,19 +74,15 @@ std::string HTTPConnector::getPage()
        postString.append(escaped);
        curl_free(escaped);
     }
-    printf("Sending: %s\n", postString.c_str());
     curl_easy_setopt(this->curl, CURLOPT_POSTFIELDS, postString.c_str());
     std::string readBuffer;
     curl_easy_setopt(this->curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(this->curl, CURLOPT_FILE, &readBuffer);
     res = curl_easy_perform(this->curl);
     if(res != CURLE_OK)
-    {
-        //FIXME Log::error("online/http_functions", "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-        printf("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-    }else{
-        printf("Retrieved: %s\n", readBuffer.c_str());
-    }
+        Log::error("online/http_functions", "curl_easy_perform() failed: %s", curl_easy_strerror(res));
+    else
+        Log::info("online/http_functions", "Received : %s", readBuffer.c_str());
     m_parameters.clear();
     return readBuffer;
 }
