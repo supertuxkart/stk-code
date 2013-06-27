@@ -88,7 +88,9 @@ KartProperties::KartProperties(const std::string &filename)
         m_rescue_time = m_rescue_height = m_explosion_time =
         m_explosion_radius = m_max_lean = m_lean_speed =
         m_swatter_distance2 = m_swatter_duration = m_squash_slowdown =
-        m_squash_duration = m_downward_impulse_factor = UNDEFINED;
+        m_squash_duration = m_downward_impulse_factor = 
+        m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
+        m_bubblegum_time = m_bubblegum_torque = UNDEFINED;
 
     m_engine_power.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
     m_max_speed.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
@@ -308,6 +310,14 @@ void KartProperties::getAllData(const XMLNode * root)
         nitro_node->get("duration",           &m_nitro_duration          );
         nitro_node->get("fade-out-time",      &m_nitro_fade_out_time     );
         nitro_node->get("max",                &m_nitro_max               );
+    }
+
+    if(const XMLNode *bubble_node = root->getNode("bubblegum"))
+    {
+        bubble_node->get("time",           &m_bubblegum_time          );
+        bubble_node->get("speed-fraction", &m_bubblegum_speed_fraction);
+        bubble_node->get("fade-in-time",   &m_bubblegum_fade_in_time  );
+        bubble_node->get("torque",         &m_bubblegum_torque        );
     }
 
     if(const XMLNode *rescue_node = root->getNode("rescue"))
@@ -659,6 +669,11 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_nitro_duration,             "nitro duration"                );
     CHECK_NEG(m_nitro_fade_out_time,        "nitro fade-out-time"           );
     CHECK_NEG(m_nitro_max,                  "nitro max"                     );
+    CHECK_NEG(m_bubblegum_time,             "bubblegum time"                );
+    CHECK_NEG(m_bubblegum_speed_fraction,   "bubblegum speed-fraction"      );
+    CHECK_NEG(m_bubblegum_fade_in_time  ,   "bubblegum fade-in-time"        );
+    CHECK_NEG(m_bubblegum_torque,           "bubblegum  torque"             );
+
     CHECK_NEG(m_swatter_distance2,          "swatter distance"              );
     CHECK_NEG(m_swatter_duration,           "swatter duration"              );
     CHECK_NEG(m_squash_duration,            "swatter squash-duration"       );

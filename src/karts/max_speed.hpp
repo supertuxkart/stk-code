@@ -42,6 +42,7 @@ public:
     enum {MS_DECREASE_MIN,
           MS_DECREASE_TERRAIN = MS_DECREASE_MIN,
           MS_DECREASE_AI,
+          MS_DECREASE_BUBBLE,
           MS_DECREASE_SQUASH,
           MS_DECREASE_MAX};
 
@@ -115,6 +116,10 @@ private:
          *  into account. */
         float m_current_fraction;
 
+        /** How long the effect should last. A -1.0f as value indicates 
+         *  that this effect stays active till it is changed back. */
+        float m_duration;
+
         /** The constructor initialises the data with data that won't
          *  affect top speed at all. */
         SpeedDecrease()
@@ -122,6 +127,7 @@ private:
             m_max_speed_fraction = 1.0f;
             m_fade_in_time       = 0.0f;
             m_current_fraction   = 1.0f;
+            m_duration           = -1.0f;
         }   // SpeedDecrease
         void update(float dt);
         // --------------------------------------------------------------------
@@ -150,7 +156,7 @@ public:
                                float engine_force, float duration,
                                float fade_out_time/*=1.0f*/);
     void  setSlowdown(unsigned int category, float max_speed_fraction,
-                      float fade_in_time);
+                      float fade_in_time, float duration=-1.0f);
     float getSpeedIncreaseTimeLeft(unsigned int category);
     void  update(float dt);
     void  reset();

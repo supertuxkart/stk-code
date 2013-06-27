@@ -306,10 +306,8 @@ void Kart::reset()
     // undo bubblegum effect
     if (m_bubblegum_time > 0.0f)
     {
-        m_bubblegum_time = 0.0f;
+        m_bubblegum_time   = 0.0f;
         m_bubblegum_torque = 0.0f;
-        m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
-                           m_kart_properties->getChassisAngularDamping() );
     }
 
     // If the controller was replaced (e.g. replaced by end controller),
@@ -346,6 +344,10 @@ void Kart::reset()
     m_current_lean         = 0.0f;
     m_view_blocked_by_plunger = 0.0f;
     m_has_caught_nolok_bubblegum = false;
+    // In case that the kart was in the air, in which case its
+    // linear damping is 0
+    m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
+                       m_kart_properties->getChassisAngularDamping() );
 
     if(m_terrain_sound)
     {
@@ -857,12 +859,18 @@ void Kart::collectedItem(Item *item, int add_info)
             break;
         }
     case Item::ITEM_BUBBLEGUM:
-        m_has_caught_nolok_bubblegum = (item->getEmitter() != NULL && item->getEmitter()->getIdent() == "nolok");
+        m_has_caught_nolok_bubblegum = (item->getEmitter() != NULL && 
+                                    item->getEmitter()->getIdent() == "nolok");
 
         // slow down
-        m_bubblegum_time = 1.0f;
-        m_bubblegum_torque = (rand()%2) ? 500.0f : -500.0f;
-        m_body->setDamping(0.8f, 0.8f);
+        m_bubblegum_time = m_kart_properties->getBubblegumTime();
+        m_bubblegum_torque = (rand()%2) 
+                           ?  m_kart_properties->getBubblegumTorque()
+                           : -m_kart_properties->getBubblegumTorque();
+        m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_BUBBLE, 
+                                 m_kart_properties->getBubblegumSpeedFraction(),
+                                 m_kart_properties->getBubblegumFadeInTime(),
+                                 m_bubblegum_time);
         m_goo_sound->position(getXYZ());
         m_goo_sound->play();
         // Play appropriate custom character sound
@@ -982,19 +990,14 @@ void Kart::update(float dt)
         if(m_squash_time<=0)
         {
             m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-            m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH,
-                                    /*slowdown*/1.0f, /*fade in*/0.0f);
         }
-    }
+    }   // if squashed
 
     if (m_bubblegum_time > 0.0f)
     {
         m_bubblegum_time -= dt;
         if (m_bubblegum_time <= 0.0f)
         {
-            // undo bubblegum effect
-            m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
-                               m_kart_properties->getChassisAngularDamping() );
             m_bubblegum_torque = 0.0f;
         }
     }
@@ -1208,7 +1211,8 @@ void Kart::update(float dt)
     {
         m_isTimeFlying = false;
         printf("  [sam] Temps en l'air: %f \n", m_timeFlying);
-        m_hitGround = new Explosion(this->getXYZ(), "jump", "jump_explosion.xml");
+        m_hitGround = new Explosion(getXYZ(), "jump", 
+                                   "jump_explosion.xml");
         projectile_manager->addHitEffect(m_hitGround);
         m_timeFlying = 0;
     }
@@ -1250,7 +1254,8 @@ void Kart::setSquash(float time, float slowdown)
         return;
     }
     m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
-    m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown, 0.1f);
+    m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown, 
+                             0.1f, time);
     m_squash_time  = time;
 }   // setSquash
 
