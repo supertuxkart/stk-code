@@ -59,6 +59,13 @@ public:
 
 	//! render
 	virtual void render();
+    
+    //! Draw billboard particle
+    void drawBillboardParticle(
+        const irr::s32 &idx,
+        const scene::SParticle &particle, 
+        const core::vector3df &view, 
+        const irr::core::matrix4 &m);
 
 	//! returns the axis aligned bounding box of this node
 	virtual const core::aabbox3d<f32>& getBoundingBox() const;
