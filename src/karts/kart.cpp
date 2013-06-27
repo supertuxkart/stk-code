@@ -49,6 +49,7 @@
 #include "io/file_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"
+#include "items/projectile_manager.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/kart_model.hpp"
@@ -66,6 +67,8 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
+
+#include "graphics/explosion.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
    // Disable warning for using 'this' in base member initializer list
@@ -116,6 +119,9 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_flying               = false;
     m_sky_particles_emitter= NULL;
     m_stars_effect         = NULL;
+    m_timeFlying           = 0;
+    m_isTimeFlying          = false;
+    m_hitGround            = NULL;
 
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
@@ -1192,6 +1198,21 @@ void Kart::update(float dt)
     // is rescued isOnGround might still be true, since the kart rigid
     // body was removed from the physics, but still retain the old
     // values for the raycasts).
+    if (!isOnGround())
+    {
+        m_timeFlying+=dt;
+        m_isTimeFlying = true;
+    }
+    
+    if(isOnGround() && m_isTimeFlying)
+    {
+        m_isTimeFlying = false;
+        printf("  [sam] Temps en l'air: %f \n", m_timeFlying);
+        m_hitGround = new Explosion(this->getXYZ(), "jump", "jump_explosion.xml");
+        projectile_manager->addHitEffect(m_hitGround);
+        m_timeFlying = 0;
+    }
+    
     if( (!isOnGround() || emergency) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
@@ -1200,7 +1221,7 @@ void Kart::update(float dt)
     if(!m_shadow_enabled && isOnGround() && !emergency)
     {
         m_shadow->enableShadow();
-        m_shadow_enabled = true;
+        m_shadow_enabled = true;  
     }
 }   // update
 

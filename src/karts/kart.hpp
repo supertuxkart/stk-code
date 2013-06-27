@@ -51,6 +51,7 @@ class Skidding;
 class SkidMarks;
 class SlipStream;
 class Stars;
+class HitEffect;
 
 /** The main kart class. All type of karts are of this object, but with
  *  different controllers. The controllers are what turn a kart into a
@@ -148,6 +149,15 @@ private:
 
     // Graphical effects
     // -----------------
+    /** The time where a kart is flying */
+    float            m_timeFlying;
+    
+    /** For the effect when the kart touch the ground */
+    HitEffect       *m_hitGround;
+    
+    /** Is time flying activated */
+    bool             m_isTimeFlying;
+    
     /** The shadow of a kart. */
     Shadow          *m_shadow;
 
