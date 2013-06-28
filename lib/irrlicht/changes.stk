@@ -4,3 +4,4 @@ The following changes have been made:
 - stencil RTT support
 - drawall types
 - materialtype override
+- skies respect Z
