@@ -634,7 +634,7 @@ void LinearWorld::moveKartAfterRescue(AbstractKart* kart)
                     m_track->getAngle(sector)));
 
     kart->getBody()->setCenterOfMassTransform(pos);
-
+    kart->setXYZ(pos.getOrigin());
     //project kart to surface of track
     bool kart_over_ground = m_track->findGround(kart);
 
