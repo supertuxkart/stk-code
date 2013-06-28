@@ -7,6 +7,10 @@
   <material name="silver.png"  light="Y" smooth-reflection="Y"/>
   <material name="bronze.png"  light="Y" smooth-reflection="Y"/>
 
+  <material name="stk_mod_nitroBarrel.png" /> 
+  <material name="stk_mod_nitroBottle.png" />
+  <material name="stk_mod_nitroLogo.png" compositing="additive" light="N" disable-z-write="Y" />
+
   <material name="nitro-tank.png" transparency="Y"/>
   <material name="tank-blue.png"  sphere="Y"/>
   <material name="tank-green.png"  sphere="Y"/>
