@@ -3,3 +3,4 @@ The following changes have been made:
 - primary sort by material type
 - stencil RTT support
 - drawall types
+- materialtype override
