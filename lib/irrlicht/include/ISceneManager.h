@@ -1152,8 +1152,9 @@ namespace scene
 		/** This can only be invoked between
 		IVideoDriver::beginScene() and IVideoDriver::endScene(). Please note that
 		the scene is not only drawn when calling this, but also animated
-		by existing scene node animators, culling of scene nodes is done, etc. */
-		virtual void drawAll() = 0;
+		by existing scene node animators, culling of scene nodes is done, etc.
+		\param flags Allows you to disable/enable specific render passes by passing bitwise OR combinations of E_SCENE_NODE_RENDER_PASS values*/
+		virtual void drawAll(u32 flags = 0xFFFFFFFF) = 0;
 
 		//! Creates a rotation animator, which rotates the attached scene node around itself.
 		/** \param rotationSpeed Specifies the speed of the animation in degree per 10 milliseconds.

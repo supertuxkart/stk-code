@@ -111,7 +111,7 @@ namespace scene
 		virtual u32 registerNodeForRendering(ISceneNode* node, E_SCENE_NODE_RENDER_PASS pass = ESNRP_AUTOMATIC);
 
 		//! draws all scene nodes
-		virtual void drawAll();
+		virtual void drawAll(u32 flags = 0xFFFFFFFF);
 
 		//! Adds a scene node for rendering using a octree to the scene graph. This a good method for rendering
 		//! scenes with lots of geometry. The Octree is built on the fly from the mesh, much

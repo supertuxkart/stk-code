@@ -1343,7 +1343,7 @@ u32 CSceneManager::registerNodeForRendering(ISceneNode* node, E_SCENE_NODE_RENDE
 
 //! This method is called just before the rendering process of the whole scene.
 //! draws all scene nodes
-void CSceneManager::drawAll()
+void CSceneManager::drawAll(u32 flags)
 {
 	if (!Driver)
 		return;
@@ -1382,6 +1382,40 @@ void CSceneManager::drawAll()
 
 	// let all nodes register themselves
 	OnRegisterSceneNode();
+
+ 	//Disable unwanted render passes
+ 	if ( flags != 0xFFFFFFFF )
+ 	{
+ 		//Disable all but the specified passes
+ 		if ((flags & ESNRP_CAMERA) != ESNRP_CAMERA )
+ 		{
+ 			CameraList.clear();
+ 		}
+ 		if ((flags & ESNRP_LIGHT) != ESNRP_LIGHT )
+ 		{
+ 			LightList.clear();
+ 		}
+ 		if ((flags & ESNRP_SKY_BOX) != ESNRP_SKY_BOX )
+ 		{
+ 			SkyBoxList.clear();
+ 		}
+ 		if ((flags & ESNRP_SOLID) != ESNRP_SOLID )
+ 		{
+ 			SolidNodeList.clear();
+ 		}
+ 		if ((flags & ESNRP_TRANSPARENT) != ESNRP_TRANSPARENT )
+ 		{
+ 			TransparentNodeList.clear();
+ 		}
+ 		if ((flags & ESNRP_TRANSPARENT_EFFECT) != ESNRP_TRANSPARENT_EFFECT )
+ 		{
+ 			TransparentEffectNodeList.clear();
+ 		}
+ 		if ((flags & ESNRP_SHADOW) != ESNRP_SHADOW )
+ 		{
+ 			ShadowNodeList.clear();
+ 		}
+ 	}
 
 	if (LightManager)
 		LightManager->OnPreRender(LightList);
