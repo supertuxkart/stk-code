@@ -303,13 +303,6 @@ void Kart::reset()
     // Reset animations and wheels
     m_kart_model->reset();
 
-    // undo bubblegum effect
-    if (m_bubblegum_time > 0.0f)
-    {
-        m_bubblegum_time   = 0.0f;
-        m_bubblegum_torque = 0.0f;
-    }
-
     // If the controller was replaced (e.g. replaced by end controller),
     // restore the original controller.
     if(m_saved_controller)
@@ -343,6 +336,8 @@ void Kart::reset()
     m_speed                = 0.0f;
     m_current_lean         = 0.0f;
     m_view_blocked_by_plunger = 0.0f;
+    m_bubblegum_time       = 0.0f;
+    m_bubblegum_torque     = 0.0f;
     m_has_caught_nolok_bubblegum = false;
     // In case that the kart was in the air, in which case its
     // linear damping is 0
