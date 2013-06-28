@@ -1210,7 +1210,6 @@ void Kart::update(float dt)
     if(isOnGround() && m_isTimeFlying)
     {
         m_isTimeFlying = false;
-        printf("  [sam] Temps en l'air: %f \n", m_timeFlying);
         m_hitGround = new Explosion(getXYZ(), "jump", 
                                    "jump_explosion.xml");
         projectile_manager->addHitEffect(m_hitGround);
