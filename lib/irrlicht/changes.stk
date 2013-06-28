@@ -5,3 +5,4 @@ The following changes have been made:
 - drawall types
 - materialtype override
 - skies respect Z
+- partial backport to expose setCurrentRendertime in the scene mgr
