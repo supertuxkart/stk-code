@@ -190,6 +190,8 @@ public:
 
 	bool attach(ITexture*);
 
+	bool hasStencil();
+
 protected:
 	GLuint DepthRenderBuffer;
 	GLuint StencilRenderBuffer;

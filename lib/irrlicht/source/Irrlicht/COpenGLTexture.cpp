@@ -893,6 +893,11 @@ void COpenGLFBODepthTexture::unbindRTT()
 {
 }
 
+bool COpenGLFBODepthTexture::hasStencil()
+{
+	return UseStencil;
+}
+
 
 bool checkFBOStatus(COpenGLDriver* Driver)
 {
