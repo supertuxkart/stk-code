@@ -278,7 +278,7 @@ CURLcode NetworkHttp::init(bool forceRefresh)
     bool download = UserConfigParams::m_news_last_updated==0  ||
                     UserConfigParams::m_news_last_updated
                         +UserConfigParams::m_news_frequency
-                    < Time::getTimeSinceEpoch();
+                    < Time::getTimeSinceEpoch() || forceRefresh;
 
     if(!download)
     {
@@ -401,10 +401,6 @@ CURLcode NetworkHttp::reInit()
         m_all_requests.getData().pop();
     m_all_requests.unlock();
 
-    std::string news_file = file_manager->getAddonsFile("news.xml");
-    file_manager->removeFile(news_file);
-    std::string addons_file = file_manager->getAddonsFile("addons.xml");
-    file_manager->removeFile(addons_file);
     if(UserConfigParams::logAddons())
         printf("[addons] Xml files deleted, re-initialising addon manager.\n");
 
