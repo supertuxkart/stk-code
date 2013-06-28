@@ -277,7 +277,6 @@ void RegistrationDialog::onUpdate(float dt)
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
-        GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
         ModalDialog::dismiss();
     }
     if (m_show_registration_info)

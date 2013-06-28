@@ -46,6 +46,7 @@ void CurrentOnlineUser::deallocate()
 
 CurrentOnlineUser::CurrentOnlineUser(){
     m_is_signed_in = false;
+    m_is_guest = true;
     m_id = 0;
     m_name = "";
     m_token = "";
@@ -104,6 +105,7 @@ bool CurrentOnlineUser::signIn( const irr::core::stringw &username,
             assert(result->get("username", &m_name));
             assert(result->get("userid", &m_id));
             m_is_signed_in = true;
+            m_is_guest = false;
         }
         result->get("info", &info);
     }

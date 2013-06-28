@@ -35,6 +35,8 @@ private:
 
 public:
 
+    void reload();
+
     virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
@@ -43,6 +45,9 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                                const int playerID) OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void beforeAddingWidget() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
