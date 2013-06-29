@@ -449,24 +449,6 @@ void RibbonWidget::removeChildNamed(const char* name)
         }
     }
 }
-/*
-// ----------------------------------------------------------------------------
-
-void RibbonWidget::hideChildNamed(const char* name)
-{
-    // This method should only be called BEFORE a widget is added
-    assert(m_element == NULL);
-
-    Widget* child;
-    for_in (child, m_children)
-    {
-        if (child->m_properties[PROP_ID] == name)
-        {
-            m_children.erase(child);
-            return;
-        }
-    }
-}*/
 
 // ----------------------------------------------------------------------------
 
@@ -764,4 +746,13 @@ int RibbonWidget::findItemNamed(const char* internalName)
         if (m_children[n].m_properties[PROP_ID] == internalName) return n;
     }
     return -1;
+}   // findItemNamed
+
+// ----------------------------------------------------------------------------
+Widget* RibbonWidget::findWidgetNamed(const char* internalName)
+{
+    int id = findItemNamed(internalName);
+    if (id >= 0)
+        return m_children.get(id);
+    return NULL;
 }   // findItemNamed
