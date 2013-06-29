@@ -1034,7 +1034,7 @@ msgstr "Réglages visuels"
 #. I18N: ./data/tracks/greenvalley/track.xml
 #: data/po/gui_strings.h:8
 msgid "Green Valley"
-msgstr "Vallée luxuriente"
+msgstr "Vallée luxuriante"
 
 #: src/config/user_config.cpp:546
 msgid "Guest"
