@@ -38,7 +38,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "modes/world.hpp"
-#include "network/flyable_info.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -416,11 +415,13 @@ bool Flyable::updateAndDelete(float dt)
  */
 void Flyable::updateFromServer(const FlyableInfo &f, float dt)
 {
+/*
     setXYZ(f.m_xyz);
     setRotation(f.m_rotation);
-
+*/
     // Update the graphical position
     Moveable::update(dt);
+    
 }   // updateFromServer
 
 // ----------------------------------------------------------------------------

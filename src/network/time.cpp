@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,25 +16,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_RACE_START_MESSAGE_HPP
-#define HEADER_RACE_START_MESSAGE_HPP
+#include "time.hpp"
 
-#include "network/message.hpp"
-#include "network/remote_kart_info.hpp"
-#include "race/race_manager.hpp"
-
-class RaceStartMessage : public Message
+namespace Time
 {
-private:
-// For now this is an empty message
-public:
-    RaceStartMessage() : Message(Message::MT_RACE_START)
-    {
-        allocate(0);
-    }   // RaceStartMessage
-
-    RaceStartMessage(ENetPacket* pkt):Message(pkt, MT_RACE_START)
-    {
-    }
-};   // RaceStartMessage
-#endif
+double getSeconds()
+{
+    time_t timer;
+    time(&timer);
+    struct tm y2k;
+    y2k.tm_hour = 0;   y2k.tm_min = 0; y2k.tm_sec = 0;
+    y2k.tm_year = 100; y2k.tm_mon = 0; y2k.tm_mday = 1;
+    return difftime(timer,mktime(&y2k)); // get the seconds elapsed since january 2000
+}
+}

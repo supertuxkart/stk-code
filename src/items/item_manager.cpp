@@ -291,7 +291,7 @@ void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
 void  ItemManager::checkItemHit(AbstractKart* kart)
 {
     // Only do this on the server
-    if(network_manager->getMode()==NetworkManager::NW_CLIENT) return;
+    if(NetworkManager::getInstance()->isServer()) return;
 
     // We could use m_items_in_quads to to check for item hits: take the quad
     // of the graph node of the kart, and only check items in that quad. But

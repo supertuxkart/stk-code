@@ -16,6 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+//NETWORK_UPDATE_PLZ
 #include "items/powerup.hpp"
 
 #include "audio/sfx_base.hpp"
@@ -30,8 +31,6 @@
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
-#include "network/network_manager.hpp"
-#include "network/race_state.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"

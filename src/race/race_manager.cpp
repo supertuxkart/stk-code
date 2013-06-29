@@ -143,9 +143,9 @@ void RaceManager::setLocalKartInfo(unsigned int player_id,
     assert(0<=player_id && player_id <m_local_player_karts.size());
     assert(kart_properties_manager->getKart(kart) != NULL);
 
-    m_local_player_karts[player_id] = RemoteKartInfo(player_id, kart,
+/*    m_local_player_karts[player_id] = RemoteKartInfo(player_id, kart,
                                                   StateManager::get()->getActivePlayerProfile(player_id)->getName(),
-                                                  network_manager->getMyHostId());
+                                                  network_manager->getMyHostId());*/
 }   // setLocalKartInfo
 
 //-----------------------------------------------------------------------------
@@ -293,7 +293,7 @@ void RaceManager::startNew(bool from_overworld)
     // Create the kart status data structure to keep track of scores, times, ...
     // ==========================================================================
     m_kart_status.clear();
-
+    printf("%d %d %d\n", (unsigned int)m_num_karts, m_ai_kart_list.size(), m_player_karts.size());
 
     assert((unsigned int)m_num_karts == m_ai_kart_list.size()+m_player_karts.size());
     // First add the AI karts (randomly chosen)
@@ -321,8 +321,8 @@ void RaceManager::startNew(bool from_overworld)
     // -------------------------------------------------
     for(int i=m_player_karts.size()-1; i>=0; i--)
     {
-        KartType kt=(m_player_karts[i].getHostId()==network_manager->getMyHostId())
-                   ? KT_PLAYER : KT_NETWORK_PLAYER;
+        KartType kt= KT_PLAYER; //(m_player_karts[i].getHostId()==network_manager->getMyHostId())
+                   //? KT_PLAYER : KT_NETWORK_PLAYER;
         m_kart_status.push_back(KartStatus(m_player_karts[i].getKartName(), i,
                                            m_player_karts[i].getLocalPlayerId(),
                                            m_player_karts[i].getGlobalPlayerId(),
@@ -510,20 +510,20 @@ void RaceManager::next()
             user_config->saveConfig();
         }
 
-        if(network_manager->getMode()==NetworkManager::NW_SERVER)
-            network_manager->beginReadySetGoBarrier();
-        else
-            network_manager->setState(NetworkManager::NS_WAIT_FOR_RACE_DATA);
+//        if(network_manager->getMode()==NetworkManager::NW_SERVER)
+//            network_manager->beginReadySetGoBarrier();
+//        else
+//            network_manager->setState(NetworkManager::NS_WAIT_FOR_RACE_DATA);
         startNextRace();
     }
     else
     {
         // Back to main menu. Change the state of the state of the
         // network manager.
-        if(network_manager->getMode()==NetworkManager::NW_SERVER)
-            network_manager->setState(NetworkManager::NS_MAIN_MENU);
-        else
-            network_manager->setState(NetworkManager::NS_WAIT_FOR_AVAILABLE_CHARACTERS);
+//        if(network_manager->getMode()==NetworkManager::NW_SERVER)
+//            network_manager->setState(NetworkManager::NS_MAIN_MENU);
+//        else
+//            network_manager->setState(NetworkManager::NS_WAIT_FOR_AVAILABLE_CHARACTERS);
         exitRace();
     }
 }   // next
@@ -753,7 +753,7 @@ void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld)
     StateManager::get()->enterGameState();
     setGrandPrix(*gp);
     setCoinTarget( 0 ); // Might still be set from a previous challenge
-    network_manager->setupPlayerKartInfo();
+//    network_manager->setupPlayerKartInfo();
 
     setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
     startNew(from_overworld);
@@ -778,7 +778,7 @@ void RaceManager::startSingleRace(const std::string &track_ident,
     setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     setCoinTarget( 0 ); // Might still be set from a previous challenge
-    network_manager->setupPlayerKartInfo();
+//    network_manager->setupPlayerKartInfo();
 
     startNew(from_overworld);
 }

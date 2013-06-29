@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,30 +16,32 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_RACE_RESULT_MESSAGE_HPP
-#define HEADER_RACE_RESULT_MESSAGE_HPP
+#ifndef LOBBY_ROOM_PROTOCOL_HPP
+#define LOBBY_ROOM_PROTOCOL_HPP
 
-#include <vector>
+#include "network/protocol.hpp"
 
-#include "network/message.hpp"
-
-
-/** This message is from the server to all clients to inform them about the
- *  result of a race. The clients wait for this message before they finish
- *  a race.
+/*!
+ * \class LobbyRoomProtocol
+ * \brief Class used while the game is being prepared.
+ * This protocol starts when a server opens a game, or when a client joins a game.
+ * It is used to exchange data about the race settings, like kart selection.
  */
-class RaceResultMessage : public Message
+class LobbyRoomProtocol : public Protocol
 {
-    struct RaceResult {
-        float m_time;
-        int   m_score;
-    };   // RaceResult
-private:
-    std::vector<RaceResult> m_all_results;
-public:
-         RaceResultMessage();
-         RaceResultMessage(ENetPacket* pkt);
-    void addRaceResult(int kart_id, float time, int points);
-    void getRaceResult(int kart_id, float &time, int &points);
-};   // RaceResultMessage
-#endif
+    public:
+        LobbyRoomProtocol(CallbackObject* callback_object);
+        virtual ~LobbyRoomProtocol();
+        
+        virtual void notifyEvent(Event* event);
+        
+        virtual void setup();
+        
+        virtual void update();
+        
+        void sendMessage(std::string message);
+        
+    protected:
+};
+
+#endif // LOBBY_ROOM_PROTOCOL_HPP

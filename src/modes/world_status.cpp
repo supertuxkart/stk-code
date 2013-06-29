@@ -112,8 +112,8 @@ void WorldStatus::enterRaceOverState()
  */
 void WorldStatus::terminateRace()
 {
-    if(network_manager->getMode()==NetworkManager::NW_SERVER)
-        network_manager->sendRaceResults();
+//    if(network_manager->getMode()==NetworkManager::NW_SERVER)
+//        network_manager->sendRaceResults();
 }   // terminateRace
 
 //-----------------------------------------------------------------------------

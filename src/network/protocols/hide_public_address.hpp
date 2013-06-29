@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,16 +16,34 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_WORLD_LOADED_HPP
-#define HEADER_WORLD_LOADED_HPP
+#ifndef HIDE_PUBLIC_ADDRESS_HPP
+#define HIDE_PUBLIC_ADDRESS_HPP
 
-#include "network/message.hpp"
+#include "network/protocol.hpp"
+#include <string>
 
-class WorldLoadedMessage : public Message
+class HidePublicAddress : public Protocol
 {
-// For now this is an empty message
-public:
-    WorldLoadedMessage()               :Message(MT_WORLD_LOADED) {allocate(0);}
-    WorldLoadedMessage(ENetPacket* pkt):Message(pkt, MT_WORLD_LOADED)     {}
-};   // WorldLoadedMessage
-#endif
+    public:
+        HidePublicAddress(CallbackObject* callback_object);
+        virtual ~HidePublicAddress();
+        
+        virtual void notifyEvent(Event* event);
+        virtual void setup();
+        virtual void update();
+        
+        virtual void setUsername(std::string username);
+        virtual void setPassword(std::string password);
+    protected:
+        std::string m_username;
+        std::string m_password;
+        
+        enum STATE
+        {
+            NONE,
+            DONE
+        };
+        STATE m_state;
+};
+
+#endif // HIDE_PUBLIC_ADDRESS_HPP

@@ -56,7 +56,6 @@
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
-#include "network/race_state.hpp"
 #include "network/network_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
@@ -77,6 +76,8 @@
 #else
 #  include <math.h>
 #endif
+
+//NETWORK_UPDATE_PLZ
 
 /** The kart constructor.
  *  \param ident  The identifier for the kart model to use.
@@ -867,11 +868,11 @@ void Kart::collectedItem(Item *item, int add_info)
     // Attachments and powerups are stored in the corresponding
     // functions (hit{Red,Green}Item), so only coins need to be
     // stored here.
-    if(network_manager->getMode()==NetworkManager::NW_SERVER &&
+    /*if(NetworkManager::getInstance()->isServer() &&
         (type==Item::ITEM_NITRO_BIG || type==Item::ITEM_NITRO_SMALL) )
     {
         race_state->itemCollected(getWorldKartId(), item->getItemId());
-    }
+    }*/
 
     if ( m_collected_energy > m_kart_properties->getNitroMax())
         m_collected_energy = m_kart_properties->getNitroMax();
@@ -1012,9 +1013,9 @@ void Kart::update(float dt)
     // Store the actual kart controls at the start of update in the server
     // state. This makes it easier to reset some fields when they are not used
     // anymore (e.g. controls.fire).
-    if(network_manager->getMode()==NetworkManager::NW_SERVER)
+    if(NetworkManager::getInstance()->isServer())
     {
-        race_state->storeKartControls(*this);
+        //race_state->storeKartControls(*this);
     }
 
     if (!m_flying)
@@ -1815,10 +1816,8 @@ void Kart::updatePhysics(float dt)
 
     updateSliding();
 
-    // Only compute the current speed if this is not the client. On a client the
-    // speed is actually received from the server.
-    if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
-        m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
+    // Compute the speed of the kart.
+    m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
 
     // calculate direction of m_speed
     const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();

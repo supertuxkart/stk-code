@@ -33,7 +33,6 @@
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp" 
-#include "network/race_state.hpp"
 #include "network/network_manager.hpp"
 #include "utils/constants.hpp"
 
@@ -260,11 +259,13 @@ void Attachment::hitBanana(Item *item, int new_attachment)
 
     // Save the information about the attachment in the race state
     // so that the clients can be updated.
-    if(network_manager->getMode()==NetworkManager::NW_SERVER)
+    if(NetworkManager::getInstance()->isPlayingOnline()) // if we're online
     {
+        /*
         race_state->itemCollected(m_kart->getWorldKartId(),
                                   item->getItemId(),
-                                  new_attachment);
+                                  new_attachment);*/
+//NETWORK_UPDATE_PLZ
     }
 
     if (add_a_new_item)

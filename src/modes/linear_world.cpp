@@ -322,10 +322,10 @@ void LinearWorld::newLap(unsigned int kart_index)
         // A client does not detect race finished by itself, it will
         // receive a message from the server. So a client does not do
         // anything here.
-        if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
+        /*if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
         {
             kart->finishedRace(getTime());
-        }
+        }*/
     }
     float time_per_lap;
     if (kart_info.m_race_lap == 1) // just completed first lap

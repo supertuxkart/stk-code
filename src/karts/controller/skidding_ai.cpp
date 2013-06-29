@@ -298,7 +298,7 @@ void SkiddingAI::update(float dt)
 #endif
 
     // The client does not do any AI computations.
-    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+    if(NetworkManager::getInstance()->isClient())
     {
         AIBaseController::update(dt);
         return;

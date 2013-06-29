@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,18 +16,32 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_RACE_INFO_MESSAGE_HPP
-#define HEADER_RACE_INFO_MESSAGE_HPP
+#ifndef GET_PUBLIC_ADDRESS_HPP
+#define GET_PUBLIC_ADDRESS_HPP
 
-#include <vector>
+#include "network/protocol.hpp"
 
-#include "network/message.hpp"
-#include "network/remote_kart_info.hpp"
-
-class RaceInfoMessage : public Message
+class GetPublicAddress : public Protocol
 {
-public:
-    RaceInfoMessage(const std::vector<RemoteKartInfo>& kart_info);
-    RaceInfoMessage(ENetPacket* pkt);
-};   // RaceInfoMessage
-#endif
+    public:
+        GetPublicAddress(CallbackObject* callback_object);
+        virtual ~GetPublicAddress();
+        
+        virtual void notifyEvent(Event* event);
+         
+        virtual void setup();
+        virtual void update();
+        
+    protected:
+        enum STATE
+        {
+            NOTHING_DONE,
+            TEST_SENT,
+            ADDRESS_KNOWN
+        };
+        STATE m_state;
+        uint32_t m_stun_tansaction_id[3];
+        static const uint32_t m_stun_magic_cookie = 0x2112A442;
+};
+
+#endif // GET_PUBLIC_ADDRESS_HPP

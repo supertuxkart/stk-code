@@ -19,9 +19,9 @@
 #ifndef HEADER_KART_CONTROL_HPP
 #define HEADER_KART_CONTROL_HPP
 
-#include "network/message.hpp"
+//NETWORK_UPDATE_PLZ
 
-/**
+/** 
   * \ingroup controller
   */
 class KartControl
@@ -52,15 +52,6 @@ public:
         reset();
     }
     // ------------------------------------------------------------------------
-    /** Construct kart control from a Message (i.e. unserialise)             */
-    KartControl(Message *m)
-    {
-        m_steer     = m->getFloat();
-        m_accel     = m->getFloat();
-        char c      = m->getChar();
-        setButtonsCompressed(c);
-    }   // KartControl(Message*)
-    // ------------------------------------------------------------------------
     /** Resets all controls. */
     void reset() 
     {
@@ -73,17 +64,6 @@ public:
         m_fire      = false;
         m_look_back = false;
     }   // reset
-    // ------------------------------------------------------------------------
-    /** Return the serialised size in bytes.                                 */
-    static int getLength() { return 9; }
-    // ------------------------------------------------------------------------
-    /** Serialises the kart control into a message.                          */
-    void serialise(Message *m) const
-    {
-        m->addFloat(m_steer);
-        m->addFloat(m_accel);
-        m->addChar(getButtonsCompressed());
-    }   // compress
     // ------------------------------------------------------------------------
     void uncompress(char *c)
     {
