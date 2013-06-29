@@ -26,8 +26,6 @@
 #include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
-#include "guiengine/widgets/icon_button_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
@@ -36,6 +34,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/login_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/registration_dialog.hpp"
 #include "modes/demo_world.hpp"
 #include "utils/translation.hpp"
 
@@ -50,46 +49,86 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 
 OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 {
+    m_recorded_state = Not;
 }   // OnlineScreen
 
 // ----------------------------------------------------------------------------
 
 void OnlineScreen::loadedFromFile()
 {
-    Log::info("OnlineScreen", "Loaded from file");
+    //Box ? FIXME
+    m_top_menu_widget = getWidget<RibbonWidget>("menu_toprow");
+    assert(m_top_menu_widget != NULL);
+    m_quick_play_widget = (IconButtonWidget *) m_top_menu_widget->findWidgetNamed("quick_play");
+    assert(m_quick_play_widget != NULL);
+    m_find_server_widget = (IconButtonWidget *) m_top_menu_widget->findWidgetNamed("find_server");
+    assert(m_find_server_widget != NULL);
+    m_create_server_widget = (IconButtonWidget *) m_top_menu_widget->findWidgetNamed("create_server");
+    assert(m_create_server_widget != NULL);
+
+    m_online_status_widget = getWidget<LabelWidget>("online_status");
+    assert(m_online_status_widget != NULL);
+
+    m_bottom_menu_widget = getWidget<RibbonWidget>("menu_bottomrow");
+    assert(m_bottom_menu_widget != NULL);
+    m_sign_in_widget = (IconButtonWidget *) m_bottom_menu_widget->findWidgetNamed("sign_in");
+    assert(m_sign_in_widget != NULL);
+    m_register_widget = (IconButtonWidget *) m_bottom_menu_widget->findWidgetNamed("register");
+    assert(m_register_widget != NULL);
+    m_sign_out_widget = (IconButtonWidget *) m_bottom_menu_widget->findWidgetNamed("sign_out");
+    assert(m_sign_out_widget != NULL);
+
 }   // loadedFromFile
+
+// ----------------------------------------------------------------------------
+bool OnlineScreen::hasStateChanged()
+{
+    State previous_state = m_recorded_state;
+    if(CurrentOnlineUser::get()->isSignedIn())
+    {
+        if(CurrentOnlineUser::get()->isGuest())
+            m_recorded_state = Guest;
+        else
+            m_recorded_state = Registered;
+    }
+    else
+        m_recorded_state = Not;
+    if (previous_state != m_recorded_state)
+        return true;
+    return false;
+}
 
 // ----------------------------------------------------------------------------
 void OnlineScreen::beforeAddingWidget()
 {
-    Log::info("OnlineScreen", "Before adding widget");
-    RibbonWidget* topRow = getWidget<RibbonWidget>("menu_toprow");
-    assert(topRow != NULL);
-    RibbonWidget* bottomRow = getWidget<RibbonWidget>("menu_bottomrow");
-    assert(bottomRow != NULL);
-    if(CurrentOnlineUser::get()->isSignedIn())
+    //Set all children of the bottom menu visible (again)
+    for(int i = 0; i < m_bottom_menu_widget->getRibbonChildren().size(); i++)
+        m_bottom_menu_widget->getRibbonChildren()[i].setVisible(true);
+
+    //Remove all badges of the top menu
+    for(int i = 0; i < m_top_menu_widget->getRibbonChildren().size(); i++)
+        m_top_menu_widget->getRibbonChildren()[i].resetAllBadges();
+
+    hasStateChanged();
+    if (m_recorded_state == Registered)
     {
-
-        if(CurrentOnlineUser::get()->isGuest())
-        {
-
-        }
-        else
-        {
-            //Signed in and not guest
-            bottomRow->removeChildNamed("sign_in");
-        }
-        bottomRow->removeChildNamed("sign_up");
+        m_register_widget->setVisible(false);
+        m_sign_in_widget->setVisible(false);
     }
-    else
+    else if (m_recorded_state == Not)
     {
-
-        //bottomRow->removeChildNamed("sign_out");
-        IconButtonWidget* iconbutton = getWidget<IconButtonWidget>("sign_out");
-        iconbutton->setVisible(false);
-        IconButtonWidget* quick_play = getWidget<IconButtonWidget>("quick_play");
-        quick_play->setVisible(false);
+        m_quick_play_widget->setBadge(LOCKED_BADGE);
+        m_find_server_widget->setBadge(LOCKED_BADGE);
+        m_create_server_widget->setBadge(LOCKED_BADGE);
+        m_sign_out_widget->setVisible(false);
     }
+    else if (m_recorded_state == Guest)
+    {
+        m_find_server_widget->setBadge(LOCKED_BADGE);
+        m_create_server_widget->setBadge(LOCKED_BADGE);
+        m_sign_in_widget->setVisible(false);
+    }
+
 } // beforeAddingWidget
 
 
@@ -98,18 +137,16 @@ void OnlineScreen::beforeAddingWidget()
 void OnlineScreen::init()
 {
     Screen::init();
-    m_online_status_widget = getWidget<LabelWidget>("online_status");
-    assert(m_online_status_widget != NULL);
-    RibbonWidget* r = getWidget<RibbonWidget>("menu_bottomrow");
-    r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_top_menu_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     DemoWorld::resetIdleTime();
-    m_online_status_widget->setText(irr::core::stringw("Signed in as : ") + CurrentOnlineUser::get()->getUserName(), true);
+    m_online_status_widget->setText(irr::core::stringw(_("Signed in as : ")) + CurrentOnlineUser::get()->getUserName() + ".", false);
 }   // init
 
 // ----------------------------------------------------------------------------
 void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
-
+    if (hasStateChanged())
+        GUIEngine::reshowCurrentScreen();
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -134,25 +171,35 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
         if (CurrentOnlineUser::get()->signOut())
         {
             new MessageDialog( _("Signed out successfully.") );
-            GUIEngine::reshowCurrentScreen();
+            //GUIEngine::reshowCurrentScreen();
         }
         else
-        {
             new MessageDialog( _("An error occured while signing out.") );
-        }
-
+    }
+    else if (selection == "register")
+    {
+        new RegistrationDialog(0.8f, 0.9f);
     }
     else if (selection == "find_server")
     {
-        new LoginDialog(LoginDialog::Registration_Required);
+        if (m_recorded_state == Registered)
+            new MessageDialog("Coming soon!");
+        else
+            new LoginDialog(LoginDialog::Registration_Required);
     }
     else if (selection == "create_server")
     {
-        new LoginDialog(LoginDialog::Registration_Required);
+        if (m_recorded_state == Registered)
+            new MessageDialog("Coming soon!");
+        else
+            new LoginDialog(LoginDialog::Registration_Required);
     }
     else if (selection == "quick_play")
     {
-        new LoginDialog(LoginDialog::Signing_In_Required);
+        if (m_recorded_state == Registered || m_recorded_state == Guest)
+            new MessageDialog("Coming soon!");
+        else
+            new LoginDialog(LoginDialog::Signing_In_Required);
     }
 
 }   // eventCallback

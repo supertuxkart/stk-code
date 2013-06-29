@@ -6,7 +6,9 @@
         <box proportion="4" width="90%" layout="vertical-row" align="center">
             <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" id="outer_box" >
                 <label I18N="In the online multiplayer screen" proportion="4" word_wrap="true" text=
-                "Here will come some information.. or statistic.. or whatever. Yet to be filled in!" align="center"/>         
+                "Here will come some information.. or statistics.. or whatever. Yet to be filled in! It will change depending on state. And I'd also like a close button at the right top.
+                
+                " align="center"/>         
             </div>
         </box>
         
@@ -32,10 +34,10 @@
             <buttonbar id="menu_bottomrow" x="0" y="0" width="20%" height="100%" align="center">
                 <icon-button id="sign_in" width="64" height="64" icon="gui/main_about.png" extend_label="50"
                              I18N="Main menu button" text="Sign In" label_location="hover"/>
+                <icon-button id="register" width="64" height="64" icon="gui/tutorial.png"  extend_label="50"
+                             I18N="Main menu button" text="Register" label_location="hover"/>
                 <icon-button id="sign_out" width="64" height="64" icon="gui/main_quit.png"  extend_label="50"
                              I18N="Main menu button" text="Sign Out" label_location="hover"/>
-                <icon-button id="sign_up" width="64" height="64" icon="gui/tutorial.png"  extend_label="50"
-                             I18N="Main menu button" text="Register" label_location="hover"/>
             </buttonbar>
             
         </bottombar>

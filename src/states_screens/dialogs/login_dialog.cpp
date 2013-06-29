@@ -22,8 +22,6 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/widgets/button_widget.hpp"
-#include "guiengine/widgets/text_box_widget.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
@@ -45,15 +43,7 @@ LoginDialog::LoginDialog(const Message message_type) :
     m_reshow_current_screen = false;
     loadFromFile("online/login_dialog.stkgui");
 
-    TextBoxWidget* textBox = getWidget<TextBoxWidget>("password");
-    assert(textBox != NULL);
-    textBox->setPasswordBox(true,L'*');
-
-    textBox = getWidget<TextBoxWidget>("username");
-    assert(textBox != NULL);
-    textBox->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-
-    LabelWidget * m_info_widget = getWidget<LabelWidget>("info");
+    m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
     irr::core::stringw info;
     if (message_type == Normal)
@@ -69,19 +59,34 @@ LoginDialog::LoginDialog(const Message message_type) :
         info += _("If you do not have an account yet, you can choose to sign in as a guest "
                   "or press the register icon at the bottom to gain access to all the features!");
     m_info_widget->setText(info, false);
+
+    m_username_widget = getWidget<TextBoxWidget>("username");
+    assert(m_username_widget != NULL);
+    m_username_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+
+    m_password_widget = getWidget<TextBoxWidget>("password");
+    assert(m_password_widget != NULL);
+    m_password_widget->setPasswordBox(true,L'*');
+
+    m_message_widget = getWidget<LabelWidget>("message");
+    assert(m_message_widget != NULL);
+
+    m_sign_in_widget = getWidget<IconButtonWidget>("sign_in");
+    assert(m_sign_in_widget != NULL);
+    m_recovery_widget = getWidget<IconButtonWidget>("recovery");
+    assert(m_recovery_widget != NULL);
+    m_register_widget = getWidget<IconButtonWidget>("register");
+    assert(m_register_widget != NULL);
+    m_as_guest_widget = getWidget<IconButtonWidget>("as_guest");
+    assert(m_as_guest_widget != NULL);
+    m_cancel_widget = getWidget<IconButtonWidget>("cancel");
+    assert(m_cancel_widget != NULL);
 }
 
 // -----------------------------------------------------------------------------
 
 LoginDialog::~LoginDialog()
 {
-}
-
-// -----------------------------------------------------------------------------
-void LoginDialog::beforeAddingWidgets()
-{
-    LabelWidget * m_message_widget = getWidget<LabelWidget>("message");
-    assert(m_message_widget != NULL);
 }
 
 // -----------------------------------------------------------------------------
@@ -95,8 +100,8 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
     }
     else if(eventSource == "sign_in")
     {
-        const stringw username = getWidget<TextBoxWidget>("username")->getText().trim();
-        const stringw password = getWidget<TextBoxWidget>("password")->getText().trim();
+        const stringw username = m_username_widget->getText().trim();
+        const stringw password = m_password_widget->getText().trim();
         stringw info = "";
         if(CurrentOnlineUser::get()->signIn(username,password,info))
         {
@@ -106,15 +111,12 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
         else
         {
             sfx_manager->quickSound( "anvil" );
-            Log::info("Login Dialog", "check1");
-            irr::video::SColor red(255, 255, 0, 0);
-            m_message_widget->setColor(red);
+            m_message_widget->setColor(irr::video::SColor(255, 255, 0, 0));
             m_message_widget->setText(info, false);
-            Log::info("Login Dialog", "check2");
         }
         return GUIEngine::EVENT_BLOCK;
     }
-    else if(eventSource == "sign_up")
+    else if(eventSource == "register")
     {
         m_open_registration_dialog = true;
         return GUIEngine::EVENT_BLOCK;
@@ -128,12 +130,10 @@ void LoginDialog::onEnterPressedInternal()
 {
     //If enter was pressed while "cancel" nor "signup" was selected, then interpret as "signin" press.
     const int playerID = PLAYER_ID_GAME_MASTER;
-    ButtonWidget* cancelButton = getWidget<ButtonWidget>("cancel");
-    assert(cancelButton != NULL);
-    ButtonWidget* registerButton = getWidget<ButtonWidget>("sign_up");
-    assert(registerButton != NULL);
-    if (!GUIEngine::isFocusedForPlayer(cancelButton, playerID)          &&
-        !GUIEngine::isFocusedForPlayer(registerButton, playerID))
+    if (!GUIEngine::isFocusedForPlayer(m_recovery_widget, playerID)     &&
+        !GUIEngine::isFocusedForPlayer(m_register_widget, playerID)     &&
+        !GUIEngine::isFocusedForPlayer(m_as_guest_widget, playerID)     &&
+        !GUIEngine::isFocusedForPlayer(m_cancel_widget, playerID))
     {
         processEvent("sign_in");
     }
@@ -151,7 +151,13 @@ void LoginDialog::onUpdate(float dt)
     {
         ModalDialog::dismiss();
         if (m_reshow_current_screen)
-            GUIEngine::reshowCurrentScreen();
+            /*Replaced to online state screen. Not 100% how I will handle this.
+             * Thee options :
+             * - Listener
+             * - Directly calling GUIEngine::reshowCurrentScreen(); (old option)
+             * - Underlying stateschreen is responsible for polling changed state (current option)
+             */
+            true;//GUIEngine::reshowCurrentScreen();
         if (m_open_registration_dialog)
             new RegistrationDialog(0.8f, 0.9f);
 

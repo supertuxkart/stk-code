@@ -46,7 +46,7 @@ void CurrentOnlineUser::deallocate()
 
 CurrentOnlineUser::CurrentOnlineUser(){
     m_is_signed_in = false;
-    m_is_guest = true;
+    m_is_guest = false;
     m_id = 0;
     m_name = "";
     m_token = "";
@@ -78,7 +78,7 @@ bool CurrentOnlineUser::signUp( const irr::core::stringw &username,
     }
     else
     {
-        info = _("Server error");
+            info = _("Unable to connect to the server. Check your internet connection or try again later.");
     }
     return success;
 }
@@ -134,6 +134,7 @@ bool CurrentOnlineUser::signOut(){
             m_name = "";
             m_id = 0;
             m_is_signed_in = false;
+            m_is_guest = false;
         }
     }
     return !m_is_signed_in;
@@ -143,10 +144,8 @@ bool CurrentOnlineUser::signOut(){
 
 irr::core::stringw CurrentOnlineUser::getUserName() const
 {
-    if(m_is_signed_in){
+    if(m_is_signed_in)
         return m_name;
-    }else{
-        return _("Not signed in");
-    }
-
+    else
+        return _("Currently not signed in");
 }

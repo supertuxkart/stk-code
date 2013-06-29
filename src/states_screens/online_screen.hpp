@@ -20,6 +20,8 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 
 namespace GUIEngine { class Widget; class ListWidget; }
 
@@ -33,7 +35,30 @@ private:
     friend class GUIEngine::ScreenSingleton<OnlineScreen>;
 
     OnlineScreen();
-    GUIEngine::LabelWidget* m_online_status_widget;
+
+    GUIEngine::RibbonWidget * m_top_menu_widget;
+    GUIEngine::IconButtonWidget * m_quick_play_widget;
+    GUIEngine::IconButtonWidget * m_find_server_widget;
+    GUIEngine::IconButtonWidget * m_create_server_widget;
+
+    GUIEngine::LabelWidget * m_online_status_widget;
+
+    GUIEngine::RibbonWidget * m_bottom_menu_widget;
+    GUIEngine::IconButtonWidget * m_sign_in_widget;
+    GUIEngine::IconButtonWidget * m_register_widget;
+    GUIEngine::IconButtonWidget * m_sign_out_widget;
+
+    enum State
+    {
+        Not = 1,
+        Guest = 2,
+        Registered = 4
+    };
+
+    State m_recorded_state;
+
+    /** \brief Checks if the recorded state differs from the actual state and sets it. */
+    bool hasStateChanged();
 
 public:
 

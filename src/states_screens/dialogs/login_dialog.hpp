@@ -23,6 +23,7 @@
 
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 
 /**
@@ -37,8 +38,17 @@ private:
     bool m_self_destroy;
     bool m_open_registration_dialog;
     bool m_reshow_current_screen;
-    GUIEngine::LabelWidget * m_message_widget;
+
     GUIEngine::LabelWidget * m_info_widget;
+    GUIEngine::TextBoxWidget * m_username_widget;
+    GUIEngine::TextBoxWidget * m_password_widget;
+    GUIEngine::LabelWidget * m_message_widget;
+
+    GUIEngine::IconButtonWidget * m_sign_in_widget;
+    GUIEngine::IconButtonWidget * m_recovery_widget;
+    GUIEngine::IconButtonWidget * m_register_widget;
+    GUIEngine::IconButtonWidget * m_as_guest_widget;
+    GUIEngine::IconButtonWidget * m_cancel_widget;
     
 public:
     
@@ -57,7 +67,6 @@ public:
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    void beforeAddingWidgets();
     
     virtual void onUpdate(float dt);
     //virtual void onTextUpdated();

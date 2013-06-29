@@ -8,7 +8,7 @@
         <spacer height="20" width="50">
         
         <label id="terms" proportion="6" width="90%" align="center" text_align="center" word_wrap="true"
-           I18N="In the registration dialog' dialog" text="The terms will come here. In a fancy scroll box."/>  
+           I18N="In the registration dialog' dialog" text="The terms will come here. In a fancy scroll box."/>
         
         <div align="center" width="fit" height="fit" layout="horizontal-row" >
             <label text_align="center" align="center" I18N="In the registration dialog" word_wrap="true"

@@ -100,6 +100,14 @@ void RegistrationDialog::showRegistrationInfo(){
     LabelWidget * label = getWidget<LabelWidget>("info");
     assert(label != NULL);
     label->setColor(irr::video::SColor(255, 255, 0, 0));
+    label->setText(m_registration_error, false);
+
+    ButtonWidget * button = getWidget<ButtonWidget>("next");
+    assert(button != NULL);
+
+    button = getWidget<ButtonWidget>("cancel");
+    assert(button != NULL);
+
 }
 
 // -----------------------------------------------------------------------------
@@ -184,14 +192,14 @@ bool RegistrationDialog::processTermsEvent(const std::string& eventSource){
         {
             assert(getWidget<CheckBoxWidget>("accepted")->getState());
             m_agreement = true;
-            irr::core::stringw info;
-            if(CurrentOnlineUser::get()->signUp(m_username, m_password, m_password_confirm, m_email, true, info))
+            if(CurrentOnlineUser::get()->signUp(m_username, m_password, m_password_confirm, m_email, true, m_registration_error))
             {
                 m_show_registration_activation = true;
+                m_registration_error = "";
             }
             else
             {
-                Log::error("Registration dialog", "Info : %s", irr::core::stringc(info.c_str()).c_str());
+                m_show_registration_info = true;
             }
             return true;
         }

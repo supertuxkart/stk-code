@@ -34,7 +34,7 @@ public:
     {
         Info = 1,
         Terms = 2,
-        Activation = 3
+        Activation = 4
     };
 
     RegistrationDialog(const float percentWidth, const float percentHeight, const Phase phase = Info);
@@ -58,6 +58,7 @@ private:
     irr::core::stringw m_password_confirm;
     irr::core::stringw m_email;
     irr::core::stringw m_email_confirm;
+    irr::core::stringw m_registration_error;
     bool m_agreement;
 
     void showRegistrationInfo();

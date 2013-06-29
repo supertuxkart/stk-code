@@ -33,15 +33,15 @@
         
         <buttonbar id="options" width="90%" proportion="1" align="center">
                 <icon-button id="sign_in" width="64" height="64" icon="gui/main_options.png"
-                             I18N="Main menu button"  text="Sign In" label_location="bottom"/>
-                <icon-button id="forgot_password" width="64" height="64" icon="gui/main_help.png"
-                             I18N="Main menu button" text="Recovery" label_location="bottom"/>
-                <icon-button id="sign_up" width="64" height="64" icon="gui/tutorial.png"
-                             I18N="Main menu button" text="Register" label_location="bottom"/>
+                             I18N="Login dialog"  text="Sign In" label_location="bottom"/>
+                <icon-button id="recovery" width="64" height="64" icon="gui/main_help.png"
+                             I18N="Login dialog" text="Recovery" label_location="bottom"/>
+                <icon-button id="register" width="64" height="64" icon="gui/tutorial.png"
+                             I18N="Login dialog" text="Register" label_location="bottom"/>
                 <icon-button id="as_guest" width="64" height="64" icon="gui/main_about.png"
-                             I18N="Main menu button" text="As guest" label_location="bottom"/>
+                             I18N="Login dialog" text="As guest" label_location="bottom"/>
                 <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
-                             I18N="Main menu button" text="Cancel" label_location="bottom"/>
+                             I18N="Login dialog" text="Cancel" label_location="bottom"/>
         </buttonbar>
         
     
