@@ -23,7 +23,6 @@
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/button_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
@@ -38,11 +37,12 @@ using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
 
-LoginDialog::LoginDialog(const float w, const float h, const core::stringw& msg) :
-        ModalDialog(w,h)
+LoginDialog::LoginDialog(const Message message_type) :
+        ModalDialog(0.8f,0.8f)
 {
     m_self_destroy = false;
     m_open_registration_dialog = false;
+    m_reshow_current_screen = false;
     loadFromFile("online/login_dialog.stkgui");
 
     TextBoxWidget* textBox = getWidget<TextBoxWidget>("password");
@@ -53,9 +53,22 @@ LoginDialog::LoginDialog(const float w, const float h, const core::stringw& msg)
     assert(textBox != NULL);
     textBox->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
-    LabelWidget * info = getWidget<LabelWidget>("info");
-    assert(info != NULL);
-    info->setText(msg, false);
+    LabelWidget * m_info_widget = getWidget<LabelWidget>("info");
+    assert(m_info_widget != NULL);
+    irr::core::stringw info;
+    if (message_type == Normal)
+        info =  _("Fill in your username and password. ");
+    else if (message_type == Signing_In_Required)
+        info =  _("You need to sign in to be able to use this feature. ");
+    else if (message_type == Registration_Required)
+        info =  _("You need to be a registered user to enjoy this feature! "
+                  "If you do not have an account yet, you can sign up using the register icon at the bottom.");
+    else
+        info = "";
+    if (message_type == Normal || message_type == Signing_In_Required)
+        info += _("If you do not have an account yet, you can choose to sign in as a guest "
+                  "or press the register icon at the bottom to gain access to all the features!");
+    m_info_widget->setText(info, false);
 }
 
 // -----------------------------------------------------------------------------
@@ -64,6 +77,12 @@ LoginDialog::~LoginDialog()
 {
 }
 
+// -----------------------------------------------------------------------------
+void LoginDialog::beforeAddingWidgets()
+{
+    LabelWidget * m_message_widget = getWidget<LabelWidget>("message");
+    assert(m_message_widget != NULL);
+}
 
 // -----------------------------------------------------------------------------
 
@@ -74,26 +93,28 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
         m_self_destroy = true;
         return GUIEngine::EVENT_BLOCK;
     }
-    else if(eventSource == "signin")
+    else if(eventSource == "sign_in")
     {
-        // ---- See if we can accept the input
         const stringw username = getWidget<TextBoxWidget>("username")->getText().trim();
         const stringw password = getWidget<TextBoxWidget>("password")->getText().trim();
         stringw info = "";
         if(CurrentOnlineUser::get()->signIn(username,password,info))
         {
+            m_reshow_current_screen = true;
             m_self_destroy = true;
         }
         else
         {
             sfx_manager->quickSound( "anvil" );
-            LabelWidget * infoLabel = getWidget<LabelWidget>("info");
-            infoLabel->setColor(irr::video::SColor(255, 255, 0, 0));
-            infoLabel->setText(info, false);
+            Log::info("Login Dialog", "check1");
+            irr::video::SColor red(255, 255, 0, 0);
+            m_message_widget->setColor(red);
+            m_message_widget->setText(info, false);
+            Log::info("Login Dialog", "check2");
         }
         return GUIEngine::EVENT_BLOCK;
     }
-    else if(eventSource == "signup")
+    else if(eventSource == "sign_up")
     {
         m_open_registration_dialog = true;
         return GUIEngine::EVENT_BLOCK;
@@ -109,12 +130,12 @@ void LoginDialog::onEnterPressedInternal()
     const int playerID = PLAYER_ID_GAME_MASTER;
     ButtonWidget* cancelButton = getWidget<ButtonWidget>("cancel");
     assert(cancelButton != NULL);
-    ButtonWidget* registerButton = getWidget<ButtonWidget>("signup");
+    ButtonWidget* registerButton = getWidget<ButtonWidget>("sign_up");
     assert(registerButton != NULL);
     if (!GUIEngine::isFocusedForPlayer(cancelButton, playerID)          &&
         !GUIEngine::isFocusedForPlayer(registerButton, playerID))
     {
-        processEvent("signin");
+        processEvent("sign_in");
     }
 }
 
@@ -124,12 +145,17 @@ void LoginDialog::onUpdate(float dt)
 {
     //If we want to open the registration dialog, we need to close this one first
     m_open_registration_dialog && (m_self_destroy = true);
+
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
         ModalDialog::dismiss();
+        if (m_reshow_current_screen)
+            GUIEngine::reshowCurrentScreen();
         if (m_open_registration_dialog)
             new RegistrationDialog(0.8f, 0.9f);
+
     }
+
 
 }

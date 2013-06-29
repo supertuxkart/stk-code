@@ -26,7 +26,6 @@
 #include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "input/device_manager.hpp"
@@ -35,11 +34,13 @@
 #include "main_loop.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/dialogs/login_dialog.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "modes/demo_world.hpp"
 #include "utils/translation.hpp"
 
 #include "online/current_online_user.hpp"
-#include "states_screens/dialogs/login_dialog.hpp"
+
 
 using namespace GUIEngine;
 
@@ -55,29 +56,20 @@ OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 
 void OnlineScreen::loadedFromFile()
 {
-
+    Log::info("OnlineScreen", "Loaded from file");
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
-//
-void OnlineScreen::init()
-{
-    Screen::init();
-    RibbonWidget* r = getWidget<RibbonWidget>("menu_toprow");
-    r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    DemoWorld::resetIdleTime();
-
-}   // init
-
-
 void OnlineScreen::beforeAddingWidget()
 {
+    Log::info("OnlineScreen", "Before adding widget");
     RibbonWidget* topRow = getWidget<RibbonWidget>("menu_toprow");
     assert(topRow != NULL);
     RibbonWidget* bottomRow = getWidget<RibbonWidget>("menu_bottomrow");
     assert(bottomRow != NULL);
     if(CurrentOnlineUser::get()->isSignedIn())
     {
+
         if(CurrentOnlineUser::get()->isGuest())
         {
 
@@ -87,12 +79,32 @@ void OnlineScreen::beforeAddingWidget()
             //Signed in and not guest
             bottomRow->removeChildNamed("sign_in");
         }
+        bottomRow->removeChildNamed("sign_up");
     }
     else
     {
-        bottomRow->removeChildNamed("sign_out");
+
+        //bottomRow->removeChildNamed("sign_out");
+        IconButtonWidget* iconbutton = getWidget<IconButtonWidget>("sign_out");
+        iconbutton->setVisible(false);
+        IconButtonWidget* quick_play = getWidget<IconButtonWidget>("quick_play");
+        quick_play->setVisible(false);
     }
-}
+} // beforeAddingWidget
+
+
+
+// ----------------------------------------------------------------------------
+void OnlineScreen::init()
+{
+    Screen::init();
+    m_online_status_widget = getWidget<LabelWidget>("online_status");
+    assert(m_online_status_widget != NULL);
+    RibbonWidget* r = getWidget<RibbonWidget>("menu_bottomrow");
+    r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    DemoWorld::resetIdleTime();
+    m_online_status_widget->setText(irr::core::stringw("Signed in as : ") + CurrentOnlineUser::get()->getUserName(), true);
+}   // init
 
 // ----------------------------------------------------------------------------
 void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
@@ -115,11 +127,32 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
 
     if (selection == "sign_in")
     {
-        new LoginDialog(0.6f, 0.6f, _("Not yet an account? Press register beneath!"));
+        new LoginDialog(LoginDialog::Normal);
     }
     else if (selection == "sign_out")
     {
-        CurrentOnlineUser::get()->signOut();
+        if (CurrentOnlineUser::get()->signOut())
+        {
+            new MessageDialog( _("Signed out successfully.") );
+            GUIEngine::reshowCurrentScreen();
+        }
+        else
+        {
+            new MessageDialog( _("An error occured while signing out.") );
+        }
+
+    }
+    else if (selection == "find_server")
+    {
+        new LoginDialog(LoginDialog::Registration_Required);
+    }
+    else if (selection == "create_server")
+    {
+        new LoginDialog(LoginDialog::Registration_Required);
+    }
+    else if (selection == "quick_play")
+    {
+        new LoginDialog(LoginDialog::Signing_In_Required);
     }
 
 }   // eventCallback
@@ -135,12 +168,3 @@ void OnlineScreen::tearDown()
 void OnlineScreen::onDisabledItemClicked(const std::string& item)
 {
 }   // onDisabledItemClicked
-
-// ----------------------------------------------------------------------------
-
-void OnlineScreen::reload()
-{
-    this->unload();
-    if (!this->isLoaded()) this->loadFromFile();
-    this->init();
-}

@@ -1,9 +1,13 @@
 <stkgui>
 
-    <div x="2%" y="5%" width="96%" height="90%" layout="vertical-row" >
+    <div x="2%" y="5%" width="96%" height="85%" layout="vertical-row" >
     
-        <header id="title" width="96%" proportion="1" text_align="center" word_wrap="true"
+        <header id="title" width="96%" height="fit" text_align="center" word_wrap="true"
        I18N="In the login dialog' dialog" text="Sign in"/>
+       
+       <spacer height="20" width="50">
+       
+        <label id="info" proportion="2" width="90%" align="center" text_align="left" word_wrap="true" text=""/>
     
         <spacer height="40" width="50">
         
@@ -23,17 +27,22 @@
         
         <spacer height="20" width="50">      
         
-        <label id="info" proportion="1" width="90%" align="center" text_align="center" word_wrap="true" dialog" text=""/>
+        <label id="message" proportion="1" width="90%" align="center" text_align="center" word_wrap="true" text=""/>
            
         <spacer height="20" width="50"> 
         
-        <div id="options" width="fit" proportion="1" align="center" layout="horizontal-row">
-            <button id="signin" height="fit" align="center" width="fit" I18N="In the login dialog" text="Sign In"/>
-            <spacer height="50" width="50">
-            <button id="signup" height="fit" align="center" width="fit" I18N="In the login dialog" text="Register"/>
-            <spacer height="50" width="50">      
-            <button id="cancel" height="fit" align="center" width="fit" I18N="In the login dialog" text="Cancel"/>
-        </div>
+        <buttonbar id="options" width="90%" proportion="1" align="center">
+                <icon-button id="sign_in" width="64" height="64" icon="gui/main_options.png"
+                             I18N="Main menu button"  text="Sign In" label_location="bottom"/>
+                <icon-button id="forgot_password" width="64" height="64" icon="gui/main_help.png"
+                             I18N="Main menu button" text="Recovery" label_location="bottom"/>
+                <icon-button id="sign_up" width="64" height="64" icon="gui/tutorial.png"
+                             I18N="Main menu button" text="Register" label_location="bottom"/>
+                <icon-button id="as_guest" width="64" height="64" icon="gui/main_about.png"
+                             I18N="Main menu button" text="As guest" label_location="bottom"/>
+                <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
+                             I18N="Main menu button" text="Cancel" label_location="bottom"/>
+        </buttonbar>
         
     
     </div>

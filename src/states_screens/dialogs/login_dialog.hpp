@@ -23,6 +23,7 @@
 
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 
 /**
  * \brief Dialog that allows a user to sign in
@@ -35,17 +36,28 @@ private:
     
     bool m_self_destroy;
     bool m_open_registration_dialog;
+    bool m_reshow_current_screen;
+    GUIEngine::LabelWidget * m_message_widget;
+    GUIEngine::LabelWidget * m_info_widget;
     
 public:
     
+    enum Message
+    {
+        Normal                  = 1,    // If the user presses the sign in button himself
+        Signing_In_Required     = 2,    // If the user needs to be signed in
+        Registration_Required   = 3     // If the user needs to be registered
+    };
+
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    LoginDialog(const float percentWidth, const float percentHeight, const core::stringw& msg);
+    LoginDialog(const Message);
     ~LoginDialog();
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    void beforeAddingWidgets();
     
     virtual void onUpdate(float dt);
     //virtual void onTextUpdated();

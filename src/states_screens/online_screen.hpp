@@ -19,6 +19,7 @@
 #define HEADER_ONLINE_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 
 namespace GUIEngine { class Widget; class ListWidget; }
 
@@ -32,10 +33,9 @@ private:
     friend class GUIEngine::ScreenSingleton<OnlineScreen>;
 
     OnlineScreen();
+    GUIEngine::LabelWidget* m_online_status_widget;
 
 public:
-
-    void reload();
 
     virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver) OVERRIDE;
 

@@ -111,7 +111,7 @@ bool CurrentOnlineUser::signIn( const irr::core::stringw &username,
     }
     else
     {
-        info = _("Server error");
+        info = _("Unable to connect to the server. Check your internet connection or try again later.");
     }
 
     return m_is_signed_in;
@@ -146,7 +146,7 @@ irr::core::stringw CurrentOnlineUser::getUserName() const
     if(m_is_signed_in){
         return m_name;
     }else{
-        return _("Not Signed In");
+        return _("Not signed in");
     }
 
 }
