@@ -18,7 +18,7 @@ void main()
     vec4 detail2 = texture2D(tex_detail2, gl_TexCoord[0].st);
     vec4 detail3 = texture2D(tex_detail3, gl_TexCoord[0].st);
     vec4 detail4 = texture2D(tex_detail4, gl_TexCoord[0].st);
-    
+
     gl_FragColor = (splatting.r * detail0 +
                     splatting.g * detail1 +
                     splatting.b * detail2 +

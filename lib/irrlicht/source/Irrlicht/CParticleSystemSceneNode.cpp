@@ -337,40 +337,7 @@ void CParticleSystemSceneNode::render()
 	{
 		const SParticle& particle = Particles[i];
 
-		#if 0
-			core::vector3df horizontal = camera->getUpVector().crossProduct(view);
-			horizontal.normalize();
-			horizontal *= 0.5f * particle.size.Width;
-
-			core::vector3df vertical = horizontal.crossProduct(view);
-			vertical.normalize();
-			vertical *= 0.5f * particle.size.Height;
-
-		#else
-			f32 f;
-
-			f = 0.5f * particle.size.Width;
-			const core::vector3df horizontal ( m[0] * f, m[4] * f, m[8] * f );
-
-			f = -0.5f * particle.size.Height;
-			const core::vector3df vertical ( m[1] * f, m[5] * f, m[9] * f );
-		#endif
-
-		Buffer->Vertices[0+idx].Pos = particle.pos + horizontal + vertical;
-		Buffer->Vertices[0+idx].Color = particle.color;
-		Buffer->Vertices[0+idx].Normal = view;
-
-		Buffer->Vertices[1+idx].Pos = particle.pos + horizontal - vertical;
-		Buffer->Vertices[1+idx].Color = particle.color;
-		Buffer->Vertices[1+idx].Normal = view;
-
-		Buffer->Vertices[2+idx].Pos = particle.pos - horizontal - vertical;
-		Buffer->Vertices[2+idx].Color = particle.color;
-		Buffer->Vertices[2+idx].Normal = view;
-
-		Buffer->Vertices[3+idx].Pos = particle.pos - horizontal + vertical;
-		Buffer->Vertices[3+idx].Color = particle.color;
-		Buffer->Vertices[3+idx].Normal = view;
+        drawBillboardParticle(idx, particle, view, m);
 
 		idx +=4;
 	}
@@ -395,6 +362,38 @@ void CParticleSystemSceneNode::render()
 		driver->setMaterial(deb_m);
 		driver->draw3DBox(Buffer->BoundingBox, video::SColor(0,255,255,255));
 	}
+}
+
+//! Draw billboard particle
+void CParticleSystemSceneNode::drawBillboardParticle(const irr::s32 &idx, 
+            const SParticle &particle, const core::vector3df &view, const irr::core::matrix4 &m)
+{
+    
+    f32 f;
+
+    f = 0.5f * particle.size.Width;
+    const core::vector3df horizontal ( m[0] * f, m[4] * f, m[8] * f );
+
+    f = -0.5f * particle.size.Height;
+    const core::vector3df vertical ( m[1] * f, m[5] * f, m[9] * f );
+
+
+    Buffer->Vertices[0+idx].Pos = particle.pos + horizontal + vertical;
+    Buffer->Vertices[0+idx].Color = particle.color;
+    Buffer->Vertices[0+idx].Normal = view;
+
+    Buffer->Vertices[1+idx].Pos = particle.pos + horizontal - vertical;
+    Buffer->Vertices[1+idx].Color = particle.color;
+    Buffer->Vertices[1+idx].Normal = view;
+
+    Buffer->Vertices[2+idx].Pos = particle.pos - horizontal - vertical;
+    Buffer->Vertices[2+idx].Color = particle.color;
+    Buffer->Vertices[2+idx].Normal = view;
+
+    Buffer->Vertices[3+idx].Pos = particle.pos - horizontal + vertical;
+    Buffer->Vertices[3+idx].Color = particle.color;
+    Buffer->Vertices[3+idx].Normal = view;
+
 }
 
 

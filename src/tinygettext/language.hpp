@@ -28,9 +28,9 @@ struct LanguageSpec;
 class Language
 {
 private:
-  LanguageSpec* language_spec;
+  const LanguageSpec* language_spec;
 
-  Language(LanguageSpec* language_spec);
+  Language(const LanguageSpec* language_spec);
 
 public:
   /** Create a language from language and country code:

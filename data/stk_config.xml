@@ -114,8 +114,8 @@
                     nolok-bubble-gum, easter egg -->
   <switch time="5"  items="1 0 4 4 2 5 2 7"/>
 
-  <!-- How often bubble gum get driven over before it disappears. --> 
-  <bubble-gum disappear-counter="1"/>
+  <!-- How often bubblegum get driven over before it disappears. --> 
+  <bubblegum disappear-counter="1"/>
 
   <!-- explosion-impulse-objects is the impulse that pushes physical objects
        away if there is an explosion. -->
@@ -178,6 +178,14 @@
      -->
     <nitro engine-force="500" consumption="1" small-container="1" big-container="3"
            max-speed-increase="5" duration="1" fade-out-time="2" max="16"/>
+
+    <!-- Bubble gum data:
+         time: How long the bubblegum lasts.
+         speed-fraction: To what fraction of top-speed the speed is reduced.
+         torque: To rotate the kart somewhat.
+         fade-in-time: How quick the slowdown takes effect.
+      -->
+    <bubblegum time="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"/>
 
     <!-- time: Time a zipper is active. 
          force: Additional zipper force. 
@@ -389,6 +397,12 @@
                  restricted to.  -->
     <swatter duration="10" distance="3" squash-duration="5" 
              squash-slowdown="0.5"/>
+    <!-- Leaning related parameters, i.e. slightly leaning the karts when
+         driving a fast curve.
+         max: maximum leaning (i.e. when steering as much as possible at highest
+              speed), in degrees.
+         sped: Speed with which the leaning changes (in degree/second). -->
+    <lean    max="8.6"  speed="5.0" />
 
     <!-- turn-radius defines the turn radius of the kart at
          a given speed. The actual steering angle is dependent on the

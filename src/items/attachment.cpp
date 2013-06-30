@@ -222,7 +222,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
     case ATTACH_BOMB:
         {
         add_a_new_item = false;
-        HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion");
+        HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion", "explosion_bomb.xml");
         if(m_kart->getController()->isPlayerController())
             he->setPlayerKartHit();
         projectile_manager->addHitEffect(he);
@@ -397,7 +397,7 @@ void Attachment::update(float dt)
         }
         if(m_time_left<=0.0)
         {
-            HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion");
+            HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion", "explosion_bomb.xml");
             if(m_kart->getController()->isPlayerController())
                 he->setPlayerKartHit();
             projectile_manager->addHitEffect(he);

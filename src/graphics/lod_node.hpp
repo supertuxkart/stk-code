@@ -62,8 +62,6 @@ private:
      *  m_forced_lod is >=0, only this level is be used. */
     int m_forced_lod;
 
-    int getLevel();
-
     enum PreviousVisibility
     {
         FIRST_PASS,
@@ -80,6 +78,8 @@ public:
 
     //! returns the axis aligned bounding box of this node
     virtual const core::aabbox3d<f32>& getBoundingBox() const { return Box; }
+
+    int getLevel();
 
     /*
     //! Returns a reference to the current relative transformation matrix.

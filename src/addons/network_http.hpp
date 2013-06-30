@@ -65,9 +65,10 @@ private:
     CURL                     *m_curl_session;
 
     static void  *mainLoop(void *obj);
-    CURLcode      init();
+    CURLcode      init(bool forceRefresh);
     CURLcode      loadAddonsList(const XMLNode *xml,
-                                 const std::string &filename);
+                                 const std::string &filename,
+                                 bool forceRefresh);
     CURLcode      downloadFileInternal(Request *request);
     static int    progressDownload(void *clientp, double dltotal, double dlnow,
                                    double ultotal, double ulnow);

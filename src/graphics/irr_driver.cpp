@@ -384,6 +384,13 @@ void IrrDriver::initDevice()
     m_glsl          = m_video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
                       m_video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
 
+    // This remaps the window, so it has to be done before the clear to avoid flicker
+    m_device->setResizable(false);
+
+    // Immediate clear to black for a nicer user loading experience
+    m_video_driver->beginScene(/*backBuffer clear*/true, /* Z */ false);
+    m_video_driver->endScene();
+
     if (m_glsl)
     {
         Log::info("irr_driver", "GLSL supported.");
@@ -409,7 +416,6 @@ void IrrDriver::initDevice()
                            classhint);
         XFree(classhint);
 #endif
-        m_device->setResizable(false);
         m_device->setWindowCaption(L"SuperTuxKart");
         m_device->getVideoDriver()
             ->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true);

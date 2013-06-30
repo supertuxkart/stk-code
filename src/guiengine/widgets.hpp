@@ -13,3 +13,4 @@
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
+#include "guiengine/widgets/rating_bar_widget.hpp"

@@ -38,7 +38,6 @@ CSkyBoxSceneNode::CSkyBoxSceneNode(video::ITexture* top, video::ITexture* bottom
 
 	video::SMaterial mat;
 	mat.Lighting = false;
-	mat.ZBuffer = video::ECFN_NEVER;
 	mat.ZWriteEnable = false;
 	mat.AntiAliasing=0;
 	mat.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;

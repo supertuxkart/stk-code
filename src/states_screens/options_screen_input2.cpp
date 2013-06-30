@@ -17,7 +17,6 @@
 
 #include "states_screens/options_screen_input2.hpp"
 
-#include "graphics/irr_driver.hpp"
 #include "guiengine/CGUISpriteBank.h"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"

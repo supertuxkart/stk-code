@@ -164,6 +164,8 @@ supertuxkart_SOURCES = \
  guiengine/widgets/text_box_widget.hpp \
  guiengine/widgets/progress_bar_widget.cpp \
  guiengine/widgets/progress_bar_widget.hpp \
+ guiengine/widgets/rating_bar_widget.cpp \
+ guiengine/widgets/rating_bar_widget.hpp \
  input/binding.cpp \
  input/binding.hpp \
  input/device_manager.cpp \

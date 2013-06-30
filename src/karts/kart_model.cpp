@@ -130,6 +130,25 @@ void KartModel::loadInfo(const XMLNode &node)
         loadWheelInfo(*wheels_node, "rear-right",  2);
         loadWheelInfo(*wheels_node, "rear-left",   3);
     }
+
+    // FIXME fallback for karts that don't have nitro emitter
+    /*
+    m_nitro_emitter_position[0] = Vec3 (0, m_kart_height*0.35f,
+                                          -m_kart_length*0.35f);
+
+    m_nitro_emitter_position[1] = Vec3 (0, m_kart_height*0.35f,
+                                          -m_kart_length*0.35f); */
+    
+    m_nitro_emitter_position[0] = Vec3 (0,0.1f,0);
+
+    m_nitro_emitter_position[1] = Vec3 (0,0.1f,0);
+
+    if(const XMLNode *nitroEmitter_node=node.getNode("nitro-emitter"))
+    {
+        loadNitroEmitterInfo(*nitroEmitter_node, "nitro-emitter-a", 0);
+        loadNitroEmitterInfo(*nitroEmitter_node, "nitro-emitter-b", 1);
+    }
+
     if(const XMLNode *hat_node=node.getNode("hat"))
     {
         if(hat_node->get("offset", &m_hat_offset))
@@ -214,6 +233,10 @@ KartModel* KartModel::makeCopy()
     km->m_animated_node     = NULL;
     km->m_hat_offset        = m_hat_offset;
     km->m_hat_name          = m_hat_name;
+    
+    km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
+    km->m_nitro_emitter_position[1] = m_nitro_emitter_position[1];
+    
     for(unsigned int i=0; i<4; i++)
     {
         km->m_wheel_model[i]             = m_wheel_model[i];
@@ -404,6 +427,31 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
 
     return true;
 }   // loadModels
+
+// ----------------------------------------------------------------------------
+/** Loads a single nitro emitter node. Currently this the position of the nitro
+ *  emitter relative to the kart.
+ *  \param emitter_name Name of the nitro emitter, e.g. emitter-a.
+ *  \param index Index of this emitter in the global m_emitter* fields.
+ */
+void KartModel::loadNitroEmitterInfo(const XMLNode &node,
+                              const std::string &emitter_name, int index)
+{
+    const XMLNode *emitter_node = node.getNode(emitter_name);
+    if(!emitter_node)
+    {
+        // Only print the warning if a model filename is given. Otherwise the
+        // stk_config file is read (which has no model information).
+        if(m_model_filename!="")
+        {
+            Log::error("Kart_Model", "Missing nitro emitter information for model"
+                       "'%s'.", m_model_filename.c_str());
+            Log::error("Kart_Model", "This can be ignored, but the nitro particles will not work");
+        }
+        return;
+    }
+    emitter_node->get("position", &m_nitro_emitter_position[index]);
+}   // loadNitroEmitterInfo
 
 // ----------------------------------------------------------------------------
 /** Loads a single wheel node. Currently this is the name of the wheel model

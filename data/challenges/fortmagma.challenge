@@ -19,5 +19,6 @@
 
     <unlock kart="gnu"/>
     <unlock kart="nolok"/>
+    <unlock difficulty="difficulty_best"/>
     <unlock track="fortmagma"/>
 </challenge>

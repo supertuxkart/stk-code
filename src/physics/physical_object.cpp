@@ -23,7 +23,6 @@
 
 using namespace irr;
 
-#include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "io/file_manager.hpp"

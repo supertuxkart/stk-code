@@ -26,7 +26,7 @@
 
 namespace irr
 {
-    namespace scene { class IMesh; }
+    namespace scene { class IMesh; class ISceneNode; }
 }
 using namespace irr;
 
@@ -284,6 +284,12 @@ public:
         if(left) return m_avoidance_points[0];
         return m_avoidance_points[1];
     }   // getAvoidancePoint
+
+    // ------------------------------------------------------------------------
+    scene::ISceneNode *getSceneNode()
+    {
+        return (scene::ISceneNode *) m_node;
+    }
 };   // class Item
 
 #endif

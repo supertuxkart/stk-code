@@ -712,7 +712,11 @@ void RaceGUIBase::drawGlobalReadySetGo()
                                 UserConfigParams::m_height>>1);
             //gui::IGUIFont* font = irr_driver->getRaceFont();
             gui::IGUIFont* font = GUIEngine::getTitleFont();
-            font->draw(m_string_go.c_str(), pos, color, true, true);
+            
+            if (race_manager->getCoinTarget() > 0)
+                font->draw(_("Collect nitro!"), pos, color, true, true);
+            else
+                font->draw(m_string_go.c_str(), pos, color, true, true);
         }
         break;
     default:

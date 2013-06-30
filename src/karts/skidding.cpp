@@ -197,6 +197,13 @@ void Skidding::update(float dt, bool is_on_ground,
         reset();
         return;
     }
+
+    // No skidding backwards or while stopped
+    if(m_kart->getSpeed() < 0.001f)
+    {
+        reset();
+    }
+
     m_skid_bonus_ready = false;
     if (is_on_ground)
     {

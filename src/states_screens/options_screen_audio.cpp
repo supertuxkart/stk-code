@@ -20,7 +20,6 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
-#include "graphics/irr_driver.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"

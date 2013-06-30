@@ -57,7 +57,6 @@ public:
     };   // UnlockableFeature
     // ------------------------------------------------------------------------
 
-private:
     /** The various types of challenges that we support, which esp. determine
      *  when a challenge is tested if it is fulfilled. For now we have GP
      *  (a GP challenge, tested at the end of a GP), Race (tested at the
@@ -73,6 +72,9 @@ private:
         CM_SINGLE_RACE,
         CM_ANY
     };
+
+
+private:
 
     /** The challenge mode of this challenge. */
     ChallengeModeType              m_mode;

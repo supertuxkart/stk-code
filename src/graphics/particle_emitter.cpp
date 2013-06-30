@@ -381,14 +381,16 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             m_node->setMaterialTexture(0, irr_driver->getTexture((file_manager->getDataDir() + "gui/main_help.png").c_str()));
         }
 
+        // velocity in m/ms
+        core::vector3df velocity(m_particle_type->getVelocityX(),
+                                 m_particle_type->getVelocityY(),
+                                 m_particle_type->getVelocityZ());
 
         switch (type->getShape())
         {
             case EMITTER_POINT:
             {
-                m_emitter = m_node->createPointEmitter(core::vector3df(m_particle_type->getVelocityX(),
-                                                                       m_particle_type->getVelocityY(),
-                                                                       m_particle_type->getVelocityZ()),   // velocity in m/ms
+                m_emitter = m_node->createPointEmitter(velocity,
                                                        type->getMinRate(),  type->getMaxRate(),
                                                        type->getMinColor(), type->getMaxColor(),
                                                        lifeTimeMin, lifeTimeMax,
@@ -404,13 +406,11 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
 
                 m_emitter = m_node->createBoxEmitter(core::aabbox3df(-box_size_x, -box_size_y, -0.6f,
                                                                      box_size_x,  box_size_y,  -0.6f - type->getBoxSizeZ()),
-                                                     core::vector3df(m_particle_type->getVelocityX(),
-                                                                     m_particle_type->getVelocityY(),
-                                                                     m_particle_type->getVelocityZ()),   // velocity in m/ms
+                                                     velocity,
                                                      type->getMinRate(),  type->getMaxRate(),
                                                      type->getMinColor(), type->getMaxColor(),
                                                      lifeTimeMin, lifeTimeMax,
-                                                     m_particle_type->getAngleSpread() /* angle */
+                                                     m_particle_type->getAngleSpread()
                                                      );
 
     #if VISUALIZE_BOX_EMITTER
@@ -433,6 +433,18 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                     }
                 }
     #endif
+                break;
+            }
+            case EMITTER_SPHERE:
+            {
+                m_emitter = m_node->createSphereEmitter(core::vector3df(0.0f,0.0f,0.0f) /* center */,
+                                                        m_particle_type->getSphereRadius(),
+                                                        velocity,
+                                                        type->getMinRate(),  type->getMaxRate(),
+                                                        type->getMinColor(), type->getMaxColor(),
+                                                        lifeTimeMin, lifeTimeMax,
+                                                        m_particle_type->getAngleSpread()
+                                                 );
                 break;
             }
             default:
@@ -475,6 +487,16 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             FadeAwayAffector* faa = new FadeAwayAffector(fas*fas, fae*fae);
             m_node->addAffector(faa);
             faa->drop();
+        }
+        
+        if (type->hasScaleAffector())
+        {
+            core::dimension2df factor = core::dimension2df(type->getScaleAffectorFactorX(),
+                                                           type->getScaleAffectorFactorY());
+            scene::IParticleAffector* scale_affector =
+                m_node->createScaleParticleAffector(factor);
+            m_node->addAffector(scale_affector);
+            scale_affector->drop();
         }
     }
 }   // setParticleType

@@ -179,7 +179,7 @@ void *NetworkHttp::mainLoop(void *obj)
         switch(me->m_current_request->getCommand())
         {
         case Request::HC_INIT:
-             status = me->init();
+             status = me->init(false);
              break;
         case Request::HC_REINIT:
              status = me->reInit();
@@ -269,7 +269,7 @@ NetworkHttp::~NetworkHttp()
  *  \return 0 if an error happened and no online connection will be available,
  *          1 otherwise.
  */
-CURLcode NetworkHttp::init()
+CURLcode NetworkHttp::init(bool forceRefresh)
 {
     news_manager->clearErrorMessage();
     core::stringw error_message("");
@@ -278,7 +278,7 @@ CURLcode NetworkHttp::init()
     bool download = UserConfigParams::m_news_last_updated==0  ||
                     UserConfigParams::m_news_last_updated
                         +UserConfigParams::m_news_frequency
-                    < Time::getTimeSinceEpoch();
+                    < Time::getTimeSinceEpoch() || forceRefresh;
 
     if(!download)
     {
@@ -332,7 +332,7 @@ CURLcode NetworkHttp::init()
             xml = new XMLNode(xml_file);
         }
         news_manager->init();
-        status = loadAddonsList(xml, xml_file);
+        status = loadAddonsList(xml, xml_file, forceRefresh);
         delete xml;
         if(status==CURLE_OK)
         {
@@ -401,14 +401,10 @@ CURLcode NetworkHttp::reInit()
         m_all_requests.getData().pop();
     m_all_requests.unlock();
 
-    std::string news_file = file_manager->getAddonsFile("news.xml");
-    file_manager->removeFile(news_file);
-    std::string addons_file = file_manager->getAddonsFile("addons.xml");
-    file_manager->removeFile(addons_file);
     if(UserConfigParams::logAddons())
         printf("[addons] Xml files deleted, re-initialising addon manager.\n");
 
-    return init();
+    return init(true /* force refresh */);
 
 }   // reInit
 
@@ -424,7 +420,8 @@ CURLcode NetworkHttp::reInit()
  *  \return curl error code (esp. CURLE_OK if no error occurred)
  */
 CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
-                                     const std::string &filename)
+                                     const std::string &filename,
+                                     bool forceRefresh)
 {
     std::string    addon_list_url("");
     Time::TimeType mtime(0);
@@ -445,7 +442,8 @@ CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
         return CURLE_COULDNT_CONNECT;
     }
 
-    bool download = mtime > UserConfigParams::m_addons_last_updated;
+    bool download = (mtime > UserConfigParams::m_addons_last_updated) || forceRefresh;
+    
     if(!download)
     {
         std::string filename=file_manager->getAddonsFile("addons.xml");
@@ -453,6 +451,11 @@ CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
             download = true;
     }
 
+    if (download)
+        Log::info("NetworkHttp", "Downloading updated addons.xml");
+    else
+        Log::info("NetworkHttp", "Using cached addons.xml");
+        
     Request r(Request::HC_DOWNLOAD_FILE, 9999, false,
               addon_list_url, "addons.xml");
     CURLcode status = download ? downloadFileInternal(&r)

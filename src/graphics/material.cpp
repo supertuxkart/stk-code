@@ -34,6 +34,7 @@
 #include "utils/string_utils.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
+#include "utils/log.hpp"
 
 #include <IGPUProgrammingServices.h>
 #include <IMaterialRendererServices.h>
@@ -873,9 +874,9 @@ void Material::initParticlesEffect(const XMLNode *node)
     node->get("base", &base);
     if (base.size() < 1)
     {
-        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Invalid "
-                        "particle settings for material '%s'\n",
-                m_texname.c_str());
+        Log::warn("Material::initParticlesEffect"
+                  "Invalid particle settings for material '%s'\n",
+                  m_texname.c_str());
         return;
     }
 
@@ -883,12 +884,19 @@ void Material::initParticlesEffect(const XMLNode *node)
     try
     {
         particles = pkm->getParticles(base.c_str());
+        
+        if (particles == NULL)
+        {
+            Log::warn("Material::initParticlesEffect",
+                      "Error loading particles '%s' for material '%s'\n",
+                      base.c_str(), m_texname.c_str());
+        }
     }
     catch (...)
     {
-        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Cannot find "
-                        "particles '%s' for material '%s'\n",
-                base.c_str(), m_texname.c_str());
+        Log::warn("Material::initParticlesEffect",
+                  "Cannot find particles '%s' for material '%s'\n",
+                  base.c_str(), m_texname.c_str());
         return;
     }
 

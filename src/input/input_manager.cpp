@@ -164,7 +164,12 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
-                kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
+                
+                if (control_is_pressed)
+                    kart->setPowerup(PowerupManager::POWERUP_SWATTER, 10000);
+                else
+                    kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL, 10000);
+                    
 #ifdef FORCE_RESCUE_ON_FIRST_KART
                 // Can be useful for debugging places where the AI gets into
                 // a rescue loop: rescue, drive, crash, rescue to same place
@@ -176,6 +181,7 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
+                
                 kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
             }
             break;

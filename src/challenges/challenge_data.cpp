@@ -331,9 +331,7 @@ void ChallengeData::setUnlocks(const std::string &id, RewardType reward)
                             }
     case UNLOCK_DIFFICULTY:
                             {
-                            //TODO: difficulty names when unlocking
-                            irr::core::stringw user_name = "?";
-                            addUnlockDifficultyReward(id, user_name);
+                            addUnlockDifficultyReward(id, core::stringw(id.c_str()));
                             break;
                             }
     case UNLOCK_KART:       {

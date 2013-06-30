@@ -40,6 +40,18 @@ DEFINE_SCREEN_SINGLETON( AddonsScreen );
 AddonsScreen::AddonsScreen() : Screen("addons_screen.stkgui")
 {
     m_selected_index = -1;
+
+    // Add date filters.
+    m_date_filters.push_back((DateFilter) {_("All")   , 0, 0,  0});
+    m_date_filters.push_back((DateFilter) {_("1 week")   , 0, 0,  7});
+    m_date_filters.push_back((DateFilter) {_("2 weeks")  , 0, 0, 12});
+    m_date_filters.push_back((DateFilter) {_("1 month")  , 0, 1,  0});
+    m_date_filters.push_back((DateFilter) {_("3 months") , 0, 3,  0});
+    m_date_filters.push_back((DateFilter) {_("6 months") , 0, 6,  0});
+    m_date_filters.push_back((DateFilter) {_("9 months") , 0, 9,  0});
+    m_date_filters.push_back((DateFilter) {_("1 year")   , 1, 0,  0});
+    m_date_filters.push_back((DateFilter) {_("2 years")   , 2, 0,  0});
+
 }   // AddonsScreen
 
 // ----------------------------------------------------------------------------
@@ -70,6 +82,7 @@ void AddonsScreen::loadedFromFile()
     GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->setColumnListener(this);
+    
 }   // loadedFromFile
 
 
@@ -83,8 +96,32 @@ void AddonsScreen::beforeAddingWidget()
     w_list->clearColumns();
     w_list->addColumn( _("Add-on name"), 2 );
     w_list->addColumn( _("Updated date"), 1 );
-}
+    
+    GUIEngine::SpinnerWidget* w_filter_date =
+                        getWidget<GUIEngine::SpinnerWidget>("filter_date");
+    w_filter_date->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    w_filter_date->m_properties[GUIEngine::PROP_MAX_VALUE] = 
+                            StringUtils::toString(m_date_filters.size() - 1);
+    
+    for (int n = 0; n < m_date_filters.size(); n++)
+    {
+        w_filter_date->addLabel(m_date_filters[n].label);
+    }
 
+    w_filter_date->setValue(0);
+    
+    GUIEngine::SpinnerWidget* w_filter_rating =
+                        getWidget<GUIEngine::SpinnerWidget>("filter_rating");
+    w_filter_rating->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    w_filter_rating->m_properties[GUIEngine::PROP_MAX_VALUE] = "4";
+    
+    for (int n = 0; n < 5; n++)
+    {
+        w_filter_rating->addLabel(StringUtils::toWString(1.0 + n / 2.0));
+    }
+
+    w_filter_rating->setValue(0);
+}
 // ----------------------------------------------------------------------------
 
 void AddonsScreen::init()
@@ -147,6 +184,27 @@ void AddonsScreen::tearDown()
  */
 void AddonsScreen::loadList()
 {
+
+    // Get the filter by words.
+    GUIEngine::TextBoxWidget* w_filter_name =
+                        getWidget<GUIEngine::TextBoxWidget>("filter_name");
+    core::stringw words = w_filter_name->getText();
+
+    // Get the filter by date.
+    GUIEngine::SpinnerWidget* w_filter_date =
+                        getWidget<GUIEngine::SpinnerWidget>("filter_date");
+    int date_index = w_filter_date->getValue();
+    Time::TimeType date = Time::getTimeSinceEpoch();
+    date = Time::addInterval(date, 
+                -m_date_filters[date_index].year, 
+                -m_date_filters[date_index].month, 
+                -m_date_filters[date_index].day);
+
+    // Get the filter by rating.
+    GUIEngine::SpinnerWidget* w_filter_rating =
+                        getWidget<GUIEngine::SpinnerWidget>("filter_rating");
+    float rating = 1.0 + w_filter_rating->getValue() / 2.0;
+
     // First create a list of sorted entries
     PtrVector<const Addon, REF> sorted_list;
     for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
@@ -163,6 +221,19 @@ void AddonsScreen::loadList()
         if (!addon.isInstalled() && (addons_manager->wasError()
                 || UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED ))
             continue;
+
+        // Filter by rating.
+        if (addon.getRating() < rating)
+            continue;
+
+        // Filter by date.
+        if (date_index != 0 && Time::compareTime(date, addon.getDate()) > 0)
+            continue;
+
+        // Filter by name, designer and description.
+        if (!addon.filterByWords(words))
+            continue;
+
         sorted_list.push_back(&addon);
     }
     sorted_list.insertionSort(/*start=*/0, m_sort_desc);
@@ -364,6 +435,11 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
             loadList();
         }
     }
+    else if (name == "filter_search")
+    {
+        loadList();
+    }
+
 }   // eventCallback
 
 // ----------------------------------------------------------------------------

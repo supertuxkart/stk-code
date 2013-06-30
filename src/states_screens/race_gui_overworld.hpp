@@ -40,6 +40,8 @@ class RaceSetup;
 /** Distance (squared) at which a challenge orb "activates" */
 const int CHALLENGE_DISTANCE_SQUARED = 20;
 
+const int CHALLENGE_HEIGHT = 4;
+
 /**
  * \brief Handles the in-race GUI (messages, mini-map, rankings, timer, etc...)
  * \ingroup states_screens

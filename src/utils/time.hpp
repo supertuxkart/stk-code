@@ -86,6 +86,35 @@ public:
     {
         return irr_driver->getDevice()->getTimer()->getRealTime()/1000.0;
     };   // getTimeSinceEpoch
+    
+    // ------------------------------------------------------------------------
+    /** 
+     * \brief Compare two different times.
+     * \return A signed integral indicating the relation between the time.
+     */
+    static int compareTime(TimeType time1, TimeType time2)
+    {
+        double diff = difftime(time1, time2);
+
+        if (diff > 0)
+            return 1;
+        else if (diff < 0)
+            return -1;
+        else
+            return 0;
+    };   // compareTime
+
+    // ------------------------------------------------------------------------
+    /** 
+     * \brief Add a interval to a time.
+     */
+    static TimeType addInterval(TimeType time, int year, int month, int day) {
+        struct tm t = *gmtime(&time);
+        t.tm_year += year;
+        t.tm_mon += month;
+        t.tm_mday += day;
+        return mktime(&t);
+    }
 
     class ScopeProfiler
     {

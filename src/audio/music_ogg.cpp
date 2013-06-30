@@ -29,7 +29,6 @@
 
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
-#include "config/user_config.hpp"
 #include "utils/constants.hpp"
 
 MusicOggStream::MusicOggStream()

@@ -98,6 +98,8 @@ void TrackSector::update(const Vec3 &xyz)
 }   // update
 
 // ----------------------------------------------------------------------------
+/** Sets current and last valid graph node to the rescue location.
+ */
 void TrackSector::rescue()
 {
     if (m_last_valid_graph_node != QuadGraph::UNKNOWN_SECTOR)

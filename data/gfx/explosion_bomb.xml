@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<particles emitter="sphere" radius="0.3">
+
+    <spreading angle="180"         />
+    
+    <velocity  x="0.000"
+               y="0.0035"
+               z="0.000"           />
+    
+    <material  file="explode.png"  />
+    
+    <!-- Amount of particles emitted per second -->
+    <rate      min="500"
+               max="800" />
+    
+    <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
+    <lifetime  min="1000"
+               max="1200"         />
+    
+    <!-- Size of the particles -->
+    <size      min="0.65"
+               max="0.95"
+               x-increase-factor="0.6"
+               y-increase-factor="0.6"
+               />
+    
+    <color     min="255 255 255"
+               max="255 255 255"  />
+    
+    <!-- How much time in milliseconds before the particle is fully faded out  -->
+    <fadeout   time="800"         />
+
+</particles>

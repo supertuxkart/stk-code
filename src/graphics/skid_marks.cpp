@@ -109,11 +109,11 @@ void SkidMarks::update(float dt, bool force_skid_marks,
     //   raycast result --> delta is 0, which is considered to be not skidding.
     const Skidding *skid = m_kart.getSkidding();
     bool is_skidding = raycast_right.m_isInContact &&
-                   ( force_skid_marks ||
-                   (  (skid->getSkidState()==Skidding::SKID_ACCUMULATE_LEFT ||
-                       skid->getSkidState()==Skidding::SKID_ACCUMULATE_RIGHT  )
-                     &&  m_kart.getSkidding()->getGraphicalJumpOffset()<=0
-                     &&  delta.length2()>=0.0001f                              ) );
+               ( force_skid_marks ||
+                 (    (skid->getSkidState()==Skidding::SKID_ACCUMULATE_LEFT||
+                       skid->getSkidState()==Skidding::SKID_ACCUMULATE_RIGHT )
+                    && skid->getGraphicalJumpOffset()<=0
+                    && delta.length2()>=0.0001f                           ) );
 
     if(m_skid_marking)
     {

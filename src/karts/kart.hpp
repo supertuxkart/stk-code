@@ -51,6 +51,7 @@ class Skidding;
 class SkidMarks;
 class SlipStream;
 class Stars;
+class HitEffect;
 
 /** The main kart class. All type of karts are of this object, but with
  *  different controllers. The controllers are what turn a kart into a
@@ -108,7 +109,6 @@ private:
     /** For stars rotating around head effect */
     Stars *m_stars_effect;
 
-private:
     /** True if the kart hasn't moved since 'ready-set-go' - used to
      *  determine startup boost. */
     bool         m_has_started;
@@ -126,6 +126,9 @@ private:
     /** How long a kart is being squashed. If this is >0
      *  the kart is squashed. */
     float        m_squash_time;
+
+    /** Current leaning of the kart. */
+    float        m_current_lean;
 
     /** If > 0 then bubble gum effect is on */
     float        m_bubblegum_time;
@@ -146,6 +149,15 @@ private:
 
     // Graphical effects
     // -----------------
+    /** The time where a kart is flying */
+    float            m_timeFlying;
+    
+    /** For the effect when the kart touch the ground */
+    HitEffect       *m_hitGround;
+    
+    /** Is time flying activated */
+    bool             m_isTimeFlying;
+    
     /** The shadow of a kart. */
     Shadow          *m_shadow;
 

@@ -226,6 +226,7 @@
     <ClCompile Include="..\..\graphics\referee.cpp" />
     <ClCompile Include="..\..\graphics\show_curve.cpp" />
     <ClCompile Include="..\..\guiengine\widgets\CGUIEditBox.cpp" />
+    <ClCompile Include="..\..\guiengine\widgets\rating_bar_widget.cpp" />
     <ClCompile Include="..\..\input\wiimote.cpp" />
     <ClCompile Include="..\..\items\rubber_ball.cpp" />
     <ClCompile Include="..\..\items\swatter.cpp" />

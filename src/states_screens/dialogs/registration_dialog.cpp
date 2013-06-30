@@ -163,7 +163,7 @@ bool RegistrationDialog::processInfoEvent(const std::string& eventSource){
                 getWidget<LabelWidget>("info")->setText(_("Username has to be between 5 and 30 characters long!"), false);
                 sfx_manager->quickSound( "anvil" );
             }
-            else if (m_password.size() < 5 || m_password.size() > 30)
+            else if (m_password.size() < 8 || m_password.size() > 30)
             {
                 getWidget<LabelWidget>("info")->setText(_("Password has to be between 5 and 30 characters long!"), false);
                 sfx_manager->quickSound( "anvil" );

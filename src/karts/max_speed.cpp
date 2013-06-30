@@ -157,13 +157,17 @@ void MaxSpeed::SpeedIncrease::update(float dt)
  *  \param category The category for which the speed is increased.
  *  \param max_speed_fraction Fraction of top speed to allow only.
  *  \param fade_in_time How long till maximum speed is capped.
+ *  \param duration How long the effect will lasts. The value of -1 (default)
+ *         indicates that this effect stays active forever (i.e. till its
+ *         value is changed to something else).
  */
 void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction,
-                           float fade_in_time)
+                           float fade_in_time, float duration)
 {
     assert(category>=MS_DECREASE_MIN && category <MS_DECREASE_MAX);
     m_speed_decrease[category].m_max_speed_fraction = max_speed_fraction;
     m_speed_decrease[category].m_fade_in_time       = fade_in_time;
+    m_speed_decrease[category].m_duration           = duration;
 }   // setSlowdown
 
 // ----------------------------------------------------------------------------
@@ -172,6 +176,19 @@ void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction,
  */
 void MaxSpeed::SpeedDecrease::update(float dt)
 {
+    if(m_duration>-1.0f)
+    {
+        // It's a timed slowdown
+        m_duration -= dt;
+        if(m_duration<0)
+        {
+            m_duration           = 0;
+            m_current_fraction   = 1.0f;
+            m_max_speed_fraction = 1.0f;
+            return;
+        }
+    }
+
     float diff = m_current_fraction - m_max_speed_fraction;
     if(diff > 0)
     {
@@ -206,16 +223,17 @@ void MaxSpeed::update(float dt)
     // First compute the minimum max-speed fraction, which
     // determines the overall decrease of maximum speed.
     // ---------------------------------------------------
-    float f = 1.0f;
+    float slowdown_factor = 1.0f;
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
     {
         SpeedDecrease &slowdown = m_speed_decrease[i];
         slowdown.update(dt);
-        f = std::min(f, slowdown.getSlowdownFraction());
+        slowdown_factor = std::min(slowdown_factor, 
+                                   slowdown.getSlowdownFraction());
     }
 
     m_add_engine_force  = 0;
-    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed() * f;
+    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed();
 
     // Then add the speed increase from each category
     // ----------------------------------------------
@@ -226,6 +244,7 @@ void MaxSpeed::update(float dt)
         m_current_max_speed += speedup.getSpeedIncrease();
         m_add_engine_force  += speedup.getEngineForce();
     }
+    m_current_max_speed *= slowdown_factor;
 
     // Then cap the current speed of the kart
     // --------------------------------------

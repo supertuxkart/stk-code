@@ -20,7 +20,6 @@
 
 #include "addons/addon.hpp"
 #include "config/stk_config.hpp"
-#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
@@ -87,9 +86,11 @@ KartProperties::KartProperties(const std::string &filename)
         m_camera_distance = m_camera_forward_up_angle =
         m_camera_backward_up_angle = m_explosion_invulnerability_time =
         m_rescue_time = m_rescue_height = m_explosion_time =
-        m_explosion_radius =
+        m_explosion_radius = m_max_lean = m_lean_speed =
         m_swatter_distance2 = m_swatter_duration = m_squash_slowdown =
-        m_squash_duration = m_downward_impulse_factor = UNDEFINED;
+        m_squash_duration = m_downward_impulse_factor = 
+        m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
+        m_bubblegum_time = m_bubblegum_torque = UNDEFINED;
 
     m_engine_power.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
     m_max_speed.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
@@ -223,8 +224,10 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // (e.g. when freeing temp. materials from a track, the last icon
     //  would get deleted, too.
     m_icon_material = material_manager->getMaterial(m_icon_file,
-                                                    /*is_full+path*/true,
-                                                    /*make_permanent*/true);
+                                                    /*is_full_path*/true,
+                                                    /*make_permanent*/true,
+                                                    /*complain_if_not_found*/true,
+                                                    /*strip_path*/false);
     if(m_minimap_icon_file!="")
         m_minimap_icon = irr_driver->getTexture(m_root+m_minimap_icon_file);
     else
@@ -309,6 +312,14 @@ void KartProperties::getAllData(const XMLNode * root)
         nitro_node->get("duration",           &m_nitro_duration          );
         nitro_node->get("fade-out-time",      &m_nitro_fade_out_time     );
         nitro_node->get("max",                &m_nitro_max               );
+    }
+
+    if(const XMLNode *bubble_node = root->getNode("bubblegum"))
+    {
+        bubble_node->get("time",           &m_bubblegum_time          );
+        bubble_node->get("speed-fraction", &m_bubblegum_speed_fraction);
+        bubble_node->get("fade-in-time",   &m_bubblegum_fade_in_time  );
+        bubble_node->get("torque",         &m_bubblegum_torque        );
     }
 
     if(const XMLNode *rescue_node = root->getNode("rescue"))
@@ -500,6 +511,14 @@ void KartProperties::getAllData(const XMLNode * root)
         }
     }
 
+    if(const XMLNode *lean_node= root->getNode("lean"))
+    {
+        lean_node->get("max",   &m_max_lean  );
+        lean_node->get("speed", &m_lean_speed);
+        m_max_lean   *= DEGREE_TO_RAD;
+        m_lean_speed *= DEGREE_TO_RAD;
+    }
+
     if(const XMLNode *camera_node= root->getNode("camera"))
     {
         camera_node->get("distance", &m_camera_distance);
@@ -652,10 +671,17 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_nitro_duration,             "nitro duration"                );
     CHECK_NEG(m_nitro_fade_out_time,        "nitro fade-out-time"           );
     CHECK_NEG(m_nitro_max,                  "nitro max"                     );
+    CHECK_NEG(m_bubblegum_time,             "bubblegum time"                );
+    CHECK_NEG(m_bubblegum_speed_fraction,   "bubblegum speed-fraction"      );
+    CHECK_NEG(m_bubblegum_fade_in_time  ,   "bubblegum fade-in-time"        );
+    CHECK_NEG(m_bubblegum_torque,           "bubblegum  torque"             );
+
     CHECK_NEG(m_swatter_distance2,          "swatter distance"              );
     CHECK_NEG(m_swatter_duration,           "swatter duration"              );
-    CHECK_NEG(m_squash_duration,            "squash-duration"               );
-    CHECK_NEG(m_squash_slowdown,            "squash-slowdown"               );
+    CHECK_NEG(m_squash_duration,            "swatter squash-duration"       );
+    CHECK_NEG(m_squash_slowdown,            "swatter squash-slowdown"       );
+    CHECK_NEG(m_max_lean,                   "lean max"                      );
+    CHECK_NEG(m_lean_speed,                 "lean speed"                    );
 
     CHECK_NEG(m_rescue_height,              "rescue height"                 );
     CHECK_NEG(m_rescue_time,                "rescue time"                   );

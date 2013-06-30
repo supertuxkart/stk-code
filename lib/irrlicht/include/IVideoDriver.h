@@ -192,6 +192,7 @@ namespace video
 							material.TextureLayer[0].TextureWrapU = Material.TextureLayer[0].TextureWrapU;
 							material.TextureLayer[0].TextureWrapV = Material.TextureLayer[0].TextureWrapV;
 							break;
+						case EMF_MATERIAL_TYPE: material.MaterialType = Material.MaterialType; break;
 						case EMF_ANTI_ALIASING: material.AntiAliasing = Material.AntiAliasing; break;
 						case EMF_COLOR_MASK: material.ColorMask = Material.ColorMask; break;
 						case EMF_COLOR_MATERIAL: material.ColorMaterial = Material.ColorMaterial; break;
@@ -435,11 +436,13 @@ namespace video
 		shares the zbuffer with the screen buffer.
 		\param name An optional name for the RTT.
 		\param format The color format of the render target. Floating point formats are supported.
+		\param useStencil Whether to enable stencil for this RTT. Default false.
 		\return Pointer to the created texture or 0 if the texture
 		could not be created. This pointer should not be dropped. See
 		IReferenceCounted::drop() for more information. */
 		virtual ITexture* addRenderTargetTexture(const core::dimension2d<u32>& size,
-				const io::path& name = "rt", const ECOLOR_FORMAT format = ECF_UNKNOWN) =0;
+				const io::path& name = "rt", const ECOLOR_FORMAT format = ECF_UNKNOWN,
+				const bool useStencil = false) =0;
 
 		//! Removes a texture from the texture cache and deletes it.
 		/** This method can free a lot of memory!

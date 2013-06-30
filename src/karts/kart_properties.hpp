@@ -215,6 +215,16 @@ private:
     float       m_nitro_fade_out_time;
     /** Maximum nitro a kart can collect. */
     float       m_nitro_max;
+    /** Bubble gum diration. */
+    float       m_bubblegum_time;
+    /** Torque to add when a bubble gum was hit in order to make the kart go 
+     *  sideways a bit. */
+    float       m_bubblegum_torque;
+    /** Fraction of top speed that can be reached maximum after hitting a
+     *  bubble gum. */
+    float       m_bubblegum_speed_fraction;
+    /** How long to fade in the slowdown for a bubble gum. */
+    float       m_bubblegum_fade_in_time;
     /** Square of the maximum distance a swatter can operate. */
     float       m_swatter_distance2;
     /** How long the swatter lasts. */
@@ -225,6 +235,14 @@ private:
      *  is max_speed*m_squash_slowdown. */
     float       m_squash_slowdown;
 
+    /** The maximum roll a kart graphics should show when driving in a fast
+     *  curve. This is read in as degrees, but stored in radians. */
+     float      m_max_lean;
+
+     /** The speed with which the roll (when leaning in a curve) changes
+      *  (in radians/second). */
+     float      m_lean_speed;
+     
     /** Engine sound effect. */
     std::string m_engine_sfx_type;
 
@@ -560,7 +578,19 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the maximum amount of nitro a kart can store. */
     float getNitroMax               () const {return m_nitro_max;             }
-
+    // ------------------------------------------------------------------------
+    /** Returns how long a bubble gum is active. */
+    float getBubblegumTime() const { return m_bubblegum_time; }
+    // ------------------------------------------------------------------------
+    /** Returns the torque to add when a bubble gum was hit . */
+    float getBubblegumTorque() const { return m_bubblegum_torque; }
+    // ------------------------------------------------------------------------
+    /** Returns the fraction of top speed that can be reached maximum after 
+     *  hitting a bubble gum. */
+    float getBubblegumSpeedFraction() const {return m_bubblegum_speed_fraction;}
+    // ------------------------------------------------------------------------
+    /** Returns how long to fade in the slowdown for a bubble gum. */
+    float getBubblegumFadeInTime() const { return m_bubblegum_fade_in_time; }
     // ------------------------------------------------------------------------
     /** Returns a shift of the center of mass (lowering the center of mass
      *  makes the karts more stable. */
@@ -806,6 +836,13 @@ public:
     /** Returns the slowdown of a kart that is squashed. */
     float getSquashSlowdown() const {return m_squash_slowdown; }
 
+    // ------------------------------------------------------------------------
+    /** The maximum leaning a kart should show (In radians). */
+    float getMaxLean() const { return m_max_lean; }
+
+    // ------------------------------------------------------------------------
+    /** The speed with which a kart should lean (in radians/s). */
+    float getLeanSpeed() const { return m_lean_speed; }
     // ------------------------------------------------------------------------
     /** Returns true if wheels should have random rotation at start. */
     bool hasRandomWheels() const { return m_has_rand_wheels; }

@@ -9,7 +9,7 @@ void main()
     gl_TexCoord[1] = gl_MultiTexCoord1;
     gl_Position = ftransform();
     vertex_color = gl_Color;
-    
+
     //normal = normalize(gl_NormalMatrix * gl_Normal);
     normal = normalize(gl_Normal);
     lightdir2 = normalize(lightdir);
