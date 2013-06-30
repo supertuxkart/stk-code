@@ -177,3 +177,42 @@ bool Addon::testIncluded(const std::string &min_ver, const std::string &max_ver)
 
     return (min_version <= current_version && max_version >= current_version);
 }
+
+// ----------------------------------------------------------------------------
+/** 
+ * \brief Filter the add-on with a list of words.
+ * \param words A list of words separated by ' '.
+ * \return true if the add-on contains one of the words, otherwise false.
+ */
+bool Addon::filterByWords(const core::stringw words) const
+{
+    if (words == NULL || words.empty())
+        return true;
+
+    std::vector<core::stringw> list = StringUtils::split(words, ' ', false);
+
+    for (unsigned int i = 0; i < list.size(); i++)
+    {
+        list[i].make_lower();
+        
+        core::stringw name = core::stringw(m_name).make_lower();
+        if (name.find(list[i].c_str()) != -1)
+        {
+            return true;
+        }
+        
+        core::stringw designer = core::stringw(m_designer).make_lower();
+        if (designer.find(list[i].c_str()) != -1)
+        {
+            return true;
+        }
+        
+        core::stringw description = core::stringw(m_description).make_lower();
+        if (description.find(list[i].c_str()) != -1)
+        {
+            return true;
+        }
+    }
+    
+    return false;
+} // filterByWords
