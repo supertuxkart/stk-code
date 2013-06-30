@@ -14,13 +14,13 @@
         
         <buttonbar id="menu_toprow" proportion="3" width="90%" align="center">
             <icon-button id="quick_play" width="128" height="128"
-                         icon="gui/menu_race.png" focus_icon="gui/menu_race_focus.png"
+                         icon="gui/online/menu_quick_play.png" focus_icon="gui/online/menu_quick_play_hover.png"
                          I18N="Online menu button" text="Quick Play"/>
             <icon-button id="find_server" width="128" height="128"
-                         icon="gui/menu_race.png" focus_icon="gui/menu_race_focus.png"
+                         icon="gui/online/menu_find_server.png" focus_icon="gui/online/menu_find_server_hover.png"
                          I18N="Online menu button" text="Find Server"/>
             <icon-button id="create_server" width="128" height="128"
-                         icon="gui/menu_race.png" focus_icon="gui/menu_race_focus.png"
+                         icon="gui/online/menu_create_server.png" focus_icon="gui/online/menu_create_server_hover.png"
                          I18N="Online menu button" text="Create Server"/>
         </buttonbar>
         
