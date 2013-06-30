@@ -113,13 +113,11 @@ void AddonsScreen::beforeAddingWidget()
     w_filter_date->m_properties[GUIEngine::PROP_MAX_VALUE] = 
                             StringUtils::toString(m_date_filters.size() - 1);
     
-    for (int n = 0; n < m_date_filters.size(); n++)
+    for (unsigned int n = 0; n < m_date_filters.size(); n++)
     {
         w_filter_date->addLabel(m_date_filters[n].label);
     }
 
-    w_filter_date->setValue(0);
-    
     GUIEngine::SpinnerWidget* w_filter_rating =
                         getWidget<GUIEngine::SpinnerWidget>("filter_rating");
     w_filter_rating->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
@@ -129,8 +127,6 @@ void AddonsScreen::beforeAddingWidget()
     {
         w_filter_rating->addLabel(StringUtils::toWString(1.0 + n / 2.0));
     }
-
-    w_filter_rating->setValue(0);
 }
 // ----------------------------------------------------------------------------
 
@@ -164,7 +160,16 @@ void AddonsScreen::init()
     else
         getWidget<GUIEngine::ButtonWidget>("reload")->setActivated();
 
-
+    // Reset filter.
+    GUIEngine::TextBoxWidget* w_filter_name =
+                        getWidget<GUIEngine::TextBoxWidget>("filter_name");
+    w_filter_name->setText(L"");
+    GUIEngine::SpinnerWidget* w_filter_date =
+                        getWidget<GUIEngine::SpinnerWidget>("filter_date");
+    w_filter_date->setValue(0);
+    GUIEngine::SpinnerWidget* w_filter_rating =
+                        getWidget<GUIEngine::SpinnerWidget>("filter_rating");
+    w_filter_rating->setValue(0);
 
     // Set the default sort order
     Addon::setSortOrder(Addon::SO_DEFAULT);
