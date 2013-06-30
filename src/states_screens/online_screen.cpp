@@ -101,13 +101,9 @@ bool OnlineScreen::hasStateChanged()
 // ----------------------------------------------------------------------------
 void OnlineScreen::beforeAddingWidget()
 {
-    //Set all children of the bottom menu visible (again)
-    for(int i = 0; i < m_bottom_menu_widget->getRibbonChildren().size(); i++)
-        m_bottom_menu_widget->getRibbonChildren()[i].setVisible(true);
-
-    //Remove all badges of the top menu
-    for(int i = 0; i < m_top_menu_widget->getRibbonChildren().size(); i++)
-        m_top_menu_widget->getRibbonChildren()[i].resetAllBadges();
+    //Set everything that could be set invisible or deactivated, to active and visible
+    m_bottom_menu_widget->setVisible(true);
+    m_top_menu_widget->setVisible(true);
 
     hasStateChanged();
     if (m_recorded_state == Registered)
@@ -117,15 +113,15 @@ void OnlineScreen::beforeAddingWidget()
     }
     else if (m_recorded_state == Not)
     {
-        m_quick_play_widget->setBadge(LOCKED_BADGE);
-        m_find_server_widget->setBadge(LOCKED_BADGE);
-        m_create_server_widget->setBadge(LOCKED_BADGE);
+        m_quick_play_widget->setDeactivated();
+        m_find_server_widget->setDeactivated();
+        m_create_server_widget->setDeactivated();
         m_sign_out_widget->setVisible(false);
     }
     else if (m_recorded_state == Guest)
     {
-        m_find_server_widget->setBadge(LOCKED_BADGE);
-        m_create_server_widget->setBadge(LOCKED_BADGE);
+        m_find_server_widget->setDeactivated();
+        m_create_server_widget->setDeactivated();
         m_sign_in_widget->setVisible(false);
     }
 
@@ -137,7 +133,11 @@ void OnlineScreen::beforeAddingWidget()
 void OnlineScreen::init()
 {
     Screen::init();
-    m_top_menu_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    if(m_recorded_state == Not)
+        m_bottom_menu_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    else
+        m_top_menu_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+
     DemoWorld::resetIdleTime();
     m_online_status_widget->setText(irr::core::stringw(_("Signed in as : ")) + CurrentOnlineUser::get()->getUserName() + ".", false);
 }   // init
@@ -182,24 +182,18 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (selection == "find_server")
     {
-        if (m_recorded_state == Registered)
+        //if (m_recorded_state == Registered)
             new MessageDialog("Coming soon!");
-        else
-            new LoginDialog(LoginDialog::Registration_Required);
     }
     else if (selection == "create_server")
     {
-        if (m_recorded_state == Registered)
+        //if (m_recorded_state == Registered)
             new MessageDialog("Coming soon!");
-        else
-            new LoginDialog(LoginDialog::Registration_Required);
     }
     else if (selection == "quick_play")
     {
-        if (m_recorded_state == Registered || m_recorded_state == Guest)
+        //if (m_recorded_state == Registered || m_recorded_state == Guest)
             new MessageDialog("Coming soon!");
-        else
-            new LoginDialog(LoginDialog::Signing_In_Required);
     }
 
 }   // eventCallback
@@ -214,4 +208,12 @@ void OnlineScreen::tearDown()
 
 void OnlineScreen::onDisabledItemClicked(const std::string& item)
 {
+    if (item == "find_server" || item =="create_server")
+    {
+            new LoginDialog(LoginDialog::Registration_Required);
+    }
+    else if (item == "quick_play")
+    {
+            new LoginDialog(LoginDialog::Signing_In_Required);
+    }
 }   // onDisabledItemClicked
