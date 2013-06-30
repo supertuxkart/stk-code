@@ -94,7 +94,7 @@ void RibbonWidget::add()
     m_active_children.clearWithoutDeleting(); // Is just a copy of m_children without the deactivated children. m_children takes care of memory.
     for (int i=0; i<m_children.size(); i++)
     {
-        if (!m_children[i].m_deactivated)
+        if (m_children[i].isVisible())
         {
             m_active_children.push_back(m_children.get(i));
         }
