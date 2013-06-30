@@ -101,9 +101,10 @@ bool CurrentOnlineUser::signIn( const irr::core::stringw &username,
     {
         if (rec_success =="yes")
         {
-            assert(result->get("token", &m_token));
-            assert(result->get("username", &m_name));
-            assert(result->get("userid", &m_id));
+            int token_fetched = result->get("token", &m_token);
+            int username_fetched = result->get("username", &m_name);
+            int userid_fetched = result->get("userid", &m_id);
+            assert(token_fetched && username_fetched && userid_fetched);
             m_is_signed_in = true;
             m_is_guest = false;
         }
