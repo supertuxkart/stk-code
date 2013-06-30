@@ -37,7 +37,6 @@ private:
     
     bool m_self_destroy;
     bool m_open_registration_dialog;
-    bool m_reshow_current_screen;
 
     GUIEngine::LabelWidget * m_info_widget;
     GUIEngine::TextBoxWidget * m_username_widget;

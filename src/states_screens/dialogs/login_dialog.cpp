@@ -40,7 +40,6 @@ LoginDialog::LoginDialog(const Message message_type) :
 {
     m_self_destroy = false;
     m_open_registration_dialog = false;
-    m_reshow_current_screen = false;
     loadFromFile("online/login_dialog.stkgui");
 
     m_info_widget = getWidget<LabelWidget>("info");
@@ -105,7 +104,6 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
         stringw info = "";
         if(CurrentOnlineUser::get()->signIn(username,password,info))
         {
-            m_reshow_current_screen = true;
             m_self_destroy = true;
         }
         else
@@ -128,7 +126,7 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
 
 void LoginDialog::onEnterPressedInternal()
 {
-    //If enter was pressed while "cancel" nor "signup" was selected, then interpret as "signin" press.
+    //If enter was pressed while none of the other widgets are focused, then interpret as "signin" press.
     const int playerID = PLAYER_ID_GAME_MASTER;
     if (!GUIEngine::isFocusedForPlayer(m_recovery_widget, playerID)     &&
         !GUIEngine::isFocusedForPlayer(m_register_widget, playerID)     &&
@@ -150,14 +148,6 @@ void LoginDialog::onUpdate(float dt)
     if (m_self_destroy)
     {
         ModalDialog::dismiss();
-        if (m_reshow_current_screen)
-            /*Replaced to online state screen. Not 100% how I will handle this.
-             * Thee options :
-             * - Listener
-             * - Directly calling GUIEngine::reshowCurrentScreen(); (old option)
-             * - Underlying stateschreen is responsible for polling changed state (current option)
-             */
-            true;//GUIEngine::reshowCurrentScreen();
         if (m_open_registration_dialog)
             new RegistrationDialog(0.8f, 0.9f);
 

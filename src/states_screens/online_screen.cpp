@@ -32,8 +32,8 @@
 #include "main_loop.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/dialogs/login_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/login_dialog.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "modes/demo_world.hpp"
 #include "utils/translation.hpp"
@@ -133,12 +133,8 @@ void OnlineScreen::beforeAddingWidget()
 void OnlineScreen::init()
 {
     Screen::init();
-    if(m_recorded_state == Not)
-        m_bottom_menu_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    else
-        m_top_menu_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-
-    DemoWorld::resetIdleTime();
+    setInitialFocus();
+    DemoWorld::resetIdleTime(); //FIXME : what's this?
     m_online_status_widget->setText(irr::core::stringw(_("Signed in as : ")) + CurrentOnlineUser::get()->getUserName() + ".", false);
 }   // init
 
@@ -205,7 +201,6 @@ void OnlineScreen::tearDown()
 }   // tearDown
 
 // ----------------------------------------------------------------------------
-
 void OnlineScreen::onDisabledItemClicked(const std::string& item)
 {
     if (item == "find_server" || item =="create_server")
@@ -217,3 +212,21 @@ void OnlineScreen::onDisabledItemClicked(const std::string& item)
             new LoginDialog(LoginDialog::Signing_In_Required);
     }
 }   // onDisabledItemClicked
+
+// ----------------------------------------------------------------------------
+void OnlineScreen::setInitialFocus()
+{
+    if(m_recorded_state == Not)
+        m_bottom_menu_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    else
+        m_top_menu_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+}   // setInitialFocus
+
+// ----------------------------------------------------------------------------
+void OnlineScreen::onDialogClose()
+{
+    if (hasStateChanged())
+        GUIEngine::reshowCurrentScreen();
+    else
+        setInitialFocus();
+}   // onLoginDialogClose()

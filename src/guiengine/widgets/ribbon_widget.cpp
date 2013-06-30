@@ -471,7 +471,6 @@ void RibbonWidget::select(std::string item, const int mousePlayerID)
 // ----------------------------------------------------------------------------
 EventPropagation RibbonWidget::rightPressed(const int playerID)
 {
-    Log::info("RibbonWidget", "Right Pressed");
     if (m_deactivated) return EVENT_LET;
     // empty ribbon, or only one item (can't move right)
     if (m_active_children.size() < 2) return EVENT_LET;

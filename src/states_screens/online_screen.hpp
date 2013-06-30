@@ -29,7 +29,8 @@ namespace GUIEngine { class Widget; class ListWidget; }
   * \brief Handles the main menu
   * \ingroup states_screens
   */
-class OnlineScreen :    public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OnlineScreen>
+class OnlineScreen :    public GUIEngine::Screen,
+                        public GUIEngine::ScreenSingleton<OnlineScreen>
 {
 private:
     friend class GUIEngine::ScreenSingleton<OnlineScreen>;
@@ -59,6 +60,8 @@ private:
 
     /** \brief Checks if the recorded state differs from the actual state and sets it. */
     bool hasStateChanged();
+    /** \brief Sets which widget has to be focused. Depends on the user state. */
+    void setInitialFocus();
 
 public:
 
@@ -82,6 +85,9 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onDisabledItemClicked(const std::string& item) OVERRIDE;
+
+    /** \brief Implements the callback when a dialog gets closed. */
+    virtual void onDialogClose() OVERRIDE;
 };
 
 #endif
