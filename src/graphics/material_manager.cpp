@@ -284,7 +284,8 @@ void MaterialManager::popTempMaterial()
 Material *MaterialManager::getMaterial(const std::string& fname,
                                        bool is_full_path,
                                        bool make_permanent,
-                                       bool complain_if_not_found)
+                                       bool complain_if_not_found,
+                                       bool strip_path)
 {
     if(fname=="")
     {
@@ -297,8 +298,13 @@ Material *MaterialManager::getMaterial(const std::string& fname,
         return NULL;
     }
 
-    std::string basename=StringUtils::getBasename(fname);
-
+    std::string basename;
+    
+    if (strip_path)
+        basename = StringUtils::getBasename(fname);
+    else
+        basename = fname;
+        
     // Search backward so that temporary (track) textures are found first
     for(int i = (int)m_materials.size()-1; i>=0; i-- )
     {

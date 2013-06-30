@@ -224,8 +224,10 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // (e.g. when freeing temp. materials from a track, the last icon
     //  would get deleted, too.
     m_icon_material = material_manager->getMaterial(m_icon_file,
-                                                    /*is_full+path*/true,
-                                                    /*make_permanent*/true);
+                                                    /*is_full_path*/true,
+                                                    /*make_permanent*/true,
+                                                    /*complain_if_not_found*/true,
+                                                    /*strip_path*/false);
     if(m_minimap_icon_file!="")
         m_minimap_icon = irr_driver->getTexture(m_root+m_minimap_icon_file);
     else
