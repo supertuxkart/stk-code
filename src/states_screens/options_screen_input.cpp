@@ -257,6 +257,7 @@ void OptionsScreenInput::filterInput(Input::InputType type,
                                      int deviceID,
                                      int btnID,
                                      int axisDir,
+                                     int axisRange,
                                      int value)
 {
     if (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON)

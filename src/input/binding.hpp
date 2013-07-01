@@ -36,6 +36,7 @@ private:
     Input::InputType        m_type;
     int                     m_id;
     Input::AxisDirection    m_dir;
+    Input::AxisRange        m_range;
     wchar_t                 m_character;
 public:
     /** Returns the type of device this binding is using. */
@@ -47,12 +48,16 @@ public:
     /** Returns the direction this binding is using. */
     Input::AxisDirection getDirection() const {return m_dir;}
     // ------------------------------------------------------------------------
+    /** Returns the range this binding is using. */
+    Input::AxisRange getRange() const {return m_range;}
+    // ------------------------------------------------------------------------
     /** Defines all values of this binding. */
     void                 set(Input::InputType type, int id,
                              Input::AxisDirection dir,
+                             Input::AxisRange range,
                              wchar_t character)
     {
-        m_type = type; m_id=id; m_dir=dir; m_character=character;
+        m_type = type; m_id=id; m_dir=dir; m_range=range; m_character=character;
     }   // set
 
     // ------------------------------------------------------------------------
