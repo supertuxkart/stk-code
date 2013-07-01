@@ -70,6 +70,8 @@ LoginDialog::LoginDialog(const Message message_type) :
     m_message_widget = getWidget<LabelWidget>("message");
     assert(m_message_widget != NULL);
 
+    m_options_widget = getWidget<RibbonWidget>("options");
+    assert(m_options_widget != NULL);
     m_sign_in_widget = getWidget<IconButtonWidget>("sign_in");
     assert(m_sign_in_widget != NULL);
     m_recovery_widget = getWidget<IconButtonWidget>("recovery");
@@ -126,15 +128,12 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
 
 void LoginDialog::onEnterPressedInternal()
 {
-    //If enter was pressed while none of the other widgets are focused, then interpret as "signin" press.
+
+    //If enter was pressed while none of the buttons was focused interpret as sign_in event
     const int playerID = PLAYER_ID_GAME_MASTER;
-    if (!GUIEngine::isFocusedForPlayer(m_recovery_widget, playerID)     &&
-        !GUIEngine::isFocusedForPlayer(m_register_widget, playerID)     &&
-        !GUIEngine::isFocusedForPlayer(m_as_guest_widget, playerID)     &&
-        !GUIEngine::isFocusedForPlayer(m_cancel_widget, playerID))
-    {
-        processEvent("sign_in");
-    }
+    if (GUIEngine::isFocusedForPlayer(m_options_widget, playerID))
+        return;
+    processEvent("sign_in");
 }
 
 // -----------------------------------------------------------------------------

@@ -147,7 +147,7 @@ bool RegistrationDialog::processInfoEvent(const std::string& eventSource){
             m_password_confirm =  getWidget<TextBoxWidget>("password_confirm")->getText().trim();
             m_email = getWidget<TextBoxWidget>("email")->getText().trim();
             m_email_confirm = getWidget<TextBoxWidget>("email_confirm")->getText().trim();
-            //FIXME More validation of registration information (Though all validation should happen at the server too!)
+            //FIXME More validation of registration information
             if (m_password != m_password_confirm)
             {
                 getWidget<LabelWidget>("info")->setText(_("Passwords don't match!"), false);
@@ -260,17 +260,18 @@ GUIEngine::EventPropagation RegistrationDialog::processEvent(const std::string& 
 
 void RegistrationDialog::onEnterPressedInternal()
 {
-    //If enter was pressed while "cancel" nor "previous" was selected, then interpret as "next" press.
+    //If enter was pressed while no button was focused, then interpret as "next" press.
     const int playerID = PLAYER_ID_GAME_MASTER;
     bool interpret_as_next = true;
-    ButtonWidget* button = getWidget<ButtonWidget>("cancel");
-    assert(button != NULL);
-    interpret_as_next = interpret_as_next && !GUIEngine::isFocusedForPlayer(button, playerID);
+    ButtonWidget * cancel_widget = getWidget<ButtonWidget>("cancel");
+    ButtonWidget * next_widget = getWidget<ButtonWidget>("next");
+    interpret_as_next = interpret_as_next &&
+                        !GUIEngine::isFocusedForPlayer(next_widget, playerID) &&
+                        !GUIEngine::isFocusedForPlayer(cancel_widget, playerID);
     if (interpret_as_next && m_phase == Terms)
     {
-        button = getWidget<ButtonWidget>("previous");
-        assert(button != NULL);
-        interpret_as_next = interpret_as_next && !GUIEngine::isFocusedForPlayer(button, playerID);
+        ButtonWidget * previous_widget = getWidget<ButtonWidget>("previous");
+        interpret_as_next = interpret_as_next && !GUIEngine::isFocusedForPlayer(previous_widget, playerID);
     }
     if (interpret_as_next)
     {
