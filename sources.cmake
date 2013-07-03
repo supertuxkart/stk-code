@@ -70,10 +70,10 @@ src/guiengine/widgets/label_widget.cpp
 src/guiengine/widgets/list_widget.cpp
 src/guiengine/widgets/model_view_widget.cpp
 src/guiengine/widgets/progress_bar_widget.cpp
+src/guiengine/widgets/rating_bar_widget.cpp
 src/guiengine/widgets/ribbon_widget.cpp
 src/guiengine/widgets/spinner_widget.cpp
 src/guiengine/widgets/text_box_widget.cpp
-src/guiengine/widgets/rating_bar_widget.cpp
 src/input/binding.cpp
 src/input/device_manager.cpp
 src/input/input_device.cpp
@@ -322,10 +322,10 @@ src/guiengine/widgets/label_widget.hpp
 src/guiengine/widgets/list_widget.hpp
 src/guiengine/widgets/model_view_widget.hpp
 src/guiengine/widgets/progress_bar_widget.hpp
+src/guiengine/widgets/rating_bar_widget.hpp
 src/guiengine/widgets/ribbon_widget.hpp
 src/guiengine/widgets/spinner_widget.hpp
 src/guiengine/widgets/text_box_widget.hpp
-src/guiengine/widgets/rating_bar_widget.hpp
 src/input/binding.hpp
 src/input/device_manager.hpp
 src/input/input_device.hpp
