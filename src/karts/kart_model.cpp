@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -27,9 +26,13 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/mesh_tools.hpp"
+#include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
+#include "physics/btKart.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 
 #define SKELETON_DEBUG 0
 
@@ -49,21 +52,25 @@ float KartModel::UNDEFINED = -99.9f;
  *  crash if attachModel is called or the destructor notices any
  *  wheels being defined.
  *  The other types are copies of one of the master objects: these are
- *  used when actually displaying the karts (e.g. in race). They must 
+ *  used when actually displaying the karts (e.g. in race). They must
  *  be copied since otherwise (if the same kart is used more than once)
  *  shared variables in KartModel (esp. animation status) will cause
  *  incorrect animations. The mesh is shared (between the master instance
  *  and all of its copies).
- *  Technically the scene node and mesh should be grab'ed on copy, 
+ *  Technically the scene node and mesh should be grab'ed on copy,
  *  and dropped when the copy is deleted. But since the master copy
  *  in the kart_properties_manager is always kept, there is no risk of
  *  a mesh being deleted to early.
  */
 KartModel::KartModel(bool is_master)
 {
-    m_is_master = is_master;
-    m_kart = NULL;
-    
+    m_is_master  = is_master;
+    m_kart       = NULL;
+    m_mesh       = NULL;
+    m_hat_name   = "";
+    m_hat_node   = NULL;
+    m_hat_offset = core::vector3df(0,0,0);
+
     for(unsigned int i=0; i<4; i++)
     {
         m_wheel_graphics_position[i] = Vec3(UNDEFINED);
@@ -72,10 +79,10 @@ KartModel::KartModel(bool is_master)
         m_wheel_model[i]             = NULL;
         m_wheel_node[i]              = NULL;
 
-        // default value for kart suspensions. move to config file later 
+        // default value for kart suspensions. move to config file later
         // if we find each kart needs custom values
-        m_min_suspension[i] = -1.3f;
-        m_max_suspension[i] = 1.3f;
+        m_min_suspension[i] = -0.59f;
+        m_max_suspension[i] = 0.59f;
         m_dampen_suspension_amplitude[i] = 2.5f;
     }
     m_wheel_filename[0] = "";
@@ -91,7 +98,7 @@ KartModel::KartModel(bool is_master)
 }   // KartModel
 
 // ----------------------------------------------------------------------------
-/** This function loads the information about the kart from a xml file. It 
+/** This function loads the information about the kart from a xml file. It
  *  does not actually load the models (see load()).
  *  \param node  XML object of configuration file.
  */
@@ -104,11 +111,11 @@ void KartModel::loadInfo(const XMLNode &node)
         animation_node->get("straight",       &m_animation_frame[AF_STRAIGHT]  );
         animation_node->get("right",          &m_animation_frame[AF_RIGHT]     );
         animation_node->get("start-winning",  &m_animation_frame[AF_WIN_START] );
-        animation_node->get("start-winning-loop",  
+        animation_node->get("start-winning-loop",
                                               &m_animation_frame[AF_WIN_LOOP_START] );
         animation_node->get("end-winning",    &m_animation_frame[AF_WIN_END]   );
         animation_node->get("start-losing",   &m_animation_frame[AF_LOSE_START]);
-        animation_node->get("start-losing-loop", 
+        animation_node->get("start-losing-loop",
                                              &m_animation_frame[AF_LOSE_LOOP_START]);
         animation_node->get("end-losing",     &m_animation_frame[AF_LOSE_END]  );
         animation_node->get("start-explosion",&m_animation_frame[AF_LOSE_START]);
@@ -123,6 +130,36 @@ void KartModel::loadInfo(const XMLNode &node)
         loadWheelInfo(*wheels_node, "rear-right",  2);
         loadWheelInfo(*wheels_node, "rear-left",   3);
     }
+
+    // FIXME fallback for karts that don't have nitro emitter
+    /*
+    m_nitro_emitter_position[0] = Vec3 (0, m_kart_height*0.35f,
+                                          -m_kart_length*0.35f);
+
+    m_nitro_emitter_position[1] = Vec3 (0, m_kart_height*0.35f,
+                                          -m_kart_length*0.35f); */
+    
+    m_nitro_emitter_position[0] = Vec3 (0,0.1f,0);
+
+    m_nitro_emitter_position[1] = Vec3 (0,0.1f,0);
+
+    if(const XMLNode *nitroEmitter_node=node.getNode("nitro-emitter"))
+    {
+        loadNitroEmitterInfo(*nitroEmitter_node, "nitro-emitter-a", 0);
+        loadNitroEmitterInfo(*nitroEmitter_node, "nitro-emitter-b", 1);
+    }
+
+    if(const XMLNode *hat_node=node.getNode("hat"))
+    {
+        if(hat_node->get("offset", &m_hat_offset))
+        {
+            // Xmas mode handling :)
+            if(UserConfigParams::m_xmas_enabled)
+                setHatMeshName("christmas_hat.b3d");
+        }
+    }
+    else
+        m_hat_offset = core::vector3df(0,0,0);
 }   // loadInfo
 
 // ----------------------------------------------------------------------------
@@ -135,23 +172,41 @@ KartModel::~KartModel()
         m_animated_node->setAnimationEndCallback(NULL);
         m_animated_node->drop();
     }
-    
+
     for(unsigned int i=0; i<4; i++)
     {
         if(m_wheel_node[i])
         {
             // Master KartModels should never have a wheel attached.
             assert(!m_is_master);
+
             m_wheel_node[i]->drop();
+        }
+        if(m_is_master && m_wheel_model[i])
+        {
+            irr_driver->dropAllTextures(m_wheel_model[i]);
+            irr_driver->removeMeshFromCache(m_wheel_model[i]);
+        }
+    }
+
+    if(m_is_master && m_mesh)
+    {
+        m_mesh->drop();
+        // If there is only one copy left, it's the copy in irrlicht's
+        // mesh cache, so it can be remove.
+        if(m_mesh && m_mesh->getReferenceCount()==1)
+        {
+            irr_driver->dropAllTextures(m_mesh);
+            irr_driver->removeMeshFromCache(m_mesh);
         }
     }
 
 #ifdef DEBUG
 #if SKELETON_DEBUG
-    irr_driver->debug_meshes.clear();
+    irr_driver->clearDebugMeshes();
 #endif
 #endif
-    
+
 }  // ~KartModel
 
 // ----------------------------------------------------------------------------
@@ -176,6 +231,12 @@ KartModel* KartModel::makeCopy()
     km->m_animation_speed   = m_animation_speed;
     km->m_current_animation = AF_DEFAULT;
     km->m_animated_node     = NULL;
+    km->m_hat_offset        = m_hat_offset;
+    km->m_hat_name          = m_hat_name;
+    
+    km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
+    km->m_nitro_emitter_position[1] = m_nitro_emitter_position[1];
+    
     for(unsigned int i=0; i<4; i++)
     {
         km->m_wheel_model[i]             = m_wheel_model[i];
@@ -203,65 +264,108 @@ KartModel* KartModel::makeCopy()
 scene::ISceneNode* KartModel::attachModel(bool animated_models)
 {
     assert(!m_is_master);
-    
+
     scene::ISceneNode* node;
-    
+
     if (animated_models)
     {
-        LODNode* lod_node = new LODNode(
-                            irr_driver->getSceneManager()->getRootSceneNode(),
-                            irr_driver->getSceneManager()                    );
+        LODNode* lod_node = new LODNode("kart",
+                                        irr_driver->getSceneManager()->getRootSceneNode(),
+                                        irr_driver->getSceneManager()                    );
 
 
         node = irr_driver->addAnimatedMesh(m_mesh);
+        // as animated mesh are not cheap to render use frustum box culling
+        node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
+
         lod_node->add(50, node, true);
         scene::ISceneNode* static_model = attachModel(false);
         lod_node->add(500, static_model, true);
         m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
+
+        m_hat_node = NULL;
+        if(m_hat_name.size()>0)
+        {
+            scene::IBoneSceneNode *bone = m_animated_node->getJointNode("Head");
+            if(!bone)
+                bone = m_animated_node->getJointNode("head");
+            if(bone)
+            {
+
+                // Till we have all models fixed, accept Head and head as bone naartme
+                scene::IMesh *hat_mesh =
+                    irr_driver->getAnimatedMesh(
+                         file_manager->getModelFile(m_hat_name));
+                m_hat_node = irr_driver->addMesh(hat_mesh);
+                bone->addChild(m_hat_node);
+                m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
+                m_animated_node->OnAnimate(0);
+                bone->updateAbsolutePosition();
+
+                // With the hat node attached to the head bone, we have to
+                // reverse the transformation of the bone, so that the hat
+                // is still properly placed. Esp. the hat offset needs
+                // to be rotated.
+                const core::matrix4 mat = bone->getAbsoluteTransformation();
+                core::matrix4 inv;
+                mat.getInverse(inv);
+                core::vector3df rotated_offset;
+                inv.rotateVect(rotated_offset, m_hat_offset);
+                m_hat_node->setPosition(rotated_offset);
+                m_hat_node->setScale(inv.getScale());
+                m_hat_node->setRotation(inv.getRotationDegrees());
+            }   // if bone
+        }   // if(m_hat_name)
+
 #ifdef DEBUG
         std::string debug_name = m_model_filename+" (animated-kart-model)";
         node->setName(debug_name.c_str());
 #if SKELETON_DEBUG
-        irr_driver->debug_meshes.push_back(m_animated_node);
+        irr_driber->addDebugMesh(m_animated_node);
 #endif
-#endif        
+#endif
         m_animated_node->setLoopMode(false);
         m_animated_node->grab();
         node = lod_node;
+
+        // Become the owner of the wheels
+        for(unsigned int i=0; i<4; i++)
+        {
+            if(!m_wheel_model[i]) continue;
+            m_wheel_node[i]->setParent(lod_node);
+        }
     }
     else
     {
         // If no animations are shown, make sure to pick the frame
         // with a straight ahead animation (if exist).
-        int straight_frame = m_animation_frame[AF_STRAIGHT]>=0 
+        int straight_frame = m_animation_frame[AF_STRAIGHT]>=0
                            ? m_animation_frame[AF_STRAIGHT]
                            : 0;
-        
+
         scene::IMesh* main_frame = m_mesh->getMesh(straight_frame);
         main_frame->setHardwareMappingHint(scene::EHM_STATIC);
-        
+
         node = irr_driver->addMesh(main_frame);
 #ifdef DEBUG
         std::string debug_name = m_model_filename+" (kart-model)";
         node->setName(debug_name.c_str());
 #endif
+        for(unsigned int i=0; i<4; i++)
+        {
+            if(!m_wheel_model[i]) continue;
+            m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], node);
+            m_wheel_node[i]->grab();
+    #ifdef DEBUG
+            std::string debug_name = m_wheel_filename[i]+" (wheel)";
+            m_wheel_node[i]->setName(debug_name.c_str());
+    #endif
+            m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
+        }
     }
-    
-
-    for(unsigned int i=0; i<4; i++)
-    {
-        if(!m_wheel_model[i]) continue;
-        m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], node);
-        m_wheel_node[i]->grab();
-#ifdef DEBUG
-        std::string debug_name = m_wheel_filename[i]+" (wheel)";
-        m_wheel_node[i]->setName(debug_name.c_str());
-#endif
-        m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
-    }
-    
     return node;
 }   // attachModel
+
 
 // ----------------------------------------------------------------------------
 /** Loads the 3d model and all wheels.
@@ -269,15 +373,17 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
 bool KartModel::loadModels(const KartProperties &kart_properties)
 {
     assert(m_is_master);
-    std::string  full_path = kart_properties.getKartDir()+"/"+m_model_filename;
+    std::string  full_path = kart_properties.getKartDir()+m_model_filename;
     m_mesh                 = irr_driver->getAnimatedMesh(full_path);
-    
     if(!m_mesh)
     {
-        printf("Problems loading mesh '%s' - kart '%s' will not be available\n",
-            full_path.c_str(), kart_properties.getIdent().c_str());
+        Log::error("Kart_Model", "Problems loading mesh '%s' - kart '%s' will"
+                   "not be available.",
+                   full_path.c_str(), kart_properties.getIdent().c_str());
         return false;
     }
+    m_mesh->grab();
+    irr_driver->grabAllTextures(m_mesh);
 
     Vec3 min, max;
     MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), &min, &max);
@@ -286,15 +392,15 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     m_kart_width  = size.getX();
     m_kart_height = size.getY();
     m_kart_length = size.getZ();
-    
-    // Now set default some default parameters (if not defined) that 
+
+    // Now set default some default parameters (if not defined) that
     // depend on the size of the kart model (wheel position, center
     // of gravity shift)
     for(unsigned int i=0; i<4; i++)
     {
         if(m_wheel_graphics_position[i].getX()==UNDEFINED)
         {
-            m_wheel_graphics_position[i].setX( ( i==1||i==3) 
+            m_wheel_graphics_position[i].setX( ( i==1||i==3)
                                                ? -0.5f*m_kart_width
                                                :  0.5f*m_kart_width  );
             m_wheel_graphics_position[i].setY(0);
@@ -310,14 +416,42 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     {
         // For kart models without wheels.
         if(m_wheel_filename[i]=="") continue;
-        std::string full_wheel = 
-            kart_properties.getKartDir()+"/"+m_wheel_filename[i];
+        std::string full_wheel =
+            kart_properties.getKartDir()+m_wheel_filename[i];
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
-        // FIXME: wheel handling still missing.
+        // Grab all textures. This is done for the master only, so
+        // the destructor will only free the textures if a master
+        // copy is freed.
+        irr_driver->grabAllTextures(m_wheel_model[i]);
     }   // for i<4
-    
+
     return true;
 }   // loadModels
+
+// ----------------------------------------------------------------------------
+/** Loads a single nitro emitter node. Currently this the position of the nitro
+ *  emitter relative to the kart.
+ *  \param emitter_name Name of the nitro emitter, e.g. emitter-a.
+ *  \param index Index of this emitter in the global m_emitter* fields.
+ */
+void KartModel::loadNitroEmitterInfo(const XMLNode &node,
+                              const std::string &emitter_name, int index)
+{
+    const XMLNode *emitter_node = node.getNode(emitter_name);
+    if(!emitter_node)
+    {
+        // Only print the warning if a model filename is given. Otherwise the
+        // stk_config file is read (which has no model information).
+        if(m_model_filename!="")
+        {
+            Log::error("Kart_Model", "Missing nitro emitter information for model"
+                       "'%s'.", m_model_filename.c_str());
+            Log::error("Kart_Model", "This can be ignored, but the nitro particles will not work");
+        }
+        return;
+    }
+    emitter_node->get("position", &m_nitro_emitter_position[index]);
+}   // loadNitroEmitterInfo
 
 // ----------------------------------------------------------------------------
 /** Loads a single wheel node. Currently this is the name of the wheel model
@@ -335,9 +469,10 @@ void KartModel::loadWheelInfo(const XMLNode &node,
         // stk_config file is read (which has no model information).
         if(m_model_filename!="")
         {
-            fprintf(stderr, "Missing wheel information '%s' for model '%s'.\n",
-                wheel_name.c_str(), m_model_filename.c_str());
-            fprintf(stderr, "This can be ignored, but the wheels will not rotate.\n");
+            Log::error("Kart_Model", "Missing wheel information '%s' for model"
+                       "'%s'.", wheel_name.c_str(), m_model_filename.c_str());
+            Log::error("Kart_Model", "This can be ignored, but the wheels will"
+                       "not rotate.");
         }
         return;
     }
@@ -364,12 +499,12 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
     {
         if(m_wheel_physics_position[i].getX()==UNDEFINED)
         {
-            m_wheel_physics_position[i].setX( ( i==1||i==3) 
+            m_wheel_physics_position[i].setX( ( i==1||i==3)
                                                ? -0.5f*m_kart_width
                                                :  0.5f*m_kart_width
                                                +center_shift.getX(  ));
             // Set the connection point so that a maximum compressed wheel
-            // (susp. length=0) will still poke a little bit out under the 
+            // (susp. length=0) will still poke a little bit out under the
             // kart
             m_wheel_physics_position[i].setY(wheel_radius-0.05f);
             m_wheel_physics_position[i].setZ( (0.5f*m_kart_length-wheel_radius)
@@ -392,17 +527,30 @@ void KartModel::reset()
 
     // Stop any animations currently being played.
     setAnimation(KartModel::AF_DEFAULT);
+    // Don't force any LOD
+    ((LODNode*)m_kart->getNode())->forceLevelOfDetail(-1);
 }   // reset
 
 // ----------------------------------------------------------------------------
-/** Enables- or disables the end animation. 
+/** Called when the kart finished the race. It will force the highest LOD
+ *  for the kart, since otherwise the end camera can be far away (due to
+ *  zooming) and show non-animated karts.
+ */
+void KartModel::finishedRace()
+{
+    // Force the animated model, independent of actual camera distance.
+    ((LODNode*)m_kart->getNode())->forceLevelOfDetail(0);
+}   // finishedRace
+
+// ----------------------------------------------------------------------------
+/** Enables- or disables the end animation.
  *  \param type The type of animation to play.
  */
 void KartModel::setAnimation(AnimationFrameType type)
 {
     // if animations disabled, give up
     if (m_animated_node == NULL) return;
-    
+
     m_current_animation = type;
     if(m_current_animation==AF_DEFAULT)
     {
@@ -418,11 +566,11 @@ void KartModel::setAnimation(AnimationFrameType type)
     }
     else if(m_animation_frame[type]>-1)
     {
-        // 'type' is the start frame of the animation, type + 1 the frame 
+        // 'type' is the start frame of the animation, type + 1 the frame
         // to begin the loop with, type + 2 to end the frame with
         AnimationFrameType end = (AnimationFrameType)(type+2);
         m_animated_node->setAnimationSpeed(m_animation_speed);
-        m_animated_node->setFrameLoop(m_animation_frame[type], 
+        m_animated_node->setFrameLoop(m_animation_frame[type],
                                       m_animation_frame[end]    );
         // Loop mode must be set to false so that we get a callback when
         // the first iteration is finished.
@@ -451,13 +599,13 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
     if(m_current_animation==AF_DEFAULT ||
         m_animation_frame[m_current_animation]<=-1)
     {
-        printf("OnAnimationEnd for '%s': current %d frame %d\n",
+        Log::debug("Kart_Model", "OnAnimationEnd for '%s': current %d frame %d",
                m_model_filename.c_str(),
                m_current_animation, m_animation_frame[m_current_animation]);
         assert(false);
     }
 
-    // 'type' is the start frame of the animation, type + 1 the frame 
+    // 'type' is the start frame of the animation, type + 1 the frame
     // to begin the loop with, type + 2 to end the frame with
     AnimationFrameType start = (AnimationFrameType)(m_current_animation+1);
     // If there is no loop-start defined (i.e. no 'introductory' sequence)
@@ -466,7 +614,7 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
         start = m_current_animation;
     AnimationFrameType end   = (AnimationFrameType)(m_current_animation+2);
     m_animated_node->setAnimationSpeed(m_animation_speed);
-    m_animated_node->setFrameLoop(m_animation_frame[start], 
+    m_animated_node->setFrameLoop(m_animation_frame[start],
                                   m_animation_frame[end]   );
     m_animated_node->setLoopMode(true);
     m_animated_node->setAnimationEndCallback(NULL);
@@ -474,12 +622,11 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
 
 // ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension.
- *  \param rotation How far the wheels should rotate.
- *  \param visual_steer How much the front wheels are turned for steering.
+ *  \param rotation_dt How far the wheels have rotated since last time.
  *  \param steer The actual steer settings.
  *  \param suspension Suspension height for all four wheels.
  */
-void KartModel::update(float rotation, float steer, const float suspension[4])
+void KartModel::update(float rotation_dt, float steer, const float suspension[4])
 {
     float clamped_suspension[4];
     // Clamp suspension to minimum and maximum suspension length, so that
@@ -487,37 +634,54 @@ void KartModel::update(float rotation, float steer, const float suspension[4])
     for(unsigned int i=0; i<4; i++)
     {
         const float suspension_length = (m_max_suspension[i]-m_min_suspension[i])/2;
-        
+
         // limit amplitude between set limits, first dividing it by a
         // somewhat arbitrary constant to reduce visible wheel movement
-        clamped_suspension[i] = std::min(std::max(suspension[i]/m_dampen_suspension_amplitude[i],
-                                                  m_min_suspension[i]),
-                                                  m_max_suspension[i]);
+        clamped_suspension[i] = suspension[i]/m_dampen_suspension_amplitude[i];
         float ratio = clamped_suspension[i] / suspension_length;
         const int sign = ratio < 0 ? -1 : 1;
-        ratio = sign * fabsf(ratio*(2-ratio)); // expanded form of 1 - (1 - x)^2, i.e. making suspension display quadratic and not linear
-        clamped_suspension[i] = ratio*suspension_length;
+        // expanded form of 1 - (1 - x)^2, i.e. making suspension display
+        // quadratic and not linear
+        ratio = sign * fabsf(ratio*(2-ratio));
+//        clamped_suspension[i] = ratio*suspension_length;
+        clamped_suspension[i] = std::min(std::max(ratio*suspension_length,
+                                                  m_min_suspension[i]),
+                                                  m_max_suspension[i]);
     }   // for i<4
 
-    core::vector3df wheel_rear (rotation*RAD_TO_DEGREE, 0, 0);
     core::vector3df wheel_steer(0, steer*30.0f, 0);
-    core::vector3df wheel_front = wheel_rear+wheel_steer;
 
     for(unsigned int i=0; i<4; i++)
     {
         if(!m_wheel_node[i]) continue;
+#ifdef DEBUG
+        if(UserConfigParams::m_physics_debug && m_kart)
+        {
+            // Make wheels that are not touching the ground invisible
+            bool wheel_has_contact =
+                m_kart->getVehicle()->getWheelInfo(i).m_raycastInfo
+                                                     .m_isInContact;
+            m_wheel_node[i]->setVisible(wheel_has_contact);
+        }
+#endif
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
         pos.Y += clamped_suspension[i];
         m_wheel_node[i]->setPosition(pos);
-    }
-    if(m_wheel_node[0]) m_wheel_node[0]->setRotation(wheel_front);
-    if(m_wheel_node[1]) m_wheel_node[1]->setRotation(wheel_front);
-    if(m_wheel_node[2]) m_wheel_node[2]->setRotation(wheel_rear );
-    if(m_wheel_node[3]) m_wheel_node[3]->setRotation(wheel_rear );
 
-    // If animaitons are disabled, stop here
+        // Now calculate the new rotation: (old + change) mod 360
+        float new_rotation = m_wheel_node[i]->getRotation().X
+                             + rotation_dt * RAD_TO_DEGREE;
+        new_rotation = fmodf(new_rotation, 360);
+        core::vector3df wheel_rotation(new_rotation, 0, 0);
+        // Only apply steer to first 2 wheels.
+        if (i < 2)
+            wheel_rotation += wheel_steer;
+        m_wheel_node[i]->setRotation(wheel_rotation);
+    } // for (i < 4)
+
+    // If animations are disabled, stop here
     if (m_animated_node == NULL) return;
-    
+
     // Check if the end animation is being played, if so, don't
     // play steering animation.
     if(m_current_animation!=AF_DEFAULT) return;
@@ -531,7 +695,7 @@ void KartModel::update(float rotation, float steer, const float suspension[4])
                               - ( ( m_animation_frame[AF_STRAIGHT]
                                         -m_animation_frame[AF_RIGHT]  )*steer);
     else if(steer<0.0f) frame = m_animation_frame[AF_STRAIGHT]
-                              + ( (m_animation_frame[AF_STRAIGHT] 
+                              + ( (m_animation_frame[AF_STRAIGHT]
                                         -m_animation_frame[AF_LEFT]   )*steer);
     else                frame = (float)m_animation_frame[AF_STRAIGHT];
 

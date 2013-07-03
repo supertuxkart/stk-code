@@ -1,0 +1,8 @@
+The following changes have been made:
+- config changes in IrrCompileConfig.h
+- primary sort by material type
+- stencil RTT support
+- drawall types
+- materialtype override
+- skies respect Z
+- partial backport to expose setCurrentRendertime in the scene mgr

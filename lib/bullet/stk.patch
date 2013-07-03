@@ -1,0 +1,201 @@
+# This patch adds some assert statements to catch NANs early
+# on, and makes some variables in btRaycastVehicle protected.
+# To apply, you might have to use patch -l
+Index: src/BulletDynamics/Dynamics/btRigidBody.cpp
+===================================================================
+--- src/BulletDynamics/Dynamics/btRigidBody.cpp	(revision 10122)
++++ src/BulletDynamics/Dynamics/btRigidBody.cpp	(working copy)
+@@ -133,6 +133,9 @@
+ 
+ void btRigidBody::setGravity(const btVector3& acceleration) 
+ {
++    btAssert(!isnan(acceleration.getX()));
++    btAssert(!isnan(acceleration.getY()));
++    btAssert(!isnan(acceleration.getZ()));
+ 	if (m_inverseMass != btScalar(0.0))
+ 	{
+ 		m_gravity = acceleration * (btScalar(1.0) / m_inverseMass);
+@@ -147,6 +150,8 @@
+ 
+ void btRigidBody::setDamping(btScalar lin_damping, btScalar ang_damping)
+ {
++    btAssert(!isnan(lin_damping));
++    btAssert(!isnan(ang_damping));
+ 	m_linearDamping = btClamped(lin_damping, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));
+ 	m_angularDamping = btClamped(ang_damping, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));
+ }
+@@ -285,6 +290,13 @@
+ 	
+ void btRigidBody::setCenterOfMassTransform(const btTransform& xform)
+ {
++    btAssert(!isnan(xform.getOrigin().getX()));
++    btAssert(!isnan(xform.getOrigin().getY()));
++    btAssert(!isnan(xform.getOrigin().getZ()));
++    btAssert(!isnan(xform.getRotation().getX()));
++    btAssert(!isnan(xform.getRotation().getY()));
++    btAssert(!isnan(xform.getRotation().getZ()));
++    btAssert(!isnan(xform.getRotation().getW()));
+ 
+ 	if (isStaticOrKinematicObject())
+ 	{
+Index: src/BulletDynamics/Dynamics/btRigidBody.h
+===================================================================
+--- src/BulletDynamics/Dynamics/btRigidBody.h	(revision 10122)
++++ src/BulletDynamics/Dynamics/btRigidBody.h	(working copy)
+@@ -21,6 +21,11 @@
+ #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"
+ #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
+ 
++#if defined(WIN32) && !defined(__CYGWIN__)
++#  define isnan _isnan
++#endif
++#include <math.h>
++
+ class btCollisionShape;
+ class btMotionState;
+ class btTypedConstraint;
+@@ -253,6 +258,9 @@
+ 	}
+ 	void setLinearFactor(const btVector3& linearFactor)
+ 	{
++        btAssert(!isnan(linearFactor.getX()));
++        btAssert(!isnan(linearFactor.getY()));
++        btAssert(!isnan(linearFactor.getZ()));
+ 		m_linearFactor = linearFactor;
+ 		m_invMass = m_linearFactor*m_inverseMass;
+ 	}
+@@ -267,6 +275,9 @@
+ 
+ 	void			applyCentralForce(const btVector3& force)
+ 	{
++        btAssert(!isnan(force.getX()));
++        btAssert(!isnan(force.getY()));
++        btAssert(!isnan(force.getZ()));
+ 		m_totalForce += force*m_linearFactor;
+ 	}
+ 
+@@ -303,22 +314,40 @@
+ 	
+ 	void	applyForce(const btVector3& force, const btVector3& rel_pos) 
+ 	{
++        btAssert(!isnan(force.getX()));
++        btAssert(!isnan(force.getY()));
++        btAssert(!isnan(force.getZ()));
++        btAssert(!isnan(rel_pos.getX()));
++        btAssert(!isnan(rel_pos.getY()));
++        btAssert(!isnan(rel_pos.getZ()));
+ 		applyCentralForce(force);
+ 		applyTorque(rel_pos.cross(force*m_linearFactor));
+ 	}
+ 	
+ 	void applyCentralImpulse(const btVector3& impulse)
+ 	{
++        btAssert(!isnan(impulse.getX()));
++        btAssert(!isnan(impulse.getY()));
++        btAssert(!isnan(impulse.getZ()));
+ 		m_linearVelocity += impulse *m_linearFactor * m_inverseMass;
+ 	}
+ 	
+   	void applyTorqueImpulse(const btVector3& torque)
+ 	{
++            btAssert(!isnan(torque.getX()));
++            btAssert(!isnan(torque.getY()));
++            btAssert(!isnan(torque.getZ()));
+ 			m_angularVelocity += m_invInertiaTensorWorld * torque * m_angularFactor;
+ 	}
+ 	
+ 	void applyImpulse(const btVector3& impulse, const btVector3& rel_pos) 
+ 	{
++        btAssert(!isnan(impulse.getX()));
++        btAssert(!isnan(impulse.getY()));
++        btAssert(!isnan(impulse.getZ()));
++        btAssert(!isnan(rel_pos.getX()));
++        btAssert(!isnan(rel_pos.getY()));
++        btAssert(!isnan(rel_pos.getZ()));
+ 		if (m_inverseMass != btScalar(0.))
+ 		{
+ 			applyCentralImpulse(impulse);
+@@ -355,11 +384,17 @@
+ 
+ 	inline void setLinearVelocity(const btVector3& lin_vel)
+ 	{ 
++        btAssert(!isnan(lin_vel.getX()));
++        btAssert(!isnan(lin_vel.getY()));
++        btAssert(!isnan(lin_vel.getZ()));
+ 		m_linearVelocity = lin_vel; 
+ 	}
+ 
+ 	inline void setAngularVelocity(const btVector3& ang_vel) 
+ 	{ 
++        btAssert(!isnan(ang_vel.getX()));
++        btAssert(!isnan(ang_vel.getY()));
++        btAssert(!isnan(ang_vel.getZ()));
+ 		m_angularVelocity = ang_vel; 
+ 	}
+ 
+Index: src/BulletCollision/CollisionShapes/btCollisionShape.cpp
+===================================================================
+--- src/BulletCollision/CollisionShapes/btCollisionShape.cpp	(revision 10122)
++++ src/BulletCollision/CollisionShapes/btCollisionShape.cpp	(working copy)
+@@ -116,4 +116,4 @@
+ 	btChunk* chunk = serializer->allocate(len,1);
+ 	const char* structType = serialize(chunk->m_oldPtr, serializer);
+ 	serializer->finalizeChunk(chunk,structType,BT_SHAPE_CODE,(void*)this);
+-}
+\ No newline at end of file
++}
+Index: src/BulletCollision/CollisionDispatch/btCollisionObject.h
+===================================================================
+--- src/BulletCollision/CollisionDispatch/btCollisionObject.h	(revision 10122)
++++ src/BulletCollision/CollisionDispatch/btCollisionObject.h	(working copy)
+@@ -16,6 +16,13 @@
+ #ifndef BT_COLLISION_OBJECT_H
+ #define BT_COLLISION_OBJECT_H
+ 
++#if defined(WIN32) && !defined(__CYGWIN__)
++#  define isnan _isnan
++#  define isinf(x) (!_finite(x))
++#else
++#  include <math.h>
++#endif
++
+ #include "LinearMath/btTransform.h"
+ 
+ //island management, m_activationState1
+@@ -294,6 +301,12 @@
+ 
+ 	void	setWorldTransform(const btTransform& worldTrans)
+ 	{
++        btAssert(!isnan(worldTrans.getOrigin().getX()));
++        btAssert(!isnan(worldTrans.getOrigin().getY()));
++        btAssert(!isnan(worldTrans.getOrigin().getZ()));
++        btAssert(!isinf(worldTrans.getOrigin().getX()));
++        btAssert(!isinf(worldTrans.getOrigin().getY()));
++        btAssert(!isinf(worldTrans.getOrigin().getZ()));
+ 		m_worldTransform = worldTrans;
+ 	}
+
+Index: src/BulletDynamics/Vehicle/btRaycastVehicle.
+===================================================================
+--- src/BulletDynamics/Vehicle/btRaycastVehicle.h
++++ src/BulletDynamics/Vehicle/btRaycastVehicle.h 
+@@ -24,7 +24,7 @@
+ ///rayCast vehicle, very special constraint that turn a rigidbody into a vehicle.
+ class btRaycastVehicle : public btActionInterface
+ {
+-
++protected:
+                btAlignedObjectArray<btVector3> m_forwardWS;
+                btAlignedObjectArray<btVector3> m_axle;
+                btAlignedObjectArray<btScalar>  m_forwardImpulse;
+@@ -56,7 +56,7 @@
+                        btScalar        m_maxSuspensionForce;
+ 
+                };
+-private:
++protected:
+ 
+        btScalar        m_tau;
+        btScalar        m_damping;
+
+ 

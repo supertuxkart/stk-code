@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs
@@ -27,7 +26,7 @@
 
 class XMLNode;
 
-/** 
+/**
   * A class to manage bezier curves and interpolation.
   * \ingroup tracks
   */

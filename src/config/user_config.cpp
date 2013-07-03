@@ -1,4 +1,3 @@
-// $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKart-Team
@@ -36,6 +35,7 @@ static PtrVector<UserConfigParam, REF> all_params;
 #define PARAM_DEFAULT(X) = X
 #include "config/user_config.hpp"
 
+#include "config/saved_grand_prix.hpp"
 #include "config/player.hpp"
 #include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"
@@ -52,6 +52,18 @@ UserConfigParam::~UserConfigParam()
     all_params.remove(this);
 }   // ~UserConfigParam
 
+// ----------------------------------------------------------------------------
+/** Writes an inner node.
+ *  \param stream the xml writer.
+ *  \param level determines indentation level.
+ */
+void UserConfigParam::writeInner(XMLWriter& stream, int level) const
+{
+    std::string tab(level * 4,' ');
+    stream << L"    " << tab.c_str() << m_param_name.c_str() << L"=\""
+           << toString() << L"\"\n";
+}   // writeInner
+
 // ============================================================================
 GroupUserConfigParam::GroupUserConfigParam(const char* group_name,
                                            const char* comment)
@@ -61,30 +73,62 @@ GroupUserConfigParam::GroupUserConfigParam(const char* group_name,
     if(comment != NULL) m_comment = comment;
 }   // GroupUserConfigParam
 
+// ============================================================================
+GroupUserConfigParam::GroupUserConfigParam(const char* group_name,
+                                           GroupUserConfigParam* group,
+                                           const char* comment)
+{
+    m_param_name = group_name;
+    group->addChild(this);
+    if(comment != NULL) m_comment = comment;
+}   // GroupUserConfigParam
+
 // ----------------------------------------------------------------------------
 void GroupUserConfigParam::write(XMLWriter& stream) const
 {
-    const int children_amount = m_children.size();
+    const int attr_amount = m_attributes.size();
 
     // comments
     if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str();
-    for(int n=0; n<children_amount; n++)
+    for(int n=0; n<attr_amount; n++)
     {
-        if(m_children[n]->m_comment.size() > 0)
-            stream << L"\n             " << m_children[n]->m_param_name.c_str()
-                   << L" : " << m_children[n]->m_comment.c_str();
+        if(m_attributes[n]->m_comment.size() > 0)
+            stream << L"\n             " << m_attributes[n]->m_param_name.c_str()
+                   << L" : " << m_attributes[n]->m_comment.c_str();
     }
 
     stream << L" -->\n    <" << m_param_name.c_str() << "\n";
 
     // actual values
+    for (int n=0; n<attr_amount; n++)
+    {
+        m_attributes[n]->writeInner(stream, 1);
+    }
+    stream << L"    >\n";
+    const int children_amount = m_children.size();
     for (int n=0; n<children_amount; n++)
     {
-        stream << L"        " << m_children[n]->m_param_name.c_str() << L"=\"" 
-               << m_children[n]->toString() << L"\"\n";
+        m_children[n]->writeInner(stream, 1);
     }
-    stream << L"        />\n\n";
+    stream << L"    </" << m_param_name.c_str() << ">\n\n";
 }   // write
+
+// ----------------------------------------------------------------------------
+void GroupUserConfigParam::writeInner(XMLWriter& stream, int level) const
+{
+    std::string tab(level * 4,' ');
+    for(int i = 0; i < level; i++) tab =+ "    ";
+    const int children_amount = m_attributes.size();
+
+    stream << L"    " << tab.c_str() << "<" << m_param_name.c_str() << "\n";
+
+    // actual values
+    for (int n=0; n<children_amount; n++)
+    {
+        m_attributes[n]->writeInner(stream, level+1);
+    }
+    stream << L"    " << tab.c_str() << "/>\n";
+}   // writeInner
 
 // ----------------------------------------------------------------------------
 void GroupUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
@@ -92,15 +136,15 @@ void GroupUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
     const XMLNode* child = node->getNode( m_param_name );
     if (child == NULL)
     {
-        //std::cerr << "/!\\ User Config : Couldn't find parameter group " 
+        //std::cerr << "/!\\ User Config : Couldn't find parameter group "
         //          << paramName << std::endl;
         return;
     }
 
-    const int children_amount = m_children.size();
-    for (int n=0; n<children_amount; n++)
+    const int attributes_amount = m_attributes.size();
+    for (int n=0; n<attributes_amount; n++)
     {
-        m_children[n]->findYourDataInAnAttributeOf(child);
+        m_attributes[n]->findYourDataInAnAttributeOf(child);
     }
 
 }   // findYourDataInAChildOf
@@ -117,13 +161,26 @@ irr::core::stringw GroupUserConfigParam::toString() const
 }   // toString
 
 // ----------------------------------------------------------------------------
-void GroupUserConfigParam::addChild(UserConfigParam* child)
+void GroupUserConfigParam::clearChildren()
+{
+    m_children.clear();
+}   // clearChildren
+
+// ----------------------------------------------------------------------------
+void GroupUserConfigParam::addChild(GroupUserConfigParam* child)
 {
     m_children.push_back(child);
 }   // addChild
 
+// ----------------------------------------------------------------------------
+void GroupUserConfigParam::addChild(UserConfigParam* child)
+{
+    m_attributes.push_back(child);
+}   // addChild
+
+
 // ============================================================================
-IntUserConfigParam::IntUserConfigParam(int default_value, 
+IntUserConfigParam::IntUserConfigParam(int default_value,
                                        const char* param_name,
                                        const char* comment)
 {
@@ -135,9 +192,9 @@ IntUserConfigParam::IntUserConfigParam(int default_value,
 }   // IntUserConfigParam
 
 // ----------------------------------------------------------------------------
-IntUserConfigParam::IntUserConfigParam(int default_value, 
+IntUserConfigParam::IntUserConfigParam(int default_value,
                                        const char* param_name,
-                                       GroupUserConfigParam* group, 
+                                       GroupUserConfigParam* group,
                                        const char* comment)
 {
     m_value         = default_value;
@@ -150,9 +207,9 @@ IntUserConfigParam::IntUserConfigParam(int default_value,
 // ----------------------------------------------------------------------------
 void IntUserConfigParam::write(XMLWriter& stream) const
 {
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str() 
+    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\"" << m_value 
+    stream << L"    <" << m_param_name.c_str() << L" value=\"" << m_value
            << L"\" />\n\n";
 }   // write
 
@@ -185,8 +242,8 @@ void IntUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 }   // findYourDataInAnAttributeOf
 
 // ============================================================================
-TimeUserConfigParam::TimeUserConfigParam(Time::TimeType default_value, 
-                                         const char* param_name, 
+TimeUserConfigParam::TimeUserConfigParam(Time::TimeType default_value,
+                                         const char* param_name,
                                          const char* comment)
 {
     m_value         = default_value;
@@ -197,9 +254,9 @@ TimeUserConfigParam::TimeUserConfigParam(Time::TimeType default_value,
 }   // TimeUserConfigParam
 
 // ----------------------------------------------------------------------------
-TimeUserConfigParam::TimeUserConfigParam(Time::TimeType default_value, 
+TimeUserConfigParam::TimeUserConfigParam(Time::TimeType default_value,
                                          const char* param_name,
-                                         GroupUserConfigParam* group, 
+                                         GroupUserConfigParam* group,
                                          const char* comment)
 {
     m_value         = default_value;
@@ -216,7 +273,7 @@ void TimeUserConfigParam::write(XMLWriter& stream) const
                                     << L" -->\n";
     std::ostringstream o;
     o<<m_value;
-    stream << L"    <" << m_param_name.c_str() << L" value=\"" 
+    stream << L"    <" << m_param_name.c_str() << L" value=\""
            << core::stringw(o.str().c_str()) << L"\" />\n\n";
 }   // write
 
@@ -227,7 +284,6 @@ irr::core::stringw TimeUserConfigParam::toString() const
     // we can't use an irrlicht's stringw directly. Since it's only a
     // number, we can use std::string, and convert to stringw
 
-    std::string tmp;
     std::ostringstream o;
     o<<m_value;
     return core::stringw(o.str().c_str());
@@ -242,18 +298,23 @@ void TimeUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
         //std::cout << "Couldn't find int parameter " << paramName <<std::endl;
         return;
     }
-    child->get( "value", &m_value );
+
+    int64_t tmp;
+    child->get( "value", &tmp );
+    m_value = tmp;
 }   // findYourDataInAChildOf
 
 // ----------------------------------------------------------------------------
 void TimeUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 {
-    node->get( m_param_name, &m_value );
+    int64_t tmp;
+    node->get( m_param_name, &tmp );
+    m_value = tmp;
 }   // findYourDataInAnAttributeOf
 
 // ============================================================================
 StringUserConfigParam::StringUserConfigParam(const char* default_value,
-                                             const char* param_name, 
+                                             const char* param_name,
                                              const char* comment)
 {
     m_value         = default_value;
@@ -264,9 +325,9 @@ StringUserConfigParam::StringUserConfigParam(const char* default_value,
 }   // StringUserConfigParam
 
 // ----------------------------------------------------------------------------
-StringUserConfigParam::StringUserConfigParam(const char* default_value, 
+StringUserConfigParam::StringUserConfigParam(const char* default_value,
                                              const char* param_name,
-                                             GroupUserConfigParam* group, 
+                                             GroupUserConfigParam* group,
                                              const char* comment)
 {
     m_value         = default_value;
@@ -279,9 +340,9 @@ StringUserConfigParam::StringUserConfigParam(const char* default_value,
 // ----------------------------------------------------------------------------
 void StringUserConfigParam::write(XMLWriter& stream) const
 {
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str() 
+    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\"" 
+    stream << L"    <" << m_param_name.c_str() << L" value=\""
            << m_value.c_str() << L"\" />\n\n";
 }   // write
 
@@ -301,15 +362,15 @@ void StringUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 }   // findYourDataInAnAttributeOf
 
 // ============================================================================
-WStringUserConfigParam::WStringUserConfigParam(const core::stringw& default_value, 
-                                               const char* param_name, 
+WStringUserConfigParam::WStringUserConfigParam(const core::stringw& default_value,
+                                               const char* param_name,
                                                const char* comment)
 {
-    
+
     m_value         = default_value;
     m_default_value = default_value;
-    
-    param_name = param_name;
+
+    m_param_name = param_name;
     all_params.push_back(this);
     if(comment != NULL) m_comment = comment;
 }   // WStringUserConfigParam
@@ -317,12 +378,12 @@ WStringUserConfigParam::WStringUserConfigParam(const core::stringw& default_valu
 // ----------------------------------------------------------------------------
 WStringUserConfigParam::WStringUserConfigParam(const core::stringw& default_value,
                                                const char* param_name,
-                                               GroupUserConfigParam* group, 
+                                               GroupUserConfigParam* group,
                                                const char* comment)
 {
     m_value         = default_value;
     m_default_value = default_value;
-    
+
     m_param_name = param_name;
     group->addChild(this);
     if(comment != NULL) m_comment = comment;
@@ -333,7 +394,7 @@ void WStringUserConfigParam::write(XMLWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\"" << m_value 
+    stream << L"    <" << m_param_name.c_str() << L" value=\"" << m_value
            << L"\" />\n\n";
 }   // write
 // ----------------------------------------------------------------------------
@@ -341,7 +402,7 @@ void WStringUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( m_param_name );
     if(child == NULL) return;
-    
+
     child->get( "value", &m_value );
 }   // findYourDataInAChildOf
 
@@ -352,13 +413,13 @@ void WStringUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 }   // findYourDataInAnAttributeOf
 
 // ============================================================================
-BoolUserConfigParam::BoolUserConfigParam(bool default_value, 
-                                         const char* param_name, 
+BoolUserConfigParam::BoolUserConfigParam(bool default_value,
+                                         const char* param_name,
                                          const char* comment)
 {
     m_value         = default_value;
     m_default_value = default_value;
-    
+
     m_param_name = param_name;
     all_params.push_back(this);
     if(comment != NULL) m_comment = comment;
@@ -367,12 +428,12 @@ BoolUserConfigParam::BoolUserConfigParam(bool default_value,
 // ----------------------------------------------------------------------------
 BoolUserConfigParam::BoolUserConfigParam(bool default_value,
                                          const char* param_name,
-                                         GroupUserConfigParam* group, 
+                                         GroupUserConfigParam* group,
                                          const char* comment)
 {
     m_value         = default_value;
     m_default_value = default_value;
-    
+
     m_param_name = param_name;
     group->addChild(this);
     if(comment != NULL) m_comment = comment;
@@ -384,7 +445,7 @@ void BoolUserConfigParam::write(XMLWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\"" 
+    stream << L"    <" << m_param_name.c_str() << L" value=\""
            << (m_value ? L"true" : L"false" ) << L"\" />\n\n";
 }   // write
 
@@ -407,7 +468,7 @@ void BoolUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
     }
     else
     {
-        std::cerr << "Unknown value for " << m_param_name 
+        std::cerr << "Unknown value for " << m_param_name
                   << "; expected true or false\n";
     }
 }   // findYourDataInAChildOf
@@ -428,7 +489,7 @@ void BoolUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
     }
     else
     {
-        std::cerr << "Unknown value for " << m_param_name 
+        std::cerr << "Unknown value for " << m_param_name
                   << "; expected true or false\n";
     }
 }   // findYourDataInAnAttributeOf
@@ -440,27 +501,27 @@ irr::core::stringw BoolUserConfigParam::toString() const
 }   // toString
 
 // ============================================================================
-FloatUserConfigParam::FloatUserConfigParam(float default_value, 
-                                           const char* param_name, 
+FloatUserConfigParam::FloatUserConfigParam(float default_value,
+                                           const char* param_name,
                                            const char* comment)
 {
     m_value         = default_value;
     m_default_value = default_value;
-    
+
     m_param_name = param_name;
     all_params.push_back(this);
     if(comment != NULL) m_comment = comment;
 }   // FloatUserConfigParam
 
 // ----------------------------------------------------------------------------
-FloatUserConfigParam::FloatUserConfigParam(float default_value, 
+FloatUserConfigParam::FloatUserConfigParam(float default_value,
                                            const char* param_name,
-                                           GroupUserConfigParam* group, 
+                                           GroupUserConfigParam* group,
                                            const char* comment)
 {
     m_value         = default_value;
     m_default_value = default_value;
-    
+
     m_param_name = param_name;
     group->addChild(this);
     if(comment != NULL) m_comment = comment;
@@ -469,9 +530,9 @@ FloatUserConfigParam::FloatUserConfigParam(float default_value,
 // ----------------------------------------------------------------------------
 void FloatUserConfigParam::write(XMLWriter& stream) const
 {
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str() 
+    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\"" << m_value 
+    stream << L"    <" << m_param_name.c_str() << L" value=\"" << m_value
            << L"\" />\n\n";
 }   // write
 
@@ -520,6 +581,7 @@ UserConfig::UserConfig()
 UserConfig::~UserConfig()
 {
     UserConfigParams::m_all_players.clearAndDeleteAll();
+    UserConfigParams::m_saved_grand_prix_list.clearAndDeleteAll();
 }   // ~UserConfig
 
 // -----------------------------------------------------------------------------
@@ -535,7 +597,7 @@ void UserConfig::addDefaultPlayer()
     else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
         username = getenv("LOGNAME");
 
-    
+
     class GuestPlayerProfile : public PlayerProfile
     {
     public:
@@ -544,19 +606,20 @@ void UserConfig::addDefaultPlayer()
             m_is_guest_account = true;
         }
     };
-    
+
     // add default guest player
     UserConfigParams::m_all_players.push_back( new GuestPlayerProfile() );
 
     // Set the name as the default name for all players.
-    UserConfigParams::m_all_players.push_back( new PlayerProfile(username.c_str()) );
+    UserConfigParams::m_all_players.push_back(
+                                         new PlayerProfile(username.c_str()) );
 
 }   // addDefaultPlayer
 
 // -----------------------------------------------------------------------------
 
 /** Comparison used to sort players. Most frequent players should be
- *  listed first, so a<b actually means that 
+ *  listed first, so a<b actually means that
  *  a.m_use_frequency > b.m_use_frequency
  *  This way we get a reversed sorted list.
  */
@@ -566,6 +629,13 @@ bool operator<(const PlayerProfile &a, const PlayerProfile &b)
 }   // operator<
 
 // -----------------------------------------------------------------------------
+/** \brief Needed for toggling sort order **/
+bool operator>(const PlayerProfile &a, const PlayerProfile &b)
+{
+    return a.getUseFrequency() < b.getUseFrequency();
+}   // operator>
+
+// -----------------------------------------------------------------------------
 /** Load configuration values from file. */
 bool UserConfig::loadConfig()
 {
@@ -573,7 +643,7 @@ bool UserConfig::loadConfig()
     XMLNode* root = file_manager->createXMLTree(filename);
     if(!root || root->getName() != "stkconfig")
     {
-        std::cerr << "Could not read user config file file " << filename.c_str() << std::endl;
+        std::cerr << "Could not read user config file file " << filename << std::endl;
         if(root) delete root;
         return false;
     }
@@ -591,7 +661,7 @@ bool UserConfig::loadConfig()
         // so we just delete the old config. in the future, for smaller updates, we can
         // add back the code previously there that upgraded the config file to the new
         // format instead of overwriting it.
-        
+
         GUIEngine::showMessage( _("Your config file was too old, so it was deleted and a new one will be created."), 10.0f);
         printf("Your config file was too old, so it was deleted and a new one will be created.");
         delete root;
@@ -606,13 +676,13 @@ bool UserConfig::loadConfig()
     {
         all_params[i].findYourDataInAChildOf(root);
     }
-    
-    
+
+
     // ---- Read players
     // we create those AFTER other values are being read simply because we have many Player
     // nodes that all bear the same name, so the generic loading code won't work here
     UserConfigParams::m_all_players.clearAndDeleteAll();
-    
+
     std::vector<XMLNode*> players;
     root->getNodes("Player", players);
     const int amount = players.size();
@@ -620,19 +690,31 @@ bool UserConfig::loadConfig()
     {
         //std::string name;
         //players[i]->get("name", &name);
-        UserConfigParams::m_all_players.push_back( new PlayerProfile(players[i]) );
+        UserConfigParams::m_all_players.push_back(
+                                               new PlayerProfile(players[i]) );
     }
-    
+
     // sort players by frequency of use
     UserConfigParams::m_all_players.insertionSort();
-    
+
+
+    // ---- Read Saved GP's
+    UserConfigParams::m_saved_grand_prix_list.clearAndDeleteAll();
+    std::vector<XMLNode*> saved_gps;
+    root->getNodes("SavedGP", saved_gps);
+    const int gp_amount = saved_gps.size();
+    for (int i=0; i<gp_amount; i++)
+    {
+        UserConfigParams::m_saved_grand_prix_list.push_back(
+                                           new SavedGrandPrix( saved_gps[i]) );
+    }
     delete root;
 
     return true;
 }   // loadConfig
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Write settings to config file. */
 void UserConfig::saveConfig()
 {
@@ -658,7 +740,7 @@ void UserConfig::saveConfig()
             //std::cout << "saving parameter " << i << " to file\n";
             all_params[i].write(configfile);
         }
-            
+
         configfile << L"</stkconfig>\n";
         configfile.close();
     }
@@ -670,12 +752,23 @@ void UserConfig::saveConfig()
 
 }   // saveConfig
 
-bool UserConfigParams::logMemory      () { return (m_verbosity&LOG_MEMORY)       == LOG_MEMORY;}
+// ----------------------------------------------------------------------------
+bool UserConfigParams::logMemory()
+     { return (m_verbosity&LOG_MEMORY) == LOG_MEMORY;}
 
-bool UserConfigParams::logGUI         () { return (m_verbosity&LOG_GUI)          == LOG_GUI;   }
+// ----------------------------------------------------------------------------
+bool UserConfigParams::logGUI ()
+     { return (m_verbosity&LOG_GUI) == LOG_GUI;   }
 
-bool UserConfigParams::logAddons      () { return (m_verbosity&LOG_ADDONS)       == LOG_ADDONS;}
+// ----------------------------------------------------------------------------
+bool UserConfigParams::logAddons()
+     { return (m_verbosity&LOG_ADDONS) == LOG_ADDONS;}
 
-bool UserConfigParams::logMisc        () { return (m_verbosity&LOG_MISC)         == LOG_MISC;  }
+// ----------------------------------------------------------------------------
+bool UserConfigParams::logFlyable()
+     { return (m_verbosity&LOG_FLYABLE) == LOG_FLYABLE;  }
 
-bool UserConfigParams::logNetworking  () { return (m_verbosity&LOG_NETWORKING)   == LOG_NETWORKING;  }
+// ----------------------------------------------------------------------------
+bool UserConfigParams::logMisc()
+     { return (m_verbosity&LOG_MISC) == LOG_MISC;  }
+

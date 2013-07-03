@@ -1,4 +1,3 @@
-// $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 SuperTuxKart-Team
@@ -31,6 +30,7 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/state_manager.hpp"
@@ -59,9 +59,9 @@ DEFINE_SCREEN_SINGLETON( GrandPrixWin );
 GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui")
 {
     setNeeds3D(true);
-    
+
     m_throttle_FPS = false;
-    
+
     try
     {
         m_music = music_manager->getMusicInformation(file_manager->getMusicFile("win_theme.music"));
@@ -80,55 +80,35 @@ void GrandPrixWin::loadedFromFile()
     m_kart_node[0] = NULL;
     m_kart_node[1] = NULL;
     m_kart_node[2] = NULL;
-    
+
     m_podium_x[0] = 1.4f;
     m_podium_z[0] = 0.0f;
-    
+
     m_podium_x[1] = 2.2f;
     m_podium_z[1] = 0.5f;
-    
+
     m_podium_x[2] = 3.0f;
     m_podium_z[2] = 0.0f;
 }   // loadedFromFile
 
 // -------------------------------------------------------------------------------------
 
-void traverse(scene::ISceneNode* curr, int level=0)
-{
-    for (int n=0; n<level; n++) std::cout << "|    ";
-    
-    unsigned int type = curr->getType();
-    const char* ptr = (const char*)&type;
-    
-    std::cout << "+ " << curr->getName() << " ("
-              << char(ptr[0]) << char(ptr[1])
-              << char(ptr[2]) << char(ptr[3]) << std::endl;
-    
-    const core::list<  scene::ISceneNode  * >& children = curr->getChildren();
-    for (core::list<scene::ISceneNode*>::ConstIterator it=children.begin(); it != children.end(); it++)
-    {
-        traverse(*it, level+1);
-    }
-}   // traverse
-
-// -------------------------------------------------------------------------------------
-
 void GrandPrixWin::init()
 {
     Screen::init();
-    if (unlock_manager->getRecentlyUnlockedFeatures().size() > 0)
+    if (unlock_manager->getCurrentSlot()->getRecentlyCompletedChallenges().size() > 0)
     {
         const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
 
-        
-        core::stringw message = _("You unlocked a new feature!");
+
+        core::stringw message = _("You completed a challenge!");
         const int message_width = GUIEngine::getFont()->getDimension(message.c_str()).Width + 30;
-        
+
         const int label_height = GUIEngine::getFontHeight() + 15;
-        
+
         const int y_from       = frame_size.Height - label_height*2;
         const int y_to         = frame_size.Height - label_height;
-        
+
         const int label_x_from = frame_size.Width/2 - message_width/2;
         const int label_x_to   = frame_size.Width/2 + message_width/2;
 
@@ -141,7 +121,7 @@ void GrandPrixWin::init()
         img->setScaleImage(true);
         img->setTabStop(false);
         img->setUseAlphaChannel(true);
-        
+
         core::rect< s32 > icon2area(label_x_to,                y_from,
                                     label_x_to + label_height, y_to);
         img = GUIEngine::getGUIEnv()->addImage( icon2area );
@@ -149,19 +129,24 @@ void GrandPrixWin::init()
         img->setScaleImage(true);
         img->setTabStop(false);
         img->setUseAlphaChannel(true);
-        
-        GUIEngine::LabelWidget* unlocked_label = new GUIEngine::LabelWidget();
-        unlocked_label->m_properties[GUIEngine::PROP_ID] = "label";
-        unlocked_label->m_properties[GUIEngine::PROP_TEXT_ALIGN] = "center";
-        unlocked_label->m_x = label_x_from;
-        unlocked_label->m_y = y_from;
-        unlocked_label->m_w = message_width;
-        unlocked_label->m_h = label_height;
-        unlocked_label->setText(message, false);
+
+        m_unlocked_label = new GUIEngine::LabelWidget();
+        m_unlocked_label->m_properties[GUIEngine::PROP_ID] = "label";
+        m_unlocked_label->m_properties[GUIEngine::PROP_TEXT_ALIGN] = "center";
+        m_unlocked_label->m_x = label_x_from;
+        m_unlocked_label->m_y = y_from;
+        m_unlocked_label->m_w = message_width;
+        m_unlocked_label->m_h = label_height;
+        m_unlocked_label->setText(message, false);
         //const irr::video::SColor orange(255, 255, 126, 21);
         //unlocked_label->setColor(orange);
-        
-        unlocked_label->add();
+
+        m_unlocked_label->add();
+        manualAddWidget(m_unlocked_label);
+    }
+    else
+    {
+        m_unlocked_label = NULL;
     }
 
     m_phase = 1;
@@ -172,9 +157,9 @@ void GrandPrixWin::init()
                                 file_manager->getTextureFile("clouds.png"));
     m_sky = irr_driver->addSkyDome(t,
                                    16 /* hori_res */, 16 /* vert_res */,
-                                   1.0f /* texture_percent */,  
+                                   1.0f /* texture_percent */,
                                    2.0f /* sphere_percent */);
-    
+
     m_camera = irr_driver->addCameraSceneNode();
     m_camera_x = 3.0f;
     m_camera_y = 0.0f;
@@ -188,8 +173,8 @@ void GrandPrixWin::init()
     m_camera->setTarget( core::vector3df(m_camera_target_x, -2.0f, m_camera_target_z) );
     m_camera->setFOV( DEGREE_TO_RAD*50.0f );
     m_camera->updateAbsolutePosition();
-    
-    
+
+
     scene::IMesh* model_village = irr_driver->getMesh( file_manager->getModelFile("village.b3d") );
     assert(model_village != NULL);
     m_village = irr_driver->addMesh(model_village);
@@ -197,33 +182,33 @@ void GrandPrixWin::init()
     m_village->setName("village");
 #endif
     m_village->setPosition( core::vector3df(2, INITIAL_Y, 0) );
-    
-    
+
+
     scene::IMesh* podium_model = irr_driver->getMesh( file_manager->getModelFile("wood_podium.b3d") );
     assert(podium_model != NULL);
-    
-    
+
+
     m_podium_step[0] = irr_driver->addMesh(podium_model);
 #ifdef DEBUG
     m_podium_step[0]->setName("Podium 0");
 #endif
     m_podium_step[0]->setPosition( core::vector3df(m_podium_x[0], INITIAL_PODIUM_Y, m_podium_z[0]) );
-    
+
     m_podium_step[1] = irr_driver->addMesh(podium_model);
 #ifdef DEBUG
     m_podium_step[1]->setName("Podium 1");
 #endif
     m_podium_step[1]->setPosition( core::vector3df(m_podium_x[1], INITIAL_PODIUM_Y, m_podium_z[1]) );
-    
+
     m_podium_step[2] = irr_driver->addMesh(podium_model);
 #ifdef DEBUG
     m_podium_step[2]->setName("Podium 2");
 #endif
     m_podium_step[2]->setPosition( core::vector3df(m_podium_x[2], INITIAL_PODIUM_Y, m_podium_z[2]) );
-    
+
     scene::ISceneManager* sceneManager = irr_driver->getSceneManager();
     sceneManager->setAmbientLight(video::SColor(255, 95, 95, 95));
-    
+
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
     m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos,
                                                                video::SColorf(0.25f,0.25f,0.25f),
@@ -231,7 +216,7 @@ void GrandPrixWin::init()
     m_light->getLightData().DiffuseColor = irr::video::SColorf(0.25f, 0.25f, 0.25f, 1.0f);
     m_light->getLightData().AmbientColor = irr::video::SColorf(0.25f, 0.25f, 0.25f, 1.0f);
     m_light->getLightData().SpecularColor = irr::video::SColorf(0.0f, 0.0f, 0.0f, 1.0f);
-    
+
     sfx_manager->quickSound("gp_end");
 }   // init
 
@@ -242,16 +227,16 @@ void GrandPrixWin::tearDown()
     Screen::tearDown();
     irr_driver->removeNode(m_sky);
     m_sky = NULL;
-    
+
     irr_driver->removeCameraSceneNode(m_camera);
     m_camera = NULL;
-    
+
     irr_driver->removeNode(m_light);
     m_light = NULL;
-    
+
     irr_driver->removeNode(m_village);
     m_village = NULL;
-    
+
     for (int n=0; n<3; n++)
     {
         irr_driver->removeNode(m_podium_step[n]);
@@ -262,6 +247,13 @@ void GrandPrixWin::tearDown()
     for(unsigned int i=0; i<m_all_kart_models.size(); i++)
         delete m_all_kart_models[i];
     m_all_kart_models.clear();
+
+    if (m_unlocked_label != NULL)
+    {
+        manualRemoveWidget(m_unlocked_label);
+        delete m_unlocked_label;
+        m_unlocked_label = NULL;
+    }
 }   // tearDown
 
 // -------------------------------------------------------------------------------------
@@ -269,17 +261,17 @@ void GrandPrixWin::tearDown()
 void GrandPrixWin::onUpdate(float dt, irr::video::IVideoDriver* driver)
 {
     m_global_time += dt;
-        
+
     m_sky_angle += dt*2;
     if (m_sky_angle > 360) m_sky_angle -= 360;
     m_sky->setRotation( core::vector3df(0, m_sky_angle, 0) );
 
-        
+
     // ---- karts move
     if (m_phase == 1)
     {
         assert(m_kart_node[0] != NULL || m_kart_node[1] != NULL || m_kart_node[2] != NULL);
-        
+
         int karts_not_yet_done = 0;
         for (int k=0; k<3; k++)
         {
@@ -306,13 +298,13 @@ void GrandPrixWin::onUpdate(float dt, irr::video::IVideoDriver* driver)
                 m_kart_node[k]->setPosition( core::vector3df(m_kart_x[k], m_kart_y[k], m_kart_z[k]) );
             }
         } // end for
-        
+
         if (karts_not_yet_done == 0)
         {
             m_phase = 2;
         }
     }
-    
+
     // ---- Karts Rotate
     else if (m_phase == 2)
     {
@@ -330,10 +322,10 @@ void GrandPrixWin::onUpdate(float dt, irr::video::IVideoDriver* driver)
                 }
             }
         } // end for
-        
+
         if (karts_not_yet_done == 0) m_phase = 3;
     }
-    
+
     // ---- Podium Rises
     else if (m_phase == 3)
     {
@@ -353,38 +345,38 @@ void GrandPrixWin::onUpdate(float dt, irr::video::IVideoDriver* driver)
                 }
             }
         } // end for
-        
+
     }
-    
+
     if (m_phase > 1)
     {
         //m_camera_x = 3.0f;
         if (m_camera_z < -2.0f)                          m_camera_z        += dt*0.2f;
-        
+
         if      (m_camera_x < m_podium_x[1] - dt*0.1f)   m_camera_x        += dt*0.1f;
         else if (m_camera_x > m_podium_x[1] + dt*0.1f)   m_camera_x        -= dt*0.1f;
         else                                             m_camera_x         = m_podium_x[1];
-            
+
         if (m_camera_target_x < m_podium_x[1])           m_camera_target_x += dt*0.1f;
-        
+
         if (m_camera_y > -1.8f)                          m_camera_y        -= dt*0.1f;
 
-        
+
         m_camera->setTarget( core::vector3df(m_camera_target_x, -2.0f, m_camera_target_z) );
-        
+
         m_camera->setPosition( core::vector3df(m_camera_x, m_camera_y, m_camera_z) );
         m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
         m_camera->updateAbsolutePosition();
     }
-    
-    
+
+
     // ---- title
     static const int w = irr_driver->getFrameSize().Width;
     static const int h = irr_driver->getFrameSize().Height;
     const irr::video::SColor color(255, 255, 255, 255);
-    
+
     static int test_y = 0;
-    
+
     GUIEngine::getTitleFont()->draw(_("You completed the Grand Prix!"),
                                     core::rect< s32 >( 0, test_y, w, h/10 ),
                                     color,
@@ -401,19 +393,20 @@ void GrandPrixWin::eventCallback(GUIEngine::Widget* widget,
     {
         // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
         race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-        
-        if (unlock_manager->getRecentlyUnlockedFeatures().size() > 0)
+
+        if (unlock_manager->getCurrentSlot()->getRecentlyCompletedChallenges().size() > 0)
         {
-            std::vector<const ChallengeData*> unlocked = 
-                unlock_manager->getRecentlyUnlockedFeatures();
-            unlock_manager->clearUnlocked();
-            
-            FeatureUnlockedCutScene* scene = 
+            std::vector<const ChallengeData*> unlocked =
+                unlock_manager->getCurrentSlot()->getRecentlyCompletedChallenges();
+            unlock_manager->getCurrentSlot()->clearUnlocked();
+
+            FeatureUnlockedCutScene* scene =
                 FeatureUnlockedCutScene::getInstance();
-            
+
             assert(unlocked.size() > 0);
-            scene->addUnlockedThings(unlocked);
-            
+            scene->addTrophy(race_manager->getDifficulty());
+            scene->findWhatWasUnlocked(race_manager->getDifficulty());
+
             StateManager::get()->replaceTopMostScreen(scene);
         }
         else
@@ -437,23 +430,23 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
     for (int n=0; n<3; n++)
     {
         if (idents[n].size() == 0) continue;
-        
+
         scene::ISceneNode* kart_main_node = NULL;
-        
+
         const KartProperties* kp = kart_properties_manager->getKart(idents[n]);
         if (kp != NULL)
         {
             KartModel *kart_model = kp->getKartModelCopy();
             m_all_kart_models.push_back(kart_model);
             kart_main_node = kart_model->attachModel(false);
-            
+
             m_kart_x[n] = m_podium_x[n];
             m_kart_y[n] = INITIAL_Y + KARTS_DELTA_Y;
             m_kart_z[n] = -4;
             m_kart_rotation[n] = 0.0f;
-            
+
             assert(kart_main_node != NULL);
-            kart_main_node->setPosition( core::vector3df(m_kart_x[n], 
+            kart_main_node->setPosition( core::vector3df(m_kart_x[n],
                                                          m_kart_y[n],
                                                          m_kart_z[n]) );
             kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
@@ -464,10 +457,10 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
         {
             std::cerr << "[GrandPrixWin] WARNING : kart '" << idents[n] << "' not found!\n";
         }
-        
+
         m_kart_node[n] = kart_main_node;
     } // end for
-    
+
     assert(m_kart_node[0] != NULL || m_kart_node[1] != NULL || m_kart_node[2] != NULL);
 }   // setKarts
 

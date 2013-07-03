@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -31,10 +30,11 @@ namespace irr
 #include "items/powerup_manager.hpp"
 #include "utils/no_copy.hpp"
 
-class Vec3;
-class Kart;
-class Explosion;
+class AbstractKart;
 class Flyable;
+class HitEffect;
+class Track;
+class Vec3;
 
 /**
   * \ingroup items
@@ -43,43 +43,33 @@ class ProjectileManager : public NoCopy
 {
 private:
     typedef std::vector<Flyable*>   Projectiles;
-    typedef std::vector<Explosion*> Explosions;
+    typedef std::vector<HitEffect*> HitEffects;
 
-    // The list of all active projectiles, i.e. projectiles
-    // which are currently moving on the track
+    /** The list of all active projectiles, i.e. projectiles which are
+     *  currently moving on the track. */
     Projectiles      m_active_projectiles;
 
-    // All active explosions, i.e. explosions which are currently
-    // being shown
-    Explosions       m_active_explosions;
+    /** All active hit effects, i.e. hit effects which are currently
+     *  being shown or have a sfx playing. */
+    HitEffects       m_active_hit_effects;
 
-    scene::IMesh    *m_explosion_model;
-    bool             m_something_was_hit;
-    bool             m_explosion_ended;
     void             updateClient(float dt);
     void             updateServer(float dt);
 public:
-                     ProjectileManager() {m_something_was_hit=false;}
+                     ProjectileManager() {}
                     ~ProjectileManager() {}
-    /** Notifies the projectile manager that something needs to be removed. */
-    void             notifyRemove     () {m_something_was_hit=true; }
-    void             FinishedExplosion() {m_explosion_ended =true;  }
-    scene::IMesh*     getExplosionModel()
-    {
-        return m_explosion_model;
-    }
-    unsigned int     getNumProjectiles() const {return m_active_explosions.size();}
-    int              getProjectileId  (const std::string ident);
     void             loadData         ();
     void             cleanup          ();
     void             update           (float dt);
-    Flyable*         newProjectile    (Kart *kart, 
+    Flyable*         newProjectile    (AbstractKart *kart, Track* track,
                                        PowerupManager::PowerupType type);
-    Explosion*       newExplosion     (const Vec3& coord, 
-                                       const char* explosion_sound="explosion",
-                                       bool is_player_kart_hit = false);
     void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();
+    // ------------------------------------------------------------------------
+    /** Adds a special hit effect to be shown.
+     *  \param hit_effect The hit effect to be added. */
+    void             addHitEffect(HitEffect *hit_effect)
+                                { m_active_hit_effects.push_back(hit_effect); }
 };
 
 extern ProjectileManager *projectile_manager;

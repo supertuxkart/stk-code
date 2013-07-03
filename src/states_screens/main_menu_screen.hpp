@@ -28,35 +28,30 @@ namespace GUIEngine { class Widget; class ListWidget; }
   */
 class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<MainMenuScreen>
 {
+private:
     friend class GUIEngine::ScreenSingleton<MainMenuScreen>;
-    
-    GUIEngine::ListWidget* m_lang_popup;
-    
+
     MainMenuScreen();
-    
-    void closeLangPopup();
-    
+
 public:
-    
-    virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver);
-    
+
+    virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver) OVERRIDE;
+
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile();
-    
+    virtual void loadedFromFile() OVERRIDE;
+
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
-    
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+                               const int playerID) OVERRIDE;
+
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void init();
-    
+    virtual void init() OVERRIDE;
+
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void tearDown();
-    
-    /** 
-     * \brief  Called when escape is pressed.
-     * \return true if the screen should be closed, false if you handled the press another way
-     */
-    virtual bool onEscapePressed();
+    virtual void tearDown() OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void onDisabledItemClicked(const std::string& item) OVERRIDE;
 };
 
 #endif

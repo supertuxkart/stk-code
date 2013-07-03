@@ -1,4 +1,3 @@
-// $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010      Joerg Henrichs
@@ -23,24 +22,17 @@
 
 #include "karts/controller/controller.hpp"
 
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 
 /** Constructor, saves the kart pointer and a pointer to the KartControl
  *  of the kart.
  */
-Controller::Controller(Kart *kart, StateManager::ActivePlayer *player)
+Controller::Controller(AbstractKart *kart, StateManager::ActivePlayer *player)
 {
     m_controls = &(kart->getControls());
     m_kart     = kart;
     m_player   = player;
+    setControllerName("Controller");
 }   // Controller
-
-// ----------------------------------------------------------------------------
-const irr::core::stringw& Controller::getNamePostfix() const
-{
-    // Static to avoid returning the address of a temporary stringq
-    static irr::core::stringw name("");
-    return name;
-}   // getNamePostfix
 
 // ----------------------------------------------------------------------------

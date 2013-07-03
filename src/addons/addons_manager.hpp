@@ -27,6 +27,9 @@
 #include "io/xml_node.hpp"
 #include "utils/synchronised.hpp"
 
+/**
+  * \ingroup addonsgroup
+  */
 class AddonsManager
 {
 private:
@@ -50,25 +53,29 @@ private:
     // Synchronise the state between threads (e.g. GUI and update thread)
     Synchronised<STATE_TYPE> m_state;
 
-    void  saveInstalled(const std::string &type="");
+    void  saveInstalled();
     void  loadInstalledAddons();
     void  downloadIcons();
 
 public:
                  AddonsManager();
+                ~AddonsManager();
     void         initOnline(const XMLNode *xml);
+    void         checkInstalledAddons();
     const Addon* getAddon(const std::string &id) const;
     int          getAddonIndex(const std::string &id) const;
     bool         install(const Addon &addon);
     bool         uninstall(const Addon &addon);
     void         reInit();
     // ------------------------------------------------------------------------
-    /** Returns true if the list of online addons has been downloaded. This is 
+    /** Returns true if the list of online addons has been downloaded. This is
      *  used to grey out the 'addons' entry till a network connections could be
      *  established. */
-    bool         onlineReady() const {return m_state.getAtomic()==STATE_READY;}
+    bool         onlineReady() const {return m_state.getAtomic()==STATE_READY; }
     // ------------------------------------------------------------------------
-    bool         wasError()  const { return m_state.getAtomic()==STATE_ERROR;}
+    bool         wasError()    const { return m_state.getAtomic()==STATE_ERROR;}
+    // ------------------------------------------------------------------------
+    bool         isLoading()   const { return m_state.getAtomic()==STATE_INIT; }
     // ------------------------------------------------------------------------
     /** Marks addon as not being available. */
     void         setErrorState() { m_state.setAtomic(STATE_ERROR); }

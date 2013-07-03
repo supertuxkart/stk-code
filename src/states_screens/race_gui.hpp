@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
@@ -30,8 +29,8 @@ using namespace irr;
 #include "config/player.hpp"
 #include "states_screens/race_gui_base.hpp"
 
+class AbstractKart;
 class InputMap;
-class Kart;
 class Material;
 class RaceSetup;
 
@@ -52,19 +51,16 @@ private:
     /** Translated string 'rank' displayed every frame. */
     core::stringw    m_string_rank;
 
-    /** Translated string 'Top %d' displayed every frame. */
-    core::stringw    m_string_top;
-    
     // Minimap related variables
     // -------------------------
     /** The mini map of the track. */
     video::ITexture *m_mini_map;
-    
-    /** The size of a single marker on the screen for AI karts, 
+
+    /** The size of a single marker on the screen for AI karts,
      *  need not be a power of 2. */
     int              m_marker_ai_size;
 
-    /** The size of a single marker on the screen or player karts, 
+    /** The size of a single marker on the screen or player karts,
      *  need not be a power of 2. */
     int              m_marker_player_size;
 
@@ -73,7 +69,7 @@ private:
 
     /** The height of the rendered mini map in pixels, must be a power of 2. */
     int              m_map_rendered_height;
-    
+
     /** Width of the map in pixels on the screen, need not be a power of 2. */
     int              m_map_width;
 
@@ -85,45 +81,42 @@ private:
 
     /** Distance of map from bottom of screen. */
     int              m_map_bottom;
-    
+
     /** Maximum string length of 'rank', 'lap', '99/99'. Used to position
      *  the rank/lap text correctly close to the right border. */
     int              m_rank_lap_width;
 
     /** Maximum string length for the timer */
     int              m_timer_width;
-    
-    /** Distance on track to begin showing overlap in drawGlobalPlayerIcons */
-    float            m_dist_show_overlap;///can be zero
-    float            m_icons_inertia;///can be zero
-    
-    /** previous position of icons */
-    std::vector< core::vector2d<s32> > m_previous_icons_position;
-    
+
+
+    bool             m_is_tutorial;
+
     /* Display informat for one player on the screen. */
-    void drawEnergyMeter       (int x, int y, const Kart *kart,
-                                const core::recti &viewport, 
+    void drawEnergyMeter       (int x, int y, const AbstractKart *kart,
+                                const core::recti &viewport,
                                 const core::vector2df &scaling);
-    void drawSpeedAndEnergy    (const Kart* kart, const core::recti &viewport, 
+    void drawSpeedAndEnergy    (const AbstractKart* kart,
+                                const core::recti &viewport,
                                 const core::vector2df &scaling);
-    void drawRankLap           (const KartIconDisplayInfo* info, const Kart* kart,
+    void drawRankLap           (const AbstractKart* kart,
                                 const core::recti &viewport);
-    void drawGlobalPlayerIcons (const KartIconDisplayInfo* info);
+
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
     void drawGlobalTimer       ();
-    
+
 public:
 
          RaceGUI();
         ~RaceGUI();
     virtual void renderGlobal(float dt);
-    virtual void renderPlayerView(const Kart *kart);
-        
+    virtual void renderPlayerView(const Camera *camera, float dt);
+
     /** Returns the size of the texture on which to render the minimap to. */
-    virtual const core::dimension2du getMiniMapSize() const 
+    virtual const core::dimension2du getMiniMapSize() const
                   { return core::dimension2du(m_map_width, m_map_height); }
-    
+
 };   // RaceGUI
 
 #endif

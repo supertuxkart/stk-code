@@ -54,16 +54,16 @@ OptionsScreenInput::OptionsScreenInput() : Screen("options_input.stkgui")
 // -----------------------------------------------------------------------------
 
 void OptionsScreenInput::loadedFromFile()
-{    
-    video::ITexture* icon1 = irr_driver->getTexture( file_manager->getGUIDir() + "/keyboard.png" );
-    video::ITexture* icon2 = irr_driver->getTexture( file_manager->getGUIDir() + "/gamepad.png" );
-    video::ITexture* icon3 = irr_driver->getTexture( file_manager->getGUIDir() + "/gamepad_off.png" );
+{
+    video::ITexture* icon1 = irr_driver->getTexture( file_manager->getGUIDir() + "keyboard.png" );
+    video::ITexture* icon2 = irr_driver->getTexture( file_manager->getGUIDir() + "gamepad.png" );
+    video::ITexture* icon3 = irr_driver->getTexture( file_manager->getGUIDir() + "gamepad_off.png" );
 
     m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv() );
-    m_icon_bank->addTextureAsSprite(icon1);    
+    m_icon_bank->addTextureAsSprite(icon1);
     m_icon_bank->addTextureAsSprite(icon2);
     m_icon_bank->addTextureAsSprite(icon3);
-    
+
     // scale icons depending on screen resolution. the numbers below are a bit arbitrary
     const int screen_width = irr_driver->getFrameSize().Width;
     const float scale = 0.3f + 0.2f*std::max(0, screen_width - 640)/564.0f;
@@ -76,44 +76,51 @@ void OptionsScreenInput::buildDeviceList()
 {
     GUIEngine::ListWidget* devices = this->getWidget<GUIEngine::ListWidget>("devices");
     assert( devices != NULL );
-    
+
     assert( m_icon_bank != NULL );
     devices->setIcons(m_icon_bank);
-    
+
     const int keyboard_config_count = input_manager->getDeviceList()->getKeyboardConfigAmount();
-    
+
     for (int i=0; i<keyboard_config_count; i++)
     {
         //KeyboardConfig *config = input_manager->getDeviceList()->getKeyboardConfig(i);
-        
+
         std::ostringstream kbname;
         kbname << "keyboard" << i;
         const std::string internal_name = kbname.str();
-        
-        // since irrLicht's list widget has the nasty tendency to put the 
+
+        // since irrLicht's list widget has the nasty tendency to put the
         // icons very close to the text, I'm adding spaces to compensate.
         devices->addItem(internal_name, (core::stringw("   ") + _("Keyboard %i", i)).c_str(), 0 /* icon */);
     }
-    
+
     const int gpad_config_count = input_manager->getDeviceList()->getGamePadConfigAmount();
-    
+
     for (int i = 0; i < gpad_config_count; i++)
     {
         GamepadConfig *config = input_manager->getDeviceList()->getGamepadConfig(i);
-        
+
         // Don't display the configuration if a matching device is not available
         if (config->isPlugged())
         {
-            // since irrLicht's list widget has the nasty tendency to put the 
+            // since irrLicht's list widget has the nasty tendency to put the
             // icons very close to the text, I'm adding spaces to compensate.
-            const irr::core::stringw name = ("   " + config->getName()).c_str();
-            
+            irr::core::stringw name = ("   " + config->getName()).c_str();
+
+            if (config->getNumberOfDevices() > 1)
+            {
+                name += core::stringw(L" (x");
+                name += config->getNumberOfDevices();
+                name += core::stringw(L")");
+            }
+
             std::ostringstream gpname;
             gpname << "gamepad" << i;
             const std::string internal_name = gpname.str();
-            
+
             const int icon = (config->isEnabled() ? 1 : 2);
-            
+
             devices->addItem(internal_name, name, icon);
         }   // if config->isPlugged
     }   // for i<gpad_config_count
@@ -125,22 +132,22 @@ void OptionsScreenInput::init()
     Screen::init();
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
     if (tabBar != NULL)  tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
-    
+
     tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
     tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
     tabBar->getRibbonChildren()[2].setTooltip( _("User Interface") );
     tabBar->getRibbonChildren()[3].setTooltip( _("Players") );
-    
+
     /*
     DynamicRibbonWidget* devices = this->getWidget<DynamicRibbonWidget>("devices");
     assert( devices != NULL );
     */
-    
-      
-    buildDeviceList();        
+
+
+    buildDeviceList();
 
     //devices->updateItemDisplay();
-    
+
     /*
     // trigger displaying bindings for default selected device
     const std::string name2("devices");
@@ -155,17 +162,17 @@ void OptionsScreenInput::rebuildDeviceList()
     /*
     DynamicRibbonWidget* devices = this->getWidget<DynamicRibbonWidget>("devices");
     assert( devices != NULL );
-    
+
     devices->clearItems();
-    buildDeviceList();        
+    buildDeviceList();
     devices->updateItemDisplay();
      */
-    
+
     ListWidget* devices = this->getWidget<ListWidget>("devices");
     assert( devices != NULL );
-    
+
     devices->clear();
-    buildDeviceList();        
+    buildDeviceList();
 }   // rebuildDeviceList
 
 // -----------------------------------------------------------------------------
@@ -173,11 +180,11 @@ void OptionsScreenInput::rebuildDeviceList()
 void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     //const std::string& screen_name = this->getName();
-    
+
     if (name == "options_choice")
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
-        
+
         if (selection == "tab_audio") StateManager::get()->replaceTopMostScreen(OptionsScreenAudio::getInstance());
         else if (selection == "tab_video") StateManager::get()->replaceTopMostScreen(OptionsScreenVideo::getInstance());
         else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
@@ -196,7 +203,7 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
     {
         ListWidget* devices = this->getWidget<ListWidget>("devices");
         assert(devices != NULL);
-        
+
         const std::string& selection = devices->getSelectionInternalName();
         if (selection.find("gamepad") != std::string::npos)
         {
@@ -233,7 +240,7 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
             std::cerr << "Cannot read internal input device ID : " << selection.c_str() << std::endl;
         }
     }
-    
+
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
@@ -258,16 +265,16 @@ void OptionsScreenInput::filterInput(Input::InputType type,
         if (gamepad != NULL && gamepad->getConfiguration() != NULL)
         {
             //printf("'%s'\n", gamepad->getConfiguration()->getName().c_str());
-            
+
             ListWidget* devices = this->getWidget<ListWidget>("devices");
             assert(devices != NULL);
-            
+
             std::string internal_name;
             const int gpad_config_count = input_manager->getDeviceList()->getGamePadConfigAmount();
             for (int i = 0; i < gpad_config_count; i++)
             {
                 GamepadConfig *config = input_manager->getDeviceList()->getGamepadConfig(i);
-                
+
                 // Don't display the configuration if a matching device is not available
                 if (config == gamepad->getConfiguration())
                 {
@@ -276,8 +283,8 @@ void OptionsScreenInput::filterInput(Input::InputType type,
                     internal_name = gpname.str();
                 }
             }
-            
-            if (internal_name.size() > 0)
+
+            if (internal_name.size() > 0 && abs(value) > Input::MAX_VALUE/2)
             {
                 devices->markItemRed(internal_name.c_str());
                 m_highlights[internal_name] = 0.25f;
@@ -295,12 +302,12 @@ void OptionsScreenInput::onUpdate(float dt, irr::video::IVideoDriver* drv)
     {
         it->second -= dt;
         if (it->second < 0.0f)
-        {            
+        {
             ListWidget* devices = this->getWidget<ListWidget>("devices");
             assert(devices != NULL);
-            
+
             devices->markItemRed(it->first.c_str(), false);
-            
+
             m_highlights.erase(it++);
         }
         else

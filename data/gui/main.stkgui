@@ -1,41 +1,31 @@
 <stkgui>
-
-    <div x="5%" y="0" width="90%" height="100%" layout="vertical-row" >
     
-        <icon id="logo" align="center" proportion="8" width="100%" icon="gui/logo.png"/>
-        <buttonbar id="menu_toprow" proportion="3" width="75%" align="center">
-            <icon-button id="new" width="128" height="128" icon="gui/main_race.png"
-                    I18N="Main menu button" text="Race"/>
-            <icon-button id="multiplayer" width="128" height="128" icon="gui/main_race_multi.png"
-                    I18N="Main menu button" text="Multiplayer Race"/>
-            <icon-button id="challenges" width="128" height="128"
-                         icon="gui/challenge.png"
-                         I18N="Main menu button"  text="Challenges"/>
+    <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
+
+        <icon id="logo" align="center" proportion="5" width="100%" icon="gui/logo.png"/>
+        
+        <buttonbar id="menu_toprow" proportion="3" width="90%" align="center">
+            <icon-button id="story" width="128" height="128"
+                         icon="gui/menu_story.png" focus_icon="gui/menu_story_focus.png"
+                         I18N="Main menu button"  text="Story Mode"/>
+            <icon-button id="new" width="128" height="128"
+                         icon="gui/menu_race.png" focus_icon="gui/menu_race_focus.png"
+                         I18N="Main menu button" text="Single-player"/>
+            <icon-button id="multiplayer" width="128" height="128"
+                         icon="gui/menu_multi.png" focus_icon="gui/menu_multi_focus.png"
+                         I18N="Main menu button" text="Multiplayer"/>
+            <icon-button id="online" width="128" height="128"
+                         icon="gui/menu_online.png" focus_icon="gui/menu_online_focus.png"
+                         I18N="Main menu button" text="Online"/>
             <icon-button id="addons" width="128" height="128"
-                         icon="gui/addons.png"
+                         icon="gui/menu_addons.png" focus_icon="gui/menu_addons_focus.png"
                          I18N="Main menu button"  text="Addons"/>
         </buttonbar>
         
-        <spacer width="10" proportion="1"/>
-        
-        <buttonbar id="menu_bottomrow" proportion="3" width="85%" align="center">
-            <icon-button id="options" width="128" height="128" icon="gui/main_options.png"
-                    I18N="Main menu button"  text="Options"/>
-            <icon-button id="help" width="128" height="128" icon="gui/main_help.png"
-                    I18N="Main menu button" text="Help"/>
-            <icon-button id="about" width="128" height="128" icon="gui/main_about.png"
-                    I18N="Main menu button" text="About"/>
-            <icon-button id="quit" width="128" height="128" icon="gui/main_quit.png"
-                    I18N="Main menu button" text="Quit"/>
-        </buttonbar>
-        
-        <spacer width="10" proportion="1"/>
-        
+        <spacer width="10" height="7%"/>
+    
         <bottombar width="100%" height="10%" layout="horizontal-row">
-            <div proportion="1" height="100%" layout="horizontal-row">
-                <icon-button id="lang_combo" icon="gui/dropdown.png" height="100%" align="center"/>
-            </div>
-            
+
             <spacer width="10" height="10" />
             
             <label proportion="3" height="100%" id="info_addons"
@@ -45,8 +35,19 @@
                
             <spacer width="10" height="10" />
             
-            <placeholder id="empty_for_now" proportion="1">
-            </placeholder>
+            <buttonbar id="menu_bottomrow" x="0" y="0" width="30%" height="100%" align="center">
+                <icon-button id="options" width="64" height="64" icon="gui/main_options.png" extend_label="50"
+                             I18N="Main menu button"  text="Options" label_location="hover"/>
+                <icon-button id="help" width="64" height="64" icon="gui/main_help.png"  extend_label="50"
+                             I18N="Main menu button" text="Help" label_location="hover"/>
+                <icon-button id="startTutorial" width="64" height="64" icon="gui/tutorial.png" extend_label="150"
+                             I18N="Main menu button" text="Tutorial" label_location="hover"/>
+                <icon-button id="about" width="64" height="64" icon="gui/main_about.png"  extend_label="50"
+                             I18N="Main menu button" text="About" label_location="hover"/>
+                <icon-button id="quit" width="64" height="64" icon="gui/main_quit.png"  extend_label="50"
+                             I18N="Main menu button" text="Quit" label_location="hover"/>
+            </buttonbar>
+            
         </bottombar>
         
     </div>

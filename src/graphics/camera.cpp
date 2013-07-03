@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
@@ -20,7 +19,7 @@
 
 #include "graphics/camera.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__)
+#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
 #  define isnan _isnan
 #else
 #  include <math.h>
@@ -29,42 +28,51 @@
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/rain.hpp"
 #include "io/xml_node.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/explosion_animation.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/skidding.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/constants.hpp"
 
-#include <ICameraSceneNode.h>
-#include <ISceneManager.h>
+#include "ICameraSceneNode.h"
+#include "ISceneManager.h"
 
 AlignedArray<Camera::EndCameraInformation> Camera::m_end_cameras;
+std::vector<Camera*>                       Camera::m_all_cameras;
 
-Camera::Camera(int camera_index, const Kart* kart)
+// ============================================================================
+Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
 {
-    m_mode     = CM_NORMAL;
-    m_index    = camera_index;
-    m_camera   = irr_driver->addCameraSceneNode();
-    
+    m_mode          = CM_NORMAL;
+    m_index         = camera_index;
+    m_rain          = NULL;
+    m_original_kart = kart;
+    m_camera        = irr_driver->addCameraSceneNode();
+
 #ifdef DEBUG
     m_camera->setName(core::stringc("Camera for ") + kart->getKartProperties()->getName());
 #endif
-    
+
     setupCamera();
     m_distance = kart->getKartProperties()->getCameraDistance();
-    m_kart     = kart;
+    setKart(kart);
     m_ambient_light = World::getWorld()->getTrack()->getDefaultAmbientColor();
 
     // TODO: Put these values into a config file
     //       Global or per split screen zone?
-    //       Either global or per user (for instance, some users may not like 
-    //       the extra camera rotation so they could set m_rotation_range to 
-    //       zero to disable it for themselves). 
+    //       Either global or per user (for instance, some users may not like
+    //       the extra camera rotation so they could set m_rotation_range to
+    //       zero to disable it for themselves).
     m_position_speed = 8.0f;
     m_target_speed   = 10.0f;
     m_rotation_range = 0.4f;
+    m_rotation_range = 0.0f;
     // TODO: Make this per user too if the one above goes that way.
     switch(UserConfigParams::m_camera_style)
     {
@@ -76,12 +84,30 @@ Camera::Camera(int camera_index, const Kart* kart)
 }   // Camera
 
 // ----------------------------------------------------------------------------
-/** Removes the camera scene node from the scene. 
+/** Removes the camera scene node from the scene.
  */
 Camera::~Camera()
 {
+    if(m_rain) delete m_rain;
     irr_driver->removeCameraSceneNode(m_camera);
 }   // ~Camera
+
+//-----------------------------------------------------------------------------
+/** Changes the owner of this camera to the new kart.
+ *  \param new_kart The new kart to use this camera.
+ */
+void Camera::setKart(AbstractKart *new_kart)
+{
+    m_kart = new_kart;
+#ifdef DEBUG
+    if(new_kart)
+    {
+        std::string name = new_kart->getIdent()+"'s camera";
+        getCameraSceneNode()->setName(name.c_str() );
+    }
+#endif
+
+}   // setKart
 
 //-----------------------------------------------------------------------------
 /** This function clears all end camera data structure. This is necessary
@@ -104,7 +130,12 @@ void Camera::readEndCamera(const XMLNode &root)
     m_end_cameras.clear();
     for(unsigned int i=0; i<root.getNumNodes(); i++)
     {
-        const XMLNode *node = root.getNode(i);
+        unsigned int index = i;
+        // In reverse mode, reverse the order in which the
+        // end cameras are read.
+        if(QuadGraph::get()->isReverse())
+            index = root.getNumNodes() - 1 - i;
+        const XMLNode *node = root.getNode(index);
         EndCameraInformation eci;
         if(!eci.readXML(*node)) continue;
         m_end_cameras.push_back(eci);
@@ -120,16 +151,16 @@ void Camera::setupCamera()
     m_aspect = (float)(UserConfigParams::m_width)/UserConfigParams::m_height;
     switch(race_manager->getNumLocalPlayers())
     {
-    case 1: m_viewport = core::recti(0, 0, 
-                                     UserConfigParams::m_width, 
+    case 1: m_viewport = core::recti(0, 0,
+                                     UserConfigParams::m_width,
                                      UserConfigParams::m_height);
             m_scaling  = core::vector2df(1.0f, 1.0f);
             m_fov      = DEGREE_TO_RAD*75.0f;
             break;
-    case 2: m_viewport = core::recti(0, 
-                                     m_index==0 ? 0 
+    case 2: m_viewport = core::recti(0,
+                                     m_index==0 ? 0
                                                 : UserConfigParams::m_height>>1,
-                                     UserConfigParams::m_width, 
+                                     UserConfigParams::m_width,
                                      m_index==0 ? UserConfigParams::m_height>>1
                                                 : UserConfigParams::m_height);
             m_scaling  = core::vector2df(1.0f, 0.5f);
@@ -140,19 +171,19 @@ void Camera::setupCamera()
             /*
             if(m_index<2)
             {
-                m_viewport = core::recti(m_index==0 ? 0 
+                m_viewport = core::recti(m_index==0 ? 0
                                                     : UserConfigParams::m_width>>1,
-                                         0, 
-                                         m_index==0 ? UserConfigParams::m_width>>1 
-                                                    : UserConfigParams::m_width, 
+                                         0,
+                                         m_index==0 ? UserConfigParams::m_width>>1
+                                                    : UserConfigParams::m_width,
                                          UserConfigParams::m_height>>1);
                 m_scaling  = core::vector2df(0.5f, 0.5f);
                 m_fov      = DEGREE_TO_RAD*50.0f;
             }
             else
             {
-                m_viewport = core::recti(0, UserConfigParams::m_height>>1, 
-                                         UserConfigParams::m_width, 
+                m_viewport = core::recti(0, UserConfigParams::m_height>>1,
+                                         UserConfigParams::m_width,
                                          UserConfigParams::m_height);
                 m_scaling  = core::vector2df(1.0f, 0.5f);
                 m_fov      = DEGREE_TO_RAD*65.0f;
@@ -170,10 +201,12 @@ void Camera::setupCamera()
             m_fov      = DEGREE_TO_RAD*50.0f;
             }
             break;
-    default:fprintf(stderr, "Incorrect number of players: '%d' - assuming 1.\n",
-                    race_manager->getNumLocalPlayers());
-            m_viewport = core::recti(0, 0, 
-                                     UserConfigParams::m_width, 
+    default:
+            if(UserConfigParams::logMisc())
+                fprintf(stderr, "Incorrect number of players: '%d' - assuming 1.\n",
+                        race_manager->getNumLocalPlayers());
+            m_viewport = core::recti(0, 0,
+                                     UserConfigParams::m_width,
                                      UserConfigParams::m_height);
             m_scaling  = core::vector2df(1.0f, 1.0f);
             m_fov      = DEGREE_TO_RAD*75.0f;
@@ -182,7 +215,14 @@ void Camera::setupCamera()
     m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
     m_camera->setFarValue(World::getWorld()->getTrack()->getCameraFar());
-    }   // setupCamera
+
+    if (UserConfigParams::m_weather_effects &&
+        World::getWorld()->getTrack()->getWeatherType() == WEATHER_RAIN)
+    {
+        m_rain = new Rain(this, NULL);
+    }
+
+}   // setupCamera
 
 // ----------------------------------------------------------------------------
 /** Sets the mode of the camera.
@@ -190,8 +230,8 @@ void Camera::setupCamera()
  */
 void Camera::setMode(Mode mode)
 {
-    // If we switch from reverse view, move the camera immediately to the 
-    // correct position. 
+    // If we switch from reverse view, move the camera immediately to the
+    // correct position.
     if(m_mode==CM_REVERSE && mode==CM_NORMAL)
     {
         Vec3 wanted_position, wanted_target;
@@ -206,14 +246,12 @@ void Camera::setMode(Mode mode)
     }
     if(mode==CM_FINAL)
     {
+        if(m_end_cameras.size()>0)
+            m_camera->setPosition(m_end_cameras[0].m_position.toIrrVector());
         m_next_end_camera    = m_end_cameras.size()>1 ? 1 : 0;
         m_current_end_camera = 0;
-        if(m_end_cameras.size()>0 && 
-            m_end_cameras[0].m_type==EndCameraInformation::EC_STATIC_FOLLOW_KART)
-        {
-            m_camera->setPosition(m_end_cameras[0].m_position.toIrrVector());
-            m_camera->setTarget(m_kart->getXYZ().toIrrVector());
-        }
+        m_camera->setFOV(m_fov);
+        handleEndCamera(0);
     }   // mode==CM_FINAL
 
     m_mode = mode;
@@ -233,6 +271,7 @@ Camera::Mode Camera::getMode()
 */
 void Camera::reset()
 {
+    m_kart = m_original_kart;
     setMode(CM_NORMAL);
     setInitialTransform();
 }   // reset
@@ -243,8 +282,9 @@ void Camera::reset()
  */
 void Camera::setInitialTransform()
 {
-    m_camera->setPosition(  m_kart->getXYZ().toIrrVector() 
-                          + core::vector3df(0, 25, -50)   );
+    Vec3 start_offset(0, 25, -50);
+    Vec3 xx = m_kart->getTrans()(start_offset);
+    m_camera->setPosition(  xx.toIrrVector());
     // Reset the target from the previous target (in case of a restart
     // of a race) - otherwise the camera will initially point in the wrong
     // direction till smoothMoveCamera has corrected this. Setting target
@@ -281,7 +321,7 @@ void Camera::smoothMoveCamera(float dt, const Vec3 &wanted_position,
     assert(!isnan(m_camera->getPosition().X));
     assert(!isnan(m_camera->getPosition().Y));
     assert(!isnan(m_camera->getPosition().Z));
-    
+
     if (race_manager->getNumLocalPlayers() < 2)
     {
         sfx_manager->positionListener(current_position,  current_target - current_position);
@@ -301,14 +341,15 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
 {
     *wanted_target = m_kart->getXYZ();
     wanted_target->setY(wanted_target->getY()+ 0.75f);
-    
-    // This first line moves the camera around behind the kart, pointing it 
+
+    // This first line moves the camera around behind the kart, pointing it
     // towards where the kart is turning (and turning even more while skidding).
     // The skidding effect is dampened.
-    float steering = m_kart->getSteerPercent() 
-                   * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f );
+    float steering = m_kart->getSteerPercent()
+                   * (1.0f + (m_kart->getSkidding()->getSkidFactor() - 1.0f)
+                             /2.3f );
     // quadratically to dampen small variations (but keep sign)
-    float dampened_steer =  fabsf(steering) * steering; 
+    float dampened_steer =  fabsf(steering) * steering;
 
     float tan_up = tan(m_kart->getKartProperties()->getCameraForwardUpAngle());
     Vec3 relative_position(-m_distance*m_rotation_range*dampened_steer*0.5f,
@@ -325,7 +366,7 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
  *  \param sideway Sideway movement of the camera.
  *  \param distance Distance from kart.
  */
-void Camera::getCameraSettings(float *above_kart, float *cam_angle, 
+void Camera::getCameraSettings(float *above_kart, float *cam_angle,
                                float *sideway, float *distance,
                                bool *smoothing)
 {
@@ -347,10 +388,11 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
     case CM_FALLING:
         {
             *above_kart    = 0.75f;
-            float steering = m_kart->getSteerPercent() 
-                           * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f );
+            float steering = m_kart->getSteerPercent()
+                           * (1.0f + (m_kart->getSkidding()->getSkidFactor()
+                                      - 1.0f)/2.3f );
             // quadratically to dampen small variations (but keep sign)
-            float dampened_steer = fabsf(steering) * steering; 
+            float dampened_steer = fabsf(steering) * steering;
             *cam_angle           = kp->getCameraForwardUpAngle();
             *sideway             = -m_rotation_range*dampened_steer*0.5f;
             *distance            = -m_distance;
@@ -370,9 +412,9 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
         {
             *above_kart = 0.75f;
             *cam_angle  = 20.0f*DEGREE_TO_RAD;
-            *sideway    = m_rotation_range 
+            *sideway    = m_rotation_range
                         * m_kart->getSteerPercent()
-                        * m_kart->getSkidding();
+                        * m_kart->getSkidding()->getSkidFactor();
             *distance   = -0.5f*m_distance;
             *smoothing  = false;
             break;
@@ -392,7 +434,7 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
         break;
     }
 
-}   // get CameraPosition
+}   // getCameraSettings
 
 //-----------------------------------------------------------------------------
 /** Called once per time frame to move the camera to the right position.
@@ -400,15 +442,28 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
  */
 void Camera::update(float dt)
 {
+    if (UserConfigParams::m_graphical_effects)
+    {
+        if (m_rain)
+        {
+            m_rain->setPosition( getCameraSceneNode()->getPosition() );
+            m_rain->update(dt);
+        }
+    }  // UserConfigParams::m_graphical_effects
+
+
     // The following settings give a debug camera which shows the track from
     // high above the kart straight down.
     if(UserConfigParams::m_camera_debug)
     {
         core::vector3df xyz = m_kart->getXYZ().toIrrVector();
         m_camera->setTarget(xyz);
-        xyz.Y = xyz.Y+30;
+        xyz.Y = xyz.Y+55;
+        xyz.Z -= 5.0f;
         m_camera->setPosition(xyz);
-        m_camera->setNearValue(52.0); // To view inside tunnels (FIXME 52>30 why??? makes no sense)
+        // To view inside tunnels (FIXME 27>15 why??? makes no sense
+        // - the kart should not be visible, but it works)
+        m_camera->setNearValue(27.0);
         return;
     }
 
@@ -423,9 +478,9 @@ void Camera::update(float dt)
     getCameraSettings(&above_kart, &cam_angle, &side_way, &distance,
                       &smoothing);
 
-    // If an explosion or rescue is happening, stop moving the camera,
+    // If an explosion is happening, stop moving the camera,
     // but keep it target on the kart.
-    if(m_kart->playingEmergencyAnimation())
+    if(dynamic_cast<ExplosionAnimation*>(m_kart->getKartAnimation()))
     {
         // The camera target needs to be 'smooth moved', otherwise
         // there will be a noticable jump in the first frame
@@ -453,7 +508,7 @@ void Camera::update(float dt)
  *  \param sideway Sideway movement of the camera.
  *  \param distance Distance from kart.
 */
-void Camera::positionCamera(float dt, float above_kart, float cam_angle, 
+void Camera::positionCamera(float dt, float above_kart, float cam_angle,
                            float side_way, float distance, float smoothing)
 {
     Vec3 wanted_position;
@@ -465,8 +520,17 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
     Vec3 relative_position(side_way,
                            fabsf(distance)*tan_up+above_kart,
                            distance);
-    const btTransform &trans=m_kart->getTrans();
-    wanted_position = trans(relative_position);
+    btTransform t=m_kart->getTrans();
+    if(stk_config->m_camera_follow_skid &&
+        m_kart->getSkidding()->getVisualSkidRotation()!=0)
+    {
+        // If the camera should follow the graphical skid, add the
+        // visual rotation to the relative vector:
+        btQuaternion q(m_kart->getSkidding()->getVisualSkidRotation(), 0, 0);
+        t.setBasis(t.getBasis() * btMatrix3x3(q));
+    }
+    wanted_position = t(relative_position);
+
     if (smoothing)
     {
         smoothMoveCamera(dt, wanted_position, wanted_target);
@@ -476,10 +540,11 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
         if (m_mode!=CM_FALLING)
             m_camera->setPosition(wanted_position.toIrrVector());
         m_camera->setTarget(wanted_target.toIrrVector());
-        
+
         if (race_manager->getNumLocalPlayers() < 2)
         {
-            sfx_manager->positionListener(m_camera->getPosition(),  wanted_target - m_camera->getPosition());
+            sfx_manager->positionListener(m_camera->getPosition(),
+                                      wanted_target - m_camera->getPosition());
         }
     }
 
@@ -487,13 +552,32 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
 
 // ----------------------------------------------------------------------------
 /** This function handles the end camera. It adjusts the camera position
- *  according to the current camera type, and checks if a switch to the 
+ *  according to the current camera type, and checks if a switch to the
  *  next camera should be made.
  *  \param dt Time step size.
 */
 void Camera::handleEndCamera(float dt)
 {
-    EndCameraInformation::EndCameraType info 
+    // First test if the kart is close enough to the next end camera, and
+    // if so activate it.
+    if( m_end_cameras.size()>0 &&
+        m_end_cameras[m_next_end_camera].isReached(m_kart->getXYZ()))
+    {
+        m_current_end_camera = m_next_end_camera;
+        if(m_end_cameras[m_current_end_camera].m_type
+            ==EndCameraInformation::EC_STATIC_FOLLOW_KART)
+        {
+            m_camera->setPosition(
+                m_end_cameras[m_current_end_camera].m_position.toIrrVector()
+                );
+        }
+        m_camera->setFOV(m_fov);
+        m_next_end_camera++;
+        if(m_next_end_camera>=(unsigned)m_end_cameras.size())
+            m_next_end_camera = 0;
+    }
+
+    EndCameraInformation::EndCameraType info
         = m_end_cameras.size()==0 ? EndCameraInformation::EC_AHEAD_OF_KART
                                   : m_end_cameras[m_current_end_camera].m_type;
 
@@ -501,16 +585,18 @@ void Camera::handleEndCamera(float dt)
     {
     case EndCameraInformation::EC_STATIC_FOLLOW_KART:
         {
-            const core::vector3df &cp = m_camera->getAbsolutePosition();
+            // Since the camera has no parents, we can use the relative
+            // position here (otherwise we need to call updateAbsolutePosition
+            // after changing the relative position in order to get the right
+            // position here).
+            const core::vector3df &cp = m_camera->getPosition();
             const Vec3            &kp = m_kart->getXYZ();
             // Estimate the fov, assuming that the vector from the camera to
             // the kart and the kart length are orthogonal to each other
             // --> tan (fov) = kart_length / camera_kart_distance
             // In order to show a little bit of the surrounding of the kart
-            // the kart length is multiplied by 3 (experimentally found, but
-            // this way we have approx one kart length on the left and right
-            // side of the screen for the surroundings)
-            float fov = 3*atan2(m_kart->getKartLength(),
+            // the kart length is multiplied by 6 (experimentally found)
+            float fov = 6*atan2(m_kart->getKartLength(),
                                 (cp-kp.toIrrVector()).getLength());
             m_camera->setFOV(fov);
             m_camera->setTarget(m_kart->getXYZ().toIrrVector());
@@ -521,30 +607,15 @@ void Camera::handleEndCamera(float dt)
             const KartProperties *kp=m_kart->getKartProperties();
             float cam_angle  = kp->getCameraBackwardUpAngle();
 
-            positionCamera(dt, /*above_kart*/0.75f, 
-                           cam_angle, /*side_way*/0, 
+            positionCamera(dt, /*above_kart*/0.75f,
+                           cam_angle, /*side_way*/0,
                            2.0f*m_distance, /*smoothing*/false);
             break;
         }
     default: break;
     }   // switch
 
-    // Now test if the kart is close enough to the next end camera, and
-    // if so activate it.
-    if( m_end_cameras.size()>0 && 
-        m_end_cameras[m_next_end_camera].isReached(m_kart->getXYZ()))
-    {
-        m_current_end_camera = m_next_end_camera;
-        if(m_end_cameras[m_current_end_camera].m_type
-            ==EndCameraInformation::EC_STATIC_FOLLOW_KART)
-            m_camera->setPosition(
-                m_end_cameras[m_current_end_camera].m_position.toIrrVector()
-                );
-        m_camera->setFOV(m_fov);
-        m_next_end_camera++;
-        if(m_next_end_camera>=(unsigned)m_end_cameras.size()) m_next_end_camera = 0;
-    }
-}   // checkForNextEndCamera
+}   // handleEndCamera
 
 // ----------------------------------------------------------------------------
 /** Sets viewport etc. for this camera. Called from irr_driver just before

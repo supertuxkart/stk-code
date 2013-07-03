@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -23,7 +22,7 @@
 #include "network/message.hpp"
 
 /** Class used to transfer information about projectiles from server to client.
- *  It contains only the coordinates, rotation, and explosion state.    
+ *  It contains only the coordinates, rotation, and explosion state.
  */
 class FlyableInfo
 {
@@ -32,13 +31,13 @@ public:
     btQuaternion m_rotation;      /** Orientation of object */
     bool         m_exploded;      /** If the object exploded in the current frame. */
 
-    /** Constructor to initialise all fields. 
+    /** Constructor to initialise all fields.
      */
     FlyableInfo(const Vec3& xyz, const btQuaternion &rotation, bool exploded) :
         m_xyz(xyz), m_rotation(rotation), m_exploded(exploded)
        {};
     // ------------------------------------------------------------------------
-    /** Allow this object to be stored in std::vector fields. 
+    /** Allow this object to be stored in std::vector fields.
      */
     FlyableInfo() {};
     // ------------------------------------------------------------------------

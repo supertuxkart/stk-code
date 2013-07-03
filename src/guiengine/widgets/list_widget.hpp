@@ -24,6 +24,7 @@
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
@@ -39,7 +40,7 @@ namespace GUIEngine
     };
     
     /** \brief A vertical list widget with text entries
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       * \note items you add to a list are not kept after the the list is in was removed
       *       (i.e. you need to add items everytime the screen is shown)
       */
@@ -66,6 +67,9 @@ namespace GUIEngine
         
         ButtonWidget* m_selected_column;
         
+        /** \brief whether this list is sorted in descending order */
+        bool m_sort_desc;
+        
         struct Column
         {
             irr::core::stringw m_text;
@@ -84,6 +88,9 @@ namespace GUIEngine
         IListWidgetHeaderListener* m_listener;
         
     public:
+        
+        LEAK_CHECK()
+        
         ListWidget();
         
         SkinWidgetContainer m_selection_skin_info;
@@ -92,7 +99,7 @@ namespace GUIEngine
         virtual void add();
         
         /** \brief implement callback from base class GUIEngine::Widget */
-        virtual void unfocused(const int playerID);
+        virtual void unfocused(const int playerID, Widget* new_focus);
         
         /** \brief implement callback from base class GUIEngine::Widget */
         virtual void elementRemoved();
@@ -183,6 +190,7 @@ namespace GUIEngine
           * \pre may only be called after the widget has been added to the screen with add()
           */
         void markItemRed(const int id, bool red=true);
+        void markItemBlue(const int id, bool blue=true);
         
         /**
           * \brief Make an item red to mark an error, for instance
@@ -195,8 +203,17 @@ namespace GUIEngine
             markItemRed( id, red );
         }
 
+        void markItemBlue(const std::string internalName, bool blue=true)
+        {
+            const int id = getItemID(internalName);
+            assert(id != -1);
+            markItemBlue( id, blue );
+        }
+
         /** Override callback from Widget */
-        virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
+        virtual EventPropagation transmitEvent(Widget* w, 
+                                               const std::string& originator, 
+                                               const int playerID);
         
         void setColumnListener(IListWidgetHeaderListener* listener)
         {

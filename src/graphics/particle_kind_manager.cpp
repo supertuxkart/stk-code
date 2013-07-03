@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2011  Joerg Henrichs, Marianne Gagnon
@@ -19,6 +18,7 @@
 
 #include "graphics/particle_kind_manager.hpp"
 #include "io/file_manager.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include <stdexcept>
@@ -51,7 +51,7 @@ ParticleKindManager::~ParticleKindManager()
 void ParticleKindManager::cleanup()
 {
     cleanUpTrackSpecificGfx();
-    
+
     std::map<std::string, ParticleKind*>::iterator it;
     for (it = m_kinds.begin(); it != m_kinds.end(); it++)
     {
@@ -97,7 +97,7 @@ ParticleKind* ParticleKindManager::getParticles(const std::string &name)
             // not found in track directory, let's try globally...
         }
     }
-    
+
     i = m_kinds.find(name);
     if (i == m_kinds.end())
     {

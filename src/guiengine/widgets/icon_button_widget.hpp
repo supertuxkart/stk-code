@@ -28,12 +28,13 @@ namespace irr
 }
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
 {
     /** \brief A button widget with an icon and optionnaly a label beneath
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class IconButtonWidget : public Widget
     {
@@ -71,6 +72,8 @@ namespace GUIEngine
         
     public:
 
+        LEAK_CHECK()
+        
         /** Whether to make the widget included in keyboard navigation order when adding */
         bool m_tab_stop;
 
@@ -119,6 +122,12 @@ namespace GUIEngine
         {
             m_highlight_texture = texture;
         }
+        
+        /** \brief override from base class */
+        virtual EventPropagation focused(const int playerID);
+        
+        /** \brief override from base class */
+        virtual void unfocused(const int playerID, Widget* new_focus);
     };
 }
 

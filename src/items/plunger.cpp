@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Joerg Henrichs
@@ -22,38 +21,24 @@
 
 #include "items/plunger.hpp"
 
-#include "graphics/irr_driver.hpp"
 #include "io/xml_node.hpp"
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
+#include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "physics/physical_object.hpp"
+#include "physics/physics.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
 
-const wchar_t* getPlungerInFaceString()
-{
-    const int PLUNGER_IN_FACE_STRINGS_AMOUNT = 2;
-
-    RandomGenerator r;
-    const int id = r.get(PLUNGER_IN_FACE_STRINGS_AMOUNT);
-
-    switch (id)
-    {
-        //I18N: shown when a player receives a plunger in his face
-        case 0: return _LTR("%0 gets a fancy mask from %1");
-        //I18N: shown when a player receives a plunger in his face
-        case 1: return _LTR("%1 merges %0's face with a plunger");
-        default:assert(false); return L"";   // avoid compiler warning
-    }
-}
-
 
 // -----------------------------------------------------------------------------
-Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
+Plunger::Plunger(AbstractKart *kart)
+       : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
 {
     const float gravity = 0.0f;
 
@@ -65,7 +50,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
     m_reverse_mode = kart->getControls().m_look_back;
 
     // find closest kart in front of the current one
-    const Kart *closest_kart=0;   
+    const AbstractKart *closest_kart=0;
     Vec3        direction;
     float       kart_dist_2;
     getClosestKart(&closest_kart, &kart_dist_2, &direction,
@@ -88,20 +73,22 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
                                        &fire_angle, &up_velocity);
 
         btTransform trans = kart->getTrans();
-    
+
         trans.setRotation(btQuaternion(btVector3(0, 1, 0), fire_angle));
 
         m_initial_velocity = btVector3(0.0f, up_velocity, plunger_speed);
 
         createPhysics(forward_offset, m_initial_velocity,
-                      new btCylinderShape(0.5f*m_extend), gravity, 
-                      /* rotates */false , /*turn around*/false, &trans );
+                      new btCylinderShape(0.5f*m_extend),
+                      0.5f /* restitution */ , gravity,
+                      /* rotates */false , /*turn around*/false, &trans);
     }
     else
     {
         createPhysics(forward_offset, btVector3(pitch, 0.0f, plunger_speed),
-                      new btCylinderShape(0.5f*m_extend), gravity, 
-                      false /* rotates */, m_reverse_mode, &kart_transform );
+                      new btCylinderShape(0.5f*m_extend),
+                      0.5f /* restitution */, gravity,
+                      false /* rotates */, m_reverse_mode, &kart_transform);
     }
 
     //adjust height according to terrain
@@ -118,21 +105,45 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
     m_keep_alive = -1;
 }   // Plunger
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 Plunger::~Plunger()
 {
     if(m_rubber_band)
         delete m_rubber_band;
 }   // ~Plunger
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void Plunger::init(const XMLNode &node, scene::IMesh *plunger_model)
 {
     Flyable::init(node, plunger_model, PowerupManager::POWERUP_PLUNGER);
 }   // init
 
-// -----------------------------------------------------------------------------
-void Plunger::update(float dt)
+// ----------------------------------------------------------------------------
+/** Picks a random message to be displayed when a kart is hit by a plunger.
+ *  \param The kart that was hit (ignored here).
+ *  \returns The string to display.
+ */
+const core::stringw Plunger::getHitString(const AbstractKart *kart) const
+{
+    const int PLUNGER_IN_FACE_STRINGS_AMOUNT = 2;
+    RandomGenerator r;
+    switch (r.get(PLUNGER_IN_FACE_STRINGS_AMOUNT))
+    {
+        //I18N: shown when a player receives a plunger in his face
+        case 0: return _LTR("%0 gets a fancy mask from %1");
+        //I18N: shown when a player receives a plunger in his face
+        case 1: return _LTR("%1 merges %0's face with a plunger");
+        default:assert(false); return L"";   // avoid compiler warning
+    }
+}   // getHitString
+
+// ----------------------------------------------------------------------------
+/** Updates the bowling ball ineach frame. If this function returns true, the
+ *  object will be removed by the projectile manager.
+ *  \param dt Time step size.
+ *  \returns True of this object should be removed.
+ */
+bool Plunger::updateAndDelete(float dt)
 {
     // In keep-alive mode, just update the rubber band
     if(m_keep_alive >= 0)
@@ -141,18 +152,19 @@ void Plunger::update(float dt)
         if(m_keep_alive<=0)
         {
             setHasHit();
-            projectile_manager->notifyRemove();
+            return true;
         }
         if(m_rubber_band != NULL) m_rubber_band->update(dt);
-        return;
+        return false;
     }
 
     // Else: update the flyable and rubber band
-    Flyable::update(dt);
+    bool ret = Flyable::updateAndDelete(dt);
     if(m_rubber_band != NULL) m_rubber_band->update(dt);
 
-    if(getHoT()==Track::NOHIT) return;
-}   // update
+    return ret;
+
+}   // updateAndDelete
 
 // -----------------------------------------------------------------------------
 /** Virtual function called when the plunger hits something.
@@ -161,10 +173,12 @@ void Plunger::update(float dt)
  *  till the rubber band expires.
  *  \param kart Pointer to the kart hit (NULL if not a kart).
  *  \param obj  Pointer to PhysicalObject object if hit (NULL otherwise).
+ *  \returns True if there was actually a hit (i.e. not owner, and target is
+ *           not immune), false otherwise.
  */
-void Plunger::hit(Kart *kart, PhysicalObject *obj)
+bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 {
-    if(isOwnerImmunity(kart)) return;
+    if(isOwnerImmunity(kart)) return false;
 
     RaceGUIBase* gui = World::getWorld()->getRaceGUI();
     irr::core::stringw hit_message;
@@ -176,18 +190,19 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
         if(kart)
         {
             kart->blockViewWithPlunger();
+            if (kart->getController()->isPlayerController())
+                sfx_manager->quickSound("plunger");
 
-            hit_message += StringUtils::insertValues(getPlungerInFaceString(),
+            hit_message += StringUtils::insertValues(getHitString(kart),
                                                      core::stringw(kart->getName()),
                                                      core::stringw(m_owner->getName())
                                                     ).c_str();
-            gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
+            gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f,
+                            video::SColor(255, 255, 255, 255), false);
         }
 
         m_keep_alive = 0;
-        // Make this object invisible by placing it faaar down. Note that if this
-        // objects is simply removed from the scene graph, it might be auto-deleted
-        // because the ref count reaches zero.
+        // Make this object invisible.
         getNode()->setVisible(false);
         World::getWorld()->getPhysics()->removeBody(getBody());
     }
@@ -208,7 +223,7 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
         if(kart)
         {
             m_rubber_band->hit(kart);
-            return;
+            return false;
         }
         else if(obj)
         {
@@ -220,6 +235,9 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
             m_rubber_band->hit(NULL, &(getXYZ()));
         }
     }
+
+    // Rubber band attached.
+    return false;
 }   // hit
 
 // -----------------------------------------------------------------------------

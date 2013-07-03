@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -23,21 +22,33 @@
 #include <stdio.h>
 #include <sstream>
 
+#include "audio/music_information.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
-#include "items/item_manager.hpp"
-#include "audio/music_information.hpp"
+#include "karts/kart_properties.hpp"
+#include "utils/log.hpp"
 
 STKConfig* stk_config=0;
 float STKConfig::UNDEFINED = -99.9f;
 
 //-----------------------------------------------------------------------------
+/** Constructor, which only initialises the object. The actual work is done
+ *  by calling load().
+ */
+STKConfig::STKConfig()
+{
+    m_has_been_loaded         = false;
+    m_default_kart_properties = new KartProperties();
+}   // STKConfig
+//-----------------------------------------------------------------------------
 STKConfig::~STKConfig()
 {
     if(m_title_music)
         delete m_title_music;
+    delete m_default_kart_properties;
 }   // ~STKConfig
+
 //-----------------------------------------------------------------------------
 /** Loads the stk configuration file. After loading it checks if all necessary
  *  values are actually defined, otherwise an error message is printed and STK
@@ -69,40 +80,34 @@ void STKConfig::load(const std::string &filename)
 
     catch(std::exception& err)
     {
-        fprintf(stderr, "FATAL ERROR while reading StkConfig '%s':\n", filename.c_str());
-        fprintf(stderr, "    %s", err.what());
-        fprintf(stderr, "\n");
-        exit(1);
+        Log::error("StkConfig", "FATAL ERROR while reading '%s':", filename.c_str());
+        Log::fatal("StkConfig", "    %s", err.what());
     }
     delete root;
 
     // Check that all necessary values are indeed set
     // -----------------------------------------------
 
-#define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                         \
-        fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
-                strA,filename.c_str());exit(-1);                       \
+#define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                   \
+        Log::fatal("StkConfig", "Missing default value for '%s' in '%s'.",    \
+                   strA,filename.c_str());              \
     }
 
     if(m_score_increase.size()==0 || (int)m_score_increase.size()!=m_max_karts)
     {
-        fprintf(stderr,"Not or not enough scores defined in stk_config");
-        exit(-1);
+        Log::fatal("StkConfig", "Not or not enough scores defined in stk_config");
     }
     if(m_leader_intervals.size()==0)
     {
-        fprintf(stderr,"No follow leader interval(s) defined in stk_config");
-        exit(-1);
+        Log::fatal("StkConfig", "No follow leader interval(s) defined in stk_config");
     }
-    
+
     if(m_switch_items.size()!=Item::ITEM_LAST-Item::ITEM_FIRST+1)
     {
-        fprintf(stderr,"No item switches defined in stk_config");
-        exit(-1);
+        Log::fatal("StkConfig", "Wrong number of item switches defined in stk_config");
     }
 
     CHECK_NEG(m_max_karts,                 "<karts max=..."             );
-    CHECK_NEG(m_gp_order,                  "grand-prix order=..."       );
     CHECK_NEG(m_parachute_friction,        "parachute-friction"         );
     CHECK_NEG(m_parachute_done_fraction,   "parachute-done-fraction"    );
     CHECK_NEG(m_parachute_time,            "parachute-time"             );
@@ -112,7 +117,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_anvil_time,                "anvil-time"                 );
     CHECK_NEG(m_anvil_weight,              "anvil-weight"               );
     CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
-    CHECK_NEG(m_bubble_gum_counter,        "bubblegum disappear counter");
+    CHECK_NEG(m_bubblegum_counter,         "bubblegum disappear counter");
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_max_history,               "max-history"                );
     CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
@@ -127,8 +132,14 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_leader_time_per_kart,      "leader time-per-kart"       );
     CHECK_NEG(m_penalty_time,              "penalty-time"               );
     CHECK_NEG(m_max_display_news,          "max-display-news"           );
+    CHECK_NEG(m_replay_delta_angle,        "replay delta-angle"         );
+    CHECK_NEG(m_replay_delta_pos2,         "replay delta-position"      );
+    CHECK_NEG(m_replay_dt,                 "replay delta-t"             );
+    CHECK_NEG(m_smooth_angle_limit,        "physics smooth-angle-limit" );
 
-    m_kart_properties.checkAllSet(filename);
+    // Square distance to make distance checks cheaper (no sqrt)
+    m_replay_delta_pos2 *= m_replay_delta_pos2;
+    m_default_kart_properties->checkAllSet(filename);
 }   // load
 
 // -----------------------------------------------------------------------------
@@ -138,28 +149,35 @@ void STKConfig::load(const std::string &filename)
  */
 void STKConfig::init_defaults()
 {
-    m_anvil_weight             = m_parachute_friction        =
-        m_parachute_time       = m_parachute_done_fraction   =
-        m_parachute_time_other = m_anvil_speed_factor        =
-        m_bomb_time            = m_bomb_time_increase        =
-        m_anvil_time           = m_music_credit_time         =
-        m_delay_finish_time    = m_skid_fadeout_time         =
-        m_near_ground          = m_item_switch_time          = 
-        m_penalty_time         = m_explosion_impulse_objects = UNDEFINED;
-    m_bubble_gum_counter       = -100;
-    m_max_karts                = -100;
-    m_gp_order                 = -100;
-    m_max_history              = -100;
-    m_max_skidmarks            = -100;
-    m_min_kart_version         = -100;
-    m_max_kart_version         = -100;
-    m_min_track_version        = -100;
-    m_max_track_version        = -100;
-    m_max_display_news         = -100;
-    m_title_music              = NULL;
-    m_enable_networking        = true;
-    m_smooth_normals           = false;
-    m_same_powerup_mode        = POWERUP_MODE_ONLY_IF_SAME;
+    m_anvil_weight               = m_parachute_friction        =
+        m_parachute_time         = m_parachute_done_fraction   =
+        m_parachute_time_other   = m_anvil_speed_factor        =
+        m_bomb_time              = m_bomb_time_increase        =
+        m_anvil_time             = m_music_credit_time         =
+        m_delay_finish_time      = m_skid_fadeout_time         =
+        m_near_ground            = m_item_switch_time          =
+        m_smooth_angle_limit     =
+        m_penalty_time           = m_explosion_impulse_objects = UNDEFINED;
+    m_bubblegum_counter          = -100;
+    m_max_karts                  = -100;
+    m_max_history                = -100;
+    m_max_skidmarks              = -100;
+    m_min_kart_version           = -100;
+    m_max_kart_version           = -100;
+    m_min_track_version          = -100;
+    m_max_track_version          = -100;
+    m_max_display_news           = -100;
+    m_replay_delta_angle         = -100;
+    m_replay_delta_pos2          = -100;
+    m_replay_dt                  = -100;
+    m_title_music                = NULL;
+    m_enable_networking          = true;
+    m_smooth_normals             = false;
+    m_same_powerup_mode          = POWERUP_MODE_ONLY_IF_SAME;
+    m_ai_acceleration            = 1.0f;
+    m_disable_steer_while_unskid = false;
+    m_camera_follow_skid         = false;
+
     m_score_increase.clear();
     m_leader_intervals.clear();
     m_switch_items.clear();
@@ -190,10 +208,6 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if(const XMLNode *gp_node = root->getNode("grand-prix"))
     {
-        std::string order;
-        gp_node->get("order", &order);
-        m_gp_order = (order=="most-points-first");
-
         for(unsigned int i=0; i<gp_node->getNumNodes(); i++)
         {
             const XMLNode *pn=gp_node->getNode(i);
@@ -207,10 +221,9 @@ void STKConfig::getAllData(const XMLNode * root)
             if(points<0 || from<0 || from>to||
                (int)m_score_increase.size()!=from-1)
             {
-                fprintf(stderr, "Incorrect GP point specification:\n");
-                fprintf(stderr, "from: %d  to: %d  points: %d\n", 
+                Log::error("StkConfig", "Incorrect GP point specification:");
+                Log::fatal("StkConfig", "from: %d  to: %d  points: %d",
                         from, to, points);
-                exit(-1);
             }
             for(int j=from; j<=to; j++)
                 m_score_increase.push_back(points);
@@ -225,7 +238,8 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *physics_node= root->getNode("physics"))
     {
-        physics_node->get("smooth-normals", &m_smooth_normals );
+        physics_node->get("smooth-normals",     &m_smooth_normals    );
+        physics_node->get("smooth-angle-limit", &m_smooth_angle_limit);
     }
 
     if (const XMLNode *startup_node= root->getNode("startup"))
@@ -238,20 +252,22 @@ void STKConfig::getAllData(const XMLNode * root)
         news_node->get("max-display", &m_max_display_news);
     }
 
+    if (const XMLNode *steer_node= root->getNode("steer"))
+    {
+        steer_node->get("disable-while-unskid", &m_disable_steer_while_unskid);
+        steer_node->get("camera-follow-skid",   &m_camera_follow_skid        );
+    }
+
     if (const XMLNode *music_node = root->getNode("music"))
     {
         std::string title_music;
         music_node->get("title", &title_music);
         assert(title_music.size() > 0);
-        
-        try
-        {
-            m_title_music = new MusicInformation(file_manager->getDataDir() + "/music/" + title_music);
-        }
-        catch (std::runtime_error& e)
-        {
-            fprintf(stderr, "Cannot load title music : %s\n", e.what());
-        }
+
+        m_title_music = MusicInformation::create(file_manager->getDataDir()
+                                                 + "/music/" + title_music  );
+        if(!m_title_music)
+            Log::error("StkConfig", "Cannot load title music : %s", title_music.c_str());
     }
 
     if(const XMLNode *history_node = root->getNode("history"))
@@ -272,7 +288,7 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *credits_node= root->getNode("credits"))
         credits_node->get("music", &m_music_credit_time);
 
-    
+
     if(const XMLNode *anvil_node= root->getNode("anvil"))
     {
         anvil_node->get("weight",       &m_anvil_weight      );
@@ -306,7 +322,7 @@ void STKConfig::getAllData(const XMLNode * root)
             m_same_powerup_mode = POWERUP_MODE_ONLY_IF_SAME;
         else
         {
-            printf("Invalid item mode '%s' - ignored.\n",
+            Log::warn("StkConfig", "Invalid item mode '%s' - ignored.",
                     s.c_str());
         }
     }
@@ -317,9 +333,9 @@ void STKConfig::getAllData(const XMLNode * root)
         switch_node->get("time",  &m_item_switch_time);
     }
 
-    if(const XMLNode *bubble_gum_node= root->getNode("bubble-gum"))
+    if(const XMLNode *bubblegum_node= root->getNode("bubblegum"))
     {
-        bubble_gum_node->get("disappear-counter", &m_bubble_gum_counter);
+        bubblegum_node->get("disappear-counter", &m_bubblegum_counter);
     }
 
     if(const XMLNode *explosion_node= root->getNode("explosion"))
@@ -327,9 +343,20 @@ void STKConfig::getAllData(const XMLNode * root)
         explosion_node->get("impulse-objects", &m_explosion_impulse_objects);
     }
 
+    if(const XMLNode *ai_node = root->getNode("ai"))
+    {
+        ai_node->get("acceleration", &m_ai_acceleration);
+    }
+
     if(const XMLNode *networking_node= root->getNode("networking"))
         networking_node->get("enable", &m_enable_networking);
 
+    if(const XMLNode *replay_node = root->getNode("replay"))
+    {
+        replay_node->get("delta-angle", &m_replay_delta_angle);
+        replay_node->get("delta-pos",   &m_replay_delta_pos2 );
+        replay_node->get("delta-t",     &m_replay_dt         );
+    }
     // Get the default KartProperties
     // ------------------------------
     const XMLNode *node = root -> getNode("general-kart-defaults");
@@ -339,7 +366,7 @@ void STKConfig::getAllData(const XMLNode * root)
         msg << "Couldn't load general-kart-defaults: no node.";
         throw std::runtime_error(msg.str());
     }
-    m_kart_properties.getAllData(node);
+    m_default_kart_properties->getAllData(node);
 
 }   // getAllData
 
@@ -353,6 +380,8 @@ void STKConfig::getAllData(const XMLNode * root)
  */
 void  STKConfig::getAllScores(std::vector<int> *all_scores, int num_karts)
 {
+    if (num_karts == 0) return;
+
     assert(num_karts <= m_max_karts);
     all_scores->resize(num_karts);
     (*all_scores)[num_karts-1] = 1;  // last position gets one point

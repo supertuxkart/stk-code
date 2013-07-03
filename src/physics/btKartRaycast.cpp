@@ -4,8 +4,8 @@
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
  * provided that the above copyright notice appear in all copies.
- * Erwin Coumans makes no representations about the suitability 
- * of this software for any purpose.  
+ * Erwin Coumans makes no representations about the suitability
+ * of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
 */
 
@@ -19,7 +19,7 @@
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 
-void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to, 
+void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
                                btVehicleRaycasterResult& result)
 {
     // ========================================================================
@@ -40,12 +40,12 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
 		virtual	btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult,
                                          bool normalInWorldSpace)
 		{
-            // We don't always get a triangle index, sometimes (e.g. ray hits 
+            // We don't always get a triangle index, sometimes (e.g. ray hits
             // other kart) we get shapePart=-1, or no localShapeInfo at all
             if(rayResult.m_localShapeInfo &&
                 rayResult.m_localShapeInfo->m_shapePart>-1)
                 m_triangle_index = rayResult.m_localShapeInfo->m_triangleIndex;
-            return 
+            return
                 btCollisionWorld::ClosestRayResultCallback::addSingleResult(rayResult,
                 normalInWorldSpace);
 		}
@@ -70,14 +70,14 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
 			result.m_hitNormalInWorld = rayCallback.m_hitNormalWorld;
 			result.m_hitNormalInWorld.normalize();
 			result.m_distFraction = rayCallback.m_closestHitFraction;
-            const TriangleMesh &tm = 
+            const TriangleMesh &tm =
                 World::getWorld()->getTrack()->getTriangleMesh();
-            if(stk_config->m_smooth_normals && 
+            if(m_smooth_normals &&
                 rayCallback.getTriangleIndex()>-1)
             {
                 btVector3 n=result.m_hitNormalInWorld;
-                result.m_hitNormalInWorld = 
-                    tm.getInterpolatedNormal(rayCallback.getTriangleIndex(), 
+                result.m_hitNormalInWorld =
+                    tm.getInterpolatedNormal(rayCallback.getTriangleIndex(),
                                              result.m_hitPointInWorld);
 #undef DEBUG_NORMALS
 #ifdef DEBUG_NORMALS

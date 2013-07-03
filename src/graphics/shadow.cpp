@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -47,7 +46,7 @@ Shadow::Shadow(video::ITexture *texture, scene::ISceneNode *node, float scale = 
     v[2].Normal  = normal;
     v[3].Normal  = normal;
     buffer->recalculateBoundingBox();
-    
+
     m_node   = irr_driver->addMesh(m_mesh);
 #ifdef DEBUG
     m_node->setName("shadow");

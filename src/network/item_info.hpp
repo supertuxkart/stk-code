@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -39,7 +38,7 @@ public:
     /** Constructor to initialise all fields. */
     ItemInfo(int kart, int item, char add_info) :
         m_kart_id(kart), m_item_id(item),
-        m_add_info(add_info)  
+        m_add_info(add_info)
     {}
     // -------------------------------------------------------------
     /** Construct ItemInfo from a message (which is unpacked). */

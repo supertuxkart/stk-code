@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -23,7 +22,8 @@
 
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -31,7 +31,7 @@
 History* history = 0;
 
 //-----------------------------------------------------------------------------
-/** Initialises the history object and sets the mode to none. 
+/** Initialises the history object and sets the mode to none.
  */
 History::History()
 {
@@ -44,7 +44,7 @@ History::History()
 void History::startReplay()
 {
     Load();
-}   // initReplay
+}   // startReplay
 
 //-----------------------------------------------------------------------------
 /** Initialise the history for a new recording. It especially allocates memory
@@ -73,8 +73,8 @@ void History::allocateMemory(int number_of_frames)
 }   // allocateMemory
 
 //-----------------------------------------------------------------------------
-/** Depending on mode either saves the data for the current time step, or 
- *  replays the data. 
+/** Depending on mode either saves the data for the current time step, or
+ *  replays the data.
  *  /param dt Time step.
  */
 void History::update(float dt)
@@ -99,7 +99,9 @@ void History::updateSaving(float dt)
     }
     else
     {
-        m_size ++;
+        // m_size must be m_all_deltas.size() or smaller
+        if(m_size<(int)m_all_deltas.size())
+            m_size ++;
     }
     m_all_deltas[m_current] = dt;
 
@@ -108,10 +110,10 @@ void History::updateSaving(float dt)
     unsigned int index     = m_current*num_karts;
     for(unsigned int i=0; i<num_karts; i++)
     {
-        const Kart *kart         = world->getKart(i);
+        const AbstractKart *kart         = world->getKart(i);
         m_all_controls[index+i]  = kart->getControls();
         m_all_xyz[index+i]       = kart->getXYZ();
-        m_all_rotations[index+i] = kart->getRotation();
+        m_all_rotations[index+i] = kart->getVisualRotation();
     }   // for i
 }   // updateSaving
 
@@ -122,16 +124,19 @@ void History::updateSaving(float dt)
 void History::updateReplay(float dt)
 {
     m_current++;
+    World *world = World::getWorld();
     if(m_current>=(int)m_all_deltas.size())
     {
         printf("Replay finished.\n");
-        exit(2);
+        m_current = 0;
+        // Note that for physics replay all physics parameters
+        // need to be reset, e.g. velocity, ...
+        world->reset();
     }
-    World *world = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
     for(unsigned k=0; k<num_karts; k++)
     {
-        Kart *kart = world->getKart(k);
+        AbstractKart *kart = world->getKart(k);
         unsigned int index=m_current*num_karts+k;
         if(m_replay_mode==HISTORY_POSITION)
         {
@@ -151,7 +156,7 @@ void History::updateReplay(float dt)
  */
 void History::Save()
 {
-    FILE *fd       = fopen("history.dat","w");
+    FILE *fd = fopen("history.dat","w");
     if(fd)
         printf("History saved in ./history.dat.\n");
     else
@@ -171,12 +176,14 @@ void History::Save()
     }
 
     World *world   = World::getWorld();
-    int  num_karts = world->getNumKarts();
+    const int num_karts = world->getNumKarts();
     fprintf(fd, "Version:  %s\n",   STK_VERSION);
     fprintf(fd, "numkarts: %d\n",   num_karts);
     fprintf(fd, "numplayers: %d\n", race_manager->getNumPlayers());
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
     fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
+
+    assert(num_karts > 0);
 
     int k;
     for(k=0; k<num_karts; k++)
@@ -203,9 +210,9 @@ void History::Save()
                     m_all_controls[index+k].getButtonsCompressed(),
                     m_all_xyz[index+k].getX(), m_all_xyz[index+k].getY(),
                     m_all_xyz[index+k].getZ(),
-                    m_all_rotations[index+k].getX(), 
+                    m_all_rotations[index+k].getX(),
                     m_all_rotations[index+k].getY(),
-                    m_all_rotations[index+k].getZ(), 
+                    m_all_rotations[index+k].getZ(),
                     m_all_rotations[index+k].getW()  );
         }   // for i
         index=(index+num_karts)%(num_karts*m_size);
@@ -237,14 +244,14 @@ void History::Load()
         fprintf(stderr, "ERROR: could not open history.dat\n");
         exit(-2);
     }
-    
+
     if (fgets(s, 1023, fd) == NULL)
     {
         fprintf(stderr, "ERROR: could not read history.dat\n");
         exit(-2);
     }
-    
-    if (sscanf(s,"Version: %s",s1)!=1)
+
+    if (sscanf(s,"Version: %1023s",s1)!=1)
     {
         fprintf(stderr, "ERROR: no Version information found in history file (bogus history file)\n");
         exit(-2);
@@ -257,13 +264,13 @@ void History::Load()
             fprintf(stderr, "         STK version is '%s'\n",STK_VERSION);
         }
     }
-    
+
     if (fgets(s, 1023, fd) == NULL)
     {
         fprintf(stderr, "ERROR: could not read history.dat\n");
         exit(-2);
     }
-    
+
     unsigned int num_karts;
     if(sscanf(s, "numkarts: %d",&num_karts)!=1)
     {
@@ -289,7 +296,7 @@ void History::Load()
     race_manager->setDifficulty((RaceManager::Difficulty)n);
 
     fgets(s, 1023, fd);
-    if(sscanf(s, "track: %s",s1)!=1)
+    if(sscanf(s, "track: %1023s",s1)!=1)
     {
         fprintf(stderr,"WARNING: Track not found in history file.\n");
     }
@@ -301,7 +308,7 @@ void History::Load()
     for(unsigned int i=0; i<num_karts; i++)
     {
         fgets(s, 1023, fd);
-        if(sscanf(s, "model %d: %s",&n, s1)!=2)
+        if(sscanf(s, "model %d: %1023s",&n, s1)!=2)
         {
             fprintf(stderr,"WARNING: No model information for kart %d found.\n",
                     i);
@@ -331,21 +338,19 @@ void History::Load()
 
     for(int i=0; i<m_size; i++)
     {
-        int j=0;
         for(unsigned int k=0; k<num_karts; k++)
         {
+            unsigned int index = num_karts * i+k;
             fgets(s, 1023, fd);
             int buttonsCompressed;
             float x,y,z,rx,ry,rz,rw;
-            sscanf(s, "%d %f %f %d  %f %f %f  %f %f %f %f\n",
-                    &j, 
-                    &m_all_controls[i].m_steer,
-                    &m_all_controls[i].m_accel,
+            sscanf(s, "%f %f %d  %f %f %f  %f %f %f %f\n",
+                    &m_all_controls[index].m_steer,
+                    &m_all_controls[index].m_accel,
                     &buttonsCompressed,
                     &x, &y, &z,
                     &rx, &ry, &rz, &rw
                     );
-            unsigned int index     = num_karts * i+k;
             m_all_xyz[index]       = Vec3(x,y,z);
             m_all_rotations[index] = btQuaternion(rx,ry,rz,rw);
             m_all_controls[index].setButtonsCompressed(char(buttonsCompressed));

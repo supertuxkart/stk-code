@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -26,6 +25,8 @@
 #include "graphics/material.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "modes/world.hpp"
+#include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
 #include <ITexture.h>
@@ -58,41 +59,88 @@ MaterialManager::~MaterialManager()
     m_materials.clear();
 }   // ~MaterialManager
 
+#if LIGHTMAP_VISUALISATION
+std::set<scene::IMeshBuffer*> g_processed;
+#endif
+
 //-----------------------------------------------------------------------------
-/** Searches for the material in the given texture, and calls a function
- *  in the material to set the irrlicht material flags.
- *  \param t Pointer to the texture.
- *  \param mb Pointer to the mesh buffer.
-*/
-void MaterialManager::setAllMaterialFlags(video::ITexture* t, 
-                                          scene::IMeshBuffer *mb) const
+
+Material* MaterialManager::getMaterialFor(video::ITexture* t,
+                                          scene::IMeshBuffer *mb)
 {
+    assert(t != NULL);
     const std::string image = StringUtils::getBasename(core::stringc(t->getName()).c_str());
     // Search backward so that temporary (track) textures are found first
     for(int i = (int)m_materials.size()-1; i>=0; i-- )
     {
         if (m_materials[i]->getTexFname()==image)
         {
-            m_materials[i]->setMaterialProperties(&(mb->getMaterial()));
-            return;
+            return m_materials[i];
         }
     }   // for i
-    
-    // This material does not appear in materials.xml. Set some common flags...
-    if (UserConfigParams::m_anisotropic)
+
+    return NULL;
+}
+
+//-----------------------------------------------------------------------------
+/** Searches for the material in the given texture, and calls a function
+ *  in the material to set the irrlicht material flags.
+ *  \param t Pointer to the texture.
+ *  \param mb Pointer to the mesh buffer.
+*/
+void MaterialManager::setAllMaterialFlags(video::ITexture* t,
+                                          scene::IMeshBuffer *mb)
+{
+    Material* mat = getMaterialFor(t, mb);
+    if (mat != NULL)
     {
-        mb->getMaterial().setFlag(video::EMF_ANISOTROPIC_FILTER, true);
+        mat->setMaterialProperties(&(mb->getMaterial()), mb);
+        return;
+    }
+
+    // This material does not appear in materials.xml. Set some common flags...
+    if (UserConfigParams::m_anisotropic > 0)
+    {
+        for (u32 i=0; i<video::MATERIAL_MAX_TEXTURES; ++i)
+        {
+            mb->getMaterial().TextureLayer[i].AnisotropicFilter =
+                                        UserConfigParams::m_anisotropic;
+        }
     }
     else if (UserConfigParams::m_trilinear)
     {
         mb->getMaterial().setFlag(video::EMF_TRILINEAR_FILTER, true);
-    }    
-    
+    }
+
+    mb->getMaterial().ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
+
+    if (World::getWorld() != NULL && World::getWorld()->getTrack() != NULL)
+    {
+        mb->getMaterial().FogEnable = World::getWorld()->getTrack()->isFogEnabled();
+    }
+
+
+    // Modify lightmap materials so that vertex colors are taken into account.
+    // But disable lighting because we assume all lighting is already part
+    // of the lightmap
+    if (mb->getMaterial().MaterialType == video::EMT_LIGHTMAP)
+    {
+        mb->getMaterial().MaterialType = video::EMT_LIGHTMAP_LIGHTING;
+        mb->getMaterial().AmbientColor  = video::SColor(255, 255, 255, 255);
+        mb->getMaterial().DiffuseColor  = video::SColor(255, 255, 255, 255);
+        mb->getMaterial().EmissiveColor = video::SColor(255, 255, 255, 255);
+        mb->getMaterial().SpecularColor = video::SColor(255, 255, 255, 255);
+    }
+
+
+    //if (UserConfigParams::m_fullscreen_antialiasing)
+    //    mb->getMaterial().AntiAliasing = video::EAAM_LINE_SMOOTH;
+
 }   // setAllMaterialFlags
 
 //-----------------------------------------------------------------------------
 
-void MaterialManager::adjustForFog(video::ITexture* t, 
+void MaterialManager::adjustForFog(video::ITexture* t,
                                    scene::IMeshBuffer *mb,
                                    scene::ISceneNode* parent,
                                    bool use_fog) const
@@ -113,21 +161,17 @@ void MaterialManager::adjustForFog(video::ITexture* t,
 
 void MaterialManager::setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const
 {
-    for(int i = (int)m_materials.size()-1; i>=0; i-- )
+    irr::video::SMaterial& material = mb->getMaterial();
+    if (material.getTexture(0) == NULL)
     {
-        irr::video::SMaterial& material = mb->getMaterial();
-        if (material.getTexture(0) == NULL)
-        {
-            //material.AmbientColor = video::SColor(255, 50, 50, 50);
-            //material.DiffuseColor = video::SColor(255, 150, 150, 150);
-            material.EmissiveColor = video::SColor(255, 0, 0, 0);
-            material.SpecularColor = video::SColor(255, 0, 0, 0);
-            //material.Shininess = 0.0f;
-            material.ColorMaterial = irr::video::ECM_DIFFUSE_AND_AMBIENT;
-            material.MaterialType = irr::video::EMT_SOLID;
-        }
-    }   // for i
-    
+        //material.AmbientColor = video::SColor(255, 50, 50, 50);
+        //material.DiffuseColor = video::SColor(255, 150, 150, 150);
+        material.EmissiveColor = video::SColor(255, 0, 0, 0);
+        material.SpecularColor = video::SColor(255, 0, 0, 0);
+        //material.Shininess = 0.0f;
+        material.ColorMaterial = irr::video::ECM_DIFFUSE_AND_AMBIENT;
+        material.MaterialType = irr::video::EMT_SOLID;
+    }
 }
 //-----------------------------------------------------------------------------
 int MaterialManager::addEntity(Material *m)
@@ -141,15 +185,18 @@ void MaterialManager::loadMaterial()
 {
     // Use temp material for reading, but then set the shared
     // material index later, so that these materials are not popped
-    const std::string fname     = "materials.xml";
-    std::string       full_name = file_manager->getTextureFile(fname);
-    addSharedMaterial(full_name);
+    addSharedMaterial(file_manager->getTextureDir()+"materials.xml");
+    std::string deprecated = file_manager->getTextureDir()
+                           + "deprecated/materials.xml";
+    if(file_manager->fileExists(deprecated))
+        addSharedMaterial(deprecated, true);
+
     // Save index of shared textures
     m_shared_material_index = (int)m_materials.size();
 }   // MaterialManager
 
 //-----------------------------------------------------------------------------
-void MaterialManager::addSharedMaterial(const std::string& filename)
+void MaterialManager::addSharedMaterial(const std::string& filename, bool deprecated)
 {
     // Use temp material for reading, but then set the shared
     // material index later, so that these materials are not popped
@@ -159,7 +206,7 @@ void MaterialManager::addSharedMaterial(const std::string& filename)
         msg<<"FATAL: File '"<<filename<<"' not found\n";
         throw std::runtime_error(msg.str());
     }
-    if(!pushTempMaterial(filename))
+    if(!pushTempMaterial(filename, deprecated))
     {
         std::ostringstream msg;
         msg <<"FATAL: Parsing error in '"<<filename<<"'\n";
@@ -169,7 +216,7 @@ void MaterialManager::addSharedMaterial(const std::string& filename)
 }   // addSharedMaterial
 
 //-----------------------------------------------------------------------------
-bool MaterialManager::pushTempMaterial(const std::string& filename)
+bool MaterialManager::pushTempMaterial(const std::string& filename, bool deprecated)
 {
     XMLNode *root = file_manager->createXMLTree(filename);
     if(!root || root->getName()!="materials")
@@ -177,18 +224,28 @@ bool MaterialManager::pushTempMaterial(const std::string& filename)
         if(root) delete root;
         return true;
     }
+    const bool success = pushTempMaterial(root, filename, deprecated);
+    delete root;
+    return success;
+}   // pushTempMaterial
+
+//-----------------------------------------------------------------------------
+bool MaterialManager::pushTempMaterial(const XMLNode *root,
+                                       const std::string& filename,
+                                       bool deprecated)
+{
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *node = root->getNode(i);
         if(!node)
         {
             // We don't have access to the filename at this stage anymore :(
-            fprintf(stderr, "Unknown node in material.dat file\n");
-            exit(-1);
+            fprintf(stderr, "Unknown node in material.xml file\n");
+            continue;
         }
         try
         {
-            m_materials.push_back(new Material(node, m_materials.size()));
+            m_materials.push_back(new Material(node, m_materials.size(), deprecated));
         }
         catch(std::exception& e)
         {
@@ -196,9 +253,9 @@ bool MaterialManager::pushTempMaterial(const std::string& filename)
             fprintf(stderr, e.what(), filename.c_str());
         }
     }   // for i<xml->getNumNodes)(
-    delete root;
     return true;
 }   // pushTempMaterial
+
 
 //-----------------------------------------------------------------------------
 void MaterialManager::popTempMaterial()
@@ -217,21 +274,23 @@ void MaterialManager::popTempMaterial()
  *  material permanent, make_permanent must be set to true. This is used for
  *  the powerup_manager, since not all icons for the powerups are listed in the
  *  materials.dat file, causing the missing ones to be temporary only (and
- *  then get deleted after one race, causing the powerup_manager to have 
+ *  then get deleted after one race, causing the powerup_manager to have
  *  invalid pointers.
  *  \param fname  Name of the material.
  *  \param is_full_path True if the name includes the path (defaults to false)
- *  \param make_permanent True if this material should be kept in memory 
+ *  \param make_permanent True if this material should be kept in memory
  *                        (defaults to false)
  */
-Material *MaterialManager::getMaterial(const std::string& fname, 
+Material *MaterialManager::getMaterial(const std::string& fname,
                                        bool is_full_path,
-                                       bool make_permanent)
+                                       bool make_permanent,
+                                       bool complain_if_not_found,
+                                       bool strip_path)
 {
     if(fname=="")
     {
         // This happens while reading the stk_config file, which contains
-        // kart_properties information (but no icon file): since at this 
+        // kart_properties information (but no icon file): since at this
         // stage loadMaterial() hasn't been called, an exception can be
         // triggered here (as it happened with visual c++), when
         // m_materials[0] is accessed.
@@ -239,8 +298,13 @@ Material *MaterialManager::getMaterial(const std::string& fname,
         return NULL;
     }
 
-    std::string basename=StringUtils::getBasename(fname);
-
+    std::string basename;
+    
+    if (strip_path)
+        basename = StringUtils::getBasename(fname);
+    else
+        basename = fname;
+        
     // Search backward so that temporary (track) textures are found first
     for(int i = (int)m_materials.size()-1; i>=0; i-- )
     {
@@ -248,9 +312,9 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     }
 
     // Add the new material
-    Material* m=new Material(fname, m_materials.size(), is_full_path);
+    Material* m=new Material(fname, m_materials.size(), is_full_path, complain_if_not_found);
     m_materials.push_back(m);
-    if(make_permanent) 
+    if(make_permanent)
     {
         assert(m_shared_material_index==(int)m_materials.size()-1);
         m_shared_material_index = (int)m_materials.size();
@@ -259,10 +323,19 @@ Material *MaterialManager::getMaterial(const std::string& fname,
 }   // getMaterial
 
 
+// ----------------------------------------------------------------------------
+/** Makes all materials permanent. Used for overworld.
+ */
+void MaterialManager::makeMaterialsPermanent()
+{
+    m_shared_material_index = m_materials.size();
+}   // makeMaterialsPermanent
+
+// ----------------------------------------------------------------------------
 bool MaterialManager::hasMaterial(const std::string& fname)
 {
     std::string basename=StringUtils::getBasename(fname);
-    
+
     // Search backward so that temporary (track) textures are found first
     for(int i = (int)m_materials.size()-1; i>=0; i-- )
     {

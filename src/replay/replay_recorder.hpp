@@ -1,7 +1,6 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Maik Semder <ikework@gmx.de>
+//  Copyright (C) 2012 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,47 +16,71 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_REPLAYRECORDER_HPP
-#define HEADER_REPLAYRECORDER_HPP
+#ifndef HEADER_REPLAY_RECORDER_HPP
+#define HEADER_REPLAY_RECORDER_HPP
 
-#ifdef HAVE_GHOST_REPLAY
-
+#include "karts/controller/kart_control.hpp"
 #include "replay/replay_base.hpp"
 
+#include <vector>
 
-// class managing:
-//      - the recording of the replay
-//      - the serializing to file
+/**
+  * \ingroup replay
+  */
 class ReplayRecorder : public ReplayBase
 {
 private:
-    // assuming 10 minutes with 50 frames per second
-    enum { BUFFER_PREALLOCATE_FRAMES = 10 * 50 * 60, };
-    enum { REPLAY_FREQUENCY_MAX = 30 };
-    // calculated from REPLAY_FREQUENCY_MAX
-    static const float  REPLAY_TIME_STEP_MIN;
 
+    /** A separate vector of Replay Events for all transforms. */
+    std::vector< std::vector<TransformEvent> > m_transform_events;
+
+    /** Time at which a transform was saved for the last time. */
+    std::vector<float> m_last_saved_time;
+
+    /** Counts the number of transform events for each kart. */
+    std::vector<unsigned int> m_count_transforms;
+
+    /** Stores the last skid state. */
+    std::vector<KartControl::SkidControl> m_skid_control;
+
+    std::vector< std::vector<KartReplayEvent> > m_kart_replay_event;
+
+    /** Static pointer to the one instance of the replay object. */
+    static ReplayRecorder *m_replay_recorder;
+
+#ifdef DEBUG
+    /** Counts overall number of events stored. */
+    unsigned int m_count;
+
+    /** Counts number of events skipped due to minimum time between events. */
+    unsigned int m_count_skipped_time;
+
+    /** Counts number of events skipped due to interpolation. */
+    unsigned int m_count_skipped_interpolation;
+#endif
+
+
+          ReplayRecorder();
+         ~ReplayRecorder();
 public:
-    ReplayRecorder();
-    virtual ~ReplayRecorder();
+    void  init();
+    void  update(float dt);
+    void  reset();
+    void  Save();
 
-    void            destroy();
-    bool            initRecorder( unsigned int number_karts, 
-                                  size_t number_preallocated_frames = BUFFER_PREALLOCATE_FRAMES );
+    // ------------------------------------------------------------------------
+    /** Creates a new instance of the replay object. */
+    static void create() {
+        assert(!m_replay_recorder);
+        m_replay_recorder = new ReplayRecorder();
+    }
+    // ------------------------------------------------------------------------
+    /** Returns the instance of the replay object. Returns NULL if no
+     *  recorder is available, i.e. recording can be disabled. */
+    static ReplayRecorder *get() { return m_replay_recorder; }
+    // ------------------------------------------------------------------------
+    /** Delete the instance of the replay object. */
+    static void destroy() { delete m_replay_recorder; m_replay_recorder=NULL; }
+};   // ReplayRecorder
 
-    // something might go wrong, since a new buffer may be allocated, so false means
-    // no memory available
-    bool            pushFrame();
-
-private:
-    // returns a new *free* frame to be used to store the current frame-data into it
-    // used to *record* the replay
-    ReplayFrame*    getNewFrame() { return m_ReplayBuffers.getNewFrame(); }
-};
-
-
-
-#endif // HAVE_GHOST_REPLAY
-
-#endif // HEADER_REPLAYRECORDER_HPP
-
+#endif

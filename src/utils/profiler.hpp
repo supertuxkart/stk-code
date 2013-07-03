@@ -35,10 +35,10 @@ extern Profiler profiler;
 
     #define PROFILER_POP_CPU_MARKER()  \
         profiler.popCpuMarker()
-    
+
     #define PROFILER_SYNC_FRAME()   \
         profiler.synchronizeFrame()
-    
+
     #define PROFILER_DRAW() \
         profiler.draw()
 #else
@@ -92,7 +92,7 @@ private:
     int             m_write_id;
     double          m_time_last_sync;
     double          m_time_between_sync;
-    
+
     // Handling freeze/unfreeze by clicking on the display
     enum FreezeState
     {
@@ -101,9 +101,9 @@ private:
         FROZEN,
         WAITING_FOR_UNFREEZE,
     };
-    
+
     FreezeState     m_freeze_state;
-    
+
 public:
     Profiler();
     virtual ~Profiler();
@@ -113,7 +113,7 @@ public:
     void    synchronizeFrame();
 
     void    draw();
-    
+
     void    onClick(const core::vector2di& mouse_pos);
 
 protected:

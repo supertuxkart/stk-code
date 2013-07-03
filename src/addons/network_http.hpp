@@ -19,6 +19,9 @@
 #ifndef HEADER_NETWORK_HTTP_HPP
 #define HEADER_NETWORK_HTTP_HPP
 
+#ifndef NO_CURL
+
+#include <queue>
 #include <pthread.h>
 #include <string>
 #include <vector>
@@ -28,27 +31,23 @@
 #endif
 #include <curl/curl.h>
 
+#include "addons/inetwork_http.hpp"
+#include "addons/request.hpp"
 #include "utils/synchronised.hpp"
 
-class Request;
 class XMLNode;
 
-class NetworkHttp
+/**
+  * \ingroup addonsgroup
+  */
+class NetworkHttp : public INetworkHttp
 {
-public:
-    /** If stk has permission to access the internet (for news
-     *  server etc).
-     *  IPERM_NOT_ASKED: The user needs to be asked if he wants to 
-     *                   grant permission
-     *  IPERM_ALLOWED:   STK is allowed to access server.
-     *  IPERM_NOT_ALLOWED: STK must not access external servers. */
-    enum InternetPermission {IPERM_NOT_ASKED  =0,
-                             IPERM_ALLOWED    =1,
-                             IPERM_NOT_ALLOWED=2 };
 private:
 
     /** The list of pointes to all requests. */
-    Synchronised< std::vector<Request*> >  m_all_requests;
+    Synchronised< std::priority_queue<Request*,
+                                      std::vector<Request*>,
+                                      Request::Compare >     >  m_all_requests;
 
     /** The current requested being worked on. */
     Request                  *m_current_request;
@@ -66,9 +65,10 @@ private:
     CURL                     *m_curl_session;
 
     static void  *mainLoop(void *obj);
-    CURLcode      init();
+    CURLcode      init(bool forceRefresh);
     CURLcode      loadAddonsList(const XMLNode *xml,
-                                 const std::string &filename);
+                                 const std::string &filename,
+                                 bool forceRefresh);
     CURLcode      downloadFileInternal(Request *request);
     static int    progressDownload(void *clientp, double dltotal, double dlnow,
                                    double ultotal, double ulnow);
@@ -76,18 +76,17 @@ private:
     CURLcode      reInit();
 public:
                   NetworkHttp();
-                 ~NetworkHttp();
+    virtual      ~NetworkHttp();
     void          startNetworkThread();
     void          stopNetworkThread();
     void          insertReInit();
-    Request      *downloadFileAsynchron(const std::string &url, 
+    Request      *downloadFileAsynchron(const std::string &url,
                                         const std::string &save = "",
                                         int   priority = 1,
                                         bool  manage_memory=true);
     void          cancelAllDownloads();
 };   // NetworkHttp
 
-extern NetworkHttp *network_http;
-
+#endif
 #endif
 

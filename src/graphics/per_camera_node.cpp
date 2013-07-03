@@ -31,14 +31,14 @@ PerCameraNode::PerCameraNode(scene::ISceneNode* parent, scene::ISceneManager* mg
     if (camera)
         setName(camera->getName());
 #endif
-    
+
     m_camera = camera;
     m_child = mgr->addMeshSceneNode(mesh, this);
     //m_child = mgr->addCubeSceneNode(0.5f, this, -1, core::vector3df(0,0,0), core::vector3df(0,0,0), core::vector3df(3.0f,0.2f,3.0f));
     //RelativeTransformationMatrix.setTranslation( core::vector3df(-0.5,-1,3) );
-    
+
     setAutomaticCulling(scene::EAC_OFF);
-    
+
     parent->addChild(this);
 }
 
@@ -60,7 +60,7 @@ PerCameraNode::~PerCameraNode()
 void PerCameraNode::render()
 {
     scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
-    
+
     // Only register children nodes if the right camera is in use
     if (curr_cam == m_camera) ISceneNode::OnRegisterSceneNode();
 }
@@ -76,7 +76,7 @@ void PerCameraNode::OnRegisterSceneNode()
 void PerCameraNode::setCamera(scene::ICameraSceneNode* camera)
 {
     m_camera = camera;
-    
+
 #ifdef DEBUG
     if (camera)
         setName(camera->getName());

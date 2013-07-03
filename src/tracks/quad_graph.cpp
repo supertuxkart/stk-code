@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs
@@ -28,27 +27,33 @@
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "modes/world.hpp"
+#include "tracks/check_lap.hpp"
 #include "tracks/check_line.hpp"
+#include "tracks/check_manager.hpp"
 #include "tracks/quad_set.hpp"
+#include "tracks/track.hpp"
 
 const int QuadGraph::UNKNOWN_SECTOR  = -1;
+QuadGraph *QuadGraph::m_quad_graph = NULL;
 
 /** Constructor, loads the graph information for a given set of quads
  *  from a graph file.
  *  \param quad_file_name Name of the file of all quads
  *  \param graph_file_name Name of the file describing the actual graph
  */
-QuadGraph::QuadGraph(const std::string &quad_file_name, 
-                     const std::string graph_file_name)
+QuadGraph::QuadGraph(const std::string &quad_file_name,
+                     const std::string graph_file_name,
+                     const bool reverse) : m_reverse(reverse)
 {
     m_node                 = NULL;
     m_mesh                 = NULL;
     m_mesh_buffer          = NULL;
     m_lap_length           = 0;
-    m_all_quads            = new QuadSet(quad_file_name);
+    QuadSet::create();
+    QuadSet::get()->init(quad_file_name);
     m_quad_filename        = quad_file_name;
-    GraphNode::m_all_quads = m_all_quads;
-    GraphNode::m_all_nodes = this;
+    m_quad_graph           = this;
     load(graph_file_name);
 }   // QuadGraph
 
@@ -56,13 +61,22 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
 /** Destructor, removes all nodes of the graph. */
 QuadGraph::~QuadGraph()
 {
-    delete m_all_quads;
+    QuadSet::destroy();
     for(unsigned int i=0; i<m_all_nodes.size(); i++) {
         delete m_all_nodes[i];
     }
     if(UserConfigParams::m_track_debug)
         cleanupDebugMesh();
 }   // ~QuadGraph
+
+// -----------------------------------------------------------------------------
+
+void QuadGraph::addSuccessor(unsigned int from, unsigned int to) {
+    if(m_reverse)
+        m_all_nodes[to]->addSuccessor(from);
+    else
+        m_all_nodes[from]->addSuccessor(to);
+}   // addSuccessor
 
 // -----------------------------------------------------------------------------
 /** Loads a quad graph from a file.
@@ -72,16 +86,17 @@ void QuadGraph::load(const std::string &filename)
 {
     const XMLNode *xml = file_manager->createXMLTree(filename);
 
-    if(!xml) 
+    if(!xml)
     {
         // No graph file exist, assume a default loop X -> X+1
         // i.e. each quad is part of the graph exactly once.
         // First create an empty graph node for each quad:
-        for(unsigned int i=0; i<m_all_quads->getNumberOfQuads(); i++)
+        for(unsigned int i=0; i<QuadSet::get()->getNumberOfQuads(); i++)
             m_all_nodes.push_back(new GraphNode(i, m_all_nodes.size()));
         // Then set the default loop:
         setDefaultSuccessors();
-        
+        computeDirectionData();
+
         if (m_all_nodes.size() > 0)
         {
             m_lap_length = m_all_nodes[m_all_nodes.size()-1]->getDistanceFromStart()
@@ -89,10 +104,10 @@ void QuadGraph::load(const std::string &filename)
         }
         else
         {
-            fprintf(stderr, "[QuadGraph] No node in driveline graph\n");
+            Log::error("Quad Graph", "No node in driveline graph.");
             m_lap_length = 10.0f;
         }
-        
+
         return;
     }
 
@@ -133,7 +148,8 @@ void QuadGraph::load(const std::string &filename)
             for(unsigned int i=from; i<=to; i++)
             {
                 assert(i!=to ? i+1 : from <m_all_nodes.size());
-                m_all_nodes[i]->addSuccessor(i!=to ? i+1 : from);
+                addSuccessor(i,(i!=to ? i+1 : from));
+                //~ m_all_nodes[i]->addSuccessor(i!=to ? i+1 : from);
             }
         }
         else if(xml_node->getName()=="edge-line")
@@ -144,7 +160,8 @@ void QuadGraph::load(const std::string &filename)
             xml_node->get("to", &to);
             for(unsigned int i=from; i<to; i++)
             {
-                m_all_nodes[i]->addSuccessor(i+1);
+                addSuccessor(i,i+1);
+                //~ m_all_nodes[i]->addSuccessor(i+1);
             }
         }
         else if(xml_node->getName()=="edge")
@@ -154,28 +171,115 @@ void QuadGraph::load(const std::string &filename)
             xml_node->get("from", &from);
             xml_node->get("to", &to);
             assert(to<m_all_nodes.size());
-            m_all_nodes[from]->addSuccessor(to);
+            addSuccessor(from,to);
+            //~ m_all_nodes[from]->addSuccessor(to);
         }   // edge
         else
         {
-            fprintf(stderr, "Incorrect specification in '%s': '%s' ignored\n",
+            Log::error("Quad Graph", "Incorrect specification in '%s': '%s' ignored.",
                     filename.c_str(), xml_node->getName().c_str());
             continue;
         }   // incorrect specification
     }
     delete xml;
 
+    setDefaultSuccessors();
+    computeDistanceFromStart(getStartNode(), 0.0f);
+    computeDirectionData();
+
+    // Define the track length as the maximum at the end of a quad
+    // (i.e. distance_from_start + length till successor 0).
+    m_lap_length = -1;
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
-        if(m_all_nodes[i]->getSuccessor(0)==0)
-        {
-            m_lap_length = m_all_nodes[i]->getDistanceFromStart()
+        float l = m_all_nodes[i]->getDistanceFromStart()
                 + m_all_nodes[i]->getDistanceToSuccessor(0);
-            break;
-        }
+        if(l > m_lap_length)
+            m_lap_length = l;
     }
-    setDefaultSuccessors();
 }   // load
+
+// ----------------------------------------------------------------------------
+/** Returns the index of the first graph node (i.e. the graph node which
+ *  will trigger a new lap when a kart first enters it). This is always
+ *  0 for normal direction (this is guaranteed by the track exporter),
+ *  but in reverse mode (where node 0 is actually the end of the track)
+ *  this is 0's successor.
+ */
+unsigned int QuadGraph::getStartNode() const
+{
+    return m_reverse ? m_all_nodes[0]->getSuccessor(0)
+                     : 0;
+}   // getStartNode
+
+// ----------------------------------------------------------------------------
+/** Sets the checkline requirements for all nodes in the graph.
+ */
+void QuadGraph::computeChecklineRequirements()
+{
+    computeChecklineRequirements(m_all_nodes[0],
+                                 CheckManager::get()->getLapLineIndex());
+}   // computeChecklineRequirements
+
+// ----------------------------------------------------------------------------
+/** Finds which checklines must be visited before driving on this quad
+ *  (useful for rescue)
+ */
+void QuadGraph::computeChecklineRequirements(GraphNode* node,
+                                             int latest_checkline)
+{
+    for (unsigned int n=0; n<node->getNumberOfSuccessors(); n++)
+    {
+        const int succ_id = node->getSuccessor(n);
+
+        // warp-around
+        if (succ_id == 0) break;
+
+        GraphNode* succ = m_all_nodes[succ_id];
+        int new_latest_checkline =
+            CheckManager::get()->getChecklineTriggering(node->getCenter(),
+                                                        succ->getCenter() );
+        if(new_latest_checkline==-1)
+            new_latest_checkline = latest_checkline;
+
+        /*
+        printf("Quad %i : checkline %i\n", succ_id, new_latest_checkline);
+
+        printf("Quad %i :\n", succ_id);
+        for (std::set<int>::iterator it = these_checklines.begin();it != these_checklines.end(); it++)
+        {
+            printf("    Depends on checkline %i\n", *it);
+        }
+        */
+
+        if (new_latest_checkline != -1)
+            succ->setChecklineRequirements(new_latest_checkline);
+
+        computeChecklineRequirements(succ, new_latest_checkline);
+    }
+}   // computeChecklineRequirements
+
+// ----------------------------------------------------------------------------
+/** This function defines the "path-to-nodes" for each graph node that has
+ *  more than one successor. The path-to-nodes indicates which successor to
+ *  use to reach a certain node. This is e.g. used for the rubber ball to
+ *  determine which path it is going to use to reach its target (this allows
+ *  the ball to hit a target that is on a shortcut). The algorithm for the
+ *  path computation favours the use of successor 0, i.e. it will if possible
+ *  only use main driveline paths, not a shortcut (even though a shortcut
+ *  could result in a faster way to the target) - but since shotcuts can
+ *  potentially be hidden they should not be used (unless necessary).
+ *  Only graph nodes with more than one successor have this data structure
+ *  (since on other graph nodes only one path can be used anyway, this
+ *  saves some memory).
+ */
+void QuadGraph::setupPaths()
+{
+    for(unsigned int i=0; i<getNumNodes(); i++)
+    {
+        m_all_nodes[i]->setupPathsToNode();
+    }
+}   // setupPaths
 
 // -----------------------------------------------------------------------------
 /** This function sets a default successor for all graph nodes that currently
@@ -185,42 +289,45 @@ void QuadGraph::setDefaultSuccessors()
 {
     for(unsigned int i=0; i<m_all_nodes.size(); i++) {
         if(m_all_nodes[i]->getNumberOfSuccessors()==0) {
-            m_all_nodes[i]->addSuccessor(i+1>=m_all_nodes.size() ? 0 : i+1);
+            addSuccessor(i,i+1>=m_all_nodes.size() ? 0 : i+1);
+            //~ m_all_nodes[i]->addSuccessor(i+1>=m_all_nodes.size() ? 0 : i+1);
         }   // if size==0
     }   // for i<m_allNodes.size()
 }   // setDefaultSuccessors
 
 // -----------------------------------------------------------------------------
-/** Sets all start positions depending on the quad graph. The number of 
+/** Sets all start positions depending on the quad graph. The number of
  *  entries needed is defined by the size of the start_transform (though all
  *  entries will be overwritten).
  *  E.g. the karts will be placed as:
  *   1           \
  *     2          +--  row with three karts, each kart is 'sidewards_distance'
- *       3       /     to the right of the previous kart, and 
+ *       3       /     to the right of the previous kart, and
  *   4                 'forwards_distance' behind the previous kart.
  *     5               The next row starts again with the kart being
  *       6             'forwards_distance' behind the end of the previous row.
  *  etc.
- *  \param start_transforms A vector sized to the needed number of start 
- *               positions. The values will all be overwritten with the 
+ *  \param start_transforms A vector sized to the needed number of start
+ *               positions. The values will all be overwritten with the
  *               default start positions.
  *  \param karts_per_row How many karts to place in each row.
- *  \param forwards_distance Distance in forward (Z) direction between 
+ *  \param forwards_distance Distance in forward (Z) direction between
  *               each kart.
- *  \param sidewards_distance Distance in sidewards (X) direction between 
+ *  \param sidewards_distance Distance in sidewards (X) direction between
  *               karts.
  */
-void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform> 
+void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
                                                        *start_transforms,
                                          unsigned int karts_per_row,
                                          float forwards_distance,
                                          float sidewards_distance,
                                          float upwards_distance) const
 {
-    // Node 0 is always the node on which the start line is.
-    int current_node          = getPredecessor(0);
-    
+    // We start just before the start node (which will trigger lap
+    // counting when reached). The first predecessor is the one on
+    // the main driveline.
+    int current_node = m_all_nodes[getStartNode()]->getPredecessor(0);
+
     float distance_from_start = 0.1f+forwards_distance;
 
     // Maximum distance to left (or right) of centre line
@@ -234,7 +341,8 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
         if (current_node == -1)
         {
             (*start_transforms)[i].setOrigin(Vec3(0,0,0));
-            (*start_transforms)[i].setRotation(btQuaternion(btVector3(0, 1, 0), 0));
+            (*start_transforms)[i].setRotation(btQuaternion(btVector3(0, 1, 0),
+                                                            0));
         }
         else
         {
@@ -242,7 +350,8 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
             while(distance_from_start > getNode(current_node).getNodeLength())
             {
                 distance_from_start -= getNode(current_node).getNodeLength();
-                current_node = getPredecessor(current_node);
+                // Only follow the main driveline, i.e. first predecessor
+                current_node = getNode(current_node).getPredecessor(0);
             }
             const GraphNode &gn   = getNode(current_node);
             Vec3 center_line = gn.getLowerCenter() - gn.getUpperCenter();
@@ -250,20 +359,20 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
 
             Vec3 horizontal_line = gn[2] - gn[3];
             horizontal_line.normalize();
-           
+
             Vec3 start = gn.getUpperCenter()
-                       + center_line     * distance_from_start 
+                       + center_line     * distance_from_start
                        + horizontal_line * x_pos;
             // Add a certain epsilon to the height in case that the
             // drivelines are beneath the track.
             (*start_transforms)[i].setOrigin(start+Vec3(0,upwards_distance,0));
             (*start_transforms)[i].setRotation(
-                btQuaternion(btVector3(0, 1, 0), 
+                btQuaternion(btVector3(0, 1, 0),
                              gn.getAngleToSuccessor(0)));
             if(x_pos >= max_x_dist-sidewards_distance*0.5f)
             {
                 x_pos  = -max_x_dist;
-                // Every 2nd row will be pushed sideways by half the distance 
+                // Every 2nd row will be pushed sideways by half the distance
                 // between karts, so that a kart can drive between the karts in
                 // the row ahead of it.
                 row_number ++;
@@ -278,19 +387,28 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
 }   // setStartPositions
 
 // -----------------------------------------------------------------------------
-/** Creates a mesh for this graph. The mesh is not added to a scene node and 
+/** Creates a mesh for this graph. The mesh is not added to a scene node and
  *  is stored in m_mesh.
+ *  \param show_invisble  If true, also create a mesh for parts of the
+ *         driveline that are invisible.
+ *  \param enable_transparency Enable alpha blending to make the mesh
+ *         semi transparent.
+ *  \param track_color Colour of the actual quads.
+ *  \param lap_color If defined, show the lap counting line in that colour.
  */
-void QuadGraph::createMesh(bool show_invisible, 
+void QuadGraph::createMesh(bool show_invisible,
+                           bool enable_transparency,
                            const video::SColor *track_color,
                            const video::SColor *lap_color)
 {
     // The debug track will not be lighted or culled.
     video::SMaterial m;
-    m.BackfaceCulling = false;
-    m.Lighting        = false;
-    m_mesh            = irr_driver->createQuadMesh(&m);
-    m_mesh_buffer     = m_mesh->getMeshBuffer(0);
+    m.BackfaceCulling  = false;
+    m.Lighting         = false;
+    if(enable_transparency)
+        m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    m_mesh             = irr_driver->createQuadMesh(&m);
+    m_mesh_buffer      = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
 
     // Count the number of quads to display (some quads might be invisible
@@ -303,10 +421,10 @@ void QuadGraph::createMesh(bool show_invisible,
 
     // Four vertices for each of the n-1 remaining quads
     video::S3DVertex *new_v = new video::S3DVertex[4*n];
-    // Each quad consists of 2 triangles with 3 elements, so 
+    // Each quad consists of 2 triangles with 3 elements, so
     // we need 2*3 indices for each quad.
     irr::u16         *ind   = new irr::u16[6*n];
-    video::SColor     c(255, 255, 0, 0);    
+    video::SColor     c(255, 255, 0, 0);
 
     if(track_color)
         c = *track_color;
@@ -321,14 +439,14 @@ void QuadGraph::createMesh(bool show_invisible,
         // Swap the colours from red to blue and back
         if(!track_color)
         {
-            c.setRed (i%2 ? 255 : 0); 
-            c.setBlue(i%2 ? 0 : 255);
+            c.setRed ((i%2) ? 255 : 0);
+            c.setBlue((i%2) ? 0 : 255);
         }
         // Transfer the 4 points of the current quad to the list of vertices
         m_all_nodes[count]->getQuad().getVertices(new_v+4*i, c);
 
         // Set up the indices for the triangles
-        // (note, afaik with opengl we could use quads directly, but the code 
+        // (note, afaik with opengl we could use quads directly, but the code
         // would not be portable to directx anymore).
         ind[6*i  ] = 4*i;  // First triangle: vertex 0, 1, 2
         ind[6*i+1] = 4*i+1;
@@ -337,8 +455,8 @@ void QuadGraph::createMesh(bool show_invisible,
         ind[6*i+4] = 4*i+2;
         ind[6*i+5] = 4*i+3;
         i++;
-    }   // for i=1; i<m_all_quads
-    
+    }   // for i=1; i<QuadSet::get()
+
     m_mesh_buffer->append(new_v, n*4, ind, n*6);
 
     if(lap_color)
@@ -351,7 +469,7 @@ void QuadGraph::createMesh(bool show_invisible,
         // Now scale the length (distance between vertix 0 and 3
         // and between 1 and 2) to be 'length':
         Vec3 bb_min, bb_max;
-        m_all_quads->getBoundingBox(&bb_min, &bb_max);
+        QuadSet::get()->getBoundingBox(&bb_min, &bb_max);
         // Length of the lap line about 3% of the 'height'
         // of the track.
         const float length=(bb_max.getZ()-bb_min.getZ())*0.03f;
@@ -398,29 +516,30 @@ void QuadGraph::createMesh(bool show_invisible,
     //m_node->setAutomaticCulling(scene::EAC_OFF);
     m_mesh_buffer->recalculateBoundingBox();
     m_mesh->setBoundingBox(m_mesh_buffer->getBoundingBox());
-    
+
     delete[] ind;
     delete[] new_v;
 }   // createMesh
 
 // -----------------------------------------------------------------------------
 
-/** Creates the debug mesh to display the quad graph on top of the track 
+/** Creates the debug mesh to display the quad graph on top of the track
  *  model. */
 void QuadGraph::createDebugMesh()
 {
     if(m_all_nodes.size()<=0) return;  // no debug output if not graph
 
-    createMesh();
+    createMesh(/*show_invisible*/true,
+               /*enable_transparency*/true);
 
     // Now colour the quads red/blue/red ...
-    video::SColor     c(255, 255, 0, 0);    
+    video::SColor     c( 128, 255, 0, 0);
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
     for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
     {
         // Swap the colours from red to blue and back
-        c.setRed (i%2 ? 255 : 0); 
-        c.setBlue(i%2 ? 0 : 255);
+        c.setRed ((i%2) ? 255 : 0);
+        c.setBlue((i%2) ? 0 : 255);
         v[i].Color = c;
     }
     m_node = irr_driver->addMesh(m_mesh);
@@ -449,12 +568,12 @@ void QuadGraph::cleanupDebugMesh()
  *  \param succ A vector of ints to which the successors are added.
  *  \param for_ai true if only quads accessible by the AI should be returned.
  */
-void QuadGraph::getSuccessors(int node_number, 
+void QuadGraph::getSuccessors(int node_number,
                               std::vector<unsigned int>& succ,
                               bool for_ai) const
 {
     const GraphNode *gn=m_all_nodes[node_number];
-    for(unsigned int i=0; i<gn->getNumberOfSuccessors(); i++) 
+    for(unsigned int i=0; i<gn->getNumberOfSuccessors(); i++)
     {
         // If getSuccessor is called for the AI, only add
         // quads that are meant for the AI to be used.
@@ -463,27 +582,185 @@ void QuadGraph::getSuccessors(int node_number,
     }
 }   // getSuccessors
 
-//-----------------------------------------------------------------------------
-/** Returns the first predecessor or a node (i.e. the one usually on the main
- *  driveline).
- *  \param node_number The number of the node.
- *  \return The node number of the first predecessor node, or -1 if no
- *          predecessor was found (and a warning is printed in this case).
+// ----------------------------------------------------------------------------
+/** Recursively determines the distance the beginning (lower end) of the quads
+ *  have from the start of the track.
+ *  \param node The node index for which to set the distance from start.
+ *  \param new_distance The new distance for the specified graph node.
  */
-int QuadGraph::getPredecessor(unsigned int target_node) const
+void QuadGraph::computeDistanceFromStart(unsigned int node, float new_distance)
 {
-    for(unsigned int node_id=0; node_id<m_all_nodes.size(); node_id++)
+    GraphNode *gn = m_all_nodes[node];
+    float current_distance = gn->getDistanceFromStart();
+
+    // If this node already has a distance defined, check if the new distance
+    // is longer, and if so adjust all following nodes. Without this the
+    // length of the track (as taken by the distance from start of the last
+    // node) could be smaller than some of the paths. This can result in
+    // incorrect results for the arrival time estimation of the AI karts.
+    // See trac #354 for details.
+    // Then there is no need to test/adjust any more nodes.
+    if(current_distance>=0)
     {
-        const GraphNode *gn=m_all_nodes[node_id];
-        for(unsigned int i=0; i <gn ->getNumberOfSuccessors(); i++)
+        if(current_distance<new_distance)
         {
-            if(gn->getSuccessor(i)==target_node)
-                return node_id;
-        }   // for i<gn->getNumberOfSuccessors()
-    }   // node_id<m_all_nodes.size()
-    printf("Warning: no predecessor for node '%d' found.\n", target_node);
-    return -1;
-}   // getPredecessor
+            float delta = new_distance - current_distance;
+            updateDistancesForAllSuccessors(gn->getQuadIndex(), delta);
+        }
+        return;
+    }
+
+    // Otherwise this node has no distance defined yet. Set the new
+    // distance, and recursively update all following nodes.
+    gn->setDistanceFromStart(new_distance);
+
+    for(unsigned int i=0; i<gn->getNumberOfSuccessors(); i++)
+    {
+        GraphNode *gn_next = m_all_nodes[gn->getSuccessor(i)];
+        // The start node (only node with distance 0) is reached again,
+        // recursion can stop now
+        if(gn_next->getDistanceFromStart()==0)
+            continue;
+
+        computeDistanceFromStart(gn_next->getQuadIndex(),
+                                 new_distance + gn->getDistanceToSuccessor(i));
+    }   // for i
+}   // computeDistanceFromStart
+
+// ----------------------------------------------------------------------------
+/** Increases the distance from start for all nodes that are directly or
+ *  indirectly a successor of the given node. This code is used when two
+ *  branches merge together, but since the latest 'fork' indicates a longer
+ *  distance from start.
+ *  \param indx Index of the node for which to increase the distance.
+ *  \param delta Amount by which to increase the distance.
+ */
+void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta)
+{
+    GraphNode &g=getNode(indx);
+    g.setDistanceFromStart(g.getDistanceFromStart()+delta);
+    for(unsigned int i=0; i<g.getNumberOfSuccessors(); i++)
+    {
+        GraphNode &g_next = getNode(g.getSuccessor(i));
+        // Stop when we reach the start node, i.e. the only node with a
+        // distance of 0
+        if(g_next.getDistanceFromStart()==0)
+            continue;
+
+        // Only increase the distance from start of a successor node, if
+        // this successor has a distance from start that is smaller then
+        // the increased amount.
+        if(g.getDistanceFromStart()+g.getDistanceToSuccessor(i) >
+            g_next.getDistanceFromStart())
+        {
+            updateDistancesForAllSuccessors(g.getSuccessor(i), delta);
+        }
+    }
+}   // updateDistancesForAllSuccessors
+
+//-----------------------------------------------------------------------------
+/** Computes the direction (straight, left, right) of all graph nodes and the
+ *  lastest graph node that is still turning in the given direction. For
+ *  example, if a successor to this graph node is turning left, it will compute
+ *  the last graph node that is still turning left. This data is used by the
+ *  AI to estimate the turn radius.
+ *  At this stage there is one restriction: if a node with more than one
+ *  successor is ahead, only successor 0 is used. That might lead to somewhat
+ *  incorrect results (i.e. the last successor is determined assuming that
+ *  the kart is always using successor 0, while in reality it might follow
+ *  a different successor, resulting in a different turn radius. It is not
+ *  expected that this makes much difference for the AI (since it will update
+ *  its data constantly, i.e. if it takes a different turn, it will be using
+ *  the new data).
+ */
+void QuadGraph::computeDirectionData()
+{
+    for(unsigned int i=0; i<m_all_nodes.size(); i++)
+    {
+        for(unsigned int succ_index=0;
+            succ_index<m_all_nodes[i]->getNumberOfSuccessors();
+            succ_index++)
+        {
+            determineDirection(i, succ_index);
+        }   // for next < getNumberOfSuccessor
+
+    }   // for i < m_all_nodes.size()
+}   // computeDirectionData
+
+//-----------------------------------------------------------------------------
+/** Adjust the given angle to be in [-PI, PI].
+ */
+float QuadGraph::normalizeAngle(float f)
+{
+    if(f>M_PI)       f -= 2*M_PI;
+    else if(f<-M_PI) f += 2*M_PI;
+    return f;
+}   // normalizeAngle
+//-----------------------------------------------------------------------------
+/** Determines the direction of the quad graph when driving to the specified
+ *  successor. It also determines the last graph node that is still following
+ *  the given direction. The computed data is saved in the corresponding
+ *  graph node.
+ *  It compares the lines connecting the center point of node n with n+1 and
+ *  the lines connecting n+1 and n+2 (where n is the current node, and +1 etc.
+ *  specifying the successor). Then it keeps on testing the line from n+2 to
+ *  n+3, n+3 to n+4, ... as long as the turn direction is the same. The last
+ *  value that still has the same direction is then set as the last node
+ *  with the same direction in the specified graph node.
+ *  \param current Index of the graph node with which to start ('n' in the
+ *                 description above).
+ *  \param succ_index The successor to be followed from the current node.
+ *                    If there should be any other branches later, successor
+ *                    0 will always be tetsed.
+ */
+void QuadGraph::determineDirection(unsigned int current,
+                                   unsigned int succ_index)
+{
+    // The maximum angle which is still considered to be straight
+    const float max_straight_angle=0.1f;
+
+    // Compute the angle from n (=current) to n+1 (=next)
+    float angle_current = getAngleToNext(current, succ_index);
+    unsigned int next   = getNode(current).getSuccessor(succ_index);
+    float angle_next    = getAngleToNext(next, 0);
+    float rel_angle     = normalizeAngle(angle_next-angle_current);
+    // Small angles are considered to be straight
+    if(fabsf(rel_angle)<max_straight_angle)
+        rel_angle = 0;
+
+    next     = getNode(next).getSuccessor(0);  // next is now n+2
+
+    // If the direction is still the same during a lap the last node
+    // in the same direction is the previous node;
+    int max_step = m_all_nodes.size()-1;
+
+    while(max_step-- != 0)
+    {
+        // Now compute the angle from n+1 (new current) to n+2 (new next)
+        angle_current = angle_next;
+        angle_next    = getAngleToNext(next, 0);
+        float new_rel_angle = normalizeAngle(angle_next - angle_current);
+        if(fabsf(new_rel_angle)<max_straight_angle)
+            new_rel_angle = 0;
+        // We have reached a different direction if we go from a non-straight
+        // section to a straight one, from a straight section to a non-
+        // straight section, or from a left to a right turn (or vice versa)
+        if( (rel_angle != 0 && new_rel_angle == 0 ) ||
+            (rel_angle == 0 && new_rel_angle != 0 ) ||
+            (rel_angle * new_rel_angle < 0        )     )
+            break;
+        rel_angle = new_rel_angle;
+
+        next = getNode(next).getSuccessor(0);
+    }    // while(1)
+
+    GraphNode::DirectionType dir =
+        rel_angle==0 ? GraphNode::DIR_STRAIGHT
+                     : (rel_angle>0) ? GraphNode::DIR_RIGHT
+                                     : GraphNode::DIR_LEFT;
+    m_all_nodes[current]->setDirectionData(succ_index, dir, next);
+}   // determineDirection
+
 
 //-----------------------------------------------------------------------------
 /** This function takes absolute coordinates (coordinates in OpenGL
@@ -495,12 +772,12 @@ int QuadGraph::getPredecessor(unsigned int target_node) const
  *  \param xyz The position of the kart.
  *  \param sector The graph node the position is on.
  */
-void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz, 
+void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
                               const int sector) const
 {
     if(sector == UNKNOWN_SECTOR )
     {
-        fprintf(stderr, "WARNING: UNKNOWN_SECTOR in spatialToTrack().\n");
+        Log::warn("Quad Graph", "UNKNOWN_SECTOR in spatialToTrack().");
         return;
     }
 
@@ -509,15 +786,12 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
 
 //-----------------------------------------------------------------------------
 /** findRoadSector returns in which sector on the road the position
- *  xyz is. If xyz is not on top of the road, it returns
- *  UNKNOWN_SECTOR.
+ *  xyz is. If xyz is not on top of the road, it sets UNKNOWN_SECTOR as sector.
  *
- *  The 'sector' could be defined as the number of the closest track
- *  segment to XYZ.
- *  \param XYZ Position for which the segment should be determined.
+ *  \param xyz Position for which the segment should be determined.
  *  \param sector Contains the previous sector (as a shortcut, since usually
  *         the sector is the same as the last one), and on return the result
- *  \param all_sectors If this is not NULL, it is a list of all sectors to 
+ *  \param all_sectors If this is not NULL, it is a list of all sectors to
  *         test. This is used by the AI to make sure that it ends up on the
  *         selected way in case of a branch, and also to make sure that it
  *         doesn't skip e.g. a loop (see explanation below for details).
@@ -527,9 +801,9 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
 {
     // Most likely the kart will still be on the sector it was before,
     // so this simple case is tested first.
-    if(*sector!=UNKNOWN_SECTOR && getQuad(*sector).pointInQuad(xyz) )
+    if(*sector!=UNKNOWN_SECTOR && getQuadOfNode(*sector).pointInQuad(xyz) )
     {
-        return; 
+        return;
     }   // if still on same quad
 
     // Now we search through all graph nodes, starting with
@@ -546,7 +820,7 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
     // and the track is supposed to be driven: ABCDEBF, the AI might find
     // the node on F, and then keep on going straight ahead instead of
     // using the loop at all.
-    unsigned int max_count  = (*sector!=UNKNOWN_SECTOR && all_sectors!=NULL) 
+    unsigned int max_count  = (*sector!=UNKNOWN_SECTOR && all_sectors!=NULL)
                             ? all_sectors->size()
                             : m_all_nodes.size();
     *sector = UNKNOWN_SECTOR;
@@ -556,9 +830,9 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
             indx = (*all_sectors)[i];
         else
             indx = indx<(int)m_all_nodes.size()-1 ? indx +1 : 0;
-        const Quad &q = getQuad(indx);
+        const Quad &q = getQuadOfNode(indx);
         float dist    = xyz.getY() - q.getMinHeight();
-        // While negative distances are unlikely, we allow some small netative
+        // While negative distances are unlikely, we allow some small negative
         // numbers in case that the kart is partly in the track.
         if(q.pointInQuad(xyz) && dist < min_dist && dist>-1.0f)
         {
@@ -566,7 +840,7 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
             *sector  = indx;
         }
     }   // for i<m_all_nodes.size()
-    
+
     return;
 }   // findRoadSector
 
@@ -598,7 +872,7 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
     until the next higher overlapping line segment, and find the closest
     one to XYZ.
  */
-int QuadGraph::findOutOfRoadSector(const Vec3& xyz, 
+int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
                                    const int curr_sector,
                                    std::vector<int> *all_sectors) const
 {
@@ -611,7 +885,7 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
         // the quads of the shortcuts. So after quad n-1 (the last one
         // before the lap counting line) quad n will not be 0 (the first
         // quad after the lap counting line), but one of the quads on a
-        // shortcut. If we only tested a limited number of quads to 
+        // shortcut. If we only tested a limited number of quads to
         // improve the performance the crossing of a lap might not be
         // detected (because quad 0 is not tested, only quads on the
         // shortcuts are tested). If this should become a performance
@@ -628,29 +902,50 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
 
     int   min_sector = UNKNOWN_SECTOR;
     float min_dist_2 = 999999.0f*999999.0f;
-    for(int j=0; j<count; j++)
-    {
-        int next_sector;
-        if(all_sectors) 
-            next_sector = (*all_sectors)[j];
-        else
-            next_sector  = current_sector+1 == (int)getNumNodes() 
-                         ? 0 
-                         : current_sector+1;
 
-        // A first simple test uses the 2d distance to the center of the quad.
-        float dist_2 = m_all_nodes[next_sector]->getDistance2FromPoint(xyz);
-        if(dist_2<min_dist_2)
+    // If a kart is falling and in between (or too far below)
+    // a driveline point it might not fulfill
+    // the height condition. So we run the test twice: first with height
+    // condition, then again without the height condition - just to make sure
+    // it always comes back with some kind of quad.
+    for(int phase=0; phase<2; phase++)
+    {
+        for(int j=0; j<count; j++)
         {
-            min_dist_2 = dist_2;
-            min_sector = next_sector;
-        }
-        current_sector = next_sector;
-    }   // for j
+            int next_sector;
+            if(all_sectors)
+                next_sector = (*all_sectors)[j];
+            else
+                next_sector  = current_sector+1 == (int)getNumNodes()
+                ? 0
+                : current_sector+1;
+
+            // A first simple test uses the 2d distance to the center of the quad.
+            float dist_2 = m_all_nodes[next_sector]->getDistance2FromPoint(xyz);
+            if(dist_2<min_dist_2)
+            {
+                const Quad &q = getQuadOfNode(next_sector);
+                float dist    = xyz.getY() - q.getMinHeight();
+                // While negative distances are unlikely, we allow some small
+                // negative numbers in case that the kart is partly in the
+                // track. Only do the height test in phase==0, in phase==1
+                // accept any point, independent of height.
+                if(phase==1 || (dist < 5.0f && dist>-1.0f) )
+                {
+                    min_dist_2 = dist_2;
+                    min_sector = next_sector;
+                }
+            }
+            current_sector = next_sector;
+        }   // for j
+        // Leave in phase 0 if any sector was found.
+        if(min_sector!=UNKNOWN_SECTOR)
+            return min_sector;
+    }   // phase
 
     if(min_sector==UNKNOWN_SECTOR )
     {
-        printf("unknown sector found.\n");
+        Log::info("Quad Grap", "unknown sector found.");
     }
     return min_sector;
 }   // findOutOfRoadSector
@@ -665,10 +960,10 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     IrrDriver::RTTProvider rttProvider(dimension, name, true);
     video::SColor red(128, 255, 0, 0);
     createMesh(/*show_invisible part of the track*/ false,
+               /*enable_transparency*/ false,
                /*track_color*/    &fill_color,
                /*lap line color*/  &red                       );
-    //video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
-    
+
     m_node = irr_driver->addMesh(m_mesh);   // add Debug Mesh
 #ifdef DEBUG
     m_node->setName("minimap-mesh");
@@ -680,23 +975,23 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     // ---------------
     scene::ICameraSceneNode *camera = irr_driver->addCameraSceneNode();
     Vec3 bb_min, bb_max;
-    m_all_quads->getBoundingBox(&bb_min, &bb_max);
+    QuadSet::get()->getBoundingBox(&bb_min, &bb_max);
     Vec3 center = (bb_max+bb_min)*0.5f;
 
     float dx = bb_max.getX()-bb_min.getX();
     float dz = bb_max.getZ()-bb_min.getZ();
 
-    // Set the scaling correctly. Also the center point (which is used 
+    // Set the scaling correctly. Also the center point (which is used
     // as the camera position) needs to be adjusted: the track must
     // be aligned to the left/top of the texture which is used (otherwise
     // mapPoint2MiniMap doesn't work), so adjust the camera position
     // that the track is properly aligned (view from the side):
     //          c        camera
-    //         / \       . 
+    //         / \       .
     //        /   \     <--- camera angle
-    //       /     \     . 
+    //       /     \     .
     //      {  [-]  }   <--- track flat (viewed from the side)
-    // If [-] is the shorter side of the track, then the camera will 
+    // If [-] is the shorter side of the track, then the camera will
     // actually render the area in { } - which is the length of the
     // longer side of the track.
     // To align the [-] side to the left, the camera must be moved
@@ -708,7 +1003,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
         center.setX(center.getX() + (dz-dx)*0.5f);
         m_scaling = dimension.Width / dz;
     }
-    else 
+    else
     {
         center.setZ(center.getZ() + (dx-dz)*0.5f);
         m_scaling = dimension.Width / dx;
@@ -717,7 +1012,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     float range = (dx>dz) ? dx : dz;
 
     core::matrix4 projection;
-    projection.buildProjectionMatrixOrthoLH(range, 
+    projection.buildProjectionMatrixOrthoLH(range,
                                             range,
                                             -1, bb_max.getY()-bb_min.getY()+1);
     camera->setProjectionMatrix(projection, true);
@@ -727,25 +1022,25 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     camera->setPosition(core::vector3df(center.getX(), bb_max.getY()+1, center.getZ()));
     camera->setUpVector(core::vector3df(0, 0, 1));
     camera->setTarget(core::vector3df(center.getX(),bb_min.getY()-1,center.getZ()));
-    
+
     video::ITexture *texture = rttProvider.renderToTexture();
-    
+
     cleanupDebugMesh();
     irr_driver->removeCameraSceneNode(camera);
     m_min_coord = bb_min;
 
-    
+
     if (texture == NULL)
     {
-        fprintf(stderr, "[QuadGraph::makeMiniMap] WARNING: RTT does not appear to work,"
-                        "mini-map will not be available\n");
+        Log::error("Quad Graph", "[makeMiniMap] WARNING: RTT does not appear to work,"
+                        "mini-map will not be available.");
     }
-    
+
     return texture;
 }   // makeMiniMap
 
 //-----------------------------------------------------------------------------
-    /** Returns the 2d coordinates of a point when drawn on the mini map 
+    /** Returns the 2d coordinates of a point when drawn on the mini map
      *  texture.
      *  \param xyz Coordinates of the point to map.
      *  \param draw_at The coordinates in pixel on the mini map of the point,

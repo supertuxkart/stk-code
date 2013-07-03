@@ -21,9 +21,12 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "items/powerup_manager.hpp"
+#include "karts/abstract_kart.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
 #include "utils/translation.hpp"
+
+#include <ISceneManager.h>
 
 //-----------------------------------------------------------------------------
 FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
@@ -36,21 +39,46 @@ FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
 
     m_leader_intervals = stk_config->m_leader_intervals;
     for(unsigned int i=0; i<m_leader_intervals.size(); i++)
-        m_leader_intervals[i] += 
+        m_leader_intervals[i] +=
             stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
     m_use_highscores   = false;  // disable high scores
     setClockMode(WorldStatus::CLOCK_COUNTDOWN, m_leader_intervals[0]);
 }
 
 //-----------------------------------------------------------------------------
-FollowTheLeaderRace::~FollowTheLeaderRace()
+/** Called immediately after the constructor. Here functions that use
+ *  World::getWorld() as well as overridden functions.
+ */
+void FollowTheLeaderRace::init()
 {
+    LinearWorld::init();
+    getKart(0)->setOnScreenText(_("Leader"));
 }
 
 #if 0
 #pragma mark -
 #pragma mark clock events
 #endif
+//-----------------------------------------------------------------------------
+FollowTheLeaderRace::~FollowTheLeaderRace()
+{
+}
+
+//-----------------------------------------------------------------------------
+/** Called just before a race is started.
+ */
+void FollowTheLeaderRace::reset()
+{
+    LinearWorld::reset();
+    m_leader_intervals.clear();
+    m_leader_intervals    = stk_config->m_leader_intervals;
+    for(unsigned int i=0; i<m_leader_intervals.size(); i++)
+        m_leader_intervals[i] +=
+            stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
+    WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
+                              m_leader_intervals[0]);
+}   // reset
+
 //-----------------------------------------------------------------------------
 /** Returns the original time at which the countdown timer started. This is
  *  used by the race_gui to display the music credits in FTL mode correctly.
@@ -71,9 +99,9 @@ void FollowTheLeaderRace::countdownReachedZero()
 
     // If the leader kart is not the first kart, remove the first
     // kart, otherwise remove the last kart.
-    int position_to_remove = m_karts[0]->getPosition()==1 
+    int position_to_remove = m_karts[0]->getPosition()==1
                            ? getCurrentNumKarts() : 1;
-    Kart *kart = getKartAtPosition(position_to_remove);
+    AbstractKart *kart = getKartAtPosition(position_to_remove);
     if(!kart || kart->isEliminated())
     {
         fprintf(stderr,"Problem with removing leader: position %d not found\n",
@@ -83,7 +111,7 @@ void FollowTheLeaderRace::countdownReachedZero()
             fprintf(stderr,"kart %d: eliminated %d position %d\n",
                     i,m_karts[i]->isEliminated(), m_karts[i]->getPosition());
         }   // for i
-    }  // 
+    }  //
     else
     {
         if(UserConfigParams::m_ftl_debug)
@@ -91,10 +119,10 @@ void FollowTheLeaderRace::countdownReachedZero()
             printf("[ftl] Eliminiating kart '%s' at position %d.\n",
                 kart->getIdent().c_str(), position_to_remove);
         }
-        removeKart(kart->getWorldKartId());
+        eliminateKart(kart->getWorldKartId());
 
-        // In case that the kart on position 1 was removed, we have 
-        // to set the correct position (which equals the remaining 
+        // In case that the kart on position 1 was removed, we have
+        // to set the correct position (which equals the remaining
         // number of karts) for the removed kart, as well as recompute
         // the position for all other karts
         if(position_to_remove==1)
@@ -114,26 +142,38 @@ void FollowTheLeaderRace::countdownReachedZero()
         }
         // Time doesn't make any sense in FTL (and it is not displayed)
         kart->finishedRace(-1.0f);
-    }
-    
+
+        // Move any camera for this kart to the leader, facing backwards,
+        // so that the eliminated player has something to watch.
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+        {
+            Camera *camera = Camera::getCamera(i);
+            if(camera->getKart()==kart)
+            {
+                camera->setMode(Camera::CM_LEADER_MODE);
+                camera->setKart(getKart(0));
+            }
+        }   // for i<number of cameras
+    }   // if kart to eliminate exists
+
     // almost over, use fast music
     if(getCurrentNumKarts()==3)
     {
         music_manager->switchToFastMusic();
     }
-    
+
     if (isRaceOver())
     {
         // Handle special FTL situation: the leader is kart number 3 when
         // the last kart gets eliminated. In this case kart on position 1
-        // is eliminated, and the kart formerly on position 2 is on 
-        // position 1, the leader now position 2. In this case the kart 
+        // is eliminated, and the kart formerly on position 2 is on
+        // position 1, the leader now position 2. In this case the kart
         // on position 1 would get more points for this victory. So if
-        // this is the case, change the position 
+        // this is the case, change the position
         if(m_karts[0]->getPosition()!=1)
         {
             // Adjust the position of all still driving karts that
-            // are ahead of the leader by +1, and move the leader 
+            // are ahead of the leader by +1, and move the leader
             // to position 1.
             for (unsigned int i=1; i<m_karts.size(); i++)
             {
@@ -150,7 +190,7 @@ void FollowTheLeaderRace::countdownReachedZero()
         // Mark all still racing karts to be finished.
         for (unsigned int n=0; n<m_karts.size(); n++)
         {
-            if (!m_karts[n]->isEliminated() && 
+            if (!m_karts[n]->isEliminated() &&
                 !m_karts[n]->hasFinishedRace())
             {
                 m_karts[n]->finishedRace(getTime());
@@ -158,7 +198,7 @@ void FollowTheLeaderRace::countdownReachedZero()
         }
     }
     // End of race is detected from World::updateWorld()
-    
+
 }   // countdownReachedZero
 
 //-----------------------------------------------------------------------------
@@ -171,33 +211,20 @@ bool FollowTheLeaderRace::isRaceOver()
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
-void FollowTheLeaderRace::restartRace()
-{
-    LinearWorld::restartRace();
-    m_leader_intervals.clear();
-    m_leader_intervals    = stk_config->m_leader_intervals;
-    for(unsigned int i=0; i<m_leader_intervals.size(); i++)
-        m_leader_intervals[i] += 
-            stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
-    WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, 
-                              m_leader_intervals[0]);
-}   // restartRace
-
-//-----------------------------------------------------------------------------
-/** Returns the internal identifier for this kind of race. 
+/** Returns the internal identifier for this kind of race.
  */
-std::string FollowTheLeaderRace::getIdent() const
+const std::string& FollowTheLeaderRace::getIdent() const
 {
-    return FTL_IDENT;
+    return IDENT_FTL;
 }   // getIdent
 
 //-----------------------------------------------------------------------------
 /** Sets the title for all karts that is displayed in the icon list. In
  *  this mode the title for the first kart is set to 'leader'.
  */
-RaceGUIBase::KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo()
+void FollowTheLeaderRace::getKartsDisplayInfo(
+                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
 {
-    LinearWorld::getKartsDisplayInfo();
-    m_kart_display_info[0].special_title = _("Leader");
-    return m_kart_display_info;
+    LinearWorld::getKartsDisplayInfo(info);
+    (*info)[0].special_title = _("Leader");
 }   // getKartsDisplayInfo

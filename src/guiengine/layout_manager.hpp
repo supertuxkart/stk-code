@@ -27,10 +27,10 @@ namespace GUIEngine
 {
     class Widget;
     class AbstractTopLevelContainer;
-    
+
     class LayoutManager
     {
-    
+
         /**
          * \brief Receives as string the raw property value retrieved from XML file.
          * Will try to make sense of it, as an absolute value or a percentage.
@@ -40,9 +40,9 @@ namespace GUIEngine
          *     Returns false if couldn't convert to either
          */
         static bool convertToCoord(std::string& x, int* absolute /* out */, int* percentage /* out */);
-        
+
         static void recursivelyReadCoords(PtrVector<Widget>& widgets);
-        
+
         /**
          * \brief Recursive call that lays out children widget within parent (or screen if none).
          *
@@ -51,10 +51,10 @@ namespace GUIEngine
          */
         static void doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLevelContainer* topLevelContainer,
                                       Widget* parent);
-        
-        
+
+
     public:
-        
+
         /**
          * \brief Recursive call that lays out children widget within parent (or screen if none).
          *
@@ -62,13 +62,13 @@ namespace GUIEngine
          * of the remaining children, as well as absolute sizes and locations.
          */
         static void calculateLayout(PtrVector<Widget>& widgets, AbstractTopLevelContainer* topLevelContainer);
-        
+
         /**
          * \brief Find a widget's x, y, w and h coords from what is specified in the XML properties.
          * Most notably, expands coords relative to parent and percentages.
          */
         static void applyCoords(Widget* self, AbstractTopLevelContainer* topLevelContainer, Widget* parent);
-        
+
         /**
          * \brief Find a widget's x, y, w and h coords from what is specified in the XML properties.
          * (First step; 'applyCoords' is the second step)

@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 Marianne Gagnon
@@ -49,8 +48,8 @@ public:
     Input::AxisDirection getDirection() const {return m_dir;}
     // ------------------------------------------------------------------------
     /** Defines all values of this binding. */
-    void                 set(Input::InputType type, int id, 
-                             Input::AxisDirection dir, 
+    void                 set(Input::InputType type, int id,
+                             Input::AxisDirection dir,
                              wchar_t character)
     {
         m_type = type; m_id=id; m_dir=dir; m_character=character;

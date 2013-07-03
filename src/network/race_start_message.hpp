@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -29,7 +28,7 @@ class RaceStartMessage : public Message
 private:
 // For now this is an empty message
 public:
-    RaceStartMessage() : Message(Message::MT_RACE_START) 
+    RaceStartMessage() : Message(Message::MT_RACE_START)
     {
         allocate(0);
     }   // RaceStartMessage

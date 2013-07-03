@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2011 Joerg Henrichs
@@ -20,16 +19,20 @@
 #ifndef HEADER_SWATTER_HPP
 #define HEADER_SWATTER_HPP
 
-#include <vector3d.h>
-
 #include "config/stk_config.hpp"
 #include "items/attachment_plugin.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/random_generator.hpp"
 
-class Kart;
+#include <vector3d.h>
+#include <IAnimatedMeshSceneNode.h>
+
+using namespace irr;
+
+class AbstractKart;
 class Item;
-class Attachment;
+class Moveable;
+class SFXBase;
 
 /**
   * \ingroup items
@@ -38,41 +41,39 @@ class Swatter : public NoCopy, public AttachmentPlugin
 {
 
 private:
-    /** Kart the attachment is attached to. */
-    Kart           *m_kart;
-
-    /** How often an attachment can be used (e.g. swatter). */
-    int             m_count;
-
-    /** State of a swatter animation. The swatter is either aiming (looking
-     *  for a kart and/or swatting an incoming item), moving towards or back
-     *  from a kart, or swatting left and right to hit an item - which has
-     *  three phases: going left to an angle a (phae 1), then going to -a
-     *  (phase 2), then going back to 0. */
-    enum            {SWATTER_AIMING, SWATTER_TO_KART,
-                     SWATTER_BACK_FROM_KART,
-                     SWATTER_ITEM_1, SWATTER_ITEM_2, SWATTER_ITEM_3,
-                     SWATTER_BACK_FROM_ITEM} m_animation_phase;
-
-    /** Timer for swatter animation. */
-    float           m_animation_timer;
+    /** State of the animation, the swatter is successively:
+     *   - aiming (default state) => it's turning to the nearest target
+     *   - going down to the target
+     *   - going up from the target
+     */
+    enum    {SWATTER_AIMING, SWATTER_TO_TARGET, SWATTER_FROM_TARGET}
+                    m_animation_phase;
 
     /** The kart the swatter is aiming at. */
-    Kart           *m_animation_target;
+    Moveable          *m_target;
 
-    /** Rotation per second so that the swatter will hit the kart. */
-    core::vector3df m_rot_per_sec;
+    SFXBase           *m_swat_sound;
 
-    void            aimSwatter();
-    bool            isLeftSideOfKart(const Vec3 &xyz);
-    void            checkForHitKart(bool isSwattingToLeft);
+    /** True if the swatter is removing an attached bomb. */
+    bool               m_removing_bomb;
+
+    /** The scene node of the attachment. */
+    scene::IAnimatedMeshSceneNode *m_scene_node;
+
+    /** The scene node where a bomb is saved (in case that the swatter
+     *  replaces a bomb. */
+    scene::ISceneNode *m_bomb_scene_node;
+
+    /** For some reason the built-in animation system doesn't work correctly here?? */
+    float              m_swat_bomb_frame;
+
+    const core::stringw getHitString(const AbstractKart *kart) const;
 
 public:
-             Swatter(Attachment *attachment, Kart *kart);
+             Swatter(AbstractKart *kart, bool was_bomb,
+                     scene::ISceneNode* bomb_scene_node);
     virtual ~Swatter();
     bool     updateAndTestFinished(float dt);
-    void     updateSwatter(float dt);
-    void     swatItem();
 
     // ------------------------------------------------------------------------
     /** Returns if the swatter is currently aiming, i.e. can be used to
@@ -81,6 +82,18 @@ public:
         return m_animation_phase == SWATTER_AIMING;
     }   // isSwatterReady
     // ------------------------------------------------------------------------
+    virtual void onAnimationEnd();
+    // ------------------------------------------------------------------------
+
+private:
+    /** Determine the nearest kart or item and update the current target accordingly */
+    void    chooseTarget();
+
+    /** If there is a current target, point to it, otherwise adopt the default position */
+    void    pointToTarget();
+
+    /** Squash karts or items that are around the end position (determined using a joint) of the swatter */
+    void    squashThingsAround();
 };   // Swatter
 
 #endif

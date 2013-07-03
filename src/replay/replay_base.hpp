@@ -1,7 +1,6 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Maik Semder <ikework@gmx.de>
+//  Copyright (C) 2012 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,60 +16,62 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_REPLAYBASE_HPP
-#define HEADER_REPLAYBASE_HPP
+#ifndef HEADER_REPLAY_BASE_HPP
+#define HEADER_REPLAY_BASE_HPP
 
-#ifdef HAVE_GHOST_REPLAY
+#include "LinearMath/btTransform.h"
+#include "utils/no_copy.hpp"
 
-
+#include <stdio.h>
 #include <string>
 
-#include "replay/replay_buffers.hpp"
-
-
-// the data stored for each kart in each frame
-struct ReplayKartState
+/**
+  * \ingroup race
+  */
+class ReplayBase : public NoCopy
 {
-    sgCoord position;
-};
-// the data stored for each frame
-struct ReplayFrame
-{
-    // absolute time of frame
-    float           time;
-    // for each kart in frame, points to continious block 
-    // in Buffers::m_pp_blocks_kart_states with m_number_karts items
-    ReplayKartState *p_kart_states;
-};
-
-
-class ReplayBase
-{
-public:
-    static const std::string REPLAY_FOLDER;
-    static const std::string REPLAY_FILE_EXTENSION_HUMAN_READABLE;
-    static const std::string REPLAY_FILE_EXTENSION_BINARY;
-
-public:
-
-    ReplayBase();
-    virtual ~ReplayBase();
-
-    virtual void    destroy();
-
-    bool            saveReplayHumanReadable( FILE *fd ) const { return m_ReplayBuffers.saveReplayHumanReadable( fd ); }
-
+    // Needs access to KartReplayEvent
+    friend class GhostKart;
 private:
-
+    /** The filename of the replay file. Only defined after calling
+     *  openReplayFile. */
+    std::string m_filename;
 protected:
-    ReplayBuffers   m_ReplayBuffers;
-};
+    /** Stores a transform event, i.e. a position and rotation of a kart
+     *  at a certain time. */
+    struct TransformEvent
+    {
+        /** Time at which this event happens. */
+        float       m_time;
+        /** The transform at a certain time. */
+        btTransform m_transform;
+    };   // TransformEvent
 
+    // ------------------------------------------------------------------------
+    /** Records all other events - atm start and end skidding. */
+    struct KartReplayEvent
+    {
+        /** The type of event. */
+        enum KartReplayEventType {KRE_NONE,
+                                  KRE_SKID_LEFT,
+                                  KRE_SKID_MIN = KRE_SKID_LEFT,
+                                  KRE_SKID_RIGHT, KRE_SKID_RELEASE} m_type;
 
+        /** Time at which this event happens. */
+        float       m_time;
+    };   // KartReplayEvent
 
+    // ------------------------------------------------------------------------
+          ReplayBase();
+    FILE *openReplayFile(bool writeable);
+    // ----------------------------------------------------------------------
+    /** Returns the filename that was opened. */
+    const std::string &getReplayFilename() const { return m_filename;}
+    // ----------------------------------------------------------------------
+    /** Returns the version number of the replay file. This is used to check
+     *  that a loaded replay file can still be understood by this
+     *  executable. */
+    unsigned int getReplayVersion() const { return 1; }
+};   // ReplayBase
 
-
-#endif // HAVE_GHOST_REPLAY
-
-#endif // HEADER_REPLAYBASE_HPP
-
+#endif

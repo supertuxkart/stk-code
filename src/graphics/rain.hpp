@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2011  Joerg Henrichs, Marianne Gagnon
@@ -20,6 +19,7 @@
 #ifndef HEADER_RAIN_HPP
 #define HEADER_RAIN_HPP
 
+class Camera;
 class PerCameraNode;
 
 #include <vector3d.h>
@@ -39,21 +39,21 @@ class Rain
     PerCameraNode* m_node[RAIN_RING_COUNT];
 
     std::vector<irr::video::SMaterial*> m_materials;
-    
+
     float m_x[RAIN_RING_COUNT];
     float m_y[RAIN_RING_COUNT];
-    
+
     float m_next_lightning;
     bool m_lightning;
     SFXBase* m_thunder_sound;
-    
+
 public:
-    Rain(irr::scene::ICameraSceneNode* camera, irr::scene::ISceneNode* parent, bool lightning);
+    Rain(Camera* camera, irr::scene::ISceneNode* parent);
     ~Rain();
-    
+
     void update(float dt);
     void setPosition(const irr::core::vector3df& position);
-    
+
     void setCamera(scene::ICameraSceneNode* camera);
 };
 

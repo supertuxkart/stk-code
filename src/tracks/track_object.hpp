@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -21,18 +20,18 @@
 #define HEADER_TRACK_OBJECT_HPP
 
 #include <vector3d.h>
-#include <IAnimatedMeshSceneNode.h>
-namespace irr
-{
-    namespace scene { class IAnimatedMesh; class ISceneNode; }
-}
-using namespace irr;
 
+#include "items/item.hpp"
+#include "physics/physical_object.hpp"
+#include "tracks/track_object_presentation.hpp"
+#include "utils/cpp2011.h"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
-
+#include <string>
 
 class XMLNode;
+class ThreeDAnimation;
+
 
 /**
  * \ingroup tracks
@@ -40,36 +39,22 @@ class XMLNode;
  *  might also have a skeletal animation. This is used by objects that
  *  have an IPO animation, as well as physical objects.
  */
-class TrackObject : public scene::IAnimationEndCallBack, public NoCopy
+class TrackObject : public NoCopy
 {
 //public:
-    // The different type of track objects: physical objects, graphical 
+    // The different type of track objects: physical objects, graphical
     // objects (without a physical representation) - the latter might be
     // eye candy (to reduce work for physics), ...
     //enum TrackObjectType {TO_PHYSICAL, TO_GRAPHICAL};
 
 private:
     /** True if the object is currently being displayed. */
-    bool                    m_enabled;
+    bool                     m_enabled;
 
-    /** True if it is a looped animation. */
-    bool                    m_is_looped;
-
-    /** Start frame of the animation to be played. */
-    unsigned int            m_frame_start;
-
-    /** End frame of the animation to be played. */
-    unsigned int            m_frame_end;
-
-    virtual void OnAnimationEnd(scene::IAnimatedMeshSceneNode* node);
+    TrackObjectPresentation* m_presentation;
 
 protected:
-    /** The irrlicht scene node this object is attached to. */
-    scene::ISceneNode             *m_node;
 
-    /** The mesh used here. It needs to be stored so that it can be 
-     *  removed from irrlicht's mesh cache when it is deleted. */
-    scene::IAnimatedMesh          *m_mesh;
 
     /** The initial XYZ position of the object. */
     core::vector3df                m_init_xyz;
@@ -80,20 +65,72 @@ protected:
     /** The initial scale of the object. */
     core::vector3df                m_init_scale;
 
+    /** LOD group this object is part of, if it is LOD */
+    std::string                    m_lod_group;
+
+    std::string                    m_interaction;
+
+    std::string                    m_type;
+
+    bool                           m_soccer_ball;
+
+    PhysicalObject*                m_rigid_body;
+
+    ThreeDAnimation*               m_animator;
+
+    void init(const XMLNode &xml_node, LODNode* lodNode);
+
 public:
-                 TrackObject(const XMLNode &xml_node);
+                 TrackObject(const XMLNode &xml_node, LODNode* lodNode=NULL);
+
+                 TrackObject(const core::vector3df& xyz,
+                             const core::vector3df& hpr,
+                             const core::vector3df& scale,
+                             const char* interaction,
+                             TrackObjectPresentation* presentation,
+                             bool is_dynamic,
+                             const PhysicalObject::Settings* physicsSettings);
                 ~TrackObject();
     virtual void update(float dt);
     virtual void reset();
-    /** To finish object constructions. Called after the track model 
+    /** To finish object constructions. Called after the track model
      *  is ready. */
     virtual void init() {};
     /** Called when an explosion happens. As a default does nothing, will
      *  e.g. be overwritten by physical objects etc. */
     virtual void handleExplosion(const Vec3& pos, bool directHit) {};
     void         setEnable(bool mode);
-    
-    scene::ISceneNode* getNode() { return m_node; }
+
+    const std::string& getLodGroup() const { return m_lod_group; }
+
+    const std::string& getType() const { return m_type; }
+
+    bool isSoccerBall() const { return m_soccer_ball; }
+
+    const PhysicalObject* getPhysics() const { return m_rigid_body; }
+    PhysicalObject* getPhysics() { return m_rigid_body; }
+
+    const core::vector3df getInitXYZ() const { return m_init_xyz; }
+    const core::vector3df getInitRotation() const { return m_init_hpr; }
+    const core::vector3df getInitScale() const { return m_init_scale; }
+
+    void move(const core::vector3df& xyz, const core::vector3df& hpr,
+              const core::vector3df& scale, bool updateRigidBody);
+
+    template<typename T>
+    T* getPresentation() { return dynamic_cast<T*>(m_presentation); }
+
+    template<typename T>
+    const T* getPresentation() const { return dynamic_cast<T*>(m_presentation); }
+
+    ThreeDAnimation* getAnimator() { return m_animator; }
+    const ThreeDAnimation* getAnimator() const { return m_animator; }
+
+    const core::vector3df& getPosition() const;
+    const core::vector3df& getRotation() const;
+    const core::vector3df& getScale() const;
+
+    LEAK_CHECK()
 };   // TrackObject
 
 #endif

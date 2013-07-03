@@ -30,17 +30,18 @@ class HelpScreen2 : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<
 {
     friend class GUIEngine::ScreenSingleton<HelpScreen2>;
     HelpScreen2();
-    
+
 public:
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile();
-    
+    virtual void loadedFromFile() OVERRIDE;
+
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
-    
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+                               const int playerID) OVERRIDE;
+
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void init();
-    };
+    virtual void init() OVERRIDE;
+};
 
 #endif

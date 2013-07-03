@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Joerg Henrichs
@@ -23,14 +22,14 @@
 #include "items/cake.hpp"
 
 #include "io/xml_node.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "utils/constants.hpp"
+#include "utils/random_generator.hpp"
 
-float Cake::m_st_max_distance;
 float Cake::m_st_max_distance_squared;
 float Cake::m_gravity;
 
-Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
+Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 {
     m_target = NULL;
 
@@ -48,7 +47,7 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
     m_speed *= kart->getSpeed() / 23.0f;
 
     //when going backwards, decrease speed of cake by less
-    if (kart->getSpeed() < 0) m_speed /= 3.6f; 
+    if (kart->getSpeed() < 0) m_speed /= 3.6f;
 
     m_speed += 16.0f;
 
@@ -61,10 +60,10 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 
     // Find closest kart in front of the current one
     const bool  backwards = kart->getControls().m_look_back;
-    const Kart *closest_kart=NULL;
+    const AbstractKart *closest_kart=NULL;
     Vec3        direction;
-    float       kartDistSquared;
-    getClosestKart(&closest_kart, &kartDistSquared, &direction, 
+    float       kart_dist_squared;
+    getClosestKart(&closest_kart, &kart_dist_squared, &direction,
                    kart /* search in front of this kart */, backwards);
 
     // aim at this kart if 1) it's not too far, 2) if the aimed kart's speed
@@ -73,10 +72,10 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
     // this code finds the correct angle and upwards velocity to hit an opponents'
     // vehicle if they were to continue travelling in the same direction and same speed
     // (barring any obstacles in the way of course)
-    if(closest_kart != NULL && kartDistSquared < m_st_max_distance_squared &&
+    if(closest_kart != NULL && kart_dist_squared < m_st_max_distance_squared &&
         m_speed>closest_kart->getSpeed())
     {
-        m_target = (Kart*)closest_kart;
+        m_target = (AbstractKart*)closest_kart;
 
         float fire_angle     = 0.0f;
         getLinearKartItemIntersection (kart->getXYZ(), closest_kart,
@@ -85,11 +84,12 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 
         // apply transformation to the bullet object (without pitch)
         trans.setRotation(btQuaternion(btVector3(0,1,0), fire_angle));
-        
+
         m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
 
         createPhysics(forward_offset, m_initial_velocity,
-                      new btCylinderShape(0.5f*m_extend), -m_gravity,
+                      new btCylinderShape(0.5f*m_extend),
+                      0.5f /* restitution */, -m_gravity,
                       true /* rotation */, false /* backwards */, &trans);
     }
     else
@@ -98,11 +98,12 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
         // kart is too far to be hit. so throw the projectile in a generic way,
         // straight ahead, without trying to hit anything in particular
         trans = kart->getAlignedTransform(pitch);
-        
+
         m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
 
         createPhysics(forward_offset, m_initial_velocity,
-                      new btCylinderShape(0.5f*m_extend), -m_gravity,
+                      new btCylinderShape(0.5f*m_extend),
+                      0.5f /* restitution */, -m_gravity,
                       true /* rotation */, backwards, &trans);
     }
 
@@ -124,45 +125,50 @@ Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 void Cake::init(const XMLNode &node, scene::IMesh *cake_model)
 {
     Flyable::init(node, cake_model, PowerupManager::POWERUP_CAKE);
-    m_st_max_distance         = 80.0f;
-    m_st_max_distance_squared = 80.0f * 80.0f;
+    float max_distance        = 80.0f;
     m_gravity                 = 9.8f;
 
     if (m_gravity < 0) m_gravity *= -1.0f;
 
-    node.get("max-distance",    &m_st_max_distance  );
-    m_st_max_distance_squared = m_st_max_distance*m_st_max_distance;
+    node.get("max-distance",    &max_distance  );
+    m_st_max_distance_squared = max_distance*max_distance;
 }   // init
 
-// -----------------------------------------------------------------------------
-void Cake::update(float dt)
+// ----------------------------------------------------------------------------
+/** Picks a random message to be displayed when a kart is hit by a cake.
+ *  \param The kart that was hit (ignored here).
+ *  \returns The string to display.
+ */
+const core::stringw Cake::getHitString(const AbstractKart *kart) const
 {
-    //The following commented out code adds a lock on to the cake. It is kept
-    //because it shows how to lock on to a moving target precisely with the
-    //intersection algorithm and may be one day useful for something else.
-
-    /*
-    if(m_target != NULL)
+    const int CAKE_STRINGS_AMOUNT = 4;
+    RandomGenerator r;
+    switch (r.get(CAKE_STRINGS_AMOUNT))
     {
-        // correct direction to go towards aimed kart
-        btTransform my_trans = getTrans();
-
-        float fire_angle     = 0.0f;
-        float time_estimated = 0.0f;
-        float up_velocity    = 0.0f;
-
-        Vec3 origin = my_trans.getOrigin() - m_target->getNormal() * 0.5 * m_target->getKartHeight();
-
-        getLinearKartItemIntersection (origin, m_target,
-                                       m_speed, m_gravity, 0,
-                                       &fire_angle, &up_velocity, &time_estimated);
-
-        m_body->setLinearVelocity( btVector3(-m_speed * sinf (fire_angle),
-                                             m_speed * cosf (fire_angle),
-                                             up_velocity) );
+        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+        case 0: return _LTR("%0 eats too much of %1's cake");
+        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+        case 1: return _LTR("%0 is dubious of %1's cooking skills");
+        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+        case 2: return _LTR("%0 should not play with %1's lunch");
+        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+        case 3: return _LTR("%1 ruins %0's cakeless diet");
+        default: assert(false); return L"";   // avoid compiler warning
     }
-    */
+}   // getHitString
+// ----------------------------------------------------------------------------
+/** Callback from the physics in case that a kart or physical object is hit.
+ *  The cake triggers an explosion when hit.
+ *  \param kart The kart hit (NULL if no kart was hit).
+ *  \param object The object that was hit (NULL if none).
+ *  \returns True if there was actually a hit (i.e. not owner, and target is
+ *           not immune), false otherwise.
+ */
+bool Cake::hit(AbstractKart* kart, PhysicalObject* obj)
+{
+    bool was_real_hit = Flyable::hit(kart, obj);
+    if(was_real_hit)
+        explode(kart, obj);
 
-    Flyable::update(dt);
-}   // update
-
+    return was_real_hit;
+}   // hit

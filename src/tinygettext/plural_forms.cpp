@@ -20,15 +20,15 @@
 #include <map>
 
 namespace tinygettext {
-
-/** 
+
+/**
  *  Plural functions are used to select a string that matches a given
  *  count. \a n is the count and the return value is the string index
  *  used in the .po file, for example:
- *   
+ *
  *   msgstr[0] = "You got %d error";
- *   msgstr[1] = "You got %d errors";        
- *          ^-- return value of plural function 
+ *   msgstr[1] = "You got %d errors";
+ *          ^-- return value of plural function
  */
 unsigned int plural1(int )     { return 0; }
 unsigned int plural2_1(int n)  { return (n != 1); }
@@ -42,12 +42,14 @@ unsigned int plural3_sk(int n) { return static_cast<unsigned int>( (n==1) ? 0 : 
 unsigned int plural3_pl(int n) { return static_cast<unsigned int>(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2); }
 unsigned int plural3_sl(int n) { return static_cast<unsigned int>(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3); }
 unsigned int plural4_ar(int n) { return static_cast<unsigned int>( n==1 ? 0 : n==2 ? 1 : n>=3 && n<=10 ? 2 : 3 ); }
-
+
+typedef std::map<std::string, class PluralForms> tPluralForms;
+
 PluralForms
 PluralForms::from_string(const std::string& str)
 {
-  static std::map<std::string, class PluralForms> plural_forms;
-    
+  static tPluralForms plural_forms;
+
   if (plural_forms.empty())
   {
     // Note that the plural forms here shouldn't contain any spaces
@@ -66,14 +68,14 @@ PluralForms::from_string(const std::string& str)
 
     plural_forms["Plural-Forms:nplurals=4;plural=n==1?0:n==2?1:n>=3&&n<=10?2:3;"]=PluralForms(4, plural4_ar);
   }
-  
+
   // Remove spaces from string before lookup
   std::string space_less_str;
   for(std::string::size_type i = 0; i < str.size(); ++i)
     if (!isspace(str[i]))
       space_less_str += str[i];
-  
-  std::map<std::string, class PluralForms>::const_iterator it= plural_forms.find(space_less_str);
+
+  tPluralForms::const_iterator it= plural_forms.find(space_less_str);
   if (it != plural_forms.end())
   {
     return it->second;

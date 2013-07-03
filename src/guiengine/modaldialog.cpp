@@ -23,6 +23,7 @@
 #include "guiengine/widget.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "utils/log.hpp"
 
 #include <IGUIEnvironment.h>
 
@@ -46,8 +47,10 @@ using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
 
-ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
+ModalDialog::ModalDialog(const float percentWidth, const float percentHeight,
+                         ModalDialogLocation location)
 {
+    m_dialog_location = location;
     doInit(percentWidth, percentHeight);
 }
 
@@ -55,25 +58,25 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
 
 void ModalDialog::loadFromFile(const char* xmlFile)
 {
-    IXMLReader* xml = file_manager->createXMLReader( (file_manager->getGUIDir() + "/" + xmlFile).c_str() );
+    IXMLReader* xml = file_manager->createXMLReader( (file_manager->getGUIDir() + xmlFile).c_str() );
     if (xml == NULL)
     {
         fprintf(stderr, "Cannot open file %s\n", xmlFile);
         assert(false);
         return;
     }
-    
+
     Screen::parseScreenFileDiv(xml, m_widgets, m_irrlicht_window);
     delete xml;
-    
+
     loadedFromFile();
-    
+
     LayoutManager::calculateLayout( m_widgets, this );
-    
+
     beforeAddingWidgets();
-    
+
     addWidgetsRecursively(m_widgets);
-    
+
     init();
 }
 
@@ -83,34 +86,52 @@ void ModalDialog::doInit(const float percentWidth, const float percentHeight)
 {
     pointer_was_shown = irr_driver->isPointerShown();
     irr_driver->showPointer();
-    
+
     const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-    
+
     const int w = (int)(frame_size.Width*percentWidth);
     const int h = (int)(frame_size.Height*percentHeight);
-    
+
     assert(frame_size.Width > 0);
     assert(frame_size.Height > 0);
     assert(frame_size.Width < 99999);
     assert(frame_size.Height < 99999);
-    
+
     assert(w > 0);
     assert(h > 0);
-    
+
     assert((unsigned int)w <= frame_size.Width);
     assert((unsigned int)h <= frame_size.Height);
-    
-    m_area = core::rect< s32 >( core::position2d< s32 >(frame_size.Width/2 - w/2, frame_size.Height/2 - h/2),
-                               core::dimension2d< s32 >(w, h) );
-    
-    if (modalWindow != NULL) delete modalWindow;
+
+    if (m_dialog_location == MODAL_DIALOG_LOCATION_CENTER)
+    {
+        m_area = core::rect<s32>(core::position2d<s32>(frame_size.Width/2 - w/2,
+                                                       frame_size.Height/2 - h/2),
+                                 core::dimension2d<s32>(w, h));
+    }
+    else if (m_dialog_location == MODAL_DIALOG_LOCATION_BOTTOM)
+    {
+        m_area = core::rect<s32>(core::position2d<s32>(frame_size.Width/2 - w/2,
+                                                       frame_size.Height - h - 15),
+                                 core::dimension2d<s32>(w, h));
+    }
+    else
+    {
+        assert(false);
+    }
+
+    if (modalWindow != NULL)
+    {
+        delete modalWindow;
+        Log::warn("GUIEngine", "Showing a modal dialog while the previous one is still open. Destroying the previous dialog.");
+    }
     modalWindow = this;
-    
-    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow   ( m_area, true /* modal */ );
-    
+
+    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area, true /* modal */);
+
     GUIEngine::getSkin()->m_dialog = true;
     GUIEngine::getSkin()->m_dialog_size = 0.0f;
-    
+
     m_previous_mode=input_manager->getMode();
     input_manager->setMode(InputManager::MENU);
 }
@@ -125,50 +146,48 @@ ModalDialog::~ModalDialog()
     // irrLicht is to stupid to remove focus from deleted widgets
     // so do it by hand
     GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
-    
+
     m_irrlicht_window->remove();
     m_irrlicht_window = NULL;
-    
+
     if (modalWindow == this) modalWindow = NULL;
-    
+
     // restore previous pointer state
     if (pointer_was_shown)  irr_driver->showPointer();
     else                    irr_driver->hidePointer();
 
     input_manager->setMode(m_previous_mode);
+
+
+    // it's generally not necessay to do that because references
+    // to the deleted widgets will be gone, but some widgets
+    // may want to perform additional cleanup at this time
+    elementsWereDeleted();
 }
 
 // ----------------------------------------------------------------------------
 
 void ModalDialog::clearWindow()
 {
-    // TODO: extract this code and its eqauivalent from Screen into the common base class?
     Widget* w;
     for_in (w, m_widgets)
     {
         m_irrlicht_window->removeChild( w->getIrrlichtElement() );
     }
-    m_widgets.clearAndDeleteAll();   
-    
+    elementsWereDeleted();
+    m_widgets.clearAndDeleteAll();
+
     m_irrlicht_window->remove();
-    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow   ( m_area, true /* modal */ );
-    
-    /*
-    const core::list<IGUIElement*>& remainingChildren = m_irrlicht_window->getChildren();
-    const int amount = remainingChildren.getSize();
-    for(core::list<IGUIElement*>::Iterator it=remainingChildren.begin(); it != remainingChildren.end(); it++)
-    {
-        it->remove();
-    }
-     */
+    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow( m_area, true /* modal */ );
 }
 
 // ----------------------------------------------------------------------------
-    
+
 void ModalDialog::dismiss()
 {
     if(modalWindow != NULL) delete modalWindow;
     modalWindow = NULL;
+    GUIEngine::getCurrentScreen()->onDialogClose();
 }
 
 // ----------------------------------------------------------------------------
@@ -197,7 +216,7 @@ ModalDialog* ModalDialog::getCurrent()
 void ModalDialog::onEnterPressedInternal()
 {
 }
-    
+
 // ----------------------------------------------------------------------------
 
 

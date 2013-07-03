@@ -21,13 +21,14 @@
 #include <vector2d.h>
 #include <IEventReceiver.h>
 #include "input/input.hpp"
+#include "utils/leak_check.hpp"
 
 /**
  * \ingroup guiengine
  */
 namespace GUIEngine
 {
-    
+
     /**
       * \ingroup guiengine
       */
@@ -36,9 +37,9 @@ namespace GUIEngine
         EVENT_BLOCK,
         EVENT_LET
     };
-    
+
     class Widget;
-    
+
     /**
      * \brief Class to handle irrLicht events (GUI and input as well)
      *
@@ -58,27 +59,30 @@ namespace GUIEngine
         EventPropagation onWidgetActivated(Widget* w, const int playerID);
         void navigateUp(const int playerID, Input::InputType type, const bool pressedDown);
         void navigateDown(const int playerID, Input::InputType type, const bool pressedDown);
-        
+
         /** \brief          send an event to the GUI module user's event callback
           * \param widget   the widget that triggerred this event
           * \param name     the name/ID (PROP_ID) of the widget that triggerred this event
           * \param playerID ID of the player that triggerred this event
           */
         void sendEventToUser(Widget* widget, std::string& name, const int playerID);
-        
+
         /** Last position of the mouse cursor */
         irr::core::vector2di     m_mouse_pos;
-        
+
     public:
+
+        LEAK_CHECK()
+
         EventHandler();
         ~EventHandler();
-        
+
         /**
          * All irrLicht events will go through this (input as well GUI; input events are
          * immediately delegated to the input module, GUI events are processed here)
          */
         bool OnEvent (const irr::SEvent &event);
-        
+
         /**
          * When the input module is done processing an input and mapped it to an action,
          * and this action needs to be applied to the GUI (e.g. fire pressed, left
@@ -86,14 +90,15 @@ namespace GUIEngine
          */
         void processGUIAction(const PlayerAction action, int deviceID, const unsigned int value,
                               Input::InputType type, const int playerID);
-        
+
         /** Get the mouse position */
         const irr::core::vector2di& getMousePos() const { return m_mouse_pos; }
-        
+
         /** singleton access */
         static EventHandler* get();
+        static void deallocate();
     };
-    
+
 }
 
 #endif

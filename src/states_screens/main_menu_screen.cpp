@@ -21,7 +21,9 @@
 
 #include <string>
 
-#include "addons/network_http.hpp"
+#include "addons/inetwork_http.hpp"
+#include "challenges/game_slot.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -32,20 +34,25 @@
 #include "io/file_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
+#include "modes/cutscene_world.hpp"
+#include "modes/overworld.hpp"
+#include "modes/demo_world.hpp"
+#include "network/network_manager.hpp"
+#include "states_screens/online_screen.hpp"
 #include "states_screens/addons_screen.hpp"
-#include "states_screens/challenges.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/tutorial_screen.hpp"
 
 #if DEBUG_MENU_ITEM
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
 #endif
+
+#include "states_screens/dialogs/message_dialog.hpp"
 
 #include "addons/news_manager.hpp"
 #include "tracks/track_manager.hpp"
@@ -56,28 +63,26 @@ using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( MainMenuScreen );
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 {
-}
+}   // MainMenuScreen
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void MainMenuScreen::loadedFromFile()
 {
-    m_lang_popup = NULL;
-    
-    LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
+    LabelWidget* w = getWidget<LabelWidget>("info_addons");
     w->setScrollSpeed(15);
-}
+}   // loadedFromFile
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
 void MainMenuScreen::init()
 {
     Screen::init();
-    
+
     // reset in case we're coming back from a race
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
@@ -90,271 +95,158 @@ void MainMenuScreen::init()
     // to select all other settings - then if the next time the kart
     // selection screen comes up, the default device will still be
     // the 2nd player. So if the first player presses 'select', it
-    // will instead add a second player (so basically the key 
+    // will instead add a second player (so basically the key
     // binding for the second player become the default, so pressing
     // select will add a new player). See bug 3090931
     // To avoid this, we will clean the last used device, making
     // the key bindings for the first player the default again.
     input_manager->getDeviceList()->clearLatestUsedDevice();
 
-    if (UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED)
+    if (addons_manager->isLoading())
     {
-        IconButtonWidget* w = this->getWidget<IconButtonWidget>("addons");
-        w->setDeactivated();
-        w->resetAllBadges();
-        w->setBadge(BAD_BADGE);
-    }
-    else if (!addons_manager->onlineReady())
-    {
-        IconButtonWidget* w = this->getWidget<IconButtonWidget>("addons");
+        IconButtonWidget* w = getWidget<IconButtonWidget>("addons");
         w->setDeactivated();
         w->resetAllBadges();
         w->setBadge(LOADING_BADGE);
     }
 
-    
-    LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
+
+    LabelWidget* w = getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = news_manager->getNextNewsMessage();
     w->setText(news_text, true);
     w->update(0.01f);
-}
 
-// ------------------------------------------------------------------------------------------------------
+    RibbonWidget* r = getWidget<RibbonWidget>("menu_bottomrow");
+    // FIXME: why do I need to do this manually
+    ((IconButtonWidget*)r->getChildren().get(0))->unfocused(PLAYER_ID_GAME_MASTER, NULL);
+    ((IconButtonWidget*)r->getChildren().get(1))->unfocused(PLAYER_ID_GAME_MASTER, NULL);
+    ((IconButtonWidget*)r->getChildren().get(2))->unfocused(PLAYER_ID_GAME_MASTER, NULL);
+
+    r = getWidget<RibbonWidget>("menu_toprow");
+    r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    DemoWorld::resetIdleTime();
+
+#if _IRR_MATERIAL_MAX_TEXTURES_ < 8
+    getWidget<IconButtonWidget>("logo")->setImage("gui/logo_broken.png",
+        IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
+#endif
+
+}   // init
+
+// ----------------------------------------------------------------------------
 void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
-    IconButtonWidget* addons_icon = this->getWidget<IconButtonWidget>("addons");
+    IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
-        if(UserConfigParams::m_internet_status!=NetworkHttp::IPERM_ALLOWED )
-        {
-            addons_icon->setDeactivated();
-            addons_icon->resetAllBadges();
-            addons_icon->setBadge(BAD_BADGE);
-        }
-        else if (addons_manager->wasError())
-        {
-            addons_icon->setDeactivated();
-            addons_icon->resetAllBadges();
-            addons_icon->setBadge(BAD_BADGE);
-        }
-        else if (addons_manager->onlineReady())
+        if (addons_manager->wasError())
         {
             addons_icon->setActivated();
             addons_icon->resetAllBadges();
+            addons_icon->setBadge(BAD_BADGE);
         }
-        else 
+        else if (addons_manager->isLoading() && UserConfigParams::m_internet_status
+                == INetworkHttp::IPERM_ALLOWED)
         {
             // Addons manager is still initialising/downloading.
             addons_icon->setDeactivated();
             addons_icon->resetAllBadges();
             addons_icon->setBadge(LOADING_BADGE);
         }
+        else
+        {
+            addons_icon->setActivated();
+            addons_icon->resetAllBadges();
+        }
+        // maybe add a new badge when not allowed to access the net
     }
 
-    LabelWidget* w = this->getWidget<LabelWidget>("info_addons");
+    LabelWidget* w = getWidget<LabelWidget>("info_addons");
     w->update(delta);
     if(w->scrolledOff())
     {
         const core::stringw &news_text = news_manager->getNextNewsMessage();
         w->setText(news_text, true);
     }
-    
-    IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");
-    if (lang_combo != NULL)
-    {
-        irr::gui::ScalableFont* font = GUIEngine::getFont();
-        
-        // I18N: Enter the name of YOUR language here, do not literally translate the word "English"
-        core::stringw language_name = _("English");
-        
-        const int LEFT_MARGIN = 5;
-        const int arrow_width = (int)(lang_combo->m_h*0.6f); // the arrow is about half wide as the combo is high
+}   // onUpdate
 
-        // Below is a not-too-pretty hack. When language name is too long to fit the space allocated by the STK
-        // widget, resize the irrlicht element (but don't resize the STK widget on top of it, because we don't
-        // want the change of size to be permanent - if we switch back to another language the combo needs
-        // to shrink back)
-        int element_width = lang_combo->getIrrlichtElement()->getRelativePosition().getWidth();
-        const int text_w = (int)font->getDimension(language_name.c_str()).Width;
-        const int needed_additional_space = text_w - (element_width - arrow_width - LEFT_MARGIN);
-        if (needed_additional_space > 0)
-        {
-            // language name too long to fit
-            gui::IGUIElement* el = lang_combo->getIrrlichtElement();
-            core::recti pos = el->getRelativePosition();
-            pos.UpperLeftCorner.X -= needed_additional_space;
-            el->setRelativePosition( pos );
-        }
-        
-        element_width = lang_combo->getIrrlichtElement()->getRelativePosition().getWidth();
-        
-        const int elem_x = lang_combo->getIrrlichtElement()->getRelativePosition().UpperLeftCorner.X;
-        font->draw(language_name,
-                   core::rect<s32>(elem_x + LEFT_MARGIN,
-                                   lang_combo->m_y,
-                                   // don't go over combo arrow
-                                   (int)(elem_x + LEFT_MARGIN + (element_width - arrow_width)),
-                                   lang_combo->m_y + lang_combo->m_h),
-                   // center horizontally only if there is enough room, irrlicht's centering algorithm
-                   // seems to give weird results when space is too tight
-                   video::SColor(255,0,0,0), (element_width - text_w > 5) /* hcenter */, true /* vcenter */);
-        
-        // Close popup when focus lost
-        if (m_lang_popup != NULL)
-        {
-            Widget* focus = GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER);
-            const core::position2d<s32> mouse = irr_driver->getDevice()->getCursorControl()->getPosition();
-            if (mouse.X < m_lang_popup->m_x - 50 || mouse.X > m_lang_popup->m_x + m_lang_popup->m_w + 50 ||
-                mouse.Y < m_lang_popup->m_y - 50  || // we don't check if mouse Y is too large because the mouse will come from the bottom
-                (focus != NULL && focus->getType() == WTYPE_RIBBON))
-            {
-                closeLangPopup();
-            }
-        }
-    }
-}
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
+void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
+                                   const int playerID)
 {
     // most interesting stuff is in the ribbons, so start there
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
-    if (ribbon == NULL)
-    {
-        // Language selection combo
-        if (name == "lang_combo")
-        {
-            if (m_lang_popup == NULL)
-            {
-                // When the combo is clicked, show a pop-up list with the choices
-                IconButtonWidget* lang_combo = this->getWidget<IconButtonWidget>("lang_combo");
-                
-                m_lang_popup = new ListWidget();
-                m_lang_popup->m_properties[PROP_ID] = "lang_popup";
-                const core::dimension2d<u32> frame_size = irr_driver->getFrameSize();
-                
-                const int width = (int)(frame_size.Width*0.4f);
-                
-                const int MARGIN_ABOVE_POPUP = 50;
-                const int CLEAR_BOTTOM = 15;
 
-                const int height = lang_combo->m_y - MARGIN_ABOVE_POPUP - CLEAR_BOTTOM;
-                
-                m_lang_popup->m_x = lang_combo->m_x;
-                m_lang_popup->m_y = lang_combo->m_y - height - CLEAR_BOTTOM;
-                m_lang_popup->m_w = width;
-                m_lang_popup->m_h = height;
-                
-                m_lang_popup->add();
+    if (ribbon == NULL) return; // what's that event??
 
-                m_lang_popup->m_properties[PROP_ID] = "language_popup";
-                
-                // I18N: in the language choice, to select the same language as the OS
-                m_lang_popup->addItem("system", _("System Language"));
-
-                const std::vector<std::string>* lang_list = translations->getLanguageList();
-                const int amount = lang_list->size();
-                for (int n=0; n<amount; n++)
-                {
-                    std::string code_name = (*lang_list)[n];
-                    std::string nice_name = tinygettext::Language::from_name(code_name.c_str()).get_name();
-                    m_lang_popup->addItem(code_name, core::stringw(code_name.c_str()) + " (" +
-                                                     nice_name.c_str() + ")");
-                }
-
-                manualAddWidget(m_lang_popup);
-                
-                m_lang_popup->setSelectionID( m_lang_popup->getItemID(UserConfigParams::m_language) );
-                m_lang_popup->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-            }
-            else
-            {
-                closeLangPopup();
-            }
-        }
-        else if (name == "language_popup")
-        {
-            std::string selection = m_lang_popup->getSelectionInternalName();
-
-            closeLangPopup();
-            
-            delete translations;
-            
-            if (selection == "system")
-            {
-#ifdef WIN32
-                _putenv("LANGUAGE=");
-#else
-                setenv( "LANGUAGE", "", 1);
-#endif
-            }
-            else
-            {
-#ifdef WIN32
-                std::string s=std::string("LANGUAGE=")+selection.c_str();
-                _putenv(s.c_str());
-#else
-                setenv("LANGUAGE", selection.c_str(), 1);
-#endif
-            }
-            
-            translations = new Translations();
-            GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
-            
-            GUIEngine::getFont()->updateRTL();
-            GUIEngine::getTitleFont()->updateRTL();
-            GUIEngine::getSmallFont()->updateRTL();
-            
-            UserConfigParams::m_language = selection.c_str();
-            user_config->saveConfig();
-        }
-        
-        return;
-    }
-    
-    // When the lang popup is shown, ignore all other widgets
-    // FIXME: for some reasons, irrlicht widgets appear to be click-through, this is why
-    //        this hack is needed
-    if (m_lang_popup != NULL)
-    {
-        return;
-    }
-    
     // ---- A ribbon icon was clicked
-    
-    std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-    
+    std::string selection =
+        ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+    /*
+    if (selection == "story")
+    {
+        StateManager::get()->enterGameState();
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        race_manager->setNumKarts( 0 );
+        race_manager->setNumPlayers(0);
+        race_manager->setNumLocalPlayers(0);
+        race_manager->startSingleRace("endcutscene", 999, false);
+
+        std::vector<std::string> parts;
+        parts.push_back("introcutscene");
+        parts.push_back("introcutscene2");
+        ((CutsceneWorld*)World::getWorld())->setParts(parts);
+        //race_manager->startSingleRace("introcutscene2", 999, false);
+        return;
+    }
+    */
+
 #if DEBUG_MENU_ITEM
     if (selection == "options")
     {
         // The DEBUG item
-        FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
-        
+        FeatureUnlockedCutScene* scene =
+            FeatureUnlockedCutScene::getInstance();
+
+        scene->addTrophy(RaceManager::DIFFICULTY_EASY);
+        StateManager::get()->pushScreen(scene);
+
+        /*
         static int i = 1;
         i++;
-        
+
         if (i % 4 == 0)
         {
-            // the passed kart will not be modified, that's why I allow myself to use const_cast
-            scene->addUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("tux")),
-                                   L"Unlocked");
+            // the passed kart will not be modified, that's why I allow myself
+            // to use const_cast
+            scene->addUnlockedKart(
+                                   const_cast<KartProperties*>(
+                                        kart_properties_manager->getKart("tux")
+                                                              ),
+                                   L"Unlocked"
+                                   );
             StateManager::get()->pushScreen(scene);
         }
         else if (i % 4 == 1)
         {
             std::vector<video::ITexture*> textures;
-            textures.push_back(irr_driver->getTexture(track_manager->getTrack("lighthouse")->getScreenshotFile().c_str()));
-            textures.push_back(irr_driver->getTexture(track_manager->getTrack("crescentcrossing")->getScreenshotFile().c_str()));
-            textures.push_back(irr_driver->getTexture(track_manager->getTrack("sandtrack")->getScreenshotFile().c_str()));
-            textures.push_back(irr_driver->getTexture(track_manager->getTrack("snowmountain")->getScreenshotFile().c_str()));
+            textures.push_back(irr_driver->getTexture(
+                track_manager->getTrack("lighthouse")
+                             ->getScreenshotFile().c_str()));
+            textures.push_back(irr_driver->getTexture(
+                track_manager->getTrack("crescentcrossing")
+                             ->getScreenshotFile().c_str()));
+            textures.push_back(irr_driver->getTexture(
+                track_manager->getTrack("sandtrack")
+                             ->getScreenshotFile().c_str()));
+            textures.push_back(irr_driver->getTexture(
+                track_manager->getTrack("snowmountain")
+                             ->getScreenshotFile().c_str()));
 
             scene->addUnlockedPictures(textures, 1.0, 0.75, L"You did it");
-            
-            /*
-            scene->addUnlockedPicture( irr_driver->getTexture(track_manager->getTrack("lighthouse")->getScreenshotFile().c_str()),
-                                      1.0, 0.75, L"You did it");
-            */
-            
+
             StateManager::get()->pushScreen(scene);
         }
         else if (i % 4 == 2)
@@ -374,6 +266,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             losers.push_back("wilber");
             scene->setKarts( losers );
         }
+         */
     }
     else
 #endif
@@ -381,12 +274,14 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     {
         KartSelectionScreen* s = KartSelectionScreen::getInstance();
         s->setMultiplayer(false);
+        s->setFromOverworld(false);
         StateManager::get()->pushScreen( s );
     }
     else if (selection == "multiplayer")
     {
         KartSelectionScreen* s = KartSelectionScreen::getInstance();
         s->setMultiplayer(true);
+        s->setFromOverworld(false);
         StateManager::get()->pushScreen( s );
     }
     else if (selection == "options")
@@ -395,7 +290,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     }
     else if (selection == "quit")
     {
-        main_loop->abort();
+        StateManager::get()->popMenu();
         return;
     }
     else if (selection == "about")
@@ -406,52 +301,110 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     {
         StateManager::get()->pushScreen(HelpScreen1::getInstance());
     }
-    else if (selection == "challenges")
+    else if (selection == "startTutorial")
     {
-        StateManager::get()->pushScreen(ChallengesScreen::getInstance());
+        race_manager->setNumLocalPlayers(1);
+        race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
+        race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
+        race_manager->setNumKarts( 1 );
+        race_manager->setTrack( "tutorial" );
+        race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
+
+        // Use keyboard 0 by default (FIXME: let player choose?)
+        InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+
+        // Create player and associate player with keyboard
+        StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+                                                device);
+
+        if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+        {
+            fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', will revert to default\n",
+                    UserConfigParams::m_default_kart.c_str());
+            UserConfigParams::m_default_kart.revertToDefaults();
+        }
+        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+
+        // ASSIGN should make sure that only input from assigned devices
+        // is read.
+        input_manager->getDeviceList()->setAssignMode(ASSIGN);
+        input_manager->getDeviceList()
+            ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
+
+        StateManager::get()->enterGameState();
+        network_manager->setupPlayerKartInfo();
+        race_manager->startNew(false);
     }
-    else if (selection == "tutorial")
+    else if (selection == "story")
     {
-        StateManager::get()->pushScreen(TutorialScreen::getInstance());
+        GameSlot* slot = unlock_manager->getCurrentSlot();
+        if (slot->isFirstTime())
+        {
+            StateManager::get()->enterGameState();
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+            race_manager->setNumKarts( 0 );
+            race_manager->setNumPlayers(0);
+            race_manager->setNumLocalPlayers(0);
+            race_manager->startSingleRace("introcutscene", 999, false);
+
+            std::vector<std::string> parts;
+            parts.push_back("introcutscene");
+            parts.push_back("introcutscene2");
+            ((CutsceneWorld*)World::getWorld())->setParts(parts);
+            //race_manager->startSingleRace("introcutscene2", 999, false);
+            return;
+        }
+        else
+        {
+            const std::string default_kart = UserConfigParams::m_default_kart;
+            if (slot->isLocked(default_kart))
+            {
+                KartSelectionScreen *next = KartSelectionScreen::getInstance();
+                next->setGoToOverworldNext();
+                next->setMultiplayer(false);
+                StateManager::get()->resetAndGoToScreen(next);
+                return;
+            }
+            OverWorld::enterOverWorld();
+        }
+    }
+    else if (selection == "online")
+    {
+        StateManager::get()->pushScreen(OnlineScreen::getInstance());
     }
     else if (selection == "addons")
     {
         StateManager::get()->pushScreen(AddonsScreen::getInstance());
     }
-}
+}   // eventCallback
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void MainMenuScreen::tearDown()
 {
-    if (m_lang_popup != NULL)
-    {
-        closeLangPopup();
-    }
-}
+}   // tearDown
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-bool MainMenuScreen::onEscapePressed()
+void MainMenuScreen::onDisabledItemClicked(const std::string& item)
 {
-    if (m_lang_popup != NULL)
+    if (item == "addons")
     {
-        closeLangPopup();
-        return false;
+        if (UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED)
+        {
+            new MessageDialog( _("The add-ons module is currently disabled in "
+                                 "the Options screen") );
+        }
+        else if (addons_manager->wasError())
+        {
+            new MessageDialog( _("Sorry, an error occurred while contacting "
+                                 "the add-ons website. Make sure you are "
+                                 "connected to the Internet and that "
+                                 "SuperTuxKart is not blocked by a firewall"));
+        }
+        else if (addons_manager->isLoading())
+        {
+            new MessageDialog( _("Please wait while the add-ons are loading"));
+        }
     }
-    
-    return true;
-}
-
-// ------------------------------------------------------------------------------------------------------
-
-void MainMenuScreen::closeLangPopup()
-{
-    assert(m_lang_popup != NULL);
-    
-    m_lang_popup->getIrrlichtElement()->remove();
-    m_lang_popup->elementRemoved();
-    manualRemoveWidget(m_lang_popup);
-    delete m_lang_popup;
-    m_lang_popup = NULL;
-}
+}   // onDisabledItemClicked

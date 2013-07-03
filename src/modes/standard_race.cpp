@@ -18,7 +18,9 @@
 #include "modes/standard_race.hpp"
 
 #include "challenges/unlock_manager.hpp"
-#include "config/user_config.hpp"
+#include "items/powerup_manager.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
 
 //-----------------------------------------------------------------------------
 StandardRace::StandardRace() : LinearWorld()
@@ -31,19 +33,19 @@ StandardRace::StandardRace() : LinearWorld()
  */
 bool StandardRace::isRaceOver()
 {
-    // The race is over if all players have finished the race. Remaining 
+    // The race is over if all players have finished the race. Remaining
     // times for AI opponents will be estimated in enterRaceOverState
     return race_manager->allPlayerFinished();
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
-void StandardRace::getDefaultCollectibles(int& collectible_type, int& amount)
+void StandardRace::getDefaultCollectibles(int *collectible_type, int *amount)
 {
     // in time trial mode, give zippers
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
     {
-        collectible_type = PowerupManager::POWERUP_ZIPPER;
-        amount = race_manager->getNumLaps();
+        *collectible_type = PowerupManager::POWERUP_ZIPPER;
+        *amount = race_manager->getNumLaps();
     }
     else World::getDefaultCollectibles(collectible_type, amount);
 }   // getDefaultCollectibles
@@ -58,13 +60,68 @@ bool StandardRace::haveBonusBoxes()
 }   // haveBonusBoxes
 
 //-----------------------------------------------------------------------------
-/** Returns an identifier for this race. 
+/** Returns an identifier for this race.
  */
-std::string StandardRace::getIdent() const
+const std::string& StandardRace::getIdent() const
 {
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
         return IDENT_TTRIAL;
     else
-        return IDENT_STD;    
+        return IDENT_STD;
 }   // getIdent
 
+//-----------------------------------------------------------------------------
+/** Ends the race early and places still active player karts at the back.
+ *  The race immediately goes to the result stage, estimating the time for the
+ *  karts still in the race. Still active player karts get a penalty in time
+ *  as well as being placed at the back. Players that already finished keep
+ *  their position.
+ *
+ *  End time for the punished players is calculated as follows
+ *  end_time = current_time + (estimated_time - current_time)
+ *                          + (estimated_time_for_last - current_time)
+ *           = estimated_time + estimated_time_for_last - current_time
+ *  This will put them at the end at all times. The further you (and the last in
+ *  the race) are from the finish line, the harsher the punishment will be.
+ */
+void StandardRace::endRaceEarly()
+{
+    const unsigned int kart_amount = m_karts.size();
+    std::vector<int> active_players;
+    // Required for debugging purposes
+    beginSetKartPositions();
+    for (unsigned int i = 1; i <= kart_amount; i++)
+    {
+        int kartid = m_position_index[i-1];
+        AbstractKart* kart = m_karts[kartid];
+        if (kart->hasFinishedRace())
+        {
+            // Have to do this to keep endSetKartPosition happy
+            setKartPosition(kartid, kart->getPosition());
+            continue;
+        }
+
+        if (kart->getController()->isPlayerController())
+        {
+            // Keep active players apart for now
+            active_players.push_back(kartid);
+        }
+        else
+        {
+            // AI karts finish
+            setKartPosition(kartid, i - active_players.size());
+            kart->finishedRace(estimateFinishTimeForKart(kart));
+        }
+    } // i <= kart_amount
+    // Now make the active players finish
+    for (unsigned int i = 0; i < active_players.size(); i++)
+    {
+        int kartid = active_players[i];
+        int position = getNumKarts() - active_players.size() + 1 + i;
+        setKartPosition(kartid, position);
+        m_karts[kartid]->eliminate();
+    } // Finish the active players
+    endSetKartPositions();
+    setPhase(RESULT_DISPLAY_PHASE);
+    terminateRace();
+} // endRaceEarly

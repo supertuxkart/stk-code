@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<challenge version="2">
+    <track id="zengarden" laps="3"/>
+    <mode major="single" minor="timetrial"/>
+    <requirements trophies="45"/>
+    
+    <hard>
+        <karts number="2"/>
+        <requirements position="1"/>
+    </hard>
+    <medium>
+        <karts number="2"/>
+        <requirements position="1"/>
+    </medium>
+    <easy>
+        <karts number="2"/>
+        <requirements position="1"/>
+    </easy>
+</challenge>

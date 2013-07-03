@@ -15,7 +15,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "io/file_manager.hpp"
@@ -47,14 +46,14 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
     m_check_inside_me      = true;
     m_supports_multiplayer = true;
     m_scrolling_enabled    = true;
-    
+
     // by default, set all players to have no selection in this ribbon
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         m_selected_item[n] = -1;
     }
     m_selected_item[0] = 0; // only player 0 has a selection by default
-    
+
     m_item_count_hint = 0;
 }
 // -----------------------------------------------------------------------------
@@ -87,9 +86,9 @@ void estimateIconAreaFor(const int rowCount, const int wantedIconWidth,
     float icon_height = (float)row_height;
     float icon_width = row_height * iconAspectRatio;
     *itemHeight = int(icon_height);
-    
+
     const int icons_per_row = std::min(int(width / icon_width), int(width / wantedIconWidth));
-    
+
     *visibleItems = std::min(maxIcons, icons_per_row * rowCount);
     *takenArea = int(*visibleItems * icon_width * icon_height);
 }
@@ -99,12 +98,12 @@ void DynamicRibbonWidget::add()
     //printf("****DynamicRibbonWidget::add()****\n");
 
     m_has_label = (m_properties[PROP_LABELS_LOCATION] == "bottom");
-    
+
     assert( m_properties[PROP_LABELS_LOCATION] == "bottom" ||
             m_properties[PROP_LABELS_LOCATION] == "each" ||
             m_properties[PROP_LABELS_LOCATION] == "none" ||
             m_properties[PROP_LABELS_LOCATION] == "");
-    
+
     if (m_has_label)
     {
         // m_label_height contains the height of ONE text line
@@ -114,7 +113,7 @@ void DynamicRibbonWidget::add()
     {
         m_label_height = 0;
     }
-    
+
     // ----- add dynamic label at bottom
     if (m_has_label)
     {
@@ -127,7 +126,7 @@ void DynamicRibbonWidget::add()
         m_label->setTextAlignment( EGUIA_CENTER, EGUIA_UPPERLEFT );
         m_label->setWordWrap(true);
     }
-    
+
     // ---- add arrow buttons on each side
     if (m_left_widget != NULL)
     {
@@ -138,11 +137,11 @@ void DynamicRibbonWidget::add()
     }
     m_left_widget  = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
     m_right_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
-    
+
     const int average_y = m_y + (m_h - m_label_height)/2;
     m_arrows_w = 40;
     const int button_h = 50;
-    
+
     // right arrow
     rect<s32> right_arrow_location = rect<s32>(m_x + m_w - m_arrows_w,
                                                average_y - button_h/2,
@@ -160,7 +159,7 @@ void DynamicRibbonWidget::add()
     m_right_widget->setHighlightedImage(GUIEngine::getSkin()->getImage("right_arrow::focus"));
 
     m_children.push_back( m_right_widget );
-    
+
     // left arrow
     rect<s32> left_arrow_location = rect<s32>(m_x,
                                               average_y - button_h/2,
@@ -179,31 +178,31 @@ void DynamicRibbonWidget::add()
     m_left_widget->setHighlightedImage(GUIEngine::getSkin()->getImage("left_arrow::focus"));
 
     m_children.push_back( m_left_widget );
-    
+
     assert( m_left_widget->ok() );
     assert( m_right_widget->ok() );
     m_left_widget->m_element->setVisible(true);
 
     // ---- Determine number of rows
-    
+
     // Find children size (and ratio)
     m_child_width  = atoi(m_properties[PROP_CHILD_WIDTH].c_str());
     m_child_height = atoi(m_properties[PROP_CHILD_HEIGHT].c_str());
-    
+
     if (m_child_width <= 0 || m_child_height <= 0)
     {
         std::cerr << "/!\\ Warning /!\\ : ribbon grid widgets require 'child_width' and 'child_height' arguments" << std::endl;
         m_child_width = 256;
         m_child_height = 256;
     }
-    
-    
+
+
     if (m_multi_row)
     {
         // determine row amount
         const float aspect_ratio = (float)m_child_width / (float)m_child_height;
         // const int count = m_items.size();
-        
+
         m_row_amount = -1;
         float max_score_so_far = -1;
 
@@ -219,9 +218,9 @@ void DynamicRibbonWidget::add()
                 int visible_items;
                 int taken_area;
                 int item_height;
-                
+
                 int item_count = m_item_count_hint;
-                
+
                 if (item_count < 1)
                 {
                     item_count = m_items.size();
@@ -232,10 +231,10 @@ void DynamicRibbonWidget::add()
                     // No idea so make assumptions
                     item_count = 20;
                 }
-                
+
                 estimateIconAreaFor(row_count, m_child_width, m_w, m_h - m_label_height,
                                     aspect_ratio, item_count, &visible_items, &taken_area, &item_height);
-                
+
                 // FIXME: this system to determine the best number of columns is really complicated!
                 // the score is computed from taken screen area AND visible item count.
                 // A number of rows that allows for the screen space to be used a lot will
@@ -243,22 +242,22 @@ void DynamicRibbonWidget::add()
                 // will be penalized. A configuration that makes items much smaller than
                 // requested in the XML file will also be penalized.
                 float ratio = (float)item_height / (float)m_child_height;
-                
+
                 // huge icons not so good either
                 if (ratio > 1.0f)
                 {
                     ratio = 1.0f - ratio/5.0f;
                     if (ratio < 0.0f) ratio = 0.0f;
                 }
-                
+
                 float total_area = (float)(m_w * m_h);
                 const float score = log(2.0f*visible_items) *
                                       std::min(ratio, 1.0f) * std::min(taken_area/total_area, 1.0f);
-                
+
                 //std::cout << "   " << row_count << " rows : " <<  visible_items << " visible items; area = "
                 //          << taken_area << "; size penalty = " << std::min((float)item_height / (float)m_child_height, 1.0f)
                 //          << "; score = " << score << "\n";
-                
+
                 if (score > max_score_so_far)
                 {
                     m_row_amount = row_count;
@@ -267,16 +266,16 @@ void DynamicRibbonWidget::add()
             }
             assert(m_row_amount != -1);
         }
-        
+
         // m_row_amount = (int)round((m_h - m_label_height) / (float)m_child_height);
-        
+
         if (m_properties[PROP_MAX_ROWS].size() > 0)
         {
             const int max_rows = atoi(m_properties[PROP_MAX_ROWS].c_str());
             if (max_rows < 1)
             {
                 std::cout << "/!\\ WARNING : the 'max_rows' property must be an integer greater than zero."
-                          << " Ingoring current value '" << m_properties[PROP_MAX_ROWS] << "'\n"; 
+                          << " Ingoring current value '" << m_properties[PROP_MAX_ROWS] << "'\n";
             }
             else
             {
@@ -288,11 +287,11 @@ void DynamicRibbonWidget::add()
     {
         m_row_amount = 1;
     }
-    
+
     assert( m_left_widget->ok() );
     assert( m_right_widget->ok() );
     m_left_widget->m_element->setVisible(true);
-    
+
     // get and build a list of IDs (by now we may not yet know everything about items,
     // but we need to get IDs *now* in order for tabbing to work.
     m_ids.resize(m_row_amount);
@@ -301,14 +300,14 @@ void DynamicRibbonWidget::add()
         m_ids[i] = getNewID();
         //std::cout << "ribbon : getNewID returns " <<  m_ids[i] << std::endl;
     }
-    
+
     buildInternalStructure();
 }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::buildInternalStructure()
 {
     //printf("****DynamicRibbonWidget::buildInternalStructure()****\n");
-    
+
     // ---- Clean-up what was previously there
     for (int i=0; i<m_children.size(); i++)
     {
@@ -322,16 +321,16 @@ void DynamicRibbonWidget::buildInternalStructure()
         }
     }
     m_rows.clearWithoutDeleting(); // rows already deleted above, don't double-delete
-    
+
     m_left_widget->m_element->setVisible(true);
     assert( m_left_widget->ok() );
     assert( m_right_widget->ok() );
-    
+
     // ---- determine column amount
     const float row_height = (float)(m_h - m_label_height)/(float)m_row_amount;
     float ratio_zoom = (float)row_height / (float)(m_child_height - m_label_height);
     m_col_amount = (int)round( m_w / ( m_child_width*ratio_zoom ) );
-    
+
     // ajust column amount to not add more item slots than we actually need
     const int item_count = m_items.size();
     //std::cout << "item_count=" << item_count << ", row_amount*m_col_amount=" << m_row_amount*m_col_amount << std::endl;
@@ -340,10 +339,10 @@ void DynamicRibbonWidget::buildInternalStructure()
         m_col_amount = (int)ceil((float)item_count/(float)m_row_amount);
         //std::cout << "Adjusting m_col_amount to be " << m_col_amount << std::endl;
     }
-    
+
     assert( m_left_widget->ok() );
     assert( m_right_widget->ok() );
-    
+
     // Hide arrows when everything is visible
     if (item_count <= m_row_amount*m_col_amount)
     {
@@ -357,7 +356,7 @@ void DynamicRibbonWidget::buildInternalStructure()
         m_left_widget->m_element->setVisible(true);
         m_right_widget->m_element->setVisible(true);
     }
-    
+
     // ---- add rows
     int added_item_count = 0;
     for (int n=0; n<m_row_amount; n++)
@@ -373,7 +372,7 @@ void DynamicRibbonWidget::buildInternalStructure()
         }
         ribbon->setListener(this);
         ribbon->m_reserved_id = m_ids[n];
-                
+
         ribbon->m_x = m_x + (m_scrolling_enabled ? m_arrows_w : 0);
         ribbon->m_y = m_y + (int)(n*row_height);
         ribbon->m_w = m_w - (m_scrolling_enabled ? m_arrows_w*2 : 0);
@@ -384,7 +383,7 @@ void DynamicRibbonWidget::buildInternalStructure()
         name << this->m_properties[PROP_ID] << "_row" << n;
         ribbon->m_properties[PROP_ID] = name.str();
         ribbon->m_event_handler = this;
-        
+
         // add columns
         for (int i=0; i<m_col_amount; i++)
         {
@@ -392,7 +391,7 @@ void DynamicRibbonWidget::buildInternalStructure()
             // (Yeah, that's complicated, but screenshots are saved compressed horizontally so it's hard to be clean)
             IconButtonWidget* icon = new IconButtonWidget(IconButtonWidget::SCALE_MODE_STRETCH, false, true);
             icon->m_properties[PROP_ICON]="textures/transparence.png";
-            
+
             // set size to get proper ratio (as most textures are saved scaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
             icon->m_properties[PROP_HEIGHT] = m_properties[PROP_CHILD_HEIGHT];
@@ -402,17 +401,17 @@ void DynamicRibbonWidget::buildInternalStructure()
             // If we want each icon to have its own label, we must make it non-empty, otherwise
             // it will assume there is no label and none will be created (FIXME: that's ugly)
             if (m_properties[PROP_LABELS_LOCATION] == "each") icon->m_text = " ";
-            
+
             // std::cout << "ribbon text = " << m_properties[PROP_TEXT].c_str() << std::endl;
-            
+
             ribbon->m_children.push_back( icon );
             added_item_count++;
-            
+
             // stop adding columns when we have enough items
             if (added_item_count == item_count)
             {
                 assert(!m_scrolling_enabled); // we can see all items, so scrolling must be off
-                break; 
+                break;
             }
             else if (added_item_count > item_count)
             {
@@ -423,15 +422,15 @@ void DynamicRibbonWidget::buildInternalStructure()
         m_children.push_back( ribbon );
         m_rows.push_back( ribbon );
         ribbon->add();
-        
+
         // stop filling rows when we have enough items
         if (added_item_count == item_count)
         {
             assert(!m_scrolling_enabled); // we can see all items, so scrolling must be off
-            break; 
+            break;
         }
     }
-    
+
 #ifdef DEBUG
     if (!m_scrolling_enabled)
     {
@@ -457,7 +456,7 @@ void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const st
     desc.m_badges = badges;
     desc.m_animated = false;
     desc.m_image_path_type = image_path_type;
-    
+
     m_items.push_back(desc);
 }
 
@@ -476,17 +475,17 @@ void DynamicRibbonWidget::addAnimatedItem( const irr::core::stringw& user_name, 
     desc.m_curr_time = 0.0f;
     desc.m_time_per_frame = time_per_frame;
     desc.m_image_path_type = image_path_type;
-    
+
     m_items.push_back(desc);
-    
+
     if (!m_animated_contents)
     {
         m_animated_contents = true;
-        
+
         /*
          FIXME: remove this unclean thing, I think irrlicht provides this feature:
          virtual void IGUIElement::OnPostRender (u32 timeMs)
-         \brief animate the element and its children. 
+         \brief animate the element and its children.
          */
         GUIEngine::needsUpdate.push_back(this);
     }
@@ -506,7 +505,7 @@ void DynamicRibbonWidget::elementRemoved()
     m_rows.clearWithoutDeleting();
     m_left_widget = NULL;
     m_right_widget = NULL;
-    
+
     m_hover_listeners.clearAndDeleteAll();
 }
 
@@ -519,9 +518,9 @@ void DynamicRibbonWidget::elementRemoved()
 const std::string& DynamicRibbonWidget::getSelectionIDString(const int playerID)
 {
     RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon(playerID));
-    
+
     if (row != NULL) return row->getSelectionIDString(playerID);
-    
+
     static const std::string nothing = "";
     return nothing;
 }
@@ -530,9 +529,9 @@ const std::string& DynamicRibbonWidget::getSelectionIDString(const int playerID)
 irr::core::stringw DynamicRibbonWidget::getSelectionText(const int playerID)
 {
     RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon(playerID));
-    
+
     if (row != NULL) return row->getSelectionText(playerID);
-    
+
     static const irr::core::stringw nothing = "";
     return nothing;
 }
@@ -548,12 +547,12 @@ RibbonWidget* DynamicRibbonWidget::getRowContaining(Widget* w)
             if (row->m_children.contains( w ) ) return row;
         }
     }
-    
+
     return NULL;
 }
 // -----------------------------------------------------------------------------
 RibbonWidget* DynamicRibbonWidget::getSelectedRibbon(const int playerID)
-{    
+{
     RibbonWidget* row;
     for_in (row, m_rows)
     {
@@ -562,7 +561,7 @@ RibbonWidget* DynamicRibbonWidget::getSelectedRibbon(const int playerID)
             return row;
         }
     }
-        
+
     return NULL;
 }
 
@@ -577,16 +576,16 @@ void DynamicRibbonWidget::registerHoverListener(DynamicRibbonHoverListener* list
 }
 // -----------------------------------------------------------------------------
 EventPropagation DynamicRibbonWidget::rightPressed(const int playerID)
-{    
+{
     if (m_deactivated) return EVENT_LET;
-    
+
     RibbonWidget* w = getSelectedRibbon(playerID);
     if (w != NULL)
     {
         updateLabel();
-        
+
         propagateSelection();
-        
+
         const int listenerAmount = m_hover_listeners.size();
         for (int n=0; n<listenerAmount; n++)
         {
@@ -595,25 +594,25 @@ EventPropagation DynamicRibbonWidget::rightPressed(const int playerID)
         }
     }
     //std::cout << "rightpressed (dynamic ribbon) " << m_properties[PROP_ID] << "\n";
-    
+
     assert(m_rows.size() >= 1);
     if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return EVENT_BLOCK;
-    
+
     //std::cout << "     rightpressed returning EVENT_LET\n";
 
     return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
 EventPropagation DynamicRibbonWidget::leftPressed(const int playerID)
-{    
+{
     if (m_deactivated) return EVENT_LET;
-    
+
     RibbonWidget* w = getSelectedRibbon(playerID);
     if (w != NULL)
     {
         updateLabel();
         propagateSelection();
-        
+
         DynamicRibbonHoverListener* listener;
         for_in( listener, m_hover_listeners )
         {
@@ -621,17 +620,22 @@ EventPropagation DynamicRibbonWidget::leftPressed(const int playerID)
                                          w->getSelectionText(playerID), playerID);
         }
     }
-    
+
     assert(m_rows.size() >= 1);
     if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return EVENT_BLOCK;
-    
+
     return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
-EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
+EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w,
+                                                 const std::string& originator,
+                                                 const int playerID)
 {
+    assert(m_magic_number == 0xCAFEC001);
+
+
     if (m_deactivated) return EVENT_LET;
-    
+
     if (originator=="left")
     {
         scroll(-1);
@@ -642,7 +646,7 @@ EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w, std::string& orig
         scroll(1);
         return EVENT_BLOCK;
     }
-    
+
     // find selection in current ribbon
     if (m_combo)
     {
@@ -653,7 +657,7 @@ EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w, std::string& orig
             if (m_selected_item[playerID] >= (int)m_items.size()) m_selected_item[playerID] -= m_items.size();
         }
     }
-    
+
     return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
@@ -664,7 +668,7 @@ EventPropagation DynamicRibbonWidget::mouseHovered(Widget* child, const int play
 
     updateLabel();
     propagateSelection();
-    
+
     if (getSelectedRibbon(playerID) != NULL)
     {
         DynamicRibbonHoverListener* listener;
@@ -674,7 +678,7 @@ EventPropagation DynamicRibbonWidget::mouseHovered(Widget* child, const int play
                                          getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
         }
     }
-    
+
     return EVENT_BLOCK;
 }
 // -----------------------------------------------------------------------------
@@ -682,21 +686,21 @@ EventPropagation DynamicRibbonWidget::focused(const int playerID)
 {
     Widget::focused(playerID);
     updateLabel();
-    
+
     DynamicRibbonHoverListener* listener;
-    
+
     if (getSelectedRibbon(playerID)->getSelectionIDString(playerID) == "")
     {
         //fprintf(stderr, "[DynamicRibbonWidget] WARNING: Can't find selection for player %i, selecting first item\n", playerID);
         getSelectedRibbon(playerID)->setSelection(0, playerID);
     }
-    
+
     for_in( listener, m_hover_listeners )
     {
         listener->onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID),
                                      getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
     }
-    
+
     return EVENT_LET;
 }
 
@@ -712,27 +716,27 @@ void DynamicRibbonWidget::onRibbonWidgetScroll(const int delta_x)
 void DynamicRibbonWidget::onRibbonWidgetFocus(RibbonWidget* emitter, const int playerID)
 {
     if (m_deactivated) return;
-    
+
     if (emitter->m_selection[playerID] >= emitter->m_children.size())
     {
         emitter->m_selection[playerID] = emitter->m_children.size()-1;
     }
-    
+
     updateLabel(emitter);
-    
+
     DynamicRibbonHoverListener* listener;
-    
+
     if (emitter->getSelectionIDString(playerID) == "")
     {
         //fprintf(stderr, "[DynamicRibbonWidget] WARNING: Can't find selection for player %i, selecting first item\n", playerID);
         emitter->setSelection(0, playerID);
     }
-    
+
     for_in( listener, m_hover_listeners )
     {
         listener->onSelectionChanged(this, emitter->getSelectionIDString(playerID),
                                      emitter->getSelectionText(playerID), playerID);
-    }    
+    }
 }
 
 #if 0
@@ -743,19 +747,19 @@ void DynamicRibbonWidget::onRibbonWidgetFocus(RibbonWidget* emitter, const int p
 void DynamicRibbonWidget::scroll(const int x_delta)
 {
     if (m_deactivated) return;
-    
+
     // Refuse to scroll when everything is visible
     if ((int)m_items.size() <= m_row_amount*m_col_amount) return;
-    
+
     m_scroll_offset += x_delta;
-    
+
     const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;
-    
+
     if (m_scroll_offset < 0) m_scroll_offset = max_scroll;
     else if (m_scroll_offset > max_scroll) m_scroll_offset = 0;
-    
+
     updateItemDisplay();
-    
+
     // update selection markers in child ribbon
     if (m_combo)
     {
@@ -766,7 +770,7 @@ void DynamicRibbonWidget::scroll(const int x_delta)
             if (id < 0) id += m_items.size();
             ribbon->setSelection(id, n);
         }
-    }    
+    }
 }
 // -----------------------------------------------------------------------------
 /** DynamicRibbonWidget is made of several ribbons; each of them thus has
@@ -774,16 +778,16 @@ void DynamicRibbonWidget::scroll(const int x_delta)
  (i.e. you remain in the same column when pressing up/down), this method is
  used to ensure that all children ribbons always select the same column */
 void DynamicRibbonWidget::propagateSelection()
-{    
+{
     for (int p=0; p<MAX_PLAYER_COUNT; p++)
     {
         // find selection in current ribbon
         RibbonWidget* selected_ribbon = (RibbonWidget*)getSelectedRibbon(p);
         if (selected_ribbon == NULL) continue;
-        
+
         const int relative_selection = selected_ribbon->m_selection[p];
         float where = 0.0f;
-        
+
         if (selected_ribbon->m_children.size() > 1)
         {
             where = (float)relative_selection / (float)(selected_ribbon->m_children.size() - 1);
@@ -792,7 +796,7 @@ void DynamicRibbonWidget::propagateSelection()
         {
             where = 0.0f;
         }
-        
+
         if (where < 0.0f)      where = 0.0f;
         else if (where > 1.0f) where = 1.0f;
 
@@ -801,7 +805,7 @@ void DynamicRibbonWidget::propagateSelection()
             m_selected_item[p] = relative_selection + m_scroll_offset;
             if (m_selected_item[p] >= (int)m_items.size()) m_selected_item[p] -= m_items.size();
         }
-        
+
         // set same selection in all ribbons
         RibbonWidget* ribbon;
         for_in( ribbon, m_rows )
@@ -812,22 +816,22 @@ void DynamicRibbonWidget::propagateSelection()
                 ribbon->updateSelection();
             }
         }
-        
+
     }
 }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
 {
     if (!m_has_label) return;
-    
+
     // only the master player can update the label
     const int playerID = PLAYER_ID_GAME_MASTER;
-    
+
     RibbonWidget* row = from_this_ribbon ? from_this_ribbon : (RibbonWidget*)getSelectedRibbon(playerID);
     if (row == NULL) return;
-    
+
     std::string selection_id = row->getSelectionIDString(playerID);
-    
+
     const int amount = m_items.size();
     for (int n=0; n<amount; n++)
     {
@@ -837,7 +841,7 @@ void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
             return;
         }
     }
-    
+
     if (selection_id == RibbonWidget::NO_ITEM_ID) m_label->setText( L"" );
     else                                          m_label->setText( L"Unknown Item" );
 }
@@ -855,22 +859,22 @@ void DynamicRibbonWidget::updateItemDisplay()
         buildInternalStructure();
         m_previous_item_count = m_items.size();
     }
-    
+
     // ---- some variables
     int icon_id = 0;
-    
+
     const int row_amount = m_rows.size();
     const int item_amount = m_items.size();
-    
+
     //FIXME: isn't this set by 'buildInternalStructure' already?
     m_needed_cols = (int)ceil( (float)item_amount / (float)row_amount );
-    
+
     //const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;
-    
+
     // the number of items that fit perfectly the number of rows we have
     // (this value will be useful to compute scrolling)
     int fitting_item_amount = (m_scrolling_enabled ? m_needed_cols * row_amount : m_items.size());
-    
+
     // ---- to determine which items go in which cell of the dynamic ribbon now,
     //      we create a temporary 2D table and fill them with the ID of the item
     //      they need to display.
@@ -879,67 +883,67 @@ void DynamicRibbonWidget::updateItemDisplay()
     item_placement.resize(row_amount);
     for(int i=0; i<row_amount; i++)
         item_placement[i].resize(m_needed_cols);
-    
+
     int counter = 0;
-    
+
 #if CHATTY_ABOUT_ITEM_PLACEMENT
     std::cout << m_items.size() << " items to be placed:\n{\n";
 #endif
-    
+
     for (int c=0; c<m_needed_cols; c++)
     {
         for (int r=0; r<row_amount; r++)
         {
-            
+
 #if CHATTY_ABOUT_ITEM_PLACEMENT
             std::cout << "    ";
 #endif
-            
+
             const int items_in_row = m_rows[r].m_children.size();
             if (c >= items_in_row)
             {
                 item_placement[r][c] = -1;
-                
+
 #if CHATTY_ABOUT_ITEM_PLACEMENT
                 std::cout << item_placement[r][c] << "  ";
 #endif
                 continue;
             }
-            
+
             int newVal = counter + m_scroll_offset*row_amount;
             while (newVal >= fitting_item_amount) newVal -= fitting_item_amount;
             item_placement[r][c] = newVal;
-            
+
 #if CHATTY_ABOUT_ITEM_PLACEMENT
             std::cout << newVal << "  ";
 #endif
-            
+
             counter++;
         }
-        
+
 #if CHATTY_ABOUT_ITEM_PLACEMENT
         std::cout << "\n";
 #endif
-        
+
     }
-    
+
 #if CHATTY_ABOUT_ITEM_PLACEMENT
     std::cout << "}\n";
 #endif
-    
+
     // ---- iterate through the rows, and set the items of each row to match those of the table
     for (int n=0; n<row_amount; n++)
     {
         RibbonWidget& row = m_rows[n];
-        
+
         //std::cout << "Row " << n << "\n{\n";
-        
+
         const unsigned int items_in_row = row.m_children.size();
         for (unsigned int i=0; i<items_in_row; i++)
         {
             IconButtonWidget* icon = dynamic_cast<IconButtonWidget*>(&row.m_children[i]);
             assert(icon != NULL);
-			
+
 			//FIXME : it is a bit hackish
 			if(i < item_placement[n].size())
 			{
@@ -950,16 +954,16 @@ void DynamicRibbonWidget::updateItemDisplay()
 											 m_items[icon_id].m_all_images[0] :
 											 m_items[icon_id].m_sshot_file);
 					icon->setImage( item_icon.c_str(), m_items[icon_id].m_image_path_type );
-					
+
 					icon->m_properties[PROP_ID]   = m_items[icon_id].m_code_name;
 					icon->setLabel(m_items[icon_id].m_user_name);
 					icon->m_text                  = m_items[icon_id].m_user_name;
 					icon->m_badges                = m_items[icon_id].m_badges;
-					
+
 					//std::cout << "    item " << i << " is " << m_items[icon_id].m_code_name << "\n";
-					
+
 					//std::wcout << L"Setting widget text '" << icon->m_text.c_str() << L"'\n";
-					
+
 					// if the ribbon has no "ribbon-wide" label, call will do nothing
 					row.setLabel(i, m_items[icon_id].m_user_name);
 				}
@@ -983,19 +987,19 @@ void DynamicRibbonWidget::update(float dt)
     for (int n=0; n<row_amount; n++)
     {
         RibbonWidget& row = m_rows[n];
-        
+
         const int items_in_row = row.m_children.size();
         for (int i=0; i<items_in_row; i++)
         {
             int col_scroll = i + m_scroll_offset;
             int item_id = (col_scroll)*row_amount + n;
             if (item_id >= (int)m_items.size()) item_id -= m_items.size();
-            
+
             assert(item_id >= 0);
             assert(item_id < (int)m_items.size());
-            
+
             //m_items[icon_id].
-            
+
             if (m_items[item_id].m_animated)
             {
                 const int frameBefore = (int)(m_items[item_id].m_curr_time / m_items[item_id].m_time_per_frame);
@@ -1003,13 +1007,13 @@ void DynamicRibbonWidget::update(float dt)
                 m_items[item_id].m_curr_time += dt;
                 int frameAfter = (int)(m_items[item_id].m_curr_time / m_items[item_id].m_time_per_frame);
                 if (frameAfter == frameBefore) continue; // no frame change yet
-                
+
                 if (frameAfter >= (int)m_items[item_id].m_all_images.size())
                 {
                     m_items[item_id].m_curr_time = 0;
                     frameAfter = 0;
                 }
-                
+
                 IconButtonWidget* icon = dynamic_cast<IconButtonWidget*>(&row.m_children[i]);
                 icon->setImage( m_items[item_id].m_all_images[frameAfter].c_str() );
             }
@@ -1023,8 +1027,8 @@ void DynamicRibbonWidget::update(float dt)
 bool DynamicRibbonWidget::findItemInRows(const char* name, int* p_row, int* p_id)
 {
     int row = -1;
-    int id;
-    
+    int id = -1;
+
     for (int r=0; r<m_rows.size(); r++)
     {
         id = m_rows[r].findItemNamed(name);
@@ -1034,7 +1038,7 @@ bool DynamicRibbonWidget::findItemInRows(const char* name, int* p_row, int* p_id
             break;
         }
     }
-    
+
     *p_row = row;
     *p_id = id;
     return (row != -1);
@@ -1042,35 +1046,37 @@ bool DynamicRibbonWidget::findItemInRows(const char* name, int* p_row, int* p_id
 
 // -----------------------------------------------------------------------------
 
-bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bool focusIt, bool evenIfDeactivated)
+bool DynamicRibbonWidget::setSelection(int item_id, const int playerID,
+                                       const bool focusIt,
+                                       bool evenIfDeactivated)
 {
     if (m_deactivated && !evenIfDeactivated) return false;
-    
+
     //printf("****DynamicRibbonWidget::setSelection()****\n");
 
     if ((unsigned int)item_id >= m_items.size()) return false;
-    
+
     m_selected_item[playerID] = item_id;
-    
+
     const std::string& name = m_items[item_id].m_code_name;
-    
+
     int row;
     int id;
-    
+
     int iterations = 0; // a safeguard to avoid infinite loops (should not happen normally)
-    
+
     while (!findItemInRows(name.c_str(), &row, &id))
     {
         // if we get here it means the item is scrolled out. Try to find it.
         scroll(1);
-        
+
         if (iterations > 50)
         {
             assert(false);
             std::cerr << "DynamicRibbonWidget::setSelection cannot find item " << item_id << " (" << name.c_str() << ")\n";
             return false;
         }
-        
+
         iterations++;
     }
 
@@ -1093,15 +1099,17 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bo
                                                     playerID);
         }
     }
-    
+
     propagateSelection();
     return true;
 }
-// -----------------------------------------------------------------------------
-bool DynamicRibbonWidget::setSelection(const std::string item_codename, const int playerID, const bool focusIt, bool evenIfDeactivated)
+// ----------------------------------------------------------------------------
+bool DynamicRibbonWidget::setSelection(const std::string &item_codename,
+                                       const int playerID, const bool focusIt,
+                                       bool evenIfDeactivated)
 {
     if (m_deactivated && !evenIfDeactivated) return false;
-    
+
     const int item_count = m_items.size();
     for (int n=0; n<item_count; n++)
     {

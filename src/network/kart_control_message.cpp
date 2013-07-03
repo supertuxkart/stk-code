@@ -1,4 +1,3 @@
-//  $Id:kart_control_message.cpp 2128 2008-06-13 00:53:52Z cosmosninja $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -19,6 +18,7 @@
 
 #include "network/kart_control_message.hpp"
 
+#include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "network/network_kart.hpp"
 
@@ -31,14 +31,14 @@ KartControlMessage::KartControlMessage()
     allocate(control_size*num_local_players);
     for(unsigned int i=0; i<num_local_players; i++)
     {
-        const Kart *kart            = world->getLocalPlayerKart(i);
+        const AbstractKart *kart    = world->getLocalPlayerKart(i);
         const KartControl& controls = kart->getControls();
         controls.serialise(this);
     }
 }   // KartControlMessage
 // ----------------------------------------------------------------------------
-/** Receives a kart control message. 
- *  \param kart_id_offset is the global id of the first kart on the host from 
+/** Receives a kart control message.
+ *  \param kart_id_offset is the global id of the first kart on the host from
  *         which this packet was received.
  */
 KartControlMessage::KartControlMessage(ENetPacket* pkt, int kart_id_offset,
@@ -51,7 +51,7 @@ KartControlMessage::KartControlMessage(ENetPacket* pkt, int kart_id_offset,
     for(int i=kart_id_offset; i<kart_id_offset+num_local_players; i++)
     {
         KartControl kc(this);
-        Kart *kart = World::getWorld()->getKart(i);
+        AbstractKart *kart = World::getWorld()->getKart(i);
         if(kart->getController()->isNetworkController())
         {
             ((NetworkKart*)kart)->setControl(kc);

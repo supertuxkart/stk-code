@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs, Stephen Leak
@@ -64,10 +63,10 @@ void Message::receive(ENetPacket* pkt, MessageType m)
     m_data_size     = pkt->dataLength;
     m_data          = (char*)pkt->data;
     m_type          = (MessageType)m_data[0];
-    if(m_type!=m) 
+    if(m_type!=m)
         printf("type %d %d\n",m_type,m);
     assert(m_type==m);
-    m_pos           = 1; 
+    m_pos           = 1;
     m_needs_destroy = true;
 }  // Message
 
@@ -81,7 +80,7 @@ Message::~Message()
 // ----------------------------------------------------------------------------
 /** Frees the memory for a received message.
  *  Calls enet_packet_destroy if necessary (i.e. if the message was received).
- *  The memory for a message created to be sent does not need to be freed, it 
+ *  The memory for a message created to be sent does not need to be freed, it
  *  is handled by enet. */
 void Message::clear()
 {
@@ -90,7 +89,7 @@ void Message::clear()
 }   // clear
 
 // ----------------------------------------------------------------------------
-/** Reserves the memory for a message. 
+/** Reserves the memory for a message.
  *  \param size Number of bytes to reserve.
  */
 void Message::allocate(int size)
@@ -110,7 +109,7 @@ void Message::addInt(int data)
 {
     assert((int)(m_pos + sizeof(int)) <= m_data_size);
     int l=htonl(data);
-    memcpy(m_data+m_pos, &l, sizeof(int)); 
+    memcpy(m_data+m_pos, &l, sizeof(int));
     m_pos+=sizeof(int);
 }   // addInt
 
@@ -132,7 +131,7 @@ void Message::addShort(short data)
 {
     assert((int)(m_pos + sizeof(short)) <= m_data_size);
     int l=htons(data);
-    memcpy(m_data+m_pos, &l, sizeof(short)); 
+    memcpy(m_data+m_pos, &l, sizeof(short));
     m_pos+=sizeof(short);
 }   // addShort
 
@@ -161,7 +160,7 @@ void Message::addFloat(const float data)
 }   // addFloat
 // ----------------------------------------------------------------------------
 float Message::getFloat()
-{ 
+{
     int i    = getInt();
     float f;
     memcpy(&f, &i, sizeof(int));
@@ -175,7 +174,7 @@ float Message::getFloat()
 
 // ----------------------------------------------------------------------------
 void Message::addString(const std::string &data)
-{ 
+{
     int len = data.size()+1;  // copy 0 end byte
     assert((int)(m_pos+len) <=m_data_size);
     memcpy (&(m_data[m_pos]), data.c_str(), len);

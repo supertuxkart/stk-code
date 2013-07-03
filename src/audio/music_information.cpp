@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -22,14 +21,56 @@
 #include <stdexcept>
 #include <iostream>
 
+#include "audio/music_dummy.hpp"
 #include "audio/music_ogg.hpp"
-#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
-MusicInformation::MusicInformation(const std::string& filename) throw (std::runtime_error)
+/** A simple factory to create music information files without raising
+ *  an exception on error, instead a NULL will be returned. This avoids
+ *  resource freeing problems if the exception is raised, and simplifies
+ *  calling code.
+ *  \param filename The name of a music file.
+ *  \return The MusicInformation object, or NULL in case of an error.
+ */
+MusicInformation *MusicInformation::create(const std::string &filename)
+{
+    assert(filename.size() > 0);
+
+    XMLNode* root = file_manager->createXMLTree(filename);
+    if (!root) return NULL;
+    if(root->getName()!="music")
+    {
+        Log::error("MusicInformation",
+                   "Music file '%s' does not contain music node.\n",
+                   filename.c_str());
+        delete root;
+        return NULL;
+    }
+    std::string s;
+    if(!root->get("title",    &s) ||
+       !root->get("composer", &s) ||
+       !root->get("file",     &s)    )
+
+    {
+        Log::error("MusicInformation",
+                    "One of 'title', 'composer' or 'file' attribute "
+                    "is missing in the music XML file '%s'!\n",
+                    filename.c_str());
+        delete root;
+        return NULL;
+    }
+    MusicInformation *mi = new MusicInformation(root, filename);
+    delete root;
+    return mi;
+}   // create()
+
+// ----------------------------------------------------------------------------
+MusicInformation::MusicInformation(const XMLNode *root,
+                                   const std::string &filename)
 {
     m_title           = "";
     m_mode            = SOUND_NORMAL;
@@ -45,64 +86,22 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     m_gain            = 1.0f;
     m_adjusted_gain   = 1.0f;
 
-    assert(filename.size() > 0);
-    
-    if (StringUtils::getExtension(filename) != "music")
-    {
-        // Create information just from ogg file
-        // -------------------------------------
-        m_title           = StringUtils::removeExtension(StringUtils::getBasename(filename));
-        m_normal_filename = filename;
-        return;
-    }
 
     // Otherwise read config file
     // --------------------------
-    XMLNode* root = file_manager->createXMLTree(filename);
-    if (!root)
-    {
-        // Don't print a message here - not finding a music file
-        // is normal since the file is searched in several different
-        // directories (e.g. in data/tracks/XX and data/music).
-        throw std::runtime_error("Could not open music XML file");
-    }
-    if(root->getName()!="music")
-    {
-        std::ostringstream msg;
-        fprintf(stderr, "Music XML file '%s' does not contain music node.",
-                filename.c_str());
-        throw std::runtime_error("No music node found");
-    }
-    if(!root->get("title", &m_title))
-    {
-        fprintf(stderr, 
-            "The 'title' attribute is missing in the music XML file '%s'!\n",
-            filename.c_str());
-        throw std::runtime_error("Incomplete or corrupt music XML file");
-        return;
-    }
-    if(!root->get("composer", &m_composer))
-    {
-        fprintf(stderr, 
-            "The 'composer' attribute is missing in the music XML file '%s'!\n",
-            filename.c_str());
-        throw std::runtime_error("Incomplete or corrupt music XML file");
-        return;
-    }
-    if(!root->get("file", &m_normal_filename))
-    {
-        fprintf(stderr, 
-            "The 'file' attribute is mandatory in the music XML file '%s'!\n",
-            filename.c_str());
-        throw std::runtime_error("Incomplete or corrupt music XML file");
-        return;
-    }
-    root->get("gain",          &m_adjusted_gain);
-    root->get("tracks",        &m_all_tracks   );
-    root->get("fast",          &m_enable_fast  );
-    root->get("fast-filename", &m_fast_filename);
-    delete root;
-    
+    std::string s;
+    root->get("title",         &s                );
+    m_title = StringUtils::decodeFromHtmlEntities(s);
+    root->get("composer",      &s                );
+    m_composer = StringUtils::decodeFromHtmlEntities(s);
+    root->get("file",          &m_normal_filename);
+    root->get("gain",          &m_gain           );
+    root->get("tracks",        &m_all_tracks     );
+    root->get("fast",          &m_enable_fast    );
+    root->get("fast-filename", &m_fast_filename  );
+
+    m_adjusted_gain = m_gain;
+
     // Get the path from the filename and add it to the ogg filename
     std::string path  = StringUtils::getPath(filename);
     m_normal_filename = path + "/" + m_normal_filename;
@@ -112,7 +111,7 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     {
         m_fast_filename = path + "/" + m_fast_filename;
     }
-    
+
     assert(m_normal_filename.size() > 0);
 
 }   // MusicInformation
@@ -121,9 +120,9 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
 
 MusicInformation::~MusicInformation()
 {
-    delete m_normal_music;
-    delete m_fast_music;
-}
+    if(m_normal_music) delete m_normal_music;
+    if(m_fast_music)   delete m_fast_music;
+}   // ~MusicInformation
 
 //-----------------------------------------------------------------------------
 
@@ -142,29 +141,32 @@ void MusicInformation::startMusic()
     m_time_since_faster  = 0.0f;
     m_mode               = SOUND_NORMAL;
 
-    std::cout << "startMusic : m_normal_filename=<" << m_normal_filename.c_str() << ">, gain="
-              << m_adjusted_gain << "\n";
-    
     if (m_normal_filename== "") return;
 
     // First load the 'normal' music
     // -----------------------------
     if (StringUtils::getExtension(m_normal_filename) != "ogg")
     {
-        fprintf(stderr, "WARNING: music file %s is not found or file format is not recognized.\n", 
-                m_normal_filename.c_str());
+        Log::warn("MusicInformation", "Music file %s is not found or file "
+                  "format is not recognized.\n", m_normal_filename.c_str());
         return;
     }
-    
+
     if (m_normal_music != NULL) delete m_normal_music;
+
+#if HAVE_OGGVORBIS
     m_normal_music = new MusicOggStream();
+#else
+    m_normal_music = new MusicDummy();
+#endif
 
     if((m_normal_music->load(m_normal_filename)) == false)
     {
         delete m_normal_music;
-        m_normal_music=0;
-        fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", 
-                m_normal_filename.c_str());
+        m_normal_music = NULL;
+        Log::warn("MusicInformation", "Unable to load music %s, "
+                  "not supported or not found.\n",
+                  m_normal_filename.c_str());
         return;
     }
     m_normal_music->volumeMusic(m_adjusted_gain);
@@ -173,7 +175,7 @@ void MusicInformation::startMusic()
     // Then (if available) load the music for the last track
     // -----------------------------------------------------
     if (m_fast_music != NULL) delete m_fast_music;
-    if (m_fast_filename == "") 
+    if (m_fast_filename == "")
     {
         m_fast_music = NULL;
         return;   // no fast music
@@ -181,19 +183,24 @@ void MusicInformation::startMusic()
 
     if(StringUtils::getExtension(m_fast_filename)!="ogg")
     {
-        fprintf(stderr, 
-                "WARNING: music file %s format not recognized, fast music is ignored\n", 
+        Log::warn(
+                "Music file %s format not recognized, fast music is ignored\n",
                 m_fast_filename.c_str());
         return;
     }
-    m_fast_music= new MusicOggStream();
+
+#if HAVE_OGGVORBIS
+    m_fast_music = new MusicOggStream();
+#else
+    m_fast_music = new MusicDummy();
+#endif
 
     if((m_fast_music->load(m_fast_filename)) == false)
     {
         delete m_fast_music;
         m_fast_music=0;
-        fprintf(stderr, "WARNING: Unabled to load fast music %s, not supported or not found.\n", 
-                m_fast_filename.c_str());
+        Log::warn("MusicInformation", "Unabled to load fast music %s, not "
+                  "supported or not found.\n", m_fast_filename.c_str());
         return;
     }
     m_fast_music->volumeMusic(m_adjusted_gain);
@@ -254,14 +261,16 @@ void MusicInformation::update(float dt)
 //-----------------------------------------------------------------------------
 void MusicInformation::stopMusic()
 {
-    if (m_normal_music != NULL)  
+    if (m_normal_music != NULL)
     {
         m_normal_music->stopMusic();
+        delete m_normal_music;
         m_normal_music = NULL;
     }
     if (m_fast_music   != NULL)
     {
         m_fast_music->stopMusic();
+        delete m_fast_music;
         m_fast_music=NULL;
     }
 }   // stopMusic
@@ -282,8 +291,6 @@ void MusicInformation::resumeMusic()
 //-----------------------------------------------------------------------------
 void MusicInformation::volumeMusic(float gain)
 {
-    // printf("Setting master volume %f\n", gain);
-    
     m_adjusted_gain = m_gain * gain;
     if (m_normal_music != NULL) m_normal_music->volumeMusic(m_adjusted_gain);
     if (m_fast_music   != NULL) m_fast_music->volumeMusic(m_adjusted_gain);
@@ -299,7 +306,7 @@ void MusicInformation::setTemporaryVolume(float gain)
 
 //-----------------------------------------------------------------------------
 void MusicInformation::switchToFastMusic()
-{    
+{
     if(!m_enable_fast) return;
     m_time_since_faster = 0.0f;
     if(m_fast_music)
@@ -309,7 +316,7 @@ void MusicInformation::switchToFastMusic()
     }
     else
     {
-        // FIXME: for now this music is too annoying, 
+        // FIXME: for now this music is too annoying,
         m_mode = SOUND_FASTER;
     }
 }   // switchToFastMusic

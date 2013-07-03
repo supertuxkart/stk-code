@@ -1,4 +1,3 @@
-//  $Id: animation_base.cpp 1681 2008-04-09 13:52:48Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -20,12 +19,19 @@
 #include "animations/animation_base.hpp"
 
 #include "animations/ipo.hpp"
-#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 
+#include <algorithm>
+
+#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
+#  define isnan _isnan
+#else
+#  include <math.h>
+#endif
+
+
 AnimationBase::AnimationBase(const XMLNode &node)
-             : TrackObject(node)
 {
     float fps=25;
     node.get("fps", &fps);
@@ -33,20 +39,26 @@ AnimationBase::AnimationBase(const XMLNode &node)
     {
         Ipo *ipo = new Ipo(*node.getNode(i), fps);
         m_all_ipos.push_back(ipo);
-    }   // for i<getNumNodes()
-    m_playing = true;
+    }
+    m_playing   = true;
+    m_anim_type = ATT_CYCLIC;
 
+    if (m_all_ipos.size() == 0) // this will happen for some separate but non-animated objects
+    {
+        m_playing = false;
+    }
+    reset();
 }   // AnimationBase
 // ----------------------------------------------------------------------------
-/** Removes all IPOs.
+/** Special constructor which takes one IPO (or curve). This is used by the
  */
-AnimationBase::~AnimationBase()
+AnimationBase::AnimationBase(Ipo *ipo)
 {
-    std::vector<Ipo*>::iterator i;
-    for(i=m_all_ipos.begin(); i<m_all_ipos.end(); i++)
-        delete *i;
-    m_all_ipos.clear();
-}   // ~AnimationBase
+    m_anim_type    = ATT_CYCLIC_ONCE;
+    m_playing      = true;
+    m_all_ipos.push_back(ipo);
+    reset();
+}   // AnimationBase(Ipo)
 
 // ----------------------------------------------------------------------------
 /** Stores the initial transform (in the IPOs actually). This is necessary
@@ -54,14 +66,14 @@ AnimationBase::~AnimationBase()
  *  \param xyz Position of the object.
  *  \param hpr Rotation of the object.
  */
-void AnimationBase::setInitialTransform(const core::vector3df &xyz, 
-                                        const core::vector3df &hpr)
+void AnimationBase::setInitialTransform(const Vec3 &xyz,
+                                        const Vec3 &hpr)
 {
-    std::vector<Ipo*>::iterator i;
-    for(i=m_all_ipos.begin(); i<m_all_ipos.end(); i++)
+    Ipo* curr;
+    for_in (curr, m_all_ipos)
     {
-        (*i)->setInitialTransform(xyz, hpr);
-    }   // for i in m_all_ipos
+        curr->setInitialTransform(xyz, hpr);
+    }
 }   // setTransform
 
 // ----------------------------------------------------------------------------
@@ -69,26 +81,34 @@ void AnimationBase::setInitialTransform(const core::vector3df &xyz,
  */
 void AnimationBase::reset()
 {
-    std::vector<Ipo*>::iterator i;
-    for(i=m_all_ipos.begin(); i<m_all_ipos.end(); i++)
+    m_current_time = 0;
+    Ipo* curr;
+    for_in (curr, m_all_ipos)
     {
-        (*i)->reset();
-    }   // for i in m_all_ipos
+        curr->reset();
+    }
 }   // reset
 
 // ----------------------------------------------------------------------------
-/** Updates the time, position and rotation. Called once per framce.
+/** Updates the time, position and rotation. Called once per frame.
  *  \param dt Time since last call.
  *  \param xyz Position to be updated.
  *  \param hpr Rotation to be updated.
  */
-void AnimationBase::update(float dt, core::vector3df *xyz, 
-                           core::vector3df *hpr, core::vector3df *scale)
+void AnimationBase::update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
 {
-    std::vector<Ipo*>::iterator i;
-    for(i=m_all_ipos.begin(); i<m_all_ipos.end(); i++)
-    {
-        (*i)->update(dt, xyz, hpr, scale);
-    }   // for i in m_all_ipos
+    assert(!isnan(m_current_time));
 
-}   // float dt
+    // Don't do anything if the animation is disabled
+    if(!m_playing) return;
+    m_current_time += dt;
+
+    assert(!isnan(m_current_time));
+
+    Ipo* curr;
+    for_in (curr, m_all_ipos)
+    {
+        curr->update(m_current_time, xyz, hpr, scale);
+    }
+}   // update
+

@@ -27,13 +27,14 @@ namespace irr
 }
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
 {
     
     /** \brief A spinner or gauge widget (to select numbers / percentages).
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class SpinnerWidget : public Widget
     {
@@ -43,8 +44,11 @@ namespace GUIEngine
         public:
             virtual ~ISpinnerConfirmListener() {}
             
-            /** \brief Invoked when the spinner is selected and "fire" is pressed */
-            virtual void onSpinnerConfirmed() = 0;
+            /**
+              * \brief Invoked when the spinner is selected and "fire" is pressed
+              * \return whether to block the event from further processing
+              */
+            virtual EventPropagation onSpinnerConfirmed() = 0;
         };
         
     protected:
@@ -65,11 +69,13 @@ namespace GUIEngine
           */
         bool m_gauge;
         
-        /** \brief Whether to warp back to the first value when going "beyond" the last value */
-        bool m_warp_around;
+        /** \brief Whether to wrap back to the first value when going "beyond" the last value */
+        bool m_wrap_around;
         
         /** \brief implementing method from base class Widget */
-        virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
+        virtual EventPropagation transmitEvent(Widget* w, 
+                                               const std::string& originator, 
+                                               const int playerID);
         
         /** \brief implementing method from base class Widget */
         virtual EventPropagation rightPressed(const int playerID);
@@ -83,12 +89,14 @@ namespace GUIEngine
         
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
-        virtual int getHeightNeededAroundLabel() const { return 16; }
+        virtual int getHeightNeededAroundLabel() const { return 8; }
         
         /** Call only if this spinner is graphical. Returns the current texture to display */
         irr::video::ITexture* getTexture();
         
     public:
+        
+        LEAK_CHECK()
         
         SpinnerWidget(const bool gauge=false);
         virtual ~SpinnerWidget() {}
@@ -145,11 +153,16 @@ namespace GUIEngine
           */
         int  getMin()   const { return m_min;   }
         
+        void setMin(int n) { m_min = n; }
+        
         /** Override method from base class Widget */
         virtual void setActivated();
         
         /** Override method from base class Widget */
         virtual void setDeactivated();
+        
+        /** Display custom text in spinner */
+        void setCustomText(const core::stringw& text);
     };
     
 }

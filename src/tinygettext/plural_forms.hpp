@@ -39,7 +39,7 @@ public:
   {}
 
   PluralForms(unsigned int nplural_, PluralFunc plural_)
-    : nplural(nplural_), 
+    : nplural(nplural_),
       plural(plural_)
   {}
 
@@ -56,6 +56,6 @@ public:
 
 } // namespace tinygettext
 
-#endif 
+#endif
 
 /* EOF */

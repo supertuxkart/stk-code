@@ -20,20 +20,17 @@
 #ifndef HEADER_PROGRESS_BAR_HPP
 #define HEADER_PROGRESS_BAR_HPP
 
-/**
-  * \defgroup widgets Guiengine/Widgets
-  */
-
 #include <irrString.h>
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
 {
     /** 
       * \brief A progress bar widget.
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class ProgressBarWidget : public Widget
     {
@@ -50,6 +47,9 @@ namespace GUIEngine
         int m_value;
         
     public:
+        
+        LEAK_CHECK()
+        
         ProgressBarWidget();
         virtual ~ProgressBarWidget() {}
         

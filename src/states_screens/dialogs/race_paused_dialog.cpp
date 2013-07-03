@@ -25,6 +25,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "modes/overworld.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
@@ -41,12 +42,19 @@ using namespace irr::gui;
 
 // ----------------------------------------------------------------------------
 
-RacePausedDialog::RacePausedDialog(const float percentWidth, 
+RacePausedDialog::RacePausedDialog(const float percentWidth,
                                    const float percentHeight) :
     ModalDialog(percentWidth, percentHeight)
 {
-    loadFromFile("race_paused_dialog.stkgui");
-    
+    if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
+    {
+        loadFromFile("overworld_dialog.stkgui");
+    }
+    else
+    {
+        loadFromFile("race_paused_dialog.stkgui");
+    }
+
     World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
 
     IconButtonWidget* back_btn = getWidget<IconButtonWidget>("backbtn");
@@ -64,14 +72,23 @@ RacePausedDialog::~RacePausedDialog()
 void RacePausedDialog::loadedFromFile()
 {
     // disable the "restart" button in GPs
-    if (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_SINGLE)
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         GUIEngine::RibbonWidget* choice_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
-        
-        
         const bool success = choice_ribbon->deleteChild("restart");
         assert(success);
+    }
+    // Remove "endrace" button for types not (yet?) implemented
+    // Also don't show it unless the race has started. Prevents finishing in
+    // a time of 0:00:00.
+    if ((race_manager->getMinorMode() != RaceManager::MINOR_MODE_NORMAL_RACE  &&
+         race_manager->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL ) ||
+         World::getWorld()->isStartPhase())
+    {
+        GUIEngine::RibbonWidget* choice_ribbon =
+            getWidget<GUIEngine::RibbonWidget>("choiceribbon");
+        choice_ribbon->deleteChild("endrace");
     }
 }
 
@@ -83,12 +100,12 @@ void RacePausedDialog::onEnterPressedInternal()
 
 // ----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation 
+GUIEngine::EventPropagation
            RacePausedDialog::processEvent(const std::string& eventSource)
 {
     GUIEngine::RibbonWidget* chocie_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
-    
+
     if (eventSource == "backbtn")
     {
         // unpausing is done in the destructor so nothing more to do here
@@ -97,14 +114,21 @@ GUIEngine::EventPropagation
     }
     else if (eventSource == "choiceribbon")
     {
-        const std::string& selection = 
+        const std::string& selection =
             chocie_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection == "exit")
         {
             ModalDialog::dismiss();
             race_manager->exitRace();
+            race_manager->setAIKartOverride("");
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+
+            if (race_manager->raceWasStartedFromOverworld())
+            {
+                OverWorld::enterOverWorld();
+            }
+
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "help")
@@ -132,9 +156,21 @@ GUIEngine::EventPropagation
             ModalDialog::dismiss();
             World::getWorld()->scheduleUnpause();
             race_manager->exitRace();
-            Screen* newStack[] = {MainMenuScreen::getInstance(), 
+            Screen* newStack[] = {MainMenuScreen::getInstance(),
                                   RaceSetupScreen::getInstance(), NULL};
             StateManager::get()->resetAndSetStack( newStack );
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == "endrace")
+        {
+            ModalDialog::dismiss();
+            World::getWorld()->endRaceEarly();
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == "selectkart")
+        {
+            dynamic_cast<OverWorld*>(World::getWorld())->scheduleSelectKart();
+            ModalDialog::dismiss();
             return GUIEngine::EVENT_BLOCK;
         }
     }

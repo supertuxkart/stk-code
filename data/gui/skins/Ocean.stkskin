@@ -2,6 +2,7 @@
 
 Ocean skin by Dakal and Marianne Gagnon, released under creative-commons BY-SA 3.0+
 Except background.jpg, by elisee
+Except stars, by s@f
 
 To make your own skin, I suggest simply duplicating this file and modifying it as needed.
 There are two types of images : some will be simply stretched as a whole, others will
@@ -174,6 +175,7 @@ when the border that intersect at this corner are enabled.
 
 <element type="list_header"  state="neutral" image="ocean/table_header.png" />
 <element type="list_sort_up" state="neutral" image="ocean/list_sort_up.png" />
+<element type="list_sort_down" state="neutral" image="ocean/list_sort_down.png" />
 <element type="list_header"  state="down"    image="ocean/table_header_down.png" />
 
 <!-- Stateless -->
@@ -207,7 +209,12 @@ when the border that intersect at this corner are enabled.
 <color type="dialog_background" state="neutral" a="120" r="0" g="0" b="0" />
 
 <!-- Text field color -->
-<color type="text_field" state="neutral" a="255" r="215" g="215" b="215" />
-<color type="text_field" state="focused" a="255" r="138" g="138" b="138" />
+<color type="text_field" state="background" a="255" r="200" g="200" b="200" />
+<color type="text_field" state="background_focused" a="255" r="223" g="238" b="248" />
+<color type="text_field" state="neutral" a="255" r="138" g="138" b="138" />
+<color type="text_field" state="focused" a="255" r="42" g="169" b="211" />
+
+<!-- Rating star image -->
+<element type="rating" state="neutral" image="ocean/rating_star.png" />
 
 </skin>

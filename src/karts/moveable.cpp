@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
@@ -20,12 +19,13 @@
 
 #include "karts/moveable.hpp"
 
-#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
+
+#include "ISceneNode.h"
 
 Moveable::Moveable()
 {
@@ -58,23 +58,27 @@ void Moveable::setNode(scene::ISceneNode *n)
 //-----------------------------------------------------------------------------
 /** Updates the graphics model. Mainly set the graphical position to be the
  *  same as the physics position, but uses offsets to position and rotation
- *  for special gfx effects (e.g. skidding will turn the karts more). 
+ *  for special gfx effects (e.g. skidding will turn the karts more).
  *  \param offset_xyz Offset to be added to the position.
  *  \param rotation Additional rotation.
  */
-void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,  
+void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
                               const btQuaternion& rotation)
 {
     Vec3 xyz=getXYZ()+offset_xyz;
     m_node->setPosition(xyz.toIrrVector());
     btQuaternion r_all = getRotation()*rotation;
+    if(btFuzzyZero(r_all.getX()) && btFuzzyZero(r_all.getY()-0.70710677f) &&
+       btFuzzyZero(r_all.getZ()) && btFuzzyZero(r_all.getW()-0.70710677f)   )
+        r_all.setX(0.000001f);
     Vec3 hpr;
     hpr.setHPR(r_all);
     m_node->setRotation(hpr.toIrrHPR());
 }   // updateGraphics
 
 //-----------------------------------------------------------------------------
-// The reset position must be set before calling reset
+/** The reset position must be set before calling reset
+ */
 void Moveable::reset()
 {
     if(m_body)
@@ -89,6 +93,8 @@ void Moveable::reset()
     m_pitch       = atan2(up.getZ(), fabsf(up.getY()));
     m_roll        = atan2(up.getX(), up.getY());
     m_velocityLC  = Vec3(0, 0, 0);
+    Vec3 forw_vec = m_transform.getBasis().getColumn(0);
+    m_heading     = -atan2f(forw_vec.getZ(), forw_vec.getX());
 
 }   // reset
 
@@ -117,7 +123,8 @@ void Moveable::stopFlying()
  */
 void Moveable::update(float dt)
 {
-    m_motion_state->getWorldTransform(m_transform);
+    if(m_body->getInvMass()!=0)
+        m_motion_state->getWorldTransform(m_transform);
     m_velocityLC  = getVelocity()*m_transform.getBasis();
     Vec3 forw_vec = m_transform.getBasis().getColumn(0);
     m_heading     = -atan2f(forw_vec.getZ(), forw_vec.getX());
@@ -139,20 +146,31 @@ void Moveable::update(float dt)
  *  \param shape Bullet collision shape for this object.
  */
 void Moveable::createBody(float mass, btTransform& trans,
-                          btCollisionShape *shape) {
+                          btCollisionShape *shape,
+                          float restitution)
+{
     btVector3 inertia;
     shape->calculateLocalInertia(mass, inertia);
     m_transform = trans;
     m_motion_state = new KartMotionState(trans);
 
-    btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state, shape, inertia);
-    info.m_restitution=0.5f;
+    btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state,
+                                                  shape, inertia);
+    info.m_restitution = restitution;
 
     // Then create a rigid body
     // ------------------------
     m_body = new btRigidBody(info);
+    if(mass==0)
+    {
+        // Create a kinematic object
+        m_body->setCollisionFlags(m_body->getCollisionFlags() |
+                                  btCollisionObject::CF_KINEMATIC_OBJECT );
+        m_body->setActivationState(DISABLE_DEACTIVATION);
+    }
+
     // The value of user_pointer must be set from the actual class, otherwise this
-    // is only a pointer to moveable, not to (say) kart, and virtual 
+    // is only a pointer to moveable, not to (say) kart, and virtual
     // functions are not called correctly. So only init the pointer to zero.
     m_user_pointer.zero();
     m_body->setUserPointer(&m_user_pointer);
@@ -166,5 +184,6 @@ void Moveable::createBody(float mass, btTransform& trans,
 void Moveable::setTrans(const btTransform &t)
 {
     m_transform=t;
-    m_motion_state->setWorldTransform(t);
+    if(m_motion_state)
+        m_motion_state->setWorldTransform(t);
 }   // setTrans

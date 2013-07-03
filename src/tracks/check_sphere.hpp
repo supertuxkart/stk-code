@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -27,7 +26,7 @@ class CheckManager;
 
 /** This class implements a check sphere that is used to change the ambient
  *  light if a kart is inside this sphere. Besides a normal radius this
- *  sphere also has a 2nd 'inner' radius: player karts inside the inner 
+ *  sphere also has a 2nd 'inner' radius: player karts inside the inner
  *  radius will have the full new ambient light, karts outside the default
  *  light, and karts in between will mix the light dependent on distance.
  *
@@ -46,16 +45,15 @@ private:
      *  This saves some computations. */
     std::vector<float> m_distance2;
 public:
-                 CheckSphere(CheckManager *check_manager, const XMLNode &node,
-                             unsigned int index);
+                 CheckSphere(const XMLNode &node, unsigned int index);
     virtual     ~CheckSphere() {};
-    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
-                             int kart_id);
+    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
+                             unsigned int kart_id);
     // ------------------------------------------------------------------------
     /** Returns if kart indx is currently inside of the sphere. */
     bool isInside(int index) const            { return m_is_inside[index]; }
     // -------------------------------------------------------------------------
-    /** Returns the squared distance of kart index from the enter of 
+    /** Returns the squared distance of kart index from the enter of
      *  this sphere. */
     float getDistance2ForKart(int index) const { return m_distance2[index];}
     // -------------------------------------------------------------------------

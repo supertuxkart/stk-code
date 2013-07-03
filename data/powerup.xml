@@ -15,6 +15,57 @@
         model="anchor.b3d"                              />
   <item name="switch"         icon="swap-icon.png"      />
   <item name="swatter"        icon="swatter-icon.png"   />
+  <!--  interval: How long a single bounce takes.
+        max-height: The maximum height of a bounce.
+        min-height: Unused mostly, but defines implicitly
+                    the starting height (as average of
+                    max and min height).
+        target-distance: When the ball is closer than 
+                    this to the target, it will aim
+                    directly at the target.
+        target-max-angle: Once the ball is aiming for its
+                    target, it can at most change the angle
+                    this much per second(!).
+        time-between-balls:  Reduces the frequency with which rubber 
+                    balls are found to 1 every 'timer' seconds.
+        min-interpolation-distance: how far the control
+                    points (which are center of squads)
+                    must be from each other. A large value
+                    allows smoother turning (no abrupt
+                    change of direction), but a large
+                    value can result in the ball being
+                    off track (e.g. a value of 30 results
+                    on the ramp in sand track that the 
+                    ball goes to the left of the tunnel,
+                    bouncing on the pyramid). Quite
+                    catastrophal on the startrack and
+                    skyline).
+        squash-slowdown: How much karts that are 
+                    squashed are slowed down.
+        squash-duration: How long karts stay squashed.
+        delete-timer: How long before the ball is removed
+                    if no suitable target is found.
+        early-target-factor: the rubber ball can use the
+                    relative position of the kart to the
+                    center of the track for improved targeting
+                    (i.e. the ball will align its relative
+                    position to the center of the track early).
+                    This allows a lower target-distance to be
+                    used since the ball is better aligned,
+                    hopefully reducing the frequency of 
+                    tunneling.
+   -->
+  <item name="rubber-ball"    icon="rubber_ball-icon.png"
+        model="rubber_ball.b3d" speed="35.0" 
+        scale="1 1 1"         interval="1"
+        max-height="4.0"      min-height="0"
+        fast-ping-distance="50" 
+        early-target-factor="1"
+        target-distance="15"  target-max-angle = "90"
+        min-interpolation-distance="5"
+        time-between-balls="15"
+        squash-slowdown="0.5" squash-duration="2"
+        delete-time="5.0"     max-height-difference="10" />
   <item name="parachute"      icon="parachute-icon.png"
         model="parachute.b3d"                           />
   <item name="plunger"        icon="plunger-icon.png"
@@ -37,19 +88,22 @@
        be quite rare, since otherwise the item might be used
        too often (compared with many items which will only
        affect a karts or two).                                -->
-  <!--      bubble  cake  bowl  zipper  plunger  switch  glove para  anvil -->
-  <first  w="25       5    15     5      10       10      10     0     0"
-    w-multi=" 0       0     5     0       0        0       5     0     0"    />
-  <top33  w="30      30    30    30      30       10      30    10     0"
-    w-multi=" 0      10    10     0      10        0      10     0     0"    />
-  <mid33  w="30      30    30    30      30       10      30    20     5"
-    w-multi=" 0      20    20    20      20        0       0     5     0"    />
-  <end33  w=" 0      30    30    30      30       10      30    30    30"
-    w-multi=" 0      30    30    30      30        0      30    20     0"    />
-  <last   w=" 0      30    30    60      60        0       0    60    60"
-    w-multi=" 0      30    30    60      60        0       0     0     0"    />
-  <battle w=" 0      30    60     0       0       10      40     0     0"
-    w-multi=" 0       0     5     0       0        0       0     0     0"    />
+  <!--      bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
+  <first  w="25       5    15     5      10       10      10     0     0     0"
+    w-multi=" 0       0     5     0       0        0       0     0     0     0"    />
+  <top33  w="30      30    30    30      30       10      10    10    10     0"
+    w-multi=" 0      10    10     0      10        0       0     0     0     0"    />
+  <mid33  w="30      30    30    30      30       10      20    20    20     0"
+    w-multi=" 0      20    20    20      20        0       0     0     0     0"    />
+  <end33  w=" 0      30    30    30      30       10      20    30    30     0"
+    w-multi=" 0      30    30    30      30        0       0     0     0     0"    />
+  <last   w=" 0      30    10    90      60        0      10    60    60     0"
+    w-multi=" 0      30    30   100      60        0       0     0     0     0"    />
+  <battle w=" 0      30    60     0       0       10      30     0     0     0"
+    w-multi=" 0       0     5     0       0        0       0     0     0     0"    />
+  <tuto   w=" 0       0     0     0       0        0       0     0     0     0"
+    w-multi=" 0       0   100     0       0        0       0     0     0     0"    />
 
+    
 </powerup>
 

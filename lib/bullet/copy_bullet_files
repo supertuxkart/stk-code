@@ -1,0 +1,46 @@
+LOCATION=$1
+cp $LOCATION/AUTHORS .
+cp $LOCATION/BulletLicense.txt .
+cp $LOCATION/ChangeLog .
+cp $LOCATION/LICENSE .
+cp $LOCATION/README .
+cp $LOCATION/VERSION .
+cp $LOCATION/src/*.h src
+cp $LOCATION/src/LinearMath/*.h   src/LinearMath/
+cp $LOCATION/src/LinearMath/*.cpp src/LinearMath/
+cp $LOCATION/src/BulletCollision/BroadphaseCollision/*.h     src/BulletCollision/BroadphaseCollision
+cp $LOCATION/src/BulletCollision/BroadphaseCollision/*.cpp   src/BulletCollision/BroadphaseCollision
+cp $LOCATION/src/BulletCollision/CollisionDispatch/*.h       src/BulletCollision/CollisionDispatch
+cp $LOCATION/src/BulletCollision/CollisionDispatch/*.cpp     src/BulletCollision/CollisionDispatch
+cp $LOCATION/src/BulletCollision/CollisionShapes/*.h         src/BulletCollision/CollisionShapes
+cp $LOCATION/src/BulletCollision/CollisionShapes/*.cpp       src/BulletCollision/CollisionShapes
+cp $LOCATION/src/BulletCollision/NarrowPhaseCollision/*.h    src/BulletCollision/NarrowPhaseCollision
+cp $LOCATION/src/BulletCollision/NarrowPhaseCollision/*.cpp  src/BulletCollision/NarrowPhaseCollision
+cp $LOCATION/src/BulletDynamics/ConstraintSolver/*.h   src/BulletDynamics/ConstraintSolver
+cp $LOCATION/src/BulletDynamics/ConstraintSolver/*.cpp src/BulletDynamics/ConstraintSolver
+cp $LOCATION/src/BulletDynamics/Dynamics/*.h           src/BulletDynamics/Dynamics
+cp $LOCATION/src/BulletDynamics/Dynamics/*.cpp         src/BulletDynamics/Dynamics
+cp $LOCATION/src/BulletDynamics/Vehicle/*.h            src/BulletDynamics/Vehicle
+cp $LOCATION/src/BulletDynamics/Vehicle/*.cpp          src/BulletDynamics/Vehicle
+cp $LOCATION/Demos/OpenGL/*.h Demos/OpenGL
+cp $LOCATION/Demos/OpenGL/*.cpp Demos/OpenGL
+
+echo "REMEMBER to patch this new bullet version:"
+echo "1) btDiscreteDynamicsWorld.cpp: 
+--- BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp (revision 4812)
++++ BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp (working copy)
+@@ -262,7 +262,12 @@
+                        for (int v=0;v<m_vehicles[i]->getNumWheels();v++)
+                        {
+                                //synchronize the wheels with the (interpolated) chassis worldtransform
++                // updateWheelTransform resets m_isInContact to false. Since
++                // this field is needed in STK, we save it here and restore
++                // its value after the call to updateWheelTransform.
++                bool contact = m_vehicles[i]->getWheelInfo(v).m_raycastInfo.m_isInContact;
+                                m_vehicles[i]->updateWheelTransform(v,true);
++                m_vehicles[i]->getWheelInfo(v).m_raycastInfo.m_isInContact = contact;
+                        }
+                }
+        }
+"
+

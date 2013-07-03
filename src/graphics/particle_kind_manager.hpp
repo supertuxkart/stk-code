@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2011 Marianne Gagnon
@@ -32,23 +31,23 @@
 class ParticleKindManager : public NoCopy
 {
 private:
-    
+
     std::map<std::string, ParticleKind*> m_per_track_kinds;
 
     std::map<std::string, ParticleKind*> m_kinds;
     static ParticleKindManager* singleton;
-    
+
     ParticleKindManager();
-    
+
 public:
-    
+
     virtual   ~ParticleKindManager();
 
     ParticleKind* getParticles(const std::string &name);
-    
+
     void   cleanUpTrackSpecificGfx();
     void   cleanup();
-    
+
     static ParticleKindManager* get();
 };
 #endif

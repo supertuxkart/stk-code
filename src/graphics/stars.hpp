@@ -35,22 +35,22 @@ using namespace irr;
 class Stars : public NoCopy
 {
 private:
-    
+
     /** Vector containing the stars */
     std::vector<scene::ISceneNode*> m_nodes;
-    
+
     /** The scene node of the kart to which the stars belong. */
     scene::ISceneNode  *m_parent_kart_node;
-    
+
     /** Center around which stars rotate */
     core::vector3df m_center;
-    
+
     /** Whether stars are currently enabled */
     bool m_enabled;
-    
+
     float m_fade_in_time;
     float m_remaining_time;
-    
+
  public:
            Stars  (scene::ISceneNode* parentKart, core::vector3df center);
           ~Stars  ();

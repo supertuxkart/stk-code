@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -42,7 +41,7 @@ class XMLNode;
 /** This class manages all powerups. It reads in powerup.xml to get the data,
  *  initialise the static member of some flyables (i.e. powerup.xml contains
  *  info about cakes, plunger etc which needs to be stored), and maintains
- *  the 'weights' (used in randomly chosing which item was collected) for all 
+ *  the 'weights' (used in randomly chosing which item was collected) for all
  *  items depending on position. The latter is done so that as the first player
  *  you get less advantageous items (but no useless ones either, e.g. anchor),
  *  while as the last you get more useful ones.
@@ -50,14 +49,14 @@ class XMLNode;
  *  The position in a race is mapped to one of five position classes:
  *  first, top, middle, bottom, last - e.g. for a 6 player game the distribution
  *  is:
- *  position  1     2   3      4      5      6 
+ *  position  1     2   3      4      5      6
  *  class     first top middle middle bottom last
  *  For each class the weight distribution is read in from powerup.xml:
  *   <!--      bubble cake bowl zipper plunger switch para anvil -->
  *   <last  w="0      1    1    2      2       0      2    2"     />
  *  So a (well, in this case 'the') player belonging to the class 'last'
  *  will not get a bubble gum or switch. Cakes and bowling balls have
- *  lower probability. 
+ *  lower probability.
  *  At the start of each race two mappings are computed in updateWeightsForRace:
  *  m_position_to_class maps each postion to the class using the function
  *                      convertPositionToClass.
@@ -75,12 +74,12 @@ public:
     // The anvil and parachute must be at the end of the enum, and the
     // zipper just before them (see Powerup::hitBonusBox).
     enum PowerupType {POWERUP_NOTHING,
-                      POWERUP_FIRST, 
-                      POWERUP_BUBBLEGUM = POWERUP_FIRST, 
+                      POWERUP_FIRST,
+                      POWERUP_BUBBLEGUM = POWERUP_FIRST,
                       POWERUP_CAKE,
                       POWERUP_BOWLING, POWERUP_ZIPPER, POWERUP_PLUNGER,
-                      POWERUP_SWITCH, POWERUP_SWATTER,
-                      POWERUP_PARACHUTE, 
+                      POWERUP_SWITCH, POWERUP_SWATTER, POWERUP_RUBBERBALL,
+                      POWERUP_PARACHUTE,
                       POWERUP_ANVIL,      //powerup.cpp assumes these two come last
                       POWERUP_LAST=POWERUP_ANVIL,
                       POWERUP_MAX
@@ -89,7 +88,7 @@ public:
     /** The different position classes, used to map a kart's position to a
      *  weight distribution for the different powerups. The battle mode is
      *  listed as a separate 'position' - this way the same implementation
-     *  as used for normal racing can be used to define which items are 
+     *  as used for normal racing can be used to define which items are
      *  available in battle mode*/
     enum PositionClass {POSITION_FIRST,
                         POSITION_TOP33,
@@ -97,6 +96,7 @@ public:
                         POSITION_END33,
                         POSITION_LAST,
                         POSITION_BATTLE_MODE,
+                        POSITION_TUTORIAL_MODE,
                         POSITION_COUNT};
 
 private:
@@ -111,6 +111,9 @@ private:
 
     /** Maximum turn angle for steering of homing powerups. */
     float         m_all_max_turn_angle[POWERUP_MAX];
+
+    /** Last time the bouncing ball was collected */
+    float         m_rubber_ball_collect_time;
 
     /** The mesh for each model (if the powerup has a model), e.g. a switch
         has none. */
@@ -136,10 +139,10 @@ private:
 
     PowerupType   getPowerupType(const std::string &name) const;
 
-    void          loadWeights(const XMLNode &root, 
+    void          loadWeights(const XMLNode &root,
                               const std::string &class_name,
                               PositionClass position_class);
-    PositionClass convertPositionToClass(unsigned int num_karts, 
+    PositionClass convertPositionToClass(unsigned int num_karts,
                                          unsigned int position);
 public:
                   PowerupManager  ();
@@ -149,17 +152,19 @@ public:
     void          LoadPowerup     (PowerupType type, const XMLNode &node);
     void          updateWeightsForRace(unsigned int num_karts);
     Material*     getIcon         (int type) const {return m_all_icons [type];}
-    PowerupManager::PowerupType 
+    PowerupManager::PowerupType
                   getRandomPowerup(unsigned int pos, unsigned int *n);
-    /** Returns the mesh for a certain powerup. 
+    /** Returns the mesh for a certain powerup.
      *  \param type Mesh type for which the model is returned. */
-    irr::scene::IMesh 
+    irr::scene::IMesh
                  *getMesh         (int type) const {return m_all_meshes[type];}
     float         getForceToTarget(int type) const {return m_all_force_to_target[type];}
     float         getMaxDistance  (int type) const {return m_all_max_distance[type];}
     float         getMaxTurnAngle (int type) const {return m_all_max_turn_angle[type];}
-    const btVector3& 
+    const btVector3&
                   getExtend       (int type) const {return m_all_extends[type];}
+    float         getBallCollectTime() const {return m_rubber_ball_collect_time;}
+    void          setBallCollectTime(float time) {m_rubber_ball_collect_time=time;}
 
 };
 

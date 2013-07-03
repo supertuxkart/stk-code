@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -22,7 +21,6 @@
 
 #include "btBulletDynamicsCommon.h"
 
-#include "graphics/irr_driver.hpp"
 #include "utils/vec3.hpp"
 
 /**
@@ -30,7 +28,7 @@
   */
 class IrrDebugDrawer : public btIDebugDraw
 {
-    /** The drawing mode to use: 
+    /** The drawing mode to use:
      *  If bit 0 is set, draw the bullet collision shape of karts
      *  If bit 1 is set, don't draw the kart graphics
      */
@@ -41,7 +39,13 @@ class IrrDebugDrawer : public btIDebugDraw
     DebugModeType   m_debug_mode;
 protected:
     virtual void    setDebugMode(int debug_mode) {}
-    virtual int     getDebugMode() const         { return DBG_DrawWireframe;}
+    /** Callback for bullet: if debug drawing should be done or not.
+     *  Note that getDebugMode is even called when debug_drawing is disabled
+     *  (i.e. not via Physics::draw()), but internally from bullet. So
+     *  we have to make sure to return nodebug if debugging is disabled. */
+    virtual int     getDebugMode() const
+                    { return m_debug_mode==DM_NONE ? DBG_NoDebug
+                                                   : DBG_DrawWireframe;}
 public:
                     IrrDebugDrawer();
     void            render(float dt);
@@ -49,12 +53,12 @@ public:
     virtual void    drawLine(const btVector3& from, const btVector3& to,
                              const btVector3& color);
     ///optional debug methods
-    virtual void    drawContactPoint(const btVector3& Point_on_b, 
+    virtual void    drawContactPoint(const btVector3& Point_on_b,
                                      const btVector3& normal_on_b,
                                      btScalar distance,int life_time,
                                      const btVector3& color)      {}
     virtual void    reportErrorWarning(const char* warningString) {}
-    virtual void    draw3dText(const btVector3& location, 
+    virtual void    draw3dText(const btVector3& location,
                                const char* textString)            {}
     /** Returns true if debug mode is enabled. */
     bool            debugEnabled() const         {return m_debug_mode!=0;}

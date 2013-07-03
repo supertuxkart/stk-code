@@ -21,6 +21,7 @@
 
 #include "config/player.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "utils/leak_check.hpp"
 
 /**
  * \brief Generic dialog to ask the user to confirm something, or to show a simple message box
@@ -37,6 +38,9 @@ public:
     class IConfirmDialogListener
     {
     public:
+        
+        LEAK_CHECK()
+        
         IConfirmDialogListener() {}
         virtual ~IConfirmDialogListener() {}
         
@@ -44,20 +48,28 @@ public:
           * \note  The dialog is not closed automatically, close it in the callback if this
           *        behavior is desired.
           */
-        virtual void onConfirm() = 0;
+        virtual void onConfirm() { ModalDialog::dismiss(); };
         
         /** \brief Implement to be notified of dialog cancelled.
           * \note  The default implementation is to close the modal dialog, but you may override
           *        this method to change the behavior.
           */
-        virtual void onCancel();
+        virtual void onCancel() { ModalDialog::dismiss(); };
+        
+        /**
+          * \brief Optional callback
+          */
+        virtual void onDialogUpdate(float dt) {}
     };
+
+    enum MessageDialogType { MESSAGE_DIALOG_OK, MESSAGE_DIALOG_CONFIRM };
     
 private:
     
     IConfirmDialogListener* m_listener;
     bool m_own_listener;
-    
+    void doInit(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool own_listener);
+
 public:
 
     /**
@@ -66,7 +78,7 @@ public:
       * \param If set to true, 'listener' will be owned by this dialog and deleted
       *        along with the dialog.
       */
-    MessageDialog(irr::core::stringw msg, IConfirmDialogListener* listener, bool delete_listener);
+    MessageDialog(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool delete_listener);
     
     /**
       * Variant of MessageDialog where cancelling is not possible (i.e. just shows a message box with OK)
@@ -75,10 +87,11 @@ public:
     MessageDialog(irr::core::stringw msg);
 
     
-    ~MessageDialog() { if (m_own_listener) delete m_listener; m_listener = NULL; }
+    ~MessageDialog();
     
     virtual void onEnterPressedInternal();
-    
+    virtual void onUpdate(float dt);
+
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };
 

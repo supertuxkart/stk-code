@@ -3,6 +3,7 @@
 #include "guiengine/abstract_state_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_device.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
@@ -14,9 +15,9 @@ InputDevice::InputDevice()
     m_player = NULL;
     m_configuration = NULL;
 }
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /**
-  * Sets which players uses this device; or pass NULL to say no player uses it. 
+  * Sets which players uses this device; or pass NULL to say no player uses it.
   */
 void InputDevice::setPlayer(StateManager::ActivePlayer* owner)
 {
@@ -28,40 +29,44 @@ void InputDevice::setPlayer(StateManager::ActivePlayer* owner)
 #pragma mark Keyboard
 #endif
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 KeyboardDevice::KeyboardDevice(KeyboardConfig *configuration)
 {
     m_configuration = configuration;
     m_type = DT_KEYBOARD;
     m_name = "Keyboard";
     m_player = NULL;
-}
-// -----------------------------------------------------------------------------
+}   // KeyboardDevice
+
+// ----------------------------------------------------------------------------
 KeyboardDevice::KeyboardDevice()
 {
     m_configuration = new KeyboardConfig();
     m_type = DT_KEYBOARD;
     m_player = NULL;
-}
+}   // KeyboardDevice
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-bool KeyboardDevice::processAndMapInput(const int id, InputManager::InputDriverMode mode,
+bool KeyboardDevice::processAndMapInput(const int id,
+                                        InputManager::InputDriverMode mode,
                                         PlayerAction* action /* out */)
 {
     if (mode == InputManager::INGAME)
     {
-        return m_configuration->getGameAction(Input::IT_KEYBOARD, id, 0, action);
+        return m_configuration->getGameAction(Input::IT_KEYBOARD, id, 0,
+                                              action);
     }
     else
     {
-        assert(mode == InputManager::MENU); // bindings can only be accessed in game and menu modes
-        return m_configuration->getMenuAction(Input::IT_KEYBOARD, id, 0, action);
+        // bindings can only be accessed in game and menu modes
+        assert(mode == InputManager::MENU);
+        return m_configuration->getMenuAction(Input::IT_KEYBOARD, id, 0,
+                                              action);
     }
-}
+}   // processAndMapInput
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
+// ============================================================================
 
 #if 0
 #pragma mark -
@@ -69,8 +74,9 @@ bool KeyboardDevice::processAndMapInput(const int id, InputManager::InputDriverM
 #endif
 
 
-GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const int axis_count,
-                             const int btnAmount, GamepadConfig *configuration)
+GamePadDevice::GamePadDevice(const int irrIndex, const std::string name,
+                             const int axis_count, const int button_count,
+                             GamepadConfig *configuration)
 {
     m_type                  = DT_GAMEPAD;
     m_deadzone              = DEADZONE_JOYSTICK;
@@ -80,10 +86,10 @@ GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const i
     m_prevAxisDirections    = new Input::AxisDirection[axis_count];
     m_prevAxisValue         = new int[axis_count];
     m_axis_ok               = new bool[axis_count];
-    m_button_count          = btnAmount;
+    m_button_count          = button_count;
     m_index                 = irrIndex;
     m_name                  = name;
-    
+
     for (int i = 0; i < axis_count; i++)
     {
         m_prevAxisDirections[i] = Input::AD_NEUTRAL;
@@ -95,7 +101,7 @@ GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const i
         m_buttonPressed[n] = false;
 }   // GamePadDevice
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Destructor for GamePadDevice.
  */
 GamePadDevice::~GamePadDevice()
@@ -107,62 +113,69 @@ GamePadDevice::~GamePadDevice()
     // FIXME - any need to close devices?
 }   // ~GamePadDevice
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 bool GamePadDevice::isButtonPressed(const int i)
 {
     return m_buttonPressed[i];
 }   // isButtonPressed
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
 {
     m_buttonPressed[i] = isButtonPressed;
 }   // setButtonPressed
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-void GamePadDevice::resetAxisDirection(const int axis, 
-                                       Input::AxisDirection direction, 
+void GamePadDevice::resetAxisDirection(const int axis,
+                                       Input::AxisDirection direction,
                                        StateManager::ActivePlayer* player)
 {
-    if (StateManager::get()->getGameState() != GUIEngine::GAME) return; // ignore this while in menus
+    // ignore this while in menus
+    if (StateManager::get()->getGameState() != GUIEngine::GAME) return;
 
-    Kart* pk = player->getKart();
+    AbstractKart* pk = player->getKart();
     if (pk == NULL)
     {
         fprintf(stderr, "Error, trying to reset axis for an unknown player\n");
         return;
     }
-    
+
     for(int n=0; n<PA_COUNT; n++)
     {
         Binding& bind = m_configuration->getBinding(n);
-        if(bind.getId() == axis && bind.getDirection()== direction)
+        if(bind.getType() == Input::IT_STICKMOTION &&
+           bind.getId() == axis &&
+           bind.getDirection()== direction &&
+           pk->getController() != NULL)
         {
-            ((PlayerController*)(pk->getController()))->action((PlayerAction)n, 0);
+            ((PlayerController*)(pk->getController()))
+                                                  ->action((PlayerAction)n, 0);
             return;
         }
     }
 
 }   // resetAxisDirection
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-bool GamePadDevice::processAndMapInput(Input::InputType type, const int id, const int value,
+bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
+                                       const int value,
                                        InputManager::InputDriverMode mode,
                                        StateManager::ActivePlayer* player,
                                        PlayerAction* action /* out */)
 {
     if (!m_configuration->isEnabled()) return false;
-    
+
     bool success = false;
     if(m_prevAxisDirections == NULL) return false; // device not open
-    
+
     if (type == Input::IT_STICKMOTION)
     {
-        if (id >= m_axis_count && id != Input::HAT_H_ID && id != Input::HAT_V_ID) return false; // this gamepad doesn't even have that many axes
+        // this gamepad doesn't even have that many axes
+        if (id >= m_axis_count) return false;
 
         if (player != NULL)
         {
@@ -173,7 +186,8 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id, cons
                 resetAxisDirection(id, Input::AD_POSITIVE, player);
             }
             // going to positive from negative
-            else if (value > 0 && m_prevAxisDirections[id] == Input::AD_NEGATIVE)
+            else if (value > 0 &&
+                     m_prevAxisDirections[id] == Input::AD_NEGATIVE)
             {
                 //  set negative id to 0
                 resetAxisDirection(id, Input::AD_NEGATIVE, player);
@@ -196,7 +210,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id, cons
                 m_axis_ok[id] = true;
             }
         }
-        
+
         // check if within deadzone
         if(value > -m_deadzone && value < m_deadzone && player != NULL)
         {
@@ -222,30 +236,32 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id, cons
 
             return false;
         }
-        
+
         // If axis did not send proper values yet, ignore it.
         if (!m_axis_ok[id]) return false;
     }
-    
+
     if (m_configuration != NULL)
     {
         if (mode == InputManager::INGAME)
         {
             success = m_configuration->getGameAction(type, id, value, action);
         }
-        else
+        else if (abs(value) > Input::MAX_VALUE/2)
         {
-            assert(mode == InputManager::MENU); // bindings can only be accessed in game and menu modes
+            // bindings can only be accessed in game and menu modes
+            assert(mode == InputManager::MENU);
             success = m_configuration->getMenuAction(type, id, value, action);
         }
     }
     else
     {
-        fprintf(stderr, "processAndMapInput() called on improperly initialized GamePadDevice\n");
+        fprintf(stderr, "processAndMapInput() called on improperly "
+                        "initialized GamePadDevice\n");
         abort();
     }
 
     return success;
 }   // processAndMapInput
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------

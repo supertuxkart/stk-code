@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -24,19 +23,17 @@
 
 #include "graphics/camera.hpp"
 #include "io/xml_node.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 
 /** Constructor for a checksphere.
- *  \param check_manager Pointer to the check manager, which is needed when
- *         resetting e.g. new lap counters. 
  *  \param node XML node containing the parameters for this checkline.
  */
-AmbientLightSphere::AmbientLightSphere(CheckManager *check_manager, 
-                                       const XMLNode &node, 
-                                       unsigned int index) 
-                  : CheckSphere(check_manager, node, index)
+AmbientLightSphere::AmbientLightSphere(const XMLNode &node,
+                                       unsigned int index)
+                  : CheckSphere(node, index)
 {
     m_ambient_color = video::SColor(255, 0, 255, 0);   // green
     m_inner_radius2 = 1;
@@ -51,10 +48,11 @@ void AmbientLightSphere::update(float dt)
     CheckStructure::update(dt);
 
     World *world = World::getWorld();
-    for(unsigned int i=0; i<world->getNumKarts(); i++)
+    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
-        Kart *kart=world->getKart(i);
-        if(!kart->getCamera()) continue;
+        Camera *camera = Camera::getCamera(i);
+        const AbstractKart *kart=camera->getKart();
+        if(!kart) continue;
         if(isInside(i))
         {
             float d2=getDistance2ForKart(i);
@@ -70,7 +68,7 @@ void AmbientLightSphere::update(float dt)
                 const video::SColor &def = track->getDefaultAmbientColor();
                 color = m_ambient_color.getInterpolated(def, f);
             }
-            kart->getCamera()->setAmbientLight(color);
+            camera->setAmbientLight(color);
         }   // if active
     }   // for i<num_karts
 }   // update
@@ -83,9 +81,13 @@ void AmbientLightSphere::update(float dt)
  *  \param indx     Index of the kart, can be used to store kart specific
  *                  additional data.
  */
-bool AmbientLightSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
-                                     int indx)
+bool AmbientLightSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
+                                     unsigned int indx)
 {
-    if(!World::getWorld()->getKart(indx)->getCamera()) return false;
-    return CheckSphere::isTriggered(old_pos, new_pos, indx);
+    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+    {
+        if(Camera::getCamera(i)->getKart()->getWorldKartId()==indx)
+            return CheckSphere::isTriggered(old_pos, new_pos, indx);
+    }
+    return false;
 }   // isTriggered

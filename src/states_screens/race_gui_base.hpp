@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 Joerg Henrichs
@@ -30,15 +29,19 @@
 namespace irr
 {
     namespace video { class ITexture; struct S3DVertex; }
+    namespace scene { class IAnimatedMeshSceneNode; }
 }
 using namespace irr;
 
+#include "utils/vec3.hpp"
 
-class Kart;
+class AbstractKart;
+class Camera;
 class Material;
+class Referee;
 
 /**
-  * \brief An abstract base class for the two race guis (race_gui and 
+  * \brief An abstract base class for the two race guis (race_gui and
   *  race_result gui)
   * \ingroup states_screens
   */
@@ -51,16 +54,16 @@ public:
       */
     struct KartIconDisplayInfo
     {
-        /** text to display next to icon, if any */
+        /** Text to display next to icon, if any. */
         core::stringw m_text;
-        
-        /** text color, if any text */
-        float r, g, b;
-        
-        /** if this kart has a special title, e.g. "leader" in follow-the-leader */
+
+        /** Text color, if any text. */
+        video::SColor m_color;
+
+        /** If this kart has a special title, e.g. "leader" in follow-the-leader. */
         core::stringw special_title;
-        
-        /** Current lap of this kart, or -1 if irrelevant */
+
+        /** Current lap of this kart, or -1 if irrelevant. */
         int lap;
     };   // KartIconDisplayInfo
 
@@ -75,26 +78,33 @@ private:
     class TimedMessage
     {
      public:
-        irr::core::stringw m_message;            //!< message to display
-        float              m_remaining_time;     //!< time remaining before removing this message from screen
-        video::SColor      m_color;              //!< color of message
-        int                m_font_size;          //!< size
-        const Kart        *m_kart;
-        bool               m_important;          //!< Important msgs are displayed in the middle of the screen
+         /** Message to display. */
+        irr::core::stringw  m_message;
+        /** Time remaining before removing this message from screen. */
+        float               m_remaining_time;
+        /** Color of message. */
+        video::SColor       m_color;
+
+        const AbstractKart *m_kart;
+        /** Important msgs are displayed in the middle of the screen. */
+        bool                m_important;
+        bool                m_big_font;
+
         // -----------------------------------------------------
         // std::vector needs standard copy-ctor and std-assignment op.
         // let compiler create defaults .. they'll do the job, no
         // deep copies here ..
-        TimedMessage(const irr::core::stringw &message, 
-                     const Kart *kart, float time, int size, 
-                     const video::SColor &color, const bool important)
+        TimedMessage(const irr::core::stringw &message,
+                     const AbstractKart *kart, float time,
+                     const video::SColor &color, const bool important,
+                     bool big_font)
         {
-            m_message        = message; 
-            m_font_size      = size;
+            m_message        = message;
             m_kart           = kart;
             m_remaining_time = ( time < 0.0f ) ? -1.0f : time;
             m_color          = color;
             m_important      = important;
+            m_big_font       = big_font;
         }   // TimedMessage
         // -----------------------------------------------------
         // in follow leader the clock counts backwards
@@ -119,9 +129,45 @@ private:
     /** Translated strings 'ready', 'set', 'go'. */
     core::stringw    m_string_ready, m_string_set, m_string_go;
 
+    /** Translated string 'Top %d' displayed every frame. */
+    core::stringw    m_string_top;
+
+    /** The position of the referee for all karts. */
+    std::vector<Vec3> m_referee_pos;
+
+    /** The actual rotation to use for the referee for each kart. */
+    std::vector<Vec3> m_referee_rotation;
+
+    /** The height of the referee. This is used to make the referee fly
+     *  into view. This is the same Y-offset for all karts, so only a
+     *  single value needs to be used. */
+    float m_referee_height;
+
+    /** The referee scene node. */
+    Referee *m_referee;
+
+
 protected:
     /** Material for the 'plunger in the face' texture. */
     Material        *m_plunger_face;
+
+    /** State of the plunger: From the 'init' states the plunger switches
+     *  between two slow moving states ('shakily moving') till the end of
+     *  the plunger time is nearly reached, then it goes to a very fast
+     *  moving state ('plunger blown off'). */
+    enum PlungerState {PLUNGER_STATE_INIT,   PLUNGER_STATE_SLOW_1,
+                       PLUNGER_STATE_SLOW_2, PLUNGER_STATE_FAST}
+                        m_plunger_state;
+
+    /** How long the plunger should stay in the current state. */
+    float m_plunger_move_time;
+
+    /** Offset of the plunger. */
+    core::vector2di m_plunger_offset;
+
+    /* Speed of the plunger. This gets changed depending on state (not moving,
+     *  slow moving, fast moving). */
+    core::vector2df m_plunger_speed;
 
     /** The size of a single marker in pixels, must be a power of 2. */
     int              m_marker_rendered_size;
@@ -129,52 +175,76 @@ protected:
     /** A texture with all mini dots to be displayed in the minimap for all karts. */
     video::ITexture *m_marker;
     video::ITexture *m_gauge_empty;
+    /** Default texture for nitro gauge. */
     video::ITexture *m_gauge_full;
+    /** Highlight gauge, used when a kart uses nitro. */
+    video::ITexture *m_gauge_full_bright;
+
     video::ITexture *m_gauge_goal;
 
     /** The frame around player karts in the mini map. */
     Material         *m_icons_frame;
-    
+
     void cleanupMessages(const float dt);
     void createMarkerTexture();
-    void createRegularPolygon(unsigned int n, float radius, 
+    void createRegularPolygon(unsigned int n, float radius,
                               const core::vector2df &center,
                               const video::SColor &color,
                               video::S3DVertex *v, unsigned short int *index);
-    void drawAllMessages       (const Kart* kart,
-                                const core::recti &viewport, 
+    void drawAllMessages       (const AbstractKart* kart,
+                                const core::recti &viewport,
                                 const core::vector2df &scaling);
-    void drawPowerupIcons      (const Kart* kart,
-                                const core::recti &viewport, 
+    void drawPowerupIcons      (const AbstractKart* kart,
+                                const core::recti &viewport,
                                 const core::vector2df &scaling);
-
     void drawGlobalMusicDescription();
     void drawGlobalReadySetGo  ();
-
+    void drawPlungerInFace(const Camera *camera, float dt);
     /** Instructs the base gui to ignore unimportant messages (like
      *  item messages).
      */
     void ignoreUnimportantMessages() { m_ignore_unimportant_messages = true; }
+
+    /** Distance on track to begin showing overlap in drawGlobalPlayerIcons */
+    float            m_dist_show_overlap;///can be zero
+    float            m_icons_inertia;///can be zero
+
+    /** previous position of icons */
+    std::vector< core::vector2d<s32> > m_previous_icons_position;
+
+    /** This vector is passed to world to be filled with the current
+     *  race data information. */
+    std::vector<KartIconDisplayInfo> m_kart_display_infos;
+
 public:
-    
+
     bool m_enabled;
 
                   RaceGUIBase();
     virtual      ~RaceGUIBase();
     virtual void renderGlobal(float dt);
-    virtual void renderPlayerView(const Kart *kart);
-    virtual void addMessage(const irr::core::stringw &m, const Kart *kart, 
-                            float time, int fonst_size, 
+    virtual void init();
+    virtual void reset();
+    virtual void renderPlayerView(const Camera *camera, float dt);
+    virtual void addMessage(const irr::core::stringw &m,
+                            const AbstractKart *kart, float time,
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
-                            bool important=true);
+                            bool important=true,
+                            bool big_font=false);
+    virtual void update(float dt);
+    virtual void preRenderCallback(const Camera *camera);
+    // ------------------------------------------------------------------------
     /** Returns the size of the texture on which to render the minimap to. */
-    virtual const core::dimension2du 
+    virtual const core::dimension2du
                   getMiniMapSize() const = 0;
+    // ------------------------------------------------------------------------
     virtual void clearAllMessages() { m_messages.clear(); }
 
     /** Set the flag that a lightning should be shown. */
     void doLightning() { m_lightning = 1.0f; }
+
+    void drawGlobalPlayerIcons(int bottom_margin);
 
 };   // RaceGUIBase
 

@@ -1,4 +1,3 @@
-// $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2010 Steve Baker <sjbaker1@airmail.net>
@@ -24,6 +23,7 @@
 
 #include "karts/controller/ai_base_controller.hpp"
 
+class Camera;
 class LinearWorld;
 class QuadGraph;
 class Track;
@@ -37,6 +37,9 @@ namespace irr
     }
 }
 
+/**
+  * \ingroup controller
+  */
 class EndController : public AIBaseController
 {
 private:
@@ -60,6 +63,9 @@ private:
 
     float m_time_since_stuck;
 
+    /** Stores a pointer to the original controller. */
+    Controller *m_previous_controller;
+
     /** For debugging purpose: a sphere indicating where the AI 
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
@@ -75,7 +81,9 @@ private:
     void         findNonCrashingPoint(Vec3 *result);
     int          calcSteps();
 public:
-                 EndController(Kart *kart, StateManager::ActivePlayer* player);
+                 EndController(AbstractKart *kart, 
+                               StateManager::ActivePlayer* player, 
+                               Controller *prev_controller);
                 ~EndController();
     virtual void update      (float delta) ;
     virtual void reset       ();
@@ -84,6 +92,7 @@ public:
      *  to the right player. */
     virtual bool isPlayerController () const {return m_player!=NULL;}
     virtual void  action             (PlayerAction action, int value);
+    virtual void  newLap             (int lap);
 
 };   // EndKart
 

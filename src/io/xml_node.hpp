@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs
@@ -32,9 +31,12 @@
 #include <path.h>
 using namespace irr;
 
+#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/time.hpp"
+#include "utils/types.hpp"
 
+class InterpolationArray;
 class Vec3;
 
 /**
@@ -50,18 +52,20 @@ private:
     std::map<std::string, core::stringw> m_attributes;
     /** List of all sub nodes. */
     std::vector<XMLNode *>               m_nodes;
-    
+
     void readXML(io::IXMLReader *xml);
-    
+
     std::string                          m_file_name;
-    
+
 public:
+         LEAK_CHECK();
          XMLNode(io::IXMLReader *xml);
-    
+
          /** \throw runtime_error if the file is not found */
          XMLNode(const std::string &filename);
-    
+
         ~XMLNode();
+
     const std::string &getName() const {return m_name; }
     const XMLNode     *getNode(const std::string &name) const;
     const void         getNodes(const std::string &s, std::vector<XMLNode*>& out) const;
@@ -69,9 +73,9 @@ public:
     unsigned int       getNumNodes() const {return m_nodes.size(); }
     int get(const std::string &attribute, std::string *value) const;
     int get(const std::string &attribute, core::stringw *value) const;
-    int get(const std::string &attribute, int *value) const;
-    int get(const std::string &attribute, unsigned int *value) const;
-    int get(const std::string &attribute, Time::TimeType *value) const;
+    int get(const std::string &attribute, int32_t  *value) const;
+    int get(const std::string &attribute, uint32_t *value) const;
+    int get(const std::string &attribute, int64_t  *value) const;
     int get(const std::string &attribute, float *value) const;
     int get(const std::string &attribute, bool *value) const;
     int get(const std::string &attribute, Vec3 *value) const;
@@ -82,11 +86,15 @@ public:
     int get(const std::string &attribute, std::vector<std::string> *value) const;
     int get(const std::string &attribute, std::vector<float> *value) const;
     int get(const std::string &attribute, std::vector<int> *value) const;
+    int get(const std::string &attribute, InterpolationArray *value) const;
     int get(core::vector3df *value) const;
     int getXYZ(core::vector3df *value) const;
     int getXYZ(Vec3 *vaslue) const;
     int getHPR(core::vector3df *value) const;
     int getHPR(Vec3 *value) const;
+
+    bool hasChildNamed(const char* name) const;
+
     /** Handy functions to test the bit pattern returned by get(vector3df*).*/
     static bool hasX(int b) { return (b&1)==1; }
     static bool hasY(int b) { return (b&2)==2; }

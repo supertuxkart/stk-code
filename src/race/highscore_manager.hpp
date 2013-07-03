@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -36,10 +35,10 @@ class HighscoreManager
 {
 public:
 private:
-    static const unsigned int CURRENT_HSCORE_FILE_VERSION = 1;
+    static const unsigned int CURRENT_HSCORE_FILE_VERSION = 3;
     typedef std::vector<Highscores*> type_all_scores;
     type_all_scores m_all_scores;
-    
+
     std::string m_filename;
     bool        m_can_write;
 
@@ -51,10 +50,11 @@ public:
                ~HighscoreManager();
     void        saveHighscores();
     Highscores *getHighscores(const Highscores::HighscoreType highscore_type,
-                              int num_karts, 
-                              const RaceManager::Difficulty difficulty, 
-                              const std::string trackName, 
-                              const int number_of_laps);
+                              int num_karts,
+                              const RaceManager::Difficulty difficulty,
+                              const std::string trackName,
+                              const int number_of_laps,
+                              const bool reverse);
 };   // HighscoreManager
 
 extern HighscoreManager* highscore_manager;

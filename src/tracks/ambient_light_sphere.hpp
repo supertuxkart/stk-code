@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -46,16 +45,15 @@ private:
      *  file is stored. */
     float         m_inner_radius2;
 
-    /** THe full ambient color to use once the kart is inside the 
+    /** THe full ambient color to use once the kart is inside the
      *  inner radius. */
     video::SColor m_ambient_color;
 public:
-                  AmbientLightSphere(CheckManager *check_manager, 
-                                     const XMLNode &node, unsigned int index);
+                  AmbientLightSphere(const XMLNode &node, unsigned int index);
     virtual      ~AmbientLightSphere() {};
     virtual void  update(float dt);
-    virtual bool  isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
-                              int indx);
+    virtual bool  isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
+                              unsigned int indx);
 };   // AmbientLightSphere
 
 #endif

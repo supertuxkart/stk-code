@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
@@ -35,8 +34,6 @@ using namespace irr;
 
 class Material;
 
-const int MAX_NITRO = 16;
-
 /**
   * \ingroup karts
   */
@@ -63,10 +60,10 @@ public:
                   Moveable();
     virtual      ~Moveable();
     /** Returns the scene node of this moveable. */
-    scene::ISceneNode 
+    scene::ISceneNode
                  *getNode() const { return m_node; }
     void          setNode(scene::ISceneNode *n);
-    virtual const btVector3 
+    virtual const btVector3
                  &getVelocity()   const        {return m_body->getLinearVelocity();}
     const btVector3
                  &getVelocityLC() const        {return m_velocityLC;               }
@@ -78,36 +75,39 @@ public:
     float         getPitch()      const        {return m_pitch;                    }
     /** Returns the roll of the kart between -pi and pi.  */
     float         getRoll()       const        {return m_roll;                     }
-    const btQuaternion 
+    const btQuaternion
                   getRotation()   const        {return m_transform.getRotation();  }
 
     /** Enter flying mode */
     virtual void flyUp();
     virtual void flyDown();
     virtual void stopFlying();
-    
+
     /** Sets the XYZ coordinates of the moveable. */
-    void setXYZ(const Vec3& a) 
+    void setXYZ(const Vec3& a)
     {
         m_transform.setOrigin(a);
-        m_motion_state->setWorldTransform(m_transform);
+        if(m_motion_state)
+            m_motion_state->setWorldTransform(m_transform);
     }
     // ------------------------------------------------------------------------
     /** Sets the rotation of this moveable. */
     void setRotation(const btQuaternion&a)
     {
         m_transform.setRotation(a);
-        m_motion_state->setWorldTransform(m_transform);
+        if(m_motion_state)
+            m_motion_state->setWorldTransform(m_transform);
     }
     // ------------------------------------------------------------------------
-    virtual void  updateGraphics(float dt, const Vec3& off_xyz,  
+    virtual void  updateGraphics(float dt, const Vec3& off_xyz,
                                  const btQuaternion& off_rotation);
     virtual void  reset();
     virtual void  update(float dt) ;
     btRigidBody  *getBody() const {return m_body; }
-    void          createBody(float mass, btTransform& trans, 
-                             btCollisionShape *shape);
-    const btTransform 
+    void          createBody(float mass, btTransform& trans,
+                             btCollisionShape *shape,
+                             float restitution);
+    const btTransform
                  &getTrans() const {return m_transform;}
     void          setTrans(const btTransform& t);
 }

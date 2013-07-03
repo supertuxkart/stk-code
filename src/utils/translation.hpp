@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -27,8 +26,10 @@
 
 #  include "tinygettext/tinygettext.hpp"
 
-#  define _(String, ...)    (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__)))
-#  define _LTR(String, ...) (StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__))
+#  define _(String, ...)        (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__)))
+#undef _C
+#  define _C(Ctx, String, ...)  (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String, Ctx), ##__VA_ARGS__)))
+#  define _LTR(String, ...)     (StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__))
 #  define gettext_noop(String)  (String)
 #  define N_(String)            (gettext_noop (String))
 // libintl defines its own fprintf, which doesn't work properly
@@ -41,21 +42,25 @@ class Translations
 private:
     tinygettext::DictionaryManager m_dictionary_manager;
     tinygettext::Dictionary        m_dictionary;
-    
+
     irr::core::stringw m_converted_string;
     bool m_rtl;
-    
+
+    std::string m_current_language_name;
+
 public:
                        Translations();
-    
-    const wchar_t     *w_gettext(const wchar_t* original);
-    const wchar_t     *w_gettext(const char* original);
-    
+
+    const wchar_t     *w_gettext(const wchar_t* original, const char* context=NULL);
+    const wchar_t     *w_gettext(const char* original, const char* context=NULL);
+
     bool               isRTLLanguage() const;
     const wchar_t*     fribidize(const wchar_t* in_ptr);
     const wchar_t*     fribidize(const irr::core::stringw &str) { return fribidize(str.c_str()); }
 
     const std::vector<std::string>* getLanguageList() const;
+
+    std::string        getCurrentLanguageName();
 };   // Translations
 
 

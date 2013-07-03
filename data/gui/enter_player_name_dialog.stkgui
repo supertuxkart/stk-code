@@ -2,7 +2,7 @@
 
 <div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
 
-    <label id="title" width="100%" text_align="center"
+    <label id="title" width="100%" text_align="center" word_wrap="true"
            I18N="In the 'add new player' dialog" text="Enter the new player's name" proportion="1" />
 
     <spacer height="25" width="10" />

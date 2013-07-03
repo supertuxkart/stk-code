@@ -32,10 +32,10 @@ using namespace irr::core;
 // ------------------------------------------------------------------------------------------------------
 
 ConfirmResolutionDialog::ConfirmResolutionDialog() : ModalDialog(0.7f, 0.7f)
-{    
+{
     loadFromFile("confirm_resolution_dialog.stkgui");
     m_remaining_time = 10.99f;
-    
+
     updateMessage();
 }
 
@@ -51,7 +51,7 @@ void ConfirmResolutionDialog::onUpdate(float dt)
 {
     const int previous_number = (int)m_remaining_time;
     m_remaining_time -= dt;
-    
+
     if (m_remaining_time < 0)
     {
         ModalDialog::dismiss();
@@ -61,7 +61,7 @@ void ConfirmResolutionDialog::onUpdate(float dt)
     {
         updateMessage();
     }
-    
+
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ void ConfirmResolutionDialog::updateMessage()
     //I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
     stringw msg = _("Confirm resolution within %i seconds", (int)m_remaining_time);
     //std::cout << stringc(msg.c_str()).c_str() << std::endl;
-    
+
     LabelWidget* countdown_message = getWidget<LabelWidget>("title");
     countdown_message->setText( msg.c_str(), false );
 }
@@ -82,18 +82,18 @@ GUIEngine::EventPropagation ConfirmResolutionDialog::processEvent(const std::str
 {
 
     if (eventSource == "cancel")
-    {   
+    {
         ModalDialog::dismiss();
-        
+
         irr_driver->cancelResChange();
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "accept")
     {
         ModalDialog::dismiss();
-        
+
         return GUIEngine::EVENT_BLOCK;
     }
-    
+
     return GUIEngine::EVENT_LET;
 }

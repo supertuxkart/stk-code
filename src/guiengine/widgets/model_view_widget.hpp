@@ -25,12 +25,13 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "utils/aligned_array.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
 {
     /** \brief A model view widget.
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class ModelViewWidget : public IconButtonWidget
     {
@@ -59,8 +60,10 @@ namespace GUIEngine
         
     public:
         
+        LEAK_CHECK()
+        
         ModelViewWidget();
-        ~ModelViewWidget();
+        virtual ~ModelViewWidget();
         
         void add();
         void clearModels();
@@ -81,6 +84,8 @@ namespace GUIEngine
         
         /** Rotate to 'targetAngle' in degrees at given speed (in degrees per second) */
         void setRotateTo(float targetAngle, float speed);
+        
+        void clearRttProvider();
     };
     
 }

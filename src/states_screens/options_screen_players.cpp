@@ -17,10 +17,11 @@
 
 #include "states_screens/options_screen_players.hpp"
 
+#include "challenges/unlock_manager.hpp"
 #include "config/player.hpp"
 #include "config/device_config.hpp"
-#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -32,7 +33,9 @@
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/story_mode_lobby.hpp"
 
+#include <IGUIButton.h>
 
 #include <iostream>
 #include <sstream>
@@ -63,86 +66,72 @@ void OptionsScreenPlayers::init()
 
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
     if (tabBar != NULL) tabBar->select( "tab_players", PLAYER_ID_GAME_MASTER );
-    
+
     tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
     tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
     tabBar->getRibbonChildren()[2].setTooltip( _("User Interface") );
     tabBar->getRibbonChildren()[4].setTooltip( _("Controls") );
-    
+
     ListWidget* players = this->getWidget<ListWidget>("players");
     assert(players != NULL);
-    
-    const int playerAmount = UserConfigParams::m_all_players.size();
-    for(int n=0; n<playerAmount; n++)
+
+    refreshPlayerList();
+
+    ButtonWidget* you = getWidget<ButtonWidget>("playername");
+    const std::string& playerID = unlock_manager->getCurrentSlot()->getPlayerID();
+    core::stringw playerName = L"-";
+    PlayerProfile* curr;
+    for_in (curr, UserConfigParams::m_all_players)
     {
-        // FIXME: Using a truncated ASCII string for internal ID. Let's cross our fingers
-        //        and hope no one enters two player names that, when stripped down to ASCII,
-        //        give the same identifier...
-        players->addItem( core::stringc(UserConfigParams::m_all_players[n].getName().c_str()).c_str(),
-                          translations->fribidize(UserConfigParams::m_all_players[n].getName()) );
+        if (curr->getUniqueID() == playerID)
+        {
+            playerName = curr->getName();
+            break;
+        }
+    }
+    you->setText( playerName );
+    ((gui::IGUIButton*)you->getIrrlichtElement())->setOverrideFont( GUIEngine::getSmallFont() );
+
+    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+    {
+        players->setDeactivated();
+        you->setDeactivated();
+    }
+    else
+    {
+        players->setActivated();
+        you->setActivated();
     }
 }   // init
 
 // -----------------------------------------------------------------------------
 
-bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfile* player)
+bool OptionsScreenPlayers::renamePlayer(const stringw& newName, PlayerProfile* player)
 {
-    // FIXME: Using a truncated ASCII string for internal ID. Let's cross our fingers
-    //        and hope no one enters two player names that, when stripped down to ASCII,
-    //        give the same identifier...
-    stringc newNameC( newName );
-    
+    player->setName( newName );
+    refreshPlayerList();
+    return true;
+}   // renamePlayer
+
+// -----------------------------------------------------------------------------
+
+void OptionsScreenPlayers::onNewPlayerWithName(const stringw& newName)
+{
     ListWidget* players = this->getWidget<ListWidget>("players");
-    if (players == NULL) return false;
-    
-    // ---- Add new player
-    if (player == NULL)
+    if (players != NULL)
     {
-        // check for duplicates
-        const int amount = UserConfigParams::m_all_players.size();
-        for (int n=0; n<amount; n++)
-        {
-            if (UserConfigParams::m_all_players[n].getName() == newName) return false;
-        }
-        
-        // add new player
-        UserConfigParams::m_all_players.push_back( new PlayerProfile(newName) );
-        
+        core::stringc newNameC(newName.c_str());
         players->addItem( newNameC.c_str(), translations->fribidize(newName) );
     }
-    else // ---- Rename existing player
-    {
-        player->setName( newName );
-        
-        // refresh list display
-        players->clear();
-        const int playerAmount =  UserConfigParams::m_all_players.size();
-        for(int n=0; n<playerAmount; n++)
-        {
-            players->addItem(newNameC.c_str(), translations->fribidize(UserConfigParams::m_all_players[n].getName()));
-        }
-        
-    }
-    return true;
-}   // gotNewPlayerName
+}
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenPlayers::deletePlayer(PlayerProfile* player)
 {
     UserConfigParams::m_all_players.erase(player);
-    
-    // refresh list display
-    ListWidget* players = this->getWidget<ListWidget>("players");
-    if(players == NULL) return;
-    players->clear();
-    
-    const int playerAmount =  UserConfigParams::m_all_players.size();
-    for(int n=0; n<playerAmount; n++)
-    {
-        players->addItem(core::stringc(UserConfigParams::m_all_players[n].getName().c_str()).c_str(),
-                         translations->fribidize(UserConfigParams::m_all_players[n].getName()));
-    }
+
+    refreshPlayerList();
 }   // deletePlayer
 
 // -----------------------------------------------------------------------------
@@ -151,16 +140,19 @@ void OptionsScreenPlayers::tearDown()
 {
     Screen::tearDown();
     user_config->saveConfig();
+    bool created = unlock_manager->createSlotsIfNeeded();
+    bool removed = unlock_manager->deleteSlotsIfNeeded();
+    if (created || removed) unlock_manager->save();
 }   // tearDown
 
 // -----------------------------------------------------------------------------
 
 void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name, const int playerID)
-{    
+{
     if (name == "options_choice")
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
-        
+
         if (selection == "tab_audio") StateManager::get()->replaceTopMostScreen(OptionsScreenAudio::getInstance());
         else if (selection == "tab_video") StateManager::get()->replaceTopMostScreen(OptionsScreenVideo::getInstance());
         else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
@@ -173,14 +165,14 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
     }
     else if (name == "addplayer")
     {
-        new EnterPlayerNameDialog(0.5f, 0.4f);
+        new EnterPlayerNameDialog(this, 0.5f, 0.4f);
     }
     else if (name == "players")
     {
         // Find which player in the list was clicked
         ListWidget* players = this->getWidget<ListWidget>("players");
         assert(players != NULL);
-        
+
         core::stringw selectedPlayer = players->getSelectionLabel();
         const int playerAmount = UserConfigParams::m_all_players.size();
         for (int n=0; n<playerAmount; n++)
@@ -194,8 +186,14 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
                 return;
             }
         } // end for
-    }   // name=="players"
-    
+    }
+    else if (name == "playername")
+    {
+        UserConfigParams::m_default_player = L"";
+        race_manager->clearKartLastPositionOnOverworld();
+        StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
+    }
+
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
@@ -205,6 +203,30 @@ void OptionsScreenPlayers::selectPlayer(const irr::core::stringw& name)
     ListWidget* players = this->getWidget<ListWidget>("players");
     assert(players != NULL);
     players->selectItemWithLabel(name);
-    
+
     players->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+}
+
+// ----------------------------------------------------------------------------
+/** Refreshes the list of players.
+ */
+bool OptionsScreenPlayers::refreshPlayerList()
+{
+    ListWidget* players = this->getWidget<ListWidget>("players");
+    if (players == NULL) return false;
+    // Get rid of previous
+    players->clear();
+    // Rebuild it
+    const int playerAmount = UserConfigParams::m_all_players.size();
+    for (int i = 0; i < playerAmount; i++)
+    {
+        // FIXME: Using a truncated ASCII string for internal ID. Let's cross
+        // our fingers and hope no one enters two player names that,
+        // when stripped down to ASCII, give the same identifier...
+        players->addItem(
+            core::stringc(UserConfigParams::m_all_players[i].getName().c_str()).c_str(),
+            translations->fribidize(UserConfigParams::m_all_players[i].getName()));
+    }
+
+    return true;
 }

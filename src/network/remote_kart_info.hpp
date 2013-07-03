@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008  Joerg Henrichs
@@ -23,6 +22,14 @@
 #include <string>
 #include <irrString.h>
 
+enum SoccerTeam
+{
+    SOCCER_TEAM_NONE=-1,
+    SOCCER_TEAM_RED=0,
+    SOCCER_TEAM_BLUE=1,
+    NB_SOCCER_TEAMS
+};
+
 class RemoteKartInfo
 {
         std::string         m_kart_name;
@@ -30,28 +37,33 @@ class RemoteKartInfo
         int                 m_local_player_id;
         int                 m_global_player_id;
         int                 m_host_id;
+        SoccerTeam          m_soccer_team;
 
 public:
-         RemoteKartInfo(int player_id, const std::string& kart_name, 
+         RemoteKartInfo(int player_id, const std::string& kart_name,
                         const irr::core::stringw& user_name, int host_id)
-                      : m_kart_name(kart_name), m_user_name(user_name), 
-                        m_local_player_id(player_id), m_host_id(host_id) 
+                      : m_kart_name(kart_name), m_user_name(user_name),
+                        m_local_player_id(player_id), m_host_id(host_id), m_soccer_team(SOCCER_TEAM_NONE)
                                              {};
          RemoteKartInfo(const std::string& kart_name)
                                              {m_kart_name=kart_name; m_user_name="";
                                               m_host_id=-1; m_local_player_id=-1;}
-         RemoteKartInfo()                    {m_kart_name=""; m_user_name=""; 
+         RemoteKartInfo()                    {m_kart_name=""; m_user_name="";
                                               m_host_id=-1; m_local_player_id=-1;}
     void setKartName(const std::string& n)   { m_kart_name = n;              }
     void setPlayerName(const irr::core::stringw& u) { m_user_name = u;              }
     void setHostId(int id)                   { m_host_id = id;               }
     void setLocalPlayerId(int id)            { m_local_player_id = id;       }
     void setGlobalPlayerId(int id)           { m_global_player_id = id;      }
+    void setSoccerTeam(SoccerTeam team)      { m_soccer_team = team;         }
+
     int  getHostId() const                   { return m_host_id;             }
     int  getLocalPlayerId() const            { return m_local_player_id;     }
     int  getGlobalPlayerId() const           { return m_global_player_id;    }
     const std::string& getKartName() const   { return m_kart_name;           }
     const irr::core::stringw& getPlayerName() const { return m_user_name;           }
+    const SoccerTeam getSoccerTeam() const   {return m_soccer_team;          }
+
     bool operator<(const RemoteKartInfo& other) const
     {
         return ((m_host_id<other.m_host_id) ||

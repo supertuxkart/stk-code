@@ -29,26 +29,26 @@ using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( HelpScreen4 );
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 HelpScreen4::HelpScreen4() : Screen("help4.stkgui")
 {
 }   // HelpScreen4
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void HelpScreen4::loadedFromFile()
 {
 }   // loadedFromFile
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void HelpScreen4::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "category")
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
-        
+
         if (selection == "page1") StateManager::get()->replaceTopMostScreen(HelpScreen1::getInstance());
         else if (selection == "page2") StateManager::get()->replaceTopMostScreen(HelpScreen2::getInstance());
         else if(selection == "page3") StateManager::get()->replaceTopMostScreen(HelpScreen3::getInstance());
@@ -59,14 +59,14 @@ void HelpScreen4::eventCallback(Widget* widget, const std::string& name, const i
     }
 }   // eventCallback
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void HelpScreen4::init()
 {
     Screen::init();
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
-    
+
     if (w != NULL) w->select( "page4", PLAYER_ID_GAME_MASTER );
 }   // init
 
-// ------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

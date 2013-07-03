@@ -1,4 +1,3 @@
-//  $Id: three_d_animation.cpp 1681 2008-04-09 13:52:48Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -21,99 +20,48 @@
 
 #include <stdio.h>
 
-#include "animations/ipo.hpp"
-#include "graphics/irr_driver.hpp"
+#include "audio/sfx_base.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
-#include "physics/physics.hpp"
 #include "physics/kart_motion_state.hpp"
+#include "physics/physics.hpp"
+#include "physics/physical_object.hpp"
+#include "physics/triangle_mesh.hpp"
 #include "tracks/bezier_curve.hpp"
+#include "tracks/track_object.hpp"
 #include "utils/constants.hpp"
+#include <ISceneManager.h>
+#include <IMeshSceneNode.h>
 
-ThreeDAnimation::ThreeDAnimation(const XMLNode &node)
-               : AnimationBase(node)
+ThreeDAnimation::ThreeDAnimation(const XMLNode &node, TrackObject* object) : AnimationBase(node)
 {
+    m_object = object;
+
+    m_crash_reset  = false;
+    m_explode_kart = false;
+    node.get("reset", &m_crash_reset);
+    node.get("explode", &m_explode_kart);
+
+    m_important_animation = (World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+    node.get("important", &m_important_animation);
+
     /** Save the initial position and rotation in the base animation object. */
-    setInitialTransform(AnimationBase::m_node->getPosition(),
-                        AnimationBase::m_node->getRotation() );
+    setInitialTransform(object->getInitXYZ(),
+                        object->getInitRotation() );
+    m_hpr = object->getInitRotation();
 
-    m_body            = NULL;
-    m_motion_state    = NULL;
-    m_collision_shape = NULL;
-    m_hpr = AnimationBase::m_node->getRotation();
-    std::string shape;
-    node.get("shape", &shape);
-    if(shape!="")
-    {
-        createPhysicsBody(shape);
-    }
+    assert(!isnan(m_hpr.getX()));
+    assert(!isnan(m_hpr.getY()));
+    assert(!isnan(m_hpr.getZ()));
 }   // ThreeDAnimation
-
-// ----------------------------------------------------------------------------
-/** Creates a bullet rigid body for this animated model. */
-void ThreeDAnimation::createPhysicsBody(const std::string &shape)
-{
-    // 1. Determine size of the object
-    // -------------------------------
-    Vec3 min, max;
-    MeshTools::minMax3D(m_mesh, &min, &max);
-    Vec3 extend = max-min;
-    if(shape=="box")
-    {
-        m_collision_shape = new btBoxShape(0.5*extend);
-    }
-    else if(shape=="coneX")
-    {
-        float radius = 0.5f*std::max(extend.getY(), extend.getZ());
-        m_collision_shape = new btConeShapeX(radius, extend.getX());
-    }
-    else if(shape=="coneY" || shape=="cone")
-    {
-        float radius = 0.5f*std::max(extend.getX(), extend.getZ());
-        m_collision_shape = new btConeShape(radius, extend.getY());
-    }
-    else if(shape=="coneZ")
-    {
-        // Note that the b3d model and therefore the extend has the
-        // irrlicht axis, i.e. Y and Z swapped. Also we need to
-        // convert 
-        float radius = 0.5f*std::max(extend.getX(), extend.getY());
-        m_collision_shape = new btConeShapeZ(radius, extend.getZ());
-    }
-    else
-    {
-        fprintf(stderr, "Shape '%s' is not supported, ignored.\n", shape.c_str());
-        return;
-    }
-    const core::vector3df &hpr=m_node->getRotation()*DEGREE_TO_RAD;
-    btQuaternion q(hpr.X, hpr.Y, hpr.Z);
-    const core::vector3df &xyz=m_node->getPosition();
-    Vec3 p(xyz);
-    btTransform trans(q,p);
-    m_motion_state = new KartMotionState(trans);
-    btRigidBody::btRigidBodyConstructionInfo info(0, m_motion_state, 
-                                                  m_collision_shape);
-
-    m_body = new btRigidBody(info);
-    m_user_pointer.set(this);
-    m_body->setUserPointer(&m_user_pointer);
-    World::getWorld()->getPhysics()->addBody(m_body);
-    m_body->setCollisionFlags( m_body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
-    m_body->setActivationState(DISABLE_DEACTIVATION);
-}   // createPhysicsBody
 
 // ----------------------------------------------------------------------------
 /** Destructor. */
 ThreeDAnimation::~ThreeDAnimation()
 {
-    if(m_body)
-    {
-        World::getWorld()->getPhysics()->removeBody(m_body);
-        delete m_body;
-        delete m_motion_state;
-        delete m_collision_shape;
-    }
 }   // ~ThreeDAnimation
 
 // ----------------------------------------------------------------------------
@@ -122,34 +70,37 @@ ThreeDAnimation::~ThreeDAnimation()
  */
 void ThreeDAnimation::update(float dt)
 {
-    core::vector3df xyz   = m_node->getPosition();
-    core::vector3df scale = m_node->getScale();
-    AnimationBase::update(dt, &xyz, &m_hpr, &scale);     //updates all IPOs
-    m_node->setPosition(xyz);
-    m_node->setScale(scale);
-    // Note that the rotation order of irrlicht is different from the one
-    // in blender. So in order to reproduce the blender IPO rotations 
-    // correctly, we have to get the rotations around each axis and combine
-    // them in the right order for irrlicht
-    core::matrix4 m;
-    m.makeIdentity();
-    core::matrix4 mx;
-    mx.setRotationDegrees(core::vector3df(m_hpr.X, 0, 0));
-    core::matrix4 my;
-    my.setRotationDegrees(core::vector3df(0, m_hpr.Y, 0));
-    core::matrix4 mz;
-    mz.setRotationDegrees(core::vector3df(0, 0, m_hpr.Z));
-    m = my*mz*mx;
-    core::vector3df hpr = m.getRotationDegrees();
-    m_node->setRotation(hpr);
-
-    // Now update the position of the bullet body if there is one:
-    if(m_body)
+    //if ( UserConfigParams::m_graphical_effects || m_important_animation )
     {
-        hpr = DEGREE_TO_RAD*hpr;
-        btQuaternion q(-hpr.Z, -hpr.X, -hpr.Y);
-        Vec3 p(xyz);
-        btTransform trans(q,p);
-        m_motion_state->setWorldTransform(trans);
+        Vec3 xyz   = m_object->getPosition();
+        Vec3 scale = m_object->getScale();
+
+        AnimationBase::update(dt, &xyz, &m_hpr, &scale);     //updates all IPOs
+        //m_node->setPosition(xyz.toIrrVector());
+        //m_node->setScale(scale.toIrrVector());
+
+        // Note that the rotation order of irrlicht is different from the one
+        // in blender. So in order to reproduce the blender IPO rotations
+        // correctly, we have to get the rotations around each axis and combine
+        // them in the right order for irrlicht
+        core::matrix4 m;
+        m.makeIdentity();
+        core::matrix4 mx;
+        assert(!isnan(m_hpr.getX()));
+        assert(!isnan(m_hpr.getY()));
+        assert(!isnan(m_hpr.getZ()));
+        mx.setRotationDegrees(core::vector3df(m_hpr.getX(), 0, 0));
+        core::matrix4 my;
+        my.setRotationDegrees(core::vector3df(0, m_hpr.getY(), 0));
+        core::matrix4 mz;
+        mz.setRotationDegrees(core::vector3df(0, 0, m_hpr.getZ()));
+        m = my*mz*mx;
+        core::vector3df hpr = m.getRotationDegrees();
+        //m_node->setRotation(hpr);
+
+        if (m_object)
+        {
+            m_object->move(xyz.toIrrVector(), hpr, scale.toIrrVector(), true);
+        }
     }
 }   // update

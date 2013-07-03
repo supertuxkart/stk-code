@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs
@@ -19,15 +18,19 @@
 
 #include "modes/profile_world.hpp"
 
+#include "main_loop.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
+#include "karts/kart_with_stats.hpp"
+#include "karts/controller/controller.hpp"
 #include "tracks/track.hpp"
 
 #include <ISceneManager.h>
 
 ProfileWorld::ProfileType ProfileWorld::m_profile_mode=PROFILE_NONE;
-int   ProfileWorld::m_num_laps = 0;
-float ProfileWorld::m_time   = 0.0f;
+int   ProfileWorld::m_num_laps    = 0;
+float ProfileWorld::m_time        = 0.0f;
+bool  ProfileWorld::m_no_graphics = false;
 
 //-----------------------------------------------------------------------------
 /** The constructor sets the number of (local) players to 0, since only AI
@@ -36,28 +39,42 @@ float ProfileWorld::m_time   = 0.0f;
 ProfileWorld::ProfileWorld()
 {
     race_manager->setNumLocalPlayers(0);
-    // Set number of laps so that the end of the race can be detected by 
+    // Set number of laps so that the end of the race can be detected by
     // quering the number of finished karts from the race manager (in laps
-    // based profiling) - otherwise just a high number.
-    race_manager->setNumLaps(m_profile_mode==PROFILE_LAPS ? m_num_laps : 99999);
-    m_phase            = RACE_PHASE;
+    // based profiling) - in case of time based profiling, the number of
+    // laps is set to 99999.
+    race_manager->setNumLaps(m_num_laps);
+    setPhase(RACE_PHASE);
     m_frame_count      = 0;
     m_start_time       = irr_driver->getRealTime();
     m_num_triangles    = 0;
     m_num_culls        = 0;
     m_num_solid        = 0;
-    m_num_transparent  = 0; 
+    m_num_transparent  = 0;
     m_num_trans_effect = 0;
     m_num_calls        = 0;
 }   // ProfileWorld
 
 //-----------------------------------------------------------------------------
-/** Enables profiling for a certain amount of time.
+/** Sets profile mode off again.
+ *  Needed because demo mode's closing allows the player to continue playing
+ *  STK. If we didn't set it off, profile mode would stay activated.
+ */
+ProfileWorld::~ProfileWorld()
+{
+    m_profile_mode = PROFILE_NONE;
+}
+
+//-----------------------------------------------------------------------------
+/** Enables profiling for a certain amount of time. It also sets the
+ *  number of laps to a high number (so that the lap count will not finish
+ *  a race before the time is over).
  *  \param time Time to profile a race for.
  */
 void ProfileWorld::setProfileModeTime(float time)
 {
     m_profile_mode = PROFILE_TIME;
+    m_num_laps     = 99999;
     m_time         = time;
 }   // setProfileModeTime
 
@@ -83,18 +100,17 @@ void ProfileWorld::setProfileModeLaps(int laps)
  *         this player globally (i.e. including network players).
  *  \param init_pos The start XYZ coordinates.
  */
-Kart *ProfileWorld::createKart(const std::string &kart_ident, int index, 
-                               int local_player_id, int global_player_id)
+AbstractKart *ProfileWorld::createKart(const std::string &kart_ident, int index,
+                                       int local_player_id, int global_player_id,
+                                       RaceManager::KartType type)
 {
-    // Ignore the kart identifier specified for this kart, instead load
-    // _only_ the kart specified for the player. This allows to measure
-    // the impact different karts have on performance.
-    const std::string prof_kart_id = race_manager->getKartIdent(
-                                           race_manager->getNumberOfKarts()-1);
     btTransform init_pos   = m_track->getStartTransform(index);
 
-    Kart *new_kart         = new Kart(prof_kart_id, m_track, index+1, false, init_pos, RaceManager::KT_AI);
-
+    Kart *new_kart         = new KartWithStats(kart_ident,
+                                               /*world kart id*/ index,
+                                               /*position*/ index+1,
+                                               init_pos);
+    new_kart->init(RaceManager::KT_AI);
     Controller *controller = loadAIController(new_kart);
     new_kart->setController(controller);
 
@@ -102,7 +118,8 @@ Kart *ProfileWorld::createKart(const std::string &kart_ident, int index,
     // karts can be seen.
     if (index == (int)race_manager->getNumberOfKarts()-1)
     {
-        new_kart->setCamera(new Camera(index, new_kart));
+        // The camera keeps track of all cameras and will free them
+        Camera::createCamera(new_kart);
     }
     return new_kart;
 }   // createKart
@@ -116,20 +133,28 @@ bool ProfileWorld::isRaceOver()
     if(m_profile_mode==PROFILE_TIME)
         return getTime()>m_time;
 
-    // Now it must be laps based profiling:
-    return race_manager->getFinishedKarts()==getNumKarts();
+    if(m_profile_mode == PROFILE_LAPS )
+    {
+        // Now it must be laps based profiling:
+        return race_manager->getFinishedKarts()==getNumKarts();
+    }
+    // Unknown profile mode
+    assert(false);
+    return false;  // keep compiler happy
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
-/** Counts the number of framces.
+/** Counts the number of frames.
  */
 void ProfileWorld::update(float dt)
 {
     StandardRace::update(dt);
+
     m_frame_count++;
     video::IVideoDriver *driver = irr_driver->getVideoDriver();
     io::IAttributes   *attr = irr_driver->getSceneManager()->getParameters();
-    m_num_triangles    += (int)(driver->getPrimitiveCountDrawn( 0 ) * ( 1.f / 1000.f ));
+    m_num_triangles    += (int)(driver->getPrimitiveCountDrawn( 0 )
+                        * ( 1.f / 1000.f ));
     m_num_calls        += attr->getAttributeAsInt("calls");
     m_num_culls        += attr->getAttributeAsInt("culled" );
     m_num_solid        += attr->getAttributeAsInt("drawn_solid" );
@@ -165,39 +190,146 @@ void ProfileWorld::enterRaceOverState()
     for (unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
     {
         // ---------- update rank ------
-        if (m_karts[i]->hasFinishedRace() || m_karts[i]->isEliminated()) continue;
+        if (m_karts[i]->hasFinishedRace() || m_karts[i]->isEliminated())
+            continue;
         m_karts[i]->finishedRace(estimateFinishTimeForKart(m_karts[i]));
     }
 
+    // Print framerate statistics
     float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
     printf("Number of frames: %d time %f, Average FPS: %f\n",
            m_frame_count, runtime, (float)m_frame_count/runtime);
-    printf("Average # drawn nodes           %f k\n",
-            (float)m_num_triangles/m_frame_count);
-    printf("Average # culled nodes:         %f k\n",
-            (float)m_num_culls/m_frame_count);
-    printf("Average # solid nodes:          %f k\n",
-            (float)m_num_solid/m_frame_count);
-    printf("Average # transparent nodes:    %f\n",
-            (float)m_num_transparent/m_frame_count);
-    printf("Average # transp. effect nodes: %f\n",
-            (float)m_num_trans_effect/m_frame_count);
 
+    // Print geometry statistics if we're not in no-graphics mode
+    if(!m_no_graphics)
+    {
+        printf("Average # drawn nodes           %f k\n",
+               (float)m_num_triangles/m_frame_count);
+        printf("Average # culled nodes:         %f k\n",
+               (float)m_num_culls/m_frame_count);
+        printf("Average # solid nodes:          %f k\n",
+               (float)m_num_solid/m_frame_count);
+        printf("Average # transparent nodes:    %f\n",
+               (float)m_num_transparent/m_frame_count);
+        printf("Average # transp. effect nodes: %f\n",
+               (float)m_num_trans_effect/m_frame_count);
+    }
+
+    // Print race statistics for each individual kart
     float min_t=999999.9f, max_t=0.0, av_t=0.0;
+    printf("name,start_position,end_position,time,average_speed,top_speed,"
+           "skid_time,rescue_time,rescue_count,brake_count,"
+           "explosion_time,explosion_count,bonus_count,banana_count,"
+           "small_nitro_count,large_nitro_count,bubblegum_count\n");
+
+    std::set<std::string> all_groups;
+
     for ( KartList::size_type i = 0; i < m_karts.size(); ++i)
     {
-        max_t = std::max(max_t, m_karts[i]->getFinishTime());
-        min_t = std::min(min_t, m_karts[i]->getFinishTime());
-        if(m_profile_mode==PROFILE_TIME)
-            av_t += getTime();
-        else
-            av_t += m_karts[i]->getFinishTime();
-        printf("%ls  start %d  end %d time %f\n",
-            m_karts[i]->getName(), 1 + (int)i,
-            m_karts[i]->getPosition(),
-            m_karts[i]->getFinishTime());
+        KartWithStats* kart = dynamic_cast<KartWithStats*>(m_karts[i]);
+
+        max_t = std::max(max_t, kart->getFinishTime());
+        min_t = std::min(min_t, kart->getFinishTime());
+        av_t += kart->getFinishTime();
+        printf("%s %s,", kart->getIdent().c_str(),
+                kart->getController()->getControllerName().c_str());
+        all_groups.insert(kart->getController()->getControllerName());
+        printf("%d,%d,%4.2f,", 1 + (int)i, kart->getPosition(), kart->getFinishTime());
+        float distance = (float)(m_profile_mode==PROFILE_LAPS
+                                 ? race_manager->getNumLaps() : 1);
+        distance *= m_track->getTrackLength();
+        printf("%4.2f,%3.2f,%4.2f,%4.2f,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d,%d\n",
+               distance/kart->getFinishTime(), kart->getTopSpeed(),
+               kart->getSkiddingTime(), kart->getRescueTime(),
+               kart->getRescueCount(), kart->getBrakeCount(),
+               kart->getExplosionTime(), kart->getExplosionCount(),
+               kart->getBonusCount(), kart->getBananaCount(),
+               kart->getSmallNitroCount(), kart->getLargeNitroCount(),
+               kart->getBubblegumCount(), kart->getOffTrackCount() );
     }
+
+    // Print group statistics of all karts
     printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_karts.size());
 
-    std::exit(-2);
+    // Determine maximum length of group name
+    unsigned int max_len=4;   // for 'name' heading
+    for(std::set<std::string>::iterator it = all_groups.begin();
+        it !=all_groups.end(); it++)
+    {
+        if(it->size()>max_len) max_len = it->size();
+    }
+    max_len++;  // increase by 1 for one additional space after the name
+
+    printf("\nname");
+    for(unsigned int j=4; j<max_len; j++)
+        printf(" ");
+    printf("Strt End  Time    AvSp  Top   Skid  Resc Rsc Brake Expl Exp Itm Ban SNitLNit Bub  Off\n");
+
+    for(std::set<std::string>::iterator it = all_groups.begin();
+        it !=all_groups.end(); it++)
+    {
+        int   count         = 0,    position_gain   = 0,    rescue_count = 0;
+        int   brake_count   = 0,    bonus_count     = 0,    banana_count = 0;
+        int   l_nitro_count = 0,    s_nitro_count   = 0,    bubble_count = 0;
+        int   expl_count    = 0,    off_track_count = 0;
+        float skidding_time = 0.0f, rescue_time     = 0.0f, expl_time    = 0.0f;
+        float av_time       = 0.0f;
+        for ( unsigned int i = 0; i < m_karts.size(); ++i)
+        {
+            KartWithStats* kart = dynamic_cast<KartWithStats*>(m_karts[i]);
+            const std::string &name=kart->getController()->getControllerName();
+            if(name!=*it)
+                continue;
+            count ++;
+            printf("%s", name.c_str());
+            for(unsigned int j=name.size(); j<max_len; j++)
+                printf(" ");
+
+            printf("%4d %3d %6.2f ", 1 + i, kart->getPosition(),
+                                     kart->getFinishTime());
+            position_gain += 1+i - kart->getPosition();
+
+            float distance = (float)(m_profile_mode==PROFILE_LAPS
+                                     ? race_manager->getNumLaps() : 1);
+            distance *= m_track->getTrackLength();
+            printf(" %4.2f %3.2f %6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d\n",
+                   distance/kart->getFinishTime(),
+                   kart->getTopSpeed(),
+                   kart->getSkiddingTime(),        kart->getRescueTime(),
+                   kart->getRescueCount(),         kart->getBrakeCount(),
+                   kart->getExplosionTime(),       kart->getExplosionCount(),
+                   kart->getBonusCount(),          kart->getBananaCount(),
+                   kart->getSmallNitroCount(),     kart->getLargeNitroCount(),
+                   kart->getBubblegumCount(),      kart->getOffTrackCount()
+                   );
+            printf("nitro %f\n", kart->getEnergy());
+            av_time += kart->getFinishTime();
+            skidding_time   += kart->getSkiddingTime();
+            rescue_time     += kart->getRescueTime();
+            rescue_count    += kart->getRescueCount();
+            brake_count     += kart->getBrakeCount();
+            bonus_count     += kart->getBonusCount();
+            banana_count    += kart->getBananaCount();
+            l_nitro_count   += kart->getLargeNitroCount();
+            s_nitro_count   += kart->getSmallNitroCount();
+            bubble_count    += kart->getBubblegumCount();
+            expl_time       += kart->getExplosionTime();
+            expl_count      += kart->getExplosionCount();
+            off_track_count += kart->getOffTrackCount();
+        }    // for i < m_karts.size
+        for(unsigned int j=0; j<max_len + 85; j++)
+            printf("-");
+        printf("\n%s", it->c_str());
+        for(unsigned int j=it->size(); j<max_len; j++)
+            printf(" ");
+        printf("%+4d     %6.2f %13s", position_gain, av_time/count, "");
+
+        printf("%6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d\n\n",
+               skidding_time/count, rescue_time/count, rescue_count,
+               brake_count, expl_time, expl_count, bonus_count,
+               banana_count, s_nitro_count, l_nitro_count, bubble_count,
+               off_track_count);
+    }   // for it !=all_groups.end
+    delete this;
+    main_loop->abort();
 }   // enterRaceOverState

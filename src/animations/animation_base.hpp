@@ -1,4 +1,3 @@
-//  $Id: animation_base.hpp 1681 2008-04-09 13:52:48Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -22,23 +21,26 @@
 
 /**
  * \defgroup animations
+ * This module manages interpolation-based animation (of position, rotation
+ * and/or scale)
  */
 
 #include <vector>
 
-#include <vector3d.h>
-using namespace irr;
+// Note that ipo.hpp is included here in order that PtrVector<Ipo> can call
+// the proper destructor!
+#include "animations/ipo.hpp"
+#include "utils/ptr_vector.hpp"
 
-#include "tracks/track_object.hpp"
+#include <algorithm>
 
 class XMLNode;
-class Ipo;
 
 /**
   * \brief A base class for all animations.
   * \ingroup animations
   */
-class AnimationBase : public TrackObject
+class AnimationBase
 {
 private:
     /** Two types of animations: cyclic ones that play all the time, and
@@ -48,35 +50,53 @@ private:
     /** True if the animation is currently playing. */
     bool  m_playing;
 
-    /** For one time animations: start time. */
-    float m_start;
+    /** The current time used in the IPOs. */
+    float m_current_time;
 
     /** For cyclic animations: duration of the cycle. */
     float m_cycle_length;
 
-    /** The current time in the cycle of a cyclic animation. */
-    float m_current_time;
-
     /** The inital position of this object. */
-    core::vector3df m_initial_xyz;
+    Vec3 m_initial_xyz;
 
     /** The initial rotation of this object. */
-    core::vector3df m_initial_hpr;
+    Vec3 m_initial_hpr;
+
 protected:
     /** All IPOs for this animation. */
-    std::vector<Ipo*> m_all_ipos;
+    PtrVector<Ipo>  m_all_ipos;
 
 public:
                  AnimationBase(const XMLNode &node);
-    virtual     ~AnimationBase();
-    virtual void update(float dt, core::vector3df *xyz, core::vector3df *hpr,
-                        core::vector3df *scale);
+                 AnimationBase(Ipo *ipo);
+    virtual void update(float dt, Vec3 *xyz=NULL, Vec3 *hpr=NULL,
+                                  Vec3 *scale=NULL);
     /** This needs to be implemented by the inheriting classes. It is called
-    *  once per frame from the track. */
-    virtual void update(float dt) = 0;
-    void         setInitialTransform(const core::vector3df &xyz, 
-                                     const core::vector3df &hpr);
+     *  once per frame from the track. It has a dummy implementation that
+     *  just asserts so that this class can be instantiated in
+     *  CannonAnimation. */
+    virtual void update(float dt) {assert(false); };
+    void         setInitialTransform(const Vec3 &xyz,
+                                     const Vec3 &hpr);
     void         reset();
+    // ------------------------------------------------------------------------
+    /** Disables or enables an animation. */
+    void         setPlaying(bool playing) {m_playing = playing; }
+
+    // ------------------------------------------------------------------------
+
+    float getAnimationDuration() const
+    {
+        float duration = -1;
+
+        const Ipo* currIpo;
+        for_in (currIpo, m_all_ipos)
+        {
+            duration = std::max(duration, currIpo->getEndTime());
+        }
+
+        return duration;
+    }
 
 };   // AnimationBase
 

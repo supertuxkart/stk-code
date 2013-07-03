@@ -28,19 +28,19 @@ struct LanguageSpec;
 class Language
 {
 private:
-  LanguageSpec* language_spec;
+  const LanguageSpec* language_spec;
 
-  Language(LanguageSpec* language_spec);
+  Language(const LanguageSpec* language_spec);
 
 public:
   /** Create a language from language and country code:
       Example: Languge("de", "DE"); */
-  static Language from_spec(const std::string& language, 
-                            const std::string& country = std::string(), 
+  static Language from_spec(const std::string& language,
+                            const std::string& country = std::string(),
                             const std::string& modifier = std::string());
 
   /** Create a language from language and country code:
-      Example: Languge("deutsch"); 
+      Example: Languge("deutsch");
       Example: Languge("de_DE"); */
   static Language from_name(const std::string& str);
 
@@ -54,7 +54,7 @@ public:
 
   /** Create an undefined Language object */
   Language();
-  
+
   operator bool() const { return language_spec!=NULL; }
 
   /** Returns the language code (i.e. de, en, fr) */

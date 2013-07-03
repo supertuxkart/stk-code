@@ -42,7 +42,7 @@ LabelWidget::LabelWidget(bool title, bool bright) : Widget(WTYPE_LABEL)
     m_has_color    = false;
     m_scroll_speed = 0;
     m_scroll_offset = 0;
-    
+
     if (bright)
     {
         m_has_color = true;
@@ -58,12 +58,12 @@ void LabelWidget::add()
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     const bool word_wrap = m_properties[PROP_WORD_WRAP] == "true";
     stringw message = getText();
-    
+
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
     if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
     else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
     EGUI_ALIGNMENT valign = EGUIA_CENTER ; //TODO: make label v-align configurable through XML file?
-    
+
     IGUIStaticText* irrwidget;
     if (m_scroll_speed != 0)
     {
@@ -83,15 +83,15 @@ void LabelWidget::add()
 #if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
     irrwidget->setRightToLeft( m_is_text_rtl );
 #endif
-    
+
     m_element = irrwidget;
     irrwidget->setTextAlignment( align, valign );
-    
+
     if (m_has_color)
     {
         irrwidget->setOverrideColor(m_color);
     }
-    
+
     if (m_title_font)
     {
         irrwidget->setOverrideColor( video::SColor(255,255,255,255) );
@@ -99,20 +99,20 @@ void LabelWidget::add()
     }
     //irrwidget->setBackgroundColor( video::SColor(255,255,0,0) );
     //irrwidget->setDrawBackground(true);
-    
+
     m_id = m_element->getID();
-    
+
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
-    
+
     if (m_scroll_speed > 0)
     {
-        IGUIFont* font = m_title_font ? GUIEngine::getTitleFont() 
+        IGUIFont* font = m_title_font ? GUIEngine::getTitleFont()
                                       : GUIEngine::getFont();
         core::dimension2du r = font->getDimension(getText().c_str());
-        
+
         //m_scroll_offset = (float)r.Width;
-        
+
         // start scrolled off
         m_scroll_offset = -999;
     }
@@ -127,30 +127,30 @@ void LabelWidget::add()
 void LabelWidget::setText(const wchar_t *text, bool expandIfNeeded)
 {
     m_scroll_offset = 0;
-    
+
     if (expandIfNeeded)
     {
         assert(m_element != NULL);
-        
+
         const int fwidth = (m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont())->getDimension(text).Width;
         core::rect<s32> rect = m_element->getRelativePosition();
-        
+
         if (rect.getWidth() < fwidth)
         {
             rect.LowerRightCorner.X = rect.UpperLeftCorner.X + fwidth;
             m_element->setRelativePosition(rect);
             m_element->updateAbsolutePosition();
-            
+
             //((IGUIStaticText*)m_element)->setBackgroundColor( video::SColor(255,255,0,0) );
         }
     }
-    
+
     if (m_scroll_speed > 0)
     {
         //m_scroll_offset = (float)m_element->getAbsolutePosition().getWidth();
         m_scroll_offset = (float)m_w;
     }
-    
+
     Widget::setText(text);
 }   // setText
 
@@ -162,8 +162,8 @@ void LabelWidget::update(float dt)
 {
     if (m_scroll_speed != 0)
     {
-        m_scroll_offset -= dt*m_scroll_speed*5.0f;        
-        m_element->setRelativePosition( core::position2di( /*m_x +*/ (int)m_scroll_offset, 
+        m_scroll_offset -= dt*m_scroll_speed*5.0f;
+        m_element->setRelativePosition( core::position2di( /*m_x +*/ (int)m_scroll_offset,
                                                            /*m_y*/ 0 ) );
     }
 }   // update
@@ -173,7 +173,7 @@ bool LabelWidget::scrolledOff() const
 {
     // This method may only be called after this widget has been add()ed
     assert(m_element != NULL);
-    
+
     return m_scroll_offset <= -m_element->getAbsolutePosition().getWidth();
 }
 
@@ -184,4 +184,14 @@ void LabelWidget::setScrollSpeed(float speed)
     //m_scroll_offset = 0;
     m_scroll_speed  = speed;
 }   // setScrollSpeed
+
+// ----------------------------------------------------------------------------
+
+void LabelWidget::setColor(const irr::video::SColor& color)
+{
+    m_color = color;
+    m_has_color = true;
+    if (m_element != NULL)
+        ((IGUIStaticText*)m_element)->setOverrideColor(m_color);
+}
 

@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
@@ -22,23 +21,26 @@
 #ifndef HEADER_CAMERA_HPP
 #define HEADER_CAMERA_HPP
 
+#include "io/xml_node.hpp"
+#include "utils/no_copy.hpp"
+#include "utils/aligned_array.hpp"
+#include "utils/leak_check.hpp"
+#include "utils/vec3.hpp"
+
+#include "SColor.h"
+#include "vector2d.h"
+#include "rect.h"
+
 #include <vector>
 
-#include <SColor.h>
-#include <vector2d.h>
-#include <rect.h>
 namespace irr
 {
     namespace scene { class ICameraSceneNode; }
 }
 using namespace irr;
 
-#include "io/xml_node.hpp"
-#include "utils/no_copy.hpp"
-#include "utils/aligned_array.hpp"
-#include "utils/vec3.hpp"
-
-class Kart;
+class AbstractKart;
+class Rain;
 
 /**
   * \brief Handles the game camera
@@ -69,7 +71,7 @@ private:
     /** Camera's mode. */
     Mode            m_mode;
 
-    /** The index of this camera which is the index of the kart it is 
+    /** The index of this camera which is the index of the kart it is
      *  attached to. */
     unsigned int    m_index;
 
@@ -88,8 +90,14 @@ private:
     /** Factor of the effects of steering in camera aim. */
     float           m_rotation_range;
 
-    /** The kart that the camera follows. */
-    const Kart     *m_kart;
+    /** The kart that the camera follows. It can't be const,
+     *  since in profile mode the camera might change its owner. */
+    AbstractKart   *m_kart;
+
+    /** A pointer to the original kart the camera was pointing at when it
+     *  was created. Used when restarting a race (since the camera might
+     *  get attached to another kart if a kart is elimiated). */
+    AbstractKart   *m_original_kart;
 
     /** The list of viewports for this cameras. */
     core::recti     m_viewport;
@@ -112,16 +120,23 @@ private:
     /* Whether we should use the pre-0.7 camera style or the
      * modern style. Should default to modern. */
     Style           m_camera_style;
-    
+
+    /** List of all cameras. */
+    static std::vector<Camera*> m_all_cameras;
+
+    /** Used to show rain graphical effects. */
+    Rain *m_rain;
+
+
     /** A class that stores information about the different end cameras
      *  which can be specified in the scene.xml file. */
     class EndCameraInformation
     {
     public:
         /** The camera type:
-            EC_STATIC_FOLLOW_KART A static camera that always points at the 
+            EC_STATIC_FOLLOW_KART A static camera that always points at the
                                   kart.
-            EC_AHEAD_OF_KART      A camera that flies ahead of the kart 
+            EC_AHEAD_OF_KART      A camera that flies ahead of the kart
                                   always pointing at the kart.
         */
         typedef enum {EC_STATIC_FOLLOW_KART,
@@ -129,7 +144,7 @@ private:
         EndCameraType m_type;
 
         /** Position of the end camera. */
-        Vec3    m_position;  
+        Vec3    m_position;
 
         /** Distance to kart by which this camera is activated. */
         float   m_distance2;
@@ -147,7 +162,7 @@ private:
                 m_type = EC_AHEAD_OF_KART;
             else
             {
-                fprintf(stderr, 
+                fprintf(stderr,
                         "Invalid camera type '%s' - camera is ignored.\n",
                         s.c_str());
                  return false;
@@ -164,11 +179,12 @@ private:
          *  \param xyz Position to test for distance.
          *  \returns True if xyz is close enough to this camera.
          */
-        bool    isReached(const Vec3 &xyz) 
+        bool    isReached(const Vec3 &xyz)
                 { return (xyz-m_position).length2() < m_distance2; }
     };   // EndCameraInformation
+    // ------------------------------------------------------------------------
 
-    /** List of all end camera information. This information is shared 
+    /** List of all end camera information. This information is shared
      *  between all cameras, so it's static. */
     static AlignedArray<EndCameraInformation> m_end_cameras;
 
@@ -184,14 +200,46 @@ private:
     void computeNormalCameraPosition(Vec3 *wanted_position,
                                      Vec3 *wanted_target);
     void handleEndCamera(float dt);
-    void getCameraSettings(float *above_kart, float *cam_angle, 
+    void getCameraSettings(float *above_kart, float *cam_angle,
                            float *side_way, float *distance,
                            bool *smoothing);
     void positionCamera(float dt, float above_kart, float cam_angle,
                         float side_way, float distance, float smoothing);
+
+         Camera(int camera_index, AbstractKart* kart);
+        ~Camera();
 public:
-         Camera            (int camera_index, const Kart* kart);
-        ~Camera            ();
+    LEAK_CHECK()
+
+    /** Returns the number of cameras used. */
+    static unsigned int getNumCameras() { return m_all_cameras.size(); }
+
+    // ------------------------------------------------------------------------
+    /** Returns a camera. */
+    static Camera *getCamera(unsigned int n) { return m_all_cameras[n]; }
+
+    // ------------------------------------------------------------------------
+    /** Remove all cameras. */
+    static void removeAllCameras()
+    {
+        for(unsigned int i=0; i<m_all_cameras.size(); i++)
+            delete m_all_cameras[i];
+        m_all_cameras.clear();
+    }   // removeAllCameras
+
+    // ------------------------------------------------------------------------
+    /** Creates a camera and adds it to the list of all cameras. Also the
+     *  camera index (which determines which viewport to use in split screen)
+     *  is set.
+     */
+    static Camera* createCamera(AbstractKart* kart)
+    {
+        Camera *c = new Camera(m_all_cameras.size(), kart);
+        m_all_cameras.push_back(c);
+        return c;
+    }   // createCamera
+    // ------------------------------------------------------------------------
+
     static void readEndCamera(const XMLNode &root);
     static void clearEndCameras();
     void setMode           (Mode mode_);    /** Set the camera to the given mode */
@@ -202,24 +250,35 @@ public:
     void setInitialTransform();
     void activate();
     void update            (float dt);
+    void setKart           (AbstractKart *new_kart);
 
+    // ------------------------------------------------------------------------
+    /** Returns the kart to which this camera is attached. */
+    const AbstractKart* getKart() const { return m_kart; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the kart to which this camera is attached. */
+    AbstractKart* getKart() { return m_kart; }
+
+    // ------------------------------------------------------------------------
     /** Sets the ambient light for this camera. */
     void setAmbientLight(const video::SColor &color) { m_ambient_light=color; }
 
+    // ------------------------------------------------------------------------
     /** Returns the current ambient light. */
     const video::SColor &getAmbientLight() const {return m_ambient_light; }
 
+    // ------------------------------------------------------------------------
     /** Returns the viewport of this camera. */
     const core::recti& getViewport() const {return m_viewport; }
 
+    // ------------------------------------------------------------------------
     /** Returns the scaling in x/y direction for this camera. */
     const core::vector2df& getScaling() const {return m_scaling; }
-    
+
+    // ------------------------------------------------------------------------
     /** Returns the camera scene node. */
-    scene::ICameraSceneNode *getCameraSceneNode() 
-    {
-        return m_camera;
-    }
+    scene::ICameraSceneNode *getCameraSceneNode() { return m_camera; }
 } ;
 
 #endif

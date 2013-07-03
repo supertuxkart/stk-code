@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Joerg Henrichs
@@ -17,24 +16,27 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/camera.hpp"
+#include "items/bowling.hpp"
+
+#include "graphics/hit_sfx.hpp"
 #include "graphics/material.hpp"
 #include "io/xml_node.hpp"
-#include "items/bowling.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "utils/random_generator.hpp"
 
 float Bowling::m_st_max_distance;   // maximum distance for a bowling ball to be attracted
 float Bowling::m_st_max_distance_squared;
 float Bowling::m_st_force_to_target;
 
 // -----------------------------------------------------------------------------
-Bowling::Bowling(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_BOWLING, 
-                                       50.0f /* mass */)
+Bowling::Bowling(AbstractKart *kart)
+        : Flyable(kart, PowerupManager::POWERUP_BOWLING, 50.0f /* mass */)
 {
+    m_has_hit_kart = false;
     float y_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f;
-    
+
     // if the kart is looking backwards, release from the back
-    if( kart->getControls().m_look_back ) 
+    if( kart->getControls().m_look_back )
     {
         y_offset   = -y_offset;
         m_speed    = -m_speed*2;
@@ -50,8 +52,9 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_BOWLING,
     }
 
     createPhysics(y_offset, btVector3(0.0f, 0.0f, m_speed*2),
-                  new btSphereShape(0.5f*m_extend.getY()), 
-                  -70.0f /*gravity*/, 
+                  new btSphereShape(0.5f*m_extend.getY()),
+                  1.0f /*restitution*/,
+                  -70.0f /*gravity*/,
                   true /*rotates*/);
     // Even if the ball is fired backwards, m_speed must be positive,
     // otherwise the ball can start to vibrate when energy is added.
@@ -60,15 +63,15 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_BOWLING,
     // this would disable gravity.
     setAdjustUpVelocity(false);
 
-    // unset no_contact_response flags, so that the ball 
+    // unset no_contact_response flags, so that the ball
     // will bounce off the track
     int flag = getBody()->getCollisionFlags();
     flag = flag & (~ btCollisionObject::CF_NO_CONTACT_RESPONSE);
     getBody()->setCollisionFlags(flag);
-    
+
     // should not live forever, auto-destruct after 20 seconds
     m_max_lifespan = 20;
-    
+
 }   // Bowling
 
 // -----------------------------------------------------------------------------
@@ -82,18 +85,71 @@ void Bowling::init(const XMLNode &node, scene::IMesh *bowling)
     m_st_max_distance         = 20.0f;
     m_st_max_distance_squared = 20.0f * 20.0f;
     m_st_force_to_target      = 10.0f;
- 
+
     node.get("max-distance",    &m_st_max_distance   );
     m_st_max_distance_squared = m_st_max_distance*m_st_max_distance;
-    
+
     node.get("force-to-target", &m_st_force_to_target);
 }   // init
 
-// -----------------------------------------------------------------------------
-void Bowling::update(float dt)
+// ----------------------------------------------------------------------------
+/** Picks a random message to be displayed when a kart is hit by a bowling
+ *  ball. This function picks a different message if a kart hit itself.
+ *  \param kart The kart that was hit.
+ *  \returns The string to display.
+ */
+const core::stringw Bowling::getHitString(const AbstractKart *kart) const
 {
-    Flyable::update(dt);
-    const Kart *kart=0;
+    RandomGenerator r;
+
+    if(kart!=m_owner)
+    {
+        const int BOWLING_STRINGS_AMOUNT = 3;
+        switch (r.get(BOWLING_STRINGS_AMOUNT))
+        {
+            //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
+            // the victim.
+        case 0 : return _LTR("%0 will not go bowling with %1 again");
+            //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
+            // the victim.
+        case 1 : return _LTR("%1 strikes %0");
+            //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
+            // the victim.
+        case 2 : return _LTR("%0 is bowled over by %1");
+        default: assert(false); return L"";  //  avoid compiler warning
+        }
+    }
+    else
+    {
+        const int SELFBOWLING_STRINGS_AMOUNT = 3;
+        switch (r.get(SELFBOWLING_STRINGS_AMOUNT))
+        {
+            //I18N: shown when hit by own bowling ball. %s is the kart.
+        case 0 : return _LTR("%s is practicing with a blue, big, spheric yo-yo");
+            //I18N: shown when hit by own bowling ball. %s is the kart.
+        case 1 : return _LTR("%s is the world master of the boomerang ball");
+            //I18N: shown when hit by own bowling ball. %s is the kart.
+        case 2 : return _LTR("%s should play (rubber) darts instead of bowling");
+        default: assert(false); return L"";  //  avoid compiler warning
+        }   // switch
+    }   // if kart_hit==owner
+
+
+}   // getHitString
+
+// ----------------------------------------------------------------------------
+/** Updates the bowling ball ineach frame. If this function returns true, the
+ *  object will be removed by the projectile manager.
+ *  \param dt Time step size.
+ *  \returns True of this object should be removed.
+ */
+bool Bowling::updateAndDelete(float dt)
+{
+    bool can_be_deleted = Flyable::updateAndDelete(dt);
+    if(can_be_deleted)
+        return true;
+
+    const AbstractKart *kart=0;
     Vec3        direction;
     float       minDistance;
     getClosestKart(&kart, &minDistance, &direction);
@@ -107,13 +163,13 @@ void Bowling::update(float dt)
             m_body->applyCentralForce(direction);
         }
     }
-    
+
     // Bowling balls lose energy (e.g. when hitting the track), so increase
     // the speed if the ball is too slow, but only if it's not too high (if
     // the ball is too high, it is 'pushed down', which can reduce the
     // speed, which causes the speed to increase, which in turn causes
     // the ball to fly higher and higher.
-    btTransform trans = getTrans();
+    //btTransform trans = getTrans();
     float hat         = getXYZ().getY()-getHoT();
     if(hat-0.5f*m_extend.getY()<0.01f)
     {
@@ -121,7 +177,7 @@ void Bowling::update(float dt)
         if(!material || material->isDriveReset())
         {
             hit(NULL);
-            return;
+            return true;
         }
     }
     btVector3 v       = m_body->getLinearVelocity();
@@ -131,13 +187,44 @@ void Bowling::update(float dt)
         if(vlen<0.8*m_speed*m_speed)
         {   // bowling lost energy (less than 80%), i.e. it's too slow - speed it up:
             if(vlen==0.0f) {
-                v    = btVector3(.5f, .0, 0.5f);  // avoid 0 div.
+                v = btVector3(.5f, .0, 0.5f);  // avoid 0 div.
             }
-            m_body->setLinearVelocity(v*m_speed/sqrt(vlen));
+ //           m_body->setLinearVelocity(v*(m_speed/sqrt(vlen)));
         }   // vlen < 0.8*m_speed*m_speed
-    }   // hat< m_max_height  
-    
+    }   // hat< m_max_height
+
     if(vlen<0.1)
+    {
         hit(NULL);
-}   // update
+        return true;
+    }
+    return false;
+}   // updateAndDelete
 // -----------------------------------------------------------------------------
+/** Callback from the physics in case that a kart or physical object is hit.
+ *  The bowling ball triggers an explosion when hit.
+ *  \param kart The kart hit (NULL if no kart was hit).
+ *  \param object The object that was hit (NULL if none).
+ *  \returns True if there was actually a hit (i.e. not owner, and target is
+ *           not immune), false otherwise.
+ */
+bool Bowling::hit(AbstractKart* kart, PhysicalObject* obj)
+{
+    bool was_real_hit = Flyable::hit(kart, obj);
+    if(was_real_hit)
+    {
+        m_has_hit_kart = kart != NULL;
+        explode(kart, obj, /*hit_secondary*/false);
+    }
+    return was_real_hit;
+}   // hit
+// ----------------------------------------------------------------------------
+/** Returns the hit effect object to use when this objects hits something.
+ *  \returns The hit effect object, or NULL if no hit effect should be played.
+ */
+HitEffect* Bowling::getHitEffect() const
+{
+    if(m_has_hit_kart)
+        return new HitSFX(getXYZ(), "strike");
+    return NULL;
+}   // getHitEffect

@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs, Stephen Leak
@@ -68,7 +67,7 @@ private:
 
     ENetHost                   *m_host;    // me
     ENetPeer                   *m_server;  // (clients only)
-    std::vector<ENetPeer*>      m_clients; // (server only) pos in vector is client host_id 
+    std::vector<ENetPeer*>      m_clients; // (server only) pos in vector is client host_id
     /** Name of the kart that a client is waiting for confirmation for. */
     std::string                 m_kart_to_confirm;
 
@@ -96,7 +95,7 @@ public:
     int          getMyHostId() const               {return m_host_id;        }
     void         setHostId(int host_id)            {m_host_id = host_id;     }
     unsigned int getNumClients() const             {return m_num_clients;    }
-    const std::string& 
+    const std::string&
                  getClientName(int i) const        {return m_client_names[i];}
     bool         initialiseConnections();
     void         update(float dt);

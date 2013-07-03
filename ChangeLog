@@ -1,3 +1,52 @@
+SuperTuxkart 0.8
+~~~~~~~~~~~~~~~
+* Story mode and new challenge set
+* Improved AI
+* Skidding and better collision physics
+* Reverse mode
+* New green valley track
+* New Blackhill Mansion track
+* Updated XR591 track
+* Updated Fort Magma track
+* Updated jungle track
+* Updates Sand track
+* Updated menus
+* New music
+
+
+SuperTuxKart 0.7.3
+~~~~~~~~~~~~~~~~~~
+* New Zen Garden and Subsea tracks
+* New Island battle arena
+* New Suzanne kart
+* New graphical effects
+* New weapons 'Swatter' and 'Rubber Ball'
+* Added Thunderbird as race referee
+* 3 Strikes Battles now displays lives as spare tires
+* Improved bubble gum
+* See progression during Grand Prix
+* Improve physics for tall karts (e.g. Adiumy)
+* Lots of bug fixes
+* Improved kart control at high speeds
+* Better placement of rescued karts
+* Transition track-making to blender 2.5/2.6
+
+SuperTuxKart 0.7.2
+~~~~~~~~~~~~~~~~~~
+* Added in-game addon manager
+* Fixed major memory leaks
+* New Snow Peak track by Samuncle
+* Improved star track UFO by Rudy
+* New Beastie kart.
+* Show when you get a highscore
+* Improve gamepad configuration under Windows (add ability to tell gamepads apart)
+* Various other tweaks done and glitches fixed
+
+SuperTuxkart 0.7.1b
+~~~~~~~~~~~~~~~~~~~
+* Fix circular dependency in challenges
+* Updated translations
+
 SuperTuxKart 0.7.1
 ~~~~~~~~~~~~~~~~~~
 * Particle  (smoke, splash, fire) and weather effects

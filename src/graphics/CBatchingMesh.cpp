@@ -6,7 +6,7 @@ namespace irr
 namespace scene
 {
 
-CBatchingMesh::CBatchingMesh() 
+CBatchingMesh::CBatchingMesh()
  : Box(core::vector3df(0,0,0)), IsDirty(false), IsFinal(false)
 {
 
@@ -37,7 +37,7 @@ void CBatchingMesh::update()
 	u32 i;
 	for (i=0; i<DestBuffers.size(); ++i)
 	{
-		if (DestBuffers[i].IndexCount != DestBuffers[i].Buffer->getIndexCount() || 
+		if (DestBuffers[i].IndexCount != DestBuffers[i].Buffer->getIndexCount() ||
 			DestBuffers[i].VertexCount != DestBuffers[i].Buffer->getVertexCount())
 		{
 			DestBuffers[i].IsDirty = true;
@@ -155,7 +155,7 @@ s32 CBatchingMesh::addMeshBuffer(IMeshBuffer* buffer, const core::matrix4 &trans
 	video::E_VERTEX_TYPE vt = buffer->getVertexType();
 	for (i=0; i<MaterialReferences.size(); ++i)
 	{
-		if (MaterialReferences[i].VertexType == vt && 
+		if (MaterialReferences[i].VertexType == vt &&
 		    MaterialReferences[i].Material == m)
 		{
 			// will there be too many vertices in the buffer?
@@ -218,7 +218,7 @@ s32 CBatchingMesh::addMeshBuffer(IMeshBuffer* buffer, const core::matrix4 &trans
 	r.IndexCount = buffer->getIndexCount();
 	r.VertexCount = buffer->getVertexCount();
 	r.FirstIndex = DestBuffers[ MaterialReferences[i].BufferIndex ].IndexCount - r.IndexCount;
-	r.FirstVertex = DestBuffers[ MaterialReferences[i].BufferIndex ].VertexCount - r.VertexCount; 
+	r.FirstVertex = DestBuffers[ MaterialReferences[i].BufferIndex ].VertexCount - r.VertexCount;
 	r.Initialized = false;
 	BufferReferences.push_back(r);
 	addSourceBuffer(buffer);
@@ -255,7 +255,7 @@ u32 CBatchingMesh::getMeshBufferCount() const
 //! Returns pointer to a mesh buffer.
 /** \param nr: Zero based index of the mesh buffer. The maximum value is
 getMeshBufferCount() - 1;
-\return Returns the pointer to the mesh buffer or 
+\return Returns the pointer to the mesh buffer or
 NULL if there is no such mesh buffer. */
 IMeshBuffer* CBatchingMesh::getMeshBuffer(u32 nr) const
 {
@@ -266,9 +266,9 @@ IMeshBuffer* CBatchingMesh::getMeshBuffer(u32 nr) const
 }
 
 //! Returns pointer to a mesh buffer which fits a material
-IMeshBuffer* CBatchingMesh::getMeshBuffer( const video::SMaterial &material) const 
-{ 
-	return 0; 
+IMeshBuffer* CBatchingMesh::getMeshBuffer( const video::SMaterial &material) const
+{
+	return 0;
 }
 
 //! Returns an axis aligned bounding box of the mesh.
@@ -422,9 +422,9 @@ void CBatchingMesh::updateDestFromSourceBuffer(u32 i)
 
 		for (x=fi; x < fi+ic; ++x)
 			dest->Indices[x] = ind[x-fi]+fv;
-		
+
 		video::S3DVertex* vertices= (video::S3DVertex*) ver;
-		
+
 		for (x=fv; x < fv+vc; ++x)
 		{
 			dest->Vertices[x] = vertices[x-fv];
@@ -439,9 +439,9 @@ void CBatchingMesh::updateDestFromSourceBuffer(u32 i)
 
 		for (x=fi; x < fi+ic; ++x)
 			dest->Indices[x] = ind[x-fi]+fv;
-		
+
 		video::S3DVertex2TCoords* vertices= (video::S3DVertex2TCoords*) ver;
-		
+
 		for (x=fv; x < fv+vc; ++x)
 		{
 			dest->Vertices[x] = vertices[x-fv];
@@ -456,9 +456,9 @@ void CBatchingMesh::updateDestFromSourceBuffer(u32 i)
 
 		for (x=fi; x < fi+ic; ++x)
 			dest->Indices[x] = ind[x-fi]+fv;
-		
+
 		video::S3DVertexTangents* vertices= (video::S3DVertexTangents*) ver;
-		
+
 		for (x=fv; x < fv+vc; ++x)
 		{
 			dest->Vertices[x] = vertices[x-fv];

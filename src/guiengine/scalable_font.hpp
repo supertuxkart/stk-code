@@ -15,6 +15,8 @@
 #include "irrArray.h"
 #include <map>
 
+#include "utils/leak_check.hpp"
+
 namespace irr
 {
 
@@ -37,40 +39,41 @@ class ScalableFont : public IGUIFontBitmap
 
     bool m_mono_space_digits;
     irr::video::SColor m_shadow_color;
-    
+
     struct TextureInfo
     {
         irr::core::stringc m_file_name;
         bool m_has_alpha;
         float m_scale;
-        
+        bool m_exclude_from_max_height_calculation;
+
         TextureInfo()
         {
             m_has_alpha = false;
             m_scale = 1.0f;
         }
     };
-    
+
     std::map<int /* texture file ID */, TextureInfo> m_texture_files;
-    
-    void lazyLoadTexture(int texID);
-    
+
     void doReadXmlFile(io::IXMLReader* xml);
-    
+
     bool m_is_hollow_copy;
     bool m_rtl;
-    
+
     /** Position in range [0..1] of the single tab stop we support */
     float m_tab_stop;
-    
+
 public:
 
+    LEAK_CHECK()
+
     bool m_black_border;
-    
+
     ScalableFont* m_fallback_font;
     float         m_fallback_font_scale;
     int           m_fallback_kerning_width;
-    
+
     //! constructor
     ScalableFont(IGUIEnvironment* env, const io::path& filename);
 
@@ -88,12 +91,14 @@ public:
         out->m_is_hollow_copy = true;
         return out;
     }
-    
+
     //! destructor
     virtual ~ScalableFont();
 
     //! loads a font from an XML file
     bool load(io::IXMLReader* xml);
+
+    void lazyLoadTexture(int texID);
 
     //! draws an text and clips it to the specified rectangle if wanted
     virtual void draw(const core::stringw& text, const core::rect<s32>& position,
@@ -103,7 +108,7 @@ public:
     virtual void draw(const core::stringw& text, const core::rect<s32>& position,
                       video::SColor color, bool hcenter,
                       bool vcenter, const core::rect<s32>* clip, bool ignoreRTL);
-    
+
     //! returns the dimension of a text
     virtual core::dimension2d<u32> getDimension(const wchar_t* text) const;
 
@@ -137,12 +142,12 @@ public:
 
     void setScale(const float scale);
     float getScale() const { return m_scale; }
-    
+
     void updateRTL();
-    
+
     /** \param pos position of the tab stop, in range [0..1] */
     void setTabStop(float pos) { m_tab_stop = pos; }
-    
+
 private:
 
     struct SFontArea
@@ -153,7 +158,7 @@ private:
         s32             width;
         u32             spriteno;
     };
-    
+
     int getCharWidth(const SFontArea& area, const bool fallback) const;
     s32 getAreaIDFromCharacter(const wchar_t c, bool* fallback_font) const;
     const SFontArea &getAreaFromCharacter(const wchar_t c, bool* fallback_font) const;

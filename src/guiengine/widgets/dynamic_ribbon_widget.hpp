@@ -24,6 +24,7 @@
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
@@ -38,8 +39,10 @@ namespace GUIEngine
     {
     public:
         virtual ~DynamicRibbonHoverListener() {}
-        virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID, 
-                                        const irr::core::stringw& selectionText, const int playerID) = 0;
+        virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, 
+                                       const std::string& selectionID,
+                                       const irr::core::stringw& selectionText,
+                                       const int playerID) = 0;
     };
     
     /** The description of an item added to a DynamicRibbonWidget */
@@ -63,7 +66,7 @@ namespace GUIEngine
       * \brief An extended version of RibbonWidget, with more capabilities.
       * A dynamic ribbon builds upon RibbonWidget, adding dynamic contents creation and sizing,
       * scrolling, multiple-row layouts.
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       * \note items you add to a list are kept after the the ribbon was in is removed
       *       (i.e. you don't need to add items everytime the screen is shown, only upon loading)
       */
@@ -164,7 +167,7 @@ namespace GUIEngine
         /** Callbacks */
         virtual void add();
         virtual EventPropagation mouseHovered(Widget* child, const int playerID);
-        virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
+        virtual EventPropagation transmitEvent(Widget* w, const std::string& originator, const int playerID);
         
         bool findItemInRows(const char* name, int* p_row, int* p_id);
         
@@ -172,6 +175,7 @@ namespace GUIEngine
         
     public:
     
+        LEAK_CHECK()
         
         /**
           * \param combo     Whether this is a "combo" ribbon, i.e. whether there is always one selected item.
@@ -257,7 +261,9 @@ namespace GUIEngine
           *
           * \return Whether setting the selection was successful (whether the item exists)
           */
-        bool setSelection(const std::string item_codename, const int playerID, const bool focusIt, bool evenIfDeactivated=false);
+        bool setSelection(const std::string &item_codename, 
+                          const int playerID, const bool focusIt, 
+                          bool evenIfDeactivated=false);
         
         /** \brief Callback from parent class Widget. */
         virtual void elementRemoved();

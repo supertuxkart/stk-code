@@ -23,6 +23,7 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
+#include "utils/translation.hpp"
 
 #include <iostream>
 
@@ -55,6 +56,7 @@ void NewsManager::init()
     const XMLNode *xml   = new XMLNode(xml_file);
     checkRedirect(xml);
     updateNews(xml, xml_file);
+    delete xml;
 }   // init
 
 // ---------------------------------------------------------------------------
@@ -70,8 +72,8 @@ void NewsManager::checkRedirect(const XMLNode *xml)
     {
         if(UserConfigParams::logAddons())
         {
-            std::cout << "[Addons] Current server: " 
-                      << (std::string)UserConfigParams::m_server_addons 
+            std::cout << "[Addons] Current server: "
+                      << (std::string)UserConfigParams::m_server_addons
                       << std::endl
                       << "[Addons] New server: " << new_server << std::endl;
         }
@@ -83,12 +85,15 @@ void NewsManager::checkRedirect(const XMLNode *xml)
 /** Updates the 'news' string to be displayed in the main menu.
  *  \param xml The XML data from the news file.
  *  \param filename The filename of the news xml file. Only needed
- *         in case of an error (e.g. the file might be corrupted) 
- *         - the file will be deleted so that on next start of stk it 
+ *         in case of an error (e.g. the file might be corrupted)
+ *         - the file will be deleted so that on next start of stk it
  *         will be updated again.
  */
 void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
 {
+
+    m_all_news_messages = "";
+    const core::stringw message_divider="  +++  ";
     // This function is also called in case of a reinit, so
     // we have to delete existing news messages here first.
     m_news.lock();
@@ -103,10 +108,12 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
     {
         const XMLNode *node = xml->getNode(i);
         if(node->getName()!="message") continue;
-        std::string news;
+        core::stringw news;
         node->get("content", &news);
         int id=-1;
         node->get("id", &id);
+        bool important=false;
+        node->get("important", &important);
 
         std::string cond;
         node->get("condition", &cond);
@@ -115,15 +122,15 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
         m_news.lock();
         {
 
+            if(!important)
+                m_all_news_messages += m_all_news_messages.size()>0
+                                    ?  message_divider + news
+                                    : news;
+            else
             // Define this if news messages should be removed
             // after being shown a certain number of times.
-#undef NEWS_MESSAGE_REMOVAL
-#ifdef NEWS_MESSAGE_REMOVAL
-            // Only add the news if it's not supposed to be ignored.
-            if(id>UserConfigParams::m_ignore_message_id)
-#endif
             {
-                NewsMessage n(core::stringw(news.c_str()), id);
+                NewsMessage n(news, id, important);
                 m_news.getData().push_back(n);
             }
         }   // m_news.lock()
@@ -142,13 +149,10 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
         NewsMessage n(_("Can't access stkaddons server..."), -1);
         m_news.lock();
         m_news.getData().push_back(n);
+
+        m_all_news_messages="";
         m_news.unlock();
     }
-#ifdef NEWS_MESSAGE_REMOVAL
-    else
-        updateMessageDisplayCount();
-#endif
-    
 }   // updateNews
 
 // ----------------------------------------------------------------------------
@@ -164,6 +168,40 @@ void NewsManager::addNewsMessage(const core::stringw &s)
     m_news.unlock();
 }   // addNewsMessage
 // ----------------------------------------------------------------------------
+/** Returns the  important message with the smallest id that has not been
+ *  shown, or NULL if no important (not shown before) message exists atm. The
+ *  user config is updated to store the last important message id shown.
+ */
+const core::stringw NewsManager::getImportantMessage()
+{
+    int index = -1;
+    m_news.lock();
+    for(unsigned int i=0; i<m_news.getData().size(); i++)
+    {
+        const NewsMessage &m = m_news.getData()[i];
+        //
+        if(m.isImportant() &&
+           m.getMessageId()>UserConfigParams::m_last_important_message_id  &&
+            (index == -1 ||
+            m.getMessageId() < m_news.getData()[index].getMessageId() )     )
+        {
+            index = i;
+        }   // if new unshown important message with smaller message id
+    }
+    core::stringw message("");
+    if(index>=0)
+    {
+        const NewsMessage &m = m_news.getData()[index];
+        message = m.getNews();
+        UserConfigParams::m_last_important_message_id = m.getMessageId();
+
+    }
+    m_news.unlock();
+
+    return message;
+}   // getImportantMessage
+
+// ----------------------------------------------------------------------------
 /** Returns the next loaded news message. It will 'wrap around', i.e.
  *  if there is only one message it will be returned over and over again.
  *  To be used by the the main menu to get the next news message after
@@ -175,45 +213,27 @@ const core::stringw NewsManager::getNextNewsMessage()
     if(m_error_message.size()>0)
         return _(m_error_message.c_str());
 
+    m_news.lock();
+    if(m_all_news_messages.size()>0)
+    {
+        // Copy the news message while it is locked.
+        core::stringw anm = m_all_news_messages;
+        m_news.unlock();
+        return anm;
+    }
+
     if(m_news.getData().size()==0)
+    {
+        // Lock
+        m_news.unlock();
         return "";
+    }
 
     core::stringw m("");
-    m_news.lock();
     {
-        // Check if we have a message that was finished being
-        // displayed --> increase display count.
-        if(m_current_news_message>-1)
-        {
-#ifdef NEWS_MESSAGE_REMOVAL
-            NewsMessage &n = m_news.getData()[m_current_news_message];
-            n.increaseDisplayCount();
-#endif
-
-            // If the message is being displayed often enough,
-            // ignore it from now on.
-#ifdef NEWS_MESSAGE_REMOVAL
-            if(n.getDisplayCount()>stk_config->m_max_display_news)
-            {
-                // Messages have sequential numbers, so we only store
-                // the latest message id (which is the current one)
-                UserConfigParams::m_ignore_message_id = n.getMessageId();
-                m_news.getData().erase(m_news.getData().begin()
-                                       +m_current_news_message  );
-
-            }
-#endif
-            updateUserConfigFile();
-            // 
-            if(m_news.getData().size()==0)
-            {
-                m_news.unlock();
-                return "";
-            }
-        }
         m_current_news_message++;
         if(m_current_news_message >= (int)m_news.getData().size())
-            m_current_news_message = 0;            
+            m_current_news_message = 0;
 
         m = m_news.getData()[m_current_news_message].getNews();
     }
@@ -222,34 +242,8 @@ const core::stringw NewsManager::getNextNewsMessage()
 }   // getNextNewsMessage
 
 // ----------------------------------------------------------------------------
-/** Saves the information about which message was being displayed how often
- *  to the user config file. It dnoes not actually save the user config
- *  file, this is left to the main program (user config is saved at
- *  the exit of the program).
- *  Note that this function assumes that m_news is already locked!
- */
-void NewsManager::updateUserConfigFile() const
-{
-#ifdef NEWS_MESSAGE_REMOVAL
-    std::ostringstream o;
-    for(unsigned int i=0; i<m_news.getData().size(); i++)
-    {
-        const NewsMessage &n=m_news.getData()[i];
-        o << n.getMessageId()    << ":"
-          << n.getDisplayCount() << " ";
-    }
-    UserConfigParams::m_display_count = o.str();
-#else
-    // Always set them to be empty to avoid any
-    // invalid data that might create a problem later.
-    UserConfigParams::m_display_count     = "";
-    UserConfigParams::m_ignore_message_id = -1;
-#endif
-}   // updateUserConfigFile
-
-// ----------------------------------------------------------------------------
 /** Checks if the given condition list are all fulfilled.
- *  The conditions must be seperated by ";", and each condition
+ *  The conditions must be separated by ";", and each condition
  *  must be of the form "type comp version".
  *  Type must be 'stkversion'
  *  comp must be one of "<", "=", ">"
@@ -266,16 +260,16 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
         std::vector<std::string> cond = StringUtils::split(cond_list[i],' ');
         if(cond.size()!=3)
         {
-            printf("Invalid condition '%s' - assumed to be true.\n", 
-                   cond_list[i].c_str());
+            Log::warn("NewsManager", "Invalid condition '%s' - assumed to "
+                                     "be true.", cond_list[i].c_str());
             continue;
         }
         // Check for stkversion comparisons
         // ================================
         if(cond[0]=="stkversion")
         {
-            int news_version = versionToInt(cond[2]);
-            int stk_version  = versionToInt(STK_VERSION);
+            int news_version = StringUtils::versionToInt(cond[2]);
+            int stk_version  = StringUtils::versionToInt(STK_VERSION);
             if(cond[1]=="=")
             {
                 if(stk_version!=news_version) return false;
@@ -291,8 +285,8 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
                 if(stk_version<=news_version) return false;
                 continue;
             }
-            printf("Invalid comparison in condition '%s' - assumed true.\n",
-                   cond_list[i].c_str());
+            Log::warn("NewsManager", "Invalid comparison in condition '%s' - "
+                                     "assumed true.", cond_list[i].c_str());
         }
         // Check for addons not installed
         // ==============================
@@ -313,8 +307,8 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
         }
         else
         {
-            printf("Invalid condition '%s' - assumed to be true.\n", 
-                   cond_list[i].c_str());
+            Log::warn("NewsManager", "Invalid condition '%s' - assumed to "
+                                     "be true.", cond_list[i].c_str());
             continue;
         }
 
@@ -323,85 +317,3 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
 }   // conditionFulfilled
 
 // ----------------------------------------------------------------------------
-/** Converts a version string (in the form of 'X.Y.Za-rcU' into an
- *  integer number.
- *  \param s The version string to convert.
- */
-int NewsManager::versionToInt(const std::string &version_string)
-{
-    // Special case: SVN
-    if(version_string=="SVN" || version_string=="svn")
-      // SVN version will be version 99.99.99i-rcJ
-        return 1000000*99     
-              +  10000*99
-              +    100*99
-              +     10* 9
-              +         9;
-
-    std::string s=version_string;
-    // To guarantee that a release gets a higher version number than 
-    // a release candidate, we assign a 'release_candidate' number
-    // of 9 to versions which are not a RC. We assert that any RC
-    // is less than 9 to guarantee the ordering.
-    int release_candidate=9;
-    if(sscanf(s.substr(s.length()-4, 4).c_str(), "-rc%d", 
-           &release_candidate)==1)
-    {
-        s = s.substr(0, s.length()-4);
-        // Otherwise a RC can get a higher version number than
-        // the corresponding release! If this should ever get
-        // triggered, multiply all scaling factors above and
-        // below by 10, to get two digits for RC numbers.
-        assert(release_candidate<9);
-    }
-    int very_minor=0;
-    if(s[s.size()-1]>='a' && s[s.size()-1]<='z')
-    {
-        very_minor = s[s.size()-1]-'a'+1;
-        s = s.substr(0, s.size()-1);
-    }
-    std::vector<std::string> l = StringUtils::split(s, '.');
-    while(l.size()<3)
-        l.push_back(0);
-    int version = 1000000*atoi(l[0].c_str())
-                +   10000*atoi(l[1].c_str())
-                +     100*atoi(l[2].c_str())
-                +      10*very_minor
-                +         release_candidate;
-
-    if(version<=0)
-        printf("Invalid version string '%s'.\n", s.c_str());
-    return version;
-}   // versionToInt
-
-// ----------------------------------------------------------------------------
-/** Reads the information about which message was dislpayed how often from
- *  the user config file.
- */
-void NewsManager::updateMessageDisplayCount()
-{
-#ifdef NEWS_MESSAGE_REMOVAL
-    m_news.lock();
-    std::vector<std::string> pairs = 
-        StringUtils::split(UserConfigParams::m_display_count,' ');
-    for(unsigned int i=0; i<pairs.size(); i++)
-    {
-        std::vector<std::string> v = StringUtils::split(pairs[i], ':');
-        int id, count;
-        StringUtils::fromString(v[0], id);
-        StringUtils::fromString(v[1], count);
-        // Search all downloaded messages for this id. 
-        for(unsigned int j=0; j<m_news.getData().size(); j++)
-        {
-            if(m_news.getData()[j].getMessageId()!=id)
-                continue;
-            m_news.getData()[j].setDisplayCount(count);
-            if(count>stk_config->m_max_display_news)
-                m_news.getData().erase(m_news.getData().begin()+j);
-            break;
-        }   // for j <m_news.getData().size()
-    }
-    m_news.unlock();
-#endif
-}   // updateMessageDisplayCount
-

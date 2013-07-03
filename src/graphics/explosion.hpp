@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -20,6 +19,7 @@
 #ifndef HEADER_EXPLOSION_HPP
 #define HEADER_EXPLOSION_HPP
 
+#include "graphics/hit_sfx.hpp"
 #include "utils/no_copy.hpp"
 
 namespace irr
@@ -30,26 +30,23 @@ using namespace irr;
 
 class Vec3;
 class SFXBase;
+class ParticleEmitter;
 
 const float explosion_time = 1.5f;
 
 /**
   * \ingroup graphics
   */
-class Explosion : public NoCopy
+class Explosion : public HitSFX
 {
 private:
-    SFXBase*       m_explode_sound;
-    float          m_remaining_time;
-    bool           m_player_kart_hit;
-    scene::IParticleSystemSceneNode   *m_node;
-    
+    float            m_remaining_time;
+    ParticleEmitter* m_emitter;
+
 public:
-         Explosion(const Vec3& coord, const char* explosion_sound, bool player_hit);
+         Explosion(const Vec3& coord, const char* explosion_sound, const char * particle_file );
         ~Explosion();
-    void init     (const Vec3& coord);
-    void update   (float delta_t);
-    int  inUse    ();
+    bool updateAndDelete(float delta_t);
     bool hasEnded () { return  m_remaining_time <= -explosion_time;  }
 
 } ;

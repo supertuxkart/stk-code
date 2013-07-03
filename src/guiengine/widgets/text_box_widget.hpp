@@ -23,6 +23,7 @@
 #include <irrString.h>
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
@@ -35,7 +36,7 @@ namespace GUIEngine
     };
     
     /** \brief A text field widget. 
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class TextBoxWidget : public Widget
     {
@@ -48,6 +49,9 @@ namespace GUIEngine
         virtual int getHeightNeededAroundLabel() const { return 10; }
         
     public:
+        
+        LEAK_CHECK()
+        
         TextBoxWidget();
         ~TextBoxWidget()
         {
@@ -58,12 +62,15 @@ namespace GUIEngine
         void addItem(const char* item);
         
         virtual EventPropagation focused(const int playerID);
-        virtual void unfocused(const int playerID);
+        virtual void unfocused(const int playerID, Widget* new_focus);
 
         void addListener(ITextBoxWidgetListener* listener);
         void clearListeners();
         
         irr::core::stringw getText() const;
+        void setPasswordBox(bool passwordBox, wchar_t passwordChar = L'*');
+        
+        virtual void elementRemoved();
     };
 }
 

@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -25,8 +24,13 @@
 #include <vector>
 
 #include "utils/no_copy.hpp"
+#include "utils/leak_check.hpp"
+
+#include <irrString.h>
+using irr::core::stringw;
 
 class Music;
+class XMLNode;
 
 /**
   * \brief Wrapper around an instance of the Music interface
@@ -37,44 +41,50 @@ class Music;
 class MusicInformation : public NoCopy
 {
 private:
-    std::string              m_composer;
-    std::string              m_title;
+    stringw                  m_composer;
+    stringw                  m_title;
     std::string              m_normal_filename;
     std::string              m_fast_filename;
-    std::vector<std::string> m_all_tracks;      
+    std::vector<std::string> m_all_tracks;
     //int                      m_numLoops;
-    
+
     /** If faster music is enabled at all (either separate file or using
      *  the pitch shift approach). */
-    bool                     m_enable_fast;    
-                                                
+    bool                     m_enable_fast;
+
     float                    m_gain;
     float                    m_adjusted_gain;
-    
-    /** Either time for fading faster music in, or time to change pitch */
+
+    /** Either time for fading faster music in, or time to change pitch. */
     float                    m_faster_time;
-    float                    m_max_pitch;      //!< maximum pitch for faster music
+    /** Maximum pitch for faster music. */
+    float                    m_max_pitch;
     static const int         LOOP_FOREVER=-1;
     Music                   *m_normal_music,
                             *m_fast_music;
-    enum {SOUND_NORMAL,                        //!< normal music is played
-          SOUND_FADING,                        //!< normal music fading out, faster fading in
-          SOUND_FASTER,                        //!< change pitch of normal music
-          SOUND_FAST}                          //!< playing faster music or max pitch reached
-                             m_mode; 
+    enum {SOUND_NORMAL,     //!< normal music is played
+          SOUND_FADING,     //!< normal music fading out, faster fading in
+          SOUND_FASTER,     //!< change pitch of normal music
+          SOUND_FAST}       //!< playing faster music or max pitch reached
+                             m_mode;
     float                    m_time_since_faster;
 
+    // The constructor is private so that the
+    // static create function must be used.
+    MusicInformation (const XMLNode *root, const std::string &filename);
 public:
-#if defined(WIN32) || defined(_WIN32)
+    LEAK_CHECK()
+
+#if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
 #pragma warning(disable:4290)
 #endif
-                       MusicInformation (const std::string& filename) throw (std::runtime_error);
                       ~MusicInformation ();
-    const std::string& getComposer      () const {return m_composer;        }
-    const std::string& getTitle         () const {return m_title;           }
+    static MusicInformation *create(const std::string &filename);
+    const stringw&     getComposer      () const {return m_composer;        }
+    const stringw&     getTitle         () const {return m_title;           }
     const std::string& getNormalFilename() const {return m_normal_filename; }
     const std::string& getFastFilename  () const {return m_fast_filename;   }
-    //int                getNumLoops      () const {return m_numLoops;        }
+    //int              getNumLoops      () const {return m_numLoops;        }
     float              getFasterTime    () const {return m_faster_time;     }
     float              getMaxPitch      () const {return m_max_pitch;       }
     void               addMusicToTracks ();
@@ -84,10 +94,10 @@ public:
     void               pauseMusic       ();
     void               resumeMusic      ();
     void               volumeMusic      (float gain);
-    
+
     void               setTemporaryVolume(float gain);
     void               resetTemporaryVolume() { volumeMusic(m_adjusted_gain); }
-    
+
     void               switchToFastMusic();
     bool               isPlaying() const;
 };   // MusicInformation

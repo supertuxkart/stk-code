@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -30,7 +29,7 @@
 #include <string>
 
 // For mkdir
-#if !defined(WIN32) || defined(__CYGWIN__)
+#if !defined(WIN32)
 #  include <sys/stat.h>
 #  include <sys/types.h>
 // For RemoveDirectory
@@ -63,6 +62,7 @@
 #include "graphics/material_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
 
@@ -72,15 +72,15 @@
 
 bool macSetBundlePathIfRelevant(std::string& data_dir)
 {
-    printf("[FileManager] checking whether we are using an app bundle... ");
-    // the following code will enable STK to find its data when placed in an 
+    Log::debug("FileManager", "Checking whether we are using an app bundle... ");
+    // the following code will enable STK to find its data when placed in an
     // app bundle on mac OS X.
     // returns true if path is set, returns false if path was not set
     char path[1024];
     CFBundleRef main_bundle = CFBundleGetMainBundle(); assert(main_bundle);
-    CFURLRef main_bundle_URL = CFBundleCopyBundleURL(main_bundle); 
+    CFURLRef main_bundle_URL = CFBundleCopyBundleURL(main_bundle);
     assert(main_bundle_URL);
-    CFStringRef cf_string_ref = CFURLCopyFileSystemPath(main_bundle_URL, 
+    CFStringRef cf_string_ref = CFURLCopyFileSystemPath(main_bundle_URL,
                                                         kCFURLPOSIXPathStyle);
     assert(cf_string_ref);
     CFStringGetCString(cf_string_ref, path, 1024, kCFStringEncodingASCII);
@@ -90,14 +90,14 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
     std::string contents = std::string(path) + std::string("/Contents");
     if(contents.find(".app") != std::string::npos)
     {
-        printf("yes\n");
+        Log::debug("FileManager", "yes\n");
         // executable is inside an app bundle, use app bundle-relative paths
         data_dir = contents + std::string("/Resources/");
         return true;
     }
     else
     {
-        printf("no\n");
+        Log::debug("FileManager", "no\n");
         return false;
     }
 }
@@ -118,20 +118,18 @@ FileManager::FileManager(char *argv[])
 {
 #ifdef __APPLE__
     // irrLicht's createDevice method has a nasty habit of messing the CWD.
-    // since the code above may rely on it, save it to be able to restore 
+    // since the code above may rely on it, save it to be able to restore
     // it after.
     char buffer[256];
     getcwd(buffer, 256);
 #endif
 
-    m_device = createDevice(video::EDT_NULL);
-
 #ifdef __APPLE__
     chdir( buffer );
 #endif
 
-    m_file_system  = m_device->getFileSystem();
-    m_is_full_path = false;
+    m_file_system  = irr_driver->getDevice()->getFileSystem();
+    m_file_system->grab();
 
     irr::io::path exe_path;
 
@@ -140,64 +138,77 @@ FileManager::FileManager(char *argv[])
     // to define the working directory when debugging, it works automatically.
     if(m_file_system->existFile(argv[0]))
         exe_path = m_file_system->getFileDir(argv[0]);
-
+    if(exe_path.size()==0 || exe_path[exe_path.size()-1]!='/')
+        exe_path += "/";
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
-        m_root_dir= getenv ( "SUPERTUXKART_DATADIR" ) ;
+        m_root_dir = std::string(getenv("SUPERTUXKART_DATADIR"))+"/" ;
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( m_root_dir ) ) { /* nothing to do */ }
 #endif
     else if(m_file_system->existFile("data/stk_config.xml"))
-        m_root_dir = "." ;
+        m_root_dir = "" ;
     else if(m_file_system->existFile("../data/stk_config.xml"))
-        m_root_dir = ".." ;
+        m_root_dir = "../" ;
     else if(m_file_system->existFile(exe_path+"/data/stk_config.xml"))
         m_root_dir = exe_path.c_str();
     else if(m_file_system->existFile(exe_path+"/../data/stk_config.xml"))
     {
         m_root_dir = exe_path.c_str();
-        m_root_dir += "/..";
+        m_root_dir += "/../";
     }
     else
+    {
 #ifdef SUPERTUXKART_DATADIR
-        m_root_dir = SUPERTUXKART_DATADIR ;
+        m_root_dir = SUPERTUXKART_DATADIR;
+        if(m_root_dir.size()==0 || m_root_dir[m_root_dir.size()-1]!='/')
+            m_root_dir+='/';
+
 #else
-        m_root_dir = "/usr/local/share/games/supertuxkart" ;
+        m_root_dir = "/usr/local/share/games/supertuxkart/";
+#endif
+    }
+    checkAndCreateConfigDir();
+    checkAndCreateAddonsDir();
+    checkAndCreateScreenshotDir();
+
+#ifdef WIN32
+    redirectOutput();
 #endif
     // We can't use _() here, since translations will only be initalised
     // after the filemanager (to get the path to the tranlsations from it)
-    fprintf(stderr, "[FileManager] Data files will be fetched from: '%s'\n",
-            m_root_dir.c_str() );
-    checkAndCreateConfigDir();
-    checkAndCreateAddonsDir();
+    Log::info("FileManager", "Data files will be fetched from: '%s'",
+              m_root_dir.c_str());
+    Log::info("FileManager", "User directory is '%s'.", m_config_dir.c_str());
+    Log::info("FileManager", "Addons files will be stored in '%s'.",
+               m_addons_dir.c_str());
+    Log::info("FileManager", "Screenshots will be stored in '%s'.",
+               m_screenshot_dir.c_str());
 }  // FileManager
 
-//-----------------------------------------------------------------------------
+ //-----------------------------------------------------------------------------
 /** Remove the dummy file system (which is called from IrrDriver before
  *  creating the actual device.
  */
 void FileManager::dropFileSystem()
 {
-    m_device->drop();
-    m_device = NULL;
+    m_file_system->drop();
 }   // dropFileSystem
 
 //-----------------------------------------------------------------------------
 /** This function is used to re-initialise the file-manager after reading in
  *  the user configuration data.
 */
-void FileManager::setDevice(IrrlichtDevice *device)
+void FileManager::reInit()
 {
-    m_device = device;
-
-    //std::cout << "^^^^^^^^ GRABBING m_device (FileManager) ^^^^^^^^\n";
-    m_device->grab();  // To make sure that the device still exists while
-                       // file_manager has a pointer to the file system.
-    m_file_system  = m_device->getFileSystem();
-    TrackManager::addTrackSearchDir(m_root_dir+"/data/tracks");
-    KartPropertiesManager::addKartSearchDir(m_root_dir+"/data/karts");
-    pushTextureSearchPath(m_root_dir+"/data/textures/");
-    pushModelSearchPath  (m_root_dir+"/data/models/"  );
-    pushMusicSearchPath  (m_root_dir+"/data/music/"   );
+    m_file_system  = irr_driver->getDevice()->getFileSystem();
+    m_file_system->grab();
+    TrackManager::addTrackSearchDir(m_root_dir+"data/tracks/");
+    KartPropertiesManager::addKartSearchDir(m_root_dir+"data/karts/");
+    pushTextureSearchPath(getTextureDir());
+    pushTextureSearchPath(getTextureDir()+"/deprecated/");
+    pushTextureSearchPath(m_root_dir+"data/gui/");
+    pushModelSearchPath  (m_root_dir+"data/models/"  );
+    pushMusicSearchPath  (m_root_dir+"data/music/"   );
 
     // Add more paths from the STK_MUSIC_PATH environment variable
     if(getenv("SUPERTUXKART_MUSIC_PATH")!=NULL)
@@ -212,13 +223,59 @@ void FileManager::setDevice(IrrlichtDevice *device)
 //-----------------------------------------------------------------------------
 FileManager::~FileManager()
 {
+    // Clean up left-over files in addons/tmp that are older than 24h
+    // ==============================================================
+    // (The 24h delay is useful when debugging a problem with a zip file)
+    std::set<std::string> allfiles;
+    std::string tmp=getAddonsFile("tmp");
+    listFiles(allfiles, tmp, /*fullpath*/true);
+    for(std::set<std::string>::iterator i=allfiles.begin();
+        i!=allfiles.end(); i++)
+    {
+        if((*i)=="." || (*i)=="..") continue;
+        // For now there should be only zip files or .part files
+        // (not fully downloaded files) in tmp. Warn about any
+        // other files.
+        std::string full_path=tmp+"/"+*i;
+        if(StringUtils::getExtension(*i)!="zip" &&
+           StringUtils::getExtension(*i)!="part"    )
+        {
+            Log::warn("FileManager", "Unexpected tmp file '%s' found.",
+                       full_path.c_str());
+            continue;
+        }
+        if(isDirectory(full_path))
+        {
+            // Gee, a .zip file which is a directory - stay away from it
+            Log::warn("FileManager", "'%s' is a directory and will not be deleted.",
+                      full_path.c_str());
+            continue;
+        }
+        struct stat mystat;
+        stat(full_path.c_str(), &mystat);
+        Time::TimeType current = Time::getTimeSinceEpoch();
+        if(current - mystat.st_ctime <24*3600)
+        {
+            if(UserConfigParams::logAddons())
+                Log::verbose("FileManager", "'%s' is less than 24h old "
+                             "and will not be deleted.",
+                             full_path.c_str());
+            continue;
+        }
+        if(UserConfigParams::logAddons())
+            Log::verbose("FileManager", "Deleting tmp file'%s'.",full_path.c_str());
+        removeFile(full_path);
+
+    }   // for i in all files in tmp
+
+    // Clean up rest of file manager
+    // =============================
     popMusicSearchPath();
     popModelSearchPath();
     popTextureSearchPath();
-    // m_file_system is ref-counted, so no delete/drop necessary.
+    popTextureSearchPath();
+    m_file_system->drop();
     m_file_system = NULL;
-    //std::cout << "^^^^^^^^ Dropping m_device (FileManager) ^^^^^^^^\n";
-    m_device->drop();
 }   // ~FileManager
 
 //-----------------------------------------------------------------------------
@@ -241,11 +298,37 @@ XMLNode *FileManager::createXMLTree(const std::string &filename)
     {
         if (UserConfigParams::logMisc())
         {
-            fprintf(stderr, "[FileManager::createXMLTree] %s\n", e.what());
+            Log::error("FileManager", "createXMLTree: %s\n", e.what());
         }
         return NULL;
     }
-}   // getXMLTree
+}   // createXMLTree
+
+//-----------------------------------------------------------------------------
+/** Reads in XML from a string and converts it into a XMLNode tree.
+ *  \param content the string containing the XML content.
+ */
+XMLNode *FileManager::createXMLTreeFromString(const std::string & content)
+{
+    try
+    {
+        char *b = new char[content.size()];
+        memcpy(b, content.c_str(), content.size());
+        io::IReadFile * ireadfile = m_file_system->createMemoryReadFile(b, strlen(b), "tempfile", true);
+        io::IXMLReader * reader = m_file_system->createXMLReader(ireadfile);
+        XMLNode* node = new XMLNode(reader);
+        reader->drop();
+        return node;
+    }
+    catch (std::runtime_error& e)
+    {
+        if (UserConfigParams::logMisc())
+        {
+            Log::error("FileManager", "createXMLTreeFromString: %s\n", e.what());
+        }
+        return NULL;
+    }
+}   // createXMLTreeFromString
 
 //-----------------------------------------------------------------------------
 /** In order to add and later remove paths we have to specify the absolute
@@ -271,7 +354,7 @@ void FileManager::pushModelSearchPath(const std::string& path)
                                   /*ignorePaths*/false,
                                   io::EFAT_FOLDER);
     // A later added file archive should be searched first (so that
-    // track specific models are found before models in data/models). 
+    // track specific models are found before models in data/models).
     // This is not necessary if this is the first member, or if the
     // addFileArchive call did not add this file systems (this can
     // happen if the file archive has been added prevously, which
@@ -299,7 +382,7 @@ void FileManager::pushTextureSearchPath(const std::string& path)
                                   io::EFAT_FOLDER);
     // A later added file archive should be searched first (so that
     // e.g. track specific textures are found before textures in
-    // data/textures). 
+    // data/textures).
     // This is not necessary if this is the first member, or if the
     // addFileArchive call did not add this file systems (this can
     // happen if the file archive has been added previously, which
@@ -345,10 +428,11 @@ bool FileManager::findFile(std::string& full_path,
                       const std::string& file_name,
                       const std::vector<std::string>& search_path) const
 {
-    for(std::vector<std::string>::const_reverse_iterator i = search_path.rbegin();
+    for(std::vector<std::string>::const_reverse_iterator
+        i = search_path.rbegin();
         i != search_path.rend(); ++i)
     {
-        full_path = *i + "/" + file_name;
+        full_path = *i + file_name;
         if(m_file_system->existFile(full_path.c_str())) return true;
     }
     full_path="";
@@ -356,7 +440,7 @@ bool FileManager::findFile(std::string& full_path,
 }   // findFile
 
 //-----------------------------------------------------------------------------
-/** Returns the full path of a texture file name by searching for this 
+/** Returns the full path of a texture file name by searching for this
  *  file in all texture search paths.
  *  \param file_name Name of the texture file to search.
  *  \return The full path for the texture, or "" if the texture was not found.
@@ -369,7 +453,7 @@ std::string FileManager::getTextureFile(const std::string& file_name) const
 }   // getTextureFile
 
 //-----------------------------------------------------------------------------
-/** Returns the full path of a model file name by searching for this 
+/** Returns the full path of a model file name by searching for this
  *  file in all model search paths.
  *  \param file_name Name of the model file to search.
  *  \return The full path for the model, or "" if the model was not found.
@@ -386,7 +470,7 @@ std::string FileManager::getModelFile(const std::string& file_name) const
  */
 std::string FileManager::getDataDir() const
 {
-    return m_root_dir+"/data/";
+    return m_root_dir+"data/";
 }   // getDataDir
 
 //-----------------------------------------------------------------------------
@@ -394,15 +478,39 @@ std::string FileManager::getDataDir() const
  */
 std::string FileManager::getGUIDir() const
 {
-    return m_root_dir+"/data/gui/";
+    return m_root_dir+"data/gui/";
 }   // getGUIDir
+
+//-----------------------------------------------------------------------------
+/** Returns the base directory for all textures.
+ */
+std::string FileManager::getTextureDir() const
+{
+    return m_root_dir+"data/textures/";
+}   // getTextureDir
+
+//-----------------------------------------------------------------------------
+/** Returns the directory in which the shaders are stored.
+ */
+std::string FileManager::getShaderDir() const
+{
+    return m_root_dir+"data/shaders/";
+}   // getShaderDir
+
+//-----------------------------------------------------------------------------
+/** Returns the directory in which screenshots should be stored.
+ */
+std::string FileManager::getScreenshotDir() const
+{
+    return m_screenshot_dir;
+}   // getScreenshotDir
 
 //-----------------------------------------------------------------------------
 /** Returns the translation directory.
  */
 std::string FileManager::getTranslationDir() const
 {
-    return m_root_dir+"/data/po";
+    return m_root_dir+"data/po/";
 }   // getTranslationDir
 
 //-----------------------------------------------------------------------------
@@ -420,7 +528,7 @@ std::vector<std::string> FileManager::getMusicDirs() const
  */
 std::string FileManager::getDataFile(const std::string& file_name) const
 {
-    return m_root_dir+"/data/"+file_name;
+    return m_root_dir+"data/"+file_name;
 }   // getDataFile
 //-----------------------------------------------------------------------------
 /** Returns the full path of graphical effect file
@@ -428,14 +536,14 @@ std::string FileManager::getDataFile(const std::string& file_name) const
  */
 std::string FileManager::getGfxFile(const std::string& file_name) const
 {
-    return m_root_dir+"/data/gfx/"+file_name;
+    return m_root_dir+"data/gfx/"+file_name;
 }
 //-----------------------------------------------------------------------------
 /** If the directory specified in path does not exist, it is created. This
  *  function does not support recursive operations, so if a directory "a/b"
  *  is tested, and "a" does not exist, this function will fail.
  *  \params path Directory to test.
- *  \return  True if the directory exists or could be created, 
+ *  \return  True if the directory exists or could be created,
  *           false otherwise.
  */
 bool FileManager::checkAndCreateDirectory(const std::string &path)
@@ -445,8 +553,8 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
     if(m_file_system->existFile(io::path(path.c_str())))
         return true;
 
-    std::cout << "{FioleManager] Creating directory \"" << path << "\"\n";
-    
+    Log::info("FileManager", "Creating directory '%s'.", path.c_str());
+
     // Otherwise try to create the directory:
 #if defined(WIN32) && !defined(__CYGWIN__)
     bool error = _mkdir(path.c_str()) != 0;
@@ -457,7 +565,7 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
 }   // checkAndCreateDirectory
 
 //-----------------------------------------------------------------------------
-/** If the directory specified in path does not exist, it is created 
+/** If the directory specified in path does not exist, it is created
  *  recursively (mkdir -p style).
  *  \params path Directory to test.
  *  \return  True if the directory exists or could be created, false otherwise.
@@ -468,9 +576,9 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
     // (using access/_access internally):
     if(m_file_system->existFile(io::path(path.c_str())))
         return true;
-    
+
     std::cout << "[FileManager] Creating directory(ies) '" << path << "'.\n";
-    
+
     std::vector<std::string> split = StringUtils::split(path,'/');
     std::string current_path = "";
     for (unsigned int i=0; i<split.size(); i++)
@@ -482,7 +590,7 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
         {
             if (!checkAndCreateDirectory(current_path))
             {
-                fprintf(stderr, "[FileManager] Can't create dir '%s'",
+                Log::error("FileManager", "Can't create dir '%s'",
                         current_path.c_str());
                 break;
             }
@@ -494,20 +602,22 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
 }   // checkAndCreateDirectory
 
 //-----------------------------------------------------------------------------
-/** Checks if the config directory exists, and it not, tries to create it. 
+/** Checks if the config directory exists, and it not, tries to create it.
  *  It will set m_config_dir to the path to which user-specific config files
  *  are stored.
  */
 void FileManager::checkAndCreateConfigDir()
 {
-    if(getenv("SUPERTUXKART_SAVEDIR") && 
+    if(getenv("SUPERTUXKART_SAVEDIR") &&
         checkAndCreateDirectory(getenv("SUPERTUXKART_SAVEDIR")) )
     {
         m_config_dir = getenv("SUPERTUXKART_SAVEDIR");
     }
     else
     {
-#if defined(WIN32)
+
+#if defined(WIN32) || defined(__CYGWIN__)
+
         // Try to use the APPDATA directory to store config files and highscore
         // lists. If not defined, used the current directory.
         if(getenv("APPDATA")!=NULL)
@@ -522,26 +632,29 @@ void FileManager::checkAndCreateConfigDir()
         }
         else
             m_config_dir = ".";
-        const std::string CONFIGDIR("supertuxkart");
 
-        m_config_dir += "/";
-        m_config_dir += CONFIGDIR;
+        m_config_dir += "/supertuxkart";
+
 #elif defined(__APPLE__)
+
         if (getenv("HOME")!=NULL)
         {
             m_config_dir = getenv("HOME");
         }
         else
         {
-            std::cerr << "[FileManager] No home directory, this should NOT happen!\n";
-            // Fall back to system-wide app data (rather than user-specific data),
-            // but should not happen anyway.
+            std::cerr <<
+                "[FileManager] No home directory, this should NOT happen!\n";
+            // Fall back to system-wide app data (rather than
+            // user-specific data), but should not happen anyway.
             m_config_dir = "";
         }
         m_config_dir += "/Library/Application Support/";
         const std::string CONFIGDIR("SuperTuxKart");
         m_config_dir += CONFIGDIR;
-#  else
+
+#else
+
         // Remaining unix variants. Use the new standards for config directory
         // i.e. either XDG_CONFIG_HOME or $HOME/.config
         if (getenv("XDG_CONFIG_HOME")!=NULL){
@@ -549,7 +662,8 @@ void FileManager::checkAndCreateConfigDir()
         }
         else if (!getenv("HOME"))
         {
-            std::cerr << "[FileManager] No home directory, this should NOT happen "
+            std::cerr
+                << "[FileManager] No home directory, this should NOT happen "
                 << "- trying '.' for config files!\n";
             m_config_dir = ".";
         }
@@ -560,126 +674,199 @@ void FileManager::checkAndCreateConfigDir()
             if(!checkAndCreateDirectory(m_config_dir))
             {
                 // If $HOME/.config can not be created:
-                std::cerr << "[FileManager] Cannot create directory '" 
-                          << m_config_dir <<"', falling back to use '" 
+                std::cerr << "[FileManager] Cannot create directory '"
+                          << m_config_dir <<"', falling back to use '"
                           << getenv("HOME")<< "'.\n";
                 m_config_dir = getenv("HOME");
             }
         }
         m_config_dir += "/supertuxkart";
+
 #endif
+
     }   // if(getenv("SUPERTUXKART_SAVEDIR") && checkAndCreateDirectory(...))
 
+    if(m_config_dir.size()>0 && *m_config_dir.rbegin()!='/')
+        m_config_dir += "/";
 
     if(!checkAndCreateDirectory(m_config_dir))
     {
-        std::cerr << "[FileManager] Can not  create config dir '" 
-                  << m_config_dir << "', falling back to '.'.\n";
-        m_config_dir = ".";
+        Log::warn("FileManager", "Can not  create config dir '%s', "
+                  "falling back to '.'.", m_config_dir.c_str());
+        m_config_dir = "./";
     }
     return;
 }   // checkAndCreateConfigDir
 
 // ----------------------------------------------------------------------------
-/** Creates the directories for the addons data. This will set m_addons_dir 
+/** Creates the directories for the addons data. This will set m_addons_dir
  *  with the appropriate path, and also create the subdirectories in this
  *  directory.
  */
 void FileManager::checkAndCreateAddonsDir()
 {
-#if defined(WIN32)
-    m_addons_dir  = m_config_dir+"/addons";
+#if defined(WIN32) || defined(__CYGWIN__)
+    m_addons_dir  = m_config_dir+"addons/";
 #elif defined(__APPLE__)
     m_addons_dir  = getenv("HOME");
-    m_addons_dir += "/Library/Application Support/SuperTuxKart/Addons";
+    m_addons_dir += "/Library/Application Support/SuperTuxKart/Addons/";
 #else
-    // Remaining unix variants. Use the new standards for config directory
-    // i.e. either XDG_CONFIG_HOME or $HOME/.local/share
+    m_addons_dir = checkAndCreateLinuxDir("XDG_DATA_HOME", "supertuxkart",
+                                          ".local/share", ".stkaddons");
+    m_addons_dir += "addons/";
+#endif
 
-    bool dir_ok = false;
-
-    if (getenv("XDG_DATA_HOME")!=NULL)
+    if(!checkAndCreateDirectory(m_addons_dir))
     {
-        m_addons_dir = getenv("XDG_DATA_HOME");
-        dir_ok = checkAndCreateDirectory(m_addons_dir);
-        if(!dir_ok)
-            std::cerr << "[FileManager] Cannot create $XDG_DATA_HOME.\n";
+        Log::error("FileManager", "Can not create add-ons dir '%s', "
+                   "falling back to '.'.", m_addons_dir.c_str());
+        m_addons_dir = "./";
+    }
 
-        // Do an additional test here, e.g. in case that XDG_DATA_HOME is '/' 
+    if (!checkAndCreateDirectory(m_addons_dir + "icons/"))
+    {
+        Log::error("FileManager", "Failed to create add-ons icon dir at '%s'.",
+                   (m_addons_dir + "icons/").c_str());
+    }
+    if (!checkAndCreateDirectory(m_addons_dir + "tmp/"))
+    {
+        Log::error("FileManager", "Failed to create add-ons tmp dir at '%s'.",
+                   (m_addons_dir + "tmp/").c_str());
+    }
+
+}   // checkAndCreateAddonsDir
+
+// ----------------------------------------------------------------------------
+/** Creates the directories for screenshots. This will set m_screenshot_dir
+ *  with the appropriate path.
+ */
+void FileManager::checkAndCreateScreenshotDir()
+{
+#if defined(WIN32) || defined(__CYGWIN__)
+    m_screenshot_dir  = m_config_dir+"screenshots/";
+#elif defined(__APPLE__)
+    m_screenshot_dir  = getenv("HOME");
+    m_screenshot_dir += "/Library/Application Support/SuperTuxKart/Screenshots/";
+#else
+    m_screenshot_dir = checkAndCreateLinuxDir("XDG_CACHE_HOME", "supertuxkart", ".cache/", ".");
+    m_screenshot_dir += "screenshots/";
+#endif
+
+    if(!checkAndCreateDirectory(m_screenshot_dir))
+    {
+        Log::error("FileManager", "Can not create screenshot directory '%s', "
+                   "falling back to '.'.", m_screenshot_dir.c_str());
+        m_screenshot_dir = ".";
+    }
+
+}   // checkAndCreateScreenshotDir
+
+// ----------------------------------------------------------------------------
+#if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
+
+/** Find a directory to use for remaining unix variants. Use the new standards
+ *  for config directory based on XDG_* environment variables, or a
+ *  subdirectory under $HOME, trying two different fallbacks. It will also
+ *  check if the directory 'dirname' can be created (to avoid problems that
+ *  e.g. $env_name is '/', which exists, but can not be written to.
+ *  \param env_name  Name of the environment variable to test first.
+ *  \param dir_name  Name of the directory to create
+ *  \param fallback1 Subdirectory under $HOME to use if the environment
+ *         variable is not defined or can not be created.
+ *  \param fallback2 Subdirectory under $HOME to use if the environment
+ *         variable and fallback1 are not defined or can not be created.
+ */
+std::string FileManager::checkAndCreateLinuxDir(const char *env_name,
+                                                const char *dir_name,
+                                                const char *fallback1,
+                                                const char *fallback2)
+{
+    bool dir_ok = false;
+    std::string dir;
+
+    if (getenv(env_name)!=NULL)
+    {
+        dir = getenv(env_name);
+        dir_ok = checkAndCreateDirectory(dir);
+        if(!dir_ok)
+            Log::warn("FileManager", "Cannot create $%s.", env_name);
+
+        if(dir[dir.size()-1]!='/') dir += "/";
+        // Do an additional test here, e.g. in case that XDG_DATA_HOME is '/'
         // and since dir_ok is set, it would not test any of the other options
         // like $HOME/.local/share
-        dir_ok = checkAndCreateDirectory(m_addons_dir+"/supertuxkart");
+        dir_ok = checkAndCreateDirectory(dir+dir_name);
         if(!dir_ok)
-            std::cerr << "[FileManager] Cannot create $XDG_DATA_HOME/supertuxkart.\n";
+            Log::warn("FileManager", "Cannot create $%s/%s.", dir.c_str(),
+                      dir_name);
     }
 
     if(!dir_ok && getenv("HOME"))
     {
         // Use ~/.local/share :
-        m_addons_dir  = getenv("HOME");
-        m_addons_dir += "/.local/share";
-        // This tests for ".local" and then for ".local/share"
-        dir_ok = checkAndCreateDirectoryP(m_addons_dir);
+        dir  = getenv("HOME");
+        if(dir.size()>0 && dir[dir.size()-1]!='/') dir += "/";
+        dir += fallback1;
+        // This will create each individual subdirectory if
+        // dir_name contains "/".
+        dir_ok = checkAndCreateDirectoryP(dir);
         if(!dir_ok)
-            std::cerr << "[FileManager] Cannot create $HOME/.local/share.\n";
+            Log::warn("FileManager", "Cannot create $HOME/%s.",
+                      fallback1);
     }
-    if(!dir_ok && getenv("HOME"))
+    if(!dir_ok && fallback2 && getenv("HOME"))
     {
-        // Use ~/.stkaddons
-        m_addons_dir  = getenv("HOME");
-        m_addons_dir += "/.stkaddons";
-        dir_ok = checkAndCreateDirectory(m_addons_dir);
+        dir  = getenv("HOME");
+        if(dir.size()>0 && dir[dir.size()-1]!='/') dir += "/";
+        dir += fallback2;
+        dir_ok = checkAndCreateDirectory(dir);
         if(!dir_ok)
-            std::cerr << "[FileManager] Cannot create $HOME/.stkaddons.\n";
+            Log::warn("FileManager", "Cannot create $HOME/%s.",
+                      fallback2);
     }
 
     if(!dir_ok)
     {
-        std::cerr << "[FileManager] Falling back to use '.'.";
-        m_addons_dir = ".";
+        Log::warn("FileManager", "Falling back to use '.'.");
+        dir = "./";
     }
 
-    m_addons_dir += "/supertuxkart";
-    dir_ok = checkAndCreateDirectory(m_addons_dir);
+    if(dir.size()>0 && dir[dir.size()-1]!='/') dir += "/";
+    dir += dir_name;
+    dir_ok = checkAndCreateDirectory(dir);
     if(!dir_ok)
     {
-        // If the directory can not be created, abort
-        std::cerr << " [FileManager] Cannot create directory '"
-                  << m_addons_dir<<"', falling back to use '.'.\n";
-        m_addons_dir=".";
-
+        // If the directory can not be created
+        Log::error("FileManager", "Cannot create directory '%s', "
+                   "falling back to use '.'.", dir.c_str());
+        dir="./";
     }
-    m_addons_dir += "/addons";
-    
+    if(dir.size()>0 && dir[dir.size()-1]!='/') dir += "/";
+    return dir;
+}   // checkAndCreateLinuxDir
 #endif
 
-    if(!checkAndCreateDirectory(m_addons_dir))
-    {
-        fprintf(stderr, 
-                "[FileManager] Can not create add-ons dir '%s', falling back to '.'.\n", 
-                m_addons_dir.c_str());
-        m_addons_dir = ".";
-    }
-    std::cout << "[FileManager] Addons files will be stored in '"<<m_addons_dir<<"'.\n";
-
-    if (!checkAndCreateDirectory(m_addons_dir + "/icons/"))
-    {
-        fprintf(stderr, "[FileManager] Failed to create add-ons icon dir at '%s'\n",
-            (m_addons_dir + "/icons/").c_str());
-    }
-    if (!checkAndCreateDirectory(m_addons_dir + "/tmp/"))
-    {
-        fprintf(stderr, "[FileManager] Failed to create add-ons tmp dir at '%s'\n",
-            (m_addons_dir + "/tmp/").c_str());
-    }
-}   // checkAndCreateAddonsDir
+//-----------------------------------------------------------------------------
+/** Redirects output to go into files in the user's config directory
+ *  instead of to the console.
+ */
+void FileManager::redirectOutput()
+{
+    //Enable logging of stdout and stderr to logfile
+    std::string logoutfile = getLogFile("stdout.log");
+    std::string logerrfile = getLogFile("stderr.log");
+    Log::verbose("main", "Error messages and other text output will "
+                         "be logged to %s and %s.", logoutfile.c_str(),
+                 logerrfile.c_str());
+    Log::openOutputFiles(logoutfile);
+}   // redirectOutput
 
 //-----------------------------------------------------------------------------
 /** Returns the directory for addon files. */
 const std::string &FileManager::getAddonsDir() const
 {
     return m_addons_dir;
-}   // getADdonsDir
+}   // getAddonsDir
 
 //-----------------------------------------------------------------------------
 /** Returns the full path of a file in the addons directory.
@@ -687,7 +874,7 @@ const std::string &FileManager::getAddonsDir() const
  */
 std::string FileManager::getAddonsFile(const std::string &name)
 {
-    return getAddonsDir()+"/"+name;
+    return getAddonsDir()+name;
 }   // getAddonsFile
 
 //-----------------------------------------------------------------------------
@@ -732,7 +919,7 @@ std::string FileManager::getMusicFile(const std::string& file_name) const
  */
 std::string FileManager::getSFXFile(const std::string& file_name) const
 {
-    return m_root_dir+"/data/sfx/"+file_name;
+    return m_root_dir+"data/sfx/"+file_name;
 }   // getSFXFile
 
 //-----------------------------------------------------------------------------
@@ -741,7 +928,7 @@ std::string FileManager::getSFXFile(const std::string& file_name) const
  */
 std::string FileManager::getFontFile(const std::string& file_name) const
 {
-    return m_root_dir+"/data/fonts/"+file_name;
+    return m_root_dir+"data/fonts/"+file_name;
 }   // getFontFile
 
 //-----------------------------------------------------------------------------
@@ -765,7 +952,7 @@ std::string FileManager::getChallengeFile(const std::string &file_name) const
 }   // getChallengeFile
 
 //-----------------------------------------------------------------------------
-/** Returns the full path of the tutorial file. 
+/** Returns the full path of the tutorial file.
  *  \param file_name Name of the tutorial file to return.
  */
 std::string FileManager::getTutorialFile(const std::string &file_name) const
@@ -780,8 +967,12 @@ std::string FileManager::getTutorialFile(const std::string &file_name) const
 bool FileManager::isDirectory(const std::string &path) const
 {
     struct stat mystat;
-
-    if(stat(path.c_str(), &mystat) < 0) return false;
+    std::string s(path);
+    // At least on windows stat returns an error if there is
+    // a '/' at the end of the path.
+    if(s[s.size()-1]=='/')
+        s.erase(s.end()-1, s.end());
+    if(stat(s.c_str(), &mystat) < 0) return false;
     return S_ISDIR(mystat.st_mode);
 }   // isDirectory
 
@@ -794,26 +985,24 @@ bool FileManager::isDirectory(const std::string &path) const
  *         otherwise m_root_dir is used.
  *  \param make_full_path If set to true, all listed files will be full paths.
  */
-void FileManager::listFiles(std::set<std::string>& result, 
-                            const std::string& dir, bool is_full_path, 
+void FileManager::listFiles(std::set<std::string>& result,
+                            const std::string& dir, bool is_full_path,
                             bool make_full_path) const
 {
     result.clear();
 
-#ifdef WIN32
-    std::string path = is_full_path ? dir : m_root_dir+"/"+dir;
-#else
-    std::string path = is_full_path ? dir + "/" : m_root_dir+"/"+dir + "/";
-#endif
-    //printf("******* Path : %s \n", path.c_str());
+    std::string path = is_full_path ? dir : m_root_dir+dir;
 
-    if(!isDirectory(path)) return;
+#ifndef ANDROID
+    if(!isDirectory(path))
+        return;
+#endif
 
     io::path previous_cwd = m_file_system->getWorkingDirectory();
 
     if(!m_file_system->changeWorkingDirectoryTo( path.c_str() ))
     {
-        printf("FileManager::listFiles : Could not change CWD!\n");
+        Log::error("FileManager", "listFiles : Could not change CWD!\n");
         return;
     }
     irr::io::IFileList* files = m_file_system->createFileList();
@@ -834,17 +1023,15 @@ void FileManager::listFiles(std::set<std::string>& result,
  *  \param addons_type The type, which is used as a subdirectory. E.g.:
  *         'karts' (m_addons_dir/karts/name will be created).
  */
-void FileManager::checkAndCreateDirForAddons(std::string addons_name, 
-                                             std::string addons_type)
+void FileManager::checkAndCreateDirForAddons(const std::string &dir)
 {
-    std::string path = getAddonsFile(addons_type);
-    bool success = checkAndCreateDirectory(path);
+    // Tries to create directory recursively
+    bool success = checkAndCreateDirectoryP(dir);
     if(!success)
     {
-        std::cout << "There is a problem with the addons dir." << std::endl;
+        Log::warn("FileManager", "There is a problem with the addons dir.");
         return;
     }
-    checkAndCreateDirectory(path+"/"+addons_name);
 }   // checkAndCreateDirForAddons
 
 // ----------------------------------------------------------------------------
@@ -874,8 +1061,9 @@ bool FileManager::removeDirectory(const std::string &name) const
     for(std::set<std::string>::iterator i=files.begin(); i!=files.end(); i++)
     {
         if((*i)=="." || (*i)=="..") continue;
-        if(UserConfigParams::m_verbosity>=3)
-            printf("Deleting directory '%s'.\n", (*i).c_str());
+        if(UserConfigParams::logMisc())
+            Log::verbose("FileManager", "Deleting directory '%s'.",
+                         (*i).c_str());
         std::string full_path=name+"/"+*i;
         if(isDirectory(full_path))
         {
@@ -889,7 +1077,7 @@ bool FileManager::removeDirectory(const std::string &name) const
             removeFile(full_path);
         }
     }
-#ifdef WIN32
+#if defined(WIN32)
         return RemoveDirectory(name.c_str())==TRUE;
 #else
     return remove(name.c_str())==0;

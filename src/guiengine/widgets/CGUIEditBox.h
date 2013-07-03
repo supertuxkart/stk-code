@@ -9,6 +9,7 @@
 #include "IGUIEditBox.h"
 #include "irrArray.h"
 #include "IOSOperator.h"
+#include "utils/leak_check.hpp"
 
 #include "utils/time.hpp"
 
@@ -18,6 +19,8 @@ using namespace gui;
 	class CGUIEditBox : public IGUIEditBox
 	{
 	public:
+
+        LEAK_CHECK()
 
 		//! constructor
 		CGUIEditBox(const wchar_t* text, bool border, IGUIEnvironment* environment,
@@ -33,7 +36,7 @@ using namespace gui;
 		virtual void setOverrideColor(video::SColor color);
 
 		//! Gets the override color
-		virtual video::SColor const & getOverrideColor() const;
+		virtual video::SColor getOverrideColor() const;
 
 		//! Sets if the text should use the overide color or the
 		//! color in the gui skin.
@@ -115,7 +118,7 @@ using namespace gui;
         virtual irr::gui::IGUIFont* getOverrideFont() const { return NULL; }
         virtual irr::gui::IGUIFont* getActiveFont() const { return NULL; }
         virtual void setDrawBackground(bool) { }
-        
+
 	protected:
 		//! Breaks the single text line.
 		void breakText();
@@ -152,7 +155,7 @@ using namespace gui;
 		u32 Max;
 
         bool m_rtl;
-        
+
 		bool WordWrap, MultiLine, AutoScroll, PasswordBox;
 		wchar_t PasswordChar;
 		EGUI_ALIGNMENT HAlign, VAlign;

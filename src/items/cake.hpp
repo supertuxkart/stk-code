@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Joerg Henrichs
@@ -27,6 +26,7 @@ namespace irr
 {
     namespace scene { class IMesh; }
 }
+#include <irrString.h>
 
 #include "items/flyable.hpp"
 
@@ -38,23 +38,34 @@ class XMLNode;
 class Cake : public Flyable
 {
 private:
-    static float m_st_max_distance;    // maximum distance for a missile to be attracted
+    /** Maximum distance for a missile to be attracted. */
     static float m_st_max_distance_squared;
     static float m_gravity;
 
     btVector3    m_initial_velocity;
-    Kart*        m_target;            // which kart is targeted by this
-                                      // projectile (NULL if none)
-public:
-    Cake (Kart *kart);
-    static  void init     (const XMLNode &node, scene::IMesh *cake_model);
-    virtual void update   (float dt);
-    virtual void hitTrack ()                      { hit(NULL);               }
-    // Kinematic objects are not allowed to have a velocity (assertion in 
-    // bullet), so we have to do our own velocity handling here
-    virtual const btVector3 &getVelocity() const  {return m_initial_velocity;}
-    virtual void  setVelocity(const btVector3& v) {m_initial_velocity=v;     }
 
+    /** Which kart is targeted by this projectile (NULL if none). */
+    Moveable*    m_target;
+public:
+                 Cake (AbstractKart *kart);
+    static  void init     (const XMLNode &node, scene::IMesh *cake_model);
+    virtual const core::stringw
+                 getHitString(const AbstractKart *kart) const;
+    virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
+    // ------------------------------------------------------------------------
+    virtual void hitTrack ()                      { hit(NULL);               }
+    // ------------------------------------------------------------------------
+    /** Kinematic objects are not allowed to have a velocity (assertion in
+     *  bullet), so we have to do our own velocity handling here. This
+     *  function returns the velocity of this object. */
+    virtual const btVector3 &getVelocity() const  {return m_initial_velocity;}
+    // ------------------------------------------------------------------------
+    /** Kinematic objects are not allowed to have a velocity (assertion in
+     *  bullet), so we have to do our own velocity handling here. This
+     *  function sets the velocity of this object.
+     *  \param v Linear velocity of this object.
+     */
+    virtual void  setVelocity(const btVector3& v) {m_initial_velocity=v;     }
 };   // Cake
 
 #endif

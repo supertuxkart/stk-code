@@ -16,15 +16,20 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/linear_world.hpp"
-#include "states_screens/race_gui_base.hpp"
 
 #include <iostream>
 
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
-#include "network/network_manager.hpp" 
+#include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
+#include "karts/kart_properties.hpp"
+#include "network/network_manager.hpp"
+#include "physics/physics.hpp"
 #include "race/history.hpp"
+#include "states_screens/race_gui_base.hpp"
+#include "tracks/track_sector.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
@@ -36,10 +41,10 @@
  */
 LinearWorld::LinearWorld() : WorldWithRank()
 {
-    m_kart_display_info   = NULL;
-    m_last_lap_sfx        = sfx_manager->createSoundSource("last_lap_fanfare");
-    m_last_lap_sfx_played = false;
+    m_last_lap_sfx         = sfx_manager->createSoundSource("last_lap_fanfare");
+    m_last_lap_sfx_played  = false;
     m_last_lap_sfx_playing = false;
+    m_fastest_lap          = 9999999.9f;
 }   // LinearWorld
 
 // ----------------------------------------------------------------------------
@@ -50,119 +55,90 @@ LinearWorld::LinearWorld() : WorldWithRank()
 void LinearWorld::init()
 {
     WorldWithRank::init();
-    
+
     assert(!m_track->isArena());
-    
+    assert(!m_track->isSoccer());
+
     m_last_lap_sfx_played           = false;
     m_last_lap_sfx_playing          = false;
-    const unsigned int kart_amount  = m_karts.size();
-    m_kart_display_info = new RaceGUIBase::KartIconDisplayInfo[kart_amount];
 
-    for(unsigned int n=0; n<kart_amount; n++)
-    {
-        KartInfo info;
-        info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
-        info.m_last_valid_sector    = 0;
-        info.m_lap_start_time       = 0;
-        m_track->getQuadGraph().findRoadSector(m_karts[n]->getXYZ(),
-                                               &info.m_track_sector);
-
-        //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
-        //the road, so we have to use another function to find the sector.
-        info.m_on_road = info.m_track_sector != QuadGraph::UNKNOWN_SECTOR;
-        if (!info.m_on_road)
-        {
-            info.m_track_sector =
-                m_track->getQuadGraph().findOutOfRoadSector(m_karts[n]->getXYZ(),
-                                                            QuadGraph::UNKNOWN_SECTOR );
-        }
-
-        m_track->getQuadGraph().spatialToTrack(&info.m_curr_track_coords,
-                                               m_karts[n]->getXYZ(),
-                                               info.m_track_sector );
-
-        info.m_race_lap             = -1;
-        info.m_lap_start_time       = 0;
-        info.m_time_at_last_lap     = 99999.9f;
-        info.m_estimated_finish     = -1.0f;
-
-        m_kart_info.push_back(info);
-    }   // next kart
-
+    // The values are initialised in reset()
+    m_kart_info.resize(m_karts.size());
 }   // init
 
 //-----------------------------------------------------------------------------
+/** The destructor frees al data structures.
+ */
 LinearWorld::~LinearWorld()
 {
     sfx_manager->deleteSFX(m_last_lap_sfx);
-
-    // In case that a track is not found, m_kart_display info was never
-    // initialised.
-    if(m_kart_display_info)
-        delete[] m_kart_display_info;
 }   // ~LinearWorld
 
 //-----------------------------------------------------------------------------
-void LinearWorld::restartRace()
+/** Called before a race is started (or restarted). It resets the data
+ *  structures that keep track of position and distance long track of
+ *  all karts.
+ */
+void LinearWorld::reset()
 {
-    WorldWithRank::restartRace();
-    //if(m_last_lap_sfx->getStatus()== SFXManager::SFX_PLAYING)
-    //    m_last_lap_sfx->stop();
+    WorldWithRank::reset();
     m_last_lap_sfx_played = false;
     m_last_lap_sfx_playing = false;
 
     const unsigned int kart_amount = m_karts.size();
     for(unsigned int i=0; i<kart_amount; i++)
     {
-        KartInfo& info              = m_kart_info[i];
-        info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
-        info.m_last_valid_sector    = 0;
-        info.m_lap_start_time       = 0;
-        m_track->getQuadGraph().findRoadSector(m_karts[i]->getXYZ(),
-                                               &info.m_track_sector);
-
-        //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
-        //the road, so we have to use another function to find the sector.
-        info.m_on_road = info.m_track_sector != QuadGraph::UNKNOWN_SECTOR;
-        if (!info.m_on_road)
-        {
-            info.m_track_sector =
-                m_track->getQuadGraph().findOutOfRoadSector(m_karts[i]->getXYZ(),
-                                                            QuadGraph::UNKNOWN_SECTOR );
-        }
-
-        m_track->getQuadGraph().spatialToTrack(&info.m_curr_track_coords,
-                                               m_karts[i]->getXYZ(),
-                                               info.m_track_sector );
-        info.m_race_lap             = -1;
-        info.m_lap_start_time       = -0;
-        info.m_time_at_last_lap     = 99999.9f;
+        m_kart_info[i].reset();
+        m_kart_info[i].getSector()->update(m_karts[i]->getXYZ());
     }   // next kart
 
-    // First all kart infos must be updated before  the kart position can be 
+    // At the moment the last kart would be the one that is furthest away
+    // from the start line, i.e. it would determine the amount by which
+    // the track length must be extended (to avoid negative numbers in
+    // estimateFinishTimeForKart()). On the other hand future game modes
+    // might not follow this rule, so check the distance for all karts here:
+    m_distance_increase = m_track->getTrackLength();
+    for(unsigned int i=0; i<kart_amount; i++)
+    {
+        m_distance_increase = std::min(m_distance_increase,
+                                       getDistanceDownTrackForKart(i));
+    }
+    // Track length - minimum distance is how much the track length must
+    // be increased to avoid negative values in estimateFinishTimeForKart
+    // Increase this value somewhat in case that a kart drivess/slides
+    // backwards a little bit at start.
+    m_distance_increase = m_track->getTrackLength() - m_distance_increase
+                        + 5.0f;
+
+    if(m_distance_increase<0) m_distance_increase = 1.0f;  // shouldn't happen
+
+    // First all kart infos must be updated before the kart position can be
     // recomputed, since otherwise 'new' (initialised) valued will be compared
     // with old values.
     updateRacePosition();
-    
+
 #ifdef DEBUG
-    //FIXME: this could be defined somewhere in a central header so it can be used everywhere
+    //FIXME: this could be defined somewhere in a central header so it can
+    //       be used everywhere
 #define assertExpr( ARG1, OP, ARG2 ) if (!(ARG1 OP ARG2)) \
         { \
-            std::cerr << "Failed assert " << #ARG1 << #OP << #ARG2 << " @ " << __FILE__ << ":" << __LINE__ \
+            std::cerr << "Failed assert " << #ARG1 << #OP << #ARG2 << " @ " \
+                      << __FILE__ << ":" << __LINE__ \
                       << "; values are (" << ARG1 << #OP << ARG2 << ")\n"; \
             assert(false); \
         }
-    
+
     for (unsigned int i=0; i<kart_amount; i++)
     {
         for (unsigned int j=i+1; j<kart_amount; j++)
         {
-            assertExpr( m_karts[i]->getPosition(), !=, m_karts[j]->getPosition() );
+            assertExpr( m_karts[i]->getPosition(), !=,
+                        m_karts[j]->getPosition() );
         }
     }
 #endif
-    
-}   // restartRace
+
+}   // reset
 
 //-----------------------------------------------------------------------------
 /** General update function called once per frame. This updates the kart
@@ -174,13 +150,15 @@ void LinearWorld::update(float dt)
     // run generic parent stuff that applies to all modes. It
     // especially updates the kart positions.
     WorldWithRank::update(dt);
-    
-    if (m_last_lap_sfx_playing && m_last_lap_sfx->getStatus() != SFXManager::SFX_PLAYING)
+
+    if (m_last_lap_sfx_playing &&
+        m_last_lap_sfx->getStatus() != SFXManager::SFX_PLAYING)
     {
-        music_manager->getCurrentMusic()->resetTemporaryVolume();
+        if(music_manager->getCurrentMusic())
+            music_manager->getCurrentMusic()->resetTemporaryVolume();
         m_last_lap_sfx_playing = false;
     }
-    
+
     const unsigned int kart_amount = getNumKarts();
 
     // Do stuff specific to this subtype of race.
@@ -188,59 +166,41 @@ void LinearWorld::update(float dt)
     for(unsigned int n=0; n<kart_amount; n++)
     {
         KartInfo& kart_info = m_kart_info[n];
-        Kart* kart = m_karts[n];
+        AbstractKart* kart = m_karts[n];
 
-        // Nothing to do for karts that are currently being rescued or eliminated
-        if(kart->playingEmergencyAnimation()) continue;
+        // Nothing to do for karts that are currently being
+        // rescued or eliminated
+        if(kart->getKartAnimation()) continue;
 
-        // ---------- deal with sector data ---------
-
-        // update sector variables
-        int prev_sector = kart_info.m_track_sector;
-        m_track->getQuadGraph().findRoadSector(kart->getXYZ(),
-                                               &kart_info.m_track_sector);
-
-        kart_info.m_on_road = kart_info.m_track_sector != QuadGraph::UNKNOWN_SECTOR;
-        if(kart_info.m_on_road)
-        {
-            kart_info.m_last_valid_sector   = kart_info.m_track_sector;
-        }
-        else
-        {
-            // Kart off road. Find the closest sector instead.
-            kart_info.m_track_sector =
-                m_track->getQuadGraph().findOutOfRoadSector(kart->getXYZ(), prev_sector );
-        }
-
-        // Update track coords (=progression)
-        m_track->getQuadGraph().spatialToTrack(&kart_info.m_curr_track_coords,
-                                               kart->getXYZ(),
-                                               kart_info.m_track_sector    );
-
+        kart_info.getSector()->update(kart->getXYZ());
+        kart_info.m_overall_distance = kart_info.m_race_lap
+                                     * m_track->getTrackLength()
+                        + getDistanceDownTrackForKart(kart->getWorldKartId());
     }   // for n
 
     // Update all positions. This must be done after _all_ karts have
     // updated their position and laps etc, otherwise inconsistencies
     // (like two karts at same position) can occur.
     // ---------------------------------------------------------------
-    
     WorldWithRank::updateTrack(dt);
     updateRacePosition();
-    
+
     for (unsigned int i=0; i<kart_amount; i++)
     {
         // ---------- update rank ------
-        if (m_karts[i]->hasFinishedRace() || m_karts[i]->isEliminated()) continue;
+        if (m_karts[i]->hasFinishedRace() ||
+            m_karts[i]->isEliminated()       ) continue;
 
         // During the last lap update the estimated finish time.
         // This is used to play the faster music, and by the AI
         if (m_kart_info[i].m_race_lap == race_manager->getNumLaps()-1)
         {
-            m_kart_info[i].m_estimated_finish = estimateFinishTimeForKart(m_karts[i]);
+            m_kart_info[i].m_estimated_finish =
+                estimateFinishTimeForKart(m_karts[i]);
         }
         checkForWrongDirection(i);
     }
-    
+
 #ifdef DEBUG
     // Debug output in case that the double position error occurs again.
     std::vector<int> pos_used;
@@ -251,12 +211,15 @@ void LinearWorld::update(float dt)
         {
             for(unsigned int j =0; j<kart_amount; j++)
             {
-                printf("kart id=%d, position=%d, finished=%d, laps=%d, distanceDownTrack=%f %s\n",
+                printf("kart id=%d, position=%d, finished=%d, laps=%d, "
+                       "distanceDownTrack=%f overallDistance=%f %s\n",
                     j, m_karts[j]->getPosition(),
                     m_karts[j]->hasFinishedRace(),
                     m_kart_info[j].m_race_lap,
                     getDistanceDownTrackForKart(m_karts[j]->getWorldKartId()),
-                    (m_karts[j]->getPosition() == m_karts[i]->getPosition() ? "<--- !!!" : ""));
+                    m_kart_info[j].m_overall_distance,
+                    (m_karts[j]->getPosition() == m_karts[i]->getPosition()
+                     ? "<--- !!!" : "")                                      );
             }
         }
         pos_used[m_karts[i]->getPosition()]=i;
@@ -271,15 +234,20 @@ void LinearWorld::update(float dt)
 void LinearWorld::newLap(unsigned int kart_index)
 {
     KartInfo &kart_info = m_kart_info[kart_index];
-    Kart    *kart       = m_karts[kart_index];
+    AbstractKart *kart  = m_karts[kart_index];
 
-    // Don't do anything if a kart that has already finished the race
-    // crosses the start line again. This avoids 'fastest lap' messages
-    // if the end controller does a fastest lap.
-    if(kart->hasFinishedRace()) return;
+    // Only update the kart controller if a kart that has already finished
+    // the race crosses the start line again. This avoids 'fastest lap'
+    // messages if the end controller does a fastest lap, but especially
+    // allows the end controller to switch end cameras
+    if(kart->hasFinishedRace())
+    {
+        kart->getController()->newLap(kart_info.m_race_lap);
+        return;
+    }
 
     const int lap_count = race_manager->getNumLaps();
-    
+
     // Only increase the lap counter and set the new time if the
     // kart hasn't already finished the race (otherwise the race_gui
     // will begin another countdown).
@@ -287,13 +255,16 @@ void LinearWorld::newLap(unsigned int kart_index)
     {
         assert(kart->getWorldKartId()==kart_index);
         kart_info.m_time_at_last_lap=getTime();
-        kart_info.m_race_lap++ ;
+        kart_info.m_race_lap++;
+        m_kart_info[kart_index].m_overall_distance =
+              m_kart_info[kart_index].m_race_lap * m_track->getTrackLength()
+            + getDistanceDownTrackForKart(kart->getWorldKartId());
     }
     // Last lap message (kart_index's assert in previous block already)
-    if(kart_info.m_race_lap+1 == lap_count)
+    if (raceHasLaps() && kart_info.m_race_lap+1 == lap_count)
     {
         m_race_gui->addMessage(_("Final lap!"), kart,
-                               3.0f, 40, video::SColor(255, 210, 100, 50), true);
+                               3.0f, video::SColor(255, 210, 100, 50), true);
         if(!m_last_lap_sfx_played && lap_count > 1)
         {
             if (UserConfigParams::m_music)
@@ -301,9 +272,10 @@ void LinearWorld::newLap(unsigned int kart_index)
                 m_last_lap_sfx->play();
                 m_last_lap_sfx_played = true;
                 m_last_lap_sfx_playing = true;
-            
+
                 // In case that no music is defined
-                if(music_manager->getCurrentMusic() && music_manager->getMasterMusicVolume() > 0.2f)
+                if(music_manager->getCurrentMusic() &&
+                    music_manager->getMasterMusicVolume() > 0.2f)
                 {
                     music_manager->getCurrentMusic()->setTemporaryVolume(0.2f);
                 }
@@ -315,17 +287,19 @@ void LinearWorld::newLap(unsigned int kart_index)
             }
         }
     }
-    else if (kart_info.m_race_lap > 0 && kart_info.m_race_lap+1 < lap_count)
+    else if (raceHasLaps() && kart_info.m_race_lap > 0 &&
+             kart_info.m_race_lap+1 < lap_count)
     {
         m_race_gui->addMessage(_("Lap %i", kart_info.m_race_lap+1),
-                               kart, 3.0f, 40, video::SColor(255, 210, 100, 50), true);
+                               kart, 3.0f, video::SColor(255, 210, 100, 50),
+                               true);
     }
 
-    // The race positions must be updated here: consider the situation where 
-    // the first kart does not cross the finish line in its last lap, instead 
-    // it passes it, the kart reverses and crosses the finishing line 
+    // The race positions must be updated here: consider the situation where
+    // the first kart does not cross the finish line in its last lap, instead
+    // it passes it, the kart reverses and crosses the finishing line
     // backwards. Just before crossing the finishing line the kart will be on
-    // the last lap, but with a distance along the track close to zero. 
+    // the last lap, but with a distance along the track close to zero.
     // Therefore its position will be wrong. If the race position gets updated
     // after increasing the number of laps (but before tagging the kart to have
     // finished the race) the position will be correct (since the kart now
@@ -338,7 +312,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     // Similarly the situation can happen if the distance along track should
     // go back to zero before actually crossing the finishing line. While this
     // should not happen, it could potentially be caused by floating point
-    // errors. In this case the call to updateRacePosition will avoid 
+    // errors. In this case the call to updateRacePosition will avoid
     // duplicated race positions as well.
     updateRacePosition();
 
@@ -364,23 +338,24 @@ void LinearWorld::newLap(unsigned int kart_index)
     }
 
     // if new fastest lap
-    if(time_per_lap < getFastestLapTime() && raceHasLaps() &&
+    if(time_per_lap < m_fastest_lap && raceHasLaps() &&
         kart_info.m_race_lap>0)
     {
-        setFastestLap(kart, time_per_lap);
-        
+        m_fastest_lap = time_per_lap;
+
         std::string s = StringUtils::timeToString(time_per_lap);
-        
+
         irr::core::stringw m_fastest_lap_message;
         //I18N: as in "fastest lap: 60 seconds by Wilber"
-        m_fastest_lap_message += _("%s by %s", s.c_str(), core::stringw(kart->getName()));
-        
+        m_fastest_lap_message += _C("fastest_lap", "%s by %s", s.c_str(),
+                                    core::stringw(kart->getName()));
+
         m_race_gui->addMessage(m_fastest_lap_message, NULL,
-                               3.0f, 40, video::SColor(255, 255, 255, 255), false);
-        
+                               3.0f, video::SColor(255, 255, 255, 255), false);
+
         m_race_gui->addMessage(_("New fastest lap"), NULL,
-            3.0f, 40, video::SColor(255, 255, 255, 255), false);
-        
+                               3.0f, video::SColor(255, 255, 255, 255), false);
+
     } // end if new fastest lap
 
     kart_info.m_lap_start_time = getTime();
@@ -388,19 +363,32 @@ void LinearWorld::newLap(unsigned int kart_index)
 }   // newLap
 
 //-----------------------------------------------------------------------------
-int LinearWorld::getSectorForKart(const int kart_id) const
+/** Gets the sector a kart is on. This function returns UNKNOWN_SECTOR if the
+ *  kart_id is larger than the current kart info. This is necessary in the case
+ *  that a collision with the track happens during resetAllKarts: at this time
+ *  m_kart_info is not initialised (and has size 0), so it would trigger this
+ *  assert. While this normally does not happen, it is useful for track
+ *  designers that STK does not crash.
+ *  \param kart_id The world kart id of the kart for which to return
+ *                 the sector.
+ */
+int LinearWorld::getSectorForKart(const AbstractKart *kart) const
 {
-    return m_kart_info[kart_id].m_track_sector;
+    if(kart->getWorldKartId()>=m_kart_info.size())
+        return QuadGraph::UNKNOWN_SECTOR;
+    return m_kart_info[kart->getWorldKartId()].getSector()
+          ->getCurrentGraphNode();
 }   // getSectorForKart
 
 //-----------------------------------------------------------------------------
-/** Returns the distance the kart has travelled along the track since 
+/** Returns the distance the kart has travelled along the track since
  *  crossing the start line..
  *  \param kart_id Index of the kart.
  */
 float LinearWorld::getDistanceDownTrackForKart(const int kart_id) const
 {
-    return m_kart_info[kart_id].m_curr_track_coords.getZ();
+    assert(kart_id < (int)m_kart_info.size());
+    return m_kart_info[kart_id].getSector()->getDistanceFromStart();
 }   // getDistanceDownTrackForKart
 
 //-----------------------------------------------------------------------------
@@ -410,12 +398,14 @@ float LinearWorld::getDistanceDownTrackForKart(const int kart_id) const
  */
 float LinearWorld::getDistanceToCenterForKart(const int kart_id) const
 {
-    return m_kart_info[kart_id].m_curr_track_coords.getX();
+    assert(kart_id < (int)m_kart_info.size());
+    return m_kart_info[kart_id].getSector()->getDistanceToCenter();
 }   // getDistanceToCenterForKart
 
 //-----------------------------------------------------------------------------
 int LinearWorld::getLapForKart(const int kart_id) const
 {
+    assert(kart_id < (int)m_kart_info.size());
     return  m_kart_info[kart_id].m_race_lap;
 }   // getLapForKart
 
@@ -425,6 +415,7 @@ int LinearWorld::getLapForKart(const int kart_id) const
  */
 float LinearWorld::getEstimatedFinishTime(const int kart_id) const
 {
+    assert(kart_id < (int)m_kart_info.size());
     assert(m_kart_info[kart_id].m_race_lap == race_manager->getNumLaps()-1);
     return m_kart_info[kart_id].m_estimated_finish;
 }   // getEstimatedFinishTime
@@ -432,11 +423,13 @@ float LinearWorld::getEstimatedFinishTime(const int kart_id) const
 //-----------------------------------------------------------------------------
 float LinearWorld::getTimeAtLapForKart(const int kart_id) const
 {
+    assert(kart_id < (int)m_kart_info.size());
     return m_kart_info[kart_id].m_time_at_last_lap;
 }   // getTimeAtLapForKart
 
 //-----------------------------------------------------------------------------
-RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
+void LinearWorld::getKartsDisplayInfo(
+                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
 {
     int   laps_of_leader       = -1;
     float time_of_leader       = -1;
@@ -446,13 +439,11 @@ RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     const unsigned int kart_amount = getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
-        RaceGUIBase::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
-        Kart* kart = m_karts[i];
+        RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
+        AbstractKart* kart = m_karts[i];
 
         // reset color
-        rank_info.r = 1.0;
-        rank_info.g = 1.0;
-        rank_info.b = 1.0;
+        rank_info.m_color = video::SColor(255, 255, 255, 255);
         rank_info.lap = -1;
 
         if(kart->isEliminated()) continue;
@@ -462,7 +453,8 @@ RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
 
         if(current_lap > laps_of_leader)
         {
-            // more laps than current leader --> new leader and new time computation
+            // more laps than current leader --> new leader and
+            // new time computation
             laps_of_leader = current_lap;
             time_of_leader = lap_time;
         } else if(current_lap == laps_of_leader)
@@ -475,20 +467,23 @@ RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     // we now know the best time of the lap. fill the remaining bits of info
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
-        RaceGUIBase::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
+        RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         KartInfo& kart_info = m_kart_info[i];
-        Kart* kart = m_karts[i];
+        AbstractKart* kart = m_karts[i];
 
         const int position = kart->getPosition();
 
-        if(laps_of_leader>0 &&    // Don't compare times when crossing the start line first
-           (getTime() - getTimeAtLapForKart(kart->getWorldKartId())<5.0f || rank_info.lap != laps_of_leader) &&
-           raceHasLaps())
+        // Don't compare times when crossing the start line first
+        if(laps_of_leader>0                                                &&
+           (getTime() - getTimeAtLapForKart(kart->getWorldKartId())<5.0f ||
+            rank_info.lap != laps_of_leader)                               &&
+            raceHasLaps())
         {  // Display for 5 seconds
             std::string str;
             if(position == 1)
             {
-                str = " " + StringUtils::timeToString( getTimeAtLapForKart(kart->getWorldKartId()) );
+                str = " " + StringUtils::timeToString(
+                                 getTimeAtLapForKart(kart->getWorldKartId()) );
             }
             else
             {
@@ -510,111 +505,164 @@ RaceGUIBase::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
 
         if(kart_info.m_race_lap>=numLaps)
         {  // kart is finished, display in green
-            rank_info.g = rank_info.b = 0;
+            rank_info.m_color.setGreen(0);
+            rank_info.m_color.setBlue(0);
         }
         else if(kart_info.m_race_lap>=0 && numLaps>1)
         {
-            rank_info.g = rank_info.b = 1.0f-(float)kart_info.m_race_lap/((float)numLaps-1.0f);
+            int col = (int)(255*(1.0f-(float)kart_info.m_race_lap
+                                    /((float)numLaps-1.0f)        ));
+            rank_info.m_color.setBlue(col);
+            rank_info.m_color.setGreen(col);
         }
     }   // next kart
 
 
-    return m_kart_display_info;
 }   // getKartsDisplayInfo
 
 //-----------------------------------------------------------------------------
-/** Estimate the arrival time of any karts that haven't arrived yet by using 
- *  their average speed up to now and the distance still to race. This 
- *  approach guarantees that the order of the karts won't change anymore 
- *  (karts ahead will have a higher average speed and therefore finish the 
- *  race earlier than karts further behind), so the position doesn't have to
- *  be updated to get the correct scoring.
+/** Estimate the arrival time of any karts that haven't arrived yet by using
+ *  their average speed up to now and the distance still to race. This
+ *  approach guarantees that the order of the karts won't change anymore
+ *  (karts ahead will have covered more distance and have therefore a higher
+ *  average speed and therefore finish the race earlier than karts further
+ *  behind), so the position doesn't have to be updated to get the correct
+ *  scoring.
+ *  As so often the devil is in the details: a kart that hasn't crossed the
+ *  starting line has a negative distance (when it is crossing the start line
+ *  its distance becomes 0), which can result in a negative average speed
+ *  (and therefore incorrect estimates). This is partly taken care of by
+ *  adding m_distance_increase to the distance covered by a kart. The value
+ *  of m_distance_increase is a bit more than the distance the last kart
+ *  has from the start line at start time. This guarantees that the distance
+ *  used in computing the average speed is positive in most cases. Only
+ *  exception is if a kart is driving backwards on purpose. While this
+ *  shouldn't happen (the AI doesn't do it, and if it's a player the game
+ *  won't finish so the time estimation won't be called and so the incorrect
+ *  result won't be displayed), this is still taken care of: if the average
+ *  speed is negative, the estimated arrival time of the kart is set to
+ *  99:00 plus kart position. This means that even in this case all karts
+ *  will have a different arrival time.
+ *  \pre The position of the karts are set according to the distance they
+ *       have covered.
  *  \param kart The kart for which to estimate the finishing times.
  */
-float LinearWorld::estimateFinishTimeForKart(Kart* kart)
+float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
 {
     const KartInfo &kart_info = m_kart_info[kart->getWorldKartId()];
-    float distance_covered  = kart_info.m_race_lap * m_track->getTrackLength()
-        + getDistanceDownTrackForKart(kart->getWorldKartId());
-    // In case that a kart is rescued behind start line, or ...
-    if(distance_covered<0) distance_covered =1.0f;
 
-    const float full_distance = race_manager->getNumLaps()*m_track->getTrackLength();
-    const float average_speed = distance_covered/getTime();
+    float full_distance = race_manager->getNumLaps()
+                        * m_track->getTrackLength();
+
+    if(full_distance == 0)
+        full_distance = 1.0f;   // For 0 lap races avoid warning below
+
+#ifdef DEBUG
+    if(kart_info.m_overall_distance > full_distance)
+    {
+        printf("WARNING: full distance < distance covered for kart '%s':\n",
+               kart->getIdent().c_str());
+        printf("%f < %f\n", full_distance, kart_info.m_overall_distance);
+    }
+#endif
+    // Avoid potential problems (floating point issues, coding bug?) if a
+    // kart has driven more than the full distance, but not finished:
+    // Return the current time plus initial position to spread arrival
+    // times a bit. This code should generally not be used at all, it's
+    // just here to avoid invalid finishing times.
+    if(kart_info.m_overall_distance > full_distance)
+        return getTime() + kart->getInitialPosition();
 
     // Finish time is the time needed for the whole race with
-    // the average speed computed above.
-    return getTime() + (full_distance - distance_covered)  / average_speed;
+    // the computed average speed computed. The distance is always positive
+    // due to the way m_distance_increase was computed, so average speed
+    // is also always positive.
+    float average_speed = getTime()==0
+                        ? 1.0f
+                        : (m_distance_increase + kart_info.m_overall_distance)
+                          / getTime();
 
+    // Avoid NAN or invalid results when average_speed is very low
+    // or negative (which can happen if a kart drives backwards and
+    // m_overall distance becomes smaller than -m_distance_increase).
+    // In this case set the time to 99 minutes, offset by kart
+    // position (to spread arrival times for all karts that arrive
+    // even later). This works for up to 60 karts (otherwise the
+    // time displayed would become too long: 100:xx:yy).
+    if(average_speed<0.01f)
+        return 99*60.0f + kart->getPosition();
+
+    float est_time = getTime() + (full_distance - kart_info.m_overall_distance)
+                                 / average_speed;
+
+    // Avoid times > 99:00 - in this case use kart position to spread
+    // arrival time so that each kart has a unique value. The pre-condition
+    // guarantees that this works correctly (higher position -> less distance
+    // covered -> later arrival time).
+    if(est_time>99*60.0f)
+        return 99*60.0f + kart->getPosition();
+
+    return est_time;
 }   // estimateFinishTimeForKart
 
 //-----------------------------------------------------------------------------
 /** Decide where to drop a rescued kart
   */
-void LinearWorld::moveKartAfterRescue(Kart* kart)
+void LinearWorld::moveKartAfterRescue(AbstractKart* kart)
 {
     KartInfo& info = m_kart_info[kart->getWorldKartId()];
 
-    // If the kart is off road, rescue it to the last valid track position
-    // instead of the current one (since the sector might be determined by
-    // being closest to it, which allows shortcuts like drive towards another
-    // part of the lap, press rescue, and be rescued to this other part of
-    // the track (example: math class, drive towards the left after start,
-    // when hitting the books, press rescue --> you are rescued to the
-    // end of the track).
-    if(!info.m_on_road)
-    {
-        info.m_track_sector = info.m_last_valid_sector;
-    }
-
-    // Using the predecessor has the additional afvantage (besides punishing
-    // the player a bit more) that it makes it less likely to fall in a 
-    // rescue loop since the kart moves back on each attempt. 
-    const QuadGraph &qg     = m_track->getQuadGraph();
-    info.m_track_sector     = qg.getNode(info.m_track_sector).getPredecessor();
-    info.m_last_valid_sector= qg.getNode(info.m_track_sector).getPredecessor();
-
-    kart->setXYZ( m_track->trackToSpatial(info.m_track_sector) );
+    info.getSector()->rescue();
+    // Setting XYZ for the kart is important since otherwise the kart
+    // will not detect the right material again when doing the next
+    // raycast to detect where it is driving on (--> potential rescue loop)
+    int sector = info.getSector()->getCurrentGraphNode();
+    kart->setXYZ( QuadGraph::get()->getQuadOfNode(sector).getCenter());
 
     btQuaternion heading(btVector3(0.0f, 1.0f, 0.0f),
-                         m_track->getAngle(info.m_track_sector) );
+                         m_track->getAngle(sector) );
     kart->setRotation(heading);
-
     // A certain epsilon is added here to the Z coordinate, in case
     // that the drivelines are somewhat under the track. Otherwise, the
     // kart might be placed a little bit under the track, triggering
     // a rescue, ... (experimentally found value)
     float epsilon = 0.5f * kart->getKartHeight();
-
+    const Vec3 &xyz = QuadGraph::get()->getQuadOfNode(sector).getCenter();
     btTransform pos;
-    pos.setOrigin(kart->getXYZ()+btVector3(0, kart->getKartHeight() + epsilon, 0));
+    pos.setOrigin(xyz+btVector3(0, kart->getKartHeight() + epsilon,0));
     pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
-                    m_track->getAngle(info.m_track_sector)));
+                    m_track->getAngle(sector)));
 
     kart->getBody()->setCenterOfMassTransform(pos);
-
+    kart->setXYZ(pos.getOrigin());
     //project kart to surface of track
-    bool kart_over_ground = m_physics->projectKartDownwards(kart);
+    bool kart_over_ground = m_track->findGround(kart);
 
     if (kart_over_ground)
     {
         //add vertical offset so that the kart starts off above the track
-        float vertical_offset = kart->getKartProperties()->getVertRescueOffset() *
-                                kart->getKartHeight();
+        float vertical_offset =
+              kart->getKartProperties()->getVertRescueOffset()
+            * kart->getKartHeight();
         kart->getBody()->translate(btVector3(0, vertical_offset, 0));
+        // Also correctly set the graphics, otherwise the kart will
+        // be displayed for one frame at the incorrect position.
+        kart->updateGraphics(0, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
     }
     else
     {
-        fprintf(stderr, "WARNING: invalid position after rescue for kart %s on track %s.\n",
+        fprintf(stderr, "WARNING: invalid position after rescue for kart %s "
+                        "on track %s.\n",
                 (kart->getIdent().c_str()), m_track->getIdent().c_str());
     }
-
 
 }   // moveKartAfterRescue
 
 //-----------------------------------------------------------------------------
-/** Find the position (rank) of every kart
-  */
+/** Find the position (rank) of every kart. ATM it uses a stable O(n^2)
+ *  algorithm by counting for each kart how many other karts are ahead of
+ *  it.
+ */
 void LinearWorld::updateRacePosition()
 {
     // Mostly for debugging:
@@ -624,13 +672,13 @@ void LinearWorld::updateRacePosition()
 #ifdef DEBUG
     bool rank_changed = false;
 #endif
-    
+
     // NOTE: if you do any changes to this loop, the next loop (see
     // DEBUG_KART_RANK below) needs to have the same changes applied
     // so that debug output is still correct!!!!!!!!!!!
     for (unsigned int i=0; i<kart_amount; i++)
     {
-        Kart* kart          = m_karts[i];
+        AbstractKart* kart = m_karts[i];
         // Karts that are either eliminated or have finished the
         // race already have their (final) position assigned. If
         // these karts would get their rank updated, it could happen
@@ -644,52 +692,33 @@ void LinearWorld::updateRacePosition()
             continue;
         }
         KartInfo& kart_info = m_kart_info[i];
-        
+
         int p = 1 ;
 
-        const int my_id                = kart->getWorldKartId();
-        const int my_laps              = getLapForKart(my_id);
-        const float my_progression     = getDistanceDownTrackForKart(my_id);        
-        // Count karts ahead of the current kart, i.e. kart that are already finished,
-        // have done more laps, or the same number of laps, but a greater distance.
+        const unsigned int my_id = kart->getWorldKartId();
+        const float my_distance  = m_kart_info[my_id].m_overall_distance;
+
+        // Count karts ahead of the current kart, i.e. kart that are
+        // already finished or have covered a larger overall distance.
         for (unsigned int j = 0 ; j < kart_amount ; j++)
         {
-            if(j == kart->getWorldKartId())  continue; // don't compare a kart with itself
-            
-            if(m_karts[j]->isEliminated())   continue; // dismiss eliminated karts
+            // don't compare a kart with itself and ignore eliminated karts
+            if(j == my_id || m_karts[j]->isEliminated())
+                continue;
 
-            if(!kart->hasFinishedRace() && m_karts[j]->hasFinishedRace())
+            // If the other kart has:
+            // - finished the race (but this kart hasn't)
+            // - or is ahead
+            // - or has the same distance (very unlikely) but started earlier
+            // it is ahead --> increase position
+            if((!kart->hasFinishedRace() && m_karts[j]->hasFinishedRace()) ||
+                m_kart_info[j].m_overall_distance > my_distance            ||
+               (m_kart_info[j].m_overall_distance == my_distance &&
+                m_karts[j]->getInitialPosition()<kart->getInitialPosition() ) )
             {
                 p++;
-                continue;
             }
 
-            /* has done more or less lapses */
-            assert(j==m_karts[j]->getWorldKartId());
-            int other_laps = getLapForKart(j);
-            if (other_laps !=  my_laps)
-            {
-                if(other_laps > my_laps)
-                {
-                    p++; // Other kart has more lapses
-                }
-                continue;
-            }
-            // Now both karts have the same number of lapses. Test progression.
-            // A kart is ahead if it's driven further, or driven the same
-            // distance, but started further to the back.
-            float other_progression = getDistanceDownTrackForKart(j);
-            if(other_progression > my_progression ||
-                (other_progression == my_progression &&
-                m_karts[j]->getInitialPosition() > kart->getInitialPosition()) )
-            {
-                p++;
-#if _DEBUG_PRINTS_LIKE_MAD_
-                std::cout << "    " << p << " : " << m_karts[j]->getIdent() <<
-                        " because he has is further within the track (my progression is " <<
-                        my_progression << ", his progression is " << other_progression << ")\n";
-#endif
-            }
         } //next kart
 
 #ifndef DEBUG
@@ -703,18 +732,24 @@ void LinearWorld::updateRacePosition()
             std::cerr <<  "Info used to decide ranking :\n";
             for (unsigned int d=0; d<kart_amount; d++)
             {
-                std::cerr << "   kart " << m_karts[d]->getIdent() << " has finished(" << m_karts[d]->hasFinishedRace()
-                          << "), is at lap (" << getLapForKart(d) << "), is at distance("
-                          << getDistanceDownTrackForKart(d) << "), is eliminated(" << m_karts[d]->isEliminated() << ")" << std::endl;
+                std::cerr << "   kart " << m_karts[d]->getIdent()
+                          << " has finished(" << m_karts[d]->hasFinishedRace()
+                          << "), is at lap (" << getLapForKart(d)
+                          << "), is at distance("
+                          << m_kart_info[d].m_overall_distance
+                          << "), is eliminated(" << m_karts[d]->isEliminated()
+                          << ")" << std::endl;
             }
-                        
+
             std::cerr <<  "Who has each ranking so far :\n";
             for (unsigned int d=0; d<i; d++)
             {
-                std::cerr << "    " << m_karts[d]->getIdent() << " has rank " << m_karts[d]->getPosition() << std::endl;
+                std::cerr << "    " << m_karts[d]->getIdent() << " has rank "
+                          << m_karts[d]->getPosition() << std::endl;
             }
-            
-            std::cerr << "    --> And " << kart->getIdent() << " is being set at rank " << p << std::endl;
+
+            std::cerr << "    --> And " << kart->getIdent()
+                      << " is being set at rank " << p << std::endl;
             history->Save();
             assert(false);
         }
@@ -735,7 +770,7 @@ void LinearWorld::updateRacePosition()
         }
     }   // for i<kart_amount
 
-    // Define this to get a detailled analyses each time a race position 
+    // Define this to get a detailled analyses each time a race position
     // changes.
 #ifdef DEBUG
 #undef DEBUG_KART_RANK
@@ -745,46 +780,58 @@ void LinearWorld::updateRacePosition()
         std::cout << "Counting laps at "<<getTime()<<" seconds.\n";
         for (unsigned int i=0; i<kart_amount; i++)
         {
-            Kart* kart          = m_karts[i];
+            AbstractKart* kart = m_karts[i];
+            std::cout << "counting karts ahead of " << kart->getIdent()
+                << " (laps "           << m_kart_info[i].m_race_lap
+                << ", progress "       << m_kart_info[i].m_overall_distance
+                << " finished "        << kart->hasFinishedRace()
+                << " eliminated "      << kart->isEliminated()
+                << " initial position "<< kart->getInitialPosition()
+                << ").\n";
+            // Karts that are either eliminated or have finished the
+            // race already have their (final) position assigned. If
+            // these karts would get their rank updated, it could happen
+            // that a kart that finished first will be overtaken after
+            // crossing the finishing line and become second!
             if(kart->isEliminated() || kart->hasFinishedRace()) continue;
             KartInfo& kart_info = m_kart_info[i];
             int p = 1 ;
-            const int my_id                = kart->getWorldKartId();
-            const int my_laps              = getLapForKart(my_id);
-            const float my_progression     = getDistanceDownTrackForKart(my_id);
-            std::cout << "counting karts ahead of " << kart->getIdent() 
-                << " (laps "<<m_kart_info[i].m_race_lap<<", progress "
-                << my_progression<<").\n";
+            const int my_id         = kart->getWorldKartId();
+            const float my_distance = m_kart_info[my_id].m_overall_distance;
+
             for (unsigned int j = 0 ; j < kart_amount ; j++)
             {
-                if(j == kart->getWorldKartId())  continue; // don't compare a kart with itself
+                if(j == my_id) continue;
+                if(m_karts[j]->isEliminated())
+                {
+                    std::cout << "    " << p << " : " << m_karts[j]->getIdent()
+                              << " because it is eliminated.\n";
+                    continue;
+                }
                 if(!kart->hasFinishedRace() && m_karts[j]->hasFinishedRace())
                 {
                     p++;
-                    std::cout << "    " << p << " : " << m_karts[j]->getIdent() << " because he has finished.\n";
+                    std::cout << "    " << p << " : " << m_karts[j]->getIdent()
+                              << " because it has finished the race.\n";
                     continue;
                 }
-                int other_laps = getLapForKart(j);
-                if (other_laps !=  my_laps)
-                {
-                    if(other_laps > my_laps)
-                    {
-                        p++; // Other kart has more lapses
-                        std::cout << "    " << p << " : " << m_karts[j]->getIdent() << " because he has more laps than me.\n";
-                    }
-                    continue;
-                }
-                float other_progression = getDistanceDownTrackForKart(j);
-                if(other_progression > my_progression ||
-                    (other_progression == my_progression &&
-                    m_karts[j]->getInitialPosition() > kart->getInitialPosition()) )
+                if(m_kart_info[j].m_overall_distance > my_distance)
                 {
                     p++;
-                    std::cout << "    " << p << " : " << m_karts[j]->getIdent() <<
-                        " because he is further within the track (my progression is " <<
-                        my_progression << ", his progression is " << other_progression << ")\n";
+                    std::cout << "    " << p << " : " << m_karts[j]->getIdent()
+                        << " because it is ahead "
+                        << m_kart_info[j].m_overall_distance <<".\n";
+                    continue;
                 }
-            } //next kart
+                if(m_kart_info[j].m_overall_distance == my_distance &&
+                   m_karts[j]->getInitialPosition()<kart->getInitialPosition())
+                {
+                    p++;
+                    std::cout << "    " << p << " : " << m_karts[j]->getIdent()
+                        << " has same distance, but started ahead "
+                        << m_karts[j]->getInitialPosition()<<".\n";
+                }
+            }   // next kart j
         }   // for i<kart_amount
         std::cout << "-------------------------------------------\n";
     }   // if rank_changed
@@ -802,19 +849,20 @@ void LinearWorld::updateRacePosition()
 void LinearWorld::checkForWrongDirection(unsigned int i)
 {
     if(!m_karts[i]->getController()->isPlayerController()) return;
-    if(!m_kart_info[i].m_on_road ||
-        m_karts[i]->playingEmergencyAnimation()) return;
+    if(!m_kart_info[i].getSector()->isOnRoad()||
+        m_karts[i]->getKartAnimation()) return;
 
-    const Kart *kart=m_karts[i];
+    const AbstractKart *kart=m_karts[i];
     // If the kart can go in more than one directions from the current track
     // don't do any reverse message handling, since it is likely that there
     // will be one direction in which it isn't going backwards anyway.
-    if(m_track->getQuadGraph().getNumberOfSuccessors(m_kart_info[i].m_track_sector)>1)
+    int sector = m_kart_info[i].getSector()->getCurrentGraphNode();
+    if(QuadGraph::get()->getNumberOfSuccessors(sector)>1)
         return;
 
     // check if the player is going in the wrong direction
     float angle_diff = kart->getHeading() -
-                       m_track->getAngle(m_kart_info[i].m_track_sector);
+                       m_track->getAngle(sector);
     if(angle_diff > M_PI) angle_diff -= 2*M_PI;
     else if (angle_diff < -M_PI) angle_diff += 2*M_PI;
     // Display a warning message if the kart is going back way (unless
@@ -824,7 +872,11 @@ void LinearWorld::checkForWrongDirection(unsigned int i)
         kart->getVelocityLC().getY() > 0.0f        &&
         !kart->hasFinishedRace() )
     {
-        m_race_gui->addMessage(_("WRONG WAY!"), kart, -1.0f, 60);
+        m_race_gui->addMessage(_("WRONG WAY!"), kart,
+                              /* time */ -1.0f,
+                               video::SColor(255,255,255,255),
+                               /*important*/ true,
+                               /*big font*/  true);
     }  // if angle is too big
 }   // checkForWrongDirection
 

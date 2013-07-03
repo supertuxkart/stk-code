@@ -22,7 +22,7 @@
 #include <vector>
 
 namespace tinygettext {
-
+
 struct LanguageSpec {
   /** Language code: "de", "en", ... */
   const char* language;
@@ -36,10 +36,10 @@ struct LanguageSpec {
   /** Language name: "German", "English", "French", ... */
   const char* name;
 };
-
+
 /** Language Definitions */
 //*{
-LanguageSpec languages[] = {
+static const LanguageSpec languages[] = {
   { "aa", 0,    0, "Afar"                        },
   { "af", 0,    0, "Afrikaans"                   },
   { "af", "ZA", 0, "Afrikaans (South Africa)"    },
@@ -191,7 +191,7 @@ LanguageSpec languages[] = {
   { "my", 0,    0, "Burmese"                     },
   { "my", "MM", 0, "Burmese (Myanmar)"           },
   { "nb", 0,    0, "Norwegian Bokmal"            },
-  { "nb", "NO", 0, "Norwegian Bokmål (Norway)"   },
+  { "nb", "NO", 0, "Norwegian BokmÃ¥l (Norway)"   },
   { "ne", 0,    0, "Nepali"                      },
   { "nl", 0,    0, "Dutch"                       },
   { "nl", "BE", 0, "Dutch (Belgium)"             },
@@ -206,6 +206,7 @@ LanguageSpec languages[] = {
   { "oc", 0,    0, "Occitan post 1500"           },
   { "om", 0,    0, "Oromo"                       },
   { "or", 0,    0, "Oriya"                       },
+  { "os", 0,    0, "Ossetian"                    },
   { "pa", 0,    0, "Punjabi"                     },
   { "pl", 0,    0, "Polish"                      },
   { "pl", "PL", 0, "Polish (Poland)"             },
@@ -281,7 +282,7 @@ LanguageSpec languages[] = {
   { NULL, 0,    0, NULL                          }
 };
 //*}
-
+
 std::string
 resolve_language_alias(const std::string& name)
 {
@@ -296,7 +297,7 @@ resolve_language_alias(const std::string& name)
 
     // Aliases taken from /etc/locale.alias
     language_aliases["bokmal"]           = "nb_NO.ISO-8859-1";
-    language_aliases["bokmål"]           = "nb_NO.ISO-8859-1";
+    language_aliases["bokmÃ¥l"]           = "nb_NO.ISO-8859-1";
     language_aliases["catalan"]          = "ca_ES.ISO-8859-1";
     language_aliases["croatian"]         = "hr_HR.ISO-8859-2";
     language_aliases["czech"]            = "cs_CZ.ISO-8859-2";
@@ -307,7 +308,7 @@ resolve_language_alias(const std::string& name)
     language_aliases["eesti"]            = "et_EE.ISO-8859-1";
     language_aliases["estonian"]         = "et_EE.ISO-8859-1";
     language_aliases["finnish"]          = "fi_FI.ISO-8859-1";
-    language_aliases["français"]         = "fr_FR.ISO-8859-1";
+    language_aliases["franÃ§ais"]         = "fr_FR.ISO-8859-1";
     language_aliases["french"]           = "fr_FR.ISO-8859-1";
     language_aliases["galego"]           = "gl_ES.ISO-8859-1";
     language_aliases["galician"]         = "gl_ES.ISO-8859-1";
@@ -350,7 +351,7 @@ resolve_language_alias(const std::string& name)
     name_lowercase[i] = static_cast<char>(tolower(name[i]));
 
   Aliases::iterator i = language_aliases.find(name_lowercase);
-  if (i != language_aliases.end()) 
+  if (i != language_aliases.end())
   {
     return i->second;
   }
@@ -359,32 +360,32 @@ resolve_language_alias(const std::string& name)
     return name;
   }
 }
-
+
 Language
 Language::from_spec(const std::string& language, const std::string& country, const std::string& modifier)
 {
-  static std::map<std::string, std::vector<LanguageSpec*> > language_map;
+  static std::map<std::string, std::vector<const LanguageSpec*> > language_map;
 
   if (language_map.empty())
   { // Init language_map
     for(int i = 0; languages[i].language != NULL; ++i)
       language_map[languages[i].language].push_back(&languages[i]);
   }
-  
-  std::map<std::string, std::vector<LanguageSpec*> >::iterator i = language_map.find(language);
+
+  std::map<std::string, std::vector<const LanguageSpec*> >::iterator i = language_map.find(language);
   if (i != language_map.end())
   {
-    std::vector<LanguageSpec*>& lst = i->second;
+    std::vector<const LanguageSpec*>& lst = i->second;
 
     LanguageSpec tmpspec;
     tmpspec.language = language.c_str();
     tmpspec.country  = country.c_str();
     tmpspec.modifier = modifier.c_str();
     Language tmplang(&tmpspec);
-      
-    LanguageSpec* best_match = 0;
+
+    const LanguageSpec* best_match = 0;
     int best_match_score = 0;
-    for(std::vector<LanguageSpec*>::iterator j = lst.begin(); j != lst.end(); ++j)
+    for(std::vector<const LanguageSpec*>::iterator j = lst.begin(); j != lst.end(); ++j)
     { // Search for the language that best matches the given spec, value country more then modifier
       int score = Language::match(Language(*j), tmplang);
 
@@ -443,8 +444,8 @@ Language::from_env(const std::string& env)
 
   return from_spec(language, country, modifier);
 }
-
-Language::Language(LanguageSpec* language_spec_)
+
+Language::Language(const LanguageSpec* language_spec_)
   : language_spec(language_spec_)
 {
 }
@@ -469,7 +470,7 @@ Language::match(const Language& lhs, const Language& rhs)
       { 7, 6, 3 }, // country wildcard
       { 4, 2, 1 }, // country miss
     };
-  
+
     int c;
     if (lhs.get_country() == rhs.get_country())
       c = 0;
@@ -477,7 +478,7 @@ Language::match(const Language& lhs, const Language& rhs)
       c = 1;
     else
       c = 2;
-  
+
     int m;
     if (lhs.get_modifier() == rhs.get_modifier())
       m = 0;
@@ -563,7 +564,7 @@ Language::operator!=(const Language& rhs)
 {
   return language_spec != rhs.language_spec;
 }
-
+
 } // namespace tinygettext
 
 /* EOF */

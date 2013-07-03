@@ -1,17 +1,19 @@
 <?xml version="1.0"?>
-
-<challenge
-    version="1"
-    id="farmtracktime"
-    name="Finish Farm in 2:30"
-    description="Finish 3 laps in Farm with 3 easy AI karts in under 2:30 minutes."
-    unlock-track="hacienda"
-    major="single"
-    minor="quickrace"
-    track="farm"
-    difficulty="easy"
-    laps="3"
-    karts="4"
-    time="150"
-/>
-
+<challenge version="2">
+    <track id="hacienda" laps="3"/>
+    <mode major="single" minor="quickrace"/>
+    <requirements trophies="45"/>
+    
+    <hard>
+        <karts number="5"/>
+        <requirements position="2" time="170"/>
+    </hard>
+    <medium>
+        <karts number="4"/>
+        <requirements time="190"/>
+    </medium>
+    <easy>
+        <karts number="4"/>
+        <requirements time="220"/>
+    </easy>
+</challenge>

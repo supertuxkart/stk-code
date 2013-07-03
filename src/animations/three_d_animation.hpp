@@ -1,4 +1,3 @@
-//  $Id: three_d_animation.hpp 1681 2008-04-09 13:52:48Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -30,6 +29,12 @@ using namespace irr;
 #include "animations/animation_base.hpp"
 #include "physics/user_pointer.hpp"
 
+namespace irr
+{
+    namespace scene { class IAnimatedMesh; class ISceneNode; class IMesh; }
+}
+
+class TrackObject;
 class BezierCurve;
 class XMLNode;
 
@@ -39,30 +44,37 @@ class XMLNode;
 class ThreeDAnimation : public AnimationBase
 {
 private:
-    /** The bullet collision shape for the physics. */
-    btCollisionShape     *m_collision_shape;
+    TrackObject          *m_object;
 
-    /** The bullet rigid body. */
-    btRigidBody          *m_body;
+    /** True if a collision with this object should trigger
+     *  rescuing a kart. */
+    bool                  m_crash_reset;
 
-    /** Motion state of the physical object. */
-    btMotionState        *m_motion_state;
-
-    /** A user pointer to connect a bullet body with this object. */
-    UserPointer           m_user_pointer;
+    /** True if a collision with this object should trigger
+     *  "exploding" a kart. */
+    bool                  m_explode_kart;
 
     /** We have to store the rotation value as computed in blender, since
      *  irrlicht uses a different order, so for rotation animations we
      *  can not use the value returned by getRotation from a scene node. */
-    core::vector3df       m_hpr;
+    Vec3                  m_hpr;
 
-    void createPhysicsBody(const std::string &shape);
+    /**
+      * If true, play animation even when GFX are disabled
+      */
+    bool                  m_important_animation;
+
+    //scene::ISceneNode*    m_node;
 
 public:
-                 ThreeDAnimation(const XMLNode &node);
+                 ThreeDAnimation(const XMLNode &node, TrackObject* object);
     virtual     ~ThreeDAnimation();
     virtual void update(float dt);
-
+    // ------------------------------------------------------------------------
+    /** Returns true if a collision with this object should
+     * trigger a rescue. */
+    bool isCrashReset() const { return m_crash_reset; }
+    bool isExplodeKartObject() const { return m_explode_kart; }
 };   // ThreeDAnimation
 #endif
 

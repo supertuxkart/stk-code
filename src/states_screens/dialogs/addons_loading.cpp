@@ -21,7 +21,7 @@
 #include <pthread.h>
 
 #include "addons/addons_manager.hpp"
-#include "addons/network_http.hpp"
+#include "addons/inetwork_http.hpp"
 #include "addons/request.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
@@ -30,6 +30,9 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/addons_screen.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/state_manager.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -47,24 +50,18 @@ AddonsLoading::AddonsLoading(const float w, const float h,
     m_addon            = *(addons_manager->getAddon(id));
     m_icon_shown       = false;
     m_download_request = NULL;
-    
+
     loadFromFile("addons_loading.stkgui");
-    
+
     m_icon             = getWidget<IconButtonWidget> ("icon"    );
     m_progress         = getWidget<ProgressBarWidget>("progress");
-    m_install_button   = getWidget<ButtonWidget>     ("install" );
-    m_back_button      = getWidget<ButtonWidget>     ("cancel"  );
-    
+    m_install_button   = getWidget<IconButtonWidget> ("install" );
+    m_back_button      = getWidget<IconButtonWidget> ("back"  );
+    m_back_button->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
+
     if(m_progress)
         m_progress->setVisible(false);
-    
-    if(m_addon.isInstalled())
-    {
-        if(m_addon.needsUpdate())
-            getWidget<ButtonWidget>("install")->setLabel(_("Update"));
-        else
-            getWidget<ButtonWidget>("install")->setLabel(_("Uninstall"));
-    }   // if isInstalled
+
 }   // AddonsLoading
 
 // ----------------------------------------------------------------------------
@@ -84,13 +81,34 @@ void AddonsLoading::beforeAddingWidgets()
     /* Init the icon here to be able to load a single image*/
     m_icon             = getWidget<IconButtonWidget> ("icon"    );
     m_progress         = getWidget<ProgressBarWidget>("progress");
-    m_back_button      = getWidget<ButtonWidget>     ("cancel"  );
+    m_back_button      = getWidget<IconButtonWidget> ("back"    );
+
+    RibbonWidget* r = getWidget<RibbonWidget>("actions");
+    RatingBarWidget* rating = getWidget<RatingBarWidget>("rating");
+
+    if (m_addon.isInstalled())
+    {
+        /* only keep the button as "update" if allowed to access the net
+         * and  not in error state
+         */
+        if (m_addon.needsUpdate() && !addons_manager->wasError()
+            && UserConfigParams::m_internet_status==INetworkHttp::IPERM_ALLOWED)
+            getWidget<IconButtonWidget> ("install")->setLabel( _("Update") );
+        else
+            r->removeChildNamed("install");
+    }
+    else
+    {
+        r->removeChildNamed("uninstall");
+    }
 
     getWidget<LabelWidget>("name")->setText(m_addon.getName().c_str(), false);
     getWidget<BubbleWidget>("description")
         ->setText(m_addon.getDescription().c_str());
     core::stringw revision = _("Version: %d", m_addon.getRevision());
     getWidget<LabelWidget>("revision")->setText(revision, false);
+    rating->setRating(m_addon.getRating());
+    rating->setStarNumber(3);
 
     // Display flags for this addon
     // ============================
@@ -102,7 +120,7 @@ void AddonsLoading::beforeAddingWidgets()
         if (!m_addon.testStatus(Addon::AS_APPROVED))
             l.push_back("NOT APPROVED");
 
-        // Note that an approved addon should never have alpha, beta, or 
+        // Note that an approved addon should never have alpha, beta, or
         // RC status - and only one of those should be used
         if(m_addon.testStatus(Addon::AS_ALPHA))
             l.push_back("alpha");
@@ -159,6 +177,8 @@ void AddonsLoading::beforeAddingWidgets()
     getWidget<LabelWidget>("size")->setText(size, false);
 }   // AddonsLoading
 
+// ----------------------------------------------------------------------------
+
 void AddonsLoading::init()
 {
     GUIEngine::LabelWidget* flags = getWidget<LabelWidget>("flags");
@@ -166,43 +186,56 @@ void AddonsLoading::init()
     {
         flags->getIrrlichtElement<IGUIStaticText>()->setOverrideFont(GUIEngine::getSmallFont());
     }
-}
+}   // init
+
+// ----------------------------------------------------------------------------
+void AddonsLoading::escapePressed()
+{
+    stopDownload();
+    ModalDialog::dismiss();
+}   // escapePressed
 
 // ----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation 
+GUIEngine::EventPropagation
                     AddonsLoading::processEvent(const std::string& event_source)
 {
-    if(event_source == "cancel")
+    GUIEngine::RibbonWidget* actions_ribbon =
+            getWidget<GUIEngine::RibbonWidget>("actions");
+
+    if (event_source == "actions")
     {
-        // Cancel a download only if we are installing/upgrading one
-        // (and not uninstalling an installed one):
-        if(m_download_request)
+        const std::string& selection =
+                actions_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        
+        if(selection == "back")
         {
-            assert(m_download_request);
-            m_download_request->cancel();
+            stopDownload();
+            dismiss();
+            return GUIEngine::EVENT_BLOCK;
         }
-        dismiss();
-        return GUIEngine::EVENT_BLOCK;
-    }
-    else if(event_source == "install")
-    {
-        // Only display the progress bar etc. if we are
-        // not uninstalling an addon.
-        if(!m_addon.isInstalled() || m_addon.needsUpdate())
+        else if(selection == "install")
         {
-            m_progress->setValue(0);
-            m_progress->setVisible(true);
-            // Change the 'back' button into a 'cancel' button.
-            m_back_button->setText(_("Cancel"));
-            m_install_button->setVisible(false);
-            startDownload();
+            // Only display the progress bar etc. if we are
+            // not uninstalling an addon.
+            if(!m_addon.isInstalled() || m_addon.needsUpdate())
+            {
+                m_progress->setValue(0);
+                m_progress->setVisible(true);
+                // Change the 'back' button into a 'cancel' button.
+                m_back_button->setLabel(_("Cancel"));
+
+                actions_ribbon->setVisible(false);
+
+                startDownload();
+            }
+            return GUIEngine::EVENT_BLOCK;
         }
-        else   // uninstall
+        else if (selection == "uninstall")
         {
-            doInstall();
+            doUninstall();
+            return GUIEngine::EVENT_BLOCK;
         }
-        return GUIEngine::EVENT_BLOCK;
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
@@ -218,12 +251,13 @@ void AddonsLoading::onUpdate(float delta)
         {
             // Avoid displaying '-100%' in case of an error.
             m_progress->setVisible(false);
-            m_back_button->setText(_("Download failed."));
+            dismiss();
+            new MessageDialog( _("Sorry, downloading the add-on failed"));
             return;
         }
         else if(progress>=1.0f)
         {
-            m_back_button->setText(_("Back"));
+            m_back_button->setLabel(_("Back"));
             // No sense to update state text, since it all
             // happens before the GUI is refrehsed.
             doInstall();
@@ -250,48 +284,58 @@ void AddonsLoading::startDownload()
     std::string file   = m_addon.getZipFileName();
     std::string save   = "tmp/"
                        + StringUtils::getBasename(m_addon.getZipFileName());
-    m_download_request = network_http->downloadFileAsynchron(file, save, 
-                                                 /*priority*/5, 
-                                            /*manage memory*/false);
+    m_download_request = INetworkHttp::get()->downloadFileAsynchron(file, save,
+                                                       /*priority*/5,
+                                                       /*manage memory*/false);
 }   // startDownload
+
+// ----------------------------------------------------------------------------
+/** This function is called when the user click on 'Back', 'Cancel' or press
+ *  escape.
+ **/
+void AddonsLoading::stopDownload()
+{
+    // Cancel a download only if we are installing/upgrading one
+    // (and not uninstalling an installed one):
+    if(m_download_request)
+    {
+        // In case of a cancel we can't free the memory, since
+        // network_http will potentially update the request. So in
+        // order to avoid a memory leak, we let network_http free
+        // the request.
+        m_download_request->setManageMemory(true);
+        m_download_request->cancel();
+    };
+}   // startDownload
+
 
 // ----------------------------------------------------------------------------
 /** Called when the asynchronous download of the addon finished.
  */
 void AddonsLoading::doInstall()
 {
+    delete m_download_request;
+    m_download_request = NULL;
     bool error=false;
-    if(!m_addon.isInstalled() || m_addon.needsUpdate())
+
+    assert(!m_addon.isInstalled() || m_addon.needsUpdate());
+    error = !addons_manager->install(m_addon);
+    if(error)
     {
-        error = !addons_manager->install(m_addon);
-        if(error)
-        {
-            core::stringw msg = StringUtils::insertValues(
-                _("Problems installing the addon '%s'."),
-                core::stringw(m_addon.getName().c_str()));
-            m_back_button->setText(msg.c_str());
-        }
-    }
-    else
-    {
-        error = !addons_manager->uninstall(m_addon);
-        if(error)
-        {
-            printf("[addons]Directory '%s' can not be removed.\n",
-                m_addon.getDataDir().c_str());
-            printf("[addons]Please remove this directory manually.\n");
-            core::stringw msg = StringUtils::insertValues(
-                _("Problems removing the addon '%s'."),
-                core::stringw(m_addon.getName().c_str()));
-            m_back_button->setText(msg.c_str());
-        }
+        core::stringw msg = StringUtils::insertValues(
+            _("Problems installing the addon '%s'."),
+            core::stringw(m_addon.getName().c_str()));
+        getWidget<BubbleWidget>("description")->setText(msg.c_str());
     }
 
     if(error)
     {
         m_progress->setVisible(false);
-        m_install_button->setVisible(true);
-        m_install_button->setText(_("Try again"));
+
+        RibbonWidget* r = getWidget<RibbonWidget>("actions");
+        r->setVisible(true);
+
+        m_install_button->setLabel(_("Try again"));
     }
     else
     {
@@ -300,4 +344,44 @@ void AddonsLoading::doInstall()
         AddonsScreen::getInstance()->loadList();
         dismiss();
     }
+
+    track_manager->loadTrackList();
 }   // doInstall
+
+// ----------------------------------------------------------------------------
+
+void AddonsLoading::doUninstall()
+{
+    delete m_download_request;
+    m_download_request = NULL;
+    bool error=false;
+
+    error = !addons_manager->uninstall(m_addon);
+    if(error)
+    {
+        printf("[addons]Directory '%s' can not be removed.\n",
+               m_addon.getDataDir().c_str());
+        printf("[addons]Please remove this directory manually.\n");
+        core::stringw msg = StringUtils::insertValues(
+                                                      _("Problems removing the addon '%s'."),
+                                                      core::stringw(m_addon.getName().c_str()));
+        getWidget<BubbleWidget>("description")->setText(msg.c_str());
+    }
+
+    if(error)
+    {
+        m_progress->setVisible(false);
+
+        RibbonWidget* r = getWidget<RibbonWidget>("actions");
+        r->setVisible(true);
+
+        m_install_button->setLabel(_("Try again"));
+    }
+    else
+    {
+        // The list of the addon screen needs to be updated to correctly
+        // display the newly (un)installed addon.
+        AddonsScreen::getInstance()->loadList();
+        dismiss();
+    }
+}   // doUninstall

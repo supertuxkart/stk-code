@@ -19,7 +19,6 @@
 #define _follow_the_leader_hpp_
 
 #include "modes/linear_world.hpp"
-#include "states_screens/race_gui_base.hpp"
 
 /**
   * \brief An implementation of World, based on LinearWorld, to provide the Follow-the-leader game mode
@@ -31,24 +30,26 @@ private:
     std::vector<float>  m_leader_intervals;    // time till elimination in follow leader
 
 public:
-    
+
              FollowTheLeaderRace();
     virtual ~FollowTheLeaderRace();
-    
+
     // clock events
-    virtual void countdownReachedZero();
-    
+    virtual void countdownReachedZero() OVERRIDE;
+
     // overriding World methods
-    virtual void restartRace();
-    virtual std::string getIdent() const;
-    float   getClockStartTime();
-    virtual bool useFastMusicNearEnd() const { return false; }
-    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo();
-    
-    virtual bool isRaceOver();
-    virtual bool raceHasLaps(){ return false; }
-    
-};
+    virtual void reset() OVERRIDE;
+    virtual const std::string& getIdent() const OVERRIDE;
+    virtual float getClockStartTime();
+    virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
+    virtual void getKartsDisplayInfo(
+                 std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
+    virtual void init() OVERRIDE;
+
+    virtual bool isRaceOver() OVERRIDE;
+    virtual bool raceHasLaps() OVERRIDE { return false; }
+
+};   // FollowTheLeader
 
 
 #endif

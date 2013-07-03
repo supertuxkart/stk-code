@@ -1,7 +1,5 @@
-//  $Id$
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Maik Semder <ikework@gmx.de>
+//  Copyright (C) 2012 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,32 +15,32 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef HAVE_GHOST_REPLAY
-
 #include "replay/replay_base.hpp"
 
+#include "io/file_manager.hpp"
+#include "race/race_manager.hpp"
 
-const std::string ReplayBase::REPLAY_FOLDER = "replay";
-const std::string ReplayBase::REPLAY_FILE_EXTENSION_HUMAN_READABLE = "rph";
-const std::string ReplayBase::REPLAY_FILE_EXTENSION_BINARY = "rpb";
-
-
+// -----------------------------------------------------------------------------
 ReplayBase::ReplayBase()
-: m_ReplayBuffers()
 {
-}
-
-ReplayBase::~ReplayBase()
+    m_filename = "";
+}   // ReplayBaese
+// -----------------------------------------------------------------------------
+/** Opens a replay file (depending on the track name, which is taken from
+ *  the race manager).
+ *  \param writeable True if the file should be opened for writing.
+ *  \return A FILE *, or NULL if the file could not be opened.
+ */
+FILE* ReplayBase::openReplayFile(bool writeable)
 {
-    destroy();
-}
+    m_filename = file_manager->getConfigDir()+"/"
+               + race_manager->getTrackName()+".replay";
+    FILE *fd = fopen(m_filename.c_str(), writeable ? "w" : "r");
+    if(!fd)
+    {
+        m_filename = race_manager->getTrackName()+".replay";
+        fd = fopen(m_filename.c_str(), writeable ? "w" : "r");
+    }
+    return fd;
 
-void ReplayBase::destroy()
-{
-    m_ReplayBuffers.destroy();
-}
-
-
-
-
-#endif // HAVE_GHOST_REPLAY
+}   // openReplayFilen

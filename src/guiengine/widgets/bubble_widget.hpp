@@ -22,11 +22,16 @@
 #include <irrString.h>
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 
 namespace GUIEngine
 {
     const int BUBBLE_MARGIN_ON_RIGHT = 15;
     
+    /**
+      * A text widget that can expand when focused
+      * \ingroup widgetsgroup
+      */
     class BubbleWidget : public Widget
     {
         friend class Skin;
@@ -47,7 +52,12 @@ namespace GUIEngine
         /** For the skin to create the zooming effect */
         float m_zoom;
         
+        /** Will add/replace text in the bubble. If it doesn't fit, the text will get shrinked. **/
+        void replaceText();
+
     public:
+        
+        LEAK_CHECK()
         
         BubbleWidget();
         
@@ -56,6 +66,10 @@ namespace GUIEngine
         virtual EventPropagation focused(const int playerID);
         
         void updateSize();
+
+        void setText(const irr::core::stringw &s);
+
+
     };
 
 }

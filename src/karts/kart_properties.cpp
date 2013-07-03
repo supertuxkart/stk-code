@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKart-Team
@@ -19,21 +18,25 @@
 
 #include "karts/kart_properties.hpp"
 
+#include "addons/addon.hpp"
+#include "config/stk_config.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/material_manager.hpp"
+#include "io/file_manager.hpp"
+#include "karts/controller/ai_properties.hpp"
+#include "karts/kart_model.hpp"
+#include "karts/skidding_properties.hpp"
+#include "modes/world.hpp"
+#include "io/xml_node.hpp"
+#include "utils/constants.hpp"
+#include "utils/log.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
+
 #include <iostream>
 #include <stdexcept>
 #include <string>
 
-#include "config/stk_config.hpp"
-#include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/material_manager.hpp"
-#include "io/file_manager.hpp"
-#include "karts/kart_model.hpp"
-#include "modes/world.hpp"
-#include "io/xml_node.hpp"
-#include "utils/constants.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 float KartProperties::UNDEFINED = -99.9f;
 
@@ -59,46 +62,45 @@ KartProperties::KartProperties(const std::string &filename)
 
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
-    m_mass = m_min_speed_turn = m_angle_at_min =
-        m_max_speed_turn = m_angle_at_max = m_brake_factor =
-        m_engine_power[0] = m_engine_power[1] = m_engine_power[2] =
-        m_max_speed[0] = m_max_speed[1] = m_max_speed[2] =
-        m_time_full_steer = m_time_full_steer_ai =
-        m_nitro_power_boost = m_nitro_consumption =
-        m_nitro_small_container = m_nitro_big_container =
+    m_mass = m_brake_factor =
+        m_time_reset_steer = m_nitro_consumption = m_nitro_engine_force =
+        m_nitro_small_container = m_nitro_big_container = m_nitro_max =
         m_nitro_max_speed_increase = m_nitro_duration = m_nitro_fade_out_time =
         m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
         m_wheel_damping_compression = m_friction_slip = m_roll_influence =
-        m_wheel_radius = m_chassis_linear_damping =
+        m_wheel_radius = m_chassis_linear_damping = m_max_suspension_force =
         m_chassis_angular_damping = m_suspension_rest =
-        m_max_speed_reverse_ratio = m_jump_velocity =
-        m_rescue_vert_offset = m_upright_tolerance = m_collision_side_impulse =
+        m_max_speed_reverse_ratio = m_rescue_vert_offset =
+        m_upright_tolerance = m_collision_terrain_impulse =
+        m_collision_impulse = m_restitution = m_collision_impulse_time =
         m_upright_max_force = m_suspension_travel_cm =
-        m_track_connection_accel = m_min_speed_turn = m_angle_at_min =
-        m_max_speed_turn = m_angle_at_max =
-        m_rubber_band_max_length = m_rubber_band_force =
-        m_rubber_band_duration = m_rubber_band_speed_increase = 
-        m_rubber_band_fade_out_time = m_plunger_in_face_duration[0] =
-        m_plunger_in_face_duration[1] = m_plunger_in_face_duration[2] =
+        m_track_connection_accel = m_rubber_band_max_length =
+        m_rubber_band_force = m_rubber_band_duration =
+        m_rubber_band_speed_increase = m_rubber_band_fade_out_time =
         m_zipper_time = m_zipper_force = m_zipper_speed_gain =
         m_zipper_max_speed_increase = m_zipper_fade_out_time =
-        m_time_till_max_skid =
-        m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
-        m_slipstream_length = m_slipstream_collect_time = 
+        m_slipstream_length = m_slipstream_width = m_slipstream_collect_time =
         m_slipstream_use_time = m_slipstream_add_power =
         m_slipstream_min_speed = m_slipstream_max_speed_increase =
         m_slipstream_duration = m_slipstream_fade_out_time =
-        m_camera_distance = m_camera_forward_up_angle = 
+        m_camera_distance = m_camera_forward_up_angle =
         m_camera_backward_up_angle = m_explosion_invulnerability_time =
         m_rescue_time = m_rescue_height = m_explosion_time =
-        m_explosion_radius = m_ai_steering_variation = 
-        m_swatter_distance2 = m_swatter_duration = m_swatter_animation_time =
-        m_swatter_item_animation_time = m_squash_slowdown = 
-        m_squash_duration = UNDEFINED;
+        m_explosion_radius = m_max_lean = m_lean_speed =
+        m_swatter_distance2 = m_swatter_duration = m_squash_slowdown =
+        m_squash_duration = m_downward_impulse_factor = 
+        m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
+        m_bubblegum_time = m_bubblegum_torque = UNDEFINED;
 
+    m_engine_power.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
+    m_max_speed.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
+    m_plunger_in_face_duration.resize(RaceManager::DIFFICULTY_COUNT,
+                                      UNDEFINED);
+
+    m_terrain_impulse_type   = IMPULSE_NONE;
     m_gravity_center_shift   = Vec3(UNDEFINED);
-    m_has_skidmarks          = true;
-    m_swatter_count          = -1;
+    m_bevel_factor           = Vec3(UNDEFINED);
+    m_exp_spring_response    = false;
     m_version                = 0;
     m_color                  = video::SColor(255, 0, 0, 0);
     m_shape                  = 32;  // close enough to a circle.
@@ -106,7 +108,19 @@ KartProperties::KartProperties(const std::string &filename)
     m_kart_model             = NULL;
     m_has_rand_wheels        = false;
     // The default constructor for stk_config uses filename=""
-    if (filename != "") load(filename, "kart");
+    if (filename != "")
+    {
+        m_skidding_properties = NULL;
+        for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
+            m_ai_properties[i]= NULL;
+        load(filename, "kart");
+    }
+    else
+    {
+        m_skidding_properties = new SkiddingProperties();
+        for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
+            m_ai_properties[i]= new AIProperties((RaceManager::Difficulty)i);
+    }
 }   // KartProperties
 
 //-----------------------------------------------------------------------------
@@ -114,7 +128,37 @@ KartProperties::KartProperties(const std::string &filename)
 KartProperties::~KartProperties()
 {
     delete m_kart_model;
+    if(m_skidding_properties)
+        delete m_skidding_properties;
+    for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
+        if(m_ai_properties[i])
+            delete m_ai_properties[i];
 }   // ~KartProperties
+
+//-----------------------------------------------------------------------------
+/** Copies this KartProperties to another one. Importnat: if you add any
+ *  pointers to kart_properties, the data structure they are pointing to
+ *  need to be copied here explicitely!
+ *  \param source The source kart properties from which to copy this objects'
+ *         values.
+ */
+void KartProperties::copyFrom(const KartProperties *source)
+{
+    *this = *source;
+
+    // After the memcpy any pointers will be shared.
+    // So all pointer variables need to be separately allocated and assigned.
+    m_skidding_properties = new SkiddingProperties();
+    assert(m_skidding_properties);
+    *m_skidding_properties = *source->m_skidding_properties;
+
+    for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
+    {
+        m_ai_properties[i] = new AIProperties((RaceManager::Difficulty)i);
+        assert(m_ai_properties);
+        *m_ai_properties[i] = *source->m_ai_properties[i];
+    }
+}   // copyFrom
 
 //-----------------------------------------------------------------------------
 /** Loads the kart properties from a file.
@@ -123,16 +167,22 @@ KartProperties::~KartProperties()
  */
 void KartProperties::load(const std::string &filename, const std::string &node)
 {
-    // Get the default values from STKConfig:
-    *this = stk_config->getDefaultKartProperties();
+    // Get the default values from STKConfig. This will also allocate any
+    // pointers used in KartProperties
+    copyFrom(&stk_config->getDefaultKartProperties());
     // m_kart_model must be initialised after assigning the default
     // values from stk_config (otherwise all kart_properties will
     // share the same KartModel
     m_kart_model  = new KartModel(/*is_master*/true);
 
     const XMLNode * root = 0;
-    m_root  = StringUtils::getPath(filename);
+    m_root  = StringUtils::getPath(filename)+"/";
     m_ident = StringUtils::getBasename(StringUtils::getPath(filename));
+    // If this is an addon kart, add "addon_" to the identifier - just in
+    // case that an addon kart has the same directory name (and therefore
+    // identifier) as an included kart.
+    if(Addon::isAddon(filename))
+        m_ident = Addon::createAddonId(m_ident);
     try
     {
         root = new XMLNode(filename);
@@ -141,7 +191,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
             std::ostringstream msg;
             msg << "Couldn't load kart properties '" << filename <<
                 "': no kart node.";
-            
+
             delete m_kart_model;
             throw std::runtime_error(msg.str());
         }
@@ -149,9 +199,9 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     }
     catch(std::exception& err)
     {
-        fprintf(stderr, "Error while parsing KartProperties '%s':\n",
-                filename.c_str());
-        fprintf(stderr, "%s\n", err.what());
+        Log::error("KartProperties", "Error while parsing KartProperties '%s':\n",
+                   filename.c_str());
+        Log::error("KartProperties", "%s\n", err.what());
     }
     if(root) delete root;
 
@@ -161,23 +211,25 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 
 
     // Load material
-    std::string materials_file = m_root+"/materials.xml";
+    std::string materials_file = m_root+"materials.xml";
     file_manager->pushModelSearchPath  (m_root);
     file_manager->pushTextureSearchPath(m_root);
 
     // addShared makes sure that these textures/material infos stay in memory
     material_manager->addSharedMaterial(materials_file);
 
-    m_icon_file = m_root+"/"+m_icon_file;
+    m_icon_file = m_root+m_icon_file;
 
     // Make permanent is important, since otherwise icons can get deleted
     // (e.g. when freeing temp. materials from a track, the last icon
     //  would get deleted, too.
     m_icon_material = material_manager->getMaterial(m_icon_file,
-                                                    /*is_full+path*/true, 
-                                                    /*make_permanent*/true);
+                                                    /*is_full_path*/true,
+                                                    /*make_permanent*/true,
+                                                    /*complain_if_not_found*/true,
+                                                    /*strip_path*/false);
     if(m_minimap_icon_file!="")
-        m_minimap_icon = irr_driver->getTexture(m_root+"/"+m_minimap_icon_file);
+        m_minimap_icon = irr_driver->getTexture(m_root+m_minimap_icon_file);
     else
         m_minimap_icon = NULL;
 
@@ -194,7 +246,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
             throw std::runtime_error("Cannot load kart models");
         }
     }
-    
+
     if(m_gravity_center_shift.getX()==UNDEFINED)
     {
         m_gravity_center_shift.setX(0);
@@ -206,14 +258,13 @@ void KartProperties::load(const std::string &filename, const std::string &node)
                                            m_wheel_radius           );
     m_wheel_base = fabsf( m_kart_model->getWheelPhysicsPosition(0).getZ()
                          -m_kart_model->getWheelPhysicsPosition(2).getZ());
-    m_angle_at_min = asinf(m_wheel_base/m_min_radius);
-    m_angle_at_max = asinf(m_wheel_base/m_max_radius);
-    if(m_max_speed_turn == m_min_speed_turn)
-        m_speed_angle_increase = 0.0;
-    else
-        m_speed_angle_increase = (m_angle_at_min   - m_angle_at_max)
-                               / (m_max_speed_turn - m_min_speed_turn);
 
+    // Now convert the turn radius into turn angle:
+    for(unsigned int i=0; i<m_turn_angle_at_speed.size(); i++)
+    {
+        m_turn_angle_at_speed.setY( i,
+                            sin(m_wheel_base/m_turn_angle_at_speed.getY(i)) );
+    }
 
     m_shadow_texture = irr_driver->getTexture(m_shadow_file);
     file_manager->popTextureSearchPath();
@@ -228,11 +279,11 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 void KartProperties::getAllData(const XMLNode * root)
 {
     root->get("version", &m_version);
-    
+
     root->get("name",              &m_name             );
-    
+
     root->get("icon-file",         &m_icon_file        );
-    
+
     root->get("minimap-icon-file", &m_minimap_icon_file);
 
     root->get("shadow-file",       &m_shadow_file      );
@@ -242,25 +293,33 @@ void KartProperties::getAllData(const XMLNode * root)
 
     root->get("groups",            &m_groups           );
 
-	root->get("random-wheel-rot",    &m_has_rand_wheels   );
+    root->get("random-wheel-rot",  &m_has_rand_wheels  );
 
-    root->get("shadow-scale",      &m_shadow_scale      );
-    root->get("shadow-x-offset",   &m_shadow_x_offset   );
-    root->get("shadow-y-offset",   &m_shadow_y_offset   );
+    root->get("shadow-scale",      &m_shadow_scale     );
+    root->get("shadow-x-offset",   &m_shadow_x_offset  );
+    root->get("shadow-y-offset",   &m_shadow_y_offset  );
 
     if(const XMLNode *dimensions_node = root->getNode("center"))
         dimensions_node->get("gravity-shift", &m_gravity_center_shift);
 
     if(const XMLNode *nitro_node = root->getNode("nitro"))
     {
-        nitro_node->get("power-boost",        &m_nitro_power_boost       );
         nitro_node->get("consumption",        &m_nitro_consumption       );
         nitro_node->get("small-container",    &m_nitro_small_container   );
         nitro_node->get("big-container",      &m_nitro_big_container     );
         nitro_node->get("max-speed-increase", &m_nitro_max_speed_increase);
+        nitro_node->get("engine-force",       &m_nitro_engine_force      );
         nitro_node->get("duration",           &m_nitro_duration          );
         nitro_node->get("fade-out-time",      &m_nitro_fade_out_time     );
+        nitro_node->get("max",                &m_nitro_max               );
+    }
 
+    if(const XMLNode *bubble_node = root->getNode("bubblegum"))
+    {
+        bubble_node->get("time",           &m_bubblegum_time          );
+        bubble_node->get("speed-fraction", &m_bubblegum_speed_fraction);
+        bubble_node->get("fade-in-time",   &m_bubblegum_fade_in_time  );
+        bubble_node->get("torque",         &m_bubblegum_torque        );
     }
 
     if(const XMLNode *rescue_node = root->getNode("rescue"))
@@ -274,32 +333,36 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         explosion_node->get("time",   &m_explosion_time  );
         explosion_node->get("radius", &m_explosion_radius);
-        explosion_node->get("invulnerability-time", 
+        explosion_node->get("invulnerability-time",
                         &m_explosion_invulnerability_time);
+    }
+
+    if(const XMLNode *skid_node = root->getNode("skid"))
+    {
+        m_skidding_properties->load(skid_node);
     }
 
     if(const XMLNode *ai_node = root->getNode("ai"))
     {
-        ai_node->get("steering-variation",   &m_ai_steering_variation  );
-    }
-    if(const XMLNode *skid_node = root->getNode("skid"))
-    {
-        skid_node->get("increase",      &m_skid_increase     );
-        skid_node->get("decrease",      &m_skid_decrease     );
-        skid_node->get("max",           &m_skid_max          );
-        skid_node->get("time-till-max", &m_time_till_max_skid);
-        skid_node->get("visual",        &m_skid_visual       );
-        skid_node->get("enable",        &m_has_skidmarks     );
+        const XMLNode *easy = ai_node->getNode("easy");
+        m_ai_properties[RaceManager::DIFFICULTY_EASY]->load(easy);
+        const XMLNode *medium = ai_node->getNode("medium");
+        m_ai_properties[RaceManager::DIFFICULTY_MEDIUM]->load(medium);
+        const XMLNode *hard = ai_node->getNode("hard");
+        m_ai_properties[RaceManager::DIFFICULTY_HARD]->load(hard);
+        const XMLNode *best = ai_node->getNode("best");
+        m_ai_properties[RaceManager::DIFFICULTY_BEST]->load(best);
     }
 
     if(const XMLNode *slipstream_node = root->getNode("slipstream"))
     {
         slipstream_node->get("length",       &m_slipstream_length            );
+        slipstream_node->get("width",        &m_slipstream_width             );
         slipstream_node->get("collect-time", &m_slipstream_collect_time      );
         slipstream_node->get("use-time",     &m_slipstream_use_time          );
         slipstream_node->get("add-power",    &m_slipstream_add_power         );
         slipstream_node->get("min-speed",    &m_slipstream_min_speed         );
-        slipstream_node->get("max-speed-increase", 
+        slipstream_node->get("max-speed-increase",
                                              &m_slipstream_max_speed_increase);
         slipstream_node->get("duration",     &m_slipstream_duration          );
         slipstream_node->get("fade-out-time",&m_slipstream_fade_out_time     );
@@ -307,65 +370,31 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *turn_node = root->getNode("turn"))
     {
-        turn_node->get("time-full-steer",      &m_time_full_steer   );
-        turn_node->get("time-full-steer-ai",   &m_time_full_steer_ai);
-        std::vector<float> v;
-        if(turn_node->get("min-speed-radius", &v))
-        {
-            if(v.size()!=2)
-                printf("Incorrect min-speed-radius specifications for kart '%s'\n",
-                getIdent().c_str());
-            else
-            {
-                m_min_speed_turn = v[0];
-                m_min_radius     = v[1];
-            }
-        }
-
-        v.clear();
-        if(turn_node->get("max-speed-radius", &v))
-        {
-            if(v.size()!=2)
-                printf("Incorrect max-speed-radius specifications for kart '%s'\n",
-                getIdent().c_str());
-            else
-            {
-                m_max_speed_turn = v[0];
-                m_max_radius     = v[1];
-            }
-        }
-    }   // if turn_node
+        turn_node->get("time-full-steer",      &m_time_full_steer     );
+        turn_node->get("time-reset-steer",     &m_time_reset_steer    );
+        turn_node->get("turn-radius",          &m_turn_angle_at_speed );
+        // For now store the turn radius in turn angle, the correct
+        // value can only be determined later in ::load
+    }
 
     if(const XMLNode *engine_node = root->getNode("engine"))
     {
         engine_node->get("brake-factor", &m_brake_factor);
         engine_node->get("max-speed-reverse-ratio", &m_max_speed_reverse_ratio);
-        std::vector<float> v;
-        if( engine_node->get("power", &v))
+        engine_node->get("power", &m_engine_power);
+        if(m_engine_power.size()!=RaceManager::DIFFICULTY_COUNT)
         {
-            if(v.size()!=3)
-                printf("Incorrect engine-power specifications for kart '%s'\n",
-                getIdent().c_str());
-            else
-            {
-                m_engine_power[0] = v[0];
-                m_engine_power[1] = v[1];
-                m_engine_power[2] = v[2];
-            }
-        }   // if engine-power
-        v.clear();
-        if( engine_node->get("max-speed", &v))
+            Log::fatal("KartProperties",
+                       "Incorrect engine-power specifications for kart '%s'\n",
+                       getIdent().c_str());
+        }
+        engine_node->get("max-speed", &m_max_speed);
+        if(m_max_speed.size()!=RaceManager::DIFFICULTY_COUNT)
         {
-            if(v.size()!=3)
-                printf("Incorrect max-speed specifications for kart '%s'\n",
-                getIdent().c_str());
-            else
-            {
-                m_max_speed[0] = v[0];
-                m_max_speed[1] = v[1];
-                m_max_speed[2] = v[2];
-            }
-        }   // if max-speed
+            Log::fatal("KartProperties",
+                       "Incorrect max-speed specifications for kart '%s'\n",
+                       getIdent().c_str());
+        }
     }   // if getNode("engine")
 
     if(const XMLNode *gear_node = root->getNode("gear"))
@@ -380,9 +409,11 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *suspension_node = root->getNode("suspension"))
     {
-        suspension_node->get("stiffness", &m_suspension_stiffness);
-        suspension_node->get("rest",      &m_suspension_rest     );
-        suspension_node->get("travel-cm", &m_suspension_travel_cm);
+        suspension_node->get("stiffness",            &m_suspension_stiffness);
+        suspension_node->get("rest",                 &m_suspension_rest     );
+        suspension_node->get("travel-cm",            &m_suspension_travel_cm);
+        suspension_node->get("exp-spring-response",  &m_exp_spring_response );
+        suspension_node->get("max-force",            &m_max_suspension_force);
     }
 
     if(const XMLNode *wheels_node = root->getNode("wheels"))
@@ -397,9 +428,16 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *stability_node = root->getNode("stability"))
     {
-        stability_node->get("roll-influence",          &m_roll_influence);
-        stability_node->get("chassis-linear-damping",  &m_chassis_linear_damping);
-        stability_node->get("chassis-angular-damping", &m_chassis_angular_damping);
+        stability_node->get("roll-influence",
+                                                   &m_roll_influence         );
+        stability_node->get("chassis-linear-damping",
+                                                   &m_chassis_linear_damping );
+        stability_node->get("chassis-angular-damping",
+                                                   &m_chassis_angular_damping);
+        stability_node->get("downward-impulse-factor",
+                                                   &m_downward_impulse_factor);
+        stability_node->get("track-connection-accel",
+                                                   &m_track_connection_accel );
     }
 
     if(const XMLNode *upright_node = root->getNode("upright"))
@@ -408,16 +446,32 @@ void KartProperties::getAllData(const XMLNode * root)
         upright_node->get("max-force", &m_upright_max_force);
     }
 
-    if(const XMLNode *track_connection_node = root->getNode("track-connection-accel"))
-        track_connection_node->get("value", &m_track_connection_accel);
-
-    if(const XMLNode *jump_node = root->getNode("jump"))
-        jump_node->get("velocity", &m_jump_velocity);
-
     if(const XMLNode *collision_node = root->getNode("collision"))
-        collision_node->get("side-impulse",  &m_collision_side_impulse);
+    {
+        collision_node->get("impulse",         &m_collision_impulse        );
+        collision_node->get("impulse-time",    &m_collision_impulse_time   );
+        collision_node->get("terrain-impulse", &m_collision_terrain_impulse);
+        collision_node->get("restitution",     &m_restitution              );
+        collision_node->get("bevel-factor",    &m_bevel_factor             );
+        std::string s;
+        collision_node->get("impulse-type",    &s                          );
+        s = StringUtils::toLowerCase(s);
+        if(s=="none")
+            m_terrain_impulse_type = IMPULSE_NONE;
+        else if(s=="normal")
+            m_terrain_impulse_type = IMPULSE_NORMAL;
+        else if(s=="driveline")
+            m_terrain_impulse_type = IMPULSE_TO_DRIVELINE;
+        else
+        {
+            Log::fatal("KartProperties",
+                       "Missing or incorrect value for impulse-type: '%s'.\n",
+                       s.c_str());
+        }
+    }
 
-    //TODO: wheel front right and wheel front left is not loaded, yet is listed as an attribute in the xml file after wheel-radius
+    //TODO: wheel front right and wheel front left is not loaded, yet is
+    //TODO: listed as an attribute in the xml file after wheel-radius
     //TODO: same goes for their rear equivalents
 
     if(const XMLNode *plunger_node= root->getNode("plunger"))
@@ -427,17 +481,11 @@ void KartProperties::getAllData(const XMLNode * root)
         plunger_node->get("band-duration",      &m_rubber_band_duration      );
         plunger_node->get("band-speed-increase",&m_rubber_band_speed_increase);
         plunger_node->get("band-fade-out-time", &m_rubber_band_fade_out_time );
-        std::vector<float> v;
-        plunger_node->get("in-face-time",    &v);
-        if(v.size()!=3)
+        plunger_node->get("in-face-time", &m_plunger_in_face_duration);
+        if(m_plunger_in_face_duration.size()!=RaceManager::DIFFICULTY_COUNT)
         {
-            fprintf(stderr, "[KartProperties] ERROR: Invalid plunger in-face-time specification.");
-        }
-        else
-        {
-            m_plunger_in_face_duration[0] = v[0];
-            m_plunger_in_face_duration[1] = v[1];
-            m_plunger_in_face_duration[2] = v[2];
+            Log::fatal("KartProperties",
+                       "Invalid plunger in-face-time specification.");
         }
     }
 
@@ -453,10 +501,6 @@ void KartProperties::getAllData(const XMLNode * root)
     if(const XMLNode *swatter_node= root->getNode("swatter"))
     {
         swatter_node->get("duration",        &m_swatter_duration      );
-        swatter_node->get("count",           &m_swatter_count         );
-        swatter_node->get("animation-time",  &m_swatter_animation_time);
-        swatter_node->get("item-animation-time",
-                                        &m_swatter_item_animation_time);
         swatter_node->get("squash-duration", &m_squash_duration       );
         swatter_node->get("squash-slowdown", &m_squash_slowdown       );
         if(swatter_node->get("distance",     &m_swatter_distance2) )
@@ -465,6 +509,14 @@ void KartProperties::getAllData(const XMLNode * root)
             // distance2 remains UNDEFINED (which is a negative value)
             m_swatter_distance2 *= m_swatter_distance2;
         }
+    }
+
+    if(const XMLNode *lean_node= root->getNode("lean"))
+    {
+        lean_node->get("max",   &m_max_lean  );
+        lean_node->get("speed", &m_lean_speed);
+        m_max_lean   *= DEGREE_TO_RAD;
+        m_lean_speed *= DEGREE_TO_RAD;
     }
 
     if(const XMLNode *camera_node= root->getNode("camera"))
@@ -490,8 +542,8 @@ void KartProperties::getAllData(const XMLNode * root)
         else if (s == "small") m_engine_sfx_type = "engine_small";
         else
         {
-            std::cerr << "[KartProperties::getAllData()] WARNING : Kart " << m_name.c_str()
-                      << " has invalid engine : " << s << "\n";
+            Log::warn("KartProperties", "Kart '%s' has invalid engine '%s'.",
+                       m_name.c_str(), s.c_str());
             m_engine_sfx_type = "engine_small";
         }
 
@@ -533,65 +585,61 @@ void KartProperties::checkAllSet(const std::string &filename)
 {
     if(m_gear_switch_ratio.size()==0)
     {
-        fprintf(stderr,"Missing default value for 'gear-switch-ratio' in '%s'.\n",
-                filename.c_str());
-        exit(-1);
+        Log::fatal("KartProperties",
+                   "Missing default value for 'gear-switch-ratio' in '%s'.\n",
+                   filename.c_str());
     }
     if(m_gear_power_increase.size()==0)
     {
-        fprintf(stderr,"Missing default value for 'gear-power-increase' in '%s'.\n",
+        Log::fatal("KartProperties",
+                   "Missing default value for 'gear-power-increase' in '%s'.\n",
                 filename.c_str());
-        exit(-1);
     }
     if(m_gear_switch_ratio.size()!=m_gear_power_increase.size())    {
-        fprintf(stderr,"Number of entries for 'gear-switch-ratio' and 'gear-power-increase\n");
-        fprintf(stderr,"in '%s' must be equal.\n", filename.c_str());
-        exit(-1);
+        Log::error("KartProperties",
+                   "Number of entries for 'gear-switch-ratio' and "
+                   "'gear-power-increase\n");
+        Log::fatal("KartProperties", "in '%s' must be equal.\n",
+                    filename.c_str());
     }
     if(m_startup_boost.size()!=m_startup_times.size())
     {
-        fprintf(stderr, "Number of entried for 'startup times' and 'startup-boost\n");
-        fprintf(stderr, "must be identical.\n");
-        exit(-1);
+        Log::error("KartProperties",
+                 "Number of entried for 'startup times' and 'startup-boost\n");
+        Log::fatal("KartProperties", "must be identical.\n");
     }
-#define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                         \
-        fprintf(stderr,"Missing default value for '%s' in '%s'.\n",    \
-                strA,filename.c_str());exit(-1);                       \
+#define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                      \
+        Log::fatal("KartProperties",                                \
+                    "Missing default value for '%s' in '%s'.\n",    \
+                    strA,filename.c_str());                \
     }
 
     CHECK_NEG(m_mass,                       "mass"                          );
-    CHECK_NEG(m_min_speed_turn,             "turn min-speed-angle"          );
-    CHECK_NEG(m_min_radius,                 "turn min-speed-angle"          );
-    CHECK_NEG(m_max_speed_turn,             "turn max-speed-angle"          );
-    CHECK_NEG(m_max_radius,                 "turn max-speed-angle"          );
-    CHECK_NEG(m_time_full_steer,            "turn time-full-steer"          );
-    CHECK_NEG(m_time_full_steer_ai,         "turn time-full-steer-ai"       );
+    CHECK_NEG(m_time_reset_steer,           "turn time-reset-steer"         );
     CHECK_NEG(m_wheel_damping_relaxation,   "wheels damping-relaxation"     );
     CHECK_NEG(m_wheel_damping_compression,  "wheels damping-compression"    );
     CHECK_NEG(m_wheel_radius,               "wheels radius"                 );
     CHECK_NEG(m_friction_slip,              "friction slip"                 );
     CHECK_NEG(m_roll_influence,             "stability roll-influence"      );
-    CHECK_NEG(m_chassis_linear_damping,     "stability chassis-linear-damping");
-    CHECK_NEG(m_chassis_angular_damping,    "stability chassis-angular-damping");
-    CHECK_NEG(m_engine_power[0],            "engine power[0]"               );
-    CHECK_NEG(m_engine_power[1],            "engine power[1]"               );
-    CHECK_NEG(m_engine_power[2],            "engine power[2]"               );
-    CHECK_NEG(m_max_speed[0],               "engine maximum-speed[0]"       );
-    CHECK_NEG(m_max_speed[1],               "engine maximum-speed[1]"       );
-    CHECK_NEG(m_max_speed[2],               "engine maximum-speed[2]"       );
+    CHECK_NEG(m_chassis_linear_damping,  "stability chassis-linear-damping" );
+    CHECK_NEG(m_chassis_angular_damping, "stability chassis-angular-damping");
+    CHECK_NEG(m_downward_impulse_factor, "stability downward-impulse-factor");
+    CHECK_NEG(m_track_connection_accel,  "stability track-connection-accel" );
     CHECK_NEG(m_max_speed_reverse_ratio,    "engine max-speed-reverse-ratio");
     CHECK_NEG(m_brake_factor,               "engine brake-factor"           );
     CHECK_NEG(m_suspension_stiffness,       "suspension stiffness"          );
     CHECK_NEG(m_suspension_rest,            "suspension rest"               );
     CHECK_NEG(m_suspension_travel_cm,       "suspension travel-cm"          );
-    CHECK_NEG(m_collision_side_impulse,     "collision side-impulse"        );
-    CHECK_NEG(m_jump_velocity,              "jump velocity"                 );
+    CHECK_NEG(m_max_suspension_force,       "suspension max-force"          );
+    CHECK_NEG(m_collision_impulse,          "collision impulse"             );
+    CHECK_NEG(m_collision_impulse_time,     "collision impulse-time"        );
+    CHECK_NEG(m_restitution,                "collision restitution"         );
+    CHECK_NEG(m_collision_terrain_impulse,  "collision terrain-impulse"     );
+    CHECK_NEG(m_bevel_factor.getX(),        "collision bevel-factor"        );
+    CHECK_NEG(m_bevel_factor.getY(),        "collision bevel-factor"        );
+    CHECK_NEG(m_bevel_factor.getZ(),        "collision bevel-factor"        );
     CHECK_NEG(m_upright_tolerance,          "upright tolerance"             );
     CHECK_NEG(m_upright_max_force,          "upright max-force"             );
-    CHECK_NEG(m_track_connection_accel,     "track-connection-accel"        );
-    CHECK_NEG(m_plunger_in_face_duration[0],"plunger in-face-time[0]"       );
-    CHECK_NEG(m_plunger_in_face_duration[1],"plunger in-face-time[1]"       );
-    CHECK_NEG(m_plunger_in_face_duration[2],"plunger in-face-time[2]"       );
     CHECK_NEG(m_rubber_band_max_length,     "plunger band-max-length"       );
     CHECK_NEG(m_rubber_band_force,          "plunger band-force"            );
     CHECK_NEG(m_rubber_band_duration,       "plunger band-duration"         );
@@ -602,56 +650,59 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_zipper_force,               "zipper-force"                  );
     CHECK_NEG(m_zipper_speed_gain,          "zipper-speed-gain"             );
     CHECK_NEG(m_zipper_max_speed_increase,  "zipper-max-speed-increase"     );
-    CHECK_NEG(m_skid_decrease,              "skid decrease"                 );
-    CHECK_NEG(m_time_till_max_skid,         "skid time-till-max"            );
-    CHECK_NEG(m_skid_increase,              "skid increase"                 );
-    CHECK_NEG(m_skid_max,                   "skid max"                      );
-    CHECK_NEG(m_skid_visual,                "skid visual"                   );
     CHECK_NEG(m_slipstream_length,          "slipstream length"             );
+    CHECK_NEG(m_slipstream_width,           "slipstream width"              );
     CHECK_NEG(m_slipstream_collect_time,    "slipstream collect-time"       );
     CHECK_NEG(m_slipstream_use_time,        "slipstream use-time"           );
     CHECK_NEG(m_slipstream_add_power,       "slipstream add-power"          );
     CHECK_NEG(m_slipstream_min_speed,       "slipstream min-speed"          );
-    CHECK_NEG(m_slipstream_max_speed_increase, 
+    CHECK_NEG(m_slipstream_max_speed_increase,
                                             "slipstream max-speed-increase" );
     CHECK_NEG(m_slipstream_duration,        "slipstream duration"           );
     CHECK_NEG(m_slipstream_fade_out_time,   "slipstream fade-out-time"      );
     CHECK_NEG(m_camera_distance,            "camera distance"               );
     CHECK_NEG(m_camera_forward_up_angle,    "camera forward-up-angle"       );
     CHECK_NEG(m_camera_backward_up_angle,   "camera forward-up-angle"       );
-    CHECK_NEG(m_nitro_power_boost,          "nitro power-boost"             );
     CHECK_NEG(m_nitro_consumption,          "nitro consumption"             );
     CHECK_NEG(m_nitro_big_container,        "nitro big-container"           );
     CHECK_NEG(m_nitro_small_container,      "nitro small-container"         );
     CHECK_NEG(m_nitro_max_speed_increase,   "nitro max-speed-increase"      );
+    CHECK_NEG(m_nitro_engine_force,         "nitro engine-force"            );
     CHECK_NEG(m_nitro_duration,             "nitro duration"                );
     CHECK_NEG(m_nitro_fade_out_time,        "nitro fade-out-time"           );
+    CHECK_NEG(m_nitro_max,                  "nitro max"                     );
+    CHECK_NEG(m_bubblegum_time,             "bubblegum time"                );
+    CHECK_NEG(m_bubblegum_speed_fraction,   "bubblegum speed-fraction"      );
+    CHECK_NEG(m_bubblegum_fade_in_time  ,   "bubblegum fade-in-time"        );
+    CHECK_NEG(m_bubblegum_torque,           "bubblegum  torque"             );
+
     CHECK_NEG(m_swatter_distance2,          "swatter distance"              );
-    CHECK_NEG(m_swatter_animation_time,     "swatter animation-time"        );
-    CHECK_NEG(m_swatter_item_animation_time,"swatter item-animation-time"   );
     CHECK_NEG(m_swatter_duration,           "swatter duration"              );
-    CHECK_NEG(m_swatter_count,              "swatter count"                 );
     CHECK_NEG(m_squash_duration,            "swatter squash-duration"       );
     CHECK_NEG(m_squash_slowdown,            "swatter squash-slowdown"       );
+    CHECK_NEG(m_max_lean,                   "lean max"                      );
+    CHECK_NEG(m_lean_speed,                 "lean speed"                    );
 
     CHECK_NEG(m_rescue_height,              "rescue height"                 );
     CHECK_NEG(m_rescue_time,                "rescue time"                   );
     CHECK_NEG(m_rescue_vert_offset,         "rescue vert-offset"            );
     CHECK_NEG(m_explosion_time,             "explosion time"                );
-    CHECK_NEG(m_explosion_invulnerability_time, 
+    CHECK_NEG(m_explosion_invulnerability_time,
                                             "explosion invulnerability-time");
     CHECK_NEG(m_explosion_radius,           "explosion radius"              );
-    CHECK_NEG(m_ai_steering_variation,      "ai steering-variation"         );
 
+    for(unsigned int i=RaceManager::DIFFICULTY_FIRST;
+        i<=RaceManager::DIFFICULTY_LAST; i++)
+    {
+        CHECK_NEG(m_max_speed[i], "engine maximum-speed[0]");
+        CHECK_NEG(m_engine_power[i], "engine power" );
+        CHECK_NEG(m_plunger_in_face_duration[i],"plunger in-face-time");
+    }
+
+    m_skidding_properties->checkAllSet(filename);
+    for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
+        m_ai_properties[i]->checkAllSet(filename);
 }   // checkAllSet
-
-// ----------------------------------------------------------------------------
-float KartProperties::getMaxSteerAngle(float speed) const
-{
-    if(speed<=m_min_speed_turn) return m_angle_at_min;
-    if(speed>=m_max_speed_turn) return m_angle_at_max;
-    return m_angle_at_min - (speed-m_min_speed_turn)*m_speed_angle_increase;
-}   // getMaxSteerAngle
 
 // ----------------------------------------------------------------------------
 /** Called the first time a kart accelerates after 'ready-set-go'. It searches

@@ -1,18 +1,21 @@
 <?xml version="1.0"?>
+<challenge version="2">
+    <track id="xr591" laps="2"/>
+    <mode major="single" minor="quickrace"/>
+    <requirements trophies="135"/>
+    
+    <hard>
+        <karts number="1"/>
+        <requirements energy="16" time="135"/>
+    </hard>
+    <medium>
+        <karts number="1"/>
+        <requirements energy="14" time="155"/>
+    </medium>
+    <easy>
+        <karts number="1"/>
+        <requirements energy="12" time="170"/>
+    </easy>
+</challenge>
 
-<challenge
-    version="1"
-    id="canyon"
-    name="Win a race on Canyon"
-    description="Win a 3 lap race on Canyon against 4 Expert level AI karts."
-    depend-on="tollway"
-    unlock-track="xr591"
-    major="single"
-    minor="quickrace"
-    track="canyon"
-    difficulty="hard"
-    laps="3"
-    karts="5"
-    position="1"
-/>
 

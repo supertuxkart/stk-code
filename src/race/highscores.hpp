@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -39,7 +38,7 @@ class Highscores
 {
 public:
     typedef std::string HighscoreType;
-    
+
 private:
     enum {HIGHSCORE_LEN = 3};       // It's a top 3 list
     std::string         m_track;
@@ -47,6 +46,7 @@ private:
     int                 m_number_of_karts;
     int                 m_difficulty;
     int                 m_number_of_laps;
+    bool                m_reverse;
     std::string         m_kart_name[HIGHSCORE_LEN];
     irr::core::stringw  m_name[HIGHSCORE_LEN];
     float               m_time[HIGHSCORE_LEN];
@@ -54,17 +54,19 @@ public:
     /** Creates a new entry
       */
     Highscores (const Highscores::HighscoreType highscore_type,
-                int num_karts, const RaceManager::Difficulty difficulty, 
-                const std::string trackName, const int number_of_laps);
+                int num_karts, const RaceManager::Difficulty difficulty,
+                const std::string trackName, const int number_of_laps,
+                const bool reverse);
     /** Creates an entry from a file
      */
     Highscores (const XMLNode &node);
-    
+
     void readEntry (const XMLNode &node);
     void writeEntry(XMLWriter &writer);
     int  matches   (HighscoreType highscore_type, int num_karts,
-                    const RaceManager::Difficulty difficulty, 
-                    const std::string track, const int number_of_laps);
+                    const RaceManager::Difficulty difficulty,
+                    const std::string track, const int number_of_laps,
+                    const bool reverse);
     int  addData   (const std::string& kart_name,
                     const irr::core::stringw& name, const float time);
     int  getNumberEntries() const;

@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -37,6 +36,12 @@ class MovingTexture : public NoCopy
 private:
     /** Translation increment per second. */
     float                m_dx, m_dy;
+
+    /** Delta set by user and count */
+    float                m_dt;
+    float                m_count;
+    bool                 m_isAnimatedByStep;
+
     /** Current x,y position. */
     float                m_x, m_y;
     /** The texture matrix of this texture. */

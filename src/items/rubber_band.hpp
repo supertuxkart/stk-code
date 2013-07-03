@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -29,7 +28,7 @@ namespace irr
 }
 using namespace irr;
 
-class Kart;
+class AbstractKart;
 class Plunger;
 
 /** This class is used together with the pluger to display a rubber band from
@@ -44,13 +43,13 @@ private:
           RB_TO_TRACK}           /**< Rubber band is attached to track.      */
                         m_attached_state;
     /** True if plunger was fired backwards. */
-    bool                m_is_backward; 
+    bool                m_is_backward;
     /** If rubber band is attached to track, the coordinates. */
     Vec3                m_hit_position;
     /** The plunger the rubber band is attached to. */
     Plunger            *m_plunger;
     /** The kart who shot this plunger. */
-    Kart               *m_owner;
+    AbstractKart       *m_owner;
 
     /** The scene node for the rubber band. */
     scene::ISceneNode  *m_node;
@@ -60,8 +59,8 @@ private:
     scene::IMeshBuffer *m_buffer;
 
     /** The kart a plunger might have hit. */
-    Kart               *m_hit_kart;
-    /** Stores the end of the rubber band (i.e. the side attached to the 
+    AbstractKart       *m_hit_kart;
+    /** Stores the end of the rubber band (i.e. the side attached to the
      *  plunger. */
     Vec3                m_end_position;
 
@@ -69,9 +68,9 @@ private:
     void updatePosition();
 
 public:
-         RubberBand(Plunger *plunger, Kart *kart);
+         RubberBand(Plunger *plunger, AbstractKart *kart);
         ~RubberBand();
     void update(float dt);
-    void hit(Kart *kart_hit, const Vec3 *track_xyz=NULL);
+    void hit(AbstractKart *kart_hit, const Vec3 *track_xyz=NULL);
 };   // RubberBand
 #endif

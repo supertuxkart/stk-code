@@ -21,20 +21,26 @@
 #define HEADER_CHECKBOX_HPP
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
 {
     /**
       * \brief A checkbox widget.
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class CheckBoxWidget : public Widget
     {
         bool m_state;
-        EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
+        EventPropagation transmitEvent(Widget* w, 
+                                       const std::string& originator, 
+                                       const int playerID);
         
     public:
+        
+        LEAK_CHECK()
+        
         CheckBoxWidget();
         virtual ~CheckBoxWidget() {}
         
@@ -46,6 +52,7 @@ namespace GUIEngine
         
         /** Set whether the checkbox is checked */
         void setState(const bool checked)  { m_state = checked; }
+        
         
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */

@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Patrick Ammann <pammann@aro.ch>
@@ -37,15 +36,15 @@ class Vec3;
   */
 class MusicManager : public NoCopy
 {
-private:        
+private:
     MusicInformation        *m_current_music;
 
     /** If the sound could not be initialized, e.g. if the player doesn't has
-     *  a sound card, we want to avoid anything sound related so we crash the 
+     *  a sound card, we want to avoid anything sound related so we crash the
      *  game. */
-    bool                     m_initialized; 
-    std::map<std::string, MusicInformation*> 
-                             m_allMusic;
+    bool                     m_initialized;
+    std::map<std::string, MusicInformation*>
+                             m_all_music;
 
     void                     loadMusicInformation();
     float                    m_masterGain;
@@ -65,20 +64,21 @@ public:
                                                      m_current_music->resumeMusic();   }
     void                    switchToFastMusic() {if(m_current_music)
                                                     m_current_music->switchToFastMusic();}
-    
+
     void                    setMasterMusicVolume(float gain);
     float                   getMasterMusicVolume() const { return m_masterGain; }
-    
-    MusicInformation       *getCurrentMusic() {return m_current_music; }   
-    
+
+    MusicInformation       *getCurrentMusic() {return m_current_music; }
+
     /**
       * @throw runtime_error if the music file could not be found/opened
-      */ 
+      */
     MusicInformation       *getMusicInformation(const std::string& filename);
-    
+
     void                    loadMusicFromOneDir(const std::string& dir);
     void                    addMusicToTracks();
 
+    void                    clearCurrentMusic() { m_current_music = NULL; }
 };
 
 extern MusicManager* music_manager;

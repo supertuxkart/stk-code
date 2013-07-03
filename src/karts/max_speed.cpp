@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010  Joerg Henrichs
@@ -22,12 +21,14 @@
 #include <algorithm>
 #include <assert.h>
 
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
+#include "physics/btKart.hpp"
 
 /** This class handles maximum speed for karts. Several factors can influence
  *  the maximum speed a kart can drive, some will decrease the maximum speed,
- *  some will increase the maximum speed. 
- *  Slowdowns are specified in fraction of the (kart specific) maximum speed 
+ *  some will increase the maximum speed.
+ *  Slowdowns are specified in fraction of the (kart specific) maximum speed
  *  of that kart. The following categories are defined:
  *  - terrain-specific slow downs
  *  - AI related slow down (low level AIs might drive slower than player)
@@ -44,13 +45,16 @@
  *  At the end the maximum is capped by a value specified in stk_config
  *  (to avoid issues with physics etc).
 */
-MaxSpeed::MaxSpeed(Kart *kart)
+MaxSpeed::MaxSpeed(AbstractKart *kart)
 {
     m_kart = kart;
+    // Initialise m_add_engine_force since it might be queried before
+    // update() is called.
+    m_add_engine_force  = 0;
 }   // MaxSpeed
 
 // ----------------------------------------------------------------------------
-/** Reset to prepare for a restart. It just overwrites each entry with a 
+/** Reset to prepare for a restart. It just overwrites each entry with a
  *  newly constructed values, i.e. values that don't cause any slowdown
  *  or speedup.
  */
@@ -80,19 +84,54 @@ void MaxSpeed::reset()
  *  \param fade_out_time How long the maximum speed will fade out linearly.
  */
 void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
-                                float duration, float fade_out_time)
+                                float engine_force, float duration,
+                                float fade_out_time)
 {
-    assert(fade_out_time>0.01f);
+    // Allow fade_out_time 0 if add_speed is set to 0.
+    assert(add_speed==0.0f || fade_out_time>0.01f);
     assert(category>=MS_INCREASE_MIN && category <MS_INCREASE_MAX);
+    m_speed_increase[category].m_max_add_speed   = add_speed;
     m_speed_increase[category].m_duration        = duration;
     m_speed_increase[category].m_fade_out_time   = fade_out_time;
-    m_speed_increase[category].m_max_add_speed   = add_speed;
     m_speed_increase[category].m_current_speedup = add_speed;
+    m_speed_increase[category].m_engine_force    = engine_force;
 }   // increaseMaxSpeed
 
 // ----------------------------------------------------------------------------
+/** This adjusts the top speed using increaseMaxSpeed, but additionally
+ *  causes an instant speed boost, which can be smaller than add-max-speed.
+ *  (e.g. a zipper can give an instant boost of 5 m/s, but over time would
+ *  allow the speed to go up by 10 m/s). Note that bullet does not restrict
+ *  speed (e.g. by simulating air resistance), so without capping the speed
+ *  (which is done my this object) the speed would go arbitrary high over time
+ *  \param category The category for which the speed is increased.
+ *  \param add_max_speed Increase of the maximum allowed speed.
+ *  \param speed_boost An instant speed increase for this kart.
+ *  \param engine_force Additional engine force.
+ *  \param duration Duration of the increased speed.
+ *  \param fade_out_time How long the maximum speed will fade out linearly.
+ */
+void MaxSpeed::instantSpeedIncrease(unsigned int category,
+                                   float add_max_speed, float speed_boost,
+                                   float engine_force, float duration,
+                                   float fade_out_time)
+{
+    increaseMaxSpeed(category, add_max_speed, engine_force, duration,
+                     fade_out_time);
+    // This will result in all max speed settings updated, but no
+    // changes to any slow downs since dt=0
+    update(0);
+    float speed = std::min(m_kart->getSpeed()+ speed_boost,
+                           MaxSpeed::getCurrentMaxSpeed() );
+
+    m_kart->getVehicle()->instantSpeedIncreaseTo(speed);
+
+}
+// instantSpeedIncrease
+
+// ----------------------------------------------------------------------------
 /** Handles the update of speed increase objects. The m_duration variable
- *  contains the remaining time - as long as this variable is positibe,
+ *  contains the remaining time - as long as this variable is positive
  *  the maximum speed increase applies, while when it is between
  *  -m_fade_out_time and 0, the maximum speed will linearly decrease.
  *  \param dt Time step size.
@@ -100,7 +139,7 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
 void MaxSpeed::SpeedIncrease::update(float dt)
 {
     m_duration -= dt;
-    // ENd of increased max speed reached.
+    // End of increased max speed reached.
     if(m_duration < -m_fade_out_time)
     {
         m_current_speedup = 0;
@@ -114,20 +153,42 @@ void MaxSpeed::SpeedIncrease::update(float dt)
 }   // SpeedIncrease::update
 
 // ----------------------------------------------------------------------------
-void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction, 
-                           float fade_in_time)
+/** Defines a slowdown, which is in fraction of top speed.
+ *  \param category The category for which the speed is increased.
+ *  \param max_speed_fraction Fraction of top speed to allow only.
+ *  \param fade_in_time How long till maximum speed is capped.
+ *  \param duration How long the effect will lasts. The value of -1 (default)
+ *         indicates that this effect stays active forever (i.e. till its
+ *         value is changed to something else).
+ */
+void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction,
+                           float fade_in_time, float duration)
 {
     assert(category>=MS_DECREASE_MIN && category <MS_DECREASE_MAX);
     m_speed_decrease[category].m_max_speed_fraction = max_speed_fraction;
     m_speed_decrease[category].m_fade_in_time       = fade_in_time;
+    m_speed_decrease[category].m_duration           = duration;
 }   // setSlowdown
 
 // ----------------------------------------------------------------------------
-/** Handles the speed increase for a certain category. 
+/** Handles the speed increase for a certain category.
  *  \param dt Time step size.
  */
 void MaxSpeed::SpeedDecrease::update(float dt)
 {
+    if(m_duration>-1.0f)
+    {
+        // It's a timed slowdown
+        m_duration -= dt;
+        if(m_duration<0)
+        {
+            m_duration           = 0;
+            m_current_fraction   = 1.0f;
+            m_max_speed_fraction = 1.0f;
+            return;
+        }
+    }
+
     float diff = m_current_fraction - m_max_speed_fraction;
     if(diff > 0)
     {
@@ -159,17 +220,20 @@ float MaxSpeed::getSpeedIncreaseTimeLeft(unsigned int category)
 void MaxSpeed::update(float dt)
 {
 
-    // First comput the minimum max-speed fraction, which 
+    // First compute the minimum max-speed fraction, which
     // determines the overall decrease of maximum speed.
     // ---------------------------------------------------
-    float f = 1.0f;
+    float slowdown_factor = 1.0f;
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
     {
         SpeedDecrease &slowdown = m_speed_decrease[i];
         slowdown.update(dt);
-        f = std::min(f, slowdown.getSlowdownFraction());
+        slowdown_factor = std::min(slowdown_factor, 
+                                   slowdown.getSlowdownFraction());
     }
-    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed() * f;
+
+    m_add_engine_force  = 0;
+    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed();
 
     // Then add the speed increase from each category
     // ----------------------------------------------
@@ -178,11 +242,14 @@ void MaxSpeed::update(float dt)
         SpeedIncrease &speedup = m_speed_increase[i];
         speedup.update(dt);
         m_current_max_speed += speedup.getSpeedIncrease();
+        m_add_engine_force  += speedup.getEngineForce();
     }
+    m_current_max_speed *= slowdown_factor;
 
     // Then cap the current speed of the kart
     // --------------------------------------
-    m_kart->capSpeed(m_current_max_speed);
+    if ( m_kart->getSpeed()>m_current_max_speed && m_kart->isOnGround() )
+        m_kart->getVehicle()->capSpeed(m_current_max_speed);
 
 }   // update
 

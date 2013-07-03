@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<particles emitter="point">
+
+    <spreading angle="10"        />
+    
+    <velocity  x="0.0"
+               y="0.002"
+               z="0.0"           />
+    
+    <material  file="smoke_black.png"  />
+    
+    <!-- Amount of particles emitted per second -->
+    <rate      min="25"
+               max="50"          />
+    
+    <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
+    <lifetime  min="2500"
+               max="5000"        />
+    
+    <!-- Size of the particles -->
+    <size      min="0.6"
+               max="1.5"         />
+
+    <color     min="255 255 255"
+               max="255 255 255" />
+
+    <!-- How much time in milliseconds before the particle is fully faded out  -->
+    <fadeout   time="1000"       />
+
+</particles>

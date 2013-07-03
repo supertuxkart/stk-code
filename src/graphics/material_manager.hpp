@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -34,6 +33,7 @@ using namespace irr;
 
 class Material;
 class XMLReader;
+class XMLNode;
 
 /**
   * \ingroup graphics
@@ -50,24 +50,32 @@ public:
               MaterialManager();
              ~MaterialManager();
     void      loadMaterial     ();
-    void      setAllMaterialFlags(video::ITexture* t, 
-                                  scene::IMeshBuffer *mb) const;
-    void      adjustForFog(video::ITexture* t, 
+    Material* getMaterialFor(video::ITexture* t,
+                             scene::IMeshBuffer *mb);
+    void      setAllMaterialFlags(video::ITexture* t,
+                                  scene::IMeshBuffer *mb);
+    void      adjustForFog(video::ITexture* t,
                            scene::IMeshBuffer *mb,
                            scene::ISceneNode* parent,
                            bool use_fog) const;
-    
+
     void      setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const;
 
     int       addEntity        (Material *m);
-    Material *getMaterial      (const std::string& t, bool is_full_path=false,
-                                bool make_permanent=false);
-    void      addSharedMaterial(const std::string& filename);
-    bool      pushTempMaterial (const std::string& filename);
+    Material *getMaterial      (const std::string& t,
+                                bool is_full_path=false,
+                                bool make_permanent=false,
+                                bool complain_if_not_found=true,
+                                bool strip_path=true);
+    void      addSharedMaterial(const std::string& filename, bool deprecated = false);
+    bool      pushTempMaterial (const std::string& filename, bool deprecated = false);
+    bool      pushTempMaterial (const XMLNode *root, const std::string& filename, bool deprecated = false);
     void      popTempMaterial  ();
-    
+    void      makeMaterialsPermanent();
     bool      hasMaterial(const std::string& fname);
-};
+
+    Material* getLatestMaterial() { return m_materials[m_materials.size()-1]; }
+};   // MaterialManager
 
 extern MaterialManager *material_manager;
 

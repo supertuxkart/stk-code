@@ -1,4 +1,3 @@
-// $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
@@ -20,14 +19,23 @@
 #ifndef HEADER_ADDON_HPP
 #define HEADER_ADDON_HPP
 
+/**
+  * \defgroup addonsgroup Add-ons
+  * Handles add-ons that can be downloaded
+  */
+
+#include "io/file_manager.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/time.hpp"
+
 #include <assert.h>
 #include <string>
 
-#include "io/file_manager.hpp"
-#include "utils/time.hpp"
-
 class XMLNode;
 
+/**
+  * \ingroup addonsgroup
+  */
 class Addon
 {
 public:
@@ -50,14 +58,35 @@ public:
                      SO_DATE       // Sorted by date, newest first
     };
 
+    // ------------------------------------------------------------------------
+    /** A static function that checks if the given ID is an addon. This is
+     *  done by testing if the directory name is in the addons directory.
+     */
+    static bool isAddon(const std::string &directory)
+    {
+        return StringUtils::startsWith(directory,file_manager->getAddonsDir());
+    }   // isAddon
+
+    // ------------------------------------------------------------------------
+    /** Create an addon id by adding a 'addon_' prefix to the given id. */
+    static std::string createAddonId(const std::string &id)
+    {
+        return "addon_"+id;
+    }   // createAddonId
+    // ------------------------------------------------------------------------
+
 private:
     /** The name to be displayed. */
-    std::string m_name;
+    core::stringw m_name;
     /** Internal id for this addon, which is the name in lower case.
-     *  This is used to create a subdirectory for this addon. */
+     *  This is the name of the subdirectory for this addon with an 'addon_'
+     *  prefix. */
     std::string m_id;
+    /** The directory name (i.d. the internal id without 'addon_' prefix. */
+    std::string m_dir_name;
+
     /** The name of the designer of the addon. */
-    std::string m_designer;
+    core::stringw m_designer;
     /** The (highest) revision number available online. */
     int         m_revision;
     /** The currently installed revision. */
@@ -66,10 +95,13 @@ private:
     int         m_icon_revision;
     /** The status flags of this addon. */
     int         m_status;
+    /** True if this addon still exists on the server, i.e. is contained
+     *  in the addons.xml file. */
+    bool        m_still_exists;
     /** Date when the addon was added. */
     Time::TimeType m_date;
     /** A description of this addon. */
-    std::string m_description;
+    core::stringw m_description;
     /** The URL of the icon (relative to the server) */
     std::string m_icon_url;
     /** Name of the icon to use. */
@@ -82,6 +114,12 @@ private:
     bool        m_installed;
     /** Compressed size of the addon package. */
     int         m_size;
+    /** Rating for thsi addon package. */
+    float       m_rating;
+    /** Minimum version addon is included with. */
+    std::string m_min_include_ver;
+    /** Maximum version addon is included with. */
+    std::string m_max_include_ver;
     /** Type, must be 'kart' or 'track'. */
     std::string m_type;
 
@@ -93,7 +131,7 @@ public:
          /** Initialises the object from an XML node. */
          Addon(const XMLNode &xml);
     // ------------------------------------------------------------------------
-    /** Sets the sort order used in the comparison function. It is static, so 
+    /** Sets the sort order used in the comparison function. It is static, so
      *  that each instance can access the sort order. */
     static void setSortOrder(SortOrder so) { m_sort_order = so; }
     // ------------------------------------------------------------------------
@@ -102,7 +140,16 @@ public:
     void copyInstallData(const Addon &addon);
     // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
-    const std::string& getName() const { return m_name; }
+    const core::stringw& getName() const { return m_name; }
+    // ------------------------------------------------------------------------
+    /** Returns the minimum version the addon was included with. */
+    const std::string& getMinIncludeVer() const {return m_min_include_ver; }
+    // ------------------------------------------------------------------------
+    /** Returns the maximum version the addon was included with. */
+    const std::string& getMaxIncludeVer() const {return m_max_include_ver; }
+    // ------------------------------------------------------------------------
+    /** Returns the rating of an addon. */
+    const float getRating() const {return m_rating; }
     // ------------------------------------------------------------------------
     /** Returns the type of the addon. */
     const std::string& getType() const { return m_type; }
@@ -117,9 +164,9 @@ public:
     const std::string getIconBasename() const { return m_icon_basename; }
     // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
-    const std::string& getDescription() const { return m_description; }
+    const core::stringw& getDescription() const { return m_description; }
     // ------------------------------------------------------------------------
-    /** Returns the date (in seconds since epoch) when the addon was 
+    /** Returns the date (in seconds since epoch) when the addon was
      *  uploaded. */
     Time::TimeType getDate() const { return m_date; }
     // ------------------------------------------------------------------------
@@ -132,8 +179,8 @@ public:
     /** Returns the installed revision number of an addon. */
     int   getInstalledRevision() const { return m_installed_revision; }
     // ------------------------------------------------------------------------
-    /** Returns the latest revision number of this addon. 
-    *  m_revision>m_installed_revision if a newer revision is available 
+    /** Returns the latest revision number of this addon.
+    *  m_revision>m_installed_revision if a newer revision is available
     *  online. */
     int   getRevision() const { return m_revision; }
     // ------------------------------------------------------------------------
@@ -141,7 +188,13 @@ public:
     const std::string& getId() const { return m_id; }
     // ------------------------------------------------------------------------
     /** Returns the designer of the addon. */
-    const std::string &getDesigner() const { return m_designer; }
+    const core::stringw& getDesigner() const { return m_designer; }
+    // ------------------------------------------------------------------------
+    /** Returns if this addon still exists on the server. */
+    bool getStillExists() const { return m_still_exists; }
+    // ------------------------------------------------------------------------
+    /** Marks that this addon still exists on the server. */
+    void setStillExists() { m_still_exists = true; }
     // ------------------------------------------------------------------------
     /** True if this addon needs to be updated. */
     bool needsUpdate() const
@@ -159,7 +212,7 @@ public:
     }   // iconNeedsUpdate
     // ------------------------------------------------------------------------
     /** Marks this addon to be installed. If the addon is marked as being
-     *  installed, it also updates the installed revision number to be the 
+     *  installed, it also updates the installed revision number to be the
      *  same as currently available revision number. */
     void setInstalled(bool state)
     {
@@ -168,28 +221,28 @@ public:
             m_installed_revision = m_revision;
     }   // setInstalled
     // ------------------------------------------------------------------------
-    /** Returns true if the icon of this addon was downloaded and is ready 
+    /** Returns true if the icon of this addon was downloaded and is ready
      *  to be displayed. */
     bool iconReady() const { return m_icon_ready; }
     // ------------------------------------------------------------------------
     /** Marks that the icon for this addon can be displayed. */
-    void setIconReady() 
-    { 
+    void setIconReady()
+    {
         m_icon_revision = m_revision;
-        m_icon_ready=true; 
+        m_icon_ready=true;
     }   // setIconReady
     // ------------------------------------------------------------------------
     /** Returns the size of the compressed package. */
     int getSize() const { return m_size; }
     // ------------------------------------------------------------------------
-    /** Returns the directory in which this type of addons is stored (in a 
+    /** Returns the directory in which this type of addons is stored (in a
      *  separate subdirectory). A kart is stored in .../karts/X and tracks in
      *  .../tracks/X. If further types are added here, make sure that the
      *  name return ends with a "/".
      */
     std::string getTypeDirectory() const
     {
-        if(m_type=="kart") 
+        if(m_type=="kart")
             return "karts/";
         else if(m_type=="track")
             return "tracks/";
@@ -201,15 +254,21 @@ public:
     }   // getTypeDirectory
 
     // ------------------------------------------------------------------------
+    /** Returns if the current version is between min and max versions */
+    bool testIncluded(const std::string &min_ver, const std::string &max_ver);
+    // ------------------------------------------------------------------------
     /** Returns if a certain status flag is set. */
     bool testStatus(AddonStatus n) const {return (m_status & n) !=0; }
     // ------------------------------------------------------------------------
     /** Returns the directory in which this addon is installed. */
-    std::string getDataDir() const 
+    std::string getDataDir() const
     {
-        return file_manager->getAddonsFile(getTypeDirectory()+getId());
+        return file_manager->getAddonsFile(getTypeDirectory()+m_dir_name);
     }   // getDataDir
     // ------------------------------------------------------------------------
+    bool filterByWords(const core::stringw words) const;
+    // ------------------------------------------------------------------------
+    
     /** Compares two addons according to the sort order currently defined.
      *  \param a The addon to compare this addon to.
      */
@@ -217,11 +276,11 @@ public:
     {
         switch(m_sort_order)
         {
-        case SO_DEFAULT: 
-            if(testStatus(AS_FEATURED) && 
-                !a.testStatus(AS_FEATURED))  return true;
-            if(!testStatus(AS_FEATURED) && 
-                a.testStatus(AS_FEATURED))  return false;
+            case SO_DEFAULT:
+                if(testStatus(AS_FEATURED) &&
+                    !a.testStatus(AS_FEATURED))  return true;
+                if(!testStatus(AS_FEATURED) &&
+                    a.testStatus(AS_FEATURED))  return false;
             // Otherwise fall through to name comparison!
             case SO_NAME:
                 // m_id is the lower case name
@@ -234,6 +293,33 @@ public:
         // Fix compiler warning.
         return true;
     }   // operator<
+
+    // ------------------------------------------------------------------------
+    /** Compares two addons according to the sort order currently defined.
+     *  Comparison is done for sorting in descending order.
+     *  \param a The addon to compare this addon to.
+     */
+    bool operator>(const Addon &a) const
+    {
+        switch(m_sort_order)
+        {
+            case SO_DEFAULT:
+                if(testStatus(AS_FEATURED) &&
+                    !a.testStatus(AS_FEATURED))  return true;
+                if(!testStatus(AS_FEATURED) &&
+                    a.testStatus(AS_FEATURED))  return false;
+            // Otherwise fall through to name comparison!
+            case SO_NAME:
+                // m_id is the lower case name
+                return m_id > a.m_id;
+                break;
+            case SO_DATE:
+                return m_date < a.m_date;
+                break;
+        }   // switch
+        // Fix compiler warning.
+        return true;
+    }   // operator>
 
 };   // Addon
 

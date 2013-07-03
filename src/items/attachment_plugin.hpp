@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2011 Joerg Henrichs
@@ -22,7 +21,7 @@
 
 #include "vector3d.h"
 
-class Kart;
+class AbstractKart;
 class Attachment;
 
 /**
@@ -30,7 +29,7 @@ class Attachment;
   *  This is the base class for a plugin into an attachment. Plugins are
   *  used to handle attachment specific data so that the attachment class
   *  that is used in every kart isn't overloaded. It could be done by
-  *  inheriting from Attachment, but then every time an attachment is 
+  *  inheriting from Attachment, but then every time an attachment is
   *  changed, we could delete and create a new SceneNode. To avoid this
   *  overhead, we use plugins to encapsulate additional code for some
   *  plugins.
@@ -38,27 +37,26 @@ class Attachment;
 class AttachmentPlugin
 {
 protected:
-    /** Keeps track of the rotation of an attachment, this base class
-     *  will set it to 0. */
-    core::vector3df   m_rotation;
+    /** Kart the attachment is attached to. */
+    AbstractKart *m_kart;
 
 public:
     /** Constructor for a plugin. */
-    AttachmentPlugin(Attachment *attachment, Kart *kart) 
+    AttachmentPlugin(AbstractKart *kart)
     {
-        m_rotation = core::vector3df(0,0,0);
+        m_kart       = kart;
     }
-    
+
     virtual ~AttachmentPlugin() {}
-    
+
     // ------------------------------------------------------------------------
     /** Updates a plugin. This is called once each time frame. If the
      *  function returns true, the attachment is discarded. */
     virtual bool updateAndTestFinished(float dt) = 0;
-    
+
     // ------------------------------------------------------------------------
-    /** Returns the rotation of the attachment. */
-    virtual const core::vector3df& getRotation() const { return m_rotation; }
+    /** Called when the animation of the Attachment's node is done. */
+    virtual void onAnimationEnd() {}
 };   // AttachmentPlugin
 
 #endif

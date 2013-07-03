@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009-2010  Joerg Henrichs
@@ -29,18 +28,20 @@ class XMLNode;
 class Track;
 class CheckManager;
 
-/** 
+/**
  * \brief Virtual base class for a check structure.
  *
  *  A check structure has a certain ype:
  *  CT_NEW_LAP  : triggering this check structure will cause a new lap to be
  *                counted. If this type is triggered, it will set itselt to
  *                inactive (which means it is not possible to count several
- *                laps by driving over the starting line forwardws and 
+ *                laps by driving over the starting line forwardws and
  *                backwards)
  *  CT_ACTIVATE:  Activates the specified other check structures.
- *  CT_TOGGLE:    Toggles the specified other check structures (active to 
+ *  CT_TOGGLE:    Toggles the specified other check structures (active to
  *                inactive and vice versa.
+ *  CT_CANNON:    A check line that 'shoots' the kart to a specified location.
+ *  CT_GOAL:      A goal line in soccer mode.
  *  Each check structure can be active or inactive. Only lap counters are
  *  initialised to be active, all other check structures are inactive.
  *
@@ -49,18 +50,21 @@ class CheckManager;
 class CheckStructure
 {
 public:
-    /** Different types of check structures: 
+    /** Different types of check structures:
      *  ACTIVATE: Activates another check structure (independent of
      *            the state that check structure is in)
      *  TOGGLE:   Switches (inverts) the state of another check structure.
      *  NEW_LAP:  On crossing a new lap is counted.
+     *  CANNON:   Causes the kart to be shot to a specified point.
+     *  GOAL:     Causes a point to be scored when a soccer ball crosses its line
      *  AMBIENT_SPHERE: Modifies the ambient color.
      *  A combination of an activate and new_lap line are used to
      *  avoid shortcuts: a new_lap line is deactivated after crossing it, and
      *  you have to cross a corresponding activate structure to re-activate it,
      *  enabling you to count the lap again.
      */
-    enum CheckType {CT_NEW_LAP, CT_ACTIVATE, CT_TOGGLE, CT_AMBIENT_SPHERE};
+    enum CheckType {CT_NEW_LAP, CT_ACTIVATE, CT_TOGGLE, CT_CANNON,
+		            CT_GOAL, CT_AMBIENT_SPHERE};
 
 protected:
     /** Stores the previous position of all karts. This is needed to detect
@@ -73,18 +77,15 @@ protected:
     /** True if this check structure should be activated at a reset. */
     bool              m_active_at_reset;
 
-private:
-    /** Stores a pointer to the check manager. */
-    CheckManager      *m_check_manager;
-
-    /** The type of this checkline. */
-    CheckType         m_check_type;
-
     /** Stores the index of this check structure. This is only used for
      *  debugging (use --check-debug option). */
     unsigned int      m_index;
 
-    /** Contains the indices of the corresponding check structures that 
+private:
+    /** The type of this checkline. */
+    CheckType         m_check_type;
+
+    /** Contains the indices of the corresponding check structures that
      *  get their state changed (activated or switched). */
     std::vector<int> m_check_structures_to_change_state;
 
@@ -101,8 +102,7 @@ private:
                       ChangeState change_state);
 
 public:
-                CheckStructure(CheckManager *check_manager, const XMLNode &node,
-                               unsigned int index);
+                CheckStructure(const XMLNode &node, unsigned int index);
     virtual    ~CheckStructure() {};
     virtual void update(float dt);
     virtual void changeDebugColor(bool is_active) {}
@@ -113,13 +113,20 @@ public:
      *  \param indx     Index of the kart, can be used to store kart specific
      *                  additional data.
      */
-    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)=0;
+    virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
+                             unsigned int indx)=0;
     virtual void trigger(unsigned int kart_index);
     virtual void reset(const Track &track);
 
+    // ------------------------------------------------------------------------
     /** Returns the type of this check structure. */
     CheckType getType() const { return m_check_type; }
-
+    // ------------------------------------------------------------------------
+    /** Adds the index of a successor check structure which will get triggered
+     *  by this check structure. */
+    void addSuccessor(unsigned int i) {
+        m_check_structures_to_change_state.push_back(i);
+    }   // addSuccessor
 };   // CheckStructure
 
 #endif

@@ -21,26 +21,34 @@
 #include "audio/sfx_manager.hpp"
 #include "audio/music_manager.hpp"
 #include "config/stk_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "main_loop.hpp"
+#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
-#include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
 
-StateManager* state_manager_singleton = NULL;
+static StateManager* state_manager_singleton = NULL;
 
 StateManager* StateManager::get()
 {
-    if (state_manager_singleton == NULL) 
+    if (state_manager_singleton == NULL)
         state_manager_singleton = new StateManager();
     return state_manager_singleton;
 }   // get
+
+void StateManager::deallocate()
+{
+    delete state_manager_singleton;
+    state_manager_singleton = NULL;
+}   // deallocate
+
 
 // ============================================================================
 
@@ -64,9 +72,9 @@ StateManager::ActivePlayer* StateManager::getActivePlayer(const int id)
         assert(false);
         return NULL;
     }
-    
+
     assert( returnPlayer->m_id == id );
-    
+
     return returnPlayer;
 }   // getActivePlayer
 
@@ -99,9 +107,9 @@ int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device
     p = new ActivePlayer(profile, device);
     i = m_active_players.size();
     m_active_players.push_back(p);
-    
+
     updateActivePlayerIDs();
-    
+
     return i;
 }   // createActivePlayer
 
@@ -164,13 +172,15 @@ void StateManager::escapePressed()
     // In-game
     else if(m_game_mode == GAME)
     {
-        if(World::getWorld()->getPhase()!=WorldStatus::RESULT_DISPLAY_PHASE)
-            new RacePausedDialog(0.8f, 0.6f);
+        if(World::getWorld()->getPhase()!=WorldStatus::RESULT_DISPLAY_PHASE
+            && !ProfileWorld::isProfileMode())
+            World::getWorld()->escapePressed();
     }
     // In menus
     else
     {
-        if (getCurrentScreen()->onEscapePressed()) popMenu();
+        if (getCurrentScreen() != NULL &&
+            getCurrentScreen()->onEscapePressed()) popMenu();
     }
 }   // escapePressed
 
@@ -180,7 +190,8 @@ void StateManager::onGameStateChange(GameState new_state)
 {
     if (new_state == GAME)
     {
-        irr_driver->hidePointer();
+        if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_OVERWORLD)
+            irr_driver->hidePointer();
         input_manager->setMode(InputManager::INGAME);
     }
     else  // menu (including in-game menu)
@@ -188,17 +199,17 @@ void StateManager::onGameStateChange(GameState new_state)
         irr_driver->showPointer();
         input_manager->setMode(InputManager::MENU);
         sfx_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
-        
+
         if (new_state == MENU)
         {
-            Screen* screen = GUIEngine::getCurrentScreen();
+            GUIEngine::Screen* screen = GUIEngine::getCurrentScreen();
             if (screen != NULL)
             {
                 music_manager->startMusic(
                     GUIEngine::getCurrentScreen()->getMusic());
             }
         }
-    }    
+    }
 }   // onGameStateChange
 
 // ----------------------------------------------------------------------------
@@ -207,8 +218,19 @@ void StateManager::onTopMostScreenChanged()
 {
     if (m_game_mode == MENU && GUIEngine::getCurrentScreen() != NULL)
     {
-        music_manager->startMusic(GUIEngine::getCurrentScreen()->getMusic());
+        if (GUIEngine::getCurrentScreen()->getMusic() != NULL)
+        {
+            music_manager->startMusic(GUIEngine::getCurrentScreen()->getMusic());
+        }
     }
+    else if (m_game_mode == INGAME_MENU && GUIEngine::getCurrentScreen() != NULL)
+    {
+        if (GUIEngine::getCurrentScreen()->getInGameMenuMusic() != NULL)
+        {
+            music_manager->startMusic(GUIEngine::getCurrentScreen()->getInGameMenuMusic());
+        }
+    }
+
 }   // onTopMostScreenChanged
 
 // ----------------------------------------------------------------------------
@@ -216,6 +238,7 @@ void StateManager::onTopMostScreenChanged()
 void StateManager::onStackEmptied()
 {
     GUIEngine::cleanUp();
+    GUIEngine::deallocate();
     main_loop->abort();
 }   // onStackEmptied
 
@@ -226,13 +249,13 @@ void StateManager::onStackEmptied()
 #pragma mark ActivePlayer
 #endif
 
-StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player, 
+StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player,
                                          InputDevice *device)
 {
 #ifdef DEBUG
     m_magic_number = 0xAC1EF1AE;
 #endif
-    
+
     m_player = player;
     m_device = NULL;
     m_kart = NULL;
@@ -243,7 +266,7 @@ StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player,
 StateManager::ActivePlayer::~ActivePlayer()
 {
     setDevice(NULL);
-    
+
 #ifdef DEBUG
     m_magic_number = 0xDEADBEEF;
 #endif
@@ -266,12 +289,12 @@ void StateManager::ActivePlayer::setDevice(InputDevice* device)
 #ifdef DEBUG
     assert(m_magic_number == 0xAC1EF1AE);
 #endif
-    
+
     // unset player from previous device he was assigned to, if any
     if (m_device != NULL) m_device->setPlayer(NULL);
-    
+
     m_device = device;
-    
+
     // inform the devce of its new owner
     if (device != NULL) device->setPlayer(this);
 }   // setDevice

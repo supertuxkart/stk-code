@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
@@ -25,19 +24,28 @@
 #include "config/player.hpp"
 #include "karts/controller/controller.hpp"
 
-class SFXBase;
+class AbstractKart;
 class Player;
+class SFXBase;
 
 /** PlayerKart manages control events from the player and moves
-    them to the Kart */
+  * them to the Kart
+  *
+  * \ingroup controller
+  */
 class PlayerController : public Controller
 {
 private:
     int            m_steer_val, m_steer_val_l, m_steer_val_r;
     int            m_prev_accel;
     bool           m_prev_brake;
+    bool           m_prev_nitro;
 
     float          m_penalty_time;
+
+    /** The camera attached to the kart for this controller. The camera
+     *  object is managed in the Camera class, so no need to free it. */
+    Camera        *m_camera;
 
     SFXBase       *m_bzzt_sound;
     SFXBase       *m_wee_sound;
@@ -47,7 +55,8 @@ private:
 
     void           steer(float, int);
 public:
-                   PlayerController  (Kart *kart, StateManager::ActivePlayer *_player,
+                   PlayerController  (AbstractKart *kart, 
+                                      StateManager::ActivePlayer *_player,
                                       unsigned int player_index);
                   ~PlayerController  ();
     void           update            (float);
@@ -55,11 +64,23 @@ public:
     void           handleZipper      (bool play_sound);
     void           collectedItem     (const Item &item, int add_info=-1,
                                       float previous_energy=0);
+    virtual void   skidBonusTriggered();
     virtual void   setPosition       (int p);
-    virtual void   finishedRace      (float time);
-    bool           isPlayerController() const {return true;}
+    virtual bool   isPlayerController() const {return true;}
+    virtual bool   isNetworkController() const { return false; }
     virtual void   reset             ();
     void           resetInputState   ();
-};
+    virtual void   finishedRace      (float time);
+    virtual void   crashed           (const AbstractKart *k) {}
+    virtual void   crashed           (const Material *m) {}
+    // ------------------------------------------------------------------------
+    /** Callback whenever a new lap is triggered. Used by the AI
+     *  to trigger a recomputation of the way to use, not used for players. */
+    virtual void  newLap(int lap) {}
+    // ------------------------------------------------------------------------
+    /** Player will always be able to get a slipstream bonus. */
+    virtual bool  disableSlipstreamBonus() const { return false; }
+
+};   // PlayerController
 
 #endif

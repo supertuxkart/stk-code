@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -22,6 +21,7 @@
 
 /**
  * \defgroup io
+ * Contains generic utility classes for file I/O (especially XML handling).
  */
 
 #include <string>
@@ -45,19 +45,20 @@ class FileManager : public NoCopy
 private:
     /** Handle to irrlicht's file systems. */
     io::IFileSystem  *m_file_system;
-    /** Pointer to the irrlicht device. This is necessary before reInit is
-     *  called to store the NULL device initially created. See Constructor
-     *  for details. */
-    IrrlichtDevice   *m_device;
 
-    bool              m_is_full_path;
     /** Directory where user config files are stored. */
     std::string       m_config_dir;
+
     /** Directory where addons are stored. */
     std::string       m_addons_dir;
+
     /** Root data directory. */
     std::string       m_root_dir;
-    std::vector<std::string>    
+
+    /** Directory to store screenshots in. */
+    std::string       m_screenshot_dir;
+
+    std::vector<std::string>
                       m_texture_search_path,
                       m_model_search_path,
                       m_music_search_path;
@@ -72,20 +73,31 @@ private:
     void              checkAndCreateConfigDir();
     bool              isDirectory(const std::string &path) const;
     void              checkAndCreateAddonsDir();
+    void              checkAndCreateScreenshotDir();
+#if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
+    std::string       checkAndCreateLinuxDir(const char *env_name,
+                                             const char *dir_name,
+                                             const char *fallback1,
+                                             const char *fallback2=NULL);
+#endif
+
 public:
                       FileManager(char *argv[]);
                      ~FileManager();
-    void              setDevice(IrrlichtDevice *device);
+    void              reInit();
     void              dropFileSystem();
     io::IXMLReader   *createXMLReader(const std::string &filename);
     XMLNode          *createXMLTree(const std::string &filename);
+    XMLNode          *createXMLTreeFromString(const std::string & content);
 
     std::string       getConfigDir() const;
+    std::string       getTextureDir() const;
+    std::string       getShaderDir() const;
+    std::string       getScreenshotDir() const;
     bool              checkAndCreateDirectoryP(const std::string &path);
     const std::string &getAddonsDir() const;
     std::string        getAddonsFile(const std::string &name);
-    void checkAndCreateDirForAddons(std::string addons_name,
-                                    std::string addons_type);
+    void checkAndCreateDirForAddons(const std::string &dir);
     bool removeFile(const std::string &name) const;
     bool removeDirectory(const std::string &name) const;
     std::string getDataDir       () const;
@@ -109,18 +121,32 @@ public:
                                   bool is_full_path=false,
                                   bool make_full_path=false) const;
 
-    bool       fileExists           (const std::string& path)
-        { return m_file_system->existFile(path.c_str()); }
 
     void       pushTextureSearchPath(const std::string& path);
     void       pushModelSearchPath  (const std::string& path);
-    void       pushMusicSearchPath  (const std::string& path)
-                                    { m_music_search_path.push_back(path);  }
     void       popTextureSearchPath ();
     void       popModelSearchPath   ();
-    void       popMusicSearchPath   () {m_music_search_path.pop_back();     }
+    void       redirectOutput();
+    // ------------------------------------------------------------------------
+    /** Adds a directory to the music search path (or stack).
+     */
+    void pushMusicSearchPath(const std::string& path)
+    {
+        m_music_search_path.push_back(path);
+    }   // pushMusicSearchPath
+    // ------------------------------------------------------------------------
+    /** Removes the last added directory from the music search path.
+     */
+    void popMusicSearchPath() {m_music_search_path.pop_back(); }
+    // ------------------------------------------------------------------------
+    /** Returns true if the specified file exists.
+     */
+    bool fileExists(const std::string& path)
+    {
+        return m_file_system->existFile(path.c_str());
+    }   // fileExists
 
-};
+};   // FileManager
 
 extern FileManager* file_manager;
 

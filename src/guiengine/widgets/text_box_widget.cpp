@@ -32,21 +32,21 @@ using namespace irr;
 class MyCGUIEditBox : public CGUIEditBox
 {
     PtrVector<GUIEngine::ITextBoxWidgetListener, REF> m_listeners;
-    
+
 public:
-    
+
     MyCGUIEditBox(const wchar_t* text, bool border, gui::IGUIEnvironment* environment,
                  gui:: IGUIElement* parent, s32 id, const core::rect<s32>& rectangle) :
         CGUIEditBox(text, border, environment, parent, id, rectangle, translations->isRTLLanguage())
     {
         if (translations->isRTLLanguage()) setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_CENTER);
     }
-    
+
     void addListener(GUIEngine::ITextBoxWidgetListener* listener)
     {
         m_listeners.push_back(listener);
     }
-    
+
     void clearListeners()
     {
         m_listeners.clearWithoutDeleting();
@@ -55,7 +55,7 @@ public:
     virtual bool OnEvent(const SEvent& event)
     {
         bool out = CGUIEditBox::OnEvent(event);
-        
+
         if (event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown)
         {
             for (int n=0; n<m_listeners.size(); n++)
@@ -63,10 +63,10 @@ public:
                 m_listeners[n].onTextUpdated();
             }
         }
-        
+
         return out;
     }
-    
+
 };
 
 using namespace GUIEngine;
@@ -85,15 +85,15 @@ TextBoxWidget::TextBoxWidget() : Widget(WTYPE_TEXTBOX)
 void TextBoxWidget::add()
 {
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
-    
+
     // Don't call TextBoxWidget::getText(), which assumes that the irrlicht
-    // widget already exists. 
+    // widget already exists.
     const stringw& text = Widget::getText();
-    
+
     m_element = new MyCGUIEditBox(text.c_str(), true /* border */, GUIEngine::getGUIEnv(),
                                   (m_parent ? m_parent : GUIEngine::getGUIEnv()->getRootGUIElement()),
                                   getNewID(), widget_size);
-    
+
     //m_element = GUIEngine::getGUIEnv()->addEditBox(text.c_str(), widget_size,
     //                                               true /* border */, m_parent, getNewID());
     m_id = m_element->getID();
@@ -122,8 +122,17 @@ stringw TextBoxWidget::getText() const
 {
     const IGUIEditBox* textCtrl =  Widget::getIrrlichtElement<IGUIEditBox>();
     assert(textCtrl != NULL);
-    
+
     return stringw(textCtrl->getText());
+}
+
+// -----------------------------------------------------------------------------
+
+void TextBoxWidget::setPasswordBox(bool passwordBox, wchar_t passwordChar)
+{
+    IGUIEditBox* textCtrl =  Widget::getIrrlichtElement<IGUIEditBox>();
+    assert(textCtrl != NULL);
+    textCtrl->setPasswordBox(passwordBox, passwordChar);
 }
 
 // -----------------------------------------------------------------------------
@@ -131,7 +140,7 @@ stringw TextBoxWidget::getText() const
 EventPropagation TextBoxWidget::focused(const int playerID)
 {
     assert(playerID == 0); // No support for multiple players in text areas!
-    
+
     // special case : to work, the text box must receive "irrLicht focus", STK focus is not enough
     GUIEngine::getGUIEnv()->setFocus(m_element);
     setWithinATextBox(true);
@@ -140,17 +149,20 @@ EventPropagation TextBoxWidget::focused(const int playerID)
 
 // -----------------------------------------------------------------------------
 
-void TextBoxWidget::unfocused(const int playerID)
+void TextBoxWidget::unfocused(const int playerID, Widget* new_focus)
 {
     assert(playerID == 0); // No support for multiple players in text areas!
 
     setWithinATextBox(false);
-    
-    // special case : to work, the text box must receive "irrLicht focus", STK focus is not enough
-    // below is a cheap way to unset the irrLicht focus from the widget (nope, 'removeFocus' from
-    // IGUIEnv doesn't work reliably, not sure why)
-    // currently, text boxes are only used in modal dialogs, so I shift the focus to the dialog
-    assert( ModalDialog::isADialogActive() );
-    GUIEngine::getGUIEnv()->setFocus( ModalDialog::getCurrent()->getIrrlichtElement() );
 }
 
+// -----------------------------------------------------------------------------
+
+void TextBoxWidget::elementRemoved()
+{
+    // normally at this point normal widgets have been deleted by irrlicht already.
+    // but this is a custom widget and the gui env does not appear to want to
+    // manage it. so we free it manually
+    m_element->drop();
+    Widget::elementRemoved();
+}

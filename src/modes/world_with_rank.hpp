@@ -22,6 +22,8 @@
 
 #include "modes/world.hpp"
 
+class AbstractKart;
+
 /**
  *  A WorldWithRank is a world where the karts are ranked. This is the base
  *  class for races and battle modes - all of which rank the kart.
@@ -37,13 +39,13 @@ protected:
 
     /** Whether to display the rank in the race GUI */
     bool m_display_rank;
-    
+
 #ifdef DEBUG
     /** Used for debugging to help detect if the same kart position
      *  is used more than once. */
     std::vector<bool> m_position_used;
 
-    /** True if beginSetKartPositions was called, false after 
+    /** True if beginSetKartPositions was called, false after
      *  endSetKartPositions. Used to make sure the sequence of calls
      *  is correct. */
     bool              m_position_setting_initialised;
@@ -57,13 +59,13 @@ public:
     virtual void  init();
 
     bool          displayRank() const { return m_display_rank; }
-    
+
     void          beginSetKartPositions();
     bool          setKartPosition(unsigned int kart_id,
                                  unsigned int position);
     void          endSetKartPositions();
 
-    Kart*         getKartAtPosition(unsigned int p) const;
+    AbstractKart* getKartAtPosition(unsigned int p) const;
     };   // WorldWithRank
 
 #endif

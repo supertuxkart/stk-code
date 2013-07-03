@@ -16,19 +16,19 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include <assert.h>
+#include "guiengine/screen.hpp"
 
 #include "io/file_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/layout_manager.hpp"
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "modes/world.hpp"
 #include "states_screens/state_manager.hpp"
 
-using namespace irr;
+#include <irrlicht.h>
 
+using namespace irr;
 using namespace core;
 using namespace scene;
 using namespace video;
@@ -36,8 +36,17 @@ using namespace io;
 using namespace gui;
 using namespace GUIEngine;
 
-// -----------------------------------------------------------------------------
+#include <assert.h>
 
+// -----------------------------------------------------------------------------
+/**
+ * \brief          Creates a screen populated by the widgets described
+ *                 in a STK GUI file.
+ * \param filename Name of the XML file describing the screen.
+ *                 This is NOT a path.
+ *                 The passed file name will be searched for in the
+ *                 STK data/gui directory.
+ */
 Screen::Screen(const char* file, bool pause_race)
 {
     m_magic_number   = 0xCAFEC001;
@@ -50,7 +59,9 @@ Screen::Screen(const char* file, bool pause_race)
 }   // Screen
 
 // -----------------------------------------------------------------------------
-
+/** \brief Creates a dummy incomplete object; only use to override behaviour
+ *         in sub-class.
+ */
 Screen::Screen(bool pause_race)
 {
     m_magic_number = 0xCAFEC001;
@@ -86,7 +97,8 @@ void Screen::init()
 /** Prepares removal of this screen. If necessary this will unpause the
  *  race (so this means that if you have several consecutive screens while
  *  the race is running the race will be unpaused and paused when switching
- *  from one screen to the next. */
+ *  from one screen to the next.
+ */
 void Screen::tearDown()
 {
     if(m_pause_race && World::getWorld())
@@ -100,31 +112,34 @@ void Screen::tearDown()
 #pragma mark Load/Init
 #endif
 
-
+/** \brief loads this Screen from the file passed to the constructor */
 void Screen::loadFromFile()
 {
     assert(m_magic_number == 0xCAFEC001);
-    
-    IXMLReader* xml = file_manager->createXMLReader( (file_manager->getGUIDir() + "/" + m_filename).c_str() );
+
+    IXMLReader* xml = file_manager->createXMLReader( (file_manager->getGUIDir() + m_filename).c_str() );
     if (xml == NULL)
     {
         fprintf(stderr, "Cannot open file %s\n", m_filename.c_str());
         assert(false);
         return;
     }
-    
+
     parseScreenFileDiv(xml, m_widgets);
     m_loaded = true;
     calculateLayout();
-    
+
     // invoke callback so that the class deriving from Screen is aware of this event
     loadedFromFile();
-    
+
     delete xml;
 }   // loadFromFile
 
 // -----------------------------------------------------------------------------
-
+/** Next time this menu needs to be shown, don't use cached values,
+ *  re-calculate everything. (useful e.g. on reschange, when sizes have changed
+ *  and must be re-calculated)
+ */
 void Screen::unload()
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -133,16 +148,18 @@ void Screen::unload()
     {
         assert(w->m_magic_number == 0xCAFEC001);
     }
-    
+
     m_loaded = false;
     m_widgets.clearAndDeleteAll();
-    
+
     // invoke callback so that the class deriving from Screen is aware of this event
     unloaded();
 }   // unload
 
 // -----------------------------------------------------------------------------
-
+/** \brief Called after all widgets have been added. namely expands layouts
+ *         into absolute positions.
+ */
 void Screen::calculateLayout()
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -156,16 +173,18 @@ void Screen::calculateLayout()
 #pragma mark Adding/Removing widgets
 #endif
 
-
+/** \brief Adds the IrrLicht widgets corresponding to this screen to the
+ *         IGUIEnvironment.
+ */
 void Screen::addWidgets()
 {
     assert(m_magic_number == 0xCAFEC001);
     if (!m_loaded) loadFromFile();
-    
+
     addWidgetsRecursively( m_widgets );
 
     //std::cout << "*****ScreenAddWidgets " << m_filename.c_str() << " : focusing the first widget*****\n";
-    
+
     // select the first widget (for first players only; if other players need some focus the Screen must provide it).
     Widget* w = getFirstWidget();
     //std::cout << "First widget is " << (w == NULL ? "null" : w->m_properties[PROP_ID].c_str()) << std::endl;
@@ -174,32 +193,9 @@ void Screen::addWidgets()
 }   // addWidgets
 
 // -----------------------------------------------------------------------------
-
-/**
- * Called when screen is removed. This means all irrlicht widgets this object has pointers
- * to are now gone. Set all references to NULL to avoid problems.
+/** \brief Can be used for custom purposes for which the load-screen-from-XML
+ *         code won't make it.
  */
-void Screen::elementsWereDeleted(PtrVector<Widget>* within_vector)
-{
-    assert(m_magic_number == 0xCAFEC001);
-    if (within_vector == NULL) within_vector = &m_widgets;
-    const unsigned short widgets_amount = within_vector->size();
-    
-    for (int n=0; n<widgets_amount; n++)
-    {
-        Widget& widget = (*within_vector)[n];
-        
-        widget.elementRemoved();
-        
-        if (widget.m_children.size() > 0)
-        {
-            elementsWereDeleted( &(widget.m_children) );
-        }
-    }
-}   // elementsWereDeleted
-
-// -----------------------------------------------------------------------------
-
 void Screen::manualAddWidget(Widget* w)
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -207,7 +203,8 @@ void Screen::manualAddWidget(Widget* w)
 }   // manualAddWidget
 
 // -----------------------------------------------------------------------------
-
+/** \brief Can be used for custom purposes for which the load-screen-from-XML
+ *         code won't make it. */
 void Screen::manualRemoveWidget(Widget* w)
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -230,7 +227,7 @@ void Screen::manualRemoveWidget(Widget* w)
 #endif
 
 // -----------------------------------------------------------------------------
-
+/** \brief Implementing method from AbstractTopLevelContainer */
 int Screen::getWidth()
 {
     core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
@@ -238,7 +235,7 @@ int Screen::getWidth()
 }
 
 // -----------------------------------------------------------------------------
-
+/** \brief Implementing method from AbstractTopLevelContainer */
 int Screen::getHeight()
 {
     core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();

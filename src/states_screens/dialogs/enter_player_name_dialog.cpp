@@ -20,13 +20,16 @@
 #include <IGUIEnvironment.h>
 
 #include "audio/sfx_manager.hpp"
+#include "challenges/unlock_manager.hpp"
+#include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
-#include "states_screens/options_screen_players.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
+#include "utils/string_utils.hpp"
+
 
 using namespace GUIEngine;
 using namespace irr;
@@ -35,15 +38,18 @@ using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
 
-EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
+EnterPlayerNameDialog::EnterPlayerNameDialog(INewPlayerListener* listener,
+                                             const float w, const float h) :
         ModalDialog(w, h)
 {
+    m_listener = listener;
+    m_self_destroy = false;
     loadFromFile("enter_player_name_dialog.stkgui");
-    
+
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     assert(textCtrl != NULL);
     textCtrl->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    
+
     //if (translations->isRTLLanguage()) textCtrl->addListener(this);
 }
 
@@ -64,7 +70,7 @@ void EnterPlayerNameDialog::onTextUpdated()
 {
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     LabelWidget* lbl = getWidget<LabelWidget>("preview");
-    
+
     lbl->setText( core::stringw(translations->fribidize(textCtrl->getText())), false );
 }
 */
@@ -93,41 +99,35 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
         processEvent(fakeEvent);
         return;
     }
-        
-    // ---- Otherwise, accept entered name
+
+    // ---- Otherwise, see if we can accept the new name
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
-    stringw playerName = textCtrl->getText();
-    const int size = playerName.size();
-    
-    // sanity check
-    int nonEmptyChars = 0;
-    for (int n=0; n<size; n++)
+    stringw playerName = textCtrl->getText().trim();
+    if (StringUtils::notEmpty(playerName))
     {
-        if (playerName[n] != L' ')
+        // check for duplicates
+        const int amount = UserConfigParams::m_all_players.size();
+        for (int n=0; n<amount; n++)
         {
-            nonEmptyChars++;
+            if (UserConfigParams::m_all_players[n].getName() == playerName)
+            {
+                LabelWidget* label = getWidget<LabelWidget>("title");
+                label->setText(_("Cannot add a player with this name."), false);
+                sfx_manager->quickSound( "anvil" );
+                return;
+            }
         }
-    }
-    
-    
-    if (size > 0 && nonEmptyChars > 0)
-    {
-        const bool success = OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName );
-        if (!success)
-        {
-            LabelWidget* label = getWidget<LabelWidget>("title");
-            label->setText(_("Cannot add a player with this name."), false);
-            sfx_manager->quickSound( "anvil" );
-            return;
-        }
-        
-        // irrLicht is too stupid to remove focus from deleted widgets
-        // so do it by hand
-        GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
-        GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
-        
-        ModalDialog::dismiss();
-    }
+
+        // Finally, add the new player.
+        UserConfigParams::m_all_players.push_back( new PlayerProfile(playerName) );
+        bool created = unlock_manager->createSlotsIfNeeded();
+        if (created) unlock_manager->save();
+        user_config->saveConfig();
+
+        // It's unsafe to delete from inside the event handler so we do it
+        // in onUpdate (which checks for m_self_destroy)
+        m_self_destroy = true;
+    } // if valid name
     else
     {
         LabelWidget* label = getWidget<LabelWidget>("title");
@@ -138,4 +138,26 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
 
 // -----------------------------------------------------------------------------
 
+void EnterPlayerNameDialog::onUpdate(float dt)
+{
+    // It's unsafe to delete from inside the event handler so we do it here
+    if (m_self_destroy)
+    {
+        TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
+        stringw playerName = textCtrl->getText().trim();
 
+        // irrLicht is too stupid to remove focus from deleted widgets
+        // so do it by hand
+        GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
+        GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
+
+        // we will destroy the dialog before notifying the listener to be safer.
+        // but in order not to crash we must make a local copy of the listern
+        // otherwise we will crash
+        INewPlayerListener* listener = m_listener;
+
+        ModalDialog::dismiss();
+
+        if (listener != NULL) listener->onNewPlayerWithName( playerName );
+    }
+}

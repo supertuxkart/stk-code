@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 Marianne Gagnon
@@ -22,15 +21,16 @@
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 
-#include <vorbis/codec.h>
-#include <vorbis/vorbisfile.h>
-
-#ifdef __APPLE__
-#  include <OpenAL/al.h>
-#  include <OpenAL/alc.h>
-#else
-#  include <AL/al.h>
-#  include <AL/alc.h>
+#if HAVE_OGGVORBIS
+#  include <vorbis/codec.h>
+#  include <vorbis/vorbisfile.h>
+#  ifdef __APPLE__
+#    include <OpenAL/al.h>
+#    include <OpenAL/alc.h>
+#  else
+#    include <AL/al.h>
+#    include <AL/alc.h>
+#  endif
 #endif
 
 //----------------------------------------------------------------------------
@@ -38,17 +38,19 @@
 SFXBuffer::SFXBuffer(const std::string& file,
                      bool  positional,
                      float rolloff,
+                     float max_width,
                      float gain)
 {
-    m_buffer     = 0;
-    m_gain       = 1.0f;
-    m_rolloff    = 0.1f;
-    m_loaded     = false;
-    m_file       = file;
-    
-    m_rolloff    = rolloff;
-    m_positional = positional;
-    m_gain       = gain;
+    m_buffer      = 0;
+    m_gain        = 1.0f;
+    m_rolloff     = 0.1f;
+    m_loaded      = false;
+    m_max_dist    = max_width;
+    m_file        = file;
+
+    m_rolloff     = rolloff;
+    m_positional  = positional;
+    m_gain        = gain;
 }
 
 //----------------------------------------------------------------------------
@@ -56,41 +58,45 @@ SFXBuffer::SFXBuffer(const std::string& file,
 SFXBuffer::SFXBuffer(const std::string& file,
                      const XMLNode* node)
 {
-    m_buffer     = 0;
-    m_gain       = 1.0f;
-    m_rolloff    = 0.1f;
-    m_positional = false;
-    m_loaded     = false;
-    m_file       = file;
-    
+    m_buffer      = 0;
+    m_gain        = 1.0f;
+    m_rolloff     = 0.1f;
+    m_max_dist    = 300.0f;
+    m_positional  = false;
+    m_loaded      = false;
+    m_file        = file;
+
     node->get("rolloff",     &m_rolloff    );
     node->get("positional",  &m_positional );
     node->get("volume",      &m_gain       );
+    node->get("max_dist",    &m_max_dist   );
 }
 
 //----------------------------------------------------------------------------
 
 bool SFXBuffer::load()
 {
+#if HAVE_OGGVORBIS
     if (m_loaded) return false;
-    
+
     alGetError(); // clear errors from previously
-    
+
     alGenBuffers(1, &m_buffer);
     if (!SFXManager::checkError("generating a buffer"))
     {
         return false;
     }
-    
+
     assert( alIsBuffer(m_buffer) );
-    
+
     if (!loadVorbisBuffer(m_file, m_buffer))
     {
-        fprintf(stderr, "Could not load sound effect %s\n", m_file.c_str());
+        Log::error("SFXBuffer", "Could not load sound effect %s\n", m_file.c_str());
         // TODO: free al buffer here?
         return false;
     }
-    
+#endif
+
     m_loaded = true;
     return true;
 }
@@ -99,82 +105,88 @@ bool SFXBuffer::load()
 
 void SFXBuffer::unload()
 {
+#if HAVE_OGGVORBIS
     if (m_loaded)
     {
         alDeleteBuffers(1, &m_buffer);
         m_buffer = 0;
     }
+#endif
     m_loaded = false;
 }
 
 //----------------------------------------------------------------------------
 /** Load a vorbis file into an OpenAL buffer
- *  based on a routine by Peter Mulholland, used with permission (quote : 
+ *  based on a routine by Peter Mulholland, used with permission (quote :
  *  "Feel free to use")
  */
 bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
 {
+#if HAVE_OGGVORBIS
     const int ogg_endianness = (IS_LITTLE_ENDIAN ? 0 : 1);
-    
-    
+
+
     bool success = false;
     FILE *file;
     vorbis_info *info;
     OggVorbis_File oggFile;
-    
+
     if (alIsBuffer(buffer) == AL_FALSE)
     {
-        printf("Error, bad OpenAL buffer");
+        Log::error("SFXBuffer", "Error, bad OpenAL buffer");
         return false;
     }
-    
+
     file = fopen(name.c_str(), "rb");
-    
+
     if(!file)
     {
-        printf("LoadVorbisBuffer() - couldn't open file!");
+        Log::error("SFXBuffer", "[SFXBuffer] LoadVorbisBuffer() - couldn't open file!\n");
         return false;
     }
-    
+
     if (ov_open_callbacks(file, &oggFile, NULL, 0,  OV_CALLBACKS_NOCLOSE) != 0)
     {
         fclose(file);
-        printf("LoadVorbisBuffer() - ov_open_callbacks() failed, file isn't vorbis?");
+        Log::error("SFXBuffer", "[SFXBuffer] LoadVorbisBuffer() - ov_open_callbacks() failed, file isn't vorbis?\n");
         return false;
     }
-    
+
     info = ov_info(&oggFile, -1);
-    
+
     long len = (long)ov_pcm_total(&oggFile, -1) * info->channels * 2;    // always 16 bit data
-    
+
     char *data = (char *) malloc(len);
     if(!data)
     {
         ov_clear(&oggFile);
-        printf("Error : LoadVorbisBuffer() - couldn't allocate decode buffer");
+        Log::error("SFXBuffer", "[SFXBuffer] loadVorbisBuffer() - Error : LoadVorbisBuffer() - couldn't allocate decode buffer\n");
         return false;
     }
-    
+
     int bs = -1;
     long todo = len;
     char *bufpt = data;
-    
+
     while (todo)
     {
         int read = ov_read(&oggFile, bufpt, todo, ogg_endianness, 2, 1, &bs);
         todo -= read;
         bufpt += read;
     }
-    
-    alBufferData(buffer, (info->channels == 1) ? AL_FORMAT_MONO16 
+
+    alBufferData(buffer, (info->channels == 1) ? AL_FORMAT_MONO16
                  : AL_FORMAT_STEREO16,
                  data, len, info->rate);
     success = true;
-    
+
     free(data);
-    
+
     ov_clear(&oggFile);
-    
+    fclose(file);
     return success;
+#else
+    return false;
+#endif
 }
 

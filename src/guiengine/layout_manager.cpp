@@ -58,14 +58,14 @@ int atoi_p(const char* val)
 // ----------------------------------------------------------------------------
 
 bool LayoutManager::convertToCoord(std::string& x, int* absolute /* out */, int* percentage /* out */)
-{    
+{
     bool is_number;
     int i;
     std::istringstream myStream(x);
     is_number = (myStream >> i)!=0;
-    
+
     if(!is_number) return false;
-    
+
     if( x[x.size()-1] == '%' ) // percentage
     {
         *percentage = i;
@@ -82,13 +82,13 @@ bool LayoutManager::convertToCoord(std::string& x, int* absolute /* out */, int*
 // ----------------------------------------------------------------------------
 
 void LayoutManager::readCoords(Widget* self)
-{    
+{
     // determine widget position and size if not already done by sizers
     std::string x      = self->m_properties[PROP_X];
     std::string y      = self->m_properties[PROP_Y];
     std::string width  = self->m_properties[PROP_WIDTH];
     std::string height = self->m_properties[PROP_HEIGHT];
-    
+
     /*
     // retrieve parent size (or screen size if none). Will be useful for layout
     // and especially for percentages.
@@ -111,7 +111,7 @@ void LayoutManager::readCoords(Widget* self)
         parent_y = parent->m_y;
     }
     */
-    
+
     // ---- try converting to number
     // x coord
     {
@@ -132,7 +132,7 @@ void LayoutManager::readCoords(Widget* self)
             }
         }
     }
-    
+
     // y coord
     {
         int abs_y = 0x7FFFFFFF, percent_y = 0x7FFFFFFF;
@@ -152,22 +152,22 @@ void LayoutManager::readCoords(Widget* self)
             }
         }
     }
-    
+
     // ---- if this widget has an icon, get icon size. this can helpful determine its optimal size
     int texture_w = -1, texture_h = -1;
-    
+
     if (self->m_properties[PROP_ICON].size() > 0)
     {
         ITexture* texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +
                                                     self->m_properties[PROP_ICON]).c_str());
-        
+
         if (texture != NULL)
         {
             texture_w = texture->getSize().Width;
             texture_h = texture->getSize().Height;
         }
     }
-    
+
     // ---- if this widget has a label, get text size. this can helpful determine its optimal size
     int label_w = -1, label_h = -1;
     if (self->m_text.size() > 0)
@@ -184,10 +184,10 @@ void LayoutManager::readCoords(Widget* self)
         // User text height to guess checkbox size
         IGUIFont* font = (self->m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont());
         core::dimension2d< u32 > dim = font->getDimension( L"X" );
-        label_h = dim.Height + self->getHeightNeededAroundLabel();   
+        label_h = dim.Height + self->getHeightNeededAroundLabel();
         label_w = label_h; // a checkbox is square
     }
-    
+
     if (label_h == -1)
     {
         if (self->getType() == WTYPE_TEXTBOX ||
@@ -202,45 +202,65 @@ void LayoutManager::readCoords(Widget* self)
             label_h = dim.Height + self->getHeightNeededAroundLabel();
         }
     }
-    
+
     // ---- if this widget has children, get their size size. this can helpful determine its optimal size
     if (self->m_properties[PROP_WIDTH] == "fit" || self->m_properties[PROP_HEIGHT] == "fit")
     {
+        bool is_vertical_row = (self->m_properties[PROP_LAYOUT] == "vertical-row");
+        bool is_horizontal_row = (self->m_properties[PROP_LAYOUT] == "horizontal-row");
+
         int child_max_width = -1, child_max_height = -1;
+        int total_width = 0, total_height = 0;
+
         for (int child=0; child<self->m_children.size(); child++)
         {
             if (self->m_children[child].m_absolute_w > -1)
             {
-                if (child_max_width == -1 || self->m_children[child].m_absolute_w > child_max_width)
+                if (is_horizontal_row)
                 {
-                    child_max_width = self->m_children[child].m_absolute_w;
+                    total_width += self->m_children[child].m_absolute_w ;
+                }
+                else
+                {
+                    if (child_max_width == -1 || self->m_children[child].m_absolute_w > child_max_width)
+                    {
+                        child_max_width = self->m_children[child].m_absolute_w;
+                    }
                 }
             }
-            
+
             if (self->m_children[child].m_absolute_h > -1)
             {
-                if (child_max_height == -1 || self->m_children[child].m_absolute_h > child_max_height)
+                if (is_vertical_row)
                 {
-                    child_max_height = self->m_children[child].m_absolute_h;
+                    total_height += self->m_children[child].m_absolute_h;
+                }
+                else
+                {
+                    if (child_max_height == -1 || self->m_children[child].m_absolute_h > child_max_height)
+                    {
+                        child_max_height = self->m_children[child].m_absolute_h;
+                    }
                 }
             }
         }
-        
+
         if (self->m_properties[PROP_WIDTH] == "fit")
         {
-            self->m_absolute_w = child_max_width;
+            self->m_absolute_w = (is_horizontal_row ? total_width : child_max_width);
         }
         if (self->m_properties[PROP_HEIGHT] == "fit")
         {
-            self->m_absolute_h = child_max_height;
+            self->m_absolute_h = (is_vertical_row ? total_height : child_max_height);
         }
     }
-    
+
     // ---- read dimension
     // width
     {
         int abs_w = -1, percent_w = -1;
-        if (convertToCoord(width, &abs_w, &percent_w ))
+        if (width == "font") self->m_absolute_w = GUIEngine::getFontHeight();
+        else if (convertToCoord(width, &abs_w, &percent_w ))
         {
             if      (abs_w > -1)     self->m_absolute_w = abs_w;
             else if (percent_w > -1) self->m_relative_w = (float)percent_w;
@@ -248,11 +268,12 @@ void LayoutManager::readCoords(Widget* self)
         else if(texture_w > -1) self->m_absolute_w = texture_w;
         else if(label_w > -1)   self->m_absolute_w = label_w;
     }
-    
+
     // height
     {
         int abs_h = -1, percent_h = -1;
-        if (convertToCoord(height, &abs_h, &percent_h ))
+        if (height == "font") self->m_absolute_h = GUIEngine::getFontHeight();
+        else if (convertToCoord(height, &abs_h, &percent_h ))
         {
             if      (abs_h > -1)     self->m_absolute_h = abs_h;
             else if (percent_h > -1) self->m_relative_h = (float)percent_h;
@@ -287,26 +308,26 @@ void LayoutManager::applyCoords(Widget* self, AbstractTopLevelContainer* topLeve
         parent_x = parent->m_x;
         parent_y = parent->m_y;
     }
-    
+
     if      (self->m_absolute_x > -1)         self->m_x = parent_x + self->m_absolute_x;
     else if (self->m_absolute_reverse_x > -1) self->m_x = parent_x + (parent_w - self->m_absolute_reverse_x);
     else if (self->m_relative_x > -1)         self->m_x = (int)(parent_x + parent_w*self->m_relative_x/100);
-    
+
     if      (self->m_absolute_y > -1)         self->m_y = parent_y + self->m_absolute_y;
     else if (self->m_absolute_reverse_y > -1) self->m_y = parent_y + (parent_h - self->m_absolute_reverse_y);
     else if (self->m_relative_y > -1)         self->m_y = (int)(parent_y + parent_h*self->m_relative_y/100);
-    
+
     if (self->m_absolute_w > -1)      self->m_w = self->m_absolute_w;
     else if (self->m_relative_w > -1) self->m_w = (int)round(parent_w*self->m_relative_w/100.0);
-    
+
     if (self->m_absolute_h > -1)      self->m_h = self->m_absolute_h;
     else if (self->m_relative_h > -1) self->m_h = (int)round(parent_h*self->m_relative_h/100.0);
-    
+
     // ---- can't make widget bigger than parent
     if (self->m_h > (int)parent_h)
     {
         float ratio = (float)parent_h / self->m_h;
-        
+
         self->m_w = (int)(self->m_w*ratio);
         self->m_h = (int)(self->m_h*ratio);
     }
@@ -314,23 +335,23 @@ void LayoutManager::applyCoords(Widget* self, AbstractTopLevelContainer* topLeve
     {
         // scale down while keeping aspect ratio (don't do this for text widgets though...)
         float ratio = (float)parent_w / self->m_w;
-        
+
         self->m_w = (int)(self->m_w * ratio);
-        
+
         // FIXME: ugly to hardcode widgets types here
         if (self->m_type != WTYPE_LABEL && self->m_type != WTYPE_BUBBLE)
         {
             self->m_h = (int)(self->m_h * ratio);
         }
     }
-    
+
     // ------ check for given max size
     if (self->m_properties[PROP_MAX_WIDTH].size() > 0)
     {
         const int max_width = atoi_p( self->m_properties[PROP_MAX_WIDTH].c_str() );
         if (self->m_w > max_width) self->m_w = max_width;
     }
-    
+
     if (self->m_properties[PROP_MAX_HEIGHT].size() > 0)
     {
         const int max_height = atoi_p( self->m_properties[PROP_MAX_HEIGHT].c_str() );
@@ -343,20 +364,20 @@ void LayoutManager::applyCoords(Widget* self, AbstractTopLevelContainer* topLeve
 void LayoutManager::recursivelyReadCoords(PtrVector<Widget>& widgets)
 {
     const unsigned short widgets_amount = widgets.size();
-    
+
     // ----- deal with containers' children
     for (int n=0; n<widgets_amount; n++)
     {
         if (widgets[n].m_type == WTYPE_DIV) recursivelyReadCoords(widgets[n].m_children);
     }
-    
+
     // ----- read x/y/size parameters
     for (unsigned short n=0; n<widgets_amount; n++)
     {
         readCoords(widgets.get(n));
-    }//next widget     
+    }//next widget
 }
-    
+
 // ----------------------------------------------------------------------------
 
 void LayoutManager::calculateLayout(PtrVector<Widget>& widgets, AbstractTopLevelContainer* topLevelContainer)
@@ -371,22 +392,22 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                                       Widget* parent)
 {
     const unsigned short widgets_amount = widgets.size();
- 
+
     for (int n=0; n<widgets_amount; n++)
     {
         applyCoords(widgets.get(n), topLevelContainer, parent);
     }
-    
+
     // ----- manage 'layout's if relevant
     do // i'm using 'while false' here just to be able to 'break' ...
     {
         if(parent == NULL) break;
-        
+
         std::string layout_name = parent->m_properties[PROP_LAYOUT];
         if(layout_name.size() < 1) break;
-        
+
         bool horizontal = false;
-        
+
         if (!strcmp("horizontal-row", layout_name.c_str()))
             horizontal = true;
         else if(!strcmp("vertical-row", layout_name.c_str()))
@@ -396,9 +417,9 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
             std::cerr << "Unknown layout name : " << layout_name.c_str() << std::endl;
             break;
         }
-        
+
         const int w = parent->m_w, h = parent->m_h;
-        
+
         // find space left after placing all absolutely-sized widgets in a row
         // (the space left will be divided between remaining widgets later)
         int left_space = (horizontal ? w : h);
@@ -412,11 +433,17 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                 total_proportion += atoi_p( prop.c_str() );
                 continue;
             }
-            
+
             // absolutely-sized widgets
             left_space -= (horizontal ? widgets[n].m_w : widgets[n].m_h);
         } // next widget
-        
+
+        if (left_space < 0)
+        {
+            fprintf(stderr, "[LayoutManager] WARNING: statically sized widgets took all the place!!\n");
+            left_space = 0;
+        }
+
         // ---- lay widgets in row
         int x = parent->m_x;
         int y = parent->m_y;
@@ -434,13 +461,13 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                               << "' is not a number for widget " << widgets[n].m_properties[PROP_ID].c_str()
                               << std::endl;
                 }
-                
+
                 const float fraction = (float)proportion/(float)total_proportion;
-                
+
                 if (horizontal)
                 {
                     widgets[n].m_x = x;
-                    
+
                     std::string align = widgets[n].m_properties[ PROP_ALIGN ];
                     if (align.size() < 1)
                     {
@@ -480,26 +507,42 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                                    <<  "' is unknown (widget '" << widgets[n].m_properties[PROP_ID].c_str()
                                    << "', in a horiozntal-row layout)\n";
                     }
-                    
+
                     widgets[n].m_w = (int)(left_space*fraction);
                     if (widgets[n].m_properties[PROP_MAX_WIDTH].size() > 0)
                     {
                         const int max_width = atoi_p( widgets[n].m_properties[PROP_MAX_WIDTH].c_str() );
                         if (widgets[n].m_w > max_width) widgets[n].m_w = max_width;
                     }
-                    
+
+                    if (widgets[n].m_w <= 0)
+                    {
+                        fprintf(stderr, "WARNING: widget '%s' has a width of %i (left_space = %i, "
+                                "fraction = %f, max_width = %s)\n", widgets[n].m_properties[PROP_ID].c_str(),
+                                widgets[n].m_w, left_space, fraction, widgets[n].m_properties[PROP_MAX_WIDTH].c_str());
+                        widgets[n].m_w = 1;
+                    }
+
                     x += widgets[n].m_w;
                 }
                 else
-                {    
+                {
                     widgets[n].m_h = (int)(left_space*fraction);
-                    
+
                     if (widgets[n].m_properties[PROP_MAX_HEIGHT].size() > 0)
                     {
                         const int max_height = atoi_p( widgets[n].m_properties[PROP_MAX_HEIGHT].c_str() );
                         if (widgets[n].m_h > max_height) widgets[n].m_h = max_height;
                     }
-                    
+
+                    if (widgets[n].m_h <= 0)
+                    {
+                        fprintf(stderr, "WARNING: widget '%s' has a height of %i (left_space = %i, "
+                                "fraction = %f, max_width = %s)\n", widgets[n].m_properties[PROP_ID].c_str(),
+                                widgets[n].m_h, left_space, fraction, widgets[n].m_properties[PROP_MAX_WIDTH].c_str());
+                        widgets[n].m_h = 1;
+                    }
+
                     std::string align = widgets[n].m_properties[ PROP_ALIGN ];
                     if (align.size() < 1)
                     {
@@ -529,7 +572,7 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                     {
                         widgets[n].m_x = x + w/2 - widgets[n].m_w/2;
                     }
-                    else if (align == "right") 
+                    else if (align == "right")
                     {
                         widgets[n].m_x = x + w - widgets[n].m_w;
                     }
@@ -540,24 +583,24 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                                   << "', in a vertical-row layout)\n";
                     }
                     widgets[n].m_y = y;
-                    
+
                     y += widgets[n].m_h;
                 }
             }
             else
             {
                 // absolute size
-                
+
                 if (horizontal)
                 {
                     widgets[n].m_x = x;
-                    
+
                     std::string align = widgets[n].m_properties[ PROP_ALIGN ];
-                    
+
                     if (align.size() < 1)
                     {
                         std::string prop_y = widgets[n].m_properties[ PROP_Y ];
-                        
+
                         if (prop_y.size() > 0)
                         {
                             if (prop_y[ prop_y.size()-1 ] == '%')
@@ -593,17 +636,17 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                                   << "' is unknown in widget " << widgets[n].m_properties[PROP_ID].c_str()
                                   << std::endl;
                     }
-                    
+
                     x += widgets[n].m_w;
                 }
                 else
-                {                    
+                {
                     std::string align = widgets[n].m_properties[ PROP_ALIGN ];
-                    
+
                     if (align.size() < 1)
                     {
                         std::string prop_x = widgets[n].m_properties[ PROP_X ];
-                        
+
                         if (prop_x.size() > 0)
                         {
                             if (prop_x[ prop_x.size()-1 ] == '%')
@@ -639,15 +682,15 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                                   << "' is unknown in widget " << widgets[n].m_properties[PROP_ID].c_str() << std::endl;
                     }
                     widgets[n].m_y = y;
-                    
+
                     y += widgets[n].m_h;
                 }
             } // end if property or absolute size
-            
+
         } // next widget
-        
+
     } while(false);
-    
+
     // ----- also deal with containers' children
     for (int n=0; n<widgets_amount; n++)
     {

@@ -18,20 +18,37 @@
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/hardware_skinning.hpp"
+#include "graphics/material_manager.hpp"
+#include "graphics/material.hpp"
+#include "config/user_config.hpp"
 
 #include <ISceneManager.h>
 #include <ICameraSceneNode.h>
+#include <IMeshSceneNode.h>
+#include <IAnimatedMeshSceneNode.h>
 
-LODNode::LODNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id)
-: ISceneNode(parent, mgr, id) //: IDummyTransformationSceneNode(parent, mgr, id)
+/**
+  * @param group_name Only useful for getGroupName()
+  */
+LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
+                 scene::ISceneManager* mgr, s32 id)
+    : ISceneNode(parent, mgr, id)
 {
     assert(mgr != NULL);
     assert(parent != NULL);
-    // At this stage refcount is two: one because of the object being 
+
+    m_group_name = group_name;
+
+    m_previous_visibility = FIRST_PASS;
+
+    // At this stage refcount is two: one because of the object being
     // created, and once because it is a child of the parent. Drop once,
     // so that only the reference from the parent is active, causing this
     // node to be deleted when it is removed from the parent.
     drop();
+
+    m_forced_lod = -1;
 }
 
 LODNode::~LODNode()
@@ -40,40 +57,199 @@ LODNode::~LODNode()
 
 void LODNode::render()
 {
-    if (isVisible())
-        ISceneNode::OnRegisterSceneNode();
     //ISceneNode::render();
+}
+
+/** Returns the level to use, or -1 if the object is too far
+ *  away.
+ */
+int LODNode::getLevel()
+{
+    // If a level is forced, use it
+    if(m_forced_lod>-1)
+        return m_forced_lod;
+
+    // TODO: optimize this, there is no need to check every frame
+    scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
+
+    // Assumes all children are at the same location
+    const int dist =
+        (int)((getPosition() + m_nodes[0]->getPosition()).getDistanceFromSQ( curr_cam->getPosition() ));
+
+    for (unsigned int n=0; n<m_detail.size(); n++)
+    {
+        if (dist < m_detail[n])
+          return n;
+    }
+    return -1;
+}  // getLevel
+
+// ---------------------------------------------------------------------------
+/** Forces the level of detail to be n. If n>number of levels, the most
+ *  detailed level is used. This is used to disable LOD when the end
+ *  camera is activated, since it zooms in to the kart. */
+void LODNode::forceLevelOfDetail(int n)
+{
+    m_forced_lod = (n >=(int)m_detail.size()) ? m_detail.size()-1 : n;
+}   // forceLevelOfDetail
+
+// ----------------------------------------------------------------------------
+void LODNode::OnAnimate(u32 timeMs)
+{
+    if (isVisible())
+    {
+        // update absolute position
+        updateAbsolutePosition();
+
+        int level = getLevel();
+        // Assume all the scene node have the same bouding box
+        if(level>=0)
+            m_nodes[level]->OnAnimate(timeMs);
+
+        Box = m_nodes[m_detail.size()-1]->getBoundingBox();
+
+        // If this node has children other than the LOD nodes, animate it
+        core::list<ISceneNode*>::Iterator it;
+        for (it = Children.begin(); it != Children.end(); it++)
+        {
+            if (m_nodes_set.find(*it) == m_nodes_set.end())
+            {
+                assert(*it != NULL);
+                if ((*it)->isVisible())
+                {
+                    (*it)->OnAnimate(timeMs);
+                }
+            }
+        }
+
+    }
 }
 
 void LODNode::OnRegisterSceneNode()
 {
     if (!isVisible()) return;
-    
-    // TODO: optimize this, there is no need to check every frame
-    scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
+    if (m_nodes.size() == 0) return;
 
-    // Assumes all children are at the same location
-    const int dist = 
-        (int)((getPosition() + m_nodes[0]->getPosition()).getDistanceFromSQ( curr_cam->getPosition() ));
-        
-    for (unsigned int n=0; n<m_detail.size(); n++)
+    bool shown = false;
+    int level = getLevel();
+    if (level>=0)
     {
-        if (dist < m_detail[n])
+        m_nodes[level]->updateAbsolutePosition();
+        m_nodes[level]->OnRegisterSceneNode();
+        shown = true;
+    }
+
+    // support an optional, mostly hard-coded fade-in/out effect for objects with a single level
+    if (m_nodes.size() == 1 && (m_nodes[0]->getType() == scene::ESNT_MESH ||
+                                m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH))
+    {
+        if (m_previous_visibility == WAS_HIDDEN && shown)
         {
-            m_nodes[n]->OnRegisterSceneNode();
-            break;
+            scene::IMesh* mesh;
+
+            if (m_nodes[0]->getType() == scene::ESNT_MESH)
+            {
+                scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
+                mesh = node->getMesh();
+            }
+            else
+            {
+                assert(m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH);
+                scene::IAnimatedMeshSceneNode* node =
+                    (scene::IAnimatedMeshSceneNode*)(m_nodes[0]);
+                assert(node != NULL);
+                mesh = node->getMesh();
+            }
+
+            for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
+            {
+                scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
+                video::ITexture* t = mb->getMaterial().getTexture(0);
+                if (t == NULL) continue;
+
+                Material* m = material_manager->getMaterialFor(t, mb);
+                if (m != NULL)
+                {
+                    m->onMadeVisible(mb);
+                }
+            }
+        }
+        else if (m_previous_visibility == WAS_SHOWN && !shown)
+        {
+            scene::IMesh* mesh;
+
+            if (m_nodes[0]->getType() == scene::ESNT_MESH)
+            {
+                scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
+                mesh = node->getMesh();
+            }
+            else
+            {
+                assert(m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH);
+                scene::IAnimatedMeshSceneNode* node =
+                    (scene::IAnimatedMeshSceneNode*)(m_nodes[0]);
+                assert(node != NULL);
+                mesh = node->getMesh();
+            }
+
+            for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
+            {
+                scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
+                video::ITexture* t = mb->getMaterial().getTexture(0);
+                if (t == NULL) continue;
+                Material* m = material_manager->getMaterialFor(t, mb);
+                if (m != NULL)
+                {
+                    m->onHidden(mb);
+                }
+            }
+        }
+        else if (m_previous_visibility == FIRST_PASS && !shown)
+        {
+            scene::IMesh* mesh;
+
+            if (m_nodes[0]->getType() == scene::ESNT_MESH)
+            {
+                scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
+                mesh = node->getMesh();
+            }
+            else
+            {
+                assert(m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH);
+                scene::IAnimatedMeshSceneNode* node =
+                (scene::IAnimatedMeshSceneNode*)(m_nodes[0]);
+                assert(node != NULL);
+                mesh = node->getMesh();
+            }
+
+            for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
+            {
+                scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
+                video::ITexture* t = mb->getMaterial().getTexture(0);
+                if(!t) continue;
+                Material* m = material_manager->getMaterialFor(t, mb);
+                if (m != NULL)
+                {
+                    m->isInitiallyHidden(mb);
+                }
+            }
         }
     }
-    
+
+    m_previous_visibility = (shown ? WAS_SHOWN : WAS_HIDDEN);
+
     // If this node has children other than the LOD nodes, draw them
     core::list<ISceneNode*>::Iterator it;
-    
+
     for (it = Children.begin(); it != Children.end(); it++)
     {
         if (m_nodes_set.find(*it) == m_nodes_set.end())
         {
             assert(*it != NULL);
-            (*it)->OnRegisterSceneNode();
+            if ((*it)->isVisible())
+            {
+                (*it)->OnRegisterSceneNode();
+            }
         }
     }
 }
@@ -89,14 +265,21 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
         assert(m_detail.back()<level*level);
         m_detail[m_detail.size() - 1] += (int)(((rand()%1000)-500)/500.0f*(m_detail[m_detail.size() - 1]*0.2f));
     }
-    
+
     assert(node != NULL);
-    
+
     node->grab();
     node->remove();
+    node->setPosition(core::vector3df(0,0,0));
     m_detail.push_back(level*level);
     m_nodes.push_back(node);
     m_nodes_set.insert(node);
     node->setParent(this);
+
+    if(UserConfigParams::m_hw_skinning_enabled && node->getType() == scene::ESNT_ANIMATED_MESH)
+        HardwareSkinning::prepareNode((scene::IAnimatedMeshSceneNode*)node);
+
     node->drop();
+
+    node->updateAbsolutePosition();
 }

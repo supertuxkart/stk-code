@@ -28,11 +28,18 @@ namespace irr { namespace gui { class STKModifiedSpriteBank; } }
 
 namespace GUIEngine { class Widget; }
 
+struct DateFilter {
+    core::stringw label;
+    int year;
+    int month;
+    int day;
+};
+
 /**
   * \brief Addons screen
   * \ingroup states_screens
   */
-class AddonsScreen : public GUIEngine::Screen, 
+class AddonsScreen : public GUIEngine::Screen,
                      public GUIEngine::ScreenSingleton<AddonsScreen>,
                      public GUIEngine::IListWidgetHeaderListener
 {
@@ -48,6 +55,9 @@ private:
     int              m_icon_installed;
     /** Icon for is not installed yet. */
     int              m_icon_not_installed;
+    /** Icon for 'loading' */
+    int              m_icon_loading;
+
     irr::gui::STKModifiedSpriteBank
                     *m_icon_bank;
     GUIEngine::LabelWidget
@@ -60,24 +70,40 @@ private:
      *  addons_loading is being displayed. */
     int              m_selected_index;
 
+    float            m_icon_height;
+
+    bool             m_reloading;
+
+    /** \brief To check (and set) if sort order is descending **/
+    bool             m_sort_desc;
+
+    /** List of date filters **/
+    std::vector<DateFilter> m_date_filters;
+
 public:
 
     /** Load the addons into the main list.*/
     void loadList();
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile();
+    virtual void loadedFromFile() OVERRIDE;
+
+    virtual void unloaded() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+                               const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void beforeAddingWidget();
-    
+    virtual void beforeAddingWidget() OVERRIDE;
+
     virtual void onColumnClicked(int columnId);
 
-    virtual void init();
-    virtual void tearDown();
+    virtual void init() OVERRIDE;
+    virtual void tearDown() OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
 
     void    setLastSelected();
 

@@ -17,6 +17,7 @@
 
 #include "modes/world_with_rank.hpp"
 
+#include "karts/abstract_kart.hpp"
 #include "race/history.hpp"
 
 #include <iostream>
@@ -25,9 +26,9 @@
 void WorldWithRank::init()
 {
     World::init();
-    
+
     m_display_rank = true;
-    
+
     m_position_index.resize(m_karts.size());
 #ifdef DEBUG
     m_position_used.resize(m_karts.size());
@@ -39,7 +40,7 @@ void WorldWithRank::init()
 /** Returns the kart with a given position.
  *  \param p The position of the kart, 1<=p<=num_karts).
  */
-Kart* WorldWithRank::getKartAtPosition(unsigned int p) const
+AbstractKart* WorldWithRank::getKartAtPosition(unsigned int p) const
 {
     if(p<1 || p>m_position_index.size())
         return NULL;
@@ -48,7 +49,7 @@ Kart* WorldWithRank::getKartAtPosition(unsigned int p) const
 }   // getKartAtPosition
 
 //-----------------------------------------------------------------------------
-/** This function must be called before starting to set all kart positions 
+/** This function must be called before starting to set all kart positions
  *  again. It's mainly used to add some debug support, i.e. detect if the
  *  same position is set in different karts.
  */
@@ -87,15 +88,16 @@ bool WorldWithRank::setKartPosition(unsigned int kart_id,
         {
             if (!m_position_used[j])
             {
-                std::cout << "    No kart is yet set at position " << j << std::endl;
+                std::cout << "    No kart is yet set at position " << j+1
+                          << std::endl;
             }
             else
             {
-                std::cout << "    Kart " << m_position_index[j] 
+                std::cout << "    Kart " << m_position_index[j]
                           << " is at position " << j << std::endl;
             }
         }
-        std::cout << "Kart " << kart_id << " is being given position " 
+        std::cout << "Kart " << kart_id << " is being given position "
                   << position << ", but this position is already taken\n";
         return false;
     }

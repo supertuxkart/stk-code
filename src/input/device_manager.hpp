@@ -1,4 +1,3 @@
-// $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 SuperTuxKart-Team
@@ -24,6 +23,8 @@
 #include "config/device_config.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
+
+#include <irrArray.h>
 
 enum PlayerAssignMode
 {
@@ -55,6 +56,8 @@ private:
     PtrVector<GamePadDevice, HOLD>     m_gamepads;
     PtrVector<KeyboardConfig, HOLD>    m_keyboard_configs;
     PtrVector<GamepadConfig, HOLD>     m_gamepad_configs;
+
+    /** The list of all joysticks that were found and activated. */
     core::array<SJoystickInfo>          m_irrlicht_gamepads;
     InputDevice*                        m_latest_used_device;
     PlayerAssignMode                    m_assign_mode;
@@ -78,7 +81,7 @@ private:
 
     /** Will be non-null in single-player mode */
     StateManager::ActivePlayer* m_single_player;
-    
+
     /**
      * Helper method, only used internally. Takes care of analyzing keyboard input.
      *
@@ -90,6 +93,11 @@ private:
     InputDevice *mapKeyboardInput     ( int btnID, InputManager::InputDriverMode mode,
                                         StateManager::ActivePlayer **player /* out */,
                                         PlayerAction *action /* out */);
+    /** If this is flag is set the next fire event (if the fire key is not
+     *  mapped to anything else) will be mapped to 'select'. This is used
+     *  in the kart select GUI to support the old way of adding players by
+     *  pressing fire. */
+    bool m_map_fire_to_select;
 
     bool deserialize();
     void shutdown();
@@ -98,7 +106,7 @@ public:
 
 
     DeviceManager();
-        
+
     // ---- Assign mode ----
     PlayerAssignMode    getAssignMode() const               { return m_assign_mode; }
     void                setAssignMode(const PlayerAssignMode assignMode);
@@ -112,8 +120,8 @@ public:
     GamePadDevice*      getGamePadFromIrrID(const int i);
     void                clearGamepads()                     { m_gamepads.clearAndDeleteAll();  }
     /** Returns the keyboard that has a binding for this button, or NULL if none */
-    bool                getConfigForGamepad(const int sdl_id, const core::stringc& pname, GamepadConfig **config);    
-    
+    bool                getConfigForGamepad(const int sdl_id, const core::stringc& pname, GamepadConfig **config);
+
     // ---- Keyboard(s) ----
     void addEmptyKeyboard();
     void addKeyboard(KeyboardDevice* d);
@@ -129,9 +137,9 @@ public:
       * \brief Delete the given config and removes DeviceManager references to it.
       */
     bool deleteConfig(DeviceConfig* config);
-       
+
     /** Given some input, finds to which device it belongs and, using the corresponding device object,
-      * maps this input to the corresponding player and game action. 
+      * maps this input to the corresponding player and game action.
       *
       * \return false if player/action could not be set.
       * \note   Special case : can return 'true' but set action to PA_BEFORE_FIRST if the input was used but
@@ -150,14 +158,17 @@ public:
 
 	void                clearLatestUsedDevice();
     InputDevice*        getLatestUsedDevice();
-    
-    StateManager::ActivePlayer* getSinglePlayer()       { return m_single_player; }
-    void setSinglePlayer(StateManager::ActivePlayer* p) { m_single_player = p;    }
-
-    
     bool initialize();
     void serialize();
-};
+
+    StateManager::ActivePlayer* getSinglePlayer()       { return m_single_player; }
+    void setSinglePlayer(StateManager::ActivePlayer* p) { m_single_player = p;    }
+    // ------------------------------------------------------------------------
+    /** Sets or reset the 'map fire to select' option.
+     */
+    void mapFireToSelect(bool v) {m_map_fire_to_select = v; }
+
+};   // DeviceManager
 
 
 #endif

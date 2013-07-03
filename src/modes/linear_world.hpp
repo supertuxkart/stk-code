@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "modes/world_with_rank.hpp"
+#include "tracks/track_sector.hpp"
 #include "utils/aligned_array.hpp"
 
 class SFXBase;
@@ -33,38 +34,76 @@ class SFXBase;
  */
 class LinearWorld : public WorldWithRank
 {
+private:
     /** Sfx for the final lap. */
     SFXBase     *m_last_lap_sfx;
 
     /** Last lap sfx should only be played once. */
     bool         m_last_lap_sfx_played;
-    
+
     bool         m_last_lap_sfx_playing;
 
-private:
+    /** The fastest lap time. */
+    float       m_fastest_lap;
+
+    /** The track length returned by Track::getLength() only covers the
+     *  distance from start line to finish line, i.e. it does not include
+     *  the distance the karts actually start behind the start line (the
+     *  karts would have a negative distance till they reach the start line
+     *  for the first time). This values stores the additional distance by
+     *  which the track length must be increased, which is important to
+     *  get valid finish times estimates. */
+    float       m_distance_increase;
+
+    // ------------------------------------------------------------------------
     /** Some additional info that needs to be kept for each kart
      * in this kind of race.
      */
-    struct KartInfo
+    class KartInfo
     {
-        int         m_race_lap;             /**<Number of finished(!) laps. */
-        float       m_time_at_last_lap;     /**<Time at finishing last lap. */
-        float       m_lap_start_time;       /**<Time at start of a new lap. */
-        float       m_estimated_finish;     /**<During last lap only:
-                                            *  estimated finishing time!   */
-        int         m_track_sector;         /**<Index in driveline, special values
-                                            * e.g. UNKNOWN_SECTOR can be negative!*/
+    public:
+        /** Number of finished(!) laps. */
+        int         m_race_lap;
 
-        int         m_last_valid_sector;    /* used when rescusing, e.g. for invalid shortcuts */
+        /** Time at finishing last lap. */
+        float       m_time_at_last_lap;
 
-        Vec3        m_curr_track_coords;
-        /** True if the kart is on top of the road path drawn by the drivelines */
-        bool        m_on_road;
+        /** Time at start of a new lap. */
+        float       m_lap_start_time;
 
+        /** During last lap only: estimated finishing time!   */
+        float       m_estimated_finish;
+
+        /** How far the kart has travelled (this is (number-of-laps-1) times
+         *  track-length plus distance-along-track). */
+        float       m_overall_distance;
+
+        /** Stores the current graph node and track coordinates etc. */
+        TrackSector m_current_sector;
+
+        /** Initialises all fields. */
+        KartInfo()  { reset(); }
+        // --------------------------------------------------------------------
+        /** Re-initialises all data. */
+        void reset()
+        {
+            m_race_lap         = -1;
+            m_lap_start_time   = 0;
+            m_time_at_last_lap = 99999.9f;
+            m_estimated_finish = -1.0f;
+            m_overall_distance = 0.0f;
+            m_current_sector.reset();
+        }   // reset
+        // --------------------------------------------------------------------
+        /** Returns a pointer to the current node object. */
+        TrackSector *getSector() {return &m_current_sector; }
+        // --------------------------------------------------------------------
+        /** Returns a pointer to the current node object. */
+        const TrackSector *getSector() const {return &m_current_sector; }
     };
+    // ------------------------------------------------------------------------
 
 protected:
-    RaceGUIBase::KartIconDisplayInfo* m_kart_display_info;
 
     /** This vector contains an 'KartInfo' struct for every kart in the race.
       * This member is not strictly private but try not to use it directly outside
@@ -72,46 +111,74 @@ protected:
       */
     AlignedArray<KartInfo> m_kart_info;
 
-    
-    /** Linear races can trigger rescues for one additional reason : shortcuts.
-      * It may need to do some specific world before calling the generic Kart::forceRescue
-      */
-    void          rescueKartAfterShortcut(Kart* kart, KartInfo& kart_info);
-    void          checkForWrongDirection(unsigned int i);
+    virtual void  checkForWrongDirection(unsigned int i);
     void          updateRacePosition();
-    virtual float estimateFinishTimeForKart(Kart* kart);
+    virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
 
 public:
                   LinearWorld();
    /** call just after instanciating. can't be moved to the contructor as child
        classes must be instanciated, otherwise polymorphism will fail and the
        results will be incorrect */
-    virtual void  init();
+    virtual void  init() OVERRIDE;
     virtual      ~LinearWorld();
 
-    virtual void  update(float delta);
-    int           getSectorForKart(const int kart_id) const;
+    virtual void  update(float delta) OVERRIDE;
+    int           getSectorForKart(const AbstractKart *kart) const;
     float         getDistanceDownTrackForKart(const int kart_id) const;
     float         getDistanceToCenterForKart(const int kart_id) const;
     float         getEstimatedFinishTime(const int kart_id) const;
     int           getLapForKart(const int kart_id) const;
     float         getTimeAtLapForKart(const int kart_id) const;
 
-    virtual  RaceGUIBase::KartIconDisplayInfo* 
-                  getKartsDisplayInfo();
-    virtual void  moveKartAfterRescue(Kart* kart);
-    virtual void  restartRace();
-    
-    virtual bool  raceHasLaps(){ return true; }
-    virtual void  newLap(unsigned int kart_index);
+    virtual  void getKartsDisplayInfo(
+                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
+    virtual void  moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
+    virtual void  reset() OVERRIDE;
+    virtual void  newLap(unsigned int kart_index) OVERRIDE;
 
-    virtual bool  haveBonusBoxes(){ return true; }
-    
+    // ------------------------------------------------------------------------
+    /** Returns if this race mode has laps. */
+    virtual bool  raceHasLaps() OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
+    /** Returns if this race mode has bonus items. */
+    virtual bool  haveBonusBoxes() OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
+    /** Override settings from base class */
+    virtual bool useChecklineRequirements() const OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
     /** Returns true if the kart is on a valid driveline quad.
-     *  \param kart_index  Index of the kart.
-     */
-    bool          isOnRoad(unsigned int kart_index) const 
-                 { return m_kart_info[kart_index].m_on_road; }
+     *  \param kart_index  Index of the kart. */
+    bool isOnRoad(unsigned int kart_index) const
+    {
+        return m_kart_info[kart_index].getSector()->isOnRoad();
+    }   // isOnRoad
+
+    // ------------------------------------------------------------------------
+    /** Returns the number of laps a kart has completed.
+     *  \param kart_index World index of the kart. */
+    int getKartLaps(unsigned int kart_index) const
+    {
+        assert(kart_index < m_kart_info.size());
+        return m_kart_info[kart_index].m_race_lap;
+    }   // getkartLap
+
+    // ------------------------------------------------------------------------
+    /** Returns the track_sector object for the specified kart.
+     *  \param kart_index World index of the kart. */
+    TrackSector& getTrackSector(unsigned int kart_index)
+    {
+        return m_kart_info[kart_index].m_current_sector;
+    }   // getTrackSector
+
+    // ------------------------------------------------------------------------
+    /** Returns how far the kart has driven so far (i.e.
+     *  number-of-laps-finished times track-length plus distance-on-track.
+     *  \param kart_index World kart id of the kart. */
+    float getOverallDistance(unsigned int kart_index) const
+    {
+        return m_kart_info[kart_index].m_overall_distance;
+    }   // getOverallDistance
 };   // LinearWorld
 
 #endif

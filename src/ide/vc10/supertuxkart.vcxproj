@@ -5,9 +5,17 @@
       <Configuration>debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -20,7 +28,17 @@
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -31,25 +49,39 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\../</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\../</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">..\..\../</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">..\..\../</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">true</LinkIncremental>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(ProjectName)_curl_d</TargetName>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</LinkIncremental>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(ProjectName)_d</TargetName>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">C:\Program Files\Microsoft SDKs\Windows\v7.0A\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../../src;../../../src/bullet/src;../../../src/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";ENABLE_BIDI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVE_OGGVORBIS;NDEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";ENABLE_BIDI;ADDONS_MANAGER;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -57,12 +89,12 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib.release;ws2_32.lib;fribidi.lib;pthreadVC2.lib;libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib;ws2_32.lib;fribidi.lib;pthreadVC2.lib;libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)/$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../dependencies/lib;../../../lib/irrlicht/lib/Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -71,12 +103,38 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVE_OGGVORBIS;NDEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE="supertuxkart";ENABLE_BIDI;WIN64;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <MinimalRebuild>true</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib;ws2_32.lib;libfribidi.lib;pthreadVC2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)/$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>../../../lib/irrlicht/lib/Win64-visualStudio;../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../../src;../../../src/bullet/src;../../../src/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ADDONS_MANAGER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <MinimalRebuild>true</MinimalRebuild>
@@ -91,7 +149,7 @@
     <Link>
       <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib;ws2_32.lib;fribidi.lib;pthreadVC2.lib;libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
-      <AdditionalLibraryDirectories>../../../dependencies/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../dependencies/lib;../../../lib/irrlicht/lib/Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -99,7 +157,7 @@
       <MapFileName>
       </MapFileName>
       <MapExports>false</MapExports>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <LinkTimeCodeGeneration>
       </LinkTimeCodeGeneration>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -109,15 +167,77 @@
       <Profile>false</Profile>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE="supertuxkart";_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ADDONS_MANAGER;_WIN64;_IRR_STATIC_LIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;user32.lib;gdi32.lib;winmm.lib;advapi32.lib;OpenAL32.lib;libogg.lib;libvorbis.lib;libvorbisfile.lib;Irrlicht.lib;ws2_32.lib;libfribidi.lib;pthreadVC2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(TargetPath)</OutputFile>
+      <AdditionalLibraryDirectories>../../../dependencies/lib;../../../lib/irrlicht/lib/Win64-VisualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>false</GenerateMapFile>
+      <MapFileName>
+      </MapFileName>
+      <MapExports>false</MapExports>
+      <SubSystem>Windows</SubSystem>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <Profile>false</Profile>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\addons\inetwork_http.cpp" />
     <ClCompile Include="..\..\addons\news_manager.cpp" />
     <ClCompile Include="..\..\addons\request.cpp" />
+    <ClCompile Include="..\..\challenges\game_slot.cpp" />
+    <ClCompile Include="..\..\config\player.cpp" />
+    <ClCompile Include="..\..\config\saved_grand_prix.cpp" />
+    <ClCompile Include="..\..\graphics\hardware_skinning.cpp" />
+    <ClCompile Include="..\..\graphics\hit_sfx.cpp" />
     <ClCompile Include="..\..\graphics\lod_node.cpp" />
     <ClCompile Include="..\..\graphics\particle_kind_manager.cpp" />
     <ClCompile Include="..\..\graphics\per_camera_node.cpp" />
+    <ClCompile Include="..\..\graphics\post_processing.cpp" />
     <ClCompile Include="..\..\graphics\rain.cpp" />
+    <ClCompile Include="..\..\graphics\referee.cpp" />
+    <ClCompile Include="..\..\graphics\show_curve.cpp" />
     <ClCompile Include="..\..\guiengine\widgets\CGUIEditBox.cpp" />
+    <ClCompile Include="..\..\guiengine\widgets\rating_bar_widget.cpp" />
+    <ClCompile Include="..\..\input\wiimote.cpp" />
+    <ClCompile Include="..\..\items\rubber_ball.cpp" />
     <ClCompile Include="..\..\items\swatter.cpp" />
+    <ClCompile Include="..\..\karts\abstract_kart.cpp" />
+    <ClCompile Include="..\..\karts\abstract_kart_animation.cpp" />
+    <ClCompile Include="..\..\karts\cannon_animation.cpp" />
+    <ClCompile Include="..\..\karts\controller\ai_properties.cpp" />
+    <ClCompile Include="..\..\karts\controller\skidding_ai.cpp" />
+    <ClCompile Include="..\..\karts\explosion_animation.cpp" />
+    <ClCompile Include="..\..\karts\ghost_kart.cpp" />
+    <ClCompile Include="..\..\karts\kart_gfx.cpp" />
+    <ClCompile Include="..\..\karts\kart_with_stats.cpp" />
+    <ClCompile Include="..\..\karts\rescue_animation.cpp" />
+    <ClCompile Include="..\..\karts\skidding.cpp" />
+    <ClCompile Include="..\..\karts\skidding_properties.cpp" />
     <ClCompile Include="..\..\main.cpp" />
     <ClCompile Include="..\..\main_loop.cpp" />
     <ClCompile Include="..\..\guiengine\abstract_state_manager.cpp" />
@@ -126,8 +246,11 @@
     <ClCompile Include="..\..\guiengine\engine.cpp" />
     <ClCompile Include="..\..\guiengine\event_handler.cpp">
       <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">false</PreprocessToFile>
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='debug|x64'">false</PreprocessToFile>
       <PreprocessSuppressLineNumbers Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">false</PreprocessSuppressLineNumbers>
+      <PreprocessSuppressLineNumbers Condition="'$(Configuration)|$(Platform)'=='debug|x64'">false</PreprocessSuppressLineNumbers>
       <PreprocessKeepComments Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">false</PreprocessKeepComments>
+      <PreprocessKeepComments Condition="'$(Configuration)|$(Platform)'=='debug|x64'">false</PreprocessKeepComments>
     </ClCompile>
     <ClCompile Include="..\..\guiengine\layout_manager.cpp" />
     <ClCompile Include="..\..\guiengine\modaldialog.cpp" />
@@ -151,20 +274,43 @@
     <ClCompile Include="..\..\challenges\challenge.cpp" />
     <ClCompile Include="..\..\challenges\challenge_data.cpp" />
     <ClCompile Include="..\..\challenges\unlock_manager.cpp" />
+    <ClCompile Include="..\..\modes\cutscene_world.cpp" />
+    <ClCompile Include="..\..\modes\demo_world.cpp" />
+    <ClCompile Include="..\..\modes\easter_egg_hunt.cpp" />
+    <ClCompile Include="..\..\modes\overworld.cpp" />
+    <ClCompile Include="..\..\modes\soccer_world.cpp" />
+    <ClCompile Include="..\..\modes\tutorial_world.cpp" />
     <ClCompile Include="..\..\physics\btKartRaycast.cpp" />
+    <ClCompile Include="..\..\replay\replay_base.cpp" />
+    <ClCompile Include="..\..\replay\replay_play.cpp" />
+    <ClCompile Include="..\..\replay\replay_recorder.cpp" />
+    <ClCompile Include="..\..\states_screens\cutscene_gui.cpp" />
+    <ClCompile Include="..\..\states_screens\dialogs\custom_video_settings.cpp" />
+    <ClCompile Include="..\..\states_screens\dialogs\select_challenge.cpp" />
+    <ClCompile Include="..\..\states_screens\dialogs\tutorial_message_dialog.cpp" />
     <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp" />
     <ClCompile Include="..\..\states_screens\options_screen_ui.cpp" />
     <ClCompile Include="..\..\states_screens\race_gui_base.cpp" />
+    <ClCompile Include="..\..\states_screens\race_gui_overworld.cpp" />
+    <ClCompile Include="..\..\states_screens\soccer_setup_screen.cpp" />
+    <ClCompile Include="..\..\states_screens\story_mode_lobby.cpp" />
     <ClCompile Include="..\..\tinygettext\dictionary.cpp" />
     <ClCompile Include="..\..\tinygettext\dictionary_manager.cpp" />
     <ClCompile Include="..\..\tinygettext\iconv.cpp" />
     <ClCompile Include="..\..\tinygettext\language.cpp" />
-    <ClCompile Include="..\..\tinygettext\log.cpp" />
     <ClCompile Include="..\..\tinygettext\plural_forms.cpp" />
     <ClCompile Include="..\..\tinygettext\po_parser.cpp" />
     <ClCompile Include="..\..\tinygettext\stk_file_system.cpp" />
+    <ClCompile Include="..\..\tinygettext\tgt_log.cpp" />
     <ClCompile Include="..\..\tinygettext\tinygettext.cpp" />
+    <ClCompile Include="..\..\tracks\check_cannon.cpp" />
+    <ClCompile Include="..\..\tracks\check_goal.cpp" />
+    <ClCompile Include="..\..\tracks\lod_node_loader.cpp" />
+    <ClCompile Include="..\..\tracks\track_object_presentation.cpp" />
+    <ClCompile Include="..\..\tracks\track_sector.cpp" />
     <ClCompile Include="..\..\utils\constants.cpp" />
+    <ClCompile Include="..\..\utils\leak_check.cpp" />
+    <ClCompile Include="..\..\utils\log.cpp" />
     <ClCompile Include="..\..\utils\profiler.cpp" />
     <ClCompile Include="..\..\utils\random_generator.cpp" />
     <ClCompile Include="..\..\utils\string_utils.cpp" />
@@ -181,7 +327,6 @@
     <ClCompile Include="..\..\modes\profile_world.cpp" />
     <ClCompile Include="..\..\modes\standard_race.cpp" />
     <ClCompile Include="..\..\modes\three_strikes_battle.cpp" />
-    <ClCompile Include="..\..\modes\tutorial_race.cpp" />
     <ClCompile Include="..\..\modes\world.cpp" />
     <ClCompile Include="..\..\modes\world_status.cpp" />
     <ClCompile Include="..\..\modes\world_with_rank.cpp" />
@@ -203,7 +348,6 @@
     <ClCompile Include="..\..\physics\physical_object.cpp" />
     <ClCompile Include="..\..\physics\physics.cpp" />
     <ClCompile Include="..\..\physics\triangle_mesh.cpp" />
-    <ClCompile Include="..\..\karts\emergency_animation.cpp" />
     <ClCompile Include="..\..\karts\kart.cpp" />
     <ClCompile Include="..\..\karts\kart_model.cpp" />
     <ClCompile Include="..\..\karts\kart_properties.cpp" />
@@ -212,9 +356,7 @@
     <ClCompile Include="..\..\karts\moveable.cpp" />
     <ClCompile Include="..\..\karts\controller\ai_base_controller.cpp" />
     <ClCompile Include="..\..\karts\controller\controller.cpp" />
-    <ClCompile Include="..\..\karts\controller\default_ai_controller.cpp" />
     <ClCompile Include="..\..\karts\controller\end_controller.cpp" />
-    <ClCompile Include="..\..\karts\controller\new_ai_controller.cpp" />
     <ClCompile Include="..\..\karts\controller\player_controller.cpp" />
     <ClCompile Include="..\..\graphics\camera.cpp" />
     <ClCompile Include="..\..\graphics\CBatchingMesh.cpp" />
@@ -255,10 +397,6 @@
     <ClCompile Include="..\..\tracks\track_manager.cpp" />
     <ClCompile Include="..\..\tracks\track_object.cpp" />
     <ClCompile Include="..\..\tracks\track_object_manager.cpp" />
-    <ClCompile Include="..\..\replay\replay_base.cpp" />
-    <ClCompile Include="..\..\replay\replay_buffers.cpp" />
-    <ClCompile Include="..\..\replay\replay_player.cpp" />
-    <ClCompile Include="..\..\replay\replay_recorder.cpp" />
     <ClCompile Include="..\..\io\file_manager.cpp" />
     <ClCompile Include="..\..\io\xml_node.cpp" />
     <ClCompile Include="..\..\io\xml_writer.cpp" />
@@ -276,12 +414,10 @@
     <ClCompile Include="..\..\config\stk_config.cpp" />
     <ClCompile Include="..\..\config\user_config.cpp" />
     <ClCompile Include="..\..\animations\animation_base.cpp" />
-    <ClCompile Include="..\..\animations\billboard_animation.cpp" />
     <ClCompile Include="..\..\animations\ipo.cpp" />
     <ClCompile Include="..\..\animations\three_d_animation.cpp" />
     <ClCompile Include="..\..\states_screens\addons_screen.cpp" />
     <ClCompile Include="..\..\states_screens\arenas_screen.cpp" />
-    <ClCompile Include="..\..\states_screens\challenges.cpp" />
     <ClCompile Include="..\..\states_screens\credits.cpp" />
     <ClCompile Include="..\..\states_screens\feature_unlocked.cpp" />
     <ClCompile Include="..\..\states_screens\grand_prix_lose.cpp" />
@@ -302,7 +438,6 @@
     <ClCompile Include="..\..\states_screens\race_setup_screen.cpp" />
     <ClCompile Include="..\..\states_screens\state_manager.cpp" />
     <ClCompile Include="..\..\states_screens\tracks_screen.cpp" />
-    <ClCompile Include="..\..\states_screens\tutorial_screen.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\add_device_dialog.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\addons_loading.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\confirm_resolution_dialog.cpp" />
@@ -311,26 +446,46 @@
     <ClCompile Include="..\..\states_screens\dialogs\message_dialog.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\player_info_dialog.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\press_a_key_dialog.cpp" />
-    <ClCompile Include="..\..\states_screens\dialogs\race_over_dialog.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\race_paused_dialog.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\track_info_dialog.cpp" />
     <ClCompile Include="..\..\addons\addon.cpp" />
     <ClCompile Include="..\..\addons\addons_manager.cpp" />
     <ClCompile Include="..\..\addons\network_http.cpp" />
     <ClCompile Include="..\..\addons\zip.cpp" />
-    <ClCompile Include="..\..\tutorial\tutorial.cpp" />
-    <ClCompile Include="..\..\tutorial\tutorial_data.cpp" />
-    <ClCompile Include="..\..\tutorial\tutorial_manager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\addons\inetwork_http.hpp" />
     <ClInclude Include="..\..\addons\news_manager.hpp" />
     <ClInclude Include="..\..\addons\request.hpp" />
+    <ClInclude Include="..\..\challenges\game_slot.hpp" />
+    <ClInclude Include="..\..\config\saved_grand_prix.hpp" />
+    <ClInclude Include="..\..\graphics\hardware_skinning.hpp" />
+    <ClInclude Include="..\..\graphics\hit_effect.hpp" />
+    <ClInclude Include="..\..\graphics\hit_sfx.hpp" />
     <ClInclude Include="..\..\graphics\lod_node.hpp" />
     <ClInclude Include="..\..\graphics\particle_kind_manager.hpp" />
     <ClInclude Include="..\..\graphics\per_camera_node.hpp" />
+    <ClInclude Include="..\..\graphics\post_processing.hpp" />
     <ClInclude Include="..\..\graphics\rain.hpp" />
+    <ClInclude Include="..\..\graphics\referee.hpp" />
+    <ClInclude Include="..\..\graphics\show_curve.hpp" />
     <ClInclude Include="..\..\guiengine\widgets\CGUIEditBox.h" />
+    <ClInclude Include="..\..\guiengine\widgets\rating_bar_widget.hpp" />
+    <ClInclude Include="..\..\input\wiimote.hpp" />
+    <ClInclude Include="..\..\items\rubber_ball.hpp" />
     <ClInclude Include="..\..\items\swatter.hpp" />
+    <ClInclude Include="..\..\karts\abstract_kart.hpp" />
+    <ClInclude Include="..\..\karts\abstract_kart_animation.hpp" />
+    <ClInclude Include="..\..\karts\cannon_animation.hpp" />
+    <ClInclude Include="..\..\karts\controller\ai_properties.hpp" />
+    <ClInclude Include="..\..\karts\controller\skidding_ai.hpp" />
+    <ClInclude Include="..\..\karts\explosion_animation.hpp" />
+    <ClInclude Include="..\..\karts\ghost_kart.hpp" />
+    <ClInclude Include="..\..\karts\kart_gfx.hpp" />
+    <ClInclude Include="..\..\karts\kart_with_stats.hpp" />
+    <ClInclude Include="..\..\karts\rescue_animation.hpp" />
+    <ClInclude Include="..\..\karts\skidding.hpp" />
+    <ClInclude Include="..\..\karts\skidding_properties.hpp" />
     <ClInclude Include="..\..\main_loop.hpp" />
     <ClInclude Include="..\..\guiengine\abstract_state_manager.hpp" />
     <ClInclude Include="..\..\guiengine\abstract_top_level_container.hpp" />
@@ -358,6 +513,12 @@
     <ClInclude Include="..\..\challenges\challenge.hpp" />
     <ClInclude Include="..\..\challenges\challenge_data.hpp" />
     <ClInclude Include="..\..\challenges\unlock_manager.hpp" />
+    <ClInclude Include="..\..\modes\cutscene_world.hpp" />
+    <ClInclude Include="..\..\modes\demo_world.hpp" />
+    <ClInclude Include="..\..\modes\easter_egg_hunt.hpp" />
+    <ClInclude Include="..\..\modes\overworld.hpp" />
+    <ClInclude Include="..\..\modes\soccer_world.hpp" />
+    <ClInclude Include="..\..\modes\tutorial_world.hpp" />
     <ClInclude Include="..\..\network\character_confirm_message.hpp" />
     <ClInclude Include="..\..\network\character_info_message.hpp" />
     <ClInclude Include="..\..\network\character_selected_message.hpp" />
@@ -378,20 +539,39 @@
     <ClInclude Include="..\..\network\remote_kart_info.hpp" />
     <ClInclude Include="..\..\network\world_loaded_message.hpp" />
     <ClInclude Include="..\..\physics\btKartRaycast.hpp" />
+    <ClInclude Include="..\..\replay\replay_base.hpp" />
+    <ClInclude Include="..\..\replay\replay_play.hpp" />
+    <ClInclude Include="..\..\replay\replay_recorder.hpp" />
+    <ClInclude Include="..\..\states_screens\cutscene_gui.hpp" />
+    <ClInclude Include="..\..\states_screens\dialogs\custom_video_settings.hpp" />
+    <ClInclude Include="..\..\states_screens\dialogs\select_challenge.hpp" />
+    <ClInclude Include="..\..\states_screens\dialogs\tutorial_message_dialog.hpp" />
     <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp" />
     <ClInclude Include="..\..\states_screens\options_screen_ui.hpp" />
+    <ClInclude Include="..\..\states_screens\race_gui_overworld.hpp" />
+    <ClInclude Include="..\..\states_screens\soccer_setup_screen.hpp" />
+    <ClInclude Include="..\..\states_screens\story_mode_lobby.hpp" />
     <ClInclude Include="..\..\tinygettext\dictionary.hpp" />
     <ClInclude Include="..\..\tinygettext\dictionary_manager.hpp" />
     <ClInclude Include="..\..\tinygettext\file_system.hpp" />
     <ClInclude Include="..\..\tinygettext\iconv.hpp" />
     <ClInclude Include="..\..\tinygettext\language.hpp" />
-    <ClInclude Include="..\..\tinygettext\log.hpp" />
     <ClInclude Include="..\..\tinygettext\log_stream.hpp" />
     <ClInclude Include="..\..\tinygettext\plural_forms.hpp" />
     <ClInclude Include="..\..\tinygettext\po_parser.hpp" />
     <ClInclude Include="..\..\tinygettext\stk_file_system.hpp" />
+    <ClInclude Include="..\..\tinygettext\tgt_log.hpp" />
     <ClInclude Include="..\..\tinygettext\tinygettext.hpp" />
+    <ClInclude Include="..\..\tracks\check_cannon.hpp" />
+    <ClInclude Include="..\..\tracks\check_goal.hpp" />
+    <ClInclude Include="..\..\tracks\lod_node_loader.hpp" />
+    <ClInclude Include="..\..\tracks\track_object_presentation.hpp" />
+    <ClInclude Include="..\..\tracks\track_sector.hpp" />
     <ClInclude Include="..\..\utils\constants.hpp" />
+    <ClInclude Include="..\..\utils\cpp2011.h" />
+    <ClInclude Include="..\..\utils\interpolation_array.hpp" />
+    <ClInclude Include="..\..\utils\leak_check.hpp" />
+    <ClInclude Include="..\..\utils\log.hpp" />
     <ClInclude Include="..\..\utils\no_copy.hpp" />
     <ClInclude Include="..\..\utils\profiler.hpp" />
     <ClInclude Include="..\..\utils\ptr_vector.hpp" />
@@ -418,7 +598,6 @@
     <ClInclude Include="..\..\modes\profile_world.hpp" />
     <ClInclude Include="..\..\modes\standard_race.hpp" />
     <ClInclude Include="..\..\modes\three_strikes_battle.hpp" />
-    <ClInclude Include="..\..\modes\tutorial_race.hpp" />
     <ClInclude Include="..\..\modes\world.hpp" />
     <ClInclude Include="..\..\modes\world_status.hpp" />
     <ClInclude Include="..\..\modes\world_with_rank.hpp" />
@@ -442,7 +621,6 @@
     <ClInclude Include="..\..\physics\physics.hpp" />
     <ClInclude Include="..\..\physics\triangle_mesh.hpp" />
     <ClInclude Include="..\..\physics\user_pointer.hpp" />
-    <ClInclude Include="..\..\karts\emergency_animation.hpp" />
     <ClInclude Include="..\..\karts\kart.hpp" />
     <ClInclude Include="..\..\karts\kart_control.hpp" />
     <ClInclude Include="..\..\karts\kart_model.hpp" />
@@ -452,9 +630,7 @@
     <ClInclude Include="..\..\karts\moveable.hpp" />
     <ClInclude Include="..\..\karts\controller\ai_base_controller.hpp" />
     <ClInclude Include="..\..\karts\controller\controller.hpp" />
-    <ClInclude Include="..\..\karts\controller\default_ai_controller.hpp" />
     <ClInclude Include="..\..\karts\controller\end_controller.hpp" />
-    <ClInclude Include="..\..\karts\controller\new_ai_controller.hpp" />
     <ClInclude Include="..\..\karts\controller\player_controller.hpp" />
     <ClInclude Include="..\..\graphics\camera.hpp" />
     <ClInclude Include="..\..\graphics\CBatchingMesh.h" />
@@ -486,11 +662,6 @@
     <ClInclude Include="..\..\tracks\track_manager.hpp" />
     <ClInclude Include="..\..\tracks\track_object.hpp" />
     <ClInclude Include="..\..\tracks\track_object_manager.hpp" />
-    <ClInclude Include="..\..\replay\replay_base.hpp" />
-    <ClInclude Include="..\..\replay\replay_buffer_tpl.hpp" />
-    <ClInclude Include="..\..\replay\replay_buffers.hpp" />
-    <ClInclude Include="..\..\replay\replay_player.hpp" />
-    <ClInclude Include="..\..\replay\replay_recorder.hpp" />
     <ClInclude Include="..\..\io\file_manager.hpp" />
     <ClInclude Include="..\..\io\xml_node.hpp" />
     <ClInclude Include="..\..\io\xml_writer.hpp" />
@@ -510,12 +681,10 @@
     <ClInclude Include="..\..\config\stk_config.hpp" />
     <ClInclude Include="..\..\config\user_config.hpp" />
     <ClInclude Include="..\..\animations\animation_base.hpp" />
-    <ClInclude Include="..\..\animations\billboard_animation.hpp" />
     <ClInclude Include="..\..\animations\ipo.hpp" />
     <ClInclude Include="..\..\animations\three_d_animation.hpp" />
     <ClInclude Include="..\..\states_screens\addons_screen.hpp" />
     <ClInclude Include="..\..\states_screens\arenas_screen.hpp" />
-    <ClInclude Include="..\..\states_screens\challenges.hpp" />
     <ClInclude Include="..\..\states_screens\credits.hpp" />
     <ClInclude Include="..\..\states_screens\feature_unlocked.hpp" />
     <ClInclude Include="..\..\states_screens\grand_prix_lose.hpp" />
@@ -537,7 +706,6 @@
     <ClInclude Include="..\..\states_screens\race_setup_screen.hpp" />
     <ClInclude Include="..\..\states_screens\state_manager.hpp" />
     <ClInclude Include="..\..\states_screens\tracks_screen.hpp" />
-    <ClInclude Include="..\..\states_screens\tutorial_screen.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\add_device_dialog.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\addons_loading.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\confirm_resolution_dialog.hpp" />
@@ -546,18 +714,22 @@
     <ClInclude Include="..\..\states_screens\dialogs\message_dialog.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\player_info_dialog.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\press_a_key_dialog.hpp" />
-    <ClInclude Include="..\..\states_screens\dialogs\race_over_dialog.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\race_paused_dialog.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\track_info_dialog.hpp" />
     <ClInclude Include="..\..\addons\addon.hpp" />
     <ClInclude Include="..\..\addons\addons_manager.hpp" />
     <ClInclude Include="..\..\addons\network_http.hpp" />
     <ClInclude Include="..\..\addons\zip.hpp" />
-    <ClInclude Include="..\..\tutorial\tutorial.hpp" />
-    <ClInclude Include="..\..\tutorial\tutorial_data.hpp" />
-    <ClInclude Include="..\..\tutorial\tutorial_manager.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\lib\irrlicht\source\Irrlicht\Irrlicht10.0.vcxproj">
+      <Project>{e08e042a-6c45-411b-92be-3cc31331019f}</Project>
+      <Private>true</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
     <ProjectReference Include="bullet_lib.vcxproj">
       <Project>{54aa44b9-b07b-49da-8b1a-05bbfe8ad5d4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

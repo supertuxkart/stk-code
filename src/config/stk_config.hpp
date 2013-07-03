@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -22,15 +21,21 @@
 
 /**
  * \defgroup config
+ * This module handles the user configuration, the supertuxkart configuration
+ * file (which contains options usually not edited by the player) and the input
+ * configuration file.
  */
 
-#include "karts/kart_properties.hpp"
 #include "utils/no_copy.hpp"
 
-class XMLNode;
-class MusicInformation;
+#include <vector>
+#include <string>
 
-/** 
+class KartProperties;
+class MusicInformation;
+class XMLNode;
+
+/**
  * \brief Global STK configuration information.
  * Parameters here can be tuned without recompilation, but the user shouldn't actually modify
  * them. It also includes the list of default kart physics parameters which are used for
@@ -40,16 +45,18 @@ class MusicInformation;
 class STKConfig : public NoCopy
 {
 protected:
-    KartProperties  m_kart_properties; /**< Default kart properties. */
+    /** Default kart properties. */
+    KartProperties  *m_default_kart_properties;
+
 public:
     /** What to do if a kart already has a powerup when it hits a bonus box:
      *  - NEW:  give it a random new bonx box.
      *  - SAME: give it one more item of the type it currently has.
      *  - ONLY_IF_SAME: only give it one more item if the randomly chosen item
      *          has the same type as the currently held item. */
-    enum {POWERUP_MODE_NEW, 
-          POWERUP_MODE_SAME, 
-          POWERUP_MODE_ONLY_IF_SAME} 
+    enum {POWERUP_MODE_NEW,
+          POWERUP_MODE_SAME,
+          POWERUP_MODE_ONLY_IF_SAME}
           m_same_powerup_mode;
 
     static float UNDEFINED;
@@ -67,23 +74,25 @@ public:
                                          passed on.                          */
     float m_anvil_time;              /**<Time an anvil is active.            */
     float m_item_switch_time;        /**< Time items will be switched.       */
-    int   m_bubble_gum_counter;      /**< How many times bananas must be eaten
+    int   m_bubblegum_counter;       /**< How many times bananas must be eaten
                                           before they disappear.             */
     float m_explosion_impulse_objects;/**<Impulse of explosion on moving
                                           objects, e.g. road cones, ...      */
-    float m_penalty_time;            /**< Penalty time when starting too 
+    float m_penalty_time;            /**< Penalty time when starting too
                                           early.                             */
     float m_delay_finish_time;       /**<Delay after a race finished before
                                          the results are displayed.          */
     float m_music_credit_time;       /**<Time the music credits are
                                          displayed.                          */
     int   m_max_karts;               /**<Maximum number of karts.            */
-    int   m_gp_order;                /**<Whether grand prix grid is in point
-                                         or reverse point order.             */
     int   m_max_history;             /**<Maximum number of frames to save in
                                          a history files.                    */
     bool  m_smooth_normals;          /**< If normals for raycasts for wheels
                                          should be interpolated.             */
+    /** If the angle between a normal on a vertex and the normal of the
+     *  triangle are more than this value, the physics will use the normal
+     *  of the triangle in smoothing normal. */
+    float m_smooth_angle_limit;
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
     float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */
     float m_near_ground;             /**<Determines when a kart is not near
@@ -98,10 +107,23 @@ public:
                                          before it is ignored. */
     bool  m_enable_networking;
 
+    /** Disable steering if skidding is stopped. This can help in making
+     *  skidding more controllable (since otherwise when trying to steer while
+     *  steering is reset to match the graphics it often results in the kart
+     *  crashing). */
+    bool m_disable_steer_while_unskid;
+
+    /** If true the camera will stay behind the kart, potentially making it
+     *  easier to see where the kart is going to after the skid. */
+    bool m_camera_follow_skid;
+
+    float m_ai_acceleration;         /**<Between 0 and 1, default being 1, can be
+                                         used to give a handicap to AIs */
+
     std::vector<float>
           m_leader_intervals;        /**<Interval in follow the leader till
                                          last kart is reomved.               */
-    float m_leader_time_per_kart;    /**< Additional time to each leader 
+    float m_leader_time_per_kart;    /**< Additional time to each leader
                                           interval for each additional kart. */
     std::vector<int> m_switch_items; /**< How to switch items.               */
     /** The number of points a kart on position X has more than the
@@ -109,8 +131,21 @@ public:
      *  position is computed. */
     std::vector<int> m_score_increase;
 
+    /** Filename of the title music to play.*/
     MusicInformation
-         *m_title_music;             /**<Filename of the title music to play.*/
+         *m_title_music;
+
+    /** Minimum time between consecutive saved tranform events.  */
+    float m_replay_dt;
+
+    /** Maximum difference between interpolated and actual position. If the
+     *  difference is larger than this, a new event is generated. */
+    float m_replay_delta_pos2;
+
+    /** A heading difference of more than that will trigger a new event to
+     *  be generated. */
+    float m_replay_delta_angle;
+
 private:
     /** True if stk_config has been loaded. This is necessary if the
      *  --stk-config command line parameter has been specified to avoid
@@ -119,18 +154,18 @@ private:
     bool  m_has_been_loaded;
 
 public:
-    /** Empty constructor. The actual work is done in load. */
-         STKConfig() {m_has_been_loaded= false;};
+         STKConfig();
         ~STKConfig();
     void init_defaults    ();
     void getAllData       (const XMLNode * root);
     void load             (const std::string &filename);
-    /** Returns the default kart properties for each kart. */
-    const KartProperties &
-         getDefaultKartProperties() const {return m_kart_properties; }
     const std::string &getMainMenuPicture(int n);
     const std::string &getBackgroundPicture(int n);
     void  getAllScores(std::vector<int> *all_scores, int num_karts);
+    // ------------------------------------------------------------------------
+    /** Returns the default kart properties for each kart. */
+    const KartProperties &
+         getDefaultKartProperties() const {return *m_default_kart_properties; }
 }
 ;   // STKConfig
 

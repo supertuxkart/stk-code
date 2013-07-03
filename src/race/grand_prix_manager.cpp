@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -62,7 +61,7 @@ void GrandPrixManager::load(const std::string& filename)
     }
     catch (std::logic_error& er)
     {
-        fprintf(stderr, "GrandPrixManager : ignoring GP %s ( %s ) \n", filename.c_str(), er.what());
+        Log::error("GrandPrixManager", "Ignoring GP %s ( %s ) \n", filename.c_str(), er.what());
     }
 }   // load
 

@@ -1,0 +1,5 @@
+This is a copy of the irrlicht 1.8, r4350.
+We need to have our own version to change some #defines for stk.
+The script 'update' will update this branch automatically from
+the correspdonding irrlicht releases/1.8 branch (the latest updated
+version is in the file current_version).

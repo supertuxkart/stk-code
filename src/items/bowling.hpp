@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Joerg Henrichs, Marianne Gagnon
@@ -24,6 +23,7 @@ namespace irr
 {
     namespace scene { class IMesh; }
 }
+#include <irrString.h>
 using namespace irr;
 
 #include "items/flyable.hpp"
@@ -39,14 +39,21 @@ private:
     static float m_st_max_distance;   // maximum distance for a bowling ball to be attracted
     static float m_st_max_distance_squared;
     static float m_st_force_to_target;
-    
+
+    /** If a bowling ball has hit something, this flag is set to indicate
+     *  if a kart was hit or not. The sound effect is only played if a
+     *  kart was hit. */
+    bool m_has_hit_kart;
+
 public:
-    Bowling(Kart* kart);
+    Bowling(AbstractKart* kart);
     static  void init(const XMLNode &node, scene::IMesh *bowling);
-    virtual void update(float dt);
-    
-    const char* getExplosionSound() const { return "strike"; }
-    
+    virtual bool updateAndDelete(float dt);
+    virtual const core::stringw getHitString(const AbstractKart *kart) const;
+    virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
+    virtual HitEffect *getHitEffect() const;
+
+
 };   // Bowling
 
 #endif

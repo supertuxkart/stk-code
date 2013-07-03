@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -25,23 +24,27 @@
 #include "utils/no_copy.hpp"
 #include "utils/random_generator.hpp"
 
-class Kart;
-class Item;
+#include <IAnimatedMeshSceneNode.h>
+using namespace irr;
 
-/** This objects is permanently available in a kart and stores information 
+class AbstractKart;
+class Item;
+class SFXBase;
+
+/** This objects is permanently available in a kart and stores information
  *  about addons. If a kart has no attachment, this object will have the
  *  attachment type ATTACH_NOTHING. This way other tests for attachment
  *  in STK do not have to additionally test if there is an attachment, all
  *  tests for a type will always be valid.
  *  Certain attachments need additional coding, this is supported by
- *  a 'plugin' mechanism: This attachment will forward certain calls to 
+ *  a 'plugin' mechanism: This attachment will forward certain calls to
  *  (see attachment_pluging abstract class). Compared to normal subclassing
  *  (i.e. replacing the attachment object each time an attachment changes)
  *  this has less overhead (since the attachment class always creates
  *  a scene node).
  *  \ingroup items
  */
-class Attachment: public NoCopy
+class Attachment: public NoCopy, public scene::IAnimationEndCallBack
 {
 public:
     // Some loop in attachment.cpp depend on ATTACH_FIRST and ATTACH_MAX.
@@ -54,6 +57,7 @@ public:
         ATTACH_BOMB,
         ATTACH_ANVIL,
         ATTACH_SWATTER,
+        ATTACH_NOLOKS_SWATTER,
         ATTACH_TINYTUX,
         ATTACH_MAX,
         ATTACH_NOTHING
@@ -64,10 +68,7 @@ private:
     AttachmentType  m_type;
 
     /** Kart the attachment is attached to. */
-    Kart           *m_kart;
-
-    /** How often an attachment can be used (e.g. swatter). */
-    int             m_count;
+    AbstractKart   *m_kart;
 
     /** Time left till attachment expires. */
     float           m_time_left;
@@ -77,30 +78,32 @@ private:
 
     /** Scene node of the attachment, which will be attached to the kart's
      *  scene node. */
-    scene::IAnimatedMeshSceneNode 
-                   *m_node;
+    scene::IAnimatedMeshSceneNode
+                     *m_node;
 
     /** Used by bombs so that it's not passed back to previous owner. */
-    Kart           *m_previous_owner;
+    AbstractKart     *m_previous_owner;
 
     /** An optional attachment - additional functionality can be implemented
      *  for certain attachments. */
     AttachmentPlugin *m_plugin;
 
     /** Pseudo random number generator. */
-    RandomGenerator m_random;
+    RandomGenerator   m_random;
+
+    /** Ticking sound for the bomb */
+    SFXBase          *m_bomb_sound;
 
 public:
-          Attachment(Kart* kart);
+          Attachment(AbstractKart* kart);
          ~Attachment();
     void  clear ();
     void  hitBanana(Item *item, int new_attachment=-1);
     void  update (float dt);
-    void  moveBombFromTo(Kart *from, Kart *to);
-    void  swatItem();
-    bool  isSwatterReady() const;
+    void  handleCollisionWithKart(AbstractKart *other);
+    void  set (AttachmentType type, float time,
+               AbstractKart *previous_kart=NULL);
 
-    void  set (AttachmentType type, float time, Kart *previous_kart=NULL);
     // ------------------------------------------------------------------------
     /** Sets the type of the attachment, but keeps the old time left value. */
     void  set (AttachmentType type) { set(type, m_time_left); }
@@ -116,12 +119,17 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the previous owner of this attachment, used in bombs that
      *  are being passed between karts. */
-    Kart* getPreviousOwner() const { return m_previous_owner; }
+    AbstractKart* getPreviousOwner() const { return m_previous_owner; }
     // ------------------------------------------------------------------------
     /** Returns additional weight for the kart. */
-    float weightAdjust() const { 
+    float weightAdjust() const {
         return m_type==ATTACH_ANVIL ? stk_config->m_anvil_weight : 0.0f; }
     // ------------------------------------------------------------------------
+    /** Return the currently associated scene node (used by e.g the swatter) */
+    scene::IAnimatedMeshSceneNode* getNode() {return m_node;}
+    // ------------------------------------------------------------------------
+    /** Implement IAnimatedMeshSceneNode */
+    virtual void OnAnimationEnd(scene::IAnimatedMeshSceneNode* node);
 };   // Attachment
 
 #endif

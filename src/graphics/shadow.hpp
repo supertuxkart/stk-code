@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -31,7 +30,7 @@ namespace irr
 }
 using namespace irr;
 
-/** 
+/**
  * \brief This class is used to enable a shadow for a kart.
  * For now it uses a simple texture to simulate the shadow, real time shadows might
  * be added later.

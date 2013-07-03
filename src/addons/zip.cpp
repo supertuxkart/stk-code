@@ -17,7 +17,7 @@
 
 #include <string.h>
 #include <iostream>
-#include <fstream> 
+#include <fstream>
 
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
@@ -58,16 +58,16 @@ bool extract_zip(const std::string &from, const std::string &to)
 {
     //Add the zip to the file system
     IFileSystem *file_system = irr_driver->getDevice()->getFileSystem();
-    if(!file_system->addFileArchive(from.c_str(), 
-                                    /*ignoreCase*/false, 
+    if(!file_system->addFileArchive(from.c_str(),
+                                    /*ignoreCase*/false,
                                    /*ignorePath*/true, io::EFAT_ZIP))
     {
         return false;
     }
 
-    // Get the recently added archive, which is necessary to get a 
+    // Get the recently added archive, which is necessary to get a
     // list of file in the zip archive.
-    io::IFileArchive *zip_archive = 
+    io::IFileArchive *zip_archive =
         file_system->getFileArchive(file_system->getFileArchiveCount()-1);
     const io::IFileList *zip_file_list = zip_archive->getFileList();
     // Copy all files from the zip archive to the destination
@@ -80,7 +80,7 @@ bool extract_zip(const std::string &from, const std::string &to)
         if(current_file[0]=='.') continue;
         const std::string base = StringUtils::getBasename(current_file);
 
-        IReadFile* src_file = 
+        IReadFile* src_file =
             zip_archive->createAndOpenFile(current_file.c_str());
         if(!src_file)
         {
@@ -90,7 +90,7 @@ bool extract_zip(const std::string &from, const std::string &to)
             continue;
         }
 
-        IWriteFile* dst_file = 
+        IWriteFile* dst_file =
             file_system->createAndWriteFile((to+"/"+base).c_str());
         if(dst_file == NULL)
         {
@@ -112,13 +112,13 @@ bool extract_zip(const std::string &from, const std::string &to)
         dst_file->drop();
         src_file->drop();
     }
-    // Remove the zip from the filesystem to save memory and avoid 
+    // Remove the zip from the filesystem to save memory and avoid
     // problem with a name conflict. Note that we have to convert
     // the path using getAbsolutePath, otherwise windows name
     // will not be detected correctly (e.g. if from=c:\...  the
     // stored filename will be c:/..., which then does not match
     // on removing it. getAbsolutePath will convert all \ to /.
     file_system->removeFileArchive(file_system->getAbsolutePath(from.c_str()));
-    
+
     return !error;
 }   // extract_zip

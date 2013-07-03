@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2011 Joerg Henrichs
@@ -21,12 +20,12 @@
 #ifndef HEADER_ALIGNED_ARRAY_HPP
 #define HEADER_ALIGNED_ARRAY_HPP
 
-// Optimised windows compilation should not use std::vector, but 
+// Optimised windows compilation should not use std::vector, but
 // btAlignedObjectArray to enable bullet SSE optimisations.
 // On the other hand, std::vector gives much better debugging features.
 // So SSE is disabled in bullet on windows debug
 #if !defined(DEBUG) && (WIN32)
-#  undef USE_ALIGNED 
+#  undef USE_ALIGNED
 #else
 #  undef  USE_ALIGNED
 #endif

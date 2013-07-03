@@ -1,7 +1,6 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Joerg Henrichs
+//  Copyright (C) 2013 Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,99 +18,159 @@
 
 #include "tracks/track_object.hpp"
 
-#include "graphics/irr_driver.hpp"
+#include "animations/three_d_animation.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
-#include "modes/world.hpp"
-#include "tracks/track.hpp"
+#include "input/device_manager.hpp"
+#include "items/item_manager.hpp"
+#include "physics/physical_object.hpp"
+#include "race/race_manager.hpp"
+
 
 /** A track object: any additional object on the track. This object implements
  *  a graphics-only representation, i.e. there is no physical representation.
- *  Derived classes can implement a physical representation (see 
+ *  Derived classes can implement a physical representation (see
  *  physics/physical_object) or animations.
  * \param xml_node The xml node from which the initial data is taken. This is
  *                 for now: initial position, initial rotation, name of the
  *                 model, enable/disable status, timer information.
+ * \param lod_node Lod node (defaults to NULL).
  */
-TrackObject::TrackObject(const XMLNode &xml_node)
+TrackObject::TrackObject(const XMLNode &xml_node, LODNode* lod_node)
+{
+    init(xml_node, lod_node);
+}
+
+// ----------------------------------------------------------------------------
+/**
+ * \param is_dynamic Only if interaction == 'movable', i.e. the object is
+ *        affected by physics
+ * \param physics_settings If interaction != 'ghost'
+ */
+TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
+                         const core::vector3df& scale, const char* interaction,
+                         TrackObjectPresentation* presentation,
+                         bool is_dynamic,
+                         const PhysicalObject::Settings* physics_settings)
+{
+    m_init_xyz   = xyz;
+    m_init_hpr   = hpr;
+    m_init_scale = scale;
+    m_enabled    = true;
+    m_presentation = NULL;
+    m_animator = NULL;
+    m_rigid_body = NULL;
+    m_interaction = interaction;
+
+    m_presentation = presentation;
+
+    if (m_interaction != "ghost" && m_interaction != "none" &&
+        physics_settings )
+    {
+        m_rigid_body = new PhysicalObject(is_dynamic,
+                                          *physics_settings,
+                                          this);
+    }
+
+    reset();
+}   // TrackObject
+
+// ----------------------------------------------------------------------------
+
+void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
 {
     m_init_xyz   = core::vector3df(0,0,0);
     m_init_hpr   = core::vector3df(0,0,0);
     m_init_scale = core::vector3df(1,1,1);
     m_enabled    = true;
-    m_is_looped  = false;
+    m_presentation = NULL;
+    m_animator = NULL;
+
+    m_rigid_body = NULL;
 
     xml_node.get("xyz",     &m_init_xyz  );
     xml_node.get("hpr",     &m_init_hpr  );
     xml_node.get("scale",   &m_init_scale);
     xml_node.get("enabled", &m_enabled   );
-    xml_node.get("looped",  &m_is_looped );
-    std::string model_name;
-    xml_node.get("model",   &model_name  );
 
-    // Some animated objects (billboards) don't use this scene node
-    if(model_name=="")
+    m_interaction = "static";
+    xml_node.get("interaction", &m_interaction);
+    xml_node.get("lod_group", &m_lod_group);
+
+    m_soccer_ball = false;
+    xml_node.get("soccer_ball", &m_soccer_ball);
+
+    std::string type;
+    xml_node.get("type",    &type );
+
+    m_type = type;
+
+
+    if (xml_node.getName() == "particle-emitter")
     {
-        m_node = NULL;
-        m_mesh = NULL;
+        m_type = "particle-emitter";
+        m_presentation = new TrackObjectPresentationParticles(xml_node);
+    }
+    else if (type == "sfx-emitter")
+    {
+        // FIXME: at this time sound emitters are just disabled in multiplayer
+        //        otherwise the sounds would be constantly heard
+        if (race_manager->getNumLocalPlayers() < 2)
+            m_presentation = new TrackObjectPresentationSound(xml_node);
+    }
+    else if (type == "action-trigger")
+    {
+        m_presentation = new TrackObjectPresentationActionTrigger(xml_node);
+    }
+    else if (type == "billboard")
+    {
+        m_presentation = new TrackObjectPresentationBillboard(xml_node);
+    }
+    else if (type=="cutscene_camera")
+    {
+        m_presentation = new TrackObjectPresentationEmpty(xml_node);
     }
     else
     {
-        std::string full_path = World::getWorld()->getTrack()->getTrackFile(model_name);
-        if(file_manager->fileExists(full_path))
+        if (lod_node != NULL)
         {
-            m_mesh = irr_driver->getAnimatedMesh(full_path);
+            m_type = "lod";
+            m_presentation = new TrackObjectPresentationLOD(xml_node, lod_node);
         }
-        if(!m_mesh)
+        else
         {
-            // If the model isn't found in the track directory, look 
-            // in STK's model directory.
-            full_path = file_manager->getModelFile(model_name);
-            m_mesh      = irr_driver->getAnimatedMesh(full_path);
-            if(!m_mesh)
-            {
-                fprintf(stderr, "Warning: '%s' in '%s' not found and is ignored.\n",
-                        xml_node.getName().c_str(), model_name.c_str());
-                return;
-            }   // if(!m_mesh)
+            m_type = "mesh";
+            m_presentation = new TrackObjectPresentationMesh(xml_node,
+                                                             m_enabled);
         }
 
-        m_mesh->grab();
-        irr_driver->grabAllTextures(m_mesh);
-        scene::IAnimatedMeshSceneNode *node=irr_driver->addAnimatedMesh(m_mesh);
-        m_node = node;
-#ifdef DEBUG
-        std::string debug_name = model_name+" (track-object)";
-        m_node->setName(debug_name.c_str());
-#endif
-        m_frame_start = node->getStartFrame();
-        xml_node.get("frame-start", &m_frame_start);
-
-        m_frame_end = node->getEndFrame();
-        xml_node.get("frame-end", &m_frame_end);
-
-        if(!m_enabled)
-            m_node->setVisible(false);
-
-        m_node->setPosition(m_init_xyz);
-        m_node->setRotation(m_init_hpr);
-        m_node->setScale(m_init_scale);
+        if (m_interaction != "ghost" && m_interaction != "none")
+        {
+            m_rigid_body = PhysicalObject::fromXML(type == "movable",
+                                                   xml_node,
+                                                   this);
+        }
     }
+
+
+    if (type == "animation" || xml_node.hasChildNamed("curve"))
+    {
+        m_animator = new ThreeDAnimation(xml_node, this);
+    }
+
     reset();
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
+
+/** Destructor. Removes the node from the scene graph, and also
+ *  drops the textures of the mesh. Sound buffers are also freed.
+ */
 TrackObject::~TrackObject()
 {
-    if(m_node)
-        irr_driver->removeNode(m_node);
-    if(m_mesh)
-    {
-        irr_driver->dropAllTextures(m_mesh);
-        m_mesh->drop();
-        if(m_mesh->getReferenceCount()==1)
-            irr_driver->removeMeshFromCache(m_mesh);
-    }
+    delete m_presentation;
+    delete m_animator;
+    delete m_rigid_body;
 }   // ~TrackObject
 
 // ----------------------------------------------------------------------------
@@ -119,43 +178,66 @@ TrackObject::~TrackObject()
  */
 void TrackObject::reset()
 {
-    if(!m_node) return;
-    if(m_node->getType()==scene::ESNT_ANIMATED_MESH)
-    {
-        scene::IAnimatedMeshSceneNode *a_node =
-            (scene::IAnimatedMeshSceneNode*)m_node;
+    if (m_presentation != NULL) m_presentation->reset();
 
-        a_node->setPosition(m_init_xyz);
-        a_node->setRotation(m_init_hpr);
-        a_node->setScale(m_init_scale);
-        a_node->setLoopMode(m_is_looped);
-
-        if(m_is_looped)
-        {
-            a_node->setFrameLoop(m_frame_start, m_frame_end);
-        }
-    }
+    if (m_animator != NULL) m_animator->reset();
 }   // reset
 // ----------------------------------------------------------------------------
-/** Enables or disables this object. This affects the visibility, i.e. 
+/** Enables or disables this object. This affects the visibility, i.e.
  *  disabled objects will not be displayed anymore.
  *  \param mode Enable (true) or disable (false) this object.
  */
 void TrackObject::setEnable(bool mode)
 {
     m_enabled = mode;
-    if(m_node)
-        m_node->setVisible(m_enabled);
+    if (m_presentation != NULL) m_presentation->setEnable(m_enabled);
 }   // setEnable
-// ----------------------------------------------------------------------------
-/** This function is called from irrlicht when a (non-looped) animation ends.
- */
-void TrackObject::OnAnimationEnd(scene::IAnimatedMeshSceneNode* node)
-{
-}   // OnAnimationEnd
-
 // ----------------------------------------------------------------------------
 void TrackObject::update(float dt)
 {
+    if (m_presentation != NULL) m_presentation->update(dt);
+
+    if (m_rigid_body != NULL) m_rigid_body->update(dt);
+
+    if (m_animator != NULL) m_animator->update(dt);
 }   // update
+
+
 // ----------------------------------------------------------------------------
+
+void TrackObject::move(const core::vector3df& xyz, const core::vector3df& hpr,
+                       const core::vector3df& scale, bool updateRigidBody)
+{
+    if (m_presentation != NULL) m_presentation->move(xyz, hpr, scale);
+    if (updateRigidBody && m_rigid_body != NULL) m_rigid_body->move(xyz, hpr);
+}
+
+// ----------------------------------------------------------------------------
+
+const core::vector3df& TrackObject::getPosition() const
+{
+    if (m_presentation != NULL)
+        return m_presentation->getPosition();
+    else
+        return m_init_xyz;
+}
+
+// ----------------------------------------------------------------------------
+
+const core::vector3df& TrackObject::getRotation() const
+{
+    if (m_presentation != NULL)
+        return m_presentation->getRotation();
+    else
+        return m_init_xyz;
+}
+
+// ----------------------------------------------------------------------------
+
+const core::vector3df& TrackObject::getScale() const
+{
+    if (m_presentation != NULL)
+        return m_presentation->getScale();
+    else
+        return m_init_xyz;
+}

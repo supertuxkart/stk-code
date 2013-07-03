@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010  Joerg Henrichs
@@ -22,18 +21,18 @@
 #include <string>
 
 #include "io/xml_node.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 
 /** Constructor for a lap line.
  *  \param check_manager Pointer to the check manager, which is needed when
- *         resetting e.g. new lap counters. 
+ *         resetting e.g. new lap counters.
  *  \param node XML node containing the parameters for this checkline.
  */
-CheckLap::CheckLap(CheckManager *check_manager, const XMLNode &node, 
-                   unsigned int index) 
-         : CheckStructure(check_manager, node, index)
+CheckLap::CheckLap(const XMLNode &node, unsigned int index)
+         : CheckStructure(node, index)
 {
     // Note that when this is called the karts have not been allocated
     // in world, so we can't call world->getNumKarts()
@@ -58,11 +57,16 @@ void CheckLap::reset(const Track &track)
  *  \param indx     Index of the kart, can be used to store kart specific
  *                  additional data.
  */
-bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
+bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
+                           unsigned int indx)
 {
     float track_length = World::getWorld()->getTrack()->getTrackLength();
-    float current_distance = 
-        ((LinearWorld*)World::getWorld())->getDistanceDownTrackForKart(indx);
+    LinearWorld *lin_world = dynamic_cast<LinearWorld*>(World::getWorld());
+    // Can happen if a non-lap based race mode is used with a scene file that
+    // has check defined.
+    if(!lin_world)
+        return false;
+    float current_distance = lin_world->getDistanceDownTrackForKart(indx);
     bool result =(m_previous_distance[indx]>0.95f*track_length &&
                   current_distance<7.0f);
     if(UserConfigParams::m_check_debug && result)
@@ -72,5 +76,6 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
                 m_previous_distance[indx], current_distance);
     }
     m_previous_distance[indx] = current_distance;
+
     return result;
 }   // isTriggered

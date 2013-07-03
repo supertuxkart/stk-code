@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -35,7 +34,7 @@ class CharacterSelectedMessage : public Message
 {
 private:
     /** Number of local players on a host. If the message is send from the
-     *  server to the clients, this field instead contains the host id of 
+     *  server to the clients, this field instead contains the host id of
      *  the host which selected the kart
      */
     int            m_num_local_players;
@@ -44,7 +43,7 @@ private:
 
 public:
     /** Contains information about a selected kart. When send from the client
-     *  to the server, it contains the number of local players (which 
+     *  to the server, it contains the number of local players (which
      *  technically needs only to be sent once); when send from from the server
      *  to the clients this field instead contains the host id of the host
      *  selected the character. This allows the client to detect if a selected
@@ -55,8 +54,8 @@ public:
      *                 used in the message instead of the number of local
      *                 players.
      */
-    CharacterSelectedMessage(int player_id, int host_id=-1)  
-        : Message(Message::MT_CHARACTER_INFO) 
+    CharacterSelectedMessage(int player_id, int host_id=-1)
+        : Message(Message::MT_CHARACTER_INFO)
     {
         m_kart_info         = race_manager->getLocalKartInfo(player_id);
         m_num_local_players = race_manager->getNumLocalPlayers();
@@ -68,7 +67,7 @@ public:
         addChar(m_kart_info.getLocalPlayerId());
         addString(m_kart_info.getKartName());
         addString(core::stringc(m_kart_info.getPlayerName().c_str()).c_str()); // FIXME: encoding issues
-        // Piggy backing this information saves sending it as a separate 
+        // Piggy backing this information saves sending it as a separate
         // message. It is actually only required in the first message
         if(host_id>-1)
             addChar(host_id);

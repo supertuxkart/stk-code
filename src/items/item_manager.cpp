@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -24,25 +23,121 @@
 #include <sstream>
 
 #include "config/stk_config.hpp"
-#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
+#include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
-ItemManager* item_manager;
+#include <IMesh.h>
+#include <IAnimatedMesh.h>
+
+std::vector<scene::IMesh *> ItemManager::m_item_mesh;
+std::vector<scene::IMesh *> ItemManager::m_item_lowres_mesh;
+ItemManager *               ItemManager::m_item_manager = NULL;
 
 //-----------------------------------------------------------------------------
-typedef std::map<std::string,scene::IMesh*>::const_iterator CI_type;
+/** Creates one instance of the item manager. */
+void ItemManager::create()
+{
+    assert(!m_item_manager);
+    m_item_manager = new ItemManager();
+}   // create
 
+//-----------------------------------------------------------------------------
+/** Destroys the one instance of the item manager. */
+void ItemManager::destroy()
+{
+    assert(m_item_manager);
+    delete m_item_manager;
+    m_item_manager = NULL;
+}   // destroy
+
+//-----------------------------------------------------------------------------
+/** Loads the default item meshes (high- and low-resolution).
+ */
+void ItemManager::loadDefaultItemMeshes()
+{
+    m_item_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
+    m_item_lowres_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
+
+    // A temporary mapping of items to names used in the XML file:
+    std::map<Item::ItemType, std::string> item_names;
+    item_names[Item::ITEM_BANANA     ] = "banana";
+    item_names[Item::ITEM_BONUS_BOX  ] = "bonus-box";
+    item_names[Item::ITEM_BUBBLEGUM  ] = "bubblegum";
+    item_names[Item::ITEM_NITRO_BIG  ] = "nitro-big";
+    item_names[Item::ITEM_NITRO_SMALL] = "nitro-small";
+    item_names[Item::ITEM_TRIGGER    ] = "trigger";
+    item_names[Item::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
+    item_names[Item::ITEM_EASTER_EGG ] = "easter-egg";
+
+    const std::string file_name = file_manager->getDataFile("items.xml");
+    const XMLNode *root         = file_manager->createXMLTree(file_name);
+    for(unsigned int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
+    {
+        const std::string &name = item_names[(Item::ItemType)i];
+        const XMLNode *node = root->getNode(name);
+        if (!node)  continue;
+
+        std::string model_filename;
+        node->get("model", &model_filename);
+
+        scene::IMesh *mesh = irr_driver->getAnimatedMesh(model_filename);
+        if(!node || model_filename.size()==0 || !mesh)
+        {
+            fprintf(stderr, "Item model '%s' in items.xml could not be loaded "
+                            "- aborting", name.c_str());
+            exit(-1);
+        }
+        mesh->grab();
+        m_item_mesh[i]            = mesh;
+
+        std::string lowres_model_filename;
+        node->get("lowmodel", &lowres_model_filename);
+        m_item_lowres_mesh[i] = lowres_model_filename.size() == 0
+                              ? NULL
+                              : irr_driver->getMesh(lowres_model_filename);
+
+        if (m_item_lowres_mesh[i]) m_item_lowres_mesh[i]->grab();
+    }   // for i
+    delete root;
+}   // loadDefaultItemMeshes
+
+//-----------------------------------------------------------------------------
+/** Clean up all textures. This is necessary when switching resolution etc.
+ */
+void ItemManager::removeTextures()
+{
+    for(unsigned int i=0; i<Item::ITEM_LAST-Item::ITEM_FIRST+1; i++)
+    {
+        if(m_item_mesh[i])
+        {
+            m_item_mesh[i]->drop();
+            irr_driver->removeMeshFromCache(m_item_mesh[i]);
+        }
+        m_item_mesh[i] = NULL;
+        if(m_item_lowres_mesh[i])
+        {
+            m_item_lowres_mesh[i]->drop();
+            irr_driver->removeMeshFromCache(m_item_lowres_mesh[i]);
+        }
+        m_item_lowres_mesh[i] = NULL;
+    }
+}   // removeTextures
+
+
+// ============================================================================
+/** Creates a new instance of the item manager. This is done at startup
+ *  of each race. */
 ItemManager::ItemManager()
 {
     m_switch_time = -1.0f;
-    m_all_meshes.clear();
     // The actual loading is done in loadDefaultItems
 
     // Prepare the switch to array, which stores which item should be
@@ -52,6 +147,18 @@ ItemManager::ItemManager()
     for(unsigned int i=Item::ITEM_FIRST; i<Item::ITEM_COUNT; i++)
         m_switch_to.push_back((Item::ItemType)i);
     setSwitchItems(stk_config->m_switch_items);
+
+    if(QuadGraph::get())
+    {
+        m_items_in_quads = new std::vector<AllItemTypes>;
+        // Entries 0 to n-1 are for the quads, entry
+        // n is for all items that are not on a quad.
+        m_items_in_quads->resize(QuadSet::get()->getNumberOfQuads()+1);
+    }
+    else
+    {
+        m_items_in_quads = NULL;
+    }
 }   // ItemManager
 
 //-----------------------------------------------------------------------------
@@ -65,90 +172,59 @@ void ItemManager::setSwitchItems(const std::vector<int> &switch_items)
         m_switch_to[i]=(Item::ItemType)stk_config->m_switch_items[i];
 }   // setSwitchItems
 
-//-----------------------------------------------------------------------------
-void ItemManager::removeTextures()
-{
-    for(AllItemTypes::iterator i =m_all_items.begin();
-        i!=m_all_items.end();  i++)
-    {
-        delete *i;
-    }
-    m_all_items.clear();
-
-    for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
-    {
-        i->second->drop();
-    }
-    for(CI_type i=m_all_low_meshes.begin(); i!=m_all_low_meshes.end(); ++i)
-    {
-        i->second->drop();
-    }
-    m_all_meshes.clear();
-    m_all_low_meshes.clear();
-}   // removeTextures
 
 //-----------------------------------------------------------------------------
+/** Destructor. Cleans up all items and meshes stored.
+ */
 ItemManager::~ItemManager()
 {
-    for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
+    if(m_items_in_quads)
+        delete m_items_in_quads;
+    for(AllItemTypes::iterator i =m_all_items.begin();
+                               i!=m_all_items.end();  i++)
     {
-        i->second->drop();
+        if(*i)
+            delete *i;
     }
-    m_all_meshes.clear();
-    
-    for(CI_type i=m_all_low_meshes.begin(); i!=m_all_low_meshes.end(); ++i)
-    {
-        i->second->drop();
-    }
-    m_all_low_meshes.clear();
+
+    m_all_items.clear();
 }   // ~ItemManager
 
 //-----------------------------------------------------------------------------
-void ItemManager::loadDefaultItems()
+/** Inserts the new item into the items management data structures, if possible
+ *  reusing an existing, unused entry (e.g. due to a removed bubble gum). Then
+ *  the item is also added to the quad-wise list of items.
+ */
+void ItemManager::insertItem(Item *item)
 {
-    // The names must be given in the order of the definition of ItemType
-    // in item.hpp. Note that bubblegum strictly isn't an item,
-    // it is implemented as one, and so loaded here, too.
-    static const std::string item_names[] = {"bonus-box", "banana",
-                                             "nitro-big", "nitro-small",
-                                             "bubblegum" };
-    const std::string file_name = file_manager->getDataFile("items.xml");
-    const XMLNode *root         = file_manager->createXMLTree(file_name);
-    for(unsigned int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
+    // Find where the item can be stored in the index list: either in a
+    // previously deleted entry, otherwise at the end.
+    int index = -1;
+    for(index=m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
+
+    if(index==-1) index = m_all_items.size();
+
+    if(index<(int)m_all_items.size())
+        m_all_items[index] = item;
+    else
+        m_all_items.push_back(item);
+    item->setItemId(index);
+
+    // Now insert into the appropriate quad list, if there is a quad list
+    // (i.e. race mode has a quad graph).
+    if(m_items_in_quads)
     {
-        const XMLNode *node = root->getNode(item_names[i]);
-        std::string model_filename, lowres_model_filename;
-        if (node)
+        int graph_node = item->getGraphNode();
+        // If the item is on the driveline, store it at the appropriate index
+        if(graph_node > -1)
         {
-            node->get("model", &model_filename);
-            node->get("lowmodel", &lowres_model_filename);
+            int sector = QuadGraph::get()->getNode(graph_node).getQuadIndex();
+            (*m_items_in_quads)[sector].push_back(item);
         }
-        
-        scene::IMesh *mesh = irr_driver->getAnimatedMesh(model_filename);
-        scene::IMesh *lowres_mesh = NULL;
-        
-        if (lowres_model_filename.size() > 0)
-            lowres_mesh = irr_driver->getMesh(lowres_model_filename);
-        
-        if(!node || model_filename.size()==0 || !mesh)
-        {
-            fprintf(stderr, "Item model '%s' in items.xml could not be loaded - aborting",
-                    item_names[i].c_str());
-            exit(-1);
-        }
-        std::string shortName =
-            StringUtils::getBasename(StringUtils::removeExtension(model_filename));
-        m_all_meshes[shortName]     = mesh;
-        m_item_mesh[i]              = mesh;
-        m_item_lowres_mesh[i]       = lowres_mesh;
-        mesh->grab();
-        
-        if (lowres_mesh != NULL)
-            m_all_low_meshes[shortName] = lowres_mesh;
-        if (lowres_mesh != NULL) lowres_mesh->grab();
-    }   // for i
-    delete root;
-}   // loadDefaultItems
+        else  // otherwise store it in the 'outside' index
+            (*m_items_in_quads)[m_items_in_quads->size()-1].push_back(item);
+    }   // if m_items_in_quads
+}   // insertItem
 
 //-----------------------------------------------------------------------------
 /** Creates a new item.
@@ -158,38 +234,49 @@ void ItemManager::loadDefaultItems()
  *  \param parent In case of a dropped item used to avoid that a kart
  *         is affected by its own items.
  */
-Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz, 
-                           const Vec3 &normal, Kart *parent)
+Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
+                           const Vec3 &normal, AbstractKart *parent)
 {
-    // Find where the item can be stored in the index list: either in a
-    // previously deleted entry, otherwise at the end.
-    int index = -1;
-    for(index=m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
+    Item::ItemType mesh_type = type;
+    if (type == Item::ITEM_BUBBLEGUM && parent->getIdent() == "nolok")
+    {
+        mesh_type = Item::ITEM_BUBBLEGUM_NOLOK;
+    }
 
-    if(index==-1) index = m_all_items.size();
-    Item* item;
-    item = new Item(type, xyz, normal, m_item_mesh[type], m_item_lowres_mesh[type], index);
+    Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
+                          m_item_lowres_mesh[mesh_type]);
+
+    insertItem(item);
     if(parent != NULL) item->setParent(parent);
     if(m_switch_time>=0)
     {
         Item::ItemType new_type = m_switch_to[item->getType()];
-        item->switchTo(new_type, m_item_mesh[(int)new_type], m_item_lowres_mesh[(int)new_type]);
+        item->switchTo(new_type, m_item_mesh[(int)new_type],
+                       m_item_lowres_mesh[(int)new_type]);
     }
-    if(index<(int)m_all_items.size())
-        m_all_items[index] = item;
-    else
-        m_all_items.push_back(item);
+    return item;
+}   // newItem
+
+//-----------------------------------------------------------------------------
+/** Creates a new trigger item.
+ *  \param xyz  Position of the item.
+ */
+Item* ItemManager::newItem(const Vec3& xyz, float distance,
+                           TriggerItemListener* listener)
+{
+    Item* item;
+    item = new Item(xyz, distance, listener);
+    insertItem(item);
 
     return item;
 }   // newItem
 
 //-----------------------------------------------------------------------------
 /** Set an item as collected.
- *  This function is called on the server when an item is collected, or on the
- *  client upon receiving information about collected items.                  */
-void ItemManager::collectedItem(int item_id, Kart *kart, int add_info)
+ *  This function is called on the server when an item is collected, or on
+ *  the client upon receiving information about collected items.             */
+void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
 {
-    Item *item=m_all_items[item_id];
     assert(item);
     item->collected(kart);
     kart->collectedItem(item, add_info);
@@ -198,49 +285,45 @@ void ItemManager::collectedItem(int item_id, Kart *kart, int add_info)
 //-----------------------------------------------------------------------------
 /** Checks if any item was collected by the given kart. This function calls
  *  collectedItem if an item was collected.
- *  \param kart Pointer to the kart. 
+ *  \param kart Pointer to the kart.
  */
-void  ItemManager::checkItemHit(Kart* kart)
+void  ItemManager::checkItemHit(AbstractKart* kart)
 {
     // Only do this on the server
     if(network_manager->getMode()==NetworkManager::NW_CLIENT) return;
+
+    // We could use m_items_in_quads to to check for item hits: take the quad
+    // of the graph node of the kart, and only check items in that quad. But
+    // then we also need to check for any adjacent quads (since an item just
+    // on the order of one quad might get hit from an adjacent quad). Then
+    // it is possible that a quad is that short that we need to test adjacent
+    // of adjacent quads. And check for items outside of the track.
+    // Since at this stace item detection is by far not a bottle neck,
+    // the original, simple and stable algorithm is left in place.
 
     for(AllItemTypes::iterator i =m_all_items.begin();
         i!=m_all_items.end();  i++)
     {
         if((!*i) || (*i)->wasCollected()) continue;
-        if((*i)->hitKart(kart))
+        // To allow inlining and avoid including kart.hpp in item.hpp,
+        // we pass the kart and the position separately.
+        if((*i)->hitKart(kart->getXYZ(), kart))
         {
-            collectedItem(i-m_all_items.begin(), kart);
+            collectedItem(*i, kart);
         }   // if hit
     }   // for m_all_items
 }   // checkItemHit
 
 //-----------------------------------------------------------------------------
-/** Remove all item instances, and the track specific models. This is used
- *  just before a new track is loaded and a race is started.
- */
-void ItemManager::cleanup()
-{
-    for(AllItemTypes::iterator i =m_all_items.begin();
-        i!=m_all_items.end();  i++)
-    {
-        if(*i)
-            delete *i;
-    }
-    m_all_items.clear();
-}   // cleanup
-
-//-----------------------------------------------------------------------------
 /** Resets all items and removes bubble gum that is stuck on the track.
- *  This is necessary in case that a race is restarted.
+ *  This is done when a race is (re)started.
  */
 void ItemManager::reset()
 {
     // If items are switched, switch them back first.
     if(m_switch_time>=0)
     {
-        for(AllItemTypes::iterator i =m_all_items.begin(); 
+        for(AllItemTypes::iterator i =m_all_items.begin();
                                    i!=m_all_items.end(); i++)
         {
             if(*i) (*i)->switchBack();
@@ -248,20 +331,22 @@ void ItemManager::reset()
         m_switch_time = -1.0f;
 
     }
+
+    // We can't simply erase items in the list: in this case the indicies
+    // stored in each item are invalid, and lead to incorrect result/crashes
+    // in deleteItem
     AllItemTypes::iterator i=m_all_items.begin();
     while(i!=m_all_items.end())
     {
-        if(!*i) 
+        if(!*i)
         {
             i++;
             continue;
         }
         if((*i)->canBeUsedUp() || (*i)->getType()==Item::ITEM_BUBBLEGUM)
         {
-            Item *b=*i;
-            AllItemTypes::iterator i_next = m_all_items.erase(i); 
-            delete b;
-            i = i_next;
+            deleteItem( *i );
+            i++;
         }
         else
         {
@@ -274,6 +359,10 @@ void ItemManager::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
+/** Updates all items, and handles switching items back if the switch time
+ *  is over.
+ *  \param dt Time step.
+ */
 void ItemManager::update(float dt)
 {
     // If switch time is over, switch all items back
@@ -284,7 +373,7 @@ void ItemManager::update(float dt)
         {
             for(AllItemTypes::iterator i =m_all_items.begin();
                 i!=m_all_items.end();  i++)
-            {   
+            {
                 if(*i) (*i)->switchBack();
             }   // for m_all_items
         }   // m_switch_time < 0
@@ -298,12 +387,38 @@ void ItemManager::update(float dt)
             (*i)->update(dt);
             if( (*i)->isUsedUp())
             {
-                delete *i;
-                m_all_items[i-m_all_items.begin()] = NULL;
+                deleteItem( *i );
             }   // if usedUp
         }   // if *i
     }   // for m_all_items
 }   // update
+
+//-----------------------------------------------------------------------------
+/** Removes an items from the items-in-quad list, from the list of all
+ *  items, and then frees the item itself.
+ *  \param The item to delete.
+ */
+void ItemManager::deleteItem(Item *item)
+{
+    // First check if the item needs to be removed from the items-in-quad list
+    if(m_items_in_quads)
+    {
+        const Vec3 &xyz = item->getXYZ();
+        int sector = QuadGraph::UNKNOWN_SECTOR;
+        QuadGraph::get()->findRoadSector(xyz, &sector);
+        unsigned int indx = sector==QuadGraph::UNKNOWN_SECTOR
+                          ? m_items_in_quads->size()-1
+                          : sector;
+        AllItemTypes &items = (*m_items_in_quads)[indx];
+        AllItemTypes::iterator it = std::find(items.begin(), items.end(),item);
+        assert(it!=items.end());
+        items.erase(it);
+    }   // if m_items_in_quads
+
+    int index = item->getItemId();
+    m_all_items[index] = NULL;
+    delete item;
+}   // delete item
 
 //-----------------------------------------------------------------------------
 /** Switches all items: boxes become bananas and vice versa for a certain
@@ -315,6 +430,15 @@ void ItemManager::switchItems()
         i!=m_all_items.end();  i++)
     {
         if(!*i) continue;
+
+        if ((*i)->getType() == Item::ITEM_BUBBLEGUM || (*i)->getType() == Item::ITEM_BUBBLEGUM_NOLOK)
+        {
+            if (race_manager->getAISuperPower() == RaceManager::SUPERPOWER_NOLOK_BOSS)
+            {
+                continue;
+            }
+        }
+
         Item::ItemType new_type = m_switch_to[(*i)->getType()];
 
         if(m_switch_time<0)

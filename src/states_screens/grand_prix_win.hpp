@@ -1,4 +1,3 @@
-// $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 SuperTuxKart-Team
@@ -24,6 +23,7 @@
 #include "karts/kart_model.hpp"
 
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; class IMeshSceneNode; } }
+namespace GUIEngine { class LabelWidget; }
 class KartProperties;
 
 /**
@@ -33,15 +33,15 @@ class KartProperties;
 class GrandPrixWin : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<GrandPrixWin>
 {
     friend class GUIEngine::ScreenSingleton<GrandPrixWin>;
-    
+
     GrandPrixWin();
-    
+
     /** sky angle, 0-360 */
     float m_sky_angle;
-    
+
     /** Global evolution of time */
     double m_global_time;
-    
+
     irr::scene::IMeshSceneNode* m_village;
 
     irr::scene::IMeshSceneNode* m_podium_step[3];
@@ -49,44 +49,47 @@ class GrandPrixWin : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
 
     /** A copy of the kart model for each kart used. */
     std::vector<KartModel*> m_all_kart_models;
-    
+
     irr::scene::ISceneNode* m_sky;
     irr::scene::ICameraSceneNode* m_camera;
 
     irr::scene::ILightSceneNode* m_light;
-    
+
+    GUIEngine::LabelWidget* m_unlocked_label;
+
     int m_phase;
-    
+
     float m_kart_x[3], m_kart_y[3], m_kart_z[3];
     float m_podium_x[3], m_podium_z[3];
     float m_kart_rotation[3];
-    
+
     float m_camera_x, m_camera_y, m_camera_z;
     float m_camera_target_x, m_camera_target_z;
-    
+
     MusicInformation* m_music;
-    
+
 public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile();
-    
+    virtual void loadedFromFile() OVERRIDE;
+
     /** \brief implement optional callback from parent class GUIEngine::Screen */
-    void onUpdate(float dt, irr::video::IVideoDriver*);
-    
+    void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
+
     /** \brief implement callback from parent class GUIEngine::Screen */
-    void init();
-    
+    void init() OVERRIDE;
+
     /** \brief implement callback from parent class GUIEngine::Screen */
-    void tearDown();
-    
+    void tearDown() OVERRIDE;
+
     /** \brief implement callback from parent class GUIEngine::Screen */
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
-    
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+                       const int playerID) OVERRIDE;
+
     /** \pre must be called after pushing the screen, but before onUpdate had the chance to be invoked */
     void setKarts(const std::string idents[3]);
 
-    virtual MusicInformation* getMusic() const { return m_music; }
+    virtual MusicInformation* getMusic() const OVERRIDE { return m_music; }
 };
 
 #endif

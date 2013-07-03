@@ -15,17 +15,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "states_screens/dialogs/gp_info_dialog.hpp"
 
+#include "audio/sfx_manager.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
-//#include "network/network_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/dialogs/gp_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
 #include "tracks/track.hpp"
@@ -46,10 +47,10 @@ using namespace GUIEngine;
 GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const float h) : ModalDialog(w, h)
 {
     m_curr_time = 0.0f;
-    
+
     const int y1 = m_area.getHeight()/7;
     const int y2 = m_area.getHeight()*6/7;
-    
+
     m_gp_ident = gpIdent;
 
     const GrandPrixData* gp = grand_prix_manager->getGrandPrix(gpIdent);
@@ -60,30 +61,30 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         ModalDialog::dismiss();
         return;
     }
-    
+
     // ---- GP Name
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
     IGUIStaticText* title = GUIEngine::getGUIEnv()->addStaticText( translations->fribidize(gp->getName()),
-                                                               area_top, false, true, // border, word warp
+                                                               area_top, false, true, // border, word wrap
                                                                m_irrlicht_window);
     title->setTabStop(false);
     title->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 
 
     // ---- Track listings
-    const std::vector<std::string>& tracks = gp->getTracks();
+    const std::vector<std::string>& tracks = gp->getTrackNames();
     const int trackAmount = tracks.size();
 
     int height_of_one_line = (y2 - y1)/(trackAmount+1);
     const int textHeight = GUIEngine::getFontHeight();
     if (height_of_one_line > (int)(textHeight*1.5f)) height_of_one_line = (int)(textHeight*1.5f);
-    
+
     bool gp_ok = true;
-    
+
     for (int t=0; t<trackAmount; t++)
     {
         const int from_y = y1 + height_of_one_line*(t+1);
-        
+
         Track* track = track_manager->getTrack(tracks[t]);
         stringw lineText;
         if (track == NULL)
@@ -96,7 +97,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         {
             lineText = track->getName();
         }
-                
+
         LabelWidget* widget = new LabelWidget();
         widget->setText(translations->fribidize(lineText), false);
         widget->m_x = 20;
@@ -104,41 +105,41 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         widget->m_w = m_area.getWidth()/2 - 20;
         widget->m_h = height_of_one_line;
         widget->setParent(m_irrlicht_window);
-        
+
         m_widgets.push_back(widget);
         widget->add();
-        
+
         // IGUIStaticText* line = GUIEngine::getGUIEnv()->addStaticText( lineText.c_str(),
-        //                                       entry_area, false , true , // border, word warp
+        //                                       entry_area, false , true , // border, word wrap
         //                                       m_irrlicht_window);
     }
-  
+
     // ---- Track screenshot
-    
+
     m_screenshot_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
                                                false /* tab stop */, false /* focusable */,
                                                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE /* Track gives us absolute paths */);
     // images are saved squared, but must be stretched to 4:3
     m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
-    
+
     m_screenshot_widget->m_x = m_area.getWidth()/2;
     m_screenshot_widget->m_y = y1;
     m_screenshot_widget->m_w = m_area.getWidth()/2;
     m_screenshot_widget->m_h = y2 - y1 - 10;
-    
+
     Track* track = track_manager->getTrack(tracks[0]);
-    
+
     m_screenshot_widget->m_properties[PROP_ICON] = (track  != NULL ?
                                                     track->getScreenshotFile().c_str() :
                                                     file_manager->getDataDir() + "gui/main_help.png");
     m_screenshot_widget->setParent(m_irrlicht_window);
     m_screenshot_widget->add();
     m_widgets.push_back(m_screenshot_widget);
-    
-    
+
+
     // ---- Start button
     ButtonWidget* okBtn = new ButtonWidget();
-    
+
     if (gp_ok)
     {
         okBtn->m_properties[PROP_ID] = "start";
@@ -150,7 +151,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         okBtn->setText(_("This Grand Prix is broken!"));
         okBtn->setBadge(BAD_BADGE);
     }
-    
+
     okBtn->m_x = m_area.getWidth()/2 - 200;
     okBtn->m_y = y2;
     okBtn->m_w = 400;
@@ -160,9 +161,9 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     okBtn->add();
     okBtn->getIrrlichtElement()->setTabStop(true);
     okBtn->getIrrlichtElement()->setTabGroup(false);
-    
+
     okBtn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
-    
+
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -176,7 +177,7 @@ GPInfoDialog::~GPInfoDialog()
     {
         ((TracksScreen*)curr_screen)->setFocusOnGP(m_gp_ident);
     }
-    
+
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -186,26 +187,28 @@ void GPInfoDialog::onEnterPressedInternal()
     // Save the gp identifier, since dismiss will delete this object.
     std::string gp_id = m_gp_ident;
     ModalDialog::dismiss();
-    race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id));
+    // Disable accidentally unlocking of a challenge
+    unlock_manager->getCurrentSlot()->setCurrentChallenge("");
+    race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false);
 }
 
-// ------------------------------------------------------------------------------------------------------   
+// ------------------------------------------------------------------------------------------------------
 
 GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& eventSource)
 {
     if (eventSource == "start")
     {
         // Save GP identifier, since dismiss will delete this object.
-        std::string gp_id = m_gp_ident;  
+        std::string gp_id = m_gp_ident;
         ModalDialog::dismiss();
-        race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id));
+        race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false);
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "cannot_start")
     {
         sfx_manager->quickSound( "anvil" );
     }
-    
+
     return GUIEngine::EVENT_LET;
 }
 
@@ -216,18 +219,18 @@ void GPInfoDialog::onUpdate(float dt)
     const int frameBefore = (int)(m_curr_time / 1.5f);
     m_curr_time += dt;
     int frameAfter = (int)(m_curr_time / 1.5f);
-    
+
     if (frameAfter == frameBefore) return; // if nothing changed, return right now
-    
+
     const GrandPrixData* gp = grand_prix_manager->getGrandPrix(m_gp_ident);
     assert(gp != NULL);
-    const std::vector<std::string>& tracks = gp->getTracks();
+    const std::vector<std::string>& tracks = gp->getTrackNames();
     if (frameAfter >= (int)tracks.size())
     {
         frameAfter = 0;
         m_curr_time = 0;
     }
-    
+
     Track* track = track_manager->getTrack(tracks[frameAfter]);
     m_screenshot_widget->setImage((track  != NULL ? track->getScreenshotFile().c_str() :
                                                     (file_manager->getDataDir()+"gui/main_help.png").c_str()),

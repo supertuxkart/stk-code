@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -22,8 +21,13 @@
 
 #include <map>
 
+#include "config/user_config.hpp"
+
 #include "challenges/challenge_data.hpp"
+#include "challenges/game_slot.hpp"
+
 #include "utils/no_copy.hpp"
+#include "utils/ptr_vector.hpp"
 
 #include <fstream>
 
@@ -38,50 +42,56 @@ class UnlockManager : public NoCopy
 {
 private:
     SFXBase    *m_locked_sound;
+
+    void       load              ();
+
     typedef std::map<std::string, ChallengeData*> AllChallengesType;
     AllChallengesType             m_all_challenges;
-    std::map<std::string, bool>   m_locked_features;
-    std::vector<const ChallengeData*> m_unlocked_features;
-    void       computeActive     ();
-    void       load              ();
-    
-    void       unlockFeature     (ChallengeData* c, bool do_save=true);
+
+    std::map<std::string, GameSlot*> m_game_slots;
+
     void readAllChallengesInDirs(const std::vector<std::string>* all_dirs);
-    
+
+    /** ID of the active player */
+    std::string m_current_game_slot;
+
+    friend class GameSlot;
+
 public:
                UnlockManager     ();
               ~UnlockManager     ();
     void       addOrFreeChallenge(ChallengeData *c);
     void       addChallenge      (const std::string& filename);
     void       save              ();
-    std::vector<const ChallengeData*> 
-               getActiveChallenges();
-    
-    /** Returns the list of recently unlocked features (e.g. call at the end of a
-        race to know if any features were unlocked) */
-    const std::vector<const ChallengeData*> 
-               getRecentlyUnlockedFeatures() {return m_unlocked_features;}
+    bool       createSlotsIfNeeded();
+    bool       deleteSlotsIfNeeded();
 
-    /** Clear the list of recently unlocked challenges */
-    void       clearUnlocked     () {m_unlocked_features.clear(); }
-    
-    /** Returns a complete list of all solved challenges */
-    const std::vector<const ChallengeData*>   getUnlockedFeatures();
-
-    /** Returns the list of currently inaccessible (locked) challenges */
-    const std::vector<const ChallengeData*>   getLockedChallenges();
-    
     const ChallengeData *getChallenge      (const std::string& id);
 
-    void       raceFinished      ();
-    void       grandPrixFinished ();
-    void       lockFeature       (const ChallengeData *challenge);
-    bool       isLocked          (const std::string& feature);
     bool       isSupportedVersion(const ChallengeData &challenge);
 
     /** Eye- (or rather ear-) candy. Play a sound when user tries to access a locked area */
     void       playLockSound() const;
-    
+
+    const std::string& getCurrentSlotID() const { return m_current_game_slot; }
+
+    GameSlot*  getCurrentSlot()
+    {
+        assert(m_game_slots.find(m_current_game_slot) != m_game_slots.end());
+        return m_game_slots[m_current_game_slot];
+    }
+
+    /** \param slotid name of the player */
+    void       setCurrentSlot(std::string slotid) { m_current_game_slot = slotid; }
+
+    void       findWhatWasUnlocked(int pointsBefore, int pointsNow,
+                                   std::vector<std::string>& tracks,
+                                   std::vector<std::string>& gps);
+
+    PlayerProfile* getCurrentPlayer();
+
+    void updateActiveChallengeList();
+
 };   // UnlockManager
 
 extern UnlockManager* unlock_manager;

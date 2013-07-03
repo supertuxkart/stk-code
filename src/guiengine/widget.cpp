@@ -28,7 +28,6 @@ using namespace video;
 using namespace io;
 using namespace gui;
 
-#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
@@ -43,7 +42,7 @@ using namespace gui;
 
 namespace GUIEngine
 {
-    
+
     static bool g_is_within_a_text_box = false;
     bool isWithinATextBox()
     {
@@ -61,7 +60,7 @@ using namespace GUIEngine;
 Widget::Widget(WidgetType type, bool reserve_id)
 {
     m_magic_number = 0xCAFEC001;
-    
+
     m_x  = -1;
     m_y  = -1;
     m_w  = -1;
@@ -74,6 +73,7 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_parent                = NULL;
     m_focusable             = true;
     m_bottom_bar            = false;
+    m_top_bar               = false;
     m_event_handler         = NULL;
     m_reserve_id            = reserve_id;
     m_show_bounding_box     = false;
@@ -81,25 +81,26 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_is_bounding_box_round = false;
     m_has_tooltip           = false;
     m_is_text_rtl           = false;
-    
+
     m_absolute_x = m_absolute_y = m_absolute_w = m_absolute_h = -1;
     m_relative_x = m_relative_y = m_relative_w = m_relative_h = -1;
     m_absolute_reverse_x = m_absolute_reverse_y = -1;
-    
-    
+
+
     m_tab_down_root = -1;
     m_tab_up_root = -1;
-    
+
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         m_player_focus[n] = false;
         m_selected[n] = false;
     }
-    
+
     m_reserved_id     = -1;
     m_deactivated     = false;
+    m_is_visible      = true;
     m_badges          = 0;
-    
+
     // set a default value, derivates can override this as they wish
     m_check_inside_me = (m_type == WTYPE_DIV);
 }
@@ -109,7 +110,7 @@ Widget::Widget(WidgetType type, bool reserve_id)
 Widget::~Widget()
 {
     assert(m_magic_number == 0xCAFEC001);
-    
+
     // If any player focused this widget, unset that focus
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
@@ -118,10 +119,10 @@ Widget::~Widget()
             GUIEngine::focusNothingForPlayer(n);
         }
     }
-    
+
     m_magic_number = 0xDEADBEEF;
 }
-    
+
 // -----------------------------------------------------------------------------
 void Widget::setText(const wchar_t *s)
 {
@@ -135,9 +136,9 @@ void Widget::setText(const wchar_t *s)
 void Widget::elementRemoved()
 {
     assert(m_magic_number == 0xCAFEC001);
-    
+
     m_element = NULL;
-    
+
     // If any player focused this widget, unset that focus
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
@@ -146,13 +147,13 @@ void Widget::elementRemoved()
             GUIEngine::focusNothingForPlayer(n);
         }
     }
-    
+
 }
 
 // -----------------------------------------------------------------------------
 
 void Widget::setActivated()
-{    
+{
     // even if this one is already active, do it anyway on purpose, maybe the
     // children widgets need to be updated
     m_deactivated = false;
@@ -199,10 +200,10 @@ namespace GUIEngine
     // IDs must not start at 0, since it appears their GUI engine hardcodes some ID values
     const unsigned int FOCUSABLE_IDS_BASE = 100;
     const unsigned int UNFOCUSABLE_IDS_BASE = 1000;
-    
+
     /** Used to assign irrLicht IDs to widgets dynamically */
     static unsigned int id_counter = FOCUSABLE_IDS_BASE;
-    
+
     /** for items that can't be reached with keyboard navigation but can be clicked */
     static unsigned int id_counter_2 = UNFOCUSABLE_IDS_BASE;
 }
@@ -220,7 +221,7 @@ int Widget::getNewNoFocusID()
 bool Widget::isFocusableId(const int id)
 {
     if (id < 0) return false;
-    
+
     if ((unsigned int)id >= UNFOCUSABLE_IDS_BASE) return false;
     else                                        return true;
 }
@@ -253,30 +254,30 @@ void Widget::add()
   * for additionnal players
   */
 void Widget::setFocusForPlayer(const int playerID)
-{    
+{
     assert(m_magic_number == 0xCAFEC001);
-    
+
     // Unset focus flag on previous widget that had focus
     if (GUIEngine::getFocusForPlayer(playerID) != NULL)
     {
-        GUIEngine::getFocusForPlayer(playerID)->unfocused(playerID);
+        GUIEngine::getFocusForPlayer(playerID)->unfocused(playerID, this);
         GUIEngine::getFocusForPlayer(playerID)->m_player_focus[playerID] = false;
     }
-    
+
     m_player_focus[playerID] = true;
     GUIEngine::Private::g_focus_for_player[playerID] = this;
 
     // Callback
     this->focused(playerID);
 }
-    
+
 // -----------------------------------------------------------------------------
 
 void Widget::unsetFocusForPlayer(const int playerID)
 {
     assert(m_magic_number == 0xCAFEC001);
-    
-    if (m_player_focus[playerID]) this->unfocused(playerID);
+
+    if (m_player_focus[playerID]) this->unfocused(playerID, NULL);
     m_player_focus[playerID] = false;
 }
 
@@ -288,7 +289,7 @@ void Widget::unsetFocusForPlayer(const int playerID)
 bool Widget::isFocusedForPlayer(const int playerID)
 {
     assert(m_magic_number == 0xCAFEC001);
-    
+
     return m_player_focus[playerID];
 }
 
@@ -297,12 +298,12 @@ bool Widget::isFocusedForPlayer(const int playerID)
 void Widget::move(const int x, const int y, const int w, const int h)
 {
     assert(m_magic_number == 0xCAFEC001);
-    
+
     m_x = x;
     m_y = y;
     m_w = w;
     m_h = h;
-    
+
     if (m_element != NULL)
         m_element->setRelativePosition( core::rect < s32 > (x, y, x+w, y+h) );
 }
@@ -319,7 +320,9 @@ void Widget::setParent(IGUIElement* parent)
 
 bool Widget::isVisible() const
 {
-    return m_element && m_element->isVisible();
+    if (m_element != NULL)
+        assert(m_element->isVisible() == m_is_visible);
+    return m_is_visible;
 }
 
 // -----------------------------------------------------------------------------
@@ -330,8 +333,9 @@ void Widget::setVisible(bool visible)
     {
         m_element->setVisible(visible);
     }
+    m_is_visible = visible;
     m_deactivated = !visible;
-    
+
     const int childrenCount = m_children.size();
     for (int n=0; n<childrenCount; n++)
     {

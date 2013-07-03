@@ -39,7 +39,7 @@ void ButtonWidget::add()
     m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent,
                                                   (m_reserved_id == -1 ? getNewID() : m_reserved_id),
                                                   message.c_str(), L"");
-    
+
     m_id = m_element->getID();
     m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
@@ -51,7 +51,7 @@ void ButtonWidget::setLabel(const irr::core::stringw &label)
 {
     // This method should only be called AFTER a widget is added
     assert(m_element != NULL);
-    
+
     m_element->setText( label.c_str() );
     setText(label);
 }

@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -19,11 +18,11 @@
 
 #include "network/race_result_message.hpp"
 
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 
-/** Creates a message containing the finishing time and rank of each kart. 
+/** Creates a message containing the finishing time and rank of each kart.
  *  This message is serialised so that it can be sent.
  */
 RaceResultMessage::RaceResultMessage() : Message(MT_RACE_RESULT)
@@ -33,25 +32,25 @@ RaceResultMessage::RaceResultMessage() : Message(MT_RACE_RESULT)
     allocate(num_karts * (getFloatLength()+getCharLength()));
     for(unsigned int i=0; i<num_karts; i++)
     {
-        const Kart *kart = world->getKart(i);
+        const AbstractKart *kart = world->getKart(i);
         addFloat(kart->getFinishTime());
         addChar(kart->getPosition());
     }   // for i in karts
 }   // RaceResultMessage
 
 // ----------------------------------------------------------------------------
-/** De-serialises a race result message and sets the appropriate results in 
+/** De-serialises a race result message and sets the appropriate results in
  *  the kart and the race manager.
  *  \param pkt The enet message paket.
  */
-RaceResultMessage::RaceResultMessage(ENetPacket* pkt) 
+RaceResultMessage::RaceResultMessage(ENetPacket* pkt)
                  : Message(pkt, MT_RACE_RESULT)
 {
     World *world = World::getWorld();
     const unsigned int num_karts = world->getNumKarts();
     for(unsigned int i=0; i<num_karts; i++)
     {
-        Kart *kart = world->getKart(i);
+        AbstractKart *kart = world->getKart(i);
         float time  = getFloat();
         char position = getChar();
         kart->setPosition(position);

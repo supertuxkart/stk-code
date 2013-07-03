@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 SuperTuxKart-Team
@@ -20,10 +19,18 @@
 #ifndef THREE_STRIKES_HPP
 #define THREE_STRIKES_HPP
 
-#include <string>
 
 #include "modes/world_with_rank.hpp"
+#include "tracks/track_object.hpp"
 #include "states_screens/race_gui_base.hpp"
+
+#include <IMesh.h>
+
+#include <string>
+
+#define CLEAR_SPAWN_RANGE  5
+
+class PhysicalObject;
 
 /**
  * \brief An implementation of World, to provide the 3 strikes battle game mode
@@ -37,14 +44,36 @@ private:
         int m_lives;
     };
 
-    RaceGUIBase::KartIconDisplayInfo* m_kart_display_info;
-    
     /** This vector contains an 'BattleInfo' struct for every kart in the race.
     */
     std::vector<BattleInfo> m_kart_info;
-    
+
+    /** The mesh of the tire which is displayed when a kart loses a life. */
+    irr::scene::IMesh* m_tire;
+
+    /** Indicates the number of tires that should be
+     *  inserted into the track. */
+    int m_insert_tire;
+
+    /** For tires that are blown away. */
+    core::vector3df m_tire_position;
+
+    /** The original locations of the tires of a kart. */
+    core::vector3df m_tire_offsets[4];
+
+    /** The radius of the karts original tires. */
+    float m_tire_radius[4];
+
+    /** The directory of the original kart tires. */
+    std::string m_tire_dir;
+
+    /** A rotation to apply to the tires when inserting them. */
+    float m_tire_rotation;
+
+    PtrVector<TrackObject, REF> m_tires;
+
 public:
-    
+
     /** Used to show a nice graph when battle is over */
     struct BattleEvent
     {
@@ -52,29 +81,34 @@ public:
         std::vector<BattleInfo> m_kart_info;
     };
     std::vector<BattleEvent> m_battle_events;
-    
+
     ThreeStrikesBattle();
     virtual ~ThreeStrikesBattle();
-    
+
     virtual void init();
-    
+
     // clock events
     virtual bool isRaceOver();
     virtual void terminateRace();
-    
+
     // overriding World methods
-    virtual void restartRace();
+    virtual void reset();
 
     //virtual void getDefaultCollectibles(int& collectible_type, int& amount);
     virtual bool useFastMusicNearEnd() const { return false; }
-    virtual RaceGUIBase::KartIconDisplayInfo* getKartsDisplayInfo();
+    virtual void getKartsDisplayInfo(
+                          std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
     virtual bool raceHasLaps(){ return false; }
-    virtual void moveKartAfterRescue(Kart* kart);
-    
-    virtual std::string getIdent() const;
-    
-    virtual void kartHit(const int kart_id);
-    virtual void update(float dt);            
+    virtual void moveKartAfterRescue(AbstractKart* kart);
+
+    virtual const std::string& getIdent() const;
+
+    virtual void kartHit(const unsigned int kart_id);
+    virtual void update(float dt);
+
+    virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node);
+
+
     void updateKartRanks();
 };   // ThreeStrikesBattles
 

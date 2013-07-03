@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010 Marianne Gagnon
@@ -21,8 +20,9 @@
 #include "input/binding.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "utils/log.hpp"
 
-/** Convert thjis binding to XML attributes. The full XML node is actually 
+/** Convert thjis binding to XML attributes. The full XML node is actually
  *  written by device_config, so we only have to add the attributes here.
  */
 void Binding::serialize(std::ofstream& stream) const
@@ -30,7 +30,7 @@ void Binding::serialize(std::ofstream& stream) const
     stream << "id=\""        << m_id        << "\" "
            << "event=\""     << m_type      << "\" "
            << "character=\"" << m_character << "\" ";
-        
+
     // Only serialize the direction for stick motions
     if (m_type == Input::IT_STICKMOTION)
     {
@@ -74,7 +74,7 @@ bool Binding::deserialize(irr::io::IrrXMLReader* xml)
 }   // deserialize
 
 // ----------------------------------------------------------------------------
-/** Returns a string representing this binding, which can be displayed on the 
+/** Returns a string representing this binding, which can be displayed on the
  *  screen.
  */
 irr::core::stringw Binding::getAsString() const
@@ -90,7 +90,7 @@ irr::core::stringw Binding::getAsString() const
             s = "?";
             if(m_character)
                 s[0]=m_character;
-            
+
             switch(m_id)
             {
 #ifdef WIN32
@@ -246,10 +246,10 @@ irr::core::stringw Binding::getAsString() const
             case irr::KEY_PA1        : s = "pa1"; break;
             case irr::KEY_OEM_CLEAR  : s = "oem clear"; break;
         }
-            
+
             break;
         case Input::IT_STICKMOTION:
-            
+
             if (m_id == Input::HAT_H_ID)
             {
                 //I18N: to appear in input configuration screen, for gamepad hats
@@ -280,6 +280,6 @@ irr::core::stringw Binding::getAsString() const
         default:
             s = "?";
     }
-    
+
     return s;
 }   // GetKeyAsString

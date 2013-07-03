@@ -22,9 +22,12 @@
 #include <aabbox3d.h>
 #include <matrix4.h>
 #include <ISceneNode.h>
+#include <vector>
+#include <string>
+
 namespace irr
 {
-    namespace scene { class ISceneManager; }
+    namespace scene { class ISceneManager; class ISceneNode; }
 }
 using namespace irr;
 
@@ -39,38 +42,55 @@ namespace irr
 }
 
 /**
- * \brief manages smoke particle effects
+ * \brief manages level-of-detail
  * \ingroup graphics
  */
-class LODNode : public scene::ISceneNode // scene::IDummyTransformationSceneNode
+class LODNode : public scene::ISceneNode
 {
 private:
     core::matrix4 RelativeTransformationMatrix;
     core::aabbox3d<f32> Box;
 
     std::vector<int> m_detail;
-    std::vector<scene::ISceneNode*> m_nodes;
-    
+    std::vector<irr::scene::ISceneNode*> m_nodes;
+
     std::set<scene::ISceneNode*> m_nodes_set;
-    
+
+    std::string m_group_name;
+
+    /** The normal level of detail can be overwritten. If
+     *  m_forced_lod is >=0, only this level is be used. */
+    int m_forced_lod;
+
+    enum PreviousVisibility
+    {
+        FIRST_PASS,
+        WAS_SHOWN,
+        WAS_HIDDEN
+    };
+
+    PreviousVisibility m_previous_visibility;
+
 public:
-    
-    LODNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id=-1);
+
+    LODNode(std::string group_name, scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id=-1);
     virtual     ~LODNode();
-    
+
     //! returns the axis aligned bounding box of this node
     virtual const core::aabbox3d<f32>& getBoundingBox() const { return Box; }
-    
+
+    int getLevel();
+
     /*
     //! Returns a reference to the current relative transformation matrix.
     //! This is the matrix, this scene node uses instead of scale, translation
     //! and rotation.
     virtual core::matrix4& getRelativeTransformationMatrix() { return RelativeTransformationMatrix; }
-    
+
     //! Returns the relative transformation of the scene node.
     virtual core::matrix4 getRelativeTransformation() const { return RelativeTransformationMatrix; }
     */
-    
+
     /**
       * Adds a node associated with a level of detail.
       * \note The LOD levels must be added in ascending order.
@@ -79,17 +99,29 @@ public:
       * \param reparent If true, node will be removed from its current parent first
       */
     void add(int level, scene::ISceneNode* node, bool reparent);
-    
+
+    void forceLevelOfDetail(int n);
+
     /** Get the highest level of detail node */
-    scene::ISceneNode* getFirstNode() { return m_nodes[0]; }
-    
+    scene::ISceneNode* getFirstNode()
+    {
+        if (m_nodes.size() > 0) return m_nodes[0];
+        else                    return NULL;
+    }
+
     std::vector<scene::ISceneNode*>& getAllNodes() { return m_nodes; }
-    
+
+    //! OnAnimate() is called just before rendering the whole scene.
+		/** This method will be called once per frame, independent
+		of whether the scene node is visible or not. */
+    virtual void OnAnimate(u32 timeMs);
+
     virtual void OnRegisterSceneNode();
     virtual void render();
-    
+
     virtual scene::ESCENE_NODE_TYPE getType() const { return (scene::ESCENE_NODE_TYPE)scene::ESNT_LOD_NODE; }
 
+    const std::string& getGroupName() const { return m_group_name; }
 };
 
 #endif

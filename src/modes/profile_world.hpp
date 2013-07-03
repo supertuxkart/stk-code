@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs
@@ -37,8 +36,9 @@ private:
     /** If profiling is done, and if so, which mode. */
     static ProfileType m_profile_mode;
 
-    /** In laps based profiling: number of laps to run. */
-    static int   m_num_laps;
+    /** If no graphics should be displayed. Useful for batch testing
+     *  of AI changes etc. */
+    static bool  m_no_graphics;
 
     /** In time based profiling only: time to run. */
     static float m_time;
@@ -59,7 +59,7 @@ private:
     long long    m_num_solid;
 
     /** Number of transparent triangles drawn. */
-    long long    m_num_transparent; 
+    long long    m_num_transparent;
 
     /** Number of transparent effect triangles drawn. */
     long long    m_num_trans_effect;
@@ -68,13 +68,17 @@ private:
     long long    m_num_calls;
 
 protected:
+    /** In laps based profiling: number of laps to run. Also
+     *  used by DemoWorld. */
+    static int   m_num_laps;
 
-    virtual Kart *createKart(const std::string &kart_ident, int index, 
-                             int local_player_id, int global_player_id);
+    virtual AbstractKart *createKart(const std::string &kart_ident, int index,
+                                     int local_player_id, int global_player_id,
+                                     RaceManager::KartType type);
 
 public:
                           ProfileWorld();
-    virtual              ~ProfileWorld() {};
+    virtual              ~ProfileWorld();
     /** Returns identifier for this world. */
     virtual  std::string getInternalCode() const {return "PROFILE"; }
     virtual  void        update(float dt);
@@ -83,8 +87,15 @@ public:
 
     static   void setProfileModeTime(float time);
     static   void setProfileModeLaps(int laps);
+    // ------------------------------------------------------------------------
     /** Returns true if profile mode was selected. */
     static   bool isProfileMode() {return m_profile_mode!=PROFILE_NONE; }
+    // ------------------------------------------------------------------------
+    /** Switches off graphics. */
+    static   void disableGraphics() { m_no_graphics = true; }
+    // ------------------------------------------------------------------------
+    /** Returns true if no graphics should be displayed. */
+    static   bool isNoGraphics()  {return m_no_graphics; }
 };
 
 #endif

@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
@@ -34,7 +33,7 @@ using namespace irr;
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
-class Kart;
+class AbstractKart;
 
 /** \brief This class is responsible for drawing skid marks for a kart.
   * \ingroup graphics
@@ -43,36 +42,47 @@ class SkidMarks : public NoCopy
 {
 private:
     /** Reference to the kart to which these skidmarks belong. */
-    const Kart        &m_kart;
+    const AbstractKart &m_kart;
+
     /** True if the kart was skidding in the previous frame. */
     bool               m_skid_marking;
+
     /** Reduce effect of Z-fighting. */
     float              m_width;
+
     /** Index of current (last added) skid mark quad. */
     int                m_current;
+
     /** Initial alpha value. */
     static const int   m_start_alpha;
+
     /** Initial grey value, same for the 3 channels. */
     static const int   m_start_grey;
 
     /** Material to use for the skid marks. */
     video::SMaterial  *m_material;
 
+    // ------------------------------------------------------------------------
     class SkidMarkQuads : public scene::SMeshBuffer, public NoCopy
     {
         /** Used to move skid marks at the same location slightly on
          *  top of each other to avoid a 'wobbling' effect when sometines
-         *  the first and sometimes the 2nd one is drawn on top
-         */
+         *  the first and sometimes the 2nd one is drawn on top. */
         float m_z_offset;
+
         /** Fade out = alpha value. */
         float m_fade_out;
+
         /** For culling, we need the overall radius of the skid marks. We
          *  approximate this by maintaining an axis-aligned boundary box. */
         core::aabbox3df m_aabb;
+
+        video::SColor   m_start_color;
+
     public:
-            SkidMarkQuads (const Vec3 &left, const Vec3 &right, 
-                           video::SMaterial *material, float z_offset);
+            SkidMarkQuads (const Vec3 &left, const Vec3 &right,
+                           video::SMaterial *material, float z_offset,
+                           video::SColor* custom_color = NULL);
         void add          (const Vec3 &left,
                            const Vec3 &right);
         void fade         (float f);
@@ -80,6 +90,7 @@ private:
         const core::aabbox3df &getAABB() { return m_aabb; }
     };  // SkidMarkQuads
 
+    // ------------------------------------------------------------------------
     /** Two skidmark objects for the left and right wheel. */
     std::vector<SkidMarkQuads *>     m_left, m_right;
 
@@ -89,14 +100,16 @@ private:
     /** Shared static so that consecutive skidmarks are at a slightly
      *  different height. */
     static float                  m_avoid_z_fighting;
+
 public:
-         SkidMarks(const Kart& kart, float width=0.2f);
+         SkidMarks(const AbstractKart& kart, float width=0.2f);
         ~SkidMarks();
-    void update  (float dt); 
+    void update (float dt, bool force_skid_marks=false,
+                 video::SColor* custom_color = NULL);
     void reset();
-    
+
     void adjustFog(bool enabled);
-    
+
 };   // SkidMarks
 
 #endif

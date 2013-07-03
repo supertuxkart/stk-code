@@ -1,0 +1,11 @@
+
+<supertuxkart_grand_prix name="At World's End">
+
+    <track id="fortmagma"    laps="3" reverse="false" />
+    <track id="minigolf"     laps="3" reverse="false" />
+    <track id="xr591"        laps="3" reverse="false" />
+    <track id="mines"        laps="3" reverse="false" />
+    <track id="lighthouse"   laps="4" reverse="false" />
+    
+</supertuxkart_grand_prix>
+

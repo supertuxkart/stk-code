@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -31,7 +30,7 @@
 
 /*
   For convenience - here are some multipliers for other units.
- 
+
   eg  30 * MILES_PER_HOUR  is 30mph expressed in m/sec
 */
 
@@ -49,10 +48,10 @@
 
 const int MAX_PLAYER_COUNT = 4;
 
-extern bool IS_LITTLE_ENDIAN;
+extern const bool IS_LITTLE_ENDIAN;
 
 #define DEFAULT_GROUP_NAME "standard"
 
-extern const char* STK_VERSION;
+extern const char STK_VERSION[];
 
 #endif

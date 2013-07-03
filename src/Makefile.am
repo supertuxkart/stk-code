@@ -6,7 +6,7 @@ bindir=$(prefix)/games
 bin_PROGRAMS = supertuxkart
 
 AM_CPPFLAGS = -DSUPERTUXKART_DATADIR="\"$(datadir)/games/$(PACKAGE)/\""  \
- -I$(srcdir)/bullet/src/ -I$(srcdir)/enet/include/
+ -I$(srcdir)/../lib/bullet/src/ -I$(srcdir)/../lib/enet/include/
 
 supertuxkart_SOURCES = \
  main.cpp \
@@ -16,6 +16,9 @@ supertuxkart_SOURCES = \
  addons/addon.hpp \
  addons/addons_manager.cpp \
  addons/addons_manager.hpp \
+ addons/dummy_network_http.hpp \
+ addons/inetwork_http.cpp \
+ addons/inetwork_http.hpp \
  addons/network_http.cpp \
  addons/network_http.hpp \
  addons/news_manager.cpp \
@@ -26,13 +29,13 @@ supertuxkart_SOURCES = \
  addons/zip.hpp \
  animations/animation_base.hpp \
  animations/animation_base.cpp \
- animations/billboard_animation.cpp \
- animations/billboard_animation.hpp \
  animations/ipo.cpp \
  animations/ipo.hpp \
  animations/three_d_animation.cpp \
  animations/three_d_animation.hpp \
+ audio/dummy_sfx.hpp \
  audio/music.hpp \
+ audio/music_dummy.hpp \
  audio/music_information.cpp \
  audio/music_information.hpp \
  audio/music_manager.cpp \
@@ -50,9 +53,14 @@ supertuxkart_SOURCES = \
  challenges/challenge.hpp \
  challenges/challenge_data.cpp \
  challenges/challenge_data.hpp \
+ challenges/game_slot.cpp \
+ challenges/game_slot.hpp \
  challenges/unlock_manager.cpp \
  challenges/unlock_manager.hpp \
+ config/player.cpp \
  config/player.hpp \
+ config/saved_grand_prix.cpp \
+ config/saved_grand_prix.hpp \
  config/stk_config.cpp \
  config/stk_config.hpp \
  config/user_config.cpp \
@@ -65,6 +73,11 @@ supertuxkart_SOURCES = \
  graphics/camera.hpp \
  graphics/explosion.cpp \
  graphics/explosion.hpp \
+ graphics/hardware_skinning.cpp \
+ graphics/hardware_skinning.hpp \
+ graphics/hit_effect.hpp \
+ graphics/hit_sfx.cpp \
+ graphics/hit_sfx.hpp \
  graphics/irr_driver.cpp \
  graphics/irr_driver.hpp \
  graphics/lod_node.cpp \
@@ -85,10 +98,16 @@ supertuxkart_SOURCES = \
  graphics/particle_kind_manager.hpp \
  graphics/per_camera_node.cpp \
  graphics/per_camera_node.hpp \
+ graphics/post_processing.cpp \
+ graphics/post_processing.hpp \
  graphics/rain.cpp \
  graphics/rain.hpp \
+ graphics/referee.cpp \
+ graphics/referee.hpp \
  graphics/shadow.cpp \
  graphics/shadow.hpp \
+ graphics/show_curve.cpp \
+ graphics/show_curve.hpp \
  graphics/skid_marks.cpp \
  graphics/skid_marks.hpp \
  graphics/slip_stream.cpp \
@@ -145,6 +164,8 @@ supertuxkart_SOURCES = \
  guiengine/widgets/text_box_widget.hpp \
  guiengine/widgets/progress_bar_widget.cpp \
  guiengine/widgets/progress_bar_widget.hpp \
+ guiengine/widgets/rating_bar_widget.cpp \
+ guiengine/widgets/rating_bar_widget.hpp \
  input/binding.cpp \
  input/binding.hpp \
  input/device_manager.cpp \
@@ -154,6 +175,8 @@ supertuxkart_SOURCES = \
  input/input_device.hpp \
  input/input_manager.cpp \
  input/input_manager.hpp \
+ input/wiimote_manager.cpp \
+ input/wiimote_manager.hpp \
  io/file_manager.cpp \
  io/file_manager.hpp \
  io/xml_node.cpp \
@@ -183,27 +206,41 @@ supertuxkart_SOURCES = \
  items/powerup_manager.hpp \
  items/projectile_manager.cpp \
  items/projectile_manager.hpp \
+ items/rubber_ball.cpp \
+ items/rubber_ball.hpp \
  items/rubber_band.cpp \
  items/rubber_band.hpp \
  items/swatter.cpp \
  items/swatter.hpp \
+ karts/abstract_kart.cpp \
+ karts/abstract_kart.hpp \
+ karts/abstract_kart_animation.cpp \
+ karts/abstract_kart_animation.hpp \
+ karts/cannon_animation.cpp \
+ karts/cannon_animation.hpp \
  karts/controller/ai_base_controller.cpp \
  karts/controller/ai_base_controller.hpp \
+ karts/controller/ai_properties.cpp \
+ karts/controller/ai_properties.hpp \
  karts/controller/controller.cpp \
  karts/controller/controller.hpp \
- karts/controller/default_ai_controller.cpp \
- karts/controller/default_ai_controller.hpp \
  karts/controller/end_controller.cpp \
  karts/controller/end_controller.hpp \
  karts/controller/kart_control.hpp \
- karts/controller/new_ai_controller.cpp \
- karts/controller/new_ai_controller.hpp \
  karts/controller/player_controller.cpp \
  karts/controller/player_controller.hpp \
- karts/emergency_animation.cpp \
- karts/emergency_animation.hpp \
+ karts/controller/skidding_ai.cpp \
+ karts/controller/skidding_ai.hpp \
+ karts/explosion_animation.cpp \
+ karts/explosion_animation.hpp \
+ karts/ghost_kart.cpp \
+ karts/ghost_lart.hpp \
  karts/kart.cpp \
  karts/kart.hpp \
+ karts/kart_gfx.cpp \
+ karts/kart_gfx.hpp \
+ karts/kart_with_stats.cpp \
+ karts/kart_with_stats.hpp \
  karts/kart_model.cpp \
  karts/kart_model.hpp \
  karts/kart_properties.cpp \
@@ -214,18 +251,34 @@ supertuxkart_SOURCES = \
  karts/max_speed.hpp \
  karts/moveable.cpp \
  karts/moveable.hpp \
+ karts/rescue_animation.cpp \
+ karts/rescue_animation.hpp \
+ karts/skidding.cpp \
+ karts/skidding.hpp \
+ karts/skidding_properties.cpp \
+ karts/skidding_properties.hpp \
+ modes/cutscene_world.cpp \
+ modes/cutscene_world.hpp \
+ modes/demo_world.cpp \
+ modes/demo_world.hpp \
+ modes/easter_egg_hunt.cpp \
+ modes/easter_egg_hunt.hpp \
  modes/follow_the_leader.cpp \
  modes/follow_the_leader.hpp \
- modes/game_tutorial.cpp \
- modes/game_tutorial.hpp \
  modes/linear_world.cpp \
  modes/linear_world.hpp \
+ modes/overworld.cpp \
+ modes/overworld.hpp \
  modes/profile_world.cpp \
  modes/profile_world.hpp \
+ modes/soccer_world.cpp \
+ modes/soccer_world.hpp \
  modes/standard_race.cpp \
  modes/standard_race.hpp \
  modes/three_strikes_battle.cpp \
  modes/three_strikes_battle.hpp \
+ modes/tutorial_world.cpp \
+ modes/tutorial_world.hpp \
  modes/world.cpp \
  modes/world.hpp \
  modes/world_status.cpp \
@@ -274,6 +327,7 @@ supertuxkart_SOURCES = \
  physics/physical_object.hpp \
  physics/physics.cpp \
  physics/physics.hpp \
+ phsyics/stk_dynamics_world.hpp \
  physics/triangle_mesh.cpp \
  physics/triangle_mesh.hpp \
  physics/user_pointer.hpp \
@@ -291,21 +345,22 @@ supertuxkart_SOURCES = \
  race/race_manager.hpp \
  replay/replay_base.cpp \
  replay/replay_base.hpp \
- replay/replay_buffer_tpl.hpp \
- replay/replay_buffers.cpp \
- replay/replay_buffers.hpp \
- replay/replay_player.cpp \
- replay/replay_player.hpp \
+ replay/replay_play.cpp \
+ replay/replay_play.hpp \
  replay/replay_recorder.cpp \
  replay/replay_recorder.hpp \
- states_screens/challenges.cpp \
- states_screens/challenges.hpp \
+ states_screens/arenas_screen.cpp \
+ states_screens/arenas_screen.hpp \
  states_screens/credits.cpp \
  states_screens/credits.hpp \
+ states_screens/cutscene_gui.cpp \
+ states_screens/cutscene_gui.hpp \
  states_screens/dialogs/add_device_dialog.cpp \
  states_screens/dialogs/add_device_dialog.hpp \
  states_screens/dialogs/confirm_resolution_dialog.cpp \
  states_screens/dialogs/confirm_resolution_dialog.hpp \
+ states_screens/dialogs/custom_video_settings.cpp \
+ states_screens/dialogs/custom_video_settings.hpp \
  states_screens/dialogs/enter_player_name_dialog.cpp \
  states_screens/dialogs/enter_player_name_dialog.hpp \
  states_screens/dialogs/gp_info_dialog.cpp \
@@ -316,16 +371,16 @@ supertuxkart_SOURCES = \
  states_screens/dialogs/player_info_dialog.cpp \
  states_screens/dialogs/press_a_key_dialog.hpp \
  states_screens/dialogs/press_a_key_dialog.cpp \
- states_screens/dialogs/race_over_dialog.cpp \
- states_screens/dialogs/race_over_dialog.hpp \
  states_screens/dialogs/race_paused_dialog.hpp \
  states_screens/dialogs/race_paused_dialog.cpp \
+ states_screens/dialogs/select_challenge.cpp \
+ states_screens/dialogs/select_challenge.hpp \
  states_screens/dialogs/track_info_dialog.cpp \
  states_screens/dialogs/track_info_dialog.hpp \
+ states_screens/dialogs/tutorial_message_dialog.cpp \
+ states_screens/dialogs/tutorial_message_dialog.hpp \
  states_screens/dialogs/addons_loading.cpp \
  states_screens/dialogs/addons_loading.hpp \
- states_screens/arenas_screen.cpp \
- states_screens/arenas_screen.hpp \
  states_screens/feature_unlocked.cpp \
  states_screens/feature_unlocked.hpp \
  states_screens/grand_prix_lose.cpp \
@@ -362,18 +417,22 @@ supertuxkart_SOURCES = \
  states_screens/addons_screen.hpp \
  states_screens/race_gui_base.cpp \
  states_screens/race_gui_base.hpp \
+ states_screens/race_gui_overworld.cpp \
+ states_screens/race_gui_overworld.hpp \
  states_screens/race_gui.cpp \
  states_screens/race_gui.hpp \
  states_screens/race_result_gui.cpp \
  states_screens/race_result_gui.hpp \
  states_screens/race_setup_screen.cpp \
  states_screens/race_setup_screen.hpp \
+ states_screens/soccer_setup_screen.cpp \
+ states_screens/soccer_setup_screen.hpp \
  states_screens/state_manager.cpp  \
  states_screens/state_manager.hpp \
+ states_screens/story_mode_lobby.cpp \
+ states_screens/story_mode_lobby.hpp \
  states_screens/tracks_screen.cpp \
  states_screens/tracks_screen.hpp \
- states_screens/tutorial_screen.cpp \
- states_screens/tutorial_screen.hpp \
  tinygettext/dictionary.cpp \
  tinygettext/dictionary.hpp \
  tinygettext/dictionary_manager.cpp \
@@ -383,8 +442,6 @@ supertuxkart_SOURCES = \
  tinygettext/iconv.hpp \
  tinygettext/language.cpp \
  tinygettext/language.hpp \
- tinygettext/log.cpp \
- tinygettext/log.hpp \
  tinygettext/log_stream.hpp \
  tinygettext/plural_forms.cpp \
  tinygettext/plural_forms.hpp \
@@ -392,12 +449,18 @@ supertuxkart_SOURCES = \
  tinygettext/po_parser.hpp \
  tinygettext/stk_file_system.cpp \
  tinygettext/stk_file_system.hpp \
+ tinygettext/tgt_log.cpp \
+ tinygettext/tgt_log.hpp \
  tinygettext/tinygettext.cpp \
  tinygettext/tinygettext.hpp \
  tracks/ambient_light_sphere.cpp \
  tracks/ambient_light_sphere.hpp \
  tracks/bezier_curve.cpp \
  tracks/bezier_curve.hpp \
+ tracks/check_cannon.cpp \
+ tracks/check_cannon.hpp \
+ tracks/check_goal.cpp \
+ tracks/check_goal.hpp \
  tracks/check_lap.cpp \
  tracks/check_lap.hpp \
  tracks/check_line.cpp \
@@ -410,6 +473,8 @@ supertuxkart_SOURCES = \
  tracks/check_structure.hpp \
  tracks/graph_node.cpp\
  tracks/graph_node.hpp\
+ tracks/lod_node_loader.cpp\
+ tracks/lod_node_loader.hpp\
  tracks/quad.cpp \
  tracks/quad.hpp \
  tracks/quad_graph.cpp \
@@ -426,15 +491,17 @@ supertuxkart_SOURCES = \
  tracks/track_object.hpp \
  tracks/track_object_manager.cpp \
  tracks/track_object_manager.hpp \
- tutorial/tutorial.cpp \
- tutorial/tutorial.hpp \
- tutorial/tutorial_data.cpp \
- tutorial/tutorial_data.hpp \
- tutorial/tutorial_manager.hpp \
- tutorial/tutorial_manager.cpp \
+ tracks/track_object_presentation.cpp \
+ tracks/track_object_presentation.hpp \
+ tracks/track_sector.cpp \
+ tracks/track_sector.hpp \
  utils/aligned_array.hpp \
  utils/constants.hpp \
  utils/constants.cpp \
+ utils/leak_check.cpp \
+ utils/leak_check.hpp \
+ utils/log.cpp \
+ utils/log.hpp \
  utils/no_copy.hpp \
  utils/profiler.cpp \
  utils/profiler.hpp \

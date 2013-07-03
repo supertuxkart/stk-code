@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
@@ -23,10 +22,14 @@
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
+#include <IBillboardTextSceneNode.h>
 
 using namespace irr;
 
+#include "addons/addon.hpp"
 #include "audio/music_manager.hpp"
+#include "challenges/challenge.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
@@ -39,20 +42,29 @@ using namespace irr;
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
 #include "items/item_manager.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
+#include "modes/linear_world.hpp"
+#include "modes/easter_egg_hunt.hpp"
 #include "modes/world.hpp"
 #include "physics/physical_object.hpp"
+#include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/bezier_curve.hpp"
 #include "tracks/check_manager.hpp"
+#include "tracks/lod_node_loader.hpp"
+#include "tracks/track_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -65,31 +77,51 @@ using namespace irr;
 const float Track::NOHIT           = -99999.9f;
 
 // ----------------------------------------------------------------------------
-Track::Track(std::string filename)
+Track::Track(const std::string &filename)
 {
 #ifdef DEBUG
     m_magic_number          = 0x17AC3802;
 #endif
-    
+
+    m_materials_loaded      = false;
     m_filename              = filename;
-    m_root                  = StringUtils::getPath(StringUtils::removeExtension(m_filename));
+    m_root                  =
+        StringUtils::getPath(StringUtils::removeExtension(m_filename));
     m_ident                 = StringUtils::getBasename(m_root);
+    // If this is an addon track, add "addon_" to the identifier - just in
+    // case that an addon track has the same directory name (and therefore
+    // identifier) as an included track.
+    if(Addon::isAddon(filename))
+        m_ident = Addon::createAddonId(m_ident);
+
+    // The directory should always have a '/' at the end, but getBasename
+    // above returns "" if a "/" is at the end, so we add the "/" here.
+    m_root                 += "/";
     m_designer              = "";
     m_screenshot            = "";
     m_version               = 0;
     m_track_mesh            = NULL;
     m_gfx_effect_mesh       = NULL;
-    m_all_nodes.clear();
-    m_all_cached_meshes.clear();
+    m_internal              = false;
+    m_enable_auto_rescue    = true;  // Below set to false in arenas
+    m_enable_push_back      = true;
+    m_reverse_available     = false;
     m_is_arena              = false;
+    m_has_easter_eggs       = false;
+    m_is_soccer             = false;
+    m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
-    m_quad_graph            = NULL;
-    m_check_manager         = NULL;
     m_mini_map              = NULL;
     m_sky_particles         = NULL;
     m_sky_dx                = 0.05f;
     m_sky_dy                = 0.0f;
     m_weather_type          = WEATHER_NONE;
+    m_cache_track           = UserConfigParams::m_cache_overworld &&
+                              m_ident=="overworld";
+    m_minimap_x_scale       = 1.0f;
+    m_minimap_y_scale       = 1.0f;
+    m_all_nodes.clear();
+    m_all_cached_meshes.clear();
     loadTrackInfo();
 }   // Track
 
@@ -97,6 +129,9 @@ Track::Track(std::string filename)
 /** Destructor, removes quad data structures etc. */
 Track::~Track()
 {
+    // Note that the music information in m_music is globally managed
+    // by the music_manager, and is freed there. So no need to free it
+    // here (esp. since various track might share the same music).
 #ifdef DEBUG
     assert(m_magic_number == 0x17AC3802);
     m_magic_number = 0xDEADBEEF;
@@ -104,16 +139,24 @@ Track::~Track()
 }   // ~Track
 
 //-----------------------------------------------------------------------------
+/** Removes all cached data structures. This is called before the resolution
+ *  is changed.
+ */
+void Track::removeCachedData()
+{
+    m_materials_loaded = false;
+}   // cleanCachedData
+
+//-----------------------------------------------------------------------------
 /** Prepates the track for a new race. This function must be called after all
- *  karts are created, since the check objects allocate data structures 
+ *  karts are created, since the check objects allocate data structures
  *  depending on the number of karts.
  */
 void Track::reset()
 {
     m_ambient_color = m_default_ambient_color;
-    if(m_check_manager)
-        m_check_manager->reset(*this);
-    item_manager->reset();
+    CheckManager::get()->reset(*this);
+    ItemManager::get()->reset();
     m_track_object_manager->reset();
 }   // reset
 
@@ -121,18 +164,13 @@ void Track::reset()
 /** Removes the physical body from the world.
  *  Called at the end of a race.
  */
-
 void Track::cleanup()
 {
-    if(m_quad_graph)    
-    {
-        delete m_quad_graph;
-        m_quad_graph = NULL;
-    }
+    QuadGraph::destroy();
+    ItemManager::destroy();
 
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
-    
-    item_manager->cleanup();
+
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
         delete m_animated_textures[i];
@@ -144,14 +182,10 @@ void Track::cleanup()
         irr_driver->removeNode(m_all_nodes[i]);
     }
     m_all_nodes.clear();
-    
+
     m_all_emitters.clearAndDeleteAll();
-    
-    if(m_check_manager)
-    {
-        delete m_check_manager;
-        m_check_manager=NULL;
-    }
+
+    CheckManager::destroy();
 
     delete m_track_object_manager;
     m_track_object_manager = NULL;
@@ -169,15 +203,15 @@ void Track::cleanup()
     // means that the mesh is stored in irrlichts mesh cache. To clean
     // everything loaded by this track, we drop the ref count for each mesh
     // here, till the ref count is 1, which means the mesh is only contained
-    // in the mesh cache, and can therefore be removed. Meshes load more 
+    // in the mesh cache, and can therefore be removed. Meshes load more
     // than once are in m_all_cached_mesh more than once (which is easier
     // than storing the mesh only once, but then having to test for each
     // mesh if it is already contained in the list or not).
     for(unsigned int i=0; i<m_all_cached_meshes.size(); i++)
     {
         irr_driver->dropAllTextures(m_all_cached_meshes[i]);
-        // If a mesh is not in Irrlicht's texture cache, its refcount is 
-        // 1 (since its scene node was removed, so the only other reference 
+        // If a mesh is not in Irrlicht's texture cache, its refcount is
+        // 1 (since its scene node was removed, so the only other reference
         // is in m_all_cached_meshes). In this case we only drop it once
         // and don't try to remove it from the cache.
         if(m_all_cached_meshes[i]->getReferenceCount()==1)
@@ -191,9 +225,15 @@ void Track::cleanup()
     }
     m_all_cached_meshes.clear();
 
-    if(m_quad_graph)    delete m_quad_graph;
-    if(m_check_manager) delete m_check_manager;
-    if(m_mini_map)      
+    // Now free meshes that are not associated to any scene node.
+    for (unsigned int i=0; i<m_detached_cached_meshes.size(); i++)
+    {
+        irr_driver->dropAllTextures(m_detached_cached_meshes[i]);
+        irr_driver->removeMeshFromCache(m_detached_cached_meshes[i]);
+    }
+    m_detached_cached_meshes.clear();
+
+    if(m_mini_map)
     {
         assert(m_mini_map->getReferenceCount()==1);
         irr_driver->removeTexture(m_mini_map);
@@ -208,12 +248,18 @@ void Track::cleanup()
     }
     m_sky_textures.clear();
 
-    // remove temporary materials loaded by the material manager
-    material_manager->popTempMaterial();
+    if(m_cache_track)
+        material_manager->makeMaterialsPermanent();
+    else
+    {
+        // remove temporary materials loaded by the material manager
+        material_manager->popTempMaterial();
+    }
 
     if(UserConfigParams::logMemory())
     {
-        printf("[memory] After cleaning '%s': mesh cache %d texture cache %d\n",
+        Log::debug("track",
+              "[memory] After cleaning '%s': mesh cache %d texture cache %d\n",
                 getIdent().c_str(),
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
                 irr_driver->getVideoDriver()->getTextureCount());
@@ -229,7 +275,7 @@ void Track::cleanup()
                 m_old_mesh_buffers.erase(p);
             else
             {
-                printf("[memory] Leaked mesh buffer '%s'.\n", 
+                Log::debug("track", "[memory] Leaked mesh buffer '%s'.\n",
                        name.getInternalName().c_str());
             }   // if name not found
         }   // for i < cache size
@@ -247,7 +293,7 @@ void Track::cleanup()
             }
             else
             {
-                printf("[memory] Leaked texture '%s'.\n", 
+                Log::debug("track", "[memory] Leaked texture '%s'.\n",
                     t->getName().getInternalName().c_str());
             }
         }
@@ -255,12 +301,6 @@ void Track::cleanup()
     }   // if verbose
 
 }   // cleanup
-
-//-----------------------------------------------------------------------------
-const Vec3& Track::trackToSpatial(const int sector) const
-{
-    return m_quad_graph->getQuad(sector).getCenter();
-}   // trackToSpatial
 
 //-----------------------------------------------------------------------------
 void Track::loadTrackInfo()
@@ -271,14 +311,15 @@ void Track::loadTrackInfo()
     m_fog_start             = 0.0f;
     m_fog_end               = 1000.0f;
     m_gravity               = 9.80665f;
+    m_smooth_normals        = false;
                               /* ARGB */
     m_fog_color             = video::SColor(255, 77, 179, 230);
     m_default_ambient_color = video::SColor(255, 120, 120, 120);
     m_sun_specular_color    = video::SColor(255, 255, 255, 255);
-    m_sun_diffuse_color     = video::SColor(255, 255, 255, 255); 
+    m_sun_diffuse_color     = video::SColor(255, 255, 255, 255);
     m_sun_position          = core::vector3df(0, 0, 0);
     XMLNode *root           = file_manager->createXMLTree(m_filename);
-        
+
     if(!root || root->getName()!="track")
     {
         std::ostringstream o;
@@ -286,18 +327,35 @@ void Track::loadTrackInfo()
         throw std::runtime_error(o.str());
     }
     root->get("name",                  &m_name);
-    
-    //root->get("description",           &m_description);
-    root->get("designer",              &m_designer);
+
+    std::string designer;
+    root->get("designer",              &designer);
+    m_designer = StringUtils::decodeFromHtmlEntities(designer);
+
     root->get("version",               &m_version);
     std::vector<std::string> filenames;
     root->get("music",                 &filenames);
     getMusicInformation(filenames, m_music);
     root->get("screenshot",            &m_screenshot);
     root->get("gravity",               &m_gravity);
+    root->get("soccer",                &m_is_soccer);
     root->get("arena",                 &m_is_arena);
+    root->get("cutscene",              &m_is_cutscene);
     root->get("groups",                &m_groups);
-        
+    root->get("internal",              &m_internal);
+    root->get("reverse",               &m_reverse_available);
+    root->get("push-back",             &m_enable_push_back);
+
+    // Make the default for auto-rescue in battle mode and soccer mode to be false
+    if(m_is_arena || m_is_soccer)
+        m_enable_auto_rescue = false;
+    root->get("auto-rescue",           & m_enable_auto_rescue);
+    root->get("smooth-normals",        &m_smooth_normals);
+    // Reverse is meaningless in arena
+    if(m_is_arena || m_is_soccer)
+        m_reverse_available = false;
+
+
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *mode=root->getNode(i);
@@ -318,16 +376,21 @@ void Track::loadTrackInfo()
 
     if(m_groups.size()==0) m_groups.push_back(DEFAULT_GROUP_NAME);
     const XMLNode *xml_node = root->getNode("curves");
-    
+
     if(xml_node) loadCurves(*xml_node);
 
     // Set the correct paths
-    m_screenshot = m_root+"/"+m_screenshot;
+    m_screenshot = m_root+m_screenshot;
     delete root;
 
+    std::string dir = StringUtils::getPath(m_filename);
+    std::string easter_name = dir+"/easter_eggs.xml";
+    m_has_easter_eggs = file_manager->fileExists(easter_name);
 }   // loadTrackInfo
 
 //-----------------------------------------------------------------------------
+/** Loads all curves from the XML node.
+ */
 void Track::loadCurves(const XMLNode &node)
 {
     for(unsigned int i=0; i<node.getNumNodes(); i++)
@@ -338,96 +401,108 @@ void Track::loadCurves(const XMLNode &node)
 }   // loadCurves
 
 //-----------------------------------------------------------------------------
-void Track::getMusicInformation(std::vector<std::string>&       filenames, 
+/** Loads all music information for the specified files (which is taken from
+ *  the track.xml file).
+ *  \param filenames List of filenames to load.
+ *  \param music On return contains the music information object for the
+ *         specified files.
+ */
+void Track::getMusicInformation(std::vector<std::string>&       filenames,
                                 std::vector<MusicInformation*>& music    )
 {
     for(int i=0; i<(int)filenames.size(); i++)
     {
-        std::string full_path = m_root+"/"+filenames[i];
-        MusicInformation* mi;
-        try
-        {
-            mi = music_manager->getMusicInformation(full_path);
-        }
-        catch(std::runtime_error)
-        {
-            mi = NULL;
-        }
+        std::string full_path = m_root+filenames[i];
+        MusicInformation* mi = music_manager->getMusicInformation(full_path);
         if(!mi)
         {
             try
             {
                 std::string shared_name = file_manager->getMusicFile(filenames[i]);
                 if(shared_name!="")
-                {
-                    try
-                    {
-                        mi = music_manager->getMusicInformation(shared_name);
-                    }
-                    catch(std::runtime_error)
-                    {
-                        mi = NULL;
-                    }
-                }   // shared_name!=""
+                    mi = music_manager->getMusicInformation(shared_name);
             }
-            catch (std::exception& e)
+            catch (...)
             {
-                (void)e;
                 mi = NULL;
             }
-            
         }
-        if(!mi)
-        {
-            fprintf(stderr, "Music information file '%s' not found - ignored.\n",
-                    filenames[i].c_str());
-            continue;
-        }
-        m_music.push_back(mi);
+        if(mi)
+            m_music.push_back(mi);
+        else
+            Log::warn("track",
+                      "Music information file '%s' not found - ignored.\n",
+                      filenames[i].c_str());
+
     }   // for i in filenames
+
 }   // getMusicInformation
 
 //-----------------------------------------------------------------------------
-void Track::startMusic() const 
+/** Select and set the music for this track (doesn't actually start it yet).
+ */
+void Track::startMusic() const
 {
     // In case that the music wasn't found (a warning was already printed)
     if(m_music.size()>0)
         music_manager->startMusic(m_music[rand()% m_music.size()], false);
+    else
+        music_manager->clearCurrentMusic();
 }   // startMusic
 
 //-----------------------------------------------------------------------------
 /** Loads the quad graph, i.e. the definition of all quads, and the way
  *  they are connected to each other.
  */
-void Track::loadQuadGraph(unsigned int mode_id)
+void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
 {
-    m_quad_graph = new QuadGraph(m_root+"/"+m_all_modes[mode_id].m_quad_name,
-                                 m_root+"/"+m_all_modes[mode_id].m_graph_name);
+    QuadGraph::create(m_root+m_all_modes[mode_id].m_quad_name,
+                      m_root+m_all_modes[mode_id].m_graph_name,
+                      reverse);
+
+    QuadGraph::get()->setupPaths();
 #ifdef DEBUG
-    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+    for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
     {
-        assert(m_quad_graph->getNode(i).getPredecessor()!=-1);
+        assert(QuadGraph::get()->getNode(i).getPredecessor(0)!=-1);
     }
 #endif
 
-    if(m_quad_graph->getNumNodes()==0)
+    if(QuadGraph::get()->getNumNodes()==0)
     {
-        fprintf(stderr, "[Track] WARNING: No graph nodes defined for track '%s'\n",
+        Log::warn("track", "No graph nodes defined for track '%s'\n",
                 m_filename.c_str());
         if (race_manager->getNumberOfKarts() > 1)
         {
-            fprintf(stderr, "[Track] FATAL: I can handle the lack of driveline in single kart mode, but not with AIs\n");
-            exit(-1);
+            Log::fatal("track", "I can handle the lack of driveline in single"
+                "kart mode, but not with AIs\n");
         }
     }
     else
     {
-        m_mini_map   = m_quad_graph->makeMiniMap(World::getWorld()->getRaceGUI()->getMiniMapSize(), 
-                                                 "minimap::"+m_ident);
+        //Check whether the hardware can do nonsquare or
+        // non power-of-two textures
+        video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
+        bool nonpower = false; //video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
+        bool nonsquare =
+            video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
 
+        //Create the minimap resizing it as necessary.
+        m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
+        core::dimension2du size = m_mini_map_size
+                                 .getOptimalSize(!nonpower,!nonsquare);
+        m_mini_map = QuadGraph::get()->makeMiniMap(size, "minimap::"+m_ident);
+        m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_mini_map->getSize().Width);
+        m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_mini_map->getSize().Height);
     }
 }   // loadQuadGraph
-
+// -----------------------------------------------------------------------------
+void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
+{
+    QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at);
+    draw_at->setX(draw_at->getX() * m_minimap_x_scale);
+    draw_at->setY(draw_at->getY() * m_minimap_y_scale);
+}
 // -----------------------------------------------------------------------------
 /** Convert the track tree into its physics equivalents.
  *  \param main_track_count The number of meshes that are already converted
@@ -446,11 +521,13 @@ void Track::createPhysicsModel(unsigned int main_track_count)
 
     if (m_track_mesh == NULL)
     {
-        fprintf(stderr, "ERROR: m_track_mesh == NULL, cannot createPhysicsModel\n");
+        Log::error("track",
+                   "m_track_mesh == NULL, cannot createPhysicsModel\n");
         return;
     }
 
-    m_track_mesh->removeBody();
+    m_track_mesh->removeAll();
+    m_gfx_effect_mesh->removeAll();
     for(unsigned int i=main_track_count; i<m_all_nodes.size(); i++)
     {
         convertTrackToBullet(m_all_nodes[i]);
@@ -466,14 +543,23 @@ void Track::createPhysicsModel(unsigned int main_track_count)
  */
 void Track::convertTrackToBullet(scene::ISceneNode *node)
 {
+    const core::vector3df &hpr = node->getRotation();
+    const core::vector3df &scale = node->getScale();
+
     if (node->getType() == scene::ESNT_LOD_NODE)
     {
         node = ((LODNode*)node)->getFirstNode();
+        if (node == NULL)
+        {
+            Log::warn("track",
+                      "This track contains an empty LOD group.");
+            return;
+        }
     }
-    
-    const core::vector3df &pos   = node->getPosition();
-    const core::vector3df &hpr   = node->getRotation();
-    const core::vector3df &scale = node->getScale();
+    node->updateAbsolutePosition();
+
+    const core::vector3df &pos   = node->getAbsolutePosition();
+
 
     scene::IMesh *mesh;
     // In case of readonly materials we have to get the material from
@@ -481,29 +567,35 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     // water nodes, which only have the material defined in the node,
     // but not in the mesh at all!
     bool is_readonly_material=false;
-    
-    
+
+
     switch(node->getType())
     {
         case scene::ESNT_MESH          :
         case scene::ESNT_WATER_SURFACE :
-        case scene::ESNT_OCTREE        : 
+        case scene::ESNT_OCTREE        :
              mesh = ((scene::IMeshSceneNode*)node)->getMesh();
-             is_readonly_material = 
+             is_readonly_material =
                  ((scene::IMeshSceneNode*)node)->isReadOnlyMaterials();
              break;
         case scene::ESNT_ANIMATED_MESH :
              mesh = ((scene::IAnimatedMeshSceneNode*)node)->getMesh();
-             is_readonly_material = 
+             is_readonly_material =
                  ((scene::IAnimatedMeshSceneNode*)node)->isReadOnlyMaterials();
              break;
         case scene::ESNT_SKY_BOX :
         case scene::ESNT_SKY_DOME:
-            // Don't add sky box/dome to the physics model.
+        case scene::ESNT_PARTICLE_SYSTEM :
+        case scene::ESNT_TEXT:
+            // These are non-physical
             return;
             break;
         default:
-            printf("Unknown scene node type.\n");
+            int type_as_int = node->getType();
+            char* type = (char*)&type_as_int;
+            Log::debug("track",
+                "[convertTrackToBullet] Unknown scene node type : %c%c%c%c.\n",
+                   type[0], type[1], type[2], type[3]);
             return;
     }   // switch node->getType()
 
@@ -519,19 +611,21 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         // FIXME: take translation/rotation into account
-        if(mb->getVertexType()!=video::EVT_STANDARD)
+        if (mb->getVertexType() != video::EVT_STANDARD &&
+            mb->getVertexType() != video::EVT_2TCOORDS &&
+            mb->getVertexType() != video::EVT_TANGENTS)
         {
-            fprintf(stderr, "WARNING: Physics::convertTrack: Ignoring type '%d'!", 
+            Log::warn("track", "convertTrackToBullet: Ignoring type '%d'!\n",
                 mb->getVertexType());
             continue;
         }
 
-        // Handle readonly materials correctly: mb->getMaterial can return 
+        // Handle readonly materials correctly: mb->getMaterial can return
         // NULL if the node is not using readonly materials. E.g. in case
         // of a water scene node, the mesh (which is the animated copy of
         // the original mesh) does not contain any material information,
         // the material is only available in the node.
-        const video::SMaterial &irrMaterial = 
+        const video::SMaterial &irrMaterial =
             is_readonly_material ? mb->getMaterial()
                                  : node->getMaterial(i);
         video::ITexture* t=irrMaterial.getTexture(0);
@@ -541,7 +635,12 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         if(t)
         {
             std::string image = std::string(core::stringc(t->getName()).c_str());
-            material=material_manager->getMaterial(StringUtils::getBasename(image));
+
+            // the third boolean argument is false because at this point we're
+            // dealing physics, so it's useless to warn about missing textures,
+            // we'd just get duplicate/useless warnings
+            material=material_manager->getMaterial(StringUtils::getBasename(image),
+                                                   false, false, false);
             // Special gfx meshes will not be stored as a normal physics body,
             // but converted to a collision body only, so that ray tests
             // against them can be done.
@@ -550,39 +649,77 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
             // A material which is a surface must be converted,
             // even if it's marked as ignore. So only ignore
             // non-surface materials.
-            else if(material->isIgnore()) 
+            else if(material->isIgnore())
                 continue;
-        } 
+        }
 
         u16 *mbIndices = mb->getIndices();
         Vec3 vertices[3];
         Vec3 normals[3];
-        irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
-        for(unsigned int j=0; j<mb->getIndexCount(); j+=3) {
-            for(unsigned int k=0; k<3; k++) {
-                int indx=mbIndices[j+k];
-                core::vector3df v = mbVertices[indx].Pos;
-                mat.transformVect(v);
-                vertices[k]=v;
-                normals[k]=mbVertices[indx].Normal;
-            }   // for k
-            if(tmesh) tmesh->addTriangle(vertices[0], vertices[1], 
-                                         vertices[2], normals[0],
-                                         normals[1],  normals[2],
-                                         material                 );
-        }   // for j
+
+        if (mb->getVertexType() == video::EVT_STANDARD)
+        {
+            irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
+            for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
+            {
+                for(unsigned int k=0; k<3; k++)
+                {
+                    int indx=mbIndices[j+k];
+                    core::vector3df v = mbVertices[indx].Pos;
+                    mat.transformVect(v);
+                    vertices[k]=v;
+                    normals[k]=mbVertices[indx].Normal;
+                }   // for k
+                if(tmesh) tmesh->addTriangle(vertices[0], vertices[1],
+                                             vertices[2], normals[0],
+                                             normals[1],  normals[2],
+                                             material                 );
+            }   // for j
+        }
+        else if (mb->getVertexType() == video::EVT_2TCOORDS)
+        {
+            irr::video::S3DVertex2TCoords* mbVertices = (video::S3DVertex2TCoords*)mb->getVertices();
+            for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
+            {
+                for(unsigned int k=0; k<3; k++)
+                {
+                    int indx=mbIndices[j+k];
+                    core::vector3df v = mbVertices[indx].Pos;
+                    mat.transformVect(v);
+                    vertices[k]=v;
+                    normals[k]=mbVertices[indx].Normal;
+                }   // for k
+                if(tmesh) tmesh->addTriangle(vertices[0], vertices[1],
+                                             vertices[2], normals[0],
+                                             normals[1],  normals[2],
+                                             material                 );
+            }   // for j
+        }
+        else if (mb->getVertexType() == video::EVT_TANGENTS)
+        {
+            irr::video::S3DVertexTangents* mbVertices = (video::S3DVertexTangents*)mb->getVertices();
+            for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
+            {
+                for(unsigned int k=0; k<3; k++)
+                {
+                    int indx=mbIndices[j+k];
+                    core::vector3df v = mbVertices[indx].Pos;
+                    mat.transformVect(v);
+                    vertices[k]=v;
+                    normals[k]=mbVertices[indx].Normal;
+                }   // for k
+                if(tmesh) tmesh->addTriangle(vertices[0], vertices[1],
+                                             vertices[2], normals[0],
+                                             normals[1],  normals[2],
+                                             material                 );
+            }   // for j
+        }
+
     }   // for i<getMeshBufferCount
 
 }   // convertTrackToBullet
 
 // ----------------------------------------------------------------------------
-
-
-bool PairCompare(const std::pair<int, std::string>& i, const std::pair<int, std::string>& j)
-{
-    return (i.first < j.first);
-}
-
 /** Loads the main track model (i.e. all other objects contained in the
  *  scene might use raycast on this track model to determine the actual
  *  height of the terrain.
@@ -591,18 +728,23 @@ bool Track::loadMainTrack(const XMLNode &root)
 {
     assert(m_track_mesh==NULL);
     assert(m_gfx_effect_mesh==NULL);
+
+    m_challenges.clear();
+    m_force_fields.clear();
+
     m_track_mesh      = new TriangleMesh();
     m_gfx_effect_mesh = new TriangleMesh();
+
     const XMLNode *track_node= root.getNode("track");
     std::string model_name;
     track_node->get("model", &model_name);
-    std::string full_path = m_root+"/"+model_name;
+    std::string full_path = m_root+model_name;
     scene::IMesh *mesh = irr_driver->getMesh(full_path);
     if(!mesh)
     {
-        fprintf(stderr, "Warning: Main track model '%s' in '%s' not found, aborting.\n",
-                track_node->getName().c_str(), model_name.c_str());
-        exit(-1);
+        Log::fatal("track",
+                   "Main track model '%s' in '%s' not found, aborting.\n",
+                   track_node->getName().c_str(), model_name.c_str());
     }
 
     // The mesh as returned does not have all mesh buffers with the same
@@ -617,12 +759,14 @@ bool Track::loadMainTrack(const XMLNode &root)
     merged_mesh->addMesh(mesh);
     merged_mesh->finalize();
 
+    adjustForFog(merged_mesh, NULL);
+
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
     //scene::ISceneNode *scene_node = irr_driver->addMesh(merged_mesh);
     scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
     // We should drop the merged mesh (since it's now referred to in the
-    // scene node), but then we need to grab it since it's in the 
+    // scene node), but then we need to grab it since it's in the
     // m_all_cached_meshes.
     m_all_cached_meshes.push_back(merged_mesh);
     irr_driver->grabAllTextures(merged_mesh);
@@ -647,11 +791,17 @@ bool Track::loadMainTrack(const XMLNode &root)
     m_all_nodes.push_back(scene_node);
 
     MeshTools::minMax3D(merged_mesh, &m_aabb_min, &m_aabb_max);
+    // Increase the maximum height of the track: since items that fly
+    // too high explode, e.g. cakes can not be show when being at the
+    // top of the track (since they will explode when leaving the AABB
+    // of the track). While the test for this in Flyable::updateAndDelete
+    // could be relaxed to fix this, it is not certain how the physics
+    // will handle items that are out of the AABB
+    m_aabb_max.setY(m_aabb_max.getY()+30.0f);
     World::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
 
-    std::map< std::string, std::map< int, std::string > > lod_groups;
-    std::map< std::string, std::vector< const XMLNode* > > lod_instances;
-    
+    LodNodeLoader lodLoader;
+
     for(unsigned int i=0; i<track_node->getNumNodes(); i++)
     {
         const XMLNode *n=track_node->getNode(i);
@@ -660,105 +810,213 @@ bool Track::loadMainTrack(const XMLNode &root)
         // Only "object" entries are allowed now inside of the model tag
         if(n->getName()!="static-object")
         {
-            fprintf(stderr, "Incorrect tag '%s' inside <model> of scene file - ignored\n",
+            Log::error("track",
+                "Incorrect tag '%s' inside <model> of scene file - ignored\n",
                     n->getName().c_str());
             continue;
         }
-        
-        bool tangent = false;
-        n->get("tangents", &tangent);
-        
-        scene::ISceneNode* scene_node;
-        model_name="";
-        n->get("model", &model_name);
-        full_path = m_root+"/"+model_name;
-        
+
+
         core::vector3df xyz(0,0,0);
         n->get("xyz", &xyz);
         core::vector3df hpr(0,0,0);
         n->get("hpr", &hpr);
         core::vector3df scale(1.0f, 1.0f, 1.0f);
         n->get("scale", &scale);
-        
-        std::string lodgroup;
-        int detail = -1;
-        bool is_instance = false;
-        
-        size_t loc = model_name.find("_LOD");
-        if (loc != std::string::npos)
-        {
-            lodgroup = model_name.substr(0, loc);
-            
-            std::string detail_str = StringUtils::removeExtension(model_name.substr(loc+4));
-            
-            if (detail_str == "x")
-            {
-                is_instance = true;
-            }
-            else if (!StringUtils::parseString(detail_str, &detail))
-            {
-                lodgroup = "";
-                fprintf(stderr, "WARNING : invalid level-of-detail model name '%s'\n", model_name.c_str());
-            }
-            // else printf("'%s' has lod group '%s' and detail '%i'\n", model_name.c_str(), lodgroup.c_str(), detail);
-        }
-        
 
-        
+        // some static meshes are conditional
+        std::string condition;
+        n->get("if", &condition);
+        if (condition == "splatting")
+        {
+            if (!irr_driver->supportsSplatting()) continue;
+        }
+        else if (condition == "trophies")
+        {
+            // Associate force fields and challenges
+            // FIXME: this assumes that challenges will appear before force fields in scene.xml
+            //        (which however seems to be the case atm)
+            int closest_challenge_id = -1;
+            float closest_distance = 99999.0f;
+            for (unsigned int c=0; c<m_challenges.size(); c++)
+            {
+
+                float dist = xyz.getDistanceFromSQ(m_challenges[c].m_position);
+                if (closest_challenge_id == -1 || dist < closest_distance)
+                {
+                    closest_challenge_id = c;
+                    closest_distance = dist;
+                }
+            }
+
+            assert(closest_challenge_id >= 0);
+            assert(closest_challenge_id < (int)m_challenges.size());
+
+            const std::string &s = m_challenges[closest_challenge_id].m_challenge_id;
+            const ChallengeData* challenge = unlock_manager->getChallenge(s);
+            if (challenge == NULL)
+            {
+                if (s != "tutorial")
+                    Log::error("track", "Cannot find challenge named '%s'\n",
+                        m_challenges[closest_challenge_id].m_challenge_id.c_str());
+                continue;
+            }
+
+            const int val = challenge->getNumTrophies();
+            bool shown = (unlock_manager->getCurrentSlot()->getPoints() < val);
+            m_force_fields.push_back(OverworldForceField(xyz, shown, val));
+
+            m_challenges[closest_challenge_id].setForceField(
+                                 m_force_fields[m_force_fields.size() - 1]);
+
+            core::stringw msg = StringUtils::toWString(val);
+            core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()
+                                                   ->getDimension(msg.c_str());
+            scene::ISceneManager* sm = irr_driver->getSceneManager();
+
+            assert(GUIEngine::getHighresDigitFont() != NULL);
+
+            scene::ISceneNode* sn =
+                sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
+                                              msg.c_str(),
+                                              NULL,
+                                              core::dimension2df(textsize.Width/45.0f,
+                                                                 textsize.Height/45.0f),
+                                              xyz,
+                                              -1 /* id */,
+                                              video::SColor(255, 255, 225, 0),
+                                              video::SColor(255, 255, 89, 0));
+            m_all_nodes.push_back(sn);
+            if (!shown) continue;
+        }
+        else if (condition == "allchallenges")
+        {
+            unsigned int unlocked_challenges = 0;
+            GameSlot* slot = unlock_manager->getCurrentSlot();
+            for (unsigned int c=0; c<m_challenges.size(); c++)
+            {
+                if (m_challenges[c].m_challenge_id == "tutorial")
+                {
+                    unlocked_challenges++;
+                    continue;
+                }
+                if (slot->getChallenge(m_challenges[c].m_challenge_id)
+                        ->isSolvedAtAnyDifficulty())
+                {
+                    unlocked_challenges++;
+                }
+            }
+
+            // allow ONE unsolved challenge : the last one
+            if (unlocked_challenges < m_challenges.size() - 1) continue;
+        }
+        else if (condition.size() > 0)
+        {
+            Log::error("track", "Unknown condition <%s>\n", condition.c_str());
+        }
+
+        std::string neg_condition;
+        n->get("ifnot", &neg_condition);
+        if (neg_condition == "splatting")
+        {
+            if (irr_driver->supportsSplatting()) continue;
+        }
+        else if (neg_condition == "allchallenges")
+        {
+            unsigned int unlocked_challenges = 0;
+            GameSlot* slot = unlock_manager->getCurrentSlot();
+            for (unsigned int c=0; c<m_challenges.size(); c++)
+            {
+                if (m_challenges[c].m_challenge_id == "tutorial")
+                {
+                    unlocked_challenges++;
+                    continue;
+                }
+                if (slot->getChallenge(m_challenges[c].m_challenge_id)
+                        ->isSolvedAtAnyDifficulty())
+                {
+                    unlocked_challenges++;
+                }
+            }
+
+            // allow ONE unsolved challenge : the last one
+            if (unlocked_challenges >= m_challenges.size() - 1) continue;
+        }
+        else if (neg_condition.size() > 0)
+        {
+            Log::error("track", "Unknown condition <%s>\n",
+                       neg_condition.c_str());
+        }
+
+        bool tangent = false;
+        n->get("tangents", &tangent);
+
+        scene::ISceneNode* scene_node;
+        model_name="";
+        n->get("model", &model_name);
+        full_path = m_root+model_name;
+
+        // a special challenge orb object for overworld
+        std::string challenge;
+        n->get("challenge", &challenge);
+
+        bool is_lod = lodLoader.check(n);
+
         if (tangent)
         {
             scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
-            
+
             scene::IMesh* original_mesh = irr_driver->getMesh(full_path);
-            
+
+            if (std::find(m_detached_cached_meshes.begin(),
+                          m_detached_cached_meshes.end(),
+                          original_mesh) == m_detached_cached_meshes.end())
+            {
+                m_detached_cached_meshes.push_back(original_mesh);
+            }
+
             // create a node out of this mesh just for bullet; delete it after, normal maps are special
             // and require tangent meshes
             scene_node = irr_driver->addMesh(original_mesh);
-            
+
             scene_node->setPosition(xyz);
             scene_node->setRotation(hpr);
             scene_node->setScale(scale);
 
             convertTrackToBullet(scene_node);
             scene_node->remove();
-            
+            irr_driver->grabAllTextures(original_mesh);
+
             scene::IMesh* mesh = manip->createMeshWithTangents(original_mesh);
             mesh->grab();
             irr_driver->grabAllTextures(mesh);
+
             m_all_cached_meshes.push_back(mesh);
             scene_node = irr_driver->addMesh(mesh);
             scene_node->setPosition(xyz);
             scene_node->setRotation(hpr);
             scene_node->setScale(scale);
-            
+
 #ifdef DEBUG
             std::string debug_name = model_name+" (tangent static track-object)";
             scene_node->setName(debug_name.c_str());
 #endif
-            
+
             handleAnimatedTextures(scene_node, *n);
             m_all_nodes.push_back( scene_node );
         }
-        else if (!lodgroup.empty())
+        else if (is_lod)
         {
-            if (is_instance)
-            {
-                lod_instances[lodgroup].push_back(n);
-                //printf("LOD instance : '%s' @ (%.2f, %.2f, %.2f)\n", lodgroup.c_str(), xyz.X, xyz.Y, xyz.Z);
-            }
-            else
-            {
-                lod_groups[lodgroup][detail] = model_name;
-                //printf("LOD Model Definition : group='%s', detail='%i', model='%s'\n", lodgroup.c_str(), detail, model_name.c_str());
-            }
+            // nothing to do
         }
         else
         {
-            scene::IAnimatedMesh *a_mesh = irr_driver->getAnimatedMesh(full_path);
+            // TODO: check if mesh is animated or not
+            scene::IMesh *a_mesh = irr_driver->getMesh(full_path);
             if(!a_mesh)
             {
-                fprintf(stderr, "Warning: object model '%s' not found, ignored.\n",
-                        full_path.c_str());
+                Log::error("track", "Object model '%s' not found, ignored.\n",
+                           full_path.c_str());
                 continue;
             }
 
@@ -773,117 +1031,108 @@ bool Track::loadMainTrack(const XMLNode &root)
             m_all_cached_meshes.push_back(a_mesh);
             irr_driver->grabAllTextures(a_mesh);
             a_mesh->grab();
-            scene_node = irr_driver->addAnimatedMesh(a_mesh);
+            scene_node = irr_driver->addMesh(a_mesh);
             scene_node->setPosition(xyz);
             scene_node->setRotation(hpr);
             scene_node->setScale(scale);
-            
+
 #ifdef DEBUG
             std::string debug_name = model_name+" (static track-object)";
             scene_node->setName(debug_name.c_str());
 #endif
-            
+
             handleAnimatedTextures(scene_node, *n);
-            m_all_nodes.push_back( scene_node );
+
+            // for challenge orbs, a bit more work to do
+            if (challenge.size() > 0)
+            {
+                const ChallengeData* c = NULL;
+
+                if (challenge != "tutorial")
+                {
+                    c = unlock_manager->getChallenge(challenge);
+                    if (c == NULL)
+                    {
+                        Log::error("track", "Cannot find challenge named <%s>\n",
+                                   challenge.c_str());
+                        scene_node->remove();
+                        continue;
+                    }
+                }
+
+                m_challenges.push_back( OverworldChallenge(xyz, challenge) );
+
+                if (c && c->isGrandPrix())
+                {
+
+                }
+                else
+                {
+                    if (challenge != "tutorial")
+                    {
+                        Track* t = track_manager->getTrack(c->getTrackId());
+                        if (t == NULL)
+                        {
+                            Log::error("track", "Cannot find track named <%s>\n",
+                                       c->getTrackId().c_str());
+                            continue;
+                        }
+
+                        std::string sshot = t->getScreenshotFile();
+                        video::ITexture* screenshot = irr_driver->getTexture(sshot);
+
+                        if (screenshot == NULL)
+                        {
+                            Log::error("track",
+                                       "Cannot find track screenshot <%s>",
+                                       sshot.c_str());
+                            continue;
+                        }
+                        scene_node->getMaterial(0).setTexture(0, screenshot);
+                    }
+                }
+
+                // make transparent
+                for (unsigned int m=0; m<a_mesh->getMeshBufferCount(); m++)
+                {
+                    scene::IMeshBuffer* mb = a_mesh->getMeshBuffer(m);
+                    if (mb->getVertexType() == video::EVT_STANDARD)
+                    {
+                        video::S3DVertex* v = (video::S3DVertex*)mb->getVertices();
+                        for (unsigned int n=0; n<mb->getVertexCount(); n++)
+                        {
+                            v[n].Color.setAlpha(125);
+                        }
+                    }
+                }
+
+
+                LODNode* lod_node = new LODNode("challenge_orb",
+                                                irr_driver->getSceneManager()->getRootSceneNode(),
+                                                irr_driver->getSceneManager());
+                lod_node->setPosition(xyz);
+                lod_node->add(50, scene_node, true /* reparent */);
+
+                m_all_nodes.push_back( lod_node );
+            }
+            else
+            {
+                m_all_nodes.push_back( scene_node );
+            }
         }
 
     }   // for i
 
-    scene::ISceneManager* sm = irr_driver->getSceneManager();
-    scene::ISceneNode* sroot = sm->getRootSceneNode();
-    
-    // ================ Level Of Detail ================
-    // Creating LOD nodes is more complicated than one might have hoped, on the C++ side;
-    // but it was done this way to minimize the work needed on the side of the artists
-    
-    // 1. Sort LOD groups (highest detail first, lowest detail last)
-    std::map<std::string, std::vector< std::pair<int, std::string> > > sorted_lod_groups;
-    
-    std::map<std::string, std::map<int, std::string> >::iterator it;
-    for (it = lod_groups.begin(); it != lod_groups.end(); it++)
+    // Create LOD nodes
+    std::vector<LODNode*> lod_nodes;
+    lodLoader.done(this, m_root, m_all_cached_meshes, lod_nodes);
+    for (unsigned int n=0; n<lod_nodes.size(); n++)
     {
-        std::map<int, std::string>::iterator it2;
-        for (it2 = it->second.begin(); it2 != it->second.end(); it2++)
-        {
-            //printf("Copying before sort : (%i) %s is in group %s\n", it2->first, it2->second.c_str(), it->first.c_str());
-            sorted_lod_groups[it->first].push_back( std::pair<int, std::string>(it2->first, it2->second) );
-        }
-        std::sort( sorted_lod_groups[it->first].begin(), sorted_lod_groups[it->first].end(), PairCompare );
-        
-        //printf("Group '%s' :\n", it->first.c_str());
-        //for (unsigned int x=0; x<sorted_lod_groups[it->first].size(); x++)
-        //{
-        //    printf("  - (%i) %s\n", sorted_lod_groups[it->first][x].first, sorted_lod_groups[it->first][x].second.c_str());
-        //}
+        // FIXME: support for animated textures on LOD objects
+        // handleAnimatedTextures( lod_nodes[n], *node );
+        m_all_nodes.push_back( lod_nodes[n] );
     }
-    
-    // 2. Read the XML nodes and instanciate LOD scene nodes where relevant
-    std::map< std::string, std::vector< const XMLNode* > >::iterator it3;
-    for (it3 = lod_instances.begin(); it3 != lod_instances.end(); it3++)
-    {
-        std::vector< std::pair<int, std::string> >& group = sorted_lod_groups[it3->first];
-        
-        std::vector< const XMLNode* >& v = it3->second;
-        for (unsigned int n=0; n<v.size(); n++)
-        {
-            const XMLNode* node = v[n];
-            
-            if(node->getName()!="static-object")
-            {
-                fprintf(stderr, "Incorrect tag '%s' used in LOD instance - ignored\n",
-                        node->getName().c_str());
-                continue;
-            }
 
-            model_name = "";
-            node->get("model", &model_name);
-            //if (model_name != sorted_lod_groups[it3->first][0].second) continue;
-                
-            core::vector3df xyz(0,0,0);
-            node->get("xyz", &xyz);
-            core::vector3df hpr(0,0,0);
-            node->get("hpr", &hpr);
-            core::vector3df scale(1.0f, 1.0f, 1.0f);
-            node->get("scale", &scale);
-            
-            LODNode* lod_node = new LODNode(sroot, sm);
-            for (unsigned int m=0; m<group.size(); m++)
-            {
-                full_path = m_root + "/" + group[m].second;
-                
-                // TODO: check whether the mesh contains animations or not, and use a static
-                //       mesh when there are no animations?
-                scene::IAnimatedMesh *a_mesh = irr_driver->getAnimatedMesh(full_path);
-                if(!a_mesh)
-                {
-                    fprintf(stderr, "Warning: object model '%s' not found, ignored.\n",
-                            full_path.c_str());
-                    continue;
-                }
-                a_mesh->grab();  // see above for usage in m_all_cached_meshes
-                m_all_cached_meshes.push_back(a_mesh);
-                irr_driver->grabAllTextures(a_mesh);
-                scene::IAnimatedMeshSceneNode* scene_node = 
-                    irr_driver->addAnimatedMesh(a_mesh);
-                scene_node->setPosition(xyz);
-                scene_node->setRotation(hpr);
-                scene_node->setScale(scale);
-                
-                lod_node->add( group[m].first, scene_node, true );
-                
-            }
-            
-#ifdef DEBUG
-            std::string debug_name = model_name+" (LOD track-object)";
-            lod_node->setName(debug_name.c_str());
-#endif
-            
-            handleAnimatedTextures(lod_node, *node);
-            m_all_nodes.push_back( lod_node );
-        }
-    }
-    // =================================================
-    
     // This will (at this stage) only convert the main track model.
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
@@ -891,11 +1140,9 @@ bool Track::loadMainTrack(const XMLNode &root)
     }
     if (m_track_mesh == NULL)
     {
-        fprintf(stderr, "ERROR: m_track_mesh == NULL, cannot loadMainTrack\n");
-        exit(-1);
+        Log::fatal("track", "m_track_mesh == NULL, cannot loadMainTrack\n");
     }
-    
-    m_track_mesh->createPhysicalBody();
+
     m_gfx_effect_mesh->createCollisionShape();
     scene_node->setMaterialFlag(video::EMF_LIGHTING, true);
     scene_node->setMaterialFlag(video::EMF_GOURAUD_SHADING, true);
@@ -910,18 +1157,18 @@ bool Track::loadMainTrack(const XMLNode &root)
  */
 void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
 {
-    for(unsigned int node_number = 0; node_number<xml.getNumNodes(); 
+    for(unsigned int node_number = 0; node_number<xml.getNumNodes();
         node_number++)
     {
         const XMLNode *texture_node = xml.getNode(node_number);
         if(texture_node->getName()!="animated-texture") continue;
         std::string name;
         texture_node->get("name", &name);
-        if(name=="") 
+        if(name=="")
         {
-            fprintf(stderr, 
-                    "Animated texture: no texture name specified for track '%s'\n",
-                    m_ident.c_str());
+            Log::error("track",
+                "Animated texture: no texture name specified for track '%s'\n",
+                 m_ident.c_str());
             continue;
         }
 
@@ -932,7 +1179,7 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
             {
                 video::ITexture* t=irrMaterial.getTexture(j);
                 if(!t) continue;
-                const std::string texture_name = 
+                const std::string texture_name =
                     StringUtils::getBasename(core::stringc(t->getName()).c_str());
                 if(texture_name!=name) continue;
                 core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
@@ -954,9 +1201,8 @@ void Track::update(float dt)
     {
         m_animated_textures[i]->update(dt);
     }
-    if(m_check_manager)
-        m_check_manager->update(dt);
-    item_manager->update(dt);
+    CheckManager::get()->update(dt);
+    ItemManager::get()->update(dt);
 
 }   // update
 
@@ -966,10 +1212,12 @@ void Track::update(float dt)
  *  \param pos  Position of the explosion.
  *  \param obj  If the hit was a physical object, this object will be affected
  *              more. Otherwise this is NULL.
- */
-void Track::handleExplosion(const Vec3 &pos, const PhysicalObject *obj) const
+ *  \param secondary_hits True if items that are not directly hit should
+ *         also be affected. */
+void Track::handleExplosion(const Vec3 &pos, const PhysicalObject *obj,
+                            bool secondary_hits) const
 {
-    m_track_object_manager->handleExplosion(pos, obj);
+    m_track_object_manager->handleExplosion(pos, obj, secondary_hits);
 }   // handleExplosion
 
 // ----------------------------------------------------------------------------
@@ -980,37 +1228,60 @@ void Track::createWater(const XMLNode &node)
 {
     std::string model_name;
     node.get("model", &model_name);
-    std::string full_path = m_root+"/"+model_name;
+    std::string full_path = m_root+model_name;
 
     scene::IMesh *mesh = irr_driver->getMesh(full_path);
+    if (mesh == NULL) return;
 
     float wave_height  = 2.0f;
     float wave_speed   = 300.0f;
     float wave_length  = 10.0f;
     node.get("height", &wave_height);
-    node.get("speed",  &wave_speed);
+    float time;
+    if(node.get("time", &time))
+    {
+        wave_speed = time * 1000.0f/(2.0f*M_PI);
+    }
+    else
+        node.get("speed",  &wave_speed);
+    if(wave_speed==0)
+    {
+        // A speed of 0 results in a division by zero, so avoid this.
+        // The actual time for a wave from one maximum to the next is
+        // given by 2*M_PI*speed/1000.
+        Log::warn("Track", 
+                  "Wave-speed or time is 0, resetting it to the default.");
+        wave_speed =300.0f;
+    }
     node.get("length", &wave_length);
     scene::ISceneNode* scene_node = NULL;
-    
+
     if (UserConfigParams::m_graphical_effects)
     {
         scene_node = irr_driver->addWaterNode(mesh,
-                                              wave_height, 
+                                              wave_height,
                                               wave_speed,
                                               wave_length);
+
+        // 'addWaterNode' welds the mesh so keep both the original and the welded copy
+        mesh->grab();
+        irr_driver->grabAllTextures(mesh);
+        m_all_cached_meshes.push_back(mesh);
+
+        mesh = ((scene::IMeshSceneNode*)scene_node)->getMesh();
     }
     else
     {
         scene_node = irr_driver->addMesh(mesh);
     }
-    
+
     if(!mesh || !scene_node)
     {
-        fprintf(stderr, "Warning: Water model '%s' in '%s' not found, ignored.\n",
-                node.getName().c_str(), model_name.c_str());
+        Log::error("track", "Water model '%s' in '%s' not found, ignored.\n",
+                    node.getName().c_str(), model_name.c_str());
         return;
     }
-    
+
 #ifdef DEBUG
     std::string debug_name = model_name+"(water node)";
     scene_node->setName(debug_name.c_str());
@@ -1027,28 +1298,38 @@ void Track::createWater(const XMLNode &node)
     scene_node->setRotation(hpr);
     m_all_nodes.push_back(scene_node);
     handleAnimatedTextures(scene_node, node);
+
+    scene_node->getMaterial(0).setFlag(video::EMF_GOURAUD_SHADING, true);
 }   // createWater
 
 // ----------------------------------------------------------------------------
-/** This function load the actual scene, i.e. all parts of the track, 
- *  animations, items, ... It  is called from world during initialisation. 
- *  Track is the first model to be loaded, so at this stage the root scene node 
- * is empty.
+/** This function load the actual scene, i.e. all parts of the track,
+ *  animations, items, ... It  is called from world during initialisation.
+ *  Track is the first model to be loaded, so at this stage the root scene node
+ *  is empty.
+ *  \param parent The actual world.
+ *  \param reverse_track True if the track should be run in reverse.
  *  \param mode_id Which of the modes of a track to use. This determines which
  *         scene, quad, and graph file to load.
  */
-
-void Track::loadTrackModel(World* parent, unsigned int mode_id)
+void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 {
+    if(!m_reverse_available)
+    {
+        reverse_track = false;
+    }
+    CheckManager::create();
     assert(m_all_cached_meshes.size()==0);
     if(UserConfigParams::logMemory())
     {
-        printf("[memory] Before loading '%s': mesh cache %d texture cache %d\n",
+        Log::debug("[memory] Before loading '%s': mesh cache %d "
+                   "texture cache %d\n",
             getIdent().c_str(),
             irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
             irr_driver->getVideoDriver()->getTextureCount());
 #ifdef DEBUG
-        scene::IMeshCache *cache = irr_driver->getSceneManager()->getMeshCache();
+        scene::IMeshCache *cache =
+            irr_driver->getSceneManager()->getMeshCache();
         m_old_mesh_buffers.clear();
         for(unsigned int i=0; i<cache->getMeshCount(); i++)
         {
@@ -1076,8 +1357,15 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     // First read the temporary materials.dat file if it exists
     try
     {
-        std::string materials_file = m_root+"/materials.xml";
-        material_manager->pushTempMaterial(materials_file);
+        std::string materials_file = m_root+"materials.xml";
+        if(m_cache_track)
+        {
+            if(!m_materials_loaded)
+                material_manager->addSharedMaterial(materials_file);
+            m_materials_loaded = true;
+        }
+        else
+            material_manager->pushTempMaterial(materials_file);
     }
     catch (std::exception& e)
     {
@@ -1086,10 +1374,10 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     }
 
     // Start building the scene graph
-    std::string path = m_root+"/"+m_all_modes[mode_id].m_scene;
+    std::string path = m_root+m_all_modes[mode_id].m_scene;
     XMLNode *root    = file_manager->createXMLTree(path);
 
-    // Make sure that we have a track (which is used for raycasts to 
+    // Make sure that we have a track (which is used for raycasts to
     // place other objects).
     if(!root || root->getName()!="scene")
     {
@@ -1103,7 +1391,9 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
-    if (!m_is_arena) loadQuadGraph(mode_id);
+    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
+
+    ItemManager::create();
 
     // Set the default start positions. Node that later the default
     // positions can still be overwritten.
@@ -1120,17 +1410,36 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         default_start->get("upwards-distance",   &upwards_distance  );
         default_start->get("karts-per-row",      &karts_per_row     );
     }
-    m_start_transforms.resize(race_manager->getNumberOfKarts());
-    if(!m_is_arena)
-        m_quad_graph->setDefaultStartPositions(&m_start_transforms,
-                                               karts_per_row,
-                                               forwards_distance,
-                                               sidewards_distance,
-                                               upwards_distance);
+    if(!m_is_arena && !m_is_soccer && !m_is_cutscene)
+    {
+        m_start_transforms.resize(race_manager->getNumberOfKarts());
+        QuadGraph::get()->setDefaultStartPositions(&m_start_transforms,
+                                                   karts_per_row,
+                                                   forwards_distance,
+                                                   sidewards_distance,
+                                                   upwards_distance);
+    }
+
+    unsigned int start_position_counter = 0;
+
+    // we need to check for fog before loading the main track model
+    if(const XMLNode *node = root->getNode("sun"))
+    {
+        node->get("xyz",           &m_sun_position );
+        node->get("ambient",       &m_default_ambient_color);
+        node->get("sun-specular",  &m_sun_specular_color);
+        node->get("sun-diffuse",   &m_sun_diffuse_color);
+        node->get("fog",           &m_use_fog);
+        node->get("fog-color",     &m_fog_color);
+        node->get("fog-density",   &m_fog_density);
+        node->get("fog-start",     &m_fog_start);
+        node->get("fog-end",       &m_fog_end);
+    }
 
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
-    unsigned int start_position_counter = 0;
+
+    LodNodeLoader lod_loader;
 
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
@@ -1141,30 +1450,18 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         if(name=="track" || name=="default-start") continue;
         if(name=="object")
         {
+            lod_loader.check(node);
             m_track_object_manager->add(*node);
         }
         else if(name=="water")
         {
             createWater(*node);
         }
-        else if(name=="banana"      || name=="item" || 
-                name=="small-nitro" || name=="big-nitro")
+        else if(name=="banana"      || name=="item" ||
+                name=="small-nitro" || name=="big-nitro" ||
+                name=="easter-egg"                           )
         {
-            Item::ItemType type;
-            if     (name=="banana"     ) type = Item::ITEM_BANANA;
-            else if(name=="item"       ) type = Item::ITEM_BONUS_BOX;
-            else if(name=="small-nitro") type = Item::ITEM_NITRO_SMALL;
-            else                         type = Item::ITEM_NITRO_BIG;
-            Vec3 xyz;
-            // Set some kind of default in case Z is not defined in the file
-            // (with the new track exporter it always is defined anyway).
-            // Z is the height from which the item is dropped on the track.
-            xyz.setY(1000);
-            node->getXYZ(&xyz);
-            bool drop=true;
-            node->get("drop", &drop);
-            // Height is needed if bit 2 (for z) is not set
-            itemCommand(xyz, type, drop);
+            // will be handled later
         }
         else if (name=="start")
         {
@@ -1175,15 +1472,16 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
             node->getXYZ(&xyz);
             float h=0;
             node->get("h", &h);
-            // It is possible that there are more start positions defined
-            // than there are karts (and therefore that there are values
-            // allocated in m_start_transforms. Ignore those:
-            if(position <(unsigned int)m_start_transforms.size())
+
+            if (position >= m_start_transforms.size())
             {
-                m_start_transforms[position].setOrigin(xyz);
-                m_start_transforms[position].setRotation(
-                                           btQuaternion(btVector3(0,1,0),h ) );
+                m_start_transforms.resize(position + 1);
             }
+
+            m_start_transforms[position].setOrigin(xyz);
+            m_start_transforms[position].setRotation(
+                                           btQuaternion(btVector3(0,1,0),
+                                                        h*DEGREE_TO_RAD ) );
         }
         else if(name=="camera")
         {
@@ -1191,44 +1489,16 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         }
         else if(name=="checks")
         {
-            m_check_manager = new CheckManager(*node, this);
+            // Easter egg hunts don't have laps.
+            if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_EASTER_EGG)
+                CheckManager::get()->load(*node);
         }
         else if (name=="particle-emitter")
         {
             if (UserConfigParams::m_graphical_effects)
             {
-                std::string path;
-                irr::core::vector3df emitter_origin;
-                node->get("kind", &path);
-                node->getXYZ(&emitter_origin);
-
-                try
-                {
-                    ParticleKind* kind = ParticleKindManager::get()->getParticles( path.c_str() );
-                    if (kind == NULL)
-                    {
-                        throw std::runtime_error(path + " could not be loaded");
-                    }
-                    ParticleEmitter* emitter = new ParticleEmitter( kind, emitter_origin );
-                    m_all_emitters.push_back(emitter);
-                }
-                catch (std::runtime_error& e)
-                {
-                    fprintf(stderr, "[Track] WARNING: Could not load particles '%s'; cause :\n    %s", path.c_str(), e.what());
-                }
+                m_track_object_manager->add(*node);
             }
-        }
-        else if(name=="sun")
-        {
-            node->get("xyz",           &m_sun_position );
-            node->get("ambient",       &m_default_ambient_color);
-            node->get("sun-specular",  &m_sun_specular_color);
-            node->get("sun-diffuse",   &m_sun_diffuse_color);
-            node->get("fog",           &m_use_fog);
-            node->get("fog-color",     &m_fog_color);
-            node->get("fog-density",   &m_fog_density);
-            node->get("fog-start",     &m_fog_start);
-            node->get("fog-end",       &m_fog_end);
         }
         else if(name=="sky-dome" || name=="sky-box" || name=="sky-color")
         {
@@ -1237,6 +1507,21 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         else if(name=="end-cameras")
         {
             Camera::readEndCamera(*node);
+        }
+        else if(name=="light")
+        {
+            core::vector3df pos;
+            node->get("xyz", &pos);
+
+            video::SColor color;
+            node->get("color", &color);
+
+            float distance = 25.0f;
+            node->get("distance", &distance);
+
+            scene::ILightSceneNode* node = irr_driver->getSceneManager()->addLightSceneNode(NULL, pos, color, distance);
+            node->setLightType(video::ELT_POINT);
+            node->enableCastShadow(true);
         }
         else if(name=="weather")
         {
@@ -1247,7 +1532,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 
             if (weather_particles.size() > 0)
             {
-                m_sky_particles = 
+                m_sky_particles =
                     ParticleKindManager::get()->getParticles(weather_particles);
             }
             else if (weather_type.size() > 0)
@@ -1258,29 +1543,69 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
                 }
                 else
                 {
-                    fprintf(stderr, "[Track] ERROR: Unknown weather type : '%s'\n", weather_type.c_str());
+                    Log::error("track", "Unknown weather type : '%s'",
+                               weather_type.c_str());
                 }
             }
             else
             {
-                fprintf(stderr, 
-                        "[Track] ERROR: Warning: bad weather node found - ignored.\n");
+                Log::error("track", "Bad weather node found - ignored.\n");
                 continue;
+            }
+        }
+        else if (name == "sun")
+        {
+            // handled above
+        }
+        else if (name == "subtitles")
+        {
+            std::vector<XMLNode*> subtitles;
+            node->getNodes("subtitle", subtitles);
+            for (unsigned int i = 0; i < subtitles.size(); i++)
+            {
+                int from = -1, to = -1;
+                std::string subtitle_text;
+                subtitles[i]->get("from", &from);
+                subtitles[i]->get("to", &to);
+                subtitles[i]->get("text", &subtitle_text);
+                if (from != -1 && to != -1 && subtitle_text.size() > 0)
+                {
+                    m_subtitles.push_back( Subtitle(from, to, _(subtitle_text.c_str())) );
+                }
             }
         }
         else
         {
-            fprintf(stderr, "Warning: while loading track '%s', element '%s' was met but is unknown.\n",
-                    m_ident.c_str(), node->getName().c_str());
+            Log::warn("track", "While loading track '%s', element '%s' was "
+                      "met but is unknown.",
+                      m_ident.c_str(), node->getName().c_str());
         }
 
     }   // for i<root->getNumNodes()
-    delete root;
+
+    // -------- Create and assign LOD nodes --------
+    // recheck the static area, we will need LOD info
+    const XMLNode* track_node = root->getNode("track");
+    for(unsigned int i=0; i<track_node->getNumNodes(); i++)
+    {
+        const XMLNode* n = track_node->getNode(i);
+        bool is_instance = false;
+        n->get("lod_instance", &is_instance);
+
+        if (!is_instance) lod_loader.check(n);
+    }
+
+    std::vector<LODNode*> lod_nodes;
+    std::vector<scene::IMesh*> devnull;
+    lod_loader.done(this, m_root, devnull, lod_nodes);
+
+    m_track_object_manager->assingLodNodes(lod_nodes);
+    // ---------------------------------------------
 
     // Init all track objects
     m_track_object_manager->init();
 
-    
+
     // ---- Fog
     // It's important to execute this BEFORE the code that creates the skycube,
     // otherwise the skycube node could be modified to have fog enabled, which
@@ -1289,12 +1614,12 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     {
         /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start
            and end do not matter */
-        irr_driver->getVideoDriver()->setFog(m_fog_color, 
-                                             video::EFT_FOG_LINEAR, 
+        irr_driver->getVideoDriver()->setFog(m_fog_color,
+                                             video::EFT_FOG_LINEAR,
                                              m_fog_start, m_fog_end,
                                              m_fog_density);
     }
-    
+
     // Enable for for all track nodes if fog is used
     //if(m_use_fog)
     //{
@@ -1305,15 +1630,15 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
         }
     //}
     m_track_object_manager->enableFog(m_use_fog);
-    
+
     // Sky dome and boxes support
     // --------------------------
     if(m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
     {
         scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],
                                                          m_sky_hori_segments,
-                                                         m_sky_vert_segments, 
-                                                         m_sky_texture_percent, 
+                                                         m_sky_vert_segments,
+                                                         m_sky_texture_percent,
                                                          m_sky_sphere_percent);
         for(unsigned int i=0; i<node->getMaterialCount(); i++)
         {
@@ -1335,20 +1660,19 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     }
     else if(m_sky_type==SKY_COLOR)
     {
-        parent->setClearBackBuffer(true);
-        parent->setClearbackBufferColor(m_sky_color);
+        World::getWorld()->setClearbackBufferColor(m_sky_color);
     }
 
-    
+
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 
     // ---- Set ambient color
     m_ambient_color = m_default_ambient_color;
     irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
-    
+
     // ---- Create sun (non-ambient directional light)
-    m_sun = irr_driver->getSceneManager()->addLightSceneNode(NULL, 
+    m_sun = irr_driver->getSceneManager()->addLightSceneNode(NULL,
                                                              m_sun_position,
                                                              m_sun_diffuse_color);
     m_sun->setLightType(video::ELT_DIRECTIONAL);
@@ -1356,7 +1680,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     // The angle of the light is rather important - let the sun
     // point towards (0,0,0).
     if(m_sun_position.getLengthSQ()==0)
-        // Backward compatibility: if no sun is specified, use the 
+        // Backward compatibility: if no sun is specified, use the
         // old hardcoded default angle
         m_sun->setRotation( core::vector3df(180, 45, 45) );
     else
@@ -1366,24 +1690,78 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 
 
     createPhysicsModel(main_track_count);
-    if (UserConfigParams::m_track_debug) m_quad_graph->createDebugMesh();
-    
+
+
+    for(unsigned int i=0; i<root->getNumNodes(); i++)
+    {
+        const XMLNode *node = root->getNode(i);
+        const std::string &name = node->getName();
+        if (name=="banana"      || name=="item"      ||
+            name=="small-nitro" || name=="big-nitro" ||
+            name=="easter-egg"                           )
+        {
+            itemCommand(node);
+        }
+    }   // for i<root->getNumNodes()
+
+    delete root;
+
+    if (UserConfigParams::m_track_debug &&
+        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+        !m_is_cutscene)
+        QuadGraph::get()->createDebugMesh();
+
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
-    if(!m_check_manager && race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
+    if(CheckManager::get()->getCheckStructureCount()==0  &&
+        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES && !m_is_cutscene)
     {
-        printf("WARNING: no check lines found in track '%s'.\n", 
-               m_ident.c_str());
-        printf("Lap counting will not work, and start positions might be incorrect.\n");
+        Log::warn("track", "No check lines found in track '%s'.",
+                  m_ident.c_str());
+        Log::warn("track", "Lap counting will not work, and start "
+                  "positions might be incorrect.");
     }
 
     if(UserConfigParams::logMemory())
-        printf("[memory] After loading  '%s': mesh cache %d texture cache %d\n",
-                getIdent().c_str(),
+        Log::debug("track", "[memory] After loading  '%s': mesh cache %d "
+                   "texture cache %d\n", getIdent().c_str(),
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
                 irr_driver->getVideoDriver()->getTextureCount());
 
+    World *world = World::getWorld();
+    if (world->useChecklineRequirements())
+    {
+        QuadGraph::get()->computeChecklineRequirements();
+    }
+
+    EasterEggHunt *easter_world = dynamic_cast<EasterEggHunt*>(world);
+    if(easter_world)
+    {
+        std::string dir = StringUtils::getPath(m_filename);
+        easter_world->readData(dir+"/easter_eggs.xml");
+    }
 }   // loadTrackModel
+
+//-----------------------------------------------------------------------------
+/** Changes all materials of the given mesh to use the current fog
+ *  setting (true/false).
+ *  \param node Scene node for which fog should be en/dis-abled.
+ */
+void Track::adjustForFog(scene::IMesh* mesh, scene::ISceneNode* parent_scene_node)
+{
+    unsigned int n = mesh->getMeshBufferCount();
+    for (unsigned int i=0; i<n; i++)
+    {
+        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+        video::SMaterial &irr_material=mb->getMaterial();
+        for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+        {
+            video::ITexture* t = irr_material.getTexture(j);
+            if (t) material_manager->adjustForFog(t, mb, parent_scene_node, m_use_fog);
+
+        }   // for j<MATERIAL_MAX_TEXTURES
+    }  // for i<getMeshBufferCount()
+}
 
 //-----------------------------------------------------------------------------
 /** Changes all materials of the given scene node to use the current fog
@@ -1393,50 +1771,29 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
 void Track::adjustForFog(scene::ISceneNode *node)
 {
     //irr_driver->setAllMaterialFlags(scene::IMesh *mesh)
-    
-    if (node->getType() == scene::ESNT_MESH || node->getType() == scene::ESNT_OCTREE)
+
+
+    if (node->getType() == scene::ESNT_OCTREE)
+    {
+        // do nothing
+    }
+    else if (node->getType() == scene::ESNT_MESH)
     {
         scene::IMeshSceneNode* mnode = (scene::IMeshSceneNode*)node;
         scene::IMesh* mesh = mnode->getMesh();
-        //irr_driver->setAllMaterialFlags(node->getMesh());
-        
-        unsigned int n = mesh->getMeshBufferCount();
-        for (unsigned int i=0; i<n; i++)
-        {
-            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-            video::SMaterial &irr_material=mb->getMaterial();
-            for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-            {
-                video::ITexture* t = irr_material.getTexture(j);
-                if (t) material_manager->adjustForFog(t, mb, mnode, m_use_fog);
-                
-            }   // for j<MATERIAL_MAX_TEXTURES
-        }  // for i<getMeshBufferCount()
+        adjustForFog(mesh, mnode);
     }
     else if (node->getType() == scene::ESNT_ANIMATED_MESH)
     {
         scene::IAnimatedMeshSceneNode* mnode = (scene::IAnimatedMeshSceneNode*)node;
         scene::IMesh* mesh = mnode->getMesh();
-        //irr_driver->setAllMaterialFlags(node->getMesh());
-        
-        unsigned int n = mesh->getMeshBufferCount();
-        for (unsigned int i=0; i<n; i++)
-        {
-            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-            video::SMaterial &irr_material=mb->getMaterial();
-            for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-            {
-                video::ITexture* t = irr_material.getTexture(j);
-                if (t) material_manager->adjustForFog(t, mb, mnode, m_use_fog);
-                
-            }   // for j<MATERIAL_MAX_TEXTURES
-        }  // for i<getMeshBufferCount()
+        adjustForFog(mesh, mnode);
     }
     else
     {
         node->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
     }
-    
+
     if (node->getType() == scene::ESNT_LOD_NODE)
     {
         std::vector<scene::ISceneNode*>& subnodes = ((LODNode*)node)->getAllNodes();
@@ -1449,7 +1806,7 @@ void Track::adjustForFog(scene::ISceneNode *node)
 }   // adjustForFog
 
 //-----------------------------------------------------------------------------
-/** Handles a sky-dome or sky-box. It takes the xml node with the 
+/** Handles a sky-dome or sky-box. It takes the xml node with the
  *  corresponding data for the sky and stores the corresponding data in
  *  the corresponding data structures.
  *  \param xml_node XML node with the sky data.
@@ -1481,7 +1838,8 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         }
         else
         {
-            printf("Sky-dome texture '%s' not found - ignored.\n", s.c_str());
+            Log::error("track", "Sky-dome texture '%s' not found - ignored.",
+                        s.c_str());
         }
     }   // if sky-dome
     else if(xml_node.getName()=="sky-box")
@@ -1499,15 +1857,16 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
             }
             else
             {
-                printf("Sky-box texture '%s' not found - ignored.\n",
-                       v[i].c_str());
+                Log::error("track","Sky-box texture '%s' not found - ignored.",
+                           v[i].c_str());
             }
         }   // for i<v.size()
         if(m_sky_textures.size()!=6)
         {
-            fprintf(stderr, "A skybox needs 6 textures, but %d are specified\n",
-                    (int)m_sky_textures.size());
-            fprintf(stderr, "in '%s'.\n", filename.c_str());
+            Log::error("track",
+                       "A skybox needs 6 textures, but %d are specified",
+                       (int)m_sky_textures.size());
+            Log::error("track", "in '%s'.", filename.c_str());
 
         }
         else
@@ -1529,13 +1888,38 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
  *  \param drop True if the item Z position should be determined based on
  *         the track topology.
  */
-void Track::itemCommand(const Vec3 &xyz, Item::ItemType type, 
-                        bool drop)
+void Track::itemCommand(const XMLNode *node)
 {
+    const std::string &name = node->getName();
+
+    Item::ItemType type;
+    if     (name=="banana"     ) type = Item::ITEM_BANANA;
+    else if(name=="item"       ) type = Item::ITEM_BONUS_BOX;
+    else if(name=="small-nitro") type = Item::ITEM_NITRO_SMALL;
+    else if(name=="easter-egg" ) type = Item::ITEM_EASTER_EGG;
+    else                         type = Item::ITEM_NITRO_BIG;
+    Vec3 xyz;
+    // Set some kind of default in case Y is not defined in the file
+    // (with the new track exporter it always is defined anyway).
+    // Y is the height from which the item is dropped on the track.
+    xyz.setY(1000);
+    node->getXYZ(&xyz);
+    bool drop=true;
+    node->get("drop", &drop);
+
     // Some modes (e.g. time trial) don't have any bonus boxes
-    if(type==Item::ITEM_BONUS_BOX && 
-       !World::getWorld()->haveBonusBoxes()) 
+    if(type==Item::ITEM_BONUS_BOX &&
+       !World::getWorld()->haveBonusBoxes())
         return;
+
+    // Only do easter eggs in easter egg mode.
+    if(type==Item::ITEM_EASTER_EGG &&
+        !(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG))
+    {
+        Log::warn("track",
+                  "Found easter egg in non-easter-egg mode - ignored.\n");
+        return;
+    }
 
     Vec3 loc(xyz);
     // if only 2d coordinates are given, let the item fall from very high
@@ -1552,9 +1936,10 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
         bool drop_success = setTerrainHeight(&loc);
         if(!drop_success)
         {
-            printf("Item at position (%f,%f,%f) can not be dropped\n",
-                loc.getX(), loc.getY(), loc.getZ());
-            printf("onto terrain - position unchanged.\n");
+            Log::warn("track",
+                      "Item at position (%f,%f,%f) can not be dropped",
+                      loc.getX(), loc.getY(), loc.getZ());
+            Log::warn("track", "onto terrain - position unchanged.");
         }
 #endif
     }
@@ -1564,7 +1949,7 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
     // around.
     //Vec3 normal(0.7071f, 0, 0.7071f);
     Vec3 normal(0, 1, 0);
-    item_manager->newItem(type, loc, normal);
+    ItemManager::get()->newItem(type, loc, normal);
 }   // itemCommand
 
 // ----------------------------------------------------------------------------
@@ -1572,7 +1957,7 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
  *  adjust the Y position of the given vector to the actual terrain
  *  height. If no terrain is found, false is returned and the
  *  y position is not modified.
- *  \param pos Pointer to the position at which to determine the 
+ *  \param pos Pointer to the position at which to determine the
  *         height. If terrain is found, its Y position will be
  *         set to the actual height.
  *  \return True if terrain was found and the height was adjusted.
@@ -1594,67 +1979,107 @@ bool Track::setTerrainHeight(Vec3 *pos) const
 // ----------------------------------------------------------------------------
 
 std::vector< std::vector<float> > Track::buildHeightMap()
-{    
+{
     std::vector< std::vector<float> > out(HEIGHT_MAP_RESOLUTION);
-    
+
     float x = m_aabb_min.getX();
     const float x_len = m_aabb_max.getX() - m_aabb_min.getX();
     const float z_len = m_aabb_max.getZ() - m_aabb_min.getZ();
-    
+
     const float x_step = x_len/HEIGHT_MAP_RESOLUTION;
     const float z_step = z_len/HEIGHT_MAP_RESOLUTION;
-    
+
     btVector3 hitpoint;
     const Material* material;
     btVector3 normal;
-    
+
     for (int i=0; i<HEIGHT_MAP_RESOLUTION; i++)
     {
         out[i].resize(HEIGHT_MAP_RESOLUTION);
         float z = m_aabb_min.getZ();
-        
+
         for (int j=0; j<HEIGHT_MAP_RESOLUTION; j++)
         {
             btVector3 pos(x, 100.0f, z);
             btVector3 to = pos;
             to.setY(-100000.f);
-            
+
             m_track_mesh->castRay(pos, to, &hitpoint, &material, &normal);
             z += z_step;
-            
+
             out[i][j] = hitpoint.getY();
-            
-            /*
-            if (out[i][j] < -50)
-            {
-                printf(" ");
-            }
-            else if (out[i][j] < -25)
-            {
-                printf("`");
-            }
-            else if (out[i][j] < 0)
-            {
-                printf("-");
-            }
-            else if (out[i][j] < 25)
-            {
-                printf(":");
-            }
-            else if (out[i][j] < 50)
-            {
-                printf("!");
-            }
-            else if (out[i][j] < 100)
-            {
-                printf("#");
-            }
-             */
-        }
-        
-        //printf("\n");
+        }   // j<HEIGHT_MAP_RESOLUTION
         x += x_step;
     }
-    
+
     return out;
 }
+
+// ----------------------------------------------------------------------------
+/** Returns the rotation of the sun. */
+const core::vector3df& Track::getSunRotation()
+{
+    return m_sun->getRotation();
+}
+//-----------------------------------------------------------------------------
+/** Determines if the kart is over ground.
+ *  Used in setting the starting positions of all the karts.
+ *  \param k The kart to project downward.
+ *  \return True of the kart is on terrain.
+ */
+
+bool Track::findGround(AbstractKart *kart)
+{
+    btVector3 to(kart->getXYZ());
+    to.setY(-100000.f);
+
+    // Material and hit point are not needed;
+    const Material *m;
+    Vec3 hit_point, normal;
+    bool over_ground = m_track_mesh->castRay(kart->getXYZ(), to, &hit_point, 
+                                             &m, &normal);
+    const Vec3 &xyz = kart->getXYZ();
+    if(!over_ground || !m)
+    {
+        Log::warn("physics", "Kart at (%f %f %f) can not be dropped.",
+                  xyz.getX(),xyz.getY(),xyz.getZ());
+        return false;
+    }
+
+    // Check if the material the kart is about to be placed on would trigger
+    // a reset. If so, this is not a valid position.
+    if(m->isDriveReset())
+    {
+        Log::warn("physics","Kart at (%f %f %f) over reset terrain '%s'",
+                   xyz.getX(),xyz.getY(),xyz.getZ(),
+            m->getTexFname().c_str());
+        return false;
+    }
+
+    // See if the kart is too high above the ground - it would drop
+    // too long.
+    if(xyz.getY() - hit_point.getY() > 5)
+    {
+        Log::warn("physics", 
+                  "Kart at (%f %f %f) is too high above ground at (%f %f %f)",
+                  xyz.getX(),xyz.getY(),xyz.getZ(),
+                  hit_point.getX(),hit_point.getY(),hit_point.getZ());
+        return false;
+    }
+
+
+        btTransform t = kart->getBody()->getCenterOfMassTransform();
+        // The computer offset is slightly too large, it should take
+        // the default suspension rest insteat of suspension rest (i.e. the
+        // length of the suspension with the weight of the kart resting on
+        // it). On the other hand this initial bouncing looks nice imho
+        // - so I'll leave it in for now.
+        float offset = kart->getKartProperties()->getSuspensionRest() +
+                       kart->getKartProperties()->getWheelRadius();
+        t.setOrigin(hit_point+Vec3(0, offset, 0) );
+        kart->getBody()->setCenterOfMassTransform(t);
+        kart->setTrans(t);
+
+    return true;
+}   // findGround
+

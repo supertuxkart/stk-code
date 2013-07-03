@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008 Joerg Henrichs
@@ -25,12 +24,15 @@
 #include "graphics/material_manager.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/max_speed.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "utils/string_utils.hpp"
 
+#include <IMesh.h>
 
 const wchar_t* getPlungerString()
 {
@@ -56,12 +58,12 @@ const wchar_t* getPlungerString()
  *  root(!) of the graph. It's easier this way to get the right coordinates
  *  than attaching it to the plunger or kart, and trying to find the other
  *  coordinate.
- *  \param plunger Pointer to the plunger (non const, since the rubber band 
+ *  \param plunger Pointer to the plunger (non const, since the rubber band
  *                 can trigger an explosion)
  *  \param kart    Reference to the kart.
  */
-RubberBand::RubberBand(Plunger *plunger, Kart *kart) :
-            m_plunger(plunger), m_owner(kart)
+RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
+          : m_plunger(plunger), m_owner(kart)
 {
     video::SColor color(77, 179, 0, 0);
     video::SMaterial m;
@@ -163,7 +165,7 @@ void RubberBand::update(float dt)
     {
         float force = m_owner->getKartProperties()->getRubberBandForce();
         Vec3 diff   = m_end_position-k;
-        
+
         // detach rubber band if kart gets very close to hit point
         if(m_attached_state==RB_TO_TRACK && diff.length2() < 10*10)
         {
@@ -173,12 +175,13 @@ void RubberBand::update(float dt)
             m_plunger->setKeepAlive(0.0f);
             return;
         }
-        
+
         diff.normalize();   // diff can't be zero here
         m_owner->getBody()->applyCentralForce(diff*force);
         m_owner->increaseMaxSpeed(MaxSpeed::MS_INCREASE_RUBBER,
             m_owner->getKartProperties()->getRubberBandSpeedIncrease(),
-            /*duration*/0.1f, 
+            /*engine_force*/ 0.0f,
+            /*duration*/0.1f,
             m_owner->getKartProperties()->getRubberBandFadeOutTime());
         if(m_attached_state==RB_TO_KART)
             m_hit_kart->getBody()->applyCentralForce(diff*(-force));
@@ -205,7 +208,7 @@ void RubberBand::checkForHit(const Vec3 &k, const Vec3 &p)
         m_owner->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = 0;
 
     // Do the raycast
-    World::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(k, p, 
+    World::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(k, p,
                                                                 ray_callback);
     // Reset collision groups
     m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_plunger_group;
@@ -229,7 +232,7 @@ void RubberBand::checkForHit(const Vec3 &k, const Vec3 &p)
  *  \param track _xyz The coordinated where the track was hit (NULL if a kart
  *                    was hit.
  */
-void RubberBand::hit(Kart *kart_hit, const Vec3 *track_xyz)
+void RubberBand::hit(AbstractKart *kart_hit, const Vec3 *track_xyz)
 {
     // More than one report of a hit. This can happen if the raycast detects
     // a hit as well as the bullet physics.
@@ -248,7 +251,8 @@ void RubberBand::hit(Kart *kart_hit, const Vec3 *track_xyz)
                                                  core::stringw(kart_hit->getName()),
                                                  core::stringw(m_owner->getName())
                                                 ).c_str();
-        gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
+        gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f,
+                        video::SColor(255, 255, 255, 255), false);
         return;
     }
 

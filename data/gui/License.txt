@@ -7,7 +7,12 @@ Except :
 main_*.png icons, hourglass, back, back_addons, next_addons, package.png
     released under Creative-Commons BY-SA 3, By yeKcim (Anthony Carré)
 
-mode_tt, released under Creative-Commons BY-SA 3, incorporatings artwork from yeKcim and onyum.com
+mode_tt, released under Creative-Commons BY-SA 3, incorporatings artwork from yeKcim and onyum.com,
+         modified by Totoplus62
+
+mode_easter, mode_ftl, mode_soccer, mode_normal, race_giveup: by Totoplus62, released under CC-BY-SA 3.0
+
+tutorial.png    by Totoplus62, released under CC-BY-SA 3.0
 
 Logo and Logo_slim : under CC-BY-SA 3.0+ by 'rastapax'
 
@@ -17,7 +22,9 @@ title_font, by Marianne Gagnon (Auria), released under CC-BY-SA 3+
 
 screen*.png, by Marianne Gagnon (Auria), including elements from the public domain Tango icon set
 
-Gauge and bar by Dakal, released under CC-BY-SA 3
+Gauge and bar by Totoplus62, released under CC-BY-SA 3
+
+menu_story by tavariz91, released under CC-0
 
 ====
 

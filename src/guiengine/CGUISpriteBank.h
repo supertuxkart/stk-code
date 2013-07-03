@@ -9,6 +9,7 @@
 #ifdef _IRR_COMPILE_WITH_GUI_
 #include <cassert>
 #include "IGUISpriteBank.h"
+#include "utils/leak_check.hpp"
 
 namespace irr
 {
@@ -28,6 +29,8 @@ namespace gui
 class STKModifiedSpriteBank : public IGUISpriteBank
 {
 public:
+
+    LEAK_CHECK()
 
     STKModifiedSpriteBank(IGUIEnvironment* env);
     virtual ~STKModifiedSpriteBank();
@@ -63,14 +66,14 @@ public:
         assert( m_magic_number == 0xCAFEC001 );
         m_scale = scale;
     }
-    
+
 protected:
 
     // this object was getting access after being freed, I wanna see when/why
     unsigned int m_magic_number;
-    
+
     float m_scale;
-    
+
     struct SDrawBatch
     {
         core::array<core::position2di> positions;

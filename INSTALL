@@ -7,22 +7,32 @@ General
 First, make sure that you have the following packages installed:
 
   * OpenGL (or Mesa 3.0 or later)
-  * Irrlicht 1.7 or later
-  * OpenAL
+  * OpenAL (recommended: openal-soft-devel)
+  * Ogg    (libogg-dev)
+  * Vorbis (libvorbis-dev)
+  * fribidi (fribidi-devel) - optional for right-to-left text
 
 Unpack the files from the tarball like this:
 
   tar xzf supertuxkart-*.tar.gz
   cd supertuxkart-*
 
+where '*' is the version of SuperTuxkart you downloaded - eg 0.8.0. Then:
 
-where '*' is the version of SuperTuxkart you downloaded - eg 0.2.0. Then:
+* Build irrlicht (atm, this will be included in cmake soonish)
+  cd lib/irrlicht/source/Irrlicht
+  NDEBUG=1 make
 
-  ./configure
-  make
+* Compile SuperTuxKart:
+    mkdir cmake_build 
+    cd cmake_build 
+    cmake .. 
+    make VERBOSE=1 -j2
+  To create a debug version of STK, use:
+    cmake .. -DCMAKE_BUILD_TYPE=Debug
 
 To test the compilation, supertuxkart can be run from the build
-directory by ./src/supertuxkart  (./src/supertuxkart.exe on windows).
+directory by ./bin/supertuxkart 
 
 To install the file, as root execute:
 
@@ -31,67 +41,14 @@ To install the file, as root execute:
 The default install location is /usr/local, i.e. the data files will
 be written to /usr/local/share/games/supertuxkart, the executable
 will be copied to /usr/local/bin. To change the default installation
-location, use the "--prefix" option of configure, e.g. --prefix=/usr
-See the --help output of configure for further options.
+location, specify CMAKE_INSTALL_PREFIX when running cmake, e.g.:
+  cmake .. -DCMAKE_INSTALL_PREFIX=/opt/stk
+
+Building STK on OS X
+--------------------
+See http://supertuxkart.sourceforge.net/Building_and_packaging_on_OSX
 
 
-SVN STK on Ubuntu
------------------
-Here are the compilation instructions for the current svn(2009-10-15) of
-Super Tux Kart originally contributed by Damien for Ubuntu Edgy, and updated
-to 9.04 version:
-
-install following packages:
-# apt-get install libtool libxxf86vm-dev libopenal-dev
-libglu1-mesa-dev subversion autoconf automake1.9 g++ gcc
-
-do a:
-$ svn checkout https://supertuxkart.svn.sourceforge.net/svnroot/supertuxkart/main/trunk
-
-Get irrlicht-1.x.zip and unzip it, compile irrlicht:
-$ cd irrlicht-1.x/source/Irrlicht/
-$ make
-$ cd ../../..
-$ pwd
-/some/path/
-
-then we can move to stk, remember to replace the output of pwd below:
-$ cd trunk
-note that the "--with-irrlicht" argument below is only required if you didn't install irrlicht to /usr/[local]
-$ ./autogen.sh && ./configure --with-irrlicht=/some/path/irrlicht-1.x/ && make
-and if all went well run the game:
-$ src/supertuxkart
-
-tested with g++ 3.3 and 4.1 , both succeeded.
-
-If you want to install the game system-wide, do 'make install'.
-
-To update the source from inside trunk directory, one simple command:
-$ svn up
-and then, in most cases, just rebuild:
-$ make
-with the exception of changes to any Makefile.am, in which case:
-$ ./autogen.sh && ./configure --with-irrlicht=/some/path/irrlicht-1.x/ && make
-
-
-But it didn't work!
--------------------
-
-If you checked out your copy directly from SVN, you have to run
-'sh autogen.sh' to generate the configure script.
-
-You should check the SuperTuxKart wiki at:
-
-http://supertuxkart.sourceforge.net/
-
-
-Also, the most common (by FAR) reason for problems is that your OpenGL/Mesa
-is incorrectly installed - so before you complain to any of the Irrlicht or
-Supertuxkart mailing lists, first try running one of the example programs
-that comes with your OpenGL implementation - or one of the Mesa or GLUT
-sample programs.
-
-If THOSE run correctly - but Supertuxkart doesn't then please get in touch
-with the SupertuxKart mailing list and we'll do our best to get you up and
-racing.
-
+Building STK on Windows
+-----------------------
+See http://supertuxkart.sourceforge.net/How_to_build_the_Windows_version

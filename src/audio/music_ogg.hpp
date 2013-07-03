@@ -1,4 +1,3 @@
-//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Damien Morel <divdams@free.fr>
@@ -20,15 +19,17 @@
 #ifndef HEADER_MUSICOGG_HPP
 #define HEADER_MUSICOGG_HPP
 
+#if HAVE_OGGVORBIS
+
 #include <string>
 
 #include <ogg/ogg.h>
 // Disable warning about potential loss of precision in vorbisfile.h
-#if defined(WIN32) && !defined(__CYGWIN__)
+#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
 #  pragma warning(disable:4244)
 #endif
 #  include <vorbis/vorbisfile.h>
-#if defined(WIN32) && !defined(__CYGWIN__)
+#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
 #  pragma warning(default:4244)
 #endif
 
@@ -61,7 +62,7 @@ public:
     virtual bool resumeMusic();
     virtual void volumeMusic (float gain);
     virtual bool isPlaying();
-    
+
 protected:
     bool empty();
     bool check(const char* what);
@@ -78,7 +79,7 @@ private:
     bool            m_error;
 
     bool            m_playing;
-    
+
     ALuint m_soundBuffers[2];
     ALuint m_soundSource;
     ALenum nb_channels;
@@ -86,5 +87,7 @@ private:
     bool m_pausedMusic;
     static const int m_buffer_size = 11025*4;//one full second of audio at 44100 samples per second
 };
+
+#endif
 
 #endif // HEADER_MUSICOGG_HPP

@@ -1,4 +1,3 @@
-// $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2010 Steve Baker <sjbaker1@airmail.net>
@@ -39,6 +38,10 @@
 #ifdef AI_DEBUG
 #include "graphics/irr_driver.hpp"
 #endif
+
+#include "karts/abstract_kart.hpp"
+#include "karts/max_speed.hpp"
+#include "karts/rescue_animation.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
@@ -46,36 +49,39 @@
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 
-EndController::EndController(Kart *kart, StateManager::ActivePlayer *player) 
+EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *player,
+                             Controller *prev_controller)
              : AIBaseController(kart, player)
 {
+    m_previous_controller = prev_controller;
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
     {
         // Overwrite the random selected default path from AIBaseController
         // with a path that always picks the first branch (i.e. it follows
         // the main driveline).
         std::vector<unsigned int> next;
-        for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+        for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
         {
             // 0 is always a valid successor - so even if the kart should end
             // up by accident on a non-selected path, it will keep on working.
             m_successor_index[i] = 0;
 
             next.clear();
-            m_quad_graph->getSuccessors(i, next);
+            QuadGraph::get()->getSuccessors(i, next);
             m_next_node_index[i] = next[0];
         }
 
         const unsigned int look_ahead=10;
         // Now compute for each node in the graph the list of the next 'look_ahead'
         // graph nodes. This is the list of node that is tested in checkCrashes.
-        // If the look_ahead is too big, the AI can skip loops (see 
+        // If the look_ahead is too big, the AI can skip loops (see
         // QuadGraph::findRoadSector for details), if it's too short the AI won't
         // find too good a driveline. Note that in general this list should
-        // be computed recursively, but since the AI for now is using only 
+        // be computed recursively, but since the AI for now is using only
         // (randomly picked) path this is fine
-        for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+        for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
         {
             std::vector<int> l;
             int current = i;
@@ -88,17 +94,20 @@ EndController::EndController(Kart *kart, StateManager::ActivePlayer *player)
         }
     }   // if not battle mode
 
-    // Reset must be called after m_quad_graph etc. is set up        
+    // Reset must be called after QuadGraph::get() etc. is set up
     reset();
 
     m_max_handicap_accel = 1.0f;
     m_min_steps          = 2;
-    setSkiddingFraction(1.3f);
 
 #ifdef AI_DEBUG
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);
 #endif
     m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI, 0.3f, 2);
+
+    // Set the name of the previous controller as this controller name, otherwise
+    // we get the incorrect name when printing statistics in profile mode.
+    setControllerName(prev_controller->getControllerName());
 }   // EndController
 
 //-----------------------------------------------------------------------------
@@ -122,18 +131,32 @@ void EndController::reset()
 
     m_track_node       = QuadGraph::UNKNOWN_SECTOR;
     // In battle mode there is no quad graph, so nothing to do in this case
-    if(m_quad_graph)
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
     {
-        m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node);
+        QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
 
         // Node that this can happen quite easily, e.g. an AI kart is
         // taken over by the end controller while it is off track.
         if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
         {
-            m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
+            m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
         }
     }
 }   // reset
+
+//-----------------------------------------------------------------------------
+/** Callback when a new lap is triggered. It is used to switch to the first
+ *  end camera (which is esp. useful in fixing up end cameras in reverse mode,
+ *  since otherwise the switch to the first end camera usually happens way too
+ *  late)
+ */
+void  EndController::newLap(int lap)
+{
+    // Forward the call to the original controller. This will implicitely
+    // trigger setting the first end camera to be active if the controller
+    // is a player controller.
+    m_previous_controller->newLap(lap);
+}   // newLap
 
 //-----------------------------------------------------------------------------
 /** The end controller must forward 'fire' presses to the race gui.
@@ -187,13 +210,12 @@ void EndController::handleSteering(float dt)
      */
     //Reaction to being outside of the road
     if( fabsf(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ))  >
-       0.5f* m_quad_graph->getNode(m_track_node).getPathWidth()+0.5f )
+       0.5f* QuadGraph::get()->getNode(m_track_node).getPathWidth()+0.5f )
     {
         const int next = m_next_node_index[m_track_node];
-        target_point = m_quad_graph->getQuad(next).getCenter();
+        target_point = QuadGraph::get()->getQuadOfNode(next).getCenter();
 #ifdef AI_DEBUG
-        std::cout << "- Outside of road: steer to center point." <<
-            std::endl;
+        Log::debug("end_controller.cpp", "- Outside of road: steer to center point.\n");
 #endif
     }
     else
@@ -211,13 +233,13 @@ void EndController::handleSteering(float dt)
 void EndController::handleRescue(const float DELTA)
 {
     // check if kart is stuck
-    if(m_kart->getSpeed()<2.0f && !m_kart->playingEmergencyAnimation() &&
+    if(m_kart->getSpeed()<2.0f && !m_kart->getKartAnimation() &&
         !m_world->isStartPhase())
     {
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)
         {
-            m_kart->forceRescue();
+            new RescueAnimation(m_kart);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }
@@ -234,7 +256,7 @@ void EndController::handleRescue(const float DELTA)
  *  and return the position of that edge.
  */
 void EndController::findNonCrashingPoint(Vec3 *result)
-{    
+{
     unsigned int sector = m_next_node_index[m_track_node];
     int target_sector;
 
@@ -251,7 +273,8 @@ void EndController::findNonCrashingPoint(Vec3 *result)
         target_sector = m_next_node_index[sector];
 
         //direction is a vector from our kart to the sectors we are testing
-        direction = m_quad_graph->getQuad(target_sector).getCenter() - m_kart->getXYZ();
+        direction = QuadGraph::get()->getQuadOfNode(target_sector).getCenter()
+                  - m_kart->getXYZ();
 
         float len=direction.length_2d();
         steps = int( len / m_kart_length );
@@ -268,16 +291,16 @@ void EndController::findNonCrashingPoint(Vec3 *result)
         {
             step_coord = m_kart->getXYZ()+direction*m_kart_length * float(i);
 
-            m_quad_graph->spatialToTrack(&step_track_coord, step_coord,
+            QuadGraph::get()->spatialToTrack(&step_track_coord, step_coord,
                                                    sector );
- 
+
             distance = fabsf(step_track_coord[0]);
 
             //If we are outside, the previous sector is what we are looking for
-            if ( distance + m_kart_width * 0.5f 
-                 > m_quad_graph->getNode(sector).getPathWidth() )
+            if ( distance + m_kart_width * 0.5f
+                 > QuadGraph::get()->getNode(sector).getPathWidth()*0.5f )
             {
-                *result = m_quad_graph->getQuad(sector).getCenter();
+                *result = QuadGraph::get()->getQuadOfNode(sector).getCenter();
                 return;
             }
         }

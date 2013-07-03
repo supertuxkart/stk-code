@@ -42,8 +42,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;../../../src/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht"
-				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;_CRTDBG_MAP_ALLOC;ENABLE_BIDI"
+				AdditionalIncludeDirectories="../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;_CRTDBG_MAP_ALLOC;ENABLE_BIDI;_IRR_STATIC_LIB_"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -68,14 +68,14 @@
 				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib Irrlicht.lib ws2_32.lib fribidi.lib pthreadVC2.lib libcurl_imp.lib"
 				OutputFile="./../../../$(ProjectName)_d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../../../dependencies/lib"
+				AdditionalLibraryDirectories="../../../dependencies/lib;../../../lib/irrlicht/lib/Win32-visualstudio/"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="true"
 				GenerateMapFile="false"
 				MapFileName=""
 				MapExports="false"
-				SubSystem="1"
+				SubSystem="2"
 				LinkTimeCodeGeneration="0"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -130,8 +130,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;../../../src/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht"
-				PreprocessorDefinitions="HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE=\&quot;supertuxkart\&quot;;ENABLE_BIDI"
+				AdditionalIncludeDirectories="../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include"
+				PreprocessorDefinitions="HAVE_OGGVORBIS;NDEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE=\&quot;supertuxkart\&quot;;ENABLE_BIDI;_IRR_STATIC_LIB_"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -149,13 +149,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib Irrlicht.lib.release ws2_32.lib fribidi.lib pthreadVC2.lib libcurl_imp.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib Irrlicht.release.lib ws2_32.lib fribidi.lib pthreadVC2.lib libcurl_imp.lib"
 				OutputFile="./../../../$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../../../dependencies/lib"
+				AdditionalLibraryDirectories="../../../lib/irrlicht/lib/Win32-visualstudio;../../../dependencies/lib"
 				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
@@ -210,8 +210,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;../../../src/enet/include;../../../dependencies/include;../../../dependencies/include/irrlicht"
-				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ADDONS_MANAGER"
+				AdditionalIncludeDirectories="../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ADDONS_MANAGER"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -236,14 +236,278 @@
 				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib Irrlicht.lib ws2_32.lib fribidi.lib pthreadVC2.lib libcurl_imp.lib"
 				OutputFile="./../../../$(ProjectName)_curl_d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../../../dependencies/lib"
+				AdditionalLibraryDirectories="../../../dependencies/lib;../../../lib/irrlicht/lib/Win32-visualstudio/"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="true"
 				GenerateMapFile="false"
 				MapFileName=""
 				MapExports="false"
-				SubSystem="1"
+				SubSystem="2"
+				LinkTimeCodeGeneration="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
+				Profile="false"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="wiiuse-debug|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;../../../lib/;../../../lib/wiiuse/"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ENABLE_WIIUSE;_IRR_STATIC_LIB_;WIIUSE_STATIC"
+				GeneratePreprocessedFile="0"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				FloatingPointExceptions="false"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib Irrlicht.lib ws2_32.lib fribidi.lib pthreadVC2.lib libcurl_imp.lib wiiuse.lib"
+				OutputFile="./../../../$(ProjectName)_wiiuse_d.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="../../../dependencies/lib/;&quot;../../../lib/irrlicht/lib/Win32-visualstudio/&quot;;C:\WinDDK\lib\win7\i386"
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames="libcmt.lib"
+				GenerateDebugInformation="true"
+				GenerateMapFile="false"
+				MapFileName=""
+				MapExports="false"
+				SubSystem="2"
+				LinkTimeCodeGeneration="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
+				Profile="false"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="breakpad|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;&quot;C:\cygwin\home\jh235117\local\google-breakpad\src&quot;"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;_CRTDBG_MAP_ALLOC;ENABLE_BIDI;BREAKPAD"
+				GeneratePreprocessedFile="0"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				FloatingPointExceptions="false"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib Irrlicht.lib ws2_32.lib fribidi.lib pthreadVC2.lib libcurl_imp.lib exception_handler.lib"
+				OutputFile="./../../../$(ProjectName)_d.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="../../../dependencies/lib;../../../lib/irrlicht/Win32-visualstudio/;&quot;C:\cygwin\home\jh235117\local\google-breakpad\src\client\windows\Debug\lib&quot;"
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames="libcmt.lib"
+				GenerateDebugInformation="true"
+				GenerateMapFile="false"
+				MapFileName=""
+				MapExports="false"
+				SubSystem="2"
+				LinkTimeCodeGeneration="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
+				Profile="false"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="wiiuse-release|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="4"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="../../../src;../../../lib/bullet/src;../../../lib/enet/include;../../../dependencies/include;../../../lib/irrlicht/include;../../../lib/;../../../lib/wiiuse/"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OGGVORBIS;_DEBUG;WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;_CRTDBG_MAP_ALLOC;ENABLE_BIDI;ENABLE_WIIUSE;_IRR_STATIC_LIB_;WIIUSE_STATIC"
+				GeneratePreprocessedFile="0"
+				MinimalRebuild="false"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="2"
+				FloatingPointExceptions="false"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib Irrlicht.lib ws2_32.lib fribidi.lib pthreadVC2.lib libcurl_imp.lib wiiuse.lib"
+				OutputFile="./../../../$(ProjectName)_wiiuse.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="../../../dependencies/lib/;&quot;../../../lib/irrlicht/lib/Win32-visualstudio/&quot;;C:\WinDDK\lib\win7\i386"
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames="libcmt.lib"
+				GenerateDebugInformation="true"
+				GenerateMapFile="false"
+				MapFileName=""
+				MapExports="false"
+				SubSystem="2"
 				LinkTimeCodeGeneration="0"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -277,7 +541,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Quelldateien"
+			Name="Source Files"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
@@ -322,6 +586,33 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="curl-debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							GeneratePreprocessedFile="0"
+							KeepComments="false"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="wiiuse-debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							GeneratePreprocessedFile="0"
+							KeepComments="false"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="breakpad|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							GeneratePreprocessedFile="0"
+							KeepComments="false"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="wiiuse-release|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -402,6 +693,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\guiengine\widgets\rating_bar_widget.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\guiengine\widgets\ribbon_widget.cpp"
 						>
 					</File>
@@ -427,6 +722,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\challenges\game_slot.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\challenges\unlock_manager.cpp"
 					>
 				</File>
@@ -436,6 +735,14 @@
 				>
 				<File
 					RelativePath="..\..\utils\constants.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\leak_check.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\log.cpp"
 					>
 				</File>
 				<File
@@ -491,6 +798,18 @@
 				Name="modes"
 				>
 				<File
+					RelativePath="..\..\modes\cutscene_world.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\demo_world.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\easter_egg_hunt.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\follow_the_leader.cpp"
 					>
 				</File>
@@ -499,7 +818,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\modes\overworld.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\profile_world.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\soccer_world.cpp"
 					>
 				</File>
 				<File
@@ -511,7 +838,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\modes\tutorial_race.cpp"
+					RelativePath="..\..\modes\tutorial_world.cpp"
 					>
 				</File>
 				<File
@@ -575,6 +902,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\items\rubber_ball.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\items\rubber_band.cpp"
 					>
 				</File>
@@ -619,11 +950,31 @@
 				Name="karts"
 				>
 				<File
-					RelativePath="..\..\karts\emergency_animation.cpp"
+					RelativePath="..\..\karts\abstract_kart.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\abstract_kart_animation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\cannon_animation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\explosion_animation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\ghost_kart.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\karts\kart.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\kart_gfx.cpp"
 					>
 				</File>
 				<File
@@ -639,11 +990,27 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\karts\kart_with_stats.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\karts\max_speed.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\karts\moveable.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\rescue_animation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\skidding.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\skidding_properties.cpp"
 					>
 				</File>
 				<Filter
@@ -654,11 +1021,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\karts\controller\controller.cpp"
+						RelativePath="..\..\karts\controller\ai_properties.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\karts\controller\default_ai_controller.cpp"
+						RelativePath="..\..\karts\controller\controller.cpp"
 						>
 					</File>
 					<File
@@ -666,11 +1033,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\karts\controller\new_ai_controller.cpp"
+						RelativePath="..\..\karts\controller\player_controller.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\karts\controller\player_controller.cpp"
+						RelativePath="..\..\karts\controller\skidding_ai.cpp"
 						>
 					</File>
 				</Filter>
@@ -688,6 +1055,14 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\explosion.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\hardware_skinning.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\hit_sfx.cpp"
 					>
 				</File>
 				<File
@@ -731,11 +1106,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\post_processing.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\rain.cpp"
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\referee.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\shadow.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\show_curve.cpp"
 					>
 				</File>
 				<File
@@ -803,6 +1190,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\tracks\check_cannon.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_goal.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\check_lap.cpp"
 					>
 				</File>
@@ -824,6 +1219,10 @@
 				</File>
 				<File
 					RelativePath="..\..\tracks\graph_node.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\lod_node_loader.cpp"
 					>
 				</File>
 				<File
@@ -858,6 +1257,14 @@
 					RelativePath="..\..\tracks\track_object_manager.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\tracks\track_object_presentation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\track_sector.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="replay"
@@ -867,11 +1274,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\replay\replay_buffers.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\replay\replay_player.cpp"
+					RelativePath="..\..\replay\replay_play.cpp"
 					>
 				</File>
 				<File
@@ -892,26 +1295,6 @@
 				</File>
 				<File
 					RelativePath="..\..\io\xml_writer.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="input"
-				>
-				<File
-					RelativePath="..\..\input\binding.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\input\device_manager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\input\input_device.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\input\input_manager.cpp"
 					>
 				</File>
 			</Filter>
@@ -951,6 +1334,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\config\player.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\config\saved_grand_prix.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\config\stk_config.cpp"
 					>
 				</File>
@@ -964,10 +1355,6 @@
 				>
 				<File
 					RelativePath="..\..\animations\animation_base.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\animations\billboard_animation.cpp"
 					>
 				</File>
 				<File
@@ -991,11 +1378,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\challenges.cpp"
+					RelativePath="..\..\states_screens\credits.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\credits.cpp"
+					RelativePath="..\..\states_screens\cutscene_gui.cpp"
 					>
 				</File>
 				<File
@@ -1071,6 +1458,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\states_screens\race_gui_overworld.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\race_result_gui.cpp"
 					>
 				</File>
@@ -1079,15 +1470,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\states_screens\soccer_setup_screen.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\state_manager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\tracks_screen.cpp"
+					RelativePath="..\..\states_screens\story_mode_lobby.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\tutorial_screen.cpp"
+					RelativePath="..\..\states_screens\tracks_screen.cpp"
 					>
 				</File>
 				<Filter
@@ -1103,6 +1498,10 @@
 					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\confirm_resolution_dialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\custom_video_settings.cpp"
 						>
 					</File>
 					<File
@@ -1126,15 +1525,19 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\states_screens\dialogs\race_over_dialog.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\states_screens\dialogs\race_paused_dialog.cpp"
 						>
 					</File>
 					<File
+						RelativePath="..\..\states_screens\dialogs\select_challenge.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\states_screens\dialogs\track_info_dialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\tutorial_message_dialog.cpp"
 						>
 					</File>
 				</Filter>
@@ -1151,6 +1554,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\addons\inetwork_http.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\addons\network_http.cpp"
 					>
 				</File>
@@ -1164,22 +1571,6 @@
 				</File>
 				<File
 					RelativePath="..\..\addons\zip.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="tutorial"
-				>
-				<File
-					RelativePath="..\..\tutorial\tutorial.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\tutorial\tutorial_data.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\tutorial\tutorial_manager.cpp"
 					>
 				</File>
 			</Filter>
@@ -1203,10 +1594,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\tinygettext\log.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\tinygettext\plural_forms.cpp"
 					>
 				</File>
@@ -1219,13 +1606,45 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\tinygettext\tgt_log.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tinygettext\tinygettext.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="input"
+				>
+				<File
+					RelativePath="..\..\input\binding.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\device_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input_device.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\wiimote.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\wiimote_manager.cpp"
 					>
 				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Headerdateien"
+			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
@@ -1324,6 +1743,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\guiengine\widgets\rating_bar_widget.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\guiengine\widgets\ribbon_widget.hpp"
 						>
 					</File>
@@ -1346,6 +1769,10 @@
 				</File>
 				<File
 					RelativePath="..\..\challenges\challenge_data.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\challenges\game_slot.hpp"
 					>
 				</File>
 				<File
@@ -1445,6 +1872,22 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\utils\cpp2011.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\interpolation_array.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\leak_check.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\log.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\no_copy.hpp"
 					>
 				</File>
@@ -1505,7 +1948,15 @@
 				Name="audio"
 				>
 				<File
+					RelativePath="..\..\audio\dummy_sfx.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\audio\music.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\audio\music_dummy.hpp"
 					>
 				</File>
 				<File
@@ -1541,6 +1992,18 @@
 				Name="modes"
 				>
 				<File
+					RelativePath="..\..\modes\cutscene_world.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\demo_world.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\easter_egg_hunt.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\follow_the_leader.hpp"
 					>
 				</File>
@@ -1549,7 +2012,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\modes\overworld.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\modes\profile_world.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\soccer_world.hpp"
 					>
 				</File>
 				<File
@@ -1561,7 +2032,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\modes\tutorial_race.hpp"
+					RelativePath="..\..\modes\tutorial_world.hpp"
 					>
 				</File>
 				<File
@@ -1669,6 +2140,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\physics\stk_dynamics_world.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\physics\triangle_mesh.hpp"
 					>
 				</File>
@@ -1681,7 +2156,23 @@
 				Name="karts"
 				>
 				<File
-					RelativePath="..\..\karts\emergency_animation.hpp"
+					RelativePath="..\..\karts\abstract_kart.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\abstract_kart_animation.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\cannon_animation.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\explosion_animation.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\ghost_kart.hpp"
 					>
 				</File>
 				<File
@@ -1689,7 +2180,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\karts\kart_control.hpp"
+					RelativePath="..\..\karts\kart_gfx.hpp"
 					>
 				</File>
 				<File
@@ -1705,11 +2196,27 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\karts\kart_with_stats.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\karts\max_speed.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\karts\moveable.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\rescue_animation.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\skidding.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\karts\skidding_properties.hpp"
 					>
 				</File>
 				<Filter
@@ -1720,11 +2227,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\karts\controller\controller.hpp"
+						RelativePath="..\..\karts\controller\ai_properties.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\karts\controller\default_ai_controller.hpp"
+						RelativePath="..\..\karts\controller\controller.hpp"
 						>
 					</File>
 					<File
@@ -1732,11 +2239,15 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\karts\controller\new_ai_controller.hpp"
+						RelativePath="..\..\karts\controller\kart_control.hpp"
 						>
 					</File>
 					<File
 						RelativePath="..\..\karts\controller\player_controller.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\karts\controller\skidding_ai.hpp"
 						>
 					</File>
 				</Filter>
@@ -1754,6 +2265,18 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\explosion.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\hardware_skinning.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\hit_effect.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\hit_sfx.hpp"
 					>
 				</File>
 				<File
@@ -1797,11 +2320,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\post_processing.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\rain.hpp"
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\referee.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\shadow.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\show_curve.hpp"
 					>
 				</File>
 				<File
@@ -1829,6 +2364,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\tracks\check_cannon.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_goal.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\check_lap.hpp"
 					>
 				</File>
@@ -1850,6 +2393,10 @@
 				</File>
 				<File
 					RelativePath="..\..\tracks\graph_node.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\lod_node_loader.hpp"
 					>
 				</File>
 				<File
@@ -1884,6 +2431,14 @@
 					RelativePath="..\..\tracks\track_object_manager.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\tracks\track_object_presentation.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\track_sector.hpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="replay"
@@ -1893,15 +2448,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\replay\replay_buffer_tpl.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\replay\replay_buffers.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\replay\replay_player.hpp"
+					RelativePath="..\..\replay\replay_play.hpp"
 					>
 				</File>
 				<File
@@ -1948,6 +2495,14 @@
 					RelativePath="..\..\input\input_manager.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\input\wiimote.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\wiimote_manager.hpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="race"
@@ -1989,6 +2544,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\config\saved_grand_prix.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\config\stk_config.hpp"
 					>
 				</File>
@@ -2002,10 +2561,6 @@
 				>
 				<File
 					RelativePath="..\..\animations\animation_base.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\animations\billboard_animation.hpp"
 					>
 				</File>
 				<File
@@ -2029,11 +2584,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\challenges.hpp"
+					RelativePath="..\..\states_screens\credits.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\credits.hpp"
+					RelativePath="..\..\states_screens\cutscene_gui.hpp"
 					>
 				</File>
 				<File
@@ -2109,6 +2664,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\states_screens\race_gui_overworld.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\race_result_gui.hpp"
 					>
 				</File>
@@ -2117,15 +2676,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\states_screens\soccer_setup_screen.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\state_manager.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\tracks_screen.hpp"
+					RelativePath="..\..\states_screens\story_mode_lobby.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\tutorial_screen.hpp"
+					RelativePath="..\..\states_screens\tracks_screen.hpp"
 					>
 				</File>
 				<Filter
@@ -2141,6 +2704,10 @@
 					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\confirm_resolution_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\custom_video_settings.hpp"
 						>
 					</File>
 					<File
@@ -2164,15 +2731,23 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\states_screens\dialogs\race_over_dialog.hpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\states_screens\dialogs\race_paused_dialog.hpp"
 						>
 					</File>
 					<File
+						RelativePath="..\..\states_screens\dialogs\select_challenge.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\story_mode_new.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\states_screens\dialogs\track_info_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\tutorial_message_dialog.hpp"
 						>
 					</File>
 				</Filter>
@@ -2189,6 +2764,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\addons\dummy_network_http.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\addons\inetwork_http.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\addons\network_http.hpp"
 					>
 				</File>
@@ -2202,22 +2785,6 @@
 				</File>
 				<File
 					RelativePath="..\..\addons\zip.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="tutorial"
-				>
-				<File
-					RelativePath="..\..\tutorial\tutorial.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\tutorial\tutorial_data.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\tutorial\tutorial_manager.hpp"
 					>
 				</File>
 			</Filter>
@@ -2245,10 +2812,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\tinygettext\log.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\tinygettext\log_stream.hpp"
 					>
 				</File>
@@ -2262,6 +2825,10 @@
 				</File>
 				<File
 					RelativePath="..\..\tinygettext\stk_file_system.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tinygettext\tgt_log.hpp"
 					>
 				</File>
 				<File

@@ -1,9 +1,9 @@
-* bowling.ac, plunger.ac, cake.ac, bomb.ac, anchor.ac
+* plunger model, cake model, bomb model, anchor model
     created by MiniBjorn (c) 2008
     released under Creative Commons Attribution-Share Alike 3.0
     [http://creativecommons.org/licenses/by-sa/3.0/]
 
-* bubblegum.ac, nitrotank-big.ac, nitrotank-small.ac, giftbox.ac
+* bubblegum model, nitrotank-big model, nitrotank-small model, giftbox model
     created by MiniBjorn (c) 2008
     released under Creative Commons Attribution-Share Alike 3.0
     [http://creativecommons.org/licenses/by-sa/3.0/]
@@ -18,6 +18,30 @@
     released under Creative Commons Attribution-Share Alike 3.0
     [http://creativecommons.org/licenses/by-sa/3.0/]
 
+* gplose
+    released under CC-BY-SA 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
+    oak by Julius Krischan Makowka, released un CC-BY-SA 3.0
+    Tires by Thomas Oppl, released under CC-BY-SA 3.0
+    scene and finishing touches by Marianne Gagnon
+
+* Hammer.jpg
+    by Marianne Gagnon, released under CC-BY-SA 3.0
+    Incorporates image by Philipp Zinger, released under CCBY 3.0
+                 image by Louise Price, released under CC-BY 2.0 (considered a derivate work thus allowing to upgrade the license version),
+                 image by Smoth 007, released under CC-BY-SA 2.0 (considered a derivate work thus allowing to upgrade the license version),
+                 image by Juangonzalez64 released under the public domain
+    
+* swatter, christmas_hat
+    released under CC-BY-SA 3.0
+    by Funto
+
+* tire
+    based on work by Thomas Oppl, released under CC-BY-SA 3.0
+    with modifications by Marianne Gagnon
+
+* tnt-bomb
+    by Fraang, released under CC-BY-SA 3.0
+    
 * village
     released under CC-BY-SA 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
     oak by Julius Krischan Makowka, released un CC-BY-SA 3.0
@@ -33,4 +57,23 @@
 * zipper_collect
     by Dakal, released under CC-BY-SA 3.0
 
+* rubber_ball and jump-bomb.jpg
+    by Samuncle, released under CC-BY-SA
+
+* thunderbird model
+    by Funto & Kinsu, released under CC-BY-SA 3.0
+
+* thunderbird texture, bomb texture
+    by Fraag, released under CC-BY-SA 3.0
+
+* swatter-icon
+    by Totoplus62, released under CC-0
+  
+* balldimpleddark
+    by Hero, released under CC-BY-SA 3.0
+
+* rubber_ball-icon, plunger icon, cake icon, bowling ball texture and icon
+    by Totoplus62, released under CC-BY-SA 3.0
+    
+    
 Others are GPL, by the original (super)TuxKart team

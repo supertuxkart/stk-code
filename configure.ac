@@ -192,7 +192,7 @@ if test "x$with_irrlicht" != "x" ; then
    CPPFLAGS="${CPPFLAGS} -I $with_irrlicht/include -I $with_irrlicht/include/irrlicht"
    AC_CHECK_HEADER(irrlicht.h, have_irrlicht_hdr=yes)
    if test x$have_irrlicht_hdr != xyes; then
-      AC_MSG_ERROR([Can't find irrlicht in $with_irrlicht.])
+      AC_MSG_ERROR([Can not find irrlicht in $with_irrlicht.])
    fi
 else
    CPPFLAGS_Save=$CPPFLAGS
@@ -222,7 +222,7 @@ else
        if test x$irrlicht_found_in_usr_local == xyes; then
           with_irrlicht="/usr/local"
        else
-          AC_MSG_ERROR([Can't find irrlicht installation in standard prefixes, use --with-irrlicht...])
+          AC_MSG_ERROR([Can not find irrlicht installation in standard prefixes, use --with-irrlicht...])
        fi
    fi
    
@@ -232,7 +232,7 @@ fi
 
 case "${host}" in
 *-*-linux* )
-  irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -L/$with_irrlicht/lib -lIrrlicht"
+  irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -L/$with_irrlicht/lib -lIrrlicht -lX11 -lpthread"
   ;;
 *darwin*|*macosx*)
   irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht -framework Cocoa"
@@ -286,7 +286,7 @@ case "${host}" in
 esac
   
 if test x$irrlicht_sample_built_fine = xfalse; then
-AC_MSG_ERROR([Can't build test irrLicht program. Check config.log to see the errors])
+AC_MSG_ERROR([Cann not build test irrLicht program. Check config.log to see the errors])
 fi
 
 # ---- Check we have the minimum required irrLicht version
@@ -318,7 +318,7 @@ AC_TRY_RUN(
 if test x$irrlicht_min_version_met = xfalse; then
     AC_MSG_ERROR([Your irrLicht is too old, please update irrLicht. 
 You need irrlicht 1.8.
-While irrlicht 1.8 is not released, we recommend using version 3629 from irrlicht SVN trunk.])
+While irrlicht 1.8 is not released, we recommend using version 3995 from irrlicht SVN trunk.])
 else
     echo "yes"
 fi
@@ -370,8 +370,8 @@ fi
 # Bullet physics
 # ==============
 AC_DEFINE([BT_NO_PROFILE], [], [Disable bullet internal profiling])
-BULLETTREE="src/bullet"
-bullet_LIBS="-Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath"
+BULLETTREE="lib/bullet"
+bullet_LIBS="-L../lib/bullet/src -lbulletdynamics -lbulletcollision -lbulletmath"
 
 
 # ====
@@ -399,10 +399,10 @@ case "${host}" in
   enet_LIBS="-Lenet -lenet -lws2_32"
   ;;
 *)
-  enet_LIBS="-Lenet -lenet"
+  enet_LIBS="-L../lib/enet -lenet"
   ;;
 esac
-ENETTREE="src/enet"
+ENETTREE="lib/enet"
 
 # ==========================================
 # Check for a known compiler bug, details in 
@@ -445,15 +445,17 @@ AC_CONFIG_FILES([                   \
  data/models/Makefile               \
  data/music/Makefile                \
  data/po/Makefile                   \
+ data/shaders/Makefile              \
  data/sfx/Makefile                  \
  data/textures/Makefile             \
  data/tracks/Makefile               \
  doc/Makefile                       \
  src/Makefile                       \
  src/ide/Makefile                   \
- src/bullet/Makefile                \
- src/bullet/src/Makefile            \
- src/enet/Makefile                  \
+ lib/bullet/Makefile                \
+ lib/bullet/src/Makefile            \
+ lib/enet/Makefile                  \
+ tools/Makefile                 
 ])
 AC_OUTPUT
 echo -e $SUMMARY

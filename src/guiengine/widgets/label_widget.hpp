@@ -24,12 +24,13 @@
 #include <SColor.h>
 
 #include "guiengine/widget.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
 {
     /** \brief A simple label widget.
-      * \ingroup widgets
+      * \ingroup widgetsgroup
       */
     class LabelWidget : public Widget
     {
@@ -41,14 +42,17 @@ namespace GUIEngine
         
         /** Current scroll offset. */
         float              m_scroll_offset;
+        
     public:
+        
+        LEAK_CHECK()
         
         /** Constructs the label widget. Parameter:
           * \param title  True if the special title font should be used.
           * \param bright True if a bright color should be used
           * \note \c title and \c bright are mutually exclusive
           */
-         LabelWidget(bool title=false, bool bright=false);
+        LabelWidget(bool title=false, bool bright=false);
         
         virtual ~LabelWidget() {}
         
@@ -57,11 +61,7 @@ namespace GUIEngine
                 
         /** Sets the color of the widget. 
          *  \param color The color to use for this widget. */
-        void     setColor(const irr::video::SColor& color)
-        {
-            m_color     = color;
-            m_has_color = true;
-        }   // setColor
+        void     setColor(const irr::video::SColor& color);
         
         /** \brief Callback from base class Widget */
         virtual void update(float dt);
