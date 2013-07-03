@@ -480,6 +480,13 @@ namespace GUIEngine
 
 
  \n
+ \subsection prop19 PROP_DIV_PADDING
+ <em> Name in XML files: </em> \c "padding"
+
+ Used on divs, indicate by how many pixels to pad contents
+
+ 
+ \n
  <HR>
  \section code Using the engine in code
  <HR>
