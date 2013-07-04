@@ -30,10 +30,19 @@ LobbyRoomProtocol::~LobbyRoomProtocol()
 
 void LobbyRoomProtocol::notifyEvent(Event* event) 
 {
+    Log::setLogLevel(1);
     if (event->type == EVENT_TYPE_MESSAGE)
     {
-        Log::info("LobbyRoomProtocol", "Message from %u : \"%s\"\n", event->peer->getAddress(), event->data.c_str());
+        
+        Log::verbose("LobbyRoomProtocol", "Message from %u : \"%s\"", event->peer->getAddress(), event->data.c_str());
     }
+    if (event->type == EVENT_TYPE_CONNECTED)
+    {
+        Log::verbose("LobbyRoomProtocol", "New player.");
+        // add the player to the game setup
+        
+    }
+    Log::setLogLevel(3);
 }
 
 void LobbyRoomProtocol::setup()

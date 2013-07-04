@@ -202,9 +202,12 @@ void ProtocolManager::update()
         Event* event = m_events_to_process.back();
         
         PROTOCOL_TYPE searchedProtocol = PROTOCOL_NONE;
-        if (event->data.size() > 0)
-            searchedProtocol = (PROTOCOL_TYPE)(event->data[0]);
-        event->removeFront(1); // remove the first byte which indicates the protocol
+        if (event->type == EVENT_TYPE_MESSAGE)
+        {
+            if (event->data.size() > 0)
+                searchedProtocol = (PROTOCOL_TYPE)(event->data[0]);
+            event->removeFront(1); // remove the first byte which indicates the protocol
+        }
         for (unsigned int i = 0; i < m_protocols.size() ; i++)
         {
             if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event->type != EVENT_TYPE_MESSAGE) // pass data to protocols even when paused
