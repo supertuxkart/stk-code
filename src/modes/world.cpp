@@ -749,7 +749,7 @@ void World::updateWorld(float dt)
 
                 StateManager::get()->enterGameState();
                 network_manager->setupPlayerKartInfo();
-                race_manager->startNew(false);
+                race_manager->startNew(true);
             }
             else
             {
