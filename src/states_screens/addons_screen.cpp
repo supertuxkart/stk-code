@@ -156,9 +156,9 @@ void AddonsScreen::init()
 
     m_type = "kart";
     if (UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED)
-        getWidget<GUIEngine::ButtonWidget>("reload")->setDeactivated();
+        getWidget<GUIEngine::IconButtonWidget>("reload")->setDeactivated();
     else
-        getWidget<GUIEngine::ButtonWidget>("reload")->setActivated();
+        getWidget<GUIEngine::IconButtonWidget>("reload")->setActivated();
 
     // Reset filter.
     GUIEngine::TextBoxWidget* w_filter_name =
