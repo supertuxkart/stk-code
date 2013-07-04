@@ -34,7 +34,6 @@ class ClientNetworkManager : public NetworkManager
         
         bool connectToHost(std::string serverNickname);
         
-        virtual void packetReceived(char* data);
         virtual void sendPacket(const char* data);
         
         STKPeer* getPeer();

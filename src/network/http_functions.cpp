@@ -18,10 +18,10 @@
 
 #include "network/http_functions.hpp"
 
-#include <iostream>
+#include "utils/log.hpp"
+
 #include <string>
 #include <curl/curl.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <memory.h>
@@ -42,7 +42,7 @@ void init()
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
     if(!curl)
-        printf("Error while loading cURL library.\n");
+        Log::error("HTTP", "Error while loading cURL library.\n");
 }
 
 std::string getPage(std::string url)
@@ -53,7 +53,7 @@ std::string getPage(std::string url)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
     res = curl_easy_perform(curl);
     if(res != CURLE_OK)
-        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        Log::error("HTTP", "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
 
     return readBuffer; 
 }

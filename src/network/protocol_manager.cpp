@@ -20,12 +20,10 @@
 
 #include "network/protocol.hpp"
 #include "network/network_manager.hpp"
+#include "utils/log.hpp"
 
 #include <assert.h>
-#include <stdio.h>
 #include <cstdlib>
-
-#define RAND_MAX 65536
 
 ProtocolManager::ProtocolManager() 
 {
@@ -38,6 +36,26 @@ ProtocolManager::ProtocolManager()
 
 ProtocolManager::~ProtocolManager()
 {
+    pthread_mutex_lock(&m_events_mutex);
+    pthread_mutex_lock(&m_protocols_mutex);
+    pthread_mutex_lock(&m_requests_mutex);
+    pthread_mutex_lock(&m_id_mutex);
+    for (unsigned int i = 0; i < m_protocols.size() ; i++)
+        delete m_protocols[i].protocol;
+    for (unsigned int i = 0; i < m_events_to_process.size() ; i++)
+        delete m_events_to_process[i];
+    m_protocols.clear();
+    m_requests.clear();
+    m_events_to_process.clear();
+    pthread_mutex_unlock(&m_events_mutex);
+    pthread_mutex_unlock(&m_protocols_mutex);
+    pthread_mutex_unlock(&m_requests_mutex);
+    pthread_mutex_unlock(&m_id_mutex);
+    
+    pthread_mutex_destroy(&m_events_mutex);
+    pthread_mutex_destroy(&m_protocols_mutex);
+    pthread_mutex_destroy(&m_requests_mutex);
+    pthread_mutex_destroy(&m_id_mutex);
 }
 
 void ProtocolManager::notifyEvent(Event* event)
@@ -122,7 +140,7 @@ void ProtocolManager::requestTerminate(Protocol* protocol)
 
 void ProtocolManager::startProtocol(ProtocolInfo protocol)
 {
-    printf("__ProtocolManager> A new protocol with id=%u has been started. There are %ld protocols running.\n", protocol.id, m_protocols.size()+1);
+    Log::info("ProtocolManager", "A new protocol with id=%u has been started. There are %ld protocols running.\n", protocol.id, m_protocols.size()+1);
     // add the protocol to the protocol vector so that it's updated
     pthread_mutex_lock(&m_protocols_mutex);
     m_protocols.push_back(protocol);
@@ -170,7 +188,7 @@ void ProtocolManager::protocolTerminated(ProtocolInfo protocol)
             offset++;
         }
     }
-    printf("__ProtocolManager> A protocol has been terminated. There are %ld protocols running.\n", m_protocols.size());
+    Log::info("ProtocolManager", "A protocol has been terminated. There are %ld protocols running.\n", m_protocols.size());
     pthread_mutex_unlock(&m_protocols_mutex);
 }
 

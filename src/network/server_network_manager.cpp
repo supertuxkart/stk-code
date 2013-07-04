@@ -24,9 +24,9 @@
 #include "network/protocols/get_peer_address.hpp"
 #include "network/protocols/connect_to_server.hpp"
 
+#include "utils/log.hpp"
+
 #include <enet/enet.h>
-#include <stdio.h>
-#include <string.h>
 #include <pthread.h>
 
 ServerNetworkManager::ServerNetworkManager()
@@ -42,7 +42,7 @@ void ServerNetworkManager::run()
 {
     if (enet_initialize() != 0) 
     {
-        printf("Could not initialize enet.\n");
+        Log::error("ServerNetworkManager", "Could not initialize enet.\n");
         return;
     }
     NetworkManager::run();
@@ -53,16 +53,16 @@ void ServerNetworkManager::start()
     m_localhost = new STKHost();
     m_localhost->setupServer(STKHost::HOST_ANY, 7321, 32, 2, 0, 0);
     m_localhost->startListening();
-    printf("Server now setup, listening on port 7321.\n");
+    Log::info("ServerNetworkManager", "Server now setup, listening on port 7321.\n");
     
-    printf("_NetworkInterface>Starting the global protocol\n");
+    Log::info("ServerNetworkManager", "Starting the global protocol\n");
     // step 1 : retreive public address
     Protocol* protocol = new GetPublicAddress(&m_public_address);
     ProtocolManager::getInstance()->requestStart(protocol);
     while (ProtocolManager::getInstance()->getProtocolState(protocol) != PROTOCOL_STATE_TERMINATED )
     {
     }
-    printf("_NetworkInterface> The public address is known.\n"); 
+    Log::info("ServerNetworkManager", "The public address is known.\n"); 
     
     // step 2 : show the public address for others (here, the server)
     ShowPublicAddress* spa = new ShowPublicAddress(NULL);
@@ -73,12 +73,12 @@ void ServerNetworkManager::start()
     while (ProtocolManager::getInstance()->getProtocolState(spa) != PROTOCOL_STATE_TERMINATED )
     {
     }
-    printf("_NetworkInterface> The public address is being shown online.\n"); 
+    Log::info("ServerNetworkManager", "The public address is being shown online.\n"); 
 }
 
 bool ServerNetworkManager::connectToPeer(std::string peer_username)
 {
-    printf("_NetworkInterface>Starting the connection to host protocol\n");
+    Log::info("ServerNetworkManager", "Starting the connection to host protocol\n");
     
     // step 3 : get the peer's addres.
     TransportAddress addr;
@@ -88,7 +88,7 @@ bool ServerNetworkManager::connectToPeer(std::string peer_username)
     while (ProtocolManager::getInstance()->getProtocolState(gpa) != PROTOCOL_STATE_TERMINATED )
     {
     }
-    printf("_NetworkInterface> The public address of the peer is known.\n"); 
+    Log::info("ServerNetworkManager", "The public address of the peer is known.\n"); 
     
     // step 2 : connect to the peer
     ConnectToServer* cts = new ConnectToServer(NULL);
@@ -101,22 +101,16 @@ bool ServerNetworkManager::connectToPeer(std::string peer_username)
     if (isConnectedTo(addr))
     {
         success = true;
-        printf("_NetworkInterface> CONNECTION SUCCES : YOU ARE NOW CONNECTED TO A PEER.\n");
+        Log::info("ServerNetworkManager", "Connection success : you are now connected to the peer.\n");
     }
     else 
     {
-        printf("_NetworkInterface> We are NOT connected to the server.\n");
+        Log::warn("ServerNetworkManager", "We are NOT connected to the peer.\n");
     }
     
     return success;
 }
 
-void ServerNetworkManager::packetReceived(char* data)
-{
-    printf("ServerNetworkManager::packetReceived()\n");
-    puts(data);
-    sendPacket(data);
-}
 void ServerNetworkManager::sendPacket(const char* data)
 {
     m_localhost->broadcastPacket(data);

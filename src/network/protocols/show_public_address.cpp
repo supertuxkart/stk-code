@@ -19,8 +19,7 @@
 #include "network/protocols/show_public_address.hpp"
 
 #include "network/http_functions.hpp"
-
-#include <stdio.h>
+#include "utils/log.hpp"
 
 ShowPublicAddress::ShowPublicAddress(CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_SILENT)
 {
@@ -39,7 +38,7 @@ void ShowPublicAddress::setup()
     m_state = NONE;
     if (m_public_ip == 0 || m_public_port == 0 || m_username == "" || m_password == "")
     {
-        printf("__ShowPublicAddress> You have to set the public ip:port, username:password and the host nickname before starting this protocol.\n");
+        Log::error("ShowPublicAddress", "You have to set the public ip:port, username:password and the host nickname before starting this protocol.\n");
         m_listener->requestTerminate(this);
     }
 }
@@ -53,12 +52,12 @@ void ShowPublicAddress::update()
         std::string result = HTTP::getPage(url);
         if (result[0] == 's' && result[1] == 'u' && result[2] == 'c' && result[3] == 'c' && result[4] == 'e' && result[5] == 's' && result[6] == 's')
         {
-            printf("__ShowPublicAddress> Address set.\n");
+            Log::info("ShowPublicAddress", "Address set.\n");
             m_state = DONE;
         }
         if (result[0] == 'f' && result[1] == 'a' && result[2] == 'i' && result[3] == 'l')
         {
-            printf("__ShowPublicAddress> Login fail. Please re-set username:password and unpause the protocol.\n");
+            Log::warn("ShowPublicAddress", "Login fail. Please re-set username:password and unpause the protocol.\n");
             m_state = NONE;
             pause();
         }

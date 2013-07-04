@@ -19,10 +19,8 @@
 #include "network/protocols/connect_to_server.hpp"
 
 #include "network/client_network_manager.hpp"
-#include "network/time.hpp"
-
-#include <stdio.h>
-#include <stdlib.h>
+#include "utils/time.hpp"
+#include "utils/log.hpp"
 
 // ----------------------------------------------------------------------------
 
@@ -48,9 +46,9 @@ void ConnectToServer::notifyEvent(Event* event)
         event->peer->getAddress() == m_server_ip && 
         event->peer->getPort() == m_server_port)
     {
-        printf("The Connect To Server protocol has received an event notifying \
-                that he's connected to the peer. The peer sent \"%s\"\n", 
-                event->data.c_str());
+        Log::info("ConnectToServer", "The Connect To Server protocol has \
+                received an event notifying that he's connected to the peer. \
+                The peer sent \"%s\"\n", event->data.c_str());
         m_state = DONE; // we received a message, we are connected
     }
 }
@@ -62,7 +60,8 @@ void ConnectToServer::setup()
     m_state = NONE;
     if (m_server_ip == 0 || m_server_port == 0 )
     {
-        printf("You have to set the server's public ip:port of the server.\n");
+        Log::error("ConnectToServer", "You have to set the server's public \
+                ip:port of the server.\n");
         m_listener->requestTerminate(this);
     }
 }
@@ -74,10 +73,7 @@ void ConnectToServer::update()
     if (m_state == NONE)
     {
         static double target = 0;
-        double currentTime = Time::getSeconds();
-         // sometimes the getSeconds method forgets 3600 seconds.
-        while (currentTime < target-1800)
-            currentTime += 3600;
+        double currentTime = Time::getRealTime();
         if (currentTime > target)
         {
             NetworkManager::getInstance()->connect(
@@ -89,7 +85,7 @@ void ConnectToServer::update()
                 return;
             }
             target = currentTime+5;
-            printf("Retrying to connect in 5 seconds.\n");
+            Log::info("ConnectToServer", "Retrying to connect in 5 seconds.\n");
         }
     }
     else if (m_state == DONE)

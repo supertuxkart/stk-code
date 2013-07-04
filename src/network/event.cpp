@@ -17,11 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/event.hpp"
-
 #include "network/network_manager.hpp"
-
-#include <vector>
-#include <stdio.h>
 
 Event::Event(ENetEvent* event)
 {
@@ -57,9 +53,8 @@ Event::Event(ENetEvent* event)
             return;
         }
     }
-    if (peer == NULL)
+    if (peer == NULL) // peer does not exist, create him
     {
-        printf("The peer still does not exist in %lu peers\n", peers.size());
         STKPeer* new_peer = new STKPeer();
         new_peer->m_peer = event->peer;
         peer = new_peer;

@@ -19,14 +19,17 @@
 #ifndef SINGLETON_HPP
 #define SINGLETON_HPP
 
-#include <iostream>
+#include "utils/log.hpp"
 
 template <typename T>
 class Singleton
 {
     protected:
-        Singleton () { }
-        virtual ~Singleton () { std::cout << "destroying singleton." << std::endl; delete m_singleton; }
+        Singleton () { m_singleton = NULL; }
+        virtual ~Singleton () 
+        { 
+            Log::info("Singleton", "Destroyed singleton."); 
+        }
 
     public:
         template<typename S>
@@ -37,7 +40,7 @@ class Singleton
             
             S* result = (dynamic_cast<S*> (m_singleton));
             if (result == NULL)
-                std::cout << "THE SINGLETON HAS NOT BEEN REALOCATED, BUT IS NOT OF THE REQUESTED TYPE." << std::endl;
+                Log::fatal("Singleton", "THE SINGLETON HAS NOT BEEN REALOCATED, BUT IS NOT OF THE REQUESTED TYPE.");
             return result;
         }
         static T *getInstance()
@@ -47,10 +50,9 @@ class Singleton
 
         static void kill ()
         {
-            if (NULL != m_singleton)
+            if (m_singleton)
             {
                 delete m_singleton;
-                m_singleton = NULL;
             }
         }
 

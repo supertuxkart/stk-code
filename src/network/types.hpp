@@ -32,6 +32,7 @@ class CallbackObject
 {
     public:
         CallbackObject() {}
+        ~CallbackObject() {}
         
 };
 
@@ -44,6 +45,7 @@ class TransportAddress : public CallbackObject
     public:
     TransportAddress(uint32_t p_ip = 0, uint16_t p_port = 0) 
     { ip = p_ip; port = p_port; }
+    ~TransportAddress() {}
     
     uint32_t ip;    //!< The IPv4 address
     uint16_t port;  //!< The port number
@@ -56,6 +58,7 @@ class PlayerLogin : public CallbackObject
 {
     public:
     PlayerLogin() {}
+    ~PlayerLogin() { username.clear(); password.clear(); }
     
     std::string username;   //!< Username of the player
     std::string password;   //!< Password of the player

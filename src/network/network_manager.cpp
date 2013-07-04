@@ -26,7 +26,10 @@
 #include "network/client_network_manager.hpp"
 #include "network/server_network_manager.hpp"
 
-#include <stdio.h>
+#include "utils/log.hpp"
+
+#include <pthread.h>
+#include <signal.h>
 
 void* protocolManagerUpdate(void* data)
 {
@@ -44,10 +47,23 @@ NetworkManager::NetworkManager()
     m_public_address.ip = 0;
     m_public_address.port = 0;
     m_protocol_manager_update_thread = NULL;
+    m_localhost = NULL;
 }
 
 NetworkManager::~NetworkManager() 
 {
+    if (m_protocol_manager_update_thread)
+        pthread_cancel(*m_protocol_manager_update_thread);//, SIGKILL);
+        
+    ProtocolManager::kill();
+    
+    if (m_localhost)
+        delete m_localhost; 
+    while(!m_peers.empty())
+    {
+        delete m_peers.back();
+        m_peers.pop_back();
+    }
 }
 
 void NetworkManager::run()
@@ -75,15 +91,15 @@ void NetworkManager::setManualSocketsMode(bool manual)
 
 void NetworkManager::notifyEvent(Event* event)
 {
-    printf("EVENT received\n");
+    Log::info("NetworkManager", "EVENT received\n");
     switch (event->type) 
     {
         case EVENT_TYPE_MESSAGE:
-            printf("Message, Sender : %u, message = \"%s\"\n", event->peer->getAddress(), event->data.c_str());
+            Log::info("NetworkManager", "Message, Sender : %u, message = \"%s\"\n", event->peer->getAddress(), event->data.c_str());
             break;
         case EVENT_TYPE_DISCONNECTED:
-            printf("Somebody is now disconnected. There are now %lu peers.\n", m_peers.size());
-            printf("Disconnected host: %i.%i.%i.%i:%i\n", event->peer->getAddress()>>24&0xff, event->peer->getAddress()>>16&0xff, event->peer->getAddress()>>8&0xff, event->peer->getAddress()&0xff,event->peer->getPort());
+            Log::info("NetworkManager", "Somebody is now disconnected. There are now %lu peers.\n", m_peers.size());
+            Log::info("NetworkManager", "Disconnected host: %i.%i.%i.%i:%i\n", event->peer->getAddress()>>24&0xff, event->peer->getAddress()>>16&0xff, event->peer->getAddress()>>8&0xff, event->peer->getAddress()&0xff,event->peer->getPort());
             // remove the peer:
             for (unsigned int i = 0; i < m_peers.size(); i++)
             {
@@ -94,10 +110,10 @@ void NetworkManager::notifyEvent(Event* event)
                     break;
                 }
             }
-            printf("ERROR : the peer that has been disconnected was not registered by the Network Manager.\n");
+            Log::fatal("NetworkManager", "The peer that has been disconnected was not registered by the Network Manager.\n");
             break;
         case EVENT_TYPE_CONNECTED:
-            printf("A client has just connected. There are now %lu peers.\n", m_peers.size() + 1);
+            Log::info("NetworkManager", "A client has just connected. There are now %lu peers.\n", m_peers.size() + 1);
             // create the new peer:
             m_peers.push_back(event->peer);
             break;

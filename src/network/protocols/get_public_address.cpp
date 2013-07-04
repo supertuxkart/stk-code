@@ -23,10 +23,9 @@
 #include "network/protocols/connect_to_server.hpp"
 #include "network/network_interface.hpp"
 
-#include <time.h>
-#include <stdlib.h>
+#include "utils/log.hpp"
+
 #include <assert.h>
-#include <stdio.h>
 
 int stunRand()
 {
@@ -98,7 +97,7 @@ void GetPublicAddress::update()
         bytes[19] = (uint8_t)(m_stun_tansaction_id[2]);
         bytes[20] = '\0'; 
         
-        printf("__GetPublicAddress> Querrying STUN server 132.177.123.6\n");
+        Log::info("GetPublicAddress", "Querrying STUN server 132.177.123.6\n");
         unsigned int dst = (132<<24)+(177<<16)+(123<<8)+6;
         NetworkManager::getInstance()->setManualSocketsMode(true);
         NetworkManager::getInstance()->getHost()->sendRawPacket(bytes, 20, TransportAddress(dst, 3478));
@@ -132,7 +131,7 @@ void GetPublicAddress::update()
                 data[18] == (uint8_t)(m_stun_tansaction_id[2]>>8 )   &&
                 data[19] == (uint8_t)(m_stun_tansaction_id[2]    ))
             {
-                printf("__GetPublicAddress> The STUN server responded with a valid answer\n");
+                Log::error("GetPublicAddress", "The STUN server responded with a valid answer\n");
                 int message_size = data[2]*256+data[3];
                 
                 // parse the stun message now:
@@ -140,12 +139,12 @@ void GetPublicAddress::update()
                 uint8_t* attributes = data+20;
                 if (message_size == 0)
                 {
-                    printf("__GetPublicAddress> STUN answer does not contain any information.\n");
+                    Log::error("GetPublicAddress", "STUN answer does not contain any information.\n");
                     finish = true;
                 }
                 if (message_size < 4) // cannot even read the size
                 {
-                    printf("__GetPublicAddress> STUN message is not valid.\n");
+                    Log::error("GetPublicAddress", "STUN message is not valid.\n");
                     finish = true;
                 }
                 uint16_t port;
@@ -176,14 +175,14 @@ void GetPublicAddress::update()
                         finish = true;
                     if (message_size < 4) // cannot even read the size
                     {
-                        printf("__GetPublicAddress> STUN message is not valid.\n");
+                        Log::error("GetPublicAddress", "STUN message is not valid.\n");
                         finish = true;
                     }
                 }
                 // finished parsing, we know our public transport address
                 if (valid)
                 {
-                    printf("__The public address has been found : %i.%i.%i.%i:%i\n", address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
+                    Log::info("GetPublicAddress", "The public address has been found : %i.%i.%i.%i:%i\n", address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
                     m_state = ADDRESS_KNOWN;
                     NetworkManager::getInstance()->setManualSocketsMode(false); 
                     TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);

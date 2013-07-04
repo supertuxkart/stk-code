@@ -293,7 +293,7 @@ void RaceManager::startNew(bool from_overworld)
     // Create the kart status data structure to keep track of scores, times, ...
     // ==========================================================================
     m_kart_status.clear();
-    printf("%d %d %d\n", (unsigned int)m_num_karts, m_ai_kart_list.size(), m_player_karts.size());
+    printf("%u %lu %lu\n", (unsigned int)m_num_karts, m_ai_kart_list.size(), m_player_karts.size());
 
     assert((unsigned int)m_num_karts == m_ai_kart_list.size()+m_player_karts.size());
     // First add the AI karts (randomly chosen)

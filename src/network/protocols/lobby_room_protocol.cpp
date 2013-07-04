@@ -18,7 +18,7 @@
 
 #include "network/protocols/lobby_room_protocol.hpp"
 
-#include <stdio.h>
+#include "utils/log.hpp"
 
 LobbyRoomProtocol::LobbyRoomProtocol(CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_LOBBY_ROOM)
 {
@@ -32,7 +32,7 @@ void LobbyRoomProtocol::notifyEvent(Event* event)
 {
     if (event->type == EVENT_TYPE_MESSAGE)
     {
-        printf("Message from %u : \"%s\"\n", event->peer->getAddress(), event->data.c_str());
+        Log::info("LobbyRoomProtocol", "Message from %u : \"%s\"\n", event->peer->getAddress(), event->data.c_str());
     }
 }
 

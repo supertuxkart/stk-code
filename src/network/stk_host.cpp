@@ -19,11 +19,12 @@
 #include "network/stk_host.hpp"
 
 #include "network/network_manager.hpp"
+#include "utils/log.hpp"
 
-#include <stdio.h>
 #include <string.h>
-#include <pthread.h>
 #include <arpa/inet.h>
+#include <pthread.h>
+#include <signal.h>
 
 // ----------------------------------------------------------------------------
 
@@ -46,13 +47,23 @@ void* STKHost::receive_data(void* self)
 STKHost::STKHost()
 {
     m_host = NULL;
-    m_listening_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
+    m_listening_thread = NULL;
 }
 
 // ----------------------------------------------------------------------------
 
 STKHost::~STKHost()
 {
+    if (m_listening_thread)
+    {
+        pthread_cancel(*m_listening_thread);//, SIGKILL);
+        delete m_listening_thread;
+        m_listening_thread = NULL;
+    }
+    if (m_host)
+    {
+        enet_host_destroy(m_host);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -69,7 +80,7 @@ void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count,
                             max_incoming_bandwidth, max_outgoing_bandwidth);
     if (m_host == NULL)
     {
-        fprintf (stderr, "An error occurred while trying to create an ENet \
+        Log::info("STKHost", "An error occurred while trying to create an ENet \
                           server host.\n");
         exit (EXIT_FAILURE);
     }
@@ -85,7 +96,7 @@ void STKHost::setupClient(int peer_count, int channel_limit,
                             max_incoming_bandwidth, max_outgoing_bandwidth);
     if (m_host == NULL)
     {
-        fprintf (stderr, "An error occurred while trying to create an ENet \
+        Log::info("STKHost", "An error occurred while trying to create an ENet \
                           client host.\n");
         exit (EXIT_FAILURE);
     }
@@ -95,6 +106,7 @@ void STKHost::setupClient(int peer_count, int channel_limit,
 
 void STKHost::startListening()
 {
+    m_listening_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
     pthread_create(m_listening_thread, NULL, &STKHost::receive_data, this);
 }
 
@@ -102,7 +114,11 @@ void STKHost::startListening()
 
 void STKHost::stopListening()
 {
-    pthread_cancel(*m_listening_thread);
+    if(m_listening_thread)
+    {
+        pthread_cancel(*m_listening_thread);
+        m_listening_thread = NULL;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -135,9 +151,8 @@ uint8_t* STKHost::receiveRawPacket()
     {
         i++;
         len = recv(m_host->socket,buffer,2048, 0);
-        usleep(1000); // wait 1 millisecond between two checks
+        usleep(1000);
     }
-    printf("Packet received after %i milliseconds\n", i);
     return buffer;
 }
 
@@ -171,9 +186,8 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender)
     {
         char s[20];
         inet_ntop(AF_INET, &(((struct sockaddr_in *)&addr)->sin_addr), s, 20);
-        printf("IPv4 Address %s\n", s);
+        Log::info("STKHost", "IPv4 Address of the sender was %s\n", s);
     }
-    printf("Packet received after %i milliseconds\n", i);
     return buffer;
 }
 

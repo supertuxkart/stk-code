@@ -39,7 +39,6 @@ class NetworkManager : public Singleton<NetworkManager>
         virtual bool connect(TransportAddress peer);
         virtual void setManualSocketsMode(bool manual);
         virtual void notifyEvent(Event* event);
-        virtual void packetReceived(char* data) = 0;
         virtual void sendPacket(const char* data) = 0;
 
         // raw data management

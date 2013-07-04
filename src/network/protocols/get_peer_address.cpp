@@ -18,11 +18,9 @@
 
 #include "network/protocols/get_peer_address.hpp"
 
-#include "network/time.hpp"
 #include "network/http_functions.hpp"
-
-#include <stdio.h>
-#include <stdlib.h>
+#include "utils/time.hpp"
+#include "utils/log.hpp"
 
 GetPeerAddress::GetPeerAddress(CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_SILENT)
 {
@@ -34,6 +32,7 @@ GetPeerAddress::~GetPeerAddress()
 
 void GetPeerAddress::notifyEvent(Event* event)
 {
+    // nothing there. If we receive events, they must be ignored
 }
 
 void GetPeerAddress::setup()
@@ -46,9 +45,7 @@ void GetPeerAddress::update()
     if (m_state == NONE)
     {
         static double target = 0;
-        double current_time = Time::getSeconds();
-        while (current_time < target-1800) // sometimes the getSeconds method forgets 3600 seconds.
-            current_time += 3600;
+        double current_time = Time::getRealTime();
         if (current_time > target)
         {
             char url[512];
@@ -56,7 +53,7 @@ void GetPeerAddress::update()
             std::string result = HTTP::getPage(url);
             if (result == "")
             {
-                printf("__GetPeerAddress> The host you try to reach does not exist. Change the host name please.\n");
+                Log::error("GetPeerAddress", "The host you try to reach does not exist. Change the host name please.\n");
                 pause();
                 return;
             }
@@ -68,12 +65,12 @@ void GetPeerAddress::update()
             uint16_t dst_port = (uint32_t)(atoi(port_nb.c_str()));
             if (dst_ip == 0 || dst_port == 0)
             {
-                printf("__GetPeerAddress> The host you try to reach is not online. There will be a new try in 10 seconds.\n");
+                Log::info("GetPeerAddress", "The host you try to reach is not online. There will be a new try in 10 seconds.\n");
                 target = current_time+10;
             }
             else
             {
-                printf("__GetPeerAddress> Public ip of target is %i.%i.%i.%i:%i\n", (dst_ip>>24)&0xff, (dst_ip>>16)&0xff, (dst_ip>>8)&0xff, dst_ip&0xff, dst_port);
+                Log::info("GetPeerAddress", "Public ip of target is %i.%i.%i.%i:%i\n", (dst_ip>>24)&0xff, (dst_ip>>16)&0xff, (dst_ip>>8)&0xff, dst_ip&0xff, dst_port);
                 uint32_t server_ip =   ((dst_ip&0x000000ff)<<24) // change the server IP to have a network-byte order
                                     + ((dst_ip&0x0000ff00)<<8)
                                     + ((dst_ip&0x00ff0000)>>8)

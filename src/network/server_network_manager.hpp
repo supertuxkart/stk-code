@@ -36,7 +36,6 @@ class ServerNetworkManager : public NetworkManager
         void start();
         bool connectToPeer(std::string peer_username);
         
-        virtual void packetReceived(char* data);
         virtual void sendPacket(const char* data);
         
         virtual bool isServer()         { return false; }

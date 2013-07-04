@@ -1190,6 +1190,7 @@ void cleanSuperTuxKart()
     if(news_manager)            delete news_manager;
     if(addons_manager)          delete addons_manager;
     NetworkManager::kill();
+    
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
     if(attachment_manager)      delete attachment_manager;

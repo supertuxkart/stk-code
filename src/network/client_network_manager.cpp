@@ -24,7 +24,7 @@
 #include "network/protocols/get_peer_address.hpp"
 #include "network/protocols/connect_to_server.hpp"
 
-#include <stdio.h>
+#include "utils/log.hpp"
 
 ClientNetworkManager::ClientNetworkManager()
 {
@@ -38,7 +38,7 @@ void ClientNetworkManager::run()
 {
     if (enet_initialize() != 0) 
     {
-        printf("Could not initialize enet.\n");
+        Log::error("ClientNetworkManager", "Could not initialize enet.\n");
         return;
     }
     m_localhost = new STKHost();
@@ -50,14 +50,14 @@ void ClientNetworkManager::run()
 
 bool ClientNetworkManager::connectToHost(std::string serverNickname)
 {
-    printf("_NetworkInterface>Starting the connection to host protocol\n");
+    Log::info("ClientNetworkManager", "Starting the connection to host protocol\n");
     // step 1 : retreive public address
     Protocol* protocol = new GetPublicAddress(&m_public_address);
     ProtocolManager::getInstance()->requestStart(protocol);
     while (ProtocolManager::getInstance()->getProtocolState(protocol) != PROTOCOL_STATE_TERMINATED )
     {
     }
-    printf("_NetworkInterface> The public address is known.\n"); 
+    Log::info("ClientNetworkManager", "The public address is known.\n"); 
     
     // step 2 : show the public address for others (here, the server)
     ShowPublicAddress* spa = new ShowPublicAddress(NULL);
@@ -68,7 +68,7 @@ bool ClientNetworkManager::connectToHost(std::string serverNickname)
     while (ProtocolManager::getInstance()->getProtocolState(spa) != PROTOCOL_STATE_TERMINATED )
     {
     }
-    printf("_NetworkInterface> The public address is being shown online.\n"); 
+    Log::info("ClientNetworkManager", "The public address is being shown online.\n"); 
     
     // step 3 : get the server's addres.
     TransportAddress addr;
@@ -78,7 +78,7 @@ bool ClientNetworkManager::connectToHost(std::string serverNickname)
     while (ProtocolManager::getInstance()->getProtocolState(gpa) != PROTOCOL_STATE_TERMINATED )
     {
     }
-    printf("_NetworkInterface> The public address of the server is known.\n"); 
+    Log::info("ClientNetworkManager", "The public address of the server is known.\n"); 
     
     // step 4 : connect to the server
     ConnectToServer* cts = new ConnectToServer(NULL);
@@ -91,11 +91,11 @@ bool ClientNetworkManager::connectToHost(std::string serverNickname)
     if (m_localhost->isConnectedTo(TransportAddress(addr.ip, addr.port)))
     {
         success = true;
-        printf("_NetworkInterface> CONNECTION SUCCES : YOU ARE NOW CONNECTED TO A SERVER.\n");
+        Log::info("ClientNetworkManager", "Connection success. You are now connected to a server.\n");
     }
     else 
     {
-        printf("_NetworkInterface> We are NOT connected to the server.\n");
+        Log::error("ClientNetworkManager", "We are NOT connected to the server.\n");
     }
     // step 5 : hide our public address
     HidePublicAddress* hpa = new HidePublicAddress(NULL);
@@ -105,20 +105,15 @@ bool ClientNetworkManager::connectToHost(std::string serverNickname)
     while (ProtocolManager::getInstance()->getProtocolState(hpa) != PROTOCOL_STATE_TERMINATED )
     {
     }
-    printf("_NetworkInterface> The public address is now hidden online.\n"); 
+    Log::info("ClientNetworkManager", "The public address is now hidden online.\n"); 
     
     return success;
 }
 
-void ClientNetworkManager::packetReceived(char* data)
-{
-    printf("ClientNetworkManager::packetReceived()\n");
-    puts(data);
-}
 void ClientNetworkManager::sendPacket(const char* data)
 {
     if (m_peers.size() > 1)
-        printf("Ambiguous send of data\n");
+        Log::warn("ClientNetworkManager", "Ambiguous send of data.\n");
     m_peers[0]->sendPacket(data);
 }
 

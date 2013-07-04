@@ -19,8 +19,7 @@
 #include "network/protocols/hide_public_address.hpp"
 
 #include "network/http_functions.hpp"
-
-#include <stdio.h>
+#include "utils/log.hpp"
 
 HidePublicAddress::HidePublicAddress(CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_SILENT)
 {
@@ -48,12 +47,12 @@ void HidePublicAddress::update()
         std::string result = HTTP::getPage(url);
         if (result[0] == 's' && result[1] == 'u' && result[2] == 'c' && result[3] == 'c' && result[4] == 'e' && result[5] == 's' && result[6] == 's')
         {
-            printf("__HidePublicAddress> Public address hidden successfully.\n");
+            Log::info("HidePublicAddress", "Public address hidden successfully.\n");
             m_state = DONE;
         }
         if (result[0] == 'f' && result[1] == 'a' && result[2] == 'i' && result[3] == 'l')
         {
-            printf("__HidePublicAddress> Public address still visible. Re-set nick:password and retry.\n");
+            Log::warn("HidePublicAddress", "Public address still visible. Re-set nick:password and retry.\n");
             m_state = NONE;
             pause();
         }
