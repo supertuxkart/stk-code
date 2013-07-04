@@ -16,9 +16,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "event.hpp"
+#include "network/event.hpp"
 
-#include "network_manager.hpp"
+#include "network/network_manager.hpp"
 
 #include <vector>
 #include <stdio.h>
@@ -71,3 +71,9 @@ Event::~Event()
     if (m_packet)
         enet_packet_destroy(m_packet);
 }
+
+void Event::removeFront(int size)
+{
+    data.erase(0, size);
+}
+

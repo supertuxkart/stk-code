@@ -19,7 +19,7 @@
 #ifndef STK_PEER_HPP
 #define STK_PEER_HPP
 
-#include "stk_host.hpp"
+#include "network/stk_host.hpp"
 #include <enet/enet.h>
 
 class STKPeer
@@ -29,7 +29,7 @@ class STKPeer
         STKPeer();
         virtual ~STKPeer();
         
-        virtual void sendPacket(char* data);
+        virtual void sendPacket(const char* data);
         
         static bool connectToHost(STKHost* localhost, TransportAddress host, uint32_t channel_count, uint32_t data);
         

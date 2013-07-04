@@ -16,13 +16,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "server_network_manager.hpp"
+#include "network/server_network_manager.hpp"
 
-#include "protocols/get_public_address.hpp"
-#include "protocols/hide_public_address.hpp"
-#include "protocols/show_public_address.hpp"
-#include "protocols/get_peer_address.hpp"
-#include "protocols/connect_to_server.hpp"
+#include "network/protocols/get_public_address.hpp"
+#include "network/protocols/hide_public_address.hpp"
+#include "network/protocols/show_public_address.hpp"
+#include "network/protocols/get_peer_address.hpp"
+#include "network/protocols/connect_to_server.hpp"
 
 #include <enet/enet.h>
 #include <stdio.h>
@@ -117,7 +117,7 @@ void ServerNetworkManager::packetReceived(char* data)
     puts(data);
     sendPacket(data);
 }
-void ServerNetworkManager::sendPacket(char* data)
+void ServerNetworkManager::sendPacket(const char* data)
 {
     m_localhost->broadcastPacket(data);
 }

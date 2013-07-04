@@ -16,15 +16,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network_manager.hpp"
+#include "network/network_manager.hpp"
 
-#include "protocols/hide_public_address.hpp"
-#include "protocols/show_public_address.hpp"
-#include "protocols/get_public_address.hpp"
+#include "network/protocols/hide_public_address.hpp"
+#include "network/protocols/show_public_address.hpp"
+#include "network/protocols/get_public_address.hpp"
 
-#include "protocol_manager.hpp"
-#include "client_network_manager.hpp"
-#include "server_network_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/client_network_manager.hpp"
+#include "network/server_network_manager.hpp"
 
 #include <stdio.h>
 

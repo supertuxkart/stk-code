@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "stk_peer.hpp"
+#include "network/stk_peer.hpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -48,7 +48,7 @@ bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host, uint32_t 
     return true;
 }
 
-void STKPeer::sendPacket(char* data)
+void STKPeer::sendPacket(const char* data)
 {
     //printf("sending packet to %i.%i.%i.%i:%i", (m_peer->address.host>>24)&0xff,(m_peer->address.host>>16)&0xff,(m_peer->address.host>>8)&0xff,(m_peer->address.host>>0)&0xff,m_peer->address.port);
     

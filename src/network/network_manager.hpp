@@ -19,14 +19,15 @@
 #ifndef NETWORKMANAGER_HPP
 #define NETWORKMANAGER_HPP
 
-#include "stk_peer.hpp"
-#include "stk_host.hpp"
-#include <vector>
+#include "network/stk_peer.hpp"
+#include "network/stk_host.hpp"
 
-#include "protocol_manager.hpp"
-#include "singleton.hpp"
-#include "types.hpp"
-#include "event.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/singleton.hpp"
+#include "network/types.hpp"
+#include "network/event.hpp"
+
+#include <vector>
 
 class NetworkManager : public Singleton<NetworkManager>
 {
@@ -39,6 +40,7 @@ class NetworkManager : public Singleton<NetworkManager>
         virtual void setManualSocketsMode(bool manual);
         virtual void notifyEvent(Event* event);
         virtual void packetReceived(char* data) = 0;
+        virtual void sendPacket(const char* data) = 0;
 
         // raw data management
         void setLogin(std::string username, std::string password);

@@ -19,9 +19,9 @@
 #ifndef NETWORK_INTERFACE_H
 #define NETWORK_INTERFACE_H
 
-#include "singleton.hpp"
-#include "types.hpp"
-#include "network_manager.hpp"
+#include "network/singleton.hpp"
+#include "network/types.hpp"
+#include "network/network_manager.hpp"
 
 #include <stdint.h>
 #include <pthread.h>

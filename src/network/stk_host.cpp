@@ -16,9 +16,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "stk_host.hpp"
+#include "network/stk_host.hpp"
 
-#include "network_manager.hpp"
+#include "network/network_manager.hpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -179,7 +179,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender)
 
 // ----------------------------------------------------------------------------
 
-void STKHost::broadcastPacket(char* data)
+void STKHost::broadcastPacket(const char* data)
 {
     ENetPacket* packet = enet_packet_create(data, strlen(data)+1,
                                             ENET_PACKET_FLAG_RELIABLE);

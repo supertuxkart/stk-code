@@ -19,8 +19,8 @@
 #ifndef PROTOCOL_HPP
 #define PROTOCOL_HPP
 
-#include "protocol_manager.hpp"
-#include "types.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/types.hpp"
 
 #include <stdint.h>
 

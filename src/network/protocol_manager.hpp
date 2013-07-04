@@ -23,8 +23,8 @@
 #ifndef PROTOCOL_MANAGER_HPP
 #define PROTOCOL_MANAGER_HPP
 
-#include "singleton.hpp"
-#include "event.hpp"
+#include "network/singleton.hpp"
+#include "network/event.hpp"
 
 #include <vector>
 #include <stdint.h>
@@ -104,7 +104,7 @@ class ProtocolManager : public Singleton<ProtocolManager>
         /*! 
          * \brief WILL BE COMMENTED LATER
          */
-        virtual void            sendMessage(std::string message);
+        virtual void            sendMessage(Protocol* sender, std::string message);
         
         /*! 
          * \brief Asks the manager to start a protocol.

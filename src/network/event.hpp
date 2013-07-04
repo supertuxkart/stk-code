@@ -19,7 +19,7 @@
 #ifndef EVENT_HPP
 #define EVENT_HPP
 
-#include "stk_peer.hpp"
+#include "network/stk_peer.hpp"
 #include <stdint.h>
 #include <string>
 
@@ -47,16 +47,19 @@ enum EVENT_TYPE
 class Event
 {
     public:
-        /*! 
-         * \brief Constructor
-         * \param event : The event that needs to be translated.
+        /*! \brief Constructor
+         *  \param event : The event that needs to be translated.
          */
         Event(ENetEvent* event);
-        /*! 
-         * \brief Destructor
-         * frees the memory of the ENetPacket.
+        /*! \brief Destructor
+         *  frees the memory of the ENetPacket.
          */
         ~Event();
+        
+        /*! \brief Remove bytes at the beginning of data.
+         *  \param size : The number of bytes to remove.
+         */
+        void removeFront(int size);
     
         EVENT_TYPE type;    //!< Type of the event.
         std::string data;   //!< Copy of the data passed by the event.

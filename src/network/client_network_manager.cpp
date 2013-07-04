@@ -115,7 +115,7 @@ void ClientNetworkManager::packetReceived(char* data)
     printf("ClientNetworkManager::packetReceived()\n");
     puts(data);
 }
-void ClientNetworkManager::sendPacket(char* data)
+void ClientNetworkManager::sendPacket(const char* data)
 {
     if (m_peers.size() > 1)
         printf("Ambiguous send of data\n");

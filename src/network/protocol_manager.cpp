@@ -16,9 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "protocol_manager.hpp"
+#include "network/protocol_manager.hpp"
 
-#include "protocol.hpp"
+#include "network/protocol.hpp"
+#include "network/network_manager.hpp"
 
 #include <assert.h>
 #include <stdio.h>
@@ -46,10 +47,11 @@ void ProtocolManager::notifyEvent(Event* event)
     pthread_mutex_unlock(&m_events_mutex);
 }
 
-void ProtocolManager::sendMessage(std::string message)
+void ProtocolManager::sendMessage(Protocol* sender, std::string message)
 {
-    std::string newMessage = " " + message; // add one byte
-    newMessage[0] = (char)(0);
+    std::string newMessage = " " + message; // add one byte to add protocol type
+    newMessage[0] = (char)(sender->getProtocolType());
+    NetworkManager::getInstance()->sendPacket(newMessage.c_str());
 }
 
 int ProtocolManager::requestStart(Protocol* protocol)
@@ -184,6 +186,7 @@ void ProtocolManager::update()
         PROTOCOL_TYPE searchedProtocol = PROTOCOL_NONE;
         if (event->data.size() > 0)
             searchedProtocol = (PROTOCOL_TYPE)(event->data[0]);
+        event->removeFront(1); // remove the first byte which indicates the protocol
         for (unsigned int i = 0; i < m_protocols.size() ; i++)
         {
             if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event->type != EVENT_TYPE_MESSAGE) // pass data to protocols even when paused

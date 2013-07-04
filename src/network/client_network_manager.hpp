@@ -19,7 +19,7 @@
 #ifndef CLIENT_NETWORK_MANAGER_HPP
 #define CLIENT_NETWORK_MANAGER_HPP
 
-#include "network_manager.hpp"
+#include "network/network_manager.hpp"
 
 class ClientNetworkManager : public NetworkManager
 {
@@ -35,7 +35,7 @@ class ClientNetworkManager : public NetworkManager
         bool connectToHost(std::string serverNickname);
         
         virtual void packetReceived(char* data);
-        virtual void sendPacket(char* data);
+        virtual void sendPacket(const char* data);
         
         STKPeer* getPeer();
         virtual bool isServer()         { return false; }
