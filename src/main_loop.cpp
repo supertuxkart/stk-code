@@ -98,17 +98,17 @@ void MainLoop::updateRace(float dt)
     // Client: send current controls to server
     // But don't do this if the race is in finish phase (otherwise
     // messages can be mixed up in the race manager)
-    if(!World::getWorld()->isFinishPhase())
-        network_manager->sendUpdates();
+    /*if(!World::getWorld()->isFinishPhase())
+        network_manager->sendUpdates();*/
     if(ProfileWorld::isProfileMode()) dt=1.0f/60.0f;
 
     // Again, only receive updates if the race isn't over - once the
     // race results are displayed (i.e. game is in finish phase)
     // messages must be handled by the normal update of the network
     // manager
-    if(!World::getWorld()->isFinishPhase())
-        network_manager->receiveUpdates();
-
+    /*if(!World::getWorld()->isFinishPhase())
+        network_manager->receiveUpdates();*/
+    
     World::getWorld()->updateWorld(dt);
 }   // updateRace
 
@@ -127,13 +127,13 @@ void MainLoop::run()
         m_prev_time = m_curr_time;
         float dt   = getLimitedDt();
 
-        network_manager->update(dt);
+//        network_manager->update(dt);
 
         if (World::getWorld())  // race is active if world exists
         {
             // Busy wait if race_manager is active (i.e. creating of world is done)
             // till all clients have reached this state.
-            if (network_manager->getState()==NetworkManager::NS_READY_SET_GO_BARRIER) continue;
+            //if (network_manager->getState()==NetworkManager::NS_READY_SET_GO_BARRIER) continue;
             updateRace(dt);
         }   // if race is active
 

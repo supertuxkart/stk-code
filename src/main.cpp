@@ -169,6 +169,8 @@
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
+#include "network/client_network_manager.hpp"
+#include "network/server_network_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -681,21 +683,16 @@ int handleCmdLine(int argc, char **argv)
         }
         else if(sscanf(argv[i], "--server=%d",&n)==1)
         {
-            network_manager->setMode(NetworkManager::NW_SERVER);
+            NetworkManager::getInstance<ServerNetworkManager>(); //create the server
             UserConfigParams::m_server_port = n;
         }
         else if( !strcmp(argv[i], "--server") )
         {
-            network_manager->setMode(NetworkManager::NW_SERVER);
+            NetworkManager::getInstance<ServerNetworkManager>();
         }
         else if( sscanf(argv[i], "--port=%d", &n) )
         {
             UserConfigParams::m_server_port=n;
-        }
-        else if( sscanf(argv[i], "--client=%1023s", s) )
-        {
-            network_manager->setMode(NetworkManager::NW_CLIENT);
-            UserConfigParams::m_server_address=s;
         }
         else if ( sscanf(argv[i], "--gfx=%d", &n) )
         {
@@ -1170,9 +1167,10 @@ void initRest()
     kart_properties_manager = new KartPropertiesManager();
     projectile_manager      = new ProjectileManager    ();
     powerup_manager         = new PowerupManager       ();
+    // If the server has been created (--server option), this will do nothing:
+    NetworkManager::getInstance<ClientNetworkManager>(); 
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
-    network_manager         = new NetworkManager       ();
     KartPropertiesManager::addKartSearchDir(
                  file_manager->getAddonsFile("karts/"));
     track_manager->addTrackSearchDir(
@@ -1219,7 +1217,8 @@ void cleanSuperTuxKart()
     INetworkHttp::destroy();
     if(news_manager)            delete news_manager;
     if(addons_manager)          delete addons_manager;
-    if(network_manager)         delete network_manager;
+    NetworkManager::kill();
+    
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
     if(attachment_manager)      delete attachment_manager;
@@ -1477,7 +1476,7 @@ int main(int argc, char *argv[] )
         {
             // This will setup the race manager etc.
             history->Load();
-            network_manager->setupPlayerKartInfo();
+//            network_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
             main_loop->run();
             // well, actually run() will never return, since
@@ -1486,20 +1485,6 @@ int main(int argc, char *argv[] )
             exit(-3);
         }
 
-        // Initialise connection in case that a command line option was set
-        // configuring a client or server. Otherwise this function does nothing
-        // here (and will be called again from the network gui).
-        if(!network_manager->initialiseConnections())
-        {
-            Log::error("main", "Problems initialising network connections,\n"
-                            "Running in non-network mode.");
-        }
-        // On the server start with the network information page for now
-        if(network_manager->getMode()==NetworkManager::NW_SERVER)
-        {
-            // TODO - network menu
-            //menu_manager->pushMenu(MENUID_NETWORK_GUI);
-        }
         // Not replaying
         // =============
         if(!ProfileWorld::isProfileMode())
@@ -1509,7 +1494,7 @@ int main(int argc, char *argv[] )
                 // Quickstart (-N)
                 // ===============
                 // all defaults are set in InitTuxkart()
-                network_manager->setupPlayerKartInfo();
+//                network_manager->setupPlayerKartInfo();
                 race_manager->startNew(false);
             }
         }
@@ -1519,7 +1504,7 @@ int main(int argc, char *argv[] )
             // =========
             race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
             race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
-            network_manager->setupPlayerKartInfo();
+//            network_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
         }
         main_loop->run();

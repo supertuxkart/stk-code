@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,25 +16,30 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_RACE_START_MESSAGE_HPP
-#define HEADER_RACE_START_MESSAGE_HPP
+#ifndef NETWORK_INTERFACE_H
+#define NETWORK_INTERFACE_H
 
-#include "network/message.hpp"
-#include "network/remote_kart_info.hpp"
-#include "race/race_manager.hpp"
+#include "network/singleton.hpp"
+#include "network/types.hpp"
+#include "network/network_manager.hpp"
 
-class RaceStartMessage : public Message
+#include <stdint.h>
+#include <pthread.h>
+#include <string>
+
+
+class NetworkInterface : public Singleton<NetworkInterface>
 {
-private:
-// For now this is an empty message
-public:
-    RaceStartMessage() : Message(Message::MT_RACE_START)
-    {
-        allocate(0);
-    }   // RaceStartMessage
+    friend class Singleton<NetworkInterface>;
+    public:
+        
+        void initNetwork(bool server);
+        
+    protected:
+        // protected functions
+        NetworkInterface();
+        virtual ~NetworkInterface();
+        
+};
 
-    RaceStartMessage(ENetPacket* pkt):Message(pkt, MT_RACE_START)
-    {
-    }
-};   // RaceStartMessage
-#endif
+#endif // NETWORK_INTERFACE_H

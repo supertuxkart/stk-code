@@ -83,7 +83,7 @@ void OverWorld::enterOverWorld()
         ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
     StateManager::get()->enterGameState();
-    network_manager->setupPlayerKartInfo();
+//    network_manager->setupPlayerKartInfo();
     race_manager->startNew(false);
     if(race_manager->haveKartLastPositionOnOverworld()){
 			OverWorld *ow = (OverWorld*)World::getWorld();

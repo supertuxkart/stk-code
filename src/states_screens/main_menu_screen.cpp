@@ -332,7 +332,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
         StateManager::get()->enterGameState();
-        network_manager->setupPlayerKartInfo();
+//        network_manager->setupPlayerKartInfo();
         race_manager->startNew(false);
     }
     else if (selection == "story")

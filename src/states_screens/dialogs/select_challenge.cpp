@@ -201,7 +201,7 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         // Initialise global data - necessary even in local games to avoid
         // many if tests in other places (e.g. if network_game call
         // network_manager else call race_manager).
-        network_manager->initCharacterDataStructures();
+//        network_manager->initCharacterDataStructures();
 
         // Launch challenge
         if (eventSource == "novice")
@@ -228,7 +228,7 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         }
 
         // Sets up kart info, including random list of kart for AI
-        network_manager->setupPlayerKartInfo();
+//        network_manager->setupPlayerKartInfo();
         race_manager->startNew(true);
 
         irr_driver->hidePointer();

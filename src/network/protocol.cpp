@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,27 +16,34 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_NUM_PLAYERS_MESSAGE_HPP
-#define HEADER_NUM_PLAYERS_MESSAGE_HPP
+#include "network/protocol.hpp"
 
-#include <string>
-#include <sstream>
-#ifndef WIN32
-#  include <unistd.h>
-#endif
-
-#include "network/message.hpp"
-#include "race/race_manager.hpp"
-
-class NumPlayersMessage : public Message
+Protocol::Protocol(CallbackObject* callback_object, PROTOCOL_TYPE type)
 {
-private:
-    int m_num_players
-public:
-                NumPlayersMessage():Message(Message::MT_CONNECT) { m_num_players=race }
-                NumPlayersMessage(ENetPacket* pkt):Message(pkt)
-                              { m_id=getString(); }
-    const std::string&
-                getNumPlayers()       { return m_num_players;      }
-};   // ConnectMessage
-#endif
+    m_callback_object = callback_object;
+    m_type = type;
+}
+
+Protocol::~Protocol()
+{
+}
+
+void Protocol::pause()
+{
+    m_listener->requestPause(this);
+}
+void Protocol::unpause()
+{
+    m_listener->requestUnpause(this);
+}
+
+
+void Protocol::setListener(ProtocolManager* listener)
+{
+    m_listener = listener; 
+}
+
+PROTOCOL_TYPE Protocol::getProtocolType()
+{
+    return m_type;
+}
