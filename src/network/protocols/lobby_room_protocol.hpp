@@ -21,6 +21,8 @@
 
 #include "network/protocol.hpp"
 
+#include "network/game_setup.hpp"
+
 /*!
  * \class LobbyRoomProtocol
  * \brief Class used while the game is being prepared.
@@ -42,6 +44,8 @@ class LobbyRoomProtocol : public Protocol
         void sendMessage(std::string message);
         
     protected:
+        GameSetup* m_setup; //!< The game setup.
+        uint8_t m_next_id;
 };
 
 #endif // LOBBY_ROOM_PROTOCOL_HPP

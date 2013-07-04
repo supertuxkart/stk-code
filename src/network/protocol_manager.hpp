@@ -179,6 +179,11 @@ class ProtocolManager : public Singleton<ProtocolManager>
          */
         virtual int             getProtocolID(Protocol* protocol);
         
+        /*! \brief Know whether the app is a server.
+         *  \return True if this application is in server mode, false elseway.
+         */
+        bool     isServer();
+        
     protected:
         // protected functions
         /*! 

@@ -30,15 +30,15 @@
 /*! \class PlayerProfile
  *  \brief Contains the profile of a player. 
  */
-class PlayerProfile 
+class NetworkPlayerProfile 
 {
     public:
-        PlayerProfile() : user_profile("") {}
-        ~PlayerProfile() {}
+        NetworkPlayerProfile() { race_id = 0; user_profile = NULL; }
+        ~NetworkPlayerProfile() {}
         
         uint8_t race_id; //!< The id of the player for the race
         std::string kart_name; //!< The selected kart.
-        OnlineUser user_profile; //!< Pointer to the lobby profile
+        OnlineUser* user_profile; //!< Pointer to the lobby profile
 };
 
 /*! \class GameSetup
@@ -51,16 +51,16 @@ class GameSetup
         GameSetup();
         virtual ~GameSetup();
         
-        void addPlayer(PlayerProfile profile); //!< Add a player.
+        void addPlayer(NetworkPlayerProfile profile); //!< Add a player.
         void removePlayer(uint32_t id); //!< Remove a player by id.
         void removePlayer(uint8_t id); //!< Remove a player by local id.
         
-        const PlayerProfile* getProfile(uint32_t id); //!< Get a profile by database id
-        const PlayerProfile* getProfile(uint8_t id); //!< Get the profile by the lobby id
+        const NetworkPlayerProfile* getProfile(uint32_t id); //!< Get a profile by database id
+        const NetworkPlayerProfile* getProfile(uint8_t id); //!< Get the profile by the lobby id
         
     protected:
-        std::vector<PlayerProfile> m_players; //!< Information about players
-        PlayerProfile m_self_profile; //!< Information about self
+        std::vector<NetworkPlayerProfile> m_players; //!< Information about players
+        NetworkPlayerProfile m_self_profile; //!< Information about self
 };
 
 #endif // GAME_SETUP_HPP

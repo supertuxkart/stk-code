@@ -41,6 +41,7 @@ void* protocolManagerUpdate(void* data)
     return NULL;
 }
 
+//-----------------------------------------------------------------------------
 
 NetworkManager::NetworkManager()
 {
@@ -49,6 +50,8 @@ NetworkManager::NetworkManager()
     m_protocol_manager_update_thread = NULL;
     m_localhost = NULL;
 }
+
+//-----------------------------------------------------------------------------
 
 NetworkManager::~NetworkManager() 
 {
@@ -66,12 +69,17 @@ NetworkManager::~NetworkManager()
     }
 }
 
+//-----------------------------------------------------------------------------
+
 void NetworkManager::run()
 {
     ProtocolManager::getInstance<ProtocolManager>();
     m_protocol_manager_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
-    pthread_create(m_protocol_manager_update_thread, NULL, protocolManagerUpdate, ProtocolManager::getInstance());
+    pthread_create(m_protocol_manager_update_thread, NULL, protocolManagerUpdate, 
+                    ProtocolManager::getInstance());
 }
+
+//-----------------------------------------------------------------------------
 
 bool NetworkManager::connect(TransportAddress peer)
 {
@@ -81,6 +89,8 @@ bool NetworkManager::connect(TransportAddress peer)
     return STKPeer::connectToHost(m_localhost, peer, 2, 0);
 }
 
+//-----------------------------------------------------------------------------
+
 void NetworkManager::setManualSocketsMode(bool manual)
 {
     if (manual)
@@ -89,17 +99,19 @@ void NetworkManager::setManualSocketsMode(bool manual)
         m_localhost->startListening();
 }
 
+//-----------------------------------------------------------------------------
+
 void NetworkManager::notifyEvent(Event* event)
 {
-    Log::info("NetworkManager", "EVENT received\n");
+    Log::info("NetworkManager", "EVENT received");
     switch (event->type) 
     {
         case EVENT_TYPE_MESSAGE:
-            Log::info("NetworkManager", "Message, Sender : %u, message = \"%s\"\n", event->peer->getAddress(), event->data.c_str());
+            Log::info("NetworkManager", "Message, Sender : %u, message = \"%s\"", event->peer->getAddress(), event->data.c_str());
             break;
         case EVENT_TYPE_DISCONNECTED:
-            Log::info("NetworkManager", "Somebody is now disconnected. There are now %lu peers.\n", m_peers.size());
-            Log::info("NetworkManager", "Disconnected host: %i.%i.%i.%i:%i\n", event->peer->getAddress()>>24&0xff, event->peer->getAddress()>>16&0xff, event->peer->getAddress()>>8&0xff, event->peer->getAddress()&0xff,event->peer->getPort());
+            Log::info("NetworkManager", "Somebody is now disconnected. There are now %lu peers.", m_peers.size());
+            Log::info("NetworkManager", "Disconnected host: %i.%i.%i.%i:%i", event->peer->getAddress()>>24&0xff, event->peer->getAddress()>>16&0xff, event->peer->getAddress()>>8&0xff, event->peer->getAddress()&0xff,event->peer->getPort());
             // remove the peer:
             for (unsigned int i = 0; i < m_peers.size(); i++)
             {
@@ -110,10 +122,10 @@ void NetworkManager::notifyEvent(Event* event)
                     break;
                 }
             }
-            Log::fatal("NetworkManager", "The peer that has been disconnected was not registered by the Network Manager.\n");
+            Log::fatal("NetworkManager", "The peer that has been disconnected was not registered by the Network Manager.");
             break;
         case EVENT_TYPE_CONNECTED:
-            Log::info("NetworkManager", "A client has just connected. There are now %lu peers.\n", m_peers.size() + 1);
+            Log::info("NetworkManager", "A client has just connected. There are now %lu peers.", m_peers.size() + 1);
             // create the new peer:
             m_peers.push_back(event->peer);
             break;
@@ -121,21 +133,40 @@ void NetworkManager::notifyEvent(Event* event)
     ProtocolManager::getInstance()->notifyEvent(event);
 }
 
+//-----------------------------------------------------------------------------
+
+GameSetup* NetworkManager::setupNewGame()
+{
+    if (m_game_setup)
+        delete m_game_setup;
+    m_game_setup = new GameSetup();
+    return m_game_setup;
+}
+
+//-----------------------------------------------------------------------------
+
+
 void NetworkManager::setLogin(std::string username, std::string password)
 {
     m_player_login.username = username;
     m_player_login.password = password;
 }
 
+//-----------------------------------------------------------------------------
+
 void NetworkManager::setPublicAddress(TransportAddress addr)
 {
     m_public_address = addr;
 }
 
+//-----------------------------------------------------------------------------
+
 bool NetworkManager::peerExists(TransportAddress peer)
 {
     return m_localhost->peerExists(peer);
 }
+
+//-----------------------------------------------------------------------------
 
 bool NetworkManager::isConnectedTo(TransportAddress peer)
 {

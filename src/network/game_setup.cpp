@@ -34,7 +34,7 @@ GameSetup::~GameSetup()
 
 //-----------------------------------------------------------------------------
 
-void GameSetup::addPlayer(PlayerProfile profile)
+void GameSetup::addPlayer(NetworkPlayerProfile profile)
 {
     m_players.push_back(profile);
 }
@@ -45,7 +45,7 @@ void GameSetup::removePlayer(uint32_t id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
-        if (m_players[i].user_profile.getUserID() == id)
+        if (m_players[i].user_profile->getUserID() == id)
         {
             m_players.erase(m_players.begin()+i, m_players.begin()+i+1);
             Log::verbose("GameSetup", "Removed a player from the game setup.");
@@ -71,20 +71,21 @@ void GameSetup::removePlayer(uint8_t id)
 
 //-----------------------------------------------------------------------------
         
-const PlayerProfile* GameSetup::getProfile(uint32_t id)
+const NetworkPlayerProfile* GameSetup::getProfile(uint32_t id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
-        if (m_players[i].user_profile.getUserID() == id)
+        if (m_players[i].user_profile->getUserID() == id)
         {
             return &m_players[i];
         }
     }
+    return NULL;
 }
 
 //-----------------------------------------------------------------------------
  
-const PlayerProfile* GameSetup::getProfile(uint8_t id)
+const NetworkPlayerProfile* GameSetup::getProfile(uint8_t id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
@@ -93,5 +94,7 @@ const PlayerProfile* GameSetup::getProfile(uint8_t id)
             return &m_players[i];
         }
     }
+    return NULL;
 }
+
 //-----------------------------------------------------------------------------

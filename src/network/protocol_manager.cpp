@@ -300,6 +300,11 @@ int ProtocolManager::getProtocolID(Protocol* protocol)
     return 0;
 }
 
+bool ProtocolManager::isServer()
+{
+    return NetworkManager::getInstance()->isServer();
+}
+
 void ProtocolManager::assignProtocolId(ProtocolInfo* protocol_info)
 {
     pthread_mutex_lock(&m_id_mutex);
