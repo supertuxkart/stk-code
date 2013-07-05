@@ -19,7 +19,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-//NETWORK_UPDATE_PLZ
 #ifndef HEADER_FLYABLE_HPP
 #define HEADER_FLYABLE_HPP
 
@@ -35,7 +34,6 @@ using namespace irr;
 #include "tracks/terrain_info.hpp"
 
 class AbstractKart;
-class FlyableInfo;
 class HitEffect;
 class PhysicalObject;
 class XMLNode;
@@ -170,7 +168,6 @@ public:
     virtual bool              updateAndDelete(float);
     virtual const core::stringw getHitString(const AbstractKart *kart) const = 0;
     virtual HitEffect*        getHitEffect() const;
-    void                      updateFromServer(const FlyableInfo &f, float dt);
     bool                      isOwnerImmunity(const AbstractKart *kart_hit) const;
     virtual bool              hit(AbstractKart* kart, PhysicalObject* obj=NULL);
     void                      explode(AbstractKart* kart, PhysicalObject* obj=NULL,

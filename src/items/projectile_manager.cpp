@@ -16,8 +16,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-//NETWORK_UPDATE_PLZ
-
 #include "items/projectile_manager.hpp"
 
 #include "graphics/explosion.hpp"
@@ -28,7 +26,6 @@
 #include "items/powerup_manager.hpp"
 #include "items/powerup.hpp"
 #include "items/rubber_ball.hpp"
-#include "network/network_manager.hpp"
 
 ProjectileManager *projectile_manager=0;
 
@@ -67,15 +64,7 @@ void ProjectileManager::cleanup()
 /** General projectile update call. */
 void ProjectileManager::update(float dt)
 {
-
-    if(NetworkManager::getInstance()->isClient())
-    {
-        updateClient(dt);
-    }
-    else
-    {
-        updateServer(dt);
-    }
+    updateServer(dt);
 
     HitEffects::iterator he = m_active_hit_effects.begin();
     while(he!=m_active_hit_effects.end())
@@ -102,25 +91,10 @@ void ProjectileManager::update(float dt)
 /** Updates all rockets on the server (or no networking). */
 void ProjectileManager::updateServer(float dt)
 {
-    // First update all projectiles on the track
-    
-    if(NetworkManager::getInstance()->isPlayingOnline()) //network_manager->getMode()!=NetworkManager::NW_NONE)
-    {
-        //race_state->setNumFlyables(m_active_projectiles.size());
-    }
-    
-
     Projectiles::iterator p = m_active_projectiles.begin();
     while(p!=m_active_projectiles.end())
     {
         bool can_be_deleted = (*p)->updateAndDelete(dt);
-        if(NetworkManager::getInstance()->isPlayingOnline()) //network_manager->getMode()!=NetworkManager::NW_NONE)
-        {
-            /*race_state->setFlyableInfo(p-m_active_projectiles.begin(),
-                                       FlyableInfo((*p)->getXYZ(),
-                                                   (*p)->getRotation(),
-                                                   can_be_deleted)     );*/
-        }
         if(can_be_deleted)
         {
             HitEffect *he = (*p)->getHitEffect();
@@ -137,31 +111,6 @@ void ProjectileManager::updateServer(float dt)
     
 }   // updateServer
 
-// -----------------------------------------------------------------------------
-/** Updates all rockets and hit effects on the client.
- *  updateClient takes the information in race_state and updates all rockets
- *  (i.e. position, hit effects etc)                                          */
-void ProjectileManager::updateClient(float dt)
-{
-    /*
-    unsigned int num_projectiles = race_state->getNumFlyables();
-    if(num_projectiles != m_active_projectiles.size())
-        fprintf(stderr, "Warning: num_projectiles %d active %d\n",
-                num_projectiles, (int)m_active_projectiles.size());
-
-    unsigned int indx=0;
-    for(Projectiles::iterator i  = m_active_projectiles.begin();
-        i != m_active_projectiles.end();   ++i, ++indx)
-    {
-        const FlyableInfo &f = race_state->getFlyable(indx);
-        (*i)->updateFromServer(f, dt);
-        if(f.m_exploded)
-        {
-            (*i)->hit(NULL);
-        }
-    }   // for i in m_active_projectiles
-    */
-}   // updateClient
 // -----------------------------------------------------------------------------
 Flyable *ProjectileManager::newProjectile(AbstractKart *kart, Track* track,
                                           PowerupManager::PowerupType type)

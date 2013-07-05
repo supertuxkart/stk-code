@@ -19,7 +19,6 @@
 #ifndef HEADER_KART_CONTROL_HPP
 #define HEADER_KART_CONTROL_HPP
 
-//NETWORK_UPDATE_PLZ
 
 /** 
   * \ingroup controller

@@ -1476,7 +1476,7 @@ int main(int argc, char *argv[] )
         {
             // This will setup the race manager etc.
             history->Load();
-//            network_manager->setupPlayerKartInfo();
+            race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
             main_loop->run();
             // well, actually run() will never return, since
@@ -1494,7 +1494,7 @@ int main(int argc, char *argv[] )
                 // Quickstart (-N)
                 // ===============
                 // all defaults are set in InitTuxkart()
-//                network_manager->setupPlayerKartInfo();
+                race_manager->setupPlayerKartInfo();
                 race_manager->startNew(false);
             }
         }
@@ -1504,7 +1504,7 @@ int main(int argc, char *argv[] )
             // =========
             race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
             race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
-//            network_manager->setupPlayerKartInfo();
+            race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
         }
         main_loop->run();

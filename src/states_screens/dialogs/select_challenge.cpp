@@ -228,7 +228,7 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         }
 
         // Sets up kart info, including random list of kart for AI
-//        network_manager->setupPlayerKartInfo();
+        race_manager->setupPlayerKartInfo();
         race_manager->startNew(true);
 
         irr_driver->hidePointer();

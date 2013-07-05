@@ -25,7 +25,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
-#include "network/network_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -319,13 +318,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     // Race finished
     if(kart_info.m_race_lap >= race_manager->getNumLaps() && raceHasLaps())
     {
-        // A client does not detect race finished by itself, it will
-        // receive a message from the server. So a client does not do
-        // anything here.
-        /*if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
-        {
-            kart->finishedRace(getTime());
-        }*/
+        kart->finishedRace(getTime());
     }
     float time_per_lap;
     if (kart_info.m_race_lap == 1) // just completed first lap

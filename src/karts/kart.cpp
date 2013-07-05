@@ -57,7 +57,6 @@
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
-#include "network/network_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
 #include "physics/btUprightConstraint.hpp"
@@ -79,8 +78,6 @@
 #else
 #  include <math.h>
 #endif
-
-//NETWORK_UPDATE_PLZ
 
 /** The kart constructor.
  *  \param ident  The identifier for the kart model to use.
@@ -875,15 +872,6 @@ void Kart::collectedItem(Item *item, int add_info)
     default        : break;
     }   // switch TYPE
 
-    // Attachments and powerups are stored in the corresponding
-    // functions (hit{Red,Green}Item), so only coins need to be
-    // stored here.
-    /*if(NetworkManager::getInstance()->isServer() &&
-        (type==Item::ITEM_NITRO_BIG || type==Item::ITEM_NITRO_SMALL) )
-    {
-        race_state->itemCollected(getWorldKartId(), item->getItemId());
-    }*/
-
     if ( m_collected_energy > m_kart_properties->getNitroMax())
         m_collected_energy = m_kart_properties->getNitroMax();
     m_controller->collectedItem(*item, add_info, old_energy);
@@ -1014,14 +1002,6 @@ void Kart::update(float dt)
     }
 
     m_slipstream->update(dt);
-
-    // Store the actual kart controls at the start of update in the server
-    // state. This makes it easier to reset some fields when they are not used
-    // anymore (e.g. controls.fire).
-    if(NetworkManager::getInstance()->isServer())
-    {
-        //race_state->storeKartControls(*this);
-    }
 
     if (!m_flying)
     {
