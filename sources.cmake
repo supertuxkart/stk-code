@@ -141,6 +141,7 @@ src/network/game_setup.cpp
 src/network/http_functions.cpp
 src/network/network_interface.cpp
 src/network/network_manager.cpp
+src/network/network_string.cpp
 src/network/protocol.cpp
 src/network/protocol_manager.cpp
 src/network/protocols/connect_to_server.cpp
@@ -404,6 +405,7 @@ src/network/game_setup.hpp
 src/network/http_functions.hpp
 src/network/network_interface.hpp
 src/network/network_manager.hpp
+src/network/network_string.hpp
 src/network/protocol.hpp
 src/network/protocol_manager.hpp
 src/network/protocols/connect_to_server.hpp

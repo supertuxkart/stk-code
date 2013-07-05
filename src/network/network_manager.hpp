@@ -42,7 +42,9 @@ class NetworkManager : public Singleton<NetworkManager>
         
         // message/packets related functions
         virtual void notifyEvent(Event* event);
-        virtual void sendPacket(const char* data) = 0;
+        virtual void sendPacket(const NetworkString& data) = 0;
+        virtual void sendPacket(STKPeer* peer, const NetworkString& data);
+        virtual void sendPacketExcept(STKPeer* peer, const NetworkString& data);
 
         // Game related functions
         virtual GameSetup* setupNewGame(); //!< Creates a new game setup and returns it

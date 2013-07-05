@@ -55,12 +55,13 @@ class GameSetup
         void removePlayer(uint32_t id); //!< Remove a player by id.
         void removePlayer(uint8_t id); //!< Remove a player by local id.
         
+        int getPlayerCount() { return m_players.size(); }
         const NetworkPlayerProfile* getProfile(uint32_t id); //!< Get a profile by database id
         const NetworkPlayerProfile* getProfile(uint8_t id); //!< Get the profile by the lobby id
         
     protected:
         std::vector<NetworkPlayerProfile> m_players; //!< Information about players
-        NetworkPlayerProfile m_self_profile; //!< Information about self
+        NetworkPlayerProfile m_self_profile; //!< Information about self (client only)
 };
 
 #endif // GAME_SETUP_HPP

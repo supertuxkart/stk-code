@@ -22,8 +22,10 @@
 #ifndef STK_HOST_HPP
 #define STK_HOST_HPP
 
-#include <enet/enet.h>
 #include "network/types.hpp"
+#include "network/network_string.hpp"
+
+#include <enet/enet.h>
 
 /*! \class STKHost
  *  \brief Represents the local host.
@@ -122,7 +124,7 @@ class STKHost
         /*! \brief Broadcasts a packet to all peers.
          *  \param data : Data to send.
          */
-        void        broadcastPacket(const char* data);
+        void        broadcastPacket(const NetworkString& data);
         
         /*! \brief Tells if a peer is known.
          *  \return True if the peer is known, false elseway.

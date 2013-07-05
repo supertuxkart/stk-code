@@ -111,7 +111,7 @@ bool ServerNetworkManager::connectToPeer(std::string peer_username)
     return success;
 }
 
-void ServerNetworkManager::sendPacket(const char* data)
+void ServerNetworkManager::sendPacket(const NetworkString& data)
 {
     m_localhost->broadcastPacket(data);
 }

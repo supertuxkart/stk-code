@@ -135,6 +135,25 @@ void NetworkManager::notifyEvent(Event* event)
 
 //-----------------------------------------------------------------------------
 
+void NetworkManager::sendPacket(STKPeer* peer, const NetworkString& data)
+{
+    if (peer)
+        peer->sendPacket(data);
+}
+
+//-----------------------------------------------------------------------------
+
+void NetworkManager::sendPacketExcept(STKPeer* peer, const NetworkString& data)
+{
+    for (unsigned int i = 0; i < m_peers.size(); i++)
+    {
+        if (m_peers[i] != peer)
+            m_peers[i]->sendPacket(data);
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 GameSetup* NetworkManager::setupNewGame()
 {
     if (m_game_setup)

@@ -110,7 +110,7 @@ bool ClientNetworkManager::connectToHost(std::string serverNickname)
     return success;
 }
 
-void ClientNetworkManager::sendPacket(const char* data)
+void ClientNetworkManager::sendPacket(const NetworkString& data)
 {
     if (m_peers.size() > 1)
         Log::warn("ClientNetworkManager", "Ambiguous send of data.\n");

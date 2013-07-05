@@ -193,9 +193,9 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender)
 
 // ----------------------------------------------------------------------------
 
-void STKHost::broadcastPacket(const char* data)
+void STKHost::broadcastPacket(const NetworkString& data)
 {
-    ENetPacket* packet = enet_packet_create(data, strlen(data)+1,
+    ENetPacket* packet = enet_packet_create(data.c_str(), data.size()+1,
                                             ENET_PACKET_FLAG_RELIABLE);
     enet_host_broadcast(m_host, 0, packet);
 }

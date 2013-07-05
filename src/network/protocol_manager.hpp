@@ -25,6 +25,7 @@
 
 #include "network/singleton.hpp"
 #include "network/event.hpp"
+#include "network/network_string.hpp"
 
 #include <vector>
 #include <stdint.h>
@@ -104,7 +105,15 @@ class ProtocolManager : public Singleton<ProtocolManager>
         /*! 
          * \brief WILL BE COMMENTED LATER
          */
-        virtual void            sendMessage(Protocol* sender, std::string message);
+        virtual void            sendMessage(Protocol* sender, const NetworkString& message);
+        /*! 
+         * \brief WILL BE COMMENTED LATER
+         */
+        virtual void            sendMessage(Protocol* sender, STKPeer* peer, const NetworkString& message);
+        /*! 
+         * \brief WILL BE COMMENTED LATER
+         */
+        virtual void            sendMessageExcept(Protocol* sender, STKPeer* peer, const NetworkString& message);
         
         /*! 
          * \brief Asks the manager to start a protocol.

@@ -22,6 +22,7 @@
 #include "network/protocol.hpp"
 
 #include "network/game_setup.hpp"
+#include "network/network_string.hpp"
 
 /*!
  * \class LobbyRoomProtocol

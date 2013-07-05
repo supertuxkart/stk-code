@@ -65,11 +65,27 @@ void ProtocolManager::notifyEvent(Event* event)
     pthread_mutex_unlock(&m_events_mutex);
 }
 
-void ProtocolManager::sendMessage(Protocol* sender, std::string message)
+void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message)
 {
-    std::string newMessage = " " + message; // add one byte to add protocol type
-    newMessage[0] = (char)(sender->getProtocolType());
-    NetworkManager::getInstance()->sendPacket(newMessage.c_str());
+    NetworkString newMessage;
+    newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
+    newMessage += message; 
+    NetworkManager::getInstance()->sendPacket(newMessage);
+}
+
+void ProtocolManager::sendMessage(Protocol* sender, STKPeer* peer, const NetworkString& message)
+{
+    NetworkString newMessage;
+    newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
+    newMessage += message; 
+    NetworkManager::getInstance()->sendPacket(peer, newMessage);
+}
+void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer, const NetworkString& message)
+{
+    NetworkString newMessage;
+    newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
+    newMessage += message; 
+    NetworkManager::getInstance()->sendPacketExcept(peer, newMessage);
 }
 
 int ProtocolManager::requestStart(Protocol* protocol)

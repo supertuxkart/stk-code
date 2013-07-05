@@ -38,7 +38,8 @@ Event::Event(ENetEvent* event)
     if (type == EVENT_TYPE_MESSAGE)
         data = std::string((char*)(event->packet->data));
     else if (event->data)
-        data = std::string((char*)(event->data));
+    {
+    }
     
     if (event->packet)
         m_packet = event->packet;
