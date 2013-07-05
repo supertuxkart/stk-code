@@ -90,36 +90,48 @@ LoginDialog::~LoginDialog()
 {
 }
 
-// -----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSource)
+
+// -----------------------------------------------------------------------------
+void LoginDialog::login()
 {
-    if (eventSource == "cancel")
+    const stringw username = m_username_widget->getText().trim();
+    const stringw password = m_password_widget->getText().trim();
+    stringw info = "";
+    if(CurrentOnlineUser::get()->signIn(username,password,info))
     {
         m_self_destroy = true;
-        return GUIEngine::EVENT_BLOCK;
     }
-    else if(eventSource == "sign_in")
+    else
     {
-        const stringw username = m_username_widget->getText().trim();
-        const stringw password = m_password_widget->getText().trim();
-        stringw info = "";
-        if(CurrentOnlineUser::get()->signIn(username,password,info))
+        sfx_manager->quickSound( "anvil" );
+        m_message_widget->setColor(irr::video::SColor(255, 255, 0, 0));
+        m_message_widget->setText(info, false);
+    }
+}
+
+// -----------------------------------------------------------------------------
+GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSource)
+{
+
+    if (eventSource == m_options_widget->m_properties[PROP_ID])
+    {
+        const std::string& selection = m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
             m_self_destroy = true;
+            return GUIEngine::EVENT_BLOCK;
         }
-        else
+        else if(selection == m_sign_in_widget->m_properties[PROP_ID])
         {
-            sfx_manager->quickSound( "anvil" );
-            m_message_widget->setColor(irr::video::SColor(255, 255, 0, 0));
-            m_message_widget->setText(info, false);
+            login();
+            return GUIEngine::EVENT_BLOCK;
         }
-        return GUIEngine::EVENT_BLOCK;
-    }
-    else if(eventSource == "register")
-    {
-        m_open_registration_dialog = true;
-        return GUIEngine::EVENT_BLOCK;
+        else if(selection == m_register_widget->m_properties[PROP_ID])
+        {
+            m_open_registration_dialog = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
     }
     return GUIEngine::EVENT_LET;
 }
@@ -133,7 +145,7 @@ void LoginDialog::onEnterPressedInternal()
     const int playerID = PLAYER_ID_GAME_MASTER;
     if (GUIEngine::isFocusedForPlayer(m_options_widget, playerID))
         return;
-    processEvent("sign_in");
+    login();
 }
 
 // -----------------------------------------------------------------------------
