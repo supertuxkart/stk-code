@@ -192,6 +192,8 @@ src/states_screens/help_screen_4.cpp
 src/states_screens/kart_selection.cpp
 src/states_screens/main_menu_screen.cpp
 src/states_screens/minimal_race_gui.cpp
+src/states_screens/networking_lobby.cpp
+src/states_screens/networking_lobby_settings.cpp
 src/states_screens/online_screen.cpp
 src/states_screens/options_screen_audio.cpp
 src/states_screens/options_screen_input2.cpp
@@ -459,6 +461,8 @@ src/states_screens/help_screen_4.hpp
 src/states_screens/kart_selection.hpp
 src/states_screens/main_menu_screen.hpp
 src/states_screens/minimal_race_gui.hpp
+src/states_screens/networking_lobby.hpp
+src/states_screens/networking_lobby_settings.hpp
 src/states_screens/online_screen.hpp
 src/states_screens/options_screen_audio.hpp
 src/states_screens/options_screen_input2.hpp
