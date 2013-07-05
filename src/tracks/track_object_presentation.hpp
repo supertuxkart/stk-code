@@ -253,6 +253,8 @@ private:
     /** For action trigger objects */
     std::string m_action;
 
+    bool m_action_active;
+
 public:
 
 
@@ -260,6 +262,8 @@ public:
     virtual ~TrackObjectPresentationActionTrigger() {}
 
     virtual void onTriggerItemApproached(Item* who) OVERRIDE;
+    
+    virtual void reset() OVERRIDE { m_action_active = true; }
 };
 
 
