@@ -615,7 +615,9 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
 {
     if (w->m_deactivated) return EVENT_BLOCK;
 
-    if (ModalDialog::isADialogActive())
+    Widget* parent = w->m_event_handler;
+    
+    if (ModalDialog::isADialogActive() && (parent == NULL || parent->m_type != GUIEngine::WTYPE_RIBBON))
     {
         if (ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]) == EVENT_BLOCK)
         {
@@ -626,7 +628,6 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
 
     //std::cout << "**** widget activated : " << w->m_properties[PROP_ID].c_str() << " ****" << std::endl;
 
-    Widget* parent = w->m_event_handler;
     if (w->m_event_handler != NULL)
     {
         /* Find all parents. Stop looping if a widget event handler's is itself, to not fall
