@@ -146,8 +146,7 @@ void TextBoxWidget::unfocused(const int playerID, Widget* new_focus)
 
     setWithinATextBox(false);
     
-    if (new_focus != NULL)
-        GUIEngine::getGUIEnv()->setFocus(new_focus->getIrrlichtElement());
+    GUIEngine::getGUIEnv()->removeFocus(m_element);
 }
 
 // -----------------------------------------------------------------------------
