@@ -51,6 +51,12 @@ struct Input
         AD_NEUTRAL
     };
 
+    enum AxisRange
+    {
+        AR_HALF,
+        AR_FULL
+    };
+
     enum InputType
     {
         IT_NONE = 0,
@@ -67,6 +73,7 @@ struct Input
     int       m_device_id;
     int       m_button_id; // or axis ID for gamepads axes
     int       m_axis_direction;
+    int       m_axis_range;
     wchar_t   m_character;
 
     Input()

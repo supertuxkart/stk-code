@@ -1,11 +1,11 @@
 <stkgui>
 
-<div x="2%" y="2%" width="96%" height="97%" layout="vertical-row" >
+<div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
 
     <header text_align="center" width="80%" align="center" text="SuperTuxKart Options"/>
     <spacer height="15" width="10"/>
     
-    <tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
+    <tabs id="options_choice" height="10%" max_height="110" x="2%" width="98%" align="center">
         <icon-button id="tab_video" width="128" height="128" icon="gui/options_video.png"/>
         <icon-button id="tab_audio" width="128" height="128" icon="gui/options_audio.png"/>
         <icon-button id="tab_ui" width="128" height="128" icon="gui/options_ui.png"/>
@@ -28,6 +28,7 @@
 
         <spacer width="50" height="20" /> 
         <div proportion="2" width="100%"  layout="horizontal-row">
+            <spacer width="7" height="5"/>
             <div height="100%" width="fit" layout="vertical-row">
                 <button id="delete"
                         I18N="To delete a keyboard configuration"  text="Delete Configuration"/>

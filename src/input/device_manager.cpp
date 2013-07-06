@@ -322,7 +322,7 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
                                              int deviceID,
                                              int btnID,
                                              int axisDir,
-                                             int value,
+                                             int *value /* inout */,
                                              InputManager::InputDriverMode mode,
                                              StateManager::ActivePlayer **player /* out */,
                                              PlayerAction *action /* out */)
@@ -361,14 +361,14 @@ bool DeviceManager::translateInput( Input::InputType type,
                                     int deviceID,
                                     int btnID,
                                     int axisDir,
-                                    int value,
+                                    int* value /* inout */,
                                     InputManager::InputDriverMode mode,
                                     StateManager::ActivePlayer** player /* out */,
                                     PlayerAction* action /* out */ )
 {
     if (GUIEngine::getCurrentScreen() != NULL)
     {
-        GUIEngine::getCurrentScreen()->filterInput(type, deviceID, btnID, axisDir, value);
+        GUIEngine::getCurrentScreen()->filterInput(type, deviceID, btnID, axisDir, *value);
     }
 
     InputDevice *device = NULL;
@@ -406,7 +406,7 @@ bool DeviceManager::translateInput( Input::InputType type,
 
 
     // Return true if input was successfully translated to an action and player
-    if (device != NULL && abs(value) > Input::MAX_VALUE/2)
+    if (device != NULL && abs(*value) > Input::MAX_VALUE/2)
     {
         m_latest_used_device = device;
     }

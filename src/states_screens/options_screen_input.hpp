@@ -70,6 +70,7 @@ public:
                              int deviceID,
                              int btnID,
                              int axisDir,
+                             int axisRange,
                              int value);
 
     /** \brief implement callback from parent class GUIEngine::Screen */

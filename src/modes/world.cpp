@@ -55,7 +55,6 @@
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/minimal_race_gui.hpp"
 #include "states_screens/race_gui.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
@@ -251,10 +250,10 @@ void World::reset()
 
 void World::createRaceGUI()
 {
-    if(UserConfigParams::m_minimal_race_gui &&
-       race_manager->getTrackName() != "tutorial")
-		m_race_gui = new MinimalRaceGUI();
-	else
+    //if(UserConfigParams::m_minimal_race_gui &&
+    //   race_manager->getTrackName() != "tutorial")
+	//	m_race_gui = new MinimalRaceGUI();
+	//else
 		m_race_gui = new RaceGUI();
 }
 
@@ -750,7 +749,7 @@ void World::updateWorld(float dt)
 
                 StateManager::get()->enterGameState();
                 network_manager->setupPlayerKartInfo();
-                race_manager->startNew(false);
+                race_manager->startNew(true);
             }
             else
             {

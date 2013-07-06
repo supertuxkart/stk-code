@@ -42,15 +42,25 @@ AddonsScreen::AddonsScreen() : Screen("addons_screen.stkgui")
     m_selected_index = -1;
 
     // Add date filters.
-    m_date_filters.push_back((DateFilter) {_("All")   , 0, 0,  0});
-    m_date_filters.push_back((DateFilter) {_("1 week")   , 0, 0,  7});
-    m_date_filters.push_back((DateFilter) {_("2 weeks")  , 0, 0, 12});
-    m_date_filters.push_back((DateFilter) {_("1 month")  , 0, 1,  0});
-    m_date_filters.push_back((DateFilter) {_("3 months") , 0, 3,  0});
-    m_date_filters.push_back((DateFilter) {_("6 months") , 0, 6,  0});
-    m_date_filters.push_back((DateFilter) {_("9 months") , 0, 9,  0});
-    m_date_filters.push_back((DateFilter) {_("1 year")   , 1, 0,  0});
-    m_date_filters.push_back((DateFilter) {_("2 years")   , 2, 0,  0});
+    // I18N: Time filters for add-ons
+    DateFilter filter_all = {_("All"), 0, 0, 0};
+    DateFilter filter_1w = {_("1 week"), 0, 0, 7};
+    DateFilter filter_2w = {_("2 weeks"), 0, 0, 12};
+    DateFilter filter_1m = {_("1 month"), 0, 1, 0};
+    DateFilter filter_3m = {_("3 months"), 0, 3, 0};
+    DateFilter filter_6m = {_("6 months"), 0, 6, 0};
+    DateFilter filter_9m = {_("9 months"), 0, 9, 0};
+    DateFilter filter_1y = {_("1 year"), 1, 0, 0};
+    DateFilter filter_2y = {_("2 years"), 2, 0, 0};
+    m_date_filters.push_back(filter_all);
+    m_date_filters.push_back(filter_1w);
+    m_date_filters.push_back(filter_2w);
+    m_date_filters.push_back(filter_1m);
+    m_date_filters.push_back(filter_3m);
+    m_date_filters.push_back(filter_6m);
+    m_date_filters.push_back(filter_9m);
+    m_date_filters.push_back(filter_1y);
+    m_date_filters.push_back(filter_2y);
 
 }   // AddonsScreen
 
@@ -103,13 +113,11 @@ void AddonsScreen::beforeAddingWidget()
     w_filter_date->m_properties[GUIEngine::PROP_MAX_VALUE] = 
                             StringUtils::toString(m_date_filters.size() - 1);
     
-    for (int n = 0; n < m_date_filters.size(); n++)
+    for (unsigned int n = 0; n < m_date_filters.size(); n++)
     {
         w_filter_date->addLabel(m_date_filters[n].label);
     }
 
-    w_filter_date->setValue(0);
-    
     GUIEngine::SpinnerWidget* w_filter_rating =
                         getWidget<GUIEngine::SpinnerWidget>("filter_rating");
     w_filter_rating->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
@@ -119,8 +127,6 @@ void AddonsScreen::beforeAddingWidget()
     {
         w_filter_rating->addLabel(StringUtils::toWString(1.0 + n / 2.0));
     }
-
-    w_filter_rating->setValue(0);
 }
 // ----------------------------------------------------------------------------
 
@@ -150,11 +156,20 @@ void AddonsScreen::init()
 
     m_type = "kart";
     if (UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED)
-        getWidget<GUIEngine::ButtonWidget>("reload")->setDeactivated();
+        getWidget<GUIEngine::IconButtonWidget>("reload")->setDeactivated();
     else
-        getWidget<GUIEngine::ButtonWidget>("reload")->setActivated();
+        getWidget<GUIEngine::IconButtonWidget>("reload")->setActivated();
 
-
+    // Reset filter.
+    GUIEngine::TextBoxWidget* w_filter_name =
+                        getWidget<GUIEngine::TextBoxWidget>("filter_name");
+    w_filter_name->setText(L"");
+    GUIEngine::SpinnerWidget* w_filter_date =
+                        getWidget<GUIEngine::SpinnerWidget>("filter_date");
+    w_filter_date->setValue(0);
+    GUIEngine::SpinnerWidget* w_filter_rating =
+                        getWidget<GUIEngine::SpinnerWidget>("filter_rating");
+    w_filter_rating->setValue(0);
 
     // Set the default sort order
     Addon::setSortOrder(Addon::SO_DEFAULT);

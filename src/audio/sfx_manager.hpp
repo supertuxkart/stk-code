@@ -101,8 +101,6 @@ private:
 
     void                      loadSfx();
 
-    bool                      loadVorbisBuffer(const std::string &name,
-                                               ALuint buffer);
 public:
                              SFXManager();
     virtual                 ~SFXManager();
