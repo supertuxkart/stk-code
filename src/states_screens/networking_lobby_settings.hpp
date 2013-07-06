@@ -44,6 +44,12 @@ private:
 
 public:
 
+    enum Action
+    {
+        Create                  = 1,    // A new server should be created
+        Edit                    = 2,    // The settings of the server should be edited
+    };
+
     virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
