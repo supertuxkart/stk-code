@@ -6,6 +6,8 @@
 #include <assert.h>
 #include <stdint.h>
 
+typedef unsigned char uchar;
+
 class NetworkString
 {
     union { 
@@ -25,6 +27,11 @@ class NetworkString
         NetworkString& removeFront(int size)
         {
             m_string.erase(0, size);
+            return *this;
+        }
+        NetworkString& remove(int pos, int size)
+        {
+            m_string.erase(pos, size);
             return *this;
         }
         
@@ -137,6 +144,53 @@ class NetworkString
                 f_as_i.i[i] = m_string[pos+i];
             return f_as_i.f;
         }
+        
+        //! Functions to get while removing
+        template<typename T, size_t n> 
+        T getAndRemove(int pos)
+        {
+            int a = n;
+            T result = 0;
+            while(a--)
+            {
+                result <<= 8; // offset one byte
+                result += ((uint8_t)(m_string[pos+n-1-a]) & 0xff); // add the data
+            }
+            remove(pos,n);
+            return result;
+        }
+        
+        inline int          getAndRemoveInt(int pos = 0)     { return getAndRemove<int,4>(pos);             }
+        inline uint32_t     getAndRemoveUInt(int pos = 0)    { return getAndRemove<uint32_t,4>(pos);        }
+        inline uint32_t     getAndRemoveUInt32(int pos = 0)  { return getAndRemove<uint32_t,4>(pos);        }
+        inline uint16_t     getAndRemoveUInt16(int pos = 0)  { return getAndRemove<uint16_t,2>(pos);        }
+        inline uint8_t      getAndRemoveUInt8(int pos = 0)   { return getAndRemove<uint8_t,1>(pos);         }
+        inline char         getAndRemoveChar(int pos = 0)    { return getAndRemove<char,1>(pos);            }
+        inline unsigned char getAndRemoveUChar(int pos = 0)  { return getAndRemove<unsigned char,1>(pos);   }
+        double getAndRemoveDouble(int pos = 0) //!< BEWARE OF PRECISION
+        {
+            for (int i = 0; i < 8; i++)
+                d_as_i.i[i] = m_string[pos+i];
+            return d_as_i.d;
+            remove(pos, 8);
+        }
+        float getAndRemoveFloat(int pos = 0) //!< BEWARE OF PRECISION
+        {
+            for (int i = 0; i < 4; i++)
+                f_as_i.i[i] = m_string[pos+i];
+            return f_as_i.f;
+            remove(pos, 4);
+        }
+        
+        inline NetworkString& gui8(uint8_t* dst)   { *dst = getAndRemoveUInt8(0);  }
+        inline NetworkString& gui16(uint16_t* dst) { *dst = getAndRemoveUInt16(0); }
+        inline NetworkString& gui32(uint32_t* dst) { *dst = getAndRemoveUInt32(0); }
+        inline NetworkString& gui(uint32_t* dst)   { *dst = getAndRemoveUInt32(0); }
+        inline NetworkString& gi(int* dst)         { *dst = getAndRemoveInt(0);    }
+        inline NetworkString& gc(char* dst)        { *dst = getAndRemoveChar(0);   }
+        inline NetworkString& guc(uchar* dst)      { *dst = getAndRemoveUChar(0);  }
+        inline NetworkString& gd(double* dst)      { *dst = getAndRemoveDouble(0); }
+        inline NetworkString& gf(float* dst)       { *dst = getAndRemoveFloat(0);  }
     
     protected:
         std::string m_string;
