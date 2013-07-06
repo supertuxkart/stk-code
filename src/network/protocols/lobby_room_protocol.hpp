@@ -36,17 +36,60 @@ class LobbyRoomProtocol : public Protocol
         LobbyRoomProtocol(CallbackObject* callback_object);
         virtual ~LobbyRoomProtocol();
         
+        virtual void notifyEvent(Event* event) = 0;
+        virtual void setup() = 0;
+        virtual void update() = 0;
+        
+    protected:
+        GameSetup* m_setup; //!< The game setup.
+};
+
+class ClientLobbyRoomProtocol : public LobbyRoomProtocol
+{
+    public:
+        ClientLobbyRoomProtocol() : LobbyRoomProtocol(NULL) {}
+        virtual ~ClientLobbyRoomProtocol() {}
+    
         virtual void notifyEvent(Event* event);
-        
         virtual void setup();
-        
         virtual void update();
         
         void sendMessage(std::string message);
         
     protected:
-        GameSetup* m_setup; //!< The game setup.
-        uint8_t m_next_id;
+        TransportAddress m_server_address; 
+        
+        enum STATE
+        {
+            NONE,
+            GETTING_SERVER_ADDRESS,
+            REQUESTING_CONNECTION,
+            CONNECTED,
+            DONE
+        };
+        STATE m_state;
+};
+
+class ServerLobbyRoomProtocol : public LobbyRoomProtocol
+{
+    public:
+        ServerLobbyRoomProtocol() : LobbyRoomProtocol(NULL) {}
+        virtual ~ServerLobbyRoomProtocol() {}
+        
+        virtual void notifyEvent(Event* event);
+        virtual void setup();
+        virtual void update();
+    
+    protected:
+        uint8_t m_next_id; //!< Next id to assign to a peer.
+        std::vector<TransportAddress> m_peers;
+         
+        enum STATE
+        {
+            WORKING,
+            DONE
+        };
+        STATE m_state;
 };
 
 #endif // LOBBY_ROOM_PROTOCOL_HPP

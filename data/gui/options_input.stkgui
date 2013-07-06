@@ -1,11 +1,11 @@
 <stkgui>
 
-<div x="2%" y="2%" width="96%" height="97%" layout="vertical-row" >
+<div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
 
     <header text_align="center" width="80%" align="center" text="SuperTuxKart Options"/>
     <spacer height="15" width="10"/>
     
-    <tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
+    <tabs id="options_choice" height="10%" max_height="110" x="2%" width="98%" align="center">
         <icon-button id="tab_video" width="128" height="128" icon="gui/options_video.png"/>
         <icon-button id="tab_audio" width="128" height="128" icon="gui/options_audio.png"/>
         <icon-button id="tab_ui" width="128" height="128" icon="gui/options_ui.png"/>
@@ -15,16 +15,17 @@
     </tabs>
     
     <box proportion="1" width="100%" layout="vertical-row">
-    
-       <spacer width="5" height="5"/>
-    
         <label width="100%"
             I18N="In key bindings configuration menu"  
             text="Press enter or double-click on a device to configure it"
             text_align="center" />
 
         <spacer width="5" height="20"/>
-        <list id="devices" proportion="5" width="75%" align="center"/>
+        
+        <box proportion="5" width="75%" align="center" layout="vertical-row" padding="8">
+            <list id="devices" x="0" y="0" width="100%" height="100%"/>
+        </box>
+        
         <spacer width="50" height="25" /> 
  
         <button id="add_device" I18N="In the input configuration screen"  text="Add a device" align="center"/>

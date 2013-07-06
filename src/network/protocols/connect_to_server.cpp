@@ -47,8 +47,7 @@ void ConnectToServer::notifyEvent(Event* event)
         event->peer->getPort() == m_server_port)
     {
         Log::info("ConnectToServer", "The Connect To Server protocol has \
-                received an event notifying that he's connected to the peer. \
-                The peer sent \"%s\"\n", event->data.c_str());
+                received an event notifying that he's connected to the peer.");
         m_state = DONE; // we received a message, we are connected
     }
 }

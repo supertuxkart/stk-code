@@ -288,7 +288,6 @@
     <ClCompile Include="..\..\states_screens\dialogs\custom_video_settings.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\select_challenge.cpp" />
     <ClCompile Include="..\..\states_screens\dialogs\tutorial_message_dialog.cpp" />
-    <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp" />
     <ClCompile Include="..\..\states_screens\options_screen_ui.cpp" />
     <ClCompile Include="..\..\states_screens\race_gui_base.cpp" />
     <ClCompile Include="..\..\states_screens\race_gui_overworld.cpp" />
@@ -546,7 +545,6 @@
     <ClInclude Include="..\..\states_screens\dialogs\custom_video_settings.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\select_challenge.hpp" />
     <ClInclude Include="..\..\states_screens\dialogs\tutorial_message_dialog.hpp" />
-    <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp" />
     <ClInclude Include="..\..\states_screens\options_screen_ui.hpp" />
     <ClInclude Include="..\..\states_screens\race_gui_overworld.hpp" />
     <ClInclude Include="..\..\states_screens\soccer_setup_screen.hpp" />

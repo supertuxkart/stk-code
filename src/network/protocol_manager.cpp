@@ -221,7 +221,7 @@ void ProtocolManager::update()
         if (event->type == EVENT_TYPE_MESSAGE)
         {
             if (event->data.size() > 0)
-                searchedProtocol = (PROTOCOL_TYPE)(event->data[0]);
+                searchedProtocol = (PROTOCOL_TYPE)(event->data.getUInt8(0));
             event->removeFront(1); // remove the first byte which indicates the protocol
         }
         for (unsigned int i = 0; i < m_protocols.size() ; i++)

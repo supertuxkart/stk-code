@@ -263,6 +263,11 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eve
         onEnterPressedInternal();
         return GUIEngine::EVENT_BLOCK;
     }
+    else if (eventSource == "closePopup")
+    {
+        ModalDialog::dismiss();
+        return GUIEngine::EVENT_BLOCK;
+    }
     else if (eventSource == "reverse")
     {
         race_manager->setReverseTrack(m_checkbox->getState());

@@ -70,6 +70,6 @@ Event::~Event()
 
 void Event::removeFront(int size)
 {
-    data.erase(0, size);
+    data.removeFront(size);
 }
 

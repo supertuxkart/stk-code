@@ -99,7 +99,7 @@ private:
      *  get attached to another kart if a kart is elimiated). */
     AbstractKart   *m_original_kart;
 
-    /** The list of viewports for this cameras. */
+    /** The viewport for this camera (portion of the game window covered by this camera) */
     core::recti     m_viewport;
 
     /** The scaling necessary for each axis. */

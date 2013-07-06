@@ -287,6 +287,7 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
     // Draw less important messages first, at the very bottom of the screen
     // unimportant messages are skipped in multiplayer, they take too much screen space
     if (race_manager->getNumLocalPlayers() < 2 &&
+        UserConfigParams::m_minimal_race_gui == false &&
         !m_ignore_unimportant_messages)
     {
         for (AllMessageType::const_iterator i = m_messages.begin();

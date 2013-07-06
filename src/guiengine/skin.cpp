@@ -1521,9 +1521,9 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
  */
 void Skin::drawList(const core::recti &rect, Widget* widget, bool focused)
 {
-    drawBoxFromStretchableTexture(widget, rect,
-                                  SkinConfig::m_render_params["list::neutral"],
-                                  widget->m_deactivated, NULL);
+    //drawBoxFromStretchableTexture(widget, rect,
+    //                              SkinConfig::m_render_params["list::neutral"],
+    //                              widget->m_deactivated, NULL);
 
 }   // drawList
 
@@ -1610,6 +1610,8 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                     drawBoxFromStretchableTexture(&widget, rect,
                               SkinConfig::m_render_params["section::neutral"]);
                 }
+                
+                renderSections( &widget.m_children );
             }
             else if (widget.isBottomBar())
             {

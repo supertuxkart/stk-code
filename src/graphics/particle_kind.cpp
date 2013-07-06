@@ -164,8 +164,8 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
         size->get("max", &m_max_size);
     }
     
-    bool has_x = size->get("x-increase-factor", &m_scale_affector_factor_x);
-    bool has_y = size->get("y-increase-factor", &m_scale_affector_factor_y);
+    bool has_x = size->get("x-increase-factor", &m_scale_affector_factor_x)==1;
+    bool has_y = size->get("y-increase-factor", &m_scale_affector_factor_y)==1;
     m_has_scale_affector = (has_x || has_y);
 
     //std::cout << "m_particle_size = " << m_particle_size << "\n";

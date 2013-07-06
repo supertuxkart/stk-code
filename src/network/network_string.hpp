@@ -22,6 +22,17 @@ class NetworkString
         NetworkString(NetworkString const& copy) { m_string = copy.m_string; }
         NetworkString(std::string str) { m_string = str; }
         
+        NetworkString& removeFront(int size)
+        {
+            m_string.erase(0, size);
+            return *this;
+        }
+        
+        uint8_t operator[](const int& pos)
+        {
+            return getUInt8(pos);
+        }
+    
         NetworkString& addUInt8(const uint8_t& value)
         {
             m_string += (char)(value);
