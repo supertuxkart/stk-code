@@ -51,6 +51,8 @@ private:
     GUIEngine::IconButtonWidget * m_as_guest_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
     
+    void login();
+
 public:
     
     enum Message

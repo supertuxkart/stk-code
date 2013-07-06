@@ -36,7 +36,7 @@
                              I18N="Main menu button" text="Sign In" label_location="hover"/>
                 <icon-button id="register" width="64" height="64" icon="gui/tutorial.png"  extend_label="75"
                              I18N="Main menu button" text="Register" label_location="hover"/>
-                <icon-button id="sign_out" width="64" height="64" icon="gui/main_quit.png"  extend_label="50"
+                <icon-button id="sign_out" width="64" height="64" icon="gui/main_quit.png"  extend_label="70"
                              I18N="Main menu button" text="Sign Out" label_location="hover"/>
             </buttonbar>
             

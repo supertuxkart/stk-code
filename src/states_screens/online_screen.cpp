@@ -36,6 +36,7 @@
 #include "states_screens/dialogs/login_dialog.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
+#include "states_screens/networking_lobby_settings.hpp"
 #include "modes/demo_world.hpp"
 #include "utils/translation.hpp"
 
@@ -185,11 +186,11 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     else if (selection == "create_server")
     {
         //if (m_recorded_state == Registered)
-            new MessageDialog("Coming soon!");
+        StateManager::get()->pushScreen(NetworkingLobbySettings::getInstance());
     }
     else if (selection == "quick_play")
     {
-        //if (m_recorded_state == Registered || m_recorded_state == Guest)
+        //if (m_recorded_state == Registered || m_recorded_state == Guest) FIXME
         StateManager::get()->pushScreen(NetworkingLobby::getInstance());
     }
 
@@ -204,9 +205,14 @@ void OnlineScreen::tearDown()
 // ----------------------------------------------------------------------------
 void OnlineScreen::onDisabledItemClicked(const std::string& item)
 {
-    if (item == "find_server" || item =="create_server")
+    if (item == "find_server")
     {
         new LoginDialog(LoginDialog::Registration_Required);
+    }
+    else if (item =="create_server")
+    {
+        StateManager::get()->pushScreen(NetworkingLobbySettings::getInstance());
+        // FIXME temporary; new LoginDialog(LoginDialog::Registration_Required);
     }
     else if (item == "quick_play")
     {
