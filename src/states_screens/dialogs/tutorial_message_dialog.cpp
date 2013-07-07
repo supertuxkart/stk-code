@@ -21,6 +21,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
@@ -48,6 +49,8 @@ TutorialMessageDialog::TutorialMessageDialog(irr::core::stringw msg, bool stopGa
 
     ButtonWidget* cancelbtn = getWidget<ButtonWidget>("continue");
     cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    
+    World::getWorld()->getKart(0)->getControls().reset();
 }
 
 // ------------------------------------------------------------------------------------------------------
