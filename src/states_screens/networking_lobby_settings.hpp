@@ -19,9 +19,10 @@
 #define HEADER_NETWORKING_LOBBY_SETTINGS_HPP
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
-#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
+#include "guiengine/widgets/spinner_widget.hpp"
 
 namespace GUIEngine { class Widget; class ListWidget; }
 
@@ -37,18 +38,22 @@ private:
 
     NetworkingLobbySettings();
 
+    GUIEngine::TextBoxWidget * m_name_widget;
+    GUIEngine::SpinnerWidget * m_max_players_widget;
+
+    GUIEngine::LabelWidget * m_info_widget;
+
+    GUIEngine::ButtonWidget * m_create_widget;
+    GUIEngine::ButtonWidget * m_cancel_widget;
+
     /** \brief Checks if the user is still signed in. */
     bool hasLostConnection();
     /** \brief Sets which widget has to be focused. Depends on the user state. */
     void setInitialFocus();
 
-public:
+    void createServer();
 
-    enum Action
-    {
-        Create                  = 1,    // A new server should be created
-        Edit                    = 2,    // The settings of the server should be edited
-    };
+public:
 
     virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver) OVERRIDE;
 

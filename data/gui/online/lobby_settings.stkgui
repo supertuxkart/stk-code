@@ -17,6 +17,8 @@
                     <gauge id="max_players" proportion="2" min_value="2" max_value="12"/>
                 </div>
             </div>
+            
+            <label id="info" proportion="1" width="90%" align="center" text_align="center" word_wrap="true" text=""/>
         </box>
         
         <spacer width="10" height="7%"/>

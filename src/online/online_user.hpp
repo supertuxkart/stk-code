@@ -34,18 +34,16 @@ class OnlineUser
 
     protected:
 
-        irr::core::stringw m_name;
-        uint32_t m_id;
+        bool                    m_is_server_host;
+        irr::core::stringw      m_name;
+        uint32_t                m_id;
         OnlineUser(){}
 
     public:
 
-        /**
-          * Constructor
-          */
         OnlineUser(const irr::core::stringw &username);
 
-        /** Returns the username. */
+
         irr::core::stringw getUserName() const { return m_name; }
         uint32_t getUserID() const { return m_id; }
 

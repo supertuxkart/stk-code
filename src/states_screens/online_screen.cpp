@@ -154,6 +154,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     if (name == "back")
     {
         StateManager::get()->escapePressed();
+        return;
     }
 
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);

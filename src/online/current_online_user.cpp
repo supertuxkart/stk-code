@@ -47,6 +47,7 @@ void CurrentOnlineUser::deallocate()
 CurrentOnlineUser::CurrentOnlineUser(){
     m_is_signed_in = false;
     m_is_guest = false;
+    m_is_server_host = false;
     m_id = 0;
     m_name = "";
     m_token = "";
@@ -117,6 +118,40 @@ bool CurrentOnlineUser::signIn( const irr::core::stringw &username,
 
     return m_is_signed_in;
 }
+
+// ============================================================================
+
+bool CurrentOnlineUser::createServer(  const irr::core::stringw &name,
+                                        int max_players,
+                                        irr::core::stringw &info)
+{
+    assert(m_is_signed_in && !m_is_guest && !m_is_server_host);
+    HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+    connector->setParameter("action",           std::string("create_server"));
+    connector->setParameter("token",            m_token);
+    connector->setParameter("userid",           m_id);
+    connector->setParameter("name",             name);
+    connector->setParameter("max_players",      max_players);
+    const XMLNode * result = connector->getXMLFromPage();
+    std::string rec_success = "";
+    if(result->get("success", &rec_success))
+    {
+       if (rec_success =="yes")
+       {
+           // FIXME
+           m_is_server_host = true;
+       }
+       result->get("info", &info);
+    }
+    else
+    {
+       info = _("Unable to connect to the server. Check your internet connection or try again later.");
+    }
+
+    return m_is_server_host;
+}
+
+
 // ============================================================================
 bool CurrentOnlineUser::signOut(){
     assert(m_is_signed_in == true);

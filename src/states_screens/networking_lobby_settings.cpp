@@ -24,17 +24,13 @@
 
 #include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
-#include "graphics/irr_driver.hpp"
-#include "guiengine/scalable_font.hpp"
-#include "input/device_manager.hpp"
-#include "input/input_manager.hpp"
-#include "io/file_manager.hpp"
-#include "main_loop.hpp"
+#include "audio/sfx_manager.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "modes/demo_world.hpp"
 #include "utils/translation.hpp"
+#include "states_screens/networking_lobby.hpp"
 
 #include "online/current_online_user.hpp"
 
@@ -54,6 +50,20 @@ NetworkingLobbySettings::NetworkingLobbySettings() : Screen("online/lobby_settin
 
 void NetworkingLobbySettings::loadedFromFile()
 {
+
+
+    m_name_widget = getWidget<TextBoxWidget>("name");
+    assert(m_name_widget != NULL);
+    m_max_players_widget = getWidget<SpinnerWidget>("max_players");
+    assert(m_max_players_widget != NULL);
+
+    m_info_widget = getWidget<LabelWidget>("info");
+    assert(m_info_widget != NULL);
+
+    m_create_widget = getWidget<ButtonWidget>("create");
+    assert(m_create_widget != NULL);
+    m_cancel_widget = getWidget<ButtonWidget>("cancel");
+    assert(m_cancel_widget != NULL);
 
 }   // loadedFromFile
 
@@ -76,18 +86,44 @@ void NetworkingLobbySettings::init()
 {
     Screen::init();
     setInitialFocus();
-    DemoWorld::resetIdleTime(); //FIXME : what's this?}   // init
+    DemoWorld::resetIdleTime();
 }
 // ----------------------------------------------------------------------------
 void NetworkingLobbySettings::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
 }   // onUpdate
 
-// ----------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
+void NetworkingLobbySettings::createServer()
+{
+    const stringw name = m_name_widget->getText().trim();
+    int max_players = m_max_players_widget->getValue();
+    stringw info = "";
+    if(CurrentOnlineUser::get()->createServer(name, max_players, info))
+    {
+        StateManager::get()->escapePressed();
+        StateManager::get()->pushScreen(NetworkingLobby::getInstance());
+    }
+    else
+    {
+        sfx_manager->quickSound( "anvil" );
+        m_info_widget->setColor(irr::video::SColor(255, 255, 0, 0));
+        m_info_widget->setText(info, false);
+    }
+}
+
+// ----------------------------------------------------------------------------
 void NetworkingLobbySettings::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-
+    if (name == m_cancel_widget->m_properties[PROP_ID])
+    {
+        StateManager::get()->escapePressed();
+    }
+    else if (name == m_create_widget->m_properties[PROP_ID])
+    {
+        createServer();
+    }
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
