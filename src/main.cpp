@@ -394,6 +394,7 @@ void cmdLineHelp (char* invocation)
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
     "       --no-graphics      Do not display the actual race.\n"
+    "       --with-profile     Enables the profile mode.\n"
     "       --demo-mode t      Enables demo mode after t seconds idle time in "
                                "main menu.\n"
     "       --demo-tracks t1,t2 List of tracks to be used in demo mode. No\n"
@@ -980,7 +981,7 @@ int handleCmdLine(int argc, char **argv)
             ProfileWorld::setProfileModeTime((float)n);
             race_manager->setNumLaps(999999); // profile end depends on time
         }
-        else if( !strcmp(argv[i], "--no-graphics") )
+        else if( !strcmp(argv[i], "--with-profile") )
         {
             // Set default profile mode of 1 lap if we haven't already set one
             if (!ProfileWorld::isProfileMode()) {
