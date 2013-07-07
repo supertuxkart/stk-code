@@ -492,8 +492,16 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
         core::dimension2du size = m_mini_map_size
                                  .getOptimalSize(!nonpower,!nonsquare);
         m_mini_map = QuadGraph::get()->makeMiniMap(size, "minimap::"+m_ident);
-        m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_mini_map->getSize().Width);
-        m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_mini_map->getSize().Height);
+        if (m_mini_map)
+        {
+            m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_mini_map->getSize().Width);
+            m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_mini_map->getSize().Height);
+        }
+        else 
+        {
+            m_minimap_x_scale = 0;
+            m_minimap_y_scale = 0;
+        }
     }
 }   // loadQuadGraph
 // -----------------------------------------------------------------------------

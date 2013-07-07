@@ -239,6 +239,7 @@ void ServerLobbyRoomProtocol::update()
     switch (m_state)
     {
         case WORKING:
+            // first poll every 5 seconds
             static double last_poll_time = 0;
             if (Time::getRealTime() > last_poll_time+5.0)
             {
@@ -258,6 +259,7 @@ void ServerLobbyRoomProtocol::update()
                     {
                         result->getNode(i)->get("id", &id);
                         Log::info("ServerLobbyRoomProtocol", "User with id %d wants to connect.", id);
+                        m_incoming_peers_ids.push_back(id);
                     }   
                 }
                 else
@@ -265,6 +267,13 @@ void ServerLobbyRoomProtocol::update()
                     Log::error("ServerLobbyRoomProtocol", "Cannot retreive the list");
                 }
             }
+            
+            // now
+            for (int i = 0; i < m_incoming_peers_ids.size(); i++)
+            {
+                
+            }
+            
             break;
         case DONE:
             m_listener->requestTerminate(this);

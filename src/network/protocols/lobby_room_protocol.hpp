@@ -81,6 +81,7 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
     protected:
         uint8_t m_next_id; //!< Next id to assign to a peer.
         std::vector<TransportAddress> m_peers;
+        std::vector<uint32_t> m_incoming_peers_ids;
          
         enum STATE
         {

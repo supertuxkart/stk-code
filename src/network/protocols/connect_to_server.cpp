@@ -52,7 +52,7 @@ void ConnectToServer::notifyEvent(Event* event)
     {
         Log::info("ConnectToServer", "The Connect To Server protocol has \
                 received an event notifying that he's connected to the peer.");
-        m_state = CONNECTING; // we received a message, we are connected
+        m_state = CONNECTED; // we received a message, we are connected
     }
 }
 

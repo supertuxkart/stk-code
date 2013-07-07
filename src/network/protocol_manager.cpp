@@ -224,9 +224,13 @@ void ProtocolManager::update()
                 searchedProtocol = (PROTOCOL_TYPE)(event->data.getUInt8(0));
             event->removeFront(1); // remove the first byte which indicates the protocol
         }
+        if (event->type == EVENT_TYPE_CONNECTED)
+        {
+            searchedProtocol = PROTOCOL_CONNECTION;
+        }
         for (unsigned int i = 0; i < m_protocols.size() ; i++)
         {
-            if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event->type != EVENT_TYPE_MESSAGE) // pass data to protocols even when paused
+            if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event->type == EVENT_TYPE_DISCONNECTED) // pass data to protocols even when paused
                 m_protocols[i].protocol->notifyEvent(event);
         }
         delete event;

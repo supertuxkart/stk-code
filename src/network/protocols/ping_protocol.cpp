@@ -28,6 +28,6 @@ void PingProtocol::update()
     {
         m_last_ping_time = Time::getRealTime();
         uint8_t data = 0;
-        NetworkManager::getInstance()->getHost()->sendRawPacket(&data, 0, m_ping_dst);
+        NetworkManager::getInstance()->getHost()->sendRawPacket(&data, 1, m_ping_dst);
     }
 }
