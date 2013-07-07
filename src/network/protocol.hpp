@@ -90,6 +90,10 @@ class Protocol
          * \brief Called by the protocol listener as often as possible. Must be re-defined.
          */
         virtual void update() = 0;
+        /*! 
+         * \brief Called when the protocol is to be killed.
+         */
+        virtual void kill();
         
         /*! 
          * \brief Method to get a protocol's type.

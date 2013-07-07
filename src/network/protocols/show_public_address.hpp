@@ -25,22 +25,14 @@
 class ShowPublicAddress : public Protocol
 {
     public:
-        ShowPublicAddress(CallbackObject* callback_object);
+        ShowPublicAddress();
         virtual ~ShowPublicAddress();
         
         virtual void notifyEvent(Event* event);
         virtual void setup();
         virtual void update();
         
-        virtual void setUsername(std::string username);
-        virtual void setPassword(std::string password);
-        virtual void setPublicAddress(uint32_t ip, uint16_t port);
-        
     protected:
-        std::string m_username;
-        std::string m_password;
-        uint32_t m_public_ip;
-        uint16_t m_public_port;
         
         enum STATE
         {

@@ -60,22 +60,22 @@ void STKPeer::sendPacket(NetworkString const& data)
     enet_peer_send(m_peer, 0, packet);
 }
 
-uint32_t STKPeer::getAddress()
+uint32_t STKPeer::getAddress() const
 {
     return m_peer->address.host;
 }
 
-uint16_t STKPeer::getPort()
+uint16_t STKPeer::getPort() const
 {
     return m_peer->address.port;
 }
 
-bool STKPeer::isConnected()
+bool STKPeer::isConnected() const
 {
     Log::info("STKPeer", "The peer state is %i\n", m_peer->state);
     return (m_peer->state == ENET_PEER_STATE_CONNECTED);
 }
-bool STKPeer::operator==(ENetPeer* peer)
+bool STKPeer::operator==(const ENetPeer* peer) const
 {
     return peer==m_peer;
 }

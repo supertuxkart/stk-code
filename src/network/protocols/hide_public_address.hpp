@@ -25,18 +25,14 @@
 class HidePublicAddress : public Protocol
 {
     public:
-        HidePublicAddress(CallbackObject* callback_object);
+        HidePublicAddress();
         virtual ~HidePublicAddress();
         
         virtual void notifyEvent(Event* event);
         virtual void setup();
         virtual void update();
         
-        virtual void setUsername(std::string username);
-        virtual void setPassword(std::string password);
     protected:
-        std::string m_username;
-        std::string m_password;
         
         enum STATE
         {

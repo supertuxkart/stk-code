@@ -49,6 +49,7 @@ NetworkManager::NetworkManager()
     m_public_address.port = 0;
     m_protocol_manager_update_thread = NULL;
     m_localhost = NULL;
+    m_game_setup = NULL;
 }
 
 //-----------------------------------------------------------------------------

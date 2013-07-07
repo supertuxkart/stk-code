@@ -88,7 +88,7 @@ void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer, const N
     NetworkManager::getInstance()->sendPacketExcept(peer, newMessage);
 }
 
-int ProtocolManager::requestStart(Protocol* protocol)
+uint32_t ProtocolManager::requestStart(Protocol* protocol)
 {
     // create the request
     ProtocolRequest req;
@@ -156,7 +156,7 @@ void ProtocolManager::requestTerminate(Protocol* protocol)
 
 void ProtocolManager::startProtocol(ProtocolInfo protocol)
 {
-    Log::info("ProtocolManager", "A new protocol with id=%u has been started. There are %ld protocols running.\n", protocol.id, m_protocols.size()+1);
+    Log::info("ProtocolManager", "A new protocol with id=%u has been started. There are %ld protocols running.", protocol.id, m_protocols.size()+1);
     // add the protocol to the protocol vector so that it's updated
     pthread_mutex_lock(&m_protocols_mutex);
     m_protocols.push_back(protocol);
@@ -204,7 +204,7 @@ void ProtocolManager::protocolTerminated(ProtocolInfo protocol)
             offset++;
         }
     }
-    Log::info("ProtocolManager", "A protocol has been terminated. There are %ld protocols running.\n", m_protocols.size());
+    Log::info("ProtocolManager", "A protocol has been terminated. There are %ld protocols running.", m_protocols.size());
     pthread_mutex_unlock(&m_protocols_mutex);
 }
 
@@ -306,7 +306,7 @@ PROTOCOL_STATE ProtocolManager::getProtocolState(Protocol* protocol)
     return PROTOCOL_STATE_TERMINATED; // we don't know this protocol at all, it's finished
 }
 
-int ProtocolManager::getProtocolID(Protocol* protocol)
+uint32_t ProtocolManager::getProtocolID(Protocol* protocol)
 {
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
@@ -314,6 +314,16 @@ int ProtocolManager::getProtocolID(Protocol* protocol)
             return m_protocols[i].id;
     }
     return 0;
+}
+
+Protocol* ProtocolManager::getProtocol(uint32_t id)
+{
+    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    {
+        if (m_protocols[i].id == id)
+            return m_protocols[i].protocol;
+    }
+    return NULL;
 }
 
 bool ProtocolManager::isServer()

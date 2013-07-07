@@ -37,6 +37,9 @@ void Protocol::unpause()
     m_listener->requestUnpause(this);
 }
 
+void Protocol::kill()
+{
+}
 
 void Protocol::setListener(ProtocolManager* listener)
 {

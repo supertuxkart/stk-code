@@ -40,7 +40,7 @@ class Singleton
             
             S* result = (dynamic_cast<S*> (m_singleton));
             if (result == NULL)
-                Log::fatal("Singleton", "THE SINGLETON HAS NOT BEEN REALOCATED, BUT IS NOT OF THE REQUESTED TYPE.");
+                Log::debug("Singleton", "THE SINGLETON HAS NOT BEEN REALOCATED, IT IS NOT OF THE REQUESTED TYPE.");
             return result;
         }
         static T *getInstance()

@@ -59,8 +59,9 @@ class CurrentOnlineUser : public OnlineUser
         bool signOut();
         /** Returns the username if signed in. */
         irr::core::stringw getUserName() const;
-        bool isSignedIn(){ return m_is_signed_in; }
-        bool isGuest(){ return m_is_guest; }
+        std::string getToken() const    { return m_token;           }
+        bool isSignedIn()               { return m_is_signed_in;    }
+        bool isGuest()                  { return m_is_guest;        }
 
 };   // class CurrentOnlineUser
 

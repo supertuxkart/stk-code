@@ -18,10 +18,13 @@
 
 #include "network/protocols/show_public_address.hpp"
 
-#include "network/http_functions.hpp"
+#include "network/network_manager.hpp"
+#include "online/http_connector.hpp"
+#include "online/current_online_user.hpp"
+#include "config/user_config.hpp"
 #include "utils/log.hpp"
 
-ShowPublicAddress::ShowPublicAddress(CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_SILENT)
+ShowPublicAddress::ShowPublicAddress() : Protocol(NULL, PROTOCOL_SILENT)
 {
 }
 
@@ -36,48 +39,42 @@ void ShowPublicAddress::notifyEvent(Event* event)
 void ShowPublicAddress::setup()
 {
     m_state = NONE;
-    if (m_public_ip == 0 || m_public_port == 0 || m_username == "" || m_password == "")
-    {
-        Log::error("ShowPublicAddress", "You have to set the public ip:port, username:password and the host nickname before starting this protocol.\n");
-        m_listener->requestTerminate(this);
-    }
 }
 
 void ShowPublicAddress::update()
 {
     if (m_state == NONE)
     {
-       char url[512];
-        sprintf(url, "http://stkconnect.freeserver.me/log.php?set&nick=%s&ip=%u&port=%u&pwd=%s", m_username.c_str(), m_public_ip, m_public_port, m_password.c_str());
-        std::string result = HTTP::getPage(url);
-        if (result[0] == 's' && result[1] == 'u' && result[2] == 'c' && result[3] == 'c' && result[4] == 'e' && result[5] == 's' && result[6] == 's')
+        HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+        connector->setParameter("id",CurrentOnlineUser::get()->getUserID());
+        connector->setParameter("token",CurrentOnlineUser::get()->getToken());
+        TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
+        connector->setParameter("address",addr.ip);
+        connector->setParameter("port",addr.port);
+        connector->setParameter("action","set");
+
+        const XMLNode * result = connector->getXMLFromPage();
+        std::string rec_success;
+
+        if(result->get("success", &rec_success))
         {
-            Log::info("ShowPublicAddress", "Address set.\n");
-            m_state = DONE;
+            if(rec_success == "yes")
+            {
+                Log::info("ShowPublicAddress", "Address shown successfully.");
+            }
+            else
+            {
+                Log::error("ShowPublicAddress", "Fail to show address.");
+            }
         }
-        if (result[0] == 'f' && result[1] == 'a' && result[2] == 'i' && result[3] == 'l')
+        else
         {
-            Log::warn("ShowPublicAddress", "Login fail. Please re-set username:password and unpause the protocol.\n");
-            m_state = NONE;
-            pause();
+            Log::error("ShowPublicAddress", "Fail to show address.");
         }
+        m_state = DONE;
     }
     else if (m_state == DONE)
     {
         m_listener->requestTerminate(this);
     }
-}
-
-void ShowPublicAddress::setUsername(std::string username)
-{
-    m_username = username;
-}
-void ShowPublicAddress::setPassword(std::string password)
-{
-    m_password = password;
-}
-void ShowPublicAddress::setPublicAddress(uint32_t ip, uint16_t port)
-{
-    m_public_ip = ip;
-    m_public_port = port;
 }

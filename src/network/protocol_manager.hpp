@@ -122,7 +122,7 @@ class ProtocolManager : public Singleton<ProtocolManager>
          * \param protocol : A pointer to the protocol to start
          * \return The unique id of the protocol that is being started.
          */
-        virtual int             requestStart(Protocol* protocol);
+        virtual uint32_t        requestStart(Protocol* protocol);
         /*! 
          * \brief Asks the manager to stop a protocol.
          * This function will store the request, and process it at a time it is
@@ -186,7 +186,14 @@ class ProtocolManager : public Singleton<ProtocolManager>
          * \param protocol : A pointer to the protocol you seek the id.
          * \return The id of the protocol pointed by the protocol parameter.
          */
-        virtual int             getProtocolID(Protocol* protocol);
+        virtual uint32_t        getProtocolID(Protocol* protocol);
+        
+        /*!
+         * \brief Get a protocol using his id.
+         * \param id : Unique ID of the seek protocol.
+         * \return The protocol that has the ID id.
+         */
+        virtual Protocol*       getProtocol(uint32_t id);
         
         /*! \brief Know whether the app is a server.
          *  \return True if this application is in server mode, false elseway.
@@ -263,7 +270,7 @@ class ProtocolManager : public Singleton<ProtocolManager>
          * If a protocol has an id lower than this value, it means that it have
          * been formerly started. 
          */
-        unsigned int                    m_next_protocol_id;
+        uint32_t                        m_next_protocol_id;
         
         // mutexes:
         /*! Used to ensure that the event queue is used thread-safely.       */

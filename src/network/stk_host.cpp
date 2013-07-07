@@ -80,8 +80,8 @@ void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count,
                             max_incoming_bandwidth, max_outgoing_bandwidth);
     if (m_host == NULL)
     {
-        Log::info("STKHost", "An error occurred while trying to create an ENet \
-                          server host.\n");
+        Log::error("STKHost", "An error occurred while trying to create an ENet \
+                          server host.");
         exit (EXIT_FAILURE);
     }
 }
@@ -96,8 +96,8 @@ void STKHost::setupClient(int peer_count, int channel_limit,
                             max_incoming_bandwidth, max_outgoing_bandwidth);
     if (m_host == NULL)
     {
-        Log::info("STKHost", "An error occurred while trying to create an ENet \
-                          client host.\n");
+        Log::error("STKHost", "An error occurred while trying to create an ENet \
+                          client host.");
         exit (EXIT_FAILURE);
     }
 }
@@ -134,6 +134,7 @@ void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
     to.sin_addr.s_addr = htonl(dst.ip);
     
     sendto(m_host->socket, data, length, 0,(sockaddr*)&to, to_len);
+    printf("Raw packet sent to %u:%u\n", dst.ip, dst.port);
 }
 
 // ----------------------------------------------------------------------------
@@ -186,7 +187,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender)
     {
         char s[20];
         inet_ntop(AF_INET, &(((struct sockaddr_in *)&addr)->sin_addr), s, 20);
-        Log::info("STKHost", "IPv4 Address of the sender was %s\n", s);
+        Log::info("STKHost", "IPv4 Address of the sender was %s", s);
     }
     return buffer;
 }

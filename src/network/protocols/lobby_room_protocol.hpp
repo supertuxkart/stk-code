@@ -62,8 +62,6 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
         enum STATE
         {
             NONE,
-            GETTING_SERVER_ADDRESS,
-            REQUESTING_CONNECTION,
             CONNECTED,
             DONE
         };

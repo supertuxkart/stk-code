@@ -19,16 +19,22 @@
 #include "network/protocols/connect_to_server.hpp"
 
 #include "network/client_network_manager.hpp"
+#include "network/protocols/get_public_address.hpp"
+#include "network/protocols/get_peer_address.hpp"
+#include "network/protocols/show_public_address.hpp"
+#include "network/protocols/hide_public_address.hpp"
+#include "network/protocols/request_connection.hpp"
+#include "network/protocols/ping_protocol.hpp"
+#include "online/current_online_user.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 
 // ----------------------------------------------------------------------------
 
-ConnectToServer::ConnectToServer(CallbackObject* callback_object) : 
-    Protocol(callback_object, PROTOCOL_CONNECTION)
+ConnectToServer::ConnectToServer(uint32_t server_id) : 
+    Protocol(NULL, PROTOCOL_CONNECTION)
 {
-    m_server_ip = 0;
-    m_server_port = 0;
+    m_server_id = server_id;
     m_state = NONE;
 }
 
@@ -42,13 +48,11 @@ ConnectToServer::~ConnectToServer()
 
 void ConnectToServer::notifyEvent(Event* event)
 {
-    if (event->type == EVENT_TYPE_CONNECTED && 
-        event->peer->getAddress() == m_server_ip && 
-        event->peer->getPort() == m_server_port)
+    if (event->type == EVENT_TYPE_CONNECTED)
     {
         Log::info("ConnectToServer", "The Connect To Server protocol has \
                 received an event notifying that he's connected to the peer.");
-        m_state = DONE; // we received a message, we are connected
+        m_state = CONNECTING; // we received a message, we are connected
     }
 }
 
@@ -57,48 +61,85 @@ void ConnectToServer::notifyEvent(Event* event)
 void ConnectToServer::setup()
 {
     m_state = NONE;
-    if (m_server_ip == 0 || m_server_port == 0 )
-    {
-        Log::error("ConnectToServer", "You have to set the server's public \
-                ip:port of the server.\n");
-        m_listener->requestTerminate(this);
-    }
+    m_public_address.ip = 0;
+    m_public_address.port = 0;
+    m_server_address.ip = 0;
+    m_server_address.port = 0;
+    m_current_protocol_id = 0;
 }
 
 // ----------------------------------------------------------------------------
 
 void ConnectToServer::update()
 {
-    if (m_state == NONE)
+    switch(m_state)
     {
-        static double target = 0;
-        double currentTime = Time::getRealTime();
-        if (currentTime > target)
+        case NONE:
         {
-            NetworkManager::getInstance()->connect(
-                                TransportAddress(m_server_ip, m_server_port));
-            if (NetworkManager::getInstance()->isConnectedTo(
-                                TransportAddress(m_server_ip, m_server_port)))
-            {   
-                m_state = DONE;
-                return;
-            }
-            target = currentTime+5;
-            Log::info("ConnectToServer", "Retrying to connect in 5 seconds.\n");
+            m_current_protocol_id = m_listener->requestStart(new GetPublicAddress(&m_public_address));
+            m_state = WAITING_SELF_ADDRESS;
+            break;
         }
+        case WAITING_SELF_ADDRESS:
+            if (m_listener->getProtocolState(m_current_protocol_id) 
+            == PROTOCOL_STATE_TERMINATED) // now we know the public addr
+            {
+                m_state = SELF_ADDRESS_KNOWN;
+                NetworkManager::getInstance()->setPublicAddress(m_public_address); // set our public address
+                m_current_protocol_id = m_listener->requestStart(new GetPeerAddress(m_server_id, &m_server_address));
+            }
+            break;
+        case SELF_ADDRESS_KNOWN:
+            if (m_listener->getProtocolState(m_current_protocol_id) 
+            == PROTOCOL_STATE_TERMINATED) // now we have the server's address
+            {
+                m_state = PEER_ADDRESS_KNOWN;
+                m_current_protocol_id = m_listener->requestStart(new ShowPublicAddress());
+            }
+            break;
+        case PEER_ADDRESS_KNOWN:
+            if (m_listener->getProtocolState(m_current_protocol_id) 
+            == PROTOCOL_STATE_TERMINATED) // now our public address is public
+            {
+                m_state = SELF_ADDRESS_SHOWN;
+                m_current_protocol_id = m_listener->requestStart(new RequestConnection(m_server_id));
+            }
+            break;
+        case SELF_ADDRESS_SHOWN:
+            if (m_listener->getProtocolState(m_current_protocol_id) 
+            == PROTOCOL_STATE_TERMINATED) // we have put a request to access the server
+            {
+                m_state = REQUEST_DONE;
+                m_current_protocol_id = m_listener->requestStart(new PingProtocol(m_server_address, 0.5));
+            }
+            break;
+        case REQUEST_DONE:
+            if (m_listener->getProtocolState(m_current_protocol_id) 
+            == PROTOCOL_STATE_TERMINATED) // we have put a request to access the server
+            {
+                m_state = CONNECTING;
+            }
+            break;
+        case CONNECTING: // waiting the server to answer our connection
+            break;
+        case CONNECTED:
+        {
+            m_listener->requestTerminate( m_listener->getProtocol(m_current_protocol_id)); // kill the ping protocol because we're connected
+            m_current_protocol_id = m_listener->requestStart(new HidePublicAddress());
+            m_state = HIDING_ADDRESS;
+            break;
+        }
+        case HIDING_ADDRESS:
+            if (m_listener->getProtocolState(m_current_protocol_id) 
+            == PROTOCOL_STATE_TERMINATED) // we have hidden our address
+            {
+                m_state = DONE;
+            }
+            break;
+        case DONE:
+            m_listener->requestTerminate(this);
+            break;
     }
-    else if (m_state == DONE)
-    {
-        m_listener->requestTerminate(this);
-    }
-}
-
-// ----------------------------------------------------------------------------
-
-void ConnectToServer::setServerAddress(uint32_t ip, uint16_t port)
-{
-    m_server_ip = ip;
-    m_server_port = port;
 }
 
 // ----------------------------------------------------------------------------

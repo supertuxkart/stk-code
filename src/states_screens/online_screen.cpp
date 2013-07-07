@@ -42,6 +42,9 @@
 
 #include "online/current_online_user.hpp"
 
+#include "network/protocol_manager.hpp"
+#include "network/protocols/connect_to_server.hpp"
+
 
 using namespace GUIEngine;
 
@@ -192,6 +195,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     {
         //if (m_recorded_state == Registered || m_recorded_state == Guest) FIXME
         StateManager::get()->pushScreen(NetworkingLobby::getInstance());
+        ProtocolManager::getInstance()->requestStart(new ConnectToServer(3));
     }
 
 }   // eventCallback

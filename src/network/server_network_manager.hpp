@@ -34,11 +34,10 @@ class ServerNetworkManager : public NetworkManager
         virtual void run();
         
         void start();
-        bool connectToPeer(std::string peer_username);
         
         virtual void sendPacket(const NetworkString& data);
         
-        virtual bool isServer()         { return false; }
+        virtual bool isServer()         { return true; }
         
     protected:
         ServerNetworkManager();

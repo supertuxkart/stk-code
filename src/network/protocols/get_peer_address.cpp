@@ -19,11 +19,14 @@
 #include "network/protocols/get_peer_address.hpp"
 
 #include "network/http_functions.hpp"
-#include "utils/time.hpp"
+#include "online/http_connector.hpp"
+#include "online/current_online_user.hpp"
+#include "config/user_config.hpp"
 #include "utils/log.hpp"
 
-GetPeerAddress::GetPeerAddress(CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_SILENT)
+GetPeerAddress::GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_SILENT)
 {
+    m_peer_id = peer_id;
 }
 
 GetPeerAddress::~GetPeerAddress()
@@ -44,44 +47,35 @@ void GetPeerAddress::update()
 {
     if (m_state == NONE)
     {
-        static double target = 0;
-        double current_time = Time::getRealTime();
-        if (current_time > target)
+        
+        HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+        connector->setParameter("id",CurrentOnlineUser::get()->getUserID());
+        connector->setParameter("token",CurrentOnlineUser::get()->getToken());
+        connector->setParameter("peer_id",m_peer_id);
+        connector->setParameter("action","get");
+
+        const XMLNode * result = connector->getXMLFromPage();
+        std::string rec_success;
+
+        if(result->get("success", &rec_success))
         {
-            char url[512];
-            sprintf(url, "http://stkconnect.freeserver.me/log.php?get&nick=%s", m_peer_name.c_str());
-            std::string result = HTTP::getPage(url);
-            if (result == "")
+            if (rec_success == "yes")
             {
-                Log::error("GetPeerAddress", "The host you try to reach does not exist. Change the host name please.\n");
-                pause();
-                return;
-            }
-            std::string ip_addr = result;
-            ip_addr.erase(ip_addr.find_first_of(':'));
-            std::string port_nb = result;
-            port_nb.erase(0, port_nb.find_first_of(':')+1);
-            uint32_t dst_ip = (uint32_t)(atoi(ip_addr.c_str()));
-            uint16_t dst_port = (uint32_t)(atoi(port_nb.c_str()));
-            if (dst_ip == 0 || dst_port == 0)
-            {
-                Log::info("GetPeerAddress", "The host you try to reach is not online. There will be a new try in 10 seconds.\n");
-                target = current_time+10;
+                TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
+                result->get("ip", &addr->ip);
+                result->get("port", &addr->port);
+                Log::info("GetPeerAddress", "Address gotten successfully.");
             }
             else
             {
-                Log::info("GetPeerAddress", "Public ip of target is %i.%i.%i.%i:%i\n", (dst_ip>>24)&0xff, (dst_ip>>16)&0xff, (dst_ip>>8)&0xff, dst_ip&0xff, dst_port);
-                uint32_t server_ip =   ((dst_ip&0x000000ff)<<24) // change the server IP to have a network-byte order
-                                    + ((dst_ip&0x0000ff00)<<8)
-                                    + ((dst_ip&0x00ff0000)>>8)
-                                    + ((dst_ip&0xff000000)>>24); 
-                uint16_t server_port = dst_port;
-                TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
-                addr->ip = server_ip;
-                addr->port = server_port;
-                m_state = DONE;
+                Log::error("GetPeerAddress", "Fail to get address.");
             }
         }
+        else
+        {
+            Log::error("GetPeerAddress", "Fail to get address.");
+        }
+        m_state = DONE;
     }
     else if (m_state == DONE)
     {
@@ -89,7 +83,7 @@ void GetPeerAddress::update()
     }
 }
 
-void GetPeerAddress::setPeerName(std::string peer_name)
+void GetPeerAddress::setPeerID(uint32_t peer_id)
 {
-    m_peer_name = peer_name;
+    m_peer_id = peer_id;
 }

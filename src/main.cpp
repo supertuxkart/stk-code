@@ -171,6 +171,9 @@
 #include "network/network_manager.hpp"
 #include "network/client_network_manager.hpp"
 #include "network/server_network_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/lobby_room_protocol.hpp"
+#include "online/current_online_user.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -689,6 +692,7 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--server") )
         {
             NetworkManager::getInstance<ServerNetworkManager>();
+            Log::info("main", "Creating a server network manager.");
         }
         else if( sscanf(argv[i], "--port=%d", &n) )
         {
@@ -1167,8 +1171,6 @@ void initRest()
     kart_properties_manager = new KartPropertiesManager();
     projectile_manager      = new ProjectileManager    ();
     powerup_manager         = new PowerupManager       ();
-    // If the server has been created (--server option), this will do nothing:
-    NetworkManager::getInstance<ClientNetworkManager>(); 
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
     KartPropertiesManager::addKartSearchDir(
@@ -1360,6 +1362,17 @@ int main(int argc, char *argv[] )
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);
+        
+        // load the network manager
+        // If the server has been created (--server option), this will do nothing (just a warning):
+        NetworkManager::getInstance<ClientNetworkManager>(); 
+        NetworkManager::getInstance()->run();
+        if (NetworkManager::getInstance()->isServer())
+        {
+            irr::core::stringw str;
+            CurrentOnlineUser::get()->signIn("server", "serverpass", str);
+            ProtocolManager::getInstance()->requestStart(new ServerLobbyRoomProtocol());
+        }
 
         addons_manager->checkInstalledAddons();
 

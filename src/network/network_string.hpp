@@ -132,6 +132,15 @@ class NetworkString
         inline uint8_t      getUInt8(int pos = 0)   { return get<uint8_t,1>(pos);         }
         inline char         getChar(int pos = 0)    { return get<char,1>(pos);            }
         inline unsigned char getUChar(int pos = 0)  { return get<unsigned char,1>(pos);   }
+        
+        inline int          gi(int pos = 0)         { return get<int,4>(pos);             }
+        inline uint32_t     gui(int pos = 0)        { return get<uint32_t,4>(pos);        }
+        inline uint32_t     gui32(int pos = 0)      { return get<uint32_t,4>(pos);        }
+        inline uint16_t     gui16(int pos = 0)      { return get<uint16_t,2>(pos);        }
+        inline uint8_t      gui8(int pos = 0)       { return get<uint8_t,1>(pos);         }
+        inline char         gc(int pos = 0)         { return get<char,1>(pos);            }
+        inline unsigned char guc(int pos = 0)       { return get<unsigned char,1>(pos);   }
+        
         double getDouble(int pos = 0) //!< BEWARE OF PRECISION
         {
             for (int i = 0; i < 8; i++)
@@ -182,15 +191,15 @@ class NetworkString
             remove(pos, 4);
         }
         
-        inline NetworkString& gui8(uint8_t* dst)   { *dst = getAndRemoveUInt8(0);  }
-        inline NetworkString& gui16(uint16_t* dst) { *dst = getAndRemoveUInt16(0); }
-        inline NetworkString& gui32(uint32_t* dst) { *dst = getAndRemoveUInt32(0); }
-        inline NetworkString& gui(uint32_t* dst)   { *dst = getAndRemoveUInt32(0); }
-        inline NetworkString& gi(int* dst)         { *dst = getAndRemoveInt(0);    }
-        inline NetworkString& gc(char* dst)        { *dst = getAndRemoveChar(0);   }
-        inline NetworkString& guc(uchar* dst)      { *dst = getAndRemoveUChar(0);  }
-        inline NetworkString& gd(double* dst)      { *dst = getAndRemoveDouble(0); }
-        inline NetworkString& gf(float* dst)       { *dst = getAndRemoveFloat(0);  }
+        inline NetworkString& gui8(uint8_t* dst)   { *dst = getAndRemoveUInt8(0);  return *this; }
+        inline NetworkString& gui16(uint16_t* dst) { *dst = getAndRemoveUInt16(0); return *this; }
+        inline NetworkString& gui32(uint32_t* dst) { *dst = getAndRemoveUInt32(0); return *this; }
+        inline NetworkString& gui(uint32_t* dst)   { *dst = getAndRemoveUInt32(0); return *this; }
+        inline NetworkString& gi(int* dst)         { *dst = getAndRemoveInt(0);    return *this; }
+        inline NetworkString& gc(char* dst)        { *dst = getAndRemoveChar(0);   return *this; }
+        inline NetworkString& guc(uchar* dst)      { *dst = getAndRemoveUChar(0);  return *this; }
+        inline NetworkString& gd(double* dst)      { *dst = getAndRemoveDouble(0); return *this; }
+        inline NetworkString& gf(float* dst)       { *dst = getAndRemoveFloat(0);  return *this; }
     
     protected:
         std::string m_string;

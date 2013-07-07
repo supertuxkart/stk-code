@@ -62,6 +62,7 @@ class NetworkManager : public Singleton<NetworkManager>
         bool isPlayingOnline()              { return m_playing_online;  }
         STKHost* getHost()                  { return m_localhost;       }
         std::vector<STKPeer*> getPeers()    { return m_peers;           }
+        TransportAddress getPublicAddress() { return m_public_address;  }
         GameSetup* getGameSetup()           { return m_game_setup;      }
         
     protected:

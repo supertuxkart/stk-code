@@ -50,65 +50,7 @@ void ServerNetworkManager::run()
 
 void ServerNetworkManager::start()
 {
-    m_localhost = new STKHost();
-    m_localhost->setupServer(STKHost::HOST_ANY, 7321, 32, 2, 0, 0);
-    m_localhost->startListening();
-    Log::info("ServerNetworkManager", "Server now setup, listening on port 7321.\n");
-    
-    Log::info("ServerNetworkManager", "Starting the global protocol\n");
-    // step 1 : retreive public address
-    Protocol* protocol = new GetPublicAddress(&m_public_address);
-    ProtocolManager::getInstance()->requestStart(protocol);
-    while (ProtocolManager::getInstance()->getProtocolState(protocol) != PROTOCOL_STATE_TERMINATED )
-    {
-    }
-    Log::info("ServerNetworkManager", "The public address is known.\n"); 
-    
-    // step 2 : show the public address for others (here, the server)
-    ShowPublicAddress* spa = new ShowPublicAddress(NULL);
-    spa->setPassword(m_player_login.password);
-    spa->setUsername(m_player_login.username);
-    spa->setPublicAddress(m_public_address.ip, m_public_address.port);
-    ProtocolManager::getInstance()->requestStart(spa);
-    while (ProtocolManager::getInstance()->getProtocolState(spa) != PROTOCOL_STATE_TERMINATED )
-    {
-    }
-    Log::info("ServerNetworkManager", "The public address is being shown online.\n"); 
-}
 
-bool ServerNetworkManager::connectToPeer(std::string peer_username)
-{
-    Log::info("ServerNetworkManager", "Starting the connection to host protocol\n");
-    
-    // step 3 : get the peer's addres.
-    TransportAddress addr;
-    GetPeerAddress* gpa = new GetPeerAddress(&addr);
-    gpa->setPeerName(peer_username);
-    ProtocolManager::getInstance()->requestStart(gpa);
-    while (ProtocolManager::getInstance()->getProtocolState(gpa) != PROTOCOL_STATE_TERMINATED )
-    {
-    }
-    Log::info("ServerNetworkManager", "The public address of the peer is known.\n"); 
-    
-    // step 2 : connect to the peer
-    ConnectToServer* cts = new ConnectToServer(NULL);
-    cts->setServerAddress(addr.ip, addr.port);
-    ProtocolManager::getInstance()->requestStart(cts);
-    while (ProtocolManager::getInstance()->getProtocolState(cts) != PROTOCOL_STATE_TERMINATED )
-    {
-    } 
-    bool success = false;
-    if (isConnectedTo(addr))
-    {
-        success = true;
-        Log::info("ServerNetworkManager", "Connection success : you are now connected to the peer.\n");
-    }
-    else 
-    {
-        Log::warn("ServerNetworkManager", "We are NOT connected to the peer.\n");
-    }
-    
-    return success;
 }
 
 void ServerNetworkManager::sendPacket(const NetworkString& data)
