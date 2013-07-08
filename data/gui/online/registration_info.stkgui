@@ -1,0 +1,61 @@
+<stkgui>
+
+    <div x="2%" y="5%" width="96%" height="90%" layout="vertical-row" >
+    
+        <header id="title" width="96%" proportion="1" text_align="center" word_wrap="true"
+       I18N="In the registration dialog' dialog" text="Registration"/>
+    
+        <spacer height="40" width="50">
+        
+        <div width="80%" align="center" layout="vertical-row" height="fit">
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" text_align="left" I18N="In the registration dialog" text="Username"/>
+                <textbox proportion="2" id="username" I18N="In the registration dialog"/>
+            </div>
+            
+            <spacer height="20" width="20">
+            
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" text_align="left" I18N="In the registration dialog" text="Password"/>
+                <textbox proportion="2" id="password" I18N="In the registration dialog"/>
+            </div>
+            
+            <spacer height="20" width="20">
+            
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" text_align="left" I18N="In the registration dialog" text="Confirm"/>
+                <textbox proportion="2" id="password_confirm" I18N="In the registration dialog"/>
+            </div>
+            
+            <spacer height="20" width="20">
+            
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" text_align="left" I18N="In the registration dialog" text="Email"/>
+                <textbox proportion="2" id="email" I18N="In the registration dialog"/>
+            </div>
+            
+            <spacer height="20" width="20">
+            
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" text_align="left" I18N="In the registration dialog" text="Confirm"/>
+                <textbox proportion="2" id="email_confirm" I18N="In the registration dialog"/>
+            </div>
+        </div>
+        
+        <spacer height="20" width="50">     
+        
+        <label id="info" proportion="1" width="90%" align="center" text_align="center" word_wrap="true"
+           I18N="In the registration dialog' dialog" text=""/>
+           
+        <spacer height="20" width="50"> 
+        
+        <div id="options" width="fit" proportion="1" align="center" layout="horizontal-row">
+            <button id="next" height="fit" align="center" width="fit" I18N="In the registration dialog" text="Next"/>
+            <spacer height="50" width="50">
+            <button id="cancel" height="fit" align="center" width="fit" I18N="In the registration dialog" text="Cancel"/>
+        </div>
+        
+    
+    </div>
+
+</stkgui>

@@ -19,7 +19,7 @@
 #ifndef GET_PUBLIC_ADDRESS_HPP
 #define GET_PUBLIC_ADDRESS_HPP
 
-#include "protocol.hpp"
+#include "../protocol.hpp"
 
 class GetPublicAddress : public Protocol
 {

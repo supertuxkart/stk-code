@@ -2,6 +2,7 @@
 
 Peach skin by Dakal and Marianne Gagnon, released under creative-commons BY-SA 3.0+
 Except background.jpg, by elisee
+Except stars, by s@f
 
 To make your own skin, I suggest simply duplicating this file and modifying it as needed.
 There are two types of images : some will be simply stretched as a whole, others will
@@ -207,7 +208,12 @@ when the border that intersect at this corner are enabled.
 <color type="dialog_background" state="neutral" a="120" r="0" g="0" b="0" />
 
 <!-- Text field color -->
-<color type="text_field" state="neutral" a="255" r="215" g="215" b="215" />
-<color type="text_field" state="focused" a="255" r="138" g="138" b="138" />
+<color type="text_field" state="background" a="255" r="200" g="200" b="200" />
+<color type="text_field" state="background_focused" a="255" r="236" g="226" b="201" />
+<color type="text_field" state="neutral" a="255" r="138" g="138" b="138" />
+<color type="text_field" state="focused" a="255" r="243" g="164" b="80" />
+
+<!-- Rating star image -->
+<element type="rating" state="neutral" image="peach/rating_star.png" />
 
 </skin>

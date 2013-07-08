@@ -32,11 +32,12 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 			<Add directory="../../src" />
+			<Add directory="/home/hilnius/Development/svn/supertuxkart/main/branches/hilnius/dev/SocketsBase/" />
 		</Compiler>
 		<Linker>
 			<Add option="-lpthread" />
 			<Add option="-lcurl" />
-			<Add library="../../lib/enet/build/libenet.a" />
+			<Add option="-lenet" />
 		</Linker>
 		<Unit filename="client_network_manager.cpp" />
 		<Unit filename="client_network_manager.hpp" />
@@ -44,15 +45,11 @@
 		<Unit filename="event.hpp" />
 		<Unit filename="http_functions.cpp" />
 		<Unit filename="http_functions.hpp" />
-		<Unit filename="lobby_room_protocol.cpp" />
-		<Unit filename="lobby_room_protocol.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="network_interface.cpp" />
 		<Unit filename="network_interface.hpp" />
 		<Unit filename="network_manager.cpp" />
 		<Unit filename="network_manager.hpp" />
-		<Unit filename="packet_logger.cpp" />
-		<Unit filename="packet_logger.hpp" />
 		<Unit filename="protocol.cpp" />
 		<Unit filename="protocol.hpp" />
 		<Unit filename="protocol_manager.cpp" />

@@ -1152,8 +1152,9 @@ namespace scene
 		/** This can only be invoked between
 		IVideoDriver::beginScene() and IVideoDriver::endScene(). Please note that
 		the scene is not only drawn when calling this, but also animated
-		by existing scene node animators, culling of scene nodes is done, etc. */
-		virtual void drawAll() = 0;
+		by existing scene node animators, culling of scene nodes is done, etc.
+		\param flags Allows you to disable/enable specific render passes by passing bitwise OR combinations of E_SCENE_NODE_RENDER_PASS values*/
+		virtual void drawAll(u32 flags = 0xFFFFFFFF) = 0;
 
 		//! Creates a rotation animator, which rotates the attached scene node around itself.
 		/** \param rotationSpeed Specifies the speed of the animation in degree per 10 milliseconds.
@@ -1637,6 +1638,8 @@ namespace scene
 		/** \param[in] lightManager: the new callbacks manager. You may pass 0 to remove the
 			current callbacks manager and restore the default behavior. */
 		virtual void setLightManager(ILightManager* lightManager) = 0;
+
+		virtual void setCurrentRendertime(E_SCENE_NODE_RENDER_PASS pass) =0;
 
 		//! Get an instance of a geometry creator.
 		/** The geometry creator provides some helper methods to create various types of

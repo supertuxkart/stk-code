@@ -84,7 +84,10 @@ namespace video
 		EMF_BLEND_OPERATION = 0x40000,
 
 		//! Flag for polygon offset
-		EMF_POLYGON_OFFSET = 0x80000
+		EMF_POLYGON_OFFSET = 0x80000,
+
+		//! MaterialType override
+		EMF_MATERIAL_TYPE = 0x100000
 	};
 
 } // end namespace video

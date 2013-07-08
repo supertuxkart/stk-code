@@ -17,13 +17,13 @@ void main()
 	// lookup normal from normal map, move from [0,1] to  [-1, 1] range, normalize
 	vec3 normal  = 2.0 * texture2D (BumpTex1, gl_TexCoord[0].st + delta1).rgb - 1.0;
     vec3 normal2 = 2.0 * texture2D (BumpTex2, gl_TexCoord[0].st + delta2).rgb - 1.0;
-    
+
     // scale normals
     normal.y = 4.0*normal.y;
     normal2.y = 4.0*normal2.y;
-    
+
 	normal = (normalize(normal) + normalize(normal2))/2.0;
-	    
+
 	// compute diffuse lighting
 	float lamberFactor = max (dot (lightVec, normal), 0.0);
 	vec4 diffuseMaterial;
@@ -38,11 +38,11 @@ void main()
     //}
 
     gl_FragColor =	diffuseMaterial * (0.3 + lamberFactor*0.7);
-    
+
     // specular (phong)
     vec3 R = normalize(reflect(lightVec, normal));
     float specular = max(dot(R,eyeVec),0.0);
-    
+
     if (specular > 0.0)
     {
         // weak specular
@@ -50,7 +50,7 @@ void main()
         specular = specular*specular;
         float specular_weak = specular*0.05;
         gl_FragColor += vec4(specular_weak, specular_weak, specular_weak, 0.0);
-        
+
         // strong specular
         specular = specular*specular;
         float specular_strong = specular*0.3;

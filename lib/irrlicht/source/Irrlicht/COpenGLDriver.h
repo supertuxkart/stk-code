@@ -23,6 +23,7 @@ namespace irr
 #include "IMaterialRendererServices.h"
 // also includes the OpenGL stuff
 #include "COpenGLExtensionHandler.h"
+#include "COpenGLTexture.h"
 
 #ifdef _IRR_COMPILE_WITH_CG_
 #include "Cg/cg.h"
@@ -344,7 +345,8 @@ namespace video
 		virtual u32 getMaximalPrimitiveCount() const;
 
 		virtual ITexture* addRenderTargetTexture(const core::dimension2d<u32>& size,
-				const io::path& name, const ECOLOR_FORMAT format = ECF_UNKNOWN);
+				const io::path& name, const ECOLOR_FORMAT format = ECF_UNKNOWN,
+				const bool useStencil = false);
 
 		//! set or reset render target
 		virtual bool setRenderTarget(video::E_RENDER_TARGET target, bool clearTarget,
@@ -390,7 +392,8 @@ namespace video
 		//! Returns the maximum texture size supported.
 		virtual core::dimension2du getMaxTextureSize() const;
 
-		ITexture* createDepthTexture(ITexture* texture, bool shared=true);
+		ITexture* createDepthTexture(ITexture* texture, const bool useStencil = false,
+						const bool shared = true);
 		void removeDepthTexture(ITexture* texture);
 
 		//! Removes a texture from the texture cache and deletes it, freeing lot of memory.
@@ -543,7 +546,7 @@ namespace video
 			}
 		};
 		STextureStageCache CurrentTexture;
-		core::array<ITexture*> DepthTextures;
+		core::array<COpenGLFBODepthTexture*> DepthTextures;
 		struct SUserClipPlane
 		{
 			SUserClipPlane() : Enabled(false) {}

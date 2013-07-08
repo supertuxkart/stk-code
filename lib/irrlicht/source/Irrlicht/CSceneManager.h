@@ -111,7 +111,7 @@ namespace scene
 		virtual u32 registerNodeForRendering(ISceneNode* node, E_SCENE_NODE_RENDER_PASS pass = ESNRP_AUTOMATIC);
 
 		//! draws all scene nodes
-		virtual void drawAll();
+		virtual void drawAll(u32 flags = 0xFFFFFFFF);
 
 		//! Adds a scene node for rendering using a octree to the scene graph. This a good method for rendering
 		//! scenes with lots of geometry. The Octree is built on the fly from the mesh, much
@@ -532,20 +532,27 @@ namespace scene
 		struct DefaultNodeEntry
 		{
 			DefaultNodeEntry(ISceneNode* n) :
-				Node(n), TextureValue(0)
+				Node(n), TextureValue(0), MaterialType(video::EMT_SOLID)
 			{
 				if (n->getMaterialCount())
+				{
 					TextureValue = (n->getMaterial(0).getTexture(0));
+					MaterialType = n->getMaterial(0).MaterialType;
+				}
 			}
 
 			bool operator < (const DefaultNodeEntry& other) const
 			{
-				return (TextureValue < other.TextureValue);
+				if (MaterialType == other.MaterialType)
+					return (TextureValue < other.TextureValue);
+				else
+					return (MaterialType < other.MaterialType);
 			}
 
 			ISceneNode* Node;
 			private:
 			void* TextureValue;
+			video::E_MATERIAL_TYPE MaterialType;
 		};
 
 		//! sort on distance (center) to camera

@@ -149,9 +149,11 @@ src/network/protocols/hide_public_address.cpp
 src/network/protocols/lobby_room_protocol.cpp
 src/network/protocols/show_public_address.cpp
 src/network/server_network_manager.cpp
-src/network/singleton.cpp
 src/network/stk_host.cpp
 src/network/stk_peer.cpp
+src/online/current_online_user.cpp
+src/online/http_connector.cpp
+src/online/online_user.cpp
 src/physics/btKart.cpp
 src/physics/btKartRaycast.cpp
 src/physics/btUprightConstraint.cpp
@@ -178,10 +180,12 @@ src/states_screens/dialogs/confirm_resolution_dialog.cpp
 src/states_screens/dialogs/custom_video_settings.cpp
 src/states_screens/dialogs/enter_player_name_dialog.cpp
 src/states_screens/dialogs/gp_info_dialog.cpp
+src/states_screens/dialogs/login_dialog.cpp
 src/states_screens/dialogs/message_dialog.cpp
 src/states_screens/dialogs/player_info_dialog.cpp
 src/states_screens/dialogs/press_a_key_dialog.cpp
 src/states_screens/dialogs/race_paused_dialog.cpp
+src/states_screens/dialogs/registration_dialog.cpp
 src/states_screens/dialogs/select_challenge.cpp
 src/states_screens/dialogs/track_info_dialog.cpp
 src/states_screens/dialogs/tutorial_message_dialog.cpp
@@ -195,6 +199,7 @@ src/states_screens/help_screen_4.cpp
 src/states_screens/kart_selection.cpp
 src/states_screens/main_menu_screen.cpp
 src/states_screens/minimal_race_gui.cpp
+src/states_screens/online_screen.cpp
 src/states_screens/options_screen_audio.cpp
 src/states_screens/options_screen_input2.cpp
 src/states_screens/options_screen_input.cpp
@@ -410,6 +415,9 @@ src/network/singleton.hpp
 src/network/stk_host.hpp
 src/network/stk_peer.hpp
 src/network/types.hpp
+src/online/current_online_user.hpp
+src/online/http_connector.hpp
+src/online/online_user.hpp
 src/physics/btKart.hpp
 src/physics/btKartRaycast.hpp
 src/physics/btUprightConstraint.hpp
@@ -439,10 +447,12 @@ src/states_screens/dialogs/confirm_resolution_dialog.hpp
 src/states_screens/dialogs/custom_video_settings.hpp
 src/states_screens/dialogs/enter_player_name_dialog.hpp
 src/states_screens/dialogs/gp_info_dialog.hpp
+src/states_screens/dialogs/login_dialog.hpp
 src/states_screens/dialogs/message_dialog.hpp
 src/states_screens/dialogs/player_info_dialog.hpp
 src/states_screens/dialogs/press_a_key_dialog.hpp
 src/states_screens/dialogs/race_paused_dialog.hpp
+src/states_screens/dialogs/registration_dialog.hpp
 src/states_screens/dialogs/select_challenge.hpp
 src/states_screens/dialogs/track_info_dialog.hpp
 src/states_screens/dialogs/tutorial_message_dialog.hpp
@@ -456,6 +466,7 @@ src/states_screens/help_screen_4.hpp
 src/states_screens/kart_selection.hpp
 src/states_screens/main_menu_screen.hpp
 src/states_screens/minimal_race_gui.hpp
+src/states_screens/online_screen.hpp
 src/states_screens/options_screen_audio.hpp
 src/states_screens/options_screen_input2.hpp
 src/states_screens/options_screen_input.hpp
@@ -516,5 +527,6 @@ src/utils/string_utils.hpp
 src/utils/synchronised.hpp
 src/utils/time.hpp
 src/utils/translation.hpp
+src/utils/types.hpp
 src/utils/vec3.hpp
 )

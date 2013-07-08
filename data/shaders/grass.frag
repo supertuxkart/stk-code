@@ -9,7 +9,7 @@ void main()
 {
     vec4 color = texture2D(tex, gl_TexCoord[0].st);
     vec4 solidColor = vec4(color.r, color.g, color.b, 1);
-    
+
     if (fog == 1)
     {
         if (coord.z > fogTo)

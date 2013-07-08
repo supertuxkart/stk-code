@@ -92,7 +92,9 @@
 
 #ifdef WIIUSE_WIN32
 	/* windows */
-	#define WIN32_LEAN_AND_MEAN 1
+	#ifndef WIN32_LEAN_AND_MEAN
+		#define WIN32_LEAN_AND_MEAN 1
+	#endif
 	#include <windows.h>
 #endif
 #ifdef WIIUSE_BLUEZ
@@ -710,6 +712,14 @@ typedef enum WIIUSE_EVENT_TYPE {
 } WIIUSE_EVENT_TYPE;
 
 /**
+ *	@brief Type of wiimote peripheral
+ */
+typedef enum WIIUSE_WIIMOTE_TYPE {
+	WIIUSE_WIIMOTE_REGULAR = 0,
+	WIIUSE_WIIMOTE_MOTION_PLUS_INSIDE,
+} WIIUSE_WIIMOTE_TYPE;
+
+/**
  *	@brief Main Wiimote device structure.
  *
  *  You need one of these to do pretty much anything with this library.
@@ -779,6 +789,7 @@ typedef struct wiimote_t {
 
 	WCONST WIIUSE_EVENT_TYPE event;			/**< type of event that occurred				*/
 	WCONST byte motion_plus_id[6];
+    WCONST WIIUSE_WIIMOTE_TYPE type;
 } wiimote;
 
 /** @brief Data passed to a callback during wiiuse_update() */

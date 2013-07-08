@@ -617,6 +617,8 @@ namespace video
 					return BlendOperation != EBO_NONE;
 				case EMF_POLYGON_OFFSET:
 					return PolygonOffsetFactor != 0;
+				default:
+					break;
 			}
 
 			return false;
