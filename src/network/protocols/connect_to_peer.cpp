@@ -89,6 +89,12 @@ void ConnectToPeer::update()
             }
             break;
         case CONNECTING: // waiting the peer to connect
+            static double timer = 0;
+            if (Time::getRealTime() > timer+5.0) // every 5 seconds
+            {
+                timer = Time::getRealTime();
+                NetworkManager::getInstance()->connect(m_peer_address);
+            }
             break;
         case CONNECTED:
         {
