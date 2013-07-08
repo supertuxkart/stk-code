@@ -76,8 +76,7 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
     {
         assert(event->data.size()); // assert that data isn't empty
         Log::verbose("LobbyRoomProtocol", "Message from %u : \"%s\"", event->peer->getAddress(), event->data.c_str());
-        uint8_t message_type = 0;
-        event->data.gui8(&message_type);
+        uint8_t message_type = event->data.getAndRemoveUInt8();
         if (message_type == 1) // new player connected
         {
             if (event->data.size() != 7 || event->data[0] != 4 || event->data[5] != 1) // 7 bytes remains now
@@ -105,7 +104,7 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
         } // new player connected
         else if (message_type == 0b10000001) // connection accepted
         {
-            if (event->data.size() != 12 || event->data[0] != 1 || event->data[2] != 4 || event->data[7] != 4) // 7 bytes remains now
+            if (event->data.size() != 12 || event->data[0] != 1 || event->data[2] != 4 || event->data[7] != 4) // 12 bytes remains now
             {
                 Log::error("LobbyRoomProtocol", "A message notifying an accepted connection wasn't formated as expected.");
                 return;
@@ -177,7 +176,7 @@ void ServerLobbyRoomProtocol::notifyEvent(Event* event)
             }
             Log::verbose("LobbyRoomProtocol", "New player.");
             int player_id = 0;
-            player_id = event->data.getUInt8(1);
+            player_id = event->data.getUInt32(1);
             // can we add the player ?
             if (m_setup->getPlayerCount() < 16) // accept player
             {
@@ -196,7 +195,7 @@ void ServerLobbyRoomProtocol::notifyEvent(Event* event)
                 m_listener->sendMessageExcept(this, event->peer, message);
                 // send a message to the one that asked to connect
                 NetworkString message_ack;
-                // 0b1000001 (connection success) ;
+                // 0b10000001 (connection success) ;
                 RandomGenerator token_generator;
                 // use 4 random numbers because rand_max is probably 2^15-1.
                 uint32_t token = (uint32_t)(((token_generator.get(RAND_MAX)<<24) & 0xff) +
@@ -204,7 +203,7 @@ void ServerLobbyRoomProtocol::notifyEvent(Event* event)
                                             ((token_generator.get(RAND_MAX)<<8)  & 0xff) +
                                             ((token_generator.get(RAND_MAX)      & 0xff)));
                 // connection success (129) -- size of token -- token
-                message_ack.ai8(0b1000001).ai8(4).ai32(token).ai8(4).ai32(token);
+                message_ack.ai8(0b10000001).ai8(1).ai8(m_next_id).ai8(4).ai32(token).ai8(4).ai32(player_id);
                 m_listener->sendMessage(this, event->peer, message_ack);
             } // accept player
             else  // refuse the connection with code 0 (too much players)
