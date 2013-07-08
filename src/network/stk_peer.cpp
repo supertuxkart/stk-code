@@ -58,7 +58,7 @@ bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host, uint32_t 
 
 void STKPeer::sendPacket(NetworkString const& data)
 {
-    //Log::info("STKPeer", "sending packet to %i.%i.%i.%i:%i", (m_peer->address.host>>24)&0xff,(m_peer->address.host>>16)&0xff,(m_peer->address.host>>8)&0xff,(m_peer->address.host>>0)&0xff,m_peer->address.port);
+    Log::info("STKPeer", "sending packet of size %d to %i.%i.%i.%i:%i", data.size(), (m_peer->address.host>>24)&0xff,(m_peer->address.host>>16)&0xff,(m_peer->address.host>>8)&0xff,(m_peer->address.host>>0)&0xff,m_peer->address.port);
     ENetPacket* packet = enet_packet_create(data.c_str(), data.size()+1,ENET_PACKET_FLAG_RELIABLE);
     
     enet_peer_send(m_peer, 0, packet);

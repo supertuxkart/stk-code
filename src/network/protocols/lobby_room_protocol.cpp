@@ -172,11 +172,12 @@ void ServerLobbyRoomProtocol::notifyEvent(Event* event)
         {
             if (event->data.size() != 5 || event->data[0] != 4)
             {
-                Log::warn("LobbyRoomProtocol", "A player is sending a badly formated message.");
+                Log::warn("LobbyRoomProtocol", "A player is sending a badly formated message. Size is %d and first byte %d", event->data.size(), event->data[0]);
                 return;
             }
             Log::verbose("LobbyRoomProtocol", "New player.");
             int player_id = 0;
+            player_id = event->data.getUInt8(1);
             // can we add the player ?
             if (m_setup->getPlayerCount() < 16) // accept player
             {
