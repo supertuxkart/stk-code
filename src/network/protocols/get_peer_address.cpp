@@ -65,10 +65,10 @@ void GetPeerAddress::update()
                 uint32_t reversed_ip;
                 result->get("ip", &reversed_ip);
                 result->get("port", &addr->port);
-                addr->ip = (((reversed_ip<<24)&0xff))
-                            +( ((reversed_ip<<16)&0xff)>>8)
-                            +( ((reversed_ip<<8)&0xff)>>16)
-                            +( ((reversed_ip<<0)&0xff)>>24);
+                addr->ip =   ((reversed_ip&0xff000000) >> 24)
+                            +((reversed_ip&0x00ff0000) >> 8)
+                            +((reversed_ip&0x0000ff00) << 8)
+                            +((reversed_ip&0x000000ff) << 24);
                 Log::info("GetPeerAddress", "Address gotten successfully.");
             }
             else
