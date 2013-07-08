@@ -981,6 +981,9 @@ int handleCmdLine(int argc, char **argv)
             ProfileWorld::setProfileModeTime((float)n);
             race_manager->setNumLaps(999999); // profile end depends on time
         }
+        else if( !strcmp(argv[i], "--no-graphics") )
+        {
+        }
         else if( !strcmp(argv[i], "--with-profile") )
         {
             // Set default profile mode of 1 lap if we haven't already set one

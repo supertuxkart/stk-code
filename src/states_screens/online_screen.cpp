@@ -195,7 +195,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     {
         //if (m_recorded_state == Registered || m_recorded_state == Guest) FIXME
         StateManager::get()->pushScreen(NetworkingLobby::getInstance());
-        ProtocolManager::getInstance()->requestStart(new ConnectToServer(3));
+        ProtocolManager::getInstance()->requestStart(new ConnectToServer(7));
     }
 
 }   // eventCallback
