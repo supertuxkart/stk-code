@@ -109,15 +109,8 @@ void ConnectToServer::update()
             if (m_listener->getProtocolState(m_current_protocol_id) 
             == PROTOCOL_STATE_TERMINATED) // we have put a request to access the server
             {
-                m_state = REQUEST_DONE;
-                m_current_protocol_id = m_listener->requestStart(new PingProtocol(m_server_address, 0.5));
-            }
-            break;
-        case REQUEST_DONE:
-            if (m_listener->getProtocolState(m_current_protocol_id) 
-            == PROTOCOL_STATE_TERMINATED) // we have put a request to access the server
-            {
                 m_state = CONNECTING;
+                m_current_protocol_id = m_listener->requestStart(new PingProtocol(m_server_address, 2.0));
             }
             break;
         case CONNECTING: // waiting the server to answer our connection

@@ -46,7 +46,6 @@ class ConnectToServer : public Protocol, public CallbackObject
             SELF_ADDRESS_KNOWN,
             PEER_ADDRESS_KNOWN,
             SELF_ADDRESS_SHOWN,
-            REQUEST_DONE,
             CONNECTING,
             CONNECTED,
             HIDING_ADDRESS,
