@@ -23,6 +23,7 @@
 #include "network/client_network_manager.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/show_public_address.hpp"
+#include "network/protocols/connect_to_peer.hpp"
 #include "online/current_online_user.hpp"
 #include "online/http_connector.hpp"
 #include "config/user_config.hpp"
@@ -267,7 +268,7 @@ void ServerLobbyRoomProtocol::update()
         case WORKING:
             // first poll every 5 seconds
             static double last_poll_time = 0;
-            if (Time::getRealTime() > last_poll_time+5.0)
+            if (Time::getRealTime() > last_poll_time+10.0)
             {
                 last_poll_time = Time::getRealTime();
                 HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
@@ -297,8 +298,9 @@ void ServerLobbyRoomProtocol::update()
             // now
             for (int i = 0; i < m_incoming_peers_ids.size(); i++)
             {
-                
+                ProtocolManager::getInstance()->requestStart(new ConnectToPeer(m_incoming_peers_ids[i]));
             }
+            m_incoming_peers_ids.clear();
             
             break;
         case DONE:
