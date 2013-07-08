@@ -19,7 +19,10 @@
 #include "network/protocols/lobby_room_protocol.hpp"
 
 #include "network/network_manager.hpp"
+#include "network/protocol_manager.hpp"
 #include "network/client_network_manager.hpp"
+#include "network/protocols/get_public_address.hpp"
+#include "network/protocols/show_public_address.hpp"
 #include "online/current_online_user.hpp"
 #include "online/http_connector.hpp"
 #include "config/user_config.hpp"
@@ -54,7 +57,10 @@ void ServerLobbyRoomProtocol::setup()
 {
     m_setup = NetworkManager::getInstance()->setupNewGame(); // create a new setup
     m_next_id = 0;
-    m_state = WORKING;
+    m_state = NONE;
+    m_public_address.ip = 0;
+    m_public_address.port = 0;
+    Log::info("ServerLobbyRoomProtocol", "Starting the protocol.");
 }
 
 //-----------------------------------------------------------------------------
@@ -238,6 +244,26 @@ void ServerLobbyRoomProtocol::update()
 {
     switch (m_state)
     {
+        case NONE:
+            m_current_protocol_id = ProtocolManager::getInstance()->requestStart(new GetPublicAddress(&m_public_address));
+            m_state = GETTING_PUBLIC_ADDRESS;
+            break;
+        case GETTING_PUBLIC_ADDRESS:
+            if (ProtocolManager::getInstance()->getProtocolState(m_current_protocol_id) == PROTOCOL_STATE_TERMINATED)
+            {
+                NetworkManager::getInstance()->setPublicAddress(m_public_address);
+                m_current_protocol_id = ProtocolManager::getInstance()->requestStart(new ShowPublicAddress());
+                m_state = SHOWING_PUBLIC_ADDRESS;
+                Log::info("ServerLobbyRoomProtocol", "Public address known.");
+            }
+            break;
+        case SHOWING_PUBLIC_ADDRESS:
+            if (ProtocolManager::getInstance()->getProtocolState(m_current_protocol_id) == PROTOCOL_STATE_TERMINATED)
+            {
+                m_state = WORKING;
+                Log::info("ServerLobbyRoomProtocol", "Public address visible.");
+            }
+            break;
         case WORKING:
             // first poll every 5 seconds
             static double last_poll_time = 0;

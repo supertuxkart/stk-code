@@ -45,6 +45,10 @@ void ServerNetworkManager::run()
         Log::error("ServerNetworkManager", "Could not initialize enet.\n");
         return;
     }
+    m_localhost = new STKHost();
+    m_localhost->setupServer(STKHost::HOST_ANY, 7321, 16, 2, 0, 0);
+    m_localhost->startListening();
+    
     NetworkManager::run();
 }
 
