@@ -62,8 +62,13 @@ void GetPeerAddress::update()
             if (rec_success == "yes")
             {
                 TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
-                result->get("ip", &addr->ip);
+                uint32_t reversed_ip;
+                result->get("ip", &reversed_ip);
                 result->get("port", &addr->port);
+                addr->ip = (((reversed_ip<<24)&0xff))
+                            +( ((reversed_ip<<16)&0xff)>>8)
+                            +( ((reversed_ip<<8)&0xff)>>16)
+                            +( ((reversed_ip<<0)&0xff)>>24);
                 Log::info("GetPeerAddress", "Address gotten successfully.");
             }
             else
