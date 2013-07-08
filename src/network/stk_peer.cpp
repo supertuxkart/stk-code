@@ -43,7 +43,7 @@ bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host, uint32_t 
          ((host.ip & 0xff000000) >> 24)
        + ((host.ip & 0x00ff0000) >> 8)
        + ((host.ip & 0x0000ff00) << 8)
-       + ((host.ip & 0x000000ff) << 24);
+       + ((host.ip & 0x000000ff) << 24); // because ENet wants little endian
     address.port = host.port;
     
     ENetPeer* peer = enet_host_connect(localhost->m_host, &address, 2, 0);

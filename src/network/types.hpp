@@ -64,5 +64,7 @@ class PlayerLogin : public CallbackObject
     std::string password;   //!< Password of the player
 };
 
+uint32_t turnEndianness(uint32_t val);
+
 
 #endif // TYPES_HPP

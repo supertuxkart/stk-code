@@ -25,6 +25,7 @@
 #include "network/protocols/hide_public_address.hpp"
 #include "network/protocols/request_connection.hpp"
 #include "network/protocols/ping_protocol.hpp"
+#include "network/protocols/lobby_room_protocol.hpp"
 #include "online/current_online_user.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
@@ -133,6 +134,7 @@ void ConnectToServer::update()
             == PROTOCOL_STATE_TERMINATED) // we have hidden our address
             {
                 m_state = DONE;
+                m_listener->requestStart(new ClientLobbyRoomProtocol(m_server_address));
             }
             break;
         case DONE:

@@ -207,7 +207,7 @@ bool STKHost::peerExists(TransportAddress peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == peer.ip && 
+        if (m_host->peers[i].address.host == turnEndianness(peer.ip) && 
             m_host->peers[i].address.port == peer.port)
         {
             return true;
@@ -222,7 +222,7 @@ bool STKHost::isConnectedTo(TransportAddress peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == peer.ip && 
+        if (m_host->peers[i].address.host == turnEndianness(peer.ip) && 
             m_host->peers[i].address.port == peer.port && 
             m_host->peers[i].state == ENET_PEER_STATE_CONNECTED)
         {

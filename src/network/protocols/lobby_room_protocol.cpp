@@ -51,6 +51,7 @@ void ClientLobbyRoomProtocol::setup()
 {
     m_setup = NetworkManager::getInstance()->setupNewGame(); // create a new setup
     m_state = NONE;
+    Log::info("ClientLobbyRoomProtocol", "Starting the protocol.");
 }
 
 //-----------------------------------------------------------------------------
@@ -121,6 +122,7 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
                 profile.user_profile = CurrentOnlineUser::get();
                 m_setup->addPlayer(profile);
                 event->peer->setClientServerToken(token);
+                m_state = CONNECTED;
             }
         } // connection accepted
         else if (message_type == 0b10000000) // connection refused
@@ -164,7 +166,8 @@ void ServerLobbyRoomProtocol::notifyEvent(Event* event)
     {
         assert(event->data.size()); // message not empty
         uint8_t message_type;
-        event->data.gui8(&message_type);
+        message_type = event->data.getAndRemoveUInt8();
+        Log::info("ServerLobbyRoomProtocol", "Message received with type %d.", message_type);
         if (message_type == 1) // player requesting connection
         {
             if (event->data.size() != 5 || event->data[0] != 4)
@@ -231,6 +234,21 @@ void ClientLobbyRoomProtocol::update()
     switch (m_state)
     {
         case NONE:
+            if (NetworkManager::getInstance()->isConnectedTo(m_server_address))
+            {
+                m_state = LINKED;
+            }
+            break;
+        case LINKED:
+        {
+            NetworkString ns;
+            // 1 (connection request), 4 (size of id), global id
+            ns.ai8(1).ai8(4).ai32(CurrentOnlineUser::get()->getUserID());
+            m_listener->sendMessage(this, ns);
+            m_state = REQUESTING_CONNECTION;
+            break;
+        }
+        case REQUESTING_CONNECTION:
             break;
         case CONNECTED:
             break;
@@ -247,20 +265,20 @@ void ServerLobbyRoomProtocol::update()
     switch (m_state)
     {
         case NONE:
-            m_current_protocol_id = ProtocolManager::getInstance()->requestStart(new GetPublicAddress(&m_public_address));
+            m_current_protocol_id = m_listener->requestStart(new GetPublicAddress(&m_public_address));
             m_state = GETTING_PUBLIC_ADDRESS;
             break;
         case GETTING_PUBLIC_ADDRESS:
-            if (ProtocolManager::getInstance()->getProtocolState(m_current_protocol_id) == PROTOCOL_STATE_TERMINATED)
+            if (m_listener->getProtocolState(m_current_protocol_id) == PROTOCOL_STATE_TERMINATED)
             {
                 NetworkManager::getInstance()->setPublicAddress(m_public_address);
-                m_current_protocol_id = ProtocolManager::getInstance()->requestStart(new StartServer());
+                m_current_protocol_id = m_listener->requestStart(new StartServer());
                 m_state = LAUNCHING_SERVER;
                 Log::info("ServerLobbyRoomProtocol", "Public address known.");
             }
             break;
         case LAUNCHING_SERVER:
-            if (ProtocolManager::getInstance()->getProtocolState(m_current_protocol_id) == PROTOCOL_STATE_TERMINATED)
+            if (m_listener->getProtocolState(m_current_protocol_id) == PROTOCOL_STATE_TERMINATED)
             {
                 m_state = WORKING;
                 Log::info("ServerLobbyRoomProtocol", "Server setup");
@@ -299,7 +317,7 @@ void ServerLobbyRoomProtocol::update()
             // now
             for (int i = 0; i < m_incoming_peers_ids.size(); i++)
             {
-                ProtocolManager::getInstance()->requestStart(new ConnectToPeer(m_incoming_peers_ids[i]));
+                m_listener->requestStart(new ConnectToPeer(m_incoming_peers_ids[i]));
             }
             m_incoming_peers_ids.clear();
             

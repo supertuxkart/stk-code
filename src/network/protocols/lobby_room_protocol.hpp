@@ -47,7 +47,8 @@ class LobbyRoomProtocol : public Protocol
 class ClientLobbyRoomProtocol : public LobbyRoomProtocol
 {
     public:
-        ClientLobbyRoomProtocol() : LobbyRoomProtocol(NULL) {}
+        ClientLobbyRoomProtocol(const TransportAddress& server_address) : LobbyRoomProtocol(NULL) 
+            { m_server_address = server_address;}
         virtual ~ClientLobbyRoomProtocol() {}
     
         virtual void notifyEvent(Event* event);
@@ -62,6 +63,8 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
         enum STATE
         {
             NONE,
+            LINKED,
+            REQUESTING_CONNECTION,
             CONNECTED,
             DONE
         };
