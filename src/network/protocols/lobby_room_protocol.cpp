@@ -24,6 +24,7 @@
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/show_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
+#include "network/protocols/start_server.hpp"
 #include "online/current_online_user.hpp"
 #include "online/http_connector.hpp"
 #include "config/user_config.hpp"
@@ -253,16 +254,16 @@ void ServerLobbyRoomProtocol::update()
             if (ProtocolManager::getInstance()->getProtocolState(m_current_protocol_id) == PROTOCOL_STATE_TERMINATED)
             {
                 NetworkManager::getInstance()->setPublicAddress(m_public_address);
-                m_current_protocol_id = ProtocolManager::getInstance()->requestStart(new ShowPublicAddress());
-                m_state = SHOWING_PUBLIC_ADDRESS;
+                m_current_protocol_id = ProtocolManager::getInstance()->requestStart(new StartServer());
+                m_state = LAUNCHING_SERVER;
                 Log::info("ServerLobbyRoomProtocol", "Public address known.");
             }
             break;
-        case SHOWING_PUBLIC_ADDRESS:
+        case LAUNCHING_SERVER:
             if (ProtocolManager::getInstance()->getProtocolState(m_current_protocol_id) == PROTOCOL_STATE_TERMINATED)
             {
                 m_state = WORKING;
-                Log::info("ServerLobbyRoomProtocol", "Public address visible.");
+                Log::info("ServerLobbyRoomProtocol", "Server setup");
             }
             break;
         case WORKING:

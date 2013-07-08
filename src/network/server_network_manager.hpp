@@ -42,6 +42,8 @@ class ServerNetworkManager : public NetworkManager
     protected:
         ServerNetworkManager();
         virtual ~ServerNetworkManager();
+        
+        pthread_t* m_thread_keyboard;
     
 };
 

@@ -111,20 +111,29 @@ void NetworkManager::notifyEvent(Event* event)
             Log::info("NetworkManager", "Message, Sender : %u, message = \"%s\"", event->peer->getAddress(), event->data.c_str());
             break;
         case EVENT_TYPE_DISCONNECTED:
+        {
             Log::info("NetworkManager", "Somebody is now disconnected. There are now %lu peers.", m_peers.size());
             Log::info("NetworkManager", "Disconnected host: %i.%i.%i.%i:%i", event->peer->getAddress()>>24&0xff, event->peer->getAddress()>>16&0xff, event->peer->getAddress()>>8&0xff, event->peer->getAddress()&0xff,event->peer->getPort());
             // remove the peer:
+            bool removed = false; 
             for (unsigned int i = 0; i < m_peers.size(); i++)
             {
-                if (m_peers[i] == event->peer)
+                if (m_peers[i] == event->peer && !removed) // remove only one
                 {
                     delete m_peers[i];
                     m_peers.erase(m_peers.begin()+i, m_peers.begin()+i+1);
-                    break;
+                    Log::info("NetworkManager", "The peer has been removed from the Network Manager.");
+                    removed = true;
+                }
+                else if (m_peers[i] == event->peer)
+                {
+                    Log::fatal("NetworkManager", "Multiple peers match the disconnected one.");
                 }
             }
-            Log::fatal("NetworkManager", "The peer that has been disconnected was not registered by the Network Manager.");
+            if (!removed)
+                Log::fatal("NetworkManager", "The peer that has been disconnected was not registered by the Network Manager.");
             break;
+        }
         case EVENT_TYPE_CONNECTED:
             Log::info("NetworkManager", "A client has just connected. There are now %lu peers.", m_peers.size() + 1);
             // create the new peer:

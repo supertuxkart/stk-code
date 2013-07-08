@@ -84,8 +84,16 @@ void ConnectToPeer::update()
             if (m_listener->getProtocolState(m_current_protocol_id) 
             == PROTOCOL_STATE_TERMINATED) // we know the peer address
             {
-                m_state = CONNECTING;
-                m_current_protocol_id = m_listener->requestStart(new PingProtocol(m_peer_address, 2.0));
+                if (m_peer_address.ip != 0 && m_peer_address.port != 0)
+                { 
+                    m_state = CONNECTING;
+                    m_current_protocol_id = m_listener->requestStart(new PingProtocol(m_peer_address, 2.0));
+                }
+                else
+                {
+                    Log::error("ConnectToPeer", "The peer you want to connect to has hidden his address.");
+                    m_state = DONE;
+                }
             }
             break;
         case CONNECTING: // waiting the peer to connect

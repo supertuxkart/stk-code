@@ -89,7 +89,7 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
         {
             NONE,
             GETTING_PUBLIC_ADDRESS,
-            SHOWING_PUBLIC_ADDRESS,
+            LAUNCHING_SERVER,
             WORKING,
             DONE
         };

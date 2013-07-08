@@ -23,19 +23,51 @@
 #include "network/protocols/show_public_address.hpp"
 #include "network/protocols/get_peer_address.hpp"
 #include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/stop_server.hpp"
 
+#include "main_loop.hpp"
 #include "utils/log.hpp"
 
 #include <enet/enet.h>
 #include <pthread.h>
+#include <iostream>
+#include <string>
+#include <stdlib.h>
+
+void* waitInput(void* data)
+{
+    std::string str = "";
+    bool stop = false;
+    while(!stop)
+    {
+        getline(std::cin, str);
+        if (str == "quit")
+        {
+            stop = true;
+        }
+    }
+    
+    uint32_t id = ProtocolManager::getInstance()->requestStart(new StopServer());
+    while(ProtocolManager::getInstance()->getProtocolState(id) != PROTOCOL_STATE_TERMINATED)
+    {
+    }
+       
+    main_loop->abort();
+    exit(0);
+    
+    return NULL;
+}
 
 ServerNetworkManager::ServerNetworkManager()
 {
     m_localhost = NULL;
+    m_thread_keyboard = NULL;
 }
 
 ServerNetworkManager::~ServerNetworkManager()
 {
+    if (m_thread_keyboard)
+        pthread_cancel(*m_thread_keyboard);//, SIGKILL);
 }
 
 void ServerNetworkManager::run()
@@ -48,6 +80,10 @@ void ServerNetworkManager::run()
     m_localhost = new STKHost();
     m_localhost->setupServer(STKHost::HOST_ANY, 7321, 16, 2, 0, 0);
     m_localhost->startListening();
+    
+    // listen keyboard console input
+    m_thread_keyboard = (pthread_t*)(malloc(sizeof(pthread_t)));
+    pthread_create(m_thread_keyboard, NULL, waitInput, NULL);
     
     NetworkManager::run();
 }
