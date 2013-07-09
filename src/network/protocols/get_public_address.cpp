@@ -97,7 +97,7 @@ void GetPublicAddress::update()
         bytes[19] = (uint8_t)(m_stun_tansaction_id[2]);
         bytes[20] = '\0'; 
         
-        Log::info("GetPublicAddress", "Querrying STUN server 132.177.123.6");
+        Log::verbose("GetPublicAddress", "Querrying STUN server 132.177.123.6");
         unsigned int dst = (132<<24)+(177<<16)+(123<<8)+6;
         NetworkManager::getInstance()->setManualSocketsMode(true);
         NetworkManager::getInstance()->getHost()->sendRawPacket(bytes, 20, TransportAddress(dst, 3478));
@@ -131,7 +131,7 @@ void GetPublicAddress::update()
                 data[18] == (uint8_t)(m_stun_tansaction_id[2]>>8 )   &&
                 data[19] == (uint8_t)(m_stun_tansaction_id[2]    ))
             {
-                Log::info("GetPublicAddress", "The STUN server responded with a valid answer");
+                Log::verbose("GetPublicAddress", "The STUN server responded with a valid answer");
                 int message_size = data[2]*256+data[3];
                 
                 // parse the stun message now:
@@ -182,7 +182,7 @@ void GetPublicAddress::update()
                 // finished parsing, we know our public transport address
                 if (valid)
                 {
-                    Log::info("GetPublicAddress", "The public address has been found : %i.%i.%i.%i:%i", address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
+                    Log::debug("GetPublicAddress", "The public address has been found : %i.%i.%i.%i:%i", address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
                     m_state = ADDRESS_KNOWN;
                     NetworkManager::getInstance()->setManualSocketsMode(false); 
                     TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);

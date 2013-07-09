@@ -64,7 +64,7 @@ void GetPeerAddress::update()
                 TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
                 result->get("ip", &addr->ip);
                 result->get("port", &addr->port);
-                Log::info("GetPeerAddress", "Address gotten successfully.");
+                Log::debug("GetPeerAddress", "Address gotten successfully.");
             }
             else
             {

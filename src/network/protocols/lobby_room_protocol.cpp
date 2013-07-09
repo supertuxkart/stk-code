@@ -270,7 +270,7 @@ void ServerLobbyRoomProtocol::update()
                 NetworkManager::getInstance()->setPublicAddress(m_public_address);
                 m_current_protocol_id = m_listener->requestStart(new StartServer());
                 m_state = LAUNCHING_SERVER;
-                Log::info("ServerLobbyRoomProtocol", "Public address known.");
+                Log::debug("ServerLobbyRoomProtocol", "Public address known.");
             }
             break;
         case LAUNCHING_SERVER:
@@ -306,7 +306,7 @@ void ServerLobbyRoomProtocol::update()
                         for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
                         {
                             users_xml->getNode(i)->get("id", &id);
-                            Log::info("ServerLobbyRoomProtocol", "User with id %d wants to connect.", id);
+                            Log::debug("ServerLobbyRoomProtocol", "User with id %d wants to connect.", id);
                             m_incoming_peers_ids.push_back(id);
                         }
                     }

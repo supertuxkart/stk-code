@@ -60,7 +60,7 @@ void ShowPublicAddress::update()
         {
             if(rec_success == "yes")
             {
-                Log::info("ShowPublicAddress", "Address shown successfully.");
+                Log::debug("ShowPublicAddress", "Address shown successfully.");
             }
             else
             {

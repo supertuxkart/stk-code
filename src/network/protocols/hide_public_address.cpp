@@ -56,7 +56,7 @@ void HidePublicAddress::update()
         {
             if(rec_success == "yes")
             {
-                Log::info("ShowPublicAddress", "Address hidden successfully.");
+                Log::debug("ShowPublicAddress", "Address hidden successfully.");
             }
             else
             {

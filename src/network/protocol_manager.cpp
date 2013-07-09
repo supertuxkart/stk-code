@@ -232,11 +232,13 @@ void ProtocolManager::protocolTerminated(ProtocolInfo protocol)
 void ProtocolManager::update()
 {
     // before updating, notice protocols that they have received information
-    pthread_mutex_lock(&m_events_mutex); // secure threads
     int size = m_events_to_process.size();
     for (int i = 0; i < size; i++)
     {
+        pthread_mutex_lock(&m_events_mutex); // secure threads
         Event* event = m_events_to_process.back();
+        m_events_to_process.pop_back();
+        pthread_mutex_unlock(&m_events_mutex); // release the mutex
         
         PROTOCOL_TYPE searchedProtocol = PROTOCOL_NONE;
         if (event->type == EVENT_TYPE_MESSAGE)
@@ -255,9 +257,7 @@ void ProtocolManager::update()
                 m_protocols[i].protocol->notifyEvent(event);
         }
         delete event;
-        m_events_to_process.pop_back();
     }
-    pthread_mutex_unlock(&m_events_mutex); // release the mutex
     
     // now update all protocols
     pthread_mutex_lock(&m_protocols_mutex);

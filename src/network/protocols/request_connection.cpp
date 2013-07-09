@@ -41,7 +41,7 @@ void RequestConnection::update()
             {
                 if (rec_success == "yes")
                 {
-                    Log::info("RequestConnection", "Connection Request made successfully.");
+                    Log::debug("RequestConnection", "Connection Request made successfully.");
                 }
                 else
                 {

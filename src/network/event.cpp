@@ -58,7 +58,7 @@ Event::Event(ENetEvent* event)
     peer = NULL;
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        if (*peers[i] == event->peer)
+        if (peers[i]->m_peer == event->peer)
         {
             peer = peers[i];
             return;
@@ -69,6 +69,7 @@ Event::Event(ENetEvent* event)
         STKPeer* new_peer = new STKPeer();
         new_peer->m_peer = event->peer;
         peer = new_peer;
+        Log::verbose("Event", "Creating a new peer, address are STKPeer:%ld, Peer:%ld", (long int)(new_peer), (long int)(event->peer));
     }
 }
     

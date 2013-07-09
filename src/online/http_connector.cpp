@@ -82,7 +82,7 @@ std::string HTTPConnector::getPage()
     if(res != CURLE_OK)
         Log::error("online/http_functions", "curl_easy_perform() failed: \"%s\"", curl_easy_strerror(res));
     else
-        Log::info("online/http_functions", "Received : \"%s\"", readBuffer.c_str());
+        Log::verbose("online/http_functions", "Received : \"%s\"", readBuffer.c_str());
     m_parameters.clear();
     return readBuffer;
 }

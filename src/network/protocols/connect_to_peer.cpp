@@ -50,8 +50,7 @@ void ConnectToPeer::notifyEvent(Event* event)
 {
     if (event->type == EVENT_TYPE_CONNECTED)
     {
-        Log::info("ConnectToPeer", "The Connect To Server protocol has\
-                received an event notifying that he's connected to the peer.");
+        Log::debug("ConnectToPeer", "Received event notifying peer connection.");
         m_state = CONNECTED; // we received a message, we are connected
     }
 }
@@ -97,15 +96,6 @@ void ConnectToPeer::update()
             }
             break;
         case CONNECTING: // waiting the peer to connect
-            {
-                static double timer = 0;
-                if (Time::getRealTime() > timer+5.0) // every 5 seconds
-                {
-                    timer = Time::getRealTime();
-                    NetworkManager::getInstance()->connect(m_peer_address);
-                }
-                break;
-            }
         case CONNECTED:
         {
             m_listener->requestTerminate( m_listener->getProtocol(m_current_protocol_id)); // kill the ping protocol because we're connected
