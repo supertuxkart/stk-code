@@ -20,8 +20,10 @@
 #define HEADER_CURRENT_ONLINE_USER_HPP
 
 #include "online/online_user.hpp"
-#include <string>
+
 #include <irrString.h>
+
+#include <string>
 
 
 // ============================================================================

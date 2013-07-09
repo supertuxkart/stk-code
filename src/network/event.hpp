@@ -21,8 +21,7 @@
 
 #include "network/stk_peer.hpp"
 #include "network/network_string.hpp"
-
-#include <stdint.h>
+#include "utils/types.hpp"
 
 /*!
  * \enum EVENT_TYPE

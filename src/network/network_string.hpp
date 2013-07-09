@@ -1,10 +1,11 @@
 #ifndef NETWORK_STRING_HPP
 #define NETWORK_STRING_HPP
 
+#include "utils/types.hpp"
+
 #include <string>
 #include <stdarg.h>
 #include <assert.h>
-#include <stdint.h>
 
 typedef unsigned char uchar;
 

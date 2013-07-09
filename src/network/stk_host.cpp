@@ -18,11 +18,17 @@
 
 #include "network/stk_host.hpp"
 
+#include "graphics/irr_driver.hpp"    // get access to irrlicht sleep function
 #include "network/network_manager.hpp"
 #include "utils/log.hpp"
 
 #include <string.h>
-#include <arpa/inet.h>
+#ifdef WIN32
+#  include "Ws2tcpip.h"
+#  define   inet_ntop  InetNtop
+#else
+#  include <arpa/inet.h>
+#endif
 #include <pthread.h>
 #include <signal.h>
 
@@ -133,7 +139,7 @@ void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
     to.sin_port = htons(dst.port);
     to.sin_addr.s_addr = htonl(dst.ip);
     
-    sendto(m_host->socket, data, length, 0,(sockaddr*)&to, to_len);
+    sendto(m_host->socket, (char*)data, length, 0,(sockaddr*)&to, to_len);
     printf("Raw packet sent to %u:%u\n", dst.ip, dst.port);
 }
 
@@ -145,14 +151,14 @@ uint8_t* STKHost::receiveRawPacket()
     buffer = (uint8_t*)(malloc(sizeof(uint8_t)*2048));
     memset(buffer, 0, 2048);
     
-    int len = recv(m_host->socket,buffer,2048, 0);
+    int len = recv(m_host->socket,(char*)buffer,2048, 0);
     int i = 0;
     // wait to receive the message because enet sockets are non-blocking
     while(len < 0) 
     {
         i++;
-        len = recv(m_host->socket,buffer,2048, 0);
-        usleep(1000);
+        len = recv(m_host->socket,(char*)buffer,2048, 0);
+        irr_driver->getDevice()->sleep(1);
     }
     return buffer;
 }
@@ -169,7 +175,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender)
     struct sockaddr addr;
     
     from_len = sizeof(addr);
-    int len = recvfrom(m_host->socket, buffer, 2048, 0, &addr, &from_len);
+    int len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
     
     int i = 0;
      // wait to receive the message because enet sockets are non-blocking
@@ -180,8 +186,8 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender)
             && (uint8_t)(addr.sa_data[5]) != (sender.ip&0xff)))
     {
         i++;
-        len = recvfrom(m_host->socket, buffer, 2048, 0, &addr, &from_len);
-        usleep(1000); // wait 1 millisecond between two checks
+        len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
+        irr_driver->getDevice()->sleep(1); // wait 1 millisecond between two checks
     }
     if (addr.sa_family == AF_INET)
     {

@@ -22,8 +22,9 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
+#include "utils/types.hpp"
+
 #include <string>
-#include <stdint.h>
 
 /*! \class CallbackObject
  *  \brief Class that must be inherited to pass objects to protocols.

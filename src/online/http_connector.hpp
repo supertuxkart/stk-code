@@ -19,11 +19,15 @@
 #ifndef HTTP_CONNECTOR_HPP
 #define HTTP_CONNECTOR_HPP
 
-#include <string>
 #include "io/xml_node.hpp"
-#include <curl/curl.h>
-#include <irrString.h>
 #include "utils/string_utils.hpp"
+
+#include <irrString.h>
+#ifdef WIN32
+#  include <WinSock2.h>
+#endif
+#include <curl/curl.h>
+#include <string>
 
 /**
   * \brief Class to connect with a server over HTTP

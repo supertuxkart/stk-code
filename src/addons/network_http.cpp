@@ -43,14 +43,6 @@
 #include "utils/time.hpp"
 #include "utils/translation.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-// Use Sleep, which takes time in msecs. It must be defined after the
-// includes, since otherwise irrlicht's sleep function is changed.
-#  define sleep(s) Sleep(1000*(s))
-#else
-#  include <unistd.h>
-#endif
-
 // ----------------------------------------------------------------------------
 /** Create a thread that handles all network functions independent of the
  *  main program. NetworkHttp supports only a single thread (i.e. it's not

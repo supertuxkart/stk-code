@@ -19,12 +19,13 @@
 
 #include "online/current_online_user.hpp"
 
+#include "config/user_config.hpp"
+#include "online/http_connector.hpp"
+#include "utils/translation.hpp"
+
+#include <assert.h>
 #include <sstream>
 #include <stdlib.h>
-#include <assert.h>
-#include "online/http_connector.hpp"
-#include "config/user_config.hpp"
-#include "utils/translation.hpp"
 
 static CurrentOnlineUser* user_singleton = NULL;
 

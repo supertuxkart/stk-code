@@ -26,9 +26,9 @@
 #include "network/singleton.hpp"
 #include "network/event.hpp"
 #include "network/network_string.hpp"
+#include "utils/types.hpp"
 
 #include <vector>
-#include <stdint.h>
 
 class Protocol;
 

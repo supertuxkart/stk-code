@@ -27,6 +27,8 @@
 
 #include <enet/enet.h>
 
+#include <pthread.h>
+
 /*! \class STKHost
  *  \brief Represents the local host.
  *  This host is either a server host or a client host. A client host is in 

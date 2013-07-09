@@ -115,13 +115,15 @@ void ConnectToServer::update()
             }
             break;
         case CONNECTING: // waiting the server to answer our connection
-            static double timer = 0;
-            if (Time::getRealTime() > timer+5.0) // every 5 seconds
             {
-                timer = Time::getRealTime();
-                NetworkManager::getInstance()->connect(m_server_address);
+                static double timer = 0;
+                if (Time::getRealTime() > timer+5.0) // every 5 seconds
+                {
+                    timer = Time::getRealTime();
+                    NetworkManager::getInstance()->connect(m_server_address);
+                }
+                break;
             }
-            break;
         case CONNECTED:
         {
             m_listener->requestTerminate( m_listener->getProtocol(m_current_protocol_id)); // kill the ping protocol because we're connected

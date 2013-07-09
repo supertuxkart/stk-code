@@ -23,7 +23,6 @@
 #include "network/types.hpp"
 #include "network/network_manager.hpp"
 
-#include <stdint.h>
 #include <pthread.h>
 #include <string>
 

@@ -32,7 +32,7 @@ int stunRand()
     static bool init = false;
     if (!init)
     {
-        srand(time(NULL));
+        srand((unsigned int)time(NULL));
         init = true;
     }
     return rand();
@@ -61,7 +61,7 @@ void GetPublicAddress::update()
     if (m_state == NOTHING_DONE)
     {
         // format :               00MMMMMCMMMCMMMM (cf rfc 5389)
-        uint16_t message_type = 0b0000000000000001; // binding request
+        uint16_t message_type = 0x0001; // binding request
         m_stun_tansaction_id[0] = stunRand();
         m_stun_tansaction_id[1] = stunRand();
         m_stun_tansaction_id[2] = stunRand();
@@ -110,12 +110,12 @@ void GetPublicAddress::update()
         assert(data);
         
         // check that the stun response is a response, contains the magic cookie and the transaction ID
-        if (    data[0] == 0b01 &&
-                data[1] == 0b01 &&
+        if (    data[0] == 0x01 &&
+                data[1] == 0x01 &&
                 data[4] ==  (uint8_t)(m_stun_magic_cookie>>24)        &&
                 data[5] ==  (uint8_t)(m_stun_magic_cookie>>16)        &&
                 data[6] ==  (uint8_t)(m_stun_magic_cookie>>8)         &&
-                data[7] ==  (uint8_t)(m_stun_magic_cookie))
+                data[7] ==  (uint8_t)(m_stun_magic_cookie)               )
         {
             if(
                 data[8] ==  (uint8_t)(m_stun_tansaction_id[0]>>24)   &&

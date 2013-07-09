@@ -21,8 +21,7 @@
 
 #include "network/protocol_manager.hpp"
 #include "network/types.hpp"
-
-#include <stdint.h>
+#include "utils/types.hpp"
 
 /** \enum PROTOCOL_TYPE
   * \brief The types that protocols can have. This is used to select which protocol receives which event.

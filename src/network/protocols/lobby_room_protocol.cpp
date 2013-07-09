@@ -102,7 +102,7 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
                 m_setup->addPlayer(profile);
             }
         } // new player connected
-        else if (message_type == 0b10000001) // connection accepted
+        else if (message_type == 0x81) // connection accepted
         {
             if (event->data.size() != 12 || event->data[0] != 1 || event->data[2] != 4 || event->data[7] != 4) // 12 bytes remains now
             {
@@ -124,7 +124,7 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
                 m_state = CONNECTED;
             }
         } // connection accepted
-        else if (message_type == 0b10000000) // connection refused
+        else if (message_type == 0x80) // connection refused
         {
             if (event->data.size() != 2 || event->data[0] != 1) // 2 bytes remains now
             {
@@ -203,13 +203,13 @@ void ServerLobbyRoomProtocol::notifyEvent(Event* event)
                                             ((token_generator.get(RAND_MAX)<<8)  & 0xff) +
                                             ((token_generator.get(RAND_MAX)      & 0xff)));
                 // connection success (129) -- size of token -- token
-                message_ack.ai8(0b10000001).ai8(1).ai8(m_next_id).ai8(4).ai32(token).ai8(4).ai32(player_id);
+                message_ack.ai8(0x81).ai8(1).ai8(m_next_id).ai8(4).ai32(token).ai8(4).ai32(player_id);
                 m_listener->sendMessage(this, event->peer, message_ack);
             } // accept player
             else  // refuse the connection with code 0 (too much players)
             {
                 NetworkString message;
-                message.ai8(0b10000000);      // 128 means connection refused
+                message.ai8(0x80);            // 128 means connection refused
                 message.ai8(1);               // 1 bytes for the error code
                 message.ai8(0);               // 0 = too much players
                 // send only to the peer that made the request
@@ -285,6 +285,7 @@ void ServerLobbyRoomProtocol::update()
             }
             break;
         case WORKING:
+            {
             // first poll every 5 seconds
             static double last_poll_time = 0;
             if (Time::getRealTime() > last_poll_time+10.0)
@@ -315,13 +316,14 @@ void ServerLobbyRoomProtocol::update()
             }
             
             // now
-            for (int i = 0; i < m_incoming_peers_ids.size(); i++)
+            for (unsigned int i = 0; i < m_incoming_peers_ids.size(); i++)
             {
                 m_listener->requestStart(new ConnectToPeer(m_incoming_peers_ids[i]));
             }
             m_incoming_peers_ids.clear();
             
             break;
+            }
         case DONE:
             m_listener->requestTerminate(this);
             break;
