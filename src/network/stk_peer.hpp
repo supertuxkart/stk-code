@@ -33,7 +33,8 @@ class STKPeer
         virtual void sendPacket(const NetworkString& data);
         
         static bool connectToHost(STKHost* localhost, TransportAddress host, uint32_t channel_count, uint32_t data);
-        
+        void disconnect();
+
         bool isConnected() const;
         void setClientServerToken(const uint32_t& token) { m_client_server_token = token; m_token_set = true; }
         void unsetClientServerToken() { m_token_set = false; }

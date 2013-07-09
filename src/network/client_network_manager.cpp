@@ -43,6 +43,10 @@ void* waitInput(void* data)
         {
             stop = true;
         }
+        else if (str == "disconnect")
+        {
+            NetworkManager::getInstance()->getPeers()[0]->disconnect();
+        }
         else if (str == "connect")
         {
             ProtocolManager::getInstance()->requestStart(new ConnectToServer());

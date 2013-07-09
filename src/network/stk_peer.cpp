@@ -56,6 +56,11 @@ bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host, uint32_t 
     return true;
 }
 
+void STKPeer::disconnect()
+{
+    enet_peer_disconnect(m_peer, 0);
+}
+
 void STKPeer::sendPacket(NetworkString const& data)
 {
     Log::info("STKPeer", "sending packet of size %d to %i.%i.%i.%i:%i", data.size(), (m_peer->address.host>>0)&0xff,(m_peer->address.host>>8)&0xff,(m_peer->address.host>>16)&0xff,(m_peer->address.host>>24)&0xff,m_peer->address.port);
