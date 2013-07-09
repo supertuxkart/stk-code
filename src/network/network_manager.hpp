@@ -77,8 +77,6 @@ class NetworkManager : public Singleton<NetworkManager>
         
         TransportAddress m_public_address;
         PlayerLogin m_player_login;
-        
-        pthread_t* m_protocol_manager_update_thread;
 };
 
 #endif // NETWORKMANAGER_HPP

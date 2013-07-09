@@ -24,6 +24,17 @@
 
 #include <assert.h>
 #include <cstdlib>
+#include <errno.h>
+
+void* protocolManagerUpdate(void* data)
+{
+    ProtocolManager* manager = static_cast<ProtocolManager*>(data);
+    while(!manager->exit())
+    {
+        manager->update();
+    }
+    return NULL;
+}
 
 ProtocolManager::ProtocolManager() 
 {
@@ -31,11 +42,18 @@ ProtocolManager::ProtocolManager()
     pthread_mutex_init(&m_protocols_mutex, NULL);
     pthread_mutex_init(&m_requests_mutex, NULL);
     pthread_mutex_init(&m_id_mutex, NULL);
+    pthread_mutex_init(&m_exit_mutex, NULL);
     m_next_protocol_id = 0;
+    
+    
+    pthread_mutex_lock(&m_exit_mutex); // will let the update function run
+    m_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
+    pthread_create(m_update_thread, NULL, protocolManagerUpdate, this);
 }
 
 ProtocolManager::~ProtocolManager()
 {
+    pthread_mutex_unlock(&m_exit_mutex); // will stop the update function
     pthread_mutex_lock(&m_events_mutex);
     pthread_mutex_lock(&m_protocols_mutex);
     pthread_mutex_lock(&m_requests_mutex);
@@ -56,6 +74,7 @@ ProtocolManager::~ProtocolManager()
     pthread_mutex_destroy(&m_protocols_mutex);
     pthread_mutex_destroy(&m_requests_mutex);
     pthread_mutex_destroy(&m_id_mutex);
+    pthread_mutex_destroy(&m_exit_mutex);
 }
 
 void ProtocolManager::notifyEvent(Event* event)
@@ -333,6 +352,18 @@ Protocol* ProtocolManager::getProtocol(uint32_t id)
 bool ProtocolManager::isServer()
 {
     return NetworkManager::getInstance()->isServer();
+}
+
+int ProtocolManager::exit()
+{
+  switch(pthread_mutex_trylock(&m_exit_mutex)) {
+    case 0: /* if we got the lock, unlock and return 1 (true) */
+      pthread_mutex_unlock(&m_exit_mutex);
+      return 1;
+    case EBUSY: /* return 0 (false) if the mutex was locked */
+      return 0;
+  }
+  return 1;
 }
 
 void ProtocolManager::assignProtocolId(ProtocolInfo* protocol_info)

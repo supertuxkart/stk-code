@@ -31,23 +31,12 @@
 #include <pthread.h>
 #include <signal.h>
 
-void* protocolManagerUpdate(void* data)
-{
-    ProtocolManager* manager = static_cast<ProtocolManager*>(data);
-    while(1)
-    {
-        manager->update();
-    }
-    return NULL;
-}
-
 //-----------------------------------------------------------------------------
 
 NetworkManager::NetworkManager()
 {
     m_public_address.ip = 0;
     m_public_address.port = 0;
-    m_protocol_manager_update_thread = NULL;
     m_localhost = NULL;
     m_game_setup = NULL;
 }
@@ -56,11 +45,8 @@ NetworkManager::NetworkManager()
 
 NetworkManager::~NetworkManager() 
 {
-    if (m_protocol_manager_update_thread)
-        pthread_cancel(*m_protocol_manager_update_thread);//, SIGKILL);
-        
     ProtocolManager::kill();
-    
+       
     if (m_localhost)
         delete m_localhost; 
     while(!m_peers.empty())
@@ -73,11 +59,9 @@ NetworkManager::~NetworkManager()
 //-----------------------------------------------------------------------------
 
 void NetworkManager::run()
-{
+{ 
+    // create the protocol manager
     ProtocolManager::getInstance<ProtocolManager>();
-    m_protocol_manager_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
-    pthread_create(m_protocol_manager_update_thread, NULL, protocolManagerUpdate, 
-                    ProtocolManager::getInstance());
 }
 
 //-----------------------------------------------------------------------------

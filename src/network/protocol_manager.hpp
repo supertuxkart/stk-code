@@ -198,7 +198,10 @@ class ProtocolManager : public Singleton<ProtocolManager>
         /*! \brief Know whether the app is a server.
          *  \return True if this application is in server mode, false elseway.
          */
-        bool     isServer();
+        bool                    isServer();
+        
+        /*! \brief Tells if we need to stop the update thread. */
+        int                     exit();
         
     protected:
         // protected functions
@@ -281,6 +284,11 @@ class ProtocolManager : public Singleton<ProtocolManager>
         pthread_mutex_t                 m_requests_mutex;
         /*! Used to ensure that the protocol id is used in a thread-safe way.*/
         pthread_mutex_t                 m_id_mutex;
+        /*! Used when need to quit.*/
+        pthread_mutex_t                 m_exit_mutex;
+        
+        /*! Update thread.*/
+        pthread_t* m_update_thread;
         
 };
 
