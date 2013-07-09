@@ -298,20 +298,27 @@ void ServerLobbyRoomProtocol::update()
 
                 const XMLNode * result = connector->getXMLFromPage();
                 std::string rec_success;
-
-                if(result->getName() == "users")
+                if(result->get("success", &rec_success))
                 {
-                    uint32_t id = 0;
-                    for (unsigned int i = 0; i < result->getNumNodes(); i++)
+                    if(rec_success == "yes")
                     {
-                        result->getNode(i)->get("id", &id);
-                        Log::info("ServerLobbyRoomProtocol", "User with id %d wants to connect.", id);
-                        m_incoming_peers_ids.push_back(id);
-                    }   
+                        const XMLNode * users_xml = result->getNode("users");
+                        uint32_t id = 0;
+                        for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
+                        {
+                            users_xml->getNode(i)->get("id", &id);
+                            Log::info("ServerLobbyRoomProtocol", "User with id %d wants to connect.", id);
+                            m_incoming_peers_ids.push_back(id);
+                        }
+                    }
+                    else
+                    {
+                        Log::error("ServerLobbyRoomProtocol", "INSERT SOME ERROR MESSAGE");
+                    }
                 }
                 else
                 {
-                    Log::error("ServerLobbyRoomProtocol", "Cannot retreive the list");
+                    Log::error("ServerLobbyRoomProtocol", "Cannot retrieve the list");
                 }
             }
             
