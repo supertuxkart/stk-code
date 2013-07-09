@@ -94,6 +94,12 @@ void ConnectToServer::update()
             if (m_listener->getProtocolState(m_current_protocol_id) 
             == PROTOCOL_STATE_TERMINATED) // now we have the server's address
             {
+                if (m_server_address.ip == 0 || m_server_address.port == 0)
+                {
+                    m_state = HIDING_ADDRESS;
+                    m_current_protocol_id = m_listener->requestStart(new HidePublicAddress());
+                    return;
+                }
                 m_state = PEER_ADDRESS_KNOWN;
                 m_current_protocol_id = m_listener->requestStart(new ShowPublicAddress());
             }

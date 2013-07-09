@@ -608,6 +608,9 @@ int handleCmdLine(int argc, char **argv)
 {
     int n;
     char s[1024];
+    
+    bool try_login = false;
+    irr::core::stringw login, password;
 
     for(int i=1; i<argc; i++)
     {
@@ -685,9 +688,8 @@ int handleCmdLine(int argc, char **argv)
         {
             AIBaseController::enableDebug();
         }
-        else if(sscanf(argv[i], "--server=%d",&n)==1)
+        else if(sscanf(argv[i], "--port=%d",&n))
         {
-            NetworkManager::getInstance<ServerNetworkManager>(); //create the server
             UserConfigParams::m_server_port = n;
         }
         else if( !strcmp(argv[i], "--server") )
@@ -695,9 +697,18 @@ int handleCmdLine(int argc, char **argv)
             NetworkManager::getInstance<ServerNetworkManager>();
             Log::info("main", "Creating a server network manager.");
         }
-        else if( sscanf(argv[i], "--port=%d", &n) )
+        else if( sscanf(argv[i], "--max-players=%d", &n) )
         {
-            UserConfigParams::m_server_port=n;
+            UserConfigParams::m_server_max_players=n;
+        }
+        else if( sscanf(argv[i], "--login=%1023s", s) )
+        {
+            login = s;
+            try_login = true;
+        }
+        else if( sscanf(argv[i], "--password=%1023s", s) )
+        {
+            password = s;
         }
         else if ( sscanf(argv[i], "--gfx=%d", &n) )
         {
@@ -1095,6 +1106,12 @@ int handleCmdLine(int argc, char **argv)
         UserConfigParams::m_sfx = false;  // Disable sound effects
         UserConfigParams::m_music = false;// and music when profiling
     }
+    
+    if (try_login)
+    {
+        irr::core::stringw s;
+        CurrentOnlineUser::get()->signIn(login, password, s);
+    }
 
     return 1;
 }   // handleCmdLine
@@ -1215,6 +1232,7 @@ void cleanSuperTuxKart()
 
     if(INetworkHttp::get())
         INetworkHttp::get()->stopNetworkThread();
+    //delete in reverse order of what they were created in.
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
     Referee::cleanup();
@@ -1373,8 +1391,6 @@ int main(int argc, char *argv[] )
         NetworkManager::getInstance()->run();
         if (NetworkManager::getInstance()->isServer())
         {
-            irr::core::stringw str;
-            CurrentOnlineUser::get()->signIn("server", "serverpass", str);
             ProtocolManager::getInstance()->requestStart(new ServerLobbyRoomProtocol());
         }
 

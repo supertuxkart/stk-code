@@ -71,7 +71,6 @@ void ServerLobbyRoomProtocol::setup()
 void ClientLobbyRoomProtocol::notifyEvent(Event* event)
 {
     assert(m_setup); // assert that the setup exists
-    Log::setLogLevel(1);
     if (event->type == EVENT_TYPE_MESSAGE)
     {
         assert(event->data.size()); // assert that data isn't empty
@@ -152,7 +151,6 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
     else if (event->type == EVENT_TYPE_DISCONNECTED)
     {
     } // if (event->type == EVENT_TYPE_DISCONNECTED)
-    Log::setLogLevel(3);
 }
 
 //-----------------------------------------------------------------------------
@@ -160,7 +158,6 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
 void ServerLobbyRoomProtocol::notifyEvent(Event* event)
 {
     assert(m_setup); // assert that the setup exists
-    Log::setLogLevel(1);
     if (event->type == EVENT_TYPE_MESSAGE)
     {
         assert(event->data.size()); // message not empty
@@ -224,7 +221,6 @@ void ServerLobbyRoomProtocol::notifyEvent(Event* event)
     {
 
     } // if (event->type == EVENT_TYPE_DISCONNECTED)
-    Log::setLogLevel(3);
 }
 
 //-----------------------------------------------------------------------------

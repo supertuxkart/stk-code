@@ -26,8 +26,37 @@
 
 #include "utils/log.hpp"
 
+#include <stdlib.h>
+#include <iostream>
+#include <string>
+
+void* waitInput(void* data)
+{
+    std::string str = "";
+    bool stop = false;
+    while(!stop)
+    {
+        getline(std::cin, str);
+        if (str == "connect=")
+        {
+            int id = 0;
+            std::cin >> id;
+            ProtocolManager::getInstance()->requestStart(new ConnectToServer(id));
+        }
+        if (str == "quit")
+        {
+            stop = true;
+        }
+    }
+
+    exit(0);
+    
+    return NULL;
+}
+
 ClientNetworkManager::ClientNetworkManager()
 {
+    m_thread_keyboard = NULL;
 }
 
 ClientNetworkManager::~ClientNetworkManager()
@@ -44,6 +73,10 @@ void ClientNetworkManager::run()
     m_localhost = new STKHost();
     m_localhost->setupClient(1, 2, 0, 0);
     m_localhost->startListening();
+    
+    // listen keyboard console input
+    m_thread_keyboard = (pthread_t*)(malloc(sizeof(pthread_t)));
+    pthread_create(m_thread_keyboard, NULL, waitInput, NULL);
     
     NetworkManager::run();
 }

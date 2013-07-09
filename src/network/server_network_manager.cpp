@@ -34,7 +34,7 @@
 #include <string>
 #include <stdlib.h>
 
-void* waitInput(void* data)
+void* waitInput2(void* data)
 {
     std::string str = "";
     bool stop = false;
@@ -83,7 +83,7 @@ void ServerNetworkManager::run()
     
     // listen keyboard console input
     m_thread_keyboard = (pthread_t*)(malloc(sizeof(pthread_t)));
-    pthread_create(m_thread_keyboard, NULL, waitInput, NULL);
+    pthread_create(m_thread_keyboard, NULL, waitInput2, NULL);
     
     NetworkManager::run();
 }

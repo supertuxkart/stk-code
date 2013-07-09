@@ -41,7 +41,7 @@ Event::Event(ENetEvent* event)
     }
     if (type == EVENT_TYPE_MESSAGE)
     {
-        data = std::string((char*)(event->packet->data), event->packet->dataLength-1);;
+        data = std::string((char*)(event->packet->data), event->packet->dataLength-1);
     }
     else if (event->data)
     {

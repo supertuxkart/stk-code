@@ -39,6 +39,8 @@ class ClientNetworkManager : public NetworkManager
     protected:
         ClientNetworkManager();
         virtual ~ClientNetworkManager();
+        
+        pthread_t* m_thread_keyboard;
 };
 
 #endif // CLIENT_NETWORK_MANAGER_HPP
