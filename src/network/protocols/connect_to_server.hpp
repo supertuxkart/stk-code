@@ -26,7 +26,8 @@
 class ConnectToServer : public Protocol, public CallbackObject
 {
     public:
-        ConnectToServer(uint32_t server_id);
+        ConnectToServer(); //!< Quick join
+        ConnectToServer(uint32_t server_id); //!< Specify server id
         virtual ~ConnectToServer();
         
         virtual void notifyEvent(Event* event);
@@ -38,14 +39,15 @@ class ConnectToServer : public Protocol, public CallbackObject
         TransportAddress m_public_address;
         uint32_t m_server_id;
         uint32_t m_current_protocol_id;
+        bool m_quick_join;
         
         enum STATE
         {
             NONE,
-            WAITING_SELF_ADDRESS,
-            SELF_ADDRESS_KNOWN,
-            PEER_ADDRESS_KNOWN,
-            SELF_ADDRESS_SHOWN,
+            GETTING_SELF_ADDRESS,
+            SHOWING_SELF_ADDRESS,
+            GETTING_SERVER_ADDRESS,
+            REQUESTING_CONNECTION,
             CONNECTING,
             CONNECTED,
             HIDING_ADDRESS,

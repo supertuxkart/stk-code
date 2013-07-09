@@ -25,6 +25,7 @@
 #include "network/protocols/hide_public_address.hpp"
 #include "network/protocols/request_connection.hpp"
 #include "network/protocols/ping_protocol.hpp"
+#include "network/protocols/quick_join_protocol.hpp"
 #include "network/protocols/lobby_room_protocol.hpp"
 #include "online/current_online_user.hpp"
 #include "utils/time.hpp"
@@ -32,10 +33,21 @@
 
 // ----------------------------------------------------------------------------
 
+ConnectToServer::ConnectToServer() : 
+    Protocol(NULL, PROTOCOL_CONNECTION)
+{
+    m_server_id = 0;
+    m_quick_join = true;
+    m_state = NONE;
+}
+
+// ----------------------------------------------------------------------------
+
 ConnectToServer::ConnectToServer(uint32_t server_id) : 
     Protocol(NULL, PROTOCOL_CONNECTION)
 {
     m_server_id = server_id;
+    m_quick_join = false;
     m_state = NONE;
 }
 
@@ -78,44 +90,57 @@ void ConnectToServer::update()
         case NONE:
         {
             m_current_protocol_id = m_listener->requestStart(new GetPublicAddress(&m_public_address));
-            m_state = WAITING_SELF_ADDRESS;
+            m_state = GETTING_SELF_ADDRESS;
             break;
         }
-        case WAITING_SELF_ADDRESS:
+        case GETTING_SELF_ADDRESS:
             if (m_listener->getProtocolState(m_current_protocol_id) 
             == PROTOCOL_STATE_TERMINATED) // now we know the public addr
             {
-                m_state = SELF_ADDRESS_KNOWN;
+                m_state = SHOWING_SELF_ADDRESS;
                 NetworkManager::getInstance()->setPublicAddress(m_public_address); // set our public address
-                m_current_protocol_id = m_listener->requestStart(new GetPeerAddress(m_server_id, &m_server_address));
+                m_current_protocol_id = m_listener->requestStart(new ShowPublicAddress());
+                /*
+                if (m_quick_join)
+                    m_current_protocol_id = m_listener->requestStart(new QuickJoinProtocol(&m_server_address, &m_server_id));
+                else
+                    m_current_protocol_id = m_listener->requestStart(new GetPeerAddress(m_server_id, &m_server_address));*/
             }
             break;
-        case SELF_ADDRESS_KNOWN:
+        case SHOWING_SELF_ADDRESS:
             if (m_listener->getProtocolState(m_current_protocol_id) 
-            == PROTOCOL_STATE_TERMINATED) // now we have the server's address
+            == PROTOCOL_STATE_TERMINATED) // now our public address is in the database
             {
-                if (m_server_address.ip == 0 || m_server_address.port == 0)
+                if (m_quick_join)
                 {
+                    m_current_protocol_id = m_listener->requestStart(new QuickJoinProtocol(&m_server_address, &m_server_id));
+                    m_state = REQUESTING_CONNECTION;
+                }
+                else
+                {
+                    m_current_protocol_id = m_listener->requestStart(new GetPeerAddress(m_server_id, &m_server_address));
+                    m_state = GETTING_SERVER_ADDRESS;
+                }
+            }
+            break;
+        case GETTING_SERVER_ADDRESS:
+            if (m_listener->getProtocolState(m_current_protocol_id) 
+            == PROTOCOL_STATE_TERMINATED) // we know the server address
+            {
+                m_state = REQUESTING_CONNECTION;
+                m_current_protocol_id = m_listener->requestStart(new RequestConnection(m_server_id));
+            }
+            break;
+        case REQUESTING_CONNECTION:
+            if (m_listener->getProtocolState(m_current_protocol_id) 
+            == PROTOCOL_STATE_TERMINATED) // server knows we wanna connect
+            {
+                if (m_server_address.ip == 0 || m_server_address.port == 0) 
+                { // server data not correct, hide address and stop
                     m_state = HIDING_ADDRESS;
                     m_current_protocol_id = m_listener->requestStart(new HidePublicAddress());
                     return;
                 }
-                m_state = PEER_ADDRESS_KNOWN;
-                m_current_protocol_id = m_listener->requestStart(new ShowPublicAddress());
-            }
-            break;
-        case PEER_ADDRESS_KNOWN:
-            if (m_listener->getProtocolState(m_current_protocol_id) 
-            == PROTOCOL_STATE_TERMINATED) // now our public address is public
-            {
-                m_state = SELF_ADDRESS_SHOWN;
-                m_current_protocol_id = m_listener->requestStart(new RequestConnection(m_server_id));
-            }
-            break;
-        case SELF_ADDRESS_SHOWN:
-            if (m_listener->getProtocolState(m_current_protocol_id) 
-            == PROTOCOL_STATE_TERMINATED) // we have put a request to access the server
-            {
                 m_state = CONNECTING;
                 m_current_protocol_id = m_listener->requestStart(new PingProtocol(m_server_address, 2.0));
             }
