@@ -92,7 +92,7 @@ void NetworkManager::notifyEvent(Event* event)
     switch (event->type) 
     {
         case EVENT_TYPE_MESSAGE:
-            Log::info("NetworkManager", "Message, Sender : %u, message = \"%s\"", event->peer->getAddress(), event->data.c_str());
+            Log::info("NetworkManager", "Message, Sender : %i.%i.%i.%i, message = \"%s\"", event->peer->getAddress()>>24&0xff, event->peer->getAddress()>>16&0xff, event->peer->getAddress()>>8&0xff, event->peer->getAddress()&0xff, event->data.c_str());
             break;
         case EVENT_TYPE_DISCONNECTED:
         {

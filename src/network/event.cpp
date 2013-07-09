@@ -47,8 +47,12 @@ Event::Event(ENetEvent* event)
     {
     }
     
+    m_packet = NULL;
     if (event->packet)
         m_packet = event->packet;
+        
+    if (m_packet)
+        enet_packet_destroy(m_packet); // we got all we need, just remove the data.
 
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
     peer = NULL;
@@ -70,8 +74,6 @@ Event::Event(ENetEvent* event)
     
 Event::~Event()
 {
-    if (m_packet)
-        enet_packet_destroy(m_packet);
 }
 
 void Event::removeFront(int size)

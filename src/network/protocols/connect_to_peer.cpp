@@ -50,7 +50,7 @@ void ConnectToPeer::notifyEvent(Event* event)
 {
     if (event->type == EVENT_TYPE_CONNECTED)
     {
-        Log::info("ConnectToPeer", "The Connect To Server protocol has \
+        Log::info("ConnectToPeer", "The Connect To Server protocol has\
                 received an event notifying that he's connected to the peer.");
         m_state = CONNECTED; // we received a message, we are connected
     }

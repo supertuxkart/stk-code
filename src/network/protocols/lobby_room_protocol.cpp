@@ -312,12 +312,12 @@ void ServerLobbyRoomProtocol::update()
                     }
                     else
                     {
-                        Log::error("ServerLobbyRoomProtocol", "INSERT SOME ERROR MESSAGE");
+                        Log::error("ServerLobbyRoomProtocol", "Error while reading the list.");
                     }
                 }
                 else
                 {
-                    Log::error("ServerLobbyRoomProtocol", "Cannot retrieve the list");
+                    Log::error("ServerLobbyRoomProtocol", "Cannot retrieve the list.");
                 }
             }
             

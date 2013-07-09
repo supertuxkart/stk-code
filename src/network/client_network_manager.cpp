@@ -34,18 +34,22 @@ void* waitInput(void* data)
 {
     std::string str = "";
     bool stop = false;
+    int n = 0;
+    
     while(!stop)
     {
         getline(std::cin, str);
-        if (str == "connect=")
-        {
-            int id = 0;
-            std::cin >> id;
-            ProtocolManager::getInstance()->requestStart(new ConnectToServer(id));
-        }
         if (str == "quit")
         {
             stop = true;
+        }
+        else if (str == "connect")
+        {
+            ProtocolManager::getInstance()->requestStart(new ConnectToServer());
+        }
+        else if (sscanf(str.c_str(), "connect=%d", &n))
+        {
+            ProtocolManager::getInstance()->requestStart(new ConnectToServer(n));
         }
     }
 

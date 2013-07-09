@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <cstdlib>
 #include <errno.h>
+#include <typeinfo>
 
 void* protocolManagerUpdate(void* data)
 {
@@ -175,7 +176,7 @@ void ProtocolManager::requestTerminate(Protocol* protocol)
 
 void ProtocolManager::startProtocol(ProtocolInfo protocol)
 {
-    Log::info("ProtocolManager", "A new protocol with id=%u has been started. There are %ld protocols running.", protocol.id, m_protocols.size()+1);
+    Log::info("ProtocolManager", "A %s protocol with id=%u has been started. There are %ld protocols running.", typeid(*protocol.protocol).name(), protocol.id, m_protocols.size()+1);
     // add the protocol to the protocol vector so that it's updated
     pthread_mutex_lock(&m_protocols_mutex);
     m_protocols.push_back(protocol);
@@ -214,6 +215,7 @@ void ProtocolManager::protocolTerminated(ProtocolInfo protocol)
 {
     pthread_mutex_lock(&m_protocols_mutex); // be sure that noone accesses the protocols vector while we erase a protocol
     int offset = 0;
+    std::string protocol_type = typeid(*protocol.protocol).name();
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
         if (m_protocols[i-offset].protocol == protocol.protocol)
@@ -223,7 +225,7 @@ void ProtocolManager::protocolTerminated(ProtocolInfo protocol)
             offset++;
         }
     }
-    Log::info("ProtocolManager", "A protocol has been terminated. There are %ld protocols running.", m_protocols.size());
+    Log::info("ProtocolManager", "A %s protocol has been terminated. There are %ld protocols running.", protocol_type.c_str(), m_protocols.size());
     pthread_mutex_unlock(&m_protocols_mutex);
 }
 
