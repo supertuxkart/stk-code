@@ -153,9 +153,12 @@ src/network/protocols/lobby_room_protocol.cpp
 src/network/protocols/ping_protocol.cpp
 src/network/protocols/request_connection.cpp
 src/network/protocols/show_public_address.cpp
+src/network/protocols/start_server.cpp
+src/network/protocols/stop_server.cpp
 src/network/server_network_manager.cpp
 src/network/stk_host.cpp
 src/network/stk_peer.cpp
+src/network/types.cpp
 src/online/current_online_user.cpp
 src/online/http_connector.cpp
 src/online/online_user.cpp
@@ -420,6 +423,8 @@ src/network/protocols/lobby_room_protocol.hpp
 src/network/protocols/ping_protocol.hpp
 src/network/protocols/request_connection.hpp
 src/network/protocols/show_public_address.hpp
+src/network/protocols/start_server.hpp
+src/network/protocols/stop_server.hpp
 src/network/remote_kart_info.hpp
 src/network/server_network_manager.hpp
 src/network/singleton.hpp
