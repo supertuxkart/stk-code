@@ -93,9 +93,12 @@ void SoccerWorld::update(float dt)
 
 void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 {
-    // TODO
-    if(m_can_score_points)
+	// TODO
+    if(m_can_score_points){
         printf("*** GOOOOOOOOOAAAAAAALLLLLL!!!! (team: %d) ***\n", first_goal ? 0 : 1);
+		m_team_goals[first_goal]++;
+		printf("Score:\nTeam One %d : %d Team Two\n", m_team_goals[0], m_team_goals[1]);
+	}
 
     //m_check_goals_enabled = false;    // TODO: remove?
 
@@ -110,8 +113,13 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         if(!obj->isSoccerBall())
             continue;
 
-        obj->reset();
+		obj->reset();
+		obj->getPhysics()->reset();
     }
+
+	//Resetting the ball triggers the goal check line one more time.
+	//This ensures that only one goal is counted, and the second is ignored.
+	m_can_score_points = !m_can_score_points;
 
     //for(int i=0 ; i < getNumKarts() ; i++
 
@@ -284,8 +292,6 @@ void SoccerWorld::initKartList()
         m_karts[n]->setPosition(-1);
     }
     // TODO: remove
-/*
-    const unsigned int kart_amount = m_karts.size();
 
     int team_karts_amount[NB_SOCCER_TEAMS];
     memset(team_karts_amount, 0, sizeof(team_karts_amount));
@@ -296,10 +302,11 @@ void SoccerWorld::initKartList()
         SoccerTeam    round_robin_team = SOCCER_TEAM_RED;
         for(unsigned int n=0; n<kart_amount; n++)
         {
-            if(m_karts[n]->getSoccerTeam() == SOCCER_TEAM_NONE)
-                m_karts[n]->setSoccerTeam(round_robin_team);
+			if(race_manager->getLocalKartInfo(n).getSoccerTeam() == SOCCER_TEAM_NONE)
+				race_manager->setLocalKartSoccerTeam(
+				race_manager->getLocalKartInfo(n).getLocalPlayerId(),round_robin_team);
 
-            team_karts_amount[m_karts[n]->getSoccerTeam()]++;
+            team_karts_amount[race_manager->getLocalKartInfo(n).getSoccerTeam()]++;
 
             round_robin_team = (round_robin_team==SOCCER_TEAM_RED ?
                                 SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
@@ -315,9 +322,13 @@ void SoccerWorld::initKartList()
     // Set kart positions, ordering them by team
     for(unsigned int n=0; n<kart_amount; n++)
     {
-        SoccerTeam  team = m_karts[n]->getSoccerTeam();
+		
+		SoccerTeam  team = race_manager->getLocalKartInfo(n).getSoccerTeam();
         m_karts[n]->setPosition(team_cur_position[team]);
         team_cur_position[team]++;
     }// next kart
-*/
+}
+//-----------------------------------------------------------------------------
+int SoccerWorld::getScore(unsigned int i){
+	return m_team_goals[i];
 }

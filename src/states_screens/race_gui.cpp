@@ -44,6 +44,7 @@ using namespace irr;
 #include "modes/follow_the_leader.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
+#include "modes/soccer_world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -177,6 +178,8 @@ void RaceGUI::renderGlobal(float dt)
 
     drawGlobalMiniMap();
 
+	if(world->getTrack()->isSoccer())	drawScores();
+
     if (!m_is_tutorial) drawGlobalPlayerIcons(m_map_height);
 }   // renderGlobal
 
@@ -211,6 +214,37 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     RaceGUIBase::renderPlayerView(camera, dt);
 }   // renderPlayerView
 
+//-----------------------------------------------------------------------------
+void RaceGUI::drawScores()
+{
+	SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
+	int offsetY = 5;
+	int offsetX = 5;
+	gui::ScalableFont* font = GUIEngine::getFont();
+	static video::SColor color = video::SColor(255,255,255,255);
+
+	//Draw kart icons above score(denoting teams)
+	for(unsigned int i=0; i<soccerWorld->getNumKarts(); i++){
+		core::rect<s32> source(i*m_marker_rendered_size, 0,
+			(i+1)*m_marker_rendered_size,m_marker_rendered_size);
+		core::recti position(offsetX, offsetY,
+			offsetX + 2*m_marker_player_size, offsetY + 2*m_marker_player_size);
+		irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source,
+			NULL, NULL, true);
+		core::stringw score = StringUtils::toWString(soccerWorld->getScore(i));
+		int stringWidth =
+			GUIEngine::getFont()->getDimension(score.c_str()).Width;
+		int stringHeight =
+			GUIEngine::getFont()->getDimension(score.c_str()).Height;
+		core::recti pos(position.UpperLeftCorner.X + 5,
+						position.LowerRightCorner.Y + offsetY,
+						position.LowerRightCorner.X,
+						position.LowerRightCorner.Y + stringHeight);
+
+		font->draw(score.c_str(),pos,color);
+		offsetX += position.LowerRightCorner.X;
+	}
+}
 //-----------------------------------------------------------------------------
 /** Displays the racing time on the screen.s
  */

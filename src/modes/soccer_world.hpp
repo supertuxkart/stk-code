@@ -45,6 +45,9 @@ private:
     /** Whether or not goals can be scored (they are disabled when a point is scored
     and re-enabled when the next game can be played)*/
     bool m_can_score_points;
+	
+	/** Team karts */
+
 
 public:
 
@@ -63,6 +66,7 @@ public:
     virtual bool useFastMusicNearEnd() const { return false; }
     virtual void getKartsDisplayInfo(
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
+	int getScore(unsigned int i);
     virtual bool raceHasLaps(){ return false; }
     virtual void moveKartAfterRescue(AbstractKart* kart);
 
