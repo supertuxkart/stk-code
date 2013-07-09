@@ -187,7 +187,9 @@ void ModalDialog::dismiss()
 {
     if(modalWindow != NULL) delete modalWindow;
     modalWindow = NULL;
-    GUIEngine::getCurrentScreen()->onDialogClose();
+    GUIEngine::Screen* scr = GUIEngine::getCurrentScreen();
+    if (scr)
+        scr->onDialogClose();
 }
 
 // ----------------------------------------------------------------------------
