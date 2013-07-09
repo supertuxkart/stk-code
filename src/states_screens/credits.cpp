@@ -23,7 +23,6 @@
 using irr::core::stringw;
 using irr::core::stringc;
 
-#include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
@@ -246,7 +245,7 @@ void CreditsScreen::init()
     assert(w != NULL);
 
     reset();
-    setArea(w->m_x, w->m_y, w->m_w, w->m_h);
+    setArea(w->m_x + 15, w->m_y + 8, w->m_w - 30, w->m_h - 16);
 }   // init
 
 // ----------------------------------------------------------------------------

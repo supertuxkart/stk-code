@@ -19,12 +19,10 @@
 #include "physics/physics.hpp"
 
 #include "animations/three_d_animation.hpp"
-#include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
 #include "items/flyable.hpp"
-#include "items/item.hpp"
 #include "modes/world.hpp"
 #include "graphics/stars.hpp"
 #include "karts/explosion_animation.hpp"
@@ -160,8 +158,6 @@ void Physics::update(float dt)
         {
             AbstractKart *a=p->getUserPointer(0)->getPointerKart();
             AbstractKart *b=p->getUserPointer(1)->getPointerKart();
-//            race_state->addCollision(a->getWorldKartId(),
-//                                     b->getWorldKartId());
             KartKartCollision(p->getUserPointer(0)->getPointerKart(),
                               p->getContactPointCS(0),
                               p->getUserPointer(1)->getPointerKart(),
@@ -250,18 +246,6 @@ void Physics::update(float dt)
         removeKart(m_karts_to_delete[i]);
     m_karts_to_delete.clear();
 }   // update
-
-//-----------------------------------------------------------------------------
-/** Project all karts downwards onto the surface below.
- *  Used in setting the starting positions of all the karts.
- */
-
-bool Physics::projectKartDownwards(const AbstractKart *k)
-{
-    btVector3 hell(0, -10000, 0);
-    return k->getVehicle()->projectVehicleToSurface(hell,
-                                                    /*allow translation*/true);
-} //projectKartsDownwards
 
 //-----------------------------------------------------------------------------
 /** Handles the special case of two karts colliding with each other, which
@@ -430,7 +414,6 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
     // more than one object, and/or more than once with each object (if there
     // is more than one collision point). So keep a list of rockets that will
     // be exploded after the collisions
-    std::vector<Moveable*> rocketsToExplode;
     for(int i=0; i<currentNumManifolds; i++)
     {
         btPersistentManifold* contact_manifold =
@@ -460,7 +443,6 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             else if(upB->is(UserPointer::UP_KART))
             {
                 AbstractKart *kart=upB->getPointerKart();
-//                race_state->addCollision(kart->getWorldKartId());
                 int n = contact_manifold->getContactPoint(0).m_index0;
                 const Material *m
                     = n>=0 ? upA->getPointerTriangleMesh()->getMaterial(n)
@@ -480,7 +462,6 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             if(upB->is(UserPointer::UP_TRACK))
             {
                 AbstractKart *kart = upA->getPointerKart();
-//                race_state->addCollision(kart->getWorldKartId());
                 int n = contact_manifold->getContactPoint(0).m_index1;
                 const Material *m
                     = n>=0 ? upB->getPointerTriangleMesh()->getMaterial(n)

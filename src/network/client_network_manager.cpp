@@ -26,8 +26,37 @@
 
 #include "utils/log.hpp"
 
+#include <stdlib.h>
+#include <iostream>
+#include <string>
+
+void* waitInput(void* data)
+{
+    std::string str = "";
+    bool stop = false;
+    while(!stop)
+    {
+        getline(std::cin, str);
+        if (str == "connect=")
+        {
+            int id = 0;
+            std::cin >> id;
+            ProtocolManager::getInstance()->requestStart(new ConnectToServer(id));
+        }
+        if (str == "quit")
+        {
+            stop = true;
+        }
+    }
+
+    exit(0);
+    
+    return NULL;
+}
+
 ClientNetworkManager::ClientNetworkManager()
 {
+    m_thread_keyboard = NULL;
 }
 
 ClientNetworkManager::~ClientNetworkManager()
@@ -45,72 +74,14 @@ void ClientNetworkManager::run()
     m_localhost->setupClient(1, 2, 0, 0);
     m_localhost->startListening();
     
+    // listen keyboard console input
+    m_thread_keyboard = (pthread_t*)(malloc(sizeof(pthread_t)));
+    pthread_create(m_thread_keyboard, NULL, waitInput, NULL);
+    
     NetworkManager::run();
 }
 
-bool ClientNetworkManager::connectToHost(std::string serverNickname)
-{
-    Log::info("ClientNetworkManager", "Starting the connection to host protocol\n");
-    // step 1 : retreive public address
-    Protocol* protocol = new GetPublicAddress(&m_public_address);
-    ProtocolManager::getInstance()->requestStart(protocol);
-    while (ProtocolManager::getInstance()->getProtocolState(protocol) != PROTOCOL_STATE_TERMINATED )
-    {
-    }
-    Log::info("ClientNetworkManager", "The public address is known.\n"); 
-    
-    // step 2 : show the public address for others (here, the server)
-    ShowPublicAddress* spa = new ShowPublicAddress(NULL);
-    spa->setPassword(m_player_login.password);
-    spa->setUsername(m_player_login.username);
-    spa->setPublicAddress(m_public_address.ip, m_public_address.port);
-    ProtocolManager::getInstance()->requestStart(spa);
-    while (ProtocolManager::getInstance()->getProtocolState(spa) != PROTOCOL_STATE_TERMINATED )
-    {
-    }
-    Log::info("ClientNetworkManager", "The public address is being shown online.\n"); 
-    
-    // step 3 : get the server's addres.
-    TransportAddress addr;
-    GetPeerAddress* gpa = new GetPeerAddress(&addr);
-    gpa->setPeerName(serverNickname);
-    ProtocolManager::getInstance()->requestStart(gpa);
-    while (ProtocolManager::getInstance()->getProtocolState(gpa) != PROTOCOL_STATE_TERMINATED )
-    {
-    }
-    Log::info("ClientNetworkManager", "The public address of the server is known.\n"); 
-    
-    // step 4 : connect to the server
-    ConnectToServer* cts = new ConnectToServer(NULL);
-    cts->setServerAddress(addr.ip, addr.port);
-    ProtocolManager::getInstance()->requestStart(cts);
-    while (ProtocolManager::getInstance()->getProtocolState(cts) != PROTOCOL_STATE_TERMINATED )
-    {
-    } 
-    bool success = false;
-    if (m_localhost->isConnectedTo(TransportAddress(addr.ip, addr.port)))
-    {
-        success = true;
-        Log::info("ClientNetworkManager", "Connection success. You are now connected to a server.\n");
-    }
-    else 
-    {
-        Log::error("ClientNetworkManager", "We are NOT connected to the server.\n");
-    }
-    // step 5 : hide our public address
-    HidePublicAddress* hpa = new HidePublicAddress(NULL);
-    hpa->setPassword(m_player_login.password);
-    hpa->setUsername(m_player_login.username);
-    ProtocolManager::getInstance()->requestStart(hpa);
-    while (ProtocolManager::getInstance()->getProtocolState(hpa) != PROTOCOL_STATE_TERMINATED )
-    {
-    }
-    Log::info("ClientNetworkManager", "The public address is now hidden online.\n"); 
-    
-    return success;
-}
-
-void ClientNetworkManager::sendPacket(const char* data)
+void ClientNetworkManager::sendPacket(const NetworkString& data)
 {
     if (m_peers.size() > 1)
         Log::warn("ClientNetworkManager", "Ambiguous send of data.\n");

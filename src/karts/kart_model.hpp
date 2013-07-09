@@ -113,6 +113,9 @@ private:
 
     /** Radius of the graphical wheels.  */
     float         m_wheel_graphics_radius[4];
+    
+    /** The position of the nitro emitters */
+    Vec3          m_nitro_emitter_position[2];
 
     /** Minimum suspension length. If the displayed suspension is
      *  shorter than this, the wheel would look wrong. */
@@ -141,6 +144,9 @@ private:
 
     void  loadWheelInfo(const XMLNode &node,
                         const std::string &wheel_name, int index);
+    
+    void  loadNitroEmitterInfo(const XMLNode &node,
+                        const std::string &emitter_name, int index);
 
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
@@ -181,6 +187,11 @@ public:
     const Vec3& getWheelGraphicsPosition(int i) const
                 {assert(i>=0 && i<4); return m_wheel_graphics_position[i];}
     // ------------------------------------------------------------------------
+    /** Returns the position of wheels relative to the kart.
+     */
+    const Vec3* getWheelsGraphicsPosition() const
+                {return m_wheel_graphics_position;}
+    // ------------------------------------------------------------------------
     /** Returns the position of a wheel relative to the kart for the physics.
      *  The physics wheels can be attached at a different place to make the
      *  karts more stable.
@@ -194,6 +205,11 @@ public:
      *           right, 3 = rear left.  */
     float       getWheelGraphicsRadius(int i) const
                 {assert(i>=0 && i<4); return m_wheel_graphics_radius[i]; }
+    // ------------------------------------------------------------------------
+    /** Returns the position of nitro emitter relative to the kart.
+     */
+    const Vec3* getNitroEmittersPositon() const
+                {return m_nitro_emitter_position;}
     // ------------------------------------------------------------------------
     /** Returns the length of the kart model. */
     float getLength                 () const {return m_kart_length;      }

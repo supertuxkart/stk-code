@@ -17,7 +17,6 @@
 
 #include "states_screens/options_screen_input2.hpp"
 
-#include "graphics/irr_driver.hpp"
 #include "guiengine/CGUISpriteBank.h"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
@@ -351,6 +350,7 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
         KeyboardConfig* keyboard = (KeyboardConfig*)m_config;
         keyboard->setBinding(binding_to_set, Input::IT_KEYBOARD,
                              sensed_input.m_button_id, Input::AD_NEUTRAL,
+                             Input::AR_HALF,
                              sensed_input.m_character);
 
         // refresh display
@@ -388,7 +388,8 @@ void OptionsScreenInput2::gotSensedInput(const Input& sensed_input)
             GamepadConfig* config =  (GamepadConfig*)m_config;
             config->setBinding(binding_to_set, sensed_input.m_type,
                                sensed_input.m_button_id,
-                              (Input::AxisDirection)sensed_input.m_axis_direction);
+                              (Input::AxisDirection)sensed_input.m_axis_direction,
+                              (Input::AxisRange)sensed_input.m_axis_range);
 
             // refresh display
             updateInputButtons();

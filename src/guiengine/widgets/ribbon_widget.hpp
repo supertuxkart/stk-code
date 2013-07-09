@@ -87,7 +87,7 @@ namespace GUIEngine
         PtrVector<irr::gui::IGUIStaticText, REF> m_labels;
         
         IRibbonListener* m_listener;
-        
+        PtrVector<Widget> m_active_children;
         
     public:
         
@@ -106,7 +106,7 @@ namespace GUIEngine
         Widget* m_mouse_focus;
         
         RibbonWidget(const RibbonType type=RIBBON_COMBO);
-        virtual ~RibbonWidget() {}
+        virtual ~RibbonWidget();
         
         void add();
 
@@ -155,6 +155,9 @@ namespace GUIEngine
         /** Returns the ID of the item, or -1 if not found */
         int findItemNamed(const char* internalName);
         
+        /** Returns the the widget, or NULL if not found */
+        GUIEngine::Widget * findWidgetNamed(const char* interalName);
+
         /** \brief Dynamically (at runtime) add a text item to this ribbon
           * \pre This must be called before RibbonWidget::add, while the 
           *      widget is not yet displayed

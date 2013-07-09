@@ -18,11 +18,17 @@
 
 #include "network/stk_host.hpp"
 
+#include "graphics/irr_driver.hpp"    // get access to irrlicht sleep function
 #include "network/network_manager.hpp"
 #include "utils/log.hpp"
 
 #include <string.h>
-#include <arpa/inet.h>
+#ifdef WIN32
+#  include "Ws2tcpip.h"
+#  define   inet_ntop  InetNtop
+#else
+#  include <arpa/inet.h>
+#endif
 #include <pthread.h>
 #include <signal.h>
 
@@ -80,8 +86,8 @@ void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count,
                             max_incoming_bandwidth, max_outgoing_bandwidth);
     if (m_host == NULL)
     {
-        Log::info("STKHost", "An error occurred while trying to create an ENet \
-                          server host.\n");
+        Log::error("STKHost", "An error occurred while trying to create an ENet \
+                          server host.");
         exit (EXIT_FAILURE);
     }
 }
@@ -96,8 +102,8 @@ void STKHost::setupClient(int peer_count, int channel_limit,
                             max_incoming_bandwidth, max_outgoing_bandwidth);
     if (m_host == NULL)
     {
-        Log::info("STKHost", "An error occurred while trying to create an ENet \
-                          client host.\n");
+        Log::error("STKHost", "An error occurred while trying to create an ENet \
+                          client host.");
         exit (EXIT_FAILURE);
     }
 }
@@ -133,7 +139,8 @@ void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
     to.sin_port = htons(dst.port);
     to.sin_addr.s_addr = htonl(dst.ip);
     
-    sendto(m_host->socket, data, length, 0,(sockaddr*)&to, to_len);
+    sendto(m_host->socket, (char*)data, length, 0,(sockaddr*)&to, to_len);
+    printf("Raw packet sent to %u:%u\n", dst.ip, dst.port);
 }
 
 // ----------------------------------------------------------------------------
@@ -144,14 +151,14 @@ uint8_t* STKHost::receiveRawPacket()
     buffer = (uint8_t*)(malloc(sizeof(uint8_t)*2048));
     memset(buffer, 0, 2048);
     
-    int len = recv(m_host->socket,buffer,2048, 0);
+    int len = recv(m_host->socket,(char*)buffer,2048, 0);
     int i = 0;
     // wait to receive the message because enet sockets are non-blocking
     while(len < 0) 
     {
         i++;
-        len = recv(m_host->socket,buffer,2048, 0);
-        usleep(1000);
+        len = recv(m_host->socket,(char*)buffer,2048, 0);
+        irr_driver->getDevice()->sleep(1);
     }
     return buffer;
 }
@@ -168,7 +175,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender)
     struct sockaddr addr;
     
     from_len = sizeof(addr);
-    int len = recvfrom(m_host->socket, buffer, 2048, 0, &addr, &from_len);
+    int len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
     
     int i = 0;
      // wait to receive the message because enet sockets are non-blocking
@@ -179,23 +186,23 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender)
             && (uint8_t)(addr.sa_data[5]) != (sender.ip&0xff)))
     {
         i++;
-        len = recvfrom(m_host->socket, buffer, 2048, 0, &addr, &from_len);
-        usleep(1000); // wait 1 millisecond between two checks
+        len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
+        irr_driver->getDevice()->sleep(1); // wait 1 millisecond between two checks
     }
     if (addr.sa_family == AF_INET)
     {
         char s[20];
         inet_ntop(AF_INET, &(((struct sockaddr_in *)&addr)->sin_addr), s, 20);
-        Log::info("STKHost", "IPv4 Address of the sender was %s\n", s);
+        Log::info("STKHost", "IPv4 Address of the sender was %s", s);
     }
     return buffer;
 }
 
 // ----------------------------------------------------------------------------
 
-void STKHost::broadcastPacket(const char* data)
+void STKHost::broadcastPacket(const NetworkString& data)
 {
-    ENetPacket* packet = enet_packet_create(data, strlen(data)+1,
+    ENetPacket* packet = enet_packet_create(data.c_str(), data.size()+1,
                                             ENET_PACKET_FLAG_RELIABLE);
     enet_host_broadcast(m_host, 0, packet);
 }
@@ -206,7 +213,7 @@ bool STKHost::peerExists(TransportAddress peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == peer.ip && 
+        if (m_host->peers[i].address.host == turnEndianness(peer.ip) && 
             m_host->peers[i].address.port == peer.port)
         {
             return true;
@@ -221,7 +228,7 @@ bool STKHost::isConnectedTo(TransportAddress peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == peer.ip && 
+        if (m_host->peers[i].address.host == turnEndianness(peer.ip) && 
             m_host->peers[i].address.port == peer.port && 
             m_host->peers[i].state == ENET_PEER_STATE_CONNECTED)
         {

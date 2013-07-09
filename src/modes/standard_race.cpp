@@ -18,7 +18,6 @@
 #include "modes/standard_race.hpp"
 
 #include "challenges/unlock_manager.hpp"
-#include "config/user_config.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"

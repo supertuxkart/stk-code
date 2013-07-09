@@ -25,7 +25,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
-#include "network/network_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -319,13 +318,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     // Race finished
     if(kart_info.m_race_lap >= race_manager->getNumLaps() && raceHasLaps())
     {
-        // A client does not detect race finished by itself, it will
-        // receive a message from the server. So a client does not do
-        // anything here.
-        /*if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
-        {
-            kart->finishedRace(getTime());
-        }*/
+        kart->finishedRace(getTime());
     }
     float time_per_lap;
     if (kart_info.m_race_lap == 1) // just completed first lap
@@ -634,9 +627,9 @@ void LinearWorld::moveKartAfterRescue(AbstractKart* kart)
                     m_track->getAngle(sector)));
 
     kart->getBody()->setCenterOfMassTransform(pos);
-
+    kart->setXYZ(pos.getOrigin());
     //project kart to surface of track
-    bool kart_over_ground = m_physics->projectKartDownwards(kart);
+    bool kart_over_ground = m_track->findGround(kart);
 
     if (kart_over_ground)
     {
@@ -645,6 +638,9 @@ void LinearWorld::moveKartAfterRescue(AbstractKart* kart)
               kart->getKartProperties()->getVertRescueOffset()
             * kart->getKartHeight();
         kart->getBody()->translate(btVector3(0, vertical_offset, 0));
+        // Also correctly set the graphics, otherwise the kart will
+        // be displayed for one frame at the incorrect position.
+        kart->updateGraphics(0, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
     }
     else
     {
@@ -652,7 +648,6 @@ void LinearWorld::moveKartAfterRescue(AbstractKart* kart)
                         "on track %s.\n",
                 (kart->getIdent().c_str()), m_track->getIdent().c_str());
     }
-
 
 }   // moveKartAfterRescue
 

@@ -23,6 +23,8 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/particle_emitter.hpp"
+#include "graphics/particle_kind_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "race/race_manager.hpp"
 #include "utils/vec3.hpp"
@@ -32,44 +34,15 @@
 const float burst_time = 0.1f;
 
 /** Creates an explosion effect. */
-Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
+Explosion::Explosion(const Vec3& coord, const char* explosion_sound, const char * particle_file)
                      : HitSFX(coord, explosion_sound)
 {
     // short emision time, explosion, not constant flame
     m_remaining_time  = burst_time;
-    m_node            = irr_driver->addParticleNode();
-    m_node->grab();
-#ifdef DEBUG
-    m_node->setName("explosion");
-#endif
-    m_node->setPosition(coord.toIrrVector());
-    Material* m = material_manager->getMaterial("explode.png");
-    m_node->setMaterialTexture(0, m->getTexture());
-    m->setMaterialProperties(&(m_node->getMaterial(0)), NULL);
-    m_node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR );
-
-    scene::IParticleEmitter* em =
-        m_node->createSphereEmitter(core::vector3df(0.0f,0.0f,0.0f), 0.5f,
-              /* velocity in m/ms */core::vector3df(0.0f,0.005f,0.0f),
-                                     600, 900, // min max particles per sec
-                                     video::SColor(0, 0, 0, 0), // min colour
-                                     video::SColor(0, 0, 0, 0), // max colour
-                                     (int)((burst_time + explosion_time)
-                                             *1000.0f), // min life ms
-                                     (int)((burst_time + explosion_time)
-                                             *1000.0f), // max max life ms
-                                     90, // max angle
-                                     // min and max start size
-                                     core::dimension2df(0.3f, 0.3f),
-                                     core::dimension2df(0.75f, 0.75f)
-                                     );
-    m_node->setEmitter(em); // this grabs the emitter
-    em->drop(); // so we can drop it here without deleting it
-
-    scene::IParticleAffector* scale_affector =
-        m_node->createScaleParticleAffector(core::dimension2df(3.0f, 3.0f));
-    m_node->addAffector(scale_affector); // same goes for the affector
-    scale_affector->drop();
+    
+    ParticleKindManager* pkm = ParticleKindManager::get();
+    ParticleKind* particles = pkm->getParticles(particle_file);
+    m_emitter = new ParticleEmitter(particles, coord,  NULL);
 }   // Explosion
 
 //-----------------------------------------------------------------------------
@@ -77,12 +50,9 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound)
  */
 Explosion::~Explosion()
 {
-    if(m_node)
+    if(m_emitter)
     {
-        m_node->drop();
-        // Remove from scene node by removing from parent.
-        irr_driver->removeNode(m_node);
-        m_node = NULL;
+        delete m_emitter;
     }
 }   // ~Explosion
 
@@ -101,19 +71,20 @@ bool Explosion::updateAndDelete(float dt)
 
     if (m_remaining_time < 0.0f && m_remaining_time >= -explosion_time)
     {
-
+        scene::ISceneNode* node = m_emitter->getNode();
+        
         const int intensity = (int)(255-(m_remaining_time/-explosion_time)*255);
-        m_node->getMaterial(0).AmbientColor.setGreen(intensity);
-        m_node->getMaterial(0).DiffuseColor.setGreen(intensity);
-        m_node->getMaterial(0).EmissiveColor.setGreen(intensity);
+        node->getMaterial(0).AmbientColor.setGreen(intensity);
+        node->getMaterial(0).DiffuseColor.setGreen(intensity);
+        node->getMaterial(0).EmissiveColor.setGreen(intensity);
 
-        m_node->getMaterial(0).AmbientColor.setBlue(intensity);
-        m_node->getMaterial(0).DiffuseColor.setBlue(intensity);
-        m_node->getMaterial(0).EmissiveColor.setBlue(intensity);
+        node->getMaterial(0).AmbientColor.setBlue(intensity);
+        node->getMaterial(0).DiffuseColor.setBlue(intensity);
+        node->getMaterial(0).EmissiveColor.setBlue(intensity);
 
-        m_node->getMaterial(0).AmbientColor.setRed(intensity);
-        m_node->getMaterial(0).DiffuseColor.setRed(intensity);
-        m_node->getMaterial(0).EmissiveColor.setRed(intensity);
+        node->getMaterial(0).AmbientColor.setRed(intensity);
+        node->getMaterial(0).DiffuseColor.setRed(intensity);
+        node->getMaterial(0).EmissiveColor.setRed(intensity);
 
     }
 
@@ -127,8 +98,8 @@ bool Explosion::updateAndDelete(float dt)
     if (m_remaining_time > -explosion_time)
     {
         // Stop the emitter and wait a little while for all particles to have time to fade out
-        m_node->getEmitter()->setMinParticlesPerSecond(0);
-        m_node->getEmitter()->setMaxParticlesPerSecond(0);
+        m_emitter->getNode()->getEmitter()->setMinParticlesPerSecond(0);
+        m_emitter->getNode()->getEmitter()->setMaxParticlesPerSecond(0);
     }
     else
     {

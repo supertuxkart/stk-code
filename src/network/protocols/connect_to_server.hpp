@@ -20,27 +20,35 @@
 #define CONNECT_TO_SERVER_HPP
 
 #include "network/protocol.hpp"
+#include "network/types.hpp"
 #include <string>
 
 class ConnectToServer : public Protocol, public CallbackObject
 {
     public:
-        ConnectToServer(CallbackObject* callback_object);
+        ConnectToServer(uint32_t server_id);
         virtual ~ConnectToServer();
         
         virtual void notifyEvent(Event* event);
         virtual void setup();
         virtual void update();
         
-        void setServerAddress(uint32_t ip, uint16_t port);
-        
     protected:
-        uint32_t m_server_ip;
-        uint16_t m_server_port;
+        TransportAddress m_server_address;
+        TransportAddress m_public_address;
+        uint32_t m_server_id;
+        uint32_t m_current_protocol_id;
         
         enum STATE
         {
             NONE,
+            WAITING_SELF_ADDRESS,
+            SELF_ADDRESS_KNOWN,
+            PEER_ADDRESS_KNOWN,
+            SELF_ADDRESS_SHOWN,
+            CONNECTING,
+            CONNECTED,
+            HIDING_ADDRESS,
             DONE
         };
         STATE m_state;

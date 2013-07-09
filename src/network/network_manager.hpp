@@ -26,6 +26,7 @@
 #include "network/singleton.hpp"
 #include "network/types.hpp"
 #include "network/event.hpp"
+#include "network/game_setup.hpp"
 
 #include <vector>
 
@@ -38,8 +39,15 @@ class NetworkManager : public Singleton<NetworkManager>
         // network management functions
         virtual bool connect(TransportAddress peer);
         virtual void setManualSocketsMode(bool manual);
+        
+        // message/packets related functions
         virtual void notifyEvent(Event* event);
-        virtual void sendPacket(const char* data) = 0;
+        virtual void sendPacket(const NetworkString& data) = 0;
+        virtual void sendPacket(STKPeer* peer, const NetworkString& data);
+        virtual void sendPacketExcept(STKPeer* peer, const NetworkString& data);
+
+        // Game related functions
+        virtual GameSetup* setupNewGame(); //!< Creates a new game setup and returns it
 
         // raw data management
         void setLogin(std::string username, std::string password);
@@ -54,6 +62,8 @@ class NetworkManager : public Singleton<NetworkManager>
         bool isPlayingOnline()              { return m_playing_online;  }
         STKHost* getHost()                  { return m_localhost;       }
         std::vector<STKPeer*> getPeers()    { return m_peers;           }
+        TransportAddress getPublicAddress() { return m_public_address;  }
+        GameSetup* getGameSetup()           { return m_game_setup;      }
         
     protected:
         NetworkManager();
@@ -63,11 +73,10 @@ class NetworkManager : public Singleton<NetworkManager>
         std::vector<STKPeer*> m_peers;
         STKHost* m_localhost;
         bool m_playing_online;
+        GameSetup* m_game_setup;
         
         TransportAddress m_public_address;
         PlayerLogin m_player_login;
-        
-        pthread_t* m_protocol_manager_update_thread;
 };
 
 #endif // NETWORKMANAGER_HPP

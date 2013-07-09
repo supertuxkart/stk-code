@@ -162,7 +162,7 @@ void GamePadDevice::resetAxisDirection(const int axis,
 // ----------------------------------------------------------------------------
 
 bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
-                                       const int value,
+                                       int* value, /* inout */
                                        InputManager::InputDriverMode mode,
                                        StateManager::ActivePlayer* player,
                                        PlayerAction* action /* out */)
@@ -180,13 +180,13 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
         if (player != NULL)
         {
             // going to negative from positive
-            if (value < 0 && m_prevAxisDirections[id] == Input::AD_POSITIVE)
+            if (*value < 0 && m_prevAxisDirections[id] == Input::AD_POSITIVE)
             {
                 //  set positive id to 0
                 resetAxisDirection(id, Input::AD_POSITIVE, player);
             }
             // going to positive from negative
-            else if (value > 0 &&
+            else if (*value > 0 &&
                      m_prevAxisDirections[id] == Input::AD_NEGATIVE)
             {
                 //  set negative id to 0
@@ -194,17 +194,17 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
             }
         }
 
-        if     (value > 0) m_prevAxisDirections[id] = Input::AD_POSITIVE;
-        else if(value < 0) m_prevAxisDirections[id] = Input::AD_NEGATIVE;
+        if     (*value > 0) m_prevAxisDirections[id] = Input::AD_POSITIVE;
+        else if(*value < 0) m_prevAxisDirections[id] = Input::AD_NEGATIVE;
 
         if (!m_axis_ok[id])
         {
             if (m_prevAxisValue[id] == -1)
             {
                 // first value we get from this axis
-                m_prevAxisValue[id] = value;
+                m_prevAxisValue[id] = *value;
             }
-            else if (m_prevAxisValue[id] != value)
+            else if (m_prevAxisValue[id] != *value)
             {
                 // second different value we get from this axis, consider it OK
                 m_axis_ok[id] = true;
@@ -212,7 +212,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
         }
 
         // check if within deadzone
-        if(value > -m_deadzone && value < m_deadzone && player != NULL)
+        if(*value > -m_deadzone && *value < m_deadzone && player != NULL)
         {
             // Axis stands still: This is reported once for digital axes and
             // can be called multipled times for analog ones. Uses the
@@ -247,7 +247,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
         {
             success = m_configuration->getGameAction(type, id, value, action);
         }
-        else if (abs(value) > Input::MAX_VALUE/2)
+        else if (abs(*value) > Input::MAX_VALUE/2)
         {
             // bindings can only be accessed in game and menu modes
             assert(mode == InputManager::MENU);

@@ -39,7 +39,7 @@ struct LanguageSpec {
 
 /** Language Definitions */
 //*{
-LanguageSpec languages[] = {
+static const LanguageSpec languages[] = {
   { "aa", 0,    0, "Afar"                        },
   { "af", 0,    0, "Afrikaans"                   },
   { "af", "ZA", 0, "Afrikaans (South Africa)"    },
@@ -364,7 +364,7 @@ resolve_language_alias(const std::string& name)
 Language
 Language::from_spec(const std::string& language, const std::string& country, const std::string& modifier)
 {
-  static std::map<std::string, std::vector<LanguageSpec*> > language_map;
+  static std::map<std::string, std::vector<const LanguageSpec*> > language_map;
 
   if (language_map.empty())
   { // Init language_map
@@ -372,10 +372,10 @@ Language::from_spec(const std::string& language, const std::string& country, con
       language_map[languages[i].language].push_back(&languages[i]);
   }
 
-  std::map<std::string, std::vector<LanguageSpec*> >::iterator i = language_map.find(language);
+  std::map<std::string, std::vector<const LanguageSpec*> >::iterator i = language_map.find(language);
   if (i != language_map.end())
   {
-    std::vector<LanguageSpec*>& lst = i->second;
+    std::vector<const LanguageSpec*>& lst = i->second;
 
     LanguageSpec tmpspec;
     tmpspec.language = language.c_str();
@@ -383,9 +383,9 @@ Language::from_spec(const std::string& language, const std::string& country, con
     tmpspec.modifier = modifier.c_str();
     Language tmplang(&tmpspec);
 
-    LanguageSpec* best_match = 0;
+    const LanguageSpec* best_match = 0;
     int best_match_score = 0;
-    for(std::vector<LanguageSpec*>::iterator j = lst.begin(); j != lst.end(); ++j)
+    for(std::vector<const LanguageSpec*>::iterator j = lst.begin(); j != lst.end(); ++j)
     { // Search for the language that best matches the given spec, value country more then modifier
       int score = Language::match(Language(*j), tmplang);
 
@@ -445,7 +445,7 @@ Language::from_env(const std::string& env)
   return from_spec(language, country, modifier);
 }
 
-Language::Language(LanguageSpec* language_spec_)
+Language::Language(const LanguageSpec* language_spec_)
   : language_spec(language_spec_)
 {
 }

@@ -137,6 +137,8 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     LabelWidget* typeLbl = getWidget<LabelWidget>("race_type_val");
     if (c->getData()->isGrandPrix())
         typeLbl->setText(_("Grand Prix"), false );
+    else if (c->getData()->getEnergy(RaceManager::DIFFICULTY_EASY) > 0)
+        typeLbl->setText(_("Nitro challenge"), false );
     else
         typeLbl->setText( RaceManager::getNameOf(c->getData()->getMinorMode()), false );
 
@@ -226,7 +228,7 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         }
 
         // Sets up kart info, including random list of kart for AI
-//        network_manager->setupPlayerKartInfo();
+        race_manager->setupPlayerKartInfo();
         race_manager->startNew(true);
 
         irr_driver->hidePointer();

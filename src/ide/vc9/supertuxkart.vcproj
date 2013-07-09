@@ -693,6 +693,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\guiengine\widgets\rating_bar_widget.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\guiengine\widgets\ribbon_widget.cpp"
 						>
 					</File>
@@ -1138,23 +1142,23 @@
 				Name="network"
 				>
 				<File
-					RelativePath="..\..\network\connect_message.cpp"
+					RelativePath="..\..\network\client_network_manager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\kart_control_message.cpp"
+					RelativePath="..\..\network\event.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\kart_update_message.cpp"
+					RelativePath="..\..\network\game_setup.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\message.cpp"
+					RelativePath="..\..\network\http_functions.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\network_kart.cpp"
+					RelativePath="..\..\network\network_interface.cpp"
 					>
 				</File>
 				<File
@@ -1162,17 +1166,81 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\race_info_message.cpp"
+					RelativePath="..\..\network\network_string.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\race_result_message.cpp"
+					RelativePath="..\..\network\protocol.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\race_state.cpp"
+					RelativePath="..\..\network\protocol_manager.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\network\server_network_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\stk_host.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\stk_peer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\types.cpp"
+					>
+				</File>
+				<Filter
+					Name="protocols"
+					>
+					<File
+						RelativePath="..\..\network\protocols\connect_to_peer.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\connect_to_server.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\get_peer_address.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\get_public_address.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\hide_public_address.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\lobby_room_protocol.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\ping_protocol.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\request_connection.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\show_public_address.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\start_server.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\stop_server.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="tracks"
@@ -1418,7 +1486,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\minimal_race_gui.cpp"
+					RelativePath="..\..\states_screens\networking_lobby.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\networking_lobby_settings.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\online_screen.cpp"
 					>
 				</File>
 				<File
@@ -1509,6 +1585,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\states_screens\dialogs\login_dialog.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\states_screens\dialogs\message_dialog.cpp"
 						>
 					</File>
@@ -1522,6 +1602,10 @@
 					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\race_paused_dialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\registration_dialog.cpp"
 						>
 					</File>
 					<File
@@ -1638,6 +1722,22 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="online"
+				>
+				<File
+					RelativePath="..\..\online\current_online_user.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\online\http_connector.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\online\online_user.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -1739,6 +1839,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\guiengine\widgets\rating_bar_widget.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\guiengine\widgets\ribbon_widget.hpp"
 						>
 					</File>
@@ -1776,47 +1880,23 @@
 				Name="network"
 				>
 				<File
-					RelativePath="..\..\network\character_confirm_message.hpp"
+					RelativePath="..\..\network\client_network_manager.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\character_info_message.hpp"
+					RelativePath="..\..\network\event.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\character_selected_message.hpp"
+					RelativePath="..\..\network\game_setup.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\connect_message.hpp"
+					RelativePath="..\..\network\http_functions.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\flyable_info.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\item_info.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\kart_control_message.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\kart_packet.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\kart_update_message.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\message.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\network_kart.hpp"
+					RelativePath="..\..\network\network_interface.hpp"
 					>
 				</File>
 				<File
@@ -1824,23 +1904,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\race_info_message.hpp"
+					RelativePath="..\..\network\network_string.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\race_result_ack_message.hpp"
+					RelativePath="..\..\network\protocol.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\race_result_message.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\race_start_message.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\network\race_state.hpp"
+					RelativePath="..\..\network\protocol_manager.hpp"
 					>
 				</File>
 				<File
@@ -1848,9 +1920,73 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\network\world_loaded_message.hpp"
+					RelativePath="..\..\network\server_network_manager.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\network\singleton.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\stk_host.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\stk_peer.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\network\types.hpp"
+					>
+				</File>
+				<Filter
+					Name="protocols"
+					>
+					<File
+						RelativePath="..\..\network\protocols\connect_to_peer.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\connect_to_server.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\get_peer_address.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\get_public_address.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\hide_public_address.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\lobby_room_protocol.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\ping_protocol.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\request_connection.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\show_public_address.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\start_server.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\stop_server.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="utils"
@@ -2620,7 +2756,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\states_screens\minimal_race_gui.hpp"
+					RelativePath="..\..\states_screens\networking_lobby.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\networking_lobby_settings.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\online_screen.hpp"
 					>
 				</File>
 				<File
@@ -2711,6 +2855,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\states_screens\dialogs\login_dialog.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\states_screens\dialogs\message_dialog.hpp"
 						>
 					</File>
@@ -2724,6 +2872,10 @@
 					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\race_paused_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\registration_dialog.hpp"
 						>
 					</File>
 					<File
@@ -2825,6 +2977,22 @@
 				</File>
 				<File
 					RelativePath="..\..\tinygettext\tinygettext.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="online"
+				>
+				<File
+					RelativePath="..\..\online\current_online_user.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\online\http_connector.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\online\online_user.hpp"
 					>
 				</File>
 			</Filter>

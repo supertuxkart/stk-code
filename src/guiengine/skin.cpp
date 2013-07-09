@@ -806,6 +806,60 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
 }   // drawProgress
 
 // ----------------------------------------------------------------------------
+/**
+ * @param focused whether this element is focus by the master player (focus
+ * for other players is not supported)
+ */
+void Skin::drawRatingBar(Widget *w, const core::recti &rect,
+                        const bool pressed, const bool focused)
+{
+    static const int step_number = 3; // Harcoded number of step.
+    
+    const ITexture *texture = SkinConfig::m_render_params["rating::neutral"].getImage();
+    const int texture_w = texture->getSize().Width / 4;
+    const int texture_h = texture->getSize().Height;
+    const float aspect_ratio = 1.0f;
+    
+    RatingBarWidget *ratingBar = (RatingBarWidget*)w;
+    const int star_number = ratingBar->getStarNumber();
+
+    int star_h = rect.getHeight();
+    int star_w = (int)(aspect_ratio * star_h);
+
+    if (rect.getWidth() < star_w * star_number)
+    {
+        const float scale_factor = rect.getWidth() / (float)(star_w * star_number);
+        star_w = (int)(star_w * scale_factor);
+        star_h = (int)(star_h * scale_factor);
+    }
+    
+    // center horizontally and vertically
+    const int x_from = rect.UpperLeftCorner.X + (rect.getWidth() - star_w) / 2; 
+    const int y_from = rect.UpperLeftCorner.Y + (rect.getHeight() - star_h) / 2;
+
+    for (int i = 0; i < star_number; i++)
+    {
+        core::recti star_rect = rect;
+
+        star_rect.UpperLeftCorner.X  = x_from + i * star_w;
+        star_rect.UpperLeftCorner.Y  = y_from;
+        star_rect.LowerRightCorner.X = x_from + (i + 1) * star_w;
+        star_rect.LowerRightCorner.Y = y_from + star_h;
+        
+        int step = ratingBar->getStepOfStar(i, step_number);
+        
+        const core::recti source_area(texture_w * step, 0, 
+                                      texture_w * (step + 1), texture_h);
+
+        GUIEngine::getDriver()->draw2DImage(texture,
+                                            star_rect, source_area,
+                                            0 /* no clipping */, 0,
+                                            true /* alpha */);
+    }
+
+}   // drawRatingBar
+
+// ----------------------------------------------------------------------------
 SColor Skin::getColor(const std::string &name)
 {
     return SkinConfig::m_colors[name];
@@ -1467,9 +1521,9 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
  */
 void Skin::drawList(const core::recti &rect, Widget* widget, bool focused)
 {
-    drawBoxFromStretchableTexture(widget, rect,
-                                  SkinConfig::m_render_params["list::neutral"],
-                                  widget->m_deactivated, NULL);
+    //drawBoxFromStretchableTexture(widget, rect,
+    //                              SkinConfig::m_render_params["list::neutral"],
+    //                              widget->m_deactivated, NULL);
 
 }   // drawList
 
@@ -1556,6 +1610,8 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                     drawBoxFromStretchableTexture(&widget, rect,
                               SkinConfig::m_render_params["section::neutral"]);
                 }
+                
+                renderSections( &widget.m_children );
             }
             else if (widget.isBottomBar())
             {
@@ -1810,6 +1866,10 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     {
         drawCheckBox(rect, widget, focused);
     }
+    else if(type == WTYPE_RATINGBAR)
+    {
+        drawRatingBar(widget, rect, pressed, focused);
+    }
 
 
     if (ID_DEBUG && id != -1 && Widget::isFocusableId(id))
@@ -1954,70 +2014,41 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
 
     if (element->getType()==gui::EGUIET_EDIT_BOX)
     {
-        SColor& color = SkinConfig::m_colors["text_field::neutral"];
-        SColor& colorFocus = SkinConfig::m_colors["text_field::focused"];
+        SColor& bg_color = SkinConfig::m_colors["text_field::background"];
+        SColor& bg_color_focused = SkinConfig::m_colors["text_field::background_focused"];
+        SColor& border_color = SkinConfig::m_colors["text_field::neutral"];
+        SColor& border_color_focus = SkinConfig::m_colors["text_field::focused"];
 
-        if (focused)
+        core::recti borderArea = rect;
+        borderArea.UpperLeftCorner -= position2d< s32 >( 2, 2 );
+        borderArea.LowerRightCorner += position2d< s32 >( 2, 2 );
+
+        // if within an appearing dialog, grow
+        if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
+            widget->m_parent->getType() == gui::EGUIET_WINDOW)
         {
-            core::recti borderArea = rect;
-            borderArea.UpperLeftCorner -= position2d< s32 >( 2, 2 );
-            borderArea.LowerRightCorner += position2d< s32 >( 2, 2 );
+            core::position2d<u32> center(irr_driver->getFrameSize()/2);
+            const float texture_size = sin(m_dialog_size*M_PI*0.5f);
 
-            // if within an appearing dialog, grow
-            if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
-                widget->m_parent->getType() == gui::EGUIET_WINDOW)
-            {
-                core::position2d<u32> center(irr_driver->getFrameSize()/2);
-                const float texture_size = sin(m_dialog_size*M_PI*0.5f);
-
-                borderArea.UpperLeftCorner.X  =
-                    center.X + (int)(((int)rect.UpperLeftCorner.X
-                                    - (int)center.X)*texture_size);
-                borderArea.UpperLeftCorner.Y  =
-                    center.Y + (int)(((int)rect.UpperLeftCorner.Y
-                                    - (int)center.Y)*texture_size);
-                borderArea.LowerRightCorner.X =
-                    center.X + (int)(((int)rect.LowerRightCorner.X
-                                    - (int)center.X)*texture_size);
-                borderArea.LowerRightCorner.Y =
-                    center.Y + (int)(((int)rect.LowerRightCorner.Y
-                                    - (int)center.Y)*texture_size);
-            }
-            GUIEngine::getDriver()->draw2DRectangle( colorFocus, borderArea );
-
-            core::recti innerArea = borderArea;
-            innerArea.UpperLeftCorner += position2d< s32 >( 2, 2 );
-            innerArea.LowerRightCorner -= position2d< s32 >( 2, 2 );
-            GUIEngine::getDriver()->draw2DRectangle( color, innerArea );
+            borderArea.UpperLeftCorner.X  =
+                center.X + (int)(((int)rect.UpperLeftCorner.X
+                                - (int)center.X)*texture_size);
+            borderArea.UpperLeftCorner.Y  =
+                center.Y + (int)(((int)rect.UpperLeftCorner.Y
+                                - (int)center.Y)*texture_size);
+            borderArea.LowerRightCorner.X =
+                center.X + (int)(((int)rect.LowerRightCorner.X
+                                - (int)center.X)*texture_size);
+            borderArea.LowerRightCorner.Y =
+                center.Y + (int)(((int)rect.LowerRightCorner.Y
+                                - (int)center.Y)*texture_size);
         }
-        else
-        {
-            // if within an appearing dialog, grow
-            if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
-                widget->m_parent->getType() == gui::EGUIET_WINDOW)
-            {
-                core::position2d<u32> center(irr_driver->getFrameSize()/2);
-                const float texture_size = sin(m_dialog_size*M_PI*0.5f);
-                core::recti sizedRect;
-                sizedRect.UpperLeftCorner.X  =
-                    center.X + (int)(((int)rect.UpperLeftCorner.X
-                                    - (int)center.X)*texture_size);
-                sizedRect.UpperLeftCorner.Y  =
-                    center.Y + (int)(((int)rect.UpperLeftCorner.Y
-                                    - (int)center.Y)*texture_size);
-                sizedRect.LowerRightCorner.X =
-                    center.X + (int)(((int)rect.LowerRightCorner.X
-                                    - (int)center.X)*texture_size);
-                sizedRect.LowerRightCorner.Y =
-                    center.Y + (int)(((int)rect.LowerRightCorner.Y
-                                    - (int)center.Y)*texture_size);
-                GUIEngine::getDriver()->draw2DRectangle( color, sizedRect );
-            }
-            else
-            {
-                GUIEngine::getDriver()->draw2DRectangle( color, rect );
-            }
-        }
+        GUIEngine::getDriver()->draw2DRectangle(focused ? border_color_focus : border_color, borderArea);
+
+        core::recti innerArea = borderArea;
+        innerArea.UpperLeftCorner += position2d< s32 >( 2, 2 );
+        innerArea.LowerRightCorner -= position2d< s32 >( 2, 2 );
+        GUIEngine::getDriver()->draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
         return;
     }
     else if (type == WTYPE_LIST)

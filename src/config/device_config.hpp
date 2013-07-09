@@ -68,7 +68,7 @@ protected:
       */
     bool doGetAction(Input::InputType    type,
                      const int           id,
-                     const int           value,
+                     int*                value, /* inout */
                      const PlayerAction  firstActionToCheck,
                      const PlayerAction  lastActionToCheck,
                      PlayerAction*       action /* out */ );
@@ -92,6 +92,7 @@ public:
                                      const Input::InputType type,
                                      const int              id,
                                      Input::AxisDirection   direction = Input::AD_NEUTRAL,
+                                     Input::AxisRange       range     = Input::AR_HALF,
                                      wchar_t                character=0);
 
     void        setPlugged          () { m_plugged++; }
@@ -106,7 +107,7 @@ public:
       */
     bool        getGameAction       (Input::InputType       type,
                                      const int              id,
-                                     const int              value,
+                                     int*                   value, /* inout */
                                      PlayerAction*          action /* out */);
 
     /**
@@ -117,7 +118,7 @@ public:
       */
     bool        getMenuAction       (Input::InputType       type,
                                      const int              id,
-                                     const int              value,
+                                     int*                   value,
                                      PlayerAction*          action /* out */);
 
     Binding&    getBinding          (int i) {return m_bindings[i];}

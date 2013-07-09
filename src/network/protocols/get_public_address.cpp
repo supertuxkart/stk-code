@@ -32,7 +32,7 @@ int stunRand()
     static bool init = false;
     if (!init)
     {
-        srand(time(NULL));
+        srand((unsigned int)time(NULL));
         init = true;
     }
     return rand();
@@ -61,7 +61,7 @@ void GetPublicAddress::update()
     if (m_state == NOTHING_DONE)
     {
         // format :               00MMMMMCMMMCMMMM (cf rfc 5389)
-        uint16_t message_type = 0b0000000000000001; // binding request
+        uint16_t message_type = 0x0001; // binding request
         m_stun_tansaction_id[0] = stunRand();
         m_stun_tansaction_id[1] = stunRand();
         m_stun_tansaction_id[2] = stunRand();
@@ -97,7 +97,7 @@ void GetPublicAddress::update()
         bytes[19] = (uint8_t)(m_stun_tansaction_id[2]);
         bytes[20] = '\0'; 
         
-        Log::info("GetPublicAddress", "Querrying STUN server 132.177.123.6\n");
+        Log::info("GetPublicAddress", "Querrying STUN server 132.177.123.6");
         unsigned int dst = (132<<24)+(177<<16)+(123<<8)+6;
         NetworkManager::getInstance()->setManualSocketsMode(true);
         NetworkManager::getInstance()->getHost()->sendRawPacket(bytes, 20, TransportAddress(dst, 3478));
@@ -110,12 +110,12 @@ void GetPublicAddress::update()
         assert(data);
         
         // check that the stun response is a response, contains the magic cookie and the transaction ID
-        if (    data[0] == 0b01 &&
-                data[1] == 0b01 &&
+        if (    data[0] == 0x01 &&
+                data[1] == 0x01 &&
                 data[4] ==  (uint8_t)(m_stun_magic_cookie>>24)        &&
                 data[5] ==  (uint8_t)(m_stun_magic_cookie>>16)        &&
                 data[6] ==  (uint8_t)(m_stun_magic_cookie>>8)         &&
-                data[7] ==  (uint8_t)(m_stun_magic_cookie))
+                data[7] ==  (uint8_t)(m_stun_magic_cookie)               )
         {
             if(
                 data[8] ==  (uint8_t)(m_stun_tansaction_id[0]>>24)   &&
@@ -131,7 +131,7 @@ void GetPublicAddress::update()
                 data[18] == (uint8_t)(m_stun_tansaction_id[2]>>8 )   &&
                 data[19] == (uint8_t)(m_stun_tansaction_id[2]    ))
             {
-                Log::error("GetPublicAddress", "The STUN server responded with a valid answer\n");
+                Log::info("GetPublicAddress", "The STUN server responded with a valid answer");
                 int message_size = data[2]*256+data[3];
                 
                 // parse the stun message now:
@@ -139,12 +139,12 @@ void GetPublicAddress::update()
                 uint8_t* attributes = data+20;
                 if (message_size == 0)
                 {
-                    Log::error("GetPublicAddress", "STUN answer does not contain any information.\n");
+                    Log::error("GetPublicAddress", "STUN answer does not contain any information.");
                     finish = true;
                 }
                 if (message_size < 4) // cannot even read the size
                 {
-                    Log::error("GetPublicAddress", "STUN message is not valid.\n");
+                    Log::error("GetPublicAddress", "STUN message is not valid.");
                     finish = true;
                 }
                 uint16_t port;
@@ -175,14 +175,14 @@ void GetPublicAddress::update()
                         finish = true;
                     if (message_size < 4) // cannot even read the size
                     {
-                        Log::error("GetPublicAddress", "STUN message is not valid.\n");
+                        Log::error("GetPublicAddress", "STUN message is not valid.");
                         finish = true;
                     }
                 }
                 // finished parsing, we know our public transport address
                 if (valid)
                 {
-                    Log::info("GetPublicAddress", "The public address has been found : %i.%i.%i.%i:%i\n", address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
+                    Log::info("GetPublicAddress", "The public address has been found : %i.%i.%i.%i:%i", address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
                     m_state = ADDRESS_KNOWN;
                     NetworkManager::getInstance()->setManualSocketsMode(false); 
                     TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);

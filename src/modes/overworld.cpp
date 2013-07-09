@@ -27,7 +27,6 @@
 #include "karts/rescue_animation.hpp"
 #include "modes/overworld.hpp"
 #include "physics/physics.hpp"
-#include "network/network_manager.hpp"
 #include "states_screens/dialogs/select_challenge.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/race_gui_overworld.hpp"
@@ -83,7 +82,7 @@ void OverWorld::enterOverWorld()
         ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
     StateManager::get()->enterGameState();
-//    network_manager->setupPlayerKartInfo();
+    race_manager->setupPlayerKartInfo();
     race_manager->startNew(false);
     if(race_manager->haveKartLastPositionOnOverworld()){
 			OverWorld *ow = (OverWorld*)World::getWorld();
@@ -263,7 +262,7 @@ void OverWorld::moveKartAfterRescue(AbstractKart* kart, float angle)
     kart->getBody()->setCenterOfMassTransform(pos);
 
     //project kart to surface of track
-    bool kart_over_ground = m_physics->projectKartDownwards(kart);
+    bool kart_over_ground = m_track->findGround(kart);
 
     if (kart_over_ground)
     {

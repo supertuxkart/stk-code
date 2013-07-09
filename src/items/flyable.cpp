@@ -410,21 +410,6 @@ bool Flyable::updateAndDelete(float dt)
 }   // updateAndDelete
 
 // ----------------------------------------------------------------------------
-/** Updates the position of a projectile based on information received frmo the
- *  server.
- */
-void Flyable::updateFromServer(const FlyableInfo &f, float dt)
-{
-/*
-    setXYZ(f.m_xyz);
-    setRotation(f.m_rotation);
-*/
-    // Update the graphical position
-    Moveable::update(dt);
-    
-}   // updateFromServer
-
-// ----------------------------------------------------------------------------
 /** Returns true if the item hit the kart who shot it (to avoid that an item
  *  that's too close to the shoter hits the shoter).
  *  \param kart Kart who was hit.
@@ -513,7 +498,7 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
  */
 HitEffect* Flyable::getHitEffect() const
 {
-    return new Explosion(getXYZ(), "explosion");
+    return new Explosion(getXYZ(), "explosion", "explosion_cake.xml");
 }   // getHitEffect
 
 /* EOF */

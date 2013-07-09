@@ -128,6 +128,15 @@ stringw TextBoxWidget::getText() const
 
 // -----------------------------------------------------------------------------
 
+void TextBoxWidget::setPasswordBox(bool passwordBox, wchar_t passwordChar)
+{
+    IGUIEditBox* textCtrl =  Widget::getIrrlichtElement<IGUIEditBox>();
+    assert(textCtrl != NULL);
+    textCtrl->setPasswordBox(passwordBox, passwordChar);
+}
+
+// -----------------------------------------------------------------------------
+
 EventPropagation TextBoxWidget::focused(const int playerID)
 {
     assert(playerID == 0); // No support for multiple players in text areas!
@@ -145,6 +154,8 @@ void TextBoxWidget::unfocused(const int playerID, Widget* new_focus)
     assert(playerID == 0); // No support for multiple players in text areas!
 
     setWithinATextBox(false);
+    
+    GUIEngine::getGUIEnv()->removeFocus(m_element);
 }
 
 // -----------------------------------------------------------------------------

@@ -308,7 +308,19 @@ void LayoutManager::applyCoords(Widget* self, AbstractTopLevelContainer* topLeve
         parent_x = parent->m_x;
         parent_y = parent->m_y;
     }
-
+    
+    if (parent != NULL && parent->getType() == WTYPE_DIV && parent->m_show_bounding_box)
+    {
+        int padding = 15;
+        if (parent->m_properties[PROP_DIV_PADDING].length() > 0)
+            padding = atoi(parent->m_properties[PROP_DIV_PADDING].c_str());
+            
+        parent_x += padding;
+        parent_y += padding;
+        parent_w -= padding*2;
+        parent_h -= padding*2;
+    }
+    
     if      (self->m_absolute_x > -1)         self->m_x = parent_x + self->m_absolute_x;
     else if (self->m_absolute_reverse_x > -1) self->m_x = parent_x + (parent_w - self->m_absolute_reverse_x);
     else if (self->m_relative_x > -1)         self->m_x = (int)(parent_x + parent_w*self->m_relative_x/100);
@@ -418,8 +430,23 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
             break;
         }
 
-        const int w = parent->m_w, h = parent->m_h;
+        int x = parent->m_x;
+        int y = parent->m_y;
+        int w = parent->m_w;
+        int h = parent->m_h;
 
+        if (parent != NULL && parent->getType() == WTYPE_DIV && parent->m_show_bounding_box)
+        {
+            int padding = 15;
+            if (parent->m_properties[PROP_DIV_PADDING].length() > 0)
+                padding = atoi(parent->m_properties[PROP_DIV_PADDING].c_str());
+            
+            x += padding;
+            y += padding;
+            w -= padding*2;
+            h -= padding*2;
+        }
+    
         // find space left after placing all absolutely-sized widgets in a row
         // (the space left will be divided between remaining widgets later)
         int left_space = (horizontal ? w : h);
@@ -445,8 +472,6 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
         }
 
         // ---- lay widgets in row
-        int x = parent->m_x;
-        int y = parent->m_y;
         for (int n=0; n<widgets_amount; n++)
         {
             std::string prop = widgets[n].m_properties[ PROP_PROPORTION ];
@@ -694,7 +719,10 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
     // ----- also deal with containers' children
     for (int n=0; n<widgets_amount; n++)
     {
-        if (widgets[n].m_type == WTYPE_DIV) doCalculateLayout(widgets[n].m_children, topLevelContainer, &widgets[n]);
+        if (widgets[n].m_type == WTYPE_DIV)
+        {
+            doCalculateLayout(widgets[n].m_children, topLevelContainer, &widgets[n]);
+        }
     }
 }   // calculateLayout
 

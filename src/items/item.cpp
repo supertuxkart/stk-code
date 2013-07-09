@@ -115,7 +115,7 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
     switch(m_type)
     {
     case ITEM_BUBBLEGUM:
-        m_disappear_counter = stk_config->m_bubble_gum_counter; break;
+        m_disappear_counter = stk_config->m_bubblegum_counter; break;
     case ITEM_EASTER_EGG:
         m_disappear_counter = -1; break;
     default:
@@ -247,7 +247,7 @@ void Item::reset()
     switch(m_type)
     {
     case ITEM_BUBBLEGUM:
-        m_disappear_counter = stk_config->m_bubble_gum_counter; break;
+        m_disappear_counter = stk_config->m_bubblegum_counter; break;
     case ITEM_EASTER_EGG:
         m_disappear_counter = -1; break;
     default:

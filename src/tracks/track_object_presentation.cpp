@@ -574,6 +574,8 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(const
 
     xml_node.get("action", &m_action);
 
+    m_action_active = true;
+    
     if (m_action.size() == 0)
     {
         fprintf(stderr, "[TrackObject] WARNING: action-trigger has no action defined\n");
@@ -584,6 +586,8 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(const
 
 void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 {
+    if (!m_action_active) return;
+    
     if (m_action == "garage")
     {
         new RacePausedDialog(0.8f, 0.6f);
@@ -593,7 +597,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     {
         //if (World::getWorld()->getPhase() == World::RACE_PHASE)
         {
-            m_action = "__disabled__";
+            m_action_active = false;
             //World::getWorld()->getRaceGUI()->clearAllMessages();
 
             InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
@@ -608,13 +612,13 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     }
     else if (m_action == "tutorial_bananas")
     {
-        m_action = "__disabled__";
+        m_action_active = false;
 
         new TutorialMessageDialog(_("Avoid bananas!"), true);
     }
     else if (m_action == "tutorial_giftboxes")
     {
-        m_action = "__disabled__";
+        m_action_active = false;
         InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
@@ -624,14 +628,14 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     }
     else if (m_action == "tutorial_nitro_collect")
     {
-        m_action = "__disabled__";
+        m_action_active = false;
 
         new TutorialMessageDialog(_("Collect nitro bottles (we will use them after the curve)"),
                                   true);
     }
     else if (m_action == "tutorial_nitro_use")
     {
-        m_action = "__disabled__";
+        m_action_active = false;
         InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw nitro = config->getBindingAsString(PA_NITRO);
@@ -641,7 +645,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     }
     else if (m_action == "tutorial_rescue")
     {
-        m_action = "__disabled__";
+        m_action_active = false;
         InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw rescue = config->getBindingAsString(PA_RESCUE);
@@ -651,7 +655,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     }
     else if (m_action == "tutorial_skidding")
     {
-        m_action = "__disabled__";
+        m_action_active = false;
         //World::getWorld()->getRaceGUI()->clearAllMessages();
 
         InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
@@ -664,7 +668,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     }
     else if (m_action == "tutorial_skidding2")
     {
-        m_action = "__disabled__";
+        m_action_active = false;
         World::getWorld()->getRaceGUI()->clearAllMessages();
 
         new TutorialMessageDialog(_("Note that if you manage to skid for several seconds, you will receive a bonus speedup as a reward!"),
@@ -672,7 +676,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     }
     else if (m_action == "tutorial_endmessage")
     {
-        m_action = "__disabled__";
+        m_action_active = false;
         World::getWorld()->getRaceGUI()->clearAllMessages();
 
         new TutorialMessageDialog(_("You are now ready to race. Good luck!"),
@@ -682,9 +686,6 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     {
         World::getWorld()->scheduleExitRace();
         return;
-    }
-    else if (m_action == "__disabled__")
-    {
     }
     else
     {

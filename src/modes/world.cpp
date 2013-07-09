@@ -53,7 +53,6 @@
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/minimal_race_gui.hpp"
 #include "states_screens/race_gui.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
@@ -117,7 +116,6 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
  */
 void World::init()
 {
-//    race_state            = new RaceState();
     m_faster_music_active = false;
     m_fastest_kart        = 0;
     m_eliminated_karts    = 0;
@@ -172,8 +170,6 @@ void World::init()
 
     if(ReplayPlay::get())
         ReplayPlay::get()->Load();
-
-//    network_manager->worldLoaded();
 
     powerup_manager->updateWeightsForRace(num_karts);
 }   // init
@@ -249,10 +245,10 @@ void World::reset()
 
 void World::createRaceGUI()
 {
-    if(UserConfigParams::m_minimal_race_gui &&
-       race_manager->getTrackName() != "tutorial")
-		m_race_gui = new MinimalRaceGUI();
-	else
+    //if(UserConfigParams::m_minimal_race_gui &&
+    //   race_manager->getTrackName() != "tutorial")
+	//	m_race_gui = new MinimalRaceGUI();
+	//else
 		m_race_gui = new RaceGUI();
 }
 
@@ -359,7 +355,6 @@ World::~World()
         // gui and this must be deleted.
         delete m_race_gui;
     }
-//    delete race_state;
 
     for ( unsigned int i = 0 ; i < m_karts.size() ; i++ )
         delete m_karts[i];
@@ -494,7 +489,8 @@ void World::resetAllKarts()
                 pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
                                 m_track->getAngle(quad))                 );
                 kart->getBody()->setCenterOfMassTransform(pos);
-                bool kart_over_ground = m_physics->projectKartDownwards(kart);
+
+                bool kart_over_ground = m_track->findGround(kart);
                 if(kart_over_ground)
                 {
                     const Vec3 &xyz = kart->getTrans().getOrigin()
@@ -535,11 +531,12 @@ void World::resetAllKarts()
     //that at least one of its wheel will be on the surface of the track
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
-        ///start projection from top of kart
-        btVector3 up_offset(0, 0.5f * ((*i)->getKartHeight()), 0);
-        (*i)->getVehicle()->getRigidBody()->translate (up_offset);
+        Vec3 xyz = (*i)->getXYZ();
+        //start projection from top of kart
+        Vec3 up_offset(0, 0.5f * ((*i)->getKartHeight()), 0);
+        (*i)->setXYZ(xyz+up_offset);
 
-        bool kart_over_ground = m_physics->projectKartDownwards(*i);
+        bool kart_over_ground = m_track->findGround(*i);
 
         if (!kart_over_ground)
         {
@@ -745,8 +742,8 @@ void World::updateWorld(float dt)
                     ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
                 StateManager::get()->enterGameState();
-//                network_manager->setupPlayerKartInfo();
-                race_manager->startNew(false);
+                race_manager->setupPlayerKartInfo();
+                race_manager->startNew(true);
             }
             else
             {
@@ -798,11 +795,8 @@ void World::update(float dt)
     if(ReplayPlay::get()) ReplayPlay::get()->update(dt);
     if(history->replayHistory()) dt=history->getNextDelta();
     WorldStatus::update(dt);
-    // Clear race state so that new information can be stored
-//    race_state->clear();
 
-//    if(network_manager->getMode()!=NetworkManager::NW_CLIENT &&
-//        !history->dontDoPhysics())
+    if (!history->dontDoPhysics())
     {
         m_physics->update(dt);
     }

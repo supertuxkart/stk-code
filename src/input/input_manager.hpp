@@ -57,6 +57,7 @@ private:
     DeviceManager  *m_device_manager;
     std::set<int>   m_sensed_input_high_gamepad;
     std::set<int>   m_sensed_input_high_kbd;
+    std::set<int>   m_sensed_input_zero_gamepad;
 
     InputDriverMode  m_mode;
 

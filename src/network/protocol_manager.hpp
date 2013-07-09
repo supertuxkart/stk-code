@@ -25,9 +25,10 @@
 
 #include "network/singleton.hpp"
 #include "network/event.hpp"
+#include "network/network_string.hpp"
+#include "utils/types.hpp"
 
 #include <vector>
-#include <stdint.h>
 
 class Protocol;
 
@@ -104,7 +105,15 @@ class ProtocolManager : public Singleton<ProtocolManager>
         /*! 
          * \brief WILL BE COMMENTED LATER
          */
-        virtual void            sendMessage(Protocol* sender, std::string message);
+        virtual void            sendMessage(Protocol* sender, const NetworkString& message);
+        /*! 
+         * \brief WILL BE COMMENTED LATER
+         */
+        virtual void            sendMessage(Protocol* sender, STKPeer* peer, const NetworkString& message);
+        /*! 
+         * \brief WILL BE COMMENTED LATER
+         */
+        virtual void            sendMessageExcept(Protocol* sender, STKPeer* peer, const NetworkString& message);
         
         /*! 
          * \brief Asks the manager to start a protocol.
@@ -113,7 +122,7 @@ class ProtocolManager : public Singleton<ProtocolManager>
          * \param protocol : A pointer to the protocol to start
          * \return The unique id of the protocol that is being started.
          */
-        virtual int             requestStart(Protocol* protocol);
+        virtual uint32_t        requestStart(Protocol* protocol);
         /*! 
          * \brief Asks the manager to stop a protocol.
          * This function will store the request, and process it at a time it is
@@ -177,7 +186,22 @@ class ProtocolManager : public Singleton<ProtocolManager>
          * \param protocol : A pointer to the protocol you seek the id.
          * \return The id of the protocol pointed by the protocol parameter.
          */
-        virtual int             getProtocolID(Protocol* protocol);
+        virtual uint32_t        getProtocolID(Protocol* protocol);
+        
+        /*!
+         * \brief Get a protocol using his id.
+         * \param id : Unique ID of the seek protocol.
+         * \return The protocol that has the ID id.
+         */
+        virtual Protocol*       getProtocol(uint32_t id);
+        
+        /*! \brief Know whether the app is a server.
+         *  \return True if this application is in server mode, false elseway.
+         */
+        bool                    isServer();
+        
+        /*! \brief Tells if we need to stop the update thread. */
+        int                     exit();
         
     protected:
         // protected functions
@@ -249,7 +273,7 @@ class ProtocolManager : public Singleton<ProtocolManager>
          * If a protocol has an id lower than this value, it means that it have
          * been formerly started. 
          */
-        unsigned int                    m_next_protocol_id;
+        uint32_t                        m_next_protocol_id;
         
         // mutexes:
         /*! Used to ensure that the event queue is used thread-safely.       */
@@ -260,6 +284,11 @@ class ProtocolManager : public Singleton<ProtocolManager>
         pthread_mutex_t                 m_requests_mutex;
         /*! Used to ensure that the protocol id is used in a thread-safe way.*/
         pthread_mutex_t                 m_id_mutex;
+        /*! Used when need to quit.*/
+        pthread_mutex_t                 m_exit_mutex;
+        
+        /*! Update thread.*/
+        pthread_t* m_update_thread;
         
 };
 

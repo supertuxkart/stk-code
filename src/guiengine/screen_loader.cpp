@@ -175,6 +175,10 @@ void Screen::parseScreenFileDiv(irr::io::IXMLReader* xml, PtrVector<Widget>& app
                 {
                     append_to.push_back(new TextBoxWidget());
                 }
+                else if (wcscmp(L"ratingbar", xml->getNodeName()) == 0)
+                {
+                    append_to.push_back(new RatingBarWidget());
+                }
                 else
                 {
                     std::cerr << "/!\\ Warning /!\\ : unknown tag found in STK GUI file  : '"
@@ -216,6 +220,7 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 READ_PROPERTY(label_location, PROP_LABELS_LOCATION);
                 READ_PROPERTY(max_rows,       PROP_MAX_ROWS);
                 READ_PROPERTY(wrap_around,    PROP_WRAP_AROUND);
+                READ_PROPERTY(padding,        PROP_DIV_PADDING);
 #undef READ_PROPERTY
 
                 const wchar_t* text = xml->getAttributeValue( L"text" );

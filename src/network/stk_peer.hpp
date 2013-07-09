@@ -20,6 +20,7 @@
 #define STK_PEER_HPP
 
 #include "network/stk_host.hpp"
+#include "network/network_string.hpp"
 #include <enet/enet.h>
 
 class STKPeer
@@ -29,17 +30,25 @@ class STKPeer
         STKPeer();
         virtual ~STKPeer();
         
-        virtual void sendPacket(const char* data);
+        virtual void sendPacket(const NetworkString& data);
         
         static bool connectToHost(STKHost* localhost, TransportAddress host, uint32_t channel_count, uint32_t data);
         
-        bool isConnected();
+        bool isConnected() const;
+        void setClientServerToken(const uint32_t& token) { m_client_server_token = token; m_token_set = true; }
+        void unsetClientServerToken() { m_token_set = false; }
         
-        uint32_t getAddress();
-        uint16_t getPort();
-        bool operator==(ENetPeer* peer);
+        uint32_t getAddress() const;
+        uint16_t getPort() const;
+        uint32_t getClientServerToken() const;
+        bool     isClientServerTokenSet() const { return m_token_set; }
+        
+        bool operator==(const ENetPeer* peer) const;
+        
     protected:
         ENetPeer* m_peer;
+        uint32_t m_client_server_token;
+        bool m_token_set;
 };
 
 #endif // STK_PEER_HPP

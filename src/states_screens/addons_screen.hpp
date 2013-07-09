@@ -28,6 +28,13 @@ namespace irr { namespace gui { class STKModifiedSpriteBank; } }
 
 namespace GUIEngine { class Widget; }
 
+struct DateFilter {
+    core::stringw label;
+    int year;
+    int month;
+    int day;
+};
+
 /**
   * \brief Addons screen
   * \ingroup states_screens
@@ -69,6 +76,9 @@ private:
 
     /** \brief To check (and set) if sort order is descending **/
     bool             m_sort_desc;
+
+    /** List of date filters **/
+    std::vector<DateFilter> m_date_filters;
 
 public:
 

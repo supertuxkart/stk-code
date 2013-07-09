@@ -21,7 +21,6 @@
 #include <IMeshSceneNode.h>
 
 #include "audio/music_manager.hpp"
-#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
@@ -258,7 +257,7 @@ void SoccerWorld::moveKartAfterRescue(AbstractKart* kart)
     kart->getBody()->setCenterOfMassTransform(pos);
 
     //project kart to surface of track
-    bool kart_over_ground = m_physics->projectKartDownwards(kart);
+    bool kart_over_ground = m_track->findGround(kart);
 
     if (kart_over_ground)
     {

@@ -31,10 +31,11 @@ void Binding::serialize(std::ofstream& stream) const
            << "event=\""     << m_type      << "\" "
            << "character=\"" << m_character << "\" ";
 
-    // Only serialize the direction for stick motions
+    // Only serialize the direction and the range for stick motions
     if (m_type == Input::IT_STICKMOTION)
     {
         stream << "direction=\"" << m_dir    << "\" ";
+        stream << "range=\""     << m_range    << "\" ";
     }
 }   // serialize
 
@@ -44,6 +45,7 @@ bool Binding::deserialize(irr::io::IrrXMLReader* xml)
     const char *id_string       = xml->getAttributeValue("id");
     const char *event_string    = xml->getAttributeValue("event");
     const char *dir_string      = xml->getAttributeValue("direction");
+    const char *range_string    = xml->getAttributeValue("range");
     const char *character       = xml->getAttributeValue("character");
 
     // Proceed only if neccesary tags were found
@@ -67,7 +69,18 @@ bool Binding::deserialize(irr::io::IrrXMLReader* xml)
             printf("WARNING: IT_STICKMOTION without direction, ignoring.\n");
             return false;
         }
-        m_dir = (Input::AxisDirection)atoi(dir_string);
+        
+        // If the action is a stick motion & a range is defined
+        if (range_string == NULL)
+        {
+            m_range = Input::AR_HALF;
+        }
+        else
+        {
+            m_range = (Input::AxisRange)atoi(range_string);
+        }
+   
+        m_dir   = (Input::AxisDirection)atoi(dir_string);
 
     }   // if m_type!=stickmotion
     return true;
@@ -263,7 +276,14 @@ irr::core::stringw Binding::getAsString() const
             else
             {
                 //I18N: to appear in input configuration screen, for gamepad axes
-                s = _("Axis %d %s", m_id, (m_dir == Input::AD_NEGATIVE) ? L"-" : L"+");
+                if (m_range == Input::AR_HALF)
+                    s = _("Axis %d %s", m_id, (m_dir == Input::AD_NEGATIVE) ? L"-" : L"+");
+                else
+                {
+                    irr::core::stringw inv = _("inverted");
+                    s = _("Axis %d %s", m_id, (m_dir == Input::AD_NEGATIVE) ? inv : L"");
+                }
+
             }
             break;
         case Input::IT_STICKBUTTON:

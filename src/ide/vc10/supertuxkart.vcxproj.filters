@@ -672,9 +672,6 @@
     <ClCompile Include="..\..\physics\btKartRaycast.cpp">
       <Filter>Source Files\physics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\states_screens\minimal_race_gui.cpp">
-      <Filter>Source Files\states_screens</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\graphics\rain.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>
@@ -869,6 +866,9 @@
     </ClCompile>
     <ClCompile Include="..\..\config\saved_grand_prix.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\guiengine\widgets\rating_bar_widget.cpp">
+      <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1445,9 +1445,6 @@
     <ClInclude Include="..\..\physics\btKartRaycast.hpp">
       <Filter>Header Files\physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\states_screens\minimal_race_gui.hpp">
-      <Filter>Header Files\states_screens</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\graphics\rain.hpp">
       <Filter>Header Files\graphics</Filter>
     </ClInclude>
@@ -1666,6 +1663,9 @@
     </ClInclude>
     <ClInclude Include="..\..\config\saved_grand_prix.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\guiengine\widgets\rating_bar_widget.hpp">
+      <Filter>Header Files\guiengine\widgets</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

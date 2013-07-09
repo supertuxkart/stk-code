@@ -302,7 +302,33 @@ XMLNode *FileManager::createXMLTree(const std::string &filename)
         }
         return NULL;
     }
-}   // getXMLTree
+}   // createXMLTree
+
+//-----------------------------------------------------------------------------
+/** Reads in XML from a string and converts it into a XMLNode tree.
+ *  \param content the string containing the XML content.
+ */
+XMLNode *FileManager::createXMLTreeFromString(const std::string & content)
+{
+    try
+    {
+        char *b = new char[content.size()];
+        memcpy(b, content.c_str(), content.size());
+        io::IReadFile * ireadfile = m_file_system->createMemoryReadFile(b, strlen(b), "tempfile", true);
+        io::IXMLReader * reader = m_file_system->createXMLReader(ireadfile);
+        XMLNode* node = new XMLNode(reader);
+        reader->drop();
+        return node;
+    }
+    catch (std::runtime_error& e)
+    {
+        if (UserConfigParams::logMisc())
+        {
+            Log::error("FileManager", "createXMLTreeFromString: %s\n", e.what());
+        }
+        return NULL;
+    }
+}   // createXMLTreeFromString
 
 //-----------------------------------------------------------------------------
 /** In order to add and later remove paths we have to specify the absolute

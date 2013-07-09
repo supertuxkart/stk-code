@@ -164,6 +164,8 @@ supertuxkart_SOURCES = \
  guiengine/widgets/text_box_widget.hpp \
  guiengine/widgets/progress_bar_widget.cpp \
  guiengine/widgets/progress_bar_widget.hpp \
+ guiengine/widgets/rating_bar_widget.cpp \
+ guiengine/widgets/rating_bar_widget.hpp \
  input/binding.cpp \
  input/binding.hpp \
  input/device_manager.cpp \
@@ -397,8 +399,6 @@ supertuxkart_SOURCES = \
  states_screens/kart_selection.hpp \
  states_screens/main_menu_screen.cpp \
  states_screens/main_menu_screen.hpp \
- states_screens/minimal_race_gui.cpp \
- states_screens/minimal_race_gui.hpp \
  states_screens/options_screen_audio.cpp \
  states_screens/options_screen_audio.hpp \
  states_screens/options_screen_input.cpp \

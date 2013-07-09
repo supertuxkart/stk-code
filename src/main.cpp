@@ -171,6 +171,9 @@
 #include "network/network_manager.hpp"
 #include "network/client_network_manager.hpp"
 #include "network/server_network_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/lobby_room_protocol.hpp"
+#include "online/current_online_user.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -354,7 +357,7 @@ void cmdLineHelp (char* invocation)
     "  -N,  --no-start-screen  Immediately start race without showing a "
                               "menu.\n"
     "  -R,  --race-now         Same as -N but also skip the ready-set-go phase"
-                              "and the music.\n"
+                              " and the music.\n"
     "  -t,  --track NAME       Start at track NAME (see --list-tracks).\n"
     "       --gp NAME          Start the specified Grand Prix.\n"
     "       --stk-config FILE  use ./data/FILE instead of "
@@ -391,6 +394,7 @@ void cmdLineHelp (char* invocation)
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
     "       --no-graphics      Do not display the actual race.\n"
+    "       --with-profile     Enables the profile mode.\n"
     "       --demo-mode t      Enables demo mode after t seconds idle time in "
                                "main menu.\n"
     "       --demo-tracks t1,t2 List of tracks to be used in demo mode. No\n"
@@ -434,8 +438,6 @@ int handleCmdLinePreliminary(int argc, char **argv)
     {
         if(argv[i][0] != '-') continue;
         if (!strcmp(argv[i], "--help" ) ||
-            !strcmp(argv[i], "-help"  ) ||
-            !strcmp(argv[i], "--help" ) ||
             !strcmp(argv[i], "-help"  ) ||
             !strcmp(argv[i], "-h"     )     )
         {
@@ -606,6 +608,9 @@ int handleCmdLine(int argc, char **argv)
 {
     int n;
     char s[1024];
+    
+    bool try_login = false;
+    irr::core::stringw login, password;
 
     for(int i=1; i<argc; i++)
     {
@@ -683,18 +688,27 @@ int handleCmdLine(int argc, char **argv)
         {
             AIBaseController::enableDebug();
         }
-        else if(sscanf(argv[i], "--server=%d",&n)==1)
+        else if(sscanf(argv[i], "--port=%d",&n))
         {
-            NetworkManager::getInstance<ServerNetworkManager>(); //create the server
             UserConfigParams::m_server_port = n;
         }
         else if( !strcmp(argv[i], "--server") )
         {
             NetworkManager::getInstance<ServerNetworkManager>();
+            Log::info("main", "Creating a server network manager.");
         }
-        else if( sscanf(argv[i], "--port=%d", &n) )
+        else if( sscanf(argv[i], "--max-players=%d", &n) )
         {
-            UserConfigParams::m_server_port=n;
+            UserConfigParams::m_server_max_players=n;
+        }
+        else if( sscanf(argv[i], "--login=%1023s", s) )
+        {
+            login = s;
+            try_login = true;
+        }
+        else if( sscanf(argv[i], "--password=%1023s", s) )
+        {
+            password = s;
         }
         else if ( sscanf(argv[i], "--gfx=%d", &n) )
         {
@@ -825,9 +839,23 @@ int handleCmdLine(int argc, char **argv)
                               argv[i+1]);
                 }
                 else if (t->isArena())
+                {
+                    //if it's arena, don't create ai karts
+                    const std::vector<std::string> l;
+                    race_manager->setDefaultAIKartList(l);
+                    // Add 1 for the player kart
+                    race_manager->setNumKarts(1);
                     race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+                }
                 else if(t->isSoccer())
+                {
+                    //if it's soccer, don't create ai karts
+                    const std::vector<std::string> l;
+                    race_manager->setDefaultAIKartList(l);
+                    // Add 1 for the player kart
+                    race_manager->setNumKarts(1);
                     race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
+                }
             }
             else
             {
@@ -929,17 +957,33 @@ int handleCmdLine(int argc, char **argv)
         }
         else if ( !strcmp(argv[i], "--laps") && i+1<argc )
         {
-            Log::verbose("main", "You choose to have %d laps.",
-                         atoi(argv[i+1]) );
-            race_manager->setNumLaps(atoi(argv[i+1]));
-            i++;
+            int laps = atoi(argv[i+1]);
+            if (laps < 0)
+            {
+                Log::error("main", "Invalid number of laps: %s.\n", argv[i+1] );
+                return 0;
+            }
+            else
+            {
+                Log::verbose("main", "You choose to have %d laps.", laps);
+                race_manager->setNumLaps(laps);
+                i++;
+            }
         }
         else if( sscanf(argv[i], "--profile-laps=%d",  &n)==1)
         {
-            Log::verbose("main", "Profiling %d laps.",n);
-            UserConfigParams::m_no_start_screen = true;
-            ProfileWorld::setProfileModeLaps(n);
-            race_manager->setNumLaps(n);
+            if (n < 0)
+            {
+                Log::error("main", "Invalid number of profile-laps: %i.\n", n );
+                return 0;
+            }
+            else
+            {
+                Log::verbose("main", "Profiling %d laps.",n);
+                UserConfigParams::m_no_start_screen = true;
+                ProfileWorld::setProfileModeLaps(n);
+                race_manager->setNumLaps(n);
+            }
         }
         else if( sscanf(argv[i], "--profile-time=%d",  &n)==1)
         {
@@ -949,6 +993,9 @@ int handleCmdLine(int argc, char **argv)
             race_manager->setNumLaps(999999); // profile end depends on time
         }
         else if( !strcmp(argv[i], "--no-graphics") )
+        {
+        }
+        else if( !strcmp(argv[i], "--with-profile") )
         {
             // Set default profile mode of 1 lap if we haven't already set one
             if (!ProfileWorld::isProfileMode()) {
@@ -1059,6 +1106,12 @@ int handleCmdLine(int argc, char **argv)
         UserConfigParams::m_sfx = false;  // Disable sound effects
         UserConfigParams::m_music = false;// and music when profiling
     }
+    
+    if (try_login)
+    {
+        irr::core::stringw s;
+        CurrentOnlineUser::get()->signIn(login, password, s);
+    }
 
     return 1;
 }   // handleCmdLine
@@ -1139,8 +1192,6 @@ void initRest()
     kart_properties_manager = new KartPropertiesManager();
     projectile_manager      = new ProjectileManager    ();
     powerup_manager         = new PowerupManager       ();
-    // If the server has been created (--server option), this will do nothing:
-    NetworkManager::getInstance<ClientNetworkManager>(); 
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
     KartPropertiesManager::addKartSearchDir(
@@ -1181,6 +1232,7 @@ void cleanSuperTuxKart()
 
     if(INetworkHttp::get())
         INetworkHttp::get()->stopNetworkThread();
+    //delete in reverse order of what they were created in.
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
     Referee::cleanup();
@@ -1332,6 +1384,15 @@ int main(int argc, char *argv[] )
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);
+        
+        // load the network manager
+        // If the server has been created (--server option), this will do nothing (just a warning):
+        NetworkManager::getInstance<ClientNetworkManager>(); 
+        NetworkManager::getInstance()->run();
+        if (NetworkManager::getInstance()->isServer())
+        {
+            ProtocolManager::getInstance()->requestStart(new ServerLobbyRoomProtocol());
+        }
 
         addons_manager->checkInstalledAddons();
 
@@ -1448,7 +1509,7 @@ int main(int argc, char *argv[] )
         {
             // This will setup the race manager etc.
             history->Load();
-//            network_manager->setupPlayerKartInfo();
+            race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
             main_loop->run();
             // well, actually run() will never return, since
@@ -1466,7 +1527,7 @@ int main(int argc, char *argv[] )
                 // Quickstart (-N)
                 // ===============
                 // all defaults are set in InitTuxkart()
-//                network_manager->setupPlayerKartInfo();
+                race_manager->setupPlayerKartInfo();
                 race_manager->startNew(false);
             }
         }
@@ -1476,7 +1537,7 @@ int main(int argc, char *argv[] )
             // =========
             race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
             race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
-//            network_manager->setupPlayerKartInfo();
+            race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
         }
         main_loop->run();
@@ -1502,6 +1563,9 @@ int main(int argc, char *argv[] )
         delete wiimote_manager;
 #endif
 
+    // If the window was closed in the middle of a race, remove players,
+    // so we don't crash later when StateManager tries to access input devices.
+    StateManager::get()->resetActivePlayers();
     if(input_manager) delete input_manager; // if early crash avoid delete NULL
 
     cleanSuperTuxKart();

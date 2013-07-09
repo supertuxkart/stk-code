@@ -64,8 +64,17 @@ RaceGUI::RaceGUI()
     m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
     m_marker_ai_size        = (int)( 14.0f * scaling);
     m_marker_player_size    = (int)( 16.0f * scaling);
-    m_map_width             = (int)(100.0f * scaling);
-    m_map_height            = (int)(100.0f * scaling);
+    
+    if (UserConfigParams::m_minimal_race_gui)
+    {
+        m_map_width             = (int)(160.0f * scaling);
+        m_map_height            = (int)(160.0f * scaling);
+    }
+    else
+    {
+        m_map_width             = (int)(100.0f * scaling);
+        m_map_height            = (int)(100.0f * scaling);
+    }
     m_map_left              = (int)( 10.0f * scaling);
     m_map_bottom            = (int)( 10.0f * scaling);
 
@@ -177,7 +186,11 @@ void RaceGUI::renderGlobal(float dt)
 
     drawGlobalMiniMap();
 
-    if (!m_is_tutorial) drawGlobalPlayerIcons(m_map_height);
+    if (!m_is_tutorial &&
+        (UserConfigParams::m_minimal_race_gui == false || world->getIdent() == IDENT_STRIKES))
+    {
+        drawGlobalPlayerIcons(m_map_height);
+    }
 }   // renderGlobal
 
 //-----------------------------------------------------------------------------
@@ -203,7 +216,9 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     if(!World::getWorld()->isRacePhase()) return;
 
     drawPowerupIcons    (kart, viewport, scaling);
-    drawSpeedAndEnergy  (kart, viewport, scaling);
+    
+    if (UserConfigParams::m_minimal_race_gui == false)
+        drawSpeedAndEnergy  (kart, viewport, scaling);
 
     if (!m_is_tutorial)
         drawRankLap     (kart, viewport);

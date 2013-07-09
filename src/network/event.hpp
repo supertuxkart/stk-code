@@ -20,8 +20,8 @@
 #define EVENT_HPP
 
 #include "network/stk_peer.hpp"
-#include <stdint.h>
-#include <string>
+#include "network/network_string.hpp"
+#include "utils/types.hpp"
 
 /*!
  * \enum EVENT_TYPE
@@ -62,7 +62,7 @@ class Event
         void removeFront(int size);
     
         EVENT_TYPE type;    //!< Type of the event.
-        std::string data;   //!< Copy of the data passed by the event.
+        NetworkString data;   //!< Copy of the data passed by the event.
         STKPeer* peer;      //!< Pointer to the peer that triggered that event.
     
     private:

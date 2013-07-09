@@ -260,8 +260,6 @@ public:
         float       m_overall_time;
         /** Needed for restart. */
         float       m_last_time;
-        /** Previous finished position. */
-        int         m_prev_finish_pos;
         /** Kart type: AI, player, network player etc. */
         KartType    m_kart_type;
         /** Player controling the kart, for AI: -1 */
@@ -277,7 +275,7 @@ public:
                    int init_gp_rank, KartType kt) :
                    m_ident(ident), m_score(0), m_last_score(0),
                    m_overall_time(0.0f), m_last_time(0.0f),
-                   m_prev_finish_pos(prev_finish_pos), m_kart_type(kt),
+                   m_kart_type(kt),
                    m_local_player_id(local_player_id),
                    m_global_player_id(global_player_id),
                    m_gp_rank(init_gp_rank)
@@ -676,6 +674,9 @@ public:
       */
     void  startSingleRace(const std::string &track_ident, const int num_laps,
                           bool from_overworld);
+    /** Receive and store the information from sendKartsInformation()
+      */
+    void  setupPlayerKartInfo();
 
     bool raceWasStartedFromOverworld() const
     {

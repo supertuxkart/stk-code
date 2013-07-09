@@ -30,6 +30,7 @@ class Material;
 enum EmitterShape
 {
     EMITTER_POINT,
+    EMITTER_SPHERE,
     EMITTER_BOX
 };
 
@@ -77,6 +78,9 @@ private:
     /** For box emitters only */
     float m_box_x, m_box_y, m_box_z;
 
+    /** For sphere emitters only */
+    float m_sphere_radius;
+
     /** Distance from camera at which particles start fading out, or negative if disabled */
     float m_fade_away_start, m_fade_away_end;
 
@@ -85,6 +89,10 @@ private:
     std::string m_name;
 
     std::string m_material_file;
+
+    bool m_has_scale_affector;
+    float m_scale_affector_factor_x;
+    float m_scale_affector_factor_y;
 
 public:
 
@@ -119,6 +127,8 @@ public:
     float     getBoxSizeY    () const { return m_box_y;           }
     float     getBoxSizeZ    () const { return m_box_z;           }
 
+    float     getSphereRadius() const { return m_sphere_radius;    }
+
     int       getAngleSpread () const { return m_angle_spread;    }
 
     float     getVelocityX   () const { return m_velocity_x;      }
@@ -137,6 +147,11 @@ public:
     void      setBoxSizeXZ    (float x, float z) { m_box_x = x; m_box_z = z;   }
 
     int       getEmissionDecayRate() const { return m_emission_decay_rate; }
+
+
+    bool      hasScaleAffector() const { return m_has_scale_affector; }
+    float     getScaleAffectorFactorX() const { return m_scale_affector_factor_x; }
+    float     getScaleAffectorFactorY() const { return m_scale_affector_factor_y; };
 
     std::string getName() const { return m_name; }
 };

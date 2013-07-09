@@ -21,7 +21,6 @@
 
 #include "items/plunger.hpp"
 
-#include "graphics/irr_driver.hpp"
 #include "io/xml_node.hpp"
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"

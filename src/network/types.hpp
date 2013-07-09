@@ -22,8 +22,9 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
+#include "utils/types.hpp"
+
 #include <string>
-#include <stdint.h>
 
 /*! \class CallbackObject
  *  \brief Class that must be inherited to pass objects to protocols.
@@ -63,6 +64,8 @@ class PlayerLogin : public CallbackObject
     std::string username;   //!< Username of the player
     std::string password;   //!< Password of the player
 };
+
+uint32_t turnEndianness(uint32_t val);
 
 
 #endif // TYPES_HPP

@@ -164,7 +164,12 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
-                kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
+                
+                if (control_is_pressed)
+                    kart->setPowerup(PowerupManager::POWERUP_SWATTER, 10000);
+                else
+                    kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL, 10000);
+                    
 #ifdef FORCE_RESCUE_ON_FIRST_KART
                 // Can be useful for debugging places where the AI gets into
                 // a rescue loop: rescue, drive, crash, rescue to same place
@@ -176,6 +181,7 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
+                
                 kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
             }
             break;
@@ -373,6 +379,8 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
                                    != m_sensed_input_high_gamepad.end();
         bool inverse_id_was_high = m_sensed_input_high_gamepad.find(-input_id)
                                    != m_sensed_input_high_gamepad.end();
+        bool id_was_zero         = m_sensed_input_zero_gamepad.find(button)
+                                   != m_sensed_input_zero_gamepad.end();
 
         // A stick was pushed far enough (for the first time) to count as
         // 'triggered' - save the axis (coded with direction in the button
@@ -382,31 +390,56 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
         // to register this as soon as the value is high enough.
         if (!id_was_high && abs(value) > Input::MAX_VALUE*6.0f/7.0f)
         {
-            m_sensed_input_high_gamepad.insert(input_id);
+            if(inverse_id_was_high && !id_was_zero) {
+                Input sensed_input;
+                sensed_input.m_type           = type;
+                sensed_input.m_device_id      = deviceID;
+                sensed_input.m_button_id      = button;
+                sensed_input.m_axis_direction = (value>=0) ? Input::AD_POSITIVE
+                                                           : Input::AD_NEGATIVE;
+                sensed_input.m_axis_range     = Input::AR_FULL;
+                sensed_input.m_character      = deviceID;
+                OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+
+            }
+            else m_sensed_input_high_gamepad.insert(input_id);
         }
-        else if ( abs(value) < Input::MAX_VALUE/8.0f && id_was_high )
+        else if ( abs(value) < Input::MAX_VALUE/8.0f )
         {
-            Input sensed_input;
-            sensed_input.m_type           = type;
-            sensed_input.m_device_id      = deviceID;
-            sensed_input.m_button_id      = button;
-            sensed_input.m_axis_direction = value>=0 ? Input::AD_POSITIVE
-                                                     : Input::AD_NEGATIVE;
-            sensed_input.m_character      = deviceID;
-            OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
-        }
-        else if ( abs(value) < Input::MAX_VALUE/8.0f && inverse_id_was_high )
-        {
-            Input sensed_input;
-            sensed_input.m_type           = type;
-            sensed_input.m_device_id      = deviceID;
-            sensed_input.m_button_id      = button;
-            // Since the inverse direction was high (i.e. stick went from
-            // +30000 to -100), we have to inverse the sign
-            sensed_input.m_axis_direction = value>=0 ? Input::AD_NEGATIVE
-                                                     : Input::AD_POSITIVE;
-            sensed_input.m_character      = deviceID;
-            OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+            if( id_was_high )
+            {
+                Input sensed_input;
+                sensed_input.m_type           = type;
+                sensed_input.m_device_id      = deviceID;
+                sensed_input.m_button_id      = button;
+                sensed_input.m_axis_direction = (value>=0) == id_was_zero
+                                                           ? Input::AD_POSITIVE
+                                                           : Input::AD_NEGATIVE;
+                sensed_input.m_axis_range     = id_was_zero ? Input::AR_HALF
+                                                            : Input::AR_FULL;
+                sensed_input.m_character      = deviceID;
+                OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+            }
+            else if( inverse_id_was_high )
+            {
+                Input sensed_input;
+                sensed_input.m_type           = type;
+                sensed_input.m_device_id      = deviceID;
+                sensed_input.m_button_id      = button;
+                // Since the inverse direction was high (i.e. stick went from
+                // +30000 to -100), we have to inverse the sign
+                sensed_input.m_axis_direction = (value>=0) == id_was_zero
+                                                           ? Input::AD_NEGATIVE
+                                                           : Input::AD_POSITIVE;
+                sensed_input.m_axis_range     = id_was_zero ? Input::AR_HALF
+                                                            : Input::AR_FULL;
+                sensed_input.m_character      = deviceID;
+                OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+            }
+            else
+            {
+                m_sensed_input_zero_gamepad.insert(button);
+            }
         }
         break;
         }
@@ -479,7 +512,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
     PlayerAction    action;
     bool action_found = m_device_manager->translateInput(type, deviceID,
                                                          button, axisDirection,
-                                                         value, m_mode,
+                                                         &value, m_mode,
                                                          &player, &action);
 
     // in menus, some keyboard keys are standard (before each player selected
@@ -962,6 +995,7 @@ void InputManager::setMode(InputDriverMode new_mode)
 
                     //irr_driver->showPointer();
                     m_sensed_input_high_gamepad.clear();
+                    m_sensed_input_zero_gamepad.clear();
                     m_sensed_input_high_kbd.clear();
 
                     // The order is deliberate just in case someone starts

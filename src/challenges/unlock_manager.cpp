@@ -434,12 +434,12 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
         if (c->getNumTrophies() > points_before &&
             c->getNumTrophies() <= points_now      )
         {
-            if (c->getTrackId() != "")
+            if (c->getMode() == ChallengeData::CM_SINGLE_RACE && c->getTrackId() != "")
             {
                 if (!getCurrentSlot()->isLocked(c->getTrackId()))
                     tracks.push_back(c->getTrackId());
             }
-            else if (c->getGPId() != "")
+            else if (c->getMode() == ChallengeData::CM_GRAND_PRIX && c->getGPId() != "")
             {
                 if (!getCurrentSlot()->isLocked(c->getGPId()))
                     gps.push_back(c->getGPId());

@@ -28,7 +28,6 @@
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "network/network_manager.hpp"
 #include "race/highscores.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/race_manager.hpp"
@@ -262,6 +261,11 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eve
     if (eventSource == "start" )
     {
         onEnterPressedInternal();
+        return GUIEngine::EVENT_BLOCK;
+    }
+    else if (eventSource == "closePopup")
+    {
+        ModalDialog::dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "reverse")

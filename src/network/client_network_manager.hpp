@@ -31,10 +31,7 @@ class ClientNetworkManager : public NetworkManager
         }
         
         virtual void run();
-        
-        bool connectToHost(std::string serverNickname);
-        
-        virtual void sendPacket(const char* data);
+        virtual void sendPacket(const NetworkString& data);
         
         STKPeer* getPeer();
         virtual bool isServer()         { return false; }
@@ -42,6 +39,8 @@ class ClientNetworkManager : public NetworkManager
     protected:
         ClientNetworkManager();
         virtual ~ClientNetworkManager();
+        
+        pthread_t* m_thread_keyboard;
 };
 
 #endif // CLIENT_NETWORK_MANAGER_HPP

@@ -198,7 +198,6 @@ void EasterEggHunt::getKartsDisplayInfo(
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
-        std::ostringstream o;
         //I18n: number of collected eggs / overall number of eggs
         rank_info.m_text = StringUtils::insertValues(_("Eggs: %d / %d"),
                                                     m_eggs_collected[i],

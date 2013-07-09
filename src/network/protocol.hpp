@@ -21,8 +21,7 @@
 
 #include "network/protocol_manager.hpp"
 #include "network/types.hpp"
-
-#include <stdint.h>
+#include "utils/types.hpp"
 
 /** \enum PROTOCOL_TYPE
   * \brief The types that protocols can have. This is used to select which protocol receives which event.
@@ -90,6 +89,10 @@ class Protocol
          * \brief Called by the protocol listener as often as possible. Must be re-defined.
          */
         virtual void update() = 0;
+        /*! 
+         * \brief Called when the protocol is to be killed.
+         */
+        virtual void kill();
         
         /*! 
          * \brief Method to get a protocol's type.

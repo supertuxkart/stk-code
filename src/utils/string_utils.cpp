@@ -111,6 +111,23 @@ namespace StringUtils
     }   // getExtension
 
     //-------------------------------------------------------------------------
+    /** Checks if the input string is not empty. ( = has characters different from a space)
+     */
+    bool notEmpty(const irr::core::stringw& input)
+    {
+        const int size = input.size();
+        int nonEmptyChars = 0;
+        for (int n=0; n<size; n++)
+        {
+            if (input[n] != L' ')
+            {
+                nonEmptyChars++;
+            }
+        }
+        return (nonEmptyChars > 0);
+    }   // getExtension
+
+    //-------------------------------------------------------------------------
     /** Returns a string converted to upper case.
      */
     std::string toUpperCase(const std::string& str)

@@ -47,6 +47,7 @@ irr::core::stringw DeviceConfig::getMappingIdString (const PlayerAction action) 
         const Input::InputType type = m_bindings[action].getType();
         const int id = m_bindings[action].getId();
         const Input::AxisDirection dir = m_bindings[action].getDirection();
+        const Input::AxisRange range = m_bindings[action].getRange();
 
         switch (type)
         {
@@ -60,6 +61,8 @@ irr::core::stringw DeviceConfig::getMappingIdString (const PlayerAction action) 
                 returnString += id;
                 returnString += "$";
                 returnString += dir;
+                returnString += "$";
+                returnString += range;
                 break;
 
             case Input::IT_STICKBUTTON:
@@ -114,9 +117,10 @@ void DeviceConfig::setBinding ( const PlayerAction      action,
                                 const Input::InputType  type,
                                 const int               id,
                                 Input::AxisDirection    direction,
+                                Input::AxisRange        range,
                                 wchar_t                 character)
 {
-    m_bindings[action].set(type, id, direction, character);
+    m_bindings[action].set(type, id, direction, range, character);
 }
 
 //------------------------------------------------------------------------------
@@ -124,7 +128,7 @@ void DeviceConfig::setBinding ( const PlayerAction      action,
 // Don't call this directly unless you are KeyboardDevice or GamepadDevice
 bool DeviceConfig::getGameAction(Input::InputType    type,
                                  const int           id,
-                                 const int           value,
+                                 int*                value, /* inout */
                                  PlayerAction*       action /* out */ )
 {
     return doGetAction(type, id, value, PA_FIRST_GAME_ACTION, PA_LAST_GAME_ACTION, action);
@@ -135,7 +139,7 @@ bool DeviceConfig::getGameAction(Input::InputType    type,
 // Don't call this directly unless you are KeyboardDevice or GamepadDevice
 bool DeviceConfig::getMenuAction(Input::InputType    type,
                                  const int           id,
-                                 const int           value,
+                                 int*                value,
                                  PlayerAction*       action /* out */ )
 {
     return doGetAction(type, id, value, PA_FIRST_MENU_ACTION, PA_LAST_MENU_ACTION, action);
@@ -145,7 +149,7 @@ bool DeviceConfig::getMenuAction(Input::InputType    type,
 
 bool DeviceConfig::doGetAction(Input::InputType    type,
                                const int           id,
-                               const int           value,
+                               int*                value, /* inout */
                                const PlayerAction  firstActionToCheck,
                                const PlayerAction  lastActionToCheck,
                                PlayerAction*       action /* out */ )
@@ -162,13 +166,30 @@ bool DeviceConfig::doGetAction(Input::InputType    type,
 
             if (type == Input::IT_STICKMOTION)
             {
-                if ( ((m_bindings[n].getDirection() == Input::AD_POSITIVE)
-                       && (value > 0))                                      ||
-                     ((m_bindings[n].getDirection() == Input::AD_NEGATIVE)
-                       && (value < 0))                                        )
+                if(m_bindings[n].getRange() == Input::AR_HALF)
                 {
-                    success = true;
-                   *action = (PlayerAction)n;
+                    if ( ((m_bindings[n].getDirection() == Input::AD_POSITIVE)
+                           && (*value > 0))                                      ||
+                         ((m_bindings[n].getDirection() == Input::AD_NEGATIVE)
+                           && (*value < 0))                                        )
+                    {
+                        success = true;
+                       *action = (PlayerAction)n;
+                    }
+                }
+                else
+                {
+                    if ( ((m_bindings[n].getDirection() == Input::AD_POSITIVE)
+                           && (*value != -Input::MAX_VALUE))                     ||
+                         ((m_bindings[n].getDirection() == Input::AD_NEGATIVE)
+                           && (*value != Input::MAX_VALUE))                        )
+                    {
+                        success = true;
+                        *action = (PlayerAction)n;
+                        if(m_bindings[n].getDirection() == Input::AD_NEGATIVE)
+                            *value = -*value;
+                        *value = (*value + Input::MAX_VALUE) / 2;
+                    }
                 }
             }
             else

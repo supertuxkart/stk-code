@@ -437,7 +437,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         if (challenges[n].m_challenge_id != "tutorial" &&
             challenges[n].getForceField().m_is_locked) continue;
 
-        if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < CHALLENGE_DISTANCE_SQUARED)
+        if ((kart_xyz - Vec3(challenges[n].m_position)).length2_2d() < CHALLENGE_DISTANCE_SQUARED &&
+            fabsf(kart_xyz[1] - challenges[n].m_position.Y) < CHALLENGE_HEIGHT)
         {
             m_close_to_a_challenge = true;
 

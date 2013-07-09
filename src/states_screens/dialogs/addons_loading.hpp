@@ -44,6 +44,7 @@ private:
     /** The addon to load. */
     Addon                         m_addon;
     void startDownload();
+    void stopDownload();
     void doInstall();
     void doUninstall();
 

@@ -21,7 +21,6 @@
 
 #include "btBulletDynamicsCommon.h"
 
-#include "graphics/irr_driver.hpp"
 #include "utils/vec3.hpp"
 
 /**

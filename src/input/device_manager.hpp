@@ -74,7 +74,7 @@ private:
                                         int deviceID,
                                         int btnID,
                                         int axisDir,
-                                        int value,
+                                        int* value /* inout */,
                                         InputManager::InputDriverMode mode,
                                         StateManager::ActivePlayer **player /* out */,
                                         PlayerAction *action /* out */);
@@ -151,7 +151,7 @@ public:
                          int deviceID,
                          int btnID,
                          int axisDir,
-                         int value,
+                         int *value /* inout */,
                          InputManager::InputDriverMode mode,
                          StateManager::ActivePlayer** player /* out */,
                          PlayerAction* action /* out */ );

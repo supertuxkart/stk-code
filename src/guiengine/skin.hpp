@@ -293,6 +293,8 @@ namespace GUIEngine
                         const bool pressed, const bool focused);
         void drawProgress(Widget* w, const core::rect< s32 > &rect,
                           const bool pressed, const bool focused);
+        void drawRatingBar(Widget* w, const core::rect< s32 > &rect,
+                          const bool pressed, const bool focused);
         void drawRibbon(const core::rect< s32 > &rect, Widget* widget,
                         const bool pressed, bool focused);
         void drawRibbonChild(const core::rect< s32 > &rect, Widget* widget,

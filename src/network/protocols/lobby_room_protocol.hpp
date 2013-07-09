@@ -21,6 +21,9 @@
 
 #include "network/protocol.hpp"
 
+#include "network/game_setup.hpp"
+#include "network/network_string.hpp"
+
 /*!
  * \class LobbyRoomProtocol
  * \brief Class used while the game is being prepared.
@@ -33,15 +36,67 @@ class LobbyRoomProtocol : public Protocol
         LobbyRoomProtocol(CallbackObject* callback_object);
         virtual ~LobbyRoomProtocol();
         
+        virtual void notifyEvent(Event* event) = 0;
+        virtual void setup() = 0;
+        virtual void update() = 0;
+        
+    protected:
+        GameSetup* m_setup; //!< The game setup.
+};
+
+class ClientLobbyRoomProtocol : public LobbyRoomProtocol
+{
+    public:
+        ClientLobbyRoomProtocol(const TransportAddress& server_address) : LobbyRoomProtocol(NULL) 
+            { m_server_address = server_address;}
+        virtual ~ClientLobbyRoomProtocol() {}
+    
         virtual void notifyEvent(Event* event);
-        
         virtual void setup();
-        
         virtual void update();
         
         void sendMessage(std::string message);
         
     protected:
+        TransportAddress m_server_address; 
+        
+        enum STATE
+        {
+            NONE,
+            LINKED,
+            REQUESTING_CONNECTION,
+            CONNECTED,
+            DONE
+        };
+        STATE m_state;
+};
+
+class ServerLobbyRoomProtocol : public LobbyRoomProtocol
+{
+    public:
+        ServerLobbyRoomProtocol() : LobbyRoomProtocol(NULL) {}
+        virtual ~ServerLobbyRoomProtocol() {}
+        
+        virtual void notifyEvent(Event* event);
+        virtual void setup();
+        virtual void update();
+    
+    protected:
+        uint8_t m_next_id; //!< Next id to assign to a peer.
+        std::vector<TransportAddress> m_peers;
+        std::vector<uint32_t> m_incoming_peers_ids;
+        uint32_t m_current_protocol_id;
+        TransportAddress m_public_address;
+        
+        enum STATE
+        {
+            NONE,
+            GETTING_PUBLIC_ADDRESS,
+            LAUNCHING_SERVER,
+            WORKING,
+            DONE
+        };
+        STATE m_state;
 };
 
 #endif // LOBBY_ROOM_PROTOCOL_HPP

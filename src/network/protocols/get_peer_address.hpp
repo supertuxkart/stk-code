@@ -24,16 +24,16 @@
 class GetPeerAddress : public Protocol
 {
     public:
-        GetPeerAddress(CallbackObject* callback_object);
+        GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object);
         virtual ~GetPeerAddress();
         
         virtual void notifyEvent(Event* event);
         virtual void setup();
         virtual void update();
         
-        void setPeerName(std::string peer_name);
+        void setPeerID(uint32_t m_peer_id);
     protected:
-        std::string m_peer_name;
+        uint32_t m_peer_id;
         
         enum STATE 
         {

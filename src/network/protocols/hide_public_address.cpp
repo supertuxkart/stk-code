@@ -18,10 +18,12 @@
 
 #include "network/protocols/hide_public_address.hpp"
 
-#include "network/http_functions.hpp"
+#include "online/http_connector.hpp"
+#include "online/current_online_user.hpp"
+#include "config/user_config.hpp"
 #include "utils/log.hpp"
 
-HidePublicAddress::HidePublicAddress(CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_SILENT)
+HidePublicAddress::HidePublicAddress() : Protocol(NULL, PROTOCOL_SILENT)
 {
 }
 
@@ -42,32 +44,33 @@ void HidePublicAddress::update()
 {
     if (m_state == NONE)
     {
-        char url[512];
-        sprintf(url, "http://stkconnect.freeserver.me/log.php?logout&nick=%s&pwd=%s", m_username.c_str(), m_password.c_str());
-        std::string result = HTTP::getPage(url);
-        if (result[0] == 's' && result[1] == 'u' && result[2] == 'c' && result[3] == 'c' && result[4] == 'e' && result[5] == 's' && result[6] == 's')
+        HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+        connector->setParameter("id",CurrentOnlineUser::get()->getUserID());
+        connector->setParameter("token",CurrentOnlineUser::get()->getToken());
+        connector->setParameter("action","unset");
+
+        const XMLNode * result = connector->getXMLFromPage();
+        std::string rec_success;
+
+        if(result->get("success", &rec_success))
         {
-            Log::info("HidePublicAddress", "Public address hidden successfully.\n");
-            m_state = DONE;
+            if(rec_success == "yes")
+            {
+                Log::info("ShowPublicAddress", "Address hidden successfully.");
+            }
+            else
+            {
+                Log::error("ShowPublicAddress", "Fail to hide address.");
+            }
         }
-        if (result[0] == 'f' && result[1] == 'a' && result[2] == 'i' && result[3] == 'l')
+        else
         {
-            Log::warn("HidePublicAddress", "Public address still visible. Re-set nick:password and retry.\n");
-            m_state = NONE;
-            pause();
+            Log::error("ShowPublicAddress", "Fail to hide address.");
         }
+        m_state = DONE;
     }
     else if (m_state == DONE)
     {
         m_listener->requestTerminate(this);
     }
-}
-
-void HidePublicAddress::setUsername(std::string username)
-{
-    m_username = username;
-}
-void HidePublicAddress::setPassword(std::string password)
-{
-    m_password = password;
 }

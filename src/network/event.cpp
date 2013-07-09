@@ -19,6 +19,10 @@
 #include "network/event.hpp"
 #include "network/network_manager.hpp"
 
+#include "utils/log.hpp"
+
+#include <string.h>
+
 Event::Event(ENetEvent* event)
 {
     switch (event->type)
@@ -36,9 +40,12 @@ Event::Event(ENetEvent* event)
         break;
     }
     if (type == EVENT_TYPE_MESSAGE)
-        data = std::string((char*)(event->packet->data));
+    {
+        data = std::string((char*)(event->packet->data), event->packet->dataLength-1);
+    }
     else if (event->data)
-        data = std::string((char*)(event->data));
+    {
+    }
     
     if (event->packet)
         m_packet = event->packet;
@@ -69,6 +76,6 @@ Event::~Event()
 
 void Event::removeFront(int size)
 {
-    data.erase(0, size);
+    data.removeFront(size);
 }
 

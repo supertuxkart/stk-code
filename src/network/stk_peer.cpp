@@ -39,7 +39,11 @@ STKPeer::~STKPeer()
 bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host, uint32_t channel_count, uint32_t data)
 {
     ENetAddress  address;
-    address.host = host.ip;
+    address.host = 
+         ((host.ip & 0xff000000) >> 24)
+       + ((host.ip & 0x00ff0000) >> 8)
+       + ((host.ip & 0x0000ff00) << 8)
+       + ((host.ip & 0x000000ff) << 24); // because ENet wants little endian
     address.port = host.port;
     
     ENetPeer* peer = enet_host_connect(localhost->m_host, &address, 2, 0);
@@ -52,30 +56,30 @@ bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host, uint32_t 
     return true;
 }
 
-void STKPeer::sendPacket(const char* data)
+void STKPeer::sendPacket(NetworkString const& data)
 {
-    //Log::info("STKPeer", "sending packet to %i.%i.%i.%i:%i", (m_peer->address.host>>24)&0xff,(m_peer->address.host>>16)&0xff,(m_peer->address.host>>8)&0xff,(m_peer->address.host>>0)&0xff,m_peer->address.port);
+    Log::info("STKPeer", "sending packet of size %d to %i.%i.%i.%i:%i", data.size(), (m_peer->address.host>>24)&0xff,(m_peer->address.host>>16)&0xff,(m_peer->address.host>>8)&0xff,(m_peer->address.host>>0)&0xff,m_peer->address.port);
+    ENetPacket* packet = enet_packet_create(data.c_str(), data.size()+1,ENET_PACKET_FLAG_RELIABLE);
     
-    ENetPacket* packet = enet_packet_create(data, strlen(data)+1,ENET_PACKET_FLAG_RELIABLE);
     enet_peer_send(m_peer, 0, packet);
 }
 
-uint32_t STKPeer::getAddress()
+uint32_t STKPeer::getAddress() const
 {
     return m_peer->address.host;
 }
 
-uint16_t STKPeer::getPort()
+uint16_t STKPeer::getPort() const
 {
     return m_peer->address.port;
 }
 
-bool STKPeer::isConnected()
+bool STKPeer::isConnected() const
 {
     Log::info("STKPeer", "The peer state is %i\n", m_peer->state);
     return (m_peer->state == ENET_PEER_STATE_CONNECTED);
 }
-bool STKPeer::operator==(ENetPeer* peer)
+bool STKPeer::operator==(const ENetPeer* peer) const
 {
     return peer==m_peer;
 }

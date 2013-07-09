@@ -402,8 +402,9 @@ public:
                                        bool secondary_hits=true) const;
     void               loadTrackModel  (bool reverse_track = false,
                                         unsigned int mode_id=0);
-    std::vector< std::vector<float> >
-                       buildHeightMap();
+    bool findGround(AbstractKart *kart);
+
+    std::vector< std::vector<float> > buildHeightMap();
     // ------------------------------------------------------------------------
     /** Returns the texture with the mini map for this track. */
     const video::ITexture*    getMiniMap    () const { return m_mini_map; }

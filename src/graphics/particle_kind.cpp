@@ -20,7 +20,6 @@
 
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
@@ -42,6 +41,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     m_box_x          = 0.5f;
     m_box_y          = 0.5f;
     m_box_z          = 0.5f;
+    m_sphere_radius  = 0.5f;
     m_angle_spread   = 45;
     m_velocity_x     = 0.001f;
     m_velocity_y     = 0.001f;
@@ -51,6 +51,9 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     m_fade_away_end    = -1.0f;
     m_force_lost_to_gravity_time = 1000;
     m_emission_decay_rate = 0;
+    m_has_scale_affector = NULL;
+    m_scale_affector_factor_x = 0.0f;
+    m_scale_affector_factor_y = 0.0f;
 
 
     // ----- Read XML file
@@ -86,6 +89,12 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
         xml->get("box_x", &m_box_x);
         xml->get("box_y", &m_box_y);
         xml->get("box_z", &m_box_z);
+    }
+    else if (emitterShape == "sphere")
+    {
+        m_shape = EMITTER_SPHERE;
+        
+        xml->get("radius", &m_sphere_radius);
     }
     else
     {
@@ -154,6 +163,10 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
         size->get("min", &m_min_size);
         size->get("max", &m_max_size);
     }
+    
+    bool has_x = size->get("x-increase-factor", &m_scale_affector_factor_x)==1;
+    bool has_y = size->get("y-increase-factor", &m_scale_affector_factor_y)==1;
+    m_has_scale_affector = (has_x || has_y);
 
     //std::cout << "m_particle_size = " << m_particle_size << "\n";
     //std::cout << "m_min_size = " << m_min_size << "\n";

@@ -24,6 +24,17 @@
 
 #include <assert.h>
 #include <cstdlib>
+#include <errno.h>
+
+void* protocolManagerUpdate(void* data)
+{
+    ProtocolManager* manager = static_cast<ProtocolManager*>(data);
+    while(!manager->exit())
+    {
+        manager->update();
+    }
+    return NULL;
+}
 
 ProtocolManager::ProtocolManager() 
 {
@@ -31,11 +42,18 @@ ProtocolManager::ProtocolManager()
     pthread_mutex_init(&m_protocols_mutex, NULL);
     pthread_mutex_init(&m_requests_mutex, NULL);
     pthread_mutex_init(&m_id_mutex, NULL);
+    pthread_mutex_init(&m_exit_mutex, NULL);
     m_next_protocol_id = 0;
+    
+    
+    pthread_mutex_lock(&m_exit_mutex); // will let the update function run
+    m_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
+    pthread_create(m_update_thread, NULL, protocolManagerUpdate, this);
 }
 
 ProtocolManager::~ProtocolManager()
 {
+    pthread_mutex_unlock(&m_exit_mutex); // will stop the update function
     pthread_mutex_lock(&m_events_mutex);
     pthread_mutex_lock(&m_protocols_mutex);
     pthread_mutex_lock(&m_requests_mutex);
@@ -56,6 +74,7 @@ ProtocolManager::~ProtocolManager()
     pthread_mutex_destroy(&m_protocols_mutex);
     pthread_mutex_destroy(&m_requests_mutex);
     pthread_mutex_destroy(&m_id_mutex);
+    pthread_mutex_destroy(&m_exit_mutex);
 }
 
 void ProtocolManager::notifyEvent(Event* event)
@@ -65,14 +84,30 @@ void ProtocolManager::notifyEvent(Event* event)
     pthread_mutex_unlock(&m_events_mutex);
 }
 
-void ProtocolManager::sendMessage(Protocol* sender, std::string message)
+void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message)
 {
-    std::string newMessage = " " + message; // add one byte to add protocol type
-    newMessage[0] = (char)(sender->getProtocolType());
-    NetworkManager::getInstance()->sendPacket(newMessage.c_str());
+    NetworkString newMessage;
+    newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
+    newMessage += message; 
+    NetworkManager::getInstance()->sendPacket(newMessage);
 }
 
-int ProtocolManager::requestStart(Protocol* protocol)
+void ProtocolManager::sendMessage(Protocol* sender, STKPeer* peer, const NetworkString& message)
+{
+    NetworkString newMessage;
+    newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
+    newMessage += message; 
+    NetworkManager::getInstance()->sendPacket(peer, newMessage);
+}
+void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer, const NetworkString& message)
+{
+    NetworkString newMessage;
+    newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
+    newMessage += message; 
+    NetworkManager::getInstance()->sendPacketExcept(peer, newMessage);
+}
+
+uint32_t ProtocolManager::requestStart(Protocol* protocol)
 {
     // create the request
     ProtocolRequest req;
@@ -140,7 +175,7 @@ void ProtocolManager::requestTerminate(Protocol* protocol)
 
 void ProtocolManager::startProtocol(ProtocolInfo protocol)
 {
-    Log::info("ProtocolManager", "A new protocol with id=%u has been started. There are %ld protocols running.\n", protocol.id, m_protocols.size()+1);
+    Log::info("ProtocolManager", "A new protocol with id=%u has been started. There are %ld protocols running.", protocol.id, m_protocols.size()+1);
     // add the protocol to the protocol vector so that it's updated
     pthread_mutex_lock(&m_protocols_mutex);
     m_protocols.push_back(protocol);
@@ -188,7 +223,7 @@ void ProtocolManager::protocolTerminated(ProtocolInfo protocol)
             offset++;
         }
     }
-    Log::info("ProtocolManager", "A protocol has been terminated. There are %ld protocols running.\n", m_protocols.size());
+    Log::info("ProtocolManager", "A protocol has been terminated. There are %ld protocols running.", m_protocols.size());
     pthread_mutex_unlock(&m_protocols_mutex);
 }
 
@@ -202,12 +237,19 @@ void ProtocolManager::update()
         Event* event = m_events_to_process.back();
         
         PROTOCOL_TYPE searchedProtocol = PROTOCOL_NONE;
-        if (event->data.size() > 0)
-            searchedProtocol = (PROTOCOL_TYPE)(event->data[0]);
-        event->removeFront(1); // remove the first byte which indicates the protocol
+        if (event->type == EVENT_TYPE_MESSAGE)
+        {
+            if (event->data.size() > 0)
+                searchedProtocol = (PROTOCOL_TYPE)(event->data.getUInt8(0));
+            event->removeFront(1); // remove the first byte which indicates the protocol
+        }
+        if (event->type == EVENT_TYPE_CONNECTED)
+        {
+            searchedProtocol = PROTOCOL_CONNECTION;
+        }
         for (unsigned int i = 0; i < m_protocols.size() ; i++)
         {
-            if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event->type != EVENT_TYPE_MESSAGE) // pass data to protocols even when paused
+            if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event->type == EVENT_TYPE_DISCONNECTED) // pass data to protocols even when paused
                 m_protocols[i].protocol->notifyEvent(event);
         }
         delete event;
@@ -287,7 +329,7 @@ PROTOCOL_STATE ProtocolManager::getProtocolState(Protocol* protocol)
     return PROTOCOL_STATE_TERMINATED; // we don't know this protocol at all, it's finished
 }
 
-int ProtocolManager::getProtocolID(Protocol* protocol)
+uint32_t ProtocolManager::getProtocolID(Protocol* protocol)
 {
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
@@ -295,6 +337,33 @@ int ProtocolManager::getProtocolID(Protocol* protocol)
             return m_protocols[i].id;
     }
     return 0;
+}
+
+Protocol* ProtocolManager::getProtocol(uint32_t id)
+{
+    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    {
+        if (m_protocols[i].id == id)
+            return m_protocols[i].protocol;
+    }
+    return NULL;
+}
+
+bool ProtocolManager::isServer()
+{
+    return NetworkManager::getInstance()->isServer();
+}
+
+int ProtocolManager::exit()
+{
+  switch(pthread_mutex_trylock(&m_exit_mutex)) {
+    case 0: /* if we got the lock, unlock and return 1 (true) */
+      pthread_mutex_unlock(&m_exit_mutex);
+      return 1;
+    case EBUSY: /* return 0 (false) if the mutex was locked */
+      return 0;
+  }
+  return 1;
 }
 
 void ProtocolManager::assignProtocolId(ProtocolInfo* protocol_info)

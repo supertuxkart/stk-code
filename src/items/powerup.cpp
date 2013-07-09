@@ -16,12 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-//NETWORK_UPDATE_PLZ
 #include "items/powerup.hpp"
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
-#include "config/user_config.hpp"
 #include "config/stk_config.hpp"
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"

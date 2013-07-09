@@ -49,6 +49,7 @@
 #include "io/file_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"
+#include "items/projectile_manager.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/kart_model.hpp"
@@ -56,7 +57,6 @@
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
-#include "network/network_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
 #include "physics/btUprightConstraint.hpp"
@@ -65,6 +65,8 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
+
+#include "graphics/explosion.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
    // Disable warning for using 'this' in base member initializer list
@@ -76,8 +78,6 @@
 #else
 #  include <math.h>
 #endif
-
-//NETWORK_UPDATE_PLZ
 
 /** The kart constructor.
  *  \param ident  The identifier for the kart model to use.
@@ -117,6 +117,9 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_flying               = false;
     m_sky_particles_emitter= NULL;
     m_stars_effect         = NULL;
+    m_timeFlying           = 0;
+    m_isTimeFlying          = false;
+    m_hitGround            = NULL;
 
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
@@ -298,15 +301,6 @@ void Kart::reset()
     // Reset animations and wheels
     m_kart_model->reset();
 
-    // undo bubblegum effect
-    if (m_bubblegum_time > 0.0f)
-    {
-        m_bubblegum_time = 0.0f;
-        m_bubblegum_torque = 0.0f;
-        m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
-                           m_kart_properties->getChassisAngularDamping() );
-    }
-
     // If the controller was replaced (e.g. replaced by end controller),
     // restore the original controller.
     if(m_saved_controller)
@@ -338,8 +332,15 @@ void Kart::reset()
     m_bounce_back_time     = 0.0f;
     m_time_last_crash      = 0.0f;
     m_speed                = 0.0f;
+    m_current_lean         = 0.0f;
     m_view_blocked_by_plunger = 0.0f;
+    m_bubblegum_time       = 0.0f;
+    m_bubblegum_torque     = 0.0f;
     m_has_caught_nolok_bubblegum = false;
+    // In case that the kart was in the air, in which case its
+    // linear damping is 0
+    m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
+                       m_kart_properties->getChassisAngularDamping() );
 
     if(m_terrain_sound)
     {
@@ -851,12 +852,18 @@ void Kart::collectedItem(Item *item, int add_info)
             break;
         }
     case Item::ITEM_BUBBLEGUM:
-        m_has_caught_nolok_bubblegum = (item->getEmitter() != NULL && item->getEmitter()->getIdent() == "nolok");
+        m_has_caught_nolok_bubblegum = (item->getEmitter() != NULL && 
+                                    item->getEmitter()->getIdent() == "nolok");
 
         // slow down
-        m_bubblegum_time = 1.0f;
-        m_bubblegum_torque = rand()%2 ? 500.0f : -500.0f;
-        m_body->setDamping(0.8f, 0.8f);
+        m_bubblegum_time = m_kart_properties->getBubblegumTime();
+        m_bubblegum_torque = (rand()%2) 
+                           ?  m_kart_properties->getBubblegumTorque()
+                           : -m_kart_properties->getBubblegumTorque();
+        m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_BUBBLE, 
+                                 m_kart_properties->getBubblegumSpeedFraction(),
+                                 m_kart_properties->getBubblegumFadeInTime(),
+                                 m_bubblegum_time);
         m_goo_sound->position(getXYZ());
         m_goo_sound->play();
         // Play appropriate custom character sound
@@ -864,15 +871,6 @@ void Kart::collectedItem(Item *item, int add_info)
         break;
     default        : break;
     }   // switch TYPE
-
-    // Attachments and powerups are stored in the corresponding
-    // functions (hit{Red,Green}Item), so only coins need to be
-    // stored here.
-    /*if(NetworkManager::getInstance()->isServer() &&
-        (type==Item::ITEM_NITRO_BIG || type==Item::ITEM_NITRO_SMALL) )
-    {
-        race_state->itemCollected(getWorldKartId(), item->getItemId());
-    }*/
 
     if ( m_collected_energy > m_kart_properties->getNitroMax())
         m_collected_energy = m_kart_properties->getNitroMax();
@@ -976,19 +974,14 @@ void Kart::update(float dt)
         if(m_squash_time<=0)
         {
             m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-            m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH,
-                                    /*slowdown*/1.0f, /*fade in*/0.0f);
         }
-    }
+    }   // if squashed
 
     if (m_bubblegum_time > 0.0f)
     {
         m_bubblegum_time -= dt;
         if (m_bubblegum_time <= 0.0f)
         {
-            // undo bubblegum effect
-            m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
-                               m_kart_properties->getChassisAngularDamping() );
             m_bubblegum_torque = 0.0f;
         }
     }
@@ -1009,14 +1002,6 @@ void Kart::update(float dt)
     }
 
     m_slipstream->update(dt);
-
-    // Store the actual kart controls at the start of update in the server
-    // state. This makes it easier to reset some fields when they are not used
-    // anymore (e.g. controls.fire).
-    if(NetworkManager::getInstance()->isServer())
-    {
-        //race_state->storeKartControls(*this);
-    }
 
     if (!m_flying)
     {
@@ -1192,6 +1177,21 @@ void Kart::update(float dt)
     // is rescued isOnGround might still be true, since the kart rigid
     // body was removed from the physics, but still retain the old
     // values for the raycasts).
+    if (!isOnGround())
+    {
+        m_timeFlying+=dt;
+        m_isTimeFlying = true;
+    }
+    
+    if(isOnGround() && m_isTimeFlying)
+    {
+        m_isTimeFlying = false;
+        m_hitGround = new Explosion(getXYZ(), "jump", 
+                                   "jump_explosion.xml");
+        projectile_manager->addHitEffect(m_hitGround);
+        m_timeFlying = 0;
+    }
+    
     if( (!isOnGround() || emergency) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
@@ -1200,7 +1200,7 @@ void Kart::update(float dt)
     if(!m_shadow_enabled && isOnGround() && !emergency)
     {
         m_shadow->enableShadow();
-        m_shadow_enabled = true;
+        m_shadow_enabled = true;  
     }
 }   // update
 
@@ -1229,7 +1229,8 @@ void Kart::setSquash(float time, float slowdown)
         return;
     }
     m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
-    m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown, 0.1f);
+    m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown, 
+                             0.1f, time);
     m_squash_time  = time;
 }   // setSquash
 
@@ -2240,21 +2241,87 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         // The speed of the kart can be higher (due to powerups) than
         // the normal maximum speed of the kart.
         if(f>1.0f) f = 1.0f;
-        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO, f);
+        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO1, f);
+        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITRO2, f);
+        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITROSMOKE1, f);
+        m_kart_gfx->setCreationRateRelative(KartGFX::KGFX_NITROSMOKE2, f);
     }
     else
-        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO, 0);
-    m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO, getSpeed(), dt);
+    {
+        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO1, 0);
+        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO2, 0);
+        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
+        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
+        
+    }
+    m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO1, getSpeed(), dt);
+    m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO2, getSpeed(), dt);
+    m_kart_gfx->resizeBox(KartGFX::KGFX_NITROSMOKE1, getSpeed(), dt);
+    m_kart_gfx->resizeBox(KartGFX::KGFX_NITROSMOKE2, getSpeed(), dt);
 
     m_kart_gfx->resizeBox(KartGFX::KGFX_ZIPPER, getSpeed(), dt);
 
-    Moveable::updateGraphics(dt, center_shift,
-                             btQuaternion(m_skidding->getVisualSkidRotation(),
-                                          0, 0));
+    // Note that we compare with maximum speed of the kart, not
+    // maximum speed including terrain effects. This avoids that
+    // leaning might get less if a kart gets a special that increases
+    // its maximum speed, but not the current speed (by much). On the
+    // other hand, that ratio can often be greater than 1.
+    float speed_frac = m_speed / m_kart_properties->getMaxSpeed();
+    if(speed_frac>1.0f)
+        speed_frac = 1.0f;
+    else if (speed_frac < 0.0f)  // no leaning when backwards driving
+        speed_frac = 0.0f;
 
-    /*
+    const float steer_frac = m_skidding->getSteeringFraction();
+
+    const float roll_speed = m_kart_properties->getLeanSpeed();
+    if(speed_frac > 0.8f && fabsf(steer_frac)>0.5f)
+    {
+        // Use steering ^ 7, which means less effect at lower
+        // steering
+        const float f = m_skidding->getSteeringFraction();
+        const float f2 = f*f;
+        const float max_lean = -m_kart_properties->getMaxLean()
+                             * f2*f2*f2*f
+                             * speed_frac;
+        if(max_lean>0)
+        {
+            m_current_lean += dt* roll_speed;
+            if(m_current_lean > max_lean)
+                m_current_lean = max_lean;
+        }
+        else if(max_lean<0)
+        {
+            m_current_lean -= dt*roll_speed;
+            if(m_current_lean < max_lean)
+                m_current_lean = max_lean;
+        }
+    }
+    else if(m_current_lean!=0.0f)
+    {
+        // Disable any potential roll factor that is still applied
+        // --------------------------------------------------------
+        if(m_current_lean>0)
+        {
+            m_current_lean -= dt * roll_speed;
+            if(m_current_lean < 0.0f)
+                m_current_lean = 0.0f;
+        }
+        else
+        {
+            m_current_lean += dt * roll_speed;
+            if(m_current_lean>0.0f)
+                m_current_lean = 0.0f;
+        }
+    }
+
+    float heading = m_skidding->getVisualSkidRotation();
+    Moveable::updateGraphics(dt, center_shift,
+                             btQuaternion(heading, 0, m_current_lean));
+
+#ifdef XX
     // cheap wheelie effect
-    if (m_zipper_fire && m_zipper_fire->getCreationRate() > 0.0f)
+    if (m_controls.m_nitro)
     {
         m_node->updateAbsolutePosition();
         m_kart_model->getWheelNodes()[0]->updateAbsolutePosition();
@@ -2262,8 +2329,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
         core::vector3df rot = m_node->getRotation();
 
-        float ratio = float(m_zipper_fire->getCreationRate())
-                   /float(m_zipper_fire->getParticlesInfo()->getMaxRate());
+        float ratio = 0.8f;  //float(m_zipper_fire->getCreationRate())
+                //   /float(m_zipper_fire->getParticlesInfo()->getMaxRate());
 
         const float a = (13.4f - ratio*13.0f);
         float dst = -45.0f*sin((a*a)/180.f*M_PI);
@@ -2277,7 +2344,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
         m_node->setPosition(m_node->getPosition() + core::vector3df(0,wheel_y_after - wheel_y,0));
     }
-     */
+#endif
+
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------

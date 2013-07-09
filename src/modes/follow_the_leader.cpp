@@ -20,7 +20,6 @@
 #include "audio/music_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "states_screens/race_gui_base.hpp"

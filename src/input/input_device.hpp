@@ -132,7 +132,7 @@ public:
      * \return Whether the pressed key/button is bound with an action
      */
     bool processAndMapInput(Input::InputType type, const int id,
-                            const int value,
+                            int* value,
                             InputManager::InputDriverMode mode,
                             StateManager::ActivePlayer* player,
                             PlayerAction* action);
