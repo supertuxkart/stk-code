@@ -57,7 +57,8 @@ void* waitInput(void* data)
         }
         else 
         {
-            NetworkString msg("\0\0");
+            NetworkString msg;
+            msg.ai8(0);
             msg += str;
             NetworkManager::getInstance()->getPeers()[0]->sendPacket(msg);
         }
@@ -71,6 +72,7 @@ void* waitInput(void* data)
 ClientNetworkManager::ClientNetworkManager()
 {
     m_thread_keyboard = NULL;
+    m_connected = false;
 }
 
 ClientNetworkManager::~ClientNetworkManager()

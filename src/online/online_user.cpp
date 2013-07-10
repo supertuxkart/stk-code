@@ -29,3 +29,10 @@ OnlineUser::OnlineUser(const irr::core::stringw &username)
     m_name = username;
 }   // OnlineUser
 
+// ============================================================================
+OnlineUser::OnlineUser(const uint32_t& id)
+{
+    m_id = id;
+}   // OnlineUser
+
+

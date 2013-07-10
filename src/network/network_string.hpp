@@ -98,6 +98,14 @@ class NetworkString
             return *this;
         }
         inline NetworkString& ad(const double& value) { return addDouble(value); }
+        
+        NetworkString& addString(const std::string& value) 
+        {
+            m_string += value;
+            return *this;
+        }
+        inline NetworkString& as(const std::string& value) { return addString(value); }
+        
         NetworkString& operator+=(NetworkString const& value)
         {
             m_string += value.m_string;

@@ -37,6 +37,7 @@ Event::Event(ENetEvent* event)
         type = EVENT_TYPE_MESSAGE;
         break;
     default:
+        type = EVENT_TYPE_MESSAGE;
         break;
     }
     if (type == EVENT_TYPE_MESSAGE)

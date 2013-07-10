@@ -26,7 +26,7 @@
 #include "network/protocols/request_connection.hpp"
 #include "network/protocols/ping_protocol.hpp"
 #include "network/protocols/quick_join_protocol.hpp"
-#include "network/protocols/lobby_room_protocol.hpp"
+#include "network/protocols/client_lobby_room_protocol.hpp"
 #include "online/current_online_user.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
@@ -159,6 +159,7 @@ void ConnectToServer::update()
         {
             m_listener->requestTerminate( m_listener->getProtocol(m_current_protocol_id)); // kill the ping protocol because we're connected
             m_current_protocol_id = m_listener->requestStart(new HidePublicAddress());
+            ClientNetworkManager::getInstance()->setConnected(true);
             m_state = HIDING_ADDRESS;
             break;
         }
@@ -167,7 +168,8 @@ void ConnectToServer::update()
             == PROTOCOL_STATE_TERMINATED) // we have hidden our address
             {
                 m_state = DONE;
-                m_listener->requestStart(new ClientLobbyRoomProtocol(m_server_address));
+                if (ClientNetworkManager::getInstance()->isConnected()) // lobby room protocol if we're connected only
+                    m_listener->requestStart(new ClientLobbyRoomProtocol(m_server_address));
             }
             break;
         case DONE:

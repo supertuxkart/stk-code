@@ -41,7 +41,7 @@ void GameSetup::addPlayer(NetworkPlayerProfile profile)
 
 //-----------------------------------------------------------------------------
  
-void GameSetup::removePlayer(uint32_t id)
+bool GameSetup::removePlayer(uint32_t id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
@@ -49,14 +49,15 @@ void GameSetup::removePlayer(uint32_t id)
         {
             m_players.erase(m_players.begin()+i, m_players.begin()+i+1);
             Log::verbose("GameSetup", "Removed a player from the game setup.");
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 //-----------------------------------------------------------------------------
  
-void GameSetup::removePlayer(uint8_t id)
+bool GameSetup::removePlayer(uint8_t id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
@@ -64,9 +65,10 @@ void GameSetup::removePlayer(uint8_t id)
         {
             m_players.erase(m_players.begin()+i, m_players.begin()+i+1);
             Log::verbose("GameSetup", "Removed a player from the game setup.");
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -98,3 +100,13 @@ const NetworkPlayerProfile* GameSetup::getProfile(uint8_t id)
 }
 
 //-----------------------------------------------------------------------------
+
+bool GameSetup::isKartAvailable(std::string kart_name)
+{
+    for (unsigned int i = 0; i < m_players.size(); i++)
+    {
+        if (m_players[i].kart_name == kart_name)
+            return false;
+    }
+    return true;
+}

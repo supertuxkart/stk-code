@@ -38,7 +38,6 @@ void* waitInput2(void* data)
 {
     std::string str = "";
     bool stop = false;
-    int n = 0;
     while(!stop)
     {
         getline(std::cin, str);
@@ -95,7 +94,7 @@ void ServerNetworkManager::run()
 
 void ServerNetworkManager::kickAllPlayers()
 {
-    for (int i = 0; i < m_peers.size(); i++)
+    for (unsigned int i = 0; i < m_peers.size(); i++)
     {
         m_peers[i]->disconnect();
     }

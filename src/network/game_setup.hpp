@@ -52,12 +52,14 @@ class GameSetup
         virtual ~GameSetup();
         
         void addPlayer(NetworkPlayerProfile profile); //!< Add a player.
-        void removePlayer(uint32_t id); //!< Remove a player by id.
-        void removePlayer(uint8_t id); //!< Remove a player by local id.
+        bool removePlayer(uint32_t id); //!< Remove a player by id.
+        bool removePlayer(uint8_t id); //!< Remove a player by local id.
         
         int getPlayerCount() { return m_players.size(); }
         const NetworkPlayerProfile* getProfile(uint32_t id); //!< Get a profile by database id
         const NetworkPlayerProfile* getProfile(uint8_t id); //!< Get the profile by the lobby id
+        
+        bool isKartAvailable(std::string kart_name);
         
     protected:
         std::vector<NetworkPlayerProfile> m_players; //!< Information about players

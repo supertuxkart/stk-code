@@ -88,11 +88,14 @@ void NetworkManager::setManualSocketsMode(bool manual)
 
 void NetworkManager::notifyEvent(Event* event)
 {
-    Log::info("NetworkManager", "EVENT received");
+    Log::info("NetworkManager", "EVENT received of type %d", (int)(event->type));
     switch (event->type) 
     {
-        case EVENT_TYPE_MESSAGE:
-            Log::debug("NetworkManager", "Message, Sender : %i.%i.%i.%i, message = \"%s\"", event->peer->getAddress()>>24&0xff, event->peer->getAddress()>>16&0xff, event->peer->getAddress()>>8&0xff, event->peer->getAddress()&0xff, event->data.c_str());
+        case EVENT_TYPE_CONNECTED:
+            Log::debug("NetworkManager", "A client has just connected. There are now %lu peers.", m_peers.size() + 1);
+            Log::verbose("NetworkManager", "Address of event->peer after connection : %ld", (long int)(event->peer));
+            // create the new peer:
+            m_peers.push_back(event->peer);
             break;
         case EVENT_TYPE_DISCONNECTED:
         {
@@ -119,14 +122,19 @@ void NetworkManager::notifyEvent(Event* event)
                 
             Log::debug("NetworkManager", "Somebody is now disconnected. There are now %lu peers.", m_peers.size());
             
-            break;
-        }
-        case EVENT_TYPE_CONNECTED:
-            Log::debug("NetworkManager", "A client has just connected. There are now %lu peers.", m_peers.size() + 1);
-            Log::verbose("NetworkManager", "Address of event->peer after connection : %ld", (long int)(event->peer));
-            // create the new peer:
-            m_peers.push_back(event->peer);
-            break;
+            
+        } break;
+        case EVENT_TYPE_MESSAGE:
+        {
+            //exit(0);
+            uint32_t addr = event->peer->getAddress();
+            Log::info("NetworkManager", "Message, Sender : %i.%i.%i.%i, message = \"%s\"", 
+                        ((addr>>24)&0xff), 
+                        ((addr>>16)&0xff), 
+                        ((addr>>8)&0xff), 
+                        (addr&0xff), event->data.c_str());
+            
+        } break;
     }
     ProtocolManager::getInstance()->notifyEvent(event);
 }

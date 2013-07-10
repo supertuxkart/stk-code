@@ -140,7 +140,8 @@ void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
     to.sin_addr.s_addr = htonl(dst.ip);
     
     sendto(m_host->socket, (char*)data, length, 0,(sockaddr*)&to, to_len);
-    Log::verbose("STKHost", "Raw packet sent to %u:%u\n", dst.ip, dst.port);
+    Log::verbose("STKHost", "Raw packet sent to %i.%i.%i.%i:%u\n", ((dst.ip>>24)&0xff)
+    , ((dst.ip>>16)&0xff), ((dst.ip>>8)&0xff), ((dst.ip>>0)&0xff), dst.port);
 }
 
 // ----------------------------------------------------------------------------

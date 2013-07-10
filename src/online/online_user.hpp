@@ -44,6 +44,7 @@ class OnlineUser
           * Constructor
           */
         OnlineUser(const irr::core::stringw &username);
+        OnlineUser(const uint32_t& id);
 
         /** Returns the username. */
         irr::core::stringw getUserName() const { return m_name; }

@@ -35,11 +35,14 @@ class ClientNetworkManager : public NetworkManager
         
         STKPeer* getPeer();
         virtual bool isServer()         { return false; }
+        void setConnected(bool value)   { m_connected = value; }
+        bool isConnected()              { return m_connected; }
         
     protected:
         ClientNetworkManager();
         virtual ~ClientNetworkManager();
         
+        bool m_connected; //!< Is the user connected to a server
         pthread_t* m_thread_keyboard;
 };
 

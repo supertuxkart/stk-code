@@ -42,7 +42,7 @@ class STKPeer
         
         uint32_t getAddress() const;
         uint16_t getPort() const;
-        uint32_t getClientServerToken() const;
+        uint32_t getClientServerToken() const   { return m_client_server_token; }
         bool     isClientServerTokenSet() const { return m_token_set; }
         
         bool operator==(const ENetPeer* peer) const;
