@@ -145,12 +145,15 @@ void ServerLobbyRoomProtocol::update()
 
 void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
 {
+    Log::info("ServerLobbyRoomProtocol", "Player disconnected.");
     if (event->peer->getPlayerProfile() != NULL) // others knew him
     {
         NetworkString msg;
         msg.ai8(0x02).ai8(1).ai8(event->peer->getPlayerProfile()->race_id);
         m_listener->sendMessage(this, msg);
     }
+    else
+        Log::info("ServerLobbyRoomProtocol", "Peer not registered");
 }
 
 //-----------------------------------------------------------------------------

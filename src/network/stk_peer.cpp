@@ -32,7 +32,6 @@ STKPeer::~STKPeer()
 {
     if (m_peer)
     {
-        free(m_peer);
         m_peer = NULL;
     }
 }
@@ -85,7 +84,20 @@ bool STKPeer::isConnected() const
     Log::info("STKPeer", "The peer state is %i\n", m_peer->state);
     return (m_peer->state == ENET_PEER_STATE_CONNECTED);
 }
+bool STKPeer::operator==(const STKPeer* peer) const
+{
+    return peer->m_peer==m_peer;
+}
+bool STKPeer::operator!=(const STKPeer* peer) const
+{
+    return peer->m_peer!=m_peer;
+}
 bool STKPeer::operator==(const ENetPeer* peer) const
 {
     return peer==m_peer;
 }
+bool STKPeer::operator!=(const ENetPeer* peer) const
+{
+    return peer!=m_peer;
+}
+
