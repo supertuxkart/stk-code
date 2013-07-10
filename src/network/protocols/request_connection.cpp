@@ -1,5 +1,6 @@
 #include "network/protocols/request_connection.hpp"
 
+#include "network/protocol_manager.hpp"
 #include "online/http_connector.hpp"
 #include "online/current_online_user.hpp"
 #include "config/user_config.hpp"
@@ -53,7 +54,7 @@ void RequestConnection::update()
                 Log::error("RequestConnection", "Fail to make a request.");
             }
             m_state = DONE;
-            
+
             break;
         }
         case DONE:

@@ -34,19 +34,20 @@ GameSetup::~GameSetup()
 
 //-----------------------------------------------------------------------------
 
-void GameSetup::addPlayer(NetworkPlayerProfile profile)
+void GameSetup::addPlayer(NetworkPlayerProfile* profile)
 {
     m_players.push_back(profile);
 }
 
 //-----------------------------------------------------------------------------
- 
+
 bool GameSetup::removePlayer(uint32_t id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
-        if (m_players[i].user_profile->getUserID() == id)
+        if (m_players[i]->user_profile->getUserID() == id)
         {
+            delete m_players[i];
             m_players.erase(m_players.begin()+i, m_players.begin()+i+1);
             Log::verbose("GameSetup", "Removed a player from the game setup.");
             return true;
@@ -56,12 +57,12 @@ bool GameSetup::removePlayer(uint32_t id)
 }
 
 //-----------------------------------------------------------------------------
- 
+
 bool GameSetup::removePlayer(uint8_t id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
-        if (m_players[i].race_id == id) // check the given id
+        if (m_players[i]->race_id == id) // check the given id
         {
             m_players.erase(m_players.begin()+i, m_players.begin()+i+1);
             Log::verbose("GameSetup", "Removed a player from the game setup.");
@@ -72,28 +73,42 @@ bool GameSetup::removePlayer(uint8_t id)
 }
 
 //-----------------------------------------------------------------------------
-        
+
+void GameSetup::setPlayerKart(uint8_t id, std::string kart_name)
+{
+    for (unsigned int i = 0; i < m_players.size(); i++)
+    {
+        if (m_players[i]->race_id == id)
+        {
+            m_players[i]->kart_name = kart_name;
+            Log::info("GameSetup", "Player %d took kart %s", id, kart_name.c_str());
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 const NetworkPlayerProfile* GameSetup::getProfile(uint32_t id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
-        if (m_players[i].user_profile->getUserID() == id)
+        if (m_players[i]->user_profile->getUserID() == id)
         {
-            return &m_players[i];
+            return m_players[i];
         }
     }
     return NULL;
 }
 
 //-----------------------------------------------------------------------------
- 
+
 const NetworkPlayerProfile* GameSetup::getProfile(uint8_t id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
-        if (m_players[i].race_id == id)
+        if (m_players[i]->race_id == id)
         {
-            return &m_players[i];
+            return m_players[i];
         }
     }
     return NULL;
@@ -105,7 +120,7 @@ bool GameSetup::isKartAvailable(std::string kart_name)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
-        if (m_players[i].kart_name == kart_name)
+        if (m_players[i]->kart_name == kart_name)
             return false;
     }
     return true;

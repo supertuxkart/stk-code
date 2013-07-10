@@ -18,6 +18,7 @@
 
 #include "network/protocols/get_peer_address.hpp"
 
+#include "network/protocol_manager.hpp"
 #include "network/http_functions.hpp"
 #include "online/http_connector.hpp"
 #include "online/current_online_user.hpp"
@@ -47,7 +48,7 @@ void GetPeerAddress::update()
 {
     if (m_state == NONE)
     {
-        
+
         HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
         connector->setParameter("id",CurrentOnlineUser::get()->getUserID());
         connector->setParameter("token",CurrentOnlineUser::get()->getToken());

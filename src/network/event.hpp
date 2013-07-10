@@ -37,7 +37,7 @@ enum EVENT_TYPE
 /*!
  * \class Event
  * \brief Class representing an event that need to pass trough the system.
- * This is used to remove ENet dependency in the network. 
+ * This is used to remove ENet dependency in the network.
  * It interfaces the ENetEvent structure.
  * The user has to be extremely careful about the peer.
  * Indeed, when packets are logged, the state of the peer cannot be stored at
@@ -51,20 +51,24 @@ class Event
          *  \param event : The event that needs to be translated.
          */
         Event(ENetEvent* event);
+        /*! \brief Constructor
+         *  \param event : The event to copy.
+         */
+        Event(const Event& event);
         /*! \brief Destructor
          *  frees the memory of the ENetPacket.
          */
         ~Event();
-        
+
         /*! \brief Remove bytes at the beginning of data.
          *  \param size : The number of bytes to remove.
          */
         void removeFront(int size);
-    
+
         EVENT_TYPE type;    //!< Type of the event.
         NetworkString data;   //!< Copy of the data passed by the event.
         STKPeer* peer;      //!< Pointer to the peer that triggered that event.
-    
+
     private:
         ENetPacket* m_packet; //!< A pointer on the ENetPacket to be deleted.
 };

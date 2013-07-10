@@ -19,9 +19,11 @@
 #ifndef PROTOCOL_HPP
 #define PROTOCOL_HPP
 
-#include "network/protocol_manager.hpp"
+#include "network/event.hpp"
 #include "network/types.hpp"
 #include "utils/types.hpp"
+
+class ProtocolManager;
 
 /** \enum PROTOCOL_TYPE
   * \brief The types that protocols can have. This is used to select which protocol receives which event.
@@ -36,7 +38,7 @@ enum PROTOCOL_TYPE
 };
 
 /** \class Protocol
-  * \brief Abstract class used to define the global protocol functions. 
+  * \brief Abstract class used to define the global protocol functions.
   * A protocol is an entity that is started at a point, and that is updated by a thread.
   * A protocol can be terminated by an other class, or it can terminate itself if has fulfilled its role.
   * This class must be inherited to make any network job.
@@ -57,44 +59,44 @@ class Protocol
         /*!
          * \brief Destructor
          */
-        virtual ~Protocol(); 
-        
+        virtual ~Protocol();
+
         /*!
          * \brief Notify a protocol matching the Event type of that event.
          * \param event : Pointer to the event.
          */
         virtual void notifyEvent(Event* event) = 0;
-        
-        /*! 
+
+        /*!
          * \brief Set the protocol listener.
          * \param listener : Pointer to the listener.
          */
         void setListener(ProtocolManager* listener);
-        
-        /*! 
+
+        /*!
          * \brief Called when the protocol is going to start. Must be re-defined by subclasses.
          */
         virtual void setup() = 0;
-        /*! 
-         * \brief Called when the protocol is paused (by an other entity or by itself). 
+        /*!
+         * \brief Called when the protocol is paused (by an other entity or by itself).
          * This function must be called by the subclasse's pause function if re-defined.
          */
         virtual void pause();
-        /*! 
-         * \brief Called when the protocol is unpaused. 
+        /*!
+         * \brief Called when the protocol is unpaused.
          * This function must be called by the subclasse's unpause function if re-defined.
          */
         virtual void unpause();
-        /*! 
+        /*!
          * \brief Called by the protocol listener as often as possible. Must be re-defined.
          */
         virtual void update() = 0;
-        /*! 
+        /*!
          * \brief Called when the protocol is to be killed.
          */
         virtual void kill();
-        
-        /*! 
+
+        /*!
          * \brief Method to get a protocol's type.
          * \return The protocol type.
          */

@@ -47,11 +47,11 @@ Event::Event(ENetEvent* event)
     else if (event->data)
     {
     }
-    
+
     m_packet = NULL;
     if (event->packet)
         m_packet = event->packet;
-        
+
     if (m_packet)
         enet_packet_destroy(m_packet); // we got all we need, just remove the data.
 
@@ -73,7 +73,16 @@ Event::Event(ENetEvent* event)
         Log::verbose("Event", "Creating a new peer, address are STKPeer:%ld, Peer:%ld", (long int)(new_peer), (long int)(event->peer));
     }
 }
-    
+
+Event::Event(const Event& event)
+{
+    m_packet = NULL;
+    data = event.data;
+    // copy the peer
+    peer = new STKPeer(*event.peer);
+    type = event.type;
+}
+
 Event::~Event()
 {
 }

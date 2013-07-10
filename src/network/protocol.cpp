@@ -18,6 +18,8 @@
 
 #include "network/protocol.hpp"
 
+#include "network/protocol_manager.hpp"
+
 Protocol::Protocol(CallbackObject* callback_object, PROTOCOL_TYPE type)
 {
     m_callback_object = callback_object;
@@ -43,7 +45,7 @@ void Protocol::kill()
 
 void Protocol::setListener(ProtocolManager* listener)
 {
-    m_listener = listener; 
+    m_listener = listener;
 }
 
 PROTOCOL_TYPE Protocol::getProtocolType()

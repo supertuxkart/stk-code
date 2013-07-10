@@ -8,15 +8,15 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
     public:
         ClientLobbyRoomProtocol(const TransportAddress& server_address);
         virtual ~ClientLobbyRoomProtocol();
-    
+
         void requestKartSelection(std::string kart_name);
         void sendMessage(std::string message);
-        
+
         virtual void notifyEvent(Event* event);
         virtual void setup();
         virtual void update();
-        
-        
+
+
     protected:
         void newPlayer(Event* event);
         void disconnectedPlayer(Event* event);
@@ -25,9 +25,9 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
         void kartSelectionRefused(Event* event);
         void kartSelectionUpdate(Event* event);
 
-        TransportAddress m_server_address; 
+        TransportAddress m_server_address;
         STKPeer* m_server;
-        
+
         enum STATE
         {
             NONE,

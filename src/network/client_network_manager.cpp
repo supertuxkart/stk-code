@@ -23,6 +23,7 @@
 #include "network/protocols/show_public_address.hpp"
 #include "network/protocols/get_peer_address.hpp"
 #include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/client_lobby_room_protocol.hpp"
 
 #include "utils/log.hpp"
 
@@ -35,7 +36,7 @@ void* waitInput(void* data)
     std::string str = "";
     bool stop = false;
     int n = 0;
-    
+
     while(!stop)
     {
         getline(std::cin, str);
@@ -55,7 +56,15 @@ void* waitInput(void* data)
         {
             ProtocolManager::getInstance()->requestStart(new ConnectToServer(n));
         }
-        else 
+        else if (str == "select")
+        {
+            std::string str2;
+            getline(std::cin, str2);
+            Protocol* protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM);
+            ClientLobbyRoomProtocol* clrp = static_cast<ClientLobbyRoomProtocol*>(protocol);
+            clrp->requestKartSelection(str2);
+        }
+        else
         {
             NetworkString msg;
             msg.ai8(0);
@@ -65,7 +74,7 @@ void* waitInput(void* data)
     }
 
     exit(0);
-    
+
     return NULL;
 }
 
@@ -79,9 +88,9 @@ ClientNetworkManager::~ClientNetworkManager()
 {
 }
 
-void ClientNetworkManager::run() 
+void ClientNetworkManager::run()
 {
-    if (enet_initialize() != 0) 
+    if (enet_initialize() != 0)
     {
         Log::error("ClientNetworkManager", "Could not initialize enet.\n");
         return;
@@ -89,11 +98,11 @@ void ClientNetworkManager::run()
     m_localhost = new STKHost();
     m_localhost->setupClient(1, 2, 0, 0);
     m_localhost->startListening();
-    
+
     // listen keyboard console input
     m_thread_keyboard = (pthread_t*)(malloc(sizeof(pthread_t)));
     pthread_create(m_thread_keyboard, NULL, waitInput, NULL);
-    
+
     NetworkManager::run();
 }
 

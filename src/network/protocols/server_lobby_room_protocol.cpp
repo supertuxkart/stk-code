@@ -46,62 +46,17 @@ void ServerLobbyRoomProtocol::notifyEvent(Event* event)
         uint8_t message_type;
         message_type = event->data.getAndRemoveUInt8();
         Log::info("ServerLobbyRoomProtocol", "Message received with type %d.", message_type);
-        if (message_type == 1) // player requesting connection
-        {
-            if (event->data.size() != 5 || event->data[0] != 4)
-            {
-                Log::warn("LobbyRoomProtocol", "A player is sending a badly formated message. Size is %d and first byte %d", event->data.size(), event->data[0]);
-                return;
-            }
-            Log::verbose("LobbyRoomProtocol", "New player.");
-            int player_id = 0;
-            player_id = event->data.getUInt32(1);
-            // can we add the player ?
-            if (m_setup->getPlayerCount() < 16) // accept player
-            {
-                // add the player to the game setup
-                while(m_setup->getProfile(m_next_id)!=NULL)
-                    m_next_id++;
-                NetworkPlayerProfile profile;
-                profile.race_id = m_next_id;
-                profile.kart_name = "";
-                profile.user_profile = new OnlineUser("Unnamed Player");
-                m_setup->addPlayer(profile);
-                // notify everybody that there is a new player
-                NetworkString message;
-                // new player (1) -- size of id -- id -- size of local id -- local id;
-                message.ai8(1).ai8(4).ai32(player_id).ai8(1).ai8(m_next_id);
-                m_listener->sendMessageExcept(this, event->peer, message);
-                // send a message to the one that asked to connect
-                NetworkString message_ack;
-                // 0b10000001 (connection success) ;
-                RandomGenerator token_generator;
-                // use 4 random numbers because rand_max is probably 2^15-1.
-                uint32_t token = (uint32_t)(((token_generator.get(RAND_MAX)<<24) & 0xff) +
-                                            ((token_generator.get(RAND_MAX)<<16) & 0xff) +
-                                            ((token_generator.get(RAND_MAX)<<8)  & 0xff) +
-                                            ((token_generator.get(RAND_MAX)      & 0xff)));
-                // connection success (129) -- size of token -- token
-                message_ack.ai8(0x81).ai8(1).ai8(m_next_id).ai8(4).ai32(token).ai8(4).ai32(player_id);
-                m_listener->sendMessage(this, event->peer, message_ack);
-            } // accept player
-            else  // refuse the connection with code 0 (too much players)
-            {
-                NetworkString message;
-                message.ai8(0x80);            // 128 means connection refused
-                message.ai8(1);               // 1 bytes for the error code
-                message.ai8(0);               // 0 = too much players
-                // send only to the peer that made the request
-                m_listener->sendMessage(this, event->peer, message);
-            }
-        }
+        if (message_type == 0x01) // player requesting connection
+            connectionRequested(event);
+        if (message_type == 0x02) // player requesting kart selection
+            kartSelectionRequested(event);
     } // if (event->type == EVENT_TYPE_MESSAGE)
     else if (event->type == EVENT_TYPE_CONNECTED)
     {
     } // if (event->type == EVENT_TYPE_CONNECTED)
     else if (event->type == EVENT_TYPE_DISCONNECTED)
     {
-
+        kartDisconnected(event);
     } // if (event->type == EVENT_TYPE_DISCONNECTED)
 }
 
@@ -188,3 +143,137 @@ void ServerLobbyRoomProtocol::update()
 }
 //-----------------------------------------------------------------------------
 
+void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
+{
+    if (event->peer->getPlayerProfile() != NULL) // others knew him
+    {
+        NetworkString msg;
+        msg.ai8(0x02).ai8(1).ai8(event->peer->getPlayerProfile()->race_id);
+        m_listener->sendMessage(this, msg);
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player asks for a connection.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1                  5
+ *       ------------------------
+ *  Size | 1 |          4       |
+ *  Data | 4 | global player id |
+ *       ------------------------
+ */
+void ServerLobbyRoomProtocol::connectionRequested(Event* event)
+{
+    if (event->data.size() != 5 || event->data[0] != 4)
+    {
+        Log::warn("ServerLobbyRoomProtocol", "The server is sending a badly formated message. Size is %d and first byte %d", event->data.size(), event->data[0]);
+        return;
+    }
+    Log::verbose("ServerLobbyRoomProtocol", "New player.");
+    int player_id = 0;
+    player_id = event->data.getUInt32(1);
+    // can we add the player ?
+    if (m_setup->getPlayerCount() < 16) // accept player
+    {
+        // add the player to the game setup
+        while(m_setup->getProfile(m_next_id)!=NULL)
+            m_next_id++;
+        NetworkPlayerProfile* profile = new NetworkPlayerProfile();
+        profile->race_id = m_next_id;
+        profile->kart_name = "";
+        profile->user_profile = new OnlineUser("Unnamed Player");
+        m_setup->addPlayer(profile);
+        event->peer->setPlayerProfile(profile);
+        // notify everybody that there is a new player
+        NetworkString message;
+        // new player (1) -- size of id -- id -- size of local id -- local id;
+        message.ai8(1).ai8(4).ai32(player_id).ai8(1).ai8(m_next_id);
+        m_listener->sendMessageExcept(this, event->peer, message);
+        // send a message to the one that asked to connect
+        NetworkString message_ack;
+        // 0b10000001 (connection success) ;
+        RandomGenerator token_generator;
+        // use 4 random numbers because rand_max is probably 2^15-1.
+        uint32_t token = (uint32_t)(((token_generator.get(RAND_MAX)<<24) & 0xff) +
+                                    ((token_generator.get(RAND_MAX)<<16) & 0xff) +
+                                    ((token_generator.get(RAND_MAX)<<8)  & 0xff) +
+                                    ((token_generator.get(RAND_MAX)      & 0xff)));
+        // connection success (129) -- size of token -- token
+        message_ack.ai8(0x81).ai8(1).ai8(m_next_id).ai8(4).ai32(token).ai8(4).ai32(player_id);
+        m_listener->sendMessage(this, event->peer, message_ack);
+    } // accept player
+    else  // refuse the connection with code 0 (too much players)
+    {
+        NetworkString message;
+        message.ai8(0x80);            // 128 means connection refused
+        message.ai8(1);               // 1 bytes for the error code
+        message.ai8(0);               // 0 = too much players
+        // send only to the peer that made the request
+        m_listener->sendMessage(this, event->peer, message);
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player asks to select a kart.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1            5                    6           N+6
+ *       ---------------------------------------------------
+ *  Size | 1 |      4     |          1         |     N     |
+ *  Data | 4 | priv token | N (kart name size) | kart name |
+ *       ---------------------------------------------------
+ */
+void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
+{
+    if (event->data.size() < 6 || event->data[0] != 4)
+    {
+        Log::warn("ServerLobbyRoomProtocol", "The server is sending a badly "
+                            "formated message. Size is %d and first byte %d",
+                            event->data.size(), event->data[0]);
+        return;
+    }
+    uint32_t token = event->data.gui32(1);
+    if (token != event->peer->getClientServerToken())
+    {
+        Log::warn("ServerLobbyRoomProtocol", "Peer sending bad token. Request "
+                            "aborted.");
+        return;
+    }
+    uint8_t kart_name_size = event->data.gui8(5);
+    std::string kart_name = event->data.gs(6);
+    if (kart_name.size() != kart_name_size)
+    {
+        Log::error("ServerLobbyRoomProtocol", "Kart names sizes differ: told:"
+                            "%d, real: %d.", kart_name_size, kart_name.size());
+        return;
+    }
+    if (!m_setup->isKartAvailable(kart_name))
+    {
+        NetworkString answer;
+        answer.ai8(0x82).ai8(1).ai8(0); // kart is already taken
+        m_listener->sendMessage(this, event->peer, answer);
+        return;
+    }
+    // check if this kart is authorized
+    if (!m_setup->isKartAllowed(kart_name))
+    {
+        NetworkString answer;
+        answer.ai8(0x82).ai8(1).ai8(1); // kart is not authorized
+        m_listener->sendMessage(this, event->peer, answer);
+        return;
+    }
+    // send a kart update to everyone
+    NetworkString answer;
+    // kart update (3), 1, race id
+    answer.ai8(0x03).ai8(1).ai8(event->peer->getPlayerProfile()->race_id);
+    //  kart name size, kart name
+    answer.ai8(kart_name.size()).as(kart_name);
+    m_listener->sendMessage(this, answer);
+}
+
+//-----------------------------------------------------------------------------

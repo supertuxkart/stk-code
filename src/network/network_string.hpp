@@ -141,6 +141,7 @@ class NetworkString
         inline uint8_t      getUInt8(int pos = 0)   { return get<uint8_t,1>(pos);         }
         inline char         getChar(int pos = 0)    { return get<char,1>(pos);            }
         inline unsigned char getUChar(int pos = 0)  { return get<unsigned char,1>(pos);   }
+        std::string         getString(int pos = 0)  { return std::string(m_string.c_str()+pos); }
         
         inline int          gi(int pos = 0)         { return get<int,4>(pos);             }
         inline uint32_t     gui(int pos = 0)        { return get<uint32_t,4>(pos);        }
@@ -149,6 +150,7 @@ class NetworkString
         inline uint8_t      gui8(int pos = 0)       { return get<uint8_t,1>(pos);         }
         inline char         gc(int pos = 0)         { return get<char,1>(pos);            }
         inline unsigned char guc(int pos = 0)       { return get<unsigned char,1>(pos);   }
+        std::string         gs(int pos = 0)         { return std::string(m_string.c_str()+pos); }
         
         double getDouble(int pos = 0) //!< BEWARE OF PRECISION
         {

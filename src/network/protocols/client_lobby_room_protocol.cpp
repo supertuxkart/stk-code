@@ -4,10 +4,10 @@
 #include "online/current_online_user.hpp"
 #include "utils/log.hpp"
 
-ClientLobbyRoomProtocol::ClientLobbyRoomProtocol(const TransportAddress& server_address) 
-    : LobbyRoomProtocol(NULL) 
-{ 
-    m_server_address = server_address; 
+ClientLobbyRoomProtocol::ClientLobbyRoomProtocol(const TransportAddress& server_address)
+    : LobbyRoomProtocol(NULL)
+{
+    m_server_address = server_address;
     m_server = NULL;
 }
 
@@ -45,7 +45,7 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
         assert(event->data.size()); // assert that data isn't empty
         Log::verbose("ClientLobbyRoomProtocol", "Message from %u : \"%s\"", event->peer->getAddress(), event->data.c_str());
         uint8_t message_type = event->data.getAndRemoveUInt8();
-        
+
         if (message_type == 0x01) // new player connected
             newPlayer(event);
         else if (message_type == 0x02) // player disconnected
@@ -102,7 +102,7 @@ void ClientLobbyRoomProtocol::update()
 
 /*! \brief Called when a new player is connected to the server
  *  \param event : Event providing the information.
- *  
+ *
  *  Format of the data :
  *  Byte 0   1                  5   6                   7
  *       ------------------------------------------------
@@ -120,9 +120,9 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
 
     uint32_t global_id = event->data.gui32(1);
 
-    NetworkPlayerProfile profile;
-    profile.kart_name = "";
-    profile.race_id = event->data.gui8(6);
+    NetworkPlayerProfile* profile = new NetworkPlayerProfile();
+    profile->kart_name = "";
+    profile->race_id = event->data.gui8(6);
 
     if (global_id == CurrentOnlineUser::get()->getUserID())
     {
@@ -131,7 +131,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
     else
     {
         Log::verbose("ClientLobbyRoomProtocol", "New player connected.");
-        profile.user_profile = new OnlineUser(global_id);
+        profile->user_profile = new OnlineUser(global_id);
         m_setup->addPlayer(profile);
     }
 }
@@ -140,7 +140,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
 
 /*! \brief Called when a new player is disconnected
  *  \param event : Event providing the information.
- *  
+ *
  *  Format of the data :
  *  Byte 0   1                   2
  *       -------------------------
@@ -170,7 +170,7 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
 
 /*! \brief Called when the server accepts the connection.
  *  \param event : Event providing the information.
- *  
+ *
  *  Format of the data :
  *  Byte 0   1                   2   3            7   8           12
  *       ----------------------------------------------------------
@@ -186,15 +186,15 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         return;
     }
 
-    NetworkPlayerProfile profile;
-    profile.kart_name = "";
-    profile.race_id = event->data.gui8(1);
+    NetworkPlayerProfile* profile = new NetworkPlayerProfile();
+    profile->kart_name = "";
+    profile->race_id = event->data.gui8(1);
     uint32_t token = event->data.gui32(3);
     uint32_t global_id = event->data.gui32(8);
     if (global_id == CurrentOnlineUser::get()->getUserID())
     {
         Log::info("ClientLobbyRoomProtocol", "The server accepted the connection.");
-        profile.user_profile = CurrentOnlineUser::get();
+        profile->user_profile = CurrentOnlineUser::get();
         m_setup->addPlayer(profile);
         event->peer->setClientServerToken(token);
         m_server = event->peer;
@@ -206,7 +206,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 
 /*! \brief Called when the server refuses the connection.
  *  \param event : Event providing the information.
- *  
+ *
  *  Format of the data :
  *  Byte 0   1              2
  *       --------------------
@@ -240,7 +240,7 @@ void ClientLobbyRoomProtocol::connectionRefused(Event* event)
 
 /*! \brief Called when the server refuses the kart selection request.
  *  \param event : Event providing the information.
- *  
+ *
  *  Format of the data :
  *  Byte 0   1              2
  *       --------------------
@@ -272,11 +272,11 @@ void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
 
 //-----------------------------------------------------------------------------
 
-/*! \brief Called when the server refuses the kart selection request.
+/*! \brief Called when the server tells to update a player's kart.
  *  \param event : Event providing the information.
- *  
+ *
  *  Format of the data :
- *  Byte 0   1         2                    3           N+3   
+ *  Byte 0   1         2                    3           N+3
  *       ------------------------------------------------
  *  Size | 1 |    1    |       1            |     N     |
  *  Data | 1 | race id | N (kart name size) | kart name |
@@ -284,9 +284,24 @@ void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
  */
 void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
 {
-    if (event->data[0] != 1) 
+    if (event->data.size() < 3 || event->data[0] != 1)
     {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying a refused connection wasn't formated as expected.");
+        Log::error("ClientLobbyRoomProtocol", "A message notifying a kart selection update wasn't formated as expected.");
         return;
     }
+    uint8_t player_id = event->data[1];
+    uint8_t kart_name_length = event->data[2];
+    std::string data = event->data.getString(3);
+    if (data.size() != kart_name_length)
+    {
+        Log::error("ClientLobbyRoomProtocol", "Kart names sizes differ: told: %d, real: %d.", kart_name_length, data.size());
+        return;
+    }
+    if (!m_setup->isKartAvailable(data))
+    {
+        Log::error("ClientLobbyRoomProtocol", "The updated kart is taken already.");
+    }
+    m_setup->setPlayerKart(player_id, data);
 }
+
+//-----------------------------------------------------------------------------

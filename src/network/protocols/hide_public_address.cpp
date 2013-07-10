@@ -18,6 +18,7 @@
 
 #include "network/protocols/hide_public_address.hpp"
 
+#include "network/protocol_manager.hpp"
 #include "online/http_connector.hpp"
 #include "online/current_online_user.hpp"
 #include "config/user_config.hpp"
