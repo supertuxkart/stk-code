@@ -283,39 +283,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         lod_node->add(500, static_model, true);
         m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
 
-        m_hat_node = NULL;
-        if(m_hat_name.size()>0)
-        {
-            scene::IBoneSceneNode *bone = m_animated_node->getJointNode("Head");
-            if(!bone)
-                bone = m_animated_node->getJointNode("head");
-            if(bone)
-            {
-
-                // Till we have all models fixed, accept Head and head as bone naartme
-                scene::IMesh *hat_mesh =
-                    irr_driver->getAnimatedMesh(
-                         file_manager->getModelFile(m_hat_name));
-                m_hat_node = irr_driver->addMesh(hat_mesh);
-                bone->addChild(m_hat_node);
-                m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
-                m_animated_node->OnAnimate(0);
-                bone->updateAbsolutePosition();
-
-                // With the hat node attached to the head bone, we have to
-                // reverse the transformation of the bone, so that the hat
-                // is still properly placed. Esp. the hat offset needs
-                // to be rotated.
-                const core::matrix4 mat = bone->getAbsoluteTransformation();
-                core::matrix4 inv;
-                mat.getInverse(inv);
-                core::vector3df rotated_offset;
-                inv.rotateVect(rotated_offset, m_hat_offset);
-                m_hat_node->setPosition(rotated_offset);
-                m_hat_node->setScale(inv.getScale());
-                m_hat_node->setRotation(inv.getRotationDegrees());
-            }   // if bone
-        }   // if(m_hat_name)
+        attachHat();
 
 #ifdef DEBUG
         std::string debug_name = m_model_filename+" (animated-kart-model)";
@@ -701,4 +669,40 @@ void KartModel::update(float rotation_dt, float steer, const float suspension[4]
 
     m_animated_node->setCurrentFrame(frame);
 }   // update
+//-----------------------------------------------------------------------------
+void KartModel::attachHat(){
+	 m_hat_node = NULL;
+        if(m_hat_name.size()>0)
+        {
+            scene::IBoneSceneNode *bone = m_animated_node->getJointNode("Head");
+            if(!bone)
+                bone = m_animated_node->getJointNode("head");
+            if(bone)
+            {
+
+                // Till we have all models fixed, accept Head and head as bone naartme
+                scene::IMesh *hat_mesh =
+                    irr_driver->getAnimatedMesh(
+                         file_manager->getModelFile(m_hat_name));
+                m_hat_node = irr_driver->addMesh(hat_mesh);
+                bone->addChild(m_hat_node);
+                m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
+                m_animated_node->OnAnimate(0);
+                bone->updateAbsolutePosition();
+
+                // With the hat node attached to the head bone, we have to
+                // reverse the transformation of the bone, so that the hat
+                // is still properly placed. Esp. the hat offset needs
+                // to be rotated.
+                const core::matrix4 mat = bone->getAbsoluteTransformation();
+                core::matrix4 inv;
+                mat.getInverse(inv);
+                core::vector3df rotated_offset;
+                inv.rotateVect(rotated_offset, m_hat_offset);
+                m_hat_node->setPosition(rotated_offset);
+                m_hat_node->setScale(inv.getScale());
+                m_hat_node->setRotation(inv.getRotationDegrees());
+            }   // if bone
+        }   // if(m_hat_name)
+}
 

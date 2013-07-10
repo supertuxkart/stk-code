@@ -313,6 +313,23 @@ void SoccerWorld::initKartList()
         }// next kart
     }
 
+	//Loading the indicator textures
+	irr::video::ITexture *redTeamTexture = irr_driver->getTexture(
+		file_manager->getTextureFile("soccer_player_red.png"));
+	irr::video::ITexture *blueTeamTexture = irr_driver->getTexture(
+		file_manager->getTextureFile("soccer_player_blue.png"));
+	//Assigning indicators
+	for(int i=0; i<kart_amount; i++){
+		scene::ISceneNode *hatNode;
+		if(race_manager->getLocalKartInfo(i).getSoccerTeam() == SOCCER_TEAM_RED)
+			hatNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3,0.3)
+			,redTeamTexture,m_karts[i]->getKartModel()->getAnimatedNode()->getJointNode("Head"));
+		else
+			hatNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3,0.3)
+			,blueTeamTexture,m_karts[i]->getKartModel()->getAnimatedNode()->getJointNode("Head"));
+		hatNode->setPosition(m_karts[i]->getKartModel()->getHatOffset());
+	}
+
     // Compute start positions for each team
     int team_cur_position[NB_SOCCER_TEAMS];
     team_cur_position[0] = 1;
