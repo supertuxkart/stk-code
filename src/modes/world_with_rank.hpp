@@ -54,7 +54,7 @@ protected:
     bool              m_position_setting_initialised;
 #endif
 
-    unsigned int WorldWithRank::getClosestStartPoint(AbstractKart *kart);
+    unsigned int getClosestStartPoint(AbstractKart *kart);
 
 public:
                   WorldWithRank() : World() {}
