@@ -417,36 +417,10 @@ bool CutsceneWorld::isRaceOver()
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
-/** Called when the race finishes, i.e. after playing (if necessary) an
- *  end of race animation. It updates the time for all karts still racing,
- *  and then updates the ranks.
- */
-void CutsceneWorld::terminateRace()
-{
-    World::terminateRace();
-}   // terminateRace
-
-//-----------------------------------------------------------------------------
-/** Returns the data to display in the race gui.
- */
-void CutsceneWorld::getKartsDisplayInfo(
-                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
-{
-}   // getKartDisplayInfo
-
-//-----------------------------------------------------------------------------
-/** Moves a kart to its rescue position.
- *  \param kart The kart that was rescued.
- */
-void CutsceneWorld::moveKartAfterRescue(AbstractKart* kart)
-{
-}   // moveKartAfterRescue
-
-//-----------------------------------------------------------------------------
 
 void CutsceneWorld::createRaceGUI()
 {
     m_race_gui = new CutsceneGUI();
-}
+}   // createRaceGUI
 
 
