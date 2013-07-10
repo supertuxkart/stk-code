@@ -244,8 +244,7 @@ void ProtocolManager::update()
         if (event->type == EVENT_TYPE_MESSAGE)
         {
             if (event->data.size() > 0)
-                searchedProtocol = (PROTOCOL_TYPE)(event->data.getUInt8(0));
-            event->removeFront(1); // remove the first byte which indicates the protocol
+                searchedProtocol = (PROTOCOL_TYPE)(event->data.getAndRemoveUInt8());
         }
         if (event->type == EVENT_TYPE_CONNECTED)
         {
@@ -255,6 +254,10 @@ void ProtocolManager::update()
         {
             if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event->type == EVENT_TYPE_DISCONNECTED) // pass data to protocols even when paused
                 m_protocols[i].protocol->notifyEvent(event);
+        }
+        if (searchedProtocol == PROTOCOL_NONE) // no protocol was aimed, show the msg to debug
+        {
+            Log::debug("ProtocolManager", "Message is \"%s\"", event->data.c_str());
         }
         delete event;
     }

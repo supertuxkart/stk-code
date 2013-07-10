@@ -33,7 +33,7 @@ class ServerNetworkManager : public NetworkManager
         
         virtual void run();
         
-        void start();
+        void kickAllPlayers();
         
         virtual void sendPacket(const NetworkString& data);
         

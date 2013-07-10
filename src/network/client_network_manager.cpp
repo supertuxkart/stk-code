@@ -55,6 +55,12 @@ void* waitInput(void* data)
         {
             ProtocolManager::getInstance()->requestStart(new ConnectToServer(n));
         }
+        else 
+        {
+            NetworkString msg("\0\0");
+            msg += str;
+            NetworkManager::getInstance()->getPeers()[0]->sendPacket(msg);
+        }
     }
 
     exit(0);
