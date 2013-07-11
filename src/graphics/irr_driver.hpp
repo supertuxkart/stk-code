@@ -159,7 +159,7 @@ public:
                                            scene::ISceneNode *parent = NULL);
     scene::ISceneNode    *addBillboard(const core::dimension2d< f32 > size,
                                        video::ITexture *texture,
-                                       scene::ISceneNode* parent=NULL);
+                                       scene::ISceneNode* parent=NULL, bool alphaTesting);
 
     scene::IParticleSystemSceneNode
                          *addParticleNode(bool default_emitter=true);
