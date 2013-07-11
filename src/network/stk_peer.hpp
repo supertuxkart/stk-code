@@ -38,12 +38,13 @@ class STKPeer
         
         void setClientServerToken(const uint32_t& token) { *m_client_server_token = token; *m_token_set = true; }
         void unsetClientServerToken() { *m_token_set = false; }
-        void setPlayerProfile(NetworkPlayerProfile* profile) { *m_player_profile = *profile; }
+        void setPlayerProfile(NetworkPlayerProfile* profile) { *m_player_profile = profile; }
+        void setPlayerProfilePtr(NetworkPlayerProfile** profile) { m_player_profile = profile; }
 
         bool isConnected() const;
         uint32_t getAddress() const;
         uint16_t getPort() const;
-        NetworkPlayerProfile* getPlayerProfile() { return m_player_profile; }
+        NetworkPlayerProfile* getPlayerProfile() { return *m_player_profile; }
         uint32_t getClientServerToken() const   { return *m_client_server_token; }
         bool     isClientServerTokenSet() const { return *m_token_set; }
 
@@ -51,7 +52,7 @@ class STKPeer
 
     protected:
         ENetPeer* m_peer;
-        NetworkPlayerProfile* m_player_profile;
+        NetworkPlayerProfile** m_player_profile;
         uint32_t *m_client_server_token;
         bool *m_token_set;
 };

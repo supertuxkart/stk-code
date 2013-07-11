@@ -64,7 +64,7 @@ void* waitInput(void* data)
             ClientLobbyRoomProtocol* clrp = static_cast<ClientLobbyRoomProtocol*>(protocol);
             clrp->requestKartSelection(str2);
         }
-        else
+        else if (NetworkManager::getInstance()->getPeers().size() > 0)
         {
             NetworkString msg;
             msg.ai8(0);

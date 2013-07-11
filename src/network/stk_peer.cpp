@@ -25,7 +25,8 @@
 STKPeer::STKPeer()
 {
     m_peer = NULL;
-    m_player_profile = new NetworkPlayerProfile();
+    m_player_profile = new NetworkPlayerProfile*;
+    *m_player_profile = NULL;
     m_client_server_token = new uint32_t;
     *m_client_server_token = 0;
     m_token_set = new bool;
@@ -36,7 +37,6 @@ STKPeer::STKPeer()
 
 STKPeer::STKPeer(const STKPeer& peer)
 {
-    Log::verbose("STKPeer", "Construction a copy of a STKPeer.");
     m_peer = peer.m_peer;
     m_player_profile = peer.m_player_profile;
     m_client_server_token = peer.m_client_server_token;

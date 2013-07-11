@@ -80,11 +80,8 @@ ProtocolManager::~ProtocolManager()
 
 void ProtocolManager::notifyEvent(Event* event)
 {
-    Log::debug("ProtocolManager", "Event received.");
     Event* event2 = new Event(*event);
-    Log::debug("ProtocolManager", "Trying to copy the event");
     pthread_mutex_lock(&m_events_mutex);
-    Log::debug("ProtocolManager", "Event ADDED.");
     m_events_to_process.push_back(event2); // add the event to the queue
     pthread_mutex_unlock(&m_events_mutex);
 }
