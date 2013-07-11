@@ -86,6 +86,8 @@ Event::Event(const Event& event)
 
 Event::~Event()
 {
+    peer = NULL;
+    m_packet = NULL;
 }
 
 void Event::removeFront(int size)

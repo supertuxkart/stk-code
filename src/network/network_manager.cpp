@@ -109,6 +109,7 @@ void NetworkManager::notifyEvent(Event* event)
     }
 
     // notify for the event now.
+    Log::info("NetworkManager", "Notifying the protocol manager.");
     ProtocolManager::getInstance()->notifyEvent(event);
 
     if (event->type == EVENT_TYPE_DISCONNECTED)

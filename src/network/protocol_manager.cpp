@@ -80,14 +80,15 @@ ProtocolManager::~ProtocolManager()
 
 void ProtocolManager::notifyEvent(Event* event)
 {
+    Event* event2 = event;
     if (event->type == EVENT_TYPE_DISCONNECTED)
     {
         // make a copy if needed (the peer will be lost elseway)
-        event = new Event(*event);
+        event2 = new Event(*event);
         Log::warn("ProtocolManager", "Trying to copy the event");
     }
     pthread_mutex_lock(&m_events_mutex);
-    m_events_to_process.push_back(event); // add the event to the queue
+    m_events_to_process.push_back(event2); // add the event to the queue
     pthread_mutex_unlock(&m_events_mutex);
 }
 
@@ -266,9 +267,9 @@ void ProtocolManager::update()
             Log::debug("ProtocolManager", "Message is \"%s\"", event->data.c_str());
         }
         
-        if (event->type == event->type == EVENT_TYPE_DISCONNECTED)
+        if (event->type == EVENT_TYPE_DISCONNECTED)
         { // because we made a copy of the event and the peer
-            delete event->peer; 
+            delete event->peer;
             delete event;
         }
     }
