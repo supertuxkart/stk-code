@@ -76,6 +76,7 @@ Event::Event(ENetEvent* event)
 
 Event::Event(const Event& event)
 {
+    Log::verbose("Event", "Constructing a copy of the event.");
     m_packet = NULL;
     data = event.data;
     // copy the peer

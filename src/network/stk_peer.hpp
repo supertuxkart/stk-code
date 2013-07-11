@@ -29,6 +29,7 @@ class STKPeer
     friend class Event;
     public:
         STKPeer();
+        STKPeer(const STKPeer& peer);
         virtual ~STKPeer();
 
         virtual void sendPacket(const NetworkString& data);
@@ -48,10 +49,7 @@ class STKPeer
         bool     isClientServerTokenSet() const { return m_token_set; }
         NetworkPlayerProfile* getPlayerProfile() { return m_player_profile; }
 
-        bool operator==(const STKPeer* peer) const;
-        bool operator==(const ENetPeer* peer) const;
-        bool operator!=(const STKPeer* peer) const;
-        bool operator!=(const ENetPeer* peer) const;
+        bool isSamePeer(const STKPeer* peer) const;
 
     protected:
         ENetPeer* m_peer;

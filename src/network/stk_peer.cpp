@@ -27,6 +27,15 @@ STKPeer::STKPeer()
     m_peer = NULL;
     m_player_profile = NULL;
 }
+STKPeer::STKPeer(const STKPeer& peer)
+{
+    Log::verbose("STKPeer", "Construction a copy of a STKPeer.");
+    m_peer = peer.m_peer;
+    m_player_profile = peer.m_player_profile;
+    m_client_server_token = peer.m_client_server_token;
+    m_token_set = peer.m_token_set;
+}
+
 
 STKPeer::~STKPeer()
 {
@@ -84,20 +93,8 @@ bool STKPeer::isConnected() const
     Log::info("STKPeer", "The peer state is %i\n", m_peer->state);
     return (m_peer->state == ENET_PEER_STATE_CONNECTED);
 }
-bool STKPeer::operator==(const STKPeer* peer) const
+bool STKPeer::isSamePeer(const STKPeer* peer) const
 {
     return peer->m_peer==m_peer;
-}
-bool STKPeer::operator!=(const STKPeer* peer) const
-{
-    return peer->m_peer!=m_peer;
-}
-bool STKPeer::operator==(const ENetPeer* peer) const
-{
-    return peer==m_peer;
-}
-bool STKPeer::operator!=(const ENetPeer* peer) const
-{
-    return peer!=m_peer;
 }
 

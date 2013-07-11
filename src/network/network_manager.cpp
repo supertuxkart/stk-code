@@ -92,7 +92,7 @@ void NetworkManager::notifyEvent(Event* event)
 
     if (event->type == EVENT_TYPE_CONNECTED)
     {
-        Log::debug("NetworkManager", "A client has just connected. There are now %lu peers.", m_peers.size() + 1);
+        Log::info("NetworkManager", "A client has just connected. There are now %lu peers.", m_peers.size() + 1);
         Log::verbose("NetworkManager", "Address of event->peer after connection : %ld", (long int)(event->peer));
         // create the new peer:
         m_peers.push_back(event->peer);
@@ -119,14 +119,14 @@ void NetworkManager::notifyEvent(Event* event)
         for (unsigned int i = 0; i < m_peers.size(); i++)
         {
             Log::error("NetworkManager", "Saved : %ld, Sender : %ld", (long int)(m_peers[i]), (long int)(event->peer));
-            if (m_peers[i] == event->peer && !removed) // remove only one
+            if (m_peers[i]->isSamePeer(event->peer) && !removed) // remove only one
             {
                 delete m_peers[i];
                 m_peers.erase(m_peers.begin()+i, m_peers.begin()+i+1);
                 Log::verbose("NetworkManager", "The peer has been removed from the Network Manager.");
                 removed = true;
             }
-            else if (m_peers[i] == event->peer)
+            else if (m_peers[i]->isSamePeer(event->peer))
             {
                 Log::fatal("NetworkManager", "Multiple peers match the disconnected one.");
             }
@@ -134,10 +134,10 @@ void NetworkManager::notifyEvent(Event* event)
         if (!removed)
             Log::warn("NetworkManager", "The peer that has been disconnected was not registered by the Network Manager.");
 
-        Log::debug("NetworkManager", "Somebody is now disconnected. There are now %lu peers.", m_peers.size());
+        Log::info("NetworkManager", "Somebody is now disconnected. There are now %lu peers.", m_peers.size());
+        delete event; // in this case only, the event has been copied by the protocol manager
     }
 
-    delete event;
 }
 
 //-----------------------------------------------------------------------------
@@ -154,8 +154,10 @@ void NetworkManager::sendPacketExcept(STKPeer* peer, const NetworkString& data)
 {
     for (unsigned int i = 0; i < m_peers.size(); i++)
     {
-        if (m_peers[i] != peer)
+        if (!m_peers[i]->isSamePeer(peer))
+        {
             m_peers[i]->sendPacket(data);
+        }
     }
 }
 
