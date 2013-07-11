@@ -26,7 +26,14 @@ STKPeer::STKPeer()
 {
     m_peer = NULL;
     m_player_profile = NULL;
+    m_client_server_token = new uint32_t;
+    *m_client_server_token = 0;
+    m_token_set = new bool;
+    *m_token_set = false;
 }
+
+//-----------------------------------------------------------------------------
+
 STKPeer::STKPeer(const STKPeer& peer)
 {
     Log::verbose("STKPeer", "Construction a copy of a STKPeer.");
@@ -36,6 +43,7 @@ STKPeer::STKPeer(const STKPeer& peer)
     m_token_set = peer.m_token_set;
 }
 
+//-----------------------------------------------------------------------------
 
 STKPeer::~STKPeer()
 {
@@ -47,7 +55,10 @@ STKPeer::~STKPeer()
         m_player_profile = NULL;
 }
 
-bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host, uint32_t channel_count, uint32_t data)
+//-----------------------------------------------------------------------------
+
+bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host, 
+                uint32_t channel_count, uint32_t data)
 {
     ENetAddress  address;
     address.host =
@@ -63,40 +74,62 @@ bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host, uint32_t 
         Log::error("STKPeer", "Could not try to connect to server.\n");
         return false;
     }
-    Log::verbose("STKPeer", "Connecting to %i.%i.%i.%i:%i.\nENetPeer address is %ld", (peer->address.host>>0)&0xff,(peer->address.host>>8)&0xff,(peer->address.host>>16)&0xff,(peer->address.host>>24)&0xff,peer->address.port, (long int)(peer));
+    Log::verbose("STKPeer", "Connecting to %i.%i.%i.%i:%i.\nENetPeer address "
+                "is %ld", (peer->address.host>>0)&0xff,
+                (peer->address.host>>8)&0xff,(peer->address.host>>16)&0xff,
+                (peer->address.host>>24)&0xff,peer->address.port, (long int)(peer));
     return true;
 }
+
+//-----------------------------------------------------------------------------
 
 void STKPeer::disconnect()
 {
     enet_peer_disconnect(m_peer, 0);
 }
 
+//-----------------------------------------------------------------------------
+
 void STKPeer::sendPacket(NetworkString const& data)
 {
-    Log::verbose("STKPeer", "sending packet of size %d to %i.%i.%i.%i:%i", data.size(), (m_peer->address.host>>0)&0xff,(m_peer->address.host>>8)&0xff,(m_peer->address.host>>16)&0xff,(m_peer->address.host>>24)&0xff,m_peer->address.port);
-    ENetPacket* packet = enet_packet_create(data.c_str(), data.size()+1,ENET_PACKET_FLAG_RELIABLE);
+    Log::verbose("STKPeer", "sending packet of size %d to %i.%i.%i.%i:%i", 
+                data.size(), (m_peer->address.host>>0)&0xff,
+                (m_peer->address.host>>8)&0xff,(m_peer->address.host>>16)&0xff,
+                (m_peer->address.host>>24)&0xff,m_peer->address.port);
+    ENetPacket* packet = enet_packet_create(data.c_str(), data.size()+1,
+                ENET_PACKET_FLAG_RELIABLE);
 
     enet_peer_send(m_peer, 0, packet);
 }
+
+//-----------------------------------------------------------------------------
 
 uint32_t STKPeer::getAddress() const
 {
     return turnEndianness(m_peer->address.host);
 }
 
+//-----------------------------------------------------------------------------
+
 uint16_t STKPeer::getPort() const
 {
     return m_peer->address.port;
 }
+
+//-----------------------------------------------------------------------------
 
 bool STKPeer::isConnected() const
 {
     Log::info("STKPeer", "The peer state is %i\n", m_peer->state);
     return (m_peer->state == ENET_PEER_STATE_CONNECTED);
 }
+
+//-----------------------------------------------------------------------------
+
 bool STKPeer::isSamePeer(const STKPeer* peer) const
 {
     return peer->m_peer==m_peer;
 }
+
+//-----------------------------------------------------------------------------
 

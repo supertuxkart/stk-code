@@ -35,7 +35,7 @@ class NetworkPlayerProfile
     public:
         NetworkPlayerProfile() { race_id = 0; user_profile = NULL; }
         ~NetworkPlayerProfile() {}
-
+        
         uint8_t race_id; //!< The id of the player for the race
         std::string kart_name; //!< The selected kart.
         OnlineUser* user_profile; //!< Pointer to the lobby profile

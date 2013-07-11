@@ -1,3 +1,21 @@
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2013 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include "network/protocols/server_lobby_room_protocol.hpp"
 
 #include "network/server_network_manager.hpp"
@@ -208,6 +226,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         // connection success (129) -- size of token -- token
         message_ack.ai8(0x81).ai8(1).ai8(m_next_id).ai8(4).ai32(token).ai8(4).ai32(player_id);
         m_listener->sendMessage(this, event->peer, message_ack);
+        event->peer->setClientServerToken(token);
     } // accept player
     else  // refuse the connection with code 0 (too much players)
     {
