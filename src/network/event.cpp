@@ -37,7 +37,10 @@ Event::Event(ENetEvent* event)
         type = EVENT_TYPE_MESSAGE;
         break;
     case ENET_EVENT_TYPE_NONE:
-        enet_packet_destroy(event->packet);
+        // Typically there's no packet data, but just in
+        // case test and delete it
+        if(event->packet)
+            enet_packet_destroy(event->packet);
         return;
         break;
     }
