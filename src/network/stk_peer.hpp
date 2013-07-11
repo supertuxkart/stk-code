@@ -38,7 +38,7 @@ class STKPeer
         
         void setClientServerToken(const uint32_t& token) { *m_client_server_token = token; *m_token_set = true; }
         void unsetClientServerToken() { *m_token_set = false; }
-        void setPlayerProfile(NetworkPlayerProfile* profile) { m_player_profile = profile; }
+        void setPlayerProfile(NetworkPlayerProfile* profile) { *m_player_profile = *profile; }
 
         bool isConnected() const;
         uint32_t getAddress() const;

@@ -241,7 +241,6 @@ void ProtocolManager::update()
     {
         pthread_mutex_lock(&m_events_mutex); // secure threads
         Event* event = m_events_to_process.back();
-        Log::debug("ProtocolManager", "Now processing event of type %d", event->type);
         m_events_to_process.pop_back();
         pthread_mutex_unlock(&m_events_mutex); // release the mutex
 
@@ -250,7 +249,6 @@ void ProtocolManager::update()
         {
             if (event->data.size() > 0)
                 searchedProtocol = (PROTOCOL_TYPE)(event->data.getAndRemoveUInt8());
-            Log::debug("ProtocolManager", "Message of type %d.", searchedProtocol);
         }
         if (event->type == EVENT_TYPE_CONNECTED)
         {

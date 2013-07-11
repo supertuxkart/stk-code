@@ -203,12 +203,6 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         // add the player to the game setup
         while(m_setup->getProfile(m_next_id)!=NULL)
             m_next_id++;
-        NetworkPlayerProfile* profile = new NetworkPlayerProfile();
-        profile->race_id = m_next_id;
-        profile->kart_name = "";
-        profile->user_profile = new OnlineUser("Unnamed Player");
-        m_setup->addPlayer(profile);
-        event->peer->setPlayerProfile(profile);
         // notify everybody that there is a new player
         NetworkString message;
         // new player (1) -- size of id -- id -- size of local id -- local id;
@@ -226,7 +220,15 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         // connection success (129) -- size of token -- token
         message_ack.ai8(0x81).ai8(1).ai8(m_next_id).ai8(4).ai32(token).ai8(4).ai32(player_id);
         m_listener->sendMessage(this, event->peer, message_ack);
+        
         event->peer->setClientServerToken(token);
+        
+        NetworkPlayerProfile* profile = new NetworkPlayerProfile();
+        profile->race_id = m_next_id;
+        profile->kart_name = "";
+        profile->user_profile = new OnlineUser("Unnamed Player");
+        m_setup->addPlayer(profile);
+        event->peer->setPlayerProfile(profile);
     } // accept player
     else  // refuse the connection with code 0 (too much players)
     {

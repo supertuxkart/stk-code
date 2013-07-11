@@ -62,7 +62,7 @@ STKHost::~STKHost()
 {
     if (m_listening_thread)
     {
-        pthread_cancel(*m_listening_thread);//, SIGKILL);
+        pthread_cancel(*m_listening_thread);//, SIGKILL); with kill
         delete m_listening_thread;
         m_listening_thread = NULL;
     }
@@ -86,8 +86,8 @@ void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count,
                             max_incoming_bandwidth, max_outgoing_bandwidth);
     if (m_host == NULL)
     {
-        Log::error("STKHost", "An error occurred while trying to create an ENet \
-                          server host.");
+        Log::error("STKHost", "An error occurred while trying to create an ENet"
+                          " server host.");
         exit (EXIT_FAILURE);
     }
 }
@@ -102,8 +102,8 @@ void STKHost::setupClient(int peer_count, int channel_limit,
                             max_incoming_bandwidth, max_outgoing_bandwidth);
     if (m_host == NULL)
     {
-        Log::error("STKHost", "An error occurred while trying to create an ENet \
-                          client host.");
+        Log::error("STKHost", "An error occurred while trying to create an ENet"
+                          " client host.");
         exit (EXIT_FAILURE);
     }
 }
@@ -140,7 +140,7 @@ void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
     to.sin_addr.s_addr = htonl(dst.ip);
     
     sendto(m_host->socket, (char*)data, length, 0,(sockaddr*)&to, to_len);
-    Log::verbose("STKHost", "Raw packet sent to %i.%i.%i.%i:%u\n", ((dst.ip>>24)&0xff)
+    Log::verbose("STKHost", "Raw packet sent to %i.%i.%i.%i:%u", ((dst.ip>>24)&0xff)
     , ((dst.ip>>16)&0xff), ((dst.ip>>8)&0xff), ((dst.ip>>0)&0xff), dst.port);
 }
 

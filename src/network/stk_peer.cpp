@@ -25,7 +25,7 @@
 STKPeer::STKPeer()
 {
     m_peer = NULL;
-    m_player_profile = NULL;
+    m_player_profile = new NetworkPlayerProfile();
     m_client_server_token = new uint32_t;
     *m_client_server_token = 0;
     m_token_set = new bool;
