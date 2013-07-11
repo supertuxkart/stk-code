@@ -76,13 +76,19 @@ bool GameSetup::removePlayer(uint8_t id)
 
 void GameSetup::setPlayerKart(uint8_t id, std::string kart_name)
 {
+    bool found = false;
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
         if (m_players[i]->race_id == id)
         {
             m_players[i]->kart_name = kart_name;
-            Log::info("GameSetup", "Player %d took kart %s", id, kart_name.c_str());
+            Log::info("GameSetup::setPlayerKart", "Player %d took kart %s", id, kart_name.c_str());
+            found = true;
         }
+    }
+    if (!found)
+    {
+        Log::info("GameSetup::setPlayerKart", "The player %d was unknown.", id);
     }
 }
 

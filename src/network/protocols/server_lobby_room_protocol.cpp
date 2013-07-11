@@ -58,7 +58,6 @@ void ServerLobbyRoomProtocol::setup()
 void ServerLobbyRoomProtocol::notifyEvent(Event* event)
 {
     assert(m_setup); // assert that the setup exists
-    Log::debug("ServerLobbyRoomProtocol", "Event received");
     if (event->type == EVENT_TYPE_MESSAGE)
     {
         assert(event->data.size()); // message not empty
@@ -165,15 +164,15 @@ void ServerLobbyRoomProtocol::update()
 void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
 {
     STKPeer* peer = *(event->peer);
-    Log::info("ServerLobbyRoomProtocol", "Player disconnected.");
     if (peer->getPlayerProfile() != NULL) // others knew him
     {
         NetworkString msg;
         msg.ai8(0x02).ai8(1).ai8(peer->getPlayerProfile()->race_id);
         m_listener->sendMessage(this, msg);
+        Log::info("ServerLobbyRoomProtocol", "Player disconnected.");
     }
     else
-        Log::info("ServerLobbyRoomProtocol", "Peer not registered");
+        Log::info("ServerLobbyRoomProtocol", "The DC peer wasn't registered.");
 }
 
 //-----------------------------------------------------------------------------
@@ -196,7 +195,6 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         Log::warn("ServerLobbyRoomProtocol", "The server is sending a badly formated message. Size is %d and first byte %d", event->data.size(), event->data[0]);
         return;
     }
-    Log::verbose("ServerLobbyRoomProtocol", "New player.");
     int player_id = 0;
     player_id = event->data.getUInt32(1);
     // can we add the player ?
@@ -231,6 +229,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         profile->user_profile = new OnlineUser("Unnamed Player");
         m_setup->addPlayer(profile);
         peer->setPlayerProfile(profile);
+        Log::verbose("ServerLobbyRoomProtocol", "New player.");
     } // accept player
     else  // refuse the connection with code 0 (too much players)
     {
@@ -240,6 +239,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         message.ai8(0);               // 0 = too much players
         // send only to the peer that made the request
         m_listener->sendMessage(this, peer, message);
+        Log::verbose("ServerLobbyRoomProtocol", "Player refused");
     }
 }
 

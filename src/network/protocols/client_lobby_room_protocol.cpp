@@ -62,9 +62,9 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
     if (event->type == EVENT_TYPE_MESSAGE)
     {
         assert(event->data.size()); // assert that data isn't empty
-        Log::verbose("ClientLobbyRoomProtocol", "Message from %u : \"%s\"", peer->getAddress(), event->data.c_str());
         uint8_t message_type = event->data.getAndRemoveUInt8();
 
+        Log::debug("ClientLobbyRoomProtocol", "Message of type %d", message_type);
         if (message_type == 0x01) // new player connected
             newPlayer(event);
         else if (message_type == 0x02) // player disconnected
@@ -220,6 +220,8 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         m_server = *(event->peer);
         m_state = CONNECTED;
     }
+    else
+        Log::info("ClientLobbyRoomProtocol", "Failure during the connection acceptation process.");
 }
 
 //-----------------------------------------------------------------------------
