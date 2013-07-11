@@ -314,6 +314,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     //  kart name size, kart name
     answer.ai8(kart_name.size()).as(kart_name);
     m_listener->sendMessage(this, answer);
+    m_setup->setPlayerKart(peer->getPlayerProfile()->race_id, kart_name);
 }
 
 //-----------------------------------------------------------------------------
