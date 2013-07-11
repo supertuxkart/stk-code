@@ -38,11 +38,12 @@ void* STKHost::receive_data(void* self)
 {
     ENetEvent event;
     ENetHost* host = (((STKHost*)(self))->m_host);
-    while (1) 
+    while (1)
     {
         while (enet_host_service(host, &event, 0) != 0) {
             Event* evt = new Event(&event);
-            NetworkManager::getInstance()->notifyEvent(evt);
+            if (event.type != ENET_EVENT_TYPE_NONE)
+                NetworkManager::getInstance()->notifyEvent(evt);
         }
     }
     return NULL;
@@ -74,15 +75,15 @@ STKHost::~STKHost()
 
 // ----------------------------------------------------------------------------
 
-void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count, 
-                            int channel_limit, uint32_t max_incoming_bandwidth, 
+void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count,
+                            int channel_limit, uint32_t max_incoming_bandwidth,
                             uint32_t max_outgoing_bandwidth)
 {
     ENetAddress* addr = (ENetAddress*)(malloc(sizeof(ENetAddress)));
     addr->host = address;
     addr->port = port;
 
-    m_host = enet_host_create(addr, peer_count, channel_limit, 
+    m_host = enet_host_create(addr, peer_count, channel_limit,
                             max_incoming_bandwidth, max_outgoing_bandwidth);
     if (m_host == NULL)
     {
@@ -94,11 +95,11 @@ void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count,
 
 // ----------------------------------------------------------------------------
 
-void STKHost::setupClient(int peer_count, int channel_limit, 
+void STKHost::setupClient(int peer_count, int channel_limit,
                             uint32_t max_incoming_bandwidth,
                             uint32_t max_outgoing_bandwidth)
 {
-    m_host = enet_host_create(NULL, peer_count, channel_limit, 
+    m_host = enet_host_create(NULL, peer_count, channel_limit,
                             max_incoming_bandwidth, max_outgoing_bandwidth);
     if (m_host == NULL)
     {
@@ -138,7 +139,7 @@ void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
     to.sin_family = AF_INET;
     to.sin_port = htons(dst.port);
     to.sin_addr.s_addr = htonl(dst.ip);
-    
+
     sendto(m_host->socket, (char*)data, length, 0,(sockaddr*)&to, to_len);
     Log::verbose("STKHost", "Raw packet sent to %i.%i.%i.%i:%u", ((dst.ip>>24)&0xff)
     , ((dst.ip>>16)&0xff), ((dst.ip>>8)&0xff), ((dst.ip>>0)&0xff), dst.port);
@@ -146,16 +147,16 @@ void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
 
 // ----------------------------------------------------------------------------
 
-uint8_t* STKHost::receiveRawPacket() 
+uint8_t* STKHost::receiveRawPacket()
 {
     uint8_t* buffer; // max size needed normally (only used for stun)
     buffer = (uint8_t*)(malloc(sizeof(uint8_t)*2048));
     memset(buffer, 0, 2048);
-    
+
     int len = recv(m_host->socket,(char*)buffer,2048, 0);
     int i = 0;
     // wait to receive the message because enet sockets are non-blocking
-    while(len < 0) 
+    while(len < 0)
     {
         i++;
         len = recv(m_host->socket,(char*)buffer,2048, 0);
@@ -166,24 +167,24 @@ uint8_t* STKHost::receiveRawPacket()
 
 // ----------------------------------------------------------------------------
 
-uint8_t* STKHost::receiveRawPacket(TransportAddress sender) 
+uint8_t* STKHost::receiveRawPacket(TransportAddress sender)
 {
     uint8_t* buffer; // max size needed normally (only used for stun)
     buffer = (uint8_t*)(malloc(sizeof(uint8_t)*2048));
     memset(buffer, 0, 2048);
-    
+
     socklen_t from_len;
     struct sockaddr addr;
-    
+
     from_len = sizeof(addr);
     int len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
-    
+
     int i = 0;
      // wait to receive the message because enet sockets are non-blocking
     while(len < 0 || (
-               (uint8_t)(addr.sa_data[2]) != (sender.ip>>24&0xff) 
-            && (uint8_t)(addr.sa_data[3]) != (sender.ip>>16&0xff) 
-            && (uint8_t)(addr.sa_data[4]) != (sender.ip>>8&0xff) 
+               (uint8_t)(addr.sa_data[2]) != (sender.ip>>24&0xff)
+            && (uint8_t)(addr.sa_data[3]) != (sender.ip>>16&0xff)
+            && (uint8_t)(addr.sa_data[4]) != (sender.ip>>8&0xff)
             && (uint8_t)(addr.sa_data[5]) != (sender.ip&0xff)))
     {
         i++;
@@ -214,7 +215,7 @@ bool STKHost::peerExists(TransportAddress peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == turnEndianness(peer.ip) && 
+        if (m_host->peers[i].address.host == turnEndianness(peer.ip) &&
             m_host->peers[i].address.port == peer.port)
         {
             return true;
@@ -229,8 +230,8 @@ bool STKHost::isConnectedTo(TransportAddress peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == turnEndianness(peer.ip) && 
-            m_host->peers[i].address.port == peer.port && 
+        if (m_host->peers[i].address.host == turnEndianness(peer.ip) &&
+            m_host->peers[i].address.port == peer.port &&
             m_host->peers[i].state == ENET_PEER_STATE_CONNECTED)
         {
             return true;
