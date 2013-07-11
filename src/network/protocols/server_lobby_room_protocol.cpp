@@ -208,17 +208,25 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         // new player (1) -- size of id -- id -- size of local id -- local id;
         message.ai8(1).ai8(4).ai32(player_id).ai8(1).ai8(m_next_id);
         m_listener->sendMessageExcept(this, peer, message);
-        // send a message to the one that asked to connect
-        NetworkString message_ack;
-        // 0b10000001 (connection success) ;
+        
+        /// now answer to the peer that just connected
         RandomGenerator token_generator;
         // use 4 random numbers because rand_max is probably 2^15-1.
         uint32_t token = (uint32_t)(((token_generator.get(RAND_MAX)<<24) & 0xff) +
                                     ((token_generator.get(RAND_MAX)<<16) & 0xff) +
                                     ((token_generator.get(RAND_MAX)<<8)  & 0xff) +
                                     ((token_generator.get(RAND_MAX)      & 0xff)));
+                                    
+        // send a message to the one that asked to connect
+        NetworkString message_ack;
         // connection success (129) -- size of token -- token
         message_ack.ai8(0x81).ai8(1).ai8(m_next_id).ai8(4).ai32(token).ai8(4).ai32(player_id);
+        // add all players so that this user knows
+        std::vector<NetworkPlayerProfile*> players = m_setup->getPlayers();
+        for (unsigned int i = 0; i < players.size(); i++)
+        {
+            message_ack.ai8(1).ai8(players[i]->race_id).ai8(4).ai32(players[i]->user_profile->getUserID()); 
+        }
         m_listener->sendMessage(this, peer, message_ack);
         
         peer->setClientServerToken(token);

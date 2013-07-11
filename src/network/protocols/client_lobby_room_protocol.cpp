@@ -58,7 +58,6 @@ void ClientLobbyRoomProtocol::requestKartSelection(std::string kart_name)
 void ClientLobbyRoomProtocol::notifyEvent(Event* event)
 {
     assert(m_setup); // assert that the setup exists
-    STKPeer* peer = *(event->peer);
     if (event->type == EVENT_TYPE_MESSAGE)
     {
         assert(event->data.size()); // assert that data isn't empty
@@ -199,7 +198,7 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
  */
 void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 {
-    if (event->data.size() != 12 || event->data[0] != 1 || event->data[2] != 4 || event->data[7] != 4) // 12 bytes remains now
+    if (event->data.size() < 12 || event->data[0] != 1 || event->data[2] != 4 || event->data[7] != 4) // 12 bytes remains now
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying an accepted connection wasn't formated as expected.");
         return;
@@ -214,6 +213,31 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     if (global_id == CurrentOnlineUser::get()->getUserID())
     {
         Log::info("ClientLobbyRoomProtocol", "The server accepted the connection.");
+        
+        // add all players
+        event->data.removeFront(12); // remove the 12 first bytes
+        int remaining = event->data.size();
+        if (remaining%7 != 0)
+        {
+            Log::error("ClientLobbyRoomProtocol", "ConnectionAccepted : Error in the server list");
+        }
+        remaining /= 7;
+        for (int i = 0; i < remaining; i++)
+        {
+            if (event->data[0] != 1 || event->data[2] != 4)
+                Log::error("ClientLobbyRoomProtocol", "Bad format in players list.");
+            uint8_t race_id = event->data[1];
+            uint32_t global_id = event->data.gui32(3);
+            OnlineUser* new_user = new OnlineUser(global_id);
+            NetworkPlayerProfile* profile2 = new NetworkPlayerProfile();
+            profile2->race_id = race_id;
+            profile2->user_profile = new_user;
+            profile2->kart_name = "";
+            m_setup->addPlayer(profile2);
+            event->data.removeFront(7);
+        }
+        
+        // add self
         profile->user_profile = CurrentOnlineUser::get();
         m_setup->addPlayer(profile);
         peer->setClientServerToken(token);
