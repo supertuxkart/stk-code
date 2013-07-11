@@ -40,6 +40,7 @@ void ServerLobbyRoomProtocol::setup()
 void ServerLobbyRoomProtocol::notifyEvent(Event* event)
 {
     assert(m_setup); // assert that the setup exists
+    Log::debug("ServerLobbyRoomProtocol", "Event received");
     if (event->type == EVENT_TYPE_MESSAGE)
     {
         assert(event->data.size()); // message not empty

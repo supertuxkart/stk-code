@@ -80,14 +80,11 @@ ProtocolManager::~ProtocolManager()
 
 void ProtocolManager::notifyEvent(Event* event)
 {
-    Event* event2 = event;
-    if (event->type == EVENT_TYPE_DISCONNECTED)
-    {
-        // make a copy if needed (the peer will be lost elseway)
-        event2 = new Event(*event);
-        Log::warn("ProtocolManager", "Trying to copy the event");
-    }
+    Log::debug("ProtocolManager", "Event received.");
+    Event* event2 = new Event(*event);
+    Log::debug("ProtocolManager", "Trying to copy the event");
     pthread_mutex_lock(&m_events_mutex);
+    Log::debug("ProtocolManager", "Event ADDED.");
     m_events_to_process.push_back(event2); // add the event to the queue
     pthread_mutex_unlock(&m_events_mutex);
 }
@@ -244,6 +241,7 @@ void ProtocolManager::update()
     {
         pthread_mutex_lock(&m_events_mutex); // secure threads
         Event* event = m_events_to_process.back();
+        Log::debug("ProtocolManager", "Now processing event of type %d", event->type);
         m_events_to_process.pop_back();
         pthread_mutex_unlock(&m_events_mutex); // release the mutex
 
@@ -252,6 +250,7 @@ void ProtocolManager::update()
         {
             if (event->data.size() > 0)
                 searchedProtocol = (PROTOCOL_TYPE)(event->data.getAndRemoveUInt8());
+            Log::debug("ProtocolManager", "Message of type %d.", searchedProtocol);
         }
         if (event->type == EVENT_TYPE_CONNECTED)
         {
@@ -267,11 +266,9 @@ void ProtocolManager::update()
             Log::debug("ProtocolManager", "Message is \"%s\"", event->data.c_str());
         }
         
-        if (event->type == EVENT_TYPE_DISCONNECTED)
-        { // because we made a copy of the event and the peer
-            delete event->peer;
-            delete event;
-        }
+        // because we made a copy of the event and the peer
+        delete event->peer;
+        delete event;
     }
 
     // now update all protocols
