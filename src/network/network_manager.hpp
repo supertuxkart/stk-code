@@ -52,6 +52,7 @@ class NetworkManager : public Singleton<NetworkManager>
         // raw data management
         void setLogin(std::string username, std::string password);
         void setPublicAddress(TransportAddress addr);
+        void removePeer(STKPeer* peer);
         
         // getters
         virtual bool peerExists(TransportAddress peer);

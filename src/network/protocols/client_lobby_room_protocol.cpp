@@ -137,20 +137,24 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
     }
 
     uint32_t global_id = event->data.gui32(1);
-
-    NetworkPlayerProfile* profile = new NetworkPlayerProfile();
-    profile->kart_name = "";
-    profile->race_id = event->data.gui8(6);
+    uint8_t race_id = event->data.gui8(6);
 
     if (global_id == CurrentOnlineUser::get()->getUserID())
     {
         Log::error("ClientLobbyRoomProtocol", "The server notified me that i'm a new player in the room (not normal).");
     }
-    else
+    else if (m_setup->getProfile(race_id) == NULL || m_setup->getProfile(global_id) == NULL)
     {
         Log::verbose("ClientLobbyRoomProtocol", "New player connected.");
+        NetworkPlayerProfile* profile = new NetworkPlayerProfile();
+        profile->kart_name = "";
+        profile->race_id = race_id;
         profile->user_profile = new OnlineUser(global_id);
         m_setup->addPlayer(profile);
+    }
+    else
+    {
+        Log::error("ClientLobbyRoomProtocol", "One of the player notified in the list is myself.");
     }
 }
 

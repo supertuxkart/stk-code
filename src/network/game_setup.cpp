@@ -37,8 +37,8 @@ GameSetup::~GameSetup()
 void GameSetup::addPlayer(NetworkPlayerProfile* profile)
 {
     m_players.push_back(profile);
-    Log::verbose("GameSetup", "New player in the game setup. Global id : %d,"
-        "Race id : %d.", profile->race_id, profile->user_profile->getUserID());
+    Log::verbose("GameSetup", "New player in the game setup. Global id : %u, "
+        "Race id : %d.", profile->user_profile->getUserID(), profile->race_id);
 }
 
 //-----------------------------------------------------------------------------
@@ -51,7 +51,8 @@ bool GameSetup::removePlayer(uint32_t id)
         {
             delete m_players[i];
             m_players.erase(m_players.begin()+i, m_players.begin()+i+1);
-            Log::verbose("GameSetup", "Removed a player from the game setup.");
+            Log::verbose("GameSetup", "Removed a player from the game setup. "
+                        "Remains %u.", m_players.size());
             return true;
         }
     }
@@ -66,8 +67,10 @@ bool GameSetup::removePlayer(uint8_t id)
     {
         if (m_players[i]->race_id == id) // check the given id
         {
+            delete m_players[i];
             m_players.erase(m_players.begin()+i, m_players.begin()+i+1);
-            Log::verbose("GameSetup", "Removed a player from the game setup.");
+            Log::verbose("GameSetup", "Removed a player from the game setup. "
+                        "Remains %u.", m_players.size());
             return true;
         }
     }
@@ -84,7 +87,8 @@ void GameSetup::setPlayerKart(uint8_t id, std::string kart_name)
         if (m_players[i]->race_id == id)
         {
             m_players[i]->kart_name = kart_name;
-            Log::info("GameSetup::setPlayerKart", "Player %d took kart %s", id, kart_name.c_str());
+            Log::info("GameSetup::setPlayerKart", "Player %d took kart %s", 
+                        id, kart_name.c_str());
             found = true;
         }
     }

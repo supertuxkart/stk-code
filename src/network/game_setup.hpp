@@ -60,7 +60,7 @@ class GameSetup
         int getPlayerCount() { return m_players.size(); }
         const NetworkPlayerProfile* getProfile(uint32_t id); //!< Get a profile by database id
         const NetworkPlayerProfile* getProfile(uint8_t id); //!< Get the profile by the lobby id
-
+        
         bool isKartAvailable(std::string kart_name);
         bool isKartAllowed(std::string kart_name) {return true; }
 

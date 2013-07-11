@@ -169,7 +169,9 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
         NetworkString msg;
         msg.ai8(0x02).ai8(1).ai8(peer->getPlayerProfile()->race_id);
         m_listener->sendMessage(this, msg);
-        Log::info("ServerLobbyRoomProtocol", "Player disconnected.");
+        Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d", 
+                peer->getPlayerProfile()->race_id);
+        m_setup->removePlayer(peer->getPlayerProfile()->race_id);
     }
     else
         Log::info("ServerLobbyRoomProtocol", "The DC peer wasn't registered.");
@@ -225,7 +227,9 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         std::vector<NetworkPlayerProfile*> players = m_setup->getPlayers();
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            message_ack.ai8(1).ai8(players[i]->race_id).ai8(4).ai32(players[i]->user_profile->getUserID()); 
+            // do not make a duplicate of the player
+            if (players[i]->race_id != m_next_id && players[i]->user_profile->getUserID() != player_id)
+                message_ack.ai8(1).ai8(players[i]->race_id).ai8(4).ai32(players[i]->user_profile->getUserID()); 
         }
         m_listener->sendMessage(this, peer, message_ack);
         
@@ -234,7 +238,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
         profile->race_id = m_next_id;
         profile->kart_name = "";
-        profile->user_profile = new OnlineUser("Unnamed Player");
+        profile->user_profile = new OnlineUser(player_id);
         m_setup->addPlayer(profile);
         peer->setPlayerProfile(profile);
         Log::verbose("ServerLobbyRoomProtocol", "New player.");
