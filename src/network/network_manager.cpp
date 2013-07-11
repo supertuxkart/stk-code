@@ -135,9 +135,9 @@ void NetworkManager::notifyEvent(Event* event)
             Log::warn("NetworkManager", "The peer that has been disconnected was not registered by the Network Manager.");
 
         Log::info("NetworkManager", "Somebody is now disconnected. There are now %lu peers.", m_peers.size());
-        delete event; // in this case only, the event has been copied by the protocol manager
     }
 
+    delete event; // in this case only, the event has been copied by the protocol manager
 }
 
 //-----------------------------------------------------------------------------

@@ -265,8 +265,12 @@ void ProtocolManager::update()
         {
             Log::debug("ProtocolManager", "Message is \"%s\"", event->data.c_str());
         }
-        delete event->peer; // because we made a copy of the peer
-        delete event;
+        
+        if (event->type == event->type == EVENT_TYPE_DISCONNECTED)
+        { // because we made a copy of the event and the peer
+            delete event->peer; 
+            delete event;
+        }
     }
 
     // now update all protocols

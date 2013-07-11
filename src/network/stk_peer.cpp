@@ -43,6 +43,8 @@ STKPeer::~STKPeer()
     {
         m_peer = NULL;
     }
+    if (m_player_profile)
+        m_player_profile = NULL;
 }
 
 bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host, uint32_t channel_count, uint32_t data)
