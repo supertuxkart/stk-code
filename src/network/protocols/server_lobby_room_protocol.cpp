@@ -169,7 +169,7 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
         NetworkString msg;
         msg.ai8(0x02).ai8(1).ai8(peer->getPlayerProfile()->race_id);
         m_listener->sendMessage(this, msg);
-        Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d", 
+        Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
                 peer->getPlayerProfile()->race_id);
         m_setup->removePlayer(peer->getPlayerProfile()->race_id);
     }
@@ -197,7 +197,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         Log::warn("ServerLobbyRoomProtocol", "The server is sending a badly formated message. Size is %d and first byte %d", event->data.size(), event->data[0]);
         return;
     }
-    int player_id = 0;
+    uint32_t player_id = 0;
     player_id = event->data.getUInt32(1);
     // can we add the player ?
     if (m_setup->getPlayerCount() < 16) // accept player
@@ -210,7 +210,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         // new player (1) -- size of id -- id -- size of local id -- local id;
         message.ai8(1).ai8(4).ai32(player_id).ai8(1).ai8(m_next_id);
         m_listener->sendMessageExcept(this, peer, message);
-        
+
         /// now answer to the peer that just connected
         RandomGenerator token_generator;
         // use 4 random numbers because rand_max is probably 2^15-1.
@@ -218,7 +218,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
                                     ((token_generator.get(RAND_MAX)<<16) & 0xff) +
                                     ((token_generator.get(RAND_MAX)<<8)  & 0xff) +
                                     ((token_generator.get(RAND_MAX)      & 0xff)));
-                                    
+
         // send a message to the one that asked to connect
         NetworkString message_ack;
         // connection success (129) -- size of token -- token
@@ -229,12 +229,12 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         {
             // do not make a duplicate of the player
             if (players[i]->race_id != m_next_id && players[i]->user_profile->getUserID() != player_id)
-                message_ack.ai8(1).ai8(players[i]->race_id).ai8(4).ai32(players[i]->user_profile->getUserID()); 
+                message_ack.ai8(1).ai8(players[i]->race_id).ai8(4).ai32(players[i]->user_profile->getUserID());
         }
         m_listener->sendMessage(this, peer, message_ack);
-        
+
         peer->setClientServerToken(token);
-        
+
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
         profile->race_id = m_next_id;
         profile->kart_name = "";

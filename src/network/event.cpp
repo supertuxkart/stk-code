@@ -36,8 +36,9 @@ Event::Event(ENetEvent* event)
     case ENET_EVENT_TYPE_RECEIVE:
         type = EVENT_TYPE_MESSAGE;
         break;
-    default:
-        type = EVENT_TYPE_MESSAGE;
+    case ENET_EVENT_TYPE_NONE:
+        enet_packet_destroy(event->packet);
+        return;
         break;
     }
     if (type == EVENT_TYPE_MESSAGE)
