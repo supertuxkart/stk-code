@@ -58,10 +58,11 @@ void ClientLobbyRoomProtocol::requestKartSelection(std::string kart_name)
 void ClientLobbyRoomProtocol::notifyEvent(Event* event)
 {
     assert(m_setup); // assert that the setup exists
+    STKPeer* peer = *(event->peer);
     if (event->type == EVENT_TYPE_MESSAGE)
     {
         assert(event->data.size()); // assert that data isn't empty
-        Log::verbose("ClientLobbyRoomProtocol", "Message from %u : \"%s\"", event->peer->getAddress(), event->data.c_str());
+        Log::verbose("ClientLobbyRoomProtocol", "Message from %u : \"%s\"", peer->getAddress(), event->data.c_str());
         uint8_t message_type = event->data.getAndRemoveUInt8();
 
         if (message_type == 0x01) // new player connected
@@ -203,6 +204,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         Log::error("ClientLobbyRoomProtocol", "A message notifying an accepted connection wasn't formated as expected.");
         return;
     }
+    STKPeer* peer = *(event->peer);
 
     NetworkPlayerProfile* profile = new NetworkPlayerProfile();
     profile->kart_name = "";
@@ -214,8 +216,8 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         Log::info("ClientLobbyRoomProtocol", "The server accepted the connection.");
         profile->user_profile = CurrentOnlineUser::get();
         m_setup->addPlayer(profile);
-        event->peer->setClientServerToken(token);
-        m_server = event->peer;
+        peer->setClientServerToken(token);
+        m_server = *(event->peer);
         m_state = CONNECTED;
     }
 }

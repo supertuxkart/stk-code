@@ -164,11 +164,12 @@ void ServerLobbyRoomProtocol::update()
 
 void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
 {
+    STKPeer* peer = *(event->peer);
     Log::info("ServerLobbyRoomProtocol", "Player disconnected.");
-    if (event->peer->getPlayerProfile() != NULL) // others knew him
+    if (peer->getPlayerProfile() != NULL) // others knew him
     {
         NetworkString msg;
-        msg.ai8(0x02).ai8(1).ai8(event->peer->getPlayerProfile()->race_id);
+        msg.ai8(0x02).ai8(1).ai8(peer->getPlayerProfile()->race_id);
         m_listener->sendMessage(this, msg);
     }
     else
@@ -189,6 +190,7 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
  */
 void ServerLobbyRoomProtocol::connectionRequested(Event* event)
 {
+    STKPeer* peer = *(event->peer);
     if (event->data.size() != 5 || event->data[0] != 4)
     {
         Log::warn("ServerLobbyRoomProtocol", "The server is sending a badly formated message. Size is %d and first byte %d", event->data.size(), event->data[0]);
@@ -207,7 +209,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         NetworkString message;
         // new player (1) -- size of id -- id -- size of local id -- local id;
         message.ai8(1).ai8(4).ai32(player_id).ai8(1).ai8(m_next_id);
-        m_listener->sendMessageExcept(this, event->peer, message);
+        m_listener->sendMessageExcept(this, peer, message);
         // send a message to the one that asked to connect
         NetworkString message_ack;
         // 0b10000001 (connection success) ;
@@ -219,16 +221,16 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
                                     ((token_generator.get(RAND_MAX)      & 0xff)));
         // connection success (129) -- size of token -- token
         message_ack.ai8(0x81).ai8(1).ai8(m_next_id).ai8(4).ai32(token).ai8(4).ai32(player_id);
-        m_listener->sendMessage(this, event->peer, message_ack);
+        m_listener->sendMessage(this, peer, message_ack);
         
-        event->peer->setClientServerToken(token);
+        peer->setClientServerToken(token);
         
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
         profile->race_id = m_next_id;
         profile->kart_name = "";
         profile->user_profile = new OnlineUser("Unnamed Player");
         m_setup->addPlayer(profile);
-        event->peer->setPlayerProfile(profile);
+        peer->setPlayerProfile(profile);
     } // accept player
     else  // refuse the connection with code 0 (too much players)
     {
@@ -237,7 +239,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         message.ai8(1);               // 1 bytes for the error code
         message.ai8(0);               // 0 = too much players
         // send only to the peer that made the request
-        m_listener->sendMessage(this, event->peer, message);
+        m_listener->sendMessage(this, peer, message);
     }
 }
 
@@ -262,8 +264,9 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
                             event->data.size(), event->data[0]);
         return;
     }
+    STKPeer* peer = *(event->peer);
     uint32_t token = event->data.gui32(1);
-    if (token != event->peer->getClientServerToken())
+    if (token != peer->getClientServerToken())
     {
         Log::warn("ServerLobbyRoomProtocol", "Peer sending bad token. Request "
                             "aborted.");
@@ -281,7 +284,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     {
         NetworkString answer;
         answer.ai8(0x82).ai8(1).ai8(0); // kart is already taken
-        m_listener->sendMessage(this, event->peer, answer);
+        m_listener->sendMessage(this, peer, answer);
         return;
     }
     // check if this kart is authorized
@@ -289,13 +292,13 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     {
         NetworkString answer;
         answer.ai8(0x82).ai8(1).ai8(1); // kart is not authorized
-        m_listener->sendMessage(this, event->peer, answer);
+        m_listener->sendMessage(this, peer, answer);
         return;
     }
     // send a kart update to everyone
     NetworkString answer;
     // kart update (3), 1, race id
-    answer.ai8(0x03).ai8(1).ai8(event->peer->getPlayerProfile()->race_id);
+    answer.ai8(0x03).ai8(1).ai8(peer->getPlayerProfile()->race_id);
     //  kart name size, kart name
     answer.ai8(kart_name.size()).as(kart_name);
     m_listener->sendMessage(this, answer);

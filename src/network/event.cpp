@@ -56,20 +56,20 @@ Event::Event(ENetEvent* event)
         enet_packet_destroy(m_packet); // we got all we need, just remove the data.
 
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
-    peer = NULL;
+    peer = new STKPeer*;
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         if (peers[i]->m_peer == event->peer)
         {
-            peer = peers[i];
+            *peer = peers[i];
             return;
         }
     }
-    if (peer == NULL) // peer does not exist, create him
+    if (*peer == NULL) // peer does not exist, create him
     {
         STKPeer* new_peer = new STKPeer();
         new_peer->m_peer = event->peer;
-        peer = new_peer;
+        *peer = new_peer;
         Log::verbose("Event", "Creating a new peer, address are STKPeer:%ld, Peer:%ld", (long int)(new_peer), (long int)(event->peer));
     }
 }
@@ -79,7 +79,7 @@ Event::Event(const Event& event)
     m_packet = NULL;
     data = event.data;
     // copy the peer
-    peer = new STKPeer(*event.peer);
+    peer = event.peer;
     type = event.type;
 }
 
