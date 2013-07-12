@@ -112,14 +112,14 @@ void ServerLobbyRoomProtocol::update()
         {
             last_poll_time = Time::getRealTime();
             TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
-            HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-            connector->setParameter("id",CurrentOnlineUser::get()->getUserID());
-            connector->setParameter("token",CurrentOnlineUser::get()->getToken());
-            connector->setParameter("address",addr.ip);
-            connector->setParameter("port",addr.port);
-            connector->setParameter("action","poll-connection-requests");
+            HTTPConnector connector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+            connector.setParameter("id",CurrentOnlineUser::get()->getUserID());
+            connector.setParameter("token",CurrentOnlineUser::get()->getToken());
+            connector.setParameter("address",addr.ip);
+            connector.setParameter("port",addr.port);
+            connector.setParameter("action","poll-connection-requests");
 
-            const XMLNode * result = connector->getXMLFromPage();
+            const XMLNode * result = connector.getXMLFromPage();
             std::string rec_success;
             if(result->get("success", &rec_success))
             {

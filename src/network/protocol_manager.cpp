@@ -260,8 +260,9 @@ void ProtocolManager::update()
         {
             Log::debug("ProtocolManager", "Message is \"%s\"", event->data.c_str());
         }
-        
+
         // because we made a copy of the event
+        delete event->peer; // no more need of that
         delete event;
     }
 

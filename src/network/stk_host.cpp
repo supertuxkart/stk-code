@@ -44,6 +44,7 @@ void* STKHost::receive_data(void* self)
             Event* evt = new Event(&event);
             if (event.type != ENET_EVENT_TYPE_NONE)
                 NetworkManager::getInstance()->notifyEvent(evt);
+            delete evt;
         }
     }
     return NULL;

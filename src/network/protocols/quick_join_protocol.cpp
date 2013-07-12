@@ -47,12 +47,12 @@ void QuickJoinProtocol::update()
     if (m_state == NONE)
     {
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
-        HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-        connector->setParameter("id",CurrentOnlineUser::get()->getUserID());
-        connector->setParameter("token",CurrentOnlineUser::get()->getToken());
-        connector->setParameter("action","quick-join");
+        HTTPConnector connector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+        connector.setParameter("id",CurrentOnlineUser::get()->getUserID());
+        connector.setParameter("token",CurrentOnlineUser::get()->getToken());
+        connector.setParameter("action","quick-join");
 
-        const XMLNode * result = connector->getXMLFromPage();
+        const XMLNode * result = connector.getXMLFromPage();
         std::string rec_success;
         TransportAddress* res = static_cast<TransportAddress*>(m_callback_object);
 

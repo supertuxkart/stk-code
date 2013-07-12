@@ -49,13 +49,13 @@ void GetPeerAddress::update()
     if (m_state == NONE)
     {
 
-        HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-        connector->setParameter("id",CurrentOnlineUser::get()->getUserID());
-        connector->setParameter("token",CurrentOnlineUser::get()->getToken());
-        connector->setParameter("peer_id",m_peer_id);
-        connector->setParameter("action","get");
+        HTTPConnector connector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+        connector.setParameter("id",CurrentOnlineUser::get()->getUserID());
+        connector.setParameter("token",CurrentOnlineUser::get()->getToken());
+        connector.setParameter("peer_id",m_peer_id);
+        connector.setParameter("action","get");
 
-        const XMLNode * result = connector->getXMLFromPage();
+        const XMLNode * result = connector.getXMLFromPage();
         std::string rec_success;
 
         if(result->get("success", &rec_success))

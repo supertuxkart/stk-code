@@ -109,8 +109,6 @@ void NetworkManager::notifyEvent(Event* event)
 
     // notify for the event now.
     ProtocolManager::getInstance()->notifyEvent(event);
-
-    delete event; // in this case only, the event has been copied by the protocol manager
 }
 
 //-----------------------------------------------------------------------------

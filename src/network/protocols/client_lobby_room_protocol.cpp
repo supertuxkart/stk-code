@@ -209,15 +209,20 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     }
     STKPeer* peer = *(event->peer);
 
-    NetworkPlayerProfile* profile = new NetworkPlayerProfile();
-    profile->kart_name = "";
-    profile->race_id = event->data.gui8(1);
-    uint32_t token = event->data.gui32(3);
     uint32_t global_id = event->data.gui32(8);
     if (global_id == CurrentOnlineUser::get()->getUserID())
     {
         Log::info("ClientLobbyRoomProtocol", "The server accepted the connection.");
-        
+
+        // self profile
+        NetworkPlayerProfile* profile = new NetworkPlayerProfile();
+        profile->kart_name = "";
+        profile->race_id = event->data.gui8(1);
+        profile->user_profile = CurrentOnlineUser::get();
+        m_setup->addPlayer(profile);
+        // connection token
+        uint32_t token = event->data.gui32(3);
+        peer->setClientServerToken(token);
         // add all players
         event->data.removeFront(12); // remove the 12 first bytes
         int remaining = event->data.size();
@@ -240,11 +245,8 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
             m_setup->addPlayer(profile2);
             event->data.removeFront(7);
         }
-        
+
         // add self
-        profile->user_profile = CurrentOnlineUser::get();
-        m_setup->addPlayer(profile);
-        peer->setClientServerToken(token);
         m_server = *(event->peer);
         m_state = CONNECTED;
     }

@@ -45,14 +45,14 @@ void StopServer::update()
     if (m_state == NONE)
     {
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
-        HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-        connector->setParameter("id",CurrentOnlineUser::get()->getUserID());
-        connector->setParameter("token",CurrentOnlineUser::get()->getToken());
-        connector->setParameter("address",addr.ip);
-        connector->setParameter("port",addr.port);
-        connector->setParameter("action","stop-server");
+        HTTPConnector connector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+        connector.setParameter("id",CurrentOnlineUser::get()->getUserID());
+        connector.setParameter("token",CurrentOnlineUser::get()->getToken());
+        connector.setParameter("address",addr.ip);
+        connector.setParameter("port",addr.port);
+        connector.setParameter("action","stop-server");
 
-        const XMLNode * result = connector->getXMLFromPage();
+        const XMLNode * result = connector.getXMLFromPage();
         std::string rec_success;
 
         if(result->get("success", &rec_success))

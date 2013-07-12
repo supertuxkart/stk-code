@@ -47,13 +47,13 @@ void RequestConnection::update()
     {
         case NONE:
         {
-            HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-            connector->setParameter("id",CurrentOnlineUser::get()->getUserID());
-            connector->setParameter("token",CurrentOnlineUser::get()->getToken());
-            connector->setParameter("server_id",m_server_id);
-            connector->setParameter("action","request-connection");
+            HTTPConnector connector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+            connector.setParameter("id",CurrentOnlineUser::get()->getUserID());
+            connector.setParameter("token",CurrentOnlineUser::get()->getToken());
+            connector.setParameter("server_id",m_server_id);
+            connector.setParameter("action","request-connection");
 
-            const XMLNode * result = connector->getXMLFromPage();
+            const XMLNode * result = connector.getXMLFromPage();
             std::string rec_success;
 
             if(result->get("success", &rec_success))

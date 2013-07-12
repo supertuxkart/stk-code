@@ -37,10 +37,6 @@ Event::Event(ENetEvent* event)
         type = EVENT_TYPE_MESSAGE;
         break;
     case ENET_EVENT_TYPE_NONE:
-        // Typically there's no packet data, but just in
-        // case test and delete it
-        if(event->packet)
-            enet_packet_destroy(event->packet);
         return;
         break;
     }
@@ -58,6 +54,7 @@ Event::Event(ENetEvent* event)
 
     if (m_packet)
         enet_packet_destroy(m_packet); // we got all we need, just remove the data.
+    m_packet = NULL;
 
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
     peer = new STKPeer*;

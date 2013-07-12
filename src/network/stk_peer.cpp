@@ -48,16 +48,15 @@ STKPeer::STKPeer(const STKPeer& peer)
 STKPeer::~STKPeer()
 {
     if (m_peer)
-    {
         m_peer = NULL;
-    }
     if (m_player_profile)
-        m_player_profile = NULL;
+        delete m_player_profile;
+    m_player_profile = NULL;
 }
 
 //-----------------------------------------------------------------------------
 
-bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host, 
+bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host,
                 uint32_t channel_count, uint32_t data)
 {
     ENetAddress  address;
@@ -92,7 +91,7 @@ void STKPeer::disconnect()
 
 void STKPeer::sendPacket(NetworkString const& data)
 {
-    Log::verbose("STKPeer", "sending packet of size %d to %i.%i.%i.%i:%i", 
+    Log::verbose("STKPeer", "sending packet of size %d to %i.%i.%i.%i:%i",
                 data.size(), (m_peer->address.host>>0)&0xff,
                 (m_peer->address.host>>8)&0xff,(m_peer->address.host>>16)&0xff,
                 (m_peer->address.host>>24)&0xff,m_peer->address.port);
