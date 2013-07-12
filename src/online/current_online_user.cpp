@@ -153,12 +153,13 @@ bool CurrentOnlineUser::createServer(  const irr::core::stringw &name,
 
 
 // ============================================================================
-bool CurrentOnlineUser::signOut(){
+bool CurrentOnlineUser::signOut(irr::core::stringw &info){
     assert(m_is_signed_in == true);
     HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
     connector->setParameter("action",std::string("disconnect"));
     connector->setParameter("token",m_token);
     connector->setParameter("userid",m_id);
+
 
     const XMLNode * result = connector->getXMLFromPage();
     std::string rec_success = "";
@@ -172,35 +173,45 @@ bool CurrentOnlineUser::signOut(){
             m_is_signed_in = false;
             m_is_guest = false;
         }
+        result->get("info", &info);
+    }
+    else
+    {
+        info = _("Unable to connect to the server. Check your internet connection or try again later.");
     }
     return !m_is_signed_in;
 }
 
 // ============================================================================
-PtrVector<Server> * CurrentOnlineUser::getServerList(){
+
+bool CurrentOnlineUser::requestJoin(uint32_t server_id, irr::core::stringw &info){
     assert(m_is_signed_in == true);
-    HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-    connector->setParameter("action",std::string("get_server_list"));
-    connector->setParameter("token",m_token);
-    connector->setParameter("userid",m_id);
-
-
+    HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+    connector->setParameter("action",std::string("request-connection"));
+    connector->setParameter("token", m_token);
+    connector->setParameter("id", m_id);
+    connector->setParameter("server_id", server_id);
+    bool success = false;
     const XMLNode * result = connector->getXMLFromPage();
     std::string rec_success = "";
     if(result->get("success", &rec_success))
     {
         if (rec_success =="yes")
         {
-            const XMLNode * servers_xml = result->getNode("servers");
-            PtrVector<Server> * servers = new PtrVector<Server>;
-            for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
-            {
-                servers->push_back(new Server(*servers_xml->getNode(i)));
-            }
-            return servers;
+            m_token = "";
+            m_name = "";
+            m_id = 0;
+            m_is_signed_in = false;
+            m_is_guest = false;
+            success = true;
         }
+        result->get("info", &info);
     }
-    return NULL;
+    else
+    {
+        info = _("Unable to connect to the server. Check your internet connection or try again later.");
+    }
+    return success;
 }
 
 // ============================================================================

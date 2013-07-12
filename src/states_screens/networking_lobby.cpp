@@ -35,6 +35,7 @@
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "modes/demo_world.hpp"
 #include "utils/translation.hpp"
+#include "online/servers_manager.hpp"
 
 #include "online/current_online_user.hpp"
 
@@ -47,13 +48,16 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 
 NetworkingLobby::NetworkingLobby() : Screen("online/lobby.stkgui")
 {
-
+    m_server = ServersManager::get()->getJoinedServer();
 }   // NetworkingLobby
 
 // ----------------------------------------------------------------------------
 
 void NetworkingLobby::loadedFromFile()
 {
+    m_server_name_widget = getWidget<LabelWidget>("server_name");
+    assert(m_server_name_widget != NULL);
+
     m_online_status_widget = getWidget<LabelWidget>("online_status");
     assert(m_online_status_widget != NULL);
 
@@ -64,12 +68,6 @@ void NetworkingLobby::loadedFromFile()
 
 
 }   // loadedFromFile
-
-// ----------------------------------------------------------------------------
-bool NetworkingLobby::hasLostConnection()
-{
-    return !CurrentOnlineUser::get()->isSignedIn();
-}
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::beforeAddingWidget()
@@ -85,7 +83,8 @@ void NetworkingLobby::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime(); //FIXME : what's this?
-    m_online_status_widget->setText(irr::core::stringw(_("Signed in as : ")) + CurrentOnlineUser::get()->getUserName() + ".", false);
+    m_server_name_widget->setText(m_server->getName(),false);
+
 }   // init
 
 // ----------------------------------------------------------------------------

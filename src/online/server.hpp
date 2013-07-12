@@ -27,6 +27,7 @@
 #include <string>
 #include <irrString.h>
 #include "io/xml_node.hpp"
+#include "utils/types.hpp"
 
 class XMLNode;
 
@@ -48,9 +49,7 @@ protected:
     irr::core::stringw m_name;
     std::string m_lower_case_name; //Used for comparison
 
-    irr::core::stringw m_description;
-
-    int m_server_id;
+    uint32_t m_server_id;
 
     int m_max_players;
 
@@ -76,13 +75,10 @@ public:
     const irr::core::stringw& getName() const { return m_name; }
     const std::string & getLowerCaseName() const { return m_lower_case_name; }
     // ------------------------------------------------------------------------
-    /** Returns the name of the server. */
-    const irr::core::stringw& getDescription() const { return m_description; }
-    // ------------------------------------------------------------------------
     const float getScore() const { return m_satisfaction_score; }
     // ------------------------------------------------------------------------
     /** Returns the ID of this server. */
-    const int getServerId() const { return m_server_id; }
+    const uint32_t getServerId() const { return m_server_id; }
     const int getMaxPlayers() const { return m_max_players; }
     const int getCurrentPlayers() const { return m_current_players; }
     // ------------------------------------------------------------------------
@@ -103,6 +99,9 @@ public:
                 // m_id is the lower case name
                 return m_name < server.getName();
                 break;
+            case SO_PLAYERS:
+                return m_current_players < server.getCurrentPlayers();
+                break;
         }   // switch
         return true;
     }   // operator<
@@ -116,9 +115,9 @@ public:
     {
         switch(m_sort_order)
         {
-            /*case SO_SCORE:
+            case SO_SCORE:
                 return m_satisfaction_score > server.getScore();
-                break;*/
+                break;
             case SO_NAME:
                 return m_lower_case_name > server.getLowerCaseName();
                 break;

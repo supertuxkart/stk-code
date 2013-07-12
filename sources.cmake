@@ -148,6 +148,7 @@ src/online/current_online_user.cpp
 src/online/http_connector.cpp
 src/online/online_user.cpp
 src/online/server.cpp
+src/online/servers_manager.cpp
 src/physics/btKart.cpp
 src/physics/btKartRaycast.cpp
 src/physics/btUprightConstraint.cpp
@@ -181,6 +182,7 @@ src/states_screens/dialogs/press_a_key_dialog.cpp
 src/states_screens/dialogs/race_paused_dialog.cpp
 src/states_screens/dialogs/registration_dialog.cpp
 src/states_screens/dialogs/select_challenge.cpp
+src/states_screens/dialogs/server_info_dialog.cpp
 src/states_screens/dialogs/track_info_dialog.cpp
 src/states_screens/dialogs/tutorial_message_dialog.cpp
 src/states_screens/feature_unlocked.cpp
@@ -415,6 +417,7 @@ src/online/current_online_user.hpp
 src/online/http_connector.hpp
 src/online/online_user.hpp
 src/online/server.hpp
+src/online/servers_manager.hpp
 src/physics/btKart.hpp
 src/physics/btKartRaycast.hpp
 src/physics/btUprightConstraint.hpp
@@ -451,6 +454,7 @@ src/states_screens/dialogs/press_a_key_dialog.hpp
 src/states_screens/dialogs/race_paused_dialog.hpp
 src/states_screens/dialogs/registration_dialog.hpp
 src/states_screens/dialogs/select_challenge.hpp
+src/states_screens/dialogs/server_info_dialog.hpp
 src/states_screens/dialogs/track_info_dialog.hpp
 src/states_screens/dialogs/tutorial_message_dialog.hpp
 src/states_screens/feature_unlocked.hpp

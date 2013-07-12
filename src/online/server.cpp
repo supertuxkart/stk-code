@@ -24,27 +24,20 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
-Server::SortOrder Server::m_sort_order=Server::SO_NAME;
+Server::SortOrder Server::m_sort_order=Server::SO_NAME; //FIXME change to some other default
 
 Server::Server(const XMLNode & xml)
 {
     assert(xml.getName() == "server");
-    m_name              = "";
-    m_server_id         = 0;
-    m_description       = "";
-    m_current_players   = 0;
-    m_max_players   = 0;
+    m_name                      = "";
+    m_satisfaction_score        = 0;
+    m_server_id                 = 0;
+    m_current_players           = 0;
+    m_max_players               = 0;
 
     xml.get("name", &m_lower_case_name);
     m_name     = StringUtils::decodeFromHtmlEntities(m_lower_case_name);
     m_lower_case_name = StringUtils::toLowerCase(m_lower_case_name);
-
-    std::string description;
-    xml.get("description", &description);
-    m_description     = StringUtils::decodeFromHtmlEntities(description);
-    // resolve XML entities
-    //m_description = StringUtils::replace(m_description, "&#10;", "\n");
-    //m_description = StringUtils::replace(m_description, "&#13;", ""); // ignore \r
 
     xml.get("id",               &m_server_id);
     xml.get("max_players",      &m_max_players);
@@ -70,11 +63,6 @@ bool Server::filterByWords(const core::stringw words) const
         list[i].make_lower();
         
         if ((core::stringw(m_name).make_lower()).find(list[i].c_str()) != -1)
-        {
-            return true;
-        }
-        
-        if ((core::stringw(m_description)).make_lower().find(list[i].c_str()) != -1)
         {
             return true;
         }

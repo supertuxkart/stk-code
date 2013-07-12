@@ -22,6 +22,7 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
+#include "online/server.hpp"
 
 namespace GUIEngine { class Widget; class ListWidget; }
 
@@ -35,7 +36,11 @@ class NetworkingLobby :     public GUIEngine::Screen,
 private:
     friend class GUIEngine::ScreenSingleton<NetworkingLobby>;
 
+    Server * m_server;
+
     NetworkingLobby();
+
+    GUIEngine::LabelWidget * m_server_name_widget;
 
     GUIEngine::LabelWidget * m_online_status_widget;
 
@@ -44,8 +49,6 @@ private:
     GUIEngine::IconButtonWidget * m_register_widget;
     GUIEngine::IconButtonWidget * m_sign_out_widget;
 
-    /** \brief Checks if the user is still signed in. */
-    bool hasLostConnection();
     /** \brief Sets which widget has to be focused. Depends on the user state. */
     void setInitialFocus();
 

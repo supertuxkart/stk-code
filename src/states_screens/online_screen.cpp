@@ -30,13 +30,13 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "main_loop.hpp"
-#include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/login_dialog.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/networking_lobby_settings.hpp"
+#include "states_screens/server_selection.hpp"
 #include "modes/demo_world.hpp"
 #include "utils/translation.hpp"
 
@@ -167,22 +167,22 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (selection == "sign_out")
     {
-        if (CurrentOnlineUser::get()->signOut())
+        irr::core::stringw info;
+        if (CurrentOnlineUser::get()->signOut(info))
         {
-            new MessageDialog( _("Signed out successfully.") );
+            new MessageDialog(_("Signed out successfully."));
             //GUIEngine::reshowCurrentScreen();
         }
         else
-            new MessageDialog( _("An error occured while signing out.") );
+            new MessageDialog(info);
     }
     else if (selection == "register")
     {
-        new RegistrationDialog(0.8f, 0.9f);
+        new RegistrationDialog();
     }
     else if (selection == "find_server")
     {
-        //if (m_recorded_state == Registered)
-            new MessageDialog("Coming soon!");
+        StateManager::get()->pushScreen(ServerSelection::getInstance());
     }
     else if (selection == "create_server")
     {
@@ -208,7 +208,8 @@ void OnlineScreen::onDisabledItemClicked(const std::string& item)
 {
     if (item == "find_server")
     {
-        new LoginDialog(LoginDialog::Registration_Required);
+        StateManager::get()->pushScreen(ServerSelection::getInstance());
+        // FIXME new LoginDialog(LoginDialog::Registration_Required);
     }
     else if (item =="create_server")
     {

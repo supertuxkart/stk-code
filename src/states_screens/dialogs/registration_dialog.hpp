@@ -37,7 +37,7 @@ public:
         Activation = 4
     };
 
-    RegistrationDialog(const float percentWidth, const float percentHeight, const Phase phase = Info);
+    RegistrationDialog(const Phase phase = Info);
     ~RegistrationDialog();
 
     void onEnterPressedInternal();

@@ -38,8 +38,8 @@ using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
 
-RegistrationDialog::RegistrationDialog(const float w, const float h, const Phase phase) :
-        ModalDialog(w,h)
+RegistrationDialog::RegistrationDialog(const Phase phase) :
+        ModalDialog(0.8f,0.9f)
 {
     m_self_destroy = false;
     m_show_registration_info = false;

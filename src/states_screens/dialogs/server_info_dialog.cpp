@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/dialogs/login_dialog.hpp"
+#include "states_screens/dialogs/server_info_dialog.hpp"
 
 #include <IGUIEnvironment.h>
 
@@ -26,7 +26,9 @@
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 #include "online/current_online_user.hpp"
+#include "online/servers_manager.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
+#include "states_screens/networking_lobby.hpp"
 
 
 using namespace GUIEngine;
@@ -35,83 +37,55 @@ using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
 
-LoginDialog::LoginDialog(const Message message_type) :
+ServerInfoDialog::ServerInfoDialog(Server * server) :
         ModalDialog(0.8f,0.8f)
 {
+    m_server = server;
     m_self_destroy = false;
-    m_open_registration_dialog = false;
-    loadFromFile("online/login_dialog.stkgui");
+    m_enter_lobby = false;
+
+    loadFromFile("online/server_info_dialog.stkgui");
+
+    m_name_widget = getWidget<LabelWidget>("name");
+    assert(m_name_widget != NULL);
+    m_name_widget->setText(server->getName(),false);
 
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
-    irr::core::stringw info;
-    if (message_type == Normal)
-        info =  _("Fill in your username and password. ");
-    else if (message_type == Signing_In_Required)
-        info =  _("You need to sign in to be able to use this feature. ");
-    else if (message_type == Registration_Required)
-        info =  _("You need to be a registered user to enjoy this feature! "
-                  "If you do not have an account yet, you can sign up using the register icon at the bottom.");
-    else
-        info = "";
-    if (message_type == Normal || message_type == Signing_In_Required)
-        info += _("If you do not have an account yet, you can choose to sign in as a guest "
-                  "or press the register icon at the bottom to gain access to all the features!");
-    m_info_widget->setText(info, false);
-
-    m_username_widget = getWidget<TextBoxWidget>("username");
-    assert(m_username_widget != NULL);
-    m_username_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-
-    m_password_widget = getWidget<TextBoxWidget>("password");
-    assert(m_password_widget != NULL);
-    m_password_widget->setPasswordBox(true,L'*');
-
-    m_message_widget = getWidget<LabelWidget>("message");
-    assert(m_message_widget != NULL);
 
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
-    m_sign_in_widget = getWidget<IconButtonWidget>("sign_in");
-    assert(m_sign_in_widget != NULL);
-    m_recovery_widget = getWidget<IconButtonWidget>("recovery");
-    assert(m_recovery_widget != NULL);
-    m_register_widget = getWidget<IconButtonWidget>("register");
-    assert(m_register_widget != NULL);
-    m_as_guest_widget = getWidget<IconButtonWidget>("as_guest");
-    assert(m_as_guest_widget != NULL);
+    m_join_widget = getWidget<IconButtonWidget>("join");
+    assert(m_join_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
+    m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }
 
 // -----------------------------------------------------------------------------
-
-LoginDialog::~LoginDialog()
+ServerInfoDialog::~ServerInfoDialog()
 {
 }
-
-
-
 // -----------------------------------------------------------------------------
-void LoginDialog::login()
+void ServerInfoDialog::requestJoin()
 {
-    const stringw username = m_username_widget->getText().trim();
-    const stringw password = m_password_widget->getText().trim();
-    stringw info = "";
-    if(CurrentOnlineUser::get()->signIn(username,password,info))
+    //FIXME totally not correct. Receiving an answer, not kept in mind.
+    irr::core::stringw info;
+    if (CurrentOnlineUser::get()->requestJoin( m_server->getServerId(), info))
     {
-        m_self_destroy = true;
+        ServersManager::get()->setJoinedServer(m_server);
+        m_enter_lobby = true;
     }
     else
     {
         sfx_manager->quickSound( "anvil" );
-        m_message_widget->setColor(irr::video::SColor(255, 255, 0, 0));
-        m_message_widget->setText(info, false);
+        m_info_widget->setColor(irr::video::SColor(255, 255, 0, 0));
+        m_info_widget->setText(info, false);
     }
 }
 
 // -----------------------------------------------------------------------------
-GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation ServerInfoDialog::processEvent(const std::string& eventSource)
 {
 
     if (eventSource == m_options_widget->m_properties[PROP_ID])
@@ -122,14 +96,9 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
             m_self_destroy = true;
             return GUIEngine::EVENT_BLOCK;
         }
-        else if(selection == m_sign_in_widget->m_properties[PROP_ID])
+        else if(selection == m_join_widget->m_properties[PROP_ID])
         {
-            login();
-            return GUIEngine::EVENT_BLOCK;
-        }
-        else if(selection == m_register_widget->m_properties[PROP_ID])
-        {
-            m_open_registration_dialog = true;
+            requestJoin();
             return GUIEngine::EVENT_BLOCK;
         }
     }
@@ -138,31 +107,28 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
 
 // -----------------------------------------------------------------------------
 
-void LoginDialog::onEnterPressedInternal()
+void ServerInfoDialog::onEnterPressedInternal()
 {
 
-    //If enter was pressed while none of the buttons was focused interpret as sign_in event
+    //If enter was pressed while none of the buttons was focused interpret as join event
     const int playerID = PLAYER_ID_GAME_MASTER;
     if (GUIEngine::isFocusedForPlayer(m_options_widget, playerID))
         return;
-    login();
+    requestJoin();
 }
 
 // -----------------------------------------------------------------------------
 
-void LoginDialog::onUpdate(float dt)
+void ServerInfoDialog::onUpdate(float dt)
 {
     //If we want to open the registration dialog, we need to close this one first
-    m_open_registration_dialog && (m_self_destroy = true);
+    m_enter_lobby && (m_self_destroy = true);
 
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
         ModalDialog::dismiss();
-        if (m_open_registration_dialog)
-            new RegistrationDialog();
-
+        if (m_enter_lobby)
+            StateManager::get()->pushScreen(NetworkingLobby::getInstance());
     }
-
-
 }

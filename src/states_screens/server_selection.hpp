@@ -23,8 +23,6 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
-#include "utils/ptr_vector.hpp"
-#include "online/server.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -60,12 +58,10 @@ private:
 
     float            m_reload_timer;
 
-    PtrVector<Server> * m_servers;
-
 public:
 
     /** Load the addons into the main list.*/
-    void loadList();
+    void loadList(bool refresh = false);
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
