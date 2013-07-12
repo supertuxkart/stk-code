@@ -147,6 +147,7 @@ src/network/race_state.cpp
 src/online/current_online_user.cpp
 src/online/http_connector.cpp
 src/online/online_user.cpp
+src/online/server.cpp
 src/physics/btKart.cpp
 src/physics/btKartRaycast.cpp
 src/physics/btUprightConstraint.cpp
@@ -205,6 +206,7 @@ src/states_screens/race_gui.cpp
 src/states_screens/race_gui_overworld.cpp
 src/states_screens/race_result_gui.cpp
 src/states_screens/race_setup_screen.cpp
+src/states_screens/server_selection.cpp
 src/states_screens/soccer_setup_screen.cpp
 src/states_screens/state_manager.cpp
 src/states_screens/story_mode_lobby.cpp
@@ -412,6 +414,7 @@ src/network/world_loaded_message.hpp
 src/online/current_online_user.hpp
 src/online/http_connector.hpp
 src/online/online_user.hpp
+src/online/server.hpp
 src/physics/btKart.hpp
 src/physics/btKartRaycast.hpp
 src/physics/btUprightConstraint.hpp
@@ -473,6 +476,7 @@ src/states_screens/race_gui.hpp
 src/states_screens/race_gui_overworld.hpp
 src/states_screens/race_result_gui.hpp
 src/states_screens/race_setup_screen.hpp
+src/states_screens/server_selection.hpp
 src/states_screens/soccer_setup_screen.hpp
 src/states_screens/state_manager.hpp
 src/states_screens/story_mode_lobby.hpp

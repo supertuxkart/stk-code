@@ -177,6 +177,33 @@ bool CurrentOnlineUser::signOut(){
 }
 
 // ============================================================================
+PtrVector<Server> * CurrentOnlineUser::getServerList(){
+    assert(m_is_signed_in == true);
+    HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+    connector->setParameter("action",std::string("get_server_list"));
+    connector->setParameter("token",m_token);
+    connector->setParameter("userid",m_id);
+
+
+    const XMLNode * result = connector->getXMLFromPage();
+    std::string rec_success = "";
+    if(result->get("success", &rec_success))
+    {
+        if (rec_success =="yes")
+        {
+            const XMLNode * servers_xml = result->getNode("servers");
+            PtrVector<Server> * servers = new PtrVector<Server>;
+            for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
+            {
+                servers->push_back(new Server(*servers_xml->getNode(i)));
+            }
+            return servers;
+        }
+    }
+    return NULL;
+}
+
+// ============================================================================
 
 irr::core::stringw CurrentOnlineUser::getUserName() const
 {

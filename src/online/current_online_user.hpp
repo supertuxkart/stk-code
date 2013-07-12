@@ -22,6 +22,8 @@
 #include "online/online_user.hpp"
 #include <string>
 #include <irrString.h>
+#include "utils/ptr_vector.hpp"
+#include "online/server.hpp"
 
 
 // ============================================================================
@@ -61,6 +63,8 @@ class CurrentOnlineUser : public OnlineUser
         bool createServer(  const irr::core::stringw &name,
                             int max_players,
                             irr::core::stringw &info);
+
+        PtrVector<Server> * getServerList();
 
         /** Returns the username if signed in. */
         irr::core::stringw getUserName() const;
