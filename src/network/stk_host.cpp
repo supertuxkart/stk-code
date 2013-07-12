@@ -40,7 +40,7 @@ void* STKHost::receive_data(void* self)
     ENetHost* host = (((STKHost*)(self))->m_host);
     while (1)
     {
-        while (enet_host_service(host, &event, 0) != 0) {
+        while (enet_host_service(host, &event, 20) != 0) {
             Event* evt = new Event(&event);
             if (event.type != ENET_EVENT_TYPE_NONE)
                 NetworkManager::getInstance()->notifyEvent(evt);

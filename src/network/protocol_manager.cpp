@@ -21,6 +21,7 @@
 #include "network/protocol.hpp"
 #include "network/network_manager.hpp"
 #include "utils/log.hpp"
+#include "graphics/irr_driver.hpp"
 
 #include <assert.h>
 #include <cstdlib>
@@ -33,6 +34,7 @@ void* protocolManagerUpdate(void* data)
     while(!manager->exit())
     {
         manager->update();
+        irr_driver->getDevice()->sleep(20);
     }
     return NULL;
 }
