@@ -24,6 +24,7 @@
 #include "network/protocols/get_peer_address.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/protocols/synchronization_protocol.hpp"
 
 #include "utils/log.hpp"
 
