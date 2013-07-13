@@ -58,12 +58,13 @@ void SynchronizationProtocol::notifyEvent(Event* event)
         NetworkString response;
         response.ai8(event->data.gui8(talk_id)).ai32(token).ai8(0).ai32(sequence);
         m_listener->sendMessage(this, peers[talk_id], response, false);
+        Log::info("SynchronizationProtocol", "Answering sequence %u", sequence);
     }
     else // response
     {
         if (sequence < m_pings[peer_id].size())
         {
-            Log::warn("SynchronizationProtocol", "The sequence isn't known.");
+            Log::warn("SynchronizationProtocol", "The sequence# %u isn't known.", sequence);
             return;
         }
         m_pings[peer_id][sequence].second = Time::getRealTime();
@@ -89,13 +90,14 @@ void SynchronizationProtocol::setup()
 void SynchronizationProtocol::update()
 {
     static double timer = Time::getRealTime();
-    if (Time::getRealTime() > timer+0.1 && m_pings_count < 100) // max 100 pings (10 seconds)
+    if (Time::getRealTime() > timer+2.0 && m_pings_count < 100) // max 100 pings (10 seconds)
     {
         std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
             NetworkString ns;
             ns.ai8(i).addUInt32(peers[i]->getClientServerToken()).addUInt8(1).addUInt32(m_pings[i].size());
+            Log::info("SynchronizationProtocol", "Added sequence number %u", m_pings[i].size());
             timer = Time::getRealTime();
             m_pings[i].push_back(std::pair<double, double>(timer, 0.0));
             m_listener->sendMessage(this, peers[i], ns, false);
