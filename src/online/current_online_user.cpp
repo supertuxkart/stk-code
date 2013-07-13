@@ -25,6 +25,7 @@
 #include "online/http_connector.hpp"
 #include "config/user_config.hpp"
 #include "utils/translation.hpp"
+#include "utils/log.hpp"
 
 static CurrentOnlineUser* user_singleton = NULL;
 
@@ -42,8 +43,6 @@ void CurrentOnlineUser::deallocate()
 }   // deallocate
 
 // ============================================================================
-
-
 CurrentOnlineUser::CurrentOnlineUser(){
     m_is_signed_in = false;
     m_is_guest = false;
@@ -51,6 +50,42 @@ CurrentOnlineUser::CurrentOnlineUser(){
     m_id = 0;
     m_name = "";
     m_token = "";
+}
+
+// ============================================================================
+bool CurrentOnlineUser::trySavedSession()
+{
+    assert(m_is_signed_in == false);
+    if(UserConfigParams::m_saved_session)
+    {
+        HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        connector->setParameter("action",std::string("validate"));
+        connector->setParameter("userid", UserConfigParams::m_saved_user);
+        connector->setParameter("token", UserConfigParams::m_saved_token);
+        const XMLNode * result = connector->getXMLFromPage();
+        std::string rec_success = "";
+        std::string info;
+        if(result->get("success", &rec_success))
+        {
+            if (rec_success =="yes")
+            {
+                int token_fetched = result->get("token", &m_token);
+                int username_fetched = result->get("username", &m_name);
+                int userid_fetched = result->get("userid", &m_id);
+                assert(token_fetched && username_fetched && userid_fetched);
+                m_is_signed_in = true;
+                m_is_guest = false;
+            }
+            result->get("info", &info);
+            Log::info("trySavedSession","%s",info);
+        }
+        else
+        {
+            Log::error("trySavedSession","%s",
+                _("Unable to connect to the server. Check your internet connection or try again later."));
+        }
+    }
+    return m_is_signed_in;
 }
 
 // ============================================================================
@@ -89,6 +124,7 @@ bool CurrentOnlineUser::signUp( const irr::core::stringw &username,
 
 bool CurrentOnlineUser::signIn( const irr::core::stringw &username,
                                 const irr::core::stringw &password,
+                                bool save_session,
                                 irr::core::stringw &info)
 {
     assert(m_is_signed_in == false);
@@ -108,6 +144,12 @@ bool CurrentOnlineUser::signIn( const irr::core::stringw &username,
             assert(token_fetched && username_fetched && userid_fetched);
             m_is_signed_in = true;
             m_is_guest = false;
+            if(save_session)
+            {
+                UserConfigParams::m_saved_user = m_id;
+                UserConfigParams::m_saved_token = m_token;
+                UserConfigParams::m_saved_session = true;
+            }
         }
         result->get("info", &info);
     }
@@ -125,7 +167,7 @@ bool CurrentOnlineUser::createServer(  const irr::core::stringw &name,
                                         int max_players,
                                         irr::core::stringw &info)
 {
-    assert(m_is_signed_in && !m_is_guest && !m_is_server_host);
+    assert(m_is_signed_in && !m_is_guest);
     HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
     connector->setParameter("action",           std::string("create_server"));
     connector->setParameter("token",            m_token);
@@ -172,6 +214,9 @@ bool CurrentOnlineUser::signOut(irr::core::stringw &info){
             m_id = 0;
             m_is_signed_in = false;
             m_is_guest = false;
+            UserConfigParams::m_saved_user = 0;
+            UserConfigParams::m_saved_token = "";
+            UserConfigParams::m_saved_session = false;
         }
         result->get("info", &info);
     }

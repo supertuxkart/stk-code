@@ -47,9 +47,12 @@ class CurrentOnlineUser : public OnlineUser
         // singleton
         static CurrentOnlineUser* get();
         static void deallocate();
+
+        bool trySavedSession();
         // Login
         bool signIn(    const irr::core::stringw &username,
                         const irr::core::stringw &password,
+                        bool save_session,
                         irr::core::stringw &info);
         // Register
         bool signUp(    const irr::core::stringw &username,
