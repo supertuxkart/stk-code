@@ -34,17 +34,17 @@ class NetworkManager : public Singleton<NetworkManager>
 {
     friend class Singleton<NetworkManager>;
     public:
-        virtual void run(); 
-        
+        virtual void run();
+
         // network management functions
         virtual bool connect(TransportAddress peer);
         virtual void setManualSocketsMode(bool manual);
-        
+
         // message/packets related functions
         virtual void notifyEvent(Event* event);
-        virtual void sendPacket(const NetworkString& data) = 0;
-        virtual void sendPacket(STKPeer* peer, const NetworkString& data);
-        virtual void sendPacketExcept(STKPeer* peer, const NetworkString& data);
+        virtual void sendPacket(const NetworkString& data, bool reliable = true) = 0;
+        virtual void sendPacket(STKPeer* peer, const NetworkString& data, bool reliable = true);
+        virtual void sendPacketExcept(STKPeer* peer, const NetworkString& data, bool reliable = true);
 
         // Game related functions
         virtual GameSetup* setupNewGame(); //!< Creates a new game setup and returns it
@@ -53,29 +53,30 @@ class NetworkManager : public Singleton<NetworkManager>
         void setLogin(std::string username, std::string password);
         void setPublicAddress(TransportAddress addr);
         void removePeer(STKPeer* peer);
-        
+
         // getters
         virtual bool peerExists(TransportAddress peer);
         virtual bool isConnectedTo(TransportAddress peer);
-        
+
         virtual bool isServer() = 0;
         inline bool isClient()              { return !isServer();       }
         bool isPlayingOnline()              { return m_playing_online;  }
         STKHost* getHost()                  { return m_localhost;       }
         std::vector<STKPeer*> getPeers()    { return m_peers;           }
+        unsigned int getPeerCount()         { return m_peers.size();    }
         TransportAddress getPublicAddress() { return m_public_address;  }
         GameSetup* getGameSetup()           { return m_game_setup;      }
-        
+
     protected:
         NetworkManager();
         virtual ~NetworkManager();
-        
+
         // protected members
         std::vector<STKPeer*> m_peers;
         STKHost* m_localhost;
         bool m_playing_online;
         GameSetup* m_game_setup;
-        
+
         TransportAddress m_public_address;
         PlayerLogin m_player_login;
 };

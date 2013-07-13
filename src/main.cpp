@@ -606,7 +606,7 @@ int handleCmdLine(int argc, char **argv)
 {
     int n;
     char s[1024];
-    
+
     bool try_login = false;
     irr::core::stringw login, password;
 
@@ -1104,7 +1104,7 @@ int handleCmdLine(int argc, char **argv)
         UserConfigParams::m_sfx = false;  // Disable sound effects
         UserConfigParams::m_music = false;// and music when profiling
     }
-    
+
     if (try_login)
     {
         irr::core::stringw s;
@@ -1240,7 +1240,7 @@ void cleanSuperTuxKart()
     if(news_manager)            delete news_manager;
     if(addons_manager)          delete addons_manager;
     NetworkManager::kill();
-    
+
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
     if(attachment_manager)      delete attachment_manager;
@@ -1382,10 +1382,10 @@ int main(int argc, char *argv[] )
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);
-        
+
         // load the network manager
         // If the server has been created (--server option), this will do nothing (just a warning):
-        NetworkManager::getInstance<ClientNetworkManager>(); 
+        NetworkManager::getInstance<ClientNetworkManager>();
         NetworkManager::getInstance()->run();
         if (NetworkManager::getInstance()->isServer())
         {

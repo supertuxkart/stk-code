@@ -113,21 +113,21 @@ void NetworkManager::notifyEvent(Event* event)
 
 //-----------------------------------------------------------------------------
 
-void NetworkManager::sendPacket(STKPeer* peer, const NetworkString& data)
+void NetworkManager::sendPacket(STKPeer* peer, const NetworkString& data, bool reliable)
 {
     if (peer)
-        peer->sendPacket(data);
+        peer->sendPacket(data, reliable);
 }
 
 //-----------------------------------------------------------------------------
 
-void NetworkManager::sendPacketExcept(STKPeer* peer, const NetworkString& data)
+void NetworkManager::sendPacketExcept(STKPeer* peer, const NetworkString& data, bool reliable)
 {
     for (unsigned int i = 0; i < m_peers.size(); i++)
     {
         if (!m_peers[i]->isSamePeer(peer))
         {
-            m_peers[i]->sendPacket(data);
+            m_peers[i]->sendPacket(data, reliable);
         }
     }
 }

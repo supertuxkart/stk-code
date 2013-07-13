@@ -29,6 +29,7 @@
 #include "input/wiimote_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_world.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
@@ -74,7 +75,7 @@ float MainLoop::getLimitedDt()
         // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
         const int max_fps = (StateManager::get()->throttleFPS() ? 35 : UserConfigParams::m_max_fps);
         const int current_fps = (int)(1000.0f/dt);
-        if( current_fps > max_fps && !ProfileWorld::isNoGraphics())
+        if( current_fps > max_fps && !ProfileWorld::isProfileMode())
         {
             int wait_time = 1000/max_fps - 1000/current_fps;
             if(wait_time < 1) wait_time = 1;
@@ -95,7 +96,10 @@ void MainLoop::updateRace(float dt)
 {
     if(ProfileWorld::isProfileMode()) dt=1.0f/60.0f;
 
-    World::getWorld()->updateWorld(dt);
+    if (NetworkWorld::getInstance<NetworkWorld>()->isRunning())
+        NetworkWorld::getInstance<NetworkWorld>()->update(dt);
+    else
+        World::getWorld()->updateWorld(dt);
 }   // updateRace
 
 //-----------------------------------------------------------------------------

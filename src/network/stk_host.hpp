@@ -31,12 +31,12 @@
 
 /*! \class STKHost
  *  \brief Represents the local host.
- *  This host is either a server host or a client host. A client host is in 
+ *  This host is either a server host or a client host. A client host is in
  *  charge of connecting to a server. A server opens a socket for incoming
- *  connections. 
+ *  connections.
  *  By default, this host will use ENet to exchange packets. It also defines an
  *  interface for ENet use. Nevertheless, this class can be used to send and/or
- *  receive packets whithout ENet adding its headers. 
+ *  receive packets whithout ENet adding its headers.
  *  This class is used by the Network Manager to send packets.
  */
 class STKHost
@@ -53,20 +53,20 @@ class STKHost
             HOST_BROADCAST = 0xFFFFFFFF,    //!< Defines the broadcast address.
             PORT_ANY       = 0              //!< Any port.
         };
-        
+
         /*! \brief Constructor                                              */
         STKHost();
         /*! \brief Destructor                                               */
         virtual ~STKHost();
-        
+
         /*! \brief Thread function checking if data is received.
          *  This function tries to get data from network low-level functions as
-         *  often as possible. When something is received, it generates an 
+         *  often as possible. When something is received, it generates an
          *  event and passes it to the Network Manager.
          *  \param self : used to pass the ENet host to the function.
          */
         static void* receive_data(void* self);
-        
+
         /*! \brief Setups the host as a server.
          *  \param address : The IPv4 address of incoming connections.
          *  \param port : The port on which the server listens.
@@ -75,9 +75,9 @@ class STKHost
          *  \param max_incoming_bandwidth : The maximum incoming bandwidth.
          *  \param max_outgoing_bandwidth : The maximum outgoing bandwidth.
          */
-        void        setupServer(uint32_t address, uint16_t port, 
-                                int peer_count, int channel_limit, 
-                                uint32_t max_incoming_bandwidth, 
+        void        setupServer(uint32_t address, uint16_t port,
+                                int peer_count, int channel_limit,
+                                uint32_t max_incoming_bandwidth,
                                 uint32_t max_outgoing_bandwidth);
         /*! \brief Setups the host as a client.
          *  In fact there is only one peer connected to this host.
@@ -86,10 +86,10 @@ class STKHost
          *  \param max_incoming_bandwidth : The maximum incoming bandwidth.
          *  \param max_outgoing_bandwidth : The maximum outgoing bandwidth.
          */
-        void        setupClient(int peer_count, int channel_limit, 
-                                uint32_t max_incoming_bandwidth, 
+        void        setupClient(int peer_count, int channel_limit,
+                                uint32_t max_incoming_bandwidth,
                                 uint32_t max_outgoing_bandwidth);
-        
+
         /*! \brief Starts the listening of events from ENet.
          *  Starts a thread that updates it as often as possible.
          */
@@ -98,26 +98,26 @@ class STKHost
          *  Stops the thread that was receiving events.
          */
         void        stopListening();
-        
+
         /*! \brief Sends a packet whithout ENet adding its headers.
          *  This function is used in particular to achieve the STUN protocol.
          *  \param data : Data to send.
          *  \param length : Length of the sent data.
          *  \param dst : Destination of the packet.
          */
-        void        sendRawPacket(uint8_t* data, int length, 
+        void        sendRawPacket(uint8_t* data, int length,
                                 TransportAddress dst);
         /*! \brief Receives a packet directly from the network interface.
          *  Receive a packet whithout ENet processing it.
          *  \return A string containing the data of the received packet.
          */
         uint8_t*    receiveRawPacket();
-        /*! \brief Receives a packet directly from the network interface and 
+        /*! \brief Receives a packet directly from the network interface and
          *  filter its address.
-         *  Receive a packet whithout ENet processing it. Checks that the 
-         *  sender of the packet is the one that corresponds to the sender 
+         *  Receive a packet whithout ENet processing it. Checks that the
+         *  sender of the packet is the one that corresponds to the sender
          *  parameter. Does not check the port right now.
-         *  \param sender : Transport address of the original sender of the 
+         *  \param sender : Transport address of the original sender of the
          *  wanted packet.
          *  \return A string containing the data of the received packet
          *  matching the sender's ip address.
@@ -126,8 +126,8 @@ class STKHost
         /*! \brief Broadcasts a packet to all peers.
          *  \param data : Data to send.
          */
-        void        broadcastPacket(const NetworkString& data);
-        
+        void        broadcastPacket(const NetworkString& data, bool reliable = true);
+
         /*! \brief Tells if a peer is known.
          *  \return True if the peer is known, false elseway.
          */
@@ -139,7 +139,7 @@ class STKHost
     protected:
         ENetHost*   m_host;             //!< ENet host interfacing sockets.
         pthread_t*  m_listening_thread; //!< Thread listening network events.
-        
+
 };
 
 #endif // STK_HOST_HPP

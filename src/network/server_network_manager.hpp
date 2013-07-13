@@ -30,21 +30,21 @@ class ServerNetworkManager : public NetworkManager
         {
             return Singleton<NetworkManager>::getInstance<ServerNetworkManager>();
         }
-        
+
         virtual void run();
-        
+
         void kickAllPlayers();
-        
-        virtual void sendPacket(const NetworkString& data);
-        
+
+        virtual void sendPacket(const NetworkString& data, bool reliable = true);
+
         virtual bool isServer()         { return true; }
-        
+
     protected:
         ServerNetworkManager();
         virtual ~ServerNetworkManager();
-        
+
         pthread_t* m_thread_keyboard;
-    
+
 };
 
 #endif // SERVER_NETWORK_MANAGER_HPP

@@ -50,15 +50,15 @@ void* waitInput2(void* data)
             ServerNetworkManager::getInstance()->kickAllPlayers();
         }
     }
-    
+
     uint32_t id = ProtocolManager::getInstance()->requestStart(new StopServer());
     while(ProtocolManager::getInstance()->getProtocolState(id) != PROTOCOL_STATE_TERMINATED)
     {
     }
-       
+
     main_loop->abort();
     exit(0);
-    
+
     return NULL;
 }
 
@@ -76,7 +76,7 @@ ServerNetworkManager::~ServerNetworkManager()
 
 void ServerNetworkManager::run()
 {
-    if (enet_initialize() != 0) 
+    if (enet_initialize() != 0)
     {
         Log::error("ServerNetworkManager", "Could not initialize enet.\n");
         return;
@@ -84,11 +84,11 @@ void ServerNetworkManager::run()
     m_localhost = new STKHost();
     m_localhost->setupServer(STKHost::HOST_ANY, 7321, 16, 2, 0, 0);
     m_localhost->startListening();
-    
+
     // listen keyboard console input
     m_thread_keyboard = (pthread_t*)(malloc(sizeof(pthread_t)));
     pthread_create(m_thread_keyboard, NULL, waitInput2, NULL);
-    
+
     NetworkManager::run();
 }
 
@@ -100,7 +100,7 @@ void ServerNetworkManager::kickAllPlayers()
     }
 }
 
-void ServerNetworkManager::sendPacket(const NetworkString& data)
+void ServerNetworkManager::sendPacket(const NetworkString& data, bool reliable)
 {
-    m_localhost->broadcastPacket(data);
+    m_localhost->broadcastPacket(data, reliable);
 }

@@ -88,27 +88,27 @@ void ProtocolManager::notifyEvent(Event* event)
     pthread_mutex_unlock(&m_events_mutex);
 }
 
-void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message)
+void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message, bool reliable)
 {
     NetworkString newMessage;
     newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
     newMessage += message;
-    NetworkManager::getInstance()->sendPacket(newMessage);
+    NetworkManager::getInstance()->sendPacket(newMessage, reliable);
 }
 
-void ProtocolManager::sendMessage(Protocol* sender, STKPeer* peer, const NetworkString& message)
+void ProtocolManager::sendMessage(Protocol* sender, STKPeer* peer, const NetworkString& message, bool reliable)
 {
     NetworkString newMessage;
     newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
     newMessage += message;
-    NetworkManager::getInstance()->sendPacket(peer, newMessage);
+    NetworkManager::getInstance()->sendPacket(peer, newMessage, reliable);
 }
-void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer, const NetworkString& message)
+void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer, const NetworkString& message, bool reliable)
 {
     NetworkString newMessage;
     newMessage.ai8(sender->getProtocolType()); // add one byte to add protocol type
     newMessage += message;
-    NetworkManager::getInstance()->sendPacketExcept(peer, newMessage);
+    NetworkManager::getInstance()->sendPacketExcept(peer, newMessage, reliable);
 }
 
 uint32_t ProtocolManager::requestStart(Protocol* protocol)

@@ -104,15 +104,15 @@ class ProtocolManager : public Singleton<ProtocolManager>
         /*!
          * \brief WILL BE COMMENTED LATER
          */
-        virtual void            sendMessage(Protocol* sender, const NetworkString& message);
+        virtual void            sendMessage(Protocol* sender, const NetworkString& message, bool reliable = true);
         /*!
          * \brief WILL BE COMMENTED LATER
          */
-        virtual void            sendMessage(Protocol* sender, STKPeer* peer, const NetworkString& message);
+        virtual void            sendMessage(Protocol* sender, STKPeer* peer, const NetworkString& message, bool reliable = true);
         /*!
          * \brief WILL BE COMMENTED LATER
          */
-        virtual void            sendMessageExcept(Protocol* sender, STKPeer* peer, const NetworkString& message);
+        virtual void            sendMessageExcept(Protocol* sender, STKPeer* peer, const NetworkString& message, bool reliable = true);
 
         /*!
          * \brief Asks the manager to start a protocol.

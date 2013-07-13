@@ -29,19 +29,19 @@ class ClientNetworkManager : public NetworkManager
         {
             return Singleton<NetworkManager>::getInstance<ClientNetworkManager>();
         }
-        
+
         virtual void run();
-        virtual void sendPacket(const NetworkString& data);
-        
+        virtual void sendPacket(const NetworkString& data, bool reliable = true);
+
         STKPeer* getPeer();
         virtual bool isServer()         { return false; }
         void setConnected(bool value)   { m_connected = value; }
         bool isConnected()              { return m_connected; }
-        
+
     protected:
         ClientNetworkManager();
         virtual ~ClientNetworkManager();
-        
+
         bool m_connected; //!< Is the user connected to a server
         pthread_t* m_thread_keyboard;
 };

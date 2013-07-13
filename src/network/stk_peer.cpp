@@ -89,14 +89,14 @@ void STKPeer::disconnect()
 
 //-----------------------------------------------------------------------------
 
-void STKPeer::sendPacket(NetworkString const& data)
+void STKPeer::sendPacket(NetworkString const& data, bool reliable)
 {
     Log::verbose("STKPeer", "sending packet of size %d to %i.%i.%i.%i:%i",
                 data.size(), (m_peer->address.host>>0)&0xff,
                 (m_peer->address.host>>8)&0xff,(m_peer->address.host>>16)&0xff,
                 (m_peer->address.host>>24)&0xff,m_peer->address.port);
     ENetPacket* packet = enet_packet_create(data.c_str(), data.size()+1,
-                ENET_PACKET_FLAG_RELIABLE);
+                (reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
 
     enet_peer_send(m_peer, 0, packet);
 }

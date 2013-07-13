@@ -26,9 +26,9 @@ class Singleton
 {
     protected:
         Singleton () { m_singleton = NULL; }
-        virtual ~Singleton () 
-        { 
-            Log::info("Singleton", "Destroyed singleton."); 
+        virtual ~Singleton ()
+        {
+            Log::info("Singleton", "Destroyed singleton.");
         }
 
     public:
@@ -37,7 +37,7 @@ class Singleton
         {
             if (m_singleton == NULL)
                 m_singleton = new S;
-            
+
             S* result = (dynamic_cast<S*> (m_singleton));
             if (result == NULL)
                 Log::debug("Singleton", "THE SINGLETON HAS NOT BEEN REALOCATED, IT IS NOT OF THE REQUESTED TYPE.");

@@ -104,6 +104,7 @@ src/karts/controller/ai_base_controller.cpp
 src/karts/controller/ai_properties.cpp
 src/karts/controller/controller.cpp
 src/karts/controller/end_controller.cpp
+src/karts/controller/network_player_controller.cpp
 src/karts/controller/player_controller.cpp
 src/karts/controller/skidding_ai.cpp
 src/karts/explosion_animation.cpp
@@ -142,6 +143,7 @@ src/network/http_functions.cpp
 src/network/network_interface.cpp
 src/network/network_manager.cpp
 src/network/network_string.cpp
+src/network/network_world.cpp
 src/network/protocol.cpp
 src/network/protocol_manager.cpp
 src/network/protocols/connect_to_peer.cpp
@@ -156,8 +158,10 @@ src/network/protocols/ping_protocol.cpp
 src/network/protocols/quick_join_protocol.cpp
 src/network/protocols/request_connection.cpp
 src/network/protocols/show_public_address.cpp
+src/network/protocols/start_game_protocol.cpp
 src/network/protocols/start_server.cpp
 src/network/protocols/stop_server.cpp
+src/network/protocols/synchronization_protocol.cpp
 src/network/server_network_manager.cpp
 src/network/stk_host.cpp
 src/network/stk_peer.cpp
@@ -378,6 +382,7 @@ src/karts/controller/ai_properties.hpp
 src/karts/controller/controller.hpp
 src/karts/controller/end_controller.hpp
 src/karts/controller/kart_control.hpp
+src/karts/controller/network_player_controller.hpp
 src/karts/controller/player_controller.hpp
 src/karts/controller/skidding_ai.hpp
 src/karts/explosion_animation.hpp
@@ -415,6 +420,7 @@ src/network/http_functions.hpp
 src/network/network_interface.hpp
 src/network/network_manager.hpp
 src/network/network_string.hpp
+src/network/network_world.hpp
 src/network/protocol.hpp
 src/network/protocol_manager.hpp
 src/network/protocols/connect_to_peer.hpp
@@ -429,8 +435,10 @@ src/network/protocols/ping_protocol.hpp
 src/network/protocols/quick_join_protocol.hpp
 src/network/protocols/request_connection.hpp
 src/network/protocols/show_public_address.hpp
+src/network/protocols/start_game_protocol.hpp
 src/network/protocols/start_server.hpp
 src/network/protocols/stop_server.hpp
+src/network/protocols/synchronization_protocol.hpp
 src/network/remote_kart_info.hpp
 src/network/server_network_manager.hpp
 src/network/singleton.hpp

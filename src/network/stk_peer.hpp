@@ -32,10 +32,10 @@ class STKPeer
         STKPeer(const STKPeer& peer);
         virtual ~STKPeer();
 
-        virtual void sendPacket(const NetworkString& data);
+        virtual void sendPacket(const NetworkString& data, bool reliable = true);
         static bool connectToHost(STKHost* localhost, TransportAddress host, uint32_t channel_count, uint32_t data);
         void disconnect();
-        
+
         void setClientServerToken(const uint32_t& token) { *m_client_server_token = token; *m_token_set = true; }
         void unsetClientServerToken() { *m_token_set = false; }
         void setPlayerProfile(NetworkPlayerProfile* profile) { *m_player_profile = profile; }

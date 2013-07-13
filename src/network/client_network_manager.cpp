@@ -36,6 +36,8 @@ void* waitInput(void* data)
     std::string str = "";
     bool stop = false;
     int n = 0;
+    bool success = false;
+    uint32_t ping = 0;
 
     while(!stop)
     {
@@ -63,6 +65,10 @@ void* waitInput(void* data)
             Protocol* protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM);
             ClientLobbyRoomProtocol* clrp = static_cast<ClientLobbyRoomProtocol*>(protocol);
             clrp->requestKartSelection(str2);
+        }
+        else if (str == "synchronize")
+        {
+            ProtocolManager::getInstance()->requestStart(new SynchronizationProtocol(&ping, &success));
         }
         else if (NetworkManager::getInstance()->getPeers().size() > 0)
         {
@@ -106,11 +112,11 @@ void ClientNetworkManager::run()
     NetworkManager::run();
 }
 
-void ClientNetworkManager::sendPacket(const NetworkString& data)
+void ClientNetworkManager::sendPacket(const NetworkString& data, bool reliable)
 {
     if (m_peers.size() > 1)
         Log::warn("ClientNetworkManager", "Ambiguous send of data.\n");
-    m_peers[0]->sendPacket(data);
+    m_peers[0]->sendPacket(data, reliable);
 }
 
 STKPeer* ClientNetworkManager::getPeer()
