@@ -89,13 +89,13 @@ void SynchronizationProtocol::setup()
 void SynchronizationProtocol::update()
 {
     static double timer = Time::getRealTime();
-    if (Time::getRealTime() > timer+100 && m_pings_count < 100) // max 100 pings (10 seconds)
+    if (Time::getRealTime() > timer+0.1 && m_pings_count < 100) // max 100 pings (10 seconds)
     {
         std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
             NetworkString ns;
-            ns.ai8(i).addUInt32(peers[i]->getClientServerToken()).addUInt8(1).addUInt32(m_pings_count);
+            ns.ai8(i).addUInt32(peers[i]->getClientServerToken()).addUInt8(1).addUInt32(m_pings[i].size());
             timer = Time::getRealTime();
             m_pings[i].push_back(std::pair<double, double>(timer, 0.0));
             m_listener->sendMessage(this, peers[i], ns, false);

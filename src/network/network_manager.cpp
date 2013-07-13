@@ -88,7 +88,7 @@ void NetworkManager::setManualSocketsMode(bool manual)
 
 void NetworkManager::notifyEvent(Event* event)
 {
-    Log::info("NetworkManager", "EVENT received of type %d", (int)(event->type));
+    Log::verbose("NetworkManager", "EVENT received of type %d", (int)(event->type));
     STKPeer* peer = *event->peer;
     if (event->type == EVENT_TYPE_CONNECTED)
     {
@@ -99,7 +99,7 @@ void NetworkManager::notifyEvent(Event* event)
     if (event->type == EVENT_TYPE_MESSAGE)
     {
         uint32_t addr = peer->getAddress();
-        Log::info("NetworkManager", "Message, Sender : %i.%i.%i.%i, message = \"%s\"",
+        Log::verbose("NetworkManager", "Message, Sender : %i.%i.%i.%i, message = \"%s\"",
                   ((addr>>24)&0xff),
                   ((addr>>16)&0xff),
                   ((addr>>8)&0xff),
