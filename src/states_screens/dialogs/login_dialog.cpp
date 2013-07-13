@@ -36,7 +36,7 @@ using namespace irr::gui;
 // -----------------------------------------------------------------------------
 
 LoginDialog::LoginDialog(const Message message_type) :
-        ModalDialog(0.8f,0.8f)
+        ModalDialog(0.8f,0.9f)
 {
     m_self_destroy = false;
     m_open_registration_dialog = false;
@@ -67,6 +67,10 @@ LoginDialog::LoginDialog(const Message message_type) :
     assert(m_password_widget != NULL);
     m_password_widget->setPasswordBox(true,L'*');
 
+    m_remember_widget = getWidget<CheckBoxWidget>("remember");
+    assert(m_remember_widget != NULL);
+    m_remember_widget->setState(false);
+
     m_message_widget = getWidget<LabelWidget>("message");
     assert(m_message_widget != NULL);
 
@@ -82,6 +86,8 @@ LoginDialog::LoginDialog(const Message message_type) :
     assert(m_as_guest_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
+
+
 }
 
 // -----------------------------------------------------------------------------
@@ -98,7 +104,7 @@ void LoginDialog::login()
     const stringw username = m_username_widget->getText().trim();
     const stringw password = m_password_widget->getText().trim();
     stringw info = "";
-    if(CurrentOnlineUser::get()->signIn(username,password,info))
+    if(CurrentOnlineUser::get()->signIn(username,password, m_remember_widget->getState(),info))
     {
         m_self_destroy = true;
     }

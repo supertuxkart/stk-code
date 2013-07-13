@@ -23,6 +23,7 @@
 
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -42,6 +43,7 @@ private:
     GUIEngine::LabelWidget * m_info_widget;
     GUIEngine::TextBoxWidget * m_username_widget;
     GUIEngine::TextBoxWidget * m_password_widget;
+    GUIEngine::CheckBoxWidget * m_remember_widget;
     GUIEngine::LabelWidget * m_message_widget;
 
     GUIEngine::RibbonWidget * m_options_widget;

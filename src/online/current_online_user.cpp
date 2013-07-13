@@ -55,13 +55,13 @@ CurrentOnlineUser::CurrentOnlineUser(){
 // ============================================================================
 bool CurrentOnlineUser::trySavedSession()
 {
-    assert(m_is_signed_in == false);
+    if (m_is_signed_in) return true;
     if(UserConfigParams::m_saved_session)
     {
         HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-        connector->setParameter("action",std::string("validate"));
+        connector->setParameter("action",std::string("saved-session"));
         connector->setParameter("userid", UserConfigParams::m_saved_user);
-        connector->setParameter("token", UserConfigParams::m_saved_token);
+        connector->setParameter("token", UserConfigParams::m_saved_token.c_str());
         const XMLNode * result = connector->getXMLFromPage();
         std::string rec_success = "";
         std::string info;
@@ -73,11 +73,12 @@ bool CurrentOnlineUser::trySavedSession()
                 int username_fetched = result->get("username", &m_name);
                 int userid_fetched = result->get("userid", &m_id);
                 assert(token_fetched && username_fetched && userid_fetched);
+                UserConfigParams::m_saved_token = m_token;
                 m_is_signed_in = true;
                 m_is_guest = false;
             }
             result->get("info", &info);
-            Log::info("trySavedSession","%s",info);
+            Log::info("trySavedSession","%s",info.c_str());
         }
         else
         {

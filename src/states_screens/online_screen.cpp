@@ -52,6 +52,7 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 {
     m_recorded_state = Not;
+    CurrentOnlineUser::get()->trySavedSession();
 }   // OnlineScreen
 
 // ----------------------------------------------------------------------------
@@ -106,7 +107,6 @@ void OnlineScreen::beforeAddingWidget()
     //Set everything that could be set invisible or deactivated, to active and visible
     m_bottom_menu_widget->setVisible(true);
     m_top_menu_widget->setVisible(true);
-
     hasStateChanged();
     if (m_recorded_state == Registered)
     {
