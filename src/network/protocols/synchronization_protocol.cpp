@@ -25,6 +25,8 @@ SynchronizationProtocol::~SynchronizationProtocol()
 
 void SynchronizationProtocol::notifyEvent(Event* event)
 {
+    if (event->type != EVENT_TYPE_MESSAGE)
+        return;
     if (event->data.size() < 10)
     {
         Log::warn("SynchronizationProtocol", "Received a message too short.");
@@ -62,20 +64,21 @@ void SynchronizationProtocol::notifyEvent(Event* event)
     }
     else // response
     {
-        if (sequence < m_pings[peer_id].size())
+        if (sequence >= m_pings[peer_id].size())
         {
             Log::warn("SynchronizationProtocol", "The sequence# %u isn't known.", sequence);
             return;
         }
         m_pings[peer_id][sequence].second = Time::getRealTime();
         m_total_diff += (m_pings[peer_id][sequence].second - m_pings[peer_id][sequence].first);
+        Log::verbose("SynchronizationProtocol", "InstantPing is %u", (unsigned int)((m_pings[peer_id][sequence].second - m_pings[peer_id][sequence].first)*1000));
         m_successed_pings++;
         *m_average_ping = (int)((m_total_diff/m_successed_pings)*1000.0);
         if ( *m_successed == false && m_successed_pings > 5)
         {
             *m_successed = true; // success after 5 pings (we have good idea of ping)
         }
-        Log::info("SynchronizationProtocol", "Ping is %u", m_average_ping);
+        Log::verbose("SynchronizationProtocol", "Ping is %u", *m_average_ping);
     }
 }
 
@@ -90,14 +93,14 @@ void SynchronizationProtocol::setup()
 void SynchronizationProtocol::update()
 {
     static double timer = Time::getRealTime();
-    if (Time::getRealTime() > timer+2.0 && m_pings_count < 100) // max 100 pings (10 seconds)
+    if (Time::getRealTime() > timer+0.1 && m_pings_count < 100) // max 100 pings (10 seconds)
     {
         std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
             NetworkString ns;
             ns.ai8(i).addUInt32(peers[i]->getClientServerToken()).addUInt8(1).addUInt32(m_pings[i].size());
-            Log::info("SynchronizationProtocol", "Added sequence number %u", m_pings[i].size());
+            Log::verbose("SynchronizationProtocol", "Added sequence number %u", m_pings[i].size());
             timer = Time::getRealTime();
             m_pings[i].push_back(std::pair<double, double>(timer, 0.0));
             m_listener->sendMessage(this, peers[i], ns, false);
