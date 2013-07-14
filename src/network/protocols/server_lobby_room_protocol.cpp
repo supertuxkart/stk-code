@@ -159,6 +159,19 @@ void ServerLobbyRoomProtocol::update()
         break;
     }
 }
+
+//-----------------------------------------------------------------------------
+
+void ServerLobbyRoomProtocol::startGame()
+{
+    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    for (unsigned int i = 0; i < peers.size(); i++)
+    {
+        NetworkString ns;
+        ns.ai8(0x04).ai8(4).ai32(peers[i]->getClientServerToken()); // start game
+    }
+}
+
 //-----------------------------------------------------------------------------
 
 void ServerLobbyRoomProtocol::kartDisconnected(Event* event)

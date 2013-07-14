@@ -13,6 +13,8 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
         virtual void setup();
         virtual void update();
 
+        void startGame();
+
     protected:
         void kartDisconnected(Event* event);
         void connectionRequested(Event* event);

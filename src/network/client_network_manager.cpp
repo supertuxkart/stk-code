@@ -37,8 +37,6 @@ void* waitInput(void* data)
     std::string str = "";
     bool stop = false;
     int n = 0;
-    bool success = false;
-    uint32_t ping = 0;
 
     while(!stop)
     {
@@ -69,7 +67,7 @@ void* waitInput(void* data)
         }
         else if (str == "synchronize")
         {
-            ProtocolManager::getInstance()->requestStart(new SynchronizationProtocol(&ping, &success));
+            ProtocolManager::getInstance()->requestStart(new SynchronizationProtocol());
         }
         else if (NetworkManager::getInstance()->getPeers().size() > 0)
         {

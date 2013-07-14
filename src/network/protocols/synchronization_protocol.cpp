@@ -5,14 +5,19 @@
 
 //-----------------------------------------------------------------------------
 
-SynchronizationProtocol::SynchronizationProtocol(uint32_t* ping, bool* successed) : Protocol(NULL, PROTOCOL_SYNCHRONIZATION)
+SynchronizationProtocol::SynchronizationProtocol() : Protocol(NULL, PROTOCOL_SYNCHRONIZATION)
 {
-    m_average_ping = ping;
-    m_successed = successed;
-    m_pings.resize(NetworkManager::getInstance()->getPeerCount(), std::vector<std::pair<double,double> >(0));
-    m_pings_count = 0;
-    m_successed_pings = 0;
-    m_total_diff = 0;
+    unsigned int size = NetworkManager::getInstance()->getPeerCount();
+    m_pings.resize(size, std::map<uint32_t,double>());
+    m_pings_count.resize(size);
+    for (unsigned int i = 0; i < size; i++)
+    {
+        m_pings_count[i] = 0;
+    }
+    m_successed_pings.resize(size);
+    m_total_diff.resize(size);
+    m_average_ping.resize(size);
+    m_ready = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -69,16 +74,14 @@ void SynchronizationProtocol::notifyEvent(Event* event)
             Log::warn("SynchronizationProtocol", "The sequence# %u isn't known.", sequence);
             return;
         }
-        m_pings[peer_id][sequence].second = Time::getRealTime();
-        m_total_diff += (m_pings[peer_id][sequence].second - m_pings[peer_id][sequence].first);
-        Log::verbose("SynchronizationProtocol", "InstantPing is %u", (unsigned int)((m_pings[peer_id][sequence].second - m_pings[peer_id][sequence].first)*1000));
-        m_successed_pings++;
-        *m_average_ping = (int)((m_total_diff/m_successed_pings)*1000.0);
-        if ( *m_successed == false && m_successed_pings > 5)
-        {
-            *m_successed = true; // success after 5 pings (we have good idea of ping)
-        }
-        Log::verbose("SynchronizationProtocol", "Ping is %u", *m_average_ping);
+        double current_time = Time::getRealTime();
+        m_total_diff[peer_id] += current_time - m_pings[peer_id][sequence];
+        Log::verbose("SynchronizationProtocol", "InstantPing is %u",
+            (unsigned int)((current_time - m_pings[peer_id][sequence])*1000));
+        m_successed_pings[peer_id]++;
+        m_average_ping[peer_id] = (int)((m_total_diff[peer_id]/m_successed_pings[peer_id])*1000.0);
+
+        Log::verbose("SynchronizationProtocol", "Ping is %u", m_average_ping[peer_id]);
     }
 }
 
@@ -93,7 +96,7 @@ void SynchronizationProtocol::setup()
 void SynchronizationProtocol::update()
 {
     static double timer = Time::getRealTime();
-    if (Time::getRealTime() > timer+0.1 && m_pings_count < 100) // max 100 pings (10 seconds)
+    if (Time::getRealTime() > timer+0.1)
     {
         std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
@@ -102,11 +105,17 @@ void SynchronizationProtocol::update()
             ns.ai8(i).addUInt32(peers[i]->getClientServerToken()).addUInt8(1).addUInt32(m_pings[i].size());
             Log::verbose("SynchronizationProtocol", "Added sequence number %u", m_pings[i].size());
             timer = Time::getRealTime();
-            m_pings[i].push_back(std::pair<double, double>(timer, 0.0));
+            m_pings[i].insert(std::pair<int,double>(m_pings_count[i], timer));
             m_listener->sendMessage(this, peers[i], ns, false);
+            m_pings_count[i]++;
         }
-        m_pings_count++;
     }
 }
 
 //-----------------------------------------------------------------------------
+
+void SynchronizationProtocol::startCountdown(bool* ready, uint32_t ms_countdown)
+{
+    m_ready = ready;
+
+}

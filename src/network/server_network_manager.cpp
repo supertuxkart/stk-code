@@ -24,6 +24,7 @@
 #include "network/protocols/get_peer_address.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/stop_server.hpp"
+#include "network/protocols/server_lobby_room_protocol.hpp"
 
 #include "main_loop.hpp"
 #include "utils/log.hpp"
@@ -48,6 +49,12 @@ void* waitInput2(void* data)
         else if (str == "kickall")
         {
             ServerNetworkManager::getInstance()->kickAllPlayers();
+        }
+        else if (str == "start")
+        {
+            ServerLobbyRoomProtocol* protocol = static_cast<ServerLobbyRoomProtocol*>(ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
+            assert(protocol);
+            protocol->startGame();
         }
     }
 

@@ -24,6 +24,7 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
         void connectionRefused(Event* event); //!< Callback function on connection refusal
         void kartSelectionRefused(Event* event);
         void kartSelectionUpdate(Event* event);
+        void startGame(Event* event);
 
         TransportAddress m_server_address;
         STKPeer* m_server;

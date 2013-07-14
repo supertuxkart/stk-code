@@ -2,27 +2,28 @@
 #define SYNCHRONIZATION_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
-#include <list>
-#include <utility>
+#include <vector>
+#include <map>
 
 class SynchronizationProtocol : public Protocol
 {
     public:
-        SynchronizationProtocol(uint32_t* ping, bool* successed);
+        SynchronizationProtocol();
         virtual ~SynchronizationProtocol();
 
         virtual void notifyEvent(Event* event);
         virtual void setup();
         virtual void update();
 
+        void startCountdown(bool* ready, uint32_t ms_countdown);
+
     protected:
-        //!< stores the start time / arrival time of packets for each peer
-        std::vector<std::vector<std::pair<double, double> > > m_pings;
-        uint32_t* m_average_ping;
-        uint32_t m_pings_count;
-        uint32_t m_successed_pings;
-        double m_total_diff;
-        bool* m_successed;
+        std::vector<std::map<uint32_t, double> > m_pings;
+        std::vector<uint32_t> m_average_ping;
+        std::vector<uint32_t> m_pings_count;
+        std::vector<uint32_t> m_successed_pings;
+        std::vector<double> m_total_diff;
+        bool* m_ready;
 };
 
 #endif // SYNCHRONIZATION_PROTOCOL_HPP

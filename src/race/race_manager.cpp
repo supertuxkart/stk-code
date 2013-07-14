@@ -42,6 +42,8 @@
 #include "modes/world.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/soccer_world.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/start_game_protocol.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
 #include "states_screens/kart_selection.hpp"
@@ -460,6 +462,17 @@ void RaceManager::startNextRace()
         m_kart_status[i].m_last_time  = 0;
     }
 
+    StartGameProtocol* protocol = static_cast<StartGameProtocol*>(
+            ProtocolManager::getInstance()->getProtocol(PROTOCOL_START_GAME));
+    if (protocol) // if this protocol exists, that's that we play online
+    {
+        bool ready = false;
+        protocol->ready();
+        protocol->onReadyChange(&ready);
+        while(!ready) // wait the protocol to say we can start
+        {
+        }
+    }
 }   // startNextRace
 
 //-----------------------------------------------------------------------------
@@ -775,23 +788,23 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 */
 void RaceManager::setupPlayerKartInfo()
 {
-    std::vector<RemoteKartInfo> m_kart_info;
+    std::vector<RemoteKartInfo> kart_info;
 
     // Get the local kart info
     for(unsigned int i=0; i<getNumLocalPlayers(); i++)
-        m_kart_info.push_back(getLocalKartInfo(i));
+        kart_info.push_back(getLocalKartInfo(i));
 
     // Now sort by (hostid, playerid)
-    std::sort(m_kart_info.begin(), m_kart_info.end());
+    std::sort(kart_info.begin(), kart_info.end());
 
     // Set the player kart information
-    setNumPlayers(m_kart_info.size());
+    setNumPlayers(kart_info.size());
 
     // Set the global player ID for each player
-    for(unsigned int i=0; i<m_kart_info.size(); i++)
+    for(unsigned int i=0; i<kart_info.size(); i++)
     {
-        m_kart_info[i].setGlobalPlayerId(i);
-        setPlayerKart(i, m_kart_info[i]);
+        kart_info[i].setGlobalPlayerId(i);
+        setPlayerKart(i, kart_info[i]);
     }
 
     computeRandomKartList();

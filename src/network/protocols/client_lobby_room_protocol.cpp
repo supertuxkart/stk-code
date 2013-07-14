@@ -19,6 +19,7 @@
 #include "network/protocols/client_lobby_room_protocol.hpp"
 
 #include "network/network_manager.hpp"
+#include "network/protocols/start_game_protocol.hpp"
 #include "online/current_online_user.hpp"
 #include "utils/log.hpp"
 
@@ -70,6 +71,8 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
             disconnectedPlayer(event);
         else if (message_type == 0x03) // kart selection update
             kartSelectionUpdate(event);
+        else if (message_type == 0x04) // start race
+            startGame(event);
         else if (message_type == 0x80) // connection refused
             connectionRefused(event);
         else if (message_type == 0x81) // connection accepted
@@ -354,6 +357,36 @@ void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
         Log::error("ClientLobbyRoomProtocol", "The updated kart is taken already.");
     }
     m_setup->setPlayerKart(player_id, data);
+}
+
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when the race needs to be started.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1       5
+ *       -------------
+ *  Size | 1 |    4  |
+ *  Data | 4 | token |
+ *       -------------
+ */
+void ClientLobbyRoomProtocol::startGame(Event* event)
+{
+    if (event->data.size() < 5 || event->data[0] != 4)
+    {
+        Log::error("ClientLobbyRoomProtocol", "A message notifying a kart "
+                    "selection update wasn't formated as expected.");
+        return;
+    }
+    uint8_t token = event->data.gui32(1);
+    if (token == NetworkManager::getInstance()->getPeers()[0]->getClientServerToken())
+    {
+        m_listener->requestStart(new StartGameProtocol(m_setup));
+    }
+    else
+        Log::error("ClientLobbyRoomProtocol", "Bad token when starting game");
+
 }
 
 //-----------------------------------------------------------------------------
