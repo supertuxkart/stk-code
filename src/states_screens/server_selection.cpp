@@ -109,7 +109,7 @@ void ServerSelection::loadList(bool refresh)
         num_players.append(StringUtils::toWString(server->getMaxPlayers()));
         PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
         row->push_back(new GUIEngine::ListWidget::ListCell(server->getName(),-1,3));
-        row->push_back(new GUIEngine::ListWidget::ListCell(num_players,-1,1));
+        row->push_back(new GUIEngine::ListWidget::ListCell(num_players,-1,1,true));
         m_server_list_widget->addItem("server", row);
     }
 

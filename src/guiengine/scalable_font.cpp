@@ -500,15 +500,12 @@ void ScalableFont::draw(const core::stringw& text,
     core::position2d<s32> offset = position.UpperLeftCorner;
     core::dimension2d<s32> text_dimension;
 
-    // When we use the "tab" hack, disable right-alignment, it messes up everything
-    bool has_tab = (text.findFirst(L'\t') != -1);
-
-    if ((m_rtl && !has_tab) || hcenter || vcenter || clip)
+    if (m_rtl || hcenter || vcenter || clip)
     {
         text_dimension = getDimension(text.c_str());
 
-        if (hcenter)                offset.X += (position.getWidth() - text_dimension.Width) / 2;
-        else if (m_rtl && !has_tab) offset.X += (position.getWidth() - text_dimension.Width);
+        if (hcenter)    offset.X += (position.getWidth() - text_dimension.Width) / 2;
+        else if (m_rtl) offset.X += (position.getWidth() - text_dimension.Width);
 
         if (vcenter)    offset.Y += (position.getHeight() - text_dimension.Height) / 2;
         if (clip)
@@ -517,14 +514,6 @@ void ScalableFont::draw(const core::stringw& text,
             clippedRect.clipAgainst(*clip);
             if (!clippedRect.isValid()) return;
         }
-    }
-
-    if (m_rtl && has_tab)
-    {
-        const int where = text.findFirst(L'\t');
-        core::stringw substr = text.subString(0, where-1);
-        text_dimension = getDimension(substr.c_str()) + getDimension(L"XX");
-        offset.X += (int)(position.getWidth()*m_tab_stop-text_dimension.Width);
     }
 
     // ---- collect character locations

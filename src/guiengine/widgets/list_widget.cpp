@@ -182,12 +182,13 @@ void ListWidget::clear()
 
 void ListWidget::addItem(   const std::string& internal_name,
                             const irr::core::stringw &name,
-                            const int icon)
+                            const int icon,
+                            bool center)
 {
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
 
-    ListCell cell(name, icon);
+    ListCell cell(name, icon, 1, center);
     ListItem newItem;
     newItem.m_internal_name = internal_name;
     newItem.m_contents.push_back(cell);

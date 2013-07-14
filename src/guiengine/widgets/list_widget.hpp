@@ -122,7 +122,8 @@ namespace GUIEngine
          */
         void addItem(   const std::string& internal_name,
                         const irr::core::stringw &name,
-                        const int icon=-1);
+                        const int icon=-1,
+                        bool center = false);
 
         void addItem(   const std::string& internal_name,
                         PtrVector<ListCell> * contents);

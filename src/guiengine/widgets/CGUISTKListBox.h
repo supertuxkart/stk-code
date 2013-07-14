@@ -32,12 +32,14 @@ namespace irr
                     irr::core::stringw m_text;
                     int m_proportion;
                     s32 m_icon;
+                    bool m_center;
 
-                    ListCell(irr::core::stringw text, s32 icon = -1, int proportion = 1)
+                    ListCell(irr::core::stringw text, s32 icon = -1, int proportion = 1, bool center = false)
                     {
                         m_text = text;
                         m_proportion = proportion;
                         m_icon = icon;
+                        m_center = center;
                     }
                 };
 

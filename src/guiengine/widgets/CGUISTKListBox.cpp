@@ -488,7 +488,7 @@ void CGUISTKListBox::draw()
                 {
                     total_proportion += Items[i].m_contents[x].m_proportion;
                 }
-                int part_size = textRect.getWidth() / total_proportion;
+                int part_size = (int)(textRect.getWidth() / float(total_proportion));
 
                 for(int x = 0; x < Items[i].m_contents.size(); ++x)
                 {
@@ -532,7 +532,7 @@ void CGUISTKListBox::draw()
                             textRect,
                             hasItemOverrideColor(i, EGUI_LBC_TEXT_HIGHLIGHT) ?
                             getItemOverrideColor(i, EGUI_LBC_TEXT_HIGHLIGHT) : getItemDefaultColor(EGUI_LBC_TEXT_HIGHLIGHT),
-                            false, true, &clientClip);
+                            Items[i].m_contents[x].m_center, true, &clientClip);
                     }
                     else
                     {
@@ -540,7 +540,7 @@ void CGUISTKListBox::draw()
                             Items[i].m_contents[x].m_text.c_str(),
                             textRect,
                             hasItemOverrideColor(i, EGUI_LBC_TEXT) ? getItemOverrideColor(i, EGUI_LBC_TEXT) : getItemDefaultColor(EGUI_LBC_TEXT),
-                            false, true, &clientClip);
+                            Items[i].m_contents[x].m_center, true, &clientClip);
                     }
                     //Position back to inital pos
                     textRect.UpperLeftCorner.X -= ItemsIconWidth+6;

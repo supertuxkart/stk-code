@@ -104,7 +104,7 @@ void AddonsScreen::beforeAddingWidget()
         getWidget<GUIEngine::ListWidget>("list_addons");
     assert(w_list != NULL);
     w_list->clearColumns();
-    w_list->addColumn( _("Add-on name"), 2 );
+    w_list->addColumn( _("Add-on name"), 3 );
     w_list->addColumn( _("Updated date"), 1 );
     
     GUIEngine::SpinnerWidget* w_filter_date =
@@ -358,8 +358,8 @@ void AddonsScreen::loadList()
         }
 
         PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
-        row->push_back(new GUIEngine::ListWidget::ListCell(s.c_str(),icon,2));
-        row->push_back(new GUIEngine::ListWidget::ListCell(addon->getDateAsString().c_str(),-1,1));
+        row->push_back(new GUIEngine::ListWidget::ListCell(s.c_str(), icon, 3, false));
+        row->push_back(new GUIEngine::ListWidget::ListCell(addon->getDateAsString().c_str(), -1, 1, true));
         w_list->addItem(addon->getId(), row);
 
         // Highlight if it's not approved in artists debug mode.
