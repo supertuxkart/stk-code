@@ -520,9 +520,10 @@ void CGUISTKListBox::draw()
                                 hasItemOverrideColor(i, EGUI_LBC_ICON) ? getItemOverrideColor(i, EGUI_LBC_ICON) : getItemDefaultColor(EGUI_LBC_ICON),
                                 0 , (i==Selected) ? os::Timer::getTime() : 0, false, true);
                         }
+                        textRect.UpperLeftCorner.X += ItemsIconWidth;
                     }
 
-                    textRect.UpperLeftCorner.X += ItemsIconWidth+3;
+                    textRect.UpperLeftCorner.X += 3;
 
                     if ( i==Selected && hl )
                     {
