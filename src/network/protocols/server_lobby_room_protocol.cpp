@@ -23,6 +23,7 @@
 #include "network/protocols/show_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/start_server.hpp"
+#include "network/protocols/start_game_protocol.hpp"
 
 #include "online/current_online_user.hpp"
 #include "online/http_connector.hpp"
@@ -170,6 +171,7 @@ void ServerLobbyRoomProtocol::startGame()
         NetworkString ns;
         ns.ai8(0x04).ai8(4).ai32(peers[i]->getClientServerToken()); // start game
     }
+    m_listener->requestStart(new StartGameProtocol(m_setup));
 }
 
 //-----------------------------------------------------------------------------
