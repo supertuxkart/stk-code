@@ -2,7 +2,7 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
-#include "CGUIListBox.h"
+#include "guiengine/widgets/CGUIListBox.h"
 
 #include "IGUISkin.h"
 #include "IGUIEnvironment.h"
@@ -390,7 +390,9 @@ bool CGUIListBox::OnEvent(const SEvent& event)
 				{
 					if (event.GUIEvent.Caller == this)
 						Selecting = false;
+					break;
 				}
+
 			default:
 			break;
 			}

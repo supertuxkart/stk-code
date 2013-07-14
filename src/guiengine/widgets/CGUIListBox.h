@@ -2,8 +2,8 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
-#ifndef __C_GUI_LIST_BOX_H_INCLUDED__
-#define __C_GUI_LIST_BOX_H_INCLUDED__
+#ifndef HEADER_CGUILISTBOX_HPP
+#define HEADER_CGUILISTBOX_HPP
 
 #include "IrrCompileConfig.h"
 
@@ -22,7 +22,7 @@ namespace gui
 	{
 	public:
 		//! constructor
-		CGUIListBox(IGUIEnvironment* environment, IGUIElement* parent,
+	        CGUIListBox(IGUIEnvironment* environment, IGUIElement* parent,
 			s32 id, core::rect<s32> rectangle, bool clip=true,
 			bool drawBack=false, bool moveOverSelect=false);
 
