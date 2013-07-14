@@ -104,11 +104,15 @@ void ClientNetworkManager::run()
     m_localhost->setupClient(1, 2, 0, 0);
     m_localhost->startListening();
 
+    Log::info("ClientNetworkManager", "Host initialized.");
+
     // listen keyboard console input
     m_thread_keyboard = (pthread_t*)(malloc(sizeof(pthread_t)));
     pthread_create(m_thread_keyboard, NULL, waitInput, NULL);
 
     NetworkManager::run();
+
+    Log::info("ClientNetworkManager", "Ready !");
 }
 
 void ClientNetworkManager::sendPacket(const NetworkString& data, bool reliable)

@@ -85,18 +85,21 @@ void ServerNetworkManager::run()
 {
     if (enet_initialize() != 0)
     {
-        Log::error("ServerNetworkManager", "Could not initialize enet.\n");
+        Log::error("ServerNetworkManager", "Could not initialize enet.");
         return;
     }
     m_localhost = new STKHost();
     m_localhost->setupServer(STKHost::HOST_ANY, 7321, 16, 2, 0, 0);
     m_localhost->startListening();
 
+    Log::error("ServerNetworkManager", "Host initialized.");
+
     // listen keyboard console input
     m_thread_keyboard = (pthread_t*)(malloc(sizeof(pthread_t)));
     pthread_create(m_thread_keyboard, NULL, waitInput2, NULL);
 
     NetworkManager::run();
+    Log::error("ServerNetworkManager", "Ready.");
 }
 
 void ServerNetworkManager::kickAllPlayers()

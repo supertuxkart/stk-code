@@ -170,6 +170,7 @@ void ServerLobbyRoomProtocol::startGame()
     {
         NetworkString ns;
         ns.ai8(0x04).ai8(4).ai32(peers[i]->getClientServerToken()); // start game
+        m_listener->sendMessage(this, peers[i], ns, true); // reliably
     }
     m_listener->requestStart(new StartGameProtocol(m_setup));
 }

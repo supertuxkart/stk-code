@@ -383,6 +383,7 @@ void ClientLobbyRoomProtocol::startGame(Event* event)
     if (token == NetworkManager::getInstance()->getPeers()[0]->getClientServerToken())
     {
         m_listener->requestStart(new StartGameProtocol(m_setup));
+        Log::error("ClientLobbyRoomProtocol", "Starting new game");
     }
     else
         Log::error("ClientLobbyRoomProtocol", "Bad token when starting game");

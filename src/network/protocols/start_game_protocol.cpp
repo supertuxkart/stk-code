@@ -59,6 +59,11 @@ void StartGameProtocol::notifyEvent(Event* event)
 void StartGameProtocol::setup()
 {
     m_state = LOADING;
+    // if no synchronization protocol exists, create one
+    SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(m_listener->getProtocol(PROTOCOL_SYNCHRONIZATION));
+    if (!protocol)
+        m_listener->requestStart(new SynchronizationProtocol());
+
     race_manager->setNumKarts(m_game_setup->getPlayerCount());
     race_manager->setNumPlayers(m_game_setup->getPlayerCount());
     race_manager->setNumLocalPlayers(1);
@@ -72,10 +77,6 @@ void StartGameProtocol::setup()
         rki.setHostId(profile->race_id);
         race_manager->setPlayerKart(i, rki);
     }
-    // if no synchronization protocol exists, create one
-    SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(m_listener->getProtocol(PROTOCOL_SYNCHRONIZATION));
-    if (!protocol)
-        m_listener->requestStart(new SynchronizationProtocol());
 }
 
 void StartGameProtocol::update()
