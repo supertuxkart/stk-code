@@ -1033,6 +1033,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\karts\controller\network_player_controller.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\karts\controller\player_controller.cpp"
 						>
 					</File>
@@ -1170,6 +1174,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\network\network_world.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\network\protocol.cpp"
 					>
 				</File>
@@ -1196,6 +1204,10 @@
 				<Filter
 					Name="protocols"
 					>
+					<File
+						RelativePath="..\..\network\protocols\client_lobby_room_protocol.cpp"
+						>
+					</File>
 					<File
 						RelativePath="..\..\network\protocols\connect_to_peer.cpp"
 						>
@@ -1225,11 +1237,23 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\network\protocols\quick_join_protocol.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\network\protocols\request_connection.cpp"
 						>
 					</File>
 					<File
+						RelativePath="..\..\network\protocols\server_lobby_room_protocol.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\network\protocols\show_public_address.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\start_game_protocol.cpp"
 						>
 					</File>
 					<File
@@ -1238,6 +1262,10 @@
 					</File>
 					<File
 						RelativePath="..\..\network\protocols\stop_server.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\synchronization_protocol.cpp"
 						>
 					</File>
 				</Filter>
@@ -1908,6 +1936,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\network\network_world.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\network\protocol.hpp"
 					>
 				</File>
@@ -1943,6 +1975,10 @@
 					Name="protocols"
 					>
 					<File
+						RelativePath="..\..\network\protocols\client_lobby_room_protocol.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\network\protocols\connect_to_peer.hpp"
 						>
 					</File>
@@ -1971,11 +2007,23 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\network\protocols\quick_join_protocol.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\network\protocols\request_connection.hpp"
 						>
 					</File>
 					<File
+						RelativePath="..\..\network\protocols\server_lobby_room_protocol.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\network\protocols\show_public_address.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\start_game_protocol.hpp"
 						>
 					</File>
 					<File
@@ -1984,6 +2032,10 @@
 					</File>
 					<File
 						RelativePath="..\..\network\protocols\stop_server.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\network\protocols\synchronization_protocol.hpp"
 						>
 					</File>
 				</Filter>
@@ -2368,6 +2420,10 @@
 					</File>
 					<File
 						RelativePath="..\..\karts\controller\kart_control.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\karts\controller\network_player_controller.hpp"
 						>
 					</File>
 					<File
