@@ -279,6 +279,8 @@ void AddonsScreen::loadList()
             s = (addon->getName()+L"\t" +
                     core::stringc(addon->getDateAsString().c_str())).c_str();
 
+       //FIXME I'd like to move this to CGUISTKListBox.cpp
+
        /* gui::IGUIFont* font = GUIEngine::getFont();
 
         // first column is 0.666% of the list's width.

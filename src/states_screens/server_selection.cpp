@@ -58,8 +58,8 @@ void ServerSelection::loadedFromFile()
 void ServerSelection::beforeAddingWidget()
 {
     m_server_list_widget->clearColumns();
-    m_server_list_widget->addColumn( _("Name"), 4 );
-    m_server_list_widget->addColumn( _("Players"), 2);
+    m_server_list_widget->addColumn( _("Name"), 3 );
+    m_server_list_widget->addColumn( _("Players"), 1);
 }
 // ----------------------------------------------------------------------------
 
@@ -103,13 +103,14 @@ void ServerSelection::loadList(bool refresh)
     for(int i=0; i <  manager->getNumServers(); i++)
     {
         Server * server = manager->getServer(i);
-        core::stringw table_entry;
-        table_entry.append(server->getName());
-        table_entry.append("\t");
-        table_entry.append(StringUtils::toWString(server->getCurrentPlayers()));
-        table_entry.append("/");
-        table_entry.append(StringUtils::toWString(server->getMaxPlayers()));
-        m_server_list_widget->addItem("server", table_entry);
+        core::stringw num_players;
+        num_players.append(StringUtils::toWString(server->getCurrentPlayers()));
+        num_players.append("/");
+        num_players.append(StringUtils::toWString(server->getMaxPlayers()));
+        PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
+        row->push_back(new GUIEngine::ListWidget::ListCell(server->getName(),-1,3));
+        row->push_back(new GUIEngine::ListWidget::ListCell(num_players,-1,1));
+        m_server_list_widget->addItem("server", row);
     }
 
 }   // loadList
