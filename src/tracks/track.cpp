@@ -121,6 +121,7 @@ Track::Track(const std::string &filename)
     m_minimap_x_scale       = 1.0f;
     m_minimap_y_scale       = 1.0f;
     m_all_nodes.clear();
+    m_all_physics_only_nodes.clear();
     m_all_cached_meshes.clear();
     loadTrackInfo();
 }   // Track
@@ -182,6 +183,7 @@ void Track::cleanup()
         irr_driver->removeNode(m_all_nodes[i]);
     }
     m_all_nodes.clear();
+    m_all_physics_only_nodes.clear();
 
     m_all_emitters.clearAndDeleteAll();
 
@@ -955,6 +957,8 @@ bool Track::loadMainTrack(const XMLNode &root)
         model_name="";
         n->get("model", &model_name);
         full_path = m_root+model_name;
+        std::string interaction;
+        n->get("interaction", &interaction);
 
         // a special challenge orb object for overworld
         std::string challenge;
@@ -1035,7 +1039,6 @@ bool Track::loadMainTrack(const XMLNode &root)
             scene_node->setPosition(xyz);
             scene_node->setRotation(hpr);
             scene_node->setScale(scale);
-
 #ifdef DEBUG
             std::string debug_name = model_name+" (static track-object)";
             scene_node->setName(debug_name.c_str());
@@ -1117,7 +1120,10 @@ bool Track::loadMainTrack(const XMLNode &root)
             }
             else
             {
-                m_all_nodes.push_back( scene_node );
+                if(interaction=="physics-only")
+                    m_all_physics_only_nodes.push_back( scene_node );
+                else
+                    m_all_nodes.push_back( scene_node );
             }
         }
 
@@ -1138,6 +1144,16 @@ bool Track::loadMainTrack(const XMLNode &root)
     {
         convertTrackToBullet(m_all_nodes[i]);
     }
+
+    // Now convert all objects that are only used for the physics 
+    // (like invisible walls).
+    for(unsigned int i=0; i<m_all_physics_only_nodes.size(); i++)
+    {
+        convertTrackToBullet(m_all_physics_only_nodes[i]);
+        irr_driver->removeNode(m_all_physics_only_nodes[i]);
+    }
+    m_all_physics_only_nodes.clear();
+
     if (m_track_mesh == NULL)
     {
         Log::fatal("track", "m_track_mesh == NULL, cannot loadMainTrack\n");
