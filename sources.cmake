@@ -63,7 +63,7 @@ src/guiengine/widget.cpp
 src/guiengine/widgets/bubble_widget.cpp
 src/guiengine/widgets/button_widget.cpp
 src/guiengine/widgets/CGUIEditBox.cpp
-src/guiengine/widgets/CGUIListBox.cpp
+src/guiengine/widgets/CGUISTKListBox.cpp
 src/guiengine/widgets/check_box_widget.cpp
 src/guiengine/widgets/dynamic_ribbon_widget.cpp
 src/guiengine/widgets/icon_button_widget.cpp
