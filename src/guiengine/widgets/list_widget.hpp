@@ -26,6 +26,8 @@
 #include "guiengine/widgets/button_widget.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
+#include "IGUIElement.h"
+#include "guiengine/widgets/CGUIListBox.h"
 
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
 
@@ -87,6 +89,8 @@ namespace GUIEngine
         
         IListWidgetHeaderListener* m_listener;
         
+        irr::gui::IGUIListBox * m_list_box;
+
     public:
         
         LEAK_CHECK()

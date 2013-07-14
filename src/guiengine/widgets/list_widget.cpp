@@ -15,14 +15,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "guiengine/widgets/list_widget.hpp"
+
 #include "guiengine/CGUISpriteBank.h"
 #include "guiengine/engine.hpp"
-#include "guiengine/widgets/list_widget.hpp"
 #include "io/file_manager.hpp"
 
+
+
 #include <IGUIElement.h>
-#include <IGUIEnvironment.h>
-#include <IGUIListBox.h>
+#include <IGUISkin.h>
+#include <CGUIEnvironment.h>
+#include "IGUIFontBitmap.h"
 
 #include <sstream>
 
@@ -80,8 +84,8 @@ void ListWidget::setIcons(STKModifiedSpriteBank* icons, int size)
 
 }
 
-// -----------------------------------------------------------------------------
 
+// -----------------------------------------------------------------------------
 void ListWidget::add()
 {
     const int header_height = GUIEngine::getFontHeight() + 15;
@@ -89,11 +93,32 @@ void ListWidget::add()
     rect<s32> widget_size = (m_header.size() > 0 ? rect<s32>(m_x, m_y + header_height, m_x + m_w, m_y + m_h) :
                                                    rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h) );
 
-    IGUIListBox* list = GUIEngine::getGUIEnv()->addListBox (widget_size, m_parent, getNewID());
-    list->setAutoScrollEnabled(false);
+    IGUISkin * current_skin = GUIEngine::getGUIEnv()->getSkin();
+    IGUIFont * current_font = GUIEngine::getGUIEnv()->getBuiltInFont();
+    IGUIListBox* m_list_box = new CGUIListBox(
+        GUIEngine::getGUIEnv(),
+        m_parent ? m_parent : (CGUIEnvironment *)GUIEngine::getGUIEnv(),
+        getNewID(),
+        widget_size,
+        true,
+        true,
+        false);
 
-    m_element = list;
-    m_element->setTabOrder( list->getID() );
+    if (current_skin && current_skin->getSpriteBank())
+    {
+            m_list_box->setSpriteBank(current_skin->getSpriteBank());
+    }
+    else if (current_font && current_font->getType() == EGFT_BITMAP)
+    {
+            m_list_box->setSpriteBank( ((IGUIFontBitmap*)current_font)->getSpriteBank());
+    }
+
+    m_list_box->drop();
+
+    m_list_box->setAutoScrollEnabled(false);
+
+    m_element = m_list_box;
+    m_element->setTabOrder( m_list_box->getID() );
 
     if (m_header.size() > 0)
     {
