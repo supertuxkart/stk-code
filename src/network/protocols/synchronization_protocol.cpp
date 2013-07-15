@@ -98,7 +98,7 @@ void SynchronizationProtocol::notifyEvent(Event* event)
 void SynchronizationProtocol::setup()
 {
     Log::info("SynchronizationProtocol", "Ready !");
-    m_countdown = 5000; // init the countdown to 5k
+    m_countdown = 5.0; // init the countdown to 5s
 }
 
 //-----------------------------------------------------------------------------
@@ -107,6 +107,11 @@ void SynchronizationProtocol::asynchronousUpdate()
 {
     static double timer = Time::getRealTime();
     double current_time = Time::getRealTime();
+    if (m_countdown_activated)
+    {
+        m_countdown -= (current_time - m_last_countdown_update);
+        m_last_countdown_update = current_time;
+    }
     if (current_time > timer+0.1)
     {
         std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
@@ -127,11 +132,6 @@ void SynchronizationProtocol::asynchronousUpdate()
             m_pings_count[i]++;
         }
     }
-    if (m_countdown_activated)
-    {
-        m_countdown -= (int)((current_time - m_last_countdown_update)*1000.0);
-        m_last_countdown_update = current_time;
-    }
     Log::info("SynchronizationProtocol", "Update! Countdown remaining : %d", m_countdown);
 
 }
@@ -141,7 +141,7 @@ void SynchronizationProtocol::asynchronousUpdate()
 void SynchronizationProtocol::startCountdown(int ms_countdown)
 {
     m_countdown_activated = true;
-    m_countdown = ms_countdown;
+    m_countdown = (double)(ms_countdown)/1000.0;
     m_last_countdown_update = Time::getRealTime();
     Log::info("SynchronizationProtocol", "Countdown started.");
 }
