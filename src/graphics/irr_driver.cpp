@@ -1266,23 +1266,6 @@ void IrrDriver::displayFPS()
     const int NO_TRUST_COUNT = 200;
     static int no_trust = NO_TRUST_COUNT;
 
-    if (no_trust)
-    {
-        no_trust--;
-
-        static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
-        font->draw( L"FPS: ...", core::rect< s32 >(100,0,400,50), fpsColor,
-                    false );
-
-        return;
-    }
-
-    // Ask for current frames per second and last number of triangles
-    // processed (trimed to thousands)
-    const int fps         = m_video_driver->getFPS();
-    const float kilotris  = m_video_driver->getPrimitiveCountDrawn(0)
-                                * (1.f / 1000.f);
-
     // Min and max info tracking, per mode, so user can check game vs menus
     bool current_state     = StateManager::get()->getGameState()
                                == GUIEngine::GAME;
@@ -1302,6 +1285,23 @@ void IrrDriver::displayFPS()
         no_trust = NO_TRUST_COUNT;
         prev_state = current_state;
     }
+
+    if (no_trust)
+    {
+        no_trust--;
+
+        static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
+        font->draw( L"FPS: ...", core::rect< s32 >(100,0,400,50), fpsColor,
+                    false );
+
+        return;
+    }
+
+    // Ask for current frames per second and last number of triangles
+    // processed (trimed to thousands)
+    const int fps         = m_video_driver->getFPS();
+    const float kilotris  = m_video_driver->getPrimitiveCountDrawn(0)
+                                * (1.f / 1000.f);
 
     if (min > fps && fps > 1) min = fps; // Start moments sometimes give useless 1
     if (max < fps) max = fps;
