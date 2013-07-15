@@ -69,3 +69,11 @@ void ServersManager::refresh()
     }
     //FIXME error message
 }
+
+// ============================================================================
+Server * ServersManager::getQuickPlay()
+{
+    if(m_servers->size() > 0)
+        return m_servers->get(0);
+    return NULL;
+}

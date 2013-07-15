@@ -49,6 +49,8 @@ class ServersManager
         void sort(bool sort_desc) { m_servers->insertionSort(0, sort_desc); };
         void setJoinedServer(Server * server){ m_joined_server = server;};
         Server * getJoinedServer(){ return m_joined_server;};
+        //Returns the best server to join
+        Server * getQuickPlay();
 };   // class ServersManager
 
 #endif

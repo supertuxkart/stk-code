@@ -22,8 +22,7 @@
 #include <string>
 #include <iostream>
 
-#include "challenges/game_slot.hpp"
-#include "challenges/unlock_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "input/device_manager.hpp"
@@ -39,8 +38,9 @@
 #include "states_screens/server_selection.hpp"
 #include "modes/demo_world.hpp"
 #include "utils/translation.hpp"
-
 #include "online/current_online_user.hpp"
+#include "online/servers_manager.hpp"
+
 
 
 using namespace GUIEngine;
@@ -136,7 +136,7 @@ void OnlineScreen::init()
 {
     Screen::init();
     setInitialFocus();
-    DemoWorld::resetIdleTime(); //FIXME : what's this?
+    DemoWorld::resetIdleTime();
     m_online_status_widget->setText(irr::core::stringw(_("Signed in as : ")) + CurrentOnlineUser::get()->getUserName() + ".", false);
 }   // init
 
@@ -186,12 +186,21 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (selection == "create_server")
     {
-        //if (m_recorded_state == Registered)
         StateManager::get()->pushScreen(NetworkingLobbySettings::getInstance());
     }
     else if (selection == "quick_play")
     {
-        //if (m_recorded_state == Registered || m_recorded_state == Guest) FIXME
+        //FIXME temporary and the request join + join sequence should be placed in one method somewhere
+        Server * server = ServersManager::get()->getQuickPlay();
+        irr::core::stringw info;
+        if (CurrentOnlineUser::get()->requestJoin( server->getServerId(), info))
+        {
+            ServersManager::get()->setJoinedServer(server);
+        }
+        else
+        {
+            sfx_manager->quickSound( "anvil" );
+        }
         StateManager::get()->pushScreen(NetworkingLobby::getInstance());
     }
 
@@ -208,18 +217,15 @@ void OnlineScreen::onDisabledItemClicked(const std::string& item)
 {
     if (item == "find_server")
     {
-        StateManager::get()->pushScreen(ServerSelection::getInstance());
-        // FIXME new LoginDialog(LoginDialog::Registration_Required);
+        new LoginDialog(LoginDialog::Registration_Required);
     }
     else if (item =="create_server")
     {
-        StateManager::get()->pushScreen(NetworkingLobbySettings::getInstance());
-        // FIXME temporary; new LoginDialog(LoginDialog::Registration_Required);
+        new LoginDialog(LoginDialog::Registration_Required);
     }
     else if (item == "quick_play")
     {
-        StateManager::get()->pushScreen(NetworkingLobby::getInstance());
-        // FIXME temporary; new LoginDialog(LoginDialog::Signing_In_Required);
+        new LoginDialog(LoginDialog::Signing_In_Required);
     }
 }   // onDisabledItemClicked
 
