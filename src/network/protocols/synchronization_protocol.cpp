@@ -68,8 +68,8 @@ void SynchronizationProtocol::notifyEvent(Event* event)
         Log::verbose("SynchronizationProtocol", "Answering sequence %u", sequence);
         if (event->data.size() == 12 && !m_listener->isServer()) // countdown time in the message
         {
-            uint16_t time_to_start = event->data.gui16(10);
-            Log::info("SynchronizationProtocol", "Starting game in %u.", time_to_start);
+            short time_to_start = event->data.gui16(10);
+            Log::info("SynchronizationProtocol", "Request to start game in %d.", time_to_start);
             startCountdown(time_to_start);
         }
         else
@@ -123,7 +123,7 @@ void SynchronizationProtocol::asynchronousUpdate()
             // now add the countdown if necessary
             if (m_countdown_activated)
             {
-                ns.ai16(m_countdown);
+                ns.ai16((int)(m_countdown*1000.0));
                 Log::info("SynchronizationProtocol", "CNTActivated: Countdown value : %f", m_countdown);
             }
             Log::verbose("SynchronizationProtocol", "Added sequence number %u for peer %d", m_pings[i].size(), i);

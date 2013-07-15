@@ -463,7 +463,7 @@ void RaceManager::startNextRace()
     }
 
     StartGameProtocol* protocol = static_cast<StartGameProtocol*>(
-            ProtocolManager::getInstance()->getProtocol(PROTOCOL_SYNCHRONIZATION));
+            ProtocolManager::getInstance()->getProtocol(PROTOCOL_START_GAME));
     if (protocol)
         protocol->ready();
 }   // startNextRace
