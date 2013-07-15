@@ -70,6 +70,7 @@ void SynchronizationProtocol::notifyEvent(Event* event)
         {
             uint16_t time_to_start = event->data.gui16(10);
             Log::info("SynchronizationProtocol", "Starting game in %u.", time_to_start);
+            startCountdown(time_to_start);
         }
         else
             Log::verbose("SynchronizationProtocol", "No countdown for now.");
@@ -97,6 +98,7 @@ void SynchronizationProtocol::notifyEvent(Event* event)
 void SynchronizationProtocol::setup()
 {
     Log::info("SynchronizationProtocol", "Ready !");
+    m_countdown = 5000; // init the countdown to 5k
 }
 
 //-----------------------------------------------------------------------------
@@ -107,7 +109,7 @@ void SynchronizationProtocol::update()
     double current_time = Time::getRealTime();
     if (current_time > timer+0.1)
     {
-        m_countdown -= (current_time - m_last_countdown_update);
+        m_countdown -= (int)((current_time - m_last_countdown_update)*1000.0);
         m_last_countdown_update = current_time;
         std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
