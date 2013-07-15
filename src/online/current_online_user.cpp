@@ -244,12 +244,11 @@ bool CurrentOnlineUser::requestJoin(uint32_t server_id, irr::core::stringw &info
     {
         if (rec_success =="yes")
         {
-            m_token = "";
-            m_name = "";
-            m_id = 0;
-            m_is_signed_in = false;
-            m_is_guest = false;
             success = true;
+        }
+        else
+        {
+            success = false;
         }
         result->get("info", &info);
     }

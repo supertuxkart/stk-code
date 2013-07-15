@@ -196,12 +196,12 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
         if (CurrentOnlineUser::get()->requestJoin( server->getServerId(), info))
         {
             ServersManager::get()->setJoinedServer(server);
+            StateManager::get()->pushScreen(NetworkingLobby::getInstance());
         }
         else
         {
             sfx_manager->quickSound( "anvil" );
         }
-        StateManager::get()->pushScreen(NetworkingLobby::getInstance());
     }
 
 }   // eventCallback
