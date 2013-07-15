@@ -50,9 +50,12 @@ ProtocolManager::ProtocolManager()
 
 
     pthread_mutex_lock(&m_exit_mutex); // will let the update function run
-    /// NOT USED but updated in main loop (because of GUI crash)
-    //m_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
-    //pthread_create(m_update_thread, NULL, protocolManagerUpdate, this);
+    /// NOT USED on client but updated in main loop (because of GUI crash)
+    if (NetworkManager::getInstance()->isServer)
+    {
+        m_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
+        pthread_create(m_update_thread, NULL, protocolManagerUpdate, this);
+    }
 }
 
 ProtocolManager::~ProtocolManager()
