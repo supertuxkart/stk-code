@@ -66,11 +66,14 @@ void SynchronizationProtocol::notifyEvent(Event* event)
         response.ai8(event->data.gui8(talk_id)).ai32(token).ai8(0).ai32(sequence);
         m_listener->sendMessage(this, peers[talk_id], response, false);
         Log::verbose("SynchronizationProtocol", "Answering sequence %u", sequence);
-        if (event->data.size() == 12 && !m_listener->isServer()) // countdown time in the message
+        if (event->data.size() == 14 && !m_listener->isServer()) // countdown time in the message
         {
-            short time_to_start = event->data.gui16(10);
+            int time_to_start = event->data.gui32(10);
             Log::info("SynchronizationProtocol", "Request to start game in %d.", time_to_start);
-            startCountdown(time_to_start);
+            if (!m_countdown_activated)
+                startCountdown(time_to_start);
+            else
+                m_countdown = (double)(time_to_start/1000.0);
         }
         else
             Log::verbose("SynchronizationProtocol", "No countdown for now.");
@@ -89,7 +92,7 @@ void SynchronizationProtocol::notifyEvent(Event* event)
         m_successed_pings[peer_id]++;
         m_average_ping[peer_id] = (int)((m_total_diff[peer_id]/m_successed_pings[peer_id])*1000.0);
 
-        Log::verbose("SynchronizationProtocol", "Ping is %u", m_average_ping[peer_id]);
+        Log::info("SynchronizationProtocol", "Ping is %u", m_average_ping[peer_id]);
     }
 }
 
@@ -121,10 +124,11 @@ void SynchronizationProtocol::asynchronousUpdate()
             NetworkString ns;
             ns.ai8(i).addUInt32(peers[i]->getClientServerToken()).addUInt8(1).addUInt32(m_pings[i].size());
             // now add the countdown if necessary
-            if (m_countdown_activated)
+            if (m_countdown_activated && m_listener->isServer())
             {
-                ns.ai16((int)(m_countdown*1000.0));
+                ns.ai32((int)(m_countdown*1000.0));
                 Log::info("SynchronizationProtocol", "CNTActivated: Countdown value : %f", m_countdown);
+                Log::info("SynchronizationProtocol", "Sent integer %d", (int)(ns.getUInt32(10)));
             }
             Log::verbose("SynchronizationProtocol", "Added sequence number %u for peer %d", m_pings[i].size(), i);
             timer = current_time;
@@ -143,5 +147,5 @@ void SynchronizationProtocol::startCountdown(int ms_countdown)
     m_countdown_activated = true;
     m_countdown = (double)(ms_countdown)/1000.0;
     m_last_countdown_update = Time::getRealTime();
-    Log::info("SynchronizationProtocol", "Countdown started.");
+    Log::info("SynchronizationProtocol", "Countdown started with value %f", m_countdown);
 }

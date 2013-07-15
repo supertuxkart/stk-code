@@ -134,8 +134,6 @@ void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer, const N
 
 uint32_t ProtocolManager::requestStart(Protocol* protocol)
 {
-    if (!protocol)
-        return;
     // create the request
     ProtocolRequest req;
     ProtocolInfo info;
