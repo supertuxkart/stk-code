@@ -18,6 +18,7 @@ SynchronizationProtocol::SynchronizationProtocol() : Protocol(NULL, PROTOCOL_SYN
     m_total_diff.resize(size);
     m_average_ping.resize(size);
     m_ready = NULL;
+    m_countdown_activated = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -65,7 +66,12 @@ void SynchronizationProtocol::notifyEvent(Event* event)
         NetworkString response;
         response.ai8(event->data.gui8(talk_id)).ai32(token).ai8(0).ai32(sequence);
         m_listener->sendMessage(this, peers[talk_id], response, false);
-        Log::info("SynchronizationProtocol", "Answering sequence %u", sequence);
+        //Log::info("SynchronizationProtocol", "Answering sequence %u", sequence);
+        if (event->data.size() == 12 && !m_listener->isServer()) // countdown time in the message
+        {
+            uint16_t time_to_start = event->data.gui16(10);
+            Log::info("SynchronizationProtocol", "Starting game in %u.", time_to_start);
+        }
     }
     else // response
     {
@@ -81,7 +87,7 @@ void SynchronizationProtocol::notifyEvent(Event* event)
         m_successed_pings[peer_id]++;
         m_average_ping[peer_id] = (int)((m_total_diff[peer_id]/m_successed_pings[peer_id])*1000.0);
 
-        Log::verbose("SynchronizationProtocol", "Ping is %u", m_average_ping[peer_id]);
+        //Log::verbose("SynchronizationProtocol", "Ping is %u", m_average_ping[peer_id]);
     }
 }
 
@@ -96,15 +102,21 @@ void SynchronizationProtocol::setup()
 void SynchronizationProtocol::update()
 {
     static double timer = Time::getRealTime();
-    if (Time::getRealTime() > timer+0.1)
+    double current_time = Time::getRealTime();
+    if (current_time > timer+0.1)
     {
+        m_countdown -= (current_time - m_last_countdown_update);
+        m_last_countdown_update = current_time;
         std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
             NetworkString ns;
             ns.ai8(i).addUInt32(peers[i]->getClientServerToken()).addUInt8(1).addUInt32(m_pings[i].size());
-            Log::verbose("SynchronizationProtocol", "Added sequence number %u", m_pings[i].size());
-            timer = Time::getRealTime();
+            // now add the countdown if necessary
+            if (m_countdown_activated)
+                ns.ai16(m_countdown);
+            //Log::verbose("SynchronizationProtocol", "Added sequence number %u", m_pings[i].size());
+            timer = current_time;
             m_pings[i].insert(std::pair<int,double>(m_pings_count[i], timer));
             m_listener->sendMessage(this, peers[i], ns, false);
             m_pings_count[i]++;
@@ -117,5 +129,8 @@ void SynchronizationProtocol::update()
 void SynchronizationProtocol::startCountdown(bool* ready, uint32_t ms_countdown)
 {
     m_ready = ready;
-
+    m_countdown_activated = true;
+    m_countdown = ms_countdown;
+    m_last_countdown_update = Time::getRealTime();
+    Log::info("SynchronizationProtocol", "Countdown started.");
 }

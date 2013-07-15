@@ -48,9 +48,14 @@ void StartGameProtocol::notifyEvent(Event* event)
         {
             // everybody ready, synchronize
             SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(m_listener->getProtocol(PROTOCOL_SYNCHRONIZATION));
-            protocol->startCountdown(m_ready, 5000); // 5 seconds countdown
-            Log::info("StartGameProtocol", "All players ready, starting countdown.");
-            m_state = READY;
+            if (protocol)
+            {
+                protocol->startCountdown(m_ready, 5000); // 5 seconds countdown
+                Log::info("StartGameProtocol", "All players ready, starting countdown.");
+                m_state = READY;
+            }
+            else
+                Log::error("StartGameProtocol", "The Synchronization protocol hasn't been started.");
         }
     }
     // on the client, we shouldn't even receive messages.
@@ -77,6 +82,8 @@ void StartGameProtocol::setup()
         rki.setHostId(profile->race_id);
         race_manager->setPlayerKart(i, rki);
     }
+
+    race_manager->startSingleRace("jungle", 1, false);
 }
 
 void StartGameProtocol::update()
@@ -93,10 +100,15 @@ void StartGameProtocol::update()
 
 void StartGameProtocol::ready() // on clients, means the loading is finished
 {
-    assert(m_listener->isServer() == false);
-    assert(NetworkManager::getInstance()->getPeerCount() == 1);
-    NetworkString ns;
-    ns.ai32(NetworkManager::getInstance()->getPeers()[0]->getClientServerToken()).ai8(1);
+    if (!m_listener->isServer()) // if we're a client
+    {
+        assert(NetworkManager::getInstance()->getPeerCount() == 1);
+        NetworkString ns;
+        ns.ai32(NetworkManager::getInstance()->getPeers()[0]->getClientServerToken()).ai8(1);
+    }
+    else // on the server
+    {
+    }
 }
 
 void StartGameProtocol::onReadyChange(bool* start)

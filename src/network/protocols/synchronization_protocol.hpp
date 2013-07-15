@@ -24,6 +24,9 @@ class SynchronizationProtocol : public Protocol
         std::vector<uint32_t> m_successed_pings;
         std::vector<double> m_total_diff;
         bool* m_ready;
+        bool m_countdown_activated;
+        uint32_t m_countdown;
+        double m_last_countdown_update;
 };
 
 #endif // SYNCHRONIZATION_PROTOCOL_HPP

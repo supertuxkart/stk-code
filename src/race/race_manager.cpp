@@ -778,7 +778,7 @@ void RaceManager::startSingleRace(const std::string &track_ident,
     setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     setCoinTarget( 0 ); // Might still be set from a previous challenge
-    race_manager->setupPlayerKartInfo();
+    //race_manager->setupPlayerKartInfo();
 
     startNew(from_overworld);
 }
