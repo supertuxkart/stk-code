@@ -109,8 +109,11 @@ void SynchronizationProtocol::update()
     double current_time = Time::getRealTime();
     if (current_time > timer+0.1)
     {
-        m_countdown -= (int)((current_time - m_last_countdown_update)*1000.0);
-        m_last_countdown_update = current_time;
+        if (m_countdown_activated)
+        {
+            m_countdown -= (int)((current_time - m_last_countdown_update)*1000.0);
+            m_last_countdown_update = current_time;
+        }
         std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
@@ -120,7 +123,7 @@ void SynchronizationProtocol::update()
             if (m_countdown_activated)
             {
                 ns.ai16(m_countdown);
-                Log::verbose("SynchronizationProtocol", "Countdown value : %u", m_countdown);
+                Log::info("SynchronizationProtocol", "Countdown value : %u", m_countdown);
             }
             Log::verbose("SynchronizationProtocol", "Added sequence number %u for peer %d", m_pings[i].size(), i);
             timer = current_time;
@@ -128,6 +131,7 @@ void SynchronizationProtocol::update()
             m_listener->sendMessage(this, peers[i], ns, false);
             m_pings_count[i]++;
         }
+        Log::info("SynchronizationProtocol", "Countdown remaining : %u", m_countdown);
     }
 }
 
