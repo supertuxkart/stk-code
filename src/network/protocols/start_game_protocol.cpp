@@ -3,6 +3,7 @@
 #include "network/network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/game_setup.hpp"
+#include "network/network_world.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
 #include "race/race_manager.hpp"
 #include "utils/log.hpp"
@@ -88,7 +89,7 @@ void StartGameProtocol::update()
         Log::info("StartGameProtocol", "SynchronizationProtocol started.");
         // race startup sequence
 
-
+        NetworkWorld::getInstance<NetworkWorld>()->start(); // builds it and starts
         race_manager->setNumKarts(m_game_setup->getPlayerCount());
         race_manager->setNumPlayers(m_game_setup->getPlayerCount());
         race_manager->setNumLocalPlayers(1);
@@ -145,6 +146,7 @@ void StartGameProtocol::ready() // on clients, means the loading is finished
         NetworkString ns;
         ns.ai32(NetworkManager::getInstance()->getPeers()[0]->getClientServerToken()).ai8(1);
         m_listener->sendMessage(this, ns, true);
+        Log::info("StartGameProtocol", "Player ready, sending message to server.");
         m_state = READY;
     }
     else // on the server

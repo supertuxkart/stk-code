@@ -34,7 +34,6 @@ void* protocolManagerUpdate(void* data)
     while(!manager->exit())
     {
         manager->update();
-        irr_driver->getDevice()->sleep(20);
     }
     return NULL;
 }

@@ -109,11 +109,6 @@ void SynchronizationProtocol::asynchronousUpdate()
     double current_time = Time::getRealTime();
     if (current_time > timer+0.1)
     {
-        if (m_countdown_activated)
-        {
-            m_countdown -= (int)((current_time - m_last_countdown_update)*1000.0);
-            m_last_countdown_update = current_time;
-        }
         std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
@@ -131,8 +126,14 @@ void SynchronizationProtocol::asynchronousUpdate()
             m_listener->sendMessage(this, peers[i], ns, false);
             m_pings_count[i]++;
         }
-        Log::info("SynchronizationProtocol", "Countdown remaining : %d", m_countdown);
     }
+    if (m_countdown_activated)
+    {
+        m_countdown -= (int)((current_time - m_last_countdown_update)*1000.0);
+        m_last_countdown_update = current_time;
+    }
+    Log::info("SynchronizationProtocol", "Update! Countdown remaining : %d", m_countdown);
+
 }
 
 //-----------------------------------------------------------------------------

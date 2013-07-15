@@ -461,6 +461,11 @@ void RaceManager::startNextRace()
         m_kart_status[i].m_last_score = m_kart_status[i].m_score;
         m_kart_status[i].m_last_time  = 0;
     }
+
+    StartGameProtocol* protocol = static_cast<StartGameProtocol*>(
+            ProtocolManager::getInstance()->getProtocol(PROTOCOL_SYNCHRONIZATION));
+    if (protocol)
+        protocol->ready();
 }   // startNextRace
 
 //-----------------------------------------------------------------------------
