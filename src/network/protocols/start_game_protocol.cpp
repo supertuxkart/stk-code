@@ -25,7 +25,6 @@ StartGameProtocol::StartGameProtocol(GameSetup* game_setup) :
         m_player_states.insert(std::pair<NetworkPlayerProfile*, STATE>(players[i], LOADING));
     }
     m_ready_count = 0;
-    m_ready = NULL;
 }
 
 StartGameProtocol::~StartGameProtocol()
@@ -58,7 +57,7 @@ void StartGameProtocol::notifyEvent(Event* event)
             SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(m_listener->getProtocol(PROTOCOL_SYNCHRONIZATION));
             if (protocol)
             {
-                protocol->startCountdown(m_ready, 5000); // 5 seconds countdown
+                protocol->startCountdown(5000); // 5 seconds countdown
                 Log::info("StartGameProtocol", "All players ready, starting countdown.");
                 m_state = READY;
             }
@@ -77,7 +76,6 @@ void StartGameProtocol::setup()
 {
     m_state = NONE;
     m_ready_count = 0;
-    m_ready = NULL;
     Log::info("SynchronizationProtocol", "Ready !");
 }
 
@@ -135,7 +133,6 @@ void StartGameProtocol::update()
     }
     else if (m_state == READY)
     {
-        *m_ready = true;
         m_listener->requestTerminate(this);
     }
 }
@@ -155,7 +152,3 @@ void StartGameProtocol::ready() // on clients, means the loading is finished
     }
 }
 
-void StartGameProtocol::onReadyChange(bool* start)
-{
-    m_ready = start;
-}

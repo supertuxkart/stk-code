@@ -14,7 +14,6 @@ class StartGameProtocol : public Protocol
         std::map<NetworkPlayerProfile*, STATE> m_player_states;
 
         GameSetup* m_game_setup;
-        bool* m_ready; //!< Set to true when the game can start
         int m_ready_count;
         double m_sending_time;
 
@@ -29,7 +28,6 @@ class StartGameProtocol : public Protocol
         virtual void update();
 
         void ready();
-        void onReadyChange(bool* start);
 
 };
 

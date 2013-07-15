@@ -15,7 +15,9 @@ class SynchronizationProtocol : public Protocol
         virtual void setup();
         virtual void update();
 
-        void startCountdown(bool* ready, uint32_t ms_countdown);
+        void startCountdown(int ms_countdown);
+
+        int getCountdown() { return m_countdown; }
 
     protected:
         std::vector<std::map<uint32_t, double> > m_pings;
@@ -23,9 +25,8 @@ class SynchronizationProtocol : public Protocol
         std::vector<uint32_t> m_pings_count;
         std::vector<uint32_t> m_successed_pings;
         std::vector<double> m_total_diff;
-        bool* m_ready;
         bool m_countdown_activated;
-        uint32_t m_countdown;
+        int m_countdown;
         double m_last_countdown_update;
 };
 

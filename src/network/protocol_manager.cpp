@@ -87,9 +87,19 @@ ProtocolManager::~ProtocolManager()
 void ProtocolManager::notifyEvent(Event* event)
 {
     Event* event2 = new Event(*event);
-    pthread_mutex_lock(&m_events_mutex);
-    m_events_to_process.push_back(event2); // add the event to the queue
-    pthread_mutex_unlock(&m_events_mutex);
+    int result = pthread_mutex_trylock(&m_protocols_mutex);
+    if (result == 0) // locked successfully
+    {
+        // if we can propagate the event now, do so:
+        propagateEvent(event2);
+        pthread_mutex_unlock(&m_protocols_mutex);
+    }
+    else
+    {
+        pthread_mutex_lock(&m_events_mutex);
+        m_events_to_process.push_back(event2); // add the event to the queue
+        pthread_mutex_unlock(&m_events_mutex);
+    }
 }
 
 void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message, bool reliable)
@@ -236,6 +246,33 @@ void ProtocolManager::protocolTerminated(ProtocolInfo protocol)
     pthread_mutex_unlock(&m_protocols_mutex);
 }
 
+void ProtocolManager::propagateEvent(Event* event)
+{
+    PROTOCOL_TYPE searchedProtocol = PROTOCOL_NONE;
+    if (event->type == EVENT_TYPE_MESSAGE)
+    {
+        if (event->data.size() > 0)
+            searchedProtocol = (PROTOCOL_TYPE)(event->data.getAndRemoveUInt8());
+    }
+    if (event->type == EVENT_TYPE_CONNECTED)
+    {
+        searchedProtocol = PROTOCOL_CONNECTION;
+    }
+    for (unsigned int i = 0; i < m_protocols.size() ; i++)
+    {
+        if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event->type == EVENT_TYPE_DISCONNECTED) // pass data to protocols even when paused
+            m_protocols[i].protocol->notifyEvent(event);
+    }
+    if (searchedProtocol == PROTOCOL_NONE) // no protocol was aimed, show the msg to debug
+    {
+        Log::debug("ProtocolManager", "Message is \"%s\"", event->data.c_str());
+    }
+
+    // because we made a copy of the event
+    delete event->peer; // no more need of that
+    delete event;
+}
+
 void ProtocolManager::update()
 {
     // before updating, notice protocols that they have received information
@@ -247,29 +284,7 @@ void ProtocolManager::update()
         m_events_to_process.pop_back();
         pthread_mutex_unlock(&m_events_mutex); // release the mutex
 
-        PROTOCOL_TYPE searchedProtocol = PROTOCOL_NONE;
-        if (event->type == EVENT_TYPE_MESSAGE)
-        {
-            if (event->data.size() > 0)
-                searchedProtocol = (PROTOCOL_TYPE)(event->data.getAndRemoveUInt8());
-        }
-        if (event->type == EVENT_TYPE_CONNECTED)
-        {
-            searchedProtocol = PROTOCOL_CONNECTION;
-        }
-        for (unsigned int i = 0; i < m_protocols.size() ; i++)
-        {
-            if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event->type == EVENT_TYPE_DISCONNECTED) // pass data to protocols even when paused
-                m_protocols[i].protocol->notifyEvent(event);
-        }
-        if (searchedProtocol == PROTOCOL_NONE) // no protocol was aimed, show the msg to debug
-        {
-            Log::debug("ProtocolManager", "Message is \"%s\"", event->data.c_str());
-        }
-
-        // because we made a copy of the event
-        delete event->peer; // no more need of that
-        delete event;
+        propagateEvent(event);
     }
 
     // now update all protocols

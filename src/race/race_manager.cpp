@@ -461,20 +461,6 @@ void RaceManager::startNextRace()
         m_kart_status[i].m_last_score = m_kart_status[i].m_score;
         m_kart_status[i].m_last_time  = 0;
     }
-
-
-    StartGameProtocol* protocol = static_cast<StartGameProtocol*>(
-            ProtocolManager::getInstance()->getProtocol(PROTOCOL_START_GAME));
-    if (protocol) // if this protocol exists, that's that we play online
-    {
-        Log::info("RaceManager", "Game ready, waiting server synchronization.");
-        bool ready = false;
-        protocol->ready();
-        protocol->onReadyChange(&ready);
-        while(!ready) // wait the protocol to say we can start
-        {
-        }
-    }
 }   // startNextRace
 
 //-----------------------------------------------------------------------------

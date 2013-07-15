@@ -17,7 +17,6 @@ SynchronizationProtocol::SynchronizationProtocol() : Protocol(NULL, PROTOCOL_SYN
     m_successed_pings.resize(size);
     m_total_diff.resize(size);
     m_average_ping.resize(size);
-    m_ready = NULL;
     m_countdown_activated = false;
 }
 
@@ -132,9 +131,8 @@ void SynchronizationProtocol::update()
 
 //-----------------------------------------------------------------------------
 
-void SynchronizationProtocol::startCountdown(bool* ready, uint32_t ms_countdown)
+void SynchronizationProtocol::startCountdown(int ms_countdown)
 {
-    m_ready = ready;
     m_countdown_activated = true;
     m_countdown = ms_countdown;
     m_last_countdown_update = Time::getRealTime();

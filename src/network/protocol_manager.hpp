@@ -258,6 +258,8 @@ class ProtocolManager : public Singleton<ProtocolManager>
          */
         virtual void            protocolTerminated(ProtocolInfo protocol);
 
+        void                    propagateEvent(Event* event);
+
         // protected members
         /*!
          * \brief Contains the running protocols.
