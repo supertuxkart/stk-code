@@ -63,32 +63,36 @@ void StartGameProtocol::notifyEvent(Event* event)
 
 void StartGameProtocol::setup()
 {
-    m_state = LOADING;
-    // if no synchronization protocol exists, create one
-    SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(m_listener->getProtocol(PROTOCOL_SYNCHRONIZATION));
-    if (!protocol)
-        m_listener->requestStart(new SynchronizationProtocol());
-
-    race_manager->setNumKarts(m_game_setup->getPlayerCount());
-    race_manager->setNumPlayers(m_game_setup->getPlayerCount());
-    race_manager->setNumLocalPlayers(1);
-    std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
-    for (unsigned int i = 0; i < players.size(); i++)
-    {
-        NetworkPlayerProfile* profile = players[i];
-        RemoteKartInfo rki(profile->race_id, profile->kart_name, profile->user_profile->getUserName(), profile->race_id);
-        rki.setGlobalPlayerId(profile->race_id);
-        rki.setLocalPlayerId(profile->race_id);
-        rki.setHostId(profile->race_id);
-        race_manager->setPlayerKart(i, rki);
-    }
-
-    race_manager->startSingleRace("jungle", 1, false);
+    m_state = NONE;
 }
 
 void StartGameProtocol::update()
 {
-    if (m_state == LOADING)
+    if (m_state == NONE)
+    {
+        // if no synchronization protocol exists, create one
+        SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(m_listener->getProtocol(PROTOCOL_SYNCHRONIZATION));
+        if (!protocol)
+            m_listener->requestStart(new SynchronizationProtocol());
+
+        race_manager->setNumKarts(m_game_setup->getPlayerCount());
+        race_manager->setNumPlayers(m_game_setup->getPlayerCount());
+        race_manager->setNumLocalPlayers(1);
+        std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
+        for (unsigned int i = 0; i < players.size(); i++)
+        {
+            NetworkPlayerProfile* profile = players[i];
+            RemoteKartInfo rki(profile->race_id, profile->kart_name, profile->user_profile->getUserName(), profile->race_id);
+            rki.setGlobalPlayerId(profile->race_id);
+            rki.setLocalPlayerId(profile->race_id);
+            rki.setHostId(profile->race_id);
+            race_manager->setPlayerKart(i, rki);
+        }
+
+        race_manager->startSingleRace("jungle", 1, false);
+        m_state = LOADING;
+    }
+    else if (m_state == LOADING)
     {
 
     }
