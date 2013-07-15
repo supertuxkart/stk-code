@@ -110,7 +110,7 @@ void StartGameProtocol::update()
             int new_player_id = StateManager::get()->createActivePlayer( profileToUse, device );
             // self config
         }
-        Log::info("StartGameProtocol", "Players config ready.");
+        Log::info("StartGameProtocol", "Player configuration ready.");
         m_state = SYNCHRONIZATION_WAIT;
 /*
         KartSelectionScreen* s = KartSelectionScreen::getInstance();
@@ -146,8 +146,8 @@ void StartGameProtocol::ready() // on clients, means the loading is finished
         assert(NetworkManager::getInstance()->getPeerCount() == 1);
         NetworkString ns;
         ns.ai32(NetworkManager::getInstance()->getPeers()[0]->getClientServerToken()).ai8(1);
+        Log::info("StartGameProtocol", "Player ready, notifying server.");
         m_listener->sendMessage(this, ns, true);
-        Log::info("StartGameProtocol", "Player ready, sending message to server.");
         m_state = READY;
     }
     else // on the server

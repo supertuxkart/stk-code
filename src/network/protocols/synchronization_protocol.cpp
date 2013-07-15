@@ -92,7 +92,7 @@ void SynchronizationProtocol::notifyEvent(Event* event)
         m_successed_pings[peer_id]++;
         m_average_ping[peer_id] = (int)((m_total_diff[peer_id]/m_successed_pings[peer_id])*1000.0);
 
-        Log::info("SynchronizationProtocol", "Ping is %u", m_average_ping[peer_id]);
+        Log::debug("SynchronizationProtocol", "Ping is %u", m_average_ping[peer_id]);
     }
 }
 
@@ -114,7 +114,13 @@ void SynchronizationProtocol::asynchronousUpdate()
     {
         m_countdown -= (current_time - m_last_countdown_update);
         m_last_countdown_update = current_time;
-        Log::info("SynchronizationProtocol", "Update! Countdown remaining : %f", m_countdown);
+        Log::debug("SynchronizationProtocol", "Update! Countdown remaining : %f", m_countdown);
+        if (m_countdown < 0.0)
+        {
+            Log::info("SynchronizationProtocol", "Countdown finished. Starting now.");
+            m_listener->requestTerminate(this);
+            return;
+        }
     }
     if (current_time > timer+0.1)
     {
@@ -127,9 +133,7 @@ void SynchronizationProtocol::asynchronousUpdate()
             if (m_countdown_activated && m_listener->isServer())
             {
                 ns.addUInt32((int)(m_countdown*1000.0));
-                Log::info("SynchronizationProtocol", "CNTActivated: Countdown value : %f", m_countdown);
-                Log::info("SynchronizationProtocol", "Sent integer %d", (int)(m_countdown*1000.0));
-                Log::info("SynchronizationProtocol", "Sent integer %d", (int)(ns.getUInt32(10)));
+                Log::debug("SynchronizationProtocol", "CNTActivated: Countdown value : %f", m_countdown);
             }
             Log::verbose("SynchronizationProtocol", "Added sequence number %u for peer %d", m_pings[i].size(), i);
             timer = current_time;

@@ -277,7 +277,7 @@ void ProtocolManager::propagateEvent(Event* event)
     {
         searchedProtocol = PROTOCOL_CONNECTION;
     }
-    Log::info("ProtocolManager", "Received event for protocols of type %d", searchedProtocol);
+    Log::verbose("ProtocolManager", "Received event for protocols of type %d", searchedProtocol);
     for (unsigned int i = 0; i < m_protocols.size() ; i++)
     {
         if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event->type == EVENT_TYPE_DISCONNECTED) // pass data to protocols even when paused
