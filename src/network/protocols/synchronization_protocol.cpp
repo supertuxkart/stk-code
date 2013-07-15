@@ -132,7 +132,7 @@ void SynchronizationProtocol::asynchronousUpdate()
             m_pings_count[i]++;
         }
     }
-    Log::info("SynchronizationProtocol", "Update! Countdown remaining : %d", m_countdown);
+    Log::info("SynchronizationProtocol", "Update! Countdown remaining : %lf", m_countdown);
 
 }
 

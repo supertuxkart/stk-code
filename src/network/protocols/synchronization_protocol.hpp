@@ -18,7 +18,7 @@ class SynchronizationProtocol : public Protocol
 
         void startCountdown(int ms_countdown);
 
-        int getCountdown() { return (int)(m_countdown*1000); }
+        int getCountdown() { return (int)(m_countdown*1000.0); }
 
     protected:
         std::vector<std::map<uint32_t, double> > m_pings;
