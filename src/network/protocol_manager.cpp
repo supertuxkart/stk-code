@@ -34,6 +34,7 @@ void* protocolManagerUpdate(void* data)
     while(!manager->exit())
     {
         manager->update();
+        irr_driver->getDevice()->sleep(20);
     }
     return NULL;
 }
@@ -98,20 +99,10 @@ ProtocolManager::~ProtocolManager()
 
 void ProtocolManager::notifyEvent(Event* event)
 {
+    pthread_mutex_lock(&m_events_mutex);
     Event* event2 = new Event(*event);
-    int result = pthread_mutex_trylock(&m_protocols_mutex);
-    if (result == 0) // locked successfully
-    {
-        // if we can propagate the event now, do so:
-        propagateEvent(event2);
-        pthread_mutex_unlock(&m_protocols_mutex);
-    }
-    else
-    {
-        pthread_mutex_lock(&m_events_mutex);
-        m_events_to_process.push_back(event2); // add the event to the queue
-        pthread_mutex_unlock(&m_events_mutex);
-    }
+    m_events_to_process.push_back(event2); // add the event to the queue
+    pthread_mutex_unlock(&m_events_mutex);
 }
 
 void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message, bool reliable)
@@ -270,6 +261,7 @@ void ProtocolManager::propagateEvent(Event* event)
     {
         searchedProtocol = PROTOCOL_CONNECTION;
     }
+    Log::info("ProtocolManager", "Received event for protocols of type %d", searchedProtocol);
     for (unsigned int i = 0; i < m_protocols.size() ; i++)
     {
         if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event->type == EVENT_TYPE_DISCONNECTED) // pass data to protocols even when paused
@@ -277,7 +269,7 @@ void ProtocolManager::propagateEvent(Event* event)
     }
     if (searchedProtocol == PROTOCOL_NONE) // no protocol was aimed, show the msg to debug
     {
-        Log::debug("ProtocolManager", "Message is \"%s\"", event->data.c_str());
+        Log::debug("ProtocolManager", "NO PROTOCOL : Message is \"%s\"", event->data.c_str());
     }
 
     // because we made a copy of the event

@@ -110,7 +110,7 @@ void StartGameProtocol::update()
             int new_player_id = StateManager::get()->createActivePlayer( profileToUse, device );
             // self config
         }
-        Log::info("StartGameProtocol", "Players config ready. Starting single race now.");
+        Log::info("StartGameProtocol", "Players config ready.");
         m_state = SYNCHRONIZATION_WAIT;
 /*
         KartSelectionScreen* s = KartSelectionScreen::getInstance();
@@ -126,6 +126,7 @@ void StartGameProtocol::update()
         {
             // now the synchronization protocol exists.
             race_manager->startSingleRace("jungle", 1, false);
+            Log::info("StartGameProtocol", "Starting the race loading.");
             m_state = LOADING;
         }
     }

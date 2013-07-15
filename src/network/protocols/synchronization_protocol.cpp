@@ -111,6 +111,7 @@ void SynchronizationProtocol::asynchronousUpdate()
     {
         m_countdown -= (current_time - m_last_countdown_update);
         m_last_countdown_update = current_time;
+        Log::info("SynchronizationProtocol", "Update! Countdown remaining : %f", m_countdown);
     }
     if (current_time > timer+0.1)
     {
@@ -123,7 +124,7 @@ void SynchronizationProtocol::asynchronousUpdate()
             if (m_countdown_activated)
             {
                 ns.ai16(m_countdown);
-                Log::info("SynchronizationProtocol", "Countdown value : %d", m_countdown);
+                Log::info("SynchronizationProtocol", "CNTActivated: Countdown value : %f", m_countdown);
             }
             Log::verbose("SynchronizationProtocol", "Added sequence number %u for peer %d", m_pings[i].size(), i);
             timer = current_time;
@@ -132,7 +133,6 @@ void SynchronizationProtocol::asynchronousUpdate()
             m_pings_count[i]++;
         }
     }
-    Log::info("SynchronizationProtocol", "Update! Countdown remaining : %lf", m_countdown);
 
 }
 
