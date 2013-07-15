@@ -140,8 +140,6 @@ void AddonsScreen::init()
 
 	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
 
-    GUIEngine::getFont()->setTabStop(0.66f);
-
     if(UserConfigParams::logAddons())
         std::cout << "[addons] Using directory <" + file_manager->getAddonsDir()
               << ">\n";
@@ -188,8 +186,6 @@ void AddonsScreen::unloaded()
 
 void AddonsScreen::tearDown()
 {
-    // return tab stop to the center when leaving this screen!!
-    GUIEngine::getFont()->setTabStop(0.5f);
 }
 
 // ----------------------------------------------------------------------------

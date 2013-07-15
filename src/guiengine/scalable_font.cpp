@@ -32,7 +32,6 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
     m_fallback_kerning_width = 0;
     m_fallback_font_scale    = 1.0f;
     m_scale                  = 1.0f;
-    m_tab_stop               = 0.5f;
     m_is_hollow_copy         = false;
     m_black_border           = false;
     m_shadow                 = false;
