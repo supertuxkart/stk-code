@@ -49,6 +49,7 @@ void StartGameProtocol::notifyEvent(Event* event)
     }
     if (m_listener->isServer() && ready) // on server, player is ready
     {
+        Log::info("StartGameProtocol", "One of the players is ready.");
         m_player_states[peer->getPlayerProfile()] = READY;
         m_ready_count++;
         if (m_ready_count == m_game_setup->getPlayerCount())
@@ -65,12 +66,18 @@ void StartGameProtocol::notifyEvent(Event* event)
                 Log::error("StartGameProtocol", "The Synchronization protocol hasn't been started.");
         }
     }
+    else
+    {
+        Log::error("StartGameProtocol", "Received a message with bad format.");
+    }
     // on the client, we shouldn't even receive messages.
 }
 
 void StartGameProtocol::setup()
 {
     m_state = NONE;
+    m_ready_count = 0;
+    m_ready = NULL;
     Log::info("SynchronizationProtocol", "Ready !");
 }
 
@@ -118,6 +125,7 @@ void StartGameProtocol::update()
             (m_listener->getProtocol(PROTOCOL_SYNCHRONIZATION));
         if (protocol)
         {
+            // now the synchronization protocol exists.
             race_manager->startSingleRace("jungle", 1, false);
             m_state = LOADING;
         }
@@ -127,6 +135,7 @@ void StartGameProtocol::update()
     }
     else if (m_state == READY)
     {
+        *m_ready = true;
         m_listener->requestTerminate(this);
     }
 }
@@ -139,6 +148,7 @@ void StartGameProtocol::ready() // on clients, means the loading is finished
         NetworkString ns;
         ns.ai32(NetworkManager::getInstance()->getPeers()[0]->getClientServerToken()).ai8(1);
         m_listener->sendMessage(this, ns, true);
+        m_state = READY;
     }
     else // on the server
     {

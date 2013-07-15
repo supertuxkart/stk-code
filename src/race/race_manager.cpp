@@ -467,6 +467,7 @@ void RaceManager::startNextRace()
             ProtocolManager::getInstance()->getProtocol(PROTOCOL_START_GAME));
     if (protocol) // if this protocol exists, that's that we play online
     {
+        Log::info("RaceManager", "Game ready, waiting server synchronization.");
         bool ready = false;
         protocol->ready();
         protocol->onReadyChange(&ready);
