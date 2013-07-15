@@ -71,6 +71,7 @@ void StartGameProtocol::notifyEvent(Event* event)
 void StartGameProtocol::setup()
 {
     m_state = NONE;
+    Log::info("SynchronizationProtocol", "Ready !");
 }
 
 void StartGameProtocol::update()
@@ -78,9 +79,8 @@ void StartGameProtocol::update()
     if (m_state == NONE)
     {
         // if no synchronization protocol exists, create one
-        SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(m_listener->getProtocol(PROTOCOL_SYNCHRONIZATION));
-        if (!protocol)
-            m_listener->requestStart(new SynchronizationProtocol());
+        m_listener->requestStart(new SynchronizationProtocol());
+        Log::info("StartGameProtocol", "SynchronizationProtocol started.");
         // race startup sequence
 
 
@@ -105,17 +105,25 @@ void StartGameProtocol::update()
             // self config
         }
         Log::info("StartGameProtocol", "Players config ready. Starting single race now.");
-        race_manager->startSingleRace("jungle", 1, false);
-        m_state = LOADING;
+        m_state = SYNCHRONIZATION_WAIT;
 /*
         KartSelectionScreen* s = KartSelectionScreen::getInstance();
         s->setMultiplayer(false);
         s->setFromOverworld(false);
         StateManager::get()->pushScreen( s );*/
     }
+    else if (m_state == SYNCHRONIZATION_WAIT)
+    {
+        SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>
+            (m_listener->getProtocol(PROTOCOL_SYNCHRONIZATION));
+        if (protocol)
+        {
+            race_manager->startSingleRace("jungle", 1, false);
+            m_state = LOADING;
+        }
+    }
     else if (m_state == LOADING)
     {
-
     }
     else if (m_state == READY)
     {

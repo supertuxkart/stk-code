@@ -10,7 +10,7 @@ class NetworkPlayerProfile;
 class StartGameProtocol : public Protocol
 {
     protected:
-        enum STATE { NONE, LOADING, READY };
+        enum STATE { NONE, SYNCHRONIZATION_WAIT, LOADING, READY };
         std::map<NetworkPlayerProfile*, STATE> m_player_states;
 
         GameSetup* m_game_setup;

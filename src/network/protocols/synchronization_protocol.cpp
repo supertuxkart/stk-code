@@ -95,6 +95,7 @@ void SynchronizationProtocol::notifyEvent(Event* event)
 
 void SynchronizationProtocol::setup()
 {
+    Log::info("SynchronizationProtocol", "Ready !");
 }
 
 //-----------------------------------------------------------------------------
