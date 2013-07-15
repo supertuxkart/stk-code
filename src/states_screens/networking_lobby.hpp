@@ -40,14 +40,14 @@ private:
 
     NetworkingLobby();
 
+    GUIEngine::IconButtonWidget * m_back_widget;
+
     GUIEngine::LabelWidget * m_server_name_widget;
 
     GUIEngine::LabelWidget * m_online_status_widget;
 
     GUIEngine::RibbonWidget * m_bottom_menu_widget;
-    GUIEngine::IconButtonWidget * m_sign_in_widget;
-    GUIEngine::IconButtonWidget * m_register_widget;
-    GUIEngine::IconButtonWidget * m_sign_out_widget;
+    GUIEngine::IconButtonWidget * m_exit_widget;
 
     /** \brief Sets which widget has to be focused. Depends on the user state. */
     void setInitialFocus();
