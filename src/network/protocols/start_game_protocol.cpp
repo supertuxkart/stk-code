@@ -8,6 +8,12 @@
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 
+#include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
+#include "challenges/unlock_manager.hpp"
+#include "states_screens/state_manager.hpp"
+#include "online/current_online_user.hpp"
+
 StartGameProtocol::StartGameProtocol(GameSetup* game_setup) :
         Protocol(NULL, PROTOCOL_START_GAME)
 {
@@ -74,6 +80,8 @@ void StartGameProtocol::update()
         SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(m_listener->getProtocol(PROTOCOL_SYNCHRONIZATION));
         if (!protocol)
             m_listener->requestStart(new SynchronizationProtocol());
+        // race startup sequence
+
 
         race_manager->setNumKarts(m_game_setup->getPlayerCount());
         race_manager->setNumPlayers(m_game_setup->getPlayerCount());
@@ -87,8 +95,15 @@ void StartGameProtocol::update()
             rki.setLocalPlayerId(profile->race_id);
             rki.setHostId(profile->race_id);
             race_manager->setPlayerKart(i, rki);
-        }
 
+            PlayerProfile* profileToUse = unlock_manager->getCurrentPlayer();
+            InputDevice* device = NULL;
+            if (players[i]->user_profile == CurrentOnlineUser::get())
+                device =  input_manager->getDeviceList()->getKeyboard(0);
+            int new_player_id = StateManager::get()->createActivePlayer( profileToUse, device );
+            // self config
+        }
+        Log::info("StartGameProtocol", "Players config ready. Starting single race now.");
         race_manager->startSingleRace("jungle", 1, false);
         m_state = LOADING;
     }
