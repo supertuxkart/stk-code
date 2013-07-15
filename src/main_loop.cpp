@@ -29,6 +29,7 @@
 #include "input/wiimote_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "network/protocol_manager.hpp"
 #include "network/network_world.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
@@ -146,6 +147,10 @@ void MainLoop::run()
 
             PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
             irr_driver->update(dt);
+            PROFILER_POP_CPU_MARKER();
+
+            PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
+            ProtocolManager::getInstance()->update();
             PROFILER_POP_CPU_MARKER();
 
             PROFILER_SYNC_FRAME();

@@ -12,6 +12,7 @@
 #include "input/input_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/kart_selection.hpp"
 #include "online/current_online_user.hpp"
 
 StartGameProtocol::StartGameProtocol(GameSetup* game_setup) :
@@ -106,6 +107,11 @@ void StartGameProtocol::update()
         Log::info("StartGameProtocol", "Players config ready. Starting single race now.");
         race_manager->startSingleRace("jungle", 1, false);
         m_state = LOADING;
+/*
+        KartSelectionScreen* s = KartSelectionScreen::getInstance();
+        s->setMultiplayer(false);
+        s->setFromOverworld(false);
+        StateManager::get()->pushScreen( s );*/
     }
     else if (m_state == LOADING)
     {
@@ -124,6 +130,7 @@ void StartGameProtocol::ready() // on clients, means the loading is finished
         assert(NetworkManager::getInstance()->getPeerCount() == 1);
         NetworkString ns;
         ns.ai32(NetworkManager::getInstance()->getPeers()[0]->getClientServerToken()).ai8(1);
+        m_listener->sendMessage(this, ns, true);
     }
     else // on the server
     {
