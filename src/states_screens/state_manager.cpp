@@ -30,6 +30,7 @@
 #include "main_loop.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "online/online_user.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
@@ -100,11 +101,12 @@ void StateManager::updateActivePlayerIDs()
 
 // ----------------------------------------------------------------------------
 
-int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device)
+int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device,
+                                            OnlineUser* user)
 {
     ActivePlayer *p;
     int i;
-    p = new ActivePlayer(profile, device);
+    p = new ActivePlayer(profile, device, user);
     i = m_active_players.size();
     m_active_players.push_back(p);
 
@@ -250,7 +252,8 @@ void StateManager::onStackEmptied()
 #endif
 
 StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player,
-                                         InputDevice *device)
+                                         InputDevice *device,
+                                         OnlineUser* user)
 {
 #ifdef DEBUG
     m_magic_number = 0xAC1EF1AE;
@@ -259,6 +262,7 @@ StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player,
     m_player = player;
     m_device = NULL;
     m_kart = NULL;
+    m_online_user = user;
     setDevice(device);
 }  // ActivePlayer
 

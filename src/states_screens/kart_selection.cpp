@@ -1240,7 +1240,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     }
 
     const int new_player_id =
-        StateManager::get()->createActivePlayer( profileToUse, device );
+        StateManager::get()->createActivePlayer( profileToUse, device, NULL );
     StateManager::ActivePlayer* aplayer =
         StateManager::get()->getActivePlayer(new_player_id);
 

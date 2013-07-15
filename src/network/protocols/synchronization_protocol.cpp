@@ -53,7 +53,14 @@ void SynchronizationProtocol::notifyEvent(Event* event)
         }
     }
 
-    uint8_t peer_id = (m_listener->isServer() ? talk_id : 0); // on clients, peer index is 0
+    uint8_t peer_id;
+    for (unsigned int i = 0; i < peers.size(); i++)
+    {
+        if (peers[i]->isSamePeer(*event->peer))
+        {
+            peer_id = i;
+        }
+    }
     if (peers[peer_id]->getClientServerToken() != token)
     {
         Log::warn("SynchronizationProtocol", "Bad token from peer %d", talk_id);
@@ -64,12 +71,12 @@ void SynchronizationProtocol::notifyEvent(Event* event)
     {
         NetworkString response;
         response.ai8(event->data.gui8(talk_id)).ai32(token).ai8(0).ai32(sequence);
-        m_listener->sendMessage(this, peers[talk_id], response, false);
+        m_listener->sendMessage(this, peers[peer_id], response, false);
         Log::verbose("SynchronizationProtocol", "Answering sequence %u", sequence);
         if (event->data.size() == 14 && !m_listener->isServer()) // countdown time in the message
         {
             uint32_t time_to_start = event->data.gui32(10);
-            Log::info("SynchronizationProtocol", "Request to start game in %d.", time_to_start);
+            Log::debug("SynchronizationProtocol", "Request to start game in %d.", time_to_start);
             if (!m_countdown_activated)
                 startCountdown(time_to_start);
             else
@@ -120,6 +127,16 @@ void SynchronizationProtocol::asynchronousUpdate()
             Log::info("SynchronizationProtocol", "Countdown finished. Starting now.");
             m_listener->requestTerminate(this);
             return;
+        }
+        static int seconds = -1;
+        if (seconds == -1)
+        {
+            seconds = (int)(ceil(m_countdown));
+        }
+        else if (seconds != (int)(ceil(m_countdown)))
+        {
+            seconds = (int)(ceil(m_countdown));
+            Log::info("SynchronizationProtocol", "Starting in %d seconds.", seconds);
         }
     }
     if (current_time > timer+0.1)

@@ -1466,7 +1466,7 @@ int main(int argc, char *argv[] )
 
             // Create player and associate player with keyboard
             StateManager::get()->createActivePlayer(
-                    UserConfigParams::m_all_players.get(0), device );
+                    UserConfigParams::m_all_players.get(0), device, NULL);
 
             if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
             {

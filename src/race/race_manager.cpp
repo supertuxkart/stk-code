@@ -146,7 +146,7 @@ void RaceManager::setLocalKartInfo(unsigned int player_id,
 
     m_local_player_karts[player_id] = RemoteKartInfo(player_id, kart,
                                                   StateManager::get()->getActivePlayerProfile(player_id)->getName(),
-                                                    0);
+                                                    0, false);
 }   // setLocalKartInfo
 
 //-----------------------------------------------------------------------------
@@ -322,7 +322,7 @@ void RaceManager::startNew(bool from_overworld)
     // -------------------------------------------------
     for(int i=m_player_karts.size()-1; i>=0; i--)
     {
-        KartType kt= KT_PLAYER;
+        KartType kt= m_player_karts[i].isNetworkPlayer() ? KT_NETWORK_PLAYER : KT_PLAYER;
         m_kart_status.push_back(KartStatus(m_player_karts[i].getKartName(), i,
                                            m_player_karts[i].getLocalPlayerId(),
                                            m_player_karts[i].getGlobalPlayerId(),

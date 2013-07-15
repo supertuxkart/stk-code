@@ -38,6 +38,7 @@
 #include "karts/controller/player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
+#include "karts/controller/network_player_controller.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
@@ -280,11 +281,10 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
-		break;  // Avoid compiler warning about enum not handled.
-        //controller = new NetworkController(kart_ident, position, init_pos,
-        //                          global_player_id);
-        //m_num_players++;
-        //break;
+        controller = new NetworkPlayerController(new_kart,
+                        StateManager::get()->getActivePlayer(local_player_id));
+        m_num_players++;
+        break;
     case RaceManager::KT_AI:
         controller = loadAIController(new_kart);
         break;
@@ -725,7 +725,7 @@ void World::updateWorld(float dt)
 
                 // Create player and associate player with keyboard
                 StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
-                                                        device);
+                                                        device, NULL);
 
                 if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
                 {

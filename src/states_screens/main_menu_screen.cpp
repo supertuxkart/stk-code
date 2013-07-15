@@ -314,7 +314,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 
         // Create player and associate player with keyboard
         StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
-                                                device);
+                                                device, NULL);
 
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
         {

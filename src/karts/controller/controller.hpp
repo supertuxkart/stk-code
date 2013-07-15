@@ -37,7 +37,7 @@ class Item;
 class KartControl;
 class Material;
 
-/** This is the base class for kart controller - that can be a player 
+/** This is the base class for kart controller - that can be a player
  *  or a a robot.
  * \ingroup controller
  */
@@ -58,7 +58,7 @@ protected:
     /** The name of the controller, mainly used for debugging purposes. */
     std::string  m_controller_name;
 public:
-                  Controller         (AbstractKart *kart, 
+                  Controller         (AbstractKart *kart,
                                       StateManager::ActivePlayer *player=NULL);
     virtual      ~Controller         () {};
     virtual void  reset              () = 0;
@@ -74,20 +74,20 @@ public:
     virtual bool  disableSlipstreamBonus() const = 0;
 	// ---------------------------------------------------------------------------
     /** Sets the controller name for this controller. */
-    virtual void setControllerName(const std::string &name) 
+    virtual void setControllerName(const std::string &name)
                                                  { m_controller_name = name; }
 	// ---------------------------------------------------------------------------
     /** Returns the name of this controller. */
     const std::string &getControllerName() const { return m_controller_name; }
 	// ---------------------------------------------------------------------------
-    /** Returns the active player for this controller (NULL 
+    /** Returns the active player for this controller (NULL
      *  if this controller does not belong to a player.    */
     StateManager::ActivePlayer *getPlayer () {return m_player;}
-    
+
 	// ---------------------------------------------------------------------------
 	/** Returns the player object (or NULL if it's a computer controller). */
     const StateManager::ActivePlayer *getPlayer () const { return m_player; }
-    
+
     // ------------------------------------------------------------------------
     /** Default: ignore actions. Only PlayerController get them. */
     virtual void action(PlayerAction action, int value) = 0;

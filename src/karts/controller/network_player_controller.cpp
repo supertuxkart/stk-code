@@ -28,6 +28,8 @@ NetworkPlayerController::NetworkPlayerController(AbstractKart *kart,
     m_penalty_time = 0.0f;
 
     reset();
+
+    Log::info("NetworkPlayerController", "New network player controller.");
 }   // NetworkPlayerController
 
 //-----------------------------------------------------------------------------
