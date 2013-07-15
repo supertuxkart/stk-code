@@ -4,7 +4,7 @@
 #include "network/protocol.hpp"
 
 /*!
- *  This protocol tells to the database that the server is up and running, 
+ *  This protocol tells to the database that the server is up and running,
  *  and shows online the public IP:port that stores the NetworkManager.
  */
 class StartServer : public Protocol
@@ -12,11 +12,12 @@ class StartServer : public Protocol
     public:
         StartServer();
         virtual ~StartServer();
-        
+
         virtual void notifyEvent(Event* event);
         virtual void setup();
-        virtual void update();
-        
+        virtual void update() {}
+        virtual void asynchronousUpdate();
+
     protected:
         enum STATE
         {

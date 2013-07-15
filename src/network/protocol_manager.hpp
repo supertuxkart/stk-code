@@ -158,10 +158,21 @@ class ProtocolManager : public Singleton<ProtocolManager>
          * protocols that they have events to process. Then ask all protocols
          * to update themselves. Finally processes stored requests about
          * starting, stoping, pausing etc... protocols.
-         * This function is called by a thread as often as possible.
-         * This function is not FPS-dependant.
+         * This function is called by the main loop.
+         * This function IS FPS-dependant.
          */
         virtual void            update();
+        /*!
+         * \brief Updates the manager.
+         *
+         * This function processes the events queue, notifies the concerned
+         * protocols that they have events to process. Then ask all protocols
+         * to update themselves. Finally processes stored requests about
+         * starting, stoping, pausing etc... protocols.
+         * This function is called in a thread.
+         * This function IS NOT FPS-dependant.
+         */
+        virtual void            asynchronousUpdate();
 
         /*!
          * \brief Get the number of protocols running.
@@ -296,6 +307,8 @@ class ProtocolManager : public Singleton<ProtocolManager>
 
         /*! Update thread.*/
         pthread_t* m_update_thread;
+        /*! Asynchronous update thread.*/
+        pthread_t* m_asynchronous_update_thread;
 
 };
 

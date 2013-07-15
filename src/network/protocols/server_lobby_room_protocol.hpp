@@ -12,6 +12,7 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
         virtual void notifyEvent(Event* event);
         virtual void setup();
         virtual void update();
+        virtual void asynchronousUpdate() {};
 
         void startGame();
 

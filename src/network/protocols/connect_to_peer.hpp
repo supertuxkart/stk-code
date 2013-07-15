@@ -28,17 +28,18 @@ class ConnectToPeer : public Protocol, public CallbackObject
     public:
         ConnectToPeer(uint32_t peer_id);
         virtual ~ConnectToPeer();
-        
+
         virtual void notifyEvent(Event* event);
         virtual void setup();
-        virtual void update();
-        
+        virtual void update() {}
+        virtual void asynchronousUpdate();
+
     protected:
         TransportAddress m_peer_address;
         TransportAddress m_public_address;
         uint32_t m_peer_id;
         uint32_t m_current_protocol_id;
-        
+
         enum STATE
         {
             NONE,

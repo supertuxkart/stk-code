@@ -40,7 +40,7 @@ void StopServer::setup()
     m_state = NONE;
 }
 
-void StopServer::update()
+void StopServer::asynchronousUpdate()
 {
     if (m_state == NONE)
     {

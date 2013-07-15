@@ -12,11 +12,12 @@ class StopServer : public Protocol
     public:
         StopServer();
         virtual ~StopServer();
-        
+
         virtual void notifyEvent(Event* event);
         virtual void setup();
-        virtual void update();
-        
+        virtual void update() {}
+        virtual void asynchronousUpdate();
+
     protected:
         enum STATE
         {

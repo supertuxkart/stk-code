@@ -40,7 +40,7 @@ void StartServer::setup()
     m_state = NONE;
 }
 
-void StartServer::update()
+void StartServer::asynchronousUpdate()
 {
     if (m_state == NONE)
     {

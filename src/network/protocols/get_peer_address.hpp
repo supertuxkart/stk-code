@@ -26,22 +26,23 @@ class GetPeerAddress : public Protocol
     public:
         GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object);
         virtual ~GetPeerAddress();
-        
+
         virtual void notifyEvent(Event* event);
         virtual void setup();
-        virtual void update();
-        
+        virtual void update() {}
+        virtual void asynchronousUpdate();
+
         void setPeerID(uint32_t m_peer_id);
     protected:
         uint32_t m_peer_id;
-        
-        enum STATE 
+
+        enum STATE
         {
             NONE,
             DONE
         };
         STATE m_state;
-        
+
 };
 
 #endif // GET_PEER_ADDRESS_HPP

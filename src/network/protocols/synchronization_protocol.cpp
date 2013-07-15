@@ -103,7 +103,7 @@ void SynchronizationProtocol::setup()
 
 //-----------------------------------------------------------------------------
 
-void SynchronizationProtocol::update()
+void SynchronizationProtocol::asynchronousUpdate()
 {
     static double timer = Time::getRealTime();
     double current_time = Time::getRealTime();
@@ -123,7 +123,7 @@ void SynchronizationProtocol::update()
             if (m_countdown_activated)
             {
                 ns.ai16(m_countdown);
-                Log::info("SynchronizationProtocol", "Countdown value : %u", m_countdown);
+                Log::info("SynchronizationProtocol", "Countdown value : %d", m_countdown);
             }
             Log::verbose("SynchronizationProtocol", "Added sequence number %u for peer %d", m_pings[i].size(), i);
             timer = current_time;
@@ -131,7 +131,7 @@ void SynchronizationProtocol::update()
             m_listener->sendMessage(this, peers[i], ns, false);
             m_pings_count[i]++;
         }
-        Log::info("SynchronizationProtocol", "Countdown remaining : %u", m_countdown);
+        Log::info("SynchronizationProtocol", "Countdown remaining : %d", m_countdown);
     }
 }
 

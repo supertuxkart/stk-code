@@ -90,9 +90,13 @@ class Protocol
          */
         virtual void unpause();
         /*!
-         * \brief Called by the protocol listener as often as possible. Must be re-defined.
+         * \brief Called by the protocol listener, synchronously with the main loop. Must be re-defined.
          */
         virtual void update() = 0;
+        /*!
+         * \brief Called by the protocol listener as often as possible. Must be re-defined.
+         */
+        virtual void asynchronousUpdate() = 0;
         /*!
          * \brief Called when the protocol is to be killed.
          */

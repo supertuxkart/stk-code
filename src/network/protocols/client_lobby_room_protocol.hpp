@@ -15,6 +15,7 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
         virtual void notifyEvent(Event* event);
         virtual void setup();
         virtual void update();
+        virtual void asynchronousUpdate() {}
 
 
     protected:

@@ -42,7 +42,7 @@ void QuickJoinProtocol::setup()
     m_state = NONE;
 }
 
-void QuickJoinProtocol::update()
+void QuickJoinProtocol::asynchronousUpdate()
 {
     if (m_state == NONE)
     {

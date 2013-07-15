@@ -26,12 +26,13 @@ class GetPublicAddress : public Protocol
     public:
         GetPublicAddress(CallbackObject* callback_object);
         virtual ~GetPublicAddress();
-        
+
         virtual void notifyEvent(Event* event);
-         
+
         virtual void setup();
-        virtual void update();
-        
+        virtual void update() {}
+        virtual void asynchronousUpdate();
+
     protected:
         enum STATE
         {

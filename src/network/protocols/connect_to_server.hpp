@@ -29,18 +29,19 @@ class ConnectToServer : public Protocol, public CallbackObject
         ConnectToServer(); //!< Quick join
         ConnectToServer(uint32_t server_id); //!< Specify server id
         virtual ~ConnectToServer();
-        
+
         virtual void notifyEvent(Event* event);
         virtual void setup();
-        virtual void update();
-        
+        virtual void update() {}
+        virtual void asynchronousUpdate();
+
     protected:
         TransportAddress m_server_address;
         TransportAddress m_public_address;
         uint32_t m_server_id;
         uint32_t m_current_protocol_id;
         bool m_quick_join;
-        
+
         enum STATE
         {
             NONE,

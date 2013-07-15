@@ -19,6 +19,7 @@ void NetworkWorld::update(float dt)
             ProtocolManager::getInstance()->getProtocol(PROTOCOL_SYNCHRONIZATION));
     if (protocol) // if this protocol exists, that's that we play online
     {
+        Log::info("NetworkWorld", "Coutdown value is %d", protocol->getCountdown());
         if (protocol->getCountdown() > 0)
         {
             return;

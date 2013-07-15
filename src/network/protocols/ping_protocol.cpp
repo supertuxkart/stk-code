@@ -40,7 +40,7 @@ void PingProtocol::setup()
     m_last_ping_time = 0;
 }
 
-void PingProtocol::update()
+void PingProtocol::asynchronousUpdate()
 {
     if (Time::getRealTime() > m_last_ping_time+m_delay_between_pings)
     {

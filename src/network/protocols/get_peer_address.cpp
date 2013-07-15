@@ -44,7 +44,7 @@ void GetPeerAddress::setup()
     m_state = NONE;
 }
 
-void GetPeerAddress::update()
+void GetPeerAddress::asynchronousUpdate()
 {
     if (m_state == NONE)
     {

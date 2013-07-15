@@ -41,7 +41,7 @@ void HidePublicAddress::setup()
     m_state = NONE;
 }
 
-void HidePublicAddress::update()
+void HidePublicAddress::asynchronousUpdate()
 {
     if (m_state == NONE)
     {

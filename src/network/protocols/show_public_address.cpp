@@ -41,7 +41,7 @@ void ShowPublicAddress::setup()
     m_state = NONE;
 }
 
-void ShowPublicAddress::update()
+void ShowPublicAddress::asynchronousUpdate()
 {
     if (m_state == NONE)
     {

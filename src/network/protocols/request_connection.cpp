@@ -41,7 +41,7 @@ void RequestConnection::setup()
     m_state = NONE;
 }
 
-void RequestConnection::update()
+void RequestConnection::asynchronousUpdate()
 {
     switch (m_state)
     {

@@ -33,7 +33,7 @@
 
 // ----------------------------------------------------------------------------
 
-ConnectToServer::ConnectToServer() : 
+ConnectToServer::ConnectToServer() :
     Protocol(NULL, PROTOCOL_CONNECTION)
 {
     m_server_id = 0;
@@ -43,7 +43,7 @@ ConnectToServer::ConnectToServer() :
 
 // ----------------------------------------------------------------------------
 
-ConnectToServer::ConnectToServer(uint32_t server_id) : 
+ConnectToServer::ConnectToServer(uint32_t server_id) :
     Protocol(NULL, PROTOCOL_CONNECTION)
 {
     m_server_id = server_id;
@@ -83,7 +83,7 @@ void ConnectToServer::setup()
 
 // ----------------------------------------------------------------------------
 
-void ConnectToServer::update()
+void ConnectToServer::asynchronousUpdate()
 {
     switch(m_state)
     {
@@ -94,7 +94,7 @@ void ConnectToServer::update()
             break;
         }
         case GETTING_SELF_ADDRESS:
-            if (m_listener->getProtocolState(m_current_protocol_id) 
+            if (m_listener->getProtocolState(m_current_protocol_id)
             == PROTOCOL_STATE_TERMINATED) // now we know the public addr
             {
                 m_state = SHOWING_SELF_ADDRESS;
@@ -108,7 +108,7 @@ void ConnectToServer::update()
             }
             break;
         case SHOWING_SELF_ADDRESS:
-            if (m_listener->getProtocolState(m_current_protocol_id) 
+            if (m_listener->getProtocolState(m_current_protocol_id)
             == PROTOCOL_STATE_TERMINATED) // now our public address is in the database
             {
                 if (m_quick_join)
@@ -124,7 +124,7 @@ void ConnectToServer::update()
             }
             break;
         case GETTING_SERVER_ADDRESS:
-            if (m_listener->getProtocolState(m_current_protocol_id) 
+            if (m_listener->getProtocolState(m_current_protocol_id)
             == PROTOCOL_STATE_TERMINATED) // we know the server address
             {
                 m_state = REQUESTING_CONNECTION;
@@ -132,10 +132,10 @@ void ConnectToServer::update()
             }
             break;
         case REQUESTING_CONNECTION:
-            if (m_listener->getProtocolState(m_current_protocol_id) 
+            if (m_listener->getProtocolState(m_current_protocol_id)
             == PROTOCOL_STATE_TERMINATED) // server knows we wanna connect
             {
-                if (m_server_address.ip == 0 || m_server_address.port == 0) 
+                if (m_server_address.ip == 0 || m_server_address.port == 0)
                 { // server data not correct, hide address and stop
                     m_state = HIDING_ADDRESS;
                     m_current_protocol_id = m_listener->requestStart(new HidePublicAddress());
@@ -164,7 +164,7 @@ void ConnectToServer::update()
             break;
         }
         case HIDING_ADDRESS:
-            if (m_listener->getProtocolState(m_current_protocol_id) 
+            if (m_listener->getProtocolState(m_current_protocol_id)
             == PROTOCOL_STATE_TERMINATED) // we have hidden our address
             {
                 m_state = DONE;

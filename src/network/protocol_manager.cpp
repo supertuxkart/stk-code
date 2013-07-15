@@ -38,6 +38,16 @@ void* protocolManagerUpdate(void* data)
     }
     return NULL;
 }
+void* protocolManagerAsynchronousUpdate(void* data)
+{
+    ProtocolManager* manager = static_cast<ProtocolManager*>(data);
+    while(!manager->exit())
+    {
+        manager->asynchronousUpdate();
+        irr_driver->getDevice()->sleep(20);
+    }
+    return NULL;
+}
 
 ProtocolManager::ProtocolManager()
 {
@@ -50,12 +60,15 @@ ProtocolManager::ProtocolManager()
 
 
     pthread_mutex_lock(&m_exit_mutex); // will let the update function run
-    /// NOT USED on client but updated in main loop (because of GUI crash)
+    /// FIXME used on server because mainloop never running
     if (NetworkManager::getInstance()->isServer())
     {
         m_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
         pthread_create(m_update_thread, NULL, protocolManagerUpdate, this);
     }
+    // always run this one
+    m_asynchronous_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
+    pthread_create(m_asynchronous_update_thread, NULL, protocolManagerAsynchronousUpdate, this);
 }
 
 ProtocolManager::~ProtocolManager()
@@ -275,6 +288,18 @@ void ProtocolManager::propagateEvent(Event* event)
 
 void ProtocolManager::update()
 {
+    // now update all protocols
+    pthread_mutex_lock(&m_protocols_mutex);
+    for (unsigned int i = 0; i < m_protocols.size(); i++)
+    {
+        if (m_protocols[i].state == PROTOCOL_STATE_RUNNING)
+            m_protocols[i].protocol->update();
+    }
+    pthread_mutex_unlock(&m_protocols_mutex);
+}
+
+void ProtocolManager::asynchronousUpdate()
+{
     // before updating, notice protocols that they have received information
     int size = m_events_to_process.size();
     for (int i = 0; i < size; i++)
@@ -287,16 +312,17 @@ void ProtocolManager::update()
         propagateEvent(event);
     }
 
-    // now update all protocols
+    // now update all protocols that need to be updated in asynchronous mode
     pthread_mutex_lock(&m_protocols_mutex);
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
         if (m_protocols[i].state == PROTOCOL_STATE_RUNNING)
-            m_protocols[i].protocol->update();
+            m_protocols[i].protocol->asynchronousUpdate();
     }
     pthread_mutex_unlock(&m_protocols_mutex);
 
     // process queued events for protocols
+    // these requests are asynchronous
     pthread_mutex_lock(&m_requests_mutex);
     for (unsigned int i = 0; i < m_requests.size(); i++)
     {

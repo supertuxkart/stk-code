@@ -27,13 +27,14 @@ class HidePublicAddress : public Protocol
     public:
         HidePublicAddress();
         virtual ~HidePublicAddress();
-        
+
         virtual void notifyEvent(Event* event);
         virtual void setup();
-        virtual void update();
-        
+        virtual void update() {}
+        virtual void asynchronousUpdate();
+
     protected:
-        
+
         enum STATE
         {
             NONE,

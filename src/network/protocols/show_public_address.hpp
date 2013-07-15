@@ -27,13 +27,14 @@ class ShowPublicAddress : public Protocol
     public:
         ShowPublicAddress();
         virtual ~ShowPublicAddress();
-        
+
         virtual void notifyEvent(Event* event);
         virtual void setup();
-        virtual void update();
-        
+        virtual void update() {}
+        virtual void asynchronousUpdate();
+
     protected:
-        
+
         enum STATE
         {
             NONE,

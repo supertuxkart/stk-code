@@ -31,7 +31,7 @@
 
 // ----------------------------------------------------------------------------
 
-ConnectToPeer::ConnectToPeer(uint32_t peer_id) : 
+ConnectToPeer::ConnectToPeer(uint32_t peer_id) :
     Protocol(NULL, PROTOCOL_CONNECTION)
 {
     m_peer_id = peer_id;
@@ -69,7 +69,7 @@ void ConnectToPeer::setup()
 
 // ----------------------------------------------------------------------------
 
-void ConnectToPeer::update()
+void ConnectToPeer::asynchronousUpdate()
 {
     switch(m_state)
     {
@@ -80,11 +80,11 @@ void ConnectToPeer::update()
             break;
         }
         case WAITING_PEER_ADDRESS:
-            if (m_listener->getProtocolState(m_current_protocol_id) 
+            if (m_listener->getProtocolState(m_current_protocol_id)
             == PROTOCOL_STATE_TERMINATED) // we know the peer address
             {
                 if (m_peer_address.ip != 0 && m_peer_address.port != 0)
-                { 
+                {
                     m_state = CONNECTING;
                     m_current_protocol_id = m_listener->requestStart(new PingProtocol(m_peer_address, 2.0));
                 }
