@@ -298,6 +298,8 @@ class ProtocolManager : public Singleton<ProtocolManager>
         pthread_mutex_t                 m_events_mutex;
         /*! Used to ensure that the protocol vector is used thread-safely.   */
         pthread_mutex_t                 m_protocols_mutex;
+        /*! Used to ensure that the protocol vector is used thread-safely.   */
+        pthread_mutex_t                 m_asynchronous_protocols_mutex;
         /*! Used to ensure that the request vector is used thread-safely.    */
         pthread_mutex_t                 m_requests_mutex;
         /*! Used to ensure that the protocol id is used in a thread-safe way.*/

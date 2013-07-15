@@ -125,8 +125,8 @@ void StartGameProtocol::update()
         if (protocol)
         {
             // now the synchronization protocol exists.
-            race_manager->startSingleRace("jungle", 1, false);
             Log::info("StartGameProtocol", "Starting the race loading.");
+            race_manager->startSingleRace("jungle", 1, false);
             m_state = LOADING;
         }
     }

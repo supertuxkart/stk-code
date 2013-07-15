@@ -27,8 +27,8 @@ void NetworkWorld::update(float dt)
         else
         {
             // kill those two protocols
-            ProtocolManager::getInstance()->requestStop(protocol);
-            ProtocolManager::getInstance()->requestStop(ProtocolManager::getInstance()->getProtocol(PROTOCOL_START_GAME));
+            ProtocolManager::getInstance()->requestTerminate(protocol);
+            ProtocolManager::getInstance()->requestTerminate(ProtocolManager::getInstance()->getProtocol(PROTOCOL_START_GAME));
         }
     }
     World::getWorld()->updateWorld(dt);

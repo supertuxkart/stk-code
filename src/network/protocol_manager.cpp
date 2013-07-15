@@ -53,6 +53,7 @@ ProtocolManager::ProtocolManager()
 {
     pthread_mutex_init(&m_events_mutex, NULL);
     pthread_mutex_init(&m_protocols_mutex, NULL);
+    pthread_mutex_init(&m_asynchronous_protocols_mutex, NULL);
     pthread_mutex_init(&m_requests_mutex, NULL);
     pthread_mutex_init(&m_id_mutex, NULL);
     pthread_mutex_init(&m_exit_mutex, NULL);
@@ -76,6 +77,7 @@ ProtocolManager::~ProtocolManager()
     pthread_mutex_unlock(&m_exit_mutex); // will stop the update function
     pthread_mutex_lock(&m_events_mutex);
     pthread_mutex_lock(&m_protocols_mutex);
+    pthread_mutex_lock(&m_asynchronous_protocols_mutex);
     pthread_mutex_lock(&m_requests_mutex);
     pthread_mutex_lock(&m_id_mutex);
     for (unsigned int i = 0; i < m_protocols.size() ; i++)
@@ -87,11 +89,13 @@ ProtocolManager::~ProtocolManager()
     m_events_to_process.clear();
     pthread_mutex_unlock(&m_events_mutex);
     pthread_mutex_unlock(&m_protocols_mutex);
+    pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
     pthread_mutex_unlock(&m_requests_mutex);
     pthread_mutex_unlock(&m_id_mutex);
 
     pthread_mutex_destroy(&m_events_mutex);
     pthread_mutex_destroy(&m_protocols_mutex);
+    pthread_mutex_destroy(&m_asynchronous_protocols_mutex);
     pthread_mutex_destroy(&m_requests_mutex);
     pthread_mutex_destroy(&m_id_mutex);
     pthread_mutex_destroy(&m_exit_mutex);
@@ -130,6 +134,8 @@ void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer, const N
 
 uint32_t ProtocolManager::requestStart(Protocol* protocol)
 {
+    if (!protocol)
+        return;
     // create the request
     ProtocolRequest req;
     ProtocolInfo info;
@@ -148,6 +154,8 @@ uint32_t ProtocolManager::requestStart(Protocol* protocol)
 
 void ProtocolManager::requestStop(Protocol* protocol)
 {
+    if (!protocol)
+        return;
     // create the request
     ProtocolRequest req;
     req.protocol_info.protocol = protocol;
@@ -160,6 +168,8 @@ void ProtocolManager::requestStop(Protocol* protocol)
 
 void ProtocolManager::requestPause(Protocol* protocol)
 {
+    if (!protocol)
+        return;
     // create the request
     ProtocolRequest req;
     req.protocol_info.protocol = protocol;
@@ -172,6 +182,8 @@ void ProtocolManager::requestPause(Protocol* protocol)
 
 void ProtocolManager::requestUnpause(Protocol* protocol)
 {
+    if (!protocol)
+        return;
     // create the request
     ProtocolRequest req;
     req.protocol_info.protocol = protocol;
@@ -184,6 +196,8 @@ void ProtocolManager::requestUnpause(Protocol* protocol)
 
 void ProtocolManager::requestTerminate(Protocol* protocol)
 {
+    if (!protocol)
+        return;
     // create the request
     ProtocolRequest req;
     req.protocol_info.protocol = protocol;
@@ -199,8 +213,10 @@ void ProtocolManager::startProtocol(ProtocolInfo protocol)
     Log::info("ProtocolManager", "A %s protocol with id=%u has been started. There are %ld protocols running.", typeid(*protocol.protocol).name(), protocol.id, m_protocols.size()+1);
     // add the protocol to the protocol vector so that it's updated
     pthread_mutex_lock(&m_protocols_mutex);
+    pthread_mutex_lock(&m_asynchronous_protocols_mutex);
     m_protocols.push_back(protocol);
     pthread_mutex_unlock(&m_protocols_mutex);
+    pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
     // setup the protocol and notify it that it's started
     protocol.protocol->setListener(this);
     protocol.protocol->setup();
@@ -234,6 +250,7 @@ void ProtocolManager::unpauseProtocol(ProtocolInfo protocol)
 void ProtocolManager::protocolTerminated(ProtocolInfo protocol)
 {
     pthread_mutex_lock(&m_protocols_mutex); // be sure that noone accesses the protocols vector while we erase a protocol
+    pthread_mutex_lock(&m_asynchronous_protocols_mutex);
     int offset = 0;
     std::string protocol_type = typeid(*protocol.protocol).name();
     for (unsigned int i = 0; i < m_protocols.size(); i++)
@@ -246,6 +263,7 @@ void ProtocolManager::protocolTerminated(ProtocolInfo protocol)
         }
     }
     Log::info("ProtocolManager", "A %s protocol has been terminated. There are %ld protocols running.", protocol_type.c_str(), m_protocols.size());
+    pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
     pthread_mutex_unlock(&m_protocols_mutex);
 }
 
@@ -304,13 +322,13 @@ void ProtocolManager::asynchronousUpdate()
     }
 
     // now update all protocols that need to be updated in asynchronous mode
-    pthread_mutex_lock(&m_protocols_mutex);
+    pthread_mutex_lock(&m_asynchronous_protocols_mutex);
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
         if (m_protocols[i].state == PROTOCOL_STATE_RUNNING)
             m_protocols[i].protocol->asynchronousUpdate();
     }
-    pthread_mutex_unlock(&m_protocols_mutex);
+    pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
 
     // process queued events for protocols
     // these requests are asynchronous
