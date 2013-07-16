@@ -130,7 +130,8 @@ void StartGameProtocol::update()
             RemoteKartInfo rki(profile->race_id, profile->kart_name,
                 profile->user_profile->getUserName(), profile->race_id, !is_me);
             rki.setGlobalPlayerId(profile->race_id);
-            rki.setLocalPlayerId(is_me?0:1);
+            // on the server, the race id must be the local one.
+            rki.setLocalPlayerId(m_listener->isServer()?profile->race_id:(is_me?0:1));
             rki.setHostId(profile->race_id);
             Log::info("StartGameProtocol", "Creating kart %s for Player#%d with race_id %d", profile->kart_name.c_str(), i, profile->race_id);
 

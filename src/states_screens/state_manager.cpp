@@ -32,6 +32,7 @@
 #include "modes/world.hpp"
 #include "online/online_user.hpp"
 #include "utils/translation.hpp"
+#include "utils/log.hpp"
 
 using namespace GUIEngine;
 
@@ -69,7 +70,7 @@ StateManager::ActivePlayer* StateManager::getActivePlayer(const int id)
     }
     else
     {
-        fprintf(stderr, "getActivePlayer(): id out of bounds\n");
+        Log::error("StateManager", "getActivePlayer(): id %d out of bounds", id);
         assert(false);
         return NULL;
     }
