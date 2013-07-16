@@ -1404,6 +1404,20 @@ int main(int argc, char *argv[] )
             }
         }
 
+        // no graphics, and no profile mode
+        if (ProfileWorld::isNoGraphics() && !ProfileWorld::isProfileMode())
+        {
+            // hack to have a running game slot :
+            PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
+            if (UserConfigParams::m_default_player.toString().size() > 0)
+                for (int n=0; n<players.size(); n++)
+                    if (players[n].getName() == UserConfigParams::m_default_player.toString())
+                        unlock_manager->setCurrentSlot(players[n].getUniqueID());
+
+            main_loop->run();
+            throw "salut";
+        }
+
         if(!UserConfigParams::m_no_start_screen)
         {
             StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());

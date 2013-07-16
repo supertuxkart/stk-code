@@ -43,19 +43,13 @@ void KartUpdateProtocol::notifyEvent(Event* event)
     {
         uint32_t kart_id = event->data.getUInt32(0);
 
-        for (unsigned int i = 0; i < m_karts.size(); i++)
-        {
-            if (m_karts[i]->getWorldKartId() == kart_id)
-            {
-                float a,b,c;
-                a = ns.getFloat(4);
-                b = ns.getFloat(8);
-                c = ns.getFloat(12);
-                m_karts[i]->setXYZ(Vec3(a,b,c));
-                Log::info("KartUpdateProtocol", "Updating kart %i pos to %f %f %f", kart_id, a,b,c);
-                break;
-            }
-        }
+        float a,b,c;
+        a = ns.getFloat(4);
+        b = ns.getFloat(8);
+        c = ns.getFloat(12);
+        m_karts[kart_id]->setXYZ(Vec3(a,b,c));
+        Log::info("KartUpdateProtocol", "Updating kart %i pos to %f %f %f", kart_id, a,b,c);
+
         ns.removeFront(16);
     }
 }
@@ -68,7 +62,7 @@ void KartUpdateProtocol::update()
 {
     static double time = 0;
     double current_time = Time::getRealTime();
-    if (current_time > time + 0.1) // 10 updates per second
+    if (current_time > time + 1) // 1 updates per second
     {
         if (m_listener->isServer())
         {
@@ -80,7 +74,7 @@ void KartUpdateProtocol::update()
                 Vec3 v = kart->getXYZ();
                 ns.ai32( kart->getWorldKartId());
                 ns.af(v[0]).af(v[1]).af(v[2]);
-                Log::info("KartUpdateProtocol", "Sending positions %f %f %f", v[0], v[1], v[2]);
+                Log::info("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
             }
             m_listener->sendMessage(this, ns, false);
         }
@@ -92,7 +86,7 @@ void KartUpdateProtocol::update()
             ns.af( World::getWorld()->getTime());
             ns.ai32( kart->getWorldKartId());
             ns.af(v[0]).af(v[1]).af(v[2]);
-            Log::info("KartUpdateProtocol", "Sending positions %f %f %f", v[0], v[1], v[2]);
+            Log::info("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
             m_listener->sendMessage(this, ns, false);
         }
     }
