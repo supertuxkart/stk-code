@@ -4,6 +4,8 @@
 #include "network/protocols/synchronization_protocol.hpp"
 #include "modes/world.hpp"
 
+#include "karts/controller/controller.hpp"
+
 NetworkWorld::NetworkWorld()
 {
     m_running = false;
@@ -24,9 +26,11 @@ void NetworkWorld::update(float dt)
         {
             return;
         }
-        else
-        {
-        }
     }
     World::getWorld()->updateWorld(dt);
+}
+
+void NetworkWorld::controllerAction(Controller* controller, PlayerAction action, int value)
+{
+
 }

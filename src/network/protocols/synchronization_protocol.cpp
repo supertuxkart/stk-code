@@ -1,6 +1,7 @@
 #include "network/protocols/synchronization_protocol.hpp"
 
 #include "network/network_manager.hpp"
+#include "network/protocols/kart_update_protocol.hpp"
 #include "utils/time.hpp"
 
 //-----------------------------------------------------------------------------
@@ -125,6 +126,7 @@ void SynchronizationProtocol::asynchronousUpdate()
         if (m_countdown < 0.0)
         {
             Log::info("SynchronizationProtocol", "Countdown finished. Starting now.");
+            m_listener->requestStart(new KartUpdateProtocol());
             m_listener->requestTerminate(this);
             return;
         }

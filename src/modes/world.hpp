@@ -273,6 +273,9 @@ public:
                         assert(kartId >= 0 && kartId < int(m_karts.size()));
                         return m_karts[kartId];                              }
     // ------------------------------------------------------------------------
+    /** Returns all karts. */
+    KartList        getKarts() const { return m_karts; }
+    // ------------------------------------------------------------------------
     /** Returns the number of currently active (i.e.non-elikminated) karts. */
     unsigned int    getCurrentNumKarts() const { return (int)m_karts.size() -
                                                          m_eliminated_karts; }

@@ -152,6 +152,7 @@ src/network/protocols/connect_to_server.cpp
 src/network/protocols/get_peer_address.cpp
 src/network/protocols/get_public_address.cpp
 src/network/protocols/hide_public_address.cpp
+src/network/protocols/kart_update_protocol.cpp
 src/network/protocols/lobby_room_protocol.cpp
 src/network/protocols/ping_protocol.cpp
 src/network/protocols/quick_join_protocol.cpp
@@ -429,6 +430,7 @@ src/network/protocols/connect_to_server.hpp
 src/network/protocols/get_peer_address.hpp
 src/network/protocols/get_public_address.hpp
 src/network/protocols/hide_public_address.hpp
+src/network/protocols/kart_update_protocol.hpp
 src/network/protocols/lobby_room_protocol.hpp
 src/network/protocols/ping_protocol.hpp
 src/network/protocols/quick_join_protocol.hpp
