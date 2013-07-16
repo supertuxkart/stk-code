@@ -93,7 +93,7 @@ void StartGameProtocol::update()
         // race startup sequence
 
         NetworkWorld::getInstance<NetworkWorld>()->start(); // builds it and starts
-        race_manager->setNumKarts(m_game_setup->getPlayerCount()+4);
+        race_manager->setNumKarts(m_game_setup->getPlayerCount());
         race_manager->setNumPlayers(m_game_setup->getPlayerCount());
         race_manager->setNumLocalPlayers(1);
         std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
@@ -119,6 +119,7 @@ void StartGameProtocol::update()
                 race_manager->setPlayerKart(i, rki);
                 race_manager->setLocalKartInfo(new_player_id, profile->kart_name);
                 Log::info("StartGameProtocol", "Self player device added.");            // self config
+                NetworkWorld::getInstance()->m_self_kart = profile->kart_name;
             }
         }
         for (unsigned int i = 0; i < players.size(); i++)

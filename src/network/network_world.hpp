@@ -25,6 +25,7 @@ class NetworkWorld : public Singleton<NetworkWorld>
 
         void controllerAction(Controller* controller, PlayerAction action, int value);
 
+        std::string m_self_kart;
     protected:
         bool m_running;
         float m_race_time;

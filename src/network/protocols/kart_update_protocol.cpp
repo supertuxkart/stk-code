@@ -3,6 +3,7 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/network_world.hpp"
 
 KartUpdateProtocol::KartUpdateProtocol()
     : Protocol(NULL, PROTOCOL_KART_UPDATE)
@@ -10,9 +11,14 @@ KartUpdateProtocol::KartUpdateProtocol()
     m_karts = World::getWorld()->getKarts();
     for (unsigned int i = 0; i < m_karts.size(); i++)
     {
-        if (m_karts[i]->getWorldKartId())
+        //if (m_karts[i]->getWorldKartId())
         {
             Log::info("KartUpdateProtocol", "Kart %d has id %d and name %s", i, m_karts[i]->getWorldKartId(), m_karts[i]->getIdent().c_str());
+        }
+        if (m_karts[i]->getIdent() == NetworkWorld::getInstance()->m_self_kart)
+        {
+            Log::info("KartUpdateProtocol", "My id is %d", i);
+            m_self_kart_index = i;
         }
     }
 }
