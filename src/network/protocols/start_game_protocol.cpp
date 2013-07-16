@@ -80,6 +80,9 @@ void StartGameProtocol::setup()
     Log::info("SynchronizationProtocol", "Ready !");
 }
 
+bool sort_karts (NetworkPlayerProfile* a, NetworkPlayerProfile* b)
+{ return (a->race_id < b->race_id); }
+
 void StartGameProtocol::update()
 {
     if (m_state == NONE)
@@ -90,11 +93,34 @@ void StartGameProtocol::update()
         // race startup sequence
 
         NetworkWorld::getInstance<NetworkWorld>()->start(); // builds it and starts
-        race_manager->setNumKarts(m_game_setup->getPlayerCount());
+        race_manager->setNumKarts(m_game_setup->getPlayerCount()+4);
         race_manager->setNumPlayers(m_game_setup->getPlayerCount());
         race_manager->setNumLocalPlayers(1);
         std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
+        std::sort(players.begin(), players.end(), sort_karts);
         // have to add self first
+        for (unsigned int i = 0; i < players.size(); i++)
+        {
+            bool is_me = (players[i]->user_profile == CurrentOnlineUser::get());
+            if (is_me)
+            {
+                NetworkPlayerProfile* profile = players[i];
+                RemoteKartInfo rki(profile->race_id, profile->kart_name,
+                    profile->user_profile->getUserName(), profile->race_id, !is_me);
+                rki.setGlobalPlayerId(profile->race_id);
+                rki.setLocalPlayerId(is_me?0:1);
+                rki.setHostId(profile->race_id);
+                PlayerProfile* profileToUse = unlock_manager->getCurrentPlayer();
+                InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+                int new_player_id = StateManager::get()->createActivePlayer( profileToUse, device , players[i]->user_profile);
+                device->setPlayer(StateManager::get()->getActivePlayer(new_player_id));
+                input_manager->getDeviceList()->setSinglePlayer(StateManager::get()->getActivePlayer(new_player_id));
+
+                race_manager->setPlayerKart(i, rki);
+                race_manager->setLocalKartInfo(new_player_id, profile->kart_name);
+                Log::info("StartGameProtocol", "Self player device added.");            // self config
+            }
+        }
         for (unsigned int i = 0; i < players.size(); i++)
         {
             bool is_me = (players[i]->user_profile == CurrentOnlineUser::get());
@@ -102,25 +128,18 @@ void StartGameProtocol::update()
             RemoteKartInfo rki(profile->race_id, profile->kart_name,
                 profile->user_profile->getUserName(), profile->race_id, !is_me);
             rki.setGlobalPlayerId(profile->race_id);
-            rki.setLocalPlayerId(i);
-            rki.setHostId(i);
-            race_manager->setPlayerKart(i, rki);
+            rki.setLocalPlayerId(is_me?0:1);
+            rki.setHostId(profile->race_id);
             Log::info("StartGameProtocol", "Creating kart %s for Player#%d with race_id %d", profile->kart_name.c_str(), i, profile->race_id);
 
-            if (is_me)
-            {
-                PlayerProfile* profileToUse = unlock_manager->getCurrentPlayer();
-                InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
-                int new_player_id = StateManager::get()->createActivePlayer( profileToUse, device , players[i]->user_profile);
-                device->setPlayer(StateManager::get()->getActivePlayer(new_player_id));
-                input_manager->getDeviceList()->setSinglePlayer(StateManager::get()->getActivePlayer(new_player_id));
-                Log::info("StartGameProtocol", "Self player device added.");            // self config
-            }
-            else
+            if (!is_me)
             {
                 StateManager::get()->createActivePlayer( NULL, NULL , players[i]->user_profile);
+
+                race_manager->setPlayerKart(i, rki);
             }
         }
+        race_manager->computeRandomKartList();
         Log::info("StartGameProtocol", "Player configuration ready.");
         m_state = SYNCHRONIZATION_WAIT;
 /*

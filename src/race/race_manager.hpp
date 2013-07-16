@@ -460,6 +460,11 @@ public:
         return m_local_player_karts[n];
     }
     // ------------------------------------------------------------------------
+    const RemoteKartInfo& getKartInfo(unsigned int n) const
+    {
+        return m_player_karts[n];
+    }
+    // ------------------------------------------------------------------------
     unsigned int getNumLocalPlayers() const
     {
         return m_local_player_karts.size();

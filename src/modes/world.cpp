@@ -959,7 +959,8 @@ AbstractKart *World::getPlayerKart(unsigned int n) const
     unsigned int count=-1;
 
     for(unsigned int i=0; i<m_karts.size(); i++)
-        if(m_karts[i]->getController()->isPlayerController())
+        if(m_karts[i]->getController()->isPlayerController() ||
+            m_karts[i]->getController()->isNetworkController())
         {
             count++;
             if(count==n) return m_karts[i];

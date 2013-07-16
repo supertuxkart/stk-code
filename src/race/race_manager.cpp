@@ -781,6 +781,7 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 */
 void RaceManager::setupPlayerKartInfo()
 {
+
     std::vector<RemoteKartInfo> kart_info;
 
     // Get the local kart info
