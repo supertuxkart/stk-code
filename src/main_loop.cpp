@@ -162,10 +162,8 @@ void MainLoop::run()
             PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
             irr_driver->update(dt);
             PROFILER_POP_CPU_MARKER();
-
-            PROFILER_SYNC_FRAME();
         }
-
+        PROFILER_SYNC_FRAME();
         PROFILER_POP_CPU_MARKER();
     }  // while !m_exit
 
