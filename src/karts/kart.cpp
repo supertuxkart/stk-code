@@ -81,7 +81,7 @@
 #  include <math.h>
 #endif
 
-const float MIN_NITRO_TIME_THRESHOLD = 2.0f;
+const float MIN_NITRO_TIME_THRESHOLD = 1.3f;
 
 /** The kart constructor.
  *  \param ident  The identifier for the kart model to use.
