@@ -26,54 +26,57 @@
 #include "config/user_config.hpp"
 #include "utils/translation.hpp"
 
-static ServersManager* user_singleton = NULL;
+namespace online{
 
-ServersManager* ServersManager::get()
-{
-    if (user_singleton == NULL)
-        user_singleton = new ServersManager();
-    return user_singleton;
-}   // get
+    static ServersManager* user_singleton = NULL;
 
-void ServersManager::deallocate()
-{
-    delete user_singleton;
-    user_singleton = NULL;
-}   // deallocate
-
-// ============================================================================
-ServersManager::ServersManager(){
-    m_servers = new PtrVector<Server>;
-    refresh();
-}
-
-// ============================================================================
-void ServersManager::refresh()
-{
-    HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-    connector->setParameter("action",std::string("get_server_list"));
-
-    const XMLNode * result = connector->getXMLFromPage();
-    std::string rec_success = "";
-    if(result->get("success", &rec_success))
+    ServersManager* ServersManager::get()
     {
-        if (rec_success =="yes")
+        if (user_singleton == NULL)
+            user_singleton = new ServersManager();
+        return user_singleton;
+    }   // get
+
+    void ServersManager::deallocate()
+    {
+        delete user_singleton;
+        user_singleton = NULL;
+    }   // deallocate
+
+    // ============================================================================
+    ServersManager::ServersManager(){
+        m_servers = new PtrVector<Server>;
+        refresh();
+    }
+
+    // ============================================================================
+    void ServersManager::refresh()
+    {
+        HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        connector->setParameter("action",std::string("get_server_list"));
+
+        const XMLNode * result = connector->getXMLFromPage();
+        std::string rec_success = "";
+        if(result->get("success", &rec_success))
         {
-            const XMLNode * servers_xml = result->getNode("servers");
-            m_servers->clearAndDeleteAll();
-            for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
+            if (rec_success =="yes")
             {
-                m_servers->push_back(new Server(*servers_xml->getNode(i)));
+                const XMLNode * servers_xml = result->getNode("servers");
+                m_servers->clearAndDeleteAll();
+                for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
+                {
+                    m_servers->push_back(new Server(*servers_xml->getNode(i)));
+                }
             }
         }
+        //FIXME error message
     }
-    //FIXME error message
-}
 
-// ============================================================================
-Server * ServersManager::getQuickPlay()
-{
-    if(m_servers->size() > 0)
-        return m_servers->get(0);
-    return NULL;
-}
+    // ============================================================================
+    Server * ServersManager::getQuickPlay()
+    {
+        if(m_servers->size() > 0)
+            return m_servers->get(0);
+        return NULL;
+    }
+} // namespace online

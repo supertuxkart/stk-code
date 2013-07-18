@@ -31,104 +31,105 @@
 
 class XMLNode;
 
-/**
-  * \ingroup online
-  */
-class Server
-{
-public:
+namespace online{
+    /**
+      * \ingroup online
+      */
+    class Server
+    {
+    public:
 
-    /** Set the sort order used in the comparison function. */
-    enum SortOrder { SO_SCORE   = 1,    // Sorted on satisfaction score
-                     SO_NAME    = 2,    // Sorted alphabetically by name
-                     SO_PLAYERS = 4
-    };
+        /** Set the sort order used in the comparison function. */
+        enum SortOrder { SO_SCORE   = 1,    // Sorted on satisfaction score
+                         SO_NAME    = 2,    // Sorted alphabetically by name
+                         SO_PLAYERS = 4
+        };
 
-protected:
-    /** The name to be displayed. */
-    irr::core::stringw m_name;
-    std::string m_lower_case_name; //Used for comparison
+    protected:
+        /** The name to be displayed. */
+        irr::core::stringw m_name;
+        std::string m_lower_case_name; //Used for comparison
 
-    uint32_t m_server_id;
+        uint32_t m_server_id;
 
-    int m_max_players;
+        int m_max_players;
 
-    int m_current_players;
+        int m_current_players;
 
-    float m_satisfaction_score;
+        float m_satisfaction_score;
 
-    /** The sort order to be used in the comparison. */
-    static SortOrder m_sort_order;
+        /** The sort order to be used in the comparison. */
+        static SortOrder m_sort_order;
 
-    Server() {};
+        Server() {};
 
-public:
-
-     /** Initialises the object from an XML node. */
-     Server(const XMLNode & xml);
-    // ------------------------------------------------------------------------
-    /** Sets the sort order used in the comparison function. It is static, so
-     *  that each instance can access the sort order. */
-    static void setSortOrder(SortOrder so) { m_sort_order = so; }
-    // ------------------------------------------------------------------------
-    /** Returns the name of the server. */
-    const irr::core::stringw& getName() const { return m_name; }
-    const std::string & getLowerCaseName() const { return m_lower_case_name; }
-    // ------------------------------------------------------------------------
-    const float getScore() const { return m_satisfaction_score; }
-    // ------------------------------------------------------------------------
-    /** Returns the ID of this server. */
-    const uint32_t getServerId() const { return m_server_id; }
-    const int getMaxPlayers() const { return m_max_players; }
-    const int getCurrentPlayers() const { return m_current_players; }
-    // ------------------------------------------------------------------------
-    bool filterByWords(const irr::core::stringw words) const;
-    // ------------------------------------------------------------------------
+    public:
     
-    /** Compares two servers according to the sort order currently defined.
-     *  \param a The addon to compare this addon to.
-     */
-    bool operator<(const Server &server) const
-    {
-        switch(m_sort_order)
+         /** Initialises the object from an XML node. */
+         Server(const XMLNode & xml);
+        // ------------------------------------------------------------------------
+        /** Sets the sort order used in the comparison function. It is static, so
+         *  that each instance can access the sort order. */
+        static void setSortOrder(SortOrder so) { m_sort_order = so; }
+        // ------------------------------------------------------------------------
+        /** Returns the name of the server. */
+        const irr::core::stringw& getName() const { return m_name; }
+        const std::string & getLowerCaseName() const { return m_lower_case_name; }
+        // ------------------------------------------------------------------------
+        const float getScore() const { return m_satisfaction_score; }
+        // ------------------------------------------------------------------------
+        /** Returns the ID of this server. */
+        const uint32_t getServerId() const { return m_server_id; }
+        const int getMaxPlayers() const { return m_max_players; }
+        const int getCurrentPlayers() const { return m_current_players; }
+        // ------------------------------------------------------------------------
+        bool filterByWords(const irr::core::stringw words) const;
+        // ------------------------------------------------------------------------
+
+        /** Compares two servers according to the sort order currently defined.
+         *  \param a The addon to compare this addon to.
+         */
+        bool operator<(const Server &server) const
         {
-            case SO_SCORE:
-                return m_satisfaction_score < server.getScore();
-                break;
-            case SO_NAME:
-                // m_id is the lower case name
-                return m_name < server.getName();
-                break;
-            case SO_PLAYERS:
-                return m_current_players < server.getCurrentPlayers();
-                break;
-        }   // switch
-        return true;
-    }   // operator<
+            switch(m_sort_order)
+            {
+                case SO_SCORE:
+                    return m_satisfaction_score < server.getScore();
+                    break;
+                case SO_NAME:
+                    // m_id is the lower case name
+                    return m_name < server.getName();
+                    break;
+                case SO_PLAYERS:
+                    return m_current_players < server.getCurrentPlayers();
+                    break;
+            }   // switch
+            return true;
+        }   // operator<
 
-    // ------------------------------------------------------------------------
-    /** Compares two addons according to the sort order currently defined.
-     *  Comparison is done for sorting in descending order.
-     *  \param a The addon to compare this addon to.
-     */
-    bool operator>(const Server &server) const
-    {
-        switch(m_sort_order)
+        // ------------------------------------------------------------------------
+        /** Compares two addons according to the sort order currently defined.
+         *  Comparison is done for sorting in descending order.
+         *  \param a The addon to compare this addon to.
+         */
+        bool operator>(const Server &server) const
         {
-            case SO_SCORE:
-                return m_satisfaction_score > server.getScore();
-                break;
-            case SO_NAME:
-                return m_lower_case_name > server.getLowerCaseName();
-                break;
-            case SO_PLAYERS:
-                return m_current_players > server.getCurrentPlayers();
-                break;
-        }   // switch
-        return true;
-    }   // operator>
+            switch(m_sort_order)
+            {
+                case SO_SCORE:
+                    return m_satisfaction_score > server.getScore();
+                    break;
+                case SO_NAME:
+                    return m_lower_case_name > server.getLowerCaseName();
+                    break;
+                case SO_PLAYERS:
+                    return m_current_players > server.getCurrentPlayers();
+                    break;
+            }   // switch
+            return true;
+        }   // operator>
 
-};   // Server
-
+    };   // Server
+} // namespace online
 
 #endif

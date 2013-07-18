@@ -34,6 +34,7 @@
 using namespace GUIEngine;
 using namespace irr;
 using namespace irr::gui;
+using namespace online;
 
 // -----------------------------------------------------------------------------
 

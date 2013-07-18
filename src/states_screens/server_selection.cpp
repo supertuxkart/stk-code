@@ -29,6 +29,8 @@
 #include "utils/string_utils.hpp"
 #include "online/servers_manager.hpp"
 
+using namespace online;
+
 DEFINE_SCREEN_SINGLETON( ServerSelection );
 
 // ----------------------------------------------------------------------------

@@ -26,6 +26,8 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "online/server.hpp"
+
+
 /**
  * \brief Dialog that allows a user to sign in
  * \ingroup states_screens
@@ -38,7 +40,7 @@ private:
     bool m_self_destroy;
     bool m_enter_lobby;
 
-    Server * m_server;
+    online::Server * m_server;
 
     GUIEngine::LabelWidget * m_name_widget;
     GUIEngine::LabelWidget * m_info_widget;
@@ -50,7 +52,7 @@ private:
     void requestJoin();
 
 public:
-    ServerInfoDialog(Server * server);
+    ServerInfoDialog(online::Server * server);
     ~ServerInfoDialog();
 
     void onEnterPressedInternal();

@@ -23,35 +23,39 @@
 #include "online/server.hpp"
 
 
-// ============================================================================
+namespace online {
 
-/**
-  * \brief
-  * \ingroup online
-  */
-class ServersManager
-{
-    private:
-        ServersManager();
-        PtrVector<Server> * m_servers;
-        bool m_not_fetched;
-        Server * m_joined_server;
+    /**
+      * \brief
+      * \ingroup online
+      */
+    class ServersManager
+    {
+        private:
+            ServersManager();
+            PtrVector<Server> * m_servers;
+            bool m_not_fetched;
+            Server * m_joined_server;
 
-    public:
-        // singleton
-        static ServersManager* get();
-        static void deallocate();
+        public:
+            // singleton
+            static ServersManager* get();
+            static void deallocate();
 
-        void refresh();
-        PtrVector<Server> * getServers () const { return m_servers; };
-        int getNumServers () const { return m_servers->size(); };
-        Server * getServer (int index) const { return m_servers->get(index);};
-        void sort(bool sort_desc) { m_servers->insertionSort(0, sort_desc); };
-        void setJoinedServer(Server * server){ m_joined_server = server;};
-        Server * getJoinedServer(){ return m_joined_server;};
-        //Returns the best server to join
-        Server * getQuickPlay();
-};   // class ServersManager
+            void refresh();
+            PtrVector<Server> * getServers () const { return m_servers; };
+            int getNumServers () const { return m_servers->size(); };
+            Server * getServer (int index) const { return m_servers->get(index);};
+            void sort(bool sort_desc) { m_servers->insertionSort(0, sort_desc); };
+            void setJoinedServer(Server * server){ m_joined_server = server;};
+            Server * getJoinedServer(){ return m_joined_server;};
+            //Returns the best server to join
+            Server * getQuickPlay();
+    };   // class ServersManager
+
+
+} // namespace online
+
 
 #endif
 

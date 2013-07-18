@@ -44,6 +44,7 @@
 
 
 using namespace GUIEngine;
+using namespace online;
 
 DEFINE_SCREEN_SINGLETON( OnlineScreen );
 
