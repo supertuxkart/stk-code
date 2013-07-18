@@ -21,6 +21,7 @@ KartUpdateProtocol::KartUpdateProtocol()
             m_self_kart_index = i;
         }
     }
+    pthread_mutex_init(&m_positions_updates_mutex, NULL);
 }
 
 KartUpdateProtocol::~KartUpdateProtocol()
@@ -47,7 +48,10 @@ void KartUpdateProtocol::notifyEvent(Event* event)
         a = ns.getFloat(4);
         b = ns.getFloat(8);
         c = ns.getFloat(12);
-        m_karts[kart_id]->setXYZ(Vec3(a,b,c));
+        pthread_mutex_trylock(&m_positions_updates_mutex);
+        m_next_positions.push_back(Vec3(a,b,c));
+        m_karts_ids.push_back(kart_id);
+        pthread_mutex_unlock(&m_positions_updates_mutex);
         Log::info("KartUpdateProtocol", "Updating kart %i pos to %f %f %f", kart_id, a,b,c);
 
         ns.removeFront(16);
@@ -89,6 +93,20 @@ void KartUpdateProtocol::update()
             Log::info("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
             m_listener->sendMessage(this, ns, false);
         }
+    }
+    switch(pthread_mutex_trylock(&m_positions_updates_mutex))
+    {
+        case 0: /* if we got the lock, unlock and return 1 (true) */
+            while (!m_next_positions.empty())
+            {
+                m_karts[m_karts_ids.back()]->setXYZ(m_next_positions.back());
+                m_next_positions.pop_back();
+                m_karts_ids.pop_back();
+            }
+            pthread_mutex_unlock(&m_positions_updates_mutex);
+            break;
+        default:
+            break;
     }
 }
 
