@@ -413,6 +413,9 @@ namespace StringUtils
 
     /** Compute a simple hash of a string */
     unsigned int simpleHash(const char* input);
+
+
+    irr::core::stringw loadingDots(float time, bool spaces = true, float interval = 0.5f, int max_dots = 3);
 } // namespace StringUtils
 
 #endif

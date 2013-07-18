@@ -24,11 +24,7 @@
 #include "online/current_user.hpp"
 
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets/text_box_widget.hpp"
-#include "guiengine/widgets/check_box_widget.hpp"
-#include "guiengine/widgets/icon_button_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets.hpp"
 
 /**
  * \brief Dialog that allows a user to sign in
@@ -57,6 +53,8 @@ private:
     GUIEngine::IconButtonWidget * m_cancel_widget;
     
     void login();
+
+    float m_load_timer;
 
 public:
     
