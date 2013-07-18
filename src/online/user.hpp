@@ -16,16 +16,40 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef HEADER_ONLINE_USER_HPP
+#define HEADER_ONLINE_USER_HPP
 
-#include "online/online_user.hpp"
+#include <irrString.h>
+#include "utils/types.hpp"
 
-#include <sstream>
-#include <stdlib.h>
+namespace online{
+
+    /**
+      * \brief Class that represents an online registered user
+      * \ingroup online
+      */
+    class User
+    {
+        private:
+
+        protected:
+
+            bool                    m_is_server_host;
+            irr::core::stringw      m_name;
+            uint32_t                m_id;
+            User(){}
+
+        public:
+
+            User(const irr::core::stringw &username);
 
 
-// ============================================================================
-OnlineUser::OnlineUser(const irr::core::stringw &username)
-{
-    m_name = username;
-}   // OnlineUser
+            irr::core::stringw getUserName() const { return m_name; }
+            uint32_t getUserID() const { return m_id; }
 
+
+    };   // class User
+} // namespace online
+#endif
+
+/*EOF*/

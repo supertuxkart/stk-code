@@ -25,7 +25,6 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "online/current_online_user.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 
 
@@ -40,6 +39,7 @@ LoginDialog::LoginDialog(const Message message_type) :
 {
     m_self_destroy = false;
     m_open_registration_dialog = false;
+    m_signin_request = NULL;
     loadFromFile("online/login_dialog.stkgui");
 
     m_info_widget = getWidget<LabelWidget>("info");
@@ -103,17 +103,7 @@ void LoginDialog::login()
 {
     const stringw username = m_username_widget->getText().trim();
     const stringw password = m_password_widget->getText().trim();
-    stringw info = "";
-    if(CurrentOnlineUser::get()->signIn(username,password, m_remember_widget->getState(),info))
-    {
-        m_self_destroy = true;
-    }
-    else
-    {
-        sfx_manager->quickSound( "anvil" );
-        m_message_widget->setColor(irr::video::SColor(255, 255, 0, 0));
-        m_message_widget->setText(info, false);
-    }
+    m_signin_request = online::CurrentUser::get()->signInRequest(username,password, m_remember_widget->getState());
 }
 
 // -----------------------------------------------------------------------------
@@ -158,6 +148,26 @@ void LoginDialog::onEnterPressedInternal()
 
 void LoginDialog::onUpdate(float dt)
 {
+    if(m_signin_request != NULL)
+    {
+        // load screen
+        if(m_signin_request->isDone())
+        {
+            stringw info = "";
+            if(online::CurrentUser::get()->signIn(m_signin_request->getResult(), info))
+            {
+                    m_self_destroy = true;
+            }
+            else
+            {
+                // error message
+                sfx_manager->quickSound( "anvil" );
+                m_message_widget->setColor(irr::video::SColor(255, 255, 0, 0));
+                m_message_widget->setText(info, false);
+            }
+        }
+    }
+
     //If we want to open the registration dialog, we need to close this one first
     m_open_registration_dialog && (m_self_destroy = true);
 
@@ -169,6 +179,4 @@ void LoginDialog::onUpdate(float dt)
             new RegistrationDialog();
 
     }
-
-
 }

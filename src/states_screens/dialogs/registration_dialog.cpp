@@ -29,7 +29,7 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "online/current_online_user.hpp"
+#include "online/current_user.hpp"
 
 
 using namespace GUIEngine;
@@ -192,7 +192,7 @@ bool RegistrationDialog::processTermsEvent(const std::string& eventSource){
         {
             assert(getWidget<CheckBoxWidget>("accepted")->getState());
             m_agreement = true;
-            if(CurrentOnlineUser::get()->signUp(m_username, m_password, m_password_confirm, m_email, true, m_registration_error))
+            if(online::CurrentUser::get()->signUp(m_username, m_password, m_password_confirm, m_email, true, m_registration_error))
             {
                 m_show_registration_activation = true;
                 m_registration_error = "";

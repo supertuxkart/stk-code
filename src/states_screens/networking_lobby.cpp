@@ -37,8 +37,6 @@
 #include "utils/translation.hpp"
 #include "online/servers_manager.hpp"
 
-#include "online/current_online_user.hpp"
-
 
 using namespace GUIEngine;
 

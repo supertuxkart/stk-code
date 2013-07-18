@@ -21,6 +21,8 @@
 
 #include <irrString.h>
 
+#include "online/current_user.hpp"
+
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
@@ -39,6 +41,7 @@ private:
     
     bool m_self_destroy;
     bool m_open_registration_dialog;
+    online::XMLRequest * m_signin_request;
 
     GUIEngine::LabelWidget * m_info_widget;
     GUIEngine::TextBoxWidget * m_username_widget;

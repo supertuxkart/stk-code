@@ -32,7 +32,7 @@
 #include "utils/translation.hpp"
 #include "states_screens/networking_lobby.hpp"
 
-#include "online/current_online_user.hpp"
+#include "online/current_user.hpp"
 
 
 using namespace GUIEngine;
@@ -70,7 +70,7 @@ void NetworkingLobbySettings::loadedFromFile()
 // ----------------------------------------------------------------------------
 bool NetworkingLobbySettings::hasLostConnection()
 {
-    return !CurrentOnlineUser::get()->isSignedIn();
+    return !online::CurrentUser::get()->isSignedIn();
 }
 
 // ----------------------------------------------------------------------------
@@ -100,7 +100,7 @@ void NetworkingLobbySettings::createServer()
     const stringw name = m_name_widget->getText().trim();
     int max_players = m_max_players_widget->getValue();
     stringw info = "";
-    if(CurrentOnlineUser::get()->createServer(name, max_players, info))
+    if(online::CurrentUser::get()->createServer(name, max_players, info))
     {
         StateManager::get()->escapePressed();
         StateManager::get()->pushScreen(NetworkingLobby::getInstance());

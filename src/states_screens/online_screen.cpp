@@ -38,7 +38,7 @@
 #include "states_screens/server_selection.hpp"
 #include "modes/demo_world.hpp"
 #include "utils/translation.hpp"
-#include "online/current_online_user.hpp"
+#include "online/current_user.hpp"
 #include "online/servers_manager.hpp"
 
 
@@ -52,7 +52,7 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 {
     m_recorded_state = Not;
-    CurrentOnlineUser::get()->trySavedSession();
+    online::CurrentUser::get()->trySavedSession();
 }   // OnlineScreen
 
 // ----------------------------------------------------------------------------
@@ -87,9 +87,9 @@ void OnlineScreen::loadedFromFile()
 bool OnlineScreen::hasStateChanged()
 {
     State previous_state = m_recorded_state;
-    if(CurrentOnlineUser::get()->isSignedIn())
+    if(online::CurrentUser::get()->isSignedIn())
     {
-        if(CurrentOnlineUser::get()->isGuest())
+        if(online::CurrentUser::get()->isGuest())
             m_recorded_state = Guest;
         else
             m_recorded_state = Registered;
@@ -137,7 +137,7 @@ void OnlineScreen::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
-    m_online_status_widget->setText(irr::core::stringw(_("Signed in as : ")) + CurrentOnlineUser::get()->getUserName() + ".", false);
+    m_online_status_widget->setText(irr::core::stringw(_("Signed in as : ")) + online::CurrentUser::get()->getUserName() + ".", false);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -168,7 +168,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     else if (selection == "sign_out")
     {
         irr::core::stringw info;
-        if (CurrentOnlineUser::get()->signOut(info))
+        if (online::CurrentUser::get()->signOut(info))
         {
             new MessageDialog(_("Signed out successfully."));
             //GUIEngine::reshowCurrentScreen();
@@ -193,7 +193,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
         //FIXME temporary and the request join + join sequence should be placed in one method somewhere
         Server * server = ServersManager::get()->getQuickPlay();
         irr::core::stringw info;
-        if (CurrentOnlineUser::get()->requestJoin( server->getServerId(), info))
+        if (online::CurrentUser::get()->requestJoin( server->getServerId(), info))
         {
             ServersManager::get()->setJoinedServer(server);
             StateManager::get()->pushScreen(NetworkingLobby::getInstance());

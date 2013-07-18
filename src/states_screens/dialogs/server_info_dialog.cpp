@@ -25,7 +25,7 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "online/current_online_user.hpp"
+#include "online/current_user.hpp"
 #include "online/servers_manager.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
@@ -71,7 +71,7 @@ void ServerInfoDialog::requestJoin()
 {
     //FIXME totally not correct. Receiving an answer, not kept in mind.
     irr::core::stringw info;
-    if (CurrentOnlineUser::get()->requestJoin( m_server->getServerId(), info))
+    if (online::CurrentUser::get()->requestJoin( m_server->getServerId(), info))
     {
         ServersManager::get()->setJoinedServer(m_server);
         m_enter_lobby = true;
