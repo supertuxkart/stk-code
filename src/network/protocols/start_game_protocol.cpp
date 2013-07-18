@@ -60,7 +60,8 @@ void StartGameProtocol::notifyEvent(Event* event)
             {
                 protocol->startCountdown(5000); // 5 seconds countdown
                 Log::info("StartGameProtocol", "All players ready, starting countdown.");
-                m_state = READY;
+                m_ready = true;
+                return;
             }
             else
                 Log::error("StartGameProtocol", "The Synchronization protocol hasn't been started.");
@@ -77,6 +78,7 @@ void StartGameProtocol::setup()
 {
     m_state = NONE;
     m_ready_count = 0;
+    m_ready = false;
     Log::info("SynchronizationProtocol", "Ready !");
 }
 
@@ -165,6 +167,10 @@ void StartGameProtocol::update()
     }
     else if (m_state == LOADING)
     {
+        if (m_ready)
+        {
+            m_state = READY;
+        }
     }
     else if (m_state == READY)
     {
@@ -182,6 +188,7 @@ void StartGameProtocol::ready() // on clients, means the loading is finished
         Log::info("StartGameProtocol", "Player ready, notifying server.");
         m_listener->sendMessage(this, ns, true);
         m_state = READY;
+        return;
     }
     else // on the server
     {

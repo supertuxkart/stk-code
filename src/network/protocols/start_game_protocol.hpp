@@ -18,6 +18,7 @@ class StartGameProtocol : public Protocol
         double m_sending_time;
 
         STATE m_state;
+        bool m_ready;
 
     public:
         StartGameProtocol(GameSetup* game_setup);

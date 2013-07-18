@@ -62,11 +62,11 @@ ProtocolManager::ProtocolManager()
 
     pthread_mutex_lock(&m_exit_mutex); // will let the update function run
     /// FIXME used on server because mainloop never running
-    if (NetworkManager::getInstance()->isServer())
+    /*if (NetworkManager::getInstance()->isServer())
     {
         m_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
         pthread_create(m_update_thread, NULL, protocolManagerUpdate, this);
-    }
+    }*/
     // always run this one
     m_asynchronous_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
     pthread_create(m_asynchronous_update_thread, NULL, protocolManagerAsynchronousUpdate, this);
@@ -208,10 +208,10 @@ void ProtocolManager::requestTerminate(Protocol* protocol)
 
 void ProtocolManager::startProtocol(ProtocolInfo protocol)
 {
-    Log::info("ProtocolManager", "A %s protocol with id=%u has been started. There are %ld protocols running.", typeid(*protocol.protocol).name(), protocol.id, m_protocols.size()+1);
     // add the protocol to the protocol vector so that it's updated
     pthread_mutex_lock(&m_protocols_mutex);
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
+    Log::info("ProtocolManager", "A %s protocol with id=%u has been started. There are %ld protocols running.", typeid(*protocol.protocol).name(), protocol.id, m_protocols.size()+1);
     m_protocols.push_back(protocol);
     pthread_mutex_unlock(&m_protocols_mutex);
     pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
