@@ -40,6 +40,7 @@ void KartUpdateProtocol::notifyEvent(Event* event)
     }
     float game_time = event->data.getFloat(0);
     ns.removeFront(4);
+    int nb_updates = 0;
     while(ns.size() >= 16)
     {
         uint32_t kart_id = event->data.getUInt32(0);
@@ -52,8 +53,8 @@ void KartUpdateProtocol::notifyEvent(Event* event)
         m_next_positions.push_back(Vec3(a,b,c));
         m_karts_ids.push_back(kart_id);
         pthread_mutex_unlock(&m_positions_updates_mutex);
-        Log::info("KartUpdateProtocol", "Updating kart %i pos to %f %f %f", kart_id, a,b,c);
-
+        Log::info("KartUpdateProtocol", "Update#%i kart %i pos to %f %f %f", nb_updates, kart_id, a,b,c);
+        nb_updates ++;
         ns.removeFront(16);
     }
 }
