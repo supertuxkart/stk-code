@@ -114,11 +114,16 @@ private:
      *  surface is not a physical object), but the location of the water
      *  effect is on the surface. */
     bool             m_surface;
+
     /** If the material is a zipper, i.e. gives a speed boost. */
     bool             m_zipper;
+
     /** If a kart is rescued when driving on this surface. */
     bool             m_drive_reset;
 
+    /** True if this is a texture that will start the jump animatoin when 
+     *  leaving it and being in the air. */
+    bool             m_is_jump_texture;
 
     /** Speed of the 'main' wave in the water shader. Only used if
         m_graphical_effect == WATER_SHADER */
@@ -320,6 +325,10 @@ public:
     /** Returns true if a kart falling over this kind of material triggers
      *  the special falling camera. */
     bool hasFallingEffect() const {return m_falling_effect; }
+    // ------------------------------------------------------------------------
+    /** Returns if being in the air after this texture should start the
+     *  jump animation. */
+    bool isJumpTexture() const { return m_is_jump_texture; }
     // ------------------------------------------------------------------------
     /** Returns the zipper parametersfor the current material. */
     void getZipperParameter(float *zipper_max_speed_increase,

@@ -90,7 +90,8 @@ KartProperties::KartProperties(const std::string &filename)
         m_swatter_distance2 = m_swatter_duration = m_squash_slowdown =
         m_squash_duration = m_downward_impulse_factor = 
         m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
-        m_bubblegum_time = m_bubblegum_torque = UNDEFINED;
+        m_bubblegum_time = m_bubblegum_torque = m_jump_animation_time = 
+            UNDEFINED;
 
     m_engine_power.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
     m_max_speed.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
@@ -517,6 +518,11 @@ void KartProperties::getAllData(const XMLNode * root)
         lean_node->get("speed", &m_lean_speed);
         m_max_lean   *= DEGREE_TO_RAD;
         m_lean_speed *= DEGREE_TO_RAD;
+    }
+
+    if(const XMLNode *jump_node= root->getNode("jump"))
+    {
+        jump_node->get("animation-time", &m_jump_animation_time);
     }
 
     if(const XMLNode *camera_node= root->getNode("camera"))

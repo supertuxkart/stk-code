@@ -41,6 +41,7 @@ class Attachment;
 class Controller;
 class Item;
 class AbstractKartAnimation;
+class HitEffect;
 class KartGFX;
 class MaxSpeed;
 class ParticleEmitter;
@@ -51,7 +52,6 @@ class Skidding;
 class SkidMarks;
 class SlipStream;
 class Stars;
-class HitEffect;
 
 /** The main kart class. All type of karts are of this object, but with
  *  different controllers. The controllers are what turn a kart into a
@@ -149,14 +149,11 @@ private:
 
     // Graphical effects
     // -----------------
-    /** The time where a kart is flying */
-    float            m_timeFlying;
-    
-    /** For the effect when the kart touch the ground */
-    HitEffect       *m_hitGround;
+    /** Time a kart is jumping. */
+    float            m_jump_time;
     
     /** Is time flying activated */
-    bool             m_isTimeFlying;
+    bool             m_is_jumping;
     
     /** The shadow of a kart. */
     Shadow          *m_shadow;

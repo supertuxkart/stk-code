@@ -483,6 +483,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     node->get("mask",             &m_mask              );
 
     node->get("water-splash",     &m_water_splash      );
+    node->get("jump",             &m_is_jump_texture   );
 
     if (m_collision_reaction != NORMAL)
     {
@@ -732,6 +733,7 @@ void Material::init(unsigned int index)
     m_is_heightmap              = false;
     m_alpha_to_coverage         = false;
     m_water_splash              = false;
+    m_is_jump_texture           = false;
 
     m_shaders.resize(SHADER_COUNT, NULL);
 

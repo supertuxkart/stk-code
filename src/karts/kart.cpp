@@ -119,10 +119,8 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_flying               = false;
     m_sky_particles_emitter= NULL;
     m_stars_effect         = NULL;
-    m_timeFlying           = 0;
-    m_isTimeFlying          = false;
-    m_hitGround            = NULL;
-
+    m_jump_time            = 0;
+    m_is_jumping           = false;
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
 
@@ -339,6 +337,8 @@ void Kart::reset()
     m_bubblegum_time       = 0.0f;
     m_bubblegum_torque     = 0.0f;
     m_has_caught_nolok_bubblegum = false;
+    m_is_jumping           = false;
+
     // In case that the kart was in the air, in which case its
     // linear damping is 0
     m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
@@ -1198,17 +1198,39 @@ void Kart::update(float dt)
     // values for the raycasts).
     if (!isOnGround())
     {
-        m_timeFlying+=dt;
-        m_isTimeFlying = true;
+        const Material *m      = getMaterial();
+        const Material *last_m = getLastMaterial();
+
+        // A jump starts only the kart isn't already jumping, is on a new
+        // (or no) texture.
+        if(!m_is_jumping && last_m && last_m!=m )
+        {
+            float v = getVelocity().getY();
+            float force = World::getWorld()->getTrack()->getGravity();;
+            // Velocity / force is the time it takes to reach the peak
+            // of the jump (i.e. when vertical speed becomes 0). Assuming
+            // that jump start height and end height are the same, it will
+            // take the same time again to reach the bottom
+            float t = 2.0f * v/force;
+
+            // Jump if either the jump is estimated to be long enough, or 
+            // the texture has the jump property set.
+            if(t>getKartProperties()->getJumpAnimationTime()  ||
+                last_m->isJumpTexture()                         )
+                m_kart_model->setAnimation(KartModel::AF_BEGIN_JUMP);
+            m_is_jumping = true;
+        }
+        m_jump_time+=dt;
     }
-    
-    if(isOnGround() && m_isTimeFlying)
+    else if (m_is_jumping)
     {
-        m_isTimeFlying = false;
-        m_hitGround = new Explosion(getXYZ(), "jump", 
-                                   "jump_explosion.xml");
-        projectile_manager->addHitEffect(m_hitGround);
-        m_timeFlying = 0;
+        // Kart touched ground again
+        m_is_jumping = false;
+        HitEffect *effect =  new Explosion(getXYZ(), "jump", 
+                                          "jump_explosion.xml");
+        projectile_manager->addHitEffect(effect);
+        m_kart_model->setAnimation(KartModel::AF_DEFAULT);
+        m_jump_time = 0;
     }
     
     if( (!isOnGround() || emergency) && m_shadow_enabled)

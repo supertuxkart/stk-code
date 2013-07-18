@@ -243,6 +243,9 @@ private:
       *  (in radians/second). */
      float      m_lean_speed;
      
+     /** How long a jump must be in order to trigger the jump animation. */
+     float      m_jump_animation_time;
+
     /** Engine sound effect. */
     std::string m_engine_sfx_type;
 
@@ -843,6 +846,10 @@ public:
     // ------------------------------------------------------------------------
     /** The speed with which a kart should lean (in radians/s). */
     float getLeanSpeed() const { return m_lean_speed; }
+    // ------------------------------------------------------------------------
+    /** Return show long a jump must last in order to play the jump 
+     *  animation. */
+    float getJumpAnimationTime() const { return m_jump_animation_time; }
     // ------------------------------------------------------------------------
     /** Returns true if wheels should have random rotation at start. */
     bool hasRandomWheels() const { return m_has_rand_wheels; }

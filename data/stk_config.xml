@@ -147,6 +147,12 @@
     <camera distance="1.5" forward-up-angle="15"
             backward-up-angle="30"/>
 
+   <!-- Jump animation related values:
+        animation-time: only if the estimated time for a jump is larger
+                        than this value will the jump animation being
+                        shown. -->
+   <jump animation-time="0.5" />
+
     <!-- If a kart starts within the specified time after 'go',
          it receives the corresponding bonus from 'boost'. Those
          fields must have the same size, and must be sorted by
