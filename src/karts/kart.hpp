@@ -207,6 +207,9 @@ private:
     SFXBase      *m_skid_sound;
     SFXBase      *m_goo_sound;
     float         m_time_last_crash;
+    
+    /** To prevent using nitro in too short bursts */
+    float         m_min_nitro_time;
 
     void          updatePhysics(float dt);
     void          handleMaterialSFX(const Material *material);

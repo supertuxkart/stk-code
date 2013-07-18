@@ -81,6 +81,8 @@
 #  include <math.h>
 #endif
 
+const float MIN_NITRO_TIME_THRESHOLD = 2.0f;
+
 /** The kart constructor.
  *  \param ident  The identifier for the kart model to use.
  *  \param position The position (or rank) for this kart (between 1 and
@@ -121,6 +123,8 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_stars_effect         = NULL;
     m_jump_time            = 0;
     m_is_jumping           = false;
+    m_min_nitro_time       = 0.0f;
+    
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
 
@@ -292,6 +296,8 @@ void Kart::reset()
     // don't have one).
     if(m_body)
         World::getWorld()->getPhysics()->addKart(this);
+
+    m_min_nitro_time = 0.0f;
 
     // Reset star effect in case that it is currently being shown.
     m_stars_effect->reset();
@@ -1530,18 +1536,40 @@ void Kart::handleZipper(const Material *material, bool play_sound)
  */
 void Kart::updateNitro(float dt)
 {
-    if(!m_controls.m_nitro || !isOnGround()) return;
+    if (m_controls.m_nitro && m_min_nitro_time <= 0.0f)
+    {
+        m_min_nitro_time = MIN_NITRO_TIME_THRESHOLD;
+    }
+    if (m_min_nitro_time > 0.0f)
+    {
+        m_min_nitro_time -= dt;
+        
+        // when pressing the key, don't allow the min time to go under zero.
+        // If it went under zero, it would be reset
+        if (m_controls.m_nitro && m_min_nitro_time <= 0.0f)
+            m_min_nitro_time = 0.1f;
+    }
+    
+    bool increase_speed = (m_controls.m_nitro && isOnGround());
+    if (!increase_speed && m_min_nitro_time <= 0.0f)
+    {
+        return;
+    }
     m_collected_energy -= dt * m_kart_properties->getNitroConsumption();
-    if(m_collected_energy<0)
+    if (m_collected_energy < 0)
     {
         m_collected_energy = 0;
         return;
     }
-    m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
-                                 m_kart_properties->getNitroMaxSpeedIncrease(),
-                                 m_kart_properties->getNitroEngineForce(),
-                                 m_kart_properties->getNitroDuration(),
-                                 m_kart_properties->getNitroFadeOutTime()    );
+    
+    if (increase_speed)
+    {
+        m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
+                                     m_kart_properties->getNitroMaxSpeedIncrease(),
+                                     m_kart_properties->getNitroEngineForce(),
+                                     m_kart_properties->getNitroDuration(),
+                                     m_kart_properties->getNitroFadeOutTime()    );
+    }
 }   // updateNitro
 
 // -----------------------------------------------------------------------------
