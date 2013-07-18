@@ -38,12 +38,12 @@ void KartUpdateProtocol::notifyEvent(Event* event)
         Log::info("KartUpdateProtocol", "Message too short.");
         return;
     }
-    float game_time = event->data.getFloat(0);
+    float game_time = ns.getFloat(0);
     ns.removeFront(4);
     int nb_updates = 0;
     while(ns.size() >= 16)
     {
-        uint32_t kart_id = event->data.getUInt32(0);
+        uint32_t kart_id = ns.getUInt32(0);
 
         float a,b,c;
         a = ns.getFloat(4);
@@ -93,6 +93,7 @@ void KartUpdateProtocol::update()
             ns.ai32( kart->getWorldKartId());
             ns.af(v[0]).af(v[1]).af(v[2]);
             Log::info("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
+            Log::info("KartUpdateProtocol", "Sending %d's positions %f %f %f", ns.gui32(4), v[0], v[1], v[2]);
             m_listener->sendMessage(this, ns, false);
         }
     }

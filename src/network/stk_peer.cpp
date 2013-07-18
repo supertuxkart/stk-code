@@ -98,6 +98,13 @@ void STKPeer::sendPacket(NetworkString const& data, bool reliable)
     ENetPacket* packet = enet_packet_create(data.c_str(), data.size()+1,
                 (reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
 
+    printf("STKPeer: ");
+    for (unsigned int i = 0; i < data.size(); i++)
+    {
+        printf("%d ", (uint8_t)(data[i]));
+    }
+    printf("\n");
+
     enet_peer_send(m_peer, 0, packet);
 }
 

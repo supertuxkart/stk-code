@@ -117,6 +117,8 @@ void ClientLobbyRoomProtocol::update()
         m_state = EXITING;
         m_listener->requestTerminate(this);
         break;
+    case EXITING:
+        break;
     }
 }
 
@@ -347,7 +349,7 @@ void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
     }
     uint8_t player_id = event->data[1];
     uint8_t kart_name_length = event->data[2];
-    std::string data = event->data.getString(3);
+    std::string data = event->data.getString(3, kart_name_length);
     if (data.size() != kart_name_length)
     {
         Log::error("ClientLobbyRoomProtocol", "Kart names sizes differ: told: %d, real: %d.", kart_name_length, data.size());

@@ -304,7 +304,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
         return;
     }
     uint8_t kart_name_size = event->data.gui8(5);
-    std::string kart_name = event->data.gs(6);
+    std::string kart_name = event->data.gs(6, kart_name_size);
     if (kart_name.size() != kart_name_size)
     {
         Log::error("ServerLobbyRoomProtocol", "Kart names sizes differ: told:"
