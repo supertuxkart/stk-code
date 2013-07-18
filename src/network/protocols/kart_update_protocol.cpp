@@ -99,7 +99,9 @@ void KartUpdateProtocol::update()
         case 0: /* if we got the lock, unlock and return 1 (true) */
             while (!m_next_positions.empty())
             {
-                m_karts[m_karts_ids.back()]->setXYZ(m_next_positions.back());
+                uint32_t id = m_karts_ids.back();
+                Vec3 pos = m_next_positions.back();
+                m_karts[id]->setXYZ(pos);
                 m_next_positions.pop_back();
                 m_karts_ids.pop_back();
             }
