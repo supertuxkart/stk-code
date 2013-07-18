@@ -40,7 +40,6 @@ void KartUpdateProtocol::notifyEvent(Event* event)
     }
     float game_time = ns.getFloat(0);
     ns.removeFront(4);
-    int nb_updates = 0;
     while(ns.size() >= 16)
     {
         uint32_t kart_id = ns.getUInt32(0);
@@ -53,8 +52,6 @@ void KartUpdateProtocol::notifyEvent(Event* event)
         m_next_positions.push_back(Vec3(a,b,c));
         m_karts_ids.push_back(kart_id);
         pthread_mutex_unlock(&m_positions_updates_mutex);
-        Log::info("KartUpdateProtocol", "Update#%i kart %i pos to %f %f %f", nb_updates, kart_id, a,b,c);
-        nb_updates ++;
         ns.removeFront(16);
     }
 }
@@ -93,18 +90,18 @@ void KartUpdateProtocol::update()
             ns.ai32( kart->getWorldKartId());
             ns.af(v[0]).af(v[1]).af(v[2]);
             Log::info("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
-            Log::info("KartUpdateProtocol", "Sending %d's positions %f %f %f", ns.gui32(4), v[0], v[1], v[2]);
             m_listener->sendMessage(this, ns, false);
         }
     }
     switch(pthread_mutex_trylock(&m_positions_updates_mutex))
     {
-        case 0: /* if we got the lock, unlock and return 1 (true) */
+        case 0: /* if we got the lock */
             while (!m_next_positions.empty())
             {
                 uint32_t id = m_karts_ids.back();
                 Vec3 pos = m_next_positions.back();
                 m_karts[id]->setXYZ(pos);
+                Log::info("KartUpdateProtocol", "Update kart %i pos to %f %f %f", id, pos[0], pos[1], pos[2]);
                 m_next_positions.pop_back();
                 m_karts_ids.pop_back();
             }
