@@ -33,7 +33,8 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
             GETTING_PUBLIC_ADDRESS,
             LAUNCHING_SERVER,
             WORKING,
-            DONE
+            DONE,
+            EXITING
         };
         STATE m_state;
 };

@@ -114,6 +114,7 @@ void ClientLobbyRoomProtocol::update()
     case CONNECTED:
         break;
     case DONE:
+        m_state = EXITING;
         m_listener->requestTerminate(this);
         break;
     }

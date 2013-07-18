@@ -103,7 +103,10 @@ void ConnectToPeer::asynchronousUpdate()
             break;
         }
         case DONE:
+            m_state = EXITING;
             m_listener->requestTerminate(this);
+            break;
+        case EXITING:
             break;
     }
 }

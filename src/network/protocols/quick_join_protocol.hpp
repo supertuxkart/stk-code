@@ -20,7 +20,8 @@ class QuickJoinProtocol : public Protocol
         enum STATE
         {
             NONE,
-            DONE
+            DONE,
+            EXITING
         };
         STATE m_state;
 };

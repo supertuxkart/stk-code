@@ -36,7 +36,8 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
             LINKED,
             REQUESTING_CONNECTION,
             CONNECTED,
-            DONE
+            DONE,
+            EXITING
         };
         STATE m_state;
 };

@@ -38,7 +38,8 @@ class GetPublicAddress : public Protocol
         {
             NOTHING_DONE,
             TEST_SENT,
-            ADDRESS_KNOWN
+            ADDRESS_KNOWN,
+            EXITING
         };
         STATE m_state;
         uint32_t m_stun_tansaction_id[3];

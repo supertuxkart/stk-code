@@ -29,6 +29,7 @@ class SynchronizationProtocol : public Protocol
         bool m_countdown_activated;
         double m_countdown;
         double m_last_countdown_update;
+        bool m_has_quit;
 };
 
 #endif // SYNCHRONIZATION_PROTOCOL_HPP

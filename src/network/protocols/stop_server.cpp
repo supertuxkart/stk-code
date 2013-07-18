@@ -74,6 +74,7 @@ void StopServer::asynchronousUpdate()
     }
     else if (m_state == DONE)
     {
+        m_state = EXITING;
         m_listener->requestTerminate(this);
     }
 }

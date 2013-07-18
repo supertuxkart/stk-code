@@ -202,6 +202,15 @@ void ProtocolManager::requestTerminate(Protocol* protocol)
     req.type = PROTOCOL_REQUEST_TERMINATE;
     // add it to the request stack
     pthread_mutex_lock(&m_requests_mutex);
+    // check that the request does not already exist :
+    for (unsigned int i = 0; i < m_requests.size(); i++)
+    {
+        if (m_requests[i].protocol_info.protocol == protocol)
+        {
+            pthread_mutex_unlock(&m_requests_mutex);
+            return;
+        }
+    }
     m_requests.push_back(req);
     pthread_mutex_unlock(&m_requests_mutex);
 }
@@ -213,11 +222,11 @@ void ProtocolManager::startProtocol(ProtocolInfo protocol)
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
     Log::info("ProtocolManager", "A %s protocol with id=%u has been started. There are %ld protocols running.", typeid(*protocol.protocol).name(), protocol.id, m_protocols.size()+1);
     m_protocols.push_back(protocol);
-    pthread_mutex_unlock(&m_protocols_mutex);
-    pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
     // setup the protocol and notify it that it's started
     protocol.protocol->setListener(this);
     protocol.protocol->setup();
+    pthread_mutex_unlock(&m_protocols_mutex);
+    pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
 }
 void ProtocolManager::stopProtocol(ProtocolInfo protocol)
 {

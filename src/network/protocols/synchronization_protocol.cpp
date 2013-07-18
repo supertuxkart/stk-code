@@ -110,6 +110,7 @@ void SynchronizationProtocol::setup()
 {
     Log::info("SynchronizationProtocol", "Ready !");
     m_countdown = 5.0; // init the countdown to 5s
+    m_has_quit = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -123,8 +124,9 @@ void SynchronizationProtocol::asynchronousUpdate()
         m_countdown -= (current_time - m_last_countdown_update);
         m_last_countdown_update = current_time;
         Log::debug("SynchronizationProtocol", "Update! Countdown remaining : %f", m_countdown);
-        if (m_countdown < 0.0)
+        if (m_countdown < 0.0 && !m_has_quit)
         {
+            m_has_quit = true;
             Log::info("SynchronizationProtocol", "Countdown finished. Starting now.");
             m_listener->requestStart(new KartUpdateProtocol());
             m_listener->requestTerminate(this);

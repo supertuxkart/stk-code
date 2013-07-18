@@ -46,7 +46,8 @@ class ConnectToPeer : public Protocol, public CallbackObject
             WAITING_PEER_ADDRESS,
             CONNECTING,
             CONNECTED,
-            DONE
+            DONE,
+            EXITING
         };
         STATE m_state;
 };

@@ -200,7 +200,11 @@ void GetPublicAddress::asynchronousUpdate()
     }
     if (m_state == ADDRESS_KNOWN)
     {
+        m_state = EXITING;
         // terminate the protocol
         m_listener->requestTerminate(this);
+    }
+    if (m_state == EXITING)
+    {
     }
 }

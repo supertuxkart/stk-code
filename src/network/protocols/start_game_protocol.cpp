@@ -174,6 +174,7 @@ void StartGameProtocol::update()
     }
     else if (m_state == READY)
     {
+        m_state = EXITING;
         m_listener->requestTerminate(this);
     }
 }
@@ -188,6 +189,7 @@ void StartGameProtocol::ready() // on clients, means the loading is finished
         Log::info("StartGameProtocol", "Player ready, notifying server.");
         m_listener->sendMessage(this, ns, true);
         m_state = READY;
+        m_ready = true;
         return;
     }
     else // on the server
