@@ -81,8 +81,6 @@
 #  include <math.h>
 #endif
 
-const float MIN_NITRO_TIME_THRESHOLD = 1.3f;
-
 /** The kart constructor.
  *  \param ident  The identifier for the kart model to use.
  *  \param position The position (or rank) for this kart (between 1 and
@@ -1538,7 +1536,7 @@ void Kart::updateNitro(float dt)
 {
     if (m_controls.m_nitro && m_min_nitro_time <= 0.0f)
     {
-        m_min_nitro_time = MIN_NITRO_TIME_THRESHOLD;
+        m_min_nitro_time = m_kart_properties->getNitroMinConsumptionTime();
     }
     if (m_min_nitro_time > 0.0f)
     {

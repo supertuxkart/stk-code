@@ -108,6 +108,7 @@ KartProperties::KartProperties(const std::string &filename)
     m_engine_sfx_type        = "engine_small";
     m_kart_model             = NULL;
     m_has_rand_wheels        = false;
+    m_nitro_min_consumption  = 1.0f;
     // The default constructor for stk_config uses filename=""
     if (filename != "")
     {
@@ -313,6 +314,7 @@ void KartProperties::getAllData(const XMLNode * root)
         nitro_node->get("duration",           &m_nitro_duration          );
         nitro_node->get("fade-out-time",      &m_nitro_fade_out_time     );
         nitro_node->get("max",                &m_nitro_max               );
+        nitro_node->get("min-consumption-time", &m_nitro_min_consumption   );
     }
 
     if(const XMLNode *bubble_node = root->getNode("bubblegum"))
