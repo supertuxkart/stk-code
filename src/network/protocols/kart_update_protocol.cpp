@@ -99,11 +99,14 @@ void KartUpdateProtocol::update()
             while (!m_next_positions.empty())
             {
                 uint32_t id = m_karts_ids.back();
-                Vec3 pos = m_next_positions.back();
-                btTransform transform = m_karts[id]->getBody()->getInterpolationWorldTransform();
-                transform.setOrigin(pos);
-                m_karts[id]->getBody()->setCenterOfMassTransform(transform);
-                Log::info("KartUpdateProtocol", "Update kart %i pos to %f %f %f", id, pos[0], pos[1], pos[2]);
+                if (id != m_self_kart_index || m_listener->isServer()) // server takes all updates
+                {
+                    Vec3 pos = m_next_positions.back();
+                    btTransform transform = m_karts[id]->getBody()->getInterpolationWorldTransform();
+                    transform.setOrigin(pos);
+                        m_karts[id]->getBody()->setCenterOfMassTransform(transform);
+                    Log::info("KartUpdateProtocol", "Update kart %i pos to %f %f %f", id, pos[0], pos[1], pos[2]);
+                }
                 m_next_positions.pop_back();
                 m_karts_ids.pop_back();
             }
