@@ -58,6 +58,7 @@ Event::Event(ENetEvent* event)
 
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
     peer = new STKPeer*;
+    *peer = NULL;
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         if (peers[i]->m_peer == event->peer)
