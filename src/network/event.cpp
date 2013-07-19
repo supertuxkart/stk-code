@@ -64,6 +64,7 @@ Event::Event(ENetEvent* event)
         if (peers[i]->m_peer == event->peer)
         {
             *peer = peers[i];
+            Log::info("Event", "The peer you sought has been found on %lx", (long int)(peer));
             return;
         }
     }
