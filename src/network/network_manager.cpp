@@ -125,9 +125,10 @@ void NetworkManager::sendPacketExcept(STKPeer* peer, const NetworkString& data, 
 {
     for (unsigned int i = 0; i < m_peers.size(); i++)
     {
-        if (!m_peers[i]->isSamePeer(peer))
+        STKPeer* p = m_peers[i];
+        if (!p->isSamePeer(peer))
         {
-            m_peers[i]->sendPacket(data, reliable);
+            p->sendPacket(data, reliable);
         }
     }
 }
