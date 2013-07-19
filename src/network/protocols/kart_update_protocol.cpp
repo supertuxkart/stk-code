@@ -64,7 +64,7 @@ void KartUpdateProtocol::update()
 {
     static double time = 0;
     double current_time = Time::getRealTime();
-    if (current_time > time + 1.0) // 1 updates per second
+    if (current_time > time + 0.1) // 10 updates per second
     {
         time = current_time;
         if (m_listener->isServer())
