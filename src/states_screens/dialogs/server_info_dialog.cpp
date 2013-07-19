@@ -34,7 +34,7 @@
 using namespace GUIEngine;
 using namespace irr;
 using namespace irr::gui;
-using namespace online;
+using namespace Online;
 
 // -----------------------------------------------------------------------------
 
@@ -72,7 +72,7 @@ void ServerInfoDialog::requestJoin()
 {
     //FIXME totally not correct. Receiving an answer, not kept in mind.
     irr::core::stringw info;
-    if (online::CurrentUser::get()->requestJoin( m_server->getServerId(), info))
+    if (Online::CurrentUser::get()->requestJoin( m_server->getServerId(), info))
     {
         ServersManager::get()->setJoinedServer(m_server);
         m_enter_lobby = true;

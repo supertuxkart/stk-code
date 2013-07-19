@@ -192,7 +192,7 @@ bool RegistrationDialog::processTermsEvent(const std::string& eventSource){
         {
             assert(getWidget<CheckBoxWidget>("accepted")->getState());
             m_agreement = true;
-            if(online::CurrentUser::get()->signUp(m_username, m_password, m_password_confirm, m_email, true, m_registration_error))
+            if(Online::CurrentUser::get()->signUp(m_username, m_password, m_password_confirm, m_email, true, m_registration_error))
             {
                 m_show_registration_activation = true;
                 m_registration_error = "";

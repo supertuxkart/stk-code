@@ -37,14 +37,13 @@
 #include "states_screens/networking_lobby_settings.hpp"
 #include "states_screens/server_selection.hpp"
 #include "modes/demo_world.hpp"
-#include "utils/translation.hpp"
-#include "online/current_user.hpp"
 #include "online/servers_manager.hpp"
+#include "online/messages.hpp"
 
 
 
 using namespace GUIEngine;
-using namespace online;
+using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( OnlineScreen );
 
@@ -52,8 +51,9 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 
 OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 {
-    m_recorded_state = Not;
-    online::CurrentUser::get()->trySavedSession();
+    m_recorded_state = CurrentUser::SIGNED_OUT;
+    CurrentUser::acquire()->trySavedSession();
+    CurrentUser::release();
 }   // OnlineScreen
 
 // ----------------------------------------------------------------------------
@@ -87,16 +87,9 @@ void OnlineScreen::loadedFromFile()
 // ----------------------------------------------------------------------------
 bool OnlineScreen::hasStateChanged()
 {
-    State previous_state = m_recorded_state;
-    if(online::CurrentUser::get()->isSignedIn())
-    {
-        if(online::CurrentUser::get()->isGuest())
-            m_recorded_state = Guest;
-        else
-            m_recorded_state = Registered;
-    }
-    else
-        m_recorded_state = Not;
+    CurrentUser::UserState previous_state = m_recorded_state;
+    m_recorded_state = CurrentUser::acquire()->getUserState();
+    CurrentUser::release();
     if (previous_state != m_recorded_state)
         return true;
     return false;
@@ -109,19 +102,24 @@ void OnlineScreen::beforeAddingWidget()
     m_bottom_menu_widget->setVisible(true);
     m_top_menu_widget->setVisible(true);
     hasStateChanged();
-    if (m_recorded_state == Registered)
+    if (m_recorded_state == CurrentUser::SIGNED_IN)
     {
         m_register_widget->setVisible(false);
         m_sign_in_widget->setVisible(false);
     }
-    else if (m_recorded_state == Not)
+    else if (m_recorded_state == CurrentUser::SIGNED_OUT || CurrentUser::SIGNING_IN || CurrentUser::SIGNING_OUT)
     {
         m_quick_play_widget->setDeactivated();
         m_find_server_widget->setDeactivated();
         m_create_server_widget->setDeactivated();
         m_sign_out_widget->setVisible(false);
+        if(CurrentUser::SIGNING_IN || CurrentUser::SIGNING_OUT)
+        {
+            m_register_widget->setDeactivated();
+            m_sign_in_widget->setDeactivated();
+        }
     }
-    else if (m_recorded_state == Guest)
+    else if (m_recorded_state == CurrentUser::GUEST)
     {
         m_find_server_widget->setDeactivated();
         m_create_server_widget->setDeactivated();
@@ -138,12 +136,20 @@ void OnlineScreen::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
-    m_online_status_widget->setText(irr::core::stringw(_("Signed in as : ")) + online::CurrentUser::get()->getUserName() + ".", false);
+    m_load_timer = 0.0f;
+    m_online_status_widget->setText(Messages::signedInAs(CurrentUser::acquire()->getUserName()), false);
+    CurrentUser::release();
+
 }   // init
 
 // ----------------------------------------------------------------------------
 void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
+    if (m_recorded_state == CurrentUser::SIGNING_IN)
+    {
+        m_load_timer += delta;
+        m_online_status_widget->setText(Messages::signingIn(m_load_timer), false);
+    }
     if (hasStateChanged())
         GUIEngine::reshowCurrentScreen();
 }   // onUpdate
@@ -169,7 +175,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     else if (selection == "sign_out")
     {
         irr::core::stringw info;
-        if (online::CurrentUser::get()->signOut(info))
+        if (Online::CurrentUser::get()->signOut(info))
         {
             new MessageDialog(_("Signed out successfully."));
             //GUIEngine::reshowCurrentScreen();
@@ -194,7 +200,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
         //FIXME temporary and the request join + join sequence should be placed in one method somewhere
         Server * server = ServersManager::get()->getQuickPlay();
         irr::core::stringw info;
-        if (online::CurrentUser::get()->requestJoin( server->getServerId(), info))
+        if (Online::CurrentUser::get()->requestJoin( server->getServerId(), info))
         {
             ServersManager::get()->setJoinedServer(server);
             StateManager::get()->pushScreen(NetworkingLobby::getInstance());
@@ -233,17 +239,18 @@ void OnlineScreen::onDisabledItemClicked(const std::string& item)
 // ----------------------------------------------------------------------------
 void OnlineScreen::setInitialFocus()
 {
-    if(m_recorded_state == Not)
-        m_bottom_menu_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    else
+    if(m_recorded_state == CurrentUser::SIGNED_IN)
         m_top_menu_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    else
+        m_bottom_menu_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+
 }   // setInitialFocus
 
 // ----------------------------------------------------------------------------
 void OnlineScreen::onDialogClose()
 {
-    if (hasStateChanged())
+    /*if (hasStateChanged())
         GUIEngine::reshowCurrentScreen();
-    else
+    else*/
         setInitialFocus();
 }   // onDialogClose()

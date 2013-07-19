@@ -39,8 +39,6 @@ LoginDialog::LoginDialog(const Message message_type) :
 {
     m_self_destroy = false;
     m_open_registration_dialog = false;
-    m_load_timer = 0.0f;
-    m_signin_request = NULL;
     loadFromFile("online/login_dialog.stkgui");
 
     m_info_widget = getWidget<LabelWidget>("info");
@@ -95,7 +93,6 @@ LoginDialog::LoginDialog(const Message message_type) :
 
 LoginDialog::~LoginDialog()
 {
-    delete m_signin_request;
 }
 
 
@@ -105,7 +102,9 @@ void LoginDialog::login()
 {
     const stringw username = m_username_widget->getText().trim();
     const stringw password = m_password_widget->getText().trim();
-    m_signin_request = online::CurrentUser::get()->signInRequest(username,password, m_remember_widget->getState());
+    Online::CurrentUser::acquire()->requestSignIn(username,password, m_remember_widget->getState());
+    Online::CurrentUser::release();
+    m_self_destroy = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -117,8 +116,6 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
         const std::string& selection = m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
-            if(m_signin_request != NULL)
-                m_signin_request->cancel();
             m_self_destroy = true;
             return GUIEngine::EVENT_BLOCK;
         }
@@ -152,31 +149,6 @@ void LoginDialog::onEnterPressedInternal()
 
 void LoginDialog::onUpdate(float dt)
 {
-    if(m_signin_request != NULL)
-    {
-        if(m_signin_request->isDone())
-        {
-            stringw info = "";
-            if(online::CurrentUser::get()->signIn(m_signin_request->getResult(), info))
-            {
-                m_self_destroy = true;
-            }
-            else
-            {
-                // error message
-                sfx_manager->quickSound( "anvil" );
-                m_message_widget->setColor(irr::video::SColor(255, 255, 0, 0));
-                m_message_widget->setText(info, false);
-            }
-            delete m_signin_request;
-            m_signin_request = NULL;
-        }
-        else
-        {
-            m_load_timer += dt;
-            m_message_widget->setText(irr::core::stringw(_("Signing in")) + StringUtils::loadingDots(m_load_timer), false);
-        }
-    }
 
     //If we want to open the registration dialog, we need to close this one first
     m_open_registration_dialog && (m_self_destroy = true);

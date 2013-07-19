@@ -22,6 +22,7 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
+#include "online/current_user.hpp"
 
 namespace GUIEngine { class Widget; class ListWidget; }
 
@@ -49,14 +50,9 @@ private:
     GUIEngine::IconButtonWidget * m_register_widget;
     GUIEngine::IconButtonWidget * m_sign_out_widget;
 
-    enum State
-    {
-        Not = 1,
-        Guest = 2,
-        Registered = 4
-    };
+    Online::CurrentUser::UserState m_recorded_state;
 
-    State m_recorded_state;
+    float m_load_timer;
 
     /** \brief Checks if the recorded state differs from the actual state and sets it. */
     bool hasStateChanged();

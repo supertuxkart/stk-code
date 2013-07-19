@@ -16,16 +16,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef HEADER_ONLINE_MESSAGES_HPP
+#define HEADER_ONLINE_MESSAGES_HPP
 
-#include "online/user.hpp"
+#include <string>
+#include <irrString.h>
 
-#include <sstream>
-#include <stdlib.h>
-
-namespace Online{
-    // ============================================================================
-    User::User(const irr::core::stringw &username)
+namespace Online
+{
+    namespace Messages
     {
-        m_name = username;
-    }
-} // namespace Online
+        irr::core::stringw loadingDots(float timer, bool spaces = true, float interval = 0.5f, int max_dots = 3);
+        irr::core::stringw signingIn  (float timer);
+        irr::core::stringw signingOut (float timer);
+        irr::core::stringw signedInAs (const irr::core::stringw & name);
+    } // namespace Messages
+}// namespace Online
+#endif
+
+/* EOF */

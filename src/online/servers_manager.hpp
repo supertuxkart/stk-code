@@ -23,7 +23,7 @@
 #include "online/server.hpp"
 
 
-namespace online {
+namespace Online {
 
     /**
       * \brief
@@ -54,7 +54,7 @@ namespace online {
     };   // class ServersManager
 
 
-} // namespace online
+} // namespace Online
 
 
 #endif

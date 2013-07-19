@@ -37,7 +37,6 @@ private:
     
     bool m_self_destroy;
     bool m_open_registration_dialog;
-    online::XMLRequest * m_signin_request;
 
     GUIEngine::LabelWidget * m_info_widget;
     GUIEngine::TextBoxWidget * m_username_widget;
@@ -53,8 +52,6 @@ private:
     GUIEngine::IconButtonWidget * m_cancel_widget;
     
     void login();
-
-    float m_load_timer;
 
 public:
     

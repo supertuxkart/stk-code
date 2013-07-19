@@ -56,7 +56,7 @@
                 <icon-button id="as_guest" width="64" height="64" icon="gui/main_about.png"
                              I18N="Login dialog" text="As guest" label_location="bottom"/>
                 <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
-                             I18N="Login dialog" text="Cancel" label_location="bottom"/>
+                             I18N="Login dialog" text="Close" label_location="bottom"/>
         </buttonbar>
         
     

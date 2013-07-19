@@ -39,7 +39,7 @@
 #  include <unistd.h>
 #endif
 
-namespace online{
+namespace Online{
 
     static HTTPManager * http_singleton = NULL;
 
@@ -119,7 +119,7 @@ namespace online{
         // thread here to cancel properly.
         cancelAllDownloads();
 
-        online::QuitRequest * request = new online::QuitRequest();
+        QuitRequest * request = new QuitRequest();
         addRequest(request);
     }   // stopNetworkThread
 
@@ -140,7 +140,7 @@ namespace online{
      *  sorted by priority.
      *  \param request The pointer to the new request to insert.
      */
-    bool HTTPManager::addRequest(online::Request *request)
+    bool HTTPManager::addRequest(Online::Request *request)
     {
         if (request->isAllowedToAdd())
         {
@@ -174,7 +174,7 @@ namespace online{
 
         me->m_current_request = NULL;
         me->m_request_queue.lock();
-        while(  me->m_request_queue.getData().empty() || !dynamic_cast<online::QuitRequest*>(me->m_request_queue.getData().top()) )
+        while(  me->m_request_queue.getData().empty() || !dynamic_cast<Online::QuitRequest*>(me->m_request_queue.getData().top()) )
         {
             bool empty = me->m_request_queue.getData().empty();
             // Wait in cond_wait for a request to arrive. The 'while' is necessary
@@ -201,7 +201,7 @@ namespace online{
         // At this stage we have the lock for m_request_queue
         while(!me->m_request_queue.getData().empty())
         {
-            online::Request * request = me->m_request_queue.getData().top();
+            Online::Request * request = me->m_request_queue.getData().top();
             me->m_request_queue.getData().pop();
             // Manage memory can be ignored here, all requests
             // need to be freed.
@@ -212,7 +212,7 @@ namespace online{
         pthread_exit(NULL);
         return 0;
     }   // mainLoop
-} // namespace online
+} // namespace Online
 
 
 

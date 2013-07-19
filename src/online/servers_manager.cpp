@@ -26,7 +26,7 @@
 #include "config/user_config.hpp"
 #include "utils/translation.hpp"
 
-namespace online{
+namespace Online{
 
     static ServersManager* user_singleton = NULL;
 
@@ -79,4 +79,4 @@ namespace online{
             return m_servers->get(0);
         return NULL;
     }
-} // namespace online
+} // namespace Online

@@ -19,13 +19,13 @@
 
 #include <string>
 
-#include "utils/leak_check.hpp"
-#include "utils/synchronised.hpp"
 #include "utils/cpp2011.h"
-#include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/synchronised.hpp"
+#include "io/file_manager.hpp"
+#include "online/http_listener.hpp"
 
-namespace online{
+namespace Online{
 
     /**
       * Stores a request for the http connector. They will be sorted by priorities.
@@ -40,7 +40,6 @@ namespace online{
         /** Cancel this request if it is active. */
         bool                m_cancel;
 
-        bool                m_done;
 
         /** True if the memory for this Request should be managed by
         *  http connector (i.e. this object is freed once the request
@@ -50,10 +49,9 @@ namespace online{
 
         virtual void beforeOperation() {}
         virtual void operation() = 0;
-        virtual void afterOperation() { m_done = true;}
+        virtual void afterOperation() {}
 
     public:
-        LEAK_CHECK()
 
         Request(int priority, bool manage_memory=true);
         virtual ~Request();
@@ -76,8 +74,6 @@ namespace online{
         /** Returns if the memory for this object should be managed by
         *  by network_http (i.e. freed once the request is handled). */
         bool manageMemory() const { return m_manage_memory; }
-
-        bool isDone() const { return m_done; }
 
         virtual bool isAllowedToAdd() {return true;}
 
@@ -119,10 +115,18 @@ namespace online{
         /** The progress indicator. 0 till it is started and the first
         *  packet is downloaded. At the end eithe -1 (error) or 1
         *  (everything ok) at the end. */
-        Synchronised<float> m_progress;
-        std::string         m_url;
-        bool                m_added;
+        Synchronised<float>             m_progress;
+        Synchronised<bool>              m_done;
+        std::string                     m_url;
+        bool                            m_added;
+        Synchronised<HTTPListener *>    m_listener;
+        int                             m_listener_target;
+        /**
+         * info to show on screen if necessary
+         */
+        irr::core::stringw  m_info;
 
+        virtual void afterOperation();
         std::string downloadPage();
 
         static int progressDownload(void *clientp,
@@ -152,7 +156,7 @@ namespace online{
         template <typename T>
         void setParameter(const std::string & name, const T& value){
             if(!m_added)
-            (   *m_parameters)[name] = StringUtils::toString(value);
+                (*m_parameters)[name] = StringUtils::toString(value);
         }
 
         /** Returns the current progress. */
@@ -160,9 +164,15 @@ namespace online{
         /** Sets the current progress. */
         void setProgress(float f) { m_progress.setAtomic(f); }
 
+        void setInfo(const irr::core::stringw & info) {m_info = info;}
+        const irr::core::stringw & getInfo() {return m_info;}
+
         const std::string &getURL() const {return m_url;}
 
         virtual bool isAllowedToAdd() OVERRIDE;
+
+        virtual void setListener(Synchronised<HTTPListener *> listener, int target = 0);
+        int getListenerTarget(){ return m_listener_target; }
 
     };
 
@@ -174,9 +184,9 @@ namespace online{
 
     public :
         XMLRequest(const std::string &url);
-        XMLNode * getResult(){ return m_result; }
+        virtual XMLNode * getResult() OVERRIDE { return m_result; }
     };
-} //namespace online
+} //namespace Online
 
 #endif
 

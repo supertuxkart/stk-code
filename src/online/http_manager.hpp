@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,7 +34,7 @@
 #include "utils/synchronised.hpp"
 #include "online/request.hpp"
 
-namespace online{
+namespace Online{
 
     /**
       * \brief Class to connect with a server over HTTP
@@ -45,7 +45,7 @@ namespace online{
         protected:
 
             /** The current requested being worked on. */
-            online::Request                  *m_current_request;
+            Online::Request                  *m_current_request;
 
             /** A conditional variable to wake up the main loop. */
             pthread_cond_t            m_cond_request;
@@ -58,9 +58,9 @@ namespace online{
 
             /** The list of pointes to all requests. */
             Synchronised< std::priority_queue <
-                                                online::Request*,
-                                                std::vector<online::Request*>,
-                                                online::Request::Compare
+                                                Online::Request*,
+                                                std::vector<Online::Request*>,
+                                                Online::Request::Compare
                                                >
                         >  m_request_queue;
 
@@ -79,16 +79,16 @@ namespace online{
             static void deallocate();
 
             //Execute
-            std::string getPage(online::Request * request);
-            XMLNode * getXMLFromPage(online::Request * request);
+            std::string getPage(Online::Request * request);
+            XMLNode * getXMLFromPage(Online::Request * request);
 
-            bool addRequest(online::Request *request);
+            bool addRequest(Online::Request *request);
             void cancelAllDownloads();
 
             bool getAbort(){ return m_abort.getAtomic(); };
 
     }; //class HTTPManager
-} // namespace online
+} // namespace Online
 
 #endif // HTTP_MANAGER_HPP
 

@@ -31,7 +31,7 @@
 
 class XMLNode;
 
-namespace online{
+namespace Online{
     /**
       * \ingroup online
       */
@@ -130,6 +130,6 @@ namespace online{
         }   // operator>
 
     };   // Server
-} // namespace online
+} // namespace Online
 
 #endif

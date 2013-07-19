@@ -16,16 +16,26 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef HTTP_LISTENER_HPP
+#define HTTP_LISTENER_HPP
 
-#include "online/user.hpp"
+#include <string>
+#include <curl/curl.h>
+#include <irrString.h>
 
-#include <sstream>
-#include <stdlib.h>
 
 namespace Online{
-    // ============================================================================
-    User::User(const irr::core::stringw &username)
+
+    class HTTPRequest;
+
+    class HTTPListener
     {
-        m_name = username;
-    }
+    public :
+        virtual ~HTTPListener() {}
+        virtual void onHTTPCallback(HTTPRequest * finished_request) {};
+    }; //class HTTPListener
 } // namespace Online
+
+#endif // HTTP_LISTENER_HPP
+
+/*EOF*/

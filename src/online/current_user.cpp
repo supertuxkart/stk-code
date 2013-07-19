@@ -27,27 +27,48 @@
 #include "utils/translation.hpp"
 #include "utils/log.hpp"
 
-namespace online{
-    static CurrentUser* user_singleton = NULL;
+namespace Online{
+    static Synchronised<CurrentUser*> user_singleton(NULL);
 
     CurrentUser* CurrentUser::get()
     {
-        if (user_singleton == NULL)
-            user_singleton = new CurrentUser();
-        return user_singleton;
+        CurrentUser* user = user_singleton.getData();
+        if (user == NULL)
+            user = new CurrentUser();
+        return user;
     }   // get
+
+    CurrentUser* CurrentUser::acquire()
+    {
+        user_singleton.lock();
+        CurrentUser * user = user_singleton.getData();
+        if (user == NULL)
+        {
+            user_singleton.unlock();
+            user = new CurrentUser();
+            user_singleton.setAtomic(user);
+            user_singleton.lock();
+        }
+        return user;
+    }
+
+    void CurrentUser::release()
+    {
+        user_singleton.unlock();
+    }
 
     void CurrentUser::deallocate()
     {
-        delete user_singleton;
-        user_singleton = NULL;
+        user_singleton.lock();
+        CurrentUser* user = user_singleton.getData();
+        delete user;
+        user = NULL;
+        user_singleton.unlock();
     }   // deallocate
 
     // ============================================================================
     CurrentUser::CurrentUser(){
-        m_is_signed_in = false;
-        m_is_guest = false;
-        m_is_server_host = false;
+        m_state = SIGNED_OUT;
         m_id = 0;
         m_name = "";
         m_token = "";
@@ -57,7 +78,8 @@ namespace online{
     // ============================================================================
     bool CurrentUser::trySavedSession()
     {
-        if (m_is_signed_in) return true;
+        if (m_state == SIGNED_IN) return true;
+        bool success = false;
         if(UserConfigParams::m_saved_session)
         {
             HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
@@ -76,11 +98,10 @@ namespace online{
                     int userid_fetched = result->get("userid", &m_id);
                     assert(token_fetched && username_fetched && userid_fetched);
                     UserConfigParams::m_saved_token = m_token;
-                    m_is_signed_in = true;
-                    m_is_guest = false;
+                    m_state = SIGNED_IN;
+                    success = true;
                 }
                 result->get("info", &info);
-                Log::info("trySavedSession","%s",info.c_str());
             }
             else
             {
@@ -88,19 +109,19 @@ namespace online{
                     _("Unable to connect to the server. Check your internet connection or try again later."));
             }
         }
-        return m_is_signed_in;
+        return success;
     }
 
     // ============================================================================
     // Register
-    bool CurrentUser::signUp( const irr::core::stringw &username,
-                                    const irr::core::stringw &password,
-                                    const irr::core::stringw &password_ver,
-                                    const irr::core::stringw &email,
-                                    bool terms,
-                                    irr::core::stringw &info)
+    bool CurrentUser::signUp(   const irr::core::stringw &username,
+                                const irr::core::stringw &password,
+                                const irr::core::stringw &password_ver,
+                                const irr::core::stringw &email,
+                                bool terms,
+                                irr::core::stringw &info)
     {
-        assert(m_is_signed_in == false);
+        assert(m_state == SIGNED_OUT || m_state == GUEST);
         HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         connector->setParameter("action",std::string("register"));
         connector->setParameter("username",username);
@@ -117,7 +138,7 @@ namespace online{
         }
         else
         {
-                info = _("Unable to connect to the server. Check your internet connection or try again later.");
+            info = _("Unable to connect to the server. Check your internet connection or try again later.");
         }
         return success;
     }
@@ -125,34 +146,40 @@ namespace online{
 
     // ============================================================================
 
-    XMLRequest * CurrentUser::signInRequest(  const irr::core::stringw &username,
-                                            const irr::core::stringw &password,
-                                            bool save_session)
+    void CurrentUser::requestSignIn(    const irr::core::stringw &username,
+                                        const irr::core::stringw &password,
+                                        bool save_session)
     {
-        assert(m_is_signed_in == false);
+        assert(m_state == SIGNED_OUT);
         m_save_session = save_session;
         XMLRequest * request = new XMLRequest((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setListener(this, CurrentUser::SIGN_IN_REQUEST);
         request->setParameter("action",std::string("connect"));
         request->setParameter("username",username);
         request->setParameter("password",password);
         if(!HTTPManager::get()->addRequest(request))
+        {
             assert(false);
-        return request;
+        }
+        m_state = SIGNING_IN;
     }
 
-    bool CurrentUser::signIn(const XMLNode * input, irr::core::stringw &info)
+    bool CurrentUser::signIn(XMLRequest * input)
     {
-        std::string rec_success = "";
-        if(input->get("success", &rec_success))
+        const XMLNode * xml = input->getResult();
+        bool success = false;
+        irr::core::stringw info;
+        std::string rec_success;
+        if(xml->get("success", &rec_success))
         {
             if (rec_success =="yes")
             {
-                int token_fetched = input->get("token", &m_token);
-                int username_fetched = input->get("username", &m_name);
-                int userid_fetched = input->get("userid", &m_id);
+                int token_fetched       = xml->get("token", &m_token);
+                int username_fetched    = xml->get("username", &m_name);
+                int userid_fetched      = xml->get("userid", &m_id);
                 assert(token_fetched && username_fetched && userid_fetched);
-                m_is_signed_in = true;
-                m_is_guest = false;
+                m_state = SIGNED_IN;
+                success = true;
                 if(m_save_session)
                 {
                     UserConfigParams::m_saved_user = m_id;
@@ -160,58 +187,64 @@ namespace online{
                     UserConfigParams::m_saved_session = true;
                 }
             }
-            input->get("info", &info);
+            xml->get("info", &info);
         }
         else
         {
             info = _("Unable to connect to the server. Check your internet connection or try again later.");
         }
-
-        return m_is_signed_in;
+        input->setInfo(info);
+        if(!success) m_state = SIGNED_OUT;
+        return success;
     }
 
     // ============================================================================
 
-    bool CurrentUser::createServer(  const irr::core::stringw &name,
-                                            int max_players,
-                                            irr::core::stringw &info)
+    XMLRequest * CurrentUser::createServerRequest ( const irr::core::stringw &name, int max_players)
     {
-        assert(m_is_signed_in && !m_is_guest);
-        HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-        connector->setParameter("action",           std::string("create_server"));
-        connector->setParameter("token",            m_token);
-        connector->setParameter("userid",           m_id);
-        connector->setParameter("name",             name);
-        connector->setParameter("max_players",      max_players);
-        const XMLNode * result = connector->getXMLFromPage();
+        assert(m_state == SIGNED_IN);
+        XMLRequest * request = new XMLRequest((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action",           std::string("create_server"));
+        request->setParameter("token",            m_token);
+        request->setParameter("userid",           m_id);
+        request->setParameter("name",             name);
+        request->setParameter("max_players",      max_players);
+        if(!HTTPManager::get()->addRequest(request))
+            assert(false);
+        return request;
+    }
+
+    bool CurrentUser::createServer( const XMLNode * input , irr::core::stringw &info)
+    {
+        bool success = false;
         std::string rec_success = "";
-        if(result->get("success", &rec_success))
+        if(input->get("success", &rec_success))
         {
            if (rec_success =="yes")
            {
                // FIXME
-               m_is_server_host = true;
+               success = true;
            }
-           result->get("info", &info);
+           input->get("info", &info);
         }
         else
         {
            info = _("Unable to connect to the server. Check your internet connection or try again later.");
         }
 
-        return m_is_server_host;
+        return success;
     }
 
 
     // ============================================================================
     bool CurrentUser::signOut(irr::core::stringw &info){
-        assert(m_is_signed_in == true);
+        assert(m_state == SIGNED_IN || m_state == GUEST);
         HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         connector->setParameter("action",std::string("disconnect"));
         connector->setParameter("token",m_token);
         connector->setParameter("userid",m_id);
 
-
+        bool success = false;
         const XMLNode * result = connector->getXMLFromPage();
         std::string rec_success = "";
         if(result->get("success", &rec_success))
@@ -221,11 +254,11 @@ namespace online{
                 m_token = "";
                 m_name = "";
                 m_id = 0;
-                m_is_signed_in = false;
-                m_is_guest = false;
+                m_state = SIGNED_OUT;
                 UserConfigParams::m_saved_user = 0;
                 UserConfigParams::m_saved_token = "";
                 UserConfigParams::m_saved_session = false;
+                success = true;
             }
             result->get("info", &info);
         }
@@ -233,13 +266,13 @@ namespace online{
         {
             info = _("Unable to connect to the server. Check your internet connection or try again later.");
         }
-        return !m_is_signed_in;
+        return success;
     }
 
     // ============================================================================
 
     bool CurrentUser::requestJoin(uint32_t server_id, irr::core::stringw &info){
-        assert(m_is_signed_in == true);
+        assert(m_state == SIGNED_IN || m_state == GUEST);
         HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
         connector->setParameter("action",std::string("request-connection"));
         connector->setParameter("token", m_token);
@@ -271,9 +304,27 @@ namespace online{
 
     irr::core::stringw CurrentUser::getUserName() const
     {
-        if(m_is_signed_in)
+        if((m_state == SIGNED_IN ) || (m_state == GUEST))
             return m_name;
         else
             return _("Currently not signed in");
     }
-} // namespace online
+
+
+    // ============================================================================
+
+
+    void CurrentUser::onHTTPCallback(HTTPRequest * finished_request)
+    {
+        XMLRequest * input = (XMLRequest *) finished_request;
+
+        switch(finished_request->getListenerTarget())
+        {
+            case CurrentUser::SIGN_IN_REQUEST:
+                 signIn(input);
+                 break;
+            default:
+                 break;
+        }
+    }
+} // namespace Online

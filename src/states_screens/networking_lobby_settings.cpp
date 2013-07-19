@@ -36,6 +36,7 @@
 
 
 using namespace GUIEngine;
+using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( NetworkingLobbySettings );
 
@@ -70,7 +71,7 @@ void NetworkingLobbySettings::loadedFromFile()
 // ----------------------------------------------------------------------------
 bool NetworkingLobbySettings::hasLostConnection()
 {
-    return !online::CurrentUser::get()->isSignedIn();
+    return !CurrentUser::get()->isSignedIn();
 }
 
 // ----------------------------------------------------------------------------
@@ -100,7 +101,7 @@ void NetworkingLobbySettings::createServer()
     const stringw name = m_name_widget->getText().trim();
     int max_players = m_max_players_widget->getValue();
     stringw info = "";
-    if(online::CurrentUser::get()->createServer(name, max_players, info))
+    /*if(online::CurrentUser::get()->createServer(name, max_players, info))
     {
         StateManager::get()->escapePressed();
         StateManager::get()->pushScreen(NetworkingLobby::getInstance());
@@ -110,7 +111,7 @@ void NetworkingLobbySettings::createServer()
         sfx_manager->quickSound( "anvil" );
         m_info_widget->setColor(irr::video::SColor(255, 255, 0, 0));
         m_info_widget->setText(info, false);
-    }
+    }*/
 }
 
 // ----------------------------------------------------------------------------

@@ -37,7 +37,7 @@
 #include "utils/translation.hpp"
 #include "online/servers_manager.hpp"
 
-using namespace online;
+using namespace Online;
 using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( NetworkingLobby );

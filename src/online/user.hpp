@@ -21,8 +21,9 @@
 
 #include <irrString.h>
 #include "utils/types.hpp"
+#include "utils/synchronised.hpp"
 
-namespace online{
+namespace Online{
 
     /**
       * \brief Class that represents an online registered user
@@ -33,10 +34,8 @@ namespace online{
         private:
 
         protected:
-
-            bool                    m_is_server_host;
-            irr::core::stringw      m_name;
-            uint32_t                m_id;
+            irr::core::stringw        m_name;
+            uint32_t                  m_id;
             User(){}
 
         public:
@@ -49,7 +48,7 @@ namespace online{
 
 
     };   // class User
-} // namespace online
+} // namespace Online
 #endif
 
 /*EOF*/

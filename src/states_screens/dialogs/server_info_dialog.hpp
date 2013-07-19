@@ -40,7 +40,7 @@ private:
     bool m_self_destroy;
     bool m_enter_lobby;
 
-    online::Server * m_server;
+    Online::Server * m_server;
 
     GUIEngine::LabelWidget * m_name_widget;
     GUIEngine::LabelWidget * m_info_widget;
@@ -52,7 +52,7 @@ private:
     void requestJoin();
 
 public:
-    ServerInfoDialog(online::Server * server);
+    ServerInfoDialog(Online::Server * server);
     ~ServerInfoDialog();
 
     void onEnterPressedInternal();

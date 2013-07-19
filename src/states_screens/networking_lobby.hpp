@@ -36,7 +36,7 @@ class NetworkingLobby :     public GUIEngine::Screen,
 private:
     friend class GUIEngine::ScreenSingleton<NetworkingLobby>;
 
-    online::Server * m_server;
+    Online::Server * m_server;
 
     NetworkingLobby();
 

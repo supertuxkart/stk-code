@@ -24,7 +24,7 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
-namespace online{
+namespace Online{
     Server::SortOrder Server::m_sort_order=Server::SO_NAME; //FIXME change to some other default
 
     Server::Server(const XMLNode & xml)
@@ -71,4 +71,4 @@ namespace online{
 
         return false;
     } // filterByWords
-} // namespace online
+} // namespace Online

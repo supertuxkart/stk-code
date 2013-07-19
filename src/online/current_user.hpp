@@ -27,35 +27,52 @@
 #include "http_manager.hpp"
 
 
-namespace online{
+namespace Online{
     // ============================================================================
 
     /**
       * \brief Class that represents an online registered user
       * \ingroup online
       */
-    class CurrentUser : public User
+    class CurrentUser : public User, HTTPListener
     {
+        public:
 
-        protected:
+            enum UserState
+            {
+                SIGNED_OUT,
+                SIGNED_IN,
+                GUEST,
+                SIGNING_IN,
+                SIGNING_OUT
+            };
+
+        private:
+            enum RequestType{
+                SIGN_IN_REQUEST
+            };
+            std::map<int, std::pair<bool, irr::core::stringw> > m_http_results;
             std::string m_token;
-            bool m_is_signed_in;
-            bool m_is_guest;
             bool m_save_session;
+            UserState m_state;
             CurrentUser();
+
+            bool signIn(XMLRequest * input);
+
 
         public:
             // singleton
             static CurrentUser* get();
             static void deallocate();
 
+            static CurrentUser* acquire();
+            static void release();
+
             bool trySavedSession();
             // Login
-            XMLRequest * signInRequest(     const irr::core::stringw &username,
-                                            const irr::core::stringw &password,
-                                            bool save_session);
-
-            bool signIn( const XMLNode * input, irr::core::stringw &info);
+            void requestSignIn(     const irr::core::stringw &username,
+                                    const irr::core::stringw &password,
+                                    bool save_session);
 
             // Register
             bool signUp(    const irr::core::stringw &username,
@@ -67,20 +84,25 @@ namespace online{
             // Logout - Best to be followed by CurrentOnlineUser::deallocate
             bool signOut(   irr::core::stringw &info);
 
-            bool createServer(  const irr::core::stringw &name,
-                                int max_players,
-                                irr::core::stringw &info);
+            XMLRequest * createServerRequest(  const irr::core::stringw &name,
+                                        int max_players);
+
+            bool createServer ( const XMLNode * input, irr::core::stringw &info);
 
             bool requestJoin(   uint32_t server_id,
                                 irr::core::stringw &info);
 
             /** Returns the username if signed in. */
             irr::core::stringw getUserName() const;
-            bool isSignedIn(){ return m_is_signed_in; }
-            bool isGuest(){ return m_is_guest; }
+            bool isSignedIn() const { return m_state == SIGNED_IN; }
+            bool isGuest() const { return m_state == GUEST; }
+            bool isSigningIn() const { return m_state == SIGNING_IN; }
+            UserState getUserState() {return m_state;}
+            void onHTTPCallback(HTTPRequest * finished_request);
 
     };   // class CurrentUser
-} // namespace online
+
+} // namespace Online
 
 #endif
 

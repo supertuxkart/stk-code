@@ -21,7 +21,7 @@
 #include <online/http_manager.hpp>
 
 
-namespace online{
+namespace Online{
 
     class HTTPManager;
 
@@ -32,7 +32,6 @@ namespace online{
         m_priority      = priority;
         m_manage_memory = manage_memory;
         m_cancel        = false;
-        m_done          = false;
     }   // Request
 
     Request::~Request()
@@ -63,20 +62,43 @@ namespace online{
         m_parameters = new Parameters;
         m_progress.setAtomic(0);
         m_added = false;
+        m_done.setAtomic(false);
+        m_listener.setAtomic(NULL);
+        m_listener_target = 0;
     }
 
     HTTPRequest::~HTTPRequest()
     {
         delete m_parameters;
+        m_listener.lock();
+        if (m_listener.getData() != NULL)
+        {
+            delete m_listener.getData();
+        }
+        m_listener.unlock();
+    }
+    void HTTPRequest::setListener(Synchronised<HTTPListener *> listener, int target)
+    {
+        m_listener = listener;
+        m_listener_target = 0;
     }
 
-    bool HTTPRequest::isAllowedToAdd(){
+    bool HTTPRequest::isAllowedToAdd()
+    {
         if (m_url.size() > 5 && ( m_url.substr(0, 5) != "http:"))
         {
             Log::info("HTTPRequest::isAllowedToAdd", "Invalid URL.");
             return false;
         }
         return true;
+    }
+
+    void HTTPRequest::afterOperation()
+    {
+        if (m_listener != NULL)
+        {
+            m_listener->onHTTPCallback(this);
+        }
     }
 
     std::string HTTPRequest::downloadPage()
@@ -198,4 +220,4 @@ namespace online{
     {
         m_result = file_manager->createXMLTreeFromString(downloadPage());
     }
-} // namespace online
+} // namespace Online
