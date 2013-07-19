@@ -72,8 +72,8 @@ namespace Online{
             static CurrentUser* acquire();
             static void release();
 
-            bool trySavedSession();
             // Login
+            SignInRequest * requestSavedSession();
             SignInRequest * requestSignIn(  const irr::core::stringw &username,
                                             const irr::core::stringw &password,
                                             bool save_session);
@@ -102,7 +102,6 @@ namespace Online{
             bool isGuest() const { return m_state == GUEST; }
             bool isSigningIn() const { return m_state == SIGNING_IN; }
             UserState getUserState() {return m_state;}
-            void onHTTPCallback(HTTPRequest * finished_request);
 
     };   // class CurrentUser
 

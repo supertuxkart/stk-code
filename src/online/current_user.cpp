@@ -76,43 +76,6 @@ namespace Online{
     }
 
     // ============================================================================
-    bool CurrentUser::trySavedSession()
-    {
-        if (m_state == SIGNED_IN) return true;
-        bool success = false;
-        if(UserConfigParams::m_saved_session)
-        {
-            HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-            connector->setParameter("action",std::string("saved-session"));
-            connector->setParameter("userid", UserConfigParams::m_saved_user);
-            connector->setParameter("token", UserConfigParams::m_saved_token.c_str());
-            const XMLNode * result = connector->getXMLFromPage();
-            std::string rec_success = "";
-            std::string info;
-            if(result->get("success", &rec_success))
-            {
-                if (rec_success =="yes")
-                {
-                    int token_fetched = result->get("token", &m_token);
-                    int username_fetched = result->get("username", &m_name);
-                    int userid_fetched = result->get("userid", &m_id);
-                    assert(token_fetched && username_fetched && userid_fetched);
-                    UserConfigParams::m_saved_token = m_token;
-                    m_state = SIGNED_IN;
-                    success = true;
-                }
-                result->get("info", &info);
-            }
-            else
-            {
-                Log::error("trySavedSession","%s",
-                    _("Unable to connect to the server. Check your internet connection or try again later."));
-            }
-        }
-        return success;
-    }
-
-    // ============================================================================
     // Register
     bool CurrentUser::signUp(   const irr::core::stringw &username,
                                 const irr::core::stringw &password,
@@ -143,12 +106,31 @@ namespace Online{
         return success;
     }
 
+    // ============================================================================
+    CurrentUser::SignInRequest * CurrentUser::requestSavedSession()
+    {
+        CurrentUser::SignInRequest * request = NULL;
+        if(m_state != SIGNED_IN  && UserConfigParams::m_saved_session)
+        {
+            request = new CurrentUser::SignInRequest((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+            request->setParameter("action",std::string("saved-session"));
+            request->setParameter("userid", UserConfigParams::m_saved_user);
+            request->setParameter("token", UserConfigParams::m_saved_token.c_str());
+            if(!HTTPManager::get()->addRequest(request))
+            {
+                assert(false);
+            }
+            m_state = SIGNING_IN;
+        }
+        return request;
+    }
+
 
     // ============================================================================
 
-    CurrentUser::SignInRequest * CurrentUser::requestSignIn( const irr::core::stringw &username,
-                                                const irr::core::stringw &password,
-                                                bool save_session)
+    CurrentUser::SignInRequest * CurrentUser::requestSignIn(    const irr::core::stringw &username,
+                                                                const irr::core::stringw &password,
+                                                                bool save_session)
     {
         assert(m_state == SIGNED_OUT);
         m_save_session = save_session;
@@ -185,6 +167,7 @@ namespace Online{
                     UserConfigParams::m_saved_user = m_id;
                     UserConfigParams::m_saved_token = m_token;
                     UserConfigParams::m_saved_session = true;
+                    m_save_session = false;
                 }
             }
             xml->get("info", &info);

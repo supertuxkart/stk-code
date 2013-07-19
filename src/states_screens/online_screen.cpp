@@ -52,9 +52,16 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 {
     m_recorded_state = CurrentUser::SIGNED_OUT;
-    CurrentUser::acquire()->trySavedSession();
+    m_sign_in_request = CurrentUser::acquire()->requestSavedSession();
     CurrentUser::release();
 }   // OnlineScreen
+
+// ----------------------------------------------------------------------------
+
+OnlineScreen::~OnlineScreen()
+{
+    delete m_sign_in_request;
+}
 
 // ----------------------------------------------------------------------------
 
@@ -145,13 +152,30 @@ void OnlineScreen::init()
 // ----------------------------------------------------------------------------
 void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
+    if (hasStateChanged())
+        GUIEngine::reshowCurrentScreen();
     if (m_recorded_state == CurrentUser::SIGNING_IN)
     {
         m_load_timer += delta;
         m_online_status_widget->setText(Messages::signingIn(m_load_timer), false);
     }
-    if (hasStateChanged())
-        GUIEngine::reshowCurrentScreen();
+    if(m_sign_in_request != NULL)
+    {
+        if(m_sign_in_request->isDone())
+        {
+            if(m_sign_in_request->isSuccess())
+            {
+                new MessageDialog(_("Automatically signed in."));
+            }
+            else
+            {
+                sfx_manager->quickSound( "anvil" );
+                new MessageDialog(m_sign_in_request->getInfo());
+            }
+            delete m_sign_in_request;
+            m_sign_in_request = NULL;
+        }
+    }
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -249,8 +273,8 @@ void OnlineScreen::setInitialFocus()
 // ----------------------------------------------------------------------------
 void OnlineScreen::onDialogClose()
 {
-    /*if (hasStateChanged())
+    if (hasStateChanged())
         GUIEngine::reshowCurrentScreen();
-    else*/
+    else
         setInitialFocus();
 }   // onDialogClose()
