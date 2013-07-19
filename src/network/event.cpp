@@ -71,7 +71,7 @@ Event::Event(ENetEvent* event)
         STKPeer* new_peer = new STKPeer();
         new_peer->m_peer = event->peer;
         *peer = new_peer;
-        Log::verbose("Event", "Creating a new peer, address are STKPeer:%ld, Peer:%ld", (long int)(new_peer), (long int)(event->peer));
+        Log::info("Event", "Creating a new peer, address are STKPeer:%lx, Peer:%lx", (long int)(new_peer), (long int)(event->peer));
     }
 }
 
