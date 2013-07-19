@@ -100,7 +100,7 @@ void KartUpdateProtocol::update()
             {
                 uint32_t id = m_karts_ids.back();
                 Vec3 pos = m_next_positions.back();
-                btTransform transform;
+                btTransform transform = m_karts[id]->getBody()->getInterpolationWorldTransform();
                 transform.setOrigin(pos);
                 m_karts[id]->getBody()->setCenterOfMassTransform(transform);
                 Log::info("KartUpdateProtocol", "Update kart %i pos to %f %f %f", id, pos[0], pos[1], pos[2]);
