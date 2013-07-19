@@ -107,13 +107,13 @@ void OnlineScreen::beforeAddingWidget()
         m_register_widget->setVisible(false);
         m_sign_in_widget->setVisible(false);
     }
-    else if (m_recorded_state == CurrentUser::SIGNED_OUT || CurrentUser::SIGNING_IN || CurrentUser::SIGNING_OUT)
+    else if (m_recorded_state == CurrentUser::SIGNED_OUT || m_recorded_state == CurrentUser::SIGNING_IN || m_recorded_state == CurrentUser::SIGNING_OUT)
     {
         m_quick_play_widget->setDeactivated();
         m_find_server_widget->setDeactivated();
         m_create_server_widget->setDeactivated();
         m_sign_out_widget->setVisible(false);
-        if(CurrentUser::SIGNING_IN || CurrentUser::SIGNING_OUT)
+        if(m_recorded_state == CurrentUser::SIGNING_IN || m_recorded_state == CurrentUser::SIGNING_OUT)
         {
             m_register_widget->setDeactivated();
             m_sign_in_widget->setDeactivated();

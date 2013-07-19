@@ -34,7 +34,7 @@ namespace Online{
       * \brief Class that represents an online registered user
       * \ingroup online
       */
-    class CurrentUser : public User, HTTPListener
+    class CurrentUser : public User
     {
         public:
 
@@ -47,17 +47,21 @@ namespace Online{
                 SIGNING_OUT
             };
 
-        private:
-            enum RequestType{
-                SIGN_IN_REQUEST
+            class SignInRequest : public XMLRequest
+            {
+            protected :
+                virtual void callback ();
+            public :
+                SignInRequest(const std::string &url) : XMLRequest(url) {}
             };
-            std::map<int, std::pair<bool, irr::core::stringw> > m_http_results;
+
+        private:
             std::string m_token;
             bool m_save_session;
             UserState m_state;
             CurrentUser();
 
-            bool signIn(XMLRequest * input);
+            void signIn(SignInRequest * input);
 
 
         public:
@@ -70,9 +74,9 @@ namespace Online{
 
             bool trySavedSession();
             // Login
-            void requestSignIn(     const irr::core::stringw &username,
-                                    const irr::core::stringw &password,
-                                    bool save_session);
+            SignInRequest * requestSignIn(  const irr::core::stringw &username,
+                                            const irr::core::stringw &password,
+                                            bool save_session);
 
             // Register
             bool signUp(    const irr::core::stringw &username,

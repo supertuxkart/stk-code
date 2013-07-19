@@ -26,6 +26,7 @@
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
+#include "online/messages.hpp"
 
 
 using namespace GUIEngine;
@@ -39,6 +40,8 @@ LoginDialog::LoginDialog(const Message message_type) :
 {
     m_self_destroy = false;
     m_open_registration_dialog = false;
+    m_load_timer = 0;
+    m_sign_in_request = NULL;
     loadFromFile("online/login_dialog.stkgui");
 
     m_info_widget = getWidget<LabelWidget>("info");
@@ -93,6 +96,7 @@ LoginDialog::LoginDialog(const Message message_type) :
 
 LoginDialog::~LoginDialog()
 {
+    delete m_sign_in_request;
 }
 
 
@@ -102,9 +106,8 @@ void LoginDialog::login()
 {
     const stringw username = m_username_widget->getText().trim();
     const stringw password = m_password_widget->getText().trim();
-    Online::CurrentUser::acquire()->requestSignIn(username,password, m_remember_widget->getState());
+    m_sign_in_request = Online::CurrentUser::acquire()->requestSignIn(username,password, m_remember_widget->getState());
     Online::CurrentUser::release();
-    m_self_destroy = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -149,7 +152,29 @@ void LoginDialog::onEnterPressedInternal()
 
 void LoginDialog::onUpdate(float dt)
 {
-
+    if(m_sign_in_request != NULL)
+    {
+        if(m_sign_in_request->isDone())
+        {
+            if(m_sign_in_request->isSuccess())
+            {
+                m_self_destroy = true;
+            }
+            else
+            {
+                sfx_manager->quickSound( "anvil" );
+                m_message_widget->setColor(irr::video::SColor(255, 255, 0, 0));
+                m_message_widget->setText(m_sign_in_request->getInfo(), false);
+            }
+            delete m_sign_in_request;
+            m_sign_in_request = NULL;
+        }
+        else
+        {
+            m_load_timer += dt;
+            m_message_widget->setText(Online::Messages::signingIn(m_load_timer), false);
+        }
+    }
     //If we want to open the registration dialog, we need to close this one first
     m_open_registration_dialog && (m_self_destroy = true);
 

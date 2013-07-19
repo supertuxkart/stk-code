@@ -23,7 +23,6 @@
 #include "utils/string_utils.hpp"
 #include "utils/synchronised.hpp"
 #include "io/file_manager.hpp"
-#include "online/http_listener.hpp"
 
 namespace Online{
 
@@ -47,9 +46,11 @@ namespace Online{
         *  be freed by the calling function. */
         bool                m_manage_memory;
 
+        Synchronised<bool>              m_done;
+
         virtual void beforeOperation() {}
         virtual void operation() = 0;
-        virtual void afterOperation() {}
+        virtual void afterOperation();
 
     public:
 
@@ -74,6 +75,8 @@ namespace Online{
         /** Returns if the memory for this object should be managed by
         *  by network_http (i.e. freed once the request is handled). */
         bool manageMemory() const { return m_manage_memory; }
+
+        bool isDone(){return m_done.getAtomic();}
 
         virtual bool isAllowedToAdd() {return true;}
 
@@ -116,11 +119,9 @@ namespace Online{
         *  packet is downloaded. At the end eithe -1 (error) or 1
         *  (everything ok) at the end. */
         Synchronised<float>             m_progress;
-        Synchronised<bool>              m_done;
         std::string                     m_url;
         bool                            m_added;
-        Synchronised<HTTPListener *>    m_listener;
-        int                             m_listener_target;
+        bool                            m_success;
         /**
          * info to show on screen if necessary
          */
@@ -139,6 +140,7 @@ namespace Online{
                                     size_t size,
                                     size_t nmemb,
                                     void *userp);
+        virtual void callback() {}
 
     public :
 
@@ -167,12 +169,12 @@ namespace Online{
         void setInfo(const irr::core::stringw & info) {m_info = info;}
         const irr::core::stringw & getInfo() {return m_info;}
 
+        void setSuccess(bool success = true){ m_success = success; }
+        bool isSuccess(){ return m_success; }
+
         const std::string &getURL() const {return m_url;}
 
         virtual bool isAllowedToAdd() OVERRIDE;
-
-        virtual void setListener(Synchronised<HTTPListener *> listener, int target = 0);
-        int getListenerTarget(){ return m_listener_target; }
 
     };
 

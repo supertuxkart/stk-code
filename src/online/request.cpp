@@ -32,6 +32,7 @@ namespace Online{
         m_priority      = priority;
         m_manage_memory = manage_memory;
         m_cancel        = false;
+        m_done.setAtomic(false);
     }   // Request
 
     Request::~Request()
@@ -43,6 +44,11 @@ namespace Online{
         beforeOperation();
         operation();
         afterOperation();
+    }
+
+    void Request::afterOperation()
+    {
+        m_done.setAtomic(true);
     }
 
     // =========================================================================================
@@ -62,25 +68,13 @@ namespace Online{
         m_parameters = new Parameters;
         m_progress.setAtomic(0);
         m_added = false;
-        m_done.setAtomic(false);
-        m_listener.setAtomic(NULL);
-        m_listener_target = 0;
+        m_info = "";
+        m_success = false;
     }
 
     HTTPRequest::~HTTPRequest()
     {
         delete m_parameters;
-        m_listener.lock();
-        if (m_listener.getData() != NULL)
-        {
-            delete m_listener.getData();
-        }
-        m_listener.unlock();
-    }
-    void HTTPRequest::setListener(Synchronised<HTTPListener *> listener, int target)
-    {
-        m_listener = listener;
-        m_listener_target = 0;
     }
 
     bool HTTPRequest::isAllowedToAdd()
@@ -95,10 +89,8 @@ namespace Online{
 
     void HTTPRequest::afterOperation()
     {
-        if (m_listener != NULL)
-        {
-            m_listener->onHTTPCallback(this);
-        }
+        callback();
+        Request::afterOperation();
     }
 
     std::string HTTPRequest::downloadPage()

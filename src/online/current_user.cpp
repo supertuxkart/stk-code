@@ -146,14 +146,13 @@ namespace Online{
 
     // ============================================================================
 
-    void CurrentUser::requestSignIn(    const irr::core::stringw &username,
-                                        const irr::core::stringw &password,
-                                        bool save_session)
+    CurrentUser::SignInRequest * CurrentUser::requestSignIn( const irr::core::stringw &username,
+                                                const irr::core::stringw &password,
+                                                bool save_session)
     {
         assert(m_state == SIGNED_OUT);
         m_save_session = save_session;
-        XMLRequest * request = new XMLRequest((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-        request->setListener(this, CurrentUser::SIGN_IN_REQUEST);
+        CurrentUser::SignInRequest * request = new CurrentUser::SignInRequest((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",std::string("connect"));
         request->setParameter("username",username);
         request->setParameter("password",password);
@@ -162,9 +161,10 @@ namespace Online{
             assert(false);
         }
         m_state = SIGNING_IN;
+        return request;
     }
 
-    bool CurrentUser::signIn(XMLRequest * input)
+    void CurrentUser::signIn(SignInRequest * input)
     {
         const XMLNode * xml = input->getResult();
         bool success = false;
@@ -194,8 +194,14 @@ namespace Online{
             info = _("Unable to connect to the server. Check your internet connection or try again later.");
         }
         input->setInfo(info);
+        input->setSuccess(success);
         if(!success) m_state = SIGNED_OUT;
-        return success;
+    }
+
+    void CurrentUser::SignInRequest::callback()
+    {
+        CurrentUser::acquire()->signIn(this);
+        CurrentUser::release();
     }
 
     // ============================================================================
@@ -310,21 +316,4 @@ namespace Online{
             return _("Currently not signed in");
     }
 
-
-    // ============================================================================
-
-
-    void CurrentUser::onHTTPCallback(HTTPRequest * finished_request)
-    {
-        XMLRequest * input = (XMLRequest *) finished_request;
-
-        switch(finished_request->getListenerTarget())
-        {
-            case CurrentUser::SIGN_IN_REQUEST:
-                 signIn(input);
-                 break;
-            default:
-                 break;
-        }
-    }
 } // namespace Online
