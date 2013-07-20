@@ -44,22 +44,22 @@ LoginDialog::LoginDialog(const Message message_type) :
     m_sign_in_request = NULL;
     loadFromFile("online/login_dialog.stkgui");
 
-    m_info_widget = getWidget<LabelWidget>("info");
-    assert(m_info_widget != NULL);
-    irr::core::stringw info;
+    m_message_widget = getWidget<LabelWidget>("message");
+    assert(m_message_widget != NULL);
+    irr::core::stringw message;
     if (message_type == Normal)
-        info =  _("Fill in your username and password. ");
+        message =  _("Fill in your username and password. ");
     else if (message_type == Signing_In_Required)
-        info =  _("You need to sign in to be able to use this feature. ");
+        message =  _("You need to sign in to be able to use this feature. ");
     else if (message_type == Registration_Required)
-        info =  _("You need to be a registered user to enjoy this feature! "
+        message =  _("You need to be a registered user to enjoy this feature! "
                   "If you do not have an account yet, you can sign up using the register icon at the bottom.");
     else
-        info = "";
+        message = "";
     if (message_type == Normal || message_type == Signing_In_Required)
-        info += _("If you do not have an account yet, you can choose to sign in as a guest "
+        message += _("If you do not have an account yet, you can choose to sign in as a guest "
                   "or press the register icon at the bottom to gain access to all the features!");
-    m_info_widget->setText(info, false);
+    m_message_widget->setText(message, false);
 
     m_username_widget = getWidget<TextBoxWidget>("username");
     assert(m_username_widget != NULL);
@@ -73,8 +73,8 @@ LoginDialog::LoginDialog(const Message message_type) :
     assert(m_remember_widget != NULL);
     m_remember_widget->setState(false);
 
-    m_message_widget = getWidget<LabelWidget>("message");
-    assert(m_message_widget != NULL);
+    m_info_widget = getWidget<LabelWidget>("info");
+    assert(m_info_widget != NULL);
 
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
@@ -163,8 +163,8 @@ void LoginDialog::onUpdate(float dt)
             else
             {
                 sfx_manager->quickSound( "anvil" );
-                m_message_widget->setColor(irr::video::SColor(255, 255, 0, 0));
-                m_message_widget->setText(m_sign_in_request->getInfo(), false);
+                m_info_widget->setErrorColor();
+                m_info_widget->setText(m_sign_in_request->getInfo(), false);
             }
             delete m_sign_in_request;
             m_sign_in_request = NULL;
@@ -172,7 +172,8 @@ void LoginDialog::onUpdate(float dt)
         else
         {
             m_load_timer += dt;
-            m_message_widget->setText(Online::Messages::signingIn(m_load_timer), false);
+            m_info_widget->setDefaultColor();
+            m_info_widget->setText(Online::Messages::signingIn(m_load_timer), false);
         }
     }
     //If we want to open the registration dialog, we need to close this one first

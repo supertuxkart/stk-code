@@ -40,11 +40,11 @@ private:
     float m_load_timer;
     Online::CurrentUser::SignInRequest * m_sign_in_request;
 
-    GUIEngine::LabelWidget * m_info_widget;
+    GUIEngine::LabelWidget * m_message_widget;
     GUIEngine::TextBoxWidget * m_username_widget;
     GUIEngine::TextBoxWidget * m_password_widget;
     GUIEngine::CheckBoxWidget * m_remember_widget;
-    GUIEngine::LabelWidget * m_message_widget;
+    GUIEngine::LabelWidget * m_info_widget;
 
     GUIEngine::RibbonWidget * m_options_widget;
     GUIEngine::IconButtonWidget * m_sign_in_widget;

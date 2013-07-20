@@ -26,6 +26,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "online/server.hpp"
+#include "online/current_user.hpp"
 
 
 /**
@@ -40,7 +41,10 @@ private:
     bool m_self_destroy;
     bool m_enter_lobby;
 
+    float m_load_timer;
+
     Online::Server * m_server;
+    Online::CurrentUser::ServerJoinRequest * m_server_join_request;
 
     GUIEngine::LabelWidget * m_name_widget;
     GUIEngine::LabelWidget * m_info_widget;

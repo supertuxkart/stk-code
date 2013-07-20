@@ -46,6 +46,16 @@ namespace Online
         {
             return irr::core::stringw(_("Signed in as : ")) + name + ".";
         }
+
+        irr::core::stringw joiningServer(float timer)
+        {
+            return irr::core::stringw(_("Joining server")) + loadingDots(timer);
+        }
+
+        irr::core::stringw creatingServer(float timer)
+        {
+            return irr::core::stringw(_("Creating server")) + loadingDots(timer);
+        }
     } // namespace messages
 } // namespace Online
 

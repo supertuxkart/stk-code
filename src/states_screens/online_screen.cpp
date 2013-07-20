@@ -239,6 +239,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     else if (selection == "quick_play")
     {
         //FIXME temporary and the request join + join sequence should be placed in one method somewhere
+            /*
         Server * server = ServersManager::get()->getQuickPlay();
         irr::core::stringw info;
         if (Online::CurrentUser::get()->requestJoin( server->getServerId(), info))
@@ -249,7 +250,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
         else
         {
             sfx_manager->quickSound( "anvil" );
-        }
+        }*/
     }
 
 }   // eventCallback

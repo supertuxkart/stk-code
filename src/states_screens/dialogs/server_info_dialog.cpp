@@ -27,8 +27,10 @@
 #include "utils/string_utils.hpp"
 #include "online/current_user.hpp"
 #include "online/servers_manager.hpp"
+#include "online/messages.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
+
 
 
 using namespace GUIEngine;
@@ -44,6 +46,8 @@ ServerInfoDialog::ServerInfoDialog(Server * server) :
     m_server = server;
     m_self_destroy = false;
     m_enter_lobby = false;
+    m_server_join_request = NULL;
+    m_load_timer = 0;
 
     loadFromFile("online/server_info_dialog.stkgui");
 
@@ -66,23 +70,13 @@ ServerInfoDialog::ServerInfoDialog(Server * server) :
 // -----------------------------------------------------------------------------
 ServerInfoDialog::~ServerInfoDialog()
 {
+    delete m_server_join_request;
 }
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::requestJoin()
 {
-    //FIXME totally not correct. Receiving an answer, not kept in mind.
-    irr::core::stringw info;
-    if (Online::CurrentUser::get()->requestJoin( m_server->getServerId(), info))
-    {
-        ServersManager::get()->setJoinedServer(m_server);
-        m_enter_lobby = true;
-    }
-    else
-    {
-        sfx_manager->quickSound( "anvil" );
-        m_info_widget->setColor(irr::video::SColor(255, 255, 0, 0));
-        m_info_widget->setText(info, false);
-    }
+    m_server_join_request = Online::CurrentUser::acquire()->requestServerJoin(m_server->getServerId());
+    Online::CurrentUser::release();
 }
 
 // -----------------------------------------------------------------------------
@@ -122,6 +116,33 @@ void ServerInfoDialog::onEnterPressedInternal()
 
 void ServerInfoDialog::onUpdate(float dt)
 {
+    if(m_server_join_request != NULL)
+    {
+        if(m_server_join_request->isDone())
+        {
+            if(m_server_join_request->isSuccess())
+            {
+                ServersManager::get()->setJoinedServer(m_server);
+                m_enter_lobby = true;
+            }
+            else
+            {
+                sfx_manager->quickSound( "anvil" );
+                m_info_widget->setErrorColor();
+                m_info_widget->setText(m_server_join_request->getInfo(), false);
+            }
+            delete m_server_join_request;
+            m_server_join_request = NULL;
+        }
+        else
+        {
+            m_load_timer += dt;
+            m_info_widget->setDefaultColor();
+            m_info_widget->setText(Online::Messages::joiningServer(m_load_timer), false);
+        }
+    }
+
+
     //If we want to open the registration dialog, we need to close this one first
     m_enter_lobby && (m_self_destroy = true);
 

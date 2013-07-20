@@ -19,6 +19,7 @@
 #include <curl/curl.h>
 #include <assert.h>
 #include <online/http_manager.hpp>
+#include <utils/translation.hpp>
 
 
 namespace Online{
@@ -68,8 +69,6 @@ namespace Online{
         m_parameters = new Parameters;
         m_progress.setAtomic(0);
         m_added = false;
-        m_info = "";
-        m_success = false;
     }
 
     HTTPRequest::~HTTPRequest()
@@ -201,8 +200,36 @@ namespace Online{
 
     // =========================================================================================
 
+    XMLRequest::XMLRequest(const std::string & url)
+        : HTTPRequest(url)
+    {
+        m_info = "";
+        m_success = false;
+        m_result = NULL;
+    }
+
+
     void XMLRequest::operation()
     {
         m_result = file_manager->createXMLTreeFromString(downloadPage());
+    }
+
+    void XMLRequest::afterOperation()
+    {
+        const XMLNode * xml = this->getResult();
+        bool success = false;
+        irr::core::stringw info;
+        std::string rec_success;
+        if(xml->get("success", &rec_success))
+        {
+            if (rec_success =="yes")
+                success = true;
+            xml->get("info", &info);
+        }
+        else
+            info = _("Unable to connect to the server. Check your internet connection or try again later.");
+        m_info = info;
+        m_success = success;
+        HTTPRequest::afterOperation();
     }
 } // namespace Online

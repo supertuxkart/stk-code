@@ -37,7 +37,6 @@ namespace Online{
     class CurrentUser : public User
     {
         public:
-
             enum UserState
             {
                 SIGNED_OUT,
@@ -57,57 +56,61 @@ namespace Online{
                 virtual void callback ();
             };
 
+            class ServerCreationRequest : public XMLRequest
+            {
+                virtual void callback ();
+            };
+
+            class ServerJoinRequest : public XMLRequest
+            {
+                virtual void callback ();
+            };
+
         private:
-            std::string m_token;
-            bool m_save_session;
-            UserState m_state;
+            std::string                 m_token;
+            bool                        m_save_session;
+            UserState                   m_state;
+
             CurrentUser();
 
-            void signIn(SignInRequest * input);
-            void signOut(SignOutRequest * input);
+            void signIn                 (const SignInRequest            * input);
+            void signOut                (const SignOutRequest           * input);
+            void createServer           (const ServerCreationRequest    * input);
 
 
         public:
-            // singleton
-            static CurrentUser* get();
-            static void deallocate();
+            static CurrentUser*         get(); //FIXME To be removed
 
-            static CurrentUser* acquire();
-            static void release();
+            //Singleton methods
+            static CurrentUser*         acquire();
+            static void                 release();
+            static void                 deallocate();
 
-            // Login
-            SignInRequest * requestSavedSession();
-            SignInRequest * requestSignIn(  const irr::core::stringw &username,
-                                            const irr::core::stringw &password,
-                                            bool save_session);
-
-            // Logout - Best to be followed by CurrentUser::deallocate
-            SignOutRequest * requestSignOut();
+            SignInRequest *             requestSavedSession();
+            SignInRequest *             requestSignIn(          const irr::core::stringw &username,
+                                                                const irr::core::stringw &password,
+                                                                bool save_session);
+            SignOutRequest *            requestSignOut();
+            ServerCreationRequest *     requestServerCreation(  const irr::core::stringw &name, int max_players);
+            ServerJoinRequest *         requestServerJoin(      uint32_t server_id);
 
 
             // Register
-            bool signUp(    const irr::core::stringw &username,
-                            const irr::core::stringw &password,
-                            const irr::core::stringw &password_ver,
-                            const irr::core::stringw &email,
-                            bool terms,
-                            irr::core::stringw &info);
+            bool                        signUp(                 const irr::core::stringw &username,
+                                                                const irr::core::stringw &password,
+                                                                const irr::core::stringw &password_ver,
+                                                                const irr::core::stringw &email,
+                                                                bool terms,
+                                                                irr::core::stringw &info);
 
 
-            XMLRequest * createServerRequest(  const irr::core::stringw &name,
-                                        int max_players);
-
-            bool createServer ( const XMLNode * input, irr::core::stringw &info);
-
-            bool requestJoin(   uint32_t server_id,
-                                irr::core::stringw &info);
 
             /** Returns the username if signed in. */
-            irr::core::stringw getUserName() const;
-            bool isSignedIn() const { return m_state == SIGNED_IN; }
-            bool isGuest() const { return m_state == GUEST; }
-            bool isSigningIn() const { return m_state == SIGNING_IN; }
-            UserState getUserState() {return m_state;}
+            irr::core::stringw          getUserName()   const;
+            bool                        isSignedIn()    const   { return m_state == SIGNED_IN; }
+            bool                        isGuest()       const   { return m_state == GUEST; }
+            bool                        isSigningIn()   const   { return m_state == SIGNING_IN; }
+            UserState                   getUserState()          { return m_state; }
 
     };   // class CurrentUser
 

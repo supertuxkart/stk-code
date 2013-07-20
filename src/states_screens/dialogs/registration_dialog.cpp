@@ -22,10 +22,6 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/widgets/button_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
-#include "guiengine/widgets/text_box_widget.hpp"
-#include "guiengine/widgets/check_box_widget.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
@@ -97,10 +93,10 @@ void RegistrationDialog::showRegistrationInfo(){
     assert(textBox != NULL);
     textBox->setText(m_email_confirm);
 
-    LabelWidget * label = getWidget<LabelWidget>("info");
-    assert(label != NULL);
-    label->setColor(irr::video::SColor(255, 255, 0, 0));
-    label->setText(m_registration_error, false);
+    m_info_widget = getWidget<LabelWidget>("info");
+    assert(m_info_widget != NULL);
+    m_info_widget->setErrorColor();
+    m_info_widget->setText(m_registration_error, false);
 
     ButtonWidget * button = getWidget<ButtonWidget>("next");
     assert(button != NULL);

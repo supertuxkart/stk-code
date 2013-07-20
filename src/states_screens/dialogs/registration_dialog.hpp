@@ -22,6 +22,7 @@
 #include <irrString.h>
 
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/widgets.hpp"
 /**
  * \brief Dialog that allows a user to register
  * \ingroup states_screens
@@ -46,6 +47,9 @@ public:
     virtual void onUpdate(float dt);
 
 private:
+
+    GUIEngine::LabelWidget * m_info_widget;
+
     Phase m_phase;
     bool m_self_destroy;
     bool m_show_registration_info;

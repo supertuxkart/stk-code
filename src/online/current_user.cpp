@@ -123,9 +123,6 @@ namespace Online{
         return request;
     }
 
-
-    // ============================================================================
-
     CurrentUser::SignInRequest * CurrentUser::requestSignIn(    const irr::core::stringw &username,
                                                                 const irr::core::stringw &password,
                                                                 bool save_session)
@@ -142,39 +139,25 @@ namespace Online{
         return request;
     }
 
-    void CurrentUser::signIn(SignInRequest * input)
+    void CurrentUser::signIn(const SignInRequest * input)
     {
-        const XMLNode * xml = input->getResult();
-        bool success = false;
-        irr::core::stringw info;
-        std::string rec_success;
-        if(xml->get("success", &rec_success))
+        if (input->isSuccess())
         {
-            if (rec_success =="yes")
+            int token_fetched       = input->getResult()->get("token", &m_token);
+            int username_fetched    = input->getResult()->get("username", &m_name);
+            int userid_fetched      = input->getResult()->get("userid", &m_id);
+            assert(token_fetched && username_fetched && userid_fetched);
+            m_state = SIGNED_IN;
+            if(m_save_session)
             {
-                int token_fetched       = xml->get("token", &m_token);
-                int username_fetched    = xml->get("username", &m_name);
-                int userid_fetched      = xml->get("userid", &m_id);
-                assert(token_fetched && username_fetched && userid_fetched);
-                m_state = SIGNED_IN;
-                success = true;
-                if(m_save_session)
-                {
-                    UserConfigParams::m_saved_user = m_id;
-                    UserConfigParams::m_saved_token = m_token;
-                    UserConfigParams::m_saved_session = true;
-                    m_save_session = false;
-                }
+                UserConfigParams::m_saved_user = m_id;
+                UserConfigParams::m_saved_token = m_token;
+                UserConfigParams::m_saved_session = true;
+                m_save_session = false;
             }
-            xml->get("info", &info);
         }
         else
-        {
-            info = _("Unable to connect to the server. Check your internet connection or try again later.");
-        }
-        input->setInfo(info);
-        input->setSuccess(success);
-        if(!success) m_state = SIGNED_OUT;
+            m_state = SIGNED_OUT;
     }
 
     void CurrentUser::SignInRequest::callback()
@@ -185,10 +168,10 @@ namespace Online{
 
     // ============================================================================
 
-    XMLRequest * CurrentUser::createServerRequest ( const irr::core::stringw &name, int max_players)
+    CurrentUser::ServerCreationRequest * CurrentUser::requestServerCreation(const irr::core::stringw &name, int max_players)
     {
         assert(m_state == SIGNED_IN);
-        XMLRequest * request = NULL;//new XMLRequest();
+        ServerCreationRequest * request = new ServerCreationRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",           std::string("create_server"));
         request->setParameter("token",            m_token);
@@ -199,25 +182,9 @@ namespace Online{
         return request;
     }
 
-    bool CurrentUser::createServer( const XMLNode * input , irr::core::stringw &info)
+    void CurrentUser::ServerCreationRequest::callback()
     {
-        bool success = false;
-        std::string rec_success = "";
-        if(input->get("success", &rec_success))
-        {
-           if (rec_success =="yes")
-           {
-               // FIXME
-               success = true;
-           }
-           input->get("info", &info);
-        }
-        else
-        {
-           info = _("Unable to connect to the server. Check your internet connection or try again later.");
-        }
-
-        return success;
+        //FIXME To be filled in
     }
 
 
@@ -234,16 +201,9 @@ namespace Online{
         return request;
     }
 
-    void CurrentUser::signOut(SignOutRequest * input)
+    void CurrentUser::signOut(const SignOutRequest * input)
     {
-        const XMLNode * xml = input->getResult();
-        irr::core::stringw info;
-        std::string rec_success;
-        if(xml->get("success", &rec_success) && (rec_success =="yes"))
-        {
-            xml->get("info", &info);
-        }
-        else
+        if(!input->isSuccess())
         {
             Log::warn("CurrentUser::signOut", "%s", _("There were some connection issues while signing out. Report a bug if this caused issues."));
         }
@@ -254,8 +214,6 @@ namespace Online{
         UserConfigParams::m_saved_user = 0;
         UserConfigParams::m_saved_token = "";
         UserConfigParams::m_saved_session = false;
-        input->setInfo(info);
-        input->setSuccess(true);
     }
 
     void CurrentUser::SignOutRequest::callback()
@@ -266,33 +224,20 @@ namespace Online{
 
     // ============================================================================
 
-    bool CurrentUser::requestJoin(uint32_t server_id, irr::core::stringw &info){
+    CurrentUser::ServerJoinRequest *  CurrentUser::requestServerJoin(uint32_t server_id){
         assert(m_state == SIGNED_IN || m_state == GUEST);
-        HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-        connector->setParameter("action",std::string("request-connection"));
-        connector->setParameter("token", m_token);
-        connector->setParameter("id", m_id);
-        connector->setParameter("server_id", server_id);
-        bool success = false;
-        const XMLNode * result = connector->getXMLFromPage();
-        std::string rec_success = "";
-        if(result->get("success", &rec_success))
-        {
-            if (rec_success =="yes")
-            {
-                success = true;
-            }
-            else
-            {
-                success = false;
-            }
-            result->get("info", &info);
-        }
-        else
-        {
-            info = _("Unable to connect to the server. Check your internet connection or try again later.");
-        }
-        return success;
+        CurrentUser::ServerJoinRequest * request = new CurrentUser::ServerJoinRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+        request->setParameter("action",std::string("request-connection"));
+        request->setParameter("token", m_token);
+        request->setParameter("id", m_id);
+        request->setParameter("server_id", server_id);
+        return request;
+    }
+
+    void CurrentUser::ServerJoinRequest::callback()
+    {
+        //FIXME To be filled in
     }
 
     // ============================================================================

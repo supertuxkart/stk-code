@@ -121,11 +121,6 @@ namespace Online{
         Synchronised<float>             m_progress;
         std::string                     m_url;
         bool                            m_added;
-        bool                            m_success;
-        /**
-         * info to show on screen if necessary
-         */
-        irr::core::stringw  m_info;
 
         virtual void afterOperation();
         std::string downloadPage();
@@ -166,12 +161,6 @@ namespace Online{
         /** Sets the current progress. */
         void setProgress(float f) { m_progress.setAtomic(f); }
 
-        void setInfo(const irr::core::stringw & info) {m_info = info;}
-        const irr::core::stringw & getInfo() {return m_info;}
-
-        void setSuccess(bool success = true){ m_success = success; }
-        bool isSuccess(){ return m_success; }
-
         const std::string &getURL() const {return m_url;}
         void setURL(const std::string & url) { m_url = url;}
 
@@ -182,12 +171,21 @@ namespace Online{
     class XMLRequest : public HTTPRequest
     {
     protected :
-        XMLNode * m_result;
-        virtual void operation() OVERRIDE;
+
+        XMLNode *                       m_result;
+        irr::core::stringw              m_info;
+        bool                            m_success;
+
+        virtual void                    operation() OVERRIDE;
+        virtual void                    afterOperation() OVERRIDE;
 
     public :
-        XMLRequest(const std::string & url = "") : HTTPRequest(url) {};
-        virtual XMLNode * getResult() OVERRIDE { return m_result; }
+        XMLRequest(const std::string & url = "");
+
+        virtual XMLNode *               getResult() const       { return m_result; }
+        const irr::core::stringw &      getInfo()   const       { return m_info; }
+        bool                            isSuccess() const       { return m_success; }
+
     };
 } //namespace Online
 
