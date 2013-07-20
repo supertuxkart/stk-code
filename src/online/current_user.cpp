@@ -112,14 +112,12 @@ namespace Online{
         CurrentUser::SignInRequest * request = NULL;
         if(m_state != SIGNED_IN  && UserConfigParams::m_saved_session)
         {
-            request = new CurrentUser::SignInRequest((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+            request = new CurrentUser::SignInRequest();
+            request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
             request->setParameter("action",std::string("saved-session"));
             request->setParameter("userid", UserConfigParams::m_saved_user);
             request->setParameter("token", UserConfigParams::m_saved_token.c_str());
-            if(!HTTPManager::get()->addRequest(request))
-            {
-                assert(false);
-            }
+            HTTPManager::get()->addRequest(request);
             m_state = SIGNING_IN;
         }
         return request;
@@ -134,14 +132,12 @@ namespace Online{
     {
         assert(m_state == SIGNED_OUT);
         m_save_session = save_session;
-        CurrentUser::SignInRequest * request = new CurrentUser::SignInRequest((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        CurrentUser::SignInRequest * request = new CurrentUser::SignInRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",std::string("connect"));
         request->setParameter("username",username);
         request->setParameter("password",password);
-        if(!HTTPManager::get()->addRequest(request))
-        {
-            assert(false);
-        }
+        HTTPManager::get()->addRequest(request);
         m_state = SIGNING_IN;
         return request;
     }
@@ -192,14 +188,14 @@ namespace Online{
     XMLRequest * CurrentUser::createServerRequest ( const irr::core::stringw &name, int max_players)
     {
         assert(m_state == SIGNED_IN);
-        XMLRequest * request = new XMLRequest((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        XMLRequest * request = NULL;//new XMLRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",           std::string("create_server"));
         request->setParameter("token",            m_token);
         request->setParameter("userid",           m_id);
         request->setParameter("name",             name);
         request->setParameter("max_players",      max_players);
-        if(!HTTPManager::get()->addRequest(request))
-            assert(false);
+        HTTPManager::get()->addRequest(request);
         return request;
     }
 
@@ -226,36 +222,46 @@ namespace Online{
 
 
     // ============================================================================
-    bool CurrentUser::signOut(irr::core::stringw &info){
+    CurrentUser::SignOutRequest * CurrentUser::requestSignOut(){
         assert(m_state == SIGNED_IN || m_state == GUEST);
-        HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-        connector->setParameter("action",std::string("disconnect"));
-        connector->setParameter("token",m_token);
-        connector->setParameter("userid",m_id);
+        CurrentUser::SignOutRequest * request = new CurrentUser::SignOutRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action",std::string("disconnect"));
+        request->setParameter("token",m_token);
+        request->setParameter("userid",m_id);
+        HTTPManager::get()->addRequest(request);
+        m_state = SIGNING_OUT;
+        return request;
+    }
 
-        bool success = false;
-        const XMLNode * result = connector->getXMLFromPage();
-        std::string rec_success = "";
-        if(result->get("success", &rec_success))
+    void CurrentUser::signOut(SignOutRequest * input)
+    {
+        const XMLNode * xml = input->getResult();
+        irr::core::stringw info;
+        std::string rec_success;
+        if(xml->get("success", &rec_success) && (rec_success =="yes"))
         {
-            if (rec_success =="yes")
-            {
-                m_token = "";
-                m_name = "";
-                m_id = 0;
-                m_state = SIGNED_OUT;
-                UserConfigParams::m_saved_user = 0;
-                UserConfigParams::m_saved_token = "";
-                UserConfigParams::m_saved_session = false;
-                success = true;
-            }
-            result->get("info", &info);
+            xml->get("info", &info);
         }
         else
         {
-            info = _("Unable to connect to the server. Check your internet connection or try again later.");
+            Log::warn("CurrentUser::signOut", "%s", _("There were some connection issues while signing out. Report a bug if this caused issues."));
         }
-        return success;
+        m_token = "";
+        m_name = "";
+        m_id = 0;
+        m_state = SIGNED_OUT;
+        UserConfigParams::m_saved_user = 0;
+        UserConfigParams::m_saved_token = "";
+        UserConfigParams::m_saved_session = false;
+        input->setInfo(info);
+        input->setSuccess(true);
+    }
+
+    void CurrentUser::SignOutRequest::callback()
+    {
+        CurrentUser::acquire()->signOut(this);
+        CurrentUser::release();
     }
 
     // ============================================================================

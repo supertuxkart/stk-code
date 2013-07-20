@@ -63,6 +63,7 @@ namespace Online{
     HTTPManager::HTTPManager(){
         curl_global_init(CURL_GLOBAL_DEFAULT);
         pthread_cond_init(&m_cond_request, NULL);
+        m_abort.setAtomic(false);
     }
 
     // ============================================================================
@@ -140,24 +141,14 @@ namespace Online{
      *  sorted by priority.
      *  \param request The pointer to the new request to insert.
      */
-    bool HTTPManager::addRequest(Online::Request *request)
+    void HTTPManager::addRequest(Online::Request *request)
     {
-        if (request->isAllowedToAdd())
-        {
-            m_request_queue.lock();
-
-            m_request_queue.getData().push(request);
-            // Wake up the network http thread
-            pthread_cond_signal(&m_cond_request);
-
-            m_request_queue.unlock();
-            return true;
-        }
-        else
-        {
-            Log::info("HTTPManager::addrequest", "Did not add request.");
-            return false;
-        }
+        assert(request->isAllowedToAdd());
+        m_request_queue.lock();
+        m_request_queue.getData().push(request);
+        // Wake up the network http thread
+        pthread_cond_signal(&m_cond_request);
+        m_request_queue.unlock();
     }   // insertRequest
 
     // ---------------------------------------------------------------------------

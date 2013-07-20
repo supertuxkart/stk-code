@@ -82,7 +82,7 @@ namespace Online{
             std::string getPage(Online::Request * request);
             XMLNode * getXMLFromPage(Online::Request * request);
 
-            bool addRequest(Online::Request *request);
+            void addRequest(Online::Request *request);
             void cancelAllDownloads();
 
             bool getAbort(){ return m_abort.getAtomic(); };

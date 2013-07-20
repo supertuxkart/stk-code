@@ -144,7 +144,7 @@ namespace Online{
 
     public :
 
-        HTTPRequest(const std::string &url);
+        HTTPRequest(const std::string & url = "");
         virtual ~HTTPRequest();
 
         void setParameter(const std::string & name, const std::string &value){
@@ -173,6 +173,7 @@ namespace Online{
         bool isSuccess(){ return m_success; }
 
         const std::string &getURL() const {return m_url;}
+        void setURL(const std::string & url) { m_url = url;}
 
         virtual bool isAllowedToAdd() OVERRIDE;
 
@@ -185,7 +186,7 @@ namespace Online{
         virtual void operation() OVERRIDE;
 
     public :
-        XMLRequest(const std::string &url);
+        XMLRequest(const std::string & url = "") : HTTPRequest(url) {};
         virtual XMLNode * getResult() OVERRIDE { return m_result; }
     };
 } //namespace Online

@@ -61,7 +61,7 @@ namespace Online{
 
     // =========================================================================================
 
-    HTTPRequest::HTTPRequest(const std::string &url)
+    HTTPRequest::HTTPRequest(const std::string & url)
         : Request(1,false)
     {
         m_url = url;
@@ -80,10 +80,7 @@ namespace Online{
     bool HTTPRequest::isAllowedToAdd()
     {
         if (m_url.size() > 5 && ( m_url.substr(0, 5) != "http:"))
-        {
-            Log::info("HTTPRequest::isAllowedToAdd", "Invalid URL.");
             return false;
-        }
         return true;
     }
 
@@ -203,10 +200,6 @@ namespace Online{
 
 
     // =========================================================================================
-    XMLRequest::XMLRequest(const std::string &url)
-        : HTTPRequest(url)
-    {
-    }
 
     void XMLRequest::operation()
     {

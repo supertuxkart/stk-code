@@ -54,7 +54,8 @@ private:
     Online::CurrentUser::UserState m_recorded_state;
 
     float m_load_timer;
-    Online::CurrentUser::SignInRequest * m_sign_in_request;
+
+    PtrVector<Online::XMLRequest> m_requests;
 
     /** \brief Checks if the recorded state differs from the actual state and sets it. */
     bool hasStateChanged();

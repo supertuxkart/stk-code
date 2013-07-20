@@ -49,10 +49,12 @@ namespace Online{
 
             class SignInRequest : public XMLRequest
             {
-            protected :
                 virtual void callback ();
-            public :
-                SignInRequest(const std::string &url) : XMLRequest(url) {}
+            };
+
+            class SignOutRequest : public XMLRequest
+            {
+                virtual void callback ();
             };
 
         private:
@@ -62,6 +64,7 @@ namespace Online{
             CurrentUser();
 
             void signIn(SignInRequest * input);
+            void signOut(SignOutRequest * input);
 
 
         public:
@@ -78,6 +81,10 @@ namespace Online{
                                             const irr::core::stringw &password,
                                             bool save_session);
 
+            // Logout - Best to be followed by CurrentUser::deallocate
+            SignOutRequest * requestSignOut();
+
+
             // Register
             bool signUp(    const irr::core::stringw &username,
                             const irr::core::stringw &password,
@@ -85,8 +92,7 @@ namespace Online{
                             const irr::core::stringw &email,
                             bool terms,
                             irr::core::stringw &info);
-            // Logout - Best to be followed by CurrentOnlineUser::deallocate
-            bool signOut(   irr::core::stringw &info);
+
 
             XMLRequest * createServerRequest(  const irr::core::stringw &name,
                                         int max_players);
