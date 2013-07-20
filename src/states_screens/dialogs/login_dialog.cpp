@@ -106,8 +106,18 @@ void LoginDialog::login()
 {
     const stringw username = m_username_widget->getText().trim();
     const stringw password = m_password_widget->getText().trim();
-    m_sign_in_request = Online::CurrentUser::acquire()->requestSignIn(username,password, m_remember_widget->getState());
-    Online::CurrentUser::release();
+    if (username.size() < 4 || username.size() > 30 || password.size() < 8 || password.size() > 30)
+    {
+        sfx_manager->quickSound("anvil");
+        m_info_widget->setErrorColor();
+        m_info_widget->setText(_("Username and/or password invalid."), false);
+    }
+    else
+    {
+        m_options_widget->setDeactivated();
+        m_sign_in_request = Online::CurrentUser::acquire()->requestSignIn(username,password, m_remember_widget->getState());
+        Online::CurrentUser::release();
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -145,7 +155,8 @@ void LoginDialog::onEnterPressedInternal()
     const int playerID = PLAYER_ID_GAME_MASTER;
     if (GUIEngine::isFocusedForPlayer(m_options_widget, playerID))
         return;
-    login();
+    if (m_sign_in_widget->isActivated())
+        login();
 }
 
 // -----------------------------------------------------------------------------
@@ -166,6 +177,7 @@ void LoginDialog::onUpdate(float dt)
                 m_info_widget->setErrorColor();
                 m_info_widget->setText(m_sign_in_request->getInfo(), false);
             }
+            m_options_widget->setActivated();
             delete m_sign_in_request;
             m_sign_in_request = NULL;
         }
