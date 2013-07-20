@@ -93,7 +93,7 @@ void NetworkManager::notifyEvent(Event* event)
     if (event->type == EVENT_TYPE_CONNECTED)
     {
         Log::info("NetworkManager", "A client has just connected. There are now %lu peers.", m_peers.size() + 1);
-        Log::info("NetworkManager", "Addresses are : %lx, %lx, %lx", event->peer, *event->peer, peer);
+        Log::debug("NetworkManager", "Addresses are : %lx, %lx, %lx", event->peer, *event->peer, peer);
         // create the new peer:
         m_peers.push_back(peer);
     }

@@ -99,6 +99,12 @@ class NetworkString
             return *this;
         }
         inline NetworkString& ad(const double& value) { return addDouble(value); }
+        NetworkString& addChar(const char& value)
+        {
+            m_string.push_back((uint8_t)(value));
+            return *this;
+        }
+        inline NetworkString& ac(const char& value) { return addChar(value); }
 
         NetworkString& addString(const std::string& value)
         {

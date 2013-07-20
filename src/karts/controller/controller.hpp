@@ -101,6 +101,9 @@ public:
     /** Called whan this controller's kart finishes the last lap. */
     virtual void  finishedRace(float time) = 0;
     // ------------------------------------------------------------------------
+    /** Get a pointer on the kart controls. */
+    virtual KartControl* getControls() { return m_controls; }
+    // ------------------------------------------------------------------------
 };   // Controller
 
 #endif

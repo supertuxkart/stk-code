@@ -37,6 +37,8 @@ enum PROTOCOL_TYPE
     PROTOCOL_START_GAME = 3,    //!< Protocol used when starting the game.
     PROTOCOL_SYNCHRONIZATION = 4,//!<Protocol used to synchronize clocks.
     PROTOCOL_KART_UPDATE = 5,   //!< Protocol to update karts position, rotation etc...
+    PROTOCOL_GAME_EVENTS = 6,   //!< Protocol to communicate the game events.
+    PROTOCOL_CONTROLLER_EVENTS = 7,//!< Protocol to transfer controller modifications
     PROTOCOL_SILENT = 0xffff    //!< Used for protocols that do not subscribe to any network event.
 };
 

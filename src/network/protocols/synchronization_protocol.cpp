@@ -2,6 +2,7 @@
 
 #include "network/network_manager.hpp"
 #include "network/protocols/kart_update_protocol.hpp"
+#include "network/protocols/controller_events_protocol.hpp"
 #include "utils/time.hpp"
 
 //-----------------------------------------------------------------------------
@@ -38,7 +39,7 @@ void SynchronizationProtocol::notifyEvent(Event* event)
         Log::warn("SynchronizationProtocol", "Received a message too short.");
         return;
     }
-    uint8_t talk_id = event->data.gui8(0);
+    uint8_t talk_id = event->data.gui8();
     uint32_t token = event->data.gui32(1);
     uint32_t request = event->data.gui8(5);
     uint32_t sequence = event->data.gui32(6);
@@ -129,6 +130,7 @@ void SynchronizationProtocol::asynchronousUpdate()
             m_has_quit = true;
             Log::info("SynchronizationProtocol", "Countdown finished. Starting now.");
             m_listener->requestStart(new KartUpdateProtocol());
+            m_listener->requestStart(new ControllerEventsProtocol());
             m_listener->requestTerminate(this);
             return;
         }

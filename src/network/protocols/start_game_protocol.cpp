@@ -39,7 +39,7 @@ void StartGameProtocol::notifyEvent(Event* event)
         Log::error("StartGameProtocol", "Too short message.");
         return;
     }
-    uint32_t token = event->data.gui32(0);
+    uint32_t token = event->data.gui32();
     uint8_t ready = event->data.gui8(4);
     STKPeer* peer = (*(event->peer));
     if (peer->getClientServerToken() != token)

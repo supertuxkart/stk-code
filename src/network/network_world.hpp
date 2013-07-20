@@ -6,7 +6,6 @@
 #include <map>
 
 class Controller;
-//class InputEventProtocol;
 class KartUpdateProtocol;
 class AbstractKart;
 
@@ -29,7 +28,6 @@ class NetworkWorld : public Singleton<NetworkWorld>
     protected:
         bool m_running;
         float m_race_time;
-        //std::map<Controller*, InputEventProtocol*> m_events_map;
 
     private:
         NetworkWorld();

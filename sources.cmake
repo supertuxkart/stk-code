@@ -149,6 +149,8 @@ src/network/protocol_manager.cpp
 src/network/protocols/client_lobby_room_protocol.cpp
 src/network/protocols/connect_to_peer.cpp
 src/network/protocols/connect_to_server.cpp
+src/network/protocols/controller_events_protocol.cpp
+src/network/protocols/game_events_protocol.cpp
 src/network/protocols/get_peer_address.cpp
 src/network/protocols/get_public_address.cpp
 src/network/protocols/hide_public_address.cpp
@@ -427,8 +429,10 @@ src/network/protocol_manager.hpp
 src/network/protocols/client_lobby_room_protocol.hpp
 src/network/protocols/connect_to_peer.hpp
 src/network/protocols/connect_to_server.hpp
+src/network/protocols/controller_events_protocol.hpp
 src/network/protocols/get_peer_address.hpp
 src/network/protocols/get_public_address.hpp
+src/network/protocols/game_events_protocol.hpp
 src/network/protocols/hide_public_address.hpp
 src/network/protocols/kart_update_protocol.hpp
 src/network/protocols/lobby_room_protocol.hpp
