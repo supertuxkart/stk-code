@@ -169,6 +169,7 @@
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
+#include "online/http_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -1211,6 +1212,8 @@ void cleanSuperTuxKart()
 
     if(INetworkHttp::get())
         INetworkHttp::get()->stopNetworkThread();
+    if(Online::HTTPManager::isRunning())
+        Online::HTTPManager::get()->stopNetworkThread();
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
     Referee::cleanup();

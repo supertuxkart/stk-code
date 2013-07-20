@@ -59,6 +59,11 @@ namespace Online{
         http_singleton = NULL;
     }   // deallocate
 
+    bool HTTPManager::isRunning()
+    {
+        return http_singleton != NULL;
+    }
+
 
     HTTPManager::HTTPManager(){
         curl_global_init(CURL_GLOBAL_DEFAULT);

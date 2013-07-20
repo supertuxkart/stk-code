@@ -45,7 +45,7 @@ namespace Online{
         protected:
 
             /** The current requested being worked on. */
-            Online::Request                  *m_current_request;
+            Online::Request *         m_current_request;
 
             /** A conditional variable to wake up the main loop. */
             pthread_cond_t            m_cond_request;
@@ -66,8 +66,6 @@ namespace Online{
 
             static void  *mainLoop(void *obj);
             void startNetworkThread();
-            void stopNetworkThread();
-
 
             HTTPManager(); //const std::string &url
             ~HTTPManager();
@@ -77,6 +75,7 @@ namespace Online{
             // singleton
             static HTTPManager* get();
             static void deallocate();
+            static bool isRunning();
 
             //Execute
             std::string getPage(Online::Request * request);
@@ -84,6 +83,7 @@ namespace Online{
 
             void addRequest(Online::Request *request);
             void cancelAllDownloads();
+            void stopNetworkThread();
 
             bool getAbort(){ return m_abort.getAtomic(); };
 
