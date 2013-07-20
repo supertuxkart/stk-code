@@ -323,10 +323,10 @@ void SoccerWorld::initKartList()
 		scene::ISceneNode *hatNode;
 		if(race_manager->getLocalKartInfo(i).getSoccerTeam() == SOCCER_TEAM_RED)
 			hatNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3,0.3)
-			,redTeamTexture,m_karts[i]->getKartModel()->getAnimatedNode()->getJointNode("Head"), true);
+			,redTeamTexture,m_karts[i]->getNode(), true);
 		else
 			hatNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3,0.3)
-			,blueTeamTexture,m_karts[i]->getKartModel()->getAnimatedNode()->getJointNode("Head"),true);
+			,blueTeamTexture,m_karts[i]->getNode(),true);
 		hatNode->setPosition(m_karts[i]->getKartModel()->getHatOffset());
 	}
 
