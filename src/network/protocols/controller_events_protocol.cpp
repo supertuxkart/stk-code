@@ -44,6 +44,15 @@ void ControllerEventsProtocol::setup()
                 }
             }
         }
+        else
+        {
+            if (peers.size() > 0)
+                peer = peers[0];
+        }
+        if (peer == NULL)
+        {
+            Log::error("ControllerEventsProtocol", "Couldn't find the peer corresponding to the kart.");
+        }
         m_controllers.push_back(std::pair<Controller*, STKPeer*>(karts[i]->getController(), peer));
     }
 }
@@ -54,7 +63,7 @@ void ControllerEventsProtocol::notifyEvent(Event* event)
 {
     if (event->data.size() < 13)
     {
-        Log::error("ControllerEventsProtocol", "The data supplied was not complete.");
+        Log::error("ControllerEventsProtocol", "The data supplied was not complete. Size was %d.", event->data.size());
         return;
     }
     uint32_t token = event->data.gui32();
@@ -69,9 +78,9 @@ void ControllerEventsProtocol::notifyEvent(Event* event)
     float event_timestamp = ns.getFloat();
     ns.removeFront(4);
     uint8_t client_index = 0;
-    while (ns.size() == 5)
+    while (ns.size() == 9)
     {
-        uint8_t controller_index = ns.gui8(0);
+        uint8_t controller_index = ns.gui8();
         client_index = controller_index;
         uint8_t serialized_1 = ns.gui8(1), serialized_2 = ns.gui8(2), serialized_3 = ns.gui8(3);
         PlayerAction action  = (PlayerAction)(ns.gui8(4));
@@ -86,9 +95,9 @@ void ControllerEventsProtocol::notifyEvent(Event* event)
         controls->m_skid        = KartControl::SkidControl(serialized_1 & 0b00000011);
 
         m_controllers[controller_index].first->action(action, action_value);
-        ns.removeFront(5);
+        ns.removeFront(9);
     }
-    if (ns.size() > 0 && ns.size() != 5)
+    if (ns.size() > 0 && ns.size() != 9)
     {
         Log::warn("ControllerEventProtocol", "The data seems corrupted.");
     }

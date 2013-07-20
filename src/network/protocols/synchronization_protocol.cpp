@@ -129,7 +129,7 @@ void SynchronizationProtocol::asynchronousUpdate()
         {
             m_has_quit = true;
             Log::info("SynchronizationProtocol", "Countdown finished. Starting now.");
-            m_listener->requestStart(new KartUpdateProtocol());
+//            m_listener->requestStart(new KartUpdateProtocol());
             m_listener->requestStart(new ControllerEventsProtocol());
             m_listener->requestTerminate(this);
             return;

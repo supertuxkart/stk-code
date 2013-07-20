@@ -77,7 +77,7 @@ void KartUpdateProtocol::update()
                 Vec3 v = kart->getXYZ();
                 ns.ai32( kart->getWorldKartId());
                 ns.af(v[0]).af(v[1]).af(v[2]);
-                Log::info("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
+                Log::verbose("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
             }
             m_listener->sendMessage(this, ns, false);
         }
@@ -89,7 +89,7 @@ void KartUpdateProtocol::update()
             ns.af( World::getWorld()->getTime());
             ns.ai32( kart->getWorldKartId());
             ns.af(v[0]).af(v[1]).af(v[2]);
-            Log::info("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
+            Log::verbose("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
             m_listener->sendMessage(this, ns, false);
         }
     }
@@ -105,7 +105,7 @@ void KartUpdateProtocol::update()
                     btTransform transform = m_karts[id]->getBody()->getInterpolationWorldTransform();
                     transform.setOrigin(pos);
                         m_karts[id]->getBody()->setCenterOfMassTransform(transform);
-                    Log::info("KartUpdateProtocol", "Update kart %i pos to %f %f %f", id, pos[0], pos[1], pos[2]);
+                    Log::verbose("KartUpdateProtocol", "Update kart %i pos to %f %f %f", id, pos[0], pos[1], pos[2]);
                 }
                 m_next_positions.pop_back();
                 m_karts_ids.pop_back();
