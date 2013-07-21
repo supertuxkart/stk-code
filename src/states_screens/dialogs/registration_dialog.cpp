@@ -25,18 +25,19 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "online/current_user.hpp"
 
 
 using namespace GUIEngine;
 using namespace irr;
 using namespace irr::gui;
+using namespace Online;
 
 // -----------------------------------------------------------------------------
 
 RegistrationDialog::RegistrationDialog(const Phase phase) :
         ModalDialog(0.8f,0.9f)
 {
+    m_sign_up_request = NULL;
     m_self_destroy = false;
     m_show_registration_info = false;
     m_show_registration_terms = false;
@@ -93,10 +94,10 @@ void RegistrationDialog::showRegistrationInfo(){
     assert(textBox != NULL);
     textBox->setText(m_email_confirm);
 
-    m_info_widget = getWidget<LabelWidget>("info");
-    assert(m_info_widget != NULL);
-    m_info_widget->setErrorColor();
-    m_info_widget->setText(m_registration_error, false);
+    LabelWidget* label = getWidget<LabelWidget>("info");
+    assert(label != NULL);
+    label->setErrorColor();
+    label->setText(m_registration_error, false);
 
     ButtonWidget * button = getWidget<ButtonWidget>("next");
     assert(button != NULL);
@@ -143,36 +144,38 @@ bool RegistrationDialog::processInfoEvent(const std::string& eventSource){
             m_password_confirm =  getWidget<TextBoxWidget>("password_confirm")->getText().trim();
             m_email = getWidget<TextBoxWidget>("email")->getText().trim();
             m_email_confirm = getWidget<TextBoxWidget>("email_confirm")->getText().trim();
+            LabelWidget * info_widget = getWidget<LabelWidget>("info");
             //FIXME More validation of registration information
             if (m_password != m_password_confirm)
             {
-                getWidget<LabelWidget>("info")->setText(_("Passwords don't match!"), false);
+                info_widget->setText(_("Passwords don't match!"), false);
                 sfx_manager->quickSound( "anvil" );
             }
             else if (m_email != m_email_confirm)
             {
-                getWidget<LabelWidget>("info")->setText(_("Emails don't match!"), false);
+                info_widget->setText(_("Emails don't match!"), false);
                 sfx_manager->quickSound( "anvil" );
             }
-            else if (m_username.size() < 5 || m_username.size() > 30)
+            else if (m_username.size() < 4 || m_username.size() > 30)
             {
-                getWidget<LabelWidget>("info")->setText(_("Username has to be between 5 and 30 characters long!"), false);
+                info_widget->setText(_("Username has to be between 5 and 30 characters long!"), false);
                 sfx_manager->quickSound( "anvil" );
             }
             else if (m_password.size() < 8 || m_password.size() > 30)
             {
-                getWidget<LabelWidget>("info")->setText(_("Password has to be between 5 and 30 characters long!"), false);
+                info_widget->setText(_("Password has to be between 5 and 30 characters long!"), false);
                 sfx_manager->quickSound( "anvil" );
             }
-            else if (m_email.size() < 5 || m_email.size() > 50)
+            else if (m_email.size() < 4 || m_email.size() > 50)
             {
-                getWidget<LabelWidget>("info")->setText(_("Email has to be between 5 and 50 characters long!"), false);
-                sfx_manager->quickSound( "anvil" );
+                info_widget->setText(_("Email has to be between 5 and 50 characters long!"), false);
             }
             else
             {
                 m_show_registration_terms = true;
+                return true;
             }
+            sfx_manager->quickSound( "anvil" );
             return true;
         }
     }
@@ -188,15 +191,7 @@ bool RegistrationDialog::processTermsEvent(const std::string& eventSource){
         {
             assert(getWidget<CheckBoxWidget>("accepted")->getState());
             m_agreement = true;
-            if(Online::CurrentUser::get()->signUp(m_username, m_password, m_password_confirm, m_email, true, m_registration_error))
-            {
-                m_show_registration_activation = true;
-                m_registration_error = "";
-            }
-            else
-            {
-                m_show_registration_info = true;
-            }
+            m_sign_up_request = CurrentUser::acquire()->requestSignUp(m_username, m_password, m_password_confirm, m_email, m_agreement);
             return true;
         }
         else if (eventSource == "accepted")
@@ -279,15 +274,38 @@ void RegistrationDialog::onEnterPressedInternal()
 
 void RegistrationDialog::onUpdate(float dt)
 {
+    /*
+    if(m_sign_up_request != NULL)
+    {
+        if(m_sign_up_request->isDone())
+        {
+            if(m_sign_up_request->isSuccess())
+            {
+                m_show_registration_activation = true;
+            }
+            else
+            {
+                sfx_manager->quickSound( "anvil" );
+                m_show_registration_info = true;
+            }
+            m_options_widget->setActivated();
+            delete m_sign_in_request;
+            m_sign_in_request = NULL;
+        }
+        else
+        {
+            m_load_timer += dt;
+            m_info_widget->setDefaultColor();
+            m_info_widget->setText(Online::Messages::signingIn(m_load_timer), false);
+        }
+    }*/
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
-    {
         ModalDialog::dismiss();
-    }
-    if (m_show_registration_info)
+    else if (m_show_registration_info)
         showRegistrationInfo();
-    if (m_show_registration_terms)
+    else if (m_show_registration_terms)
         showRegistrationTerms();
-    if (m_show_registration_activation)
+    else if (m_show_registration_activation)
         showRegistrationActivation();
 }

@@ -40,11 +40,11 @@ private:
     
     bool m_self_destroy;
     bool m_enter_lobby;
+    bool m_joining_server;
 
     float m_load_timer;
 
     Online::Server * m_server;
-    Online::CurrentUser::ServerJoinRequest * m_server_join_request;
 
     GUIEngine::LabelWidget * m_name_widget;
     GUIEngine::LabelWidget * m_info_widget;

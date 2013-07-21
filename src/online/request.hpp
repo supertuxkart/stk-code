@@ -32,12 +32,26 @@ namespace Online{
       */
     class Request
     {
+    public:
+        /** List of different types of requests which are used as key in the response map
+         */
+        enum RequestType {
+            RT_QUIT,
+            RT_SIGN_IN,
+            RT_SIGN_OUT,
+            RT_SIGN_UP,
+            RT_SERVER_CREATION,
+            RT_SERVER_JOIN
+        };
+
     protected:
         /** The priority of this request. The higher the value the more
         important this request is. */
         int                 m_priority;
         /** Cancel this request if it is active. */
         bool                m_cancel;
+
+        const RequestType   m_type;
 
 
         /** True if the memory for this Request should be managed by
@@ -46,7 +60,7 @@ namespace Online{
         *  be freed by the calling function. */
         bool                m_manage_memory;
 
-        Synchronised<bool>              m_done;
+        Synchronised<bool>  m_done;
 
         virtual void beforeOperation() {}
         virtual void operation() = 0;
@@ -54,31 +68,33 @@ namespace Online{
 
     public:
 
-        Request(int priority, bool manage_memory=true);
+        Request(RequestType type, int priority, bool manage_memory=true);
         virtual ~Request();
 
         void execute();
 
         // ------------------------------------------------------------------------
         /** Returns the priority of this request. */
-        int getPriority() const { return m_priority; }
+        int getPriority() const         { return m_priority; }
         // ------------------------------------------------------------------------
         /** Signals that this request should be canceled. */
-        void cancel() { m_cancel = true; }
+        void cancel()                   { m_cancel = true; }
         // ------------------------------------------------------------------------
         /** Returns if this request is to be canceled. */
-        bool isCancelled() const { return m_cancel; }
+        bool isCancelled() const        { return m_cancel; }
         // ------------------------------------------------------------------------
-        /** Specifies if the memory should be managed by network_http. */
-        void setManageMemory(bool m) { m_manage_memory = m; }
+        /** Specifies if the memory should be managed by http manager. */
+        void setManageMemory(bool m)    { m_manage_memory = m; }
         // ------------------------------------------------------------------------
         /** Returns if the memory for this object should be managed by
         *  by network_http (i.e. freed once the request is handled). */
-        bool manageMemory() const { return m_manage_memory; }
+        bool manageMemory() const       { return m_manage_memory; }
 
-        bool isDone(){return m_done.getAtomic();}
+        bool isDone() const             { return m_done.getAtomic(); }
 
-        virtual bool isAllowedToAdd() {return true;}
+        RequestType getType() const     { return m_type; }
+
+        virtual bool isAllowedToAdd()   { return true; }
 
         /** This class is used by the priority queue to sort requests by priority.
          */
@@ -120,7 +136,6 @@ namespace Online{
         *  (everything ok) at the end. */
         Synchronised<float>             m_progress;
         std::string                     m_url;
-        bool                            m_added;
 
         virtual void afterOperation();
         std::string downloadPage();
@@ -138,22 +153,18 @@ namespace Online{
         virtual void callback() {}
 
     public :
-
-        HTTPRequest(const std::string & url = "");
+        HTTPRequest(RequestType type, const std::string & url = "");
         virtual ~HTTPRequest();
 
         void setParameter(const std::string & name, const std::string &value){
-            if(!m_added)
-                (*m_parameters)[name] = value;
+            (*m_parameters)[name] = value;
         };
         void setParameter(const std::string & name, const irr::core::stringw &value){
-            if(!m_added)
-                (*m_parameters)[name] = irr::core::stringc(value.c_str()).c_str();
+            (*m_parameters)[name] = irr::core::stringc(value.c_str()).c_str();
         }
         template <typename T>
         void setParameter(const std::string & name, const T& value){
-            if(!m_added)
-                (*m_parameters)[name] = StringUtils::toString(value);
+            (*m_parameters)[name] = StringUtils::toString(value);
         }
 
         /** Returns the current progress. */
@@ -180,7 +191,7 @@ namespace Online{
         virtual void                    afterOperation() OVERRIDE;
 
     public :
-        XMLRequest(const std::string & url = "");
+        XMLRequest(RequestType type, const std::string & url = "");
 
         virtual XMLNode *               getResult() const       { return m_result; }
         const irr::core::stringw &      getInfo()   const       { return m_info; }

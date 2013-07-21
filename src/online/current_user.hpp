@@ -28,6 +28,33 @@
 
 
 namespace Online{
+
+    class SignInRequest : public XMLRequest
+    {
+        virtual void callback ();
+    public :
+        SignInRequest() : XMLRequest(RT_SIGN_IN) {}
+    };
+
+    class SignOutRequest : public XMLRequest
+    {
+        virtual void callback ();
+    public :
+        SignOutRequest() : XMLRequest(RT_SIGN_OUT) {}
+    };
+
+    class ServerCreationRequest : public XMLRequest {
+        virtual void callback ();
+    public :
+        ServerCreationRequest() : XMLRequest(RT_SERVER_JOIN) {}
+    };
+
+    class ServerJoinRequest : public XMLRequest {
+        virtual void callback ();
+    public :
+        ServerJoinRequest() : XMLRequest(RT_SERVER_JOIN) {}
+    };
+
     // ============================================================================
 
     /**
@@ -46,37 +73,12 @@ namespace Online{
                 SIGNING_OUT
             };
 
-            class SignInRequest : public XMLRequest
-            {
-                virtual void callback ();
-            };
-
-            class SignOutRequest : public XMLRequest
-            {
-                virtual void callback ();
-            };
-
-            class ServerCreationRequest : public XMLRequest
-            {
-                virtual void callback ();
-            };
-
-            class ServerJoinRequest : public XMLRequest
-            {
-                virtual void callback ();
-            };
-
         private:
             std::string                 m_token;
             bool                        m_save_session;
             UserState                   m_state;
 
             CurrentUser();
-
-            void signIn                 (const SignInRequest            * input);
-            void signOut                (const SignOutRequest           * input);
-            void createServer           (const ServerCreationRequest    * input);
-
 
         public:
             static CurrentUser*         get(); //FIXME To be removed
@@ -96,21 +98,22 @@ namespace Online{
 
 
             // Register
-            bool                        signUp(                 const irr::core::stringw &username,
+            XMLRequest *                 requestSignUp(         const irr::core::stringw &username,
                                                                 const irr::core::stringw &password,
                                                                 const irr::core::stringw &password_ver,
                                                                 const irr::core::stringw &email,
-                                                                bool terms,
-                                                                irr::core::stringw &info);
+                                                                bool terms);
 
-
+            void signIn                 (const SignInRequest            * input);
+            void signOut                (const SignOutRequest           * input);
+            void createServer           (const ServerCreationRequest    * input);
 
             /** Returns the username if signed in. */
             irr::core::stringw          getUserName()   const;
-            bool                        isSignedIn()    const   { return m_state == SIGNED_IN; }
-            bool                        isGuest()       const   { return m_state == GUEST; }
-            bool                        isSigningIn()   const   { return m_state == SIGNING_IN; }
-            UserState                   getUserState()          { return m_state; }
+            bool                        isSignedIn()    const { return m_state == SIGNED_IN; }
+            bool                        isGuest()       const { return m_state == GUEST; }
+            bool                        isSigningIn()   const { return m_state == SIGNING_IN; }
+            UserState                   getUserState()        { return m_state; }
 
     };   // class CurrentUser
 

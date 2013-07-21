@@ -53,10 +53,6 @@ private:
 
     Online::CurrentUser::UserState m_recorded_state;
 
-    float m_load_timer;
-
-    PtrVector<Online::XMLRequest> m_requests;
-
     /** \brief Checks if the recorded state differs from the actual state and sets it. */
     bool hasStateChanged();
     /** \brief Sets which widget has to be focused. Depends on the user state. */

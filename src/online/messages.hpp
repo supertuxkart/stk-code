@@ -26,11 +26,11 @@ namespace Online
 {
     namespace Messages
     {
-        irr::core::stringw loadingDots          (float timer, bool spaces = true, float interval = 0.5f, int max_dots = 3);
-        irr::core::stringw signingIn            (float timer);
-        irr::core::stringw signingOut           (float timer);
-        irr::core::stringw joiningServer        (float timer);
-        irr::core::stringw creatingServer       (float timer);
+        irr::core::stringw loadingDots          (bool spaces = true, float interval = 0.5f, int max_dots = 3);
+        irr::core::stringw signingIn            ();
+        irr::core::stringw signingOut           ();
+        irr::core::stringw joiningServer        ();
+        irr::core::stringw creatingServer       ();
         irr::core::stringw signedInAs           (const irr::core::stringw & name);
     } // namespace Messages
 }// namespace Online

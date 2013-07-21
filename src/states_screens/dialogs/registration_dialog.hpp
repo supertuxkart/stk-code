@@ -23,6 +23,7 @@
 
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets.hpp"
+#include "online/current_user.hpp"
 /**
  * \brief Dialog that allows a user to register
  * \ingroup states_screens
@@ -48,13 +49,13 @@ public:
 
 private:
 
-    GUIEngine::LabelWidget * m_info_widget;
-
     Phase m_phase;
     bool m_self_destroy;
     bool m_show_registration_info;
     bool m_show_registration_terms;
     bool m_show_registration_activation;
+
+    Online::XMLRequest * m_sign_up_request;
 
     //Saved user input :
     irr::core::stringw m_username;
@@ -64,6 +65,7 @@ private:
     irr::core::stringw m_email_confirm;
     irr::core::stringw m_registration_error;
     bool m_agreement;
+
 
     void showRegistrationInfo();
     void showRegistrationTerms();

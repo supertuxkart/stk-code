@@ -18,27 +18,28 @@
 
 #include "online/messages.hpp"
 #include "utils/translation.hpp"
+#include "utils/time.hpp"
 
 namespace Online
 {
     namespace Messages
     {
-        irr::core::stringw loadingDots(float timer, bool spaces, float interval, int max_dots)
+        irr::core::stringw loadingDots(bool spaces, float interval, int max_dots)
         {
-            int nr_dots = int(floor(timer * (1 / interval))) % (max_dots+1);
+            int nr_dots = int(floor(Time::getRealTime() * (1 / interval))) % (max_dots+1);
             return irr::core::stringw((std::string(nr_dots,'.') + std::string(max_dots-nr_dots,' ')).c_str());
         }
         // ------------------------------------------------------------------------
 
-        irr::core::stringw signingIn(float timer)
+        irr::core::stringw signingIn()
         {
-            return irr::core::stringw(_("Signing in")) + loadingDots(timer);
+            return irr::core::stringw(_("Signing in")) + loadingDots();
         }
         // ------------------------------------------------------------------------
 
-        irr::core::stringw signingOut(float timer)
+        irr::core::stringw signingOut()
         {
-            return irr::core::stringw(_("Signing out")) + loadingDots(timer);
+            return irr::core::stringw(_("Signing out")) + loadingDots();
         }
         // ------------------------------------------------------------------------
 
@@ -47,14 +48,14 @@ namespace Online
             return irr::core::stringw(_("Signed in as : ")) + name + ".";
         }
 
-        irr::core::stringw joiningServer(float timer)
+        irr::core::stringw joiningServer()
         {
-            return irr::core::stringw(_("Joining server")) + loadingDots(timer);
+            return irr::core::stringw(_("Joining server")) + loadingDots();
         }
 
-        irr::core::stringw creatingServer(float timer)
+        irr::core::stringw creatingServer()
         {
-            return irr::core::stringw(_("Creating server")) + loadingDots(timer);
+            return irr::core::stringw(_("Creating server")) + loadingDots();
         }
     } // namespace messages
 } // namespace Online

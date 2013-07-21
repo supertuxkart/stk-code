@@ -44,6 +44,8 @@ namespace Online{
     {
         protected:
 
+            /** Ment for networking threads */
+
             /** The current requested being worked on. */
             Online::Request *         m_current_request;
 
@@ -56,13 +58,18 @@ namespace Online{
             /** Thread id of the thread running in this object. */
             Synchronised<pthread_t *> m_thread_id;
 
-            /** The list of pointes to all requests. */
+            /** The list of pointers to all requests that still need to be handled. */
             Synchronised< std::priority_queue <
                                                 Online::Request*,
                                                 std::vector<Online::Request*>,
                                                 Online::Request::Compare
                                                >
                         >  m_request_queue;
+
+            /** The list of pointers to all requests that are already handled but didn't need to be deleted. */
+            Synchronised< std::map  < Online::Request::RequestType, Online::Request* > > m_response_queue;
+
+            void addResponse(Online::Request*);
 
             static void  *mainLoop(void *obj);
             void startNetworkThread();
@@ -84,6 +91,9 @@ namespace Online{
             void addRequest(Online::Request *request);
             void cancelAllDownloads();
             void stopNetworkThread();
+            Request * getResponse(Online::Request::RequestType type);
+            /** Same as getResponse but with a cast to XMLRequest */
+            XMLRequest * getXMLResponse(Online::Request::RequestType type);
 
             bool getAbort(){ return m_abort.getAtomic(); };
 

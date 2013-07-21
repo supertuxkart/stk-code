@@ -28,7 +28,8 @@ namespace Online{
 
     // =========================================================================================
 
-    Request::Request(int priority, bool manage_memory)
+    Request::Request(RequestType type, int priority, bool manage_memory)
+        :m_type(type)
     {
         m_priority      = priority;
         m_manage_memory = manage_memory;
@@ -55,20 +56,19 @@ namespace Online{
     // =========================================================================================
 
     QuitRequest::QuitRequest()
-        : Request(9999,true)
+        : Request(RT_QUIT,9999,true)
     {
     }
 
 
     // =========================================================================================
 
-    HTTPRequest::HTTPRequest(const std::string & url)
-        : Request(1,false)
+    HTTPRequest::HTTPRequest(RequestType type, const std::string & url)
+        : Request(type, 1,false)
     {
         m_url = url;
         m_parameters = new Parameters;
         m_progress.setAtomic(0);
-        m_added = false;
     }
 
     HTTPRequest::~HTTPRequest()
@@ -200,8 +200,8 @@ namespace Online{
 
     // =========================================================================================
 
-    XMLRequest::XMLRequest(const std::string & url)
-        : HTTPRequest(url)
+    XMLRequest::XMLRequest(RequestType type, const std::string & url)
+        : HTTPRequest(type, url)
     {
         m_info = "";
         m_success = false;

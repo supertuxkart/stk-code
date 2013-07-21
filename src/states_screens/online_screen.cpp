@@ -52,9 +52,7 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 {
     m_recorded_state = CurrentUser::SIGNED_OUT;
-    CurrentUser::SignInRequest * request = CurrentUser::acquire()->requestSavedSession();
-    if(request != NULL)
-        m_requests.push_back(request);
+    CurrentUser::acquire()->requestSavedSession();
     CurrentUser::release();
 }   // OnlineScreen
 
@@ -62,7 +60,6 @@ OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 
 OnlineScreen::~OnlineScreen()
 {
-    m_requests.clearAndDeleteAll();
 }
 
 // ----------------------------------------------------------------------------
@@ -145,7 +142,6 @@ void OnlineScreen::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
-    m_load_timer = 0.0f;
     m_online_status_widget->setText(Messages::signedInAs(CurrentUser::acquire()->getUserName()), false);
     CurrentUser::release();
 
@@ -158,46 +154,42 @@ void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
         GUIEngine::reshowCurrentScreen();
     if (m_recorded_state == CurrentUser::SIGNING_IN)
     {
-        m_load_timer += delta;
-        m_online_status_widget->setText(Messages::signingIn(m_load_timer), false);
+        m_online_status_widget->setText(Messages::signingIn(), false);
     }
     else if (m_recorded_state == CurrentUser::SIGNING_OUT)
     {
-        m_load_timer += delta;
-        m_online_status_widget->setText(Messages::signingOut(m_load_timer), false);
+        m_online_status_widget->setText(Messages::signingOut(), false);
     }
 
-    for(int i = m_requests.size()-1; i>=0; --i)
+    XMLRequest * sign_in_request = HTTPManager::get()->getXMLResponse(Request::RT_SIGN_IN);
+    if(sign_in_request != NULL)
     {
-        if(m_requests[i].isDone())
+        if(sign_in_request->isSuccess())
         {
-            if( dynamic_cast<CurrentUser::SignInRequest*>(m_requests.get(i)))
-            {
-                if(m_requests[i].isSuccess())
-                {
-                    new MessageDialog(_("Automatically signed in."));
-                }
-                else
-                {
-                    sfx_manager->quickSound( "anvil" );
-                    new MessageDialog(m_requests[i].getInfo());
-                }
-            }else if( dynamic_cast<CurrentUser::SignOutRequest*>(m_requests.get(i)))
-            {
-                if(m_requests[i].isSuccess())
-                {
-                    new MessageDialog(_("Signed out successfully."));
-                }
-                else
-                {
-                    sfx_manager->quickSound( "anvil" );
-                    new MessageDialog(m_requests[i].getInfo());
-                }
-            }
-
-            m_requests.erase(i);
+            new MessageDialog(_("Signed in."));
         }
+        else
+        {
+            sfx_manager->quickSound( "anvil" );
+            new MessageDialog(sign_in_request->getInfo());
+        }
+        delete sign_in_request;
     }
+    XMLRequest * sign_out_request = HTTPManager::get()->getXMLResponse(Request::RT_SIGN_OUT);
+    if(sign_out_request != NULL)
+    {
+        if(sign_out_request->isSuccess())
+        {
+            new MessageDialog(_("Signed out successfully."));
+        }
+        else
+        {
+            sfx_manager->quickSound( "anvil" );
+            new MessageDialog(sign_out_request->getInfo());
+        }
+        delete sign_out_request;
+    }
+
 
 }   // onUpdate
 
@@ -221,7 +213,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (selection == "sign_out")
     {
-        m_requests.push_back(CurrentUser::acquire()->requestSignOut());
+        CurrentUser::acquire()->requestSignOut();
         CurrentUser::release();
     }
     else if (selection == "register")

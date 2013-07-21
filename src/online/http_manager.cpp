@@ -146,7 +146,7 @@ namespace Online{
      *  sorted by priority.
      *  \param request The pointer to the new request to insert.
      */
-    void HTTPManager::addRequest(Online::Request *request)
+    void HTTPManager::addRequest(Request *request)
     {
         assert(request->isAllowedToAdd());
         m_request_queue.lock();
@@ -155,6 +155,36 @@ namespace Online{
         pthread_cond_signal(&m_cond_request);
         m_request_queue.unlock();
     }   // insertRequest
+
+    // ----------------------------------------------------------------------------
+    /**
+     *  \param request The pointer to the finished request to insert.
+     */
+    void HTTPManager::addResponse(Request *request)
+    {
+        m_response_queue.lock();
+        m_response_queue.getData()[request->getType()] = request;
+        m_response_queue.unlock();
+    }   // insertRequest
+
+    Request * HTTPManager::getResponse(Request::RequestType type)
+    {
+        Request * response = NULL;
+        m_response_queue.lock();
+        if (m_response_queue.getData().count(type))
+            response = m_response_queue.getData()[type];
+        m_response_queue.getData().erase(type);
+        m_response_queue.unlock();
+        return response;
+    }
+
+    XMLRequest * HTTPManager::getXMLResponse(Request::RequestType type)
+    {
+        Request * response = getResponse(type);
+        if(response != NULL)
+            return (XMLRequest *) response;
+        return NULL;
+    }
 
     // ---------------------------------------------------------------------------
     /** The actual main loop, which is started as a separate thread from the
@@ -170,7 +200,7 @@ namespace Online{
 
         me->m_current_request = NULL;
         me->m_request_queue.lock();
-        while(  me->m_request_queue.getData().empty() || !dynamic_cast<Online::QuitRequest*>(me->m_request_queue.getData().top()) )
+        while(  me->m_request_queue.getData().empty() || me->m_request_queue.getData().top()->getType() != Request::RT_QUIT )
         {
             bool empty = me->m_request_queue.getData().empty();
             // Wait in cond_wait for a request to arrive. The 'while' is necessary
@@ -185,11 +215,14 @@ namespace Online{
             me->m_request_queue.getData().pop();
             me->m_request_queue.unlock();
             me->m_current_request->execute();
-
             if(me->m_current_request->manageMemory())
             {
                 delete me->m_current_request;
                 me->m_current_request = NULL;
+            }
+            else
+            {
+                me->addResponse(me->m_current_request);
             }
             me->m_request_queue.lock();
         }   // while

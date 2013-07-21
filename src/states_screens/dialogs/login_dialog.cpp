@@ -32,6 +32,7 @@
 using namespace GUIEngine;
 using namespace irr;
 using namespace irr::gui;
+using namespace Online;
 
 // -----------------------------------------------------------------------------
 
@@ -40,8 +41,7 @@ LoginDialog::LoginDialog(const Message message_type) :
 {
     m_self_destroy = false;
     m_open_registration_dialog = false;
-    m_load_timer = 0;
-    m_sign_in_request = NULL;
+    m_signing_in = false;
     loadFromFile("online/login_dialog.stkgui");
 
     m_message_widget = getWidget<LabelWidget>("message");
@@ -96,7 +96,6 @@ LoginDialog::LoginDialog(const Message message_type) :
 
 LoginDialog::~LoginDialog()
 {
-    delete m_sign_in_request;
 }
 
 
@@ -115,8 +114,9 @@ void LoginDialog::login()
     else
     {
         m_options_widget->setDeactivated();
-        m_sign_in_request = Online::CurrentUser::acquire()->requestSignIn(username,password, m_remember_widget->getState());
+        Online::CurrentUser::acquire()->requestSignIn(username,password, m_remember_widget->getState());
         Online::CurrentUser::release();
+        m_signing_in = true;
     }
 }
 
@@ -163,30 +163,22 @@ void LoginDialog::onEnterPressedInternal()
 
 void LoginDialog::onUpdate(float dt)
 {
-    if(m_sign_in_request != NULL)
+    XMLRequest * sign_in_request = HTTPManager::get()->getXMLResponse(Request::RT_SIGN_IN);
+    if(sign_in_request != NULL)
     {
-        if(m_sign_in_request->isDone())
+        if(sign_in_request->isSuccess())
         {
-            if(m_sign_in_request->isSuccess())
-            {
-                m_self_destroy = true;
-            }
-            else
-            {
-                sfx_manager->quickSound( "anvil" );
-                m_info_widget->setErrorColor();
-                m_info_widget->setText(m_sign_in_request->getInfo(), false);
-            }
-            m_options_widget->setActivated();
-            delete m_sign_in_request;
-            m_sign_in_request = NULL;
+            m_self_destroy = true;
         }
         else
         {
-            m_load_timer += dt;
-            m_info_widget->setDefaultColor();
-            m_info_widget->setText(Online::Messages::signingIn(m_load_timer), false);
+            sfx_manager->quickSound( "anvil" );
+            m_info_widget->setErrorColor();
+            m_info_widget->setText(sign_in_request->getInfo(), false);
         }
+        delete sign_in_request;
+        m_signing_in = false;
+        m_options_widget->setActivated();
     }
     //If we want to open the registration dialog, we need to close this one first
     m_open_registration_dialog && (m_self_destroy = true);
@@ -197,6 +189,12 @@ void LoginDialog::onUpdate(float dt)
         ModalDialog::dismiss();
         if (m_open_registration_dialog)
             new RegistrationDialog();
+        return;
+    }
 
+    if (m_signing_in)
+    {
+        m_info_widget->setDefaultColor();
+        m_info_widget->setText(Online::Messages::signingIn(), false);
     }
 }
