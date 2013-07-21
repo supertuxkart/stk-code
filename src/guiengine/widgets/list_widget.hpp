@@ -178,6 +178,7 @@ namespace GUIEngine
          * renames first cell only
          */
         void renameItem(const int row_num, const irr::core::stringw newName, const int icon=-1);
+        void renameItem(const std::string  & internal_name, const irr::core::stringw newName, const int icon=-1);
 
         /**
           * \brief rename an item and/or change its icon based on its internal name

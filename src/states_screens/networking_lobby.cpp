@@ -46,7 +46,8 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 
 NetworkingLobby::NetworkingLobby() : Screen("online/lobby.stkgui")
 {
-    m_server = ServersManager::get()->getJoinedServer();
+    m_server = ServersManager::acquire()->getJoinedServer();
+    ServersManager::release();
 }   // NetworkingLobby
 
 // ----------------------------------------------------------------------------

@@ -146,7 +146,6 @@ src/network/race_info_message.cpp
 src/network/race_result_message.cpp
 src/network/race_state.cpp
 src/online/current_user.cpp
-src/online/http_connector.cpp
 src/online/http_manager.cpp
 src/online/messages.cpp
 src/online/request.cpp
@@ -418,8 +417,6 @@ src/network/race_state.hpp
 src/network/remote_kart_info.hpp
 src/network/world_loaded_message.hpp
 src/online/current_user.hpp
-src/online/http_connector.hpp
-src/online/http_listener.hpp
 src/online/http_manager.hpp
 src/online/messages.hpp
 src/online/request.hpp

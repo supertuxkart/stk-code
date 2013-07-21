@@ -254,6 +254,14 @@ void ListWidget::renameItem(const int row_index, const irr::core::stringw newNam
 }
 
 // -----------------------------------------------------------------------------
+void ListWidget::renameItem(const std::string & internal_name, const irr::core::stringw newName, const int icon)
+{
+    CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
+    assert(list != NULL);
+    renameCell(list->getRowByInternalName(internal_name), 0, newName, icon);
+}
+
+// -----------------------------------------------------------------------------
 
 std::string ListWidget::getSelectionInternalName()
 {

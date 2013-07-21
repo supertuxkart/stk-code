@@ -46,8 +46,6 @@ private:
     GUIEngine::ButtonWidget * m_create_widget;
     GUIEngine::ButtonWidget * m_cancel_widget;
 
-    /** \brief Checks if the user is still signed in. */
-    bool hasLostConnection();
     /** \brief Sets which widget has to be focused. Depends on the user state. */
     void setInitialFocus();
 

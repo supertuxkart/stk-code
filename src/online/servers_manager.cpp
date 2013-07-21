@@ -22,54 +22,85 @@
 #include <string>
 #include <irrString.h>
 #include <assert.h>
-#include "online/http_connector.hpp"
 #include "config/user_config.hpp"
 #include "utils/translation.hpp"
+#include "utils/time.hpp"
+
+#define SERVER_REFRESH_INTERVAL 5.0f
 
 namespace Online{
 
-    static ServersManager* user_singleton = NULL;
+    static Synchronised<ServersManager*> manager_singleton(NULL);
 
-    ServersManager* ServersManager::get()
+    ServersManager* ServersManager::acquire()
     {
-        if (user_singleton == NULL)
-            user_singleton = new ServersManager();
-        return user_singleton;
-    }   // get
+        manager_singleton.lock();
+        ServersManager * manager = manager_singleton.getData();
+        if (manager == NULL)
+        {
+            manager_singleton.unlock();
+            manager = new ServersManager();
+            manager_singleton.setAtomic(manager);
+            manager_singleton.lock();
+        }
+        return manager;
+    }
+
+    void ServersManager::release()
+    {
+        manager_singleton.unlock();
+    }
 
     void ServersManager::deallocate()
     {
-        delete user_singleton;
-        user_singleton = NULL;
+        manager_singleton.lock();
+        ServersManager* manager = manager_singleton.getData();
+        delete manager;
+        manager = NULL;
+        manager_singleton.unlock();
     }   // deallocate
 
     // ============================================================================
     ServersManager::ServersManager(){
         m_servers = new PtrVector<Server>;
-        refresh();
+        m_info_message = "";
+        m_last_load_time = 0.0f;
     }
 
     // ============================================================================
-    void ServersManager::refresh()
+    ServersManager::RefreshRequest * ServersManager::refreshRequest()
     {
-        HTTPConnector * connector = new HTTPConnector((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-        connector->setParameter("action",std::string("get_server_list"));
-
-        const XMLNode * result = connector->getXMLFromPage();
-        std::string rec_success = "";
-        if(result->get("success", &rec_success))
+        RefreshRequest * request = NULL;
+        if(Time::getRealTime() - m_last_load_time > SERVER_REFRESH_INTERVAL)
         {
-            if (rec_success =="yes")
-            {
-                const XMLNode * servers_xml = result->getNode("servers");
-                m_servers->clearAndDeleteAll();
-                for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
-                {
-                    m_servers->push_back(new Server(*servers_xml->getNode(i)));
-                }
-            }
+            request = new RefreshRequest();
+            request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+            request->setParameter("action",std::string("get_server_list"));
+            HTTPManager::get()->addRequest(request);
         }
+        return request;
+    }
+
+    void ServersManager::refresh(const RefreshRequest * input)
+    {
+        if (input->isSuccess())
+        {
+            const XMLNode * servers_xml = input->getResult()->getNode("servers");
+            m_servers->clearAndDeleteAll();
+            for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
+            {
+                m_servers->push_back(new Server(*servers_xml->getNode(i)));
+            }
+            m_last_load_time += Time::getRealTime();
+        }
+        m_info_message = input->getInfo();
         //FIXME error message
+    }
+
+    void ServersManager::RefreshRequest::callback()
+    {
+        ServersManager::acquire()->refresh(this);
+        ServersManager::release();
     }
 
     // ============================================================================

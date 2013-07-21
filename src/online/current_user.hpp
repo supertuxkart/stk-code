@@ -90,10 +90,12 @@ namespace Online{
 
             CurrentUser();
 
-        public:
-            static CurrentUser*         get(); //FIXME To be removed
+            void signIn                 (const SignInRequest            * input);
+            void signOut                (const SignOutRequest           * input);
+            void createServer           (const ServerCreationRequest    * input);
 
-            //Singleton methods
+        public:
+            //Singleton
             static CurrentUser*         acquire();
             static void                 release();
             static void                 deallocate();
@@ -113,10 +115,6 @@ namespace Online{
                                                                 const irr::core::stringw &password_ver,
                                                                 const irr::core::stringw &email,
                                                                 bool terms);
-
-            void signIn                 (const SignInRequest            * input);
-            void signOut                (const SignOutRequest           * input);
-            void createServer           (const ServerCreationRequest    * input);
 
             /** Returns the username if signed in. */
             irr::core::stringw          getUserName()   const;

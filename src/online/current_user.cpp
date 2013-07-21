@@ -22,21 +22,12 @@
 #include <sstream>
 #include <stdlib.h>
 #include <assert.h>
-#include "online/http_connector.hpp"
 #include "config/user_config.hpp"
 #include "utils/translation.hpp"
 #include "utils/log.hpp"
 
 namespace Online{
     static Synchronised<CurrentUser*> user_singleton(NULL);
-
-    CurrentUser* CurrentUser::get()
-    {
-        CurrentUser* user = user_singleton.getData();
-        if (user == NULL)
-            user = new CurrentUser();
-        return user;
-    }   // get
 
     CurrentUser* CurrentUser::acquire()
     {
@@ -97,8 +88,10 @@ namespace Online{
     CurrentUser::SignInRequest * CurrentUser::requestSavedSession()
     {
         SignInRequest * request = NULL;
+        Log::info("CurrentUser::requestSavedSession","1");
         if(m_state != US_SIGNED_IN  && UserConfigParams::m_saved_session)
         {
+                Log::info("CurrentUser::requestSavedSession","2");
             request = new SignInRequest();
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
             request->setParameter("action",std::string("saved-session"));

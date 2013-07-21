@@ -17,10 +17,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifndef HEADER_SERVERS_MANAGER_HPP
-#define HEADER_CURRENT_ONLINE_USER_HPP
+#define HEADER_SERVERS_MANAGER_HPP
 
 #include "utils/ptr_vector.hpp"
 #include "online/server.hpp"
+#include "http_manager.hpp"
+
 
 
 namespace Online {
@@ -31,26 +33,43 @@ namespace Online {
       */
     class ServersManager
     {
-        private:
-            ServersManager();
-            PtrVector<Server> * m_servers;
-            bool m_not_fetched;
-            Server * m_joined_server;
+    public:
+        enum RequestType
+        {
+            RT_REFRESH = 1
+        };
 
+        class RefreshRequest : public XMLRequest
+        {
+            virtual void callback ();
         public:
-            // singleton
-            static ServersManager* get();
-            static void deallocate();
+            RefreshRequest() : XMLRequest(RT_REFRESH) {}
+        };
 
-            void refresh();
-            PtrVector<Server> * getServers () const { return m_servers; };
-            int getNumServers () const { return m_servers->size(); };
-            Server * getServer (int index) const { return m_servers->get(index);};
-            void sort(bool sort_desc) { m_servers->insertionSort(0, sort_desc); };
-            void setJoinedServer(Server * server){ m_joined_server = server;};
-            Server * getJoinedServer(){ return m_joined_server;};
-            //Returns the best server to join
-            Server * getQuickPlay();
+    private:
+        ServersManager();
+        PtrVector<Server> *             m_servers;
+        bool                            m_not_fetched;
+        Server *                        m_joined_server;
+        irr::core::stringw              m_info_message;
+        float                           m_last_load_time;
+        void                            refresh(const RefreshRequest * input);
+
+    public:
+        // Singleton
+        static ServersManager*          acquire();
+        static void                     release();
+        static void                     deallocate();
+
+        RefreshRequest *                refreshRequest();
+        PtrVector<Server> *             getServers ()           const   { return m_servers;                             }
+        int                             getNumServers ()        const   { return m_servers->size();                     }
+        Server *                        getServer (int index)   const   { return m_servers->get(index);                 }
+        void                            sort(bool sort_desc)            { m_servers->insertionSort(0, sort_desc);       }
+        void                            setJoinedServer(Server * server){ m_joined_server = server;                     }
+        Server *                        getJoinedServer()               { return m_joined_server;                       }
+        //Returns the best server to join
+        Server *                        getQuickPlay();
     };   // class ServersManager
 
 

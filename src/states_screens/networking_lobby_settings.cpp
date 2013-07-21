@@ -69,12 +69,6 @@ void NetworkingLobbySettings::loadedFromFile()
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
-bool NetworkingLobbySettings::hasLostConnection()
-{
-    return !CurrentUser::get()->isSignedIn();
-}
-
-// ----------------------------------------------------------------------------
 void NetworkingLobbySettings::beforeAddingWidget()
 {
 

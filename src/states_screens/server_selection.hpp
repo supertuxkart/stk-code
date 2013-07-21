@@ -19,10 +19,8 @@
 #define HEADER_SERVER_SELECTION_HPP
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets/label_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
-#include "guiengine/widgets/list_widget.hpp"
-#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets.hpp"
+#include "online/servers_manager.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -38,6 +36,7 @@ class ServerSelection :  public GUIEngine::Screen,
 
 private:
     ServerSelection();
+    ~ServerSelection();
 
     GUIEngine::IconButtonWidget * m_back_widget;
     GUIEngine::IconButtonWidget * m_reload_widget;
@@ -51,22 +50,19 @@ private:
      *  addons_loading is being displayed. */
     int              m_selected_index;
 
-    bool             m_reloading;
-
     /** \brief To check (and set) if sort order is descending **/
     bool             m_sort_desc;
 
-    float            m_reload_timer;
+    Online::ServersManager::RefreshRequest * m_refresh_request;
+    void refresh();
 
 public:
 
     /** Load the addons into the main list.*/
-    void loadList(bool refresh = false);
+    void loadList();
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
-
-    virtual void unloaded() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
@@ -78,7 +74,6 @@ public:
     virtual void onColumnClicked(int columnId);
 
     virtual void init() OVERRIDE;
-    virtual void tearDown() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;

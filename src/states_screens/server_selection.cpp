@@ -21,13 +21,13 @@
 #include <assert.h>
 
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widget.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/server_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "online/servers_manager.hpp"
+#include "online/messages.hpp"
+#include "audio/sfx_manager.hpp"
 
 using namespace Online;
 
@@ -38,14 +38,34 @@ DEFINE_SCREEN_SINGLETON( ServerSelection );
 ServerSelection::ServerSelection() : Screen("online/server_selection.stkgui")
 {
     m_selected_index = -1;
-    m_reload_timer = 0.0f;
+    m_refresh_request = NULL;
+
 }   // ServerSelection
+
+// ----------------------------------------------------------------------------
+
+ServerSelection::~ServerSelection()
+{
+    delete m_refresh_request;
+}   // ServerSelection
+
+
+// ----------------------------------------------------------------------------
+
+void ServerSelection::refresh()
+{
+    m_refresh_request = ServersManager::acquire()->refreshRequest();
+    ServersManager::release();
+    m_server_list_widget->clear();
+    m_server_list_widget->addItem("spacer", L"");
+    m_server_list_widget->addItem("loading", Messages::fetchingServers());
+}
+
 
 // ----------------------------------------------------------------------------
 
 void ServerSelection::loadedFromFile()
 {
-
     m_back_widget = getWidget<GUIEngine::IconButtonWidget>("back");
     m_reload_widget = getWidget<GUIEngine::IconButtonWidget>("reload");
 
@@ -68,40 +88,24 @@ void ServerSelection::beforeAddingWidget()
 void ServerSelection::init()
 {
     Screen::init();
-    m_reloading = false;
     m_sort_desc = true;
     m_reload_widget->setActivated();
 
     // Set the default sort order
     Server::setSortOrder(Server::SO_NAME);
-    loadList();
+    refresh();
 }   // init
-
-// ----------------------------------------------------------------------------
-
-void ServerSelection::unloaded()
-{
-}
-
-// ----------------------------------------------------------------------------
-
-void ServerSelection::tearDown()
-{
-}
 
 // ----------------------------------------------------------------------------
 /** Loads the list of all servers. The gui element will be
  *  updated.
  *  \param type Must be 'kart' or 'track'.
  */
-void ServerSelection::loadList(bool refresh)
+void ServerSelection::loadList()
 {
     m_server_list_widget->clear();
-    ServersManager * manager = ServersManager::get();
-    if (refresh)
-        manager->refresh();
+    ServersManager * manager = ServersManager::acquire();
     manager->sort(m_sort_desc);
-
     for(int i=0; i <  manager->getNumServers(); i++)
     {
         Server * server = manager->getServer(i);
@@ -114,7 +118,7 @@ void ServerSelection::loadList(bool refresh)
         row->push_back(new GUIEngine::ListWidget::ListCell(num_players,-1,1,true));
         m_server_list_widget->addItem("server", row);
     }
-
+    ServersManager::release();
 }   // loadList
 
 // ----------------------------------------------------------------------------
@@ -143,19 +147,14 @@ void ServerSelection::eventCallback( GUIEngine::Widget* widget,
 
     else if (name == "reload")
     {
-        if (!m_reloading)
-        {
-            m_reloading = true;
-            m_server_list_widget->clear();
-            m_server_list_widget->addItem("spacer", L"");
-            m_server_list_widget->addItem("loading", _("Please wait while the list is being updated."));
-        }
+        refresh();
     }
 
     else if (name == m_server_list_widget->m_properties[GUIEngine::PROP_ID])
     {
         m_selected_index = m_server_list_widget->getSelectionID();
-        new ServerInfoDialog(ServersManager::get()->getServer(m_selected_index));
+        new ServerInfoDialog(ServersManager::acquire()->getServer(m_selected_index));
+        ServersManager::release();
     }
 
 }   // eventCallback
@@ -180,18 +179,26 @@ void ServerSelection::setLastSelected()
 
 void ServerSelection::onUpdate(float dt, irr::video::IVideoDriver*)
 {
-    m_reload_timer += dt;
-    if (m_reloading)
+    if(m_refresh_request != NULL)
     {
-        m_reloading = false;
-        if(m_reload_timer > 5000.0f)
+        if(m_refresh_request->isDone())
         {
-            loadList(true);
-            m_reload_timer = 0.0f;
+            if(m_refresh_request->isSuccess())
+            {
+                loadList();
+            }
+            else
+            {
+                sfx_manager->quickSound( "anvil" );
+                new MessageDialog(m_refresh_request->getInfo());
+            }
+            delete m_refresh_request;
+            m_refresh_request = NULL;
+            //m_options_widget->setActivated();
         }
         else
         {
-            loadList(false);
+            m_server_list_widget->renameItem("loading", Messages::fetchingServers());
         }
     }
 }   // onUpdate
