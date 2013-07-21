@@ -33,7 +33,7 @@ void KartUpdateProtocol::notifyEvent(Event* event)
     if (event->type != EVENT_TYPE_MESSAGE)
         return;
     NetworkString ns = event->data;
-    if (ns.size() < 20)
+    if (ns.size() < 36)
     {
         Log::info("KartUpdateProtocol", "Message too short.");
         return;
@@ -48,11 +48,17 @@ void KartUpdateProtocol::notifyEvent(Event* event)
         a = ns.getFloat(4);
         b = ns.getFloat(8);
         c = ns.getFloat(12);
+        float d,e,f,g;
+        d = ns.getFloat(16);
+        e = ns.getFloat(20);
+        f = ns.getFloat(24);
+        g = ns.getFloat(28);
         pthread_mutex_trylock(&m_positions_updates_mutex);
         m_next_positions.push_back(Vec3(a,b,c));
+        m_next_quaternions.push_back(btQuaternion(d,e,f,g));
         m_karts_ids.push_back(kart_id);
         pthread_mutex_unlock(&m_positions_updates_mutex);
-        ns.removeFront(16);
+        ns.removeFront(32);
     }
 }
 
@@ -75,8 +81,10 @@ void KartUpdateProtocol::update()
             {
                 AbstractKart* kart = m_karts[i];
                 Vec3 v = kart->getXYZ();
+                btQuaternion quat = kart->getRotation();
                 ns.ai32( kart->getWorldKartId());
-                ns.af(v[0]).af(v[1]).af(v[2]);
+                ns.af(v[0]).af(v[1]).af(v[2]); // add position
+                ns.af(quat.x()).af(quat.y()).af(quat.z()).af(quat.w()); // add rotation
                 Log::verbose("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
             }
             m_listener->sendMessage(this, ns, false);
@@ -85,10 +93,12 @@ void KartUpdateProtocol::update()
         {
             AbstractKart* kart = m_karts[m_self_kart_index];
             Vec3 v = kart->getXYZ();
+            btQuaternion quat = kart->getRotation();
             NetworkString ns;
             ns.af( World::getWorld()->getTime());
             ns.ai32( kart->getWorldKartId());
-            ns.af(v[0]).af(v[1]).af(v[2]);
+            ns.af(v[0]).af(v[1]).af(v[2]); // add position
+            ns.af(quat.x()).af(quat.y()).af(quat.z()).af(quat.w()); // add rotation
             Log::verbose("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
             m_listener->sendMessage(this, ns, false);
         }
@@ -104,10 +114,12 @@ void KartUpdateProtocol::update()
                     Vec3 pos = m_next_positions.back();
                     btTransform transform = m_karts[id]->getBody()->getInterpolationWorldTransform();
                     transform.setOrigin(pos);
-                        m_karts[id]->getBody()->setCenterOfMassTransform(transform);
+                    transform.setRotation(m_next_quaternions.back());
+                    m_karts[id]->getBody()->setCenterOfMassTransform(transform);
                     Log::verbose("KartUpdateProtocol", "Update kart %i pos to %f %f %f", id, pos[0], pos[1], pos[2]);
                 }
                 m_next_positions.pop_back();
+                m_next_quaternions.pop_back();
                 m_karts_ids.pop_back();
             }
             pthread_mutex_unlock(&m_positions_updates_mutex);
