@@ -32,27 +32,14 @@ namespace Online{
       */
     class Request
     {
-    public:
-        /** List of different types of requests which are used as key in the response map
-         */
-        enum RequestType {
-            RT_QUIT,
-            RT_SIGN_IN,
-            RT_SIGN_OUT,
-            RT_SIGN_UP,
-            RT_SERVER_CREATION,
-            RT_SERVER_JOIN
-        };
-
+    private:
+        const int           m_type;
     protected:
         /** The priority of this request. The higher the value the more
         important this request is. */
         int                 m_priority;
         /** Cancel this request if it is active. */
         bool                m_cancel;
-
-        const RequestType   m_type;
-
 
         /** True if the memory for this Request should be managed by
         *  http connector (i.e. this object is freed once the request
@@ -63,12 +50,17 @@ namespace Online{
         Synchronised<bool>  m_done;
 
         virtual void beforeOperation() {}
-        virtual void operation() = 0;
+        virtual void operation() {};
         virtual void afterOperation();
 
     public:
+        /** Negative numbers are reserved for requests that are special for the HTTP Manager*/
+        enum RequestType
+        {
+            RT_QUIT = -1
+        };
 
-        Request(RequestType type, int priority, bool manage_memory=true);
+        Request(int type, bool manage_memory, int priority);
         virtual ~Request();
 
         void execute();
@@ -83,18 +75,15 @@ namespace Online{
         /** Returns if this request is to be canceled. */
         bool isCancelled() const        { return m_cancel; }
         // ------------------------------------------------------------------------
-        /** Specifies if the memory should be managed by http manager. */
-        void setManageMemory(bool m)    { m_manage_memory = m; }
-        // ------------------------------------------------------------------------
         /** Returns if the memory for this object should be managed by
         *  by network_http (i.e. freed once the request is handled). */
         bool manageMemory() const       { return m_manage_memory; }
 
         bool isDone() const             { return m_done.getAtomic(); }
 
-        RequestType getType() const     { return m_type; }
-
         virtual bool isAllowedToAdd()   { return true; }
+
+        int getType() const             { return m_type; }
 
         /** This class is used by the priority queue to sort requests by priority.
          */
@@ -107,17 +96,6 @@ namespace Online{
             { return a->getPriority() < b->getPriority(); }
         };   // Compare
     };   // Request
-
-
-    // ========================================================================
-
-
-    class QuitRequest : public Request
-    {
-    public :
-        QuitRequest();
-        virtual void operation() OVERRIDE {}
-    };
 
 
     // ========================================================================
@@ -153,7 +131,7 @@ namespace Online{
         virtual void callback() {}
 
     public :
-        HTTPRequest(RequestType type, const std::string & url = "");
+        HTTPRequest(int type = 0, bool manage_memory = false, int priority = 1);
         virtual ~HTTPRequest();
 
         void setParameter(const std::string & name, const std::string &value){
@@ -191,7 +169,7 @@ namespace Online{
         virtual void                    afterOperation() OVERRIDE;
 
     public :
-        XMLRequest(RequestType type, const std::string & url = "");
+        XMLRequest(int type = 0, bool manage_memory = false, int priority = 1);
 
         virtual XMLNode *               getResult() const       { return m_result; }
         const irr::core::stringw &      getInfo()   const       { return m_info; }

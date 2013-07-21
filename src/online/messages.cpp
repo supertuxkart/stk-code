@@ -24,13 +24,6 @@ namespace Online
 {
     namespace Messages
     {
-        irr::core::stringw loadingDots(bool spaces, float interval, int max_dots)
-        {
-            int nr_dots = int(floor(Time::getRealTime() * (1 / interval))) % (max_dots+1);
-            return irr::core::stringw((std::string(nr_dots,'.') + std::string(max_dots-nr_dots,' ')).c_str());
-        }
-        // ------------------------------------------------------------------------
-
         irr::core::stringw signingIn()
         {
             return irr::core::stringw(_("Signing in")) + loadingDots();
@@ -42,20 +35,34 @@ namespace Online
             return irr::core::stringw(_("Signing out")) + loadingDots();
         }
         // ------------------------------------------------------------------------
+        irr::core::stringw signingUp()
+        {
+            return irr::core::stringw(_("Validating registration info")) + loadingDots();
+        }
+        // ------------------------------------------------------------------------
 
         irr::core::stringw signedInAs(const irr::core::stringw & name)
         {
             return irr::core::stringw(_("Signed in as : ")) + name + ".";
         }
+        // ------------------------------------------------------------------------
 
         irr::core::stringw joiningServer()
         {
             return irr::core::stringw(_("Joining server")) + loadingDots();
         }
+        // ------------------------------------------------------------------------
 
         irr::core::stringw creatingServer()
         {
             return irr::core::stringw(_("Creating server")) + loadingDots();
+        }
+
+        // ------------------------------------------------------------------------
+        irr::core::stringw loadingDots(bool spaces, float interval, int max_dots)
+        {
+            int nr_dots = int(floor(Time::getRealTime() * (1 / interval))) % (max_dots+1);
+            return irr::core::stringw((std::string(nr_dots,'.') + std::string(max_dots-nr_dots,' ')).c_str());
         }
     } // namespace messages
 } // namespace Online

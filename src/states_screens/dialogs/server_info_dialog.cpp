@@ -46,7 +46,7 @@ ServerInfoDialog::ServerInfoDialog(Server * server) :
     m_server = server;
     m_self_destroy = false;
     m_enter_lobby = false;
-    m_joining_server = false;
+    m_server_join_request = NULL;
 
     loadFromFile("online/server_info_dialog.stkgui");
 
@@ -69,13 +69,13 @@ ServerInfoDialog::ServerInfoDialog(Server * server) :
 // -----------------------------------------------------------------------------
 ServerInfoDialog::~ServerInfoDialog()
 {
+    delete m_server_join_request;
 }
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::requestJoin()
 {
     Online::CurrentUser::acquire()->requestServerJoin(m_server->getServerId());
     Online::CurrentUser::release();
-    m_joining_server = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -115,21 +115,28 @@ void ServerInfoDialog::onEnterPressedInternal()
 
 void ServerInfoDialog::onUpdate(float dt)
 {
-    XMLRequest * request = HTTPManager::get()->getXMLResponse(Request::RT_SERVER_JOIN);
-    if(request != NULL)
+    if(m_server_join_request != NULL)
     {
-        if(request->isSuccess())
+        if(m_server_join_request->isDone())
         {
-            m_self_destroy = true;
+            if(m_server_join_request->isSuccess())
+            {
+                m_self_destroy = true;
+            }
+            else
+            {
+                sfx_manager->quickSound( "anvil" );
+                m_info_widget->setErrorColor();
+                m_info_widget->setText(m_server_join_request->getInfo(), false);
+            }
+            delete m_server_join_request;
+            m_server_join_request = NULL;
         }
         else
         {
-            sfx_manager->quickSound( "anvil" );
-            m_info_widget->setErrorColor();
-            m_info_widget->setText(request->getInfo(), false);
+            m_info_widget->setDefaultColor();
+            m_info_widget->setText(Online::Messages::joiningServer(), false);
         }
-        delete request;
-        m_joining_server = false;
     }
 
     //If we want to open the registration dialog, we need to close this one first
@@ -142,11 +149,5 @@ void ServerInfoDialog::onUpdate(float dt)
         if (m_enter_lobby)
             StateManager::get()->pushScreen(NetworkingLobby::getInstance());
         return;
-    }
-
-    if (m_joining_server)
-    {
-        m_info_widget->setDefaultColor();
-        m_info_widget->setText(Online::Messages::joiningServer(), false);
     }
 }

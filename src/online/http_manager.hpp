@@ -66,11 +66,6 @@ namespace Online{
                                                >
                         >  m_request_queue;
 
-            /** The list of pointers to all requests that are already handled but didn't need to be deleted. */
-            Synchronised< std::map  < Online::Request::RequestType, Online::Request* > > m_response_queue;
-
-            void addResponse(Online::Request*);
-
             static void  *mainLoop(void *obj);
             void startNetworkThread();
 
@@ -91,9 +86,6 @@ namespace Online{
             void addRequest(Online::Request *request);
             void cancelAllDownloads();
             void stopNetworkThread();
-            Request * getResponse(Online::Request::RequestType type);
-            /** Same as getResponse but with a cast to XMLRequest */
-            XMLRequest * getXMLResponse(Online::Request::RequestType type);
 
             bool getAbort(){ return m_abort.getAtomic(); };
 

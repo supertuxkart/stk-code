@@ -25,6 +25,7 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
+#include "online/messages.hpp"
 
 
 using namespace GUIEngine;
@@ -38,6 +39,7 @@ RegistrationDialog::RegistrationDialog(const Phase phase) :
         ModalDialog(0.8f,0.9f)
 {
     m_sign_up_request = NULL;
+    m_activation_request = NULL;
     m_self_destroy = false;
     m_show_registration_info = false;
     m_show_registration_terms = false;
@@ -59,6 +61,8 @@ RegistrationDialog::RegistrationDialog(const Phase phase) :
 
 RegistrationDialog::~RegistrationDialog()
 {
+    delete m_sign_up_request;
+    delete m_activation_request;
 }
 
 // -----------------------------------------------------------------------------
@@ -190,8 +194,8 @@ bool RegistrationDialog::processTermsEvent(const std::string& eventSource){
         if (eventSource == "next")
         {
             assert(getWidget<CheckBoxWidget>("accepted")->getState());
-            m_agreement = true;
-            m_sign_up_request = CurrentUser::acquire()->requestSignUp(m_username, m_password, m_password_confirm, m_email, m_agreement);
+            m_sign_up_request = CurrentUser::acquire()->requestSignUp(m_username, m_password, m_password_confirm, m_email, true);
+            CurrentUser::release();
             return true;
         }
         else if (eventSource == "accepted")
@@ -274,12 +278,42 @@ void RegistrationDialog::onEnterPressedInternal()
 
 void RegistrationDialog::onUpdate(float dt)
 {
-    /*
-    if(m_sign_up_request != NULL)
+    if (m_phase == Terms)
     {
-        if(m_sign_up_request->isDone())
+        if(m_sign_up_request  != NULL)
         {
-            if(m_sign_up_request->isSuccess())
+            if(m_sign_up_request->isDone())
+            {
+                if(m_sign_up_request->isSuccess())
+                {
+                    m_show_registration_activation = true;
+                }
+                else
+                {
+                    sfx_manager->quickSound( "anvil" );
+                    m_show_registration_info = true;
+                    m_registration_error = m_sign_up_request->getInfo();
+                }
+                delete m_sign_up_request;
+                m_sign_up_request = NULL;
+                //FIXME m_options_widget->setActivated();
+            }
+            else
+            {
+                LabelWidget* label = getWidget<LabelWidget>("info");
+                assert(label != NULL);
+                label->setDefaultColor();
+                label->setText(Messages::signingUp(), false);
+            }
+        }
+    }
+    else if (m_phase == Activation)
+    {
+        /*
+        XMLRequest * sign_up_request = HTTPManager::get()->getXMLResponse(Request::RT_SIGN_UP);
+        if(sign_up_request != NULL)
+        {
+            if(sign_up_request->isSuccess())
             {
                 m_show_registration_activation = true;
             }
@@ -287,18 +321,13 @@ void RegistrationDialog::onUpdate(float dt)
             {
                 sfx_manager->quickSound( "anvil" );
                 m_show_registration_info = true;
+                m_registration_error = sign_up_request->getInfo();
             }
-            m_options_widget->setActivated();
-            delete m_sign_in_request;
-            m_sign_in_request = NULL;
-        }
-        else
-        {
-            m_load_timer += dt;
-            m_info_widget->setDefaultColor();
-            m_info_widget->setText(Online::Messages::signingIn(m_load_timer), false);
-        }
-    }*/
+            delete sign_up_request;
+            m_signing_up = false;
+            //FIXME m_options_widget->setActivated();
+        }*/
+    }
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
         ModalDialog::dismiss();

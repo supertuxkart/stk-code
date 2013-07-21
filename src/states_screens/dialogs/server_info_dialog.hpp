@@ -40,7 +40,7 @@ private:
     
     bool m_self_destroy;
     bool m_enter_lobby;
-    bool m_joining_server;
+    Online::CurrentUser::ServerJoinRequest * m_server_join_request;
 
     float m_load_timer;
 

@@ -29,32 +29,6 @@
 
 namespace Online{
 
-    class SignInRequest : public XMLRequest
-    {
-        virtual void callback ();
-    public :
-        SignInRequest() : XMLRequest(RT_SIGN_IN) {}
-    };
-
-    class SignOutRequest : public XMLRequest
-    {
-        virtual void callback ();
-    public :
-        SignOutRequest() : XMLRequest(RT_SIGN_OUT) {}
-    };
-
-    class ServerCreationRequest : public XMLRequest {
-        virtual void callback ();
-    public :
-        ServerCreationRequest() : XMLRequest(RT_SERVER_JOIN) {}
-    };
-
-    class ServerJoinRequest : public XMLRequest {
-        virtual void callback ();
-    public :
-        ServerJoinRequest() : XMLRequest(RT_SERVER_JOIN) {}
-    };
-
     // ============================================================================
 
     /**
@@ -66,12 +40,48 @@ namespace Online{
         public:
             enum UserState
             {
-                SIGNED_OUT,
-                SIGNED_IN,
-                GUEST,
-                SIGNING_IN,
-                SIGNING_OUT
+                US_SIGNED_OUT,
+                US_SIGNED_IN,
+                US_GUEST,
+                US_SIGNING_IN,
+                US_SIGNING_OUT
             };
+
+            enum RequestType
+            {
+                RT_SIGN_IN = 1,
+                RT_SIGN_OUT,
+                RT_SIGN_UP,
+                RT_SERVER_JOIN,
+                RT_SERVER_CREATION
+            };
+
+            class SignInRequest : public XMLRequest
+            {
+                virtual void callback ();
+            public:
+                SignInRequest() : XMLRequest(RT_SIGN_IN) {}
+            };
+
+            class SignOutRequest : public XMLRequest
+            {
+                virtual void callback ();
+            public:
+                SignOutRequest() : XMLRequest(RT_SIGN_OUT) {}
+            };
+
+            class ServerCreationRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                ServerCreationRequest() : XMLRequest(RT_SERVER_CREATION) {}
+            };
+
+            class ServerJoinRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                ServerJoinRequest() : XMLRequest(RT_SERVER_JOIN) {}
+            };
+
 
         private:
             std::string                 m_token;
@@ -110,9 +120,9 @@ namespace Online{
 
             /** Returns the username if signed in. */
             irr::core::stringw          getUserName()   const;
-            bool                        isSignedIn()    const { return m_state == SIGNED_IN; }
-            bool                        isGuest()       const { return m_state == GUEST; }
-            bool                        isSigningIn()   const { return m_state == SIGNING_IN; }
+            bool                        isSignedIn()    const { return m_state == US_SIGNED_IN; }
+            bool                        isGuest()       const { return m_state == US_GUEST; }
+            bool                        isSigningIn()   const { return m_state == US_SIGNING_IN; }
             UserState                   getUserState()        { return m_state; }
 
     };   // class CurrentUser
