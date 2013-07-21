@@ -36,11 +36,11 @@ void ControllerEventsProtocol::setup()
         STKPeer* peer = NULL;
         if (m_listener->isServer())
         {
-            for (unsigned int i = 0; i < peers.size(); i++)
+            for (unsigned int j = 0; j < peers.size(); j++)
             {
-                if (peers[i]->getPlayerProfile()->kart_name == karts[i]->getIdent())
+                if (peers[j]->getPlayerProfile()->kart_name == karts[i]->getIdent())
                 {
-                    peer = peers[i];
+                    peer = peers[j];
                 }
             }
         }
@@ -61,7 +61,7 @@ void ControllerEventsProtocol::setup()
 
 void ControllerEventsProtocol::notifyEvent(Event* event)
 {
-    if (event->data.size() < 13)
+    if (event->data.size() < 17)
     {
         Log::error("ControllerEventsProtocol", "The data supplied was not complete. Size was %d.", event->data.size());
         return;
@@ -96,7 +96,7 @@ void ControllerEventsProtocol::notifyEvent(Event* event)
 
         m_controllers[controller_index].first->action(action, action_value);
         ns.removeFront(9);
-        Log::info("ControllerEventProtocol", "Registered one action.");
+        //Log::info("ControllerEventProtocol", "Registered one action.");
     }
     if (ns.size() > 0 && ns.size() != 9)
     {
@@ -136,10 +136,6 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
 {
     assert(!m_listener->isServer());
 
-    NetworkString ns;
-    ns.ai32(m_controllers[m_self_controller_index].second->getClientServerToken());
-    ns.af(World::getWorld()->getTime());
-    ns.ai8(m_self_controller_index);
     KartControl* controls = controller->getControls();
     uint8_t serialized_1 = 0;
     serialized_1 |= (controls->m_brake==true);
@@ -155,10 +151,14 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
     serialized_1 += controls->m_skid;
     uint8_t serialized_2 = (uint8_t)(controls->m_accel*255.0);
     uint8_t serialized_3 = (uint8_t)(controls->m_steer*127.0);
+
+    NetworkString ns;
+    ns.ai32(m_controllers[m_self_controller_index].second->getClientServerToken());
+    ns.af(World::getWorld()->getTime());
     ns.ai8(m_self_controller_index);
     ns.ai8(serialized_1).ai8(serialized_2).ai8(serialized_3);
-
     ns.ai8((uint8_t)(action)).ai32(value);
+
     m_listener->sendMessage(this, ns, false); // send message to server
 }
 
