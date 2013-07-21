@@ -163,7 +163,7 @@ void LoginDialog::onEnterPressedInternal()
 
 bool LoginDialog::onEscapePressed()
 {
-    return false;
+    return m_cancel_widget->isActivated();
 }
 
 void LoginDialog::onUpdate(float dt)
