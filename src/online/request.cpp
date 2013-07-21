@@ -29,11 +29,9 @@ namespace Online{
     // =========================================================================================
 
     Request::Request(int type, bool manage_memory, int priority)
-        : m_type(type)
+        : m_type(type), m_manage_memory(manage_memory), m_priority(priority)
     {
-        m_priority      = priority;
-        m_manage_memory = manage_memory;
-        m_cancel        = false;
+        m_cancel.setAtomic(false);
         m_done.setAtomic(false);
     }   // Request
 

@@ -153,6 +153,8 @@ void OnlineScreen::init()
 // ----------------------------------------------------------------------------
 void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
+    if (hasStateChanged())
+        GUIEngine::reshowCurrentScreen();
     if (m_recorded_state == CurrentUser::US_SIGNING_IN)
     {
         m_online_status_widget->setText(Messages::signingIn(), false);
@@ -161,7 +163,6 @@ void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     {
         m_online_status_widget->setText(Messages::signingOut(), false);
     }
-
     for(int i = m_requests.size()-1; i>=0; --i)
     {
         if(m_requests[i].isDone())
@@ -184,8 +185,6 @@ void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
             m_requests.erase(i);
         }
     }
-    if (hasStateChanged())
-        GUIEngine::reshowCurrentScreen();
 }   // onUpdate
 
 // ----------------------------------------------------------------------------

@@ -27,27 +27,32 @@
 namespace Online{
 
     /**
-      * Stores a request for the http connector. They will be sorted by priorities.
+      * Stores a request for the HTTP Manager. They will be sorted by priorities.
       * \ingroup online
       */
     class Request
     {
     private:
-        const int           m_type;
-    protected:
-        /** The priority of this request. The higher the value the more
-        important this request is. */
-        int                 m_priority;
-        /** Cancel this request if it is active. */
-        bool                m_cancel;
-
+        /** Can be used as identifier for the user.
+         *  Has 0 as default value.
+         *  Only requests ment to control the HTTP Manager should use negative values, for all other uses positive values are obliged
+         *  */
+        const int              m_type;
         /** True if the memory for this Request should be managed by
         *  http connector (i.e. this object is freed once the request
         *  is handled). Otherwise the memory is not freed, so it must
         *  be freed by the calling function. */
-        bool                m_manage_memory;
+        const bool             m_manage_memory;
+        /** The priority of this request. The higher the value the more
+        important this request is. */
+        const int              m_priority;
 
-        Synchronised<bool>  m_done;
+    protected:
+
+        /** Cancel this request if it is active. */
+        Synchronised<bool>              m_cancel;
+        /** Set to though if the reply of the request is in and callbacks are executed */
+        Synchronised<bool>              m_done;
 
         virtual void beforeOperation() {}
         virtual void operation() {};
@@ -64,26 +69,26 @@ namespace Online{
         virtual ~Request();
 
         void execute();
-
-        // ------------------------------------------------------------------------
-        /** Returns the priority of this request. */
-        int getPriority() const         { return m_priority; }
-        // ------------------------------------------------------------------------
-        /** Signals that this request should be canceled. */
-        void cancel()                   { m_cancel = true; }
-        // ------------------------------------------------------------------------
-        /** Returns if this request is to be canceled. */
-        bool isCancelled() const        { return m_cancel; }
+        int getType()                   const   { return m_type; }
         // ------------------------------------------------------------------------
         /** Returns if the memory for this object should be managed by
         *  by network_http (i.e. freed once the request is handled). */
-        bool manageMemory() const       { return m_manage_memory; }
-
-        bool isDone() const             { return m_done.getAtomic(); }
-
-        virtual bool isAllowedToAdd()   { return true; }
-
-        int getType() const             { return m_type; }
+        bool manageMemory()             const   { return m_manage_memory; }
+        // ------------------------------------------------------------------------
+        /** Returns the priority of this request. */
+        int getPriority()               const   { return m_priority; }
+        // ------------------------------------------------------------------------
+        /** Signals that this request should be canceled. */
+        void cancel()                           { m_cancel.setAtomic(true); }
+        // ------------------------------------------------------------------------
+        /** Returns if this request is to be canceled. */
+        bool isCancelled()              const   { return m_cancel.getAtomic(); }
+        // ------------------------------------------------------------------------
+        /** Returns if this request is done. */
+        bool isDone()                   const   { return m_done.getAtomic(); }
+        // ------------------------------------------------------------------------
+        /** Virtual method to check if a request has initialized all needed members to a valid value. */
+        virtual bool isAllowedToAdd()   const   { return true; }
 
         /** This class is used by the priority queue to sort requests by priority.
          */
@@ -93,7 +98,9 @@ namespace Online{
             /** Compares two requests, returns if the first request has a lower
              *  priority than the second one. */
             bool operator() (const Request *a, const Request *b) const
-            { return a->getPriority() < b->getPriority(); }
+            {
+                return a->getPriority() < b->getPriority();
+            }
         };   // Compare
     };   // Request
 
@@ -106,29 +113,36 @@ namespace Online{
 
     protected :
 
-        typedef std::map<std::string, std::string> Parameters;
-        Parameters * m_parameters;
+        typedef std::map<std::string, std::string>      Parameters;
 
-        /** The progress indicator. 0 till it is started and the first
-        *  packet is downloaded. At the end eithe -1 (error) or 1
+
+        /** The progress indicator. 0 untill it is started and the first
+        *  packet is downloaded. At the end either -1 (error) or 1
         *  (everything ok) at the end. */
-        Synchronised<float>             m_progress;
-        std::string                     m_url;
+        Synchronised<float>                             m_progress;
+        std::string                            m_url;
+        Parameters *                           m_parameters;
 
-        virtual void afterOperation();
-        std::string downloadPage();
+        virtual void                                    afterOperation() OVERRIDE;
+        /** Executed when a request has finished. */
+        virtual void                                    callback() {}
+        /**
+         * Performs a POST request to the website with URL m_url using the parameters given in m_parameters.
+         * Returns the page as a string.
+         **/
+        std::string                                     downloadPage();
 
-        static int progressDownload(void *clientp,
-                                    double dltotal,
-                                    double dlnow,
-                                    double ultotal,
-                                    double ulnow);
+        static int                                      progressDownload(   void *clientp,
+                                                                            double dltotal,
+                                                                            double dlnow,
+                                                                            double ultotal,
+                                                                            double ulnow);
 
-        static size_t WriteCallback(void *contents,
-                                    size_t size,
-                                    size_t nmemb,
-                                    void *userp);
-        virtual void callback() {}
+        static size_t                                   WriteCallback(      void *contents,
+                                                                            size_t size,
+                                                                            size_t nmemb,
+                                                                            void *userp);
+
 
     public :
         HTTPRequest(int type = 0, bool manage_memory = false, int priority = 1);
