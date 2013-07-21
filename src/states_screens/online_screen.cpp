@@ -34,8 +34,8 @@
 #include "states_screens/dialogs/login_dialog.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
-#include "states_screens/networking_lobby_settings.hpp"
 #include "states_screens/server_selection.hpp"
+#include "states_screens/create_server_screen.hpp"
 #include "modes/demo_world.hpp"
 #include "online/servers_manager.hpp"
 #include "online/messages.hpp"
@@ -198,7 +198,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
 
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
-    if (ribbon == NULL) return; // what's that event??
+    if (ribbon == NULL) return;
     std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
     if (selection == "sign_in")
@@ -220,7 +220,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (selection == "create_server")
     {
-        StateManager::get()->pushScreen(NetworkingLobbySettings::getInstance());
+        StateManager::get()->pushScreen(CreateServerScreen::getInstance());
     }
     else if (selection == "quick_play")
     {

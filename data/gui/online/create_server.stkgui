@@ -19,13 +19,16 @@
             </div>
             
             <label id="info" proportion="1" width="90%" align="center" text_align="center" word_wrap="true" text=""/>
+            
+            <buttonbar id="options" x="0" y="0" width="100%" height="10%" align="center">
+                <icon-button id="create" width="64" height="64" icon="gui/tutorial.png"  extend_label="75"
+                             I18N="Main menu button" text="Create" label_location="hover"/>
+                <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"  extend_label="70"
+                             I18N="Main menu button" text="Cancel" label_location="hover"/>
+            </buttonbar>
         </box>
         
-        <spacer width="10" height="7%"/>
-    
-        <bottombar x="2%" width="96%" height="10%" layout="horizontal-row">
-            
-        </bottombar>
+
         
     </div>
     

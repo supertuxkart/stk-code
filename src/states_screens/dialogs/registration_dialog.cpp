@@ -100,7 +100,6 @@ void RegistrationDialog::showRegistrationInfo(){
 
     LabelWidget* label = getWidget<LabelWidget>("info");
     assert(label != NULL);
-    label->setErrorColor();
     label->setText(m_registration_error, false);
 
     ButtonWidget * button = getWidget<ButtonWidget>("next");
@@ -150,29 +149,26 @@ bool RegistrationDialog::processInfoEvent(const std::string& eventSource){
             m_email_confirm = getWidget<TextBoxWidget>("email_confirm")->getText().trim();
             LabelWidget * info_widget = getWidget<LabelWidget>("info");
             //FIXME More validation of registration information
+            info_widget->setErrorColor();
             if (m_password != m_password_confirm)
             {
                 info_widget->setText(_("Passwords don't match!"), false);
-                sfx_manager->quickSound( "anvil" );
             }
             else if (m_email != m_email_confirm)
             {
                 info_widget->setText(_("Emails don't match!"), false);
-                sfx_manager->quickSound( "anvil" );
             }
             else if (m_username.size() < 4 || m_username.size() > 30)
             {
-                info_widget->setText(_("Username has to be between 5 and 30 characters long!"), false);
-                sfx_manager->quickSound( "anvil" );
+                info_widget->setText(_("Username has to be between 4 and 30 characters long!"), false);
             }
             else if (m_password.size() < 8 || m_password.size() > 30)
             {
-                info_widget->setText(_("Password has to be between 5 and 30 characters long!"), false);
-                sfx_manager->quickSound( "anvil" );
+                info_widget->setText(_("Password has to be between 8 and 30 characters long!"), false);
             }
             else if (m_email.size() < 4 || m_email.size() > 50)
             {
-                info_widget->setText(_("Email has to be between 5 and 50 characters long!"), false);
+                info_widget->setText(_("Email has to be between 4 and 50 characters long!"), false);
             }
             else
             {

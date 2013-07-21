@@ -41,6 +41,7 @@ namespace Online{
         m_lower_case_name = StringUtils::toLowerCase(m_lower_case_name);
 
         xml.get("id",               &m_server_id);
+        xml.get("hostid",           &m_host_id);
         xml.get("max_players",      &m_max_players);
         xml.get("current_players",  &m_current_players);
 

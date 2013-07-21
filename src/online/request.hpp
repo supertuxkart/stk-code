@@ -120,8 +120,8 @@ namespace Online{
         *  packet is downloaded. At the end either -1 (error) or 1
         *  (everything ok) at the end. */
         Synchronised<float>                             m_progress;
-        std::string                            m_url;
-        Parameters *                           m_parameters;
+        std::string                                     m_url;
+        Parameters *                                    m_parameters;
 
         virtual void                                    afterOperation() OVERRIDE;
         /** Executed when a request has finished. */
@@ -184,6 +184,7 @@ namespace Online{
 
     public :
         XMLRequest(int type = 0, bool manage_memory = false, int priority = 1);
+        virtual ~XMLRequest() {delete m_result;}
 
         virtual XMLNode *               getResult() const       { return m_result; }
         const irr::core::stringw &      getInfo()   const       { return m_info; }

@@ -56,7 +56,7 @@ private:
     void requestJoin();
 
 public:
-    ServerInfoDialog(Online::Server * server);
+    ServerInfoDialog(Online::Server * server, bool join = false);
     ~ServerInfoDialog();
 
     void onEnterPressedInternal();

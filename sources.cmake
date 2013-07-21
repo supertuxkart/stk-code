@@ -170,6 +170,7 @@ src/replay/replay_play.cpp
 src/replay/replay_recorder.cpp
 src/states_screens/addons_screen.cpp
 src/states_screens/arenas_screen.cpp
+src/states_screens/create_server_screen.cpp
 src/states_screens/credits.cpp
 src/states_screens/cutscene_gui.cpp
 src/states_screens/dialogs/add_device_dialog.cpp
@@ -198,7 +199,6 @@ src/states_screens/help_screen_4.cpp
 src/states_screens/kart_selection.cpp
 src/states_screens/main_menu_screen.cpp
 src/states_screens/networking_lobby.cpp
-src/states_screens/networking_lobby_settings.cpp
 src/states_screens/online_screen.cpp
 src/states_screens/options_screen_audio.cpp
 src/states_screens/options_screen_input2.cpp
@@ -444,6 +444,7 @@ src/replay/replay_play.hpp
 src/replay/replay_recorder.hpp
 src/states_screens/addons_screen.hpp
 src/states_screens/arenas_screen.hpp
+src/states_screens/create_server_screen.hpp
 src/states_screens/credits.hpp
 src/states_screens/cutscene_gui.hpp
 src/states_screens/dialogs/add_device_dialog.hpp
@@ -472,7 +473,6 @@ src/states_screens/help_screen_4.hpp
 src/states_screens/kart_selection.hpp
 src/states_screens/main_menu_screen.hpp
 src/states_screens/networking_lobby.hpp
-src/states_screens/networking_lobby_settings.hpp
 src/states_screens/online_screen.hpp
 src/states_screens/options_screen_audio.hpp
 src/states_screens/options_screen_input2.hpp

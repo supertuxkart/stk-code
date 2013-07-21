@@ -40,7 +40,7 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-ServerInfoDialog::ServerInfoDialog(Server * server) :
+ServerInfoDialog::ServerInfoDialog(Server * server, bool join) :
         ModalDialog(0.8f,0.8f)
 {
     m_server = server;
@@ -64,6 +64,7 @@ ServerInfoDialog::ServerInfoDialog(Server * server) :
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    requestJoin();
 }
 
 // -----------------------------------------------------------------------------
@@ -121,7 +122,7 @@ void ServerInfoDialog::onUpdate(float dt)
         {
             if(m_server_join_request->isSuccess())
             {
-                m_self_destroy = true;
+                m_enter_lobby = true;
             }
             else
             {

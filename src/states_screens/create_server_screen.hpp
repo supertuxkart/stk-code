@@ -15,14 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_NETWORKING_LOBBY_SETTINGS_HPP
-#define HEADER_NETWORKING_LOBBY_SETTINGS_HPP
+#ifndef HEADER_CREATE_SERVER_SCREEN_HPP
+#define HEADER_CREATE_SERVER_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets/button_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
-#include "guiengine/widgets/text_box_widget.hpp"
-#include "guiengine/widgets/spinner_widget.hpp"
+#include "guiengine/widgets.hpp"
+#include "online/current_user.hpp"
+
 
 namespace GUIEngine { class Widget; class ListWidget; }
 
@@ -30,26 +29,33 @@ namespace GUIEngine { class Widget; class ListWidget; }
   * \brief Handles the main menu
   * \ingroup states_screens
   */
-class NetworkingLobbySettings :     public GUIEngine::Screen,
-                                    public GUIEngine::ScreenSingleton<NetworkingLobbySettings>
+class CreateServerScreen :      public GUIEngine::Screen,
+                                public GUIEngine::ScreenSingleton<CreateServerScreen>
 {
 private:
-    friend class GUIEngine::ScreenSingleton<NetworkingLobbySettings>;
+    friend class GUIEngine::ScreenSingleton<CreateServerScreen>;
 
-    NetworkingLobbySettings();
+    CreateServerScreen();
+
+    bool m_enter_server;
 
     GUIEngine::TextBoxWidget * m_name_widget;
     GUIEngine::SpinnerWidget * m_max_players_widget;
 
     GUIEngine::LabelWidget * m_info_widget;
 
-    GUIEngine::ButtonWidget * m_create_widget;
-    GUIEngine::ButtonWidget * m_cancel_widget;
+    GUIEngine::RibbonWidget * m_options_widget;
+    GUIEngine::IconButtonWidget * m_create_widget;
+    GUIEngine::IconButtonWidget * m_cancel_widget;
+
+
+
+    Online::CurrentUser::ServerCreationRequest * m_server_creation_request;
 
     /** \brief Sets which widget has to be focused. Depends on the user state. */
     void setInitialFocus();
 
-    void createServer();
+    void serverCreationRequest();
 
 public:
 

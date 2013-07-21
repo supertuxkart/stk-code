@@ -214,7 +214,6 @@ namespace Online{
 
     void CurrentUser::ServerJoinRequest::callback()
     {
-        //FIXME
     }
 
     // ============================================================================

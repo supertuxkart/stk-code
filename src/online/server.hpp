@@ -51,6 +51,7 @@ namespace Online{
         std::string m_lower_case_name; //Used for comparison
 
         uint32_t m_server_id;
+        uint32_t m_host_id;
 
         int m_max_players;
 
