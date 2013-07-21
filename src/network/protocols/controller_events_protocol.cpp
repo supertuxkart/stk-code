@@ -77,8 +77,8 @@ void ControllerEventsProtocol::notifyEvent(Event* event)
     NetworkString ns = pure_message;
     float event_timestamp = ns.getFloat();
     ns.removeFront(4);
-    uint8_t client_index = 0;
-    while (ns.size() == 9)
+    uint8_t client_index = -1;
+    while (ns.size() >= 9)
     {
         uint8_t controller_index = ns.gui8();
         client_index = controller_index;
@@ -96,10 +96,17 @@ void ControllerEventsProtocol::notifyEvent(Event* event)
 
         m_controllers[controller_index].first->action(action, action_value);
         ns.removeFront(9);
+        Log::info("ControllerEventProtocol", "Registered one action.");
     }
     if (ns.size() > 0 && ns.size() != 9)
     {
         Log::warn("ControllerEventProtocol", "The data seems corrupted.");
+        return;
+    }
+    if (client_index < 0)
+    {
+        Log::warn("ControllerEventProtocol", "Couldn't have a client id.");
+        return;
     }
     if (m_listener->isServer())
     {
