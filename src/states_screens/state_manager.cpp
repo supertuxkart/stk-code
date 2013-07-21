@@ -167,7 +167,8 @@ void StateManager::escapePressed()
     // when another modal dialog is visible
     else if(ModalDialog::isADialogActive())
     {
-        ModalDialog::getCurrent()->escapePressed();
+        if(ModalDialog::getCurrent()->onEscapePressed())
+            ModalDialog::getCurrent()->dismiss();
     }
     // In-game
     else if(m_game_mode == GAME)
