@@ -42,6 +42,8 @@ void ControllerEventsProtocol::setup()
                 {
                     peer = peers[j];
                 }
+                Log::info("ControllerEventsProtocol", "Compared %s and %s", 
+                        peers[j]->getPlayerProfile()->kart_name.c_str(), karts[i]->getIdent().c_str());
             }
         }
         else
@@ -100,7 +102,7 @@ void ControllerEventsProtocol::notifyEvent(Event* event)
     }
     if (ns.size() > 0 && ns.size() != 9)
     {
-        Log::warn("ControllerEventProtocol", "The data seems corrupted.");
+        Log::warn("ControllerEventProtocol", "The data seems corrupted. Remains %d", ns.size());
         return;
     }
     if (client_index < 0)
@@ -119,6 +121,7 @@ void ControllerEventsProtocol::notifyEvent(Event* event)
             ns2.ai32(m_controllers[i].second->getClientServerToken());
             ns2 += pure_message;
             m_listener->sendMessage(this, m_controllers[i].second, ns2, false);
+            //Log::info("ControllerEventsProtocol", "Sizes are %d and %d", ns2.size(), pure_message.size());
         }
     }
 }
