@@ -74,6 +74,11 @@ namespace Online{
     // ============================================================================
     HTTPManager::~HTTPManager(){
         curl_global_cleanup();
+        m_response_queue.lock();
+        //FIXME should all be deleted
+        m_response_queue.getData().clear();
+        m_response_queue.unlock();
+        //FIXME empty and delete request queue?
     }
 
 
@@ -163,6 +168,11 @@ namespace Online{
     void HTTPManager::addResponse(Request *request)
     {
         m_response_queue.lock();
+        if (m_response_queue.getData().count(request->getType()))
+        {
+            delete m_response_queue.getData()[request->getType()];
+            m_response_queue.getData().erase(request->getType());
+        }
         m_response_queue.getData()[request->getType()] = request;
         m_response_queue.unlock();
     }   // insertRequest
