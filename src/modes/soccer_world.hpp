@@ -23,6 +23,7 @@
 #include "states_screens/race_gui_base.hpp"
 #include "karts/abstract_kart.hpp"
 
+
 #include <IMesh.h>
 
 #include <string>
@@ -30,6 +31,8 @@
 #define CLEAR_SPAWN_RANGE  5
 
 class PhysicalObject;
+class AbstractKart;
+class Controller;
 
 /**
  * \brief An implementation of World, to provide the soccer game mode
@@ -78,6 +81,10 @@ public:
 
 private:
     void initKartList();
+protected:
+	virtual AbstractKart *createKart(const std::string &kart_ident, int index,
+                             int local_player_id, int global_player_id,
+                             RaceManager::KartType type);
 };   // SoccerWorld
 
 

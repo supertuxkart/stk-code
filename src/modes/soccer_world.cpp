@@ -23,9 +23,11 @@
 #include "audio/music_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
@@ -349,3 +351,47 @@ void SoccerWorld::initKartList()
 int SoccerWorld::getScore(unsigned int i){
 	return m_team_goals[i];
 }
+//-----------------------------------------------------------------------------
+AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
+                                int local_player_id, int global_player_id,
+                                RaceManager::KartType kart_type)
+{
+	int posIndex = index;
+	if(race_manager->getLocalKartInfo(index).getSoccerTeam() == SOCCER_TEAM_RED){
+		if(index % 2 != 0)	posIndex += 1;
+	}
+	else if(race_manager->getLocalKartInfo(index).getSoccerTeam() == SOCCER_TEAM_BLUE){
+		if(index % 2 != 1) posIndex += 1;
+	}
+	int position           = index+1;
+    btTransform init_pos   = m_track->getStartTransform(posIndex);
+    AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos);
+    new_kart->init(race_manager->getKartType(index));
+    Controller *controller = NULL;
+    switch(kart_type)
+    {
+    case RaceManager::KT_PLAYER:
+        controller = new PlayerController(new_kart,
+                         StateManager::get()->getActivePlayer(local_player_id),
+                                          local_player_id);
+        m_num_players ++;
+        break;
+    case RaceManager::KT_NETWORK_PLAYER:
+		break;  // Avoid compiler warning about enum not handled.
+        //controller = new NetworkController(kart_ident, position, init_pos,
+        //                          global_player_id);
+        //m_num_players++;
+        //break;
+    case RaceManager::KT_AI:
+        controller = loadAIController(new_kart);
+        break;
+    case RaceManager::KT_GHOST:
+        break;
+    case RaceManager::KT_LEADER:
+        break;
+    }
+
+    new_kart->setController(controller);
+
+    return new_kart;
+}   // createKart

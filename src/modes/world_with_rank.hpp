@@ -66,6 +66,7 @@ public:
     void          endSetKartPositions();
 
     AbstractKart* getKartAtPosition(unsigned int p) const;
+
     };   // WorldWithRank
 
 #endif
