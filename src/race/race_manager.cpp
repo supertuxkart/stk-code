@@ -43,6 +43,7 @@
 #include "modes/three_strikes_battle.hpp"
 #include "modes/soccer_world.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/network_world.hpp"
 #include "network/protocols/start_game_protocol.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
@@ -772,7 +773,8 @@ void RaceManager::startSingleRace(const std::string &track_ident,
     setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     setCoinTarget( 0 ); // Might still be set from a previous challenge
-    //race_manager->setupPlayerKartInfo();
+    if (!NetworkWorld::getInstance<NetworkWorld>()->isRunning()) // if not in a network world
+    race_manager->setupPlayerKartInfo(); // do this setup player kart
 
     startNew(from_overworld);
 }

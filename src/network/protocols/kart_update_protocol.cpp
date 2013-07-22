@@ -116,6 +116,7 @@ void KartUpdateProtocol::update()
                     transform.setOrigin(pos);
                     transform.setRotation(m_next_quaternions.back());
                     m_karts[id]->getBody()->setCenterOfMassTransform(transform);
+                    //m_karts[id]->getBody()->setLinearVelocity(Vec3(0,0,0));
                     Log::verbose("KartUpdateProtocol", "Update kart %i pos to %f %f %f", id, pos[0], pos[1], pos[2]);
                 }
                 m_next_positions.pop_back();
