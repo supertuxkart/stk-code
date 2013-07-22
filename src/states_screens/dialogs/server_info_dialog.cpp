@@ -64,7 +64,8 @@ ServerInfoDialog::ServerInfoDialog(Server * server, bool join) :
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    requestJoin();
+    if (join)
+        requestJoin();
 }
 
 // -----------------------------------------------------------------------------
@@ -75,7 +76,7 @@ ServerInfoDialog::~ServerInfoDialog()
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::requestJoin()
 {
-    Online::CurrentUser::acquire()->requestServerJoin(m_server->getServerId());
+    m_server_join_request = Online::CurrentUser::acquire()->requestServerJoin(m_server->getServerId());
     Online::CurrentUser::release();
 }
 
@@ -122,6 +123,8 @@ void ServerInfoDialog::onUpdate(float dt)
         {
             if(m_server_join_request->isSuccess())
             {
+                ServersManager::acquire()->setJoinedServer(m_server);
+                ServersManager::release();
                 m_enter_lobby = true;
             }
             else
@@ -148,7 +151,9 @@ void ServerInfoDialog::onUpdate(float dt)
     {
         ModalDialog::dismiss();
         if (m_enter_lobby)
+        {
             StateManager::get()->pushScreen(NetworkingLobby::getInstance());
+        }
         return;
     }
 }

@@ -25,6 +25,7 @@
 #include "config/user_config.hpp"
 #include "utils/translation.hpp"
 #include "utils/log.hpp"
+#include "online/servers_manager.hpp"
 
 namespace Online{
     static Synchronised<CurrentUser*> user_singleton(NULL);
@@ -209,6 +210,7 @@ namespace Online{
         request->setParameter("token", m_token);
         request->setParameter("id", m_id);
         request->setParameter("server_id", server_id);
+        HTTPManager::get()->addRequest(request);
         return request;
     }
 
