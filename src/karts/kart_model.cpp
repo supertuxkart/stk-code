@@ -563,6 +563,8 @@ void KartModel::setAnimation(AnimationFrameType type)
         // 'type' is the start frame of the animation, type + 1 the frame
         // to begin the loop with, type + 2 to end the frame with
         AnimationFrameType end = (AnimationFrameType)(type+2);
+        if(m_animation_frame[end]==-1)
+            end = (AnimationFrameType)((int)end-1);
         m_animated_node->setAnimationSpeed(m_animation_speed);
         m_animated_node->setFrameLoop(m_animation_frame[type],
                                       m_animation_frame[end]    );
@@ -607,10 +609,16 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
     if(m_animation_frame[start]==-1)
         start = m_current_animation;
     AnimationFrameType end   = (AnimationFrameType)(m_current_animation+2);
-    m_animated_node->setAnimationSpeed(m_animation_speed);
-    m_animated_node->setFrameLoop(m_animation_frame[start],
-                                  m_animation_frame[end]   );
-    m_animated_node->setLoopMode(true);
+
+    // Switch to loop mode if the current animation has a loop defined
+    // (else just disable the callback, and the last frame will be shown).
+    if(m_animation_frame[end]>-1)
+    {
+        m_animated_node->setAnimationSpeed(m_animation_speed);
+        m_animated_node->setFrameLoop(m_animation_frame[start],
+                                      m_animation_frame[end]   );
+        m_animated_node->setLoopMode(true);
+    }
     m_animated_node->setAnimationEndCallback(NULL);
 }   // OnAnimationEnd
 
