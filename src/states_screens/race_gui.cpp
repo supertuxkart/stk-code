@@ -225,8 +225,11 @@ void RaceGUI::drawScores()
 
 	//Draw kart icons above score(denoting teams)
 	for(unsigned int i=0; i<soccerWorld->getNumKarts(); i++){
-		core::rect<s32> source(i*m_marker_rendered_size, 0,
-			(i+1)*m_marker_rendered_size,m_marker_rendered_size);
+		int j = soccerWorld->getTeamLeader(i);
+		if(j < 0) break;
+
+		core::rect<s32> source(j*m_marker_rendered_size, 0,
+			(j+1)*m_marker_rendered_size,m_marker_rendered_size);
 		core::recti position(offsetX, offsetY,
 			offsetX + 2*m_marker_player_size, offsetY + 2*m_marker_player_size);
 		irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source,

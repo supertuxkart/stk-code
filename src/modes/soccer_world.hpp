@@ -78,6 +78,7 @@ public:
     virtual void update(float dt);
 
     void onCheckGoalTriggered(bool first_goal);
+	int getTeamLeader(unsigned int i);
 
 private:
     void initKartList();
