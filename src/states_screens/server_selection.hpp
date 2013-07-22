@@ -38,22 +38,23 @@ private:
     ServerSelection();
     ~ServerSelection();
 
-    GUIEngine::IconButtonWidget * m_back_widget;
-    GUIEngine::IconButtonWidget * m_reload_widget;
-    GUIEngine::LabelWidget * m_update_status;
-    GUIEngine::ListWidget *  m_server_list_widget;
+    GUIEngine::IconButtonWidget *               m_back_widget;
+    GUIEngine::IconButtonWidget *               m_reload_widget;
+    GUIEngine::LabelWidget *                    m_update_status;
+    GUIEngine::ListWidget *                     m_server_list_widget;
 
     /** Currently selected type. */
-    std::string      m_type;
+    std::string                                 m_type;
 
     /** The currently selected index, used to re-select this item after
      *  addons_loading is being displayed. */
-    int              m_selected_index;
+    int                                         m_selected_index;
 
     /** \brief To check (and set) if sort order is descending **/
-    bool             m_sort_desc;
+    bool                                        m_sort_desc;
 
-    Online::ServersManager::RefreshRequest * m_refresh_request;
+    Online::ServersManager::RefreshRequest *    m_refresh_request;
+    bool                                        m_fake_refresh;
     void refresh();
 
 public:

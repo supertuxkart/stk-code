@@ -56,9 +56,11 @@ void ServerSelection::refresh()
 {
     m_refresh_request = ServersManager::acquire()->refreshRequest();
     ServersManager::release();
+    m_fake_refresh = (m_refresh_request == NULL ? true : false);
     m_server_list_widget->clear();
     m_server_list_widget->addItem("spacer", L"");
     m_server_list_widget->addItem("loading", Messages::fetchingServers());
+    m_reload_widget->setDeactivated();
 }
 
 
@@ -67,8 +69,9 @@ void ServerSelection::refresh()
 void ServerSelection::loadedFromFile()
 {
     m_back_widget = getWidget<GUIEngine::IconButtonWidget>("back");
+    assert(m_back_widget != NULL);
     m_reload_widget = getWidget<GUIEngine::IconButtonWidget>("reload");
-
+    assert(m_reload_widget != NULL);
     m_server_list_widget = getWidget<GUIEngine::ListWidget>("server_list");
     assert(m_server_list_widget != NULL);
     m_server_list_widget->setColumnListener(this);
@@ -89,7 +92,7 @@ void ServerSelection::init()
 {
     Screen::init();
     m_sort_desc = true;
-    m_reload_widget->setActivated();
+
 
     // Set the default sort order
     Server::setSortOrder(Server::SO_NAME);
@@ -194,11 +197,17 @@ void ServerSelection::onUpdate(float dt, irr::video::IVideoDriver*)
             }
             delete m_refresh_request;
             m_refresh_request = NULL;
-            //m_options_widget->setActivated();
+            m_reload_widget->setActivated();
         }
         else
         {
             m_server_list_widget->renameItem("loading", Messages::fetchingServers());
         }
+    }
+    else if(m_fake_refresh)
+    {
+        loadList();
+        m_fake_refresh = false;
+        m_reload_widget->setActivated();
     }
 }   // onUpdate

@@ -48,6 +48,7 @@ namespace Online {
 
     private:
         ServersManager();
+        ~ServersManager();
         PtrVector<Server> *             m_servers;
         bool                            m_not_fetched;
         Server *                        m_joined_server;

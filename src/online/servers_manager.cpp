@@ -65,6 +65,12 @@ namespace Online{
         m_servers = new PtrVector<Server>;
         m_info_message = "";
         m_last_load_time = 0.0f;
+        m_joined_server = NULL;
+    }
+
+    ServersManager::~ServersManager(){
+        m_servers->clearAndDeleteAll();
+        delete m_joined_server;
     }
 
     // ============================================================================
@@ -91,7 +97,7 @@ namespace Online{
             {
                 m_servers->push_back(new Server(*servers_xml->getNode(i)));
             }
-            m_last_load_time += Time::getRealTime();
+            m_last_load_time = Time::getRealTime();
         }
         m_info_message = input->getInfo();
         //FIXME error message

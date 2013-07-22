@@ -31,7 +31,7 @@
             
             <spacer width="10" height="10" />                         
             
-            <buttonbar id="menu_bottomrow" x="0" y="0" width="20%" height="100%" align="center">
+            <buttonbar id="menu_bottomrow" x="0" y="0" width="10%" height="100%" align="center">
                 <icon-button id="sign_in" width="64" height="64" icon="gui/main_about.png" extend_label="50"
                              I18N="Main menu button" text="Sign In" label_location="hover"/>
                 <icon-button id="register" width="64" height="64" icon="gui/tutorial.png"  extend_label="75"
