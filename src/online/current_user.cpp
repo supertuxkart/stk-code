@@ -77,10 +77,12 @@ namespace Online{
         assert(m_state == US_SIGNED_OUT || m_state == US_GUEST);
         XMLRequest * request = new XMLRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-        request->setParameter("action",std::string("register"));
-        request->setParameter("username",username);
-        request->setParameter("password",password);
-        request->setParameter("password_confirm",password_confirm);
+        request->setParameter("action", std::string("register"));
+        request->setParameter("username", username);
+        request->setParameter("password", password);
+        request->setParameter("password_confirm", password_confirm);
+        request->setParameter("email", email);
+        request->setParameter("terms", std::string("on"));
         HTTPManager::get()->addRequest(request);
         return request;
     }

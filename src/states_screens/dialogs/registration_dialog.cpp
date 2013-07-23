@@ -125,7 +125,6 @@ void RegistrationDialog::showRegistrationTerms(){
 
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
-    m_info_widget->setText(m_registration_error, false);
 
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
