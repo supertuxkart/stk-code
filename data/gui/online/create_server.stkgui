@@ -21,8 +21,8 @@
 	            
 	            <label id="info" proportion="1" width="100%" align="center" text_align="center" word_wrap="true" text=""/>
 	            
-	            <buttonbar id="options" x="0" y="0" width="30%" height="12%" align="center">
-	                <icon-button id="create" width="64" height="64" icon="gui/tutorial.png"
+	            <buttonbar id="options" x="0" y="0" width="25%" height="12%" align="center">
+	                <icon-button id="create" width="64" height="64" icon="gui/green_check.png"
 	                             I18N="Main menu button" text="Create" label_location="bottom"/>
 	                <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
 	                             I18N="Main menu button" text="Cancel" label_location="bottom"/>
