@@ -120,8 +120,9 @@ void KartModel::loadInfo(const XMLNode &node)
         animation_node->get("end-losing",     &m_animation_frame[AF_LOSE_END]  );
         animation_node->get("start-explosion",&m_animation_frame[AF_LOSE_START]);
         animation_node->get("end-explosion",  &m_animation_frame[AF_LOSE_END]  );
-        animation_node->get("start-jump",     &m_animation_frame[AF_BEGIN_JUMP]);
-        animation_node->get("end-jump",       &m_animation_frame[AF_END_JUMP]  );
+        animation_node->get("start-jump",     &m_animation_frame[AF_JUMP_START]);
+        animation_node->get("start-jump-loop",&m_animation_frame[AF_JUMP_LOOP] );
+        animation_node->get("end-jump",       &m_animation_frame[AF_JUMP_END]  );
         animation_node->get("speed",          &m_animation_speed               );
     }
 

@@ -1221,7 +1221,7 @@ void Kart::update(float dt)
             // the texture has the jump property set.
             if(t>getKartProperties()->getJumpAnimationTime()  ||
                 last_m->isJumpTexture()                         )
-                m_kart_model->setAnimation(KartModel::AF_BEGIN_JUMP);
+                m_kart_model->setAnimation(KartModel::AF_JUMP_START);
             m_is_jumping = true;
         }
         m_jump_time+=dt;
