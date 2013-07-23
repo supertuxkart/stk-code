@@ -1872,7 +1872,6 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     m_light->setLightType(video::ELT_SPOT);
     m_light->setRotation((core::vector3df(0, 10, 0) - spot_pos).getHorizontalAngle());
     m_light->updateAbsolutePosition();
-    m_light->OnRegisterSceneNode();
 
     m_rtt_main_node->setMaterialFlag(video::EMF_GOURAUD_SHADING , true);
     m_rtt_main_node->setMaterialFlag(video::EMF_LIGHTING, true);
