@@ -163,7 +163,13 @@ namespace Online{
 
     void CurrentUser::ServerCreationRequest::callback()
     {
-        //FIXME
+        if(isSuccess())
+        {
+            Server * server = new Server(*getResult()->getNode("server"));
+            ServersManager::acquire()->addServer(server);
+            ServersManager::release();
+            m_created_server_id.setAtomic(server->getServerId());
+        }
     }
 
     // ============================================================================
@@ -216,6 +222,14 @@ namespace Online{
 
     void CurrentUser::ServerJoinRequest::callback()
     {
+        if(isSuccess())
+        {
+            uint32_t server_id;
+            getResult()->get("serverid", &server_id);
+            ServersManager::acquire()->setJoinedServer(server_id);
+            ServersManager::release();
+        }
+        //FIXME needs changes for actual valid joining
     }
 
     // ============================================================================

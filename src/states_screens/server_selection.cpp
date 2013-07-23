@@ -117,7 +117,7 @@ void ServerSelection::loadList()
     manager->sort(m_sort_desc);
     for(int i=0; i <  manager->getNumServers(); i++)
     {
-        Server * server = manager->getServer(i);
+        Server * server = manager->getServerBySort(i);
         core::stringw num_players;
         num_players.append(StringUtils::toWString(server->getCurrentPlayers()));
         num_players.append("/");
@@ -162,8 +162,9 @@ void ServerSelection::eventCallback( GUIEngine::Widget* widget,
     else if (name == m_server_list_widget->m_properties[GUIEngine::PROP_ID])
     {
         m_selected_index = m_server_list_widget->getSelectionID();
-        new ServerInfoDialog(ServersManager::acquire()->getServer(m_selected_index));
+        uint32_t server_id = ServersManager::acquire()->getServerBySort(m_selected_index)->getServerId();
         ServersManager::release();
+        new ServerInfoDialog(server_id);
     }
 
 }   // eventCallback

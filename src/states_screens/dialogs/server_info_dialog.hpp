@@ -27,6 +27,7 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "online/server.hpp"
 #include "online/current_user.hpp"
+#include "utils/types.hpp"
 
 
 /**
@@ -44,7 +45,7 @@ private:
 
     float m_load_timer;
 
-    Online::Server * m_server;
+    uint32_t m_server_id;
 
     GUIEngine::LabelWidget * m_name_widget;
     GUIEngine::LabelWidget * m_info_widget;
@@ -56,7 +57,7 @@ private:
     void requestJoin();
 
 public:
-    ServerInfoDialog(Online::Server * server, bool join = false);
+    ServerInfoDialog(uint32_t server_id, bool join = false);
     ~ServerInfoDialog();
 
     void onEnterPressedInternal();

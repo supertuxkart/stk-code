@@ -20,6 +20,7 @@
 #define HEADER_SERVERS_MANAGER_HPP
 
 #include "utils/ptr_vector.hpp"
+#include "utils/types.hpp"
 #include "online/server.hpp"
 #include "http_manager.hpp"
 
@@ -49,12 +50,18 @@ namespace Online {
     private:
         ServersManager();
         ~ServersManager();
-        PtrVector<Server> *             m_servers;
-        bool                            m_not_fetched;
+        /** Sorted vector of servers */
+        PtrVector<Server>               m_sorted_servers;
+        /** Maps server id's to the same servers*/
+        std::map<uint32_t, Server*>     m_mapped_servers;
+        /** This is a pointer to a copy of the server, the moment it got joined */
         Server *                        m_joined_server;
+
+        bool                            m_not_fetched;
         irr::core::stringw              m_info_message;
         float                           m_last_load_time;
         void                            refresh(RefreshRequest * input);
+        void                            cleanUpServers();
 
     public:
         // Singleton
@@ -63,11 +70,13 @@ namespace Online {
         static void                     deallocate();
 
         RefreshRequest *                refreshRequest();
-        PtrVector<Server> *             getServers ()           const   { return m_servers;                             }
-        int                             getNumServers ()        const   { return m_servers->size();                     }
-        Server *                        getServer (int index)   const   { return m_servers->get(index);                 }
-        void                            sort(bool sort_desc)            { m_servers->insertionSort(0, sort_desc);       }
-        void                            setJoinedServer(Server * server){ m_joined_server = server;                     }
+        void                            setJoinedServer(uint32_t server_id);
+        void                            unsetJoinedServer();
+        void                            addServer(Server * server);
+        int                             getNumServers ();
+        Server *                        getServerByID (uint32_t server_id);
+        Server *                        getServerBySort (int index);
+        void                            sort(bool sort_desc)            { m_sorted_servers.insertionSort(0, sort_desc); }
         Server *                        getJoinedServer()               { return m_joined_server;                       }
         //Returns the best server to join
         Server *                        getQuickPlay();

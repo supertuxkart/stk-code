@@ -62,15 +62,21 @@ namespace Online{
 
     // ============================================================================
     ServersManager::ServersManager(){
-        m_servers = new PtrVector<Server>;
         m_info_message = "";
         m_last_load_time = 0.0f;
         m_joined_server = NULL;
     }
 
     ServersManager::~ServersManager(){
-        m_servers->clearAndDeleteAll();
+        cleanUpServers();
         delete m_joined_server;
+    }
+
+    // ============================================================================
+    void ServersManager::cleanUpServers()
+    {
+        m_sorted_servers.clearAndDeleteAll();
+        m_mapped_servers.clear();
     }
 
     // ============================================================================
@@ -92,10 +98,10 @@ namespace Online{
         if (input->isSuccess())
         {
             const XMLNode * servers_xml = input->getResult()->getNode("servers");
-            m_servers->clearAndDeleteAll();
+            cleanUpServers();
             for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
             {
-                m_servers->push_back(new Server(*servers_xml->getNode(i)));
+                addServer(new Server(*servers_xml->getNode(i)));
             }
             m_last_load_time = Time::getRealTime();
         }
@@ -112,8 +118,48 @@ namespace Online{
     // ============================================================================
     Server * ServersManager::getQuickPlay()
     {
-        if(m_servers->size() > 0)
-            return m_servers->get(0);
+        if(m_sorted_servers.size() > 0)
+            return getServerBySort(0);
         return NULL;
+    }
+
+    // ============================================================================
+    void ServersManager::setJoinedServer(uint32_t id)
+    {
+        delete m_joined_server;
+        //It's a copy!
+        m_joined_server = new Server(*getServerByID(id));
+    }
+
+    // ============================================================================
+    void ServersManager::unsetJoinedServer()
+    {
+        delete m_joined_server;
+        m_joined_server = NULL;
+    }
+
+    // ============================================================================
+    void ServersManager::addServer(Server * server)
+    {
+        m_sorted_servers.push_back(server);
+        m_mapped_servers[server->getServerId()] = server;
+    }
+
+    // ============================================================================
+    int ServersManager::getNumServers ()
+    {
+        return m_sorted_servers.size();
+    }
+
+    // ============================================================================
+    Server * ServersManager::getServerBySort (int index)
+    {
+        return m_sorted_servers.get(index);
+    }
+
+    // ============================================================================
+    Server * ServersManager::getServerByID (uint32_t id)
+    {
+        return m_mapped_servers[id];
     }
 } // namespace Online

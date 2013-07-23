@@ -97,8 +97,7 @@ void CreateServerScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver
             if(m_server_creation_request->isSuccess())
             {
                 if (m_enter_server){
-                    Server * server = new Server(*m_server_creation_request->getResult()->getNode("server"));
-                    new ServerInfoDialog(server,true);
+                    new ServerInfoDialog(m_server_creation_request->getCreatedServerID(),true);
                 }
                 else
                 {

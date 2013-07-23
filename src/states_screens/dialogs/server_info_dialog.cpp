@@ -40,10 +40,10 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-ServerInfoDialog::ServerInfoDialog(Server * server, bool join) :
+ServerInfoDialog::ServerInfoDialog(uint32_t server_id, bool join) :
         ModalDialog(0.8f,0.8f)
 {
-    m_server = server;
+    m_server_id = server_id;
     m_self_destroy = false;
     m_enter_lobby = false;
     m_server_join_request = NULL;
@@ -52,8 +52,9 @@ ServerInfoDialog::ServerInfoDialog(Server * server, bool join) :
 
     m_name_widget = getWidget<LabelWidget>("name");
     assert(m_name_widget != NULL);
+    Server * server = ServersManager::acquire()->getServerByID(m_server_id);
     m_name_widget->setText(server->getName(),false);
-
+    ServersManager::release();
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
 
@@ -76,7 +77,7 @@ ServerInfoDialog::~ServerInfoDialog()
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::requestJoin()
 {
-    m_server_join_request = Online::CurrentUser::acquire()->requestServerJoin(m_server->getServerId());
+    m_server_join_request = Online::CurrentUser::acquire()->requestServerJoin(m_server_id);
     Online::CurrentUser::release();
 }
 
@@ -123,8 +124,6 @@ void ServerInfoDialog::onUpdate(float dt)
         {
             if(m_server_join_request->isSuccess())
             {
-                ServersManager::acquire()->setJoinedServer(m_server);
-                ServersManager::release();
                 m_enter_lobby = true;
             }
             else

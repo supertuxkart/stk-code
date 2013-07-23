@@ -72,8 +72,10 @@ namespace Online{
 
             class ServerCreationRequest : public XMLRequest {
                 virtual void callback ();
+                Synchronised<uint32_t> m_created_server_id;
             public:
                 ServerCreationRequest() : XMLRequest(RT_SERVER_CREATION) {}
+                uint32_t getCreatedServerID() {return m_created_server_id.getAtomic();}
             };
 
             class ServerJoinRequest : public XMLRequest {
