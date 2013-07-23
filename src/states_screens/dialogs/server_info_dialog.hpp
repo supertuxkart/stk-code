@@ -41,6 +41,7 @@ private:
     
     bool m_self_destroy;
     bool m_enter_lobby;
+    bool m_from_server_creation;
     Online::CurrentUser::ServerJoinRequest * m_server_join_request;
 
     float m_load_timer;
@@ -57,14 +58,13 @@ private:
     void requestJoin();
 
 public:
-    ServerInfoDialog(uint32_t server_id, bool join = false);
+    ServerInfoDialog(uint32_t server_id, bool just_created = false);
     ~ServerInfoDialog();
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     
     virtual void onUpdate(float dt);
-    //virtual void onTextUpdated();
 };
 
 #endif

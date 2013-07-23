@@ -46,7 +46,6 @@ DEFINE_SCREEN_SINGLETON( CreateServerScreen );
 CreateServerScreen::CreateServerScreen() : Screen("online/create_server.stkgui")
 {
     m_server_creation_request = NULL;
-    m_enter_server = true;
 }   // CreateServerScreen
 
 // ----------------------------------------------------------------------------
@@ -57,8 +56,11 @@ void CreateServerScreen::loadedFromFile()
 
     m_name_widget = getWidget<TextBoxWidget>("name");
     assert(m_name_widget != NULL);
+    m_name_widget->setText(CurrentUser::acquire()->getUserName() + _("'s server"));
+    CurrentUser::release();
     m_max_players_widget = getWidget<SpinnerWidget>("max_players");
     assert(m_max_players_widget != NULL);
+    m_max_players_widget->setValue(8);
 
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
@@ -86,6 +88,7 @@ void CreateServerScreen::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
+    m_info_widget->setText("", false);
 }
 // ----------------------------------------------------------------------------
 void CreateServerScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
@@ -96,13 +99,7 @@ void CreateServerScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver
         {
             if(m_server_creation_request->isSuccess())
             {
-                if (m_enter_server){
-                    new ServerInfoDialog(m_server_creation_request->getCreatedServerID(),true);
-                }
-                else
-                {
-                    StateManager::get()->escapePressed();
-                }
+                new ServerInfoDialog(m_server_creation_request->getCreatedServerID(), true);
             }
             else
             {

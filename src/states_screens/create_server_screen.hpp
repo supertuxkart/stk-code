@@ -37,8 +37,6 @@ private:
 
     CreateServerScreen();
 
-    bool m_enter_server;
-
     GUIEngine::TextBoxWidget * m_name_widget;
     GUIEngine::SpinnerWidget * m_max_players_widget;
 
@@ -47,8 +45,6 @@ private:
     GUIEngine::RibbonWidget * m_options_widget;
     GUIEngine::IconButtonWidget * m_create_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
-
-
 
     Online::CurrentUser::ServerCreationRequest * m_server_creation_request;
 

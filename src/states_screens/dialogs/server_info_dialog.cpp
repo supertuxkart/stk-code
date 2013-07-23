@@ -40,12 +40,13 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-ServerInfoDialog::ServerInfoDialog(uint32_t server_id, bool join) :
+ServerInfoDialog::ServerInfoDialog(uint32_t server_id, bool from_server_creation) :
         ModalDialog(0.8f,0.8f)
 {
     m_server_id = server_id;
     m_self_destroy = false;
     m_enter_lobby = false;
+    m_from_server_creation = from_server_creation;
     m_server_join_request = NULL;
 
     loadFromFile("online/server_info_dialog.stkgui");
@@ -57,7 +58,8 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, bool join) :
     ServersManager::release();
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
-
+    if (m_from_server_creation)
+        m_info_widget->setText(_("Server successfully created. You can now join it."), true);
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
     m_join_widget = getWidget<IconButtonWidget>("join");
@@ -65,8 +67,7 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, bool join) :
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    if (join)
-        requestJoin();
+
 }
 
 // -----------------------------------------------------------------------------
@@ -149,10 +150,10 @@ void ServerInfoDialog::onUpdate(float dt)
     if (m_self_destroy)
     {
         ModalDialog::dismiss();
+        if (m_from_server_creation)
+            StateManager::get()->popMenu();
         if (m_enter_lobby)
-        {
             StateManager::get()->pushScreen(NetworkingLobby::getInstance());
-        }
         return;
     }
 }
