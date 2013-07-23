@@ -46,8 +46,7 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 
 NetworkingLobby::NetworkingLobby() : Screen("online/lobby.stkgui")
 {
-    m_server = ServersManager::acquire()->getJoinedServer();
-    ServersManager::release();
+    m_server = NULL;
 }   // NetworkingLobby
 
 // ----------------------------------------------------------------------------
@@ -85,6 +84,8 @@ void NetworkingLobby::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime(); //FIXME : what's this?
+    m_server = ServersManager::acquire()->getJoinedServer();
+    ServersManager::release();
     m_server_name_widget->setText(m_server->getName(),false);
 
 }   // init

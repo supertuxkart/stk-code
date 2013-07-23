@@ -46,8 +46,14 @@ ServerSelection::ServerSelection() : Screen("online/server_selection.stkgui")
 
 ServerSelection::~ServerSelection()
 {
-    delete m_refresh_request;
 }   // ServerSelection
+
+// ----------------------------------------------------------------------------
+
+void ServerSelection::tearDown()
+{
+    delete m_refresh_request;
+}   // tearDown
 
 
 // ----------------------------------------------------------------------------

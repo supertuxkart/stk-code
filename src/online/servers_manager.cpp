@@ -87,7 +87,7 @@ namespace Online{
         return request;
     }
 
-    void ServersManager::refresh(const RefreshRequest * input)
+    void ServersManager::refresh(RefreshRequest * input)
     {
         if (input->isSuccess())
         {

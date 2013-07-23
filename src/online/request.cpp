@@ -58,7 +58,7 @@ namespace Online{
     {
         //Negative numbers are reserved for special requests ment for the HTTP Manager
         assert(type >= 0);
-        m_url = "";
+        m_url.setAtomic("");
         m_parameters = new Parameters;
         m_progress.setAtomic(0);
     }
@@ -70,9 +70,12 @@ namespace Online{
 
     bool HTTPRequest::isAllowedToAdd()
     {
-        if (m_url.size() > 5 && ( m_url.substr(0, 5) != "http:"))
-            return false;
-        return true;
+        bool ok = true;
+        m_url.lock();
+        if (m_url.getData().size() > 5 && ( m_url.getData().substr(0, 5) != "http:"))
+            ok = false;
+        m_url.unlock();
+        return ok;
     }
 
     void HTTPRequest::afterOperation()
@@ -90,8 +93,7 @@ namespace Online{
             Log::error("online/http_functions", "Error while initialising libCurl session");
             return "";
         }
-
-        curl_easy_setopt(curl_session, CURLOPT_URL, m_url.c_str());
+        curl_easy_setopt(curl_session, CURLOPT_URL, m_url.getAtomic().c_str());
         Parameters::iterator iter;
         std::string postString = "";
         for (iter = m_parameters->begin(); iter != m_parameters->end(); ++iter)
@@ -195,9 +197,14 @@ namespace Online{
     XMLRequest::XMLRequest(int type, bool manage_memory, int priority)
         : HTTPRequest(priority, manage_memory, type)
     {
-        m_info = "";
-        m_success = false;
+        m_info.setAtomic("");
+        m_success.setAtomic(false);
         m_result = NULL;
+    }
+
+    XMLRequest::~XMLRequest()
+    {
+        delete m_result;
     }
 
 
@@ -220,8 +227,8 @@ namespace Online{
         }
         else
             info = _("Unable to connect to the server. Check your internet connection or try again later.");
-        m_info = info;
-        m_success = success;
+        m_info.setAtomic(info);
+        m_success.setAtomic(success);
         HTTPRequest::afterOperation();
     }
 } // namespace Online

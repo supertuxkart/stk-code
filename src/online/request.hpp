@@ -120,7 +120,7 @@ namespace Online{
         *  packet is downloaded. At the end either -1 (error) or 1
         *  (everything ok) at the end. */
         Synchronised<float>                             m_progress;
-        std::string                                     m_url;
+        Synchronised<std::string>                       m_url;
         Parameters *                                    m_parameters;
 
         virtual void                                    afterOperation() OVERRIDE;
@@ -164,8 +164,14 @@ namespace Online{
         /** Sets the current progress. */
         void setProgress(float f) { m_progress.setAtomic(f); }
 
-        const std::string &getURL() const {return m_url;}
-        void setURL(const std::string & url) { m_url = url;}
+        const std::string getURL()     {
+                                            m_url.lock();
+                                            const std::string url = m_url.getData();
+                                            m_url.unlock();
+                                            return url;
+                                        }
+
+        void setURL(const std::string & url) { m_url.setAtomic(url);}
 
         virtual bool isAllowedToAdd() OVERRIDE;
 
@@ -175,20 +181,25 @@ namespace Online{
     {
     protected :
 
-        XMLNode *                       m_result;
-        irr::core::stringw              m_info;
-        bool                            m_success;
+        XMLNode *                                       m_result;
+        Synchronised<irr::core::stringw>                m_info;
+        Synchronised<bool>                              m_success;
 
         virtual void                    operation() OVERRIDE;
         virtual void                    afterOperation() OVERRIDE;
 
     public :
         XMLRequest(int type = 0, bool manage_memory = false, int priority = 1);
-        virtual ~XMLRequest() {delete m_result;}
+        virtual ~XMLRequest();
 
         virtual XMLNode *               getResult() const       { return m_result; }
-        const irr::core::stringw &      getInfo()   const       { return m_info; }
-        bool                            isSuccess() const       { return m_success; }
+        const irr::core::stringw        getInfo()               {
+                                                                    m_info.lock();
+                                                                    const irr::core::stringw info = m_info.getData();
+                                                                    m_info.unlock();
+                                                                    return info;
+                                                                }
+        bool                            isSuccess() const       { return m_success.getAtomic(); }
 
     };
 } //namespace Online

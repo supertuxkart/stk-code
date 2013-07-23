@@ -54,7 +54,7 @@ namespace Online {
         Server *                        m_joined_server;
         irr::core::stringw              m_info_message;
         float                           m_last_load_time;
-        void                            refresh(const RefreshRequest * input);
+        void                            refresh(RefreshRequest * input);
 
     public:
         // Singleton
