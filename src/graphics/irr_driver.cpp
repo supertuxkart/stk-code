@@ -1863,17 +1863,16 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         }
     }
 
-    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 120,
-                                                                 120, 120) );
+    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 10, 10, 10) );
 
-    const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
+    const core::vector3df &spot_pos = core::vector3df(30, 30, 30);
     m_light = irr_driver->getSceneManager()
-        ->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f),
-                            10000.0f /* radius */);
-    m_light->getLightData().DiffuseColor
-        = video::SColorf(0.5f, 0.5f, 0.5f, 0.5f);
-    m_light->getLightData().SpecularColor
-        = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+        ->addLightSceneNode(NULL, spot_pos, video::SColorf(1.0f,1.0f,1.0f),
+                            1600 /* radius */);
+    m_light->setLightType(video::ELT_SPOT);
+    m_light->setRotation((core::vector3df(0, 10, 0) - spot_pos).getHorizontalAngle());
+    m_light->updateAbsolutePosition();
+    m_light->OnRegisterSceneNode();
 
     m_rtt_main_node->setMaterialFlag(video::EMF_GOURAUD_SHADING , true);
     m_rtt_main_node->setMaterialFlag(video::EMF_LIGHTING, true);
