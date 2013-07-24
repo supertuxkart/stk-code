@@ -2,7 +2,7 @@
 #define STOP_SERVER_HPP
 
 #include "network/protocol.hpp"
-
+#include "online/request.hpp"
 
 /*! \brief Removes the server info from the database
  */
@@ -19,9 +19,11 @@ class StopServer : public Protocol
         virtual void asynchronousUpdate();
 
     protected:
+        Online::XMLRequest* m_request;
         enum STATE
         {
             NONE,
+            REQUEST_PENDING,
             DONE,
             EXITING
         };

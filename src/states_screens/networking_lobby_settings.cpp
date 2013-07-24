@@ -36,7 +36,7 @@
 #include "modes/demo_world.hpp"
 #include "utils/translation.hpp"
 
-#include "online/current_online_user.hpp"
+#include "online/current_user.hpp"
 
 
 using namespace GUIEngine;
@@ -60,7 +60,7 @@ void NetworkingLobbySettings::loadedFromFile()
 // ----------------------------------------------------------------------------
 bool NetworkingLobbySettings::hasLostConnection()
 {
-    return !CurrentOnlineUser::get()->isSignedIn();
+    return !Online::CurrentUser::acquire()->isSignedIn();
 }
 
 // ----------------------------------------------------------------------------

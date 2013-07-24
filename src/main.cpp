@@ -173,7 +173,8 @@
 #include "network/server_network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
-#include "online/current_online_user.hpp"
+#include "online/current_user.hpp"
+#include "online/http_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -1107,8 +1108,16 @@ int handleCmdLine(int argc, char **argv)
 
     if (try_login)
     {
+/*
         irr::core::stringw s;
-        CurrentOnlineUser::get()->signIn(login, password, s);
+        Online::CurrentUser::SignInRequest* request =
+                Online::CurrentUser::acquire()->requestSignIn(login, password, false);
+        request->setManageMemory(true);
+
+        if (request->isSuccess())
+        {
+            Log::info("Main", "Logged in from command line.");
+        }*/
     }
 
     return 1;
@@ -1230,6 +1239,8 @@ void cleanSuperTuxKart()
 
     if(INetworkHttp::get())
         INetworkHttp::get()->stopNetworkThread();
+    if(Online::HTTPManager::isRunning())
+        Online::HTTPManager::get()->stopNetworkThread();
     //delete in reverse order of what they were created in.
     //delete in reverse order of what they were created in.
     //see InitTuxkart()

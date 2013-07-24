@@ -105,7 +105,7 @@ namespace GUIEngine
         static bool isADialogActive();
 
         /** Override to change what happens on escape pressed */
-        virtual void escapePressed() { dismiss(); }
+        virtual bool onEscapePressed() { return true; }
 
         /** Override to be notified of updates */
         virtual void onUpdate(float dt) { }

@@ -16,43 +16,26 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_ONLINE_USER_HPP
-#define HEADER_ONLINE_USER_HPP
+#ifndef HEADER_ONLINE_MESSAGES_HPP
+#define HEADER_ONLINE_MESSAGES_HPP
 
+#include <string>
 #include <irrString.h>
-#include "utils/types.hpp"
 
-// ============================================================================
-
-/**
-  * \brief Class that represents an online registered user
-  * \ingroup online
-  */
-class OnlineUser
+namespace Online
 {
-    private:
-
-    protected:
-
-        irr::core::stringw m_name;
-        uint32_t m_id;
-        OnlineUser(){}
-
-    public:
-
-        /**
-          * Constructor
-          */
-        OnlineUser(const irr::core::stringw &username);
-        OnlineUser(const uint32_t& id);
-
-        /** Returns the username. */
-        irr::core::stringw getUserName() const { return m_name; }
-        uint32_t getUserID() const { return m_id; }
-
-
-};   // class OnlineUser
-
+    namespace Messages
+    {
+        irr::core::stringw loadingDots          (bool spaces = true, float interval = 0.5f, int max_dots = 3);
+        irr::core::stringw signingIn            ();
+        irr::core::stringw signingOut           ();
+        irr::core::stringw signingUp            ();
+        irr::core::stringw joiningServer        ();
+        irr::core::stringw creatingServer       ();
+        irr::core::stringw fetchingServers      ();
+        irr::core::stringw signedInAs           (const irr::core::stringw & name);
+    } // namespace Messages
+}// namespace Online
 #endif
 
-/*EOF*/
+/* EOF */

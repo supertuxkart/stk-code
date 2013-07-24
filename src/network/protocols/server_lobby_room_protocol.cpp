@@ -25,8 +25,8 @@
 #include "network/protocols/start_server.hpp"
 #include "network/protocols/start_game_protocol.hpp"
 
-#include "online/current_online_user.hpp"
-#include "online/http_connector.hpp"
+#include "online/current_user.hpp"
+#include "online/http_manager.hpp"
 #include "config/user_config.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -113,14 +113,18 @@ void ServerLobbyRoomProtocol::update()
         {
             last_poll_time = Time::getRealTime();
             TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
-            HTTPConnector connector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-            connector.setParameter("id",CurrentOnlineUser::get()->getUserID());
-            connector.setParameter("token",CurrentOnlineUser::get()->getToken());
-            connector.setParameter("address",addr.ip);
-            connector.setParameter("port",addr.port);
-            connector.setParameter("action","poll-connection-requests");
+            Online::XMLRequest* request = new Online::XMLRequest();
+            request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+            request->setParameter("id",Online::CurrentUser::acquire()->getUserID());
+            request->setParameter("token",Online::CurrentUser::acquire()->getToken());
+            request->setParameter("address",addr.ip);
+            request->setParameter("port",addr.port);
+            request->setParameter("action","poll-connection-requests");
 
-            const XMLNode * result = connector.getXMLFromPage();
+            Online::HTTPManager::get()->synchronousRequest(request);
+            assert(request->isDone());
+
+            const XMLNode * result = request->getResult();
             std::string rec_success;
             if(result->get("success", &rec_success))
             {
@@ -144,6 +148,7 @@ void ServerLobbyRoomProtocol::update()
             {
                 Log::error("ServerLobbyRoomProtocol", "Cannot retrieve the list.");
             }
+            delete request;
         }
 
         // now
@@ -257,7 +262,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
         profile->race_id = m_next_id;
         profile->kart_name = "";
-        profile->user_profile = new OnlineUser(player_id);
+        profile->user_profile = new Online::User(player_id);
         m_setup->addPlayer(profile);
         peer->setPlayerProfile(profile);
         Log::verbose("ServerLobbyRoomProtocol", "New player.");

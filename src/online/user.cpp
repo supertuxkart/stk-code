@@ -17,22 +17,20 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "online/online_user.hpp"
+#include "online/user.hpp"
 
 #include <sstream>
 #include <stdlib.h>
 
-
-// ============================================================================
-OnlineUser::OnlineUser(const irr::core::stringw &username)
-{
-    m_name = username;
-}   // OnlineUser
-
-// ============================================================================
-OnlineUser::OnlineUser(const uint32_t& id)
-{
-    m_id = id;
-}   // OnlineUser
-
-
+namespace Online{
+    // ============================================================================
+    User::User(const irr::core::stringw &username)
+    {
+        m_name = username;
+    }
+    // ============================================================================
+    User::User(uint32_t id)
+    {
+        m_id = id;
+    }
+} // namespace Online

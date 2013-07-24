@@ -20,8 +20,8 @@
 
 #include "network/protocol_manager.hpp"
 #include "network/http_functions.hpp"
-#include "online/http_connector.hpp"
-#include "online/current_online_user.hpp"
+#include "online/http_manager.hpp"
+#include "online/current_user.hpp"
 #include "config/user_config.hpp"
 #include "utils/log.hpp"
 
@@ -42,20 +42,26 @@ void GetPeerAddress::notifyEvent(Event* event)
 void GetPeerAddress::setup()
 {
     m_state = NONE;
+    m_request = NULL;
 }
 
 void GetPeerAddress::asynchronousUpdate()
 {
     if (m_state == NONE)
     {
+        m_request = new Online::XMLRequest();
+        m_request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+        m_request->setParameter("id",Online::CurrentUser::acquire()->getUserID());
+        m_request->setParameter("token",Online::CurrentUser::acquire()->getToken());
+        m_request->setParameter("peer_id",m_peer_id);
+        m_request->setParameter("action","get");
 
-        HTTPConnector connector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-        connector.setParameter("id",CurrentOnlineUser::get()->getUserID());
-        connector.setParameter("token",CurrentOnlineUser::get()->getToken());
-        connector.setParameter("peer_id",m_peer_id);
-        connector.setParameter("action","get");
-
-        const XMLNode * result = connector.getXMLFromPage();
+        Online::HTTPManager::get()->addRequest(m_request);
+        m_state = REQUEST_PENDING;
+    }
+    else if (m_state == REQUEST_PENDING && m_request->isDone())
+    {
+        const XMLNode * result = m_request->getResult();
         std::string rec_success;
 
         if(result->get("success", &rec_success))
@@ -81,6 +87,8 @@ void GetPeerAddress::asynchronousUpdate()
     else if (m_state == DONE)
     {
         m_state = EXITING;
+        delete m_request;
+        m_request = NULL;
         m_listener->requestTerminate(this);
     }
 }

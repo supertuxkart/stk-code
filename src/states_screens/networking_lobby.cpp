@@ -35,10 +35,9 @@
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "modes/demo_world.hpp"
 #include "utils/translation.hpp"
+#include "online/servers_manager.hpp"
 
-#include "online/current_online_user.hpp"
-
-
+using namespace Online;
 using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( NetworkingLobby );
@@ -47,29 +46,29 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 
 NetworkingLobby::NetworkingLobby() : Screen("online/lobby.stkgui")
 {
-
+    m_server = NULL;
 }   // NetworkingLobby
 
 // ----------------------------------------------------------------------------
 
 void NetworkingLobby::loadedFromFile()
 {
+    m_back_widget = getWidget<IconButtonWidget>("back");
+    assert(m_back_widget != NULL);
+
+    m_server_name_widget = getWidget<LabelWidget>("server_name");
+    assert(m_server_name_widget != NULL);
+
     m_online_status_widget = getWidget<LabelWidget>("online_status");
     assert(m_online_status_widget != NULL);
 
     m_bottom_menu_widget = getWidget<RibbonWidget>("menu_bottomrow");
     assert(m_bottom_menu_widget != NULL);
-    /*m_sign_in_widget = (IconButtonWidget *) m_bottom_menu_widget->findWidgetNamed("sign_in");
-    assert(m_sign_in_widget != NULL);*/
 
+    m_exit_widget = (IconButtonWidget *) m_bottom_menu_widget->findWidgetNamed("exit");
+    assert(m_exit_widget != NULL);
 
 }   // loadedFromFile
-
-// ----------------------------------------------------------------------------
-bool NetworkingLobby::hasLostConnection()
-{
-    return !CurrentOnlineUser::get()->isSignedIn();
-}
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::beforeAddingWidget()
@@ -85,7 +84,10 @@ void NetworkingLobby::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime(); //FIXME : what's this?
-    m_online_status_widget->setText(irr::core::stringw(_("Signed in as : ")) + CurrentOnlineUser::get()->getUserName() + ".", false);
+    m_server = ServersManager::acquire()->getJoinedServer();
+    ServersManager::release();
+    m_server_name_widget->setText(m_server->getName(),false);
+
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -97,7 +99,20 @@ void NetworkingLobby::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 
 void NetworkingLobby::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
+    if (name == m_back_widget->m_properties[PROP_ID])
+    {
+        StateManager::get()->escapePressed();
+        return;
+    }
 
+    RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
+    if (ribbon == NULL) return;
+    std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+    if (selection == m_exit_widget->m_properties[PROP_ID])
+    {
+        StateManager::get()->escapePressed();
+    }
 }   // eventCallback
 
 // ----------------------------------------------------------------------------

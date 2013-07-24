@@ -21,11 +21,10 @@
 
 #include <irrString.h>
 
+#include "online/current_user.hpp"
+
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets/text_box_widget.hpp"
-#include "guiengine/widgets/icon_button_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets.hpp"
 
 /**
  * \brief Dialog that allows a user to sign in
@@ -38,11 +37,12 @@ private:
     
     bool m_self_destroy;
     bool m_open_registration_dialog;
-
-    GUIEngine::LabelWidget * m_info_widget;
+    Online::CurrentUser::SignInRequest * m_sign_in_request;
+    GUIEngine::LabelWidget * m_message_widget;
     GUIEngine::TextBoxWidget * m_username_widget;
     GUIEngine::TextBoxWidget * m_password_widget;
-    GUIEngine::LabelWidget * m_message_widget;
+    GUIEngine::CheckBoxWidget * m_remember_widget;
+    GUIEngine::LabelWidget * m_info_widget;
 
     GUIEngine::RibbonWidget * m_options_widget;
     GUIEngine::IconButtonWidget * m_sign_in_widget;
@@ -69,8 +69,10 @@ public:
     ~LoginDialog();
 
     void onEnterPressedInternal();
+
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     
+    virtual bool onEscapePressed();
     virtual void onUpdate(float dt);
     //virtual void onTextUpdated();
 };

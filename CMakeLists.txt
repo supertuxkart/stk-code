@@ -42,6 +42,8 @@ endif()
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
+include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/source/Irrlicht")
+
 
 
 # Set include paths

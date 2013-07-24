@@ -34,6 +34,7 @@ namespace GUIEngine
       */
     class LabelWidget : public Widget
     {
+        bool               m_bright;
         bool               m_has_color;
         irr::video::SColor m_color;
 
@@ -58,10 +59,12 @@ namespace GUIEngine
         
         /** \brief Callback from base class Widget */
         virtual void add();
-                
-        /** Sets the color of the widget. 
+
+        /** Sets the color of the widget.
          *  \param color The color to use for this widget. */
         void     setColor(const irr::video::SColor& color);
+        void     setErrorColor();
+        void     setDefaultColor();
         
         /** \brief Callback from base class Widget */
         virtual void update(float dt);
@@ -83,11 +86,11 @@ namespace GUIEngine
         virtual void setText(const wchar_t *text, bool expandAsNeeded);
         
         /** Overloaded function which takes a stringw. */
-        virtual void setText(const irr::core::stringw &s, bool expandAsNeeded) 
+        virtual void setText(const irr::core::stringw &s, bool expandAsNeeded)
         {
             setText(s.c_str(), expandAsNeeded); 
         }
-        
+
         // --------------------------------------------------------------------
         
         /** Sets horizontal scroll speed. */

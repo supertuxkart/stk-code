@@ -30,7 +30,7 @@
 #include "main_loop.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
-#include "online/online_user.hpp"
+#include "online/user.hpp"
 #include "utils/translation.hpp"
 #include "utils/log.hpp"
 
@@ -103,7 +103,7 @@ void StateManager::updateActivePlayerIDs()
 // ----------------------------------------------------------------------------
 
 int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device,
-                                            OnlineUser* user)
+                                            Online::User* user)
 {
     ActivePlayer *p;
     int i;
@@ -170,7 +170,8 @@ void StateManager::escapePressed()
     // when another modal dialog is visible
     else if(ModalDialog::isADialogActive())
     {
-        ModalDialog::getCurrent()->escapePressed();
+        if(ModalDialog::getCurrent()->onEscapePressed())
+            ModalDialog::getCurrent()->dismiss();
     }
     // In-game
     else if(m_game_mode == GAME)
@@ -254,7 +255,7 @@ void StateManager::onStackEmptied()
 
 StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player,
                                          InputDevice *device,
-                                         OnlineUser* user)
+                                         Online::User* user)
 {
 #ifdef DEBUG
     m_magic_number = 0xAC1EF1AE;

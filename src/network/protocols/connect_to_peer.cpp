@@ -25,7 +25,7 @@
 #include "network/protocols/hide_public_address.hpp"
 #include "network/protocols/request_connection.hpp"
 #include "network/protocols/ping_protocol.hpp"
-#include "online/current_online_user.hpp"
+#include "online/current_user.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 

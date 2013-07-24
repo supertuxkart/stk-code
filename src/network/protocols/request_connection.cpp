@@ -19,8 +19,8 @@
 #include "network/protocols/request_connection.hpp"
 
 #include "network/protocol_manager.hpp"
-#include "online/http_connector.hpp"
-#include "online/current_online_user.hpp"
+#include "online/http_manager.hpp"
+#include "online/current_user.hpp"
 #include "config/user_config.hpp"
 
 RequestConnection::RequestConnection(uint32_t server_id) : Protocol(NULL, PROTOCOL_SILENT)
@@ -47,13 +47,22 @@ void RequestConnection::asynchronousUpdate()
     {
         case NONE:
         {
-            HTTPConnector connector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-            connector.setParameter("id",CurrentOnlineUser::get()->getUserID());
-            connector.setParameter("token",CurrentOnlineUser::get()->getToken());
-            connector.setParameter("server_id",m_server_id);
-            connector.setParameter("action","request-connection");
+            m_request = new Online::XMLRequest();
+            m_request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+            m_request->setParameter("id",Online::CurrentUser::acquire()->getUserID());
+            m_request->setParameter("token",Online::CurrentUser::acquire()->getToken());
+            m_request->setParameter("server_id",m_server_id);
+            m_request->setParameter("action","request-connection");
 
-            const XMLNode * result = connector.getXMLFromPage();
+            Online::HTTPManager::get()->addRequest(m_request);
+            m_state = REQUEST_PENDING;
+            break;
+        }
+        case REQUEST_PENDING:
+        {
+            if (!m_request->isDone())
+                return;
+            const XMLNode * result = m_request->getResult();
             std::string rec_success;
 
             if(result->get("success", &rec_success))
@@ -77,6 +86,8 @@ void RequestConnection::asynchronousUpdate()
         }
         case DONE:
             m_state = EXITING;
+            delete m_request;
+            m_request = NULL;
             m_listener->requestTerminate(this);
             break;
         case EXITING:

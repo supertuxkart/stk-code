@@ -19,8 +19,8 @@
 #include "network/protocols/stop_server.hpp"
 
 #include "network/network_manager.hpp"
-#include "online/current_online_user.hpp"
-#include "online/http_connector.hpp"
+#include "online/current_user.hpp"
+#include "online/http_manager.hpp"
 #include "config/user_config.hpp"
 
 StopServer::StopServer() : Protocol(NULL, PROTOCOL_SILENT)
@@ -45,14 +45,20 @@ void StopServer::asynchronousUpdate()
     if (m_state == NONE)
     {
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
-        HTTPConnector connector((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-        connector.setParameter("id",CurrentOnlineUser::get()->getUserID());
-        connector.setParameter("token",CurrentOnlineUser::get()->getToken());
-        connector.setParameter("address",addr.ip);
-        connector.setParameter("port",addr.port);
-        connector.setParameter("action","stop-server");
+        m_request = new Online::XMLRequest();
+        m_request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
+        m_request->setParameter("id",Online::CurrentUser::acquire()->getUserID());
+        m_request->setParameter("token",Online::CurrentUser::acquire()->getToken());
+        m_request->setParameter("address",addr.ip);
+        m_request->setParameter("port",addr.port);
+        m_request->setParameter("action","stop-server");
 
-        const XMLNode * result = connector.getXMLFromPage();
+        Online::HTTPManager::get()->addRequest(m_request);
+        m_state = REQUEST_PENDING;
+    }
+    else if (m_state == REQUEST_PENDING && m_request->isDone())
+    {
+        const XMLNode * result = m_request->getResult();
         std::string rec_success;
 
         if(result->get("success", &rec_success))
@@ -75,6 +81,8 @@ void StopServer::asynchronousUpdate()
     else if (m_state == DONE)
     {
         m_state = EXITING;
+        delete m_request;
+        m_request = NULL;
         m_listener->requestTerminate(this);
     }
 }

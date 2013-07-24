@@ -6,8 +6,10 @@
         <div proportion="1" x="2%" width="96%" layout="vertical-row">
             <div width="100%" proportion="2" layout="horizontal-row">
                 <box id="info" proportion="2" height="100%" layout="vertical-row">
-                     <label I18N="In networking lobby" word_wrap="true" text="Description about room" 
-                     align="center" text-align="center"/> 
+                    <div width="100%" height="fit" layout="horizontal-row" >
+                        <label proportion="1" text_align="left" I18N="In the networking lobby" text="Server name :"/>
+                        <label proportion="2" text_align="left" id="server_name" text=""/>
+                    </div>
                 </box>
                 <spacer width="20" height="20"/>
                 <box proportion="1" height="100%" layout="vertical-row">
@@ -36,12 +38,8 @@
             <spacer width="10" height="10" />                         
             
             <buttonbar id="menu_bottomrow" x="0" y="0" width="20%" height="100%" align="center">
-                <icon-button id="sign_in" width="64" height="64" icon="gui/main_about.png" extend_label="50"
-                             I18N="Main menu button" text="Sign In" label_location="hover"/>
-                <icon-button id="register" width="64" height="64" icon="gui/tutorial.png"  extend_label="75"
-                             I18N="Main menu button" text="Register" label_location="hover"/>
-                <icon-button id="sign_out" width="64" height="64" icon="gui/main_quit.png"  extend_label="70"
-                             I18N="Main menu button" text="Sign Out" label_location="hover"/>
+                <icon-button id="exit" width="64" height="64" icon="gui/main_quit.png"  extend_label="50"
+                             I18N="Main menu button" text="Exit" label_location="hover"/>
             </buttonbar>
             
         </bottombar>

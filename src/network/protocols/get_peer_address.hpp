@@ -20,6 +20,7 @@
 #define GET_PEER_ADDRESS_HPP
 
 #include "network/protocol.hpp"
+#include "online/request.hpp"
 
 class GetPeerAddress : public Protocol
 {
@@ -35,10 +36,11 @@ class GetPeerAddress : public Protocol
         void setPeerID(uint32_t m_peer_id);
     protected:
         uint32_t m_peer_id;
-
+        Online::XMLRequest* m_request;
         enum STATE
         {
             NONE,
+            REQUEST_PENDING,
             DONE,
             EXITING
         };

@@ -20,6 +20,7 @@
 #define HIDE_PUBLIC_ADDRESS_HPP
 
 #include "network/protocol.hpp"
+#include "online/request.hpp"
 #include <string>
 
 class HidePublicAddress : public Protocol
@@ -34,10 +35,11 @@ class HidePublicAddress : public Protocol
         virtual void asynchronousUpdate();
 
     protected:
-
+        Online::XMLRequest* m_request;
         enum STATE
         {
             NONE,
+            REQUEST_PENDING,
             DONE,
             EXITING
         };

@@ -14,7 +14,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/kart_selection.hpp"
-#include "online/current_online_user.hpp"
+#include "online/current_user.hpp"
 
 StartGameProtocol::StartGameProtocol(GameSetup* game_setup) :
         Protocol(NULL, PROTOCOL_START_GAME)
@@ -103,7 +103,7 @@ void StartGameProtocol::update()
         // have to add self first
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            bool is_me = (players[i]->user_profile == CurrentOnlineUser::get());
+            bool is_me = (players[i]->user_profile == Online::CurrentUser::acquire());
             if (is_me)
             {
                 NetworkPlayerProfile* profile = players[i];
@@ -127,7 +127,7 @@ void StartGameProtocol::update()
         }
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            bool is_me = (players[i]->user_profile == CurrentOnlineUser::get());
+            bool is_me = (players[i]->user_profile == Online::CurrentUser::acquire());
             NetworkPlayerProfile* profile = players[i];
             RemoteKartInfo rki(profile->race_id, profile->kart_name,
                 profile->user_profile->getUserName(), profile->race_id, !is_me);

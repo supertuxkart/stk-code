@@ -22,6 +22,8 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
+#include "online/current_user.hpp"
+#include "utils/ptr_vector.hpp"
 
 namespace GUIEngine { class Widget; class ListWidget; }
 
@@ -36,6 +38,7 @@ private:
     friend class GUIEngine::ScreenSingleton<OnlineScreen>;
 
     OnlineScreen();
+    ~OnlineScreen();
 
     GUIEngine::RibbonWidget * m_top_menu_widget;
     GUIEngine::IconButtonWidget * m_quick_play_widget;
@@ -49,14 +52,9 @@ private:
     GUIEngine::IconButtonWidget * m_register_widget;
     GUIEngine::IconButtonWidget * m_sign_out_widget;
 
-    enum State
-    {
-        Not = 1,
-        Guest = 2,
-        Registered = 4
-    };
+    Online::CurrentUser::UserState m_recorded_state;
 
-    State m_recorded_state;
+    PtrVector<Online::XMLRequest> m_requests;
 
     /** \brief Checks if the recorded state differs from the actual state and sets it. */
     bool hasStateChanged();

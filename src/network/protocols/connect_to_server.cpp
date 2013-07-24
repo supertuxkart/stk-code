@@ -27,7 +27,7 @@
 #include "network/protocols/ping_protocol.hpp"
 #include "network/protocols/quick_join_protocol.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
-#include "online/current_online_user.hpp"
+#include "online/current_user.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 

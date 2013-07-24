@@ -22,7 +22,7 @@
 #ifndef GAME_SETUP_HPP
 #define GAME_SETUP_HPP
 
-#include "online/online_user.hpp"
+#include "online/user.hpp"
 
 #include <vector>
 #include <string>
@@ -35,10 +35,10 @@ class NetworkPlayerProfile
     public:
         NetworkPlayerProfile() { race_id = 0; user_profile = NULL; }
         ~NetworkPlayerProfile() {}
-        
+
         uint8_t race_id; //!< The id of the player for the race
         std::string kart_name; //!< The selected kart.
-        OnlineUser* user_profile; //!< Pointer to the lobby profile
+        Online::User* user_profile; //!< Pointer to the lobby profile
 };
 
 /*! \class GameSetup
@@ -60,7 +60,7 @@ class GameSetup
         int getPlayerCount() { return m_players.size(); }
         const NetworkPlayerProfile* getProfile(uint32_t id); //!< Get a profile by database id
         const NetworkPlayerProfile* getProfile(uint8_t id); //!< Get the profile by the lobby id
-        
+
         bool isKartAvailable(std::string kart_name);
         bool isKartAllowed(std::string kart_name) {return true; }
 

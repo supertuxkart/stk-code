@@ -2,7 +2,7 @@
 #define QUICK_JOIN_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
-
+#include "online/request.hpp"
 
 class QuickJoinProtocol : public Protocol
 {
@@ -17,9 +17,11 @@ class QuickJoinProtocol : public Protocol
 
     protected:
         uint32_t* m_server_id;
+        Online::XMLRequest* m_request;
         enum STATE
         {
             NONE,
+            REQUEST_PENDING,
             DONE,
             EXITING
         };

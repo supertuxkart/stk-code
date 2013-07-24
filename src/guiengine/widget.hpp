@@ -326,6 +326,8 @@ namespace GUIEngine
         /** Returns if the element is visible. */
         bool isVisible() const;
 
+        bool isActivated() const;
+
         /**
          * Call to resize/move the widget. Not all widgets can resize gracefully.
          */

@@ -2,6 +2,7 @@
 #define START_SERVER_HPP
 
 #include "network/protocol.hpp"
+#include "online/request.hpp"
 
 /*!
  *  This protocol tells to the database that the server is up and running,
@@ -19,9 +20,11 @@ class StartServer : public Protocol
         virtual void asynchronousUpdate();
 
     protected:
+        Online::XMLRequest* m_request;
         enum STATE
         {
             NONE,
+            REQUEST_PENDING,
             DONE,
             EXITING
         };

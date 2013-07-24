@@ -63,6 +63,7 @@ src/guiengine/widget.cpp
 src/guiengine/widgets/bubble_widget.cpp
 src/guiengine/widgets/button_widget.cpp
 src/guiengine/widgets/CGUIEditBox.cpp
+src/guiengine/widgets/CGUISTKListBox.cpp
 src/guiengine/widgets/check_box_widget.cpp
 src/guiengine/widgets/dynamic_ribbon_widget.cpp
 src/guiengine/widgets/icon_button_widget.cpp
@@ -169,9 +170,13 @@ src/network/server_network_manager.cpp
 src/network/stk_host.cpp
 src/network/stk_peer.cpp
 src/network/types.cpp
-src/online/current_online_user.cpp
-src/online/http_connector.cpp
-src/online/online_user.cpp
+src/online/current_user.cpp
+src/online/http_manager.cpp
+src/online/messages.cpp
+src/online/request.cpp
+src/online/server.cpp
+src/online/servers_manager.cpp
+src/online/user.cpp
 src/physics/btKart.cpp
 src/physics/btKartRaycast.cpp
 src/physics/btUprightConstraint.cpp
@@ -190,6 +195,7 @@ src/replay/replay_play.cpp
 src/replay/replay_recorder.cpp
 src/states_screens/addons_screen.cpp
 src/states_screens/arenas_screen.cpp
+src/states_screens/create_server_screen.cpp
 src/states_screens/credits.cpp
 src/states_screens/cutscene_gui.cpp
 src/states_screens/dialogs/add_device_dialog.cpp
@@ -205,6 +211,7 @@ src/states_screens/dialogs/press_a_key_dialog.cpp
 src/states_screens/dialogs/race_paused_dialog.cpp
 src/states_screens/dialogs/registration_dialog.cpp
 src/states_screens/dialogs/select_challenge.cpp
+src/states_screens/dialogs/server_info_dialog.cpp
 src/states_screens/dialogs/track_info_dialog.cpp
 src/states_screens/dialogs/tutorial_message_dialog.cpp
 src/states_screens/feature_unlocked.cpp
@@ -230,6 +237,7 @@ src/states_screens/race_gui.cpp
 src/states_screens/race_gui_overworld.cpp
 src/states_screens/race_result_gui.cpp
 src/states_screens/race_setup_screen.cpp
+src/states_screens/server_selection.cpp
 src/states_screens/soccer_setup_screen.cpp
 src/states_screens/state_manager.cpp
 src/states_screens/story_mode_lobby.cpp
@@ -430,9 +438,9 @@ src/network/protocols/client_lobby_room_protocol.hpp
 src/network/protocols/connect_to_peer.hpp
 src/network/protocols/connect_to_server.hpp
 src/network/protocols/controller_events_protocol.hpp
+src/network/protocols/game_events_protocol.hpp
 src/network/protocols/get_peer_address.hpp
 src/network/protocols/get_public_address.hpp
-src/network/protocols/game_events_protocol.hpp
 src/network/protocols/hide_public_address.hpp
 src/network/protocols/kart_update_protocol.hpp
 src/network/protocols/lobby_room_protocol.hpp
@@ -451,9 +459,13 @@ src/network/singleton.hpp
 src/network/stk_host.hpp
 src/network/stk_peer.hpp
 src/network/types.hpp
-src/online/current_online_user.hpp
-src/online/http_connector.hpp
-src/online/online_user.hpp
+src/online/current_user.hpp
+src/online/http_manager.hpp
+src/online/messages.hpp
+src/online/request.hpp
+src/online/server.hpp
+src/online/servers_manager.hpp
+src/online/user.hpp
 src/physics/btKart.hpp
 src/physics/btKartRaycast.hpp
 src/physics/btUprightConstraint.hpp
@@ -475,6 +487,7 @@ src/replay/replay_play.hpp
 src/replay/replay_recorder.hpp
 src/states_screens/addons_screen.hpp
 src/states_screens/arenas_screen.hpp
+src/states_screens/create_server_screen.hpp
 src/states_screens/credits.hpp
 src/states_screens/cutscene_gui.hpp
 src/states_screens/dialogs/add_device_dialog.hpp
@@ -490,6 +503,7 @@ src/states_screens/dialogs/press_a_key_dialog.hpp
 src/states_screens/dialogs/race_paused_dialog.hpp
 src/states_screens/dialogs/registration_dialog.hpp
 src/states_screens/dialogs/select_challenge.hpp
+src/states_screens/dialogs/server_info_dialog.hpp
 src/states_screens/dialogs/track_info_dialog.hpp
 src/states_screens/dialogs/tutorial_message_dialog.hpp
 src/states_screens/feature_unlocked.hpp
@@ -515,6 +529,7 @@ src/states_screens/race_gui.hpp
 src/states_screens/race_gui_overworld.hpp
 src/states_screens/race_result_gui.hpp
 src/states_screens/race_setup_screen.hpp
+src/states_screens/server_selection.hpp
 src/states_screens/soccer_setup_screen.hpp
 src/states_screens/state_manager.hpp
 src/states_screens/story_mode_lobby.hpp

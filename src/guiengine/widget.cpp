@@ -327,6 +327,15 @@ bool Widget::isVisible() const
 
 // -----------------------------------------------------------------------------
 
+bool Widget::isActivated() const
+{
+    if (isVisible())
+        return !m_deactivated;
+    return false;
+}
+
+// -----------------------------------------------------------------------------
+
 void Widget::setVisible(bool visible)
 {
     if (m_element != NULL)

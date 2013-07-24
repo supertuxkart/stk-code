@@ -25,39 +25,41 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "online/current_online_user.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
+#include "online/messages.hpp"
 
 
 using namespace GUIEngine;
 using namespace irr;
 using namespace irr::gui;
+using namespace Online;
 
 // -----------------------------------------------------------------------------
 
 LoginDialog::LoginDialog(const Message message_type) :
-        ModalDialog(0.8f,0.8f)
+        ModalDialog(0.8f,0.9f)
 {
     m_self_destroy = false;
     m_open_registration_dialog = false;
+    m_sign_in_request = NULL;
     loadFromFile("online/login_dialog.stkgui");
 
-    m_info_widget = getWidget<LabelWidget>("info");
-    assert(m_info_widget != NULL);
-    irr::core::stringw info;
+    m_message_widget = getWidget<LabelWidget>("message");
+    assert(m_message_widget != NULL);
+    irr::core::stringw message;
     if (message_type == Normal)
-        info =  _("Fill in your username and password. ");
+        message =  _("Fill in your username and password. ");
     else if (message_type == Signing_In_Required)
-        info =  _("You need to sign in to be able to use this feature. ");
+        message =  _("You need to sign in to be able to use this feature. ");
     else if (message_type == Registration_Required)
-        info =  _("You need to be a registered user to enjoy this feature! "
+        message =  _("You need to be a registered user to enjoy this feature! "
                   "If you do not have an account yet, you can sign up using the register icon at the bottom.");
     else
-        info = "";
+        message = "";
     if (message_type == Normal || message_type == Signing_In_Required)
-        info += _("If you do not have an account yet, you can choose to sign in as a guest "
+        message += _("If you do not have an account yet, you can choose to sign in as a guest "
                   "or press the register icon at the bottom to gain access to all the features!");
-    m_info_widget->setText(info, false);
+    m_message_widget->setText(message, false);
 
     m_username_widget = getWidget<TextBoxWidget>("username");
     assert(m_username_widget != NULL);
@@ -67,8 +69,12 @@ LoginDialog::LoginDialog(const Message message_type) :
     assert(m_password_widget != NULL);
     m_password_widget->setPasswordBox(true,L'*');
 
-    m_message_widget = getWidget<LabelWidget>("message");
-    assert(m_message_widget != NULL);
+    m_remember_widget = getWidget<CheckBoxWidget>("remember");
+    assert(m_remember_widget != NULL);
+    m_remember_widget->setState(false);
+
+    m_info_widget = getWidget<LabelWidget>("info");
+    assert(m_info_widget != NULL);
 
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
@@ -82,12 +88,15 @@ LoginDialog::LoginDialog(const Message message_type) :
     assert(m_as_guest_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
+
+
 }
 
 // -----------------------------------------------------------------------------
 
 LoginDialog::~LoginDialog()
 {
+    delete m_sign_in_request;
 }
 
 
@@ -97,16 +106,17 @@ void LoginDialog::login()
 {
     const stringw username = m_username_widget->getText().trim();
     const stringw password = m_password_widget->getText().trim();
-    stringw info = "";
-    if(CurrentOnlineUser::get()->signIn(username,password,info))
+    if (username.size() < 4 || username.size() > 30 || password.size() < 8 || password.size() > 30)
     {
-        m_self_destroy = true;
+        sfx_manager->quickSound("anvil");
+        m_info_widget->setErrorColor();
+        m_info_widget->setText(_("Username and/or password invalid."), false);
     }
     else
     {
-        sfx_manager->quickSound( "anvil" );
-        m_message_widget->setColor(irr::video::SColor(255, 255, 0, 0));
-        m_message_widget->setText(info, false);
+        m_options_widget->setDeactivated();
+        m_sign_in_request = Online::CurrentUser::acquire()->requestSignIn(username,password, m_remember_widget->getState());
+        Online::CurrentUser::release();
     }
 }
 
@@ -145,13 +155,43 @@ void LoginDialog::onEnterPressedInternal()
     const int playerID = PLAYER_ID_GAME_MASTER;
     if (GUIEngine::isFocusedForPlayer(m_options_widget, playerID))
         return;
-    login();
+    if (m_sign_in_widget->isActivated())
+        login();
 }
 
 // -----------------------------------------------------------------------------
 
+bool LoginDialog::onEscapePressed()
+{
+    return m_cancel_widget->isActivated();
+}
+
 void LoginDialog::onUpdate(float dt)
 {
+    if(m_sign_in_request != NULL)
+    {
+        if(m_sign_in_request->isDone())
+        {
+            if(m_sign_in_request->isSuccess())
+            {
+                m_self_destroy = true;
+            }
+            else
+            {
+                sfx_manager->quickSound( "anvil" );
+                m_info_widget->setErrorColor();
+                m_info_widget->setText(m_sign_in_request->getInfo(), false);
+            }
+            delete m_sign_in_request;
+            m_sign_in_request = NULL;
+            m_options_widget->setActivated();
+        }
+        else
+        {
+            m_info_widget->setDefaultColor();
+            m_info_widget->setText(Online::Messages::signingIn(), false);
+        }
+    }
     //If we want to open the registration dialog, we need to close this one first
     m_open_registration_dialog && (m_self_destroy = true);
 
@@ -160,9 +200,7 @@ void LoginDialog::onUpdate(float dt)
     {
         ModalDialog::dismiss();
         if (m_open_registration_dialog)
-            new RegistrationDialog(0.8f, 0.9f);
-
+            new RegistrationDialog();
+        return;
     }
-
-
 }
