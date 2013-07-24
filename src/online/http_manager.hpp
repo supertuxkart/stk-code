@@ -83,6 +83,7 @@ namespace Online{
             std::string getPage(Online::Request * request);
             XMLNode * getXMLFromPage(Online::Request * request);
 
+            void synchronousRequest(Online::Request *request);
             void addRequest(Online::Request *request);
             void cancelAllDownloads();
             void stopNetworkThread();

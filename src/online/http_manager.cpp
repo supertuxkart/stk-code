@@ -152,7 +152,17 @@ namespace Online{
         // Wake up the network http thread
         pthread_cond_signal(&m_cond_request);
         m_request_queue.unlock();
-    }   // insertRequest
+    }   // addRequest
+
+    // ----------------------------------------------------------------------------
+    /** Immediately performs a request synchronously
+     *  \param request The pointer to the new request to insert.
+     */
+    void HTTPManager::synchronousRequest(Request *request)
+    {
+        assert(request->isAllowedToAdd());
+        request->execute();
+    }   // synchronousRequest
 
     // ---------------------------------------------------------------------------
     /** The actual main loop, which is started as a separate thread from the
