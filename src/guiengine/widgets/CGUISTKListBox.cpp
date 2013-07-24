@@ -11,7 +11,9 @@
 #include "IGUIFont.h"
 #include "IGUISpriteBank.h"
 #include "CGUIScrollBar.h"
-#include "os.h"
+//#include "os.h"
+#include "utils/time.hpp"
+
 
 namespace irr
 {
@@ -113,7 +115,7 @@ void CGUISTKListBox::removeItem(u32 id)
 	else if ((u32)Selected > id)
 	{
 		Selected -= 1;
-		selectTime = os::Timer::getTime();
+		selectTime = Time::getTimeSinceEpoch();
 	}
 
 	Items.erase(id);
@@ -203,7 +205,7 @@ void CGUISTKListBox::setSelected(s32 id)
 	else
 		Selected = id;
 
-	selectTime = os::Timer::getTime();
+	selectTime = Time::getTimeSinceEpoch();
 
 	recalculateScrollPos();
 }
@@ -395,7 +397,7 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
 
 void CGUISTKListBox::selectNew(s32 ypos, bool onlyHover)
 {
-	u32 now = os::Timer::getTime();
+	u32 now = Time::getTimeSinceEpoch();
 	s32 oldSelected = Selected;
 
 	Selected = getItemAt(AbsoluteRect.UpperLeftCorner.X, ypos);
@@ -509,7 +511,7 @@ void CGUISTKListBox::draw()
                                 iconPos, &clientClip,
                                 hasItemOverrideColor(i, EGUI_LBC_ICON_HIGHLIGHT) ?
                                 getItemOverrideColor(i, EGUI_LBC_ICON_HIGHLIGHT) : getItemDefaultColor(EGUI_LBC_ICON_HIGHLIGHT),
-                                selectTime, os::Timer::getTime(), false, true);
+                                selectTime, Time::getTimeSinceEpoch(), false, true);
                         }
                         else
                         {
@@ -518,7 +520,7 @@ void CGUISTKListBox::draw()
                                 iconPos,
                                 &clientClip,
                                 hasItemOverrideColor(i, EGUI_LBC_ICON) ? getItemOverrideColor(i, EGUI_LBC_ICON) : getItemDefaultColor(EGUI_LBC_ICON),
-                                0 , (i==Selected) ? os::Timer::getTime() : 0, false, true);
+                                0 , (i==Selected) ? Time::getTimeSinceEpoch() : 0, false, true);
                         }
                         textRect.UpperLeftCorner.X += ItemsIconWidth;
                     }
@@ -614,7 +616,7 @@ bool CGUISTKListBox::isAutoScrollEnabled() const
 
 void CGUISTKListBox::recalculateIconWidth()
 {
-    for(int x = 0; x < Items.getLast().m_contents.size(); ++x)
+    for(int x = 0; x < (int)Items.getLast().m_contents.size(); ++x)
     {
         s32 icon = Items.getLast().m_contents[x].m_icon;
 	if (IconBank && icon > -1 &&
