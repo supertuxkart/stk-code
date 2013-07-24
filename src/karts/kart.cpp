@@ -2302,7 +2302,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     y += m_skidding->getGraphicalJumpOffset();
     center_shift.setY(y);
 
-    if (m_controls.m_nitro && isOnGround() &&  m_collected_energy > 0)
+    if ((m_controls.m_nitro || m_min_nitro_time > 0.0f) && isOnGround() &&  m_collected_energy > 0)
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!

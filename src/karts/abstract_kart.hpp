@@ -317,6 +317,11 @@ public:
     // ------------------------------------------------------------------------
     virtual void setEnergy(float val) = 0;
     // ------------------------------------------------------------------------
+    /** Return whether nitro is being used despite the nitro button not being
+     *  pressed due to minimal use time requirements
+     */
+    virtual float isOnMinNitroTime() const = 0;
+    // ------------------------------------------------------------------------
     /** Returns the current material the kart is on. */
     virtual const Material *getMaterial() const = 0;
     // ------------------------------------------------------------------------

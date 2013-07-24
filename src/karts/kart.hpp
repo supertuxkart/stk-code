@@ -403,6 +403,11 @@ public:
     /** Sets the energy the kart has collected. */
     virtual void   setEnergy(float val) { m_collected_energy = val; }
     // ------------------------------------------------------------------------
+    /** Return whether nitro is being used despite the nitro button not being
+     *  pressed due to minimal use time requirements
+     */
+    virtual float isOnMinNitroTime() const { return m_min_nitro_time > 0.0f; }
+    // ------------------------------------------------------------------------
     /** Returns if the kart is currently being squashed. */
     virtual bool   isSquashed() const { return m_squash_time >0; }
     // ------------------------------------------------------------------------
