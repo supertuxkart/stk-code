@@ -121,7 +121,7 @@ namespace Online{
         *  (everything ok) at the end. */
         Synchronised<float>                             m_progress;
         Synchronised<std::string>                       m_url;
-        Parameters *                                    m_parameters;
+        Synchronised<Parameters *>                      m_parameters;
 
         virtual void                                    afterOperation() OVERRIDE;
         /** Executed when a request has finished. */
@@ -149,14 +149,17 @@ namespace Online{
         virtual ~HTTPRequest();
 
         void setParameter(const std::string & name, const std::string &value){
-            (*m_parameters)[name] = value;
+            MutexLocker(m_parameters);
+            (*m_parameters.getData())[name] = value;
         };
         void setParameter(const std::string & name, const irr::core::stringw &value){
-            (*m_parameters)[name] = irr::core::stringc(value.c_str()).c_str();
+            MutexLocker(m_parameters);
+            (*m_parameters.getData())[name] = irr::core::stringc(value.c_str()).c_str();
         }
         template <typename T>
         void setParameter(const std::string & name, const T& value){
-            (*m_parameters)[name] = StringUtils::toString(value);
+            MutexLocker(m_parameters);
+            (*m_parameters.getData())[name] = StringUtils::toString(value);
         }
 
         /** Returns the current progress. */
@@ -179,9 +182,9 @@ namespace Online{
 
     class XMLRequest : public HTTPRequest
     {
+    private:
+        Synchronised<XMLNode *>                         m_result;
     protected :
-
-        XMLNode *                                       m_result;
         Synchronised<irr::core::stringw>                m_info;
         Synchronised<bool>                              m_success;
 
@@ -192,13 +195,8 @@ namespace Online{
         XMLRequest(int type = 0, bool manage_memory = false, int priority = 1);
         virtual ~XMLRequest();
 
-        virtual XMLNode *               getResult() const       { return m_result; }
-        const irr::core::stringw        getInfo()   const       {
-                                                                    m_info.lock();
-                                                                    const irr::core::stringw info = m_info.getData();
-                                                                    m_info.unlock();
-                                                                    return info;
-                                                                }
+        const XMLNode *                 getResult() const;
+        const irr::core::stringw &      getInfo()   const;
         bool                            isSuccess() const       { return m_success.getAtomic(); }
 
     };

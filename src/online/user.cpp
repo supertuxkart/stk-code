@@ -22,10 +22,15 @@
 #include <sstream>
 #include <stdlib.h>
 
+using namespace Online;
+
 namespace Online{
     // ============================================================================
-    User::User(const irr::core::stringw &username)
+    User::User  (   const irr::core::stringw & username,
+                    const uint32_t           & userid
+                )
     {
-        m_name = username;
+        setUserName(username);
+        setUserID(userid);
     }
 } // namespace Online

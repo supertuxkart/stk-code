@@ -40,10 +40,9 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-ServerInfoDialog::ServerInfoDialog(uint32_t server_id, bool from_server_creation) :
-        ModalDialog(0.8f,0.8f)
+ServerInfoDialog::ServerInfoDialog(const uint32_t server_id, bool from_server_creation)
+        : ModalDialog(0.8f,0.8f), m_server_id(server_id)
 {
-    m_server_id = server_id;
     m_self_destroy = false;
     m_enter_lobby = false;
     m_from_server_creation = from_server_creation;
@@ -77,8 +76,7 @@ ServerInfoDialog::~ServerInfoDialog()
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::requestJoin()
 {
-    m_server_join_request = Online::CurrentUser::acquire()->requestServerJoin(m_server_id);
-    Online::CurrentUser::release();
+    m_server_join_request = Online::CurrentUser::get()->requestServerJoin(m_server_id);
 }
 
 // -----------------------------------------------------------------------------

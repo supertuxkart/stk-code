@@ -27,54 +27,41 @@
 #include "utils/log.hpp"
 #include "online/servers_manager.hpp"
 
+using namespace Online;
+
 namespace Online{
-    static Synchronised<CurrentUser*> user_singleton(NULL);
+    static CurrentUser* current_user_singleton(NULL);
 
-    CurrentUser* CurrentUser::acquire()
+    CurrentUser* CurrentUser::get()
     {
-        user_singleton.lock();
-        CurrentUser * user = user_singleton.getData();
-        if (user == NULL)
-        {
-            user_singleton.unlock();
-            user = new CurrentUser();
-            user_singleton.setAtomic(user);
-            user_singleton.lock();
-        }
-        return user;
-    }
-
-    void CurrentUser::release()
-    {
-        user_singleton.unlock();
+        if (current_user_singleton == NULL)
+            current_user_singleton = new CurrentUser();
+        return current_user_singleton;
     }
 
     void CurrentUser::deallocate()
     {
-        user_singleton.lock();
-        CurrentUser* user = user_singleton.getData();
-        delete user;
-        user = NULL;
-        user_singleton.unlock();
+        delete current_user_singleton;
+        current_user_singleton = NULL;
     }   // deallocate
 
     // ============================================================================
-    CurrentUser::CurrentUser(){
-        m_state = US_SIGNED_OUT;
-        m_id = 0;
-        m_name = "";
-        m_token = "";
-        m_save_session = false;
+    CurrentUser::CurrentUser()
+        : User("",0)
+    {
+        setState(US_SIGNED_OUT);
+        setToken("");
+        setSaveSession(false);
     }
 
     // ============================================================================
-    XMLRequest * CurrentUser::requestSignUp(    const irr::core::stringw &username,
-                                                const irr::core::stringw &password,
-                                                const irr::core::stringw &password_confirm,
-                                                const irr::core::stringw &email,
-                                                bool terms)
+    const XMLRequest * CurrentUser::requestSignUp(  const irr::core::stringw &username,
+                                                    const irr::core::stringw &password,
+                                                    const irr::core::stringw &password_confirm,
+                                                    const irr::core::stringw &email,
+                                                    bool terms)
     {
-        assert(m_state == US_SIGNED_OUT || m_state == US_GUEST);
+        assert(getState() == US_SIGNED_OUT || getState() == US_GUEST);
         XMLRequest * request = new XMLRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("register"));
@@ -88,10 +75,10 @@ namespace Online{
     }
 
     // ============================================================================
-    CurrentUser::SignInRequest * CurrentUser::requestSavedSession()
+    const CurrentUser::SignInRequest * CurrentUser::requestSavedSession()
     {
         SignInRequest * request = NULL;
-        if(m_state != US_SIGNED_IN  && UserConfigParams::m_saved_session)
+        if(getState() != US_SIGNED_IN  && UserConfigParams::m_saved_session)
         {
             request = new SignInRequest();
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
@@ -99,24 +86,24 @@ namespace Online{
             request->setParameter("userid", UserConfigParams::m_saved_user);
             request->setParameter("token", UserConfigParams::m_saved_token.c_str());
             HTTPManager::get()->addRequest(request);
-            m_state = US_SIGNING_IN;
+            setState(US_SIGNING_IN);
         }
         return request;
     }
 
-    CurrentUser::SignInRequest * CurrentUser::requestSignIn(    const irr::core::stringw &username,
-                                                                const irr::core::stringw &password,
-                                                                bool save_session)
+    const CurrentUser::SignInRequest * CurrentUser::requestSignIn(  const irr::core::stringw &username,
+                                                                    const irr::core::stringw &password,
+                                                                    bool save_session)
     {
-        assert(m_state == US_SIGNED_OUT);
-        m_save_session = save_session;
+        assert(getState() == US_SIGNED_OUT);
+        setSaveSession(save_session);
         SignInRequest * request = new SignInRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",std::string("connect"));
         request->setParameter("username",username);
         request->setParameter("password",password);
         HTTPManager::get()->addRequest(request);
-        m_state = US_SIGNING_IN;
+        setState(US_SIGNING_IN);
         return request;
     }
 
@@ -124,39 +111,44 @@ namespace Online{
     {
         if (input->isSuccess())
         {
-            int token_fetched       = input->getResult()->get("token", &m_token);
-            int username_fetched    = input->getResult()->get("username", &m_name);
-            int userid_fetched      = input->getResult()->get("userid", &m_id);
+            std::string token("");
+            int token_fetched       = input->getResult()->get("token", &token);
+            setToken(token);
+            irr::core::stringw username("");
+            int username_fetched    = input->getResult()->get("username", &username);
+            setUserName(username);
+            uint32_t userid(0);
+            int userid_fetched      = input->getResult()->get("userid", &userid);
+            setUserID(userid);
             assert(token_fetched && username_fetched && userid_fetched);
-            m_state = US_SIGNED_IN;
-            if(m_save_session)
+            setState(US_SIGNED_IN);
+            if(getSaveSession())
             {
-                UserConfigParams::m_saved_user = m_id;
-                UserConfigParams::m_saved_token = m_token;
+                UserConfigParams::m_saved_user = getUserID();
+                UserConfigParams::m_saved_token = getToken();
                 UserConfigParams::m_saved_session = true;
-                m_save_session = false;
             }
         }
         else
-            m_state = US_SIGNED_OUT;
+            setState(US_SIGNED_OUT);
     }
 
     void CurrentUser::SignInRequest::callback()
     {
-        CurrentUser::acquire()->signIn(this);
-        CurrentUser::release();
+        CurrentUser::get()->signIn(this);
     }
 
     // ============================================================================
 
-    CurrentUser::ServerCreationRequest * CurrentUser::requestServerCreation(const irr::core::stringw &name, int max_players)
+    const CurrentUser::ServerCreationRequest * CurrentUser::requestServerCreation(  const irr::core::stringw &name,
+                                                                                    int max_players)
     {
-        assert(m_state == US_SIGNED_IN);
+        assert(getState() == US_SIGNED_IN);
         ServerCreationRequest * request = new ServerCreationRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",           std::string("create_server"));
-        request->setParameter("token",            m_token);
-        request->setParameter("userid",           m_id);
+        request->setParameter("token",            getToken());
+        request->setParameter("userid",           getUserID());
         request->setParameter("name",             name);
         request->setParameter("max_players",      max_players);
         HTTPManager::get()->addRequest(request);
@@ -174,15 +166,15 @@ namespace Online{
     }
 
     // ============================================================================
-    CurrentUser::SignOutRequest * CurrentUser::requestSignOut(){
-        assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
+    const CurrentUser::SignOutRequest * CurrentUser::requestSignOut(){
+        assert(getState() == US_SIGNED_IN || getState() == US_GUEST);
         SignOutRequest * request = new SignOutRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",std::string("disconnect"));
-        request->setParameter("token",m_token);
-        request->setParameter("userid",m_id);
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getUserID());
         HTTPManager::get()->addRequest(request);
-        m_state = US_SIGNING_OUT;
+        setState(US_SIGNING_OUT);
         return request;
     }
 
@@ -192,10 +184,10 @@ namespace Online{
         {
             Log::warn("CurrentUser::signOut", "%s", _("There were some connection issues while signing out. Report a bug if this caused issues."));
         }
-        m_token = "";
-        m_name = "";
-        m_id = 0;
-        m_state = US_SIGNED_OUT;
+        setToken("");
+        setUserName("");
+        setUserID(0);
+        setState(US_SIGNED_OUT);
         UserConfigParams::m_saved_user = 0;
         UserConfigParams::m_saved_token = "";
         UserConfigParams::m_saved_session = false;
@@ -203,19 +195,18 @@ namespace Online{
 
     void CurrentUser::SignOutRequest::callback()
     {
-        CurrentUser::acquire()->signOut(this);
-        CurrentUser::release();
+        CurrentUser::get()->signOut(this);
     }
 
     // ============================================================================
 
-    CurrentUser::ServerJoinRequest *  CurrentUser::requestServerJoin(uint32_t server_id){
-        assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
+    const CurrentUser::ServerJoinRequest *  CurrentUser::requestServerJoin(uint32_t server_id){
+        assert(getState() == US_SIGNED_IN || getState() == US_GUEST);
         ServerJoinRequest * request = new ServerJoinRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
         request->setParameter("action",std::string("request-connection"));
-        request->setParameter("token", m_token);
-        request->setParameter("id", m_id);
+        request->setParameter("token", getToken());
+        request->setParameter("id", getUserID());
         request->setParameter("server_id", server_id);
         HTTPManager::get()->addRequest(request);
         return request;
@@ -234,12 +225,11 @@ namespace Online{
 
     // ============================================================================
 
-    irr::core::stringw CurrentUser::getUserName() const
+    const irr::core::stringw CurrentUser::getUserName() const
     {
-        if((m_state == US_SIGNED_IN ) || (m_state == US_GUEST))
-            return m_name;
+        if((getState() == US_SIGNED_IN ) || (getState() == US_GUEST))
+            return getUserName();
         else
             return _("Currently not signed in");
     }
-
 } // namespace Online

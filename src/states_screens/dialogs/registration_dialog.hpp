@@ -56,8 +56,8 @@ private:
     bool m_show_registration_terms;
     bool m_show_registration_activation;
 
-    Online::XMLRequest * m_sign_up_request;
-    Online::XMLRequest * m_activation_request;
+    const Online::XMLRequest * m_sign_up_request;
+    const Online::XMLRequest * m_activation_request;
 
     //Saved user input :
     irr::core::stringw m_username;

@@ -52,10 +52,9 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 {
     m_recorded_state = CurrentUser::US_SIGNED_OUT;
-    CurrentUser::SignInRequest * request = CurrentUser::acquire()->requestSavedSession();
+    const CurrentUser::SignInRequest * request = CurrentUser::get()->requestSavedSession();
     if(request != NULL)
         m_requests.push_back(request);
-    CurrentUser::release();
 }   // OnlineScreen
 
 // ----------------------------------------------------------------------------
@@ -97,8 +96,7 @@ void OnlineScreen::loadedFromFile()
 bool OnlineScreen::hasStateChanged()
 {
     CurrentUser::UserState previous_state = m_recorded_state;
-    m_recorded_state = CurrentUser::acquire()->getUserState();
-    CurrentUser::release();
+    m_recorded_state = CurrentUser::get()->getUserState();
     if (previous_state != m_recorded_state)
         return true;
     return false;
@@ -145,8 +143,7 @@ void OnlineScreen::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
-    m_online_status_widget->setText(Messages::signedInAs(CurrentUser::acquire()->getUserName()), false);
-    CurrentUser::release();
+    m_online_status_widget->setText(Messages::signedInAs(CurrentUser::get()->getUserName()), false);
 
 }   // init
 
@@ -207,8 +204,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (selection == "sign_out")
     {
-        CurrentUser::acquire()->requestSignOut();
-        CurrentUser::release();
+        CurrentUser::get()->requestSignOut();
     }
     else if (selection == "register")
     {

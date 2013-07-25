@@ -47,16 +47,14 @@ namespace Online{
 
     // ============================================================================
     ServersManager::ServersManager(){
-        m_info_message.setAtomic("");
         m_last_load_time.setAtomic(0.0f);
         m_joined_server.setAtomic(NULL);
     }
 
     ServersManager::~ServersManager(){
         cleanUpServers();
-        m_joined_server.lock();
+        MutexLocker(m_joined_server);
         delete m_joined_server.getData();
-        m_joined_server.unlock();
     }
 
     // ============================================================================
@@ -96,7 +94,6 @@ namespace Online{
             }
             m_last_load_time.setAtomic(Time::getRealTime());
         }
-        m_info_message.setAtomic(input->getInfo());
         //FIXME error message
     }
 
@@ -116,20 +113,18 @@ namespace Online{
     // ============================================================================
     void ServersManager::setJoinedServer(uint32_t id)
     {
-        m_joined_server.lock();
+        MutexLocker(m_joined_server);
         delete m_joined_server.getData();
         //It's a copy!
         m_joined_server.getData() = new Server(*getServerByID(id));
-        m_joined_server.unlock();
     }
 
     // ============================================================================
     void ServersManager::unsetJoinedServer()
     {
-        m_joined_server.lock();
+        MutexLocker(m_joined_server);
         delete m_joined_server.getData();
         m_joined_server.getData() = NULL;
-        m_joined_server.unlock();
     }
 
     // ============================================================================
@@ -146,21 +141,21 @@ namespace Online{
     // ============================================================================
     int ServersManager::getNumServers () const
     {
-        MutexLocker locker(m_sorted_servers);
+        MutexLocker(m_sorted_servers);
         return m_sorted_servers.getData().size();
     }
 
     // ============================================================================
     const Server * ServersManager::getServerBySort (int index) const
     {
-        MutexLocker locker(m_sorted_servers);
+        MutexLocker(m_sorted_servers);
         return m_sorted_servers.getData().get(index);
     }
 
     // ============================================================================
     const Server * ServersManager::getServerByID (uint32_t id) const
     {
-        MutexLocker locker(m_mapped_servers);
+        MutexLocker(m_mapped_servers);
         return m_mapped_servers.getData().at(id);
     }
 
@@ -172,9 +167,8 @@ namespace Online{
 
     // ============================================================================
     void ServersManager::sort(bool sort_desc){
-        m_sorted_servers.lock();
+        MutexLocker(m_sorted_servers);
         m_sorted_servers.getData().insertionSort(0, sort_desc);
-        m_sorted_servers.unlock();
     }
 
 } // namespace Online

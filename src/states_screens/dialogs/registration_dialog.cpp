@@ -214,8 +214,7 @@ bool RegistrationDialog::processTermsEvent(const std::string& eventSource){
             m_options_widget->setDeactivated();
             m_info_widget->setDefaultColor();
             m_info_widget->setText(Messages::signingUp(), false);
-            m_sign_up_request = CurrentUser::acquire()->requestSignUp(m_username, m_password, m_password_confirm, m_email, true);
-            CurrentUser::release();
+            m_sign_up_request = CurrentUser::get()->requestSignUp(m_username, m_password, m_password_confirm, m_email, true);
             return true;
         }
         else if (eventSource == m_accept_terms_widget->m_properties[PROP_ID])

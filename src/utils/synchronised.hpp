@@ -21,8 +21,6 @@
 
 #include <pthread.h>
 
-
-
 class ISynchronised
 {
 public :
@@ -122,17 +120,18 @@ private:
     void operator=(const Synchronised<TYPE>& v) {}
 };
 
+#define MutexLocker(x) MutexLockerHelper __dummy(x);
 
-class MutexLocker
+class MutexLockerHelper
 {
     const ISynchronised * m_synchronised;
 public:
-    MutexLocker(const ISynchronised & synchronised){
+    MutexLockerHelper(const ISynchronised & synchronised){
         m_synchronised = &synchronised;
         m_synchronised->lock();
     }
 
-    ~MutexLocker(){
+    ~MutexLockerHelper(){
         m_synchronised->unlock();
     }
 };

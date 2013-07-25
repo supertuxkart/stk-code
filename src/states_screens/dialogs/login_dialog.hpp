@@ -37,7 +37,7 @@ private:
     
     bool m_self_destroy;
     bool m_open_registration_dialog;
-    Online::CurrentUser::SignInRequest * m_sign_in_request;
+    const Online::CurrentUser::SignInRequest * m_sign_in_request;
     GUIEngine::LabelWidget * m_message_widget;
     GUIEngine::TextBoxWidget * m_username_widget;
     GUIEngine::TextBoxWidget * m_password_widget;

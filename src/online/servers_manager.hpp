@@ -59,7 +59,6 @@ namespace Online {
         /** This is a pointer to a copy of the server, the moment it got joined */
         Synchronised<Server *>                          m_joined_server;
 
-        Synchronised<irr::core::stringw>                m_info_message;
         Synchronised<float>                             m_last_load_time;
         void                                            refresh(RefreshRequest * input);
         void                                            cleanUpServers();

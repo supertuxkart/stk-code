@@ -115,8 +115,7 @@ void LoginDialog::login()
     else
     {
         m_options_widget->setDeactivated();
-        m_sign_in_request = Online::CurrentUser::acquire()->requestSignIn(username,password, m_remember_widget->getState());
-        Online::CurrentUser::release();
+        m_sign_in_request = Online::CurrentUser::get()->requestSignIn(username,password, m_remember_widget->getState());
     }
 }
 

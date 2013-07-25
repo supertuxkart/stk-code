@@ -42,11 +42,11 @@ private:
     bool m_self_destroy;
     bool m_enter_lobby;
     bool m_from_server_creation;
-    Online::CurrentUser::ServerJoinRequest * m_server_join_request;
+    const Online::CurrentUser::ServerJoinRequest * m_server_join_request;
 
     float m_load_timer;
 
-    uint32_t m_server_id;
+    const uint32_t m_server_id;
 
     GUIEngine::LabelWidget * m_name_widget;
     GUIEngine::LabelWidget * m_info_widget;
@@ -58,7 +58,7 @@ private:
     void requestJoin();
 
 public:
-    ServerInfoDialog(uint32_t server_id, bool just_created = false);
+    ServerInfoDialog(const uint32_t server_id, bool just_created = false);
     ~ServerInfoDialog();
 
     void onEnterPressedInternal();

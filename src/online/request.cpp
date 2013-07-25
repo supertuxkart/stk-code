@@ -59,13 +59,15 @@ namespace Online{
         //Negative numbers are reserved for special requests ment for the HTTP Manager
         assert(type >= 0);
         m_url.setAtomic("");
-        m_parameters = new Parameters;
+        MutexLocker(m_parameters);
+        m_parameters.getData() = new Parameters;
         m_progress.setAtomic(0);
     }
 
     HTTPRequest::~HTTPRequest()
     {
-        delete m_parameters;
+        MutexLocker(m_parameters);
+        delete m_parameters.getData();
     }
 
     bool HTTPRequest::isAllowedToAdd()
@@ -96,9 +98,10 @@ namespace Online{
         curl_easy_setopt(curl_session, CURLOPT_URL, m_url.getAtomic().c_str());
         Parameters::iterator iter;
         std::string postString = "";
-        for (iter = m_parameters->begin(); iter != m_parameters->end(); ++iter)
+        m_parameters.lock();
+        for (iter = m_parameters.getData()->begin(); iter != m_parameters.getData()->end(); ++iter)
         {
-           if(iter != m_parameters->begin())
+           if(iter != m_parameters.getData()->begin())
                postString.append("&");
            char * escaped = curl_easy_escape(curl_session , iter->first.c_str(), iter->first.size());
            postString.append(escaped);
@@ -108,6 +111,7 @@ namespace Online{
            postString.append(escaped);
            curl_free(escaped);
         }
+        m_parameters.unlock();
         curl_easy_setopt(curl_session, CURLOPT_POSTFIELDS, postString.c_str());
         std::string readBuffer;
         curl_easy_setopt(curl_session, CURLOPT_WRITEFUNCTION, &HTTPRequest::WriteCallback);
@@ -199,18 +203,21 @@ namespace Online{
     {
         m_info.setAtomic("");
         m_success.setAtomic(false);
-        m_result = NULL;
+        MutexLocker(m_result);
+        m_result.getData() = NULL;
     }
 
     XMLRequest::~XMLRequest()
     {
-        delete m_result;
+        MutexLocker(m_result);
+        delete m_result.getData();
     }
 
 
     void XMLRequest::operation()
     {
-        m_result = file_manager->createXMLTreeFromString(downloadPage());
+        MutexLocker(m_result);
+        m_result.getData() = file_manager->createXMLTreeFromString(downloadPage());
     }
 
     void XMLRequest::afterOperation()
@@ -227,8 +234,22 @@ namespace Online{
         }
         else
             info = _("Unable to connect to the server. Check your internet connection or try again later.");
-        m_info.setAtomic(info);
+        m_info.lock();
+        m_info.getData() = info;
+        m_info.unlock();
         m_success.setAtomic(success);
         HTTPRequest::afterOperation();
+    }
+
+    const XMLNode * XMLRequest::getResult() const
+    {
+        MutexLocker(m_result);
+        return m_result.getData();
+    }
+
+    const irr::core::stringw & XMLRequest::getInfo()   const
+    {
+        MutexLocker(m_info);
+        return m_info.getData();
     }
 } // namespace Online
