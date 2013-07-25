@@ -193,7 +193,7 @@ namespace Online{
         virtual ~XMLRequest();
 
         virtual XMLNode *               getResult() const       { return m_result; }
-        const irr::core::stringw        getInfo()               {
+        const irr::core::stringw        getInfo()   const       {
                                                                     m_info.lock();
                                                                     const irr::core::stringw info = m_info.getData();
                                                                     m_info.unlock();

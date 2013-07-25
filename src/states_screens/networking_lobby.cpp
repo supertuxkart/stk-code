@@ -84,8 +84,7 @@ void NetworkingLobby::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime(); //FIXME : what's this?
-    m_server = ServersManager::acquire()->getJoinedServer();
-    ServersManager::release();
+    m_server = ServersManager::get()->getJoinedServer();
     m_server_name_widget->setText(m_server->getName(),false);
 
 }   // init

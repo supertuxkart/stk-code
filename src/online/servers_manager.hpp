@@ -23,6 +23,8 @@
 #include "utils/types.hpp"
 #include "online/server.hpp"
 #include "http_manager.hpp"
+#include "utils/synchronised.hpp"
+
 
 
 
@@ -51,35 +53,33 @@ namespace Online {
         ServersManager();
         ~ServersManager();
         /** Sorted vector of servers */
-        PtrVector<Server>               m_sorted_servers;
+        Synchronised<PtrVector<Server> >                m_sorted_servers;
         /** Maps server id's to the same servers*/
-        std::map<uint32_t, Server*>     m_mapped_servers;
+        Synchronised<std::map<uint32_t, Server*> >      m_mapped_servers;
         /** This is a pointer to a copy of the server, the moment it got joined */
-        Server *                        m_joined_server;
+        Synchronised<Server *>                          m_joined_server;
 
-        bool                            m_not_fetched;
-        irr::core::stringw              m_info_message;
-        float                           m_last_load_time;
-        void                            refresh(RefreshRequest * input);
-        void                            cleanUpServers();
+        Synchronised<irr::core::stringw>                m_info_message;
+        Synchronised<float>                             m_last_load_time;
+        void                                            refresh(RefreshRequest * input);
+        void                                            cleanUpServers();
 
     public:
         // Singleton
-        static ServersManager*          acquire();
-        static void                     release();
-        static void                     deallocate();
+        static ServersManager*                          get();
+        static void                                     deallocate();
 
-        RefreshRequest *                refreshRequest();
-        void                            setJoinedServer(uint32_t server_id);
-        void                            unsetJoinedServer();
-        void                            addServer(Server * server);
-        int                             getNumServers ();
-        Server *                        getServerByID (uint32_t server_id);
-        Server *                        getServerBySort (int index);
-        void                            sort(bool sort_desc)            { m_sorted_servers.insertionSort(0, sort_desc); }
-        Server *                        getJoinedServer()               { return m_joined_server;                       }
+        const RefreshRequest *                          refreshRequest() const;
+        void                                            setJoinedServer(uint32_t server_id);
+        void                                            unsetJoinedServer();
+        void                                            addServer(Server * server);
+        int                                             getNumServers () const;
+        const Server *                                  getServerByID (uint32_t server_id) const;
+        const Server *                                  getServerBySort (int index) const;
+        void                                            sort(bool sort_desc);
+        Server *                                        getJoinedServer() const;
         //Returns the best server to join
-        Server *                        getQuickPlay();
+        const Server *                                  getQuickPlay() const;
     };   // class ServersManager
 
 

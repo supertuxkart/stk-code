@@ -53,9 +53,8 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, bool from_server_creation
 
     m_name_widget = getWidget<LabelWidget>("name");
     assert(m_name_widget != NULL);
-    Server * server = ServersManager::acquire()->getServerByID(m_server_id);
+    const Server * server = ServersManager::get()->getServerByID(m_server_id);
     m_name_widget->setText(server->getName(),false);
-    ServersManager::release();
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
     if (m_from_server_creation)

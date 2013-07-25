@@ -21,11 +21,20 @@
 
 #include <pthread.h>
 
-template<typename TYPE>
+
+
+class ISynchronised
+{
+public :
+    virtual ~ISynchronised() {}
+    virtual void lock() const = 0 ;
+    virtual void unlock() const = 0;
+};
 
 /** A variable that is automatically synchronised using pthreads mutex.
  */
-class Synchronised
+template<typename TYPE>
+class Synchronised : public ISynchronised
 {
 private:
     /** The mutex to protect this variable with. */
@@ -97,11 +106,11 @@ public:
     /** Locks the mutex. Note that calls to get() or set() will fail, since
      *  they will try to lock the mutex as well!
      */
-    void lock() { pthread_mutex_lock(&m_mutex); }
+    void lock() const { pthread_mutex_lock(&m_mutex); }
     // ------------------------------------------------------------------------
     /** Unlocks the mutex.
      */
-    void unlock() {pthread_mutex_unlock(&m_mutex); }
+    void unlock() const {pthread_mutex_unlock(&m_mutex); }
     // ------------------------------------------------------------------------
     /** Gives access to the mutex, which can then be used in other pthread
      *  calls (e.g. pthread_cond_wait).
@@ -111,6 +120,21 @@ private:
     // Make sure that no actual copying is taking place
     // ------------------------------------------------------------------------
     void operator=(const Synchronised<TYPE>& v) {}
+};
+
+
+class MutexLocker
+{
+    const ISynchronised * m_synchronised;
+public:
+    MutexLocker(const ISynchronised & synchronised){
+        m_synchronised = &synchronised;
+        m_synchronised->lock();
+    }
+
+    ~MutexLocker(){
+        m_synchronised->unlock();
+    }
 };
 
 

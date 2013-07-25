@@ -168,8 +168,7 @@ namespace Online{
         if(isSuccess())
         {
             Server * server = new Server(*getResult()->getNode("server"));
-            ServersManager::acquire()->addServer(server);
-            ServersManager::release();
+            ServersManager::get()->addServer(server);
             m_created_server_id.setAtomic(server->getServerId());
         }
     }
@@ -228,8 +227,7 @@ namespace Online{
         {
             uint32_t server_id;
             getResult()->get("serverid", &server_id);
-            ServersManager::acquire()->setJoinedServer(server_id);
-            ServersManager::release();
+            ServersManager::get()->setJoinedServer(server_id);
         }
         //FIXME needs changes for actual valid joining
     }
