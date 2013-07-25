@@ -19,9 +19,11 @@
 
 #include "utils/string_utils.hpp"
 
+#include "utils/log.hpp"
+
 #include "coreutil.h"
 
-#include "math.h"
+#include <math.h>
 #include <algorithm>
 #include <cstring>
 #include <stdio.h>
@@ -174,14 +176,14 @@ namespace StringUtils
         }
         catch (std::exception& e)
         {
-            fprintf(stderr,
-                    "Fatal error in split(std::string) : %s @ line %i : %s\n",
+            Log::error("StringUtils", 
+                       "Error in split(std::string) : %s @ line %i : %s.",
                      __FILE__, __LINE__, e.what());
-            printf("Splitting %s\n", s.c_str());
+            Log::error("StringUtils", "Splitting '%s'.", s.c_str());
 
             for (int n=0; n<(int)result.size(); n++)
             {
-                printf("Split : %s\n", result[n].c_str());
+                Log::error("StringUtils", "Split : %s", result[n].c_str());
             }
 
             assert(false); // in debug mode, trigger debugger
@@ -236,10 +238,9 @@ namespace StringUtils
         catch (std::exception& e)
         {
             (void)e;  // avoid warning about unused variable
-            fprintf(stderr,
-                    "Fatal error in split(stringw) : %s @ line %i : %s\n",
-                     __FILE__, __LINE__, e.what());
-            assert(false); // in dbug mode, trigger debugger
+            Log::fatal("StringUtils",
+                       "Fatal error in split(stringw) : %s @ line %i : '%s'.",
+                       __FILE__, __LINE__, e.what());
             exit(1);
         }
     }   // split
@@ -293,8 +294,9 @@ namespace StringUtils
         catch (std::exception& e)
         {
             (void)e;  // avoid warning about unused variable
-            fprintf(stderr, "Fatal error in splitPath : %s @ line %i\n",
-                    __FILE__, __LINE__);
+            Log::fatal("StringUtils", 
+                "Fatal error in splitPath : %s @ line %i: '%s'.",
+                        __FILE__, __LINE__, path.c_str());
             exit(1);
         }
     }   // splitPath
@@ -323,10 +325,10 @@ namespace StringUtils
                     {
                         if (insertValID >= all_vals.size())
                         {
-                            fprintf(stderr,
-                                    "[StringUtils::insertValues] ERROR: "
-                                    "Invalid number of arguments in '%s'\n",
-                                    s.c_str());
+                            Log::warn("StringUtils", 
+                                      "insertValues: "
+                                      "Invalid number of arguments in '%s'.",
+                                      s.c_str());
                             new_string += "??" + sv[i].substr(2);
                         }
                         else
@@ -341,9 +343,9 @@ namespace StringUtils
                         const unsigned int index = sv[i][1] - '0';
                         if (index >= all_vals.size())
                         {
-                            fprintf(stderr,"[StringUtils::insertValues] ERROR:"
-                                           " Invalid argument index in '%s' "
-                                           "for %i\n", s.c_str(), index);
+                            Log::warn("StringUtils", "insertValues: "
+                                      " Invalid argument index in '%s' "
+                                      "for %i.", s.c_str(), index);
                             new_string += "??" + sv[i].substr(2);
                         }
                         else
@@ -362,8 +364,9 @@ namespace StringUtils
         catch (std::exception& e)
         {
             (void)e;  // avoid warning about unused variable
-            fprintf(stderr, "Fatal error in insertValues(std::string) : %s @ "
-                            "line %i\n", __FILE__, __LINE__);
+            Log::fatal("StringUtils", 
+                       "Fatal error in insertValues(std::string) : %s @ "
+                       "line %i: '%s'", __FILE__, __LINE__, s.c_str());
             exit(1);
         }
     }
@@ -394,10 +397,9 @@ namespace StringUtils
                     {
                         if (insertValID >= all_vals.size())
                         {
-                            fprintf(stderr,
-                                    "[StringUtils::insertValues] ERROR: "
-                                    "Invalid number of arguments in '%s'\n",
-                                    irr::core::stringc(s.c_str()).c_str());
+                            Log::warn("StringUtils", "insertValues: "
+                                      "Invalid number of arguments in '%s'\n",
+                                      irr::core::stringc(s.c_str()).c_str());
                             new_string += "??";
                             new_string += sv[i].subString(2, sv[i].size()-2);
                         }
@@ -425,11 +427,10 @@ namespace StringUtils
                                  - '0' + delta;
                         if (index >= all_vals.size())
                         {
-                            fprintf(stderr,
-                                    "[StringUtils::insertValues] ERROR: "
-                                    "Invalid argument ID in '%s' : %i\n",
-                                    irr::core::stringc(s.c_str()).c_str(),
-                                    index);
+                            Log::warn("StringUtils", "insertValues: "
+                                      "Invalid argument ID in '%s' : %i\n",
+                                      irr::core::stringc(s.c_str()).c_str(),
+                                      index);
                             new_string += "??";
                             new_string += rest;
                         }
@@ -449,9 +450,9 @@ namespace StringUtils
         catch (std::exception& e)
         {
             (void)e;  // avoid warning about unused variable
-            fprintf(stderr,
-                    "Fatal error in insertValues(stringw) : %s @ line %i\n",
-                     __FILE__, __LINE__);
+            Log::fatal("StringUtils",
+                       "Fatal error in insertValues(stringw) : %s @ line %i.",
+                       __FILE__, __LINE__);
             exit(1);
         }
     }
@@ -582,10 +583,9 @@ namespace StringUtils
                         }
                         else
                         {
-                            fprintf(stderr,
-                                    "[StringUtils] WARNING: non-numeric HTML "
-                                    "entity not supported in '%s'\n",
-                                    input.c_str());
+                            Log::warn("StringUtils", "non-numeric HTML "
+                                      "entity not supported in '%s'.",
+                                      input.c_str());
                         }
                         state = NORMAL;
                     }
