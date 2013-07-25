@@ -97,11 +97,11 @@ public:
     /** Locks the mutex. Note that calls to get() or set() will fail, since
      *  they will try to lock the mutex as well!
      */
-    void lock() { pthread_mutex_lock(&m_mutex); }
+    void lock() const { pthread_mutex_lock(&m_mutex); }
     // ------------------------------------------------------------------------
     /** Unlocks the mutex.
      */
-    void unlock() {pthread_mutex_unlock(&m_mutex); }
+    void unlock() const {pthread_mutex_unlock(&m_mutex); }
     // ------------------------------------------------------------------------
     /** Gives access to the mutex, which can then be used in other pthread
      *  calls (e.g. pthread_cond_wait).
