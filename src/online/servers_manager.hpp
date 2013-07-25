@@ -69,7 +69,7 @@ namespace Online {
         static void                     release();
         static void                     deallocate();
 
-        RefreshRequest *                refreshRequest();
+        RefreshRequest *                refreshRequest(bool request_now = true);
         void                            setJoinedServer(uint32_t server_id);
         void                            unsetJoinedServer();
         void                            addServer(Server * server);

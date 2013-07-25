@@ -213,7 +213,9 @@ namespace Online{
 
     // ============================================================================
 
-    CurrentUser::ServerJoinRequest *  CurrentUser::requestServerJoin(uint32_t server_id){
+    CurrentUser::ServerJoinRequest *  CurrentUser::requestServerJoin(uint32_t server_id,
+                                                                    bool request_now)
+    {
         assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
         ServerJoinRequest * request = new ServerJoinRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
@@ -221,6 +223,8 @@ namespace Online{
         request->setParameter("token", m_token);
         request->setParameter("id", m_id);
         request->setParameter("server_id", server_id);
+        if (request_now)
+            HTTPManager::get()->addRequest(request);
         return request;
     }
 

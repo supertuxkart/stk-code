@@ -238,7 +238,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
         Server * server = ServersManager::acquire()->getQuickPlay();
         ServersManager::release();
 
-        Online::CurrentUser::ServerJoinRequest* request2 = Online::CurrentUser::acquire()->requestServerJoin( server->getServerId());
+        Online::CurrentUser::ServerJoinRequest* request2 = Online::CurrentUser::acquire()->requestServerJoin( server->getServerId(), false);
         Online::CurrentUser::release();
         if (request2)
         {

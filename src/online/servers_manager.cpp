@@ -80,7 +80,7 @@ namespace Online{
     }
 
     // ============================================================================
-    ServersManager::RefreshRequest * ServersManager::refreshRequest()
+    ServersManager::RefreshRequest * ServersManager::refreshRequest(bool request_now)
     {
         RefreshRequest * request = NULL;
         if(Time::getRealTime() - m_last_load_time > SERVER_REFRESH_INTERVAL)
@@ -88,6 +88,8 @@ namespace Online{
             request = new RefreshRequest();
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
             request->setParameter("action",std::string("get_server_list"));
+            if (request_now)
+                HTTPManager::get()->addRequest(request);
         }
         return request;
     }

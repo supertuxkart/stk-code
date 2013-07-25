@@ -109,7 +109,7 @@ namespace Online{
                                                                 bool request_now = true);
             SignOutRequest *            requestSignOut();
             ServerCreationRequest *     requestServerCreation(  const irr::core::stringw &name, int max_players);
-            ServerJoinRequest *         requestServerJoin(      uint32_t server_id);
+            ServerJoinRequest *         requestServerJoin(      uint32_t server_id, bool request_now = true);
 
 
             // Register
