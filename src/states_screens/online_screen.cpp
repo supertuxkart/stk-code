@@ -39,6 +39,7 @@
 #include "modes/demo_world.hpp"
 #include "online/servers_manager.hpp"
 #include "online/messages.hpp"
+#include "online/request.hpp"
 
 
 #include "network/protocol_manager.hpp"
@@ -228,19 +229,22 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     else if (selection == "quick_play")
     {
         //FIXME temporary and the request join + join sequence should be placed in one method somewhere
-            /*
-        Server * server = ServersManager::get()->getQuickPlay();
-        irr::core::stringw info;
-        if (Online::CurrentUser::get()->requestJoin( server->getServerId(), info))
+        // refresh server list
+        Online::ServersManager::RefreshRequest* request = ServersManager::acquire()->refreshRequest();
+        //Online::HTTPManager::get()->synchronousRequest(request);
+        request->execute();
+        delete request;
+        // select first one
+        Server * server = ServersManager::acquire()->getQuickPlay();
+        if (Online::CurrentUser::acquire()->requestServerJoin( server->getServerId()))
         {
-            ServersManager::get()->setJoinedServer(server);
             StateManager::get()->pushScreen(NetworkingLobby::getInstance());
         }
         else
         {
             sfx_manager->quickSound( "anvil" );
-        }*/
-        ProtocolManager::getInstance()->requestStart(new ConnectToServer(7));
+        }
+        ProtocolManager::getInstance()->requestStart(new ConnectToServer(server->getServerId()));
     }
 
 }   // eventCallback

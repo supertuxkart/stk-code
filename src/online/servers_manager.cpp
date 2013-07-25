@@ -88,7 +88,6 @@ namespace Online{
             request = new RefreshRequest();
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
             request->setParameter("action",std::string("get_server_list"));
-            HTTPManager::get()->addRequest(request);
         }
         return request;
     }
