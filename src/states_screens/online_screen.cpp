@@ -230,7 +230,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     {
         //FIXME temporary and the request join + join sequence should be placed in one method somewhere
         // refresh server list
-        Online::ServersManager::RefreshRequest* request = ServersManager::acquire()->refreshRequest();
+        Online::ServersManager::RefreshRequest* request = ServersManager::acquire()->refreshRequest(false);
         ServersManager::release();
         Online::HTTPManager::get()->synchronousRequest(request);
         delete request;
@@ -245,9 +245,9 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
             Online::HTTPManager::get()->synchronousRequest(request2);
             if (request2->isSuccess())
             {
-                delete request;
+                delete request2;
                 StateManager::get()->pushScreen(NetworkingLobby::getInstance());
-                ProtocolManager::getInstance()->requestStart(new ConnectToServer(server->getServerId()));
+                ProtocolManager::getInstance()->requestStart(new ConnectToServer(server->getHostId()));
             }
             else
             {

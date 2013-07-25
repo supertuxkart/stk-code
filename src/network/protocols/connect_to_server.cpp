@@ -73,6 +73,7 @@ void ConnectToServer::notifyEvent(Event* event)
 
 void ConnectToServer::setup()
 {
+    Log::info("ConnectToServer", "SETUPP");
     m_state = NONE;
     m_public_address.ip = 0;
     m_public_address.port = 0;
@@ -89,6 +90,7 @@ void ConnectToServer::asynchronousUpdate()
     {
         case NONE:
         {
+            Log::info("ConnectToServer", "Protocol starting");
             m_current_protocol_id = m_listener->requestStart(new GetPublicAddress(&m_public_address));
             m_state = GETTING_SELF_ADDRESS;
             break;
@@ -100,6 +102,7 @@ void ConnectToServer::asynchronousUpdate()
                 m_state = SHOWING_SELF_ADDRESS;
                 NetworkManager::getInstance()->setPublicAddress(m_public_address); // set our public address
                 m_current_protocol_id = m_listener->requestStart(new ShowPublicAddress());
+                Log::info("ConnectToServer", "Public address known");
                 /*
                 if (m_quick_join)
                     m_current_protocol_id = m_listener->requestStart(new QuickJoinProtocol(&m_server_address, &m_server_id));
@@ -111,6 +114,7 @@ void ConnectToServer::asynchronousUpdate()
             if (m_listener->getProtocolState(m_current_protocol_id)
             == PROTOCOL_STATE_TERMINATED) // now our public address is in the database
             {
+                Log::info("ConnectToServer", "Public address shown");
                 if (m_quick_join)
                 {
                     m_current_protocol_id = m_listener->requestStart(new QuickJoinProtocol(&m_server_address, &m_server_id));
@@ -129,12 +133,14 @@ void ConnectToServer::asynchronousUpdate()
             {
                 m_state = REQUESTING_CONNECTION;
                 m_current_protocol_id = m_listener->requestStart(new RequestConnection(m_server_id));
+                Log::info("ConnectToServer", "Server's address known");
             }
             break;
         case REQUESTING_CONNECTION:
             if (m_listener->getProtocolState(m_current_protocol_id)
             == PROTOCOL_STATE_TERMINATED) // server knows we wanna connect
             {
+                Log::info("ConnectToServer", "Connection request made");
                 if (m_server_address.ip == 0 || m_server_address.port == 0)
                 { // server data not correct, hide address and stop
                     m_state = HIDING_ADDRESS;
@@ -157,6 +163,7 @@ void ConnectToServer::asynchronousUpdate()
             }
         case CONNECTED:
         {
+            Log::info("ConnectToServer", "Connected");
             m_listener->requestTerminate( m_listener->getProtocol(m_current_protocol_id)); // kill the ping protocol because we're connected
             m_current_protocol_id = m_listener->requestStart(new HidePublicAddress());
             ClientNetworkManager::getInstance()->setConnected(true);
@@ -167,6 +174,7 @@ void ConnectToServer::asynchronousUpdate()
             if (m_listener->getProtocolState(m_current_protocol_id)
             == PROTOCOL_STATE_TERMINATED) // we have hidden our address
             {
+                Log::info("ConnectToServer", "Address hidden");
                 m_state = DONE;
                 if (ClientNetworkManager::getInstance()->isConnected()) // lobby room protocol if we're connected only
                     m_listener->requestStart(new ClientLobbyRoomProtocol(m_server_address));
