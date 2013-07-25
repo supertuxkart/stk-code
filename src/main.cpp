@@ -1108,16 +1108,16 @@ int handleCmdLine(int argc, char **argv)
 
     if (try_login)
     {
-/*
         irr::core::stringw s;
         Online::CurrentUser::SignInRequest* request =
-                Online::CurrentUser::acquire()->requestSignIn(login, password, false);
-        request->setManageMemory(true);
+                Online::CurrentUser::acquire()->requestSignIn(login, password, false, false);
+        Online::CurrentUser::release();
+        Online::HTTPManager::get()->synchronousRequest(request);
 
         if (request->isSuccess())
         {
             Log::info("Main", "Logged in from command line.");
-        }*/
+        }
     }
 
     return 1;
