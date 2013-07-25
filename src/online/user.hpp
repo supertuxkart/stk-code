@@ -40,14 +40,13 @@ namespace Online{
             void        setUserID   (const uint32_t & id)                   { m_id.setAtomic(id); }
 
         public:
-
             User(       const irr::core::stringw & username,
                         const uint32_t           & userid
                 );
+            virtual ~User() {};
 
-
-            const irr::core::stringw  getUserName()       const   { return m_name.getAtomic();  }
-            const uint32_t            getUserID()         const   { return m_id.getAtomic();    }
+            virtual const irr::core::stringw    getUserName()       const   { return m_name.getAtomic();  }
+            const uint32_t                      getUserID()         const   { return m_id.getAtomic();    }
 
 
     };   // class User

@@ -91,11 +91,10 @@ namespace Online{
             Synchronised<bool>          m_save_session;
             Synchronised<UserState>     m_state;
 
-            UserState                   getState()              const   { return m_state.getAtomic();             }
             bool                        getSaveSession()        const   { return m_save_session.getAtomic();      }
             const std::string           getToken()              const   { return m_token.getAtomic();      }
 
-            void setState               (UserState user_state)          { m_state.setAtomic(user_state);          }
+            void setUserState           (UserState user_state)          { m_state.setAtomic(user_state);          }
             void setSaveSession         (bool save_session)             { m_save_session.setAtomic(save_session); }
             void setToken               (const std::string & token)     { m_token.setAtomic(token);               }
 
@@ -127,8 +126,8 @@ namespace Online{
                                                                     bool terms);
 
             /** Returns the username if signed in. */
-            const irr::core::stringw    getUserName()   const;
-            const UserState             getUserState()  const { return m_state.getAtomic(); }
+            const irr::core::stringw            getUserName()   const;
+            const UserState                     getUserState()  const { return m_state.getAtomic(); }
 
     };   // class CurrentUser
 
