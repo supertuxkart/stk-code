@@ -147,6 +147,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
 
     if (global_id == Online::CurrentUser::acquire()->getUserID())
     {
+        Online::CurrentUser::release();
         Log::error("ClientLobbyRoomProtocol", "The server notified me that i'm a new player in the room (not normal).");
     }
     else if (m_setup->getProfile(race_id) == NULL || m_setup->getProfile(global_id) == NULL)
@@ -218,6 +219,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     uint32_t global_id = event->data.gui32(8);
     if (global_id == Online::CurrentUser::acquire()->getUserID())
     {
+        Online::CurrentUser::release();
         Log::info("ClientLobbyRoomProtocol", "The server accepted the connection.");
 
         // self profile
@@ -225,6 +227,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         profile->kart_name = "";
         profile->race_id = event->data.gui8(1);
         profile->user_profile = Online::CurrentUser::acquire();
+        Online::CurrentUser::release();
         m_setup->addPlayer(profile);
         // connection token
         uint32_t token = event->data.gui32(3);

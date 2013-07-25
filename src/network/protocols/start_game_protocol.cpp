@@ -104,6 +104,7 @@ void StartGameProtocol::update()
         for (unsigned int i = 0; i < players.size(); i++)
         {
             bool is_me = (players[i]->user_profile == Online::CurrentUser::acquire());
+            Online::CurrentUser::release();
             if (is_me)
             {
                 NetworkPlayerProfile* profile = players[i];
@@ -128,6 +129,7 @@ void StartGameProtocol::update()
         for (unsigned int i = 0; i < players.size(); i++)
         {
             bool is_me = (players[i]->user_profile == Online::CurrentUser::acquire());
+            Online::CurrentUser::release();
             NetworkPlayerProfile* profile = players[i];
             RemoteKartInfo rki(profile->race_id, profile->kart_name,
                 profile->user_profile->getUserName(), profile->race_id, !is_me);

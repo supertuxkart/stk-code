@@ -231,20 +231,33 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
         //FIXME temporary and the request join + join sequence should be placed in one method somewhere
         // refresh server list
         Online::ServersManager::RefreshRequest* request = ServersManager::acquire()->refreshRequest();
-        //Online::HTTPManager::get()->synchronousRequest(request);
-        request->execute();
+        ServersManager::release();
+        Online::HTTPManager::get()->synchronousRequest(request);
         delete request;
         // select first one
         Server * server = ServersManager::acquire()->getQuickPlay();
-        if (Online::CurrentUser::acquire()->requestServerJoin( server->getServerId()))
+        ServersManager::release();
+
+        Online::CurrentUser::ServerJoinRequest* request2 = Online::CurrentUser::acquire()->requestServerJoin( server->getServerId());
+        Online::CurrentUser::release();
+        if (request2)
         {
-            StateManager::get()->pushScreen(NetworkingLobby::getInstance());
+            Online::HTTPManager::get()->synchronousRequest(request2);
+            if (request2->isSuccess())
+            {
+                delete request;
+                StateManager::get()->pushScreen(NetworkingLobby::getInstance());
+                ProtocolManager::getInstance()->requestStart(new ConnectToServer(server->getServerId()));
+            }
+            else
+            {
+                sfx_manager->quickSound( "anvil" );
+            }
         }
         else
         {
             sfx_manager->quickSound( "anvil" );
         }
-        ProtocolManager::getInstance()->requestStart(new ConnectToServer(server->getServerId()));
     }
 
 }   // eventCallback

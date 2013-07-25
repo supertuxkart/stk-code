@@ -221,7 +221,6 @@ namespace Online{
         request->setParameter("token", m_token);
         request->setParameter("id", m_id);
         request->setParameter("server_id", server_id);
-        HTTPManager::get()->addRequest(request);
         return request;
     }
 

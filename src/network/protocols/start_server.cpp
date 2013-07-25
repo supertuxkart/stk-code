@@ -48,7 +48,9 @@ void StartServer::asynchronousUpdate()
         m_request = new Online::XMLRequest();
         m_request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
         m_request->setParameter("id",Online::CurrentUser::acquire()->getUserID());
+        Online::CurrentUser::release();
         m_request->setParameter("token",Online::CurrentUser::acquire()->getToken());
+        Online::CurrentUser::release();
         m_request->setParameter("address",addr.ip);
         m_request->setParameter("port",addr.port);
         m_request->setParameter("max_players",UserConfigParams::m_server_max_players);
