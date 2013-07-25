@@ -828,10 +828,8 @@ void FileManager::redirectOutput()
 {
     //Enable logging of stdout and stderr to logfile
     std::string logoutfile = getLogFile("stdout.log");
-    std::string logerrfile = getLogFile("stderr.log");
     Log::verbose("main", "Error messages and other text output will "
-                         "be logged to %s and %s.", logoutfile.c_str(),
-                 logerrfile.c_str());
+                         "be logged to %s.", logoutfile.c_str());
     Log::openOutputFiles(logoutfile);
 }   // redirectOutput
 
