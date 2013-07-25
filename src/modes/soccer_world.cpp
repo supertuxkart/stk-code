@@ -58,6 +58,8 @@ void SoccerWorld::init()
         fprintf(stderr, "No AI exists for this game mode\n");
         exit(1);
     }
+	m_goal_target = race_manager->getMaxGoal();
+	printf("Max Goal: %d\n", m_goal_target);
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -146,7 +148,11 @@ bool SoccerWorld::isRaceOver()
     {
         return false;
     }
-
+	// One team scored the target goals ...
+	else if(getScore(0) >= m_goal_target ||
+		getScore(1) >= m_goal_target){
+			return true;
+	}
     // TODO
     return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
 }   // isRaceOver
