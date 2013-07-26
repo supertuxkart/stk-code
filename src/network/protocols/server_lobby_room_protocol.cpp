@@ -51,6 +51,7 @@ void ServerLobbyRoomProtocol::setup()
     m_state = NONE;
     m_public_address.ip = 0;
     m_public_address.port = 0;
+    m_selection_enabled = false;
     Log::info("ServerLobbyRoomProtocol", "Starting the protocol.");
 }
 
@@ -187,6 +188,20 @@ void ServerLobbyRoomProtocol::startGame()
 
 //-----------------------------------------------------------------------------
 
+void ServerLobbyRoomProtocol::startSelection()
+{
+    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    for (unsigned int i = 0; i < peers.size(); i++)
+    {
+        NetworkString ns;
+        ns.ai8(0x05).ai8(4).ai32(peers[i]->getClientServerToken()); // start selection
+        m_listener->sendMessage(this, peers[i], ns, true); // reliably
+    }
+    m_selection_enabled = true;
+}
+
+//-----------------------------------------------------------------------------
+
 void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
 {
     STKPeer* peer = *(event->peer);
@@ -318,6 +333,15 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
                             "%d, real: %d.", kart_name_size, kart_name.size());
         return;
     }
+    // check if selection is possible
+    if (!m_selection_enabled)
+    {
+        NetworkString answer;
+        answer.ai8(0x82).ai8(1).ai8(2); // selection still not started
+        m_listener->sendMessage(this, peer, answer);
+        return;
+    }
+    // check if somebody picked that kart
     if (!m_setup->isKartAvailable(kart_name))
     {
         NetworkString answer;

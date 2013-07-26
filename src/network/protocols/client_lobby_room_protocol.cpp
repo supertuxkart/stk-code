@@ -21,6 +21,8 @@
 #include "network/network_manager.hpp"
 #include "network/protocols/start_game_protocol.hpp"
 #include "online/current_user.hpp"
+#include "states_screens/state_manager.hpp"
+#include "states_screens/network_kart_selection.hpp"
 #include "utils/log.hpp"
 
 ClientLobbyRoomProtocol::ClientLobbyRoomProtocol(const TransportAddress& server_address)
@@ -73,6 +75,8 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
             kartSelectionUpdate(event);
         else if (message_type == 0x04) // start race
             startGame(event);
+        else if (message_type == 0x05) // start selection phase
+            startSelection(event);
         else if (message_type == 0x80) // connection refused
             connectionRefused(event);
         else if (message_type == 0x81) // connection accepted
@@ -112,6 +116,10 @@ void ClientLobbyRoomProtocol::update()
     case REQUESTING_CONNECTION:
         break;
     case CONNECTED:
+        break;
+    case SELECTING_KARTS:
+        break;
+    case PLAYING:
         break;
     case DONE:
         m_state = EXITING;
@@ -388,11 +396,44 @@ void ClientLobbyRoomProtocol::startGame(Event* event)
     uint8_t token = event->data.gui32(1);
     if (token == NetworkManager::getInstance()->getPeers()[0]->getClientServerToken())
     {
+        m_state = PLAYING;
         m_listener->requestStart(new StartGameProtocol(m_setup));
         Log::error("ClientLobbyRoomProtocol", "Starting new game");
     }
     else
         Log::error("ClientLobbyRoomProtocol", "Bad token when starting game");
+
+}
+
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when the kart selection starts.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1       5
+ *       -------------
+ *  Size | 1 |    4  |
+ *  Data | 4 | token |
+ *       -------------
+ */
+void ClientLobbyRoomProtocol::startSelection(Event* event)
+{
+    if (event->data.size() < 5 || event->data[0] != 4)
+    {
+        Log::error("ClientLobbyRoomProtocol", "A message notifying a kart "
+                    "selection update wasn't formated as expected.");
+        return;
+    }
+    uint8_t token = event->data.gui32(1);
+    if (token == NetworkManager::getInstance()->getPeers()[0]->getClientServerToken())
+    {
+        m_state = SELECTING_KARTS;
+        StateManager::get()->pushScreen(NetworkKartSelectionScreen::getInstance());
+        Log::info("ClientLobbyRoomProtocol", "Kart selection starts now");
+    }
+    else
+        Log::error("ClientLobbyRoomProtocol", "Bad token");
 
 }
 

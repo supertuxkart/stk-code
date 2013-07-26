@@ -2,7 +2,7 @@
 #define REQUEST_CONNECTION_HPP
 
 #include "network/protocol.hpp"
-#include "online/request.hpp"
+#include "online/current_user.hpp"
 
 class RequestConnection : public Protocol
 {
@@ -17,7 +17,7 @@ class RequestConnection : public Protocol
 
     protected:
         uint32_t m_server_id;
-        Online::XMLRequest* m_request;
+        Online::CurrentUser::ServerJoinRequest* m_request;
         enum STATE
         {
             NONE,

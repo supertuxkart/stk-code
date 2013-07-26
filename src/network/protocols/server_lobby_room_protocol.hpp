@@ -15,6 +15,7 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
         virtual void asynchronousUpdate() {};
 
         void startGame();
+        void startSelection();
 
     protected:
         void kartDisconnected(Event* event);
@@ -26,6 +27,7 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
         std::vector<uint32_t> m_incoming_peers_ids;
         uint32_t m_current_protocol_id;
         TransportAddress m_public_address;
+        bool m_selection_enabled;
 
         enum STATE
         {

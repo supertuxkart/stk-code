@@ -39,7 +39,7 @@ class KartSelectionScreen : public GUIEngine::Screen,
     friend class KartHoverListener;
     friend class PlayerNameSpinner;
     friend class FocusDispatcher;
-
+protected:
     /** Contains the custom widget shown for every player. (ref only since
      *  we're adding them to a Screen, and the Screen will take ownership
      *  of these widgets)

@@ -25,6 +25,8 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/connect_to_server.hpp"
 #include "online/current_user.hpp"
 #include "online/servers_manager.hpp"
 #include "online/messages.hpp"
@@ -40,10 +42,11 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-ServerInfoDialog::ServerInfoDialog(uint32_t server_id, bool from_server_creation) :
+ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id,bool from_server_creation) :
         ModalDialog(0.8f,0.8f)
 {
     m_server_id = server_id;
+    m_host_id = host_id;
     m_self_destroy = false;
     m_enter_lobby = false;
     m_from_server_creation = from_server_creation;
@@ -73,13 +76,16 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, bool from_server_creation
 // -----------------------------------------------------------------------------
 ServerInfoDialog::~ServerInfoDialog()
 {
-    delete m_server_join_request;
+    if (m_server_join_request)
+        delete m_server_join_request;
+    m_server_join_request = NULL;
 }
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::requestJoin()
 {
-    m_server_join_request = Online::CurrentUser::acquire()->requestServerJoin(m_server_id);
-    Online::CurrentUser::release();
+    //m_server_join_request = Online::CurrentUser::acquire()->requestServerJoin(m_server_id);
+    ProtocolManager::getInstance()->requestStart(new ConnectToServer(m_host_id));
+    //Online::CurrentUser::release();
 }
 
 // -----------------------------------------------------------------------------

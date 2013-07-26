@@ -56,6 +56,12 @@ void* waitInput2(void* data)
             assert(protocol);
             protocol->startGame();
         }
+        else if (str == "selection")
+        {
+            ServerLobbyRoomProtocol* protocol = static_cast<ServerLobbyRoomProtocol*>(ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
+            assert(protocol);
+            protocol->startSelection();
+        }
     }
 
     uint32_t id = ProtocolManager::getInstance()->requestStart(new StopServer());

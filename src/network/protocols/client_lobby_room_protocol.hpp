@@ -26,6 +26,7 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
         void kartSelectionRefused(Event* event);
         void kartSelectionUpdate(Event* event);
         void startGame(Event* event);
+        void startSelection(Event* event);
 
         TransportAddress m_server_address;
         STKPeer* m_server;
@@ -35,7 +36,9 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
             NONE,
             LINKED,
             REQUESTING_CONNECTION,
-            CONNECTED,
+            CONNECTED, // means in the lobby room
+            SELECTING_KARTS, // in the network kart selection screen
+            PLAYING,
             DONE,
             EXITING
         };

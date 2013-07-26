@@ -164,7 +164,9 @@ void ServerSelection::eventCallback( GUIEngine::Widget* widget,
         m_selected_index = m_server_list_widget->getSelectionID();
         uint32_t server_id = ServersManager::acquire()->getServerBySort(m_selected_index)->getServerId();
         ServersManager::release();
-        new ServerInfoDialog(server_id);
+        uint32_t host_id = ServersManager::acquire()->getServerBySort(m_selected_index)->getHostId();
+        ServersManager::release();
+        new ServerInfoDialog(server_id, host_id);
     }
 
 }   // eventCallback
