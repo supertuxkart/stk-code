@@ -75,7 +75,7 @@ void RequestConnection::asynchronousUpdate()
                 }
                 else
                 {
-                    Log::error("RequestConnection", "Fail to make a request.");
+                    Log::error("RequestConnection", "Fail to make a request to connecto to server %d", m_server_id);
                 }
             }
             else

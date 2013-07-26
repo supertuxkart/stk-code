@@ -66,7 +66,7 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
         assert(event->data.size()); // assert that data isn't empty
         uint8_t message_type = event->data.getAndRemoveUInt8();
 
-        Log::debug("ClientLobbyRoomProtocol", "Message of type %d", message_type);
+        Log::info("ClientLobbyRoomProtocol", "Message of type %d", message_type);
         if (message_type == 0x01) // new player connected
             newPlayer(event);
         else if (message_type == 0x02) // player disconnected
@@ -110,12 +110,17 @@ void ClientLobbyRoomProtocol::update()
         NetworkString ns;
         // 1 (connection request), 4 (size of id), global id
         ns.ai8(1).ai8(4).ai32(Online::CurrentUser::acquire()->getUserID());
+        Online::CurrentUser::release();
         m_listener->sendMessage(this, ns);
         m_state = REQUESTING_CONNECTION;
     } break;
     case REQUESTING_CONNECTION:
         break;
     case CONNECTED:
+        break;
+    case KART_SELECTION:
+        StateManager::get()->pushScreen(NetworkKartSelectionScreen::getInstance());
+        m_state = SELECTING_KARTS;
         break;
     case SELECTING_KARTS:
         break;
@@ -428,8 +433,7 @@ void ClientLobbyRoomProtocol::startSelection(Event* event)
     uint8_t token = event->data.gui32(1);
     if (token == NetworkManager::getInstance()->getPeers()[0]->getClientServerToken())
     {
-        m_state = SELECTING_KARTS;
-        StateManager::get()->pushScreen(NetworkKartSelectionScreen::getInstance());
+        m_state = KART_SELECTION;
         Log::info("ClientLobbyRoomProtocol", "Kart selection starts now");
     }
     else

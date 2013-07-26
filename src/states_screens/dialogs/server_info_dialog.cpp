@@ -47,6 +47,7 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id,bool fro
 {
     m_server_id = server_id;
     m_host_id = host_id;
+    Log::info("ServerInfoDialog", "Server id is %d, Host id is %d", server_id, host_id);
     m_self_destroy = false;
     m_enter_lobby = false;
     m_from_server_creation = from_server_creation;
@@ -84,7 +85,11 @@ ServerInfoDialog::~ServerInfoDialog()
 void ServerInfoDialog::requestJoin()
 {
     //m_server_join_request = Online::CurrentUser::acquire()->requestServerJoin(m_server_id);
-    ProtocolManager::getInstance()->requestStart(new ConnectToServer(m_host_id));
+    Online::ServersManager::acquire()->setJoinedServer(m_server_id);
+    Online::ServersManager::release();
+    ProtocolManager::getInstance()->requestStart(new ConnectToServer(m_server_id, m_host_id));
+    ModalDialog::dismiss();
+    StateManager::get()->pushScreen(NetworkingLobby::getInstance());
     //Online::CurrentUser::release();
 }
 

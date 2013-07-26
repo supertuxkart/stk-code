@@ -247,7 +247,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
             {
                 delete request2;
                 StateManager::get()->pushScreen(NetworkingLobby::getInstance());
-                ProtocolManager::getInstance()->requestStart(new ConnectToServer(server->getHostId()));
+                ProtocolManager::getInstance()->requestStart(new ConnectToServer(server->getServerId(), server->getHostId()));
             }
             else
             {

@@ -27,7 +27,7 @@ class ConnectToServer : public Protocol, public CallbackObject
 {
     public:
         ConnectToServer(); //!< Quick join
-        ConnectToServer(uint32_t server_id); //!< Specify server id
+        ConnectToServer(uint32_t server_id, uint32_t host_id); //!< Specify server id
         virtual ~ConnectToServer();
 
         virtual void notifyEvent(Event* event);
@@ -39,6 +39,7 @@ class ConnectToServer : public Protocol, public CallbackObject
         TransportAddress m_server_address;
         TransportAddress m_public_address;
         uint32_t m_server_id;
+        uint32_t m_host_id;
         uint32_t m_current_protocol_id;
         bool m_quick_join;
 

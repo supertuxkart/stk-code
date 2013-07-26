@@ -43,10 +43,11 @@ ConnectToServer::ConnectToServer() :
 
 // ----------------------------------------------------------------------------
 
-ConnectToServer::ConnectToServer(uint32_t server_id) :
+ConnectToServer::ConnectToServer(uint32_t server_id, uint32_t host_id) :
     Protocol(NULL, PROTOCOL_CONNECTION)
 {
     m_server_id = server_id;
+    m_host_id = host_id;
     m_quick_join = false;
     m_state = NONE;
 }
@@ -122,7 +123,7 @@ void ConnectToServer::asynchronousUpdate()
                 }
                 else
                 {
-                    m_current_protocol_id = m_listener->requestStart(new GetPeerAddress(m_server_id, &m_server_address));
+                    m_current_protocol_id = m_listener->requestStart(new GetPeerAddress(m_host_id, &m_server_address));
                     m_state = GETTING_SERVER_ADDRESS;
                 }
             }

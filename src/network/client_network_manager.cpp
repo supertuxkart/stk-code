@@ -53,10 +53,6 @@ void* waitInput(void* data)
         {
             ProtocolManager::getInstance()->requestStart(new ConnectToServer());
         }
-        else if (sscanf(str.c_str(), "connect=%d", &n))
-        {
-            ProtocolManager::getInstance()->requestStart(new ConnectToServer(n));
-        }
         else if (str == "select")
         {
             std::string str2;

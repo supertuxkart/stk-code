@@ -37,6 +37,7 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
             LINKED,
             REQUESTING_CONNECTION,
             CONNECTED, // means in the lobby room
+            KART_SELECTION,
             SELECTING_KARTS, // in the network kart selection screen
             PLAYING,
             DONE,

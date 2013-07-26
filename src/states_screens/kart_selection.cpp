@@ -396,6 +396,7 @@ public:
 
         // ---- Kart name label
         m_kart_name = new LabelWidget();
+        m_kart_name->add(); // add the widget
         m_kart_name->setText(props->getName(), false);
         m_kart_name->m_properties[PROP_TEXT_ALIGN] = "center";
         m_kart_name->m_properties[PROP_ID] =
