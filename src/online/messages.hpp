@@ -30,6 +30,7 @@ namespace Online
         irr::core::stringw signingIn            ();
         irr::core::stringw signingOut           ();
         irr::core::stringw signingUp            ();
+        irr::core::stringw recovery             ();
         irr::core::stringw joiningServer        ();
         irr::core::stringw creatingServer       ();
         irr::core::stringw fetchingServers      ();

@@ -26,6 +26,7 @@
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
+#include "states_screens/dialogs/recovery_dialog.hpp"
 #include "online/messages.hpp"
 
 
@@ -41,6 +42,7 @@ LoginDialog::LoginDialog(const Message message_type) :
 {
     m_self_destroy = false;
     m_open_registration_dialog = false;
+    m_open_recovery_dialog = false;
     m_sign_in_request = NULL;
     loadFromFile("online/login_dialog.stkgui");
 
@@ -86,6 +88,7 @@ LoginDialog::LoginDialog(const Message message_type) :
     assert(m_register_widget != NULL);
     m_as_guest_widget = getWidget<IconButtonWidget>("as_guest");
     assert(m_as_guest_widget != NULL);
+    m_as_guest_widget->setDeactivated();
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
 
@@ -141,6 +144,11 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
             m_open_registration_dialog = true;
             return GUIEngine::EVENT_BLOCK;
         }
+        else if(selection == m_recovery_widget->m_properties[PROP_ID])
+        {
+            m_open_recovery_dialog = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
     }
     return GUIEngine::EVENT_LET;
 }
@@ -191,8 +199,8 @@ void LoginDialog::onUpdate(float dt)
             m_info_widget->setText(Online::Messages::signingIn(), false);
         }
     }
-    //If we want to open the registration dialog, we need to close this one first
-    m_open_registration_dialog && (m_self_destroy = true);
+    //If we want to open another dialog, we need to close this one first
+    (m_open_registration_dialog || m_open_recovery_dialog) && (m_self_destroy = true);
 
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
@@ -200,6 +208,8 @@ void LoginDialog::onUpdate(float dt)
         ModalDialog::dismiss();
         if (m_open_registration_dialog)
             new RegistrationDialog();
+        else if (m_open_recovery_dialog)
+            new RecoveryDialog();
         return;
     }
 }

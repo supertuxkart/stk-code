@@ -55,6 +55,20 @@ namespace Online{
     }
 
     // ============================================================================
+    const XMLRequest * CurrentUser::requestRecovery(    const irr::core::stringw &username,
+                                                        const irr::core::stringw &email)
+    {
+        assert(getUserState() == US_SIGNED_OUT || getUserState() == US_GUEST);
+        XMLRequest * request = new XMLRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("recovery"));
+        request->setParameter("username", username);
+        request->setParameter("email", email);
+        HTTPManager::get()->addRequest(request);
+        return request;
+    }
+
+    // ============================================================================
     const XMLRequest * CurrentUser::requestSignUp(  const irr::core::stringw &username,
                                                     const irr::core::stringw &password,
                                                     const irr::core::stringw &password_confirm,

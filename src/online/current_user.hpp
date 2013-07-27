@@ -105,7 +105,7 @@ namespace Online{
             void createServer           (const ServerCreationRequest    * input);
 
         public:
-            //Singleton
+            /**Singleton */
             static CurrentUser *            get();
             static void                     deallocate();
 
@@ -118,12 +118,15 @@ namespace Online{
             const ServerJoinRequest *       requestServerJoin(      uint32_t server_id);
 
 
-            // Register
+            /** Register */
             const XMLRequest *              requestSignUp(          const irr::core::stringw &username,
                                                                     const irr::core::stringw &password,
                                                                     const irr::core::stringw &password_ver,
                                                                     const irr::core::stringw &email,
                                                                     bool terms);
+
+            const XMLRequest *              requestRecovery(        const irr::core::stringw &username,
+                                                                    const irr::core::stringw &email);
 
             /** Returns the username if signed in. */
             const irr::core::stringw            getUserName()   const;

@@ -40,6 +40,11 @@ namespace Online
             return irr::core::stringw(_("Validating registration info")) + loadingDots();
         }
         // ------------------------------------------------------------------------
+        irr::core::stringw recovery()
+        {
+            return irr::core::stringw(_("Validating recovery info")) + loadingDots();
+        }
+        // ------------------------------------------------------------------------
 
         irr::core::stringw signedInAs(const irr::core::stringw & name)
         {

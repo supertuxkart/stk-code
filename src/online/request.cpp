@@ -92,7 +92,7 @@ namespace Online{
         curl_session = curl_easy_init();
         if(!curl_session)
         {
-            Log::error("online/http_functions", "Error while initialising libCurl session");
+            Log::error("HTTPRequest::downloadPage", "Error while initialising libCurl session");
             return "";
         }
         curl_easy_setopt(curl_session, CURLOPT_URL, m_url.getAtomic().c_str());
@@ -132,7 +132,7 @@ namespace Online{
         CURLcode res = curl_easy_perform(curl_session);
         if(res == CURLE_OK)
         {
-            Log::info("online/http_functions", "Received : %s", readBuffer.c_str());
+            Log::info("HTTPRequest::downloadPage", "Received : %s", readBuffer.c_str());
             setProgress(1.0f);
         }
         else

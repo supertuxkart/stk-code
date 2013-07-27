@@ -35,26 +35,20 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-RegistrationDialog::RegistrationDialog(const Phase phase) :
+RegistrationDialog::RegistrationDialog() :
         ModalDialog(0.8f,0.9f)
 {
     m_sign_up_request = NULL;
-    m_activation_request = NULL;
     m_self_destroy = false;
-    m_show_registration_info = false;
+    m_show_registration_input = true;
     m_show_registration_terms = false;
-    m_show_registration_activation = false;
+    m_show_registration_info = false;
     m_username = "";
     m_email = "";
     m_email_confirm = "";
     m_password = "";
     m_password_confirm = "";
     m_agreement = false;
-    //If not asked for the Activation phase, default to the Info phase.
-    if (phase == Activation)
-        m_show_registration_activation = true;
-    else
-        m_show_registration_info = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -62,16 +56,16 @@ RegistrationDialog::RegistrationDialog(const Phase phase) :
 RegistrationDialog::~RegistrationDialog()
 {
     delete m_sign_up_request;
-    delete m_activation_request;
 }
 
 // -----------------------------------------------------------------------------
 
-void RegistrationDialog::showRegistrationInfo(){
-    m_show_registration_info = false;
+void RegistrationDialog::showRegistrationInput()
+{
+    m_show_registration_input = false;
     clearWindow();
-    m_phase = Info;
-    loadFromFile("online/registration_info.stkgui");
+    m_phase = Input;
+    loadFromFile("online/registration_input.stkgui");
 
     //Password should always be reentered if previous has been clicked, or an error occurred.
     m_password = "";
@@ -113,7 +107,8 @@ void RegistrationDialog::showRegistrationInfo(){
 
 // -----------------------------------------------------------------------------
 
-void RegistrationDialog::showRegistrationTerms(){
+void RegistrationDialog::showRegistrationTerms()
+{
     m_show_registration_terms = false;
     clearWindow();
     m_phase = Terms;
@@ -139,64 +134,71 @@ void RegistrationDialog::showRegistrationTerms(){
 
 // -----------------------------------------------------------------------------
 
-void RegistrationDialog::showRegistrationActivation(){
-    m_show_registration_activation = false;
+void RegistrationDialog::showRegistrationInfo()
+{
+    m_show_registration_info = false;
     clearWindow();
-    m_phase = Activation;
-    loadFromFile("online/registration_activation.stkgui");
+    m_phase = Info;
+    loadFromFile("online/registration_info.stkgui");
 
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
-    m_info_widget->setText(m_registration_error, false);
 
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
-    m_next_widget = getWidget<IconButtonWidget>("next");
-    assert(m_next_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
 }
 
 // -----------------------------------------------------------------------------
 
-bool RegistrationDialog::processInfoEvent(const std::string& eventSource){
-    if (m_phase == Info)
+void RegistrationDialog::processInput()
+{
+    m_username = m_username_widget->getText().trim();
+    m_password = m_password_widget->getText().trim();
+    m_password_confirm =  m_password_confirm_widget->getText().trim();
+    m_email = m_email_widget->getText().trim();
+    m_email_confirm = m_email_confirm_widget->getText().trim();
+    //FIXME More validation of registration information
+    m_info_widget->setErrorColor();
+    if (m_password != m_password_confirm)
+    {
+        m_info_widget->setText(_("Passwords don't match!"), false);
+    }
+    else if (m_email != m_email_confirm)
+    {
+        m_info_widget->setText(_("Emails don't match!"), false);
+    }
+    else if (m_username.size() < 4 || m_username.size() > 30)
+    {
+        m_info_widget->setText(_("Username has to be between 4 and 30 characters long!"), false);
+    }
+    else if (m_password.size() < 8 || m_password.size() > 30)
+    {
+        m_info_widget->setText(_("Password has to be between 8 and 30 characters long!"), false);
+    }
+    else if (m_email.size() < 4 || m_email.size() > 50)
+    {
+        m_info_widget->setText(_("Email has to be between 4 and 50 characters long!"), false);
+    }
+    else
+    {
+        m_show_registration_terms = true;
+        return;
+    }
+    sfx_manager->quickSound( "anvil" );
+}
+
+
+// -----------------------------------------------------------------------------
+
+bool RegistrationDialog::processInputEvent(const std::string& eventSource)
+{
+    if (m_phase == Input)
     {
         if (eventSource == m_next_widget->m_properties[PROP_ID])
         {
-            m_username = m_username_widget->getText().trim();
-            m_password = m_password_widget->getText().trim();
-            m_password_confirm =  m_password_confirm_widget->getText().trim();
-            m_email = m_email_widget->getText().trim();
-            m_email_confirm = m_email_confirm_widget->getText().trim();
-            //FIXME More validation of registration information
-            m_info_widget->setErrorColor();
-            if (m_password != m_password_confirm)
-            {
-                m_info_widget->setText(_("Passwords don't match!"), false);
-            }
-            else if (m_email != m_email_confirm)
-            {
-                m_info_widget->setText(_("Emails don't match!"), false);
-            }
-            else if (m_username.size() < 4 || m_username.size() > 30)
-            {
-                m_info_widget->setText(_("Username has to be between 4 and 30 characters long!"), false);
-            }
-            else if (m_password.size() < 8 || m_password.size() > 30)
-            {
-                m_info_widget->setText(_("Password has to be between 8 and 30 characters long!"), false);
-            }
-            else if (m_email.size() < 4 || m_email.size() > 50)
-            {
-                m_info_widget->setText(_("Email has to be between 4 and 50 characters long!"), false);
-            }
-            else
-            {
-                m_show_registration_terms = true;
-                return true;
-            }
-            sfx_manager->quickSound( "anvil" );
+            processInput();
             return true;
         }
     }
@@ -205,7 +207,8 @@ bool RegistrationDialog::processInfoEvent(const std::string& eventSource){
 
 // -----------------------------------------------------------------------------
 
-bool RegistrationDialog::processTermsEvent(const std::string& eventSource){
+bool RegistrationDialog::processTermsEvent(const std::string& eventSource)
+{
     if (m_phase == Terms)
     {
         if (eventSource == m_next_widget->m_properties[PROP_ID])
@@ -238,16 +241,8 @@ bool RegistrationDialog::processTermsEvent(const std::string& eventSource){
 
 // -----------------------------------------------------------------------------
 
-bool RegistrationDialog::processActivationEvent(const std::string& eventSource){
-    if (m_phase == Activation)
-    {
-        if (eventSource == m_next_widget->m_properties[PROP_ID])
-        {
-            //FIXME : activate
-            m_self_destroy = true;
-            return true;
-        }
-    }
+bool RegistrationDialog::processInfoEvent(const std::string& eventSource)
+{
     return false;
 }
 
@@ -272,7 +267,7 @@ GUIEngine::EventPropagation RegistrationDialog::processEvent(const std::string& 
         m_self_destroy = true;
         return GUIEngine::EVENT_BLOCK;
     }
-    else if (processInfoEvent(selection) || processTermsEvent(selection) || processActivationEvent(selection))
+    else if (processInputEvent(selection) || processTermsEvent(selection) || processInfoEvent(selection))
     {
         return GUIEngine::EVENT_BLOCK;
     }
@@ -287,7 +282,7 @@ void RegistrationDialog::onEnterPressedInternal()
     if (GUIEngine::isFocusedForPlayer(m_options_widget, PLAYER_ID_GAME_MASTER))
         return;
     if (m_next_widget->isActivated())
-        processEvent("next");
+        processInput();
 }
 
 // -----------------------------------------------------------------------------
@@ -302,12 +297,12 @@ void RegistrationDialog::onUpdate(float dt)
             {
                 if(m_sign_up_request->isSuccess())
                 {
-                    m_show_registration_activation = true;
+                    m_show_registration_info = true;
                 }
                 else
                 {
                     sfx_manager->quickSound( "anvil" );
-                    m_show_registration_info = true;
+                    m_show_registration_input = true;
                     m_registration_error = m_sign_up_request->getInfo();
                 }
                 delete m_sign_up_request;
@@ -321,34 +316,13 @@ void RegistrationDialog::onUpdate(float dt)
             }
         }
     }
-    else if (m_phase == Activation)
-    {
-        /*
-        XMLRequest * sign_up_request = HTTPManager::get()->getXMLResponse(Request::RT_SIGN_UP);
-        if(sign_up_request != NULL)
-        {
-            if(sign_up_request->isSuccess())
-            {
-                m_show_registration_activation = true;
-            }
-            else
-            {
-                sfx_manager->quickSound( "anvil" );
-                m_show_registration_info = true;
-                m_registration_error = sign_up_request->getInfo();
-            }
-            delete sign_up_request;
-            m_signing_up = false;
-            //FIXME m_options_widget->setActivated();
-        }*/
-    }
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
         ModalDialog::dismiss();
-    else if (m_show_registration_info)
-        showRegistrationInfo();
+    else if (m_show_registration_input)
+        showRegistrationInput();
     else if (m_show_registration_terms)
         showRegistrationTerms();
-    else if (m_show_registration_activation)
-        showRegistrationActivation();
+    else if (m_show_registration_info)
+        showRegistrationInfo();
 }

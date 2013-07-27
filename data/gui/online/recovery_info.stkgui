@@ -2,13 +2,13 @@
 
     <div x="2%" y="5%" width="96%" height="90%" layout="vertical-row" >
     
-        <header id="title" width="96%" proportion="1" text_align="center" word_wrap="true"
-       I18N="In the registration dialog' dialog" text="Registration Complete"/>
+        <header id="title" width="96%" height="fit" text_align="center" word_wrap="true"
+       I18N="In the registration dialog' dialog" text="Account Recovery"/>
     
         <spacer height="20" width="50">
         
         <label id="info" proportion="1" width="90%" align="center" text_align="center" word_wrap="true" I18N="In the registration dialog" 
-        text="You will receive an email with further instructions regarding account activation. Please be patient and be sure to check your spam folder."/>
+        text="You will receive an email with further instructions on how to reset your password. Please be patient and be sure to check your spam folder."/>
            
         <spacer height="20" width="50"> 
         
