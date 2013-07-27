@@ -28,7 +28,7 @@
 #include "modes/overworld.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/dialogs/select_challenge.hpp"
-#include "states_screens/kart_selection.hpp"
+#include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/race_gui_overworld.hpp"
 #include "tracks/track.hpp"
 
@@ -128,7 +128,7 @@ void OverWorld::update(float dt)
         m_return_to_garage = false;
         delayedSelfDestruct();
         race_manager->exitRace(false);
-        KartSelectionScreen* s = KartSelectionScreen::getInstance();
+        KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
         s->setMultiplayer(false);
         s->setFromOverworld(true);
         StateManager::get()->resetAndGoToScreen(s);

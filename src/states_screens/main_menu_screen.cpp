@@ -41,7 +41,7 @@
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/help_screen_1.hpp"
-#include "states_screens/kart_selection.hpp"
+#include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -271,14 +271,14 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 #endif
     if (selection == "new")
     {
-        KartSelectionScreen* s = KartSelectionScreen::getInstance();
+        KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
         s->setMultiplayer(false);
         s->setFromOverworld(false);
         StateManager::get()->pushScreen( s );
     }
     else if (selection == "multiplayer")
     {
-        KartSelectionScreen* s = KartSelectionScreen::getInstance();
+        KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
         s->setMultiplayer(true);
         s->setFromOverworld(false);
         StateManager::get()->pushScreen( s );
@@ -358,7 +358,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             const std::string default_kart = UserConfigParams::m_default_kart;
             if (slot->isLocked(default_kart))
             {
-                KartSelectionScreen *next = KartSelectionScreen::getInstance();
+                KartSelectionScreen *next = OfflineKartSelectionScreen::getInstance();
                 next->setGoToOverworldNext();
                 next->setMultiplayer(false);
                 StateManager::get()->resetAndGoToScreen(next);

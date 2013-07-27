@@ -58,8 +58,8 @@ static const char ID_DONT_USE[] = "x";
 // Use '/' as special character to avoid that someone creates
 // a kart called 'locked'
 static const char ID_LOCKED[] = "locked/";
-
-DEFINE_SCREEN_SINGLETON( KartSelectionScreen );
+KartSelectionScreen* KartSelectionScreen::m_instance_ptr = NULL;
+//DEFINE_SCREEN_SINGLETON( KartSelectionScreen );
 
 class PlayerKartWidget;
 
@@ -490,7 +490,7 @@ public:
     {
         assert(m_magic_number == 0x33445566);
 
-        assert(KartSelectionScreen::getInstance()
+        assert(KartSelectionScreen::getRunningInstance()
                ->m_kart_widgets.contains(this));
         bool mineInList = false;
         for (int p=0; p<StateManager::get()->activePlayerCount(); p++)
@@ -835,7 +835,7 @@ public:
     /** \brief Event callback from ISpinnerConfirmListener */
     virtual EventPropagation onSpinnerConfirmed()
     {
-        KartSelectionScreen::getInstance()->playerConfirm(m_playerID);
+        KartSelectionScreen::getRunningInstance()->playerConfirm(m_playerID);
         return EVENT_BLOCK;
     }   // onSpinnerConfirmed
 };   // PlayerKartWidget
@@ -987,6 +987,13 @@ KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
     m_from_overworld       = false;
     m_go_to_overworld_next = false;
 }   // KartSelectionScreen
+
+// ============================================================================
+
+KartSelectionScreen* KartSelectionScreen::getRunningInstance()
+{
+    return m_instance_ptr;
+}
 
 // ----------------------------------------------------------------------------
 

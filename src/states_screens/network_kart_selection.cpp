@@ -6,6 +6,7 @@ DEFINE_SCREEN_SINGLETON( NetworkKartSelectionScreen );
 
 NetworkKartSelectionScreen::NetworkKartSelectionScreen() : KartSelectionScreen()
 {
+    KartSelectionScreen::m_instance_ptr = this;
 }
 
 NetworkKartSelectionScreen::~NetworkKartSelectionScreen()

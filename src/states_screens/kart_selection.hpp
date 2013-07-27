@@ -33,8 +33,7 @@ class KartHoverListener;
   * \brief screen where players can choose their kart
   * \ingroup states_screens
   */
-class KartSelectionScreen : public GUIEngine::Screen,
-                         public GUIEngine::ScreenSingleton<KartSelectionScreen>
+class KartSelectionScreen : public GUIEngine::Screen
 {
     friend class KartHoverListener;
     friend class PlayerNameSpinner;
@@ -92,7 +91,11 @@ protected:
 
     void playerConfirm(const int playerID);
 
+    /** Stores a pointer to the current selection screen */
+    static KartSelectionScreen* m_instance_ptr;
 public:
+    /** Returns the current instance */
+    static KartSelectionScreen* getRunningInstance();
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;

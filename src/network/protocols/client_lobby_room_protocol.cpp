@@ -119,9 +119,11 @@ void ClientLobbyRoomProtocol::update()
     case CONNECTED:
         break;
     case KART_SELECTION:
-        StateManager::get()->pushScreen(NetworkKartSelectionScreen::getInstance());
+    {
+        NetworkKartSelectionScreen* screen = NetworkKartSelectionScreen::getInstance();
+        StateManager::get()->pushScreen(screen);
         m_state = SELECTING_KARTS;
-        break;
+    } break;
     case SELECTING_KARTS:
         break;
     case PLAYING:
