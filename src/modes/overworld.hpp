@@ -20,7 +20,7 @@
 
 #include <vector>
 
-#include "modes/linear_world.hpp"
+#include "modes/world_with_rank.hpp"
 #include "utils/aligned_array.hpp"
 
 #include "LinearMath/btTransform.h"
@@ -32,7 +32,7 @@
  *       linear.
  * \ingroup modes
  */
-class OverWorld : public LinearWorld
+class OverWorld : public WorldWithRank
 {
 protected:
 
@@ -41,10 +41,6 @@ protected:
 
     bool m_return_to_garage;
 
-    void moveKartAfterRescue(AbstractKart* kart, float angle);
-
-    btTransform getClosestStartPoint(float currentKart_x, float currentKart_z);
-
 public:
                   OverWorld();
     virtual      ~OverWorld();
@@ -52,7 +48,8 @@ public:
     static void enterOverWorld();
 
     virtual void  update(float delta) OVERRIDE;
-
+    virtual void  getKartsDisplayInfo(
+                 std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns if this race mode has laps. */
     virtual bool  raceHasLaps() OVERRIDE { return false; }
@@ -76,8 +73,6 @@ public:
     virtual bool useChecklineRequirements() const OVERRIDE { return false; }
     // ------------------------------------------------------------------------
     void scheduleSelectKart() { m_return_to_garage = true; }
-    // ------------------------------------------------------------------------
-    virtual void moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void onMouseClick(int x, int y) OVERRIDE;
 };

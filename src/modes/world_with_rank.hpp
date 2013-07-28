@@ -28,7 +28,10 @@ class AbstractKart;
  *  A WorldWithRank is a world where the karts are ranked. This is the base
  *  class for races and battle modes - all of which rank the kart.
  *  A class using this as a subclass must call setKartPosition(kart id, position)
- *  and this class is used to access the ranks from other objects.
+ *  and this class is used to access the ranks from other objects. This class
+ *  adds a convenient rescue implementation: a kart is rescued to the closest
+ *  start point. This is useful for battle, soccer, ... modes. Linear world
+ *  defines its own rescue functions and will overwrite this.
  * \ingroup modes
  */
 class WorldWithRank : public World
@@ -51,6 +54,8 @@ protected:
     bool              m_position_setting_initialised;
 #endif
 
+    unsigned int getClosestStartPoint(AbstractKart *kart);
+
 public:
                   WorldWithRank() : World() {}
     /** call just after instanciating. can't be moved to the contructor as child
@@ -64,8 +69,13 @@ public:
     bool          setKartPosition(unsigned int kart_id,
                                  unsigned int position);
     void          endSetKartPositions();
-
     AbstractKart* getKartAtPosition(unsigned int p) const;
+
+    virtual unsigned int getNumberOfRescuePositions() const OVERRIDE;
+    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
+    virtual btTransform  getRescueTransform(unsigned int index) const OVERRIDE;
+
+
     };   // WorldWithRank
 
 #endif

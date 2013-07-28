@@ -79,7 +79,22 @@ World* World::m_world = NULL;
  *  of all karts is set (i.e. in a normal race the arrival time for karts
  *  will be estimated), highscore is updated, and the race result gui
  *  is being displayed.
+ *  Rescuing is handled via the three functions: 
+ *  getNumberOfRescuePositions() - which returns the number of rescue 
+ *           positions defined.
+ *  getRescuePositionIndex(AbstractKart *kart) - which determines the
+ *           index of the rescue position to be used for the given kart.
+ *  getRescueTransform(unsigned int index) - which returns the transform
+ *           (i.e. position and rotation) for the specified rescue
+ *           position.
+ *  This allows the world class to do some tests to make sure all rescue
+ *  positions are valid (when started with --track-debug). It tries to
+ *  place all karts on all rescue positions. If there are any problems
+ *  (e.g. a rescue position not over terrain (perhaps because it is too
+ *  low); or the rescue position is on a texture which will immediately
+ *  trigger another rescue), a warning message will be printed.
  */
+
 //-----------------------------------------------------------------------------
 /** Constructor. Note that in the constructor it is not possible to call any
  *  functions that use World::getWorld(), since this is only defined
@@ -320,7 +335,7 @@ Controller* World::loadAIController(AbstractKart *kart)
             controller = new SkiddingAI(kart);
             break;
         default:
-            fprintf(stderr, "Warning: Unknown robot, using default.\n");
+            Log::warn("World", "Unknown AI, using default.");
             controller = new SkiddingAI(kart);
             break;
     }
@@ -471,64 +486,30 @@ void World::resetAllKarts()
 
     // If track checking is requested, check all rescue positions if
     // they are heigh enough.
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
-        UserConfigParams::m_track_debug)
+    if(UserConfigParams::m_track_debug)
     {
-        Vec3 eps = Vec3(0,1.5f*m_karts[0]->getKartHeight(),0);
-        for(unsigned int quad=0; quad<QuadGraph::get()->getNumNodes(); quad++)
-        {
-            const Quad &q   = QuadGraph::get()->getQuadOfNode(quad);
-            const Vec3 center = q.getCenter();
-            // We have to test for all karts, since the karts have different
-            // heights and so things might change from kart to kart.
-            for(unsigned int kart_id=0; kart_id<m_karts.size(); kart_id++)
-            {
-                AbstractKart *kart = m_karts[kart_id];
-                kart->setXYZ(center);
-
-                btQuaternion heading(btVector3(0.0f, 1.0f, 0.0f),
-                                     m_track->getAngle(quad) );
-                kart->setRotation(heading);
-
-                btTransform pos;
-                pos.setOrigin(center+eps);
-                pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
-                                m_track->getAngle(quad))                 );
-                kart->getBody()->setCenterOfMassTransform(pos);
-
-                bool kart_over_ground = m_track->findGround(kart);
-                if(kart_over_ground)
-                {
-                    const Vec3 &xyz = kart->getTrans().getOrigin()
-                                    + Vec3(0,0.3f,0);
-                    if(dynamic_cast<Kart*>(kart))
-                        dynamic_cast<Kart*>(kart)->getTerrainInfo()
-                                                 ->update(xyz);
-                    const Material *material = kart->getMaterial();
-                    if(!material || material->isDriveReset())
-                        kart_over_ground = false;
-                }
-                if(!kart_over_ground)
-                {
-                    printf("Kart '%s' not over quad '%d'\n",
-                        kart->getIdent().c_str(), quad);
-                    printf("Center point: %f %f %f\n",
-                        center.getX(), center.getY(), center.getZ());
-
-                }
-            }   // for kart_id<m_karts.size()
-        }   // for quad < quad_graph.getNumNodes
-
+        // Loop over all karts, in case that some karts are dfferent
         for(unsigned int kart_id=0; kart_id<m_karts.size(); kart_id++)
         {
+            for(unsigned int rescue_pos=0; 
+                rescue_pos<getNumberOfRescuePositions();
+                rescue_pos++)
+            {
+                btTransform t = getRescueTransform(rescue_pos);
+                // This will print out warnings if there is no terrain under
+                // the kart, or the kart is being dropped on a reset texture
+                moveKartTo(m_karts[kart_id], t);
+
+            }   // rescue_pos<getNumberOfRescuePositions
+
             // Reset the karts back to the original start position.
             // This call is a bit of an overkill, but setting the correct
             // transforms, positions, motion state is a bit of a hassle.
             m_karts[kart_id]->reset();
-        }
+        }   // for kart_id<m_karts.size()
+
 
     }   // if m_track_debug
-
 
     m_schedule_pause = false;
     m_schedule_unpause = false;
@@ -546,13 +527,12 @@ void World::resetAllKarts()
 
         if (!kart_over_ground)
         {
-            fprintf(stderr,
-                    "ERROR: no valid starting position for kart %d "
-                    "on track %s.\n",
-                    (int)(i-m_karts.begin()), m_track->getIdent().c_str());
+            Log::error("World",
+                       "No valid starting position for kart %d on track %s.",
+                        (int)(i-m_karts.begin()), m_track->getIdent().c_str());
             if (UserConfigParams::m_artist_debug_mode)
             {
-                fprintf(stderr, "Activating fly mode.\n");
+                Log::warn("World", "Activating fly mode.");
                 (*i)->flyUp();
                 continue;
             }
@@ -598,14 +578,14 @@ void World::resetAllKarts()
                                                    &normal);
                 if(!material)
                 {
-                    fprintf(stderr,
-                            "ERROR: no valid starting position for "
-                            "kart %d on track %s.\n",
-                            (int)(i-m_karts.begin()),
-                            m_track->getIdent().c_str());
+                    Log::error("World",
+                               "No valid starting position for kart %d "
+                               "on track %s.",
+                               (int)(i-m_karts.begin()),
+                               m_track->getIdent().c_str());
                     if (UserConfigParams::m_artist_debug_mode)
                     {
-                        fprintf(stderr, "Activating fly mode.\n");
+                        Log::warn("World", "Activating fly mode.");
                         (*i)->flyUp();
                         continue;
                     }
@@ -636,6 +616,44 @@ void World::resetAllKarts()
         Camera::getCamera(i)->setInitialTransform();
     }
 }   // resetAllKarts
+
+// ----------------------------------------------------------------------------
+/** Places a kart that is rescued. It calls getRescuePositionIndex to find
+ *  to which rescue position the kart should be moved, then getRescueTransform
+ *  to get the position and rotation of this rescue position, and then moves
+ *  the kart.
+ *  \param kart The kart that is rescued.
+ */
+void World::moveKartAfterRescue(AbstractKart* kart)
+{
+    unsigned int index = getRescuePositionIndex(kart);
+    btTransform t      = getRescueTransform(index);
+    moveKartTo(kart, t);
+}  // moveKartAfterRescue
+
+// ----------------------------------------------------------------------------
+/** Places the kart at a given position and rotation.
+ *  \param kart The kart to be moved.
+ *  \param transform
+ */
+void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
+{
+    btTransform pos(transform);
+
+    // Move the kart
+    Vec3 xyz = pos.getOrigin() + btVector3(0, 0.5f*kart->getKartHeight(),0.0f);
+
+    pos.setOrigin(xyz);
+    kart->setXYZ(xyz);
+    kart->setRotation(pos.getRotation());
+
+    kart->getBody()->setCenterOfMassTransform(pos);
+
+    // Project kart to surface of track
+    // This will set the physics transform 
+    m_track->findGround(kart);
+
+}   // moveKartTo
 
 // ----------------------------------------------------------------------------
 void World::schedulePause(Phase phase)
@@ -730,13 +748,15 @@ void World::updateWorld(float dt)
                 InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
                 // Create player and associate player with keyboard
-                StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
-                                                        device);
+                StateManager::get()
+                    ->createActivePlayer(unlock_manager->getCurrentPlayer(),
+                                         device);
 
-                if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+                if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))
                 {
-                    fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', will revert to default\n",
-                            UserConfigParams::m_default_kart.c_str());
+                    Log::warn("World", 
+                              "Cannot find kart '%s', will revert to default.",
+                              UserConfigParams::m_default_kart.c_str());
                     UserConfigParams::m_default_kart.revertToDefaults();
                 }
                 race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
@@ -912,11 +932,11 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
             // the kart location data is wrong
 
 #ifdef DEBUG
-            fprintf(stderr, "Error, incorrect kart positions:\n");
+            Log::error("World", "Incorrect kart positions:");
             for (unsigned int i=0; i<m_karts.size(); i++ )
             {
-                fprintf(stderr, "i=%d position %d\n",i,
-                        m_karts[i]->getPosition());
+                Log::error("World", "i=%d position %d.",i,
+                           m_karts[i]->getPosition());
             }
 #endif
             continue;

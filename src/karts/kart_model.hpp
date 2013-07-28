@@ -60,6 +60,9 @@ public:
             AF_LOSE_END,           // End losing animation
             AF_BEGIN_EXPLOSION,    // Begin explosion animation
             AF_END_EXPLOSION,      // End explosion animation
+            AF_JUMP_START,         // Begin of jump
+            AF_JUMP_LOOP,          // Begin of jump loop
+            AF_JUMP_END,           // End of jump
             AF_WIN_START,          // Begin of win animation
             AF_WIN_LOOP_START,     // Begin of win loop animation
             AF_WIN_END,            // End of win animation

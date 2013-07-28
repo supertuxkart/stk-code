@@ -174,7 +174,13 @@ private:
     /** The base dir of all files of this track. */
     std::string              m_root;
     std::vector<std::string> m_groups;
+
+    /** The list of all nodes. */
     std::vector<scene::ISceneNode*> m_all_nodes;
+
+    /** The list of all nodes that are to be converted into physics,
+     *  but not to be drawn (e.g. invisible walls). */
+    std::vector<scene::ISceneNode*> m_all_physics_only_nodes;
 
     /** The list of all meshes that are loaded from disk, which means
      *  that those meshes are being cached by irrlicht, and need to be freed. */

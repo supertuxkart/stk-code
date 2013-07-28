@@ -79,7 +79,7 @@ private:
         float       m_overall_distance;
 
         /** Stores the current graph node and track coordinates etc. */
-        TrackSector m_current_sector;
+        TrackSector m_track_sector;
 
         /** Initialises all fields. */
         KartInfo()  { reset(); }
@@ -92,14 +92,14 @@ private:
             m_time_at_last_lap = 99999.9f;
             m_estimated_finish = -1.0f;
             m_overall_distance = 0.0f;
-            m_current_sector.reset();
+            m_track_sector.reset();
         }   // reset
         // --------------------------------------------------------------------
         /** Returns a pointer to the current node object. */
-        TrackSector *getSector() {return &m_current_sector; }
+        TrackSector *getTrackSector() {return &m_track_sector; }
         // --------------------------------------------------------------------
         /** Returns a pointer to the current node object. */
-        const TrackSector *getSector() const {return &m_current_sector; }
+        const TrackSector *getTrackSector() const {return &m_track_sector; }
     };
     // ------------------------------------------------------------------------
 
@@ -133,7 +133,10 @@ public:
 
     virtual  void getKartsDisplayInfo(
                   std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
-    virtual void  moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
+
+    virtual unsigned int getNumberOfRescuePositions() const OVERRIDE;
+    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
+    virtual btTransform getRescueTransform(unsigned int index) const OVERRIDE;
     virtual void  reset() OVERRIDE;
     virtual void  newLap(unsigned int kart_index) OVERRIDE;
 
@@ -151,7 +154,7 @@ public:
      *  \param kart_index  Index of the kart. */
     bool isOnRoad(unsigned int kart_index) const
     {
-        return m_kart_info[kart_index].getSector()->isOnRoad();
+        return m_kart_info[kart_index].getTrackSector()->isOnRoad();
     }   // isOnRoad
 
     // ------------------------------------------------------------------------
@@ -168,7 +171,7 @@ public:
      *  \param kart_index World index of the kart. */
     TrackSector& getTrackSector(unsigned int kart_index)
     {
-        return m_kart_info[kart_index].m_current_sector;
+        return m_kart_info[kart_index].m_track_sector;
     }   // getTrackSector
 
     // ------------------------------------------------------------------------

@@ -34,9 +34,9 @@
 #include "tracks/track.hpp"
 
 //-----------------------------------------------------------------------------
-OverWorld::OverWorld() : LinearWorld()
+OverWorld::OverWorld() : WorldWithRank()
 {
-    m_return_to_garage = false;
+    m_return_to_garage            = false;
     m_stop_music_when_dialog_open = false;
 }   // Overworld
 
@@ -115,7 +115,7 @@ void OverWorld::update(float dt)
             music_manager->getCurrentMusic()->startMusic();
         m_karts[0]->startEngineSFX();
     }
-    LinearWorld::update(dt);
+    WorldWithRank::update(dt);
     const unsigned int kart_amount  = m_karts.size();
 
     // isn't it cool, on the overworld nitro is free!
@@ -135,6 +135,15 @@ void OverWorld::update(float dt)
         StateManager::get()->resetAndGoToScreen(s);
     }
 }   // update
+
+//-----------------------------------------------------------------------------
+/** This function is not used in the overworld race gui.
+ */
+void OverWorld::getKartsDisplayInfo(
+                       std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
+{
+    assert(false);
+}   // getKartsDisplayInfo
 
 //-----------------------------------------------------------------------------
 /** Override the base class method to change behavior. We don't want wrong
@@ -192,96 +201,6 @@ void OverWorld::onFirePressed(Controller* who)
 }   // onFirePressed
 
 //-----------------------------------------------------------------------------
-
-btTransform OverWorld::getClosestStartPoint(float currentKart_x,
-                                            float currentKart_z)
-{
-    // find closest point to drop kart on
-    World *world = World::getWorld();
-    const int start_spots_amount =
-        world->getTrack()->getNumberOfStartPositions();
-    assert(start_spots_amount > 0);
-
-
-    int closest_id = -1;
-    float closest_distance = 999999999.0f;
-
-    for (int n=0; n<start_spots_amount; n++)
-    {
-        // no need for the overhead to compute exact distance with sqrt(),
-        // so using the 'manhattan' heuristic which will do fine enough.
-        const btTransform &s = world->getTrack()->getStartTransform(n);
-        const Vec3 &v = s.getOrigin();
-
-        float absDistance = fabs(currentKart_x - v.getX()) +
-                    fabs(currentKart_z - v.getZ());
-
-        if (absDistance < closest_distance)
-        {
-            closest_distance = absDistance;
-            closest_id = n;
-        }
-    }
-
-    assert(closest_id != -1);
-    return world->getTrack()->getStartTransform(closest_id);
-}   // getClosestStartPoint
-
-//-----------------------------------------------------------------------------
-/** Moves a kart to its rescue position.
- *  \param kart The kart that was rescued.
- */
-void OverWorld::moveKartAfterRescue(AbstractKart* kart)
-{
-    moveKartAfterRescue(kart, 0);
-}   // moveKartAfterRescue(AbstractKart*)
-
-//-----------------------------------------------------------------------------
-
-void OverWorld::moveKartAfterRescue(AbstractKart* kart, float angle)
-{
-    // find closest point to drop kart on
-    World *world = World::getWorld();
-    const int start_spots_amount =
-        world->getTrack()->getNumberOfStartPositions();
-    assert(start_spots_amount > 0);
-
-    const float currentKart_x = kart->getXYZ().getX();
-    const float currentKart_z = kart->getXYZ().getZ();
-
-    const btTransform& s = getClosestStartPoint(currentKart_x, currentKart_z);
-    const Vec3 &xyz = s.getOrigin();
-    kart->setXYZ(xyz);
-    kart->setRotation(s.getRotation());
-
-    //position kart from same height as in World::resetAllKarts
-    btTransform pos;
-    pos.setOrigin( kart->getXYZ()
-                  +btVector3(0, 0.5f*kart->getKartHeight(), 0.0f) );
-    pos.setRotation( btQuaternion(btVector3(0.0f, 1.0f, 0.0f), angle) );
-
-    kart->getBody()->setCenterOfMassTransform(pos);
-
-    //project kart to surface of track
-    bool kart_over_ground = m_track->findGround(kart);
-
-    if (kart_over_ground)
-    {
-        //add vertical offset so that the kart starts off above the track
-        float vertical_offset =
-              kart->getKartProperties()->getVertRescueOffset()
-            * kart->getKartHeight();
-        kart->getBody()->translate(btVector3(0, vertical_offset, 0));
-    }
-    else
-    {
-        Log::warn("overworld", "Invalid position after rescue for kart %s "
-        						"on track %s.", (kart->getIdent().c_str()),
-                                m_track->getIdent().c_str());
-    }
-}   // moveKartAfterRescue
-
-//-----------------------------------------------------------------------------
 /** Called when a mouse click happens. If the click happened while the mouse
  *  was hovering on top of a challenge, the kart will be teleported to
  *  the challenge.
@@ -294,14 +213,19 @@ void OverWorld::onMouseClick(int x, int y)
 
     if(challenge)
     {
+        // Use the 'get closest start point' rescue function
+        // from WorldWithRank by setting the kart's position to
+        // be the location of the challenge bubble.
         AbstractKart* kart = getKart(0);
-        const btTransform& s = getClosestStartPoint(challenge->m_position.X,
-                                                    challenge->m_position.Z);
-        const Vec3 &xyz = s.getOrigin();
-        float angle = atan2(challenge->m_position.X - xyz[0],
-                            challenge->m_position.Z - xyz[2]);
-        kart->setXYZ(xyz);
-        moveKartAfterRescue(kart, angle);
+        kart->setXYZ(challenge->m_position);
+
+        unsigned int index   = getRescuePositionIndex(kart);
+        btTransform s        = getRescueTransform(index);
+        const btVector3 &xyz = s.getOrigin();
+        float angle          = atan2(challenge->m_position.X - xyz[0],
+                                     challenge->m_position.Z - xyz[2]);
+        s.setRotation( btQuaternion(btVector3(0.0f, 1.0f, 0.0f), angle) );
+        moveKartTo(kart, s);
         return;
     }
 }  // onMouseClick

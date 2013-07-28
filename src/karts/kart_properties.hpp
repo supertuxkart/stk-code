@@ -176,6 +176,11 @@ private:
     /** Vertical offset after rescue. */
     float m_rescue_vert_offset;
 
+    /** Minimum time during which nitro is consumed when pressing
+     *  the nitro key (to prevent using in very small bursts)
+     */
+    float m_nitro_min_consumption;
+
     /** Filename of the wheel models. */
     std::string m_wheel_filename[4];
     /**  Radius of the graphical wheels.  */
@@ -243,6 +248,9 @@ private:
       *  (in radians/second). */
      float      m_lean_speed;
      
+     /** How long a jump must be in order to trigger the jump animation. */
+     float      m_jump_animation_time;
+
     /** Engine sound effect. */
     std::string m_engine_sfx_type;
 
@@ -844,9 +852,17 @@ public:
     /** The speed with which a kart should lean (in radians/s). */
     float getLeanSpeed() const { return m_lean_speed; }
     // ------------------------------------------------------------------------
+    /** Return show long a jump must last in order to play the jump 
+     *  animation. */
+    float getJumpAnimationTime() const { return m_jump_animation_time; }
+    // ------------------------------------------------------------------------
     /** Returns true if wheels should have random rotation at start. */
     bool hasRandomWheels() const { return m_has_rand_wheels; }
-
+    // ------------------------------------------------------------------------
+    /** Returns minimum time during which nitro is consumed when pressing nitro
+     *  key, to prevent using nitro in very short bursts
+     */
+    float getNitroMinConsumptionTime() const { return m_nitro_min_consumption; }
     // ------------------------------------------------------------------------
     /** Returns the bevel factor (!=0 indicates to use a bevelled box). */
     const Vec3 &getBevelFactor() const { return m_bevel_factor; }

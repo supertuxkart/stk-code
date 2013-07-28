@@ -1266,23 +1266,6 @@ void IrrDriver::displayFPS()
     const int NO_TRUST_COUNT = 200;
     static int no_trust = NO_TRUST_COUNT;
 
-    if (no_trust)
-    {
-        no_trust--;
-
-        static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
-        font->draw( L"FPS: ...", core::rect< s32 >(100,0,400,50), fpsColor,
-                    false );
-
-        return;
-    }
-
-    // Ask for current frames per second and last number of triangles
-    // processed (trimed to thousands)
-    const int fps         = m_video_driver->getFPS();
-    const float kilotris  = m_video_driver->getPrimitiveCountDrawn(0)
-                                * (1.f / 1000.f);
-
     // Min and max info tracking, per mode, so user can check game vs menus
     bool current_state     = StateManager::get()->getGameState()
                                == GUIEngine::GAME;
@@ -1302,6 +1285,23 @@ void IrrDriver::displayFPS()
         no_trust = NO_TRUST_COUNT;
         prev_state = current_state;
     }
+
+    if (no_trust)
+    {
+        no_trust--;
+
+        static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
+        font->draw( L"FPS: ...", core::rect< s32 >(100,0,400,50), fpsColor,
+                    false );
+
+        return;
+    }
+
+    // Ask for current frames per second and last number of triangles
+    // processed (trimed to thousands)
+    const int fps         = m_video_driver->getFPS();
+    const float kilotris  = m_video_driver->getPrimitiveCountDrawn(0)
+                                * (1.f / 1000.f);
 
     if (min > fps && fps > 1) min = fps; // Start moments sometimes give useless 1
     if (max < fps) max = fps;
@@ -1863,17 +1863,15 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         }
     }
 
-    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 120,
-                                                                 120, 120) );
+    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 10, 10, 10) );
 
-    const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
+    const core::vector3df &spot_pos = core::vector3df(30, 30, 30);
     m_light = irr_driver->getSceneManager()
-        ->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f),
-                            10000.0f /* radius */);
-    m_light->getLightData().DiffuseColor
-        = video::SColorf(0.5f, 0.5f, 0.5f, 0.5f);
-    m_light->getLightData().SpecularColor
-        = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+        ->addLightSceneNode(NULL, spot_pos, video::SColorf(1.0f,1.0f,1.0f),
+                            1600 /* radius */);
+    m_light->setLightType(video::ELT_SPOT);
+    m_light->setRotation((core::vector3df(0, 10, 0) - spot_pos).getHorizontalAngle());
+    m_light->updateAbsolutePosition();
 
     m_rtt_main_node->setMaterialFlag(video::EMF_GOURAUD_SHADING , true);
     m_rtt_main_node->setMaterialFlag(video::EMF_LIGHTING, true);

@@ -33,6 +33,8 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/random_generator.hpp"
 
+#include "LinearMath/btTransform.h"
+
 class AbstractKart;
 class btRigidBody;
 class Controller;
@@ -156,6 +158,7 @@ protected:
     virtual void  update(float dt);
     virtual void  createRaceGUI();
             void  updateTrack(float dt);
+    void moveKartTo(AbstractKart* kart, const btTransform &t);
     // ------------------------------------------------------------------------
     /** Used for AI karts that are still racing when all player kart finished.
      *  Generally it should estimate the arrival time for those karts, but as
@@ -192,13 +195,19 @@ public:
 
     /** Each game mode should have a unique identifier. Override
       * this method in child classes to provide it. */
-    virtual const std::string&
-                    getIdent() const = 0;
+    virtual const std::string& getIdent() const = 0;
     // ------------------------------------------------------------------------
-    /** Since each mode will have a different way of deciding where a rescued
-     *  kart is dropped, this method will be called and each mode can implement
-     *  it. */
-    virtual void moveKartAfterRescue(AbstractKart* kart) = 0;
+    /** Returns the number of rescue positions on a given track and game 
+     *  mode. */
+    virtual unsigned int getNumberOfRescuePositions() const OVERRIDE = 0;
+    // ------------------------------------------------------------------------
+    /** Determines the rescue position index of the specified kart. */
+    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) = 0;
+    // ------------------------------------------------------------------------
+    /** Returns the bullet transformation for the specified rescue index. */
+    virtual btTransform getRescueTransform(unsigned int index) const = 0;
+    // ------------------------------------------------------------------------
+    void moveKartAfterRescue(AbstractKart* kart);
     // ------------------------------------------------------------------------
     /** Called when it is needed to know whether this kind of race involves
      *  counting laps. */

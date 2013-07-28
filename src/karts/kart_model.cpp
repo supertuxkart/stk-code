@@ -120,6 +120,9 @@ void KartModel::loadInfo(const XMLNode &node)
         animation_node->get("end-losing",     &m_animation_frame[AF_LOSE_END]  );
         animation_node->get("start-explosion",&m_animation_frame[AF_LOSE_START]);
         animation_node->get("end-explosion",  &m_animation_frame[AF_LOSE_END]  );
+        animation_node->get("start-jump",     &m_animation_frame[AF_JUMP_START]);
+        animation_node->get("start-jump-loop",&m_animation_frame[AF_JUMP_LOOP] );
+        animation_node->get("end-jump",       &m_animation_frame[AF_JUMP_END]  );
         animation_node->get("speed",          &m_animation_speed               );
     }
 
@@ -130,14 +133,6 @@ void KartModel::loadInfo(const XMLNode &node)
         loadWheelInfo(*wheels_node, "rear-right",  2);
         loadWheelInfo(*wheels_node, "rear-left",   3);
     }
-
-    // FIXME fallback for karts that don't have nitro emitter
-    /*
-    m_nitro_emitter_position[0] = Vec3 (0, m_kart_height*0.35f,
-                                          -m_kart_length*0.35f);
-
-    m_nitro_emitter_position[1] = Vec3 (0, m_kart_height*0.35f,
-                                          -m_kart_length*0.35f); */
     
     m_nitro_emitter_position[0] = Vec3 (0,0.1f,0);
 
@@ -569,6 +564,8 @@ void KartModel::setAnimation(AnimationFrameType type)
         // 'type' is the start frame of the animation, type + 1 the frame
         // to begin the loop with, type + 2 to end the frame with
         AnimationFrameType end = (AnimationFrameType)(type+2);
+        if(m_animation_frame[end]==-1)
+            end = (AnimationFrameType)((int)end-1);
         m_animated_node->setAnimationSpeed(m_animation_speed);
         m_animated_node->setFrameLoop(m_animation_frame[type],
                                       m_animation_frame[end]    );
@@ -613,10 +610,16 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
     if(m_animation_frame[start]==-1)
         start = m_current_animation;
     AnimationFrameType end   = (AnimationFrameType)(m_current_animation+2);
-    m_animated_node->setAnimationSpeed(m_animation_speed);
-    m_animated_node->setFrameLoop(m_animation_frame[start],
-                                  m_animation_frame[end]   );
-    m_animated_node->setLoopMode(true);
+
+    // Switch to loop mode if the current animation has a loop defined
+    // (else just disable the callback, and the last frame will be shown).
+    if(m_animation_frame[end]>-1)
+    {
+        m_animated_node->setAnimationSpeed(m_animation_speed);
+        m_animated_node->setFrameLoop(m_animation_frame[start],
+                                      m_animation_frame[end]   );
+        m_animated_node->setLoopMode(true);
+    }
     m_animated_node->setAnimationEndCallback(NULL);
 }   // OnAnimationEnd
 

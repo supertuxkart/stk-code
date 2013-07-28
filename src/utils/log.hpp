@@ -20,6 +20,7 @@
 #ifndef HEADER_LOG_HPP
 #define HEADER_LOG_HPP
 
+#include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -66,7 +67,9 @@ public:
     static void printMessage(int level, const char *component,
                              const char *format, VALIST va_list);
     // ------------------------------------------------------------------------
-    /** A simple macro to define the various log functions. */
+    /** A simple macro to define the various log functions. 
+     *  Note that an assert is added so that a debugger is triggered
+     *  when debugging. */
 #define LOG(NAME, LEVEL)                                             \
     static void NAME(const char *component, const char *format, ...) \
     {                                                                \
@@ -76,7 +79,11 @@ public:
         printMessage(LEVEL, component, format, args);                \
         va_end(args);                                                \
                                                                      \
-        if (LEVEL == LL_FATAL) exit(1);                              \
+        if (LEVEL == LL_FATAL)                                       \
+        {                                                            \
+            assert(false);                                           \
+            exit(1);                                                 \
+        }                                                            \
     }
     LOG(verbose, LL_VERBOSE);
     LOG(debug,   LL_DEBUG);

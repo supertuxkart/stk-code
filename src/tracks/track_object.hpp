@@ -90,7 +90,7 @@ public:
                              TrackObjectPresentation* presentation,
                              bool is_dynamic,
                              const PhysicalObject::Settings* physicsSettings);
-                ~TrackObject();
+    virtual      ~TrackObject();
     virtual void update(float dt);
     virtual void reset();
     /** To finish object constructions. Called after the track model
