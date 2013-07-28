@@ -104,7 +104,7 @@ namespace Online{
             {
                 addServer(new Server(*servers_xml->getNode(i)));
             }
-            m_last_load_time = Time::getRealTime();
+            m_last_load_time = (float)Time::getRealTime();
         }
         m_info_message = input->getInfo();
         //FIXME error message

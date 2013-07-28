@@ -19,13 +19,14 @@
 
 #include "online/current_user.hpp"
 
+#include "config/user_config.hpp"
+#include "online/servers_manager.hpp"
+#include "utils/log.hpp"
+#include "utils/translation.hpp"
+
 #include <sstream>
 #include <stdlib.h>
 #include <assert.h>
-#include "config/user_config.hpp"
-#include "utils/translation.hpp"
-#include "utils/log.hpp"
-#include "online/servers_manager.hpp"
 
 namespace Online{
     static Synchronised<CurrentUser*> user_singleton(NULL);

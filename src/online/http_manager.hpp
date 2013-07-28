@@ -19,20 +19,22 @@
 #ifndef HTTP_MANAGER_HPP
 #define HTTP_MANAGER_HPP
 
-#include <string>
-#include <curl/curl.h>
-#include <irrString.h>
-#include <queue>
-#include <pthread.h>
+#include "io/xml_node.hpp"
+#include "online/request.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/synchronised.hpp"
 
+#include <irrString.h>
+
+#include <string>
 #ifdef WIN32
 #  include <winsock2.h>
 #endif
 
-#include "io/xml_node.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/synchronised.hpp"
-#include "online/request.hpp"
+#include <curl/curl.h>
+#include <queue>
+#include <pthread.h>
+
 
 namespace Online{
 

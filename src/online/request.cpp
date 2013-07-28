@@ -16,10 +16,15 @@
 
 #include "online/request.hpp"
 
+#include "online/http_manager.hpp"
+#include "utils/translation.hpp"
+
+#ifdef WIN32
+#  include <winsock2.h>
+#endif
+
 #include <curl/curl.h>
 #include <assert.h>
-#include <online/http_manager.hpp>
-#include <utils/translation.hpp>
 
 
 namespace Online{

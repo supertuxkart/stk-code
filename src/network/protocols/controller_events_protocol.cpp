@@ -88,13 +88,13 @@ void ControllerEventsProtocol::notifyEvent(Event* event)
         PlayerAction action  = (PlayerAction)(ns.gui8(4));
         int action_value = ns.gui32(5);
 
-        KartControl* controls = m_controllers[controller_index].first->getControls();
-        controls->m_brake       = serialized_1 & 0b01000000;
-        controls->m_nitro       = serialized_1 & 0b00100000;
-        controls->m_rescue      = serialized_1 & 0b00010000;
-        controls->m_fire        = serialized_1 & 0b00001000;
-        controls->m_look_back   = serialized_1 & 0b00000100;
-        controls->m_skid        = KartControl::SkidControl(serialized_1 & 0b00000011);
+        KartControl* controls   = m_controllers[controller_index].first->getControls();
+        controls->m_brake       = (serialized_1 & 0x40)!=0;
+        controls->m_nitro       = (serialized_1 & 0x20)!=0;
+        controls->m_rescue      = (serialized_1 & 0x10)!=0;
+        controls->m_fire        = (serialized_1 & 0x08)!=0;
+        controls->m_look_back   = (serialized_1 & 0x04)!=0;
+        controls->m_skid        = KartControl::SkidControl(serialized_1 & 0x03);
 
         m_controllers[controller_index].first->action(action, action_value);
         ns.removeFront(9);

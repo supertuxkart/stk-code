@@ -19,13 +19,14 @@
 #ifndef HEADER_CURRENT_ONLINE_USER_HPP
 #define HEADER_CURRENT_ONLINE_USER_HPP
 
-#include "online/user.hpp"
-#include <string>
-#include <irrString.h>
-#include "utils/types.hpp"
-#include "online/server.hpp"
 #include "http_manager.hpp"
+#include "online/server.hpp"
+#include "online/user.hpp"
+#include "utils/types.hpp"
 
+#include <irrString.h>
+
+#include <string>
 
 namespace Online{
 
