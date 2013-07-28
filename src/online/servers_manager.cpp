@@ -92,7 +92,7 @@ namespace Online{
             {
                 addServer(new Server(*servers_xml->getNode(i)));
             }
-            m_last_load_time.setAtomic(Time::getRealTime());
+            m_last_load_time.setAtomic((float)Time::getRealTime());
         }
         //FIXME error message
     }
@@ -107,7 +107,8 @@ namespace Online{
     {
         /*if(m_sorted_servers.size() > 0)
             return getServerBySort(0);
-        return NULL;*/
+			*/
+        return NULL;
     }
 
     // ============================================================================

@@ -115,7 +115,7 @@ void CGUISTKListBox::removeItem(u32 id)
 	else if ((u32)Selected > id)
 	{
 		Selected -= 1;
-		selectTime = Time::getTimeSinceEpoch();
+		selectTime = (u32)Time::getTimeSinceEpoch();
 	}
 
 	Items.erase(id);
@@ -205,7 +205,7 @@ void CGUISTKListBox::setSelected(s32 id)
 	else
 		Selected = id;
 
-	selectTime = Time::getTimeSinceEpoch();
+	selectTime = (u32)Time::getTimeSinceEpoch();
 
 	recalculateScrollPos();
 }
@@ -397,7 +397,7 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
 
 void CGUISTKListBox::selectNew(s32 ypos, bool onlyHover)
 {
-	u32 now = Time::getTimeSinceEpoch();
+	u32 now = (u32)Time::getTimeSinceEpoch();
 	s32 oldSelected = Selected;
 
 	Selected = getItemAt(AbsoluteRect.UpperLeftCorner.X, ypos);
@@ -486,13 +486,13 @@ void CGUISTKListBox::draw()
             if (Font)
             {
                 int total_proportion = 0;
-                for(int x = 0; x < Items[i].m_contents.size(); ++x)
+                for(unsigned int x = 0; x < Items[i].m_contents.size(); ++x)
                 {
                     total_proportion += Items[i].m_contents[x].m_proportion;
                 }
                 int part_size = (int)(textRect.getWidth() / float(total_proportion));
 
-                for(int x = 0; x < Items[i].m_contents.size(); ++x)
+                for(unsigned int x = 0; x < Items[i].m_contents.size(); ++x)
                 {
                     textRect.LowerRightCorner.X = textRect.UpperLeftCorner.X +
                                                   (Items[i].m_contents[x].m_proportion * part_size);
@@ -511,7 +511,7 @@ void CGUISTKListBox::draw()
                                 iconPos, &clientClip,
                                 hasItemOverrideColor(i, EGUI_LBC_ICON_HIGHLIGHT) ?
                                 getItemOverrideColor(i, EGUI_LBC_ICON_HIGHLIGHT) : getItemDefaultColor(EGUI_LBC_ICON_HIGHLIGHT),
-                                selectTime, Time::getTimeSinceEpoch(), false, true);
+                                selectTime, (u32)Time::getTimeSinceEpoch(), false, true);
                         }
                         else
                         {
@@ -520,7 +520,7 @@ void CGUISTKListBox::draw()
                                 iconPos,
                                 &clientClip,
                                 hasItemOverrideColor(i, EGUI_LBC_ICON) ? getItemOverrideColor(i, EGUI_LBC_ICON) : getItemDefaultColor(EGUI_LBC_ICON),
-                                0 , (i==Selected) ? Time::getTimeSinceEpoch() : 0, false, true);
+                                0 , (i==Selected) ? (u32)Time::getTimeSinceEpoch() : 0, false, true);
                         }
                         textRect.UpperLeftCorner.X += ItemsIconWidth;
                     }
