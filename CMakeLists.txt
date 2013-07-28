@@ -54,6 +54,7 @@ if(MSVC)
     set(ENV{PATH} ${PROJECT_SOURCE_DIR}/dependencies/include)
     set(ENV{LIB} ${PROJECT_SOURCE_DIR}/dependencies/lib)
     set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
+    add_definitions(/D_IRR_STATIC_LIB_)
 endif()
 
 if(APPLE)
@@ -244,7 +245,10 @@ add_subdirectory(tools/font_tool)
 
 
 # ==== Make dist target ====
-add_custom_target(dist
+if(MSVC)
+  # Don't create a dist target for VS
+else()
+  add_custom_target(dist
     COMMAND rm -rf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION} && rm -f ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}.tar.bz2
             && echo "Exporting..."
             && svn export ${PROJECT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}
@@ -253,7 +257,9 @@ add_custom_target(dist
             && tar -cjf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}.tar.bz2 ./SuperTuxKart-${PROJECT_VERSION}
             && echo "Done, cleaning up"
             && rm -rf ${CMAKE_BINARY_DIR}/SuperTuxKart-${PROJECT_VERSION}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  )
+endif()
 
 # ==== Install target ====
 install(TARGETS supertuxkart RUNTIME DESTINATION ${STK_INSTALL_BINARY_DIR} BUNDLE DESTINATION .)
