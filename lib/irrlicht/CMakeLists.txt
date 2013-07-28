@@ -12,10 +12,14 @@ if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch i386 -F/Library/Frameworks")
 endif()
 
-add_definitions(-Wall -pipe -fexpensive-optimizations -I/usr/X11R6/include -DIRRLICHT_EXPORTS=1 -DNDEBUG=1)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -O3  -fno-exceptions -fno-rtti -fstrict-aliasing")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPNG_THREAD_UNSAFE_OK -DPNG_NO_MMX_CODE -DPNG_NO_MNG_FEATURES")
+add_definitions(-DNDEBUG=1 -DIRRLICHT_EXPORTS=1 -DPNG_THREAD_UNSAFE_OK -DPNG_NO_MMX_CODE -DPNG_NO_MNG_FEATURES)
+if(MSVC)
+  add_definitions(/D_IRR_STATIC_LIB_)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" /MTd)
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions -fno-rtti -fstrict-aliasing -fexpensive-optimizations -I/usr/X11R6/include")
+  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions -fno-rtti -fstrict-aliasing -fexpensive-optimizations -I/usr/X11R6/include")
+endif()
 
 set(IRRLICHT_SOURCES
 source/Irrlicht/CTRStencilShadow.cpp
