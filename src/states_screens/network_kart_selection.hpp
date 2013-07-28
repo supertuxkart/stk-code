@@ -12,8 +12,6 @@ protected:
     virtual ~NetworkKartSelectionScreen();
 
 public:
-    static bool isRunning() { return singleton!=NULL; }
-    virtual void init() OVERRIDE;
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                                const int playerID) OVERRIDE;
 };

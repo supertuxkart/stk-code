@@ -13,11 +13,6 @@ NetworkKartSelectionScreen::~NetworkKartSelectionScreen()
 {
 }
 
-
-void NetworkKartSelectionScreen::init()
-{
-}
-
 /**
  * Callback handling events from the kart selection menu
  */
