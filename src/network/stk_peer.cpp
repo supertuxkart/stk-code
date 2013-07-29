@@ -17,7 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/stk_peer.hpp"
-
+#include "network/network_manager.hpp"
 #include "utils/log.hpp"
 
 #include <string.h>
