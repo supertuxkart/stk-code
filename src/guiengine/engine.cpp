@@ -485,7 +485,7 @@ namespace GUIEngine
 
  Used on divs, indicate by how many pixels to pad contents
 
- 
+
  \n
  <HR>
  \section code Using the engine in code
@@ -903,6 +903,25 @@ namespace GUIEngine
     {
         g_loaded_screens.push_back(cutscene);
     }   // addScreenToList
+
+    // ------------------------------------------------------------------------
+
+    void removeScreen(const char* name)
+    {
+        const int screen_amount = g_loaded_screens.size();
+        for(int n=0; n<screen_amount; n++)
+        {
+            if (g_loaded_screens[n].getName() == name)
+            {
+                g_current_screen = g_loaded_screens.get(n);
+                g_current_screen->unload();
+                delete g_current_screen;
+                g_current_screen = NULL;
+                g_loaded_screens.remove(n);
+                break;
+            }
+        }
+    }
 
     // ------------------------------------------------------------------------
     void reshowCurrentScreen()

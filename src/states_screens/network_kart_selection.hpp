@@ -12,6 +12,7 @@ protected:
     virtual ~NetworkKartSelectionScreen();
 
 public:
+    virtual void init();
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                                const int playerID) OVERRIDE;
 };

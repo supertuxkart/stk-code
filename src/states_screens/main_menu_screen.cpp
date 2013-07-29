@@ -42,6 +42,7 @@
 #include "states_screens/credits.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/offline_kart_selection.hpp"
+#include "states_screens/network_kart_selection.hpp" // FIXME : remove when not testing
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -271,7 +272,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 #endif
     if (selection == "new")
     {
-        KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
+        KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance(); //FIXME : that was for tests
         s->setMultiplayer(false);
         s->setFromOverworld(false);
         StateManager::get()->pushScreen( s );

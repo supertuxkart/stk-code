@@ -974,6 +974,7 @@ void KartSelectionScreen::beforeAddingWidget()
 void KartSelectionScreen::init()
 {
     Screen::init();
+    m_must_delete_on_back = false;
 
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
@@ -1083,6 +1084,9 @@ void KartSelectionScreen::tearDown()
 
     Screen::tearDown();
     m_kart_widgets.clearAndDeleteAll();
+
+    if (m_must_delete_on_back)
+        GUIEngine::removeScreen(this->getName().c_str());
 }   // tearDown
 
 // ----------------------------------------------------------------------------
@@ -1567,7 +1571,7 @@ void KartSelectionScreen::eventCallback(Widget* widget,
     else if (name == "back")
     {
         m_go_to_overworld_next = false; // valid once
-
+        m_must_delete_on_back = true;
         if (m_from_overworld)
         {
             m_from_overworld = false; // valid once
@@ -1606,7 +1610,7 @@ void KartSelectionScreen::setMultiplayer(bool multiplayer)
 bool KartSelectionScreen::onEscapePressed()
 {
     m_go_to_overworld_next = false; // valid once
-
+    m_must_delete_on_back = true; // delete the screen
     if (m_from_overworld)
     {
         m_from_overworld = false; // valid once

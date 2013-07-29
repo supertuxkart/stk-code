@@ -16,6 +16,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef KART_SELECTION_INCLUDED
+#define KART_SELECTION_INCLUDED
+
 #include <string>
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -61,6 +64,7 @@ protected:
 
     bool m_go_to_overworld_next;
 
+    bool m_must_delete_on_back; //!< To delete the screen if back is pressed
 
     KartSelectionScreen();
 
@@ -350,3 +354,5 @@ public:
                             const irr::core::stringw& selectionText,
                             const int playerID);
 };   // KartHoverListener
+
+#endif
