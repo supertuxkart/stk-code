@@ -58,6 +58,14 @@ void ClientLobbyRoomProtocol::requestKartSelection(std::string kart_name)
 
 //-----------------------------------------------------------------------------
 
+void ClientLobbyRoomProtocol::leave()
+{
+    assert(NetworkManager::getInstance()->getPeerCount() == 1);
+    NetworkManager::getInstance()->getPeers()[0]->disconnect(); // just dc
+}
+
+//-----------------------------------------------------------------------------
+
 void ClientLobbyRoomProtocol::notifyEvent(Event* event)
 {
     assert(m_setup); // assert that the setup exists

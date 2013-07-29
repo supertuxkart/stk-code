@@ -85,6 +85,7 @@ bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host,
 void STKPeer::disconnect()
 {
     enet_peer_disconnect(m_peer, 0);
+    NetworkManager::getInstance()->removePeer(this);
 }
 
 //-----------------------------------------------------------------------------

@@ -213,6 +213,7 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
                 peer->getPlayerProfile()->race_id);
         m_setup->removePlayer(peer->getPlayerProfile()->race_id);
+        NetworkManager::getInstance()->removePeer(peer);
     }
     else
         Log::info("ServerLobbyRoomProtocol", "The DC peer wasn't registered.");

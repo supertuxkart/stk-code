@@ -11,12 +11,12 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
 
         void requestKartSelection(std::string kart_name);
         void sendMessage(std::string message);
+        void leave();
 
         virtual void notifyEvent(Event* event);
         virtual void setup();
         virtual void update();
         virtual void asynchronousUpdate() {}
-
 
     protected:
         void newPlayer(Event* event);

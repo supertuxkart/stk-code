@@ -279,7 +279,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "multiplayer")
     {
-        KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
+        KartSelectionScreen* s = NetworkKartSelectionScreen::getInstance();
         s->setMultiplayer(true);
         s->setFromOverworld(false);
         StateManager::get()->pushScreen( s );
