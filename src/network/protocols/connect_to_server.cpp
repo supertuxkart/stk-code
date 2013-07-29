@@ -159,6 +159,7 @@ void ConnectToServer::asynchronousUpdate()
                 {
                     timer = Time::getRealTime();
                     NetworkManager::getInstance()->connect(m_server_address);
+                    Log::info("ConnectToServer", "Trying to connect");
                 }
                 break;
             }

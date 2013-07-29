@@ -64,6 +64,18 @@ void NetworkManager::run()
     ProtocolManager::getInstance<ProtocolManager>();
 }
 
+void NetworkManager::reset()
+{
+    if (m_localhost)
+        delete m_localhost;
+    m_localhost = NULL;
+    while(!m_peers.empty())
+    {
+        delete m_peers.back();
+        m_peers.pop_back();
+    }
+}
+
 //-----------------------------------------------------------------------------
 
 bool NetworkManager::connect(TransportAddress peer)
@@ -140,12 +152,30 @@ GameSetup* NetworkManager::setupNewGame()
 {
     if (m_game_setup)
         delete m_game_setup;
+    m_game_setup = NULL;
     m_game_setup = new GameSetup();
     return m_game_setup;
 }
 
 //-----------------------------------------------------------------------------
 
+void NetworkManager::disconnected()
+{
+    // delete the game setup
+    if (m_game_setup)
+        delete m_game_setup;
+    m_game_setup = NULL;
+
+    // remove all peers
+    for (unsigned int i = 0; i < m_peers.size(); i++)
+    {
+        delete m_peers[i];
+        m_peers[i] = NULL;
+    }
+    m_peers.clear();
+}
+
+//-----------------------------------------------------------------------------
 
 void NetworkManager::setLogin(std::string username, std::string password)
 {
@@ -163,6 +193,8 @@ void NetworkManager::setPublicAddress(TransportAddress addr)
 
 void NetworkManager::removePeer(STKPeer* peer)
 {
+    if (!peer || !peer->exists()) // peer does not exist (already removed)
+        return;
     Log::debug("NetworkManager", "Disconnected host: %i.%i.%i.%i:%i",
                peer->getAddress()>>24&0xff,
                peer->getAddress()>>16&0xff,

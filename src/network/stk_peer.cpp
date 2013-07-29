@@ -85,7 +85,6 @@ bool STKPeer::connectToHost(STKHost* localhost, TransportAddress host,
 void STKPeer::disconnect()
 {
     enet_peer_disconnect(m_peer, 0);
-    NetworkManager::getInstance()->removePeer(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -129,6 +128,13 @@ bool STKPeer::isConnected() const
 {
     Log::info("STKPeer", "The peer state is %i\n", m_peer->state);
     return (m_peer->state == ENET_PEER_STATE_CONNECTED);
+}
+
+//-----------------------------------------------------------------------------
+
+bool STKPeer::exists() const
+{
+    return (m_peer != NULL); // assert that the peer exists
 }
 
 //-----------------------------------------------------------------------------

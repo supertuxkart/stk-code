@@ -111,6 +111,17 @@ void ClientNetworkManager::run()
     Log::info("ClientNetworkManager", "Ready !");
 }
 
+void ClientNetworkManager::reset()
+{
+    NetworkManager::reset();
+
+    m_connected = false;
+    m_localhost = new STKHost();
+    m_localhost->setupClient(1, 2, 0, 0);
+    m_localhost->startListening();
+
+}
+
 void ClientNetworkManager::sendPacket(const NetworkString& data, bool reliable)
 {
     if (m_peers.size() > 1)

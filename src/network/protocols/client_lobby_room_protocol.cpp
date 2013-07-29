@@ -60,8 +60,9 @@ void ClientLobbyRoomProtocol::requestKartSelection(std::string kart_name)
 
 void ClientLobbyRoomProtocol::leave()
 {
-    assert(NetworkManager::getInstance()->getPeerCount() == 1);
-    NetworkManager::getInstance()->getPeers()[0]->disconnect(); // just dc
+    m_server->disconnect();
+    m_server_address.ip = 0;
+    m_server_address.port = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -96,8 +97,14 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
     else if (event->type == EVENT_TYPE_CONNECTED)
     {
     } // connection
-    else if (event->type == EVENT_TYPE_DISCONNECTED)
+    else if (event->type == EVENT_TYPE_DISCONNECTED) // means we left essentially
     {
+        NetworkManager::getInstance()->removePeer(m_server);
+        m_server = NULL;
+        NetworkManager::getInstance()->disconnected();
+        m_listener->requestTerminate(this);
+        NetworkManager::getInstance()->reset();
+        NetworkManager::getInstance()->removePeer(*event->peer); // prolly the same as m_server
     } // disconnection
 }
 

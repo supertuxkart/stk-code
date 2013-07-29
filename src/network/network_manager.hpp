@@ -35,6 +35,7 @@ class NetworkManager : public Singleton<NetworkManager>
     friend class Singleton<NetworkManager>;
     public:
         virtual void run();
+        virtual void reset();
 
         // network management functions
         virtual bool connect(TransportAddress peer);
@@ -48,6 +49,7 @@ class NetworkManager : public Singleton<NetworkManager>
 
         // Game related functions
         virtual GameSetup* setupNewGame(); //!< Creates a new game setup and returns it
+        virtual void disconnected(); //!< Called when you leave a server
 
         // raw data management
         void setLogin(std::string username, std::string password);

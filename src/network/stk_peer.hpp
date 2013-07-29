@@ -42,6 +42,7 @@ class STKPeer
         void setPlayerProfilePtr(NetworkPlayerProfile** profile) { m_player_profile = profile; }
 
         bool isConnected() const;
+        bool exists() const;
         uint32_t getAddress() const;
         uint16_t getPort() const;
         NetworkPlayerProfile* getPlayerProfile() { return *m_player_profile; }

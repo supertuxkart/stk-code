@@ -31,6 +31,7 @@ class ClientNetworkManager : public NetworkManager
         }
 
         virtual void run();
+        virtual void reset();
         virtual void sendPacket(const NetworkString& data, bool reliable = true);
 
         STKPeer* getPeer();

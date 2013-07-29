@@ -47,5 +47,6 @@ void PingProtocol::asynchronousUpdate()
         m_last_ping_time = Time::getRealTime();
         uint8_t data = 0;
         NetworkManager::getInstance()->getHost()->sendRawPacket(&data, 1, m_ping_dst);
+        Log::info("PingProtocol", "Ping message sent");
     }
 }

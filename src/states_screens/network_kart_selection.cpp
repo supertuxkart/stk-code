@@ -46,18 +46,23 @@ void NetworkKartSelectionScreen::eventCallback(GUIEngine::Widget* widget, const 
     }
     else if (name == "back")
     {
-        // first do the back action
         KartSelectionScreen::eventCallback(widget, name, playerID);
-        // then remove the lobby screen (you left the server)
-        StateManager::get()->popMenu();
-        // and notify the server that you left
-        ClientLobbyRoomProtocol* protocol = static_cast<ClientLobbyRoomProtocol*>(
-                ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
-        if (protocol)
-            protocol->leave();
     }
     else // name != karts
     {
         KartSelectionScreen::eventCallback(widget, name, playerID);
     }
 }   // eventCallback
+
+
+bool NetworkKartSelectionScreen::onEscapePressed()
+{
+    // then remove the lobby screen (you left the server)
+    StateManager::get()->popMenu();
+    // notify the server that we left
+    ClientLobbyRoomProtocol* protocol = static_cast<ClientLobbyRoomProtocol*>(
+            ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
+    if (protocol)
+        protocol->leave();
+    return true; // remove the screen
+}

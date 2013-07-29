@@ -30,6 +30,12 @@ GameSetup::GameSetup()
 
 GameSetup::~GameSetup()
 {
+    // remove all players
+    for (unsigned int i = 0; i < m_players.size(); i++)
+    {
+        delete m_players[i];
+    };
+    m_players.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -87,7 +93,7 @@ void GameSetup::setPlayerKart(uint8_t id, std::string kart_name)
         if (m_players[i]->race_id == id)
         {
             m_players[i]->kart_name = kart_name;
-            Log::info("GameSetup::setPlayerKart", "Player %d took kart %s", 
+            Log::info("GameSetup::setPlayerKart", "Player %d took kart %s",
                         id, kart_name.c_str());
             found = true;
         }
