@@ -26,6 +26,7 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
+#include "network/network_manager.hpp"
 
 #include <irrlicht.h>
 
@@ -111,6 +112,8 @@ void WorldStatus::enterRaceOverState()
  */
 void WorldStatus::terminateRace()
 {
+    if(network_manager->getMode()==NetworkManager::NW_SERVER)
+        network_manager->sendRaceResults();
 }   // terminateRace
 
 //-----------------------------------------------------------------------------

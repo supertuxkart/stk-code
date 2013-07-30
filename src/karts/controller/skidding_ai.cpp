@@ -54,6 +54,7 @@
 #include "items/powerup.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/profile_world.hpp"
+#include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
@@ -295,6 +296,13 @@ void SkiddingAI::update(float dt)
     m_controls->m_steer     = 0;
     return;
 #endif
+
+    // The client does not do any AI computations.
+    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+    {
+        AIBaseController::update(dt);
+        return;
+    }
 
     // If the kart needs to be rescued, do it now (and nothing else)
     if(isStuck() && !m_kart->getKartAnimation())

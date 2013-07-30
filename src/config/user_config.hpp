@@ -487,15 +487,13 @@ namespace UserConfigParams
     // not saved to file
 
     // ---- Networking
+    PARAM_PREFIX StringUserConfigParam      m_server_address
+            PARAM_DEFAULT(  StringUserConfigParam("localhost", "server_adress",
+                                       "Information about last server used") );
     PARAM_PREFIX IntUserConfigParam         m_server_port
-            PARAM_DEFAULT(  IntUserConfigParam(7321, "server_port",
-                                       "Information about the port to listen on.") );
-                                       
-    PARAM_PREFIX IntUserConfigParam         m_server_max_players
-            PARAM_DEFAULT(  IntUserConfigParam(16, "server_max_players",
-                                       "Maximum number of players on the server.") );
-    
-    
+            PARAM_DEFAULT(  IntUserConfigParam(2305, "server_port",
+                                       "Information about last server used") );
+
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
             PARAM_DEFAULT( GroupUserConfigParam("GFX",

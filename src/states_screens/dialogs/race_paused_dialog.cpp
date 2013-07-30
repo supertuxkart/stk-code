@@ -146,7 +146,7 @@ GUIEngine::EventPropagation
         else if (selection == "restart")
         {
             ModalDialog::dismiss();
-//            network_manager->setState(NetworkManager::NS_MAIN_MENU);
+            network_manager->setState(NetworkManager::NS_MAIN_MENU);
             World::getWorld()->scheduleUnpause();
             race_manager->rerunRace();
             return GUIEngine::EVENT_BLOCK;

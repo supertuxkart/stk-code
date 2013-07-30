@@ -674,9 +674,6 @@ public:
       */
     void  startSingleRace(const std::string &track_ident, const int num_laps,
                           bool from_overworld);
-    /** Receive and store the information from sendKartsInformation()
-      */
-    void  setupPlayerKartInfo();
 
     bool raceWasStartedFromOverworld() const
     {

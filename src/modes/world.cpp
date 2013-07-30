@@ -42,6 +42,8 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
+#include "network/network_manager.hpp"
+#include "network/race_state.hpp"
 #include "physics/btKart.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -131,6 +133,7 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
  */
 void World::init()
 {
+    race_state            = new RaceState();
     m_faster_music_active = false;
     m_fastest_kart        = 0;
     m_eliminated_karts    = 0;
@@ -185,6 +188,8 @@ void World::init()
 
     if(ReplayPlay::get())
         ReplayPlay::get()->Load();
+
+    network_manager->worldLoaded();
 
     powerup_manager->updateWeightsForRace(num_karts);
 }   // init
@@ -370,6 +375,7 @@ World::~World()
         // gui and this must be deleted.
         delete m_race_gui;
     }
+    delete race_state;
 
     for ( unsigned int i = 0 ; i < m_karts.size() ; i++ )
         delete m_karts[i];
@@ -762,7 +768,7 @@ void World::updateWorld(float dt)
                     ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
                 StateManager::get()->enterGameState();
-                race_manager->setupPlayerKartInfo();
+                network_manager->setupPlayerKartInfo();
                 race_manager->startNew(true);
             }
             else
@@ -815,8 +821,11 @@ void World::update(float dt)
     if(ReplayPlay::get()) ReplayPlay::get()->update(dt);
     if(history->replayHistory()) dt=history->getNextDelta();
     WorldStatus::update(dt);
+    // Clear race state so that new information can be stored
+    race_state->clear();
 
-    if (!history->dontDoPhysics())
+    if(network_manager->getMode()!=NetworkManager::NW_CLIENT &&
+        !history->dontDoPhysics())
     {
         m_physics->update(dt);
     }

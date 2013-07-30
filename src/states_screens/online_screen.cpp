@@ -34,14 +34,12 @@
 #include "states_screens/dialogs/login_dialog.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
-#include "states_screens/networking_lobby_settings.hpp"
+#include "states_screens/server_selection.hpp"
+#include "states_screens/create_server_screen.hpp"
 #include "modes/demo_world.hpp"
 #include "online/servers_manager.hpp"
 #include "online/messages.hpp"
 
-
-#include "network/protocol_manager.hpp"
-#include "network/protocols/connect_to_server.hpp"
 
 
 using namespace GUIEngine;
@@ -218,14 +216,23 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (selection == "create_server")
     {
-        //if (m_recorded_state == Registered)
-        StateManager::get()->pushScreen(NetworkingLobbySettings::getInstance());
+        StateManager::get()->pushScreen(CreateServerScreen::getInstance());
     }
     else if (selection == "quick_play")
     {
-        //if (m_recorded_state == Registered || m_recorded_state == Guest) FIXME
-        StateManager::get()->pushScreen(NetworkingLobby::getInstance());
-        ProtocolManager::getInstance()->requestStart(new ConnectToServer(7));
+        //FIXME temporary and the request join + join sequence should be placed in one method somewhere
+            /*
+        Server * server = ServersManager::get()->getQuickPlay();
+        irr::core::stringw info;
+        if (Online::CurrentUser::get()->requestJoin( server->getServerId(), info))
+        {
+            ServersManager::get()->setJoinedServer(server);
+            StateManager::get()->pushScreen(NetworkingLobby::getInstance());
+        }
+        else
+        {
+            sfx_manager->quickSound( "anvil" );
+        }*/
     }
 
 }   // eventCallback
@@ -244,8 +251,7 @@ void OnlineScreen::onDisabledItemClicked(const std::string& item)
     }
     else if (item =="create_server")
     {
-        StateManager::get()->pushScreen(NetworkingLobbySettings::getInstance());
-        // FIXME temporary; new LoginDialog(LoginDialog::Registration_Required);
+        new LoginDialog(LoginDialog::Registration_Required);
     }
     else if (item == "quick_play")
     {

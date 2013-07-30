@@ -20,7 +20,6 @@
 #define HEADER_HISTORY_HPP
 
 #include <vector>
-#include <string>
 
 #include "LinearMath/btQuaternion.h"
 

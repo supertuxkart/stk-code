@@ -53,6 +53,7 @@ private:
      *  being shown or have a sfx playing. */
     HitEffects       m_active_hit_effects;
 
+    void             updateClient(float dt);
     void             updateServer(float dt);
 public:
                      ProjectileManager() {}

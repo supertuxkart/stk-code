@@ -37,6 +37,7 @@
 #include "modes/cutscene_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/demo_world.hpp"
+#include "network/network_manager.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
@@ -331,7 +332,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
         StateManager::get()->enterGameState();
-        race_manager->setupPlayerKartInfo();
+        network_manager->setupPlayerKartInfo();
         race_manager->startNew(false);
     }
     else if (selection == "story")

@@ -19,11 +19,9 @@
 #include "physics/physics.hpp"
 
 #include "animations/three_d_animation.hpp"
-#include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
-#include "items/flyable.hpp"
-#include "modes/world.hpp"
+#include "network/race_state.hpp"
 #include "graphics/stars.hpp"
 #include "karts/explosion_animation.hpp"
 #include "physics/btKart.hpp"
@@ -158,6 +156,8 @@ void Physics::update(float dt)
         {
             AbstractKart *a=p->getUserPointer(0)->getPointerKart();
             AbstractKart *b=p->getUserPointer(1)->getPointerKart();
+            race_state->addCollision(a->getWorldKartId(),
+                                     b->getWorldKartId());
             KartKartCollision(p->getUserPointer(0)->getPointerKart(),
                               p->getContactPointCS(0),
                               p->getUserPointer(1)->getPointerKart(),
@@ -443,6 +443,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             else if(upB->is(UserPointer::UP_KART))
             {
                 AbstractKart *kart=upB->getPointerKart();
+                race_state->addCollision(kart->getWorldKartId());
                 int n = contact_manifold->getContactPoint(0).m_index0;
                 const Material *m
                     = n>=0 ? upA->getPointerTriangleMesh()->getMaterial(n)
@@ -462,6 +463,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             if(upB->is(UserPointer::UP_TRACK))
             {
                 AbstractKart *kart = upA->getPointerKart();
+                race_state->addCollision(kart->getWorldKartId());
                 int n = contact_manifold->getContactPoint(0).m_index1;
                 const Material *m
                     = n>=0 ? upB->getPointerTriangleMesh()->getMaterial(n)
