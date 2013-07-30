@@ -46,7 +46,7 @@ private:
     GUIEngine::IconButtonWidget * m_create_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
 
-    Online::CurrentUser::ServerCreationRequest * m_server_creation_request;
+    const Online::CurrentUser::ServerCreationRequest * m_server_creation_request;
 
     /** \brief Sets which widget has to be focused. Depends on the user state. */
     void setInitialFocus();

@@ -54,7 +54,7 @@ private:
 
     Online::CurrentUser::UserState m_recorded_state;
 
-    PtrVector<Online::XMLRequest> m_requests;
+    PtrVector<const Online::XMLRequest> m_requests;
 
     /** \brief Checks if the recorded state differs from the actual state and sets it. */
     bool hasStateChanged();

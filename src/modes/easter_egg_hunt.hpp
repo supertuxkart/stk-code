@@ -54,7 +54,6 @@ public:
     virtual void reset();
 
     virtual bool raceHasLaps(){ return false; }
-    virtual void moveKartAfterRescue(AbstractKart* kart);
 
     virtual const std::string& getIdent() const;
 

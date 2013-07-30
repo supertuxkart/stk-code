@@ -56,10 +56,9 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 {
     m_recorded_state = CurrentUser::US_SIGNED_OUT;
-    CurrentUser::SignInRequest * request = CurrentUser::acquire()->requestSavedSession();
+    const CurrentUser::SignInRequest * request = CurrentUser::get()->requestSavedSession();
     if(request != NULL)
         m_requests.push_back(request);
-    CurrentUser::release();
 }   // OnlineScreen
 
 // ----------------------------------------------------------------------------
@@ -101,8 +100,7 @@ void OnlineScreen::loadedFromFile()
 bool OnlineScreen::hasStateChanged()
 {
     CurrentUser::UserState previous_state = m_recorded_state;
-    m_recorded_state = CurrentUser::acquire()->getUserState();
-    CurrentUser::release();
+    m_recorded_state = CurrentUser::get()->getUserState();
     if (previous_state != m_recorded_state)
         return true;
     return false;
@@ -149,8 +147,7 @@ void OnlineScreen::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
-    m_online_status_widget->setText(Messages::signedInAs(CurrentUser::acquire()->getUserName()), false);
-    CurrentUser::release();
+    m_online_status_widget->setText(Messages::signedInAs(CurrentUser::get()->getUserName()), false);
 
 }   // init
 
@@ -211,8 +208,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (selection == "sign_out")
     {
-        CurrentUser::acquire()->requestSignOut();
-        CurrentUser::release();
+        CurrentUser::get()->requestSignOut();
     }
     else if (selection == "register")
     {
@@ -230,16 +226,13 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     {
         //FIXME temporary and the request join + join sequence should be placed in one method somewhere
         // refresh server list
-        Online::ServersManager::RefreshRequest* request = ServersManager::acquire()->refreshRequest(false);
-        ServersManager::release();
+        Online::ServersManager::RefreshRequest* request = ServersManager::get()->refreshRequest(false);
         Online::HTTPManager::get()->synchronousRequest(request);
         delete request;
         // select first one
-        Server * server = ServersManager::acquire()->getQuickPlay();
-        ServersManager::release();
+        const Server * server = ServersManager::get()->getQuickPlay();
 
-        Online::CurrentUser::ServerJoinRequest* request2 = Online::CurrentUser::acquire()->requestServerJoin( server->getServerId(), false);
-        Online::CurrentUser::release();
+        Online::CurrentUser::ServerJoinRequest* request2 = Online::CurrentUser::get()->requestServerJoin( server->getServerId(), false);
         if (request2)
         {
             Online::HTTPManager::get()->synchronousRequest(request2);

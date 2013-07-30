@@ -206,15 +206,3 @@ void EasterEggHunt::getKartsDisplayInfo(
     }
 }   // getKartDisplayInfo
 
-//-----------------------------------------------------------------------------
-/** Moves a kart to its rescue position.
- *  \param kart The kart that was rescued.
- */
-void EasterEggHunt::moveKartAfterRescue(AbstractKart* kart)
-{
-    int start_position = kart->getInitialPosition();
-    btTransform start_pos = getTrack()->getStartTransform(start_position-1);
-
-    kart->getBody()->setCenterOfMassTransform(start_pos);
-
-}   // moveKartAfterRescue

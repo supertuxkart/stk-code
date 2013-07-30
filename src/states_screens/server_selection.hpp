@@ -53,7 +53,7 @@ private:
     /** \brief To check (and set) if sort order is descending **/
     bool                                        m_sort_desc;
 
-    Online::ServersManager::RefreshRequest *    m_refresh_request;
+    const Online::ServersManager::RefreshRequest *    m_refresh_request;
     bool                                        m_fake_refresh;
     void refresh();
 

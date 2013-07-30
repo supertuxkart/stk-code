@@ -1110,8 +1110,7 @@ int handleCmdLine(int argc, char **argv)
     {
         irr::core::stringw s;
         Online::CurrentUser::SignInRequest* request =
-                Online::CurrentUser::acquire()->requestSignIn(login, password, false, false);
-        Online::CurrentUser::release();
+                Online::CurrentUser::get()->requestSignIn(login, password, false, false);
         Online::HTTPManager::get()->synchronousRequest(request);
 
         if (request->isSuccess())

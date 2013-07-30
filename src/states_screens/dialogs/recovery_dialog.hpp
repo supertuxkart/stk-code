@@ -16,29 +16,29 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef HEADER_REGISTRATION_DIALOG_HPP
-#define HEADER_REGISTRATION_DIALOG_HPP
+#ifndef HEADER_RECOVERY_DIALOG_HPP
+#define HEADER_RECOVERY_DIALOG_HPP
 
 #include <irrString.h>
 
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets.hpp"
 #include "online/current_user.hpp"
+
 /**
- * \brief Dialog that allows a user to register
+ * \brief Dialog that allows a user to recover his account
  * \ingroup states_screens
  */
-class RegistrationDialog : public GUIEngine::ModalDialog
+class RecoveryDialog : public GUIEngine::ModalDialog
 {
 public:
     enum Phase
     {
         Input = 1,
-        Terms = 2,
-        Info  = 4
+        Info  = 2,
     };
-    RegistrationDialog();
-    ~RegistrationDialog();
+    RecoveryDialog();
+    ~RecoveryDialog();
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
@@ -49,44 +49,23 @@ public:
 private:
     Phase m_phase;
     bool m_self_destroy;
-    bool m_show_registration_input;
-    bool m_show_registration_terms;
-    bool m_show_registration_info;
+    bool m_show_recovery_input;
+    bool m_show_recovery_info;
 
-    const Online::XMLRequest * m_sign_up_request;
-
-    //Saved user input :
-    irr::core::stringw m_username;
-    irr::core::stringw m_password;
-    irr::core::stringw m_password_confirm;
-    irr::core::stringw m_email;
-    irr::core::stringw m_email_confirm;
-    irr::core::stringw m_registration_error;
-    bool m_agreement;
+    const Online::XMLRequest * m_recovery_request;
 
     GUIEngine::TextBoxWidget * m_username_widget;
-    GUIEngine::TextBoxWidget * m_password_widget;
-    GUIEngine::TextBoxWidget * m_password_confirm_widget;
     GUIEngine::TextBoxWidget * m_email_widget;
-    GUIEngine::TextBoxWidget * m_email_confirm_widget;
 
     GUIEngine::LabelWidget * m_info_widget;
 
     GUIEngine::RibbonWidget * m_options_widget;
-    GUIEngine::IconButtonWidget * m_previous_widget;
-    GUIEngine::IconButtonWidget * m_next_widget;
+    GUIEngine::IconButtonWidget * m_submit_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
 
-    GUIEngine::CheckBoxWidget * m_accept_terms_widget;
-
-    void showRegistrationInput();
-    void showRegistrationTerms();
-    void showRegistrationInfo();
+    void showRecoveryInput();
+    void showRecoveryInfo();
     void processInput();
-    bool processInputEvent(const std::string& eventSource);
-    bool processTermsEvent(const std::string& eventSource);
-    bool processInfoEvent(const std::string& eventSource);
-
 };
 
 #endif

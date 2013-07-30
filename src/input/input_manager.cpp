@@ -531,6 +531,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         else if (button == KEY_RIGHT)  action = PA_MENU_RIGHT;
         else if (button == KEY_SPACE)  action = PA_MENU_SELECT;
         else if (button == KEY_RETURN) action = PA_MENU_SELECT;
+        else if (button == KEY_TAB)    action = PA_MENU_DOWN;
 
         if (button == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive())
         {

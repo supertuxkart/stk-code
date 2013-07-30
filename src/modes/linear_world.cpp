@@ -88,7 +88,7 @@ void LinearWorld::reset()
     for(unsigned int i=0; i<kart_amount; i++)
     {
         m_kart_info[i].reset();
-        m_kart_info[i].getSector()->update(m_karts[i]->getXYZ());
+        m_kart_info[i].getTrackSector()->update(m_karts[i]->getXYZ());
     }   // next kart
 
     // At the moment the last kart would be the one that is furthest away
@@ -171,7 +171,7 @@ void LinearWorld::update(float dt)
         // rescued or eliminated
         if(kart->getKartAnimation()) continue;
 
-        kart_info.getSector()->update(kart->getXYZ());
+        kart_info.getTrackSector()->update(kart->getXYZ());
         kart_info.m_overall_distance = kart_info.m_race_lap
                                      * m_track->getTrackLength()
                         + getDistanceDownTrackForKart(kart->getWorldKartId());
@@ -369,7 +369,7 @@ int LinearWorld::getSectorForKart(const AbstractKart *kart) const
 {
     if(kart->getWorldKartId()>=m_kart_info.size())
         return QuadGraph::UNKNOWN_SECTOR;
-    return m_kart_info[kart->getWorldKartId()].getSector()
+    return m_kart_info[kart->getWorldKartId()].getTrackSector()
           ->getCurrentGraphNode();
 }   // getSectorForKart
 
@@ -381,7 +381,7 @@ int LinearWorld::getSectorForKart(const AbstractKart *kart) const
 float LinearWorld::getDistanceDownTrackForKart(const int kart_id) const
 {
     assert(kart_id < (int)m_kart_info.size());
-    return m_kart_info[kart_id].getSector()->getDistanceFromStart();
+    return m_kart_info[kart_id].getTrackSector()->getDistanceFromStart();
 }   // getDistanceDownTrackForKart
 
 //-----------------------------------------------------------------------------
@@ -392,7 +392,7 @@ float LinearWorld::getDistanceDownTrackForKart(const int kart_id) const
 float LinearWorld::getDistanceToCenterForKart(const int kart_id) const
 {
     assert(kart_id < (int)m_kart_info.size());
-    return m_kart_info[kart_id].getSector()->getDistanceToCenter();
+    return m_kart_info[kart_id].getTrackSector()->getDistanceToCenter();
 }   // getDistanceToCenterForKart
 
 //-----------------------------------------------------------------------------
@@ -598,58 +598,37 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
     return est_time;
 }   // estimateFinishTimeForKart
 
-//-----------------------------------------------------------------------------
-/** Decide where to drop a rescued kart
+// ------------------------------------------------------------------------
+/** Returns the number of rescue positions on a given track, which in 
+ *  linear races is just the number of driveline quads.
   */
-void LinearWorld::moveKartAfterRescue(AbstractKart* kart)
+unsigned int LinearWorld::getNumberOfRescuePositions() const
+{
+    return QuadGraph::get()->getNumNodes();
+}   // getNumberOfRescuePositions
+
+// ------------------------------------------------------------------------
+unsigned int LinearWorld::getRescuePositionIndex(AbstractKart *kart)
 {
     KartInfo& info = m_kart_info[kart->getWorldKartId()];
 
-    info.getSector()->rescue();
+    info.getTrackSector()->rescue();
     // Setting XYZ for the kart is important since otherwise the kart
     // will not detect the right material again when doing the next
     // raycast to detect where it is driving on (--> potential rescue loop)
-    int sector = info.getSector()->getCurrentGraphNode();
-    kart->setXYZ( QuadGraph::get()->getQuadOfNode(sector).getCenter());
+    return info.getTrackSector()->getCurrentGraphNode();
+}   // getRescuePositionIndex
 
-    btQuaternion heading(btVector3(0.0f, 1.0f, 0.0f),
-                         m_track->getAngle(sector) );
-    kart->setRotation(heading);
-    // A certain epsilon is added here to the Z coordinate, in case
-    // that the drivelines are somewhat under the track. Otherwise, the
-    // kart might be placed a little bit under the track, triggering
-    // a rescue, ... (experimentally found value)
-    float epsilon = 0.5f * kart->getKartHeight();
-    const Vec3 &xyz = QuadGraph::get()->getQuadOfNode(sector).getCenter();
+// ------------------------------------------------------------------------
+btTransform LinearWorld::getRescueTransform(unsigned int index) const
+{
+    const Vec3 &xyz = QuadGraph::get()->getQuadOfNode(index).getCenter();
     btTransform pos;
-    pos.setOrigin(xyz+btVector3(0, kart->getKartHeight() + epsilon,0));
+    pos.setOrigin(xyz);
     pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
-                    m_track->getAngle(sector)));
-
-    kart->getBody()->setCenterOfMassTransform(pos);
-    kart->setXYZ(pos.getOrigin());
-    //project kart to surface of track
-    bool kart_over_ground = m_track->findGround(kart);
-
-    if (kart_over_ground)
-    {
-        //add vertical offset so that the kart starts off above the track
-        float vertical_offset =
-              kart->getKartProperties()->getVertRescueOffset()
-            * kart->getKartHeight();
-        kart->getBody()->translate(btVector3(0, vertical_offset, 0));
-        // Also correctly set the graphics, otherwise the kart will
-        // be displayed for one frame at the incorrect position.
-        kart->updateGraphics(0, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
-    }
-    else
-    {
-        fprintf(stderr, "WARNING: invalid position after rescue for kart %s "
-                        "on track %s.\n",
-                (kart->getIdent().c_str()), m_track->getIdent().c_str());
-    }
-
-}   // moveKartAfterRescue
+                    m_track->getAngle(index)));
+    return pos;
+}   // getRescueTransform
 
 //-----------------------------------------------------------------------------
 /** Find the position (rank) of every kart. ATM it uses a stable O(n^2)
@@ -842,14 +821,14 @@ void LinearWorld::updateRacePosition()
 void LinearWorld::checkForWrongDirection(unsigned int i)
 {
     if(!m_karts[i]->getController()->isPlayerController()) return;
-    if(!m_kart_info[i].getSector()->isOnRoad()||
+    if(!m_kart_info[i].getTrackSector()->isOnRoad()||
         m_karts[i]->getKartAnimation()) return;
 
     const AbstractKart *kart=m_karts[i];
     // If the kart can go in more than one directions from the current track
     // don't do any reverse message handling, since it is likely that there
     // will be one direction in which it isn't going backwards anyway.
-    int sector = m_kart_info[i].getSector()->getCurrentGraphNode();
+    int sector = m_kart_info[i].getTrackSector()->getCurrentGraphNode();
     if(QuadGraph::get()->getNumberOfSuccessors(sector)>1)
         return;
 

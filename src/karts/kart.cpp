@@ -117,10 +117,10 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_flying               = false;
     m_sky_particles_emitter= NULL;
     m_stars_effect         = NULL;
-    m_timeFlying           = 0;
-    m_isTimeFlying          = false;
-    m_hitGround            = NULL;
-
+    m_jump_time            = 0;
+    m_is_jumping           = false;
+    m_min_nitro_time       = 0.0f;
+    
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
 
@@ -293,6 +293,8 @@ void Kart::reset()
     if(m_body)
         World::getWorld()->getPhysics()->addKart(this);
 
+    m_min_nitro_time = 0.0f;
+
     // Reset star effect in case that it is currently being shown.
     m_stars_effect->reset();
     m_max_speed->reset();
@@ -337,6 +339,8 @@ void Kart::reset()
     m_bubblegum_time       = 0.0f;
     m_bubblegum_torque     = 0.0f;
     m_has_caught_nolok_bubblegum = false;
+    m_is_jumping           = false;
+
     // In case that the kart was in the air, in which case its
     // linear damping is 0
     m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
@@ -1179,17 +1183,39 @@ void Kart::update(float dt)
     // values for the raycasts).
     if (!isOnGround())
     {
-        m_timeFlying+=dt;
-        m_isTimeFlying = true;
+        const Material *m      = getMaterial();
+        const Material *last_m = getLastMaterial();
+
+        // A jump starts only the kart isn't already jumping, is on a new
+        // (or no) texture.
+        if(!m_is_jumping && last_m && last_m!=m )
+        {
+            float v = getVelocity().getY();
+            float force = World::getWorld()->getTrack()->getGravity();;
+            // Velocity / force is the time it takes to reach the peak
+            // of the jump (i.e. when vertical speed becomes 0). Assuming
+            // that jump start height and end height are the same, it will
+            // take the same time again to reach the bottom
+            float t = 2.0f * v/force;
+
+            // Jump if either the jump is estimated to be long enough, or 
+            // the texture has the jump property set.
+            if(t>getKartProperties()->getJumpAnimationTime()  ||
+                last_m->isJumpTexture()                         )
+                m_kart_model->setAnimation(KartModel::AF_JUMP_START);
+            m_is_jumping = true;
+        }
+        m_jump_time+=dt;
     }
-    
-    if(isOnGround() && m_isTimeFlying)
+    else if (m_is_jumping)
     {
-        m_isTimeFlying = false;
-        m_hitGround = new Explosion(getXYZ(), "jump", 
-                                   "jump_explosion.xml");
-        projectile_manager->addHitEffect(m_hitGround);
-        m_timeFlying = 0;
+        // Kart touched ground again
+        m_is_jumping = false;
+        HitEffect *effect =  new Explosion(getXYZ(), "jump", 
+                                          "jump_explosion.xml");
+        projectile_manager->addHitEffect(effect);
+        m_kart_model->setAnimation(KartModel::AF_DEFAULT);
+        m_jump_time = 0;
     }
     
     if( (!isOnGround() || emergency) && m_shadow_enabled)
@@ -1489,18 +1515,40 @@ void Kart::handleZipper(const Material *material, bool play_sound)
  */
 void Kart::updateNitro(float dt)
 {
-    if(!m_controls.m_nitro || !isOnGround()) return;
+    if (m_controls.m_nitro && m_min_nitro_time <= 0.0f)
+    {
+        m_min_nitro_time = m_kart_properties->getNitroMinConsumptionTime();
+    }
+    if (m_min_nitro_time > 0.0f)
+    {
+        m_min_nitro_time -= dt;
+        
+        // when pressing the key, don't allow the min time to go under zero.
+        // If it went under zero, it would be reset
+        if (m_controls.m_nitro && m_min_nitro_time <= 0.0f)
+            m_min_nitro_time = 0.1f;
+    }
+    
+    bool increase_speed = (m_controls.m_nitro && isOnGround());
+    if (!increase_speed && m_min_nitro_time <= 0.0f)
+    {
+        return;
+    }
     m_collected_energy -= dt * m_kart_properties->getNitroConsumption();
-    if(m_collected_energy<0)
+    if (m_collected_energy < 0)
     {
         m_collected_energy = 0;
         return;
     }
-    m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
-                                 m_kart_properties->getNitroMaxSpeedIncrease(),
-                                 m_kart_properties->getNitroEngineForce(),
-                                 m_kart_properties->getNitroDuration(),
-                                 m_kart_properties->getNitroFadeOutTime()    );
+    
+    if (increase_speed)
+    {
+        m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
+                                     m_kart_properties->getNitroMaxSpeedIncrease(),
+                                     m_kart_properties->getNitroEngineForce(),
+                                     m_kart_properties->getNitroDuration(),
+                                     m_kart_properties->getNitroFadeOutTime()    );
+    }
 }   // updateNitro
 
 // -----------------------------------------------------------------------------
@@ -2233,7 +2281,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     y += m_skidding->getGraphicalJumpOffset();
     center_shift.setY(y);
 
-    if (m_controls.m_nitro && isOnGround() &&  m_collected_energy > 0)
+    if ((m_controls.m_nitro || m_min_nitro_time > 0.0f) && isOnGround() &&  m_collected_energy > 0)
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!

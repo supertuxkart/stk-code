@@ -42,11 +42,9 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id,bool from_server_creation) :
-        ModalDialog(0.8f,0.8f)
+ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id, bool from_server_creation)
+        : ModalDialog(0.8f,0.8f), m_server_id(server_id), m_host_id(host_id)
 {
-    m_server_id = server_id;
-    m_host_id = host_id;
     Log::info("ServerInfoDialog", "Server id is %d, Host id is %d", server_id, host_id);
     m_self_destroy = false;
     m_enter_lobby = false;
@@ -57,9 +55,8 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id,bool fro
 
     m_name_widget = getWidget<LabelWidget>("name");
     assert(m_name_widget != NULL);
-    Server * server = ServersManager::acquire()->getServerByID(m_server_id);
+    const Server * server = ServersManager::get()->getServerByID(m_server_id);
     m_name_widget->setText(server->getName(),false);
-    ServersManager::release();
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
     if (m_from_server_creation)
@@ -84,9 +81,8 @@ ServerInfoDialog::~ServerInfoDialog()
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::requestJoin()
 {
-    //m_server_join_request = Online::CurrentUser::acquire()->requestServerJoin(m_server_id);
-    Online::ServersManager::acquire()->setJoinedServer(m_server_id);
-    Online::ServersManager::release();
+    //m_server_join_request = Online::CurrentUser::get()->requestServerJoin(m_server_id);
+    Online::ServersManager::get()->setJoinedServer(m_server_id);
     ProtocolManager::getInstance()->requestStart(new ConnectToServer(m_server_id, m_host_id));
     ModalDialog::dismiss();
     StateManager::get()->pushScreen(NetworkingLobby::getInstance());

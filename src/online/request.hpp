@@ -1,5 +1,7 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2011 Joerg Henrichs
+//                2013 Glenn De Jonghe
+//
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -18,11 +20,13 @@
 #define HEADER_ONLINE_REQUEST_HPP
 
 #include <string>
+#include <curl/curl.h>
 
 #include "utils/cpp2011.h"
 #include "utils/string_utils.hpp"
 #include "utils/synchronised.hpp"
 #include "io/file_manager.hpp"
+
 
 namespace Online{
 
@@ -54,8 +58,8 @@ namespace Online{
         /** Set to though if the reply of the request is in and callbacks are executed */
         Synchronised<bool>              m_done;
 
-        virtual void beforeOperation() {}
-        virtual void operation() {};
+        virtual void prepareOperation() {}
+        virtual void operation() {}
         virtual void afterOperation();
 
     public:
@@ -115,22 +119,20 @@ namespace Online{
 
         typedef std::map<std::string, std::string>      Parameters;
 
-
         /** The progress indicator. 0 untill it is started and the first
         *  packet is downloaded. At the end either -1 (error) or 1
         *  (everything ok) at the end. */
         Synchronised<float>                             m_progress;
         Synchronised<std::string>                       m_url;
-        Parameters *                                    m_parameters;
+        Synchronised<Parameters *>                      m_parameters;
+        CURL *                                          m_curl_session;
+        CURLcode                                        m_curl_code;
 
+        virtual void                                    prepareOperation() OVERRIDE;
+        virtual void                                    operation() OVERRIDE;
         virtual void                                    afterOperation() OVERRIDE;
         /** Executed when a request has finished. */
         virtual void                                    callback() {}
-        /**
-         * Performs a POST request to the website with URL m_url using the parameters given in m_parameters.
-         * Returns the page as a string.
-         **/
-        std::string                                     downloadPage();
 
         static int                                      progressDownload(   void *clientp,
                                                                             double dltotal,
@@ -149,14 +151,17 @@ namespace Online{
         virtual ~HTTPRequest();
 
         void setParameter(const std::string & name, const std::string &value){
-            (*m_parameters)[name] = value;
+            MutexLocker(m_parameters);
+            (*m_parameters.getData())[name] = value;
         };
         void setParameter(const std::string & name, const irr::core::stringw &value){
-            (*m_parameters)[name] = irr::core::stringc(value.c_str()).c_str();
+            MutexLocker(m_parameters);
+            (*m_parameters.getData())[name] = irr::core::stringc(value.c_str()).c_str();
         }
         template <typename T>
         void setParameter(const std::string & name, const T& value){
-            (*m_parameters)[name] = StringUtils::toString(value);
+            MutexLocker(m_parameters);
+            (*m_parameters.getData())[name] = StringUtils::toString(value);
         }
 
         /** Returns the current progress. */
@@ -179,27 +184,25 @@ namespace Online{
 
     class XMLRequest : public HTTPRequest
     {
-    protected :
+    private:
+        Synchronised<XMLNode *>                         m_result;
+        std::string                                     m_string_buffer;
 
-        XMLNode *                                       m_result;
+    protected :
         Synchronised<irr::core::stringw>                m_info;
         Synchronised<bool>                              m_success;
 
-        virtual void                    operation() OVERRIDE;
-        virtual void                    afterOperation() OVERRIDE;
+        virtual void                                    prepareOperation() OVERRIDE;
+        virtual void                                    operation() OVERRIDE;
+        virtual void                                    afterOperation() OVERRIDE;
 
     public :
         XMLRequest(int type = 0, bool manage_memory = false, int priority = 1);
         virtual ~XMLRequest();
 
-        virtual XMLNode *               getResult() const       { return m_result; }
-        const irr::core::stringw        getInfo()               {
-                                                                    m_info.lock();
-                                                                    const irr::core::stringw info = m_info.getData();
-                                                                    m_info.unlock();
-                                                                    return info;
-                                                                }
-        bool                            isSuccess() const       { return m_success.getAtomic(); }
+        const XMLNode *                                 getResult() const;
+        const irr::core::stringw &                      getInfo()   const;
+        bool                                            isSuccess() const       { return m_success.getAtomic(); }
 
     };
 } //namespace Online

@@ -23,6 +23,7 @@
 #include "online/server.hpp"
 #include "online/user.hpp"
 #include "utils/types.hpp"
+#include "utils/synchronised.hpp"
 
 #include <irrString.h>
 
@@ -76,7 +77,7 @@ namespace Online{
                 Synchronised<uint32_t> m_created_server_id;
             public:
                 ServerCreationRequest() : XMLRequest(RT_SERVER_CREATION) {}
-                uint32_t getCreatedServerID() {return m_created_server_id.getAtomic();}
+                const uint32_t getCreatedServerID() const {return m_created_server_id.getAtomic();}
             };
 
             class ServerJoinRequest : public XMLRequest {
@@ -87,9 +88,15 @@ namespace Online{
 
 
         private:
-            std::string                 m_token;
-            bool                        m_save_session;
-            UserState                   m_state;
+            Synchronised<std::string>   m_token;
+            Synchronised<bool>          m_save_session;
+            Synchronised<UserState>     m_state;
+
+            bool                        getSaveSession()        const   { return m_save_session.getAtomic();      }
+
+            void setUserState           (UserState user_state)          { m_state.setAtomic(user_state);          }
+            void setSaveSession         (bool save_session)             { m_save_session.setAtomic(save_session); }
+            void setToken               (const std::string & token)     { m_token.setAtomic(token);               }
 
             CurrentUser();
 
@@ -98,35 +105,34 @@ namespace Online{
             void createServer           (const ServerCreationRequest    * input);
 
         public:
-            //Singleton
-            static CurrentUser*         acquire();
-            static void                 release();
-            static void                 deallocate();
+            /**Singleton */
+            static CurrentUser *            get();
+            static void                     deallocate();
 
-            SignInRequest *             requestSavedSession();
-            SignInRequest *             requestSignIn(          const irr::core::stringw &username,
-                                                                const irr::core::stringw &password,
-                                                                bool save_session,
-                                                                bool request_now = true);
-            SignOutRequest *            requestSignOut();
-            ServerCreationRequest *     requestServerCreation(  const irr::core::stringw &name, int max_players);
-            ServerJoinRequest *         requestServerJoin(      uint32_t server_id, bool request_now = true);
+            const SignInRequest *           requestSavedSession();
+            SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
+                                                            const irr::core::stringw &password,
+                                                            bool save_session,
+                                                            bool request_now = true);
+            const SignOutRequest *          requestSignOut();
+            const ServerCreationRequest *   requestServerCreation(const irr::core::stringw &name, int max_players);
+            ServerJoinRequest *             requestServerJoin(uint32_t server_id, bool request_now = true);
 
 
-            // Register
-            XMLRequest *                 requestSignUp(         const irr::core::stringw &username,
-                                                                const irr::core::stringw &password,
-                                                                const irr::core::stringw &password_ver,
-                                                                const irr::core::stringw &email,
-                                                                bool terms);
+            /** Register */
+            const XMLRequest *               requestSignUp( const irr::core::stringw &username,
+                                                            const irr::core::stringw &password,
+                                                            const irr::core::stringw &password_ver,
+                                                            const irr::core::stringw &email,
+                                                            bool terms);
+
+            const XMLRequest *              requestRecovery(const irr::core::stringw &username,
+                                                            const irr::core::stringw &email);
 
             /** Returns the username if signed in. */
-            irr::core::stringw          getUserName()   const;
-            bool                        isSignedIn()    const { return m_state == US_SIGNED_IN; }
-            bool                        isGuest()       const { return m_state == US_GUEST; }
-            bool                        isSigningIn()   const { return m_state == US_SIGNING_IN; }
-            UserState                   getUserState()        { return m_state; }
-            std::string                 getToken()      const { return m_token; }
+            const irr::core::stringw        getUserName()   const;
+            const UserState                 getUserState()  const { return m_state.getAtomic(); }
+            const std::string               getToken()      const { return m_token.getAtomic(); }
 
     };   // class CurrentUser
 

@@ -116,10 +116,8 @@ void ServerLobbyRoomProtocol::update()
             TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
             Online::XMLRequest* request = new Online::XMLRequest();
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-            request->setParameter("id",Online::CurrentUser::acquire()->getUserID());
-            Online::CurrentUser::release();
-            request->setParameter("token",Online::CurrentUser::acquire()->getToken());
-            Online::CurrentUser::release();
+            request->setParameter("id",Online::CurrentUser::get()->getUserID());
+            request->setParameter("token",Online::CurrentUser::get()->getToken());
             request->setParameter("address",addr.ip);
             request->setParameter("port",addr.port);
             request->setParameter("action","poll-connection-requests");

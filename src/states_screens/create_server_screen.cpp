@@ -56,8 +56,7 @@ void CreateServerScreen::loadedFromFile()
 
     m_name_widget = getWidget<TextBoxWidget>("name");
     assert(m_name_widget != NULL);
-    m_name_widget->setText(CurrentUser::acquire()->getUserName() + _("'s server"));
-    CurrentUser::release();
+    m_name_widget->setText(CurrentUser::get()->getUserName() + _("'s server"));
     m_max_players_widget = getWidget<SpinnerWidget>("max_players");
     assert(m_max_players_widget != NULL);
     m_max_players_widget->setValue(8);
@@ -137,8 +136,7 @@ void CreateServerScreen::serverCreationRequest()
     else
     {
         //m_options_widget->setDeactivated();
-        m_server_creation_request = Online::CurrentUser::acquire()->requestServerCreation(name, max_players);
-        Online::CurrentUser::release();
+        m_server_creation_request = Online::CurrentUser::get()->requestServerCreation(name, max_players);
         return;
     }
     sfx_manager->quickSound("anvil");

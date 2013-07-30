@@ -42,11 +42,11 @@ private:
     bool m_self_destroy;
     bool m_enter_lobby;
     bool m_from_server_creation;
-    Online::CurrentUser::ServerJoinRequest * m_server_join_request;
+    const Online::CurrentUser::ServerJoinRequest * m_server_join_request;
 
     float m_load_timer;
 
-    uint32_t m_server_id;
+    const uint32_t m_server_id;
     uint32_t m_host_id;
 
     GUIEngine::LabelWidget * m_name_widget;

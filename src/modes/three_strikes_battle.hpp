@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef THREE_STRIKES_HPP
-#define THREE_STRIKES_HPP
+#ifndef THREE_STRIKES_BATTLE_HPP
+#define THREE_STRIKES_BATTLE_HPP
 
 
 #include "modes/world_with_rank.hpp"
@@ -27,8 +27,6 @@
 #include <IMesh.h>
 
 #include <string>
-
-#define CLEAR_SPAWN_RANGE  5
 
 class PhysicalObject;
 
@@ -99,7 +97,7 @@ public:
     virtual void getKartsDisplayInfo(
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
     virtual bool raceHasLaps(){ return false; }
-    virtual void moveKartAfterRescue(AbstractKart* kart);
+    virtual unsigned int getRescuePositionIndex(AbstractKart *kart);
 
     virtual const std::string& getIdent() const;
 

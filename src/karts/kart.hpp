@@ -41,6 +41,7 @@ class Attachment;
 class Controller;
 class Item;
 class AbstractKartAnimation;
+class HitEffect;
 class KartGFX;
 class MaxSpeed;
 class ParticleEmitter;
@@ -51,7 +52,6 @@ class Skidding;
 class SkidMarks;
 class SlipStream;
 class Stars;
-class HitEffect;
 
 /** The main kart class. All type of karts are of this object, but with
  *  different controllers. The controllers are what turn a kart into a
@@ -149,14 +149,11 @@ private:
 
     // Graphical effects
     // -----------------
-    /** The time where a kart is flying */
-    float            m_timeFlying;
-    
-    /** For the effect when the kart touch the ground */
-    HitEffect       *m_hitGround;
+    /** Time a kart is jumping. */
+    float            m_jump_time;
     
     /** Is time flying activated */
-    bool             m_isTimeFlying;
+    bool             m_is_jumping;
     
     /** The shadow of a kart. */
     Shadow          *m_shadow;
@@ -210,6 +207,9 @@ private:
     SFXBase      *m_skid_sound;
     SFXBase      *m_goo_sound;
     float         m_time_last_crash;
+    
+    /** To prevent using nitro in too short bursts */
+    float         m_min_nitro_time;
 
     void          updatePhysics(float dt);
     void          handleMaterialSFX(const Material *material);
@@ -402,6 +402,11 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the energy the kart has collected. */
     virtual void   setEnergy(float val) { m_collected_energy = val; }
+    // ------------------------------------------------------------------------
+    /** Return whether nitro is being used despite the nitro button not being
+     *  pressed due to minimal use time requirements
+     */
+    virtual float isOnMinNitroTime() const { return m_min_nitro_time > 0.0f; }
     // ------------------------------------------------------------------------
     /** Returns if the kart is currently being squashed. */
     virtual bool   isSquashed() const { return m_squash_time >0; }

@@ -214,7 +214,7 @@ void AddonsScreen::loadList()
     // Get the filter by rating.
     GUIEngine::SpinnerWidget* w_filter_rating =
                         getWidget<GUIEngine::SpinnerWidget>("filter_rating");
-    float rating = 1.0 + w_filter_rating->getValue() / 2.0;
+    float rating = 1.0f + w_filter_rating->getValue() / 2.0f;
 
     // First create a list of sorted entries
     PtrVector<const Addon, REF> sorted_list;

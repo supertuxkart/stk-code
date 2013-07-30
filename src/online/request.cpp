@@ -24,6 +24,7 @@
 #endif
 
 #include <curl/curl.h>
+
 #include <assert.h>
 
 
@@ -46,7 +47,7 @@ namespace Online{
 
     void Request::execute()
     {
-        beforeOperation();
+        prepareOperation();
         operation();
         afterOperation();
     }
@@ -64,13 +65,15 @@ namespace Online{
         //Negative numbers are reserved for special requests ment for the HTTP Manager
         assert(type >= 0);
         m_url.setAtomic("");
-        m_parameters = new Parameters;
+        MutexLocker(m_parameters);
+        m_parameters.getData() = new Parameters;
         m_progress.setAtomic(0);
     }
 
     HTTPRequest::~HTTPRequest()
     {
-        delete m_parameters;
+        MutexLocker(m_parameters);
+        delete m_parameters.getData();
     }
 
     bool HTTPRequest::isAllowedToAdd()
@@ -83,68 +86,73 @@ namespace Online{
         return ok;
     }
 
-    void HTTPRequest::afterOperation()
+    void HTTPRequest::prepareOperation()
     {
-        callback();
-        Request::afterOperation();
+        m_curl_session = curl_easy_init();
+        if(!m_curl_session)
+        {
+            Log::error("HTTPRequest::prepareOperation", "LibCurl session not initialized.");
+            return;
+        }
+        curl_easy_setopt(m_curl_session, CURLOPT_URL, m_url.getAtomic().c_str());
+        curl_easy_setopt(m_curl_session, CURLOPT_FOLLOWLOCATION, 1);
+        curl_easy_setopt(m_curl_session, CURLOPT_WRITEFUNCTION, &HTTPRequest::WriteCallback);
+        curl_easy_setopt(m_curl_session, CURLOPT_NOPROGRESS, 0);
+        curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSDATA, this);
+        curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSFUNCTION, &HTTPRequest::progressDownload);
+        curl_easy_setopt(m_curl_session, CURLOPT_CONNECTTIMEOUT, 20);
+        curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_LIMIT, 10);
+        curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_TIME, 20);
     }
 
-    std::string HTTPRequest::downloadPage()
+    void HTTPRequest::operation()
     {
-        CURL * curl_session;
-        curl_session = curl_easy_init();
-        if(!curl_session)
-        {
-            Log::error("online/http_functions", "Error while initialising libCurl session");
-            return "";
-        }
-        curl_easy_setopt(curl_session, CURLOPT_URL, m_url.getAtomic().c_str());
+        if(!m_curl_session)
+            return;
         Parameters::iterator iter;
-        std::string postString = "";
-        for (iter = m_parameters->begin(); iter != m_parameters->end(); ++iter)
+        std::string postString("");
+        m_parameters.lock();
+        for (iter = m_parameters.getData()->begin(); iter != m_parameters.getData()->end(); ++iter)
         {
-           if(iter != m_parameters->begin())
+           if(iter != m_parameters.getData()->begin())
                postString.append("&");
-           char * escaped = curl_easy_escape(curl_session , iter->first.c_str(), iter->first.size());
+           char * escaped = curl_easy_escape(m_curl_session , iter->first.c_str(), iter->first.size());
            postString.append(escaped);
            curl_free(escaped);
            postString.append("=");
-           escaped = curl_easy_escape(curl_session , iter->second.c_str(), iter->second.size());
+           escaped = curl_easy_escape(m_curl_session , iter->second.c_str(), iter->second.size());
            postString.append(escaped);
            curl_free(escaped);
         }
-        curl_easy_setopt(curl_session, CURLOPT_POSTFIELDS, postString.c_str());
-        std::string readBuffer;
-        curl_easy_setopt(curl_session, CURLOPT_WRITEFUNCTION, &HTTPRequest::WriteCallback);
-        curl_easy_setopt(curl_session, CURLOPT_NOPROGRESS, 0);
-        curl_easy_setopt(curl_session, CURLOPT_PROGRESSDATA, this);
-        curl_easy_setopt(curl_session, CURLOPT_PROGRESSFUNCTION, &HTTPRequest::progressDownload);
-        curl_easy_setopt(curl_session, CURLOPT_FILE, &readBuffer);
-        // Timeout
-        // Reduce the connection phase timeout (it's 300 by default).
-        // Add a low speed limit to have a sort of timeout in the
-        // download phase. Being under 10 B/s during a certain time will
-        // probably only happen when no access to the net is available.
-        // The timeout is set to 20s, it should be enough to not produce
-        // false positive error.
-        curl_easy_setopt(curl_session, CURLOPT_CONNECTTIMEOUT, 20);
-        curl_easy_setopt(curl_session, CURLOPT_LOW_SPEED_LIMIT, 10);
-        curl_easy_setopt(curl_session, CURLOPT_LOW_SPEED_TIME, 20);
-        CURLcode res = curl_easy_perform(curl_session);
-        if(res == CURLE_OK)
-        {
-            Log::info("online/http_functions", "Received : %s", readBuffer.c_str());
-            setProgress(1.0f);
-        }
-        else
-        {
-            Log::error("HTTPRequest::downloadPage", "curl_easy_perform() failed: %s", curl_easy_strerror(res));
-            setProgress(-1.0f);
-        }
-        curl_easy_cleanup(curl_session);
-        return readBuffer;
+        m_parameters.unlock();
+        curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS, postString.c_str());
+        std::string uagent( std::string("SuperTuxKart/") + STK_VERSION );
+            #ifdef WIN32
+                    uagent += (std::string)" (Windows)";
+            #elif defined(__APPLE__)
+                    uagent += (std::string)" (Macintosh)";
+            #elif defined(__FreeBSD__)
+                    uagent += (std::string)" (FreeBSD)";
+            #elif defined(linux)
+                    uagent += (std::string)" (Linux)";
+            #else
+                    // Unknown system type
+            #endif
+        curl_easy_setopt(m_curl_session, CURLOPT_USERAGENT, uagent.c_str());
+
+        m_curl_code = curl_easy_perform(m_curl_session);
     }
 
+    void HTTPRequest::afterOperation()
+    {
+        if(m_curl_code == CURLE_OK)
+            setProgress(1.0f);
+        else
+            setProgress(-1.0f);
+        curl_easy_cleanup(m_curl_session);
+        callback();
+        Request::afterOperation();
+    }
 
     size_t HTTPRequest::WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
     {
@@ -202,38 +210,68 @@ namespace Online{
     XMLRequest::XMLRequest(int type, bool manage_memory, int priority)
         : HTTPRequest(priority, manage_memory, type)
     {
+        m_string_buffer = "";
         m_info.setAtomic("");
         m_success.setAtomic(false);
-        m_result = NULL;
+        MutexLocker(m_result);
+        m_result.getData() = NULL;
     }
 
     XMLRequest::~XMLRequest()
     {
-        delete m_result;
+        MutexLocker(m_result);
+        delete m_result.getData();
+    }
+
+    void XMLRequest::prepareOperation()
+    {
+        HTTPRequest::prepareOperation();
+        curl_easy_setopt(m_curl_session, CURLOPT_WRITEDATA, &m_string_buffer);
     }
 
 
     void XMLRequest::operation()
     {
-        m_result = file_manager->createXMLTreeFromString(downloadPage());
+        HTTPRequest::operation();
+        MutexLocker(m_result);
+        m_result.getData() = file_manager->createXMLTreeFromString(m_string_buffer);
     }
 
     void XMLRequest::afterOperation()
     {
-        const XMLNode * xml = this->getResult();
+        if(m_curl_code != CURLE_OK)
+            Log::error( "XMLRequest::afterOperation", "curl_easy_perform() failed: %s", curl_easy_strerror(m_curl_code));
+        else
+            Log::info(  "XMLRequest::afterOperation", "Received : %s",                  m_string_buffer.c_str());
+        m_result.lock();;
         bool success = false;
         irr::core::stringw info;
         std::string rec_success;
-        if(xml->get("success", &rec_success))
+        if(m_result.getData()->get("success", &rec_success))
         {
             if (rec_success =="yes")
                 success = true;
-            xml->get("info", &info);
+            m_result.getData()->get("info", &info);
         }
         else
             info = _("Unable to connect to the server. Check your internet connection or try again later.");
-        m_info.setAtomic(info);
+        m_result.unlock();
+        m_info.lock();
+        m_info.getData() = info;
+        m_info.unlock();
         m_success.setAtomic(success);
         HTTPRequest::afterOperation();
+    }
+
+    const XMLNode * XMLRequest::getResult() const
+    {
+        MutexLocker(m_result);
+        return m_result.getData();
+    }
+
+    const irr::core::stringw & XMLRequest::getInfo()   const
+    {
+        MutexLocker(m_info);
+        return m_info.getData();
     }
 } // namespace Online

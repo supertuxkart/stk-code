@@ -60,8 +60,7 @@ void ServerSelection::tearDown()
 
 void ServerSelection::refresh()
 {
-    m_refresh_request = ServersManager::acquire()->refreshRequest();
-    ServersManager::release();
+    m_refresh_request = ServersManager::get()->refreshRequest();
     m_fake_refresh = (m_refresh_request == NULL ? true : false);
     m_server_list_widget->clear();
     m_server_list_widget->addItem("spacer", L"");
@@ -113,11 +112,11 @@ void ServerSelection::init()
 void ServerSelection::loadList()
 {
     m_server_list_widget->clear();
-    ServersManager * manager = ServersManager::acquire();
+    ServersManager * manager = ServersManager::get();
     manager->sort(m_sort_desc);
     for(int i=0; i <  manager->getNumServers(); i++)
     {
-        Server * server = manager->getServerBySort(i);
+        const Server * server = manager->getServerBySort(i);
         core::stringw num_players;
         num_players.append(StringUtils::toWString(server->getCurrentPlayers()));
         num_players.append("/");
@@ -127,7 +126,6 @@ void ServerSelection::loadList()
         row->push_back(new GUIEngine::ListWidget::ListCell(num_players,-1,1,true));
         m_server_list_widget->addItem("server", row);
     }
-    ServersManager::release();
 }   // loadList
 
 // ----------------------------------------------------------------------------
@@ -162,10 +160,8 @@ void ServerSelection::eventCallback( GUIEngine::Widget* widget,
     else if (name == m_server_list_widget->m_properties[GUIEngine::PROP_ID])
     {
         m_selected_index = m_server_list_widget->getSelectionID();
-        uint32_t server_id = ServersManager::acquire()->getServerBySort(m_selected_index)->getServerId();
-        ServersManager::release();
-        uint32_t host_id = ServersManager::acquire()->getServerBySort(m_selected_index)->getHostId();
-        ServersManager::release();
+        uint32_t server_id = ServersManager::get()->getServerBySort(m_selected_index)->getServerId();
+        uint32_t host_id = ServersManager::get()->getServerBySort(m_selected_index)->getHostId();
         new ServerInfoDialog(server_id, host_id);
     }
 

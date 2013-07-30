@@ -1,3 +1,5 @@
+
+
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 SuperTuxKart-Team
 //
@@ -477,83 +479,52 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
 }   // getKartsDisplayInfo
 
 //-----------------------------------------------------------------------------
-/** Moves a kart to its rescue position.
- *  \param kart The kart that was rescued.
+/** Determines the rescue position for a kart. The rescue position is the
+ *  start position which is has the biggest accumulated distance to all other
+ *  karts, and which has no other kart very close. The latter avoids dropping
+ *  a kart on top of another kart.
+ *  \param kart The kart that is going to be rescued.
+ *  \returns The index of the start position to which the rescued kart
+ *           should be moved to.
  */
-void ThreeStrikesBattle::moveKartAfterRescue(AbstractKart* kart)
+
+unsigned int ThreeStrikesBattle::getRescuePositionIndex(AbstractKart *kart)
 {
-    // find closest point to drop kart on
-    World *world = World::getWorld();
-    const int start_spots_amount = world->getTrack()->getNumberOfStartPositions();
+    const int start_spots_amount = getTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
 
     float largest_accumulated_distance_found = -1;
-    int furthest_id_found = -1;
-
-    const float kart_x = kart->getXYZ().getX();
-    const float kart_z = kart->getXYZ().getZ();
+    int   furthest_id_found                  = -1;
 
     for(int n=0; n<start_spots_amount; n++)
     {
-        // no need for the overhead to compute exact distance with sqrt(),
-        // so using the 'manhattan' heuristic which will do fine enough.
-        const btTransform &s = world->getTrack()->getStartTransform(n);
+        const btTransform &s = getTrack()->getStartTransform(n);
         const Vec3 &v=s.getOrigin();
-        float accumulatedDistance = .0f;
-        bool spawnPointClear = true;
+        float accumulated_distance = .0f;
+        bool spawn_point_clear = true;
 
         for(unsigned int k=0; k<getCurrentNumKarts(); k++)
         {
-            const AbstractKart *currentKart = World::getWorld()->getKart(k);
-            const float currentKart_x = currentKart->getXYZ().getX();
-            const float currentKartk_z = currentKart->getXYZ().getZ();
-
-            if(kart_x!=currentKart_x && kart_z !=currentKartk_z)
+            if(kart->getWorldKartId()==k) continue;
+            float abs_distance2 = (getKart(k)->getXYZ()-v).length2_2d();
+            const float CLEAR_SPAWN_RANGE2 = 5*5;
+            if( abs_distance2 < CLEAR_SPAWN_RANGE2)
             {
-                float absDistance = fabs(currentKart_x - v.getX()) +
-                    fabs(currentKartk_z - v.getZ());
-                if(absDistance < CLEAR_SPAWN_RANGE)
-                {
-                    spawnPointClear = false;
-                    break;
-                }
-                accumulatedDistance += absDistance;
+                spawn_point_clear = false;
+                break;
             }
+            accumulated_distance += sqrt(abs_distance2);
         }
 
-        if(largest_accumulated_distance_found < accumulatedDistance && spawnPointClear)
+        if(accumulated_distance > largest_accumulated_distance_found && 
+            spawn_point_clear)
         {
             furthest_id_found = n;
-            largest_accumulated_distance_found = accumulatedDistance;
+            largest_accumulated_distance_found = accumulated_distance;
         }
     }
 
     assert(furthest_id_found != -1);
-    const btTransform &s = world->getTrack()->getStartTransform(furthest_id_found);
-    const Vec3 &xyz = s.getOrigin();
-    kart->setXYZ(xyz);
-    kart->setRotation(s.getRotation());
+    return furthest_id_found;
+}   // getRescuePositionIndex
 
-    //position kart from same height as in World::resetAllKarts
-    btTransform pos;
-    pos.setOrigin(kart->getXYZ()+btVector3(0, 0.5f*kart->getKartHeight(), 0.0f));
-    pos.setRotation( btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0 /* angle */) );
-
-    kart->getBody()->setCenterOfMassTransform(pos);
-
-    //project kart to surface of track
-    bool kart_over_ground = m_track->findGround(kart);
-
-    if (kart_over_ground)
-    {
-        //add vertical offset so that the kart starts off above the track
-        float vertical_offset = kart->getKartProperties()->getVertRescueOffset() *
-                                kart->getKartHeight();
-        kart->getBody()->translate(btVector3(0, vertical_offset, 0));
-    }
-    else
-    {
-        fprintf(stderr, "WARNING: invalid position after rescue for kart %s on track %s.\n",
-                (kart->getIdent().c_str()), m_track->getIdent().c_str());
-    }
-}   // moveKartAfterRescue

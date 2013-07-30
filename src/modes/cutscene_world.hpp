@@ -68,17 +68,6 @@ public:
 
     // clock events
     virtual bool isRaceOver() OVERRIDE;
-    virtual void terminateRace() OVERRIDE;
-
-    void setParts(std::vector<std::string> parts)
-    {
-        m_parts = parts;
-    }
-
-    virtual void getKartsDisplayInfo(
-                 std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
-    virtual bool raceHasLaps() OVERRIDE { return false; }
-    virtual void moveKartAfterRescue(AbstractKart* kart) OVERRIDE;
 
     virtual const std::string& getIdent() const OVERRIDE;
 
@@ -88,8 +77,35 @@ public:
 
     virtual void enterRaceOverState() OVERRIDE;
 
+    // ------------------------------------------------------------------------
+    virtual bool raceHasLaps() OVERRIDE { return false; }
+    // ------------------------------------------------------------------------
+    virtual unsigned int getNumberOfRescuePositions() const OVERRIDE 
+    {
+        return 0;
+    }   // getNumberOfRescuePositions
+    // ------------------------------------------------------------------------
+    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE
+    {
+        return 0;
+    }   // getRescuePositionIndex
+    // ------------------------------------------------------------------------
+    virtual btTransform  getRescueTransform(unsigned int index) const OVERRIDE
+    {
+        return btTransform();
+    }   // getRescueTransform
+    // ------------------------------------------------------------------------
     virtual void onFirePressed(Controller* who) OVERRIDE { abortCutscene(); }
-
+    // ------------------------------------------------------------------------
+    void setParts(std::vector<std::string> parts) { m_parts = parts; }
+    // ------------------------------------------------------------------------
+    /** Returns the data to display in the race gui.
+     */
+    virtual void getKartsDisplayInfo(
+                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE
+    {
+    };
+    // ------------------------------------------------------------------------
     virtual void escapePressed() OVERRIDE { abortCutscene(); }
 
 };   // CutsceneWorld

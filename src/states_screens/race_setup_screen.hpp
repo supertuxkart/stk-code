@@ -39,6 +39,8 @@ class RaceSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingle
 
     void onGameModeChanged();
 
+    void assignDifficulty();
+
 public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */

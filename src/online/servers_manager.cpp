@@ -30,60 +30,49 @@
 
 namespace Online{
 
-    static Synchronised<ServersManager*> manager_singleton(NULL);
+    static ServersManager* manager_singleton(NULL);
 
-    ServersManager* ServersManager::acquire()
+    ServersManager* ServersManager::get()
     {
-        manager_singleton.lock();
-        ServersManager * manager = manager_singleton.getData();
-        if (manager == NULL)
-        {
-            manager_singleton.unlock();
-            manager = new ServersManager();
-            manager_singleton.setAtomic(manager);
-            manager_singleton.lock();
-        }
-        return manager;
-    }
-
-    void ServersManager::release()
-    {
-        manager_singleton.unlock();
+        if (manager_singleton == NULL)
+            manager_singleton = new ServersManager();
+        return manager_singleton;
     }
 
     void ServersManager::deallocate()
     {
-        manager_singleton.lock();
-        ServersManager* manager = manager_singleton.getData();
-        delete manager;
-        manager = NULL;
-        manager_singleton.unlock();
+        delete manager_singleton;
+        manager_singleton = NULL;
     }   // deallocate
 
     // ============================================================================
     ServersManager::ServersManager(){
-        m_info_message = "";
-        m_last_load_time = 0.0f;
-        m_joined_server = NULL;
+        m_last_load_time.setAtomic(0.0f);
+        m_joined_server.setAtomic(NULL);
     }
 
     ServersManager::~ServersManager(){
         cleanUpServers();
-        delete m_joined_server;
+        MutexLocker(m_joined_server);
+        delete m_joined_server.getData();
     }
 
     // ============================================================================
     void ServersManager::cleanUpServers()
     {
-        m_sorted_servers.clearAndDeleteAll();
-        m_mapped_servers.clear();
+        m_sorted_servers.lock();
+        m_sorted_servers.getData().clearAndDeleteAll();
+        m_sorted_servers.unlock();
+        m_mapped_servers.lock();
+        m_mapped_servers.getData().clear();
+        m_mapped_servers.unlock();
     }
 
     // ============================================================================
-    ServersManager::RefreshRequest * ServersManager::refreshRequest(bool request_now)
+    ServersManager::RefreshRequest * ServersManager::refreshRequest(bool request_now) const
     {
         RefreshRequest * request = NULL;
-        if(Time::getRealTime() - m_last_load_time > SERVER_REFRESH_INTERVAL)
+        if(Time::getRealTime() - m_last_load_time.getAtomic() > SERVER_REFRESH_INTERVAL)
         {
             request = new RefreshRequest();
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
@@ -104,63 +93,84 @@ namespace Online{
             {
                 addServer(new Server(*servers_xml->getNode(i)));
             }
-            m_last_load_time = (float)Time::getRealTime();
+            m_last_load_time.setAtomic((float)Time::getRealTime());
         }
-        m_info_message = input->getInfo();
         //FIXME error message
     }
 
     void ServersManager::RefreshRequest::callback()
     {
-        ServersManager::acquire()->refresh(this);
-        ServersManager::release();
+        ServersManager::get()->refresh(this);
     }
 
     // ============================================================================
-    Server * ServersManager::getQuickPlay()
+    const Server * ServersManager::getQuickPlay() const
     {
-        if(m_sorted_servers.size() > 0)
+        /*if(m_sorted_servers.size() > 0)
             return getServerBySort(0);
+			*/
         return NULL;
     }
 
     // ============================================================================
     void ServersManager::setJoinedServer(uint32_t id)
     {
-        delete m_joined_server;
+        MutexLocker(m_joined_server);
+        delete m_joined_server.getData();
         //It's a copy!
-        m_joined_server = new Server(*getServerByID(id));
+        m_joined_server.getData() = new Server(*getServerByID(id));
     }
 
     // ============================================================================
     void ServersManager::unsetJoinedServer()
     {
-        delete m_joined_server;
-        m_joined_server = NULL;
+        MutexLocker(m_joined_server);
+        delete m_joined_server.getData();
+        m_joined_server.getData() = NULL;
     }
 
     // ============================================================================
     void ServersManager::addServer(Server * server)
     {
-        m_sorted_servers.push_back(server);
-        m_mapped_servers[server->getServerId()] = server;
+        m_sorted_servers.lock();
+        m_sorted_servers.getData().push_back(server);
+        m_sorted_servers.unlock();
+        m_mapped_servers.lock();
+        m_mapped_servers.getData()[server->getServerId()] = server;
+        m_mapped_servers.unlock();
     }
 
     // ============================================================================
-    int ServersManager::getNumServers ()
+    int ServersManager::getNumServers () const
     {
-        return m_sorted_servers.size();
+        MutexLocker(m_sorted_servers);
+        return m_sorted_servers.getData().size();
     }
 
     // ============================================================================
-    Server * ServersManager::getServerBySort (int index)
+    const Server * ServersManager::getServerBySort (int index) const
     {
-        return m_sorted_servers.get(index);
+        MutexLocker(m_sorted_servers);
+        return m_sorted_servers.getData().get(index);
     }
 
     // ============================================================================
-    Server * ServersManager::getServerByID (uint32_t id)
+    const Server * ServersManager::getServerByID (uint32_t id) const
     {
-        return m_mapped_servers[id];
+        MutexLocker(m_mapped_servers);
+        return m_mapped_servers.getData().at(id);
     }
+
+    // ============================================================================
+    Server * ServersManager::getJoinedServer() const
+    {
+        return m_joined_server.getAtomic();
+    }
+
+    // ============================================================================
+    void ServersManager::sort(bool sort_desc){
+        MutexLocker(m_sorted_servers);
+        m_sorted_servers.getData().insertionSort(0, sort_desc);
+    }
+
 } // namespace Online

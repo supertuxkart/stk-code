@@ -162,6 +162,7 @@ void MainLoop::run()
             PROFILER_POP_CPU_MARKER();
         }
 
+        PROFILER_SYNC_FRAME();
         PROFILER_POP_CPU_MARKER();
     }  // while !m_exit
 

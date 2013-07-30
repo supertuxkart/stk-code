@@ -32,20 +32,22 @@ namespace Online{
     class User
     {
         private:
+            Synchronised<irr::core::stringw>    m_name;
+            Synchronised<uint32_t>              m_id;
 
         protected:
-            irr::core::stringw        m_name;
-            uint32_t                  m_id;
-            User(){}
+            void        setUserName (const irr::core::stringw & name)       { m_name.setAtomic(name); }
+            void        setUserID   (const uint32_t & id)                   { m_id.setAtomic(id); }
 
         public:
+            User(       const irr::core::stringw & username,
+                        const uint32_t           & userid
+                );
+            virtual ~User() {};
 
-            User(const irr::core::stringw &username);
+            virtual const irr::core::stringw    getUserName()       const   { return m_name.getAtomic();  }
+            const uint32_t                      getUserID()         const   { return m_id.getAtomic();    }
             User(uint32_t id);
-
-
-            irr::core::stringw getUserName() const { return m_name; }
-            uint32_t getUserID() const { return m_id; }
 
 
     };   // class User

@@ -60,8 +60,8 @@ void NetworkingLobbySettings::loadedFromFile()
 // ----------------------------------------------------------------------------
 bool NetworkingLobbySettings::hasLostConnection()
 {
-    bool return_value = !Online::CurrentUser::acquire()->isSignedIn();
-    Online::CurrentUser::release();
+    bool return_value = (   Online::CurrentUser::get()->getUserState() !=
+                            Online::CurrentUser::US_SIGNED_IN);
     return return_value;
 }
 

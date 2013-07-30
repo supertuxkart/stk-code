@@ -77,44 +77,12 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
 {
     if (name == "difficulty")
     {
-        RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
-        assert(w != NULL);
-        const std::string& selection = w->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-
-        if (selection == "novice")
-        {
-            UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_EASY;
-            race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
-        }
-        else if (selection == "intermediate")
-        {
-            UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_MEDIUM;
-            race_manager->setDifficulty(RaceManager::DIFFICULTY_MEDIUM);
-        }
-        else if (selection == "expert")
-        {
-            UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_HARD;
-            race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
-        }
-        else if (selection == "best")
-        {
-            if (unlock_manager->getCurrentSlot()->isLocked("difficulty_best"))
-            {
-                unlock_manager->playLockSound();
-                UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_HARD;
-                race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
-                w->setSelection(2, PLAYER_ID_GAME_MASTER);
-                w->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-            }
-            else
-            {
-                UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_BEST;
-                race_manager->setDifficulty(RaceManager::DIFFICULTY_BEST);
-            }
-        }
+        assignDifficulty();
     }
     else if (name == "gamemode")
     {
+        assignDifficulty();
+
         DynamicRibbonWidget* w = dynamic_cast<DynamicRibbonWidget*>(widget);
         const std::string& selectedMode = w->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
@@ -182,6 +150,47 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
     }
 
 }   // eventCallback
+
+// -----------------------------------------------------------------------------
+
+void RaceSetupScreen::assignDifficulty()
+{
+    RibbonWidget* difficulty = getWidget<RibbonWidget>("difficulty");
+    assert(difficulty != NULL);
+    const std::string& difficultySelection = difficulty->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    
+    if (difficultySelection == "novice")
+    {
+        UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_EASY;
+        race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
+    }
+    else if (difficultySelection == "intermediate")
+    {
+        UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_MEDIUM;
+        race_manager->setDifficulty(RaceManager::DIFFICULTY_MEDIUM);
+    }
+    else if (difficultySelection == "expert")
+    {
+        UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_HARD;
+        race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
+    }
+    else if (difficultySelection == "best")
+    {
+        if (unlock_manager->getCurrentSlot()->isLocked("difficulty_best"))
+        {
+            unlock_manager->playLockSound();
+            UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_HARD;
+            race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
+            difficulty->setSelection(2, PLAYER_ID_GAME_MASTER);
+            difficulty->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        }
+        else
+        {
+            UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_BEST;
+            race_manager->setDifficulty(RaceManager::DIFFICULTY_BEST);
+        }
+    }
+}
 
 // -----------------------------------------------------------------------------
 
