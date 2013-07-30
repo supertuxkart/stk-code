@@ -21,7 +21,6 @@
 #include "guiengine/modaldialog.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
-#include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -149,7 +148,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     m_do_demo = true;
     race_manager->setNumKarts(m_num_karts);
     race_manager->setLocalKartInfo(0, "tux");
-    network_manager->setupPlayerKartInfo();
+    race_manager->setupPlayerKartInfo();
     race_manager->startSingleRace(m_demo_tracks[0], m_num_laps, false);
     m_demo_tracks.push_back(m_demo_tracks[0]);
     m_demo_tracks.erase(m_demo_tracks.begin());

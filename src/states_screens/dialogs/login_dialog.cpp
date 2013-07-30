@@ -109,16 +109,16 @@ void LoginDialog::login()
 {
     const stringw username = m_username_widget->getText().trim();
     const stringw password = m_password_widget->getText().trim();
-    if (username.size() < 4 || username.size() > 30 || password.size() < 8 || password.size() > 30)
+    stringw info = "";
+    if(CurrentOnlineUser::get()->signIn(username,password,info))
     {
-        sfx_manager->quickSound("anvil");
-        m_info_widget->setErrorColor();
-        m_info_widget->setText(_("Username and/or password invalid."), false);
+        m_self_destroy = true;
     }
     else
     {
-        m_options_widget->setDeactivated();
-        m_sign_in_request = Online::CurrentUser::get()->requestSignIn(username,password, m_remember_widget->getState());
+        sfx_manager->quickSound( "anvil" );
+        m_message_widget->setColor(irr::video::SColor(255, 255, 0, 0));
+        m_message_widget->setText(info, false);
     }
 }
 
@@ -144,11 +144,6 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
             m_open_registration_dialog = true;
             return GUIEngine::EVENT_BLOCK;
         }
-        else if(selection == m_recovery_widget->m_properties[PROP_ID])
-        {
-            m_open_recovery_dialog = true;
-            return GUIEngine::EVENT_BLOCK;
-        }
     }
     return GUIEngine::EVENT_LET;
 }
@@ -162,8 +157,7 @@ void LoginDialog::onEnterPressedInternal()
     const int playerID = PLAYER_ID_GAME_MASTER;
     if (GUIEngine::isFocusedForPlayer(m_options_widget, playerID))
         return;
-    if (m_sign_in_widget->isActivated())
-        login();
+    login();
 }
 
 // -----------------------------------------------------------------------------
