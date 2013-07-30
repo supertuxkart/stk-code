@@ -19,13 +19,17 @@
 #ifndef HEADER_ONLINE_REQUEST_HPP
 #define HEADER_ONLINE_REQUEST_HPP
 
-#include <string>
-#include <curl/curl.h>
-
+#include "io/file_manager.hpp"
 #include "utils/cpp2011.h"
 #include "utils/string_utils.hpp"
 #include "utils/synchronised.hpp"
-#include "io/file_manager.hpp"
+
+#ifdef WIN32
+#  include <winsock2.h>
+#endif
+#include <curl/curl.h>
+
+#include <string>
 
 
 namespace Online{
