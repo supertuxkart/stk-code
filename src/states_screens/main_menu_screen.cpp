@@ -37,12 +37,12 @@
 #include "modes/cutscene_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/demo_world.hpp"
-#include "network/network_manager.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/help_screen_1.hpp"
-#include "states_screens/kart_selection.hpp"
+#include "states_screens/offline_kart_selection.hpp"
+#include "states_screens/network_kart_selection.hpp" // FIXME : remove when not testing
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -272,14 +272,14 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 #endif
     if (selection == "new")
     {
-        KartSelectionScreen* s = KartSelectionScreen::getInstance();
+        KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance(); //FIXME : that was for tests
         s->setMultiplayer(false);
         s->setFromOverworld(false);
         StateManager::get()->pushScreen( s );
     }
     else if (selection == "multiplayer")
     {
-        KartSelectionScreen* s = KartSelectionScreen::getInstance();
+        KartSelectionScreen* s = NetworkKartSelectionScreen::getInstance();
         s->setMultiplayer(true);
         s->setFromOverworld(false);
         StateManager::get()->pushScreen( s );
@@ -315,7 +315,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 
         // Create player and associate player with keyboard
         StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
-                                                device);
+                                                device, NULL);
 
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
         {
@@ -332,7 +332,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
         StateManager::get()->enterGameState();
-        network_manager->setupPlayerKartInfo();
+        race_manager->setupPlayerKartInfo();
         race_manager->startNew(false);
     }
     else if (selection == "story")
@@ -359,7 +359,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             const std::string default_kart = UserConfigParams::m_default_kart;
             if (slot->isLocked(default_kart))
             {
-                KartSelectionScreen *next = KartSelectionScreen::getInstance();
+                KartSelectionScreen *next = OfflineKartSelectionScreen::getInstance();
                 next->setGoToOverworldNext();
                 next->setMultiplayer(false);
                 StateManager::get()->resetAndGoToScreen(next);

@@ -61,6 +61,7 @@ namespace GUIEngine
     template<typename SCREEN>
     class ScreenSingleton
     {
+    protected:
         static SCREEN* singleton;
 
     public:

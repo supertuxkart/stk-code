@@ -38,7 +38,7 @@ class ServerInfoDialog : public GUIEngine::ModalDialog
 {
 
 private:
-    
+
     bool m_self_destroy;
     bool m_enter_lobby;
     bool m_from_server_creation;
@@ -47,6 +47,7 @@ private:
     float m_load_timer;
 
     const uint32_t m_server_id;
+    uint32_t m_host_id;
 
     GUIEngine::LabelWidget * m_name_widget;
     GUIEngine::LabelWidget * m_info_widget;
@@ -54,16 +55,16 @@ private:
     GUIEngine::RibbonWidget * m_options_widget;
     GUIEngine::IconButtonWidget * m_join_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
-    
+
     void requestJoin();
 
 public:
-    ServerInfoDialog(const uint32_t server_id, bool just_created = false);
+    ServerInfoDialog(uint32_t server_id, uint32_t host_id, bool just_created = false);
     ~ServerInfoDialog();
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
+
     virtual void onUpdate(float dt);
 };
 

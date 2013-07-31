@@ -19,14 +19,15 @@
 #ifndef HEADER_CURRENT_ONLINE_USER_HPP
 #define HEADER_CURRENT_ONLINE_USER_HPP
 
-#include "online/user.hpp"
-#include <string>
-#include <irrString.h>
-#include "utils/types.hpp"
-#include "online/server.hpp"
 #include "http_manager.hpp"
+#include "online/server.hpp"
+#include "online/user.hpp"
+#include "utils/types.hpp"
 #include "utils/synchronised.hpp"
 
+#include <irrString.h>
+
+#include <string>
 
 namespace Online{
 
@@ -92,7 +93,6 @@ namespace Online{
             Synchronised<UserState>     m_state;
 
             bool                        getSaveSession()        const   { return m_save_session.getAtomic();      }
-            const std::string           getToken()              const   { return m_token.getAtomic();      }
 
             void setUserState           (UserState user_state)          { m_state.setAtomic(user_state);          }
             void setSaveSession         (bool save_session)             { m_save_session.setAtomic(save_session); }
@@ -110,27 +110,29 @@ namespace Online{
             static void                     deallocate();
 
             const SignInRequest *           requestSavedSession();
-            const SignInRequest *           requestSignIn(          const irr::core::stringw &username,
-                                                                    const irr::core::stringw &password,
-                                                                    bool save_session);
+            SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
+                                                            const irr::core::stringw &password,
+                                                            bool save_session,
+                                                            bool request_now = true);
             const SignOutRequest *          requestSignOut();
-            const ServerCreationRequest *   requestServerCreation(  const irr::core::stringw &name, int max_players);
-            const ServerJoinRequest *       requestServerJoin(      uint32_t server_id);
+            const ServerCreationRequest *   requestServerCreation(const irr::core::stringw &name, int max_players);
+            ServerJoinRequest *             requestServerJoin(uint32_t server_id, bool request_now = true);
 
 
             /** Register */
-            const XMLRequest *              requestSignUp(          const irr::core::stringw &username,
-                                                                    const irr::core::stringw &password,
-                                                                    const irr::core::stringw &password_ver,
-                                                                    const irr::core::stringw &email,
-                                                                    bool terms);
+            const XMLRequest *               requestSignUp( const irr::core::stringw &username,
+                                                            const irr::core::stringw &password,
+                                                            const irr::core::stringw &password_ver,
+                                                            const irr::core::stringw &email,
+                                                            bool terms);
 
-            const XMLRequest *              requestRecovery(        const irr::core::stringw &username,
-                                                                    const irr::core::stringw &email);
+            const XMLRequest *              requestRecovery(const irr::core::stringw &username,
+                                                            const irr::core::stringw &email);
 
             /** Returns the username if signed in. */
-            const irr::core::stringw            getUserName()   const;
-            const UserState                     getUserState()  const { return m_state.getAtomic(); }
+            const irr::core::stringw        getUserName()   const;
+            const UserState                 getUserState()  const { return m_state.getAtomic(); }
+            const std::string               getToken()      const { return m_token.getAtomic(); }
 
     };   // class CurrentUser
 

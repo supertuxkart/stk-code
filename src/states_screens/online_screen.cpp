@@ -36,10 +36,14 @@
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/server_selection.hpp"
 #include "states_screens/create_server_screen.hpp"
-#include "modes/demo_world.hpp"
+#include "states_screens/networking_lobby_settings.hpp"
 #include "online/servers_manager.hpp"
 #include "online/messages.hpp"
+#include "online/request.hpp"
+#include "modes/demo_world.hpp"
 
+#include "network/protocol_manager.hpp"
+#include "network/protocols/connect_to_server.hpp"
 
 
 using namespace GUIEngine;
@@ -221,18 +225,40 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     else if (selection == "quick_play")
     {
         //FIXME temporary and the request join + join sequence should be placed in one method somewhere
-            /*
-        Server * server = ServersManager::get()->getQuickPlay();
-        irr::core::stringw info;
-        if (Online::CurrentUser::get()->requestJoin( server->getServerId(), info))
+        // refresh server list
+        Online::ServersManager::RefreshRequest* request = ServersManager::get()->refreshRequest(false);
+        if (request != NULL) // consider request done
         {
-            ServersManager::get()->setJoinedServer(server);
-            StateManager::get()->pushScreen(NetworkingLobby::getInstance());
+            Online::HTTPManager::get()->synchronousRequest(request);
+            delete request;
+        }
+        else
+        {
+            Log::error("OnlineScreen", "Could not get the server list.");
+            return;
+        }
+        // select first one
+        const Server * server = ServersManager::get()->getQuickPlay();
+
+        Online::CurrentUser::ServerJoinRequest* request2 = Online::CurrentUser::get()->requestServerJoin( server->getServerId(), false);
+        if (request2)
+        {
+            Online::HTTPManager::get()->synchronousRequest(request2);
+            if (request2->isSuccess())
+            {
+                delete request2;
+                StateManager::get()->pushScreen(NetworkingLobby::getInstance());
+                ProtocolManager::getInstance()->requestStart(new ConnectToServer(server->getServerId(), server->getHostId()));
+            }
+            else
+            {
+                sfx_manager->quickSound( "anvil" );
+            }
         }
         else
         {
             sfx_manager->quickSound( "anvil" );
-        }*/
+        }
     }
 
 }   // eventCallback

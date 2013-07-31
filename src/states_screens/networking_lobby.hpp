@@ -73,6 +73,9 @@ public:
     virtual void tearDown() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual bool onEscapePressed() OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onDisabledItemClicked(const std::string& item) OVERRIDE;
 
     /** \brief Implements the callback when a dialog gets closed. */

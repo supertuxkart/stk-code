@@ -19,13 +19,14 @@
 
 #include "online/current_user.hpp"
 
+#include "config/user_config.hpp"
+#include "online/servers_manager.hpp"
+#include "utils/log.hpp"
+#include "utils/translation.hpp"
+
 #include <sstream>
 #include <stdlib.h>
 #include <assert.h>
-#include "config/user_config.hpp"
-#include "utils/translation.hpp"
-#include "utils/log.hpp"
-#include "online/servers_manager.hpp"
 
 using namespace Online;
 
@@ -105,9 +106,9 @@ namespace Online{
         return request;
     }
 
-    const CurrentUser::SignInRequest * CurrentUser::requestSignIn(  const irr::core::stringw &username,
-                                                                    const irr::core::stringw &password,
-                                                                    bool save_session)
+    CurrentUser::SignInRequest * CurrentUser::requestSignIn(    const irr::core::stringw &username,
+                                                                const irr::core::stringw &password,
+                                                                bool save_session, bool request_now)
     {
         assert(getUserState() == US_SIGNED_OUT);
         setSaveSession(save_session);
@@ -116,8 +117,11 @@ namespace Online{
         request->setParameter("action",std::string("connect"));
         request->setParameter("username",username);
         request->setParameter("password",password);
-        HTTPManager::get()->addRequest(request);
-        setUserState (US_SIGNING_IN);
+        if (request_now)
+        {
+            HTTPManager::get()->addRequest(request);
+            setUserState (US_SIGNING_IN);
+        }
         return request;
     }
 
@@ -214,7 +218,9 @@ namespace Online{
 
     // ============================================================================
 
-    const CurrentUser::ServerJoinRequest *  CurrentUser::requestServerJoin(uint32_t server_id){
+    CurrentUser::ServerJoinRequest *  CurrentUser::requestServerJoin(uint32_t server_id,
+                                                                    bool request_now)
+    {
         assert(getUserState() == US_SIGNED_IN || getUserState() == US_GUEST);
         ServerJoinRequest * request = new ServerJoinRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
@@ -222,7 +228,8 @@ namespace Online{
         request->setParameter("token", getToken());
         request->setParameter("id", getUserID());
         request->setParameter("server_id", server_id);
-        HTTPManager::get()->addRequest(request);
+        if (request_now)
+            HTTPManager::get()->addRequest(request);
         return request;
     }
 

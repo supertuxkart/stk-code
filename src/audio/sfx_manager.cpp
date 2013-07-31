@@ -282,7 +282,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     //       race_manager->getNumLocalPlayers(), buffer->isPositional());
 
 #if HAVE_OGGVORBIS
-    assert( alIsBuffer(buffer->getBufferID()) );
+    //assert( alIsBuffer(buffer->getBufferID()) ); crashes on server
     SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain(), owns_buffer);
 #else
     SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain(), owns_buffer);

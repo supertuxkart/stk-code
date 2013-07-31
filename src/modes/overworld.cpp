@@ -27,9 +27,8 @@
 #include "karts/rescue_animation.hpp"
 #include "modes/overworld.hpp"
 #include "physics/physics.hpp"
-#include "network/network_manager.hpp"
 #include "states_screens/dialogs/select_challenge.hpp"
-#include "states_screens/kart_selection.hpp"
+#include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/race_gui_overworld.hpp"
 #include "tracks/track.hpp"
 
@@ -64,7 +63,7 @@ void OverWorld::enterOverWorld()
 
     // Create player and associate player with keyboard
     StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
-                                            device);
+                                            device, NULL);
 
     if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))
     {
@@ -83,7 +82,7 @@ void OverWorld::enterOverWorld()
         ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
     StateManager::get()->enterGameState();
-    network_manager->setupPlayerKartInfo();
+    race_manager->setupPlayerKartInfo();
     race_manager->startNew(false);
     if(race_manager->haveKartLastPositionOnOverworld()){
 			OverWorld *ow = (OverWorld*)World::getWorld();
@@ -129,7 +128,7 @@ void OverWorld::update(float dt)
         m_return_to_garage = false;
         delayedSelfDestruct();
         race_manager->exitRace(false);
-        KartSelectionScreen* s = KartSelectionScreen::getInstance();
+        KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
         s->setMultiplayer(false);
         s->setFromOverworld(true);
         StateManager::get()->resetAndGoToScreen(s);

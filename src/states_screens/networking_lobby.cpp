@@ -33,6 +33,8 @@
 #include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/client_lobby_room_protocol.hpp"
 #include "modes/demo_world.hpp"
 #include "utils/translation.hpp"
 #include "online/servers_manager.hpp"
@@ -119,6 +121,18 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name, con
 void NetworkingLobby::tearDown()
 {
 }   // tearDown
+
+// ----------------------------------------------------------------------------
+
+bool NetworkingLobby::onEscapePressed()
+{
+    // notify the server that we left
+    ClientLobbyRoomProtocol* protocol = static_cast<ClientLobbyRoomProtocol*>(
+            ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
+    if (protocol)
+        protocol->leave();
+    return true; // close the screen
+}
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::onDisabledItemClicked(const std::string& item)

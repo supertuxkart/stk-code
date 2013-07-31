@@ -38,12 +38,11 @@
 #include "karts/controller/player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
+#include "karts/controller/network_player_controller.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
-#include "network/network_manager.hpp"
-#include "network/race_state.hpp"
 #include "physics/btKart.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -79,8 +78,8 @@ World* World::m_world = NULL;
  *  of all karts is set (i.e. in a normal race the arrival time for karts
  *  will be estimated), highscore is updated, and the race result gui
  *  is being displayed.
- *  Rescuing is handled via the three functions: 
- *  getNumberOfRescuePositions() - which returns the number of rescue 
+ *  Rescuing is handled via the three functions:
+ *  getNumberOfRescuePositions() - which returns the number of rescue
  *           positions defined.
  *  getRescuePositionIndex(AbstractKart *kart) - which determines the
  *           index of the rescue position to be used for the given kart.
@@ -133,7 +132,6 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
  */
 void World::init()
 {
-    race_state            = new RaceState();
     m_faster_music_active = false;
     m_fastest_kart        = 0;
     m_eliminated_karts    = 0;
@@ -188,8 +186,6 @@ void World::init()
 
     if(ReplayPlay::get())
         ReplayPlay::get()->Load();
-
-    network_manager->worldLoaded();
 
     powerup_manager->updateWeightsForRace(num_karts);
 }   // init
@@ -300,11 +296,10 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
-		break;  // Avoid compiler warning about enum not handled.
-        //controller = new NetworkController(kart_ident, position, init_pos,
-        //                          global_player_id);
-        //m_num_players++;
-        //break;
+        controller = new NetworkPlayerController(new_kart,
+                        StateManager::get()->getActivePlayer(local_player_id));
+        m_num_players++;
+        break;
     case RaceManager::KT_AI:
         controller = loadAIController(new_kart);
         break;
@@ -375,7 +370,6 @@ World::~World()
         // gui and this must be deleted.
         delete m_race_gui;
     }
-    delete race_state;
 
     for ( unsigned int i = 0 ; i < m_karts.size() ; i++ )
         delete m_karts[i];
@@ -491,7 +485,7 @@ void World::resetAllKarts()
         // Loop over all karts, in case that some karts are dfferent
         for(unsigned int kart_id=0; kart_id<m_karts.size(); kart_id++)
         {
-            for(unsigned int rescue_pos=0; 
+            for(unsigned int rescue_pos=0;
                 rescue_pos<getNumberOfRescuePositions();
                 rescue_pos++)
             {
@@ -650,7 +644,7 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
     kart->getBody()->setCenterOfMassTransform(pos);
 
     // Project kart to surface of track
-    // This will set the physics transform 
+    // This will set the physics transform
     m_track->findGround(kart);
 
 }   // moveKartTo
@@ -748,13 +742,12 @@ void World::updateWorld(float dt)
                 InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
                 // Create player and associate player with keyboard
-                StateManager::get()
-                    ->createActivePlayer(unlock_manager->getCurrentPlayer(),
-                                         device);
+                StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+                                                        device, NULL);
 
                 if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))
                 {
-                    Log::warn("World", 
+                    Log::warn("World",
                               "Cannot find kart '%s', will revert to default.",
                               UserConfigParams::m_default_kart.c_str());
                     UserConfigParams::m_default_kart.revertToDefaults();
@@ -768,7 +761,7 @@ void World::updateWorld(float dt)
                     ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
                 StateManager::get()->enterGameState();
-                network_manager->setupPlayerKartInfo();
+                race_manager->setupPlayerKartInfo();
                 race_manager->startNew(true);
             }
             else
@@ -821,11 +814,8 @@ void World::update(float dt)
     if(ReplayPlay::get()) ReplayPlay::get()->update(dt);
     if(history->replayHistory()) dt=history->getNextDelta();
     WorldStatus::update(dt);
-    // Clear race state so that new information can be stored
-    race_state->clear();
 
-    if(network_manager->getMode()!=NetworkManager::NW_CLIENT &&
-        !history->dontDoPhysics())
+    if (!history->dontDoPhysics())
     {
         m_physics->update(dt);
     }
@@ -988,7 +978,8 @@ AbstractKart *World::getPlayerKart(unsigned int n) const
     unsigned int count=-1;
 
     for(unsigned int i=0; i<m_karts.size(); i++)
-        if(m_karts[i]->getController()->isPlayerController())
+        if(m_karts[i]->getController()->isPlayerController() ||
+            m_karts[i]->getController()->isNetworkController())
         {
             count++;
             if(count==n) return m_karts[i];

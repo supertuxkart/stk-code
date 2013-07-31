@@ -68,7 +68,7 @@ namespace Online {
         static ServersManager*                          get();
         static void                                     deallocate();
 
-        const RefreshRequest *                          refreshRequest() const;
+        RefreshRequest *                                refreshRequest(bool request_now = true) const;
         void                                            setJoinedServer(uint32_t server_id);
         void                                            unsetJoinedServer();
         void                                            addServer(Server * server);

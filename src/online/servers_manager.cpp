@@ -69,7 +69,7 @@ namespace Online{
     }
 
     // ============================================================================
-    const ServersManager::RefreshRequest * ServersManager::refreshRequest() const
+    ServersManager::RefreshRequest * ServersManager::refreshRequest(bool request_now) const
     {
         RefreshRequest * request = NULL;
         if(Time::getRealTime() - m_last_load_time.getAtomic() > SERVER_REFRESH_INTERVAL)
@@ -77,7 +77,8 @@ namespace Online{
             request = new RefreshRequest();
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
             request->setParameter("action",std::string("get_server_list"));
-            HTTPManager::get()->addRequest(request);
+            if (request_now)
+                HTTPManager::get()->addRequest(request);
         }
         return request;
     }
@@ -105,9 +106,9 @@ namespace Online{
     // ============================================================================
     const Server * ServersManager::getQuickPlay() const
     {
-        /*if(m_sorted_servers.size() > 0)
+        if(m_sorted_servers.getData().size() > 0)
             return getServerBySort(0);
-			*/
+
         return NULL;
     }
 

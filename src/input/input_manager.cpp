@@ -164,12 +164,12 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
-                
+
                 if (control_is_pressed)
                     kart->setPowerup(PowerupManager::POWERUP_SWATTER, 10000);
                 else
                     kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL, 10000);
-                    
+
 #ifdef FORCE_RESCUE_ON_FIRST_KART
                 // Can be useful for debugging places where the AI gets into
                 // a rescue loop: rescue, drive, crash, rescue to same place
@@ -181,7 +181,7 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
-                
+
                 kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
             }
             break;
@@ -557,7 +557,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                                      action == PA_MENU_CANCEL ) )
             {
                 // returns true if the event was handled
-                if (KartSelectionScreen::getInstance()->playerQuit( player ))
+                if (KartSelectionScreen::getRunningInstance()->playerQuit( player ))
                 {
                     return; // we're done here
                 }
@@ -592,7 +592,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
                     if (device != NULL)
                     {
-                        KartSelectionScreen::getInstance()->playerJoin(device,
+                        KartSelectionScreen::getRunningInstance()->playerJoin(device,
                                                                        false );
                     }
                 }

@@ -65,7 +65,7 @@ namespace Online{
         Server() {};
 
     public:
-    
+
          /** Initialises the object from an XML node. */
          Server(const XMLNode & xml);
         // ------------------------------------------------------------------------
@@ -81,6 +81,7 @@ namespace Online{
         // ------------------------------------------------------------------------
         /** Returns the ID of this server. */
         const uint32_t getServerId() const { return m_server_id; }
+        const uint32_t getHostId() const { return m_host_id; }
         const int getMaxPlayers() const { return m_max_players; }
         const int getCurrentPlayers() const { return m_current_players; }
         // ------------------------------------------------------------------------
