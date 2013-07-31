@@ -106,9 +106,9 @@ namespace Online{
     // ============================================================================
     const Server * ServersManager::getQuickPlay() const
     {
-        /*if(m_sorted_servers.size() > 0)
+        if(m_sorted_servers.getData().size() > 0)
             return getServerBySort(0);
-			*/
+
         return NULL;
     }
 

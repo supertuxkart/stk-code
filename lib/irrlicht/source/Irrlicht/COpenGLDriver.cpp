@@ -987,7 +987,7 @@ void COpenGLDriver::setTransform(E_TRANSFORMATION_STATE state, const core::matri
 			else
 			{
 				GLfloat glmat[16];
-				if (isRTT)
+				if (isRTT && CurrentTarget == ERT_FRAME_BUFFER)
 					getGLTextureMatrix(glmat, mat * TextureFlipMatrix);
 				else
 					getGLTextureMatrix(glmat, mat);

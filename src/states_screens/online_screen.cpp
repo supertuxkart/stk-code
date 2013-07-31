@@ -227,8 +227,16 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
         //FIXME temporary and the request join + join sequence should be placed in one method somewhere
         // refresh server list
         Online::ServersManager::RefreshRequest* request = ServersManager::get()->refreshRequest(false);
-        Online::HTTPManager::get()->synchronousRequest(request);
-        delete request;
+        if (request != NULL) // consider request done
+        {
+            Online::HTTPManager::get()->synchronousRequest(request);
+            delete request;
+        }
+        else
+        {
+            Log::error("OnlineScreen", "Could not get the server list.");
+            return;
+        }
         // select first one
         const Server * server = ServersManager::get()->getQuickPlay();
 
