@@ -130,9 +130,13 @@ namespace Online{
                                                             const irr::core::stringw &email);
 
             /** Returns the username if signed in. */
-            const irr::core::stringw        getUserName()   const;
-            const UserState                 getUserState()  const { return m_state.getAtomic(); }
-            const std::string               getToken()      const { return m_token.getAtomic(); }
+            const irr::core::stringw        getUserName()           const;
+            const UserState                 getUserState()          const { return m_state.getAtomic(); }
+            bool                            isRegisteredUser()      const {
+                                                                            MutexLocker(m_state);
+                                                                            return m_state.getData() == US_SIGNED_IN;
+                                                                          }
+            const std::string               getToken()              const { return m_token.getAtomic(); }
 
     };   // class CurrentUser
 

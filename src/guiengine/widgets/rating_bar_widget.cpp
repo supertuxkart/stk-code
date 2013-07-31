@@ -57,7 +57,7 @@ void RatingBarWidget::add()
 int RatingBarWidget::getStepOfStar(int index, int max_step)
 {
     assert(index >= 0 && index < m_star_number); // Index must be between 0 and m_star_number - 1.
-    assert(max_step >= 2); // The maximun number of step must be superior or equals to 2.
+    assert(max_step >= 2); // The maximun number of step must be larger or equal to 2.
 
     if (m_rating < index)
     {
@@ -82,4 +82,11 @@ int RatingBarWidget::getStepOfStar(int index, int max_step)
     return 0;
     // TODO: Assert or throws a exception, what type?
 } // getStepOfStar
+
+
+EventPropagation RatingBarWidget::mouseHovered(Widget* child, const int playerID) {
+    Log::info("RatingBarWidget::mouseHovered","");
+    //m_rating++;
+    return EVENT_BLOCK;
+}
 

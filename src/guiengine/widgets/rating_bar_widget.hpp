@@ -38,6 +38,10 @@ namespace GUIEngine
         float m_rating;
         int m_star_number;
         
+    protected:
+
+        virtual EventPropagation mouseHovered(Widget* child, const int playerID);
+
     public:
         
         LEAK_CHECK()
@@ -45,6 +49,8 @@ namespace GUIEngine
         RatingBarWidget();
         virtual ~RatingBarWidget() {}
         
+
+
         void add();
         
         /** Change the rating value of the widget. */
@@ -53,10 +59,10 @@ namespace GUIEngine
         /** Get the current value of the widget. */
         float getRating() {return m_rating; };
         
-        /** Change the number of star of the widget. */
+        /** Change the number of stars of the widget. */
         void setStarNumber(int star_number) { m_star_number = star_number; };
         
-        /** Get the current number of star of the widget. */
+        /** Get the current number of stars of the widget. */
         int getStarNumber() {return m_star_number; };
         
         int getStepOfStar(int index, int max_step);

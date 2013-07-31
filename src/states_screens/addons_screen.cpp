@@ -426,7 +426,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
         if (!id.empty() && addons_manager->getAddon(id) != NULL)
         {
             m_selected_index = list->getSelectionID();
-            new AddonsLoading(0.8f, 0.8f, id);
+            new AddonsLoading(id);
         }
     }
     if (name == "category")

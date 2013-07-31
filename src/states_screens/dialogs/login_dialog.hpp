@@ -33,11 +33,21 @@
 class LoginDialog : public GUIEngine::ModalDialog
 {
 
+public:
+    class Listener
+    {
+    public :
+        virtual void onSuccess() const = 0;
+    };
+
 private:
     
+    const Listener * m_listener;
+
     bool m_self_destroy;
     bool m_open_registration_dialog;
     bool m_open_recovery_dialog;
+    bool m_success;
     const Online::CurrentUser::SignInRequest * m_sign_in_request;
     GUIEngine::LabelWidget * m_message_widget;
     GUIEngine::TextBoxWidget * m_username_widget;
@@ -66,7 +76,7 @@ public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    LoginDialog(const Message);
+    LoginDialog(const Message, const LoginDialog::Listener * = NULL);
     ~LoginDialog();
 
     void onEnterPressedInternal();

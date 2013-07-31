@@ -55,16 +55,15 @@ private:
      *  to the progress of a download. */
     Request *m_download_request;
 
+    bool m_vote_clicked;
+
 public:
-            AddonsLoading(const float percent_width, 
-                          const float percent_height,
-                          const std::string &addon_name);
-    
-           ~AddonsLoading();
+    AddonsLoading(const std::string &addon_name);
+
+   ~AddonsLoading();
+
     virtual GUIEngine::EventPropagation processEvent(const std::string& event_source);
-    
     virtual void beforeAddingWidgets();
-    
     virtual void init();
     
     /** This function is called by the GUI, all the frame (or somthing like
@@ -72,6 +71,7 @@ public:
      *  and do the necessary.
      * */
     void onUpdate(float delta);
+    void voteClicked();
     
 };   // AddonsLoading
 

@@ -1,0 +1,25 @@
+<stkgui>
+
+    <div x="2%" y="5%" width="96%" height="90%" layout="vertical-row" >
+    
+        <header id="title" width="96%" height="fit" text_align="center" word_wrap="true"
+       I18N="In the vote dialog' dialog" text="Vote"/>
+    
+        <spacer proportion="1" width="50">
+        
+        <div width="80%" height="fit" layout="vertical-row" >
+            <ratingbar id="rating" height="64" width="100%"/> 
+        </div>
+        
+        <spacer proportion="1" width="50">
+        
+        <buttonbar id="options" width="25%" height="15%" align="center">
+    		<icon-button id="submit" width="64" height="64" icon="gui/green_check.png"
+            	I18N="Vote dialog" text="Submit" label_location="none"/>
+            <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
+            	I18N="Vote dialog" text="Cancel" label_location="none"/>
+        </buttonbar>
+        
+    </div>
+
+</stkgui>
