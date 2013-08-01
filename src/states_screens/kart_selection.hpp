@@ -99,7 +99,7 @@ protected:
     /** Fill the ribbon with the karts from the currently selected group */
     void setKartsFromCurrentGroup();
 
-    void playerConfirm(const int playerID);
+    virtual void playerConfirm(const int playerID);
 
     /** Stores a pointer to the current selection screen */
     static KartSelectionScreen* m_instance_ptr;

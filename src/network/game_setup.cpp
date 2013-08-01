@@ -79,6 +79,10 @@ bool GameSetup::removePlayer(uint8_t id)
                         "Remains %u.", m_players.size());
             return true;
         }
+        if (m_players[i]->race_id > id)
+        {
+            m_players[i]->race_id--; // all indices in [0;n[ (n = #players)
+        }
     }
     return false;
 }

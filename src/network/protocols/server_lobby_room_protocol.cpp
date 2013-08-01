@@ -243,8 +243,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     if (m_setup->getPlayerCount() < 16) // accept player
     {
         // add the player to the game setup
-        while(m_setup->getProfile(m_next_id)!=NULL)
-            m_next_id++;
+        m_next_id = m_setup->getPlayerCount();
         // notify everybody that there is a new player
         NetworkString message;
         // new player (1) -- size of id -- id -- size of local id -- local id;
@@ -267,7 +266,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         std::vector<NetworkPlayerProfile*> players = m_setup->getPlayers();
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            // do not make a duplicate of the player
+            // do not duplicate the player into the message
             if (players[i]->race_id != m_next_id && players[i]->user_profile->getUserID() != player_id)
                 message_ack.ai8(1).ai8(players[i]->race_id).ai8(4).ai32(players[i]->user_profile->getUserID());
         }
