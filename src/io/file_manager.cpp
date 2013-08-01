@@ -45,7 +45,6 @@
 #endif
 
 #ifdef WIN32
-#  include <io.h>
 #  include <stdio.h>
 #  ifndef __CYGWIN__
 #    define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
