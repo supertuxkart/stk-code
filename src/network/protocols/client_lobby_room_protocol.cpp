@@ -70,6 +70,21 @@ void ClientLobbyRoomProtocol::leave()
 
 bool ClientLobbyRoomProtocol::notifyEvent(Event* event)
 {
+    assert(m_setup); // assert that the setup exists
+    if (event->type == EVENT_TYPE_MESSAGE)
+    {
+        NetworkString data = event->data();
+        assert(data.size()); // assert that data isn't empty
+        uint8_t message_type = data[0];
+        if (message_type != 0x03) // kart selection update only here (for now)
+            return false;
+
+        event->removeFront(1);
+        if (message_type == 0x03) // kart selection update
+            kartSelectionUpdate(event);
+
+        return true;
+    }
     return false;
 }
 
@@ -83,14 +98,14 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         NetworkString data = event->data();
         assert(data.size()); // assert that data isn't empty
         uint8_t message_type = data[0];
+        if (message_type == 0x03) // kart selection update is synchronous (updates gui)
+            return false;
         event->removeFront(1);
         Log::info("ClientLobbyRoomProtocol", "Message of type %d", message_type);
         if (message_type == 0x01) // new player connected
             newPlayer(event);
         else if (message_type == 0x02) // player disconnected
             disconnectedPlayer(event);
-        else if (message_type == 0x03) // kart selection update
-            kartSelectionUpdate(event);
         else if (message_type == 0x04) // start race
             startGame(event);
         else if (message_type == 0x05) // start selection phase
@@ -101,10 +116,11 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
             connectionAccepted(event);
         else if (message_type == 0x82) // kart selection refused
             kartSelectionRefused(event);
-
+        return true;
     } // message
     else if (event->type == EVENT_TYPE_CONNECTED)
     {
+        return true;
     } // connection
     else if (event->type == EVENT_TYPE_DISCONNECTED) // means we left essentially
     {
@@ -114,8 +130,9 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         m_listener->requestTerminate(this);
         NetworkManager::getInstance()->reset();
         NetworkManager::getInstance()->removePeer(*event->peer); // prolly the same as m_server
+        return true;
     } // disconnection
-    return true;
+    return false;
 }
 
 //-----------------------------------------------------------------------------
