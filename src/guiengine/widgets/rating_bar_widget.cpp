@@ -67,20 +67,19 @@ int RatingBarWidget::getStepsOfStar(int index)
 
 void RatingBarWidget::setStepValues(float float_rating)
 {
-    int rating = round(float_rating);
     float step_size = 1 / (float)(m_steps - 1);
 
     for (int star = 0; star < m_stars; star++)
     {
-        if (rating < star)
+        if (float_rating < star)
             m_star_values[star] = 0;
-        else if (rating > star + 1)
+        else if (float_rating > star + 1)
             m_star_values[star] = m_steps-1;
         else
         {
             for (int step = 0; step < m_steps; step++)
             {
-                if (rating > star + step_size * (step - 0.5) && rating < star + step_size * (step + 0.5))
+                if (float_rating > star + step_size * (step - 0.5) && float_rating < star + step_size * (step + 0.5))
                 {
                     m_star_values[star] = step;
                     break;
