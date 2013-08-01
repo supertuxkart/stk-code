@@ -27,8 +27,8 @@ class GetPublicAddress : public Protocol
         GetPublicAddress(CallbackObject* callback_object);
         virtual ~GetPublicAddress();
 
-        virtual void notifyEvent(Event* event);
-
+        virtual bool notifyEvent(Event* event) { return true; }
+        virtual bool notifyEventAsynchronous(Event* event) { return true; }
         virtual void setup();
         virtual void update() {}
         virtual void asynchronousUpdate();

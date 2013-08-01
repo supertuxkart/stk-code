@@ -60,7 +60,7 @@ ConnectToServer::~ConnectToServer()
 
 // ----------------------------------------------------------------------------
 
-void ConnectToServer::notifyEvent(Event* event)
+bool ConnectToServer::notifyEventAsynchronous(Event* event)
 {
     if (event->type == EVENT_TYPE_CONNECTED)
     {
@@ -68,6 +68,7 @@ void ConnectToServer::notifyEvent(Event* event)
                 "received an event notifying that he's connected to the peer.");
         m_state = CONNECTED; // we received a message, we are connected
     }
+    return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -184,6 +185,7 @@ void ConnectToServer::asynchronousUpdate()
             break;
         case DONE:
             m_listener->requestTerminate(this);
+            m_state = EXITING;
             break;
     }
 }

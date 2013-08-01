@@ -65,11 +65,13 @@ class Event
          */
         void removeFront(int size);
 
+        NetworkString data() const { return m_data; }
+
         EVENT_TYPE type;    //!< Type of the event.
-        NetworkString data; //!< Copy of the data passed by the event.
         STKPeer** peer;     //!< Pointer to the peer that triggered that event.
 
     private:
+        NetworkString m_data; //!< Copy of the data passed by the event.
         ENetPacket* m_packet; //!< A pointer on the ENetPacket to be deleted.
 };
 

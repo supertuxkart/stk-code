@@ -33,10 +33,6 @@ QuickJoinProtocol::~QuickJoinProtocol()
 {
 }
 
-void QuickJoinProtocol::notifyEvent(Event* event)
-{
-}
-
 void QuickJoinProtocol::setup()
 {
     m_state = NONE;

@@ -68,14 +68,22 @@ void ClientLobbyRoomProtocol::leave()
 
 //-----------------------------------------------------------------------------
 
-void ClientLobbyRoomProtocol::notifyEvent(Event* event)
+bool ClientLobbyRoomProtocol::notifyEvent(Event* event)
+{
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+
+bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
 {
     assert(m_setup); // assert that the setup exists
     if (event->type == EVENT_TYPE_MESSAGE)
     {
-        assert(event->data.size()); // assert that data isn't empty
-        uint8_t message_type = event->data.getAndRemoveUInt8();
-
+        NetworkString data = event->data();
+        assert(data.size()); // assert that data isn't empty
+        uint8_t message_type = data[0];
+        event->removeFront(1);
         Log::info("ClientLobbyRoomProtocol", "Message of type %d", message_type);
         if (message_type == 0x01) // new player connected
             newPlayer(event);
@@ -107,6 +115,7 @@ void ClientLobbyRoomProtocol::notifyEvent(Event* event)
         NetworkManager::getInstance()->reset();
         NetworkManager::getInstance()->removePeer(*event->peer); // prolly the same as m_server
     } // disconnection
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -185,14 +194,15 @@ void ClientLobbyRoomProtocol::update()
  */
 void ClientLobbyRoomProtocol::newPlayer(Event* event)
 {
-    if (event->data.size() != 7 || event->data[0] != 4 || event->data[5] != 1) // 7 bytes remains now
+    NetworkString data = event->data();
+    if (data.size() != 7 || data[0] != 4 || data[5] != 1) // 7 bytes remains now
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a new player wasn't formated as expected.");
         return;
     }
 
-    uint32_t global_id = event->data.gui32(1);
-    uint8_t race_id = event->data.gui8(6);
+    uint32_t global_id = data.gui32(1);
+    uint8_t race_id = data.gui8(6);
 
     if (global_id == Online::CurrentUser::get()->getUserID())
     {
@@ -227,12 +237,13 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
  */
 void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
 {
-    if (event->data.size() != 2 || event->data[0] != 1)
+    NetworkString data = event->data();
+    if (data.size() != 2 || data[0] != 1)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a new player wasn't formated as expected.");
         return;
     }
-    uint8_t id = event->data[1];
+    uint8_t id = data[1];
     if (m_setup->removePlayer(id))
     {
         Log::info("ClientLobbyRoomProtocol", "Peer removed successfully.");
@@ -257,14 +268,15 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
  */
 void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 {
-    if (event->data.size() < 12 || event->data[0] != 1 || event->data[2] != 4 || event->data[7] != 4) // 12 bytes remains now
+    NetworkString data = event->data();
+    if (data.size() < 12 || data[0] != 1 || data[2] != 4 || data[7] != 4) // 12 bytes remains now
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying an accepted connection wasn't formated as expected.");
         return;
     }
     STKPeer* peer = *(event->peer);
 
-    uint32_t global_id = event->data.gui32(8);
+    uint32_t global_id = data.gui32(8);
     if (global_id == Online::CurrentUser::get()->getUserID())
     {
         Log::info("ClientLobbyRoomProtocol", "The server accepted the connection.");
@@ -272,15 +284,15 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         // self profile
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
         profile->kart_name = "";
-        profile->race_id = event->data.gui8(1);
+        profile->race_id = data.gui8(1);
         profile->user_profile = Online::CurrentUser::get();
         m_setup->addPlayer(profile);
         // connection token
-        uint32_t token = event->data.gui32(3);
+        uint32_t token = data.gui32(3);
         peer->setClientServerToken(token);
         // add all players
-        event->data.removeFront(12); // remove the 12 first bytes
-        int remaining = event->data.size();
+        data.removeFront(12); // remove the 12 first bytes
+        int remaining = data.size();
         if (remaining%7 != 0)
         {
             Log::error("ClientLobbyRoomProtocol", "ConnectionAccepted : Error in the server list");
@@ -288,17 +300,17 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         remaining /= 7;
         for (int i = 0; i < remaining; i++)
         {
-            if (event->data[0] != 1 || event->data[2] != 4)
+            if (data[0] != 1 || data[2] != 4)
                 Log::error("ClientLobbyRoomProtocol", "Bad format in players list.");
-            uint8_t race_id = event->data[1];
-            uint32_t global_id = event->data.gui32(3);
+            uint8_t race_id = data[1];
+            uint32_t global_id = data.gui32(3);
             Online::User* new_user = new Online::User(global_id);
             NetworkPlayerProfile* profile2 = new NetworkPlayerProfile();
             profile2->race_id = race_id;
             profile2->user_profile = new_user;
             profile2->kart_name = "";
             m_setup->addPlayer(profile2);
-            event->data.removeFront(7);
+            data.removeFront(7);
         }
 
         // add self
@@ -323,13 +335,14 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
  */
 void ClientLobbyRoomProtocol::connectionRefused(Event* event)
 {
-    if (event->data.size() != 2 || event->data[0] != 1) // 2 bytes remains now
+    NetworkString data = event->data();
+    if (data.size() != 2 || data[0] != 1) // 2 bytes remains now
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a refused connection wasn't formated as expected.");
         return;
     }
 
-    switch (event->data[1]) // the second byte
+    switch (data[1]) // the second byte
     {
     case 0:
         Log::info("ClientLobbyRoomProtocol", "Connection refused : too many players.");
@@ -357,13 +370,14 @@ void ClientLobbyRoomProtocol::connectionRefused(Event* event)
  */
 void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
 {
-    if (event->data.size() != 2 || event->data[0] != 1)
+    NetworkString data = event->data();
+    if (data.size() != 2 || data[0] != 1)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a refused kart selection wasn't formated as expected.");
         return;
     }
 
-    switch (event->data[1]) // the error code
+    switch (data[1]) // the error code
     {
     case 0:
         Log::info("ClientLobbyRoomProtocol", "Kart selection refused : already taken.");
@@ -391,24 +405,26 @@ void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
  */
 void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
 {
-    if (event->data.size() < 3 || event->data[0] != 1)
+    NetworkString data = event->data();
+    if (data.size() < 3 || data[0] != 1)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a kart selection update wasn't formated as expected.");
         return;
     }
-    uint8_t player_id = event->data[1];
-    uint8_t kart_name_length = event->data[2];
-    std::string data = event->data.getString(3, kart_name_length);
-    if (data.size() != kart_name_length)
+    uint8_t player_id = data[1];
+    uint8_t kart_name_length = data[2];
+    std::string kart_name = data.getString(3, kart_name_length);
+    if (kart_name.size() != kart_name_length)
     {
-        Log::error("ClientLobbyRoomProtocol", "Kart names sizes differ: told: %d, real: %d.", kart_name_length, data.size());
+        Log::error("ClientLobbyRoomProtocol", "Kart names sizes differ: told: %d, real: %d.", kart_name_length, kart_name.size());
         return;
     }
-    if (!m_setup->isKartAvailable(data))
+    if (!m_setup->isKartAvailable(kart_name))
     {
         Log::error("ClientLobbyRoomProtocol", "The updated kart is taken already.");
     }
-    m_setup->setPlayerKart(player_id, data);
+    m_setup->setPlayerKart(player_id, kart_name);
+    NetworkKartSelectionScreen::getInstance()->playerSelected(player_id, kart_name);
 }
 
 //-----------------------------------------------------------------------------
@@ -425,13 +441,14 @@ void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
  */
 void ClientLobbyRoomProtocol::startGame(Event* event)
 {
-    if (event->data.size() < 5 || event->data[0] != 4)
+    NetworkString data = event->data();
+    if (data.size() < 5 || data[0] != 4)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a kart "
                     "selection update wasn't formated as expected.");
         return;
     }
-    uint8_t token = event->data.gui32(1);
+    uint8_t token = data.gui32(1);
     if (token == NetworkManager::getInstance()->getPeers()[0]->getClientServerToken())
     {
         m_state = PLAYING;
@@ -457,13 +474,14 @@ void ClientLobbyRoomProtocol::startGame(Event* event)
  */
 void ClientLobbyRoomProtocol::startSelection(Event* event)
 {
-    if (event->data.size() < 5 || event->data[0] != 4)
+    NetworkString data = event->data();
+    if (data.size() < 5 || data[0] != 4)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a kart "
                     "selection update wasn't formated as expected.");
         return;
     }
-    uint8_t token = event->data.gui32(1);
+    uint8_t token = data.gui32(1);
     if (token == NetworkManager::getInstance()->getPeers()[0]->getClientServerToken())
     {
         m_state = KART_SELECTION;

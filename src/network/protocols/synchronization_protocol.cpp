@@ -30,19 +30,20 @@ SynchronizationProtocol::~SynchronizationProtocol()
 
 //-----------------------------------------------------------------------------
 
-void SynchronizationProtocol::notifyEvent(Event* event)
+bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 {
     if (event->type != EVENT_TYPE_MESSAGE)
-        return;
-    if (event->data.size() < 10)
+        return true;
+    NetworkString data = event->data();
+    if (data.size() < 10)
     {
         Log::warn("SynchronizationProtocol", "Received a message too short.");
-        return;
+        return true;
     }
-    uint8_t talk_id = event->data.gui8();
-    uint32_t token = event->data.gui32(1);
-    uint32_t request = event->data.gui8(5);
-    uint32_t sequence = event->data.gui32(6);
+    uint8_t talk_id = data.gui8();
+    uint32_t token = data.gui32(1);
+    uint32_t request = data.gui8(5);
+    uint32_t sequence = data.gui32(6);
 
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
 
@@ -51,7 +52,7 @@ void SynchronizationProtocol::notifyEvent(Event* event)
         if (talk_id > peers.size())
         {
             Log::warn("SynchronizationProtocol", "The ID isn't known.");
-            return;
+            return true;
         }
     }
 
@@ -66,18 +67,18 @@ void SynchronizationProtocol::notifyEvent(Event* event)
     if (peers[peer_id]->getClientServerToken() != token)
     {
         Log::warn("SynchronizationProtocol", "Bad token from peer %d", talk_id);
-        return;
+        return true;
     }
 
     if (request)
     {
         NetworkString response;
-        response.ai8(event->data.gui8(talk_id)).ai32(token).ai8(0).ai32(sequence);
+        response.ai8(data.gui8(talk_id)).ai32(token).ai8(0).ai32(sequence);
         m_listener->sendMessage(this, peers[peer_id], response, false);
         Log::verbose("SynchronizationProtocol", "Answering sequence %u", sequence);
-        if (event->data.size() == 14 && !m_listener->isServer()) // countdown time in the message
+        if (data.size() == 14 && !m_listener->isServer()) // countdown time in the message
         {
-            uint32_t time_to_start = event->data.gui32(10);
+            uint32_t time_to_start = data.gui32(10);
             Log::debug("SynchronizationProtocol", "Request to start game in %d.", time_to_start);
             if (!m_countdown_activated)
                 startCountdown(time_to_start);
@@ -92,7 +93,7 @@ void SynchronizationProtocol::notifyEvent(Event* event)
         if (sequence >= m_pings[peer_id].size())
         {
             Log::warn("SynchronizationProtocol", "The sequence# %u isn't known.", sequence);
-            return;
+            return true;
         }
         double current_time = Time::getRealTime();
         m_total_diff[peer_id] += current_time - m_pings[peer_id][sequence];
@@ -103,6 +104,7 @@ void SynchronizationProtocol::notifyEvent(Event* event)
 
         Log::debug("SynchronizationProtocol", "Ping is %u", m_average_ping[peer_id]);
     }
+    return true;
 }
 
 //-----------------------------------------------------------------------------

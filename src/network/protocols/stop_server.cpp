@@ -31,8 +31,9 @@ StopServer::~StopServer()
 {
 }
 
-void StopServer::notifyEvent(Event* event)
+bool StopServer::notifyEventAsynchronous(Event* event)
 {
+    return true;
 }
 
 void StopServer::setup()

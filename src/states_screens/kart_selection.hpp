@@ -34,6 +34,10 @@ namespace GUIEngine
     class BubbleWidget;
     enum EventPropagation;
 }
+namespace Online
+{
+    class User;
+}
 class InputDevice;
 class PlayerKartWidget;
 class KartHoverListener;
@@ -234,8 +238,9 @@ class PlayerKartWidget : public GUIEngine::Widget,
     float x_speed, y_speed, w_speed, h_speed;
 
     /** Object representing this player */
-    StateManager::ActivePlayer* m_associatedPlayer;
+    StateManager::ActivePlayer* m_associatedPlayer; // local info
     int m_playerID;
+    Online::User* m_associated_user; // network info
 
     /** Internal name of the spinner; useful to interpret spinner events,
      *  which contain the name of the activated object */
@@ -267,6 +272,7 @@ public:
 
     PlayerKartWidget(KartSelectionScreen* parent,
                      StateManager::ActivePlayer* associatedPlayer,
+                     Online::User* associatedUser,
                      core::recti area, const int playerID,
                      std::string kartGroup,
                      const int irrlichtWidgetID=-1);

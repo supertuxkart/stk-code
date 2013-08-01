@@ -30,7 +30,7 @@ class ConnectToServer : public Protocol, public CallbackObject
         ConnectToServer(uint32_t server_id, uint32_t host_id); //!< Specify server id
         virtual ~ConnectToServer();
 
-        virtual void notifyEvent(Event* event);
+        virtual bool notifyEventAsynchronous(Event* event);
         virtual void setup();
         virtual void update() {}
         virtual void asynchronousUpdate();
@@ -53,7 +53,8 @@ class ConnectToServer : public Protocol, public CallbackObject
             CONNECTING,
             CONNECTED,
             HIDING_ADDRESS,
-            DONE
+            DONE,
+            EXITING
         };
         STATE m_state;
 };

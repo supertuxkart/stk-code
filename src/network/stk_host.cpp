@@ -161,7 +161,7 @@ uint8_t* STKHost::receiveRawPacket()
     {
         i++;
         len = recv(m_host->socket,(char*)buffer,2048, 0);
-        irr_driver->getDevice()->sleep(1);
+        usleep(1000);
     }
     return buffer;
 }
@@ -190,7 +190,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender)
     {
         i++;
         len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
-        irr_driver->getDevice()->sleep(1); // wait 1 millisecond between two checks
+        usleep(1000); // wait 1 millisecond between two checks
     }
     if (addr.sa_family == AF_INET)
     {

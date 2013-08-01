@@ -10,7 +10,8 @@ class QuickJoinProtocol : public Protocol
         QuickJoinProtocol(CallbackObject* callback_object, uint32_t* server_id);
         virtual ~QuickJoinProtocol();
 
-        virtual void notifyEvent(Event* event);
+        virtual bool notifyEvent(Event* event) { return true; }
+        virtual bool notifyEventAsynchronous(Event* event) { return true; }
         virtual void setup();
         virtual void update() {}
         virtual void asynchronousUpdate();

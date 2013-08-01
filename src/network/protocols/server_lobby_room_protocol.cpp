@@ -57,14 +57,15 @@ void ServerLobbyRoomProtocol::setup()
 
 //-----------------------------------------------------------------------------
 
-void ServerLobbyRoomProtocol::notifyEvent(Event* event)
+bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
 {
     assert(m_setup); // assert that the setup exists
     if (event->type == EVENT_TYPE_MESSAGE)
     {
-        assert(event->data.size()); // message not empty
+        NetworkString data = event->data();
+        assert(data.size()); // message not empty
         uint8_t message_type;
-        message_type = event->data.getAndRemoveUInt8();
+        message_type = data.getAndRemoveUInt8();
         Log::info("ServerLobbyRoomProtocol", "Message received with type %d.", message_type);
         if (message_type == 0x01) // player requesting connection
             connectionRequested(event);
@@ -78,6 +79,7 @@ void ServerLobbyRoomProtocol::notifyEvent(Event* event)
     {
         kartDisconnected(event);
     } // if (event->type == EVENT_TYPE_DISCONNECTED)
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -232,13 +234,14 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
 void ServerLobbyRoomProtocol::connectionRequested(Event* event)
 {
     STKPeer* peer = *(event->peer);
-    if (event->data.size() != 5 || event->data[0] != 4)
+    NetworkString data = event->data();
+    if (data.size() != 5 || data[0] != 4)
     {
-        Log::warn("ServerLobbyRoomProtocol", "The server is sending a badly formated message. Size is %d and first byte %d", event->data.size(), event->data[0]);
+        Log::warn("ServerLobbyRoomProtocol", "The server is sending a badly formated message. Size is %d and first byte %d", data.size(), data[0]);
         return;
     }
     uint32_t player_id = 0;
-    player_id = event->data.getUInt32(1);
+    player_id = data.getUInt32(1);
     // can we add the player ?
     if (m_setup->getPlayerCount() < 16) // accept player
     {
@@ -308,23 +311,24 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
  */
 void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
 {
-    if (event->data.size() < 6 || event->data[0] != 4)
+    NetworkString data = event->data();
+    if (data.size() < 6 || data[0] != 4)
     {
         Log::warn("ServerLobbyRoomProtocol", "The server is sending a badly "
                             "formated message. Size is %d and first byte %d",
-                            event->data.size(), event->data[0]);
+                            data.size(), data[0]);
         return;
     }
     STKPeer* peer = *(event->peer);
-    uint32_t token = event->data.gui32(1);
+    uint32_t token = data.gui32(1);
     if (token != peer->getClientServerToken())
     {
         Log::warn("ServerLobbyRoomProtocol", "Peer sending bad token. Request "
                             "aborted.");
         return;
     }
-    uint8_t kart_name_size = event->data.gui8(5);
-    std::string kart_name = event->data.gs(6, kart_name_size);
+    uint8_t kart_name_size = data.gui8(5);
+    std::string kart_name = data.gs(6, kart_name_size);
     if (kart_name.size() != kart_name_size)
     {
         Log::error("ServerLobbyRoomProtocol", "Kart names sizes differ: told:"

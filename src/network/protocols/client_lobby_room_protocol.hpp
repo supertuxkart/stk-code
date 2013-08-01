@@ -13,7 +13,8 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
         void sendMessage(std::string message);
         void leave();
 
-        virtual void notifyEvent(Event* event);
+        virtual bool notifyEvent(Event* event);
+        virtual bool notifyEventAsynchronous(Event* event);
         virtual void setup();
         virtual void update();
         virtual void asynchronousUpdate() {}

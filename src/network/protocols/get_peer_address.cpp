@@ -34,11 +34,6 @@ GetPeerAddress::~GetPeerAddress()
 {
 }
 
-void GetPeerAddress::notifyEvent(Event* event)
-{
-    // nothing there. If we receive events, they must be ignored
-}
-
 void GetPeerAddress::setup()
 {
     m_state = NONE;

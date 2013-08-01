@@ -32,20 +32,21 @@ StartGameProtocol::~StartGameProtocol()
 {
 }
 
-void StartGameProtocol::notifyEvent(Event* event)
+bool StartGameProtocol::notifyEventAsynchronous(Event* event)
 {
-    if (event->data.size() < 5)
+    NetworkString data = event->data();
+    if (data.size() < 5)
     {
         Log::error("StartGameProtocol", "Too short message.");
-        return;
+        return true;
     }
-    uint32_t token = event->data.gui32();
-    uint8_t ready = event->data.gui8(4);
+    uint32_t token = data.gui32();
+    uint8_t ready = data.gui8(4);
     STKPeer* peer = (*(event->peer));
     if (peer->getClientServerToken() != token)
     {
         Log::error("StartGameProtocol", "Bad token received.");
-        return;
+        return true;
     }
     if (m_listener->isServer() && ready) // on server, player is ready
     {
@@ -61,17 +62,17 @@ void StartGameProtocol::notifyEvent(Event* event)
                 protocol->startCountdown(5000); // 5 seconds countdown
                 Log::info("StartGameProtocol", "All players ready, starting countdown.");
                 m_ready = true;
-                return;
+                return true;
             }
             else
                 Log::error("StartGameProtocol", "The Synchronization protocol hasn't been started.");
         }
     }
-    else
+    else // on the client, we shouldn't even receive messages.
     {
         Log::error("StartGameProtocol", "Received a message with bad format.");
     }
-    // on the client, we shouldn't even receive messages.
+    return true;
 }
 
 void StartGameProtocol::setup()

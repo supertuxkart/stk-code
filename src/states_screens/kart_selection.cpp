@@ -38,6 +38,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
+#include "online/user.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
@@ -182,17 +183,20 @@ void PlayerNameSpinner::markAsCorrect()
 
 PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
                                    StateManager::ActivePlayer* associatedPlayer,
+                                   Online::User* associatedUser,
                                    core::recti area, const int playerID,
                                    std::string kartGroup,
                                    const int irrlichtWidgetID) : Widget(WTYPE_DIV)
 {
 #ifdef DEBUG
-    assert(associatedPlayer->ok());
+    if (associatedPlayer)
+        assert(associatedPlayer->ok());
     m_magic_number = 0x33445566;
 #endif
     m_ready_text = NULL;
     m_parent_screen = parent;
 
+    m_associated_user = associatedUser;
     m_associatedPlayer = associatedPlayer;
     x_speed = 1.0f;
     y_speed = 1.0f;
@@ -214,13 +218,15 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     target_h = m_h;
 
     // ---- Player identity spinner
+    m_player_ident_spinner = NULL;
+
     m_player_ident_spinner = new PlayerNameSpinner(parent, m_playerID);
     m_player_ident_spinner->m_x = player_name_x;
     m_player_ident_spinner->m_y = player_name_y;
     m_player_ident_spinner->m_w = player_name_w;
     m_player_ident_spinner->m_h = player_name_h;
 
-    if (parent->m_multiplayer)
+    if (parent->m_multiplayer && associatedPlayer)
     {
         if (associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
         {
@@ -230,6 +236,10 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         {
             m_player_ident_spinner->setBadge(GAMEPAD_BADGE);
         }
+    }
+    else if (m_associated_user) // online user, FIXME is that useful ?
+    {
+        m_player_ident_spinner->setBadge(OK_BADGE);
     }
 
     if (irrlichtWidgetID == -1)
@@ -415,18 +425,21 @@ void PlayerKartWidget::add()
 
     assert(KartSelectionScreen::getRunningInstance()
            ->m_kart_widgets.contains(this));
-    bool mineInList = false;
-    for (int p=0; p<StateManager::get()->activePlayerCount(); p++)
+    if (m_associatedPlayer) // if player is local
     {
-#ifdef DEBUG
-        assert(StateManager::get()->getActivePlayer(p)->ok());
-#endif
-        if (StateManager::get()->getActivePlayer(p) == m_associatedPlayer)
+        bool mineInList = false;
+        for (int p=0; p<StateManager::get()->activePlayerCount(); p++)
         {
-            mineInList = true;
+#ifdef DEBUG
+            assert(StateManager::get()->getActivePlayer(p)->ok());
+#endif
+            if (StateManager::get()->getActivePlayer(p) == m_associatedPlayer)
+            {
+                mineInList = true;
+            }
         }
+        assert(mineInList);
     }
-    assert(mineInList);
 
     //m_player_ID_label->add();
 
@@ -447,6 +460,13 @@ void PlayerKartWidget::add()
     m_model_view->update(0);
 
     m_player_ident_spinner->clearLabels();
+
+    irr::core::stringw name; // name of the player
+    if (m_associatedPlayer)
+        name = m_associatedPlayer->getProfile()->getName();
+    if (m_associated_user)
+        name = m_associated_user->getUserName();
+
     if (m_parent_screen->m_multiplayer)
     {
         const int playerAmount = UserConfigParams::m_all_players.size();
@@ -457,17 +477,15 @@ void PlayerKartWidget::add()
         }
 
         // select the right player profile in the spinner
-        m_player_ident_spinner->setValue(m_associatedPlayer->getProfile()
-                                         ->getName()   );
+        m_player_ident_spinner->setValue(name);
     }
     else
     {
-        m_player_ident_spinner->addLabel( m_associatedPlayer->getProfile()->getName() );
+        m_player_ident_spinner->addLabel(name);
         m_player_ident_spinner->setVisible(false);
     }
 
-    assert(m_player_ident_spinner->getStringValue() ==
-           m_associatedPlayer->getProfile()->getName());
+    assert(m_player_ident_spinner->getStringValue() == name);
 }   // add
 
 // ------------------------------------------------------------------------
@@ -1179,7 +1197,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 
     // ---- Create player/kart widget
     PlayerKartWidget* newPlayerWidget =
-        new PlayerKartWidget(this, aplayer, kartsArea, m_kart_widgets.size(),
+        new PlayerKartWidget(this, aplayer, NULL, kartsArea, m_kart_widgets.size(),
                              selected_kart_group);
 
     manualAddWidget(newPlayerWidget);

@@ -42,7 +42,7 @@ void ControllerEventsProtocol::setup()
                 {
                     peer = peers[j];
                 }
-                Log::info("ControllerEventsProtocol", "Compared %s and %s", 
+                Log::info("ControllerEventsProtocol", "Compared %s and %s",
                         peers[j]->getPlayerProfile()->kart_name.c_str(), karts[i]->getIdent().c_str());
             }
         }
@@ -61,20 +61,21 @@ void ControllerEventsProtocol::setup()
 
 //-----------------------------------------------------------------------------
 
-void ControllerEventsProtocol::notifyEvent(Event* event)
+bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
 {
-    if (event->data.size() < 17)
+    NetworkString data = event->data();
+    if (data.size() < 17)
     {
-        Log::error("ControllerEventsProtocol", "The data supplied was not complete. Size was %d.", event->data.size());
-        return;
+        Log::error("ControllerEventsProtocol", "The data supplied was not complete. Size was %d.", data.size());
+        return true;
     }
-    uint32_t token = event->data.gui32();
-    NetworkString pure_message = event->data;
+    uint32_t token = data.gui32();
+    NetworkString pure_message = data;
     pure_message.removeFront(4);
     if (token != (*event->peer)->getClientServerToken())
     {
         Log::error("ControllerEventsProtocol", "Bad token from peer.");
-        return;
+        return true;
     }
     NetworkString ns = pure_message;
     float event_timestamp = ns.getFloat();
@@ -103,12 +104,12 @@ void ControllerEventsProtocol::notifyEvent(Event* event)
     if (ns.size() > 0 && ns.size() != 9)
     {
         Log::warn("ControllerEventProtocol", "The data seems corrupted. Remains %d", ns.size());
-        return;
+        return true;
     }
     if (client_index < 0)
     {
         Log::warn("ControllerEventProtocol", "Couldn't have a client id.");
-        return;
+        return true;
     }
     if (m_listener->isServer())
     {
@@ -124,6 +125,7 @@ void ControllerEventsProtocol::notifyEvent(Event* event)
             //Log::info("ControllerEventsProtocol", "Sizes are %d and %d", ns2.size(), pure_message.size());
         }
     }
+    return true;
 }
 
 //-----------------------------------------------------------------------------

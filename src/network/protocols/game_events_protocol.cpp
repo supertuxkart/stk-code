@@ -8,10 +8,6 @@ GameEventsProtocol::~GameEventsProtocol()
 {
 }
 
-void GameEventsProtocol::notifyEvent(Event* event)
-{
-}
-
 void GameEventsProtocol::setup()
 {
 }

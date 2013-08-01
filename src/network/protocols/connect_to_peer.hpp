@@ -29,7 +29,7 @@ class ConnectToPeer : public Protocol, public CallbackObject
         ConnectToPeer(uint32_t peer_id);
         virtual ~ConnectToPeer();
 
-        virtual void notifyEvent(Event* event);
+        virtual bool notifyEventAsynchronous(Event* event);
         virtual void setup();
         virtual void update() {}
         virtual void asynchronousUpdate();

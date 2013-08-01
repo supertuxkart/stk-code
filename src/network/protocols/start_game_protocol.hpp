@@ -24,7 +24,7 @@ class StartGameProtocol : public Protocol
         StartGameProtocol(GameSetup* game_setup);
         virtual ~StartGameProtocol();
 
-        virtual void notifyEvent(Event* event);
+        virtual bool notifyEventAsynchronous(Event* event);
         virtual void setup();
         virtual void update();
         virtual void asynchronousUpdate() {}

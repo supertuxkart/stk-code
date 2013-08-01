@@ -31,10 +31,6 @@ PingProtocol::~PingProtocol()
 {
 }
 
-void PingProtocol::notifyEvent(Event* event)
-{
-}
-
 void PingProtocol::setup()
 {
     m_last_ping_time = 0;

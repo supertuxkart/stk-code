@@ -32,10 +32,6 @@ ShowPublicAddress::~ShowPublicAddress()
 {
 }
 
-void ShowPublicAddress::notifyEvent(Event* event)
-{
-}
-
 void ShowPublicAddress::setup()
 {
     m_state = NONE;

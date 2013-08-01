@@ -31,10 +31,6 @@ StartServer::~StartServer()
 {
 }
 
-void StartServer::notifyEvent(Event* event)
-{
-}
-
 void StartServer::setup()
 {
     m_state = NONE;

@@ -78,6 +78,15 @@ typedef struct ProtocolRequest
     ProtocolInfo protocol_info; //!< The concerned protocol information
 } ProtocolRequest;
 
+/*! \struct ProtocolRequest
+ *  \brief Used to pass the event to protocols that need it
+ */
+typedef struct EventProcessingInfo
+{
+    Event* event;
+    std::vector<int> protocols_ids;
+} EventProcessingInfo;
+
 /*!
  * \class ProtocolManager
  * \brief Manages the protocols at runtime.
@@ -269,7 +278,7 @@ class ProtocolManager : public Singleton<ProtocolManager>
          */
         virtual void            protocolTerminated(ProtocolInfo protocol);
 
-        void                    propagateEvent(Event* event);
+        bool                    propagateEvent(EventProcessingInfo* event, bool synchronous);
 
         // protected members
         /*!
@@ -281,7 +290,7 @@ class ProtocolManager : public Singleton<ProtocolManager>
         /*!
          * \brief Contains the network events to pass to protocols.
          */
-        std::vector<Event*>             m_events_to_process;
+        std::vector<EventProcessingInfo>             m_events_to_process;
         /*!
          * \brief Contains the requests to start/stop etc... protocols.
          */

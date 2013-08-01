@@ -42,10 +42,7 @@ Event::Event(ENetEvent* event)
     }
     if (type == EVENT_TYPE_MESSAGE)
     {
-        data = NetworkString(std::string((char*)(event->packet->data), event->packet->dataLength-1));
-    }
-    else if (event->data)
-    {
+        m_data = NetworkString(std::string((char*)(event->packet->data), event->packet->dataLength-1));
     }
 
     m_packet = NULL;
@@ -80,7 +77,7 @@ Event::Event(ENetEvent* event)
 Event::Event(const Event& event)
 {
     m_packet = NULL;
-    data = event.data;
+    m_data = event.m_data;
     // copy the peer
     peer = event.peer;
     type = event.type;
@@ -94,6 +91,6 @@ Event::~Event()
 
 void Event::removeFront(int size)
 {
-    data.removeFront(size);
+    m_data.removeFront(size);
 }
 

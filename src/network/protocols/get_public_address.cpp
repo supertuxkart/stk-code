@@ -46,11 +46,6 @@ GetPublicAddress::~GetPublicAddress()
 {
 }
 
-void GetPublicAddress::notifyEvent(Event* event)
-{
-
-}
-
 void GetPublicAddress::setup()
 {
     m_state = NOTHING_DONE;

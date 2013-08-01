@@ -32,10 +32,6 @@ HidePublicAddress::~HidePublicAddress()
 {
 }
 
-void HidePublicAddress::notifyEvent(Event* event)
-{
-}
-
 void HidePublicAddress::setup()
 {
     m_state = NONE;
