@@ -20,7 +20,6 @@
 #include <IGUIEnvironment.h>
 
 #include "audio/sfx_manager.hpp"
-//#include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
@@ -46,8 +45,6 @@ VoteDialog::VoteDialog(const std::string & addon_id)
     m_rating_widget = getWidget<RatingBarWidget>("rating");
     assert(m_rating_widget != NULL);
     m_rating_widget->setRating(0);
-    m_rating_widget->setStarNumber(3);
-
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
     m_submit_widget = getWidget<IconButtonWidget>("submit");
@@ -55,6 +52,7 @@ VoteDialog::VoteDialog(const std::string & addon_id)
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+
 
 }
 
@@ -68,14 +66,15 @@ VoteDialog::~VoteDialog()
 GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& eventSource)
 {
 
+    if (eventSource == m_rating_widget->m_properties[PROP_ID])
+    {
+        m_self_destroy = true;
+        return GUIEngine::EVENT_BLOCK;
+    }
+
     if (eventSource == m_options_widget->m_properties[PROP_ID])
     {
         const std::string& selection = m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        if (selection == m_rating_widget->m_properties[PROP_ID])
-        {
-            m_self_destroy = true;
-            return GUIEngine::EVENT_BLOCK;
-        }
     }
     return GUIEngine::EVENT_LET;
 }
@@ -84,5 +83,6 @@ GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& eventSou
 
 void VoteDialog::onUpdate(float dt)
 {
-
+    if (m_self_destroy)
+        ModalDialog::dismiss();
 }

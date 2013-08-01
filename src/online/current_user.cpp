@@ -246,6 +246,36 @@ namespace Online{
 
     // ============================================================================
 
+    const XMLRequest * CurrentUser::requestGetAddonVote( uint32_t addon_id)
+    {
+        assert(isRegisteredUser());
+        XMLRequest * request = new XMLRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("get-addon-vote"));
+        request->setParameter("token", getToken());
+        request->setParameter("id", getUserID());
+        request->setParameter("addon-id", addon_id);
+        HTTPManager::get()->addRequest(request);
+        return request;
+    }
+
+    // ============================================================================
+
+    const XMLRequest * CurrentUser::requestSetAddonVote( uint32_t addon_id)
+    {
+        assert(isRegisteredUser());
+        XMLRequest * request = new XMLRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("set-addon-vote"));
+        request->setParameter("token", getToken());
+        request->setParameter("id", getUserID());
+        request->setParameter("addon-id", addon_id);
+        HTTPManager::get()->addRequest(request);
+        return request;
+    }
+
+    // ============================================================================
+
     const irr::core::stringw CurrentUser::getUserName() const
     {
         if((getUserState() == US_SIGNED_IN ) || (getUserState() == US_GUEST))

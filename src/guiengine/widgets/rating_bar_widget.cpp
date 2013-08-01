@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "guiengine/engine.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/rating_bar_widget.hpp"
 #include "utils/string_utils.hpp"
 #include <string.h>
@@ -23,6 +24,7 @@
 #include <IGUIEnvironment.h>
 #include <IGUIElement.h>
 #include <IGUIButton.h>
+#include <cmath>
 
 using namespace GUIEngine;
 using namespace irr::core;
@@ -32,15 +34,17 @@ using namespace irr;
 RatingBarWidget::RatingBarWidget() : Widget(WTYPE_RATINGBAR)
 {
     m_rating = 0;
-    m_star_number = 0;
+    m_stars = 3;
+    m_steps = 3;
+    for(int i = 0; i < m_stars; i++)
+        m_star_values.push_back(0);
 }
 
 // -----------------------------------------------------------------------------
 void RatingBarWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    irr::core::rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewNoFocusID(), NULL, L"");
-
     m_id = m_element->getID();
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
@@ -50,43 +54,62 @@ void RatingBarWidget::add()
 /** Get the current step of the star
  * 
  * \param index     The index of the star.
- * \param max_step  The number of different steps that a star can display. Two 
- *                   step are obligatory: full and empty.
  * \return The current step of the star.
  */
-int RatingBarWidget::getStepOfStar(int index, int max_step)
+int RatingBarWidget::getStepsOfStar(int index)
 {
-    assert(index >= 0 && index < m_star_number); // Index must be between 0 and m_star_number - 1.
-    assert(max_step >= 2); // The maximun number of step must be larger or equal to 2.
+    assert(index >= 0 && index < m_stars); // Index must be between 0 and m_star_number - 1.
 
-    if (m_rating < index)
-    {
-        return 0;
-    }
-    else if (m_rating > index + 1)
-    {
-        return max_step - 1;
-    }
-    else
-    {
-        float step_size = 1 / (float)(max_step - 1);
-        
-        for (int i = 0; i < max_step; i++)
-        {
-            if (m_rating > index + step_size * (i - 0.5)
-                && m_rating < index + step_size * (i + 0.5))
-                return i;
-        }
-    }
-    
-    return 0;
-    // TODO: Assert or throws a exception, what type?
+    return m_star_values[index];
 } // getStepOfStar
 
 
-EventPropagation RatingBarWidget::mouseHovered(Widget* child, const int playerID) {
-    Log::info("RatingBarWidget::mouseHovered","");
-    //m_rating++;
-    return EVENT_BLOCK;
+
+void RatingBarWidget::setStepValues(float float_rating)
+{
+    int rating = round(float_rating);
+    float step_size = 1 / (float)(m_steps - 1);
+
+    for (int star = 0; star < m_stars; star++)
+    {
+        if (rating < star)
+            m_star_values[star] = 0;
+        else if (rating > star + 1)
+            m_star_values[star] = m_steps-1;
+        else
+        {
+            for (int step = 0; step < m_steps; step++)
+            {
+                if (rating > star + step_size * (step - 0.5) && rating < star + step_size * (step + 0.5))
+                {
+                    m_star_values[star] = step;
+                    break;
+                }
+            }
+        }
+    }
 }
+
+// -----------------------------------------------------------------------------
+
+void RatingBarWidget::setRating(float rating)
+{
+    m_rating = rating;
+    setStepValues(m_rating);
+}
+
+// -----------------------------------------------------------------------------
+
+void RatingBarWidget::setStepValuesByMouse(const core::position2d<s32> & mouse_position)
+{
+    if(m_element->getAbsolutePosition().isPointInside(mouse_position))
+    {
+
+        float value = (float)(mouse_position.X - m_element->getAbsolutePosition().UpperLeftCorner.X);
+        setStepValues(  (float)( value / (float)m_w * (float)m_stars)  );
+
+    }
+}
+
+
 

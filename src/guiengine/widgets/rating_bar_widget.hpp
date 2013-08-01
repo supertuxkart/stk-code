@@ -1,5 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Marianne Gagnon
+//                2013 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,13 +35,13 @@ namespace GUIEngine
       */
     class RatingBarWidget : public Widget
     {
-        
-        float m_rating;
-        int m_star_number;
-        
-    protected:
+    private:
+        float                   m_rating;
+        int                     m_stars;
+        int                     m_steps;
+        std::vector<int>        m_star_values;
 
-        virtual EventPropagation mouseHovered(Widget* child, const int playerID);
+        void setStepValues(float rating);
 
     public:
         
@@ -54,18 +55,20 @@ namespace GUIEngine
         void add();
         
         /** Change the rating value of the widget. */
-        void setRating(float rating) { m_rating = rating; };
+        void setRating(float rating);
         
         /** Get the current value of the widget. */
         float getRating() {return m_rating; };
         
         /** Change the number of stars of the widget. */
-        void setStarNumber(int star_number) { m_star_number = star_number; };
+        void setStarNumber(int star_number) { m_stars = star_number; };
         
         /** Get the current number of stars of the widget. */
-        int getStarNumber() {return m_star_number; };
+        int getStarNumber() {return m_stars; };
         
-        int getStepOfStar(int index, int max_step);
+        int getStepsOfStar(int index);
+
+        void setStepValuesByMouse(const core::position2d<s32> & mouse_position);
     }; 
 }
 
