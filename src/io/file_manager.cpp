@@ -17,9 +17,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <irrlicht.h>
 
 #include "io/file_manager.hpp"
+
+#include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/material_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "tracks/track_manager.hpp"
+#include "utils/log.hpp"
+#include "utils/string_utils.hpp"
+
+#include <irrlicht.h>
 
 #include <stdio.h>
 #include <stdexcept>
@@ -32,37 +41,20 @@
 #if !defined(WIN32)
 #  include <sys/stat.h>
 #  include <sys/types.h>
-// For RemoveDirectory
+#  include <dirent.h>
+#  include <unistd.h>
 #else
 #  include <direct.h>
 #  include <Windows.h>
-#endif
-
-/*Needed by the remove directory function */
-
-#ifndef WIN32
-#  include <dirent.h>
-#endif
-
-#ifdef WIN32
 #  include <stdio.h>
 #  ifndef __CYGWIN__
 #    define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
 #    define S_ISREG(mode)  (((mode) & S_IFMT) == S_IFREG)
 #  endif
-#else
-#  include <unistd.h>
 #endif
 
-#include "btBulletDynamicsCommon.h"
+/*Needed by the remove directory function */
 
-#include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/material_manager.hpp"
-#include "karts/kart_properties_manager.hpp"
-#include "tracks/track_manager.hpp"
-#include "utils/log.hpp"
-#include "utils/string_utils.hpp"
 
 
 #ifdef __APPLE__
