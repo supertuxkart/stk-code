@@ -755,6 +755,7 @@ int handleCmdLine(int argc, char **argv)
                 {
                     Log::warn("main", "Kart '%s' not found, ignored.",
                               argv[i+1]);
+                    i++;  // ignore the next parameter, otherwise STK will abort
                 }
             }
             else   // kart locked
