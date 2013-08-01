@@ -132,57 +132,6 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
     }
 }
 
-void NetworkKartSelectionScreen::considerKartHovered(uint8_t widget_id, std::string selection)
-{
-    ModelViewWidget* w3 = m_kart_widgets[widget_id].m_model_view;
-    assert( w3 != NULL );
-
-    if (selection == RANDOM_KART_ID)
-    {
-        // Random kart
-        scene::IMesh* model =
-            ItemManager::getItemModel(Item::ITEM_BONUS_BOX);
-        w3->clearModels();
-        w3->addModel( model, Vec3(0.0f, -12.0f, 0.0f),
-                      Vec3(35.0f, 35.0f, 35.0f) );
-        w3->update(0);
-        m_kart_widgets[widget_id].m_kart_name->setText(
-                _("Random Kart"), false );
-    }
-    else
-    {
-        const KartProperties *kp =
-            kart_properties_manager->getKart(selection);
-        if (kp != NULL)
-        {
-            const KartModel &kart_model = kp->getMasterKartModel();
-
-            //w3->clearModels();
-            w3->addModel( kart_model.getModel(), Vec3(0,0,0),
-                          Vec3(35.0f, 35.0f, 35.0f),
-                          kart_model.getBaseFrame() );
-            w3->addModel( kart_model.getWheelModel(0),
-                          kart_model.getWheelGraphicsPosition(0) );
-            w3->addModel( kart_model.getWheelModel(1),
-                          kart_model.getWheelGraphicsPosition(1) );
-            w3->addModel( kart_model.getWheelModel(2),
-                          kart_model.getWheelGraphicsPosition(2) );
-            w3->addModel( kart_model.getWheelModel(3),
-                          kart_model.getWheelGraphicsPosition(3) );
-            w3->update(0);
-
-            m_kart_widgets[widget_id].m_kart_name->setText(
-                    selection.c_str(), false );
-        }
-        else
-        {
-            fprintf(stderr, "[KartSelectionScreen] WARNING: could not "
-                    "find a kart named '%s'\n",
-                    selection.c_str());
-        }
-    }
-}
-
 void NetworkKartSelectionScreen::playerSelected(uint8_t race_id, std::string kart_name)
 {
     uint8_t widget_id = -1;
