@@ -115,7 +115,11 @@ void StartGameProtocol::update()
                 PlayerProfile* profileToUse = unlock_manager->getCurrentPlayer();
                 assert(profileToUse);
                 InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
-                int new_player_id = StateManager::get()->createActivePlayer( profileToUse, device , players[i]->user_profile);
+                int new_player_id = 0;
+                if (StateManager::get()->getActivePlayers().size() >= 0) // more than one player, we're the first
+                    new_player_id = 0;
+                else
+                    new_player_id = StateManager::get()->createActivePlayer( profileToUse, device , players[i]->user_profile);
                 device->setPlayer(StateManager::get()->getActivePlayer(new_player_id));
                 input_manager->getDeviceList()->setSinglePlayer(StateManager::get()->getActivePlayer(new_player_id));
 

@@ -36,11 +36,14 @@
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/server_selection.hpp"
 #include "states_screens/create_server_screen.hpp"
-#include "modes/demo_world.hpp"
+#include "states_screens/networking_lobby_settings.hpp"
 #include "online/servers_manager.hpp"
 #include "online/messages.hpp"
 #include "online/request.hpp"
+#include "modes/demo_world.hpp"
 
+#include "network/protocol_manager.hpp"
+#include "network/protocols/connect_to_server.hpp"
 
 #include "network/protocol_manager.hpp"
 #include "network/protocols/connect_to_server.hpp"

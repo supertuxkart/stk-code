@@ -10,6 +10,7 @@
 NetworkWorld::NetworkWorld()
 {
     m_running = false;
+    m_has_run = false;
 }
 
 NetworkWorld::~NetworkWorld()
@@ -18,6 +19,8 @@ NetworkWorld::~NetworkWorld()
 
 void NetworkWorld::update(float dt)
 {
+    if (!m_has_run)
+        m_has_run = true;
     SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(
             ProtocolManager::getInstance()->getProtocol(PROTOCOL_SYNCHRONIZATION));
     if (protocol) // if this protocol exists, that's that we play online
@@ -29,6 +32,12 @@ void NetworkWorld::update(float dt)
         }
     }
     World::getWorld()->updateWorld(dt);
+    if (World::getWorld()->getPhase() >= WorldStatus::RESULT_DISPLAY_PHASE) // means it's the end
+    {
+        // consider the world finished.
+        stop();
+        Log::info("NetworkWorld", "The game is considered finish.");
+    }
 }
 
 void NetworkWorld::controllerAction(Controller* controller, PlayerAction action, int value)
@@ -37,4 +46,11 @@ void NetworkWorld::controllerAction(Controller* controller, PlayerAction action,
         ProtocolManager::getInstance()->getProtocol(PROTOCOL_CONTROLLER_EVENTS));
     if (protocol)
         protocol->controllerAction(controller, action, value);
+}
+
+bool NetworkWorld::isRaceOver()
+{
+    if (!World::getWorld())
+        return false;
+    return (World::getWorld()->getPhase() >= WorldStatus::RESULT_DISPLAY_PHASE);
 }

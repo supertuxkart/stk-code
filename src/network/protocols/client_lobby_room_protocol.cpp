@@ -20,6 +20,7 @@
 
 #include "network/network_manager.hpp"
 #include "network/protocols/start_game_protocol.hpp"
+#include "network/network_world.hpp"
 #include "online/current_user.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/network_kart_selection.hpp"
@@ -141,7 +142,26 @@ void ClientLobbyRoomProtocol::update()
     case SELECTING_KARTS:
         break;
     case PLAYING:
-        break;
+    {
+        if (NetworkWorld::getInstance<NetworkWorld>()->isRaceOver()) // race is now over, kill race protocols and return to connected state
+        {
+            Protocol* protocol = NULL;
+            protocol = m_listener->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
+            if (protocol)
+                m_listener->requestTerminate(protocol);
+            else
+                Log::error("ClientLobbyRoomProtocol", "No controller events protocol registered.");
+
+            protocol = m_listener->getProtocol(PROTOCOL_KART_UPDATE);
+            if (protocol)
+                m_listener->requestTerminate(protocol);
+            else
+                Log::error("ClientLobbyRoomProtocol", "No kart update protocol registered.");
+
+            Log::info("ClientLobbyRoomProtocol", "Game finished.");
+            m_state = CONNECTED;
+        }
+    } break;
     case DONE:
         m_state = EXITING;
         m_listener->requestTerminate(this);

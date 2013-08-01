@@ -774,7 +774,7 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 
     setCoinTarget( 0 ); // Might still be set from a previous challenge
     if (!NetworkWorld::getInstance<NetworkWorld>()->isRunning()) // if not in a network world
-    race_manager->setupPlayerKartInfo(); // do this setup player kart
+        race_manager->setupPlayerKartInfo(); // do this setup player kart
 
     startNew(from_overworld);
 }

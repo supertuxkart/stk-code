@@ -31,7 +31,6 @@
 
 #include <string>
 
-
 namespace Online{
 
     /**
