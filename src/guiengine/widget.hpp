@@ -650,6 +650,9 @@ namespace GUIEngine
          */
 
         bool ok() const { return (m_magic_number == 0xCAFEC001); }
+
+        /** Gets called when the widget is active and got clicked. (Only works for button widgets for now.) */
+        virtual void onClick()  { }
     };
 
 

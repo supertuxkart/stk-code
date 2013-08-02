@@ -362,4 +362,3 @@ void Widget::moveIrrlichtElement()
                                                          irr::core::dimension2di(m_w, m_h) ) );
     }
 }
-

@@ -33,9 +33,11 @@ using namespace irr;
 // -----------------------------------------------------------------------------
 RatingBarWidget::RatingBarWidget() : Widget(WTYPE_RATINGBAR)
 {
-    m_rating = 0;
+    m_rating = 0.0f;
+    m_hover_rating = 0.0f;
     m_stars = 3;
     m_steps = 3;
+    m_hovering = false;
     for(int i = 0; i < m_stars; i++)
         m_star_values.push_back(0);
 }
@@ -99,13 +101,25 @@ void RatingBarWidget::setRating(float rating)
 
 // -----------------------------------------------------------------------------
 
-void RatingBarWidget::setStepValuesByMouse(const core::position2d<s32> & mouse_position, const core::recti & stars_rect)
+void RatingBarWidget::setStepValuesByMouse(const core::position2di & mouse_position, const core::recti & stars_rect)
 {
     if(stars_rect.isPointInside(mouse_position))
     {
-        float value = (float)(mouse_position.X - stars_rect.UpperLeftCorner.X);
-        setStepValues(  (float)( value / (float)stars_rect.getWidth() * (float)m_stars)  );
+        m_hovering = true;
+        m_hover_rating = (float)(mouse_position.X - stars_rect.UpperLeftCorner.X) / (float)stars_rect.getWidth() * (float)m_stars;
+        setStepValues(m_hover_rating );
     }
+    else if(m_hovering)
+    {
+        setStepValues(m_rating);
+        m_hovering = false;
+    }
+
+}
+
+void RatingBarWidget::onClick()
+{
+    m_rating = m_hover_rating;
 }
 
 

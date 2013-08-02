@@ -37,9 +37,11 @@ namespace GUIEngine
     {
     private:
         float                   m_rating;
+        float                   m_hover_rating;
         int                     m_stars;
         int                     m_steps;
         std::vector<int>        m_star_values;
+        bool                    m_hovering;
 
         void setStepValues(float rating);
 
@@ -68,7 +70,9 @@ namespace GUIEngine
         
         int getStepsOfStar(int index);
 
-        void setStepValuesByMouse(const core::position2d<s32> & mouse_position, const core::recti & stars_rect);
+        void setStepValuesByMouse(const core::position2di & mouse_position, const core::recti & stars_rect);
+
+        virtual void onClick();
     }; 
 }
 
