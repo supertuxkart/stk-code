@@ -815,9 +815,6 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
 {
     RatingBarWidget *ratingBar = (RatingBarWidget*)w;
 
-    core::position2d<s32> mouse_position = irr_driver->getDevice()->getCursorControl()->getPosition();
-    ratingBar->setStepValuesByMouse(mouse_position);
-    
     const ITexture *texture = SkinConfig::m_render_params["rating::neutral"].getImage();
     const int texture_w = texture->getSize().Width / 4;
     const int texture_h = texture->getSize().Height;
@@ -838,6 +835,10 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
     // center horizontally and vertically
     const int x_from = rect.UpperLeftCorner.X + (rect.getWidth() - star_w) / 2; 
     const int y_from = rect.UpperLeftCorner.Y + (rect.getHeight() - star_h) / 2;
+
+    core::recti stars_rect(x_from, y_from, x_from + (star_number * star_w), y_from + star_h);
+
+    ratingBar->setStepValuesByMouse(irr_driver->getDevice()->getCursorControl()->getPosition(), stars_rect);
 
     for (int i = 0; i < star_number; i++)
     {

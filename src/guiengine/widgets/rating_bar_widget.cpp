@@ -99,14 +99,12 @@ void RatingBarWidget::setRating(float rating)
 
 // -----------------------------------------------------------------------------
 
-void RatingBarWidget::setStepValuesByMouse(const core::position2d<s32> & mouse_position)
+void RatingBarWidget::setStepValuesByMouse(const core::position2d<s32> & mouse_position, const core::recti & stars_rect)
 {
-    if(m_element->getAbsolutePosition().isPointInside(mouse_position))
+    if(stars_rect.isPointInside(mouse_position))
     {
-
-        float value = (float)(mouse_position.X - m_element->getAbsolutePosition().UpperLeftCorner.X);
-        setStepValues(  (float)( value / (float)m_w * (float)m_stars)  );
-
+        float value = (float)(mouse_position.X - stars_rect.UpperLeftCorner.X);
+        setStepValues(  (float)( value / (float)stars_rect.getWidth() * (float)m_stars)  );
     }
 }
 

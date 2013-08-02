@@ -68,7 +68,7 @@ namespace GUIEngine
         
         int getStepsOfStar(int index);
 
-        void setStepValuesByMouse(const core::position2d<s32> & mouse_position);
+        void setStepValuesByMouse(const core::position2d<s32> & mouse_position, const core::recti & stars_rect);
     }; 
 }
 
