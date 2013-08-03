@@ -104,7 +104,7 @@ void RatingBarWidget::setRating(float rating)
 
 void RatingBarWidget::setStepValuesByMouse(const core::position2di & mouse_position, const core::recti & stars_rect)
 {
-    if(m_allow_voting & isActivated()){
+    if(m_allow_voting){
         if(stars_rect.isPointInside(mouse_position))
         {
             m_hovering = true;
@@ -121,7 +121,7 @@ void RatingBarWidget::setStepValuesByMouse(const core::position2di & mouse_posit
 
 void RatingBarWidget::onClick()
 {
-    if(m_allow_voting & isActivated())
+    if(m_allow_voting)
         m_rating = m_hover_rating;
 }
 

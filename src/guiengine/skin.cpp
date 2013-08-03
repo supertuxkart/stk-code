@@ -838,7 +838,8 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
 
     core::recti stars_rect(x_from, y_from, x_from + (star_number * star_w), y_from + star_h);
 
-    ratingBar->setStepValuesByMouse(irr_driver->getDevice()->getCursorControl()->getPosition(), stars_rect);
+    if(!w->m_deactivated)
+        ratingBar->setStepValuesByMouse(irr_driver->getDevice()->getCursorControl()->getPosition(), stars_rect);
 
     SColor colors[] =  { SColor(100,255,255,255),
                          SColor(100,255,255,255),
