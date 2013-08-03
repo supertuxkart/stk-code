@@ -42,6 +42,7 @@ namespace GUIEngine
         int                     m_steps;
         std::vector<int>        m_star_values;
         bool                    m_hovering;
+        bool                    m_allow_voting;
 
         void setStepValues(float rating);
 
@@ -73,6 +74,8 @@ namespace GUIEngine
         void setStepValuesByMouse(const core::position2di & mouse_position, const core::recti & stars_rect);
 
         virtual void onClick();
+
+        void allowVoting() { m_allow_voting = true; }
     }; 
 }
 

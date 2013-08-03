@@ -33,6 +33,7 @@ using namespace irr;
 // -----------------------------------------------------------------------------
 RatingBarWidget::RatingBarWidget() : Widget(WTYPE_RATINGBAR)
 {
+    m_allow_voting = false;
     m_rating = 0.0f;
     m_hover_rating = 0.0f;
     m_stars = 3;
@@ -45,7 +46,7 @@ RatingBarWidget::RatingBarWidget() : Widget(WTYPE_RATINGBAR)
 // -----------------------------------------------------------------------------
 void RatingBarWidget::add()
 {
-    irr::core::rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    const irr::core::recti widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewNoFocusID(), NULL, L"");
     m_id = m_element->getID();
     m_element->setTabStop(false);
@@ -103,23 +104,25 @@ void RatingBarWidget::setRating(float rating)
 
 void RatingBarWidget::setStepValuesByMouse(const core::position2di & mouse_position, const core::recti & stars_rect)
 {
-    if(stars_rect.isPointInside(mouse_position))
-    {
-        m_hovering = true;
-        m_hover_rating = (float)(mouse_position.X - stars_rect.UpperLeftCorner.X) / (float)stars_rect.getWidth() * (float)m_stars;
-        setStepValues(m_hover_rating );
+    if(m_allow_voting & isActivated()){
+        if(stars_rect.isPointInside(mouse_position))
+        {
+            m_hovering = true;
+            m_hover_rating = (float)(mouse_position.X - stars_rect.UpperLeftCorner.X) / (float)stars_rect.getWidth() * (float)m_stars;
+            setStepValues(m_hover_rating );
+        }
+        else if(m_hovering)
+        {
+            setStepValues(m_rating);
+            m_hovering = false;
+        }
     }
-    else if(m_hovering)
-    {
-        setStepValues(m_rating);
-        m_hovering = false;
-    }
-
 }
 
 void RatingBarWidget::onClick()
 {
-    m_rating = m_hover_rating;
+    if(m_allow_voting & isActivated())
+        m_rating = m_hover_rating;
 }
 
 

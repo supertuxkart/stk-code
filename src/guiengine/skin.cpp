@@ -833,12 +833,17 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
     }
     
     // center horizontally and vertically
-    const int x_from = rect.UpperLeftCorner.X + (rect.getWidth() - star_w) / 2; 
-    const int y_from = rect.UpperLeftCorner.Y + (rect.getHeight() - star_h) / 2;
+    const int x_from = rect.UpperLeftCorner.X; // + (rect.getWidth() - star_w) / 2;
+    const int y_from = rect.UpperLeftCorner.Y; // + (rect.getHeight() - star_h) / 2;
 
     core::recti stars_rect(x_from, y_from, x_from + (star_number * star_w), y_from + star_h);
 
     ratingBar->setStepValuesByMouse(irr_driver->getDevice()->getCursorControl()->getPosition(), stars_rect);
+
+    SColor colors[] =  { SColor(100,255,255,255),
+                         SColor(100,255,255,255),
+                         SColor(100,255,255,255),
+                         SColor(100,255,255,255) };
 
     for (int i = 0; i < star_number; i++)
     {
@@ -856,7 +861,8 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
 
         GUIEngine::getDriver()->draw2DImage(texture,
                                             star_rect, source_area,
-                                            0 /* no clipping */, 0,
+                                            0 /* no clipping */,
+                                           (w->m_deactivated || ID_DEBUG) ? colors : 0,
                                             true /* alpha */);
     }
 

@@ -24,7 +24,6 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets.hpp"
 #include "online/current_user.hpp"
-#include "utils/types.hpp"
 #include "states_screens/dialogs/login_dialog.hpp"
 
 
@@ -44,14 +43,17 @@ public :
     };
 
 private:
-
+    const std::string m_addon_id;
     bool m_self_destroy;
-    //const Online::CurrentUser::AddonVoteRequest * m_addon_vote_request;
+    const Online::XMLRequest * m_fetch_vote_request;
+    const Online::XMLRequest * m_perform_vote_request;
+
+    GUIEngine::LabelWidget * m_info_widget;
 
     GUIEngine::RatingBarWidget * m_rating_widget;
 
     GUIEngine::RibbonWidget * m_options_widget;
-    GUIEngine::IconButtonWidget * m_submit_widget;
+    GUIEngine::IconButtonWidget * m_save_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
 
 public:
@@ -59,6 +61,7 @@ public:
     ~VoteDialog();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     virtual void onUpdate(float dt);
+    virtual bool onEscapePressed();
 };
 
 #endif

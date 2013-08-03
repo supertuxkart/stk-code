@@ -129,8 +129,8 @@ namespace Online{
             const XMLRequest *              requestRecovery(const irr::core::stringw &username,
                                                             const irr::core::stringw &email);
 
-            const XMLRequest *              requestGetAddonVote(uint32_t addon_id);
-            const XMLRequest *              requestSetAddonVote(uint32_t addon_id);
+            const XMLRequest *              requestGetAddonVote(const std::string & addon_id) const;
+            const XMLRequest *              requestSetAddonVote(const std::string & addon_id, float rating) const;
 
             /** Returns the username if signed in. */
             const irr::core::stringw        getUserName()           const;

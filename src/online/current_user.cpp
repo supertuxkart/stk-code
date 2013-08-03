@@ -246,7 +246,7 @@ namespace Online{
 
     // ============================================================================
 
-    const XMLRequest * CurrentUser::requestGetAddonVote( uint32_t addon_id)
+    const XMLRequest * CurrentUser::requestGetAddonVote( const std::string & addon_id) const
     {
         assert(isRegisteredUser());
         XMLRequest * request = new XMLRequest();
@@ -261,7 +261,7 @@ namespace Online{
 
     // ============================================================================
 
-    const XMLRequest * CurrentUser::requestSetAddonVote( uint32_t addon_id)
+    const XMLRequest * CurrentUser::requestSetAddonVote( const std::string & addon_id, float rating) const
     {
         assert(isRegisteredUser());
         XMLRequest * request = new XMLRequest();
@@ -270,6 +270,7 @@ namespace Online{
         request->setParameter("token", getToken());
         request->setParameter("id", getUserID());
         request->setParameter("addon-id", addon_id);
+        request->setParameter("rating", rating);
         HTTPManager::get()->addRequest(request);
         return request;
     }

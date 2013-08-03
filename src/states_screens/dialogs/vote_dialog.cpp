@@ -37,29 +37,47 @@ using namespace Online;
 // -----------------------------------------------------------------------------
 
 VoteDialog::VoteDialog(const std::string & addon_id)
-        : ModalDialog(0.8f,0.8f)
+        : ModalDialog(0.8f,0.6f), m_addon_id(addon_id)
 {
+    m_fetch_vote_request = NULL;
+    m_perform_vote_request = NULL;
     m_self_destroy = false;
     loadFromFile("online/vote_dialog.stkgui");
+
+    m_info_widget = getWidget<LabelWidget>("info");
+    assert(m_info_widget != NULL);
 
     m_rating_widget = getWidget<RatingBarWidget>("rating");
     assert(m_rating_widget != NULL);
     m_rating_widget->setRating(0);
+    m_rating_widget->allowVoting();
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
-    m_submit_widget = getWidget<IconButtonWidget>("submit");
-    assert(m_submit_widget != NULL);
+    m_save_widget = getWidget<IconButtonWidget>("save");
+    assert(m_save_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
+    m_fetch_vote_request = CurrentUser::get()->requestGetAddonVote(m_addon_id);
 
+    m_rating_widget->setDeactivated();
+    m_save_widget->setDeactivated();
+    m_cancel_widget->setDeactivated();
 }
 
 // -----------------------------------------------------------------------------
 VoteDialog::~VoteDialog()
 {
-    //delete m_server_join_request;
+    delete m_fetch_vote_request;
+    delete m_perform_vote_request;
+}
+
+// -----------------------------------------------------------------------------
+
+bool VoteDialog::onEscapePressed()
+{
+    return m_cancel_widget->isActivated();
 }
 
 // -----------------------------------------------------------------------------
@@ -75,6 +93,19 @@ GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& eventSou
     if (eventSource == m_options_widget->m_properties[PROP_ID])
     {
         const std::string& selection = m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        if (selection == m_cancel_widget->m_properties[PROP_ID])
+        {
+            m_self_destroy = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == m_save_widget->m_properties[PROP_ID])
+        {
+            m_perform_vote_request = CurrentUser::get()->requestSetAddonVote(m_addon_id, m_rating_widget->getRating());
+            m_rating_widget->setDeactivated();
+            m_save_widget->setDeactivated();
+            m_cancel_widget->setDeactivated();
+            return GUIEngine::EVENT_BLOCK;
+        }
     }
     return GUIEngine::EVENT_LET;
 }
@@ -83,6 +114,58 @@ GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& eventSou
 
 void VoteDialog::onUpdate(float dt)
 {
+    if(m_fetch_vote_request != NULL)
+    {
+        if(m_fetch_vote_request->isDone())
+        {
+            if(m_fetch_vote_request->isSuccess())
+            {
+                m_info_widget->setDefaultColor();
+                m_info_widget->setText(_("bla"), false); //FIXME
+                m_options_widget->setActivated();
+                m_rating_widget->setActivated();
+            }
+            else
+            {
+                sfx_manager->quickSound( "anvil" );
+                m_info_widget->setErrorColor();
+                m_info_widget->setText(m_fetch_vote_request->getInfo(), false);
+                m_cancel_widget->setActivated();
+            }
+            delete m_fetch_vote_request;
+            m_fetch_vote_request = NULL;
+        }
+        else
+        {
+            m_info_widget->setText(irr::core::stringw(_("Fetching last vote")) + Messages::loadingDots(), false);
+        }
+    }
+    if(m_perform_vote_request != NULL)
+    {
+        if(m_perform_vote_request->isDone())
+        {
+            if(m_perform_vote_request->isSuccess())
+            {
+                m_info_widget->setDefaultColor();
+                m_info_widget->setText(_("Vote cast! You can now close the window."), false);
+                m_cancel_widget->setActivated();
+            }
+            else
+            {
+                sfx_manager->quickSound( "anvil" );
+                m_info_widget->setErrorColor();
+                m_info_widget->setText(m_perform_vote_request->getInfo(), false);
+                m_options_widget->setActivated();
+                m_rating_widget->setActivated();
+            }
+            delete m_perform_vote_request;
+            m_perform_vote_request = NULL;
+        }
+        else
+        {
+            m_info_widget->setText(irr::core::stringw(_("Performing vote")) + Messages::loadingDots(), false);
+        }
+    }
     if (m_self_destroy)
         ModalDialog::dismiss();
 }
