@@ -123,6 +123,15 @@ void ServerInfoDialog::onEnterPressedInternal()
 
 // -----------------------------------------------------------------------------
 
+bool ServerInfoDialog::onEscapePressed()
+{
+    if (m_cancel_widget->isActivated())
+        m_self_destroy = true;
+    return false;
+}
+
+// -----------------------------------------------------------------------------
+
 void ServerInfoDialog::onUpdate(float dt)
 {
     if(m_server_join_request != NULL)

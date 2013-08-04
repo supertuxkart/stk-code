@@ -171,8 +171,12 @@ void LoginDialog::onEnterPressedInternal()
 
 bool LoginDialog::onEscapePressed()
 {
-    return m_cancel_widget->isActivated();
+    if (m_cancel_widget->isActivated())
+        m_self_destroy = true;
+    return false;
 }
+
+// -----------------------------------------------------------------------------
 
 void LoginDialog::onUpdate(float dt)
 {

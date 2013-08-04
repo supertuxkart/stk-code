@@ -151,6 +151,9 @@ public:
     /** Returns the rating of an addon. */
     const float getRating() const {return m_rating; }
     // ------------------------------------------------------------------------
+    /** Sets the rating of an addon. */
+    void setRating(const float rating) {m_rating = rating; }
+    // ------------------------------------------------------------------------
     /** Returns the type of the addon. */
     const std::string& getType() const { return m_type; }
     // ------------------------------------------------------------------------

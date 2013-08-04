@@ -86,6 +86,12 @@ namespace Online{
                 ServerJoinRequest() : XMLRequest(RT_SERVER_JOIN) {}
             };
 
+            class setAddonVoteRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                setAddonVoteRequest() : XMLRequest() {}
+            };
+
 
         private:
             Synchronised<std::string>   m_token;
@@ -130,7 +136,7 @@ namespace Online{
                                                             const irr::core::stringw &email);
 
             const XMLRequest *              requestGetAddonVote(const std::string & addon_id) const;
-            const XMLRequest *              requestSetAddonVote(const std::string & addon_id, float rating) const;
+            const setAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
 
             /** Returns the username if signed in. */
             const irr::core::stringw        getUserName()           const;

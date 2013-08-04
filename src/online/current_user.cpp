@@ -19,6 +19,7 @@
 
 #include "online/current_user.hpp"
 
+#include "addons/addons_manager.hpp"
 #include "config/user_config.hpp"
 #include "online/servers_manager.hpp"
 #include "utils/log.hpp"
@@ -261,10 +262,10 @@ namespace Online{
 
     // ============================================================================
 
-    const XMLRequest * CurrentUser::requestSetAddonVote( const std::string & addon_id, float rating) const
+    const CurrentUser::setAddonVoteRequest * CurrentUser::requestSetAddonVote( const std::string & addon_id, float rating) const
     {
         assert(isRegisteredUser());
-        XMLRequest * request = new XMLRequest();
+        CurrentUser::setAddonVoteRequest * request = new CurrentUser::setAddonVoteRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("set-addon-vote"));
         request->setParameter("token", getToken());
@@ -273,6 +274,18 @@ namespace Online{
         request->setParameter("rating", rating);
         HTTPManager::get()->addRequest(request);
         return request;
+    }
+
+    void CurrentUser::setAddonVoteRequest::callback()
+    {
+        if(isSuccess())
+        {
+            std::string addon_id;
+            getResult()->get("addon-id", &addon_id);
+            float average;
+            getResult()->get("new-average", &average);
+            addons_manager->getAddon(addon_id)->setRating(average);
+        }
     }
 
     // ============================================================================

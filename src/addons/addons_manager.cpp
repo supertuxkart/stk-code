@@ -345,7 +345,7 @@ void AddonsManager::loadInstalledAddons()
  *  found!
  *  \param id The id to search for.
  */
-const Addon* AddonsManager::getAddon(const std::string &id) const
+Addon* AddonsManager::getAddon(const std::string &id)
 {
     int i = getAddonIndex(id);
     return (i<0) ? NULL : &(m_addons_list.getData()[i]);

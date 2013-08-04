@@ -46,7 +46,7 @@ private:
     const std::string m_addon_id;
     bool m_self_destroy;
     const Online::XMLRequest * m_fetch_vote_request;
-    const Online::XMLRequest * m_perform_vote_request;
+    const Online::CurrentUser::setAddonVoteRequest * m_perform_vote_request;
 
     GUIEngine::LabelWidget * m_info_widget;
 

@@ -220,7 +220,7 @@ void AddonsScreen::loadList()
     PtrVector<const Addon, REF> sorted_list;
     for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
     {
-        const Addon &addon = addons_manager->getAddon(i);
+        const Addon & addon = addons_manager->getAddon(i);
         // Ignore addons of a different type
         if(addon.getType()!=m_type) continue;
         // Ignore invisible addons
