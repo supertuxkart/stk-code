@@ -115,7 +115,7 @@ private:
     /** Compressed size of the addon package. */
     int         m_size;
     /** Rating for thsi addon package. */
-    float       m_rating;
+    mutable float       m_rating;
     /** Minimum version addon is included with. */
     std::string m_min_include_ver;
     /** Maximum version addon is included with. */
@@ -152,7 +152,7 @@ public:
     const float getRating() const {return m_rating; }
     // ------------------------------------------------------------------------
     /** Sets the rating of an addon. */
-    void setRating(const float rating) {m_rating = rating; }
+    void setRating(const float rating) const {m_rating = rating; }
     // ------------------------------------------------------------------------
     /** Returns the type of the addon. */
     const std::string& getType() const { return m_type; }

@@ -15,42 +15,32 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_NETWORKING_LOBBY_SETTINGS_HPP
-#define HEADER_NETWORKING_LOBBY_SETTINGS_HPP
+
+#ifndef __HEADER_ONLINE_PROFILE_OVERVIEW_HPP__
+#define __HEADER_ONLINE_PROFILE_OVERVIEW_HPP__
+
+#include <string>
+#include <irrString.h>
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets/label_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
-#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets.hpp"
 
-namespace GUIEngine { class Widget; class ListWidget; }
+namespace GUIEngine { class Widget; }
+
 
 /**
-  * \brief Handles the main menu
+  * \brief Online profiel overview screen
   * \ingroup states_screens
   */
-class NetworkingLobbySettings :     public GUIEngine::Screen,
-                                    public GUIEngine::ScreenSingleton<NetworkingLobbySettings>
+class OnlineProfileOverview : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OnlineProfileOverview>
 {
 private:
-    friend class GUIEngine::ScreenSingleton<NetworkingLobbySettings>;
+    OnlineProfileOverview();
 
-    NetworkingLobbySettings();
-
-    /** \brief Checks if the user is still signed in. */
-    bool hasLostConnection();
-    /** \brief Sets which widget has to be focused. Depends on the user state. */
-    void setInitialFocus();
+    GUIEngine::RibbonWidget* m_profile_tabs;
 
 public:
-
-    enum Action
-    {
-        Create                  = 1,    // A new server should be created
-        Edit                    = 2,    // The settings of the server should be edited
-    };
-
-    virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver) OVERRIDE;
+    friend class GUIEngine::ScreenSingleton<OnlineProfileOverview>;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
@@ -60,19 +50,10 @@ public:
                                const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void beforeAddingWidget() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onDisabledItemClicked(const std::string& item) OVERRIDE;
-
-    /** \brief Implements the callback when a dialog gets closed. */
-    virtual void onDialogClose() OVERRIDE;
 };
 
 #endif

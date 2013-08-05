@@ -113,6 +113,23 @@ void RegistrationDialog::showRegistrationTerms()
     clearWindow();
     m_phase = Terms;
     loadFromFile("online/registration_terms.stkgui");
+
+
+    ListWidget * terms_widget = getWidget<ListWidget>("terms");
+
+
+    terms_widget->addItem("title", "=== STK Terms and Conditions ===", -1 , true );
+    terms_widget->addItem("par1", "You must agree to these terms in order to register an account for STK.", -1 , false );
+    terms_widget->addItem("par2",
+        "Still needs actual content. Preferably in an XML document which can then be parsed to be put here."
+        , -1 , false );
+    terms_widget->addItem("par3",
+        "By checking the box below, you are confirming that you understand these terms."
+        "If you have any questions or comments regarding these terms,"
+        "one of the members of the development team would gladly assist you."
+        , -1 , false );
+
+
     m_accept_terms_widget = getWidget<CheckBoxWidget>("accepted");
     assert(m_accept_terms_widget != NULL);
     m_accept_terms_widget->setState(false);

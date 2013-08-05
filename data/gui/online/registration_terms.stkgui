@@ -6,9 +6,10 @@
        I18N="In the registration dialog' dialog" text="Terms and Agreement"/>
     
         <spacer height="20" width="50">
-        
-        <label id="terms" proportion="5" width="90%" align="center" text_align="center" word_wrap="true"
-           I18N="In the registration dialog' dialog" text="The terms will come here. In a fancy scroll box."/>
+                   
+        <box proportion="5" width="90%" align="center" layout="vertical-row" padding="8">
+            <list id="terms" x="0" y="0" width="100%" height="100%"/>
+        </box>
         
         <div align="center" width="fit" height="fit" layout="horizontal-row" >
             <label text_align="center" align="center" I18N="In the registration dialog" word_wrap="true"

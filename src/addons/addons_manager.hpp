@@ -62,7 +62,7 @@ public:
                 ~AddonsManager();
     void         initOnline(const XMLNode *xml);
     void         checkInstalledAddons();
-    Addon*       getAddon(const std::string &id);
+    const Addon* getAddon(const std::string &id) const;
     int          getAddonIndex(const std::string &id) const;
     bool         install(const Addon &addon);
     bool         uninstall(const Addon &addon);
