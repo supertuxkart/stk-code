@@ -51,6 +51,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
                 ItemManager::get()->getItem(item_id),
                 kart,
                 powerup_type);
+            Log::info("GameEventsProtocol", "Item picked by a player.");
         }   break;
         default:
             Log::warn("GameEventsProtocol", "Unkown message type.");
@@ -81,5 +82,6 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
         // 0x01 : item picked : send item id, powerup type and kart race id
         ns.ai8(0x01).ai32(item->getItemId()).ai8((int)(kart->getPowerup()->getType())).ai8(player_profile->race_id); // send item,
         m_listener->sendMessage(this, peers[i], ns, true); // reliable
+        Log::info("GameEventsProtocol", "Notified a peer that a kart collected an item.");
     }
 }
