@@ -66,7 +66,7 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         assert(data.size()); // message not empty
         uint8_t message_type;
         message_type = data[0];
-        data->removeFront(1);
+        event->removeFront(1);
         Log::info("ServerLobbyRoomProtocol", "Message received with type %d.", message_type);
         if (message_type == 0x01) // player requesting connection
             connectionRequested(event);
