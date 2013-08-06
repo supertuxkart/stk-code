@@ -57,6 +57,8 @@
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
+#include "network/network_world.hpp"
+#include "network/network_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
 #include "physics/btUprightConstraint.hpp"
@@ -1152,7 +1154,8 @@ void Kart::update(float dt)
     }   // if there is material
 
     // Check if any item was hit.
-    if (!m_controller->isNetworkController()) // no need in network
+    // check it if we're not in a network world, or if we're on the server (when network mode is on)
+    if (!NetworkWorld::getInstance()->isRunning() || NetworkManager::getInstance()->isServer())
         ItemManager::get()->checkItemHit(this);
 
     static video::SColor pink(255, 255, 133, 253);
