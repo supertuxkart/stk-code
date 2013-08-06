@@ -70,8 +70,6 @@ int RatingBarWidget::getStepsOfStar(int index)
 
 void RatingBarWidget::setStepValues(float float_rating)
 {
-    float step_size = 1 / (float)(m_steps - 1);
-
     for (int star = 0; star < m_stars; star++)
     {
         if (float_rating < star)
@@ -80,14 +78,7 @@ void RatingBarWidget::setStepValues(float float_rating)
             m_star_values[star] = m_steps-1;
         else
         {
-            for (int step = 0; step < m_steps; step++)
-            {
-                if (float_rating > star + step_size * (step - 0.5) && float_rating < star + step_size * (step + 0.5))
-                {
-                    m_star_values[star] = step;
-                    break;
-                }
-            }
+            m_star_values[star] = round((float_rating * (m_steps-1)) - (star*(m_steps-1)));
         }
     }
 }
@@ -108,8 +99,9 @@ void RatingBarWidget::setStepValuesByMouse(const core::position2di & mouse_posit
         if(stars_rect.isPointInside(mouse_position))
         {
             m_hovering = true;
-            m_hover_rating = (float)(mouse_position.X - stars_rect.UpperLeftCorner.X) / (float)stars_rect.getWidth() * (float)m_stars;
-            setStepValues(m_hover_rating );
+            float exact_hover = (float)(mouse_position.X - stars_rect.UpperLeftCorner.X) / (float)stars_rect.getWidth() * (float)m_stars;
+            m_hover_rating = round(exact_hover * (m_steps-1)) / (m_steps-1);
+            setStepValues(m_hover_rating);
         }
         else if(m_hovering)
         {

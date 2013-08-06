@@ -147,12 +147,6 @@ namespace Online{
                 UserConfigParams::m_saved_token = getToken();
                 UserConfigParams::m_saved_session = true;
             }
-            else
-            {
-                UserConfigParams::m_saved_user = 0;
-                UserConfigParams::m_saved_token = "";
-                UserConfigParams::m_saved_session = false;
-            }
         }
         else
             setUserState (US_SIGNED_OUT);
