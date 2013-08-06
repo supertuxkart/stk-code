@@ -147,7 +147,7 @@ void ProtocolManager::notifyEvent(Event* event)
         m_events_to_process.push_back(epi); // add the event to the queue
     }
     else
-        Log::warn("ProtocolManager", "Received an event that has no destination protocol.");
+        Log::warn("ProtocolManager", "Received an event for %d that has no destination protocol.", searchedProtocol);
     pthread_mutex_unlock(&m_events_mutex);
 }
 
