@@ -65,7 +65,8 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         NetworkString data = event->data();
         assert(data.size()); // message not empty
         uint8_t message_type;
-        message_type = data.getAndRemoveUInt8();
+        message_type = data[0];
+        data->removeFront(1);
         Log::info("ServerLobbyRoomProtocol", "Message received with type %d.", message_type);
         if (message_type == 0x01) // player requesting connection
             connectionRequested(event);
@@ -237,7 +238,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     NetworkString data = event->data();
     if (data.size() != 5 || data[0] != 4)
     {
-        Log::warn("ServerLobbyRoomProtocol", "The server is sending a badly formated message. Size is %d and first byte %d", data.size(), data[0]);
+        Log::warn("ServerLobbyRoomProtocol", "Receiving badly formated message. Size is %d and first byte %d", data.size(), data[0]);
         return;
     }
     uint32_t player_id = 0;
@@ -314,7 +315,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     NetworkString data = event->data();
     if (data.size() < 6 || data[0] != 4)
     {
-        Log::warn("ServerLobbyRoomProtocol", "The server is sending a badly "
+        Log::warn("ServerLobbyRoomProtocol", "Receiving a badly "
                             "formated message. Size is %d and first byte %d",
                             data.size(), data[0]);
         return;
