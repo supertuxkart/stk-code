@@ -311,7 +311,10 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
             if (!NetworkWorld::getInstance()->isRunning())
                 collectedItem(*i, kart);
             else if (NetworkManager::getInstance()->isServer())
+            {
+                collectedItem(*i, kart);
                 NetworkWorld::getInstance()->collectedItem(*i, kart);
+            }
         }   // if hit
     }   // for m_all_items
 }   // checkItemHit
