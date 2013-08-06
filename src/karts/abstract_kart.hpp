@@ -270,7 +270,7 @@ public:
      *  \param add_info Additional info, used in networking games to force
      *         a specific item to be used (instead of a random item) to keep
      *         all karts in synch. */
-    virtual void  collectedItem(Item *item, int random_attachment) = 0;
+    virtual void  collectedItem(Item *item, int add_info) = 0;
     // ------------------------------------------------------------------------
     /** Returns the current position of this kart in the race. */
     virtual int getPosition() const = 0;

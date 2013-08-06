@@ -104,6 +104,10 @@ protected:
     void setKartsFromCurrentGroup();
 
     virtual void playerConfirm(const int playerID);
+    /** updates model of a kart widget, to have the good selection when the user validates */
+    void updateKartWidgetModel(uint8_t widget_id,
+                const std::string& selection,
+                const irr::core::stringw& selectionText);
 
     /** Stores a pointer to the current selection screen */
     static KartSelectionScreen* m_instance_ptr;

@@ -39,6 +39,7 @@ class NetworkPlayerProfile
         uint8_t race_id; //!< The id of the player for the race
         std::string kart_name; //!< The selected kart.
         Online::User* user_profile; //!< Pointer to the lobby profile
+        uint8_t world_kart_id; //!< the kart id in the World class (pointer to AbstractKart)
 };
 
 /*! \class GameSetup
@@ -55,11 +56,13 @@ class GameSetup
         bool removePlayer(uint32_t id); //!< Remove a player by id.
         bool removePlayer(uint8_t id); //!< Remove a player by local id.
         void setPlayerKart(uint8_t id, std::string kart_name); //!< Set the kart of a player
+        void bindKartsToProfiles();
 
         std::vector<NetworkPlayerProfile*> getPlayers() { return m_players; }
         int getPlayerCount() { return m_players.size(); }
         const NetworkPlayerProfile* getProfile(uint32_t id); //!< Get a profile by database id
         const NetworkPlayerProfile* getProfile(uint8_t id); //!< Get the profile by the lobby id
+        const NetworkPlayerProfile* getProfile(std::string kart_name);
 
         bool isKartAvailable(std::string kart_name);
         bool isKartAllowed(std::string kart_name) {return true; }

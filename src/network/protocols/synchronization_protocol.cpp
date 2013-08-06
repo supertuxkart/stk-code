@@ -3,6 +3,7 @@
 #include "network/network_manager.hpp"
 #include "network/protocols/kart_update_protocol.hpp"
 #include "network/protocols/controller_events_protocol.hpp"
+#include "network/protocols/game_events_protocol.hpp"
 #include "utils/time.hpp"
 
 //-----------------------------------------------------------------------------
@@ -133,6 +134,7 @@ void SynchronizationProtocol::asynchronousUpdate()
             Log::info("SynchronizationProtocol", "Countdown finished. Starting now.");
             m_listener->requestStart(new KartUpdateProtocol());
             m_listener->requestStart(new ControllerEventsProtocol());
+            m_listener->requestStart(new GameEventsProtocol());
             m_listener->requestTerminate(this);
             return;
         }

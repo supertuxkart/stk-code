@@ -120,7 +120,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_jump_time            = 0;
     m_is_jumping           = false;
     m_min_nitro_time       = 0.0f;
-    
+
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
 
@@ -852,19 +852,19 @@ void Kart::collectedItem(Item *item, int add_info)
         break;
     case Item::ITEM_BONUS_BOX  :
         {
-            m_powerup->hitBonusBox(*item, add_info);
+            m_powerup->hitBonusBox(*item, add_info); // selects the powerup
             break;
         }
     case Item::ITEM_BUBBLEGUM:
-        m_has_caught_nolok_bubblegum = (item->getEmitter() != NULL && 
+        m_has_caught_nolok_bubblegum = (item->getEmitter() != NULL &&
                                     item->getEmitter()->getIdent() == "nolok");
 
         // slow down
         m_bubblegum_time = m_kart_properties->getBubblegumTime();
-        m_bubblegum_torque = (rand()%2) 
+        m_bubblegum_torque = (rand()%2)
                            ?  m_kart_properties->getBubblegumTorque()
                            : -m_kart_properties->getBubblegumTorque();
-        m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_BUBBLE, 
+        m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_BUBBLE,
                                  m_kart_properties->getBubblegumSpeedFraction(),
                                  m_kart_properties->getBubblegumFadeInTime(),
                                  m_bubblegum_time);
@@ -1152,7 +1152,8 @@ void Kart::update(float dt)
     }   // if there is material
 
     // Check if any item was hit.
-    ItemManager::get()->checkItemHit(this);
+    if (!m_controller->isNetworkController()) // no need in network
+        ItemManager::get()->checkItemHit(this);
 
     static video::SColor pink(255, 255, 133, 253);
     static video::SColor green(255, 61, 87, 23);
@@ -1198,7 +1199,7 @@ void Kart::update(float dt)
             // take the same time again to reach the bottom
             float t = 2.0f * v/force;
 
-            // Jump if either the jump is estimated to be long enough, or 
+            // Jump if either the jump is estimated to be long enough, or
             // the texture has the jump property set.
             if(t>getKartProperties()->getJumpAnimationTime()  ||
                 last_m->isJumpTexture()                         )
@@ -1211,13 +1212,13 @@ void Kart::update(float dt)
     {
         // Kart touched ground again
         m_is_jumping = false;
-        HitEffect *effect =  new Explosion(getXYZ(), "jump", 
+        HitEffect *effect =  new Explosion(getXYZ(), "jump",
                                           "jump_explosion.xml");
         projectile_manager->addHitEffect(effect);
         m_kart_model->setAnimation(KartModel::AF_DEFAULT);
         m_jump_time = 0;
     }
-    
+
     if( (!isOnGround() || emergency) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
@@ -1226,7 +1227,7 @@ void Kart::update(float dt)
     if(!m_shadow_enabled && isOnGround() && !emergency)
     {
         m_shadow->enableShadow();
-        m_shadow_enabled = true;  
+        m_shadow_enabled = true;
     }
 }   // update
 
@@ -1255,7 +1256,7 @@ void Kart::setSquash(float time, float slowdown)
         return;
     }
     m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
-    m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown, 
+    m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown,
                              0.1f, time);
     m_squash_time  = time;
 }   // setSquash
@@ -1522,13 +1523,13 @@ void Kart::updateNitro(float dt)
     if (m_min_nitro_time > 0.0f)
     {
         m_min_nitro_time -= dt;
-        
+
         // when pressing the key, don't allow the min time to go under zero.
         // If it went under zero, it would be reset
         if (m_controls.m_nitro && m_min_nitro_time <= 0.0f)
             m_min_nitro_time = 0.1f;
     }
-    
+
     bool increase_speed = (m_controls.m_nitro && isOnGround());
     if (!increase_speed && m_min_nitro_time <= 0.0f)
     {
@@ -1540,7 +1541,7 @@ void Kart::updateNitro(float dt)
         m_collected_energy = 0;
         return;
     }
-    
+
     if (increase_speed)
     {
         m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
@@ -2300,7 +2301,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITRO2, 0);
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
         m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
-        
+
     }
     m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO1, getSpeed(), dt);
     m_kart_gfx->resizeBox(KartGFX::KGFX_NITRO2, getSpeed(), dt);

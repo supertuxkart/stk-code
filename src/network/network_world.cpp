@@ -1,8 +1,10 @@
 #include "network/network_world.hpp"
 
+#include "network/network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
 #include "network/protocols/controller_events_protocol.hpp"
+#include "network/protocols/game_events_protocol.hpp"
 #include "modes/world.hpp"
 
 #include "karts/controller/controller.hpp"
@@ -40,6 +42,21 @@ void NetworkWorld::update(float dt)
     }
 }
 
+bool NetworkWorld::isRaceOver()
+{
+    if (!World::getWorld())
+        return false;
+    return (World::getWorld()->getPhase() >= WorldStatus::RESULT_DISPLAY_PHASE);
+}
+
+void NetworkWorld::collectedItem(Item *item, AbstractKart *kart)
+{
+    assert(NetworkManager::getInstance()->isServer()); // this is only called in the server
+    GameEventsProtocol* protocol = static_cast<GameEventsProtocol*>(
+        ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS));
+    protocol->collectedItem(item,kart);
+}
+
 void NetworkWorld::controllerAction(Controller* controller, PlayerAction action, int value)
 {
     ControllerEventsProtocol* protocol = static_cast<ControllerEventsProtocol*>(
@@ -48,9 +65,3 @@ void NetworkWorld::controllerAction(Controller* controller, PlayerAction action,
         protocol->controllerAction(controller, action, value);
 }
 
-bool NetworkWorld::isRaceOver()
-{
-    if (!World::getWorld())
-        return false;
-    return (World::getWorld()->getPhase() >= WorldStatus::RESULT_DISPLAY_PHASE);
-}

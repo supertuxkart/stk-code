@@ -144,7 +144,7 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t race_id, std::string kar
 
     assert(widget_id>=0 && widget_id < m_kart_widgets.size());
 
-    considerKartHovered(widget_id,kart_name);
+    KartSelectionScreen::updateKartWidgetModel(widget_id, kart_name, irr::core::stringw(kart_name.c_str()));
     m_kart_widgets[widget_id].setKartInternalName(kart_name);
     m_kart_widgets[widget_id].markAsReady(); // mark player ready
 }

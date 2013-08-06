@@ -832,75 +832,7 @@ void KartHoverListener::onSelectionChanged(DynamicRibbonWidget* theWidget,
         return;
     }
 
-    // Update the displayed model
-    ModelViewWidget* w3 = m_parent->m_kart_widgets[playerID].m_model_view;
-    assert( w3 != NULL );
-
-    if (selectionID == RANDOM_KART_ID)
-    {
-        // Random kart
-        scene::IMesh* model =
-            ItemManager::getItemModel(Item::ITEM_BONUS_BOX);
-        w3->clearModels();
-        w3->addModel( model, Vec3(0.0f, -12.0f, 0.0f),
-                      Vec3(35.0f, 35.0f, 35.0f) );
-        w3->update(0);
-        m_parent->m_kart_widgets[playerID].m_kart_name
-        ->setText( _("Random Kart"), false );
-    }
-    // selectionID contains the name of the kart, so check only for substr
-    else if (StringUtils::startsWith(selectionID, ID_LOCKED))
-    {
-        w3->clearModels();
-        w3->addModel(irr_driver->getAnimatedMesh(
-                         file_manager->getDataDir() + "/models/chest.b3d" )->getMesh(20),
-                     Vec3(0,0,0), Vec3(15.0f, 15.0f, 15.0f) );
-        w3->update(0);
-
-        if (m_parent->m_multiplayer)
-        {
-            m_parent->m_kart_widgets[playerID].m_kart_name
-            ->setText(_("Locked"), false );
-        }
-        else
-        {
-            m_parent->m_kart_widgets[playerID].m_kart_name
-            ->setText(_("Locked : solve active challenges to gain "
-                        "access to more!"), false );
-        }
-    }
-    else
-    {
-        const KartProperties *kp =
-            kart_properties_manager->getKart(selectionID);
-        if (kp != NULL)
-        {
-            const KartModel &kart_model = kp->getMasterKartModel();
-
-            w3->clearModels();
-            w3->addModel( kart_model.getModel(), Vec3(0,0,0),
-                          Vec3(35.0f, 35.0f, 35.0f),
-                          kart_model.getBaseFrame() );
-            w3->addModel( kart_model.getWheelModel(0),
-                          kart_model.getWheelGraphicsPosition(0) );
-            w3->addModel( kart_model.getWheelModel(1),
-                          kart_model.getWheelGraphicsPosition(1) );
-            w3->addModel( kart_model.getWheelModel(2),
-                          kart_model.getWheelGraphicsPosition(2) );
-            w3->addModel( kart_model.getWheelModel(3),
-                          kart_model.getWheelGraphicsPosition(3) );
-            w3->update(0);
-
-            m_parent->m_kart_widgets[playerID].m_kart_name
-            ->setText( selectionText.c_str(), false );
-        }
-        else
-        {
-            fprintf(stderr, "[KartSelectionScreen] WARNING: could not "
-                    "find a kart named '%s'\n",
-                    selectionID.c_str());
-        }
-    }
+    m_parent->updateKartWidgetModel(playerID, selectionID, selectionText);
 
     m_parent->m_kart_widgets[playerID].setKartInternalName(selectionID);
     m_parent->validateKartChoices();
@@ -1506,8 +1438,11 @@ void KartSelectionScreen::playerConfirm(const int playerID)
 
 // ----------------------------------------------------------------------------
 
-void KartSelectionScreen::considerKartHovered(uint8_t widget_id, std::string selection)
+void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
+                const std::string& selection,
+                const irr::core::stringw& selectionText)
 {
+    // Update the displayed model
     ModelViewWidget* w3 = m_kart_widgets[widget_id].m_model_view;
     assert( w3 != NULL );
 
@@ -1520,8 +1455,29 @@ void KartSelectionScreen::considerKartHovered(uint8_t widget_id, std::string sel
         w3->addModel( model, Vec3(0.0f, -12.0f, 0.0f),
                       Vec3(35.0f, 35.0f, 35.0f) );
         w3->update(0);
-        m_kart_widgets[widget_id].m_kart_name->setText(
-                _("Random Kart"), false );
+        m_kart_widgets[widget_id].m_kart_name
+        ->setText( _("Random Kart"), false );
+    }
+    // selection contains the name of the kart, so check only for substr
+    else if (StringUtils::startsWith(selection, ID_LOCKED))
+    {
+        w3->clearModels();
+        w3->addModel(irr_driver->getAnimatedMesh(
+                         file_manager->getDataDir() + "/models/chest.b3d" )->getMesh(20),
+                     Vec3(0,0,0), Vec3(15.0f, 15.0f, 15.0f) );
+        w3->update(0);
+
+        if (m_multiplayer)
+        {
+            m_kart_widgets[widget_id].m_kart_name
+            ->setText(_("Locked"), false );
+        }
+        else
+        {
+            m_kart_widgets[widget_id].m_kart_name
+            ->setText(_("Locked : solve active challenges to gain "
+                        "access to more!"), false );
+        }
     }
     else
     {
@@ -1545,8 +1501,8 @@ void KartSelectionScreen::considerKartHovered(uint8_t widget_id, std::string sel
                           kart_model.getWheelGraphicsPosition(3) );
             w3->update(0);
 
-            m_kart_widgets[widget_id].m_kart_name->setText(
-                    selection.c_str(), false );
+            m_kart_widgets[widget_id].m_kart_name
+            ->setText( selectionText.c_str(), false );
         }
         else
         {

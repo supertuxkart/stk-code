@@ -8,6 +8,7 @@
 class Controller;
 class KartUpdateProtocol;
 class AbstractKart;
+class Item;
 
 /*! \brief Manages the world updates during an online game
  *  This function's update is to be called instead of the normal World update
@@ -23,6 +24,7 @@ class NetworkWorld : public Singleton<NetworkWorld>
         bool isRunning() { return m_running; }
         bool isRaceOver();
 
+        void collectedItem(Item *item, AbstractKart *kart);
         void controllerAction(Controller* controller, PlayerAction action, int value);
 
         std::string m_self_kart;

@@ -32,7 +32,7 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
-#include "modes/world.hpp" 
+#include "modes/world.hpp"
 #include "utils/constants.hpp"
 
 /** Initialises the attachment each kart has.

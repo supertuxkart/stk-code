@@ -3,6 +3,8 @@
 
 #include "network/protocol.hpp"
 
+class AbstractKart;
+class Item;
 
 class GameEventsProtocol : public Protocol
 {
@@ -10,11 +12,13 @@ class GameEventsProtocol : public Protocol
         GameEventsProtocol();
         virtual ~GameEventsProtocol();
 
-        virtual bool notifyEvent(Event* event) { return true; }
-        virtual bool notifyEventAsynchronous(Event* event) { return true; }
+        virtual bool notifyEvent(Event* event);
+        virtual bool notifyEventAsynchronous(Event* event) { return false; }
         virtual void setup();
         virtual void update();
         virtual void asynchronousUpdate() {}
+
+        void collectedItem(Item* item, AbstractKart* kart);
 
     protected:
 };

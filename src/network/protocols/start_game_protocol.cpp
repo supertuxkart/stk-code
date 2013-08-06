@@ -193,6 +193,8 @@ void StartGameProtocol::ready() // on clients, means the loading is finished
         ns.ai32(NetworkManager::getInstance()->getPeers()[0]->getClientServerToken()).ai8(1);
         Log::info("StartGameProtocol", "Player ready, notifying server.");
         m_listener->sendMessage(this, ns, true);
+        // set karts into the network game setup
+        NetworkManager::getInstance()->getGameSetup()->bindKartsToProfiles();
         m_state = READY;
         m_ready = true;
         return;
