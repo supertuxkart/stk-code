@@ -36,7 +36,7 @@ namespace Online{
         : m_type(type), m_manage_memory(manage_memory), m_priority(priority)
     {
         m_cancel.setAtomic(false);
-        m_done.setAtomic(false);
+        m_state.setAtomic(S_PREPARING);
     }   // Request
 
     Request::~Request()
@@ -45,6 +45,7 @@ namespace Online{
 
     void Request::execute()
     {
+        assert(isBusy());
         prepareOperation();
         operation();
         afterOperation();
@@ -52,7 +53,7 @@ namespace Online{
 
     void Request::afterOperation()
     {
-        m_done.setAtomic(true);
+        m_state.setAtomic(S_DONE);
     }
 
     // =========================================================================================
@@ -62,26 +63,21 @@ namespace Online{
     {
         //Negative numbers are reserved for special requests ment for the HTTP Manager
         assert(type >= 0);
-        m_url.setAtomic("");
-        MutexLocker(m_parameters);
-        m_parameters.getData() = new Parameters;
+        m_url = "";
+        m_parameters = new Parameters();
         m_progress.setAtomic(0);
     }
 
     HTTPRequest::~HTTPRequest()
     {
-        MutexLocker(m_parameters);
-        delete m_parameters.getData();
+        delete m_parameters;
     }
 
     bool HTTPRequest::isAllowedToAdd()
     {
-        bool ok = true;
-        m_url.lock();
-        if (m_url.getData().size() > 5 && ( m_url.getData().substr(0, 5) != "http:"))
-            ok = false;
-        m_url.unlock();
-        return ok;
+        if (!Request::isAllowedToAdd() || m_url.size() < 5 || ( m_url.substr(0, 5) != "http:"))
+            return false;
+        return true;
     }
 
     void HTTPRequest::prepareOperation()
@@ -92,7 +88,7 @@ namespace Online{
             Log::error("HTTPRequest::prepareOperation", "LibCurl session not initialized.");
             return;
         }
-        curl_easy_setopt(m_curl_session, CURLOPT_URL, m_url.getAtomic().c_str());
+        curl_easy_setopt(m_curl_session, CURLOPT_URL, m_url.c_str());
         curl_easy_setopt(m_curl_session, CURLOPT_FOLLOWLOCATION, 1);
         curl_easy_setopt(m_curl_session, CURLOPT_WRITEFUNCTION, &HTTPRequest::WriteCallback);
         curl_easy_setopt(m_curl_session, CURLOPT_NOPROGRESS, 0);
@@ -109,10 +105,9 @@ namespace Online{
             return;
         Parameters::iterator iter;
         std::string postString("");
-        m_parameters.lock();
-        for (iter = m_parameters.getData()->begin(); iter != m_parameters.getData()->end(); ++iter)
+        for (iter = m_parameters->begin(); iter != m_parameters->end(); ++iter)
         {
-           if(iter != m_parameters.getData()->begin())
+           if(iter != m_parameters->begin())
                postString.append("&");
            char * escaped = curl_easy_escape(m_curl_session , iter->first.c_str(), iter->first.size());
            postString.append(escaped);
@@ -122,7 +117,6 @@ namespace Online{
            postString.append(escaped);
            curl_free(escaped);
         }
-        m_parameters.unlock();
         curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS, postString.c_str());
         std::string uagent( std::string("SuperTuxKart/") + STK_VERSION );
             #ifdef WIN32
@@ -209,16 +203,14 @@ namespace Online{
         : HTTPRequest(priority, manage_memory, type)
     {
         m_string_buffer = "";
-        m_info.setAtomic("");
-        m_success.setAtomic(false);
-        MutexLocker(m_result);
-        m_result.getData() = NULL;
+        m_info = "";
+        m_success = false;
+        m_result = NULL;
     }
 
     XMLRequest::~XMLRequest()
     {
-        MutexLocker(m_result);
-        delete m_result.getData();
+        delete m_result;
     }
 
     void XMLRequest::prepareOperation()
@@ -231,8 +223,7 @@ namespace Online{
     void XMLRequest::operation()
     {
         HTTPRequest::operation();
-        MutexLocker(m_result);
-        m_result.getData() = file_manager->createXMLTreeFromString(m_string_buffer);
+        m_result = file_manager->createXMLTreeFromString(m_string_buffer);
     }
 
     void XMLRequest::afterOperation()
@@ -241,35 +232,34 @@ namespace Online{
             Log::error( "XMLRequest::afterOperation", "curl_easy_perform() failed: %s", curl_easy_strerror(m_curl_code));
         else
             Log::info(  "XMLRequest::afterOperation", "Received : %s",                  m_string_buffer.c_str());
-        m_result.lock();;
         bool success = false;
-        irr::core::stringw info;
         std::string rec_success;
-        if(m_result.getData()->get("success", &rec_success))
+        if(m_result->get("success", &rec_success))
         {
             if (rec_success =="yes")
                 success = true;
-            m_result.getData()->get("info", &info);
+            m_result->get("info", &m_info);
         }
         else
-            info = _("Unable to connect to the server. Check your internet connection or try again later.");
-        m_result.unlock();
-        m_info.lock();
-        m_info.getData() = info;
-        m_info.unlock();
-        m_success.setAtomic(success);
+            m_info = _("Unable to connect to the server. Check your internet connection or try again later.");
+        m_success = success;
         HTTPRequest::afterOperation();
     }
 
     const XMLNode * XMLRequest::getResult() const
     {
-        MutexLocker(m_result);
-        return m_result.getData();
+        assert(isDone());
+        return m_result;
     }
-
     const irr::core::stringw & XMLRequest::getInfo()   const
     {
-        MutexLocker(m_info);
-        return m_info.getData();
+        assert(isDone());
+        return m_info;
     }
+    bool XMLRequest::isSuccess() const
+    {
+        assert(isDone());
+        return m_success;
+    }
+
 } // namespace Online

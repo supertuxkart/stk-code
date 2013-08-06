@@ -28,6 +28,7 @@
 #include <irrString.h>
 
 #include <string>
+#include <assert.h>
 
 namespace Online{
 
@@ -74,10 +75,10 @@ namespace Online{
 
             class ServerCreationRequest : public XMLRequest {
                 virtual void callback ();
-                Synchronised<uint32_t> m_created_server_id;
+                uint32_t m_created_server_id;
             public:
                 ServerCreationRequest() : XMLRequest(RT_SERVER_CREATION) {}
-                const uint32_t getCreatedServerID() const {return m_created_server_id.getAtomic();}
+                const uint32_t getCreatedServerID() const { assert(isDone()); return m_created_server_id;}
             };
 
             class ServerJoinRequest : public XMLRequest {
@@ -106,9 +107,8 @@ namespace Online{
 
             CurrentUser();
 
-            void signIn                 (const SignInRequest            * input);
-            void signOut                (const SignOutRequest           * input);
-            void createServer           (const ServerCreationRequest    * input);
+            void signIn                 (bool success, const XMLNode * input);
+            void signOut                (bool success, const XMLNode * input);
 
         public:
             /**Singleton */

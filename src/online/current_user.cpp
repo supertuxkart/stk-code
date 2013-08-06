@@ -126,18 +126,18 @@ namespace Online{
         return request;
     }
 
-    void CurrentUser::signIn(const SignInRequest * input)
+    void CurrentUser::signIn(bool success, const XMLNode * input)
     {
-        if (input->isSuccess())
+        if (success)
         {
             std::string token("");
-            int token_fetched       = input->getResult()->get("token", &token);
+            int token_fetched       = input->get("token", &token);
             setToken(token);
             irr::core::stringw username("");
-            int username_fetched    = input->getResult()->get("username", &username);
+            int username_fetched    = input->get("username", &username);
             setUserName(username);
             uint32_t userid(0);
-            int userid_fetched      = input->getResult()->get("userid", &userid);
+            int userid_fetched      = input->get("userid", &userid);
             setUserID(userid);
             assert(token_fetched && username_fetched && userid_fetched);
             setUserState (US_SIGNED_IN);
@@ -147,6 +147,12 @@ namespace Online{
                 UserConfigParams::m_saved_token = getToken();
                 UserConfigParams::m_saved_session = true;
             }
+            else
+            {
+                UserConfigParams::m_saved_user = 0;
+                UserConfigParams::m_saved_token = "";
+                UserConfigParams::m_saved_session = false;
+            }
         }
         else
             setUserState (US_SIGNED_OUT);
@@ -154,7 +160,7 @@ namespace Online{
 
     void CurrentUser::SignInRequest::callback()
     {
-        CurrentUser::get()->signIn(this);
+        CurrentUser::get()->signIn(m_success, m_result);
     }
 
     // ============================================================================
@@ -176,11 +182,11 @@ namespace Online{
 
     void CurrentUser::ServerCreationRequest::callback()
     {
-        if(isSuccess())
+        if(m_success)
         {
-            Server * server = new Server(*getResult()->getNode("server"));
+            Server * server = new Server(*m_result->getNode("server"));
             ServersManager::get()->addServer(server);
-            m_created_server_id.setAtomic(server->getServerId());
+            m_created_server_id = server->getServerId();
         }
     }
 
@@ -197,9 +203,9 @@ namespace Online{
         return request;
     }
 
-    void CurrentUser::signOut(const SignOutRequest * input)
+    void CurrentUser::signOut(bool success, const XMLNode * input)
     {
-        if(!input->isSuccess())
+        if(!success)
         {
             Log::warn("CurrentUser::signOut", "%s", _("There were some connection issues while signing out. Report a bug if this caused issues."));
         }
@@ -214,7 +220,7 @@ namespace Online{
 
     void CurrentUser::SignOutRequest::callback()
     {
-        CurrentUser::get()->signOut(this);
+        CurrentUser::get()->signOut(m_success, m_result);
     }
 
     // ============================================================================
@@ -239,7 +245,7 @@ namespace Online{
         if(isSuccess())
         {
             uint32_t server_id;
-            getResult()->get("serverid", &server_id);
+            m_result->get("serverid", &server_id);
             ServersManager::get()->setJoinedServer(server_id);
         }
         //FIXME needs changes for actual valid joining
@@ -254,8 +260,8 @@ namespace Online{
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("get-addon-vote"));
         request->setParameter("token", getToken());
-        request->setParameter("id", getUserID());
-        request->setParameter("addon-id", addon_id);
+        request->setParameter("userid", getUserID());
+        request->setParameter("addonid", addon_id);
         HTTPManager::get()->addRequest(request);
         return request;
     }
@@ -269,8 +275,8 @@ namespace Online{
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("set-addon-vote"));
         request->setParameter("token", getToken());
-        request->setParameter("id", getUserID());
-        request->setParameter("addon-id", addon_id);
+        request->setParameter("userid", getUserID());
+        request->setParameter("addonid", addon_id);
         request->setParameter("rating", rating);
         HTTPManager::get()->addRequest(request);
         return request;
@@ -278,12 +284,12 @@ namespace Online{
 
     void CurrentUser::setAddonVoteRequest::callback()
     {
-        if(isSuccess())
+        if(m_success)
         {
             std::string addon_id;
-            getResult()->get("addon-id", &addon_id);
+            m_result->get("addon-id", &addon_id);
             float average;
-            getResult()->get("new-average", &average);
+            m_result->get("new-average", &average);
             addons_manager->getAddon(addon_id)->setRating(average);
         }
     }

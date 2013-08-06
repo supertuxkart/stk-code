@@ -28,7 +28,7 @@
 #  include <winsock2.h>
 #endif
 #include <curl/curl.h>
-
+#include <assert.h>
 #include <string>
 
 namespace Online{
@@ -54,12 +54,19 @@ namespace Online{
         important this request is. */
         const int              m_priority;
 
+        enum State
+        {
+            S_PREPARING,
+            S_BUSY,
+            S_DONE
+        };
+
     protected:
 
         /** Cancel this request if it is active. */
         Synchronised<bool>              m_cancel;
         /** Set to though if the reply of the request is in and callbacks are executed */
-        Synchronised<bool>              m_done;
+        Synchronised<State>             m_state;
 
         virtual void prepareOperation() {}
         virtual void operation() {}
@@ -92,10 +99,19 @@ namespace Online{
         bool isCancelled()              const   { return m_cancel.getAtomic(); }
         // ------------------------------------------------------------------------
         /** Returns if this request is done. */
-        bool isDone()                   const   { return m_done.getAtomic(); }
+        bool isDone()                   const   { return m_state.getAtomic() == S_DONE; }
+        // ------------------------------------------------------------------------
+        /** Returns if this request is being prepared. */
+        bool isPreparing()              const   { return m_state.getAtomic() == S_PREPARING; }
+        // ------------------------------------------------------------------------
+        /** Returns if this request is busy. */
+        bool isBusy()                   const   { return m_state.getAtomic() == S_BUSY; }
+        // ------------------------------------------------------------------------
+        /** Sets the request stqte to busy. */
+        void setBusy()                          { m_state.setAtomic(S_BUSY); }
         // ------------------------------------------------------------------------
         /** Virtual method to check if a request has initialized all needed members to a valid value. */
-        virtual bool isAllowedToAdd()   const   { return true; }
+        virtual bool isAllowedToAdd()   const   { return isPreparing(); }
 
         /** This class is used by the priority queue to sort requests by priority.
          */
@@ -126,8 +142,8 @@ namespace Online{
         *  packet is downloaded. At the end either -1 (error) or 1
         *  (everything ok) at the end. */
         Synchronised<float>                             m_progress;
-        Synchronised<std::string>                       m_url;
-        Synchronised<Parameters *>                      m_parameters;
+        std::string                                     m_url;
+        Parameters *                                    m_parameters;
         CURL *                                          m_curl_session;
         CURLcode                                        m_curl_code;
 
@@ -154,32 +170,27 @@ namespace Online{
         virtual ~HTTPRequest();
 
         void setParameter(const std::string & name, const std::string &value){
-            MutexLocker(m_parameters);
-            (*m_parameters.getData())[name] = value;
+            assert(isPreparing());
+            (*m_parameters)[name] = value;
         };
         void setParameter(const std::string & name, const irr::core::stringw &value){
-            MutexLocker(m_parameters);
-            (*m_parameters.getData())[name] = irr::core::stringc(value.c_str()).c_str();
+            assert(isPreparing());
+            (*m_parameters)[name] = irr::core::stringc(value.c_str()).c_str();
         }
         template <typename T>
         void setParameter(const std::string & name, const T& value){
-            MutexLocker(m_parameters);
-            (*m_parameters.getData())[name] = StringUtils::toString(value);
+            assert(isPreparing());
+            (*m_parameters)[name] = StringUtils::toString(value);
         }
 
         /** Returns the current progress. */
-        float getProgress() const { return m_progress.getAtomic(); }
+        float getProgress() const                       { return m_progress.getAtomic(); }
         /** Sets the current progress. */
-        void setProgress(float f) { m_progress.setAtomic(f); }
+        void setProgress(float f)                       { m_progress.setAtomic(f); }
 
-        const std::string getURL()     {
-                                            m_url.lock();
-                                            const std::string url = m_url.getData();
-                                            m_url.unlock();
-                                            return url;
-                                        }
+        const std::string & getURL()                    { assert(isBusy()); return m_url;}
 
-        void setURL(const std::string & url) { m_url.setAtomic(url);}
+        void setURL(const std::string & url)            { assert(isPreparing()); m_url = url;}
 
         virtual bool isAllowedToAdd() OVERRIDE;
 
@@ -188,12 +199,12 @@ namespace Online{
     class XMLRequest : public HTTPRequest
     {
     private:
-        Synchronised<XMLNode *>                         m_result;
         std::string                                     m_string_buffer;
 
     protected :
-        Synchronised<irr::core::stringw>                m_info;
-        Synchronised<bool>                              m_success;
+        XMLNode *                                       m_result;
+        irr::core::stringw                              m_info;
+        bool                                            m_success;
 
         virtual void                                    prepareOperation() OVERRIDE;
         virtual void                                    operation() OVERRIDE;
@@ -205,7 +216,7 @@ namespace Online{
 
         const XMLNode *                                 getResult() const;
         const irr::core::stringw &                      getInfo()   const;
-        bool                                            isSuccess() const       { return m_success.getAtomic(); }
+        bool                                            isSuccess() const;
 
     };
 } //namespace Online

@@ -53,7 +53,6 @@ private:
     GUIEngine::RatingBarWidget * m_rating_widget;
 
     GUIEngine::RibbonWidget * m_options_widget;
-    GUIEngine::IconButtonWidget * m_save_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
 
 public:

@@ -149,6 +149,7 @@ namespace Online{
     void HTTPManager::addRequest(Request *request)
     {
         assert(request->isAllowedToAdd());
+        request->setBusy();
         m_request_queue.lock();
         m_request_queue.getData().push(request);
         // Wake up the network http thread

@@ -53,8 +53,6 @@ VoteDialog::VoteDialog(const std::string & addon_id)
     m_rating_widget->allowVoting();
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
-    m_save_widget = getWidget<IconButtonWidget>("save");
-    assert(m_save_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
@@ -62,7 +60,6 @@ VoteDialog::VoteDialog(const std::string & addon_id)
     m_fetch_vote_request = CurrentUser::get()->requestGetAddonVote(m_addon_id);
 
     m_rating_widget->setDeactivated();
-    m_save_widget->setDeactivated();
     m_cancel_widget->setDeactivated();
 }
 
@@ -88,7 +85,9 @@ GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& eventSou
 
     if (eventSource == m_rating_widget->m_properties[PROP_ID])
     {
-        m_self_destroy = true;
+        m_perform_vote_request = CurrentUser::get()->requestSetAddonVote(m_addon_id, m_rating_widget->getRating());
+        m_rating_widget->setDeactivated();
+        m_cancel_widget->setDeactivated();
         return GUIEngine::EVENT_BLOCK;
     }
 
@@ -98,14 +97,6 @@ GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& eventSou
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
             m_self_destroy = true;
-            return GUIEngine::EVENT_BLOCK;
-        }
-        else if (selection == m_save_widget->m_properties[PROP_ID])
-        {
-            m_perform_vote_request = CurrentUser::get()->requestSetAddonVote(m_addon_id, m_rating_widget->getRating());
-            m_rating_widget->setDeactivated();
-            m_save_widget->setDeactivated();
-            m_cancel_widget->setDeactivated();
             return GUIEngine::EVENT_BLOCK;
         }
     }
@@ -124,7 +115,20 @@ void VoteDialog::onUpdate(float dt)
             {
                 m_info_widget->setDefaultColor();
                 m_info_widget->setText(_("bla"), false); //FIXME
-                m_options_widget->setActivated();
+                std::string voted;
+                m_fetch_vote_request->getResult()->get("voted", &voted);
+                if(voted == "yes")
+                {
+                    float rating;
+                    m_fetch_vote_request->getResult()->get("rating", &rating);
+                    m_rating_widget->setRating(rating);
+                    m_info_widget->setText(_("You can adapt your previous rating by clicking the stars beneath."), false);
+                }
+                else if(voted == "no")
+                {
+                    m_info_widget->setText(_("You have not yet voted for this addon. Select your desired rating by clicking the stars beneath"), false);
+                }
+                m_cancel_widget->setActivated();
                 m_rating_widget->setActivated();
             }
             else
@@ -149,7 +153,7 @@ void VoteDialog::onUpdate(float dt)
             if(m_perform_vote_request->isSuccess())
             {
                 m_info_widget->setDefaultColor();
-                m_info_widget->setText(_("Vote cast! You can now close the window."), false);
+                m_info_widget->setText(_("Vote successful! You can now close the window."), false);
                 m_cancel_widget->setActivated();
             }
             else
@@ -157,7 +161,7 @@ void VoteDialog::onUpdate(float dt)
                 sfx_manager->quickSound( "anvil" );
                 m_info_widget->setErrorColor();
                 m_info_widget->setText(m_perform_vote_request->getInfo(), false);
-                m_options_widget->setActivated();
+                m_cancel_widget->setActivated();
                 m_rating_widget->setActivated();
             }
             delete m_perform_vote_request;
