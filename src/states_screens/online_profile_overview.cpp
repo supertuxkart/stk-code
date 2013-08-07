@@ -38,22 +38,15 @@ DEFINE_SCREEN_SINGLETON( OnlineProfileOverview );
 
 // -----------------------------------------------------------------------------
 
-OnlineProfileOverview::OnlineProfileOverview() : Screen("online/profile_overview.stkgui")
+OnlineProfileOverview::OnlineProfileOverview() : OnlineProfileBase("online/profile_overview.stkgui")
 {
 }   // OnlineProfileOverview
-
-
-
 
 // -----------------------------------------------------------------------------
 
 void OnlineProfileOverview::loadedFromFile()
 {
-    m_profile_tabs = this->getWidget<RibbonWidget>("profile_tabs");
-    assert(m_profile_tabs != NULL);
-    LabelWidget * header = this->getWidget<LabelWidget>("title");
-    assert(header != NULL);
-    header->setText(_("Your profile"), false);
+    OnlineProfileBase::loadedFromFile();
 
 }   // loadedFromFile
 
@@ -61,36 +54,14 @@ void OnlineProfileOverview::loadedFromFile()
 
 void OnlineProfileOverview::init()
 {
-    Screen::init();
-    m_profile_tabs->select( "tab_players", PLAYER_ID_GAME_MASTER );
-
-    /*
-    tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
-    tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
-    tabBar->getRibbonChildren()[2].setTooltip( _("User Interface") );
-    tabBar->getRibbonChildren()[4].setTooltip( _("Controls") );*/
+    OnlineProfileBase::init();
+    m_profile_tabs->select( m_overview_tab->m_properties[PROP_ID], PLAYER_ID_GAME_MASTER );
 }   // init
-
-// -----------------------------------------------------------------------------
-
-void OnlineProfileOverview::tearDown()
-{
-    Screen::tearDown();
-}   // tearDown
 
 // -----------------------------------------------------------------------------
 
 void OnlineProfileOverview::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    if (name == m_profile_tabs->m_properties[PROP_ID])
-    {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
-
-        //if (selection == "tab_audio") StateManager::get()->replaceTopMostScreen(OptionsScreenAudio::getInstance());
-    }
-    else if (name == "back")
-    {
-        StateManager::get()->escapePressed();
-    }
+    OnlineProfileBase::eventCallback( widget, name, playerID);
 }   // eventCallback
 

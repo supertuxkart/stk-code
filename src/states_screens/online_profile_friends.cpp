@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Glenn De Jonghe
+//  Copyright (C) 2013 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -38,59 +38,28 @@ DEFINE_SCREEN_SINGLETON( OnlineProfileFriends );
 
 // -----------------------------------------------------------------------------
 
-OnlineProfileFriends::OnlineProfileFriends() : Screen("online/profile_overview.stkgui")
+OnlineProfileFriends::OnlineProfileFriends() : OnlineProfileBase("online/profile_friends.stkgui")
 {
 }   // OnlineProfileFriends
-
-
-
 
 // -----------------------------------------------------------------------------
 
 void OnlineProfileFriends::loadedFromFile()
 {
-    m_profile_tabs = this->getWidget<RibbonWidget>("profile_tabs");
-    assert(m_profile_tabs != NULL);
-    LabelWidget * header = this->getWidget<LabelWidget>("title");
-    assert(header != NULL);
-    header->setText(_("Your profile"), false);
-
+    OnlineProfileBase::loadedFromFile();
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
 
 void OnlineProfileFriends::init()
 {
-    Screen::init();
-    m_profile_tabs->select( "tab_players", PLAYER_ID_GAME_MASTER );
-
-    /*
-    tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
-    tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
-    tabBar->getRibbonChildren()[2].setTooltip( _("User Interface") );
-    tabBar->getRibbonChildren()[4].setTooltip( _("Controls") );*/
+    OnlineProfileBase::init();
+    m_profile_tabs->select( m_friends_tab->m_properties[PROP_ID], PLAYER_ID_GAME_MASTER );
 }   // init
-
-// -----------------------------------------------------------------------------
-
-void OnlineProfileFriends::tearDown()
-{
-    Screen::tearDown();
-}   // tearDown
-
 // -----------------------------------------------------------------------------
 
 void OnlineProfileFriends::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    if (name == m_profile_tabs->m_properties[PROP_ID])
-    {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
-
-        //if (selection == "tab_audio") StateManager::get()->replaceTopMostScreen(OptionsScreenAudio::getInstance());
-    }
-    else if (name == "back")
-    {
-        StateManager::get()->escapePressed();
-    }
+    OnlineProfileBase::eventCallback( widget, name, playerID);
 }   // eventCallback
 

@@ -229,6 +229,7 @@ src/states_screens/main_menu_screen.cpp
 src/states_screens/networking_lobby.cpp
 src/states_screens/network_kart_selection.cpp
 src/states_screens/offline_kart_selection.cpp
+src/states_screens/online_profile_base.cpp
 src/states_screens/online_profile_friends.cpp
 src/states_screens/online_profile_overview.cpp
 src/states_screens/online_screen.cpp
@@ -527,6 +528,7 @@ src/states_screens/main_menu_screen.hpp
 src/states_screens/networking_lobby.hpp
 src/states_screens/network_kart_selection.hpp
 src/states_screens/offline_kart_selection.hpp
+src/states_screens/online_profile_base.hpp
 src/states_screens/online_profile_friends.hpp
 src/states_screens/online_profile_overview.hpp
 src/states_screens/online_screen.hpp

@@ -24,6 +24,7 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
+#include "states_screens/online_profile_base.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -32,12 +33,10 @@ namespace GUIEngine { class Widget; }
   * \brief Online profiel overview screen
   * \ingroup states_screens
   */
-class OnlineProfileFriends : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OnlineProfileFriends>
+class OnlineProfileFriends : public OnlineProfileBase, public GUIEngine::ScreenSingleton<OnlineProfileFriends>
 {
 private:
     OnlineProfileFriends();
-
-    GUIEngine::RibbonWidget* m_profile_tabs;
 
 public:
     friend class GUIEngine::ScreenSingleton<OnlineProfileFriends>;
@@ -46,14 +45,10 @@ public:
     virtual void loadedFromFile() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
-                               const int playerID) OVERRIDE;
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void tearDown() OVERRIDE;
 };
 
 #endif

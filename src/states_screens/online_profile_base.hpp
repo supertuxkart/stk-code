@@ -16,15 +16,14 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef __HEADER_ONLINE_PROFILE_OVERVIEW_HPP__
-#define __HEADER_ONLINE_PROFILE_OVERVIEW_HPP__
+#ifndef __HEADER_ONLINE_PROFILE_BASE_HPP__
+#define __HEADER_ONLINE_PROFILE_BASE_HPP__
 
 #include <string>
 #include <irrString.h>
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
-#include "states_screens/online_profile_base.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -33,20 +32,21 @@ namespace GUIEngine { class Widget; }
   * \brief Online profiel overview screen
   * \ingroup states_screens
   */
-class OnlineProfileOverview : public OnlineProfileBase, public GUIEngine::ScreenSingleton<OnlineProfileOverview>
+class OnlineProfileBase : public GUIEngine::Screen
 {
 protected:
-    OnlineProfileOverview();
+    OnlineProfileBase(const char* filename);
+    GUIEngine::RibbonWidget* m_profile_tabs;
+    GUIEngine::IconButtonWidget * m_overview_tab;
+    GUIEngine::IconButtonWidget * m_friends_tab;
 
 public:
-    friend class GUIEngine::ScreenSingleton<OnlineProfileOverview>;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
-                               const int playerID) OVERRIDE;
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
