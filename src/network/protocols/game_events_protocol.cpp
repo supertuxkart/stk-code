@@ -1,6 +1,7 @@
 #include "network/protocols/game_events_protocol.hpp"
 
 #include "karts/abstract_kart.hpp"
+#include "items/attachment.hpp"
 #include "items/item.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup.hpp"
@@ -80,7 +81,12 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
         NetworkString ns;
         ns.ai32(peers[i]->getClientServerToken());
         // 0x01 : item picked : send item id, powerup type and kart race id
-        uint8_t powerup = (((int)(kart->getPowerup()->getType()) << 4)&0xf0) + (kart->getPowerup()->getNum()&0x0f);
+        uint8_t powerup = 0;
+        if (item->getType() == Item::ITEM_BANANA)
+            powerup = (int)(kart->getAttachment()->getType());
+        else if (item->getType() == Item::ITEM_BONUS_BOX)
+            powerup = (((int)(kart->getPowerup()->getType()) << 4)&0xf0) + (kart->getPowerup()->getNum()&0x0f);
+
         ns.ai8(0x01).ai32(item->getItemId()).ai8(powerup).ai8(player_profile->race_id); // send item,
         m_listener->sendMessage(this, peers[i], ns, true); // reliable
         Log::info("GameEventsProtocol", "Notified a peer that a kart collected item %d.", (int)(kart->getPowerup()->getType()));
