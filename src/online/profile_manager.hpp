@@ -23,6 +23,7 @@
 #include "online/request.hpp"
 #include "online/user.hpp"
 #include "utils/types.hpp"
+#include "utils/ptr_vector.hpp"
 
 
 #include <irrString.h>
@@ -39,37 +40,50 @@ namespace Online{
       */
     class ProfileManager
     {
-        public:
+        public :
+            class FriendsListRequest : public XMLRequest
+            {
+                virtual void callback ();
+            public:
+                FriendsListRequest() : XMLRequest() {}
+            };
+        private:
+            ProfileManager      ();
+
             enum State
             {
                 S_FETCHING = 1,
                 S_READY
             };
 
-            class ProfileInfoRequest : public XMLRequest
-            {
-                virtual void callback ();
-            public:
-                ProfileInfoRequest() : XMLRequest() {}
-            };
+            Synchronised<State>         m_state;
+            bool                        m_is_current_user;
+            uint32_t                    m_visiting_id;
+            irr::core::stringw          m_visiting_username;
 
-        private:
-            Synchronised<State>     m_state;
-            bool                    m_is_current_user;
-            bool                    m_has_fetched_overview;
+            bool                        m_has_fetched_friends;
+            PtrVector<Online::User>     m_friends;
+            FriendsListRequest *        m_friends_list_request;
 
-            ProfileManager();
 
-            void setState           (State state) { m_state.setAtomic(state); }
+
+            void                            setState(State state)       { m_state.setAtomic(state); }
+            const State                     getState() const            { return m_state.getAtomic(); }
+
+            void friendsListCallback(const XMLNode * input);
 
         public:
             /**Singleton */
             static ProfileManager *         get();
             static void                     deallocate();
 
-            void set();
-            void set(Online::User *);
-            const State                     getState()          const { return m_state.getAtomic(); }
+            void set(Online::User * = NULL);
+            void fetchFriends();
+            const PtrVector<Online::User> & getFriends();
+
+            bool isFetching() { return getState() == S_FETCHING; }
+            bool isReady() { return getState() == S_READY; }
+
 
     };   // class CurrentUser
 

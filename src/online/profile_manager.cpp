@@ -50,21 +50,66 @@ namespace Online{
     {
         setState (S_READY);
         m_is_current_user = false;
-    }
-
-    // ============================================================================
-    void ProfileManager::set()
-    {
-        assert(CurrentUser::get()->isRegisteredUser());
-        //CurrentUser::get()->isRegisteredUser()
-        m_is_current_user = true;
-
+        m_has_fetched_friends = false;
     }
 
     // ============================================================================
     void ProfileManager::set(User * user)
     {
-        //CurrentUser::get()->isRegisteredUser()
-        m_is_current_user = false;
+        if (user == NULL)
+        {
+            assert(CurrentUser::get()->isRegisteredUser());
+            m_is_current_user = true;
+            m_visiting_id = CurrentUser::get()->getUserID();
+            m_visiting_username = CurrentUser::get()->getUserName();
+        }
+        else
+        {
+            m_is_current_user = false;
+            m_visiting_id = CurrentUser::get()->getUserID();
+        }
     }
+
+    // ============================================================================
+    void ProfileManager::fetchFriends()
+    {
+        if(m_has_fetched_friends)
+            return;
+        //m_friends_list_request
+        setState (S_FETCHING);
+    }
+    // ============================================================================
+
+
+    void ProfileManager::friendsListCallback(const XMLNode * input)
+    {
+        uint32_t friendid = 0;
+        irr::core::stringw username("");
+        const XMLNode * friends_xml = input->getNode("friends");
+        m_friends.clearAndDeleteAll();
+        for (unsigned int i = 0; i < friends_xml->getNumNodes(); i++)
+        {
+            friends_xml->getNode(i)->get("friend_id", &friendid);
+            m_friends.push_back(new User(username, friendid));
+        }
+        ProfileManager::setState (ProfileManager::S_READY);
+    }
+
+
+    // ============================================================================
+
+    void ProfileManager::FriendsListRequest::callback()
+    {
+        ProfileManager::get()->friendsListCallback(m_result);
+    }
+
+    // ============================================================================
+
+    const PtrVector<Online::User> & ProfileManager::getFriends()
+    {
+        assert (m_has_fetched_friends && getState() == S_READY);
+        return m_friends;
+    }
+    // ============================================================================
+
 } // namespace Online
