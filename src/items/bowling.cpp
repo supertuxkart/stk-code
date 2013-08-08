@@ -24,6 +24,8 @@
 #include "karts/abstract_kart.hpp"
 #include "utils/random_generator.hpp"
 
+#include "utils/log.hpp" //TODO: remove after debugging is done
+
 float Bowling::m_st_max_distance;   // maximum distance for a bowling ball to be attracted
 float Bowling::m_st_max_distance_squared;
 float Bowling::m_st_force_to_target;
@@ -213,11 +215,21 @@ bool Bowling::hit(AbstractKart* kart, PhysicalObject* obj)
     bool was_real_hit = Flyable::hit(kart, obj);
     if(was_real_hit)
     {
-        m_has_hit_kart = kart != NULL;
-        explode(kart, obj, /*hit_secondary*/false);
+        if(kart && kart->isShielded())
+        {
+            kart->decreaseShieldTime(0.0f); //Decreasing the shield time by the default value.
+            Log::verbose("Bowling", "Decreasing shield!");
+            return true;
+        }
+        else
+        {
+            m_has_hit_kart = kart != NULL;
+            explode(kart, obj, /*hit_secondary*/false);
+        }
     }
     return was_real_hit;
 }   // hit
+
 // ----------------------------------------------------------------------------
 /** Returns the hit effect object to use when this objects hits something.
  *  \returns The hit effect object, or NULL if no hit effect should be played.

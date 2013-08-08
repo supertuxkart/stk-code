@@ -425,7 +425,7 @@ void Flyable::updateFromServer(const FlyableInfo &f, float dt)
 
 // ----------------------------------------------------------------------------
 /** Returns true if the item hit the kart who shot it (to avoid that an item
- *  that's too close to the shoter hits the shoter).
+ *  that's too close to the shooter hits the shooter).
  *  \param kart Kart who was hit.
  */
 bool Flyable::isOwnerImmunity(const AbstractKart* kart_hit) const
@@ -448,7 +448,7 @@ bool Flyable::hit(AbstractKart *kart_hit, PhysicalObject* object)
     if(isOwnerImmunity(kart_hit)) return false;
 
     if (kart_hit != NULL)
-    {
+    {    //TODO: reduce shield time; add other string ?
         RaceGUIBase* gui = World::getWorld()->getRaceGUI();
         irr::core::stringw hit_message =
             StringUtils::insertValues(getHitString(kart_hit),

@@ -76,7 +76,7 @@ void KartWithStats::update(float dt)
  */
 void KartWithStats::setKartAnimation(AbstractKartAnimation *ka)
 {
-    bool is_new = !getKartAnimation() && !isInvulnerable();
+    bool is_new = !getKartAnimation() && !isInvulnerable() && !isShielded();
     Kart::setKartAnimation(ka);
     // Nothing to count if it's not a new animation
     if(!is_new) return;

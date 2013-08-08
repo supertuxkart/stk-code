@@ -1149,6 +1149,10 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
  *  better job on higher level AI - e.g. aiming at karts ahead/behind, wait an
  *  appropriate time before using multiple items etc.
  *  \param dt Time step size.
+ *  TODO: Implications of Bubble-Shield for AI's powerup-handling
+
+ *  STATE: shield on -> avoid usage of offensive items (with certain tolerance)
+ *  STATE: swatter on -> avoid usage of shield
  */
 void SkiddingAI::handleItems(const float dt)
 {
@@ -1192,11 +1196,13 @@ void SkiddingAI::handleItems(const float dt)
 
     // Tactic 2: calculate
     // -------------------
+    float min_bubble_time = 2.0f;
+
     switch( m_kart->getPowerup()->getType() )
     {
     case PowerupManager::POWERUP_BUBBLEGUM:
         // Avoid dropping all bubble gums one after another
-        if( m_time_since_last_shot <3.0f) break;
+        if( m_time_since_last_shot < 3.0f) break;
 
         // Either use the bubble gum after 10 seconds, or if the next kart
         // behind is 'close' but not too close (too close likely means that the
@@ -1205,16 +1211,30 @@ void SkiddingAI::handleItems(const float dt)
         // kart as well? I.e. only drop if the kart behind is faster? Otoh
         // this approach helps preventing an overtaken kart to overtake us
         // again.
+        m_controls->m_look_back = true; //handle traditinal usage as bubble gum
         m_controls->m_fire = (m_distance_behind < 15.0f &&
-                              m_distance_behind > 3.0f    );
+                              m_distance_behind > 3.0f    );//TODO: is this criteria sufficient to hit another kart with a high probability
+
+        m_controls->m_look_back = false;
+        //Do not use a shield, when you still have a swatter
+        if (m_kart->getAttachment()->getType() == Attachment::ATTACH_SWATTER  || m_kart->getAttachment()->getType() == Attachment::ATTACH_NOLOKS_SWATTER)
+            break;
+        //else there are no objections not to use a shield
+        m_controls->m_fire = true;
+
         break;   // POWERUP_BUBBLEGUM
 
     // All the thrown/fired items might be improved by considering the angle
     // towards m_kart_ahead.
     case PowerupManager::POWERUP_CAKE:
         {
+            // Do not destroy your own shield
+            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a swatter.
+                break;
             // Leave some time between shots
             if(m_time_since_last_shot<3.0f) break;
+            //TODO: do not fire if the kart is driving too slow
+
             // Since cakes can be fired all around, just use a sane distance
             // with a bit of extra for backwards, as enemy will go towards cake
             bool fire_backwards = (m_kart_behind && m_kart_ahead &&
@@ -1231,6 +1251,9 @@ void SkiddingAI::handleItems(const float dt)
 
     case PowerupManager::POWERUP_BOWLING:
         {
+            // Do not destroy your own shield
+            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a swatter.
+                break;
             // Leave more time between bowling balls, since they are
             // slower, so it should take longer to hit something which
             // can result in changing our target.
@@ -1258,6 +1281,10 @@ void SkiddingAI::handleItems(const float dt)
 
     case PowerupManager::POWERUP_PLUNGER:
         {
+            // Do not destroy your own shield
+            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a swatter.
+                break;
+
             // Leave more time after a plunger, since it will take some
             // time before a plunger effect becomes obvious.
             if(m_time_since_last_shot < 5.0f) break;
@@ -1311,6 +1338,9 @@ void SkiddingAI::handleItems(const float dt)
         {
             // Squared distance for which the swatter works
             float d2 = m_kart->getKartProperties()->getSwatterDistance2();
+            // if the kart has a shield, do not break it by using a swatter.
+            if(m_kart->getShieldTime() > min_bubble_time)
+                break;
             // Fire if the closest kart ahead or to the back is not already
             // squashed and close enough.
             // FIXME: this can be improved on, since more than one kart might
@@ -1325,6 +1355,9 @@ void SkiddingAI::handleItems(const float dt)
             break;
         }
     case PowerupManager::POWERUP_RUBBERBALL:
+        // Do not destroy your own shield
+        if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a swatter.
+            break;
         // Perhaps some more sophisticated algorithm might be useful.
         // For now: fire if there is a kart ahead (which means that
         // this kart is certainly not the first kart)

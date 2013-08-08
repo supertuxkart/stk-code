@@ -32,6 +32,8 @@
 #include "race/race_manager.hpp"
 #include "utils/string_utils.hpp"
 
+#include "utils/log.hpp" //TODO: remove after debugging is done
+
 #include <IMesh.h>
 
 const wchar_t* getPlungerString()
@@ -135,7 +137,7 @@ void RubberBand::updatePosition()
  */
 void RubberBand::update(float dt)
 {
-    if(m_owner->isEliminated())
+    if(m_owner->isEliminated() || m_owner->isShielded())
     {
         // Rubber band snaps
         m_plunger->hit(NULL);
@@ -238,10 +240,20 @@ void RubberBand::hit(AbstractKart *kart_hit, const Vec3 *track_xyz)
     // a hit as well as the bullet physics.
     if(m_attached_state!=RB_TO_PLUNGER) return;
 
+
     // A kart was hit
     // ==============
     if(kart_hit)
     {
+        if(kart_hit->isShielded())
+        {
+            kart_hit->decreaseShieldTime(0.0f); //Decreasing the shield time by the default value.
+            m_plunger->setKeepAlive(0.0f);
+            Log::verbose("rubber_band", "Decreasing shield! \n");
+
+            return;
+        }
+
         m_hit_kart       = kart_hit;
         m_attached_state = RB_TO_KART;
 
