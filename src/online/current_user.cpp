@@ -24,6 +24,7 @@
 #include "online/servers_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
+#include "addons/addon.hpp"
 
 #include <sstream>
 #include <stdlib.h>
@@ -268,7 +269,7 @@ namespace Online{
         request->setParameter("action", std::string("get-addon-vote"));
         request->setParameter("token", getToken());
         request->setParameter("userid", getUserID());
-        request->setParameter("addonid", addon_id);
+        request->setParameter("addonid", addon_id.substr(6));
         HTTPManager::get()->addRequest(request);
         return request;
     }
@@ -283,7 +284,7 @@ namespace Online{
         request->setParameter("action", std::string("set-addon-vote"));
         request->setParameter("token", getToken());
         request->setParameter("userid", getUserID());
-        request->setParameter("addonid", addon_id);
+        request->setParameter("addonid", addon_id.substr(6));
         request->setParameter("rating", rating);
         HTTPManager::get()->addRequest(request);
         return request;
@@ -297,7 +298,7 @@ namespace Online{
             m_result->get("addon-id", &addon_id);
             float average;
             m_result->get("new-average", &average);
-            addons_manager->getAddon(addon_id)->setRating(average);
+            addons_manager->getAddon(Addon::createAddonId(addon_id))->setRating(average);
         }
     }
 
