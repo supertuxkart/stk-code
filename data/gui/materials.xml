@@ -4,5 +4,7 @@
   <material name="speedback.png"    compositing="test" clampU="Y" clampV="Y" light="N" ignore="Y"/>
   <material name="speedfore.png"    compositing="test" clampU="Y" clampV="Y" light="N" ignore="Y"/>
   <material name="notes.png"             compositing="test" light="N" ignore="Y"/>
+  <material name="soccer_player_red.png"             compositing="blend" light="N" ignore="Y"/>
+  <material name="soccer_player_blue.png"             compositing="blend" light="N" ignore="Y"/>
 
 </materials>

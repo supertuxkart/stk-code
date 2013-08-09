@@ -56,6 +56,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, c
     if(name == "continue")
     {
         StateManager::get()->pushScreen( ArenasScreen::getInstance() );
+		race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
     }
     else if (name == "back")
     {
@@ -221,7 +222,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
         break;
     }
 
-    if(team_switch != SOCCER_TEAM_NONE) // A player wants to change its team?
+    if(team_switch != SOCCER_TEAM_NONE) // A player wants to change his team?
     {
         // Find the corresponding kart view, update its team and update the layout
         for(int i=0 ; i < nb_players ; i++)

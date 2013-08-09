@@ -850,12 +850,14 @@ PerCameraNode *IrrDriver::addPerCameraMesh(scene::IMesh* mesh,
  */
 scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
                                            video::ITexture *texture,
-                                           scene::ISceneNode* parent)
+                                           scene::ISceneNode* parent, bool alphaTesting)
 {
     scene::IBillboardSceneNode* node =
         m_scene_manager->addBillboardSceneNode(parent, size);
     assert(node->getMaterialCount() > 0);
     node->setMaterialTexture(0, texture);
+	if(alphaTesting)
+		node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
     return node;
 }   // addMesh
 

@@ -76,6 +76,7 @@ public:
     virtual btTransform  getRescueTransform(unsigned int index) const OVERRIDE;
 
 
+
     };   // WorldWithRank
 
 #endif
