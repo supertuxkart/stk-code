@@ -31,6 +31,11 @@
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 
+#ifdef WIN32
+#else
+#include <ifaddrs.h>
+#endif
+
 // ----------------------------------------------------------------------------
 
 ConnectToServer::ConnectToServer() :
@@ -133,9 +138,11 @@ void ConnectToServer::asynchronousUpdate()
             if (m_listener->getProtocolState(m_current_protocol_id)
             == PROTOCOL_STATE_TERMINATED) // we know the server address
             {
+                Log::info("ConnectToServer", "Server's address known");
+                if (m_server_address.ip == m_public_address.ip) // we're in the same lan (same public ip address) !!
+                    Log::info("ConnectToServer", "Server appears to be in the same LAN.");
                 m_state = REQUESTING_CONNECTION;
                 m_current_protocol_id = m_listener->requestStart(new RequestConnection(m_server_id));
-                Log::info("ConnectToServer", "Server's address known");
             }
             break;
         case REQUESTING_CONNECTION:
@@ -149,8 +156,41 @@ void ConnectToServer::asynchronousUpdate()
                     m_current_protocol_id = m_listener->requestStart(new HidePublicAddress());
                     return;
                 }
-                m_state = CONNECTING;
-                m_current_protocol_id = m_listener->requestStart(new PingProtocol(m_server_address, 2.0));
+                if (m_server_address.ip == m_public_address.ip) // we're in the same lan (same public ip address) !!
+                {
+                    // just send a broadcast packet, the client will know our ip address and will connect
+                    STKHost* host = NetworkManager::getInstance()->getHost();
+                    NetworkManager::getInstance()->setManualSocketsMode(true);
+                    TransportAddress sender;
+                    Log::info("ConnectToServer", "Waiting broadcast message.");
+                    const uint8_t* received_data = host->receiveRawPacket(&sender); // get the sender
+                    const char data[] = "aloha_stk\0";
+                    if (strcmp(data, (char*)(received_data)) == 0)
+                    {
+                        Log::info("ConnectToServer", "LAN Server found : %u:%u", sender.ip, sender.port);
+                        // just check if the ip is ours : if so, then just use localhost (127.0.0.1)
+                        struct ifaddrs *ifap, *ifa;
+                        struct sockaddr_in *sa;
+                        getifaddrs (&ifap);
+                        for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+                            if (ifa->ifa_addr->sa_family==AF_INET) {
+                                sa = (struct sockaddr_in *) ifa->ifa_addr;
+                                if (turnEndianness(sa->sin_addr.s_addr) == sender.ip) // this interface is ours
+                                    sender.ip = 0x7f000001; // 127.0.0.1
+                            }
+                        }
+                        freeifaddrs(ifap);
+
+                        m_server_address = sender;
+                        m_state = CONNECTING;
+                    }
+                    NetworkManager::getInstance()->setManualSocketsMode(false);
+                }
+                else
+                {
+                    m_state = CONNECTING;
+                    m_current_protocol_id = m_listener->requestStart(new PingProtocol(m_server_address, 2.0));
+                }
             }
             break;
         case CONNECTING: // waiting the server to answer our connection
@@ -160,7 +200,7 @@ void ConnectToServer::asynchronousUpdate()
                 {
                     timer = Time::getRealTime();
                     NetworkManager::getInstance()->connect(m_server_address);
-                    Log::info("ConnectToServer", "Trying to connect");
+                    Log::info("ConnectToServer", "Trying to connect to %u:%u", m_server_address.ip, m_server_address.port);
                 }
                 break;
             }

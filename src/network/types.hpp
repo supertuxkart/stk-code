@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-/*! \file types.hpp 
+/*! \file types.hpp
  *  \brief Declares the general types that are used by the network.
  */
 #ifndef TYPES_HPP
@@ -34,20 +34,26 @@ class CallbackObject
     public:
         CallbackObject() {}
         ~CallbackObject() {}
-        
+
 };
 
 /*! \class TransportAddress
  *  \brief Describes a transport-layer address.
  *  For IP networks, a transport address is the couple ip:port.
  */
-class TransportAddress : public CallbackObject 
+class TransportAddress : public CallbackObject
 {
     public:
-    TransportAddress(uint32_t p_ip = 0, uint16_t p_port = 0) 
+    TransportAddress(uint32_t p_ip = 0, uint16_t p_port = 0)
     { ip = p_ip; port = p_port; }
     ~TransportAddress() {}
-    
+
+    bool operator==(const TransportAddress& other) const
+    { return other.ip == ip && other.port == port; }
+
+    bool operator!=(const TransportAddress& other) const
+    { return other.ip != ip || other.port != port; }
+
     uint32_t ip;    //!< The IPv4 address
     uint16_t port;  //!< The port number
 };
@@ -55,17 +61,18 @@ class TransportAddress : public CallbackObject
 /*! \class PlayerLogin
  *  \brief Contains the information needed to authenticate a user.
  */
-class PlayerLogin : public CallbackObject 
+class PlayerLogin : public CallbackObject
 {
     public:
     PlayerLogin() {}
     ~PlayerLogin() { username.clear(); password.clear(); }
-    
+
     std::string username;   //!< Username of the player
     std::string password;   //!< Password of the player
 };
 
 uint32_t turnEndianness(uint32_t val);
+uint16_t turnEndianness(uint16_t val);
 
 
 #endif // TYPES_HPP

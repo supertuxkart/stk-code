@@ -86,8 +86,23 @@ void ConnectToPeer::asynchronousUpdate()
             {
                 if (m_peer_address.ip != 0 && m_peer_address.port != 0)
                 {
+                    // we're in the same lan (same public ip address) !!
+                    if (m_peer_address.ip == NetworkManager::getInstance()->getPublicAddress().ip)
+                    {
+                        // just send a broadcast packet with the string aloha_stk inside, the client will know our ip address and will connect
+                        STKHost* host = NetworkManager::getInstance()->getHost();
+                        TransportAddress broadcast_address;
+                        broadcast_address.ip = -1; // 255.255.255.255
+                        broadcast_address.port = m_peer_address.port;
+                        char data[] = "aloha_stk\0";
+                        host->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
+                        Log::info("ConnectToPeer", "Broadcast aloha sent.");
+                    }
+                    else
+                    {
+                        m_current_protocol_id = m_listener->requestStart(new PingProtocol(m_peer_address, 2.0));
+                    }
                     m_state = CONNECTING;
-                    m_current_protocol_id = m_listener->requestStart(new PingProtocol(m_peer_address, 2.0));
                 }
                 else
                 {
@@ -99,7 +114,9 @@ void ConnectToPeer::asynchronousUpdate()
         case CONNECTING: // waiting the peer to connect
         case CONNECTED:
         {
-            m_listener->requestTerminate( m_listener->getProtocol(m_current_protocol_id)); // kill the ping protocol because we're connected
+            // the ping protocol is there for NAT traversal (disabled when connecting to LAN peer)
+            if (m_peer_address != NetworkManager::getInstance()->getPublicAddress())
+                m_listener->requestTerminate( m_listener->getProtocol(m_current_protocol_id)); // kill the ping protocol because we're connected
             m_state = DONE;
             break;
         }

@@ -168,6 +168,42 @@ uint8_t* STKHost::receiveRawPacket()
 
 // ----------------------------------------------------------------------------
 
+uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
+{
+    uint8_t* buffer; // max size needed normally (only used for stun)
+    buffer = (uint8_t*)(malloc(sizeof(uint8_t)*2048));
+    memset(buffer, 0, 2048);
+
+    socklen_t from_len;
+    struct sockaddr addr;
+
+    from_len = sizeof(addr);
+    int len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
+
+    int i = 0;
+     // wait to receive the message because enet sockets are non-blocking
+    while(len < 0)
+    {
+        i++;
+        len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
+        usleep(1000); // wait 1 millisecond between two checks
+    }
+    struct sockaddr_in *sin = (struct sockaddr_in *) (&addr);
+    // we received the data
+    sender->ip = turnEndianness(sin->sin_addr.s_addr);
+    sender->port = turnEndianness(sin->sin_port);
+
+    if (addr.sa_family == AF_INET)
+    {
+        char s[20];
+        inet_ntop(AF_INET, &(((struct sockaddr_in *)&addr)->sin_addr), s, 20);
+        Log::info("STKHost", "IPv4 Address of the sender was %s", s);
+    }
+    return buffer;
+}
+
+// ----------------------------------------------------------------------------
+
 uint8_t* STKHost::receiveRawPacket(TransportAddress sender)
 {
     uint8_t* buffer; // max size needed normally (only used for stun)

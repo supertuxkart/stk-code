@@ -7,3 +7,9 @@ uint32_t turnEndianness(uint32_t val)
             +((val&0x0000ff00)<<8)
             +((val&0x000000ff)<<24);
 }
+
+uint16_t turnEndianness(uint16_t val)
+{
+    return   ((val&0xff00)>>8)
+            +((val&0x00ff)<<8);
+}

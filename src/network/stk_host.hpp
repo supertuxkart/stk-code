@@ -112,6 +112,7 @@ class STKHost
          *  \return A string containing the data of the received packet.
          */
         uint8_t*    receiveRawPacket();
+        uint8_t*    receiveRawPacket(TransportAddress* sender);
         /*! \brief Receives a packet directly from the network interface and
          *  filter its address.
          *  Receive a packet whithout ENet processing it. Checks that the
