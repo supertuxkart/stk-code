@@ -97,11 +97,16 @@ void SoccerWorld::update(float dt)
 
 void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 {
-	// TODO
-    if(m_can_score_points){
-        printf("*** GOOOOOOOOOAAAAAAALLLLLL!!!! (team: %d) ***\n", first_goal ? 0 : 1);
+    if (m_can_score_points)
+    {
+        //I18N: soccer mode
+        m_race_gui->addMessage(_("GOAL!"), NULL,
+                              /* time */ 3.0f,
+                               video::SColor(255,255,255,255),
+                               /*important*/ true,
+                               /*big font*/  true);
 		m_team_goals[first_goal]++;
-		printf("Score:\nTeam One %d : %d Team Two\n", m_team_goals[0], m_team_goals[1]);
+		//printf("Score:\nTeam One %d : %d Team Two\n", m_team_goals[0], m_team_goals[1]);
 	}
 
     //m_check_goals_enabled = false;    // TODO: remove?
