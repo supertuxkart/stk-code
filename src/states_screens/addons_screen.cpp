@@ -121,11 +121,11 @@ void AddonsScreen::beforeAddingWidget()
     GUIEngine::SpinnerWidget* w_filter_rating =
                         getWidget<GUIEngine::SpinnerWidget>("filter_rating");
     w_filter_rating->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    w_filter_rating->m_properties[GUIEngine::PROP_MAX_VALUE] = "4";
+    w_filter_rating->m_properties[GUIEngine::PROP_MAX_VALUE] = "6";
     
-    for (int n = 0; n < 5; n++)
+    for (int n = 0; n < 7; n++)
     {
-        w_filter_rating->addLabel(StringUtils::toWString(1.0 + n / 2.0));
+        w_filter_rating->addLabel(StringUtils::toWString(n / 2.0));
     }
 }
 // ----------------------------------------------------------------------------
@@ -218,7 +218,7 @@ void AddonsScreen::loadList()
     // Get the filter by rating.
     GUIEngine::SpinnerWidget* w_filter_rating =
                         getWidget<GUIEngine::SpinnerWidget>("filter_rating");
-    float rating = 1.0f + w_filter_rating->getValue() / 2.0f;
+    float rating = w_filter_rating->getValue() / 2.0f;
 
     // First create a list of sorted entries
     PtrVector<const Addon, REF> sorted_list;
