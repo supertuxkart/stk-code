@@ -71,6 +71,7 @@ namespace Online{
             void                            setState(State state)       { m_state.setAtomic(state); }
             const State                     getState() const            { return m_state.getAtomic(); }
 
+            const FriendsListRequest * requestFriendsList();
             void friendsListCallback(const XMLNode * input);
 
         public:

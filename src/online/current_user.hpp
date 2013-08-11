@@ -139,9 +139,6 @@ namespace Online{
             const XMLRequest *              requestGetAddonVote(const std::string & addon_id) const;
             const setAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
 
-
-            const Profile::FriendsListRequest * requestFriendsOf(const uint32_t visiting_id);
-
             /** Returns the username if signed in. */
             const irr::core::stringw        getUserName()           const;
             const UserState                 getUserState()          const { return m_state.getAtomic(); }

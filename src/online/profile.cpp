@@ -20,6 +20,8 @@
 #include "online/profile.hpp"
 
 #include "online/profile_manager.hpp"
+#include "online/http_manager.hpp"
+#include "config/user_config.hpp"
 #include "online/current_user.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -55,20 +57,21 @@ namespace Online{
         if(m_has_fetched_friends)
             return;
         setState (S_FETCHING);
-        m_friends_list_request = CurrentUser::get()->requestFriendsOf(m_id);
+        m_friends_list_request = requestFriendsList();
     }
     // ============================================================================
 
 
     void Profile::friendsListCallback(const XMLNode * input)
     {
-        uint32_t friendid(0);
-        irr::core::stringw username("check");
         const XMLNode * friends_xml = input->getNode("friends");
         m_friends.clearAndDeleteAll();
+        uint32_t friendid(0);
+        irr::core::stringw username("");
         for (unsigned int i = 0; i < friends_xml->getNumNodes(); i++)
         {
             friends_xml->getNode(i)->get("friend_id", &friendid);
+            friends_xml->getNode(i)->get("friend_name", &username);
             m_friends.push_back(new User(username, friendid));
         }
         m_has_fetched_friends = true;
@@ -77,6 +80,18 @@ namespace Online{
 
 
     // ============================================================================
+
+    const Profile::FriendsListRequest * Profile::requestFriendsList()
+    {
+        FriendsListRequest * request = new FriendsListRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action",std::string("get-friends-list"));
+        request->setParameter("token", CurrentUser::get()->getToken());
+        request->setParameter("userid", CurrentUser::get()->getUserID());
+        request->setParameter("visitingid", m_id);
+        HTTPManager::get()->addRequest(request);
+        return request;
+    }
 
     void Profile::FriendsListRequest::callback()
     {

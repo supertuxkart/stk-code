@@ -219,19 +219,6 @@ namespace Online{
     }
 
     // ============================================================================
-    const Profile::FriendsListRequest * CurrentUser::requestFriendsOf(const uint32_t visiting_id){
-        assert(isRegisteredUser());
-        Profile::FriendsListRequest * request = new Profile::FriendsListRequest();
-        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-        request->setParameter("action",std::string("get-friends-list"));
-        request->setParameter("token", getToken());
-        request->setParameter("userid", getUserID());
-        request->setParameter("visitingid", visiting_id);
-        HTTPManager::get()->addRequest(request);
-        return request;
-    }
-
-    // ============================================================================
 
     CurrentUser::ServerJoinRequest *  CurrentUser::requestServerJoin(uint32_t server_id,
                                                                     bool request_now)
