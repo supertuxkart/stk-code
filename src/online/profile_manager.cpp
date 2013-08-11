@@ -78,7 +78,7 @@ namespace Online{
 
     void ProfileManager::addToCache(Profile * profile)
     {
-
+        assert(profile != NULL);
         if(m_profiles_cache.size() == m_max_cache_size)
         {
             ProfilesMap::iterator iter;
@@ -121,7 +121,10 @@ namespace Online{
     Profile * ProfileManager::getProfileByID(uint32_t id)
     {
         if( m_profiles_cache.find(id) == m_profiles_cache.end())
+        {
+            Log::info("getProfileByID","here");
             return NULL;
+        }
         return m_profiles_cache[id];
     }
 

@@ -58,7 +58,7 @@ void OnlineProfileFriends::loadedFromFile()
 void OnlineProfileFriends::beforeAddingWidget()
 {
     m_friends_list_widget->clearColumns();
-    m_friends_list_widget->addColumn( _("Username"), 3 );
+    m_friends_list_widget->addColumn( _("Friends"), 3 );
 }
 
 // -----------------------------------------------------------------------------
@@ -68,7 +68,9 @@ void OnlineProfileFriends::init()
     OnlineProfileBase::init();
     m_profile_tabs->select( m_friends_tab->m_properties[PROP_ID], PLAYER_ID_GAME_MASTER );
     m_visiting_profile = ProfileManager::get()->getVisitingProfile();
+    assert(m_visiting_profile != NULL);
     m_visiting_profile->fetchFriends();
+    m_waiting_for_friends = true;
     m_friends_list_widget->clear();
     m_friends_list_widget->addItem("spacer", L"");
     m_friends_list_widget->addItem("loading", Messages::fetchingFriends());
@@ -83,17 +85,22 @@ void OnlineProfileFriends::eventCallback(Widget* widget, const std::string& name
 // ----------------------------------------------------------------------------
 void OnlineProfileFriends::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
-    if(m_visiting_profile->isReady())
+    if(m_waiting_for_friends)
     {
-        for(int i = 0; i < m_visiting_profile->getFriends().size(); i++)
+        if(m_visiting_profile->isReady())
         {
-            PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
-            row->push_back(new GUIEngine::ListWidget::ListCell(m_visiting_profile->getFriends()[i].getUserName(),-1,3));
-            m_friends_list_widget->addItem("server", row);
+            m_friends_list_widget->clear();
+            for(int i = 0; i < m_visiting_profile->getFriends().size(); i++)
+            {
+                PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
+                row->push_back(new GUIEngine::ListWidget::ListCell(m_visiting_profile->getFriends()[i].getUserName(),-1,3));
+                m_friends_list_widget->addItem("server", row);
+            }
+            m_waiting_for_friends = false;
         }
-    }
-    else
-    {
-            m_friends_list_widget->renameItem("loading", Messages::fetchingFriends());
+        else
+        {
+                m_friends_list_widget->renameItem("loading", Messages::fetchingFriends());
+        }
     }
 }

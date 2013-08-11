@@ -62,8 +62,8 @@ namespace Online{
 
     void Profile::friendsListCallback(const XMLNode * input)
     {
-        uint32_t friendid = 0;
-        irr::core::stringw username("");
+        uint32_t friendid(0);
+        irr::core::stringw username("check");
         const XMLNode * friends_xml = input->getNode("friends");
         m_friends.clearAndDeleteAll();
         for (unsigned int i = 0; i < friends_xml->getNumNodes(); i++)
@@ -71,6 +71,7 @@ namespace Online{
             friends_xml->getNode(i)->get("friend_id", &friendid);
             m_friends.push_back(new User(username, friendid));
         }
+        m_has_fetched_friends = true;
         Profile::setState (Profile::S_READY);
     }
 
@@ -79,8 +80,8 @@ namespace Online{
 
     void Profile::FriendsListRequest::callback()
     {
-        uint32_t user_id;
-        m_result->get("visitingid", &user_id);
+        uint32_t user_id(0);
+        int result = m_result->get("visitingid", &user_id);
         assert(ProfileManager::get()->getProfileByID(user_id) != NULL);
         ProfileManager::get()->getProfileByID(user_id)->friendsListCallback(m_result);
     }

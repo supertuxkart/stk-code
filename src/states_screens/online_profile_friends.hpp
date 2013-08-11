@@ -40,8 +40,9 @@ class OnlineProfileFriends : public OnlineProfileBase, public GUIEngine::ScreenS
 private:
     OnlineProfileFriends();
 
-    GUIEngine::ListWidget * m_friends_list_widget;
-    Online::Profile * m_visiting_profile;
+    GUIEngine::ListWidget *     m_friends_list_widget;
+    Online::Profile *           m_visiting_profile;
+    bool                        m_waiting_for_friends;
 
 public:
     friend class GUIEngine::ScreenSingleton<OnlineProfileFriends>;
