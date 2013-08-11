@@ -23,6 +23,7 @@
 #include "guiengine/widget.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
+#include "online/messages.hpp"
 
 #include <IGUIButton.h>
 
@@ -47,7 +48,18 @@ OnlineProfileFriends::OnlineProfileFriends() : OnlineProfileBase("online/profile
 void OnlineProfileFriends::loadedFromFile()
 {
     OnlineProfileBase::loadedFromFile();
+    m_friends_list_widget = getWidget<GUIEngine::ListWidget>("friends_list");
+    assert(m_friends_list_widget != NULL);
+
 }   // loadedFromFile
+
+// ----------------------------------------------------------------------------
+
+void OnlineProfileFriends::beforeAddingWidget()
+{
+    m_friends_list_widget->clearColumns();
+    m_friends_list_widget->addColumn( _("Username"), 3 );
+}
 
 // -----------------------------------------------------------------------------
 
@@ -55,6 +67,11 @@ void OnlineProfileFriends::init()
 {
     OnlineProfileBase::init();
     m_profile_tabs->select( m_friends_tab->m_properties[PROP_ID], PLAYER_ID_GAME_MASTER );
+    m_visiting_profile = ProfileManager::get()->getVisitingProfile();
+    m_visiting_profile->fetchFriends();
+    m_friends_list_widget->clear();
+    m_friends_list_widget->addItem("spacer", L"");
+    m_friends_list_widget->addItem("loading", Messages::fetchingFriends());
 }   // init
 // -----------------------------------------------------------------------------
 
@@ -63,3 +80,20 @@ void OnlineProfileFriends::eventCallback(Widget* widget, const std::string& name
     OnlineProfileBase::eventCallback( widget, name, playerID);
 }   // eventCallback
 
+// ----------------------------------------------------------------------------
+void OnlineProfileFriends::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+{
+    if(m_visiting_profile->isReady())
+    {
+        for(int i = 0; i < m_visiting_profile->getFriends().size(); i++)
+        {
+            PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
+            row->push_back(new GUIEngine::ListWidget::ListCell(m_visiting_profile->getFriends()[i].getUserName(),-1,3));
+            m_friends_list_widget->addItem("server", row);
+        }
+    }
+    else
+    {
+            m_friends_list_widget->renameItem("loading", Messages::fetchingFriends());
+    }
+}

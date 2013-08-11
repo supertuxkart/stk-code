@@ -52,7 +52,7 @@ namespace Online{
 
             ProfilesMap                             m_profiles_cache;
             Profile *                               m_currently_visiting;
-            const int                               m_max_cache_size = 5;
+            static const unsigned int               m_max_cache_size = 5;
 
             void                                    iterateCache();
             void                                    addToCache(Profile * profile);

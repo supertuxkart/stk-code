@@ -34,6 +34,7 @@ namespace Online
         irr::core::stringw joiningServer        ();
         irr::core::stringw creatingServer       ();
         irr::core::stringw fetchingServers      ();
+        irr::core::stringw fetchingFriends      ();
         irr::core::stringw signedInAs           (const irr::core::stringw & name);
     } // namespace Messages
 }// namespace Online

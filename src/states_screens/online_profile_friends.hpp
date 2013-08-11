@@ -25,6 +25,8 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
 #include "states_screens/online_profile_base.hpp"
+#include "online/profile_manager.hpp"
+
 
 namespace GUIEngine { class Widget; }
 
@@ -38,6 +40,9 @@ class OnlineProfileFriends : public OnlineProfileBase, public GUIEngine::ScreenS
 private:
     OnlineProfileFriends();
 
+    GUIEngine::ListWidget * m_friends_list_widget;
+    Online::Profile * m_visiting_profile;
+
 public:
     friend class GUIEngine::ScreenSingleton<OnlineProfileFriends>;
 
@@ -49,6 +54,10 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
+
+    virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver) OVERRIDE;
+
+    virtual void beforeAddingWidget() OVERRIDE;
 };
 
 #endif

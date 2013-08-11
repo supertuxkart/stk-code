@@ -90,6 +90,8 @@ namespace Online{
     const PtrVector<Online::User> & Profile::getFriends()
     {
         assert (m_has_fetched_friends && getState() == S_READY);
+        delete m_friends_list_request;
+        m_friends_list_request = NULL;
         return m_friends;
     }
     // ============================================================================
