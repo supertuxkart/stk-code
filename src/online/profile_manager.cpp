@@ -30,86 +30,101 @@
 using namespace Online;
 
 namespace Online{
-    static ProfileManager* current_user_singleton(NULL);
+    static ProfileManager* profile_manager_singleton(NULL);
 
     ProfileManager* ProfileManager::get()
     {
-        if (current_user_singleton == NULL)
-            current_user_singleton = new ProfileManager();
-        return current_user_singleton;
+        if (profile_manager_singleton == NULL)
+            profile_manager_singleton = new ProfileManager();
+        return profile_manager_singleton;
     }
 
     void ProfileManager::deallocate()
     {
-        delete current_user_singleton;
-        current_user_singleton = NULL;
+        delete profile_manager_singleton;
+        profile_manager_singleton = NULL;
     }   // deallocate
 
     // ============================================================================
     ProfileManager::ProfileManager()
     {
-        setState (S_READY);
-        m_is_current_user = false;
-        m_has_fetched_friends = false;
+        assert(m_max_cache_size > 1);
     }
 
     // ============================================================================
-    void ProfileManager::set(User * user)
+
+    void ProfileManager::iterateCache()
     {
-        if (user == NULL)
+        if(m_profiles_cache.size() == m_max_cache_size)
         {
-            assert(CurrentUser::get()->isRegisteredUser());
-            m_is_current_user = true;
-            m_visiting_id = CurrentUser::get()->getUserID();
-            m_visiting_username = CurrentUser::get()->getUserName();
+            m_currently_visiting->setCacheBit();
+            ProfilesMap::iterator iter;
+            for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end(); ++iter)
+            {
+               if (!iter->second->getCacheBit())
+                   return;
+            }
+            //All cache bits are one! Set then all to zero except the one currently being visited
+            for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end(); ++iter)
+            {
+               iter->second->unsetCacheBit();
+            }
+            m_currently_visiting->setCacheBit();
+        }
+
+    }
+
+    // ============================================================================
+
+    void ProfileManager::addToCache(Profile * profile)
+    {
+
+        if(m_profiles_cache.size() == m_max_cache_size)
+        {
+            ProfilesMap::iterator iter;
+            for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end();)
+            {
+               if (!iter->second->getCacheBit())
+               {
+                   m_profiles_cache.erase(iter++);
+                   continue;
+               }
+               else
+                   ++iter;
+            }
+        }
+        m_profiles_cache[profile->getID()] = profile;
+        assert(m_profiles_cache.size() <= m_max_cache_size);
+
+    }
+
+    // ============================================================================
+    void ProfileManager::setVisiting(User * user)
+    {
+        assert(user != NULL);
+        if( m_profiles_cache.find(user->getUserID()) == m_profiles_cache.end())
+        {
+            //cache miss
+            m_currently_visiting = new Profile(user);
+            addToCache(m_currently_visiting);
         }
         else
         {
-            m_is_current_user = false;
-            m_visiting_id = CurrentUser::get()->getUserID();
+            //cache hit
+            m_currently_visiting = m_profiles_cache[user->getUserID()];
         }
+        iterateCache();
     }
 
     // ============================================================================
-    void ProfileManager::fetchFriends()
+
+    Profile * ProfileManager::getProfileByID(uint32_t id)
     {
-        if(m_has_fetched_friends)
-            return;
-        //m_friends_list_request
-        setState (S_FETCHING);
-    }
-    // ============================================================================
-
-
-    void ProfileManager::friendsListCallback(const XMLNode * input)
-    {
-        uint32_t friendid = 0;
-        irr::core::stringw username("");
-        const XMLNode * friends_xml = input->getNode("friends");
-        m_friends.clearAndDeleteAll();
-        for (unsigned int i = 0; i < friends_xml->getNumNodes(); i++)
-        {
-            friends_xml->getNode(i)->get("friend_id", &friendid);
-            m_friends.push_back(new User(username, friendid));
-        }
-        ProfileManager::setState (ProfileManager::S_READY);
+        if( m_profiles_cache.find(id) == m_profiles_cache.end())
+            return NULL;
+        return m_profiles_cache[id];
     }
 
 
-    // ============================================================================
-
-    void ProfileManager::FriendsListRequest::callback()
-    {
-        ProfileManager::get()->friendsListCallback(m_result);
-    }
-
-    // ============================================================================
-
-    const PtrVector<Online::User> & ProfileManager::getFriends()
-    {
-        assert (m_has_fetched_friends && getState() == S_READY);
-        return m_friends;
-    }
-    // ============================================================================
 
 } // namespace Online

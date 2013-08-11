@@ -173,6 +173,7 @@ src/network/types.cpp
 src/online/current_user.cpp
 src/online/http_manager.cpp
 src/online/messages.cpp
+src/online/profile.cpp
 src/online/profile_manager.cpp
 src/online/request.cpp
 src/online/server.cpp
@@ -469,6 +470,7 @@ src/network/types.hpp
 src/online/current_user.hpp
 src/online/http_manager.hpp
 src/online/messages.hpp
+src/online/profile.hpp
 src/online/profile_manager.hpp
 src/online/request.hpp
 src/online/server.hpp

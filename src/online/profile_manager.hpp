@@ -19,11 +19,9 @@
 #ifndef HEADER_ONLINE_PROFILE_MANAGER_HPP
 #define HEADER_ONLINE_PROFILE_MANAGER_HPP
 
-#include "http_manager.hpp"
-#include "online/request.hpp"
 #include "online/user.hpp"
 #include "utils/types.hpp"
-#include "utils/ptr_vector.hpp"
+#include "online/profile.hpp"
 
 
 #include <irrString.h>
@@ -40,13 +38,7 @@ namespace Online{
       */
     class ProfileManager
     {
-        public :
-            class FriendsListRequest : public XMLRequest
-            {
-                virtual void callback ();
-            public:
-                FriendsListRequest() : XMLRequest() {}
-            };
+
         private:
             ProfileManager      ();
 
@@ -56,34 +48,23 @@ namespace Online{
                 S_READY
             };
 
-            Synchronised<State>         m_state;
-            bool                        m_is_current_user;
-            uint32_t                    m_visiting_id;
-            irr::core::stringw          m_visiting_username;
+            typedef std::map<uint32_t, Profile*>    ProfilesMap;
 
-            bool                        m_has_fetched_friends;
-            PtrVector<Online::User>     m_friends;
-            FriendsListRequest *        m_friends_list_request;
+            ProfilesMap                             m_profiles_cache;
+            Profile *                               m_currently_visiting;
+            const int                               m_max_cache_size = 5;
 
-
-
-            void                            setState(State state)       { m_state.setAtomic(state); }
-            const State                     getState() const            { return m_state.getAtomic(); }
-
-            void friendsListCallback(const XMLNode * input);
+            void                                    iterateCache();
+            void                                    addToCache(Profile * profile);
 
         public:
             /**Singleton */
-            static ProfileManager *         get();
-            static void                     deallocate();
+            static ProfileManager *                 get();
+            static void                             deallocate();
 
-            void set(Online::User * = NULL);
-            void fetchFriends();
-            const PtrVector<Online::User> & getFriends();
-
-            bool isFetching() { return getState() == S_FETCHING; }
-            bool isReady() { return getState() == S_READY; }
-
+            void                                    setVisiting(Online::User * user);
+            Profile *                               getVisitingProfile() {return m_currently_visiting;}
+            Profile *                               getProfileByID(uint32_t id);
 
     };   // class CurrentUser
 
