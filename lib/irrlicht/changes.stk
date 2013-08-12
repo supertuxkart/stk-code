@@ -8,3 +8,4 @@ The following changes have been made:
 - partial backport to expose setCurrentRendertime in the scene mgr
 - a workaround for every other RTTs flipping
 - aabbox intersection support
+- texture override

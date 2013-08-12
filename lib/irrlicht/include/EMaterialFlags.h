@@ -87,7 +87,16 @@ namespace video
 		EMF_POLYGON_OFFSET = 0x80000,
 
 		//! MaterialType override
-		EMF_MATERIAL_TYPE = 0x100000
+		EMF_MATERIAL_TYPE = 0x100000,
+
+		//! Texture
+		EMF_TEXTURE0 = 0x200000,
+
+		//! Texture
+		EMF_TEXTURE1 = 0x400000,
+
+		//! Texture
+		EMF_TEXTURE2 = 0x800000,
 	};
 
 } // end namespace video
