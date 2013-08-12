@@ -263,6 +263,21 @@ namespace Online{
 
     // ============================================================================
 
+    const XMLRequest * CurrentUser::requestUserSearch( const irr::core::stringw & search_string) const
+    {
+        assert(isRegisteredUser());
+        XMLRequest * request = new XMLRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("user-search"));
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getUserID());
+        request->setParameter("search-string", search_string);
+        HTTPManager::get()->addRequest(request);
+        return request;
+    }
+
+    // ============================================================================
+
     const CurrentUser::setAddonVoteRequest * CurrentUser::requestSetAddonVote( const std::string & addon_id, float rating) const
     {
         assert(isRegisteredUser());

@@ -41,6 +41,9 @@ private:
     OnlineProfileFriends();
 
     GUIEngine::ListWidget *     m_friends_list_widget;
+    GUIEngine::ButtonWidget *   m_search_button_widget;
+    GUIEngine::TextBoxWidget *  m_search_box_widget;
+
     Online::Profile *           m_visiting_profile;
     bool                        m_waiting_for_friends;
 

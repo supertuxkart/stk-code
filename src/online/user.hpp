@@ -22,6 +22,7 @@
 #include <irrString.h>
 #include "utils/types.hpp"
 #include "utils/synchronised.hpp"
+#include "io/xml_node.hpp"
 
 namespace Online{
 
@@ -43,6 +44,7 @@ namespace Online{
             User(       const irr::core::stringw & username,
                         const uint32_t           & userid
                 );
+            User(       const XMLNode * xml);
             virtual ~User() {};
 
             virtual const irr::core::stringw    getUserName()       const   { return m_name.getAtomic();  }

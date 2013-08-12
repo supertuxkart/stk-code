@@ -45,6 +45,11 @@ namespace Online
             return irr::core::stringw(_("Validating recovery info")) + loadingDots();
         }
         // ------------------------------------------------------------------------
+        irr::core::stringw searching()
+        {
+            return irr::core::stringw(_("Searching")) + loadingDots();
+        }
+        // ------------------------------------------------------------------------
 
         irr::core::stringw signedInAs(const irr::core::stringw & name)
         {

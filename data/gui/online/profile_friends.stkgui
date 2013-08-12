@@ -12,18 +12,23 @@
     </tabs>
     
     <box proportion="1" width="100%" layout="vertical-row">
-        <div x="1%" y="2%" width="98%" height="96%" layout="vertical-row" >
-			<div proportion="1" width="100%" layout="horizontal-row"> 
-				<box proportion="1" height="100%" align="center" layout="vertical-row" padding="6">
+        <div x="1%" y="2%" width="98%" height="96%" layout="horizontal-row" >
+			<div proportion="2" height="100%" layout="vertical-row"> 
+				<box proportion="2" width="100%" align="center" layout="vertical-row" padding="6">
 					<list id="friends_list" x="0" y="0" width="100%" height="100%"/>
 				</box>
-				<spacer width="2%" height="10"/>
-				<div proportion="1" height="100%" layout="vertical-row" > </div>
+				<spacer width="10" height="10"/>
+				<label height="fit" text_align="left" I18N="Profile friends" text="Look for more friends:"/>
+				<spacer width="10" height="10"/>
+				<div height="fit" width="100%" layout="horizontal-row" align="center"> 
+					<textbox id="search_box" proportion="1" height="100%"/>
+					<spacer width="30" height="10"/>
+					<button id="search_button" height="fit" width="fit" text="Search" />
+					<spacer width="10" height="10"/>
+				</div>
 			</div>
-			
-					
-	        
-	    	<div proportion="1" width="100%" layout="horizontal-row" > </div>
+			<spacer width="2%" height="10"/>
+	    	<div proportion="1" height="100%" layout="horizontal-row" > </div>
         </div>
     </box>
 </div>

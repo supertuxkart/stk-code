@@ -234,6 +234,7 @@ src/states_screens/online_profile_base.cpp
 src/states_screens/online_profile_friends.cpp
 src/states_screens/online_profile_overview.cpp
 src/states_screens/online_screen.cpp
+src/states_screens/online_user_search.cpp
 src/states_screens/options_screen_audio.cpp
 src/states_screens/options_screen_input2.cpp
 src/states_screens/options_screen_input.cpp
@@ -534,6 +535,7 @@ src/states_screens/online_profile_base.hpp
 src/states_screens/online_profile_friends.hpp
 src/states_screens/online_profile_overview.hpp
 src/states_screens/online_screen.hpp
+src/states_screens/online_user_search.hpp
 src/states_screens/options_screen_audio.hpp
 src/states_screens/options_screen_input2.hpp
 src/states_screens/options_screen_input.hpp

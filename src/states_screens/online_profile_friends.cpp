@@ -22,6 +22,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/online_user_search.hpp"
 #include "utils/translation.hpp"
 #include "online/messages.hpp"
 
@@ -50,6 +51,10 @@ void OnlineProfileFriends::loadedFromFile()
     OnlineProfileBase::loadedFromFile();
     m_friends_list_widget = getWidget<GUIEngine::ListWidget>("friends_list");
     assert(m_friends_list_widget != NULL);
+    m_search_button_widget = getWidget<GUIEngine::ButtonWidget>("search_button");
+    assert(m_search_button_widget != NULL);
+    m_search_box_widget = getWidget<GUIEngine::TextBoxWidget>("search_box");
+    assert(m_search_box_widget != NULL);
 
 }   // loadedFromFile
 
@@ -80,6 +85,12 @@ void OnlineProfileFriends::init()
 void OnlineProfileFriends::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     OnlineProfileBase::eventCallback( widget, name, playerID);
+    if (name == m_search_button_widget->m_properties[GUIEngine::PROP_ID])
+    {
+        OnlineUserSearch * instance = OnlineUserSearch::getInstance();
+        instance->setSearchString(m_search_box_widget->getText().trim());
+        StateManager::get()->pushScreen(instance);
+    }
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
