@@ -34,15 +34,16 @@
 #include "tracks/terrain_info.hpp"
 #include "utils/no_copy.hpp"
 
+
+class AbstractKartAnimation;
+class Attachment;
 class btKart;
 class btUprightConstraint;
-
-class Attachment;
 class Controller;
-class Item;
-class AbstractKartAnimation;
 class HitEffect;
+class Item;
 class KartGFX;
+class KartRewinder;
 class MaxSpeed;
 class ParticleEmitter;
 class ParticleKind;
@@ -197,6 +198,9 @@ private:
      *  > 0 the number it contains is the time left before removing plunger. */
     float         m_view_blocked_by_plunger;
     float         m_speed;
+
+	/** The rewinder object for network play. */
+	KartRewinder *m_rewinder;
 
     std::vector<SFXBase*> m_custom_sounds;
     SFXBase      *m_beep_sound;

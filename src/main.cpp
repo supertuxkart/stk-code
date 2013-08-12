@@ -168,6 +168,7 @@
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
+#include "network/rewind_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -590,7 +591,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
         }   // --verbose or -v
     }
     return 0;
-}
+}   // handleCmdLinePreliminary
 
 // ============================================================================
 /** Handles command line options.
@@ -638,6 +639,10 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_camera_debug=1;
         }
+		else if( !strcmp(argv[i], "--rewind") )
+		{
+			RewindManager::setEnable(true);
+		}
         else if(UserConfigParams::m_artist_debug_mode &&
                !strcmp(argv[i], "--physics-debug"))
         {

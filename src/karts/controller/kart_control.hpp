@@ -21,6 +21,8 @@
 
 #include "network/message.hpp"
 
+#include <string.h>
+
 /**
   * \ingroup controller
   */
@@ -74,6 +76,21 @@ public:
         m_look_back = false;
     }   // reset
     // ------------------------------------------------------------------------
+    /** Tests if two KartControls are equal. 
+      */
+    bool operator==(const KartControl &other)
+    {
+        return m_steer     == other.m_steer   &&
+               m_accel     == other.m_accel   &&
+               m_brake     == other.m_brake   &&
+               m_nitro     == other.m_nitro   &&
+               m_skid      == other.m_skid    &&
+               m_rescue    == other.m_rescue  &&
+               m_fire      == other.m_fire    &&
+               m_look_back == other.m_look_back;
+    }    // operator==
+
+    // ------------------------------------------------------------------------
     /** Return the serialised size in bytes.                                 */
     static int getLength() { return 9; }
     // ------------------------------------------------------------------------
@@ -84,6 +101,24 @@ public:
         m->addFloat(m_accel);
         m->addChar(getButtonsCompressed());
     }   // compress
+    // ------------------------------------------------------------------------
+    /** Copies the important data from this objects into a memory buffer. */
+    void copyToMemory(char *buffer)
+    {
+        memcpy(buffer,               &m_steer, sizeof(float));
+        memcpy(buffer+sizeof(float), &m_accel, sizeof(float));
+        buffer[2*sizeof(float)] = getButtonsCompressed();
+    }   // copyToMemory
+
+    // ------------------------------------------------------------------------
+    /** Restores this object from a previously saved memory  buffer. */
+    void setFromMemory(char *buffer)
+    {
+        memcpy(&m_steer, buffer, sizeof(float));
+        memcpy(&m_accel, buffer+4*sizeof(float), sizeof(float));
+        setButtonsCompressed(buffer[2*sizeof(float)]);
+    }   // setFromMemory
+
     // ------------------------------------------------------------------------
     void uncompress(char *c)
     {

@@ -28,6 +28,7 @@
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "replay/replay_recorder.hpp"
@@ -92,6 +93,8 @@ InputManager::~InputManager()
 void InputManager::handleStaticAction(int key, int value)
 {
     static bool control_is_pressed = false;
+    static bool shift_is_pressed   = false;
+
     World *world = World::getWorld();
 
     // When no players... a cutscene
@@ -131,7 +134,10 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_LWIN:
             control_is_pressed = value!=0;
             break;
-
+        case KEY_LSHIFT:
+        case KEY_RSHIFT:
+        case KEY_SHIFT:
+            shift_is_pressed = value!=0; break;
         case KEY_KEY_I:
         {
             if (!world || !UserConfigParams::m_artist_debug_mode) break;
@@ -161,7 +167,18 @@ void InputManager::handleStaticAction(int key, int value)
             break;
 
         case KEY_F1:
-            if (UserConfigParams::m_artist_debug_mode && world)
+            if(value && shift_is_pressed && world && RewindManager::isEnabled())
+            {
+                printf("Enter rewind time:");
+                char s[256];
+                fgets(s, 256, stdin);
+                float t;
+                StringUtils::fromString(s,t);
+                RewindManager::get()->rewindTo(world->getTime()-t);
+                Log::info("Rewind", "Rewinding from %f to %f", 
+                          world->getTime(), world->getTime()-t);
+            }
+            else if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
                 

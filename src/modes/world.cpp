@@ -44,6 +44,7 @@
 #include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -148,6 +149,8 @@ void World::init()
     // constructor is called, so the wrong race gui would be created.
     createRaceGUI();
 
+	RewindManager::create();
+
     // Grab the track file
     m_track = track_manager->getTrack(race_manager->getTrackName());
     if(!m_track)
@@ -201,6 +204,8 @@ void World::init()
  */
 void World::reset()
 {
+	RewindManager::get()->reset();
+
     // If m_saved_race_gui is set, it means that the restart was done
     // when the race result gui was being shown. In this case restore the
     // race gui (note that the race result gui is cached and so never really
@@ -346,6 +351,8 @@ Controller* World::loadAIController(AbstractKart *kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
+	RewindManager::destroy();
+
     if(ReplayPlay::get())
     {
         // Destroy the old replay object, which also stored the ghost
@@ -844,7 +851,9 @@ void World::update(float dt)
 
     projectile_manager->update(dt);
 
-    PROFILER_POP_CPU_MARKER();
+	RewindManager::get()->update(dt);
+
+	PROFILER_POP_CPU_MARKER();
 
 #ifdef DEBUG
     assert(m_magic_number == 0xB01D6543);

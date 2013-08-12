@@ -19,13 +19,6 @@
 
 #include "karts/kart.hpp"
 
-#include <math.h>
-#include <iostream>
-#include <algorithm> // for min and max
-
-#include <ICameraSceneNode.h>
-#include <ISceneManager.h>
-
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
@@ -44,6 +37,7 @@
 #include "guiengine/scalable_font.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
+#include "karts/kart_rewinder.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world.hpp"
@@ -70,6 +64,13 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
 
+
+#include <math.h>
+#include <iostream>
+#include <algorithm> // for min and max
+
+#include <ICameraSceneNode.h>
+#include <ISceneManager.h>
 
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
@@ -220,6 +221,8 @@ void Kart::init(RaceManager::KartType type)
                                   0.0f)                               );
 
     reset();
+
+	m_rewinder = new KartRewinder(this);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -229,6 +232,8 @@ void Kart::init(RaceManager::KartType type)
  */
 Kart::~Kart()
 {
+	delete m_rewinder;
+
     // Delete all custom sounds (TODO: add back when properly done)
     /*
     for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
@@ -1055,6 +1060,8 @@ void Kart::eliminate()
  */
 void Kart::update(float dt)
 {
+    m_rewinder->update();
+
     if ( UserConfigParams::m_graphical_effects )
     {
         // update star effect (call will do nothing if stars are not activated)
