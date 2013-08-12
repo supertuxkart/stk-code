@@ -7,3 +7,4 @@ The following changes have been made:
 - skies respect Z
 - partial backport to expose setCurrentRendertime in the scene mgr
 - a workaround for every other RTTs flipping
+- aabbox intersection support
