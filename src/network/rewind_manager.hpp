@@ -147,7 +147,7 @@ private:
     ~RewindManager();
     unsigned int findFirstIndex(float time) const;
     void insertRewindInfo(RewindInfo *ri);
-
+    float determineTimeStepSize(int state);
 public:
     // First static functions to manage rewinding.
     // ===========================================

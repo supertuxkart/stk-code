@@ -295,9 +295,9 @@ void RewindManager::rewindTo(float rewind_time)
     }   // while rewind info at time current_time
 
     // Store the time to which we have to replay to
-    float current_time = World::getWorld()->getTime();
+    current_time = World::getWorld()->getTime();
 
-    World::setTime(current_time);
+    World::getWorld()->setTime(current_time);
 
     // Now go forward through the saved states, and
     // replay taking the events into account.
@@ -307,10 +307,11 @@ void RewindManager::rewindTo(float rewind_time)
         // Find the next event which needs to be taken into account
         // All other states can be deleted
         // TODO ... for now
-        while(state < m_rewind_info.size() && !m_rewind_info[state]->isEvent())
+        while(state < (int)m_rewind_info.size() && 
+              !m_rewind_info[state]->isEvent())
             state ++;
         float dt = determineTimeStepSize(state);
-        World::getWorld()->update(dt);
+        World::getWorld()->updateWorld(dt);
 
     }
 
