@@ -1512,9 +1512,6 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
                                              0 /* no clipping */, 0,
                                              true /* alpha */);
     }
-    
-    
-    irr_driver->getVideoDriver()->draw2DRectangleOutline(rect, video::SColor(255,255,0,0));
 }   // drawCheckBox
 
 // ----------------------------------------------------------------------------
