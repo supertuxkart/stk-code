@@ -181,6 +181,12 @@ void Physics::update(float dt)
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 ExplosionAnimation::create(kart);
             }
+            else if (obj->isFlattenKartObject())
+            {
+                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+                const KartProperties* kp = kart->getKartProperties();
+                kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
+            }
             continue;
         }
 
@@ -197,6 +203,12 @@ void Physics::update(float dt)
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 ExplosionAnimation::create(kart);
+            }
+            else if (anim->isFlattenKartObject())
+            {
+                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+                const KartProperties* kp = kart->getKartProperties();
+                kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
             }
             continue;
 
