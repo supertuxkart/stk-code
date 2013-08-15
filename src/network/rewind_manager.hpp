@@ -25,6 +25,50 @@
 #include <assert.h>
 #include <vector>
 
+/** \ingroup network
+ *  This class manages rewinding. It keeps track of:
+ *  -  states for each rewindable object (for example a kart would have
+ *     its position, rotation, linear and angular velocity etc as state)
+ *     States can be confirmed (i.e. were received by the network server
+ *     and are therefore confirmed to be conrrect), or not (just a snapshot
+ *     on this client, which can save time in rewinding later).
+ *  -  events for each rewindable object (for example any change in the kart
+ *     controls, like steering, fire, ... are an event). While states can be
+ *     discarded (especially unconfirmed ones), e.g. to save spave, events
+ *     will always be kept (in order to allow replaying).
+ *  Each object that is to be rewinded an instance of Rewinder needs to be
+ *  declared (usually inside of the object it can rewind). This instance
+ *  is automatically registered with the RewindManager.
+ *  All states and events are stored in a RewindInfo object. All RewindInfo
+ *  objects are stored in a list sorted by time.
+ *  When a rewind to time T is requested, the following takes place:
+ *  1. Go back in time:
+ *     Determine the latest time t_min < T so that each rewindable objects
+ *     has at least one state before T. For each state that is skipped during
+ *     this process `undoState()` is being called, and for each event
+ *     `undoEvent()` of the Rewinder.
+ *  2. Restore state at time `t_min`
+ *     For each Rewinder the state at time t_min is restored by calling
+ *     `rewindToState(char *)`.
+ *     TODO: atm there is no guarantee that each object will have a state
+ *     at a given time. We either need to work around that, or make sure
+ *     to store at least an unconfirmed state whenever we receive a 
+ *     confirmed state.
+ *  3. Rerun the simulation till the current time t_current is reached:
+ *     1. Determine the time `t_next` of the next frame. This is either
+ *        current_time + 1/60 (physics default time step size), or less
+ *        if RewindInfo at an earlier time is available).
+ *        This determines the time step size for the next frame (i.e.
+ *        `t_next - t_current`).
+ *     2. For all RewindInfo at time t_next call:
+ *        - `restoreState()` if the RewindInfo is a confirmed state
+ *        - `discardState()` if the RewindInfo is an unconfirmed state
+ *          TODO: still missing, and instead of discard perhaps
+ *                store a new state??
+ *        - `rewindToEvent()` if the RewindInfo is an event
+ *     3. Do one step of world simulation, using the updated (confirmed)
+ *        states and newly set events (e.g. kart input).
+ */
 
 class RewindManager
 {
@@ -40,9 +84,6 @@ private:
 
     /** A list of all objects that can be rewound. */
     AllRewinder m_all_rewinder;
-
-    /** Overall amount of memory allocated by states. */
-    unsigned int m_overall_state_size;
 
     // ========================================================================
     /** Used to store rewind information for a given time for all rewind 
@@ -134,6 +175,18 @@ private:
 
     AllRewindInfo m_rewind_info;
 
+    /** Overall amount of memory allocated by states. */
+    unsigned int m_overall_state_size;
+
+    /** Indicates if currently a rewind is happening. */
+    bool m_is_rewinding;
+
+    /** How much time between consecutive state saves. */
+    float m_state_frequency;
+
+    /** Time at which the last state was saved. */
+    float m_last_saved_state;
+
 #define REWIND_SEARCH_STATS
 
 #ifdef REWIND_SEARCH_STATS
@@ -147,7 +200,7 @@ private:
     ~RewindManager();
     unsigned int findFirstIndex(float time) const;
     void insertRewindInfo(RewindInfo *ri);
-    float determineTimeStepSize(int state);
+    float determineTimeStepSize(int state, float max_time);
 public:
     // First static functions to manage rewinding.
     // ===========================================
