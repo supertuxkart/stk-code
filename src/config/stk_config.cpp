@@ -118,6 +118,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_anvil_weight,              "anvil-weight"               );
     CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
     CHECK_NEG(m_bubblegum_counter,         "bubblegum disappear counter");
+    CHECK_NEG(m_bubblegum_shield_time,     "bubblegum shield-time"      );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_max_history,               "max-history"                );
     CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
@@ -159,6 +160,8 @@ void STKConfig::init_defaults()
         m_smooth_angle_limit     =
         m_penalty_time           = m_explosion_impulse_objects = UNDEFINED;
     m_bubblegum_counter          = -100;
+    m_bubblegum_shield_time      = -100;
+    m_shield_restrict_weapos     = false;
     m_max_karts                  = -100;
     m_max_history                = -100;
     m_max_skidmarks              = -100;
@@ -335,7 +338,9 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if(const XMLNode *bubblegum_node= root->getNode("bubblegum"))
     {
-        bubblegum_node->get("disappear-counter", &m_bubblegum_counter);
+        bubblegum_node->get("disappear-counter", &m_bubblegum_counter     );
+        bubblegum_node->get("shield-time",       &m_bubblegum_shield_time );
+        bubblegum_node->get("restrict-weapons",  &m_shield_restrict_weapos);
     }
 
     if(const XMLNode *explosion_node= root->getNode("explosion"))

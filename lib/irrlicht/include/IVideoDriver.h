@@ -201,6 +201,12 @@ namespace video
 						case EMF_POLYGON_OFFSET:
 							material.PolygonOffsetDirection = Material.PolygonOffsetDirection;
 							material.PolygonOffsetFactor = Material.PolygonOffsetFactor; break;
+						case EMF_TEXTURE0:
+							material.TextureLayer[0] = Material.TextureLayer[0]; break;
+						case EMF_TEXTURE1:
+							material.TextureLayer[1] = Material.TextureLayer[1]; break;
+						case EMF_TEXTURE2:
+							material.TextureLayer[2] = Material.TextureLayer[2]; break;
 						}
 					}
 				}

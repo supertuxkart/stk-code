@@ -34,7 +34,8 @@
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp" 
 #include "utils/constants.hpp"
-
+#include "utils/log.hpp" //TODO: remove after debugging is done
+// Log::verbose("attachment", "Decreasing shield \n");
 /** Initialises the attachment each kart has.
  */
 Attachment::Attachment(AbstractKart* kart)
@@ -90,7 +91,7 @@ void Attachment::set(AttachmentType type, float time,
 {
     bool was_bomb = (m_type == ATTACH_BOMB);
     scene::ISceneNode* bomb_scene_node = NULL;
-    if (was_bomb && type == ATTACH_SWATTER)
+    if (was_bomb && type == ATTACH_SWATTER) //What about  ATTACH_NOLOKS_SWATTER ??
     {
         // let's keep the bomb node, and create a new one for
         // the new attachment
@@ -204,6 +205,13 @@ void Attachment::clear()
 */
 void Attachment::hitBanana(Item *item, int new_attachment)
 {
+    //Bubble gum shield effect:
+    if(m_type == ATTACH_BUBBLEGUM_SHIELD)
+    {
+        m_time_left -= stk_config->m_bubblegum_shield_time;
+        return;
+    }
+
     float leftover_time   = 0.0f;
 
     bool add_a_new_item = true;
@@ -402,6 +410,18 @@ void Attachment::update(float dt)
         break;
     case ATTACH_TINYTUX:
         // Nothing to do for tinytux, this is all handled in EmergencyAnimation
+        break;
+    case ATTACH_BUBBLEGUM_SHIELD:
+        if(!m_kart->isShielded())
+        {
+            m_time_left = 0.0f;
+            if (m_kart->m_bubble_drop)
+            {
+                Log::verbose("Attachment", "Drop a small bubble gum. \n");;
+                //TODO: drop a bubble gum item on the track
+            }
+
+        }
         break;
     }   // switch
 

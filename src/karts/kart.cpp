@@ -32,6 +32,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/explosion.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
@@ -65,8 +66,9 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp" //TODO: remove after debugging is done
 
-#include "graphics/explosion.hpp"
+
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
    // Disable warning for using 'this' in base member initializer list
@@ -509,7 +511,23 @@ void Kart::setPosition(int p)
 }   // setPosition
 
 // -----------------------------------------------------------------------------
+/** Sets that the view is blocked by a plunger. The duration depends on
+ *  the difficulty, see KartPorperties getPlungerInFaceTime.
+ */
+void Kart::blockViewWithPlunger()
+{
+    // Avoid that a plunger extends the plunger time
+    if(m_view_blocked_by_plunger<=0 && !isShielded())
+        m_view_blocked_by_plunger =
+                               m_kart_properties->getPlungerInFaceTime();
+    if(isShielded())
+    {
+        decreaseShieldTime(0.0f); //decrease the default amount of time
+        Log::verbose("Kart", "Decreasing shield, because of removing the plunger. \n");
+    }
+}   // blockViewWithPlunger
 
+// -----------------------------------------------------------------------------
 /** Returns a transform that will align an object with the kart: the heading
  *  and the pitch will be set appropriately. A custom pitch value can be
  *  specified in order to overwrite the terrain pitch (which would be used
@@ -931,6 +949,67 @@ bool Kart::isNearGround() const
                  < stk_config->m_near_ground);
 }   // isNearGround
 
+// ------------------------------------------------------------------------
+/**
+ * Enables a kart shield protection for a certain amount of time.
+ */
+void Kart::setShieldTime(float t)
+{
+    if(this->isShielded())
+    {
+        this->getAttachment()->setTimeLeft(t);
+    }
+}
+// ------------------------------------------------------------------------
+/**
+ * Returns true if the kart is protected by a shield.
+ */
+bool Kart::isShielded() const
+{
+    if(getAttachment() != NULL)
+        return getAttachment()->getType() == Attachment::ATTACH_BUBBLEGUM_SHIELD;
+    else
+        return false;
+}
+// ------------------------------------------------------------------------
+/**
+ *Returns the remaining time the kart is protected by a shield.
+ */
+float Kart::getShieldTime() const
+{
+    if(isShielded())
+        return getAttachment()->getTimeLeft();
+    else
+        return 0.0f;
+}
+// ------------------------------------------------------------------------
+/**
+ * Decreases the kart's shield time.
+ * \param t The time substracted from the shield timer. If t == 0.0f, the default amout of time is substracted.
+ */
+void Kart::decreaseShieldTime(float t)
+{
+    if(this->isShielded())
+    {
+        getAttachment()->setTimeLeft( getAttachment()->getTimeLeft() - t );
+        if(t == 0.0f)
+        {
+            getAttachment()->setTimeLeft( getAttachment()->getTimeLeft()
+                                          - stk_config->m_bubblegum_shield_time);
+        }
+
+    }
+    //Let the kart drop a bubble gum, if the shield was not damaged.
+    //This is the default, whenever a powerup is used by a kart.
+    //It is turned off, if the shield was reduced below zero by a hit. (Or by intently damaging the shield.)
+    if(!this->isShielded())
+        m_bubble_drop = false;
+
+}
+
+
+
+
 //-----------------------------------------------------------------------------
 /** Shows the star effect for a certain time.
  *  \param t Time to show the star effect for.
@@ -998,7 +1077,9 @@ void Kart::update(float dt)
 
     // if its view is blocked by plunger, decrease remaining time
     if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= dt;
-
+    //unblock the view if kart just became shielded
+    if(isShielded())
+        m_view_blocked_by_plunger = 0.0f;
     // Decrease remaining invulnerability time
     if(m_invulnerable_time>0)
     {
@@ -1066,6 +1147,7 @@ void Kart::update(float dt)
         // since use() can test if something needs to be switched on/off.
         m_powerup->use() ;
         World::getWorld()->onFirePressed(getController());
+        m_bubble_drop = true;
     }
     // Reset the fire button
     m_controls.m_fire = 0;
@@ -1248,6 +1330,13 @@ void Kart::showZipperFire()
 void Kart::setSquash(float time, float slowdown)
 {
     if (isInvulnerable()) return;
+
+    if (isShielded())
+    {
+        decreaseShieldTime(stk_config->m_bubblegum_shield_time/2.0f);
+        Log::verbose("Kart", "Decreasing shield \n");
+        return;
+    }
 
     if(m_attachment->getType()==Attachment::ATTACH_BOMB && time>0)
     {

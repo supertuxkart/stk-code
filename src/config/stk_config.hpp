@@ -74,8 +74,10 @@ public:
                                          passed on.                          */
     float m_anvil_time;              /**<Time an anvil is active.            */
     float m_item_switch_time;        /**< Time items will be switched.       */
-    int   m_bubblegum_counter;       /**< How many times bananas must be eaten
-                                          before they disappear.             */
+    int   m_bubblegum_counter;       /**< How many times bubble gums must be
+                                          driven over before they disappear. */
+    float m_bubblegum_shield_time;   /**<How long a bubble gum shield lasts. */
+    bool  m_shield_restrict_weapos;  /**<Wether weapon usage is punished. */
     float m_explosion_impulse_objects;/**<Impulse of explosion on moving
                                           objects, e.g. road cones, ...      */
     float m_penalty_time;            /**< Penalty time when starting too

@@ -850,12 +850,14 @@ PerCameraNode *IrrDriver::addPerCameraMesh(scene::IMesh* mesh,
  */
 scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
                                            video::ITexture *texture,
-                                           scene::ISceneNode* parent)
+                                           scene::ISceneNode* parent, bool alphaTesting)
 {
     scene::IBillboardSceneNode* node =
         m_scene_manager->addBillboardSceneNode(parent, size);
     assert(node->getMaterialCount() > 0);
     node->setMaterialTexture(0, texture);
+	if(alphaTesting)
+		node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
     return node;
 }   // addMesh
 
@@ -1863,9 +1865,9 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         }
     }
 
-    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 10, 10, 10) );
+    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 35, 35, 35) );
 
-    const core::vector3df &spot_pos = core::vector3df(30, 30, 30);
+    const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
     m_light = irr_driver->getSceneManager()
         ->addLightSceneNode(NULL, spot_pos, video::SColorf(1.0f,1.0f,1.0f),
                             1600 /* radius */);

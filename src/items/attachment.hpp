@@ -59,6 +59,7 @@ public:
         ATTACH_SWATTER,
         ATTACH_NOLOKS_SWATTER,
         ATTACH_TINYTUX,
+        ATTACH_BUBBLEGUM_SHIELD,
         ATTACH_MAX,
         ATTACH_NOTHING
     };

@@ -51,13 +51,15 @@ PhysicalObject* PhysicalObject::fromXML(bool is_dynamic,
     settings.radius       = -1;
     settings.crash_reset  = false;
     settings.knock_kart   = false;
+    settings.flatten_kart = false;
 
     std::string shape;
-    xml_node.get("mass",    &settings.mass       );
-    xml_node.get("radius",  &settings.radius     );
-    xml_node.get("shape",   &shape               );
-    xml_node.get("reset",   &settings.crash_reset);
-    xml_node.get("explode", &settings.knock_kart );
+    xml_node.get("mass",    &settings.mass        );
+    xml_node.get("radius",  &settings.radius      );
+    xml_node.get("shape",   &shape                );
+    xml_node.get("reset",   &settings.crash_reset );
+    xml_node.get("explode", &settings.knock_kart  );
+    xml_node.get("flatten", &settings.flatten_kart);
 
     settings.reset_when_too_low =
         xml_node.get("reset-when-below", &settings.reset_height) == 1;
@@ -96,6 +98,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_radius             = -1;
     m_crash_reset        = false;
     m_explode_kart       = false;
+    m_flatten_kart       = false;
     m_triangle_mesh      = NULL;
 
     m_object = object;
@@ -109,6 +112,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_body_type = settings.body_type;
     m_crash_reset = settings.crash_reset;
     m_explode_kart = settings.knock_kart;
+    m_flatten_kart = settings.flatten_kart;
     m_reset_when_too_low = settings.reset_when_too_low;
     m_reset_height = settings.reset_height;
 

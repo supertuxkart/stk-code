@@ -123,7 +123,6 @@
 #  define _WINSOCKAPI_
 #  include <windows.h>
 #  ifdef _MSC_VER
-#    include <io.h>
 #    include <direct.h>
 #  endif
 #else
@@ -769,6 +768,7 @@ int handleCmdLine(int argc, char **argv)
                 {
                     Log::warn("main", "Kart '%s' not found, ignored.",
                               argv[i+1]);
+                    i++;  // ignore the next parameter, otherwise STK will abort
                 }
             }
             else   // kart locked

@@ -136,6 +136,8 @@ private:
     /** The torque to apply after hitting a bubble gum. */
     float        m_bubblegum_torque;
 
+
+
     // Bullet physics parameters
     // -------------------------
     btCompoundShape          m_kart_chassis;
@@ -310,13 +312,7 @@ public:
     // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */
-    virtual void   blockViewWithPlunger()
-    {
-        // Avoid that a plunger extends the plunger time
-        if(m_view_blocked_by_plunger<=0)
-            m_view_blocked_by_plunger =
-                                   m_kart_properties->getPlungerInFaceTime();
-    }   // blockViewWithPlunger
+    virtual void   blockViewWithPlunger();
     // -------------------------------------------------------------------------
     /** Returns a bullet transform object located at the kart's position
         and oriented in the direction the kart is going. Can be useful
@@ -395,11 +391,25 @@ public:
     virtual void eliminate();
     // ------------------------------------------------------------------------
     /** Makes a kart invulnerable for a certain amount of time. */
-    virtual void  setInvulnerableTime(float t) { m_invulnerable_time = t; };
+    virtual void  setInvulnerableTime(float t) { m_invulnerable_time = t; }
     // ------------------------------------------------------------------------
     /** Returns if the kart is invulnerable. */
     virtual bool   isInvulnerable() const { return m_invulnerable_time > 0; }
     // ------------------------------------------------------------------------
+    /** Enables a kart shield protection for a certain amount of time. */
+    virtual void setShieldTime(float t);
+    // ------------------------------------------------------------------------
+    /** Returns if the kart is protected by a shield. */
+    virtual bool isShielded() const;
+    // ------------------------------------------------------------------------
+    /** Returns the remaining time the kart is protected by a shield. */
+    virtual float getShieldTime() const;
+    // ------------------------------------------------------------------------
+    /** Decreases the kart's shield time. */
+    //If t = 0.0f: decrease shield time by the default amount.
+    virtual void decreaseShieldTime(float t);
+    // ------------------------------------------------------------------------
+
     /** Sets the energy the kart has collected. */
     virtual void   setEnergy(float val) { m_collected_energy = val; }
     // ------------------------------------------------------------------------

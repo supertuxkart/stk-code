@@ -26,6 +26,8 @@
 #include "utils/constants.hpp"
 #include "utils/random_generator.hpp"
 
+#include "utils/log.hpp" //TODO: remove after debugging is done
+
 float Cake::m_st_max_distance_squared;
 float Cake::m_gravity;
 
@@ -168,7 +170,15 @@ bool Cake::hit(AbstractKart* kart, PhysicalObject* obj)
 {
     bool was_real_hit = Flyable::hit(kart, obj);
     if(was_real_hit)
+    {
+        if(kart && kart->isShielded())
+        {
+            kart->decreaseShieldTime(0.0f); //Decreasing the shield time by the default value.
+            Log::verbose("Cake", "Decreasing shield! \n");
+            return false; //Not sure if a shield hit is a real hit.
+        }
         explode(kart, obj);
+    }
 
     return was_real_hit;
 }   // hit

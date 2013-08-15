@@ -42,8 +42,10 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node, TrackObject* object) : Ani
 
     m_crash_reset  = false;
     m_explode_kart = false;
+    m_flatten_kart = false;
     node.get("reset", &m_crash_reset);
     node.get("explode", &m_explode_kart);
+    node.get("flatten", &m_flatten_kart);
 
     m_important_animation = (World::getWorld()->getIdent() == IDENT_CUSTSCENE);
     node.get("important", &m_important_animation);

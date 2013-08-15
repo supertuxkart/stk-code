@@ -108,7 +108,7 @@ KartProperties::KartProperties(const std::string &filename)
     m_engine_sfx_type        = "engine_small";
     m_kart_model             = NULL;
     m_has_rand_wheels        = false;
-    m_nitro_min_consumption  = 1.0f;
+    m_nitro_min_consumption  = 1.05f;
     // The default constructor for stk_config uses filename=""
     if (filename != "")
     {
