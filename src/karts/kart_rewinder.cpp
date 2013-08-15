@@ -39,7 +39,7 @@ KartRewinder::KartRewinder(AbstractKart *kart) : Rewinder(/*can_be_destroyed*/ f
  */
 int KartRewinder::getState(char **buffer) const
 {
-    const int MEMSIZE = 13*sizeof(float);
+    const int MEMSIZE = 13*sizeof(float) + 9;
 
     *buffer = new char[MEMSIZE];
     float* p = (float*)*buffer;
@@ -57,6 +57,7 @@ int KartRewinder::getState(char **buffer) const
     memcpy(p+ 3, &q, 4*sizeof(float));
     memcpy(p+ 7, body->getLinearVelocity(), 3*sizeof(float));
     memcpy(p+10, body->getAngularVelocity(), 3*sizeof(float));
+    m_kart->getControls().copyToMemory((char*)(p+13));
     return MEMSIZE;
 }   // getState
 
@@ -89,6 +90,8 @@ void KartRewinder::rewindToState(char *buffer)
     body->proceedToTransform(t);
     body->setLinearVelocity(*(btVector3*)(p+7));
     body->setAngularVelocity(*(btVector3*)(p+10));
+
+    m_kart->getControls().setFromMemory((char*)(p+13));
 
     return;
 }   // rewindToState
