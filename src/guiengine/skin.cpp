@@ -2020,8 +2020,8 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
         SColor& border_color_focus = SkinConfig::m_colors["text_field::focused"];
 
         core::recti borderArea = rect;
-        borderArea.UpperLeftCorner -= position2d< s32 >( 2, 2 );
-        borderArea.LowerRightCorner += position2d< s32 >( 2, 2 );
+        //borderArea.UpperLeftCorner -= position2d< s32 >( 2, 2 );
+        //borderArea.LowerRightCorner += position2d< s32 >( 2, 2 );
 
         // if within an appearing dialog, grow
         if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
@@ -2046,8 +2046,8 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
         GUIEngine::getDriver()->draw2DRectangle(focused ? border_color_focus : border_color, borderArea);
 
         core::recti innerArea = borderArea;
-        innerArea.UpperLeftCorner += position2d< s32 >( 2, 2 );
-        innerArea.LowerRightCorner -= position2d< s32 >( 2, 2 );
+        innerArea.UpperLeftCorner += position2d< s32 >( 3, 3 );
+        innerArea.LowerRightCorner -= position2d< s32 >( 3, 3 );
         GUIEngine::getDriver()->draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
         return;
     }
