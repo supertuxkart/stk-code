@@ -114,9 +114,9 @@ public:
     /** Restores this object from a previously saved memory  buffer. */
     void setFromMemory(char *buffer)
     {
-        memcpy(&m_steer, buffer, sizeof(float));
-        memcpy(&m_accel, buffer+4*sizeof(float), sizeof(float));
-        setButtonsCompressed(buffer[2*sizeof(float)]);
+        memcpy(&m_steer,     buffer                , sizeof(float));
+        memcpy(&m_accel,     buffer+  sizeof(float), sizeof(float));
+        setButtonsCompressed(buffer[2*sizeof(float)]              );
     }   // setFromMemory
 
     // ------------------------------------------------------------------------

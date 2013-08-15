@@ -39,9 +39,7 @@ public:
    virtual      ~KartRewinder() {};
    virtual int   getState(char **buffer) const;
    virtual void  rewindToState(char *p) OVERRIDE;
-   virtual void  rewindToEvent(char *p) OVERRIDE
-   {
-   };   // rewindToEvent
+   virtual void  rewindToEvent(char *p) OVERRIDE;
 
    // -------------------------------------------------------------------------
    virtual void  undoState(char *p) OVERRIDE

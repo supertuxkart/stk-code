@@ -62,6 +62,24 @@ int KartRewinder::getState(char **buffer) const
 }   // getState
 
 // ----------------------------------------------------------------------------
+/** Actuall rewind to the specified state. */
+void KartRewinder::rewindToState(char *buffer)
+{
+    btTransform t;
+    float *p = (float*)buffer;
+    t.setOrigin(*(btVector3*)p);
+    t.setRotation(*(btQuaternion*)(p+3));
+    btRigidBody *body = m_kart->getBody();
+    body->proceedToTransform(t);
+    body->setLinearVelocity(*(btVector3*)(p+7));
+    body->setAngularVelocity(*(btVector3*)(p+10));
+
+    m_kart->getControls().setFromMemory((char*)(p+13));
+
+    return;
+}   // rewindToState
+
+// ----------------------------------------------------------------------------
 /** Called once a frame. It will add a new kart control event to the rewind
  *  manager if any control values have changed.
  */
@@ -79,21 +97,9 @@ void KartRewinder::update()
 }   // update
 
 // ----------------------------------------------------------------------------
-/** Actuall rewind to the specified state. */
-void KartRewinder::rewindToState(char *buffer)
+void KartRewinder::rewindToEvent(char *p)
 {
-    btTransform t;
-    float *p = (float*)buffer;
-    t.setOrigin(*(btVector3*)p);
-    t.setRotation(*(btQuaternion*)(p+3));
-    btRigidBody *body = m_kart->getBody();
-    body->proceedToTransform(t);
-    body->setLinearVelocity(*(btVector3*)(p+7));
-    body->setAngularVelocity(*(btVector3*)(p+10));
-
-    m_kart->getControls().setFromMemory((char*)(p+13));
-
-    return;
-}   // rewindToState
+    m_kart->getControls().setFromMemory(p);
+};   // rewindToEvent
 
 
