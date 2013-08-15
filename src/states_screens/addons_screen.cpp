@@ -121,11 +121,11 @@ void AddonsScreen::beforeAddingWidget()
     GUIEngine::SpinnerWidget* w_filter_rating =
                         getWidget<GUIEngine::SpinnerWidget>("filter_rating");
     w_filter_rating->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    w_filter_rating->m_properties[GUIEngine::PROP_MAX_VALUE] = "4";
+    w_filter_rating->m_properties[GUIEngine::PROP_MAX_VALUE] = "6";
     
-    for (int n = 0; n < 5; n++)
+    for (int n = 0; n < 7; n++)
     {
-        w_filter_rating->addLabel(StringUtils::toWString(1.0 + n / 2.0));
+        w_filter_rating->addLabel(StringUtils::toWString(n / 2.0));
     }
 }
 // ----------------------------------------------------------------------------
@@ -214,13 +214,13 @@ void AddonsScreen::loadList()
     // Get the filter by rating.
     GUIEngine::SpinnerWidget* w_filter_rating =
                         getWidget<GUIEngine::SpinnerWidget>("filter_rating");
-    float rating = 1.0f + w_filter_rating->getValue() / 2.0f;
+    float rating = w_filter_rating->getValue() / 2.0f;
 
     // First create a list of sorted entries
     PtrVector<const Addon, REF> sorted_list;
     for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
     {
-        const Addon &addon = addons_manager->getAddon(i);
+        const Addon & addon = addons_manager->getAddon(i);
         // Ignore addons of a different type
         if(addon.getType()!=m_type) continue;
         // Ignore invisible addons
@@ -426,7 +426,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
         if (!id.empty() && addons_manager->getAddon(id) != NULL)
         {
             m_selected_index = list->getSelectionID();
-            new AddonsLoading(0.8f, 0.8f, id);
+            new AddonsLoading(id);
         }
     }
     if (name == "category")

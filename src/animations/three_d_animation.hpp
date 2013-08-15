@@ -53,6 +53,8 @@ private:
     /** True if a collision with this object should trigger
      *  "exploding" a kart. */
     bool                  m_explode_kart;
+    
+    bool                  m_flatten_kart;
 
     /** We have to store the rotation value as computed in blender, since
      *  irrlicht uses a different order, so for rotation animations we
@@ -75,6 +77,7 @@ public:
      * trigger a rescue. */
     bool isCrashReset() const { return m_crash_reset; }
     bool isExplodeKartObject() const { return m_explode_kart; }
+    bool isFlattenKartObject() const { return m_flatten_kart; }
 };   // ThreeDAnimation
 #endif
 

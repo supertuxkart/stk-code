@@ -21,6 +21,8 @@
 #include "network/network_manager.hpp"
 #include "network/protocols/start_game_protocol.hpp"
 #include "network/network_world.hpp"
+
+#include "modes/world_with_rank.hpp"
 #include "online/current_user.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/network_kart_selection.hpp"
@@ -183,6 +185,12 @@ void ClientLobbyRoomProtocol::update()
                 m_listener->requestTerminate(protocol);
             else
                 Log::error("ClientLobbyRoomProtocol", "No kart update protocol registered.");
+
+            protocol = m_listener->getProtocol(PROTOCOL_GAME_EVENTS);
+            if (protocol)
+                m_listener->requestTerminate(protocol);
+            else
+                Log::error("ClientLobbyRoomProtocol", "No game events protocol registered.");
 
             Log::info("ClientLobbyRoomProtocol", "Game finished.");
             m_state = CONNECTED;
@@ -507,6 +515,49 @@ void ClientLobbyRoomProtocol::startSelection(Event* event)
     else
         Log::error("ClientLobbyRoomProtocol", "Bad token");
 
+}
+
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when all karts have finished the race.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1         5         6          7           8            9
+ *       -------------------------------------------------------------------
+ *  Size | 1 |    4    |    1    |     1    |     1     |      1     |     |
+ *  Data | 4 | kart id | race_id | position | kart id 2 | position 2 | ... |
+ *       -------------------------------------------------------------------
+ */
+void ClientLobbyRoomProtocol::raceFinished(Event* event)
+{
+    if (event->data().size() < 5)
+    {
+        Log::error("ClientLobbyRoomProtocol", "Not enough data provided.");
+        return;
+    }
+    NetworkString data = event->data();
+    if ((*event->peer)->getClientServerToken() != data.gui32(1))
+    {
+        Log::error("ClientLobbyRoomProtocol", "Bad token");
+        return;
+    }
+    data.removeFront(5);
+    WorldWithRank* ranked_world = (WorldWithRank*)(World::getWorld());
+    while(data.size()>0)
+    {
+        if (data.size() < 2)
+        {
+            Log::error("ClientLobbyRoomProtocol", "Incomplete field.");
+            return;
+        }
+        uint8_t kart_id = data[0];
+        uint8_t position = data[1];
+        ranked_world->setKartPosition(kart_id,position);
+        Log::info("ClientLobbyRoomProtocol", "Kart %d has finished #%d", kart_id, position);
+        data.removeFront(2);
+    }
+    ranked_world->terminateRace();
 }
 
 //-----------------------------------------------------------------------------

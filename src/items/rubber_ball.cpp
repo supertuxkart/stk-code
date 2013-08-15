@@ -20,6 +20,7 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/stk_config.hpp"
 #include "items/attachment.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -27,6 +28,8 @@
 #include "physics/btKart.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
+
+#include "utils/log.hpp" //TODO: remove after debugging is done
 
 float RubberBall::m_st_interval;
 float RubberBall::m_st_min_interpolation_distance;
@@ -719,6 +722,21 @@ bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
     }
     bool was_real_hit = Flyable::hit(kart, object);
     if(was_real_hit)
-        explode(kart, object);
+    {
+        /*if(kart && kart->isShielded() && kart->getShieldTime() > stk_config->m_bubblegum_shield_time )
+        {   //remove twice the default shield time
+            kart->decreaseShieldTime(stk_config->m_bubblegum_shield_time * 2);
+            Log::verbose("rubber_ball", "Decreasing shield 1! \n");
+        }
+        else */if(kart && kart->isShielded())
+        {
+            kart->decreaseShieldTime(stk_config->m_bubblegum_shield_time);
+            //kart->getAttachment()->update(0.0f);
+            //kart->setSquash(m_st_squash_duration, m_st_squash_slowdown);
+            Log::verbose("rubber_ball", "Decreasing shield 2! \n");
+        }
+        else
+            explode(kart, object);
+    }
     return was_real_hit;
 }   // hit

@@ -43,8 +43,6 @@ private:
     GUIEngine::LabelWidget *                    m_update_status;
     GUIEngine::ListWidget *                     m_server_list_widget;
 
-    /** Currently selected type. */
-    std::string                                 m_type;
 
     /** The currently selected index, used to re-select this item after
      *  addons_loading is being displayed. */

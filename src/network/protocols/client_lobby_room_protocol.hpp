@@ -28,6 +28,7 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
         void kartSelectionUpdate(Event* event);
         void startGame(Event* event);
         void startSelection(Event* event);
+        void raceFinished(Event* event);
 
         TransportAddress m_server_address;
         STKPeer* m_server;

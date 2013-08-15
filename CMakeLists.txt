@@ -14,6 +14,15 @@ endif()
 option(USE_WIIUSE "Support for wiimote input devices" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
+if(MSVC)
+    # Normally hide the option to build wiiuse on VS, since it depends
+    # on the installation of the Windows DDK (Driver Developer Kit), 
+    # which also needs an absolute path :(
+    option(WIIUSE_BUILD "Build wiiuse lib (only for developers)" OFF)
+    mark_as_advanced(WIIUSE_BUILD)
+else()
+    set(WIIUSE_BUILD ON)
+endif()
 
 set(STK_SOURCE_DIR "src")
 set(STK_DATA_DIR "${PROJECT_SOURCE_DIR}/data")
@@ -33,17 +42,22 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
-# Build the Wiiuse library
-if(USE_WIIUSE)
-    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/wiiuse")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse")
-endif()
-
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
-include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/source/Irrlicht")
 
+# Build the Wiiuse library
+# Note: wiiuse MUST be declared after irrlicht, since otherwise
+# (at least on VS) irrlicht will find wiiuse io.h file because
+# of the added include directory.
+if(USE_WIIUSE)
+    if(WIIUSE_BUILD)
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/wiiuse")
+    endif()
+    include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse")
+endif()
+
+include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/source/Irrlicht")
 
 
 # Set include paths
@@ -229,14 +243,24 @@ if(USE_FRIBIDI)
     add_definitions(-DENABLE_BIDI)
 endif()
 
+# Wiiuse
+# ------
 if(USE_WIIUSE)
     if(APPLE)
         find_library(BLUETOOTH_LIBRARY NAMES IOBluetooth PATHS /Developer/Library/Frameworks/IOBluetooth.framework)
         target_link_libraries(supertuxkart wiiuse ${BLUETOOTH_LIBRARY})
+    elseif(MSVC)
+        add_definitions("/DWIIUSE_STATIC")
+        if(WIIUSE_BUILD)
+            target_link_libraries(supertuxkart wiiuse)
+        else()
+            target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/wiiuse.lib)
+        endif()
     else()
         target_link_libraries(supertuxkart wiiuse bluetooth)
     endif()
     add_definitions(-DENABLE_WIIUSE)
+
 endif()
 
 

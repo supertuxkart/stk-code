@@ -60,7 +60,7 @@ namespace Online {
         Synchronised<Server *>                          m_joined_server;
 
         Synchronised<float>                             m_last_load_time;
-        void                                            refresh(RefreshRequest * input);
+        void                                            refresh(bool success, const XMLNode * input);
         void                                            cleanUpServers();
 
     public:

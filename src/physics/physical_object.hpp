@@ -49,6 +49,7 @@ public:
         PhysicalObject::bodyTypes body_type;
         bool crash_reset;
         bool knock_kart;
+        bool flatten_kart;
         bool reset_when_too_low;
         float reset_height;
     };
@@ -107,6 +108,8 @@ private:
     /** True if kart should "explode" when touching this */
     bool                  m_explode_kart;
 
+    bool                  m_flatten_kart;
+
     /** True if object should be reset to its initial position if it's
      *  too low (see m_reset_height). */
     bool                  m_reset_when_too_low;
@@ -144,6 +147,7 @@ public:
      *  hits it. */
     bool isCrashReset() const { return m_crash_reset; }
     bool isExplodeKartObject () const { return m_explode_kart; }
+    bool isFlattenKartObject () const { return m_flatten_kart; }
 
     void move(const Vec3& xyz, const core::vector3df& hpr);
 

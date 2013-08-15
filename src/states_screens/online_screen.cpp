@@ -36,9 +36,10 @@
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/server_selection.hpp"
 #include "states_screens/create_server_screen.hpp"
-#include "states_screens/networking_lobby_settings.hpp"
+#include "states_screens/online_profile_overview.hpp"
 #include "online/servers_manager.hpp"
 #include "online/messages.hpp"
+#include "online/profile_manager.hpp"
 #include "online/request.hpp"
 #include "modes/demo_world.hpp"
 
@@ -94,6 +95,8 @@ void OnlineScreen::loadedFromFile()
     assert(m_sign_in_widget != NULL);
     m_register_widget = (IconButtonWidget *) m_bottom_menu_widget->findWidgetNamed("register");
     assert(m_register_widget != NULL);
+    m_profile_widget = (IconButtonWidget *) m_bottom_menu_widget->findWidgetNamed("profile");
+    assert(m_profile_widget != NULL);
     m_sign_out_widget = (IconButtonWidget *) m_bottom_menu_widget->findWidgetNamed("sign_out");
     assert(m_sign_out_widget != NULL);
 
@@ -127,6 +130,7 @@ void OnlineScreen::beforeAddingWidget()
         m_find_server_widget->setDeactivated();
         m_create_server_widget->setDeactivated();
         m_sign_out_widget->setVisible(false);
+        m_profile_widget->setVisible(false);
         if(m_recorded_state == CurrentUser::US_SIGNING_IN || m_recorded_state == CurrentUser::US_SIGNING_OUT)
         {
             m_register_widget->setDeactivated();
@@ -138,6 +142,7 @@ void OnlineScreen::beforeAddingWidget()
         m_find_server_widget->setDeactivated();
         m_create_server_widget->setDeactivated();
         m_sign_in_widget->setVisible(false);
+        m_profile_widget->setVisible(false);
     }
 
 } // beforeAddingWidget
@@ -212,6 +217,11 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     else if (selection == "sign_out")
     {
         CurrentUser::get()->requestSignOut();
+    }
+    else if (selection == m_profile_widget->m_properties[PROP_ID])
+    {
+        ProfileManager::get()->setVisiting(CurrentUser::get());
+        StateManager::get()->pushScreen(OnlineProfileOverview::getInstance());
     }
     else if (selection == "register")
     {

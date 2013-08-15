@@ -34,7 +34,7 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
-
+#include "utils/log.hpp" //TODO: remove after debugging is done
 
 // -----------------------------------------------------------------------------
 Plunger::Plunger(AbstractKart *kart)
@@ -180,6 +180,13 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 {
     if(isOwnerImmunity(kart)) return false;
 
+    /*if(kart && kart->isShielded())
+    {
+        //kart->decreaseShieldTime(0.0f); //Decreasing the shield time by the default value.
+        Log::verbose("Plunger", "Almost Decreasing shield! \n");
+
+        return false; //Not sure if a shield hit is a real hit.
+    }*/
     RaceGUIBase* gui = World::getWorld()->getRaceGUI();
     irr::core::stringw hit_message;
 

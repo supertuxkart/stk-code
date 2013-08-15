@@ -23,9 +23,11 @@
 #include "audio/music_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
@@ -56,6 +58,8 @@ void SoccerWorld::init()
         fprintf(stderr, "No AI exists for this game mode\n");
         exit(1);
     }
+    m_goal_target = race_manager->getMaxGoal();
+    printf("Max Goal: %d\n", m_goal_target);
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -93,9 +97,17 @@ void SoccerWorld::update(float dt)
 
 void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 {
-    // TODO
-    if(m_can_score_points)
-        printf("*** GOOOOOOOOOAAAAAAALLLLLL!!!! (team: %d) ***\n", first_goal ? 0 : 1);
+    if (m_can_score_points)
+    {
+        //I18N: soccer mode
+        m_race_gui->addMessage(_("GOAL!"), NULL,
+                               /* time */ 3.0f,
+                               video::SColor(255,255,255,255),
+                               /*important*/ true,
+                               /*big font*/  true);
+        m_team_goals[first_goal]++;
+        //printf("Score:\nTeam One %d : %d Team Two\n", m_team_goals[0], m_team_goals[1]);
+    }
 
     //m_check_goals_enabled = false;    // TODO: remove?
 
@@ -111,7 +123,12 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
             continue;
 
         obj->reset();
+        obj->getPhysics()->reset();
     }
+
+    //Resetting the ball triggers the goal check line one more time.
+    //This ensures that only one goal is counted, and the second is ignored.
+    m_can_score_points = !m_can_score_points;
 
     //for(int i=0 ; i < getNumKarts() ; i++
 
@@ -136,7 +153,12 @@ bool SoccerWorld::isRaceOver()
     {
         return false;
     }
-
+    // One team scored the target goals ...
+    else if(getScore(0) >= m_goal_target ||
+            getScore(1) >= m_goal_target    )
+    {
+        return true;
+    }
     // TODO
     return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
 }   // isRaceOver
@@ -156,7 +178,7 @@ void SoccerWorld::terminateRace()
 /** Returns the data to display in the race gui.
  */
 void SoccerWorld::getKartsDisplayInfo(
-                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
+    std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
 {
     // TODO!!
     /*
@@ -191,8 +213,89 @@ void SoccerWorld::getKartsDisplayInfo(
     */
 }   // getKartsDisplayInfo
 
-// ----------------------------------------------------------------------------
-/** Set position and team for the karts */
+//-----------------------------------------------------------------------------
+/** Moves a kart to its rescue position.
+ *  \param kart The kart that was rescued.
+ */
+void SoccerWorld::moveKartAfterRescue(AbstractKart* kart)
+{
+    // find closest point to drop kart on
+    World *world = World::getWorld();
+    const int start_spots_amount = world->getTrack()->getNumberOfStartPositions();
+    assert(start_spots_amount > 0);
+
+    float largest_accumulated_distance_found = -1;
+    int furthest_id_found = -1;
+
+    const float kart_x = kart->getXYZ().getX();
+    const float kart_z = kart->getXYZ().getZ();
+
+    for(int n=0; n<start_spots_amount; n++)
+    {
+        // no need for the overhead to compute exact distance with sqrt(),
+        // so using the 'manhattan' heuristic which will do fine enough.
+        const btTransform &s = world->getTrack()->getStartTransform(n);
+        const Vec3 &v=s.getOrigin();
+        float accumulatedDistance = .0f;
+        bool spawnPointClear = true;
+
+        for(unsigned int k=0; k<getCurrentNumKarts(); k++)
+        {
+            const AbstractKart *currentKart = World::getWorld()->getKart(k);
+            const float currentKart_x = currentKart->getXYZ().getX();
+            const float currentKartk_z = currentKart->getXYZ().getZ();
+
+            if(kart_x!=currentKart_x && kart_z !=currentKartk_z)
+            {
+                float absDistance = fabs(currentKart_x - v.getX()) +
+                                    fabs(currentKartk_z - v.getZ());
+                if(absDistance < CLEAR_SPAWN_RANGE)
+                {
+                    spawnPointClear = false;
+                    break;
+                }
+                accumulatedDistance += absDistance;
+            }
+        }
+
+        if(largest_accumulated_distance_found < accumulatedDistance && spawnPointClear)
+        {
+            furthest_id_found = n;
+            largest_accumulated_distance_found = accumulatedDistance;
+        }
+    }
+
+    assert(furthest_id_found != -1);
+    const btTransform &s = world->getTrack()->getStartTransform(furthest_id_found);
+    const Vec3 &xyz = s.getOrigin();
+    kart->setXYZ(xyz);
+    kart->setRotation(s.getRotation());
+
+    //position kart from same height as in World::resetAllKarts
+    btTransform pos;
+    pos.setOrigin(kart->getXYZ()+btVector3(0, 0.5f*kart->getKartHeight(), 0.0f));
+    pos.setRotation( btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0 /* angle */) );
+
+    kart->getBody()->setCenterOfMassTransform(pos);
+
+    //project kart to surface of track
+    bool kart_over_ground = m_track->findGround(kart);
+
+    if (kart_over_ground)
+    {
+        //add vertical offset so that the kart starts off above the track
+        float vertical_offset = kart->getKartProperties()->getVertRescueOffset() *
+                                kart->getKartHeight();
+        kart->getBody()->translate(btVector3(0, vertical_offset, 0));
+    }
+    else
+    {
+        fprintf(stderr, "WARNING: invalid position after rescue for kart %s on track %s.\n",
+                (kart->getIdent().c_str()), m_track->getIdent().c_str());
+    }
+}   // moveKartAfterRescue
+
+//-----------------------------------------------------------------------------/** Set position and team for the karts */
 void SoccerWorld::initKartList()
 {
     const unsigned int kart_amount = m_karts.size();
@@ -203,8 +306,6 @@ void SoccerWorld::initKartList()
         m_karts[n]->setPosition(-1);
     }
     // TODO: remove
-/*
-    const unsigned int kart_amount = m_karts.size();
 
     int team_karts_amount[NB_SOCCER_TEAMS];
     memset(team_karts_amount, 0, sizeof(team_karts_amount));
@@ -215,14 +316,33 @@ void SoccerWorld::initKartList()
         SoccerTeam    round_robin_team = SOCCER_TEAM_RED;
         for(unsigned int n=0; n<kart_amount; n++)
         {
-            if(m_karts[n]->getSoccerTeam() == SOCCER_TEAM_NONE)
-                m_karts[n]->setSoccerTeam(round_robin_team);
+            if(race_manager->getLocalKartInfo(n).getSoccerTeam() == SOCCER_TEAM_NONE)
+                race_manager->setLocalKartSoccerTeam(
+                    race_manager->getLocalKartInfo(n).getLocalPlayerId(),round_robin_team);
 
-            team_karts_amount[m_karts[n]->getSoccerTeam()]++;
+            team_karts_amount[race_manager->getLocalKartInfo(n).getSoccerTeam()]++;
 
             round_robin_team = (round_robin_team==SOCCER_TEAM_RED ?
                                 SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
         }// next kart
+    }
+
+    //Loading the indicator textures
+    irr::video::ITexture *redTeamTexture = irr_driver->getTexture(
+            file_manager->getTextureFile("soccer_player_red.png"));
+    irr::video::ITexture *blueTeamTexture = irr_driver->getTexture(
+            file_manager->getTextureFile("soccer_player_blue.png"));
+    //Assigning indicators
+    for(unsigned int i=0; i<kart_amount; i++)
+    {
+        scene::ISceneNode *hatNode;
+        if(race_manager->getLocalKartInfo(i).getSoccerTeam() == SOCCER_TEAM_RED)
+            hatNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,0.3f)
+                                               ,redTeamTexture,m_karts[i]->getNode(), true);
+        else
+            hatNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,0.3f)
+                                               ,blueTeamTexture,m_karts[i]->getNode(),true);
+        hatNode->setPosition(m_karts[i]->getKartModel()->getHatOffset());
     }
 
     // Compute start positions for each team
@@ -234,9 +354,71 @@ void SoccerWorld::initKartList()
     // Set kart positions, ordering them by team
     for(unsigned int n=0; n<kart_amount; n++)
     {
-        SoccerTeam  team = m_karts[n]->getSoccerTeam();
+
+        SoccerTeam  team = race_manager->getLocalKartInfo(n).getSoccerTeam();
         m_karts[n]->setPosition(team_cur_position[team]);
         team_cur_position[team]++;
-    }// next kart
-*/
+    }   // next kart
 }
+
+//-----------------------------------------------------------------------------
+int SoccerWorld::getScore(unsigned int i)
+{
+    return m_team_goals[i];
+}
+//-----------------------------------------------------------------------------
+int SoccerWorld::getTeamLeader(unsigned int team)
+{
+    for(unsigned int i = 0; i< m_karts.size(); i++)
+    {
+        if(race_manager->getLocalKartInfo(i).getSoccerTeam() == (SoccerTeam) team)
+            return i;
+    }
+    return -1;
+}
+//-----------------------------------------------------------------------------
+AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
+                                      int local_player_id, int global_player_id,
+                                      RaceManager::KartType kart_type)
+{
+    int posIndex = index;
+    if(race_manager->getLocalKartInfo(index).getSoccerTeam() == SOCCER_TEAM_RED)
+    {
+        if(index % 2 != 0)      posIndex += 1;
+    }
+    else if(race_manager->getLocalKartInfo(index).getSoccerTeam() == SOCCER_TEAM_BLUE)
+    {
+        if(index % 2 != 1) posIndex += 1;
+    }
+    int position           = index+1;
+    btTransform init_pos   = m_track->getStartTransform(posIndex);
+    AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos);
+    new_kart->init(race_manager->getKartType(index));
+    Controller *controller = NULL;
+    switch(kart_type)
+    {
+    case RaceManager::KT_PLAYER:
+        controller = new PlayerController(new_kart,
+                                          StateManager::get()->getActivePlayer(local_player_id),
+                                          local_player_id);
+        m_num_players ++;
+        break;
+    case RaceManager::KT_NETWORK_PLAYER:
+        break;  // Avoid compiler warning about enum not handled.
+        //controller = new NetworkController(kart_ident, position, init_pos,
+        //                          global_player_id);
+        //m_num_players++;
+        //break;
+    case RaceManager::KT_AI:
+        controller = loadAIController(new_kart);
+        break;
+    case RaceManager::KT_GHOST:
+        break;
+    case RaceManager::KT_LEADER:
+        break;
+    }
+
+    new_kart->setController(controller);
+
+    return new_kart;
+}   // createKart

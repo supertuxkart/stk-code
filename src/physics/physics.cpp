@@ -181,6 +181,12 @@ void Physics::update(float dt)
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 ExplosionAnimation::create(kart);
             }
+            else if (obj->isFlattenKartObject())
+            {
+                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+                const KartProperties* kp = kart->getKartProperties();
+                kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
+            }
             continue;
         }
 
@@ -197,6 +203,12 @@ void Physics::update(float dt)
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 ExplosionAnimation::create(kart);
+            }
+            else if (anim->isFlattenKartObject())
+            {
+                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+                const KartProperties* kp = kart->getKartProperties();
+                kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
             }
             continue;
 
@@ -223,11 +235,15 @@ void Physics::update(float dt)
             // --------------------
             // Only explode a bowling ball if the target is
             // not invulnerable
+            AbstractKart* target_kart = p->getUserPointer(1)->getPointerKart();
             if(p->getUserPointer(0)->getPointerFlyable()->getType()
-                !=PowerupManager::POWERUP_BOWLING                         ||
-                !p->getUserPointer(1)->getPointerKart()->isInvulnerable()   )
+                !=PowerupManager::POWERUP_BOWLING ||
+                !target_kart->isInvulnerable()      )
+            {
                     p->getUserPointer(0)->getPointerFlyable()
-                     ->hit(p->getUserPointer(1)->getPointerKart());
+                     ->hit(target_kart);
+            }
+
         }
         else
         {

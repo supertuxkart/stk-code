@@ -39,4 +39,15 @@ namespace Online{
         setUserName("");
         setUserID(id);
     }
+
+    // ============================================================================
+    User::User  (   const XMLNode * xml)
+    {
+        irr::core::stringw username("");
+        xml->get("user_name", &username);
+        setUserName(username);
+        uint32_t id;
+        xml->get("id", &id);
+        setUserID(id);
+    }
 } // namespace Online

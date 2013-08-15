@@ -58,7 +58,7 @@ public:
     void setHostId(int id)                   { m_host_id = id;               }
     void setLocalPlayerId(int id)            { m_local_player_id = id;       }
     void setGlobalPlayerId(int id)           { m_global_player_id = id;      }
-    void setSoccerTeam(SoccerTeam team)      { m_soccer_team = team;         }
+    const void setSoccerTeam(SoccerTeam team)      { m_soccer_team = team;         }
     void setNetworkPlayer(bool value)        { m_network_player = value;     }
 
     int  getHostId() const                   { return m_host_id;             }

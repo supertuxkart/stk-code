@@ -22,12 +22,14 @@
 #include "http_manager.hpp"
 #include "online/server.hpp"
 #include "online/user.hpp"
+#include "online/profile.hpp"
 #include "utils/types.hpp"
 #include "utils/synchronised.hpp"
 
 #include <irrString.h>
 
 #include <string>
+#include <assert.h>
 
 namespace Online{
 
@@ -74,16 +76,22 @@ namespace Online{
 
             class ServerCreationRequest : public XMLRequest {
                 virtual void callback ();
-                Synchronised<uint32_t> m_created_server_id;
+                uint32_t m_created_server_id;
             public:
                 ServerCreationRequest() : XMLRequest(RT_SERVER_CREATION) {}
-                const uint32_t getCreatedServerID() const {return m_created_server_id.getAtomic();}
+                const uint32_t getCreatedServerID() const { assert(isDone()); return m_created_server_id;}
             };
 
             class ServerJoinRequest : public XMLRequest {
                 virtual void callback ();
             public:
                 ServerJoinRequest() : XMLRequest(RT_SERVER_JOIN) {}
+            };
+
+            class setAddonVoteRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                setAddonVoteRequest() : XMLRequest() {}
             };
 
 
@@ -100,9 +108,8 @@ namespace Online{
 
             CurrentUser();
 
-            void signIn                 (const SignInRequest            * input);
-            void signOut                (const SignOutRequest           * input);
-            void createServer           (const ServerCreationRequest    * input);
+            void signIn                 (bool success, const XMLNode * input);
+            void signOut                (bool success, const XMLNode * input);
 
         public:
             /**Singleton */
@@ -129,10 +136,19 @@ namespace Online{
             const XMLRequest *              requestRecovery(const irr::core::stringw &username,
                                                             const irr::core::stringw &email);
 
+            const XMLRequest *              requestGetAddonVote(const std::string & addon_id) const;
+            const setAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
+
+            const XMLRequest *              requestUserSearch(const irr::core::stringw & search_string) const;
+
             /** Returns the username if signed in. */
-            const irr::core::stringw        getUserName()   const;
-            const UserState                 getUserState()  const { return m_state.getAtomic(); }
-            const std::string               getToken()      const { return m_token.getAtomic(); }
+            const irr::core::stringw        getUserName()           const;
+            const UserState                 getUserState()          const { return m_state.getAtomic(); }
+            bool                            isRegisteredUser()      const {
+                                                                            MutexLocker(m_state);
+                                                                            return m_state.getData() == US_SIGNED_IN;
+                                                                          }
+            const std::string               getToken()              const { return m_token.getAtomic(); }
 
     };   // class CurrentUser
 

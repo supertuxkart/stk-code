@@ -173,6 +173,8 @@ src/network/types.cpp
 src/online/current_user.cpp
 src/online/http_manager.cpp
 src/online/messages.cpp
+src/online/profile.cpp
+src/online/profile_manager.cpp
 src/online/request.cpp
 src/online/server.cpp
 src/online/servers_manager.cpp
@@ -215,6 +217,7 @@ src/states_screens/dialogs/select_challenge.cpp
 src/states_screens/dialogs/server_info_dialog.cpp
 src/states_screens/dialogs/track_info_dialog.cpp
 src/states_screens/dialogs/tutorial_message_dialog.cpp
+src/states_screens/dialogs/vote_dialog.cpp
 src/states_screens/feature_unlocked.cpp
 src/states_screens/grand_prix_lose.cpp
 src/states_screens/grand_prix_win.cpp
@@ -225,10 +228,13 @@ src/states_screens/help_screen_4.cpp
 src/states_screens/kart_selection.cpp
 src/states_screens/main_menu_screen.cpp
 src/states_screens/networking_lobby.cpp
-src/states_screens/networking_lobby_settings.cpp
 src/states_screens/network_kart_selection.cpp
 src/states_screens/offline_kart_selection.cpp
+src/states_screens/online_profile_base.cpp
+src/states_screens/online_profile_friends.cpp
+src/states_screens/online_profile_overview.cpp
 src/states_screens/online_screen.cpp
+src/states_screens/online_user_search.cpp
 src/states_screens/options_screen_audio.cpp
 src/states_screens/options_screen_input2.cpp
 src/states_screens/options_screen_input.cpp
@@ -465,6 +471,8 @@ src/network/types.hpp
 src/online/current_user.hpp
 src/online/http_manager.hpp
 src/online/messages.hpp
+src/online/profile.hpp
+src/online/profile_manager.hpp
 src/online/request.hpp
 src/online/server.hpp
 src/online/servers_manager.hpp
@@ -510,6 +518,7 @@ src/states_screens/dialogs/select_challenge.hpp
 src/states_screens/dialogs/server_info_dialog.hpp
 src/states_screens/dialogs/track_info_dialog.hpp
 src/states_screens/dialogs/tutorial_message_dialog.hpp
+src/states_screens/dialogs/vote_dialog.hpp
 src/states_screens/feature_unlocked.hpp
 src/states_screens/grand_prix_lose.hpp
 src/states_screens/grand_prix_win.hpp
@@ -520,10 +529,13 @@ src/states_screens/help_screen_4.hpp
 src/states_screens/kart_selection.hpp
 src/states_screens/main_menu_screen.hpp
 src/states_screens/networking_lobby.hpp
-src/states_screens/networking_lobby_settings.hpp
 src/states_screens/network_kart_selection.hpp
 src/states_screens/offline_kart_selection.hpp
+src/states_screens/online_profile_base.hpp
+src/states_screens/online_profile_friends.hpp
+src/states_screens/online_profile_overview.hpp
 src/states_screens/online_screen.hpp
+src/states_screens/online_user_search.hpp
 src/states_screens/options_screen_audio.hpp
 src/states_screens/options_screen_input2.hpp
 src/states_screens/options_screen_input.hpp

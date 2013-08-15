@@ -298,8 +298,6 @@ void OptionsScreenVideo::init()
         gfx->setDeactivated();
         getWidget<ButtonWidget>("custom")->setDeactivated();
     }
-
-    updateTooltip();
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -332,6 +330,7 @@ void OptionsScreenVideo::updateGfxSlider()
         gfx->setCustomText( _("Custom") );
     }
 
+    updateTooltip();
 }
 
 // ----------------------------------------------------------------------------
@@ -465,7 +464,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_postprocess_enabled      = GFX_POSTPROCESSING[level-1];
         UserConfigParams::m_pixel_shaders            = GFX_PIXEL_SHADERS[level-1];
 
-        updateTooltip();
+        updateGfxSlider();
     }
     else if (name == "vsync")
     {

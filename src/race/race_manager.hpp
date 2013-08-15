@@ -331,6 +331,7 @@ private:
     int                              m_coin_target;
     bool                             m_has_time_target;
     float                            m_time_target;
+	int								 m_goal_target;
 
     void startNextRace();    // start a next race
 
@@ -389,6 +390,10 @@ public:
     int getLocalPlayerGPRank(const int playerID) const;
 
     bool hasTimeTarget() const { return m_has_time_target; }
+
+	void setMaxGoal(int maxGoal){ m_goal_target = maxGoal; }
+
+	int getMaxGoal(){ return m_goal_target; }
 
     /** Sort karts and update the m_gp_rank KartStatus member, in preparation
       * for future calls to RaceManager::getKartGPRank or
@@ -553,6 +558,11 @@ public:
     float getOverallTime(int kart) const
     {
         return m_kart_status[kart].m_overall_time;
+    }
+    // ------------------------------------------------------------------------
+    float getKartRaceTime(int kart) const
+    {
+        return m_kart_status[kart].m_last_time;
     }
     // ------------------------------------------------------------------------
     KartType getKartType(int kart) const

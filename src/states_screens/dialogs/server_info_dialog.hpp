@@ -44,8 +44,6 @@ private:
     bool m_from_server_creation;
     const Online::CurrentUser::ServerJoinRequest * m_server_join_request;
 
-    float m_load_timer;
-
     const uint32_t m_server_id;
     uint32_t m_host_id;
 
@@ -65,6 +63,7 @@ public:
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 
+    virtual bool onEscapePressed();
     virtual void onUpdate(float dt);
 };
 

@@ -16,6 +16,8 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
 
         void startGame();
         void startSelection();
+        void checkIncomingConnectionRequests();
+        void checkRaceFinished();
 
     protected:
         void kartDisconnected(Event* event);
@@ -28,6 +30,7 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
         uint32_t m_current_protocol_id;
         TransportAddress m_public_address;
         bool m_selection_enabled;
+        bool m_in_race;
 
         enum STATE
         {

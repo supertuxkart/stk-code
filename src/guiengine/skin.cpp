@@ -813,14 +813,13 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
 void Skin::drawRatingBar(Widget *w, const core::recti &rect,
                         const bool pressed, const bool focused)
 {
-    static const int step_number = 3; // Harcoded number of step.
-    
+    RatingBarWidget *ratingBar = (RatingBarWidget*)w;
+
     const ITexture *texture = SkinConfig::m_render_params["rating::neutral"].getImage();
     const int texture_w = texture->getSize().Width / 4;
     const int texture_h = texture->getSize().Height;
     const float aspect_ratio = 1.0f;
     
-    RatingBarWidget *ratingBar = (RatingBarWidget*)w;
     const int star_number = ratingBar->getStarNumber();
 
     int star_h = rect.getHeight();
@@ -834,8 +833,18 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
     }
     
     // center horizontally and vertically
-    const int x_from = rect.UpperLeftCorner.X + (rect.getWidth() - star_w) / 2; 
-    const int y_from = rect.UpperLeftCorner.Y + (rect.getHeight() - star_h) / 2;
+    const int x_from = rect.UpperLeftCorner.X; // + (rect.getWidth() - star_w) / 2;
+    const int y_from = rect.UpperLeftCorner.Y; // + (rect.getHeight() - star_h) / 2;
+
+    core::recti stars_rect(x_from, y_from, x_from + (star_number * star_w), y_from + star_h);
+
+    if(!w->m_deactivated)
+        ratingBar->setStepValuesByMouse(irr_driver->getDevice()->getCursorControl()->getPosition(), stars_rect);
+
+    SColor colors[] =  { SColor(100,255,255,255),
+                         SColor(100,255,255,255),
+                         SColor(100,255,255,255),
+                         SColor(100,255,255,255) };
 
     for (int i = 0; i < star_number; i++)
     {
@@ -846,14 +855,15 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         star_rect.LowerRightCorner.X = x_from + (i + 1) * star_w;
         star_rect.LowerRightCorner.Y = y_from + star_h;
         
-        int step = ratingBar->getStepOfStar(i, step_number);
+        int step = ratingBar->getStepsOfStar(i);
         
         const core::recti source_area(texture_w * step, 0, 
                                       texture_w * (step + 1), texture_h);
 
         GUIEngine::getDriver()->draw2DImage(texture,
                                             star_rect, source_area,
-                                            0 /* no clipping */, 0,
+                                            0 /* no clipping */,
+                                           (w->m_deactivated || ID_DEBUG) ? colors : 0,
                                             true /* alpha */);
     }
 
@@ -2020,8 +2030,8 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
         SColor& border_color_focus = SkinConfig::m_colors["text_field::focused"];
 
         core::recti borderArea = rect;
-        borderArea.UpperLeftCorner -= position2d< s32 >( 2, 2 );
-        borderArea.LowerRightCorner += position2d< s32 >( 2, 2 );
+        //borderArea.UpperLeftCorner -= position2d< s32 >( 2, 2 );
+        //borderArea.LowerRightCorner += position2d< s32 >( 2, 2 );
 
         // if within an appearing dialog, grow
         if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
@@ -2046,8 +2056,8 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
         GUIEngine::getDriver()->draw2DRectangle(focused ? border_color_focus : border_color, borderArea);
 
         core::recti innerArea = borderArea;
-        innerArea.UpperLeftCorner += position2d< s32 >( 2, 2 );
-        innerArea.LowerRightCorner -= position2d< s32 >( 2, 2 );
+        innerArea.UpperLeftCorner += position2d< s32 >( 3, 3 );
+        innerArea.LowerRightCorner -= position2d< s32 >( 3, 3 );
         GUIEngine::getDriver()->draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
         return;
     }

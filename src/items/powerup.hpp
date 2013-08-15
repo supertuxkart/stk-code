@@ -56,8 +56,9 @@ public:
     void            set          (PowerupManager::PowerupType _type, int n=1);
     void            reset        ();
     Material*       getIcon      () const;
+    void            adjustSound ();
     void            use          ();
-    void            hitBonusBox  (const Item &item, int newC=-1);
+    void            hitBonusBox (const Item &item, int newC=-1);
 
     /** Returns the number of powerups. */
     int             getNum       () const {return m_number;}

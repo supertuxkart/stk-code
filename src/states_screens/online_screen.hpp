@@ -50,6 +50,7 @@ private:
     GUIEngine::RibbonWidget * m_bottom_menu_widget;
     GUIEngine::IconButtonWidget * m_sign_in_widget;
     GUIEngine::IconButtonWidget * m_register_widget;
+    GUIEngine::IconButtonWidget * m_profile_widget;
     GUIEngine::IconButtonWidget * m_sign_out_widget;
 
     Online::CurrentUser::UserState m_recorded_state;

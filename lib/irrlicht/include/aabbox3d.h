@@ -245,6 +245,25 @@ class aabbox3d
 					(T)(line.getLength() * 0.5));
 		}
 
+		//! Returns the intersection of this box with another, if possible.
+		aabbox3d<T> intersect(const aabbox3d<T>& other) const
+		{
+			aabbox3d<T> out;
+
+			if (!intersectsWithBox(other))
+				return out;
+
+			out.MaxEdge.X = min_(MaxEdge.X, other.MaxEdge.X);
+			out.MaxEdge.Y = min_(MaxEdge.Y, other.MaxEdge.Y);
+			out.MaxEdge.Z = min_(MaxEdge.Z, other.MaxEdge.Z);
+
+			out.MinEdge.X = max_(MinEdge.X, other.MinEdge.X);
+			out.MinEdge.Y = max_(MinEdge.Y, other.MinEdge.Y);
+			out.MinEdge.Z = max_(MinEdge.Z, other.MinEdge.Z);
+
+			return out;
+		}
+
 		//! Tests if the box intersects with a line
 		/** \param linemiddle Center of the line.
 		\param linevect Vector of the line.

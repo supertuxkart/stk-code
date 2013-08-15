@@ -37,12 +37,13 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-LoginDialog::LoginDialog(const Message message_type) :
-        ModalDialog(0.8f,0.9f)
+LoginDialog::LoginDialog(const Message message_type, const LoginDialog::Listener * listener) :
+        ModalDialog(0.8f,0.9f), m_listener(listener)
 {
     m_self_destroy = false;
     m_open_registration_dialog = false;
     m_open_recovery_dialog = false;
+    m_success = false;
     m_sign_in_request = NULL;
     loadFromFile("online/login_dialog.stkgui");
 
@@ -170,8 +171,12 @@ void LoginDialog::onEnterPressedInternal()
 
 bool LoginDialog::onEscapePressed()
 {
-    return m_cancel_widget->isActivated();
+    if (m_cancel_widget->isActivated())
+        m_self_destroy = true;
+    return false;
 }
+
+// -----------------------------------------------------------------------------
 
 void LoginDialog::onUpdate(float dt)
 {
@@ -181,7 +186,7 @@ void LoginDialog::onUpdate(float dt)
         {
             if(m_sign_in_request->isSuccess())
             {
-                m_self_destroy = true;
+                m_success = true;
             }
             else
             {
@@ -200,7 +205,7 @@ void LoginDialog::onUpdate(float dt)
         }
     }
     //If we want to open another dialog, we need to close this one first
-    (m_open_registration_dialog || m_open_recovery_dialog) && (m_self_destroy = true);
+    (m_open_registration_dialog || m_open_recovery_dialog || m_success) && (m_self_destroy = true);
 
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
@@ -210,6 +215,8 @@ void LoginDialog::onUpdate(float dt)
             new RegistrationDialog();
         else if (m_open_recovery_dialog)
             new RecoveryDialog();
+        else if (m_success && (m_listener != NULL) )
+            m_listener->onSuccess();
         return;
     }
 }

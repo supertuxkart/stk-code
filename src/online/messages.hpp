@@ -31,9 +31,11 @@ namespace Online
         irr::core::stringw signingOut           ();
         irr::core::stringw signingUp            ();
         irr::core::stringw recovery             ();
+        irr::core::stringw searching            ();
         irr::core::stringw joiningServer        ();
         irr::core::stringw creatingServer       ();
         irr::core::stringw fetchingServers      ();
+        irr::core::stringw fetchingFriends      ();
         irr::core::stringw signedInAs           (const irr::core::stringw & name);
     } // namespace Messages
 }// namespace Online

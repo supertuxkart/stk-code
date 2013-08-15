@@ -83,11 +83,11 @@ namespace Online{
         return request;
     }
 
-    void ServersManager::refresh(RefreshRequest * input)
+    void ServersManager::refresh(bool success, const XMLNode * input)
     {
-        if (input->isSuccess())
+        if (success)
         {
-            const XMLNode * servers_xml = input->getResult()->getNode("servers");
+            const XMLNode * servers_xml = input->getNode("servers");
             cleanUpServers();
             for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
             {
@@ -100,7 +100,7 @@ namespace Online{
 
     void ServersManager::RefreshRequest::callback()
     {
-        ServersManager::get()->refresh(this);
+        ServersManager::get()->refresh(m_success, m_result);
     }
 
     // ============================================================================

@@ -114,8 +114,10 @@
                     nolok-bubble-gum, easter egg -->
   <switch time="5"  items="1 0 4 4 2 5 2 7"/>
 
-  <!-- How often bubblegum get driven over before it disappears. --> 
-  <bubblegum disappear-counter="1"/>
+  <!-- disappear-counter: How often bubblegum gets driven over before it disappears. 
+       shield-time: How long the bubblegum shield lasts 
+       restrict-weapons: If true, using weapons will destroy the user's shield --> 
+  <bubblegum disappear-counter="1" shield-time="10.0" restrict-weapons="false"/>
 
   <!-- explosion-impulse-objects is the impulse that pushes physical objects
        away if there is an explosion. -->

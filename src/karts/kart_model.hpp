@@ -231,9 +231,15 @@ public:
     // ------------------------------------------------------------------------
     /**  Name of the hat mesh to use. */
     void setHatMeshName(const std::string &name) {m_hat_name = name; }
+	// ------------------------------------------------------------------------
+	void attachHat();
     // ------------------------------------------------------------------------
     /** Returns the array of wheel nodes. */
     scene::ISceneNode** getWheelNodes() { return m_wheel_node; }
+	// ------------------------------------------------------------------------
+	scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
+	// ------------------------------------------------------------------------
+	core::vector3df getHatOffset() { return m_hat_offset; }
 
 };   // KartModel
 #endif

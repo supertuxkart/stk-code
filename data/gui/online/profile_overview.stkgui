@@ -1,0 +1,23 @@
+<stkgui>
+
+<div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+
+    <header id="title" text_align="center" width="80%" align="center" text="..."/>
+    
+    <spacer height="25" width="10"/>
+    
+    <tabs id="profile_tabs" height="10%" max_height="110" x="2%" width="98%" align="center">
+        <icon-button id="tab_overview" width="128" height="128" icon="gui/options_ui.png" I18N="Section in the profile menu" text="Overview"/>
+        <icon-button id="tab_friends" width="128" height="128" icon="gui/options_players.png" />
+    </tabs>
+    
+    <box proportion="1" width="100%" layout="vertical-row">
+        <div x="1%" y="2%" width="98%" height="96%" layout="vertical-row" >
+
+        </div>
+    </box>
+</div>
+
+<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
+</stkgui>

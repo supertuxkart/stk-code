@@ -378,6 +378,18 @@ public:
     // ------------------------------------------------------------------------
     virtual void setInvulnerableTime(float t) = 0;
     // ------------------------------------------------------------------------
+    /** Returns if the kart is protected by a shield. */
+    virtual bool isShielded() const = 0;
+    // ------------------------------------------------------------------------
+    virtual void setShieldTime(float t) = 0;
+    // ------------------------------------------------------------------------
+    virtual float getShieldTime() const = 0;
+    // ------------------------------------------------------------------------
+    /** Decreases the kart's shield time. */
+    //Hard coded shield decrease time
+    virtual void decreaseShieldTime(float t) = 0;
+    // ------------------------------------------------------------------------
+
     /** Shows the star effect for a certain time. */
     virtual void showStarEffect(float t) = 0;
     // ------------------------------------------------------------------------
@@ -403,6 +415,9 @@ public:
     /** Set a text that is displayed on top of a kart.
      */
     virtual void setOnScreenText(const wchar_t *text) = 0;
+    /** Whether an unused bubble gum shield becomes a bubble gum on the ground.
+     * */
+    bool         m_bubble_drop;
 };   // AbstractKart
 
 
