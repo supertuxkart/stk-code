@@ -75,6 +75,8 @@ namespace Online{
             m_friends.push_back(new User(username, friendid));
         }
         m_has_fetched_friends = true;
+        delete m_friends_list_request;
+        m_friends_list_request = NULL;
         Profile::setState (Profile::S_READY);
     }
 
@@ -96,7 +98,7 @@ namespace Online{
     void Profile::FriendsListRequest::callback()
     {
         uint32_t user_id(0);
-        int result = m_result->get("visitingid", &user_id);
+        m_result->get("visitingid", &user_id);
         assert(ProfileManager::get()->getProfileByID(user_id) != NULL);
         ProfileManager::get()->getProfileByID(user_id)->friendsListCallback(m_result);
     }
@@ -106,8 +108,6 @@ namespace Online{
     const PtrVector<Online::User> & Profile::getFriends()
     {
         assert (m_has_fetched_friends && getState() == S_READY);
-        delete m_friends_list_request;
-        m_friends_list_request = NULL;
         return m_friends;
     }
     // ============================================================================
