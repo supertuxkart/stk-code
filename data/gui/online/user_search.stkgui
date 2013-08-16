@@ -1,23 +1,22 @@
 <stkgui>
-
-<div x="0%" y="0%" width="100%" height="98%" layout="vertical-row" >
-
-    <div x="0" y="0" width="100%" layout="horizontal-row" height="8%">
-        <icon-button id="back"   height="100%" icon="gui/back.png"/>
-        <header text_align="center" proportion="1" text="Server Selection" align="center"/>
-    </div>
-  
-	<div height="fit" width="100%" layout="horizontal-row" align="center"> 
-		<textbox id="search_box" proportion="1" height="100%"/>
-		<spacer width="30" height="10"/>
-		<button id="search_button" height="fit" width="fit" text="Search" />
+	<div x="1%" y="0%" width="98%" height="99%" layout="vertical-row" >
+	
+	    <header text_align="center" height="fit" text="User search" align="center"/>
+	    
+	    <spacer width="10" height="10"/>
+	  
+		<div height="fit" width="100%" layout="horizontal-row" align="center"> 
+			<textbox id="search_box" height="fit" proportion="1" height="100%"/>
+			<spacer width="10" height="10"/>
+			<button id="search_button" height="100%" width="fit" text="Search" />
+		</div>
+		
 		<spacer width="10" height="10"/>
+					
+	    <box proportion="1" width="100%" align="center" layout="vertical-row" padding="6">
+	        <list id="user_list" x="0" y="0" width="100%" height="100%"/>
+	    </box>
+	       
 	</div>
-				
-    <box proportion="1" width="98%" align="center" layout="vertical-row" padding="6">
-        <list id="user_list" x="0" y="0" width="100%" height="100%"/>
-    </box>
-       
-</div>
-
+	<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 </stkgui>

@@ -21,9 +21,9 @@
 				<label height="fit" text_align="left" I18N="Profile friends" text="Look for more friends:"/>
 				<spacer width="10" height="10"/>
 				<div height="fit" width="100%" layout="horizontal-row" align="center"> 
-					<textbox id="search_box" proportion="1" height="100%"/>
+					<textbox id="search_box" proportion="1" height="fit"/>
 					<spacer width="10" height="10"/>
-					<button id="search_button" height="fit" width="fit" text="Search" />
+					<button id="search_button" height="100%" width="fit" text="Search" />
 				</div>
 			</div>
 			<spacer width="2%" height="10"/>
