@@ -45,7 +45,7 @@ namespace Online{
             {
                 virtual void callback ();
             public:
-                FriendsListRequest() : XMLRequest() {}
+                FriendsListRequest() : XMLRequest(0, true) {}
             };
         private:
 
@@ -62,16 +62,13 @@ namespace Online{
 
             bool                            m_has_fetched_friends;
             PtrVector<Online::User>         m_friends;
-            const FriendsListRequest *      m_friends_list_request;
 
             bool                            m_cache_bit;
-
-
 
             void                            setState(State state)       { m_state.setAtomic(state); }
             const State                     getState() const            { return m_state.getAtomic(); }
 
-            const FriendsListRequest * requestFriendsList();
+            void requestFriendsList();
             void friendsListCallback(const XMLNode * input);
 
         public:

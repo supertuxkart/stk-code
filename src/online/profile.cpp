@@ -46,8 +46,6 @@ namespace Online{
         m_is_current_user = (m_id == CurrentUser::get()->getUserID());
 
         m_has_fetched_friends = false;
-        m_friends_list_request = NULL;
-
     }
 
     // ============================================================================
@@ -57,7 +55,7 @@ namespace Online{
         if(m_has_fetched_friends)
             return;
         setState (S_FETCHING);
-        m_friends_list_request = requestFriendsList();
+        requestFriendsList();
     }
     // ============================================================================
 
@@ -75,15 +73,13 @@ namespace Online{
             m_friends.push_back(new User(username, friendid));
         }
         m_has_fetched_friends = true;
-        delete m_friends_list_request;
-        m_friends_list_request = NULL;
         Profile::setState (Profile::S_READY);
     }
 
 
     // ============================================================================
 
-    const Profile::FriendsListRequest * Profile::requestFriendsList()
+    void Profile::requestFriendsList()
     {
         FriendsListRequest * request = new FriendsListRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
@@ -92,7 +88,6 @@ namespace Online{
         request->setParameter("userid", CurrentUser::get()->getUserID());
         request->setParameter("visitingid", m_id);
         HTTPManager::get()->addRequest(request);
-        return request;
     }
 
     void Profile::FriendsListRequest::callback()
