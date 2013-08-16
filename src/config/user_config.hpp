@@ -620,7 +620,7 @@ namespace UserConfigParams
                                           "Everything related to online play.") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_multiplayer
-            PARAM_DEFAULT( StringUserConfigParam(   "http://api.stkaddons.net/",
+            PARAM_DEFAULT( StringUserConfigParam(   "https://api.stkaddons.net/",
                                                      "server_multiplayer",
                                                      &m_online_group,
                                                     "The server used for online multiplayer."));
