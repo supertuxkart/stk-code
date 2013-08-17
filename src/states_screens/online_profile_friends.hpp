@@ -46,6 +46,7 @@ private:
 
     int                         m_selected_friend_index;
     bool                        m_waiting_for_friends;
+    bool                        m_own_profile;
 
 public:
     friend class GUIEngine::ScreenSingleton<OnlineProfileFriends>;

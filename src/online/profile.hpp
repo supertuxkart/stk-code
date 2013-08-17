@@ -107,7 +107,7 @@ namespace Online{
             bool                            isReady() const                  { return getState() == S_READY; }
 
             bool                            isCurrentUser() const            { return m_is_current_user; }
-            const RelationInfo *            getRelationInfo()                { return m_relation_info; }
+            RelationInfo *                  getRelationInfo()                { return m_relation_info; }
 
             void                            setCacheBit()                    { m_cache_bit = true; }
             void                            unsetCacheBit()                  { m_cache_bit = false; }

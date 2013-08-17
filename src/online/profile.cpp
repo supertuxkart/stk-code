@@ -39,7 +39,6 @@ namespace Online{
     Profile::RelationInfo::RelationInfo(const irr::core::stringw & date, bool is_online, bool is_pending, bool is_asker)
     {
         m_date = date;
-        Log::info("date","%s",m_date.c_str());
         m_is_online = is_online;
         m_is_pending = is_pending;
         m_is_asker = is_asker;
@@ -113,7 +112,11 @@ namespace Online{
         m_friends.clear();
         for (unsigned int i = 0; i < friends_xml->getNumNodes(); i++)
         {
-            Profile * profile = new Profile(friends_xml->getNode(i), (m_is_current_user ? C_RELATION_INFO : C_DEFAULT));
+            Profile * profile;
+            if(m_is_current_user)
+                profile = new Profile(friends_xml->getNode(i) , C_RELATION_INFO);
+            else
+                profile = new Profile(friends_xml->getNode(i)->getNode("user"), C_DEFAULT);
             m_friends.push_back(profile->getID());
             ProfileManager::get()->addToCache(profile);
         }
