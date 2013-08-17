@@ -65,16 +65,11 @@ void OnlineUserSearch::parseResult(const XMLNode * input)
 {
     m_users.clear();
     const XMLNode * users_xml = input->getNode("users");
-    uint32_t id(0);
-    irr::core::stringw username("");
     for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
     {
-        users_xml->getNode(i)->get("id", &id);
-        users_xml->getNode(i)->get("user_name", &username);
-        ProfileManager::get()->addToCache(
-            new Profile(id, username)
-        );
-        m_users.push_back(id);
+        Profile * profile = new Profile(users_xml->getNode(i));
+        ProfileManager::get()->addToCache(profile);
+        m_users.push_back(profile->getID());
     }
 }
 
@@ -85,6 +80,7 @@ void OnlineUserSearch::showList()
     {
         PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
         Profile * profile = ProfileManager::get()->getProfileByID(m_users[i]);
+        assert(profile != NULL);
         row->push_back(new GUIEngine::ListWidget::ListCell(profile->getUserName(),-1,3));
         m_user_list_widget->addItem("user", row);
     }

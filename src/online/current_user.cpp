@@ -22,6 +22,7 @@
 #include "addons/addons_manager.hpp"
 #include "config/user_config.hpp"
 #include "online/servers_manager.hpp"
+#include "online/profile_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 #include "addons/addon.hpp"
@@ -148,6 +149,7 @@ namespace Online{
                 UserConfigParams::m_saved_token = getToken();
                 UserConfigParams::m_saved_session = true;
             }
+            ProfileManager::get()->addToCache(new Profile(CurrentUser::get()->getUserID(), CurrentUser::get()->getUserName()));
         }
         else
             setUserState (US_SIGNED_OUT);

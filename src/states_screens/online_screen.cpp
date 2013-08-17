@@ -217,7 +217,6 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (selection == m_profile_widget->m_properties[PROP_ID])
     {
-        ProfileManager::get()->addToCache(new Profile(CurrentUser::get()->getUserID(), CurrentUser::get()->getUserName()));
         ProfileManager::get()->setVisiting(CurrentUser::get()->getUserID());
         StateManager::get()->pushScreen(OnlineProfileOverview::getInstance());
     }

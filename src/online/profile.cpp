@@ -35,9 +35,20 @@ using namespace Online;
 namespace Online{
 
 
+
+    Profile::RelationInfo::RelationInfo(const irr::core::stringw & date, bool is_online, bool is_pending, bool is_asker)
+    {
+        m_date = date;
+        Log::info("date","%s",m_date.c_str());
+        m_is_online = is_online;
+        m_is_pending = is_pending;
+        m_is_asker = is_asker;
+    }
+
+
     // ============================================================================
-    Profile::Profile(   const uint32_t           & userid,
-                        const irr::core::stringw & username)
+    Profile::Profile( const uint32_t           & userid,
+                      const irr::core::stringw & username)
     {
         setState (S_READY);
         m_cache_bit = true;
@@ -45,6 +56,43 @@ namespace Online{
         m_is_current_user = (m_id == CurrentUser::get()->getUserID());
         m_username = username;
         m_has_fetched_friends = false;
+        m_relation_info = NULL;
+    }
+
+    Profile::Profile(const XMLNode * xml, ConstructorType type)
+    {
+        m_relation_info = NULL;
+        if(type == C_RELATION_INFO){
+            std::string is_online_string("");
+            xml->get("online", &is_online_string);
+            bool is_online = is_online_string == "yes";
+            irr::core::stringw date("");
+            xml->get("date", &date);
+            std::string is_pending_string("");
+            xml->get("is_pending", &is_pending_string);
+            bool is_pending = is_pending_string == "yes";
+            bool is_asker(false);
+            if(is_pending)
+            {
+                std::string is_asker_string("");
+                xml->get("is_asker", &is_asker_string);
+                is_asker = is_asker_string == "yes";
+            }
+            m_relation_info = new RelationInfo(date, is_online, is_pending, is_asker);
+            xml = xml->getNode("user");
+        }
+
+        xml->get("id", &m_id);
+        xml->get("user_name", &m_username);
+        m_cache_bit = true;
+        m_has_fetched_friends = false;
+        m_is_current_user = (m_id == CurrentUser::get()->getUserID());
+        setState (S_READY);
+    }
+    // ============================================================================
+    Profile::~Profile()
+    {
+        delete m_relation_info;
     }
 
     // ============================================================================
@@ -63,17 +111,11 @@ namespace Online{
     {
         const XMLNode * friends_xml = input->getNode("friends");
         m_friends.clear();
-        uint32_t friend_id(0);
-        irr::core::stringw friend_username("");
         for (unsigned int i = 0; i < friends_xml->getNumNodes(); i++)
         {
-            friends_xml->getNode(i)->get("friend_id", &friend_id);
-            friends_xml->getNode(i)->get("friend_name", &friend_username);
-            ProfileManager::get()->addToCache(
-                new Profile(friend_id, friend_username)
-            );
-            m_friends.push_back(friend_id);
-
+            Profile * profile = new Profile(friends_xml->getNode(i), (m_is_current_user ? C_RELATION_INFO : C_DEFAULT));
+            m_friends.push_back(profile->getID());
+            ProfileManager::get()->addToCache(profile);
         }
         m_has_fetched_friends = true;
         Profile::setState (Profile::S_READY);

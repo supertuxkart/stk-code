@@ -106,6 +106,7 @@ void OnlineProfileFriends::onUpdate(float delta,  irr::video::IVideoDriver* driv
         if(m_visiting_profile->isReady())
         {
             m_friends_list_widget->clear();
+            Log::info("","%d",m_visiting_profile->getFriends().size());
             for(unsigned int i = 0; i < m_visiting_profile->getFriends().size(); i++)
             {
                 PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;

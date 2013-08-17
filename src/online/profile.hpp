@@ -41,6 +41,26 @@ namespace Online{
     class Profile
     {
         public :
+            enum ConstructorType
+            {
+                C_DEFAULT = 1,
+                C_RELATION_INFO
+            };
+            class RelationInfo
+            {
+            private:
+                bool m_is_online;
+                bool m_is_pending;
+                bool m_is_asker;
+                irr::core::stringw m_date;
+            public:
+                RelationInfo(const irr::core::stringw & date, bool is_online, bool is_pending, bool is_asker = false);
+                bool isPending(){return m_is_pending;}
+                bool isAsker(){return m_is_asker;}
+                const irr::core::stringw & getDate() { return m_date; }
+                bool                            isOnline() const                 { return m_is_online; }
+                void                            setOnline(bool online)           { m_is_online = online; }
+            };
             class FriendsListRequest : public XMLRequest
             {
                 virtual void callback ();
@@ -61,6 +81,7 @@ namespace Online{
             bool                            m_is_current_user;
             uint32_t                        m_id;
             irr::core::stringw              m_username;
+            RelationInfo *                  m_relation_info;
 
             bool                            m_has_fetched_friends;
             std::vector<uint32_t>           m_friends;
@@ -76,6 +97,9 @@ namespace Online{
         public:
                                             Profile(    const uint32_t           & userid,
                                                         const irr::core::stringw & username);
+                                            Profile(    const XMLNode * xml,
+                                                        ConstructorType type = C_DEFAULT);
+                                            ~Profile();
             void                            fetchFriends();
             const std::vector<uint32_t> &   getFriends();
 
@@ -83,13 +107,14 @@ namespace Online{
             bool                            isReady() const                  { return getState() == S_READY; }
 
             bool                            isCurrentUser() const            { return m_is_current_user; }
+            const RelationInfo *            getRelationInfo()                { return m_relation_info; }
 
             void                            setCacheBit()                    { m_cache_bit = true; }
             void                            unsetCacheBit()                  { m_cache_bit = false; }
             bool                            getCacheBit() const              { return m_cache_bit; }
 
             uint32_t                        getID() const                    { return m_id; }
-            irr::core::stringw              getUserName() const              { return m_username; }
+            const irr::core::stringw &      getUserName() const              { return m_username; }
 
 
     };   // class CurrentUser
