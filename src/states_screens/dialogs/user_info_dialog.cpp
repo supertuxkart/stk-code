@@ -51,7 +51,6 @@ UserInfoDialog::UserInfoDialog(uint32_t visiting_id)
     m_profile = ProfileManager::get()->getProfileByID(visiting_id);
     m_name_widget = getWidget<LabelWidget>("name");
     assert(m_name_widget != NULL);
-    //const Server * server = ProfileManager::get()->getServerByID(m_visiting_id);
     m_name_widget->setText(m_profile->getUserName(),false);
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);

@@ -78,7 +78,6 @@ void OnlineProfileFriends::init()
     m_visiting_profile->fetchFriends();
     m_waiting_for_friends = true;
     m_friends_list_widget->clear();
-    m_friends_list_widget->addItem("spacer", L"");
     m_friends_list_widget->addItem("loading", Messages::fetchingFriends());
 }   // init
 // -----------------------------------------------------------------------------
@@ -90,7 +89,7 @@ void OnlineProfileFriends::eventCallback(Widget* widget, const std::string& name
     {
         OnlineUserSearch * instance = OnlineUserSearch::getInstance();
         instance->setSearchString(m_search_box_widget->getText().trim());
-        StateManager::get()->pushScreen(instance);
+        StateManager::get()->replaceTopMostScreen(instance);
     }
     else if (name == m_friends_list_widget->m_properties[GUIEngine::PROP_ID])
     {

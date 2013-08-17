@@ -1,6 +1,6 @@
 <stkgui>
 	<div x="1%" y="0%" width="98%" height="99%" layout="vertical-row" >
-	
+		<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 	    <header text_align="center" height="fit" text="User search" align="center"/>
 	    
 	    <spacer width="10" height="10"/>
@@ -18,5 +18,5 @@
 	    </box>
 	       
 	</div>
-	<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+	
 </stkgui>
