@@ -36,15 +36,14 @@ namespace Online{
 
 
     // ============================================================================
-    Profile::Profile(User * user)
+    Profile::Profile(   const uint32_t           & userid,
+                        const irr::core::stringw & username)
     {
         setState (S_READY);
-        m_is_current_user = false;
-        m_cache_bit = false;
-        m_id = user->getUserID();
-        m_username = user->getUserName();
+        m_cache_bit = true;
+        m_id = userid;
         m_is_current_user = (m_id == CurrentUser::get()->getUserID());
-
+        m_username = username;
         m_has_fetched_friends = false;
     }
 
@@ -63,14 +62,18 @@ namespace Online{
     void Profile::friendsListCallback(const XMLNode * input)
     {
         const XMLNode * friends_xml = input->getNode("friends");
-        m_friends.clearAndDeleteAll();
-        uint32_t friendid(0);
-        irr::core::stringw username("");
+        m_friends.clear();
+        uint32_t friend_id(0);
+        irr::core::stringw friend_username("");
         for (unsigned int i = 0; i < friends_xml->getNumNodes(); i++)
         {
-            friends_xml->getNode(i)->get("friend_id", &friendid);
-            friends_xml->getNode(i)->get("friend_name", &username);
-            m_friends.push_back(new User(username, friendid));
+            friends_xml->getNode(i)->get("friend_id", &friend_id);
+            friends_xml->getNode(i)->get("friend_name", &friend_username);
+            ProfileManager::get()->addToCache(
+                new Profile(friend_id, friend_username)
+            );
+            m_friends.push_back(friend_id);
+
         }
         m_has_fetched_friends = true;
         Profile::setState (Profile::S_READY);
@@ -100,7 +103,7 @@ namespace Online{
 
     // ============================================================================
 
-    const PtrVector<Online::User> & Profile::getFriends()
+    const std::vector<uint32_t> & Profile::getFriends()
     {
         assert (m_has_fetched_friends && getState() == S_READY);
         return m_friends;

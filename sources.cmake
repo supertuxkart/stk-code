@@ -217,6 +217,7 @@ src/states_screens/dialogs/select_challenge.cpp
 src/states_screens/dialogs/server_info_dialog.cpp
 src/states_screens/dialogs/track_info_dialog.cpp
 src/states_screens/dialogs/tutorial_message_dialog.cpp
+src/states_screens/dialogs/user_info_dialog.cpp
 src/states_screens/dialogs/vote_dialog.cpp
 src/states_screens/feature_unlocked.cpp
 src/states_screens/grand_prix_lose.cpp
@@ -518,6 +519,7 @@ src/states_screens/dialogs/select_challenge.hpp
 src/states_screens/dialogs/server_info_dialog.hpp
 src/states_screens/dialogs/track_info_dialog.hpp
 src/states_screens/dialogs/tutorial_message_dialog.hpp
+src/states_screens/dialogs/user_info_dialog.hpp
 src/states_screens/dialogs/vote_dialog.hpp
 src/states_screens/feature_unlocked.hpp
 src/states_screens/grand_prix_lose.hpp

@@ -53,11 +53,11 @@ namespace Online{
 
     // ============================================================================
 
-    void ProfileManager::iterateCache()
+    void ProfileManager::iterateCache(Profile * profile)
     {
         if(m_profiles_cache.size() == m_max_cache_size)
         {
-            m_currently_visiting->setCacheBit();
+            profile->setCacheBit();
             ProfilesMap::iterator iter;
             for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end(); ++iter)
             {
@@ -69,14 +69,14 @@ namespace Online{
             {
                iter->second->unsetCacheBit();
             }
-            m_currently_visiting->setCacheBit();
+            profile->setCacheBit();
         }
 
     }
 
     // ============================================================================
 
-    void ProfileManager::addToCache(Profile * profile)
+    void ProfileManager::directToCache(Profile * profile)
     {
         assert(profile != NULL);
         if(m_profiles_cache.size() == m_max_cache_size)
@@ -98,34 +98,49 @@ namespace Online{
 
     }
 
-    // ============================================================================
-    void ProfileManager::setVisiting(User * user)
+
+    void ProfileManager::addToCache(Profile * profile)
     {
-        assert(user != NULL);
-        if( m_profiles_cache.find(user->getUserID()) == m_profiles_cache.end())
+        if(cacheHit(profile->getID()))
         {
-            //cache miss
-            m_currently_visiting = new Profile(user);
-            addToCache(m_currently_visiting);
+            //FIXME should do updating of values
+            delete profile;
         }
         else
         {
-            //cache hit
-            m_currently_visiting = m_profiles_cache[user->getUserID()];
+            directToCache(profile);
         }
-        iterateCache();
+    }
+
+
+    bool ProfileManager::cacheHit(const uint32_t id)
+    {
+        if (m_profiles_cache.find(id) != m_profiles_cache.end())
+        {
+            iterateCache(m_profiles_cache[id]);
+            return true;
+        }
+        return false;
+    }
+
+    // ============================================================================
+    void ProfileManager::setVisiting(const uint32_t id)
+    {
+        if(cacheHit(id))
+        {
+            m_currently_visiting = m_profiles_cache[id];
+        }
+        else
+            m_currently_visiting = NULL;
     }
 
     // ============================================================================
 
-    Profile * ProfileManager::getProfileByID(uint32_t id)
+    Profile * ProfileManager::getProfileByID(const uint32_t id)
     {
-        if( m_profiles_cache.find(id) == m_profiles_cache.end())
-        {
-            Log::info("getProfileByID","here");
-            return NULL;
-        }
-        return m_profiles_cache[id];
+        if(cacheHit(id))
+            return m_profiles_cache[id];
+        return NULL;
     }
 
 

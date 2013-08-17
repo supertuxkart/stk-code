@@ -52,19 +52,21 @@ namespace Online{
 
             ProfilesMap                             m_profiles_cache;
             Profile *                               m_currently_visiting;
-            static const unsigned int               m_max_cache_size = 5;
+            static const unsigned int               m_max_cache_size = 20;
 
-            void                                    iterateCache();
-            void                                    addToCache(Profile * profile);
+            void                                    iterateCache(Profile * profile);
+            void                                    directToCache(Profile * profile);
 
         public:
             /**Singleton */
             static ProfileManager *                 get();
             static void                             deallocate();
 
-            void                                    setVisiting(Online::User * user);
+            void                                    addToCache(Profile * profile);
+            void                                    setVisiting(const uint32_t id);
+            bool                                    cacheHit(const uint32_t id);
             Profile *                               getVisitingProfile() {return m_currently_visiting;}
-            Profile *                               getProfileByID(uint32_t id);
+            Profile *                               getProfileByID(const uint32_t id);
 
     };   // class CurrentUser
 

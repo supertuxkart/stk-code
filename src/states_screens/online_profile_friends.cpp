@@ -23,6 +23,7 @@
 #include "guiengine/widget.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online_user_search.hpp"
+#include "states_screens/dialogs/user_info_dialog.hpp"
 #include "utils/translation.hpp"
 #include "online/messages.hpp"
 
@@ -42,6 +43,7 @@ DEFINE_SCREEN_SINGLETON( OnlineProfileFriends );
 
 OnlineProfileFriends::OnlineProfileFriends() : OnlineProfileBase("online/profile_friends.stkgui")
 {
+    m_selected_friend_index = -1;
 }   // OnlineProfileFriends
 
 // -----------------------------------------------------------------------------
@@ -72,7 +74,6 @@ void OnlineProfileFriends::init()
 {
     OnlineProfileBase::init();
     m_profile_tabs->select( m_friends_tab->m_properties[PROP_ID], PLAYER_ID_GAME_MASTER );
-    m_visiting_profile = ProfileManager::get()->getVisitingProfile();
     assert(m_visiting_profile != NULL);
     m_visiting_profile->fetchFriends();
     m_waiting_for_friends = true;
@@ -91,6 +92,11 @@ void OnlineProfileFriends::eventCallback(Widget* widget, const std::string& name
         instance->setSearchString(m_search_box_widget->getText().trim());
         StateManager::get()->pushScreen(instance);
     }
+    else if (name == m_friends_list_widget->m_properties[GUIEngine::PROP_ID])
+    {
+        m_selected_friend_index = m_friends_list_widget->getSelectionID();
+        new UserInfoDialog(m_visiting_profile->getFriends()[m_selected_friend_index]);
+    }
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
@@ -101,17 +107,18 @@ void OnlineProfileFriends::onUpdate(float delta,  irr::video::IVideoDriver* driv
         if(m_visiting_profile->isReady())
         {
             m_friends_list_widget->clear();
-            for(int i = 0; i < m_visiting_profile->getFriends().size(); i++)
+            for(unsigned int i = 0; i < m_visiting_profile->getFriends().size(); i++)
             {
                 PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
-                row->push_back(new GUIEngine::ListWidget::ListCell(m_visiting_profile->getFriends()[i].getUserName(),-1,3));
-                m_friends_list_widget->addItem("server", row);
+                Profile * friend_profile = ProfileManager::get()->getProfileByID(m_visiting_profile->getFriends()[i]);
+                row->push_back(new GUIEngine::ListWidget::ListCell(friend_profile->getUserName(),-1,3));
+                m_friends_list_widget->addItem("friend", row);
             }
             m_waiting_for_friends = false;
         }
         else
         {
-                m_friends_list_widget->renameItem("loading", Messages::fetchingFriends());
+            m_friends_list_widget->renameItem("loading", Messages::fetchingFriends());
         }
     }
 }

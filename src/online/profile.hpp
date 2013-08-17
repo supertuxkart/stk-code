@@ -47,6 +47,8 @@ namespace Online{
             public:
                 FriendsListRequest() : XMLRequest(0, true) {}
             };
+
+            typedef std::vector<uint32_t> IDList;
         private:
 
             enum State
@@ -61,7 +63,7 @@ namespace Online{
             irr::core::stringw              m_username;
 
             bool                            m_has_fetched_friends;
-            PtrVector<Online::User>         m_friends;
+            std::vector<uint32_t>           m_friends;
 
             bool                            m_cache_bit;
 
@@ -72,18 +74,22 @@ namespace Online{
             void friendsListCallback(const XMLNode * input);
 
         public:
-            Profile(User * user);
-            void fetchFriends();
-            const PtrVector<Online::User> & getFriends();
+                                            Profile(    const uint32_t           & userid,
+                                                        const irr::core::stringw & username);
+            void                            fetchFriends();
+            const std::vector<uint32_t> &   getFriends();
 
-            bool isFetching() { return getState() == S_FETCHING; }
-            bool isReady() { return getState() == S_READY; }
+            bool                            isFetching() const               { return getState() == S_FETCHING; }
+            bool                            isReady() const                  { return getState() == S_READY; }
 
-            void setCacheBit() { m_cache_bit = true; }
-            void unsetCacheBit() { m_cache_bit = false; }
-            bool getCacheBit() { return m_cache_bit; }
-            uint32_t getID() { return m_id; }
-            irr::core::stringw getUsername() { return m_username; }
+            bool                            isCurrentUser() const            { return m_is_current_user; }
+
+            void                            setCacheBit()                    { m_cache_bit = true; }
+            void                            unsetCacheBit()                  { m_cache_bit = false; }
+            bool                            getCacheBit() const              { return m_cache_bit; }
+
+            uint32_t                        getID() const                    { return m_id; }
+            irr::core::stringw              getUserName() const              { return m_username; }
 
 
     };   // class CurrentUser

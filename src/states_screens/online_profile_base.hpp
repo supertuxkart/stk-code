@@ -24,6 +24,7 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
+#include "online/profile.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -36,9 +37,12 @@ class OnlineProfileBase : public GUIEngine::Screen
 {
 protected:
     OnlineProfileBase(const char* filename);
+    GUIEngine::LabelWidget * m_header;
     GUIEngine::RibbonWidget* m_profile_tabs;
     GUIEngine::IconButtonWidget * m_overview_tab;
     GUIEngine::IconButtonWidget * m_friends_tab;
+
+    Online::Profile *           m_visiting_profile;
 
 public:
 
