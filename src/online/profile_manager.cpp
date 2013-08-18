@@ -84,7 +84,7 @@ namespace Online{
             ProfilesMap::iterator iter;
             for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end();)
             {
-               if (!iter->second->getCacheBit())
+               if (!iter->second->getCacheBit() && iter->second->canAutoDelete())
                {
                    m_profiles_cache.erase(iter++);
                    continue;
@@ -98,6 +98,7 @@ namespace Online{
 
     }
 
+    // ============================================================================
 
     void ProfileManager::addToCache(Profile * profile)
     {
@@ -111,6 +112,8 @@ namespace Online{
             directToCache(profile);
         }
     }
+
+    // ============================================================================
 
 
     bool ProfileManager::cacheHit(const uint32_t id)

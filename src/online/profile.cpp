@@ -47,9 +47,11 @@ namespace Online{
 
     // ============================================================================
     Profile::Profile( const uint32_t           & userid,
-                      const irr::core::stringw & username)
+                      const irr::core::stringw & username,
+                      bool auto_delete)
     {
         setState (S_READY);
+        m_auto_delete = auto_delete;
         m_cache_bit = true;
         m_id = userid;
         m_is_current_user = (m_id == CurrentUser::get()->getUserID());
@@ -58,9 +60,10 @@ namespace Online{
         m_relation_info = NULL;
     }
 
-    Profile::Profile(const XMLNode * xml, ConstructorType type)
+    Profile::Profile(const XMLNode * xml, ConstructorType type, bool auto_delete)
     {
         m_relation_info = NULL;
+        m_auto_delete = auto_delete;
         if(type == C_RELATION_INFO){
             std::string is_online_string("");
             xml->get("online", &is_online_string);

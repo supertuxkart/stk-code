@@ -149,7 +149,7 @@ namespace Online{
                 UserConfigParams::m_saved_token = getToken();
                 UserConfigParams::m_saved_session = true;
             }
-            ProfileManager::get()->addToCache(new Profile(CurrentUser::get()->getUserID(), CurrentUser::get()->getUserName()));
+            ProfileManager::get()->addToCache(new Profile(CurrentUser::get()->getUserID(), CurrentUser::get()->getUserName(), false));
         }
         else
             setUserState (US_SIGNED_OUT);
@@ -308,6 +308,51 @@ namespace Online{
 
     // ============================================================================
 
+    const CurrentUser::FriendRequest * CurrentUser::requestFriendRequest(const uint32_t friend_id) const
+    {
+        assert(isRegisteredUser());
+        CurrentUser::FriendRequest * request = new CurrentUser::FriendRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("friend-request"));
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getUserID());
+        request->setParameter("friendid", friend_id);
+        HTTPManager::get()->addRequest(request);
+        return request;
+    }
+
+    // ============================================================================
+
+    const CurrentUser::AcceptFriendRequest * CurrentUser::requestAcceptFriend(const uint32_t friend_id) const
+    {
+        assert(isRegisteredUser());
+        CurrentUser::AcceptFriendRequest * request = new CurrentUser::AcceptFriendRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("accept-friend-request"));
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getUserID());
+        request->setParameter("friendid", friend_id);
+        HTTPManager::get()->addRequest(request);
+        return request;
+    }
+
+    // ============================================================================
+
+    const CurrentUser::DeclineFriendRequest * CurrentUser::requestDeclineFriend(const uint32_t friend_id) const
+    {
+        assert(isRegisteredUser());
+        CurrentUser::DeclineFriendRequest * request = new CurrentUser::DeclineFriendRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("decline-friend-request"));
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getUserID());
+        request->setParameter("friendid", friend_id);
+        HTTPManager::get()->addRequest(request);
+        return request;
+    }
+
+
+    // ============================================================================
     const irr::core::stringw CurrentUser::getUserName() const
     {
         if((getUserState() == US_SIGNED_IN ) || (getUserState() == US_GUEST))

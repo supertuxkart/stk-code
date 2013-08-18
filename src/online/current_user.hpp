@@ -94,6 +94,24 @@ namespace Online{
                 setAddonVoteRequest() : XMLRequest() {}
             };
 
+            class FriendRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                FriendRequest() : XMLRequest() {}
+            };
+
+            class AcceptFriendRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                AcceptFriendRequest() : XMLRequest() {}
+            };
+
+            class DeclineFriendRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                DeclineFriendRequest() : XMLRequest() {}
+            };
+
 
         private:
             Synchronised<std::string>   m_token;
@@ -127,7 +145,7 @@ namespace Online{
 
 
             /** Register */
-            const XMLRequest *               requestSignUp( const irr::core::stringw &username,
+            const XMLRequest *              requestSignUp(  const irr::core::stringw &username,
                                                             const irr::core::stringw &password,
                                                             const irr::core::stringw &password_ver,
                                                             const irr::core::stringw &email,
@@ -138,8 +156,13 @@ namespace Online{
 
             const XMLRequest *              requestGetAddonVote(const std::string & addon_id) const;
             const setAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
+            const FriendRequest *           requestFriendRequest(const uint32_t friend_id) const;
+            const AcceptFriendRequest *     requestAcceptFriend(const uint32_t friend_id) const;
+            const DeclineFriendRequest *    requestDeclineFriend(const uint32_t friend_id) const;
 
             const XMLRequest *              requestUserSearch(const irr::core::stringw & search_string) const;
+
+
 
             /** Returns the username if signed in. */
             const irr::core::stringw        getUserName()           const;

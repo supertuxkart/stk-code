@@ -87,6 +87,7 @@ namespace Online{
             std::vector<uint32_t>           m_friends;
 
             bool                            m_cache_bit;
+            bool                            m_auto_delete;
 
             void                            setState(State state)       { m_state.setAtomic(state); }
             const State                     getState() const            { return m_state.getAtomic(); }
@@ -96,9 +97,11 @@ namespace Online{
 
         public:
                                             Profile(    const uint32_t           & userid,
-                                                        const irr::core::stringw & username);
+                                                        const irr::core::stringw & username,
+                                                        bool auto_delete = true);
                                             Profile(    const XMLNode * xml,
-                                                        ConstructorType type = C_DEFAULT);
+                                                        ConstructorType type = C_DEFAULT,
+                                                        bool auto_delete = true);
                                             ~Profile();
             void                            fetchFriends();
             const std::vector<uint32_t> &   getFriends();
@@ -112,6 +115,7 @@ namespace Online{
             void                            setCacheBit()                    { m_cache_bit = true; }
             void                            unsetCacheBit()                  { m_cache_bit = false; }
             bool                            getCacheBit() const              { return m_cache_bit; }
+            bool                            canAutoDelete() const            { return m_auto_delete; }
 
             uint32_t                        getID() const                    { return m_id; }
             const irr::core::stringw &      getUserName() const              { return m_username; }
