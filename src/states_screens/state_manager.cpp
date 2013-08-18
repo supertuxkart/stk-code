@@ -30,7 +30,6 @@
 #include "main_loop.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
-#include "online/user.hpp"
 #include "utils/translation.hpp"
 #include "utils/log.hpp"
 
@@ -102,8 +101,7 @@ void StateManager::updateActivePlayerIDs()
 
 // ----------------------------------------------------------------------------
 
-int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device,
-                                            Online::User* user)
+int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device, Online::Profile* user)
 {
     ActivePlayer *p;
     int i;
@@ -255,7 +253,7 @@ void StateManager::onStackEmptied()
 
 StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player,
                                          InputDevice *device,
-                                         Online::User* user)
+                                         Online::Profile* user)
 {
 #ifdef DEBUG
     m_magic_number = 0xAC1EF1AE;

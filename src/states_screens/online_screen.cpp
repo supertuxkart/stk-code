@@ -217,7 +217,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (selection == m_profile_widget->m_properties[PROP_ID])
     {
-        ProfileManager::get()->setVisiting(CurrentUser::get()->getUserID());
+        ProfileManager::get()->setVisiting(CurrentUser::get()->getID());
         StateManager::get()->pushScreen(OnlineProfileOverview::getInstance());
     }
     else if (selection == "register")

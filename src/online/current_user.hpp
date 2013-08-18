@@ -21,7 +21,6 @@
 
 #include "online/http_manager.hpp"
 #include "online/server.hpp"
-#include "online/user.hpp"
 #include "online/profile.hpp"
 #include "utils/types.hpp"
 #include "utils/synchronised.hpp"
@@ -39,7 +38,7 @@ namespace Online{
       * \brief Class that represents an online registered user
       * \ingroup online
       */
-    class CurrentUser : public User
+    class CurrentUser
     {
         public:
             enum UserState
@@ -114,15 +113,16 @@ namespace Online{
 
 
         private:
-            Synchronised<std::string>   m_token;
-            Synchronised<bool>          m_save_session;
-            Synchronised<UserState>     m_state;
+            std::string                 m_token;
+            bool                        m_save_session;
+            UserState                   m_state;
+            Profile *                   m_profile;
 
-            bool                        getSaveSession()        const   { return m_save_session.getAtomic();      }
+            bool                        getSaveSession()        const   { return m_save_session;      }
 
-            void setUserState           (UserState user_state)          { m_state.setAtomic(user_state);          }
-            void setSaveSession         (bool save_session)             { m_save_session.setAtomic(save_session); }
-            void setToken               (const std::string & token)     { m_token.setAtomic(token);               }
+            void setUserState           (UserState user_state)          { m_state = user_state;          }
+            void setSaveSession         (bool save_session)             { m_save_session = save_session; }
+            void setToken               (const std::string & token)     { m_token= token;               }
 
             CurrentUser();
 
@@ -165,13 +165,12 @@ namespace Online{
 
 
             /** Returns the username if signed in. */
-            const irr::core::stringw        getUserName()           const;
-            const UserState                 getUserState()          const { return m_state.getAtomic(); }
-            bool                            isRegisteredUser()      const {
-                                                                            MutexLocker(m_state);
-                                                                            return m_state.getData() == US_SIGNED_IN;
-                                                                          }
-            const std::string               getToken()              const { return m_token.getAtomic(); }
+            irr::core::stringw              getUserName()           const;
+            uint32_t                        getID()                 const;
+            const UserState                 getUserState()          const { return m_state; }
+            bool                            isRegisteredUser()      const { return m_state == US_SIGNED_IN; }
+            const std::string &             getToken()              const { return m_token; }
+            Profile *                       getProfile()            const { return m_profile; }
 
             void                            requestPoll();
 

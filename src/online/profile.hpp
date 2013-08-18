@@ -21,7 +21,6 @@
 
 #include "http_manager.hpp"
 #include "online/request.hpp"
-#include "online/user.hpp"
 #include "utils/types.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -98,7 +97,8 @@ namespace Online{
         public:
                                             Profile(    const uint32_t           & userid,
                                                         const irr::core::stringw & username,
-                                                        bool auto_delete = true);
+                                                        bool auto_delete = true,
+                                                        bool is_current_user = false);
                                             Profile(    const XMLNode * xml,
                                                         ConstructorType type = C_DEFAULT,
                                                         bool auto_delete = true);

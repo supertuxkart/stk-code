@@ -48,13 +48,14 @@ namespace Online{
     // ============================================================================
     Profile::Profile( const uint32_t           & userid,
                       const irr::core::stringw & username,
-                      bool auto_delete)
+                      bool auto_delete,
+                      bool is_current_user)
     {
         setState (S_READY);
         m_auto_delete = auto_delete;
         m_cache_bit = true;
         m_id = userid;
-        m_is_current_user = (m_id == CurrentUser::get()->getUserID());
+        m_is_current_user = is_current_user;
         m_username = username;
         m_has_fetched_friends = false;
         m_relation_info = NULL;
@@ -88,7 +89,7 @@ namespace Online{
         xml->get("user_name", &m_username);
         m_cache_bit = true;
         m_has_fetched_friends = false;
-        m_is_current_user = (m_id == CurrentUser::get()->getUserID());
+        m_is_current_user = (m_id == CurrentUser::get()->getID());
         setState (S_READY);
     }
     // ============================================================================
@@ -136,7 +137,7 @@ namespace Online{
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",std::string("get-friends-list"));
         request->setParameter("token", CurrentUser::get()->getToken());
-        request->setParameter("userid", CurrentUser::get()->getUserID());
+        request->setParameter("userid", CurrentUser::get()->getID());
         request->setParameter("visitingid", m_id);
         HTTPManager::get()->addRequest(request);
     }

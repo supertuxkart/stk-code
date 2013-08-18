@@ -178,7 +178,6 @@ src/online/profile_manager.cpp
 src/online/request.cpp
 src/online/server.cpp
 src/online/servers_manager.cpp
-src/online/user.cpp
 src/physics/btKart.cpp
 src/physics/btKartRaycast.cpp
 src/physics/btUprightConstraint.cpp
@@ -477,7 +476,6 @@ src/online/profile_manager.hpp
 src/online/request.hpp
 src/online/server.hpp
 src/online/servers_manager.hpp
-src/online/user.hpp
 src/physics/btKart.hpp
 src/physics/btKartRaycast.hpp
 src/physics/btUprightConstraint.hpp

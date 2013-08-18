@@ -19,7 +19,6 @@
 #ifndef HEADER_ONLINE_PROFILE_MANAGER_HPP
 #define HEADER_ONLINE_PROFILE_MANAGER_HPP
 
-#include "online/user.hpp"
 #include "utils/types.hpp"
 #include "online/profile.hpp"
 

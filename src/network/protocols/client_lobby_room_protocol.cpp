@@ -124,7 +124,7 @@ void ClientLobbyRoomProtocol::update()
     {
         NetworkString ns;
         // 1 (connection request), 4 (size of id), global id
-        ns.ai8(1).ai8(4).ai32(Online::CurrentUser::get()->getUserID());
+        ns.ai8(1).ai8(4).ai32(Online::CurrentUser::get()->getID());
         m_listener->sendMessage(this, ns);
         m_state = REQUESTING_CONNECTION;
     } break;
@@ -174,7 +174,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
     uint32_t global_id = event->data.gui32(1);
     uint8_t race_id = event->data.gui8(6);
 
-    if (global_id == Online::CurrentUser::get()->getUserID())
+    if (global_id == Online::CurrentUser::get()->getID())
     {
         Log::error("ClientLobbyRoomProtocol", "The server notified me that i'm a new player in the room (not normal).");
     }
@@ -184,7 +184,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
         profile->kart_name = "";
         profile->race_id = race_id;
-        profile->user_profile = new Online::User("", global_id);
+        profile->user_profile = new Online::Profile(global_id, "");
         m_setup->addPlayer(profile);
     }
     else
@@ -245,7 +245,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     STKPeer* peer = *(event->peer);
 
     uint32_t global_id = event->data.gui32(8);
-    if (global_id == Online::CurrentUser::get()->getUserID())
+    if (global_id == Online::CurrentUser::get()->getID())
     {
         Log::info("ClientLobbyRoomProtocol", "The server accepted the connection.");
 
@@ -253,7 +253,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
         profile->kart_name = "";
         profile->race_id = event->data.gui8(1);
-        profile->user_profile = Online::CurrentUser::get();
+        profile->user_profile = Online::CurrentUser::get()->getProfile();
         m_setup->addPlayer(profile);
         // connection token
         uint32_t token = event->data.gui32(3);
@@ -272,7 +272,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
                 Log::error("ClientLobbyRoomProtocol", "Bad format in players list.");
             uint8_t race_id = event->data[1];
             uint32_t global_id = event->data.gui32(3);
-            Online::User* new_user = new Online::User("", global_id);
+            Online::Profile* new_user = new Online::Profile(global_id, "");
             NetworkPlayerProfile* profile2 = new NetworkPlayerProfile();
             profile2->race_id = race_id;
             profile2->user_profile = new_user;
