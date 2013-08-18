@@ -19,7 +19,7 @@
 #ifndef HEADER_CURRENT_ONLINE_USER_HPP
 #define HEADER_CURRENT_ONLINE_USER_HPP
 
-#include "http_manager.hpp"
+#include "online/http_manager.hpp"
 #include "online/server.hpp"
 #include "online/user.hpp"
 #include "online/profile.hpp"
@@ -88,10 +88,10 @@ namespace Online{
                 ServerJoinRequest() : XMLRequest(RT_SERVER_JOIN) {}
             };
 
-            class setAddonVoteRequest : public XMLRequest {
+            class SetAddonVoteRequest : public XMLRequest {
                 virtual void callback ();
             public:
-                setAddonVoteRequest() : XMLRequest() {}
+                SetAddonVoteRequest() : XMLRequest() {}
             };
 
             class FriendRequest : public XMLRequest {
@@ -155,7 +155,7 @@ namespace Online{
                                                             const irr::core::stringw &email);
 
             const XMLRequest *              requestGetAddonVote(const std::string & addon_id) const;
-            const setAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
+            const SetAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
             const FriendRequest *           requestFriendRequest(const uint32_t friend_id) const;
             const AcceptFriendRequest *     requestAcceptFriend(const uint32_t friend_id) const;
             const DeclineFriendRequest *    requestDeclineFriend(const uint32_t friend_id) const;

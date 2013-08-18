@@ -56,6 +56,12 @@ UserInfoDialog::UserInfoDialog(uint32_t visiting_id)
     assert(m_info_widget != NULL);
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
+    m_friend_widget = getWidget<IconButtonWidget>("friend");
+    assert(m_friend_widget != NULL);
+    m_accept_widget = getWidget<IconButtonWidget>("accept");
+    assert(m_accept_widget != NULL);
+    m_decline_widget = getWidget<IconButtonWidget>("decline");
+    assert(m_decline_widget != NULL);
     m_enter_widget = getWidget<IconButtonWidget>("enter");
     assert(m_enter_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");

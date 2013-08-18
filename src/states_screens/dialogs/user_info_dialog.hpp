@@ -47,7 +47,9 @@ private:
     GUIEngine::LabelWidget * m_info_widget;
 
     GUIEngine::RibbonWidget * m_options_widget;
-    GUIEngine::IconButtonWidget * m_add_widget;
+    GUIEngine::IconButtonWidget * m_friend_widget;
+    GUIEngine::IconButtonWidget * m_accept_widget;
+    GUIEngine::IconButtonWidget * m_decline_widget;
     GUIEngine::IconButtonWidget * m_enter_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
 

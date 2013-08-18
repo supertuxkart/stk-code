@@ -280,10 +280,10 @@ namespace Online{
 
     // ============================================================================
 
-    const CurrentUser::setAddonVoteRequest * CurrentUser::requestSetAddonVote( const std::string & addon_id, float rating) const
+    const CurrentUser::SetAddonVoteRequest * CurrentUser::requestSetAddonVote( const std::string & addon_id, float rating) const
     {
         assert(isRegisteredUser());
-        CurrentUser::setAddonVoteRequest * request = new CurrentUser::setAddonVoteRequest();
+        CurrentUser::SetAddonVoteRequest * request = new CurrentUser::SetAddonVoteRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("set-addon-vote"));
         request->setParameter("token", getToken());
@@ -294,7 +294,7 @@ namespace Online{
         return request;
     }
 
-    void CurrentUser::setAddonVoteRequest::callback()
+    void CurrentUser::SetAddonVoteRequest::callback()
     {
         if(m_success)
         {
@@ -321,6 +321,14 @@ namespace Online{
         return request;
     }
 
+    void CurrentUser::FriendRequest::callback()
+    {
+        if(m_success)
+        {
+            //FIXME
+        }
+    }
+
     // ============================================================================
 
     const CurrentUser::AcceptFriendRequest * CurrentUser::requestAcceptFriend(const uint32_t friend_id) const
@@ -336,6 +344,14 @@ namespace Online{
         return request;
     }
 
+    void CurrentUser::AcceptFriendRequest::callback()
+    {
+        if(m_success)
+        {
+            //FIXME
+        }
+    }
+
     // ============================================================================
 
     const CurrentUser::DeclineFriendRequest * CurrentUser::requestDeclineFriend(const uint32_t friend_id) const
@@ -349,6 +365,14 @@ namespace Online{
         request->setParameter("friendid", friend_id);
         HTTPManager::get()->addRequest(request);
         return request;
+    }
+
+    void CurrentUser::DeclineFriendRequest::callback()
+    {
+        if(m_success)
+        {
+            //FIXME
+        }
     }
 
 
