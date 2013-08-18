@@ -93,7 +93,7 @@ namespace Online{
     }
 
     // ============================================================================
-    const CurrentUser::SignInRequest * CurrentUser::requestSavedSession()
+    void CurrentUser::requestSavedSession()
     {
         SignInRequest * request = NULL;
         if(getUserState() != US_SIGNED_IN  && UserConfigParams::m_saved_session)
@@ -106,7 +106,6 @@ namespace Online{
             HTTPManager::get()->addRequest(request);
             setUserState (US_SIGNING_IN);
         }
-        return request;
     }
 
     CurrentUser::SignInRequest * CurrentUser::requestSignIn(    const irr::core::stringw &username,

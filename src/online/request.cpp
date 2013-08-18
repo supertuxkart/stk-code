@@ -75,7 +75,9 @@ namespace Online{
     bool HTTPRequest::isAllowedToAdd()
     {
         if (!Request::isAllowedToAdd() || m_url.size() < 5 || ( m_url.substr(0, 5) != "http:"))
+        {
             return false;
+        }
         return true;
     }
 

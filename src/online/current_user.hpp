@@ -134,7 +134,7 @@ namespace Online{
             static CurrentUser *            get();
             static void                     deallocate();
 
-            const SignInRequest *           requestSavedSession();
+            void                            requestSavedSession();
             SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
                                                             const irr::core::stringw &password,
                                                             bool save_session,

@@ -57,9 +57,6 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 {
     m_recorded_state = CurrentUser::US_SIGNED_OUT;
-    const CurrentUser::SignInRequest * request = CurrentUser::get()->requestSavedSession();
-    if(request != NULL)
-        m_requests.push_back(request);
 }   // OnlineScreen
 
 // ----------------------------------------------------------------------------

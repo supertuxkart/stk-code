@@ -57,6 +57,7 @@ namespace Online{
         {
             http_singleton = new HTTPManager();
             http_singleton->startNetworkThread();
+            CurrentUser::get()->requestSavedSession();
         }
         return http_singleton;
     }   // get
