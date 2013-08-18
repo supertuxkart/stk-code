@@ -31,6 +31,7 @@
 #include "modes/world.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/network_world.hpp"
+#include "online/database_polling.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
@@ -151,6 +152,10 @@ void MainLoop::run()
 
             PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
             ProtocolManager::getInstance()->update();
+            PROFILER_POP_CPU_MARKER();
+
+            PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
+            DatabasePolling::getInstance()->update();
             PROFILER_POP_CPU_MARKER();
 
             PROFILER_SYNC_FRAME();

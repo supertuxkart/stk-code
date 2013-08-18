@@ -157,6 +157,7 @@ namespace Online{
         m_request_queue.unlock();
     }   // addRequest
 
+
     // ----------------------------------------------------------------------------
     /** Immediately performs a request synchronously
      *  \param request The pointer to the new request to insert.

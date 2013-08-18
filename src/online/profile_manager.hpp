@@ -42,12 +42,6 @@ namespace Online{
         private:
             ProfileManager      ();
 
-            enum State
-            {
-                S_FETCHING = 1,
-                S_READY
-            };
-
             typedef std::map<uint32_t, Profile*>    ProfilesMap;
 
             ProfilesMap                             m_profiles_cache;
