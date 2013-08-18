@@ -141,7 +141,6 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
     }*/
 
     // TODO: rescue the karts
-    // TODO: score a point
 }   // onCheckGoalTriggered
 
 //-----------------------------------------------------------------------------
@@ -378,10 +377,10 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
 {
 	int posIndex = index;
 	if(race_manager->getLocalKartInfo(index).getSoccerTeam() == SOCCER_TEAM_RED){
-		if(index % 2 != 1)	posIndex += 1;
+		if(index % 2 != 0)	posIndex += 1;
 	}
 	else if(race_manager->getLocalKartInfo(index).getSoccerTeam() == SOCCER_TEAM_BLUE){
-		if(index % 2 != 0) posIndex += 1;
+		if(index % 2 != 1) posIndex += 1;
 	}
 	int position           = index+1;
     btTransform init_pos   = m_track->getStartTransform(posIndex);
