@@ -237,7 +237,7 @@ void WorldStatus::update(const float dt)
             // Nothing to do here.
             break;
 		case GOAL_PHASE:
-			printf("%f", m_time);
+			// Nothing to do here as well.
 
         default: break;
     }

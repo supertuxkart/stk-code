@@ -21,6 +21,7 @@
 #include <IMeshSceneNode.h>
 
 #include "audio/music_manager.hpp"
+#include "audio/sfx_base.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart.hpp"
@@ -58,6 +59,7 @@ void SoccerWorld::init()
         fprintf(stderr, "No AI exists for this game mode\n");
         exit(1);
     }
+	m_goal_sound = sfx_manager->createSoundSource("goal_scored");
 	m_goal_target = race_manager->getMaxGoal();
 	printf("Max Goal: %d\n", m_goal_target);
 }   // init
@@ -102,11 +104,11 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         printf("*** GOOOOOOOOOAAAAAAALLLLLL!!!! (team: %d) ***\n", first_goal ? 0 : 1);
 		m_team_goals[first_goal ? 0 : 1]++;
 		printf("Score:\nTeam One %d : %d Team Two\n", m_team_goals[0], m_team_goals[1]);
+		World *world = World::getWorld();
+		world->setPhase(WorldStatus::GOAL_PHASE);
+		world->setClockMode(World::CLOCK_COUNTDOWN, 1.0);
+		m_goal_sound->play();
 	}
-
-	World *world = World::getWorld();
-	world->setPhase(WorldStatus::GOAL_PHASE);
-	world->setClockMode(World::CLOCK_COUNTDOWN, 1.0);
 
     //m_check_goals_enabled = false;    // TODO: remove?
 
