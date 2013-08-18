@@ -79,6 +79,8 @@ public:
 
     virtual void update(float dt);
 
+	virtual void countdownReachedZero();
+
     void onCheckGoalTriggered(bool first_goal);
 	int getTeamLeader(unsigned int i);
 

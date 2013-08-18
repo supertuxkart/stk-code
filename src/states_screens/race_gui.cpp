@@ -160,6 +160,8 @@ void RaceGUI::renderGlobal(float dt)
     {
         drawGlobalReadySetGo();
     }
+	if(world->getPhase() == World::GOAL_PHASE)
+			drawGlobalGoal();
 
     // Timer etc. are not displayed unless the game is actually started.
     if(!world->isRacePhase()) return;

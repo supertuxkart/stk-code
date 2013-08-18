@@ -100,9 +100,13 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 	// TODO
     if(m_can_score_points){
         printf("*** GOOOOOOOOOAAAAAAALLLLLL!!!! (team: %d) ***\n", first_goal ? 0 : 1);
-		m_team_goals[first_goal]++;
+		m_team_goals[first_goal ? 0 : 1]++;
 		printf("Score:\nTeam One %d : %d Team Two\n", m_team_goals[0], m_team_goals[1]);
 	}
+
+	World *world = World::getWorld();
+	world->setPhase(WorldStatus::GOAL_PHASE);
+	world->setClockMode(World::CLOCK_COUNTDOWN, 1.0);
 
     //m_check_goals_enabled = false;    // TODO: remove?
 
@@ -372,10 +376,10 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
 {
 	int posIndex = index;
 	if(race_manager->getLocalKartInfo(index).getSoccerTeam() == SOCCER_TEAM_RED){
-		if(index % 2 != 0)	posIndex += 1;
+		if(index % 2 != 1)	posIndex += 1;
 	}
 	else if(race_manager->getLocalKartInfo(index).getSoccerTeam() == SOCCER_TEAM_BLUE){
-		if(index % 2 != 1) posIndex += 1;
+		if(index % 2 != 0) posIndex += 1;
 	}
 	int position           = index+1;
     btTransform init_pos   = m_track->getStartTransform(posIndex);
@@ -409,3 +413,8 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
 
     return new_kart;
 }   // createKart
+//-----------------------------------------------------------------------------
+void SoccerWorld::countdownReachedZero(){
+	World *world = World::getWorld();
+	world->setPhase(World::RACE_PHASE);
+}

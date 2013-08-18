@@ -69,6 +69,8 @@ RaceGUIBase::RaceGUIBase()
     m_string_set            = _("Set!");
     //I18N: as in "ready, set, go", shown at the beginning of the race
     m_string_go             = _("Go!");
+	//Shown when a goal is scored
+	m_string_goal			= "GOAL!";
     // Make the two materials permanent (in case that they are not listed
     // in the textures/materials.xml file).
     m_music_icon            = material_manager->getMaterial("notes.png",
@@ -674,6 +676,16 @@ void RaceGUIBase::drawGlobalMusicDescription()
                                               NULL, NULL, true);
 }   // drawGlobalMusicDescription
 
+//-----------------------------------------------------------------------------
+void RaceGUIBase::drawGlobalGoal(){
+	static video::SColor color = video::SColor(255, 255, 255, 255);
+            core::rect<s32> pos(UserConfigParams::m_width>>1,
+                                UserConfigParams::m_height>>1,
+                                UserConfigParams::m_width>>1,
+                                UserConfigParams::m_height>>1);
+            gui::IGUIFont* font = GUIEngine::getTitleFont();
+            font->draw(m_string_goal.c_str(), pos, color, true, true);
+}
 // ----------------------------------------------------------------------------
 /** Draws the ready-set-go message on the screen.
  */
