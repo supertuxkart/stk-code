@@ -21,6 +21,7 @@
 #include "online/http_manager.hpp"
 
 #include "online/current_user.hpp"
+#include "states_screens/state_manager.hpp"
 
 #include <iostream>
 #include <stdio.h>
@@ -47,7 +48,7 @@ using namespace Online;
 
 namespace Online{
     #define MENU_POLLING_INTERVAL 5.0f
-    #define RACE_POLLING_INTERVAL 10.0f
+    #define GAME_POLLING_INTERVAL 10.0f
 
     static HTTPManager * http_singleton = NULL;
 
@@ -265,7 +266,9 @@ namespace Online{
             return;
 
         m_time_since_poll += dt;
-        float interval = MENU_POLLING_INTERVAL;
+        float interval = GAME_POLLING_INTERVAL;
+        if (StateManager::get()->getGameState() == GUIEngine::MENU)
+                interval = MENU_POLLING_INTERVAL;
         if(m_time_since_poll > interval)
         {
             m_time_since_poll = 0;
