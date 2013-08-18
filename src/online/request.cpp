@@ -53,7 +53,6 @@ namespace Online{
 
     void Request::afterOperation()
     {
-        m_state.setAtomic(S_DONE);
     }
 
     // =========================================================================================
@@ -149,7 +148,6 @@ namespace Online{
         else
             setProgress(-1.0f);
         curl_easy_cleanup(m_curl_session);
-        callback();
         Request::afterOperation();
     }
 

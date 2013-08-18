@@ -30,7 +30,7 @@
 #include <curl/curl.h>
 #include <assert.h>
 #include <string>
-network_world
+
 namespace Online{
 
     /**
@@ -101,6 +101,9 @@ namespace Online{
         /** Returns if this request is done. */
         bool isDone()                   const   { return m_state.getAtomic() == S_DONE; }
         // ------------------------------------------------------------------------
+        /** Should only be called by the manager */
+        void setDone()                          { m_state.setAtomic(S_DONE); }
+        // ------------------------------------------------------------------------
         /** Returns if this request is being prepared. */
         bool isPreparing()              const   { return m_state.getAtomic() == S_PREPARING; }
         // ------------------------------------------------------------------------
@@ -112,6 +115,9 @@ namespace Online{
         // ------------------------------------------------------------------------
         /** Virtual method to check if a request has initialized all needed members to a valid value. */
         virtual bool isAllowedToAdd()   const   { return isPreparing(); }
+
+        /** Executed when a request has finished. */
+        virtual void                                    callback() {}
 
         /** This class is used by the priority queue to sort requests by priority.
          */
@@ -150,8 +156,7 @@ namespace Online{
         virtual void                                    prepareOperation() OVERRIDE;
         virtual void                                    operation() OVERRIDE;
         virtual void                                    afterOperation() OVERRIDE;
-        /** Executed when a request has finished. */
-        virtual void                                    callback() {}
+
 
         static int                                      progressDownload(   void *clientp,
                                                                             double dltotal,

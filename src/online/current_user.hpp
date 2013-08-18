@@ -173,6 +173,8 @@ namespace Online{
                                                                           }
             const std::string               getToken()              const { return m_token.getAtomic(); }
 
+            void                            requestPoll();
+
     };   // class CurrentUser
 
 } // namespace Online

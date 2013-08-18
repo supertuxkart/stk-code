@@ -20,6 +20,8 @@
 
 #include "online/http_manager.hpp"
 
+#include "online/current_user.hpp"
+
 #include <iostream>
 #include <stdio.h>
 #include <memory.h>
@@ -41,7 +43,11 @@
 #  include <unistd.h>
 #endif
 
+using namespace Online;
+
 namespace Online{
+    #define MENU_POLLING_INTERVAL 5.0f
+    #define RACE_POLLING_INTERVAL 10.0f
 
     static HTTPManager * http_singleton = NULL;
 
@@ -71,6 +77,7 @@ namespace Online{
         curl_global_init(CURL_GLOBAL_DEFAULT);
         pthread_cond_init(&m_cond_request, NULL);
         m_abort.setAtomic(false);
+        m_time_since_poll = 0.0f;
     }
 
     // ============================================================================
@@ -197,11 +204,8 @@ namespace Online{
             me->m_request_queue.getData().pop();
             me->m_request_queue.unlock();
             me->m_current_request->execute();
-            if(me->m_current_request->manageMemory())
-            {
-                delete me->m_current_request;
-                me->m_current_request = NULL;
-            }
+            me->m_current_request->callback();
+            me->addResult(me->m_current_request);
             me->m_request_queue.lock();
         }   // while
 
@@ -219,6 +223,55 @@ namespace Online{
         pthread_exit(NULL);
         return 0;
     }   // mainLoop
+
+
+    void HTTPManager::addResult(Online::Request *request)
+    {
+        assert(request->isBusy());
+        m_result_queue.lock();
+        m_result_queue.getData().push(request);
+        m_result_queue.unlock();
+    }
+
+    void HTTPManager::handleResultQueue()
+    {
+        Request * request = NULL;
+        m_result_queue.lock();
+        if(!m_result_queue.getData().empty())
+        {
+            request = m_result_queue.getData().front();
+            m_result_queue.getData().pop();
+        }
+        m_result_queue.unlock();
+        if(request != NULL)
+        {
+            request->callback();
+            if(request->manageMemory())
+            {
+                delete request;
+                request = NULL;
+            }
+            else
+                request->setDone();
+        }
+    }
+
+    void HTTPManager::update(float dt){
+        handleResultQueue();
+
+        //Database polling starts here, only needed for registered users
+        if(!CurrentUser::get()->isRegisteredUser())
+            return;
+
+        m_time_since_poll += dt;
+        float interval = MENU_POLLING_INTERVAL;
+        if(m_time_since_poll > interval)
+        {
+            m_time_since_poll = 0;
+            CurrentUser::get()->requestPoll();
+        }
+
+    }
 } // namespace Online
 
 
