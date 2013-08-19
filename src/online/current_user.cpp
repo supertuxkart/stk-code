@@ -138,7 +138,7 @@ namespace Online{
             int username_fetched    = input->get("username", &username);
             uint32_t userid(0);
             int userid_fetched      = input->get("userid", &userid);
-            m_profile = new Profile(userid, username, false, true);
+            m_profile = new Profile(userid, username, true);
             assert(token_fetched && username_fetched && userid_fetched);
             m_state = US_SIGNED_IN;
             if(getSaveSession())
@@ -147,7 +147,7 @@ namespace Online{
                 UserConfigParams::m_saved_token = getToken();
                 UserConfigParams::m_saved_session = true;
             }
-            ProfileManager::get()->addToCache(m_profile);
+            ProfileManager::get()->addPersistent(m_profile);
             m_profile->fetchFriends();
             HTTPManager::get()->startPolling();
         }

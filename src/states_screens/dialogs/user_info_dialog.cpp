@@ -41,14 +41,14 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-UserInfoDialog::UserInfoDialog(uint32_t visiting_id)
-        : ModalDialog(0.8f,0.8f), m_visiting_id(visiting_id)
+UserInfoDialog::UserInfoDialog(uint32_t showing_id)
+        : ModalDialog(0.8f,0.8f), m_showing_id(showing_id)
 {
     m_self_destroy = false;
     m_enter_profile = false;
 
     loadFromFile("online/user_info_dialog.stkgui");
-    m_profile = ProfileManager::get()->getProfileByID(visiting_id);
+    m_profile = ProfileManager::get()->getProfileByID(showing_id);
     m_name_widget = getWidget<LabelWidget>("name");
     assert(m_name_widget != NULL);
     m_name_widget->setText(m_profile->getUserName(),false);
@@ -69,6 +69,14 @@ UserInfoDialog::UserInfoDialog(uint32_t visiting_id)
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
 }
+
+void UserInfoDialog::beforeAddingWidgets()
+{
+    /*m_accept_widget->setVisible(false);
+    m_decline_widget->setVisible(false);*/
+}
+
+
 
 // -----------------------------------------------------------------------------
 UserInfoDialog::~UserInfoDialog()

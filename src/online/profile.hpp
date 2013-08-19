@@ -76,20 +76,17 @@ namespace Online{
                 S_READY
             };
 
-            Synchronised<State>             m_state;
+            State                           m_state;
             bool                            m_is_current_user;
             uint32_t                        m_id;
             irr::core::stringw              m_username;
             RelationInfo *                  m_relation_info;
+            bool                            m_is_friend;
 
             bool                            m_has_fetched_friends;
             std::vector<uint32_t>           m_friends;
 
             bool                            m_cache_bit;
-            bool                            m_auto_delete;
-
-            void                            setState(State state)       { m_state.setAtomic(state); }
-            const State                     getState() const            { return m_state.getAtomic(); }
 
             void requestFriendsList();
             void friendsListCallback(const XMLNode * input);
@@ -97,25 +94,23 @@ namespace Online{
         public:
                                             Profile(    const uint32_t           & userid,
                                                         const irr::core::stringw & username,
-                                                        bool auto_delete = true,
                                                         bool is_current_user = false);
                                             Profile(    const XMLNode * xml,
-                                                        ConstructorType type = C_DEFAULT,
-                                                        bool auto_delete = true);
+                                                        ConstructorType type = C_DEFAULT);
                                             ~Profile();
             void                            fetchFriends();
             const std::vector<uint32_t> &   getFriends();
 
-            bool                            isFetching() const               { return getState() == S_FETCHING; }
-            bool                            isReady() const                  { return getState() == S_READY; }
+            bool                            isFetching() const               { return m_state == S_FETCHING; }
+            bool                            isReady() const                  { return m_state == S_READY; }
 
             bool                            isCurrentUser() const            { return m_is_current_user; }
+            bool                            isFriend() const                 { return m_is_friend; }
             RelationInfo *                  getRelationInfo()                { return m_relation_info; }
 
             void                            setCacheBit()                    { m_cache_bit = true; }
             void                            unsetCacheBit()                  { m_cache_bit = false; }
             bool                            getCacheBit() const              { return m_cache_bit; }
-            bool                            canAutoDelete() const            { return m_auto_delete; }
 
             uint32_t                        getID() const                    { return m_id; }
             const irr::core::stringw &      getUserName() const              { return m_username; }

@@ -46,7 +46,7 @@ namespace GUIEngine
         /**Singleton */
         static DialogQueue *                 get();
         static void                          deallocate();
-        void                                 pushDialog(ModalDialog * dialog, bool closes_any_dialog);
+        void                                 pushDialog(ModalDialog * dialog, bool closes_any_dialog = false);
         void                                 update();
 
     };

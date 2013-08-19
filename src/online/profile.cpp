@@ -48,23 +48,22 @@ namespace Online{
     // ============================================================================
     Profile::Profile( const uint32_t           & userid,
                       const irr::core::stringw & username,
-                      bool auto_delete,
                       bool is_current_user)
     {
-        setState (S_READY);
-        m_auto_delete = auto_delete;
+        m_state = S_READY;
         m_cache_bit = true;
         m_id = userid;
         m_is_current_user = is_current_user;
         m_username = username;
         m_has_fetched_friends = false;
         m_relation_info = NULL;
+        m_is_friend = false;
     }
 
-    Profile::Profile(const XMLNode * xml, ConstructorType type, bool auto_delete)
+    Profile::Profile(const XMLNode * xml, ConstructorType type)
     {
         m_relation_info = NULL;
-        m_auto_delete = auto_delete;
+        m_is_friend = false;
         if(type == C_RELATION_INFO){
             std::string is_online_string("");
             xml->get("online", &is_online_string);
@@ -81,6 +80,10 @@ namespace Online{
                 xml->get("is_asker", &is_asker_string);
                 is_asker = is_asker_string == "yes";
             }
+            else
+            {
+                m_is_friend = true;
+            }
             m_relation_info = new RelationInfo(date, is_online, is_pending, is_asker);
             xml = xml->getNode("user");
         }
@@ -90,7 +93,7 @@ namespace Online{
         m_cache_bit = true;
         m_has_fetched_friends = false;
         m_is_current_user = (m_id == CurrentUser::get()->getID());
-        setState (S_READY);
+        m_state = S_READY;
     }
     // ============================================================================
     Profile::~Profile()
@@ -104,7 +107,7 @@ namespace Online{
         assert(CurrentUser::get()->isRegisteredUser());
         if(m_has_fetched_friends)
             return;
-        setState (S_FETCHING);
+        m_state = S_FETCHING;
         requestFriendsList();
     }
     // ============================================================================
@@ -118,14 +121,19 @@ namespace Online{
         {
             Profile * profile;
             if(m_is_current_user)
+            {
                 profile = new Profile(friends_xml->getNode(i) , C_RELATION_INFO);
+                ProfileManager::get()->addPersistent(profile);
+            }
             else
+            {
                 profile = new Profile(friends_xml->getNode(i)->getNode("user"), C_DEFAULT);
+                ProfileManager::get()->addToCache(profile);
+            }
             m_friends.push_back(profile->getID());
-            ProfileManager::get()->addToCache(profile);
         }
         m_has_fetched_friends = true;
-        Profile::setState (Profile::S_READY);
+        m_state = S_READY;
     }
 
 
@@ -154,7 +162,7 @@ namespace Online{
 
     const std::vector<uint32_t> & Profile::getFriends()
     {
-        assert (m_has_fetched_friends && getState() == S_READY);
+        assert (m_has_fetched_friends && m_state == S_READY);
         return m_friends;
     }
     // ============================================================================

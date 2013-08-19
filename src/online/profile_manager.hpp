@@ -40,10 +40,12 @@ namespace Online{
 
         private:
             ProfileManager      ();
+            ~ProfileManager     ();
 
             typedef std::map<uint32_t, Profile*>    ProfilesMap;
 
             ProfilesMap                             m_profiles_cache;
+            ProfilesMap                             m_profiles_persistent; // current user and friends
             Profile *                               m_currently_visiting;
             static const unsigned int               m_max_cache_size = 20;
 
@@ -56,8 +58,11 @@ namespace Online{
             static void                             deallocate();
 
             void                                    addToCache(Profile * profile);
+            void                                    addPersistent(Profile * profile);
+            void                                    removePersistent(const uint32_t id);
             void                                    setVisiting(const uint32_t id);
             bool                                    cacheHit(const uint32_t id);
+            bool                                    inPersistent(const uint32_t id);
             Profile *                               getVisitingProfile() {return m_currently_visiting;}
             Profile *                               getProfileByID(const uint32_t id);
 

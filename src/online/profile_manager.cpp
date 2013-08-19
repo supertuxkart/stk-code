@@ -52,6 +52,18 @@ namespace Online{
     }
 
     // ============================================================================
+    ProfileManager::~ProfileManager()
+    {
+        ProfilesMap::iterator it;
+        for ( it = m_profiles_persistent.begin(); it != m_profiles_persistent.end(); ++it ) {
+            delete it->second;
+        }
+        for ( it = m_profiles_cache.begin(); it != m_profiles_persistent.end(); ++it ) {
+            delete it->second;
+        }
+    }
+
+    // ============================================================================
 
     void ProfileManager::iterateCache(Profile * profile)
     {
@@ -84,10 +96,13 @@ namespace Online{
             ProfilesMap::iterator iter;
             for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end();)
             {
-               if (!iter->second->getCacheBit() && iter->second->canAutoDelete())
+               if (!iter->second->getCacheBit())
                {
-                   m_profiles_cache.erase(iter++);
-                   continue;
+                   ProfilesMap::iterator toErase = iter;
+                   ++iter;
+                   delete toErase->second;
+                   m_profiles_cache.erase(toErase);
+                   break;
                }
                else
                    ++iter;
@@ -100,9 +115,30 @@ namespace Online{
 
     // ============================================================================
 
+    void ProfileManager::addPersistent(Profile * profile)
+    {
+        assert (!inPersistent(profile->getID()));
+        m_profiles_persistent[profile->getID()] = profile;
+    }
+    // ============================================================================
+
+    void ProfileManager::removePersistent(const uint32_t id)
+    {
+        assert (inPersistent(id));
+        delete m_profiles_persistent[id];
+        m_profiles_persistent.erase(id);
+    }
+
+    // ============================================================================
+
     void ProfileManager::addToCache(Profile * profile)
     {
-        if(cacheHit(profile->getID()))
+
+        if(inPersistent(profile->getID()))
+        {
+            //FIXME should do updating of values
+        }
+        else if(cacheHit(profile->getID()))
         {
             //FIXME should do updating of values
             delete profile;
@@ -115,6 +151,16 @@ namespace Online{
 
     // ============================================================================
 
+    bool ProfileManager::inPersistent(const uint32_t id)
+    {
+        if (m_profiles_persistent.find(id) != m_profiles_persistent.end())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // ============================================================================
 
     bool ProfileManager::cacheHit(const uint32_t id)
     {
@@ -129,18 +175,15 @@ namespace Online{
     // ============================================================================
     void ProfileManager::setVisiting(const uint32_t id)
     {
-        if(cacheHit(id))
-        {
-            m_currently_visiting = m_profiles_cache[id];
-        }
-        else
-            m_currently_visiting = NULL;
+        m_currently_visiting = getProfileByID(id);
     }
 
     // ============================================================================
 
     Profile * ProfileManager::getProfileByID(const uint32_t id)
     {
+        if(inPersistent(id))
+            return m_profiles_persistent[id];
         if(cacheHit(id))
             return m_profiles_cache[id];
         return NULL;

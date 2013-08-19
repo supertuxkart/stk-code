@@ -40,7 +40,7 @@ private:
     bool m_self_destroy;
     bool m_enter_profile;
 
-    const uint32_t m_visiting_id;
+    const uint32_t m_showing_id;
     Online::Profile * m_profile;
 
     GUIEngine::LabelWidget * m_name_widget;
@@ -56,8 +56,10 @@ private:
     void requestJoin();
 
 public:
-    UserInfoDialog(uint32_t visiting_id);
+    UserInfoDialog(uint32_t showing_id);
     ~UserInfoDialog();
+
+    virtual void beforeAddingWidgets();
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
