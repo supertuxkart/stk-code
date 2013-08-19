@@ -40,9 +40,8 @@ namespace Online{
     class Request
     {
     private:
-        /** Can be used as identifier for the user.
+        /** Type of the request
          *  Has 0 as default value.
-         *  Only requests ment to control the HTTP Manager should use negative values, for all other uses positive values are obliged
          *  */
         const int              m_type;
         /** True if the memory for this Request should be managed by
@@ -73,13 +72,12 @@ namespace Online{
         virtual void afterOperation();
 
     public:
-        /** Negative numbers are reserved for requests that are special for the HTTP Manager*/
         enum RequestType
         {
-            RT_QUIT = -1
+            RT_QUIT = 1
         };
 
-        Request(int type, bool manage_memory, int priority);
+        Request(bool manage_memory, int priority, int type);
         virtual ~Request();
 
         void execute();
@@ -171,7 +169,7 @@ namespace Online{
 
 
     public :
-        HTTPRequest(int type = 0, bool manage_memory = false, int priority = 1);
+        HTTPRequest(bool manage_memory = false, int priority = 1);
         virtual ~HTTPRequest();
 
         void setParameter(const std::string & name, const std::string &value){
@@ -216,7 +214,7 @@ namespace Online{
         virtual void                                    afterOperation() OVERRIDE;
 
     public :
-        XMLRequest(int type = 0, bool manage_memory = false, int priority = 1);
+        XMLRequest(bool manage_memory = false, int priority = 1);
         virtual ~XMLRequest();
 
         const XMLNode *                                 getResult() const;

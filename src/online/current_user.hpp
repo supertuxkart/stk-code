@@ -50,41 +50,32 @@ namespace Online{
                 US_SIGNING_OUT
             };
 
-            enum RequestType
-            {
-                RT_SIGN_IN = 1,
-                RT_SIGN_OUT,
-                RT_SIGN_UP,
-                RT_SERVER_JOIN,
-                RT_SERVER_CREATION
-            };
-
             class SignInRequest : public XMLRequest
             {
                 virtual void callback ();
             public:
-                SignInRequest() : XMLRequest(RT_SIGN_IN) {}
+                SignInRequest(bool manage_memory = false) : XMLRequest(manage_memory) {}
             };
 
             class SignOutRequest : public XMLRequest
             {
                 virtual void callback ();
             public:
-                SignOutRequest() : XMLRequest(RT_SIGN_OUT) {}
+                SignOutRequest() : XMLRequest() {}
             };
 
             class ServerCreationRequest : public XMLRequest {
                 virtual void callback ();
                 uint32_t m_created_server_id;
             public:
-                ServerCreationRequest() : XMLRequest(RT_SERVER_CREATION) {}
+                ServerCreationRequest() : XMLRequest() {}
                 const uint32_t getCreatedServerID() const { assert(isDone()); return m_created_server_id;}
             };
 
             class ServerJoinRequest : public XMLRequest {
                 virtual void callback ();
             public:
-                ServerJoinRequest() : XMLRequest(RT_SERVER_JOIN) {}
+                ServerJoinRequest() : XMLRequest() {}
             };
 
             class SetAddonVoteRequest : public XMLRequest {

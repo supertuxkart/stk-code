@@ -98,7 +98,7 @@ namespace Online{
         SignInRequest * request = NULL;
         if(getUserState() != US_SIGNED_IN  && UserConfigParams::m_saved_session)
         {
-            request = new SignInRequest();
+            request = new SignInRequest(true);
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
             request->setParameter("action",std::string("saved-session"));
             request->setParameter("userid", UserConfigParams::m_saved_user);
