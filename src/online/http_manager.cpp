@@ -80,6 +80,7 @@ namespace Online{
         pthread_cond_init(&m_cond_request, NULL);
         m_abort.setAtomic(false);
         m_time_since_poll = 0.0f;
+        m_polling = false;
     }
 
     // ============================================================================
@@ -206,7 +207,6 @@ namespace Online{
             me->m_request_queue.getData().pop();
             me->m_request_queue.unlock();
             me->m_current_request->execute();
-            me->m_current_request->callback();
             me->addResult(me->m_current_request);
             me->m_request_queue.lock();
         }   // while

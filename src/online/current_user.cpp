@@ -147,7 +147,9 @@ namespace Online{
                 UserConfigParams::m_saved_token = getToken();
                 UserConfigParams::m_saved_session = true;
             }
-            ProfileManager::get()->addToCache(new Profile(CurrentUser::get()->getID(), CurrentUser::get()->getUserName(), false));
+            ProfileManager::get()->addToCache(m_profile);
+            m_profile->fetchFriends();
+            HTTPManager::get()->startPolling();
         }
         else
             setUserState (US_SIGNED_OUT);
@@ -211,6 +213,7 @@ namespace Online{
         UserConfigParams::m_saved_user = 0;
         UserConfigParams::m_saved_token = "";
         UserConfigParams::m_saved_session = false;
+        HTTPManager::get()->startPolling();
     }
 
     void CurrentUser::SignOutRequest::callback()

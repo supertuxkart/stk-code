@@ -63,7 +63,6 @@ OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 
 OnlineScreen::~OnlineScreen()
 {
-    m_requests.clearAndDeleteAll();
 }
 
 // ----------------------------------------------------------------------------
@@ -165,28 +164,6 @@ void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     else if (m_recorded_state == CurrentUser::US_SIGNING_OUT)
     {
         m_online_status_widget->setText(Messages::signingOut(), false);
-    }
-    for(int i = m_requests.size()-1; i>=0; --i)
-    {
-        if(m_requests[i].isDone())
-        {
-            if(m_requests[i].getType() == CurrentUser::RT_SIGN_IN)
-            {
-                if(m_requests[i].isSuccess())
-                {
-                    new MessageDialog(_("Signed in."));
-                }
-                else
-                {
-                    sfx_manager->quickSound( "anvil" );
-                    new MessageDialog(m_requests[i].getInfo());
-                }
-            }else if(m_requests[i].getType() == CurrentUser::RT_SIGN_OUT)
-            {
-                new MessageDialog(_("Signed out successfully."));
-            }
-            m_requests.erase(i);
-        }
     }
 }   // onUpdate
 

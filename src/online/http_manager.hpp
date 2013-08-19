@@ -49,6 +49,7 @@ namespace Online{
         protected:
 
             float                     m_time_since_poll;
+            bool                      m_polling;
 
             /** The current requested being worked on. */
             Online::Request *         m_current_request;
@@ -87,6 +88,9 @@ namespace Online{
             static HTTPManager* get();
             static void deallocate();
             static bool isRunning();
+
+            void startPolling(){ m_polling = true; }
+            void stopPolling(){  m_polling = false; }
 
             //Execute
             std::string getPage(Online::Request * request);
