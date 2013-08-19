@@ -55,10 +55,11 @@ namespace GUIEngine
     class ModalDialog : public SkinWidgetContainer, public AbstractTopLevelContainer
     {
     private:
-        /** Because C++ doesn't support constructor delegation... */
-        void doInit(const float percentWidth, const float percentHeight);
 
         ModalDialogLocation m_dialog_location;
+
+        float m_percent_width, m_percent_height;
+        bool m_init;
 
 
     protected:
@@ -70,7 +71,7 @@ namespace GUIEngine
         /**
          * \brief Creates a modal dialog with given percentage of screen width and height
          */
-        ModalDialog(const float percentWidth, const float percentHeight,
+        ModalDialog(const float percentWidth, const float percentHeight, bool do_init = true,
                     ModalDialogLocation location = MODAL_DIALOG_LOCATION_CENTER);
 
         /** \brief Load a XML file to create the dialog from
@@ -88,6 +89,10 @@ namespace GUIEngine
 
     public:
         LEAK_CHECK()
+
+        /** Because C++ doesn't support constructor delegation... */
+        void doInit();
+        bool isInited() {return m_init;}
 
         virtual ~ModalDialog();
 

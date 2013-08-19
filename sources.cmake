@@ -51,6 +51,7 @@ src/graphics/stars.cpp
 src/guiengine/abstract_state_manager.cpp
 src/guiengine/abstract_top_level_container.cpp
 src/guiengine/CGUISpriteBank.cpp
+src/guiengine/dialog_queue.cpp
 src/guiengine/engine.cpp
 src/guiengine/event_handler.cpp
 src/guiengine/layout_manager.cpp
@@ -347,6 +348,7 @@ src/graphics/slip_stream.hpp
 src/graphics/stars.hpp
 src/guiengine/abstract_state_manager.hpp
 src/guiengine/abstract_top_level_container.hpp
+src/guiengine/dialog_queue.hpp
 src/guiengine/engine.hpp
 src/guiengine/event_handler.hpp
 src/guiengine/layout_manager.hpp

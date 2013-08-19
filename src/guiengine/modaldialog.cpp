@@ -47,11 +47,12 @@ using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
 
-ModalDialog::ModalDialog(const float percentWidth, const float percentHeight,
-                         ModalDialogLocation location)
+ModalDialog::ModalDialog(const float percentWidth, const float percentHeight, bool do_init, ModalDialogLocation location)
 {
     m_dialog_location = location;
-    doInit(percentWidth, percentHeight);
+    m_init = false;
+    if(do_init)
+        doInit();
 }
 
 // ----------------------------------------------------------------------------
@@ -82,15 +83,16 @@ void ModalDialog::loadFromFile(const char* xmlFile)
 
 // ----------------------------------------------------------------------------
 
-void ModalDialog::doInit(const float percentWidth, const float percentHeight)
+void ModalDialog::doInit()
 {
+    m_init = true;
     pointer_was_shown = irr_driver->isPointerShown();
     irr_driver->showPointer();
 
     const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
 
-    const int w = (int)(frame_size.Width*percentWidth);
-    const int h = (int)(frame_size.Height*percentHeight);
+    const int w = (int)(frame_size.Width* m_percent_width);
+    const int h = (int)(frame_size.Height* m_percent_height);
 
     assert(frame_size.Width > 0);
     assert(frame_size.Height > 0);
