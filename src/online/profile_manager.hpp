@@ -59,7 +59,8 @@ namespace Online{
 
             void                                    addToCache(Profile * profile);
             void                                    addPersistent(Profile * profile);
-            void                                    removePersistent(const uint32_t id);
+            void                                    deleteFromPersistent(const uint32_t id);
+            void                                    moveToCache(const uint32_t id);
             void                                    setVisiting(const uint32_t id);
             bool                                    cacheHit(const uint32_t id);
             bool                                    inPersistent(const uint32_t id);

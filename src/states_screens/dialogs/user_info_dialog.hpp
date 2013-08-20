@@ -66,6 +66,7 @@ public:
     ~UserInfoDialog();
 
     virtual void beforeAddingWidgets();
+    virtual void load();
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);

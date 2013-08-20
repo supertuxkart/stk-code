@@ -28,6 +28,7 @@
 #include "addons/addon.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
+#include "states_screens/online_profile_friends.hpp"
 
 #include <sstream>
 #include <stdlib.h>
@@ -390,7 +391,10 @@ namespace Online{
         irr::core::stringw info_text("");
         if(m_success)
         {
-            ProfileManager::get()->removePersistent(id);
+            CurrentUser::get()->getProfile()->removeFriend(id);
+            ProfileManager::get()->moveToCache(id);
+            ProfileManager::get()->getProfileByID(id)->deleteRelationalInfo();
+            OnlineProfileFriends::getInstance()->refreshFriendsList();
             info_text = _("Friend request declined!");
         }
         else

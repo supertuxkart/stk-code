@@ -71,7 +71,7 @@ namespace GUIEngine
         /**
          * \brief Creates a modal dialog with given percentage of screen width and height
          */
-        ModalDialog(const float percentWidth, const float percentHeight, bool do_init = true,
+        ModalDialog(const float percentWidth, const float percentHeight,
                     ModalDialogLocation location = MODAL_DIALOG_LOCATION_CENTER);
 
         /** \brief Load a XML file to create the dialog from
@@ -86,12 +86,13 @@ namespace GUIEngine
           *        that takes a XML file as argument is used)
           */
         virtual void loadedFromFile() {}
+        void doInit();
 
     public:
         LEAK_CHECK()
 
         /** Because C++ doesn't support constructor delegation... */
-        void doInit();
+
         bool isInited() {return m_init;}
 
         virtual ~ModalDialog();
@@ -120,6 +121,7 @@ namespace GUIEngine
          *        init(), which is invoked afer widgets were added)
          */
         virtual void beforeAddingWidgets() {}
+        virtual void load() {}
 
         /** \brief Optional callback invoked after widgets have been add()ed */
         virtual void init() {}

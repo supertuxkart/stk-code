@@ -47,6 +47,7 @@ private:
     int                         m_selected_friend_index;
     bool                        m_waiting_for_friends;
     bool                        m_own_profile;
+    bool                        m_refresh_screen;
 
 public:
     friend class GUIEngine::ScreenSingleton<OnlineProfileFriends>;
@@ -63,6 +64,8 @@ public:
     virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver) OVERRIDE;
 
     virtual void beforeAddingWidget() OVERRIDE;
+
+    virtual void refreshFriendsList() {m_waiting_for_friends = true; }
 };
 
 #endif

@@ -47,20 +47,19 @@ using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
 
-ModalDialog::ModalDialog(const float percentWidth, const float percentHeight, bool do_init, ModalDialogLocation location)
+ModalDialog::ModalDialog(const float percentWidth, const float percentHeight, ModalDialogLocation location)
 {
     m_dialog_location = location;
     m_init = false;
     m_percent_width = percentWidth;
     m_percent_height = percentHeight;
-    if(do_init)
-        doInit();
 }
 
 // ----------------------------------------------------------------------------
 
 void ModalDialog::loadFromFile(const char* xmlFile)
 {
+    doInit();
     IXMLReader* xml = file_manager->createXMLReader( (file_manager->getGUIDir() + xmlFile).c_str() );
     if (xml == NULL)
     {

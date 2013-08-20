@@ -161,6 +161,32 @@ namespace Online{
 
     // ============================================================================
 
+    void Profile::removeFriend( const uint32_t id)
+    {
+        assert (m_has_fetched_friends);
+        std::vector<uint32_t>::iterator iter;
+        for (iter = m_friends.begin(); iter != m_friends.end();)
+        {
+           if (*iter == id)
+           {
+               m_friends.erase(iter++);
+               break;
+           }
+           else
+               ++iter;
+        }
+    }
+
+    // ============================================================================
+
+    void Profile::deleteRelationalInfo()
+    {
+        delete m_relation_info;
+        m_relation_info = NULL;
+    }
+
+    // ============================================================================
+
     const std::vector<uint32_t> & Profile::getFriends()
     {
         assert (m_has_fetched_friends && m_state == S_READY);

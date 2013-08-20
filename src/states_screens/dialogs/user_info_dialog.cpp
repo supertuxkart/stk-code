@@ -35,29 +35,32 @@ using namespace Online;
 // -----------------------------------------------------------------------------
 
 UserInfoDialog::UserInfoDialog(uint32_t showing_id, const core::stringw info, bool error, bool from_queue)
-        : ModalDialog(0.8f,0.8f, !from_queue), m_showing_id(showing_id)
+        : ModalDialog(0.8f,0.8f), m_showing_id(showing_id)
 {
-    m_profile = ProfileManager::get()->getProfileByID(showing_id);
-    if(m_profile->isCurrentUser())
-        ModalDialog::dismiss();
-    m_self_destroy = false;
-    m_enter_profile = false;
-    m_processing = false;
     m_error = error;
     m_info = info;
+    if(!from_queue) load();
+}
+
+void UserInfoDialog::load()
+{
+    loadFromFile("online/user_info_dialog.stkgui");
 }
 
 void UserInfoDialog::beforeAddingWidgets()
 {
-    loadFromFile("online/user_info_dialog.stkgui");
-    if(m_error)
-        m_info_widget->setErrorColor();
-    m_info_widget->setText(m_info, false);
+    m_profile = ProfileManager::get()->getProfileByID(m_showing_id);
+    m_self_destroy = false;
+    m_enter_profile = false;
+    m_processing = false;
     m_name_widget = getWidget<LabelWidget>("name");
     assert(m_name_widget != NULL);
     m_name_widget->setText(m_profile->getUserName(),false);
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
+    if(m_error)
+        m_info_widget->setErrorColor();
+    m_info_widget->setText(m_info, false);
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
     m_friend_widget = getWidget<IconButtonWidget>("friend");
@@ -72,18 +75,22 @@ void UserInfoDialog::beforeAddingWidgets()
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
-    Profile::RelationInfo * relation_info = m_profile->getRelationInfo();
-
-    if(relation_info == NULL || !relation_info->isPending() || !relation_info->isAsker())
-    {
-        m_accept_widget->setVisible(false);
-        m_decline_widget->setVisible(false);
-        if (relation_info == NULL) return;
-    }
-
-    if(m_profile->isFriend() || relation_info->isPending())
-    {
+    m_accept_widget->setVisible(false);
+    m_decline_widget->setVisible(false);
+    if(m_profile->isFriend() || m_profile->isCurrentUser())
         m_friend_widget->setVisible(false);
+
+    Profile::RelationInfo * relation_info = m_profile->getRelationInfo();
+    if(relation_info != NULL)
+    {
+        if(relation_info->isPending() && relation_info->isAsker())
+        {
+            m_accept_widget->setVisible(true);
+            m_decline_widget->setVisible(true);
+        }
+
+        if(relation_info->isPending())
+            m_friend_widget->setVisible(false);
     }
 
 }

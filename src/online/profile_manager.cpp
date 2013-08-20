@@ -117,23 +117,47 @@ namespace Online{
 
     void ProfileManager::addPersistent(Profile * profile)
     {
-        assert (!inPersistent(profile->getID()));
-        m_profiles_persistent[profile->getID()] = profile;
+        if(inPersistent(profile->getID()))
+        {
+            delete m_profiles_persistent[profile->getID()];
+            m_profiles_persistent[profile->getID()] = profile;
+        }
+        else
+        {
+            m_profiles_persistent[profile->getID()] = profile;
+        }
     }
     // ============================================================================
 
-    void ProfileManager::removePersistent(const uint32_t id)
+    void ProfileManager::deleteFromPersistent(const uint32_t id)
     {
-        assert (inPersistent(id));
-        delete m_profiles_persistent[id];
-        m_profiles_persistent.erase(id);
+        if (inPersistent(id))
+        {
+            delete m_profiles_persistent[id];
+            m_profiles_persistent.erase(id);
+        }
+        else
+            Log::warn("ProfileManager::removePersistent", "Tried to remove profile with id %d from persistent while not present", id);
+    }
+
+    // ============================================================================
+
+    void ProfileManager::moveToCache(const uint32_t id)
+    {
+        if (inPersistent(id))
+        {
+            Profile * profile = getProfileByID(id);
+            m_profiles_persistent.erase(id);
+            addToCache(profile);
+        }
+        else
+            Log::warn("ProfileManager::removePersistent", "Tried to move profile with id %d from persistent to cache while not present", id);
     }
 
     // ============================================================================
 
     void ProfileManager::addToCache(Profile * profile)
     {
-
         if(inPersistent(profile->getID()))
         {
             //FIXME should do updating of values
@@ -147,6 +171,8 @@ namespace Online{
         {
             directToCache(profile);
         }
+        Log::info("persistent size","%d", m_profiles_persistent.size());
+        Log::info("cache size","%d", m_profiles_cache.size());
     }
 
     // ============================================================================
@@ -182,6 +208,7 @@ namespace Online{
 
     Profile * ProfileManager::getProfileByID(const uint32_t id)
     {
+
         if(inPersistent(id))
             return m_profiles_persistent[id];
         if(cacheHit(id))

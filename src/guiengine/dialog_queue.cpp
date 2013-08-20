@@ -63,7 +63,7 @@ namespace GUIEngine
             if(entry->closes() || !ModalDialog::isADialogActive())
             {
                 ModalDialog::dismiss();
-                entry->get()->doInit();
+                entry->get()->load();
                 m_queue.pop();
                 delete entry;
             }
