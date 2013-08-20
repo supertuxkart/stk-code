@@ -210,13 +210,13 @@ namespace Online{
             Log::warn("CurrentUser::signOut", "%s", _("There were some connection issues while signing out. Report a bug if this caused issues."));
         }
         setToken("");
-        delete m_profile;
+        ProfileManager::get()->deleteFromPersistent(m_profile->getID());
         m_profile = NULL;
         setUserState (US_SIGNED_OUT);
         UserConfigParams::m_saved_user = 0;
         UserConfigParams::m_saved_token = "";
         UserConfigParams::m_saved_session = false;
-        HTTPManager::get()->startPolling();
+        HTTPManager::get()->stopPolling();
     }
 
     void CurrentUser::SignOutRequest::callback()
@@ -332,6 +332,7 @@ namespace Online{
         if(m_success)
         {
             ProfileManager::get()->getProfileByID(id)->setRelationInfo(new Profile::RelationInfo(_("Today"), false, true, false));
+            OnlineProfileFriends::getInstance()->refreshFriendsList();
             info_text = _("Friend request send!");
         }
         else
@@ -363,6 +364,7 @@ namespace Online{
             Profile * profile = ProfileManager::get()->getProfileByID(id);
             profile->setFriend();
             profile->setRelationInfo(new Profile::RelationInfo(_("Today"), false, false, true));
+            OnlineProfileFriends::getInstance()->refreshFriendsList();
             info_text = _("Friend request accepted!");
         }
         else
