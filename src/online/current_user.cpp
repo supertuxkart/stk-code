@@ -26,6 +26,8 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 #include "addons/addon.hpp"
+#include "guiengine/dialog_queue.hpp"
+#include "states_screens/dialogs/user_info_dialog.hpp"
 
 #include <sstream>
 #include <stdlib.h>
@@ -309,7 +311,7 @@ namespace Online{
 
     // ============================================================================
 
-    const CurrentUser::FriendRequest * CurrentUser::requestFriendRequest(const uint32_t friend_id) const
+    void CurrentUser::requestFriendRequest(const uint32_t friend_id) const
     {
         assert(isRegisteredUser());
         CurrentUser::FriendRequest * request = new CurrentUser::FriendRequest();
@@ -319,20 +321,26 @@ namespace Online{
         request->setParameter("userid", getID());
         request->setParameter("friendid", friend_id);
         HTTPManager::get()->addRequest(request);
-        return request;
     }
 
     void CurrentUser::FriendRequest::callback()
     {
+        uint32_t id(0);
+        m_result->get("friendid", &id);
+        irr::core::stringw info_text("");
         if(m_success)
         {
-            //FIXME
+            ProfileManager::get()->getProfileByID(id)->setRelationInfo(new Profile::RelationInfo(_("Today"), false, true, false));
+            info_text = _("Friend request send!");
         }
+        else
+            info_text = m_info;
+        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!m_success, true), true);
     }
 
     // ============================================================================
 
-    const CurrentUser::AcceptFriendRequest * CurrentUser::requestAcceptFriend(const uint32_t friend_id) const
+    void CurrentUser::requestAcceptFriend(const uint32_t friend_id) const
     {
         assert(isRegisteredUser());
         CurrentUser::AcceptFriendRequest * request = new CurrentUser::AcceptFriendRequest();
@@ -342,20 +350,28 @@ namespace Online{
         request->setParameter("userid", getID());
         request->setParameter("friendid", friend_id);
         HTTPManager::get()->addRequest(request);
-        return request;
     }
 
     void CurrentUser::AcceptFriendRequest::callback()
     {
+        uint32_t id(0);
+        m_result->get("friendid", &id);
+        irr::core::stringw info_text("");
         if(m_success)
         {
-            //FIXME
+            Profile * profile = ProfileManager::get()->getProfileByID(id);
+            profile->setFriend();
+            profile->setRelationInfo(new Profile::RelationInfo(_("Today"), false, false, true));
+            info_text = _("Friend request accepted!");
         }
+        else
+            info_text = m_info;
+        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!m_success, true), true);
     }
 
     // ============================================================================
 
-    const CurrentUser::DeclineFriendRequest * CurrentUser::requestDeclineFriend(const uint32_t friend_id) const
+    void CurrentUser::requestDeclineFriend(const uint32_t friend_id) const
     {
         assert(isRegisteredUser());
         CurrentUser::DeclineFriendRequest * request = new CurrentUser::DeclineFriendRequest();
@@ -365,15 +381,22 @@ namespace Online{
         request->setParameter("userid", getID());
         request->setParameter("friendid", friend_id);
         HTTPManager::get()->addRequest(request);
-        return request;
     }
 
     void CurrentUser::DeclineFriendRequest::callback()
     {
+        uint32_t id(0);
+        m_result->get("friendid", &id);
+        irr::core::stringw info_text("");
         if(m_success)
         {
-            //FIXME
+            ProfileManager::get()->removePersistent(id);
+            info_text = _("Friend request declined!");
         }
+        else
+            info_text = m_info;
+        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!m_success, true), true);
+
     }
     // ============================================================================
     void CurrentUser::requestPoll()

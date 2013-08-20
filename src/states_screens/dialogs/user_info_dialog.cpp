@@ -20,18 +20,11 @@
 #include <IGUIEnvironment.h>
 
 #include "audio/sfx_manager.hpp"
-#include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online_profile_overview.hpp"
 #include "utils/translation.hpp"
-#include "utils/string_utils.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/connect_to_server.hpp"
 #include "online/messages.hpp"
-#include "states_screens/dialogs/registration_dialog.hpp"
-#include "states_screens/networking_lobby.hpp"
-
 
 
 using namespace GUIEngine;
@@ -41,14 +34,25 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-UserInfoDialog::UserInfoDialog(uint32_t showing_id)
-        : ModalDialog(0.8f,0.8f), m_showing_id(showing_id)
+UserInfoDialog::UserInfoDialog(uint32_t showing_id, const core::stringw info, bool error, bool from_queue)
+        : ModalDialog(0.8f,0.8f, !from_queue), m_showing_id(showing_id)
 {
+    m_profile = ProfileManager::get()->getProfileByID(showing_id);
+    if(m_profile->isCurrentUser())
+        ModalDialog::dismiss();
     m_self_destroy = false;
     m_enter_profile = false;
+    m_processing = false;
+    m_error = error;
+    m_info = info;
+}
 
+void UserInfoDialog::beforeAddingWidgets()
+{
     loadFromFile("online/user_info_dialog.stkgui");
-    m_profile = ProfileManager::get()->getProfileByID(showing_id);
+    if(m_error)
+        m_info_widget->setErrorColor();
+    m_info_widget->setText(m_info, false);
     m_name_widget = getWidget<LabelWidget>("name");
     assert(m_name_widget != NULL);
     m_name_widget->setText(m_profile->getUserName(),false);
@@ -68,12 +72,20 @@ UserInfoDialog::UserInfoDialog(uint32_t showing_id)
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
-}
+    Profile::RelationInfo * relation_info = m_profile->getRelationInfo();
 
-void UserInfoDialog::beforeAddingWidgets()
-{
-    /*m_accept_widget->setVisible(false);
-    m_decline_widget->setVisible(false);*/
+    if(relation_info == NULL || !relation_info->isPending() || !relation_info->isAsker())
+    {
+        m_accept_widget->setVisible(false);
+        m_decline_widget->setVisible(false);
+        if (relation_info == NULL) return;
+    }
+
+    if(m_profile->isFriend() || relation_info->isPending())
+    {
+        m_friend_widget->setVisible(false);
+    }
+
 }
 
 
@@ -101,9 +113,40 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
             m_enter_profile = true;
             return GUIEngine::EVENT_BLOCK;
         }
+        else if(selection == m_friend_widget->m_properties[PROP_ID])
+        {
+            CurrentUser::get()->requestFriendRequest(m_profile->getID());
+            m_processing = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if(selection == m_accept_widget->m_properties[PROP_ID])
+        {
+            CurrentUser::get()->requestAcceptFriend(m_profile->getID());
+            m_processing = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if(selection == m_decline_widget->m_properties[PROP_ID])
+        {
+            CurrentUser::get()->requestDeclineFriend(m_profile->getID());
+            m_processing = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
     }
     return GUIEngine::EVENT_LET;
 }
+
+// -----------------------------------------------------------------------------
+void UserInfoDialog::deactivate()
+{
+    m_options_widget->setDeactivated();
+}
+
+// -----------------------------------------------------------------------------
+void UserInfoDialog::activate()
+{
+
+}
+
 
 // -----------------------------------------------------------------------------
 
@@ -130,7 +173,7 @@ bool UserInfoDialog::onEscapePressed()
 
 void UserInfoDialog::onUpdate(float dt)
 {
-
+    if(m_processing) m_info_widget->setText(Messages::processing(), false);
 
     //If we want to open the registration dialog, we need to close this one first
     m_enter_profile && (m_self_destroy = true);

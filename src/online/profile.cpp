@@ -65,15 +65,13 @@ namespace Online{
         m_relation_info = NULL;
         m_is_friend = false;
         if(type == C_RELATION_INFO){
-            std::string is_online_string("");
-            xml->get("online", &is_online_string);
-            bool is_online = is_online_string == "yes";
             irr::core::stringw date("");
             xml->get("date", &date);
             std::string is_pending_string("");
             xml->get("is_pending", &is_pending_string);
             bool is_pending = is_pending_string == "yes";
             bool is_asker(false);
+            bool is_online(false);
             if(is_pending)
             {
                 std::string is_asker_string("");
@@ -82,6 +80,9 @@ namespace Online{
             }
             else
             {
+                std::string is_online_string("");
+                xml->get("online", &is_online_string);
+                is_online = is_online_string == "yes";
                 m_is_friend = true;
             }
             m_relation_info = new RelationInfo(date, is_online, is_pending, is_asker);

@@ -39,6 +39,10 @@ private:
 
     bool m_self_destroy;
     bool m_enter_profile;
+    bool m_processing;
+
+    bool m_error;
+    irr::core::stringw m_info;
 
     const uint32_t m_showing_id;
     Online::Profile * m_profile;
@@ -54,9 +58,11 @@ private:
     GUIEngine::IconButtonWidget * m_cancel_widget;
 
     void requestJoin();
+    void activate();
+    void deactivate();
 
 public:
-    UserInfoDialog(uint32_t showing_id);
+    UserInfoDialog(uint32_t showing_id, const core::stringw info = "", bool error = false, bool from_queue = false);
     ~UserInfoDialog();
 
     virtual void beforeAddingWidgets();

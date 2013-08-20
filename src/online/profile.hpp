@@ -106,7 +106,9 @@ namespace Online{
 
             bool                            isCurrentUser() const            { return m_is_current_user; }
             bool                            isFriend() const                 { return m_is_friend; }
+            void                            setFriend()                      { m_is_friend = true; }
             RelationInfo *                  getRelationInfo()                { return m_relation_info; }
+            void                            setRelationInfo(RelationInfo * r){ delete m_relation_info; m_relation_info = r;}
 
             void                            setCacheBit()                    { m_cache_bit = true; }
             void                            unsetCacheBit()                  { m_cache_bit = false; }

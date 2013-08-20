@@ -130,7 +130,7 @@ void OnlineProfileFriends::onUpdate(float delta,  irr::video::IVideoDriver* driv
                     irr::core::stringw status("");
                     if(relation_info->isPending())
                     {
-                        status = (relation_info->isAsker() ? _("Pending") : _("New request"));
+                        status = (relation_info->isAsker() ? _("New Request") : _("Pending"));
                     }
                     else
                         status = (relation_info->isOnline() ? _("Online") : _("Offline"));

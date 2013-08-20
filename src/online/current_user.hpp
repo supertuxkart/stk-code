@@ -87,19 +87,19 @@ namespace Online{
             class FriendRequest : public XMLRequest {
                 virtual void callback ();
             public:
-                FriendRequest() : XMLRequest() {}
+                FriendRequest() : XMLRequest(true) {}
             };
 
             class AcceptFriendRequest : public XMLRequest {
                 virtual void callback ();
             public:
-                AcceptFriendRequest() : XMLRequest() {}
+                AcceptFriendRequest() : XMLRequest(true) {}
             };
 
             class DeclineFriendRequest : public XMLRequest {
                 virtual void callback ();
             public:
-                DeclineFriendRequest() : XMLRequest() {}
+                DeclineFriendRequest() : XMLRequest(true) {}
             };
 
 
@@ -147,9 +147,9 @@ namespace Online{
 
             const XMLRequest *              requestGetAddonVote(const std::string & addon_id) const;
             const SetAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
-            const FriendRequest *           requestFriendRequest(const uint32_t friend_id) const;
-            const AcceptFriendRequest *     requestAcceptFriend(const uint32_t friend_id) const;
-            const DeclineFriendRequest *    requestDeclineFriend(const uint32_t friend_id) const;
+            void                            requestFriendRequest(const uint32_t friend_id) const;
+            void                            requestAcceptFriend(const uint32_t friend_id) const;
+            void                            requestDeclineFriend(const uint32_t friend_id) const;
 
             const XMLRequest *              requestUserSearch(const irr::core::stringw & search_string) const;
 

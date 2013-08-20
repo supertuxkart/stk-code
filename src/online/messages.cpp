@@ -83,6 +83,13 @@ namespace Online
         }
 
         // ------------------------------------------------------------------------
+
+        irr::core::stringw processing()
+        {
+            return irr::core::stringw(_("Processing")) + loadingDots();
+        }
+
+        // ------------------------------------------------------------------------
         irr::core::stringw loadingDots(bool spaces, float interval, int max_dots)
         {
             int nr_dots = int(floor(Time::getRealTime() * (1 / interval))) % (max_dots+1);
