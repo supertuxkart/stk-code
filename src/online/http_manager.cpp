@@ -47,8 +47,8 @@
 using namespace Online;
 
 namespace Online{
-    #define MENU_POLLING_INTERVAL 5.0f
-    #define GAME_POLLING_INTERVAL 10.0f
+    #define MENU_POLLING_INTERVAL 10.0f
+    #define GAME_POLLING_INTERVAL 15.0f
 
     static HTTPManager * http_singleton = NULL;
 

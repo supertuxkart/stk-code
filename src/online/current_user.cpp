@@ -28,6 +28,7 @@
 #include "addons/addon.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/online_profile_friends.hpp"
 
 #include <sstream>
@@ -407,9 +408,90 @@ namespace Online{
     // ============================================================================
     void CurrentUser::requestPoll()
     {
-        //FIXME
+        assert(isRegisteredUser());
+        CurrentUser::PollRequest * request = new CurrentUser::PollRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("poll"));
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getID());
+        HTTPManager::get()->addRequest(request);
     }
 
+    void CurrentUser::PollRequest::callback()
+    {
+        if(m_success)
+        {
+            std::string online_friends_string("");
+            m_result->get("online", &online_friends_string);
+            std::vector<std::string> parts = StringUtils::split(online_friends_string, ' ');
+            std::vector<uint32_t> online_friends;
+            for(unsigned int i = 0; i < parts.size(); ++i)
+            {
+                online_friends.push_back(atoi(parts[i].c_str()));
+            }
+            std::vector<uint32_t> friends = CurrentUser::get()->getProfile()->getFriends();
+            std::vector<irr::core::stringw> to_notify;
+            for(unsigned int i = 0; i < friends.size(); ++i)
+            {
+                 std::vector<uint32_t>::iterator iter;
+                 for (iter = online_friends.begin(); iter != online_friends.end();)
+                 {
+                    if (*iter == friends[i])
+                    {
+                        online_friends.erase(iter++);
+                        break;
+                    }
+                    else
+                        ++iter;
+                 }
+                 bool now_online = false;
+                 if(iter != online_friends.end())
+                     now_online = true;
+
+                 Profile * profile = ProfileManager::get()->getProfileByID(friends[i]);
+                 Profile::RelationInfo * relation_info = profile->getRelationInfo();
+                 if( relation_info->isOnline() )
+                 {
+                     if (!now_online)
+                         relation_info->setOnline(false);
+                 }
+                 else
+                 {
+                     if (now_online)
+                     {
+                         relation_info->setOnline(true);
+                         to_notify.push_back(profile->getUserName());
+                     }
+                 }
+
+            }
+
+            if(to_notify.size() > 0)
+            {
+                irr::core::stringw message("");
+                if(to_notify.size() == 1)
+                {
+                    message = to_notify[0] + _(" is now online.");
+                }
+                else if(to_notify.size() == 2)
+                {
+                    message = to_notify[0] + _(" and ") + to_notify[1] + _(" are now online.");
+                }
+                else if(to_notify.size() == 3)
+                {
+                    message = to_notify[0] + _(", ") + to_notify[1] + _(" and ") + to_notify[2] + _(" are now online.");
+                }
+                else if(to_notify.size() > 3)
+                {
+                    message = StringUtils::toWString(to_notify.size()) + _(" friends are now online.");
+                }
+                GUIEngine::DialogQueue::get()->pushDialog( new MessageDialog(message, true), false);
+                OnlineProfileFriends::getInstance()->refreshFriendsList();
+            }
+        }
+        // FIXME show connection error?
+
+    }
 
     // ============================================================================
     irr::core::stringw CurrentUser::getUserName() const

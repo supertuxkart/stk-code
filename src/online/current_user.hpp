@@ -102,6 +102,12 @@ namespace Online{
                 DeclineFriendRequest() : XMLRequest(true) {}
             };
 
+            class PollRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                PollRequest() : XMLRequest(true) {}
+            };
+
 
         private:
             std::string                 m_token;
