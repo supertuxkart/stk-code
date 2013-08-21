@@ -184,7 +184,7 @@ when the border that intersect at this corner are enabled.
       hborder_out_portion="0.0" vborder_out_portion="0.0" />
 
 <!-- Stateless -->
-<element type="rounded_section" image="glass/glass_rsection.png"
+<element type="rounded_section" image="ocean/glass_rsection.png"
       left_border="15" right_border="15" top_border="15" bottom_border="15"
       hborder_out_portion="0.0" vborder_out_portion="0.0" />
 
