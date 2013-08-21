@@ -108,6 +108,7 @@ namespace Online{
             bool                            isFriend() const                 { return m_is_friend; }
             void                            setFriend()                      { m_is_friend = true; }
             void                            removeFriend(const uint32_t id);
+            void                            addFriend(const uint32_t id);
             void                            deleteRelationalInfo();
             RelationInfo *                  getRelationInfo()                { return m_relation_info; }
             void                            setRelationInfo(RelationInfo * r){ delete m_relation_info; m_relation_info = r;}

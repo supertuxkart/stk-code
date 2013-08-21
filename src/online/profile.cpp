@@ -179,6 +179,15 @@ namespace Online{
 
     // ============================================================================
 
+    void Profile::addFriend( const uint32_t id)
+    {
+        assert (m_has_fetched_friends);
+        //FIXME check if it's not already in there
+        m_friends.push_back(id);
+    }
+
+    // ============================================================================
+
     void Profile::deleteRelationalInfo()
     {
         delete m_relation_info;

@@ -332,6 +332,7 @@ namespace Online{
         irr::core::stringw info_text("");
         if(m_success)
         {
+            CurrentUser::get()->getProfile()->addFriend(id);
             ProfileManager::get()->getProfileByID(id)->setRelationInfo(new Profile::RelationInfo(_("Today"), false, true, false));
             OnlineProfileFriends::getInstance()->refreshFriendsList();
             info_text = _("Friend request send!");
