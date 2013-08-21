@@ -79,7 +79,7 @@ namespace Online{
         curl_global_init(CURL_GLOBAL_DEFAULT);
         pthread_cond_init(&m_cond_request, NULL);
         m_abort.setAtomic(false);
-        m_time_since_poll = 0.0f;
+        m_time_since_poll = MENU_POLLING_INTERVAL * (2.0/3.0);
         m_polling = false;
     }
 

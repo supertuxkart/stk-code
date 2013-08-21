@@ -429,6 +429,7 @@ namespace Online{
             for(unsigned int i = 0; i < parts.size(); ++i)
             {
                 online_friends.push_back(atoi(parts[i].c_str()));
+                Log::info("online friend", "%d", online_friends[i]);
             }
             std::vector<uint32_t> friends = CurrentUser::get()->getProfile()->getFriends();
             std::vector<irr::core::stringw> to_notify;
@@ -439,7 +440,8 @@ namespace Online{
                  {
                     if (*iter == friends[i])
                     {
-                        online_friends.erase(iter++);
+                        Log::info("found online friend", "%d", *iter);
+                        online_friends.erase(iter--);
                         break;
                     }
                     else
@@ -447,7 +449,10 @@ namespace Online{
                  }
                  bool now_online = false;
                  if(iter != online_friends.end())
+                 {
                      now_online = true;
+                     Log::info("now online", "%d", *iter);
+                 }
 
                  Profile * profile = ProfileManager::get()->getProfileByID(friends[i]);
                  Profile::RelationInfo * relation_info = profile->getRelationInfo();
@@ -462,6 +467,7 @@ namespace Online{
                      {
                          relation_info->setOnline(true);
                          to_notify.push_back(profile->getUserName());
+                         Log::info("adding", "%d", friends[i]);
                      }
                  }
 
@@ -472,19 +478,19 @@ namespace Online{
                 irr::core::stringw message("");
                 if(to_notify.size() == 1)
                 {
-                    message = to_notify[0] + _(" is now online.");
+                    message = to_notify[0] + irr::core::stringw(_(" is now online."));
                 }
                 else if(to_notify.size() == 2)
                 {
-                    message = to_notify[0] + _(" and ") + to_notify[1] + _(" are now online.");
+                    message = to_notify[0] + irr::core::stringw(_(" and ")) + to_notify[1] + irr::core::stringw(_(" are now online."));
                 }
                 else if(to_notify.size() == 3)
                 {
-                    message = to_notify[0] + _(", ") + to_notify[1] + _(" and ") + to_notify[2] + _(" are now online.");
+                    message = to_notify[0] + irr::core::stringw(_(", ")) + to_notify[1] + irr::core::stringw(_(" and ")) + to_notify[2] + irr::core::stringw(_(" are now online."));
                 }
                 else if(to_notify.size() > 3)
                 {
-                    message = StringUtils::toWString(to_notify.size()) + _(" friends are now online.");
+                    message = StringUtils::toWString(to_notify.size()) + irr::core::stringw(_(" friends are now online."));
                 }
                 GUIEngine::DialogQueue::get()->pushDialog( new MessageDialog(message, true), false);
                 OnlineProfileFriends::getInstance()->refreshFriendsList();
