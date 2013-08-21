@@ -32,6 +32,7 @@ void NetworkWorld::update(float dt)
         {
             return;
         }
+        World::getWorld()->setNetworkWorld(true);
     }
     World::getWorld()->updateWorld(dt);
     if (World::getWorld()->getPhase() >= WorldStatus::RESULT_DISPLAY_PHASE) // means it's the end
@@ -42,11 +43,22 @@ void NetworkWorld::update(float dt)
     }
 }
 
+void NetworkWorld::start()
+{
+    m_running = true;
+}
+
+void NetworkWorld::stop()
+{
+    m_running = false;
+    World::getWorld()->setNetworkWorld(false);
+}
+
 bool NetworkWorld::isRaceOver()
 {
     if (!World::getWorld())
         return false;
-    return (World::getWorld()->getPhase() >= WorldStatus::RESULT_DISPLAY_PHASE);
+    return (World::getWorld()->getPhase() >  WorldStatus::RACE_PHASE);
 }
 
 void NetworkWorld::collectedItem(Item *item, AbstractKart *kart)

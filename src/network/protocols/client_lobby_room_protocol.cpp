@@ -112,6 +112,8 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
             startGame(event);
         else if (message_type == 0x05) // start selection phase
             startSelection(event);
+        else if (message_type == 0x06) // end of race
+            raceFinished(event);
         else if (message_type == 0x80) // connection refused
             connectionRefused(event);
         else if (message_type == 0x81) // connection accepted
@@ -193,9 +195,11 @@ void ClientLobbyRoomProtocol::update()
                 Log::error("ClientLobbyRoomProtocol", "No game events protocol registered.");
 
             Log::info("ClientLobbyRoomProtocol", "Game finished.");
-            m_state = CONNECTED;
+            m_state = RACE_FINISHED;
         }
     } break;
+    case RACE_FINISHED:
+        break;
     case DONE:
         m_state = EXITING;
         m_listener->requestTerminate(this);
@@ -523,11 +527,11 @@ void ClientLobbyRoomProtocol::startSelection(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1         5         6          7           8            9
- *       -------------------------------------------------------------------
- *  Size | 1 |    4    |    1    |     1    |     1     |      1     |     |
- *  Data | 4 | kart id | race_id | position | kart id 2 | position 2 | ... |
- *       -------------------------------------------------------------------
+ *  Byte 0   1       5   6           7   8           9
+ *       ---------------------------------------------------
+ *  Size | 1 |    4  | 1 |     1     | 1 |     1     |     |
+ *  Data | 4 | token | 1 | Kart 1 ID | 1 | kart id 2 | ... |
+ *       ---------------------------------------------------
  */
 void ClientLobbyRoomProtocol::raceFinished(Event* event)
 {
@@ -544,6 +548,7 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
     }
     data.removeFront(5);
     WorldWithRank* ranked_world = (WorldWithRank*)(World::getWorld());
+    int position = 1;
     while(data.size()>0)
     {
         if (data.size() < 2)
@@ -551,12 +556,18 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
             Log::error("ClientLobbyRoomProtocol", "Incomplete field.");
             return;
         }
-        uint8_t kart_id = data[0];
-        uint8_t position = data[1];
+        if (data[0] != 1)
+        {
+            Log::error("ClientLobbyRoomProtocol", "Badly formatted field.");
+            return;
+        }
+        uint8_t kart_id = data[1];
         ranked_world->setKartPosition(kart_id,position);
         Log::info("ClientLobbyRoomProtocol", "Kart %d has finished #%d", kart_id, position);
         data.removeFront(2);
+        position++;
     }
+    m_state = RACE_FINISHED;
     ranked_world->terminateRace();
 }
 

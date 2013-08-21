@@ -19,8 +19,8 @@ class NetworkWorld : public Singleton<NetworkWorld>
     public:
         void update(float dt);
 
-        void start() { m_running = true; }
-        void stop() { m_running = false; }
+        void start();
+        void stop();
         bool isRunning() { return m_running; }
         bool isRaceOver();
 

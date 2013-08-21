@@ -42,6 +42,7 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
             KART_SELECTION,
             SELECTING_KARTS, // in the network kart selection screen
             PLAYING,
+            RACE_FINISHED,
             DONE,
             EXITING
         };

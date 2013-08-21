@@ -117,6 +117,7 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_schedule_exit_race = false;
     m_self_destruct      = false;
     m_schedule_tutorial  = false;
+    m_is_network_world   = false;
 
     m_stop_music_when_dialog_open = true;
 
@@ -946,7 +947,9 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
 
         PlayerController *controller = (PlayerController*)(k->getController());
 
-        int highscore_rank = highscores->addData(k->getIdent(),
+        int highscore_rank = 0;
+        if (controller->getPlayer()->getProfile() != NULL) // if we have the player profile here
+            highscore_rank = highscores->addData(k->getIdent(),
                               controller->getPlayer()->getProfile()->getName(),
                                                  k->getFinishTime());
 

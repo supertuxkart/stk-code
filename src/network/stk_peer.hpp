@@ -45,7 +45,7 @@ class STKPeer
         bool exists() const;
         uint32_t getAddress() const;
         uint16_t getPort() const;
-        NetworkPlayerProfile* getPlayerProfile() { return *m_player_profile; }
+        NetworkPlayerProfile* getPlayerProfile() { return (m_player_profile==NULL)?NULL:(*m_player_profile); }
         uint32_t getClientServerToken() const   { return *m_client_server_token; }
         bool     isClientServerTokenSet() const { return *m_token_set; }
 

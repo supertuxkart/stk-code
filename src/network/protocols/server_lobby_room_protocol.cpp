@@ -219,19 +219,18 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
 void ServerLobbyRoomProtocol::checkRaceFinished()
 {
     assert(NetworkWorld::getInstance()->isRunning());
+    assert(World::getWorld());
     // if race is over, give the final score to everybody
     if (NetworkWorld::getInstance()->isRaceOver())
     {
-        World* world = World::getWorld();
-        world->terminateRace();
         // calculate karts ranks :
         int num_players = race_manager->getNumberOfKarts();
         std::vector<int> karts_results;
-        for (unsigned int j = 0; j < num_players; j++)
+        for (int j = 0; j < num_players; j++)
         {
             float lowest_time = race_manager->getKartRaceTime(0);
             int lowest_index = 0;
-            for (unsigned int i = 0; i < num_players; i++)
+            for (int i = 0; i < num_players; i++)
             {
                 float time = race_manager->getKartRaceTime(i);
                 if (time < lowest_time)
@@ -248,16 +247,22 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
         NetworkString queue;
         for (unsigned int i = 0; i < karts_results.size(); i++)
         {
-            queue.ai8(karts_results[i]).ai8(i+1); // position is i+1
+            queue.ai8(1).ai8(karts_results[i]); // position is i+1
         }
         for (unsigned int i = 0; i < peers.size(); i++)
         {
             NetworkString ns;
-            ns.ai8(4).ai32(peers[i]->getClientServerToken());
+            ns.ai8(0x06).ai8(4).ai32(peers[i]->getClientServerToken());
             NetworkString total = ns + queue;
             m_listener->sendMessage(this, peers[i], total, true);
         }
         Log::info("ServerLobbyRoomProtocol", "End of game message sent");
+        m_in_race = false;
+        NetworkWorld::getInstance()->stop();
+    }
+    else
+    {
+        //Log::info("ServerLobbyRoomProtocol", "Phase is %d", World::getWorld()->getPhase());
     }
 }
 
