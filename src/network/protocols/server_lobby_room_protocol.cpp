@@ -258,6 +258,28 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
         }
         Log::info("ServerLobbyRoomProtocol", "End of game message sent");
         m_in_race = false;
+
+        // stop race protocols
+        Protocol* protocol = NULL;
+        protocol = m_listener->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
+        if (protocol)
+            m_listener->requestTerminate(protocol);
+        else
+            Log::error("ClientLobbyRoomProtocol", "No controller events protocol registered.");
+
+        protocol = m_listener->getProtocol(PROTOCOL_KART_UPDATE);
+        if (protocol)
+            m_listener->requestTerminate(protocol);
+        else
+            Log::error("ClientLobbyRoomProtocol", "No kart update protocol registered.");
+
+        protocol = m_listener->getProtocol(PROTOCOL_GAME_EVENTS);
+        if (protocol)
+            m_listener->requestTerminate(protocol);
+        else
+            Log::error("ClientLobbyRoomProtocol", "No game events protocol registered.");
+
+        // notify the network world that it is stopped
         NetworkWorld::getInstance()->stop();
     }
     else

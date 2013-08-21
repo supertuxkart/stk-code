@@ -78,12 +78,16 @@ bool ClientLobbyRoomProtocol::notifyEvent(Event* event)
         NetworkString data = event->data();
         assert(data.size()); // assert that data isn't empty
         uint8_t message_type = data[0];
-        if (message_type != 0x03) // kart selection update only here (for now)
-            return false;
+        if (message_type != 0x03 &&
+            message_type != 0x06)
+            return false; // don't treat the event
 
         event->removeFront(1);
+        Log::info("ClientLobbyRoomProtocol", "Synchronous message of type %d", message_type);
         if (message_type == 0x03) // kart selection update
             kartSelectionUpdate(event);
+        else if (message_type == 0x06) // end of race
+            raceFinished(event);
 
         return true;
     }
@@ -100,10 +104,12 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         NetworkString data = event->data();
         assert(data.size()); // assert that data isn't empty
         uint8_t message_type = data[0];
-        if (message_type == 0x03) // kart selection update is synchronous (updates gui)
-            return false;
+        if (message_type == 0x03 ||
+            message_type == 0x06)
+            return false; // don't treat the event
+
         event->removeFront(1);
-        Log::info("ClientLobbyRoomProtocol", "Message of type %d", message_type);
+        Log::info("ClientLobbyRoomProtocol", "Asynchronous message of type %d", message_type);
         if (message_type == 0x01) // new player connected
             newPlayer(event);
         else if (message_type == 0x02) // player disconnected
@@ -112,14 +118,13 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
             startGame(event);
         else if (message_type == 0x05) // start selection phase
             startSelection(event);
-        else if (message_type == 0x06) // end of race
-            raceFinished(event);
         else if (message_type == 0x80) // connection refused
             connectionRefused(event);
         else if (message_type == 0x81) // connection accepted
             connectionAccepted(event);
         else if (message_type == 0x82) // kart selection refused
             kartSelectionRefused(event);
+
         return true;
     } // message
     else if (event->type == EVENT_TYPE_CONNECTED)
@@ -158,7 +163,8 @@ void ClientLobbyRoomProtocol::update()
         ns.ai8(1).ai8(4).ai32(Online::CurrentUser::get()->getUserID());
         m_listener->sendMessage(this, ns);
         m_state = REQUESTING_CONNECTION;
-    } break;
+    }
+    break;
     case REQUESTING_CONNECTION:
         break;
     case CONNECTED:
@@ -168,36 +174,19 @@ void ClientLobbyRoomProtocol::update()
         NetworkKartSelectionScreen* screen = NetworkKartSelectionScreen::getInstance();
         StateManager::get()->pushScreen(screen);
         m_state = SELECTING_KARTS;
-    } break;
+    }
+    break;
     case SELECTING_KARTS:
         break;
     case PLAYING:
     {
         if (NetworkWorld::getInstance<NetworkWorld>()->isRaceOver()) // race is now over, kill race protocols and return to connected state
         {
-            Protocol* protocol = NULL;
-            protocol = m_listener->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
-            if (protocol)
-                m_listener->requestTerminate(protocol);
-            else
-                Log::error("ClientLobbyRoomProtocol", "No controller events protocol registered.");
-
-            protocol = m_listener->getProtocol(PROTOCOL_KART_UPDATE);
-            if (protocol)
-                m_listener->requestTerminate(protocol);
-            else
-                Log::error("ClientLobbyRoomProtocol", "No kart update protocol registered.");
-
-            protocol = m_listener->getProtocol(PROTOCOL_GAME_EVENTS);
-            if (protocol)
-                m_listener->requestTerminate(protocol);
-            else
-                Log::error("ClientLobbyRoomProtocol", "No game events protocol registered.");
-
             Log::info("ClientLobbyRoomProtocol", "Game finished.");
             m_state = RACE_FINISHED;
         }
-    } break;
+    }
+    break;
     case RACE_FINISHED:
         break;
     case DONE:
@@ -474,7 +463,7 @@ void ClientLobbyRoomProtocol::startGame(Event* event)
     if (data.size() < 5 || data[0] != 4)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a kart "
-                    "selection update wasn't formated as expected.");
+                   "selection update wasn't formated as expected.");
         return;
     }
     uint8_t token = data.gui32(1);
@@ -507,7 +496,7 @@ void ClientLobbyRoomProtocol::startSelection(Event* event)
     if (data.size() < 5 || data[0] != 4)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a kart "
-                    "selection update wasn't formated as expected.");
+                   "selection update wasn't formated as expected.");
         return;
     }
     uint8_t token = data.gui32(1);
@@ -547,7 +536,32 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
         return;
     }
     data.removeFront(5);
+    Log::error("ClientLobbyRoomProtocol", "Server notified that the race is finished.");
+
+    // stop race protocols
+    Protocol* protocol = NULL;
+    protocol = m_listener->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
+    if (protocol)
+        m_listener->requestTerminate(protocol);
+    else
+        Log::error("ClientLobbyRoomProtocol", "No controller events protocol registered.");
+
+    protocol = m_listener->getProtocol(PROTOCOL_KART_UPDATE);
+    if (protocol)
+        m_listener->requestTerminate(protocol);
+    else
+        Log::error("ClientLobbyRoomProtocol", "No kart update protocol registered.");
+
+    protocol = m_listener->getProtocol(PROTOCOL_GAME_EVENTS);
+    if (protocol)
+        m_listener->requestTerminate(protocol);
+    else
+        Log::error("ClientLobbyRoomProtocol", "No game events protocol registered.");
+
+    // finish the race
     WorldWithRank* ranked_world = (WorldWithRank*)(World::getWorld());
+    ranked_world->beginSetKartPositions();
+    ranked_world->setPhase(WorldStatus::RESULT_DISPLAY_PHASE);
     int position = 1;
     while(data.size()>0)
     {
@@ -567,6 +581,7 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
         data.removeFront(2);
         position++;
     }
+    ranked_world->endSetKartPositions();
     m_state = RACE_FINISHED;
     ranked_world->terminateRace();
 }

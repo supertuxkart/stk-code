@@ -796,29 +796,32 @@ void Kart::finishedRace(float time)
         // in modes that support it, start end animation
         setController(new EndController(this, m_controller->getPlayer(),
                                         m_controller));
-        GameSlot *slot = unlock_manager->getCurrentSlot();
-        const Challenge *challenge = slot->getCurrentChallenge();
-        // In case of a GP challenge don't make the end animation depend
-        // on if the challenge is fulfilled
-        if(challenge && !challenge->getData()->isGrandPrix())
+        if (m_controller->isPlayerController()) // if player is on this computer
         {
-            if(challenge->getData()->isChallengeFulfilled())
-                m_kart_model->setAnimation(KartModel::AF_WIN_START);
+            GameSlot *slot = unlock_manager->getCurrentSlot();
+            const Challenge *challenge = slot->getCurrentChallenge();
+            // In case of a GP challenge don't make the end animation depend
+            // on if the challenge is fulfilled
+            if(challenge && !challenge->getData()->isGrandPrix())
+            {
+                if(challenge->getData()->isChallengeFulfilled())
+                    m_kart_model->setAnimation(KartModel::AF_WIN_START);
+                else
+                    m_kart_model->setAnimation(KartModel::AF_LOSE_START);
+
+            }
+            else if(m_race_position<=0.5f*race_manager->getNumberOfKarts() ||
+                    m_race_position==1)
+                    m_kart_model->setAnimation(KartModel::AF_WIN_START);
             else
                 m_kart_model->setAnimation(KartModel::AF_LOSE_START);
 
-        }
-        else if(m_race_position<=0.5f*race_manager->getNumberOfKarts() ||
-                m_race_position==1)
-                m_kart_model->setAnimation(KartModel::AF_WIN_START);
-        else
-            m_kart_model->setAnimation(KartModel::AF_LOSE_START);
-
-        RaceGUIBase* m = World::getWorld()->getRaceGUI();
-        if(m)
-        {
-            m->addMessage((getPosition() == 1 ? _("You won the race!") : _("You finished the race!")) ,
-                          this, 2.0f);
+            RaceGUIBase* m = World::getWorld()->getRaceGUI();
+            if(m)
+            {
+                m->addMessage((getPosition() == 1 ? _("You won the race!") : _("You finished the race!")) ,
+                              this, 2.0f);
+            }
         }
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)

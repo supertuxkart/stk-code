@@ -708,7 +708,7 @@ public:
       */
     bool allPlayerFinished() const
     {
-        return m_num_finished_players==m_player_karts.size();
+        return m_num_finished_players == m_player_karts.size();
     }
     // ------------------------------------------------------------------------
     void kartFinishedRace(const AbstractKart* kart, float time);
