@@ -99,14 +99,17 @@ private:
     class RewindInfo
     {
     private:
+        /** The different information types that can be saved. */
+        enum RewindInfoType {RIT_TIME, RIT_STATE, RIT_EVENT};
+
         /** Pointer to the buffer which stores all states. */
         char *m_buffer; 
 
         /** Time when this state was taken. */
         float m_time;
 
-        /** True if this is an event, and not a state. */
-        bool m_is_event;
+        /** Type of this information. */
+        RewindInfoType m_type;
 
         /** A confirmed event is one that was sent from the server. When
          *  rewinding we have to start with a confirmed state for each 
@@ -119,6 +122,8 @@ private:
         RewindInfo(Rewinder *rewinder, float time, char *buffer, 
                    bool is_event, bool is_confirmed);
         // --------------------------------------------------------------------
+        RewindInfo(float time);
+        // --------------------------------------------------------------------
         ~RewindInfo()
         {
             delete m_buffer;
@@ -130,7 +135,11 @@ private:
         /** Returns the time at which this rewind state was saved. */
         float getTime() const { return m_time; }
         // --------------------------------------------------------------------
-        bool isEvent() const { return m_is_event; }
+        bool isEvent() const { return m_type==RIT_EVENT; }
+        // --------------------------------------------------------------------
+        bool isTime() const { return m_type==RIT_TIME; }
+        // --------------------------------------------------------------------
+        bool isState() const { return m_type==RIT_STATE; }
         // --------------------------------------------------------------------
         /** Returns if this state is confirmed. */
         bool isConfirmed() const { return m_is_confirmed; }
@@ -139,10 +148,11 @@ private:
          *  It calls either undoEvent or undoState in the rewinder. */
         void undo()
         {
-            if(m_is_event)
+            if(m_type==RIT_EVENT)
                 m_rewinder->undoEvent(m_buffer);
-            else
+            else if(m_type==RIT_STATE)
                 m_rewinder->undoState(m_buffer);
+            // time evnet can be ignored.
         }   // undoEvent
         // --------------------------------------------------------------------
         /** Rewinds to this state. This is called while going forwards in time
@@ -154,9 +164,9 @@ private:
          */
         void rewind()
         {
-            if(m_is_event)
+            if(m_type==RIT_EVENT)
                 m_rewinder->rewindToEvent(m_buffer);
-            else
+            else if(m_type==RIT_STATE)
             {
                 if(m_is_confirmed)
                     m_rewinder->rewindToState(m_buffer);
@@ -165,7 +175,7 @@ private:
                     // TODO
                     // Handle replacing of stored states.
                 }
-            }
+            }   // time information can be ignored
         }   // rewind
     };   // RewindInfo
     // ========================================================================

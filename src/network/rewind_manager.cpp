@@ -54,8 +54,18 @@ RewindManager::RewindInfo::RewindInfo(Rewinder *rewinder, float time,
     m_rewinder     = rewinder;
     m_time         = time;
     m_buffer       = buffer;
-    m_is_event     = is_event;
+    m_type         = is_event ? RIT_EVENT : RIT_STATE;
     m_is_confirmed = is_confirmed;
+}   // RewindInfo
+
+// ----------------------------------------------------------------------------
+RewindManager::RewindInfo::RewindInfo(float time)
+{
+    m_rewinder     = NULL;
+    m_time         = time;
+    m_buffer       = NULL;
+    m_type         = RIT_TIME;
+    m_is_confirmed = true;
 }   // RewindInfo
 
 // ============================================================================
@@ -187,7 +197,8 @@ unsigned int RewindManager::findFirstIndex(float target_time) const
 #ifdef REWIND_SEARCH_STATS
         m_count_of_comparisons++;
 #endif
-        if(m_rewind_info[index]->getTime()<target_time)
+        if(m_rewind_info[index]->getTime()<target_time &&
+            !m_rewind_info[index]->isTime()               )
             return index;
         index--;
     }
@@ -222,11 +233,15 @@ void RewindManager::update(float dt)
 {
     if(!m_enable_rewind_manager  || 
         m_all_rewinder.size()==0 ||
-        m_is_rewinding              ) return;
-
+        m_is_rewinding              )  return;
+   
     float time = World::getWorld()->getTime();
     if(time - m_last_saved_state < m_state_frequency)
+    {
+        RewindInfo *ri = new RewindInfo(World::getWorld()->getTime());
+        insertRewindInfo(ri);
         return;
+    }
 
     // For now always create a snapshot.
     for(unsigned int i=0; i<m_all_rewinder.size(); i++)
@@ -264,7 +279,7 @@ void RewindManager::rewindTo(float rewind_time)
     // ------------------------------------------------
     int state = findFirstIndex(rewind_time);
 
-    if(m_rewind_info[state]->isEvent())
+    if(!m_rewind_info[state]->isState())
     {
         Log::error("RewindManager", "No state for rewind to %d, state %d.",
                    rewind_time, state);
@@ -315,7 +330,7 @@ void RewindManager::rewindTo(float rewind_time)
     // Now go forward through the saved states, and
     // replay taking the events into account.
     while(World::getWorld()->getTime() < current_time &&
-        state < m_rewind_info.size())
+         state < (int)m_rewind_info.size())
     {
 
         // Find the next RewindInfo which needs to be taken into account
@@ -323,8 +338,8 @@ void RewindManager::rewindTo(float rewind_time)
         // TODO ... for now
         int next_important_state = state;
         while(next_important_state < (int)m_rewind_info.size()    && 
-               !m_rewind_info[next_important_state]->isEvent()    &&
-               !m_rewind_info[next_important_state]->isConfirmed()   )    
+              m_rewind_info[next_important_state]->isState()      &&
+              !m_rewind_info[next_important_state]->isConfirmed()   )    
         {
             // TODO discard/replace state
             next_important_state ++;
@@ -333,11 +348,11 @@ void RewindManager::rewindTo(float rewind_time)
         float dt = determineTimeStepSize(state, current_time);
         float next_time = World::getWorld()->getTime() + dt;
         // Now set all events and confirmed states
-        while(state < m_rewind_info.size() &&
+        while(state < (int)m_rewind_info.size() &&
             m_rewind_info[state]->getTime() <= next_time)
         {
             if(m_rewind_info[state]->isEvent() ||
-                m_rewind_info[state]->isConfirmed() )
+               m_rewind_info[state]->isConfirmed() )
             {
                 m_rewind_info[state]->rewind();
             }
@@ -365,6 +380,8 @@ void RewindManager::rewindTo(float rewind_time)
  */
 float RewindManager::determineTimeStepSize(int next_state, float end_time)
 {
+    return m_rewind_info[next_state]->getTime()-World::getWorld()->getTime();
+
     float dt = 1.0f/60.0f;
     float t = World::getWorld()->getTime();
     if(m_rewind_info[next_state]->getTime() < t + dt)
