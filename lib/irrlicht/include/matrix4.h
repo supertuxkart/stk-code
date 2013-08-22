@@ -279,6 +279,9 @@ namespace core
 			//! Builds a left-handed orthogonal projection matrix.
 			CMatrix4<T>& buildProjectionMatrixOrthoLH(f32 widthOfViewVolume, f32 heightOfViewVolume, f32 zNear, f32 zFar);
 
+			//! Builds a left-handed orthogonal projection matrix, with specific corners.
+			CMatrix4<T>& buildProjectionMatrixOrthoLH(f32 left, f32 right, f32 up, f32 down, f32 zNear, f32 zFar);
+
 			//! Builds a right-handed orthogonal projection matrix.
 			CMatrix4<T>& buildProjectionMatrixOrthoRH(f32 widthOfViewVolume, f32 heightOfViewVolume, f32 zNear, f32 zFar);
 
@@ -1633,6 +1636,41 @@ namespace core
 		return *this;
 	}
 
+	// Builds a left-handed orthogonal projection matrix, with specific corners.
+	template <class T>
+	inline CMatrix4<T>& CMatrix4<T>::buildProjectionMatrixOrthoLH(
+			f32 left, f32 right, f32 up, f32 down,
+			f32 zNear, f32 zFar)
+	{
+		_IRR_DEBUG_BREAK_IF(zNear == zFar); //divide by zero
+		_IRR_DEBUG_BREAK_IF(right == left); //divide by zero
+		_IRR_DEBUG_BREAK_IF(up == down); //divide by zero
+
+		M[0] = (T)(2/(right - left));
+		M[1] = 0;
+		M[2] = 0;
+		M[3] = 0;
+
+		M[4] = 0;
+		M[5] = (T)(2/(up - down));
+		M[6] = 0;
+		M[7] = 0;
+
+		M[8] = 0;
+		M[9] = 0;
+		M[10] = (T)(1/(zFar - zNear));
+		M[11] = 0;
+
+		M[12] = (T)-((right + left) / (right - left));
+		M[13] = (T)-((up + down) / (up - down));
+		M[14] = (T)(zNear/(zNear-zFar));
+		M[15] = 1;
+
+#if defined ( USE_MATRIX_TEST )
+		definitelyIdentityMatrix=false;
+#endif
+		return *this;
+	}
 
 	// Builds a right-handed orthogonal projection matrix.
 	template <class T>
