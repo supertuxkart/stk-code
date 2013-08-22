@@ -42,6 +42,7 @@ namespace GUIEngine
 
     DialogQueue::DialogQueue()
     {
+        m_closer = NULL;
     }
 
     // ----------------------------------------------------------------------------
@@ -49,26 +50,33 @@ namespace GUIEngine
     void DialogQueue::pushDialog(ModalDialog * dialog, bool closes_any_dialog)
     {
         assert(!dialog->isInited());
-        m_queue.push( new Entry(dialog, closes_any_dialog)); }
+        if(closes_any_dialog)
+        {
+            delete m_closer;
+            m_closer = dialog;
+        }
+        else
+            m_queue.push(dialog);
     }
 
     // ----------------------------------------------------------------------------
 
     void DialogQueue::update()
     {
-
-        if(!m_queue.empty())
+        if(m_closer != NULL)
         {
-            Entry * entry = m_queue.front();
-            if(entry->closes() || !ModalDialog::isADialogActive())
+            ModalDialog::dismiss();
+            m_closer->load();
+            m_closer = NULL;
+        }
+        else if(!m_queue.empty())
+        {
+            ModalDialog * entry = m_queue.front();
+            if(!ModalDialog::isADialogActive())
             {
-                ModalDialog::dismiss();
-                entry->get()->load();
+                entry->load();
                 m_queue.pop();
-                delete entry;
             }
+        }
     }
-
-
 }
-

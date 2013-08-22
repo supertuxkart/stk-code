@@ -31,16 +31,8 @@ namespace GUIEngine
     {
     private :
 
-        class Entry
-        {
-            ModalDialog * m_dialog;
-            bool m_closes_any_dialog;
-        public :
-            Entry(ModalDialog * dialog, bool closes_any_dialog) : m_dialog(dialog), m_closes_any_dialog(closes_any_dialog) {}
-            bool closes() { return m_closes_any_dialog; }
-            ModalDialog* get() { return m_dialog; }
-        };
-        std::queue<Entry *> m_queue;
+        std::queue<ModalDialog *> m_queue;
+        ModalDialog * m_closer;
         DialogQueue();
     public :
         /**Singleton */
