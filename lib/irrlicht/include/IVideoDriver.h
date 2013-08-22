@@ -1459,6 +1459,9 @@ namespace video
 		//! Get the maximum texture size supported.
 		virtual core::dimension2du getMaxTextureSize() const =0;
 
+		//! Convert the number of indices to the number of primitives
+		virtual u32 indiceToPrimitiveCount(scene::E_PRIMITIVE_TYPE pType, u32 count) const = 0;
+
 		//! Color conversion convenience function
 		/** Convert an image (as array of pixels) from source to destination
 		array, thereby converting the color format. The pixel size is
