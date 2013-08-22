@@ -142,6 +142,17 @@ namespace Online{
 
     // ============================================================================
 
+    void ProfileManager::clearPersistent()
+    {
+        ProfilesMap::iterator it;
+        for ( it = m_profiles_persistent.begin(); it != m_profiles_persistent.end(); ++it ) {
+            delete it->second;
+        }
+        m_profiles_persistent.clear();
+    }
+
+    // ============================================================================
+
     void ProfileManager::moveToCache(const uint32_t id)
     {
         if (inPersistent(id))

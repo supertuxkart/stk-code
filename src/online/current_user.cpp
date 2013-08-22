@@ -201,6 +201,7 @@ namespace Online{
         request->setParameter("userid", getID());
         HTTPManager::get()->addRequest(request);
         setUserState (US_SIGNING_OUT);
+        HTTPManager::get()->stopPolling();
         return request;
     }
 
@@ -211,13 +212,12 @@ namespace Online{
             Log::warn("CurrentUser::signOut", "%s", _("There were some connection issues while signing out. Report a bug if this caused issues."));
         }
         setToken("");
-        ProfileManager::get()->deleteFromPersistent(m_profile->getID());
+        ProfileManager::get()->clearPersistent();
         m_profile = NULL;
         setUserState (US_SIGNED_OUT);
         UserConfigParams::m_saved_user = 0;
         UserConfigParams::m_saved_token = "";
         UserConfigParams::m_saved_session = false;
-        HTTPManager::get()->stopPolling();
     }
 
     void CurrentUser::SignOutRequest::callback()
