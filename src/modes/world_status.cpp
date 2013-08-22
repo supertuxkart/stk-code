@@ -236,6 +236,9 @@ void WorldStatus::update(const float dt)
         case FINISH_PHASE:
             // Nothing to do here.
             break;
+		case GOAL_PHASE:
+			// Nothing to do here as well.
+
         default: break;
     }
 

@@ -77,7 +77,10 @@ public:
         IN_GAME_MENU_PHASE,
 
         // Undefined, used in asserts to catch incorrect states.
-        UNDEFINED_PHASE
+        UNDEFINED_PHASE,
+
+		//Goal scored phase
+		GOAL_PHASE
     };
 protected:
     /** Sound to play at the beginning of a race, during which a

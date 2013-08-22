@@ -50,6 +50,7 @@ private:
     /** Whether or not goals can be scored (they are disabled when a point is scored
     and re-enabled when the next game can be played)*/
     bool m_can_score_points;
+	SFXBase *m_goal_sound;
 	
 	/** Team karts */
 
@@ -78,6 +79,8 @@ public:
     virtual const std::string& getIdent() const;
 
     virtual void update(float dt);
+
+	virtual void countdownReachedZero();
 
     void onCheckGoalTriggered(bool first_goal);
 	int getTeamLeader(unsigned int i);
