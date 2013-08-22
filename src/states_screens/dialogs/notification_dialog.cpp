@@ -37,6 +37,7 @@ NotificationDialog::NotificationDialog(Type type, const core::stringw info, bool
         : ModalDialog(0.8f,0.5f)
 {
     m_info = info;
+    m_type = type;
     if(!from_queue) load();
 }
 

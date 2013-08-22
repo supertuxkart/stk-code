@@ -512,6 +512,7 @@ namespace Online{
                     Profile * p = new Profile(node);
                     p->setRelationInfo(ri);
                     ProfileManager::get()->addPersistent(p);
+                    friend_request_count++;
                 }
             }
             if(friend_request_count > 0)
