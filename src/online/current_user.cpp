@@ -429,8 +429,8 @@ namespace Online{
             for(unsigned int i = 0; i < parts.size(); ++i)
             {
                 online_friends.push_back(atoi(parts[i].c_str()));
-                Log::info("online friend", "%d", online_friends[i]);
             }
+            bool went_offline = false;
             std::vector<uint32_t> friends = CurrentUser::get()->getProfile()->getFriends();
             std::vector<irr::core::stringw> to_notify;
             for(unsigned int i = 0; i < friends.size(); ++i)
@@ -440,7 +440,6 @@ namespace Online{
                  {
                     if (*iter == friends[i])
                     {
-                        Log::info("found online friend", "%d", *iter);
                         online_friends.erase(iter--);
                         break;
                     }
@@ -451,7 +450,6 @@ namespace Online{
                  if(iter != online_friends.end())
                  {
                      now_online = true;
-                     Log::info("now online", "%d", *iter);
                  }
 
                  Profile * profile = ProfileManager::get()->getProfileByID(friends[i]);
@@ -459,7 +457,10 @@ namespace Online{
                  if( relation_info->isOnline() )
                  {
                      if (!now_online)
+                     {
                          relation_info->setOnline(false);
+                         went_offline = true;
+                     }
                  }
                  else
                  {
@@ -467,7 +468,6 @@ namespace Online{
                      {
                          relation_info->setOnline(true);
                          to_notify.push_back(profile->getUserName());
-                         Log::info("adding", "%d", friends[i]);
                      }
                  }
 
@@ -495,8 +495,13 @@ namespace Online{
                 GUIEngine::DialogQueue::get()->pushDialog( new MessageDialog(message, true), false);
                 OnlineProfileFriends::getInstance()->refreshFriendsList();
             }
+            else if(went_offline)
+            {
+                OnlineProfileFriends::getInstance()->refreshFriendsList();
+            }
         }
-        // FIXME show connection error?
+        // FIXME show connection error??
+        // after 2 misses I'll show something
 
     }
 

@@ -44,6 +44,12 @@ namespace Online{
         m_is_asker = is_asker;
     }
 
+    // ============================================================================
+    void Profile::RelationInfo::setOnline(bool online)
+    {
+        m_is_online = online;
+        m_is_pending = false;
+    }
 
     // ============================================================================
     Profile::Profile( const uint32_t           & userid,
@@ -176,7 +182,6 @@ namespace Online{
                ++iter;
         }
     }
-
     // ============================================================================
 
     void Profile::addFriend( const uint32_t id)

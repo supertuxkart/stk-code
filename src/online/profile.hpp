@@ -58,7 +58,7 @@ namespace Online{
                 bool isAsker(){return m_is_asker;}
                 const irr::core::stringw & getDate() { return m_date; }
                 bool                            isOnline() const                 { return m_is_online; }
-                void                            setOnline(bool online)           { m_is_online = online; }
+                void                            setOnline(bool online);
             };
             class FriendsListRequest : public XMLRequest
             {
