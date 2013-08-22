@@ -13,8 +13,8 @@ void main()
 {
 	float inter = dot(normal, eyeVec);
 	float m = texture2D(tex, vec2(0.5, uv.y)).r;
-	inter = 1 - inter;
-	float alpha = inter + 1;// * m;
+	inter = 1.0 - inter;
+	float alpha = inter + 1.0;// * m;
 
 	gl_FragColor = vec4(0.8, 0.16, 0.48, alpha);
 }
