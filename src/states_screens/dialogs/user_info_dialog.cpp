@@ -45,6 +45,8 @@ UserInfoDialog::UserInfoDialog(uint32_t showing_id, const core::stringw info, bo
 void UserInfoDialog::load()
 {
     loadFromFile("online/user_info_dialog.stkgui");
+    if(m_error)
+        m_info_widget->setErrorColor();
 }
 
 void UserInfoDialog::beforeAddingWidgets()
@@ -58,8 +60,6 @@ void UserInfoDialog::beforeAddingWidgets()
     m_name_widget->setText(m_profile->getUserName(),false);
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
-    if(m_error)
-        m_info_widget->setErrorColor();
     m_info_widget->setText(m_info, false);
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
