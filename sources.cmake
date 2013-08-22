@@ -208,6 +208,7 @@ src/states_screens/dialogs/enter_player_name_dialog.cpp
 src/states_screens/dialogs/gp_info_dialog.cpp
 src/states_screens/dialogs/login_dialog.cpp
 src/states_screens/dialogs/message_dialog.cpp
+src/states_screens/dialogs/notification_dialog.cpp
 src/states_screens/dialogs/player_info_dialog.cpp
 src/states_screens/dialogs/press_a_key_dialog.cpp
 src/states_screens/dialogs/race_paused_dialog.cpp
@@ -510,6 +511,7 @@ src/states_screens/dialogs/enter_player_name_dialog.hpp
 src/states_screens/dialogs/gp_info_dialog.hpp
 src/states_screens/dialogs/login_dialog.hpp
 src/states_screens/dialogs/message_dialog.hpp
+src/states_screens/dialogs/notification_dialog.hpp
 src/states_screens/dialogs/player_info_dialog.hpp
 src/states_screens/dialogs/press_a_key_dialog.hpp
 src/states_screens/dialogs/race_paused_dialog.hpp

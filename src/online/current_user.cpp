@@ -28,7 +28,7 @@
 #include "addons/addon.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/notification_dialog.hpp"
 #include "states_screens/online_profile_friends.hpp"
 
 #include <sstream>
@@ -423,80 +423,109 @@ namespace Online{
         if(m_success)
         {
             std::string online_friends_string("");
-            m_result->get("online", &online_friends_string);
-            std::vector<std::string> parts = StringUtils::split(online_friends_string, ' ');
-            std::vector<uint32_t> online_friends;
-            for(unsigned int i = 0; i < parts.size(); ++i)
+
+            if(m_result->get("online", &online_friends_string) == 1)
             {
-                online_friends.push_back(atoi(parts[i].c_str()));
-            }
-            bool went_offline = false;
-            std::vector<uint32_t> friends = CurrentUser::get()->getProfile()->getFriends();
-            std::vector<irr::core::stringw> to_notify;
-            for(unsigned int i = 0; i < friends.size(); ++i)
-            {
-                 std::vector<uint32_t>::iterator iter;
-                 for (iter = online_friends.begin(); iter != online_friends.end();)
-                 {
-                    if (*iter == friends[i])
+                std::vector<std::string> parts = StringUtils::split(online_friends_string, ' ');
+                std::vector<uint32_t> online_friends;
+                for(unsigned int i = 0; i < parts.size(); ++i)
+                {
+                    online_friends.push_back(atoi(parts[i].c_str()));
+                }
+                bool went_offline = false;
+                std::vector<uint32_t> friends = CurrentUser::get()->getProfile()->getFriends();
+                std::vector<irr::core::stringw> to_notify;
+                for(unsigned int i = 0; i < friends.size(); ++i)
+                {
+                     std::vector<uint32_t>::iterator iter;
+                     for (iter = online_friends.begin(); iter != online_friends.end();)
+                     {
+                        if (*iter == friends[i])
+                        {
+                            online_friends.erase(iter--);
+                            break;
+                        }
+                        else
+                            ++iter;
+                     }
+                     bool now_online = false;
+                     if(iter != online_friends.end())
+                     {
+                         now_online = true;
+                     }
+
+                     Profile * profile = ProfileManager::get()->getProfileByID(friends[i]);
+                     Profile::RelationInfo * relation_info = profile->getRelationInfo();
+                     if( relation_info->isOnline() )
+                     {
+                         if (!now_online)
+                         {
+                             relation_info->setOnline(false);
+                             went_offline = true;
+                         }
+                     }
+                     else
+                     {
+                         if (now_online)
+                         {
+                             relation_info->setOnline(true);
+                             to_notify.push_back(profile->getUserName());
+                         }
+                     }
+
+                }
+
+                if(to_notify.size() > 0)
+                {
+                    irr::core::stringw message("");
+                    if(to_notify.size() == 1)
                     {
-                        online_friends.erase(iter--);
-                        break;
+                        message = to_notify[0] + irr::core::stringw(_(" is now online."));
                     }
-                    else
-                        ++iter;
-                 }
-                 bool now_online = false;
-                 if(iter != online_friends.end())
-                 {
-                     now_online = true;
-                 }
-
-                 Profile * profile = ProfileManager::get()->getProfileByID(friends[i]);
-                 Profile::RelationInfo * relation_info = profile->getRelationInfo();
-                 if( relation_info->isOnline() )
-                 {
-                     if (!now_online)
-                     {
-                         relation_info->setOnline(false);
-                         went_offline = true;
-                     }
-                 }
-                 else
-                 {
-                     if (now_online)
-                     {
-                         relation_info->setOnline(true);
-                         to_notify.push_back(profile->getUserName());
-                     }
-                 }
-
+                    else if(to_notify.size() == 2)
+                    {
+                        message = to_notify[0] + irr::core::stringw(_(" and ")) + to_notify[1] + irr::core::stringw(_(" are now online."));
+                    }
+                    else if(to_notify.size() == 3)
+                    {
+                        message = to_notify[0] + irr::core::stringw(_(", ")) + to_notify[1] + irr::core::stringw(_(" and ")) + to_notify[2] + irr::core::stringw(_(" are now online."));
+                    }
+                    else if(to_notify.size() > 3)
+                    {
+                        message = StringUtils::toWString(to_notify.size()) + irr::core::stringw(_(" friends are now online."));
+                    }
+                    GUIEngine::DialogQueue::get()->pushDialog( new NotificationDialog(NotificationDialog::T_Friends, message), false);
+                    OnlineProfileFriends::getInstance()->refreshFriendsList();
+                }
+                else if(went_offline)
+                {
+                    OnlineProfileFriends::getInstance()->refreshFriendsList();
+                }
             }
-
-            if(to_notify.size() > 0)
+            int friend_request_count = 0;
+            for(unsigned int i = 0; i < m_result->getNumNodes(); i++)
+            {
+                const XMLNode * node = m_result->getNode(i);
+                if(node->getName() == "new_friend_request")
+                {
+                    Profile::RelationInfo * ri = new Profile::RelationInfo("New", false, true, true);
+                    Profile * p = new Profile(node);
+                    p->setRelationInfo(ri);
+                    ProfileManager::get()->addPersistent(p);
+                }
+            }
+            if(friend_request_count > 0)
             {
                 irr::core::stringw message("");
-                if(to_notify.size() == 1)
+                if(friend_request_count > 1)
                 {
-                    message = to_notify[0] + irr::core::stringw(_(" is now online."));
+                    message = irr::core::stringw(_("You have ")) + StringUtils::toWString(friend_request_count) + irr::core::stringw(_(" new friend requests!."));
                 }
-                else if(to_notify.size() == 2)
+                else
                 {
-                    message = to_notify[0] + irr::core::stringw(_(" and ")) + to_notify[1] + irr::core::stringw(_(" are now online."));
+                    message = _("You have a new friend request!.");
                 }
-                else if(to_notify.size() == 3)
-                {
-                    message = to_notify[0] + irr::core::stringw(_(", ")) + to_notify[1] + irr::core::stringw(_(" and ")) + to_notify[2] + irr::core::stringw(_(" are now online."));
-                }
-                else if(to_notify.size() > 3)
-                {
-                    message = StringUtils::toWString(to_notify.size()) + irr::core::stringw(_(" friends are now online."));
-                }
-                GUIEngine::DialogQueue::get()->pushDialog( new MessageDialog(message, true), false);
-                OnlineProfileFriends::getInstance()->refreshFriendsList();
-            }
-            else if(went_offline)
-            {
+                GUIEngine::DialogQueue::get()->pushDialog( new NotificationDialog(NotificationDialog::T_Friends, message), false);
                 OnlineProfileFriends::getInstance()->refreshFriendsList();
             }
         }
