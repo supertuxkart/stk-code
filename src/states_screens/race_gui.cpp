@@ -169,6 +169,8 @@ void RaceGUI::renderGlobal(float dt)
     {
         drawGlobalReadySetGo();
     }
+	if(world->getPhase() == World::GOAL_PHASE)
+			drawGlobalGoal();
 
     // Timer etc. are not displayed unless the game is actually started.
     if(!world->isRacePhase()) return;
@@ -264,14 +266,12 @@ void RaceGUI::drawScores()
 		irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source,
 			NULL, NULL, true);
 		core::stringw score = StringUtils::toWString(soccerWorld->getScore(i));
-		int stringWidth =
-			GUIEngine::getFont()->getDimension(score.c_str()).Width;
-		int stringHeight =
+		int string_height =
 			GUIEngine::getFont()->getDimension(score.c_str()).Height;
 		core::recti pos(position.UpperLeftCorner.X + 5,
 						position.LowerRightCorner.Y + offsetY,
 						position.LowerRightCorner.X,
-						position.LowerRightCorner.Y + stringHeight);
+						position.LowerRightCorner.Y + string_height);
 
 		font->draw(score.c_str(),pos,color);
 		offsetX += position.LowerRightCorner.X;
