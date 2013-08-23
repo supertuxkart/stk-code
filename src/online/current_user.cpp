@@ -535,6 +535,7 @@ namespace Online{
                          if (now_online)
                          {
                              relation_info->setOnline(true);
+                             profile->setFriend();
                              to_notify.push_back(profile->getUserName());
                          }
                      }

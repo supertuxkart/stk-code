@@ -48,7 +48,8 @@ namespace Online{
     void Profile::RelationInfo::setOnline(bool online)
     {
         m_is_online = online;
-        m_is_pending = false;
+        if(m_is_online)
+            m_is_pending = false;
     }
 
     // ============================================================================
