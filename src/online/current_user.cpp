@@ -590,7 +590,7 @@ namespace Online{
                 }
                 else
                 {
-                    message = _("You have a new friend request!.");
+                    message = _("You have a new friend request!");
                 }
                 GUIEngine::DialogQueue::get()->pushDialog( new NotificationDialog(NotificationDialog::T_Friends, message), false);
                 OnlineProfileFriends::getInstance()->refreshFriendsList();

@@ -136,12 +136,14 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
         {
             ProfileManager::get()->setVisiting(m_profile->getID());
             m_enter_profile = true;
+            m_options_widget->setDeactivated();
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == m_friend_widget->m_properties[PROP_ID])
         {
             CurrentUser::get()->requestFriendRequest(m_profile->getID());
             m_processing = true;
+            m_options_widget->setDeactivated();
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == m_remove_widget->m_properties[PROP_ID])
@@ -151,18 +153,21 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
             else
                 CurrentUser::get()->requestRemoveFriend(m_profile->getID());
             m_processing = true;
+            m_options_widget->setDeactivated();
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == m_accept_widget->m_properties[PROP_ID])
         {
             CurrentUser::get()->requestAcceptFriend(m_profile->getID());
             m_processing = true;
+            m_options_widget->setDeactivated();
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == m_decline_widget->m_properties[PROP_ID])
         {
             CurrentUser::get()->requestDeclineFriend(m_profile->getID());
             m_processing = true;
+            m_options_widget->setDeactivated();
             return GUIEngine::EVENT_BLOCK;
         }
     }
