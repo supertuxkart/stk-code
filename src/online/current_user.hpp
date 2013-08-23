@@ -102,6 +102,18 @@ namespace Online{
                 DeclineFriendRequest() : XMLRequest(true) {}
             };
 
+            class RemoveFriendRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                RemoveFriendRequest() : XMLRequest(true) {}
+            };
+
+            class CancelFriendRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                CancelFriendRequest() : XMLRequest(true) {}
+            };
+
             class PollRequest : public XMLRequest {
                 virtual void callback ();
             public:
@@ -156,6 +168,8 @@ namespace Online{
             void                            requestFriendRequest(const uint32_t friend_id) const;
             void                            requestAcceptFriend(const uint32_t friend_id) const;
             void                            requestDeclineFriend(const uint32_t friend_id) const;
+            void                            requestRemoveFriend(const uint32_t friend_id) const;
+            void                            requestCancelFriend(const uint32_t friend_id) const;
 
             const XMLRequest *              requestUserSearch(const irr::core::stringw & search_string) const;
 

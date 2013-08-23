@@ -406,6 +406,72 @@ namespace Online{
         GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!m_success, true), true);
 
     }
+
+    // ============================================================================
+
+    void CurrentUser::requestCancelFriend(const uint32_t friend_id) const
+    {
+        assert(isRegisteredUser());
+        CurrentUser::CancelFriendRequest * request = new CurrentUser::CancelFriendRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("cancel-friend-request"));
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getID());
+        request->setParameter("friendid", friend_id);
+        HTTPManager::get()->addRequest(request);
+    }
+
+    void CurrentUser::CancelFriendRequest::callback()
+    {
+        uint32_t id(0);
+        m_result->get("friendid", &id);
+        irr::core::stringw info_text("");
+        if(m_success)
+        {
+            CurrentUser::get()->getProfile()->removeFriend(id);
+            ProfileManager::get()->moveToCache(id);
+            ProfileManager::get()->getProfileByID(id)->deleteRelationalInfo();
+            OnlineProfileFriends::getInstance()->refreshFriendsList();
+            info_text = _("Friend request cancelled!");
+        }
+        else
+            info_text = m_info;
+        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!m_success, true), true);
+
+    }
+
+    // ============================================================================
+
+    void CurrentUser::requestRemoveFriend(const uint32_t friend_id) const
+    {
+        assert(isRegisteredUser());
+        CurrentUser::RemoveFriendRequest * request = new CurrentUser::RemoveFriendRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("remove-friend-request"));
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getID());
+        request->setParameter("friendid", friend_id);
+        HTTPManager::get()->addRequest(request);
+    }
+
+    void CurrentUser::RemoveFriendRequest::callback()
+    {
+        uint32_t id(0);
+        m_result->get("friendid", &id);
+        irr::core::stringw info_text("");
+        if(m_success)
+        {
+            CurrentUser::get()->getProfile()->removeFriend(id);
+            ProfileManager::get()->moveToCache(id);
+            ProfileManager::get()->getProfileByID(id)->deleteRelationalInfo();
+            OnlineProfileFriends::getInstance()->refreshFriendsList();
+            info_text = _("Friend removed!");
+        }
+        else
+            info_text = m_info;
+        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!m_success, true), true);
+
+    }
     // ============================================================================
     void CurrentUser::requestPoll()
     {

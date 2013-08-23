@@ -47,6 +47,8 @@ void UserInfoDialog::load()
     loadFromFile("online/user_info_dialog.stkgui");
     if(m_error)
         m_info_widget->setErrorColor();
+    m_name_widget->setText(m_profile->getUserName(),false);
+    m_info_widget->setText(m_info, false);
 }
 
 void UserInfoDialog::beforeAddingWidgets()
@@ -57,12 +59,13 @@ void UserInfoDialog::beforeAddingWidgets()
     m_processing = false;
     m_name_widget = getWidget<LabelWidget>("name");
     assert(m_name_widget != NULL);
-    m_name_widget->setText(m_profile->getUserName(),false);
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
-    m_info_widget->setText(m_info, false);
+
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
+    m_remove_widget = getWidget<IconButtonWidget>("remove");
+    assert(m_remove_widget != NULL);
     m_friend_widget = getWidget<IconButtonWidget>("friend");
     assert(m_friend_widget != NULL);
     m_accept_widget = getWidget<IconButtonWidget>("accept");
@@ -77,20 +80,35 @@ void UserInfoDialog::beforeAddingWidgets()
 
     m_accept_widget->setVisible(false);
     m_decline_widget->setVisible(false);
-    if(m_profile->isFriend() || m_profile->isCurrentUser())
+    m_remove_widget->setVisible(false);
+    if(m_profile->isCurrentUser())
+    {
         m_friend_widget->setVisible(false);
+    }
+    if(m_profile->isFriend())
+    {
+        m_friend_widget->setVisible(false);
+        m_remove_widget->setVisible(true);
+    }
 
     Profile::RelationInfo * relation_info = m_profile->getRelationInfo();
     if(relation_info != NULL)
     {
-        if(relation_info->isPending() && relation_info->isAsker())
-        {
-            m_accept_widget->setVisible(true);
-            m_decline_widget->setVisible(true);
-        }
-
         if(relation_info->isPending())
+        {
             m_friend_widget->setVisible(false);
+            if(relation_info->isAsker())
+            {
+                m_accept_widget->setVisible(true);
+                m_decline_widget->setVisible(true);
+            }
+            else
+            {
+                m_remove_widget->setVisible(true);
+                m_remove_widget->setLabel("Cancel");
+                //FIXME set text to cancel?
+            }
+        }
     }
 
 }
@@ -123,6 +141,15 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
         else if(selection == m_friend_widget->m_properties[PROP_ID])
         {
             CurrentUser::get()->requestFriendRequest(m_profile->getID());
+            m_processing = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if(selection == m_remove_widget->m_properties[PROP_ID])
+        {
+            if(m_profile->getRelationInfo()->isPending())
+                CurrentUser::get()->requestCancelFriend(m_profile->getID());
+            else
+                CurrentUser::get()->requestRemoveFriend(m_profile->getID());
             m_processing = true;
             return GUIEngine::EVENT_BLOCK;
         }
