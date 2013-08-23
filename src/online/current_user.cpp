@@ -66,7 +66,7 @@ namespace Online{
     const XMLRequest * CurrentUser::requestRecovery(    const irr::core::stringw &username,
                                                         const irr::core::stringw &email)
     {
-        assert(getUserState() == US_SIGNED_OUT || getUserState() == US_GUEST);
+        assert(m_state == US_SIGNED_OUT || m_state == US_GUEST);
         XMLRequest * request = new XMLRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("recovery"));
@@ -83,7 +83,7 @@ namespace Online{
                                                     const irr::core::stringw &email,
                                                     bool terms)
     {
-        assert(getUserState() == US_SIGNED_OUT || getUserState() == US_GUEST);
+        assert(m_state == US_SIGNED_OUT || m_state == US_GUEST);
         XMLRequest * request = new XMLRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("register"));
@@ -100,7 +100,7 @@ namespace Online{
     void CurrentUser::requestSavedSession()
     {
         SignInRequest * request = NULL;
-        if(getUserState() != US_SIGNED_IN  && UserConfigParams::m_saved_session)
+        if(m_state != US_SIGNED_IN  && UserConfigParams::m_saved_session)
         {
             request = new SignInRequest(true);
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
@@ -108,7 +108,7 @@ namespace Online{
             request->setParameter("userid", UserConfigParams::m_saved_user);
             request->setParameter("token", UserConfigParams::m_saved_token.c_str());
             HTTPManager::get()->addRequest(request);
-            setUserState (US_SIGNING_IN);
+            m_state = US_SIGNING_IN;
         }
     }
 
@@ -116,8 +116,8 @@ namespace Online{
                                                                 const irr::core::stringw &password,
                                                                 bool save_session, bool request_now)
     {
-        assert(getUserState() == US_SIGNED_OUT);
-        setSaveSession(save_session);
+        assert(m_state == US_SIGNED_OUT);
+        m_save_session = save_session;
         SignInRequest * request = new SignInRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",std::string("connect"));
@@ -126,7 +126,7 @@ namespace Online{
         if (request_now)
         {
             HTTPManager::get()->addRequest(request);
-            setUserState (US_SIGNING_IN);
+            m_state = US_SIGNING_IN;
         }
         return request;
     }
@@ -156,7 +156,7 @@ namespace Online{
             HTTPManager::get()->startPolling();
         }
         else
-            setUserState (US_SIGNED_OUT);
+            m_state = US_SIGNED_OUT;
     }
 
     void CurrentUser::SignInRequest::callback()
@@ -169,7 +169,7 @@ namespace Online{
     const CurrentUser::ServerCreationRequest * CurrentUser::requestServerCreation(  const irr::core::stringw &name,
                                                                                     int max_players)
     {
-        assert(getUserState() == US_SIGNED_IN);
+        assert(m_state == US_SIGNED_IN);
         ServerCreationRequest * request = new ServerCreationRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",           std::string("create_server"));
@@ -193,14 +193,14 @@ namespace Online{
 
     // ============================================================================
     const CurrentUser::SignOutRequest * CurrentUser::requestSignOut(){
-        assert(getUserState() == US_SIGNED_IN || getUserState() == US_GUEST);
+        assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
         SignOutRequest * request = new SignOutRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",std::string("disconnect"));
         request->setParameter("token", getToken());
         request->setParameter("userid", getID());
         HTTPManager::get()->addRequest(request);
-        setUserState (US_SIGNING_OUT);
+        m_state = US_SIGNING_OUT;
         HTTPManager::get()->stopPolling();
         return request;
     }
@@ -214,7 +214,7 @@ namespace Online{
         setToken("");
         ProfileManager::get()->clearPersistent();
         m_profile = NULL;
-        setUserState (US_SIGNED_OUT);
+        m_state = US_SIGNED_OUT;
         UserConfigParams::m_saved_user = 0;
         UserConfigParams::m_saved_token = "";
         UserConfigParams::m_saved_session = false;
@@ -230,7 +230,7 @@ namespace Online{
     CurrentUser::ServerJoinRequest *  CurrentUser::requestServerJoin(uint32_t server_id,
                                                                     bool request_now)
     {
-        assert(getUserState() == US_SIGNED_IN || getUserState() == US_GUEST);
+        assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
         ServerJoinRequest * request = new ServerJoinRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
         request->setParameter("action",std::string("request-connection"));
@@ -244,7 +244,7 @@ namespace Online{
 
     void CurrentUser::ServerJoinRequest::callback()
     {
-        if(isSuccess())
+        if(m_success)
         {
             uint32_t server_id;
             m_result->get("serverid", &server_id);
@@ -257,7 +257,7 @@ namespace Online{
 
     const XMLRequest * CurrentUser::requestGetAddonVote( const std::string & addon_id) const
     {
-        assert(isRegisteredUser());
+        assert(m_state == US_SIGNED_IN);
         XMLRequest * request = new XMLRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("get-addon-vote"));
@@ -272,7 +272,7 @@ namespace Online{
 
     const XMLRequest * CurrentUser::requestUserSearch( const irr::core::stringw & search_string) const
     {
-        assert(isRegisteredUser());
+        assert(m_state == US_SIGNED_IN);
         XMLRequest * request = new XMLRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("user-search"));
@@ -287,7 +287,7 @@ namespace Online{
 
     const CurrentUser::SetAddonVoteRequest * CurrentUser::requestSetAddonVote( const std::string & addon_id, float rating) const
     {
-        assert(isRegisteredUser());
+        assert(m_state == US_SIGNED_IN);
         CurrentUser::SetAddonVoteRequest * request = new CurrentUser::SetAddonVoteRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("set-addon-vote"));
@@ -315,7 +315,7 @@ namespace Online{
 
     void CurrentUser::requestFriendRequest(const uint32_t friend_id) const
     {
-        assert(isRegisteredUser());
+        assert(m_state == US_SIGNED_IN);
         CurrentUser::FriendRequest * request = new CurrentUser::FriendRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("friend-request"));
@@ -346,7 +346,7 @@ namespace Online{
 
     void CurrentUser::requestAcceptFriend(const uint32_t friend_id) const
     {
-        assert(isRegisteredUser());
+        assert(m_state == US_SIGNED_IN);
         CurrentUser::AcceptFriendRequest * request = new CurrentUser::AcceptFriendRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("accept-friend-request"));
@@ -378,7 +378,7 @@ namespace Online{
 
     void CurrentUser::requestDeclineFriend(const uint32_t friend_id) const
     {
-        assert(isRegisteredUser());
+        assert(m_state == US_SIGNED_IN);
         CurrentUser::DeclineFriendRequest * request = new CurrentUser::DeclineFriendRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("decline-friend-request"));
@@ -411,7 +411,7 @@ namespace Online{
 
     void CurrentUser::requestCancelFriend(const uint32_t friend_id) const
     {
-        assert(isRegisteredUser());
+        assert(m_state == US_SIGNED_IN);
         CurrentUser::CancelFriendRequest * request = new CurrentUser::CancelFriendRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("cancel-friend-request"));
@@ -444,7 +444,7 @@ namespace Online{
 
     void CurrentUser::requestRemoveFriend(const uint32_t friend_id) const
     {
-        assert(isRegisteredUser());
+        assert(m_state == US_SIGNED_IN);
         CurrentUser::RemoveFriendRequest * request = new CurrentUser::RemoveFriendRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("remove-friend-request"));
@@ -475,7 +475,7 @@ namespace Online{
     // ============================================================================
     void CurrentUser::requestPoll()
     {
-        assert(isRegisteredUser());
+        assert(m_state == US_SIGNED_IN);
         CurrentUser::PollRequest * request = new CurrentUser::PollRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("poll"));
@@ -604,7 +604,7 @@ namespace Online{
     // ============================================================================
     irr::core::stringw CurrentUser::getUserName() const
     {
-        if((getUserState() == US_SIGNED_IN ) || (getUserState() == US_GUEST))
+        if((m_state == US_SIGNED_IN ) || (m_state == US_GUEST))
         {
             assert(m_profile != NULL);
             return m_profile->getUserName();
@@ -615,7 +615,7 @@ namespace Online{
     // ============================================================================
     uint32_t CurrentUser::getID() const
     {
-        if((getUserState() == US_SIGNED_IN ))
+        if((m_state == US_SIGNED_IN ))
         {
             assert(m_profile != NULL);
             return m_profile->getID();

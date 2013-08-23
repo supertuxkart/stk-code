@@ -49,6 +49,8 @@ void UserInfoDialog::load()
         m_info_widget->setErrorColor();
     m_name_widget->setText(m_profile->getUserName(),false);
     m_info_widget->setText(m_info, false);
+    if(m_remove_widget->isVisible() && !m_profile->isFriend())
+        m_remove_widget->setLabel("Cancel Request");
 }
 
 void UserInfoDialog::beforeAddingWidgets()
@@ -105,8 +107,6 @@ void UserInfoDialog::beforeAddingWidgets()
             else
             {
                 m_remove_widget->setVisible(true);
-                m_remove_widget->setLabel("Cancel");
-                //FIXME set text to cancel?
             }
         }
     }
