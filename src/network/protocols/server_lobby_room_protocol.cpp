@@ -226,20 +226,19 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
         // calculate karts ranks :
         int num_players = race_manager->getNumberOfKarts();
         std::vector<int> karts_results;
+        std::vector<float> karts_times;
         for (int j = 0; j < num_players; j++)
         {
-            float lowest_time = race_manager->getKartRaceTime(0);
-            int lowest_index = 0;
-            for (int i = 0; i < num_players; i++)
+            float kart_time = race_manager->getKartRaceTime(j);
+            for (int i = 0; i < karts_times.size(); i++)
             {
-                float time = race_manager->getKartRaceTime(i);
-                if (time < lowest_time)
+                if (kart_time < karts_times[i])
                 {
-                    lowest_time = time;
-                    lowest_index = i;
+                    karts_times.insert(karts_times.begin()+i, kart_time);
+                    karts_results.insert(karts_results.begin()+i, j);
+                    break;
                 }
             }
-            karts_results.push_back(lowest_index);
         }
 
         std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
@@ -247,7 +246,8 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
         NetworkString queue;
         for (unsigned int i = 0; i < karts_results.size(); i++)
         {
-            queue.ai8(1).ai8(karts_results[i]); // position is i+1
+            queue.ai8(1).ai8(karts_results[i]); // kart pos = i+1
+            Log::info("ServerLobbyRoomProtocol", "Kart %d finished #%d", karts_results[i], i+1);
         }
         for (unsigned int i = 0; i < peers.size(); i++)
         {
