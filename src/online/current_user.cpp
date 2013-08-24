@@ -447,7 +447,7 @@ namespace Online{
         assert(m_state == US_SIGNED_IN);
         CurrentUser::RemoveFriendRequest * request = new CurrentUser::RemoveFriendRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-        request->setParameter("action", std::string("remove-friend-request"));
+        request->setParameter("action", std::string("remove-friend"));
         request->setParameter("token", getToken());
         request->setParameter("userid", getID());
         request->setParameter("friendid", friend_id);
