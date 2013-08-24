@@ -102,6 +102,45 @@ public:
 };   // GroupUserConfigParam
 
 // ============================================================================
+template<typename T>
+class ListUserConfigParam : public UserConfigParam
+{
+    std::vector<T> m_elements;
+
+public:
+    ListUserConfigParam(const char* param_name,
+                         const char* comment = NULL);
+    ListUserConfigParam(const char* param_name,
+                         const char* comment,
+                         int nb_elts,
+                         ...);
+    ListUserConfigParam(const char* param_name,
+                         GroupUserConfigParam* group,
+                         const char* comment = NULL);
+    ListUserConfigParam(const char* param_name,
+                         GroupUserConfigParam* group,
+                         const char* comment,
+                         int nb_elts,
+                         ...);
+
+    void write(XMLWriter& stream) const;
+    void findYourDataInAChildOf(const XMLNode* node);
+    void findYourDataInAnAttributeOf(const XMLNode* node);
+
+    void addElement(T element);
+
+    irr::core::stringw toString() const;
+
+    operator std::vector<T>() const
+            { return m_elements; }
+    float& operator=(const std::vector<T>& v)
+            { m_elements = std::vector<T>(v); return m_elements; }
+    float& operator=(const ListUserConfigParam& v)
+            { m_elements = std::vector<T>(v); return m_elements; }
+};   // ListUserConfigParam
+typedef ListUserConfigParam<char*>    StringListUserConfigParam;
+
+// ============================================================================
 class IntUserConfigParam : public UserConfigParam
 {
     int m_value;
@@ -490,12 +529,40 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_server_port
             PARAM_DEFAULT(  IntUserConfigParam(7321, "server_port",
                                        "Information about the port to listen on.") );
-                                       
+
     PARAM_PREFIX IntUserConfigParam         m_server_max_players
             PARAM_DEFAULT(  IntUserConfigParam(16, "server_max_players",
                                        "Maximum number of players on the server.") );
-    
-    
+
+    PARAM_PREFIX StringListUserConfigParam         m_stun_servers
+            PARAM_DEFAULT(  StringListUserConfigParam("Stun_servers", "The stun servers"
+                            " that will be used to know the public address.",
+                            24,
+                            "provserver.televolution.net",
+                            "sip1.lakedestiny.cordiaip.com",
+                            "stun1.voiceeclipse.net",
+                            "stun01.sipphone.com",
+                            "stun.callwithus.com",
+                            "stun.counterpath.net",
+                            "stun.endigovoip.com",
+                            "stun.ekiga.net",
+                            "stun.ideasip.com" ,
+                            "stun.internetcalls.com",
+                            "stun.ipns.com",
+                            "stun.noc.ams-ix.net",
+                            "stun.phonepower.com",
+                            "stun.phoneserve.com",
+                            "stun.rnktel.com",
+                            "stun.softjoys.com",
+                            "stunserver.org",
+                            "stun.sipgate.net",
+                            "stun.stunprotocol.org",
+                            "stun.voip.aebc.com",
+                            "stun.voipbuster.com",
+                            "stun.voxalot.com",
+                            "stun.voxgratia.org",
+                            "stun.xten.com") );
+
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
             PARAM_DEFAULT( GroupUserConfigParam("GFX",

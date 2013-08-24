@@ -180,6 +180,162 @@ void GroupUserConfigParam::addChild(UserConfigParam* child)
 
 
 // ============================================================================
+template<typename T>
+ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
+                                           const char* comment)
+{
+    m_param_name = param_name;
+    all_params.push_back(this);
+    if(comment != NULL) m_comment = comment;
+}   // ListUserConfigParam
+
+// ============================================================================
+template<typename T>
+ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
+                                           const char* comment,
+                                           int nb_elements,
+                                           ...)
+{
+    m_param_name = param_name;
+    all_params.push_back(this);
+    if(comment != NULL) m_comment = comment;
+
+    // add the default list
+    va_list arguments;
+    va_start ( arguments, nb_elements );
+    for ( int i = 0; i < nb_elements; i++ )
+        m_elements.push_back(va_arg ( arguments, T ));
+    va_end ( arguments );                  // Cleans up the list
+}   // ListUserConfigParam
+
+// ============================================================================
+template<typename T>
+ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
+                                           GroupUserConfigParam* group,
+                                           const char* comment)
+{
+    m_param_name = param_name;
+    group->addChild(this);
+    if(comment != NULL) m_comment = comment;
+}   // ListUserConfigParam
+
+// ============================================================================
+template<typename T>
+ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
+                                           GroupUserConfigParam* group,
+                                           const char* comment,
+                                           int nb_elements,
+                                           ...)
+{
+    m_param_name = param_name;
+    group->addChild(this);
+    if(comment != NULL) m_comment = comment;
+
+    // add the default list
+    va_list arguments;
+    va_start ( arguments, nb_elements );
+    for ( int i = 0; i < nb_elements; i++ )
+        m_elements.push_back(va_arg ( arguments, T ));
+    va_end ( arguments );                  // Cleans up the list
+}   // ListUserConfigParam
+
+// ----------------------------------------------------------------------------
+template<typename T>
+void ListUserConfigParam<T>::write(XMLWriter& stream) const
+{
+    const int elts_amount = m_elements.size();
+
+    // comment
+    if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str();
+    stream << L" -->\n    <" << m_param_name.c_str() << "\n";
+
+    stream << L"        Size=\"" << elts_amount << "\"\n";
+    // actual elements
+    for (int n=0; n<elts_amount; n++)
+    {
+        stream << L"        " << n << "=\"" << m_elements[n] << "\"\n";
+    }
+    stream << L"    >\n";
+    stream << L"    </" << m_param_name.c_str() << ">\n\n";
+}   // write
+
+// ----------------------------------------------------------------------------
+
+// Write your own convert function depending on the type of list you use.
+void convert(std::string str, char** str2)
+{
+    *str2 = (char*)(malloc(str.size()+1));
+    strcpy(*str2, str.c_str());
+}
+// Write your own equals function depending on the type of list you use.
+bool equals(char* str1, char* str2)
+{
+    return (strcmp(str1, str2) == 0);
+}
+
+template<typename T>
+void ListUserConfigParam<T>::findYourDataInAChildOf(const XMLNode* node)
+{
+    const XMLNode* child = node->getNode( m_param_name );
+    if (child == NULL)
+    {
+        //std::cerr << "/!\\ User Config : Couldn't find parameter group "
+        //          << paramName << std::endl;
+        return;
+    }
+
+    int attr_count = 0;
+    child->get( "Size", &attr_count);
+    for (int n=0; n<attr_count; n++)
+    {
+        T elt;
+        std::ostringstream oss;
+        oss << n;
+        std::string str;
+        child->get( oss.str(), &str);
+        convert(str, &elt);
+        // check if the element is already there :
+        bool there = false;
+        for (unsigned int i = 0; i < m_elements.size(); i++)
+        {
+            if (equals(m_elements[i], elt))
+            {
+                there = true;
+                break;
+            }
+        }
+        if (!there)
+        {
+            Log::info("ListUserConfigParam", "New data : %s, \"%s\"", str.c_str(), elt);
+            m_elements.push_back(elt);
+        }
+    }
+
+}   // findYourDataInAChildOf
+
+// ----------------------------------------------------------------------------
+template<typename T>
+void ListUserConfigParam<T>::findYourDataInAnAttributeOf(const XMLNode* node)
+{
+}   // findYourDataInAnAttributeOf
+
+// ----------------------------------------------------------------------------
+template<typename T>
+void ListUserConfigParam<T>::addElement(T element)
+{
+    m_elements.push_back(element);
+}   // findYourDataInAnAttributeOf
+
+// ----------------------------------------------------------------------------
+template<typename T>
+irr::core::stringw ListUserConfigParam<T>::toString() const
+{
+    return "";
+}   // toString
+
+
+
+// ============================================================================
 IntUserConfigParam::IntUserConfigParam(int default_value,
                                        const char* param_name,
                                        const char* comment)

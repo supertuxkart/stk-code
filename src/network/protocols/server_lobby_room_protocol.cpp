@@ -281,6 +281,9 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
 
         // notify the network world that it is stopped
         NetworkWorld::getInstance()->stop();
+        // exit the race now
+        race_manager->exitRace();
+        race_manager->setAIKartOverride("");
     }
     else
     {

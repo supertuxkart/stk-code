@@ -94,7 +94,6 @@ void StartGameProtocol::update()
         m_listener->requestStart(new SynchronizationProtocol());
         Log::info("StartGameProtocol", "SynchronizationProtocol started.");
         // race startup sequence
-
         NetworkWorld::getInstance<NetworkWorld>()->start(); // builds it and starts
         race_manager->setNumKarts(m_game_setup->getPlayerCount());
         race_manager->setNumPlayers(m_game_setup->getPlayerCount());
