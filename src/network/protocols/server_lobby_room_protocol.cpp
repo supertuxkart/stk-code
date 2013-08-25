@@ -224,7 +224,7 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
     if (NetworkWorld::getInstance()->isRaceOver())
     {
         // calculate karts ranks :
-        int num_players = race_manager->getNumberOfKarts();
+        unsigned int num_players = race_manager->getNumberOfKarts();
         std::vector<int> karts_results;
         std::vector<float> karts_times;
         for (int j = 0; j < num_players; j++)
