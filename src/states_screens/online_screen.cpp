@@ -181,11 +181,11 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     if (ribbon == NULL) return;
     std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-    if (selection == "sign_in")
+    if (selection == m_sign_in_widget->m_properties[PROP_ID])
     {
         new LoginDialog(LoginDialog::Normal);
     }
-    else if (selection == "sign_out")
+    else if (selection == m_sign_out_widget->m_properties[PROP_ID])
     {
         CurrentUser::get()->requestSignOut();
     }
@@ -194,19 +194,19 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
         ProfileManager::get()->setVisiting(CurrentUser::get()->getID());
         StateManager::get()->pushScreen(OnlineProfileOverview::getInstance());
     }
-    else if (selection == "register")
+    else if (selection == m_register_widget->m_properties[PROP_ID])
     {
         new RegistrationDialog();
     }
-    else if (selection == "find_server")
+    else if (selection == m_find_server_widget->m_properties[PROP_ID])
     {
         StateManager::get()->pushScreen(ServerSelection::getInstance());
     }
-    else if (selection == "create_server")
+    else if (selection == m_create_server_widget->m_properties[PROP_ID])
     {
         StateManager::get()->pushScreen(CreateServerScreen::getInstance());
     }
-    else if (selection == "quick_play")
+    else if (selection == m_quick_play_widget->m_properties[PROP_ID])
     {
         //FIXME temporary and the request join + join sequence should be placed in one method somewhere
         // refresh server list

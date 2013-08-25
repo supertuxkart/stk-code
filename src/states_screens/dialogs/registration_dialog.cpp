@@ -40,7 +40,7 @@ RegistrationDialog::RegistrationDialog() :
 {
     m_sign_up_request = NULL;
     m_self_destroy = false;
-    m_show_registration_input = true;
+    m_show_registration_input = false;
     m_show_registration_terms = false;
     m_show_registration_info = false;
     m_username = "";
@@ -49,6 +49,7 @@ RegistrationDialog::RegistrationDialog() :
     m_password = "";
     m_password_confirm = "";
     m_agreement = false;
+    showRegistrationInput();
 }
 
 // -----------------------------------------------------------------------------
@@ -62,8 +63,9 @@ RegistrationDialog::~RegistrationDialog()
 
 void RegistrationDialog::showRegistrationInput()
 {
+    if(isInited())
+        clearWindow();
     m_show_registration_input = false;
-    clearWindow();
     m_phase = Input;
     loadFromFile("online/registration_input.stkgui");
 
@@ -110,7 +112,8 @@ void RegistrationDialog::showRegistrationInput()
 void RegistrationDialog::showRegistrationTerms()
 {
     m_show_registration_terms = false;
-    clearWindow();
+    if(isInited())
+        clearWindow();
     m_phase = Terms;
     loadFromFile("online/registration_terms.stkgui");
 
@@ -154,7 +157,8 @@ void RegistrationDialog::showRegistrationTerms()
 void RegistrationDialog::showRegistrationInfo()
 {
     m_show_registration_info = false;
-    clearWindow();
+    if(isInited())
+        clearWindow();
     m_phase = Info;
     loadFromFile("online/registration_info.stkgui");
 
