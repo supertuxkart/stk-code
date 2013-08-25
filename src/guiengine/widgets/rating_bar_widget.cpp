@@ -19,12 +19,21 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/rating_bar_widget.hpp"
 #include "utils/string_utils.hpp"
-#include <string.h>
 
 #include <IGUIEnvironment.h>
 #include <IGUIElement.h>
 #include <IGUIButton.h>
 #include <cmath>
+
+#ifdef WIN32
+// VS up to and including VS 2012 do not provide the normal round function
+static inline double round(double val)
+{    
+    return floor(val + 0.5);
+}
+#endif
+
+#include <string.h>
 
 using namespace GUIEngine;
 using namespace irr::core;
