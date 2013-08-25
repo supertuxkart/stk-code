@@ -25,6 +25,9 @@
 #include <IGUIElement.h>
 #include <IGUIButton.h>
 #include <cmath>
+#ifndef round
+#  define round(x)  (floor(x+0.5f))
+#endif
 
 using namespace GUIEngine;
 using namespace irr::core;
