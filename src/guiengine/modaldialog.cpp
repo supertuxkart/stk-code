@@ -86,6 +86,7 @@ void ModalDialog::loadFromFile(const char* xmlFile)
 
 void ModalDialog::doInit()
 {
+    if(m_init) return;
     m_init = true;
     pointer_was_shown = irr_driver->isPointerShown();
     irr_driver->showPointer();
