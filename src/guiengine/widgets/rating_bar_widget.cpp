@@ -27,9 +27,9 @@
 
 #ifdef WIN32
 // VS up to and including VS 2012 do not provide the normal round function
-static inline double round(double val)
+static inline float round(float val)
 {    
-    return floor(val + 0.5);
+    return floor(val + 0.5f);
 }
 #endif
 
@@ -87,7 +87,7 @@ void RatingBarWidget::setStepValues(float float_rating)
             m_star_values[star] = m_steps-1;
         else
         {
-            m_star_values[star] = round((float_rating * (m_steps-1)) - (star*(m_steps-1)));
+            m_star_values[star] =(int)round((float_rating * (m_steps-1)) - (star*(m_steps-1)));
         }
     }
 }
