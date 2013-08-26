@@ -503,23 +503,19 @@ namespace Online{
                 std::vector<irr::core::stringw> to_notify;
                 for(unsigned int i = 0; i < friends.size(); ++i)
                 {
+                     bool now_online = false;
                      std::vector<uint32_t>::iterator iter;
                      for (iter = online_friends.begin(); iter != online_friends.end();)
                      {
                         if (*iter == friends[i])
                         {
-                            online_friends.erase(iter--);
+                            now_online = true;
+                            online_friends.erase(iter++);
                             break;
                         }
                         else
                             ++iter;
                      }
-                     bool now_online = false;
-                     if(iter != online_friends.end())
-                     {
-                         now_online = true;
-                     }
-
                      Profile * profile = ProfileManager::get()->getProfileByID(friends[i]);
                      Profile::RelationInfo * relation_info = profile->getRelationInfo();
                      if( relation_info->isOnline() )
