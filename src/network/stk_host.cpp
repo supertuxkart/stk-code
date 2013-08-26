@@ -190,7 +190,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
     }
     struct sockaddr_in *sin = (struct sockaddr_in *) (&addr);
     // we received the data
-    sender->ip = turnEndianness(sin->sin_addr.s_addr);
+    sender->ip = turnEndianness((uint32_t)(sin->sin_addr.s_addr));
     sender->port = turnEndianness(sin->sin_port);
 
     if (addr.sa_family == AF_INET)
