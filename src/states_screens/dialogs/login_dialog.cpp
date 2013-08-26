@@ -43,7 +43,6 @@ LoginDialog::LoginDialog(const Message message_type, const LoginDialog::Listener
     m_self_destroy = false;
     m_open_registration_dialog = false;
     m_open_recovery_dialog = false;
-    m_success = false;
     m_sign_in_request = NULL;
     loadFromFile("online/login_dialog.stkgui");
 
@@ -180,13 +179,14 @@ bool LoginDialog::onEscapePressed()
 
 void LoginDialog::onUpdate(float dt)
 {
+    bool success = false;
     if(m_sign_in_request != NULL)
     {
         if(m_sign_in_request->isDone())
         {
             if(m_sign_in_request->isSuccess())
             {
-                m_success = true;
+                success = true;
             }
             else
             {
@@ -205,18 +205,23 @@ void LoginDialog::onUpdate(float dt)
         }
     }
     //If we want to open another dialog, we need to close this one first
-    (m_open_registration_dialog || m_open_recovery_dialog || m_success) && (m_self_destroy = true);
+    m_self_destroy = m_open_registration_dialog || m_open_recovery_dialog || success;
 
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
+        // Get a copy of all member variables that are still needed after
+        // dismiss (which deletes this).
+        bool open_registration_dialog = m_open_registration_dialog;
+        bool open_recovery_dialog = m_open_recovery_dialog;
+        const LoginDialog::Listener *listener = m_listener;
         ModalDialog::dismiss();
-        if (m_open_registration_dialog)
+        if (open_registration_dialog)
             new RegistrationDialog();
-        else if (m_open_recovery_dialog)
+        else if (open_recovery_dialog)
             new RecoveryDialog();
-        else if (m_success && (m_listener != NULL) )
-            m_listener->onSuccess();
+        else if (success && listener )
+            listener->onSuccess();
         return;
     }
 }

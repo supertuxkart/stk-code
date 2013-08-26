@@ -47,7 +47,6 @@ private:
     bool m_self_destroy;
     bool m_open_registration_dialog;
     bool m_open_recovery_dialog;
-    bool m_success;
     const Online::CurrentUser::SignInRequest * m_sign_in_request;
     GUIEngine::LabelWidget * m_message_widget;
     GUIEngine::TextBoxWidget * m_username_widget;
