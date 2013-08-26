@@ -32,6 +32,7 @@
 #include "utils/log.hpp"
 
 #ifdef WIN32
+#  include <iphlpapi.h>
 #else
 #include <ifaddrs.h>
 #endif
@@ -168,6 +169,7 @@ void ConnectToServer::asynchronousUpdate()
                     if (strcmp(data, (char*)(received_data)) == 0)
                     {
                         Log::info("ConnectToServer", "LAN Server found : %u:%u", sender.ip, sender.port);
+#ifndef WIN32
                         // just check if the ip is ours : if so, then just use localhost (127.0.0.1)
                         struct ifaddrs *ifap, *ifa;
                         struct sockaddr_in *sa;
@@ -180,7 +182,41 @@ void ConnectToServer::asynchronousUpdate()
                             }
                         }
                         freeifaddrs(ifap);
+#else
+                        // Query the list of all IP addresses on the local host
+                        // First call to GetIpAddrTable with 0 bytes buffer
+                        // will return insufficient buffer error, and size 
+                        // will contain the number of bytes needed for all
+                        // data. Repeat the process of querying the size
+                        // using GetIpAddrTable in a while loop since it
+                        // can happen that an interface comes online between
+                        // the previous call to GetIpAddrTable and the next
+                        // call.
+                        MIB_IPADDRTABLE *table = NULL;
+                        unsigned long size = 0;
+                        int error = GetIpAddrTable(table, &size, 0);
+                        // Also add a count to limit the while loop - in
+                        // case that something strange is going on.
+                        int count = 0;
+                        while(error==ERROR_INSUFFICIENT_BUFFER && count < 10)
+                        {
+                            delete table;   // deleting NULL is legal
+                            table =  (MIB_IPADDRTABLE*)new char[size];
+                            error = GetIpAddrTable(table, &size, 0);
+                            count ++;
+                        }   // while insufficient buffer
+                        for(unsigned int i=0; i<table->dwNumEntries; i++)
+                        {
+                            int ip = ntohl(table->table[i].dwAddr);
+                            if(sender.ip == ip) // this interface is ours
+                            {
+                                sender.ip = 0x7f000001; // 127.0.0.1
+                                break;
+                            }
+                        }
+                        delete table;
 
+#endif
                         m_server_address = sender;
                         m_state = CONNECTING;
                     }
