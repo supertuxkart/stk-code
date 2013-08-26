@@ -204,7 +204,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
 
 // ----------------------------------------------------------------------------
 
-uint8_t* STKHost::receiveRawPacket(TransportAddress sender)
+uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
 {
     uint8_t* buffer; // max size needed normally (only used for stun)
     buffer = (uint8_t*)(malloc(sizeof(uint8_t)*2048));
@@ -227,6 +227,11 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender)
         i++;
         len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
         irr_driver->getDevice()->sleep(1); // wait 1 millisecond between two checks
+        if (i >= max_tries && max_tries != -1)
+        {
+            Log::verbose("STKHost", "No answer from the server.");
+            return NULL;
+        }
     }
     if (addr.sa_family == AF_INET)
     {

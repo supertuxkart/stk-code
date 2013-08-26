@@ -44,6 +44,7 @@ class GetPublicAddress : public Protocol
         STATE m_state;
         uint32_t m_stun_tansaction_id[3];
         static const uint32_t m_stun_magic_cookie = 0x2112A442;
+        uint32_t m_stun_server_ip;
 };
 
 #endif // GET_PUBLIC_ADDRESS_HPP

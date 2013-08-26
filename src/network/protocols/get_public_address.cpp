@@ -18,14 +18,18 @@
 
 #include "network/protocols/get_public_address.hpp"
 
+#include "config/user_config.hpp"
 #include "network/network_manager.hpp"
 #include "network/client_network_manager.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/network_interface.hpp"
 
 #include "utils/log.hpp"
+#include "utils/random_generator.hpp"
 
 #include <assert.h>
+#include <netdb.h>
+#include <sys/types.h>
 
 int stunRand()
 {
@@ -92,16 +96,48 @@ void GetPublicAddress::asynchronousUpdate()
         bytes[19] = (uint8_t)(m_stun_tansaction_id[2]);
         bytes[20] = '\0';
 
-        Log::verbose("GetPublicAddress", "Querrying STUN server 132.177.123.6");
-        unsigned int dst = (132<<24)+(177<<16)+(123<<8)+6;
-        NetworkManager::getInstance()->setManualSocketsMode(true);
-        NetworkManager::getInstance()->getHost()->sendRawPacket(bytes, 20, TransportAddress(dst, 3478));
-        m_state = TEST_SENT;
+        // time to pick a random stun server
+        std::vector<char*> stun_servers = UserConfigParams::m_stun_servers;
+
+        RandomGenerator random_gen;
+        int rand_result = random_gen.get(stun_servers.size());
+        Log::verbose("GetPublicAddress", "Using STUN server %s", stun_servers[rand_result]);
+
+        // resolve the name into an IP address
+        struct addrinfo hints, *res, *p;
+        int status;
+
+        memset(&hints, 0, sizeof hints);
+        hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
+        hints.ai_socktype = SOCK_STREAM;
+
+        if ((status = getaddrinfo(stun_servers[rand_result], NULL, &hints, &res)) != 0) {
+            fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
+            return;
+        }
+        for(p = res;p != NULL; p = p->ai_next)
+        {
+            struct sockaddr_in* interface = (struct sockaddr_in*)(p->ai_addr);
+
+            m_stun_server_ip = ntohl(interface->sin_addr.s_addr);
+            NetworkManager::getInstance()->setManualSocketsMode(true);
+            NetworkManager::getInstance()->getHost()->sendRawPacket(bytes, 20, TransportAddress(m_stun_server_ip, 3478));
+            m_state = TEST_SENT;
+
+            freeaddrinfo(res); // free the linked list
+            return;
+        }
+        freeaddrinfo(res); // free the linked list
+
     }
     if (m_state == TEST_SENT)
     {
-        unsigned int dst = (132<<24)+(177<<16)+(123<<8)+6;
-        uint8_t* data = NetworkManager::getInstance()->getHost()->receiveRawPacket(TransportAddress(dst, 3478));
+        uint8_t* data = NetworkManager::getInstance()->getHost()->receiveRawPacket(TransportAddress(m_stun_server_ip, 3478), 2000);
+        if (!data)
+        {
+            m_state = NOTHING_DONE; // will send the test again to an other server
+            return;
+        }
         assert(data);
 
         // check that the stun response is a response, contains the magic cookie and the transaction ID

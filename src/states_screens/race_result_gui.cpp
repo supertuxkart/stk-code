@@ -36,6 +36,7 @@
 #include "modes/demo_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world_with_rank.hpp"
+#include "network/network_world.hpp"
 #include "race/highscores.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
@@ -94,6 +95,23 @@ void RaceResultGUI::enableAllButtons()
     if (race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         enableGPProgress();
+    }
+
+    // If we're in a network world, change the buttons text
+    if (NetworkWorld::getInstance()->isRunning())
+    {
+        top->setVisible(false);
+        middle->setText( _("Continue.") );
+        middle->setVisible(true);
+        middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        bottom->setText( _("Quit the server.") );
+        bottom->setVisible(true);
+        if (race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
+        {
+            middle->setVisible(false); // you have to wait the server to start again
+            bottom->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        }
+        return;
     }
 
     // If something was unlocked
@@ -213,6 +231,22 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         fprintf(stderr, "Incorrect event '%s' when things are unlocked.\n",
                 name.c_str());
         assert(false);
+    }
+
+    // If we're playing online :
+    if (NetworkWorld::getInstance()->isRunning())
+    {
+        StateManager::get()->popMenu();
+        if (name == "middle") // Continue button (return to server lobby)
+        {
+        }
+        if (name == "bottom") // Quit server (return to main menu)
+        {
+            race_manager->exitRace();
+            race_manager->setAIKartOverride("");
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        }
+        return;
     }
 
     // Next check for GP

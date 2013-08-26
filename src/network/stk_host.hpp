@@ -120,10 +120,13 @@ class STKHost
          *  parameter. Does not check the port right now.
          *  \param sender : Transport address of the original sender of the
          *  wanted packet.
+         *  \param max_tries : Number of times we try to read data from the
+         *  socket. This is aproximately the time we wait in milliseconds.
+         *  -1 means eternal tries.
          *  \return A string containing the data of the received packet
          *  matching the sender's ip address.
          */
-        uint8_t*    receiveRawPacket(TransportAddress sender);
+        uint8_t*    receiveRawPacket(TransportAddress sender, int max_tries = -1);
         /*! \brief Broadcasts a packet to all peers.
          *  \param data : Data to send.
          */
