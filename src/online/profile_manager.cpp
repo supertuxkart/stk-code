@@ -224,6 +224,7 @@ namespace Online{
             return m_profiles_persistent[id];
         if(cacheHit(id))
             return m_profiles_cache[id];
+        //FIXME not able to get! fetch it ourselves and put it in cache
         return NULL;
     }
 

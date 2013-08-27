@@ -100,6 +100,7 @@ namespace Online{
                                             ~Profile();
             void                            fetchFriends();
             const std::vector<uint32_t> &   getFriends();
+            bool                            hasFetchedFriends()              { return m_has_fetched_friends;}
 
             bool                            isFetching() const               { return m_state == S_FETCHING; }
             bool                            isReady() const                  { return m_state == S_READY; }

@@ -162,8 +162,8 @@ namespace Online{
     {
         uint32_t user_id(0);
         m_result->get("visitingid", &user_id);
-        assert(ProfileManager::get()->getProfileByID(user_id) != NULL);
-        ProfileManager::get()->getProfileByID(user_id)->friendsListCallback(m_result);
+        if( ProfileManager::get()->getProfileByID(user_id) != NULL )
+            ProfileManager::get()->getProfileByID(user_id)->friendsListCallback(m_result);
     }
 
     // ============================================================================
