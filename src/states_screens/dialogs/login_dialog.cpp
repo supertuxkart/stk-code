@@ -43,12 +43,14 @@ LoginDialog::LoginDialog(const Message message_type, const LoginDialog::Listener
     m_self_destroy = false;
     m_open_registration_dialog = false;
     m_open_recovery_dialog = false;
-    m_sign_in_request = NULL;
+    m_success = false;
+
     loadFromFile("online/login_dialog.stkgui");
 
     m_message_widget = getWidget<LabelWidget>("message");
     assert(m_message_widget != NULL);
-    irr::core::stringw message;
+
+    irr::core::stringw message("");
     if (message_type == Normal)
         message =  _("Fill in your username and password. ");
     else if (message_type == Signing_In_Required)
@@ -91,18 +93,13 @@ LoginDialog::LoginDialog(const Message message_type, const LoginDialog::Listener
     m_as_guest_widget->setDeactivated();
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
-
-
 }
 
 // -----------------------------------------------------------------------------
 
 LoginDialog::~LoginDialog()
 {
-    delete m_sign_in_request;
 }
-
-
 
 // -----------------------------------------------------------------------------
 void LoginDialog::login()
@@ -118,7 +115,8 @@ void LoginDialog::login()
     else
     {
         m_options_widget->setDeactivated();
-        m_sign_in_request = Online::CurrentUser::get()->requestSignIn(username,password, m_remember_widget->getState());
+        m_info_widget->setDefaultColor();
+        Online::CurrentUser::get()->requestSignIn(username,password, m_remember_widget->getState());
     }
 }
 
@@ -176,52 +174,46 @@ bool LoginDialog::onEscapePressed()
 }
 
 // -----------------------------------------------------------------------------
+void LoginDialog::success()
+{
+    m_success = true;
+}
+
+// -----------------------------------------------------------------------------
+void LoginDialog::error(const irr::core::stringw & error)
+{
+    sfx_manager->quickSound("anvil");
+    m_info_widget->setErrorColor();
+    m_info_widget->setText(error, false);
+    m_options_widget->setActivated();
+    m_as_guest_widget->setDeactivated();
+}
+
+// -----------------------------------------------------------------------------
 
 void LoginDialog::onUpdate(float dt)
 {
-    bool success = false;
-    if(m_sign_in_request != NULL)
-    {
-        if(m_sign_in_request->isDone())
-        {
-            if(m_sign_in_request->isSuccess())
-            {
-                success = true;
-            }
-            else
-            {
-                sfx_manager->quickSound( "anvil" );
-                m_info_widget->setErrorColor();
-                m_info_widget->setText(m_sign_in_request->getInfo(), false);
-            }
-            delete m_sign_in_request;
-            m_sign_in_request = NULL;
-            m_options_widget->setActivated();
-        }
-        else
-        {
-            m_info_widget->setDefaultColor();
-            m_info_widget->setText(Online::Messages::signingIn(), false);
-        }
-    }
+    if(!m_options_widget->isActivated())
+        m_info_widget->setText(Online::Messages::signingIn(), false);
     //If we want to open another dialog, we need to close this one first
-    m_self_destroy = m_open_registration_dialog || m_open_recovery_dialog || success;
+    m_self_destroy |= (m_open_registration_dialog || m_open_recovery_dialog || m_success);
+
+
+    bool open_registration_dialog = m_open_registration_dialog;
+    bool open_recovery_dialog = m_open_recovery_dialog;
+    bool success = m_success;
+    const LoginDialog::Listener *listener = m_listener;
 
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
-        // Get a copy of all member variables that are still needed after
-        // dismiss (which deletes this).
-        bool open_registration_dialog = m_open_registration_dialog;
-        bool open_recovery_dialog = m_open_recovery_dialog;
-        const LoginDialog::Listener *listener = m_listener;
         ModalDialog::dismiss();
         if (open_registration_dialog)
             new RegistrationDialog();
         else if (open_recovery_dialog)
             new RecoveryDialog();
-        else if (success && listener )
-            listener->onSuccess();
+        else if (success && (listener != NULL) )
+            listener->onClose();
         return;
     }
 }

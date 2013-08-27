@@ -39,7 +39,7 @@ public :
         const std::string m_addon_id;
     public :
         LoginListener(const std::string & addon_id) : m_addon_id(addon_id) {}
-        virtual void onSuccess() const { new VoteDialog(m_addon_id); }
+        virtual void onClose() const { new VoteDialog(m_addon_id); }
     };
 
 private:

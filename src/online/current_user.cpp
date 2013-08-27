@@ -27,6 +27,7 @@
 #include "utils/translation.hpp"
 #include "addons/addon.hpp"
 #include "guiengine/dialog_queue.hpp"
+#include "states_screens/dialogs/login_dialog.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
 #include "states_screens/online_profile_friends.hpp"
@@ -34,6 +35,7 @@
 #include <sstream>
 #include <stdlib.h>
 #include <assert.h>
+#include <algorithm>
 
 using namespace Online;
 
@@ -118,7 +120,7 @@ namespace Online{
     {
         assert(m_state == US_SIGNED_OUT);
         m_save_session = save_session;
-        SignInRequest * request = new SignInRequest();
+        SignInRequest * request = new SignInRequest(request_now);
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",std::string("connect"));
         request->setParameter("username",username);
@@ -135,9 +137,7 @@ namespace Online{
     {
         if (success)
         {
-            std::string token("");
-            int token_fetched       = input->get("token", &token);
-            setToken(token);
+            int token_fetched       = input->get("token", &m_token);
             irr::core::stringw username("");
             int username_fetched    = input->get("username", &username);
             uint32_t userid(0);
@@ -156,12 +156,25 @@ namespace Online{
             HTTPManager::get()->startPolling();
         }
         else
+        {
             m_state = US_SIGNED_OUT;
+        }
     }
 
     void CurrentUser::SignInRequest::callback()
     {
         CurrentUser::get()->signIn(m_success, m_result);
+        if(GUIEngine::ModalDialog::isADialogActive())
+        {
+            LoginDialog * dialog  = dynamic_cast<LoginDialog*>(GUIEngine::ModalDialog::getCurrent());
+            if(dialog != NULL)
+            {
+                if(m_success)
+                    dialog->success();
+                else
+                    dialog->error(m_info);
+            }
+        }
     }
 
     // ============================================================================
@@ -211,7 +224,7 @@ namespace Online{
         {
             Log::warn("CurrentUser::signOut", "%s", _("There were some connection issues while signing out. Report a bug if this caused issues."));
         }
-        setToken("");
+        m_token = "";
         ProfileManager::get()->clearPersistent();
         m_profile = NULL;
         m_state = US_SIGNED_OUT;
@@ -504,17 +517,12 @@ namespace Online{
                 for(unsigned int i = 0; i < friends.size(); ++i)
                 {
                      bool now_online = false;
-                     std::vector<uint32_t>::iterator iter;
-                     for (iter = online_friends.begin(); iter != online_friends.end();)
+                     std::vector<uint32_t>::iterator iter =
+                         std::find(online_friends.begin(),online_friends.end(), friends[i]);
+                     if (iter != online_friends.end())
                      {
-                        if (*iter == friends[i])
-                        {
-                            now_online = true;
-                            online_friends.erase(iter++);
-                            break;
-                        }
-                        else
-                            ++iter;
+                         now_online = true;
+                         online_friends.erase(iter);
                      }
                      Profile * profile = ProfileManager::get()->getProfileByID(friends[i]);
                      Profile::RelationInfo * relation_info = profile->getRelationInfo();

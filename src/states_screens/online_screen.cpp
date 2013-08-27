@@ -69,7 +69,9 @@ OnlineScreen::~OnlineScreen()
 
 void OnlineScreen::loadedFromFile()
 {
-    //Box ? FIXME
+    m_back_widget = getWidget<IconButtonWidget>("back");
+    assert(m_back_widget != NULL);
+
     m_top_menu_widget = getWidget<RibbonWidget>("menu_toprow");
     assert(m_top_menu_widget != NULL);
     m_quick_play_widget = (IconButtonWidget *) m_top_menu_widget->findWidgetNamed("quick_play");
@@ -156,7 +158,11 @@ void OnlineScreen::init()
 void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 {
     if (hasStateChanged())
+    {
         GUIEngine::reshowCurrentScreen();
+        return;
+    }
+
     if (m_recorded_state == CurrentUser::US_SIGNING_IN)
     {
         m_online_status_widget->setText(Messages::signingIn(), false);
@@ -171,7 +177,7 @@ void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
 
 void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    if (name == "back")
+    if (name == m_back_widget->m_properties[PROP_ID])
     {
         StateManager::get()->escapePressed();
         return;
