@@ -170,7 +170,7 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         Online::XMLRequest* request = new Online::XMLRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-        request->setParameter("id",Online::CurrentUser::get()->getUserID());
+        request->setParameter("id",Online::CurrentUser::get()->getProfile()->getID());
         request->setParameter("token",Online::CurrentUser::get()->getToken());
         request->setParameter("address",addr.ip);
         request->setParameter("port",addr.port);
@@ -361,8 +361,8 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         for (unsigned int i = 0; i < players.size(); i++)
         {
             // do not duplicate the player into the message
-            if (players[i]->race_id != m_next_id && players[i]->user_profile->getUserID() != player_id)
-                message_ack.ai8(1).ai8(players[i]->race_id).ai8(4).ai32(players[i]->user_profile->getUserID());
+            if (players[i]->race_id != m_next_id && players[i]->user_profile->getID() != player_id)
+                message_ack.ai8(1).ai8(players[i]->race_id).ai8(4).ai32(players[i]->user_profile->getID());
         }
         m_listener->sendMessage(this, peer, message_ack);
 
@@ -371,7 +371,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
         profile->race_id = m_next_id;
         profile->kart_name = "";
-        profile->user_profile = new Online::User(player_id);
+        profile->user_profile = new Online::Profile(player_id, "");
         m_setup->addPlayer(profile);
         peer->setPlayerProfile(profile);
         Log::verbose("ServerLobbyRoomProtocol", "New player.");

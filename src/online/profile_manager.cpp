@@ -52,12 +52,24 @@ namespace Online{
     }
 
     // ============================================================================
+    ProfileManager::~ProfileManager()
+    {
+        ProfilesMap::iterator it;
+        for ( it = m_profiles_persistent.begin(); it != m_profiles_persistent.end(); ++it ) {
+            delete it->second;
+        }
+        for ( it = m_profiles_cache.begin(); it != m_profiles_persistent.end(); ++it ) {
+            delete it->second;
+        }
+    }
 
-    void ProfileManager::iterateCache()
+    // ============================================================================
+
+    void ProfileManager::iterateCache(Profile * profile)
     {
         if(m_profiles_cache.size() == m_max_cache_size)
         {
-            m_currently_visiting->setCacheBit();
+            profile->setCacheBit();
             ProfilesMap::iterator iter;
             for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end(); ++iter)
             {
@@ -69,14 +81,14 @@ namespace Online{
             {
                iter->second->unsetCacheBit();
             }
-            m_currently_visiting->setCacheBit();
+            profile->setCacheBit();
         }
 
     }
 
     // ============================================================================
 
-    void ProfileManager::addToCache(Profile * profile)
+    void ProfileManager::directToCache(Profile * profile)
     {
         assert(profile != NULL);
         if(m_profiles_cache.size() == m_max_cache_size)
@@ -86,8 +98,11 @@ namespace Online{
             {
                if (!iter->second->getCacheBit())
                {
-                   m_profiles_cache.erase(iter++);
-                   continue;
+                   ProfilesMap::iterator toErase = iter;
+                   ++iter;
+                   delete toErase->second;
+                   m_profiles_cache.erase(toErase);
+                   break;
                }
                else
                    ++iter;
@@ -99,33 +114,117 @@ namespace Online{
     }
 
     // ============================================================================
-    void ProfileManager::setVisiting(User * user)
+
+    void ProfileManager::addPersistent(Profile * profile)
     {
-        assert(user != NULL);
-        if( m_profiles_cache.find(user->getUserID()) == m_profiles_cache.end())
+        if(inPersistent(profile->getID()))
         {
-            //cache miss
-            m_currently_visiting = new Profile(user);
-            addToCache(m_currently_visiting);
+            delete m_profiles_persistent[profile->getID()];
+            m_profiles_persistent[profile->getID()] = profile;
         }
         else
         {
-            //cache hit
-            m_currently_visiting = m_profiles_cache[user->getUserID()];
+            m_profiles_persistent[profile->getID()] = profile;
         }
-        iterateCache();
+    }
+    // ============================================================================
+
+    void ProfileManager::deleteFromPersistent(const uint32_t id)
+    {
+        if (inPersistent(id))
+        {
+            delete m_profiles_persistent[id];
+            m_profiles_persistent.erase(id);
+        }
+        else
+            Log::warn("ProfileManager::removePersistent", "Tried to remove profile with id %d from persistent while not present", id);
     }
 
     // ============================================================================
 
-    Profile * ProfileManager::getProfileByID(uint32_t id)
+    void ProfileManager::clearPersistent()
     {
-        if( m_profiles_cache.find(id) == m_profiles_cache.end())
-        {
-            Log::info("getProfileByID","here");
-            return NULL;
+        ProfilesMap::iterator it;
+        for ( it = m_profiles_persistent.begin(); it != m_profiles_persistent.end(); ++it ) {
+            delete it->second;
         }
-        return m_profiles_cache[id];
+        m_profiles_persistent.clear();
+    }
+
+    // ============================================================================
+
+    void ProfileManager::moveToCache(const uint32_t id)
+    {
+        if (inPersistent(id))
+        {
+            Profile * profile = getProfileByID(id);
+            m_profiles_persistent.erase(id);
+            addToCache(profile);
+        }
+        else
+            Log::warn("ProfileManager::removePersistent", "Tried to move profile with id %d from persistent to cache while not present", id);
+    }
+
+    // ============================================================================
+
+    void ProfileManager::addToCache(Profile * profile)
+    {
+        if(inPersistent(profile->getID()))
+        {
+            //FIXME should do updating of values
+        }
+        else if(cacheHit(profile->getID()))
+        {
+            //FIXME should do updating of values
+            delete profile;
+        }
+        else
+        {
+            directToCache(profile);
+        }
+        Log::info("persistent size","%d", m_profiles_persistent.size());
+        Log::info("cache size","%d", m_profiles_cache.size());
+    }
+
+    // ============================================================================
+
+    bool ProfileManager::inPersistent(const uint32_t id)
+    {
+        if (m_profiles_persistent.find(id) != m_profiles_persistent.end())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // ============================================================================
+
+    bool ProfileManager::cacheHit(const uint32_t id)
+    {
+        if (m_profiles_cache.find(id) != m_profiles_cache.end())
+        {
+            iterateCache(m_profiles_cache[id]);
+            return true;
+        }
+        return false;
+    }
+
+    // ============================================================================
+    void ProfileManager::setVisiting(const uint32_t id)
+    {
+        m_currently_visiting = getProfileByID(id);
+    }
+
+    // ============================================================================
+
+    Profile * ProfileManager::getProfileByID(const uint32_t id)
+    {
+
+        if(inPersistent(id))
+            return m_profiles_persistent[id];
+        if(cacheHit(id))
+            return m_profiles_cache[id];
+        return NULL;
     }
 
 

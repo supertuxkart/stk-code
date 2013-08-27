@@ -154,14 +154,16 @@ void SFXManager::loadSfx()
         std::cerr << "Could not read sounf effects XML file " << sfx_config_name.c_str() << std::endl;
     }
 
+    int i;
+
     const int amount = root->getNumNodes();
-    for (int i=0; i<amount; i++)
+    for (i=0; i<amount; i++)
     {
         const XMLNode* node = root->getNode(i);
 
         if (node->getName() == "sfx")
         {
-            loadSingleSfx(node);
+            loadSingleSfx(node, "", false);
         }
         else
         {
@@ -171,7 +173,27 @@ void SFXManager::loadSfx()
     }// nend for
 
     delete root;
-   }   // loadSfx
+
+    // Now load them in parallel
+    const int max = m_all_sfx_types.size();
+    SFXBuffer **array = new SFXBuffer *[max];
+    i = 0;
+
+    for (std::map<std::string, SFXBuffer*>::iterator it = m_all_sfx_types.begin();
+         it != m_all_sfx_types.end(); it++)
+    {
+        SFXBuffer* const buffer = (*it).second;
+        array[i++] = buffer;
+    }
+
+    #pragma omp parallel for private(i)
+    for (i = 0; i < max; i++)
+    {
+        array[i]->load();
+    }
+
+    delete [] array;
+}   // loadSfx
 
 // -----------------------------------------------------------------------------
 /** Introduces a mechanism by which one can load sound effects beyond the basic
@@ -188,7 +210,8 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
                                     bool               positional,
                                     float              rolloff,
                                     float              max_width,
-                                    float              gain)
+                                    float              gain,
+                                    const bool         load)
 {
 
     SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff, max_width, gain);
@@ -205,7 +228,7 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
     if (UserConfigParams::logMisc())
         Log::debug("SFXManager", "Loading SFX %s\n", sfx_file.c_str());
 
-    if (buffer->load()) return buffer;
+    if (load && buffer->load()) return buffer;
 
     return NULL;
 } // addSingleSFX
@@ -215,7 +238,8 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
  *  \param node The XML node with the data for this sfx.
  */
 SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
-                                     const std::string &path)
+                                     const std::string &path,
+                                     const bool load)
 {
     std::string filename;
 
@@ -254,7 +278,8 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
                         tmpbuffer.isPositional(),
                         tmpbuffer.getRolloff(),
                         tmpbuffer.getMaxDist(),
-                        tmpbuffer.getGain());
+                        tmpbuffer.getGain(),
+                        load);
 
 }   // loadSingleSfx
 

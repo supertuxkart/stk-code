@@ -22,9 +22,14 @@
 #include "addons/addons_manager.hpp"
 #include "config/user_config.hpp"
 #include "online/servers_manager.hpp"
+#include "online/profile_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 #include "addons/addon.hpp"
+#include "guiengine/dialog_queue.hpp"
+#include "states_screens/dialogs/user_info_dialog.hpp"
+#include "states_screens/dialogs/notification_dialog.hpp"
+#include "states_screens/online_profile_friends.hpp"
 
 #include <sstream>
 #include <stdlib.h>
@@ -50,18 +55,18 @@ namespace Online{
 
     // ============================================================================
     CurrentUser::CurrentUser()
-        : User("",0)
     {
-        setUserState (US_SIGNED_OUT);
-        setToken("");
-        setSaveSession(false);
+        m_state = US_SIGNED_OUT;
+        m_token = "";
+        m_save_session = false;
+        m_profile = NULL;
     }
 
     // ============================================================================
     const XMLRequest * CurrentUser::requestRecovery(    const irr::core::stringw &username,
                                                         const irr::core::stringw &email)
     {
-        assert(getUserState() == US_SIGNED_OUT || getUserState() == US_GUEST);
+        assert(m_state == US_SIGNED_OUT || m_state == US_GUEST);
         XMLRequest * request = new XMLRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("recovery"));
@@ -78,7 +83,7 @@ namespace Online{
                                                     const irr::core::stringw &email,
                                                     bool terms)
     {
-        assert(getUserState() == US_SIGNED_OUT || getUserState() == US_GUEST);
+        assert(m_state == US_SIGNED_OUT || m_state == US_GUEST);
         XMLRequest * request = new XMLRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("register"));
@@ -92,28 +97,27 @@ namespace Online{
     }
 
     // ============================================================================
-    const CurrentUser::SignInRequest * CurrentUser::requestSavedSession()
+    void CurrentUser::requestSavedSession()
     {
         SignInRequest * request = NULL;
-        if(getUserState() != US_SIGNED_IN  && UserConfigParams::m_saved_session)
+        if(m_state != US_SIGNED_IN  && UserConfigParams::m_saved_session)
         {
-            request = new SignInRequest();
+            request = new SignInRequest(true);
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
             request->setParameter("action",std::string("saved-session"));
             request->setParameter("userid", UserConfigParams::m_saved_user);
             request->setParameter("token", UserConfigParams::m_saved_token.c_str());
             HTTPManager::get()->addRequest(request);
-            setUserState (US_SIGNING_IN);
+            m_state = US_SIGNING_IN;
         }
-        return request;
     }
 
     CurrentUser::SignInRequest * CurrentUser::requestSignIn(    const irr::core::stringw &username,
                                                                 const irr::core::stringw &password,
                                                                 bool save_session, bool request_now)
     {
-        assert(getUserState() == US_SIGNED_OUT);
-        setSaveSession(save_session);
+        assert(m_state == US_SIGNED_OUT);
+        m_save_session = save_session;
         SignInRequest * request = new SignInRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",std::string("connect"));
@@ -122,7 +126,7 @@ namespace Online{
         if (request_now)
         {
             HTTPManager::get()->addRequest(request);
-            setUserState (US_SIGNING_IN);
+            m_state = US_SIGNING_IN;
         }
         return request;
     }
@@ -136,21 +140,23 @@ namespace Online{
             setToken(token);
             irr::core::stringw username("");
             int username_fetched    = input->get("username", &username);
-            setUserName(username);
             uint32_t userid(0);
             int userid_fetched      = input->get("userid", &userid);
-            setUserID(userid);
+            m_profile = new Profile(userid, username, true);
             assert(token_fetched && username_fetched && userid_fetched);
-            setUserState (US_SIGNED_IN);
+            m_state = US_SIGNED_IN;
             if(getSaveSession())
             {
-                UserConfigParams::m_saved_user = getUserID();
+                UserConfigParams::m_saved_user = getID();
                 UserConfigParams::m_saved_token = getToken();
                 UserConfigParams::m_saved_session = true;
             }
+            ProfileManager::get()->addPersistent(m_profile);
+            m_profile->fetchFriends();
+            HTTPManager::get()->startPolling();
         }
         else
-            setUserState (US_SIGNED_OUT);
+            m_state = US_SIGNED_OUT;
     }
 
     void CurrentUser::SignInRequest::callback()
@@ -163,12 +169,12 @@ namespace Online{
     const CurrentUser::ServerCreationRequest * CurrentUser::requestServerCreation(  const irr::core::stringw &name,
                                                                                     int max_players)
     {
-        assert(getUserState() == US_SIGNED_IN);
+        assert(m_state == US_SIGNED_IN);
         ServerCreationRequest * request = new ServerCreationRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",           std::string("create_server"));
         request->setParameter("token",            getToken());
-        request->setParameter("userid",           getUserID());
+        request->setParameter("userid",           getID());
         request->setParameter("name",             name);
         request->setParameter("max_players",      max_players);
         HTTPManager::get()->addRequest(request);
@@ -187,14 +193,15 @@ namespace Online{
 
     // ============================================================================
     const CurrentUser::SignOutRequest * CurrentUser::requestSignOut(){
-        assert(getUserState() == US_SIGNED_IN || getUserState() == US_GUEST);
+        assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
         SignOutRequest * request = new SignOutRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",std::string("disconnect"));
         request->setParameter("token", getToken());
-        request->setParameter("userid", getUserID());
+        request->setParameter("userid", getID());
         HTTPManager::get()->addRequest(request);
-        setUserState (US_SIGNING_OUT);
+        m_state = US_SIGNING_OUT;
+        HTTPManager::get()->stopPolling();
         return request;
     }
 
@@ -205,9 +212,9 @@ namespace Online{
             Log::warn("CurrentUser::signOut", "%s", _("There were some connection issues while signing out. Report a bug if this caused issues."));
         }
         setToken("");
-        setUserName("");
-        setUserID(0);
-        setUserState (US_SIGNED_OUT);
+        ProfileManager::get()->clearPersistent();
+        m_profile = NULL;
+        m_state = US_SIGNED_OUT;
         UserConfigParams::m_saved_user = 0;
         UserConfigParams::m_saved_token = "";
         UserConfigParams::m_saved_session = false;
@@ -223,12 +230,12 @@ namespace Online{
     CurrentUser::ServerJoinRequest *  CurrentUser::requestServerJoin(uint32_t server_id,
                                                                     bool request_now)
     {
-        assert(getUserState() == US_SIGNED_IN || getUserState() == US_GUEST);
+        assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
         ServerJoinRequest * request = new ServerJoinRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
         request->setParameter("action",std::string("request-connection"));
         request->setParameter("token", getToken());
-        request->setParameter("id", getUserID());
+        request->setParameter("id", getID());
         request->setParameter("server_id", server_id);
         if (request_now)
             HTTPManager::get()->addRequest(request);
@@ -237,7 +244,7 @@ namespace Online{
 
     void CurrentUser::ServerJoinRequest::callback()
     {
-        if(isSuccess())
+        if(m_success)
         {
             uint32_t server_id;
             m_result->get("serverid", &server_id);
@@ -250,12 +257,12 @@ namespace Online{
 
     const XMLRequest * CurrentUser::requestGetAddonVote( const std::string & addon_id) const
     {
-        assert(isRegisteredUser());
+        assert(m_state == US_SIGNED_IN);
         XMLRequest * request = new XMLRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("get-addon-vote"));
         request->setParameter("token", getToken());
-        request->setParameter("userid", getUserID());
+        request->setParameter("userid", getID());
         request->setParameter("addonid", addon_id.substr(6));
         HTTPManager::get()->addRequest(request);
         return request;
@@ -265,12 +272,12 @@ namespace Online{
 
     const XMLRequest * CurrentUser::requestUserSearch( const irr::core::stringw & search_string) const
     {
-        assert(isRegisteredUser());
+        assert(m_state == US_SIGNED_IN);
         XMLRequest * request = new XMLRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("user-search"));
         request->setParameter("token", getToken());
-        request->setParameter("userid", getUserID());
+        request->setParameter("userid", getID());
         request->setParameter("search-string", search_string);
         HTTPManager::get()->addRequest(request);
         return request;
@@ -278,21 +285,21 @@ namespace Online{
 
     // ============================================================================
 
-    const CurrentUser::setAddonVoteRequest * CurrentUser::requestSetAddonVote( const std::string & addon_id, float rating) const
+    const CurrentUser::SetAddonVoteRequest * CurrentUser::requestSetAddonVote( const std::string & addon_id, float rating) const
     {
-        assert(isRegisteredUser());
-        CurrentUser::setAddonVoteRequest * request = new CurrentUser::setAddonVoteRequest();
+        assert(m_state == US_SIGNED_IN);
+        CurrentUser::SetAddonVoteRequest * request = new CurrentUser::SetAddonVoteRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action", std::string("set-addon-vote"));
         request->setParameter("token", getToken());
-        request->setParameter("userid", getUserID());
+        request->setParameter("userid", getID());
         request->setParameter("addonid", addon_id.substr(6));
         request->setParameter("rating", rating);
         HTTPManager::get()->addRequest(request);
         return request;
     }
 
-    void CurrentUser::setAddonVoteRequest::callback()
+    void CurrentUser::SetAddonVoteRequest::callback()
     {
         if(m_success)
         {
@@ -306,11 +313,310 @@ namespace Online{
 
     // ============================================================================
 
-    const irr::core::stringw CurrentUser::getUserName() const
+    void CurrentUser::requestFriendRequest(const uint32_t friend_id) const
     {
-        if((getUserState() == US_SIGNED_IN ) || (getUserState() == US_GUEST))
-            return User::getUserName();
+        assert(m_state == US_SIGNED_IN);
+        CurrentUser::FriendRequest * request = new CurrentUser::FriendRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("friend-request"));
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getID());
+        request->setParameter("friendid", friend_id);
+        HTTPManager::get()->addRequest(request);
+    }
+
+    void CurrentUser::FriendRequest::callback()
+    {
+        uint32_t id(0);
+        m_result->get("friendid", &id);
+        irr::core::stringw info_text("");
+        if(m_success)
+        {
+            CurrentUser::get()->getProfile()->addFriend(id);
+            ProfileManager::get()->getProfileByID(id)->setRelationInfo(new Profile::RelationInfo(_("Today"), false, true, false));
+            OnlineProfileFriends::getInstance()->refreshFriendsList();
+            info_text = _("Friend request send!");
+        }
         else
-            return _("Currently not signed in");
+            info_text = m_info;
+        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!m_success, true), true);
+    }
+
+    // ============================================================================
+
+    void CurrentUser::requestAcceptFriend(const uint32_t friend_id) const
+    {
+        assert(m_state == US_SIGNED_IN);
+        CurrentUser::AcceptFriendRequest * request = new CurrentUser::AcceptFriendRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("accept-friend-request"));
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getID());
+        request->setParameter("friendid", friend_id);
+        HTTPManager::get()->addRequest(request);
+    }
+
+    void CurrentUser::AcceptFriendRequest::callback()
+    {
+        uint32_t id(0);
+        m_result->get("friendid", &id);
+        irr::core::stringw info_text("");
+        if(m_success)
+        {
+            Profile * profile = ProfileManager::get()->getProfileByID(id);
+            profile->setFriend();
+            profile->setRelationInfo(new Profile::RelationInfo(_("Today"), false, false, true));
+            OnlineProfileFriends::getInstance()->refreshFriendsList();
+            info_text = _("Friend request accepted!");
+        }
+        else
+            info_text = m_info;
+        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!m_success, true), true);
+    }
+
+    // ============================================================================
+
+    void CurrentUser::requestDeclineFriend(const uint32_t friend_id) const
+    {
+        assert(m_state == US_SIGNED_IN);
+        CurrentUser::DeclineFriendRequest * request = new CurrentUser::DeclineFriendRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("decline-friend-request"));
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getID());
+        request->setParameter("friendid", friend_id);
+        HTTPManager::get()->addRequest(request);
+    }
+
+    void CurrentUser::DeclineFriendRequest::callback()
+    {
+        uint32_t id(0);
+        m_result->get("friendid", &id);
+        irr::core::stringw info_text("");
+        if(m_success)
+        {
+            CurrentUser::get()->getProfile()->removeFriend(id);
+            ProfileManager::get()->moveToCache(id);
+            ProfileManager::get()->getProfileByID(id)->deleteRelationalInfo();
+            OnlineProfileFriends::getInstance()->refreshFriendsList();
+            info_text = _("Friend request declined!");
+        }
+        else
+            info_text = m_info;
+        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!m_success, true), true);
+
+    }
+
+    // ============================================================================
+
+    void CurrentUser::requestCancelFriend(const uint32_t friend_id) const
+    {
+        assert(m_state == US_SIGNED_IN);
+        CurrentUser::CancelFriendRequest * request = new CurrentUser::CancelFriendRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("cancel-friend-request"));
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getID());
+        request->setParameter("friendid", friend_id);
+        HTTPManager::get()->addRequest(request);
+    }
+
+    void CurrentUser::CancelFriendRequest::callback()
+    {
+        uint32_t id(0);
+        m_result->get("friendid", &id);
+        irr::core::stringw info_text("");
+        if(m_success)
+        {
+            CurrentUser::get()->getProfile()->removeFriend(id);
+            ProfileManager::get()->moveToCache(id);
+            ProfileManager::get()->getProfileByID(id)->deleteRelationalInfo();
+            OnlineProfileFriends::getInstance()->refreshFriendsList();
+            info_text = _("Friend request cancelled!");
+        }
+        else
+            info_text = m_info;
+        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!m_success, true), true);
+
+    }
+
+    // ============================================================================
+
+    void CurrentUser::requestRemoveFriend(const uint32_t friend_id) const
+    {
+        assert(m_state == US_SIGNED_IN);
+        CurrentUser::RemoveFriendRequest * request = new CurrentUser::RemoveFriendRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("remove-friend"));
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getID());
+        request->setParameter("friendid", friend_id);
+        HTTPManager::get()->addRequest(request);
+    }
+
+    void CurrentUser::RemoveFriendRequest::callback()
+    {
+        uint32_t id(0);
+        m_result->get("friendid", &id);
+        irr::core::stringw info_text("");
+        if(m_success)
+        {
+            CurrentUser::get()->getProfile()->removeFriend(id);
+            ProfileManager::get()->moveToCache(id);
+            ProfileManager::get()->getProfileByID(id)->deleteRelationalInfo();
+            OnlineProfileFriends::getInstance()->refreshFriendsList();
+            info_text = _("Friend removed!");
+        }
+        else
+            info_text = m_info;
+        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!m_success, true), true);
+
+    }
+    // ============================================================================
+    void CurrentUser::requestPoll()
+    {
+        assert(m_state == US_SIGNED_IN);
+        CurrentUser::PollRequest * request = new CurrentUser::PollRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("poll"));
+        request->setParameter("token", getToken());
+        request->setParameter("userid", getID());
+        HTTPManager::get()->addRequest(request);
+    }
+
+    void CurrentUser::PollRequest::callback()
+    {
+        if(m_success)
+        {
+            std::string online_friends_string("");
+
+            if(m_result->get("online", &online_friends_string) == 1)
+            {
+                std::vector<std::string> parts = StringUtils::split(online_friends_string, ' ');
+                std::vector<uint32_t> online_friends;
+                for(unsigned int i = 0; i < parts.size(); ++i)
+                {
+                    online_friends.push_back(atoi(parts[i].c_str()));
+                }
+                bool went_offline = false;
+                std::vector<uint32_t> friends = CurrentUser::get()->getProfile()->getFriends();
+                std::vector<irr::core::stringw> to_notify;
+                for(unsigned int i = 0; i < friends.size(); ++i)
+                {
+                     bool now_online = false;
+                     std::vector<uint32_t>::iterator iter;
+                     for (iter = online_friends.begin(); iter != online_friends.end();)
+                     {
+                        if (*iter == friends[i])
+                        {
+                            now_online = true;
+                            online_friends.erase(iter++);
+                            break;
+                        }
+                        else
+                            ++iter;
+                     }
+                     Profile * profile = ProfileManager::get()->getProfileByID(friends[i]);
+                     Profile::RelationInfo * relation_info = profile->getRelationInfo();
+                     if( relation_info->isOnline() )
+                     {
+                         if (!now_online)
+                         {
+                             relation_info->setOnline(false);
+                             went_offline = true;
+                         }
+                     }
+                     else
+                     {
+                         if (now_online)
+                         {
+                             relation_info->setOnline(true);
+                             profile->setFriend();
+                             to_notify.push_back(profile->getUserName());
+                         }
+                     }
+
+                }
+
+                if(to_notify.size() > 0)
+                {
+                    irr::core::stringw message("");
+                    if(to_notify.size() == 1)
+                    {
+                        message = to_notify[0] + irr::core::stringw(_(" is now online."));
+                    }
+                    else if(to_notify.size() == 2)
+                    {
+                        message = to_notify[0] + irr::core::stringw(_(" and ")) + to_notify[1] + irr::core::stringw(_(" are now online."));
+                    }
+                    else if(to_notify.size() == 3)
+                    {
+                        message = to_notify[0] + irr::core::stringw(_(", ")) + to_notify[1] + irr::core::stringw(_(" and ")) + to_notify[2] + irr::core::stringw(_(" are now online."));
+                    }
+                    else if(to_notify.size() > 3)
+                    {
+                        message = StringUtils::toWString(to_notify.size()) + irr::core::stringw(_(" friends are now online."));
+                    }
+                    GUIEngine::DialogQueue::get()->pushDialog( new NotificationDialog(NotificationDialog::T_Friends, message), false);
+                    OnlineProfileFriends::getInstance()->refreshFriendsList();
+                }
+                else if(went_offline)
+                {
+                    OnlineProfileFriends::getInstance()->refreshFriendsList();
+                }
+            }
+            int friend_request_count = 0;
+            for(unsigned int i = 0; i < m_result->getNumNodes(); i++)
+            {
+                const XMLNode * node = m_result->getNode(i);
+                if(node->getName() == "new_friend_request")
+                {
+                    Profile::RelationInfo * ri = new Profile::RelationInfo("New", false, true, true);
+                    Profile * p = new Profile(node);
+                    p->setRelationInfo(ri);
+                    ProfileManager::get()->addPersistent(p);
+                    friend_request_count++;
+                }
+            }
+            if(friend_request_count > 0)
+            {
+                irr::core::stringw message("");
+                if(friend_request_count > 1)
+                {
+                    message = irr::core::stringw(_("You have ")) + StringUtils::toWString(friend_request_count) + irr::core::stringw(_(" new friend requests!."));
+                }
+                else
+                {
+                    message = _("You have a new friend request!");
+                }
+                GUIEngine::DialogQueue::get()->pushDialog( new NotificationDialog(NotificationDialog::T_Friends, message), false);
+                OnlineProfileFriends::getInstance()->refreshFriendsList();
+            }
+        }
+        // FIXME show connection error??
+        // after 2 misses I'll show something
+
+    }
+
+    // ============================================================================
+    irr::core::stringw CurrentUser::getUserName() const
+    {
+        if((m_state == US_SIGNED_IN ) || (m_state == US_GUEST))
+        {
+            assert(m_profile != NULL);
+            return m_profile->getUserName();
+        }
+        return _("Currently not signed in");
+    }
+
+    // ============================================================================
+    uint32_t CurrentUser::getID() const
+    {
+        if((m_state == US_SIGNED_IN ))
+        {
+            assert(m_profile != NULL);
+            return m_profile->getID();
+        }
+        return 0;
     }
 } // namespace Online

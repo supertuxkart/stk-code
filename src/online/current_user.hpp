@@ -19,9 +19,8 @@
 #ifndef HEADER_CURRENT_ONLINE_USER_HPP
 #define HEADER_CURRENT_ONLINE_USER_HPP
 
-#include "http_manager.hpp"
+#include "online/http_manager.hpp"
 #include "online/server.hpp"
-#include "online/user.hpp"
 #include "online/profile.hpp"
 #include "utils/types.hpp"
 #include "utils/synchronised.hpp"
@@ -39,7 +38,7 @@ namespace Online{
       * \brief Class that represents an online registered user
       * \ingroup online
       */
-    class CurrentUser : public User
+    class CurrentUser
     {
         public:
             enum UserState
@@ -51,60 +50,88 @@ namespace Online{
                 US_SIGNING_OUT
             };
 
-            enum RequestType
-            {
-                RT_SIGN_IN = 1,
-                RT_SIGN_OUT,
-                RT_SIGN_UP,
-                RT_SERVER_JOIN,
-                RT_SERVER_CREATION
-            };
-
             class SignInRequest : public XMLRequest
             {
                 virtual void callback ();
             public:
-                SignInRequest() : XMLRequest(RT_SIGN_IN) {}
+                SignInRequest(bool manage_memory = false) : XMLRequest(manage_memory) {}
             };
 
             class SignOutRequest : public XMLRequest
             {
                 virtual void callback ();
             public:
-                SignOutRequest() : XMLRequest(RT_SIGN_OUT) {}
+                SignOutRequest() : XMLRequest() {}
             };
 
             class ServerCreationRequest : public XMLRequest {
                 virtual void callback ();
                 uint32_t m_created_server_id;
             public:
-                ServerCreationRequest() : XMLRequest(RT_SERVER_CREATION) {}
+                ServerCreationRequest() : XMLRequest() {}
                 const uint32_t getCreatedServerID() const { assert(isDone()); return m_created_server_id;}
             };
 
             class ServerJoinRequest : public XMLRequest {
                 virtual void callback ();
             public:
-                ServerJoinRequest() : XMLRequest(RT_SERVER_JOIN) {}
+                ServerJoinRequest() : XMLRequest() {}
             };
 
-            class setAddonVoteRequest : public XMLRequest {
+            class SetAddonVoteRequest : public XMLRequest {
                 virtual void callback ();
             public:
-                setAddonVoteRequest() : XMLRequest() {}
+                SetAddonVoteRequest() : XMLRequest() {}
+            };
+
+            class FriendRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                FriendRequest() : XMLRequest(true) {}
+            };
+
+            class AcceptFriendRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                AcceptFriendRequest() : XMLRequest(true) {}
+            };
+
+            class DeclineFriendRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                DeclineFriendRequest() : XMLRequest(true) {}
+            };
+
+            class RemoveFriendRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                RemoveFriendRequest() : XMLRequest(true) {}
+            };
+
+            class CancelFriendRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                CancelFriendRequest() : XMLRequest(true) {}
+            };
+
+            class PollRequest : public XMLRequest {
+                virtual void callback ();
+            public:
+                PollRequest() : XMLRequest(true) {}
             };
 
 
         private:
-            Synchronised<std::string>   m_token;
-            Synchronised<bool>          m_save_session;
-            Synchronised<UserState>     m_state;
+            std::string                 m_token;
+            bool                        m_save_session;
+            UserState                   m_state;
+            Profile *                   m_profile;
 
-            bool                        getSaveSession()        const   { return m_save_session.getAtomic();      }
+            bool                        getSaveSession()        const   { return m_save_session;      }
 
-            void setUserState           (UserState user_state)          { m_state.setAtomic(user_state);          }
-            void setSaveSession         (bool save_session)             { m_save_session.setAtomic(save_session); }
-            void setToken               (const std::string & token)     { m_token.setAtomic(token);               }
+            void setUserState           (UserState user_state)          { m_state = user_state;          }
+            void setSaveSession         (bool save_session)             { m_save_session = save_session; }
+            void setToken               (const std::string & token)     { m_token= token;               }
 
             CurrentUser();
 
@@ -116,7 +143,7 @@ namespace Online{
             static CurrentUser *            get();
             static void                     deallocate();
 
-            const SignInRequest *           requestSavedSession();
+            void                            requestSavedSession();
             SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
                                                             const irr::core::stringw &password,
                                                             bool save_session,
@@ -127,7 +154,7 @@ namespace Online{
 
 
             /** Register */
-            const XMLRequest *               requestSignUp( const irr::core::stringw &username,
+            const XMLRequest *              requestSignUp(  const irr::core::stringw &username,
                                                             const irr::core::stringw &password,
                                                             const irr::core::stringw &password_ver,
                                                             const irr::core::stringw &email,
@@ -137,18 +164,26 @@ namespace Online{
                                                             const irr::core::stringw &email);
 
             const XMLRequest *              requestGetAddonVote(const std::string & addon_id) const;
-            const setAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
+            const SetAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
+            void                            requestFriendRequest(const uint32_t friend_id) const;
+            void                            requestAcceptFriend(const uint32_t friend_id) const;
+            void                            requestDeclineFriend(const uint32_t friend_id) const;
+            void                            requestRemoveFriend(const uint32_t friend_id) const;
+            void                            requestCancelFriend(const uint32_t friend_id) const;
 
             const XMLRequest *              requestUserSearch(const irr::core::stringw & search_string) const;
 
+
+
             /** Returns the username if signed in. */
-            const irr::core::stringw        getUserName()           const;
-            const UserState                 getUserState()          const { return m_state.getAtomic(); }
-            bool                            isRegisteredUser()      const {
-                                                                            MutexLocker(m_state);
-                                                                            return m_state.getData() == US_SIGNED_IN;
-                                                                          }
-            const std::string               getToken()              const { return m_token.getAtomic(); }
+            irr::core::stringw              getUserName()           const;
+            uint32_t                        getID()                 const;
+            const UserState                 getUserState()          const { return m_state; }
+            bool                            isRegisteredUser()      const { return m_state == US_SIGNED_IN; }
+            const std::string &             getToken()              const { return m_token; }
+            Profile *                       getProfile()            const { return m_profile; }
+
+            void                            requestPoll();
 
     };   // class CurrentUser
 

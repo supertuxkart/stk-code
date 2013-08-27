@@ -48,7 +48,8 @@ namespace Online{
     {
         protected:
 
-            /** Ment for networking threads */
+            float                     m_time_since_poll;
+            bool                      m_polling;
 
             /** The current requested being worked on. */
             Online::Request *         m_current_request;
@@ -70,6 +71,11 @@ namespace Online{
                                                >
                         >  m_request_queue;
 
+            Synchronised< std::queue<Online::Request*> >    m_result_queue;
+
+            void addResult(Online::Request *request);
+            void handleResultQueue();
+
             static void  *mainLoop(void *obj);
             void startNetworkThread();
 
@@ -83,6 +89,9 @@ namespace Online{
             static void deallocate();
             static bool isRunning();
 
+            void startPolling(){ m_polling = true; }
+            void stopPolling(){  m_polling = false; }
+
             //Execute
             std::string getPage(Online::Request * request);
             XMLNode * getXMLFromPage(Online::Request * request);
@@ -93,6 +102,7 @@ namespace Online{
             void stopNetworkThread();
 
             bool getAbort(){ return m_abort.getAtomic(); };
+            void update(float dt);
 
     }; //class HTTPManager
 } // namespace Online

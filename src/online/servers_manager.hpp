@@ -37,16 +37,12 @@ namespace Online {
     class ServersManager
     {
     public:
-        enum RequestType
-        {
-            RT_REFRESH = 1
-        };
 
         class RefreshRequest : public XMLRequest
         {
             virtual void callback ();
         public:
-            RefreshRequest() : XMLRequest(RT_REFRESH) {}
+            RefreshRequest() : XMLRequest() {}
         };
 
     private:

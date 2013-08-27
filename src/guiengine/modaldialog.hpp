@@ -55,10 +55,11 @@ namespace GUIEngine
     class ModalDialog : public SkinWidgetContainer, public AbstractTopLevelContainer
     {
     private:
-        /** Because C++ doesn't support constructor delegation... */
-        void doInit(const float percentWidth, const float percentHeight);
 
         ModalDialogLocation m_dialog_location;
+
+        float m_percent_width, m_percent_height;
+        bool m_init;
 
 
     protected:
@@ -85,9 +86,14 @@ namespace GUIEngine
           *        that takes a XML file as argument is used)
           */
         virtual void loadedFromFile() {}
+        void doInit();
 
     public:
         LEAK_CHECK()
+
+        /** Because C++ doesn't support constructor delegation... */
+
+        bool isInited() {return m_init;}
 
         virtual ~ModalDialog();
 
@@ -115,6 +121,7 @@ namespace GUIEngine
          *        init(), which is invoked afer widgets were added)
          */
         virtual void beforeAddingWidgets() {}
+        virtual void load() {}
 
         /** \brief Optional callback invoked after widgets have been add()ed */
         virtual void init() {}

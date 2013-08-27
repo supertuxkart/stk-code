@@ -34,7 +34,7 @@ namespace Online{
 
     // =========================================================================================
 
-    Request::Request(int type, bool manage_memory, int priority)
+    Request::Request(bool manage_memory, int priority, int type)
         : m_type(type), m_manage_memory(manage_memory), m_priority(priority)
     {
         m_cancel.setAtomic(false);
@@ -55,16 +55,13 @@ namespace Online{
 
     void Request::afterOperation()
     {
-        m_state.setAtomic(S_DONE);
     }
 
     // =========================================================================================
 
-    HTTPRequest::HTTPRequest(int type, bool manage_memory, int priority)
-        : Request(priority, manage_memory, type)
+    HTTPRequest::HTTPRequest(bool manage_memory, int priority)
+        : Request(manage_memory, priority, 0)
     {
-        //Negative numbers are reserved for special requests ment for the HTTP Manager
-        assert(type >= 0);
         m_url = "";
         m_parameters = new Parameters();
         m_progress.setAtomic(0);
@@ -78,7 +75,9 @@ namespace Online{
     bool HTTPRequest::isAllowedToAdd()
     {
         if (!Request::isAllowedToAdd() || m_url.size() < 5 || ( m_url.substr(0, 5) != "http:"))
+        {
             return false;
+        }
         return true;
     }
 
@@ -99,6 +98,13 @@ namespace Online{
         curl_easy_setopt(m_curl_session, CURLOPT_CONNECTTIMEOUT, 20);
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_LIMIT, 10);
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_TIME, 20);
+        //https
+        struct curl_slist *chunk = NULL;
+        chunk = curl_slist_append(chunk, "Host: api.stkaddons.net");
+        curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, chunk);
+        curl_easy_setopt(m_curl_session, CURLOPT_CAINFO, (file_manager->getDataDir() + "web.tuxfamily.org.pem").c_str());
+        curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 0L);
+        //curl_easy_setopt(m_curl_session, CURLOPT_VERBOSE, 1L);
     }
 
     void HTTPRequest::operation()
@@ -145,7 +151,6 @@ namespace Online{
             setProgress(-1.0f);
         Request::afterOperation();
         curl_easy_cleanup(m_curl_session);
-        callback();
     }
 
     size_t HTTPRequest::WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -201,8 +206,8 @@ namespace Online{
 
     // =========================================================================================
 
-    XMLRequest::XMLRequest(int type, bool manage_memory, int priority)
-        : HTTPRequest(priority, manage_memory, type)
+    XMLRequest::XMLRequest(bool manage_memory, int priority)
+        : HTTPRequest(manage_memory, priority)
     {
         m_string_buffer = "";
         m_info = "";

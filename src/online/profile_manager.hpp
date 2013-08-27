@@ -19,7 +19,6 @@
 #ifndef HEADER_ONLINE_PROFILE_MANAGER_HPP
 #define HEADER_ONLINE_PROFILE_MANAGER_HPP
 
-#include "online/user.hpp"
 #include "utils/types.hpp"
 #include "online/profile.hpp"
 
@@ -41,30 +40,33 @@ namespace Online{
 
         private:
             ProfileManager      ();
-
-            enum State
-            {
-                S_FETCHING = 1,
-                S_READY
-            };
+            ~ProfileManager     ();
 
             typedef std::map<uint32_t, Profile*>    ProfilesMap;
 
             ProfilesMap                             m_profiles_cache;
+            ProfilesMap                             m_profiles_persistent; // current user and friends
             Profile *                               m_currently_visiting;
-            static const unsigned int               m_max_cache_size = 5;
+            static const unsigned int               m_max_cache_size = 20;
 
-            void                                    iterateCache();
-            void                                    addToCache(Profile * profile);
+            void                                    iterateCache(Profile * profile);
+            void                                    directToCache(Profile * profile);
 
         public:
             /**Singleton */
             static ProfileManager *                 get();
             static void                             deallocate();
 
-            void                                    setVisiting(Online::User * user);
+            void                                    addToCache(Profile * profile);
+            void                                    addPersistent(Profile * profile);
+            void                                    deleteFromPersistent(const uint32_t id);
+            void                                    clearPersistent();
+            void                                    moveToCache(const uint32_t id);
+            void                                    setVisiting(const uint32_t id);
+            bool                                    cacheHit(const uint32_t id);
+            bool                                    inPersistent(const uint32_t id);
             Profile *                               getVisitingProfile() {return m_currently_visiting;}
-            Profile *                               getProfileByID(uint32_t id);
+            Profile *                               getProfileByID(const uint32_t id);
 
     };   // class CurrentUser
 

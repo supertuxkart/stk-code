@@ -1022,7 +1022,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     }
     if (m_smooth_reflection_shader)
     {
-        IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (UserConfigParams::m_pixel_shaders &&
             irr_driver->isGLSL())
         {
@@ -1308,7 +1307,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 
     if (m_graphical_effect == GE_WATER_SHADER)
     {
-        IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (UserConfigParams::m_pixel_shaders &&
             irr_driver->isGLSL())
         {
@@ -1345,7 +1343,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 
     if (m_graphical_effect == GE_GRASS)
     {
-        IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (UserConfigParams::m_pixel_shaders &&
             irr_driver->isGLSL())
         {

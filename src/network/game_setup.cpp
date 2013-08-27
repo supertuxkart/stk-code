@@ -47,7 +47,7 @@ void GameSetup::addPlayer(NetworkPlayerProfile* profile)
 {
     m_players.push_back(profile);
     Log::info("GameSetup", "New player in the game setup. Global id : %u, "
-        "Race id : %d.", profile->user_profile->getUserID(), profile->race_id);
+        "Race id : %d.", profile->user_profile->getID(), profile->race_id);
 }
 
 //-----------------------------------------------------------------------------
@@ -56,7 +56,7 @@ bool GameSetup::removePlayer(uint32_t id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
-        if (m_players[i]->user_profile->getUserID() == id)
+        if (m_players[i]->user_profile->getID() == id)
         {
             delete m_players[i];
             m_players.erase(m_players.begin()+i, m_players.begin()+i+1);
@@ -150,7 +150,7 @@ const NetworkPlayerProfile* GameSetup::getProfile(uint32_t id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
-        if (m_players[i]->user_profile->getUserID() == id)
+        if (m_players[i]->user_profile->getID() == id)
         {
             return m_players[i];
         }

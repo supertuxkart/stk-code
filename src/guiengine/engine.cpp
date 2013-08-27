@@ -657,6 +657,7 @@ namespace GUIEngine
 #include "guiengine/screen.hpp"
 #include "guiengine/skin.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/dialog_queue.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -835,6 +836,7 @@ namespace GUIEngine
             {
                 widget->update(dt);
             }
+            DialogQueue::get()->update();
         }
 
     }

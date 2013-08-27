@@ -45,9 +45,8 @@ void OnlineProfileBase::loadedFromFile()
 {
     m_profile_tabs = this->getWidget<RibbonWidget>("profile_tabs");
     assert(m_profile_tabs != NULL);
-    LabelWidget * header = this->getWidget<LabelWidget>("title");
-    assert(header != NULL);
-    header->setText(_("Your profile"), false);
+    m_header = this->getWidget<LabelWidget>("title");
+    assert(m_header != NULL);
 
     m_overview_tab = (IconButtonWidget *) m_profile_tabs->findWidgetNamed("tab_overview");
     assert(m_overview_tab != NULL);
@@ -64,6 +63,12 @@ void OnlineProfileBase::init()
 
     m_overview_tab->setTooltip( _("Overview") );
     m_friends_tab->setTooltip( _("Friends") );
+
+    m_visiting_profile = ProfileManager::get()->getVisitingProfile();
+    if (m_visiting_profile->isCurrentUser())
+        m_header->setText(_("Your profile"), false);
+    else
+        m_header->setText( m_visiting_profile->getUserName() +  _("'s profile"), false);
 
 }   // init
 

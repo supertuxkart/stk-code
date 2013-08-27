@@ -46,7 +46,7 @@ void GetPeerAddress::asynchronousUpdate()
     {
         m_request = new Online::XMLRequest();
         m_request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-        m_request->setParameter("id",Online::CurrentUser::get()->getUserID());
+        m_request->setParameter("id",Online::CurrentUser::get()->getID());
         m_request->setParameter("token",Online::CurrentUser::get()->getToken());
         m_request->setParameter("peer_id",m_peer_id);
         m_request->setParameter("action","get");

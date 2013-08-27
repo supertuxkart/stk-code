@@ -960,9 +960,9 @@ bool Kart::isNearGround() const
  */
 void Kart::setShieldTime(float t)
 {
-    if(this->isShielded())
+    if(isShielded())
     {
-        this->getAttachment()->setTimeLeft(t);
+        getAttachment()->setTimeLeft(t);
     }
 }
 // ------------------------------------------------------------------------
@@ -975,7 +975,8 @@ bool Kart::isShielded() const
         return getAttachment()->getType() == Attachment::ATTACH_BUBBLEGUM_SHIELD;
     else
         return false;
-}
+}   // isShielded
+
 // ------------------------------------------------------------------------
 /**
  *Returns the remaining time the kart is protected by a shield.
@@ -986,7 +987,8 @@ float Kart::getShieldTime() const
         return getAttachment()->getTimeLeft();
     else
         return 0.0f;
-}
+}   // getShieldTime
+
 // ------------------------------------------------------------------------
 /**
  * Decreases the kart's shield time.
@@ -994,7 +996,7 @@ float Kart::getShieldTime() const
  */
 void Kart::decreaseShieldTime(float t)
 {
-    if(this->isShielded())
+    if(isShielded())
     {
         getAttachment()->setTimeLeft( getAttachment()->getTimeLeft() - t );
         if(t == 0.0f)
@@ -1007,13 +1009,10 @@ void Kart::decreaseShieldTime(float t)
     //Let the kart drop a bubble gum, if the shield was not damaged.
     //This is the default, whenever a powerup is used by a kart.
     //It is turned off, if the shield was reduced below zero by a hit. (Or by intently damaging the shield.)
-    if(!this->isShielded())
+    if(!isShielded())
         m_bubble_drop = false;
 
-}
-
-
-
+}   // decreaseShieldTime
 
 //-----------------------------------------------------------------------------
 /** Shows the star effect for a certain time.

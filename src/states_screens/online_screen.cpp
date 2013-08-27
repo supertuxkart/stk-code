@@ -60,16 +60,12 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 {
     m_recorded_state = CurrentUser::US_SIGNED_OUT;
-    const CurrentUser::SignInRequest * request = CurrentUser::get()->requestSavedSession();
-    if(request != NULL)
-        m_requests.push_back(request);
 }   // OnlineScreen
 
 // ----------------------------------------------------------------------------
 
 OnlineScreen::~OnlineScreen()
 {
-    m_requests.clearAndDeleteAll();
 }
 
 // ----------------------------------------------------------------------------
@@ -172,28 +168,6 @@ void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     {
         m_online_status_widget->setText(Messages::signingOut(), false);
     }
-    for(int i = m_requests.size()-1; i>=0; --i)
-    {
-        if(m_requests[i].isDone())
-        {
-            if(m_requests[i].getType() == CurrentUser::RT_SIGN_IN)
-            {
-                if(m_requests[i].isSuccess())
-                {
-                    new MessageDialog(_("Signed in."));
-                }
-                else
-                {
-                    sfx_manager->quickSound( "anvil" );
-                    new MessageDialog(m_requests[i].getInfo());
-                }
-            }else if(m_requests[i].getType() == CurrentUser::RT_SIGN_OUT)
-            {
-                new MessageDialog(_("Signed out successfully."));
-            }
-            m_requests.erase(i);
-        }
-    }
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -210,32 +184,32 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     if (ribbon == NULL) return;
     std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-    if (selection == "sign_in")
+    if (selection == m_sign_in_widget->m_properties[PROP_ID])
     {
         new LoginDialog(LoginDialog::Normal);
     }
-    else if (selection == "sign_out")
+    else if (selection == m_sign_out_widget->m_properties[PROP_ID])
     {
         CurrentUser::get()->requestSignOut();
     }
     else if (selection == m_profile_widget->m_properties[PROP_ID])
     {
-        ProfileManager::get()->setVisiting(CurrentUser::get());
+        ProfileManager::get()->setVisiting(CurrentUser::get()->getID());
         StateManager::get()->pushScreen(OnlineProfileOverview::getInstance());
     }
-    else if (selection == "register")
+    else if (selection == m_register_widget->m_properties[PROP_ID])
     {
         new RegistrationDialog();
     }
-    else if (selection == "find_server")
+    else if (selection == m_find_server_widget->m_properties[PROP_ID])
     {
         StateManager::get()->pushScreen(ServerSelection::getInstance());
     }
-    else if (selection == "create_server")
+    else if (selection == m_create_server_widget->m_properties[PROP_ID])
     {
         StateManager::get()->pushScreen(CreateServerScreen::getInstance());
     }
-    else if (selection == "quick_play")
+    else if (selection == m_quick_play_widget->m_properties[PROP_ID])
     {
         //FIXME temporary and the request join + join sequence should be placed in one method somewhere
         // refresh server list

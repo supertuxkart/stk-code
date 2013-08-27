@@ -94,6 +94,8 @@ namespace video
 		//! Returns amount of textures currently loaded
 		virtual u32 getTextureCount() const;
 
+		virtual u32 indiceToPrimitiveCount(scene::E_PRIMITIVE_TYPE pType, u32 count) const;
+
 		//! Renames a texture
 		virtual void renameTexture(ITexture* texture, const io::path& newName);
 

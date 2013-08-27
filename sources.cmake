@@ -51,6 +51,7 @@ src/graphics/stars.cpp
 src/guiengine/abstract_state_manager.cpp
 src/guiengine/abstract_top_level_container.cpp
 src/guiengine/CGUISpriteBank.cpp
+src/guiengine/dialog_queue.cpp
 src/guiengine/engine.cpp
 src/guiengine/event_handler.cpp
 src/guiengine/layout_manager.cpp
@@ -178,7 +179,6 @@ src/online/profile_manager.cpp
 src/online/request.cpp
 src/online/server.cpp
 src/online/servers_manager.cpp
-src/online/user.cpp
 src/physics/btKart.cpp
 src/physics/btKartRaycast.cpp
 src/physics/btUprightConstraint.cpp
@@ -208,6 +208,7 @@ src/states_screens/dialogs/enter_player_name_dialog.cpp
 src/states_screens/dialogs/gp_info_dialog.cpp
 src/states_screens/dialogs/login_dialog.cpp
 src/states_screens/dialogs/message_dialog.cpp
+src/states_screens/dialogs/notification_dialog.cpp
 src/states_screens/dialogs/player_info_dialog.cpp
 src/states_screens/dialogs/press_a_key_dialog.cpp
 src/states_screens/dialogs/race_paused_dialog.cpp
@@ -217,6 +218,7 @@ src/states_screens/dialogs/select_challenge.cpp
 src/states_screens/dialogs/server_info_dialog.cpp
 src/states_screens/dialogs/track_info_dialog.cpp
 src/states_screens/dialogs/tutorial_message_dialog.cpp
+src/states_screens/dialogs/user_info_dialog.cpp
 src/states_screens/dialogs/vote_dialog.cpp
 src/states_screens/feature_unlocked.cpp
 src/states_screens/grand_prix_lose.cpp
@@ -347,6 +349,7 @@ src/graphics/slip_stream.hpp
 src/graphics/stars.hpp
 src/guiengine/abstract_state_manager.hpp
 src/guiengine/abstract_top_level_container.hpp
+src/guiengine/dialog_queue.hpp
 src/guiengine/engine.hpp
 src/guiengine/event_handler.hpp
 src/guiengine/layout_manager.hpp
@@ -476,7 +479,6 @@ src/online/profile_manager.hpp
 src/online/request.hpp
 src/online/server.hpp
 src/online/servers_manager.hpp
-src/online/user.hpp
 src/physics/btKart.hpp
 src/physics/btKartRaycast.hpp
 src/physics/btUprightConstraint.hpp
@@ -509,6 +511,7 @@ src/states_screens/dialogs/enter_player_name_dialog.hpp
 src/states_screens/dialogs/gp_info_dialog.hpp
 src/states_screens/dialogs/login_dialog.hpp
 src/states_screens/dialogs/message_dialog.hpp
+src/states_screens/dialogs/notification_dialog.hpp
 src/states_screens/dialogs/player_info_dialog.hpp
 src/states_screens/dialogs/press_a_key_dialog.hpp
 src/states_screens/dialogs/race_paused_dialog.hpp
@@ -518,6 +521,7 @@ src/states_screens/dialogs/select_challenge.hpp
 src/states_screens/dialogs/server_info_dialog.hpp
 src/states_screens/dialogs/track_info_dialog.hpp
 src/states_screens/dialogs/tutorial_message_dialog.hpp
+src/states_screens/dialogs/user_info_dialog.hpp
 src/states_screens/dialogs/vote_dialog.hpp
 src/states_screens/feature_unlocked.hpp
 src/states_screens/grand_prix_lose.hpp

@@ -34,7 +34,7 @@ void* protocolManagerUpdate(void* data)
     while(!manager->exit())
     {
         manager->update();
-        irr_driver->getDevice()->sleep(20);
+        usleep(2000);
     }
     return NULL;
 }
@@ -44,7 +44,7 @@ void* protocolManagerAsynchronousUpdate(void* data)
     while(!manager->exit())
     {
         manager->asynchronousUpdate();
-        irr_driver->getDevice()->sleep(20);
+        usleep(2000);
     }
     return NULL;
 }

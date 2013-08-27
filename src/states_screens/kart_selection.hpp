@@ -244,7 +244,7 @@ class PlayerKartWidget : public GUIEngine::Widget,
     /** Object representing this player */
     StateManager::ActivePlayer* m_associatedPlayer; // local info
     int m_playerID;
-    Online::User* m_associated_user; // network info
+    Online::Profile* m_associated_user; // network info
 
     /** Internal name of the spinner; useful to interpret spinner events,
      *  which contain the name of the activated object */
@@ -276,7 +276,7 @@ public:
 
     PlayerKartWidget(KartSelectionScreen* parent,
                      StateManager::ActivePlayer* associatedPlayer,
-                     Online::User* associatedUser,
+                     Online::Profile* associatedUser,
                      core::recti area, const int playerID,
                      std::string kartGroup,
                      const int irrlichtWidgetID=-1);

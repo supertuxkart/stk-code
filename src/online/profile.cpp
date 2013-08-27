@@ -35,19 +35,78 @@ using namespace Online;
 namespace Online{
 
 
-    // ============================================================================
-    Profile::Profile(User * user)
+
+    Profile::RelationInfo::RelationInfo(const irr::core::stringw & date, bool is_online, bool is_pending, bool is_asker)
     {
-        setState (S_READY);
-        m_is_current_user = false;
-        m_cache_bit = false;
-        m_id = user->getUserID();
-        m_username = user->getUserName();
-        m_is_current_user = (m_id == CurrentUser::get()->getUserID());
+        m_date = date;
+        m_is_online = is_online;
+        m_is_pending = is_pending;
+        m_is_asker = is_asker;
+    }
 
+    // ============================================================================
+    void Profile::RelationInfo::setOnline(bool online)
+    {
+        m_is_online = online;
+        if(m_is_online)
+            m_is_pending = false;
+    }
+
+    // ============================================================================
+    Profile::Profile( const uint32_t           & userid,
+                      const irr::core::stringw & username,
+                      bool is_current_user)
+    {
+        m_state = S_READY;
+        m_cache_bit = true;
+        m_id = userid;
+        m_is_current_user = is_current_user;
+        m_username = username;
         m_has_fetched_friends = false;
-        m_friends_list_request = NULL;
+        m_relation_info = NULL;
+        m_is_friend = false;
+    }
 
+    Profile::Profile(const XMLNode * xml, ConstructorType type)
+    {
+        m_relation_info = NULL;
+        m_is_friend = false;
+        if(type == C_RELATION_INFO){
+            irr::core::stringw date("");
+            xml->get("date", &date);
+            std::string is_pending_string("");
+            xml->get("is_pending", &is_pending_string);
+            bool is_pending = is_pending_string == "yes";
+            bool is_asker(false);
+            bool is_online(false);
+            if(is_pending)
+            {
+                std::string is_asker_string("");
+                xml->get("is_asker", &is_asker_string);
+                is_asker = is_asker_string == "yes";
+            }
+            else
+            {
+                std::string is_online_string("");
+                xml->get("online", &is_online_string);
+                is_online = is_online_string == "yes";
+                m_is_friend = true;
+            }
+            m_relation_info = new RelationInfo(date, is_online, is_pending, is_asker);
+            xml = xml->getNode("user");
+        }
+
+        xml->get("id", &m_id);
+        xml->get("user_name", &m_username);
+        m_cache_bit = true;
+        m_has_fetched_friends = false;
+        m_is_current_user = (m_id == CurrentUser::get()->getID());
+        m_state = S_READY;
+    }
+    // ============================================================================
+    Profile::~Profile()
+    {
+        delete m_relation_info;
     }
 
     // ============================================================================
@@ -56,8 +115,8 @@ namespace Online{
         assert(CurrentUser::get()->isRegisteredUser());
         if(m_has_fetched_friends)
             return;
-        setState (S_FETCHING);
-        m_friends_list_request = requestFriendsList();
+        m_state = S_FETCHING;
+        requestFriendsList();
     }
     // ============================================================================
 
@@ -65,34 +124,38 @@ namespace Online{
     void Profile::friendsListCallback(const XMLNode * input)
     {
         const XMLNode * friends_xml = input->getNode("friends");
-        m_friends.clearAndDeleteAll();
-        uint32_t friendid(0);
-        irr::core::stringw username("");
+        m_friends.clear();
         for (unsigned int i = 0; i < friends_xml->getNumNodes(); i++)
         {
-            friends_xml->getNode(i)->get("friend_id", &friendid);
-            friends_xml->getNode(i)->get("friend_name", &username);
-            m_friends.push_back(new User(username, friendid));
+            Profile * profile;
+            if(m_is_current_user)
+            {
+                profile = new Profile(friends_xml->getNode(i) , C_RELATION_INFO);
+                ProfileManager::get()->addPersistent(profile);
+            }
+            else
+            {
+                profile = new Profile(friends_xml->getNode(i)->getNode("user"), C_DEFAULT);
+                ProfileManager::get()->addToCache(profile);
+            }
+            m_friends.push_back(profile->getID());
         }
         m_has_fetched_friends = true;
-        delete m_friends_list_request;
-        m_friends_list_request = NULL;
-        Profile::setState (Profile::S_READY);
+        m_state = S_READY;
     }
 
 
     // ============================================================================
 
-    const Profile::FriendsListRequest * Profile::requestFriendsList()
+    void Profile::requestFriendsList()
     {
         FriendsListRequest * request = new FriendsListRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",std::string("get-friends-list"));
         request->setParameter("token", CurrentUser::get()->getToken());
-        request->setParameter("userid", CurrentUser::get()->getUserID());
+        request->setParameter("userid", CurrentUser::get()->getID());
         request->setParameter("visitingid", m_id);
         HTTPManager::get()->addRequest(request);
-        return request;
     }
 
     void Profile::FriendsListRequest::callback()
@@ -105,9 +168,43 @@ namespace Online{
 
     // ============================================================================
 
-    const PtrVector<Online::User> & Profile::getFriends()
+    void Profile::removeFriend( const uint32_t id)
     {
-        assert (m_has_fetched_friends && getState() == S_READY);
+        assert (m_has_fetched_friends);
+        std::vector<uint32_t>::iterator iter;
+        for (iter = m_friends.begin(); iter != m_friends.end();)
+        {
+           if (*iter == id)
+           {
+               m_friends.erase(iter++);
+               break;
+           }
+           else
+               ++iter;
+        }
+    }
+    // ============================================================================
+
+    void Profile::addFriend( const uint32_t id)
+    {
+        assert (m_has_fetched_friends);
+        //FIXME check if it's not already in there
+        m_friends.push_back(id);
+    }
+
+    // ============================================================================
+
+    void Profile::deleteRelationalInfo()
+    {
+        delete m_relation_info;
+        m_relation_info = NULL;
+    }
+
+    // ============================================================================
+
+    const std::vector<uint32_t> & Profile::getFriends()
+    {
+        assert (m_has_fetched_friends && m_state == S_READY);
         return m_friends;
     }
     // ============================================================================

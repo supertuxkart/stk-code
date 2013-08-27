@@ -21,7 +21,6 @@
 
 #include "http_manager.hpp"
 #include "online/request.hpp"
-#include "online/user.hpp"
 #include "utils/types.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -41,12 +40,34 @@ namespace Online{
     class Profile
     {
         public :
+            enum ConstructorType
+            {
+                C_DEFAULT = 1,
+                C_RELATION_INFO
+            };
+            class RelationInfo
+            {
+            private:
+                bool m_is_online;
+                bool m_is_pending;
+                bool m_is_asker;
+                irr::core::stringw m_date;
+            public:
+                RelationInfo(const irr::core::stringw & date, bool is_online, bool is_pending, bool is_asker = false);
+                bool isPending(){return m_is_pending;}
+                bool isAsker(){return m_is_asker;}
+                const irr::core::stringw & getDate() { return m_date; }
+                bool                            isOnline() const                 { return m_is_online; }
+                void                            setOnline(bool online);
+            };
             class FriendsListRequest : public XMLRequest
             {
                 virtual void callback ();
             public:
-                FriendsListRequest() : XMLRequest() {}
+                FriendsListRequest() : XMLRequest(0, true) {}
             };
+
+            typedef std::vector<uint32_t> IDList;
         private:
 
             enum State
@@ -55,38 +76,49 @@ namespace Online{
                 S_READY
             };
 
-            Synchronised<State>             m_state;
+            State                           m_state;
             bool                            m_is_current_user;
             uint32_t                        m_id;
             irr::core::stringw              m_username;
+            RelationInfo *                  m_relation_info;
+            bool                            m_is_friend;
 
             bool                            m_has_fetched_friends;
-            PtrVector<Online::User>         m_friends;
-            const FriendsListRequest *      m_friends_list_request;
+            std::vector<uint32_t>           m_friends;
 
             bool                            m_cache_bit;
 
-
-
-            void                            setState(State state)       { m_state.setAtomic(state); }
-            const State                     getState() const            { return m_state.getAtomic(); }
-
-            const FriendsListRequest * requestFriendsList();
+            void requestFriendsList();
             void friendsListCallback(const XMLNode * input);
 
         public:
-            Profile(User * user);
-            void fetchFriends();
-            const PtrVector<Online::User> & getFriends();
+                                            Profile(    const uint32_t           & userid,
+                                                        const irr::core::stringw & username,
+                                                        bool is_current_user = false);
+                                            Profile(    const XMLNode * xml,
+                                                        ConstructorType type = C_DEFAULT);
+                                            ~Profile();
+            void                            fetchFriends();
+            const std::vector<uint32_t> &   getFriends();
 
-            bool isFetching() { return getState() == S_FETCHING; }
-            bool isReady() { return getState() == S_READY; }
+            bool                            isFetching() const               { return m_state == S_FETCHING; }
+            bool                            isReady() const                  { return m_state == S_READY; }
 
-            void setCacheBit() { m_cache_bit = true; }
-            void unsetCacheBit() { m_cache_bit = false; }
-            bool getCacheBit() { return m_cache_bit; }
-            uint32_t getID() { return m_id; }
-            irr::core::stringw getUsername() { return m_username; }
+            bool                            isCurrentUser() const            { return m_is_current_user; }
+            bool                            isFriend() const                 { return m_is_friend; }
+            void                            setFriend()                      { m_is_friend = true; }
+            void                            removeFriend(const uint32_t id);
+            void                            addFriend(const uint32_t id);
+            void                            deleteRelationalInfo();
+            RelationInfo *                  getRelationInfo()                { return m_relation_info; }
+            void                            setRelationInfo(RelationInfo * r){ delete m_relation_info; m_relation_info = r;}
+
+            void                            setCacheBit()                    { m_cache_bit = true; }
+            void                            unsetCacheBit()                  { m_cache_bit = false; }
+            bool                            getCacheBit() const              { return m_cache_bit; }
+
+            uint32_t                        getID() const                    { return m_id; }
+            const irr::core::stringw &      getUserName() const              { return m_username; }
 
 
     };   // class CurrentUser

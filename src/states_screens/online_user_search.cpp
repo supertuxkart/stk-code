@@ -21,7 +21,7 @@
 #include <assert.h>
 
 #include "guiengine/modaldialog.hpp"
-//#include "states_screens/dialogs/user_info_dialog.hpp"
+#include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/translation.hpp"
@@ -48,8 +48,6 @@ OnlineUserSearch::OnlineUserSearch() : Screen("online/user_search.stkgui")
 
 OnlineUserSearch::~OnlineUserSearch()
 {
-    delete m_search_request;
-    m_users.clearAndDeleteAll();
 }   // OnlineUserSearch
 
 // ----------------------------------------------------------------------------
@@ -65,21 +63,25 @@ void OnlineUserSearch::tearDown()
 
 void OnlineUserSearch::parseResult(const XMLNode * input)
 {
-    m_users.clearAndDeleteAll();
+    m_users.clear();
     const XMLNode * users_xml = input->getNode("users");
     for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
     {
-        m_users.push_back(new User(users_xml->getNode(i)));
+        Profile * profile = new Profile(users_xml->getNode(i));
+        ProfileManager::get()->addToCache(profile);
+        m_users.push_back(profile->getID());
     }
 }
 
 void OnlineUserSearch::showList()
 {
     m_user_list_widget->clear();
-    for(int i=0; i < m_users.size(); i++)
+    for(unsigned int i=0; i < m_users.size(); i++)
     {
         PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
-        row->push_back(new GUIEngine::ListWidget::ListCell(m_users[i].getUserName(),-1,3));
+        Profile * profile = ProfileManager::get()->getProfileByID(m_users[i]);
+        assert(profile != NULL);
+        row->push_back(new GUIEngine::ListWidget::ListCell(profile->getUserName(),-1,3));
         m_user_list_widget->addItem("user", row);
     }
 }
@@ -92,6 +94,8 @@ void OnlineUserSearch::search()
         m_search_request = CurrentUser::get()->requestUserSearch(m_search_string);
     else
         m_fake_refresh = true;
+    m_user_list_widget->clear();
+    m_user_list_widget->addItem("spacer", L"");
     m_user_list_widget->addItem("loading", Messages::searching());
     m_back_widget->setDeactivated();
     m_search_box_widget->setDeactivated();
@@ -132,9 +136,7 @@ void OnlineUserSearch::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-void OnlineUserSearch::eventCallback( GUIEngine::Widget* widget,
-                                     const std::string& name,
-                                     const int playerID)
+void OnlineUserSearch::eventCallback( GUIEngine::Widget* widget, const std::string& name, const int playerID)
 {
     if (name == m_back_widget->m_properties[GUIEngine::PROP_ID])
     {
@@ -143,7 +145,7 @@ void OnlineUserSearch::eventCallback( GUIEngine::Widget* widget,
     else if (name == m_user_list_widget->m_properties[GUIEngine::PROP_ID])
     {
         m_selected_index = m_user_list_widget->getSelectionID();
-        //new UserInfoDialog(m_users[m_selected_index]); FIXME
+        new UserInfoDialog(m_users[m_selected_index]);
     }
     else if (name == m_search_button_widget->m_properties[GUIEngine::PROP_ID])
     {
