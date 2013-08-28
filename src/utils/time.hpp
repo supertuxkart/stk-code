@@ -113,7 +113,7 @@ public:
 #ifdef WIN32
         Sleep(msec);
 #else
-        usleep(msec*1000)
+        usleep(msec*1000);
 #endif
     }   // sleep
     // ------------------------------------------------------------------------
