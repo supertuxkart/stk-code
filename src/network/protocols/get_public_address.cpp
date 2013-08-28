@@ -28,7 +28,12 @@
 #include "utils/random_generator.hpp"
 
 #include <assert.h>
-#include <netdb.h>
+#ifdef WIN32
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#else
+#  include <netdb.h>
+#endif
 #include <sys/types.h>
 
 int stunRand()
@@ -117,9 +122,9 @@ void GetPublicAddress::asynchronousUpdate()
         }
         for(p = res;p != NULL; p = p->ai_next)
         {
-            struct sockaddr_in* interface = (struct sockaddr_in*)(p->ai_addr);
+            struct sockaddr_in* current_interface = (struct sockaddr_in*)(p->ai_addr);
 
-            m_stun_server_ip = ntohl(interface->sin_addr.s_addr);
+            m_stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
             NetworkManager::getInstance()->setManualSocketsMode(true);
             NetworkManager::getInstance()->getHost()->sendRawPacket(bytes, 20, TransportAddress(m_stun_server_ip, 3478));
             m_state = TEST_SENT;

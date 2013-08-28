@@ -236,6 +236,9 @@ if(APPLE)
     # CMake pick the library it wants essentially means I can't build.
     set_target_properties(supertuxkart PROPERTIES LINK_FLAGS "-arch i386 -F/Library/Frameworks -framework OpenAL -framework Ogg -framework Vorbis")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/Library/Frameworks/OpenAL.framework/Versions/A/Headers")
+elseif(MSVC)
+  # We need to link with Iphlpapi.lib for some networking support:
+  target_link_libraries(supertuxkart "Iphlpapi.lib")
 endif()
 
 if(USE_FRIBIDI)
