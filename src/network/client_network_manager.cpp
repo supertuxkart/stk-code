@@ -36,7 +36,6 @@ void* waitInput(void* data)
 {
     std::string str = "";
     bool stop = false;
-    int n = 0;
 
     while(!stop)
     {

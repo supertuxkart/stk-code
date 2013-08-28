@@ -38,7 +38,6 @@ bool KartUpdateProtocol::notifyEventAsynchronous(Event* event)
         Log::info("KartUpdateProtocol", "Message too short.");
         return true;
     }
-    float game_time = ns.getFloat(0);
     ns.removeFront(4);
     while(ns.size() >= 16)
     {

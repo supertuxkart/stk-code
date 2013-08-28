@@ -78,14 +78,14 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
         return true;
     }
     NetworkString ns = pure_message;
-    float event_timestamp = ns.getFloat();
+
     ns.removeFront(4);
     uint8_t client_index = -1;
     while (ns.size() >= 9)
     {
         uint8_t controller_index = ns.gui8();
         client_index = controller_index;
-        uint8_t serialized_1 = ns.gui8(1), serialized_2 = ns.gui8(2), serialized_3 = ns.gui8(3);
+        uint8_t serialized_1 = ns.gui8(1);
         PlayerAction action  = (PlayerAction)(ns.gui8(4));
         int action_value = ns.gui32(5);
 
