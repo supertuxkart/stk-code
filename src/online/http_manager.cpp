@@ -36,14 +36,6 @@
 #  include <math.h>
 #endif
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-// Use Sleep, which takes time in msecs. It must be defined after the
-// includes, since otherwise irrlicht's sleep function is changed.
-#  define sleep(s) Sleep(1000*(s))
-#else
-#  include <unistd.h>
-#endif
-
 using namespace Online;
 
 namespace Online{

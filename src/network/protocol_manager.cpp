@@ -21,7 +21,7 @@
 #include "network/protocol.hpp"
 #include "network/network_manager.hpp"
 #include "utils/log.hpp"
-#include "graphics/irr_driver.hpp"
+#include "utils/time.hpp"
 
 #include <assert.h>
 #include <cstdlib>
@@ -34,7 +34,7 @@ void* protocolManagerUpdate(void* data)
     while(!manager->exit())
     {
         manager->update();
-        usleep(2000);
+        Time::sleep(2);
     }
     return NULL;
 }
@@ -44,7 +44,7 @@ void* protocolManagerAsynchronousUpdate(void* data)
     while(!manager->exit())
     {
         manager->asynchronousUpdate();
-        usleep(2000);
+        Time::sleep(2);
     }
     return NULL;
 }

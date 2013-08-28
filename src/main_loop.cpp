@@ -82,7 +82,7 @@ float MainLoop::getLimitedDt()
             int wait_time = 1000/max_fps - 1000/current_fps;
             if(wait_time < 1) wait_time = 1;
 
-            irr_driver->getDevice()->sleep(wait_time);
+            Time::sleep(wait_time);
         }
         else break;
     }

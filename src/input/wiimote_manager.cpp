@@ -26,6 +26,7 @@
 #include "input/device_manager.hpp"
 #include "input/wiimote.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/time.hpp"
 #include "utils/translation.hpp"
 
 #include "wiiuse.h"
@@ -110,7 +111,7 @@ void WiimoteManager::launchDetection(int timeout)
         wiiuse_rumble(wiimote_handle, 1);
     }
 
-    irr_driver->getDevice()->sleep(200);
+    Timer::sleep(200);
 
     for(unsigned int i=0 ; i < m_wiimotes.size(); i++)
     {
@@ -284,7 +285,7 @@ void WiimoteManager::threadFunc()
             }
         }
 
-        irr_driver->getDevice()->sleep(1);  // 'cause come on, the whole CPU is not ours :)
+        Timer::sleep(1);  // 'cause come on, the whole CPU is not ours :)
     } // end while
 }   // threadFunc
 

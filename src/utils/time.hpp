@@ -105,6 +105,18 @@ public:
     };   // compareTime
 
     // ------------------------------------------------------------------------
+    /** Sleeps for the specified amount of time.
+     *  \param msec Number of milliseconds to sleep.
+     */
+    static void sleep(int msec)
+    {
+#ifdef WIN32
+        Sleep(msec);
+#else
+        usleep(msec*1000)
+#endif
+    }   // sleep
+    // ------------------------------------------------------------------------
     /** 
      * \brief Add a interval to a time.
      */
@@ -116,6 +128,7 @@ public:
         return mktime(&t);
     }
 
+    // ------------------------------------------------------------------------
     class ScopeProfiler
     {
         float m_time;

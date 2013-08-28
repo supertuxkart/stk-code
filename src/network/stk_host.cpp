@@ -18,9 +18,9 @@
 
 #include "network/stk_host.hpp"
 
-#include "graphics/irr_driver.hpp"    // get access to irrlicht sleep function
 #include "network/network_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/time.hpp"
 
 #include <string.h>
 #ifdef WIN32
@@ -161,7 +161,7 @@ uint8_t* STKHost::receiveRawPacket()
     {
         i++;
         len = recv(m_host->socket,(char*)buffer,2048, 0);
-        irr_driver->getDevice()->sleep(1);
+        Time::sleep(1);
     }
     return buffer;
 }
@@ -186,7 +186,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
     {
         i++;
         len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
-        irr_driver->getDevice()->sleep(1); // wait 1 millisecond between two checks
+        Time::sleep(1); // wait 1 millisecond between two checks
     }
     struct sockaddr_in *sin = (struct sockaddr_in *) (&addr);
     // we received the data
@@ -226,7 +226,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
     {
         i++;
         len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
-        irr_driver->getDevice()->sleep(1); // wait 1 millisecond between two checks
+        Time::sleep(1); // wait 1 millisecond between two checks
         if (i >= max_tries && max_tries != -1)
         {
             Log::verbose("STKHost", "No answer from the server.");
