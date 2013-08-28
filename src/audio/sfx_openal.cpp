@@ -121,7 +121,7 @@ bool SFXOpenAL::init()
  */
 void SFXOpenAL::speed(float factor)
 {
-    if(!m_ok) return;
+    if(!m_ok || !isnormal(factor)) return;
 
     //OpenAL only accepts pitches in the range of 0.5 to 2.0
     if(factor > 2.0f)
