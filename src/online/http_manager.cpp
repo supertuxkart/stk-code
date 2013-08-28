@@ -135,7 +135,8 @@ namespace Online{
         // a download, which mean we can get the mutex and ask the service
         // thread here to cancel properly.
         cancelAllDownloads();
-        addRequest(new Request(true, 9999, Request::RT_QUIT));
+        CurrentUser::get()->onSTKQuit();
+        addRequest(new Request(true, MAX_PRIORITY, Request::RT_QUIT));
     }   // stopNetworkThread
 
 

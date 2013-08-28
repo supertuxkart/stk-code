@@ -155,6 +155,7 @@
 #include "graphics/referee.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
+#include "guiengine/dialog_queue.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/wiimote_manager.hpp"
@@ -168,13 +169,14 @@
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
-#include "online/http_manager.hpp"
 #include "network/client_network_manager.hpp"
 #include "network/server_network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "online/current_user.hpp"
 #include "online/http_manager.hpp"
+#include "online/profile_manager.hpp"
+#include "online/servers_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -1242,8 +1244,13 @@ void cleanSuperTuxKart()
     if(Online::HTTPManager::isRunning())
         Online::HTTPManager::get()->stopNetworkThread();
     //delete in reverse order of what they were created in.
-    //delete in reverse order of what they were created in.
     //see InitTuxkart()
+    Online::ServersManager::deallocate();
+    Online::ProfileManager::deallocate();
+    Online::CurrentUser::deallocate();
+    GUIEngine::DialogQueue::deallocate();
+
+
     Referee::cleanup();
     if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;

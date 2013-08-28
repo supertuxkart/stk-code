@@ -612,6 +612,20 @@ namespace Online{
         // after 2 misses I'll show something
 
     }
+    // ============================================================================
+
+    void CurrentUser::onSTKQuit() const
+    {
+        if(m_state != US_SIGNED_OUT)
+        {
+            HTTPRequest * request = new HTTPRequest(true, HTTPManager::MAX_PRIORITY);
+            request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+            request->setParameter("action", std::string("client-quit"));
+            request->setParameter("token", getToken());
+            request->setParameter("userid", getID());
+            HTTPManager::get()->addRequest(request);
+        }
+    }
 
     // ============================================================================
     irr::core::stringw CurrentUser::getUserName() const

@@ -82,6 +82,7 @@ namespace Online{
             ~HTTPManager();
 
         public:
+            static const int MAX_PRIORITY = 9999;
 
             // singleton
             static HTTPManager* get();

@@ -169,7 +169,7 @@ namespace Online{
 
             const XMLRequest *              requestUserSearch(const irr::core::stringw & search_string) const;
 
-
+            void                            onSTKQuit() const;
 
             /** Returns the username if signed in. */
             irr::core::stringw              getUserName()           const;
