@@ -184,6 +184,8 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
+void cleanSuperTuxKart();
+
 // ============================================================================
 //                        gamepad visualisation screen
 // ============================================================================
@@ -1082,6 +1084,7 @@ int handleCmdLine(int argc, char **argv)
 
             Log::error("main", "Invalid parameter: %s.\n", argv[i] );
             cmdLineHelp(argv[0]);
+            cleanSuperTuxKart();
             return 0;
         }
     }   // for i <argc
