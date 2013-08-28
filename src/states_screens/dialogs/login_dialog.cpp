@@ -155,8 +155,6 @@ GUIEngine::EventPropagation LoginDialog::processEvent(const std::string& eventSo
 
 void LoginDialog::onEnterPressedInternal()
 {
-
-    //If enter was pressed while none of the buttons was focused interpret as sign_in event
     const int playerID = PLAYER_ID_GAME_MASTER;
     if (GUIEngine::isFocusedForPlayer(m_options_widget, playerID))
         return;

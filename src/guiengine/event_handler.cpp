@@ -734,7 +734,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                     if (playerID == -1) break;
                     if (input_manager->masterPlayerOnly() && playerID != PLAYER_ID_GAME_MASTER) break;
 
-                    if (ribbon->mouseHovered(w, playerID) == EVENT_LET) sendEventToUser(ribbon, ribbon->m_properties[PROP_ID], playerID);
+                    ribbon->mouseHovered(w, playerID);
                     if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w, playerID);
                     ribbon->setFocusForPlayer(playerID);
                 }
