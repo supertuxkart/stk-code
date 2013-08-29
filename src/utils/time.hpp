@@ -27,6 +27,7 @@
 #else
 #  include <stdint.h>
 #  include <sys/time.h>
+#  include <unistd.h>
 #endif
 
 #include <string>
@@ -86,9 +87,9 @@ public:
     {
         return irr_driver->getDevice()->getTimer()->getRealTime()/1000.0;
     };   // getTimeSinceEpoch
-    
+
     // ------------------------------------------------------------------------
-    /** 
+    /**
      * \brief Compare two different times.
      * \return A signed integral indicating the relation between the time.
      */
@@ -117,7 +118,7 @@ public:
 #endif
     }   // sleep
     // ------------------------------------------------------------------------
-    /** 
+    /**
      * \brief Add a interval to a time.
      */
     static TimeType addInterval(TimeType time, int year, int month, int day) {
