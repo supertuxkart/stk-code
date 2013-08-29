@@ -215,6 +215,7 @@ void World::reset()
     m_faster_music_active = false;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
+    m_is_network_world = false;
 
     for ( KartList::iterator i = m_karts.begin(); i != m_karts.end() ; ++i )
     {

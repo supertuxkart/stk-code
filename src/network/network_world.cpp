@@ -51,7 +51,6 @@ void NetworkWorld::start()
 void NetworkWorld::stop()
 {
     m_running = false;
-    World::getWorld()->setNetworkWorld(false);
 }
 
 bool NetworkWorld::isRaceOver()

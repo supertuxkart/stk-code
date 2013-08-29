@@ -1,20 +1,21 @@
 #include "network/protocols/start_game_protocol.hpp"
 
+#include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
+#include "challenges/unlock_manager.hpp"
+#include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
+#include "online/current_user.hpp"
 #include "race/race_manager.hpp"
-#include "utils/log.hpp"
-#include "utils/time.hpp"
-
-#include "input/device_manager.hpp"
-#include "input/input_manager.hpp"
-#include "challenges/unlock_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/kart_selection.hpp"
-#include "online/current_user.hpp"
+#include "states_screens/network_kart_selection.hpp"
+#include "utils/log.hpp"
+#include "utils/time.hpp"
 
 StartGameProtocol::StartGameProtocol(GameSetup* game_setup) :
         Protocol(NULL, PROTOCOL_START_GAME)
@@ -166,6 +167,7 @@ void StartGameProtocol::update()
             // now the synchronization protocol exists.
             Log::info("StartGameProtocol", "Starting the race loading.");
             race_manager->startSingleRace("jungle", 1, false);
+            World::getWorld()->setNetworkWorld(true);
             m_state = LOADING;
         }
     }

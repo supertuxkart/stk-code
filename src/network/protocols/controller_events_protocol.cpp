@@ -164,6 +164,7 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
     ns.ai8(serialized_1).ai8(serialized_2).ai8(serialized_3);
     ns.ai8((uint8_t)(action)).ai32(value);
 
+    Log::info("ControllerEventsProtocol", "Action %d value %d", action, value);
     m_listener->sendMessage(this, ns, false); // send message to server
 }
 

@@ -86,6 +86,7 @@ ClientNetworkManager::ClientNetworkManager()
 
 ClientNetworkManager::~ClientNetworkManager()
 {
+    pthread_cancel(*m_thread_keyboard);
 }
 
 void ClientNetworkManager::run()

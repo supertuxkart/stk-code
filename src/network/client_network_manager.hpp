@@ -16,6 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+/*! \file client_network_manager.hpp
+ *  \brief Defines a Client Network manager, that will connect to a server.
+ */
+
 #ifndef CLIENT_NETWORK_MANAGER_HPP
 #define CLIENT_NETWORK_MANAGER_HPP
 
