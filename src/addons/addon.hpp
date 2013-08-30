@@ -99,7 +99,7 @@ private:
      *  in the addons.xml file. */
     bool        m_still_exists;
     /** Date when the addon was added. */
-    Time::TimeType m_date;
+    StkTime::TimeType m_date;
     /** A description of this addon. */
     core::stringw m_description;
     /** The URL of the icon (relative to the server) */
@@ -168,7 +168,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the date (in seconds since epoch) when the addon was
      *  uploaded. */
-    Time::TimeType getDate() const { return m_date; }
+    StkTime::TimeType getDate() const { return m_date; }
     // ------------------------------------------------------------------------
     /** Returns a user readable date as a string. */
     std::string getDateAsString() const;

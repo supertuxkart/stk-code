@@ -31,7 +31,7 @@
 
 #include <string>
 
-class Time
+class StkTime
 {
 public:
     typedef time_t TimeType;

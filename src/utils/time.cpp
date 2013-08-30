@@ -23,7 +23,7 @@
  *  time of the application, 1.1.1970, ...).
  *  The value is a double precision floating point value in seconds.
  */
-double Time::getRealTime(long startAt)
+double StkTime::getRealTime(long startAt)
 {
     return irr_driver->getRealTime()/1000.0;
 }   // getTimeSinceEpoch

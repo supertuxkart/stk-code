@@ -209,8 +209,8 @@ void AddonsScreen::loadList()
     GUIEngine::SpinnerWidget* w_filter_date =
                         getWidget<GUIEngine::SpinnerWidget>("filter_date");
     int date_index = w_filter_date->getValue();
-    Time::TimeType date = Time::getTimeSinceEpoch();
-    date = Time::addInterval(date, 
+    StkTime::TimeType date = StkTime::getTimeSinceEpoch();
+    date = StkTime::addInterval(date, 
                 -m_date_filters[date_index].year, 
                 -m_date_filters[date_index].month, 
                 -m_date_filters[date_index].day);
@@ -242,7 +242,7 @@ void AddonsScreen::loadList()
             continue;
 
         // Filter by date.
-        if (date_index != 0 && Time::compareTime(date, addon.getDate()) > 0)
+        if (date_index != 0 && StkTime::compareTime(date, addon.getDate()) > 0)
             continue;
 
         // Filter by name, designer and description.

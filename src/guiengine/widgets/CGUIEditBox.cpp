@@ -26,9 +26,9 @@
 */
 
 
-Time::TimeType getTime()
+StkTime::TimeType getTime()
 {
-    return Time::getTimeSinceEpoch();
+    return StkTime::getTimeSinceEpoch();
 }
 
 //! constructor
