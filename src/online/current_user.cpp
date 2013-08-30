@@ -616,7 +616,7 @@ namespace Online{
 
     void CurrentUser::onSTKQuit() const
     {
-        if(m_state != US_SIGNED_OUT)
+        if(isRegisteredUser())
         {
             HTTPRequest * request = new HTTPRequest(true, HTTPManager::MAX_PRIORITY);
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
