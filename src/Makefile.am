@@ -510,6 +510,7 @@ supertuxkart_SOURCES = \
  utils/string_utils.hpp \
  utils/synchronised.hpp \
  utils/time.hpp \
+ utils/time.cpp \
  utils/translation.cpp \
  utils/translation.hpp \
  utils/utf8.h \

@@ -19,6 +19,7 @@
 #include "physics/physics.hpp"
 
 #include "animations/three_d_animation.hpp"
+#include "graphics/irr_driver.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
 #include "network/race_state.hpp"

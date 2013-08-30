@@ -23,6 +23,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "io/file_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
@@ -434,4 +435,3 @@ void SoccerWorld::countdownReachedZero()
     World *world = World::getWorld();
     world->setPhase(World::RACE_PHASE);
 }   // countdownReachedZero
-

@@ -18,6 +18,7 @@
 
 #include "physics/irr_debug_drawer.hpp"
 
+#include "graphics/irr_driver.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 

@@ -30,7 +30,6 @@
 #endif
 
 #include <string>
-#include "graphics/irr_driver.hpp"
 
 class Time
 {
@@ -82,11 +81,8 @@ public:
      *  time of the application, 1.1.1970, ...).
      *  The value is a double precision floating point value in seconds.
      */
-    static double getRealTime(long startAt=0)
-    {
-        return irr_driver->getDevice()->getTimer()->getRealTime()/1000.0;
-    };   // getTimeSinceEpoch
-    
+    static double getRealTime(long startAt=0);
+
     // ------------------------------------------------------------------------
     /** 
      * \brief Compare two different times.
