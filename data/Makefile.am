@@ -14,7 +14,7 @@ desktopdir = $(prefix)/share/applications
 desktop_DATA = supertuxkart.desktop
 
 icondir = $(prefix)/share/pixmaps
-dist_icon_DATA = supertuxkart_32.xpm supertuxkart_64.xpm
+dist_icon_DATA = supertuxkart_32.png supertuxkart_128.png
 
 
 # The desktop file needs the absolute path to the binary

@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=SuperTuxKart
-Icon=@PREFIX@/share/pixmaps/supertuxkart_64.xpm
+Icon=@PREFIX@/share/pixmaps/supertuxkart_128.png
 GenericName=A kart racing game
 GenericName[de_DE]=Ein Kart-Rennspiel
 GenericName[fr_FR]=Un jeu de karting
