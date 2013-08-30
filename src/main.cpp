@@ -184,7 +184,7 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
-void cleanSuperTuxKart();
+static void cleanSuperTuxKart();
 
 // ============================================================================
 //                        gamepad visualisation screen
@@ -1211,7 +1211,7 @@ void initRest()
 //=============================================================================
 /** Frees all manager and their associated memory.
  */
-void cleanSuperTuxKart()
+static void cleanSuperTuxKart()
 {
     irr_driver->updateConfigIfRelevant();
 
