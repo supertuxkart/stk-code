@@ -237,6 +237,7 @@ src/utils/log.cpp
 src/utils/profiler.cpp
 src/utils/random_generator.cpp
 src/utils/string_utils.cpp
+src/utils/time.cpp
 src/utils/translation.cpp
 src/utils/vec3.cpp
 )
