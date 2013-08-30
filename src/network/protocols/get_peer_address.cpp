@@ -19,7 +19,6 @@
 #include "network/protocols/get_peer_address.hpp"
 
 #include "network/protocol_manager.hpp"
-#include "network/http_functions.hpp"
 #include "online/http_manager.hpp"
 #include "online/current_user.hpp"
 #include "config/user_config.hpp"

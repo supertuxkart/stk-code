@@ -141,7 +141,6 @@ src/modes/world_with_rank.cpp
 src/network/client_network_manager.cpp
 src/network/event.cpp
 src/network/game_setup.cpp
-src/network/http_functions.cpp
 src/network/network_interface.cpp
 src/network/network_manager.cpp
 src/network/network_string.cpp
@@ -439,7 +438,6 @@ src/modes/world_with_rank.hpp
 src/network/client_network_manager.hpp
 src/network/event.hpp
 src/network/game_setup.hpp
-src/network/http_functions.hpp
 src/network/network_interface.hpp
 src/network/network_manager.hpp
 src/network/network_string.hpp
