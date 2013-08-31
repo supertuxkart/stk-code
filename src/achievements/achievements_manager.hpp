@@ -35,17 +35,30 @@
   */
 class AchievementsManager
 {
+private :
 
-    private:
-        AchievementsManager      ();
-        ~AchievementsManager     ();
-        void parseAchievements();
+    class AchievementsSlot
+    {
         std::map<uint32_t, * Achievement> m_achievements;
+    public :
+        void parse();
+        void load();
+        void save();
+    };
+    std::vector<AchievementsSlot> m_slots;
+    AchievementsManager      ();
+    ~AchievementsManager     ();
 
-    public:
-        /**Singleton */
-        static AchievementsManager *            get();
-        static void                             deallocate();
+
+
+public:
+    /**Singleton */
+    static AchievementsManager *            get();
+    static void                             deallocate();
+
+    void parse();
+    void save();
+    void load();
 };   // class AchievementsManager
 
 #endif

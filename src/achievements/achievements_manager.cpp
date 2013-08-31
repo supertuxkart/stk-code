@@ -46,16 +46,42 @@ void AchievementsManager::deallocate()
 // ============================================================================
 AchievementsManager::AchievementsManager()
 {
-    parseAchievements();
+    parse();
 }
 
 // ============================================================================
 AchievementsManager::~AchievementsManager()
 {
+}
 
+// ============================================================================
+void AchievementsManager::save()
+{
+    std::string filename = file_manager->getConfigDir() + ("/challenges.xml");
+
+    std::ofstream achievements_file(filename.c_str(), std::ios::out);
+
+    if (!achievements_file.is_open())
+    {
+        Log::warn("AchievementsManager::save",
+                  "Failed to open '%s' for writing, achievements won't be saved\n",
+                  filename.c_str());
+        return;
+    }
+
+    achievements_file << "<?xml version=\"1.0\"?>\n";
+    achievements_file << "<achievements>\n";
+
+    for (int i = 0; i < m_slots.size(); i++)
+    {
+        m_slots[i].save();
+    }
+
+    achievements_file << "</achievements>\n\n";
+    achievements_file.close();
 }
 // ============================================================================
-void AchievementsManager::parseAchievements()
+void AchievementsManager::AchievementsSlot::parse()
 {
     const std::string file_name = file_manager->getDataFile("items.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
