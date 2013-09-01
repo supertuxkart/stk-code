@@ -55,9 +55,19 @@ AchievementsManager::~AchievementsManager()
 }
 
 // ============================================================================
+void AchievementsManager::parse()
+{
+
+}
+// ============================================================================
+void AchievementsManager::load()
+{
+
+}
+// ============================================================================
 void AchievementsManager::save()
 {
-    std::string filename = file_manager->getConfigDir() + ("/challenges.xml");
+    std::string filename = file_manager->getConfigFile("challenges.xml");
 
     std::ofstream achievements_file(filename.c_str(), std::ios::out);
 
@@ -72,7 +82,7 @@ void AchievementsManager::save()
     achievements_file << "<?xml version=\"1.0\"?>\n";
     achievements_file << "<achievements>\n";
 
-    for (int i = 0; i < m_slots.size(); i++)
+    for (unsigned int i = 0; i < m_slots.size(); i++)
     {
         m_slots[i].save();
     }
@@ -81,9 +91,11 @@ void AchievementsManager::save()
     achievements_file.close();
 }
 // ============================================================================
+// ============================================================================
+
 void AchievementsManager::AchievementsSlot::parse()
 {
-    const std::string file_name = file_manager->getDataFile("items.xml");
+    const std::string file_name = file_manager->getDataFile("achievements.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
     unsigned int num_nodes = root->getNumNodes();
     for(unsigned int i = 0; i < num_nodes; i++)
@@ -107,6 +119,19 @@ void AchievementsManager::AchievementsSlot::parse()
         }
         m_achievements[achievement->getID()] = achievement;
     }
-    if(num_nodes != m_achievements.count())
+    if(num_nodes != m_achievements.size())
         Log::error("AchievementsManager::parseAchievements","Multiple achievements with the same id!");
 }   // parseAchievements
+
+// ============================================================================
+void AchievementsManager::AchievementsSlot::load()
+{
+}
+
+
+// ============================================================================
+void AchievementsManager::AchievementsSlot::save()
+{
+
+}
+

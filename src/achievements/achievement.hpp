@@ -23,7 +23,7 @@
 
 #include <irrString.h>
 #include <string>
-#include "io/xml_writer.hpp"
+#include "io/xml_node.hpp"
 
 
 // ============================================================================
@@ -34,7 +34,7 @@
   */
 class Achievement
 {
-private:
+protected:
     uint32_t m_id;
     bool     m_achieved;
     virtual void check() = 0;
@@ -55,7 +55,7 @@ private:
 
 public:
     SingleAchievement     (const XMLNode * input);
-    virtual ~SingleAchievement     ();
+    virtual ~SingleAchievement     () {};
 };   // class Achievement
 
 class MapAchievement : public Achievement
@@ -67,7 +67,7 @@ private:
 
 public:
     MapAchievement      (const XMLNode * input);
-    virtual ~MapAchievement     ();
+    virtual ~MapAchievement     () {};
 };   // class Achievement
 
 #endif

@@ -21,6 +21,8 @@
 
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
+#include "io/xml_writer.hpp"
+
 
 #include <sstream>
 #include <stdlib.h>

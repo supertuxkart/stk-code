@@ -204,7 +204,7 @@ const ChallengeData* UnlockManager::getChallenge(const std::string& id)
 */
 void UnlockManager::load()
 {
-    const std::string filename=file_manager->getChallengeFile("challenges.xml");
+    const std::string filename=file_manager->getConfigFile("challenges.xml");
     XMLNode* root = file_manager->createXMLTree(filename);
     if(!root || root->getName() != "challenges")
     {
@@ -263,7 +263,7 @@ void UnlockManager::load()
 
 void UnlockManager::save()
 {
-    std::string filename = file_manager->getChallengeFile("challenges.xml");
+    std::string filename = file_manager->getConfigFile("challenges.xml");
 
     std::ofstream challenge_file(filename.c_str(), std::ios::out);
 

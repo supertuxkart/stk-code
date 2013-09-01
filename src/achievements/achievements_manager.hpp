@@ -25,6 +25,8 @@
 
 #include <irrString.h>
 #include <string>
+#include <vector>
+#include <map>
 
 
 // ============================================================================
@@ -39,7 +41,7 @@ private :
 
     class AchievementsSlot
     {
-        std::map<uint32_t, * Achievement> m_achievements;
+        std::map<uint32_t, Achievement *> m_achievements;
     public :
         void parse();
         void load();
