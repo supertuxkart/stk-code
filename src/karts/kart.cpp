@@ -125,6 +125,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_jump_time            = 0;
     m_is_jumping           = false;
     m_min_nitro_time       = 0.0f;
+    m_fire_clicked         = 0;
     
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
@@ -1159,17 +1160,18 @@ void Kart::update(float dt)
     if (m_collision_particles) m_collision_particles->update(dt);
 
     updatePhysics(dt);
+    
+    if(!m_controls.m_fire) m_fire_clicked = 0;
 
-    if(m_controls.m_fire && !m_kart_animation)
+    if(m_controls.m_fire && !m_fire_clicked && !m_kart_animation)
     {
         // use() needs to be called even if there currently is no collecteable
         // since use() can test if something needs to be switched on/off.
         m_powerup->use() ;
         World::getWorld()->onFirePressed(getController());
         m_bubble_drop = true;
+        m_fire_clicked = 1;
     }
-    // Reset the fire button
-    m_controls.m_fire = 0;
 
     /* (TODO: add back when properly done)
     for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
