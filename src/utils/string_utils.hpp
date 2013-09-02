@@ -414,10 +414,7 @@ namespace StringUtils
     /** Compute a simple hash of a string */
     unsigned int simpleHash(const char* input);
 
-    const char* boolstr(bool b)
-    {
-        return (b ? "true" : "false");
-    }
+    const char* boolstr(bool b);
 } // namespace StringUtils
 
 #endif

@@ -78,7 +78,7 @@ MapAchievementInfo::MapAchievementInfo(const XMLNode * input)
 bool MapAchievementInfo::checkCompletion(Achievement * achievement) const
 {
     MapAchievement * map_achievement = (MapAchievement *) achievement;
-    std::map<std::string, int>::iterator iter;
+    std::map<std::string, int>::const_iterator iter;
     for ( iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++ ) {
         if(map_achievement->getValue(iter->first) < iter->second)
             return false;

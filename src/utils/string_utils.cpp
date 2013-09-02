@@ -709,6 +709,11 @@ namespace StringUtils
 		    printf("Invalid version string '%s'.\n", s.c_str());
 	    return version;
     }   // versionToInt
+
+    const char* boolstr(bool b)
+    {
+        return (b ? "true" : "false");
+    }
 } // namespace StringUtils
 
 
