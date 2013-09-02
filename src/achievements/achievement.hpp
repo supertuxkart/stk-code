@@ -24,8 +24,8 @@
 #include <irrString.h>
 #include <string>
 #include "io/xml_node.hpp"
-#include "achievements/achievement_info.hpp"
 
+class AchievementInfo;
 
 // ============================================================================
 
