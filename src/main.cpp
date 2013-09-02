@@ -139,6 +139,7 @@
 #include <IEventReceiver.h>
 
 #include "main_loop.hpp"
+#include "achievements/achievements_manager.hpp"
 #include "addons/addons_manager.hpp"
 #include "addons/inetwork_http.hpp"
 #include "addons/news_manager.hpp"

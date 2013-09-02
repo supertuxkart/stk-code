@@ -18,11 +18,12 @@
 
 #include "achievements/achievements_manager.hpp"
 
-#include "achievements/achievement.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_writer.hpp"
+#include "config/player.hpp"
+#include "config/user_config.hpp"
 
 #include <sstream>
 #include <stdlib.h>
@@ -46,7 +47,8 @@ void AchievementsManager::deallocate()
 // ============================================================================
 AchievementsManager::AchievementsManager()
 {
-    parse();
+    parseDataFile();
+    parseConfigFile();
 }
 
 // ============================================================================
@@ -55,15 +57,110 @@ AchievementsManager::~AchievementsManager()
 }
 
 // ============================================================================
-void AchievementsManager::parse()
+void AchievementsManager::parseDataFile()
 {
-
+    const std::string file_name = file_manager->getDataFile("achievements.xml");
+    const XMLNode *root         = file_manager->createXMLTree(file_name);
+    unsigned int num_nodes = root->getNumNodes();
+    for(unsigned int i = 0; i < num_nodes; i++)
+    {
+        const XMLNode *node = root->getNode(i);
+        std::string type("");
+        node->get("type", &type);
+        AchievementInfo * achievement_info;
+        if(type == "single")
+        {
+            achievement_info = new SingleAchievementInfo(node);
+        }
+        else if(type == "map")
+        {
+            achievement_info = new MapAchievementInfo(node);
+        }
+        else
+        {
+            Log::error("AchievementsManager::parseAchievements","Non-existent achievement type. Skipping - definitely results in unwanted behaviour.");
+            continue;
+        }
+        m_achievements_info.push_back(achievement_info);
+    }
+    if(num_nodes != m_achievements_info.size())
+        Log::error("AchievementsManager::parseAchievements","Multiple achievements with the same id!");
 }
+
+
 // ============================================================================
-void AchievementsManager::load()
+void AchievementsManager::parseConfigFile()
 {
+    const std::string filename=file_manager->getConfigFile("achievements.xml");
+    XMLNode* root = file_manager->createXMLTree(filename);
+    if(!root || root->getName() != "achievements")
+    {
+        Log::info("AchievementsManager", "Achievements file '%s' will be created.",
+                  filename.c_str());
+        createSlotsIfNeeded();
+        save();
 
-}
+        if (root) delete root;
+        return;
+    }
+
+    std::vector<XMLNode*> xml_slots;
+    root->getNodes("slot", xml_slots);
+    for (unsigned int n=0; n < xml_slots.size(); n++)
+    {
+        AchievementsSlot * slot = new AchievementsSlot(xml_slots[n]);
+        if(!slot->isValid())
+        {
+            Log::warn("AchievementsManager", "Found game slot with faulty or missing information. Discarding it.");
+            delete slot;
+            continue;
+        }
+        m_slots.push_back(slot);
+    }
+
+    bool something_changed = createSlotsIfNeeded();
+    if (something_changed) save();
+
+    delete root;
+}   // load
+
+
+
+//-----------------------------------------------------------------------------
+/** Creates a slot for players that don't have one yet
+ *  \return true if any were created
+ */
+bool AchievementsManager::createSlotsIfNeeded()
+{
+    bool something_changed = false;
+
+    // make sure all players have at least one game slot associated
+    PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
+    for (int n=0; n<players.size(); n++)
+    {
+        bool exists = false;
+
+        for(unsigned int i = 0; i < m_slots.size(); i++)
+        {
+            if(!m_slots[i]->isOnline() && m_slots[i]->getID() == players[n].getUniqueID())
+            {
+                exists = true;
+                break;
+            }
+        }
+
+        if (!exists)
+        {
+            AchievementsSlot* slot = new AchievementsSlot(players[n].getUniqueID(), false);
+            m_slots.push_back(slot);
+            something_changed = true;
+        }
+    }
+
+    return something_changed;
+} // UnlockManager::createSlotsIfNeeded
+
+
 // ============================================================================
 void AchievementsManager::save()
 {
@@ -84,54 +181,10 @@ void AchievementsManager::save()
 
     for (unsigned int i = 0; i < m_slots.size(); i++)
     {
-        m_slots[i].save();
+        m_slots[i]->save(achievements_file);
     }
 
     achievements_file << "</achievements>\n\n";
     achievements_file.close();
-}
-// ============================================================================
-// ============================================================================
-
-void AchievementsManager::AchievementsSlot::parse()
-{
-    const std::string file_name = file_manager->getDataFile("achievements.xml");
-    const XMLNode *root         = file_manager->createXMLTree(file_name);
-    unsigned int num_nodes = root->getNumNodes();
-    for(unsigned int i = 0; i < num_nodes; i++)
-    {
-        const XMLNode *node = root->getNode(i);
-        std::string type("");
-        node->get("type", &type);
-        Achievement * achievement;
-        if(type == "single")
-        {
-            achievement = new SingleAchievement(node);
-        }
-        else if(type == "map")
-        {
-            achievement = new MapAchievement(node);
-        }
-        else
-        {
-            Log::error("AchievementsManager::parseAchievements","Non-existent achievement type. Skipping - definitely results in unwanted behaviour.");
-            continue;
-        }
-        m_achievements[achievement->getID()] = achievement;
-    }
-    if(num_nodes != m_achievements.size())
-        Log::error("AchievementsManager::parseAchievements","Multiple achievements with the same id!");
-}   // parseAchievements
-
-// ============================================================================
-void AchievementsManager::AchievementsSlot::load()
-{
-}
-
-
-// ============================================================================
-void AchievementsManager::AchievementsSlot::save()
-{
-
 }
 

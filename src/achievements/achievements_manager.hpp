@@ -20,7 +20,8 @@
 #define HEADER_ACHIEVEMENTS_MANAGER_HPP
 
 #include "utils/types.hpp"
-#include "achievements/achievement.hpp"
+#include "achievements/achievement_info.hpp"
+#include "achievements/achievements_slot.hpp"
 
 
 #include <irrString.h>
@@ -38,29 +39,22 @@
 class AchievementsManager
 {
 private :
-
-    class AchievementsSlot
-    {
-        std::map<uint32_t, Achievement *> m_achievements;
-    public :
-        void parse();
-        void load();
-        void save();
-    };
-    std::vector<AchievementsSlot> m_slots;
+    std::vector<AchievementsSlot*> m_slots;
+    std::vector<AchievementInfo *> m_achievements_info;
     AchievementsManager      ();
     ~AchievementsManager     ();
-
-
+    bool createSlotsIfNeeded();
 
 public:
     /**Singleton */
     static AchievementsManager *            get();
     static void                             deallocate();
 
-    void parse();
+    const std::vector<AchievementInfo *> & getAllInfo() const { return m_achievements_info;};
+
+    void parseDataFile();
+    void parseConfigFile();
     void save();
-    void load();
 };   // class AchievementsManager
 
 #endif

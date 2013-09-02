@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <achievements>
   <achievement id="1" type="map" title="Christoffel Columbus" description="Play every official track at least once." >
-      <entry key="mapid1" />
-      <entry key="mapid2" />
+      <entry key="mapid1" goal="1"/>
+      <entry key="mapid2" goal="1"/>
   </achievement>
   <achievement id="2" type="single" goal="1" title="Strike!" description="Hit a kart with a bowling-ball." />
 </achievements>

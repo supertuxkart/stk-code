@@ -24,6 +24,7 @@
 #include <irrString.h>
 #include <string>
 #include "io/xml_node.hpp"
+#include "achievements/achievement_info.hpp"
 
 
 // ============================================================================
@@ -32,43 +33,58 @@
   * \brief
   * \ingroup
   */
+class AchievementInfo;
+
 class Achievement
 {
 protected:
-    uint32_t m_id;
-    bool     m_achieved;
-    virtual void check() = 0;
-    void onAchieving();
+    uint32_t                            m_id;
+    bool                                m_achieved;
+    AchievementInfo *                   m_achievement_info;
+    void                check           ();
 
 public:
-    Achievement      (const XMLNode * input);
-    virtual ~Achievement     ();
-    uint32_t getID() const { return m_id; }
+    Achievement                         (AchievementInfo * info);
+    virtual ~Achievement                ();
+    uint32_t getID                      () const { return m_id; }
+    virtual void load                   (XMLNode * input) = 0;
+    virtual void save                   (std::ofstream & out) = 0;
+
+    enum AchievementType
+    {
+        AT_SINGLE,
+        AT_MAP
+    };
+
 };   // class Achievement
 
 class SingleAchievement : public Achievement
 {
-private:
-    virtual void check();
-    int m_goal;
+protected:
     int m_progress;
 
 public:
-    SingleAchievement     (const XMLNode * input);
-    virtual ~SingleAchievement     () {};
-};   // class Achievement
+    SingleAchievement                   (AchievementInfo * info);
+    virtual ~SingleAchievement          () {};
+
+    void load                           (XMLNode * input);
+    int getValue                        () const { return m_progress; }
+    void save                           (std::ofstream & out);
+};   // class SingleAchievement
 
 class MapAchievement : public Achievement
 {
-private:
-    virtual void check();
-    typedef std::map<std::string, bool> ProgressMap;
-    ProgressMap m_progress_map;
+protected:
+    std::map<std::string, int> m_progress_map;
 
 public:
-    MapAchievement      (const XMLNode * input);
-    virtual ~MapAchievement     () {};
-};   // class Achievement
+    MapAchievement                      (AchievementInfo * info);
+    virtual ~MapAchievement             () {};
+
+    void load                           (XMLNode * input);
+    int getValue                        (const std::string & key);
+    void save                           (std::ofstream & out);
+};   // class MapAchievement
 
 #endif
 
