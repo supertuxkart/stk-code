@@ -19,9 +19,10 @@
 
 #include "achievements/achievement.hpp"
 
+#include "achievements/achievement_info.hpp"
+#include "io/xml_writer.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
-#include "io/xml_writer.hpp"
 
 
 #include <sstream>
