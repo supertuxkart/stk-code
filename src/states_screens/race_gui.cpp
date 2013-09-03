@@ -602,11 +602,11 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
+
 void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
                                  const core::recti &viewport,
                                  const core::vector2df &scaling)
 {
-
     float minRatio         = std::min(scaling.X, scaling.Y);
     const int SPEEDWIDTH   = 128;
     int meter_width        = (int)(SPEEDWIDTH*minRatio);
@@ -722,7 +722,14 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
     pos.LowerRightCorner.X=(int)(offset.X + 0.8f*meter_width);
     pos.LowerRightCorner.Y=(int)(offset.X - 0.5f*meter_height);
 
-    gui::ScalableFont* font = GUIEngine::getLargeFont();
+    gui::ScalableFont* font;
+
+    if (pos.getWidth() > 55)
+        font = GUIEngine::getLargeFont();
+    else if (pos.getWidth() > 40)
+        font = GUIEngine::getFont();
+    else
+        font = GUIEngine::getSmallFont();
 
     static video::SColor color = video::SColor(255, 255, 255, 255);
     char str[256];
