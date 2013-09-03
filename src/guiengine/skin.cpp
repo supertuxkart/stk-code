@@ -1547,9 +1547,9 @@ void Skin::drawListSelection(const core::recti &rect, Widget* widget,
 void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
                           Widget* widget)
 {
-    bool isSelected =(((ListWidget*)widget->m_event_handler)->m_selected_column
-                          == widget);
-
+    bool isSelected =
+         (((ListWidget*)widget->m_event_handler)->m_selected_column == widget &&
+         ((ListWidget*)widget->m_event_handler)->m_sort_default == false);
 
     drawBoxFromStretchableTexture(widget, rect,
             (isSelected ? SkinConfig::m_render_params["list_header::down"]
@@ -1562,10 +1562,11 @@ void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
         ITexture* img;
         if (((ListWidget*)widget->m_event_handler)->m_sort_desc)
             img =
-                SkinConfig::m_render_params["list_sort_down::neutral"].getImage();
+                SkinConfig::m_render_params["list_sort_up::neutral"].getImage();
         else
             img =
-                SkinConfig::m_render_params["list_sort_up::neutral"].getImage();
+                SkinConfig::m_render_params["list_sort_down::neutral"].getImage();
+
         core::recti destRect(rect.UpperLeftCorner,
                              core::dimension2di(rect.getHeight(),
                                                 rect.getHeight()));

@@ -77,6 +77,8 @@ private:
     /** \brief To check (and set) if sort order is descending **/
     bool             m_sort_desc;
 
+    bool             m_sort_default;
+
     /** List of date filters **/
     std::vector<DateFilter> m_date_filters;
 

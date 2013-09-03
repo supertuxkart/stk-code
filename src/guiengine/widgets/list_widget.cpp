@@ -39,6 +39,7 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_listener = NULL;
     m_selected_column = NULL;
     m_sort_desc = true;
+    m_sort_default = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -299,6 +300,8 @@ void ListWidget::elementRemoved()
     }
     m_header_elements.clearAndDeleteAll();
     m_selected_column = NULL;
+    m_sort_desc = 1;
+    m_sort_default = 1;
 }
 
 // -----------------------------------------------------------------------------
@@ -373,7 +376,13 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
         m_selected_column = m_header_elements.get(col);
 
         /** \brief Allows sort icon to change depending on sort order **/
-        m_sort_desc = !m_sort_desc;
+        if (m_sort_desc && !m_sort_default)
+            m_sort_default = true;
+        else
+        {
+            m_sort_desc = !m_sort_desc;
+            m_sort_default = false;
+        }
         /*
         for (int n=0; n<m_header_elements.size(); n++)
         {

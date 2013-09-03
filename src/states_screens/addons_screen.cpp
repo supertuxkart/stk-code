@@ -137,6 +137,7 @@ void AddonsScreen::init()
     m_reloading = false;
 
     m_sort_desc = true;
+    m_sort_default = true;
 
 	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
 
@@ -380,14 +381,31 @@ void AddonsScreen::loadList()
 // ----------------------------------------------------------------------------
 void AddonsScreen::onColumnClicked(int column_id)
 {
+    if (m_sort_desc && !m_sort_default)
+        m_sort_default = true;
+    else
+    {
+        m_sort_desc = !m_sort_desc;
+        m_sort_default = false;
+    }
+
     switch(column_id)
     {
-    case 0: Addon::setSortOrder(Addon::SO_NAME); break;
-    case 1: Addon::setSortOrder(Addon::SO_DATE); break;
+    case 0: 
+        if (!m_sort_default)
+            Addon::setSortOrder(Addon::SO_NAME); 
+        else
+            Addon::setSortOrder(Addon::SO_DEFAULT); 
+        break;
+    case 1:
+        if (!m_sort_default)
+            Addon::setSortOrder(Addon::SO_NAME); 
+        else
+            Addon::setSortOrder(Addon::SO_DEFAULT); 
+        break;
     default: assert(0);
     }   // switch
     /** \brief Toggle the sort order after column click **/
-    m_sort_desc = !m_sort_desc;
     loadList();
 }   // onColumnClicked
 
