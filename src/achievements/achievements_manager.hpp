@@ -45,7 +45,6 @@ private :
     PtrVector<AchievementInfo> m_achievements_info;
     AchievementsManager      ();
     ~AchievementsManager     ();
-    bool createSlotsIfNeeded();
     AchievementsSlot * createNewSlot(std::string id, bool online);
 
 public:
@@ -60,7 +59,9 @@ public:
     void save();
     void onRaceEnd();
     void updateCurrentPlayer();
+    AchievementsSlot * getActive() const { return m_active_slot; }
     AchievementsSlot * getSlot(const std::string & id, bool online);
+    void createSlotsIfNeeded();
 };   // class AchievementsManager
 
 #endif

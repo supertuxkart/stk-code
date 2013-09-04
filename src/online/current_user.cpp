@@ -19,6 +19,7 @@
 
 #include "online/current_user.hpp"
 
+#include "achievements/achievements_manager.hpp"
 #include "addons/addons_manager.hpp"
 #include "config/user_config.hpp"
 #include "online/servers_manager.hpp"
@@ -152,6 +153,8 @@ namespace Online{
                 UserConfigParams::m_saved_session = true;
             }
             ProfileManager::get()->addPersistent(m_profile);
+            AchievementsManager::get()->updateCurrentPlayer();
+            AchievementsManager::get()->getActive()->sync();
             m_profile->fetchFriends();
         }
         else
@@ -229,6 +232,7 @@ namespace Online{
         UserConfigParams::m_saved_user = 0;
         UserConfigParams::m_saved_token = "";
         UserConfigParams::m_saved_session = false;
+        AchievementsManager::get()->updateCurrentPlayer();
     }
 
     void CurrentUser::SignOutRequest::callback()
@@ -623,6 +627,23 @@ namespace Online{
             request->setParameter("action", std::string("client-quit"));
             request->setParameter("token", getToken());
             request->setParameter("userid", getID());
+            HTTPManager::get()->addRequest(request);
+        }
+    }
+
+
+    // ============================================================================
+
+    void CurrentUser::onAchieving(uint32_t achievement_id) const
+    {
+        if(isRegisteredUser())
+        {
+            HTTPRequest * request = new HTTPRequest(true);
+            request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+            request->setParameter("action", std::string("achieving"));
+            request->setParameter("token", getToken());
+            request->setParameter("userid", getID());
+            request->setParameter("achievementid", achievement_id);
             HTTPManager::get()->addRequest(request);
         }
     }

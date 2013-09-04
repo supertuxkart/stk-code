@@ -129,6 +129,11 @@ void NotificationDialog::onUpdate(float dt)
                 ProfileManager::get()->setVisiting(CurrentUser::get()->getID());
                 StateManager::get()->pushScreen(OnlineProfileFriends::getInstance());
             }
+            else if (m_type == T_Achievements)
+            {
+                ProfileManager::get()->setVisiting(CurrentUser::get()->getID());
+                StateManager::get()->pushScreen(OnlineProfileFriends::getInstance()); //FIXME should actually pop up achievements screen
+            }
         }
         return;
     }

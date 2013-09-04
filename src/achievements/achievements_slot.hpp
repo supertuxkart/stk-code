@@ -46,7 +46,7 @@ public :
     void sync();
     void onRaceEnd();
     const std::string & getID() const {return m_id;}
-    Achievement * findAchievement(uint32_t id);
+    Achievement * getAchievement(uint32_t id);
 };
 
 #endif

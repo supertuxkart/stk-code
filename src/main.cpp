@@ -1242,14 +1242,16 @@ void cleanSuperTuxKart()
 
     if(INetworkHttp::get())
         INetworkHttp::get()->stopNetworkThread();
-    if(Online::HTTPManager::isRunning())
-        Online::HTTPManager::get()->stopNetworkThread();
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
     Online::ServersManager::deallocate();
     Online::ProfileManager::deallocate();
+    AchievementsManager::deallocate();
     Online::CurrentUser::deallocate();
     GUIEngine::DialogQueue::deallocate();
+
+    if(Online::HTTPManager::isRunning())
+        Online::HTTPManager::get()->stopNetworkThread();
 
 
     Referee::cleanup();
@@ -1365,6 +1367,7 @@ int main(int argc, char *argv[] )
                            file_manager->getGUIDir() + "options_video.png") );
         kart_properties_manager -> loadAllKarts    ();
         unlock_manager          = new UnlockManager();
+        AchievementsManager::get();
         //m_tutorial_manager      = new TutorialManager();
         GUIEngine::addLoadingIcon( irr_driver->getTexture(
                                file_manager->getTextureFile("gui_lock.png")) );

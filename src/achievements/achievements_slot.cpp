@@ -51,7 +51,7 @@ AchievementsSlot::AchievementsSlot(const XMLNode * input)
     {
         uint32_t achievement_id(0);
         xml_achievements[i]->get("id", &achievement_id);
-        Achievement * achievement = findAchievement(achievement_id);
+        Achievement * achievement = getAchievement(achievement_id);
         if(achievement == NULL)
         {
             Log::warn("AchievementsSlot", "Found saved achievement data for a non-existent achievement. Discarding.");
@@ -109,7 +109,7 @@ void AchievementsSlot::save(std::ofstream & out)
 }
 
 // ============================================================================
-Achievement * AchievementsSlot::findAchievement(uint32_t id)
+Achievement * AchievementsSlot::getAchievement(uint32_t id)
 {
     if ( m_achievements.find(id) != m_achievements.end())
         return m_achievements[id];

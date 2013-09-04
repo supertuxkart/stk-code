@@ -57,6 +57,7 @@ AchievementsManager::AchievementsManager()
 // ============================================================================
 AchievementsManager::~AchievementsManager()
 {
+    save();
     m_slots.clearAndDeleteAll();
     m_achievements_info.clearAndDeleteAll();
 }
@@ -122,10 +123,6 @@ void AchievementsManager::parseConfigFile()
         }
         m_slots.push_back(slot);
     }
-
-    bool something_changed = createSlotsIfNeeded();
-    if (something_changed) save();
-
     delete root;
 }   // load
 
@@ -142,7 +139,7 @@ AchievementsSlot * AchievementsManager::createNewSlot(std::string id, bool onlin
 /** Creates a slot for players that don't have one yet
  *  \return true if any were created
  */
-bool AchievementsManager::createSlotsIfNeeded()
+void AchievementsManager::createSlotsIfNeeded()
 {
     bool something_changed = false;
 
@@ -157,7 +154,7 @@ bool AchievementsManager::createSlotsIfNeeded()
         }
     }
 
-    return something_changed;
+    if(something_changed) save();
 } // UnlockManager::createSlotsIfNeeded
 
 
@@ -212,13 +209,13 @@ AchievementsSlot * AchievementsManager::getSlot(const std::string & id, bool onl
 // ============================================================================
 void AchievementsManager::updateCurrentPlayer()
 {
+    createSlotsIfNeeded();
     if(Online::CurrentUser::get()->isRegisteredUser())
     {
         m_active_slot = getSlot(StringUtils::toString(Online::CurrentUser::get()->getID()), true);
         if(m_active_slot == NULL)
         {
             m_active_slot = createNewSlot(StringUtils::toString(Online::CurrentUser::get()->getID()), true);
-            m_active_slot->sync();
         }
     }
     else

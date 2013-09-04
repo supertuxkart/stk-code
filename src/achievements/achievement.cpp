@@ -20,6 +20,8 @@
 #include "achievements/achievement.hpp"
 
 #include "achievements/achievement_info.hpp"
+#include "guiengine/dialog_queue.hpp"
+#include "states_screens/dialogs/notification_dialog.hpp"
 #include "io/xml_writer.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -58,7 +60,12 @@ void Achievement::check()
     if(m_achievement_info->checkCompletion(this))
     {
         //show achievement
+        GUIEngine::DialogQueue::get()->pushDialog(
+            new NotificationDialog(NotificationDialog::T_Achievements,
+            _("Completed achievement") + '"' + m_achievement_info->getDescription() + '".'
+        ));
         //send to server
+        Online::CurrentUser::get()->onAchieving(m_id);
         m_achieved = true;
     }
 }
@@ -100,6 +107,7 @@ void SingleAchievement::reset()
 void SingleAchievement::increase(int increase)
 {
     m_progress += increase;
+    check();
 }
 
 // ============================================================================
@@ -164,6 +172,9 @@ void MapAchievement::reset()
 void MapAchievement::increase(const std::string & key, int increase)
 {
     if ( m_progress_map.find(key) != m_progress_map.end())
+    {
         m_progress_map[key] += increase;
+        check();
+    }
 }
 
