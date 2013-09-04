@@ -399,7 +399,7 @@ void AddonsScreen::onColumnClicked(int column_id)
         break;
     case 1:
         if (!m_sort_default)
-            Addon::setSortOrder(Addon::SO_NAME); 
+            Addon::setSortOrder(Addon::SO_DATE); 
         else
             Addon::setSortOrder(Addon::SO_DEFAULT); 
         break;
