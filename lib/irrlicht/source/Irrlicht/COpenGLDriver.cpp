@@ -4425,6 +4425,23 @@ IImage* COpenGLDriver::createScreenShot(video::ECOLOR_FORMAT format, video::E_RE
 		else
 			type = GL_UNSIGNED_BYTE;
 		break;
+	case ECF_R8G8:
+		// GL_ARB_texture_rg is considered always available in headers. No ifdefs.
+		fmt = GL_RG;
+		type = GL_UNSIGNED_BYTE;
+		break;
+	case ECF_R16G16:
+		fmt = GL_RG;
+		type = GL_UNSIGNED_SHORT;
+		break;
+	case ECF_R8:
+		fmt = GL_RED;
+		type = GL_UNSIGNED_BYTE;
+		break;
+	case ECF_R16:
+		fmt = GL_RED;
+		type = GL_UNSIGNED_SHORT;
+		break;
 	case ECF_R16F:
 		if (FeatureAvailable[IRR_ARB_texture_rg])
 			fmt = GL_RED;

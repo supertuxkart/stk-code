@@ -11,3 +11,4 @@ The following changes have been made:
 - texture override
 - non-triangle VBO support
 - extension order mismatch
+- support for some RG texture formats
