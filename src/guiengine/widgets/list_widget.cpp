@@ -300,8 +300,8 @@ void ListWidget::elementRemoved()
     }
     m_header_elements.clearAndDeleteAll();
     m_selected_column = NULL;
-    m_sort_desc = 1;
-    m_sort_default = 1;
+    m_sort_desc = true;
+    m_sort_default = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -371,18 +371,22 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
 
     if (originator.find(m_properties[PROP_ID] + "_column_") != std::string::npos)
     {
-        int col = originator[ (m_properties[PROP_ID] + "_column_").size() ] - '0';
-
-        m_selected_column = m_header_elements.get(col);
-
-        /** \brief Allows sort icon to change depending on sort order **/
-        if (m_sort_desc && !m_sort_default)
-            m_sort_default = true;
-        else
+        if (m_sort_col != originator[(m_properties[PROP_ID] + "_column_").size()] - '0')
         {
-            m_sort_desc = !m_sort_desc;
+            m_sort_desc = false;
             m_sort_default = false;
         }
+        else
+        {
+            m_sort_default = m_sort_desc && !m_sort_default;
+            if (!m_sort_default) m_sort_desc = !m_sort_desc;
+        }
+
+        m_sort_col = originator[(m_properties[PROP_ID] + "_column_").size()] - '0';
+        m_selected_column = m_header_elements.get(m_sort_col);
+
+        /** \brief Allows sort icon to change depending on sort order **/
+
         /*
         for (int n=0; n<m_header_elements.size(); n++)
         {
@@ -391,7 +395,7 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
         m_header_elements[col].getIrrlichtElement<IGUIButton>()->setPressed(true);
         */
 
-        if (m_listener) m_listener->onColumnClicked(col);
+        if (m_listener) m_listener->onColumnClicked(m_sort_col);
 
         return EVENT_BLOCK;
     }

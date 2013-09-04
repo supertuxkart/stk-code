@@ -78,6 +78,8 @@ private:
     bool             m_sort_desc;
 
     bool             m_sort_default;
+    
+    int              m_sort_col;
 
     /** List of date filters **/
     std::vector<DateFilter> m_date_filters;
