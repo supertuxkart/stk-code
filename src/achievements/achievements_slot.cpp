@@ -22,8 +22,10 @@
 #include "achievements/achievement_info.hpp"
 #include "achievements/achievements_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
 #include "io/xml_writer.hpp"
+#include "online/current_user.hpp"
 
 #include <sstream>
 #include <stdlib.h>
@@ -73,10 +75,10 @@ AchievementsSlot::AchievementsSlot(std::string id, bool online)
 void AchievementsSlot::createFreshSlot()
 {
     m_achievements.clear();
-    std::vector<AchievementInfo *> all_info = AchievementsManager::get()->getAllInfo();
-    for( unsigned int i=0; i < all_info.size(); i++)
+    PtrVector<AchievementInfo> all_info = AchievementsManager::get()->getAllInfo();
+    for(int i=0; i < all_info.size(); i++)
     {
-        AchievementInfo * info = all_info[i];
+        AchievementInfo * info = all_info.get(i);
         Achievement::AchievementType achievement_type = info->getType();
         Achievement * achievement;
         if(achievement_type == Achievement::AT_SINGLE)
@@ -112,4 +114,21 @@ Achievement * AchievementsSlot::findAchievement(uint32_t id)
     if ( m_achievements.find(id) != m_achievements.end())
         return m_achievements[id];
     return NULL;
+}
+
+// ============================================================================
+void AchievementsSlot::sync()
+{
+    assert(StringUtils::toString(Online::CurrentUser::get()->getID()) == m_id);
+    //FIXME
+}
+
+// ============================================================================
+void AchievementsSlot::onRaceEnd()
+{
+    //reset all values that need to be reset
+    std::map<uint32_t, Achievement *>::iterator iter;
+    for ( iter = m_achievements.begin(); iter != m_achievements.end(); ++iter ) {
+        iter->second->onRaceEnd();
+    }
 }

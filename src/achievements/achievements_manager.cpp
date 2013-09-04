@@ -24,6 +24,8 @@
 #include "io/xml_writer.hpp"
 #include "config/player.hpp"
 #include "config/user_config.hpp"
+#include "online/current_user.hpp"
+#include "challenges/unlock_manager.hpp"
 
 #include <sstream>
 #include <stdlib.h>
@@ -49,11 +51,14 @@ AchievementsManager::AchievementsManager()
 {
     parseDataFile();
     parseConfigFile();
+    updateCurrentPlayer();
 }
 
 // ============================================================================
 AchievementsManager::~AchievementsManager()
 {
+    m_slots.clearAndDeleteAll();
+    m_achievements_info.clearAndDeleteAll();
 }
 
 // ============================================================================
@@ -61,8 +66,8 @@ void AchievementsManager::parseDataFile()
 {
     const std::string file_name = file_manager->getDataFile("achievements.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
-    unsigned int num_nodes = root->getNumNodes();
-    for(unsigned int i = 0; i < num_nodes; i++)
+    int num_nodes = root->getNumNodes();
+    for(int i = 0; i < num_nodes; i++)
     {
         const XMLNode *node = root->getNode(i);
         std::string type("");
@@ -125,6 +130,13 @@ void AchievementsManager::parseConfigFile()
 }   // load
 
 
+AchievementsSlot * AchievementsManager::createNewSlot(std::string id, bool online)
+{
+    AchievementsSlot* slot = new AchievementsSlot(id, false);
+    m_slots.push_back(slot);
+    return slot;
+}
+
 
 //-----------------------------------------------------------------------------
 /** Creates a slot for players that don't have one yet
@@ -138,21 +150,9 @@ bool AchievementsManager::createSlotsIfNeeded()
     PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
     for (int n=0; n<players.size(); n++)
     {
-        bool exists = false;
-
-        for(unsigned int i = 0; i < m_slots.size(); i++)
+        if (getSlot(players[n].getUniqueID(), false) == NULL )
         {
-            if(!m_slots[i]->isOnline() && m_slots[i]->getID() == players[n].getUniqueID())
-            {
-                exists = true;
-                break;
-            }
-        }
-
-        if (!exists)
-        {
-            AchievementsSlot* slot = new AchievementsSlot(players[n].getUniqueID(), false);
-            m_slots.push_back(slot);
+            createNewSlot(players[n].getUniqueID(), false);
             something_changed = true;
         }
     }
@@ -179,12 +179,52 @@ void AchievementsManager::save()
     achievements_file << "<?xml version=\"1.0\"?>\n";
     achievements_file << "<achievements>\n";
 
-    for (unsigned int i = 0; i < m_slots.size(); i++)
+    for (int i = 0; i < m_slots.size(); i++)
     {
-        m_slots[i]->save(achievements_file);
+        m_slots[i].save(achievements_file);
     }
 
     achievements_file << "</achievements>\n\n";
     achievements_file.close();
 }
 
+
+// ============================================================================
+void AchievementsManager::onRaceEnd()
+{
+    //reset all values that need to be reset
+    m_active_slot->onRaceEnd();
+}
+
+// ============================================================================
+AchievementsSlot * AchievementsManager::getSlot(const std::string & id, bool online)
+{
+    for(int i = 0; i < m_slots.size(); i++)
+    {
+        if(m_slots[i].isOnline() == online && m_slots[i].getID() == id)
+        {
+            return m_slots.get(i);
+        }
+    }
+    return NULL;
+}
+
+// ============================================================================
+void AchievementsManager::updateCurrentPlayer()
+{
+    if(Online::CurrentUser::get()->isRegisteredUser())
+    {
+        m_active_slot = getSlot(StringUtils::toString(Online::CurrentUser::get()->getID()), true);
+        if(m_active_slot == NULL)
+        {
+            m_active_slot = createNewSlot(StringUtils::toString(Online::CurrentUser::get()->getID()), true);
+            m_active_slot->sync();
+        }
+    }
+    else
+    {
+        m_active_slot = getSlot(unlock_manager->getCurrentPlayer()->getUniqueID(), false);
+        if(m_active_slot == NULL)
+            m_active_slot = createNewSlot(unlock_manager->getCurrentPlayer()->getUniqueID(), false);
+    }
+}

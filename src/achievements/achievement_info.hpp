@@ -50,6 +50,7 @@ public:
     irr::core::stringw getDescription   () const { return m_description; }
     virtual Achievement::AchievementType getType         () = 0;
     virtual bool checkCompletion        (Achievement * achievement) const = 0;
+    bool needsResetAfterRace() {return m_reset_after_race; }
 };   // class AchievementInfo
 
 class SingleAchievementInfo : public AchievementInfo

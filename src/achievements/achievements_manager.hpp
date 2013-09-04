@@ -20,6 +20,7 @@
 #define HEADER_ACHIEVEMENTS_MANAGER_HPP
 
 #include "utils/types.hpp"
+#include "utils/ptr_vector.hpp"
 #include "achievements/achievement_info.hpp"
 #include "achievements/achievements_slot.hpp"
 
@@ -39,22 +40,27 @@
 class AchievementsManager
 {
 private :
-    std::vector<AchievementsSlot*> m_slots;
-    std::vector<AchievementInfo *> m_achievements_info;
+    AchievementsSlot * m_active_slot;
+    PtrVector<AchievementsSlot> m_slots;
+    PtrVector<AchievementInfo> m_achievements_info;
     AchievementsManager      ();
     ~AchievementsManager     ();
     bool createSlotsIfNeeded();
+    AchievementsSlot * createNewSlot(std::string id, bool online);
 
 public:
     /**Singleton */
     static AchievementsManager *            get();
     static void                             deallocate();
 
-    const std::vector<AchievementInfo *> & getAllInfo() const { return m_achievements_info;};
+    const PtrVector<AchievementInfo> & getAllInfo() const { return m_achievements_info;};
 
     void parseDataFile();
     void parseConfigFile();
     void save();
+    void onRaceEnd();
+    void updateCurrentPlayer();
+    AchievementsSlot * getSlot(const std::string & id, bool online);
 };   // class AchievementsManager
 
 #endif

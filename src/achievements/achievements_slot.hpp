@@ -43,6 +43,8 @@ public :
     bool isValid() const { return m_valid;}
     void save(std::ofstream & out);
     bool isOnline() const {return m_online;}
+    void sync();
+    void onRaceEnd();
     const std::string & getID() const {return m_id;}
     Achievement * findAchievement(uint32_t id);
 };

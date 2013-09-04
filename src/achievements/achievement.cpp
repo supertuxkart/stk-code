@@ -43,6 +43,13 @@ Achievement::~Achievement()
 }
 
 // ============================================================================
+void Achievement::onRaceEnd()
+{
+    if(m_achievement_info->needsResetAfterRace())
+        this->reset();
+}
+
+// ============================================================================
 void Achievement::check()
 {
     if(m_achieved)
@@ -82,6 +89,18 @@ void SingleAchievement::save(std::ofstream & out)
         << "value=\"" << StringUtils::toString(m_progress) << "\""
         << "/>\n";
 }   // save
+
+// ============================================================================
+void SingleAchievement::reset()
+{
+    m_progress = 0;
+}   // reset
+
+// ============================================================================
+void SingleAchievement::increase(int increase)
+{
+    m_progress += increase;
+}
 
 // ============================================================================
 MapAchievement::MapAchievement(AchievementInfo * info)
@@ -129,5 +148,22 @@ int MapAchievement::getValue(const std::string & key)
     if ( m_progress_map.find(key) != m_progress_map.end())
         return m_progress_map[key];
     return 0;
+}
+
+
+// ============================================================================
+void MapAchievement::reset()
+{
+    std::map<std::string, int>::iterator iter;
+    for ( iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter ) {
+        iter->second = 0;
+    }
+}   // reset
+
+// ============================================================================
+void MapAchievement::increase(const std::string & key, int increase)
+{
+    if ( m_progress_map.find(key) != m_progress_map.end())
+        m_progress_map[key] += increase;
 }
 

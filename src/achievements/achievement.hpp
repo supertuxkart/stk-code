@@ -25,7 +25,6 @@
 #include <string>
 #include "io/xml_node.hpp"
 
-class AchievementInfo;
 
 // ============================================================================
 
@@ -49,6 +48,8 @@ public:
     uint32_t getID                      () const { return m_id; }
     virtual void load                   (XMLNode * input) = 0;
     virtual void save                   (std::ofstream & out) = 0;
+    virtual void reset                  () = 0;
+    void onRaceEnd                      ();
 
     enum AchievementType
     {
@@ -70,6 +71,8 @@ public:
     void load                           (XMLNode * input);
     int getValue                        () const { return m_progress; }
     void save                           (std::ofstream & out);
+    void increase                       (int increase = 1);
+    void reset                          ();
 };   // class SingleAchievement
 
 class MapAchievement : public Achievement
@@ -83,7 +86,9 @@ public:
 
     void load                           (XMLNode * input);
     int getValue                        (const std::string & key);
+    void increase                       (const std::string & key, int increase = 1);
     void save                           (std::ofstream & out);
+    void reset                          ();
 };   // class MapAchievement
 
 #endif
