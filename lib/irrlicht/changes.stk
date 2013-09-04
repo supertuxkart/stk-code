@@ -10,3 +10,4 @@ The following changes have been made:
 - aabbox intersection support (upstream)
 - texture override
 - non-triangle VBO support
+- extension order mismatch
