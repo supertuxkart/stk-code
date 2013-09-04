@@ -831,6 +831,9 @@ void World::update(float dt)
     // Clear race state so that new information can be stored
     race_state->clear();
 
+    RewindManager::get()->saveStates(dt);
+
+
     if(network_manager->getMode()!=NetworkManager::NW_CLIENT &&
         !history->dontDoPhysics())
     {
@@ -850,8 +853,6 @@ void World::update(float dt)
     }
 
     projectile_manager->update(dt);
-
-	RewindManager::get()->update(dt);
 
 	PROFILER_POP_CPU_MARKER();
 

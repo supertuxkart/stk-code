@@ -20,6 +20,8 @@
 
 #include "modes/world.hpp"
 #include "network/rewinder.hpp"
+#include "physics/physics.hpp"
+#include "race/history.hpp"
 #include "utils/log.hpp"
 
 RewindManager* RewindManager::m_rewind_manager        = NULL;
@@ -53,6 +55,7 @@ RewindManager::RewindInfo::RewindInfo(Rewinder *rewinder, float time,
 {
     m_rewinder     = rewinder;
     m_time         = time;
+    m_local_physics_time = World::getWorld()->getPhysics()->getPhysicsWorld()->getLocalTime();
     m_buffer       = buffer;
     m_type         = is_event ? RIT_EVENT : RIT_STATE;
     m_is_confirmed = is_confirmed;
@@ -63,6 +66,7 @@ RewindManager::RewindInfo::RewindInfo(float time)
 {
     m_rewinder     = NULL;
     m_time         = time;
+    m_local_physics_time = World::getWorld()->getPhysics()->getPhysicsWorld()->getLocalTime();
     m_buffer       = NULL;
     m_type         = RIT_TIME;
     m_is_confirmed = true;
@@ -229,7 +233,7 @@ void RewindManager::addEvent(Rewinder *rewinder, float time, char *buffer)
  *  rewinder to do so.
  *  \param dt Time step size.
  */
-void RewindManager::update(float dt)
+void RewindManager::saveStates(float dt)
 {
     if(!m_enable_rewind_manager  || 
         m_all_rewinder.size()==0 ||
@@ -265,7 +269,8 @@ void RewindManager::update(float dt)
                  float(m_count_of_comparisons)/ float(m_count_of_searches) );
 
     m_last_saved_state = time;
-}   // update
+}   // saveStates
+
 // ----------------------------------------------------------------------------
 /** Rewinds to the specified time.
  *  \param t Time to rewind to.
@@ -274,6 +279,8 @@ void RewindManager::rewindTo(float rewind_time)
 {
     assert(!m_is_rewinding);
     m_is_rewinding = true;
+
+    history->doReplayHistory(History::HISTORY_NONE);
 
     // First find the state to which we need to rewind
     // ------------------------------------------------
@@ -311,6 +318,7 @@ void RewindManager::rewindTo(float rewind_time)
     // Rewind to the required state
     // ----------------------------
     float exact_rewind_time = m_rewind_info[state]->getTime();
+    World::getWorld()->getPhysics()->getPhysicsWorld()->setLocalTime(m_rewind_info[state]->getLocalPhysicsTime());
 
     // Rewind all objects (and also all state) that happen at the
     // current time. 

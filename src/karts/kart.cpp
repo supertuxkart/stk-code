@@ -1060,8 +1060,6 @@ void Kart::eliminate()
  */
 void Kart::update(float dt)
 {
-    m_rewinder->update();
-
     if ( UserConfigParams::m_graphical_effects )
     {
         // update star effect (call will do nothing if stars are not activated)
@@ -1336,6 +1334,10 @@ void Kart::update(float dt)
         m_shadow->enableShadow();
         m_shadow_enabled = true;  
     }
+
+    // Store current controls if there was any change from the previous state:
+    m_rewinder->update();
+
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -1944,11 +1946,15 @@ void Kart::updatePhysics(float dt)
     {
         m_has_started = true;
         float f       = m_kart_properties->getStartupBoost();
-        m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
-                                          0.9f*f, f,
-                                          /*engine_force*/200.0f,
-                                          /*duration*/5.0f,
-                                          /*fade_out_time*/5.0f);
+
+        // Only give the additional engine_force if a boost was reached
+        // (otherwise even with f==0, the 200 engine force would apply)
+        if(f>0)
+            m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
+                                              0.9f*f, f,
+                                              /*engine_force*/200.0f,
+                                              /*duration*/5.0f,
+                                              /*fade_out_time*/5.0f);
     }
 
     m_bounce_back_time-=dt;

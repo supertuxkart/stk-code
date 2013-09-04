@@ -108,6 +108,9 @@ private:
         /** Time when this state was taken. */
         float m_time;
 
+        /** The 'left over' time from the physics. */
+        float m_local_physics_time;
+
         /** Type of this information. */
         RewindInfoType m_type;
 
@@ -143,6 +146,9 @@ private:
         // --------------------------------------------------------------------
         /** Returns if this state is confirmed. */
         bool isConfirmed() const { return m_is_confirmed; }
+        // --------------------------------------------------------------------
+        /** Returns the left-over physics time. */
+        float getLocalPhysicsTime() const { return m_local_physics_time; }
         // --------------------------------------------------------------------
         /** Called when going back in time to undo any rewind information. 
          *  It calls either undoEvent or undoState in the rewinder. */
@@ -236,7 +242,7 @@ public:
     // ------------------------------------------------------------------------
 
     void reset();
-    void update(float dt);
+    void saveStates(float dt);
     // ------------------------------------------------------------------------
     /** Adds a Rewinder to the list of all rewinders.
      *  \return true If rewinding is enabled, false otherwise. 
