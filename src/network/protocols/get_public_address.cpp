@@ -125,8 +125,9 @@ void GetPublicAddress::asynchronousUpdate()
             struct sockaddr_in* current_interface = (struct sockaddr_in*)(p->ai_addr);
 
             m_stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
-            NetworkManager::getInstance()->setManualSocketsMode(true);
-            NetworkManager::getInstance()->getHost()->sendRawPacket(bytes, 20, TransportAddress(m_stun_server_ip, 3478));
+            m_transaction_host = new STKHost();
+            m_transaction_host->setupClient(1,1,0,0);
+            m_transaction_host->sendRawPacket(bytes, 20, TransportAddress(m_stun_server_ip, 3478));
             m_state = TEST_SENT;
 
             freeaddrinfo(res); // free the linked list
@@ -137,7 +138,7 @@ void GetPublicAddress::asynchronousUpdate()
     }
     if (m_state == TEST_SENT)
     {
-        uint8_t* data = NetworkManager::getInstance()->getHost()->receiveRawPacket(TransportAddress(m_stun_server_ip, 3478), 2000);
+        uint8_t* data = m_transaction_host->receiveRawPacket(TransportAddress(m_stun_server_ip, 3478), 2000);
         if (!data)
         {
             m_state = NOTHING_DONE; // will send the test again to an other server
@@ -220,7 +221,6 @@ void GetPublicAddress::asynchronousUpdate()
                 {
                     Log::debug("GetPublicAddress", "The public address has been found : %i.%i.%i.%i:%i", address>>24&0xff, address>>16&0xff, address>>8&0xff, address&0xff, port);
                     m_state = ADDRESS_KNOWN;
-                    NetworkManager::getInstance()->setManualSocketsMode(false);
                     TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
                     addr->ip = address;
                     addr->port = port;

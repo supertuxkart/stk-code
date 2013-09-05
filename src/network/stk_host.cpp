@@ -37,8 +37,9 @@
 void* STKHost::receive_data(void* self)
 {
     ENetEvent event;
-    ENetHost* host = (((STKHost*)(self))->m_host);
-    while (1)
+    STKHost* myself = (STKHost*)(self);
+    ENetHost* host = myself->m_host;
+    while (!myself->mustStopListening())
     {
         while (enet_host_service(host, &event, 20) != 0) {
             Event* evt = new Event(&event);
@@ -47,6 +48,9 @@ void* STKHost::receive_data(void* self)
             delete evt;
         }
     }
+    myself->m_listening = false;
+    delete myself->m_listening_thread;
+    myself->m_listening_thread = NULL;
     return NULL;
 }
 
@@ -56,18 +60,14 @@ STKHost::STKHost()
 {
     m_host = NULL;
     m_listening_thread = NULL;
+    pthread_mutex_init(&m_exit_mutex, NULL);
 }
 
 // ----------------------------------------------------------------------------
 
 STKHost::~STKHost()
 {
-    if (m_listening_thread)
-    {
-        pthread_cancel(*m_listening_thread);//, SIGKILL); with kill
-        delete m_listening_thread;
-        m_listening_thread = NULL;
-    }
+    stopListening();
     if (m_host)
     {
         enet_host_destroy(m_host);
@@ -83,6 +83,13 @@ void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count,
     ENetAddress* addr = (ENetAddress*)(malloc(sizeof(ENetAddress)));
     addr->host = address;
     addr->port = port;
+
+#ifdef WIN32/*
+	addr->host = 0;
+	addr->host += ((unsigned int)(192)<<0); // 192.168.0.11
+	addr->host += ((unsigned int)(168)<<8); // 192.168.0.11
+	addr->host += ((unsigned int)(11)<<24); // 192.168.0.11*/
+#endif
 
     m_host = enet_host_create(addr, peer_count, channel_limit,
                             max_incoming_bandwidth, max_outgoing_bandwidth);
@@ -114,8 +121,10 @@ void STKHost::setupClient(int peer_count, int channel_limit,
 
 void STKHost::startListening()
 {
+    pthread_mutex_lock(&m_exit_mutex); // will let the update function start
     m_listening_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
     pthread_create(m_listening_thread, NULL, &STKHost::receive_data, this);
+    m_listening = true;
 }
 
 // ----------------------------------------------------------------------------
@@ -124,8 +133,7 @@ void STKHost::stopListening()
 {
     if(m_listening_thread)
     {
-        pthread_cancel(*m_listening_thread);
-        m_listening_thread = NULL;
+        pthread_mutex_unlock(&m_exit_mutex); // will stop the update function
     }
 }
 
@@ -182,12 +190,16 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
 
     int i = 0;
      // wait to receive the message because enet sockets are non-blocking
-    while(len < 0)
+    while(len == -1) // nothing received
     {
         i++;
         len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
         Time::sleep(1); // wait 1 millisecond between two checks
     }
+	if (len == SOCKET_ERROR)
+	{
+		Log::error("STKHost", "Problem with the socket. Please contact the dev team.");
+	}
     struct sockaddr_in *sin = (struct sockaddr_in *) (&addr);
     // we received the data
     sender->ip = turnEndianness((uint32_t)(sin->sin_addr.s_addr));
@@ -211,32 +223,40 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
     memset(buffer, 0, 2048);
 
     socklen_t from_len;
-    struct sockaddr addr;
+    struct sockaddr_in addr;
 
     from_len = sizeof(addr);
-    int len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
+    int len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, (struct sockaddr*)(&addr), &from_len);
 
     int i = 0;
      // wait to receive the message because enet sockets are non-blocking
-    while(len < 0 || (
-               (uint8_t)(addr.sa_data[2]) != (sender.ip>>24&0xff)
-            && (uint8_t)(addr.sa_data[3]) != (sender.ip>>16&0xff)
-            && (uint8_t)(addr.sa_data[4]) != (sender.ip>>8&0xff)
-            && (uint8_t)(addr.sa_data[5]) != (sender.ip&0xff)))
+    while(len < 0 || addr.sin_addr.s_addr == sender.ip)
     {
         i++;
-        len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
+		if (len>=0)
+		{
+            Log::info("STKHost", "Message received but the ip address didn't match the expected one.");
+        }
+        len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, (struct sockaddr*)(&addr), &from_len);
+		uint32_t addr1 = addr.sin_addr.s_addr;
+		uint32_t addr2 = sender.ip;
+		uint32_t addr3 = ntohl(addr1);
+		uint32_t addr4 = ntohl(addr2);
         Time::sleep(1); // wait 1 millisecond between two checks
         if (i >= max_tries && max_tries != -1)
         {
-            Log::verbose("STKHost", "No answer from the server.");
+            Log::verbose("STKHost", "No answer from the server on %u.%u.%u.%u:%u", (m_host->address.host&0xff), 
+						(m_host->address.host>>8&0xff),
+						(m_host->address.host>>16&0xff),
+						(m_host->address.host>>24&0xff),
+						(m_host->address.port));
             return NULL;
         }
     }
-    if (addr.sa_family == AF_INET)
+    if (addr.sin_family == AF_INET)
     {
         char s[20];
-        inet_ntop(AF_INET, &(((struct sockaddr_in *)&addr)->sin_addr), s, 20);
+        inet_ntop(AF_INET, &(addr.sin_addr), s, 20);
         Log::info("STKHost", "IPv4 Address of the sender was %s", s);
     }
     return buffer;
@@ -280,4 +300,18 @@ bool STKHost::isConnectedTo(TransportAddress peer)
         }
     }
     return false;
+}
+
+// ---------------------------------------------------------------------------
+
+int STKHost::mustStopListening()
+{
+  switch(pthread_mutex_trylock(&m_exit_mutex)) {
+    case 0: /* if we got the lock, unlock and return 1 (true) */
+      pthread_mutex_unlock(&m_exit_mutex);
+      return 1;
+    case EBUSY: /* return 0 (false) if the mutex was locked */
+      return 0;
+  }
+  return 1;
 }

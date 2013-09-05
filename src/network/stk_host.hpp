@@ -140,9 +140,16 @@ class STKHost
          *  \return True if the peer is known and connected, false elseway.
          */
         bool        isConnectedTo(TransportAddress peer_address);
+
+        /*! \brief Returns true when the thread should stop listening. */
+        int         mustStopListening();
+        /*! \brief Returns true when the thread has stopped listening. */
+        bool        hasStoppedListening() { return m_listening; }
     protected:
         ENetHost*   m_host;             //!< ENet host interfacing sockets.
         pthread_t*  m_listening_thread; //!< Thread listening network events.
+        pthread_mutex_t m_exit_mutex;   //!< Mutex to kill properly the thread
+        bool        m_listening;
 
 };
 

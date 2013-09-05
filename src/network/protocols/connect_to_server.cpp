@@ -161,7 +161,6 @@ void ConnectToServer::asynchronousUpdate()
                 {
                     // just send a broadcast packet, the client will know our ip address and will connect
                     STKHost* host = NetworkManager::getInstance()->getHost();
-                    NetworkManager::getInstance()->setManualSocketsMode(true);
                     TransportAddress sender;
                     Log::info("ConnectToServer", "Waiting broadcast message.");
                     const uint8_t* received_data = host->receiveRawPacket(&sender); // get the sender
@@ -173,9 +172,11 @@ void ConnectToServer::asynchronousUpdate()
                         // just check if the ip is ours : if so, then just use localhost (127.0.0.1)
                         struct ifaddrs *ifap, *ifa;
                         struct sockaddr_in *sa;
-                        getifaddrs (&ifap);
-                        for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
-                            if (ifa->ifa_addr->sa_family==AF_INET) {
+                        getifaddrs (&ifap); // get the info
+                        for (ifa = ifap; ifa; ifa = ifa->ifa_next) 
+                        {
+                            if (ifa->ifa_addr->sa_family==AF_INET) 
+                            {
                                 sa = (struct sockaddr_in *) ifa->ifa_addr;
                                 if (turnEndianness(sa->sin_addr.s_addr) == sender.ip) // this interface is ours
                                     sender.ip = 0x7f000001; // 127.0.0.1
@@ -220,7 +221,6 @@ void ConnectToServer::asynchronousUpdate()
                         m_server_address = sender;
                         m_state = CONNECTING;
                     }
-                    NetworkManager::getInstance()->setManualSocketsMode(false);
                 }
                 else
                 {
