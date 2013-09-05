@@ -152,14 +152,18 @@ void AchievementsManager::createSlotsIfNeeded()
         }
     }
 
-    if(something_changed) save();
+    if(something_changed){
+        Log::warn("AchievementsManager::save",
+                  "errueeeur");
+        save();
+    }
 } // UnlockManager::createSlotsIfNeeded
 
 
 // ============================================================================
 void AchievementsManager::save()
 {
-    std::string filename = file_manager->getConfigFile("challenges.xml");
+    std::string filename = file_manager->getConfigFile("achievements.xml");
 
     std::ofstream achievements_file(filename.c_str(), std::ios::out);
 

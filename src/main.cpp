@@ -1367,7 +1367,6 @@ int main(int argc, char *argv[] )
                            file_manager->getGUIDir() + "options_video.png") );
         kart_properties_manager -> loadAllKarts    ();
         unlock_manager          = new UnlockManager();
-        AchievementsManager::get();
         //m_tutorial_manager      = new TutorialManager();
         GUIEngine::addLoadingIcon( irr_driver->getTexture(
                                file_manager->getTextureFile("gui_lock.png")) );
@@ -1524,6 +1523,7 @@ int main(int argc, char *argv[] )
             // Go straight to the race
             StateManager::get()->enterGameState();
         }
+        AchievementsManager::get();
 
 
         // If an important news message exists it is shown in a popup dialog.

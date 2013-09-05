@@ -77,7 +77,6 @@ public:
     virtual ~MapAchievementInfo         () {};
     int getGoalValue                    (const std::string & key) { return m_goal_values[key];}
     virtual bool checkCompletion        (Achievement * achievement) const;
-
     virtual Achievement::AchievementType  getType() const { return Achievement::AT_MAP; };
 };   // class MapAchievementInfo
 
