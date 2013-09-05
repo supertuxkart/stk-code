@@ -104,8 +104,6 @@ void AchievementsManager::parseConfigFile()
         Log::info("AchievementsManager", "Achievements file '%s' will be created.",
                   filename.c_str());
         createSlotsIfNeeded();
-        save();
-
         if (root) delete root;
         return;
     }
@@ -114,7 +112,7 @@ void AchievementsManager::parseConfigFile()
     root->getNodes("slot", xml_slots);
     for (unsigned int n=0; n < xml_slots.size(); n++)
     {
-        AchievementsSlot * slot = new AchievementsSlot(xml_slots[n]);
+        AchievementsSlot * slot = new AchievementsSlot(xml_slots[n], m_achievements_info);
         if(!slot->isValid())
         {
             Log::warn("AchievementsManager", "Found game slot with faulty or missing information. Discarding it.");
@@ -129,7 +127,7 @@ void AchievementsManager::parseConfigFile()
 
 AchievementsSlot * AchievementsManager::createNewSlot(std::string id, bool online)
 {
-    AchievementsSlot* slot = new AchievementsSlot(id, false);
+    AchievementsSlot* slot = new AchievementsSlot(id, false, m_achievements_info);
     m_slots.push_back(slot);
     return slot;
 }

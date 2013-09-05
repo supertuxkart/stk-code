@@ -32,7 +32,8 @@
 #include <assert.h>
 
 // ============================================================================
-Achievement::Achievement(AchievementInfo * info)
+Achievement::Achievement(const AchievementInfo * info)
+    :m_achievement_info(info)
 {
     m_id = info->getID();
     m_achieved = false;
@@ -62,7 +63,7 @@ void Achievement::check()
         //show achievement
         GUIEngine::DialogQueue::get()->pushDialog(
             new NotificationDialog(NotificationDialog::T_Achievements,
-            _("Completed achievement") + '"' + m_achievement_info->getDescription() + '".'
+            irr::core::stringw(_("Completed achievement")) + irr::core::stringw("\"") + m_achievement_info->getDescription() + irr::core::stringw("\".")
         ));
         //send to server
         Online::CurrentUser::get()->onAchieving(m_id);
@@ -71,7 +72,7 @@ void Achievement::check()
 }
 
 // ============================================================================
-SingleAchievement::SingleAchievement(AchievementInfo * info)
+SingleAchievement::SingleAchievement(const AchievementInfo * info)
     : Achievement(info)
 {
 }
@@ -111,7 +112,7 @@ void SingleAchievement::increase(int increase)
 }
 
 // ============================================================================
-MapAchievement::MapAchievement(AchievementInfo * info)
+MapAchievement::MapAchievement(const AchievementInfo * info)
     : Achievement(info)
 {
 }

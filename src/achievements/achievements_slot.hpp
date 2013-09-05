@@ -35,11 +35,11 @@ private:
     bool m_valid;
     std::string m_id;
 
-    void createFreshSlot();
+    void createFreshSlot( const PtrVector<AchievementInfo> & info);
 
 public :
-    AchievementsSlot(const XMLNode * input);
-    AchievementsSlot(std::string id, bool online);
+    AchievementsSlot(const XMLNode * input, const PtrVector<AchievementInfo> & info);
+    AchievementsSlot(std::string id, bool online, const PtrVector<AchievementInfo> & info);
     bool isValid() const { return m_valid;}
     void save(std::ofstream & out);
     bool isOnline() const {return m_online;}

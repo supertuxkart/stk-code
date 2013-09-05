@@ -39,11 +39,11 @@ class Achievement
 protected:
     uint32_t                            m_id;
     bool                                m_achieved;
-    AchievementInfo *                   m_achievement_info;
+    const AchievementInfo *             m_achievement_info;
     void                check           ();
 
 public:
-    Achievement                         (AchievementInfo * info);
+    Achievement                         (const AchievementInfo * info);
     virtual ~Achievement                ();
     uint32_t getID                      () const { return m_id; }
     virtual void load                   (XMLNode * input) = 0;
@@ -65,7 +65,7 @@ protected:
     int m_progress;
 
 public:
-    SingleAchievement                   (AchievementInfo * info);
+    SingleAchievement                   (const AchievementInfo * info);
     virtual ~SingleAchievement          () {};
 
     void load                           (XMLNode * input);
@@ -81,7 +81,7 @@ protected:
     std::map<std::string, int> m_progress_map;
 
 public:
-    MapAchievement                      (AchievementInfo * info);
+    MapAchievement                      (const AchievementInfo * info);
     virtual ~MapAchievement             () {};
 
     void load                           (XMLNode * input);

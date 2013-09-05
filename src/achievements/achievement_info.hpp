@@ -48,9 +48,9 @@ public:
     virtual ~AchievementInfo            () {};
     uint32_t getID                      () const { return m_id; }
     irr::core::stringw getDescription   () const { return m_description; }
-    virtual Achievement::AchievementType getType         () = 0;
+    virtual Achievement::AchievementType getType () const = 0;
     virtual bool checkCompletion        (Achievement * achievement) const = 0;
-    bool needsResetAfterRace() {return m_reset_after_race; }
+    bool needsResetAfterRace() const {return m_reset_after_race; }
 };   // class AchievementInfo
 
 class SingleAchievementInfo : public AchievementInfo
@@ -64,7 +64,7 @@ public:
     int getGoalValue                    () const { return m_goal_value; }
     virtual bool checkCompletion        (Achievement * achievement) const;
 
-    virtual Achievement::AchievementType getType() { return Achievement::AT_SINGLE; };
+    virtual Achievement::AchievementType getType() const { return Achievement::AT_SINGLE; };
 };   // class SingleAchievementInfo
 
 class MapAchievementInfo : public AchievementInfo
@@ -78,7 +78,7 @@ public:
     int getGoalValue                    (const std::string & key) { return m_goal_values[key];}
     virtual bool checkCompletion        (Achievement * achievement) const;
 
-    virtual Achievement::AchievementType  getType() { return Achievement::AT_MAP; };
+    virtual Achievement::AchievementType  getType() const { return Achievement::AT_MAP; };
 };   // class MapAchievementInfo
 
 #endif

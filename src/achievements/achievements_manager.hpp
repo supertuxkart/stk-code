@@ -52,8 +52,6 @@ public:
     static AchievementsManager *            get();
     static void                             deallocate();
 
-    const PtrVector<AchievementInfo> & getAllInfo() const { return m_achievements_info;};
-
     void parseDataFile();
     void parseConfigFile();
     void save();

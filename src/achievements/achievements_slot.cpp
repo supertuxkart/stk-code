@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <assert.h>
 // ============================================================================
-AchievementsSlot::AchievementsSlot(const XMLNode * input)
+AchievementsSlot::AchievementsSlot(const XMLNode * input,  const PtrVector<AchievementInfo> & info)
 {
     int fetched_user_id = input->get("user_id", &m_id);
     std::string online;
@@ -43,7 +43,7 @@ AchievementsSlot::AchievementsSlot(const XMLNode * input)
     m_valid = true;
     m_online = online == "true";
 
-    createFreshSlot();
+    createFreshSlot(info);
 
     std::vector<XMLNode*> xml_achievements;
     input->getNodes("achievement", xml_achievements);
@@ -62,23 +62,22 @@ AchievementsSlot::AchievementsSlot(const XMLNode * input)
 }
 
 // ============================================================================
-AchievementsSlot::AchievementsSlot(std::string id, bool online)
+AchievementsSlot::AchievementsSlot(std::string id, bool online, const PtrVector<AchievementInfo> & info)
 {
     m_valid = true;
     m_online = online;
     m_id = id;
 
-    createFreshSlot();
+    createFreshSlot(info);
 }
 
 // ============================================================================
-void AchievementsSlot::createFreshSlot()
+void AchievementsSlot::createFreshSlot( const PtrVector<AchievementInfo> & all_info)
 {
     m_achievements.clear();
-    PtrVector<AchievementInfo> all_info = AchievementsManager::get()->getAllInfo();
     for(int i=0; i < all_info.size(); i++)
     {
-        AchievementInfo * info = all_info.get(i);
+        const AchievementInfo * info = all_info.get(i);
         Achievement::AchievementType achievement_type = info->getType();
         Achievement * achievement;
         if(achievement_type == Achievement::AT_SINGLE)

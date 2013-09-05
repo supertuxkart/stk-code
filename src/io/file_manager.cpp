@@ -916,7 +916,7 @@ std::string FileManager::getFontFile(const std::string& file_name) const
  */
 std::string FileManager::getConfigFile(const std::string &file_name) const
 {
-    return getConfigDir()+"/"+file_name;
+    return getConfigDir()+file_name;
 }   // getChallengeFile
 
 
