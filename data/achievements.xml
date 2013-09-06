@@ -12,6 +12,6 @@
       <entry key="hacienda" goal="1"/>
       <entry key="jungle" goal="1"/>      
   </achievement>
-  <achievement id="2" type="single" goal="1" title="Strike!" description="Hit a kart with a bowling-ball." />
+  <achievement id="2" type="single" goal="10" title="Strike!" description="Hit 10 karts with a bowling-ball." />
 </achievements>
 

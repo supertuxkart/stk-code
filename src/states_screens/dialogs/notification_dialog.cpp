@@ -57,6 +57,14 @@ void NotificationDialog::beforeAddingWidgets()
     assert(m_options_widget != NULL);
     m_view_widget = getWidget<IconButtonWidget>("view");
     assert(m_view_widget != NULL);
+    if(m_type == T_Friends)
+    {
+        m_view_widget->setText(_("View Friends"));
+    }
+    else if (m_type == T_Achievements)
+    {
+        m_view_widget->setText(_("View Achievements"));
+    }
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
@@ -131,8 +139,7 @@ void NotificationDialog::onUpdate(float dt)
             }
             else if (m_type == T_Achievements)
             {
-                ProfileManager::get()->setVisiting(CurrentUser::get()->getID());
-                StateManager::get()->pushScreen(OnlineProfileFriends::getInstance()); //FIXME should actually pop up achievements screen
+                    //FIXME
             }
         }
         return;

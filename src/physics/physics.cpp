@@ -18,6 +18,7 @@
 
 #include "physics/physics.hpp"
 
+#include "achievements/achievements_manager.hpp"
 #include "animations/three_d_animation.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
@@ -236,12 +237,12 @@ void Physics::update(float dt)
             // Only explode a bowling ball if the target is
             // not invulnerable
             AbstractKart* target_kart = p->getUserPointer(1)->getPointerKart();
-            if(p->getUserPointer(0)->getPointerFlyable()->getType()
-                !=PowerupManager::POWERUP_BOWLING ||
-                !target_kart->isInvulnerable()      )
+            PowerupManager::PowerupType type = p->getUserPointer(0)->getPointerFlyable()->getType();
+            if(type != PowerupManager::POWERUP_BOWLING || !target_kart->isInvulnerable())
             {
-                    p->getUserPointer(0)->getPointerFlyable()
-                     ->hit(target_kart);
+                p->getUserPointer(0)->getPointerFlyable()->hit(target_kart);
+                if ( type ==PowerupManager::POWERUP_BOWLING )
+                    ((SingleAchievement *) AchievementsManager::get()->getActive()->getAchievement(2))->increase(1);
             }
 
         }

@@ -153,8 +153,6 @@ void AchievementsManager::createSlotsIfNeeded()
     }
 
     if(something_changed){
-        Log::warn("AchievementsManager::save",
-                  "errueeeur");
         save();
     }
 } // UnlockManager::createSlotsIfNeeded

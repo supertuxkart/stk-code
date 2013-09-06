@@ -48,6 +48,7 @@ public:
     virtual ~AchievementInfo            () {};
     uint32_t getID                      () const { return m_id; }
     irr::core::stringw getDescription   () const { return m_description; }
+    irr::core::stringw getTitle         () const { return m_title; }
     virtual Achievement::AchievementType getType () const = 0;
     virtual bool checkCompletion        (Achievement * achievement) const = 0;
     bool needsResetAfterRace() const {return m_reset_after_race; }

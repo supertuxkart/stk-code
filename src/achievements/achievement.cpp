@@ -63,7 +63,7 @@ void Achievement::check()
         //show achievement
         GUIEngine::DialogQueue::get()->pushDialog(
             new NotificationDialog(NotificationDialog::T_Achievements,
-            irr::core::stringw(_("Completed achievement")) + irr::core::stringw("\"") + m_achievement_info->getDescription() + irr::core::stringw("\".")
+            irr::core::stringw(_("Completed achievement")) + irr::core::stringw(" \"") + m_achievement_info->getTitle() + irr::core::stringw("\".")
         ));
         //send to server
         Online::CurrentUser::get()->onAchieving(m_id);
@@ -94,8 +94,8 @@ void SingleAchievement::load(XMLNode * input)
 // ============================================================================
 void SingleAchievement::save(std::ofstream & out)
 {
-    out << "        <achievement id=\"" << m_id << "\""
-        << "achieved=\"" << StringUtils::boolstr(m_achieved) << "\""
+    out << "        <achievement id=\"" << m_id << "\" "
+        << "achieved=\"" << StringUtils::boolstr(m_achieved) << "\" "
         << "value=\"" << StringUtils::toString(m_progress) << "\""
         << "/>\n";
 }   // save

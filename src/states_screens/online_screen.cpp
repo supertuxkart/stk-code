@@ -151,7 +151,6 @@ void OnlineScreen::init()
     setInitialFocus();
     DemoWorld::resetIdleTime();
     m_online_status_widget->setText(Messages::signedInAs(CurrentUser::get()->getUserName()), false);
-
 }   // init
 
 // ----------------------------------------------------------------------------
