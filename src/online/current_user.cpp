@@ -154,7 +154,9 @@ namespace Online{
             }
             ProfileManager::get()->addPersistent(m_profile);
             AchievementsManager::get()->updateCurrentPlayer();
-            AchievementsManager::get()->getActive()->sync();
+            std::string achieved_string("");
+            if(input->get("achieved", &achieved_string) == 1)
+                AchievementsManager::get()->getActive()->sync(achieved_string);
             m_profile->fetchFriends();
         }
         else

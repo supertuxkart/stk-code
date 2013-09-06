@@ -116,10 +116,20 @@ Achievement * AchievementsSlot::getAchievement(uint32_t id)
 }
 
 // ============================================================================
-void AchievementsSlot::sync()
+void AchievementsSlot::sync(const std::string & achieved_string)
 {
-    assert(StringUtils::toString(Online::CurrentUser::get()->getID()) == m_id);
-    //FIXME
+    std::vector<std::string> parts = StringUtils::split(achieved_string, ' ');
+    std::vector<uint32_t> achieved_ids;
+    for(unsigned int i = 0; i < parts.size(); ++i)
+    {
+       achieved_ids.push_back(atoi(parts[i].c_str()));
+    }
+    for(unsigned int i =0; i < achieved_ids.size(); ++i)
+    {
+        Achievement * achievement = getAchievement(achieved_ids[i]);
+        if(achievement != NULL)
+            achievement->setAchieved();
+    }
 }
 
 // ============================================================================

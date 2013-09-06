@@ -50,6 +50,7 @@ public:
     virtual void save                   (std::ofstream & out) = 0;
     virtual void reset                  () = 0;
     void onRaceEnd                      ();
+    void setAchieved                    () {m_achieved = true; };
 
     enum AchievementType
     {

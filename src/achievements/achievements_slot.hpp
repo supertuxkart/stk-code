@@ -21,6 +21,7 @@
 
 #include "utils/types.hpp"
 #include "achievements/achievement.hpp"
+#include "online/http_manager.hpp"
 
 #include <irrString.h>
 #include <string>
@@ -37,13 +38,19 @@ private:
 
     void createFreshSlot( const PtrVector<AchievementInfo> & info);
 
+    class SyncAchievementsRequest : public Online::XMLRequest {
+        virtual void callback ();
+    public:
+        SyncAchievementsRequest() : Online::XMLRequest(true) {}
+    };
+
 public :
     AchievementsSlot(const XMLNode * input, const PtrVector<AchievementInfo> & info);
     AchievementsSlot(std::string id, bool online, const PtrVector<AchievementInfo> & info);
     bool isValid() const { return m_valid;}
     void save(std::ofstream & out);
     bool isOnline() const {return m_online;}
-    void sync();
+    void sync(const std::string & achieved_string);
     void onRaceEnd();
     const std::string & getID() const {return m_id;}
     Achievement * getAchievement(uint32_t id);
