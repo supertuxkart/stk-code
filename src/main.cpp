@@ -369,6 +369,8 @@ void cmdLineHelp (char* invocation)
     // TODO: add back "--players" switch
     // "       --players n      Define number of players to between 1 and 4.\n"
     "  -f,  --fullscreen       Select fullscreen display.\n"
+    "       --multiscreen      Each split screen is on a different physical screen\n"
+    "       --singlescreen     Each split screen is on the same physical screen\n"
     "  -w,  --windowed         Windowed display (default).\n"
     "  -s,  --screensize WxH   Set the screen size (e.g. 320x200).\n"
     "  -v,  --version          Show version of SuperTuxKart.\n"
@@ -500,6 +502,14 @@ int handleCmdLinePreliminary(int argc, char **argv)
         else if( !strcmp(argv[i], "--no-graphics") )
         {
             ProfileWorld::disableGraphics();
+        }
+        else if ( !strcmp(argv[i], "--multiscreen"))
+        {
+            UserConfigParams::m_multi_screen = true;
+        }
+        else if ( !strcmp(argv[i], "--singlescreen"))
+        {
+            UserConfigParams::m_multi_screen = false;
         }
 #if !defined(WIN32) && !defined(__CYGWIN)
         else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
@@ -1016,6 +1026,8 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--log=file"     )                       ) {}
         else if( !strcmp(argv[i], "--screensize") || 
                  !strcmp(argv[i], "-s")            )                     {i++;}
+        else if( !strcmp(argv[i], "--multiscreen"  )                       ) {}
+        else if( !strcmp(argv[i], "--singlescreen")                        ) {}
         else if( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}
         else if( !strcmp(argv[i], "--windowed")   || !strcmp(argv[i], "-w")) {}
         else if( !strcmp(argv[i], "--version")    || !strcmp(argv[i], "-v")) {}

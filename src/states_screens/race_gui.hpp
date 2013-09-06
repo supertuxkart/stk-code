@@ -77,10 +77,13 @@ private:
     int              m_map_height;
 
     /** Distance of map from left side of screen. */
-    int              m_map_left;
+    std::vector<int> m_map_left;
 
     /** Distance of map from bottom of screen. */
-    int              m_map_bottom;
+    std::vector<int> m_map_bottom;
+
+    /** Positions of the timer. */
+    std::vector<core::vector2di> m_timer_pos;
     
     /** Maximum string length of 'rank', 'lap', '99/99'. Used to position
      *  the rank/lap text correctly close to the right border. */
@@ -109,6 +112,7 @@ public:
 
          RaceGUI();
         ~RaceGUI();
+    virtual void init();
     virtual void renderGlobal(float dt);
     virtual void renderPlayerView(const AbstractKart *kart, float dt);
         

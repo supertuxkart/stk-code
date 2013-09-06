@@ -123,6 +123,21 @@ void RaceGUIBase::init()
     // Do everything else required at a race restart as well, esp. 
     // resetting the height of the referee.
     restartRace();
+    if(UserConfigParams::m_multi_screen)
+    {
+        for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
+        {
+            const Camera *c = World::getWorld()->getLocalPlayerKart(i)->getCamera();
+            m_viewports_for_global.push_back(c->getViewport());
+        }
+    }
+    else
+    {
+        m_viewports_for_global.push_back(core::rect<s32>(0, 0,
+                                                  UserConfigParams::m_width,
+                                                  UserConfigParams::m_height));
+    }
+
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -671,45 +686,41 @@ void RaceGUIBase::drawGlobalMusicDescription()
  */
 void RaceGUIBase::drawGlobalReadySetGo()
 {
-    switch (World::getWorld()->getPhase())
+    const World *world = World::getWorld();
+    if( world->getPhase()<WorldStatus::READY_PHASE ||
+        world->getPhase()>WorldStatus::GO_PHASE      )
+        return;
+
+    static video::SColor color = video::SColor(255, 255, 255, 255);
+    gui::IGUIFont* font = GUIEngine::getTitleFont();
+    core::rect<s32> pos;
+
+    for(unsigned int i=0; i<m_viewports_for_global.size(); i++)
     {
-    case WorldStatus::READY_PHASE:
+        const core::rect<s32> &r = m_viewports_for_global[i];
+        const core::rect<s32> center((r.UpperLeftCorner.X + r.LowerRightCorner.X)/2,
+                                     (r.UpperLeftCorner.Y + r.LowerRightCorner.Y)/2,
+                                     (r.UpperLeftCorner.X + r.LowerRightCorner.X)/2,
+                                     (r.UpperLeftCorner.Y + r.LowerRightCorner.Y)/2);
+        switch (World::getWorld()->getPhase())
         {
-            static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(UserConfigParams::m_width>>1, 
-                                UserConfigParams::m_height>>1,
-                                UserConfigParams::m_width>>1,
-                                UserConfigParams::m_height>>1);
-            gui::IGUIFont* font = GUIEngine::getTitleFont();
-            font->draw(m_string_ready.c_str(), pos, color, true, true);
-        }
-        break;
-    case WorldStatus::SET_PHASE:
-        {
-            static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(UserConfigParams::m_width>>1, 
-                                UserConfigParams::m_height>>1,
-                                UserConfigParams::m_width>>1, 
-                                UserConfigParams::m_height>>1);
-            gui::IGUIFont* font = GUIEngine::getTitleFont();
-            font->draw(m_string_set.c_str(), pos, color, true, true);
-        }
-        break;
-    case WorldStatus::GO_PHASE:
-        {
-            static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(UserConfigParams::m_width>>1, 
-                                UserConfigParams::m_height>>1,
-                                UserConfigParams::m_width>>1, 
-                                UserConfigParams::m_height>>1);
-            //gui::IGUIFont* font = irr_driver->getRaceFont();
-            gui::IGUIFont* font = GUIEngine::getTitleFont();
-            font->draw(m_string_go.c_str(), pos, color, true, true);
-        }
-        break;
-    default: 
-         break;
-    }   // switch
+        case WorldStatus::READY_PHASE:
+            font->draw(m_string_ready.c_str(), center, color, true, true);
+            break;
+        case WorldStatus::SET_PHASE:
+            font->draw(m_string_set.c_str(), center, color, true, true);
+            break;
+        case WorldStatus::GO_PHASE:
+             if (race_manager->getCoinTarget() > 0)
+                font->draw(_("Collect nitro!"), center, color, true, true);
+             else
+                font->draw(m_string_go.c_str(), center, color, true, true);
+            break;
+        default:
+            break;
+        }   // switch
+    }
+
 }   // drawGlobalReadySetGo
 
 //-----------------------------------------------------------------------------

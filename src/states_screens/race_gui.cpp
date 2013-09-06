@@ -66,20 +66,6 @@ RaceGUI::RaceGUI()
     m_marker_player_size    = (int)( 16.0f * scaling);
     m_map_width             = (int)(100.0f * scaling);
     m_map_height            = (int)(100.0f * scaling);
-    m_map_left              = (int)( 10.0f * scaling);
-    m_map_bottom            = (int)( 10.0f * scaling);
-    
-    // Minimap is also rendered bigger via OpenGL, so find power-of-two again
-    const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
-    m_map_rendered_width    = map_texture;
-    m_map_rendered_height   = map_texture;
-
-
-    // special case : when 3 players play, use available 4th space for such things
-    if (race_manager->getNumLocalPlayers() == 3)
-    {
-        m_map_left = UserConfigParams::m_width - m_map_width;
-    }
 
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
@@ -92,13 +78,17 @@ RaceGUI::RaceGUI()
     m_string_rank     = _("Rank");
 
     
+}   // RaceGUI
+
+//-----------------------------------------------------------------------------
+void RaceGUI::init()
+{
+    RaceGUIBase::init();
     // Determine maximum length of the rank/lap text, in order to
     // align those texts properly on the right side of the viewport.
     gui::ScalableFont* font = GUIEngine::getFont(); 
     m_rank_lap_width = font->getDimension(m_string_lap.c_str()).Width;
     
-    m_timer_width = font->getDimension(L"99:99:99").Width;
-
     font = (race_manager->getNumLocalPlayers() > 2 ? GUIEngine::getSmallFont() : GUIEngine::getFont());
     
     int w;
@@ -117,8 +107,46 @@ RaceGUI::RaceGUI()
     if(m_rank_lap_width < w) m_rank_lap_width = w;
     w = font->getDimension(m_string_rank.c_str()).Width;
     if(m_rank_lap_width < w) m_rank_lap_width = w;
-    
-}   // RaceGUI
+    // Originally m_map_height was 100, and we take 480 as minimum res
+    const float scaling = irr_driver->getFrameSize().Height / 480.0f;
+    m_timer_width       = font->getDimension(L"99:99:99").Width;
+
+    if(UserConfigParams::m_multi_screen)
+    {
+        for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
+        {
+            const core::recti &vp=World::getWorld()->getPlayerKart(i)->getCamera()->getViewport();
+            m_map_left.push_back((int)(vp.UpperLeftCorner.X + 10.0f*scaling));
+            m_map_bottom.push_back((int)(vp.LowerRightCorner.Y - 10.0f * scaling));
+            m_timer_pos.push_back(core::vector2di(vp.LowerRightCorner.X-m_timer_width-10,
+                                                  vp.UpperLeftCorner.Y+10));
+        }
+
+    }
+    else
+    {
+        // special case : when 3 players play, use available 4th space for such things
+        if (race_manager->getNumLocalPlayers() == 3)
+        {
+            m_map_left.push_back(UserConfigParams::m_width - m_map_width);
+            m_timer_pos.push_back(core::vector2di( UserConfigParams::m_width - m_timer_width-10,
+                                                   UserConfigParams::m_height/2+10));
+        }
+        else
+        {
+            m_map_left.push_back((int)( 10.0f * scaling));
+            m_timer_pos.push_back(core::vector2di( UserConfigParams::m_width - m_timer_width-10, 10));
+        }
+        m_map_bottom.push_back(UserConfigParams::m_height - (int)( 10.0f * scaling));
+    }
+
+    // Minimap is also rendered bigger via OpenGL, so find power-of-two again
+    const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
+    m_map_rendered_width    = map_texture;
+    m_map_rendered_height   = map_texture;
+
+}   // init
+
 
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()
@@ -221,7 +249,9 @@ void RaceGUI::drawGlobalTimer()
 
     core::stringw sw;
     video::SColor time_color = video::SColor(255, 255, 255, 255);
-    int dist_from_right = 10 + m_timer_width;
+    int dist_from_right = 0;
+    gui::ScalableFont* font = (race_manager->getNumLocalPlayers() > 2 ? GUIEngine::getSmallFont()
+                                                                      : GUIEngine::getFont());
 
     float elapsed_time = World::getWorld()->getTime();
     if (!race_manager->hasTimeTarget())
@@ -240,24 +270,20 @@ void RaceGUI::drawGlobalTimer()
         else
         {
             sw = _("Challenge Failed");
-            int string_width = 
-                GUIEngine::getFont()->getDimension(_("Challenge Failed")).Width;
-            dist_from_right = 10 + string_width;
+            int string_width =font->getDimension(_("Challenge Failed")).Width;
+            dist_from_right = string_width - m_timer_width;
+
             time_color = video::SColor(255,255,0,0);
         }
     }
     
-    core::rect<s32> pos(UserConfigParams::m_width - dist_from_right, 10, 
-                        UserConfigParams::m_width                  , 50);
-    
-    // special case : when 3 players play, use available 4th space for such things
-    if (race_manager->getNumLocalPlayers() == 3)
+    for(unsigned int i=0; i<m_timer_pos.size(); i++)
     {
-        pos += core::vector2d<s32>(0, UserConfigParams::m_height/2);
-    }
-        
-    gui::ScalableFont* font = GUIEngine::getFont();
-    font->draw(sw.c_str(), pos, time_color, false, false, NULL, true /* ignore RTL */);
+        core::rect<s32> pos(m_timer_pos[i].X - dist_from_right, m_timer_pos[i].Y,
+                            m_timer_pos[i].X                  , m_timer_pos[i].Y+40);
+        font->draw(sw.c_str(), pos, time_color, false, false, NULL,
+                   true /* ignore RTL */);
+     }
     
 }   // drawGlobalTimer
 
@@ -271,40 +297,46 @@ void RaceGUI::drawGlobalMiniMap()
     if(world->getTrack()->isArena()) return;
 
     const video::ITexture *mini_map = world->getTrack()->getMiniMap();
-    
-    int upper_y = UserConfigParams::m_height - m_map_bottom - m_map_height;
-    int lower_y = UserConfigParams::m_height - m_map_bottom;
-    
-    if (mini_map != NULL)
+
+    for(unsigned int vp=0; vp<m_map_left.size(); vp++)
+
     {
-        core::rect<s32> dest(m_map_left,               upper_y, 
-                             m_map_left + m_map_width, lower_y);
-        core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
-        irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
-    }
-    
-    for(unsigned int i=0; i<world->getNumKarts(); i++)
-    {
-        const AbstractKart *kart = world->getKart(i);
-        if(kart->isEliminated()) continue;   // don't draw eliminated kart
-        const Vec3& xyz = kart->getXYZ();
-        Vec3 draw_at;
-        world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
-        // int marker_height = m_marker->getOriginalSize().Height;
-        core::rect<s32> source(i    *m_marker_rendered_size,
-                               0, 
-                               (i+1)*m_marker_rendered_size, 
-                               m_marker_rendered_size);
-        int marker_half_size = (kart->getController()->isPlayerController() 
-                                ? m_marker_player_size 
-                                : m_marker_ai_size                        )>>1;
-        core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size), 
-                                 lower_y   -(int)(draw_at.getY()+marker_half_size),
-                                 m_map_left+(int)(draw_at.getX()+marker_half_size), 
-                                 lower_y   -(int)(draw_at.getY()-marker_half_size));
-        irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source, 
-                                                  NULL, NULL, true);
-    }   // for i<getNumKarts
+        int upper_y = m_map_bottom[vp] - m_map_height;
+        int lower_y = m_map_bottom[vp];
+        if (mini_map != NULL)
+        {
+            core::rect<s32> dest(m_map_left[vp],               upper_y,
+                                 m_map_left[vp] + m_map_width, lower_y);
+            core::rect<s32> source(core::position2di(0, 0),
+                                   mini_map->getOriginalSize());
+            irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source,
+                                                      NULL, NULL, true);
+        }
+
+        for(unsigned int i=0; i<world->getNumKarts(); i++)
+        {
+            const AbstractKart *kart = world->getKart(i);
+            if(kart->isEliminated()) continue;   // don't draw eliminated kart
+            const Vec3& xyz = kart->getXYZ();
+            Vec3 draw_at;
+            world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
+            // int marker_height = m_marker->getOriginalSize().Height;
+            core::rect<s32> source(i    *m_marker_rendered_size,
+                                   0,
+                                  (i+1)*m_marker_rendered_size,
+                                  m_marker_rendered_size);
+            int marker_half_size = (kart->getController()->isPlayerController()
+                                 ? m_marker_player_size
+                                 : m_marker_ai_size                        )>>1;
+            core::rect<s32> position(m_map_left[vp]+(int)(draw_at.getX()-marker_half_size),
+                                     lower_y   -(int)(draw_at.getY()+marker_half_size),
+                                     m_map_left[vp]+(int)(draw_at.getX()+marker_half_size),
+                                     lower_y   -(int)(draw_at.getY()-marker_half_size));
+            irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source,
+                NULL, NULL, true);
+        }   // for i<getNumKarts
+    }   // for vp < m_map_left.size()
+
 }   // drawGlobalMiniMap
 
 //-----------------------------------------------------------------------------
@@ -506,9 +538,10 @@ void RaceGUI::drawRankLap(const KartIconDisplayInfo* info,
     // If the time display in the top right is in this viewport,
     // move the lap/rank display down a little bit so that it is
     // displayed under the time.
-    if(viewport.UpperLeftCorner.Y==0 && 
-        viewport.LowerRightCorner.X==UserConfigParams::m_width &&
-        race_manager->getNumPlayers()!=3)
+    if( (viewport.UpperLeftCorner.Y==0 &&
+         viewport.LowerRightCorner.X==UserConfigParams::m_width &&
+          race_manager->getNumPlayers()!=3                        ) ||
+          UserConfigParams::m_multi_screen)
         pos.UpperLeftCorner.Y   += 40;
     pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y;
     pos.UpperLeftCorner.X   = viewport.LowerRightCorner.X 

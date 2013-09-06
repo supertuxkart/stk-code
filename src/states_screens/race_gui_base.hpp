@@ -149,6 +149,11 @@ private:
 protected:
     /** Material for the 'plunger in the face' texture. */
     Material        *m_plunger_face;
+    /** The viewport(s) to use for global elements. This is usually just
+     *  the global viewport, but can the camera viewports in case that
+     *  several independent screens are used. */
+    std::vector<core::rect<s32> > m_viewports_for_global;
+
 
     /** State of the plunger: From the 'init' states the plunger switches 
      *  between two slow moving states ('shakily moving') till the end of

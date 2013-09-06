@@ -360,6 +360,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_fullscreen
             PARAM_DEFAULT(  BoolUserConfigParam(false, "fullscreen", 
                                                 &m_video_group) );
+    PARAM_PREFIX BoolUserConfigParam        m_multi_screen
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "multiscreen", 
+                                                &m_video_group) );
     PARAM_PREFIX IntUserConfigParam         m_prev_width
             PARAM_DEFAULT(  IntUserConfigParam(1024, "prev_width", 
                             &m_video_group, "Previous screen/window width") );
