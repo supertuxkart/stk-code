@@ -93,10 +93,15 @@ void ConnectToPeer::asynchronousUpdate()
                         STKHost* host = NetworkManager::getInstance()->getHost();
                         TransportAddress broadcast_address;
                         broadcast_address.ip = -1; // 255.255.255.255
-                        broadcast_address.port = m_peer_address.port;
+                        broadcast_address.port = m_peer_address.port; // 0b10101100000101101101111111111111; // for test
                         char data[] = "aloha_stk\0";
                         host->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
                         Log::info("ConnectToPeer", "Broadcast aloha sent.");
+                        Time::sleep(1);
+                        broadcast_address.ip = 0x7f000001; // 127.0.0.1 (localhost)
+                        broadcast_address.port = m_peer_address.port;
+                        host->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
+                        Log::info("ConnectToPeer", "Broadcast aloha to self.");
                     }
                     else
                     {

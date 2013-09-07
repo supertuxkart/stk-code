@@ -53,6 +53,7 @@ void StopServer::asynchronousUpdate()
         m_request->setParameter("address",addr.ip);
         m_request->setParameter("port",addr.port);
         m_request->setParameter("action","stop-server");
+        Log::info("StopServer", "address %u, port %d", addr.ip, addr.port);
 
         Online::HTTPManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;

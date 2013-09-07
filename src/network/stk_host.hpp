@@ -144,7 +144,10 @@ class STKHost
         /*! \brief Returns true when the thread should stop listening. */
         int         mustStopListening();
         /*! \brief Returns true when the thread has stopped listening. */
-        bool        hasStoppedListening() { return m_listening; }
+        bool        hasStoppedListening() const { return m_listening; }
+
+        uint32_t    getAddress() const          { return m_host->address.host; }
+        uint16_t    getPort() const;
     protected:
         ENetHost*   m_host;             //!< ENet host interfacing sockets.
         pthread_t*  m_listening_thread; //!< Thread listening network events.

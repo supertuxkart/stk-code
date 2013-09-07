@@ -112,7 +112,7 @@ void STKPeer::sendPacket(NetworkString const& data, bool reliable)
 
 uint32_t STKPeer::getAddress() const
 {
-    return turnEndianness(m_peer->address.host);
+    return ntohl(m_peer->address.host);
 }
 
 //-----------------------------------------------------------------------------

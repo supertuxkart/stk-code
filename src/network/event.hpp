@@ -70,6 +70,10 @@ class Event
          */
         void removeFront(int size);
 
+        /*! \brief Get a copy of the data.
+         *  \return A copy of the message data. This is empty for events like
+         *  connection or disconnections.
+         */
         NetworkString data() const { return m_data; }
 
         EVENT_TYPE type;    //!< Type of the event.

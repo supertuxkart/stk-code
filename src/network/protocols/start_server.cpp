@@ -47,8 +47,10 @@ void StartServer::asynchronousUpdate()
         m_request->setParameter("token",Online::CurrentUser::get()->getToken());
         m_request->setParameter("address",addr.ip);
         m_request->setParameter("port",addr.port);
+        m_request->setParameter("private_port",NetworkManager::getInstance()->getHost()->getPort());
         m_request->setParameter("max_players",UserConfigParams::m_server_max_players);
         m_request->setParameter("action","start-server");
+        Log::info("ShowPublicAddress", "Showing addr %u and port %d", addr.ip, addr.port);
 
         Online::HTTPManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;

@@ -154,6 +154,7 @@ void ConnectToServer::asynchronousUpdate()
                 if (m_server_address.ip == 0 || m_server_address.port == 0)
                 { // server data not correct, hide address and stop
                     m_state = HIDING_ADDRESS;
+                    Log::error("ConnectToServer", "Server address is "ADDRESS_FORMAT, ADDRESS_ARGS(m_server_address.ip, m_server_address.port));
                     m_current_protocol_id = m_listener->requestStart(new HidePublicAddress());
                     return;
                 }
@@ -161,9 +162,19 @@ void ConnectToServer::asynchronousUpdate()
                 {
                     // just send a broadcast packet, the client will know our ip address and will connect
                     STKHost* host = NetworkManager::getInstance()->getHost();
+                    host->stopListening(); // stop the listening
                     TransportAddress sender;
+
+                        TransportAddress broadcast_address;
+                        broadcast_address.ip = -1; // 255.255.255.255
+                        broadcast_address.port = 7321; // 0b10101100000101101101111111111111; // for test
+                        char data2[] = "aloha_stk\0";
+                        host->sendRawPacket((uint8_t*)(data2), 10, broadcast_address);
+
                     Log::info("ConnectToServer", "Waiting broadcast message.");
                     const uint8_t* received_data = host->receiveRawPacket(&sender); // get the sender
+
+                    host->startListening(); // start listening again
                     const char data[] = "aloha_stk\0";
                     if (strcmp(data, (char*)(received_data)) == 0)
                     {
@@ -173,12 +184,12 @@ void ConnectToServer::asynchronousUpdate()
                         struct ifaddrs *ifap, *ifa;
                         struct sockaddr_in *sa;
                         getifaddrs (&ifap); // get the info
-                        for (ifa = ifap; ifa; ifa = ifa->ifa_next) 
+                        for (ifa = ifap; ifa; ifa = ifa->ifa_next)
                         {
-                            if (ifa->ifa_addr->sa_family==AF_INET) 
+                            if (ifa->ifa_addr->sa_family==AF_INET)
                             {
                                 sa = (struct sockaddr_in *) ifa->ifa_addr;
-                                if (turnEndianness(sa->sin_addr.s_addr) == sender.ip) // this interface is ours
+                                if (ntohl(sa->sin_addr.s_addr) == sender.ip) // this interface is ours
                                     sender.ip = 0x7f000001; // 127.0.0.1
                             }
                         }
@@ -186,7 +197,7 @@ void ConnectToServer::asynchronousUpdate()
 #else
                         // Query the list of all IP addresses on the local host
                         // First call to GetIpAddrTable with 0 bytes buffer
-                        // will return insufficient buffer error, and size 
+                        // will return insufficient buffer error, and size
                         // will contain the number of bytes needed for all
                         // data. Repeat the process of querying the size
                         // using GetIpAddrTable in a while loop since it
@@ -262,6 +273,8 @@ void ConnectToServer::asynchronousUpdate()
         case DONE:
             m_listener->requestTerminate(this);
             m_state = EXITING;
+            break;
+        case EXITING:
             break;
     }
 }

@@ -25,17 +25,32 @@
 
 #include "network/network_manager.hpp"
 
+/*! \class ClientNetworkManager
+ *  \ingroup network
+ */
 class ClientNetworkManager : public NetworkManager
 {
     friend class Singleton<NetworkManager>;
     public:
+        /*! \brief Get the instance.
+         *  This is a utility function to avoid passing templates parameters
+         *  to the getInstance singleton method.
+         */
         static ClientNetworkManager* getInstance()
         {
             return Singleton<NetworkManager>::getInstance<ClientNetworkManager>();
         }
 
+        /*! \brief Initializes network.
+         *  This starts the threads and initializes network libraries.
+         */
         virtual void run();
+        /*! \brief Resets the network socket. */
         virtual void reset();
+        /*! \brief Sends a packet to the server.
+         *  \param data : The network 8-bit string to send.
+         *  \param reliable : If set to true, ENet will ensure that the packet is received.
+         */
         virtual void sendPacket(const NetworkString& data, bool reliable = true);
 
         STKPeer* getPeer();

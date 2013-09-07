@@ -28,6 +28,7 @@
 #  define   inet_ntop  InetNtop
 #else
 #  include <arpa/inet.h>
+#  include <errno.h>
 #endif
 #include <pthread.h>
 #include <signal.h>
@@ -51,6 +52,7 @@ void* STKHost::receive_data(void* self)
     myself->m_listening = false;
     delete myself->m_listening_thread;
     myself->m_listening_thread = NULL;
+    Log::info("STKHost", "Listening has been stopped");
     return NULL;
 }
 
@@ -133,7 +135,11 @@ void STKHost::stopListening()
 {
     if(m_listening_thread)
     {
-        pthread_mutex_unlock(&m_exit_mutex); // will stop the update function
+        pthread_mutex_unlock(&m_exit_mutex); // will stop the update function on its next update
+        while (m_listening == true)
+        {
+            Time::sleep(1);
+        }
     }
 }
 
@@ -183,32 +189,31 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
     memset(buffer, 0, 2048);
 
     socklen_t from_len;
-    struct sockaddr addr;
+    struct sockaddr_in addr;
 
     from_len = sizeof(addr);
-    int len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
+    int len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, (struct sockaddr*)(&addr), &from_len);
 
     int i = 0;
      // wait to receive the message because enet sockets are non-blocking
     while(len == -1) // nothing received
     {
         i++;
-        len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, &addr, &from_len);
+        len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, (struct sockaddr*)(&addr), &from_len);
         Time::sleep(1); // wait 1 millisecond between two checks
     }
 	if (len == SOCKET_ERROR)
 	{
 		Log::error("STKHost", "Problem with the socket. Please contact the dev team.");
 	}
-    struct sockaddr_in *sin = (struct sockaddr_in *) (&addr);
     // we received the data
-    sender->ip = turnEndianness((uint32_t)(sin->sin_addr.s_addr));
-    sender->port = turnEndianness(sin->sin_port);
+    sender->ip = ntohl((uint32_t)(addr.sin_addr.s_addr));
+    sender->port = ntohs(addr.sin_port);
 
-    if (addr.sa_family == AF_INET)
+    if (addr.sin_family == AF_INET)
     {
         char s[20];
-        inet_ntop(AF_INET, &(((struct sockaddr_in *)&addr)->sin_addr), s, 20);
+        inet_ntop(AF_INET, &(addr.sin_addr), s, 20);
         Log::info("STKHost", "IPv4 Address of the sender was %s", s);
     }
     return buffer;
@@ -245,7 +250,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
         Time::sleep(1); // wait 1 millisecond between two checks
         if (i >= max_tries && max_tries != -1)
         {
-            Log::verbose("STKHost", "No answer from the server on %u.%u.%u.%u:%u", (m_host->address.host&0xff), 
+            Log::verbose("STKHost", "No answer from the server on %u.%u.%u.%u:%u", (m_host->address.host&0xff),
 						(m_host->address.host>>8&0xff),
 						(m_host->address.host>>16&0xff),
 						(m_host->address.host>>24&0xff),
@@ -277,7 +282,7 @@ bool STKHost::peerExists(TransportAddress peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == turnEndianness(peer.ip) &&
+        if (m_host->peers[i].address.host == ntohl(peer.ip) &&
             m_host->peers[i].address.port == peer.port)
         {
             return true;
@@ -292,7 +297,7 @@ bool STKHost::isConnectedTo(TransportAddress peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == turnEndianness(peer.ip) &&
+        if (m_host->peers[i].address.host == ntohl(peer.ip) &&
             m_host->peers[i].address.port == peer.port &&
             m_host->peers[i].state == ENET_PEER_STATE_CONNECTED)
         {
@@ -314,4 +319,15 @@ int STKHost::mustStopListening()
       return 0;
   }
   return 1;
+}
+
+uint16_t STKHost::getPort() const
+{
+    struct sockaddr_in sin;
+    socklen_t len = sizeof(sin);
+    if (getsockname(m_host->socket, (struct sockaddr *)&sin, &len) == -1)
+        Log::error("STKHost", "Error while using getsockname().");
+    else
+        return ntohs(sin.sin_port);
+    return 0;
 }

@@ -56,15 +56,37 @@ class GameSetup
         bool removePlayer(uint32_t id); //!< Remove a player by id.
         bool removePlayer(uint8_t id); //!< Remove a player by local id.
         void setPlayerKart(uint8_t id, std::string kart_name); //!< Set the kart of a player
-        void bindKartsToProfiles();
+        void bindKartsToProfiles(); //!< Sets the right world_kart_id in profiles
 
         std::vector<NetworkPlayerProfile*> getPlayers() { return m_players; }
         int getPlayerCount() { return m_players.size(); }
-        const NetworkPlayerProfile* getProfile(uint32_t id); //!< Get a profile by database id
-        const NetworkPlayerProfile* getProfile(uint8_t id); //!< Get the profile by the lobby id
+        /*! \brief Get a network player profile matching a universal id.
+         *  \param id : Global id of the player (the one in the SQL database)
+         *  \return The profile of the player matching the id.
+         */
+        const NetworkPlayerProfile* getProfile(uint32_t id);
+        /*! \brief Get a network player profile matching a kart name.
+         *  \param kart_name : Name of the kart used by the player.
+         *  \return The profile of the player having the kart kart_name
+         */
+        const NetworkPlayerProfile* getProfile(uint8_t id);
+        /*! \brief Get a network player profile matching a kart name.
+         *  \param kart_name : Name of the kart used by the player.
+         *  \return The profile of the player having the kart kart_name.
+         */
         const NetworkPlayerProfile* getProfile(std::string kart_name);
 
+        /*! \brief Used to know if a kart is available.
+         *  \param kart_name : Name of the kart to check.
+         *  \return True if the kart hasn't been selected yet, false elseway.
+         */
         bool isKartAvailable(std::string kart_name);
+        /*! \brief Used to know if a kart is playable.
+         *  \param kart_name : Name of the kart to check.
+         *  \return True if the kart is playable (standard kart).
+         *  Currently this is always true as the kart selection screen shows
+         *  only the standard karts.
+         */
         bool isKartAllowed(std::string kart_name) {return true; }
 
     protected:

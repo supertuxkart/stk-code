@@ -19,6 +19,7 @@
 #include "network/protocols/get_peer_address.hpp"
 
 #include "network/protocol_manager.hpp"
+#include "network/network_manager.hpp"
 #include "online/http_manager.hpp"
 #include "online/current_user.hpp"
 #include "config/user_config.hpp"
@@ -64,7 +65,10 @@ void GetPeerAddress::asynchronousUpdate()
             {
                 TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
                 result->get("ip", &addr->ip);
-                result->get("port", &addr->port);
+                if (addr->ip == NetworkManager::getInstance()->getPublicAddress().ip)
+                    result->get("private_port", &addr->port);
+                else
+                    result->get("port", &addr->port);
                 Log::debug("GetPeerAddress", "Address gotten successfully.");
             }
             else

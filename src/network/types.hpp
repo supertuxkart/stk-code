@@ -26,6 +26,10 @@
 
 #include <string>
 
+/*! functions to write easily addresses in logs. */
+#define ADDRESS_FORMAT "%d.%d.%d.%d:%d"
+#define ADDRESS_ARGS(ip,port) ((ip>>24)&0xff),((ip>>16)&0xff),((ip>>8)&0xff),((ip>>0)&0xff),port
+
 /*! \class CallbackObject
  *  \brief Class that must be inherited to pass objects to protocols.
  */
@@ -70,9 +74,6 @@ class PlayerLogin : public CallbackObject
     std::string username;   //!< Username of the player
     std::string password;   //!< Password of the player
 };
-
-uint32_t turnEndianness(uint32_t val);
-uint16_t turnEndianness(uint16_t val);
 
 
 #endif // TYPES_HPP

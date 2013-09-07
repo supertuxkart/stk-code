@@ -16,6 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+/*! \file network_manager.hpp
+ *  \brief Instantiates the generic functionnalities of a network manager.
+ */
+
 #ifndef NETWORKMANAGER_HPP
 #define NETWORKMANAGER_HPP
 
