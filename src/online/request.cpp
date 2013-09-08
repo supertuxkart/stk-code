@@ -237,8 +237,6 @@ namespace Online{
     {
         if(m_curl_code != CURLE_OK)
             Log::error( "XMLRequest::afterOperation", "curl_easy_perform() failed: %s", curl_easy_strerror(m_curl_code));
-        else
-            Log::info(  "XMLRequest::afterOperation", "Received : %s",                  m_string_buffer.c_str());
         bool success = false;
         std::string rec_success;
         if(m_result->get("success", &rec_success))
