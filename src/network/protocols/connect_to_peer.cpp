@@ -117,6 +117,7 @@ void ConnectToPeer::asynchronousUpdate()
             }
             break;
         case CONNECTING: // waiting the peer to connect
+            break;
         case CONNECTED:
         {
             // the ping protocol is there for NAT traversal (disabled when connecting to LAN peer)

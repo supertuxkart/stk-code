@@ -58,6 +58,13 @@ class STKHost
         STKHost();
         /*! \brief Destructor                                               */
         virtual ~STKHost();
+        
+        /*! \brief Log packets into a file
+         *  \param ns : The data in the packet
+         *  \param incoming : True if the packet comes from a peer.
+         *  False if it's sent to a peer.
+         */
+        static void logPacket(const NetworkString ns, bool incoming);
 
         /*! \brief Thread function checking if data is received.
          *  This function tries to get data from network low-level functions as
@@ -153,6 +160,8 @@ class STKHost
         pthread_t*  m_listening_thread; //!< Thread listening network events.
         pthread_mutex_t m_exit_mutex;   //!< Mutex to kill properly the thread
         bool        m_listening;
+        static FILE*       m_log_file;         //!< Where to log packets
+        static pthread_mutex_t m_log_mutex;    //!< To write in the log only once at a time
 
 };
 

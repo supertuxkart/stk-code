@@ -18,6 +18,7 @@
 
 #include "network/stk_host.hpp"
 
+#include "config/user_config.hpp"
 #include "network/network_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -33,6 +34,26 @@
 #include <pthread.h>
 #include <signal.h>
 
+FILE* STKHost::m_log_file = NULL;
+pthread_mutex_t STKHost::m_log_mutex;
+
+void STKHost::logPacket(const NetworkString ns, bool incoming)
+{
+    if (m_log_file == NULL)
+        return;
+    pthread_mutex_lock(&m_log_mutex);
+    if (incoming)
+        fprintf(m_log_file, "[%d\t]  <--  ", (int)(Time::getRealTime()));
+    else
+        fprintf(m_log_file, "[%d\t]  -->  ", (int)(Time::getRealTime()));
+    for (int i = 0; i < ns.size(); i++)
+    {
+        fprintf(m_log_file, "%d.", ns[i]);
+    }
+    fprintf(m_log_file, "\n");
+    pthread_mutex_unlock(&m_log_mutex);
+}
+
 // ----------------------------------------------------------------------------
 
 void* STKHost::receive_data(void* self)
@@ -44,6 +65,8 @@ void* STKHost::receive_data(void* self)
     {
         while (enet_host_service(host, &event, 20) != 0) {
             Event* evt = new Event(&event);
+            if (evt->type == EVENT_TYPE_MESSAGE)
+                logPacket(evt->data(), true);
             if (event.type != ENET_EVENT_TYPE_NONE)
                 NetworkManager::getInstance()->notifyEvent(evt);
             delete evt;
@@ -62,7 +85,13 @@ STKHost::STKHost()
 {
     m_host = NULL;
     m_listening_thread = NULL;
+    m_log_file = NULL;
     pthread_mutex_init(&m_exit_mutex, NULL);
+    pthread_mutex_init(&m_log_mutex, NULL);
+    if (UserConfigParams::m_packets_log_filename.toString() != "")
+        m_log_file = fopen(UserConfigParams::m_packets_log_filename.c_str(), "w");
+    if (!m_log_file)
+        Log::warn("STKHost", "Network packets won't be logged: no file.");
 }
 
 // ----------------------------------------------------------------------------
@@ -70,6 +99,8 @@ STKHost::STKHost()
 STKHost::~STKHost()
 {
     stopListening();
+    if (m_log_file)
+        fclose(m_log_file);
     if (m_host)
     {
         enet_host_destroy(m_host);
@@ -158,6 +189,7 @@ void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
     sendto(m_host->socket, (char*)data, length, 0,(sockaddr*)&to, to_len);
     Log::verbose("STKHost", "Raw packet sent to %i.%i.%i.%i:%u", ((dst.ip>>24)&0xff)
     , ((dst.ip>>16)&0xff), ((dst.ip>>8)&0xff), ((dst.ip>>0)&0xff), dst.port);
+    STKHost::logPacket(NetworkString(std::string((char*)(data), length)), false);
 }
 
 // ----------------------------------------------------------------------------
@@ -177,6 +209,7 @@ uint8_t* STKHost::receiveRawPacket()
         len = recv(m_host->socket,(char*)buffer,2048, 0);
         Time::sleep(1);
     }
+    STKHost::logPacket(NetworkString(std::string((char*)(buffer), len)), true);
     return buffer;
 }
 
@@ -216,6 +249,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
         inet_ntop(AF_INET, &(addr.sin_addr), s, 20);
         Log::info("STKHost", "IPv4 Address of the sender was %s", s);
     }
+    STKHost::logPacket(NetworkString(std::string((char*)(buffer), len)), true);
     return buffer;
 }
 
@@ -264,6 +298,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
         inet_ntop(AF_INET, &(addr.sin_addr), s, 20);
         Log::info("STKHost", "IPv4 Address of the sender was %s", s);
     }
+    STKHost::logPacket(NetworkString(std::string((char*)(buffer), len)), true);
     return buffer;
 }
 
@@ -274,6 +309,7 @@ void STKHost::broadcastPacket(const NetworkString& data, bool reliable)
     ENetPacket* packet = enet_packet_create(data.c_str(), data.size()+1,
                (reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
     enet_host_broadcast(m_host, 0, packet);
+    STKHost::logPacket(data, false);
 }
 
 // ----------------------------------------------------------------------------

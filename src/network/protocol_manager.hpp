@@ -31,6 +31,8 @@
 
 #include <vector>
 
+#define TIME_TO_KEEP_EVENTS 1.0
+
 /*!
  * \enum PROTOCOL_STATE
  * \brief Defines the three states that a protocol can have.
@@ -84,6 +86,7 @@ typedef struct ProtocolRequest
 typedef struct EventProcessingInfo
 {
     Event* event;
+    double arrival_time;
     std::vector<int> protocols_ids;
 } EventProcessingInfo;
 

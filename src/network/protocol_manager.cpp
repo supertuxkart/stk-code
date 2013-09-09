@@ -142,6 +142,7 @@ void ProtocolManager::notifyEvent(Event* event)
     if (protocols_ids.size() != 0)
     {
         EventProcessingInfo epi;
+        epi.arrival_time = Time::getTimeSinceEpoch();
         epi.event = event2;
         epi.protocols_ids = protocols_ids;
         m_events_to_process.push_back(epi); // add the event to the queue
@@ -334,7 +335,7 @@ bool ProtocolManager::propagateEvent(EventProcessingInfo* event, bool synchronou
                 index++;
         }
     }
-    if (event->protocols_ids.size() == 0)
+    if (event->protocols_ids.size() == 0 || (Time::getTimeSinceEpoch()-event->arrival_time) >= TIME_TO_KEEP_EVENTS)
     {
         // because we made a copy of the event
         delete event->event->peer; // no more need of that
