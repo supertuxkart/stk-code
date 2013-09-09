@@ -58,7 +58,7 @@ namespace Online{
         for ( it = m_profiles_persistent.begin(); it != m_profiles_persistent.end(); ++it ) {
             delete it->second;
         }
-        for ( it = m_profiles_cache.begin(); it != m_profiles_persistent.end(); ++it ) {
+        for ( it = m_profiles_cache.begin(); it != m_profiles_cache.end(); ++it ) {
             delete it->second;
         }
     }
