@@ -485,10 +485,9 @@ void Camera::update(float dt)
         current_target += ((wanted_target-current_target)*m_target_speed)*dt;
 
         m_camera->setTarget(current_target);
-        return;
     }
-
-    positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing);
+    else
+        positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing);
 
     if (UserConfigParams::m_graphical_effects)
     {
