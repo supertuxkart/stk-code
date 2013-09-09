@@ -50,7 +50,7 @@ public :
     bool isValid() const { return m_valid;}
     void save(std::ofstream & out);
     bool isOnline() const {return m_online;}
-    void sync(const std::string & achieved_string);
+    void sync(const std::vector<uint32_t> & achieved_ids);
     void onRaceEnd();
     const std::string & getID() const {return m_id;}
     Achievement * getAchievement(uint32_t id);

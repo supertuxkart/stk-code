@@ -156,7 +156,10 @@ namespace Online{
             AchievementsManager::get()->updateCurrentPlayer();
             std::string achieved_string("");
             if(input->get("achieved", &achieved_string) == 1)
-                AchievementsManager::get()->getActive()->sync(achieved_string);
+            {
+                std::vector<uint32_t> achieved_ids = StringUtils::splitToUInt(achieved_string, ' ');
+                AchievementsManager::get()->getActive()->sync(achieved_ids);
+            }
             m_profile->fetchFriends();
         }
         else
@@ -512,12 +515,7 @@ namespace Online{
                 std::string online_friends_string("");
                 if(m_result->get("online", &online_friends_string) == 1)
                 {
-                    std::vector<std::string> parts = StringUtils::split(online_friends_string, ' ');
-                    std::vector<uint32_t> online_friends;
-                    for(unsigned int i = 0; i < parts.size(); ++i)
-                    {
-                        online_friends.push_back(atoi(parts[i].c_str()));
-                    }
+                    std::vector<uint32_t> online_friends = StringUtils::splitToUInt(online_friends_string, ' ');
                     bool went_offline = false;
                     std::vector<uint32_t> friends = CurrentUser::get()->getProfile()->getFriends();
                     std::vector<irr::core::stringw> to_notify;
