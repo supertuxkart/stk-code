@@ -44,7 +44,6 @@ DEFINE_SCREEN_SINGLETON( OnlineProfileFriends );
 OnlineProfileFriends::OnlineProfileFriends() : OnlineProfileBase("online/profile_friends.stkgui")
 {
     m_selected_friend_index = -1;
-    m_own_profile = true;
 }   // OnlineProfileFriends
 
 // -----------------------------------------------------------------------------
@@ -65,9 +64,10 @@ void OnlineProfileFriends::loadedFromFile()
 
 void OnlineProfileFriends::beforeAddingWidget()
 {
+    OnlineProfileBase::beforeAddingWidget();
     m_friends_list_widget->clearColumns();
     m_friends_list_widget->addColumn( _("Username"), 2 );
-    if(m_own_profile)
+    if(m_visiting_profile->isCurrentUser())
     {
         m_friends_list_widget->addColumn( _("Since"), 1 );
         m_friends_list_widget->addColumn( _("Status"), 2 );
@@ -79,12 +79,6 @@ void OnlineProfileFriends::beforeAddingWidget()
 void OnlineProfileFriends::init()
 {
     OnlineProfileBase::init();
-    if(m_own_profile != m_visiting_profile->isCurrentUser())
-    {
-        m_own_profile = m_visiting_profile->isCurrentUser();
-        GUIEngine::reshowCurrentScreen();
-        return;
-    }
     m_profile_tabs->select( m_friends_tab->m_properties[PROP_ID], PLAYER_ID_GAME_MASTER );
     assert(m_visiting_profile != NULL);
     m_visiting_profile->fetchFriends();

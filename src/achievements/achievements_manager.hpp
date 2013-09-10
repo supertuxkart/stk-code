@@ -42,24 +42,27 @@ class AchievementsManager
 private :
     AchievementsSlot * m_active_slot;
     PtrVector<AchievementsSlot> m_slots;
-    PtrVector<AchievementInfo> m_achievements_info;
+    std::map<uint32_t, AchievementInfo *> m_achievements_info;
     AchievementsManager      ();
     ~AchievementsManager     ();
     AchievementsSlot * createNewSlot(std::string id, bool online);
+    void parseDataFile();
+    void parseConfigFile();
 
 public:
     /**Singleton */
     static AchievementsManager *            get();
     static void                             deallocate();
 
-    void parseDataFile();
-    void parseConfigFile();
+    void init();
     void save();
     void onRaceEnd();
     void updateCurrentPlayer();
     AchievementsSlot * getActive() const { return m_active_slot; }
     AchievementsSlot * getSlot(const std::string & id, bool online);
     void createSlotsIfNeeded();
+    AchievementInfo * getAchievementInfo(uint32_t id);
+    const std::map<uint32_t, AchievementInfo *> & getAllInfo() { return m_achievements_info;}
 };   // class AchievementsManager
 
 #endif

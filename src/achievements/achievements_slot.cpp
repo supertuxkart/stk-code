@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <assert.h>
 // ============================================================================
-AchievementsSlot::AchievementsSlot(const XMLNode * input,  const PtrVector<AchievementInfo> & info)
+AchievementsSlot::AchievementsSlot(const XMLNode * input)
 {
     int fetched_user_id = input->get("user_id", &m_id);
     std::string online;
@@ -43,7 +43,7 @@ AchievementsSlot::AchievementsSlot(const XMLNode * input,  const PtrVector<Achie
     m_valid = true;
     m_online = online == "true";
 
-    createFreshSlot(info);
+    createFreshSlot();
 
     std::vector<XMLNode*> xml_achievements;
     input->getNodes("achievement", xml_achievements);
@@ -62,31 +62,47 @@ AchievementsSlot::AchievementsSlot(const XMLNode * input,  const PtrVector<Achie
 }
 
 // ============================================================================
-AchievementsSlot::AchievementsSlot(std::string id, bool online, const PtrVector<AchievementInfo> & info)
+AchievementsSlot::AchievementsSlot(std::string id, bool online)
 {
     m_valid = true;
     m_online = online;
     m_id = id;
 
-    createFreshSlot(info);
+    createFreshSlot();
 }
 
 // ============================================================================
-void AchievementsSlot::createFreshSlot( const PtrVector<AchievementInfo> & all_info)
+AchievementsSlot::~AchievementsSlot()
 {
+    deleteAchievements();
+}
+
+// ============================================================================
+void AchievementsSlot::deleteAchievements()
+{
+    std::map<uint32_t, Achievement *>::iterator it;
+    for ( it = m_achievements.begin(); it != m_achievements.end(); ++it ) {
+        delete it->second;
+    }
     m_achievements.clear();
-    for(int i=0; i < all_info.size(); i++)
-    {
-        const AchievementInfo * info = all_info.get(i);
-        Achievement::AchievementType achievement_type = info->getType();
+}
+
+// ============================================================================
+void AchievementsSlot::createFreshSlot()
+{
+    deleteAchievements();
+    const std::map<uint32_t, AchievementInfo *> all_info = AchievementsManager::get()->getAllInfo();
+    std::map<uint32_t, AchievementInfo *>::const_iterator it;
+    for ( it = all_info.begin(); it != all_info.end(); ++it ) {
+        Achievement::AchievementType achievement_type = it->second->getType();
         Achievement * achievement;
         if(achievement_type == Achievement::AT_SINGLE)
         {
-            achievement = new SingleAchievement(info);
+            achievement = new SingleAchievement(it->second);
         }
         else if(achievement_type == Achievement::AT_MAP)
         {
-            achievement = new MapAchievement(info);
+            achievement = new MapAchievement(it->second);
         }
         m_achievements[achievement->getID()] = achievement;
     }

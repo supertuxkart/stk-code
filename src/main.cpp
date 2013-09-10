@@ -1523,7 +1523,7 @@ int main(int argc, char *argv[] )
             // Go straight to the race
             StateManager::get()->enterGameState();
         }
-        AchievementsManager::get();
+        AchievementsManager::get()->init();
 
 
         // If an important news message exists it is shown in a popup dialog.

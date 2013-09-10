@@ -50,6 +50,12 @@ void AchievementsManager::deallocate()
 AchievementsManager::AchievementsManager()
 {
     parseDataFile();
+}
+
+
+// ============================================================================
+void AchievementsManager::init()
+{
     parseConfigFile();
     updateCurrentPlayer();
 }
@@ -59,7 +65,11 @@ AchievementsManager::~AchievementsManager()
 {
     save();
     m_slots.clearAndDeleteAll();
-    m_achievements_info.clearAndDeleteAll();
+    std::map<uint32_t, AchievementInfo *>::iterator it;
+    for ( it = m_achievements_info.begin(); it != m_achievements_info.end(); ++it ) {
+        delete it->second;
+    }
+    m_achievements_info.clear();
 }
 
 // ============================================================================
@@ -67,8 +77,8 @@ void AchievementsManager::parseDataFile()
 {
     const std::string file_name = file_manager->getDataFile("achievements.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
-    int num_nodes = root->getNumNodes();
-    for(int i = 0; i < num_nodes; i++)
+    unsigned int num_nodes = root->getNumNodes();
+    for(unsigned int i = 0; i < num_nodes; i++)
     {
         const XMLNode *node = root->getNode(i);
         std::string type("");
@@ -87,7 +97,7 @@ void AchievementsManager::parseDataFile()
             Log::error("AchievementsManager::parseAchievements","Non-existent achievement type. Skipping - definitely results in unwanted behaviour.");
             continue;
         }
-        m_achievements_info.push_back(achievement_info);
+        m_achievements_info[achievement_info->getID()] = achievement_info;
     }
     if(num_nodes != m_achievements_info.size())
         Log::error("AchievementsManager::parseAchievements","Multiple achievements with the same id!");
@@ -101,8 +111,7 @@ void AchievementsManager::parseConfigFile()
     XMLNode* root = file_manager->createXMLTree(filename);
     if(!root || root->getName() != "achievements")
     {
-        Log::info("AchievementsManager", "Achievements file '%s' will be created.",
-                  filename.c_str());
+        Log::info("AchievementsManager", "Achievements file '%s' will be created.",filename.c_str());
         createSlotsIfNeeded();
         if (root) delete root;
         return;
@@ -112,7 +121,7 @@ void AchievementsManager::parseConfigFile()
     root->getNodes("slot", xml_slots);
     for (unsigned int n=0; n < xml_slots.size(); n++)
     {
-        AchievementsSlot * slot = new AchievementsSlot(xml_slots[n], m_achievements_info);
+        AchievementsSlot * slot = new AchievementsSlot(xml_slots[n]);
         if(!slot->isValid())
         {
             Log::warn("AchievementsManager", "Found game slot with faulty or missing information. Discarding it.");
@@ -127,7 +136,7 @@ void AchievementsManager::parseConfigFile()
 
 AchievementsSlot * AchievementsManager::createNewSlot(std::string id, bool online)
 {
-    AchievementsSlot* slot = new AchievementsSlot(id, online, m_achievements_info);
+    AchievementsSlot* slot = new AchievementsSlot(id, online);
     m_slots.push_back(slot);
     return slot;
 }
@@ -227,4 +236,13 @@ void AchievementsManager::updateCurrentPlayer()
             save();
         }
     }
+}
+
+
+// ============================================================================
+AchievementInfo * AchievementsManager::getAchievementInfo(uint32_t id)
+{
+    if ( m_achievements_info.find(id) != m_achievements_info.end())
+        return m_achievements_info[id];
+    return NULL;
 }

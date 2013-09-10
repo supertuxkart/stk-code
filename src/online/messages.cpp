@@ -84,6 +84,13 @@ namespace Online
 
         // ------------------------------------------------------------------------
 
+        irr::core::stringw fetchingAchievements()
+        {
+            return irr::core::stringw(_("Fetching achievements")) + loadingDots();
+        }
+
+        // ------------------------------------------------------------------------
+
         irr::core::stringw processing()
         {
             return irr::core::stringw(_("Processing")) + loadingDots();

@@ -25,6 +25,7 @@
 #include "utils/translation.hpp"
 #include "states_screens/online_profile_overview.hpp"
 #include "states_screens/online_profile_friends.hpp"
+#include "states_screens/online_profile_achievements.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -37,6 +38,7 @@ using namespace Online;
 
 OnlineProfileBase::OnlineProfileBase(const char* filename) : Screen(filename)
 {
+    m_visiting_profile = ProfileManager::get()->getVisitingProfile();
 }   // OnlineProfileBase
 
 // -----------------------------------------------------------------------------
@@ -52,19 +54,35 @@ void OnlineProfileBase::loadedFromFile()
     assert(m_overview_tab != NULL);
     m_friends_tab = (IconButtonWidget *) m_profile_tabs->findWidgetNamed("tab_friends");
     assert(m_friends_tab != NULL);
+    m_achievements_tab = (IconButtonWidget *) m_profile_tabs->findWidgetNamed("tab_achievements");
+    assert(m_achievements_tab != NULL);
 
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
+void OnlineProfileBase::beforeAddingWidget()
+{
+}
 
+// -----------------------------------------------------------------------------
 void OnlineProfileBase::init()
 {
+    Profile * previous_profile = m_visiting_profile;
+    m_visiting_profile = ProfileManager::get()->getVisitingProfile();
+
+    if(previous_profile->isCurrentUser() != m_visiting_profile->isCurrentUser())
+    {
+        GUIEngine::reshowCurrentScreen();
+        return;
+    }
+
     Screen::init();
 
     m_overview_tab->setTooltip( _("Overview") );
     m_friends_tab->setTooltip( _("Friends") );
+    m_achievements_tab->setTooltip( _("Achievements") );
 
-    m_visiting_profile = ProfileManager::get()->getVisitingProfile();
+
     if (m_visiting_profile->isCurrentUser())
         m_header->setText(_("Your profile"), false);
     else
@@ -82,6 +100,7 @@ void OnlineProfileBase::eventCallback(Widget* widget, const std::string& name, c
 
         if (selection == m_overview_tab->m_properties[PROP_ID]) StateManager::get()->replaceTopMostScreen(OnlineProfileOverview::getInstance());
         else if (selection == m_friends_tab->m_properties[PROP_ID]) StateManager::get()->replaceTopMostScreen(OnlineProfileFriends::getInstance());
+        else if (selection == m_achievements_tab->m_properties[PROP_ID]) StateManager::get()->replaceTopMostScreen(OnlineProfileAchievements::getInstance());
     }
     else if (name == "back")
     {

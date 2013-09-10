@@ -36,7 +36,8 @@ private:
     bool m_valid;
     std::string m_id;
 
-    void createFreshSlot( const PtrVector<AchievementInfo> & info);
+    void createFreshSlot();
+    void deleteAchievements();
 
     class SyncAchievementsRequest : public Online::XMLRequest {
         virtual void callback ();
@@ -45,8 +46,9 @@ private:
     };
 
 public :
-    AchievementsSlot(const XMLNode * input, const PtrVector<AchievementInfo> & info);
-    AchievementsSlot(std::string id, bool online, const PtrVector<AchievementInfo> & info);
+    AchievementsSlot(const XMLNode * input);
+    AchievementsSlot(std::string id, bool online);
+    ~AchievementsSlot();
     bool isValid() const { return m_valid;}
     void save(std::ofstream & out);
     bool isOnline() const {return m_online;}

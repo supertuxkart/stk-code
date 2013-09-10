@@ -24,13 +24,13 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/profile.hpp"
+#include "online/profile_manager.hpp"
 
 namespace GUIEngine { class Widget; }
 
 
 /**
-  * \brief Online profiel overview screen
+  * \brief Online profile base screen
   * \ingroup states_screens
   */
 class OnlineProfileBase : public GUIEngine::Screen
@@ -41,6 +41,7 @@ protected:
     GUIEngine::RibbonWidget* m_profile_tabs;
     GUIEngine::IconButtonWidget * m_overview_tab;
     GUIEngine::IconButtonWidget * m_friends_tab;
+    GUIEngine::IconButtonWidget * m_achievements_tab;
 
     Online::Profile *           m_visiting_profile;
 
@@ -54,6 +55,8 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
+
+    virtual void beforeAddingWidget() OVERRIDE;
 };
 
 #endif
