@@ -22,6 +22,7 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "utils/translation.hpp"
@@ -106,7 +107,7 @@ void OnlineProfileAchievements::eventCallback(Widget* widget, const std::string&
     {
         m_selected_achievement_index = m_achievements_list_widget->getSelectionID();
 
-        //new achievementInfoDialog(atoi(m_achievements_list_widget->getSelectionInternalName().c_str())); //FIXME dialog
+        new MessageDialog(AchievementsManager::get()->getAchievementInfo(atoi(m_achievements_list_widget->getSelectionInternalName().c_str()))->getDescription());
     }
 }   // eventCallback
 

@@ -63,6 +63,7 @@ namespace Online{
         m_is_current_user = is_current_user;
         m_username = username;
         m_has_fetched_friends = false;
+        m_has_fetched_achievements = false;
         m_relation_info = NULL;
         m_is_friend = false;
     }
@@ -100,6 +101,7 @@ namespace Online{
         xml->get("user_name", &m_username);
         m_cache_bit = true;
         m_has_fetched_friends = false;
+        m_has_fetched_achievements = false;
         m_is_current_user = (m_id == CurrentUser::get()->getID());
         m_state = S_READY;
     }
@@ -130,6 +132,7 @@ namespace Online{
         }
         m_has_fetched_achievements = true;
         m_state = S_READY;
+        Log::info("test","tit");
     }
 
     // ============================================================================

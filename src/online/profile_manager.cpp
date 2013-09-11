@@ -49,6 +49,7 @@ namespace Online{
     ProfileManager::ProfileManager()
     {
         assert(m_max_cache_size > 1);
+        m_currently_visiting = NULL;
     }
 
     // ============================================================================

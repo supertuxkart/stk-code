@@ -203,7 +203,6 @@ irr::core::stringw MapAchievement::getProgressAsString()
     for ( iter = goal_values.begin(); iter != goal_values.end(); ++iter ) {
         goal += iter->second;
         progress += m_progress_map[iter->first];
-        Log::info("ach","%s",iter->first.c_str());
     }
     return StringUtils::toWString(progress) + "/" + StringUtils::toWString(goal);
 }

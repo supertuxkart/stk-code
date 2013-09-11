@@ -38,7 +38,6 @@ using namespace Online;
 
 OnlineProfileBase::OnlineProfileBase(const char* filename) : Screen(filename)
 {
-    m_visiting_profile = ProfileManager::get()->getVisitingProfile();
 }   // OnlineProfileBase
 
 // -----------------------------------------------------------------------------
@@ -62,26 +61,17 @@ void OnlineProfileBase::loadedFromFile()
 // -----------------------------------------------------------------------------
 void OnlineProfileBase::beforeAddingWidget()
 {
+    m_visiting_profile = ProfileManager::get()->getVisitingProfile();
 }
 
 // -----------------------------------------------------------------------------
 void OnlineProfileBase::init()
 {
-    Profile * previous_profile = m_visiting_profile;
-    m_visiting_profile = ProfileManager::get()->getVisitingProfile();
-
-    if(previous_profile->isCurrentUser() != m_visiting_profile->isCurrentUser())
-    {
-        GUIEngine::reshowCurrentScreen();
-        return;
-    }
-
     Screen::init();
 
     m_overview_tab->setTooltip( _("Overview") );
     m_friends_tab->setTooltip( _("Friends") );
     m_achievements_tab->setTooltip( _("Achievements") );
-
 
     if (m_visiting_profile->isCurrentUser())
         m_header->setText(_("Your profile"), false);
