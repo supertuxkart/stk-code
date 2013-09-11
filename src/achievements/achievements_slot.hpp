@@ -55,6 +55,7 @@ public :
     void sync(const std::vector<uint32_t> & achieved_ids);
     void onRaceEnd();
     const std::string & getID() const {return m_id;}
+    const std::map<uint32_t, Achievement *> & getAllAchievements() {return m_achievements;}
     Achievement * getAchievement(uint32_t id);
 };
 

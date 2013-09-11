@@ -117,6 +117,12 @@ void SingleAchievement::increase(int increase)
 }
 
 // ============================================================================
+irr::core::stringw SingleAchievement::getProgressAsString()
+{
+    return StringUtils::toWString(m_progress) + "/" + StringUtils::toWString(((SingleAchievementInfo *) m_achievement_info)->getGoalValue());
+}
+
+// ============================================================================
 MapAchievement::MapAchievement(const AchievementInfo * info)
     : Achievement(info)
 {
@@ -185,5 +191,20 @@ void MapAchievement::increase(const std::string & key, int increase)
         m_progress_map[key] += increase;
         check();
     }
+}
+
+// ============================================================================
+irr::core::stringw MapAchievement::getProgressAsString()
+{
+    int progress(0);
+    int goal(0);
+    const std::map<std::string, int> goal_values = ((MapAchievementInfo *) m_achievement_info)->getGoalValues();
+    std::map<std::string, int>::const_iterator iter;
+    for ( iter = goal_values.begin(); iter != goal_values.end(); ++iter ) {
+        goal += iter->second;
+        progress += m_progress_map[iter->first];
+        Log::info("ach","%s",iter->first.c_str());
+    }
+    return StringUtils::toWString(progress) + "/" + StringUtils::toWString(goal);
 }
 

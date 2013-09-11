@@ -77,6 +77,7 @@ public:
     MapAchievementInfo                  (const XMLNode * input);
     virtual ~MapAchievementInfo         () {};
     int getGoalValue                    (const std::string & key) { return m_goal_values[key];}
+    const std::map<std::string, int> & getGoalValues() const {return m_goal_values;}
     virtual bool checkCompletion        (Achievement * achievement) const;
     virtual Achievement::AchievementType  getType() const { return Achievement::AT_MAP; };
 };   // class MapAchievementInfo
