@@ -59,6 +59,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
         race_manager->setNumKarts( 1 );
         race_manager->setTrack( "tutorial" );
         race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
+        race_manager->setReverseTrack(false);
 
         // Use keyboard 0 by default (FIXME: let player choose?)
         InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
