@@ -221,7 +221,7 @@ namespace Online{
             delete request;
         }
         me->m_request_queue.unlock();
-
+        HTTPManager::deallocate();
         pthread_exit(NULL);
         return 0;
     }   // mainLoop

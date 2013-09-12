@@ -1244,6 +1244,7 @@ void cleanSuperTuxKart()
         INetworkHttp::get()->stopNetworkThread();
     if(Online::HTTPManager::isRunning())
         Online::HTTPManager::get()->stopNetworkThread();
+
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
     Online::ServersManager::deallocate();
@@ -1251,7 +1252,6 @@ void cleanSuperTuxKart()
     AchievementsManager::deallocate();
     Online::CurrentUser::deallocate();
     GUIEngine::DialogQueue::deallocate();
-
 
     Referee::cleanup();
     if(ReplayPlay::get())       ReplayPlay::destroy();

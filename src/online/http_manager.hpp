@@ -77,6 +77,7 @@ namespace Online{
 
             static void  *mainLoop(void *obj);
             void startNetworkThread();
+            static void deallocate();
 
             HTTPManager(); //const std::string &url
             ~HTTPManager();
@@ -86,7 +87,6 @@ namespace Online{
 
             // singleton
             static HTTPManager* get();
-            static void deallocate();
             static bool isRunning();
 
             //Execute
