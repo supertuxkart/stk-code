@@ -126,6 +126,7 @@ namespace Online{
         request->setParameter("action",std::string("connect"));
         request->setParameter("username",username);
         request->setParameter("password",password);
+        request->setParameter("save-session", StringUtils::boolstr(save_session));
         if (request_now)
         {
             HTTPManager::get()->addRequest(request);
