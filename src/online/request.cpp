@@ -103,6 +103,7 @@ namespace Online{
         curl_easy_setopt(m_curl_session, CURLOPT_CAINFO, (file_manager->getDataDir() + "web.tuxfamily.org.pem").c_str());
         curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 0L);
         //curl_easy_setopt(m_curl_session, CURLOPT_VERBOSE, 1L);
+        curl_easy_setopt(m_curl_session, CURLOPT_WRITEDATA, &m_string_buffer);
     }
 
     void HTTPRequest::operation()
@@ -222,7 +223,6 @@ namespace Online{
     void XMLRequest::prepareOperation()
     {
         HTTPRequest::prepareOperation();
-        curl_easy_setopt(m_curl_session, CURLOPT_WRITEDATA, &m_string_buffer);
     }
 
 

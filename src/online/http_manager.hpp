@@ -76,8 +76,6 @@ namespace Online{
             void handleResultQueue();
 
             static void  *mainLoop(void *obj);
-            void startNetworkThread();
-            static void deallocate();
 
             HTTPManager(); //const std::string &url
             ~HTTPManager();
@@ -87,6 +85,7 @@ namespace Online{
 
             // singleton
             static HTTPManager* get();
+            static void deallocate();
             static bool isRunning();
 
             //Execute
@@ -96,6 +95,7 @@ namespace Online{
             void synchronousRequest(Online::Request *request);
             void addRequest(Online::Request *request);
             void cancelAllDownloads();
+            void startNetworkThread();
             void stopNetworkThread();
 
             bool getAbort(){ return m_abort.getAtomic(); };

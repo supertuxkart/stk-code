@@ -150,6 +150,7 @@ namespace Online{
         Parameters *                                    m_parameters;
         CURL *                                          m_curl_session;
         CURLcode                                        m_curl_code;
+        std::string                                     m_string_buffer;
 
         virtual void                                    prepareOperation() OVERRIDE;
         virtual void                                    operation() OVERRIDE;
@@ -201,9 +202,6 @@ namespace Online{
 
     class XMLRequest : public HTTPRequest
     {
-    private:
-        std::string                                     m_string_buffer;
-
     protected :
         XMLNode *                                       m_result;
         irr::core::stringw                              m_info;

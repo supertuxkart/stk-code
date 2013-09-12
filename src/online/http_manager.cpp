@@ -57,16 +57,17 @@ namespace Online{
         if (http_singleton == NULL)
         {
             http_singleton = new HTTPManager();
-            http_singleton->startNetworkThread();
-            CurrentUser::get()->requestSavedSession();
         }
         return http_singleton;
     }   // get
 
     void HTTPManager::deallocate()
     {
-        delete http_singleton;
-        http_singleton = NULL;
+        if (http_singleton != NULL)
+        {
+            delete http_singleton;
+            http_singleton = NULL;
+        }
     }   // deallocate
 
     bool HTTPManager::isRunning()
@@ -84,6 +85,11 @@ namespace Online{
 
     // ============================================================================
     HTTPManager::~HTTPManager(){
+        m_thread_id.lock();
+        pthread_join(*m_thread_id.getData(), NULL);
+        delete m_thread_id.getData();
+        m_thread_id.unlock();
+        pthread_cond_destroy(&m_cond_request);
         curl_global_cleanup();
     }
 
@@ -116,8 +122,8 @@ namespace Online{
             Log::error("HTTP Manager", "Could not create thread, error=%d.\n", errno);
         }
         pthread_attr_destroy(&attr);
+        CurrentUser::get()->requestSavedSession();
     }   // startNetworkThread
-
 
 
     // ---------------------------------------------------------------------------
@@ -188,7 +194,7 @@ namespace Online{
     {
         HTTPManager *me = (HTTPManager*) obj;
 
-        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,      NULL);
+        //pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,      NULL);
 
         me->m_current_request = NULL;
         me->m_request_queue.lock();
@@ -221,7 +227,6 @@ namespace Online{
             delete request;
         }
         me->m_request_queue.unlock();
-        HTTPManager::deallocate();
         pthread_exit(NULL);
         return 0;
     }   // mainLoop

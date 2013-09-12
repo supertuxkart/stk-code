@@ -1191,6 +1191,7 @@ void initRest()
     // to network_http (since the thread might use network_http, otherwise
     // a race condition can be introduced resulting in a crash).
     INetworkHttp::get()->startNetworkThread();
+    Online::HTTPManager::get()->startNetworkThread();
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -1297,6 +1298,7 @@ void cleanSuperTuxKart()
 
     StateManager::deallocate();
     GUIEngine::EventHandler::deallocate();
+    Online::HTTPManager::deallocate();
 }   // cleanSuperTuxKart
 
 //=============================================================================
