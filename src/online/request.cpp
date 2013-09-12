@@ -123,6 +123,7 @@ namespace Online{
            postString.append(escaped);
            curl_free(escaped);
         }
+        Log::info(  "HTTPRequest::operation", "Sending : %s", postString.c_str());
         curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS, postString.c_str());
         std::string uagent( std::string("SuperTuxKart/") + STK_VERSION );
             #ifdef WIN32

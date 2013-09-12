@@ -134,7 +134,7 @@ namespace Online{
         // and we couldn't finish STK. This way we request an abort of
         // a download, which mean we can get the mutex and ask the service
         // thread here to cancel properly.
-        cancelAllDownloads();
+        //cancelAllDownloads(); FIXME if used this way it also cancels the client-quit action
         CurrentUser::get()->onSTKQuit();
         addRequest(new Request(true, MAX_PRIORITY, Request::RT_QUIT));
     }   // stopNetworkThread
