@@ -870,6 +870,9 @@
     <ClCompile Include="..\..\guiengine\widgets\rating_bar_widget.cpp">
       <Filter>Source Files\guiengine\widgets</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\utils\time.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
