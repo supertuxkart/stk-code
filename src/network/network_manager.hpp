@@ -40,6 +40,7 @@ class NetworkManager : public Singleton<NetworkManager>
     public:
         virtual void run();
         virtual void reset();
+        virtual void abort();
 
         // network management functions
         virtual bool connect(TransportAddress peer);

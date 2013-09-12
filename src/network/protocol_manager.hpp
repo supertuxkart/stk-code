@@ -105,8 +105,11 @@ typedef struct EventProcessingInfo
 class ProtocolManager : public Singleton<ProtocolManager>
 {
     friend class Singleton<ProtocolManager>;
-
+    friend void* protocolManagerAsynchronousUpdate(void* data);
     public:
+        
+        /*! \brief Stops the protocol manager. */
+        virtual void            abort();
         /*!
          * \brief Function that processes incoming events.
          * This function is called by the network manager each time there is an
@@ -323,6 +326,8 @@ class ProtocolManager : public Singleton<ProtocolManager>
         pthread_t* m_update_thread;
         /*! Asynchronous update thread.*/
         pthread_t* m_asynchronous_update_thread;
+        /*! True if the thread is running. */
+        bool m_asynchronous_thread_running;
 
 };
 

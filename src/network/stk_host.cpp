@@ -89,7 +89,7 @@ STKHost::STKHost()
     pthread_mutex_init(&m_exit_mutex, NULL);
     pthread_mutex_init(&m_log_mutex, NULL);
     if (UserConfigParams::m_packets_log_filename.toString() != "")
-        m_log_file = fopen(UserConfigParams::m_packets_log_filename.c_str(), "w");
+        m_log_file = fopen(UserConfigParams::m_packets_log_filename.c_str(), "w+");
     if (!m_log_file)
         Log::warn("STKHost", "Network packets won't be logged: no file.");
 }
@@ -100,7 +100,10 @@ STKHost::~STKHost()
 {
     stopListening();
     if (m_log_file)
+    {
         fclose(m_log_file);
+        Log::warn("STKHost", "Packet logging file has been closed.");
+    }
     if (m_host)
     {
         enet_host_destroy(m_host);

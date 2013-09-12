@@ -67,10 +67,10 @@ void* waitInput2(void* data)
     uint32_t id = ProtocolManager::getInstance()->requestStart(new StopServer());
     while(ProtocolManager::getInstance()->getProtocolState(id) != PROTOCOL_STATE_TERMINATED)
     {
+           Time::sleep(1);
     }
 
     main_loop->abort();
-    exit(0);
 
     return NULL;
 }

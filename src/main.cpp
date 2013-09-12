@@ -1431,11 +1431,8 @@ int main(int argc, char *argv[] )
                     if (players[n].getName() == UserConfigParams::m_default_player.toString())
                         unlock_manager->setCurrentSlot(players[n].getUniqueID());
 
-            main_loop->run();
-            throw "salut";
         }
-
-        if(!UserConfigParams::m_no_start_screen)
+        else if(!UserConfigParams::m_no_start_screen)
         {
             StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
 #ifdef ENABLE_WIIUSE
@@ -1596,6 +1593,7 @@ int main(int argc, char *argv[] )
     // so we don't crash later when StateManager tries to access input devices.
     StateManager::get()->resetActivePlayers();
     if(input_manager) delete input_manager; // if early crash avoid delete NULL
+    NetworkManager::getInstance()->abort();
 
     cleanSuperTuxKart();
 

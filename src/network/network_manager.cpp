@@ -76,6 +76,13 @@ void NetworkManager::reset()
     }
 }
 
+void NetworkManager::abort()
+{
+    m_localhost->stopListening();
+    reset();
+    ProtocolManager::getInstance()->abort();
+}
+
 //-----------------------------------------------------------------------------
 
 bool NetworkManager::connect(TransportAddress peer)

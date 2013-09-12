@@ -31,7 +31,7 @@
 void* protocolManagerUpdate(void* data)
 {
     ProtocolManager* manager = static_cast<ProtocolManager*>(data);
-    while(!manager->exit())
+    while(manager && !manager->exit())
     {
         manager->update();
         Time::sleep(2);
@@ -41,11 +41,13 @@ void* protocolManagerUpdate(void* data)
 void* protocolManagerAsynchronousUpdate(void* data)
 {
     ProtocolManager* manager = static_cast<ProtocolManager*>(data);
-    while(!manager->exit())
+    manager->m_asynchronous_thread_running = true;
+    while(manager && !manager->exit())
     {
         manager->asynchronousUpdate();
         Time::sleep(2);
     }
+    manager->m_asynchronous_thread_running = false;
     return NULL;
 }
 
@@ -74,7 +76,16 @@ ProtocolManager::ProtocolManager()
 
 ProtocolManager::~ProtocolManager()
 {
+}
+
+
+void ProtocolManager::abort()
+{
     pthread_mutex_unlock(&m_exit_mutex); // will stop the update function
+    while (m_asynchronous_thread_running) // wait the thread to finish before we delete all mutexes etc..
+    {
+        Time::sleep(2);
+    }
     pthread_mutex_lock(&m_events_mutex);
     pthread_mutex_lock(&m_protocols_mutex);
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
