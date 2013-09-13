@@ -65,6 +65,8 @@ void OnlineProfileBase::loadedFromFile()
 void OnlineProfileBase::beforeAddingWidget()
 {
     m_visiting_profile = ProfileManager::get()->getVisitingProfile();
+    if (!m_visiting_profile->isCurrentUser())
+        m_settings_tab->setVisible(false);
 }
 
 // -----------------------------------------------------------------------------
