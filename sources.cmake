@@ -240,6 +240,7 @@ src/states_screens/online_profile_achievements.cpp
 src/states_screens/online_profile_base.cpp
 src/states_screens/online_profile_friends.cpp
 src/states_screens/online_profile_overview.cpp
+src/states_screens/online_profile_settings.cpp
 src/states_screens/online_screen.cpp
 src/states_screens/online_user_search.cpp
 src/states_screens/options_screen_audio.cpp
@@ -548,6 +549,7 @@ src/states_screens/online_profile_achievements.hpp
 src/states_screens/online_profile_base.hpp
 src/states_screens/online_profile_friends.hpp
 src/states_screens/online_profile_overview.hpp
+src/states_screens/online_profile_settings.hpp
 src/states_screens/online_screen.hpp
 src/states_screens/online_user_search.hpp
 src/states_screens/options_screen_audio.hpp
