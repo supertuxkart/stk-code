@@ -41,19 +41,14 @@ class Controller;
 class SoccerWorld : public WorldWithRank
 {
 private:
-    /** Number of goals each team scored
-     */
+    /** Number of goals each team scored */
     int m_team_goals[NB_SOCCER_TEAMS];
-	/** Number of goals needed to win
-	 */
-	int m_goal_target;
+    /** Number of goals needed to win */
+    int m_goal_target;
     /** Whether or not goals can be scored (they are disabled when a point is scored
     and re-enabled when the next game can be played)*/
     bool m_can_score_points;
-	SFXBase *m_goal_sound;
-	
-	/** Team karts */
-
+    SFXBase *m_goal_sound;
 
 public:
 
@@ -72,7 +67,7 @@ public:
     virtual bool useFastMusicNearEnd() const { return false; }
     virtual void getKartsDisplayInfo(
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
-	int getScore(unsigned int i);
+    int getScore(unsigned int i);
     virtual bool raceHasLaps(){ return false; }
     virtual void moveKartAfterRescue(AbstractKart* kart);
 
@@ -80,15 +75,15 @@ public:
 
     virtual void update(float dt);
 
-	virtual void countdownReachedZero();
+    virtual void countdownReachedZero();
 
     void onCheckGoalTriggered(bool first_goal);
-	int getTeamLeader(unsigned int i);
+    int getTeamLeader(unsigned int i);
 
 private:
     void initKartList();
 protected:
-	virtual AbstractKart *createKart(const std::string &kart_ident, int index,
+    virtual AbstractKart *createKart(const std::string &kart_ident, int index,
                              int local_player_id, int global_player_id,
                              RaceManager::KartType type);
 };   // SoccerWorld
