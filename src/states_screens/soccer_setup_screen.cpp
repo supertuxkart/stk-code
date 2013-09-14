@@ -35,7 +35,7 @@ using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( SoccerSetupScreen );
 
 #define KART_CONTINUOUS_ROTATION_SPEED      35.f
-#define KART_CONFIRMATION_ROTATION_SPEED    4.f
+#define KART_CONFIRMATION_ROTATION_SPEED    0.f
 #define KART_CONFIRMATION_TARGET_ANGLE      10.f
 
 // -----------------------------------------------------------------------------
@@ -57,6 +57,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, c
     {
         StateManager::get()->pushScreen( ArenasScreen::getInstance() );
 		race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
+        input_manager->setMasterPlayerOnly(true);
     }
     else if (name == "back")
     {
@@ -147,7 +148,7 @@ void SoccerSetupScreen::init()
     bt_continue->setDeactivated();
 
     // We need players to be able to choose their teams
-    input_manager->getDeviceList()->setAssignMode(ASSIGN);
+    //~ input_manager->getDeviceList()->setAssignMode(ASSIGN);
     input_manager->setMasterPlayerOnly(false);
 }
 
@@ -244,7 +245,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
     ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
     if(areAllKartsConfirmed())
     {
-        bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        //~ bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
         bt_continue->setActivated();
 
         for(int i=0 ; i < nb_players ; i++)

@@ -105,9 +105,9 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
     {
         //I18N: soccer mode
         m_race_gui->addMessage(_("GOAL!"), NULL,
-                              /* time */ 3.0f,
+                              /* time */ 5.0f,
                                video::SColor(255,255,255,255),
-                               /*important*/ true,
+                               /*important*/ false,
                                /*big font*/  true);
         m_team_goals[first_goal ? 0 : 1]++;
         //printf("Score:\nTeam One %d : %d Team Two\n", m_team_goals[0], m_team_goals[1]);
@@ -390,11 +390,11 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
   int posIndex = index;
   if(race_manager->getLocalKartInfo(index).getSoccerTeam() == SOCCER_TEAM_RED)
   {
-      if(index % 2 != 0)      posIndex += 1;
+      if(index % 2 != 1) posIndex += 1;
   }
   else if(race_manager->getLocalKartInfo(index).getSoccerTeam() == SOCCER_TEAM_BLUE)
   {
-      if(index % 2 != 1) posIndex += 1;
+      if(index % 2 != 0) posIndex += 1;
   }
   int position           = index+1;
   btTransform init_pos   = m_track->getStartTransform(posIndex);

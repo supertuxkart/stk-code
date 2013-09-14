@@ -19,6 +19,7 @@
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
+#include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/arenas_screen.hpp"
@@ -222,6 +223,7 @@ void RaceSetupScreen::onGameModeChanged()
 void RaceSetupScreen::init()
 {
     Screen::init();
+    input_manager->setMasterPlayerOnly(true);
     RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
     assert( w != NULL );
 
@@ -288,6 +290,7 @@ void RaceSetupScreen::init()
     }
 
 #ifdef ENABLE_SOCCER_MODE
+if (race_manager->getNumLocalPlayers() > 1 || UserConfigParams::m_artist_debug_mode)
     {
         irr::core::stringw name5 = irr::core::stringw(
             RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
