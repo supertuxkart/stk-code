@@ -22,6 +22,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/dialogs/change_password_dialog.hpp"
 #include "utils/translation.hpp"
 
 #include <IGUIButton.h>
@@ -47,7 +48,8 @@ OnlineProfileSettings::OnlineProfileSettings() : OnlineProfileBase("online/profi
 void OnlineProfileSettings::loadedFromFile()
 {
     OnlineProfileBase::loadedFromFile();
-
+    m_change_password_button = this->getWidget<ButtonWidget>("change_password_button");
+    assert(m_change_password_button != NULL);
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -63,5 +65,9 @@ void OnlineProfileSettings::init()
 void OnlineProfileSettings::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     OnlineProfileBase::eventCallback( widget, name, playerID);
+    if (name == m_change_password_button->m_properties[GUIEngine::PROP_ID])
+   {
+       new ChangePasswordDialog();
+   }
 }   // eventCallback
 

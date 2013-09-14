@@ -16,8 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef HEADER_LOGIN_DIALOG_HPP
-#define HEADER_LOGIN_DIALOG_HPP
+#ifndef HEADER_CHANGE_PASSWORD_DIALOG_HPP
+#define HEADER_CHANGE_PASSWORD_DIALOG_HPP
 
 #include <irrString.h>
 
@@ -30,61 +30,41 @@
  * \brief Dialog that allows a user to sign in
  * \ingroup states_screens
  */
-class LoginDialog : public GUIEngine::ModalDialog
+class ChangePasswordDialog : public GUIEngine::ModalDialog
 {
 
 public:
-    class Listener
-    {
-    public :
-        virtual void onClose() const = 0;
-    };
-
-    enum Message
-    {
-        Normal                  = 0,    // If the user presses the sign in button himself
-        Signing_In_Required     = 1,    // If the user needs to be signed in
-        Registration_Required   = 2     // If the user needs to be registered
-    };
 
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    LoginDialog(const Message = Normal, const LoginDialog::Listener * = NULL);
-    ~LoginDialog();
+    ChangePasswordDialog();
+    ~ChangePasswordDialog();
 
     virtual void onEnterPressedInternal();
-    void success();
-    void error(const irr::core::stringw & error_message);
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 
     virtual bool onEscapePressed();
     virtual void onUpdate(float dt);
+    void success();
+    void error(const irr::core::stringw & error_message);
 
 private:
-    
-    const Listener * m_listener;
 
     bool m_self_destroy;
-    bool m_open_registration_dialog;
-    bool m_open_recovery_dialog;
     bool m_success;
 
-    GUIEngine::LabelWidget * m_message_widget;
-    GUIEngine::TextBoxWidget * m_username_widget;
-    GUIEngine::TextBoxWidget * m_password_widget;
-    GUIEngine::CheckBoxWidget * m_remember_widget;
+    GUIEngine::TextBoxWidget * m_current_password_widget;
+    GUIEngine::TextBoxWidget * m_new_password1_widget;
+    GUIEngine::TextBoxWidget * m_new_password2_widget;
     GUIEngine::LabelWidget * m_info_widget;
 
     GUIEngine::RibbonWidget * m_options_widget;
-    GUIEngine::IconButtonWidget * m_sign_in_widget;
-    GUIEngine::IconButtonWidget * m_recovery_widget;
-    GUIEngine::IconButtonWidget * m_register_widget;
-    GUIEngine::IconButtonWidget * m_as_guest_widget;
+    GUIEngine::IconButtonWidget * m_submit_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
     
-    void login();
+    void submit();
 };
 
 #endif

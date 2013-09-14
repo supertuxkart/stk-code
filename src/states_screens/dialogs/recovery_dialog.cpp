@@ -177,7 +177,7 @@ void RecoveryDialog::onUpdate(float dt)
         }
         else
         {
-            m_info_widget->setText(Messages::recovery(), false);
+            m_info_widget->setText(Messages::validatingInfo(), false);
         }
     }
     // It's unsafe to delete from inside the event handler so we do it here

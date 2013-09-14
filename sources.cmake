@@ -206,6 +206,7 @@ src/states_screens/credits.cpp
 src/states_screens/cutscene_gui.cpp
 src/states_screens/dialogs/add_device_dialog.cpp
 src/states_screens/dialogs/addons_loading.cpp
+src/states_screens/dialogs/change_password_dialog.cpp
 src/states_screens/dialogs/confirm_resolution_dialog.cpp
 src/states_screens/dialogs/custom_video_settings.cpp
 src/states_screens/dialogs/enter_player_name_dialog.cpp
@@ -515,6 +516,7 @@ src/states_screens/credits.hpp
 src/states_screens/cutscene_gui.hpp
 src/states_screens/dialogs/add_device_dialog.hpp
 src/states_screens/dialogs/addons_loading.hpp
+src/states_screens/dialogs/change_password_dialog.hpp
 src/states_screens/dialogs/confirm_resolution_dialog.hpp
 src/states_screens/dialogs/custom_video_settings.hpp
 src/states_screens/dialogs/enter_player_name_dialog.hpp

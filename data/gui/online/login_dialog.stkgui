@@ -3,7 +3,7 @@
     <div x="2%" y="5%" width="96%" height="90%" layout="vertical-row" >
     
         <header id="title" width="96%" height="fit" text_align="center" word_wrap="true"
-       I18N="In the login dialog' dialog" text="Sign in"/>
+       I18N="In the login dialog" text="Sign in"/>
        
        <spacer height="25" width="50">
        

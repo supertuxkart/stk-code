@@ -120,6 +120,13 @@ namespace Online{
                 PollRequest() : XMLRequest(true) {}
             };
 
+            class ChangePasswordRequest : public XMLRequest
+            {
+                virtual void callback ();
+            public:
+                ChangePasswordRequest() : XMLRequest(true) {}
+            };
+
 
         private:
             std::string                 m_token;
@@ -166,6 +173,9 @@ namespace Online{
             void                            requestDeclineFriend(const uint32_t friend_id) const;
             void                            requestRemoveFriend(const uint32_t friend_id) const;
             void                            requestCancelFriend(const uint32_t friend_id) const;
+            void                            requestPasswordChange(  const irr::core::stringw &current_password,
+                                                                    const irr::core::stringw &new_password,
+                                                                    const irr::core::stringw &new_password_ver) const;
 
             const XMLRequest *              requestUserSearch(const irr::core::stringw & search_string) const;
 

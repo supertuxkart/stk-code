@@ -28,6 +28,7 @@
 #include "utils/translation.hpp"
 #include "addons/addon.hpp"
 #include "guiengine/dialog_queue.hpp"
+#include "states_screens/dialogs/change_password_dialog.hpp"
 #include "states_screens/dialogs/login_dialog.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
@@ -492,6 +493,37 @@ namespace Online{
             info_text = m_info;
         GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!m_success, true), true);
 
+    }
+
+    // ============================================================================
+    void CurrentUser::requestPasswordChange(const irr::core::stringw &current_password,
+                                            const irr::core::stringw &new_password,
+                                            const irr::core::stringw &new_password_ver) const
+    {
+        assert(m_state == US_SIGNED_IN);
+        ChangePasswordRequest * request = new ChangePasswordRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action", std::string("change_password"));
+        request->setParameter("userid", getID());
+        request->setParameter("current", current_password);
+        request->setParameter("new1", new_password);
+        request->setParameter("new2", new_password_ver);
+        HTTPManager::get()->addRequest(request);
+    }
+
+    void CurrentUser::ChangePasswordRequest::callback()
+    {
+        if(GUIEngine::ModalDialog::isADialogActive())
+        {
+            ChangePasswordDialog * dialog  = dynamic_cast<ChangePasswordDialog*>(GUIEngine::ModalDialog::getCurrent());
+            if(dialog != NULL)
+            {
+                if(m_success)
+                    dialog->success();
+                else
+                    dialog->error(m_info);
+            }
+        }
     }
     // ============================================================================
     void CurrentUser::requestPoll()
