@@ -57,7 +57,6 @@ AchievementsManager::AchievementsManager()
 void AchievementsManager::init()
 {
     parseConfigFile();
-    updateCurrentPlayer();
 }
 
 // ============================================================================

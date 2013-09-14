@@ -1192,6 +1192,7 @@ void initRest()
     // a race condition can be introduced resulting in a crash).
     INetworkHttp::get()->startNetworkThread();
     Online::HTTPManager::get()->startNetworkThread();
+    AchievementsManager::get()->init();
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -1524,8 +1525,6 @@ int main(int argc, char *argv[] )
             // Go straight to the race
             StateManager::get()->enterGameState();
         }
-        AchievementsManager::get()->init();
-
 
         // If an important news message exists it is shown in a popup dialog.
         const core::stringw important_message =

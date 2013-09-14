@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <iostream>
 
+#include "achievements/achievements_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/player.hpp"
@@ -420,6 +421,15 @@ void UnlockManager::updateActiveChallengeList()
 {
     getCurrentSlot()->computeActive();
 }
+
+
+//-----------------------------------------------------------------------------
+void UnlockManager::setCurrentSlot(std::string slotid)
+{
+    m_current_game_slot = slotid;
+    AchievementsManager::get()->updateCurrentPlayer();
+}
+
 
 //-----------------------------------------------------------------------------
 
