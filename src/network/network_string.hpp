@@ -32,6 +32,10 @@
 
 typedef unsigned char uchar;
 
+/** \class NetworkString
+ *  \brief Describes a chain of 8-bit unsigned integers.
+ *  This class allows you to easily create and parse 8-bit strings.
+ */
 class NetworkString
 {
     union {

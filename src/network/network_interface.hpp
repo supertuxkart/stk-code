@@ -38,6 +38,9 @@ class NetworkInterface : public Singleton<NetworkInterface>
     friend class Singleton<NetworkInterface>;
     public:
 
+        /*! \brief Used to init the network.
+         *  \param server : True if we're a server.
+         */
         void initNetwork(bool server);
 
     protected:

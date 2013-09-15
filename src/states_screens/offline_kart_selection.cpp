@@ -2,7 +2,7 @@
 
 DEFINE_SCREEN_SINGLETON( OfflineKartSelectionScreen );
 
-OfflineKartSelectionScreen::OfflineKartSelectionScreen() : KartSelectionScreen()
+OfflineKartSelectionScreen::OfflineKartSelectionScreen() : KartSelectionScreen("karts.stkgui")
 {
     KartSelectionScreen::m_instance_ptr = this;
 }

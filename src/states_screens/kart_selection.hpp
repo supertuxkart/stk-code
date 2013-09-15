@@ -70,7 +70,7 @@ protected:
 
     bool m_must_delete_on_back; //!< To delete the screen if back is pressed
 
-    KartSelectionScreen();
+    KartSelectionScreen(const char* filename);
 
     /** Stores whether any player confirmed their choice; then, some things
       * are "frozen", for instance the selected kart group tab

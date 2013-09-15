@@ -845,7 +845,7 @@ void KartHoverListener::onSelectionChanged(DynamicRibbonWidget* theWidget,
 
 // ============================================================================
 
-KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
+KartSelectionScreen::KartSelectionScreen(const char* filename) : Screen(filename)
 {
     m_removed_widget       = NULL;
     m_multiplayer_message  = NULL;
@@ -933,6 +933,8 @@ void KartSelectionScreen::init()
 
     Widget* placeholder = getWidget("playerskarts");
     assert(placeholder != NULL);
+
+    // FIXME : The reserved id value is -1 when we switch from KSS to NKSS and vice-versa
 
     g_dispatcher->setRootID(placeholder->m_reserved_id);
 
