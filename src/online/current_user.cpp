@@ -576,8 +576,9 @@ namespace Online{
                          {
                              if (now_online)
                              {
+                                 //User came online
                                  relation_info->setOnline(true);
-                                 profile->setFriend();
+                                 profile->setFriend(); //Do this because a user might have accepted a pending friend request.
                                  to_notify.push_back(profile->getUserName());
                              }
                          }

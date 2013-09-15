@@ -86,10 +86,16 @@ namespace Online{
             bool                            m_is_current_user;
             uint32_t                        m_id;
             irr::core::stringw              m_username;
+            /** information about the relation with the current user */
             RelationInfo *                  m_relation_info;
+            /** Whether or not the user of this profile, is a friend of the current user */
             bool                            m_is_friend;
 
             bool                            m_has_fetched_friends;
+            /**
+             * List of user id's that are friends with the user of this profile.
+             * In case this profile is of the current user, this list also contains any id's of users that still have a friend request pending.
+             * */
             std::vector<uint32_t>           m_friends;
 
             bool                            m_has_fetched_achievements;
@@ -130,15 +136,16 @@ namespace Online{
             RelationInfo *                  getRelationInfo()                { return m_relation_info; }
             void                            setRelationInfo(RelationInfo * r){ delete m_relation_info; m_relation_info = r;}
 
-            void                            setCacheBit()                    { m_cache_bit = true; }
-            void                            unsetCacheBit()                  { m_cache_bit = false; }
+            void                            setCacheBit(bool cache_bit)      { m_cache_bit = cache_bit; }
             bool                            getCacheBit() const              { return m_cache_bit; }
 
             uint32_t                        getID() const                    { return m_id; }
             const irr::core::stringw &      getUserName() const              { return m_username; }
 
+            void                            merge(Profile * profile);
 
-    };   // class CurrentUser
+
+    };   // class Profile
 
 } // namespace Online
 

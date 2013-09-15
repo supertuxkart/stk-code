@@ -234,7 +234,9 @@ namespace Online{
     void Profile::addFriend( const uint32_t id)
     {
         assert (m_has_fetched_friends);
-        //FIXME check if it's not already in there
+        for(int i=0; i< m_friends.size(); i++)
+            if(m_friends[i] == id)
+                return;
         m_friends.push_back(id);
     }
 
@@ -258,6 +260,22 @@ namespace Online{
     {
         assert (m_has_fetched_achievements && m_state == S_READY && !m_is_current_user);
         return m_achievements;
+    }
+
+    //=============================================================================
+    void Profile::merge(Profile * profile)
+    {
+        assert (profile != NULL);
+        if(!this->m_has_fetched_friends && profile->m_has_fetched_friends)
+            this->m_friends = profile->m_friends;
+        if(!this->m_has_fetched_achievements && profile->m_has_fetched_friends)
+            this->m_achievements = profile->m_achievements;
+        if(this->m_relation_info == NULL && profile->m_relation_info != NULL)
+        {
+            this->m_relation_info = profile->m_relation_info;
+            profile->m_relation_info = NULL; //We don't want the destructor of the profile instance to destroy the relation info
+        }
+        delete profile;
     }
 
 } // namespace Online

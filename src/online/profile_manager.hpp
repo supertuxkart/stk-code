@@ -44,9 +44,15 @@ namespace Online{
 
             typedef std::map<uint32_t, Profile*>    ProfilesMap;
 
+            /** A map of profiles that is persistent. (i.e. no automatic removing happens) Normally used for the current user's profile and friends. */
+            ProfilesMap                             m_profiles_persistent;
+            /**
+             * Any profiles that don't go into the persistent map, go here.
+             * Using a Least Recent Used caching algorithm with age bits to remove entries when the max size is reached.
+             **/
             ProfilesMap                             m_profiles_cache;
-            ProfilesMap                             m_profiles_persistent; // current user and friends
             Profile *                               m_currently_visiting;
+            /** The max size of the m_profiles cache.  */
             static const unsigned int               m_max_cache_size = 20;
 
             void                                    iterateCache(Profile * profile);
@@ -65,6 +71,7 @@ namespace Online{
             void                                    setVisiting(const uint32_t id);
             bool                                    cacheHit(const uint32_t id);
             bool                                    inPersistent(const uint32_t id);
+            /** \return the instance of the profile that's currently being visited */
             Profile *                               getVisitingProfile() {return m_currently_visiting;}
             Profile *                               getProfileByID(const uint32_t id);
 
