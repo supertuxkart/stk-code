@@ -762,19 +762,21 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
 
     // First draw the icon
     // -------------------
-    
-    if(ri->m_kart_icon && !isSoccerMode)
+    if (!isSoccerMode)
     {
-        core::recti source_rect(core::vector2di(0,0),
-                                ri->m_kart_icon->getSize());
-        core::recti dest_rect(current_x, y,
-                              current_x+m_width_icon, y+m_width_icon);
-        irr_driver->getVideoDriver()->draw2DImage(ri->m_kart_icon, dest_rect,
-                                                  source_rect, NULL, NULL,
-                                                  true);
+        if(ri->m_kart_icon)
+        {
+            core::recti source_rect(core::vector2di(0,0),
+                                    ri->m_kart_icon->getSize());
+            core::recti dest_rect(current_x, y,
+                                  current_x+m_width_icon, y+m_width_icon);
+            irr_driver->getVideoDriver()->draw2DImage(ri->m_kart_icon, dest_rect,
+                                                      source_rect, NULL, NULL,
+                                                      true);
+        }
+    
+        current_x += m_width_icon + m_width_column_space;
     }
-
-    current_x += m_width_icon + m_width_column_space;
 
     // Draw the name
     // -------------
