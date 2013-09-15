@@ -41,7 +41,7 @@
 namespace Online{
 
     /**
-      * \brief Class to connect with a server over HTTP
+      * \brief Class to connect with a server over HTTP(S)
       * \ingroup online
       */
     class HTTPManager
@@ -70,6 +70,7 @@ namespace Online{
                                                >
                         >  m_request_queue;
 
+            /** The list of pointers to all requests that are already executed by the networking thread, but still need to be processed by the main thread. */
             Synchronised< std::queue<Online::Request*> >    m_result_queue;
 
             void addResult(Online::Request *request);
@@ -87,10 +88,6 @@ namespace Online{
             static HTTPManager* get();
             static void deallocate();
             static bool isRunning();
-
-            //Execute
-            std::string getPage(Online::Request * request);
-            XMLNode * getXMLFromPage(Online::Request * request);
 
             void synchronousRequest(Online::Request *request);
             void addRequest(Online::Request *request);

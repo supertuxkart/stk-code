@@ -154,6 +154,7 @@ namespace Online{
     void HTTPManager::cancelAllDownloads()
     {
         m_abort.setAtomic(true);
+        //FIXME doesn't get called at the moment. When using this again, be sure that MAX_PRIORITY requests still get executed.
     }   // cancelAllDownloads
 
 
@@ -176,7 +177,7 @@ namespace Online{
 
     // ----------------------------------------------------------------------------
     /** Immediately performs a request synchronously
-     *  \param request The pointer to the new request to insert.
+     *  \param request The pointer to the request to execute.
      */
     void HTTPManager::synchronousRequest(Request *request)
     {
@@ -231,7 +232,10 @@ namespace Online{
         return 0;
     }   // mainLoop
 
-
+    // ----------------------------------------------------------------------------
+    /** Inserts a request into the queue of results.
+     *  \param request The pointer to the request to insert.
+     */
     void HTTPManager::addResult(Online::Request *request)
     {
         assert(request->isBusy());
@@ -240,6 +244,11 @@ namespace Online{
         m_result_queue.unlock();
     }
 
+    // ----------------------------------------------------------------------------
+    /**
+     * Takes a request out of the result queue, if any is present.
+     * Calls the callback method of the request and takes care of memory management if necessary.
+     */
     void HTTPManager::handleResultQueue()
     {
         Request * request = NULL;
@@ -263,6 +272,11 @@ namespace Online{
         }
     }
 
+    // ----------------------------------------------------------------------------
+    /**
+     * Should be called every frame and takes care of processing the result queue
+     * and polling the database server if a user is signed in.
+     */
     void HTTPManager::update(float dt){
         handleResultQueue();
 
