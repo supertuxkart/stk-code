@@ -28,7 +28,7 @@
 class RaceConfig
 {
     int m_world_type;
-}
+};
 
 /*!
  * \class LobbyRoomProtocol

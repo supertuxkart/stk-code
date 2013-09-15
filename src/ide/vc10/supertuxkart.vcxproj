@@ -313,6 +313,7 @@
     <ClCompile Include="..\..\utils\profiler.cpp" />
     <ClCompile Include="..\..\utils\random_generator.cpp" />
     <ClCompile Include="..\..\utils\string_utils.cpp" />
+    <ClCompile Include="..\..\utils\time.cpp" />
     <ClCompile Include="..\..\utils\translation.cpp" />
     <ClCompile Include="..\..\utils\vec3.cpp" />
     <ClCompile Include="..\..\audio\music_information.cpp" />

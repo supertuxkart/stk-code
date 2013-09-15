@@ -222,7 +222,7 @@ void RubberBall::getNextControlPoint()
 
     int next = getSuccessorToHitTarget(m_last_aimed_graph_node, &dist);
     float d = QuadGraph::get()->getDistanceFromStart(next)-f;
-    while(d<m_st_min_interpolation_distance && d>0)
+    while(d<m_st_min_interpolation_distance && d>=0)
     {
         next = getSuccessorToHitTarget(next, &dist);
         d = QuadGraph::get()->getDistanceFromStart(next)-f;

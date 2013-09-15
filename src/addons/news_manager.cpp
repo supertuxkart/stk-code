@@ -50,7 +50,7 @@ NewsManager::~NewsManager()
  */
 void NewsManager::init()
 {
-    UserConfigParams::m_news_last_updated = Time::getTimeSinceEpoch();
+    UserConfigParams::m_news_last_updated = StkTime::getTimeSinceEpoch();
 
     std::string xml_file = file_manager->getAddonsFile("news.xml");
     const XMLNode *xml   = new XMLNode(xml_file);

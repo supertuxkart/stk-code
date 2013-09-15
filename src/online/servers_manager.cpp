@@ -72,7 +72,7 @@ namespace Online{
     ServersManager::RefreshRequest * ServersManager::refreshRequest(bool request_now) const
     {
         RefreshRequest * request = NULL;
-        if(Time::getRealTime() - m_last_load_time.getAtomic() > SERVER_REFRESH_INTERVAL)
+        if(StkTime::getRealTime() - m_last_load_time.getAtomic() > SERVER_REFRESH_INTERVAL)
         {
             request = new RefreshRequest();
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
@@ -93,7 +93,7 @@ namespace Online{
             {
                 addServer(new Server(*servers_xml->getNode(i)));
             }
-            m_last_load_time.setAtomic((float)Time::getRealTime());
+            m_last_load_time.setAtomic((float)StkTime::getRealTime());
         }
         //FIXME error message
     }

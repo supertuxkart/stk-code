@@ -398,7 +398,7 @@ void IntUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 }   // findYourDataInAnAttributeOf
 
 // ============================================================================
-TimeUserConfigParam::TimeUserConfigParam(Time::TimeType default_value,
+TimeUserConfigParam::TimeUserConfigParam(StkTime::TimeType default_value,
                                          const char* param_name,
                                          const char* comment)
 {
@@ -410,7 +410,7 @@ TimeUserConfigParam::TimeUserConfigParam(Time::TimeType default_value,
 }   // TimeUserConfigParam
 
 // ----------------------------------------------------------------------------
-TimeUserConfigParam::TimeUserConfigParam(Time::TimeType default_value,
+TimeUserConfigParam::TimeUserConfigParam(StkTime::TimeType default_value,
                                          const char* param_name,
                                          GroupUserConfigParam* group,
                                          const char* comment)

@@ -499,7 +499,7 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
             m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_mini_map->getSize().Width);
             m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_mini_map->getSize().Height);
         }
-        else 
+        else
         {
             m_minimap_x_scale = 0;
             m_minimap_y_scale = 0;
@@ -1153,7 +1153,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         convertTrackToBullet(m_all_nodes[i]);
     }
 
-    // Now convert all objects that are only used for the physics 
+    // Now convert all objects that are only used for the physics
     // (like invisible walls).
     for(unsigned int i=0; i<m_all_physics_only_nodes.size(); i++)
     {
@@ -1273,7 +1273,7 @@ void Track::createWater(const XMLNode &node)
         // A speed of 0 results in a division by zero, so avoid this.
         // The actual time for a wave from one maximum to the next is
         // given by 2*M_PI*speed/1000.
-        Log::warn("Track", 
+        Log::warn("Track",
                   "Wave-speed or time is 0, resetting it to the default.");
         wave_speed =300.0f;
     }
@@ -2060,7 +2060,7 @@ bool Track::findGround(AbstractKart *kart)
     // Material and hit point are not needed;
     const Material *m;
     Vec3 hit_point, normal;
-    bool over_ground = m_track_mesh->castRay(kart->getXYZ(), to, &hit_point, 
+    bool over_ground = m_track_mesh->castRay(kart->getXYZ(), to, &hit_point,
                                              &m, &normal);
     const Vec3 &xyz = kart->getXYZ();
     if(!over_ground || !m)
@@ -2084,7 +2084,7 @@ bool Track::findGround(AbstractKart *kart)
     // too long.
     if(xyz.getY() - hit_point.getY() > 5)
     {
-        Log::warn("physics", 
+        Log::warn("physics",
                   "Kart at (%f %f %f) is too high above ground at (%f %f %f)",
                   xyz.getX(),xyz.getY(),xyz.getZ(),
                   hit_point.getX(),hit_point.getY(),hit_point.getZ());

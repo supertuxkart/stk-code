@@ -165,7 +165,7 @@ void Log::printMessage(int level, const char *component, const char *format,
     }
 
     // If we don't have a console file, write to stdout and hope for the best
-    if(!m_file_stdout ||
+    if(!m_file_stdout || level >= LL_WARN ||
         UserConfigParams::m_log_errors_to_console) // log to console & file
     {
         VALIST out;

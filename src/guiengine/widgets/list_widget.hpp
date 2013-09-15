@@ -64,6 +64,12 @@ namespace GUIEngine
         /** \brief whether this list is sorted in descending order */
         bool m_sort_desc;
         
+        /** true when deault sorting is enabled */
+        bool m_sort_default;
+        
+        /** index of column*/
+        int m_sort_col;
+        
         struct Column
         {
             irr::core::stringw m_text;

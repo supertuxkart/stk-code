@@ -18,6 +18,7 @@
 
 #include "online/http_manager.hpp"
 #include "utils/translation.hpp"
+#include "utils/constants.hpp"
 
 #ifdef WIN32
 #  include <winsock2.h>

@@ -92,7 +92,7 @@ namespace Online
         // ------------------------------------------------------------------------
         irr::core::stringw loadingDots(bool spaces, float interval, int max_dots)
         {
-            int nr_dots = int(floor(Time::getRealTime() * (1 / interval))) % (max_dots+1);
+            int nr_dots = int(floor(StkTime::getRealTime() * (1 / interval))) % (max_dots+1);
             return irr::core::stringw((std::string(nr_dots,'.') + std::string(max_dots-nr_dots,' ')).c_str());
         }
     } // namespace messages

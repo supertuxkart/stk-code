@@ -244,7 +244,7 @@ FileManager::~FileManager()
         }
         struct stat mystat;
         stat(full_path.c_str(), &mystat);
-        Time::TimeType current = Time::getTimeSinceEpoch();
+        StkTime::TimeType current = StkTime::getTimeSinceEpoch();
         if(current - mystat.st_ctime <24*3600)
         {
             if(UserConfigParams::logAddons())

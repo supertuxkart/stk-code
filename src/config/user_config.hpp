@@ -171,14 +171,14 @@ public:
 // ============================================================================
 class TimeUserConfigParam : public UserConfigParam
 {
-    Time::TimeType m_value;
-    Time::TimeType m_default_value;
+    StkTime::TimeType m_value;
+    StkTime::TimeType m_default_value;
 
 public:
 
-    TimeUserConfigParam(Time::TimeType default_value, const char* param_name,
+    TimeUserConfigParam(StkTime::TimeType default_value, const char* param_name,
                         const char* comment = NULL);
-    TimeUserConfigParam(Time::TimeType default_value, const char* param_name,
+    TimeUserConfigParam(StkTime::TimeType default_value, const char* param_name,
                         GroupUserConfigParam* group, const char* comment=NULL);
 
     void write(XMLWriter& stream) const;
@@ -187,10 +187,10 @@ public:
 
     irr::core::stringw toString() const;
     void revertToDefaults()               { m_value = m_default_value;        }
-    operator Time::TimeType() const       { return m_value;                   }
-    Time::TimeType& operator=(const Time::TimeType& v)
+    operator StkTime::TimeType() const       { return m_value;                   }
+    StkTime::TimeType& operator=(const StkTime::TimeType& v)
                                           { m_value = v; return m_value;      }
-    Time::TimeType& operator=(const TimeUserConfigParam& v)
+    StkTime::TimeType& operator=(const TimeUserConfigParam& v)
                                           { m_value = (int)v; return m_value; }
 };   // TimeUserConfigParam
 

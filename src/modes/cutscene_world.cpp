@@ -198,7 +198,7 @@ void CutsceneWorld::update(float dt)
             curr->reset();
         }
         m_time = 0.01f;
-        m_time_at_second_reset = Time::getRealTime();
+        m_time_at_second_reset = StkTime::getRealTime();
         m_second_reset = true;
     }
     else if (m_second_reset)
@@ -213,7 +213,7 @@ void CutsceneWorld::update(float dt)
         }
 
         //m_time_at_second_reset = m_time;
-        m_time_at_second_reset = Time::getRealTime();
+        m_time_at_second_reset = StkTime::getRealTime();
         m_time = 0.01f;
     }
     else
@@ -221,7 +221,7 @@ void CutsceneWorld::update(float dt)
         // this way of calculating time and  dt is more in line with what
         // irrlicht does andprovides better synchronisation
         double prev_time = m_time;
-        double now = Time::getRealTime();
+        double now = StkTime::getRealTime();
         m_time = now - m_time_at_second_reset;
         dt = (float)(m_time - prev_time);
     }

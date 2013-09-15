@@ -243,9 +243,9 @@ void ConnectToServer::asynchronousUpdate()
         case CONNECTING: // waiting the server to answer our connection
             {
                 static double timer = 0;
-                if (Time::getRealTime() > timer+5.0) // every 5 seconds
+                if (StkTime::getRealTime() > timer+5.0) // every 5 seconds
                 {
-                    timer = Time::getRealTime();
+                    timer = StkTime::getRealTime();
                     NetworkManager::getInstance()->connect(m_server_address);
                     Log::info("ConnectToServer", "Trying to connect to %u:%u", m_server_address.ip, m_server_address.port);
                 }

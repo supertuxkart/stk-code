@@ -135,6 +135,9 @@ private:
 
     /** The torque to apply after hitting a bubble gum. */
     float        m_bubblegum_torque;
+    
+    /** True if fire button was pushed and not released */
+    bool         m_fire_clicked;
 
 
 

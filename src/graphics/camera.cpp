@@ -442,19 +442,12 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
  */
 void Camera::update(float dt)
 {
-    if (UserConfigParams::m_graphical_effects)
-    {
-        if (m_rain)
-        {
-            m_rain->setPosition( getCameraSceneNode()->getPosition() );
-            m_rain->update(dt);
-        }
-    }  // UserConfigParams::m_graphical_effects
-
+    float above_kart, cam_angle, side_way, distance;
+    bool  smoothing;
 
     // The following settings give a debug camera which shows the track from
     // high above the kart straight down.
-    if(UserConfigParams::m_camera_debug)
+    if (UserConfigParams::m_camera_debug)
     {
         core::vector3df xyz = m_kart->getXYZ().toIrrVector();
         m_camera->setTarget(xyz);
@@ -464,24 +457,18 @@ void Camera::update(float dt)
         // To view inside tunnels (FIXME 27>15 why??? makes no sense
         // - the kart should not be visible, but it works)
         m_camera->setNearValue(27.0);
-        return;
     }
 
-    if(m_mode==CM_FINAL)
+    else if (m_mode==CM_FINAL)
     {
         handleEndCamera(dt);
-        return;
     }
-
-    float above_kart, cam_angle, side_way, distance;
-    bool  smoothing;
-    getCameraSettings(&above_kart, &cam_angle, &side_way, &distance,
-                      &smoothing);
 
     // If an explosion is happening, stop moving the camera,
     // but keep it target on the kart.
-    if(dynamic_cast<ExplosionAnimation*>(m_kart->getKartAnimation()))
+    else if (dynamic_cast<ExplosionAnimation*>(m_kart->getKartAnimation()))
     {
+        getCameraSettings(&above_kart, &cam_angle, &side_way, &distance, &smoothing);
         // The camera target needs to be 'smooth moved', otherwise
         // there will be a noticable jump in the first frame
 
@@ -495,10 +482,19 @@ void Camera::update(float dt)
         current_target += ((wanted_target-current_target)*m_target_speed)*dt;
 
         m_camera->setTarget(current_target);
-        return;
     }
 
-    positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing);
+    else
+    {
+        getCameraSettings(&above_kart, &cam_angle, &side_way, &distance, &smoothing);
+        positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing);
+    }
+
+    if (UserConfigParams::m_graphical_effects && m_rain)
+    {
+        m_rain->setPosition( getCameraSceneNode()->getPosition() );
+        m_rain->update(dt);
+    }  // UserConfigParams::m_graphical_effects
 }   // update
 
 // ----------------------------------------------------------------------------

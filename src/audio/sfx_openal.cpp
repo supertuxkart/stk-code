@@ -20,11 +20,11 @@
 #if HAVE_OGGVORBIS
 
 #include "audio/sfx_openal.hpp"
+
 #include "audio/sfx_buffer.hpp"
+#include "config/user_config.hpp"
+#include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
-#include <assert.h>
-#include <stdio.h>
-#include <string>
 
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
@@ -32,8 +32,16 @@
 #  include <AL/al.h>
 #endif
 
-#include "config/user_config.hpp"
-#include "io/file_manager.hpp"
+#include <assert.h>
+#include <stdio.h>
+#include <string>
+
+#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
+#  define isnan _isnan
+#else
+#  include <math.h>
+#endif
+
 
 SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, bool ownsBuffer) : SFXBase()
 {
@@ -121,7 +129,7 @@ bool SFXOpenAL::init()
  */
 void SFXOpenAL::speed(float factor)
 {
-    if(!m_ok) return;
+    if(!m_ok || isnan(factor)) return;
 
     //OpenAL only accepts pitches in the range of 0.5 to 2.0
     if(factor > 2.0f)

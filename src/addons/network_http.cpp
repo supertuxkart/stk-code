@@ -270,7 +270,7 @@ CURLcode NetworkHttp::init(bool forceRefresh)
     bool download = UserConfigParams::m_news_last_updated==0  ||
                     UserConfigParams::m_news_last_updated
                         +UserConfigParams::m_news_frequency
-                    < Time::getTimeSinceEpoch() || forceRefresh;
+                    < StkTime::getTimeSinceEpoch() || forceRefresh;
 
     if(!download)
     {
@@ -303,7 +303,7 @@ CURLcode NetworkHttp::init(bool forceRefresh)
     {
         std::string xml_file = file_manager->getAddonsFile("news.xml");
         if(download)
-            UserConfigParams::m_news_last_updated = Time::getTimeSinceEpoch();
+            UserConfigParams::m_news_last_updated = StkTime::getTimeSinceEpoch();
         const XMLNode *xml = new XMLNode(xml_file);
 
         // A proper news file has at least a version number, mtime, and
@@ -319,7 +319,7 @@ CURLcode NetworkHttp::init(bool forceRefresh)
             status = downloadFileInternal(&r);
             if(status==CURLE_OK)
                 UserConfigParams::m_news_last_updated =
-                    Time::getTimeSinceEpoch();
+                    StkTime::getTimeSinceEpoch();
             delete xml;
             xml = new XMLNode(xml_file);
         }
@@ -416,7 +416,7 @@ CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
                                      bool forceRefresh)
 {
     std::string    addon_list_url("");
-    Time::TimeType mtime(0);
+    StkTime::TimeType mtime(0);
     const XMLNode *include = xml->getNode("include");
     if(include)
     {
@@ -456,7 +456,7 @@ CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
     {
         std::string xml_file = file_manager->getAddonsFile("addons.xml");
         if(download)
-            UserConfigParams::m_addons_last_updated=Time::getTimeSinceEpoch();
+            UserConfigParams::m_addons_last_updated=StkTime::getTimeSinceEpoch();
         const XMLNode *xml = new XMLNode(xml_file);
         addons_manager->initOnline(xml);
         if(UserConfigParams::logAddons())

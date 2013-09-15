@@ -20,6 +20,7 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_buffer.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"

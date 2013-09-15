@@ -196,6 +196,8 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
+static void cleanSuperTuxKart();
+
 // ============================================================================
 //                        gamepad visualisation screen
 // ============================================================================
@@ -1098,8 +1100,12 @@ int handleCmdLine(int argc, char **argv)
 #endif
         else
         {
+            // invalid param needs to go to console
+            UserConfigParams::m_log_errors_to_console = true;
+
             Log::error("main", "Invalid parameter: %s.\n", argv[i] );
             cmdLineHelp(argv[0]);
+            cleanSuperTuxKart();
             return 0;
         }
     }   // for i <argc
@@ -1239,7 +1245,7 @@ void initRest()
 //=============================================================================
 /** Frees all manager and their associated memory.
  */
-void cleanSuperTuxKart()
+static void cleanSuperTuxKart()
 {
     irr_driver->updateConfigIfRelevant();
 

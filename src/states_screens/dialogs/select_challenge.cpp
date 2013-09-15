@@ -17,6 +17,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"

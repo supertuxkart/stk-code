@@ -71,7 +71,7 @@ void KartUpdateProtocol::update()
     if (!World::getWorld())
         return;
     static double time = 0;
-    double current_time = Time::getRealTime();
+    double current_time = StkTime::getRealTime();
     if (current_time > time + 0.1) // 10 updates per second
     {
         time = current_time;

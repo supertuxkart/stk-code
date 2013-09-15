@@ -43,9 +43,9 @@ void STKHost::logPacket(const NetworkString ns, bool incoming)
         return;
     pthread_mutex_lock(&m_log_mutex);
     if (incoming)
-        fprintf(m_log_file, "[%d\t]  <--  ", (int)(Time::getRealTime()));
+        fprintf(m_log_file, "[%d\t]  <--  ", (int)(StkTime::getRealTime()));
     else
-        fprintf(m_log_file, "[%d\t]  -->  ", (int)(Time::getRealTime()));
+        fprintf(m_log_file, "[%d\t]  -->  ", (int)(StkTime::getRealTime()));
     for (int i = 0; i < ns.size(); i++)
     {
         fprintf(m_log_file, "%d.", ns[i]);
@@ -170,10 +170,7 @@ void STKHost::stopListening()
     if(m_listening_thread)
     {
         pthread_mutex_unlock(&m_exit_mutex); // will stop the update function on its next update
-        while (m_listening == true)
-        {
-            Time::sleep(1);
-        }
+        pthread_join(*m_listening_thread, NULL); // wait the thread to end
     }
 }
 
@@ -210,7 +207,7 @@ uint8_t* STKHost::receiveRawPacket()
     {
         i++;
         len = recv(m_host->socket,(char*)buffer,2048, 0);
-        Time::sleep(1);
+        StkTime::sleep(1);
     }
     STKHost::logPacket(NetworkString(std::string((char*)(buffer), len)), true);
     return buffer;
@@ -236,7 +233,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
     {
         i++;
         len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, (struct sockaddr*)(&addr), &from_len);
-        Time::sleep(1); // wait 1 millisecond between two checks
+        StkTime::sleep(1); // wait 1 millisecond between two checks
     }
 	if (len == SOCKET_ERROR)
 	{
@@ -284,7 +281,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
 		uint32_t addr2 = sender.ip;
 		uint32_t addr3 = ntohl(addr1);
 		uint32_t addr4 = ntohl(addr2);
-        Time::sleep(1); // wait 1 millisecond between two checks
+        StkTime::sleep(1); // wait 1 millisecond between two checks
         if (i >= max_tries && max_tries != -1)
         {
             Log::verbose("STKHost", "No answer from the server on %u.%u.%u.%u:%u", (m_host->address.host&0xff),

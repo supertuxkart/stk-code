@@ -31,9 +31,9 @@
 #endif
 
 #include <string>
-#include "graphics/irr_driver.hpp"
+#include <stdio.h>
 
-class Time
+class StkTime
 {
 public:
     typedef time_t TimeType;
@@ -83,10 +83,7 @@ public:
      *  time of the application, 1.1.1970, ...).
      *  The value is a double precision floating point value in seconds.
      */
-    static double getRealTime(long startAt=0)
-    {
-        return irr_driver->getDevice()->getTimer()->getRealTime()/1000.0;
-    };   // getTimeSinceEpoch
+    static double getRealTime(long startAt=0);
 
     // ------------------------------------------------------------------------
     /**

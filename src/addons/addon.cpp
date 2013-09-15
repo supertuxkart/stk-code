@@ -162,7 +162,7 @@ void Addon::writeXML(std::ofstream *out_stream)
 // ----------------------------------------------------------------------------
 std::string Addon::getDateAsString() const
 {
-    return Time::toString(m_date);
+    return StkTime::toString(m_date);
 }   // getDateAsString
 
 // ----------------------------------------------------------------------------

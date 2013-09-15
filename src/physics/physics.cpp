@@ -20,6 +20,7 @@
 
 #include "animations/three_d_animation.hpp"
 #include "karts/abstract_kart.hpp"
+#include "graphics/irr_driver.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
 #include "items/flyable.hpp"

@@ -19,6 +19,7 @@
 #include "tracks/track_object.hpp"
 
 #include "animations/three_d_animation.hpp"
+#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"

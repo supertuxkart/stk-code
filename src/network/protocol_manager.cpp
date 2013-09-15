@@ -34,7 +34,7 @@ void* protocolManagerUpdate(void* data)
     while(manager && !manager->exit())
     {
         manager->update();
-        Time::sleep(2);
+        StkTime::sleep(2);
     }
     return NULL;
 }
@@ -45,7 +45,7 @@ void* protocolManagerAsynchronousUpdate(void* data)
     while(manager && !manager->exit())
     {
         manager->asynchronousUpdate();
-        Time::sleep(2);
+        StkTime::sleep(2);
     }
     manager->m_asynchronous_thread_running = false;
     return NULL;
@@ -82,10 +82,8 @@ ProtocolManager::~ProtocolManager()
 void ProtocolManager::abort()
 {
     pthread_mutex_unlock(&m_exit_mutex); // will stop the update function
-    while (m_asynchronous_thread_running) // wait the thread to finish before we delete all mutexes etc..
-    {
-        Time::sleep(2);
-    }
+    pthread_join(*m_asynchronous_update_thread, NULL);
+
     pthread_mutex_lock(&m_events_mutex);
     pthread_mutex_lock(&m_protocols_mutex);
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
@@ -153,7 +151,7 @@ void ProtocolManager::notifyEvent(Event* event)
     if (protocols_ids.size() != 0)
     {
         EventProcessingInfo epi;
-        epi.arrival_time = Time::getTimeSinceEpoch();
+        epi.arrival_time = StkTime::getTimeSinceEpoch();
         epi.event = event2;
         epi.protocols_ids = protocols_ids;
         m_events_to_process.push_back(epi); // add the event to the queue
@@ -346,7 +344,7 @@ bool ProtocolManager::propagateEvent(EventProcessingInfo* event, bool synchronou
                 index++;
         }
     }
-    if (event->protocols_ids.size() == 0 || (Time::getTimeSinceEpoch()-event->arrival_time) >= TIME_TO_KEEP_EVENTS)
+    if (event->protocols_ids.size() == 0 || (StkTime::getTimeSinceEpoch()-event->arrival_time) >= TIME_TO_KEEP_EVENTS)
     {
         // because we made a copy of the event
         delete event->event->peer; // no more need of that

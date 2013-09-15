@@ -97,7 +97,7 @@ void ConnectToPeer::asynchronousUpdate()
                         char data[] = "aloha_stk\0";
                         host->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
                         Log::info("ConnectToPeer", "Broadcast aloha sent.");
-                        Time::sleep(1);
+                        StkTime::sleep(1);
                         broadcast_address.ip = 0x7f000001; // 127.0.0.1 (localhost)
                         broadcast_address.port = m_peer_address.port;
                         host->sendRawPacket((uint8_t*)(data), 10, broadcast_address);

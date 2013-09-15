@@ -149,7 +149,7 @@ using namespace gui;
 		gui::IGUIFont *OverrideFont, *LastBreakFont;
 		IOSOperator* Operator;
 
-        Time::TimeType BlinkStartTime;
+        StkTime::TimeType BlinkStartTime;
 		s32 CursorPos;
 		s32 HScrollPos, VScrollPos; // scroll position in characters
 		u32 Max;

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,33 +16,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network/protocols/ping_protocol.hpp"
-
-#include "network/network_manager.hpp"
 #include "utils/time.hpp"
+#include "graphics/irr_driver.hpp"
 
-PingProtocol::PingProtocol(const TransportAddress& ping_dst, double delay_between_pings) : Protocol(NULL, PROTOCOL_SILENT)
+/** Returns a time based on an arbitrary 'epoch' (e.g. could be start
+ *  time of the application, 1.1.1970, ...).
+ *  The value is a double precision floating point value in seconds.
+ */
+double StkTime::getRealTime(long startAt)
 {
-    m_ping_dst = ping_dst;
-    m_delay_between_pings = delay_between_pings;
-}
-
-PingProtocol::~PingProtocol()
-{
-}
-
-void PingProtocol::setup()
-{
-    m_last_ping_time = 0;
-}
-
-void PingProtocol::asynchronousUpdate()
-{
-    if (StkTime::getRealTime() > m_last_ping_time+m_delay_between_pings)
-    {
-        m_last_ping_time = StkTime::getRealTime();
-        uint8_t data = 0;
-        NetworkManager::getInstance()->getHost()->sendRawPacket(&data, 1, m_ping_dst);
-        Log::info("PingProtocol", "Ping message sent");
-    }
-}
+    return irr_driver->getRealTime()/1000.0;
+}   // getTimeSinceEpoch

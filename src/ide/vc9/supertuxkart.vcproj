@@ -758,6 +758,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\utils\time.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\translation.cpp"
 					>
 				</File>

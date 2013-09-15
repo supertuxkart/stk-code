@@ -21,6 +21,7 @@
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
+#include "graphics/irr_driver.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
 #include "karts/controller/controller.hpp"
