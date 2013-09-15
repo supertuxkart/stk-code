@@ -234,7 +234,7 @@ namespace Online{
     void Profile::addFriend( const uint32_t id)
     {
         assert (m_has_fetched_friends);
-        for(int i=0; i< m_friends.size(); i++)
+        for(unsigned int i=0; i< m_friends.size(); i++)
             if(m_friends[i] == id)
                 return;
         m_friends.push_back(id);

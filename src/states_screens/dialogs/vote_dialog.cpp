@@ -114,8 +114,7 @@ void VoteDialog::onUpdate(float dt)
             if(m_fetch_vote_request->isSuccess())
             {
                 m_info_widget->setDefaultColor();
-                m_info_widget->setText(_("bla"), false); //FIXME
-                std::string voted;
+                std::string voted("");
                 m_fetch_vote_request->getResult()->get("voted", &voted);
                 if(voted == "yes")
                 {

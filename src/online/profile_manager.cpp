@@ -221,7 +221,7 @@ namespace Online{
             return m_profiles_persistent[id];
         if(cacheHit(id))
             return m_profiles_cache[id];
-        //FIXME not able to get! fetch it ourselves and put it in cache
+        //FIXME not able to get! Now this should actually fetch the info from the server, but I haven't come up with a good asynchronous idea yet.
         return NULL;
     }
 

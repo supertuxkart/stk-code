@@ -214,7 +214,7 @@ namespace Online{
     }
 
     // ============================================================================
-    const CurrentUser::SignOutRequest * CurrentUser::requestSignOut(){
+    void CurrentUser::requestSignOut(){
         assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
         SignOutRequest * request = new SignOutRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
@@ -223,7 +223,6 @@ namespace Online{
         request->setParameter("userid", getID());
         HTTPManager::get()->addRequest(request);
         m_state = US_SIGNING_OUT;
-        return request;
     }
 
     void CurrentUser::signOut(bool success, const XMLNode * input)
@@ -647,7 +646,7 @@ namespace Online{
             }
         }
         // FIXME show connection error??
-        // after 2 misses I'll show something
+        // Perhaps show something after 2 misses.
 
     }
     // ============================================================================

@@ -61,7 +61,7 @@ namespace Online{
             {
                 virtual void callback ();
             public:
-                SignOutRequest() : XMLRequest() {}
+                SignOutRequest() : XMLRequest(true) {}
             };
 
             class ServerCreationRequest : public XMLRequest {
@@ -151,7 +151,7 @@ namespace Online{
                                                             const irr::core::stringw &password,
                                                             bool save_session,
                                                             bool request_now = true);
-            const SignOutRequest *          requestSignOut();
+            void                            requestSignOut();
             const ServerCreationRequest *   requestServerCreation(const irr::core::stringw &name, int max_players);
             ServerJoinRequest *             requestServerJoin(uint32_t server_id, bool request_now = true);
 

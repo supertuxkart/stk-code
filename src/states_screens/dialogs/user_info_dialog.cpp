@@ -210,6 +210,7 @@ bool UserInfoDialog::onEscapePressed()
 
 // -----------------------------------------------------------------------------
 
+
 void UserInfoDialog::onUpdate(float dt)
 {
     if(m_processing) m_info_widget->setText(Messages::processing(), false);
