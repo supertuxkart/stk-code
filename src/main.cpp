@@ -139,6 +139,7 @@
 #include <IEventReceiver.h>
 
 #include "main_loop.hpp"
+#include "achievements/achievements_manager.hpp"
 #include "addons/addons_manager.hpp"
 #include "addons/inetwork_http.hpp"
 #include "addons/news_manager.hpp"
@@ -155,6 +156,7 @@
 #include "graphics/referee.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
+#include "guiengine/dialog_queue.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/wiimote_manager.hpp"
@@ -180,6 +182,8 @@
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "online/current_user.hpp"
 #include "online/http_manager.hpp"
+#include "online/profile_manager.hpp"
+#include "online/servers_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -1200,6 +1204,8 @@ void initRest()
     // to network_http (since the thread might use network_http, otherwise
     // a race condition can be introduced resulting in a crash).
     INetworkHttp::get()->startNetworkThread();
+    Online::HTTPManager::get()->startNetworkThread();
+    AchievementsManager::get()->init();
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -1253,9 +1259,15 @@ static void cleanSuperTuxKart()
         INetworkHttp::get()->stopNetworkThread();
     if(Online::HTTPManager::isRunning())
         Online::HTTPManager::get()->stopNetworkThread();
-    //delete in reverse order of what they were created in.
+
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
+    Online::ServersManager::deallocate();
+    Online::ProfileManager::deallocate();
+    AchievementsManager::deallocate();
+    Online::CurrentUser::deallocate();
+    GUIEngine::DialogQueue::deallocate();
+
     Referee::cleanup();
     if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
@@ -1300,6 +1312,7 @@ static void cleanSuperTuxKart()
 
     StateManager::deallocate();
     GUIEngine::EventHandler::deallocate();
+    Online::HTTPManager::deallocate();
 }   // cleanSuperTuxKart
 
 //=============================================================================
@@ -1522,7 +1535,6 @@ int main(int argc, char *argv[] )
             // Go straight to the race
             StateManager::get()->enterGameState();
         }
-
 
         // If an important news message exists it is shown in a popup dialog.
         const core::stringw important_message =

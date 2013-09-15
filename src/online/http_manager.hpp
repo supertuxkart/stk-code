@@ -49,7 +49,6 @@ namespace Online{
         protected:
 
             float                     m_time_since_poll;
-            bool                      m_polling;
 
             /** The current requested being worked on. */
             Online::Request *         m_current_request;
@@ -77,20 +76,17 @@ namespace Online{
             void handleResultQueue();
 
             static void  *mainLoop(void *obj);
-            void startNetworkThread();
 
             HTTPManager(); //const std::string &url
             ~HTTPManager();
 
         public:
+            static const int MAX_PRIORITY = 9999;
 
             // singleton
             static HTTPManager* get();
             static void deallocate();
             static bool isRunning();
-
-            void startPolling(){ m_polling = true; }
-            void stopPolling(){  m_polling = false; }
 
             //Execute
             std::string getPage(Online::Request * request);
@@ -99,6 +95,7 @@ namespace Online{
             void synchronousRequest(Online::Request *request);
             void addRequest(Online::Request *request);
             void cancelAllDownloads();
+            void startNetworkThread();
             void stopNetworkThread();
 
             bool getAbort(){ return m_abort.getAtomic(); };

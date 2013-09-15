@@ -37,8 +37,30 @@ public:
     class Listener
     {
     public :
-        virtual void onSuccess() const = 0;
+        virtual void onClose() const = 0;
     };
+
+    enum Message
+    {
+        Normal                  = 0,    // If the user presses the sign in button himself
+        Signing_In_Required     = 1,    // If the user needs to be signed in
+        Registration_Required   = 2     // If the user needs to be registered
+    };
+
+    /**
+     * Creates a modal dialog with given percentage of screen width and height
+     */
+    LoginDialog(const Message = Normal, const LoginDialog::Listener * = NULL);
+    ~LoginDialog();
+
+    virtual void onEnterPressedInternal();
+    void success();
+    void error(const irr::core::stringw & error_message);
+
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+
+    virtual bool onEscapePressed();
+    virtual void onUpdate(float dt);
 
 private:
     
@@ -48,7 +70,7 @@ private:
     bool m_open_registration_dialog;
     bool m_open_recovery_dialog;
     bool m_success;
-    const Online::CurrentUser::SignInRequest * m_sign_in_request;
+
     GUIEngine::LabelWidget * m_message_widget;
     GUIEngine::TextBoxWidget * m_username_widget;
     GUIEngine::TextBoxWidget * m_password_widget;
@@ -63,29 +85,6 @@ private:
     GUIEngine::IconButtonWidget * m_cancel_widget;
     
     void login();
-
-public:
-    
-    enum Message
-    {
-        Normal                  = 1,    // If the user presses the sign in button himself
-        Signing_In_Required     = 2,    // If the user needs to be signed in
-        Registration_Required   = 3     // If the user needs to be registered
-    };
-
-    /**
-     * Creates a modal dialog with given percentage of screen width and height
-     */
-    LoginDialog(const Message, const LoginDialog::Listener * = NULL);
-    ~LoginDialog();
-
-    void onEnterPressedInternal();
-
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
-    virtual bool onEscapePressed();
-    virtual void onUpdate(float dt);
-    //virtual void onTextUpdated();
 };
 
 #endif

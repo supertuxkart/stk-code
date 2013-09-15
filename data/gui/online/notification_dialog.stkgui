@@ -8,7 +8,7 @@
         
         <buttonbar id="options" width="90%" height="30%" align="center">
             <icon-button id="view" width="64" height="64" icon="gui/difficulty_medium.png"
-                         I18N="User info dialog"  text="View friends" label_location="bottom"/>
+                         I18N="User info dialog"  text="View" label_location="bottom"/>
             <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
                          I18N="User info dialog" text="Close" label_location="bottom"/>
         </buttonbar>

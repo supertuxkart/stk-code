@@ -49,6 +49,7 @@ namespace Online{
     ProfileManager::ProfileManager()
     {
         assert(m_max_cache_size > 1);
+        m_currently_visiting = NULL;
     }
 
     // ============================================================================
@@ -58,7 +59,7 @@ namespace Online{
         for ( it = m_profiles_persistent.begin(); it != m_profiles_persistent.end(); ++it ) {
             delete it->second;
         }
-        for ( it = m_profiles_cache.begin(); it != m_profiles_persistent.end(); ++it ) {
+        for ( it = m_profiles_cache.begin(); it != m_profiles_cache.end(); ++it ) {
             delete it->second;
         }
     }
@@ -224,6 +225,7 @@ namespace Online{
             return m_profiles_persistent[id];
         if(cacheHit(id))
             return m_profiles_cache[id];
+        //FIXME not able to get! fetch it ourselves and put it in cache
         return NULL;
     }
 

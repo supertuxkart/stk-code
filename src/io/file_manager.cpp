@@ -844,7 +844,7 @@ std::string FileManager::checkAndCreateLinuxDir(const char *env_name,
 void FileManager::redirectOutput()
 {
     //Enable logging of stdout and stderr to logfile
-    std::string logoutfile = getLogFile("stdout.log");
+    std::string logoutfile = getConfigFile("stdout.log");
     Log::verbose("main", "Error messages and other text output will "
                          "be logged to %s.", logoutfile.c_str());
     Log::openOutputFiles(logoutfile);
@@ -873,16 +873,6 @@ std::string FileManager::getConfigDir() const
 {
     return m_config_dir;
 }   // getConfigDir
-
-//-----------------------------------------------------------------------------
-/** Returns the full path of a file in the user config directory which is
- *  used to store stdout/stderr if it is redirected.
- *  \param name Name of the file.
- */
-std::string FileManager::getLogFile(const std::string& file_name) const
-{
-    return getConfigDir()+"/"+file_name;
-}   // getLogFile
 
 //-----------------------------------------------------------------------------
 /** Returns the full path of a music file by searching all music search paths.
@@ -921,33 +911,14 @@ std::string FileManager::getFontFile(const std::string& file_name) const
 }   // getFontFile
 
 //-----------------------------------------------------------------------------
-/** Returns the full path of a highscore file (which is stored in the user
- *  specific config directory).
- *  \param file_name Name of the sound effect file.
- */
-std::string FileManager::getHighscoreFile(const std::string& file_name) const
-{
-    return getConfigDir()+"/"+file_name;
-}   // getHighscoreFile
-
-//-----------------------------------------------------------------------------
-/** Returns the full path of the challenge file (which is stored in a user
- *  specific config area).
+/** Returns the full path of a file in the config dir
  *  \param file_name Name of the file.
  */
-std::string FileManager::getChallengeFile(const std::string &file_name) const
+std::string FileManager::getConfigFile(const std::string &file_name) const
 {
-    return getConfigDir()+"/"+file_name;
+    return getConfigDir()+file_name;
 }   // getChallengeFile
 
-//-----------------------------------------------------------------------------
-/** Returns the full path of the tutorial file.
- *  \param file_name Name of the tutorial file to return.
- */
-std::string FileManager::getTutorialFile(const std::string &file_name) const
-{
-    return getConfigDir()+"/"+file_name;
-}   // getTutorialFile
 
 //-----------------------------------------------------------------------------
 /** Returns true if the given name is a directory.

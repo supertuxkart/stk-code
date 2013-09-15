@@ -24,6 +24,7 @@
 #include <vector>
 #include <sstream>
 #include <irrString.h>
+#include "utils/types.hpp"
 
 namespace StringUtils
 {
@@ -92,7 +93,9 @@ namespace StringUtils
                                           bool keepSplitChar=false);
     std::vector<irr::core::stringw> split(const irr::core::stringw& s,
                                           char c, bool keepSplitChar=false);
-    std::vector<std::string>         splitPath(const std::string& path);
+    std::vector<uint32_t>           splitToUInt(const std::string& s, char c,
+                                                bool keepSplitChar=false);
+    std::vector<std::string>        splitPath(const std::string& path);
 
     // ------------------------------------------------------------------------
     /**
@@ -413,6 +416,8 @@ namespace StringUtils
 
     /** Compute a simple hash of a string */
     unsigned int simpleHash(const char* input);
+
+    const char* boolstr(bool b);
 } // namespace StringUtils
 
 #endif

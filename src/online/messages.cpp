@@ -35,14 +35,9 @@ namespace Online
             return irr::core::stringw(_("Signing out")) + loadingDots();
         }
         // ------------------------------------------------------------------------
-        irr::core::stringw signingUp()
+        irr::core::stringw validatingInfo()
         {
-            return irr::core::stringw(_("Validating registration info")) + loadingDots();
-        }
-        // ------------------------------------------------------------------------
-        irr::core::stringw recovery()
-        {
-            return irr::core::stringw(_("Validating recovery info")) + loadingDots();
+            return irr::core::stringw(_("Validating info")) + loadingDots();
         }
         // ------------------------------------------------------------------------
         irr::core::stringw searching()
@@ -80,6 +75,13 @@ namespace Online
         irr::core::stringw fetchingFriends()
         {
             return irr::core::stringw(_("Fetching friends")) + loadingDots();
+        }
+
+        // ------------------------------------------------------------------------
+
+        irr::core::stringw fetchingAchievements()
+        {
+            return irr::core::stringw(_("Fetching achievements")) + loadingDots();
         }
 
         // ------------------------------------------------------------------------

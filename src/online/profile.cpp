@@ -63,6 +63,7 @@ namespace Online{
         m_is_current_user = is_current_user;
         m_username = username;
         m_has_fetched_friends = false;
+        m_has_fetched_achievements = false;
         m_relation_info = NULL;
         m_is_friend = false;
     }
@@ -100,6 +101,7 @@ namespace Online{
         xml->get("user_name", &m_username);
         m_cache_bit = true;
         m_has_fetched_friends = false;
+        m_has_fetched_achievements = false;
         m_is_current_user = (m_id == CurrentUser::get()->getID());
         m_state = S_READY;
     }
@@ -107,6 +109,52 @@ namespace Online{
     Profile::~Profile()
     {
         delete m_relation_info;
+    }
+
+    // ============================================================================
+    void Profile::fetchAchievements()
+    {
+        assert(CurrentUser::get()->isRegisteredUser());
+        if(m_has_fetched_achievements || m_is_current_user)
+            return;
+        m_state = S_FETCHING;
+        requestAchievements();
+    }
+
+    // ============================================================================
+    void Profile::achievementsCallback(const XMLNode * input)
+    {
+        m_achievements.clear();
+        std::string achieved_string("");
+        if(input->get("achieved", &achieved_string) == 1)
+        {
+            m_achievements = StringUtils::splitToUInt(achieved_string, ' ');
+        }
+        m_has_fetched_achievements = true;
+        m_state = S_READY;
+        Log::info("test","tit");
+    }
+
+    // ============================================================================
+
+    void Profile::requestAchievements()
+    {
+        assert(CurrentUser::get()->isRegisteredUser() && !m_is_current_user);
+        AchievementsRequest * request = new AchievementsRequest();
+        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
+        request->setParameter("action",std::string("get-achievements"));
+        request->setParameter("token", CurrentUser::get()->getToken());
+        request->setParameter("userid", CurrentUser::get()->getID());
+        request->setParameter("visitingid", m_id);
+        HTTPManager::get()->addRequest(request);
+    }
+
+    void Profile::AchievementsRequest::callback()
+    {
+        uint32_t user_id(0);
+        m_result->get("visitingid", &user_id);
+        if( ProfileManager::get()->getProfileByID(user_id) != NULL )
+            ProfileManager::get()->getProfileByID(user_id)->achievementsCallback(m_result);
     }
 
     // ============================================================================
@@ -119,8 +167,6 @@ namespace Online{
         requestFriendsList();
     }
     // ============================================================================
-
-
     void Profile::friendsListCallback(const XMLNode * input)
     {
         const XMLNode * friends_xml = input->getNode("friends");
@@ -144,11 +190,11 @@ namespace Online{
         m_state = S_READY;
     }
 
-
     // ============================================================================
 
     void Profile::requestFriendsList()
     {
+        assert(CurrentUser::get()->isRegisteredUser());
         FriendsListRequest * request = new FriendsListRequest();
         request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
         request->setParameter("action",std::string("get-friends-list"));
@@ -162,8 +208,8 @@ namespace Online{
     {
         uint32_t user_id(0);
         m_result->get("visitingid", &user_id);
-        assert(ProfileManager::get()->getProfileByID(user_id) != NULL);
-        ProfileManager::get()->getProfileByID(user_id)->friendsListCallback(m_result);
+        if( ProfileManager::get()->getProfileByID(user_id) != NULL )
+            ProfileManager::get()->getProfileByID(user_id)->friendsListCallback(m_result);
     }
 
     // ============================================================================
@@ -201,12 +247,17 @@ namespace Online{
     }
 
     // ============================================================================
-
     const std::vector<uint32_t> & Profile::getFriends()
     {
         assert (m_has_fetched_friends && m_state == S_READY);
         return m_friends;
     }
+
     // ============================================================================
+    const std::vector<uint32_t> & Profile::getAchievements()
+    {
+        assert (m_has_fetched_achievements && m_state == S_READY && !m_is_current_user);
+        return m_achievements;
+    }
 
 } // namespace Online

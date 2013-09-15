@@ -49,16 +49,17 @@ namespace Online{
         if (http_singleton == NULL)
         {
             http_singleton = new HTTPManager();
-            http_singleton->startNetworkThread();
-            CurrentUser::get()->requestSavedSession();
         }
         return http_singleton;
     }   // get
 
     void HTTPManager::deallocate()
     {
-        delete http_singleton;
-        http_singleton = NULL;
+        if (http_singleton != NULL)
+        {
+            delete http_singleton;
+            http_singleton = NULL;
+        }
     }   // deallocate
 
     bool HTTPManager::isRunning()
@@ -71,12 +72,16 @@ namespace Online{
         curl_global_init(CURL_GLOBAL_DEFAULT);
         pthread_cond_init(&m_cond_request, NULL);
         m_abort.setAtomic(false);
-        m_time_since_poll = MENU_POLLING_INTERVAL * (2.0/3.0);
-        m_polling = false;
+        m_time_since_poll = MENU_POLLING_INTERVAL * 0.9;
     }
 
     // ============================================================================
     HTTPManager::~HTTPManager(){
+        m_thread_id.lock();
+        pthread_join(*m_thread_id.getData(), NULL);
+        delete m_thread_id.getData();
+        m_thread_id.unlock();
+        pthread_cond_destroy(&m_cond_request);
         curl_global_cleanup();
     }
 
@@ -109,8 +114,8 @@ namespace Online{
             Log::error("HTTP Manager", "Could not create thread, error=%d.\n", errno);
         }
         pthread_attr_destroy(&attr);
+        CurrentUser::get()->requestSavedSession();
     }   // startNetworkThread
-
 
 
     // ---------------------------------------------------------------------------
@@ -127,8 +132,9 @@ namespace Online{
         // and we couldn't finish STK. This way we request an abort of
         // a download, which mean we can get the mutex and ask the service
         // thread here to cancel properly.
-        cancelAllDownloads();
-        addRequest(new Request(true, 9999, Request::RT_QUIT));
+        //cancelAllDownloads(); FIXME if used this way it also cancels the client-quit action
+        CurrentUser::get()->onSTKQuit();
+        addRequest(new Request(true, MAX_PRIORITY, Request::RT_QUIT));
     }   // stopNetworkThread
 
 
@@ -183,7 +189,7 @@ namespace Online{
     {
         HTTPManager *me = (HTTPManager*) obj;
 
-        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,      NULL);
+        //pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,      NULL);
 
         me->m_current_request = NULL;
         me->m_request_queue.lock();
@@ -216,7 +222,6 @@ namespace Online{
             delete request;
         }
         me->m_request_queue.unlock();
-
         pthread_exit(NULL);
         return 0;
     }   // mainLoop

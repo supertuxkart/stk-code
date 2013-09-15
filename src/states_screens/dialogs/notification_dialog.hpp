@@ -36,7 +36,8 @@ class NotificationDialog : public GUIEngine::ModalDialog
 public:
     enum Type
     {
-        T_Friends = 1
+        T_Friends = 1,
+        T_Achievements = 2
     };
 
 private:

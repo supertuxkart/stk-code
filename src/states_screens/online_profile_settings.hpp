@@ -16,8 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef __HEADER_ONLINE_PROFILE_FRIENDS_HPP__
-#define __HEADER_ONLINE_PROFILE_FRIENDS_HPP__
+#ifndef __HEADER_ONLINE_PROFILE_SETTINGS_HPP__
+#define __HEADER_ONLINE_PROFILE_SETTINGS_HPP__
 
 #include <string>
 #include <irrString.h>
@@ -25,8 +25,6 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
 #include "states_screens/online_profile_base.hpp"
-#include "online/profile_manager.hpp"
-
 
 namespace GUIEngine { class Widget; }
 
@@ -35,35 +33,24 @@ namespace GUIEngine { class Widget; }
   * \brief Online profiel overview screen
   * \ingroup states_screens
   */
-class OnlineProfileFriends : public OnlineProfileBase, public GUIEngine::ScreenSingleton<OnlineProfileFriends>
+class OnlineProfileSettings : public OnlineProfileBase, public GUIEngine::ScreenSingleton<OnlineProfileSettings>
 {
-private:
-    OnlineProfileFriends();
-
-    GUIEngine::ListWidget *     m_friends_list_widget;
-    GUIEngine::ButtonWidget *   m_search_button_widget;
-    GUIEngine::TextBoxWidget *  m_search_box_widget;
-
-    int                         m_selected_friend_index;
-    bool                        m_waiting_for_friends;
+protected:
+    OnlineProfileSettings();
+    GUIEngine::ButtonWidget * m_change_password_button;
 
 public:
-    friend class GUIEngine::ScreenSingleton<OnlineProfileFriends>;
+    friend class GUIEngine::ScreenSingleton<OnlineProfileSettings>;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID) OVERRIDE;
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+                               const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
-
-    virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver) OVERRIDE;
-
-    virtual void beforeAddingWidget() OVERRIDE;
-
-    virtual void refreshFriendsList() {m_waiting_for_friends = true; }
 };
 
 #endif

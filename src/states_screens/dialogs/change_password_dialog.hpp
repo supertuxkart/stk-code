@@ -16,51 +16,55 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef HEADER_VOTE_DIALOG_HPP
-#define HEADER_VOTE_DIALOG_HPP
+#ifndef HEADER_CHANGE_PASSWORD_DIALOG_HPP
+#define HEADER_CHANGE_PASSWORD_DIALOG_HPP
 
 #include <irrString.h>
 
+#include "online/current_user.hpp"
+
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/current_user.hpp"
-#include "states_screens/dialogs/login_dialog.hpp"
-
 
 /**
  * \brief Dialog that allows a user to sign in
  * \ingroup states_screens
  */
-class VoteDialog : public GUIEngine::ModalDialog
+class ChangePasswordDialog : public GUIEngine::ModalDialog
 {
-public :
-    class LoginListener : public LoginDialog::Listener
-    {
-        const std::string m_addon_id;
-    public :
-        LoginListener(const std::string & addon_id) : m_addon_id(addon_id) {}
-        virtual void onClose() const { new VoteDialog(m_addon_id); }
-    };
-
-private:
-    const std::string m_addon_id;
-    bool m_self_destroy;
-    const Online::XMLRequest * m_fetch_vote_request;
-    const Online::CurrentUser::SetAddonVoteRequest * m_perform_vote_request;
-
-    GUIEngine::LabelWidget * m_info_widget;
-
-    GUIEngine::RatingBarWidget * m_rating_widget;
-
-    GUIEngine::RibbonWidget * m_options_widget;
-    GUIEngine::IconButtonWidget * m_cancel_widget;
 
 public:
-    VoteDialog(const std::string & addon_id);
-    ~VoteDialog();
+
+    /**
+     * Creates a modal dialog with given percentage of screen width and height
+     */
+    ChangePasswordDialog();
+    ~ChangePasswordDialog();
+
+    virtual void onEnterPressedInternal();
+
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    virtual void onUpdate(float dt);
+
     virtual bool onEscapePressed();
+    virtual void onUpdate(float dt);
+    void success();
+    void error(const irr::core::stringw & error_message);
+
+private:
+
+    bool m_self_destroy;
+    bool m_success;
+
+    GUIEngine::TextBoxWidget * m_current_password_widget;
+    GUIEngine::TextBoxWidget * m_new_password1_widget;
+    GUIEngine::TextBoxWidget * m_new_password2_widget;
+    GUIEngine::LabelWidget * m_info_widget;
+
+    GUIEngine::RibbonWidget * m_options_widget;
+    GUIEngine::IconButtonWidget * m_submit_widget;
+    GUIEngine::IconButtonWidget * m_cancel_widget;
+    
+    void submit();
 };
 
 #endif

@@ -29,13 +29,13 @@ namespace Online
         irr::core::stringw loadingDots          (bool spaces = true, float interval = 0.5f, int max_dots = 3);
         irr::core::stringw signingIn            ();
         irr::core::stringw signingOut           ();
-        irr::core::stringw signingUp            ();
-        irr::core::stringw recovery             ();
+        irr::core::stringw validatingInfo       ();
         irr::core::stringw searching            ();
         irr::core::stringw joiningServer        ();
         irr::core::stringw creatingServer       ();
         irr::core::stringw fetchingServers      ();
         irr::core::stringw fetchingFriends      ();
+        irr::core::stringw fetchingAchievements ();
         irr::core::stringw processing           ();
         irr::core::stringw signedInAs           (const irr::core::stringw & name);
     } // namespace Messages

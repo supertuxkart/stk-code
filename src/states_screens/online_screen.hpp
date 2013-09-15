@@ -40,6 +40,8 @@ private:
     OnlineScreen();
     ~OnlineScreen();
 
+    GUIEngine::IconButtonWidget * m_back_widget;
+
     GUIEngine::RibbonWidget * m_top_menu_widget;
     GUIEngine::IconButtonWidget * m_quick_play_widget;
     GUIEngine::IconButtonWidget * m_find_server_widget;

@@ -66,6 +66,12 @@ namespace Online{
             public:
                 FriendsListRequest() : XMLRequest(0, true) {}
             };
+            class AchievementsRequest : public XMLRequest
+            {
+                virtual void callback ();
+            public:
+                AchievementsRequest() : XMLRequest(0, true) {}
+            };
 
             typedef std::vector<uint32_t> IDList;
         private:
@@ -86,10 +92,16 @@ namespace Online{
             bool                            m_has_fetched_friends;
             std::vector<uint32_t>           m_friends;
 
+            bool                            m_has_fetched_achievements;
+            std::vector<uint32_t>           m_achievements;
+
             bool                            m_cache_bit;
 
             void requestFriendsList();
             void friendsListCallback(const XMLNode * input);
+
+            void requestAchievements();
+            void achievementsCallback(const XMLNode * input);
 
         public:
                                             Profile(    const uint32_t           & userid,
@@ -100,6 +112,11 @@ namespace Online{
                                             ~Profile();
             void                            fetchFriends();
             const std::vector<uint32_t> &   getFriends();
+            bool                            hasFetchedFriends()              { return m_has_fetched_friends;}
+
+            void                            fetchAchievements();
+            const std::vector<uint32_t> &   getAchievements();
+            bool                            hasFetchedAchievements()         { return m_has_fetched_achievements;}
 
             bool                            isFetching() const               { return m_state == S_FETCHING; }
             bool                            isReady() const                  { return m_state == S_READY; }

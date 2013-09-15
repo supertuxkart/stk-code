@@ -263,6 +263,18 @@ namespace StringUtils
     }   // split
 
 
+    std::vector<uint32_t> splitToUInt(const std::string& s, char c, bool keepSplitChar)
+    {
+        std::vector<std::string> parts = split(s, c, keepSplitChar);
+        std::vector<uint32_t> ints;
+        for(unsigned int i = 0; i < parts.size(); ++i)
+        {
+           ints.push_back(atoi(parts[i].c_str()));
+        }
+        return ints;
+    }
+
+
     // ------------------------------------------------------------------------
     /** Splits a : separated string (like PATH) into its individual components.
      *  It especially handles Windows-style paths (c:/mydir1:d:/mydir2)
@@ -709,6 +721,11 @@ namespace StringUtils
 		    printf("Invalid version string '%s'.\n", s.c_str());
 	    return version;
     }   // versionToInt
+
+    const char* boolstr(bool b)
+    {
+        return (b ? "true" : "false");
+    }
 } // namespace StringUtils
 
 

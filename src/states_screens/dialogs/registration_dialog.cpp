@@ -237,7 +237,7 @@ bool RegistrationDialog::processTermsEvent(const std::string& eventSource)
             assert(m_accept_terms_widget->getState());
             m_options_widget->setDeactivated();
             m_info_widget->setDefaultColor();
-            m_info_widget->setText(Messages::signingUp(), false);
+            m_info_widget->setText(Messages::validatingInfo(), false);
             m_sign_up_request = CurrentUser::get()->requestSignUp(m_username, m_password, m_password_confirm, m_email, true);
             return true;
         }
@@ -333,7 +333,7 @@ void RegistrationDialog::onUpdate(float dt)
             else
             {
                 m_info_widget->setDefaultColor();
-                m_info_widget->setText(Messages::signingUp(), false);
+                m_info_widget->setText(Messages::validatingInfo(), false);
             }
         }
     }
