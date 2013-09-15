@@ -787,24 +787,46 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         current_x += m_width_kart_name + m_width_column_space;
     }
 
-    // Draw name of team which won in soccer mode
-    // ------------------------------------------
+    // Draw icon, name of team which won in soccer mode and score
+    // ----------------------------------------------------------
     if (isSoccerMode)
     {
         core::stringw text;
-        core::recti pos_name(current_x, y,
-                             UserConfigParams::m_width, y+m_distance_between_rows);
-
+        irr::video::ITexture *team_icon;
         if (m_team_goals[0] > m_team_goals[1])
+        {
             text = core::stringw(_("Red team won"));
+            team_icon = irr_driver->getTexture(
+                file_manager->getTextureFile("soccer_ball_red.png"));
+        }
         else if (m_team_goals[0] < m_team_goals[1])
+        {
             text = core::stringw(_("Blue team won"));
+            team_icon = irr_driver->getTexture(
+                file_manager->getTextureFile("soccer_ball_blue.png"));
+        }
         else
             text = core::stringw(_("Draw"));
 
+        core::recti source_rect(core::vector2di(0,0), team_icon->getSize());
+        core::recti dest_rect(current_x, y, current_x+m_width_icon, y+m_width_icon);
+        irr_driver->getVideoDriver()->draw2DImage(team_icon, dest_rect,
+                                                  source_rect, NULL, NULL,
+                                                  true);
+
+        current_x += m_width_icon + m_width_column_space;
+        core::recti pos_name(current_x, y,
+                             UserConfigParams::m_width, y+m_distance_between_rows);
+
         m_font->draw(text, pos_name, color, false, false, NULL, true /* ignoreRTL */);
         core::dimension2du rect = m_font->getDimension(text.c_str());
-        current_x += rect.Width + m_width_column_space;
+        current_x += rect.Width + 2*m_width_column_space;
+
+        text = core::stringw(m_team_goals[0]) + " : " + core::stringw(m_team_goals[1]);
+        dest_rect = core::recti(current_x, y, current_x+100, y+10);
+        m_font->draw(text, dest_rect, color, false, false, NULL, true /* ignoreRTL */);
+        rect = m_font->getDimension(text.c_str());
+        current_x += rect.Width + 2*m_width_column_space;
     }
     
     // Draw the time except in FTL mode
@@ -850,16 +872,6 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         m_font->draw(point_inc_string, dest_rect, color, false, false, NULL,
                      true /* ignoreRTL */);
     }
-    
-    if (isSoccerMode)
-    {
-        char score[256];
-        sprintf(score, "%d : %d", m_team_goals[0], m_team_goals[1]);
-        core::recti dest_rect = core::recti(current_x, y, current_x+100, y+10);
-        m_font->draw(score, dest_rect, color, false, false, NULL,
-                     true /* ignoreRTL */);
-    }
-
 }   // displayOneEntry
 
 //-----------------------------------------------------------------------------
