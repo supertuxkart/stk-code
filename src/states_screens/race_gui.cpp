@@ -245,16 +245,9 @@ void RaceGUI::drawScores()
 		file_manager->getTextureFile("soccer_ball_red.png"));
 	irr::video::ITexture *blue_team = irr_driver->getTexture(
 		file_manager->getTextureFile("soccer_ball_blue.png"));
-	
-	core::rect<s32> indicatorPos(offsetX-6, offsetY,
-		offsetX -6 + red_team->getSize().Width/8,
-		offsetY + red_team->getSize().Height/8);
-	core::rect<s32> sourceRect(core::position2d<s32>(0,0),
-                                               red_team->getOriginalSize());
-	irr_driver->getVideoDriver()->draw2DImage(red_team,indicatorPos,sourceRect,
-		NULL,NULL,true);
-	
+    irr::video::ITexture *team_icon;
 
+    int numLeader = 1;
 	for(unsigned int i=0; i<soccerWorld->getNumKarts(); i++){
 		int j = soccerWorld->getTeamLeader(i);
 		if(j < 0) break;
@@ -274,17 +267,23 @@ void RaceGUI::drawScores()
 						position.LowerRightCorner.Y + string_height);
 
 		font->draw(score.c_str(),pos,color);
+        
+        switch(numLeader)
+        {
+            case 1: team_icon = red_team; break;
+            case 2: team_icon = blue_team; break;
+            default: break;
+        }
+        core::rect<s32> indicatorPos(offsetX, offsetY,
+            offsetX + m_marker_player_size/1.25,
+            offsetY + m_marker_player_size/1.25);
+        core::rect<s32> sourceRect(core::position2d<s32>(0,0),
+                                                   team_icon->getOriginalSize());
+        irr_driver->getVideoDriver()->draw2DImage(team_icon,indicatorPos,sourceRect,
+            NULL,NULL,true);
+        numLeader++;
 		offsetX += position.LowerRightCorner.X;
 	}
-	offsetX = 80;
-	offsetY = 5;
-	indicatorPos = core::rect<s32>(offsetX, offsetY,
-		offsetX + blue_team->getSize().Width/8,
-		offsetY + blue_team->getSize().Height/8);
-	sourceRect = core::rect<s32> (core::position2d<s32>(0,0),
-                                               blue_team->getOriginalSize());
-	irr_driver->getVideoDriver()->draw2DImage(blue_team,indicatorPos,sourceRect,
-		NULL,NULL,true);
 }
 //-----------------------------------------------------------------------------
 /** Displays the racing time on the screen.s
