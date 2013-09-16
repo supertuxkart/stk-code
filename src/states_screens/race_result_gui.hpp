@@ -109,6 +109,10 @@ private:
 #endif
     };   // Rowinfo
 
+    /** The team icons. */
+    video::ITexture *redTeamTexture;
+    video::ITexture *blueTeamTexture;
+
     std::vector<RowInfo>       m_all_row_infos;
 
     /** Time to wait till the next row starts to be animated. */

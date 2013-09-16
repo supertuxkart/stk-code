@@ -298,6 +298,14 @@ void RaceResultGUI::onConfirm()
  */
 void RaceResultGUI::determineTableLayout()
 {
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    {
+        redTeamTexture = irr_driver->getTexture(
+                         file_manager->getTextureFile("soccer_ball_red.png"));
+        blueTeamTexture = irr_driver->getTexture(
+                        file_manager->getTextureFile("soccer_ball_blue.png"));
+    }
+
     GUIEngine::Widget *table_area = getWidget("result-table");
 
     m_font          = GUIEngine::getFont();
@@ -798,14 +806,12 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         if (m_team_goals[0] > m_team_goals[1])
         {
             text = core::stringw(_("Red team won"));
-            team_icon = irr_driver->getTexture(
-                file_manager->getTextureFile("soccer_ball_red.png"));
+            team_icon = redTeamTexture;
         }
         else if (m_team_goals[0] < m_team_goals[1])
         {
             text = core::stringw(_("Blue team won"));
-            team_icon = irr_driver->getTexture(
-                file_manager->getTextureFile("soccer_ball_blue.png"));
+            team_icon = blueTeamTexture;
         }
         else
             text = core::stringw(_("Draw"));
