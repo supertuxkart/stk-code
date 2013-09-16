@@ -24,6 +24,10 @@
 
 namespace Online
 {
+    /**
+      * \brief Messages to be shown related to API communication
+      * \ingroup online
+      */
     namespace Messages
     {
         irr::core::stringw loadingDots          (bool spaces = true, float interval = 0.5f, int max_dots = 3);

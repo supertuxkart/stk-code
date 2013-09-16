@@ -290,7 +290,10 @@ namespace Online{
     }
 
     // ============================================================================
-
+    /**
+     * A request to the server, to fetch matching results for the supplied search term.
+     * \param search_string the string to search for.
+     */
     const XMLRequest * CurrentUser::requestUserSearch( const irr::core::stringw & search_string) const
     {
         assert(m_state == US_SIGNED_IN);
@@ -305,7 +308,11 @@ namespace Online{
     }
 
     // ============================================================================
-
+    /**
+     * A request to the server, to perform a vote on an addon.
+     * \param addon_id the id of the addon to vote for.
+     * \param rating the voted rating.
+     */
     const CurrentUser::SetAddonVoteRequest * CurrentUser::requestSetAddonVote( const std::string & addon_id, float rating) const
     {
         assert(m_state == US_SIGNED_IN);
@@ -320,6 +327,9 @@ namespace Online{
         return request;
     }
 
+    /**
+     * Callback for the request to vote for an addon. Updates the local average rating.
+     */
     void CurrentUser::SetAddonVoteRequest::callback()
     {
         if(m_success)
@@ -333,7 +343,10 @@ namespace Online{
     }
 
     // ============================================================================
-
+    /**
+     * A request to the server, to invite a user to be friends.
+     * \param friend_id The id of the user which has to be friended.
+     */
     void CurrentUser::requestFriendRequest(const uint32_t friend_id) const
     {
         assert(m_state == US_SIGNED_IN);
@@ -346,6 +359,9 @@ namespace Online{
         HTTPManager::get()->addRequest(request);
     }
 
+    /**
+     * Callback for the request to send a friend invitation. Shows a confirmation message and takes care of updating all the cached information.
+     */
     void CurrentUser::FriendRequest::callback()
     {
         uint32_t id(0);
@@ -364,7 +380,10 @@ namespace Online{
     }
 
     // ============================================================================
-
+    /**
+     * A request to the server, to accept a friend request.
+     * \param friend_id The id of the user of which the request has to be accepted.
+     */
     void CurrentUser::requestAcceptFriend(const uint32_t friend_id) const
     {
         assert(m_state == US_SIGNED_IN);
@@ -377,6 +396,9 @@ namespace Online{
         HTTPManager::get()->addRequest(request);
     }
 
+    /**
+     * Callback for the request to accept a friend invitation. Shows a confirmation message and takes care of updating all the cached information.
+     */
     void CurrentUser::AcceptFriendRequest::callback()
     {
         uint32_t id(0);
@@ -396,7 +418,10 @@ namespace Online{
     }
 
     // ============================================================================
-
+    /**
+     * A request to the server, to decline a friend request.
+     * \param friend_id The id of the user of which the request has to be declined.
+     */
     void CurrentUser::requestDeclineFriend(const uint32_t friend_id) const
     {
         assert(m_state == US_SIGNED_IN);
@@ -409,6 +434,9 @@ namespace Online{
         HTTPManager::get()->addRequest(request);
     }
 
+    /**
+     * Callback for the request to decline a friend invitation. Shows a confirmation message and takes care of updating all the cached information.
+     */
     void CurrentUser::DeclineFriendRequest::callback()
     {
         uint32_t id(0);
@@ -429,7 +457,10 @@ namespace Online{
     }
 
     // ============================================================================
-
+    /**
+     * A request to the server, to cancel a pending friend request.
+     * \param friend_id The id of the user of which the request has to be canceled.
+     */
     void CurrentUser::requestCancelFriend(const uint32_t friend_id) const
     {
         assert(m_state == US_SIGNED_IN);
@@ -442,6 +473,9 @@ namespace Online{
         HTTPManager::get()->addRequest(request);
     }
 
+    /**
+     * Callback for the request to cancel a friend invitation. Shows a confirmation message and takes care of updating all the cached information.
+     */
     void CurrentUser::CancelFriendRequest::callback()
     {
         uint32_t id(0);
@@ -462,7 +496,10 @@ namespace Online{
     }
 
     // ============================================================================
-
+    /**
+     * A request to the server, to remove a friend relation.
+     * \param friend_id The id of the friend to be removed.
+     */
     void CurrentUser::requestRemoveFriend(const uint32_t friend_id) const
     {
         assert(m_state == US_SIGNED_IN);
@@ -475,6 +512,9 @@ namespace Online{
         HTTPManager::get()->addRequest(request);
     }
 
+    /**
+     * Callback for the request to remove a friend. Shows a confirmation message and takes care of updating all the cached information.
+     */
     void CurrentUser::RemoveFriendRequest::callback()
     {
         uint32_t id(0);
@@ -495,6 +535,12 @@ namespace Online{
     }
 
     // ============================================================================
+    /**
+     * A request to the server, to change the password of the signed in user.
+     * \param current_password The active password of the currently signed in user.
+     * \param new_password     The password the user wants to change to.
+     * \param new_password_ver Confirmation of that password. Has to be the exact same.
+     */
     void CurrentUser::requestPasswordChange(const irr::core::stringw &current_password,
                                             const irr::core::stringw &new_password,
                                             const irr::core::stringw &new_password_ver) const
@@ -510,6 +556,9 @@ namespace Online{
         HTTPManager::get()->addRequest(request);
     }
 
+    /**
+     * Callback for the change password request. If the matching dialog is still open, show a confirmation message.
+     */
     void CurrentUser::ChangePasswordRequest::callback()
     {
         if(GUIEngine::ModalDialog::isADialogActive())
@@ -525,7 +574,10 @@ namespace Online{
         }
     }
     // ============================================================================
-    void CurrentUser::requestPoll()
+    /**
+     * Sends a request to the server to see if any new information is available. (online friends, notifications, etc.).
+     */
+    void CurrentUser::requestPoll() const
     {
         assert(m_state == US_SIGNED_IN);
         CurrentUser::PollRequest * request = new CurrentUser::PollRequest();
@@ -536,6 +588,9 @@ namespace Online{
         HTTPManager::get()->addRequest(request);
     }
 
+    /**
+     * Callback for the poll request. Parses the information and spawns notifications accordingly.
+     */
     void CurrentUser::PollRequest::callback()
     {
         if(m_success)
@@ -650,7 +705,9 @@ namespace Online{
 
     }
     // ============================================================================
-
+    /**
+     * Sends a message to the server that the client has been closed, if a user is signed in.
+     */
     void CurrentUser::onSTKQuit() const
     {
         if(isRegisteredUser())
@@ -664,9 +721,11 @@ namespace Online{
         }
     }
 
-
     // ============================================================================
-
+    /**
+     * Sends a confirmation to the server that an achievement has been completed, if a user is signed in.
+     * \param achievement_id the id of the achievement that got completed
+     */
     void CurrentUser::onAchieving(uint32_t achievement_id) const
     {
         if(isRegisteredUser())
@@ -682,6 +741,7 @@ namespace Online{
     }
 
     // ============================================================================
+    /** \return the username if signed in. */
     irr::core::stringw CurrentUser::getUserName() const
     {
         if((m_state == US_SIGNED_IN ) || (m_state == US_GUEST))
@@ -693,6 +753,7 @@ namespace Online{
     }
 
     // ============================================================================
+    /** \return the online id. */
     uint32_t CurrentUser::getID() const
     {
         if((m_state == US_SIGNED_IN ))

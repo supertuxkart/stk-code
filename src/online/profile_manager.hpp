@@ -28,9 +28,6 @@
 #include <string>
 
 namespace Online{
-
-    // ============================================================================
-
     /**
       * \brief Class that takes care of online profiles
       * \ingroup online

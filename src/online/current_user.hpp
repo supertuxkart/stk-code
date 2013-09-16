@@ -181,16 +181,18 @@ namespace Online{
 
             void                            onSTKQuit() const;
             void                            onAchieving(uint32_t achievement_id) const;
+            void                            requestPoll() const;
 
-            /** Returns the username if signed in. */
             irr::core::stringw              getUserName()           const;
             uint32_t                        getID()                 const;
+            /** Returns the user state. */
             const UserState                 getUserState()          const { return m_state; }
+            /** Returns whether a user is signed in or not. */
             bool                            isRegisteredUser()      const { return m_state == US_SIGNED_IN; }
+            /** Returns the session token of the signed in user. */
             const std::string &             getToken()              const { return m_token; }
+            /** Returns a pointer to the profile associated with the current user. */
             Profile *                       getProfile()            const { return m_profile; }
-
-            void                            requestPoll();
 
     };   // class CurrentUser
 
