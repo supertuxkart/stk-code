@@ -169,8 +169,8 @@ void RaceGUI::renderGlobal(float dt)
     {
         drawGlobalReadySetGo();
     }
-	if(world->getPhase() == World::GOAL_PHASE)
-			drawGlobalGoal();
+    if(world->getPhase() == World::GOAL_PHASE)
+            drawGlobalGoal();
 
     // Timer etc. are not displayed unless the game is actually started.
     if(!world->isRacePhase()) return;
@@ -195,7 +195,7 @@ void RaceGUI::renderGlobal(float dt)
         drawGlobalPlayerIcons(m_map_height);
     }
     
-	if(world->getTrack()->isSoccer())	drawScores();
+    if(world->getTrack()->isSoccer())   drawScores();
 }   // renderGlobal
 
 //-----------------------------------------------------------------------------
@@ -234,39 +234,39 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 //-----------------------------------------------------------------------------
 void RaceGUI::drawScores()
 {
-	SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
-	int offsetY = 5;
-	int offsetX = 5;
-	gui::ScalableFont* font = GUIEngine::getFont();
-	static video::SColor color = video::SColor(255,255,255,255);
+    SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
+    int offsetY = 5;
+    int offsetX = 5;
+    gui::ScalableFont* font = GUIEngine::getFont();
+    static video::SColor color = video::SColor(255,255,255,255);
 
-	//Draw kart icons above score(denoting teams)
-	irr::video::ITexture *red_team = irr_driver->getTexture(
-		file_manager->getTextureFile("soccer_ball_red.png"));
-	irr::video::ITexture *blue_team = irr_driver->getTexture(
-		file_manager->getTextureFile("soccer_ball_blue.png"));
+    //Draw kart icons above score(denoting teams)
+    irr::video::ITexture *red_team = irr_driver->getTexture(
+        file_manager->getTextureFile("soccer_ball_red.png"));
+    irr::video::ITexture *blue_team = irr_driver->getTexture(
+        file_manager->getTextureFile("soccer_ball_blue.png"));
     irr::video::ITexture *team_icon;
 
     int numLeader = 1;
-	for(unsigned int i=0; i<soccerWorld->getNumKarts(); i++){
-		int j = soccerWorld->getTeamLeader(i);
-		if(j < 0) break;
+    for(unsigned int i=0; i<soccerWorld->getNumKarts(); i++){
+        int j = soccerWorld->getTeamLeader(i);
+        if(j < 0) break;
 
-		core::rect<s32> source(j*m_marker_rendered_size, 0,
-			(j+1)*m_marker_rendered_size,m_marker_rendered_size);
-		core::recti position(offsetX, offsetY,
-			offsetX + 2*m_marker_player_size, offsetY + 2*m_marker_player_size);
-		irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source,
-			NULL, NULL, true);
-		core::stringw score = StringUtils::toWString(soccerWorld->getScore(i));
-		int string_height =
-			GUIEngine::getFont()->getDimension(score.c_str()).Height;
-		core::recti pos(position.UpperLeftCorner.X + 5,
-						position.LowerRightCorner.Y + offsetY,
-						position.LowerRightCorner.X,
-						position.LowerRightCorner.Y + string_height);
+        core::rect<s32> source(j*m_marker_rendered_size, 0,
+            (j+1)*m_marker_rendered_size,m_marker_rendered_size);
+        core::recti position(offsetX, offsetY,
+            offsetX + 2*m_marker_player_size, offsetY + 2*m_marker_player_size);
+        irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source,
+            NULL, NULL, true);
+        core::stringw score = StringUtils::toWString(soccerWorld->getScore(i));
+        int string_height =
+            GUIEngine::getFont()->getDimension(score.c_str()).Height;
+        core::recti pos(position.UpperLeftCorner.X + 5,
+                        position.LowerRightCorner.Y + offsetY,
+                        position.LowerRightCorner.X,
+                        position.LowerRightCorner.Y + string_height);
 
-		font->draw(score.c_str(),pos,color);
+        font->draw(score.c_str(),pos,color);
         
         switch(numLeader)
         {
@@ -282,8 +282,8 @@ void RaceGUI::drawScores()
         irr_driver->getVideoDriver()->draw2DImage(team_icon,indicatorPos,sourceRect,
             NULL,NULL,true);
         numLeader++;
-		offsetX += position.LowerRightCorner.X;
-	}
+        offsetX += position.LowerRightCorner.X;
+    }
 }
 //-----------------------------------------------------------------------------
 /** Displays the racing time on the screen.s
