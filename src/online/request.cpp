@@ -31,7 +31,12 @@ namespace Online{
     class HTTPManager;
 
     // =========================================================================================
-
+    /**
+     * Creates a request that can be handled by the HTTPManager
+     * \param manage_memory whether or not the HTTPManager should take care of deleting the object after all callbacks have been done
+     * \param priority by what priority should the HTTPManager take care of this request
+     * \param type indicates whether the request has a special task for the HTTPManager
+     */
     Request::Request(bool manage_memory, int priority, int type)
         : m_type(type), m_manage_memory(manage_memory), m_priority(priority)
     {
@@ -56,7 +61,11 @@ namespace Online{
     }
 
     // =========================================================================================
-
+    /**
+     * Creates a HTTP(S) request that will have a raw string as result. (Can ofcourse be used if the result doesn't matter.)
+     * \param manage_memory whether or not the HTTPManager should take care of deleting the object after all callbacks have been done
+     * \param priority by what priority should the HTTPManager take care of this request
+     */
     HTTPRequest::HTTPRequest(bool manage_memory, int priority)
         : Request(manage_memory, priority, 0)
     {
@@ -70,6 +79,9 @@ namespace Online{
         delete m_parameters;
     }
 
+    /**
+     * Checks the request if it has enough (correct) information to be executed (and thus allowed to add to the queue)
+     */
     bool HTTPRequest::isAllowedToAdd()
     {
         if (!Request::isAllowedToAdd() || m_url.size() < 5 || ( m_url.substr(0, 5) != "http:"))
@@ -159,6 +171,16 @@ namespace Online{
         return size * nmemb;
     }
 
+    /**
+     * \pre request has to be done
+     * \return get the result string from the request reply
+     */
+    const std::string & HTTPRequest::getResult() const
+    {
+        assert(isDone());
+        return m_string_buffer;
+    }
+
     // ----------------------------------------------------------------------------
     /** Callback function from curl: inform about progress.
      *  \param clientp
@@ -202,10 +224,12 @@ namespace Online{
         return 0;
     }   // progressDownload
 
-
-
     // =========================================================================================
-
+    /**
+     * Creates a HTTP(S) request that will automatically parse the answer into a XML structure
+     * \param manage_memory whether or not the HTTPManager should take care of deleting the object after all callbacks have been done
+     * \param priority by what priority should the HTTPManager take care of this request
+     */
     XMLRequest::XMLRequest(bool manage_memory, int priority)
         : HTTPRequest(manage_memory, priority)
     {
@@ -252,16 +276,30 @@ namespace Online{
         HTTPRequest::afterOperation();
     }
 
+    /**
+     * \pre request has to be done
+     * \return get the complete result from the request reply
+     */
     const XMLNode * XMLRequest::getResult() const
     {
         assert(isDone());
         return m_result;
     }
+
+    /**
+     * \pre request has to be done
+     * \return get the info from the request reply
+     */
     const irr::core::stringw & XMLRequest::getInfo()   const
     {
         assert(isDone());
         return m_info;
     }
+
+    /**
+     * \pre request has to be done
+     * \return whether or not the request was a success
+     */
     bool XMLRequest::isSuccess() const
     {
         assert(isDone());

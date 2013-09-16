@@ -147,6 +147,7 @@ namespace Online{
         *  (everything ok) at the end. */
         Synchronised<float>                             m_progress;
         std::string                                     m_url;
+        /** The POST parameters that will be send with the request. */
         Parameters *                                    m_parameters;
         CURL *                                          m_curl_session;
         CURLcode                                        m_curl_code;
@@ -186,6 +187,8 @@ namespace Online{
             assert(isPreparing());
             (*m_parameters)[name] = StringUtils::toString(value);
         }
+
+        const std::string & getResult() const;
 
         /** Returns the current progress. */
         float getProgress() const                       { return m_progress.getAtomic(); }
