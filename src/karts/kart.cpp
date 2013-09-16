@@ -840,7 +840,8 @@ void Kart::finishedRace(float time)
                           this, 2.0f);
         }
     }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
+             race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
     {
         setController(new EndController(this, m_controller->getPlayer(),
                                         m_controller));

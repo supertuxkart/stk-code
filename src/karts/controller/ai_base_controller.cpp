@@ -94,7 +94,8 @@ AIBaseController::AIBaseController(AbstractKart *kart,
     m_ai_properties =
         m_kart->getKartProperties()->getAIPropertiesForDifficulty();
 
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+       race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         m_world     = dynamic_cast<LinearWorld*>(World::getWorld());
         m_track     = m_world->getTrack();

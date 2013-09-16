@@ -56,7 +56,8 @@ EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *pla
              : AIBaseController(kart, player)
 {
     m_previous_controller = prev_controller;
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+       race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         // Overwrite the random selected default path from AIBaseController
         // with a path that always picks the first branch (i.e. it follows
@@ -131,7 +132,8 @@ void EndController::reset()
 
     m_track_node       = QuadGraph::UNKNOWN_SECTOR;
     // In battle mode there is no quad graph, so nothing to do in this case
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+       race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
 
@@ -181,7 +183,8 @@ void EndController::update(float dt)
     AIBaseController::update(dt);
 
     // In case of battle mode: don't do anything
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+       race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
     {
         m_controls->m_accel = 0.0f;
         // Brake while we are still driving forwards (if we keep
