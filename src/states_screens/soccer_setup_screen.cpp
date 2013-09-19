@@ -176,6 +176,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
                                                                Input::InputType type,
                                                                int playerId)
 {
+    ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
     GUIEngine::EventPropagation result = EVENT_LET;
     SoccerTeam  team_switch = SOCCER_TEAM_NONE;
     int nb_players = m_kart_view_info.size();
@@ -183,13 +184,26 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
     switch(action)
     {
     case PA_MENU_LEFT:
-        team_switch = SOCCER_TEAM_RED;
+        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+            team_switch = SOCCER_TEAM_RED;
         break;
     case PA_MENU_RIGHT:
-        team_switch = SOCCER_TEAM_BLUE;
+        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+            team_switch = SOCCER_TEAM_BLUE;
+        break;
+    case PA_MENU_UP:
+        if (playerId != PLAYER_ID_GAME_MASTER)
+            result = EVENT_BLOCK;
+        break;
+    case PA_MENU_DOWN:
+        if (playerId != PLAYER_ID_GAME_MASTER)
+            result = EVENT_BLOCK;
         break;
     case PA_MENU_SELECT:
     {
+        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+            return result;
+
         // Confirm team selection
         for(int i=0 ; i < nb_players ; i++)
         {
@@ -197,7 +211,6 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
             {
                 m_kart_view_info[i].confirmed = true;
                 m_kart_view_info[i].view->setRotateTo( KART_CONFIRMATION_TARGET_ANGLE, KART_CONFIRMATION_ROTATION_SPEED );
-                result = EVENT_BLOCK;
                 break;
             }
         }
@@ -205,6 +218,9 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
     }
     case PA_MENU_CANCEL:
     {
+        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+            return result;
+
         // Un-confirm team selection
         // TODO: shouldn't trigger quitting the screen...
         for(int i=0 ; i < nb_players ; i++)
@@ -213,10 +229,10 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
             {
                 m_kart_view_info[i].confirmed = false;
                 m_kart_view_info[i].view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );
-                result = EVENT_BLOCK;
                 break;
             }
         }
+        result = EVENT_BLOCK;
         break;
     }
     default:
@@ -235,14 +251,12 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
                     break;
                 m_kart_view_info[i].team = team_switch;
                 updateKartViewsLayout();
-                result = EVENT_BLOCK;
                 break;
             }
         }
     }
 
     // Update "continue" button state
-    ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
     if(areAllKartsConfirmed())
     {
         //~ bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
