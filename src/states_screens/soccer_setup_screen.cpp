@@ -201,7 +201,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
         break;
     case PA_MENU_SELECT:
     {
-        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) || areAllKartsConfirmed())
             return result;
 
         // Confirm team selection
@@ -214,6 +214,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
                 break;
             }
         }
+        result = EVENT_BLOCK;
         break;
     }
     case PA_MENU_CANCEL:
