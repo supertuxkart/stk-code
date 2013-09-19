@@ -313,7 +313,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain(), owns_buffer);
 #endif
 
-    sfx->volume(m_master_gain);
+    sfx->masterVolume(m_master_gain);
 
     if (add_to_SFX_list) m_all_sfx.push_back(sfx);
 
@@ -467,7 +467,7 @@ void SFXManager::setMasterSFXVolume(float gain)
         for (std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
             i!=m_all_sfx.end(); i++)
         {
-            (*i)->volume(m_master_gain);
+            (*i)->masterVolume(m_master_gain);
         }   // for i in m_all_sfx
     }
 
@@ -476,7 +476,7 @@ void SFXManager::setMasterSFXVolume(float gain)
         std::map<std::string, SFXBase*>::iterator i = m_quick_sounds.begin();
         for (; i != m_quick_sounds.end(); i++)
         {
-            (*i).second->volume(m_master_gain);
+            (*i).second->masterVolume(m_master_gain);
         }
     }
 

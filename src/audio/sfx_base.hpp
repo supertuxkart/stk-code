@@ -55,6 +55,7 @@ public:
     virtual void       resume()                  = 0;
     virtual void       speed(float factor)       = 0;
     virtual void       volume(float gain)        = 0;
+    virtual void       masterVolume(float gain)  = 0;
     virtual SFXManager::SFXStatus
                        getStatus()               = 0;
     virtual void       onSoundEnabledBack()      = 0;
