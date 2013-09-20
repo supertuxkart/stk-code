@@ -90,6 +90,9 @@ void SoccerWorld::reset()
         obj->reset();
         obj->getPhysics()->reset();
     }
+    
+    World *world = World::getWorld();
+    world->setClockMode(World::CLOCK_NONE);
 
     initKartList();
 }   // reset
