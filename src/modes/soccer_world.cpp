@@ -75,6 +75,21 @@ void SoccerWorld::reset()
 
     m_can_score_points = true;
     memset(m_team_goals, 0, sizeof(m_team_goals));
+    
+    // Reset original positions for the soccer balls
+    TrackObjectManager* tom = getTrack()->getTrackObjectManager();
+    assert(tom);
+
+    PtrVector<TrackObject>&   objects = tom->getObjects();
+    for(int i=0; i<objects.size(); i++)
+    {
+        TrackObject* obj = objects.get(i);
+        if(!obj->isSoccerBall())
+            continue;
+
+        obj->reset();
+        obj->getPhysics()->reset();
+    }
 
     initKartList();
 }   // reset
@@ -130,8 +145,8 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         if(!obj->isSoccerBall())
             continue;
 
-                obj->reset();
-                obj->getPhysics()->reset();
+        obj->reset();
+        obj->getPhysics()->reset();
     }
 
     //Resetting the ball triggers the goal check line one more time.
