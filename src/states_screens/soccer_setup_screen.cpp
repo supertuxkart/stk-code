@@ -219,11 +219,11 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
     }
     case PA_MENU_CANCEL:
     {
+        if (playerId != PLAYER_ID_GAME_MASTER) result = EVENT_BLOCK;
         if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
             return result;
 
         // Un-confirm team selection
-        // TODO: shouldn't trigger quitting the screen...
         for(int i=0 ; i < nb_players ; i++)
         {
             if(m_kart_view_info[i].local_player_id == playerId)
