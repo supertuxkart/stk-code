@@ -77,6 +77,9 @@ private:
     /** For parachutes only. */
     float           m_initial_speed;
 
+    /** For zoom-in animation */
+    float           m_node_scale;
+
     /** Scene node of the attachment, which will be attached to the kart's
      *  scene node. */
     scene::IAnimatedMeshSceneNode

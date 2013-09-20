@@ -48,7 +48,8 @@ Attachment::Attachment(AbstractKart* kart)
     m_kart           = kart;
     m_previous_owner = NULL;
     m_bomb_sound     = NULL;
-
+    m_node_scale     = 1.0f;
+    
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.
     m_node = irr_driver->addAnimatedMesh(
@@ -111,7 +112,8 @@ void Attachment::set(AttachmentType type, float time,
     }
 
     clear();
-
+    m_node_scale = 0.3f;
+    
     // If necessary create the appropriate plugin which encapsulates
     // the associated behavior
     switch(type)
@@ -141,6 +143,8 @@ void Attachment::set(AttachmentType type, float time,
         m_node->setAnimationSpeed(0);
         m_node->setCurrentFrame(0);
     }
+
+    m_node->setScale(core::vector3df(m_node_scale,m_node_scale,m_node_scale));
 
     m_type             = type;
     m_time_left        = time;
@@ -360,6 +364,13 @@ void Attachment::update(float dt)
 {
     if(m_type==ATTACH_NOTHING) return;
     m_time_left -=dt;
+    
+    if (m_node_scale < 1.0f)
+    {
+        m_node_scale += dt*1.5f;
+        if (m_node_scale > 1.0f) m_node_scale = 1.0f;
+        m_node->setScale(core::vector3df(m_node_scale,m_node_scale,m_node_scale));
+    }
 
     if(m_plugin)
     {
