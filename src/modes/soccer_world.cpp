@@ -122,11 +122,11 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
     if (m_can_score_points)
     {
         //I18N: soccer mode
-        m_race_gui->addMessage(_("GOAL!"), NULL,
-                              /* time */ 5.0f,
-                               video::SColor(255,255,255,255),
-                               /*important*/ false,
-                               /*big font*/  true);
+        //~ m_race_gui->addMessage(_("GOAL!"), NULL,
+                              //~ /* time */ 5.0f,
+                               //~ video::SColor(255,255,255,255),
+                               //~ /*important*/ true,
+                               //~ /*big font*/  true);
         m_team_goals[first_goal ? 0 : 1]++;
         //printf("Score:\nTeam One %d : %d Team Two\n", m_team_goals[0], m_team_goals[1]);
         World *world = World::getWorld();

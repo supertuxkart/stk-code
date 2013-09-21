@@ -69,8 +69,8 @@ RaceGUIBase::RaceGUIBase()
     m_string_set            = _("Set!");
     //I18N: as in "ready, set, go", shown at the beginning of the race
     m_string_go             = _("Go!");
-	//Shown when a goal is scored
-	m_string_goal			= "GOAL!";
+    //I18N: Shown when a goal is scored
+    m_string_goal			= _("GOAL!");
     // Make the two materials permanent (in case that they are not listed
     // in the textures/materials.xml file).
     m_music_icon            = material_manager->getMaterial("notes.png",
