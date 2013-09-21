@@ -526,8 +526,7 @@ void Kart::blockViewWithPlunger()
                                m_kart_properties->getPlungerInFaceTime();
     if(isShielded())
     {
-        decreaseShieldTime(0.0f); //decrease the default amount of time
-        Log::verbose("Kart", "Decreasing shield, because of removing the plunger. \n");
+        decreaseShieldTime();
     }
 }   // blockViewWithPlunger
 
@@ -1003,24 +1002,12 @@ float Kart::getShieldTime() const
  * Decreases the kart's shield time.
  * \param t The time substracted from the shield timer. If t == 0.0f, the default amout of time is substracted.
  */
-void Kart::decreaseShieldTime(float t)
+void Kart::decreaseShieldTime()
 {
-    if(isShielded())
+    if (isShielded())
     {
-        getAttachment()->setTimeLeft( getAttachment()->getTimeLeft() - t );
-        if(t == 0.0f)
-        {
-            getAttachment()->setTimeLeft( getAttachment()->getTimeLeft()
-                                          - stk_config->m_bubblegum_shield_time);
-        }
-
+        getAttachment()->setTimeLeft(0.0f);
     }
-    //Let the kart drop a bubble gum, if the shield was not damaged.
-    //This is the default, whenever a powerup is used by a kart.
-    //It is turned off, if the shield was reduced below zero by a hit. (Or by intently damaging the shield.)
-    if(!isShielded())
-        m_bubble_drop = false;
-
 }   // decreaseShieldTime
 
 //-----------------------------------------------------------------------------
@@ -1170,7 +1157,6 @@ void Kart::update(float dt)
         // since use() can test if something needs to be switched on/off.
         m_powerup->use() ;
         World::getWorld()->onFirePressed(getController());
-        m_bubble_drop = true;
         m_fire_clicked = 1;
     }
 
@@ -1355,8 +1341,7 @@ void Kart::setSquash(float time, float slowdown)
 
     if (isShielded())
     {
-        decreaseShieldTime(stk_config->m_bubblegum_shield_time/2.0f);
-        Log::verbose("Kart", "Decreasing shield \n");
+        decreaseShieldTime();
         return;
     }
 

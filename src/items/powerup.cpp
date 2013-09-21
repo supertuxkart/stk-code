@@ -368,8 +368,7 @@ void Powerup::use()
                 if(kart->isEliminated() || kart== m_owner) continue;
                 if(kart->isShielded())
                 {
-                    kart->decreaseShieldTime(stk_config->m_bubblegum_shield_time);
-                    Log::verbose("Powerup", "Decreasing shield \n");
+                    kart->decreaseShieldTime();
                     continue;
                 }
                 if(m_owner->getPosition() > kart->getPosition())

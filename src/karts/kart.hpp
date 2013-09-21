@@ -409,8 +409,7 @@ public:
     virtual float getShieldTime() const;
     // ------------------------------------------------------------------------
     /** Decreases the kart's shield time. */
-    //If t = 0.0f: decrease shield time by the default amount.
-    virtual void decreaseShieldTime(float t);
+    virtual void decreaseShieldTime();
     // ------------------------------------------------------------------------
 
     /** Sets the energy the kart has collected. */

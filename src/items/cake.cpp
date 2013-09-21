@@ -173,8 +173,7 @@ bool Cake::hit(AbstractKart* kart, PhysicalObject* obj)
     {
         if(kart && kart->isShielded())
         {
-            kart->decreaseShieldTime(0.0f); //Decreasing the shield time by the default value.
-            Log::verbose("Cake", "Decreasing shield! \n");
+            kart->decreaseShieldTime();
             return false; //Not sure if a shield hit is a real hit.
         }
         explode(kart, obj);

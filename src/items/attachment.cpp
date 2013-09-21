@@ -25,6 +25,7 @@
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
 #include "items/attachment_manager.hpp"
+#include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "items/swatter.hpp"
 #include "karts/abstract_kart.hpp"
@@ -35,20 +36,23 @@
 #include "modes/world.hpp" 
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
+#include "physics/triangle_mesh.hpp"
+#include "tracks/track.hpp"
 #include "utils/constants.hpp"
-#include "utils/log.hpp" //TODO: remove after debugging is done
-// Log::verbose("attachment", "Decreasing shield \n");
+#include "utils/log.hpp" 
+
 /** Initialises the attachment each kart has.
  */
 Attachment::Attachment(AbstractKart* kart)
 {
-    m_type           = ATTACH_NOTHING;
-    m_time_left      = 0.0;
-    m_plugin         = NULL;
-    m_kart           = kart;
-    m_previous_owner = NULL;
-    m_bomb_sound     = NULL;
-    m_node_scale     = 1.0f;
+    m_type                 = ATTACH_NOTHING;
+    m_time_left            = 0.0;
+    m_plugin               = NULL;
+    m_kart                 = kart;
+    m_previous_owner       = NULL;
+    m_bomb_sound           = NULL;
+    m_bubble_explode_sound = NULL;
+    m_node_scale           = 1.0f;
     
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.
@@ -76,6 +80,12 @@ Attachment::~Attachment()
     {
         sfx_manager->deleteSFX(m_bomb_sound);
         m_bomb_sound = NULL;
+    }
+    
+    if (m_bubble_explode_sound)
+    {
+        sfx_manager->deleteSFX(m_bubble_explode_sound);
+        m_bubble_explode_sound = NULL;
     }
 }   // ~Attachment
 
@@ -214,7 +224,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
     //Bubble gum shield effect:
     if(m_type == ATTACH_BUBBLEGUM_SHIELD)
     {
-        m_time_left -= stk_config->m_bubblegum_shield_time;
+        m_time_left = 0.0f;
         return;
     }
 
@@ -434,15 +444,33 @@ void Attachment::update(float dt)
         // Nothing to do for tinytux, this is all handled in EmergencyAnimation
         break;
     case ATTACH_BUBBLEGUM_SHIELD:
-        if(!m_kart->isShielded())
+        if (m_time_left < 0)
         {
             m_time_left = 0.0f;
-            if (m_kart->m_bubble_drop)
+            if (m_bubble_explode_sound) sfx_manager->deleteSFX(m_bubble_explode_sound);
+            m_bubble_explode_sound = sfx_manager->createSoundSource("bubblegum_explode");
+            m_bubble_explode_sound->position(m_kart->getXYZ());
+            m_bubble_explode_sound->play();
+            
+            // drop a small bubble gum
+            Vec3 hit_point;
+            Vec3 normal;
+            const Material* material_hit;
+            Vec3 pos = m_kart->getXYZ();
+            Vec3 to=pos+Vec3(0, -10000, 0);
+            World* world = World::getWorld();
+            world->getTrack()->getTriangleMesh().castRay(pos, to, &hit_point,
+                                                         &material_hit, &normal);
+            // This can happen if the kart is 'over nothing' when dropping
+            // the bubble gum
+            if(material_hit)
             {
-                Log::verbose("Attachment", "Drop a small bubble gum. \n");;
-                //TODO: drop a bubble gum item on the track
-            }
+                normal.normalize();
 
+                pos.setY(hit_point.getY()-0.05f);
+                
+                ItemManager::get()->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_kart);
+            }
         }
         break;
     }   // switch

@@ -217,8 +217,7 @@ bool Bowling::hit(AbstractKart* kart, PhysicalObject* obj)
     {
         if(kart && kart->isShielded())
         {
-            kart->decreaseShieldTime(0.0f); //Decreasing the shield time by the default value.
-            Log::verbose("Bowling", "Decreasing shield!");
+            kart->decreaseShieldTime();
             return true;
         }
         else

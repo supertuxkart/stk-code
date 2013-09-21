@@ -386,8 +386,7 @@ public:
     virtual float getShieldTime() const = 0;
     // ------------------------------------------------------------------------
     /** Decreases the kart's shield time. */
-    //Hard coded shield decrease time
-    virtual void decreaseShieldTime(float t) = 0;
+    virtual void decreaseShieldTime() = 0;
     // ------------------------------------------------------------------------
 
     /** Shows the star effect for a certain time. */
@@ -415,9 +414,7 @@ public:
     /** Set a text that is displayed on top of a kart.
      */
     virtual void setOnScreenText(const wchar_t *text) = 0;
-    /** Whether an unused bubble gum shield becomes a bubble gum on the ground.
-     * */
-    bool         m_bubble_drop;
+
 };   // AbstractKart
 
 

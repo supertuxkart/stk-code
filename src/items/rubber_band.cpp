@@ -247,9 +247,8 @@ void RubberBand::hit(AbstractKart *kart_hit, const Vec3 *track_xyz)
     {
         if(kart_hit->isShielded())
         {
-            kart_hit->decreaseShieldTime(0.0f); //Decreasing the shield time by the default value.
+            kart_hit->decreaseShieldTime();
             m_plunger->setKeepAlive(0.0f);
-            Log::verbose("rubber_band", "Decreasing shield! \n");
 
             return;
         }

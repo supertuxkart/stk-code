@@ -38,12 +38,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
                                                bool direct_hit)
 {
     if(kart->isInvulnerable()) return NULL;
-    /*else if(kart->isShielded() && !direct_hit) //How can I test this code ??
-    {
-        kart->decreaseShieldTime(0.0f); //Decreasing the shield time by the default value.
-        Log::verbose("ExlosionAnimation", "Decreasing shield \n");
-        return NULL;
-    }*/
+    
     float r = kart->getKartProperties()->getExplosionRadius();
 
     // Ignore explosion that are too far away.
@@ -61,8 +56,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart)
     if(kart->isInvulnerable()) return NULL;
     else if(kart->isShielded())
     {
-        kart->decreaseShieldTime(0.0f) ; //decreasing the shieldtime by the default amount
-        Log::verbose("ExplosionAnimation", "Decreasing shield 2\n");
+        kart->decreaseShieldTime();
         return NULL;
     }
     return new ExplosionAnimation(kart, kart->getXYZ(), /*direct hit*/true);

@@ -98,6 +98,9 @@ private:
     /** Ticking sound for the bomb */
     SFXBase          *m_bomb_sound;
 
+    /** Soung for exploding bubble gum shield */
+    SFXBase          *m_bubble_explode_sound;
+    
 public:
           Attachment(AbstractKart* kart);
          ~Attachment();
