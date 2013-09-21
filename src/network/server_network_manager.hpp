@@ -36,6 +36,9 @@ class ServerNetworkManager : public NetworkManager
 
         virtual void run();
 
+        void setMaxPlayers(uint8_t count) { m_max_players = count; }
+        uint8_t getMaxPlayers() {return m_max_players;}
+
         void kickAllPlayers();
 
         virtual void sendPacket(const NetworkString& data, bool reliable = true);
@@ -47,6 +50,7 @@ class ServerNetworkManager : public NetworkManager
         virtual ~ServerNetworkManager();
 
         pthread_t* m_thread_keyboard;
+        uint8_t m_max_players;
 
 };
 

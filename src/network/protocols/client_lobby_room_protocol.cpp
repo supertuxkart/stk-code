@@ -320,11 +320,11 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         {
             if (data[0] != 1 || data[2] != 4)
                 Log::error("ClientLobbyRoomProtocol", "Bad format in players list.");
-            
+
             uint8_t race_id = data[1];
             uint32_t global_id = data.gui32(3);
             Online::Profile* new_user = new Online::Profile(global_id, "");
-            
+
             NetworkPlayerProfile* profile2 = new NetworkPlayerProfile();
             profile2->race_id = race_id;
             profile2->user_profile = new_user;

@@ -44,19 +44,6 @@ void TrackVote::voteLaps(int laps)
     track_info.laps = laps;
     has_voted_laps = true;
 }
-//-----------------------------------------------------------------------------
-
-int GPRaceInfo::getMajorMode()
-{
-    return RaceManager::MAJOR_MODE_GRAND_PRIX;
-}
-
-//-----------------------------------------------------------------------------
-
-int SingleRaceInfo::getMajorMode()
-{
-    return RaceManager::MAJOR_MODE_SINGLE;
-}
 
 //-----------------------------------------------------------------------------
 
@@ -147,23 +134,9 @@ void RaceConfig::computeNextTrack()
 
 //-----------------------------------------------------------------------------
 
-const TrackInfo* RaceConfig::getNextTrack() const
+const TrackInfo* RaceConfig::getNextTrackInfo() const
 {
-    return m_track.track;
-}
-
-//-----------------------------------------------------------------------------
-
-bool RaceConfig::getReverse() const
-{
-    return m_track.track;
-}
-
-//-----------------------------------------------------------------------------
-
-bool RaceConfig::getLapCount() const
-{
-    return m_track.track;
+    return &m_track;
 }
 
 //-----------------------------------------------------------------------------

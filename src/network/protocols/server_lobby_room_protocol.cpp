@@ -334,7 +334,8 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     uint32_t player_id = 0;
     player_id = data.getUInt32(1);
     // can we add the player ?
-    if (m_setup->getPlayerCount() < 16) // accept player
+    if (m_setup->getPlayerCount() <
+        ServerNetworkManager::getInstance()->getMaxPlayers()) //accept
     {
         // add the player to the game setup
         m_next_id = m_setup->getPlayerCount();

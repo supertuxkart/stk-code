@@ -1422,6 +1422,9 @@ int main(int argc, char *argv[] )
         // load the network manager
         // If the server has been created (--server option), this will do nothing (just a warning):
         NetworkManager::getInstance<ClientNetworkManager>();
+        if (NetworkManager::getInstance()->isServer())
+            ServerNetworkManager::getInstance()->setMaxPlayers(
+                    UserConfigParams::m_server_max_players);
         NetworkManager::getInstance()->run();
         if (NetworkManager::getInstance()->isServer())
         {

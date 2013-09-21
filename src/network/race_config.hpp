@@ -41,7 +41,7 @@ class RaceConfig
 
     void computeNextTrack();
 
-    const TrackInfo* getNextTrack() const;
+    const TrackInfo* getNextTrackInfo() const;
     bool getReverse() const;
     bool getLapCount() const;
 
