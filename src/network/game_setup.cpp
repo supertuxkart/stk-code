@@ -20,13 +20,14 @@
 
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
+#include "race/race_manager.hpp"
 #include "utils/log.hpp"
-
 
 //-----------------------------------------------------------------------------
 
 GameSetup::GameSetup()
 {
+    m_race_config = new RaceConfig();
 }
 
 //-----------------------------------------------------------------------------

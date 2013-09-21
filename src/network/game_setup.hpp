@@ -23,6 +23,7 @@
 #define GAME_SETUP_HPP
 
 #include "online/profile.hpp"
+#include "network/race_config.hpp"
 
 #include <vector>
 #include <string>
@@ -89,9 +90,12 @@ class GameSetup
          */
         bool isKartAllowed(std::string kart_name) {return true; }
 
+        RaceConfig* getRaceConfig() { return m_race_config; }
+
     protected:
         std::vector<NetworkPlayerProfile*> m_players; //!< Information about players
         NetworkPlayerProfile m_self_profile; //!< Information about self (client only)
+        RaceConfig* m_race_config;
 };
 
 #endif // GAME_SETUP_HPP

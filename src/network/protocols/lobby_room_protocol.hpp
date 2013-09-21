@@ -24,12 +24,6 @@
 #include "network/game_setup.hpp"
 #include "network/network_string.hpp"
 
-
-class RaceConfig
-{
-    int m_world_type;
-};
-
 /*!
  * \class LobbyRoomProtocol
  * \brief Class used while the game is being prepared.
