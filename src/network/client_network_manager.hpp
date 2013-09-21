@@ -52,10 +52,22 @@ class ClientNetworkManager : public NetworkManager
          *  \param reliable : If set to true, ENet will ensure that the packet is received.
          */
         virtual void sendPacket(const NetworkString& data, bool reliable = true);
-
+        
+        /*! \brief Get the peer (the server)
+         *  \return The peer with whom we're connected (if it exists). NULL elseway.
+         */
         STKPeer* getPeer();
+        /*! \brief Function to know if we're a server.
+         *  \return Returns true if we're on a server. False if we're a client.
+         */
         virtual bool isServer()         { return false; }
+        /*! \brief Function used to notice the manager that we're connected to a server.
+         *  \param value : True if we're connected, false elseway.
+         */
         void setConnected(bool value)   { m_connected = value; }
+        /*! \brief Function to know if we're a server.
+         *  \return Returns true if we're on a server. False if we're a client.
+         */
         bool isConnected()              { return m_connected; }
 
     protected:
@@ -63,7 +75,7 @@ class ClientNetworkManager : public NetworkManager
         virtual ~ClientNetworkManager();
 
         bool m_connected; //!< Is the user connected to a server
-        pthread_t* m_thread_keyboard;
+        pthread_t* m_thread_keyboard; //!< The thread listening for keyboard console input.
 };
 
 #endif // CLIENT_NETWORK_MANAGER_HPP

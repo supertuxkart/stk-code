@@ -59,6 +59,9 @@ class GameSetup
         void setPlayerKart(uint8_t id, std::string kart_name); //!< Set the kart of a player
         void bindKartsToProfiles(); //!< Sets the right world_kart_id in profiles
 
+        /** \brief Get the players that are in the game 
+         *  \return A vector containing pointers on the players profiles.
+         */
         std::vector<NetworkPlayerProfile*> getPlayers() { return m_players; }
         int getPlayerCount() { return m_players.size(); }
         /*! \brief Get a network player profile matching a universal id.

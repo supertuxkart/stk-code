@@ -82,8 +82,7 @@ ProtocolManager::~ProtocolManager()
 void ProtocolManager::abort()
 {
     pthread_mutex_unlock(&m_exit_mutex); // will stop the update function
-    pthread_join(*m_asynchronous_update_thread, NULL);
-
+    pthread_join(*m_asynchronous_update_thread, NULL); // wait the thread to finish
     pthread_mutex_lock(&m_events_mutex);
     pthread_mutex_lock(&m_protocols_mutex);
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);

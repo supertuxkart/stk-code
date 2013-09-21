@@ -170,8 +170,7 @@ void STKHost::stopListening()
     if(m_listening_thread)
     {
         pthread_mutex_unlock(&m_exit_mutex); // will stop the update function on its next update
-        pthread_join(*m_listening_thread, NULL); // wait the thread to end
-    }
+        pthread_join(*m_listening_thread, NULL); // wait the thread to end    }
 }
 
 // ----------------------------------------------------------------------------
