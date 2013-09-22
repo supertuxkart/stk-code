@@ -360,14 +360,16 @@ void SoccerWorld::initKartList()
     //Assigning indicators
     for(unsigned int i=0; i<kart_amount; i++)
     {
-        scene::ISceneNode *hatNode;
+        scene::ISceneNode *arrowNode;
+        float arrow_pos_height = m_karts[i]->getKartModel()->getHeight()+0.5;
+
         if(race_manager->getLocalKartInfo(i).getSoccerTeam() == SOCCER_TEAM_RED)
-            hatNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,0.3f),
+            arrowNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,0.3f),
                                                redTeamTexture,m_karts[i]->getNode(), true);
         else
-            hatNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,0.3f),
+            arrowNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,0.3f),
                                                blueTeamTexture,m_karts[i]->getNode(),true);
-        hatNode->setPosition(m_karts[i]->getKartModel()->getHatOffset());
+        arrowNode->setPosition(core::vector3df(0, arrow_pos_height, 0));
     }
 
     // Compute start positions for each team
