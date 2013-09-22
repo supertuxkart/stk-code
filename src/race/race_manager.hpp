@@ -623,6 +623,7 @@ public:
         //       The reason for this duplication is that we might want to know
         //       whether to display highscores without creating a World.
         return m_minor_mode != MINOR_MODE_3_STRIKES &&
+               m_minor_mode != MINOR_MODE_SOCCER &&
                m_minor_mode != MINOR_MODE_FOLLOW_LEADER;
     }   // modeHasHighscore
 
