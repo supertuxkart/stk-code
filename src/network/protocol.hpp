@@ -112,6 +112,13 @@ class Protocol
          *  \return The protocol type.
          */
         PROTOCOL_TYPE getProtocolType();
+
+        /// functions to check incoming data easily
+        bool checkDataSizeAndToken(Event* event, int minimum_size);
+        bool isByteCorrect(Event* event, int byte_nb, int value);
+        void sendMessageToPeersChangingToken(NetworkString prefix, NetworkString message);
+
+
     protected:
         ProtocolManager* m_listener;        //!< The protocol listener
         PROTOCOL_TYPE m_type;               //!< The type of the protocol

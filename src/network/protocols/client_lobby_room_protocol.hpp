@@ -10,6 +10,12 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
         virtual ~ClientLobbyRoomProtocol();
 
         void requestKartSelection(std::string kart_name);
+        void voteMajor(uint8_t major);
+        void voteRaceCount(uint8_t count);
+        void voteMinor(uint8_t minor);
+        void voteTrack(std::string track, uint8_t track_nb = 0);
+        void voteReversed(bool reversed, uint8_t track_nb = 0);
+        void voteLaps(uint8_t laps, uint8_t track_nb = 0);
         void sendMessage(std::string message);
         void leave();
 
@@ -29,6 +35,13 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
         void startGame(Event* event);
         void startSelection(Event* event);
         void raceFinished(Event* event);
+        // race votes
+        void playerMajorVote(Event* event);
+        void playerRaceCountVote(Event* event);
+        void playerMinorVote(Event* event);
+        void playerTrackVote(Event* event);
+        void playerReversedVote(Event* event);
+        void playerLapsVote(Event* event);
 
         TransportAddress m_server_address;
         STKPeer* m_server;

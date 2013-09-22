@@ -20,9 +20,18 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
         void checkRaceFinished();
 
     protected:
+        // connection management
         void kartDisconnected(Event* event);
         void connectionRequested(Event* event);
+        // kart selection
         void kartSelectionRequested(Event* event);
+        // race votes
+        void playerMajorVote(Event* event);
+        void playerRaceCountVote(Event* event);
+        void playerMinorVote(Event* event);
+        void playerTrackVote(Event* event);
+        void playerReversedVote(Event* event);
+        void playerLapsVote(Event* event);
 
         uint8_t m_next_id; //!< Next id to assign to a peer.
         std::vector<TransportAddress> m_peers;

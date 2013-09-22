@@ -34,6 +34,7 @@
 #include "utils/time.hpp"
 #include "utils/random_generator.hpp"
 
+
 ServerLobbyRoomProtocol::ServerLobbyRoomProtocol() : LobbyRoomProtocol(NULL)
 {
 }
@@ -49,6 +50,7 @@ ServerLobbyRoomProtocol::~ServerLobbyRoomProtocol()
 void ServerLobbyRoomProtocol::setup()
 {
     m_setup = NetworkManager::getInstance()->setupNewGame(); // create a new setup
+    m_setup->getRaceConfig()->setPlayerCount(16); //FIXME : this has to be moved to when logging into the server
     m_next_id = 0;
     m_state = NONE;
     m_public_address.ip = 0;
@@ -73,8 +75,20 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         Log::info("ServerLobbyRoomProtocol", "Message received with type %d.", message_type);
         if (message_type == 0x01) // player requesting connection
             connectionRequested(event);
-        if (message_type == 0x02) // player requesting kart selection
+        else if (message_type == 0x02) // player requesting kart selection
             kartSelectionRequested(event);
+        else if (message_type == 0xc0) // vote for major mode
+            playerMajorVote(event);
+        else if (message_type == 0xc1) // vote for race count
+            playerRaceCountVote(event);
+        else if (message_type == 0xc2) // vote for minor mode
+            playerMinorVote(event);
+        else if (message_type == 0xc3) // vote for track
+            playerTrackVote(event);
+        else if (message_type == 0xc4) // vote for reversed mode
+            playerReversedVote(event);
+        else if (message_type == 0xc5) // vote for laps
+            playerLapsVote(event);
     } // if (event->type == EVENT_TYPE_MESSAGE)
     else if (event->type == EVENT_TYPE_CONNECTED)
     {
@@ -404,21 +418,10 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
 void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
 {
     NetworkString data = event->data();
-    if (data.size() < 6 || data[0] != 4)
-    {
-        Log::warn("ServerLobbyRoomProtocol", "Receiving a badly "
-                  "formated message. Size is %d and first byte %d",
-                  data.size(), data[0]);
-        return;
-    }
     STKPeer* peer = *(event->peer);
-    uint32_t token = data.gui32(1);
-    if (token != peer->getClientServerToken())
-    {
-        Log::warn("ServerLobbyRoomProtocol", "Peer sending bad token. Request "
-                  "aborted.");
+    if (!checkDataSizeAndToken(event, 6))
         return;
-    }
+
     uint8_t kart_name_size = data.gui8(5);
     std::string kart_name = data.gs(6, kart_name_size);
     if (kart_name.size() != kart_name_size)
@@ -461,4 +464,196 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     m_setup->setPlayerKart(peer->getPlayerProfile()->race_id, kart_name);
 }
 
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player votes for a major race mode.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1            5   6                 7
+ *       ----------------------------------------
+ *  Size | 1 |      4     | 1 |        1        |
+ *  Data | 4 | priv token | 1 | major mode vote |
+ *       ----------------------------------------
+ */
+void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
+{
+    NetworkString data = event->data();
+    STKPeer* peer = *(event->peer);
+    if (!checkDataSizeAndToken(event, 7))
+        return;
+    if (!isByteCorrect(event, 5, 1))
+        return;
+    uint8_t player_id = peer->getPlayerProfile()->race_id;
+    m_setup->getRaceConfig()->setPlayerMajorVote(player_id, data[6]);
+    // Send the vote to everybody (including the sender)
+    NetworkString other;
+    other.ai8(1).ai8(player_id); // add the player id
+    data.removeFront(5); // remove the token
+    other += data; // add the data
+    NetworkString prefix;
+    prefix.ai8(0xc0); // prefix the token with the ype
+    sendMessageToPeersChangingToken(prefix, other);
+}
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player votes for the number of races in a GP.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1            5   6             7
+ *       ------------------------------------
+ *  Size | 1 |      4     | 1 |      1      |
+ *  Data | 4 | priv token | 1 | races count |
+ *       ------------------------------------
+ */
+void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
+{
+    NetworkString data = event->data();
+    STKPeer* peer = *(event->peer);
+    if (!checkDataSizeAndToken(event, 7))
+        return;
+    if (!isByteCorrect(event, 5, 1))
+        return;
+    uint8_t player_id = peer->getPlayerProfile()->race_id;
+    m_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, data[6]);
+    // Send the vote to everybody (including the sender)
+    NetworkString other;
+    other.ai8(1).ai8(player_id); // add the player id
+    data.removeFront(5); // remove the token
+    other += data; // add the data
+    NetworkString prefix;
+    prefix.ai8(0xc1); // prefix the token with the ype
+    sendMessageToPeersChangingToken(prefix, other);
+}
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player votes for a minor race mode.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1            5   6                 7
+ *       ----------------------------------------
+ *  Size | 1 |      4     | 1 |        1        |
+ *  Data | 4 | priv token | 1 | minor mode vote |
+ *       ----------------------------------------
+ */
+void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
+{
+    NetworkString data = event->data();
+    STKPeer* peer = *(event->peer);
+    if (!checkDataSizeAndToken(event, 7))
+        return;
+    if (!isByteCorrect(event, 5, 1))
+        return;
+    uint8_t player_id = peer->getPlayerProfile()->race_id;
+    m_setup->getRaceConfig()->setPlayerMinorVote(player_id, data[6]);
+    // Send the vote to everybody (including the sender)
+    NetworkString other;
+    other.ai8(1).ai8(player_id); // add the player id
+    data.removeFront(5); // remove the token
+    other += data; // add the data
+    NetworkString prefix;
+    prefix.ai8(0xc2); // prefix the token with the ype
+    sendMessageToPeersChangingToken(prefix, other);
+}
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player votes for a track.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1            5   6            N+6 N+7                 N+8
+ *       -----------------------------------------------------------
+ *  Size | 1 |      4     | 1 |      N     | 1 |       1           |
+ *  Data | 4 | priv token | N | track name | 1 | track number (gp) |
+ *       -----------------------------------------------------------
+ */
+void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
+{
+    NetworkString data = event->data();
+    STKPeer* peer = *(event->peer);
+    if (!checkDataSizeAndToken(event, 8))
+        return;
+    int N = data[5];
+    std::string track_name = data.gs(5, N);
+    if (!isByteCorrect(event, N+6, 1))
+        return;
+    uint8_t player_id = peer->getPlayerProfile()->race_id;
+    m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name, data[N+7]);
+    // Send the vote to everybody (including the sender)
+    NetworkString other;
+    other.ai8(1).ai8(player_id); // add the player id
+    data.removeFront(5); // remove the token
+    other += data; // add the data
+    NetworkString prefix;
+    prefix.ai8(0xc3); // prefix the token with the ype
+    sendMessageToPeersChangingToken(prefix, other);
+}
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player votes for the reverse mode of a race
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1            5   6          7   8                   9
+ *       ---------------------------------------------------------
+ *  Size | 1 |      4     | 1 |     1    | 1 |       1           |
+ *  Data | 4 | priv token | 1 | reversed | 1 | track number (gp) |
+ *       ---------------------------------------------------------
+ */
+void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
+{
+    NetworkString data = event->data();
+    STKPeer* peer = *(event->peer);
+    if (!checkDataSizeAndToken(event, 9))
+        return;
+    if (!isByteCorrect(event, 5, 1))
+        return;
+    if (!isByteCorrect(event, 7, 1))
+        return;
+    uint8_t player_id = peer->getPlayerProfile()->race_id;
+    m_setup->getRaceConfig()->setPlayerReversedVote(player_id, data[6], data[8]);
+    // Send the vote to everybody (including the sender)
+    NetworkString other;
+    other.ai8(1).ai8(player_id); // add the player id
+    data.removeFront(5); // remove the token
+    other += data; // add the data
+    NetworkString prefix;
+    prefix.ai8(0xc4); // prefix the token with the ype
+    sendMessageToPeersChangingToken(prefix, other);
+}
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player votes for a major race mode.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1            5   6      7   8                   9
+ *       -----------------------------------------------------
+ *  Size | 1 |      4     | 1 |   1  | 1 |       1           |
+ *  Data | 4 | priv token | 1 | laps | 1 | track number (gp) |
+ *       -----------------------------------------------------
+ */
+void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
+{
+    NetworkString data = event->data();
+    STKPeer* peer = *(event->peer);
+    if (!checkDataSizeAndToken(event, 9))
+        return;
+    if (!isByteCorrect(event, 5, 1))
+        return;
+    if (!isByteCorrect(event, 7, 1))
+        return;
+    uint8_t player_id = peer->getPlayerProfile()->race_id;
+    m_setup->getRaceConfig()->setPlayerLapsVote(player_id, data[6], data[8]);
+    // Send the vote to everybody (including the sender)
+    NetworkString other;
+    other.ai8(1).ai8(player_id); // add the player id
+    data.removeFront(5); // remove the token
+    other += data; // add the data
+    NetworkString prefix;
+    prefix.ai8(0xc5); // prefix the token with the ype
+    sendMessageToPeersChangingToken(prefix, other);
+}
 //-----------------------------------------------------------------------------

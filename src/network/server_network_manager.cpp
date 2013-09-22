@@ -62,6 +62,16 @@ void* waitInput2(void* data)
             assert(protocol);
             protocol->startSelection();
         }
+        else if (str == "compute_race")
+        {
+            GameSetup* setup = NetworkManager::getInstance()->getGameSetup();
+            setup->getRaceConfig()->computeRaceMode();
+        }
+        else if (str == "compute_track")
+        {
+            GameSetup* setup = NetworkManager::getInstance()->getGameSetup();
+            setup->getRaceConfig()->computeNextTrack();
+        }
     }
 
     uint32_t id = ProtocolManager::getInstance()->requestStart(new StopServer());

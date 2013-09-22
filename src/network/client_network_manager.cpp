@@ -44,14 +44,6 @@ void* waitInput(void* data)
         {
             stop = true;
         }
-        else if (str == "disconnect")
-        {
-            NetworkManager::getInstance()->getPeers()[0]->disconnect();
-        }
-        else if (str == "connect")
-        {
-            ProtocolManager::getInstance()->requestStart(new ConnectToServer());
-        }
         else if (str == "select")
         {
             std::string str2;
@@ -60,9 +52,48 @@ void* waitInput(void* data)
             ClientLobbyRoomProtocol* clrp = static_cast<ClientLobbyRoomProtocol*>(protocol);
             clrp->requestKartSelection(str2);
         }
-        else if (str == "synchronize")
+        else if (str == "vote")
         {
-            ProtocolManager::getInstance()->requestStart(new SynchronizationProtocol());
+            std::cout << "Vote for ? (track/laps/reversed/major/minor/race#) :";
+            std::string str2;
+            getline(std::cin, str2);
+            Protocol* protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM);
+            ClientLobbyRoomProtocol* clrp = static_cast<ClientLobbyRoomProtocol*>(protocol);
+            if (str2 == "track")
+            {
+                std::cin >> str2;
+                clrp->voteTrack(str2);
+            }
+            else if (str2 == "laps")
+            {
+                int cnt;
+                std::cin >> cnt;
+                clrp->voteLaps(cnt);
+            }
+            else if (str2 == "reversed")
+            {
+                bool cnt;
+                std::cin >> cnt;
+                clrp->voteReversed(cnt);
+            }
+            else if (str2 == "major")
+            {
+                int cnt;
+                std::cin >> cnt;
+                clrp->voteMajor(cnt);
+            }
+            else if (str2 == "minor")
+            {
+                int cnt;
+                std::cin >> cnt;
+                clrp->voteMinor(cnt);
+            }
+            else if (str2 == "race#")
+            {
+                int cnt;
+                std::cin >> cnt;
+                clrp->voteRaceCount(cnt);
+            }
         }
         else if (NetworkManager::getInstance()->getPeers().size() > 0)
         {

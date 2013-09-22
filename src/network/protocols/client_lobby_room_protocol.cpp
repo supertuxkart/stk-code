@@ -46,6 +46,7 @@ ClientLobbyRoomProtocol::~ClientLobbyRoomProtocol()
 void ClientLobbyRoomProtocol::setup()
 {
     m_setup = NetworkManager::getInstance()->setupNewGame(); // create a new setup
+    m_setup->getRaceConfig()->setPlayerCount(16); //FIXME : this has to be changed when logging into the server
     m_state = NONE;
 }
 
@@ -56,7 +57,67 @@ void ClientLobbyRoomProtocol::requestKartSelection(std::string kart_name)
     NetworkString request;
     // 0x02 : kart selection request, size_token (4), token, size kart name, kart name
     request.ai8(0x02).ai8(4).ai32(m_server->getClientServerToken()).ai8(kart_name.size()).as(kart_name);
-    m_listener->sendMessage(this, request);
+    m_listener->sendMessage(this, request, true);
+}
+
+//-----------------------------------------------------------------------------
+
+void ClientLobbyRoomProtocol::voteMajor(uint8_t major)
+{
+    NetworkString request;
+    // 0xc0 : major vote, size_token (4), token, size major(1),major
+    request.ai8(0xc0).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(major);
+    m_listener->sendMessage(this, request, true);
+}
+
+//-----------------------------------------------------------------------------
+
+void ClientLobbyRoomProtocol::voteRaceCount(uint8_t count)
+{
+    NetworkString request;
+    // 0xc0 : race count vote, size_token (4), token, size race count(1), count
+    request.ai8(0xc1).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(count);
+    m_listener->sendMessage(this, request, true);
+}
+
+//-----------------------------------------------------------------------------
+
+void ClientLobbyRoomProtocol::voteMinor(uint8_t minor)
+{
+    NetworkString request;
+    // 0xc0 : minor vote, size_token (4), token, size minor(1),minor
+    request.ai8(0xc2).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(minor);
+    m_listener->sendMessage(this, request, true);
+}
+
+//-----------------------------------------------------------------------------
+
+void ClientLobbyRoomProtocol::voteTrack(std::string track, uint8_t track_nb)
+{
+    NetworkString request;
+    // 0xc0 : major vote, size_token (4), token, size track, track, size #track, #track
+    request.ai8(0xc3).ai8(4).ai32(m_server->getClientServerToken()).ai8(track.size()).as(track).ai8(1).ai8(track_nb);
+    m_listener->sendMessage(this, request, true);
+}
+
+//-----------------------------------------------------------------------------
+
+void ClientLobbyRoomProtocol::voteReversed(bool reversed, uint8_t track_nb)
+{
+    NetworkString request;
+    // 0xc0 : major vote, size_token (4), token, size reversed(1),reversed, size #track, #track
+    request.ai8(0xc4).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(reversed).ai8(1).ai8(track_nb);
+    m_listener->sendMessage(this, request, true);
+}
+
+//-----------------------------------------------------------------------------
+
+void ClientLobbyRoomProtocol::voteLaps(uint8_t laps, uint8_t track_nb)
+{
+    NetworkString request;
+    // 0xc0 : major vote, size_token (4), token, size laps(1),laps, size #track, #track
+    request.ai8(0xc5).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(laps).ai8(1).ai8(track_nb);
+    m_listener->sendMessage(this, request, true);
 }
 
 //-----------------------------------------------------------------------------
@@ -124,6 +185,18 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
             connectionAccepted(event);
         else if (message_type == 0x82) // kart selection refused
             kartSelectionRefused(event);
+        else if (message_type == 0xc0) // vote for major mode
+            playerMajorVote(event);
+        else if (message_type == 0xc1) // vote for race count
+            playerRaceCountVote(event);
+        else if (message_type == 0xc2) // vote for minor mode
+            playerMinorVote(event);
+        else if (message_type == 0xc3) // vote for track
+            playerTrackVote(event);
+        else if (message_type == 0xc4) // vote for reversed mode
+            playerReversedVote(event);
+        else if (message_type == 0xc5) // vote for laps
+            playerLapsVote(event);
 
         return true;
     } // message
@@ -588,4 +661,146 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
     ranked_world->terminateRace();
 }
 
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player votes for a major race mode.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1            5   6           7   8                 9
+ *       --------------------------------------------------------
+ *  Size | 1 |      4     | 1 |     1     | 1 |        1        |
+ *  Data | 4 | priv token | 1 | player id | 1 | major mode vote |
+ *       --------------------------------------------------------
+ */
+void ClientLobbyRoomProtocol::playerMajorVote(Event* event)
+{
+    NetworkString data = event->data();
+    if (!checkDataSizeAndToken(event, 9))
+        return;
+    if (!isByteCorrect(event, 5, 1))
+        return;
+    if (!isByteCorrect(event, 7, 1))
+        return;
+    m_setup->getRaceConfig()->setPlayerMajorVote(data[6], data[8]);
+}
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player votes for the number of races in a GP.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1            5   6           7   8             9
+ *       ----------------------------------------------------
+ *  Size | 1 |      4     | 1 |     1     | 1 |      1      |
+ *  Data | 4 | priv token | 1 | player id | 1 | races count |
+ *       ----------------------------------------------------
+ */
+void ClientLobbyRoomProtocol::playerRaceCountVote(Event* event)
+{
+    NetworkString data = event->data();
+    if (!checkDataSizeAndToken(event, 9))
+        return;
+    if (!isByteCorrect(event, 5, 1))
+        return;
+    if (!isByteCorrect(event, 7, 1))
+        return;
+    m_setup->getRaceConfig()->setPlayerRaceCountVote(data[6], data[8]);
+}
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player votes for a minor race mode.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1            5   6           7   8                 9
+ *       --------------------------------------------------------
+ *  Size | 1 |      4     | 1 |      1    | 1 |        1        |
+ *  Data | 4 | priv token | 1 | player id | 1 | minor mode vote |
+ *       --------------------------------------------------------
+ */
+void ClientLobbyRoomProtocol::playerMinorVote(Event* event)
+{
+    NetworkString data = event->data();
+    if (!checkDataSizeAndToken(event, 9))
+        return;
+    if (!isByteCorrect(event, 5, 1))
+        return;
+    if (!isByteCorrect(event, 7, 1))
+        return;
+    m_setup->getRaceConfig()->setPlayerMinorVote(data[6], data[8]);
+}
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player votes for a track.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1            5   6           7   8            N+8 N+9                 N+10
+ *       ---------------------------------------------------------------------------
+ *  Size | 1 |      4     | 1 |      1    | 1 |      N     | 1 |       1           |
+ *  Data | 4 | priv token | 1 | player id | N | track name | 1 | track number (gp) |
+ *       ---------------------------------------------------------------------------
+ */
+void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
+{
+    NetworkString data = event->data();
+    if (!checkDataSizeAndToken(event, 10))
+        return;
+    if (!isByteCorrect(event, 5, 1))
+        return;
+    int N = data[7];
+    std::string track_name = data.gs(8, N);
+    if (!isByteCorrect(event, N+8, 1))
+        return;
+    m_setup->getRaceConfig()->setPlayerTrackVote(data[6], track_name, data[N+9]);
+}
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player votes for the reverse mode of a race
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1            5   6           7   8          9   10                  11
+ *       -------------------------------------------------------------------------
+ *  Size | 1 |      4     | 1 |     1     | 1 |     1    | 1 |       1           |
+ *  Data | 4 | priv token | 1 | player id | 1 | reversed | 1 | track number (gp) |
+ *       -------------------------------------------------------------------------
+ */
+void ClientLobbyRoomProtocol::playerReversedVote(Event* event)
+{
+    NetworkString data = event->data();
+    if (!checkDataSizeAndToken(event, 11))
+        return;
+    if (!isByteCorrect(event, 5, 1))
+        return;
+    if (!isByteCorrect(event, 7, 1))
+        return;
+    if (!isByteCorrect(event, 9, 1))
+        return;
+    m_setup->getRaceConfig()->setPlayerReversedVote(data[6], data[8], data[10]);
+}
+//-----------------------------------------------------------------------------
+
+/*! \brief Called when a player votes for a major race mode.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0   1            5   6           7   8      9   10                  11
+ *       ---------------------------------------------------------------------
+ *  Size | 1 |      4     | 1 |     1     | 1 |   1  | 1 |       1           |
+ *  Data | 4 | priv token | 1 | player id | 1 | laps | 1 | track number (gp) |
+ *       ---------------------------------------------------------------------
+ */
+void ClientLobbyRoomProtocol::playerLapsVote(Event* event)
+{
+    NetworkString data = event->data();
+    if (!checkDataSizeAndToken(event, 9))
+        return;
+    if (!isByteCorrect(event, 5, 1))
+        return;
+    if (!isByteCorrect(event, 7, 1))
+        return;
+    m_setup->getRaceConfig()->setPlayerLapsVote(data[6], data[8], data[10]);
+}
 //-----------------------------------------------------------------------------
