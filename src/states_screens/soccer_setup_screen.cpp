@@ -137,10 +137,12 @@ void SoccerSetupScreen::beforeAddingWidget()
 void SoccerSetupScreen::init()
 {
     Screen::init();
+    
+    if (UserConfigParams::m_num_goals <= 0)
+        UserConfigParams::m_num_goals = 3;
 
-    // TODO: remember in config.xml the last number of goals
     SpinnerWidget*  goalamount = getWidget<SpinnerWidget>("goalamount");
-    goalamount->setValue(3);
+    goalamount->setValue(UserConfigParams::m_num_goals);
 
     // Set focus on "continue"
     ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
@@ -164,6 +166,8 @@ void SoccerSetupScreen::tearDown()
 
     // Reset the 'map fire to select' option of the device manager
     input_manager->getDeviceList()->mapFireToSelect(false);
+    
+    UserConfigParams::m_num_goals = getWidget<SpinnerWidget>("goalamount")->getValue();
 
     // Remove all ModelViewWidgets we created manually
     PtrVector<Widget>&  children = central_div->getChildren();
