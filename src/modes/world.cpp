@@ -827,11 +827,12 @@ void World::update(float dt)
     if(ReplayRecorder::get()) ReplayRecorder::get()->update(dt);
     if(ReplayPlay::get()) ReplayPlay::get()->update(dt);
     if(history->replayHistory()) dt=history->getNextDelta();
-    WorldStatus::update(dt);
     // Clear race state so that new information can be stored
     race_state->clear();
 
-    RewindManager::get()->saveStates(dt);
+    RewindManager::get()->setCurrentTime(World::getWorld()->getTime(), dt);
+    RewindManager::get()->saveStates();
+    WorldStatus::update(dt);
 
 
     if(network_manager->getMode()!=NetworkManager::NW_CLIENT &&

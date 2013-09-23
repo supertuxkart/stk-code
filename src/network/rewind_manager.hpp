@@ -108,6 +108,9 @@ private:
         /** Time when this state was taken. */
         float m_time;
 
+        /** Time step size. */
+        float m_time_step;
+
         /** The 'left over' time from the physics. */
         float m_local_physics_time;
 
@@ -122,10 +125,10 @@ private:
         /** The Rewinder instance for which this data is. */
         Rewinder *m_rewinder;
     public:
-        RewindInfo(Rewinder *rewinder, float time, char *buffer, 
+        RewindInfo(Rewinder *rewinder, char *buffer, 
                    bool is_event, bool is_confirmed);
         // --------------------------------------------------------------------
-        RewindInfo(float time);
+        RewindInfo();
         // --------------------------------------------------------------------
         ~RewindInfo()
         {
@@ -137,6 +140,9 @@ private:
         // --------------------------------------------------------------------
         /** Returns the time at which this rewind state was saved. */
         float getTime() const { return m_time; }
+        // --------------------------------------------------------------------
+        /** Time step size. */
+        float getTimeStep() const { return m_time_step; }
         // --------------------------------------------------------------------
         bool isEvent() const { return m_type==RIT_EVENT; }
         // --------------------------------------------------------------------
@@ -203,6 +209,15 @@ private:
     /** Time at which the last state was saved. */
     float m_last_saved_state;
 
+    /** The current time to be used in all states/events. This is used to
+     *  give all states and events during one frame the same time, even
+     *  if e.g. states are saved before world time is increased, other
+     *  events later. */
+    float m_current_time;
+
+    /** The current time step size. */
+    float m_time_step;
+
 #define REWIND_SEARCH_STATS
 
 #ifdef REWIND_SEARCH_STATS
@@ -223,6 +238,24 @@ public:
     static RewindManager *create();
     static void destroy();
     // ------------------------------------------------------------------------
+    /** Sets the time that is to be used for all further states or events,
+     *  and the time step size. This is necessary so that states/events before 
+     *  and after World::m_time is increased have the same time stamp. 
+     *  \param t Time.
+     *  \param dt Time step size.
+     */
+    void setCurrentTime(float t, float dt)
+    {
+        m_current_time = t;
+        m_time_step    = dt;
+    }   // setCurrentTime
+
+    // ------------------------------------------------------------------------
+    /** Returns the current time. */
+    float getCurrentTime() const { return m_current_time; }
+    // ------------------------------------------------------------------------
+    float getCurrentTimeStep() const { return m_time_step; }
+    // ------------------------------------------------------------------------
     /** En- or disables rewinding. */
     static void setEnable(bool m) { m_enable_rewind_manager = m;}
 
@@ -242,7 +275,9 @@ public:
     // ------------------------------------------------------------------------
 
     void reset();
-    void saveStates(float dt);
+    void saveStates();
+    void rewindTo(float target_time);
+    void addEvent(Rewinder *rewinder, char *buffer);
     // ------------------------------------------------------------------------
     /** Adds a Rewinder to the list of all rewinders.
      *  \return true If rewinding is enabled, false otherwise. 
@@ -254,9 +289,8 @@ public:
         return true;
     }   // addRewinder
     // ------------------------------------------------------------------------
-    void rewindTo(float target_time);
-    // ------------------------------------------------------------------------
-    void addEvent(Rewinder *rewinder, float time, char *buffer);
+    /** Returns true if currently a rewind is happening. */
+    bool isRewinding() const { return m_is_rewinding; }
 };   // RewindManager
 
 

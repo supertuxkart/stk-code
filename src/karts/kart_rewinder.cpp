@@ -93,7 +93,7 @@ void KartRewinder::update()
     m_previous_control.copyToMemory(buffer);
 
     // The rewind manager will free the memory once it's not needed anymore
-    RewindManager::get()->addEvent(this, World::getWorld()->getTime(), buffer);
+    RewindManager::get()->addEvent(this, buffer);
 }   // update
 
 // ----------------------------------------------------------------------------

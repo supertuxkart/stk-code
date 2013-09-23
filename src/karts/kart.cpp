@@ -52,8 +52,9 @@
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
-#include "network/race_state.hpp"
 #include "network/network_manager.hpp"
+#include "network/rewind_manager.hpp"
+#include "network/race_state.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
 #include "physics/btUprightConstraint.hpp"
@@ -530,7 +531,7 @@ void Kart::blockViewWithPlunger()
     if(isShielded())
     {
         decreaseShieldTime(0.0f); //decrease the default amount of time
-        Log::verbose("Kart", "Decreasing shield, because of removing the plunger. \n");
+        Log::verbose("Kart", "Decreasing shield, because of removing the plunger.");
     }
 }   // blockViewWithPlunger
 
@@ -1088,7 +1089,7 @@ void Kart::update(float dt)
     // Update the position and other data taken from the physics
     Moveable::update(dt);
 
-    if(!history->replayHistory())
+    if(!history->replayHistory() && !RewindManager::get()->isRewinding())
         m_controller->update(dt);
 
     // if its view is blocked by plunger, decrease remaining time
@@ -1362,7 +1363,7 @@ void Kart::setSquash(float time, float slowdown)
     if (isShielded())
     {
         decreaseShieldTime(stk_config->m_bubblegum_shield_time/2.0f);
-        Log::verbose("Kart", "Decreasing shield \n");
+        Log::verbose("Kart", "Decreasing shield");
         return;
     }
 
@@ -2043,7 +2044,7 @@ void Kart::updatePhysics(float dt)
        );
 #endif
 
-}   // updatePhysics
+}   // updatephysics
 
 //-----------------------------------------------------------------------------
 /** Adjust the engine sound effect depending on the speed of the kart.
