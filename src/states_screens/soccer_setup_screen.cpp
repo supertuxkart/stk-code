@@ -56,7 +56,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, c
     if(name == "continue")
     {
         StateManager::get()->pushScreen( ArenasScreen::getInstance() );
-		race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
+        race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
         input_manager->setMasterPlayerOnly(true);
     }
     else if (name == "back")
@@ -216,6 +216,11 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
         if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) || areAllKartsConfirmed())
             return result;
 
+        if(getNumConfirmedKarts() > nb_players-2 && 
+          (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 || 
+           getNumKartsInTeam(SOCCER_TEAM_BLUE) == 0))
+           return EVENT_BLOCK;
+
         // Confirm team selection
         for(int i=0 ; i < nb_players ; i++)
         {
@@ -299,6 +304,30 @@ bool SoccerSetupScreen::areAllKartsConfirmed() const
         }
     }
     return all_confirmed;
+}
+
+int SoccerSetupScreen::getNumKartsInTeam(int team)
+{
+    int karts_in_team = 0;
+    int nb_players = m_kart_view_info.size();
+    for(int i=0 ; i < nb_players ; i++)
+    {
+        if(m_kart_view_info[i].team == team)
+            karts_in_team++;
+    }
+    return karts_in_team;
+}
+
+int SoccerSetupScreen::getNumConfirmedKarts()
+{
+    int confirmed_karts = 0;
+    int nb_players = m_kart_view_info.size();
+    for(int i=0 ; i < nb_players ; i++)
+    {
+        if(m_kart_view_info[i].confirmed == true)
+            confirmed_karts++;
+    }
+    return confirmed_karts;
 }
 
 void SoccerSetupScreen::updateKartViewsLayout()

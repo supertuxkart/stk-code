@@ -72,6 +72,8 @@ public:
 
 private:
     bool areAllKartsConfirmed() const;
+    int SoccerSetupScreen::getNumKartsInTeam(int team);
+    int SoccerSetupScreen::getNumConfirmedKarts();
     void updateKartViewsLayout();
 };
 
