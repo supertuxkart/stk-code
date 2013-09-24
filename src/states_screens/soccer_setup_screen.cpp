@@ -216,10 +216,16 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
         if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) || areAllKartsConfirmed())
             return result;
 
-        if(getNumConfirmedKarts() > nb_players-2 && 
-          (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 || 
-           getNumKartsInTeam(SOCCER_TEAM_BLUE) == 0))
-           return EVENT_BLOCK;
+        if (getNumConfirmedKarts() > nb_players-2 && 
+           (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 || 
+            getNumKartsInTeam(SOCCER_TEAM_BLUE) == 0))
+        {
+            if (!m_kart_view_info[playerId].confirmed)
+            {
+                sfx_manager->quickSound( "anvil" );
+            }
+            return EVENT_BLOCK;
+        }
 
         // Confirm team selection
         for(int i=0 ; i < nb_players ; i++)
@@ -229,6 +235,8 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
             {
                 m_kart_view_info[i].confirmed = true;
                 m_kart_view_info[i].view->setRotateTo( KART_CONFIRMATION_TARGET_ANGLE, KART_CONFIRMATION_ROTATION_SPEED );
+                m_kart_view_info[i].view->setBadge(OK_BADGE);
+                sfx_manager->quickSound( "wee" );
                 break;
             }
         }
@@ -248,6 +256,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
             {
                 m_kart_view_info[i].confirmed = false;
                 m_kart_view_info[i].view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );
+                m_kart_view_info[i].view->unsetBadge(OK_BADGE);
                 break;
             }
         }
@@ -257,7 +266,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
     default:
         break;
     }
-
+        
     if(team_switch != SOCCER_TEAM_NONE) // A player wants to change his team?
     {
         // Find the corresponding kart view, update its team and update the layout
