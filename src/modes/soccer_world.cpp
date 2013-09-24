@@ -117,11 +117,12 @@ void SoccerWorld::update(float dt)
     if (world->getPhase() == World::GOAL_PHASE)
     {
         m_goal_timer += dt;
-    }
-    if (m_goal_timer > 3.0f)
-    {
-        world->setPhase(WorldStatus::RACE_PHASE);
-        m_goal_timer = 0;
+
+        if (m_goal_timer > 3.0f)
+        {
+            world->setPhase(WorldStatus::RACE_PHASE);
+            m_goal_timer = 0;
+        }
     }
 
     // TODO
