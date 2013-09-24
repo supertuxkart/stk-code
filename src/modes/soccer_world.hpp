@@ -49,6 +49,8 @@ private:
     and re-enabled when the next game can be played)*/
     bool m_can_score_points;
     SFXBase *m_goal_sound;
+    /** Timer for displaying goal text*/
+    float m_goal_timer;
 
 public:
 
@@ -74,8 +76,6 @@ public:
     virtual const std::string& getIdent() const;
 
     virtual void update(float dt);
-
-    virtual void countdownReachedZero();
 
     void onCheckGoalTriggered(bool first_goal);
     int getTeamLeader(unsigned int i);

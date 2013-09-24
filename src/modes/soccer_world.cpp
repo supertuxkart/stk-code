@@ -53,6 +53,7 @@ void SoccerWorld::init()
 {
     WorldWithRank::init();
     m_display_rank = false;
+    m_goal_timer = 0.f;
 
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
@@ -90,9 +91,6 @@ void SoccerWorld::reset()
         obj->reset();
         obj->getPhysics()->reset();
     }
-    
-    World *world = World::getWorld();
-    world->setClockMode(World::CLOCK_NONE);
 
     initKartList();
 }   // reset
@@ -111,8 +109,20 @@ const std::string& SoccerWorld::getIdent() const
  */
 void SoccerWorld::update(float dt)
 {
+    World *world = World::getWorld();
+
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
+
+    if (world->getPhase() == World::GOAL_PHASE)
+    {
+        m_goal_timer += dt;
+    }
+    if (m_goal_timer > 3.0f)
+    {
+        world->setPhase(WorldStatus::RACE_PHASE);
+        m_goal_timer = 0;
+    }
 
     // TODO
 }   // update
@@ -131,7 +141,6 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         //printf("Score:\nTeam One %d : %d Team Two\n", m_team_goals[0], m_team_goals[1]);
         World *world = World::getWorld();
         world->setPhase(WorldStatus::GOAL_PHASE);
-        world->setClockMode(World::CLOCK_COUNTDOWN, 1.0);
         m_goal_sound->play();
     }
 
@@ -450,8 +459,4 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
 }   // createKart
 
 //-----------------------------------------------------------------------------
-void SoccerWorld::countdownReachedZero()
-{
-    World *world = World::getWorld();
-    world->setPhase(World::RACE_PHASE);
-}   // countdownReachedZero
+
