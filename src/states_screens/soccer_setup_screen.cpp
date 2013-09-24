@@ -35,7 +35,7 @@ using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( SoccerSetupScreen );
 
 #define KART_CONTINUOUS_ROTATION_SPEED      35.f
-#define KART_CONFIRMATION_ROTATION_SPEED    0.f
+#define KART_CONFIRMATION_ROTATION_SPEED    4.f
 #define KART_CONFIRMATION_TARGET_ANGLE      10.f
 
 // -----------------------------------------------------------------------------
@@ -219,7 +219,8 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
         // Confirm team selection
         for(int i=0 ; i < nb_players ; i++)
         {
-            if(m_kart_view_info[i].local_player_id == playerId)
+            if(m_kart_view_info[i].local_player_id == playerId && 
+               m_kart_view_info[i].confirmed == false)
             {
                 m_kart_view_info[i].confirmed = true;
                 m_kart_view_info[i].view->setRotateTo( KART_CONFIRMATION_TARGET_ANGLE, KART_CONFIRMATION_ROTATION_SPEED );
