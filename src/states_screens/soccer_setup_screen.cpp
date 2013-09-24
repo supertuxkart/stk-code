@@ -196,12 +196,28 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
     switch(action)
     {
     case PA_MENU_LEFT:
-        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
+            m_kart_view_info[playerId].confirmed == false)
+        {
             team_switch = SOCCER_TEAM_RED;
+
+            for(int i=0 ; i < nb_players ; i++)
+            {
+                m_kart_view_info[i].view->unsetBadge(BAD_BADGE);
+            }
+        }
         break;
     case PA_MENU_RIGHT:
-        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
+            m_kart_view_info[playerId].confirmed == false)
+        {
             team_switch = SOCCER_TEAM_BLUE;
+
+            for(int i=0 ; i < nb_players ; i++)
+            {
+                m_kart_view_info[i].view->unsetBadge(BAD_BADGE);
+            }
+        }
         break;
     case PA_MENU_UP:
         if (playerId != PLAYER_ID_GAME_MASTER)
@@ -223,6 +239,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
             if (!m_kart_view_info[playerId].confirmed)
             {
                 sfx_manager->quickSound( "anvil" );
+                m_kart_view_info[playerId].view->setBadge(BAD_BADGE);
             }
             return EVENT_BLOCK;
         }
@@ -257,8 +274,8 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
                 m_kart_view_info[i].confirmed = false;
                 m_kart_view_info[i].view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );
                 m_kart_view_info[i].view->unsetBadge(OK_BADGE);
-                break;
             }
+            m_kart_view_info[i].view->unsetBadge(BAD_BADGE);
         }
         result = EVENT_BLOCK;
         break;
