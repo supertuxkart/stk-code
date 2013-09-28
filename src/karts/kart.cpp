@@ -1405,6 +1405,21 @@ void Kart::handleMaterialSFX(const Material *material)
             m_terrain_sound = NULL;
         }
     }
+
+    if(m_terrain_sound)
+    {
+        if((m_flying || dynamic_cast<RescueAnimation*>(getKartAnimation())) &&
+            m_terrain_sound->getStatus()!=SFXManager::SFX_PAUSED)
+        {
+            m_terrain_sound->pause();
+        }
+        else if(m_terrain_sound->getStatus()==SFXManager::SFX_PAUSED && 
+               !m_flying && !dynamic_cast<RescueAnimation*>(getKartAnimation()))
+        {
+            m_terrain_sound->resume();
+        }
+    }
+
     if(m_previous_terrain_sound &&
         m_previous_terrain_sound->getStatus()==SFXManager::SFX_STOPPED)
     {
@@ -1417,9 +1432,7 @@ void Kart::handleMaterialSFX(const Material *material)
 
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
-    if(m_terrain_sound
-        && (m_terrain_sound->getStatus() == SFXManager::SFX_PLAYING
-         || m_terrain_sound->getStatus() == SFXManager::SFX_PAUSED))
+    if(m_terrain_sound && m_terrain_sound->getStatus()==SFXManager::SFX_PLAYING)
     {
         m_terrain_sound->position(getXYZ());
         material->setSFXSpeed(m_terrain_sound, m_speed);
