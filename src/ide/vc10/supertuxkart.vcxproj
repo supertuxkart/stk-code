@@ -302,9 +302,12 @@
     <ClCompile Include="..\..\tinygettext\stk_file_system.cpp" />
     <ClCompile Include="..\..\tinygettext\tgt_log.cpp" />
     <ClCompile Include="..\..\tinygettext\tinygettext.cpp" />
+    <ClCompile Include="..\..\tracks\battle_graph.cpp" />
     <ClCompile Include="..\..\tracks\check_cannon.cpp" />
     <ClCompile Include="..\..\tracks\check_goal.cpp" />
     <ClCompile Include="..\..\tracks\lod_node_loader.cpp" />
+    <ClCompile Include="..\..\tracks\navmesh.cpp" />
+    <ClCompile Include="..\..\tracks\nav_poly.cpp" />
     <ClCompile Include="..\..\tracks\track_object_presentation.cpp" />
     <ClCompile Include="..\..\tracks\track_sector.cpp" />
     <ClCompile Include="..\..\utils\constants.cpp" />
@@ -561,9 +564,12 @@
     <ClInclude Include="..\..\tinygettext\stk_file_system.hpp" />
     <ClInclude Include="..\..\tinygettext\tgt_log.hpp" />
     <ClInclude Include="..\..\tinygettext\tinygettext.hpp" />
+    <ClInclude Include="..\..\tracks\battle_graph.hpp" />
     <ClInclude Include="..\..\tracks\check_cannon.hpp" />
     <ClInclude Include="..\..\tracks\check_goal.hpp" />
     <ClInclude Include="..\..\tracks\lod_node_loader.hpp" />
+    <ClInclude Include="..\..\tracks\navmesh.hpp" />
+    <ClInclude Include="..\..\tracks\nav_poly.hpp" />
     <ClInclude Include="..\..\tracks\track_object_presentation.hpp" />
     <ClInclude Include="..\..\tracks\track_sector.hpp" />
     <ClInclude Include="..\..\utils\constants.hpp" />

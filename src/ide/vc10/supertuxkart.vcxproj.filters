@@ -873,6 +873,15 @@
     <ClCompile Include="..\..\utils\time.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\tracks\navmesh.cpp">
+      <Filter>Source Files\tracks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tracks\nav_poly.cpp">
+      <Filter>Source Files\tracks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tracks\battle_graph.cpp">
+      <Filter>Source Files\tracks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1669,6 +1678,15 @@
     </ClInclude>
     <ClInclude Include="..\..\guiengine\widgets\rating_bar_widget.hpp">
       <Filter>Header Files\guiengine\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tracks\navmesh.hpp">
+      <Filter>Header Files\tracks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tracks\nav_poly.hpp">
+      <Filter>Source Files\tracks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tracks\battle_graph.hpp">
+      <Filter>Header Files\tracks</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
