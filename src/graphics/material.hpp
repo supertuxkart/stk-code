@@ -253,7 +253,7 @@ public:
                    bool complain_if_not_found=true);
          ~Material ();
 
-    void  setSFXSpeed(SFXBase *sfx, float speed) const;
+    void  setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) const;
     void  setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb);
     void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, bool use_fog) const;
 

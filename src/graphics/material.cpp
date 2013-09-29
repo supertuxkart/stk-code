@@ -938,8 +938,9 @@ void Material::initParticlesEffect(const XMLNode *node)
 /** Adjusts the pitch of the given sfx depending on the given speed.
  *  \param sfx The sound effect to adjust.
  *  \param speed The speed of the kart.
+ *  \param should_be_paused Pause for other reasons, i.e. kart is rescued.
  */
-void Material::setSFXSpeed(SFXBase *sfx, float speed) const
+void Material::setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) const
 {
     // Still make a sound when driving backwards on the material.
     if (speed < 0) speed = -speed;
@@ -947,14 +948,14 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed) const
     // If we paused it due to too low speed earlier, we can continue now.
     if (sfx->getStatus() == SFXManager::SFX_PAUSED)
     {
-        if (speed<m_sfx_min_speed) return;
+        if (speed<m_sfx_min_speed || should_be_paused == 1) return;
         // TODO: Do we first need to stop the sound completely so it
         // starts over?
         sfx->play();
     }
     else if (sfx->getStatus() == SFXManager::SFX_PLAYING)
     {
-        if (speed<m_sfx_min_speed)
+        if (speed<m_sfx_min_speed || should_be_paused == 1)
         {
             // Pausing it to differentiate with sounds that ended etc
             sfx->pause();
