@@ -19,12 +19,12 @@
 #ifndef HEADER_NAV_POLY_HPP
 #define HEADER_NAV_POLY_HPP
 
-#include "tracks/navmesh.hpp"
 
 #include <vector>
 #include <string>
-
+#include <SColor.h>
 #include "utils/vec3.hpp"
+
 
 
 class NavPoly
@@ -45,9 +45,17 @@ public:
             const std::vector<int> &adjacentPolygonIndices);
     
     const Vec3&        getCenter() const   {return m_center;}
+
     const std::vector<int>&     getAdjacents() const {return m_adjacents;}
+
     const std::vector<Vec3>     getVertices();
+
+    const std::vector<int>      getVerticesIndex() const {return m_vertices;}
+
     bool                        pointInPoly(const Vec3& p) const;
+
+    const Vec3&                 operator[](int i) const ;
+   
 };
 
 

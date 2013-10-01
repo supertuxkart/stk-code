@@ -57,6 +57,7 @@ using namespace irr;
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/bezier_curve.hpp"
+#include "tracks/battle_graph.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/lod_node_loader.hpp"
 #include "tracks/track_manager.hpp"
@@ -168,6 +169,7 @@ void Track::reset()
 void Track::cleanup()
 {
     QuadGraph::destroy();
+    BattleGraph::destroy();
     ItemManager::destroy();
 
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
@@ -506,6 +508,18 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
         }
     }
 }   // loadQuadGraph
+
+//-----------------------------------------------------------------------------
+/** Loads the polygon graph for battle, i.e. the definition of all polys, and the way
+ *  they are connected to each other. Input file name is hardcoded for now
+ */
+void Track::loadBattleGraph()
+{
+    BattleGraph::create(m_root+"navmesh.xml");
+}
+
+
+
 // -----------------------------------------------------------------------------
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {
@@ -1416,6 +1430,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // the information about the size of the texture to render the mini
     // map to.
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
+    if (m_is_arena && !m_is_soccer && !m_is_cutscene) loadBattleGraph();
 
     ItemManager::create();
 
@@ -1734,6 +1749,12 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
         !m_is_cutscene)
         QuadGraph::get()->createDebugMesh();
+
+    if (UserConfigParams::m_track_debug &&
+        race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
+        !m_is_cutscene)
+        BattleGraph::get()->createDebugMesh();
+
 
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.

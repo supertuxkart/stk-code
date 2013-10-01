@@ -16,8 +16,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "tracks/navmesh.hpp"
+
+
 #include "tracks/nav_poly.hpp"
+#include "tracks/navmesh.hpp"
+
+#include <algorithm>
 
 
 NavPoly::NavPoly(const  std::vector<int> &polygonVertIndices,  
@@ -57,7 +61,7 @@ bool NavPoly::pointInPoly(const Vec3& p) const
     
     
     // The point is inside the polygon if it is on the same side for all edges
-    for(int i=1; i<points.size(); i++)
+    for(unsigned int i=1; i<points.size(); i++)
     {
         // If it is on different side then product is < 0 , return false
         if(p.sideOfLine2D(points[i % points.size()],
@@ -67,3 +71,11 @@ bool NavPoly::pointInPoly(const Vec3& p) const
 
     return true;
 }
+
+// ----------------------------------------------------------------------------
+
+const Vec3& NavPoly::operator[](int i) const
+{ 
+    return NavMesh::get()->getVertex(m_vertices[i]); 
+}
+

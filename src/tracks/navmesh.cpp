@@ -20,7 +20,11 @@
 #include "tracks/nav_poly.hpp"
 
 #include <algorithm>
+#include <S3DVertex.h>
+#include <triangle3d.h>
 
+
+#include "LinearMath/btTransform.h"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
@@ -44,12 +48,18 @@ void NavMesh::readVertex(const XMLNode *xml, Vec3* result) const
 NavMesh::NavMesh(const std::string &filename)
 {
     
+    m_n_verts=0;
+    m_n_polys=0;
+    
     XMLNode *xml = file_manager->createXMLTree(filename);
     if(!xml || xml->getName()!="navmesh")
     {
         Log::error("NavMesh", "NavMesh '%s' not found. \n", filename.c_str());
         return;
     }
+
+    // Assigning m_nav_mesh here because constructing NavPoly requires m_nav_mesh to be defined
+    m_nav_mesh = this;
 
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
@@ -58,8 +68,8 @@ NavMesh::NavMesh(const std::string &filename)
         {
             for(unsigned int i=0; i<xml_node->getNumNodes(); i++)
             {
-                const XMLNode *xml_node_node = xml->getNode(i);
-                if(xml_node_node->getName()!="vertex")
+                const XMLNode *xml_node_node = xml_node->getNode(i);
+                if(!(xml_node_node->getName()=="vertex"))
                 {
                     Log::error("NavMesh", "Unsupported type '%s' found in '%s' - ignored. \n",
                         xml_node_node->getName().c_str(),filename.c_str());
@@ -79,7 +89,7 @@ NavMesh::NavMesh(const std::string &filename)
         {
             for(unsigned int i=0; i<xml_node->getNumNodes(); i++)
             {
-                const XMLNode *xml_node_node = xml->getNode(i);
+                const XMLNode *xml_node_node = xml_node->getNode(i);
                 if(xml_node_node->getName()!="face")
                 {
                     Log::error("NavMesh", "Unsupported type '%s' found in '%s' - ignored. \n",
@@ -94,6 +104,7 @@ NavMesh::NavMesh(const std::string &filename)
                 xml_node_node->get("adjacent", &adjacentPolygonIndices);
                 NavPoly *np = new NavPoly(polygonVertIndices, adjacentPolygonIndices);
                 m_polys.push_back(*np);
+                m_n_polys++;
             }
 
         }
@@ -103,12 +114,11 @@ NavMesh::NavMesh(const std::string &filename)
            xml_node->get("nvp", &m_nvp);
         }   
 
-        delete xml_node;
+        //delete xml_node;
     }
 
     delete xml;
 
-    m_nav_mesh = this;
 }
 
 NavMesh::~NavMesh()
@@ -116,3 +126,34 @@ NavMesh::~NavMesh()
     delete m_nav_mesh;
     m_nav_mesh = NULL;
 }
+//
+//void NavMesh::getS3DVertsOfPoly(int n, video::S3DVertex *v, const video::SColor &color) const
+//{
+//    // Eps is used to raise the track debug quads a little bit higher than
+//    // the ground, so that they are actually visible.
+//    std::vector< Vec3 > verticesVec3 = NavMesh::get()->getVertsOfPoly(n);
+//    core::vector3df eps(0, 0.1f, 0);
+//    
+//    for( unsigned int i=0; i<verticesVec3.size(); ++i)
+//    {
+//        v[i].Pos = verticesVec3[i].toIrrVector() + eps;
+//        v[i].Color = color;
+//    }
+//
+//    // Number of triangles in the triangle fan
+//    unsigned int numberOfTriangles = verticesVec3.size() -2 ;
+//
+//    for( unsigned int count = 1; count<=numberOfTriangles; count++)
+//    {
+//        core::triangle3df tri(verticesVec3[0].toIrrVector(), 
+//                            verticesVec3[count].toIrrVector(),
+//                          verticesVec3[count+1].toIrrVector());
+//        core::vector3df normal = tri.getNormal();
+//        normal.normalize();
+//        v[0].Normal = normal;
+//        v[count].Normal = normal;
+//        v[count+1].Normal = normal;
+//    }   
+//}
+
+// ----------------------------------------------------------------------------
