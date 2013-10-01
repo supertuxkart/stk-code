@@ -142,7 +142,7 @@ void BattleGraph::createMesh(bool enable_transparency,
                
     }   
 
-    m_mesh_buffer->append(new_v.data(), v.size(), ind.data(), ind.size());
+    m_mesh_buffer->append(new_v.data(), new_v.size(), ind.data(), ind.size());
 
     // Instead of setting the bounding boxes, we could just disable culling,
     // since the debug track should always be drawn.

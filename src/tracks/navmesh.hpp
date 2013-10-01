@@ -99,8 +99,6 @@ public:
     const std::vector<Vec3> getVertsOfPoly(int n)
                                 {return m_polys[n].getVertices();}
 
-    /*void                    getS3DVertsOfPoly(int n, video::S3DVertex *v, 
-                                const video::SColor &color) const;*/
 };
 
 

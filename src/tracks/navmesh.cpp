@@ -126,34 +126,5 @@ NavMesh::~NavMesh()
     delete m_nav_mesh;
     m_nav_mesh = NULL;
 }
-//
-//void NavMesh::getS3DVertsOfPoly(int n, video::S3DVertex *v, const video::SColor &color) const
-//{
-//    // Eps is used to raise the track debug quads a little bit higher than
-//    // the ground, so that they are actually visible.
-//    std::vector< Vec3 > verticesVec3 = NavMesh::get()->getVertsOfPoly(n);
-//    core::vector3df eps(0, 0.1f, 0);
-//    
-//    for( unsigned int i=0; i<verticesVec3.size(); ++i)
-//    {
-//        v[i].Pos = verticesVec3[i].toIrrVector() + eps;
-//        v[i].Color = color;
-//    }
-//
-//    // Number of triangles in the triangle fan
-//    unsigned int numberOfTriangles = verticesVec3.size() -2 ;
-//
-//    for( unsigned int count = 1; count<=numberOfTriangles; count++)
-//    {
-//        core::triangle3df tri(verticesVec3[0].toIrrVector(), 
-//                            verticesVec3[count].toIrrVector(),
-//                          verticesVec3[count+1].toIrrVector());
-//        core::vector3df normal = tri.getNormal();
-//        normal.normalize();
-//        v[0].Normal = normal;
-//        v[count].Normal = normal;
-//        v[count+1].Normal = normal;
-//    }   
-//}
 
 // ----------------------------------------------------------------------------
