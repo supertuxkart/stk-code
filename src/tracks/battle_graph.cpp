@@ -71,91 +71,78 @@ void BattleGraph::createMesh(bool enable_transparency,
     m_mesh             = irr_driver->createQuadMesh(&m);
     m_mesh_buffer      = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
-
-   
-    
-    // Fetch the number of vertices
-    unsigned int n = NavMesh::get()->getNumberOfVerts();
-    
-    // Get the reference to a vector of vertices from NavMesh
-    const std::vector<Vec3>& v = NavMesh::get()->getAllVertices();
- 
-    // Declare array to hold new converted vertices
-    video::S3DVertex *new_v = new video::S3DVertex[n];
+      
     
     // Eps is used to raise the track debug quads a little bit higher than
     // the ground, so that they are actually visible. 
     core::vector3df eps(0, 0.4f, 0);
     video::SColor     defaultColor(255, 255, 0, 0), c;
-    
-    for( unsigned count=0; count<n; count++)
-    {
-        new_v[count].Pos = v[count].toIrrVector() + eps;
-        new_v[count].Color = defaultColor;
-    }
-    
-    // Each quad consists of 2 triangles with 3 elements, so
-    // we need 2*3 indices for each quad.
+        
+    // Declare vector to hold new converted vertices, vertices are copied over 
+    // for each polygon, although it results in redundant vertex copies in the 
+    // final vector, this is the only way I know to make each poly have different color.
+     std::vector<video::S3DVertex> new_v;
+
+    // Declare vector to hold indices
     std::vector<irr::u16> ind;
     
-    // Now add all quads
+    // Now add all polygons
     int i=0;
     for(unsigned int count=0; count<m_graph.size(); count++)
     {
-        ///from red to blue and back
+        ///compute colors
         if(!track_color)
         {   
             c.setAlpha(178);
             //c.setRed ((i%2) ? 255 : 0);
             //c.setBlue((i%3) ? 0 : 255);
-            c.setRed((3*i)%256);
-            c.setBlue((5*i)%256);
-            c.setGreen((7*i)%256);
+            c.setRed(i%256);
+            c.setBlue((2*i)%256);
+            c.setGreen((3*i)%256);
         }
         
         NavPoly poly = NavMesh::get()->getNavPoly(count);
 
-        std::vector<int> vInd = poly.getVerticesIndex();
-
+        //std::vector<int> vInd = poly.getVerticesIndex();
+        const std::vector<Vec3>& v = poly.getVertices();
+       
         // Number of triangles in the triangle fan
-        unsigned int numberOfTriangles = vInd.size() -2 ;
+        unsigned int numberOfTriangles = v.size() -2 ;
 
         // Set up the indices for the triangles
         
          for( unsigned int count = 1; count<=numberOfTriangles; count++)
          {
-             ind.push_back(vInd[0]);
-             ind.push_back(vInd[count]);
-             ind.push_back(vInd[count+1]);
+             video::S3DVertex v1,v2,v3;
+             v1.Pos=v[0].toIrrVector() + eps;
+             v2.Pos=v[count].toIrrVector() + eps;
+             v3.Pos=v[count+1].toIrrVector() + eps;
+             
+             v1.Color = c;
+             v2.Color = c;
+             v3.Color = c;
 
-             if(new_v[vInd[0]].Color==defaultColor) new_v[vInd[0]].Color = c;
-             if(new_v[vInd[count]].Color==defaultColor) new_v[vInd[count]].Color = c;
-             if(new_v[vInd[count+1]].Color==defaultColor)new_v[vInd[count+1]].Color = c;
+             core::triangle3df tri(v1.Pos, v2.Pos, v3.Pos);
+             core::vector3df normal = tri.getNormal();
+             normal.normalize();
+             v1.Normal = normal;
+             v2.Normal = normal;
+             v3.Normal = normal;
+                          
+             new_v.push_back(v1);
+             new_v.push_back(v2);
+             new_v.push_back(v3);
+             
+             ind.push_back(i++);
+             ind.push_back(i++);
+             ind.push_back(i++);
 
-            core::triangle3df tri(v[vInd[0]].toIrrVector(), 
-                                v[vInd[count]].toIrrVector(),
-                                v[vInd[count+1]].toIrrVector());
-            core::vector3df normal = tri.getNormal();
-            normal.normalize();
-            new_v[vInd[0]].Normal = normal;
-            new_v[vInd[count]].Normal = normal;
-            new_v[vInd[count+1]].Normal = normal;
-
+            
         }   
-        
-                 
-        //// (note, afaik with opengl we could use quads directly, but the code
-        //// would not be portable to directx anymore).
-        //ind[6*i  ] = 4*i;  // First triangle: vertex 0, 1, 2
-        //ind[6*i+1] = 4*i+1;
-        //ind[6*i+2] = 4*i+2;
-        //ind[6*i+3] = 4*i;  // second triangle: vertex 0, 1, 3
-        //ind[6*i+4] = 4*i+2;
-        //ind[6*i+5] = 4*i+3;
-        //i++;
-    }   // for i=1; i<QuadSet::get()
+               
+    }   
 
-    m_mesh_buffer->append(new_v, n, ind.data(), ind.size());
+    m_mesh_buffer->append(new_v.data(), v.size(), ind.data(), ind.size());
 
     // Instead of setting the bounding boxes, we could just disable culling,
     // since the debug track should always be drawn.
@@ -163,28 +150,17 @@ void BattleGraph::createMesh(bool enable_transparency,
     m_mesh_buffer->recalculateBoundingBox();
     m_mesh->setBoundingBox(m_mesh_buffer->getBoundingBox());
 
-    delete[] new_v;
 }   // createMesh
 
 
 /** Creates the debug mesh to display the quad graph on top of the track
  *  model. */
+
 void BattleGraph::createDebugMesh()
 {
     if(m_graph.size()<=0) return;  // no debug output if not graph
 
     createMesh(/*enable_transparency*/true);
-
-    //// Now colour the quads red/blue/red ...
-    //video::SColor     c( 128, 255, 0, 0);
-    //video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
-    //for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
-    //{
-    //    // Swap the colours from red to blue and back
-    //    c.setRed ((i%2) ? 255 : 0);
-    //    c.setBlue((i%2) ? 0 : 255);
-    //    v[i].Color = c;
-    //}
     m_node = (scene::ISceneNode*)irr_driver->addMesh(m_mesh);
 #ifdef DEBUG
     m_node->setName("track-debug-mesh");
