@@ -211,6 +211,7 @@ src/tinygettext/stk_file_system.cpp
 src/tinygettext/tgt_log.cpp
 src/tinygettext/tinygettext.cpp
 src/tracks/ambient_light_sphere.cpp
+src/tracks/battle_graph.cpp
 src/tracks/bezier_curve.cpp
 src/tracks/check_cannon.cpp
 src/tracks/check_goal.cpp
@@ -221,6 +222,8 @@ src/tracks/check_sphere.cpp
 src/tracks/check_structure.cpp
 src/tracks/graph_node.cpp
 src/tracks/lod_node_loader.cpp
+src/tracks/navmesh.cpp
+src/tracks/nav_poly.cpp
 src/tracks/quad.cpp
 src/tracks/quad_graph.cpp
 src/tracks/quad_set.cpp
@@ -474,6 +477,7 @@ src/tinygettext/stk_file_system.hpp
 src/tinygettext/tgt_log.hpp
 src/tinygettext/tinygettext.hpp
 src/tracks/ambient_light_sphere.hpp
+src/tracks/battle_graph.hpp
 src/tracks/bezier_curve.hpp
 src/tracks/check_cannon.hpp
 src/tracks/check_goal.hpp
@@ -484,6 +488,8 @@ src/tracks/check_sphere.hpp
 src/tracks/check_structure.hpp
 src/tracks/graph_node.hpp
 src/tracks/lod_node_loader.hpp
+src/tracks/navmesh.hpp
+src/tracks/nav_poly.hpp
 src/tracks/quad_graph.hpp
 src/tracks/quad.hpp
 src/tracks/quad_set.hpp
