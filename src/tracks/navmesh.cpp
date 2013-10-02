@@ -123,8 +123,6 @@ NavMesh::NavMesh(const std::string &filename)
 
 NavMesh::~NavMesh()
 {
-    delete m_nav_mesh;
-    m_nav_mesh = NULL;
 }
 
 // ----------------------------------------------------------------------------

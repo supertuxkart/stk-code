@@ -22,6 +22,7 @@
 #include <IMesh.h>
 #include <ICameraSceneNode.h>
 
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "tracks/navmesh.hpp"
 #include "utils/vec3.hpp"
@@ -56,7 +57,10 @@ void BattleGraph::buildGraph(NavMesh* navmesh)
 }
 BattleGraph::~BattleGraph(void)
 {
+    NavMesh::destroy();
 
+    if(UserConfigParams::m_track_debug)
+        cleanupDebugMesh();
 }
 
 void BattleGraph::createMesh(bool enable_transparency,
@@ -96,7 +100,7 @@ void BattleGraph::createMesh(bool enable_transparency,
             c.setAlpha(178);
             //c.setRed ((i%2) ? 255 : 0);
             //c.setBlue((i%3) ? 0 : 255);
-            c.setRed(i%256);
+            c.setRed(7*i%256);
             c.setBlue((2*i)%256);
             c.setGreen((3*i)%256);
         }
@@ -167,3 +171,13 @@ void BattleGraph::createDebugMesh()
 #endif
 
 }   // createDebugMesh
+
+void BattleGraph::cleanupDebugMesh()
+{
+    irr_driver->removeNode(m_node);
+    m_node = NULL;
+    // No need to call irr_driber->removeMeshFromCache, since the mesh
+    // was manually made and so never added to the mesh cache.
+    m_mesh->drop();
+    m_mesh = NULL;
+}

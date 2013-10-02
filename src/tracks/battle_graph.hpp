@@ -85,7 +85,7 @@ public:
     unsigned int    getNumNodes() const { return m_graph.size(); }
 
     void            createDebugMesh();
-
+    void            cleanupDebugMesh();
 };
 
 #endif

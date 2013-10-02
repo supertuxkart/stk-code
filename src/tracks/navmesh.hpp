@@ -67,7 +67,16 @@ public:
         new NavMesh(filename);
     }
 
+    static void destroy()
+    { 
+      if(m_nav_mesh)
+      {
+        delete m_nav_mesh;
+        m_nav_mesh = NULL;
+      }
+    }
    
+
     static NavMesh          *get() { return m_nav_mesh; }
 
     const NavPoly&          getNavPoly(int n) const 

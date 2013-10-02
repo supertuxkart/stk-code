@@ -451,7 +451,7 @@ void Camera::update(float dt)
     {
         core::vector3df xyz = m_kart->getXYZ().toIrrVector();
         m_camera->setTarget(xyz);
-        xyz.Y = xyz.Y+55;
+        xyz.Y = xyz.Y+40;
         xyz.Z -= 5.0f;
         m_camera->setPosition(xyz);
         // To view inside tunnels (FIXME 27>15 why??? makes no sense
