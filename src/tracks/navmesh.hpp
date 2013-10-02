@@ -51,8 +51,8 @@ private:
     unsigned int                    m_n_polys;
     unsigned int                    m_nvp;
 
-    void NavMesh::readVertex(const XMLNode *xml, Vec3* result) const;
-    //void NavMesh::readFace(const XMLNode *xml, Vec3* result) const;
+    void readVertex(const XMLNode *xml, Vec3* result) const;
+    //void readFace(const XMLNode *xml, Vec3* result) const;
     NavMesh(const std::string &filename);
     ~NavMesh();
 
