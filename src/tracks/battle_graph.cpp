@@ -21,6 +21,7 @@
 
 #include <IMesh.h>
 #include <ICameraSceneNode.h>
+#include <IMeshSceneNode.h>
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -41,7 +42,7 @@ void BattleGraph::buildGraph(NavMesh* navmesh)
 {
     unsigned int n_polys = navmesh->getNumberOfPolys();
     m_graph.resize(n_polys);
-    for(int i=0; i<n_polys; i++)
+    for(unsigned int i=0; i<n_polys; i++)
     {
         NavPoly currentPoly = navmesh->getNavPoly(i);
         std::vector<int> adjacents = navmesh->getAdjacentPolys(i);
@@ -165,7 +166,7 @@ void BattleGraph::createDebugMesh()
     if(m_graph.size()<=0) return;  // no debug output if not graph
 
     createMesh(/*enable_transparency*/true);
-    m_node = (scene::ISceneNode*)irr_driver->addMesh(m_mesh);
+    m_node = irr_driver->addMesh(m_mesh);
 #ifdef DEBUG
     m_node->setName("track-debug-mesh");
 #endif
