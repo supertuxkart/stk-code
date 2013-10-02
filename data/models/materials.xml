@@ -11,7 +11,7 @@
   <material name="stk_mod_nitroBottle.png" />
   <material name="stk_mod_nitroLogo.png" compositing="additive" light="N" disable-z-write="Y" />
 
-   <material name="bubblegum_shield.png" compositing="blend"/>
+   <material name="bubblegum_shield.png" compositing="blend" disable-z-write="Y"/>
   <material name="parachute.png" backface-culling="n" ignore="Y"/>
   <material name="zipper.png"  light="N" zipper="Y"/>
   <material name="zipper_collect.png"  light="N" zipper="Y"/>
