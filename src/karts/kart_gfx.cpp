@@ -50,13 +50,16 @@ KartGFX::KartGFX(const AbstractKart *kart)
     
     
     */
-    Vec3 rear_left(kart->getWheelGraphicsPosition(3).toIrrVector().X, (kart->getKartHeight()-0.6f)*0.35f,
-                        kart->getWheelGraphicsPosition(3).toIrrVector().Z);
-    Vec3 rear_right(kart->getWheelGraphicsPosition(2).toIrrVector().X, (kart->getKartHeight()-0.6f)*0.35f,
-                        kart->getWheelGraphicsPosition(2).toIrrVector().Z);
+    Vec3 rear_left(kart->getWheelGraphicsPosition(3).toIrrVector().X, 0.05f,
+                        kart->getWheelGraphicsPosition(3).toIrrVector().Z-0.1f);
+    Vec3 rear_right(kart->getWheelGraphicsPosition(2).toIrrVector().X, 0.05f,
+                        kart->getWheelGraphicsPosition(2).toIrrVector().Z-0.1f);
 
     Vec3 rear_center(0, kart->getKartHeight()*0.35f,
                        -kart->getKartLength()*0.35f);
+                       
+    Vec3 rear_nitro_center(0, kart->getKartHeight()*0.15f,
+                       -kart->getKartLength()*0.1f);
 
     // FIXME Used to match the emitter as seen in blender
     const float delta = 0.6f;
@@ -67,6 +70,8 @@ KartGFX::KartGFX(const AbstractKart *kart)
     Vec3 rear_nitro_left(kart->getNitroEmitterPosition(1).toIrrVector().X,
                           kart->getNitroEmitterPosition(1).toIrrVector().Y,
                           kart->getNitroEmitterPosition(1).toIrrVector().Z + delta);
+    if (!kart->hasNitroEmitter())
+        rear_nitro_right = rear_nitro_left = rear_nitro_center;
 
     // Create all effects. Note that they must be created
     // in the order of KartGFXType.

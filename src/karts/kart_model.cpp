@@ -135,13 +135,14 @@ void KartModel::loadInfo(const XMLNode &node)
     }
     
     m_nitro_emitter_position[0] = Vec3 (0,0.1f,0);
-
     m_nitro_emitter_position[1] = Vec3 (0,0.1f,0);
+    m_has_nitro_emitter = false;
 
     if(const XMLNode *nitroEmitter_node=node.getNode("nitro-emitter"))
     {
         loadNitroEmitterInfo(*nitroEmitter_node, "nitro-emitter-a", 0);
         loadNitroEmitterInfo(*nitroEmitter_node, "nitro-emitter-b", 1);
+        m_has_nitro_emitter = true;
     }
 
     if(const XMLNode *hat_node=node.getNode("hat"))
@@ -231,6 +232,7 @@ KartModel* KartModel::makeCopy()
     
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
     km->m_nitro_emitter_position[1] = m_nitro_emitter_position[1];
+    km->m_has_nitro_emitter = m_has_nitro_emitter;
     
     for(unsigned int i=0; i<4; i++)
     {

@@ -120,6 +120,9 @@ private:
     /** The position of the nitro emitters */
     Vec3          m_nitro_emitter_position[2];
 
+    /** True if kart has nitro emitters */
+    bool          m_has_nitro_emitter;
+
     /** Minimum suspension length. If the displayed suspension is
      *  shorter than this, the wheel would look wrong. */
     float         m_min_suspension[4];
@@ -213,6 +216,10 @@ public:
      */
     const Vec3* getNitroEmittersPositon() const
                 {return m_nitro_emitter_position;}
+    // ------------------------------------------------------------------------
+    /** Returns true if kart has nitro emitters */
+    const bool hasNitroEmitters() const
+                {return m_has_nitro_emitter;}
     // ------------------------------------------------------------------------
     /** Returns the length of the kart model. */
     float getLength                 () const {return m_kart_length;      }
