@@ -237,5 +237,6 @@ HitEffect* Bowling::getHitEffect() const
 {
     if(m_has_hit_kart)
         return new HitSFX(getXYZ(), "strike");
-    return NULL;
+    else
+        return new HitSFX(getXYZ(), "crash");
 }   // getHitEffect
