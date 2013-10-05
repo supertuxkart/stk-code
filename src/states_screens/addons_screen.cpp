@@ -136,7 +136,7 @@ void AddonsScreen::init()
 
     m_reloading = false;
 
-    m_sort_desc = true;
+    m_sort_desc = false;
     m_sort_default = true;
     m_sort_col = 0;
 
@@ -389,8 +389,8 @@ void AddonsScreen::onColumnClicked(int column_id)
     }
     else
     {
-        m_sort_default = m_sort_desc && !m_sort_default;
         if (!m_sort_default) m_sort_desc = !m_sort_desc;
+        m_sort_default = !m_sort_desc && !m_sort_default;
     }
     
     m_sort_col = column_id;

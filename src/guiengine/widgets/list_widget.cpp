@@ -38,7 +38,7 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_icons = NULL;
     m_listener = NULL;
     m_selected_column = NULL;
-    m_sort_desc = true;
+    m_sort_desc = false;
     m_sort_default = true;
 }
 
@@ -300,7 +300,7 @@ void ListWidget::elementRemoved()
     }
     m_header_elements.clearAndDeleteAll();
     m_selected_column = NULL;
-    m_sort_desc = true;
+    m_sort_desc = false;
     m_sort_default = true;
 }
 
@@ -378,8 +378,8 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
         }
         else
         {
-            m_sort_default = m_sort_desc && !m_sort_default;
             if (!m_sort_default) m_sort_desc = !m_sort_desc;
+            m_sort_default = !m_sort_desc && !m_sort_default;
         }
 
         m_sort_col = originator[(m_properties[PROP_ID] + "_column_").size()] - '0';
