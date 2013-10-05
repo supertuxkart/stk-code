@@ -494,6 +494,11 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
         // rockets on short distance.
         if( (m_owner!=kart || m_owner==kart_hit) && !kart->getKartAnimation())
         {
+            if(kart->isShielded())
+            {
+                kart->decreaseShieldTime();
+                continue;
+            }
             // The explosion animation will register itself with the kart
             // and will free it later.
             ExplosionAnimation::create(kart, getXYZ(), kart==kart_hit);
