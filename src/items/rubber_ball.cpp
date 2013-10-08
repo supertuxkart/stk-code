@@ -87,6 +87,10 @@ RubberBall::RubberBall(AbstractKart *kart)
     m_delete_timer       = -1.0f;
     m_tunnel_count       = 0;
 
+    LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
+    // FIXME: what does the rubber ball do in case of battle mode??
+    if(!world) return;
+
     computeTarget();
 
     // initialises the current graph node
@@ -141,8 +145,6 @@ void RubberBall::initializeControlPoints(const Vec3 &xyz)
 void RubberBall::computeTarget()
 {
     LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
-    // FIXME: what does the rubber ball do in case of battle mode??
-    if(!world) return;
 
     for(unsigned int p = race_manager->getFinishedKarts()+1;
                      p < world->getNumKarts()+1; p++)
@@ -190,13 +192,11 @@ unsigned int RubberBall::getSuccessorToHitTarget(unsigned int node_index,
 {
     int succ = 0;
     LinearWorld *lin_world = dynamic_cast<LinearWorld*>(World::getWorld());
-    // FIXME: what does the rubber ball do in case of battle mode??
-    if(lin_world)
-    {
-        unsigned int sect =
-            lin_world->getSectorForKart(m_target);
-        succ = QuadGraph::get()->getNode(node_index).getSuccessorToReach(sect);
-    }
+
+    unsigned int sect =
+        lin_world->getSectorForKart(m_target);
+    succ = QuadGraph::get()->getNode(node_index).getSuccessorToReach(sect);
+
     if(dist)
         *dist += QuadGraph::get()->getNode(node_index)
                 .getDistanceToSuccessor(succ);
@@ -322,6 +322,10 @@ const core::stringw RubberBall::getHitString(const AbstractKart *kart) const
  */
 bool RubberBall::updateAndDelete(float dt)
 {
+    LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
+    // FIXME: what does the rubber ball do in case of battle mode??
+    if(!world) return true;
+
     if(m_delete_timer>0)
     {
         m_delete_timer -= dt;
@@ -629,7 +633,6 @@ float RubberBall::getMaxTerrainHeight(const Vec3 &vertical_offset) const
 void RubberBall::updateDistanceToTarget()
 {
     const LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
-    if(!world) return;   // FIXME battle mode
 
     float target_distance =
         world->getDistanceDownTrackForKart(m_target->getWorldKartId());
