@@ -18,6 +18,8 @@
 
 #include "items/bowling.hpp"
 
+#include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
 #include "graphics/hit_sfx.hpp"
 #include "graphics/material.hpp"
 #include "io/xml_node.hpp"
@@ -74,7 +76,21 @@ Bowling::Bowling(AbstractKart *kart)
     // should not live forever, auto-destruct after 20 seconds
     m_max_lifespan = 20;
 
+    m_roll_sfx = sfx_manager->createSoundSource("bowling_roll");
+    m_roll_sfx->play();
+    m_roll_sfx->setLoop(true);
+
 }   // Bowling
+
+// ----------------------------------------------------------------------------
+/** Destructor, removes any playing sfx.
+ */
+Bowling::~Bowling()
+{
+    if(m_roll_sfx->getStatus()==SFXManager::SFX_PLAYING)
+        m_roll_sfx->stop();
+    sfx_manager->deleteSFX(m_roll_sfx);
+}   // ~RubberBall
 
 // -----------------------------------------------------------------------------
 /** Initialises this object with data from the power.xml file.
@@ -200,6 +216,10 @@ bool Bowling::updateAndDelete(float dt)
         hit(NULL);
         return true;
     }
+
+    if (m_roll_sfx->getStatus()==SFXManager::SFX_PLAYING)
+        m_roll_sfx->position(getXYZ());
+
     return false;
 }   // updateAndDelete
 // -----------------------------------------------------------------------------

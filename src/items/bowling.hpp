@@ -29,6 +29,7 @@ using namespace irr;
 #include "items/flyable.hpp"
 
 class XMLNode;
+class SFXBase;
 
 /**
   * \ingroup items
@@ -45,8 +46,12 @@ private:
      *  kart was hit. */
     bool m_has_hit_kart;
 
+    /** A sound effect for rolling ball. */
+    SFXBase     *m_roll_sfx;
+
 public:
-    Bowling(AbstractKart* kart);
+             Bowling(AbstractKart* kart);
+    virtual ~Bowling();
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual bool updateAndDelete(float dt);
     virtual const core::stringw getHitString(const AbstractKart *kart) const;

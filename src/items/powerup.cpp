@@ -152,7 +152,7 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
             break ;
 
         case PowerupManager::POWERUP_BOWLING:
-            m_sound_use = sfx_manager->createSoundSource("bowling_roll");
+            m_sound_use = sfx_manager->createSoundSource("bowling_shoot");
             break ;
 
         case PowerupManager::POWERUP_ANVIL:
