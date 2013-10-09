@@ -42,7 +42,7 @@ public:
     //LEAK_CHECK();
 protected:
     // Give them access to the members
-    friend class AIBaseController;
+    friend class AIBaseLapController;
     friend class SkiddingAI;
 
     /** Used to check that all values are defined in the xml file. */

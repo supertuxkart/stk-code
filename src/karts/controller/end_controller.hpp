@@ -21,7 +21,7 @@
 #ifndef HEADER_END_CONTROLLER_HPP
 #define HEADER_END_CONTROLLER_HPP
 
-#include "karts/controller/ai_base_controller.hpp"
+#include "karts/controller/ai_base_lap_controller.hpp"
 
 class Camera;
 class LinearWorld;
@@ -40,7 +40,7 @@ namespace irr
 /**
   * \ingroup controller
   */
-class EndController : public AIBaseController
+class EndController : public AIBaseLapController
 {
 private:
     /** Stores the type of the previous controller. This is necessary so that

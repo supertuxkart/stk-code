@@ -372,9 +372,6 @@
     <ClCompile Include="..\..\karts\moveable.cpp">
       <Filter>Source Files\karts</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\karts\controller\ai_base_controller.cpp">
-      <Filter>Source Files\karts\controller</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\karts\controller\controller.cpp">
       <Filter>Source Files\karts\controller</Filter>
     </ClCompile>
@@ -882,6 +879,12 @@
     <ClCompile Include="..\..\tracks\battle_graph.cpp">
       <Filter>Source Files\tracks</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\karts\controller\ai_base_lap_controller.cpp">
+      <Filter>Source Files\karts\controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\karts\controller\ai_base_controller.cpp">
+      <Filter>Source Files\karts\controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1174,9 +1177,6 @@
     </ClInclude>
     <ClInclude Include="..\..\karts\moveable.hpp">
       <Filter>Header Files\karts</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\karts\controller\ai_base_controller.hpp">
-      <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\controller.hpp">
       <Filter>Header Files\karts\controller</Filter>
@@ -1687,6 +1687,12 @@
     </ClInclude>
     <ClInclude Include="..\..\tracks\battle_graph.hpp">
       <Filter>Header Files\tracks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\controller\ai_base_lap_controller.hpp">
+      <Filter>Header Files\karts\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\karts\controller\ai_base_controller.hpp">
+      <Filter>Header Files\karts\controller</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

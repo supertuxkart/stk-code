@@ -78,7 +78,7 @@
 #include <iostream>
 
 SkiddingAI::SkiddingAI(AbstractKart *kart)
-                   : AIBaseController(kart)
+                   : AIBaseLapController(kart)
 {
     reset();
     // Determine if this AI has superpowers, which happens e.g.
@@ -195,7 +195,7 @@ void SkiddingAI::reset()
     m_skid_probability_state     = SKID_PROBAB_NOT_YET;
     m_last_item_random           = NULL;
 
-    AIBaseController::reset();
+    AIBaseLapController::reset();
     m_track_node               = QuadGraph::UNKNOWN_SECTOR;
     QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
     if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
@@ -207,7 +207,7 @@ void SkiddingAI::reset()
         m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
     }
 
-	AIBaseController::reset();
+	AIBaseLapController::reset();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -300,7 +300,7 @@ void SkiddingAI::update(float dt)
     // The client does not do any AI computations.
     if(network_manager->getMode()==NetworkManager::NW_CLIENT)
     {
-        AIBaseController::update(dt);
+        AIBaseLapController::update(dt);
         return;
     }
 
@@ -308,14 +308,14 @@ void SkiddingAI::update(float dt)
     if(isStuck() && !m_kart->getKartAnimation())
     {
         new RescueAnimation(m_kart);
-        AIBaseController::update(dt);
+        AIBaseLapController::update(dt);
         return;
     }
 
     if( m_world->isStartPhase() )
     {
         handleRaceStart();
-        AIBaseController::update(dt);
+        AIBaseLapController::update(dt);
         return;
     }
 
@@ -390,7 +390,7 @@ void SkiddingAI::update(float dt)
     }
 
     /*And obviously general kart stuff*/
-    AIBaseController::update(dt);
+    AIBaseLapController::update(dt);
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -2152,7 +2152,7 @@ void SkiddingAI::handleCurve()
 /** Determines if the kart should skid. The base implementation enables
  *  skidding
  *  \param steer_fraction The steering fraction as computed by the
- *          AIBaseController.
+ *          AIBaseLapController.
  *  \return True if the kart should skid.
  */
 bool SkiddingAI::doSkid(float steer_fraction)
