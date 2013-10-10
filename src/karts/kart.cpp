@@ -1036,6 +1036,7 @@ void Kart::eliminate()
         m_stars_effect->update(1);
     }
 
+    m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
     m_eliminated = true;
 
     m_node->setVisible(false);
