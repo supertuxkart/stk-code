@@ -523,7 +523,7 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
     data.removeFront(5); // remove the token
     other += data; // add the data
     NetworkString prefix;
-    prefix.ai8(0xc1); // prefix the token with the ype
+    prefix.ai8(0xc1); // prefix the token with the type
     sendMessageToPeersChangingToken(prefix, other);
 }
 //-----------------------------------------------------------------------------
