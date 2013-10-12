@@ -37,10 +37,19 @@ SkidMarks::SkidMarks(const AbstractKart& kart, float width) : m_kart(kart)
 {
     m_width                   = width;
     m_material                = new video::SMaterial();
-    m_material->MaterialType  = video::EMT_TRANSPARENT_VERTEX_ALPHA;
+    m_material->MaterialType = video::EMT_ONETEXTURE_BLEND;
+    m_material->MaterialTypeParam =
+            pack_textureBlendFunc(video::EBF_SRC_ALPHA,
+                                  video::EBF_ONE_MINUS_SRC_ALPHA,
+                                  video::EMFN_MODULATE_1X,
+                                  video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
     m_material->AmbientColor  = video::SColor(128, 0, 0, 0);
     m_material->DiffuseColor  = video::SColor(128, 16, 16, 16);
+    //m_material->AmbientColor  = video::SColor(255, 255, 255, 255);
+    //m_material->DiffuseColor  = video::SColor(255, 255, 255, 255);
+    m_material->setFlag(video::EMF_ANISOTROPIC_FILTER, true);
     m_material->Shininess     = 0;
+    m_material->TextureLayer[0].Texture = irr_driver->getTexture("skidmarks.png");
     m_skid_marking            = false;
     m_current                 = -1;
 }   // SkidMark
@@ -133,10 +142,20 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         delta.normalize();
         delta *= m_width;
 
+        float distance = 0.0f;
+        if (m_current > 0)
+        {
+            Vec3 previousPoint = m_left[m_current - 1]->getMiddlePoint();
+            Vec3 newPoint = (raycast_left.m_contactPointWS + raycast_right.m_contactPointWS)/2;
+            distance = m_left[m_current - 1]->getDistance() + (newPoint - previousPoint).length();
+        }
+
         m_left [m_current]->add(raycast_left.m_contactPointWS,
-                                raycast_left.m_contactPointWS + delta);
+                                raycast_left.m_contactPointWS + delta,
+                                distance);
         m_right[m_current]->add(raycast_right.m_contactPointWS-delta,
-                                raycast_right.m_contactPointWS);
+                                raycast_right.m_contactPointWS,
+                                distance);
         // Adjust the boundary box of the mesh to include the
         // adjusted aabb of its buffers.
         core::aabbox3df aabb=m_nodes[m_current]->getMesh()
@@ -163,14 +182,14 @@ void SkidMarks::update(float dt, bool force_skid_marks,
     SkidMarkQuads *smq_left =
         new SkidMarkQuads(raycast_left.m_contactPointWS,
                           raycast_left.m_contactPointWS + delta,
-                          m_material, m_avoid_z_fighting, custom_color);
+                          m_material, 0.0f, m_avoid_z_fighting, custom_color);
     scene::SMesh *new_mesh = new scene::SMesh();
     new_mesh->addMeshBuffer(smq_left);
 
     SkidMarkQuads *smq_right =
         new SkidMarkQuads(raycast_right.m_contactPointWS - delta,
                           raycast_right.m_contactPointWS,
-                          m_material, m_avoid_z_fighting, custom_color);
+                          m_material, 0.0f, m_avoid_z_fighting, custom_color);
     new_mesh->addMeshBuffer(smq_right);
     scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh);
 #ifdef DEBUG
@@ -215,12 +234,15 @@ void SkidMarks::update(float dt, bool force_skid_marks,
 SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
                                         const Vec3 &right,
                                         video::SMaterial *material,
+                                        float distance,
                                         float z_offset,
                                         video::SColor* custom_color)
                          : scene::SMeshBuffer()
 {
+    m_middle_point = (left + right)/2;
     m_z_offset = z_offset;
     m_fade_out = 0.0f;
+    m_distance = distance;
 
     m_start_color = (custom_color != NULL ? *custom_color :
                      video::SColor(255,
@@ -230,7 +252,7 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
 
     Material   = *material;
     m_aabb     = core::aabbox3df(left.toIrrVector());
-    add(left, right);
+    add(left, right, distance);
 
 
 }   // SkidMarkQuads
@@ -240,7 +262,8 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
  *  \param left,right Left and right coordinates.
  */
 void SkidMarks::SkidMarkQuads::add(const Vec3 &left,
-                                   const Vec3 &right)
+                                   const Vec3 &right,
+                                   float distance)
 {
     // The skid marks must be raised slightly higher, otherwise it blends
     // too much with the track.
@@ -252,9 +275,11 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left,
     v.Pos = left.toIrrVector();
     v.Pos.Y += m_z_offset;
     v.Normal = core::vector3df(0, 1, 0);
+    v.TCoords = core::vector2df(0.0f, distance*0.5f);
     Vertices.push_back(v);
     v.Pos = right.toIrrVector();
     v.Pos.Y += m_z_offset;
+    v.TCoords = core::vector2df(1.0f, distance*0.5f);
     Vertices.push_back(v);
     // Out of the box Irrlicht only supports triangle meshes and not
     // triangle strips. Since this is a strip it would be more efficient

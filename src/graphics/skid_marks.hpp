@@ -79,15 +79,21 @@ private:
 
         video::SColor   m_start_color;
 
+        Vec3 m_middle_point;
+        float m_distance;
+
     public:
             SkidMarkQuads (const Vec3 &left, const Vec3 &right,
-                           video::SMaterial *material, float z_offset,
-                           video::SColor* custom_color = NULL);
+                           video::SMaterial *material, float distance,
+                           float z_offset, video::SColor* custom_color = NULL);
         void add          (const Vec3 &left,
-                           const Vec3 &right);
+                           const Vec3 &right,
+                           float distance);
         void fade         (float f);
         /** Returns the aabb of this skid mark quads. */
         const core::aabbox3df &getAABB() { return m_aabb; }
+        const Vec3& getMiddlePoint() const { return m_middle_point; }
+        float getDistance() const { return m_distance; }
     };  // SkidMarkQuads
 
     // ------------------------------------------------------------------------
