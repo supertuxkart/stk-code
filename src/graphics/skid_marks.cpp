@@ -143,14 +143,11 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         delta *= m_width;
 
         float distance = 0.0f;
-        if (m_current > 0)
-        {
-            Vec3 start = m_left[m_current - 1]->getCenterStart();
-            Vec3 newPoint = (raycast_left.m_contactPointWS + raycast_right.m_contactPointWS)/2;
-            // this linear distance does not account for the kart turning, it's true,
-            // but it produces good enough results
-            distance = (newPoint - start).length();
-        }
+        Vec3 start = m_left[m_current]->getCenterStart();
+        Vec3 newPoint = (raycast_left.m_contactPointWS + raycast_right.m_contactPointWS)/2;
+        // this linear distance does not account for the kart turning, it's true,
+        // but it produces good enough results
+        distance = (newPoint - start).length();
 
         m_left [m_current]->add(raycast_left.m_contactPointWS,
                                 raycast_left.m_contactPointWS + delta,
@@ -271,7 +268,10 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left,
 
     video::S3DVertex v;
     v.Color = m_start_color;
-    v.Color.setAlpha(m_start_alpha);
+    if (n == 0)
+        v.Color.setAlpha(0.0f);
+    else
+        v.Color.setAlpha(m_start_alpha);
     v.Pos = left.toIrrVector();
     v.Pos.Y += m_z_offset;
     v.Normal = core::vector3df(0, 1, 0);
@@ -317,7 +317,7 @@ void SkidMarks::SkidMarkQuads::fade(float f)
         a -= (a < m_fade_out ? a : (int)m_fade_out);
 
         c.setAlpha(a);
-        for(unsigned int i=0; i<Vertices.size(); i++)
+        for(unsigned int i=2; i<Vertices.size(); i++)
         {
             Vertices[i].Color.setAlpha(a);
         }
