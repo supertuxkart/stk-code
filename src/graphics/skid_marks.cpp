@@ -48,6 +48,7 @@ SkidMarks::SkidMarks(const AbstractKart& kart, float width) : m_kart(kart)
     //m_material->AmbientColor  = video::SColor(255, 255, 255, 255);
     //m_material->DiffuseColor  = video::SColor(255, 255, 255, 255);
     m_material->setFlag(video::EMF_ANISOTROPIC_FILTER, true);
+    m_material->setFlag(video::EMF_ZWRITE_ENABLE, false);
     m_material->Shininess     = 0;
     m_material->TextureLayer[0].Texture = irr_driver->getTexture("skidmarks.png");
     m_skid_marking            = false;
