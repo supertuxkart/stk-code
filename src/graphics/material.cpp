@@ -778,7 +778,6 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
         {
             fprintf(stderr, "Applying mask failed for '%s'!\n",
                     m_texname.c_str());
-            return;
         }
     }
     m_texture->grab();
