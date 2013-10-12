@@ -107,7 +107,7 @@ private:
     static float                  m_avoid_z_fighting;
 
 public:
-         SkidMarks(const AbstractKart& kart, float width=0.2f);
+         SkidMarks(const AbstractKart& kart, float width=0.32f);
         ~SkidMarks();
     void update (float dt, bool force_skid_marks=false,
                  video::SColor* custom_color = NULL);
