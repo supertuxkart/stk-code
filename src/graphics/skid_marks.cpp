@@ -268,10 +268,17 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left,
 
     video::S3DVertex v;
     v.Color = m_start_color;
-    if (n == 0)
-        v.Color.setAlpha(0.0f);
-    else
-        v.Color.setAlpha(m_start_alpha);
+    v.Color.setAlpha(0.0f); // initially create all vertices at alpha=0...
+
+    // then when adding a new set of vertices, make the previous 2 opaque.
+    // this ensures that the last two vertices are always at alpha=0,
+    // producing a fade-out effect
+    if (n > 4)
+    {
+        Vertices[n - 1].Color.setAlpha(m_start_alpha);
+        Vertices[n - 2].Color.setAlpha(m_start_alpha);
+    }
+
     v.Pos = left.toIrrVector();
     v.Pos.Y += m_z_offset;
     v.Normal = core::vector3df(0, 1, 0);
@@ -317,7 +324,8 @@ void SkidMarks::SkidMarkQuads::fade(float f)
         a -= (a < m_fade_out ? a : (int)m_fade_out);
 
         c.setAlpha(a);
-        for(unsigned int i=2; i<Vertices.size(); i++)
+        // the first 2 and last 2 already have alpha=0 for fade-in and fade-out
+        for(unsigned int i=2; i<Vertices.size() - 2; i++)
         {
             Vertices[i].Color.setAlpha(a);
         }
