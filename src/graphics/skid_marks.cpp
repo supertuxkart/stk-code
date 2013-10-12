@@ -145,9 +145,11 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         float distance = 0.0f;
         if (m_current > 0)
         {
-            Vec3 previousPoint = m_left[m_current - 1]->getMiddlePoint();
+            Vec3 start = m_left[m_current - 1]->getCenterStart();
             Vec3 newPoint = (raycast_left.m_contactPointWS + raycast_right.m_contactPointWS)/2;
-            distance = m_left[m_current - 1]->getDistance() + (newPoint - previousPoint).length();
+            // this linear distance does not account for the kart turning, it's true,
+            // but it produces good enough results
+            distance = (newPoint - start).length();
         }
 
         m_left [m_current]->add(raycast_left.m_contactPointWS,
@@ -182,14 +184,14 @@ void SkidMarks::update(float dt, bool force_skid_marks,
     SkidMarkQuads *smq_left =
         new SkidMarkQuads(raycast_left.m_contactPointWS,
                           raycast_left.m_contactPointWS + delta,
-                          m_material, 0.0f, m_avoid_z_fighting, custom_color);
+                          m_material, m_avoid_z_fighting, custom_color);
     scene::SMesh *new_mesh = new scene::SMesh();
     new_mesh->addMeshBuffer(smq_left);
 
     SkidMarkQuads *smq_right =
         new SkidMarkQuads(raycast_right.m_contactPointWS - delta,
                           raycast_right.m_contactPointWS,
-                          m_material, 0.0f, m_avoid_z_fighting, custom_color);
+                          m_material, m_avoid_z_fighting, custom_color);
     new_mesh->addMeshBuffer(smq_right);
     scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh);
 #ifdef DEBUG
@@ -234,15 +236,13 @@ void SkidMarks::update(float dt, bool force_skid_marks,
 SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
                                         const Vec3 &right,
                                         video::SMaterial *material,
-                                        float distance,
                                         float z_offset,
                                         video::SColor* custom_color)
                          : scene::SMeshBuffer()
 {
-    m_middle_point = (left + right)/2;
+    m_center_start = (left + right)/2;
     m_z_offset = z_offset;
     m_fade_out = 0.0f;
-    m_distance = distance;
 
     m_start_color = (custom_color != NULL ? *custom_color :
                      video::SColor(255,
@@ -252,7 +252,7 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
 
     Material   = *material;
     m_aabb     = core::aabbox3df(left.toIrrVector());
-    add(left, right, distance);
+    add(left, right, 0.0f);
 
 
 }   // SkidMarkQuads
