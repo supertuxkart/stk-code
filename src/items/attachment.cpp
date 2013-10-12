@@ -329,9 +329,15 @@ void Attachment::hitBanana(Item *item, int new_attachment)
 void Attachment::handleCollisionWithKart(AbstractKart *other)
 {
     Attachment *attachment_other=other->getAttachment();
-
+    
     if(getType()==Attachment::ATTACH_BOMB)
     {
+        // Don't attach a bomb when the kart is shielded
+        if(other->isShielded())
+        {
+            other->decreaseShieldTime();
+            return;
+        }
         // If both karts have a bomb, explode them immediately:
         if(attachment_other->getType()==Attachment::ATTACH_BOMB)
         {
@@ -356,6 +362,12 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
     else if(attachment_other->getType()==Attachment::ATTACH_BOMB &&
             (attachment_other->getPreviousOwner()!=m_kart || World::getWorld()->getNumKarts() <= 2))
     {
+        // Don't attach a bomb when the kart is shielded
+        if(m_kart->isShielded())
+        {
+            m_kart->decreaseShieldTime();
+            return;
+        }
         set(ATTACH_BOMB, other->getAttachment()->getTimeLeft()+
                          stk_config->m_bomb_time_increase, other);
         other->getAttachment()->clear();
