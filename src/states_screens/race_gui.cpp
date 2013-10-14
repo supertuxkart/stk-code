@@ -275,8 +275,8 @@ void RaceGUI::drawScores()
             default: break;
         }
         core::rect<s32> indicatorPos(offsetX, offsetY,
-            offsetX + m_marker_player_size/1.25,
-            offsetY + m_marker_player_size/1.25);
+                                     offsetX + (int)(m_marker_player_size/1.25f),
+                                     offsetY + (int)(m_marker_player_size/1.25f));
         core::rect<s32> sourceRect(core::position2d<s32>(0,0),
                                                    team_icon->getOriginalSize());
         irr_driver->getVideoDriver()->draw2DImage(team_icon,indicatorPos,sourceRect,
