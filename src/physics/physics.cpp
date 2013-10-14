@@ -235,6 +235,13 @@ void Physics::update(float dt)
             // -------------------------------
             p->getUserPointer(0)->getPointerFlyable()
                 ->hit(NULL, p->getUserPointer(1)->getPointerPhysicalObject());
+            PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
+            if(obj->isSoccerBall())
+            {
+                int kartId = p->getUserPointer(0)->getPointerFlyable()->getOwnerId();
+                SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
+                soccerWorld->setLastKartTohitBall(kartId);
+            }
 
         }
         else if(p->getUserPointer(1)->is(UserPointer::UP_KART))

@@ -208,6 +208,8 @@ public:
      *  call, or if the inheriting object will update TerrainInfo itself
      *  (or perhaps not at all if it is not needed). */
     void setDoTerrainInfo(bool d) { m_do_terrain_info = d; }
+    // ------------------------------------------------------------------------
+    unsigned int getOwnerId();
 };   // Flyable
 
 #endif
