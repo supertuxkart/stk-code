@@ -198,6 +198,7 @@ private:
     void displayGPProgress();
     void cleanupGPProgress();
     void displayHighScores();
+	void displaySoccerResults();
 public:
 
                  RaceResultGUI();

@@ -529,5 +529,10 @@ void PhysicalObject::handleExplosion(const Vec3& pos, bool direct_hit)
 }   // handleExplosion
 
 // ----------------------------------------------------------------------------
+bool PhysicalObject::isSoccerBall()
+{
+	return m_object->isSoccerBall(); 
+}
+// ----------------------------------------------------------------------------
 /* EOF */
 

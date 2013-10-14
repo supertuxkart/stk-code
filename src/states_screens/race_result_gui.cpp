@@ -298,14 +298,6 @@ void RaceResultGUI::onConfirm()
  */
 void RaceResultGUI::determineTableLayout()
 {
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
-    {
-        redTeamTexture = irr_driver->getTexture(
-                         file_manager->getTextureFile("soccer_ball_red.png"));
-        blueTeamTexture = irr_driver->getTexture(
-                        file_manager->getTextureFile("soccer_ball_blue.png"));
-    }
-
     GUIEngine::Widget *table_area = getWidget("result-table");
 
     m_font          = GUIEngine::getFont();
@@ -520,7 +512,9 @@ void RaceResultGUI::onUpdate(float dt, irr::video::IVideoDriver*)
  */
 void RaceResultGUI::renderGlobal(float dt)
 {
-    m_timer               += dt;
+	bool isSoccerWorld = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+	
+	m_timer               += dt;
     assert(World::getWorld()->getPhase()==WorldStatus::RESULT_DISPLAY_PHASE);
     unsigned int num_karts = m_all_row_infos.size();
 
@@ -666,7 +660,10 @@ void RaceResultGUI::renderGlobal(float dt)
         case RR_WAIT_TILL_END:
             break;
         }   // switch
-        displayOneEntry((unsigned int)x, (unsigned int)y, i, true);
+        if(isSoccerWorld)
+			displaySoccerResults();
+		else
+			displayOneEntry((unsigned int)x, (unsigned int)y, i, true);
     }   // for i
 
     // Display highscores
@@ -744,12 +741,6 @@ void RaceResultGUI::determineGPLayout()
 void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                                     unsigned int n, bool display_points)
 {
-    SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
-    bool isSoccerMode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
-    int m_team_goals[2] = {soccerWorld->getScore(0), soccerWorld->getScore(1)};
-    
-    if (isSoccerMode && n > 0) return;
-    
     RowInfo *ri = &(m_all_row_infos[n]);
     video::SColor color = ri->m_is_player_kart
                         ? video::SColor(255,255,0,  0  )
@@ -770,73 +761,29 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
 
     // First draw the icon
     // -------------------
-    if (!isSoccerMode)
+    if(ri->m_kart_icon)
     {
-        if(ri->m_kart_icon)
-        {
-            core::recti source_rect(core::vector2di(0,0),
-                                    ri->m_kart_icon->getSize());
-            core::recti dest_rect(current_x, y,
-                                  current_x+m_width_icon, y+m_width_icon);
-            irr_driver->getVideoDriver()->draw2DImage(ri->m_kart_icon, dest_rect,
-                                                      source_rect, NULL, NULL,
-                                                      true);
-        }
-    
-        current_x += m_width_icon + m_width_column_space;
+        core::recti source_rect(core::vector2di(0,0),
+                                ri->m_kart_icon->getSize());
+        core::recti dest_rect(current_x, y,
+                                current_x+m_width_icon, y+m_width_icon);
+        irr_driver->getVideoDriver()->draw2DImage(ri->m_kart_icon, dest_rect,
+                                                    source_rect, NULL, NULL,
+                                                    true);
     }
+    
+    current_x += m_width_icon + m_width_column_space;
 
     // Draw the name
     // -------------
-    if (!isSoccerMode)
-    {
-        core::recti pos_name(current_x, y,
-                             UserConfigParams::m_width, y+m_distance_between_rows);
-        m_font->draw(ri->m_kart_name, pos_name, color, false, false, NULL,
-                     true /* ignoreRTL */);
-        current_x += m_width_kart_name + m_width_column_space;
-    }
 
-    // Draw icon, name of team which won in soccer mode and score
-    // ----------------------------------------------------------
-    if (isSoccerMode)
-    {
-        core::stringw text;
-        irr::video::ITexture *team_icon;
-        if (m_team_goals[0] > m_team_goals[1])
-        {
-            text = core::stringw(_("Red team won"));
-            team_icon = redTeamTexture;
-        }
-        else if (m_team_goals[0] < m_team_goals[1])
-        {
-            text = core::stringw(_("Blue team won"));
-            team_icon = blueTeamTexture;
-        }
-        else
-            text = core::stringw(_("Draw"));
+    core::recti pos_name(current_x, y,
+                            UserConfigParams::m_width, y+m_distance_between_rows);
+    m_font->draw(ri->m_kart_name, pos_name, color, false, false, NULL,
+                    true /* ignoreRTL */);
+    current_x += m_width_kart_name + m_width_column_space;
 
-        core::recti source_rect(core::vector2di(0,0), team_icon->getSize());
-        core::recti dest_rect(current_x, y, current_x+m_width_icon, y+m_width_icon);
-        irr_driver->getVideoDriver()->draw2DImage(team_icon, dest_rect,
-                                                  source_rect, NULL, NULL,
-                                                  true);
-
-        current_x += m_width_icon + m_width_column_space;
-        core::recti pos_name(current_x, y,
-                             UserConfigParams::m_width, y+m_distance_between_rows);
-
-        m_font->draw(text, pos_name, color, false, false, NULL, true /* ignoreRTL */);
-        core::dimension2du rect = m_font->getDimension(text.c_str());
-        current_x += rect.Width + 2*m_width_column_space;
-
-        text = core::stringw(m_team_goals[0]) + " : " + core::stringw(m_team_goals[1]);
-        dest_rect = core::recti(current_x, y, current_x+100, y+10);
-        m_font->draw(text, dest_rect, color, false, false, NULL, true /* ignoreRTL */);
-        rect = m_font->getDimension(text.c_str());
-        current_x += rect.Width + 2*m_width_column_space;
-    }
-    
+   
     // Draw the time except in FTL mode
     // --------------------------------
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
@@ -881,6 +828,124 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                      true /* ignoreRTL */);
     }
 }   // displayOneEntry
+
+//-----------------------------------------------------------------------------
+void RaceResultGUI::displaySoccerResults()
+{
+
+	//Draw win text
+	core::stringw resultText;
+	static video::SColor color;
+	gui::IGUIFont* font = GUIEngine::getTitleFont();
+	float currX = UserConfigParams::m_width/2;
+	RowInfo *ri = &(m_all_row_infos[0]);
+	float currY = ri->m_y_pos; 
+	SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
+	int teamScore[2] = {soccerWorld->getScore(0), soccerWorld->getScore(1)};
+
+	if(teamScore[0] > teamScore[1])
+    {
+		resultText = _("Red Team Wins");
+		color = video::SColor(255, 255, 0, 0);
+	}
+	else if(teamScore[1] > teamScore[0])
+    {
+		resultText = _("Blue Team Wins");
+		color = video::SColor(255,0,0,255);
+	}
+	else
+    {
+		resultText = _("It's a draw");
+		color = video::SColor(255, 255, 255, 255);
+	}
+
+	core::rect<s32> pos(currX, currY, currX, currY);
+	font->draw(resultText.c_str(), pos, color, true, true);
+
+	//Draw team scores:
+	currY += 20;
+	currX /= 2;
+	irr::video::ITexture* redTeamIcon = irr_driver->getTexture(
+		file_manager->getTextureFile("soccer_ball_red.png"));
+	irr::video::ITexture* blueTeamIcon = irr_driver->getTexture(
+		file_manager->getTextureFile("soccer_ball_blue.png"));
+
+	core::recti sourceRect(core::vector2di(0,0), redTeamIcon->getSize());
+	core::recti destRect(currX, currY, currX+redTeamIcon->getSize().Width/2,
+		currY+redTeamIcon->getSize().Height/2);
+	irr_driver->getVideoDriver()->draw2DImage(redTeamIcon, destRect,sourceRect,
+		NULL,NULL, true);
+	currX += UserConfigParams::m_width/2 - redTeamIcon->getSize().Width/2;
+	destRect = core::recti(currX, currY, currX+redTeamIcon->getSize().Width/2,
+		currY+redTeamIcon->getSize().Height/2);
+	irr_driver->getVideoDriver()->draw2DImage(blueTeamIcon,destRect,sourceRect,
+		NULL, NULL, true);
+	
+	currX += redTeamIcon->getSize().Width/4;
+	currY += 10 + redTeamIcon->getSize().Height/2;
+	resultText = StringUtils::toWString(teamScore[1]);
+	pos = core::rect<s32>(currX, currY, currX, currY);
+	color = video::SColor(255,255,255,255);
+	font->draw(resultText.c_str(), pos, color, true, false);
+
+	currX -= UserConfigParams::m_width/2 - redTeamIcon->getSize().Width/2;
+	resultText = StringUtils::toWString(teamScore[0]);
+	pos = core::rect<s32>(currX,currY,currX,currY);
+	font->draw(resultText.c_str(), pos, color, true, false);
+	
+	resultText = "-";
+	float centerX = UserConfigParams::m_width/2;
+	pos = core::rect<s32>(centerX, currY, centerX, currY);
+	font->draw(resultText.c_str(), pos, color, true, false);
+
+	//Draw goal scorers:
+	//The red scorers:
+	currY += 50;
+	font = GUIEngine::getSmallFont();
+	std::vector<int> scorers = soccerWorld->getScorers(0);
+	std::vector<float> scoreTimes = soccerWorld->getScoreTimes(0);
+	irr::video::ITexture* scorerIcon;
+
+	for(int i=0; i<scorers.size(); i++)
+    {
+		std::string kartName = race_manager->getKartIdent(scorers.at(i)).c_str();
+		resultText = kartName.c_str();
+		resultText.append(" ");
+		resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
+		pos = core::rect<s32>(currX,currY,currX,currY);
+		font->draw(resultText,pos, color, true, false);
+		std::string path = "../karts/" + kartName + "/" + kartName + "icon.png";
+		scorerIcon = irr_driver->getTexture(file_manager->getTextureFile(path));
+		sourceRect = core::recti(core::vector2di(0,0), scorerIcon->getSize());
+		destRect = core::recti(currX-95, currY-5, currX - 65, currY+ 25);
+		irr_driver->getVideoDriver()->draw2DImage(scorerIcon, destRect, sourceRect,
+			NULL, NULL, true);
+		currY += 30;
+	}
+
+	//The blue scorers:
+	currY -= 30*scorers.size();
+	currX += UserConfigParams::m_width/2 - redTeamIcon->getSize().Width/2;
+	scorers = soccerWorld->getScorers(1);
+	scoreTimes = soccerWorld->getScoreTimes(1);
+	for(int i=0; i<scorers.size(); i++)
+    {
+		std::string kartName = race_manager->getKartIdent(scorers.at(i)).c_str();
+		resultText = kartName.c_str();
+		resultText.append(" ");
+		resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
+		pos = core::rect<s32>(currX,currY,currX,currY);
+		font->draw(resultText,pos, color, true, false);
+
+		std::string path = "../karts/" + kartName + "/" + kartName + "icon.png";
+		scorerIcon = irr_driver->getTexture(file_manager->getTextureFile(path));
+		sourceRect = core::recti(core::vector2di(0,0), scorerIcon->getSize());
+		destRect = core::recti(currX-95, currY-5, currX - 65, currY+ 25);
+		irr_driver->getVideoDriver()->draw2DImage(scorerIcon, destRect, sourceRect,
+			NULL, NULL, true);
+		currY += 30;
+	}
+}
 
 //-----------------------------------------------------------------------------
 

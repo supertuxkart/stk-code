@@ -54,6 +54,7 @@ void SoccerWorld::init()
     WorldWithRank::init();
     m_display_rank = false;
     m_goal_timer = 0.f;
+	m_lastKartToHitBall = -1;
 
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
@@ -62,7 +63,6 @@ void SoccerWorld::init()
         exit(1);
     }
     m_goal_target = race_manager->getMaxGoal();
-    printf("Max Goal: %d\n", m_goal_target);
     m_goal_sound = sfx_manager->createSoundSource("goal_scored");
 
 }   // init
@@ -80,7 +80,11 @@ void SoccerWorld::reset()
     // Reset original positions for the soccer balls
     TrackObjectManager* tom = getTrack()->getTrackObjectManager();
     assert(tom);
-
+	m_redScorers.clear();
+	m_redScoreTimes.clear();
+	m_blueScorers.clear();
+	m_blueScoreTimes.clear();
+	m_lastKartToHitBall = -1;
     PtrVector<TrackObject>&   objects = tom->getObjects();
     for(int i=0; i<objects.size(); i++)
     {
@@ -143,6 +147,17 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         World *world = World::getWorld();
         world->setPhase(WorldStatus::GOAL_PHASE);
         m_goal_sound->play();
+		if(m_lastKartToHitBall != -1)
+        {
+			if(first_goal){
+				m_redScorers.push_back(m_lastKartToHitBall);
+				m_redScoreTimes.push_back(world->getTime());
+			}
+			else{
+				m_blueScorers.push_back(m_lastKartToHitBall);
+				m_blueScoreTimes.push_back(world->getTime());
+			}
+		}
     }
 
     //m_check_goals_enabled = false;    // TODO: remove?
@@ -178,6 +193,13 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
     // TODO: rescue the karts
 }   // onCheckGoalTriggered
 
+//-----------------------------------------------------------------------------
+/** Sets the last kart that hit the ball, to be able to
+* identify the scorer later.
+*/
+void SoccerWorld::setLastKartTohitBall(unsigned int kartId){
+	m_lastKartToHitBall = kartId;
+}
 //-----------------------------------------------------------------------------
 /** The battle is over if only one kart is left, or no player kart.
  */

@@ -27,6 +27,7 @@
 #include "utils/vec3.hpp"
 #include "utils/leak_check.hpp"
 
+
 class XMLNode;
 class TrackObject;
 
@@ -138,6 +139,7 @@ public:
     virtual void handleExplosion(const Vec3& pos, bool directHit);
     void         update         (float dt);
     void         init           ();
+	bool         isSoccerBall();
 
     // ------------------------------------------------------------------------
     /** Returns the rigid body of this physical object. */
