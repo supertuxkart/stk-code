@@ -44,6 +44,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
+#include <algorithm>
 
 DEFINE_SCREEN_SINGLETON( RaceResultGUI );
 
@@ -837,9 +838,9 @@ void RaceResultGUI::displaySoccerResults()
 	core::stringw resultText;
 	static video::SColor color;
 	gui::IGUIFont* font = GUIEngine::getTitleFont();
-	float currX = UserConfigParams::m_width/2;
+	int currX = UserConfigParams::m_width/2;
 	RowInfo *ri = &(m_all_row_infos[0]);
-	float currY = ri->m_y_pos; 
+	int currY = (int)ri->m_y_pos; 
 	SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
 	int teamScore[2] = {soccerWorld->getScore(0), soccerWorld->getScore(1)};
 
@@ -855,10 +856,10 @@ void RaceResultGUI::displaySoccerResults()
 	}
 	else
     {
+        //Cannot really happen now. Only in time limited matches.
 		resultText = _("It's a draw");
 		color = video::SColor(255, 255, 255, 255);
 	}
-
 	core::rect<s32> pos(currX, currY, currX, currY);
 	font->draw(resultText.c_str(), pos, color, true, true);
 
@@ -894,30 +895,33 @@ void RaceResultGUI::displaySoccerResults()
 	font->draw(resultText.c_str(), pos, color, true, false);
 	
 	resultText = "-";
-	float centerX = UserConfigParams::m_width/2;
+	int centerX = UserConfigParams::m_width/2;
 	pos = core::rect<s32>(centerX, currY, centerX, currY);
 	font->draw(resultText.c_str(), pos, color, true, false);
 
 	//Draw goal scorers:
 	//The red scorers:
-	currY += 50;
+    currY += GUIEngine::getFont()->getDimension(resultText.c_str()).Height + 20;
 	font = GUIEngine::getSmallFont();
 	std::vector<int> scorers = soccerWorld->getScorers(0);
 	std::vector<float> scoreTimes = soccerWorld->getScoreTimes(0);
 	irr::video::ITexture* scorerIcon;
 
-	for(int i=0; i<scorers.size(); i++)
+	for(unsigned int i=0; i<scorers.size(); i++)
     {
 		std::string kartName = race_manager->getKartIdent(scorers.at(i)).c_str();
-		resultText = kartName.c_str();
+		resultText = _(kartName.c_str());
 		resultText.append(" ");
 		resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
 		pos = core::rect<s32>(currX,currY,currX,currY);
 		font->draw(resultText,pos, color, true, false);
-		std::string path = "../karts/" + kartName + "/" + kartName + "icon.png";
-		scorerIcon = irr_driver->getTexture(file_manager->getTextureFile(path));
+        std::string iconFile = soccerWorld->getKart(scorers.at(i))->
+            getKartProperties()->getAbsoluteIconFile();
+        iconFile = iconFile.substr(iconFile.find(".."));
+        scorerIcon = irr_driver->getTexture(file_manager->getTextureFile(iconFile.c_str()));
 		sourceRect = core::recti(core::vector2di(0,0), scorerIcon->getSize());
-		destRect = core::recti(currX-95, currY-5, currX - 65, currY+ 25);
+        irr::u32 offsetX = GUIEngine::getFont()->getDimension(resultText.c_str()).Width/2;
+		destRect = core::recti(currX-offsetX-30, currY, currX-offsetX, currY+ 30);
 		irr_driver->getVideoDriver()->draw2DImage(scorerIcon, destRect, sourceRect,
 			NULL, NULL, true);
 		currY += 30;
@@ -928,19 +932,22 @@ void RaceResultGUI::displaySoccerResults()
 	currX += UserConfigParams::m_width/2 - redTeamIcon->getSize().Width/2;
 	scorers = soccerWorld->getScorers(1);
 	scoreTimes = soccerWorld->getScoreTimes(1);
-	for(int i=0; i<scorers.size(); i++)
+	for(unsigned int i=0; i<scorers.size(); i++)
     {
 		std::string kartName = race_manager->getKartIdent(scorers.at(i)).c_str();
-		resultText = kartName.c_str();
+		resultText = _(kartName.c_str());
 		resultText.append(" ");
 		resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
 		pos = core::rect<s32>(currX,currY,currX,currY);
 		font->draw(resultText,pos, color, true, false);
-
-		std::string path = "../karts/" + kartName + "/" + kartName + "icon.png";
-		scorerIcon = irr_driver->getTexture(file_manager->getTextureFile(path));
+        std::string iconFile = soccerWorld->getKart(scorers.at(i))->
+            getKartProperties()->getAbsoluteIconFile();
+        iconFile = iconFile.substr(iconFile.find(".."));
+		scorerIcon = irr_driver->getTexture(file_manager->getTextureFile(iconFile));
 		sourceRect = core::recti(core::vector2di(0,0), scorerIcon->getSize());
-		destRect = core::recti(currX-95, currY-5, currX - 65, currY+ 25);
+        irr::u32 offsetX = GUIEngine::getFont()->getDimension(resultText.c_str()).Width/2;
+
+		destRect = core::recti(currX-offsetX-30, currY, currX-offsetX, currY+ 30);
 		irr_driver->getVideoDriver()->draw2DImage(scorerIcon, destRect, sourceRect,
 			NULL, NULL, true);
 		currY += 30;

@@ -88,14 +88,14 @@ public:
     {
 		if(team == 0)
 			return m_redScorers;
-		else if(team == 1)
+        else
 			return m_blueScorers;
 	}
 	std::vector<float> getScoreTimes(unsigned int team)
     {
 		if(team == 0)
 			return m_redScoreTimes;
-		else if(team == 1)
+		else
 			return m_blueScoreTimes;
 	}
 

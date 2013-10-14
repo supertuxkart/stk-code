@@ -110,8 +110,6 @@ private:
     };   // Rowinfo
 
     /** The team icons. */
-    video::ITexture *redTeamTexture;
-    video::ITexture *blueTeamTexture;
 
     std::vector<RowInfo>       m_all_row_infos;
 
