@@ -915,10 +915,8 @@ void RaceResultGUI::displaySoccerResults()
 		resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
 		pos = core::rect<s32>(currX,currY,currX,currY);
 		font->draw(resultText,pos, color, true, false);
-        std::string iconFile = soccerWorld->getKart(scorers.at(i))->
-            getKartProperties()->getAbsoluteIconFile();
-        iconFile = iconFile.substr(iconFile.find(".."));
-        scorerIcon = irr_driver->getTexture(file_manager->getTextureFile(iconFile.c_str()));
+        scorerIcon = soccerWorld->getKart(scorers.at(i))->
+            getKartProperties()->getIconMaterial()->getTexture();
 		sourceRect = core::recti(core::vector2di(0,0), scorerIcon->getSize());
         irr::u32 offsetX = GUIEngine::getFont()->getDimension(resultText.c_str()).Width/2;
 		destRect = core::recti(currX-offsetX-30, currY, currX-offsetX, currY+ 30);
@@ -940,10 +938,8 @@ void RaceResultGUI::displaySoccerResults()
 		resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
 		pos = core::rect<s32>(currX,currY,currX,currY);
 		font->draw(resultText,pos, color, true, false);
-        std::string iconFile = soccerWorld->getKart(scorers.at(i))->
-            getKartProperties()->getAbsoluteIconFile();
-        iconFile = iconFile.substr(iconFile.find(".."));
-		scorerIcon = irr_driver->getTexture(file_manager->getTextureFile(iconFile));
+        scorerIcon = soccerWorld->getKart(scorers.at(i))->
+            getKartProperties()->getIconMaterial()->getTexture();
 		sourceRect = core::recti(core::vector2di(0,0), scorerIcon->getSize());
         irr::u32 offsetX = GUIEngine::getFont()->getDimension(resultText.c_str()).Width/2;
 
