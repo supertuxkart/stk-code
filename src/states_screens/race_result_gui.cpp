@@ -836,7 +836,7 @@ void RaceResultGUI::displaySoccerResults()
 
 	//Draw win text
 	core::stringw resultText;
-	static video::SColor color;
+	static video::SColor color = video::SColor(255, 255, 255, 255);
 	gui::IGUIFont* font = GUIEngine::getTitleFont();
 	int currX = UserConfigParams::m_width/2;
 	RowInfo *ri = &(m_all_row_infos[0]);
@@ -847,18 +847,15 @@ void RaceResultGUI::displaySoccerResults()
 	if(teamScore[0] > teamScore[1])
     {
 		resultText = _("Red Team Wins");
-		color = video::SColor(255, 255, 0, 0);
 	}
 	else if(teamScore[1] > teamScore[0])
     {
 		resultText = _("Blue Team Wins");
-		color = video::SColor(255,0,0,255);
 	}
 	else
     {
         //Cannot really happen now. Only in time limited matches.
 		resultText = _("It's a draw");
-		color = video::SColor(255, 255, 255, 255);
 	}
 	core::rect<s32> pos(currX, currY, currX, currY);
 	font->draw(resultText.c_str(), pos, color, true, true);
@@ -909,8 +906,8 @@ void RaceResultGUI::displaySoccerResults()
 
 	for(unsigned int i=0; i<scorers.size(); i++)
     {
-		std::string kartName = race_manager->getKartIdent(scorers.at(i)).c_str();
-		resultText = _(kartName.c_str());
+		resultText = soccerWorld->getKart(scorers.at(i))->
+            getKartProperties()->getName();
 		resultText.append(" ");
 		resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
 		pos = core::rect<s32>(currX,currY,currX,currY);
@@ -932,8 +929,8 @@ void RaceResultGUI::displaySoccerResults()
 	scoreTimes = soccerWorld->getScoreTimes(1);
 	for(unsigned int i=0; i<scorers.size(); i++)
     {
-		std::string kartName = race_manager->getKartIdent(scorers.at(i)).c_str();
-		resultText = _(kartName.c_str());
+		resultText = soccerWorld->getKart(scorers.at(i))->
+            getKartProperties()->getName();
 		resultText.append(" ");
 		resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
 		pos = core::rect<s32>(currX,currY,currX,currY);
