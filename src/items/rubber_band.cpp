@@ -137,7 +137,7 @@ void RubberBand::updatePosition()
  */
 void RubberBand::update(float dt)
 {
-    if(m_owner->isEliminated() || m_owner->isShielded())
+    if(m_owner->isEliminated())
     {
         // Rubber band snaps
         m_plunger->hit(NULL);
