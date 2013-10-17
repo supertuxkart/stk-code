@@ -143,6 +143,7 @@ void SoccerSetupScreen::init()
 
     SpinnerWidget*  goalamount = getWidget<SpinnerWidget>("goalamount");
     goalamount->setValue(UserConfigParams::m_num_goals);
+    goalamount->setMax(10);
 
     // Set focus on "continue"
     ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");

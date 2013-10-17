@@ -620,52 +620,54 @@ void RaceResultGUI::renderGlobal(float dt)
     // Second phase: update X and Y positions for the various animations
     // =================================================================
     float v = 0.9f*UserConfigParams::m_width/m_time_single_scroll;
-    for(unsigned int i=0; i<m_all_row_infos.size(); i++)
+    if(!isSoccerWorld)
     {
-        RowInfo *ri = &(m_all_row_infos[i]);
-        float x = ri->m_x_pos;
-        float y = ri->m_y_pos;
-        switch(m_animation_state)
+        for(unsigned int i=0; i<m_all_row_infos.size(); i++)
         {
-        // Both states use the same scrolling:
-        case RR_INIT: break;   // Remove compiler warning
-        case RR_RACE_RESULT:
-        case RR_OLD_GP_RESULTS:
-             if(m_timer > ri->m_start_at)
-             {   // if active
-                 ri->m_x_pos -= dt*v;
-                 if(ri->m_x_pos<m_leftmost_column)
-                     ri->m_x_pos = (float)m_leftmost_column;
-                 x = ri->m_x_pos;
-             }
-             break;
-        case RR_INCREASE_POINTS:
-            ri->m_current_displayed_points +=
-                dt*race_manager->getPositionScore(1)/m_time_for_points;
-            if(ri->m_current_displayed_points>ri->m_new_overall_points)
+            RowInfo *ri = &(m_all_row_infos[i]);
+            float x = ri->m_x_pos;
+            float y = ri->m_y_pos;
+            switch(m_animation_state)
             {
-                ri->m_current_displayed_points =
-                   (float)ri->m_new_overall_points;
-            }
-            ri->m_new_points -=
-                dt*race_manager->getPositionScore(1)/m_time_for_points;
-            if(ri->m_new_points<0)
-                ri->m_new_points = 0;
-            break;
-        case RR_RESORT_TABLE:
-            x = ri->m_x_pos
-              - ri->m_radius*sin(m_timer/m_time_rotation*M_PI);
-            y = ri->m_centre_point
-              + ri->m_radius*cos(m_timer/m_time_rotation*M_PI);
-            break;
-        case RR_WAIT_TILL_END:
-            break;
-        }   // switch
-        if(isSoccerWorld)
-            displaySoccerResults();
-        else
+            // Both states use the same scrolling:
+            case RR_INIT: break;   // Remove compiler warning
+            case RR_RACE_RESULT:
+            case RR_OLD_GP_RESULTS:
+                 if(m_timer > ri->m_start_at)
+                 {   // if active
+                     ri->m_x_pos -= dt*v;
+                     if(ri->m_x_pos<m_leftmost_column)
+                         ri->m_x_pos = (float)m_leftmost_column;
+                     x = ri->m_x_pos;
+                 }
+                 break;
+            case RR_INCREASE_POINTS:
+                ri->m_current_displayed_points +=
+                    dt*race_manager->getPositionScore(1)/m_time_for_points;
+                if(ri->m_current_displayed_points>ri->m_new_overall_points)
+                {
+                    ri->m_current_displayed_points =
+                       (float)ri->m_new_overall_points;
+                }
+                ri->m_new_points -=
+                    dt*race_manager->getPositionScore(1)/m_time_for_points;
+                if(ri->m_new_points<0)
+                    ri->m_new_points = 0;
+                break;
+            case RR_RESORT_TABLE:
+                x = ri->m_x_pos
+                  - ri->m_radius*sin(m_timer/m_time_rotation*M_PI);
+                y = ri->m_centre_point
+                  + ri->m_radius*cos(m_timer/m_time_rotation*M_PI);
+                break;
+            case RR_WAIT_TILL_END:
+                break;
+            }   // switch
             displayOneEntry((unsigned int)x, (unsigned int)y, i, true);
-    }   // for i
+        }   // for i
+    }
+    else
+        displaySoccerResults();
 
     // Display highscores
     if (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
@@ -843,6 +845,9 @@ void RaceResultGUI::displaySoccerResults()
     int currY = (int)ri->m_y_pos; 
     SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
     int teamScore[2] = {soccerWorld->getScore(0), soccerWorld->getScore(1)};
+    
+    GUIEngine::Widget *table_area = getWidget("result-table");
+    int height = table_area->m_h + table_area->m_y;
 
     if(teamScore[0] > teamScore[1])
     {
@@ -914,7 +919,10 @@ void RaceResultGUI::displaySoccerResults()
         resultText.append(" ");
         resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
         rect = m_font->getDimension(resultText.c_str());
+
         currY += rect.Height;
+        if(currY > height) break;
+
         pos = core::rect<s32>(currX,currY,currX,currY);
         font->draw(resultText,pos, color, true, false);
         scorerIcon = soccerWorld->getKart(scorers.at(i))->
@@ -938,7 +946,10 @@ void RaceResultGUI::displaySoccerResults()
         resultText.append(" ");
         resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
         rect = m_font->getDimension(resultText.c_str());
+        
         currY += rect.Height;
+        if(currY > height) break;
+
         pos = core::rect<s32>(currX,currY,currX,currY);
         font->draw(resultText,pos, color, true, false);
         scorerIcon = soccerWorld->getKart(scorers.at(i))->
