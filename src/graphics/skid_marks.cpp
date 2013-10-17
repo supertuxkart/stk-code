@@ -269,7 +269,7 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left,
 
     video::S3DVertex v;
     v.Color = m_start_color;
-    v.Color.setAlpha(0.0f); // initially create all vertices at alpha=0...
+    v.Color.setAlpha(0); // initially create all vertices at alpha=0...
 
     // then when adding a new set of vertices, make the previous 2 opaque.
     // this ensures that the last two vertices are always at alpha=0,
