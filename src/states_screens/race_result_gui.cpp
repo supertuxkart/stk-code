@@ -859,9 +859,11 @@ void RaceResultGUI::displaySoccerResults()
     }
     core::rect<s32> pos(currX, currY, currX, currY);
     font->draw(resultText.c_str(), pos, color, true, true);
+    
+    core::dimension2du rect = m_font->getDimension(resultText.c_str());
 
     //Draw team scores:
-    currY += 20;
+    currY += rect.Height;
     currX /= 2;
     irr::video::ITexture* redTeamIcon = irr_driver->getTexture(
         file_manager->getTextureFile("soccer_ball_red.png"));
@@ -879,9 +881,10 @@ void RaceResultGUI::displaySoccerResults()
     irr_driver->getVideoDriver()->draw2DImage(blueTeamIcon,destRect,sourceRect,
         NULL, NULL, true);
     
-    currX += redTeamIcon->getSize().Width/4;
-    currY += 10 + redTeamIcon->getSize().Height/2;
     resultText = StringUtils::toWString(teamScore[1]);
+    rect = m_font->getDimension(resultText.c_str());
+    currX += redTeamIcon->getSize().Width/4;
+    currY += redTeamIcon->getSize().Height/2 + rect.Height/4;
     pos = core::rect<s32>(currX, currY, currX, currY);
     color = video::SColor(255,255,255,255);
     font->draw(resultText.c_str(), pos, color, true, false);
@@ -891,25 +894,27 @@ void RaceResultGUI::displaySoccerResults()
     pos = core::rect<s32>(currX,currY,currX,currY);
     font->draw(resultText.c_str(), pos, color, true, false);
     
-    resultText = "-";
     int centerX = UserConfigParams::m_width/2;
     pos = core::rect<s32>(centerX, currY, centerX, currY);
-    font->draw(resultText.c_str(), pos, color, true, false);
+    font->draw("-", pos, color, true, false);
 
     //Draw goal scorers:
     //The red scorers:
-    currY += GUIEngine::getFont()->getDimension(resultText.c_str()).Height + 20;
+    currY += rect.Height/2 + rect.Height/4;
     font = GUIEngine::getSmallFont();
     std::vector<int> scorers = soccerWorld->getScorers(0);
     std::vector<float> scoreTimes = soccerWorld->getScoreTimes(0);
     irr::video::ITexture* scorerIcon;
 
+    int prevY = currY;
     for(unsigned int i=0; i<scorers.size(); i++)
     {
         resultText = soccerWorld->getKart(scorers.at(i))->
             getKartProperties()->getName();
         resultText.append(" ");
         resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
+        rect = m_font->getDimension(resultText.c_str());
+        currY += rect.Height;
         pos = core::rect<s32>(currX,currY,currX,currY);
         font->draw(resultText,pos, color, true, false);
         scorerIcon = soccerWorld->getKart(scorers.at(i))->
@@ -919,11 +924,10 @@ void RaceResultGUI::displaySoccerResults()
         destRect = core::recti(currX-offsetX-30, currY, currX-offsetX, currY+ 30);
         irr_driver->getVideoDriver()->draw2DImage(scorerIcon, destRect, sourceRect,
             NULL, NULL, true);
-        currY += 30;
     }
 
     //The blue scorers:
-    currY -= 30*scorers.size();
+    currY = prevY;
     currX += UserConfigParams::m_width/2 - redTeamIcon->getSize().Width/2;
     scorers = soccerWorld->getScorers(1);
     scoreTimes = soccerWorld->getScoreTimes(1);
@@ -933,6 +937,8 @@ void RaceResultGUI::displaySoccerResults()
             getKartProperties()->getName();
         resultText.append(" ");
         resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
+        rect = m_font->getDimension(resultText.c_str());
+        currY += rect.Height;
         pos = core::rect<s32>(currX,currY,currX,currY);
         font->draw(resultText,pos, color, true, false);
         scorerIcon = soccerWorld->getKart(scorers.at(i))->
@@ -943,7 +949,6 @@ void RaceResultGUI::displaySoccerResults()
         destRect = core::recti(currX-offsetX-30, currY, currX-offsetX, currY+ 30);
         irr_driver->getVideoDriver()->draw2DImage(scorerIcon, destRect, sourceRect,
             NULL, NULL, true);
-        currY += 30;
     }
 }
 
