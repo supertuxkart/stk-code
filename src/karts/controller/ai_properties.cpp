@@ -38,6 +38,7 @@ AIProperties::AIProperties(RaceManager::Difficulty difficulty)
     m_skidding_threshold         = UNDEFINED;
     m_min_start_delay            = UNDEFINED;
     m_max_start_delay            = UNDEFINED;
+    m_shield_incoming_radius     = UNDEFINED;
     m_false_start_probability    = UNDEFINED;
     m_make_use_of_slipstream     = false;
     m_collect_avoid_items        = false;
@@ -68,6 +69,7 @@ void AIProperties::load(const XMLNode *ai_node)
     ai_node->get("collect-avoid-items",       &m_collect_avoid_items       );
     ai_node->get("handle-bomb",               &m_handle_bomb               );
     ai_node->get("skidding-threshold",        &m_skidding_threshold        );
+    ai_node->get("shield-incoming-radius",    &m_shield_incoming_radius    );
     ai_node->get("false-start-probability",   &m_false_start_probability   );
     ai_node->get("min-start-delay",           &m_min_start_delay           );
     ai_node->get("max-start-delay",           &m_max_start_delay           );
@@ -109,6 +111,7 @@ void AIProperties::checkAllSet(const std::string &filename) const
     CHECK_NEG(m_bad_item_closeness_2,      "bad-item-closeness"        );
     CHECK_NEG(m_straight_length_for_zipper,"straight-length-for-zipper");
     CHECK_NEG(m_skidding_threshold,        "skidding-threshold"        );
+    CHECK_NEG(m_shield_incoming_radius,    "shield-incoming-radius"    );
     CHECK_NEG(m_false_start_probability,   "false-start-probability"   );
     CHECK_NEG(m_min_start_delay,           "min-start-delay"           );
     CHECK_NEG(m_max_start_delay,           "max-start-delay"           );

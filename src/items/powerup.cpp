@@ -264,7 +264,7 @@ void Powerup::use()
         Powerup::adjustSound();
         m_sound_use->play();
 
-        projectile_manager->newProjectile(m_owner, world->getTrack(), m_type);
+        projectile_manager->newProjectile(m_owner, m_type);
         break ;
 
     case PowerupManager::POWERUP_SWATTER:
