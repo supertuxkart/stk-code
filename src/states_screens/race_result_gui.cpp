@@ -920,7 +920,11 @@ void RaceResultGUI::displaySoccerResults()
         resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
         rect = m_font->getDimension(resultText.c_str());
 
-        currY += rect.Height;
+        if(height-prevY < ((short)scorers.size()+1)*(short)rect.Height)
+            currY += (height-prevY)/((short)scorers.size()+1);
+        else
+            currY += rect.Height;
+
         if(currY > height) break;
 
         pos = core::rect<s32>(currX,currY,currX,currY);
@@ -947,7 +951,11 @@ void RaceResultGUI::displaySoccerResults()
         resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
         rect = m_font->getDimension(resultText.c_str());
         
-        currY += rect.Height;
+        if(height-prevY < ((short)scorers.size()+1)*(short)rect.Height)
+            currY += (height-prevY)/((short)scorers.size()+1);
+        else
+            currY += rect.Height;
+
         if(currY > height) break;
 
         pos = core::rect<s32>(currX,currY,currX,currY);
