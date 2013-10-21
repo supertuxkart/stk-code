@@ -778,7 +778,7 @@ void ClientLobbyRoomProtocol::playerReversedVote(Event* event)
         return;
     if (!isByteCorrect(event, 9, 1))
         return;
-    m_setup->getRaceConfig()->setPlayerReversedVote(data[6], data[8], data[10]);
+    m_setup->getRaceConfig()->setPlayerReversedVote(data[6], data[8]!=0, data[10]);
 }
 //-----------------------------------------------------------------------------
 

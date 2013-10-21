@@ -613,7 +613,7 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
     if (!isByteCorrect(event, 7, 1))
         return;
     uint8_t player_id = peer->getPlayerProfile()->race_id;
-    m_setup->getRaceConfig()->setPlayerReversedVote(player_id, data[6], data[8]);
+    m_setup->getRaceConfig()->setPlayerReversedVote(player_id, data[6]!=0, data[8]);
     // Send the vote to everybody (including the sender)
     NetworkString other;
     other.ai8(1).ai8(player_id); // add the player id
