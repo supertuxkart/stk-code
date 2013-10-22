@@ -20,6 +20,7 @@
 #define HEADER_KART_MODEL_HPP
 
 #include <string>
+#include <vector>
 
 #include <IAnimatedMeshSceneNode.h>
 namespace irr
@@ -35,6 +36,23 @@ using namespace irr;
 class AbstractKart;
 class KartProperties;
 class XMLNode;
+
+struct SpeedWeightedObject
+{
+    SpeedWeightedObject() : m_model(NULL), m_node(NULL), m_position(), m_name() {}
+    /** Model */
+    scene::IAnimatedMesh *              m_model;
+
+    /** The scene node the speed weighted model is attached to */
+    scene::IAnimatedMeshSceneNode *     m_node;
+
+    /** The position of the "speed weighted" objects relative to the kart */
+    Vec3                                m_position;
+
+    /** Filename of the "speed weighted" object */
+    std::string                         m_name;
+};
+typedef std::vector<SpeedWeightedObject>    SpeedWeightedObjectList;
 
 /**
  * \brief This class stores a 3D kart model.
@@ -66,7 +84,9 @@ public:
             AF_WIN_START,          // Begin of win animation
             AF_WIN_LOOP_START,     // Begin of win loop animation
             AF_WIN_END,            // End of win animation
-            AF_END=AF_WIN_END,     // Last animation frame
+            AF_SPEED_WEIGHTED_START,        // Start of speed-weighted animation
+            AF_SPEED_WEIGHTED_END,          // End of speed-weighted animation
+            AF_END=AF_SPEED_WEIGHTED_END,   // Last animation frame
             AF_COUNT};             // Number of entries here
 private:
     /** Which frame number starts/end which animation. */
@@ -123,6 +143,9 @@ private:
     /** True if kart has nitro emitters */
     bool          m_has_nitro_emitter;
 
+    /** The speed weighted objects. */
+    SpeedWeightedObjectList     m_speed_weighted_objects;
+    
     /** Minimum suspension length. If the displayed suspension is
      *  shorter than this, the wheel would look wrong. */
     float         m_min_suspension[4];
@@ -154,6 +177,8 @@ private:
     void  loadNitroEmitterInfo(const XMLNode &node,
                         const std::string &emitter_name, int index);
 
+    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node);
+
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
     /** Pointer to the kart object belonging to this kart model. */
@@ -167,7 +192,7 @@ public:
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
     void          update(float rotation_dt, float steer,
-                         const float suspension[4]);
+                         const float suspension[4], float speed);
     void          setDefaultPhysicsPosition(const Vec3 &center_shift,
                                             float wheel_radius);
     void          finishedRace();
@@ -220,6 +245,15 @@ public:
     /** Returns true if kart has nitro emitters */
     const bool hasNitroEmitters() const
                 {return m_has_nitro_emitter;}
+    // ------------------------------------------------------------------------
+    /** Returns the number of speed weighted objects for this kart */
+    size_t      getSpeedWeightedObjectsCount() const
+                {return m_speed_weighted_objects.size();}
+    // ------------------------------------------------------------------------
+    /** Returns the position of a speed weighted object relative to the kart.
+     *  \param i Index of the object  */
+    const SpeedWeightedObject& getSpeedWeightedObject(int i) const
+                {return m_speed_weighted_objects[i];}
     // ------------------------------------------------------------------------
     /** Returns the length of the kart model. */
     float getLength                 () const {return m_kart_length;      }

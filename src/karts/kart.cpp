@@ -2389,7 +2389,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         wheel_up_axis[i] = m_default_suspension_length[i]
                          - m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
     }
-    m_kart_model->update(m_wheel_rotation_dt, getSteerPercent(), wheel_up_axis);
+    m_kart_model->update(m_wheel_rotation_dt, getSteerPercent(), wheel_up_axis, m_speed);
 
     Vec3        center_shift  = m_kart_properties->getGravityCenterShift();
     float y = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getY()

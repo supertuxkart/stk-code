@@ -89,6 +89,7 @@ KartModel::KartModel(bool is_master)
     m_wheel_filename[1] = "";
     m_wheel_filename[2] = "";
     m_wheel_filename[3] = "";
+    m_speed_weighted_objects.clear();
     m_animated_node     = NULL;
     m_mesh              = NULL;
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
@@ -123,6 +124,8 @@ void KartModel::loadInfo(const XMLNode &node)
         animation_node->get("start-jump",     &m_animation_frame[AF_JUMP_START]);
         animation_node->get("start-jump-loop",&m_animation_frame[AF_JUMP_LOOP] );
         animation_node->get("end-jump",       &m_animation_frame[AF_JUMP_END]  );
+        animation_node->get("start-speed-weighted",     &m_animation_frame[AF_SPEED_WEIGHTED_START]     );
+        animation_node->get("end-speed-weighted",       &m_animation_frame[AF_SPEED_WEIGHTED_END]       );
         animation_node->get("speed",          &m_animation_speed               );
     }
 
@@ -143,6 +146,14 @@ void KartModel::loadInfo(const XMLNode &node)
         loadNitroEmitterInfo(*nitroEmitter_node, "nitro-emitter-a", 0);
         loadNitroEmitterInfo(*nitroEmitter_node, "nitro-emitter-b", 1);
         m_has_nitro_emitter = true;
+    }
+
+	if(const XMLNode *speedWeighted_node=node.getNode("speed-weighted"))
+    {
+		for(unsigned int i=0 ; i < speedWeighted_node->getNumNodes() ; i++)
+		{
+			loadSpeedWeightedInfo(speedWeighted_node->getNode(i));
+		}
     }
 
     if(const XMLNode *hat_node=node.getNode("hat"))
@@ -182,6 +193,22 @@ KartModel::~KartModel()
         {
             irr_driver->dropAllTextures(m_wheel_model[i]);
             irr_driver->removeMeshFromCache(m_wheel_model[i]);
+        }
+    }
+
+    for(size_t i=0; i<m_speed_weighted_objects.size(); i++)
+    {
+        if(m_speed_weighted_objects[i].m_node)
+        {
+            // Master KartModels should never have a speed weighted object attached.
+            assert(!m_is_master);
+
+            m_speed_weighted_objects[i].m_node->drop();
+        }
+        if(m_is_master && m_speed_weighted_objects[i].m_model)
+        {
+            irr_driver->dropAllTextures(m_speed_weighted_objects[i].m_model);
+            irr_driver->removeMeshFromCache(m_speed_weighted_objects[i].m_model);
         }
     }
 
@@ -247,6 +274,17 @@ KartModel* KartModel::makeCopy()
         km->m_max_suspension[i]             = m_max_suspension[i];
         km->m_dampen_suspension_amplitude[i]= m_dampen_suspension_amplitude[i];
     }
+    
+    km->m_speed_weighted_objects.resize(m_speed_weighted_objects.size());
+    for(size_t i=0; i<m_speed_weighted_objects.size(); i++)
+    {
+        km->m_speed_weighted_objects[i].m_model            = m_speed_weighted_objects[i].m_model;
+        // Master should not have any speed weighted nodes.
+        assert(!m_speed_weighted_objects[i].m_node);
+        km->m_speed_weighted_objects[i].m_name             = m_speed_weighted_objects[i].m_name;
+        km->m_speed_weighted_objects[i].m_position         = m_speed_weighted_objects[i].m_position;
+    }
+
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
         km->m_animation_frame[i] = m_animation_frame[i];
 
@@ -299,6 +337,13 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
             if(!m_wheel_model[i]) continue;
             m_wheel_node[i]->setParent(lod_node);
         }
+
+        // Become the owner of the speed weighted objects
+        for(size_t i=0; i<m_speed_weighted_objects.size(); i++)
+        {
+            if(!m_speed_weighted_objects[i].m_node) continue;
+            m_speed_weighted_objects[i].m_node->setParent(lod_node);
+        }
     }
     else
     {
@@ -316,6 +361,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         std::string debug_name = m_model_filename+" (kart-model)";
         node->setName(debug_name.c_str());
 #endif
+
+        // Attach the wheels
         for(unsigned int i=0; i<4; i++)
         {
             if(!m_wheel_model[i]) continue;
@@ -326,6 +373,27 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
             m_wheel_node[i]->setName(debug_name.c_str());
     #endif
             m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
+        }
+
+        // Attach the speed weighted objects + set the animation state
+        for(size_t i=0 ; i < m_speed_weighted_objects.size() ; i++)
+        {
+            SpeedWeightedObject&    obj = m_speed_weighted_objects[i];
+            obj.m_node = NULL;
+            if(obj.m_model)
+            {
+                obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, node);
+                obj.m_node->grab();
+
+                obj.m_node->setAnimationStrength(0.0f);
+                obj.m_node->setFrameLoop(m_animation_frame[AF_SPEED_WEIGHTED_START], m_animation_frame[AF_SPEED_WEIGHTED_END]);
+
+        #ifdef DEBUG
+                std::string debug_name = obj.m_name+" (speed-weighted)";
+                obj.m_node->setName(debug_name.c_str());
+        #endif
+                obj.m_node->setPosition(obj.m_position.toIrrVector());
+            }
         }
     }
     return node;
@@ -350,10 +418,31 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
 
-    Vec3 min, max;
-    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), &min, &max);
+    Vec3 kart_min, kart_max;
+    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), &kart_min, &kart_max);
 
-    Vec3 size     = max-min;
+    // Load the speed weighted object models. We need to do that now because it can affect the dimensions of the kart
+    for(size_t i=0 ; i < m_speed_weighted_objects.size() ; i++)
+    {
+        SpeedWeightedObject&    obj = m_speed_weighted_objects[i];
+        std::string full_name =
+            kart_properties.getKartDir()+obj.m_name;
+        obj.m_model = irr_driver->getAnimatedMesh(full_name);
+        // Grab all textures. This is done for the master only, so
+        // the destructor will only free the textures if a master
+        // copy is freed.
+        irr_driver->grabAllTextures(obj.m_model);
+
+        // Update min/max
+        Vec3 obj_min, obj_max;
+        MeshTools::minMax3D(obj.m_model, &obj_min, &obj_max);
+        obj_min += obj.m_position;
+        obj_max += obj.m_position;
+        kart_min.min(obj_min);
+        kart_max.min(obj_max);
+    }
+
+    Vec3 size     = kart_max-kart_min;
     m_kart_width  = size.getX();
     m_kart_height = size.getY();
     m_kart_length = size.getZ();
@@ -417,6 +506,18 @@ void KartModel::loadNitroEmitterInfo(const XMLNode &node,
     }
     emitter_node->get("position", &m_nitro_emitter_position[index]);
 }   // loadNitroEmitterInfo
+
+/** Loads a single speed weighted node. */
+void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node)
+{
+    SpeedWeightedObject obj;
+    
+    speed_weighted_node->get("position", &obj.m_position);
+    speed_weighted_node->get("model",    &obj.m_name);
+
+    if(!obj.m_name.empty())
+        m_speed_weighted_objects.push_back(obj);
+}
 
 // ----------------------------------------------------------------------------
 /** Loads a single wheel node. Currently this is the name of the wheel model
@@ -488,7 +589,7 @@ void KartModel::reset()
 {
     // Reset the wheels
     const float suspension[4]={0,0,0,0};
-    update(0, 0.0f, suspension);
+    update(0, 0.0f, suspension, 0.0f);
 
     // Stop any animations currently being played.
     setAnimation(KartModel::AF_DEFAULT);
@@ -594,12 +695,14 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
 }   // OnAnimationEnd
 
 // ----------------------------------------------------------------------------
-/** Rotates and turns the wheels appropriately, and adjust for suspension.
+/** Rotates and turns the wheels appropriately, and adjust for suspension
+    + updates the speed-weighted objects' animations.
  *  \param rotation_dt How far the wheels have rotated since last time.
  *  \param steer The actual steer settings.
  *  \param suspension Suspension height for all four wheels.
+ *  \param speed The speed of the kart in meters/sec, used for the speed-weighted objects' animations
  */
-void KartModel::update(float rotation_dt, float steer, const float suspension[4])
+void KartModel::update(float rotation_dt, float steer, const float suspension[4], float speed)
 {
     float clamped_suspension[4];
     // Clamp suspension to minimum and maximum suspension length, so that
@@ -654,6 +757,18 @@ void KartModel::update(float rotation_dt, float steer, const float suspension[4]
 
     // If animations are disabled, stop here
     if (m_animated_node == NULL) return;
+
+    // Update the speed-weighted objects' animations
+    for(size_t i=0 ; i < m_speed_weighted_objects.size() ; i++)
+    {
+        SpeedWeightedObject&    obj = m_speed_weighted_objects[i];
+        float strength = speed * m_kart->getKartProperties()->getSpeedWeightedStrengthFactor();
+        btClamp<float>(strength, 0.0f, 1.0f);
+        obj.m_node->setAnimationStrength(strength);
+
+        float anim_speed = speed * m_kart->getKartProperties()->getSpeedWeightedSpeedFactor();
+        obj.m_node->setAnimationSpeed(anim_speed);
+    }
 
     // Check if the end animation is being played, if so, don't
     // play steering animation.
@@ -710,4 +825,3 @@ void KartModel::attachHat(){
             }   // if bone
         }   // if(m_hat_name)
 }
-

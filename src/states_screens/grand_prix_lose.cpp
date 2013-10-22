@@ -340,7 +340,7 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
             kart_main_node->updateAbsolutePosition();
             kart_main_node->setRotation(vector3df(0, 90, 0));
             float susp[4]={0,0,0,0};
-            kart_model->update(0.0f, 0.0f, susp);
+            kart_model->update(0.0f, 0.0f, susp, 0.0f);
         }
         else
         {

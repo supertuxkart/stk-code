@@ -171,7 +171,7 @@ public:
     void                  removeMeshFromCache(scene::IMesh *mesh);
     void                  removeTexture(video::ITexture *t);
     scene::IAnimatedMeshSceneNode
-                         *addAnimatedMesh(scene::IAnimatedMesh *mesh);
+                         *addAnimatedMesh(scene::IAnimatedMesh *mesh, scene::ISceneNode* parent=NULL);
     scene::ICameraSceneNode
                          *addCameraSceneNode();
     Camera               *addCamera(unsigned int index, AbstractKart *kart);

@@ -994,9 +994,9 @@ void IrrDriver::removeTexture(video::ITexture *t)
 /** Adds an animated mesh to the scene.
  *  \param mesh The animated mesh to add.
  */
-scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh)
+scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh, scene::ISceneNode* parent)
 {
-    return m_scene_manager->addAnimatedMeshSceneNode(mesh, NULL, -1,
+    return m_scene_manager->addAnimatedMeshSceneNode(mesh, parent, -1,
                                                      core::vector3df(0,0,0),
                                                      core::vector3df(0,0,0),
                                                      core::vector3df(1,1,1),

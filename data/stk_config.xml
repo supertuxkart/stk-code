@@ -483,6 +483,11 @@
       <rear-right  position="0.38 0 -0.6" />
       <rear-left   position="-0.38 0 -0.6"/>
     </wheels>
+    
+    <!-- Parameters for the speed-weighted objects:
+         a bigger value for strength-factor leads to the speed of the kart more quickly affecting
+         the strength of the animation (up to a maximum value that corresponds to the original animation) -->
+    <speed-weighted strength-factor="0.05" speed-factor="5.0"/>
 
     <!-- friction: slip used for bullet skidding. A high value 
          (like 10000000) disables bullet skidding. -->
