@@ -33,7 +33,7 @@ CAnimatedMeshSceneNode::CAnimatedMeshSceneNode(IAnimatedMesh* mesh,
 		const core::vector3df& scale)
 : IAnimatedMeshSceneNode(parent, mgr, id, position, rotation, scale), Mesh(0),
 	StartFrame(0), EndFrame(0), FramesPerSecond(0.025f),
-	CurrentFrameNr(0.f), LastTimeMs(0),
+	CurrentFrameNr(0.f), AnimationStrength(1.f), LastTimeMs(0),
 	TransitionTime(0), Transiting(0.f), TransitingBlend(0.f),
 	JointMode(EJUOR_NONE), JointsUsed(false),
 	Looping(true), ReadOnlyMaterials(false), RenderFromIdentity(false),
@@ -210,7 +210,7 @@ IMesh * CAnimatedMeshSceneNode::getMeshForCurrentFrame()
 			skinnedMesh->animateMesh(getFrameNr(), 1.0f);
 
 		// Update the skinned mesh for the current joint transforms.
-		skinnedMesh->skinMesh();
+		skinnedMesh->skinMesh(AnimationStrength);
 
 		if (JointMode == EJUOR_READ)//read from mesh
 		{
@@ -513,6 +513,21 @@ void CAnimatedMeshSceneNode::setAnimationSpeed(f32 framesPerSecond)
 f32 CAnimatedMeshSceneNode::getAnimationSpeed() const
 {
 	return FramesPerSecond * 1000.f;
+}
+
+
+//! Sets the animation strength (how important the animation is)
+/** \param strength: The importance of the animation: 1.f keeps the original animation, 0.f is no animation. */
+void CAnimatedMeshSceneNode::setAnimationStrength(f32 strength)
+{
+	AnimationStrength = strength;
+}
+
+//! Gets the animation strength (how important the animation is)
+/** \return The importance of the animation: 1.f keeps the original animation, 0.f is no animation. */
+f32 CAnimatedMeshSceneNode::getAnimationStrength() const
+{
+	return AnimationStrength;
 }
 
 

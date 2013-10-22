@@ -445,7 +445,7 @@ void CSkinnedMesh::getFrameData(f32 frame, SJoint *joint,
 //--------------------------------------------------------------------------
 
 //! Preforms a software skin on this mesh based of joint positions
-void CSkinnedMesh::skinMesh()
+void CSkinnedMesh::skinMesh(f32 strength)
 {
 	if (!HasAnimation || SkinnedLastFrame)
 		return;
@@ -478,7 +478,7 @@ void CSkinnedMesh::skinMesh()
 
 		//skin starting with the root joints
 		for (i=0; i<RootJoints.size(); ++i)
-			skinJoint(RootJoints[i], 0);
+			skinJoint(RootJoints[i], 0, strength);
 
 		for (i=0; i<SkinningBuffers->size(); ++i)
 			(*SkinningBuffers)[i]->setDirty(EBT_VERTEX);
@@ -486,8 +486,7 @@ void CSkinnedMesh::skinMesh()
 	updateBoundingBox();
 }
 
-
-void CSkinnedMesh::skinJoint(SJoint *joint, SJoint *parentJoint)
+void CSkinnedMesh::skinJoint(SJoint *joint, SJoint *parentJoint, f32 strength)
 {
 	if (joint->Weights.size())
 	{
@@ -509,6 +508,14 @@ void CSkinnedMesh::skinJoint(SJoint *joint, SJoint *parentJoint)
 
 			if (AnimateNormals)
 				jointVertexPull.rotateVect(thisNormalMove, weight.StaticNormal);
+
+			// Apply animation strength
+			if(strength != 1.f)
+			{
+				thisVertexMove = core::lerp(weight.StaticPos, thisVertexMove, strength);
+				if(AnimateNormals)
+					thisNormalMove = core::lerp(weight.StaticNormal, thisNormalMove, strength);
+			}
 
 			if (! (*(weight.Moved)) )
 			{
@@ -537,7 +544,7 @@ void CSkinnedMesh::skinJoint(SJoint *joint, SJoint *parentJoint)
 
 	//Skin all children
 	for (u32 j=0; j<joint->Children.size(); ++j)
-		skinJoint(joint->Children[j], joint);
+		skinJoint(joint->Children[j], joint, strength);
 }
 
 
