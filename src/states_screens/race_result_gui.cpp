@@ -81,6 +81,12 @@ void RaceResultGUI::tearDown()
 {
     Screen::tearDown();
     m_font->setMonospaceDigits(m_was_monospace);
+
+    if (m_finish_sound != NULL &&
+        m_finish_sound->getStatus() == SFXManager::SFX_PLAYING)
+    {
+        m_finish_sound->stop();
+    }
 }   // tearDown
 
 //-----------------------------------------------------------------------------
