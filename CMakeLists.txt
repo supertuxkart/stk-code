@@ -72,6 +72,8 @@ endif()
 if(APPLE)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch i386")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch i386 -F/Library/Frameworks")
+elseif(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")   # Enable multi-processor compilation (faster)
 endif()
 
 # OpenAL

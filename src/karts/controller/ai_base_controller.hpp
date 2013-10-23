@@ -23,6 +23,7 @@
 
 class AIProperties;
 class LinearWorld;
+class ThreeStrikesBattle;
 class QuadGraph;
 class BattleGraph;
 class Track;
@@ -34,12 +35,43 @@ class AIBaseController : public Controller
 
 
 
+protected:
+     /** Length of the kart, storing it here saves many function calls. */
+    float m_kart_length;
+
+    /** Cache width of kart. */
+    float m_kart_width;
+
+    
+    /** Keep a pointer to the track to reduce calls */
+    Track       *m_track;
+
+    
+    
+    /** A pointer to the AI properties for this kart. */
+    const AIProperties *m_ai_properties;
+
+
+
+    /** The current node the kart is on. This can be different from the value
+     *  in LinearWorld, since it takes the chosen path of the AI into account
+     *  (e.g. the closest point in LinearWorld might be on a branch not
+     *  chosen by the AI). */
+    int   m_track_node;
+
+    virtual void setSteering   (float angle, float dt);
+    void    setControllerName(const std::string &name);
+    float   steerToPoint(const Vec3 &point);
+    float    normalizeAngle(float angle);
+    virtual bool doSkid(float steer_fraction);
 
 public:
     
     AIBaseController(AbstractKart *kart,
                               StateManager::ActivePlayer *player=NULL);
     virtual ~AIBaseController() {};
+
+    virtual bool  disableSlipstreamBonus() const;
 
 };
 #endif

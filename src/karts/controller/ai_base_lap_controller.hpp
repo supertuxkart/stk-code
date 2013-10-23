@@ -44,26 +44,9 @@ private:
     bool m_stuck_trigger_rescue;
 
 protected:
-    /** Length of the kart, storing it here saves many function calls. */
-    float m_kart_length;
-
-    /** Cache width of kart. */
-    float m_kart_width;
-
-    /** Keep a pointer to the track to reduce calls */
-    Track       *m_track;
-
+   
     /** Keep a pointer to world. */
     LinearWorld *m_world;
-
-    /** A pointer to the AI properties for this kart. */
-    const AIProperties *m_ai_properties;
-
-    /** The current node the kart is on. This can be different from the value
-     *  in LinearWorld, since it takes the chosen path of the AI into account
-     *  (e.g. the closest point in LinearWorld might be on a branch not
-     *  chosen by the AI). */
-    int   m_track_node;
 
     /** Which of the successors of a node was selected by the AI. */
     std::vector<int> m_successor_index;
@@ -80,13 +63,13 @@ protected:
     virtual void update      (float delta) ;
     virtual unsigned int getNextSector(unsigned int index);
     virtual void  newLap             (int lap);
-    virtual void setControllerName(const std::string &name);
-    virtual void setSteering   (float angle, float dt);
+    //virtual void setControllerName(const std::string &name);
+    
     float    steerToAngle  (const unsigned int sector, const float angle);
-    float    steerToPoint  (const Vec3 &point);
-    float    normalizeAngle(float angle);
+    
+    
     void     computePath();
-    virtual bool doSkid(float steer_fraction);
+    
     // ------------------------------------------------------------------------
     /** Nothing special to do when the race is finished. */
     virtual void raceFinished() {};
@@ -113,7 +96,7 @@ public:
     virtual bool isPlayerController() const { return false; }
     virtual void action(PlayerAction action, int value) {};
     virtual void  skidBonusTriggered() {};
-    virtual bool  disableSlipstreamBonus() const;
+    
 };   // AIBaseLapController
 
 #endif
