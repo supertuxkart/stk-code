@@ -64,7 +64,7 @@ void calculate_orientation(struct accel_t* ac, struct vec3b_t* accel, struct ori
 	 */
 
 	/* yaw - set to 0, IR will take care of it if it's enabled */
-	//orient->yaw = 0.0f;
+	orient->yaw = 0.0f;
 
 	/* find out how much it has to move to be 1g */
 	xg = (float)ac->cal_g.x;
@@ -108,12 +108,6 @@ void calculate_orientation(struct accel_t* ac, struct vec3b_t* accel, struct ori
 
 		orient->pitch = y;
 		orient->a_pitch = y;
-	}
-
-	if (abs(accel->z - ac->cal_zero.z) <= ac->cal_g.z) {
-	        z = RAD_TO_DEGREE(atan2f(x, y));
-
-		orient->yaw = z;
 	}
 
 	/* smooth the angles if enabled */
