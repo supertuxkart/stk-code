@@ -1,5 +1,7 @@
 # CMakeLists.txt - wiiuse
 
+cmake_minimum_required(VERSION 2.8.1)
+
 set(WIIUSE_SOURCES
     classic.c
     dynamics.c
@@ -29,7 +31,7 @@ endif()
 if(MSVC)
     add_definitions("/DWIIUSE_STATIC")
     add_library(wiiuse STATIC ${WIIUSE_SOURCES})
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" /MTd)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MTd")
 else()
     add_library(wiiuse ${WIIUSE_SOURCES})
 endif()
