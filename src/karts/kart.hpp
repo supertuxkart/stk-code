@@ -130,7 +130,7 @@ private:
     /** Current leaning of the kart. */
     float        m_current_lean;
 
-    /** If > 0 then bubble gum effect is on */
+    /** If > 0 then bubble gum effect is on. This is the sliding when hitting a gum on the floor, not the shield. */
     float        m_bubblegum_time;
 
     /** The torque to apply after hitting a bubble gum. */
@@ -211,6 +211,7 @@ private:
     SFXBase      *m_previous_terrain_sound;
     SFXBase      *m_skid_sound;
     SFXBase      *m_goo_sound;
+    SFXBase      *m_boing_sound;
     float         m_time_last_crash;
     
     /** To prevent using nitro in too short bursts */
@@ -225,7 +226,7 @@ private:
     void          updateEngineSFX();
     void          updateNitro(float dt);
     float         getActualWheelForce();
-    void          crashed();
+    void          crashed(const Material* m, AbstractKart *k);
     void          loadData(RaceManager::KartType type, bool animatedModel);
 
 public:

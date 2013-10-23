@@ -35,12 +35,6 @@
     <Filter Include="Header Files\physics">
       <UniqueIdentifier>{1298df87-da0e-462e-b074-a496598571d8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\karts">
-      <UniqueIdentifier>{11a7d573-5959-4be8-8a3f-d455d7833333}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\karts\controller">
-      <UniqueIdentifier>{d477b64b-eb9c-4059-a647-98f3a2f7203a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\graphics">
       <UniqueIdentifier>{2f186570-85e9-4cea-88dc-0f716c6e141a}</UniqueIdentifier>
     </Filter>
@@ -153,6 +147,12 @@
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Header Files\items\karts">
+      <UniqueIdentifier>{11a7d573-5959-4be8-8a3f-d455d7833333}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\items\karts\controller">
+      <UniqueIdentifier>{d477b64b-eb9c-4059-a647-98f3a2f7203a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -885,6 +885,9 @@
     <ClCompile Include="..\..\karts\controller\ai_base_controller.cpp">
       <Filter>Source Files\karts\controller</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\karts\controller\battle_ai.cpp">
+      <Filter>Source Files\karts\controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\main_loop.hpp">
@@ -1158,34 +1161,34 @@
       <Filter>Header Files\physics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart_control.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart_model.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart_properties.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart_properties_manager.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\max_speed.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\moveable.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\controller.hpp">
-      <Filter>Header Files\karts\controller</Filter>
+      <Filter>Header Files\items\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\end_controller.hpp">
-      <Filter>Header Files\karts\controller</Filter>
+      <Filter>Header Files\items\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\player_controller.hpp">
-      <Filter>Header Files\karts\controller</Filter>
+      <Filter>Header Files\items\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\graphics\camera.hpp">
       <Filter>Header Files\graphics</Filter>
@@ -1539,7 +1542,7 @@
       <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart_with_stats.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tracks\track_sector.hpp">
       <Filter>Header Files\tracks</Filter>
@@ -1575,7 +1578,7 @@
       <Filter>Header Files\states_screens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\kart_gfx.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\states_screens\dialogs\select_challenge.hpp">
       <Filter>Header Files\states_screens\dialogs</Filter>
@@ -1590,28 +1593,28 @@
       <Filter>Header Files\replay</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\ghost_kart.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\skidding.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\skidding_properties.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\explosion_animation.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\abstract_kart_animation.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\abstract_kart.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\cannon_animation.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\rescue_animation.hpp">
-      <Filter>Header Files\karts</Filter>
+      <Filter>Header Files\items\karts</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modes\demo_world.hpp">
       <Filter>Header Files\modes</Filter>
@@ -1626,7 +1629,7 @@
       <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\skidding_ai.hpp">
-      <Filter>Header Files\karts\controller</Filter>
+      <Filter>Header Files\items\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modes\cutscene_world.hpp">
       <Filter>Header Files\modes</Filter>
@@ -1638,7 +1641,7 @@
       <Filter>Header Files\addons</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\ai_properties.hpp">
-      <Filter>Header Files\karts\controller</Filter>
+      <Filter>Header Files\items\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\interpolation_array.hpp">
       <Filter>Header Files\utils</Filter>
@@ -1689,10 +1692,10 @@
       <Filter>Header Files\tracks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\ai_base_lap_controller.hpp">
-      <Filter>Header Files\karts\controller</Filter>
+      <Filter>Header Files\items\karts\controller</Filter>
     </ClInclude>
     <ClInclude Include="..\..\karts\controller\ai_base_controller.hpp">
-      <Filter>Header Files\karts\controller</Filter>
+      <Filter>Header Files\items\karts\controller</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

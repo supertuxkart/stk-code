@@ -392,6 +392,11 @@ public:
                                 kart_model.getWheelGraphicsPosition(2) );
         m_model_view->addModel( kart_model.getWheelModel(3),
                                 kart_model.getWheelGraphicsPosition(3) );
+        for(size_t i=0 ; i < kart_model.getSpeedWeightedObjectsCount() ; i++)
+        {
+            const SpeedWeightedObject&  obj = kart_model.getSpeedWeightedObject(i);
+            m_model_view->addModel(obj.m_model, obj.m_position);
+        }
         m_model_view->setRotateContinuously( 35.0f );
 
         // ---- Kart name label
@@ -954,6 +959,11 @@ public:
                               kart_model.getWheelGraphicsPosition(2) );
                 w3->addModel( kart_model.getWheelModel(3),
                               kart_model.getWheelGraphicsPosition(3) );
+                for(size_t i=0 ; i < kart_model.getSpeedWeightedObjectsCount() ; i++)
+                {
+                    const SpeedWeightedObject&  obj = kart_model.getSpeedWeightedObject(i);
+                    w3->addModel(obj.m_model, obj.m_position);
+                }
                 w3->update(0);
 
                 m_parent->m_kart_widgets[playerID].m_kart_name

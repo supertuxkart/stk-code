@@ -37,10 +37,20 @@ SkidMarks::SkidMarks(const AbstractKart& kart, float width) : m_kart(kart)
 {
     m_width                   = width;
     m_material                = new video::SMaterial();
-    m_material->MaterialType  = video::EMT_TRANSPARENT_VERTEX_ALPHA;
+    m_material->MaterialType = video::EMT_ONETEXTURE_BLEND;
+    m_material->MaterialTypeParam =
+            pack_textureBlendFunc(video::EBF_SRC_ALPHA,
+                                  video::EBF_ONE_MINUS_SRC_ALPHA,
+                                  video::EMFN_MODULATE_1X,
+                                  video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
     m_material->AmbientColor  = video::SColor(128, 0, 0, 0);
     m_material->DiffuseColor  = video::SColor(128, 16, 16, 16);
+    //m_material->AmbientColor  = video::SColor(255, 255, 255, 255);
+    //m_material->DiffuseColor  = video::SColor(255, 255, 255, 255);
+    m_material->setFlag(video::EMF_ANISOTROPIC_FILTER, true);
+    m_material->setFlag(video::EMF_ZWRITE_ENABLE, false);
     m_material->Shininess     = 0;
+    m_material->TextureLayer[0].Texture = irr_driver->getTexture("skidmarks.png");
     m_skid_marking            = false;
     m_current                 = -1;
 }   // SkidMark
@@ -133,10 +143,19 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         delta.normalize();
         delta *= m_width;
 
+        float distance = 0.0f;
+        Vec3 start = m_left[m_current]->getCenterStart();
+        Vec3 newPoint = (raycast_left.m_contactPointWS + raycast_right.m_contactPointWS)/2;
+        // this linear distance does not account for the kart turning, it's true,
+        // but it produces good enough results
+        distance = (newPoint - start).length();
+
         m_left [m_current]->add(raycast_left.m_contactPointWS,
-                                raycast_left.m_contactPointWS + delta);
+                                raycast_left.m_contactPointWS + delta,
+                                distance);
         m_right[m_current]->add(raycast_right.m_contactPointWS-delta,
-                                raycast_right.m_contactPointWS);
+                                raycast_right.m_contactPointWS,
+                                distance);
         // Adjust the boundary box of the mesh to include the
         // adjusted aabb of its buffers.
         core::aabbox3df aabb=m_nodes[m_current]->getMesh()
@@ -219,6 +238,7 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
                                         video::SColor* custom_color)
                          : scene::SMeshBuffer()
 {
+    m_center_start = (left + right)/2;
     m_z_offset = z_offset;
     m_fade_out = 0.0f;
 
@@ -230,7 +250,7 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
 
     Material   = *material;
     m_aabb     = core::aabbox3df(left.toIrrVector());
-    add(left, right);
+    add(left, right, 0.0f);
 
 
 }   // SkidMarkQuads
@@ -240,7 +260,8 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
  *  \param left,right Left and right coordinates.
  */
 void SkidMarks::SkidMarkQuads::add(const Vec3 &left,
-                                   const Vec3 &right)
+                                   const Vec3 &right,
+                                   float distance)
 {
     // The skid marks must be raised slightly higher, otherwise it blends
     // too much with the track.
@@ -248,13 +269,25 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left,
 
     video::S3DVertex v;
     v.Color = m_start_color;
-    v.Color.setAlpha(m_start_alpha);
+    v.Color.setAlpha(0); // initially create all vertices at alpha=0...
+
+    // then when adding a new set of vertices, make the previous 2 opaque.
+    // this ensures that the last two vertices are always at alpha=0,
+    // producing a fade-out effect
+    if (n > 4)
+    {
+        Vertices[n - 1].Color.setAlpha(m_start_alpha);
+        Vertices[n - 2].Color.setAlpha(m_start_alpha);
+    }
+
     v.Pos = left.toIrrVector();
     v.Pos.Y += m_z_offset;
     v.Normal = core::vector3df(0, 1, 0);
+    v.TCoords = core::vector2df(0.0f, distance*0.5f);
     Vertices.push_back(v);
     v.Pos = right.toIrrVector();
     v.Pos.Y += m_z_offset;
+    v.TCoords = core::vector2df(1.0f, distance*0.5f);
     Vertices.push_back(v);
     // Out of the box Irrlicht only supports triangle meshes and not
     // triangle strips. Since this is a strip it would be more efficient
@@ -292,7 +325,8 @@ void SkidMarks::SkidMarkQuads::fade(float f)
         a -= (a < m_fade_out ? a : (int)m_fade_out);
 
         c.setAlpha(a);
-        for(unsigned int i=0; i<Vertices.size(); i++)
+        // the first 2 and last 2 already have alpha=0 for fade-in and fade-out
+        for(unsigned int i=2; i<Vertices.size() - 2; i++)
         {
             Vertices[i].Color.setAlpha(a);
         }

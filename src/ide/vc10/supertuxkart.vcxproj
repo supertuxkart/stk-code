@@ -231,6 +231,7 @@
     <ClCompile Include="..\..\karts\cannon_animation.cpp" />
     <ClCompile Include="..\..\karts\controller\ai_base_controller.cpp" />
     <ClCompile Include="..\..\karts\controller\ai_properties.cpp" />
+    <ClCompile Include="..\..\karts\controller\battle_ai.cpp" />
     <ClCompile Include="..\..\karts\controller\skidding_ai.cpp" />
     <ClCompile Include="..\..\karts\explosion_animation.cpp" />
     <ClCompile Include="..\..\karts\ghost_kart.cpp" />

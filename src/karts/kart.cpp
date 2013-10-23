@@ -157,6 +157,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_engine_sound  = sfx_manager->createSoundSource(m_kart_properties->getEngineSfxType());
     m_beep_sound    = sfx_manager->createSoundSource( "horn"  );
     m_crash_sound   = sfx_manager->createSoundSource( "crash" );
+    m_boing_sound   = sfx_manager->createSoundSource( "boing" );
     m_goo_sound     = sfx_manager->createSoundSource( "goo"   );
     m_skid_sound    = sfx_manager->createSoundSource( "skid"  );
     m_terrain_sound          = NULL;
@@ -181,6 +182,7 @@ void Kart::init(RaceManager::KartType type)
             m_goo_sound->volume( 1.0f / factor );
             m_skid_sound->volume( 1.0f / factor );
             m_crash_sound->volume( 1.0f / factor );
+            m_boing_sound->volume( 1.0f / factor );
             m_beep_sound->volume( 1.0f / factor );
         }
         else
@@ -189,6 +191,7 @@ void Kart::init(RaceManager::KartType type)
             m_skid_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
             m_crash_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
             m_beep_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
+            m_boing_sound->volume( 1.0f / race_manager->getNumberOfKarts() );
         }
     }
 
@@ -244,6 +247,7 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_skid_sound   );
     sfx_manager->deleteSFX(m_goo_sound    );
     sfx_manager->deleteSFX(m_beep_sound   );
+    sfx_manager->deleteSFX(m_boing_sound  );
     delete m_kart_gfx;
     if(m_terrain_sound)          sfx_manager->deleteSFX(m_terrain_sound);
     if(m_previous_terrain_sound) sfx_manager->deleteSFX(m_previous_terrain_sound);
@@ -1032,6 +1036,7 @@ void Kart::eliminate()
         m_stars_effect->update(1);
     }
 
+    m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
     m_eliminated = true;
 
     m_node->setVisible(false);
@@ -1171,6 +1176,7 @@ void Kart::update(float dt)
     m_engine_sound->position ( getXYZ() );
     m_crash_sound->position  ( getXYZ() );
     m_skid_sound->position   ( getXYZ() );
+    m_boing_sound->position  ( getXYZ() );
 
     // Check if a kart is (nearly) upside down and not moving much --> automatic rescue
     if(World::getWorld()->getTrack()->isAutoRescueEnabled() &&
@@ -1405,6 +1411,7 @@ void Kart::handleMaterialSFX(const Material *material)
             m_terrain_sound = NULL;
         }
     }
+
     if(m_previous_terrain_sound &&
         m_previous_terrain_sound->getStatus()==SFXManager::SFX_STOPPED)
     {
@@ -1414,15 +1421,19 @@ void Kart::handleMaterialSFX(const Material *material)
         sfx_manager->deleteSFX(m_previous_terrain_sound);
         m_previous_terrain_sound = NULL;
     }
+    
+    bool m_schedule_pause = m_flying || 
+                        dynamic_cast<RescueAnimation*>(getKartAnimation()) ||
+                        dynamic_cast<ExplosionAnimation*>(getKartAnimation());
 
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
-    if(m_terrain_sound
-        && (m_terrain_sound->getStatus() == SFXManager::SFX_PLAYING
-         || m_terrain_sound->getStatus() == SFXManager::SFX_PAUSED))
+    if(m_terrain_sound && 
+      (m_terrain_sound->getStatus()==SFXManager::SFX_PLAYING ||
+       m_terrain_sound->getStatus()==SFXManager::SFX_PAUSED))
     {
         m_terrain_sound->position(getXYZ());
-        material->setSFXSpeed(m_terrain_sound, m_speed);
+        material->setSFXSpeed(m_terrain_sound, m_speed, m_schedule_pause);
     }
 
 }   // handleMaterialSFX
@@ -1668,7 +1679,7 @@ void Kart::crashed(AbstractKart *k, bool update_attachments)
         getAttachment()->handleCollisionWithKart(k);
     }
     m_controller->crashed(k);
-    crashed();
+    crashed(NULL, k);
 }   // crashed(Kart, update_attachments
 
 // -----------------------------------------------------------------------------
@@ -1808,13 +1819,15 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     }   // if(m && m->getCollisionReaction() != Material::NORMAL &&
         //   !getKartAnimation())
     m_controller->crashed(m);
-    crashed();
+    crashed(m, NULL);
 }   // crashed(Material)
 
 // -----------------------------------------------------------------------------
 /** Common code used when a kart or a material was hit.
+ * @param m The material collided into, or NULL if none
+ * @param k The kart collided into, or NULL if none
  */
-void Kart::crashed()
+void Kart::crashed(const Material* m, AbstractKart *k)
 {
     if(World::getWorld()->getTime()-m_time_last_crash < 0.5f) return;
 
@@ -1828,8 +1841,16 @@ void Kart::crashed()
         {
             // In case that the sfx is longer than 0.5 seconds, only play it if
             // it's not already playing.
-            if(m_crash_sound->getStatus() != SFXManager::SFX_PLAYING)
-                m_crash_sound->play();
+            if (isShielded() || (k != NULL && k->isShielded()))
+            {
+                if (m_boing_sound->getStatus() != SFXManager::SFX_PLAYING)
+                    m_boing_sound->play();
+            }
+            else
+            {
+                if(m_crash_sound->getStatus() != SFXManager::SFX_PLAYING)
+                    m_crash_sound->play();
+            }
         }
 
         m_bounce_back_time = 0.1f;
@@ -2368,7 +2389,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         wheel_up_axis[i] = m_default_suspension_length[i]
                          - m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
     }
-    m_kart_model->update(m_wheel_rotation_dt, getSteerPercent(), wheel_up_axis);
+    m_kart_model->update(m_wheel_rotation_dt, getSteerPercent(), wheel_up_axis, m_speed);
 
     Vec3        center_shift  = m_kart_properties->getGravityCenterShift();
     float y = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getY()

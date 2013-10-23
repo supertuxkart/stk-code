@@ -19,6 +19,7 @@
 
 #include "config/saved_grand_prix.hpp"
 
+#include "karts/kart_properties_manager.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/string_utils.hpp"
 
@@ -145,10 +146,12 @@ void SavedGrandPrix::loadKarts(std::vector<RaceManager::KartStatus> & kart_list)
     int aikarts = 0;
     for(int i = 0; i < m_karts.size(); i++)
     {
+        const KartProperties *kp = kart_properties_manager->getKart(m_karts[i].m_ident);
+
         if(m_karts[i].m_local_player_id == -1)
         {
             //AI kart found
-            kart_list[aikarts].m_ident = m_karts[i].m_ident;
+            if(kp) kart_list[aikarts].m_ident = m_karts[i].m_ident;
             kart_list[aikarts].m_score = m_karts[i].m_score;
             kart_list[aikarts].m_overall_time = m_karts[i].m_overall_time;
             aikarts++;

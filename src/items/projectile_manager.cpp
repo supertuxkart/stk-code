@@ -156,8 +156,13 @@ void ProjectileManager::updateClient(float dt)
     }   // for i in m_active_projectiles
 
 }   // updateClient
+
 // -----------------------------------------------------------------------------
-Flyable *ProjectileManager::newProjectile(AbstractKart *kart, Track* track,
+/** Creates a new projectile of the given type.
+ *  \param kart The kart which shoots the projectile.
+ *  \param type Type of projectile.
+ */
+Flyable *ProjectileManager::newProjectile(AbstractKart *kart,
                                           PowerupManager::PowerupType type)
 {
     Flyable *f;
@@ -173,3 +178,22 @@ Flyable *ProjectileManager::newProjectile(AbstractKart *kart, Track* track,
     m_active_projectiles.push_back(f);
     return f;
 }   // newProjectile
+// -----------------------------------------------------------------------------
+/** Returns true if a projectile is within the given distance of the specified
+ *  kart.
+ *  \param kart The kart for which the test is done.
+ *  \param radius Distance within which the projectile must be.
+*/
+bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
+                                         float radius)
+{
+    float r2 = radius*radius;
+
+    for(Projectiles::iterator i  = m_active_projectiles.begin();
+                              i != m_active_projectiles.end();   i++)
+    {
+        float dist2 = (*i)->getXYZ().distance2(kart->getXYZ());
+        if(dist2<r2) return true;
+    }
+    return false;
+}   // projectileIsClose

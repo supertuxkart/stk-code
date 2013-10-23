@@ -1017,10 +1017,12 @@ namespace GUIEngine
         // normal text will range from 0.2, in 640x* resolutions (won't scale
         // below that) to 0.4, in 1024x* resolutions, and linearly up
         const int screen_width = irr_driver->getFrameSize().Width;
-        const float normal_text_scale =
-            0.7f + 0.2f*std::max(0, screen_width - 640)/564.0f;
-        const float title_text_scale =
-            0.2f + 0.2f*std::max(0, screen_width - 640)/564.0f;
+        const int screen_height = irr_driver->getFrameSize().Height;
+        float scale = std::max(0, screen_width - 640)/564.0f;
+        if (screen_height < 700) scale = std::min(scale, 0.25f); // attempt to compensate for small screens
+
+        float normal_text_scale = 0.7f + 0.2f*scale;
+        float title_text_scale = 0.2f + 0.2f*scale;
 
         ScalableFont* sfont =
             new ScalableFont(g_env,

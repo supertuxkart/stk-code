@@ -86,6 +86,14 @@ namespace scene
 		/** \return Frames per second played. */
 		virtual f32 getAnimationSpeed() const =0;
 
+		//! Sets the animation strength (how important the animation is)
+		/** \param strength: The importance of the animation: 1.f keeps the original animation, 0.f is no animation. */
+		virtual void setAnimationStrength(f32 strength) =0;
+
+		//! Gets the animation strength (how important the animation is)
+		/** \return The importance of the animation: 1.f keeps the original animation, 0.f is no animation. */
+		virtual f32 getAnimationStrength() const =0;
+
 		//! Creates shadow volume scene node as child of this node.
 		/** The shadow can be rendered using the ZPass or the zfail
 		method. ZPass is a little bit faster because the shadow volume

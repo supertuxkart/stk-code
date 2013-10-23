@@ -110,8 +110,6 @@ private:
     };   // Rowinfo
 
     /** The team icons. */
-    video::ITexture *redTeamTexture;
-    video::ITexture *blueTeamTexture;
 
     std::vector<RowInfo>       m_all_row_infos;
 
@@ -198,6 +196,7 @@ private:
     void displayGPProgress();
     void cleanupGPProgress();
     void displayHighScores();
+    void displaySoccerResults();
 public:
 
                  RaceResultGUI();

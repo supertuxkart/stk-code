@@ -44,6 +44,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
+#include <algorithm>
 
 DEFINE_SCREEN_SINGLETON( RaceResultGUI );
 
@@ -80,6 +81,12 @@ void RaceResultGUI::tearDown()
 {
     Screen::tearDown();
     m_font->setMonospaceDigits(m_was_monospace);
+
+    if (m_finish_sound != NULL &&
+        m_finish_sound->getStatus() == SFXManager::SFX_PLAYING)
+    {
+        m_finish_sound->stop();
+    }
 }   // tearDown
 
 //-----------------------------------------------------------------------------
@@ -298,14 +305,6 @@ void RaceResultGUI::onConfirm()
  */
 void RaceResultGUI::determineTableLayout()
 {
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
-    {
-        redTeamTexture = irr_driver->getTexture(
-                         file_manager->getTextureFile("soccer_ball_red.png"));
-        blueTeamTexture = irr_driver->getTexture(
-                        file_manager->getTextureFile("soccer_ball_blue.png"));
-    }
-
     GUIEngine::Widget *table_area = getWidget("result-table");
 
     m_font          = GUIEngine::getFont();
@@ -520,6 +519,8 @@ void RaceResultGUI::onUpdate(float dt, irr::video::IVideoDriver*)
  */
 void RaceResultGUI::renderGlobal(float dt)
 {
+    bool isSoccerWorld = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    
     m_timer               += dt;
     assert(World::getWorld()->getPhase()==WorldStatus::RESULT_DISPLAY_PHASE);
     unsigned int num_karts = m_all_row_infos.size();
@@ -625,49 +626,54 @@ void RaceResultGUI::renderGlobal(float dt)
     // Second phase: update X and Y positions for the various animations
     // =================================================================
     float v = 0.9f*UserConfigParams::m_width/m_time_single_scroll;
-    for(unsigned int i=0; i<m_all_row_infos.size(); i++)
+    if(!isSoccerWorld)
     {
-        RowInfo *ri = &(m_all_row_infos[i]);
-        float x = ri->m_x_pos;
-        float y = ri->m_y_pos;
-        switch(m_animation_state)
+        for(unsigned int i=0; i<m_all_row_infos.size(); i++)
         {
-        // Both states use the same scrolling:
-        case RR_INIT: break;   // Remove compiler warning
-        case RR_RACE_RESULT:
-        case RR_OLD_GP_RESULTS:
-             if(m_timer > ri->m_start_at)
-             {   // if active
-                 ri->m_x_pos -= dt*v;
-                 if(ri->m_x_pos<m_leftmost_column)
-                     ri->m_x_pos = (float)m_leftmost_column;
-                 x = ri->m_x_pos;
-             }
-             break;
-        case RR_INCREASE_POINTS:
-            ri->m_current_displayed_points +=
-                dt*race_manager->getPositionScore(1)/m_time_for_points;
-            if(ri->m_current_displayed_points>ri->m_new_overall_points)
+            RowInfo *ri = &(m_all_row_infos[i]);
+            float x = ri->m_x_pos;
+            float y = ri->m_y_pos;
+            switch(m_animation_state)
             {
-                ri->m_current_displayed_points =
-                   (float)ri->m_new_overall_points;
-            }
-            ri->m_new_points -=
-                dt*race_manager->getPositionScore(1)/m_time_for_points;
-            if(ri->m_new_points<0)
-                ri->m_new_points = 0;
-            break;
-        case RR_RESORT_TABLE:
-            x = ri->m_x_pos
-              - ri->m_radius*sin(m_timer/m_time_rotation*M_PI);
-            y = ri->m_centre_point
-              + ri->m_radius*cos(m_timer/m_time_rotation*M_PI);
-            break;
-        case RR_WAIT_TILL_END:
-            break;
-        }   // switch
-        displayOneEntry((unsigned int)x, (unsigned int)y, i, true);
-    }   // for i
+            // Both states use the same scrolling:
+            case RR_INIT: break;   // Remove compiler warning
+            case RR_RACE_RESULT:
+            case RR_OLD_GP_RESULTS:
+                 if(m_timer > ri->m_start_at)
+                 {   // if active
+                     ri->m_x_pos -= dt*v;
+                     if(ri->m_x_pos<m_leftmost_column)
+                         ri->m_x_pos = (float)m_leftmost_column;
+                     x = ri->m_x_pos;
+                 }
+                 break;
+            case RR_INCREASE_POINTS:
+                ri->m_current_displayed_points +=
+                    dt*race_manager->getPositionScore(1)/m_time_for_points;
+                if(ri->m_current_displayed_points>ri->m_new_overall_points)
+                {
+                    ri->m_current_displayed_points =
+                       (float)ri->m_new_overall_points;
+                }
+                ri->m_new_points -=
+                    dt*race_manager->getPositionScore(1)/m_time_for_points;
+                if(ri->m_new_points<0)
+                    ri->m_new_points = 0;
+                break;
+            case RR_RESORT_TABLE:
+                x = ri->m_x_pos
+                  - ri->m_radius*sin(m_timer/m_time_rotation*M_PI);
+                y = ri->m_centre_point
+                  + ri->m_radius*cos(m_timer/m_time_rotation*M_PI);
+                break;
+            case RR_WAIT_TILL_END:
+                break;
+            }   // switch
+            displayOneEntry((unsigned int)x, (unsigned int)y, i, true);
+        }   // for i
+    }
+    else
+        displaySoccerResults();
 
     // Display highscores
     if (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
@@ -744,12 +750,6 @@ void RaceResultGUI::determineGPLayout()
 void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                                     unsigned int n, bool display_points)
 {
-    SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
-    bool isSoccerMode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
-    int m_team_goals[2] = {soccerWorld->getScore(0), soccerWorld->getScore(1)};
-    
-    if (isSoccerMode && n > 0) return;
-    
     RowInfo *ri = &(m_all_row_infos[n]);
     video::SColor color = ri->m_is_player_kart
                         ? video::SColor(255,255,0,  0  )
@@ -770,73 +770,29 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
 
     // First draw the icon
     // -------------------
-    if (!isSoccerMode)
+    if(ri->m_kart_icon)
     {
-        if(ri->m_kart_icon)
-        {
-            core::recti source_rect(core::vector2di(0,0),
-                                    ri->m_kart_icon->getSize());
-            core::recti dest_rect(current_x, y,
-                                  current_x+m_width_icon, y+m_width_icon);
-            irr_driver->getVideoDriver()->draw2DImage(ri->m_kart_icon, dest_rect,
-                                                      source_rect, NULL, NULL,
-                                                      true);
-        }
-    
-        current_x += m_width_icon + m_width_column_space;
+        core::recti source_rect(core::vector2di(0,0),
+                                ri->m_kart_icon->getSize());
+        core::recti dest_rect(current_x, y,
+                                current_x+m_width_icon, y+m_width_icon);
+        irr_driver->getVideoDriver()->draw2DImage(ri->m_kart_icon, dest_rect,
+                                                    source_rect, NULL, NULL,
+                                                    true);
     }
+    
+    current_x += m_width_icon + m_width_column_space;
 
     // Draw the name
     // -------------
-    if (!isSoccerMode)
-    {
-        core::recti pos_name(current_x, y,
-                             UserConfigParams::m_width, y+m_distance_between_rows);
-        m_font->draw(ri->m_kart_name, pos_name, color, false, false, NULL,
-                     true /* ignoreRTL */);
-        current_x += m_width_kart_name + m_width_column_space;
-    }
 
-    // Draw icon, name of team which won in soccer mode and score
-    // ----------------------------------------------------------
-    if (isSoccerMode)
-    {
-        core::stringw text;
-        irr::video::ITexture *team_icon;
-        if (m_team_goals[0] > m_team_goals[1])
-        {
-            text = core::stringw(_("Red team won"));
-            team_icon = redTeamTexture;
-        }
-        else if (m_team_goals[0] < m_team_goals[1])
-        {
-            text = core::stringw(_("Blue team won"));
-            team_icon = blueTeamTexture;
-        }
-        else
-            text = core::stringw(_("Draw"));
+    core::recti pos_name(current_x, y,
+                            UserConfigParams::m_width, y+m_distance_between_rows);
+    m_font->draw(ri->m_kart_name, pos_name, color, false, false, NULL,
+                    true /* ignoreRTL */);
+    current_x += m_width_kart_name + m_width_column_space;
 
-        core::recti source_rect(core::vector2di(0,0), team_icon->getSize());
-        core::recti dest_rect(current_x, y, current_x+m_width_icon, y+m_width_icon);
-        irr_driver->getVideoDriver()->draw2DImage(team_icon, dest_rect,
-                                                  source_rect, NULL, NULL,
-                                                  true);
-
-        current_x += m_width_icon + m_width_column_space;
-        core::recti pos_name(current_x, y,
-                             UserConfigParams::m_width, y+m_distance_between_rows);
-
-        m_font->draw(text, pos_name, color, false, false, NULL, true /* ignoreRTL */);
-        core::dimension2du rect = m_font->getDimension(text.c_str());
-        current_x += rect.Width + 2*m_width_column_space;
-
-        text = core::stringw(m_team_goals[0]) + " : " + core::stringw(m_team_goals[1]);
-        dest_rect = core::recti(current_x, y, current_x+100, y+10);
-        m_font->draw(text, dest_rect, color, false, false, NULL, true /* ignoreRTL */);
-        rect = m_font->getDimension(text.c_str());
-        current_x += rect.Width + 2*m_width_column_space;
-    }
-    
+   
     // Draw the time except in FTL mode
     // --------------------------------
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
@@ -881,6 +837,145 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                      true /* ignoreRTL */);
     }
 }   // displayOneEntry
+
+//-----------------------------------------------------------------------------
+void RaceResultGUI::displaySoccerResults()
+{
+
+    //Draw win text
+    core::stringw resultText;
+    static video::SColor color = video::SColor(255, 255, 255, 255);
+    gui::IGUIFont* font = GUIEngine::getTitleFont();
+    int currX = UserConfigParams::m_width/2;
+    RowInfo *ri = &(m_all_row_infos[0]);
+    int currY = (int)ri->m_y_pos; 
+    SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
+    int teamScore[2] = {soccerWorld->getScore(0), soccerWorld->getScore(1)};
+    
+    GUIEngine::Widget *table_area = getWidget("result-table");
+    int height = table_area->m_h + table_area->m_y;
+
+    if(teamScore[0] > teamScore[1])
+    {
+        resultText = _("Red Team Wins");
+    }
+    else if(teamScore[1] > teamScore[0])
+    {
+        resultText = _("Blue Team Wins");
+    }
+    else
+    {
+        //Cannot really happen now. Only in time limited matches.
+        resultText = _("It's a draw");
+    }
+    core::rect<s32> pos(currX, currY, currX, currY);
+    font->draw(resultText.c_str(), pos, color, true, true);
+    
+    core::dimension2du rect = m_font->getDimension(resultText.c_str());
+
+    //Draw team scores:
+    currY += rect.Height;
+    currX /= 2;
+    irr::video::ITexture* redTeamIcon = irr_driver->getTexture(
+        file_manager->getTextureFile("soccer_ball_red.png"));
+    irr::video::ITexture* blueTeamIcon = irr_driver->getTexture(
+        file_manager->getTextureFile("soccer_ball_blue.png"));
+
+    core::recti sourceRect(core::vector2di(0,0), redTeamIcon->getSize());
+    core::recti destRect(currX, currY, currX+redTeamIcon->getSize().Width/2,
+        currY+redTeamIcon->getSize().Height/2);
+    irr_driver->getVideoDriver()->draw2DImage(redTeamIcon, destRect,sourceRect,
+        NULL,NULL, true);
+    currX += UserConfigParams::m_width/2 - redTeamIcon->getSize().Width/2;
+    destRect = core::recti(currX, currY, currX+redTeamIcon->getSize().Width/2,
+        currY+redTeamIcon->getSize().Height/2);
+    irr_driver->getVideoDriver()->draw2DImage(blueTeamIcon,destRect,sourceRect,
+        NULL, NULL, true);
+    
+    resultText = StringUtils::toWString(teamScore[1]);
+    rect = m_font->getDimension(resultText.c_str());
+    currX += redTeamIcon->getSize().Width/4;
+    currY += redTeamIcon->getSize().Height/2 + rect.Height/4;
+    pos = core::rect<s32>(currX, currY, currX, currY);
+    color = video::SColor(255,255,255,255);
+    font->draw(resultText.c_str(), pos, color, true, false);
+
+    currX -= UserConfigParams::m_width/2 - redTeamIcon->getSize().Width/2;
+    resultText = StringUtils::toWString(teamScore[0]);
+    pos = core::rect<s32>(currX,currY,currX,currY);
+    font->draw(resultText.c_str(), pos, color, true, false);
+    
+    int centerX = UserConfigParams::m_width/2;
+    pos = core::rect<s32>(centerX, currY, centerX, currY);
+    font->draw("-", pos, color, true, false);
+
+    //Draw goal scorers:
+    //The red scorers:
+    currY += rect.Height/2 + rect.Height/4;
+    font = GUIEngine::getSmallFont();
+    std::vector<int> scorers = soccerWorld->getScorers(0);
+    std::vector<float> scoreTimes = soccerWorld->getScoreTimes(0);
+    irr::video::ITexture* scorerIcon;
+
+    int prevY = currY;
+    for(unsigned int i=0; i<scorers.size(); i++)
+    {
+        resultText = soccerWorld->getKart(scorers.at(i))->
+            getKartProperties()->getName();
+        resultText.append(" ");
+        resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
+        rect = m_font->getDimension(resultText.c_str());
+
+        if(height-prevY < ((short)scorers.size()+1)*(short)rect.Height)
+            currY += (height-prevY)/((short)scorers.size()+1);
+        else
+            currY += rect.Height;
+
+        if(currY > height) break;
+
+        pos = core::rect<s32>(currX,currY,currX,currY);
+        font->draw(resultText,pos, color, true, false);
+        scorerIcon = soccerWorld->getKart(scorers.at(i))->
+            getKartProperties()->getIconMaterial()->getTexture();
+        sourceRect = core::recti(core::vector2di(0,0), scorerIcon->getSize());
+        irr::u32 offsetX = GUIEngine::getFont()->getDimension(resultText.c_str()).Width/2;
+        destRect = core::recti(currX-offsetX-30, currY, currX-offsetX, currY+ 30);
+        irr_driver->getVideoDriver()->draw2DImage(scorerIcon, destRect, sourceRect,
+            NULL, NULL, true);
+    }
+
+    //The blue scorers:
+    currY = prevY;
+    currX += UserConfigParams::m_width/2 - redTeamIcon->getSize().Width/2;
+    scorers = soccerWorld->getScorers(1);
+    scoreTimes = soccerWorld->getScoreTimes(1);
+    for(unsigned int i=0; i<scorers.size(); i++)
+    {
+        resultText = soccerWorld->getKart(scorers.at(i))->
+            getKartProperties()->getName();
+        resultText.append(" ");
+        resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
+        rect = m_font->getDimension(resultText.c_str());
+        
+        if(height-prevY < ((short)scorers.size()+1)*(short)rect.Height)
+            currY += (height-prevY)/((short)scorers.size()+1);
+        else
+            currY += rect.Height;
+
+        if(currY > height) break;
+
+        pos = core::rect<s32>(currX,currY,currX,currY);
+        font->draw(resultText,pos, color, true, false);
+        scorerIcon = soccerWorld->getKart(scorers.at(i))->
+            getKartProperties()->getIconMaterial()->getTexture();
+        sourceRect = core::recti(core::vector2di(0,0), scorerIcon->getSize());
+        irr::u32 offsetX = GUIEngine::getFont()->getDimension(resultText.c_str()).Width/2;
+
+        destRect = core::recti(currX-offsetX-30, currY, currX-offsetX, currY+ 30);
+        irr_driver->getVideoDriver()->draw2DImage(scorerIcon, destRect, sourceRect,
+            NULL, NULL, true);
+    }
+}
 
 //-----------------------------------------------------------------------------
 

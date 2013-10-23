@@ -72,6 +72,8 @@ public:
 
 private:
     bool areAllKartsConfirmed() const;
+    int getNumKartsInTeam(int team);
+    int getNumConfirmedKarts();
     void updateKartViewsLayout();
 };
 

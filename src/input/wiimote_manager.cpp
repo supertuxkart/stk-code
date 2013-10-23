@@ -306,7 +306,8 @@ int WiimoteManager::askUserToConnectWiimotes()
 {
 	new MessageDialog(
 		_("Press the buttons 1+2 simultaneously on your wiimote to put "
-		  "it in discovery mode, then click on OK."),
+		  "it in discovery mode, then click on Yes."
+                  "Detailed instructions at supertuxkart.net/Wiimote"),
 		MessageDialog::MESSAGE_DIALOG_CONFIRM,
 		new WiimoteDialogListener(), true);
 

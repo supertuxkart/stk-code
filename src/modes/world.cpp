@@ -327,7 +327,7 @@ Controller* World::loadAIController(AbstractKart *kart)
 {
     Controller *controller;
     int turn=0;
-    // If different AIs should be used, adjust turn (or switch randomly
+    // If different AIs 8should be used, adjust turn (or switch randomly
     // or dependent on difficulty)
     switch(turn)
     {

@@ -32,6 +32,7 @@
 #include "physics/stk_dynamics_world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
+#include "modes/soccer_world.hpp"
 
 // ----------------------------------------------------------------------------
 /** Initialise physics.
@@ -188,6 +189,12 @@ void Physics::update(float dt)
                 const KartProperties* kp = kart->getKartProperties();
                 kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
             }
+			else if(obj->isSoccerBall())
+            {
+				int kartId = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
+				SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
+				soccerWorld->setLastKartTohitBall(kartId);
+			}
             continue;
         }
 
@@ -228,6 +235,13 @@ void Physics::update(float dt)
             // -------------------------------
             p->getUserPointer(0)->getPointerFlyable()
                 ->hit(NULL, p->getUserPointer(1)->getPointerPhysicalObject());
+            PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
+            if(obj->isSoccerBall())
+            {
+                int kartId = p->getUserPointer(0)->getPointerFlyable()->getOwnerId();
+                SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
+                soccerWorld->setLastKartTohitBall(kartId);
+            }
 
         }
         else if(p->getUserPointer(1)->is(UserPointer::UP_KART))

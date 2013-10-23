@@ -515,4 +515,9 @@ HitEffect* Flyable::getHitEffect() const
     return new Explosion(getXYZ(), "explosion", "explosion_cake.xml");
 }   // getHitEffect
 
+// ----------------------------------------------------------------------------
+unsigned int Flyable::getOwnerId()
+{
+    return m_owner->getWorldKartId();
+}
 /* EOF */
