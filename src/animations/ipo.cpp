@@ -21,6 +21,7 @@
 #include "io/xml_node.hpp"
 
 #include <string.h>
+#include <algorithm>
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
 #  define isnan _isnan

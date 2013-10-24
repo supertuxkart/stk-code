@@ -23,6 +23,7 @@
 #include <IGUIEnvironment.h>
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 
 using namespace GUIEngine;
 using namespace irr::core;

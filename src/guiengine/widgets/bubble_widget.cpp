@@ -18,6 +18,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "utils/translation.hpp"
+#include <algorithm>
 
 #include <IGUIStaticText.h>
 #include <IGUIElement.h>

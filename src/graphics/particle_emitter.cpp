@@ -32,6 +32,7 @@
 #include <IParticleSystemSceneNode.h>
 #include <IParticleBoxEmitter.h>
 #include <ISceneManager.h>
+#include <algorithm>
 
 class FadeAwayAffector : public scene::IParticleAffector
 {
