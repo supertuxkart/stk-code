@@ -762,12 +762,24 @@ void KartModel::update(float rotation_dt, float steer, const float suspension[4]
     for(size_t i=0 ; i < m_speed_weighted_objects.size() ; i++)
     {
         SpeedWeightedObject&    obj = m_speed_weighted_objects[i];
-        float strength = speed * m_kart->getKartProperties()->getSpeedWeightedStrengthFactor();
-        btClamp<float>(strength, 0.0f, 1.0f);
-        obj.m_node->setAnimationStrength(strength);
 
-        float anim_speed = speed * m_kart->getKartProperties()->getSpeedWeightedSpeedFactor();
-        obj.m_node->setAnimationSpeed(anim_speed);
+        // Animation strength
+        float strength = 1.0f;
+        const float strength_factor = m_kart->getKartProperties()->getSpeedWeightedStrengthFactor();
+        if(strength_factor >= 0.0f)
+        {
+            strength = speed * strength_factor;
+            btClamp<float>(strength, 0.0f, 1.0f);
+        }
+        obj.m_node->setAnimationStrength(strength);
+        
+        // Animation speed
+        const float speed_factor = m_kart->getKartProperties()->getSpeedWeightedSpeedFactor();
+        if(speed_factor >= 0.0f)
+        {
+            float anim_speed = speed * speed_factor;
+            obj.m_node->setAnimationSpeed(anim_speed);
+        }
     }
 
     // Check if the end animation is being played, if so, don't
