@@ -46,6 +46,9 @@ static PtrVector<UserConfigParam, REF> all_params;
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+const int UserConfig::m_current_config_version = 8;
+
+
 // ----------------------------------------------------------------------------
 UserConfigParam::~UserConfigParam()
 {
@@ -649,13 +652,14 @@ bool UserConfig::loadConfig()
     }
 
     // ---- Read config file version
-    int configFileVersion = CURRENT_CONFIG_VERSION;
-    if(root->get("version", &configFileVersion) < 1)
+    int config_file_version = m_current_config_version;
+    if(root->get("version", &config_file_version) < 1)
     {
         GUIEngine::showMessage( _("Your config file was malformed, so it was deleted and a new one will be created."), 10.0f);
-        std::cerr << "Warning, malformed user config file! Contains no version\n";
+        Log::error("UserConfig", 
+                   "Warning, malformed user config file! Contains no version");
     }
-    if (configFileVersion < CURRENT_CONFIG_VERSION)
+    if (config_file_version < m_current_config_version)
     {
         // current version (8) is 100% incompatible with other versions (which were lisp)
         // so we just delete the old config. in the future, for smaller updates, we can
@@ -713,7 +717,6 @@ bool UserConfig::loadConfig()
     return true;
 }   // loadConfig
 
-
 // ----------------------------------------------------------------------------
 /** Write settings to config file. */
 void UserConfig::saveConfig()
@@ -732,7 +735,8 @@ void UserConfig::saveConfig()
         XMLWriter configfile(filename.c_str());
 
         configfile << L"<?xml version=\"1.0\"?>\n";
-        configfile << L"<stkconfig version=\"" << CURRENT_CONFIG_VERSION << L"\" >\n\n";
+        configfile << L"<stkconfig version=\"" << m_current_config_version
+                   << L"\" >\n\n";
 
         const int paramAmount = all_params.size();
         for(int i=0; i<paramAmount; i++)

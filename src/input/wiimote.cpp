@@ -77,7 +77,7 @@ void Wiimote::resetIrrEvent()
 void Wiimote::update()
 {
     float normalized_angle = -(m_wiimote_handle->accel.y-128)
-                           /  UserConfigParams::m_wiimote_max;
+                           /  UserConfigParams::m_wiimote_raw_max;
 
 #ifdef DEBUG
     if(UserConfigParams::m_wiimote_debug)
