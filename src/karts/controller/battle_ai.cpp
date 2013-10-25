@@ -21,6 +21,14 @@
 
 #include "karts/controller/battle_ai.hpp"
 
+#include "karts/abstract_kart.hpp"
+#include "karts/controller/kart_control.hpp"
+#include "karts/controller/ai_properties.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/max_speed.hpp"
+#include "karts/rescue_animation.hpp"
+#include "karts/skidding.hpp"
+#include "karts/skidding_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
 
 
@@ -43,7 +51,14 @@ BattleAI::BattleAI(AbstractKart *kart,
         m_track           = NULL;
     }
     // Don't call our own setControllerName, since this will add a
-    // billboard showing 'AIBaseLapController' to the kar.
+    // billboard showing 'AIBaseController' to the kar.
     Controller::setControllerName("BattleAI");
 
+}
+
+void BattleAI::update(float dt)
+{
+    m_controls->m_accel     = 1;
+    m_controls->m_steer     = 0;
+    return;
 }

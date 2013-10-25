@@ -202,10 +202,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\io_nix.c"
-				>
-			</File>
-			<File
 				RelativePath="..\ir.c"
 				>
 			</File>
@@ -231,10 +227,6 @@
 			</File>
 			<File
 				RelativePath="..\os.h"
-				>
-			</File>
-			<File
-				RelativePath="..\os_nix.c"
 				>
 			</File>
 			<File

@@ -20,6 +20,7 @@
 #include <cassert>
 #include <stdexcept>
 #include <iostream>
+#include <algorithm>
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"

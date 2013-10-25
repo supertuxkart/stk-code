@@ -37,8 +37,6 @@
       cause an undefined game action now
    6: Added stick configurations.
 */
-const int CURRENT_CONFIG_VERSION = 8;
-
 #include <string>
 #include <map>
 #include <vector>
@@ -348,10 +346,10 @@ namespace UserConfigParams
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
         PARAM_DEFAULT( GroupUserConfigParam("WiiMote",
                                             "Settings for the wiimote") );
-    PARAM_PREFIX FloatUserConfigParam         m_wiimote_max
-            PARAM_DEFAULT( FloatUserConfigParam(90.0f, "wiimote-max",
+    PARAM_PREFIX FloatUserConfigParam         m_wiimote_raw_max
+            PARAM_DEFAULT( FloatUserConfigParam(25.0f, "wiimote-raw-max",
             &m_wiimote_group,
-            "At what angle (0-128) maximum steering is reached.") );
+            "At what raw input value maximum steering is reached (between 1 and 25).") );
 
 	PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_linear
             PARAM_DEFAULT( FloatUserConfigParam(0.2f, "wiimote-weight-linear",
@@ -700,6 +698,8 @@ private:
     /** Filename of the user config file. */
     std::string        m_filename;
     irr::core::stringw m_warning;
+
+    static const int m_current_config_version;
 
 public:
           /** Create the user config object; does not actually load it,

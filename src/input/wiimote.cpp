@@ -76,24 +76,26 @@ void Wiimote::resetIrrEvent()
  */
 void Wiimote::update()
 {
+    float normalized_angle = -(m_wiimote_handle->accel.y-128)
+                           /  UserConfigParams::m_wiimote_raw_max;
+
 #ifdef DEBUG
     if(UserConfigParams::m_wiimote_debug)
     {
-        Log::verbose("wiimote", "pitch: %f yaw %f roll %f",
-                     m_wiimote_handle->orient.pitch,
-                     m_wiimote_handle->orient.yaw,
-                     m_wiimote_handle->orient.roll);
+        Log::verbose("wiimote", "xyz %d %d %d %f",
+                     m_wiimote_handle->accel.x,
+                     m_wiimote_handle->accel.y,
+                     m_wiimote_handle->accel.z,
+                     normalized_angle);
     }
 #endif
-
-    float normalized_angle = -m_wiimote_handle->orient.pitch / UserConfigParams::m_wiimote_max;
     if(normalized_angle<-1.0f)
         normalized_angle = -1.0f;
     else if(normalized_angle>1.0f)
         normalized_angle = 1.0f;
 
-	// Shape the curve that determines steering depending on wiimote angle.
-	// The wiimote value is already normalized to be in [-1,1]. Now use a
+    // Shape the curve that determines steering depending on wiimote angle.
+    // The wiimote value is already normalized to be in [-1,1]. Now use a
     // weighted linear combination to compute the steering value used in game.
     float w1 = UserConfigParams::m_wiimote_weight_linear;
     float w2 = UserConfigParams::m_wiimote_weight_square;

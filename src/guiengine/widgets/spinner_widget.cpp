@@ -64,7 +64,8 @@ void SpinnerWidget::add()
     {
         int i;
         std::istringstream myStream(min_s);
-        bool is_number = (myStream >> i)!=0;
+		myStream >> i;
+        bool is_number = (i!=0);
         if (is_number)
         {
             m_min = i;
@@ -79,7 +80,8 @@ void SpinnerWidget::add()
     {
         int i;
         std::istringstream myStream(max_s);
-        bool is_number = (myStream >> i)!=0;
+		myStream >> i;
+        bool is_number = (i!=0);
         if (is_number)
         {
             m_max = i;

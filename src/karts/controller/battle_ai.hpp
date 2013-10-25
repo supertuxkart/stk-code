@@ -54,7 +54,7 @@ public:
                 BattleAI(AbstractKart *kart, 
                     StateManager::ActivePlayer *player=NULL);
                 //~BattleAI();
-                virtual void update      (float delta) {};
+    virtual void update      (float delta);
     virtual void reset       () {};
     //static void enableDebug() {m_ai_debug = true; }
     virtual void crashed(const AbstractKart *k) {};

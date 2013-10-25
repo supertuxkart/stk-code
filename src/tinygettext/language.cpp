@@ -20,6 +20,7 @@
 #include <map>
 #include <assert.h>
 #include <vector>
+#include <algorithm>
 
 namespace tinygettext {
 

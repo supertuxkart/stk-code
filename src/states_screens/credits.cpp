@@ -18,6 +18,7 @@
 #include "states_screens/credits.hpp"
 
 #include <fstream>
+#include <algorithm>
 
 #include "irrString.h"
 using irr::core::stringw;
