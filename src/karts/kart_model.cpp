@@ -439,7 +439,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         obj_min += obj.m_position;
         obj_max += obj.m_position;
         kart_min.min(obj_min);
-        kart_max.min(obj_max);
+        kart_max.max(obj_max);
     }
 
     Vec3 size     = kart_max-kart_min;
