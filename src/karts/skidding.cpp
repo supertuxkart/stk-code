@@ -115,6 +115,16 @@ void Skidding::updateSteering(float steer, float dt)
                 m_visual_rotation = f;
         }
         break;
+    case SKID_BREAK:
+        m_real_steering = steer;
+        if (m_visual_rotation > 0.05f) m_visual_rotation -= 0.05;
+        else if (m_visual_rotation < -0.05f) m_visual_rotation += 0.05;
+        else
+        {
+            m_visual_rotation = 0;
+            reset();
+        }        
+        break;
     case SKID_ACCUMULATE_RIGHT:
         {
             float f = (1.0f+steer)*0.5f;   // map [-1,1] --> [0, 1]
@@ -139,6 +149,8 @@ void Skidding::updateSteering(float steer, float dt)
                 m_visual_rotation = m_skid_visual * m_real_steering;
             break;
         }
+        
+
     }   // switch m_skid_state
 
 }   // updateSteering
@@ -160,6 +172,7 @@ float Skidding::getSteeringWhenSkidding(float steering) const
     case SKID_OLD:            assert(false); break;
     case SKID_SHOW_GFX_LEFT:
     case SKID_SHOW_GFX_RIGHT:
+    case SKID_BREAK:
     case SKID_NONE:           return steering;
         break;
     case SKID_ACCUMULATE_RIGHT:
@@ -201,7 +214,9 @@ void Skidding::update(float dt, bool is_on_ground,
     // No skidding backwards or while stopped
     if(m_kart->getSpeed() < 0.001f)
     {
-        reset();
+        m_skid_state = SKID_BREAK;
+        m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
+        m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
     }
 
     m_skid_bonus_ready = false;
@@ -336,6 +351,11 @@ void Skidding::update(float dt, bool is_on_ground,
 
 #endif
             m_skid_time  = 0;   // fallthrough
+        }
+    case SKID_BREAK:
+        {
+            updateSteering(steering, dt);
+            break;
         }
     case SKID_ACCUMULATE_LEFT:
     case SKID_ACCUMULATE_RIGHT:
