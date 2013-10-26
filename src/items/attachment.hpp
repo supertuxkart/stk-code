@@ -80,9 +80,6 @@ private:
     /** For zoom-in animation */
     float           m_node_scale;
 
-    /** Scale for bubblegum shield */ 
- 	float           m_wanted_node_scale; 
-
     /** Scene node of the attachment, which will be attached to the kart's
      *  scene node. */
     scene::IAnimatedMeshSceneNode
