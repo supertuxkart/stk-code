@@ -38,16 +38,17 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
                                                bool direct_hit)
 {
     if(kart->isInvulnerable()) return NULL;
-    else if(kart->isShielded())
-    {
-        kart->decreaseShieldTime();
-        return NULL;
-    }
     
     float r = kart->getKartProperties()->getExplosionRadius();
 
     // Ignore explosion that are too far away.
     if(!direct_hit && pos.distance2(kart->getXYZ())>r*r) return NULL;
+
+    if(kart->isShielded())
+    {
+        kart->decreaseShieldTime();
+        return NULL;
+    }
 
     return new ExplosionAnimation(kart, pos, direct_hit);
 }   // create
