@@ -185,7 +185,7 @@
          max: How much nitro a kart can store.
      -->
     <nitro engine-force="500" consumption="1" small-container="1" big-container="3"
-           max-speed-increase="5" duration="1" fade-out-time="2" max="16"/>
+           max-speed-increase="5" duration="1" fade-out-time="2" max="20"/>
 
     <!-- Bubble gum data:
          time: How long the bubblegum lasts.
