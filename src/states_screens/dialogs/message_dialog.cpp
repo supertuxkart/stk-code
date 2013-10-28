@@ -29,19 +29,20 @@ using namespace GUIEngine;
 
 // ------------------------------------------------------------------------------------------------------
 
-MessageDialog::MessageDialog(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool own_listener) :
+MessageDialog::MessageDialog(const irr::core::stringw &msg, MessageDialogType type, 
+                             IConfirmDialogListener* listener, bool own_listener) :
     ModalDialog(0.6f, 0.6f)
 {
     doInit(msg, type, listener, own_listener);
-}
+}   // MessageDialog(stringw, type, listener, own_listener)
 
 // ------------------------------------------------------------------------------------------------------
 
-MessageDialog::MessageDialog(irr::core::stringw msg) :
+MessageDialog::MessageDialog(const irr::core::stringw &msg) :
     ModalDialog(0.6f, 0.6f)
 {
     doInit(msg, MessageDialog::MESSAGE_DIALOG_OK, NULL, false);
-}
+}   // MessageDialog(stringw)
 
 // ------------------------------------------------------------------------------------------------------
 
@@ -53,11 +54,11 @@ MessageDialog::~MessageDialog()
     {
         World::getWorld()->scheduleUnpause();
     }
-}
+}   // ~MessageDialog
 
 // ------------------------------------------------------------------------------------------------------
 
-void MessageDialog::doInit(irr::core::stringw msg, MessageDialogType type,
+void MessageDialog::doInit(const irr::core::stringw &msg, MessageDialogType type,
                            IConfirmDialogListener* listener, bool own_listener)
 {
     if (StateManager::get()->getGameState() == GUIEngine::GAME)
@@ -84,6 +85,12 @@ void MessageDialog::doInit(irr::core::stringw msg, MessageDialogType type,
         ButtonWidget* cancelbtn = getWidget<ButtonWidget>("cancel");
         cancelbtn->setText(_("OK"));
         cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    }
+    else if (type == MessageDialog::MESSAGE_DIALOG_OK_CANCEL)
+    {
+        // In case of a OK_CANCEL dialog, change the text from 'Yes' to 'Ok'
+        ButtonWidget* yesbtn = getWidget<ButtonWidget>("confirm");
+        yesbtn->setText(_("OK"));
     }
 }
 

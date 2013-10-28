@@ -62,13 +62,15 @@ public:
         virtual void onDialogUpdate(float dt) {}
     };
 
-    enum MessageDialogType { MESSAGE_DIALOG_OK, MESSAGE_DIALOG_CONFIRM };
+    enum MessageDialogType { MESSAGE_DIALOG_OK, MESSAGE_DIALOG_CONFIRM,
+                             MESSAGE_DIALOG_OK_CANCEL                    };
     
 private:
     
     IConfirmDialogListener* m_listener;
     bool m_own_listener;
-    void doInit(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool own_listener);
+    void doInit(const irr::core::stringw &msg, MessageDialogType type, 
+                IConfirmDialogListener* listener, bool own_listener);
 
 public:
 
@@ -78,13 +80,14 @@ public:
       * \param If set to true, 'listener' will be owned by this dialog and deleted
       *        along with the dialog.
       */
-    MessageDialog(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool delete_listener);
+    MessageDialog(const irr::core::stringw &msg, MessageDialogType type, 
+                  IConfirmDialogListener* listener, bool delete_listener);
     
     /**
       * Variant of MessageDialog where cancelling is not possible (i.e. just shows a message box with OK)
       * \param msg Message to display in the dialog
       */
-    MessageDialog(irr::core::stringw msg);
+    MessageDialog(const irr::core::stringw &msg);
 
     
     ~MessageDialog();
