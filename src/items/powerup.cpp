@@ -302,13 +302,29 @@ void Powerup::use()
 
             if(!m_owner->isShielded()) //if the previous shield had been used up.
             {
-                m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                               stk_config->m_bubblegum_shield_time);
+                if (m_owner->getIdent() == "nolok")
+                {
+                    m_owner->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                                                   stk_config->m_bubblegum_shield_time);
+                }
+                else
+                {
+                    m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                                                   stk_config->m_bubblegum_shield_time);
+                }
             }
             else // using a bubble gum while still having a shield
             {
-                m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                               stk_config->m_bubblegum_shield_time + m_owner->getShieldTime());
+                if (m_owner->getIdent() == "nolok")
+                {
+                    m_owner->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                                                  stk_config->m_bubblegum_shield_time + m_owner->getShieldTime());
+                }
+                else
+                {
+                    m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                                                  stk_config->m_bubblegum_shield_time + m_owner->getShieldTime());
+                }
             }
 
             m_sound_use = sfx_manager->createSoundSource("inflate");//Extraordinary. Usually sounds are set in Powerup::set()

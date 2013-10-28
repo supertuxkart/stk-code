@@ -984,9 +984,15 @@ void Kart::setShieldTime(float t)
 bool Kart::isShielded() const
 {
     if(getAttachment() != NULL)
-        return getAttachment()->getType() == Attachment::ATTACH_BUBBLEGUM_SHIELD;
+    {
+        Attachment::AttachmentType type = getAttachment()->getType();
+        return type == Attachment::ATTACH_BUBBLEGUM_SHIELD ||
+               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+    }
     else
+    {
         return false;
+    }
 }   // isShielded
 
 // ------------------------------------------------------------------------
