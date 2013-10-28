@@ -59,7 +59,6 @@ int atoi_p(const char* val)
 
 bool LayoutManager::convertToCoord(std::string& x, int* absolute /* out */, int* percentage /* out */)
 {
-    bool is_number;
     int i = 0;
 	if (!StringUtils::fromString<int>(x, i /* out */)) return false;
 
