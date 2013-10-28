@@ -727,9 +727,6 @@ bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
         if(kart && kart->isShielded())
         {
             kart->decreaseShieldTime();
-            //kart->getAttachment()->update(0.0f);
-            //kart->setSquash(m_st_squash_duration, m_st_squash_slowdown);
-            Log::verbose("rubber_ball", "Decreasing shield 2! \n");
         }
         else
             explode(kart, object);
