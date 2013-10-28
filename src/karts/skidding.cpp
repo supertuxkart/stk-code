@@ -117,8 +117,8 @@ void Skidding::updateSteering(float steer, float dt)
         break;
     case SKID_BREAK:
         m_real_steering = steer;
-        if (m_visual_rotation > 0.05f) m_visual_rotation -= 0.05;
-        else if (m_visual_rotation < -0.05f) m_visual_rotation += 0.05;
+        if (m_visual_rotation > 0.05f) m_visual_rotation -= 0.05f;
+        else if (m_visual_rotation < -0.05f) m_visual_rotation += 0.05f;
         else
         {
             m_visual_rotation = 0;
