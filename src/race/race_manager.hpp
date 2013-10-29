@@ -180,7 +180,7 @@ public:
             //I18N: Game mode
             case MINOR_MODE_3_STRIKES:      return _("3 Strikes Battle");
             //I18N: Game mode
-            case MINOR_MODE_EASTER_EGG:     return _("Easter Egg Hunt");
+            case MINOR_MODE_EASTER_EGG:     return _("Egg Hunt");
             //I18N: Game mode
             case MINOR_MODE_SOCCER:         return _("Soccer");
             default: assert(false); return NULL;

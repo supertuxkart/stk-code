@@ -306,7 +306,7 @@ void RaceSetupScreen::init()
         irr::core::stringw name1 = irr::core::stringw(
            RaceManager::getNameOf(RaceManager::MINOR_MODE_EASTER_EGG)) + L"\n";
         //FIXME: avoid duplicating descriptions from the help menu!
-        name1 +=  _("Find all Easter Eggs");
+        name1 +=  _("Explore traks to find all hidden eggs");
 
         w2->addItem( name1, IDENT_EASTER,
                    RaceManager::getIconOf(RaceManager::MINOR_MODE_EASTER_EGG));
