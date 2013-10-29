@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <stdlib.h>
 
 /** A random number generator. Each objects that needs a random number uses
     its own number random generator. They are all seeded with number provided
