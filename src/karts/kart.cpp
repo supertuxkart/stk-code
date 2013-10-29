@@ -839,8 +839,10 @@ void Kart::finishedRace(float time)
         RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if(m)
         {
-            m->addMessage((getPosition() == 2 ? _("You won the race!") : _("You finished the race!")) ,
-                          this, 2.0f);
+            if (getPosition() == 2)
+                m->addMessage(_("You won the race!"), this, 2.0f);
+            else
+                m->addMessage(_("You have been eliminated!"), this, 2.0f);
         }
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
