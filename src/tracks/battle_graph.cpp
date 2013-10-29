@@ -28,7 +28,7 @@
 #include "tracks/navmesh.hpp"
 #include "utils/vec3.hpp"
 
-
+const int BattleGraph::UNKNOWN_POLY  = -1;
 BattleGraph * BattleGraph::m_battle_graph = NULL;
 
 BattleGraph::BattleGraph(const std::string &navmesh_file_name)
@@ -36,12 +36,15 @@ BattleGraph::BattleGraph(const std::string &navmesh_file_name)
     NavMesh::create(navmesh_file_name);
     m_navmesh_file = navmesh_file_name;
     buildGraph(NavMesh::get());
+    computeFloydWarshall();
+
 }
 
 void BattleGraph::buildGraph(NavMesh* navmesh)
 {
     unsigned int n_polys = navmesh->getNumberOfPolys();
-    m_graph.resize(n_polys);
+    //m_graph.resize(n_polys);
+    m_distance_matrix = std::vector< std::vector<float>> (n_polys, std::vector<float>(n_polys, 999.9f));
     for(unsigned int i=0; i<n_polys; i++)
     {
         NavPoly currentPoly = navmesh->getNavPoly(i);
@@ -50,12 +53,49 @@ void BattleGraph::buildGraph(NavMesh* navmesh)
         {
             Vec3 adjacentPolyCenter = navmesh->getCenterOfPoly(adjacents[j]);
             float distance = Vec3(adjacentPolyCenter - currentPoly.getCenter()).length_2d();
-            m_graph[i].push_back(std::make_pair(adjacents[i], distance));
+            //m_graph[i].push_back(std::make_pair(adjacents[j], distance));
 
+            m_distance_matrix[i][adjacents[j]] = distance;
+
+        }
+        m_distance_matrix[i][i] = 0.0f;
+    }
+
+}
+
+
+// computes all pair shortest path
+// iteratively updates the m_next_poly
+void BattleGraph::computeFloydWarshall()
+{
+    int n = getNumNodes();
+    
+    // initialize m_next_poly with unknown_poly so that if no path is found b/w i and j
+    // then m_next_poly[i][j] = -1 (UNKNOWN_POLY)
+    // AI must check this
+    m_next_poly = std::vector< std::vector<int>> (n, std::vector<int>(n,BattleGraph::UNKNOWN_POLY));
+   
+    for(unsigned int k=0; k<n; k++)
+    {
+        for(unsigned int i=0; i<n; i++)
+        {
+            for(unsigned int j=0; j<n; j++)
+            {
+                if( (m_distance_matrix[i][k] + m_distance_matrix[k][j]) < m_distance_matrix[i][j])
+                {
+                    m_distance_matrix[i][j] = m_distance_matrix[i][k] + m_distance_matrix[k][j];
+                    m_next_poly[i][j] = k;
+                }
+                else if((m_distance_matrix[i][k] + m_distance_matrix[k][j]) == m_distance_matrix[i][j])
+                {
+                    m_next_poly[i][j]= j;
+                }
+            }
         }
     }
 
 }
+
 BattleGraph::~BattleGraph(void)
 {
     NavMesh::destroy();
@@ -93,7 +133,7 @@ void BattleGraph::createMesh(bool enable_transparency,
     
     // Now add all polygons
     int i=0;
-    for(unsigned int count=0; count<m_graph.size(); count++)
+    for(unsigned int count=0; count<getNumNodes(); count++)
     {
         ///compute colors
         if(!track_color)
@@ -163,7 +203,7 @@ void BattleGraph::createMesh(bool enable_transparency,
 
 void BattleGraph::createDebugMesh()
 {
-    if(m_graph.size()<=0) return;  // no debug output if not graph
+    if(getNumNodes()<=0) return;  // no debug output if not graph
 
     createMesh(/*enable_transparency*/true);
     m_node = irr_driver->addMesh(m_mesh);
@@ -175,7 +215,9 @@ void BattleGraph::createDebugMesh()
 
 void BattleGraph::cleanupDebugMesh()
 {
-    irr_driver->removeNode(m_node);
+    if(m_node != NULL)
+        irr_driver->removeNode(m_node);
+    
     m_node = NULL;
     // No need to call irr_driber->removeMeshFromCache, since the mesh
     // was manually made and so never added to the mesh cache.

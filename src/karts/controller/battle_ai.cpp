@@ -30,12 +30,17 @@
 #include "karts/skidding.hpp"
 #include "karts/skidding_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
+#include "tracks/nav_poly.hpp"
+#include "tracks/navmesh.hpp"
 
+#include <iostream>
 
 BattleAI::BattleAI(AbstractKart *kart, 
                     StateManager::ActivePlayer *player) 
                        : AIBaseController(kart, player)
 {
+
+    reset();
     
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
     {
@@ -50,6 +55,9 @@ BattleAI::BattleAI(AbstractKart *kart,
         m_world           = NULL;
         m_track           = NULL;
     }
+
+    updateCurrentNode(); 
+
     // Don't call our own setControllerName, since this will add a
     // billboard showing 'AIBaseController' to the kar.
     Controller::setControllerName("BattleAI");
@@ -58,7 +66,82 @@ BattleAI::BattleAI(AbstractKart *kart,
 
 void BattleAI::update(float dt)
 {
-    m_controls->m_accel     = 1;
-    m_controls->m_steer     = 0;
-    return;
+    m_controls->m_accel     = 0.65f;
+ //   m_controls->m_steer     = 0;
+    updateCurrentNode();
+ 
+    handleSteering(dt);
+}
+
+
+void BattleAI::reset()
+{
+    m_current_node = BattleGraph::UNKNOWN_POLY;
+}
+
+void BattleAI::updateCurrentNode()
+{
+    //std::cout<<"Current Node \t"<< m_current_node << std::endl;
+
+    // if unknown location, search everywhere
+    if(m_current_node == BattleGraph::UNKNOWN_POLY)
+    {
+        int max_count = BattleGraph::get()->getNumNodes();
+        for(unsigned int i =0; i<max_count; i++)
+        {
+            const NavPoly& p = BattleGraph::get()->getPolyOfNode(i);
+            if(p.pointInPoly(m_kart->getXYZ()))
+                m_current_node = i;
+        }
+        return;
+    }
+
+    if(m_current_node != BattleGraph::UNKNOWN_POLY)
+    {
+        //check if the kart is still on the same node
+        const NavPoly& p = BattleGraph::get()->getPolyOfNode(m_current_node);
+        if(p.pointInPoly(m_kart->getXYZ())) return;
+
+        //if not then check all adjacent polys
+        const std::vector<int>& adjacents = 
+                            NavMesh::get()->getAdjacentPolys(m_current_node);
+        
+        // Set m_current_node to unknown so that if no adjacent poly checks true
+        // we look everywhere the next time updateCurrentNode is called. This is
+        // useful in cases when you are "teleported" to some other poly, ex. rescue
+        m_current_node = BattleGraph::UNKNOWN_POLY;
+        
+        
+        for(unsigned int i=0; i<adjacents.size(); i++)
+        {
+            const NavPoly& p_temp = 
+                    BattleGraph::get()->getPolyOfNode(adjacents[i]);
+            if(p_temp.pointInPoly(m_kart->getXYZ())) m_current_node = adjacents[i];
+        }
+        return;
+    }
+}
+
+
+void BattleAI::handleSteering(const float dt)
+{
+    Vec3  target_point;
+    const AbstractKart* kart = m_world->getPlayerKart(0);
+    int player_node = -1;
+    for(unsigned int i =0; i<BattleGraph::get()->getNumNodes(); i++)
+        {
+            const NavPoly& p = BattleGraph::get()->getPolyOfNode(i);
+            if(p.pointInPoly(kart->getXYZ()))
+                player_node = i;
+        }
+    
+    if(player_node == BattleGraph::UNKNOWN_POLY || m_current_node == BattleGraph::UNKNOWN_POLY) return;
+    int next_node = BattleGraph::get()->getNextShortestPathPoly(m_current_node, player_node);
+    if(next_node == -1) return;
+    target_point = NavMesh::get()->getCenterOfPoly(next_node);
+    
+    if(player_node != m_current_node)
+    setSteering(steerToPoint(target_point),dt);
+    else
+        setSteering(steerToPoint(kart->getXYZ()),dt);
 }

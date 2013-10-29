@@ -53,11 +53,7 @@ protected:
 
 
 
-    /** The current node the kart is on. This can be different from the value
-     *  in LinearWorld, since it takes the chosen path of the AI into account
-     *  (e.g. the closest point in LinearWorld might be on a branch not
-     *  chosen by the AI). */
-    int   m_track_node;
+    
 
     virtual void setSteering   (float angle, float dt);
     void    setControllerName(const std::string &name);

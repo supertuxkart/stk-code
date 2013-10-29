@@ -35,6 +35,7 @@
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
 #include "items/projectile_manager.hpp"
+#include "karts/controller/battle_ai.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
@@ -327,12 +328,18 @@ Controller* World::loadAIController(AbstractKart *kart)
 {
     Controller *controller;
     int turn=0;
+
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+        turn=1;
     // If different AIs 8should be used, adjust turn (or switch randomly
     // or dependent on difficulty)
     switch(turn)
     {
         case 0:
             controller = new SkiddingAI(kart);
+            break;
+        case 1:
+            controller = new BattleAI(kart);
             break;
         default:
             Log::warn("World", "Unknown AI, using default.");

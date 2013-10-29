@@ -22,7 +22,7 @@
 #include "tracks/navmesh.hpp"
 
 #include <algorithm>
-
+#include <iostream>
 
 NavPoly::NavPoly(const  std::vector<int> &polygonVertIndices,  
             const std::vector<int> &adjacentPolygonIndices)
@@ -30,10 +30,10 @@ NavPoly::NavPoly(const  std::vector<int> &polygonVertIndices,
     m_vertices = polygonVertIndices;
 
     m_adjacents = adjacentPolygonIndices;
-
+    
     std::vector<Vec3> xyz_points = getVertices();
     
-    Vec3 temp;
+    Vec3 temp(0.0f,0.0f,0.0f);
     for(unsigned int i=0; i<xyz_points.size(); i++)
         temp = temp + xyz_points[i];
 

@@ -44,19 +44,31 @@ namespace irr
 class BattleAI : public AIBaseController
 {
 
+private: 
+
+    int m_current_node;
+
+    void updateCurrentNode();
+    void handleAcceleration(const float dt) {};
+    void handleSteering(const float dt);
+    void handleBraking() {};
+    
 
 protected:
 
     /** Keep a pointer to world. */
     ThreeStrikesBattle *m_world;
 
+
+
 public:
                 BattleAI(AbstractKart *kart, 
                     StateManager::ActivePlayer *player=NULL);
                 //~BattleAI();
+    unsigned int getCurrentNode() const { return m_current_node; } 
     virtual void update      (float delta);
-    virtual void reset       () {};
-    //static void enableDebug() {m_ai_debug = true; }
+    virtual void reset       ();
+    
     virtual void crashed(const AbstractKart *k) {};
     virtual void crashed(const Material *m) {};
     virtual void handleZipper(bool play_sound) {};

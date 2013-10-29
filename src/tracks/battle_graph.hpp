@@ -43,7 +43,8 @@ private:
     static BattleGraph        *m_battle_graph;
 
     std::vector< std::vector< std::pair<int,float> > > m_graph;
-    
+    std::vector< std::vector< float > > m_distance_matrix;
+    std::vector< std::vector< int > > m_next_poly;
      /** For debug mode only: the node of the debug mesh. */
     scene::ISceneNode       *m_node;
     /** For debug only: the mesh of the debug mesh. */
@@ -56,6 +57,7 @@ private:
 
 
     void buildGraph(NavMesh*);
+    void computeFloydWarshall();
     void createMesh(bool enable_transparency=false,
                     const video::SColor *track_color=NULL);
     
@@ -63,7 +65,9 @@ private:
     ~BattleGraph(void);
 
 public:
-    
+
+    static const int UNKNOWN_POLY;
+
     static BattleGraph *get() { return m_battle_graph; }
 
     static void create(const std::string &navmesh_file_name)
@@ -82,7 +86,12 @@ public:
         }
     }
 
-    unsigned int    getNumNodes() const { return m_graph.size(); }
+    unsigned int    getNumNodes() const { return m_distance_matrix.size(); }
+    const NavPoly&    getPolyOfNode(int i) const 
+                                        { return NavMesh::get()->getNavPoly(i); }
+
+    const int & getNextShortestPathPoly(int i, int j) const 
+                                        { return m_next_poly[i][j]; }
 
     void            createDebugMesh();
     void            cleanupDebugMesh();

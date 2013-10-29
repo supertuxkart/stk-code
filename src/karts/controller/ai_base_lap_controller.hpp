@@ -45,6 +45,12 @@ private:
 
 protected:
    
+    /** The current node the kart is on. This can be different from the value
+     *  in LinearWorld, since it takes the chosen path of the AI into account
+     *  (e.g. the closest point in LinearWorld might be on a branch not
+     *  chosen by the AI). */
+    int   m_track_node;
+
     /** Keep a pointer to world. */
     LinearWorld *m_world;
 

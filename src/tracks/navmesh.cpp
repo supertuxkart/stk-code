@@ -101,7 +101,7 @@ NavMesh::NavMesh(const std::string &filename)
                 std::vector<int> polygonVertIndices;
                 std::vector<int> adjacentPolygonIndices;
                 xml_node_node->get("indices", &polygonVertIndices);
-                xml_node_node->get("adjacent", &adjacentPolygonIndices);
+                xml_node_node->get("adjacents", &adjacentPolygonIndices);
                 NavPoly *np = new NavPoly(polygonVertIndices, adjacentPolygonIndices);
                 m_polys.push_back(*np);
                 m_n_polys++;
