@@ -841,8 +841,6 @@ void Kart::finishedRace(float time)
         {
             if (getPosition() == 2)
                 m->addMessage(_("You won the race!"), this, 2.0f);
-            else
-                m->addMessage(_("You have been eliminated!"), this, 2.0f);
         }
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||

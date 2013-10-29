@@ -43,6 +43,7 @@ FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
             stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
     m_use_highscores   = false;  // disable high scores
     setClockMode(WorldStatus::CLOCK_COUNTDOWN, m_leader_intervals[0]);
+    m_is_over_delay = 5.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -77,6 +78,8 @@ void FollowTheLeaderRace::reset()
             stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
     WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
                               m_leader_intervals[0]);
+                              
+    m_is_over_delay = 2.0f;
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -145,15 +148,18 @@ void FollowTheLeaderRace::countdownReachedZero()
 
         // Move any camera for this kart to the leader, facing backwards,
         // so that the eliminated player has something to watch.
-        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+        if (race_manager->getNumPlayers() > 1)
         {
-            Camera *camera = Camera::getCamera(i);
-            if(camera->getKart()==kart)
+            for(unsigned int i=0; i<Camera::getNumCameras(); i++)
             {
-                camera->setMode(Camera::CM_LEADER_MODE);
-                camera->setKart(getKart(0));
-            }
-        }   // for i<number of cameras
+                Camera *camera = Camera::getCamera(i);
+                if(camera->getKart()==kart)
+                {
+                    camera->setMode(Camera::CM_LEADER_MODE);
+                    camera->setKart(getKart(0));
+                }
+            }   // for i<number of cameras
+        }
     }   // if kart to eliminate exists
 
     // almost over, use fast music
@@ -207,7 +213,23 @@ void FollowTheLeaderRace::countdownReachedZero()
  */
 bool FollowTheLeaderRace::isRaceOver()
 {
-    return getCurrentNumKarts()==2 || getCurrentNumPlayers()==0;
+    bool is_over = (getCurrentNumKarts()==2 || getCurrentNumPlayers()==0);
+    if (is_over)
+    {
+        if (m_is_over_delay < 0.0f)
+        {
+            return true;
+        }
+        else
+        {
+            m_is_over_delay -= GUIEngine::getLatestDt();
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
