@@ -943,7 +943,7 @@ msgid "Expert"
 msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:309
-msgid "Explore traks to find all hidden eggs"
+msgid "Explore tracks to find all hidden eggs"
 msgstr ""
 
 #. I18N: shown when a player is hit by a rubber ball. %1 is the
