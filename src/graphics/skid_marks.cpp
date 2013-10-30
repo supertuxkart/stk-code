@@ -123,7 +123,7 @@ void SkidMarks::update(float dt, bool force_skid_marks,
                        skid->getSkidState()==Skidding::SKID_ACCUMULATE_RIGHT )
                     && skid->getGraphicalJumpOffset()<=0
                     && delta.length2()>=0.0001f                           ) );
-    is_skidding = true;
+
     if(m_skid_marking)
     {
         if (!is_skidding)   // end skid marking
