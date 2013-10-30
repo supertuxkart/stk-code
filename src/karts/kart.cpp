@@ -1969,7 +1969,7 @@ void Kart::updatePhysics(float dt)
 
     m_skidding->update(dt, isOnGround(), m_controls.m_steer,
                        m_controls.m_skid);
-
+    m_vehicle->setVisualRotation(m_skidding->getVisualSkidRotation());
     if(( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
          m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
         m_skidding->getGraphicalJumpOffset()==0)
