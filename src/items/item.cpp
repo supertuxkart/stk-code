@@ -110,8 +110,7 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
     m_deactive_time     = 0;
     m_time_till_return  = 0.0f;  // not strictly necessary, see isCollected()
     m_emitter           = NULL;
-    m_rotate            = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER) &&
-                          (type!=ITEM_EASTER_EGG);
+    m_rotate            = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
     switch(m_type)
     {
     case ITEM_BUBBLEGUM:
