@@ -29,6 +29,7 @@ Shadow::Shadow(video::ITexture *texture, scene::ISceneNode *node, float scale = 
     m.setTexture(0, texture);
     m.BackfaceCulling = false;
     m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    m.setFlag(video::EMF_ZWRITE_ENABLE , false);
     m_mesh   = irr_driver->createQuadMesh(&m, /*create_one_quad*/true);
     scene::IMeshBuffer *buffer = m_mesh->getMeshBuffer(0);
     irr::video::S3DVertex* v=(video::S3DVertex*)buffer->getVertices();
