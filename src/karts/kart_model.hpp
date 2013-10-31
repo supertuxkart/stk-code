@@ -51,6 +51,9 @@ struct SpeedWeightedObject
 
     /** Filename of the "speed weighted" object */
     std::string                         m_name;
+
+    /** Current uv translation in the texture matrix for speed-weighted texture animations */
+    core::vector2df                     m_texture_cur_offset;
 };
 typedef std::vector<SpeedWeightedObject>    SpeedWeightedObjectList;
 
@@ -192,7 +195,7 @@ public:
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
-    void          update(float rotation_dt, float steer,
+    void          update(float dt, float rotation_dt, float steer,
                          const float suspension[4], float speed);
     void          setDefaultPhysicsPosition(const Vec3 &center_shift,
                                             float wheel_radius);

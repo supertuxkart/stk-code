@@ -267,6 +267,7 @@ private:
     // Parameters for speed-weighted objects
     float m_speed_weighted_strength_factor;
     float m_speed_weighted_speed_factor;
+    core::vector2df m_speed_weighted_texture_speed;
 
     /** An impulse pushing the kart down which is proportional to speed. So
      *  the actual impulse is  speed * m_downward_impulse_factor. Set it to
@@ -539,6 +540,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns animation speed factor for speed-weighted objects */
     float getSpeedWeightedSpeedFactor() const {return m_speed_weighted_speed_factor;}
+
+    const core::vector2df& getSpeedWeightedTextureSpeed() const {return m_speed_weighted_texture_speed;}
     
     // ------------------------------------------------------------------------
     /** Returns the wheel base (distance front to rear axis). */

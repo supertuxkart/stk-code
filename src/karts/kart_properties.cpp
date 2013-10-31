@@ -69,6 +69,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
         m_wheel_damping_compression = m_friction_slip = m_roll_influence =
         m_wheel_radius = m_speed_weighted_strength_factor = m_speed_weighted_speed_factor =
+        m_speed_weighted_texture_speed.X = m_speed_weighted_texture_speed.Y =
         m_chassis_linear_damping = m_max_suspension_force =
         m_chassis_angular_damping = m_suspension_rest =
         m_max_speed_reverse_ratio = m_rescue_vert_offset =
@@ -431,6 +432,8 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         speed_weighted_node->get("strength-factor", &m_speed_weighted_strength_factor);
         speed_weighted_node->get("speed-factor",    &m_speed_weighted_speed_factor);
+        speed_weighted_node->get("texture-speed-x", &m_speed_weighted_texture_speed.X);
+        speed_weighted_node->get("texture-speed-y", &m_speed_weighted_texture_speed.Y);
     }
 
     if(const XMLNode *friction_node = root->getNode("friction"))

@@ -592,7 +592,7 @@ void KartModel::reset()
 {
     // Reset the wheels
     const float suspension[4]={0,0,0,0};
-    update(0, 0.0f, suspension, 0.0f);
+    update(0.0f, 0.0f, 0.0f, suspension, 0.0f);
 
     // Stop any animations currently being played.
     setAnimation(KartModel::AF_DEFAULT);
@@ -700,12 +700,13 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
 // ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension
     + updates the speed-weighted objects' animations.
+ *  \param dt time since last frame
  *  \param rotation_dt How far the wheels have rotated since last time.
  *  \param steer The actual steer settings.
  *  \param suspension Suspension height for all four wheels.
  *  \param speed The speed of the kart in meters/sec, used for the speed-weighted objects' animations
  */
-void KartModel::update(float rotation_dt, float steer, const float suspension[4], float speed)
+void KartModel::update(float dt, float rotation_dt, float steer, const float suspension[4], float speed)
 {
     float clamped_suspension[4];
     // Clamp suspension to minimum and maximum suspension length, so that
@@ -782,6 +783,27 @@ void KartModel::update(float rotation_dt, float steer, const float suspension[4]
         {
             float anim_speed = speed * speed_factor;
             obj.m_node->setAnimationSpeed(anim_speed);
+        }
+
+        // Texture animation
+        const core::vector2df& tex_speed = m_kart->getKartProperties()->getSpeedWeightedTextureSpeed();
+        if(tex_speed != core::vector2df(0.0f, 0.0f))
+        {
+            obj.m_texture_cur_offset += speed * tex_speed * dt;
+            if(obj.m_texture_cur_offset.X > 1.0f) obj.m_texture_cur_offset.X = fmod(obj.m_texture_cur_offset.X, 1.0f);
+            if(obj.m_texture_cur_offset.Y > 1.0f) obj.m_texture_cur_offset.Y = fmod(obj.m_texture_cur_offset.Y, 1.0f);
+            
+            for(unsigned int i=0; i<obj.m_node->getMaterialCount(); i++)
+            {
+                video::SMaterial &irrMaterial=obj.m_node->getMaterial(i);
+                for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+                {
+                    video::ITexture* t=irrMaterial.getTexture(j);
+                    if(!t) continue;
+                    core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
+                    m->setTextureTranslate(obj.m_texture_cur_offset.X, obj.m_texture_cur_offset.Y);
+                }   // for j<MATERIAL_MAX_TEXTURES
+            }   // for i<getMaterialCount 
         }
     }
 
