@@ -382,16 +382,15 @@ void Powerup::use()
             {
                 AbstractKart *kart=world->getKart(i);
                 if(kart->isEliminated() || kart== m_owner) continue;
-                if(kart->isShielded())
-                {
-                    kart->decreaseShieldTime();
-                    continue;
-                }
+
                 if(m_owner->getPosition() > kart->getPosition())
                 {
+                    // Player should be informed that parachute is the reason
+                    // of removed bubblegum shield. In this case parachute is
+                    // displayed for a short while.
                     kart->getAttachment()
-                        ->set(Attachment::ATTACH_PARACHUTE,
-                              stk_config->m_parachute_time_other);
+                        ->set(Attachment::ATTACH_PARACHUTE, kart->isShielded() ?
+                              0.2f : stk_config->m_parachute_time_other);
 
                     if(kart->getController()->isPlayerController())
                         player_kart = kart;
