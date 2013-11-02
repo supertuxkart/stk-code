@@ -38,6 +38,37 @@
 
 float KartModel::UNDEFINED = -99.9f;
 
+// ------------------------------------------------------------
+// SpeedWeightedObject implementation
+
+#define SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED -99.f
+
+SpeedWeightedObject::Properties::Properties()
+{
+    m_strength_factor = m_speed_factor = m_texture_speed.X = m_texture_speed.Y = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
+}
+
+void SpeedWeightedObject::Properties::loadFromXMLNode(const XMLNode* xml_node)
+{
+    xml_node->get("strength-factor", &m_strength_factor);
+    xml_node->get("speed-factor",    &m_speed_factor);
+    xml_node->get("texture-speed-x", &m_texture_speed.X);
+    xml_node->get("texture-speed-y", &m_texture_speed.Y);
+}
+
+void SpeedWeightedObject::Properties::checkAllSet()
+{
+#define CHECK_NEG(  a,strA) if(a<=SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED) {                   \
+            Log::fatal("SpeedWeightedObject", "Missing default value for '%s'.",    \
+                        strA);              \
+        }
+    CHECK_NEG(m_strength_factor, "speed-weighted strength-factor"    );
+    CHECK_NEG(m_speed_factor,    "speed-weighted speed-factor"    );
+    CHECK_NEG(m_texture_speed.X,  "speed-weighted texture speed X"    );
+    CHECK_NEG(m_texture_speed.Y,  "speed-weighted texture speed Y"    );
+#undef CHECK_NEG
+}
+
 /** Default constructor which initialises all variables with defaults.
  *  Note that the KartModel is copied, so make sure to update makeCopy
  *  if any more variables are added to this object.
@@ -148,12 +179,15 @@ void KartModel::loadInfo(const XMLNode &node)
         m_has_nitro_emitter = true;
     }
 
-	if(const XMLNode *speedWeighted_node=node.getNode("speed-weighted"))
+    if(const XMLNode *speed_weighted_objects_node=node.getNode("speed-weighted-objects"))
     {
-		for(unsigned int i=0 ; i < speedWeighted_node->getNumNodes() ; i++)
-		{
-			loadSpeedWeightedInfo(speedWeighted_node->getNode(i));
-		}
+        SpeedWeightedObject::Properties   fallback_properties;
+        fallback_properties.loadFromXMLNode(speed_weighted_objects_node);
+
+        for(unsigned int i=0 ; i < speed_weighted_objects_node->getNumNodes() ; i++)
+        {
+            loadSpeedWeightedInfo(speed_weighted_objects_node->getNode(i), fallback_properties);
+        }
     }
 
     if(const XMLNode *hat_node=node.getNode("hat"))
@@ -279,11 +313,9 @@ KartModel* KartModel::makeCopy()
     km->m_speed_weighted_objects.resize(m_speed_weighted_objects.size());
     for(size_t i=0; i<m_speed_weighted_objects.size(); i++)
     {
-        km->m_speed_weighted_objects[i].m_model            = m_speed_weighted_objects[i].m_model;
         // Master should not have any speed weighted nodes.
         assert(!m_speed_weighted_objects[i].m_node);
-        km->m_speed_weighted_objects[i].m_name             = m_speed_weighted_objects[i].m_name;
-        km->m_speed_weighted_objects[i].m_position         = m_speed_weighted_objects[i].m_position;
+        km->m_speed_weighted_objects[i] = m_speed_weighted_objects[i];
     }
 
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
@@ -511,9 +543,11 @@ void KartModel::loadNitroEmitterInfo(const XMLNode &node,
 }   // loadNitroEmitterInfo
 
 /** Loads a single speed weighted node. */
-void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node)
+void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, const SpeedWeightedObject::Properties& fallback_properties)
 {
     SpeedWeightedObject obj;
+    obj.m_properties    = fallback_properties;
+    obj.m_properties.loadFromXMLNode(speed_weighted_node);
     
     speed_weighted_node->get("position", &obj.m_position);
     speed_weighted_node->get("model",    &obj.m_name);
@@ -767,9 +801,13 @@ void KartModel::update(float dt, float rotation_dt, float steer, const float sus
     {
         SpeedWeightedObject&    obj = m_speed_weighted_objects[i];
 
+#define GET_VALUE(obj, value_name)   \
+    obj.m_properties.value_name > SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED ? obj.m_properties.value_name : \
+    m_kart->getKartProperties()->getSpeedWeightedObjectProperties().value_name
+
         // Animation strength
         float strength = 1.0f;
-        const float strength_factor = m_kart->getKartProperties()->getSpeedWeightedStrengthFactor();
+        const float strength_factor =   GET_VALUE(obj, m_strength_factor);
         if(strength_factor >= 0.0f)
         {
             strength = speed * strength_factor;
@@ -778,7 +816,7 @@ void KartModel::update(float dt, float rotation_dt, float steer, const float sus
         obj.m_node->setAnimationStrength(strength);
         
         // Animation speed
-        const float speed_factor = m_kart->getKartProperties()->getSpeedWeightedSpeedFactor();
+        const float speed_factor =   GET_VALUE(obj, m_speed_factor);
         if(speed_factor >= 0.0f)
         {
             float anim_speed = speed * speed_factor;
@@ -786,7 +824,9 @@ void KartModel::update(float dt, float rotation_dt, float steer, const float sus
         }
 
         // Texture animation
-        const core::vector2df& tex_speed = m_kart->getKartProperties()->getSpeedWeightedTextureSpeed();
+        core::vector2df tex_speed;
+        tex_speed.X = GET_VALUE(obj, m_texture_speed.X);
+        tex_speed.Y = GET_VALUE(obj, m_texture_speed.Y);
         if(tex_speed != core::vector2df(0.0f, 0.0f))
         {
             obj.m_texture_cur_offset += speed * tex_speed * dt;
@@ -805,6 +845,7 @@ void KartModel::update(float dt, float rotation_dt, float steer, const float sus
                 }   // for j<MATERIAL_MAX_TEXTURES
             }   // for i<getMaterialCount 
         }
+#undef GET_VALUE
     }
 
     // Check if the end animation is being played, if so, don't

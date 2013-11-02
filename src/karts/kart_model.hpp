@@ -37,8 +37,28 @@ class AbstractKart;
 class KartProperties;
 class XMLNode;
 
+/** A speed-weighted object is an object whose characteristics are influenced by the kart's speed */
 struct SpeedWeightedObject
 {
+    /** Parameters for a speed-weighted object */
+    struct Properties
+    {
+        Properties();
+
+        /** Strength factor: how much the kart speed affects the animation's distance from a static pose (-1 to disable) */
+        float               m_strength_factor;
+
+        /** Speed factor: how much the kart speed affects the animation's speed (-1 to disable) */
+        float               m_speed_factor;
+
+        /** Texture speed, in UV coordinates */
+        core::vector2df     m_texture_speed;
+
+        void    loadFromXMLNode(const XMLNode* xml_node);
+
+        void    checkAllSet();
+    };
+
     SpeedWeightedObject() : m_model(NULL), m_node(NULL), m_position(), m_name() {}
     /** Model */
     scene::IAnimatedMesh *              m_model;
@@ -54,6 +74,10 @@ struct SpeedWeightedObject
 
     /** Current uv translation in the texture matrix for speed-weighted texture animations */
     core::vector2df                     m_texture_cur_offset;
+
+    /** Specific properties for this given speed-weighted object,
+      * otherwise just a copy of the values from the kart's properties */
+    Properties                          m_properties;
 };
 typedef std::vector<SpeedWeightedObject>    SpeedWeightedObjectList;
 
@@ -181,7 +205,7 @@ private:
     void  loadNitroEmitterInfo(const XMLNode &node,
                         const std::string &emitter_name, int index);
 
-    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node);
+    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, const SpeedWeightedObject::Properties& fallback_properties);
 
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 

@@ -68,9 +68,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_nitro_max_speed_increase = m_nitro_duration = m_nitro_fade_out_time =
         m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
         m_wheel_damping_compression = m_friction_slip = m_roll_influence =
-        m_wheel_radius = m_speed_weighted_strength_factor = m_speed_weighted_speed_factor =
-        m_speed_weighted_texture_speed.X = m_speed_weighted_texture_speed.Y =
-        m_chassis_linear_damping = m_max_suspension_force =
+        m_wheel_radius = m_chassis_linear_damping = m_max_suspension_force =
         m_chassis_angular_damping = m_suspension_rest =
         m_max_speed_reverse_ratio = m_rescue_vert_offset =
         m_upright_tolerance = m_collision_terrain_impulse =
@@ -428,12 +426,9 @@ void KartProperties::getAllData(const XMLNode * root)
         wheels_node->get("radius",              &m_wheel_radius             );
     }
 
-    if(const XMLNode *speed_weighted_node = root->getNode("speed-weighted"))
+    if(const XMLNode *speed_weighted_objects_node = root->getNode("speed-weighted-objects"))
     {
-        speed_weighted_node->get("strength-factor", &m_speed_weighted_strength_factor);
-        speed_weighted_node->get("speed-factor",    &m_speed_weighted_speed_factor);
-        speed_weighted_node->get("texture-speed-x", &m_speed_weighted_texture_speed.X);
-        speed_weighted_node->get("texture-speed-y", &m_speed_weighted_texture_speed.Y);
+        m_speed_weighted_object_properties.loadFromXMLNode(speed_weighted_objects_node);
     }
 
     if(const XMLNode *friction_node = root->getNode("friction"))
@@ -636,8 +631,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_time_reset_steer,           "turn time-reset-steer"         );
     CHECK_NEG(m_wheel_damping_relaxation,   "wheels damping-relaxation"     );
     CHECK_NEG(m_wheel_damping_compression,  "wheels damping-compression"    );
-    CHECK_NEG(m_speed_weighted_strength_factor, "speed-weighted strength-factor"    );
-    CHECK_NEG(m_speed_weighted_speed_factor,    "speed-weighted speed-factor"    );
     CHECK_NEG(m_wheel_radius,               "wheels radius"                 );
     CHECK_NEG(m_friction_slip,              "friction slip"                 );
     CHECK_NEG(m_roll_influence,             "stability roll-influence"      );
@@ -718,6 +711,8 @@ void KartProperties::checkAllSet(const std::string &filename)
         CHECK_NEG(m_engine_power[i], "engine power" );
         CHECK_NEG(m_plunger_in_face_duration[i],"plunger in-face-time");
     }
+
+    m_speed_weighted_object_properties.checkAllSet();
 
     m_skidding_properties->checkAllSet(filename);
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
