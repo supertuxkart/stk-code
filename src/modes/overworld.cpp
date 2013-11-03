@@ -116,6 +116,7 @@ void OverWorld::update(float dt)
         m_karts[0]->startEngineSFX();
     }
     WorldWithRank::update(dt);
+	WorldWithRank::updateTrack(dt);
     const unsigned int kart_amount  = m_karts.size();
 
     // isn't it cool, on the overworld nitro is free!
