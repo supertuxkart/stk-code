@@ -332,13 +332,13 @@ void SoccerWorld::initKartList()
 	irr::video::ITexture *blueTeamTexture = irr_driver->getTexture(
 		file_manager->getTextureFile("soccer_player_blue.png"));
 	//Assigning indicators
-	for(int i=0; i<kart_amount; i++){
+	for(unsigned int i=0; i<kart_amount; i++){
 		scene::ISceneNode *hatNode;
 		if(race_manager->getLocalKartInfo(i).getSoccerTeam() == SOCCER_TEAM_RED)
-			hatNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3,0.3)
+			hatNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,0.3f)
 			,redTeamTexture,m_karts[i]->getNode(), true);
 		else
-			hatNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3,0.3)
+			hatNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,0.3f)
 			,blueTeamTexture,m_karts[i]->getNode(),true);
 		hatNode->setPosition(m_karts[i]->getKartModel()->getHatOffset());
 	}
@@ -364,12 +364,13 @@ int SoccerWorld::getScore(unsigned int i){
 }
 //-----------------------------------------------------------------------------
 int SoccerWorld::getTeamLeader(unsigned int team){
-		for(int i = 0; i< m_karts.size(); i++){
-			if(race_manager->getLocalKartInfo(i).getSoccerTeam() == (SoccerTeam) team)
-				return i;
-		}
-		return -1;
-	}
+    for(int i = 0; i< m_karts.size(); i++)
+    {
+        if(race_manager->getLocalKartInfo(i).getSoccerTeam() == (SoccerTeam) team)
+            return i;
+    }
+    return -1;
+}
 //-----------------------------------------------------------------------------
 AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
                                 int local_player_id, int global_player_id,
