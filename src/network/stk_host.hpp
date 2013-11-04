@@ -25,6 +25,7 @@
 #include "network/types.hpp"
 #include "network/network_string.hpp"
 
+#define WIN32_LEAN_AND_MEAN
 #include <enet/enet.h>
 
 #include <pthread.h>

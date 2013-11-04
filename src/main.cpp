@@ -121,6 +121,7 @@
 #    include <unistd.h>
 #  endif
 #  define _WINSOCKAPI_
+#  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #  ifdef _MSC_VER
 #    include <direct.h>
