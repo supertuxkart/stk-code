@@ -718,6 +718,17 @@ bool UserConfig::loadConfig()
 }   // loadConfig
 
 // ----------------------------------------------------------------------------
+
+void UserConfig::postLoadInit()
+{
+	for (int i = 0; i < UserConfigParams::m_all_players.size(); i++)
+	{
+		PlayerProfile* player = UserConfigParams::m_all_players.get(i);
+		if (player->isGuestAccount()) player->setName(_LTR("Guest"));
+	}
+}
+
+// ----------------------------------------------------------------------------
 /** Write settings to config file. */
 void UserConfig::saveConfig()
 {
