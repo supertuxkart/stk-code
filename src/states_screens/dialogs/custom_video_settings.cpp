@@ -67,12 +67,12 @@ void CustomVideoSettingsialog::beforeAddingWidgets()
     else if (UserConfigParams::m_anisotropic == 8)  value = 4;
     else if (UserConfigParams::m_anisotropic == 16) value = 5;
     else if (UserConfigParams::m_trilinear)         value = 1;
-    filtering->addLabel( L"Bilinear" );        // 0
-    filtering->addLabel( L"Trilinear" );       // 1
-    filtering->addLabel( L"Anisotropic x2" );  // 2
-    filtering->addLabel( L"Anisotropic x4" );  // 3
-    filtering->addLabel( L"Anisotropic x8" );  // 4
-    filtering->addLabel( L"Anisotropic x16" ); // 5
+    filtering->addLabel( _("Bilinear") );        // 0
+    filtering->addLabel( _("Trilinear") );       // 1
+    filtering->addLabel( _("Anisotropic x2") );  // 2
+    filtering->addLabel( _("Anisotropic x4") );  // 3
+    filtering->addLabel( _("Anisotropic x8") );  // 4
+    filtering->addLabel( _("Anisotropic x16") ); // 5
 
     filtering->setValue( value );
 
