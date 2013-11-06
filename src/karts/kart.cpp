@@ -1330,6 +1330,7 @@ void Kart::update(float dt)
         m_shadow->enableShadow();
         m_shadow_enabled = true;  
     }
+    //m_shadow->disableShadow();
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -2397,13 +2398,11 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     }
     m_kart_model->update(dt, m_wheel_rotation_dt, getSteerPercent(), wheel_up_axis, m_speed);
 
-    Vec3        center_shift  = m_kart_properties->getGravityCenterShift();
-    float y = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getY()
-            - m_default_suspension_length[0]
+    Vec3 center_shift  = m_kart_properties->getGravityCenterShift();
+    
+    float y = m_kart_model->getWheelGraphicsRadius(0) 
             - m_vehicle->getWheelInfo(0).m_wheelsRadius
-            - (m_kart_model->getWheelGraphicsRadius(0)
-               -m_kart_model->getWheelGraphicsPosition(0).getY() );
-    y += m_skidding->getGraphicalJumpOffset();
+            + m_skidding->getGraphicalJumpOffset();
     center_shift.setY(y);
 
     if ((m_controls.m_nitro || m_min_nitro_time > 0.0f) && isOnGround() &&  m_collected_energy > 0)

@@ -779,7 +779,7 @@ void KartModel::update(float dt, float rotation_dt, float steer, const float sus
         }
 #endif
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
-        pos.Y += clamped_suspension[i];
+        pos.Y += suspension[i];
         m_wheel_node[i]->setPosition(pos);
 
         // Now calculate the new rotation: (old + change) mod 360

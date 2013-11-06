@@ -323,9 +323,10 @@ btScalar btKart::rayCast(unsigned int index)
 #else
     if(index==2 || index==3)
     {
-        if(m_visual_rotation==0)
+        if(m_visual_rotation==0.123123123)
         {
-            m_visual_contact_point[index] = rayResults.m_hitPointInWorld;
+            m_visual_contact_point[index  ] = rayResults.m_hitPointInWorld;
+            m_visual_contact_point[index-2] = source;
             m_visual_wheels_touch_ground &= (object!=NULL);
         }
         else
@@ -335,19 +336,21 @@ btScalar btKart::rayCast(unsigned int index)
             {
                 getRigidBody()->getMotionState()->getWorldTransform(chassisTrans);
             }
-            btQuaternion q(Vec3(0,1,0), m_visual_rotation);
+            btQuaternion q(m_visual_rotation, 0, 0);
             btQuaternion rot_new = chassisTrans.getRotation() * q;
             chassisTrans.setRotation(rot_new);
-            btVector3 pos = wheel.m_chassisConnectionPointCS;
-            pos.setZ(pos.getZ() * 0.3f);
+            btVector3 pos = m_kart->getKartModel()->getWheelGraphicsPosition(index);
+            pos.setZ(pos.getZ()*0.9f);
+            //pos.setX(pos.getX()*0.1f);
+            //btVector3 pos = wheel.m_chassisConnectionPointCS;
             btVector3 source = chassisTrans( pos );
             btVector3 target = source + rayvector;
             btVehicleRaycaster::btVehicleRaycasterResult rayResults;
 
             void* object = m_vehicleRaycaster->castRay(source,target,rayResults);
             m_visual_contact_point[index] = rayResults.m_hitPointInWorld;
+            m_visual_contact_point[index-2] = source;
             m_visual_wheels_touch_ground &= (object!=NULL);        
-
         }
     }
 #endif
@@ -939,6 +942,9 @@ void btKart::debugDraw(btIDebugDraw* debugDrawer)
                               wheelColor);
 
     }   // for i < getNumWheels
+    btVector3 yellow(1.0f, 1.0f, 0.0f);
+    debugDrawer->drawLine(m_visual_contact_point[0], m_visual_contact_point[2], yellow);
+    debugDrawer->drawLine(m_visual_contact_point[1], m_visual_contact_point[3], yellow);
 }   // debugDraw
 
 
