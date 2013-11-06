@@ -426,7 +426,11 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
     // at it directly, stop interpolating, instead fly straight
     // towards it.
     Vec3 diff = m_target->getXYZ()-getXYZ();
-    *next_xyz = getXYZ() + (dt*m_speed/diff.length())*diff;
+    // Avoid potential division by zero
+    if(diff.length2()==0)
+        *next_xyz = getXYZ();
+    else
+        *next_xyz = getXYZ() + (dt*m_speed/diff.length())*diff;
 
     Vec3 old_vec = getXYZ()-m_previous_xyz;
     Vec3 new_vec = *next_xyz - getXYZ();
