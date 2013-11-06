@@ -449,8 +449,9 @@ namespace UserConfigParams
     /** True if check structures should be debugged. */
     PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );
 
-    /** Special debug camera being high over the kart. */
-    PARAM_PREFIX bool m_camera_debug PARAM_DEFAULT( false );
+    /** Special debug camera: 0: normal cameral; 1: being high over the kart.;
+                              2: on ground level. */
+    PARAM_PREFIX int m_camera_debug PARAM_DEFAULT( false );
 
     /** True if physics debugging should be enabled. */
     PARAM_PREFIX bool m_physics_debug PARAM_DEFAULT( false );
