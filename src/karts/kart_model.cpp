@@ -742,28 +742,7 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
  */
 void KartModel::update(float dt, float rotation_dt, float steer, const float suspension[4], float speed)
 {
-    float clamped_suspension[4];
-    // Clamp suspension to minimum and maximum suspension length, so that
-    // the graphical wheel models don't look too wrong.
-    for(unsigned int i=0; i<4; i++)
-    {
-        const float suspension_length = (m_max_suspension[i]-m_min_suspension[i])/2;
-
-        // limit amplitude between set limits, first dividing it by a
-        // somewhat arbitrary constant to reduce visible wheel movement
-        clamped_suspension[i] = suspension[i]/m_dampen_suspension_amplitude[i];
-        float ratio = clamped_suspension[i] / suspension_length;
-        const int sign = ratio < 0 ? -1 : 1;
-        // expanded form of 1 - (1 - x)^2, i.e. making suspension display
-        // quadratic and not linear
-        ratio = sign * fabsf(ratio*(2-ratio));
-//        clamped_suspension[i] = ratio*suspension_length;
-        clamped_suspension[i] = std::min(std::max(ratio*suspension_length,
-                                                  m_min_suspension[i]),
-                                                  m_max_suspension[i]);
-    }   // for i<4
-
-    core::vector3df wheel_steer(0, steer*30.0f, 0);
+   core::vector3df wheel_steer(0, steer*30.0f, 0);
 
     for(unsigned int i=0; i<4; i++)
     {

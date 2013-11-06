@@ -2400,10 +2400,9 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     Vec3 center_shift  = m_kart_properties->getGravityCenterShift();
     
-    float y = m_kart_model->getWheelGraphicsRadius(0) 
-            - m_vehicle->getWheelInfo(0).m_wheelsRadius
-            + m_skidding->getGraphicalJumpOffset();
-    center_shift.setY(y);
+    float kart_y_offset = m_kart_model->getWheelGraphicsRadius(0) 
+                        - m_vehicle->getWheelInfo(0).m_wheelsRadius
+                        + m_skidding->getGraphicalJumpOffset();
 
     if ((m_controls.m_nitro || m_min_nitro_time > 0.0f) && isOnGround() &&  m_collected_energy > 0)
     {
@@ -2487,6 +2486,11 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         }
     }
 
+    // If the kart is leaning, part of the kart might end up 'in' the track.
+    // To avoid this, raise the kart enough to offset the leaning.
+    float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
+
+    center_shift.setY(kart_y_offset + lean_height);
     float heading = m_skidding->getVisualSkidRotation();
     Moveable::updateGraphics(dt, center_shift,
                              btQuaternion(heading, 0, m_current_lean));
