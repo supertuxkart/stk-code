@@ -128,7 +128,6 @@
 #else
 #  include <unistd.h>
 #endif
-#include <time.h>
 #include <stdexcept>
 #include <cstdio>
 #include <string>
@@ -339,11 +338,38 @@ void gamepadVisualisation()
 
         driver->endScene();
     }
-}
+}   // gamepadVisualisation
+
 // ============================================================================
+/** Sets the Christmas flag (m_xmas_enabled), depending on currently set
+ *  Christ mode (m_xmas_mode)
+ */
+void handleXmasMode()
+{
+    bool xmas = false;
+    switch(UserConfigParams::m_xmas_mode)
+    {
+    case 0:  
+        {
+            int day, month;
+            StkTime::getDate(&day, &month);
+            // Christmat hats are shown between 17. of December
+            // and 9th of January
+            xmas = (month == 12 && day>=17)  || (month ==  1 && day <10);
+            break;
+        }
+    case 1:  xmas = true;  break;
+    default: xmas = false; break;
+    }   // switch m_xmas_mode
 
+    if(xmas)
+        kart_properties_manager->setHatMeshName("christmas_hat.b3d");
+}   // handleXmasMode
 
-void cmdLineHelp (char* invocation)
+// ----------------------------------------------------------------------------
+/** Prints help for command line options to stdout.
+ */
+void cmdLineHelp(char* invocation)
 {
     Log::info("main",
     "Usage: %s [OPTIONS]\n\n"
@@ -466,14 +492,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
         }
         else if ( sscanf(argv[i], "--xmas=%d", &n) )
         {
-            if (n)
-            {
-                UserConfigParams::m_xmas_enabled = true;
-            }
-            else
-            {
-                UserConfigParams::m_xmas_enabled = false;
-            }
+            UserConfigParams::m_xmas_mode = n;
         }
         else if( !strcmp(argv[i], "--no-console"))
         {
@@ -592,7 +611,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
         }   // --verbose or -v
     }
     return 0;
-}
+}   // handleCmdLinePreliminary
 
 // ============================================================================
 /** Handles command line options.
@@ -1113,8 +1132,7 @@ void initUserConfig(char *argv[])
     irr_driver              = new IrrDriver();
     file_manager            = new FileManager(argv);
     user_config             = new UserConfig();     // needs file_manager
-    const bool config_ok    = user_config->loadConfig();
-
+    const bool config_ok    = user_config->loadConfig();    
     if (UserConfigParams::m_language.toString() != "system")
     {
 #ifdef WIN32
@@ -1283,15 +1301,6 @@ bool ShowDumpResults(const wchar_t* dump_path,
 }
 #endif
 
-static bool checkXmasTime()
-{
-    time_t      rawtime;
-    struct tm*  timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    return (timeinfo->tm_mon == 12-1);  // Xmas mode happens in December
-}
-
 #if defined(DEBUG) && defined(WIN32) && !defined(__CYGWIN__)
 #pragma comment(linker, "/SUBSYSTEM:console")
 #endif
@@ -1310,8 +1319,6 @@ int main(int argc, char *argv[] )
         // not have) other managers initialised:
         initUserConfig(argv); // argv passed so config file can be
                               // found more reliably
-
-        UserConfigParams::m_xmas_enabled = checkXmasTime();
 
         handleCmdLinePreliminary(argc, argv);
 
@@ -1335,6 +1342,7 @@ int main(int argc, char *argv[] )
         GUIEngine::addLoadingIcon( irr_driver->getTexture(
                            file_manager->getGUIDir() + "options_video.png") );
         kart_properties_manager -> loadAllKarts    ();
+        handleXmasMode();
         unlock_manager          = new UnlockManager();
         //m_tutorial_manager      = new TutorialManager();
         GUIEngine::addLoadingIcon( irr_driver->getTexture(

@@ -192,15 +192,8 @@ void KartModel::loadInfo(const XMLNode &node)
 
     if(const XMLNode *hat_node=node.getNode("hat"))
     {
-        if(hat_node->get("offset", &m_hat_offset))
-        {
-            // Xmas mode handling :)
-            if(UserConfigParams::m_xmas_enabled)
-                setHatMeshName("christmas_hat.b3d");
-        }
+        hat_node->get("offset", &m_hat_offset);
     }
-    else
-        m_hat_offset = core::vector3df(0,0,0);
 }   // loadInfo
 
 // ----------------------------------------------------------------------------
@@ -357,7 +350,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         std::string debug_name = m_model_filename+" (animated-kart-model)";
         node->setName(debug_name.c_str());
 #if SKELETON_DEBUG
-        irr_driber->addDebugMesh(m_animated_node);
+        irr_driver->addDebugMesh(m_animated_node);
 #endif
 #endif
         m_animated_node->setLoopMode(false);

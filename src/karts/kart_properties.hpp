@@ -420,6 +420,14 @@ public:
     const KartModel& getMasterKartModel() const {return *m_kart_model;        }
 
     // ------------------------------------------------------------------------
+    /** Sets the name of a mesh to be used for this kart.
+     *  \param hat_name Name of the mesh.
+     */
+    void setHatMeshName(const std::string &hat_name)
+    {
+        m_kart_model->setHatMeshName(hat_name);
+    }   // setHatMeshName
+    // ------------------------------------------------------------------------
     /** Returns the name of this kart.
         \note Pass it through fridibi as needed, this is the LTR name
       */

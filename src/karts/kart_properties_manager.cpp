@@ -233,6 +233,18 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
 }   // loadKartData
 
 //-----------------------------------------------------------------------------
+/** Sets the name of a mesh to use as a hat for all karts.
+ *  \param hat_name Name of the hat mash.
+  */
+void KartPropertiesManager::setHatMeshName(const std::string &hat_name)
+{
+    for (int i=0; i<m_karts_properties.size(); i++)
+    {
+        m_karts_properties[i].setHatMeshName(hat_name);
+    }
+}   // setHatMeshName
+
+//-----------------------------------------------------------------------------
 /** Returns index of the kart properties with the given ident.
  *  \return Index of kart (between 0 and number of karts - 1).
  */

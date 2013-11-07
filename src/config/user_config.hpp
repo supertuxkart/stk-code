@@ -483,9 +483,6 @@ namespace UserConfigParams
     /** True if hardware skinning should be enabled */
     PARAM_PREFIX bool m_hw_skinning_enabled  PARAM_DEFAULT( false );
 
-    /** True if Christmas Mode should be enabled */
-    PARAM_PREFIX bool m_xmas_enabled  PARAM_DEFAULT( false );
-
     // not saved to file
 
     // ---- Networking
@@ -520,6 +517,11 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "anim_gfx",
                             &m_graphics_quality, "Scenery animations") );
+
+    // This saves the actual user preference.
+    PARAM_PREFIX IntUserConfigParam        m_xmas_mode
+            PARAM_DEFAULT(  IntUserConfigParam(0, "christmas-mode",
+                            &m_graphics_quality, "Christmas hats: 0 use calendar, 1 always on, 2 always off") );
 
     PARAM_PREFIX BoolUserConfigParam        m_weather_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx",

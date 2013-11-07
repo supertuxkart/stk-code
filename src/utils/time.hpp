@@ -37,7 +37,10 @@ class StkTime
 public:
     typedef time_t TimeType;
 
-    /** Converts the time in this object to a human readable string. */
+    static double getRealTime(long startAt=0);
+    static void getDate(int *day=NULL, int *month=NULL, int *year=NULL);
+
+        /** Converts the time in this object to a human readable string. */
     static std::string toString(const TimeType &tt)
     {
         const struct tm *t = gmtime(&tt);
@@ -78,13 +81,6 @@ public:
     };   // getTimeSinceEpoch
 
     // ------------------------------------------------------------------------
-    /** Returns a time based on an arbitrary 'epoch' (e.g. could be start
-     *  time of the application, 1.1.1970, ...).
-     *  The value is a double precision floating point value in seconds.
-     */
-    static double getRealTime(long startAt=0);
-
-    // ------------------------------------------------------------------------
     /** 
      * \brief Compare two different times.
      * \return A signed integral indicating the relation between the time.
@@ -111,8 +107,9 @@ public:
         t.tm_mon += month;
         t.tm_mday += day;
         return mktime(&t);
-    }
+    }   // addInterval
 
+    // ------------------------------------------------------------------------
     class ScopeProfiler
     {
         float m_time;
@@ -128,7 +125,7 @@ public:
             float f2 = (float)getRealTime();
             printf("} // took %f s\n", (f2 - m_time));
         }
-    };
+    };   // class ScopeProfiler
 
 };   // namespace time
 #endif
