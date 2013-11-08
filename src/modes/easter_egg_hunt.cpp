@@ -214,4 +214,10 @@ void EasterEggHunt::checkForWrongDirection(unsigned int i)
 {
 }   // checkForWrongDirection
 
+//-----------------------------------------------------------------------------
 
+void EasterEggHunt::terminateRace()
+{
+	m_karts[0]->getControls().reset();
+	WorldWithRank::terminateRace();
+}
