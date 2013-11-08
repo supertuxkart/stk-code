@@ -184,7 +184,8 @@ void EndController::update(float dt)
 
     // In case of battle mode: don't do anything
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
-       race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
+       race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER  ||
+       race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG)
     {
         m_controls->m_accel = 0.0f;
         // Brake while we are still driving forwards (if we keep

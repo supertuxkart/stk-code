@@ -19,7 +19,7 @@
 #ifndef EASTER_EGG_HUNT_HPP
 #define EASTER_EGG_HUNT_HPP
 
-#include "modes/world_with_rank.hpp"
+#include "modes/linear_world.hpp"
 #include "states_screens/race_gui_base.hpp"
 
 #include <string>
@@ -31,7 +31,7 @@ class AbstractKart;
  * \brief An implementation of World to provide an easter egg hunt like mode
  * \ingroup modes
  */
-class EasterEggHunt: public WorldWithRank
+class EasterEggHunt: public LinearWorld
 {
 private:
     /** Keeps track of how many eggs each kart has found. */
@@ -64,6 +64,8 @@ public:
     void updateKartRanks();
     void collectedEasterEgg(const AbstractKart *kart);
     void readData(const std::string &filename);
+
+    virtual void checkForWrongDirection(unsigned int i) OVERRIDE;
 };   // EasterEggHunt
 
 

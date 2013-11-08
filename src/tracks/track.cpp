@@ -1527,9 +1527,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
         else if(name=="checks")
         {
-            // Easter egg hunts don't have laps.
-            if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_EASTER_EGG)
-                CheckManager::get()->load(*node);
+            CheckManager::get()->load(*node);
         }
         else if (name=="particle-emitter")
         {

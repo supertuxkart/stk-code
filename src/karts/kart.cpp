@@ -849,6 +849,12 @@ void Kart::finishedRace(float time)
         setController(new EndController(this, m_controller->getPlayer(),
                                         m_controller));
     }
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
+    {
+        m_kart_model->setAnimation(KartModel::AF_WIN_START);
+        setController(new EndController(this, m_controller->getPlayer(),
+                                        m_controller));
+    }
 
 }   // finishedRace
 
