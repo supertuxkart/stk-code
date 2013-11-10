@@ -59,7 +59,7 @@ private:
 public:
 
     SoccerWorld();
-    virtual ~SoccerWorld() {}
+    virtual ~SoccerWorld();
 
     virtual void init();
 

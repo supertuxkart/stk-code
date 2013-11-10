@@ -44,8 +44,16 @@ SoccerWorld::SoccerWorld() : WorldWithRank()
     WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = false;
 }   // SoccerWorld
-
 //-----------------------------------------------------------------------------
+
+/** The destructor frees al data structures.
+ */
+SoccerWorld::~SoccerWorld()
+{
+    sfx_manager->deleteSFX(m_goal_sound);
+}   // ~SoccerWorld
+//-----------------------------------------------------------------------------
+
 /** Initializes the soccer world. It sets up the data structure
  *  to keep track of points etc. for each kart.
  */
@@ -94,6 +102,12 @@ void SoccerWorld::reset()
 
         obj->reset();
         obj->getPhysics()->reset();
+    }
+    
+    if (m_goal_sound != NULL &&
+        m_goal_sound->getStatus() == SFXManager::SFX_PLAYING)
+    {
+        m_goal_sound->stop();
     }
 
     initKartList();
