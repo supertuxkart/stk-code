@@ -34,6 +34,8 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
+#include "IMeshManipulator.h"
+
 #define SKELETON_DEBUG 0
 
 float KartModel::UNDEFINED = -99.9f;
@@ -276,7 +278,8 @@ KartModel* KartModel::makeCopy()
     km->m_kart_width        = m_kart_width;
     km->m_kart_length       = m_kart_length;
     km->m_kart_height       = m_kart_height;
-	km->m_kart_highest_point = m_kart_highest_point;
+	km->m_kart_highest_point= m_kart_highest_point;
+    km->m_kart_lowest_point = m_kart_lowest_point;
     km->m_mesh              = m_mesh;
     km->m_model_filename    = m_model_filename;
     km->m_animation_speed   = m_animation_speed;
@@ -393,6 +396,10 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         {
             if(!m_wheel_model[i]) continue;
             m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], node);
+            Vec3 wheel_min, wheel_max;
+            MeshTools::minMax3D(m_wheel_model[i], &wheel_min, &wheel_max);
+            m_wheel_graphics_radius[i] = 0.5f*(wheel_max.getY() - wheel_min.getY());
+
             m_wheel_node[i]->grab();
     #ifdef DEBUG
             std::string debug_name = m_wheel_filename[i]+" (wheel)";
@@ -445,9 +452,26 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     irr_driver->grabAllTextures(m_mesh);
 
     Vec3 kart_min, kart_max;
-    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), &kart_min, &kart_max);
+    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), 
+                        &kart_min, &kart_max);
 
+#undef MOVE_KART_MESHES
+#ifdef MOVE_KART_MESHES
+    // Kart models are not exactly centered. 
+    scene::IMeshManipulator *mani =
+        irr_driver->getVideoDriver()->getMeshManipulator();
+    Vec3 offset_from_center = -0.5f*(kart_max+kart_min);
+    offset_from_center.setY(-kart_min.getY());
+    offset_from_center.setY(0);
+
+    core::matrix4 translate(core::matrix4::EM4CONST_IDENTITY);
+    translate.setTranslation(offset_from_center.toIrrVector());
+    mani->transform(m_mesh, translate);
+    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), 
+                        &kart_min, &kart_max);
+#endif
 	m_kart_highest_point = kart_max.getY();
+    m_kart_lowest_point  = kart_min.getY();
 
     // Load the speed weighted object models. We need to do that now because it can affect the dimensions of the kart
     for(size_t i=0 ; i < m_speed_weighted_objects.size() ; i++)
@@ -733,7 +757,8 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
  *  \param suspension Suspension height for all four wheels.
  *  \param speed The speed of the kart in meters/sec, used for the speed-weighted objects' animations
  */
-void KartModel::update(float dt, float rotation_dt, float steer, const float suspension[4], float speed)
+void KartModel::update(float dt, float rotation_dt, float steer, 
+                       const float height_above_terrain[4], float speed)
 {
    core::vector3df wheel_steer(0, steer*30.0f, 0);
 
@@ -751,7 +776,8 @@ void KartModel::update(float dt, float rotation_dt, float steer, const float sus
         }
 #endif
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
-        pos.Y += suspension[i];
+        pos.Y = m_kart_lowest_point -  height_above_terrain[i] 
+              + m_wheel_graphics_radius[i];
         m_wheel_node[i]->setPosition(pos);
 
         // Now calculate the new rotation: (old + change) mod 360

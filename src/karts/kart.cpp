@@ -1336,7 +1336,6 @@ void Kart::update(float dt)
         m_shadow->enableShadow();
         m_shadow_enabled = true;  
     }
-    //m_shadow->disableShadow();
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -2354,6 +2353,12 @@ void Kart::setSuspensionLength()
     {
         m_default_suspension_length[i] =
             m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
+        m_default_suspension_length[i] =
+            getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getY()-
+                       m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactPointWS.getY();
+        m_default_suspension_length[i] = (  m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS
+                                          - m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactPointWS).length()
+                                          - m_vehicle->getWheelInfo(i).m_chassisConnectionPointCS.getY();
     }   // for i
 }   // setSuspensionLength
 
@@ -2395,20 +2400,27 @@ void Kart::applyEngineForce(float force)
 void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
                           const btQuaternion& rotation)
 {
-    float wheel_up_axis[4];
+    float height_above_terrain[4];
+    float min_hat = 9999.9f;
     for(unsigned int i=0; i<4; i++)
     {
         // Set the suspension length
-        wheel_up_axis[i] = m_default_suspension_length[i]
-                         - m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
+        height_above_terrain[i] = 
+            (  m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS
+             - m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactPointWS).length()
+            - m_vehicle->getWheelInfo(i).m_chassisConnectionPointCS.getY();
+        if(height_above_terrain[i] < min_hat) min_hat = height_above_terrain[i];
     }
-    m_kart_model->update(dt, m_wheel_rotation_dt, getSteerPercent(), wheel_up_axis, m_speed);
 
-    Vec3 center_shift  = m_kart_properties->getGravityCenterShift();
-    
-    float kart_y_offset = m_kart_model->getWheelGraphicsRadius(0) 
-                        - m_vehicle->getWheelInfo(0).m_wheelsRadius
-                        + m_skidding->getGraphicalJumpOffset();
+    float chassis_delta = 0;
+    if(min_hat > m_kart_model->getLowestPoint())
+    {
+        chassis_delta = min_hat - m_kart_model->getLowestPoint();
+        for(unsigned int i=0; i<4; i++)
+            height_above_terrain[i] -= chassis_delta;
+    }
+    m_kart_model->update(dt, m_wheel_rotation_dt, getSteerPercent(), 
+                        height_above_terrain, m_speed);
 
     if ((m_controls.m_nitro || m_min_nitro_time > 0.0f) && isOnGround() &&  m_collected_energy > 0)
     {
@@ -2496,7 +2508,10 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // To avoid this, raise the kart enough to offset the leaning.
     float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
 
-    center_shift.setY(kart_y_offset + lean_height);
+    Vec3 center_shift  = m_kart_properties->getGravityCenterShift();
+
+    center_shift.setY(m_skidding->getGraphicalJumpOffset() + lean_height 
+                       - m_kart_model->getLowestPoint() -chassis_delta    );
     float heading = m_skidding->getVisualSkidRotation();
     Moveable::updateGraphics(dt, center_shift,
                              btQuaternion(heading, 0, m_current_lean));

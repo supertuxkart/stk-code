@@ -190,10 +190,21 @@ private:
      *  to AF_DEFAULT the default steering animation is shown. */
     AnimationFrameType m_current_animation;
 
-    float m_kart_width;               /**< Width of kart.  */
-    float m_kart_length;              /**< Length of kart. */
-    float m_kart_height;              /**< Height of kart. */
-	float m_kart_highest_point;       /**< Coordinate on up axis */
+    /** Width of kart.  */
+    float m_kart_width;
+
+    /** Length of kart. */
+    float m_kart_length;
+
+    /** Height of kart. */
+    float m_kart_height;
+
+    /** Largest coordinate on up axis. */
+	float m_kart_highest_point;
+
+    /** Smallest coordinate on up axis. */
+    float m_kart_lowest_point; 
+
     /** True if this is the master copy, managed by KartProperties. This
      *  is mainly used for debugging, e.g. the master copies might not have
      * anything attached to it etc. */
@@ -205,7 +216,8 @@ private:
     void  loadNitroEmitterInfo(const XMLNode &node,
                         const std::string &emitter_name, int index);
 
-    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, const SpeedWeightedObject::Properties& fallback_properties);
+    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, 
+                                const SpeedWeightedObject::Properties& fallback_properties);
 
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
@@ -220,7 +232,7 @@ public:
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
     void          update(float dt, float rotation_dt, float steer,
-                         const float suspension[4], float speed);
+                         const float height_abve_terrain[4], float speed);
     void          setDefaultPhysicsPosition(const Vec3 &center_shift,
                                             float wheel_radius);
     void          finishedRace();
@@ -292,8 +304,11 @@ public:
     /** Returns the height of the kart. */
     float getHeight                 () const {return m_kart_height;      }
 	// ------------------------------------------------------------------------
-	/** Coordoinate on up axis */
+	/** Highest coordinate on up axis */
 	float getHighestPoint           () const { return m_kart_highest_point;  }
+	// ------------------------------------------------------------------------
+	/** Lowest coordinate on up axis */
+	float getLowestPoint           () const { return m_kart_lowest_point;  }
     // ------------------------------------------------------------------------
     /** Enables- or disables the end animation. */
     void  setAnimation(AnimationFrameType type);
