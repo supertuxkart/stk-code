@@ -63,7 +63,7 @@
 * thunderbird model
     by Funto & Kinsu, released under CC-BY-SA 3.0
 
-* thunderbird texture, bomb texture
+* thunderbird texture, easter egg, bomb texture
     by Fraag, released under CC-BY-SA 3.0
 
 * swatter-icon
@@ -72,7 +72,7 @@
 * balldimpleddark
     by Hero, released under CC-BY-SA 3.0
 
-* rubber_ball-icon, plunger icon, cake icon, bowling ball texture and icon
+* rubber_ball-icon, plunger icon, easter egg icon, cake icon, bowling ball texture and icon
     by Totoplus62, released under CC-BY-SA 3.0
 
 * shield-icon
