@@ -354,8 +354,8 @@ void handleXmasMode()
             int day, month;
             StkTime::getDate(&day, &month);
             // Christmat hats are shown between 17. of December
-            // and 9th of January
-            xmas = (month == 12 && day>=17)  || (month ==  1 && day <10);
+            // and 5th of January
+            xmas = (month == 12 && day>=17)  || (month ==  1 && day <=5);
             break;
         }
     case 1:  xmas = true;  break;
