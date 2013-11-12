@@ -602,9 +602,6 @@ void World::resetAllKarts()
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
-        // Now store the current (i.e. in rest) suspension length for each
-        // kart, so that the karts can visualise the suspension.
-        (*i)->setSuspensionLength();
         // Update the kart transforms with the newly computed position
         // after all karts are reset
         (*i)->setTrans((*i)->getBody()->getWorldTransform());
