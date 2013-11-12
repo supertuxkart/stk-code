@@ -457,7 +457,10 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
 
 #undef MOVE_KART_MESHES
 #ifdef MOVE_KART_MESHES
-    // Kart models are not exactly centered. 
+    // Kart models are not exactly centered. The following code would
+    // transform the mesh so that they are properly centered, but it
+    // would also mean all location relative to the original kart's
+    // center (wheel position, emitter, hat) would need to be modified.
     scene::IMeshManipulator *mani =
         irr_driver->getVideoDriver()->getMeshManipulator();
     Vec3 offset_from_center = -0.5f*(kart_max+kart_min);

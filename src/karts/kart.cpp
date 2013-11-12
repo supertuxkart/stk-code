@@ -2340,29 +2340,6 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 }   // loadData
 
 // ----------------------------------------------------------------------------
-/** Stores the current suspension length. This function is called from world
- *  after all karts are in resting position (see World::resetAllKarts), so
- *  that the default suspension rest length can be stored. This is then used
- *  later to move the wheels depending on actual suspension, so that when
- *  a kart is in rest, the wheels are at the position at which they were
- *  modelled.
- */
-void Kart::setSuspensionLength()
-{
-    for(unsigned int i=0; i<4; i++)
-    {
-        m_default_suspension_length[i] =
-            m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
-        m_default_suspension_length[i] =
-            getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getY()-
-                       m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactPointWS.getY();
-        m_default_suspension_length[i] = (  m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS
-                                          - m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactPointWS).length()
-                                          - m_vehicle->getWheelInfo(i).m_chassisConnectionPointCS.getY();
-    }   // for i
-}   // setSuspensionLength
-
-//-----------------------------------------------------------------------------
 /** Applies engine power to all the wheels that are traction capable,
  *  so other parts of code do not have to be adjusted to simulate different
  *  kinds of vehicles in the general case, only if they are trying to
@@ -2400,29 +2377,11 @@ void Kart::applyEngineForce(float force)
 void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
                           const btQuaternion& rotation)
 {
-    float height_above_terrain[4];
-    float min_hat = 9999.9f;
-    for(unsigned int i=0; i<4; i++)
-    {
-        // Set the suspension length
-        height_above_terrain[i] = 
-            (  m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS
-             - m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactPointWS).length()
-            - m_vehicle->getWheelInfo(i).m_chassisConnectionPointCS.getY();
-        if(height_above_terrain[i] < min_hat) min_hat = height_above_terrain[i];
-    }
-
-    float chassis_delta = 0;
-    if(min_hat > m_kart_model->getLowestPoint())
-    {
-        chassis_delta = min_hat - m_kart_model->getLowestPoint();
-        for(unsigned int i=0; i<4; i++)
-            height_above_terrain[i] -= chassis_delta;
-    }
-    m_kart_model->update(dt, m_wheel_rotation_dt, getSteerPercent(), 
-                        height_above_terrain, m_speed);
-
-    if ((m_controls.m_nitro || m_min_nitro_time > 0.0f) && isOnGround() &&  m_collected_energy > 0)
+    // Upate particle effects (creation rate, and emitter size 
+    // depending on speed)
+    // --------------------------------------------------------
+    if ( (m_controls.m_nitro || m_min_nitro_time > 0.0f) && 
+         isOnGround() &&  m_collected_energy > 0            )
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
@@ -2450,6 +2409,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     m_kart_gfx->resizeBox(KartGFX::KGFX_ZIPPER, getSpeed(), dt);
 
+    // Handle leaning of karts
+    // -----------------------
     // Note that we compare with maximum speed of the kart, not
     // maximum speed including terrain effects. This avoids that
     // leaning might get less if a kart gets a special that increases
@@ -2503,6 +2464,41 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
                 m_current_lean = 0.0f;
         }
     }
+
+    // Now determine graphical chassis and wheel position depending on
+    // the physics result. The center of gravity of the chassis is at the 
+    // bottom of the chassis, but the position of the graphical chassis is at
+    // the bottom of the wheels (i.e. in blender the kart is positioned on
+    // the horizonal plane through (0,0,0)). So first determine how far
+    // above the terrain is the center of the physics body. If the minimum
+    // of those values is larger than the lowest point of the chassis model
+    // the kart chassis would be too high (and look odd), so in this case
+    // move the chassis down so that the wheels (when touching the ground)
+    // look close enough to the chassis.
+    float height_above_terrain[4];
+    float min_hat = 9999.9f;
+    for(unsigned int i=0; i<4; i++)
+    {
+        // Set the suspension length
+        height_above_terrain[i] = 
+            (  m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS
+             - m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactPointWS).length()
+            - m_vehicle->getWheelInfo(i).m_chassisConnectionPointCS.getY();
+        if(height_above_terrain[i] < min_hat) min_hat = height_above_terrain[i];
+    }
+
+    float chassis_delta = 0;
+    // Check if the chassis needs to be moved down so that the wheels look
+    // like they are in the rest state, i.e. the wheels are not too far down.
+    if(min_hat > m_kart_model->getLowestPoint())
+    {
+        chassis_delta = min_hat - m_kart_model->getLowestPoint();
+        for(unsigned int i=0; i<4; i++)
+            height_above_terrain[i] -= chassis_delta;
+    }
+    m_kart_model->update(dt, m_wheel_rotation_dt, getSteerPercent(), 
+                        height_above_terrain, m_speed);
+
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.

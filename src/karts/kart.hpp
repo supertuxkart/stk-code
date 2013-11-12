@@ -184,12 +184,6 @@ private:
     /** Rotation change in the last time delta, same for all wheels */
     float           m_wheel_rotation_dt;
 
-    /** For each wheel it stores the suspension length after the karts are at
-     *  the start position, i.e. the suspension will be somewhat compressed.
-     *  The bullet suspensionRestLength is the value when the suspension is not
-     *  at all compressed. */
-    float           m_default_suspension_length[4];
-
     /** The skidmarks object for this kart. */
     SkidMarks      *m_skidmarks;
 
@@ -239,7 +233,6 @@ public:
     virtual void   createPhysics    ();
     virtual void   updateWeight     ();
     virtual bool   isInRest         () const;
-    virtual void   setSuspensionLength();
     virtual void   applyEngineForce (float force);
 
     virtual void flyUp();

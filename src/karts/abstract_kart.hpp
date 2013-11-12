@@ -363,14 +363,6 @@ public:
      *  over. */
     virtual void startEngineSFX() = 0;
     // ------------------------------------------------------------------------
-    /** Stores the current suspension length. This function is called from
-     *  world after all karts are in resting position (see
-     *  World::resetAllKarts), so that the default suspension rest length can
-     *  be stored. This is then used later to move the wheels depending on
-     *  actual suspension, so that when a kart is in rest, the wheels are at
-     *  the position at which they were modelled. */
-    virtual void setSuspensionLength() = 0;
-    // ------------------------------------------------------------------------
     /** This method is to be called every time the mass of the kart is updated,
      *  which includes attaching an anvil to the kart (and detaching). */
     virtual void updateWeight() = 0;
