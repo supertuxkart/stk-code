@@ -344,6 +344,9 @@ private:
 
     bool m_have_kart_last_position_on_overworld;
     Vec3 m_kart_last_position_on_overworld;
+    
+    /** Determines if saved GP should be continued or not*/
+    bool m_continue_saved_gp;
 
 public:
          RaceManager();
@@ -669,7 +672,8 @@ public:
       * \brief Higher-level method to start a GP without having to care about
       *  the exact startup sequence
       */
-    void  startGP(const GrandPrixData* gp, bool from_overworld);
+    void  startGP(const GrandPrixData* gp, bool from_overworld, 
+                  bool continue_saved_gp);
 
     /**
       * \brief Higher-level method to start a GP without having to care about

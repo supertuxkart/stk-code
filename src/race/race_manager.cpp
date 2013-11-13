@@ -337,7 +337,7 @@ void RaceManager::startNew(bool from_overworld)
     }
 
     m_track_number = 0;
-    if(m_major_mode==MAJOR_MODE_GRAND_PRIX)
+    if(m_major_mode==MAJOR_MODE_GRAND_PRIX && m_continue_saved_gp)
     {
         //We look if Player 1 has a saved version of this GP.
         // =================================================
@@ -746,7 +746,8 @@ void RaceManager::rerunRace()
 
 //-----------------------------------------------------------------------------
 
-void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld)
+void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld, 
+                          bool continue_saved_gp)
 {
     assert(gp != NULL);
 
@@ -754,6 +755,7 @@ void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld)
     setGrandPrix(*gp);
     setCoinTarget( 0 ); // Might still be set from a previous challenge
     network_manager->setupPlayerKartInfo();
+    m_continue_saved_gp = continue_saved_gp;
 
     setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
     startNew(from_overworld);
