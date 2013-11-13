@@ -345,9 +345,11 @@ void IrrDriver::initDevice()
                            "anti-alias setting : %i\n",
                            (int)UserConfigParams::m_antialiasing);
             }
+            m_device = createDeviceEx(params);
+            if(m_device)
+                break;
         }   // for bits=32, 24, 16
 
-        m_device = createDeviceEx(params);
 
         // if still no device, try with a standard 800x600 window size, maybe
         // size is the problem
