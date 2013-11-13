@@ -28,8 +28,9 @@
 #include "utils/leak_check.hpp"
 
 
-class XMLNode;
+class Material;
 class TrackObject;
+class XMLNode;
 
 /**
   * \ingroup physics
@@ -139,8 +140,9 @@ public:
     virtual void handleExplosion(const Vec3& pos, bool directHit);
     void         update         (float dt);
     void         init           ();
-	bool         isSoccerBall();
-
+    void         move           (const Vec3& xyz, const core::vector3df& hpr);
+    void         hit            (const Material *m, const Vec3 &normal);
+    bool         isSoccerBall   () const;
     // ------------------------------------------------------------------------
     /** Returns the rigid body of this physical object. */
     btRigidBody *getBody        ()          { return m_body; }
@@ -148,10 +150,15 @@ public:
     /** Returns true if this object should trigger a rescue in a kart that
      *  hits it. */
     bool isCrashReset() const { return m_crash_reset; }
+    // ------------------------------------------------------------------------
+    /** Returns true if this object should cause an explosion if a kart hits
+     *  it. */
     bool isExplodeKartObject () const { return m_explode_kart; }
+    // ------------------------------------------------------------------------
+    /** Returns true if this object should cause a kart that touches it to
+     *  be flattened. */
     bool isFlattenKartObject () const { return m_flatten_kart; }
 
-    void move(const Vec3& xyz, const core::vector3df& hpr);
 
     LEAK_CHECK()
 };  // PhysicalObject

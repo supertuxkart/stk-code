@@ -529,10 +529,27 @@ void PhysicalObject::handleExplosion(const Vec3& pos, bool direct_hit)
 }   // handleExplosion
 
 // ----------------------------------------------------------------------------
-bool PhysicalObject::isSoccerBall()
+/** Returns true if this object is a soccer ball.
+ */
+bool PhysicalObject::isSoccerBall() const
 {
 	return m_object->isSoccerBall(); 
-}
+}   // is SoccerBall
+
+// ----------------------------------------------------------------------------
+/** Called when a physical object hits the track. Atm only used to push a
+ *  soccer ball away from the edge of the field.
+ *  \param m Material which was hit.
+ *  \param normal Normal of the track at the hit point.
+ */
+void PhysicalObject::hit(const Material *m, const Vec3 &normal)
+{
+    if(isSoccerBall() && m->getCollisionReaction() == Material::PUSH_BACK)
+    {
+        m_body->applyCentralImpulse(normal * 1000.0f);
+    }
+}   // hit
+
 // ----------------------------------------------------------------------------
 /* EOF */
 

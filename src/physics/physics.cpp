@@ -486,6 +486,16 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                                                             .m_normalWorldOnB;
                 kart->crashed(m, normal);
             }
+            else if(upB->is(UserPointer::UP_PHYSICAL_OBJECT))
+            {
+                int n = contact_manifold->getContactPoint(0).m_index1;
+                const Material *m
+                    = n>=0 ? upA->getPointerTriangleMesh()->getMaterial(n)
+                           : NULL;
+                const btVector3 &normal = contact_manifold->getContactPoint(0)
+                                                           .m_normalWorldOnB;
+                upB->getPointerPhysicalObject()->hit(m, normal);
+            }
         }
         // 2) object a is a kart
         // =====================
@@ -553,6 +563,16 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                 m_all_collisions.push_back(
                     upA, contact_manifold->getContactPoint(0).m_localPointA,
                     upB, contact_manifold->getContactPoint(0).m_localPointB);
+            else if(upB->is(UserPointer::UP_TRACK))
+            {
+                int n = contact_manifold->getContactPoint(0).m_index1;
+                const Material *m
+                    = n>=0 ? upB->getPointerTriangleMesh()->getMaterial(n)
+                           : NULL;
+                const btVector3 &normal = contact_manifold->getContactPoint(0)
+                                                           .m_normalWorldOnB;
+                upA->getPointerPhysicalObject()->hit(m, normal);
+            }
         }
         else if (upA->is(UserPointer::UP_ANIMATION))
         {
