@@ -19,6 +19,7 @@
 
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/saved_grand_prix.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -140,10 +141,21 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     // ---- Start button
     ButtonWidget* okBtn = new ButtonWidget();
 
+    SavedGrandPrix* saved_gp = SavedGrandPrix::getSavedGP( StateManager::get()
+                                               ->getActivePlayerProfile(0)
+                                               ->getUniqueID(),
+                                               gpIdent,
+                                               race_manager->getDifficulty(),
+                                               race_manager->getNumberOfKarts(),
+                                               race_manager->getNumLocalPlayers());
+
     if (gp_ok)
     {
         okBtn->m_properties[PROP_ID] = "start";
-        okBtn->setText(_("Start Grand Prix"));
+        if (saved_gp)
+            okBtn->setText(_("Continue Grand Prix"));
+        else
+            okBtn->setText(_("Start Grand Prix"));
     }
     else
     {

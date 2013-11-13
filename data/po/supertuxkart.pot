@@ -788,6 +788,10 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
+#: src/states_screens/dialogs/gp_info_dialog.cpp:156
+msgid "Continue Grand Prix"
+msgstr ""
+
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/options_device.stkgui
@@ -1901,7 +1905,7 @@ msgstr ""
 msgid "Start Game"
 msgstr ""
 
-#: src/states_screens/dialogs/gp_info_dialog.cpp:146
+#: src/states_screens/dialogs/gp_info_dialog.cpp:158
 msgid "Start Grand Prix"
 msgstr ""
 
@@ -2039,7 +2043,7 @@ msgid ""
 "all highscores have been erased."
 msgstr ""
 
-#: src/states_screens/dialogs/gp_info_dialog.cpp:151
+#: src/states_screens/dialogs/gp_info_dialog.cpp:163
 msgid "This Grand Prix is broken!"
 msgstr ""
 
