@@ -2387,7 +2387,11 @@ inline void COpenGLExtensionHandler::extGlProgramParameteri(GLhandleARB program,
 #elif defined(GL_ARB_geometry_shader4)
 	glProgramParameteriARB(program, pname, value);
 #elif defined(GL_EXT_geometry_shader4)
+    #ifdef __clang__
+    glProgramParameteriEXT((long)program, pname, value);
+    #else
 	glProgramParameteriEXT((long GLuint)program, pname, value);
+    #endif
 #elif defined(GL_NV_geometry_program4) || defined(GL_NV_geometry_shader4)
 	glProgramParameteriNV(program, pname, value);
 #else
