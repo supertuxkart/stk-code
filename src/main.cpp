@@ -1264,19 +1264,6 @@ static void cleanSuperTuxKart()
     if(music_manager)           delete music_manager;
     delete ParticleKindManager::get();
     if(stk_config)              delete stk_config;
-
-#ifndef WIN32
-    if (user_config) //close logfiles
-    {
-        Log::closeOutputFiles();
-#endif
-        fclose(stderr);
-        fclose(stdout);
-#ifndef WIN32
-    }
-#endif
-
-
     if(user_config)             delete user_config;
     if(unlock_manager)          delete unlock_manager;
     if(translations)            delete translations;
@@ -1574,6 +1561,19 @@ int main(int argc, char *argv[] )
 #ifdef DEBUG
     MemoryLeaks::checkForLeaks();
 #endif
+
+#ifndef WIN32
+    if (user_config) //close logfiles
+    {
+        Log::closeOutputFiles();
+#endif
+        fclose(stderr);
+        fclose(stdout);
+#ifndef WIN32
+    }
+#endif
+
+
 
     return 0 ;
 }   // main
