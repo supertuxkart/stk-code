@@ -401,6 +401,7 @@ void Track::loadTrackInfo()
                 break; 
             } 
         } 
+        delete easter;
     } 
 }   // loadTrackInfo
 

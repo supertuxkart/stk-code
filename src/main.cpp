@@ -1236,6 +1236,9 @@ void initRest()
  */
 static void cleanSuperTuxKart()
 {
+
+    delete main_loop;
+
     irr_driver->updateConfigIfRelevant();
 
     if(INetworkHttp::get())
