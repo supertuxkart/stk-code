@@ -953,6 +953,8 @@ namespace GUIEngine
         //delete g_small_font;
         g_small_font->drop();
         g_small_font = NULL;
+        g_large_font->drop();
+        g_large_font = NULL;
         g_digit_font->drop();
         g_digit_font = NULL;
 
