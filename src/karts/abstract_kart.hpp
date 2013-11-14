@@ -55,10 +55,6 @@ private:
 	float m_kart_highest_point;
     /** The position of all four wheels in the 3d model */
     const Vec3* m_wheel_graphics_position;
-    /** The position of all nitro emitters in the 3d model */
-    const Vec3* m_nitro_emitter_position;
-    /** True if kart has nitro emitters */
-    bool m_has_nitro_emitter;
 
     /** Index of kart in world. */
     unsigned int m_world_kart_id;
@@ -144,6 +140,9 @@ public:
     /** Returns this kart's kart model. */
     KartModel* getKartModel() { return m_kart_model;      }
     // ------------------------------------------------------------------------
+    /** Returns this kart's kart model. */
+    const KartModel* getKartModel() const { return m_kart_model;      }
+    // ------------------------------------------------------------------------
     /** Returns the length of the kart. */
     float getKartLength() const { return m_kart_length; }
     // ------------------------------------------------------------------------
@@ -164,14 +163,6 @@ public:
      *           right, 3 = rear left.  */
     const Vec3& getWheelGraphicsPosition(int i) const
                 {assert(i>=0 && i<4); return m_wheel_graphics_position[i];}
-    // ------------------------------------------------------------------------
-    /** Returns the position of a nitro emitter relative to the kart */
-    const Vec3& getNitroEmitterPosition(int i) const
-                {assert(i>=0 && i<2); return m_nitro_emitter_position[i];}
-    // ------------------------------------------------------------------------
-    /** Returns true if kart has nitro emitters */
-    const bool hasNitroEmitter() const
-                {return m_has_nitro_emitter;}
 
     // ========================================================================
     // Emergency animation related functions.

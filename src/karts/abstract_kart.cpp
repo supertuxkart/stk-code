@@ -55,8 +55,6 @@ AbstractKart::AbstractKart(const std::string& ident,
     m_kart_length = m_kart_model->getLength();
 	m_kart_highest_point = m_kart_model->getHighestPoint();
     m_wheel_graphics_position = m_kart_model->getWheelsGraphicsPosition();
-    m_nitro_emitter_position = m_kart_model->getNitroEmittersPositon();
-    m_has_nitro_emitter = m_kart_model->hasNitroEmitters();
 }   // AbstractKart
 
 // ----------------------------------------------------------------------------

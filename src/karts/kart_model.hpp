@@ -278,9 +278,10 @@ public:
                 {assert(i>=0 && i<4); return m_wheel_graphics_radius[i]; }
     // ------------------------------------------------------------------------
     /** Returns the position of nitro emitter relative to the kart.
+     *  \param i Index of the emitter: 0 = right, 1 = left
      */
-    const Vec3* getNitroEmittersPositon() const
-                {return m_nitro_emitter_position;}
+    const Vec3& getNitroEmittersPositon(unsigned int i) const
+                { assert(i>=0 && i<2);  return m_nitro_emitter_position[i]; }
     // ------------------------------------------------------------------------
     /** Returns true if kart has nitro emitters */
     const bool hasNitroEmitters() const
