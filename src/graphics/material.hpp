@@ -73,7 +73,8 @@ public:
     {
         NORMAL,
         RESCUE,
-        PUSH_BACK
+        PUSH_BACK,
+        PUSH_SOCCER_BALL
     };
 
 private:

@@ -544,7 +544,7 @@ bool PhysicalObject::isSoccerBall() const
  */
 void PhysicalObject::hit(const Material *m, const Vec3 &normal)
 {
-    if(isSoccerBall() && m->getCollisionReaction() == Material::PUSH_BACK)
+    if(isSoccerBall() && m->getCollisionReaction() == Material::PUSH_SOCCER_BALL)
     {
         m_body->applyCentralImpulse(normal * 1000.0f);
     }

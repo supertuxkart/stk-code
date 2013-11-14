@@ -458,6 +458,10 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     {
         m_collision_reaction = PUSH_BACK;
     }
+    else if (creaction == "push-soccer")
+    {
+        m_collision_reaction = PUSH_SOCCER_BALL;
+    }
     else if (creaction.size() > 0)
     {
         fprintf(stderr, "[Material] WARNING: Unknown collision reaction '%s'\n", creaction.c_str());
