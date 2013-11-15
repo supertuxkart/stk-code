@@ -39,6 +39,9 @@ public:
         ~MainLoop();
     void run();
     void abort();
+    // ------------------------------------------------------------------------
+    /** Returns true if STK is to be stoppe. */
+    bool isAborted() const { return m_abort; }
 };   // MainLoop
 
 extern MainLoop* main_loop;

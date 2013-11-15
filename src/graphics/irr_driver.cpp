@@ -1586,6 +1586,11 @@ void IrrDriver::update(float dt)
         return;
     }
 
+    // If we quit via the menu the m_device->run() does not return true.
+    // To avoid any other calls, we return here.
+    if(main_loop->isAborted())
+        return;
+
     // If the resolution should be switched, do it now. This will delete the
     // old device and create a new one.
     if (m_resolution_changing!=RES_CHANGE_NONE)
