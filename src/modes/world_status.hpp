@@ -79,8 +79,8 @@ public:
         // Undefined, used in asserts to catch incorrect states.
         UNDEFINED_PHASE,
 
-		//Goal scored phase
-		GOAL_PHASE
+        //Goal scored phase
+        GOAL_PHASE
     };
 protected:
     /** Sound to play at the beginning of a race, during which a

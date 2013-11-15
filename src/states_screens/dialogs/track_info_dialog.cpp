@@ -122,7 +122,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
 
     // Reverse track
     const bool reverse_available = track->reverseAvailable() &&
-								   race_manager->getMinorMode() != RaceManager::MINOR_MODE_EASTER_EGG;
+               race_manager->getMinorMode() != RaceManager::MINOR_MODE_EASTER_EGG;
     if (reverse_available)
     {
         m_checkbox = getWidget<CheckBoxWidget>("reverse");

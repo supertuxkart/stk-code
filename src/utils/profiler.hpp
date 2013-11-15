@@ -77,8 +77,8 @@ private:
         }
     };
 
-    typedef	std::list<Marker>   MarkerList;
-    typedef	std::stack<Marker>  MarkerStack;
+    typedef    std::list<Marker>   MarkerList;
+    typedef    std::stack<Marker>  MarkerStack;
 
     struct ThreadInfo
     {
@@ -86,7 +86,7 @@ private:
         MarkerStack  markers_stack[2];
     };
 
-    typedef	std::vector<ThreadInfo>	ThreadInfoList;
+    typedef    std::vector<ThreadInfo>  ThreadInfoList;
 
     ThreadInfoList  m_thread_infos;
     int             m_write_id;

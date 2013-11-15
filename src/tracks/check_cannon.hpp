@@ -36,7 +36,7 @@ class XMLNode;
 class CheckCannon : public CheckLine
 {
 private:
-	/** The target point the kart will fly to. */
+    /** The target point the kart will fly to. */
     core::line3df   m_target;
 
     /** Stores the cannon curve data. */

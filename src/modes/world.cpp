@@ -265,11 +265,7 @@ void World::reset()
 
 void World::createRaceGUI()
 {
-    //if(UserConfigParams::m_minimal_race_gui &&
-    //   race_manager->getTrackName() != "tutorial")
-	//	m_race_gui = new MinimalRaceGUI();
-	//else
-		m_race_gui = new RaceGUI();
+    m_race_gui = new RaceGUI();
 }
 
 //-----------------------------------------------------------------------------
@@ -300,7 +296,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
-		break;  // Avoid compiler warning about enum not handled.
+        break;  // Avoid compiler warning about enum not handled.
         //controller = new NetworkController(kart_ident, position, init_pos,
         //                          global_player_id);
         //m_num_players++;

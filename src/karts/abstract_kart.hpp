@@ -51,8 +51,8 @@ private:
     float m_kart_width;
     /** Height of the kart, copy of the data from KartModel. */
     float m_kart_height;
-	/** Coordinate on up axis */
-	float m_kart_highest_point;
+    /** Coordinate on up axis */
+    float m_kart_highest_point;
     /** The position of all four wheels in the 3d model */
     const Vec3* m_wheel_graphics_position;
 
@@ -151,9 +151,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the width of the kart. */
     float getKartWidth() const {return m_kart_width; }
-	// ------------------------------------------------------------------------
-	/** Returns the highest point of the kart (coordinate on up axis) */
-	float getHighestPoint() const { return m_kart_highest_point;  }
+    // ------------------------------------------------------------------------
+    /** Returns the highest point of the kart (coordinate on up axis) */
+    float getHighestPoint() const { return m_kart_highest_point;  }
     // ------------------------------------------------------------------------
     /** Returns true if this kart has no wheels. */
     bool isWheeless() const;

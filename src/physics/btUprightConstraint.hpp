@@ -111,7 +111,7 @@ public:
                                          timeStep);
     virtual void getInfo1 (btConstraintInfo1* info);
     virtual void getInfo2 (btConstraintInfo2* info);
-    virtual	void setParam(int num, btScalar value, int axis = -1);
+    virtual void setParam(int num, btScalar value, int axis = -1);
     virtual btScalar getParam(int num, int axis) const;
 
 };

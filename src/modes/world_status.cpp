@@ -146,7 +146,7 @@ void WorldStatus::update(const float dt)
             // long, we use the aux timer to force the next phase
             // after 3.5 seconds.
             if(m_track_intro_sound->getStatus()==SFXManager::SFX_PLAYING
-	            && m_auxiliary_timer<3.5f)
+                && m_auxiliary_timer<3.5f)
                 return;
             // Wait before ready phase if sounds are disabled
             if(!UserConfigParams::m_sfx && m_auxiliary_timer<3.0f)
@@ -239,8 +239,8 @@ void WorldStatus::update(const float dt)
         case FINISH_PHASE:
             // Nothing to do here.
             break;
-		case GOAL_PHASE:
-			// Nothing to do here as well.
+        case GOAL_PHASE:
+            // Nothing to do here as well.
 
         default: break;
     }

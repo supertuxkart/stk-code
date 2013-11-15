@@ -219,7 +219,7 @@ void ParticleEmitter::update(float dt)
 
     // the emission direction does not automatically follow the orientation of
     // the node so fix that manually...
-    core::matrix4 	transform = m_node->getAbsoluteTransformation();
+    core::matrix4   transform = m_node->getAbsoluteTransformation();
     core::vector3df velocity(m_particle_type->getVelocityX(),
                              m_particle_type->getVelocityY(),
                              m_particle_type->getVelocityZ());

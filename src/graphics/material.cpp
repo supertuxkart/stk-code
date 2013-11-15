@@ -1426,11 +1426,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         /**
         //! Texture is clamped to the last pixel
-		ETC_CLAMP,
-		//! Texture is clamped to the edge pixel
-		ETC_CLAMP_TO_EDGE,
-		//! Texture is clamped to the border pixel (if exists)
-		ETC_CLAMP_TO_BORDER,
+        ETC_CLAMP,
+        //! Texture is clamped to the edge pixel
+        ETC_CLAMP_TO_EDGE,
+        //! Texture is clamped to the border pixel (if exists)
+        ETC_CLAMP_TO_BORDER,
         */
         for (unsigned int n=0; n<video::MATERIAL_MAX_TEXTURES; n++)
         {

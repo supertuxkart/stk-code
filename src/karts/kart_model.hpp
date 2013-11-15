@@ -200,7 +200,7 @@ private:
     float m_kart_height;
 
     /** Largest coordinate on up axis. */
-	float m_kart_highest_point;
+    float m_kart_highest_point;
 
     /** Smallest coordinate on up axis. */
     float m_kart_lowest_point; 
@@ -304,12 +304,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the height of the kart. */
     float getHeight                 () const {return m_kart_height;      }
-	// ------------------------------------------------------------------------
-	/** Highest coordinate on up axis */
-	float getHighestPoint           () const { return m_kart_highest_point;  }
-	// ------------------------------------------------------------------------
-	/** Lowest coordinate on up axis */
-	float getLowestPoint           () const { return m_kart_lowest_point;  }
+    // ------------------------------------------------------------------------
+    /** Highest coordinate on up axis */
+    float getHighestPoint           () const { return m_kart_highest_point;  }
+    // ------------------------------------------------------------------------
+    /** Lowest coordinate on up axis */
+    float getLowestPoint           () const { return m_kart_lowest_point;  }
     // ------------------------------------------------------------------------
     /** Enables- or disables the end animation. */
     void  setAnimation(AnimationFrameType type);
@@ -319,15 +319,15 @@ public:
     // ------------------------------------------------------------------------
     /**  Name of the hat mesh to use. */
     void setHatMeshName(const std::string &name) {m_hat_name = name; }
-	// ------------------------------------------------------------------------
-	void attachHat();
+    // ------------------------------------------------------------------------
+    void attachHat();
     // ------------------------------------------------------------------------
     /** Returns the array of wheel nodes. */
     scene::ISceneNode** getWheelNodes() { return m_wheel_node; }
-	// ------------------------------------------------------------------------
-	scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
-	// ------------------------------------------------------------------------
-	core::vector3df getHatOffset() { return m_hat_offset; }
+    // ------------------------------------------------------------------------
+    scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
+    // ------------------------------------------------------------------------
+    core::vector3df getHatOffset() { return m_hat_offset; }
 
 };   // KartModel
 #endif

@@ -105,7 +105,7 @@ private:
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
     void drawGlobalTimer       ();
-	void drawScores();
+    void drawScores();
 
 
 public:

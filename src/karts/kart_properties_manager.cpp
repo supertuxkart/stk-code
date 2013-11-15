@@ -192,7 +192,7 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
 {
     std::string config_filename=dir+"/kart.xml";
     if(!file_manager->fileExists(config_filename))
-    	return false;
+        return false;
 
     KartProperties* kart_properties;
     try

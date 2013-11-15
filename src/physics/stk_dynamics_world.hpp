@@ -24,7 +24,7 @@
 class STKDynamicsWorld : public btDiscreteDynamicsWorld
 {
 public:
-	/** The standard constructor which just created a btDiscreteDynamicsWorld. */
+    /** The standard constructor which just created a btDiscreteDynamicsWorld. */
     STKDynamicsWorld(btDispatcher*             dispatcher,
                      btBroadphaseInterface*    pairCache,
                      btConstraintSolver*       constraintSolver,

@@ -64,7 +64,7 @@ public:
      *  enabling you to count the lap again.
      */
     enum CheckType {CT_NEW_LAP, CT_ACTIVATE, CT_TOGGLE, CT_CANNON,
-		            CT_GOAL, CT_AMBIENT_SPHERE};
+                    CT_GOAL, CT_AMBIENT_SPHERE};
 
 protected:
     /** Stores the previous position of all karts. This is needed to detect

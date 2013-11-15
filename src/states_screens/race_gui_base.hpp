@@ -198,8 +198,8 @@ protected:
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
     void drawGlobalMusicDescription();
-    void drawGlobalReadySetGo  ();
-	void drawGlobalGoal		   ();
+    void drawGlobalReadySetGo();
+    void drawGlobalGoal();
     void drawPlungerInFace(const Camera *camera, float dt);
     /** Instructs the base gui to ignore unimportant messages (like
      *  item messages).

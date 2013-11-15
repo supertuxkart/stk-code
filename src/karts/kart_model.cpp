@@ -278,7 +278,7 @@ KartModel* KartModel::makeCopy()
     km->m_kart_width        = m_kart_width;
     km->m_kart_length       = m_kart_length;
     km->m_kart_height       = m_kart_height;
-	km->m_kart_highest_point= m_kart_highest_point;
+    km->m_kart_highest_point= m_kart_highest_point;
     km->m_kart_lowest_point = m_kart_lowest_point;
     km->m_mesh              = m_mesh;
     km->m_model_filename    = m_model_filename;
@@ -473,7 +473,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), 
                         &kart_min, &kart_max);
 #endif
-	m_kart_highest_point = kart_max.getY();
+    m_kart_highest_point = kart_max.getY();
     m_kart_lowest_point  = kart_min.getY();
 
     // Load the speed weighted object models. We need to do that now because it can affect the dimensions of the kart
@@ -490,7 +490,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
 
         // Update min/max
         Vec3 obj_min, obj_max;
-		MeshTools::minMax3D(obj.m_model, &obj_min, &obj_max);
+        MeshTools::minMax3D(obj.m_model, &obj_min, &obj_max);
         obj_min += obj.m_position;
         obj_max += obj.m_position;
         kart_min.min(obj_min);
@@ -870,37 +870,35 @@ void KartModel::update(float dt, float rotation_dt, float steer,
 }   // update
 //-----------------------------------------------------------------------------
 void KartModel::attachHat(){
-	 m_hat_node = NULL;
-        if(m_hat_name.size()>0)
+    m_hat_node = NULL;
+    if(m_hat_name.size()>0)
+    {
+        scene::IBoneSceneNode *bone = m_animated_node->getJointNode("Head");
+        if(!bone)
+            bone = m_animated_node->getJointNode("head");
+        if(bone)
         {
-            scene::IBoneSceneNode *bone = m_animated_node->getJointNode("Head");
-            if(!bone)
-                bone = m_animated_node->getJointNode("head");
-            if(bone)
-            {
-
-                // Till we have all models fixed, accept Head and head as bone naartme
-                scene::IMesh *hat_mesh =
-                    irr_driver->getAnimatedMesh(
-                         file_manager->getModelFile(m_hat_name));
-                m_hat_node = irr_driver->addMesh(hat_mesh);
-                bone->addChild(m_hat_node);
-                m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
-                m_animated_node->OnAnimate(0);
-                bone->updateAbsolutePosition();
-
-                // With the hat node attached to the head bone, we have to
-                // reverse the transformation of the bone, so that the hat
-                // is still properly placed. Esp. the hat offset needs
-                // to be rotated.
-                const core::matrix4 mat = bone->getAbsoluteTransformation();
-                core::matrix4 inv;
-                mat.getInverse(inv);
-                core::vector3df rotated_offset;
-                inv.rotateVect(rotated_offset, m_hat_offset);
-                m_hat_node->setPosition(rotated_offset);
-                m_hat_node->setScale(inv.getScale());
-                m_hat_node->setRotation(inv.getRotationDegrees());
-            }   // if bone
-        }   // if(m_hat_name)
+             // Till we have all models fixed, accept Head and head as bone naartme
+            scene::IMesh *hat_mesh =
+                irr_driver->getAnimatedMesh(
+                     file_manager->getModelFile(m_hat_name));
+            m_hat_node = irr_driver->addMesh(hat_mesh);
+            bone->addChild(m_hat_node);
+            m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
+            m_animated_node->OnAnimate(0);
+            bone->updateAbsolutePosition();
+             // With the hat node attached to the head bone, we have to
+            // reverse the transformation of the bone, so that the hat
+            // is still properly placed. Esp. the hat offset needs
+            // to be rotated.
+            const core::matrix4 mat = bone->getAbsoluteTransformation();
+            core::matrix4 inv;
+            mat.getInverse(inv);
+            core::vector3df rotated_offset;
+            inv.rotateVect(rotated_offset, m_hat_offset);
+            m_hat_node->setPosition(rotated_offset);
+            m_hat_node->setScale(inv.getScale());
+            m_hat_node->setRotation(inv.getRotationDegrees());
+        }   // if bone
+    }   // if(m_hat_name)
 }

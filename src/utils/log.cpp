@@ -67,9 +67,9 @@ void Log::setTerminalColor(LogLevel level)
 #else
     enum TermAttr
     {
-        TERM_RESET = 0,	// "normal" mode
+        TERM_RESET = 0, // "normal" mode
         TERM_BRIGHT = 1,// more luminosity for the foreground
-        TERM_DIM = 2,	// less luminosity for the foreground
+        TERM_DIM = 2,   // less luminosity for the foreground
     };
 
     enum TermColor

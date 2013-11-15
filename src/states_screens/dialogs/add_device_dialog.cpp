@@ -178,7 +178,7 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent
     {
         // Remove the previous modal dialog to avoid a warning
         GUIEngine::ModalDialog::dismiss();
-		if(wiimote_manager->askUserToConnectWiimotes() > 0)
+        if(wiimote_manager->askUserToConnectWiimotes() > 0)
             ((OptionsScreenInput*)GUIEngine::getCurrentScreen())->rebuildDeviceList();
 
         return GUIEngine::EVENT_BLOCK;

@@ -265,8 +265,8 @@ void IrrDriver::initDevice()
         if(m_modes.size()==0)
         {
             createListOfVideoModes();
-		    // The debug name is only set if irrlicht is compiled in debug
-		    // mode. So we use this to print a warning to the user.
+            // The debug name is only set if irrlicht is compiled in debug
+            // mode. So we use this to print a warning to the user.
             if(m_device->getDebugName())
             {
                 Log::warn("irr_driver",
@@ -858,8 +858,8 @@ scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
         m_scene_manager->addBillboardSceneNode(parent, size);
     assert(node->getMaterialCount() > 0);
     node->setMaterialTexture(0, texture);
-	if(alphaTesting)
-		node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
+    if(alphaTesting)
+        node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
     return node;
 }   // addMesh
 

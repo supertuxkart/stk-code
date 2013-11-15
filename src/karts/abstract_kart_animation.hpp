@@ -41,8 +41,8 @@ private:
     /** Name of this animation, used for debug prints only. */
     std::string m_name;
 protected:
-	/** A pointer to the kart which is animated by this class. */
-	AbstractKart *m_kart;
+   /** A pointer to the kart which is animated by this class. */
+    AbstractKart *m_kart;
 
     /** Timer for the explosion. */
     float m_timer;

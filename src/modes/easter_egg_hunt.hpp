@@ -56,7 +56,7 @@ public:
     virtual bool raceHasLaps(){ return false; }
 
     virtual const std::string& getIdent() const;
-	virtual void terminateRace();
+    virtual void terminateRace();
     virtual void update(float dt);
     virtual void getKartsDisplayInfo(
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info);

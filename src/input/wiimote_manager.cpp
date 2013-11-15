@@ -304,19 +304,19 @@ void* WiimoteManager::threadFuncWrapper(void *data)
  */
 int WiimoteManager::askUserToConnectWiimotes()
 {
-	new MessageDialog(
+    new MessageDialog(
 #ifdef WIN32
-		_("Connect your wiimote to the Bluetooth manager, then click on Ok."
+        _("Connect your wiimote to the Bluetooth manager, then click on Ok."
                   "Detailed instructions at supertuxkart.net/Wiimote"),
 #else
-		_("Press the buttons 1+2 simultaneously on your wiimote to put "
-		  "it in discovery mode, then click on Ok."
+        _("Press the buttons 1+2 simultaneously on your wiimote to put "
+          "it in discovery mode, then click on Ok."
                   "Detailed instructions at supertuxkart.net/Wiimote"),
 #endif
-		MessageDialog::MESSAGE_DIALOG_OK_CANCEL,
-		new WiimoteDialogListener(), true);
+        MessageDialog::MESSAGE_DIALOG_OK_CANCEL,
+        new WiimoteDialogListener(), true);
 
-	return getNumberOfWiimotes();
+    return getNumberOfWiimotes();
 }   // askUserToConnectWiimotes
 
 // ============================================================================
@@ -325,23 +325,23 @@ int WiimoteManager::askUserToConnectWiimotes()
  */
 void WiimoteManager::WiimoteDialogListener::onConfirm()
 {
-	GUIEngine::ModalDialog::dismiss();
+    GUIEngine::ModalDialog::dismiss();
 
-	wiimote_manager->launchDetection(5);
+    wiimote_manager->launchDetection(5);
 
-	int nb_wiimotes = wiimote_manager->getNumberOfWiimotes();
-	if(nb_wiimotes > 0)
-	{
-		core::stringw msg = StringUtils::insertValues(
-			_("Found %d wiimote(s)"),
-			core::stringw(nb_wiimotes));
+    int nb_wiimotes = wiimote_manager->getNumberOfWiimotes();
+    if(nb_wiimotes > 0)
+    {
+        core::stringw msg = StringUtils::insertValues(
+            _("Found %d wiimote(s)"),
+            core::stringw(nb_wiimotes));
 
-		new MessageDialog( msg );
+        new MessageDialog( msg );
 
-	}
-	else
-	{
-		new MessageDialog( _("Could not detect any wiimote :/") );
-	}
+    }
+    else
+    {
+        new MessageDialog( _("Could not detect any wiimote :/") );
+    }
 }   // WiimoteDialogListeneronConfirm
 #endif // ENABLE_WIIUSE

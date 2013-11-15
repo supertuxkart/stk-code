@@ -108,7 +108,7 @@ public:
     virtual void handleZipper(bool play_sound) {};
     virtual void finishedRace(float time) {};
     virtual void collectedItem(const Item &item, int add_info=-1,
-		                       float previous_energy=0) {};
+                               float previous_energy=0) {};
     virtual void setPosition(int p) {};
     virtual bool isNetworkController() const { return false; }
     virtual bool isPlayerController() const { return false; }

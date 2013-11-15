@@ -51,11 +51,11 @@ private:
     SFXBase *m_goal_sound;
     /** Timer for displaying goal text*/
     float m_goal_timer;
-	int m_lastKartToHitBall;
-	std::vector<int> m_redScorers;
-	std::vector<float> m_redScoreTimes;
-	std::vector<int> m_blueScorers;
-	std::vector<float> m_blueScoreTimes;
+    int m_lastKartToHitBall;
+    std::vector<int> m_redScorers;
+    std::vector<float> m_redScoreTimes;
+    std::vector<int> m_blueScorers;
+    std::vector<float> m_blueScoreTimes;
 public:
 
     SoccerWorld();
@@ -83,21 +83,21 @@ public:
 
     void onCheckGoalTriggered(bool first_goal);
     int getTeamLeader(unsigned int i);
-	void setLastKartTohitBall(unsigned int kartId);
-	std::vector<int> getScorers(unsigned int team)
+    void setLastKartTohitBall(unsigned int kartId);
+    std::vector<int> getScorers(unsigned int team)
     {
-		if(team == 0)
-			return m_redScorers;
+        if(team == 0)
+            return m_redScorers;
         else
-			return m_blueScorers;
-	}
-	std::vector<float> getScoreTimes(unsigned int team)
+            return m_blueScorers;
+    }
+    std::vector<float> getScoreTimes(unsigned int team)
     {
-		if(team == 0)
-			return m_redScoreTimes;
-		else
-			return m_blueScoreTimes;
-	}
+        if(team == 0)
+            return m_redScoreTimes;
+        else
+            return m_blueScoreTimes;
+    }
 
 private:
     void initKartList();

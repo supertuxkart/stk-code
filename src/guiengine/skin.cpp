@@ -128,7 +128,7 @@ namespace SkinConfig
 
         if(node->get("type", &type) == 0)
         {
-        	Log::error("skin", "All elements must have a type\n");
+            Log::error("skin", "All elements must have a type\n");
             return;
         }
         node->get("state", &state);
@@ -155,7 +155,7 @@ namespace SkinConfig
         if(!root)
         {
             Log::error("skin", "Could not read XML file '%s'.",
-            		   file.c_str());
+                       file.c_str());
             throw std::runtime_error("Invalid skin file");
         }
 
@@ -175,7 +175,7 @@ namespace SkinConfig
             else
             {
                 Log::error("skin", "Unknown node in XML file '%s'.",
-                		   node->getName().c_str());
+                           node->getName().c_str());
             }
         }// nend for
 

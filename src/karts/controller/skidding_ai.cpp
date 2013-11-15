@@ -208,7 +208,7 @@ void SkiddingAI::reset()
         m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
     }
 
-	AIBaseController::reset();
+    AIBaseController::reset();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -486,8 +486,8 @@ void SkiddingAI::handleSteering(float dt)
      *finite state machine.
      */
     //Reaction to being outside of the road
-	float side_dist =
-		m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() );
+    float side_dist =
+        m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() );
 
     if( fabsf(side_dist)  >
        0.5f* QuadGraph::get()->getNode(m_track_node).getPathWidth()+0.5f )

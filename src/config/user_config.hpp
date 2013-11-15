@@ -354,27 +354,27 @@ namespace UserConfigParams
             &m_wiimote_group,
             "At what raw input value maximum steering is reached (between 1 and 25).") );
 
-	PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_linear
+    PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_linear
             PARAM_DEFAULT( FloatUserConfigParam(0.2f, "wiimote-weight-linear",
             &m_wiimote_group,
-			"A weight applied to the linear component of mapping wiimote angle to steering angle"));
+            "A weight applied to the linear component of mapping wiimote angle to steering angle"));
 
     PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_square
             PARAM_DEFAULT( FloatUserConfigParam(0.8f, "wiimote-weight-square",
             &m_wiimote_group,
-			"A weight applied to the square component of mapping wiimote angle to steering angle"));
+            "A weight applied to the square component of mapping wiimote angle to steering angle"));
 
     PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_asin
             PARAM_DEFAULT( FloatUserConfigParam(0.0f, "wiimote-weight-asin",
             &m_wiimote_group,
-			"A weight applied to the asin component of mapping wiimote angle to steering angle"));
+            "A weight applied to the asin component of mapping wiimote angle to steering angle"));
 
     PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_sin
             PARAM_DEFAULT( FloatUserConfigParam(0.0f, "wiimote-weight-sin",
             &m_wiimote_group,
-			"A weight applied to the sin component of mapping wiimote angle to steering angle"));
+            "A weight applied to the sin component of mapping wiimote angle to steering angle"));
 
-	// ---- GP start order
+    // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
             PARAM_DEFAULT( GroupUserConfigParam("GpStartOrder",
                                                 "Order karts start in GP") );
@@ -719,7 +719,7 @@ public:
     const irr::core::stringw& getWarning()        { return m_warning;  }
     void  resetWarning()                          { m_warning="";      }
     void  setWarning(irr::core::stringw& warning) { m_warning=warning; }
-	void  postLoadInit();
+    void  postLoadInit();
     void  addDefaultPlayer();
 
 };   // UserConfig

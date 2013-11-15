@@ -85,13 +85,13 @@ Physics::~Physics()
  */
 void Physics::addKart(const AbstractKart *kart)
 {
-	const btCollisionObjectArray &all_objs =
-		m_dynamics_world->getCollisionObjectArray();
-	for(unsigned int i=0; i<(unsigned int)all_objs.size(); i++)
-	{
-		if(btRigidBody::upcast(all_objs[i])== kart->getBody())
-			return;
-	}
+    const btCollisionObjectArray &all_objs =
+        m_dynamics_world->getCollisionObjectArray();
+    for(unsigned int i=0; i<(unsigned int)all_objs.size(); i++)
+    {
+        if(btRigidBody::upcast(all_objs[i])== kart->getBody())
+            return;
+    }
     m_dynamics_world->addRigidBody(kart->getBody());
     m_dynamics_world->addVehicle(kart->getVehicle());
     m_dynamics_world->addConstraint(kart->getUprightConstraint());
@@ -189,12 +189,12 @@ void Physics::update(float dt)
                 const KartProperties* kp = kart->getKartProperties();
                 kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
             }
-			else if(obj->isSoccerBall())
+            else if(obj->isSoccerBall())
             {
-				int kartId = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
-				SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
-				soccerWorld->setLastKartTohitBall(kartId);
-			}
+                int kartId = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
+                SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
+                soccerWorld->setLastKartTohitBall(kartId);
+            }
             continue;
         }
 

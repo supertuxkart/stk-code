@@ -140,7 +140,7 @@ void AddonsScreen::init()
     m_sort_default = true;
     m_sort_col = 0;
 
-	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
+    getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
 
     GUIEngine::getFont()->setTabStop(0.66f);
 
@@ -273,8 +273,8 @@ void AddonsScreen::loadList()
         if(addon->isInstalled())
             icon = addon->needsUpdate() ? m_icon_needs_update
                                         : m_icon_installed;
-	    else
-        	icon = m_icon_not_installed;
+        else
+            icon = m_icon_not_installed;
 
         core::stringw s;
         if (addon->getDesigner().size()==0)
@@ -367,15 +367,15 @@ void AddonsScreen::loadList()
         }
     }
 
-	getWidget<GUIEngine::RibbonWidget>("category")->setActivated();
-	if(m_type == "kart")
-    	getWidget<GUIEngine::RibbonWidget>("category")->select("tab_kart",
+    getWidget<GUIEngine::RibbonWidget>("category")->setActivated();
+    if(m_type == "kart")
+        getWidget<GUIEngine::RibbonWidget>("category")->select("tab_kart",
                                                         PLAYER_ID_GAME_MASTER);
-	else if(m_type == "track")
-    	getWidget<GUIEngine::RibbonWidget>("category")->select("tab_track",
+    else if(m_type == "track")
+        getWidget<GUIEngine::RibbonWidget>("category")->select("tab_track",
                                                         PLAYER_ID_GAME_MASTER);
     else
-    	getWidget<GUIEngine::RibbonWidget>("category")->select("tab_update",
+        getWidget<GUIEngine::RibbonWidget>("category")->select("tab_update",
                                                         PLAYER_ID_GAME_MASTER);
 }   // loadList
 

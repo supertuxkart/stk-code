@@ -1147,7 +1147,7 @@ void initUserConfig(char *argv[])
     translations            = new Translations();   // needs file_manager
     stk_config              = new STKConfig();      // in case of --stk-config
                                                     // command line parameters
-	user_config->postLoadInit();
+    user_config->postLoadInit();
     if (!config_ok || UserConfigParams::m_all_players.size() == 0)
     {
         user_config->addDefaultPlayer();

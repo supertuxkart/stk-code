@@ -64,7 +64,7 @@ Profiler profiler;
 //-----------------------------------------------------------------------------
 Profiler::Profiler()
 {
-    m_thread_infos.resize(1);	// TODO: monothread now, should support multithreading
+    m_thread_infos.resize(1);    // TODO: monothread now, should support multithreading
     m_write_id = 0;
     m_time_last_sync = _getTimeMilliseconds();
     m_time_between_sync = 0.0;
@@ -101,7 +101,7 @@ void Profiler::popCpuMarker()
     if(m_freeze_state == FROZEN || m_freeze_state == WAITING_FOR_UNFREEZE)
         return;
 
-    ThreadInfo&	ti = getThreadInfo();
+    ThreadInfo&    ti = getThreadInfo();
     assert(ti.markers_stack[m_write_id].size() > 0);
 
     MarkerStack& markers_stack = ti.markers_stack[m_write_id];
@@ -195,7 +195,7 @@ void Profiler::draw()
     int read_id = !m_write_id;
 
     // Compute some values for drawing (unit: pixels, but we keep floats for reducing errors accumulation)
-    core::dimension2d<u32>	screen_size	= driver->getScreenSize();
+    core::dimension2d<u32>    screen_size    = driver->getScreenSize();
     const double profiler_width = (1.0 - 2.0*MARGIN_X) * screen_size.Width;
     const double x_offset    = MARGIN_X*screen_size.Width;
     const double y_offset    = (MARGIN_Y + LINE_HEIGHT)*screen_size.Height;
@@ -220,12 +220,12 @@ void Profiler::draw()
         MarkerList::const_iterator it_end = markers.end();
         for(MarkerList::const_iterator it = markers.begin() ; it != it_end ; it++)
         {
-            const Marker&	m = *it;
+            const Marker&    m = *it;
             assert(m.end >= 0.0);
-            core::rect<s32>	pos((s32)( x_offset + factor*m.start ),
-                                (s32)( y_offset + i*line_height ),
-                                (s32)( x_offset + factor*m.end ),
-                                (s32)( y_offset + (i+1)*line_height ));
+            core::rect<s32>    pos((s32)( x_offset + factor*m.start ),
+                                   (s32)( y_offset + i*line_height ),
+                                   (s32)( x_offset + factor*m.end ),
+                                   (s32)( y_offset + (i+1)*line_height ));
 
             // Reduce vertically the size of the markers according to their layer
             pos.UpperLeftCorner.Y  += m.layer;
