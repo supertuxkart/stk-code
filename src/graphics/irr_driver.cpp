@@ -688,11 +688,11 @@ void IrrDriver::printRenderStats()
 scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
 {
     scene::IAnimatedMesh *m  = NULL;
-    io::IFileSystem* file_system = getDevice()->getFileSystem();
 
     if (StringUtils::getExtension(filename) == "b3dz")
     {
         // compressed file
+        io::IFileSystem* file_system = getDevice()->getFileSystem();
         if (!file_system->addFileArchive(filename.c_str(),
                                          /*ignoreCase*/false,
                                          /*ignorePath*/true, io::EFAT_ZIP))
@@ -707,8 +707,6 @@ scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
         io::IFileArchive* zip_archive =
         file_system->getFileArchive(file_system->getFileArchiveCount()-1);
         io::IReadFile* content = zip_archive->createAndOpenFile(0);
-
-        m_scene_manager->getParameters()->setAttribute(irr::scene::B3D_TEXTURE_PATH, file_system->getFileDir(irr::io::path(filename.c_str()) ).c_str() );
         m = m_scene_manager->getMesh(content);
         content->drop();
 
@@ -716,7 +714,6 @@ scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
     }
     else
     {
-        m_scene_manager->getParameters()->setAttribute(irr::scene::B3D_TEXTURE_PATH, file_system->getFileDir(irr::io::path(filename.c_str()) ).c_str() );
         m = m_scene_manager->getMesh(filename.c_str());
     }
 
