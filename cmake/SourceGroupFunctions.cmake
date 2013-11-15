@@ -8,7 +8,7 @@ function(source_group_hierarchy SRCS HDRS)
     endforeach()
 
     foreach(header_file ${${HDRS}})
-        source_group_file(${header_file} "Header Files\\")
+        source_group_file(${header_file} "Source Files\\")
     endforeach()
 endfunction()
 
