@@ -2033,6 +2033,13 @@ void Kart::updatePhysics(float dt)
     //at low velocity, forces on kart push it back and forth so we ignore this
     if(fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
          m_speed = 0;
+         
+    if (dynamic_cast<RescueAnimation*>(getKartAnimation()) ||
+        dynamic_cast<ExplosionAnimation*>(getKartAnimation()))
+    {
+        m_speed = 0;
+    }
+    
     updateEngineSFX();
 #ifdef XX
     Log::info("Kart","forward %f %f %f %f  side %f %f %f %f angVel %f %f %f heading %f\n"
@@ -2496,6 +2503,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         for(unsigned int i=0; i<4; i++)
             height_above_terrain[i] -= chassis_delta;
     }
+
     m_kart_model->update(dt, m_wheel_rotation_dt, getSteerPercent(), 
                         height_above_terrain, m_speed);
 
