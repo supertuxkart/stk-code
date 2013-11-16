@@ -19,6 +19,7 @@
 #ifndef HEADER_GRAND_PRIX_WIN_HPP
 #define HEADER_GRAND_PRIX_WIN_HPP
 
+#include "audio/sfx_base.hpp"
 #include "guiengine/screen.hpp"
 #include "karts/kart_model.hpp"
 
@@ -67,6 +68,7 @@ class GrandPrixWin : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     float m_camera_target_x, m_camera_target_z;
 
     MusicInformation* m_music;
+    SFXBase* m_finish_sound;
 
 public:
 

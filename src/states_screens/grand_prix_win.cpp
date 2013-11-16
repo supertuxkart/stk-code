@@ -217,7 +217,7 @@ void GrandPrixWin::init()
     m_light->getLightData().AmbientColor = irr::video::SColorf(0.25f, 0.25f, 0.25f, 1.0f);
     m_light->getLightData().SpecularColor = irr::video::SColorf(0.0f, 0.0f, 0.0f, 1.0f);
 
-    sfx_manager->quickSound("gp_end");
+    m_finish_sound = sfx_manager->quickSound("gp_end");
 }   // init
 
 // -------------------------------------------------------------------------------------
@@ -253,6 +253,12 @@ void GrandPrixWin::tearDown()
         manualRemoveWidget(m_unlocked_label);
         delete m_unlocked_label;
         m_unlocked_label = NULL;
+    }
+    
+    if (m_finish_sound != NULL &&
+        m_finish_sound->getStatus() == SFXManager::SFX_PLAYING)
+    {
+        m_finish_sound->stop();
     }
 }   // tearDown
 
