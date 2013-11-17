@@ -11,7 +11,7 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
 
-option(USE_WIIUSE "Support for wiimote input devices" OFF)
+option(USE_WIIUSE "Support for wiimote input devices" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 if(UNIX)
     option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
