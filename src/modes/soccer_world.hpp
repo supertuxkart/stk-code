@@ -45,6 +45,7 @@ private:
     int m_team_goals[NB_SOCCER_TEAMS];
     /** Number of goals needed to win */
     int m_goal_target;
+    bool countDownReachedZero;
     /** Whether or not goals can be scored (they are disabled when a point is scored
     and re-enabled when the next game can be played)*/
     bool m_can_score_points;
@@ -66,6 +67,7 @@ public:
     // clock events
     virtual bool isRaceOver();
     virtual void terminateRace();
+    virtual void countdownReachedZero() OVERRIDE;
 
     // overriding World methods
     virtual void reset();

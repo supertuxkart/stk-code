@@ -41,7 +41,11 @@
  */
 SoccerWorld::SoccerWorld() : WorldWithRank()
 {
-    WorldStatus::setClockMode(CLOCK_CHRONO);
+    if(race_manager->hasTimeTarget()){
+        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, race_manager->getTimeTarget());
+        countDownReachedZero = false;
+    }
+    else WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = false;
 }   // SoccerWorld
 //-----------------------------------------------------------------------------
@@ -63,7 +67,7 @@ void SoccerWorld::init()
     m_display_rank = false;
     m_goal_timer = 0.f;
     m_lastKartToHitBall = -1;
-
+    
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
     {
@@ -81,6 +85,11 @@ void SoccerWorld::init()
 void SoccerWorld::reset()
 {
     WorldWithRank::reset();
+    if(race_manager->hasTimeTarget()){
+        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, race_manager->getTimeTarget());
+        countDownReachedZero = false;
+    }
+    else WorldStatus::setClockMode(CLOCK_CHRONO);
 
     m_can_score_points = true;
     memset(m_team_goals, 0, sizeof(m_team_goals));
@@ -165,11 +174,17 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         {
             if(first_goal){
                 m_redScorers.push_back(m_lastKartToHitBall);
-                m_redScoreTimes.push_back(world->getTime());
+                if(race_manager->hasTimeTarget())
+                    m_redScoreTimes.push_back(race_manager->getTimeTarget() - world->getTime());
+                else
+                    m_redScoreTimes.push_back(world->getTime());
             }
             else{
                 m_blueScorers.push_back(m_lastKartToHitBall);
-                m_blueScoreTimes.push_back(world->getTime());
+                if(race_manager->hasTimeTarget())
+                    m_blueScoreTimes.push_back(race_manager->getTimeTarget() - world->getTime());
+                else
+                    m_blueScoreTimes.push_back(world->getTime());
             }
         }
     }
@@ -224,7 +239,11 @@ bool SoccerWorld::isRaceOver()
     {
         return false;
     }
-        // One team scored the target goals ...
+    
+    else if(race_manager->hasTimeTarget()){
+        return countDownReachedZero;
+    }
+    // One team scored the target goals ...
     else if(getScore(0) >= m_goal_target ||
             getScore(1) >= m_goal_target    )
     {
@@ -244,6 +263,12 @@ void SoccerWorld::terminateRace()
     m_can_score_points = false;
     WorldWithRank::terminateRace();
 }   // terminateRace
+//-----------------------------------------------------------------------------
+/** Called when the match time ends.
+*/
+void SoccerWorld::countdownReachedZero(){
+    countDownReachedZero = true;
+}
 
 //-----------------------------------------------------------------------------
 /** Returns the data to display in the race gui.

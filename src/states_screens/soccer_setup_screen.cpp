@@ -23,6 +23,7 @@
 #include "states_screens/arenas_screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -56,12 +57,30 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, c
     if(name == "continue")
     {
         StateManager::get()->pushScreen( ArenasScreen::getInstance() );
-        race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
+        if(getWidget<SpinnerWidget>("goalamount")->isActivated())
+            race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
+        else
+            race_manager->setTimeTarget((float)getWidget<SpinnerWidget>("timeamount")->getValue()*60);
+
         input_manager->setMasterPlayerOnly(true);
     }
     else if (name == "back")
     {
         StateManager::get()->escapePressed();
+    }
+    else if(name == "time_enabled")
+    {
+        CheckBoxWidget* timeEnabled = dynamic_cast<CheckBoxWidget*>(widget);
+        if(timeEnabled->getState())
+        {
+            getWidget<SpinnerWidget>("goalamount")->setDeactivated();
+            getWidget<SpinnerWidget>("timeamount")->setActivated();
+        }
+        else
+        {
+            getWidget<SpinnerWidget>("timeamount")->setDeactivated();
+            getWidget<SpinnerWidget>("goalamount")->setActivated();
+        }
     }
 }
 
@@ -143,6 +162,12 @@ void SoccerSetupScreen::init()
 
     SpinnerWidget*  goalamount = getWidget<SpinnerWidget>("goalamount");
     goalamount->setValue(UserConfigParams::m_num_goals);
+    goalamount->setDeactivated();
+
+    SpinnerWidget* timeAmount = getWidget<SpinnerWidget>("timeamount");
+    timeAmount->setValue(timeAmount->getMin());
+
+    CheckBoxWidget* timeEnabled = getWidget<CheckBoxWidget>("time_enabled");
 
     // Set focus on "continue"
     ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
