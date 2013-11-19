@@ -26,6 +26,8 @@
   Name "SuperTuxKart for Windows"
   OutFile "supertuxkart.exe"
 
+  RequestExecutionLevel admin
+
   ;Default installation folder
   InstallDir "$PROGRAMFILES\SuperTuxKart"
 
@@ -39,8 +41,8 @@
   !define MUI_ICON "SuperTuxKart\install.ico"
   !define MUI_UNICON "SuperTuxKart\uninstall.ico"
   !define MUI_HEADERIMAGE	
-  !define MUI_WELCOMEFINISHPAGE_BITMAP "supertuxkart\stk_installer.bmp"
-  !define MUI_HEADERIMAGE_BITMAP "supertuxkart\logo_slim.bmp"
+  !define MUI_WELCOMEFINISHPAGE_BITMAP "stk_installer.bmp"
+  !define MUI_HEADERIMAGE_BITMAP "logo_slim.bmp"
   ;!define MUI_TEXT_INSTALLING_SUBTITLE "Please vote for SuperTuxKart to become SourceForge's Project of the month at vote.supertuxkart.net"
   ;!define MUI_TEXT_FINISH_INFO_TEXT "Please vote for SuperTuxKart to become $\"Project of the Month$\" at vote.supertuxkart.net"
 
@@ -110,11 +112,6 @@ FunctionEnd
   !insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
-function ChangeFont
-CreateFont $0 "$(^Font)" "20" "700"
-SendMessage $mui.Line.Standard ${WM_SETFONT} $0 0
-functionend
-
 
 ;Installer Sections
 
@@ -168,8 +165,9 @@ Section "Uninstall"redist
   Delete "$INSTDIR\Uninstall.exe"
   RMDir "$INSTDIR"
 
+  SetShellVarContext all
 
-  ;Remove start menuy items
+  ;Remove start menu items
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
 
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
