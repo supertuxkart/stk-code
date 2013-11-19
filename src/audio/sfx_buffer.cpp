@@ -18,6 +18,7 @@
 
 #include "audio/sfx_buffer.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 
@@ -76,6 +77,8 @@ SFXBuffer::SFXBuffer(const std::string& file,
 
 bool SFXBuffer::load()
 {
+    if (UserConfigParams::m_sfx == false) return false;
+    
 #if HAVE_OGGVORBIS
     if (m_loaded) return false;
 
