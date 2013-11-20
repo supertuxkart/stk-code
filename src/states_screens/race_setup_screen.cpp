@@ -23,6 +23,7 @@
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/arenas_screen.hpp"
+#include "states_screens/easter_egg_screen.hpp"
 #include "states_screens/soccer_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
@@ -121,7 +122,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             race_manager->setMinorMode(RaceManager::MINOR_MODE_EASTER_EGG);
             UserConfigParams::m_game_mode = CONFIG_CODE_EASTER;
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
-            StateManager::get()->pushScreen( TracksScreen::getInstance() );
+            StateManager::get()->pushScreen( EasterEggScreen::getInstance() );
         }
         else if (selectedMode == IDENT_SOCCER)
         {
