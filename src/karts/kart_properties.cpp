@@ -217,6 +217,9 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     file_manager->pushModelSearchPath  (m_root);
     file_manager->pushTextureSearchPath(m_root);
 
+    irr_driver->setTextureErrorMessage("Error while loading kart '%s':",
+                                       m_name);
+
     // addShared makes sure that these textures/material infos stay in memory
     material_manager->addSharedMaterial(materials_file);
 
@@ -269,6 +272,8 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     }
 
     m_shadow_texture = irr_driver->getTexture(m_shadow_file);
+
+    irr_driver->unsetTextureErrorMessage();
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath();
 

@@ -124,6 +124,8 @@ void Referee::init()
         scene::IMeshBuffer *mb = m_st_referee_mesh->getMeshBuffer(i);
         video::SMaterial &irrMaterial = mb->getMaterial();
         video::ITexture* t=irrMaterial.getTexture(0);
+        if(!t) continue;
+
         std::string name=StringUtils::getBasename(t->getName()
                                                   .getInternalName().c_str());
         if(name==colors[0] || name==colors[1] ||name==colors[2] )

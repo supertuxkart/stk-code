@@ -1070,6 +1070,29 @@ void IrrDriver::removeCameraSceneNode(scene::ICameraSceneNode *camera)
 }   // removeCameraSceneNode
 
 // ----------------------------------------------------------------------------
+/** Sets an error message to be displayed when a texture is not found. This
+ *  error message is shown before the "Texture '%s' not found" message. It can
+ *  be used to supply additional details like what kart is currently being
+ *  loaded.
+ *  \param error Error message, potentially with a '%' which will be replaced
+ *               with detail.
+ *  \param detail String to replace a '%' in the error message.
+ */
+void IrrDriver::setTextureErrorMessage(const std::string &error,
+                                       const std::string &detail)
+{
+    m_texture_error_message = StringUtils::insertValues(error, detail);
+}   // setTextureErrorMessage
+
+// ----------------------------------------------------------------------------
+/** Disables the texture error message again.
+ */
+void IrrDriver::unsetTextureErrorMessage()
+{
+    m_texture_error_message = "";
+}   // unsetTextureErrorMessage
+
+// ----------------------------------------------------------------------------
 /** Loads a texture from a file and returns the texture object.
  *  \param filename File name of the texture to load.
  *  \param is_premul If the alpha values needd to be multiplied for
@@ -1150,9 +1173,11 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
 
     if (complain_if_not_found && out == NULL)
     {
-        Log::error("irr_driver",  "Texture '%s' not found; Put a breakpoint "
-                   "at line %s:%i to debug!\n",
-                   filename.c_str(), __FILE__, __LINE__);
+        if(m_texture_error_message.size()>0)
+        {
+            Log::error("irr_driver", m_texture_error_message.c_str());
+        }
+        Log::error("irr_driver", "Texture '%s' not found.", filename.c_str());
     }
 
     return out;
