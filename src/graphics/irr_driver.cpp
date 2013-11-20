@@ -1081,7 +1081,10 @@ void IrrDriver::removeCameraSceneNode(scene::ICameraSceneNode *camera)
 void IrrDriver::setTextureErrorMessage(const std::string &error,
                                        const std::string &detail)
 {
-    m_texture_error_message = StringUtils::insertValues(error, detail);
+    if(detail=="")
+        m_texture_error_message = error;
+    else
+        m_texture_error_message = StringUtils::insertValues(error, detail);
 }   // setTextureErrorMessage
 
 // ----------------------------------------------------------------------------
@@ -1121,7 +1124,7 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
         // PNGs are non premul, but some are used for premul tasks, so convert
         // http://home.comcast.net/~tom_forsyth/blog.wiki.html#[[Premultiplied%20alpha]]
         // FIXME check param, not name
-        if(is_premul &&
+        if(img && is_premul &&
             StringUtils::hasSuffix(filename.c_str(), ".png") &&
             (img->getColorFormat() == video::ECF_A8R8G8B8) &&
             img->lock())
@@ -1144,7 +1147,7 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
         }   // if png and ColorFOrmat and lock
         // Other formats can be premul, but the tasks can be non premul
         // So divide to get the separate RGBA (only possible if alpha!=0)
-        else if(is_prediv &&
+        else if(img && is_prediv &&
             (img->getColorFormat() == video::ECF_A8R8G8B8) &&
             img->lock())
         {
@@ -1173,6 +1176,7 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
 
     if (complain_if_not_found && out == NULL)
     {
+
         if(m_texture_error_message.size()>0)
         {
             Log::error("irr_driver", m_texture_error_message.c_str());

@@ -229,6 +229,26 @@ public:
     }   // getTexture
 
     // ------------------------------------------------------------------------
+    /** Convenience function that loads a texture with default parameters
+     *  but includes an error message.
+     *  \param filename File name of the texture to load.
+     *  \param error Error message, potentially with a '%' which will be replaced
+     *               with detail.
+     *  \param detail String to replace a '%' in the error message.
+     */
+    video::ITexture* getTexture(const std::string &filename,
+                                char *error_message,
+                                char *detail=NULL)
+    {
+        if(!detail)
+            return getTexture(filename, std::string(error_message), 
+                              std::string(""));
+
+        return getTexture(filename, std::string(error_message),
+                          std::string(detail));
+    }   // getTexture
+
+    // ------------------------------------------------------------------------
     /** Returns the currently defined texture error message, which is used
      *  by event_handler.cpp to print additional info about irrlicht
      *  internal errors or warnings. If no error message is currently

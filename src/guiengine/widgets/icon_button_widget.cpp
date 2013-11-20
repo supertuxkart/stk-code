@@ -72,8 +72,11 @@ void IconButtonWidget::add()
         Log::error("icon_button",
                     "add() : error, cannot find texture '%s'.",
                    m_properties[PROP_ICON].c_str());
-        std::string file = file_manager->getDataDir() + "gui/main_help.png";
+        std::string file = file_manager->getGUIDir() + "main_help.png";
         m_texture = irr_driver->getTexture(file);
+        if(!m_texture)
+            Log::fatal("IconButtonWidget",
+                  "Can't find fallback texture 'gui/main_help.png, aborting.");
     }
     m_texture_w = m_texture->getSize().Width;
     m_texture_h = m_texture->getSize().Height;
