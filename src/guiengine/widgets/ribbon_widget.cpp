@@ -574,7 +574,7 @@ void RibbonWidget::unfocused(const int playerID, Widget* new_focus)
 {
     if (new_focus != NULL && new_focus != this && !m_children.contains(new_focus))
     {
-        if (m_selection[playerID] != -1)
+        if (m_selection[playerID] >= 0 && m_selection[playerID] < m_children.size())
         {
             m_children.get(m_selection[playerID])->unfocused(playerID, new_focus);
         }
