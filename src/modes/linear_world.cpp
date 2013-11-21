@@ -549,9 +549,6 @@ void LinearWorld::getKartsDisplayInfo(
  */
 float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
 {
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
-        return getTime();
-
     const KartInfo &kart_info = m_kart_info[kart->getWorldKartId()];
 
     float full_distance = race_manager->getNumLaps()

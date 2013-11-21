@@ -66,6 +66,8 @@ public:
     void readData(const std::string &filename);
 
     virtual void checkForWrongDirection(unsigned int i) OVERRIDE;
+    virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
+
 };   // EasterEggHunt
 
 
