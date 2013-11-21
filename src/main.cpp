@@ -1530,7 +1530,6 @@ int main(int argc, char *argv[] )
             // Profiling
             // =========
             race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-            race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
             network_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
         }
