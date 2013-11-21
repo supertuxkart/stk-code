@@ -221,3 +221,11 @@ void EasterEggHunt::terminateRace()
     m_karts[0]->getControls().reset();
     WorldWithRank::terminateRace();
 }
+//-----------------------------------------------------------------------------
+/** In Easter Egg mode the finish time is just the time the race is over,
+ *  since there are no AI karts.
+ */
+float EasterEggHunt::estimateFinishTimeForKart(AbstractKart* kart)
+{
+    return getTime();
+}   // estimateFinishTimeForKart
