@@ -23,7 +23,7 @@
 ;General
 
   ;Name and file
-  Name "SuperTuxKart for Windows"
+  Name "SuperTuxKart"
   OutFile "supertuxkart.exe"
 
   RequestExecutionLevel admin
