@@ -323,9 +323,17 @@ void SkiddingAI::update(float dt)
     // Get information that is needed by more than 1 of the handling funcs
     computeNearestKarts();
 
-    m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI,
-                        m_ai_properties->getSpeedCap(m_distance_to_player),
-                        /*fade_in_time*/0.0f);
+    const Material *m = m_kart->getMaterial();
+    // If the AI is on a zipper material, disable any AI related slowdown,
+    // since otherwise it might happen that a jump is too short.
+    if(m && m->isZipper())
+        m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI,
+                            /*max_speed_fraction*/1.0,
+                            /*fade_in_time*/0.0f);
+    else
+        m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI,
+                            m_ai_properties->getSpeedCap(m_distance_to_player),
+                            /*fade_in_time*/0.0f);
     //Detect if we are going to crash with the track and/or kart
     checkCrashes(m_kart->getXYZ());
     determineTrackDirection();
