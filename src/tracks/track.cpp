@@ -1353,6 +1353,9 @@ void Track::createWater(const XMLNode &node)
  */
 void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 {
+    // Use m_filename to also get the path, not only the identifier
+    irr_driver->setTextureErrorMessage("While loading track '%s'",
+                                       m_filename                  );
     if(!m_reverse_available)
     {
         reverse_track = false;
@@ -1777,6 +1780,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         std::string dir = StringUtils::getPath(m_filename);
         easter_world->readData(dir+"/easter_eggs.xml");
     }
+
+    irr_driver->unsetTextureErrorMessage();
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------

@@ -1627,6 +1627,14 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                 ITexture* tex =
                     irr_driver->getTexture( file_manager->getGUIDir()
                                             + "bar.png" );
+                if(!tex)
+                {
+                    std::string file = file_manager->getGUIDir() + "main_help.png";
+                    tex = irr_driver->getTexture(file);
+                    if(!tex)
+                        Log::fatal("Skin",
+                        "Can't find fallback texture 'main_help.png, aborting.");
+                }
                 core::recti r1(0, (int)(widget.m_y - 40*y_size),
                                framesize.Width, framesize.Height);
                 core::recti r2(core::dimension2di(0,0), tex->getSize());
@@ -1892,6 +1900,9 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
 void doDrawBadge(ITexture* texture, const core::recti& rect,
                  float max_icon_size, bool badge_at_left)
 {
+    // In case of a problem
+    if(!texture) return;
+
     const core::dimension2d<u32>& texture_size = texture->getSize();
     const float aspectRatio = (float)texture_size.Width
                             / (float)texture_size.Height;
@@ -1922,6 +1933,8 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     if (widget->m_badges & LOCKED_BADGE)
     {
         video::ITexture* texture = irr_driver->getTexture(
+                                 file_manager->getTextureFile("gui_lock.png"),
+                                 "Can't find '%s'.",
                                  file_manager->getTextureFile("gui_lock.png"));
         float max_icon_size = 0.5f; // Lock badge can be quite big
         doDrawBadge(texture, rect, max_icon_size, true);
@@ -1929,6 +1942,8 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     if (widget->m_badges & OK_BADGE)
     {
         video::ITexture* texture = irr_driver->getTexture(
+                              file_manager->getTextureFile("green_check.png"),
+                              "Can't find '%s'.",
                               file_manager->getTextureFile("green_check.png"));
         float max_icon_size = 0.35f;
         doDrawBadge(texture, rect, max_icon_size, true);
@@ -1936,7 +1951,8 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     if (widget->m_badges & BAD_BADGE)
     {
         video::ITexture* texture = irr_driver->getTexture(
-                                 file_manager->getTextureFile("red_mark.png"));
+                                 file_manager->getTextureFile("red_mark.png"),
+                                 "Can't find red_mark.png");
         float max_icon_size = 0.35f;
         doDrawBadge(texture, rect, max_icon_size, false);
     }
@@ -1944,13 +1960,16 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     {
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(
-                               file_manager->getTextureFile("cup_bronze.png"));
+                               file_manager->getTextureFile("cup_bronze.png"),
+                               "Can't find cup_bronze.png.");
         doDrawBadge(texture, rect, max_icon_size, false);
     }
     if (widget->m_badges & KEYBOARD_BADGE)
     {
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(
+                                   file_manager->getGUIDir() + "keyboard.png",
+                                   "Can't find '%s'.",
                                    file_manager->getGUIDir() + "keyboard.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
@@ -1958,6 +1977,8 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     {
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(
+                                    file_manager->getGUIDir() + "gamepad.png",
+                                    "Can't find '%s'.",
                                     file_manager->getGUIDir() + "gamepad.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
@@ -1965,6 +1986,8 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     {
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(
+                                  file_manager->getGUIDir() + "hourglass.png",
+                                  "Can't find '%s'.",
                                   file_manager->getGUIDir() + "hourglass.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }

@@ -22,6 +22,7 @@
 #include <IGUIEnvironment.h>
 #include <IGUIListBox.h>
 
+#include "graphics/irr_driver.hpp"
 #include "guiengine/abstract_state_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -192,14 +193,18 @@ bool EventHandler::OnEvent (const SEvent &event)
 #else
             return true; // EVENT_BLOCK
 #endif
-
+            const std::string &error_info = irr_driver->getTextureErrorMessage();
             if (event.LogEvent.Level == irr::ELL_WARNING)
             {
-                printf("[Irrlicht Warning] %s\n", event.LogEvent.Text);
+                if(error_info.size()>0)
+                    Log::warn("EventHandler", error_info.c_str());
+                Log::warn("Irrlicht", event.LogEvent.Text);
             }
             else if (event.LogEvent.Level == irr::ELL_ERROR)
             {
-                printf("[Irrlicht Error] %s\n", event.LogEvent.Text);
+                if(error_info.size()>0)
+                    Log::error("EventHandler", error_info.c_str());
+                Log::error("Irrlicht", event.LogEvent.Text);
             }
         }
         return true;

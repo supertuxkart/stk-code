@@ -1261,6 +1261,11 @@ namespace GUIEngine
         ITexture* loading =
             irr_driver->getTexture(file_manager->getGUIDir()+"loading.png");
 
+        if(!loading)
+        {
+            Log::fatal("Engine", "Can not find loading.png texture, aborting.");
+            exit(-1);
+        }
         const int texture_w = loading->getSize().Width;
         const int texture_h = loading->getSize().Height;
 

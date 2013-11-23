@@ -76,19 +76,29 @@ RaceGUIBase::RaceGUIBase()
     m_music_icon            = material_manager->getMaterial("notes.png",
                                                             /*full path*/false,
                                                             /*permanent*/true);
+    if(!m_music_icon->getTexture())
+        Log::fatal("RaceGuiBase", "Can't find 'notes.png' texture, aborting.");
+
     m_plunger_face          = material_manager->getMaterial("plungerface.png",
                                                             /*full path*/false,
                                                             /*permanent*/true);
+    if(!m_plunger_face->getTexture())
+        Log::fatal("RaceGuiBase",
+                   "Can't find 'plungerface.png' texture, aborting.");
+
     //read frame picture for icons in the mini map.
     m_icons_frame           = material_manager->getMaterial("icons-frame.png",
                                                             /*full_path*/false,
                                                             /*permanent*/true);
+    if(!m_icons_frame->getTexture())
+        Log::fatal("RaceGuiBase",
+                   "Can't find 'icons-frame.png' texture, aborting.");
+
     const std::string &guid = file_manager->getGUIDir();
     m_gauge_full            = irr_driver->getTexture(guid+"gauge_full.png" );
     m_gauge_full_bright     = irr_driver->getTexture(guid+"gauge_full_bright.png" );
     m_gauge_empty           = irr_driver->getTexture(guid+"gauge_empty.png");
     m_gauge_goal            = irr_driver->getTexture(guid+"gauge_goal.png" );
-
     m_dist_show_overlap     = 2;
     m_icons_inertia         = 2;
 

@@ -85,7 +85,10 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
 
                 if (clickedTrack != NULL)
                 {
-                    ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
+                    ITexture* screenshot = 
+                        irr_driver->getTexture( clickedTrack->getScreenshotFile(),
+                                                "While loading screenshot for track '%s':",
+                                                clickedTrack->getFilename()   );
 
                     new TrackInfoDialog(selection, clickedTrack->getIdent(),
                                         translations->fribidize(clickedTrack->getName()),
@@ -105,7 +108,10 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 Track* clickedTrack = track_manager->getTrack(selection);
                 if (clickedTrack != NULL)
                 {
-                    ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
+                    ITexture* screenshot = 
+                        irr_driver->getTexture( clickedTrack->getScreenshotFile(),
+                                                "While loading screenshot for track '%s'",
+                                                clickedTrack->getFilename());
 
                     new TrackInfoDialog(selection, clickedTrack->getIdent(),
                                         translations->fribidize(clickedTrack->getName()),
@@ -255,14 +261,16 @@ void TracksScreen::init()
 
     buildTrackList();
 
-    // select something for the game master
-    // FIXME: 'setSelection' will not scroll up to the passed track, so if given track
-    //         is not visible with current scrolling this fails
+    // select old track for the game master (if found)
+    irr_driver->setTextureErrorMessage(
+              "While loading screenshot in track screen for last track '%s':",
+              UserConfigParams::m_last_track);
     if (!tracks_widget->setSelection(UserConfigParams::m_last_track,
                                      PLAYER_ID_GAME_MASTER, true))
     {
         tracks_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
     }
+    irr_driver->unsetTextureErrorMessage();
 }
 
 // -----------------------------------------------------------------------------

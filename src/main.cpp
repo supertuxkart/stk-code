@@ -1217,8 +1217,10 @@ void initRest()
     // Consistency check for challenges, and enable all challenges
     // that have all prerequisites fulfilled
     grand_prix_manager->checkConsistency();
-    GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                               file_manager->getTextureFile("cup_gold.png")) );
+    std::string file = file_manager->getTextureFile("cup_gold.png");
+    if(file.size()==0)
+        Log::fatal("main", "Can not find cup_gold.png, aborting.");
+    GUIEngine::addLoadingIcon( irr_driver->getTexture(file) );
 
     race_manager            = new RaceManager          ();
     // default settings for Quickstart
@@ -1334,9 +1336,10 @@ int main(int argc, char *argv[] )
         kart_properties_manager -> loadAllKarts    ();
         handleXmasMode();
         unlock_manager          = new UnlockManager();
-        //m_tutorial_manager      = new TutorialManager();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                               file_manager->getTextureFile("gui_lock.png")) );
+        std::string file = file_manager->getTextureFile("gui_lock.png");
+        if(file.size()==0)
+            Log::fatal("main", "Can not find gui_lock.png, aborting.");
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(file));
         projectile_manager      -> loadData        ();
 
         // Both item_manager and powerup_manager load models and therefore

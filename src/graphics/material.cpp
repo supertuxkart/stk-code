@@ -430,8 +430,9 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     else if (s=="" || s=="none")
         m_adjust_image = ADJ_NONE;
     else
-        printf("Incorrect adjust-image specification: '%s' - ignored.\n",
-               s.c_str());
+        Log::warn("material", 
+                  "Incorrect adjust-image specification: '%s' - ignored.",
+                  s.c_str());
     node->get("alpha",            &m_alpha_blending    );
     node->get("light",            &m_lighting          );
 
@@ -464,7 +465,8 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     }
     else if (creaction.size() > 0)
     {
-        fprintf(stderr, "[Material] WARNING: Unknown collision reaction '%s'\n", creaction.c_str());
+        Log::warn("Material","Unknown collision reaction '%s'", 
+                  creaction.c_str());
     }
 
     node->get("below-surface",    &m_below_surface     );
@@ -573,9 +575,9 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     }
     else if (s != "")
     {
-        fprintf(stderr,
-                "Invalid graphical effect specification: '%s' - ignored.\n",
-                s.c_str());
+        Log::warn("material", 
+                  "Invalid graphical effect specification: '%s' - ignored.",
+                  s.c_str());
     }
     else
     {
@@ -595,7 +597,8 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         }
         else
         {
-            fprintf(stderr, "[Material] WARNING: could not find normal map image in materials.xml\n");
+            Log::warn("material", 
+                      "Could not find normal map image in materials.xml");
         }
 
         node->get("normal-light-map", &m_normal_map_shader_lightmap);
@@ -618,9 +621,8 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         else if (s == "additive") m_add = true;
         else if (s == "coverage") m_alpha_to_coverage = true;
         else if (s != "none")
-            fprintf(stderr,
-                    "[Material] WARNING: Unknown compositing mode '%s'\n",
-                    s.c_str());
+            Log::warn("material", "Unknown compositing mode '%s'",
+                      s.c_str());
     }
 
 
@@ -665,10 +667,9 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         }
         else
         {
-            fprintf(stderr,
-                   "[Material] WARNING: unknown node type '%s' for texture "
-                   "'%s' - ignored.\n",
-                    child_node->getName().c_str(), m_texname.c_str());
+            Log::warn("material", "Unknown node type '%s' for texture "
+                      "'%s' - ignored.",
+                      child_node->getName().c_str(), m_texname.c_str());
         }
 
     }   // for i <node->getNumNodes()
@@ -756,14 +757,16 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
 
     if (complain_if_not_found && full_path.size() == 0)
     {
-        fprintf(stderr, "[Material] WARNING, cannot find texture '%s'\n", m_texname.c_str());
+        Log::error("material", "Cannot find texture '%s'.", m_texname.c_str());
+        m_texture = NULL;
     }
-
-
-    m_texture = irr_driver->getTexture(full_path,
-                                       isPreMul(),
-                                       isPreDiv(),
-                                       complain_if_not_found);
+    else
+    {
+        m_texture = irr_driver->getTexture(full_path,
+                                           isPreMul(),
+                                           isPreDiv(),
+                                           complain_if_not_found);
+    }
 
     if (m_texture == NULL) return;
 
@@ -780,8 +783,8 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
         }
         else
         {
-            fprintf(stderr, "Applying mask failed for '%s'!\n",
-                    m_texname.c_str());
+            Log::warn("material", "Applying mask failed for '%s'!",
+                      m_texname.c_str());
         }
     }
     m_texture->grab();
@@ -833,8 +836,8 @@ void Material::initCustomSFX(const XMLNode *sfx)
 
     if (filename.empty())
     {
-        fprintf(stderr, "[Material] WARNING: sfx node has no 'filename' "
-                        "attribute, sound effect will be ignored\n");
+        Log::warn("material", "Sfx node has no 'filename' "
+                  "attribute, sound effect will be ignored.");
         return;
     }
 
@@ -912,10 +915,10 @@ void Material::initParticlesEffect(const XMLNode *node)
 
     if (count == 0)
     {
-        fprintf(stderr, "[Material::initParticlesEffect] WARNING: Particles "
-                        "'%s' for material '%s' are declared but not used "
-                        "(no emission condition set)\n",
-                base.c_str(), m_texname.c_str());
+        Log::warn("material", "initParticlesEffect: Particles "
+                  "'%s' for material '%s' are declared but not used "
+                  "(no emission condition set).",
+                  base.c_str(), m_texname.c_str());
     }
 
     for (int c=0; c<count; c++)
@@ -930,8 +933,8 @@ void Material::initParticlesEffect(const XMLNode *node)
         }
         else
         {
-            fprintf(stderr, "[Material::initParticlesEffect] WARNING: Unknown "
-                            "condition '%s' for material '%s'\n",
+            Log::warn("material", "initParticlesEffect: Unknown "
+                            "condition '%s' for material '%s'",
                     conditions[c].c_str(), m_texname.c_str());
         }
     }
@@ -985,9 +988,12 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     //            materials.xml, if you want to set flags for all surfaces, see
     //            'MaterialManager::setAllMaterialFlags'
 
-    if (m_deprecated || (m->getTexture(0) != NULL && ((core::stringc)m->getTexture(0)->getName()).find("deprecated") != -1))
+    if (m_deprecated || 
+        (m->getTexture(0) != NULL && 
+         ((core::stringc)m->getTexture(0)->getName()).find("deprecated") != -1))
     {
-        fprintf(stderr, "WARNING: track uses deprecated texture <%s>\n", m_texname.c_str());
+        Log::warn("material", "Track uses deprecated texture '%s'\n", 
+                  m_texname.c_str());
     }
 
 

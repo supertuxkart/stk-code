@@ -298,6 +298,15 @@ void RibbonWidget::add()
                                  + m_children[i].m_properties[PROP_ICON];
             video::ITexture* image =
                 irr_driver->getTexture((filename).c_str());
+            if(!image)
+            {
+                std::string file = file_manager->getGUIDir() + "main_help.png";
+                image = irr_driver->getTexture(file);
+                if(!image)
+                    Log::fatal("RibbonWidget",
+                        "Can't find fallback texture 'gui/main_help.png, aborting.");
+            }
+
             float image_h = (float)image->getSize().Height;
             float image_w = image_h*imageRatio;
 
