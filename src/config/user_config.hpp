@@ -350,17 +350,17 @@ namespace UserConfigParams
         PARAM_DEFAULT( GroupUserConfigParam("WiiMote",
                                             "Settings for the wiimote") );
     PARAM_PREFIX FloatUserConfigParam         m_wiimote_raw_max
-            PARAM_DEFAULT( FloatUserConfigParam(25.0f, "wiimote-raw-max",
+            PARAM_DEFAULT( FloatUserConfigParam(20.0f, "wiimote-raw-max",
             &m_wiimote_group,
             "At what raw input value maximum steering is reached (between 1 and 25).") );
 
     PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_linear
-            PARAM_DEFAULT( FloatUserConfigParam(0.2f, "wiimote-weight-linear",
+            PARAM_DEFAULT( FloatUserConfigParam(1.0f, "wiimote-weight-linear",
             &m_wiimote_group,
             "A weight applied to the linear component of mapping wiimote angle to steering angle"));
 
     PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_square
-            PARAM_DEFAULT( FloatUserConfigParam(0.8f, "wiimote-weight-square",
+            PARAM_DEFAULT( FloatUserConfigParam(0.0f, "wiimote-weight-square",
             &m_wiimote_group,
             "A weight applied to the square component of mapping wiimote angle to steering angle"));
 
