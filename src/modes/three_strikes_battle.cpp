@@ -342,6 +342,7 @@ void ThreeStrikesBattle::update(float dt)
         physicsSettings.mass = 15.0f;
         physicsSettings.radius = radius;
         physicsSettings.reset_when_too_low = false;
+        physicsSettings.flatten_kart = false;
 
         TrackObjectPresentationMesh* tire_presentation =
             new TrackObjectPresentationMesh(tire, tire_xyz, tire_hpr, tire_scale);
