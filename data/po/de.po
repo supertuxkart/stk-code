@@ -7,13 +7,13 @@ msgstr ""
 "Project-Id-Version: Supertuxkart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-11-12 11:39+1100\n"
-"PO-Revision-Date: 2013-11-13 00:54+0000\n"
-"Last-Translator: Wuzzy <almikes@aol.com>\n"
+"PO-Revision-Date: 2013-11-17 22:59+0000\n"
+"Last-Translator: Tobias Bannert <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-11-15 22:56+0000\n"
+"X-Launchpad-Export-Date: 2013-11-24 21:41+0000\n"
 "X-Generator: Launchpad (build 16831)\n"
 "X-Poedit-SearchPath-0: /home/constantin/Medien/projekte/stk/svn-"
 "vanilla/supertuxkart\n"
@@ -526,7 +526,7 @@ msgstr "Am Ende der Welt"
 #: src/states_screens/options_screen_ui.cpp:112
 #: src/states_screens/options_screen_video.cpp:87 data/po/gui_strings.h:139
 msgid "Audio"
-msgstr "Audio"
+msgstr "Ton"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -1964,7 +1964,7 @@ msgstr "Add-on-Download fehlgeschlagen"
 #. I18N: Section in audio/video settings submenu
 #: data/po/gui_strings.h:155
 msgid "Sound Effects"
-msgstr "Soundeffekte"
+msgstr "Klangeffekte"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
@@ -2536,6 +2536,7 @@ msgstr ""
 "  STK-team https://launchpad.net/~stk\n"
 "  Salesome https://launchpad.net/~xaver-bastiani-deactivatedaccount\n"
 "  Simeon https://launchpad.net/~simeon5\n"
+"  Tobias Bannert https://launchpad.net/~toba\n"
 "  Wolfs https://launchpad.net/~pizzaservice\n"
 "  Wuzzy https://launchpad.net/~wuzzy\n"
 "  cmdrhenner https://launchpad.net/~cmdrhenner\n"

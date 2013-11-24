@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2013-11-12 11:39+1100\n"
-"PO-Revision-Date: 2013-07-26 11:11+0000\n"
-"Last-Translator: Gyönki Bendegúz <gyonkibendeguz@gmail.com>\n"
+"PO-Revision-Date: 2013-11-24 09:28+0000\n"
+"Last-Translator: Jf. Tasz <jftatsz@gmail.com>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-11-15 22:56+0000\n"
+"X-Launchpad-Export-Date: 2013-11-24 21:40+0000\n"
 "X-Generator: Launchpad (build 16831)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
@@ -620,7 +620,7 @@ msgstr "Több szerencsét legközelebb!"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:70
 msgid "Bilinear"
-msgstr ""
+msgstr "Bilineáris"
 
 #. I18N: ./data/tracks/mansion/track.xml
 #: data/po/gui_strings.h:29
@@ -1026,7 +1026,7 @@ msgstr "Kövesd a Főnököt"
 
 #: src/states_screens/race_gui_base.cpp:732
 msgid "Follow the leader!"
-msgstr ""
+msgstr "Kövesd a vezért!"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -1723,7 +1723,7 @@ msgstr "Kész!"
 
 #: src/states_screens/race_result_gui.cpp:860
 msgid "Red Team Wins"
-msgstr ""
+msgstr "Piros Csapat nyert"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -1841,7 +1841,7 @@ msgstr "Gokart kiválasztása"
 #. I18N: In the new story mode game dialog
 #: data/po/gui_strings.h:357
 msgid "Select your identity"
-msgstr ""
+msgstr "Válaszd ki az identitásodat"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:69
@@ -2151,7 +2151,7 @@ msgstr "Pályák"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 msgid "Trilinear"
-msgstr ""
+msgstr "Trilineáris"
 
 #: src/states_screens/dialogs/addons_loading.cpp:338
 #: src/states_screens/dialogs/addons_loading.cpp:378
@@ -2200,7 +2200,7 @@ msgstr "Frissítés"
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will show only recently updated items
 #: data/po/gui_strings.h:557
 msgid "Updated"
-msgstr ""
+msgstr "Frissítve"
 
 #: src/states_screens/addons_screen.cpp:108
 msgid "Updated date"
@@ -2396,6 +2396,8 @@ msgid ""
 "You need more points\n"
 "to enter this challenge!"
 msgstr ""
+"Több pontra van szükséged ahhoz,\n"
+"hogy elvállalhasd ezt a kihívást!"
 
 #: src/states_screens/feature_unlocked.cpp:649
 msgid "You unlocked grand prix %0"

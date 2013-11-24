@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2013-11-12 11:39+1100\n"
-"PO-Revision-Date: 2013-11-01 14:27+0000\n"
+"PO-Revision-Date: 2013-11-23 08:17+0000\n"
 "Last-Translator: Alan <Unknown>\n"
 "Language-Team: Breton <br@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-11-15 22:56+0000\n"
+"X-Launchpad-Export-Date: 2013-11-24 21:41+0000\n"
 "X-Generator: Launchpad (build 16831)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
@@ -447,19 +447,19 @@ msgstr "Gweledva blivet : %s"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 msgid "Anisotropic x16"
-msgstr ""
+msgstr "Annebahelek x16"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:72
 msgid "Anisotropic x2"
-msgstr ""
+msgstr "Annebahelek x2"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 msgid "Anisotropic x4"
-msgstr ""
+msgstr "Annebahelek x4"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:74
 msgid "Anisotropic x8"
-msgstr ""
+msgstr "Annebahelek x8"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -621,7 +621,7 @@ msgstr "Gwell e vo ar wech a zeu !"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:70
 msgid "Bilinear"
-msgstr ""
+msgstr "Uelinennek"
 
 #. I18N: ./data/tracks/mansion/track.xml
 #: data/po/gui_strings.h:29
@@ -2184,7 +2184,7 @@ msgstr "Loabroù"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 msgid "Trilinear"
-msgstr ""
+msgstr "Trilinennek"
 
 #: src/states_screens/dialogs/addons_loading.cpp:338
 #: src/states_screens/dialogs/addons_loading.cpp:378
@@ -2496,4 +2496,5 @@ msgstr "skoueriek"
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Alan https://launchpad.net/~alan-m."
+"  Alan https://launchpad.net/~alan-m.\n"
+"  STK-team https://launchpad.net/~stk"
