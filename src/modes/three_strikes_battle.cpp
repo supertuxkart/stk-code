@@ -296,15 +296,14 @@ void ThreeStrikesBattle::update(float dt)
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
 
-    core::vector3df tire_offset;
-    std::string tire;
-    float scale = 0.5f;
-    float radius = 0.5f;
-    PhysicalObject::BodyTypes body_shape;
-
     // insert blown away tire(s) now if was requested
     while (m_insert_tire > 0)
     {
+        std::string tire;
+        core::vector3df tire_offset;
+        float scale = 0.5f;
+        float radius = 0.5f;
+        PhysicalObject::BodyTypes body_shape;
         if(m_insert_tire == 1)
         {
             tire_offset = core::vector3df(0.0f, 0.0f, 0.0f);
@@ -335,27 +334,28 @@ void ThreeStrikesBattle::update(float dt)
                                                    m_tire_rotation *RAD_TO_DEGREE + 180);
         core::vector3df tire_scale(scale,scale,scale);
 
-        PhysicalObject::Settings physics_settings(PhysicalObject::MP_CYLINDER_Y, 
+        PhysicalObject::Settings physics_settings(body_shape, 
                                                   radius, /*mass*/15.0f);
 
         TrackObjectPresentationMesh* tire_presentation =
             new TrackObjectPresentationMesh(tire, tire_xyz, tire_hpr, tire_scale);
 
-        TrackObject* tire = new TrackObject(tire_xyz, tire_hpr, tire_scale,
-                                            "movable", tire_presentation,
-                                            true /* is_dynamic */,
-                                            &physics_settings);
-        getTrack()->getTrackObjectManager()->insertObject(tire);
+        TrackObject* tire_obj = new TrackObject(tire_xyz, tire_hpr, tire_scale,
+                                                "movable", tire_presentation,
+                                                true /* is_dynamic */,
+                                                &physics_settings);
+        getTrack()->getTrackObjectManager()->insertObject(tire_obj);
 
         // FIXME: orient the force relative to kart orientation
-        tire->getPhysics()->getBody()->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
+        tire_obj->getPhysics()->getBody()
+                ->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
 
         m_insert_tire--;
         if(m_insert_tire == 1)
             m_insert_tire = 0;
 
-        m_tires.push_back(tire);
-    }
+        m_tires.push_back(tire_obj);
+    }   // while
 }   // update
 
 //-----------------------------------------------------------------------------
