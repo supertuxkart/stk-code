@@ -43,8 +43,9 @@ using namespace irr;
 PhysicalObject::Settings::Settings(BodyTypes type, float radius, float mass)
 {
     init();
-    m_mass               = mass;
-    m_radius             = radius;
+    m_body_type  = type;
+    m_mass       = mass;
+    m_radius     = radius;
 }   // Settings
 
 // ----------------------------------------------------------------------------
