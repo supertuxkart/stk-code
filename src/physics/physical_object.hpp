@@ -39,22 +39,38 @@ class PhysicalObject
 {
 public:
     /** The supported collision shapes. */
-    enum bodyTypes {MP_NONE,
+    enum BodyTypes {MP_NONE,
                     MP_CONE_Y, MP_CONE_X, MP_CONE_Z,
                     MP_CYLINDER_Y, MP_CYLINDER_X, MP_CYLINDER_Z,
                     MP_BOX, MP_SPHERE, MP_EXACT};
 
-    struct Settings
+    class Settings
     {
-        float mass;
-        float radius;
-        PhysicalObject::bodyTypes body_type;
-        bool crash_reset;
-        bool knock_kart;
-        bool flatten_kart;
-        bool reset_when_too_low;
-        float reset_height;
-    };
+    public:
+        /** Mass of the object. */
+        float                     m_mass;
+        /** Radius of the object. */
+        float                     m_radius;
+        /** Shape of the object. */
+        PhysicalObject::BodyTypes m_body_type;
+        /** Trigger a reset in karts touching it? */
+        bool                      m_crash_reset;
+        /** Knock the kart around. */
+        bool                      m_knock_kart;
+        /** Flatten the kart when this object is touched. */
+        bool                      m_flatten_kart;
+        /** Reset the object when it falls under the track (useful
+         *  e.g. for a boulder rolling down a hill). */
+        bool                      m_reset_when_too_low;
+        /** If the item is below that height, it is reset (when 
+         *  m_reset_when_too_low is true). */
+        float                     m_reset_height;
+    private:
+        void init();
+    public:
+        Settings(BodyTypes type, float radius, float mass);
+        Settings(const XMLNode &xml_node);
+    };   // Settings
 
 private:
 
@@ -70,7 +86,7 @@ private:
     TrackObject          *m_object;
 
     /** The shape of this object. */
-    bodyTypes             m_body_type;
+    BodyTypes             m_body_type;
 
     /** The bullet collision shape. */
     btCollisionShape     *m_shape;
