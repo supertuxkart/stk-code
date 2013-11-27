@@ -446,20 +446,6 @@ bool Flyable::hit(AbstractKart *kart_hit, PhysicalObject* object)
 {
     // the owner of this flyable should not be hit by his own flyable
     if(isOwnerImmunity(kart_hit)) return false;
-
-    if (kart_hit != NULL)
-    {    //TODO: reduce shield time; add other string ?
-        RaceGUIBase* gui = World::getWorld()->getRaceGUI();
-        irr::core::stringw hit_message =
-            StringUtils::insertValues(getHitString(kart_hit),
-                                      core::stringw(kart_hit->getName()),
-                                      core::stringw(m_owner ->getName())
-                                                                         );
-        if(hit_message.size()>0)
-            gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f,
-                            video::SColor(255, 255, 255, 255), false);
-    }
-
     m_has_hit_something=true;
 
     return true;

@@ -167,7 +167,6 @@ public:
     static void  init        (const XMLNode &node, scene::IMesh *model,
                               PowerupManager::PowerupType type);
     virtual bool              updateAndDelete(float);
-    virtual const core::stringw getHitString(const AbstractKart *kart) const = 0;
     virtual HitEffect*        getHitEffect() const;
     void                      updateFromServer(const FlyableInfo &f, float dt);
     bool                      isOwnerImmunity(const AbstractKart *kart_hit) const;

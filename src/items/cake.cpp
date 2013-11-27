@@ -137,28 +137,6 @@ void Cake::init(const XMLNode &node, scene::IMesh *cake_model)
 }   // init
 
 // ----------------------------------------------------------------------------
-/** Picks a random message to be displayed when a kart is hit by a cake.
- *  \param The kart that was hit (ignored here).
- *  \returns The string to display.
- */
-const core::stringw Cake::getHitString(const AbstractKart *kart) const
-{
-    const int CAKE_STRINGS_AMOUNT = 4;
-    RandomGenerator r;
-    switch (r.get(CAKE_STRINGS_AMOUNT))
-    {
-        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-        case 0: return _LTR("%0 eats too much of %1's cake");
-        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-        case 1: return _LTR("%0 is dubious of %1's cooking skills");
-        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-        case 2: return _LTR("%0 should not play with %1's lunch");
-        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
-        case 3: return _LTR("%1 ruins %0's cakeless diet");
-        default: assert(false); return L"";   // avoid compiler warning
-    }
-}   // getHitString
-// ----------------------------------------------------------------------------
 /** Callback from the physics in case that a kart or physical object is hit.
  *  The cake triggers an explosion when hit.
  *  \param kart The kart hit (NULL if no kart was hit).
