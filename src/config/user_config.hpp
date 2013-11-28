@@ -562,8 +562,6 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_cache_overworld
             PARAM_DEFAULT(  BoolUserConfigParam(true, "cache-overworld") );
 
-    PARAM_PREFIX BoolUserConfigParam        m_minimal_race_gui
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "minimal-race-gui") );
     // TODO : is this used with new code? does it still work?
     PARAM_PREFIX BoolUserConfigParam        m_crashed
             PARAM_DEFAULT(  BoolUserConfigParam(false, "crashed") );
