@@ -3,13 +3,13 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-11-12 11:39+1100\n"
-"PO-Revision-Date: 2013-11-02 13:42+0000\n"
+"PO-Revision-Date: 2013-11-18 21:53+0000\n"
 "Last-Translator: Marc Coll Carrillo <Unknown>\n"
 "Language-Team: STK spanish team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-11-15 22:56+0000\n"
+"X-Launchpad-Export-Date: 2013-11-24 21:41+0000\n"
 "X-Generator: Launchpad (build 16831)\n"
 "X-Poedit-Language: Spanish\n"
 "X-Poedit-Bookmarks: -1,-1,-1,-1,-1,-1,189,-1,-1,-1\n"
@@ -445,19 +445,19 @@ msgstr "Escenario animado: %s"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 msgid "Anisotropic x16"
-msgstr ""
+msgstr "Anisotrópico x16"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:72
 msgid "Anisotropic x2"
-msgstr ""
+msgstr "Anisotrópico x2"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 msgid "Anisotropic x4"
-msgstr ""
+msgstr "Anisotrópico x4"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:74
 msgid "Anisotropic x8"
-msgstr ""
+msgstr "Anisotrópico x8"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -619,7 +619,7 @@ msgstr "¡Más suerte la próxima vez!"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:70
 msgid "Bilinear"
-msgstr ""
+msgstr "Bilineal"
 
 #. I18N: ./data/tracks/mansion/track.xml
 #: data/po/gui_strings.h:29
@@ -2187,7 +2187,7 @@ msgstr "Circuitos"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 msgid "Trilinear"
-msgstr ""
+msgstr "Trilineal"
 
 #: src/states_screens/dialogs/addons_loading.cpp:338
 #: src/states_screens/dialogs/addons_loading.cpp:378

@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2013-11-12 11:39+1100\n"
-"PO-Revision-Date: 2013-11-14 23:34+0000\n"
+"PO-Revision-Date: 2013-11-20 10:34+0000\n"
 "Last-Translator: GunChleoc <Unknown>\n"
 "Language-Team: Fòram na Gàidhlig http://www.foramnagaidhlig.net\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-11-15 22:56+0000\n"
+"X-Launchpad-Export-Date: 2013-11-24 21:40+0000\n"
 "X-Generator: Launchpad (build 16831)\n"
 "Language: gd\n"
 
@@ -63,7 +63,7 @@ msgstr "Tha %0 teagmhach mu na sgilean còcaireachd aig %1"
 #. I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
 #: src/items/cake.cpp:155
 msgid "%0 should not play with %1's lunch"
-msgstr "Cha bu chòir dha %0 cluiche leis a’ bhiadh aig %1"
+msgstr "Cha bu chòir do %0 cluiche leis a’ bhiadh aig %1"
 
 #. I18N: shown when hit by bowling ball. %1 is the attacker, %0 is
 #. the victim.
@@ -158,14 +158,14 @@ msgstr "Tha %s air a dhruim-dìreach"
 #: src/items/powerup.cpp:51
 #, c-format
 msgid "%s is a mighty pirate!"
-msgstr "Abair thusa gu bheil %s na spùinneadair-mara tapaidh!"
+msgstr "Abair thusa gu bheil %s ’na spùinneadair-mara tapaidh!"
 
 #. I18N: shown when a player is hit by a rubber ball. %1 is the
 #. attacker, %0 is the victim.
 #: src/items/rubber_ball.cpp:310
 #, c-format
 msgid "%s is being bounced around."
-msgstr "Tha %s ga bhocadh mu thimcheall."
+msgstr "Tha %s ’ga bhocadh mu thimcheall."
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/bowling.cpp:146
@@ -187,7 +187,7 @@ msgstr "’S e gaisgeach a’ bhàla bhùmaraing a th’ ann an %s"
 #: src/items/powerup.cpp:50
 #, c-format
 msgid "%s pays the next round of grog!"
-msgstr "Pàighidh %s an ath thràth dhe ghrog"
+msgstr "Pàighidh %s an ath thràth grog"
 
 #. I18N: shown when hit by own bowling ball. %s is the kart.
 #: src/items/bowling.cpp:150
@@ -198,7 +198,7 @@ msgstr "Bu chòir do %s gathan (rubair) a chluiche an àite bobhlaireachd"
 #: src/modes/world.cpp:1028
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr "Chaidh cur às dha ‘%s’"
+msgstr "Tha “%s” air a ruaig"
 
 #. I18N: for empty highscores entries
 #. I18N: ./data/gui/track_info_dialog.stkgui
@@ -222,7 +222,8 @@ msgstr ""
 #. I18N: in the help screen
 #: data/po/gui_strings.h:646
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr "Faic/Atharraich ceangal nan iuchraichean sa chlàr-taice Roghainnean"
+msgstr ""
+"Faic/Atharraich nasgadh nan iuchraichean sa chlàr-taice “Roghainnean”"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -233,9 +234,9 @@ msgid ""
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
 msgstr ""
-"* Faodaidh tu a’ mhòr-chuid dhe na modhan-geama seo a chluiche ann an dòigh "
+"* Faodaidh tu a’ mhòrchuid dhe na modhan-geama seo a chluiche ann an dòigh "
 "Grand Prix cuideachd: an àite a bhith a’ cluiche rèis a-mhàin, cluichidh tu "
-"sreath dhiubh. Mar as fheàrr an rang agad, ’s ann as motha na puingean a "
+"sreath dhiubh. Mar as fhearr an rang agad, ’s ann as motha na puingean a "
 "gheibh thu. Aig deireadh an latha, ’s e an cluicheadair aig a bheil na "
 "puingean as motha a bhuannaicheas a’ chuach."
 
@@ -245,8 +246,8 @@ msgid ""
 "* Which config to use will be inferred from which 'fire' key is pressed to "
 "join the game."
 msgstr ""
-"Thèid co-dhùnadh dè an rèiteachadh a tha ri chleachdadh a rèir dè an iuchair "
-"‘loisg’ a chaidh a bhrùthadh gus gabhail sa gheama."
+"Thèid co-dhùnadh dè an rèiteachadh a tha ri chleachdadh a-rèir dè an iuchair "
+"“loisg” a chaidh a bhrùthadh gus pàirt a ghabhail sa gheama."
 
 #: src/states_screens/addons_screen.cpp:49
 msgid "1 month"
@@ -312,7 +313,7 @@ msgstr "Sguir dhen Grand Prix"
 #. I18N: Main menu button
 #: data/po/gui_strings.h:546
 msgid "About"
-msgstr "Mu dheidhinn"
+msgstr "About"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:190
@@ -405,14 +406,14 @@ msgstr "A h-uile slighe"
 #: src/states_screens/race_setup_screen.cpp:259
 msgid "All blows allowed, so catch weapons and make clever use of them!"
 msgstr ""
-"Tha gach seòrsa dhe bhuille ceadaichte, mar sin glac airm is cleachd gu glic "
+"Tha gach seòrsa de bhuille ceadaichte, mar sin tog airm is cleachd gu glic "
 "iad!"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 #: data/po/gui_strings.h:451
 msgid "Allow STK to connect to the Internet"
-msgstr "Ceadaich dha STK ceangal air an eadar-lìon"
+msgstr "Ceadaich do STK ceangal ris an eadar-lìon"
 
 #. I18N: ./data/tracks/jungle/track.xml
 #: data/po/gui_strings.h:17
@@ -602,7 +603,7 @@ msgid ""
 "down on the way."
 msgstr ""
 "Bàla basket - bocaidh e an tòir an toisiche is cuiridh e cartaichean air an "
-"rathad nan spleuchd no maille orra, ’s dòcha."
+"rathad ’nan spleuchd no maille orra, ’s dòcha."
 
 #. I18N: ./data/tracks/battleisland/track.xml
 #: data/po/gui_strings.h:23
@@ -622,7 +623,7 @@ msgstr "Beastie"
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:260
 msgid "Better luck next time!"
-msgstr "Gun tèid nas fheàrr leat an ath thuras!"
+msgstr "Gun tèid nas fhearr leat an ath thuras!"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:70
 msgid "Bilinear"
@@ -670,14 +671,14 @@ msgstr ""
 #: data/po/gui_strings.h:86 data/po/gui_strings.h:89
 msgid "But I'm a fair creature, so I'll make you a deal."
 msgstr ""
-"Co-dhiù, ’s e creutair cothromach a th’ anam is bheir mi seans dhuibh."
+"Co-dhiù, ’s e creutair cothromach a th’ annam is bheir mi seans dhuibh."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:675
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights."
 msgstr ""
-"Cèic - tilg air an fharpaiseach as fhaisge e, as fheàrr air amasan faisg ort "
+"Cèic - tilg air an fharpaiseach as fhaisge e, as fhearr air amasan faisg ort "
 "no air slighean dìreach."
 
 #: src/addons/network_http.cpp:432 src/addons/news_manager.cpp:149
@@ -808,8 +809,8 @@ msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok.Detailed "
 "instructions at supertuxkart.net/Wiimote"
 msgstr ""
-"Ceangail a' wiimote agad ris an stiùiriche Bluetooth is an uairsin briog air "
-"\"Ceart ma-thà\". Gheibh thu stiùireadh mionaideach air "
+"Ceangail a’ wiimote agad ris an stiùiriche Bluetooth is an uairsin briog air "
+"“Ceart ma-thà”. Gheibh thu stiùireadh mionaideach air "
 "supertuxkart.net/Wiimote"
 
 #: src/states_screens/race_setup_screen.cpp:266
@@ -873,7 +874,7 @@ msgstr "Roghainnean gnàthaichte"
 #. I18N: To delete a keyboard configuration
 #: src/states_screens/options_screen_input2.cpp:96 data/po/gui_strings.h:394
 msgid "Delete Configuration"
-msgstr "Sguab às dhan rèiteachadh"
+msgstr "Sguab às an rèiteachadh"
 
 #. I18N: button to disable a gamepad configuration
 #: src/states_screens/options_screen_input2.cpp:81
@@ -903,7 +904,7 @@ msgstr "A bheil thu cinnteach gu behil thu airson sgur dhen Grand Prix?"
 #: src/states_screens/dialogs/player_info_dialog.cpp:155
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
-msgstr "A bheil thu airson sguabadh às dhan chluicheadair ‘%s’ ?"
+msgstr "A bheil thu airson an cluicheadair “%s” a sguabadh às?"
 
 #: src/items/powerup.cpp:68
 msgid "Do you want to fly kites?"
@@ -911,7 +912,7 @@ msgstr "A bheil thu airson itealag?"
 
 #: src/karts/controller/player_controller.cpp:334
 msgid "Don't accelerate before go"
-msgstr "Na luathaich ron chomharra \"Dèan às!\""
+msgstr "Na luathaich ron chomharra “Dèan às!”"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:219
@@ -942,7 +943,7 @@ msgstr "Elephpant"
 #: src/states_screens/race_result_gui.cpp:353
 #: src/states_screens/race_result_gui.cpp:717
 msgid "Eliminated"
-msgstr "Neo-shoirbheachail"
+msgstr "Air a ruaig"
 
 #. I18N: ./data/karts/emule/kart.xml
 #: data/po/gui_strings.h:840
@@ -967,7 +968,7 @@ msgstr "An comas"
 #. I18N: animations setting (all karts are animated)
 #: src/states_screens/dialogs/custom_video_settings.cpp:60
 msgid "Enabled for all"
-msgstr "An comas airson a h-uile"
+msgstr "An comas airson na h-uile"
 
 #. I18N: ./data/gui/enter_player_name_dialog.stkgui
 #. I18N: In the 'add new player' dialog
@@ -981,7 +982,7 @@ msgid ""
 "Press 'Select' now to join the game!"
 msgstr ""
 "A h-uile duine:\n"
-"Brùth air ‘Tagh’ an-dràsta gus gabhail sa gheama!"
+"Brùth air “Tagh” an-dràsta gus pàirt a ghabhail sa gheama!"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
@@ -1030,14 +1031,14 @@ msgid ""
 "in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
 msgstr ""
-"Sa chiad dol a-mach, bidh barrachd air aon uidheam ion-chuir a dhìth ort (’s "
-"e iomadh pada-geama no joysticks an dòigh as fheàrr gus cluiche le daoine "
-"eile). Rach gu sgrìn nan roghainnean ion-chuir is suidhich na padaichean-"
-"geama. ’S urrainn dhut cluiche air meur-chlàr(an) cuideachd, ach bidh "
-"buidheann dhe dh’iuchraichean eadar-dhealaichte a dhìth aig gach "
-"cluicheadair. Thoir an aire nach eil a’ mhòr-chuid dhe na meur-chlàran "
+"Sa chiad dol a-mach, bidh feum agad air barrachd air aon uidheam ion-chuir "
+"(’s e iomadh pada-geama no joysticks an dòigh as fhearr gus cluiche le "
+"daoine eile). Rach gu sgrìn nan roghainnean ion-chuir is suidhich na "
+"padaichean-geama. ’S urrainn dhut cluiche air meur-chlàr(an) cuideachd, ach "
+"bidh feum air buidheann dhe dh’iuchraichean eadar-dhealaichte airson gach "
+"cluicheadair. Thoir an aire nach eil a’ mhòrchuid dhe na meur-chlàran "
 "freagarrach airson geama ioma-chluicheadair on nach cuir iad taic ri "
-"brùthadh air àireamh mòr dhe dh’iuchraichean."
+"brùthadh air àireamh mhòr de dh’iuchraichean."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:179
@@ -1058,8 +1059,8 @@ msgid ""
 msgstr ""
 "Lean an toisiche: feuch an crìochnaich thu air an dàrna àite on a thèid an "
 "cart mu dheireadh a dhì-chòireachadh gach turas a ruigeas an cunntair a "
-"neoni. Thoir an aire: thèid do dhì-chòireachadh cuideachd ma thèid thu "
-"seachad air an toisiche!"
+"neoni. Thoir an aire: thèid do ruaig cuideachd ma thèid thu seachad air an "
+"toisiche!"
 
 #. I18N: ./data/tracks/fortmagma/track.xml
 #: data/po/gui_strings.h:56
@@ -1162,7 +1163,7 @@ msgstr "Adhartas a’ Grand Prix:"
 #. I18N: In the graphics settings
 #: data/po/gui_strings.h:268
 msgid "Graphical Effects Level"
-msgstr "Ìre buaidh grafaigeachd"
+msgstr "Ìre nan èifeachdan grafaigeachd"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
@@ -1246,7 +1247,7 @@ msgstr ""
 #, c-format
 msgid "Ignoring '%s', you needed to join earlier to play!"
 msgstr ""
-"A’ leigeil seachad ‘%s’, feumaidh tu gabhail ann nas tràithe gus cluiche!"
+"A’ leigeil seachad “%s”, feumaidh tu gabhail ann nas tràithe gus cluiche!"
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
@@ -1324,7 +1325,7 @@ msgstr "Clì"
 
 #: src/guiengine/engine.cpp:1286
 msgid "Loading"
-msgstr "Ga luchdadh"
+msgstr "’Ga luchdadh"
 
 #: src/states_screens/kart_selection.cpp:933
 msgid "Locked"
@@ -1354,7 +1355,7 @@ msgstr "Sùil air ais"
 msgid "Magic, son. Nothing else in the world smells like that."
 msgstr ""
 "Draoidheachd, ’Ille. Chan eil dad eile fon ghrèin le fàileadh dhen leithid "
-"air"
+"air."
 
 #. I18N: if some kart animations are enabled
 #: src/states_screens/options_screen_video.cpp:355
@@ -1426,12 +1427,12 @@ msgstr "Geama ùr"
 #: src/challenges/challenge_data.cpp:509
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr "Tha Grand Prix ùr ‘%s’ ri fhaighinn a-nis"
+msgstr "Tha Grand Prix ùr “%s” ri fhaighinn a-nis"
 
 #: src/challenges/challenge_data.cpp:513
 #, c-format
 msgid "New difficulty '%s' now available"
-msgstr "Tha duilgheas ùr ‘%s’ ri fhaighinn a-nis"
+msgstr "Tha duilgheas ùr “%s” ri fhaighinn a-nis"
 
 #: src/modes/linear_world.cpp:356
 msgid "New fastest lap"
@@ -1440,17 +1441,17 @@ msgstr "Cuairt as luaithe ùr"
 #: src/challenges/challenge_data.cpp:499
 #, c-format
 msgid "New game mode '%s' now available"
-msgstr "Tha am modh-geama ‘%s’ ri fhaighinn a-nis"
+msgstr "Tha am modh-geama “%s” ri fhaighinn a-nis"
 
 #: src/challenges/challenge_data.cpp:523
 #, c-format
 msgid "New kart '%s' now available"
-msgstr "Tha cart ùr ‘%s’ ri fhaighinn a-nis"
+msgstr "Tha cart ùr “%s” ri fhaighinn a-nis"
 
 #: src/challenges/challenge_data.cpp:493
 #, c-format
 msgid "New track '%s' now available"
-msgstr "Tha slighe ùr ‘%s’ ri fhaighinn a-nis"
+msgstr "Tha slighe ùr “%s” ri fhaighinn a-nis"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_input2.cpp:199
@@ -1503,19 +1504,19 @@ msgstr "Foghlamaiche"
 #: src/states_screens/dialogs/select_challenge.cpp:65
 #, c-format
 msgid "Number of AI Karts : %i"
-msgstr "Àireamh dhe chartaichean IF : %i"
+msgstr "Àireamh de chartaichean IF : %i"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: In race setup menu
 #: data/po/gui_strings.h:767
 msgid "Number of AI karts"
-msgstr "Àireamh dhe chartaichean IF"
+msgstr "Àireamh de chartaichean IF"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup menu
 #: data/po/gui_strings.h:796
 msgid "Number of goals to win"
-msgstr "Àireamh dhe thadhalan airson buaidh a thoirt"
+msgstr "Àireamh de thadhalan gus buaidh a thoirt"
 
 #: src/states_screens/dialogs/message_dialog.cpp:86
 #: src/states_screens/dialogs/message_dialog.cpp:93
@@ -1532,7 +1533,7 @@ msgstr "Slighe iomallach"
 #: data/po/gui_strings.h:80 data/po/gui_strings.h:83
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
 msgstr ""
-"Ò, seadh, tha e sa chaisteal agam an-dràsta is thèid e na dhìnnear ..."
+"Ò, seadh, tha e sa chaisteal agam an-dràsta is thèid e ’na dhìnnear ..."
 
 #. I18N: ./data/tracks/mines/track.xml
 #: data/po/gui_strings.h:71
@@ -1625,7 +1626,7 @@ msgstr "Cluicheadairean"
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:480
 msgid "Please re-configure your key bindings."
-msgstr "An ath-rèitich thu ceanglaidhean nan iuchraichean agad?"
+msgstr "An ath-rèitich thu nasgadh nan iuchraichean agad?"
 
 #: src/states_screens/addons_screen.cpp:434
 msgid "Please wait while addons are updated"
@@ -1633,7 +1634,7 @@ msgstr "Fuirich ort fhad ’s a thèid tuilleadain ùrachadh"
 
 #: src/states_screens/main_menu_screen.cpp:403
 msgid "Please wait while the add-ons are loading"
-msgstr "Fuirich ort fhad ’s a tha tuilleadain gan luchdadh"
+msgstr "Fuirich ort fhad ’s a tha tuilleadain ’gan luchdadh"
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:678
@@ -1681,7 +1682,8 @@ msgstr ""
 #: data/po/gui_strings.h:510
 msgid "Press enter or double-click on a player to edit him/her"
 msgstr ""
-"Brùth air enter no briog gu dùbailte air cluicheadair gus a d(h)easachadh"
+"Brùth air enter no dèan briogadh dùbailte air cluicheadair gus a "
+"d(h)easachadh"
 
 #: src/states_screens/race_gui_overworld.cpp:455
 msgid "Press fire to play the tutorial"
@@ -1696,19 +1698,19 @@ msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
 "mode, then click on Ok.Detailed instructions at supertuxkart.net/Wiimote"
 msgstr ""
-"Brùthaich na putanan 1+2 air a' wiimote agad aig an aon àm gus a chur sa "
-"mhodh luirg is an uairsin briog air \"Ceart ma-thà\". Gheibh thu stiùireadh "
+"Brùth air na putanan 1+2 air a’ wiimote agad aig an aon àm gus a chur sa "
+"mhodh luirg is an uairsin briog air “Ceart ma-thà”. Gheibh thu stiùireadh "
 "mionaideach air supertuxkart.net/Wiimote"
 
 #: src/states_screens/dialogs/addons_loading.cpp:326
 #, c-format
 msgid "Problems installing the addon '%s'."
-msgstr "Duilgheadas le stàladh an tuilleadain ‘%s’."
+msgstr "Duilgheadas le stàladh an tuilleadain “%s”."
 
 #: src/states_screens/dialogs/addons_loading.cpp:366
 #, c-format
 msgid "Problems removing the addon '%s'."
-msgstr "Duilgheadas le toirt air falbh an tuilleadain ‘%s’."
+msgstr "Duilgheadas le toirt air falbh an tuilleadain “%s”."
 
 #. I18N: ./data/karts/puffy/kart.xml
 #: data/po/gui_strings.h:846
@@ -1799,7 +1801,7 @@ msgstr "Thoir air falbh"
 #. I18N: In the player info dialog
 #: src/states_screens/dialogs/player_info_dialog.cpp:91
 msgid "Rename"
-msgstr "Ath-ainmich"
+msgstr "Ainm ùr air"
 
 #: src/states_screens/dialogs/select_challenge.cpp:61
 #, c-format
@@ -1957,7 +1959,7 @@ msgid ""
 "Soccer: Only in multiplayer games. Use your kart to push the ball into the "
 "goal."
 msgstr ""
-"Ball-coise: ri làimh le geamannan ioma-chluicheadair a-mhàin. Cleachd an "
+"Ball-coise: ri fhaighinn le geamannan ioma-chluicheadair a-mhàin. Cleachd an "
 "cart agad gus am bàla a bhrùthadh dhan tadhal."
 
 #: src/states_screens/addons_screen.cpp:512
@@ -1979,7 +1981,7 @@ msgstr "Duilich, ach dh’fhàillig le luchdadh a-nuas an tuilleadain"
 #. I18N: Section in audio/video settings submenu
 #: data/po/gui_strings.h:155
 msgid "Sound Effects"
-msgstr "Buaidhean fuaime"
+msgstr "Èifeachdan fuaime"
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
@@ -2064,7 +2066,7 @@ msgstr ""
 #. I18N: ./data/gui/help3.stkgui
 #: data/po/gui_strings.h:732
 msgid "SuperTuxKart features several game modes"
-msgstr "Tha iomadh mhodh-geama aig SuperTuxKart"
+msgstr "Tha iomadh modh-geama aig SuperTuxKart"
 
 #: src/main.cpp:1439
 msgid ""
@@ -2074,10 +2076,10 @@ msgid ""
 "\"Allow STK to connect to the Internet\")."
 msgstr ""
 "Faodaidh SuperTuxKart ceangal a dhèanamh ri frithealaiche gus tuilleadain a "
-"luchdadh a-nuas is brath air ùrachaidhean a chur thugad. A bheil thu airson "
-"am feart seo a chur air? (Gus an roghainn seo atharrachadh ùine sam bith, "
-"rach gu Roghainnean, tagh an taba ‘Eadar-aghaidh’ is deasaich “Allow STK to "
-"connect to the Internet”)."
+"luchdadh a-nuas is brath air ùrachaidhean a thoirt dhut. A bheil thu airson "
+"am feart seo a chur air? (Gus an roghainn seo atharrachadh uair sam bith, "
+"rach gu “Roghainnean”, tagh an taba “Eadar-aghaidh” is deasaich “Ceadaich do "
+"STK ceangal ris an eadar-lìon”)."
 
 #. I18N: ./data/karts/suzanne/kart.xml
 #: data/po/gui_strings.h:831
@@ -2090,14 +2092,14 @@ msgid ""
 "Swapper - gift boxes are transformed into bananas and vice versa for a short "
 "time."
 msgstr ""
-"Suaipear - thèid bogsaichean tìodhlaic nan bananathan is taobh mu seach fad "
+"Suaipear - thèid bogsaichean tìodhlaic ’nan bananathan is taobh mu seach fad "
 "greiseag."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:696
 msgid "Swatter - will squash karts close by, slowing them down."
 msgstr ""
-"Bualadair - cuiridh e cartaichean faisg ort nan spleuchd is maille orra."
+"Bualadair - cuiridh e cartaichean faisg ort ’nan spleuchd is maille orra."
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options_screen_ui.cpp:162
@@ -2115,7 +2117,7 @@ msgstr "Criathrag innich"
 #: data/po/gui_strings.h:642
 msgid "The 'skidding' key allows you to skid in sharp turns and get a boost."
 msgstr ""
-"Leigidh an iuchair ‘sleamhnachadh’ leat sleamhnachadh ann an lùban casa is "
+"Leigidh an iuchair “sleamhnachadh” leat sleamhnachadh ann an lùban casa is "
 "neartachadh fhaighinn."
 
 #. I18N: ./data/tracks/islandtrack/track.xml
@@ -2135,7 +2137,7 @@ msgstr "An lann-cluiche"
 #: src/states_screens/main_menu_screen.cpp:391
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr ""
-"Chaidh mòideil nan tuilleadan a chur à comas ann an sgrìn nan Roghainnean"
+"Chaidh mòideil nan tuilleadan a chur à comas ann an sgrìn nan roghainnean"
 
 #: src/race/highscore_manager.cpp:100
 msgid ""
@@ -2143,7 +2145,7 @@ msgid ""
 "all highscores have been erased."
 msgstr ""
 "Bha faidhle nan sgòran àrda ro shean,\n"
-"chaidh sguabadh às dhan a h-uile sgòr àrd."
+"chaidh na h-uile sgòr àrd a sguabadh às."
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:151
 msgid "This Grand Prix is broken!"
@@ -2178,12 +2180,12 @@ msgstr ""
 "air an liosta.\n"
 "\n"
 "Gus rèiteachadh meur-chlàir a chur ris, faodaidh tu am putan gu h-ìosal a "
-"chleachdadh. Co-dhiù, thoir an AIRE nach cuir a’ mhòr chuid dhe na meur-"
-"chlàran taic ach ri àireamh cuingichte dhe bhrùthadh air iuchraichean aig an "
+"chleachdadh. Co-dhiù, thoir an AIRE nach cuir a’ mhòrchuid dhe na meur-"
+"chlàran taic ach ri àireamh cuingichte de bhrùthadh air iuchraichean aig an "
 "aon àm is mar sin chan eil iad freagarrach airson geama ioma-chluicheadair. "
-"(Co-dhiù, ’s urrainn dhut iomadh meur-chlàran a cheangal ris a’ choimpiutair "
-"agad. Cùm nad aire gu bheil ceanglaichean dhe dh’iuchraichean eadar-"
-"dhealaichte a dhìth aig gach cluicheadair fhathast.)"
+"(Co-dhiù, ’s urrainn dhut iomadh meur-chlàr a cheangal ris a’ choimpiutair "
+"agad. Cum ’nad aire gu bheil nasgadh iuchraichean eadar-dhealaichte a dhìth "
+"aig gach cluicheadair fhathast.)"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
@@ -2332,9 +2334,9 @@ msgid ""
 "keys that contain a character that is different in upper-case will stop "
 "working."
 msgstr ""
-"Rabhadh, cha mholamaid an iuchair ‘Shift’: ma bhrùthas tu air, sguiridh a h-"
-"uile iuchair dhe bhith ag obrachadh aig a bheil caractar eadar-dhealaichte "
-"nuair a bhios e na litir mhòr."
+"Rabhadh, cha mholamaid an iuchair “Shift”: ma bhrùthas tu air, sguiridh a h-"
+"uile iuchair de bhith ag obrachadh aig a bheil caractar eadar-dhealaichte "
+"nuair a bhios e ’na litir mhòr."
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
@@ -2353,13 +2355,13 @@ msgstr "Airm"
 #. I18N: Video settings
 #: data/po/gui_strings.h:409
 msgid "Weather Effects"
-msgstr "Buaidhean sìde"
+msgstr "Èifeachdan sìde"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:376
 #, c-format
 msgid "Weather Effects : %s"
-msgstr "Buaidhean sìde: %s"
+msgstr "Èifeachdan sìde: %s"
 
 #. I18N: Cutscene subtitle from ./data/tracks/introcutscene2/scene.xml
 #. I18N: ./data/tracks/introcutscene2/scene.xml
@@ -2379,13 +2381,13 @@ msgid ""
 "not be used for this operation."
 msgstr ""
 "Nuair a bhios na h-uidheaman ion-chuir air an rèiteachadh, bidh thu ullamh "
-"airson cluiche. Tagh an ìomhaigheag ‘Ioma-chluicheadair’ air a’ phrìomh "
+"airson cluiche. Tagh an ìomhaigheag “Ioma-chluicheadair” air a’ phrìomh "
 "chlàr-taice. Nuair a thig an àm gus cart a thaghadh, faodaidh gach "
-"cluicheadair brùthadh air an iuchair ‘loisg’ air a’ phada-gheama no mheur-"
-"chlàr aca gus gabhail sa gheama. Faodaidh gach cluicheadair an t-uidheam ion-"
-"chuir aca a chleachdadh gus cart a thaghadh. Leanaidh an geama air nuair a "
-"bhios a h-uile duine air cart a thaghadh. Thoir an aire nach urrainn dhut an "
-"luchag a chleachdadh gus seo a dhèanamh."
+"cluicheadair brùthadh air an iuchair “loisg” air a’ phada-gheama no mheur-"
+"chlàr aige gus pàirt a ghabhail sa gheama. Faodaidh gach cluicheadair an t-"
+"uidheam ion-chuir aige a chleachdadh gus cart a thaghadh. Leanaidh an geama "
+"air adhart nuair a bhios a h-uile duine air cart a thaghadh. Thoir an aire "
+"nach urrainn dhut an luchag a chleachdadh gus seo a dhèanamh."
 
 #. I18N: ./data/karts/wilber/kart.xml
 #: data/po/gui_strings.h:864
@@ -2420,7 +2422,7 @@ msgstr "Tha thu a’ cluiche mar"
 #: src/states_screens/dialogs/player_info_dialog.cpp:160
 msgid "You cannot delete this player because it is currently in use."
 msgstr ""
-"Chan urrainn dhut sguabadh às dhan chluicheadair seo oir tha e ga "
+"Chan urrainn dhut an cluicheadair seo a sguabadh às oir tha e ’ga "
 "chleachdadh an-dràsta."
 
 #: src/states_screens/grand_prix_win.cpp:104
@@ -2440,20 +2442,20 @@ msgstr "Choilean thu an Grand Prix!"
 #, c-format
 msgid "You completed the difficult challenge! This trophy is worth %i points"
 msgstr ""
-"Choilean thu an dùbhlan doirbh! Tha luach dhe %i puing air an triathach"
+"Choilean thu an dùbhlan doirbh! Tha luach de %i puing air an triathach"
 
 #: src/states_screens/feature_unlocked.cpp:174
 #, c-format
 msgid "You completed the easy challenge! This trophy is worth %i points"
 msgstr ""
-"Choilean thu an dùbhlan furasta! Tha luach dhe %i puing air an triathach"
+"Choilean thu an dùbhlan furasta! Tha luach de %i puing air an triathach"
 
 #: src/states_screens/feature_unlocked.cpp:178
 #, c-format
 msgid ""
 "You completed the intermediate challenge! This trophy is worth %i points"
 msgstr ""
-"Choilean thu an dùbhlan meadhanach! Tha luach dhe %i puing air an triathach"
+"Choilean thu an dùbhlan meadhanach! Tha luach de %i puing air an triathach"
 
 #: src/karts/kart.cpp:825
 msgid "You finished the race!"
@@ -2461,14 +2463,14 @@ msgstr "Choilean thu an rèis!"
 
 #: src/modes/world.cpp:1025
 msgid "You have been eliminated!"
-msgstr "Chaidh cur às dhut!"
+msgstr "Chaidh do ruaig!"
 
 #: src/karts/kart.cpp:1814
 msgid ""
 "You need more points\n"
 "to enter this challenge!"
 msgstr ""
-"Tha barrachd puingean a dhìth ort\n"
+"Tha barrachd phuingean a dhìth ort\n"
 "ach am faigh thu a-steach dhan dùbhlan seo!"
 
 #: src/states_screens/feature_unlocked.cpp:649
@@ -2488,22 +2490,22 @@ msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
 msgstr ""
-"Bha cruth ceàrr air an fhaidhle rèiteachaidh agad, mar sin chaidh sguabadh "
-"às dha is thèid fear ùr a chruthachadh."
+"Bha cruth cearr air an fhaidhle rèiteachaidh agad, mar sin chaidh sguabadh "
+"às is thèid fear ùr a chruthachadh."
 
 #: src/config/user_config.cpp:669
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
 msgstr ""
-"Bha am faidhle rèiteachaidh agad ro shean, mar sin chaidh sguabadh às dha is "
+"Bha am faidhle rèiteachaidh agad ro shean, mar sin chaidh sguabadh às is "
 "thèid fear ùr a chruthachadh."
 
 #: src/input/device_manager.cpp:482
 msgid "Your input config file is not compatible with this version of STK."
 msgstr ""
 "Chan eil am faidhle rèiteachaidh ion-chuir agad co-chòrdail ris an tionndadh "
-"seo dhe STK."
+"seo de STK."
 
 #. I18N: ./data/tracks/zengarden/track.xml
 #: data/po/gui_strings.h:68

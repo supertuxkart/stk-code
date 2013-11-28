@@ -9,13 +9,13 @@ msgstr ""
 "Project-Id-Version: stk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2013-11-12 11:39+1100\n"
-"PO-Revision-Date: 2012-11-20 09:02+0000\n"
+"PO-Revision-Date: 2013-11-21 21:56+0000\n"
 "Last-Translator: Mantas Kriaučiūnas <mantas@akl.lt>\n"
 "Language-Team: Lietuvių <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-11-15 22:56+0000\n"
+"X-Launchpad-Export-Date: 2013-11-24 21:40+0000\n"
 "X-Generator: Launchpad (build 16831)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
@@ -324,7 +324,7 @@ msgstr ""
 #: src/tracks/track_object_presentation.cpp:610
 #, c-format
 msgid "Accelerate with <%s> and steer with <%s> and <%s>"
-msgstr ""
+msgstr "Pagreitinsite paspaudę <%s>, o vairuosite su <%s> ir <%s>"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:111
@@ -491,7 +491,7 @@ msgstr "Arenos"
 #. I18N: ./data/tracks/lighthouse/track.xml
 #: data/po/gui_strings.h:44
 msgid "Around the lighthouse"
-msgstr ""
+msgstr "Aplink švyturį"
 
 #. I18N: shown when anchor applied. %s is the victim.
 #: src/items/powerup.cpp:49
@@ -530,7 +530,7 @@ msgstr "Apvažiuok bananus!"
 #: src/input/binding.cpp:293
 #, c-format
 msgid "Axis %d"
-msgstr ""
+msgstr "Ašis(kryptis) %d"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:281
@@ -542,7 +542,7 @@ msgstr "Ašis %d %s"
 #: src/input/binding.cpp:288
 #, c-format
 msgid "Axis %d inverted"
-msgstr ""
+msgstr "Ašis %d apversta"
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-ons screen action
@@ -564,7 +564,7 @@ msgstr "Grįžti į žaidimą"
 
 #: src/states_screens/race_result_gui.cpp:142
 msgid "Back to challenge selection"
-msgstr ""
+msgstr "Grįžti į užduočių pasirinkimą"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
@@ -719,7 +719,7 @@ msgstr "Užduotis įvykdyta"
 
 #: src/states_screens/race_gui.cpp:320 src/states_screens/race_gui.cpp:322
 msgid "Challenge Failed"
-msgstr ""
+msgstr "Neįvykdėte užduoties"
 
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: Title for challenges screen
@@ -736,12 +736,12 @@ msgstr "Pasirinkite automobilį"
 #. I18N: ./data/gui/help1.stkgui
 #: data/po/gui_strings.h:622
 msgid "Click here to play the tutorial"
-msgstr ""
+msgstr "Spauskite čia norėdami išmokti žaisti"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #: data/po/gui_strings.h:432
 msgid "Close"
-msgstr ""
+msgstr "Užverti"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -757,11 +757,11 @@ msgstr ""
 
 #: src/tracks/track_object_presentation.cpp:634
 msgid "Collect nitro bottles (we will use them after the curve)"
-msgstr ""
+msgstr "Rinkite ypatingo „nitro“ kuro butelius (juos panaudosite už posūkio)"
 
 #: src/states_screens/race_gui_base.cpp:730
 msgid "Collect nitro!"
-msgstr ""
+msgstr "Rinkite „nitro“ kurą!"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -771,9 +771,9 @@ msgid ""
 "pressing the appropriate key. You can see your current level of nitro in the "
 "bar at the right of the game screen."
 msgstr ""
-"Jei rinksi „Nitro“ paspaudęs atitinkamą klavišą, galėsi panaudoti trumpą "
-"greičio persvarą. Dešinėj ekrano pusėj esančioj juostoj gali matyti "
-"dabartinį savo „Nitro“ kiekį."
+"Jei rinksi „Nitro“ kurą - paspaudęs atitinkamą klavišą, galėsi trumpam "
+"panaudoti greičio persvarą. Dešinėj ekrano pusėj esančioj juostoj gali "
+"matyti dabartinį savo „Nitro“ kuro kiekį."
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/dialogs/player_info_dialog.cpp:179
@@ -1021,7 +1021,7 @@ msgstr "Sekite paskui pirmaujantį"
 
 #: src/states_screens/race_gui_base.cpp:732
 msgid "Follow the leader!"
-msgstr ""
+msgstr "Sekite pirmaujantį lyderį!"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -1104,7 +1104,7 @@ msgstr "Geronimo!!!"
 #. I18N: Race paused button
 #: data/po/gui_strings.h:338
 msgid "Give Up Race"
-msgstr ""
+msgstr "Pasitraukti iš lenktynių"
 
 #. I18N: ./data/karts/gnu/kart.xml
 #: data/po/gui_strings.h:828
@@ -1423,7 +1423,7 @@ msgstr "Nitro"
 
 #: src/states_screens/dialogs/select_challenge.cpp:142
 msgid "Nitro challenge"
-msgstr ""
+msgstr "Užduotis „Nitro kuras“"
 
 #. I18N: ./data/karts/nolok/kart.xml
 #: data/po/gui_strings.h:834
@@ -1513,6 +1513,8 @@ msgstr "Čia veikti gali tik žaidimo meistrai!"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr ""
+"Oi! Jei atsidūrėte neišvažiuojamoje vietoje - spauskite <%s> ir būsite "
+"išgelbėtas"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
@@ -1645,11 +1647,11 @@ msgstr "Nustatymams keisti paspauskite Enter arba dukart spustelėkite pele"
 
 #: src/states_screens/race_gui_overworld.cpp:455
 msgid "Press fire to play the tutorial"
-msgstr ""
+msgstr "Žaidimo pamokas pradėsite paspaudę „Šaudyti“"
 
 #: src/states_screens/race_gui_overworld.cpp:515
 msgid "Press fire to start the challenge"
-msgstr ""
+msgstr "Užduočiai pradėti paspauskite šaudymo mygtuką"
 
 #: src/input/wiimote_manager.cpp:312
 msgid ""
@@ -2166,13 +2168,13 @@ msgstr "Bandyti dar kartą"
 #. I18N: Main menu button
 #: src/states_screens/race_gui_overworld.cpp:448 data/po/gui_strings.h:542
 msgid "Tutorial"
-msgstr ""
+msgstr "Pamokos"
 
 #. I18N: ./data/gui/tutorial.stkgui
 #. I18N: Title for tutorials screen
 #: data/po/gui_strings.h:593
 msgid "Tutorial : Selection Room"
-msgstr "Konsultacija : Pasirinkimų kambarys"
+msgstr "Pamokos: Pasirinkimų kambarys"
 
 #. I18N: ./data/karts/tux/kart.xml
 #: data/po/gui_strings.h:843
@@ -2225,7 +2227,7 @@ msgstr ""
 #: src/tracks/track_object_presentation.cpp:644
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
-msgstr ""
+msgstr "Panaudokite surinktą „nitro“ kurą paspausdami <%s>!"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: Section in the settings menu
@@ -2346,7 +2348,7 @@ msgstr "Taip"
 
 #: src/tracks/track_object_presentation.cpp:683
 msgid "You are now ready to race. Good luck!"
-msgstr ""
+msgstr "Jūs jau pasiruošęs lenktynėms. Sėkmės!"
 
 #. I18N: ./data/gui/options_players.stkgui
 #: data/po/gui_strings.h:506
@@ -2360,11 +2362,11 @@ msgstr ""
 #: src/states_screens/grand_prix_win.cpp:104
 #: src/states_screens/race_result_gui.cpp:112
 msgid "You completed a challenge!"
-msgstr ""
+msgstr "Jūs įvykdėte užduotį!"
 
 #: src/states_screens/race_result_gui.cpp:113
 msgid "You completed challenges!"
-msgstr ""
+msgstr "Jūs įvykdėte užduotis!"
 
 #: src/states_screens/grand_prix_win.cpp:380
 msgid "You completed the Grand Prix!"
@@ -2399,6 +2401,8 @@ msgid ""
 "You need more points\n"
 "to enter this challenge!"
 msgstr ""
+"Norint pradėti žaisti šią užduotį\n"
+"jums reikia uždirbti daugiau taškų!"
 
 #: src/states_screens/feature_unlocked.cpp:649
 msgid "You unlocked grand prix %0"

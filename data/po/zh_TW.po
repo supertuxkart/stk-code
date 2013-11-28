@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: supertuxkart.pot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-11-12 11:39+1100\n"
-"PO-Revision-Date: 2013-11-02 11:49+0000\n"
+"PO-Revision-Date: 2013-11-23 07:43+0000\n"
 "Last-Translator: Bill <cges30901@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-11-15 22:56+0000\n"
+"X-Launchpad-Export-Date: 2013-11-24 21:41+0000\n"
 "X-Generator: Launchpad (build 16831)\n"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
@@ -607,7 +607,7 @@ msgstr "下次運氣會更好！"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:70
 msgid "Bilinear"
-msgstr ""
+msgstr "雙線性"
 
 #. I18N: ./data/tracks/mansion/track.xml
 #: data/po/gui_strings.h:29
@@ -882,7 +882,7 @@ msgstr "下"
 #. I18N: Game mode
 #: src/race/race_manager.hpp:183
 msgid "Egg Hunt"
-msgstr ""
+msgstr "獵蛋"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -2112,7 +2112,7 @@ msgstr "賽道"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 msgid "Trilinear"
-msgstr ""
+msgstr "三線性"
 
 #: src/states_screens/dialogs/addons_loading.cpp:338
 #: src/states_screens/dialogs/addons_loading.cpp:378
