@@ -233,6 +233,7 @@ src/tracks/track_object_manager.cpp
 src/tracks/track_object_presentation.cpp
 src/tracks/track_sector.cpp
 src/utils/constants.cpp
+src/utils/crash_reporting.cpp
 src/utils/leak_check.cpp
 src/utils/log.cpp
 src/utils/profiler.cpp
@@ -499,6 +500,7 @@ src/tracks/track_sector.hpp
 src/utils/aligned_array.hpp
 src/utils/constants.hpp
 src/utils/interpolation_array.hpp
+src/utils/crash_reporting.hpp
 src/utils/leak_check.hpp
 src/utils/log.hpp
 src/utils/no_copy.hpp

@@ -179,6 +179,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/crash_reporting.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -1303,6 +1304,8 @@ int main(int argc, char *argv[] )
     google_breakpad::ExceptionHandler eh(L"C:\\Temp", NULL, ShowDumpResults,
                                          NULL, google_breakpad::ExceptionHandler::HANDLER_ALL);
 #endif
+    CrashReporting::installHandlers();
+
     srand(( unsigned ) time( 0 ));
 
     try {
