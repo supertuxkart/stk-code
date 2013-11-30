@@ -34,11 +34,7 @@ using namespace gui;
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
-
-
-#ifndef round
-# define round(x)  (floor(x+0.5f))
-#endif
+#include "utils/vs.hpp"
 
 namespace GUIEngine
 {

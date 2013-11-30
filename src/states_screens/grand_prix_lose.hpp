@@ -53,7 +53,7 @@ class GrandPrixLose : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
     irr::scene::ISceneNode* m_sky;
     irr::scene::ICameraSceneNode* m_camera;
 
-    irr::scene::ILightSceneNode* m_light;
+    irr::scene::ISceneNode* m_light;
 
     /** A copy of the kart model for each kart used. */
     std::vector<KartModel*> m_all_kart_models;

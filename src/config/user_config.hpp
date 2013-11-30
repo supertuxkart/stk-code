@@ -510,10 +510,6 @@ namespace UserConfigParams
 #define FBO_DEFAULT true
 #endif
 
-    PARAM_PREFIX BoolUserConfigParam        m_fbo
-        PARAM_DEFAULT(  BoolUserConfigParam(FBO_DEFAULT, "fbo",
-                     &m_graphics_quality, "Use frame buffer objects (FBOs)") );
-
     PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "anim_gfx",
                             &m_graphics_quality, "Scenery animations") );
@@ -552,11 +548,22 @@ namespace UserConfigParams
     PARAM_DEFAULT( BoolUserConfigParam(true, "pixel_shaders",
                                        &m_graphics_quality,
                                        "Whether to enable pixel shaders (splatting, normal maps, ...)") );
-    PARAM_PREFIX BoolUserConfigParam         m_postprocess_enabled
+    PARAM_PREFIX BoolUserConfigParam         m_motionblur
             PARAM_DEFAULT( BoolUserConfigParam(false,
-                           "postprocess_enabled", &m_graphics_quality,
-                           "Whether post-processing (motion blur...) should "
-                           "be enabled") );
+                           "motionblur_enabled", &m_graphics_quality,
+                           "Whether motion blur should be enabled") );
+    PARAM_PREFIX BoolUserConfigParam         m_mlaa
+            PARAM_DEFAULT( BoolUserConfigParam(false,
+                           "mlaa", &m_graphics_quality,
+                           "Whether MLAA should be enabled") );
+    PARAM_PREFIX IntUserConfigParam          m_ssao
+            PARAM_DEFAULT( IntUserConfigParam(0,
+                           "ssao", &m_graphics_quality,
+                           "Whether SSAO is enabled (0 = disabled, 1 = low, 2 = high") );
+    PARAM_PREFIX IntUserConfigParam          m_shadows
+            PARAM_DEFAULT( IntUserConfigParam(0,
+                           "shadows", &m_graphics_quality,
+                           "Whether shadows are enabled (0 = disabled, 1 = low, 2 = high") );
 
     // ---- Misc
     PARAM_PREFIX BoolUserConfigParam        m_cache_overworld

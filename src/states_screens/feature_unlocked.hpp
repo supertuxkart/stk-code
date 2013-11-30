@@ -113,7 +113,7 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
     irr::scene::IAnimatedMeshSceneNode *m_chest;
 
     /** The scene node for the light. */
-    irr::scene::ILightSceneNode* m_light;
+    irr::scene::ISceneNode* m_light;
 
     //#define USE_IRRLICHT_BUG_WORKAROUND
 

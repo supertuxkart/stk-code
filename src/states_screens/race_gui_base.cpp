@@ -20,21 +20,8 @@
 
 #include "states_screens/race_gui_base.hpp"
 
-#ifdef __APPLE__
-#  include <OpenGL/gl.h>
-#else
-#  define _WINSOCKAPI_
-#  ifdef WIN32
-#    include <windows.h>
-#  endif
-#  ifdef ANDROID
-#    include <GLES/gl.h>
-#  else
-#    include <GL/gl.h>
-#  endif
-#endif
-
 #include "audio/music_manager.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"

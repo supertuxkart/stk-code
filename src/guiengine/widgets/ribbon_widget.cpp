@@ -28,6 +28,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/vs.hpp"
 
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
@@ -36,10 +37,6 @@
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
-
-#ifndef round
-#  define round(x)  (floor(x+0.5f))
-#endif
 
 const char RibbonWidget::NO_ITEM_ID[] = "?";
 

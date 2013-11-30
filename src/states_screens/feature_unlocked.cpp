@@ -300,15 +300,16 @@ void FeatureUnlockedCutScene::init()
                                                                  120, 120));
 
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
-    m_light =
-        irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos,
-                                                         video::SColorf(1.0f,1.0f,1.0f),
-                                                         10000.0f /* radius */);
+    m_light = irr_driver->addLight(sun_pos, 10000.0f, 1, 1, 1);
 #ifdef DEBUG
     m_light->setName("light");
 #endif
-    m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-    m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+
+    if (!irr_driver->isGLSL())
+    {
+        ((scene::ILightSceneNode *) m_light)->getLightData().DiffuseColor = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+        ((scene::ILightSceneNode *) m_light)->getLightData().SpecularColor = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+    }
 
     const int unlockedStuffCount = m_unlocked_stuff.size();
 

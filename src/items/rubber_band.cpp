@@ -67,7 +67,7 @@ const wchar_t* getPlungerString()
 RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
           : m_plunger(plunger), m_owner(kart)
 {
-    video::SColor color(77, 179, 0, 0);
+    const video::SColor color(77, 179, 0, 0);
     video::SMaterial m;
     m.AmbientColor    = color;
     m.DiffuseColor    = color;
@@ -78,8 +78,19 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
     m_attached_state = RB_TO_PLUNGER;
     assert(m_buffer->getVertexType()==video::EVT_STANDARD);
 
+    // Set the vertex colors properly, as the new pipeline doesn't use the old light values
+    u32 i;
+    scene::IMeshBuffer * const mb = m_mesh->getMeshBuffer(0);
+    video::S3DVertex * const verts = (video::S3DVertex *) mb->getVertices();
+    const u32 max = mb->getVertexCount();
+    for (i = 0; i < max; i++)
+    {
+        verts[i].Color = color;
+    }
+
     updatePosition();
     m_node = irr_driver->addMesh(m_mesh);
+    irr_driver->applyObjectPassShader(m_node);
 #ifdef DEBUG
     std::string debug_name = m_owner->getIdent()+" (rubber-band)";
     m_node->setName(debug_name.c_str());

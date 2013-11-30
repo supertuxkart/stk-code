@@ -18,28 +18,117 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
 #include "graphics/per_camera_node.hpp"
 #include "graphics/rain.hpp"
+#include "graphics/shaders.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui.hpp"
 #include "utils/constants.hpp"
 #include "utils/random_generator.hpp"
 
+#include <ISceneManager.h>
 #include <SMeshBuffer.h>
-#include <SMesh.h>
 
-const float RAIN_RADIUS[RAIN_RING_COUNT] = { 1.0f, 3.0f, 6.0f, 12.0f, 24.0f };
-const float RAIN_Y_TO = 25.0f;
-const float RAIN_Y_FROM = -10.0f;
-const float RAIN_DY = 2.5f;
-const float RAIN_DX = 0.0f;
+using namespace video;
+using namespace scene;
+using namespace core;
 
-const float TEXTURE_X_TILES[RAIN_RING_COUNT] = { 2.0f, 2.5f, 3.5f, 5.0f, 8.0f };
-const float TEXTURE_Y_TILES[RAIN_RING_COUNT] = { 8.0f, 7.0f, 6.0f, 4.0f, 4.0f };
+// The actual rain node
+class RainNode: public scene::ISceneNode
+{
+public:
+    RainNode(scene::ISceneManager* mgr, ITexture *tex)
+            : scene::ISceneNode(0, mgr, -1)
+    {
+        mat.Lighting = false;
+        mat.ZWriteEnable = false;
+        mat.MaterialType = irr_driver->getShader(ES_RAIN);
+        mat.Thickness = 200;
+        mat.BlendOperation = EBO_ADD;
 
+        mat.setTexture(0, tex);
+        mat.TextureLayer[0].TextureWrapU =
+        mat.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+
+        count = 2500;
+        area = 3500;
+
+        // Fill in the mesh buffer
+        buf.Vertices.clear();
+        buf.Indices.clear();
+
+        buf.Vertices.set_used(count);
+        buf.Indices.set_used(count);
+
+        buf.Primitive = EPT_POINT_SPRITES;
+        buf.setHardwareMappingHint(EHM_STATIC);
+
+        u32 i;
+        float x, y, z;
+        for (i = 0; i < count; i++)
+    {
+            x = ((rand() % area) - area/2) / 100.0f;
+            y = ((rand() % 2400)) / 100.0f;
+            z = ((rand() % area) - area/2) / 100.0f;
+
+            buf.Indices[i] = i;
+            buf.Vertices[i] = S3DVertex(x, y, z, 0, 0, 0, SColor(255, 255, 0, 0), 0, 0);
+        }
+
+        box.addInternalPoint(vector3df(-area/2));
+        box.addInternalPoint(vector3df(area/2));
+    }
+
+    ~RainNode()
+    {
+    }
+
+    virtual void render()
+        {
+        glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
+        IVideoDriver * const drv = irr_driver->getVideoDriver();
+        drv->setTransform(ETS_WORLD, AbsoluteTransformation);
+        drv->setMaterial(mat);
+
+        drv->drawMeshBuffer(&buf);
+
+        glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+    }
+
+    virtual const core::aabbox3d<f32>& getBoundingBox() const
+    {
+        return box;
+    }
+
+    virtual void OnRegisterSceneNode()
+            {
+        if (IsVisible &&
+           (irr_driver->getRenderPass() & ESNRP_TRANSPARENT) == ESNRP_TRANSPARENT)
+        {
+            SceneManager->registerNodeForRendering(this, ESNRP_TRANSPARENT);
+            }
+
+        ISceneNode::OnRegisterSceneNode();
+        }
+
+    virtual u32 getMaterialCount() const { return 1; }
+    virtual video::SMaterial& getMaterial(u32 i) { return mat; }
+
+private:
+    video::SMaterial mat;
+    core::aabbox3d<f32> box;
+    u32 count;
+    s32 area;
+
+    scene::SMeshBuffer buf;
+};
+
+// The rain manager
 
 Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent)
 {
@@ -54,80 +143,17 @@ Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent)
     RandomGenerator g;
     m_next_lightning = (float)g.get(35);
 
-    for (int r=0; r<RAIN_RING_COUNT; r++)
-    {
-        m_x[r] = r/(float)RAIN_RING_COUNT;
-        m_y[r] = r/(float)RAIN_RING_COUNT;
-
-        scene::SMeshBuffer *buffer = new scene::SMeshBuffer();
-
-        buffer->Material.setTexture(0, m->getTexture());
-        m->setMaterialProperties(&buffer->Material, NULL);
-        buffer->Material.ZWriteEnable = false;
-        buffer->Material.BackfaceCulling = false;
-
-        m_materials.push_back(&buffer->Material);
-
-        video::S3DVertex v;
-        v.Color.set(255,255,255,255);
-
-        // create a cylinder mesh
-        const int VERTICES = 17;
-
-        for (int vid=0; vid<VERTICES*2; vid+=2)
-        {
-            const float ratio = float(vid) / float(VERTICES-1);
-            const float angle = ratio * 2.0f * M_PI;
-
-            v.Pos.X = cos(angle)*RAIN_RADIUS[r];
-            v.Pos.Y = RAIN_Y_TO;
-            v.Pos.Z = sin(angle)*RAIN_RADIUS[r];
-
-            // offset the X coord in texturing so you don't see textures from
-            // the different rings lining up
-            v.TCoords.X = ratio*TEXTURE_X_TILES[r] + r/3.0f;
-            v.TCoords.Y = TEXTURE_Y_TILES[r];
-            buffer->Vertices.push_back(v);
-
-            v.Pos.Y =  RAIN_Y_FROM;
-
-            v.TCoords.Y = 0.0f;
-            buffer->Vertices.push_back(v);
-
-            if (vid > 0)
-            {
-                buffer->Indices.push_back(vid-2);
-                buffer->Indices.push_back(vid-1);
-                buffer->Indices.push_back(vid);
-                buffer->Indices.push_back(vid-1);
-                buffer->Indices.push_back(vid);
-                buffer->Indices.push_back(vid+1);
-            }
-        }
-
-        scene::SMesh* mesh = new scene::SMesh();
-        mesh->addMeshBuffer(buffer);
-        mesh->recalculateBoundingBox();
-
-        m_node[r] = irr_driver->addPerCameraMesh(mesh,
-                                                 camera->getCameraSceneNode(),
-                                                 parent);
-        m_node[r]->setAutomaticCulling(0);
-        mesh->drop();
-
-        buffer->drop();
-    }
+    RainNode *node = new RainNode(irr_driver->getSceneManager(), m->getTexture());
+    m_node = irr_driver->addPerCameraNode(node, camera->getCameraSceneNode(), parent);
+    m_node->setAutomaticCulling(0);
 }   // Rain
 
 // ----------------------------------------------------------------------------
 
 Rain::~Rain()
 {
-    for (int r=0; r<RAIN_RING_COUNT; r++)
-    {
-        m_node[r]->drop();      // drop STK's reference
-        m_node[r]->remove();    // Then remove it from the scene graph.
-    }
+    m_node->drop();      // drop STK's reference
+    m_node->remove();    // Then remove it from the scene graph.
 
     if (m_lightning && m_thunder_sound != NULL) sfx_manager->deleteSFX(m_thunder_sound);
 }
@@ -136,19 +162,6 @@ Rain::~Rain()
 
 void Rain::update(float dt)
 {
-    //const int count = m_materials.size();
-    for (int m=0; m<RAIN_RING_COUNT; m++)
-    {
-        m_x[m] = m_x[m] + dt*RAIN_DX;
-        m_y[m] = m_y[m] + dt*RAIN_DY;
-        if (m_x[m] > 1.0f) m_x[m] = fmod(m_x[m], 1.0f);
-        if (m_y[m] > 1.0f) m_y[m] = fmod(m_y[m], 1.0f);
-
-        core::matrix4& matrix = m_node[m]->getChild()->getMaterial(0).getTextureMatrix(0);
-
-        matrix.setTextureTranslate(m_x[m], m_y[m]);
-    }
-
     if (m_lightning)
     {
         m_next_lightning -= dt;
@@ -173,15 +186,12 @@ void Rain::update(float dt)
 
 void Rain::setPosition(const core::vector3df& position)
 {
-    for (int m=0; m<RAIN_RING_COUNT; m++)
-    {
-        m_node[m]->getChild()->setPosition(position);
-    }
+    m_node->getChild()->setPosition(position);
 }   // setPosition
 
 // ----------------------------------------------------------------------------
 
 void Rain::setCamera(scene::ICameraSceneNode* camera)
 {
-    for (int n=0; n<RAIN_RING_COUNT; n++) m_node[n]->setCamera(camera);
+    m_node->setCamera(camera);
 }

@@ -148,6 +148,11 @@ public:
      *  be generated. */
     float m_replay_delta_angle;
 
+    /** Colors for glows */
+    float m_nitro_glow_color[3];
+
+    float m_box_glow_color[3];
+
 private:
     /** True if stk_config has been loaded. This is necessary if the
      *  --stk-config command line parameter has been specified to avoid

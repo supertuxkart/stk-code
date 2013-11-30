@@ -135,6 +135,9 @@
   <steer disable-while-unskid="false"
          camera-follow-skid="true"     />
 
+  <!-- Glow colors for the items -->
+  <glow-colors nitro="0 0 255" box="255 0 0" />
+
   <!-- Default values for all karts
        ============================ -->
   <general-kart-defaults>

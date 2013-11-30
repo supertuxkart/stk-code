@@ -173,6 +173,8 @@ Referee::Referee()
     m_scene_node->setScale(m_st_scale.toIrrVector());
     m_scene_node->setFrameLoop(m_st_first_start_frame,
                                m_st_last_start_frame);
+
+    irr_driver->applyObjectPassShader(m_scene_node);
 }   // Referee
 
 // ----------------------------------------------------------------------------
@@ -197,6 +199,8 @@ Referee::Referee(const AbstractKart &kart)
     m_scene_node->setPosition(core::vector3df(0, kart.getKartHeight() + 0.4f, 0));
     m_scene_node->setFrameLoop(m_st_first_rescue_frame,
                                m_st_last_rescue_frame);
+
+    irr_driver->applyObjectPassShader(m_scene_node);
 }   // Referee
 
 // ----------------------------------------------------------------------------

@@ -61,18 +61,14 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
+#include "utils/vs.hpp"
 
 #ifdef AI_DEBUG
 #  include "irrlicht.h"
    using namespace irr;
 #endif
 
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
-
+#include <math.h>
 #include <cstdlib>
 #include <ctime>
 #include <cstdio>

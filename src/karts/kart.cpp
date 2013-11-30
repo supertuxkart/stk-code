@@ -70,18 +70,13 @@
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
+#include "utils/vs.hpp"
 
 
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
    // Disable warning for using 'this' in base member initializer list
 #  pragma warning(disable:4355)
-#endif
-
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
 #endif
 
 /** The kart constructor.
@@ -1325,13 +1320,18 @@ void Kart::update(float dt)
         m_kart_model->setAnimation(KartModel::AF_DEFAULT);
         m_jump_time = 0;
     }
-    
-    if( (!isOnGround() || emergency) && m_shadow_enabled)
+
+    const bool dyn_shadows = World::getWorld()->getTrack()->hasShadows() &&
+                             UserConfigParams::m_shadows &&
+                             irr_driver->isGLSL();
+
+    // Disable the fake shadow if real ones are in use, or if we're flying
+    if( ((!isOnGround() || emergency) && m_shadow_enabled) || dyn_shadows)
     {
         m_shadow_enabled = false;
         m_shadow->disableShadow();
     }
-    if(!m_shadow_enabled && isOnGround() && !emergency)
+    if(!m_shadow_enabled && isOnGround() && !emergency && !dyn_shadows)
     {
         m_shadow->enableShadow();
         m_shadow_enabled = true;  

@@ -150,6 +150,15 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     std::string model_name;
     xml_node.get("model",   &model_name  );
 
+    m_is_in_skybox = false;
+    std::string render_pass;
+    xml_node.get("renderpass", &render_pass);
+
+    if(render_pass == "skybox")
+    {
+        m_is_in_skybox = true;
+    }
+
     std::string full_path =
         World::getWorld()->getTrack()->getTrackFile(model_name);
 
@@ -225,7 +234,19 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, bool enabled)
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
 
-    if (animated)
+    if (m_is_in_skybox)
+    {
+        // Tell the driver that this mesh is a part of the background
+        scene::IMeshSceneNode * const node =
+            irr_driver->getSceneManager()->addMeshSceneNode(m_mesh);
+        node->grab();
+        node->setParent(NULL);
+
+        irr_driver->addBackgroundNode(node);
+
+        m_node = node;
+    }
+    else if (animated)
     {
         scene::IAnimatedMeshSceneNode *node =
             irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_mesh);
@@ -576,7 +597,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(const
     xml_node.get("action", &m_action);
 
     m_action_active = true;
-    
+
     if (m_action.size() == 0)
     {
         fprintf(stderr, "[TrackObject] WARNING: action-trigger has no action defined\n");
@@ -588,7 +609,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(const
 void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 {
     if (!m_action_active) return;
-    
+
     if (m_action == "garage")
     {
         new RacePausedDialog(0.8f, 0.6f);

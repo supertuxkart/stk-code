@@ -54,7 +54,7 @@ class GrandPrixWin : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     irr::scene::ISceneNode* m_sky;
     irr::scene::ICameraSceneNode* m_camera;
 
-    irr::scene::ILightSceneNode* m_light;
+    irr::scene::ISceneNode* m_light;
 
     GUIEngine::LabelWidget* m_unlocked_label;
 

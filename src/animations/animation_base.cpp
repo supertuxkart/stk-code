@@ -21,14 +21,10 @@
 #include "animations/ipo.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "utils/vs.hpp"
 
 #include <algorithm>
-
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
+#include <math.h>
 
 
 AnimationBase::AnimationBase(const XMLNode &node)

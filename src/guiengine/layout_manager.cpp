@@ -33,12 +33,9 @@ using namespace video;
 #include "io/file_manager.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/vs.hpp"
 
 using namespace GUIEngine;
-
-#ifndef round
-# define round(x)  (floor(x+0.5f))
-#endif
 
 /** Like atoi, but on error prints an error message to stderr */
 int atoi_p(const char* val)

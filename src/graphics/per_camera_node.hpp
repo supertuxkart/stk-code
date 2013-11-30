@@ -54,7 +54,7 @@ private:
 public:
 
     PerCameraNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
-                  scene::ICameraSceneNode* camera, scene::IMesh* mesh);
+                  scene::ICameraSceneNode* camera, scene::ISceneNode* node);
     virtual     ~PerCameraNode();
 
     //! returns the axis aligned bounding box of this node

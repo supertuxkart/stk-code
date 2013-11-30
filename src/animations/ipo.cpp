@@ -19,15 +19,11 @@
 #include "animations/ipo.hpp"
 
 #include "io/xml_node.hpp"
+#include "utils/vs.hpp"
 
 #include <string.h>
 #include <algorithm>
-
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
+#include <math.h>
 
 const std::string Ipo::m_all_channel_names[IPO_MAX] =
                 {"LocX", "LocY", "LocZ", "LocXYZ",

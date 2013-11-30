@@ -60,10 +60,6 @@ MaterialManager::~MaterialManager()
     m_materials.clear();
 }   // ~MaterialManager
 
-#if LIGHTMAP_VISUALISATION
-std::set<scene::IMeshBuffer*> g_processed;
-#endif
-
 //-----------------------------------------------------------------------------
 
 Material* MaterialManager::getMaterialFor(video::ITexture* t,

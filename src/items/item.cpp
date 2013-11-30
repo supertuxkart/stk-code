@@ -186,7 +186,10 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
     {
         node = m_node->getAllNodes()[1];
         ((scene::IMeshSceneNode*)node)->setMesh(lowmesh);
+        irr_driver->applyObjectPassShader(m_node->getAllNodes()[1]);
     }
+
+    irr_driver->applyObjectPassShader(m_node->getAllNodes()[0]);
 
     World::getWorld()->getTrack()->adjustForFog(m_node);
 }   // switchTo

@@ -165,6 +165,9 @@ private:
     /** True if it is a looped animation. */
     bool                    m_is_looped;
 
+    /** True if the object is in the skybox */
+    bool                    m_is_in_skybox;
+
     /** Start frame of the animation to be played. */
     unsigned int            m_frame_start;
 
@@ -281,7 +284,7 @@ public:
     virtual ~TrackObjectPresentationActionTrigger() {}
 
     virtual void onTriggerItemApproached(Item* who) OVERRIDE;
-    
+
     virtual void reset() OVERRIDE { m_action_active = true; }
 };
 

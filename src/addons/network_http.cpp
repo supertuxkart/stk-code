@@ -24,14 +24,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string>
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  include <windows.h>
-#  define isnan _isnan
-#else
-#  include <sys/time.h>
-#  include <math.h>
-#endif
+#include <math.h>
 
 #include "addons/news_manager.hpp"
 #include "addons/request.hpp"
@@ -42,6 +35,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 #include "utils/translation.hpp"
+#include "utils/vs.hpp"
 
 // ----------------------------------------------------------------------------
 /** Create a thread that handles all network functions independent of the

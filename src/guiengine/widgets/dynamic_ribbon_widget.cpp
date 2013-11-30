@@ -19,6 +19,7 @@
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/vs.hpp"
 
 #include <IGUIEnvironment.h>
 #include <sstream>
@@ -28,10 +29,6 @@
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
-
-#ifndef round
-#  define round(x)  (floor(x+0.5f))
-#endif
 
 DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row) : Widget(WTYPE_DYNAMIC_RIBBON)
 {

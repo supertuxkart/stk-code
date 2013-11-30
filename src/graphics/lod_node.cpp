@@ -49,6 +49,7 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
     drop();
 
     m_forced_lod = -1;
+    m_last_tick = 0;
 }
 
 LODNode::~LODNode()
@@ -81,6 +82,11 @@ int LODNode::getLevel()
         if (dist < m_detail[n])
           return n;
     }
+
+    // If it's the shadow pass, and we would have otherwise hidden the item, show the min one
+    if (curr_cam->isOrthogonal())
+        return m_detail.size() - 1;
+
     return -1;
 }  // getLevel
 
@@ -139,9 +145,12 @@ void LODNode::OnRegisterSceneNode()
         shown = true;
     }
 
+    const u32 now = irr_driver->getDevice()->getTimer()->getTime();
+
     // support an optional, mostly hard-coded fade-in/out effect for objects with a single level
     if (m_nodes.size() == 1 && (m_nodes[0]->getType() == scene::ESNT_MESH ||
-                                m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH))
+                                m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH) &&
+        now > m_last_tick)
     {
         if (m_previous_visibility == WAS_HIDDEN && shown)
         {
@@ -237,6 +246,7 @@ void LODNode::OnRegisterSceneNode()
     }
 
     m_previous_visibility = (shown ? WAS_SHOWN : WAS_HIDDEN);
+    m_last_tick = now;
 
     // If this node has children other than the LOD nodes, draw them
     core::list<ISceneNode*>::Iterator it;
@@ -279,7 +289,13 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     if(UserConfigParams::m_hw_skinning_enabled && node->getType() == scene::ESNT_ANIMATED_MESH)
         HardwareSkinning::prepareNode((scene::IAnimatedMeshSceneNode*)node);
 
+    if (node->getType() == scene::ESNT_ANIMATED_MESH)
+        ((scene::IAnimatedMeshSceneNode *) node)->setReadOnlyMaterials(true);
+    if (node->getType() == scene::ESNT_MESH)
+        ((scene::IMeshSceneNode *) node)->setReadOnlyMaterials(true);
+
     node->drop();
 
     node->updateAbsolutePosition();
+    irr_driver->applyObjectPassShader(node);
 }

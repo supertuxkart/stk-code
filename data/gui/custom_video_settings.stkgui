@@ -1,18 +1,33 @@
 <stkgui>
 
-<div x="2%" y="5%" width="96%" height="90%" layout="vertical-row" >
+<div x="2%" y="5%" width="96%" height="95%" layout="vertical-row" >
 
     <header id="title" width="100%" height="fit" text_align="center" word_wrap="true" text="Graphics Settings" />
 
-    <spacer height="25" width="10" />
+    <spacer height="20" width="10" />
+
+    <div layout="horizontal-row" width="100%" height="fit">
+        <checkbox id="pixelshaders"/>
+        <spacer width="10" height="10"/>
+        <label text="Pixel Shaders (requires restart)" I18N="Video settings"/>
+    </div>
+
+    <spacer height="4" width="10" />
 
     <div layout="horizontal-row" width="100%" height="fit">
         <checkbox id="anim_gfx"/>
         <spacer width="10" height="10"/>
         <label text="Animated Scenery" I18N="Video settings"/>
+
+        <spacer width="20%" height="10"/>
+
+        <checkbox id="motionblur"/>
+        <spacer width="10" height="10"/>
+        <label text="Motion blur" I18N="Video settings"/>
+
     </div>
     
-    <spacer height="5" width="10" />
+    <spacer height="4" width="10" />
 
     <div layout="horizontal-row" width="100%" height="fit">
         <checkbox id="weather_gfx"/>
@@ -20,7 +35,7 @@
         <label text="Weather Effects" I18N="Video settings"/>
     </div>
     
-    <spacer height="5" width="10" />
+    <spacer height="4" width="10" />
     
     <div layout="horizontal-row" width="100%" height="fit">
         <label text="Animated Characters" I18N="Video settings" width="40%"/>
@@ -28,7 +43,7 @@
         <gauge id="steering_animations" min_value="0" max_value="2" width="50%" />
     </div>
     
-    <spacer height="5" width="10" />
+    <spacer height="4" width="10" />
     
     <div layout="horizontal-row" width="100%" height="fit">
         <label text="Texture filtering" I18N="Video settings" width="40%"/>
@@ -36,7 +51,7 @@
         <gauge id="filtering" min_value="0" max_value="5" width="50%" />
     </div>
     
-    <spacer height="5" width="10" />
+    <spacer height="4" width="10" />
     
     <div layout="horizontal-row" width="100%" height="fit">
         <label text="Anti-aliasing (requires restart)" I18N="Video settings" width="40%" />
@@ -44,20 +59,28 @@
         <gauge id="antialiasing" min_value="0" max_value="3" width="50%"/>
     </div>
     
-    <spacer height="5" width="10" />
+    <spacer height="4" width="10" />
     
     <div layout="horizontal-row" width="100%" height="fit">
-        <checkbox id="postprocessing"/>
+        <checkbox id="mlaa"/>
         <spacer width="10" height="10"/>
-        <label text="Post-processing (motion blur)" I18N="Video settings"/>
+        <label text="MLAA (morphological anti-aliasing)" I18N="Video settings"/>
     </div>
-    
-    <spacer height="5" width="10" />
-    
+
+    <spacer height="4" width="10" />
+
     <div layout="horizontal-row" width="100%" height="fit">
-        <checkbox id="pixelshaders"/>
+        <label text="SSAO (Ambient Occlusion, requires restart)" I18N="Video settings"/>
         <spacer width="10" height="10"/>
-        <label text="Pixel Shaders" I18N="Video settings"/>
+        <gauge id="ssao" min_value="0" max_value="2" width="50%"/>
+    </div>
+
+    <spacer height="4" width="10" />
+
+    <div layout="horizontal-row" width="100%" height="fit">
+        <label text="Shadows (requires restart)" I18N="Video settings"/>
+        <spacer width="10" height="10"/>
+        <gauge id="shadows" min_value="0" max_value="2" width="50%"/>
     </div>
     
     <spacer proportion="1"/>

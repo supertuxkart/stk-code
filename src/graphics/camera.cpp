@@ -19,11 +19,7 @@
 
 #include "graphics/camera.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
+#include <math.h>
 
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
@@ -40,6 +36,7 @@
 #include "tracks/track.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/constants.hpp"
+#include "utils/vs.hpp"
 
 #include "ICameraSceneNode.h"
 #include "ISceneManager.h"

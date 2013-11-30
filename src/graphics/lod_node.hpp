@@ -71,6 +71,8 @@ private:
 
     PreviousVisibility m_previous_visibility;
 
+    u32 m_last_tick;
+
 public:
 
     LODNode(std::string group_name, scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id=-1);

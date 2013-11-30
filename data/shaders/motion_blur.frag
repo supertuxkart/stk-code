@@ -41,7 +41,7 @@ uniform float mask_radius;
 uniform float max_tex_height;
 
 // Number of samples used for blurring
-#define NB_SAMPLES 12
+#define NB_SAMPLES 8
 
 void main()
 {
@@ -49,14 +49,6 @@ void main()
 
 	// Sample the color buffer
 	vec3 color = texture2D(color_buffer, texcoords).rgb;
-
-	// If no motion blur is needed, don't do any of the blur computation,
-	// just return the color from the texture.
-	if(boost_amount==0.0)
-	{
-		gl_FragColor = vec4(color, 1.0);
-		return;
-	}
 
 	// Compute the blur direction.
 	// IMPORTANT: we don't normalize it so that it avoids a glitch around 'center',

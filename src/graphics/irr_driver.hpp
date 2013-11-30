@@ -39,11 +39,15 @@
 namespace irr
 {
     namespace scene { class ISceneManager; class IMesh; class IAnimatedMeshSceneNode; class IAnimatedMesh;
-        class IMeshSceneNode; class IParticleSystemSceneNode; class ICameraSceneNode; class ILightSceneNode; }
+        class IMeshSceneNode; class IParticleSystemSceneNode; class ICameraSceneNode; class ILightSceneNode;
+        class CLensFlareSceneNode; }
     namespace gui   { class IGUIEnvironment; class IGUIFont; }
 }
 using namespace irr;
 
+#include "graphics/rtts.hpp"
+#include "graphics/shaders.hpp"
+#include "graphics/wind.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
@@ -53,6 +57,8 @@ class AbstractKart;
 class Camera;
 class PerCameraNode;
 class PostProcessing;
+class LightNode;
+class ShadowImportance;
 
 /**
   * \brief class that creates the irrLicht device and offers higher-level
@@ -74,10 +80,21 @@ private:
     gui::IGUIFont              *m_race_font;
     /** Post-processing. */
     PostProcessing             *m_post_processing;
+    /** Shaders. */
+    Shaders              *m_shaders;
+    /** Wind. */
+    Wind                 *m_wind;
+    /** RTTs. */
+    RTT                *m_rtts;
+    /** Shadow importance. */
+    ShadowImportance   *m_shadow_importance;
 
     /** Additional details to be shown in case that a texture is not found.
      *  This is used to specify details like: "while loading kart '...'" */
     std::string                 m_texture_error_message;
+
+    /** The main MRT setup. */
+    core::array<video::IRenderTarget> m_mrt;
 
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
@@ -99,6 +116,12 @@ public:
         int getWidth() const  {return m_width;  }
         int getHeight() const {return m_height; }
     };   // VideoMode
+
+    struct BloomData {
+        scene::ISceneNode * node;
+        float power;
+    };
+
 private:
     std::vector<VideoMode> m_modes;
 
@@ -116,6 +139,34 @@ private:
 
     bool                 m_request_screenshot;
 
+    bool                 m_wireframe;
+    bool                 m_mipviz;
+    bool                 m_normals;
+    bool                 m_ssaoviz;
+    bool                 m_shadowviz;
+    bool                 m_lightviz;
+    bool                 m_distortviz;
+    u32                  m_renderpass;
+    u32                  m_lensflare_query;
+    scene::IMeshSceneNode *m_sun_interposer;
+    scene::CLensFlareSceneNode *m_lensflare;
+    scene::ICameraSceneNode *m_suncam;
+
+    struct GlowData {
+        scene::ISceneNode * node;
+        float r, g, b;
+    };
+
+    std::vector<GlowData> m_glowing;
+
+    std::vector<LightNode *> m_lights;
+
+    std::vector<BloomData> m_forcedbloom;
+
+    std::vector<scene::ISceneNode *> m_displacing;
+
+    std::vector<scene::ISceneNode *> m_background;
+
 #ifdef DEBUG
     /** Used to visualise skeletons. */
     std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
@@ -125,6 +176,9 @@ private:
                    irr::scene::ISkinnedMesh::SJoint* joint,
                    irr::scene::ISkinnedMesh* mesh, int id);
 #endif
+
+    void renderFixed(float dt);
+    void renderGLSL(float dt);
 
     void doScreenShot();
 public:
@@ -151,7 +205,8 @@ public:
                                          bool create_one_quad=false);
     scene::IMesh         *createTexturedQuadMesh(const video::SMaterial *material,
                                                  const double w, const double h);
-    scene::ISceneNode    *addWaterNode(scene::IMesh *mesh, float wave_height,
+    scene::ISceneNode    *addWaterNode(scene::IMesh *mesh, scene::IMesh **welded,
+                                       float wave_height,
                                        float wave_speed, float wave_length);
     scene::IMeshSceneNode*addOctTree(scene::IMesh *mesh);
     scene::IMeshSceneNode*addSphere(float radius,
@@ -160,6 +215,9 @@ public:
                                   scene::ISceneNode *parent=NULL);
     PerCameraNode        *addPerCameraMesh(scene::IMesh* mesh,
                                            scene::ICameraSceneNode* node,
+                                           scene::ISceneNode *parent = NULL);
+    PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
+                                           scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);
     scene::ISceneNode    *addBillboard(const core::dimension2d< f32 > size,
                                        video::ITexture *texture,
@@ -286,9 +344,86 @@ public:
     /** Returns a pointer to the post processing object. */
     inline PostProcessing* getPostProcessing()  {return m_post_processing;}
     // ------------------------------------------------------------------------
-
+    inline core::vector3df getWind()  {return m_wind->getWind();}
+    // ------------------------------------------------------------------------
+    inline video::E_MATERIAL_TYPE getShader(const ShaderType num)  {return m_shaders->getShader(num);}
+    // ------------------------------------------------------------------------
+    inline video::IShaderConstantSetCallBack* getCallback(const ShaderType num)  {return m_shaders->m_callbacks[num];}
+    // ------------------------------------------------------------------------
+    inline video::ITexture* getRTT(TypeRTT which)  {return m_rtts->getRTT(which);}
+    // ------------------------------------------------------------------------
     inline bool isGLSL() const { return m_glsl; }
     // ------------------------------------------------------------------------
+    void toggleWireframe() { m_wireframe ^= 1; }
+    // ------------------------------------------------------------------------
+    void toggleMipVisualization() { m_mipviz ^= 1; }
+    // ------------------------------------------------------------------------
+    void toggleNormals() { m_normals ^= 1; }
+    // ------------------------------------------------------------------------
+    bool getNormals() { return m_normals; }
+    // ------------------------------------------------------------------------
+    void toggleSSAOViz() { m_ssaoviz ^= 1; }
+    // ------------------------------------------------------------------------
+    void toggleLightViz() { m_lightviz ^= 1; }
+    // ------------------------------------------------------------------------
+    bool getSSAOViz() { return m_ssaoviz; }
+    // ------------------------------------------------------------------------
+    void toggleShadowViz() { m_shadowviz ^= 1; }
+    // ------------------------------------------------------------------------
+    bool getShadowViz() { return m_shadowviz; }
+    // ------------------------------------------------------------------------
+    void toggleDistortViz() { m_distortviz ^= 1; }
+    // ------------------------------------------------------------------------
+    bool getDistortViz() { return m_distortviz; }
+    // ------------------------------------------------------------------------
+    u32 getRenderPass() { return m_renderpass; }
+    // ------------------------------------------------------------------------
+    void addGlowingNode(scene::ISceneNode *n, float r = 1.0f, float g = 1.0f, float b = 1.0f)
+    {
+        GlowData dat;
+        dat.node = n;
+        dat.r = r;
+        dat.g = g;
+        dat.b = b;
+
+        m_glowing.push_back(dat);
+    }
+    // ------------------------------------------------------------------------
+    void clearGlowingNodes() { m_glowing.clear(); }
+    // ------------------------------------------------------------------------
+    void addForcedBloomNode(scene::ISceneNode *n, float power = 1)
+    {
+        BloomData dat;
+        dat.node = n;
+        dat.power = power;
+
+        m_forcedbloom.push_back(dat);
+    }
+    // ------------------------------------------------------------------------
+    void clearForcedBloom() { m_forcedbloom.clear(); }
+    // ------------------------------------------------------------------------
+    const std::vector<BloomData> &getForcedBloom() const { return m_forcedbloom; }
+    // ------------------------------------------------------------------------
+    void clearDisplacingNodes() { m_displacing.clear(); }
+    // ------------------------------------------------------------------------
+    const std::vector<scene::ISceneNode *> &getDisplacingNodes() const { return m_displacing; }
+    // ------------------------------------------------------------------------
+    void addDisplacingNode(scene::ISceneNode * const n) { m_displacing.push_back(n); }
+    // ------------------------------------------------------------------------
+    void clearBackgroundNodes() { m_background.clear(); }
+    // ------------------------------------------------------------------------
+    void addBackgroundNode(scene::ISceneNode * const n) { m_background.push_back(n); }
+    // ------------------------------------------------------------------------
+    void applyObjectPassShader();
+    void applyObjectPassShader(scene::ISceneNode * const node, bool rimlit = false);
+    // ------------------------------------------------------------------------
+    scene::ISceneNode *addLight(const core::vector3df &pos, float radius = 1.0f, float r = 1.0f,
+                  float g = 1.0f, float b = 1.0f, bool sun = false);
+    // ------------------------------------------------------------------------
+    void clearLights();
+    // ------------------------------------------------------------------------
+    scene::IMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
+
 #ifdef DEBUG
     /** Removes debug meshes. */
     void clearDebugMesh() { m_debug_meshes.clear(); }

@@ -15,13 +15,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
-uniform sampler2D main_texture;
+uniform sampler2D tex;
 uniform float transparency;
 varying vec2 uv;
 
 void main()
 {
-    gl_FragColor = texture2D(main_texture, uv);
-    gl_FragColor.a *= transparency;
+	gl_FragColor = texture2D(tex, uv);
+	gl_FragColor.a *= transparency;
 }

@@ -177,6 +177,8 @@ void Attachment::set(AttachmentType type, float time,
         }
     }
     m_node->setVisible(true);
+
+    irr_driver->applyObjectPassShader(m_node);
 }   // set
 
 // -----------------------------------------------------------------------------

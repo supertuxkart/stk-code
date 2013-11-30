@@ -221,7 +221,7 @@ private:
 #endif
 
     PtrVector<ParticleEmitter>      m_all_emitters;
-    scene::ILightSceneNode  *m_sun;
+    scene::ISceneNode  *m_sun;
     /** Used to collect the triangles for the bullet mesh. */
     TriangleMesh*            m_track_mesh;
     /** Used to collect the triangles which do not have a physical
@@ -350,9 +350,11 @@ private:
     /** True if this track supports using smoothed normals. */
     bool                m_smooth_normals;
 
-    float               m_fog_density;
+    float               m_fog_max;
     float               m_fog_start;
     float               m_fog_end;
+    float               m_fog_height_start;
+    float               m_fog_height_end;
     core::vector3df     m_sun_position;
     /** The current ambient color for each kart. */
     video::SColor       m_ambient_color;
@@ -366,6 +368,18 @@ private:
     core::dimension2du      m_mini_map_size;
     float                   m_minimap_x_scale;
     float                   m_minimap_y_scale;
+
+    bool m_clouds;
+
+    bool m_bloom;
+    float m_bloom_threshold;
+
+    bool m_lensflare;
+    bool m_godrays;
+    bool m_shadows;
+
+    float m_displacement_speed;
+    float m_caustics_speed;
 
     /** List of all bezier curves in the track - for e.g. camera, ... */
     std::vector<BezierCurve*> m_all_curves;
@@ -534,7 +548,15 @@ public:
     // ------------------------------------------------------------------------
     float getFogEnd()    const { return m_fog_end; }
     // ------------------------------------------------------------------------
+    float getFogStartHeight()  const { return m_fog_height_start; }
+    // ------------------------------------------------------------------------
+    float getFogEndHeight()    const { return m_fog_height_end; }
+    // ------------------------------------------------------------------------
+    float getFogMax()    const { return m_fog_max; }
+    // ------------------------------------------------------------------------
     video::SColor getFogColor() const { return m_fog_color; }
+    // ------------------------------------------------------------------------
+    video::SColor getSunColor() const { return m_sun_diffuse_color; }
     // ------------------------------------------------------------------------
     /** Whether this is an "internal" track. If so it won't be offered
      * in the track selection screen. */
@@ -557,6 +579,17 @@ public:
 
     const std::vector<Subtitle>& getSubtitles() const { return m_subtitles; }
 
+    bool hasClouds() const { return m_clouds; }
+
+    bool getBloom() const { return m_bloom; }
+    float getBloomThreshold() const { return m_bloom_threshold; }
+
+    bool hasLensFlare() const { return m_lensflare; }
+    bool hasGodRays() const { return m_godrays; }
+    bool hasShadows() const { return m_shadows; }
+
+    float getDisplacementSpeed() const { return m_displacement_speed; }
+    float getCausticsSpeed() const { return m_caustics_speed; }
 };   // class Track
 
 #endif
