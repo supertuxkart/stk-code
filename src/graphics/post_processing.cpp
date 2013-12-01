@@ -161,11 +161,14 @@ void PostProcessing::begin()
 /** Set the boost amount according to the speed of the camera */
 void PostProcessing::giveBoost(unsigned int camera_index)
 {
-    m_boost_time[camera_index] = 0.75f;
+    if (irr_driver->isGLSL())
+    {
+        m_boost_time[camera_index] = 0.75f;
 
-    MotionBlurProvider * const cb = (MotionBlurProvider *) irr_driver->
-                                                           getCallback(ES_MOTIONBLUR);
-    cb->setBoostTime(camera_index, m_boost_time[camera_index]);
+        MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
+            getCallback(ES_MOTIONBLUR);
+        cb->setBoostTime(camera_index, m_boost_time[camera_index]);
+    }
 }   // giveBoost
 
 // ----------------------------------------------------------------------------
@@ -174,10 +177,15 @@ void PostProcessing::giveBoost(unsigned int camera_index)
  */
 void PostProcessing::update(float dt)
 {
-    MotionBlurProvider * const cb = (MotionBlurProvider *) irr_driver->
-                                                           getCallback(ES_MOTIONBLUR);
+    if (!irr_driver->isGLSL())
+        return;
 
-    for(unsigned int i=0; i<m_boost_time.size(); i++)
+    MotionBlurProvider* const cb =
+        (MotionBlurProvider*) irr_driver->getCallback(ES_MOTIONBLUR);
+
+    if (cb == NULL) return;
+
+    for (unsigned int i=0; i<m_boost_time.size(); i++)
     {
         if (m_boost_time[i] > 0.0f)
         {
@@ -193,6 +201,8 @@ void PostProcessing::update(float dt)
 /** Render the post-processed scene, solids only, color to color, no stencil */
 void PostProcessing::renderSolid(const u32 cam)
 {
+    if (irr_driver->isGLSL()) return;
+
     // Early out: do nothing if at all possible
     if (UserConfigParams::m_ssao < 1 && !World::getWorld()->getTrack()->isFogEnabled())
         return;
@@ -316,6 +326,8 @@ void PostProcessing::renderSolid(const u32 cam)
 /** Render the post-processed scene */
 void PostProcessing::render()
 {
+    if (!irr_driver->isGLSL()) return;
+
     IVideoDriver * const drv = irr_driver->getVideoDriver();
     drv->setTransform(ETS_WORLD, core::IdentityMatrix);
     drv->setTransform(ETS_VIEW, core::IdentityMatrix);

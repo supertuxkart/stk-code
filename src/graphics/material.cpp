@@ -1013,9 +1013,13 @@ void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
 /** Callback from LOD nodes to create some effects */
 void Material::onMadeVisible(scene::IMeshBuffer* who)
 {
+    if (!irr_driver->isGLSL()) return;
+
     BubbleEffectProvider * bubble = (BubbleEffectProvider *)
                                      irr_driver->getCallback(ES_BUBBLES);
-    bubble->onMadeVisible(who);
+
+    if (bubble != NULL)
+        bubble->onMadeVisible(who);
 }
 
 //-----------------------------------------------------------------------------
@@ -1023,18 +1027,24 @@ void Material::onMadeVisible(scene::IMeshBuffer* who)
 /** Callback from LOD nodes to create some effects */
 void Material::onHidden(scene::IMeshBuffer* who)
 {
+    if (!irr_driver->isGLSL()) return;
+
     BubbleEffectProvider * bubble = (BubbleEffectProvider *)
                                      irr_driver->getCallback(ES_BUBBLES);
-    bubble->onHidden(who);
+    if (bubble != NULL)
+        bubble->onHidden(who);
 }
 
 //-----------------------------------------------------------------------------
 
 void Material::isInitiallyHidden(scene::IMeshBuffer* who)
 {
+    if (!irr_driver->isGLSL()) return;
+
     BubbleEffectProvider * bubble = (BubbleEffectProvider *)
                                      irr_driver->getCallback(ES_BUBBLES);
-    bubble->isInitiallyHidden(who);
+    if (bubble != NULL)
+        bubble->isInitiallyHidden(who);
 }
 
 //-----------------------------------------------------------------------------

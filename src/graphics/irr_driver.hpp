@@ -348,7 +348,10 @@ public:
     // ------------------------------------------------------------------------
     inline video::E_MATERIAL_TYPE getShader(const ShaderType num)  {return m_shaders->getShader(num);}
     // ------------------------------------------------------------------------
-    inline video::IShaderConstantSetCallBack* getCallback(const ShaderType num)  {return m_shaders->m_callbacks[num];}
+    inline video::IShaderConstantSetCallBack* getCallback(const ShaderType num) 
+    {
+        return (m_shaders == NULL ? NULL : m_shaders->m_callbacks[num]);
+    }
     // ------------------------------------------------------------------------
     inline video::ITexture* getRTT(TypeRTT which)  {return m_rtts->getRTT(which);}
     // ------------------------------------------------------------------------
