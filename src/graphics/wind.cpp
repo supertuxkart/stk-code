@@ -20,7 +20,7 @@
 
 Wind::Wind()
 {
-    m_seed = (rand() % 1000) - 500;
+    m_seed = (float)((rand() % 1000) - 500);
 }
 
 vector3df Wind::getWind() const

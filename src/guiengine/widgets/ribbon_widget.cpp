@@ -137,7 +137,7 @@ void RibbonWidget::add()
     //free_w_space = (int)(m_w - total_needed_space*global_zoom);
 
     const int one_button_space =
-        (int)round((float)m_w / (float)subbuttons_amount);
+        (int)roundf((float)m_w / (float)subbuttons_amount);
 
     int widget_x = -1;
 

@@ -198,7 +198,7 @@ void BubbleEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     }
     else
     {
-        transparency = 1.0 - diff;
+        transparency = 1.0f - diff;
     }
 
     transparency = clampf(transparency, 0, 1);
@@ -211,7 +211,7 @@ void BubbleEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void RainEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
-    const float screenw = UserConfigParams::m_width;
+    const float screenw = (float)UserConfigParams::m_width;
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 90.0f;
     const matrix4 viewm = srv->getVideoDriver()->getTransform(ETS_VIEW);
     const vector3df campos = irr_driver->getSceneManager()->getActiveCamera()->getPosition();
@@ -286,8 +286,8 @@ void MipVizProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     const dimension2du size = tex->getSize();
 
     const float texsize[2] = {
-        size.Width,
-        size.Height
+        (float)size.Width,
+        (float)size.Height
         };
 
     srv->setVertexShaderConstant("texsize", texsize, 2);

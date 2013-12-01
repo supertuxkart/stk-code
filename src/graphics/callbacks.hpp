@@ -202,7 +202,7 @@ public:
 
     bool contains(const scene::IMeshBuffer * const mb) const
     {
-        return m_bubbles.count(mb);
+        return m_bubbles.count(mb)!=0;
     }
 
 private:
@@ -282,7 +282,7 @@ public:
         m_pixel[1] = 1.0f / UserConfigParams::m_height;
     }
 
-    void setResolution(float x, float y)
+    void setResolution(int x, int y)
     {
         m_pixel[0] = 1.0f / x;
         m_pixel[1] = 1.0f / y;
@@ -327,10 +327,10 @@ class GlowProvider: public CallBase
 public:
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
 
-    void setResolution(float x, float y)
+    void setResolution(int x, int y)
     {
-        m_res[0] = x;
-        m_res[1] = y;
+        m_res[0] = (float)x;
+        m_res[1] = (float)y;
     }
 
 private:
@@ -360,8 +360,8 @@ class PointLightProvider: public CallBase
 public:
     PointLightProvider()
     {
-        m_screen[0] = UserConfigParams::m_width;
-        m_screen[1] = UserConfigParams::m_height;
+        m_screen[0] = (float)UserConfigParams::m_width;
+        m_screen[1] = (float)UserConfigParams::m_height;
 
         m_specular = 200;
     }
@@ -426,8 +426,8 @@ class SunLightProvider: public CallBase
 public:
     SunLightProvider()
     {
-        m_screen[0] = UserConfigParams::m_width;
-        m_screen[1] = UserConfigParams::m_height;
+        m_screen[0] = (float)UserConfigParams::m_width;
+        m_screen[1] = (float)UserConfigParams::m_height;
 
         m_wind[0] = m_wind[1] = 0;
     }
@@ -580,7 +580,7 @@ class CollapseProvider: public CallBase
 public:
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
 
-    void setResolution(const float x, const float y)
+    void setResolution(const int x, const int y)
     {
         m_pixel[0] = 1.0f / x;
         m_pixel[1] = 1.0f / y;
@@ -599,7 +599,7 @@ public:
             std::swap(m_multi[0], m_multi[1]);
         }
 
-        m_size = std::max(x, y);
+        m_size = (int)std::max(x, y);
     }
 
 private:
@@ -662,8 +662,8 @@ public:
 
     DisplaceProvider()
     {
-        m_screen[0] = UserConfigParams::m_width;
-        m_screen[1] = UserConfigParams::m_height;
+        m_screen[0] = (float)UserConfigParams::m_width;
+        m_screen[1] = (float)UserConfigParams::m_height;
 
         m_dir[0] = m_dir[1] = m_dir2[0] = m_dir2[1] = 0;
     }

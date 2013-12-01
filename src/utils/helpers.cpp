@@ -134,10 +134,10 @@ static inline float permute(float x) {
 float noise2d(float v1, float v2) {
 
 	const float C[] = {
-		0.211324865405187,
-		0.366025403784439,
-		-0.577350269189626,
-		0.024390243902439 };
+		0.211324865405187f,
+		0.366025403784439f,
+		-0.577350269189626f,
+		0.024390243902439f };
 
 	// First corner
 	float i[2];
@@ -174,9 +174,9 @@ float noise2d(float v1, float v2) {
 	p[2] = permute(permute(i[1] + 1) + i[0] + 1);
 
 	float m[3];
-	m[0] = std::max<float>(0.5 - x0[0]*x0[0] - x0[1]*x0[1], 0);
-	m[1] = std::max<float>(0.5 - x12[0]*x12[0] - x12[1]*x12[1], 0);
-	m[2] = std::max<float>(0.5 - x12[2]*x12[2] - x12[3]*x12[3], 0);
+	m[0] = std::max<float>(0.5f - x0[0]*x0[0] - x0[1]*x0[1], 0);
+	m[1] = std::max<float>(0.5f - x12[0]*x12[0] - x12[1]*x12[1], 0);
+	m[2] = std::max<float>(0.5f - x12[2]*x12[2] - x12[3]*x12[3], 0);
 
 	m[0] = m[0] * m[0] * m[0] * m[0];
 	m[1] = m[1] * m[1] * m[1] * m[1];

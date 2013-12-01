@@ -1422,7 +1422,7 @@ void IrrDriver::displayFPS()
     else
     {
         sprintf(buffer, "FPS: %i/%i/%i - %i KTris", min, fps, max,
-                (int)round(kilotris));
+                (int)roundf(kilotris));
     }
 
     core::stringw fpsString = buffer;

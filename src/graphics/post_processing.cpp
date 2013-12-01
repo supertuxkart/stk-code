@@ -390,7 +390,7 @@ void PostProcessing::render()
             if (globalbloom || bloomsize)
             {
                 // Clear the alpha to a suitable value, stencil
-                glClearColor(0, 0, 0, 0.1);
+                glClearColor(0, 0, 0, 0.1f);
                 glColorMask(0, 0, 0, 1);
 
                 glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);

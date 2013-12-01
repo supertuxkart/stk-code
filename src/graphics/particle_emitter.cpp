@@ -188,7 +188,7 @@ class WindAffector : public scene::IParticleAffector
 public:
     WindAffector(float speed): m_speed(speed)
     {
-        m_seed = (rand() % 1000) - 500;
+        m_seed = (float)((rand() % 1000) - 500);
     }
 
     // ------------------------------------------------------------------------

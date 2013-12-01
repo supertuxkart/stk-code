@@ -327,7 +327,7 @@ void DynamicRibbonWidget::buildInternalStructure()
     // ---- determine column amount
     const float row_height = (float)(m_h - m_label_height)/(float)m_row_amount;
     float ratio_zoom = (float)row_height / (float)(m_child_height - m_label_height);
-    m_col_amount = (int)round( m_w / ( m_child_width*ratio_zoom ) );
+    m_col_amount = (int)roundf( m_w / ( m_child_width*ratio_zoom ) );
 
     // ajust column amount to not add more item slots than we actually need
     const int item_count = m_items.size();
@@ -810,7 +810,7 @@ void DynamicRibbonWidget::propagateSelection()
         {
             if (ribbon != selected_ribbon)
             {
-                ribbon->m_selection[p] = (int)round(where*(ribbon->m_children.size()-1));
+                ribbon->m_selection[p] = (int)roundf(where*(ribbon->m_children.size()-1));
                 ribbon->updateSelection();
             }
         }

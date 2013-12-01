@@ -79,8 +79,8 @@ public:
             buf.Vertices[i] = S3DVertex(x, y, z, 0, 0, 0, SColor(255, 255, 0, 0), 0, 0);
         }
 
-        box.addInternalPoint(vector3df(-area/2));
-        box.addInternalPoint(vector3df(area/2));
+        box.addInternalPoint(vector3df((float)(-area/2)));
+        box.addInternalPoint(vector3df((float)( area/2)));
     }
 
     ~RainNode()

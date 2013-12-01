@@ -94,7 +94,7 @@ public:
                 buf.Vertices[i] = S3DVertex(xpos, ypos, 0, 0, 0, 0,
                                             SColor(255, 255, 255, 255), 0, 0);
 
-                glVertex2s(roundf(xpos * 32767), roundf(ypos * 32767));
+                glVertex2s((int)roundf(xpos * 32767), (int)roundf(ypos * 32767));
                 i++;
             }
         }
