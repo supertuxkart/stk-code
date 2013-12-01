@@ -20,8 +20,8 @@ void main()
 	float outBlack = 0.0;
 
 	
-	col = (pow(((col * 255.0) - inBlack) / (inWhite - inBlack),
-                (1.0 / inGamma)) * (outWhite - outBlack) + outBlack) / 255.0;
+	col.rgb = (pow(((col.rgb * 255.0) - inBlack) / (inWhite - inBlack),
+                vec3(1.0 / inGamma)) * (outWhite - outBlack) + outBlack) / 255.0;
   
 	gl_FragColor = vec4(col.rgb, 1.0);
 }
