@@ -1,7 +1,7 @@
 varying vec4 offset[2];
 
 uniform sampler2D colorMapG;
-const float threshold = 0.1f;
+const float threshold = 0.1;
 
 void main() {
 	vec3 weights = vec3(0.2126,0.7152, 0.0722); // ITU-R BT. 709

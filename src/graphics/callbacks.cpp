@@ -85,7 +85,7 @@ void WaterShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
     srv->setVertexShaderConstant("height", &height, 1);
     srv->setVertexShaderConstant("speed", &speed, 1);
-    srv->setVertexShaderConstant("length", &m_length, 1);
+    srv->setVertexShaderConstant("waveLength", &m_length, 1);
 
     // Can't use the firstdone optimization, as the callback is shared
     //if (!firstdone)

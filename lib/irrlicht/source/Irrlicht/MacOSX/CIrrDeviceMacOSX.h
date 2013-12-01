@@ -10,9 +10,9 @@
 
 #ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
 
-#include "CIrrDeviceStub.h"
+#include "../CIrrDeviceStub.h"
 #include "IrrlichtDevice.h"
-#include "IImagePresenter.h"
+#include "../IImagePresenter.h"
 #include "IGUIEnvironment.h"
 #include "ICursorControl.h"
 

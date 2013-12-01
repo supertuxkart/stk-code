@@ -3,7 +3,7 @@
 
 uniform float speed;
 uniform float height;
-uniform float length;
+uniform float waveLength;
 
 uniform vec3 lightdir;
 
@@ -15,7 +15,7 @@ void main()
 {
 	vec4 pos = gl_Vertex;
 
-	pos.y += (sin(pos.x/length + speed) + cos(pos.z/length + speed)) * height;
+	pos.y += (sin(pos.x/waveLength + speed) + cos(pos.z/waveLength + speed)) * height;
 
 	vec3 vertexPosition = vec3(gl_ModelViewMatrix * pos);
 
