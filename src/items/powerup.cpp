@@ -36,57 +36,6 @@
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
 
-const wchar_t* getAnchorString()
-{
-    const int ANCHOR_STRINGS_COUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(ANCHOR_STRINGS_COUNT);
-
-    switch (id)
-    {
-        //I18N: shown when anchor applied. %s is the victim.
-        case 0: return _LTR("Arrr, the %s dropped anchor, Captain!");
-        case 1: return _LTR("%s pays the next round of grog!");
-        case 2: return _LTR("%s is a mighty pirate!");
-        default: assert(false); return L"";   // avoid compiler warning.
-    }
-}   // getAnchorString
-
-//-----------------------------------------------------------------------------
-const wchar_t* getParachuteString()
-{
-    const int PARACHUTE_STRINGS_COUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(PARACHUTE_STRINGS_COUNT);
-
-    switch (id)
-    {
-        case 0: return _("Geronimo!!!"); // Parachutist shout
-        case 1: return _("The Space Shuttle has landed!");
-        case 2: return _("Do you want to fly kites?");
-        default: assert(false); return  L"";  // avoid compiler warning
-    }
-}   // getParachuteString
-
-//-----------------------------------------------------------------------------
-const wchar_t* getSwapperString()
-{
-    const int SWAPPER_STRINGS_COUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(SWAPPER_STRINGS_COUNT);
-
-    switch (id)
-    {
-        case 0: return _("Magic, son. Nothing else in the world smells like that.");
-        case 1: return _("A wizard did it!");
-        case 2: return _("Banana? Box? Banana? Box? Banana? Box?");
-        default: assert(false); return L"";  // avoid compiler warning
-    }
-}   // getSwapperString
-
 //-----------------------------------------------------------------------------
 /** Constructor, stores the kart to which this powerup belongs.
  *  \param kart The kart to which this powerup belongs.
@@ -250,9 +199,6 @@ void Powerup::use()
             ItemManager::get()->switchItems();
             m_sound_use->position(m_owner->getXYZ());
             m_sound_use->play();
-
-            gui->addMessage(getSwapperString(), NULL, 3.0f,
-                            video::SColor(255, 255, 255, 255), false);
             break;
         }
     case PowerupManager::POWERUP_CAKE:
@@ -361,11 +307,6 @@ void Powerup::use()
                     m_sound_use->position(m_owner->getXYZ());
 
                 m_sound_use->play();
-
-                irr::core::stringw anchor_message;
-                anchor_message += StringUtils::insertValues(getAnchorString(), core::stringw(kart->getName()));
-                gui->addMessage(translations->fribidize(anchor_message), NULL, 3.0f,
-                                video::SColor(255, 255, 255, 255), false);
                 break;
             }
         }
@@ -407,9 +348,6 @@ void Powerup::use()
             else if(player_kart)
                 m_sound_use->position(player_kart->getXYZ());
             m_sound_use->play();
-
-            gui->addMessage(getParachuteString(), NULL, 3.0f,
-                            video::SColor(255, 255, 255, 255), false);
         }
         break;
 
