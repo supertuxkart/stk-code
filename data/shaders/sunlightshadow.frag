@@ -75,9 +75,22 @@ void main() {
 
 	float moved = (abs(dx) + abs(dy)) * 0.5;
 
+
+/*
 	float bias = 0.002 * tan(acos(NdotL)); // According to the slope
 	bias += smoothstep(0.001, 0.1, moved) * 0.014; // According to the warping
 	bias = clamp(bias, 0.001, 0.014);
+*/
+/*
+  float avi = 0.002;
+  float abi = 0.0025; */
+
+  float avi = 0.0018;
+  float abi = 0.002;
+
+	float bias = avi * tan(acos(NdotL)); // According to the slope
+	bias += smoothstep(0.001, 0.1, moved) * abi; // According to the warping
+	bias = clamp(bias, 0.001, abi);
 
 	// This ID, and four IDs around this must match for a shadow pixel
 	float right = texture2D(shadowtex, shadowcoord.xy + vec2(shadowoffset, 0.0)).a;
