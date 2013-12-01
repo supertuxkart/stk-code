@@ -76,12 +76,14 @@ void CustomVideoSettingsialog::beforeAddingWidgets()
 
     filtering->setValue( value );
 
+    /*
     SpinnerWidget* antialias = getWidget<SpinnerWidget>("antialiasing");
     antialias->addLabel( _("Disabled") ); // 0
     antialias->addLabel( L"x2" );         // 1
     antialias->addLabel( L"x4" );         // 2
     antialias->addLabel( L"x8" );         // 3
     antialias->setValue( UserConfigParams::m_antialiasing );
+    */
 
     SpinnerWidget* ssao = getWidget<SpinnerWidget>("ssao");
     ssao->addLabel( _("Disabled") );   // 0
@@ -94,10 +96,10 @@ void CustomVideoSettingsialog::beforeAddingWidgets()
     shadows->addLabel( _("low") );          // 1
     shadows->addLabel( _("high") );         // 2
     shadows->setValue( UserConfigParams::m_shadows );
-
+    
     getWidget<CheckBoxWidget>("motionblur")->setState( UserConfigParams::m_motionblur );
     getWidget<CheckBoxWidget>("mlaa")->setState( UserConfigParams::m_mlaa );
-    getWidget<CheckBoxWidget>("pixelshaders")->setState( UserConfigParams::m_pixel_shaders );
+    getWidget<CheckBoxWidget>("pixelshaders")->setState(UserConfigParams::m_pixel_shaders);
 }
 
 // -----------------------------------------------------------------------------
@@ -110,8 +112,8 @@ GUIEngine::EventPropagation CustomVideoSettingsialog::processEvent(const std::st
             getWidget<CheckBoxWidget>("anim_gfx")->getState();
         UserConfigParams::m_weather_effects          =
             getWidget<CheckBoxWidget>("weather_gfx")->getState();
-        UserConfigParams::m_antialiasing  =
-            getWidget<SpinnerWidget>("antialiasing")->getValue();
+        //UserConfigParams::m_antialiasing  =
+        //    getWidget<SpinnerWidget>("antialiasing")->getValue();
         UserConfigParams::m_motionblur      =
             getWidget<CheckBoxWidget>("motionblur")->getState();
         UserConfigParams::m_show_steering_animations =

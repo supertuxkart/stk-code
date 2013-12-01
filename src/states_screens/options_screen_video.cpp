@@ -48,7 +48,7 @@ DEFINE_SCREEN_SINGLETON( OptionsScreenVideo );
 static const bool GFX           [] = {false, true,  true,  true,  true,  true,  true, true};
 static const int  GFX_ANIM_KARTS[] = {0,     1,     2,     2,     2,     2,     2,    2};
 static const bool GFX_WEATHER   [] = {false, false, true,  true,  true,  true,  true, true};
-static const int  GFX_ANTIALIAS [] = {0,     0,     0,     0,     0,     2,     2,    3};
+//static const int  GFX_ANTIALIAS [] = {0,     0,     0,     0,     0,     2,     2,    3};
 static const bool GFX_MOTIONBLUR[] =
                               {false, false, false, false, true,  true,  true, true};
 static const bool GFX_PIXEL_SHADERS[] =
@@ -314,7 +314,7 @@ void OptionsScreenVideo::updateGfxSlider()
         if (UserConfigParams::m_show_steering_animations == GFX_ANIM_KARTS[l]&&
             UserConfigParams::m_graphical_effects        == GFX[l] &&
             UserConfigParams::m_weather_effects          == GFX_WEATHER[l] &&
-            UserConfigParams::m_antialiasing             == GFX_ANTIALIAS[l] &&
+            //UserConfigParams::m_antialiasing             == GFX_ANTIALIAS[l] &&
             UserConfigParams::m_motionblur               == GFX_MOTIONBLUR[l] &&
             UserConfigParams::m_mlaa                     == GFX_MLAA[l] &&
             UserConfigParams::m_ssao                     == GFX_SSAO[l] &&
@@ -359,6 +359,7 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: if no kart animations are enabled
     const core::stringw none = _LTR("None");
 
+    /*
     core::stringw antialias_label;
     switch ((int)UserConfigParams::m_antialiasing)
     {
@@ -371,6 +372,7 @@ void OptionsScreenVideo::updateTooltip()
     case 3:
         antialias_label = L"x8"; break;
     }
+    */
 
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Pixel shaders : %s",
@@ -387,16 +389,16 @@ void OptionsScreenVideo::updateTooltip()
         ? all
         : (UserConfigParams::m_show_steering_animations == 1 ? me : none));
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Anti-aliasing (requires restart) : %s",
-                                  antialias_label);
+    //tooltip = tooltip + L"\n" + _("Anti-aliasing (requires restart) : %s",
+    //                              antialias_label);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Motion blur: %s",
         UserConfigParams::m_motionblur ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("MLAA: %s",
+    tooltip = tooltip + L"\n" + _("Anti-aliasing : %s",
         UserConfigParams::m_mlaa ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("SSAO: %s",
+    tooltip = tooltip + L"\n" + _("Ambient occlusion : %s",
         UserConfigParams::m_ssao == 1 ? "low" : UserConfigParams::m_ssao == 2 ?
                                     "high" : disabled);
     //I18N: in graphical options
@@ -477,7 +479,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_show_steering_animations = GFX_ANIM_KARTS[level-1];
         UserConfigParams::m_graphical_effects        = GFX[level-1];
         UserConfigParams::m_weather_effects          = GFX_WEATHER[level-1];
-        UserConfigParams::m_antialiasing             = GFX_ANTIALIAS[level-1];
+        //UserConfigParams::m_antialiasing             = GFX_ANTIALIAS[level-1];
         UserConfigParams::m_motionblur               = GFX_MOTIONBLUR[level-1];
         UserConfigParams::m_pixel_shaders            = GFX_PIXEL_SHADERS[level-1];
         UserConfigParams::m_mlaa                     = GFX_MLAA[level-1];

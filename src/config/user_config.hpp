@@ -536,10 +536,12 @@ namespace UserConfigParams
                            &m_graphics_quality,
                            "Whether trilinear filtering is allowed to be "
                            "used (true or false)") );
+    /*
     PARAM_PREFIX IntUserConfigParam          m_antialiasing
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "antialiasing", &m_graphics_quality,
                            "Whether antialiasing is enabled (0 = disabled, 1 = 2x, 2 = 4x, 3 = 8x") );
+    */
     PARAM_PREFIX BoolUserConfigParam         m_vsync
             PARAM_DEFAULT( BoolUserConfigParam(false, "vsync",
                            &m_graphics_quality,
@@ -555,7 +557,7 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam         m_mlaa
             PARAM_DEFAULT( BoolUserConfigParam(false,
                            "mlaa", &m_graphics_quality,
-                           "Whether MLAA should be enabled") );
+                           "Whether MLAA anti-aliasing should be enabled") );
     PARAM_PREFIX IntUserConfigParam          m_ssao
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "ssao", &m_graphics_quality,

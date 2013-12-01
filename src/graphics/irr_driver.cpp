@@ -337,6 +337,8 @@ void IrrDriver::initDevice()
             params.WindowSize    =
                 core::dimension2du(UserConfigParams::m_width,
                                    UserConfigParams::m_height);
+
+            /*
             switch ((int)UserConfigParams::m_antialiasing)
             {
             case 0:
@@ -356,6 +358,7 @@ void IrrDriver::initDevice()
                            "anti-alias setting : %i\n",
                            (int)UserConfigParams::m_antialiasing);
             }
+            */
             m_device = createDeviceEx(params);
             if(m_device)
                 break;
@@ -449,7 +452,7 @@ void IrrDriver::initDevice()
     }
     else
     {
-        Log::warn("irr_driver", "Too old GPU; using the fixed pipeline.");
+        Log::warn("irr_driver", "Using the fixed pipeline (old GPU, or shaders disabled in options)");
     }
 
     // Only change video driver settings if we are showing graphics
