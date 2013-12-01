@@ -1321,17 +1321,17 @@ void Kart::update(float dt)
         m_jump_time = 0;
     }
 
-    const bool dyn_shadows = World::getWorld()->getTrack()->hasShadows() &&
-                             UserConfigParams::m_shadows &&
-                             irr_driver->isGLSL();
+    //const bool dyn_shadows = World::getWorld()->getTrack()->hasShadows() &&
+    //                         UserConfigParams::m_shadows &&
+    //                         irr_driver->isGLSL();
 
-    // Disable the fake shadow if real ones are in use, or if we're flying
-    if( ((!isOnGround() || emergency) && m_shadow_enabled) || dyn_shadows)
+    // Disable the fake shadow if we're flying
+    if((!isOnGround() || emergency) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
         m_shadow->disableShadow();
     }
-    if(!m_shadow_enabled && isOnGround() && !emergency && !dyn_shadows)
+    if(!m_shadow_enabled && isOnGround() && !emergency)
     {
         m_shadow->enableShadow();
         m_shadow_enabled = true;  
