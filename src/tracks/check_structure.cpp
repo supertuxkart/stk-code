@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009  Joerg Henrichs
+//  Copyright (C) 2009-2013  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -49,8 +49,8 @@ CheckStructure::CheckStructure(const XMLNode &node, unsigned int index)
     else if(kind=="ambient-light")
         m_check_type = CT_AMBIENT_SPHERE;
     // Cannons don't have a kind specified, so test for the name in this case
-	else if(node.getName()=="cannon")
-		m_check_type = CT_CANNON;
+    else if(node.getName()=="cannon")
+        m_check_type = CT_CANNON;
     else
     {
         printf("Unknown check structure '%s' - ignored.\n", kind.c_str());

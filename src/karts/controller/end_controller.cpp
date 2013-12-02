@@ -1,8 +1,8 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2010 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2010 Eduardo Hernandez Munoz
-//  Copyright (C) 2008-2010 Joerg Henrichs
+//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2013 Eduardo Hernandez Munoz
+//  Copyright (C) 2008-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -55,7 +55,8 @@ EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *pla
              : AIBaseController(kart, player)
 {
     m_previous_controller = prev_controller;
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+       race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         // Overwrite the random selected default path from AIBaseController
         // with a path that always picks the first branch (i.e. it follows
@@ -130,7 +131,8 @@ void EndController::reset()
 
     m_track_node       = QuadGraph::UNKNOWN_SECTOR;
     // In battle mode there is no quad graph, so nothing to do in this case
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+       race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
 
@@ -180,7 +182,9 @@ void EndController::update(float dt)
     AIBaseController::update(dt);
 
     // In case of battle mode: don't do anything
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+       race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER  ||
+       race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG)
     {
         m_controls->m_accel = 0.0f;
         // Brake while we are still driving forwards (if we keep

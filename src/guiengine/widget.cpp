@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,11 +34,7 @@ using namespace gui;
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
-
-
-#ifndef round
-# define round(x)  (floor(x+0.5f))
-#endif
+#include "utils/vs.hpp"
 
 namespace GUIEngine
 {

@@ -1,7 +1,7 @@
 
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010  Joerg Henrichs
+//  Copyright (C) 2010-2013  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -72,20 +72,20 @@ public:
     virtual bool  isPlayerController () const = 0;
     virtual bool  isNetworkController() const = 0;
     virtual bool  disableSlipstreamBonus() const = 0;
-	// ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
     /** Sets the controller name for this controller. */
     virtual void setControllerName(const std::string &name)
                                                  { m_controller_name = name; }
-	// ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
     /** Returns the name of this controller. */
     const std::string &getControllerName() const { return m_controller_name; }
-	// ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
     /** Returns the active player for this controller (NULL
      *  if this controller does not belong to a player.    */
     StateManager::ActivePlayer *getPlayer () {return m_player;}
 
-	// ---------------------------------------------------------------------------
-	/** Returns the player object (or NULL if it's a computer controller). */
+    // ---------------------------------------------------------------------------
+    /** Returns the player object (or NULL if it's a computer controller). */
     const StateManager::ActivePlayer *getPlayer () const { return m_player; }
 
     // ------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2013 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -76,6 +76,10 @@ private:
 
     /** \brief To check (and set) if sort order is descending **/
     bool             m_sort_desc;
+
+    bool             m_sort_default;
+    
+    int              m_sort_col;
 
     /** List of date filters **/
     std::vector<DateFilter> m_date_filters;

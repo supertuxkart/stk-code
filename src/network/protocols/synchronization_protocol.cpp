@@ -94,7 +94,7 @@ void SynchronizationProtocol::notifyEvent(Event* event)
             Log::warn("SynchronizationProtocol", "The sequence# %u isn't known.", sequence);
             return;
         }
-        double current_time = Time::getRealTime();
+        double current_time = StkTime::getRealTime();
         m_total_diff[peer_id] += current_time - m_pings[peer_id][sequence];
         Log::verbose("SynchronizationProtocol", "InstantPing is %u",
             (unsigned int)((current_time - m_pings[peer_id][sequence])*1000));
@@ -118,8 +118,8 @@ void SynchronizationProtocol::setup()
 
 void SynchronizationProtocol::asynchronousUpdate()
 {
-    static double timer = Time::getRealTime();
-    double current_time = Time::getRealTime();
+    static double timer = StkTime::getRealTime();
+    double current_time = StkTime::getRealTime();
     if (m_countdown_activated)
     {
         m_countdown -= (current_time - m_last_countdown_update);
@@ -174,6 +174,6 @@ void SynchronizationProtocol::startCountdown(int ms_countdown)
 {
     m_countdown_activated = true;
     m_countdown = (double)(ms_countdown)/1000.0;
-    m_last_countdown_update = Time::getRealTime();
+    m_last_countdown_update = StkTime::getRealTime();
     Log::info("SynchronizationProtocol", "Countdown started with value %f", m_countdown);
 }

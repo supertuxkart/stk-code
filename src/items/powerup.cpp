@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -33,57 +33,6 @@
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
-
-const wchar_t* getAnchorString()
-{
-    const int ANCHOR_STRINGS_COUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(ANCHOR_STRINGS_COUNT);
-
-    switch (id)
-    {
-        //I18N: shown when anchor applied. %s is the victim.
-        case 0: return _LTR("Arrr, the %s dropped anchor, Captain!");
-        case 1: return _LTR("%s pays the next round of grog!");
-        case 2: return _LTR("%s is a mighty pirate!");
-        default: assert(false); return L"";   // avoid compiler warning.
-    }
-}   // getAnchorString
-
-//-----------------------------------------------------------------------------
-const wchar_t* getParachuteString()
-{
-    const int PARACHUTE_STRINGS_COUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(PARACHUTE_STRINGS_COUNT);
-
-    switch (id)
-    {
-        case 0: return _("Geronimo!!!"); // Parachutist shout
-        case 1: return _("The Space Shuttle has landed!");
-        case 2: return _("Do you want to fly kites?");
-        default: assert(false); return  L"";  // avoid compiler warning
-    }
-}   // getParachuteString
-
-//-----------------------------------------------------------------------------
-const wchar_t* getSwapperString()
-{
-    const int SWAPPER_STRINGS_COUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(SWAPPER_STRINGS_COUNT);
-
-    switch (id)
-    {
-        case 0: return _("Magic, son. Nothing else in the world smells like that.");
-        case 1: return _("A wizard did it!");
-        case 2: return _("Banana? Box? Banana? Box? Banana? Box?");
-        default: assert(false); return L"";  // avoid compiler warning
-    }
-}   // getSwapperString
 
 //-----------------------------------------------------------------------------
 /** Constructor, stores the kart to which this powerup belongs.
@@ -150,7 +99,7 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
             break ;
 
         case PowerupManager::POWERUP_BOWLING:
-            m_sound_use = sfx_manager->createSoundSource("bowling_roll");
+            m_sound_use = sfx_manager->createSoundSource("bowling_shoot");
             break ;
 
         case PowerupManager::POWERUP_ANVIL:
@@ -237,7 +186,6 @@ void Powerup::use()
 
     m_number--;
     World *world = World::getWorld();
-    RaceGUIBase* gui = world->getRaceGUI();
     switch (m_type)
     {
     case PowerupManager::POWERUP_ZIPPER:
@@ -248,9 +196,6 @@ void Powerup::use()
             ItemManager::get()->switchItems();
             m_sound_use->position(m_owner->getXYZ());
             m_sound_use->play();
-
-            gui->addMessage(getSwapperString(), NULL, 3.0f,
-                            video::SColor(255, 255, 255, 255), false);
             break;
         }
     case PowerupManager::POWERUP_CAKE:
@@ -262,7 +207,7 @@ void Powerup::use()
         Powerup::adjustSound();
         m_sound_use->play();
 
-        projectile_manager->newProjectile(m_owner, world->getTrack(), m_type);
+        projectile_manager->newProjectile(m_owner, m_type);
         break ;
 
     case PowerupManager::POWERUP_SWATTER:
@@ -300,13 +245,29 @@ void Powerup::use()
 
             if(!m_owner->isShielded()) //if the previous shield had been used up.
             {
-                m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                               stk_config->m_bubblegum_shield_time);
+                if (m_owner->getIdent() == "nolok")
+                {
+                    m_owner->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                                                   stk_config->m_bubblegum_shield_time);
+                }
+                else
+                {
+                    m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                                                   stk_config->m_bubblegum_shield_time);
+                }
             }
             else // using a bubble gum while still having a shield
             {
-                m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                               stk_config->m_bubblegum_shield_time + m_owner->getShieldTime());
+                if (m_owner->getIdent() == "nolok")
+                {
+                    m_owner->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                                                  stk_config->m_bubblegum_shield_time + m_owner->getShieldTime());
+                }
+                else
+                {
+                    m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                                                  stk_config->m_bubblegum_shield_time + m_owner->getShieldTime());
+                }
             }
 
             m_sound_use = sfx_manager->createSoundSource("inflate");//Extraordinary. Usually sounds are set in Powerup::set()
@@ -343,11 +304,6 @@ void Powerup::use()
                     m_sound_use->position(m_owner->getXYZ());
 
                 m_sound_use->play();
-
-                irr::core::stringw anchor_message;
-                anchor_message += StringUtils::insertValues(getAnchorString(), core::stringw(kart->getName()));
-                gui->addMessage(translations->fribidize(anchor_message), NULL, 3.0f,
-                                video::SColor(255, 255, 255, 255), false);
                 break;
             }
         }
@@ -366,8 +322,7 @@ void Powerup::use()
                 if(kart->isEliminated() || kart== m_owner) continue;
                 if(kart->isShielded())
                 {
-                    kart->decreaseShieldTime(stk_config->m_bubblegum_shield_time);
-                    Log::verbose("Powerup", "Decreasing shield \n");
+                    kart->decreaseShieldTime();
                     continue;
                 }
                 if(m_owner->getPosition() > kart->getPosition())
@@ -390,9 +345,6 @@ void Powerup::use()
             else if(player_kart)
                 m_sound_use->position(player_kart->getXYZ());
             m_sound_use->play();
-
-            gui->addMessage(getParachuteString(), NULL, 3.0f,
-                            video::SColor(255, 255, 255, 255), false);
         }
         break;
 

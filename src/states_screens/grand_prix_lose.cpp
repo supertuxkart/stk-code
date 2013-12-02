@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 SuperTuxKart-Team
+//  Copyright (C) 2010-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -155,11 +155,14 @@ void GrandPrixLose::init()
     sceneManager->setAmbientLight(video::SColor(255, 120, 120, 120));
 
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
-    m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos,
-                                                               video::SColorf(1.0f,1.0f,1.0f),
-                                                               300.0f /* radius */);
-    m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-    m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 0.0f, 0.0f, 0.0f);
+    m_light = irr_driver->addLight(sun_pos, 300.0f, 1, 1, 1);
+
+    if (!irr_driver->isGLSL())
+    {
+        scene::ILightSceneNode *lnode = (scene::ILightSceneNode *) m_light;
+        lnode->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+        lnode->getLightData().SpecularColor = irr::video::SColorf(1.0f, 0.0f, 0.0f, 0.0f);
+    }
 }   // init
 
 // -------------------------------------------------------------------------------------
@@ -340,7 +343,7 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
             kart_main_node->updateAbsolutePosition();
             kart_main_node->setRotation(vector3df(0, 90, 0));
             float susp[4]={0,0,0,0};
-            kart_model->update(0.0f, 0.0f, susp);
+            kart_model->update(0.0f, 0.0f, 0.0f, susp, 0.0f);
         }
         else
         {

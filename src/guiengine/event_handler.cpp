@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,6 +22,7 @@
 #include <IGUIEnvironment.h>
 #include <IGUIListBox.h>
 
+#include "graphics/irr_driver.hpp"
 #include "guiengine/abstract_state_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -44,6 +45,7 @@ using namespace irr::gui;
 
 EventHandler::EventHandler()
 {
+    m_accept_events = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -56,6 +58,8 @@ EventHandler::~EventHandler()
 
 bool EventHandler::OnEvent (const SEvent &event)
 {
+    if (!m_accept_events && event.EventType != EET_LOG_TEXT_EVENT) return true;
+    
     // TO DEBUG HATS (when you don't actually have a hat)
     /*
     if (event.EventType == EET_KEY_INPUT_EVENT)
@@ -189,14 +193,18 @@ bool EventHandler::OnEvent (const SEvent &event)
 #else
             return true; // EVENT_BLOCK
 #endif
-
+            const std::string &error_info = irr_driver->getTextureErrorMessage();
             if (event.LogEvent.Level == irr::ELL_WARNING)
             {
-                printf("[Irrlicht Warning] %s\n", event.LogEvent.Text);
+                if(error_info.size()>0)
+                    Log::warn("EventHandler", error_info.c_str());
+                Log::warn("Irrlicht", event.LogEvent.Text);
             }
             else if (event.LogEvent.Level == irr::ELL_ERROR)
             {
-                printf("[Irrlicht Error] %s\n", event.LogEvent.Text);
+                if(error_info.size()>0)
+                    Log::error("EventHandler", error_info.c_str());
+                Log::error("Irrlicht", event.LogEvent.Text);
             }
         }
         return true;

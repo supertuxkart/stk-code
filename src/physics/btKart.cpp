@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 Erwin Coumans http://continuousphysics.com/Bullet/
+ * Copyright (C) 2005-2013 Erwin Coumans http://continuousphysics.com/Bullet/
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -84,6 +84,7 @@ btWheelInfo& btKart::addWheel(const btVector3& connectionPointCS,
     ci.m_maxSuspensionForce       = tuning.m_maxSuspensionForce;
 
     m_wheelInfo.push_back( btWheelInfo(ci));
+    m_visual_contact_point.push_back(btVector3());
 
     btWheelInfo& wheel = m_wheelInfo[getNumWheels()-1];
 
@@ -111,16 +112,18 @@ void btKart::reset()
         wheel.m_rotation                       = 0;
         updateWheelTransform(i, true);
     }
-    m_zipper_active             = false;
-    m_zipper_velocity           = btScalar(0);
-    m_skid_angular_velocity     = 0;
-    m_is_skidding               = false;
-    m_allow_sliding             = false;
-    m_num_wheels_on_ground      = 0;
-    m_additional_impulse        = btVector3(0,0,0);
-    m_time_additional_impulse   = 0;
-    m_additional_rotation       = btVector3(0,0,0);
-    m_time_additional_rotation  = 0;
+    m_visual_wheels_touch_ground = false;
+    m_zipper_active              = false;
+    m_zipper_velocity            = btScalar(0);
+    m_skid_angular_velocity      = 0;
+    m_is_skidding                = false;
+    m_allow_sliding              = false;
+    m_num_wheels_on_ground       = 0;
+    m_additional_impulse         = btVector3(0,0,0);
+    m_time_additional_impulse    = 0;
+    m_additional_rotation        = btVector3(0,0,0);
+    m_time_additional_rotation   = 0;
+    m_visual_rotation            = 0;
 
     // Set the brakes so that karts don't slide downhill
     setAllBrakes(5.0f);
@@ -209,8 +212,12 @@ void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
 }   // updateWheelTransformsWS
 
 // ----------------------------------------------------------------------------
-btScalar btKart::rayCast(btWheelInfo& wheel)
+/** 
+ */
+btScalar btKart::rayCast(unsigned int index)
 {
+    btWheelInfo &wheel = m_wheelInfo[index];
+
     // Work around a bullet problem: when using a convex hull the raycast
     // would sometimes hit the chassis (which does not happen when using a
     // box shape). Therefore set the collision mask in the chassis body so
@@ -224,7 +231,6 @@ btScalar btKart::rayCast(btWheelInfo& wheel)
     }
 
     updateWheelTransformsWS( wheel,false);
-
 
     btScalar depth = -1;
 
@@ -311,12 +317,53 @@ btScalar btKart::rayCast(btWheelInfo& wheel)
         wheel.m_clippedInvContactDotSuspension = btScalar(1.0);
     }
 
+#define USE_VISUAL
+#ifndef USE_VISUAL
+    m_visual_contact_point[index] = rayResults.m_hitPointInWorld;
+#else
+    if(index==2 || index==3)
+    {
+        if(m_visual_rotation==0.123123123)
+        {
+            m_visual_contact_point[index  ] = rayResults.m_hitPointInWorld;
+            m_visual_contact_point[index-2] = source;
+            m_visual_wheels_touch_ground &= (object!=NULL);
+        }
+        else
+        {
+            btTransform chassisTrans = getChassisWorldTransform();
+            if (getRigidBody()->getMotionState())
+            {
+                getRigidBody()->getMotionState()->getWorldTransform(chassisTrans);
+            }
+            btQuaternion q(m_visual_rotation, 0, 0);
+            btQuaternion rot_new = chassisTrans.getRotation() * q;
+            chassisTrans.setRotation(rot_new);
+            btVector3 pos = m_kart->getKartModel()->getWheelGraphicsPosition(index);
+            pos.setZ(pos.getZ()*0.9f);
+            //pos.setX(pos.getX()*0.1f);
+            //btVector3 pos = wheel.m_chassisConnectionPointCS;
+            btVector3 source = chassisTrans( pos );
+            btVector3 target = source + rayvector;
+            btVehicleRaycaster::btVehicleRaycasterResult rayResults;
+
+            void* object = m_vehicleRaycaster->castRay(source,target,rayResults);
+            m_visual_contact_point[index] = rayResults.m_hitPointInWorld;
+            m_visual_contact_point[index-2] = source;
+            m_visual_wheels_touch_ground &= (object!=NULL);        
+        }
+    }
+#endif
+
     if(m_chassisBody->getBroadphaseHandle())
     {
         m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup
             = old_group;
     }
+
+
     return depth;
+
 }   // rayCast
 
 // ----------------------------------------------------------------------------
@@ -342,11 +389,12 @@ void btKart::updateVehicle( btScalar step )
     // Simulate suspension
     // -------------------
 
-    m_num_wheels_on_ground = 0;
+    m_num_wheels_on_ground       = 0;
+    m_visual_wheels_touch_ground = true;
     for (int i=0;i<m_wheelInfo.size();i++)
     {
         btScalar depth;
-        depth = rayCast( m_wheelInfo[i]);
+        depth = rayCast( i);
         if(m_wheelInfo[i].m_raycastInfo.m_isInContact)
             m_num_wheels_on_ground++;
     }
@@ -894,6 +942,9 @@ void btKart::debugDraw(btIDebugDraw* debugDrawer)
                               wheelColor);
 
     }   // for i < getNumWheels
+    btVector3 yellow(1.0f, 1.0f, 0.0f);
+    debugDrawer->drawLine(m_visual_contact_point[0], m_visual_contact_point[2], yellow);
+    debugDrawer->drawLine(m_visual_contact_point[1], m_visual_contact_point[3], yellow);
 }   // debugDraw
 
 

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 SuperTuxKart-Team
+//  Copyright (C) 2010-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -113,7 +113,7 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
     irr::scene::IAnimatedMeshSceneNode *m_chest;
 
     /** The scene node for the light. */
-    irr::scene::ILightSceneNode* m_light;
+    irr::scene::ISceneNode* m_light;
 
     //#define USE_IRRLICHT_BUG_WORKAROUND
 

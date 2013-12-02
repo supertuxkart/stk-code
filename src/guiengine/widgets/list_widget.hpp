@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -63,6 +63,12 @@ namespace GUIEngine
         
         /** \brief whether this list is sorted in descending order */
         bool m_sort_desc;
+        
+        /** true when deault sorting is enabled */
+        bool m_sort_default;
+        
+        /** index of column*/
+        int m_sort_col;
         
         struct Column
         {

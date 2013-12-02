@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -108,7 +108,7 @@ KartProperties::KartProperties(const std::string &filename)
     m_engine_sfx_type        = "engine_small";
     m_kart_model             = NULL;
     m_has_rand_wheels        = false;
-    m_nitro_min_consumption  = 1.05f;
+    m_nitro_min_consumption  = 0.53f;
     // The default constructor for stk_config uses filename=""
     if (filename != "")
     {
@@ -217,6 +217,9 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     file_manager->pushModelSearchPath  (m_root);
     file_manager->pushTextureSearchPath(m_root);
 
+    irr_driver->setTextureErrorMessage("Error while loading kart '%s':",
+                                       m_name);
+
     // addShared makes sure that these textures/material infos stay in memory
     material_manager->addSharedMaterial(materials_file);
 
@@ -269,6 +272,8 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     }
 
     m_shadow_texture = irr_driver->getTexture(m_shadow_file);
+
+    irr_driver->unsetTextureErrorMessage();
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath();
 
@@ -424,6 +429,11 @@ void KartProperties::getAllData(const XMLNode * root)
         wheels_node->get("damping-relaxation",  &m_wheel_damping_relaxation );
         wheels_node->get("damping-compression", &m_wheel_damping_compression);
         wheels_node->get("radius",              &m_wheel_radius             );
+    }
+
+    if(const XMLNode *speed_weighted_objects_node = root->getNode("speed-weighted-objects"))
+    {
+        m_speed_weighted_object_properties.loadFromXMLNode(speed_weighted_objects_node);
     }
 
     if(const XMLNode *friction_node = root->getNode("friction"))
@@ -706,6 +716,8 @@ void KartProperties::checkAllSet(const std::string &filename)
         CHECK_NEG(m_engine_power[i], "engine power" );
         CHECK_NEG(m_plunger_in_face_duration[i],"plunger in-face-time");
     }
+
+    m_speed_weighted_object_properties.checkAllSet();
 
     m_skidding_properties->checkAllSet(filename);
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Joerg Henrichs
+//  Copyright (C) 2010-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,6 +18,7 @@
 
 #include "physics/irr_debug_drawer.hpp"
 
+#include "graphics/irr_driver.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 

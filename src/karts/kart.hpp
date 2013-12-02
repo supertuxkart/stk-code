@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2013 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -130,11 +130,14 @@ private:
     /** Current leaning of the kart. */
     float        m_current_lean;
 
-    /** If > 0 then bubble gum effect is on */
+    /** If > 0 then bubble gum effect is on. This is the sliding when hitting a gum on the floor, not the shield. */
     float        m_bubblegum_time;
 
     /** The torque to apply after hitting a bubble gum. */
     float        m_bubblegum_torque;
+    
+    /** True if fire button was pushed and not released */
+    bool         m_fire_clicked;
 
 
 
@@ -181,12 +184,6 @@ private:
     /** Rotation change in the last time delta, same for all wheels */
     float           m_wheel_rotation_dt;
 
-    /** For each wheel it stores the suspension length after the karts are at
-     *  the start position, i.e. the suspension will be somewhat compressed.
-     *  The bullet suspensionRestLength is the value when the suspension is not
-     *  at all compressed. */
-    float           m_default_suspension_length[4];
-
     /** The skidmarks object for this kart. */
     SkidMarks      *m_skidmarks;
 
@@ -208,6 +205,7 @@ private:
     SFXBase      *m_previous_terrain_sound;
     SFXBase      *m_skid_sound;
     SFXBase      *m_goo_sound;
+    SFXBase      *m_boing_sound;
     float         m_time_last_crash;
     
     /** To prevent using nitro in too short bursts */
@@ -222,7 +220,7 @@ private:
     void          updateEngineSFX();
     void          updateNitro(float dt);
     float         getActualWheelForce();
-    void          crashed();
+    void          crashed(const Material* m, AbstractKart *k);
     void          loadData(RaceManager::KartType type, bool animatedModel);
 
 public:
@@ -235,7 +233,6 @@ public:
     virtual void   createPhysics    ();
     virtual void   updateWeight     ();
     virtual bool   isInRest         () const;
-    virtual void   setSuspensionLength();
     virtual void   applyEngineForce (float force);
 
     virtual void flyUp();
@@ -406,8 +403,7 @@ public:
     virtual float getShieldTime() const;
     // ------------------------------------------------------------------------
     /** Decreases the kart's shield time. */
-    //If t = 0.0f: decrease shield time by the default amount.
-    virtual void decreaseShieldTime(float t);
+    virtual void decreaseShieldTime();
     // ------------------------------------------------------------------------
 
     /** Sets the energy the kart has collected. */

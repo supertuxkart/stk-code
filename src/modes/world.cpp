@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -182,6 +182,9 @@ void World::init()
 
     }  // for i
 
+    // Now that all models are loaded, apply the overrides
+    irr_driver->applyObjectPassShader();
+
     // Must be called after all karts are created
     m_race_gui->init();
 
@@ -262,11 +265,7 @@ void World::reset()
 
 void World::createRaceGUI()
 {
-    //if(UserConfigParams::m_minimal_race_gui &&
-    //   race_manager->getTrackName() != "tutorial")
-	//	m_race_gui = new MinimalRaceGUI();
-	//else
-		m_race_gui = new RaceGUI();
+    m_race_gui = new RaceGUI();
 }
 
 //-----------------------------------------------------------------------------
@@ -600,9 +599,6 @@ void World::resetAllKarts()
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
-        // Now store the current (i.e. in rest) suspension length for each
-        // kart, so that the karts can visualise the suspension.
-        (*i)->setSuspensionLength();
         // Update the kart transforms with the newly computed position
         // after all karts are reset
         (*i)->setTrans((*i)->getBody()->getWorldTransform());
@@ -741,6 +737,7 @@ void World::updateWorld(float dt)
                 race_manager->setNumKarts( 1 );
                 race_manager->setTrack( "tutorial" );
                 race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
+                race_manager->setReverseTrack(false);
 
                 // Use keyboard 0 by default (FIXME: let player choose?)
                 InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);

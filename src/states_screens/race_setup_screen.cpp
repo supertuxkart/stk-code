@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,9 +19,11 @@
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
+#include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/arenas_screen.hpp"
+#include "states_screens/easter_egg_screen.hpp"
 #include "states_screens/soccer_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
@@ -120,7 +122,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             race_manager->setMinorMode(RaceManager::MINOR_MODE_EASTER_EGG);
             UserConfigParams::m_game_mode = CONFIG_CODE_EASTER;
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
-            StateManager::get()->pushScreen( TracksScreen::getInstance() );
+            StateManager::get()->pushScreen( EasterEggScreen::getInstance() );
         }
         else if (selectedMode == IDENT_SOCCER)
         {
@@ -222,6 +224,7 @@ void RaceSetupScreen::onGameModeChanged()
 void RaceSetupScreen::init()
 {
     Screen::init();
+    input_manager->setMasterPlayerOnly(true);
     RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
     assert( w != NULL );
 
@@ -288,6 +291,7 @@ void RaceSetupScreen::init()
     }
 
 #ifdef ENABLE_SOCCER_MODE
+    if (race_manager->getNumLocalPlayers() > 1 || UserConfigParams::m_artist_debug_mode)
     {
         irr::core::stringw name5 = irr::core::stringw(
             RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
@@ -298,11 +302,12 @@ void RaceSetupScreen::init()
 
 #define ENABLE_EASTER_EGG_MODE
 #ifdef ENABLE_EASTER_EGG_MODE
+    if(race_manager->getNumLocalPlayers() == 1)
     {
         irr::core::stringw name1 = irr::core::stringw(
            RaceManager::getNameOf(RaceManager::MINOR_MODE_EASTER_EGG)) + L"\n";
         //FIXME: avoid duplicating descriptions from the help menu!
-        name1 +=  _("Find all Easter Eggs");
+        name1 +=  _("Explore tracks to find all hidden eggs");
 
         w2->addItem( name1, IDENT_EASTER,
                    RaceManager::getIconOf(RaceManager::MINOR_MODE_EASTER_EGG));

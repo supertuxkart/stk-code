@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -28,6 +28,7 @@ class FollowTheLeaderRace : public LinearWorld
 {
 private:
     std::vector<float>  m_leader_intervals;    // time till elimination in follow leader
+    float m_is_over_delay; //!< A timer used before terminating the race
 
 public:
 

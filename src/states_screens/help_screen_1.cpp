@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -58,6 +58,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
         race_manager->setNumKarts( 1 );
         race_manager->setTrack( "tutorial" );
         race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
+        race_manager->setReverseTrack(false);
 
         // Use keyboard 0 by default (FIXME: let player choose?)
         InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
@@ -106,16 +107,16 @@ void HelpScreen1::init()
 {
     Screen::init();
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
-	ButtonWidget* tutorial = getWidget<ButtonWidget>("startTutorial");
+    ButtonWidget* tutorial = getWidget<ButtonWidget>("startTutorial");
 
-	if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-	{
-		tutorial->setDeactivated();
-	}
-	else
-	{
-		tutorial->setActivated();
-	}
+    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+    {
+        tutorial->setDeactivated();
+    }
+    else
+    {
+        tutorial->setActivated();
+    }
 
     if (w != NULL)  w->select( "page1", PLAYER_ID_GAME_MASTER );
 }   //init

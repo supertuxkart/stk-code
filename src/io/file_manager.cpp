@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//            (C) 2008 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2008-2013 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -244,7 +244,7 @@ FileManager::~FileManager()
         }
         struct stat mystat;
         stat(full_path.c_str(), &mystat);
-        Time::TimeType current = Time::getTimeSinceEpoch();
+        StkTime::TimeType current = StkTime::getTimeSinceEpoch();
         if(current - mystat.st_ctime <24*3600)
         {
             if(UserConfigParams::logAddons())

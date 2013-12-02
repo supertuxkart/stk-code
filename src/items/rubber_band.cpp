@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -67,7 +67,7 @@ const wchar_t* getPlungerString()
 RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
           : m_plunger(plunger), m_owner(kart)
 {
-    video::SColor color(77, 179, 0, 0);
+    const video::SColor color(77, 179, 0, 0);
     video::SMaterial m;
     m.AmbientColor    = color;
     m.DiffuseColor    = color;
@@ -78,8 +78,19 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
     m_attached_state = RB_TO_PLUNGER;
     assert(m_buffer->getVertexType()==video::EVT_STANDARD);
 
+    // Set the vertex colors properly, as the new pipeline doesn't use the old light values
+    u32 i;
+    scene::IMeshBuffer * const mb = m_mesh->getMeshBuffer(0);
+    video::S3DVertex * const verts = (video::S3DVertex *) mb->getVertices();
+    const u32 max = mb->getVertexCount();
+    for (i = 0; i < max; i++)
+    {
+        verts[i].Color = color;
+    }
+
     updatePosition();
     m_node = irr_driver->addMesh(m_mesh);
+    irr_driver->applyObjectPassShader(m_node);
 #ifdef DEBUG
     std::string debug_name = m_owner->getIdent()+" (rubber-band)";
     m_node->setName(debug_name.c_str());
@@ -137,7 +148,7 @@ void RubberBand::updatePosition()
  */
 void RubberBand::update(float dt)
 {
-    if(m_owner->isEliminated() || m_owner->isShielded())
+    if(m_owner->isEliminated())
     {
         // Rubber band snaps
         m_plunger->hit(NULL);
@@ -247,9 +258,8 @@ void RubberBand::hit(AbstractKart *kart_hit, const Vec3 *track_xyz)
     {
         if(kart_hit->isShielded())
         {
-            kart_hit->decreaseShieldTime(0.0f); //Decreasing the shield time by the default value.
+            kart_hit->decreaseShieldTime();
             m_plunger->setKeepAlive(0.0f);
-            Log::verbose("rubber_band", "Decreasing shield! \n");
 
             return;
         }

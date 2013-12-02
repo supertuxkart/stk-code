@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -40,7 +40,8 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_icons = NULL;
     m_listener = NULL;
     m_selected_column = NULL;
-    m_sort_desc = true;
+    m_sort_desc = false;
+    m_sort_default = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -358,6 +359,8 @@ void ListWidget::elementRemoved()
     }
     m_header_elements.clearAndDeleteAll();
     m_selected_column = NULL;
+    m_sort_desc = false;
+    m_sort_default = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -413,12 +416,22 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
 
     if (originator.find(m_properties[PROP_ID] + "_column_") != std::string::npos)
     {
-        int col = originator[ (m_properties[PROP_ID] + "_column_").size() ] - '0';
+        if (m_sort_col != originator[(m_properties[PROP_ID] + "_column_").size()] - '0')
+        {
+            m_sort_desc = false;
+            m_sort_default = false;
+        }
+        else
+        {
+            if (!m_sort_default) m_sort_desc = !m_sort_desc;
+            m_sort_default = !m_sort_desc && !m_sort_default;
+        }
 
-        m_selected_column = m_header_elements.get(col);
+        m_sort_col = originator[(m_properties[PROP_ID] + "_column_").size()] - '0';
+        m_selected_column = m_header_elements.get(m_sort_col);
 
         /** \brief Allows sort icon to change depending on sort order **/
-        m_sort_desc = !m_sort_desc;
+
         /*
         for (int n=0; n<m_header_elements.size(); n++)
         {
@@ -427,7 +440,7 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
         m_header_elements[col].getIrrlichtElement<IGUIButton>()->setPressed(true);
         */
 
-        if (m_listener) m_listener->onColumnClicked(col);
+        if (m_listener) m_listener->onColumnClicked(m_sort_col);
 
         return EVENT_BLOCK;
     }

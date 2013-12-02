@@ -1,7 +1,7 @@
 
 
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -296,15 +296,14 @@ void ThreeStrikesBattle::update(float dt)
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
 
-    core::vector3df tire_offset;
-    std::string tire;
-    float scale = 0.5f;
-    float radius = 0.5f;
-    PhysicalObject::bodyTypes body_shape;
-
     // insert blown away tire(s) now if was requested
     while (m_insert_tire > 0)
     {
+        std::string tire;
+        core::vector3df tire_offset;
+        float scale = 0.5f;
+        float radius = 0.5f;
+        PhysicalObject::BodyTypes body_shape;
         if(m_insert_tire == 1)
         {
             tire_offset = core::vector3df(0.0f, 0.0f, 0.0f);
@@ -332,35 +331,31 @@ void ThreeStrikesBattle::update(float dt)
 
         core::vector3df tire_xyz = m_tire_position + tire_offset;
         core::vector3df tire_hpr = core::vector3df(800.0f,0,
-                                                   m_tire_rotation / M_PI * 180 + 180);
+                                                   m_tire_rotation *RAD_TO_DEGREE + 180);
         core::vector3df tire_scale(scale,scale,scale);
 
-        PhysicalObject::Settings physicsSettings;
-        physicsSettings.body_type = PhysicalObject::MP_CYLINDER_Y;
-        physicsSettings.crash_reset = false;
-        physicsSettings.knock_kart = false;
-        physicsSettings.mass = 15.0f;
-        physicsSettings.radius = radius;
-        physicsSettings.reset_when_too_low = false;
+        PhysicalObject::Settings physics_settings(body_shape, 
+                                                  radius, /*mass*/15.0f);
 
         TrackObjectPresentationMesh* tire_presentation =
             new TrackObjectPresentationMesh(tire, tire_xyz, tire_hpr, tire_scale);
 
-        TrackObject* tire = new TrackObject(tire_xyz, tire_hpr, tire_scale,
-                                            "movable", tire_presentation,
-                                            true /* is_dynamic */,
-                                            &physicsSettings);
-        getTrack()->getTrackObjectManager()->insertObject(tire);
+        TrackObject* tire_obj = new TrackObject(tire_xyz, tire_hpr, tire_scale,
+                                                "movable", tire_presentation,
+                                                true /* is_dynamic */,
+                                                &physics_settings);
+        getTrack()->getTrackObjectManager()->insertObject(tire_obj);
 
         // FIXME: orient the force relative to kart orientation
-        tire->getPhysics()->getBody()->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
+        tire_obj->getPhysics()->getBody()
+                ->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
 
         m_insert_tire--;
         if(m_insert_tire == 1)
             m_insert_tire = 0;
 
-        m_tires.push_back(tire);
-    }
+        m_tires.push_back(tire_obj);
+    }   // while
 }   // update
 
 //-----------------------------------------------------------------------------

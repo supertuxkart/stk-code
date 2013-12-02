@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012  Joerg Henrichs
+//  Copyright (C) 2012-2013  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -53,8 +53,8 @@ AbstractKart::AbstractKart(const std::string& ident,
     m_kart_width  = m_kart_model->getWidth();
     m_kart_height = m_kart_model->getHeight();
     m_kart_length = m_kart_model->getLength();
+    m_kart_highest_point = m_kart_model->getHighestPoint();
     m_wheel_graphics_position = m_kart_model->getWheelsGraphicsPosition();
-    m_nitro_emitter_position = m_kart_model->getNitroEmittersPositon();
 }   // AbstractKart
 
 // ----------------------------------------------------------------------------

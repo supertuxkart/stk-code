@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Joerg Henrichs
+//  Copyright (C) 2013-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -67,9 +67,9 @@ void Log::setTerminalColor(LogLevel level)
 #else
     enum TermAttr
     {
-        TERM_RESET = 0,	// "normal" mode
+        TERM_RESET = 0, // "normal" mode
         TERM_BRIGHT = 1,// more luminosity for the foreground
-        TERM_DIM = 2,	// less luminosity for the foreground
+        TERM_DIM = 2,   // less luminosity for the foreground
     };
 
     enum TermColor
@@ -165,7 +165,7 @@ void Log::printMessage(int level, const char *component, const char *format,
     }
 
     // If we don't have a console file, write to stdout and hope for the best
-    if(!m_file_stdout ||
+    if(!m_file_stdout || level >= LL_WARN ||
         UserConfigParams::m_log_errors_to_console) // log to console & file
     {
         VALIST out;

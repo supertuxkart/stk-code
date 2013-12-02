@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Patrick Ammann <pammann@aro.ch>
+//  Copyright (C) 2006-2013 Patrick Ammann <pammann@aro.ch>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -55,6 +55,9 @@ private:
      the sound source won't be created and we'll be left with no clue when enabling
      sounds later. */
     float m_gain;
+    
+    /** The master gain set in user preferences */
+    float m_master_gain;
 
     bool m_owns_buffer;
 
@@ -74,6 +77,7 @@ public:
     virtual void                  speed(float factor);
     virtual void                  position(const Vec3 &position);
     virtual void                  volume(float gain);
+    virtual void                  masterVolume(float gain);
     virtual SFXManager::SFXStatus getStatus();
     virtual void                  onSoundEnabledBack();
     virtual void                  setRolloff(float rolloff);

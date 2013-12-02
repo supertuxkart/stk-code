@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Joerg Henrichs
+//  Copyright (C) 2009-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -123,7 +123,9 @@ public:
                                  const video::SColor &fill_color
                                         =video::SColor(127, 255, 255, 255) );
     void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
-    void         updateDistancesForAllSuccessors(unsigned int indx, float delta);
+    void         updateDistancesForAllSuccessors(unsigned int indx, 
+                                                 float delta,
+                                                 unsigned int count);
     void         setupPaths();
     void         computeChecklineRequirements();
 // ----------------------------------------------------------------------

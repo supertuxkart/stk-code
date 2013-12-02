@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2006 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2011 Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2011-2013 Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -129,7 +129,6 @@
 #else
 #  include <unistd.h>
 #endif
-#include <time.h>
 #include <stdexcept>
 #include <cstdio>
 #include <string>
@@ -191,9 +190,12 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/crash_reporting.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
+
+static void cleanSuperTuxKart();
 
 // ============================================================================
 //                        gamepad visualisation screen
@@ -348,11 +350,38 @@ void gamepadVisualisation()
 
         driver->endScene();
     }
-}
+}   // gamepadVisualisation
+
 // ============================================================================
+/** Sets the Christmas flag (m_xmas_enabled), depending on currently set
+ *  Christ mode (m_xmas_mode)
+ */
+void handleXmasMode()
+{
+    bool xmas = false;
+    switch(UserConfigParams::m_xmas_mode)
+    {
+    case 0:  
+        {
+            int day, month;
+            StkTime::getDate(&day, &month);
+            // Christmat hats are shown between 17. of December
+            // and 5th of January
+            xmas = (month == 12 && day>=17)  || (month ==  1 && day <=5);
+            break;
+        }
+    case 1:  xmas = true;  break;
+    default: xmas = false; break;
+    }   // switch m_xmas_mode
 
+    if(xmas)
+        kart_properties_manager->setHatMeshName("christmas_hat.b3d");
+}   // handleXmasMode
 
-void cmdLineHelp (char* invocation)
+// ----------------------------------------------------------------------------
+/** Prints help for command line options to stdout.
+ */
+void cmdLineHelp(char* invocation)
 {
     Log::info("main",
     "Usage: %s [OPTIONS]\n\n"
@@ -474,14 +503,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
         }
         else if ( sscanf(argv[i], "--xmas=%d", &n) )
         {
-            if (n)
-            {
-                UserConfigParams::m_xmas_enabled = true;
-            }
-            else
-            {
-                UserConfigParams::m_xmas_enabled = false;
-            }
+            UserConfigParams::m_xmas_mode = n;
         }
         else if( !strcmp(argv[i], "--no-console"))
         {
@@ -600,7 +622,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
         }   // --verbose or -v
     }
     return 0;
-}
+}   // handleCmdLinePreliminary
 
 // ============================================================================
 /** Handles command line options.
@@ -645,6 +667,11 @@ int handleCmdLine(int argc, char **argv)
         else if(!strcmp(argv[i], "--ftl-debug"))
         {
             UserConfigParams::m_ftl_debug = true;
+        }
+        else if(UserConfigParams::m_artist_debug_mode &&
+               !strcmp(argv[i], "--camera-wheel-debug"))
+        {
+            UserConfigParams::m_camera_debug=2;
         }
         else if(UserConfigParams::m_artist_debug_mode &&
                !strcmp(argv[i], "--camera-debug"))
@@ -1097,8 +1124,12 @@ int handleCmdLine(int argc, char **argv)
 #endif
         else
         {
+            // invalid param needs to go to console
+            UserConfigParams::m_log_errors_to_console = true;
+
             Log::error("main", "Invalid parameter: %s.\n", argv[i] );
             cmdLineHelp(argv[0]);
+            cleanSuperTuxKart();
             return 0;
         }
     }   // for i <argc
@@ -1135,8 +1166,7 @@ void initUserConfig(char *argv[])
     irr_driver              = new IrrDriver();
     file_manager            = new FileManager(argv);
     user_config             = new UserConfig();     // needs file_manager
-    const bool config_ok    = user_config->loadConfig();
-
+    const bool config_ok    = user_config->loadConfig();    
     if (UserConfigParams::m_language.toString() != "system")
     {
 #ifdef WIN32
@@ -1151,7 +1181,7 @@ void initUserConfig(char *argv[])
     translations            = new Translations();   // needs file_manager
     stk_config              = new STKConfig();      // in case of --stk-config
                                                     // command line parameters
-
+    user_config->postLoadInit();
     if (!config_ok || UserConfigParams::m_all_players.size() == 0)
     {
         user_config->addDefaultPlayer();
@@ -1222,8 +1252,10 @@ void initRest()
     // Consistency check for challenges, and enable all challenges
     // that have all prerequisites fulfilled
     grand_prix_manager->checkConsistency();
-    GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                               file_manager->getTextureFile("cup_gold.png")) );
+    std::string file = file_manager->getTextureFile("cup_gold.png");
+    if(file.size()==0)
+        Log::fatal("main", "Can not find cup_gold.png, aborting.");
+    GUIEngine::addLoadingIcon( irr_driver->getTexture(file) );
 
     race_manager            = new RaceManager          ();
     // default settings for Quickstart
@@ -1239,8 +1271,11 @@ void initRest()
 //=============================================================================
 /** Frees all manager and their associated memory.
  */
-void cleanSuperTuxKart()
+static void cleanSuperTuxKart()
 {
+
+    delete main_loop;
+
     irr_driver->updateConfigIfRelevant();
 
     if(INetworkHttp::get())
@@ -1279,19 +1314,6 @@ void cleanSuperTuxKart()
     if(music_manager)           delete music_manager;
     delete ParticleKindManager::get();
     if(stk_config)              delete stk_config;
-
-#ifndef WIN32
-    if (user_config) //close logfiles
-    {
-        Log::closeOutputFiles();
-#endif
-        fclose(stderr);
-        fclose(stdout);
-#ifndef WIN32
-    }
-#endif
-
-
     if(user_config)             delete user_config;
     if(unlock_manager)          delete unlock_manager;
     if(translations)            delete translations;
@@ -1317,15 +1339,6 @@ bool ShowDumpResults(const wchar_t* dump_path,
 }
 #endif
 
-static bool checkXmasTime()
-{
-    time_t      rawtime;
-    struct tm*  timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    return (timeinfo->tm_mon == 12-1);  // Xmas mode happens in December
-}
-
 #if defined(DEBUG) && defined(WIN32) && !defined(__CYGWIN__)
 #pragma comment(linker, "/SUBSYSTEM:console")
 #endif
@@ -1336,6 +1349,8 @@ int main(int argc, char *argv[] )
     google_breakpad::ExceptionHandler eh(L"C:\\Temp", NULL, ShowDumpResults,
                                          NULL, google_breakpad::ExceptionHandler::HANDLER_ALL);
 #endif
+    CrashReporting::installHandlers();
+
     srand(( unsigned ) time( 0 ));
 
     try {
@@ -1344,8 +1359,6 @@ int main(int argc, char *argv[] )
         // not have) other managers initialised:
         initUserConfig(argv); // argv passed so config file can be
                               // found more reliably
-
-        UserConfigParams::m_xmas_enabled = checkXmasTime();
 
         handleCmdLinePreliminary(argc, argv);
 
@@ -1369,10 +1382,12 @@ int main(int argc, char *argv[] )
         GUIEngine::addLoadingIcon( irr_driver->getTexture(
                            file_manager->getGUIDir() + "options_video.png") );
         kart_properties_manager -> loadAllKarts    ();
+        handleXmasMode();
         unlock_manager          = new UnlockManager();
-        //m_tutorial_manager      = new TutorialManager();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                               file_manager->getTextureFile("gui_lock.png")) );
+        std::string file = file_manager->getTextureFile("gui_lock.png");
+        if(file.size()==0)
+            Log::fatal("main", "Can not find gui_lock.png, aborting.");
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(file));
         projectile_manager      -> loadData        ();
 
         // Both item_manager and powerup_manager load models and therefore
@@ -1571,7 +1586,6 @@ int main(int argc, char *argv[] )
             // Profiling
             // =========
             race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-            race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
             race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
         }
@@ -1608,6 +1622,19 @@ int main(int argc, char *argv[] )
 #ifdef DEBUG
     MemoryLeaks::checkForLeaks();
 #endif
+
+#ifndef WIN32
+    if (user_config) //close logfiles
+    {
+        Log::closeOutputFiles();
+#endif
+        fclose(stderr);
+        fclose(stdout);
+#ifndef WIN32
+    }
+#endif
+
+
 
     return 0 ;
 }   // main

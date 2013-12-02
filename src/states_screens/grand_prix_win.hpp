@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 SuperTuxKart-Team
+//  Copyright (C) 2010-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
 #ifndef HEADER_GRAND_PRIX_WIN_HPP
 #define HEADER_GRAND_PRIX_WIN_HPP
 
+#include "audio/sfx_base.hpp"
 #include "guiengine/screen.hpp"
 #include "karts/kart_model.hpp"
 
@@ -53,7 +54,7 @@ class GrandPrixWin : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     irr::scene::ISceneNode* m_sky;
     irr::scene::ICameraSceneNode* m_camera;
 
-    irr::scene::ILightSceneNode* m_light;
+    irr::scene::ISceneNode* m_light;
 
     GUIEngine::LabelWidget* m_unlocked_label;
 
@@ -67,6 +68,7 @@ class GrandPrixWin : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     float m_camera_target_x, m_camera_target_z;
 
     MusicInformation* m_music;
+    SFXBase* m_finish_sound;
 
 public:
 

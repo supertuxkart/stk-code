@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 SuperTuxKart-Team
+//  Copyright (C) 2010-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -210,12 +210,16 @@ void GrandPrixWin::init()
     sceneManager->setAmbientLight(video::SColor(255, 95, 95, 95));
 
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
-    m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos,
-                                                               video::SColorf(0.25f,0.25f,0.25f),
-                                                               300.0f /* radius */);
-    m_light->getLightData().DiffuseColor = irr::video::SColorf(0.25f, 0.25f, 0.25f, 1.0f);
-    m_light->getLightData().AmbientColor = irr::video::SColorf(0.25f, 0.25f, 0.25f, 1.0f);
-    m_light->getLightData().SpecularColor = irr::video::SColorf(0.0f, 0.0f, 0.0f, 1.0f);
+    m_light = irr_driver->addLight(sun_pos, 300.0f, 0.25f, 0.25f, 0.25f);
+
+    m_finish_sound = sfx_manager->quickSound("gp_end");
+    if (!irr_driver->isGLSL())
+    {
+        scene::ILightSceneNode *lnode = (scene::ILightSceneNode *) m_light;
+        lnode->getLightData().DiffuseColor = irr::video::SColorf(0.25f, 0.25f, 0.25f, 1.0f);
+        lnode->getLightData().AmbientColor = irr::video::SColorf(0.25f, 0.25f, 0.25f, 1.0f);
+        lnode->getLightData().SpecularColor = irr::video::SColorf(0.0f, 0.0f, 0.0f, 1.0f);
+    }
 
     sfx_manager->quickSound("gp_end");
 }   // init
@@ -253,6 +257,12 @@ void GrandPrixWin::tearDown()
         manualRemoveWidget(m_unlocked_label);
         delete m_unlocked_label;
         m_unlocked_label = NULL;
+    }
+    
+    if (m_finish_sound != NULL &&
+        m_finish_sound->getStatus() == SFXManager::SFX_PLAYING)
+    {
+        m_finish_sound->stop();
     }
 }   // tearDown
 
@@ -451,7 +461,7 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
                                                          m_kart_z[n]) );
             kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
             float susp[4]={0,0,0,0};
-            kart_model->update(0.0f, 0.0f, susp);
+            kart_model->update(0.0f, 0.0f, 0.0f, susp, 0.0f);
         }
         else
         {

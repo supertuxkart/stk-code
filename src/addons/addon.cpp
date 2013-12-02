@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2013 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -162,7 +162,7 @@ void Addon::writeXML(std::ofstream *out_stream)
 // ----------------------------------------------------------------------------
 std::string Addon::getDateAsString() const
 {
-    return Time::toString(m_date);
+    return StkTime::toString(m_date);
 }   // getDateAsString
 
 // ----------------------------------------------------------------------------

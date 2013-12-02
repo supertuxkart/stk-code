@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -54,6 +54,7 @@ static const initAttachmentType iat[]=
     {Attachment::ATTACH_NOLOKS_SWATTER,   "swatter_nolok.b3d",    "swatter-icon.png"             },
     {Attachment::ATTACH_TINYTUX,          "reset-button.b3d",     "reset-attach-icon.png"        },
     {Attachment::ATTACH_BUBBLEGUM_SHIELD, "bubblegum_shield.b3d", "shield-icon.png"              },
+    {Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD, "bubblegum_shield_nolok.b3d", "shield-icon.png"              },
     {Attachment::ATTACH_MAX,              "",                     ""                             },
 };
 

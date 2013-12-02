@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Joerg Henrichs
+//  Copyright (C) 2010-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -109,6 +109,8 @@ private:
 #endif
     };   // Rowinfo
 
+    /** The team icons. */
+
     std::vector<RowInfo>       m_all_row_infos;
 
     /** Time to wait till the next row starts to be animated. */
@@ -194,6 +196,7 @@ private:
     void displayGPProgress();
     void cleanupGPProgress();
     void displayHighScores();
+    void displaySoccerResults();
 public:
 
                  RaceResultGUI();

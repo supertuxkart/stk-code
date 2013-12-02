@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Lionel Fuentes
+//  Copyright (C) 2013-2013 Lionel Fuentes
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -72,6 +72,8 @@ public:
 
 private:
     bool areAllKartsConfirmed() const;
+    int getNumKartsInTeam(int team);
+    int getNumConfirmedKarts();
     void updateKartViewsLayout();
 };
 

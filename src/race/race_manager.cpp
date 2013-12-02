@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -355,8 +355,15 @@ void RaceManager::startNew(bool from_overworld)
         // =========================================
         if(gp != NULL)
         {
-            m_track_number = gp->getNextTrack();
-            gp->loadKarts(m_kart_status);
+            if (m_continue_saved_gp)
+            {
+                m_track_number = gp->getNextTrack();
+                gp->loadKarts(m_kart_status);
+            }
+            else
+            {
+                gp->remove();
+            }
         }
     }
     startNextRace();
@@ -741,7 +748,8 @@ void RaceManager::rerunRace()
 
 //-----------------------------------------------------------------------------
 
-void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld)
+void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld, 
+                          bool continue_saved_gp)
 {
     assert(gp != NULL);
 
@@ -749,6 +757,7 @@ void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld)
     setGrandPrix(*gp);
     setCoinTarget( 0 ); // Might still be set from a previous challenge
     race_manager->setupPlayerKartInfo();
+    m_continue_saved_gp = continue_saved_gp;
 
     setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
     startNew(from_overworld);

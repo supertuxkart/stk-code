@@ -1,6 +1,6 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006
+//
+//  Copyright (C) 2006-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -315,6 +315,11 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
                             kart_model.getWheelGraphicsPosition(2) );
     m_model_view->addModel( kart_model.getWheelModel(3),
                             kart_model.getWheelGraphicsPosition(3) );
+    for(size_t i=0 ; i < kart_model.getSpeedWeightedObjectsCount() ; i++)
+    {
+        const SpeedWeightedObject&  obj = kart_model.getSpeedWeightedObject(i);
+        m_model_view->addModel(obj.m_model, obj.m_position);
+    }
     m_model_view->setRotateContinuously( 35.0f );
 
     // ---- Kart name label

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -29,21 +29,22 @@ using namespace GUIEngine;
 
 // ------------------------------------------------------------------------------------------------------
 
-MessageDialog::MessageDialog(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool own_listener) :
+MessageDialog::MessageDialog(const irr::core::stringw &msg, MessageDialogType type, 
+                             IConfirmDialogListener* listener, bool own_listener) :
     ModalDialog(0.6f, 0.6f)
 {
     m_msg = msg;
     doInit(type, listener, own_listener);
-}
+}   // MessageDialog(stringw, type, listener, own_listener)
 
 // ------------------------------------------------------------------------------------------------------
 
-MessageDialog::MessageDialog(irr::core::stringw msg, bool from_queue) :
+MessageDialog::MessageDialog(const irr::core::stringw &msg, bool from_queue) :
     ModalDialog(0.6f, 0.6f)
 {
     m_msg = msg;
     if(!from_queue) load();
-}
+}   // MessageDialog(stringw)
 
 // ------------------------------------------------------------------------------------------------------
 
@@ -62,7 +63,7 @@ MessageDialog::~MessageDialog()
     {
         World::getWorld()->scheduleUnpause();
     }
-}
+}   // ~MessageDialog
 
 // ------------------------------------------------------------------------------------------------------
 
@@ -93,6 +94,12 @@ void MessageDialog::doInit(MessageDialogType type,
         ButtonWidget* cancelbtn = getWidget<ButtonWidget>("cancel");
         cancelbtn->setText(_("OK"));
         cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    }
+    else if (type == MessageDialog::MESSAGE_DIALOG_OK_CANCEL)
+    {
+        // In case of a OK_CANCEL dialog, change the text from 'Yes' to 'Ok'
+        ButtonWidget* yesbtn = getWidget<ButtonWidget>("confirm");
+        yesbtn->setText(_("OK"));
     }
 }
 

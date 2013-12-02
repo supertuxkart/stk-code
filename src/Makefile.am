@@ -69,10 +69,14 @@ supertuxkart_SOURCES = \
  config/device_config.hpp \
  graphics/CBatchingMesh.cpp \
  graphics/CBatchingMesh.hpp \
+ graphics/callbacks.cpp \
+ graphics/callbacks.hpp \
  graphics/camera.cpp \
  graphics/camera.hpp \
  graphics/explosion.cpp \
  graphics/explosion.hpp \
+ graphics/glow.cpp \
+ graphics/glow.hpp \
  graphics/hardware_skinning.cpp \
  graphics/hardware_skinning.hpp \
  graphics/hit_effect.hpp \
@@ -80,6 +84,11 @@ supertuxkart_SOURCES = \
  graphics/hit_sfx.hpp \
  graphics/irr_driver.cpp \
  graphics/irr_driver.hpp \
+ graphics/large_mesh_buffer.hpp \
+ graphics/lens_flare.cpp \
+ graphics/lens_flare.hpp \
+ graphics/light.hpp \
+ graphics/light.cpp \
  graphics/lod_node.cpp \
  graphics/lod_node.hpp \
  graphics/material.cpp \
@@ -102,10 +111,19 @@ supertuxkart_SOURCES = \
  graphics/post_processing.hpp \
  graphics/rain.cpp \
  graphics/rain.hpp \
+ graphics/render.cpp \
  graphics/referee.cpp \
  graphics/referee.hpp \
+ graphics/rtts.hpp \
+ graphics/rtts.cpp \
+ graphics/screenquad.cpp \
+ graphics/screenquad.hpp \
+ graphics/shaders.cpp \
+ graphics/shaders.hpp \
  graphics/shadow.cpp \
  graphics/shadow.hpp \
+ graphics/shadow_importance.cpp \
+ graphics/shadow_importance.hpp \
  graphics/show_curve.cpp \
  graphics/show_curve.hpp \
  graphics/skid_marks.cpp \
@@ -114,6 +132,12 @@ supertuxkart_SOURCES = \
  graphics/slip_stream.hpp \
  graphics/stars.cpp \
  graphics/stars.hpp \
+ graphics/sun.hpp \
+ graphics/sun.cpp \
+ graphics/water.hpp \
+ graphics/water.cpp \
+ graphics/wind.hpp \
+ graphics/wind.cpp \
  guiengine/CGUISpriteBank.cpp \
  guiengine/CGUISpriteBank.h \
  guiengine/abstract_state_manager.cpp \
@@ -496,6 +520,8 @@ supertuxkart_SOURCES = \
  utils/aligned_array.hpp \
  utils/constants.hpp \
  utils/constants.cpp \
+ utils/helpers.hpp \
+ utils/helpers.cpp \
  utils/leak_check.cpp \
  utils/leak_check.hpp \
  utils/log.cpp \
@@ -510,6 +536,7 @@ supertuxkart_SOURCES = \
  utils/string_utils.hpp \
  utils/synchronised.hpp \
  utils/time.hpp \
+ utils/time.cpp \
  utils/translation.cpp \
  utils/translation.hpp \
  utils/utf8.h \
@@ -517,7 +544,8 @@ supertuxkart_SOURCES = \
  utils/utf8/core.h \
  utils/utf8/unchecked.h \
  utils/vec3.cpp \
- utils/vec3.hpp
+ utils/vec3.hpp \
+ utils/vs.hpp
 
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = \

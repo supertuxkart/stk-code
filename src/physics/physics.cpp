@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 #include "achievements/achievements_manager.hpp"
 #include "animations/three_d_animation.hpp"
 #include "karts/abstract_kart.hpp"
+#include "graphics/irr_driver.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
 #include "items/flyable.hpp"
@@ -34,6 +35,7 @@
 #include "physics/stk_dynamics_world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
+#include "modes/soccer_world.hpp"
 
 // ----------------------------------------------------------------------------
 /** Initialise physics.
@@ -86,13 +88,13 @@ Physics::~Physics()
  */
 void Physics::addKart(const AbstractKart *kart)
 {
-	const btCollisionObjectArray &all_objs =
-		m_dynamics_world->getCollisionObjectArray();
-	for(unsigned int i=0; i<(unsigned int)all_objs.size(); i++)
-	{
-		if(btRigidBody::upcast(all_objs[i])== kart->getBody())
-			return;
-	}
+    const btCollisionObjectArray &all_objs =
+        m_dynamics_world->getCollisionObjectArray();
+    for(unsigned int i=0; i<(unsigned int)all_objs.size(); i++)
+    {
+        if(btRigidBody::upcast(all_objs[i])== kart->getBody())
+            return;
+    }
     m_dynamics_world->addRigidBody(kart->getBody());
     m_dynamics_world->addVehicle(kart->getVehicle());
     m_dynamics_world->addConstraint(kart->getUprightConstraint());
@@ -188,6 +190,12 @@ void Physics::update(float dt)
                 const KartProperties* kp = kart->getKartProperties();
                 kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
             }
+            else if(obj->isSoccerBall())
+            {
+                int kartId = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
+                SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
+                soccerWorld->setLastKartTohitBall(kartId);
+            }
             continue;
         }
 
@@ -228,6 +236,13 @@ void Physics::update(float dt)
             // -------------------------------
             p->getUserPointer(0)->getPointerFlyable()
                 ->hit(NULL, p->getUserPointer(1)->getPointerPhysicalObject());
+            PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
+            if(obj->isSoccerBall())
+            {
+                int kartId = p->getUserPointer(0)->getPointerFlyable()->getOwnerId();
+                SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
+                soccerWorld->setLastKartTohitBall(kartId);
+            }
 
         }
         else if(p->getUserPointer(1)->is(UserPointer::UP_KART))
@@ -471,6 +486,16 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                                                             .m_normalWorldOnB;
                 kart->crashed(m, normal);
             }
+            else if(upB->is(UserPointer::UP_PHYSICAL_OBJECT))
+            {
+                int n = contact_manifold->getContactPoint(0).m_index1;
+                const Material *m
+                    = n>=0 ? upA->getPointerTriangleMesh()->getMaterial(n)
+                           : NULL;
+                const btVector3 &normal = contact_manifold->getContactPoint(0)
+                                                           .m_normalWorldOnB;
+                upB->getPointerPhysicalObject()->hit(m, normal);
+            }
         }
         // 2) object a is a kart
         // =====================
@@ -537,6 +562,16 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                 m_all_collisions.push_back(
                     upA, contact_manifold->getContactPoint(0).m_localPointA,
                     upB, contact_manifold->getContactPoint(0).m_localPointB);
+            else if(upB->is(UserPointer::UP_TRACK))
+            {
+                int n = contact_manifold->getContactPoint(0).m_index1;
+                const Material *m
+                    = n>=0 ? upB->getPointerTriangleMesh()->getMaterial(n)
+                           : NULL;
+                const btVector3 &normal = contact_manifold->getContactPoint(0)
+                                                           .m_normalWorldOnB;
+                upA->getPointerPhysicalObject()->hit(m, normal);
+            }
         }
         else if (upA->is(UserPointer::UP_ANIMATION))
         {

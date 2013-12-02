@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -33,12 +33,9 @@ using namespace video;
 #include "io/file_manager.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/vs.hpp"
 
 using namespace GUIEngine;
-
-#ifndef round
-# define round(x)  (floor(x+0.5f))
-#endif
 
 /** Like atoi, but on error prints an error message to stderr */
 int atoi_p(const char* val)
@@ -59,12 +56,8 @@ int atoi_p(const char* val)
 
 bool LayoutManager::convertToCoord(std::string& x, int* absolute /* out */, int* percentage /* out */)
 {
-    bool is_number;
-    int i;
-    std::istringstream myStream(x);
-    is_number = (myStream >> i)!=0;
-
-    if(!is_number) return false;
+    int i = 0;
+    if (!StringUtils::fromString<int>(x, i /* out */)) return false;
 
     if( x[x.size()-1] == '%' ) // percentage
     {

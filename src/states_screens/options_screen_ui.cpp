@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -125,14 +125,6 @@ void OptionsScreenUI::init()
     assert( news != NULL );
     news->setState( UserConfigParams::m_internet_status
                                             ==INetworkHttp::IPERM_ALLOWED );
-    CheckBoxWidget* min_gui = getWidget<CheckBoxWidget>("minimal-racegui");
-    assert( min_gui != NULL );
-    min_gui->setState( UserConfigParams::m_minimal_race_gui);
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-        min_gui->setDeactivated();
-    else
-        min_gui->setActivated();
-
 
     // --- select the right skin in the spinner
     bool currSkinFound = false;
@@ -235,13 +227,6 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         // to network_http (since the thread might use network_http, otherwise
         // a race condition can be introduced resulting in a crash).
         INetworkHttp::get()->startNetworkThread();
-    }
-    else if (name=="minimal-racegui")
-    {
-        CheckBoxWidget* min_gui = getWidget<CheckBoxWidget>("minimal-racegui");
-        assert( min_gui != NULL );
-        UserConfigParams::m_minimal_race_gui =
-            !UserConfigParams::m_minimal_race_gui;
     }
     else if (name == "language")
     {

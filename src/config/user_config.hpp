@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006-2013 SuperTuxKart-Team
 //  Modelled after Supertux's configfile.h
 //
 //  This program is free software; you can redistribute it and/or
@@ -37,8 +37,6 @@
       cause an undefined game action now
    6: Added stick configurations.
 */
-const int CURRENT_CONFIG_VERSION = 8;
-
 #include <string>
 #include <map>
 #include <vector>
@@ -132,14 +130,14 @@ public:
 // ============================================================================
 class TimeUserConfigParam : public UserConfigParam
 {
-    Time::TimeType m_value;
-    Time::TimeType m_default_value;
+    StkTime::TimeType m_value;
+    StkTime::TimeType m_default_value;
 
 public:
 
-    TimeUserConfigParam(Time::TimeType default_value, const char* param_name,
+    TimeUserConfigParam(StkTime::TimeType default_value, const char* param_name,
                         const char* comment = NULL);
-    TimeUserConfigParam(Time::TimeType default_value, const char* param_name,
+    TimeUserConfigParam(StkTime::TimeType default_value, const char* param_name,
                         GroupUserConfigParam* group, const char* comment=NULL);
 
     void write(XMLWriter& stream) const;
@@ -148,10 +146,10 @@ public:
 
     irr::core::stringw toString() const;
     void revertToDefaults()               { m_value = m_default_value;        }
-    operator Time::TimeType() const       { return m_value;                   }
-    Time::TimeType& operator=(const Time::TimeType& v)
+    operator StkTime::TimeType() const       { return m_value;                   }
+    StkTime::TimeType& operator=(const StkTime::TimeType& v)
                                           { m_value = v; return m_value;      }
-    Time::TimeType& operator=(const TimeUserConfigParam& v)
+    StkTime::TimeType& operator=(const TimeUserConfigParam& v)
                                           { m_value = (int)v; return m_value; }
 };   // TimeUserConfigParam
 
@@ -328,6 +326,9 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam          m_num_laps
             PARAM_DEFAULT(  IntUserConfigParam(4, "numlaps",
             &m_race_setup_group, "Default number of laps.") );
+    PARAM_PREFIX IntUserConfigParam          m_num_goals
+            PARAM_DEFAULT(  IntUserConfigParam(3, "numgoals",
+            &m_race_setup_group, "Default number of goals in soccer mode.") );
     PARAM_PREFIX IntUserConfigParam          m_difficulty
             PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty",
                             &m_race_setup_group,
@@ -348,32 +349,32 @@ namespace UserConfigParams
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
         PARAM_DEFAULT( GroupUserConfigParam("WiiMote",
                                             "Settings for the wiimote") );
-    PARAM_PREFIX FloatUserConfigParam         m_wiimote_max
-            PARAM_DEFAULT( FloatUserConfigParam(90.0f, "wiimote-max",
+    PARAM_PREFIX FloatUserConfigParam         m_wiimote_raw_max
+            PARAM_DEFAULT( FloatUserConfigParam(20.0f, "wiimote-raw-max",
             &m_wiimote_group,
-            "At what angle (0-128) maximum steering is reached.") );
+            "At what raw input value maximum steering is reached (between 1 and 25).") );
 
-	PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_linear
-            PARAM_DEFAULT( FloatUserConfigParam(0.2f, "wiimote-weight-linear",
+    PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_linear
+            PARAM_DEFAULT( FloatUserConfigParam(1.0f, "wiimote-weight-linear",
             &m_wiimote_group,
-			"A weight applied to the linear component of mapping wiimote angle to steering angle"));
+            "A weight applied to the linear component of mapping wiimote angle to steering angle"));
 
     PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_square
-            PARAM_DEFAULT( FloatUserConfigParam(0.8f, "wiimote-weight-square",
+            PARAM_DEFAULT( FloatUserConfigParam(0.0f, "wiimote-weight-square",
             &m_wiimote_group,
-			"A weight applied to the square component of mapping wiimote angle to steering angle"));
+            "A weight applied to the square component of mapping wiimote angle to steering angle"));
 
     PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_asin
             PARAM_DEFAULT( FloatUserConfigParam(0.0f, "wiimote-weight-asin",
             &m_wiimote_group,
-			"A weight applied to the asin component of mapping wiimote angle to steering angle"));
+            "A weight applied to the asin component of mapping wiimote angle to steering angle"));
 
     PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_sin
             PARAM_DEFAULT( FloatUserConfigParam(0.0f, "wiimote-weight-sin",
             &m_wiimote_group,
-			"A weight applied to the sin component of mapping wiimote angle to steering angle"));
+            "A weight applied to the sin component of mapping wiimote angle to steering angle"));
 
-	// ---- GP start order
+    // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
             PARAM_DEFAULT( GroupUserConfigParam("GpStartOrder",
                                                 "Order karts start in GP") );
@@ -448,8 +449,9 @@ namespace UserConfigParams
     /** True if check structures should be debugged. */
     PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );
 
-    /** Special debug camera being high over the kart. */
-    PARAM_PREFIX bool m_camera_debug PARAM_DEFAULT( false );
+    /** Special debug camera: 0: normal cameral; 1: being high over the kart.;
+                              2: on ground level. */
+    PARAM_PREFIX int m_camera_debug PARAM_DEFAULT( false );
 
     /** True if physics debugging should be enabled. */
     PARAM_PREFIX bool m_physics_debug PARAM_DEFAULT( false );
@@ -481,9 +483,6 @@ namespace UserConfigParams
     /** True if hardware skinning should be enabled */
     PARAM_PREFIX bool m_hw_skinning_enabled  PARAM_DEFAULT( false );
 
-    /** True if Christmas Mode should be enabled */
-    PARAM_PREFIX bool m_xmas_enabled  PARAM_DEFAULT( false );
-
     // not saved to file
 
     // ---- Networking
@@ -513,13 +512,14 @@ namespace UserConfigParams
 #define FBO_DEFAULT true
 #endif
 
-    PARAM_PREFIX BoolUserConfigParam        m_fbo
-        PARAM_DEFAULT(  BoolUserConfigParam(FBO_DEFAULT, "fbo",
-                     &m_graphics_quality, "Use frame buffer objects (FBOs)") );
-
     PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "anim_gfx",
                             &m_graphics_quality, "Scenery animations") );
+
+    // This saves the actual user preference.
+    PARAM_PREFIX IntUserConfigParam        m_xmas_mode
+            PARAM_DEFAULT(  IntUserConfigParam(0, "christmas-mode",
+                            &m_graphics_quality, "Christmas hats: 0 use calendar, 1 always on, 2 always off") );
 
     PARAM_PREFIX BoolUserConfigParam        m_weather_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx",
@@ -538,10 +538,12 @@ namespace UserConfigParams
                            &m_graphics_quality,
                            "Whether trilinear filtering is allowed to be "
                            "used (true or false)") );
+    /*
     PARAM_PREFIX IntUserConfigParam          m_antialiasing
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "antialiasing", &m_graphics_quality,
                            "Whether antialiasing is enabled (0 = disabled, 1 = 2x, 2 = 4x, 3 = 8x") );
+    */
     PARAM_PREFIX BoolUserConfigParam         m_vsync
             PARAM_DEFAULT( BoolUserConfigParam(false, "vsync",
                            &m_graphics_quality,
@@ -550,18 +552,27 @@ namespace UserConfigParams
     PARAM_DEFAULT( BoolUserConfigParam(true, "pixel_shaders",
                                        &m_graphics_quality,
                                        "Whether to enable pixel shaders (splatting, normal maps, ...)") );
-    PARAM_PREFIX BoolUserConfigParam         m_postprocess_enabled
+    PARAM_PREFIX BoolUserConfigParam         m_motionblur
             PARAM_DEFAULT( BoolUserConfigParam(false,
-                           "postprocess_enabled", &m_graphics_quality,
-                           "Whether post-processing (motion blur...) should "
-                           "be enabled") );
+                           "motionblur_enabled", &m_graphics_quality,
+                           "Whether motion blur should be enabled") );
+    PARAM_PREFIX BoolUserConfigParam         m_mlaa
+            PARAM_DEFAULT( BoolUserConfigParam(false,
+                           "mlaa", &m_graphics_quality,
+                           "Whether MLAA anti-aliasing should be enabled") );
+    PARAM_PREFIX IntUserConfigParam          m_ssao
+            PARAM_DEFAULT( IntUserConfigParam(0,
+                           "ssao", &m_graphics_quality,
+                           "Whether SSAO is enabled (0 = disabled, 1 = low, 2 = high") );
+    PARAM_PREFIX IntUserConfigParam          m_shadows
+            PARAM_DEFAULT( IntUserConfigParam(0,
+                           "shadows", &m_graphics_quality,
+                           "Whether shadows are enabled (0 = disabled, 1 = low, 2 = high") );
 
     // ---- Misc
     PARAM_PREFIX BoolUserConfigParam        m_cache_overworld
             PARAM_DEFAULT(  BoolUserConfigParam(true, "cache-overworld") );
 
-    PARAM_PREFIX BoolUserConfigParam        m_minimal_race_gui
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "minimal-race-gui") );
     // TODO : is this used with new code? does it still work?
     PARAM_PREFIX BoolUserConfigParam        m_crashed
             PARAM_DEFAULT(  BoolUserConfigParam(false, "crashed") );
@@ -735,6 +746,8 @@ private:
     std::string        m_filename;
     irr::core::stringw m_warning;
 
+    static const int m_current_config_version;
+
 public:
           /** Create the user config object; does not actually load it,
            *  UserConfig::loadConfig needs to be called. */
@@ -747,7 +760,7 @@ public:
     const irr::core::stringw& getWarning()        { return m_warning;  }
     void  resetWarning()                          { m_warning="";      }
     void  setWarning(irr::core::stringw& warning) { m_warning=warning; }
-
+    void  postLoadInit();
     void  addDefaultPlayer();
 
 };   // UserConfig

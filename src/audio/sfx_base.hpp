@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Patrick Ammann <pammann@aro.ch>
-//  Copyright (C) 2008 Joerg Henrichs, Patrick Ammann
+//  Copyright (C) 2006-2013 Patrick Ammann <pammann@aro.ch>
+//  Copyright (C) 2008-2013 Joerg Henrichs, Patrick Ammann
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -55,6 +55,7 @@ public:
     virtual void       resume()                  = 0;
     virtual void       speed(float factor)       = 0;
     virtual void       volume(float gain)        = 0;
+    virtual void       masterVolume(float gain)  = 0;
     virtual SFXManager::SFXStatus
                        getStatus()               = 0;
     virtual void       onSoundEnabledBack()      = 0;

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Joerg Henrichs
+//  Copyright (C) 2011-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -50,7 +50,7 @@ NewsManager::~NewsManager()
  */
 void NewsManager::init()
 {
-    UserConfigParams::m_news_last_updated = Time::getTimeSinceEpoch();
+    UserConfigParams::m_news_last_updated = StkTime::getTimeSinceEpoch();
 
     std::string xml_file = file_manager->getAddonsFile("news.xml");
     const XMLNode *xml   = new XMLNode(xml_file);

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -129,7 +129,7 @@ void WorldStatus::update(const float dt)
         case SETUP_PHASE:
             m_auxiliary_timer = 0.0f;
             m_phase = TRACK_INTRO_PHASE;
-            if (UserConfigParams::m_music && m_play_racestart_sounds)
+            if (m_play_racestart_sounds)
             {
                 m_track_intro_sound->play();
             }
@@ -143,7 +143,10 @@ void WorldStatus::update(const float dt)
             // long, we use the aux timer to force the next phase
             // after 3.5 seconds.
             if(m_track_intro_sound->getStatus()==SFXManager::SFX_PLAYING
-	            && m_auxiliary_timer<3.5f)
+                && m_auxiliary_timer<3.5f)
+                return;
+            // Wait before ready phase if sounds are disabled
+            if(!UserConfigParams::m_sfx && m_auxiliary_timer<3.0f)
                 return;
             m_auxiliary_timer = 0.0f;
             if (m_play_racestart_sounds) m_prestart_sound->play();
@@ -233,6 +236,9 @@ void WorldStatus::update(const float dt)
         case FINISH_PHASE:
             // Nothing to do here.
             break;
+        case GOAL_PHASE:
+            // Nothing to do here as well.
+
         default: break;
     }
 

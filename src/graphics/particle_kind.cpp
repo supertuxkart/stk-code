@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011  Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2011-2013  Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -54,6 +54,8 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     m_has_scale_affector = NULL;
     m_scale_affector_factor_x = 0.0f;
     m_scale_affector_factor_y = 0.0f;
+    m_wind_speed     = 0;
+    m_flips          = false;
 
 
     // ----- Read XML file
@@ -219,6 +221,14 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
         m_material_file = material_manager->getLatestMaterial()->getTexFname();
     }
 
+    // ------------------------------------------------------------------------
+
+    const XMLNode* wind = xml->getNode("wind");
+    if (wind != NULL)
+    {
+        wind->get("speed", &m_wind_speed);
+        wind->get("flips", &m_flips);
+    }
 
     // ------------------------------------------------------------------------
 

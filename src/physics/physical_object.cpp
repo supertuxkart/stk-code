@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -38,48 +38,71 @@ using namespace irr;
 #include <ISceneManager.h>
 #include <IMeshSceneNode.h>
 
-// ----------------------------------------------------------------------------
+/** Creates a physical Settings object with the given type, radius and mass.
+ */
+PhysicalObject::Settings::Settings(BodyTypes type, float radius, float mass)
+{
+    init();
+    m_body_type  = type;
+    m_mass       = mass;
+    m_radius     = radius;
+}   // Settings
 
+// ----------------------------------------------------------------------------
+/** Reads the physical settings values from a given XML node.
+ */
+PhysicalObject::Settings::Settings(const XMLNode &xml_node)
+{
+    init();
+    std::string shape;
+    xml_node.get("mass",    &m_mass        );
+    xml_node.get("radius",  &m_radius      );
+    xml_node.get("shape",   &shape        );
+    xml_node.get("reset",   &m_crash_reset );
+    xml_node.get("explode", &m_knock_kart  );
+    xml_node.get("flatten", &m_flatten_kart);
+
+    m_reset_when_too_low =
+        xml_node.get("reset-when-below", &m_reset_height) == 1;
+
+    m_body_type = MP_NONE;
+    if     (shape=="cone"  ||
+            shape=="coneY"    ) m_body_type = MP_CONE_Y;
+    else if(shape=="coneX"    ) m_body_type = MP_CONE_X;
+    else if(shape=="coneZ"    ) m_body_type = MP_CONE_Z;
+    else if(shape=="cylinder"||
+            shape=="cylinderY") m_body_type = MP_CYLINDER_Y;
+    else if(shape=="cylinderX") m_body_type = MP_CYLINDER_X;
+    else if(shape=="cylinderZ") m_body_type = MP_CYLINDER_Z;
+    else if(shape=="box"      ) m_body_type = MP_BOX;
+    else if(shape=="sphere"   ) m_body_type = MP_SPHERE;
+    else if(shape=="exact"    ) m_body_type = MP_EXACT;
+
+    else 
+        Log::error("PhysicalObject", "Unknown shape type : %s.", 
+                   shape.c_str());
+}   // Settings(XMLNode)
+
+// ----------------------------------------------------------------------------
+/** Initialises a Settings object.
+ */
+void PhysicalObject::Settings::init()
+{
+    m_body_type          = PhysicalObject::MP_NONE;
+    m_crash_reset        = false;
+    m_knock_kart         = false;
+    m_mass               = -1.0f;
+    m_radius             = -1.0f;
+    m_reset_when_too_low = false;
+    m_flatten_kart       = false;
+}   // Settings
+
+// ============================================================================
 PhysicalObject* PhysicalObject::fromXML(bool is_dynamic,
                                         const XMLNode &xml_node,
                                         TrackObject* object)
 {
-    PhysicalObject::Settings settings;
-
-    settings.reset_height = 0;
-    settings.mass         = 1;
-    settings.radius       = -1;
-    settings.crash_reset  = false;
-    settings.knock_kart   = false;
-    settings.flatten_kart = false;
-
-    std::string shape;
-    xml_node.get("mass",    &settings.mass        );
-    xml_node.get("radius",  &settings.radius      );
-    xml_node.get("shape",   &shape                );
-    xml_node.get("reset",   &settings.crash_reset );
-    xml_node.get("explode", &settings.knock_kart  );
-    xml_node.get("flatten", &settings.flatten_kart);
-
-    settings.reset_when_too_low =
-        xml_node.get("reset-when-below", &settings.reset_height) == 1;
-
-    settings.body_type = MP_NONE;
-    if     (shape=="cone"  ||
-            shape=="coneY"    ) settings.body_type = MP_CONE_Y;
-    else if(shape=="coneX"    ) settings.body_type = MP_CONE_X;
-    else if(shape=="coneZ"    ) settings.body_type = MP_CONE_Z;
-    else if(shape=="cylinder"||
-            shape=="cylinderY") settings.body_type = MP_CYLINDER_Y;
-    else if(shape=="cylinderX") settings.body_type = MP_CYLINDER_X;
-    else if(shape=="cylinderZ") settings.body_type = MP_CYLINDER_Z;
-
-    else if(shape=="box"    ) settings.body_type = MP_BOX;
-    else if(shape=="sphere" ) settings.body_type = MP_SPHERE;
-    else if(shape=="exact")   settings.body_type = MP_EXACT;
-
-    else fprintf(stderr, "Unknown shape type : %s\n", shape.c_str());
-
+    PhysicalObject::Settings settings(xml_node);
     return new PhysicalObject(is_dynamic, settings, object);
 }   // fromXML
 
@@ -107,14 +130,14 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_init_hpr   = object->getRotation();
     m_init_scale = object->getScale();
 
-    m_mass = settings.mass;
-    m_radius = settings.radius;
-    m_body_type = settings.body_type;
-    m_crash_reset = settings.crash_reset;
-    m_explode_kart = settings.knock_kart;
-    m_flatten_kart = settings.flatten_kart;
-    m_reset_when_too_low = settings.reset_when_too_low;
-    m_reset_height = settings.reset_height;
+    m_mass               = settings.m_mass;
+    m_radius             = settings.m_radius;
+    m_body_type          = settings.m_body_type;
+    m_crash_reset        = settings.m_crash_reset;
+    m_explode_kart       = settings.m_knock_kart;
+    m_flatten_kart       = settings.m_flatten_kart;
+    m_reset_when_too_low = settings.m_reset_when_too_low;
+    m_reset_height       = settings.m_reset_height;
 
     m_init_pos.setIdentity();
     Vec3 radHpr(m_init_hpr);
@@ -527,6 +550,29 @@ void PhysicalObject::handleExplosion(const Vec3& pos, bool direct_hit)
     m_body->activate();
 
 }   // handleExplosion
+
+// ----------------------------------------------------------------------------
+/** Returns true if this object is a soccer ball.
+ */
+bool PhysicalObject::isSoccerBall() const
+{
+    return m_object->isSoccerBall(); 
+}   // is SoccerBall
+
+// ----------------------------------------------------------------------------
+/** Called when a physical object hits the track. Atm only used to push a
+ *  soccer ball away from the edge of the field.
+ *  \param m Material which was hit.
+ *  \param normal Normal of the track at the hit point.
+ */
+void PhysicalObject::hit(const Material *m, const Vec3 &normal)
+{
+    if(isSoccerBall() && m != NULL && 
+       m->getCollisionReaction() == Material::PUSH_SOCCER_BALL)
+    {
+        m_body->applyCentralImpulse(normal * 1000.0f);
+    }
+}   // hit
 
 // ----------------------------------------------------------------------------
 /* EOF */

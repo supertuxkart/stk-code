@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -154,14 +154,16 @@ void SFXManager::loadSfx()
         std::cerr << "Could not read sounf effects XML file " << sfx_config_name.c_str() << std::endl;
     }
 
+    int i;
+
     const int amount = root->getNumNodes();
-    for (int i=0; i<amount; i++)
+    for (i=0; i<amount; i++)
     {
         const XMLNode* node = root->getNode(i);
 
         if (node->getName() == "sfx")
         {
-            loadSingleSfx(node);
+            loadSingleSfx(node, "", false);
         }
         else
         {
@@ -171,7 +173,27 @@ void SFXManager::loadSfx()
     }// nend for
 
     delete root;
-   }   // loadSfx
+
+    // Now load them in parallel
+    const int max = m_all_sfx_types.size();
+    SFXBuffer **array = new SFXBuffer *[max];
+    i = 0;
+
+    for (std::map<std::string, SFXBuffer*>::iterator it = m_all_sfx_types.begin();
+         it != m_all_sfx_types.end(); it++)
+    {
+        SFXBuffer* const buffer = (*it).second;
+        array[i++] = buffer;
+    }
+
+    #pragma omp parallel for private(i)
+    for (i = 0; i < max; i++)
+    {
+        array[i]->load();
+    }
+
+    delete [] array;
+}   // loadSfx
 
 // -----------------------------------------------------------------------------
 /** Introduces a mechanism by which one can load sound effects beyond the basic
@@ -188,7 +210,8 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
                                     bool               positional,
                                     float              rolloff,
                                     float              max_width,
-                                    float              gain)
+                                    float              gain,
+                                    const bool         load)
 {
 
     SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff, max_width, gain);
@@ -205,7 +228,7 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
     if (UserConfigParams::logMisc())
         Log::debug("SFXManager", "Loading SFX %s\n", sfx_file.c_str());
 
-    if (buffer->load()) return buffer;
+    if (load && buffer->load()) return buffer;
 
     return NULL;
 } // addSingleSFX
@@ -215,7 +238,8 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
  *  \param node The XML node with the data for this sfx.
  */
 SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
-                                     const std::string &path)
+                                     const std::string &path,
+                                     const bool load)
 {
     std::string filename;
 
@@ -254,7 +278,8 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
                         tmpbuffer.isPositional(),
                         tmpbuffer.getRolloff(),
                         tmpbuffer.getMaxDist(),
-                        tmpbuffer.getGain());
+                        tmpbuffer.getGain(),
+                        load);
 
 }   // loadSingleSfx
 
@@ -288,7 +313,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain(), owns_buffer);
 #endif
 
-    sfx->volume(m_master_gain);
+    sfx->masterVolume(m_master_gain);
 
     if (add_to_SFX_list) m_all_sfx.push_back(sfx);
 
@@ -442,7 +467,7 @@ void SFXManager::setMasterSFXVolume(float gain)
         for (std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
             i!=m_all_sfx.end(); i++)
         {
-            (*i)->volume(m_master_gain);
+            (*i)->masterVolume(m_master_gain);
         }   // for i in m_all_sfx
     }
 
@@ -451,7 +476,7 @@ void SFXManager::setMasterSFXVolume(float gain)
         std::map<std::string, SFXBase*>::iterator i = m_quick_sounds.begin();
         for (; i != m_quick_sounds.end(); i++)
         {
-            (*i).second->volume(m_master_gain);
+            (*i).second->masterVolume(m_master_gain);
         }
     }
 

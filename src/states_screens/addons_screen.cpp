@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2013 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -136,9 +136,11 @@ void AddonsScreen::init()
 
     m_reloading = false;
 
-    m_sort_desc = true;
+    m_sort_desc = false;
+    m_sort_default = true;
+    m_sort_col = 0;
 
-	getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
+    getWidget<GUIEngine::RibbonWidget>("category")->setDeactivated();
 
     if(UserConfigParams::logAddons())
         std::cout << "[addons] Using directory <" + file_manager->getAddonsDir()
@@ -205,8 +207,8 @@ void AddonsScreen::loadList()
     GUIEngine::SpinnerWidget* w_filter_date =
                         getWidget<GUIEngine::SpinnerWidget>("filter_date");
     int date_index = w_filter_date->getValue();
-    Time::TimeType date = Time::getTimeSinceEpoch();
-    date = Time::addInterval(date, 
+    StkTime::TimeType date = StkTime::getTimeSinceEpoch();
+    date = StkTime::addInterval(date, 
                 -m_date_filters[date_index].year, 
                 -m_date_filters[date_index].month, 
                 -m_date_filters[date_index].day);
@@ -238,7 +240,7 @@ void AddonsScreen::loadList()
             continue;
 
         // Filter by date.
-        if (date_index != 0 && Time::compareTime(date, addon.getDate()) > 0)
+        if (date_index != 0 && StkTime::compareTime(date, addon.getDate()) > 0)
             continue;
 
         // Filter by name, designer and description.
@@ -267,8 +269,8 @@ void AddonsScreen::loadList()
         if(addon->isInstalled())
             icon = addon->needsUpdate() ? m_icon_needs_update
                                         : m_icon_installed;
-	    else
-        	icon = m_icon_not_installed;
+        else
+            icon = m_icon_not_installed;
 
         core::stringw s;
         if (addon->getDesigner().size()==0)
@@ -368,27 +370,43 @@ void AddonsScreen::loadList()
 
     getWidget<GUIEngine::RibbonWidget>("category")->setActivated();
     if(m_type == "kart")
-    getWidget<GUIEngine::RibbonWidget>("category")->select("tab_kart",
-                                                    PLAYER_ID_GAME_MASTER);
+        getWidget<GUIEngine::RibbonWidget>("category")->select("tab_kart",
+                                                        PLAYER_ID_GAME_MASTER);
     else if(m_type == "track")
-    getWidget<GUIEngine::RibbonWidget>("category")->select("tab_track",
-                                                    PLAYER_ID_GAME_MASTER);
+        getWidget<GUIEngine::RibbonWidget>("category")->select("tab_track",
+                                                        PLAYER_ID_GAME_MASTER);
     else
-    getWidget<GUIEngine::RibbonWidget>("category")->select("tab_update",
-                                                    PLAYER_ID_GAME_MASTER);
+        getWidget<GUIEngine::RibbonWidget>("category")->select("tab_update",
+                                                        PLAYER_ID_GAME_MASTER);
 }   // loadList
 
 // ----------------------------------------------------------------------------
 void AddonsScreen::onColumnClicked(int column_id)
 {
+    if (m_sort_col != column_id)
+    {
+        m_sort_desc = false;
+        m_sort_default = false;
+    }
+    else
+    {
+        if (!m_sort_default) m_sort_desc = !m_sort_desc;
+        m_sort_default = !m_sort_desc && !m_sort_default;
+    }
+    
+    m_sort_col = column_id;
+
     switch(column_id)
     {
-    case 0: Addon::setSortOrder(Addon::SO_NAME); break;
-    case 1: Addon::setSortOrder(Addon::SO_DATE); break;
+    case 0: 
+        Addon::setSortOrder(m_sort_default ? Addon::SO_DEFAULT : Addon::SO_NAME); 
+        break;
+    case 1:
+        Addon::setSortOrder(m_sort_default ? Addon::SO_DEFAULT : Addon::SO_DATE); 
+        break;
     default: assert(0); break;
     }   // switch
     /** \brief Toggle the sort order after column click **/
-    m_sort_desc = !m_sort_desc;
     loadList();
 }   // onColumnClicked
 

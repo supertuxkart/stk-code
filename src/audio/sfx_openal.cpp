@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Patrick Ammann <pammann@aro.ch>
-//                2009-2011 Marianne Gagnon
+//  Copyright (C) 2006-2013 Patrick Ammann <pammann@aro.ch>
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,11 +20,11 @@
 #if HAVE_OGGVORBIS
 
 #include "audio/sfx_openal.hpp"
+
 #include "audio/sfx_buffer.hpp"
+#include "config/user_config.hpp"
+#include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
-#include <assert.h>
-#include <stdio.h>
-#include <string>
 
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
@@ -32,8 +32,16 @@
 #  include <AL/al.h>
 #endif
 
-#include "config/user_config.hpp"
-#include "io/file_manager.hpp"
+#include <assert.h>
+#include <stdio.h>
+#include <string>
+
+#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
+#  define isnan _isnan
+#else
+#  include <math.h>
+#endif
+
 
 SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, bool ownsBuffer) : SFXBase()
 {
@@ -44,6 +52,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, bool ownsBu
     m_defaultGain = gain;
     m_loop        = false;
     m_gain        = -1.0f;
+    m_master_gain = 1.0f;
     m_owns_buffer = ownsBuffer;
 
     // Don't initialise anything else if the sfx manager was not correctly
@@ -98,11 +107,11 @@ bool SFXOpenAL::init()
 
     if (m_gain < 0.0f)
     {
-        alSourcef (m_soundSource, AL_GAIN,        m_defaultGain);
+        alSourcef (m_soundSource, AL_GAIN,        m_defaultGain * m_master_gain);
     }
     else
     {
-        alSourcef (m_soundSource, AL_GAIN,        m_gain);
+        alSourcef (m_soundSource, AL_GAIN,        m_gain * m_master_gain);
     }
 
     if (m_positional) alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_FALSE);
@@ -121,7 +130,7 @@ bool SFXOpenAL::init()
  */
 void SFXOpenAL::speed(float factor)
 {
-    if(!m_ok) return;
+    if(!m_ok || isnan(factor)) return;
 
     //OpenAL only accepts pitches in the range of 0.5 to 2.0
     if(factor > 2.0f)
@@ -146,9 +155,21 @@ void SFXOpenAL::volume(float gain)
 
     if(!m_ok) return;
 
-    alSourcef(m_soundSource, AL_GAIN, m_defaultGain * gain);
+    alSourcef(m_soundSource, AL_GAIN, m_gain * m_master_gain);
     SFXManager::checkError("setting volume");
 }   // volume
+
+//-----------------------------------------------------------------------------
+
+void SFXOpenAL::masterVolume(float gain)
+{
+    m_master_gain = gain;
+    
+    if(!m_ok) return;
+
+    alSourcef(m_soundSource, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);
+    SFXManager::checkError("setting volume");
+}
 
 //-----------------------------------------------------------------------------
 /** Loops this sound effect.
@@ -258,7 +279,7 @@ void SFXOpenAL::position(const Vec3 &position)
     }
     else
     {
-        alSourcef(m_soundSource, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain));
+        alSourcef(m_soundSource, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);
     }
 
     SFXManager::checkError("positioning");
@@ -295,7 +316,7 @@ void SFXOpenAL::onSoundEnabledBack()
             alSourcef(m_soundSource, AL_GAIN, 0);
             play();
             pause();
-            alSourcef(m_soundSource, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain));
+            alSourcef(m_soundSource, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);
         }
     }
 }

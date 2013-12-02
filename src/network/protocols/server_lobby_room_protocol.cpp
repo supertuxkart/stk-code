@@ -110,9 +110,9 @@ void ServerLobbyRoomProtocol::update()
     {
         // first poll every 5 seconds
         static double last_poll_time = 0;
-        if (Time::getRealTime() > last_poll_time+10.0)
+        if (StkTime::getRealTime() > last_poll_time+10.0)
         {
-            last_poll_time = Time::getRealTime();
+            last_poll_time = StkTime::getRealTime();
             TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
             Online::XMLRequest* request = new Online::XMLRequest();
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");

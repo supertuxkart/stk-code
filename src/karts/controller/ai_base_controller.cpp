@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2009  Eduardo Hernandez Munoz
-//  Copyright (C) 2009, 2010 Joerg Henrichs
+//  Copyright (C) 2006-2013  Eduardo Hernandez Munoz
+//  Copyright (C) 2009-2013  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -94,7 +94,8 @@ AIBaseController::AIBaseController(AbstractKart *kart,
     m_ai_properties =
         m_kart->getKartProperties()->getAIPropertiesForDifficulty();
 
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+       race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         m_world     = dynamic_cast<LinearWorld*>(World::getWorld());
         m_track     = m_world->getTrack();
@@ -118,8 +119,8 @@ AIBaseController::AIBaseController(AbstractKart *kart,
 //-----------------------------------------------------------------------------
 void AIBaseController::reset()
 {
-	m_stuck_trigger_rescue = false;
-	m_collision_times.clear();
+    m_stuck_trigger_rescue = false;
+    m_collision_times.clear();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -219,7 +220,7 @@ void AIBaseController::computePath()
  */
 void AIBaseController::update(float dt)
 {
-	m_stuck_trigger_rescue = false;
+    m_stuck_trigger_rescue = false;
 
     if(QuadGraph::get())
     {
@@ -254,52 +255,52 @@ void AIBaseController::update(float dt)
  */
 void AIBaseController::crashed(const Material *m)
 {
-	// Defines how many collision in what time will trigger a rescue.
-	// Note that typically it takes ~0.5 seconds for the AI to hit
-	// the track again if it is stuck (i.e. time for the push back plus
-	// time for the AI to accelerate and hit the terrain again).
-	const unsigned int NUM_COLLISION = 3;
-	const float COLLISION_TIME       = 1.5f;
+    // Defines how many collision in what time will trigger a rescue.
+    // Note that typically it takes ~0.5 seconds for the AI to hit
+    // the track again if it is stuck (i.e. time for the push back plus
+    // time for the AI to accelerate and hit the terrain again).
+    const unsigned int NUM_COLLISION = 3;
+    const float COLLISION_TIME       = 1.5f;
 
-	float time = World::getWorld()->getTime();
-	if(m_collision_times.size()==0)
-	{
-		m_collision_times.push_back(time);
-		return;
-	}
+    float time = World::getWorld()->getTime();
+    if(m_collision_times.size()==0)
+    {
+        m_collision_times.push_back(time);
+        return;
+    }
 
-	// Filter out multiple collisions report caused by single collision
-	// (bullet can report a collision more than once per frame, and
-	// resolving it can take a few frames as well, causing more reported
-	// collisions to happen). The time of 0.2 seconds was experimentally
-	// found, typically it takes 0.5 seconds for a kart to be pushed back
-	// from the terrain and accelerate to hit the same terrain again.
-	if(time - m_collision_times.back() < 0.2f)
-		return;
+    // Filter out multiple collisions report caused by single collision
+    // (bullet can report a collision more than once per frame, and
+    // resolving it can take a few frames as well, causing more reported
+    // collisions to happen). The time of 0.2 seconds was experimentally
+    // found, typically it takes 0.5 seconds for a kart to be pushed back
+    // from the terrain and accelerate to hit the same terrain again.
+    if(time - m_collision_times.back() < 0.2f)
+        return;
 
 
-	// Remove all outdated entries, i.e. entries that are older than the
-	// collision time plus 1 second. Older entries must be deleted,
-	// otherwise a collision that happened (say) 10 seconds ago could
-	// contribute to a stuck condition.
-	while(m_collision_times.size()>0 &&
-		   time - m_collision_times[0] > 1.0f+COLLISION_TIME)
-		   m_collision_times.erase(m_collision_times.begin());
+    // Remove all outdated entries, i.e. entries that are older than the
+    // collision time plus 1 second. Older entries must be deleted,
+    // otherwise a collision that happened (say) 10 seconds ago could
+    // contribute to a stuck condition.
+    while(m_collision_times.size()>0 &&
+           time - m_collision_times[0] > 1.0f+COLLISION_TIME)
+           m_collision_times.erase(m_collision_times.begin());
 
-	m_collision_times.push_back(time);
+    m_collision_times.push_back(time);
 
-	// Now detect if there are enough collision records in the
-	// specified time interval.
-	if(time - m_collision_times.front() > COLLISION_TIME
-		&& m_collision_times.size()>=NUM_COLLISION)
-	{
-		// We can't call m_kart->forceRescue here, since crased() is
-		// called during physics processing, and forceRescue() removes the
-		// chassis from the physics world, which would then cause
-		// inconsistencies and potentially a crash during the physics
-		// processing. So only set a flag, which is tested during update.
-		m_stuck_trigger_rescue = true;
-	}
+    // Now detect if there are enough collision records in the
+    // specified time interval.
+    if(time - m_collision_times.front() > COLLISION_TIME
+        && m_collision_times.size()>=NUM_COLLISION)
+    {
+        // We can't call m_kart->forceRescue here, since crased() is
+        // called during physics processing, and forceRescue() removes the
+        // chassis from the physics world, which would then cause
+        // inconsistencies and potentially a crash during the physics
+        // processing. So only set a flag, which is tested during update.
+        m_stuck_trigger_rescue = true;
+    }
 
 }   // crashed(Material)
 

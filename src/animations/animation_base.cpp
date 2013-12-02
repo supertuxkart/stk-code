@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009  Joerg Henrichs
+//  Copyright (C) 2009-2013  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,14 +21,10 @@
 #include "animations/ipo.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "utils/vs.hpp"
 
 #include <algorithm>
-
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
+#include <math.h>
 
 
 AnimationBase::AnimationBase(const XMLNode &node)

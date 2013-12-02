@@ -1,8 +1,8 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2007 Eduardo Hernandez Munoz
-//  Copyright (C) 2008-2012 Joerg Henrichs
+//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2013 Eduardo Hernandez Munoz
+//  Copyright (C) 2008-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -41,6 +41,10 @@
 #endif
 #include "graphics/show_curve.hpp"
 #include "graphics/slip_stream.hpp"
+#include "items/attachment.hpp"
+#include "items/item_manager.hpp"
+#include "items/powerup.hpp"
+#include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/controller/ai_properties.hpp"
@@ -49,9 +53,6 @@
 #include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
 #include "karts/skidding_properties.hpp"
-#include "items/attachment.hpp"
-#include "items/item_manager.hpp"
-#include "items/powerup.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/profile_world.hpp"
 #include "race/race_manager.hpp"
@@ -59,18 +60,14 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
+#include "utils/vs.hpp"
 
 #ifdef AI_DEBUG
 #  include "irrlicht.h"
    using namespace irr;
 #endif
 
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
-
+#include <math.h>
 #include <cstdlib>
 #include <ctime>
 #include <cstdio>
@@ -206,7 +203,7 @@ void SkiddingAI::reset()
         m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
     }
 
-	AIBaseController::reset();
+    AIBaseController::reset();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -477,8 +474,8 @@ void SkiddingAI::handleSteering(float dt)
      *finite state machine.
      */
     //Reaction to being outside of the road
-	float side_dist =
-		m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() );
+    float side_dist =
+        m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() );
 
     if( fabsf(side_dist)  >
        0.5f* QuadGraph::get()->getNode(m_track_node).getPathWidth()+0.5f )
@@ -1161,7 +1158,7 @@ void SkiddingAI::handleItems(const float dt)
 
         if( m_time_since_last_shot > 3.0f )
         {
-            m_controls->m_fire = true;
+            m_controls->m_fire      = true;
             if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_SWATTER)
                 m_time_since_last_shot = 3.0f;
             else
@@ -1193,29 +1190,54 @@ void SkiddingAI::handleItems(const float dt)
     switch( m_kart->getPowerup()->getType() )
     {
     case PowerupManager::POWERUP_BUBBLEGUM:
-        // Avoid dropping all bubble gums one after another
-        if( m_time_since_last_shot < 3.0f) break;
+        {
+            Attachment::AttachmentType type = m_kart->getAttachment()->getType();
+            // Don't use shield when we have a swatter.
+            if( type == Attachment::ATTACH_SWATTER       ||
+                type == Attachment::ATTACH_NOLOKS_SWATTER  )
+                break;
 
-        // Either use the bubble gum after 10 seconds, or if the next kart
-        // behind is 'close' but not too close (too close likely means that the
-        // kart is not behind but more to the side of this kart and so won't
-        // be hit by the bubble gum anyway). Should we check the speed of the
-        // kart as well? I.e. only drop if the kart behind is faster? Otoh
-        // this approach helps preventing an overtaken kart to overtake us
-        // again.
-        m_controls->m_look_back = true; //handle traditinal usage as bubble gum
-        m_controls->m_fire = (m_distance_behind < 15.0f &&
-                              m_distance_behind > 3.0f    );//TODO: is this criteria sufficient to hit another kart with a high probability
+            // Check if a flyable (cake, ...) is close. If so, use bubblegum
+            // as shield
+            if( !m_kart->isShielded() &&
+                projectile_manager->projectileIsClose(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius) )
+            {
+                m_controls->m_fire      = true;
+                m_controls->m_look_back = false;
+                break;
+            }
 
-        m_controls->m_look_back = false;
-        //Do not use a shield, when you still have a swatter
-        if (m_kart->getAttachment()->getType() == Attachment::ATTACH_SWATTER  || m_kart->getAttachment()->getType() == Attachment::ATTACH_NOLOKS_SWATTER)
-            break;
-        //else there are no objections not to use a shield
-        m_controls->m_fire = true;
+            // Avoid dropping all bubble gums one after another
+            if( m_time_since_last_shot < 3.0f) break;
 
-        break;   // POWERUP_BUBBLEGUM
+            // Use bubblegum if the next kart  behind is 'close' but not too close
+            // (too close likely means that the kart is not behind but more to the
+            // side of this kart and so won't be hit by the bubble gum anyway).
+            // Should we check the speed of the kart as well? I.e. only drop if
+            // the kart behind is faster? Otoh this approach helps preventing an
+            // overtaken kart to overtake us again.
+            if(m_distance_behind < 15.0f && m_distance_behind > 3.0f    )
+            {
+                m_controls->m_fire      = true;
+                m_controls->m_look_back = true;
+                break;
+            }
 
+            // If this kart is in its last lap, drop bubble gums at every 
+            // opportunity, since this kart won't envounter them anymore.
+            LinearWorld *lin_world = dynamic_cast<LinearWorld*>(World::getWorld());
+            if(m_time_since_last_shot > 3.0f && 
+                lin_world && 
+                lin_world->getKartLaps(m_kart->getWorldKartId()) 
+                                   == race_manager->getNumLaps()-1)
+            {
+                m_controls->m_fire      = true;
+                m_controls->m_look_back = true;
+                break;
+            }
+            break;   // POWERUP_BUBBLEGUM
+        }
     // All the thrown/fired items might be improved by considering the angle
     // towards m_kart_ahead.
     case PowerupManager::POWERUP_CAKE:

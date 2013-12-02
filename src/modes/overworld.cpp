@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -85,10 +85,10 @@ void OverWorld::enterOverWorld()
     race_manager->setupPlayerKartInfo();
     race_manager->startNew(false);
     if(race_manager->haveKartLastPositionOnOverworld()){
-			OverWorld *ow = (OverWorld*)World::getWorld();
-			ow->getKart(0)->setXYZ(race_manager->getKartLastPositionOnOverworld());
-			ow->moveKartAfterRescue(ow->getKart(0));
-		}
+            OverWorld *ow = (OverWorld*)World::getWorld();
+            ow->getKart(0)->setXYZ(race_manager->getKartLastPositionOnOverworld());
+            ow->moveKartAfterRescue(ow->getKart(0));
+        }
     irr_driver->showPointer(); // User should be able to click on the minimap
 
 }   // enterOverWorld
@@ -115,6 +115,7 @@ void OverWorld::update(float dt)
         m_karts[0]->startEngineSFX();
     }
     WorldWithRank::update(dt);
+    WorldWithRank::updateTrack(dt);
     const unsigned int kart_amount  = m_karts.size();
 
     // isn't it cool, on the overworld nitro is free!

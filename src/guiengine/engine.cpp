@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -839,6 +839,17 @@ namespace GUIEngine
             DialogQueue::get()->update();
         }
 
+        // Hack : on the first frame, irrlicht processes all events that have been queued
+        // during the loading screen. So way until the second frame to start processing events.
+        // (Events queues during the loading screens are likely the user clicking on the
+        // frame to focus it, or similar, and should not be used as a game event)
+        static int frame = 0;
+        if (frame < 2)
+        {
+            frame++;
+            if (frame == 2)
+                GUIEngine::EventHandler::get()->startAcceptingEvents();
+        }
     }
     // ------------------------------------------------------------------------
 
@@ -963,6 +974,8 @@ namespace GUIEngine
         //delete g_small_font;
         g_small_font->drop();
         g_small_font = NULL;
+        g_large_font->drop();
+        g_large_font = NULL;
         g_digit_font->drop();
         g_digit_font = NULL;
 
@@ -1038,10 +1051,12 @@ namespace GUIEngine
         // normal text will range from 0.2, in 640x* resolutions (won't scale
         // below that) to 0.4, in 1024x* resolutions, and linearly up
         const int screen_width = irr_driver->getFrameSize().Width;
-        const float normal_text_scale =
-            0.7f + 0.2f*std::max(0, screen_width - 640)/564.0f;
-        const float title_text_scale =
-            0.2f + 0.2f*std::max(0, screen_width - 640)/564.0f;
+        const int screen_height = irr_driver->getFrameSize().Height;
+        float scale = std::max(0, screen_width - 640)/564.0f;
+        if (screen_height < 700) scale = std::min(scale, 0.25f); // attempt to compensate for small screens
+
+        float normal_text_scale = 0.7f + 0.2f*scale;
+        float title_text_scale = 0.2f + 0.2f*scale;
 
         ScalableFont* sfont =
             new ScalableFont(g_env,
@@ -1267,6 +1282,11 @@ namespace GUIEngine
         ITexture* loading =
             irr_driver->getTexture(file_manager->getGUIDir()+"loading.png");
 
+        if(!loading)
+        {
+            Log::fatal("Engine", "Can not find loading.png texture, aborting.");
+            exit(-1);
+        }
         const int texture_w = loading->getSize().Width;
         const int texture_h = loading->getSize().Height;
 

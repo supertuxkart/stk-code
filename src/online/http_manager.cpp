@@ -195,7 +195,7 @@ namespace Online{
     {
         HTTPManager *me = (HTTPManager*) obj;
 
-        //pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,      NULL);
+        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
         me->m_current_request = NULL;
         me->m_request_queue.lock();

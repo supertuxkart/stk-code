@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -60,6 +60,7 @@ public:
         ATTACH_NOLOKS_SWATTER,
         ATTACH_TINYTUX,
         ATTACH_BUBBLEGUM_SHIELD,
+        ATTACH_NOLOK_BUBBLEGUM_SHIELD,
         ATTACH_MAX,
         ATTACH_NOTHING
     };
@@ -76,6 +77,9 @@ private:
 
     /** For parachutes only. */
     float           m_initial_speed;
+
+    /** For zoom-in animation */
+    float           m_node_scale;
 
     /** Scene node of the attachment, which will be attached to the kart's
      *  scene node. */
@@ -95,6 +99,9 @@ private:
     /** Ticking sound for the bomb */
     SFXBase          *m_bomb_sound;
 
+    /** Soung for exploding bubble gum shield */
+    SFXBase          *m_bubble_explode_sound;
+    
 public:
           Attachment(AbstractKart* kart);
          ~Attachment();

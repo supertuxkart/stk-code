@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,6 +17,7 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
+#include <algorithm>
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;

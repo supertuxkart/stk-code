@@ -42,9 +42,9 @@ void PingProtocol::setup()
 
 void PingProtocol::asynchronousUpdate()
 {
-    if (Time::getRealTime() > m_last_ping_time+m_delay_between_pings)
+    if (StkTime::getRealTime() > m_last_ping_time+m_delay_between_pings)
     {
-        m_last_ping_time = Time::getRealTime();
+        m_last_ping_time = StkTime::getRealTime();
         uint8_t data = 0;
         NetworkManager::getInstance()->getHost()->sendRawPacket(&data, 1, m_ping_dst);
         Log::info("PingProtocol", "Ping message sent");

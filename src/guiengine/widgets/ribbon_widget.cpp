@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -28,6 +28,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/vs.hpp"
 
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
@@ -36,10 +37,6 @@
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
-
-#ifndef round
-#  define round(x)  (floor(x+0.5f))
-#endif
 
 const char RibbonWidget::NO_ITEM_ID[] = "?";
 
@@ -313,6 +310,15 @@ void RibbonWidget::add()
                                  + m_active_children[i].m_properties[PROP_ICON];
             video::ITexture* image =
                 irr_driver->getTexture((filename).c_str());
+            if(!image)
+            {
+                std::string file = file_manager->getGUIDir() + "main_help.png";
+                image = irr_driver->getTexture(file);
+                if(!image)
+                    Log::fatal("RibbonWidget",
+                        "Can't find fallback texture 'gui/main_help.png, aborting.");
+            }
+
             float image_h = (float)image->getSize().Height;
             float image_w = image_h*imageRatio;
 
@@ -589,7 +595,7 @@ void RibbonWidget::unfocused(const int playerID, Widget* new_focus)
 {
     if (new_focus != NULL && new_focus != this && !m_active_children.contains(new_focus))
     {
-        if (m_selection[playerID] != -1)
+        if (m_selection[playerID] >= 0 && m_selection[playerID] < m_children.size())
         {
             m_active_children.get(m_selection[playerID])->unfocused(playerID, new_focus);
         }

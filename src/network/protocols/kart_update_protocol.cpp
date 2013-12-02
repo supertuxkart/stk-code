@@ -38,7 +38,6 @@ void KartUpdateProtocol::notifyEvent(Event* event)
         Log::info("KartUpdateProtocol", "Message too short.");
         return;
     }
-    float game_time = ns.getFloat(0);
     ns.removeFront(4);
     while(ns.size() >= 16)
     {
@@ -69,7 +68,7 @@ void KartUpdateProtocol::setup()
 void KartUpdateProtocol::update()
 {
     static double time = 0;
-    double current_time = Time::getRealTime();
+    double current_time = StkTime::getRealTime();
     if (current_time > time + 0.1) // 10 updates per second
     {
         time = current_time;

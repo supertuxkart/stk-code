@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -106,13 +106,15 @@ public:
     virtual                 ~SFXManager();
     bool                     sfxAllowed();
     SFXBuffer*               loadSingleSfx(const XMLNode* node,
-                                           const std::string &path=std::string(""));
+                                           const std::string &path=std::string(""),
+                                           const bool load = true);
     SFXBuffer*               addSingleSfx(const std::string &sfx_name,
                                           const std::string &filename,
                                           bool               positional,
                                           float              rolloff,
                                           float              max_width,
-                                          float              gain);
+                                          float              gain,
+                                          const bool         load = true);
 
     SFXBase*                 createSoundSource(SFXBuffer* info,
                                                const bool addToSFXList=true,

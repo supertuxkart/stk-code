@@ -1,5 +1,6 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
+//
+//  Copyright (C) 2012-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +22,7 @@
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
+#include "graphics/irr_driver.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
 #include "karts/controller/controller.hpp"
@@ -288,15 +290,51 @@ void InputManager::handleStaticAction(int key, int value)
                 UserConfigParams::m_profiler_enabled =
                                          !UserConfigParams::m_profiler_enabled;
             break;
+
+        // Debug views
+        // These should be available in normal (non-artist) mode
+        // to enable easier bug reports (go there, press this key, screenshot)
+        // without requiring editing the UTF-32 config files (which is inconvenient).
         case KEY_HOME:
             if (value)
             {
-                video::SOverrideMaterial &mat =
-                    irr_driver->getVideoDriver()->getOverrideMaterial();
-
-                mat.Material.Wireframe ^= 1;
-                mat.EnableFlags = video::EMF_WIREFRAME;
-                mat.EnablePasses = scene::ESNRP_SOLID | scene::ESNRP_TRANSPARENT;
+                irr_driver->toggleWireframe();
+            }
+            break;
+        case KEY_END:
+            if (value)
+            {
+                irr_driver->toggleMipVisualization();
+            }
+            break;
+        case KEY_DELETE:
+            if (value)
+            {
+                irr_driver->toggleNormals();
+            }
+            break;
+        case KEY_NEXT: // pgdown
+            if (value)
+            {
+                irr_driver->toggleSSAOViz();
+            }
+            break;
+        case KEY_PRIOR: // pgup
+            if (value)
+            {
+                irr_driver->toggleLightViz();
+            }
+            break;
+        case KEY_INSERT:
+            if (value)
+            {
+                irr_driver->toggleShadowViz();
+            }
+            break;
+        case KEY_SCROLL:
+            if (value)
+            {
+                irr_driver->toggleDistortViz();
             }
             break;
         default:
