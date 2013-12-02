@@ -112,6 +112,9 @@ namespace scene
 		//! returns texture coord of vertex i
 		virtual core::vector2df& getTCoords(u32 i) = 0;
 
+		//! Returns the primitive type of this buffer
+		virtual scene::E_PRIMITIVE_TYPE getPrimitiveType() const = 0;
+
 		//! Append the vertices and indices to the current buffer
 		/** Only works for compatible vertex types.
 		\param vertices Pointer to a vertex array.

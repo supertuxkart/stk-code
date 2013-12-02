@@ -18,7 +18,9 @@ namespace scene
 	{
 	public:
 		//! Default constructor for empty meshbuffer
-		CMeshBuffer():ChangedID_Vertex(1),ChangedID_Index(1),MappingHint_Vertex(EHM_NEVER), MappingHint_Index(EHM_NEVER)
+		CMeshBuffer(): ChangedID_Vertex(1), ChangedID_Index(1),
+				MappingHint_Vertex(EHM_NEVER), MappingHint_Index(EHM_NEVER),
+				Primitive(EPT_TRIANGLES)
 		{
 			#ifdef _DEBUG
 			setDebugName("SMeshBuffer");
@@ -171,6 +173,10 @@ namespace scene
 			return Vertices[i].TCoords;
 		}
 
+		virtual scene::E_PRIMITIVE_TYPE getPrimitiveType() const
+		{
+			return Primitive;
+		}
 
 		//! Append the vertices and indices to the current buffer
 		/** Only works for compatible types, i.e. either the same type
@@ -285,6 +291,9 @@ namespace scene
 		core::array<u16> Indices;
 		//! Bounding box of this meshbuffer.
 		core::aabbox3d<f32> BoundingBox;
+
+		//! What kind of primitives does this buffer contain? Default triangles
+		scene::E_PRIMITIVE_TYPE Primitive;
 	};
 
 	//! Standard meshbuffer

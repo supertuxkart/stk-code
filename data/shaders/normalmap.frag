@@ -4,7 +4,7 @@
 uniform sampler2D BumpTex; //The bump-map
 uniform sampler2D DecalTex; //The texture
 uniform sampler2D LightMapTex;
- int HasLightMap;
+uniform int HasLightMap;
 
 // New bumpmapping
 varying vec3 lightVec;
@@ -19,18 +19,18 @@ void main()
 	normal = normalize (normal);
 
 	// compute diffuse lighting
-	float lamberFactor = max (dot (lightVec, normal), 0.0) ;
+	float lamberFactor = max (dot (lightVec, normal), 0.0);
 	vec4 diffuseMaterial;
 
-    diffuseMaterial = texture2D (DecalTex, gl_TexCoord[0].st);
+	diffuseMaterial = texture2D (DecalTex, gl_TexCoord[0].st);
 
-    if (HasLightMap < 1)
-    {
-        // 0.5 is the ambient light
-        gl_FragColor =	diffuseMaterial * (0.5 + lamberFactor*0.5);
-    }
-    else
-    {
-        gl_FragColor =	diffuseMaterial * (0.5 + lamberFactor*0.5) * texture2D(LightMapTex, gl_TexCoord[0].st);
-    }
+	if (HasLightMap < 1)
+	{
+		// 0.5 is the ambient light
+		gl_FragColor =	diffuseMaterial * (0.5 + lamberFactor*0.5);
+	}
+	else
+	{
+		gl_FragColor =	diffuseMaterial * (0.5 + lamberFactor*0.5) * texture2D(LightMapTex, gl_TexCoord[0].st);
+	}
 }

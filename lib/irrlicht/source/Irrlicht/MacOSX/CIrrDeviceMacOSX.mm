@@ -616,8 +616,8 @@ bool CIrrDeviceMacOSX::createWindow()
 
 	// we need to check where the exceptions may happen and work at them
 	// for now we will just catch them to be able to avoid an app exit
-	@try
-	{
+	//@try
+	//{
 		if (!CreationParams.Fullscreen)
 		{
 			if(!CreationParams.WindowId) //create another window when WindowId is null
@@ -858,12 +858,12 @@ bool CIrrDeviceMacOSX::createWindow()
 				}
 			}
 		}
-	}
-	@catch (NSException *exception)
-	{
-		closeDevice();
-		result = false;
-	}
+	//}
+	//@catch (NSException *exception)
+	//{
+	//	closeDevice();
+	//	result = false;
+	//}
 
 	if (result)
 	{

@@ -1,0 +1,44 @@
+New pipeline overview
+=====================
+
+Organized by RTTs
+-----------------
+
+To color:
+	- initialize the glow representations (no rendering yet)
+	- render the 3d skybox, if any (includes the usual skybox)
+
+To the MRT (color, normals, depth):
+	- solids
+
+To quarter1:
+	- glowmap
+
+To various shadow maps:
+	- shadows
+
+To tmp1:
+	- lights
+
+To color:
+	- lights from tmp1 are multiplicatively blended
+	- skybox if there is no 3d skybox
+	- lens flare/god rays occlusion query (no rendering)
+	- solid post-processing
+	- transparents
+
+To displace:
+	- displacing nodes, if any
+
+To the screen:
+	- the post-processing chain
+	- GUI
+
+
+Organized by passes
+-------------------
+
+Init:		glow init -> 3d skybox
+Main:		solids -> glows -> shadows -> lights -> occlusion query -> solid PP
+Transparent:	transparents -> displacing -> PP
+GUI:		gui

@@ -135,6 +135,9 @@
   <steer disable-while-unskid="false"
          camera-follow-skid="true"     />
 
+  <!-- Glow colors for the items -->
+  <glow-colors nitro="0 0 255" box="255 0 0" />
+
   <!-- Default values for all karts
        ============================ -->
   <general-kart-defaults>
@@ -185,7 +188,7 @@
          max: How much nitro a kart can store.
      -->
     <nitro engine-force="500" consumption="1" small-container="1" big-container="3"
-           max-speed-increase="5" duration="1" fade-out-time="2" max="16"/>
+           max-speed-increase="5" duration="1" fade-out-time="2" max="20"/>
 
     <!-- Bubble gum data:
          time: How long the bubblegum lasts.
@@ -253,6 +256,8 @@
          disable-slipstream-usage: even if the AI is not trying to use slipstream,
            it can get a lot of bonus, esp. on easy since the AI creates trains.
            Set this to true to make sure AI does not get any slipstream bonus.
+         shield-incoming-radius: Radius at which projectiles will be detected and
+           trigger a shield usage.
          false-start-probability: Probability of a false start.
          min/max-start-delay: Minimum and maximum start delay.
            See http://www.humanbenchmark.com/tests/reactiontime/stats.php
@@ -316,6 +321,7 @@
                 straight-length-for-zipper="35"
                 use-slipstream="false"
                 disable-slipstream-usage="true"
+                shield-incoming-radius="0"
                 false-start-probability="0.08"
                 min-start-delay="0.3" max-start-delay="0.5"
                 nitro-usage="none"
@@ -333,6 +339,7 @@
                 straight-length-for-zipper="35"
                 use-slipstream="false"
                 disable-slipstream-usage="false"
+                shield-incoming-radius="10"
                 false-start-probability="0.04"
                 min-start-delay="0.25" max-start-delay="0.4"
                 nitro-usage="some"
@@ -350,6 +357,7 @@
                 straight-length-for-zipper="35"
                 use-slipstream="true"
                 disable-slipstream-usage="false"
+                shield-incoming-radius="10"
                 false-start-probability="0.01"
                 min-start-delay="0.15" max-start-delay="0.28"
                 nitro-usage="all"
@@ -367,6 +375,7 @@
                 straight-length-for-zipper="35"
                 use-slipstream="true"
                 disable-slipstream-usage="false"
+                shield-incoming-radius="10"
                 false-start-probability="0.0"
                 min-start-delay="0.15" max-start-delay="0.2"
                 nitro-usage="all"
@@ -477,6 +486,11 @@
       <rear-right  position="0.38 0 -0.6" />
       <rear-left   position="-0.38 0 -0.6"/>
     </wheels>
+    
+    <!-- Parameters for the speed-weighted objects:
+         a bigger value for strength-factor leads to the speed of the kart more quickly affecting
+         the strength of the animation (up to a maximum value that corresponds to the original animation) -->
+    <speed-weighted-objects strength-factor="0.05" speed-factor="1.0" texture-speed-x="0.0" texture-speed-y="0.0"/>
 
     <!-- friction: slip used for bullet skidding. A high value 
          (like 10000000) disables bullet skidding. -->

@@ -3,13 +3,25 @@
 # - SRCS list of source files
 # - HDRS list of header files
 function(source_group_hierarchy SRCS HDRS)
-    foreach(source_file ${${SRCS}})
-        source_group_file(${source_file} "Source Files\\")
-    endforeach()
+    if(MSVC)
+        # This removes the 'Source Files' folder, which is
+        # not really necessary. Also, put header and source
+        # files into the same folder
+        foreach(source_file ${${SRCS}})
+            source_group_file(${source_file} "")
+        endforeach()
+        foreach(header_file ${${HDRS}})
+            source_group_file(${header_file} "")
+        endforeach()
+    else()
+        foreach(source_file ${${SRCS}})
+            source_group_file(${source_file} "Source Files\\")
+        endforeach()
+        foreach(header_file ${${HDRS}})
+            source_group_file(${header_file} "Source Files\\")
+        endforeach()
+    endif()
 
-    foreach(header_file ${${HDRS}})
-        source_group_file(${header_file} "Header Files\\")
-    endforeach()
 endfunction()
 
 # Determine source_group depending on file path

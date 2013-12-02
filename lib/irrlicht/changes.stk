@@ -5,7 +5,10 @@ The following changes have been made:
 - drawall types
 - materialtype override
 - skies respect Z
-- partial backport to expose setCurrentRendertime in the scene mgr
+- partial backport to expose setCurrentRendertime in the scene mgr (upstream)
 - a workaround for every other RTTs flipping
-- aabbox intersection support
+- aabbox intersection support (upstream)
 - texture override
+- non-triangle VBO support
+- extension order mismatch
+- support for some RG texture formats

@@ -66,6 +66,14 @@ namespace scene
 		//! gets the speed with which the animation is played
 		virtual f32 getAnimationSpeed() const;
 
+		//! Sets the animation strength (how important the animation is)
+		/** \param strength: The importance of the animation: 1.f keeps the original animation, 0.f is no animation. */
+		virtual void setAnimationStrength(f32 strength);
+
+		//! Gets the animation strength (how important the animation is)
+		/** \return The importance of the animation: 1.f keeps the original animation, 0.f is no animation. */
+		virtual f32 getAnimationStrength() const;
+
 		//! returns the material based on the zero based index i. To get the amount
 		//! of materials used by this scene node, use getMaterialCount().
 		//! This function is needed for inserting the node into the scene hirachy on a
@@ -182,6 +190,8 @@ namespace scene
 		s32 EndFrame;
 		f32 FramesPerSecond;
 		f32 CurrentFrameNr;
+
+		f32 AnimationStrength;
 
 		u32 LastTimeMs;
 		u32 TransitionTime; //Transition time in millisecs

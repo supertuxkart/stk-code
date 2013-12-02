@@ -11,9 +11,11 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
 
-option(USE_WIIUSE "Support for wiimote input devices" OFF)
+option(USE_WIIUSE "Support for wiimote input devices" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
-option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
+if(UNIX)
+    option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
+endif()
 
 set(STK_SOURCE_DIR "src")
 set(STK_DATA_DIR "${PROJECT_SOURCE_DIR}/data")
@@ -60,6 +62,8 @@ endif()
 if(APPLE)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch i386")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch i386 -F/Library/Frameworks")
+elseif(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")   # Enable multi-processor compilation (faster)
 endif()
 
 # OpenAL
@@ -103,8 +107,10 @@ if(USE_FRIBIDI)
     endif()
 endif()
 
-if(USE_CPP2011)
-    add_definitions("-std=gnu++11")
+if(UNIX)
+    if(USE_CPP2011)
+        add_definitions("-std=gnu++11")
+    endif()
 endif()
 
 # OpenGL
@@ -153,7 +159,7 @@ source_group_hierarchy(STK_SOURCES STK_HEADERS)
 
 if(APPLE)
     # icon files to copy in the bundle
-    set(OSX_ICON_FILES ${PROJECT_SOURCE_DIR}/src/ide/Xcode/stk.icns)
+    set(OSX_ICON_FILES ${PROJECT_SOURCE_DIR}/data/supertuxkart.icns)
     set_source_files_properties(${OSX_ICON_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     set(STK_SOURCES ${STK_SOURCES} ${OSX_ICON_FILES})
 
@@ -175,7 +181,7 @@ if(APPLE)
 
     # configure CMake to use a custom Info.plist
     set_target_properties(supertuxkart PROPERTIES
-        MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/src/ide/Xcode/SuperTuxKart-Info.plist)
+        MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/data/SuperTuxKart-Info.plist)
 
     if(CMAKE_GENERATOR MATCHES "Xcode")
         add_custom_command(TARGET supertuxkart POST_BUILD
@@ -265,7 +271,8 @@ endif()
 install(TARGETS supertuxkart RUNTIME DESTINATION ${STK_INSTALL_BINARY_DIR} BUNDLE DESTINATION .)
 install(DIRECTORY ${STK_DATA_DIR} DESTINATION ${STK_INSTALL_DATA_DIR} PATTERN ".svn" EXCLUDE)
 install(FILES ${PROJECT_BINARY_DIR}/supertuxkart.desktop DESTINATION share/applications)
-install(FILES data/supertuxkart_32.xpm data/supertuxkart_64.xpm DESTINATION share/pixmaps)
+install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
+install(FILES data/supertuxkart.appdata DESTINATION share/appdata)
 
 set(PREFIX ${CMAKE_INSTALL_PREFIX})
 configure_file(data/supertuxkart_desktop.template supertuxkart.desktop)

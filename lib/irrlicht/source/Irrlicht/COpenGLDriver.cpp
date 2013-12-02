@@ -1301,7 +1301,7 @@ void COpenGLDriver::drawHardwareBuffer(SHWBufferLink *_HWBuffer)
 		indexList=0;
 	}
 
-	drawVertexPrimitiveList(vertices, mb->getVertexCount(), indexList, mb->getIndexCount()/3, mb->getVertexType(), scene::EPT_TRIANGLES, mb->getIndexType());
+	drawVertexPrimitiveList(vertices, mb->getVertexCount(), indexList, indiceToPrimitiveCount(mb->getPrimitiveType(), mb->getIndexCount()), mb->getVertexType(), mb->getPrimitiveType(), mb->getIndexType());
 
 	if (HWBuffer->Mapped_Vertex!=scene::EHM_NEVER)
 		extGlBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -4424,6 +4424,23 @@ IImage* COpenGLDriver::createScreenShot(video::ECOLOR_FORMAT format, video::E_RE
 			type = GL_UNSIGNED_INT_8_8_8_8_REV;
 		else
 			type = GL_UNSIGNED_BYTE;
+		break;
+	case ECF_R8G8:
+		// GL_ARB_texture_rg is considered always available in headers. No ifdefs.
+		fmt = GL_RG;
+		type = GL_UNSIGNED_BYTE;
+		break;
+	case ECF_R16G16:
+		fmt = GL_RG;
+		type = GL_UNSIGNED_SHORT;
+		break;
+	case ECF_R8:
+		fmt = GL_RED;
+		type = GL_UNSIGNED_BYTE;
+		break;
+	case ECF_R16:
+		fmt = GL_RED;
+		type = GL_UNSIGNED_SHORT;
 		break;
 	case ECF_R16F:
 		if (FeatureAvailable[IRR_ARB_texture_rg])
