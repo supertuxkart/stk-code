@@ -12,9 +12,22 @@
             <bright proportion="1" height="100%"
                     I18N="In soccer setup menu" text="Number of goals to win" text_align="right" />
             <spacer width="50" height="25"/>
-            <spinner id="goalamount" proportion="1" height="100%" min_value="1" max_value="30" wrap_around="true"/>
+            <spinner id="goalamount" proportion="1" height="100%" min_value="1" max_value="10" wrap_around="true"/>
         </div>
+
         
+
+        <div layout="horizontal-row" width="100%" height="50" align="center">
+
+            <bright proportion="1" height="100%"
+                    I18N="In soccer setup menu" text="Maximum time(minutes)" text_align="right" />
+            <spacer width="20" height="25"/>
+            <checkbox id="time_enabled"/>
+            <spacer width="20" height ="25">
+            <spinner id="timeamount" proportion="1" height="100%" min_value="1" max_value="45" wrap_around="true"/>
+        </div>
+
+
         <spacer height="25" width="25"/>
         
         <bright height="15" width="25" I18N="In soccer setup menu" text="Use left/right to choose your team" text_align="center" align="center" />
