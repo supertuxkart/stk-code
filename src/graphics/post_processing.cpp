@@ -201,7 +201,7 @@ void PostProcessing::update(float dt)
 /** Render the post-processed scene, solids only, color to color, no stencil */
 void PostProcessing::renderSolid(const u32 cam)
 {
-    if (irr_driver->isGLSL()) return;
+    if (!irr_driver->isGLSL()) return;
 
     // Early out: do nothing if at all possible
     if (UserConfigParams::m_ssao < 1 && !World::getWorld()->getTrack()->isFogEnabled())
