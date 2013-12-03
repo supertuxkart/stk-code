@@ -275,13 +275,23 @@ irr::core::stringw Binding::getAsString() const
             }
             else
             {
-                //I18N: to appear in input configuration screen, for gamepad axes
                 if (m_range == Input::AR_HALF)
+                {
+                    //I18N: to appear in input configuration screen, for gamepad axes
                     s = _("Axis %d %s", m_id, (m_dir == Input::AD_NEGATIVE) ? L"-" : L"+");
+                }
                 else
                 {
-                    irr::core::stringw inv = _("inverted");
-                    s = _("Axis %d %s", m_id, (m_dir == Input::AD_NEGATIVE) ? inv : L"");
+                    if(m_dir == Input::AD_NEGATIVE)
+                    {
+                        //I18N: to appear in input configuration screen, for gamepad axes
+                        s = _("Axis %d inverted", m_id);
+                    }
+                    else
+                    {
+                        //I18N: to appear in input configuration screen, for gamepad axes
+                        s = _("Axis %d", m_id);
+                    }
                 }
 
             }

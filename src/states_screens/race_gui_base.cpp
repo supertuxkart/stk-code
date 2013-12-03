@@ -728,6 +728,8 @@ void RaceGUIBase::drawGlobalReadySetGo()
             
             if (race_manager->getCoinTarget() > 0)
                 font->draw(_("Collect nitro!"), pos, color, true, true);
+            else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+                font->draw(_("Follow the leader!"), pos, color, true, true);
             else
                 font->draw(m_string_go.c_str(), pos, color, true, true);
         }

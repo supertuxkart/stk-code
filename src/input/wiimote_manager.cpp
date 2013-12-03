@@ -305,10 +305,15 @@ void* WiimoteManager::threadFuncWrapper(void *data)
 int WiimoteManager::askUserToConnectWiimotes()
 {
 	new MessageDialog(
-		_("Press the buttons 1+2 simultaneously on your wiimote to put "
-		  "it in discovery mode, then click on Yes."
+#ifdef WIN32
+		_("Connect your wiimote to the Bluetooth manager, then click on Ok."
                   "Detailed instructions at supertuxkart.net/Wiimote"),
-		MessageDialog::MESSAGE_DIALOG_CONFIRM,
+#else
+		_("Press the buttons 1+2 simultaneously on your wiimote to put "
+		  "it in discovery mode, then click on Ok."
+                  "Detailed instructions at supertuxkart.net/Wiimote"),
+#endif
+		MessageDialog::MESSAGE_DIALOG_OK_CANCEL,
 		new WiimoteDialogListener(), true);
 
 	return getNumberOfWiimotes();

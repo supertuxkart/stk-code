@@ -185,7 +185,7 @@
          max: How much nitro a kart can store.
      -->
     <nitro engine-force="500" consumption="1" small-container="1" big-container="3"
-           max-speed-increase="5" duration="1" fade-out-time="2" max="16"/>
+           max-speed-increase="5" duration="1" fade-out-time="2" max="20"/>
 
     <!-- Bubble gum data:
          time: How long the bubblegum lasts.
@@ -487,7 +487,7 @@
     <!-- Parameters for the speed-weighted objects:
          a bigger value for strength-factor leads to the speed of the kart more quickly affecting
          the strength of the animation (up to a maximum value that corresponds to the original animation) -->
-    <speed-weighted strength-factor="0.05" speed-factor="5.0"/>
+    <speed-weighted strength-factor="0.05" speed-factor="1.0"/>
 
     <!-- friction: slip used for bullet skidding. A high value 
          (like 10000000) disables bullet skidding. -->

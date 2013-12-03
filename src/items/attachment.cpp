@@ -53,7 +53,7 @@ Attachment::Attachment(AbstractKart* kart)
     m_bomb_sound           = NULL;
     m_bubble_explode_sound = NULL;
     m_node_scale           = 1.0f;
-    
+
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.
     m_node = irr_driver->addAnimatedMesh(
@@ -222,7 +222,8 @@ void Attachment::clear()
 void Attachment::hitBanana(Item *item, int new_attachment)
 {
     //Bubble gum shield effect:
-    if(m_type == ATTACH_BUBBLEGUM_SHIELD)
+    if(m_type == ATTACH_BUBBLEGUM_SHIELD ||
+       m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
     {
         m_time_left = 0.0f;
         return;
@@ -387,10 +388,14 @@ void Attachment::update(float dt)
     if(m_type==ATTACH_NOTHING) return;
     m_time_left -=dt;
     
-    if (m_node_scale < 1.0f)
+    
+    bool is_shield = (m_type == ATTACH_BUBBLEGUM_SHIELD|| m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD);
+    float m_wanted_node_scale = is_shield ? std::max(1.0f, m_kart->getHighestPoint()*1.1f) : 1.0f;
+    
+    if (m_node_scale < m_wanted_node_scale)
     {
         m_node_scale += dt*1.5f;
-        if (m_node_scale > 1.0f) m_node_scale = 1.0f;
+        if (m_node_scale > m_wanted_node_scale) m_node_scale = m_wanted_node_scale; 
         m_node->setScale(core::vector3df(m_node_scale,m_node_scale,m_node_scale));
     }
 
@@ -456,6 +461,7 @@ void Attachment::update(float dt)
         // Nothing to do for tinytux, this is all handled in EmergencyAnimation
         break;
     case ATTACH_BUBBLEGUM_SHIELD:
+    case ATTACH_NOLOK_BUBBLEGUM_SHIELD:
         if (m_time_left < 0)
         {
             m_time_left = 0.0f;

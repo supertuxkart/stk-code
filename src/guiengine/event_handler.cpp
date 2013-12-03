@@ -44,6 +44,7 @@ using namespace irr::gui;
 
 EventHandler::EventHandler()
 {
+    m_accept_events = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -56,6 +57,8 @@ EventHandler::~EventHandler()
 
 bool EventHandler::OnEvent (const SEvent &event)
 {
+    if (!m_accept_events && event.EventType != EET_LOG_TEXT_EVENT) return true;
+    
     // TO DEBUG HATS (when you don't actually have a hat)
     /*
     if (event.EventType == EET_KEY_INPUT_EVENT)

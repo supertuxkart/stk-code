@@ -249,6 +249,7 @@ KartModel* KartModel::makeCopy()
     km->m_kart_width        = m_kart_width;
     km->m_kart_length       = m_kart_length;
     km->m_kart_height       = m_kart_height;
+	km->m_kart_highest_point = m_kart_highest_point;
     km->m_mesh              = m_mesh;
     km->m_model_filename    = m_model_filename;
     km->m_animation_speed   = m_animation_speed;
@@ -421,6 +422,8 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     Vec3 kart_min, kart_max;
     MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), &kart_min, &kart_max);
 
+	m_kart_highest_point = kart_max.getY();
+
     // Load the speed weighted object models. We need to do that now because it can affect the dimensions of the kart
     for(size_t i=0 ; i < m_speed_weighted_objects.size() ; i++)
     {
@@ -435,7 +438,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
 
         // Update min/max
         Vec3 obj_min, obj_max;
-        MeshTools::minMax3D(obj.m_model, &obj_min, &obj_max);
+		MeshTools::minMax3D(obj.m_model, &obj_min, &obj_max);
         obj_min += obj.m_position;
         obj_max += obj.m_position;
         kart_min.min(obj_min);

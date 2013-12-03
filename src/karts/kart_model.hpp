@@ -166,6 +166,7 @@ private:
     float m_kart_width;               /**< Width of kart.  */
     float m_kart_length;              /**< Length of kart. */
     float m_kart_height;              /**< Height of kart. */
+	float m_kart_highest_point;       /**< Coordinate on up axis */
     /** True if this is the master copy, managed by KartProperties. This
      *  is mainly used for debugging, e.g. the master copies might not have
      * anything attached to it etc. */
@@ -263,6 +264,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the height of the kart. */
     float getHeight                 () const {return m_kart_height;      }
+	// ------------------------------------------------------------------------
+	/** Coordoinate on up axis */
+	float getHighestPoint           () const { return m_kart_highest_point;  }
     // ------------------------------------------------------------------------
     /** Enables- or disables the end animation. */
     void  setAnimation(AnimationFrameType type);

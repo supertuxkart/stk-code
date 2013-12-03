@@ -389,7 +389,21 @@ void Track::loadTrackInfo()
 
     std::string dir = StringUtils::getPath(m_filename);
     std::string easter_name = dir+"/easter_eggs.xml";
-    m_has_easter_eggs = file_manager->fileExists(easter_name);
+
+    XMLNode *easter = file_manager->createXMLTree(easter_name); 
+  
+    if(easter) 
+    {
+        for(unsigned int i=0; i<easter->getNumNodes(); i++) 
+        { 
+            const XMLNode *eggs = easter->getNode(i); 
+            if(eggs->getNumNodes() > 0) 
+            { 
+                m_has_easter_eggs = true; 
+                break; 
+            } 
+        } 
+    } 
 }   // loadTrackInfo
 
 //-----------------------------------------------------------------------------

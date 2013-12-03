@@ -839,8 +839,8 @@ void Kart::finishedRace(float time)
         RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if(m)
         {
-            m->addMessage((getPosition() == 2 ? _("You won the race!") : _("You finished the race!")) ,
-                          this, 2.0f);
+            if (getPosition() == 2)
+                m->addMessage(_("You won the race!"), this, 2.0f);
         }
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
@@ -984,9 +984,15 @@ void Kart::setShieldTime(float t)
 bool Kart::isShielded() const
 {
     if(getAttachment() != NULL)
-        return getAttachment()->getType() == Attachment::ATTACH_BUBBLEGUM_SHIELD;
+    {
+        Attachment::AttachmentType type = getAttachment()->getType();
+        return type == Attachment::ATTACH_BUBBLEGUM_SHIELD ||
+               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+    }
     else
+    {
         return false;
+    }
 }   // isShielded
 
 // ------------------------------------------------------------------------

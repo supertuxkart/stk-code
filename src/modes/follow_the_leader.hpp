@@ -28,6 +28,7 @@ class FollowTheLeaderRace : public LinearWorld
 {
 private:
     std::vector<float>  m_leader_intervals;    // time till elimination in follow leader
+    float m_is_over_delay; //!< A timer used before terminating the race
 
 public:
 

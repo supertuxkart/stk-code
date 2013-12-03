@@ -837,6 +837,17 @@ namespace GUIEngine
             }
         }
 
+        // Hack : on the first frame, irrlicht processes all events that have been queued
+        // during the loading screen. So way until the second frame to start processing events.
+        // (Events queues during the loading screens are likely the user clicking on the
+        // frame to focus it, or similar, and should not be used as a game event)
+        static int frame = 0;
+        if (frame < 2)
+        {
+            frame++;
+            if (frame == 2)
+                GUIEngine::EventHandler::get()->startAcceptingEvents();
+        }
     }
     // ------------------------------------------------------------------------
 
