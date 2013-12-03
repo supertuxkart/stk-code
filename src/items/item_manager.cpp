@@ -29,7 +29,6 @@
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
-#include "network/network_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
@@ -293,9 +292,6 @@ void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
  */
 void  ItemManager::checkItemHit(AbstractKart* kart)
 {
-    // Only do this on the server
-    if(network_manager->getMode()==NetworkManager::NW_CLIENT) return;
-
     // We could use m_items_in_quads to to check for item hits: take the quad
     // of the graph node of the kart, and only check items in that quad. But
     // then we also need to check for any adjacent quads (since an item just

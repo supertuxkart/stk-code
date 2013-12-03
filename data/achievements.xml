@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<achievements>
+  <achievement id="1" type="map" title="Christoffel Columbus" description="Play every official track at least once." >
+      <entry key="farm" goal="1"/>
+      <entry key="scotland" goal="1"/>
+      <entry key="lighthouse" goal="1"/>
+      <entry key="sandtrack" goal="1"/>
+      <entry key="olivermath" goal="1"/>
+      <entry key="subsea" goal="1"/>
+      <entry key="mansion" goal="1"/>
+      <entry key="minigolf" goal="1"/>
+      <entry key="hacienda" goal="1"/>
+      <entry key="jungle" goal="1"/>      
+  </achievement>
+  <achievement id="2" type="single" goal="10" title="Strike!" description="Hit 10 karts with a bowling-ball." />
+</achievements>
+

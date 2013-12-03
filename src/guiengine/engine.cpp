@@ -485,7 +485,7 @@ namespace GUIEngine
 
  Used on divs, indicate by how many pixels to pad contents
 
- 
+
  \n
  <HR>
  \section code Using the engine in code
@@ -657,6 +657,7 @@ namespace GUIEngine
 #include "guiengine/screen.hpp"
 #include "guiengine/skin.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/dialog_queue.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -835,6 +836,7 @@ namespace GUIEngine
             {
                 widget->update(dt);
             }
+            DialogQueue::get()->update();
         }
 
         // Hack : on the first frame, irrlicht processes all events that have been queued
@@ -914,6 +916,25 @@ namespace GUIEngine
     {
         g_loaded_screens.push_back(cutscene);
     }   // addScreenToList
+
+    // ------------------------------------------------------------------------
+
+    void removeScreen(const char* name)
+    {
+        const int screen_amount = g_loaded_screens.size();
+        for(int n=0; n<screen_amount; n++)
+        {
+            if (g_loaded_screens[n].getName() == name)
+            {
+                g_current_screen = g_loaded_screens.get(n);
+                g_current_screen->unload();
+                delete g_current_screen;
+                g_current_screen = NULL;
+                g_loaded_screens.remove(n);
+                break;
+            }
+        }
+    }
 
     // ------------------------------------------------------------------------
     void reshowCurrentScreen()

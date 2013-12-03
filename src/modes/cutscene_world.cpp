@@ -35,7 +35,7 @@
 #include "physics/physics.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/cutscene_gui.hpp"
-#include "states_screens/kart_selection.hpp"
+#include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
@@ -384,7 +384,7 @@ void CutsceneWorld::enterRaceOverState()
 
                 slot->setFirstTime(false);
                 unlock_manager->save();
-                KartSelectionScreen* s = KartSelectionScreen::getInstance();
+                KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
                 s->setMultiplayer(false);
                 s->setGoToOverworldNext();
                 StateManager::get()->pushScreen( s );

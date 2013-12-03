@@ -595,7 +595,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                                      action == PA_MENU_CANCEL ) )
             {
                 // returns true if the event was handled
-                if (KartSelectionScreen::getInstance()->playerQuit( player ))
+                if (KartSelectionScreen::getRunningInstance()->playerQuit( player ))
                 {
                     return; // we're done here
                 }
@@ -630,7 +630,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
                     if (device != NULL)
                     {
-                        KartSelectionScreen::getInstance()->playerJoin(device,
+                        KartSelectionScreen::getRunningInstance()->playerJoin(device,
                                                                        false );
                     }
                 }

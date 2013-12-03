@@ -545,6 +545,7 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
         }
     }
 }   // loadQuadGraph
+
 // -----------------------------------------------------------------------------
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {

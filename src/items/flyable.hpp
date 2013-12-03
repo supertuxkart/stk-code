@@ -34,7 +34,6 @@ using namespace irr;
 #include "tracks/terrain_info.hpp"
 
 class AbstractKart;
-class FlyableInfo;
 class HitEffect;
 class PhysicalObject;
 class XMLNode;
@@ -168,7 +167,6 @@ public:
                               PowerupManager::PowerupType type);
     virtual bool              updateAndDelete(float);
     virtual HitEffect*        getHitEffect() const;
-    void                      updateFromServer(const FlyableInfo &f, float dt);
     bool                      isOwnerImmunity(const AbstractKart *kart_hit) const;
     virtual bool              hit(AbstractKart* kart, PhysicalObject* obj=NULL);
     void                      explode(AbstractKart* kart, PhysicalObject* obj=NULL,

@@ -150,7 +150,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
     {
         StateManager::get()->escapePressed();
     }
-    
+
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
@@ -237,7 +237,7 @@ void RaceSetupScreen::init()
     {
         w->setSelection( UserConfigParams::m_difficulty, PLAYER_ID_GAME_MASTER );
     }
-    
+
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
     kartamount->setActivated();
 
@@ -341,13 +341,13 @@ void RaceSetupScreen::init()
 
     m_mode_listener = new GameModeRibbonListener(this);
     w2->registerHoverListener(m_mode_listener);
-    
-    
+
+
     if (unlock_manager->getCurrentSlot()->isLocked("difficulty_best"))
     {
         RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
         assert(w != NULL);
-        
+
         int index = w->findItemNamed("best");
         Widget* hardestWidget = &w->getChildren()[index];
         hardestWidget->setBadge(LOCKED_BADGE);

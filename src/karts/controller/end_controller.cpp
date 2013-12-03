@@ -43,7 +43,6 @@
 #include "karts/max_speed.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/linear_world.hpp"
-#include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "tracks/quad_graph.hpp"

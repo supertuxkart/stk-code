@@ -28,7 +28,6 @@
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "network/network_manager.hpp"
 #include "race/highscores.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/race_manager.hpp"

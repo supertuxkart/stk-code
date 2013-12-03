@@ -61,6 +61,7 @@ namespace GUIEngine
     template<typename SCREEN>
     class ScreenSingleton
     {
+    protected:
         static SCREEN* singleton;
 
     public:
@@ -302,6 +303,10 @@ namespace GUIEngine
                                  int axisDir,
                                  int value) {}
 
+        /** Callback that gets called when a dialog is closed.
+         *  Can be used to set focus for instance.
+         */
+        virtual void onDialogClose() {}
     };
 
 }

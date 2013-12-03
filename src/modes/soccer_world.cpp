@@ -467,12 +467,14 @@ int SoccerWorld::getScore(unsigned int i)
 //-----------------------------------------------------------------------------
 int SoccerWorld::getTeamLeader(unsigned int team)
 {
-                for(unsigned int i = 0; i< m_karts.size(); i++){
-                        if(race_manager->getLocalKartInfo(i).getSoccerTeam() == (SoccerTeam) team)
-                                return i;
-                }
+    for(unsigned int i = 0; i< m_karts.size(); i++)
+    {
+        if(race_manager->getLocalKartInfo(i).getSoccerTeam() == (SoccerTeam) team)
+            return i;
+    }
                 return -1;
-        }
+}   // getTeamLeader
+
 //-----------------------------------------------------------------------------
 AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
                                 int local_player_id, int global_player_id,

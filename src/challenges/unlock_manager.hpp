@@ -82,8 +82,7 @@ public:
     }
 
     /** \param slotid name of the player */
-    void       setCurrentSlot(std::string slotid) { m_current_game_slot = slotid; }
-
+    void       setCurrentSlot(std::string slotid);
     void       findWhatWasUnlocked(int pointsBefore, int pointsNow,
                                    std::vector<std::string>& tracks,
                                    std::vector<std::string>& gps);

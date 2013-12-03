@@ -25,6 +25,7 @@
 #include <vector>
 #include <sstream>
 #include <irrString.h>
+#include "utils/types.hpp"
 
 namespace StringUtils
 {
@@ -41,6 +42,8 @@ namespace StringUtils
 
     std::string removeExtension(const std::string& filename);
     std::string getExtension(const std::string& filename);
+
+    bool notEmpty(const irr::core::stringw& input);
 
     template <class T>
     std::string toString (const T& any)
@@ -91,7 +94,9 @@ namespace StringUtils
                                           bool keepSplitChar=false);
     std::vector<irr::core::stringw> split(const irr::core::stringw& s,
                                           char c, bool keepSplitChar=false);
-    std::vector<std::string>         splitPath(const std::string& path);
+    std::vector<uint32_t>           splitToUInt(const std::string& s, char c,
+                                                bool keepSplitChar=false);
+    std::vector<std::string>        splitPath(const std::string& path);
 
     // ------------------------------------------------------------------------
     /**
@@ -412,6 +417,8 @@ namespace StringUtils
 
     /** Compute a simple hash of a string */
     unsigned int simpleHash(const char* input);
+
+    const char* boolstr(bool b);
 } // namespace StringUtils
 
 #endif

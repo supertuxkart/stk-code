@@ -31,13 +31,14 @@ using namespace irr;
 #include "physics/user_pointer.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
+#include "network/types.hpp"
 
 class Material;
 
 /**
   * \ingroup karts
   */
-class Moveable: public NoCopy
+class Moveable: public NoCopy, public CallbackObject
 {
 private:
     btVector3              m_velocityLC;      /**<Velocity in kart coordinates. */

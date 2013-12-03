@@ -468,6 +468,11 @@ public:
         return m_local_player_karts[n];
     }
     // ------------------------------------------------------------------------
+    const RemoteKartInfo& getKartInfo(unsigned int n) const
+    {
+        return m_player_karts[n];
+    }
+    // ------------------------------------------------------------------------
     unsigned int getNumLocalPlayers() const
     {
         return m_local_player_karts.size();
@@ -684,6 +689,9 @@ public:
       */
     void  startSingleRace(const std::string &track_ident, const int num_laps,
                           bool from_overworld);
+    /** Receive and store the information from sendKartsInformation()
+      */
+    void  setupPlayerKartInfo();
 
     bool raceWasStartedFromOverworld() const
     {

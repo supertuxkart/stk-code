@@ -30,7 +30,9 @@
 #include "input/wiimote_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
-#include "network/network_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/network_world.hpp"
+#include "online/http_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
@@ -74,9 +76,9 @@ float MainLoop::getLimitedDt()
         // Throttle fps if more than maximum, which can reduce
         // the noise the fan on a graphics card makes.
         // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
-        const int max_fps = (StateManager::get()->throttleFPS() ? 35 : UserConfigParams::m_max_fps);
+        const int max_fps = 35;//(StateManager::get()->throttleFPS() ? 35 : UserConfigParams::m_max_fps);
         const int current_fps = (int)(1000.0f/dt);
-        if( current_fps > max_fps && !ProfileWorld::isNoGraphics())
+        if( current_fps > max_fps && !ProfileWorld::isProfileMode())
         {
             int wait_time = 1000/max_fps - 1000/current_fps;
             if(wait_time < 1) wait_time = 1;
@@ -95,22 +97,12 @@ float MainLoop::getLimitedDt()
  */
 void MainLoop::updateRace(float dt)
 {
-    // Server: Send the current position and previous controls to all clients
-    // Client: send current controls to server
-    // But don't do this if the race is in finish phase (otherwise
-    // messages can be mixed up in the race manager)
-    if(!World::getWorld()->isFinishPhase())
-        network_manager->sendUpdates();
     if(ProfileWorld::isProfileMode()) dt=1.0f/60.0f;
 
-    // Again, only receive updates if the race isn't over - once the
-    // race results are displayed (i.e. game is in finish phase)
-    // messages must be handled by the normal update of the network
-    // manager
-    if(!World::getWorld()->isFinishPhase())
-        network_manager->receiveUpdates();
-
-    World::getWorld()->updateWorld(dt);
+    if (NetworkWorld::getInstance<NetworkWorld>()->isRunning())
+        NetworkWorld::getInstance<NetworkWorld>()->update(dt);
+    else
+        World::getWorld()->updateWorld(dt);
 }   // updateRace
 
 //-----------------------------------------------------------------------------
@@ -128,13 +120,8 @@ void MainLoop::run()
         m_prev_time = m_curr_time;
         float dt   = getLimitedDt();
 
-        network_manager->update(dt);
-
         if (World::getWorld())  // race is active if world exists
         {
-            // Busy wait if race_manager is active (i.e. creating of world is done)
-            // till all clients have reached this state.
-            if (network_manager->getState()==NetworkManager::NS_READY_SET_GO_BARRIER) continue;
             updateRace(dt);
         }   // if race is active
 
@@ -163,7 +150,24 @@ void MainLoop::run()
             PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
             irr_driver->update(dt);
             PROFILER_POP_CPU_MARKER();
+
+            PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
+            ProtocolManager::getInstance()->update();
+            PROFILER_POP_CPU_MARKER();
+
+            PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
+            Online::HTTPManager::get()->update(dt);
+            PROFILER_POP_CPU_MARKER();
+
+            PROFILER_SYNC_FRAME();
         }
+        else if (!m_abort && ProfileWorld::isNoGraphics())
+        {
+            PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
+            ProtocolManager::getInstance()->update();
+            PROFILER_POP_CPU_MARKER();
+        }
+
         PROFILER_SYNC_FRAME();
         PROFILER_POP_CPU_MARKER();
     }  // while !m_exit

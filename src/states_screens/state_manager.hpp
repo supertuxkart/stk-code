@@ -34,6 +34,10 @@
 class AbstractKart;
 class InputDevice;
 struct Input;
+namespace Online
+{
+    class Profile;
+}
 
 namespace GUIEngine
 {
@@ -72,6 +76,7 @@ public:
     {
         friend class StateManager;
 
+        Online::Profile  *m_online_user;
         PlayerProfile *m_player;
         InputDevice   *m_device;
 
@@ -81,7 +86,7 @@ public:
         /** ID of this player within the list of active players */
         int m_id;
 
-        ActivePlayer(PlayerProfile* player, InputDevice* device);
+        ActivePlayer(PlayerProfile* player, InputDevice* device, Online::Profile* user);
 
 #ifdef DEBUG
         unsigned int m_magic_number;
@@ -121,6 +126,16 @@ public:
         /** Call to change the identity of this player (useful when player is
          *  selecting his identity) */
         void setPlayerProfile(PlayerProfile* player);
+
+        // --------------------------------------------------------------------
+        Online::Profile* getOnlineUser()
+        {
+            return m_online_user;
+        }
+        // --------------------------------------------------------------------
+        /** Call to change the identity of this player (useful when player is
+         *  selecting his identity) */
+        void setOnlineUser(Online::Profile* user) { m_online_user = user; }
 
         // --------------------------------------------------------------------
         /** ID of this player within the list of active players */
@@ -178,7 +193,7 @@ public:
       */
     const PlayerProfile* getActivePlayerProfile(const int id);
 
-    int createActivePlayer(PlayerProfile *profile, InputDevice *device);
+    int createActivePlayer(PlayerProfile *profile, InputDevice *device, Online::Profile* use);
     void removeActivePlayer(int id);
 
     int activePlayerCount();

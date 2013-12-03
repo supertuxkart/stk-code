@@ -69,8 +69,9 @@ private:
     
     IConfirmDialogListener* m_listener;
     bool m_own_listener;
-    void doInit(const irr::core::stringw &msg, MessageDialogType type, 
-                IConfirmDialogListener* listener, bool own_listener);
+    irr::core::stringw m_msg;
+    void doInit(MessageDialogType type, IConfirmDialogListener* listener, 
+                bool own_listener);
 
 public:
 
@@ -87,13 +88,13 @@ public:
       * Variant of MessageDialog where cancelling is not possible (i.e. just shows a message box with OK)
       * \param msg Message to display in the dialog
       */
-    MessageDialog(const irr::core::stringw &msg);
-
+    MessageDialog(const irr::core::stringw &msg, bool from_queue = false);
     
     ~MessageDialog();
     
     virtual void onEnterPressedInternal();
     virtual void onUpdate(float dt);
+    virtual void load();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };

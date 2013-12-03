@@ -121,6 +121,7 @@
 #    include <unistd.h>
 #  endif
 #  define _WINSOCKAPI_
+#  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #  ifdef _MSC_VER
 #    include <direct.h>
@@ -138,6 +139,7 @@
 #include <IEventReceiver.h>
 
 #include "main_loop.hpp"
+#include "achievements/achievements_manager.hpp"
 #include "addons/addons_manager.hpp"
 #include "addons/inetwork_http.hpp"
 #include "addons/news_manager.hpp"
@@ -154,6 +156,7 @@
 #include "graphics/referee.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
+#include "guiengine/dialog_queue.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/wiimote_manager.hpp"
@@ -167,6 +170,14 @@
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
+#include "network/client_network_manager.hpp"
+#include "network/server_network_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "online/current_user.hpp"
+#include "online/http_manager.hpp"
+#include "online/profile_manager.hpp"
+#include "online/servers_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -417,6 +428,7 @@ void cmdLineHelp(char* invocation)
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
     "       --no-graphics      Do not display the actual race.\n"
+    "       --with-profile     Enables the profile mode.\n"
     "       --demo-mode t      Enables demo mode after t seconds idle time in "
                                "main menu.\n"
     "       --demo-tracks t1,t2 List of tracks to be used in demo mode. No\n"
@@ -428,13 +440,11 @@ void cmdLineHelp(char* invocation)
     // "       --history=n        Replay history file 'history.dat' using:\n"
     // "                            n=1: recorded positions\n"
     // "                            n=2: recorded key strokes\n"
-    //"       --server[=port]    This is the server (running on the specified "
-    //                          "port).\n"
-    //"       --client=ip        This is a client, connect to the specified ip"
-    //                          " address.\n"
-    //"       --port=n           Port number to use.\n"
-    //"       --numclients=n     Number of clients to wait for (server "
-    //                          "only).\n"
+    "       --server           Start a server (not a playing client).\n"
+    "       --login=s          Automatically sign in (set the login).\n"
+    "       --password=s       Automatically sign in (set the password).\n"
+    "       --port=n           Port number to use.\n"
+    "       --max-players=n    Maximum number of clients (server only).\n"
     "       --no-console       Does not write messages in the console but to\n"
     "                          stdout.log.\n"
     "       --console          Write messages in the console and files\n"
@@ -624,6 +634,9 @@ int handleCmdLine(int argc, char **argv)
     int n;
     char s[1024];
 
+    bool try_login = false;
+    irr::core::stringw login, password;
+
     for(int i=1; i<argc; i++)
     {
 
@@ -705,23 +718,27 @@ int handleCmdLine(int argc, char **argv)
         {
             AIBaseController::enableDebug();
         }
-        else if(sscanf(argv[i], "--server=%d",&n)==1)
+        else if(sscanf(argv[i], "--port=%d",&n))
         {
-            network_manager->setMode(NetworkManager::NW_SERVER);
             UserConfigParams::m_server_port = n;
         }
         else if( !strcmp(argv[i], "--server") )
         {
-            network_manager->setMode(NetworkManager::NW_SERVER);
+            NetworkManager::getInstance<ServerNetworkManager>();
+            Log::info("main", "Creating a server network manager.");
         }
-        else if( sscanf(argv[i], "--port=%d", &n) )
+        else if( sscanf(argv[i], "--max-players=%d", &n) )
         {
-            UserConfigParams::m_server_port=n;
+            UserConfigParams::m_server_max_players=n;
         }
-        else if( sscanf(argv[i], "--client=%1023s", s) )
+        else if( sscanf(argv[i], "--login=%1023s", s) )
         {
-            network_manager->setMode(NetworkManager::NW_CLIENT);
-            UserConfigParams::m_server_address=s;
+            login = s;
+            try_login = true;
+        }
+        else if( sscanf(argv[i], "--password=%1023s", s) )
+        {
+            password = s;
         }
         else if ( sscanf(argv[i], "--gfx=%d", &n) )
         {
@@ -1008,6 +1025,9 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( !strcmp(argv[i], "--no-graphics") )
         {
+        }
+        else if( !strcmp(argv[i], "--with-profile") )
+        {
             // Set default profile mode of 1 lap if we haven't already set one
             if (!ProfileWorld::isProfileMode()) {
                 UserConfigParams::m_no_start_screen = true;
@@ -1122,6 +1142,19 @@ int handleCmdLine(int argc, char **argv)
         UserConfigParams::m_music = false;// and music when profiling
     }
 
+    if (try_login)
+    {
+        irr::core::stringw s;
+        Online::CurrentUser::SignInRequest* request =
+                Online::CurrentUser::get()->requestSignIn(login, password, false, false);
+        Online::HTTPManager::get()->synchronousRequest(request);
+
+        if (request->isSuccess())
+        {
+            Log::info("Main", "Logged in from command line.");
+        }
+    }
+
     return 1;
 }   // handleCmdLine
 
@@ -1189,6 +1222,8 @@ void initRest()
     // to network_http (since the thread might use network_http, otherwise
     // a race condition can be introduced resulting in a crash).
     INetworkHttp::get()->startNetworkThread();
+    Online::HTTPManager::get()->startNetworkThread();
+    AchievementsManager::get()->init();
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -1202,7 +1237,6 @@ void initRest()
     powerup_manager         = new PowerupManager       ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
-    network_manager         = new NetworkManager       ();
     KartPropertiesManager::addKartSearchDir(
                  file_manager->getAddonsFile("karts/"));
     track_manager->addTrackSearchDir(
@@ -1246,15 +1280,25 @@ static void cleanSuperTuxKart()
 
     if(INetworkHttp::get())
         INetworkHttp::get()->stopNetworkThread();
+    if(Online::HTTPManager::isRunning())
+        Online::HTTPManager::get()->stopNetworkThread();
+
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
+    Online::ServersManager::deallocate();
+    Online::ProfileManager::deallocate();
+    AchievementsManager::deallocate();
+    Online::CurrentUser::deallocate();
+    GUIEngine::DialogQueue::deallocate();
+
     Referee::cleanup();
     if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
     INetworkHttp::destroy();
     if(news_manager)            delete news_manager;
     if(addons_manager)          delete addons_manager;
-    if(network_manager)         delete network_manager;
+    NetworkManager::kill();
+
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
     if(attachment_manager)      delete attachment_manager;
@@ -1278,6 +1322,7 @@ static void cleanSuperTuxKart()
 
     StateManager::deallocate();
     GUIEngine::EventHandler::deallocate();
+    Online::HTTPManager::deallocate();
 }   // cleanSuperTuxKart
 
 //=============================================================================
@@ -1377,6 +1422,15 @@ int main(int argc, char *argv[] )
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);
 
+        // load the network manager
+        // If the server has been created (--server option), this will do nothing (just a warning):
+        NetworkManager::getInstance<ClientNetworkManager>();
+        NetworkManager::getInstance()->run();
+        if (NetworkManager::getInstance()->isServer())
+        {
+            ProtocolManager::getInstance()->requestStart(new ServerLobbyRoomProtocol());
+        }
+
         addons_manager->checkInstalledAddons();
 
         // Load addons.xml to get info about addons even when not
@@ -1387,6 +1441,20 @@ int main(int argc, char *argv[] )
                 const XMLNode *xml = new XMLNode (xml_file);
                 addons_manager->initOnline(xml);
             }
+        }
+
+        // no graphics, and no profile mode
+        if (ProfileWorld::isNoGraphics() && !ProfileWorld::isProfileMode())
+        {
+            // hack to have a running game slot :
+            PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
+            if (UserConfigParams::m_default_player.toString().size() > 0)
+                for (int n=0; n<players.size(); n++)
+                    if (players[n].getName() == UserConfigParams::m_default_player.toString())
+                        unlock_manager->setCurrentSlot(players[n].getUniqueID());
+
+            main_loop->run();
+            throw "salut";
         }
 
         if(!UserConfigParams::m_no_start_screen)
@@ -1451,7 +1519,7 @@ int main(int argc, char *argv[] )
 
             // Create player and associate player with keyboard
             StateManager::get()->createActivePlayer(
-                    UserConfigParams::m_all_players.get(0), device );
+                    UserConfigParams::m_all_players.get(0), device, NULL);
 
             if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
             {
@@ -1474,7 +1542,6 @@ int main(int argc, char *argv[] )
             StateManager::get()->enterGameState();
         }
 
-
         // If an important news message exists it is shown in a popup dialog.
         const core::stringw important_message =
                                            news_manager->getImportantMessage();
@@ -1492,7 +1559,7 @@ int main(int argc, char *argv[] )
         {
             // This will setup the race manager etc.
             history->Load();
-            network_manager->setupPlayerKartInfo();
+            race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
             main_loop->run();
             // well, actually run() will never return, since
@@ -1501,20 +1568,6 @@ int main(int argc, char *argv[] )
             exit(-3);
         }
 
-        // Initialise connection in case that a command line option was set
-        // configuring a client or server. Otherwise this function does nothing
-        // here (and will be called again from the network gui).
-        if(!network_manager->initialiseConnections())
-        {
-            Log::error("main", "Problems initialising network connections,\n"
-                            "Running in non-network mode.");
-        }
-        // On the server start with the network information page for now
-        if(network_manager->getMode()==NetworkManager::NW_SERVER)
-        {
-            // TODO - network menu
-            //menu_manager->pushMenu(MENUID_NETWORK_GUI);
-        }
         // Not replaying
         // =============
         if(!ProfileWorld::isProfileMode())
@@ -1524,7 +1577,7 @@ int main(int argc, char *argv[] )
                 // Quickstart (-N)
                 // ===============
                 // all defaults are set in InitTuxkart()
-                network_manager->setupPlayerKartInfo();
+                race_manager->setupPlayerKartInfo();
                 race_manager->startNew(false);
             }
         }
@@ -1533,7 +1586,7 @@ int main(int argc, char *argv[] )
             // Profiling
             // =========
             race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-            network_manager->setupPlayerKartInfo();
+            race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
         }
         main_loop->run();

@@ -114,6 +114,23 @@ namespace StringUtils
     }   // getExtension
 
     //-------------------------------------------------------------------------
+    /** Checks if the input string is not empty. ( = has characters different from a space)
+     */
+    bool notEmpty(const irr::core::stringw& input)
+    {
+        const int size = input.size();
+        int nonEmptyChars = 0;
+        for (int n=0; n<size; n++)
+        {
+            if (input[n] != L' ')
+            {
+                nonEmptyChars++;
+            }
+        }
+        return (nonEmptyChars > 0);
+    }   // getExtension
+
+    //-------------------------------------------------------------------------
     /** Returns a string converted to upper case.
      */
     std::string toUpperCase(const std::string& str)
@@ -245,6 +262,18 @@ namespace StringUtils
             exit(1);
         }
     }   // split
+
+
+    std::vector<uint32_t> splitToUInt(const std::string& s, char c, bool keepSplitChar)
+    {
+        std::vector<std::string> parts = split(s, c, keepSplitChar);
+        std::vector<uint32_t> ints;
+        for(unsigned int i = 0; i < parts.size(); ++i)
+        {
+           ints.push_back(atoi(parts[i].c_str()));
+        }
+        return ints;
+    }
 
 
     // ------------------------------------------------------------------------
@@ -695,6 +724,11 @@ namespace StringUtils
             printf("Invalid version string '%s'.\n", s.c_str());
         return version;
     }   // versionToInt
+
+    const char* boolstr(bool b)
+    {
+        return (b ? "true" : "false");
+    }
 } // namespace StringUtils
 
 

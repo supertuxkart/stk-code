@@ -486,13 +486,15 @@ namespace UserConfigParams
     // not saved to file
 
     // ---- Networking
-    PARAM_PREFIX StringUserConfigParam      m_server_address
-            PARAM_DEFAULT(  StringUserConfigParam("localhost", "server_adress",
-                                       "Information about last server used") );
     PARAM_PREFIX IntUserConfigParam         m_server_port
-            PARAM_DEFAULT(  IntUserConfigParam(2305, "server_port",
-                                       "Information about last server used") );
-
+            PARAM_DEFAULT(  IntUserConfigParam(7321, "server_port",
+                                       "Information about the port to listen on.") );
+                                       
+    PARAM_PREFIX IntUserConfigParam         m_server_max_players
+            PARAM_DEFAULT(  IntUserConfigParam(16, "server_max_players",
+                                       "Maximum number of players on the server.") );
+    
+    
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
             PARAM_DEFAULT( GroupUserConfigParam("GFX",
@@ -614,9 +616,48 @@ namespace UserConfigParams
         PARAM_DEFAULT( WStringUserConfigParam(L"", "default_player",
                                               "Which player to use by default (if empty, will prompt)") );
 
+    // ---- Internet related
+
+    PARAM_PREFIX IntUserConfigParam        m_internet_status
+            PARAM_DEFAULT(  IntUserConfigParam(0, "enable_internet",
+                                               "Status of internet: 0 user "
+                                               "wasn't asked, 1: allowed, 2: "
+                                               "not allowed") );
+
+    // ---- Online gameplay related
+
+    PARAM_PREFIX GroupUserConfigParam       m_online_group
+            PARAM_DEFAULT( GroupUserConfigParam("OnlinePlay",
+                                          "Everything related to online play.") );
+
+    PARAM_PREFIX StringUserConfigParam      m_server_multiplayer
+            PARAM_DEFAULT( StringUserConfigParam(   "https://api.stkaddons.net/",
+                                                     "server_multiplayer",
+                                                     &m_online_group,
+                                                    "The server used for online multiplayer."));
+
+    PARAM_PREFIX BoolUserConfigParam        m_saved_session
+            PARAM_DEFAULT(  BoolUserConfigParam(    false,
+                                                    "saved_session",
+                                                    &m_online_group,
+                                                    "Is there a saved session?") );
+
+    PARAM_PREFIX IntUserConfigParam         m_saved_user
+            PARAM_DEFAULT(  IntUserConfigParam(     0,
+                                                    "saved_user",
+                                                    &m_online_group,
+                                                    "User ID of the saved session.") );
+
+    PARAM_PREFIX StringUserConfigParam      m_saved_token
+            PARAM_DEFAULT(  StringUserConfigParam(  "",
+                                                    "saved_token",
+                                                    &m_online_group,
+                                                    "Token of the saved session.") );
+
+
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
-        PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews",
+            PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews",
                                           "Addon and news related settings") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_addons
@@ -646,13 +687,6 @@ namespace UserConfigParams
                                                &m_addon_group,
                                                "Don't show important message "
                                                "with this or a lower id again") );
-
-    PARAM_PREFIX IntUserConfigParam        m_internet_status
-            PARAM_DEFAULT(  IntUserConfigParam(0, "enable_internet",
-                                               &m_addon_group,
-                                               "Status of internet: 0 user "
-                                               "wasn't asked, 1: allowed, 2: "
-                                               "not allowed") );
 
     PARAM_PREFIX TimeUserConfigParam        m_addons_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "addon_last_updated",

@@ -39,15 +39,17 @@ using namespace irr;
 LabelWidget::LabelWidget(bool title, bool bright) : Widget(WTYPE_LABEL)
 {
     m_title_font   = title;
-    m_has_color    = false;
     m_scroll_speed = 0;
     m_scroll_offset = 0;
+    m_bright = bright;
 
-    if (bright)
+    if (m_bright)
     {
         m_has_color = true;
         m_color = Skin::getColor("brighttext::neutral");
     }
+    else
+        m_has_color = false;
 }   // LabelWidget
 
 // ----------------------------------------------------------------------------
@@ -131,7 +133,6 @@ void LabelWidget::setText(const wchar_t *text, bool expandIfNeeded)
     if (expandIfNeeded)
     {
         assert(m_element != NULL);
-
         const int fwidth = (m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont())->getDimension(text).Width;
         core::rect<s32> rect = m_element->getRelativePosition();
 
@@ -173,7 +174,6 @@ bool LabelWidget::scrolledOff() const
 {
     // This method may only be called after this widget has been add()ed
     assert(m_element != NULL);
-
     return m_scroll_offset <= -m_element->getAbsolutePosition().getWidth();
 }
 
@@ -185,3 +185,38 @@ void LabelWidget::setScrollSpeed(float speed)
     m_scroll_speed  = speed;
 }   // setScrollSpeed
 
+// ----------------------------------------------------------------------------
+
+void LabelWidget::setColor(const irr::video::SColor& color)
+{
+    assert(m_element != NULL);
+    m_color = color;
+    m_has_color = true;
+    ((IGUIStaticText*)m_element)->setOverrideColor(m_color);
+}
+// ----------------------------------------------------------------------------
+
+void LabelWidget::setErrorColor()
+{
+    setColor(irr::video::SColor(255, 255, 0, 0));
+}
+
+// ----------------------------------------------------------------------------
+
+void LabelWidget::setDefaultColor()
+{
+    if (m_bright)
+    {
+        setColor(Skin::getColor("brighttext::neutral"));
+    }
+    else
+    {
+        if(m_has_color)
+        {
+            assert(m_element != NULL);
+            m_has_color = false;
+            ((IGUIStaticText*)m_element)->enableOverrideColor(false);
+        }
+    }
+}
+// ----------------------------------------------------------------------------
