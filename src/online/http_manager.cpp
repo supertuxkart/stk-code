@@ -142,7 +142,7 @@ namespace Online{
         // thread here to cancel properly.
         //cancelAllDownloads(); FIXME if used this way it also cancels the client-quit action
         CurrentUser::get()->onSTKQuit();
-        addRequest(new Request(true, MAX_PRIORITY, Request::RT_QUIT));
+        addRequest(new Request(true, HTTP_MAX_PRIORITY, Request::RT_QUIT));
     }   // stopNetworkThread
 
 
@@ -154,7 +154,8 @@ namespace Online{
     void HTTPManager::cancelAllDownloads()
     {
         m_abort.setAtomic(true);
-        //FIXME doesn't get called at the moment. When using this again, be sure that MAX_PRIORITY requests still get executed.
+        // FIXME doesn't get called at the moment. When using this again, 
+        // be sure that HTTP_MAX_PRIORITY requests still get executed.
     }   // cancelAllDownloads
 
 

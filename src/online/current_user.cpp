@@ -712,7 +712,7 @@ namespace Online{
     {
         if(isRegisteredUser())
         {
-            HTTPRequest * request = new HTTPRequest(true, HTTPManager::MAX_PRIORITY);
+            HTTPRequest * request = new HTTPRequest(true, HTTPManager::HTTP_MAX_PRIORITY);
             request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
             request->setParameter("action", std::string("client-quit"));
             request->setParameter("token", getToken());
