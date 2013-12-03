@@ -56,8 +56,6 @@ BattleAI::BattleAI(AbstractKart *kart,
         m_track           = NULL;
     }
 
-    updateCurrentNode(); 
-
     // Don't call our own setControllerName, since this will add a
     // billboard showing 'AIBaseController' to the kar.
     Controller::setControllerName("BattleAI");
@@ -66,9 +64,9 @@ BattleAI::BattleAI(AbstractKart *kart,
 
 void BattleAI::update(float dt)
 {
-    m_controls->m_accel     = 0.65f;
+    m_controls->m_accel     = 0.45f;
  //   m_controls->m_steer     = 0;
-    updateCurrentNode();
+   // updateCurrentNode();
  
     handleSteering(dt);
 }
@@ -79,22 +77,13 @@ void BattleAI::reset()
     m_current_node = BattleGraph::UNKNOWN_POLY;
 }
 
+/*
 void BattleAI::updateCurrentNode()
 {
-    //std::cout<<"Current Node \t"<< m_current_node << std::endl;
+    std::cout<<"Current Node \t"<< m_current_node << std::endl;
 
     // if unknown location, search everywhere
-    if(m_current_node == BattleGraph::UNKNOWN_POLY)
-    {
-        int max_count = BattleGraph::get()->getNumNodes();
-        for(unsigned int i =0; i<max_count; i++)
-        {
-            const NavPoly& p = BattleGraph::get()->getPolyOfNode(i);
-            if(p.pointInPoly(m_kart->getXYZ()))
-                m_current_node = i;
-        }
-        return;
-    }
+   
 
     if(m_current_node != BattleGraph::UNKNOWN_POLY)
     {
@@ -118,10 +107,28 @@ void BattleAI::updateCurrentNode()
                     BattleGraph::get()->getPolyOfNode(adjacents[i]);
             if(p_temp.pointInPoly(m_kart->getXYZ())) m_current_node = adjacents[i];
         }
-        return;
+        
     }
-}
 
+    if(m_current_node == BattleGraph::UNKNOWN_POLY)
+    {
+        int max_count = BattleGraph::get()->getNumNodes();
+        //float min_dist = 9999.99f;
+        for(unsigned int i =0; i<max_count; i++)
+        {
+            const NavPoly& p = BattleGraph::get()->getPolyOfNode(i);
+            if((p.pointInPoly(m_kart->getXYZ())))
+            {
+                m_current_node = i;
+                //min_dist = (p.getCenter() - m_kart->getXYZ()).length_2d();
+            }
+        }
+        
+    }
+
+    return;
+}
+*/
 
 void BattleAI::handleSteering(const float dt)
 {
@@ -134,7 +141,7 @@ void BattleAI::handleSteering(const float dt)
             if(p.pointInPoly(kart->getXYZ()))
                 player_node = i;
         }
-    
+    std::cout<<"PLayer node " << player_node<<" This cpu kart node" << m_current_node<<std::endl;
     if(player_node == BattleGraph::UNKNOWN_POLY || m_current_node == BattleGraph::UNKNOWN_POLY) return;
     int next_node = BattleGraph::get()->getNextShortestPathPoly(m_current_node, player_node);
     if(next_node == -1) return;

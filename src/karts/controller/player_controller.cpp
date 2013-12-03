@@ -37,6 +37,7 @@
 #include "modes/world.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "tracks/battle_graph.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -93,6 +94,7 @@ void PlayerController::reset()
     m_prev_accel   = 0;
     m_prev_nitro   = false;
     m_penalty_time = 0;
+    m_current_node = BattleGraph::UNKNOWN_POLY;
 }   // reset
 
 // ----------------------------------------------------------------------------

@@ -26,6 +26,8 @@
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/battle_ai.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "physics/physics.hpp"
@@ -298,6 +300,8 @@ void ThreeStrikesBattle::update(float dt)
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
 
+    updateKartNodes();
+
     core::vector3df tire_offset;
     std::string tire;
     float scale = 0.5f;
@@ -431,6 +435,121 @@ bool ThreeStrikesBattle::isRaceOver()
 
     return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
 }   // isRaceOver
+
+//-----------------------------------------------------------------------------
+/** Updates the m_current_node value of each kart controller to localize it  
+ *  on the navigation mesh.
+ */
+void ThreeStrikesBattle::updateKartNodes()
+{
+
+    const unsigned int n = getNumKarts();
+    for(unsigned int i=0; i<n; i++)
+    {
+        if(m_karts[i]->isEliminated()) continue;
+
+        const AbstractKart* kart = m_karts[i];
+        
+        if(!kart->getController()->isPlayerController())
+        {
+                BattleAI* controller = (BattleAI*)(kart->getController());
+    
+
+                if(controller->getCurrentNode()!= BattleGraph::UNKNOWN_POLY)
+                {
+                    //check if the kart is still on the same node
+                    const NavPoly& p = BattleGraph::get()->getPolyOfNode(controller->getCurrentNode());
+                    if(p.pointInPoly(kart->getXYZ())) return;
+
+                    //if not then check all adjacent polys
+                    const std::vector<int>& adjacents = 
+                        NavMesh::get()->getAdjacentPolys(controller->getCurrentNode());
+        
+                    // Set m_current_node to unknown so that if no adjacent poly checks true
+                    // we look everywhere the next time updateCurrentNode is called. This is
+                    // useful in cases when you are "teleported" to some other poly, ex. rescue
+                   controller->setCurrentNode(BattleGraph::UNKNOWN_POLY);
+        
+        
+                    for(unsigned int i=0; i<adjacents.size(); i++)
+                    {
+                        const NavPoly& p_temp = 
+                                BattleGraph::get()->getPolyOfNode(adjacents[i]);
+                        if(p_temp.pointInPoly(kart->getXYZ())) 
+                            controller->setCurrentNode(adjacents[i]);
+                    }
+        
+                 }
+
+                if(controller->getCurrentNode() == BattleGraph::UNKNOWN_POLY)
+                {
+                    unsigned int max_count = BattleGraph::get()->getNumNodes();
+                    //float min_dist = 9999.99f;
+                    for(unsigned int i =0; i<max_count; i++)
+                    {
+                        const NavPoly& p = BattleGraph::get()->getPolyOfNode(i);
+                        if((p.pointInPoly(kart->getXYZ())))
+                        {
+                            controller->setCurrentNode(i);
+                            //m_current_node = i;
+                            //min_dist = (p.getCenter() - m_kart->getXYZ()).length_2d();
+                        }
+                    }
+        
+                }
+
+        }
+        else
+        {
+            PlayerController* controller = (PlayerController*)(kart->getController());
+    
+
+                if(controller->getCurrentNode()!= BattleGraph::UNKNOWN_POLY)
+                {
+                    //check if the kart is still on the same node
+                    const NavPoly& p = BattleGraph::get()->getPolyOfNode(controller->getCurrentNode());
+                    if(p.pointInPoly(kart->getXYZ())) return;
+
+                    //if not then check all adjacent polys
+                    const std::vector<int>& adjacents = 
+                        NavMesh::get()->getAdjacentPolys(controller->getCurrentNode());
+        
+                    // Set m_current_node to unknown so that if no adjacent poly checks true
+                    // we look everywhere the next time updateCurrentNode is called. This is
+                    // useful in cases when you are "teleported" to some other poly, ex. rescue
+                   controller->setCurrentNode(BattleGraph::UNKNOWN_POLY);
+        
+        
+                    for(unsigned int i=0; i<adjacents.size(); i++)
+                    {
+                        const NavPoly& p_temp = 
+                                BattleGraph::get()->getPolyOfNode(adjacents[i]);
+                        if(p_temp.pointInPoly(kart->getXYZ())) 
+                            controller->setCurrentNode(adjacents[i]);
+                    }
+        
+                 }
+
+                if(controller->getCurrentNode() == BattleGraph::UNKNOWN_POLY)
+                {
+                    unsigned int max_count = BattleGraph::get()->getNumNodes();
+                    //float min_dist = 9999.99f;
+                    for(unsigned int i =0; i<max_count; i++)
+                    {
+                        const NavPoly& p = BattleGraph::get()->getPolyOfNode(i);
+                        if((p.pointInPoly(kart->getXYZ())))
+                        {
+                            controller->setCurrentNode(i);
+                            //m_current_node = i;
+                            //min_dist = (p.getCenter() - m_kart->getXYZ()).length_2d();
+                        }
+                    }
+        
+                }
+        }
+    }
+}
+
 
 //-----------------------------------------------------------------------------
 /** Called when the race finishes, i.e. after playing (if necessary) an

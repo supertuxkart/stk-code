@@ -48,7 +48,7 @@ private:
 
     int m_current_node;
 
-    void updateCurrentNode();
+    //void updateCurrentNode();
     void handleAcceleration(const float dt) {};
     void handleSteering(const float dt);
     void handleBraking() {};
@@ -65,7 +65,8 @@ public:
                 BattleAI(AbstractKart *kart, 
                     StateManager::ActivePlayer *player=NULL);
                 //~BattleAI();
-    unsigned int getCurrentNode() const { return m_current_node; } 
+    unsigned int getCurrentNode() const { return m_current_node; }
+    void         setCurrentNode(int i)  { m_current_node = i;   } 
     virtual void update      (float delta);
     virtual void reset       ();
     
