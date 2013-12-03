@@ -72,7 +72,7 @@
     );
     typedef DWORD (__stdcall *tUnDecorateSymbolName)(
         _In_ PCSTR name,
-        _Out_writes_(maxStringLength) PSTR outputString,
+        _Out_ PSTR outputString,
         _In_ DWORD maxStringLength,
         _In_ DWORD flags
     );
