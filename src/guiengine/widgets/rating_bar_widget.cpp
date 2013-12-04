@@ -25,7 +25,7 @@
 #include <IGUIButton.h>
 #include <cmath>
 
-#if defined(WIN32) && _MSC_VER < 1700
+#if defined(WIN32) && _MSC_VER < 1800
 // VS up to and including VS 2012 do not provide the normal round function
 static inline float round(float val)
 {    
