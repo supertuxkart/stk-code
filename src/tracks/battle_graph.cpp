@@ -17,7 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, B
 
 #include "tracks/battle_graph.hpp"
-
+#include <iostream>
 
 #include <IMesh.h>
 #include <ICameraSceneNode.h>
@@ -44,7 +44,7 @@ void BattleGraph::buildGraph(NavMesh* navmesh)
 {
     unsigned int n_polys = navmesh->getNumberOfPolys();
     //m_graph.resize(n_polys);
-    m_distance_matrix = std::vector< std::vector<float>> (n_polys, std::vector<float>(n_polys, 999.9f));
+    m_distance_matrix = std::vector< std::vector<float>> (n_polys, std::vector<float>(n_polys, 9999.9f));
     for(unsigned int i=0; i<n_polys; i++)
     {
         NavPoly currentPoly = navmesh->getNavPoly(i);
@@ -56,25 +56,45 @@ void BattleGraph::buildGraph(NavMesh* navmesh)
             //m_graph[i].push_back(std::make_pair(adjacents[j], distance));
 
             m_distance_matrix[i][adjacents[j]] = distance;
+            //m_distance_matrix[adjacents[j]][i] = distance;
 
         }
         m_distance_matrix[i][i] = 0.0f;
     }
-
+    
+        for(int i=0; i<n_polys; i++)
+        for(int j=0; j<n_polys; j++)
+        {
+            if(fabsf(m_distance_matrix[i][j]-m_distance_matrix[j][i])>0.1)
+            {
+                int d;
+                std::cout<<"messed up";
+                std::cin>>d;
+            }
+}
 }
 
-
-// computes all pair shortest path
-// iteratively updates the m_next_poly
+/** computeFloydWarshall() computes the shortest distance between any two nodes.
+ *  At the end of the computation, m_distance_matrix[i][j] stores the shortest path
+ *  distance from i to j and m_parent_poly[i][j] stores the last vertex visited on the 
+ *  shortest path from i to j before visiting j. Suppose the shortest path from i to j is
+ *  i->......->k->j  then m_parent_poly[i][j] = k
+ */
 void BattleGraph::computeFloydWarshall()
 {
     int n = getNumNodes();
     
-    // initialize m_next_poly with unknown_poly so that if no path is found b/w i and j
-    // then m_next_poly[i][j] = -1 (UNKNOWN_POLY)
+    // initialize m_parent_poly with unknown_poly so that if no path is found b/w i and j
+    // then m_parent_poly[i][j] = -1 (UNKNOWN_POLY)
     // AI must check this
-    m_next_poly = std::vector< std::vector<int>> (n, std::vector<int>(n,BattleGraph::UNKNOWN_POLY));
-   
+    m_parent_poly = std::vector< std::vector<int>> (n, std::vector<int>(n,BattleGraph::UNKNOWN_POLY));
+    for(unsigned int i=0; i<n; i++)
+        for(unsigned int j=0; j<n; j++)
+        {
+            if(i == j || m_distance_matrix[i][j]>=9899.9f) m_parent_poly[i][j]=-1;
+            else    m_parent_poly[i][j] = i;
+        }
+
     for(unsigned int k=0; k<n; k++)
     {
         for(unsigned int i=0; i<n; i++)
@@ -84,12 +104,13 @@ void BattleGraph::computeFloydWarshall()
                 if( (m_distance_matrix[i][k] + m_distance_matrix[k][j]) < m_distance_matrix[i][j])
                 {
                     m_distance_matrix[i][j] = m_distance_matrix[i][k] + m_distance_matrix[k][j];
-                    m_next_poly[i][j] = k;
+                    m_parent_poly[i][j] = m_parent_poly[k][j];
                 }
-                else if((m_distance_matrix[i][k] + m_distance_matrix[k][j]) == m_distance_matrix[i][j])
+               /* else if((m_distance_matrix[i][k] + m_distance_matrix[k][j]) == m_distance_matrix[i][j])
                 {
-                    m_next_poly[i][j]= j;
+                    m_parent_poly[i][j]= j;
                 }
+                */
             }
         }
     }

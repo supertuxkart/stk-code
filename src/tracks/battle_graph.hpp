@@ -44,7 +44,7 @@ private:
 
     std::vector< std::vector< std::pair<int,float> > > m_graph;
     std::vector< std::vector< float > > m_distance_matrix;
-    std::vector< std::vector< int > > m_next_poly;
+    std::vector< std::vector< int > > m_parent_poly;
      /** For debug mode only: the node of the debug mesh. */
     scene::ISceneNode       *m_node;
     /** For debug only: the mesh of the debug mesh. */
@@ -91,7 +91,7 @@ public:
                                         { return NavMesh::get()->getNavPoly(i); }
 
     const int & getNextShortestPathPoly(int i, int j) const 
-                                        { return m_next_poly[i][j]; }
+                                        { return m_parent_poly[j][i]; }
 
     void            createDebugMesh();
     void            cleanupDebugMesh();
