@@ -49,57 +49,63 @@ RTT::RTT()
     //
     // Optionally, the collapse ones use a smaller format.
 
-    rtts[RTT_TMP1] = drv->addRenderTargetTexture(res, "rtt.tmp1", ECF_A8R8G8B8, true);
-    rtts[RTT_TMP2] = drv->addRenderTargetTexture(res, "rtt.tmp2", ECF_A8R8G8B8, true);
-    rtts[RTT_TMP3] = drv->addRenderTargetTexture(res, "rtt.tmp3", ECF_A8R8G8B8, true);
-    rtts[RTT_TMP4] = drv->addRenderTargetTexture(res, "rtt.tmp4", ECF_A8R8G8B8, true);
-    rtts[RTT_DEPTH] = drv->addRenderTargetTexture(res, "rtt.depth", ECF_A8R8G8B8, true);
-    rtts[RTT_NORMAL] = drv->addRenderTargetTexture(res, "rtt.normal", ECF_A8R8G8B8, true);
-    rtts[RTT_COLOR] = drv->addRenderTargetTexture(res, "rtt.color", ECF_A8R8G8B8, true);
+    // Work around for intel hd3000 cards :(
+#ifdef DONT_USE_STENCILS
+    bool stencil = false;
+#else
+    bool stencil = true;
+#endif
+    rtts[RTT_TMP1] = drv->addRenderTargetTexture(res, "rtt.tmp1", ECF_A8R8G8B8, stencil);
+    rtts[RTT_TMP2] = drv->addRenderTargetTexture(res, "rtt.tmp2", ECF_A8R8G8B8, stencil);
+    rtts[RTT_TMP3] = drv->addRenderTargetTexture(res, "rtt.tmp3", ECF_A8R8G8B8, stencil);
+    rtts[RTT_TMP4] = drv->addRenderTargetTexture(res, "rtt.tmp4", ECF_A8R8G8B8, stencil);
+    rtts[RTT_DEPTH] = drv->addRenderTargetTexture(res, "rtt.depth", ECF_A8R8G8B8, stencil);
+    rtts[RTT_NORMAL] = drv->addRenderTargetTexture(res, "rtt.normal", ECF_A8R8G8B8, stencil);
+    rtts[RTT_COLOR] = drv->addRenderTargetTexture(res, "rtt.color", ECF_A8R8G8B8, stencil);
 
-    rtts[RTT_HALF1] = drv->addRenderTargetTexture(half, "rtt.half1", ECF_A8R8G8B8, true);
-    rtts[RTT_HALF2] = drv->addRenderTargetTexture(half, "rtt.half2", ECF_A8R8G8B8, true);
+    rtts[RTT_HALF1] = drv->addRenderTargetTexture(half, "rtt.half1", ECF_A8R8G8B8, stencil);
+    rtts[RTT_HALF2] = drv->addRenderTargetTexture(half, "rtt.half2", ECF_A8R8G8B8, stencil);
 
-    rtts[RTT_QUARTER1] = drv->addRenderTargetTexture(quarter, "rtt.q1", ECF_A8R8G8B8, true);
-    rtts[RTT_QUARTER2] = drv->addRenderTargetTexture(quarter, "rtt.q2", ECF_A8R8G8B8, true);
-    rtts[RTT_QUARTER3] = drv->addRenderTargetTexture(quarter, "rtt.q3", ECF_A8R8G8B8, true);
+    rtts[RTT_QUARTER1] = drv->addRenderTargetTexture(quarter, "rtt.q1", ECF_A8R8G8B8, stencil);
+    rtts[RTT_QUARTER2] = drv->addRenderTargetTexture(quarter, "rtt.q2", ECF_A8R8G8B8, stencil);
+    rtts[RTT_QUARTER3] = drv->addRenderTargetTexture(quarter, "rtt.q3", ECF_A8R8G8B8, stencil);
 
-    rtts[RTT_EIGHTH1] = drv->addRenderTargetTexture(eighth, "rtt.e1", ECF_A8R8G8B8, true);
-    rtts[RTT_EIGHTH2] = drv->addRenderTargetTexture(eighth, "rtt.e2", ECF_A8R8G8B8, true);
+    rtts[RTT_EIGHTH1] = drv->addRenderTargetTexture(eighth, "rtt.e1", ECF_A8R8G8B8, stencil);
+    rtts[RTT_EIGHTH2] = drv->addRenderTargetTexture(eighth, "rtt.e2", ECF_A8R8G8B8, stencil);
 
-    rtts[RTT_SIXTEENTH1] = drv->addRenderTargetTexture(sixteenth, "rtt.s1", ECF_A8R8G8B8, true);
-    rtts[RTT_SIXTEENTH2] = drv->addRenderTargetTexture(sixteenth, "rtt.s2", ECF_A8R8G8B8, true);
+    rtts[RTT_SIXTEENTH1] = drv->addRenderTargetTexture(sixteenth, "rtt.s1", ECF_A8R8G8B8, stencil);
+    rtts[RTT_SIXTEENTH2] = drv->addRenderTargetTexture(sixteenth, "rtt.s2", ECF_A8R8G8B8, stencil);
 
-    rtts[RTT_SSAO1] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao1", ECF_A8R8G8B8, true);
-    rtts[RTT_SSAO2] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao2", ECF_A8R8G8B8, true);
+    rtts[RTT_SSAO1] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao1", ECF_A8R8G8B8, stencil);
+    rtts[RTT_SSAO2] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao2", ECF_A8R8G8B8, stencil);
 
-    rtts[RTT_SHADOW] = drv->addRenderTargetTexture(shadowsize, "rtt.shadow", ECF_A8R8G8B8, true);
-    rtts[RTT_WARPV] = drv->addRenderTargetTexture(warpvsize, "rtt.warpv", ECF_A8R8G8B8, true);
-    rtts[RTT_WARPH] = drv->addRenderTargetTexture(warphsize, "rtt.warph", ECF_A8R8G8B8, true);
+    rtts[RTT_SHADOW] = drv->addRenderTargetTexture(shadowsize, "rtt.shadow", ECF_A8R8G8B8, stencil);
+    rtts[RTT_WARPV] = drv->addRenderTargetTexture(warpvsize, "rtt.warpv", ECF_A8R8G8B8, stencil);
+    rtts[RTT_WARPH] = drv->addRenderTargetTexture(warphsize, "rtt.warph", ECF_A8R8G8B8, stencil);
 
-    rtts[RTT_DISPLACE] = drv->addRenderTargetTexture(res, "rtt.displace", ECF_A8R8G8B8, true);
+    rtts[RTT_DISPLACE] = drv->addRenderTargetTexture(res, "rtt.displace", ECF_A8R8G8B8, stencil);
 
     if (((COpenGLDriver *) drv)->queryOpenGLFeature(COpenGLDriver::IRR_ARB_texture_rg))
     {
         // Use optimized formats if supported
-        rtts[RTT_COLLAPSE] = drv->addRenderTargetTexture(shadowsize, "rtt.collapse", ECF_R8, true);
+        rtts[RTT_COLLAPSE] = drv->addRenderTargetTexture(shadowsize, "rtt.collapse", ECF_R8, stencil);
 
-        rtts[RTT_COLLAPSEV] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev", ECF_R8, true);
-        rtts[RTT_COLLAPSEH] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh", ECF_R8, true);
-        rtts[RTT_COLLAPSEV2] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev2", ECF_R8, true);
-        rtts[RTT_COLLAPSEH2] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh2", ECF_R8, true);
+        rtts[RTT_COLLAPSEV] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev", ECF_R8, stencil);
+        rtts[RTT_COLLAPSEH] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh", ECF_R8, stencil);
+        rtts[RTT_COLLAPSEV2] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev2", ECF_R8, stencil);
+        rtts[RTT_COLLAPSEH2] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh2", ECF_R8, stencil);
 
-        rtts[RTT_HALF_SOFT] = drv->addRenderTargetTexture(half, "rtt.halfsoft", ECF_R8, true);
+        rtts[RTT_HALF_SOFT] = drv->addRenderTargetTexture(half, "rtt.halfsoft", ECF_R8, stencil);
     } else
     {
-        rtts[RTT_COLLAPSE] = drv->addRenderTargetTexture(shadowsize, "rtt.collapse", ECF_A8R8G8B8, true);
+        rtts[RTT_COLLAPSE] = drv->addRenderTargetTexture(shadowsize, "rtt.collapse", ECF_A8R8G8B8, stencil);
 
-        rtts[RTT_COLLAPSEV] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev", ECF_A8R8G8B8, true);
-        rtts[RTT_COLLAPSEH] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh", ECF_A8R8G8B8, true);
-        rtts[RTT_COLLAPSEV2] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev2", ECF_A8R8G8B8, true);
-        rtts[RTT_COLLAPSEH2] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh2", ECF_A8R8G8B8, true);
+        rtts[RTT_COLLAPSEV] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev", ECF_A8R8G8B8, stencil);
+        rtts[RTT_COLLAPSEH] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh", ECF_A8R8G8B8, stencil);
+        rtts[RTT_COLLAPSEV2] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev2", ECF_A8R8G8B8, stencil);
+        rtts[RTT_COLLAPSEH2] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh2", ECF_A8R8G8B8, stencil);
 
-        rtts[RTT_HALF_SOFT] = drv->addRenderTargetTexture(half, "rtt.halfsoft", ECF_A8R8G8B8, true);
+        rtts[RTT_HALF_SOFT] = drv->addRenderTargetTexture(half, "rtt.halfsoft", ECF_A8R8G8B8, stencil);
     }
 
     u32 i;
