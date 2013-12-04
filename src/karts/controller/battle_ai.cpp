@@ -18,9 +18,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#define AI_DEBUG
 
 #include "karts/controller/battle_ai.hpp"
 
+#ifdef AI_DEBUG
+#  include "graphics/irr_driver.hpp"
+#endif
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/controller/ai_properties.hpp"
@@ -33,6 +37,17 @@
 #include "tracks/nav_poly.hpp"
 #include "tracks/navmesh.hpp"
 
+#ifdef AI_DEBUG
+#  include "irrlicht.h"
+   using namespace irr;
+#endif
+
+#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
+#  define isnan _isnan
+#else
+#  include <math.h>
+#endif
+
 #include <iostream>
 
 BattleAI::BattleAI(AbstractKart *kart, 
@@ -42,6 +57,14 @@ BattleAI::BattleAI(AbstractKart *kart,
 
     reset();
     
+    #ifdef AI_DEBUG
+    
+        video::SColor col_debug(128, 128,0,0);
+        m_debug_sphere = irr_driver->addSphere(1.0f, col_debug);
+        m_debug_sphere->setVisible(true);
+        //m_item_sphere  = irr_driver->addSphere(1.0f);
+    #endif
+
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
     {
         m_world     = dynamic_cast<ThreeStrikesBattle*>(World::getWorld());
@@ -64,13 +87,20 @@ BattleAI::BattleAI(AbstractKart *kart,
 
 void BattleAI::update(float dt)
 {
-    m_controls->m_accel     = 0.45f;
+    m_controls->m_accel     = 0.25f;
  //   m_controls->m_steer     = 0;
    // updateCurrentNode();
  
     handleSteering(dt);
-}
+}   //BattleAI
 
+
+BattleAI::~BattleAI()
+{
+#ifdef AI_DEBUG
+    irr_driver->removeNode(m_debug_sphere);
+#endif
+}   //  ~BattleAI
 
 void BattleAI::reset()
 {
@@ -145,8 +175,14 @@ void BattleAI::handleSteering(const float dt)
     if(player_node == BattleGraph::UNKNOWN_POLY || m_current_node == BattleGraph::UNKNOWN_POLY) return;
     int next_node = BattleGraph::get()->getNextShortestPathPoly(m_current_node, player_node);
     if(next_node == -1) return;
+    std::cout<<"Aiming at "<<next_node<<"\n";
     target_point = NavMesh::get()->getCenterOfPoly(next_node);
     
+#ifdef AI_DEBUG
+        m_debug_sphere->setPosition(target_point.toIrrVector());
+        Log::debug("skidding_ai","-Outside of road: steer to center point.\n");
+#endif
+
     if(player_node != m_current_node)
     setSteering(steerToPoint(target_point),dt);
     else
