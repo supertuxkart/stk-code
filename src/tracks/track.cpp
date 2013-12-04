@@ -114,6 +114,8 @@ Track::Track(const std::string &filename)
     m_mini_map              = NULL;
     m_bloom                 = true;
     m_bloom_threshold       = 0.75f;
+    m_color_inlevel         = core::vector3df(0.0,1.0, 255.0);
+    m_color_outlevel        = core::vector2df(0.0, 255.0);
     m_clouds                = false;
     m_lensflare             = false;
     m_godrays               = false;
@@ -371,6 +373,8 @@ void Track::loadTrackInfo()
     root->get("god-rays",              &m_godrays);
     root->get("displacement-speed",    &m_displacement_speed);
     root->get("caustics-speed",        &m_caustics_speed);
+    root->get("color-level-in",        &m_color_inlevel);
+    root->get("color-level-out",       &m_color_outlevel);
 
     // Make the default for auto-rescue in battle mode and soccer mode to be false
     if(m_is_arena || m_is_soccer)

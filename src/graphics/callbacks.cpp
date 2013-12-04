@@ -144,12 +144,12 @@ void GrassShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int use
 
 void ColorLevelsProvider::OnSetConstants(IMaterialRendererServices *srv, int userData)
 {
-    m_inlevel = vector3df(0.0, 0.65, 137.0);
-    m_outlevel = vector2df(0.0, 255.0);
+
+    m_inlevel = World::getWorld()->getTrack()->getColorLevelIn();
+    m_outlevel = World::getWorld()->getTrack()->getColorLevelOut();
 
     srv->setVertexShaderConstant("inlevel", &m_inlevel.X, 3);
     srv->setVertexShaderConstant("outlevel", &m_outlevel.X, 2);
-    
 
     if (!firstdone)
     {

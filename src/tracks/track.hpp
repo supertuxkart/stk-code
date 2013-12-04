@@ -380,6 +380,12 @@ private:
 
     float m_displacement_speed;
     float m_caustics_speed;
+    
+    /** The levels for color correction 
+     * m_color_inlevel(black, gamma, white)
+     * m_color_outlevel(black, white)*/
+    core::vector3df m_color_inlevel;
+    core::vector2df m_color_outlevel;
 
     /** List of all bezier curves in the track - for e.g. camera, ... */
     std::vector<BezierCurve*> m_all_curves;
@@ -583,10 +589,15 @@ public:
 
     bool getBloom() const { return m_bloom; }
     float getBloomThreshold() const { return m_bloom_threshold; }
+    
+    /** Return the color levels for color correction shader */
+    core::vector3df getColorLevelIn() const { return m_color_inlevel; }
+    core::vector2df getColorLevelOut() const { return m_color_outlevel; }
 
     bool hasLensFlare() const { return m_lensflare; }
     bool hasGodRays() const { return m_godrays; }
     bool hasShadows() const { return m_shadows; }
+    
 
     float getDisplacementSpeed() const { return m_displacement_speed; }
     float getCausticsSpeed() const { return m_caustics_speed; }
