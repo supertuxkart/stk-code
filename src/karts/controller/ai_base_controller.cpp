@@ -28,6 +28,7 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
+bool AIBaseController::m_ai_debug = true;
 
 AIBaseController::AIBaseController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player)

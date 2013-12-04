@@ -83,8 +83,7 @@ protected:
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */
     bool     isStuck() const { return m_stuck_trigger_rescue; }
-
-    static bool m_ai_debug;
+    
 public:
              AIBaseLapController(AbstractKart *kart,
                               StateManager::ActivePlayer *player=NULL);

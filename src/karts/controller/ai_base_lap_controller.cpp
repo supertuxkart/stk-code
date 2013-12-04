@@ -29,7 +29,6 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-bool AIBaseLapController::m_ai_debug = false;
 
 /**
 This is the base class for all AIs. At this stage there are two similar

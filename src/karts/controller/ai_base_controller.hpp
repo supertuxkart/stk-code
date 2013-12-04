@@ -21,6 +21,7 @@
 #include "karts/controller/controller.hpp"
 #include "states_screens/state_manager.hpp"
 
+
 class AIProperties;
 class LinearWorld;
 class ThreeStrikesBattle;
@@ -60,6 +61,7 @@ protected:
     float   steerToPoint(const Vec3 &point);
     float    normalizeAngle(float angle);
     virtual bool doSkid(float steer_fraction);
+    static bool m_ai_debug;
 
 public:
     
