@@ -741,7 +741,7 @@ void PostProcessing::render()
             m_material.setTexture(0, irr_driver->getRTT(RTT_SHADOW));
         } else
         {
-            m_material.MaterialType = irr_driver->getShader(ES_FLIP);
+            m_material.MaterialType = irr_driver->getShader(ES_COLOR_LEVELS);
             m_material.setTexture(0, in);
         }
 

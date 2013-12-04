@@ -45,6 +45,7 @@ Shaders::Shaders()
     m_callbacks[ES_SPLATTING] = new SplattingProvider();
     m_callbacks[ES_WATER] = new WaterShaderProvider();
     m_callbacks[ES_GRASS] = new GrassShaderProvider();
+    m_callbacks[ES_COLOR_LEVELS] = new ColorLevelsProvider();
     m_callbacks[ES_BUBBLES] = new BubbleEffectProvider();
     m_callbacks[ES_RAIN] = new RainEffectProvider();
     m_callbacks[ES_SNOW] = new SnowEffectProvider();
@@ -126,6 +127,9 @@ Shaders::Shaders()
                                     0, EMT_SOLID);
     m_shaders[ES_FLIP_ADDITIVE] = glslmat(std::string(""), dir + "flip.frag",
                                     0, EMT_TRANSPARENT_ADD_COLOR);
+                                    
+    m_shaders[ES_COLOR_LEVELS] = glslmat(std::string(""), dir + "color_levels.frag",
+                                    m_callbacks[ES_COLOR_LEVELS], EMT_SOLID);
 
     m_shaders[ES_BLOOM] = glslmat(std::string(""), dir + "bloom.frag",
                                     m_callbacks[ES_BLOOM], EMT_SOLID);

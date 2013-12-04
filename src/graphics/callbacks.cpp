@@ -142,6 +142,26 @@ void GrassShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int use
 
 //-------------------------------------
 
+void ColorLevelsProvider::OnSetConstants(IMaterialRendererServices *srv, int userData)
+{
+    m_inlevel = vector3df(0.0, 0.65, 137.0);
+    m_outlevel = vector2df(0.0, 255.0);
+
+    srv->setVertexShaderConstant("inlevel", &m_inlevel.X, 3);
+    srv->setVertexShaderConstant("outlevel", &m_outlevel.X, 2);
+    
+
+    if (!firstdone)
+    {
+        s32 tex = 0;
+        srv->setVertexShaderConstant("tex", &tex, 1);
+
+        firstdone = true;
+    }
+}
+
+//-------------------------------------
+
 void SplattingProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     const float camfar = irr_driver->getSceneManager()->getActiveCamera()->getFarValue();

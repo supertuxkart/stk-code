@@ -40,6 +40,7 @@ using namespace irr;
     ACT(ES_MIPVIZ) \
     ACT(ES_FLIP) \
     ACT(ES_FLIP_ADDITIVE) \
+    ACT(ES_COLOR_LEVELS) \
     ACT(ES_BLOOM) \
     ACT(ES_GAUSSIAN6H) \
     ACT(ES_GAUSSIAN6V) \
