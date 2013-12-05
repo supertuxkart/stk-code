@@ -120,6 +120,7 @@
 #  ifdef __CYGWIN__
 #    include <unistd.h>
 #  endif
+#  define WIN32_LEAN_AND_MEAN
 #  define _WINSOCKAPI_
 #  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
@@ -170,6 +171,12 @@
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
+#include "network/client_network_manager.hpp"
+#include "network/server_network_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "online/current_user.hpp"
+#include "online/http_manager.hpp"
 #include "network/client_network_manager.hpp"
 #include "network/server_network_manager.hpp"
 #include "network/protocol_manager.hpp"
@@ -1147,6 +1154,7 @@ int handleCmdLine(int argc, char **argv)
         irr::core::stringw s;
         Online::CurrentUser::SignInRequest* request =
                 Online::CurrentUser::get()->requestSignIn(login, password, false, false);
+
         Online::HTTPManager::get()->synchronousRequest(request);
 
         if (request->isSuccess())
@@ -1425,6 +1433,9 @@ int main(int argc, char *argv[] )
         // load the network manager
         // If the server has been created (--server option), this will do nothing (just a warning):
         NetworkManager::getInstance<ClientNetworkManager>();
+        if (NetworkManager::getInstance()->isServer())
+            ServerNetworkManager::getInstance()->setMaxPlayers(
+                    UserConfigParams::m_server_max_players);
         NetworkManager::getInstance()->run();
         if (NetworkManager::getInstance()->isServer())
         {
@@ -1453,11 +1464,8 @@ int main(int argc, char *argv[] )
                     if (players[n].getName() == UserConfigParams::m_default_player.toString())
                         unlock_manager->setCurrentSlot(players[n].getUniqueID());
 
-            main_loop->run();
-            throw "salut";
         }
-
-        if(!UserConfigParams::m_no_start_screen)
+        else if(!UserConfigParams::m_no_start_screen)
         {
             StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
 #ifdef ENABLE_WIIUSE
@@ -1616,6 +1624,7 @@ int main(int argc, char *argv[] )
     // so we don't crash later when StateManager tries to access input devices.
     StateManager::get()->resetActivePlayers();
     if(input_manager) delete input_manager; // if early crash avoid delete NULL
+    NetworkManager::getInstance()->abort();
 
     cleanSuperTuxKart();
 

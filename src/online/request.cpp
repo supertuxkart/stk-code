@@ -24,6 +24,8 @@
 #  include <winsock2.h>
 #endif
 
+#include <curl/curl.h>
+
 #include <assert.h>
 
 
@@ -162,8 +164,8 @@ namespace Online{
             setProgress(1.0f);
         else
             setProgress(-1.0f);
-        curl_easy_cleanup(m_curl_session);
         Request::afterOperation();
+        curl_easy_cleanup(m_curl_session);
     }
 
     size_t HTTPRequest::WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -261,8 +263,6 @@ namespace Online{
     {
         if(m_curl_code != CURLE_OK)
             Log::error( "XMLRequest::afterOperation", "curl_easy_perform() failed: %s", curl_easy_strerror(m_curl_code));
-        else
-            Log::info(  "XMLRequest::afterOperation", "Received : %s",                  m_string_buffer.c_str());
         bool success = false;
         std::string rec_success;
         if(m_result->get("success", &rec_success))

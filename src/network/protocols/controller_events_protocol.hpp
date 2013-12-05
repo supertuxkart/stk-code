@@ -16,8 +16,8 @@ class ControllerEventsProtocol : public Protocol
         ControllerEventsProtocol();
         virtual ~ControllerEventsProtocol();
 
+        virtual bool notifyEventAsynchronous(Event* event);
         virtual void setup();
-        virtual void notifyEvent(Event* event);
         virtual void update();
         virtual void asynchronousUpdate() {}
 

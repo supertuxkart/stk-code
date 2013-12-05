@@ -27,8 +27,8 @@ class GetPublicAddress : public Protocol
         GetPublicAddress(CallbackObject* callback_object);
         virtual ~GetPublicAddress();
 
-        virtual void notifyEvent(Event* event);
-
+        virtual bool notifyEvent(Event* event) { return true; }
+        virtual bool notifyEventAsynchronous(Event* event) { return true; }
         virtual void setup();
         virtual void update() {}
         virtual void asynchronousUpdate();
@@ -44,6 +44,8 @@ class GetPublicAddress : public Protocol
         STATE m_state;
         uint32_t m_stun_tansaction_id[3];
         static const uint32_t m_stun_magic_cookie = 0x2112A442;
+        uint32_t m_stun_server_ip;
+        STKHost* m_transaction_host;
 };
 
 #endif // GET_PUBLIC_ADDRESS_HPP

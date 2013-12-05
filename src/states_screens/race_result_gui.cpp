@@ -40,7 +40,11 @@
 #include "race/highscores.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/networking_lobby.hpp"
+#include "states_screens/network_kart_selection.hpp"
+#include "states_screens/online_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"
+#include "states_screens/server_selection.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -103,6 +107,25 @@ void RaceResultGUI::enableAllButtons()
     {
         enableGPProgress();
     }
+
+    // If we're in a network world, change the buttons text
+    if (World::getWorld()->isNetworkWorld())
+    {
+        Log::info("This work was networked", "This is a network world.");
+        top->setVisible(false);
+        middle->setText( _("Continue.") );
+        middle->setVisible(true);
+        middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        bottom->setText( _("Quit the server.") );
+        bottom->setVisible(true);
+        if (race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
+        {
+            middle->setVisible(false); // you have to wait the server to start again
+            bottom->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        }
+        return;
+    }
+    Log::info("This work was NOT networked", "This is NOT a network world.");
 
     // If something was unlocked
     // -------------------------
@@ -223,6 +246,30 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         assert(false);
     }
 
+    // If we're playing online :
+    if (World::getWorld()->isNetworkWorld())
+    {
+        StateManager::get()->popMenu();
+        if (name == "middle") // Continue button (return to server lobby)
+        {
+            race_manager->exitRace();
+            race_manager->setAIKartOverride("");
+            Screen* newStack[] = {MainMenuScreen::getInstance(),
+                                  OnlineScreen::getInstance(),
+                                  ServerSelection::getInstance(),
+                                  NetworkingLobby::getInstance(),
+                                  NULL};
+            StateManager::get()->resetAndSetStack( newStack );
+        }
+        if (name == "bottom") // Quit server (return to main menu)
+        {
+            race_manager->exitRace();
+            race_manager->setAIKartOverride("");
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        }
+        return;
+    }
+
     // Next check for GP
     // -----------------
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
@@ -254,6 +301,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         race_manager->exitRace();
         race_manager->setAIKartOverride("");
+        NetworkKartSelectionScreen::getInstance()->tearDown(); // be sure to delete the kart selection screen
         Screen* newStack[] = {MainMenuScreen::getInstance(),
                               RaceSetupScreen::getInstance(),
                               NULL};
@@ -267,6 +315,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         race_manager->exitRace();
         race_manager->setAIKartOverride("");
+        NetworkKartSelectionScreen::getInstance()->tearDown(); // be sure to delete the kart selection screen
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 
         if (race_manager->raceWasStartedFromOverworld())

@@ -16,22 +16,39 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+/*! \file singleton.hpp
+ */
+
 #ifndef SINGLETON_HPP
 #define SINGLETON_HPP
 
 #include "utils/log.hpp"
 
+/*! \class ProtocolManager
+ *  \brief Manages the protocols at runtime.
+ *  This has been designed to allow multi-inheritance. This is advised to
+ *  re-declare getInstance, but whithout templates parameters in the inheriting
+ *  classes.
+ */
 template <typename T>
 class Singleton
 {
     protected:
+        /*! \brief Constructor */
         Singleton () { m_singleton = NULL; }
+        /*! \brief Destructor */
         virtual ~Singleton ()
         {
             Log::info("Singleton", "Destroyed singleton.");
         }
 
     public:
+        /*! \brief Used to get the instance, after a dynamic cast.
+         *  This is important when making a double-inheritance of this class.
+         *  For example, if A is a singleton inherited by B, you can call
+         *  B::getInstance<A>() to have the instance returned as a A*.
+         *  If the cast fails, a log message will notify it.
+         */
         template<typename S>
         static S *getInstance ()
         {
@@ -43,11 +60,13 @@ class Singleton
                 Log::debug("Singleton", "THE SINGLETON HAS NOT BEEN REALOCATED, IT IS NOT OF THE REQUESTED TYPE.");
             return result;
         }
+        /*! \brief Used to get the instance. */
         static T *getInstance()
         {
-            return (dynamic_cast<T*> (m_singleton));
+            return m_singleton;
         }
 
+        /*! \brief Used to kill the singleton, if needed. */
         static void kill ()
         {
             if (m_singleton)

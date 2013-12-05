@@ -157,7 +157,6 @@ src/modes/world_with_rank.cpp
 src/network/client_network_manager.cpp
 src/network/event.cpp
 src/network/game_setup.cpp
-src/network/http_functions.cpp
 src/network/network_interface.cpp
 src/network/network_manager.cpp
 src/network/network_string.cpp
@@ -183,6 +182,7 @@ src/network/protocols/start_game_protocol.cpp
 src/network/protocols/start_server.cpp
 src/network/protocols/stop_server.cpp
 src/network/protocols/synchronization_protocol.cpp
+src/network/race_config.cpp
 src/network/server_network_manager.cpp
 src/network/stk_host.cpp
 src/network/stk_peer.cpp
@@ -480,7 +480,6 @@ src/modes/world_with_rank.hpp
 src/network/event.hpp
 src/network/client_network_manager.hpp
 src/network/game_setup.hpp
-src/network/http_functions.hpp
 src/network/network_interface.hpp
 src/network/network_manager.hpp
 src/network/network_string.hpp
@@ -506,6 +505,7 @@ src/network/protocols/start_game_protocol.hpp
 src/network/protocols/start_server.hpp
 src/network/protocols/stop_server.hpp
 src/network/protocols/synchronization_protocol.hpp
+src/network/race_config.hpp
 src/network/remote_kart_info.hpp
 src/network/server_network_manager.hpp
 src/network/singleton.hpp

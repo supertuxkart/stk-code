@@ -16,6 +16,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+/*! \file event.hpp
+ *  \brief Contains an interface to store network events, like connections,
+ *  disconnections and messages.
+ */
+
 #ifndef EVENT_HPP
 #define EVENT_HPP
 
@@ -65,11 +70,17 @@ class Event
          */
         void removeFront(int size);
 
+        /*! \brief Get a copy of the data.
+         *  \return A copy of the message data. This is empty for events like
+         *  connection or disconnections.
+         */
+        NetworkString data() const { return m_data; }
+
         EVENT_TYPE type;    //!< Type of the event.
-        NetworkString data; //!< Copy of the data passed by the event.
         STKPeer** peer;     //!< Pointer to the peer that triggered that event.
 
     private:
+        NetworkString m_data; //!< Copy of the data passed by the event.
         ENetPacket* m_packet; //!< A pointer on the ENetPacket to be deleted.
 };
 

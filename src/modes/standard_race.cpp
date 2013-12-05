@@ -21,6 +21,7 @@
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "network/network_manager.hpp"
 
 //-----------------------------------------------------------------------------
 StandardRace::StandardRace() : LinearWorld()
@@ -123,5 +124,6 @@ void StandardRace::endRaceEarly()
     } // Finish the active players
     endSetKartPositions();
     setPhase(RESULT_DISPLAY_PHASE);
-    terminateRace();
+    if (!isNetworkWorld() || NetworkManager::getInstance()->isServer())
+        terminateRace();
 } // endRaceEarly

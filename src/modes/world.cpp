@@ -118,6 +118,7 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_schedule_exit_race = false;
     m_self_destruct      = false;
     m_schedule_tutorial  = false;
+    m_is_network_world   = false;
 
     m_stop_music_when_dialog_open = true;
 
@@ -218,6 +219,7 @@ void World::reset()
     m_faster_music_active = false;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
+    m_is_network_world = false;
 
     for ( KartList::iterator i = m_karts.begin(); i != m_karts.end() ; ++i )
     {
@@ -435,13 +437,16 @@ void World::terminateRace()
     int best_finish_time = -1;
     std::string highscore_who = "";
     StateManager::ActivePlayer* best_player = NULL;
-    updateHighscores(&best_highscore_rank, &best_finish_time, &highscore_who,
+    if (!this->isNetworkWorld())
+    {
+        updateHighscores(&best_highscore_rank, &best_finish_time, &highscore_who,
                      &best_player);
+        unlock_manager->getCurrentSlot()->raceFinished();
+    }
 
     unlock_manager->getCurrentSlot()->raceFinished();
     ((MapAchievement *) AchievementsManager::get()->getActive()->getAchievement(1))->increase(getTrack()->getIdent(), 1);
     AchievementsManager::get()->onRaceEnd();
-
 
     if (m_race_gui) m_race_gui->clearAllMessages();
     // we can't delete the race gui here, since it is needed in case of
@@ -947,7 +952,9 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
 
         PlayerController *controller = (PlayerController*)(k->getController());
 
-        int highscore_rank = highscores->addData(k->getIdent(),
+        int highscore_rank = 0;
+        if (controller->getPlayer()->getProfile() != NULL) // if we have the player profile here
+            highscore_rank = highscores->addData(k->getIdent(),
                               controller->getPlayer()->getProfile()->getName(),
                                                  k->getFinishTime());
 

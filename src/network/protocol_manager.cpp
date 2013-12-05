@@ -21,7 +21,7 @@
 #include "network/protocol.hpp"
 #include "network/network_manager.hpp"
 #include "utils/log.hpp"
-#include "graphics/irr_driver.hpp"
+#include "utils/time.hpp"
 
 #include <assert.h>
 #include <cstdlib>
@@ -31,21 +31,23 @@
 void* protocolManagerUpdate(void* data)
 {
     ProtocolManager* manager = static_cast<ProtocolManager*>(data);
-    while(!manager->exit())
+    while(manager && !manager->exit())
     {
         manager->update();
-        irr_driver->getDevice()->sleep(20);
+        StkTime::sleep(2);
     }
     return NULL;
 }
 void* protocolManagerAsynchronousUpdate(void* data)
 {
     ProtocolManager* manager = static_cast<ProtocolManager*>(data);
-    while(!manager->exit())
+    manager->m_asynchronous_thread_running = true;
+    while(manager && !manager->exit())
     {
         manager->asynchronousUpdate();
-        irr_driver->getDevice()->sleep(20);
+        StkTime::sleep(2);
     }
+    manager->m_asynchronous_thread_running = false;
     return NULL;
 }
 
@@ -74,7 +76,13 @@ ProtocolManager::ProtocolManager()
 
 ProtocolManager::~ProtocolManager()
 {
+}
+
+
+void ProtocolManager::abort()
+{
     pthread_mutex_unlock(&m_exit_mutex); // will stop the update function
+    pthread_join(*m_asynchronous_update_thread, NULL); // wait the thread to finish
     pthread_mutex_lock(&m_events_mutex);
     pthread_mutex_lock(&m_protocols_mutex);
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
@@ -83,7 +91,7 @@ ProtocolManager::~ProtocolManager()
     for (unsigned int i = 0; i < m_protocols.size() ; i++)
         delete m_protocols[i].protocol;
     for (unsigned int i = 0; i < m_events_to_process.size() ; i++)
-        delete m_events_to_process[i];
+        delete m_events_to_process[i].event;
     m_protocols.clear();
     m_requests.clear();
     m_events_to_process.clear();
@@ -105,7 +113,50 @@ void ProtocolManager::notifyEvent(Event* event)
 {
     pthread_mutex_lock(&m_events_mutex);
     Event* event2 = new Event(*event);
-    m_events_to_process.push_back(event2); // add the event to the queue
+    // register protocols that will receive this event
+    std::vector<int> protocols_ids;
+    PROTOCOL_TYPE searchedProtocol = PROTOCOL_NONE;
+    if (event2->type == EVENT_TYPE_MESSAGE)
+    {
+        if (event2->data().size() > 0)
+        {
+            searchedProtocol = (PROTOCOL_TYPE)(event2->data()[0]);
+            event2->removeFront(1);
+        }
+        else
+        {
+            Log::warn("ProtocolManager", "Not enough data.");
+        }
+    }
+    if (event2->type == EVENT_TYPE_CONNECTED)
+    {
+        searchedProtocol = PROTOCOL_CONNECTION;
+    }
+    Log::verbose("ProtocolManager", "Received event for protocols of type %d", searchedProtocol);
+    pthread_mutex_lock(&m_protocols_mutex);
+    for (unsigned int i = 0; i < m_protocols.size() ; i++)
+    {
+        if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event2->type == EVENT_TYPE_DISCONNECTED) // pass data to protocols even when paused
+        {
+            protocols_ids.push_back(m_protocols[i].id);
+        }
+    }
+    pthread_mutex_unlock(&m_protocols_mutex);
+    if (searchedProtocol == PROTOCOL_NONE) // no protocol was aimed, show the msg to debug
+    {
+        Log::debug("ProtocolManager", "NO PROTOCOL : Message is \"%s\"", event2->data().c_str());
+    }
+
+    if (protocols_ids.size() != 0)
+    {
+        EventProcessingInfo epi;
+        epi.arrival_time = StkTime::getTimeSinceEpoch();
+        epi.event = event2;
+        epi.protocols_ids = protocols_ids;
+        m_events_to_process.push_back(epi); // add the event to the queue
+    }
+    else
+        Log::warn("ProtocolManager", "Received an event for %d that has no destination protocol.", searchedProtocol);
     pthread_mutex_unlock(&m_events_mutex);
 }
 
@@ -274,36 +325,50 @@ void ProtocolManager::protocolTerminated(ProtocolInfo protocol)
     pthread_mutex_unlock(&m_protocols_mutex);
 }
 
-void ProtocolManager::propagateEvent(Event* event)
+bool ProtocolManager::propagateEvent(EventProcessingInfo* event, bool synchronous)
 {
-    PROTOCOL_TYPE searchedProtocol = PROTOCOL_NONE;
-    if (event->type == EVENT_TYPE_MESSAGE)
+    int index = 0;
+    for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
-        if (event->data.size() > 0)
-            searchedProtocol = (PROTOCOL_TYPE)(event->data.getAndRemoveUInt8());
+        if (event->protocols_ids[index] == m_protocols[i].id)
+        {
+            bool result = false;
+            if (synchronous)
+                result = m_protocols[i].protocol->notifyEvent(event->event);
+            else
+                result = m_protocols[i].protocol->notifyEventAsynchronous(event->event);
+            if (result)
+                event->protocols_ids.pop_back();
+            else
+                index++;
+        }
     }
-    if (event->type == EVENT_TYPE_CONNECTED)
+    if (event->protocols_ids.size() == 0 || (StkTime::getTimeSinceEpoch()-event->arrival_time) >= TIME_TO_KEEP_EVENTS)
     {
-        searchedProtocol = PROTOCOL_CONNECTION;
+        // because we made a copy of the event
+        delete event->event->peer; // no more need of that
+        delete event->event;
+        return true;
     }
-    Log::verbose("ProtocolManager", "Received event for protocols of type %d", searchedProtocol);
-    for (unsigned int i = 0; i < m_protocols.size() ; i++)
-    {
-        if (m_protocols[i].protocol->getProtocolType() == searchedProtocol || event->type == EVENT_TYPE_DISCONNECTED) // pass data to protocols even when paused
-            m_protocols[i].protocol->notifyEvent(event);
-    }
-    if (searchedProtocol == PROTOCOL_NONE) // no protocol was aimed, show the msg to debug
-    {
-        Log::debug("ProtocolManager", "NO PROTOCOL : Message is \"%s\"", event->data.c_str());
-    }
-
-    // because we made a copy of the event
-    delete event->peer; // no more need of that
-    delete event;
+    return false;
 }
 
 void ProtocolManager::update()
 {
+    // before updating, notice protocols that they have received events
+    pthread_mutex_lock(&m_events_mutex); // secure threads
+    int size = m_events_to_process.size();
+    int offset = 0;
+    for (int i = 0; i < size; i++)
+    {
+        bool result = propagateEvent(&m_events_to_process[i+offset], true);
+        if (result)
+        {
+            m_events_to_process.erase(m_events_to_process.begin()+i+offset,m_events_to_process.begin()+i+offset+1);
+            offset --;
+        }
+    }
+    pthread_mutex_unlock(&m_events_mutex); // release the mutex
     // now update all protocols
     pthread_mutex_lock(&m_protocols_mutex);
     for (unsigned int i = 0; i < m_protocols.size(); i++)
@@ -317,16 +382,19 @@ void ProtocolManager::update()
 void ProtocolManager::asynchronousUpdate()
 {
     // before updating, notice protocols that they have received information
+    pthread_mutex_lock(&m_events_mutex); // secure threads
     int size = m_events_to_process.size();
+    int offset = 0;
     for (int i = 0; i < size; i++)
     {
-        pthread_mutex_lock(&m_events_mutex); // secure threads
-        Event* event = m_events_to_process.back();
-        m_events_to_process.pop_back();
-        pthread_mutex_unlock(&m_events_mutex); // release the mutex
-
-        propagateEvent(event);
+        bool result = propagateEvent(&m_events_to_process[i+offset], false);
+        if (result)
+        {
+            m_events_to_process.erase(m_events_to_process.begin()+i+offset,m_events_to_process.begin()+i+offset+1);
+            offset --;
+        }
     }
+    pthread_mutex_unlock(&m_events_mutex); // release the mutex
 
     // now update all protocols that need to be updated in asynchronous mode
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);

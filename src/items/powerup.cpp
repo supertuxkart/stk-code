@@ -393,13 +393,21 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
 
     // Check if two bouncing balls are collected less than getRubberBallTimer()
     //seconds apart. If yes, then call getRandomPowerup again. If no, then break.
-    for(int i=0; i<20; i++)
+    if (add_info<0)
     {
-        new_powerup = powerup_manager->getRandomPowerup(position, &n);
-        if(new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
-            ( World::getWorld()->getTime() - powerup_manager->getBallCollectTime()) >
-              RubberBall::getTimeBetweenRubberBalls() )
-            break;
+        for(int i=0; i<20; i++)
+        {
+            new_powerup = powerup_manager->getRandomPowerup(position, &n);
+            if(new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
+                ( World::getWorld()->getTime() - powerup_manager->getBallCollectTime()) >
+                  RubberBall::getTimeBetweenRubberBalls() )
+                break;
+        }
+    }
+    else // set powerup manually
+    {
+        new_powerup = (PowerupManager::PowerupType)((add_info>>4)&0x0f); // highest 4 bits for the type
+        n = (add_info&0x0f); // last 4 bits for the amount
     }
 
     if(new_powerup == PowerupManager::POWERUP_RUBBERBALL)

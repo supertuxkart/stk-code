@@ -34,6 +34,10 @@ namespace GUIEngine
     class BubbleWidget;
     enum EventPropagation;
 }
+namespace Online
+{
+    class User;
+}
 class InputDevice;
 class PlayerKartWidget;
 class KartHoverListener;
@@ -66,7 +70,7 @@ protected:
 
     bool m_must_delete_on_back; //!< To delete the screen if back is pressed
 
-    KartSelectionScreen();
+    KartSelectionScreen(const char* filename);
 
     /** Stores whether any player confirmed their choice; then, some things
       * are "frozen", for instance the selected kart group tab
@@ -99,7 +103,11 @@ protected:
     /** Fill the ribbon with the karts from the currently selected group */
     void setKartsFromCurrentGroup();
 
-    void playerConfirm(const int playerID);
+    virtual void playerConfirm(const int playerID);
+    /** updates model of a kart widget, to have the good selection when the user validates */
+    void updateKartWidgetModel(uint8_t widget_id,
+                const std::string& selection,
+                const irr::core::stringw& selectionText);
 
     /** Stores a pointer to the current selection screen */
     static KartSelectionScreen* m_instance_ptr;
@@ -234,8 +242,9 @@ class PlayerKartWidget : public GUIEngine::Widget,
     float x_speed, y_speed, w_speed, h_speed;
 
     /** Object representing this player */
-    StateManager::ActivePlayer* m_associatedPlayer;
+    StateManager::ActivePlayer* m_associatedPlayer; // local info
     int m_playerID;
+    Online::Profile* m_associated_user; // network info
 
     /** Internal name of the spinner; useful to interpret spinner events,
      *  which contain the name of the activated object */
@@ -267,6 +276,7 @@ public:
 
     PlayerKartWidget(KartSelectionScreen* parent,
                      StateManager::ActivePlayer* associatedPlayer,
+                     Online::Profile* associatedUser,
                      core::recti area, const int playerID,
                      std::string kartGroup,
                      const int irrlichtWidgetID=-1);

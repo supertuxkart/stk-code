@@ -32,10 +32,6 @@ ShowPublicAddress::~ShowPublicAddress()
 {
 }
 
-void ShowPublicAddress::notifyEvent(Event* event)
-{
-}
-
 void ShowPublicAddress::setup()
 {
     m_state = NONE;
@@ -52,7 +48,9 @@ void ShowPublicAddress::asynchronousUpdate()
         m_request->setParameter("token",Online::CurrentUser::get()->getToken());
         m_request->setParameter("address",addr.ip);
         m_request->setParameter("port",addr.port);
+        m_request->setParameter("private_port",NetworkManager::getInstance()->getHost()->getPort());
         m_request->setParameter("action","set");
+        Log::info("ShowPublicAddress", "Showing addr %u and port %d", addr.ip, addr.port);
 
         Online::HTTPManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;

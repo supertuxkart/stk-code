@@ -42,7 +42,7 @@ void ControllerEventsProtocol::setup()
                 {
                     peer = peers[j];
                 }
-                Log::info("ControllerEventsProtocol", "Compared %s and %s", 
+                Log::info("ControllerEventsProtocol", "Compared %s and %s",
                         peers[j]->getPlayerProfile()->kart_name.c_str(), karts[i]->getIdent().c_str());
             }
         }
@@ -61,30 +61,31 @@ void ControllerEventsProtocol::setup()
 
 //-----------------------------------------------------------------------------
 
-void ControllerEventsProtocol::notifyEvent(Event* event)
+bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
 {
-    if (event->data.size() < 17)
+    NetworkString data = event->data();
+    if (data.size() < 17)
     {
-        Log::error("ControllerEventsProtocol", "The data supplied was not complete. Size was %d.", event->data.size());
-        return;
+        Log::error("ControllerEventsProtocol", "The data supplied was not complete. Size was %d.", data.size());
+        return true;
     }
-    uint32_t token = event->data.gui32();
-    NetworkString pure_message = event->data;
+    uint32_t token = data.gui32();
+    NetworkString pure_message = data;
     pure_message.removeFront(4);
     if (token != (*event->peer)->getClientServerToken())
     {
         Log::error("ControllerEventsProtocol", "Bad token from peer.");
-        return;
+        return true;
     }
     NetworkString ns = pure_message;
-    float event_timestamp = ns.getFloat();
+
     ns.removeFront(4);
     uint8_t client_index = -1;
     while (ns.size() >= 9)
     {
         uint8_t controller_index = ns.gui8();
         client_index = controller_index;
-        uint8_t serialized_1 = ns.gui8(1), serialized_2 = ns.gui8(2), serialized_3 = ns.gui8(3);
+        uint8_t serialized_1 = ns.gui8(1);
         PlayerAction action  = (PlayerAction)(ns.gui8(4));
         int action_value = ns.gui32(5);
 
@@ -103,12 +104,12 @@ void ControllerEventsProtocol::notifyEvent(Event* event)
     if (ns.size() > 0 && ns.size() != 9)
     {
         Log::warn("ControllerEventProtocol", "The data seems corrupted. Remains %d", ns.size());
-        return;
+        return true;
     }
     if (client_index < 0)
     {
         Log::warn("ControllerEventProtocol", "Couldn't have a client id.");
-        return;
+        return true;
     }
     if (m_listener->isServer())
     {
@@ -124,6 +125,7 @@ void ControllerEventsProtocol::notifyEvent(Event* event)
             //Log::info("ControllerEventsProtocol", "Sizes are %d and %d", ns2.size(), pure_message.size());
         }
     }
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -162,6 +164,7 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
     ns.ai8(serialized_1).ai8(serialized_2).ai8(serialized_3);
     ns.ai8((uint8_t)(action)).ai32(value);
 
+    Log::info("ControllerEventsProtocol", "Action %d value %d", action, value);
     m_listener->sendMessage(this, ns, false); // send message to server
 }
 

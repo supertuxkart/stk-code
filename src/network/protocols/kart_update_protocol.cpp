@@ -28,15 +28,15 @@ KartUpdateProtocol::~KartUpdateProtocol()
 {
 }
 
-void KartUpdateProtocol::notifyEvent(Event* event)
+bool KartUpdateProtocol::notifyEventAsynchronous(Event* event)
 {
     if (event->type != EVENT_TYPE_MESSAGE)
-        return;
-    NetworkString ns = event->data;
+        return true;
+    NetworkString ns = event->data();
     if (ns.size() < 36)
     {
         Log::info("KartUpdateProtocol", "Message too short.");
-        return;
+        return true;
     }
     ns.removeFront(4);
     while(ns.size() >= 16)
@@ -59,6 +59,7 @@ void KartUpdateProtocol::notifyEvent(Event* event)
         pthread_mutex_unlock(&m_positions_updates_mutex);
         ns.removeFront(32);
     }
+    return true;
 }
 
 void KartUpdateProtocol::setup()
@@ -67,6 +68,8 @@ void KartUpdateProtocol::setup()
 
 void KartUpdateProtocol::update()
 {
+    if (!World::getWorld())
+        return;
     static double time = 0;
     double current_time = StkTime::getRealTime();
     if (current_time > time + 0.1) // 10 updates per second

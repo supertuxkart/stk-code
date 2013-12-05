@@ -18,12 +18,16 @@
 
 #include "network/game_setup.hpp"
 
+#include "karts/abstract_kart.hpp"
+#include "modes/world.hpp"
+#include "race/race_manager.hpp"
 #include "utils/log.hpp"
 
 //-----------------------------------------------------------------------------
 
 GameSetup::GameSetup()
 {
+    m_race_config = new RaceConfig();
 }
 
 //-----------------------------------------------------------------------------
@@ -43,7 +47,7 @@ GameSetup::~GameSetup()
 void GameSetup::addPlayer(NetworkPlayerProfile* profile)
 {
     m_players.push_back(profile);
-    Log::verbose("GameSetup", "New player in the game setup. Global id : %u, "
+    Log::info("GameSetup", "New player in the game setup. Global id : %u, "
         "Race id : %d.", profile->user_profile->getID(), profile->race_id);
 }
 
@@ -79,6 +83,10 @@ bool GameSetup::removePlayer(uint8_t id)
                         "Remains %u.", m_players.size());
             return true;
         }
+        if (m_players[i]->race_id > id)
+        {
+            m_players[i]->race_id--; // all indices in [0;n[ (n = #players)
+        }
     }
     return false;
 }
@@ -106,6 +114,39 @@ void GameSetup::setPlayerKart(uint8_t id, std::string kart_name)
 
 //-----------------------------------------------------------------------------
 
+void GameSetup::bindKartsToProfiles()
+{
+    World::KartList karts = World::getWorld()->getKarts();
+
+    for (unsigned int i = 0; i < m_players.size(); i++)
+    {
+        Log::info("GameSetup", "Player %d has id %d and kart %s", i, m_players[i]->race_id, m_players[i]->kart_name.c_str());
+    }
+    for (unsigned int i = 0; i < karts.size(); i++)
+    {
+        Log::info("GameSetup", "Kart %d has id %d and kart %s", i, karts[i]->getWorldKartId(), karts[i]->getIdent().c_str());
+    }
+    for (unsigned int j = 0; j < m_players.size(); j++)
+    {
+        bool found = false;
+        for (unsigned int i = 0 ; i < karts.size(); i++)
+        {
+            if (karts[i]->getIdent() == m_players[j]->kart_name)
+            {
+                m_players[j]->world_kart_id = karts[i]->getWorldKartId();
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            Log::error("GameSetup", "Error while binding world kart ids to players profiles.");
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 const NetworkPlayerProfile* GameSetup::getProfile(uint32_t id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
@@ -125,6 +166,20 @@ const NetworkPlayerProfile* GameSetup::getProfile(uint8_t id)
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
         if (m_players[i]->race_id == id)
+        {
+            return m_players[i];
+        }
+    }
+    return NULL;
+}
+
+//-----------------------------------------------------------------------------
+
+const NetworkPlayerProfile* GameSetup::getProfile(std::string kart_name)
+{
+    for (unsigned int i = 0; i < m_players.size(); i++)
+    {
+        if (m_players[i]->kart_name == kart_name)
         {
             return m_players[i];
         }

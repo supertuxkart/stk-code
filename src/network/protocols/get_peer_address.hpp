@@ -28,7 +28,8 @@ class GetPeerAddress : public Protocol
         GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object);
         virtual ~GetPeerAddress();
 
-        virtual void notifyEvent(Event* event);
+        virtual bool notifyEvent(Event* event) { return true; }
+        virtual bool notifyEventAsynchronous(Event* event) { return true; }
         virtual void setup();
         virtual void update() {}
         virtual void asynchronousUpdate();

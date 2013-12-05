@@ -19,7 +19,7 @@
 #include "network/protocols/get_peer_address.hpp"
 
 #include "network/protocol_manager.hpp"
-#include "network/http_functions.hpp"
+#include "network/network_manager.hpp"
 #include "online/http_manager.hpp"
 #include "online/current_user.hpp"
 #include "config/user_config.hpp"
@@ -32,11 +32,6 @@ GetPeerAddress::GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object
 
 GetPeerAddress::~GetPeerAddress()
 {
-}
-
-void GetPeerAddress::notifyEvent(Event* event)
-{
-    // nothing there. If we receive events, they must be ignored
 }
 
 void GetPeerAddress::setup()
@@ -70,7 +65,10 @@ void GetPeerAddress::asynchronousUpdate()
             {
                 TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
                 result->get("ip", &addr->ip);
-                result->get("port", &addr->port);
+                if (addr->ip == NetworkManager::getInstance()->getPublicAddress().ip)
+                    result->get("private_port", &addr->port);
+                else
+                    result->get("port", &addr->port);
                 Log::debug("GetPeerAddress", "Address gotten successfully.");
             }
             else

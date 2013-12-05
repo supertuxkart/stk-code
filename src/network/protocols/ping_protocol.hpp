@@ -10,7 +10,8 @@ class PingProtocol : public Protocol
         PingProtocol(const TransportAddress& ping_dst, double delay_between_pings);
         virtual ~PingProtocol();
 
-        virtual void notifyEvent(Event* event);
+        virtual bool notifyEvent(Event* event) { return true; }
+        virtual bool notifyEventAsynchronous(Event* event) { return true; }
         virtual void setup();
         virtual void update() {}
         virtual void asynchronousUpdate();

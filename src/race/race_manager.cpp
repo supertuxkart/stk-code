@@ -339,7 +339,7 @@ void RaceManager::startNew(bool from_overworld)
     }
 
     m_track_number = 0;
-    if(m_major_mode==MAJOR_MODE_GRAND_PRIX)
+    if(m_major_mode==MAJOR_MODE_GRAND_PRIX && !NetworkWorld::getInstance()->isRunning()) // offline mode only
     {
         //We look if Player 1 has a saved version of this GP.
         // =================================================
@@ -487,7 +487,7 @@ void RaceManager::next()
     m_track_number++;
     if(m_track_number<(int)m_tracks.size())
     {
-        if(m_major_mode==MAJOR_MODE_GRAND_PRIX)
+        if(m_major_mode==MAJOR_MODE_GRAND_PRIX && !NetworkWorld::getInstance()->isRunning())
         {
             //Saving GP state
             //We look if Player 1 has already saved this GP.
@@ -631,7 +631,7 @@ void RaceManager::exitRace(bool delete_world)
     if (m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size())
     {
         unlock_manager->getCurrentSlot()->grandPrixFinished();
-        if(m_major_mode==MAJOR_MODE_GRAND_PRIX)
+        if(m_major_mode==MAJOR_MODE_GRAND_PRIX&& !NetworkWorld::getInstance()->isRunning())
         {
             //Delete saved GP
             SavedGrandPrix* gp =
@@ -730,7 +730,9 @@ void RaceManager::kartFinishedRace(const AbstractKart *kart, float time)
     m_kart_status[id].m_overall_time += time;
     m_kart_status[id].m_last_time     = time;
     m_num_finished_karts ++;
-    if(kart->getController()->isPlayerController()) m_num_finished_players++;
+    if(kart->getController()->isPlayerController() ||
+        kart->getController()->isNetworkController())
+        m_num_finished_players++;
 }   // kartFinishedRace
 
 //-----------------------------------------------------------------------------
@@ -783,7 +785,7 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 
     setCoinTarget( 0 ); // Might still be set from a previous challenge
     if (!NetworkWorld::getInstance<NetworkWorld>()->isRunning()) // if not in a network world
-    race_manager->setupPlayerKartInfo(); // do this setup player kart
+        race_manager->setupPlayerKartInfo(); // do this setup player kart
 
     startNew(from_overworld);
 }

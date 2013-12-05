@@ -83,7 +83,7 @@ float MainLoop::getLimitedDt()
             int wait_time = 1000/max_fps - 1000/current_fps;
             if(wait_time < 1) wait_time = 1;
 
-            irr_driver->getDevice()->sleep(wait_time);
+            StkTime::sleep(wait_time);
         }
         else break;
     }
@@ -165,6 +165,10 @@ void MainLoop::run()
         {
             PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
             ProtocolManager::getInstance()->update();
+            PROFILER_POP_CPU_MARKER();
+
+            PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
+            Online::HTTPManager::get()->update(dt);
             PROFILER_POP_CPU_MARKER();
         }
 

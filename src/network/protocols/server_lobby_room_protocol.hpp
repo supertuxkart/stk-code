@@ -9,18 +9,29 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
         ServerLobbyRoomProtocol();
         virtual ~ServerLobbyRoomProtocol();
 
-        virtual void notifyEvent(Event* event);
+        virtual bool notifyEventAsynchronous(Event* event);
         virtual void setup();
         virtual void update();
         virtual void asynchronousUpdate() {};
 
         void startGame();
         void startSelection();
+        void checkIncomingConnectionRequests();
+        void checkRaceFinished();
 
     protected:
+        // connection management
         void kartDisconnected(Event* event);
         void connectionRequested(Event* event);
+        // kart selection
         void kartSelectionRequested(Event* event);
+        // race votes
+        void playerMajorVote(Event* event);
+        void playerRaceCountVote(Event* event);
+        void playerMinorVote(Event* event);
+        void playerTrackVote(Event* event);
+        void playerReversedVote(Event* event);
+        void playerLapsVote(Event* event);
 
         uint8_t m_next_id; //!< Next id to assign to a peer.
         std::vector<TransportAddress> m_peers;
@@ -28,6 +39,7 @@ class ServerLobbyRoomProtocol : public LobbyRoomProtocol
         uint32_t m_current_protocol_id;
         TransportAddress m_public_address;
         bool m_selection_enabled;
+        bool m_in_race;
 
         enum STATE
         {

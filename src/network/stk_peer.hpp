@@ -16,6 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+/*! \file stk_peer.hpp
+ *  \brief Defines functions to easily manipulate 8-bit network destinated strings.
+ */
+
 #ifndef STK_PEER_HPP
 #define STK_PEER_HPP
 
@@ -24,6 +28,10 @@
 #include "network/game_setup.hpp"
 #include <enet/enet.h>
 
+/*! \class STKPeer
+ *  \brief Represents a peer.
+ *  This class is used to interface the ENetPeer structure.
+ */
 class STKPeer
 {
     friend class Event;
@@ -45,7 +53,7 @@ class STKPeer
         bool exists() const;
         uint32_t getAddress() const;
         uint16_t getPort() const;
-        NetworkPlayerProfile* getPlayerProfile() { return *m_player_profile; }
+        NetworkPlayerProfile* getPlayerProfile() { return (m_player_profile)?(*m_player_profile):NULL; }
         uint32_t getClientServerToken() const   { return *m_client_server_token; }
         bool     isClientServerTokenSet() const { return *m_token_set; }
 

@@ -1,20 +1,21 @@
 #include "network/protocols/start_game_protocol.hpp"
 
+#include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
+#include "challenges/unlock_manager.hpp"
+#include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
+#include "online/current_user.hpp"
 #include "race/race_manager.hpp"
-#include "utils/log.hpp"
-#include "utils/time.hpp"
-
-#include "input/device_manager.hpp"
-#include "input/input_manager.hpp"
-#include "challenges/unlock_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/kart_selection.hpp"
-#include "online/current_user.hpp"
+#include "states_screens/network_kart_selection.hpp"
+#include "utils/log.hpp"
+#include "utils/time.hpp"
 
 StartGameProtocol::StartGameProtocol(GameSetup* game_setup) :
         Protocol(NULL, PROTOCOL_START_GAME)
@@ -32,20 +33,21 @@ StartGameProtocol::~StartGameProtocol()
 {
 }
 
-void StartGameProtocol::notifyEvent(Event* event)
+bool StartGameProtocol::notifyEventAsynchronous(Event* event)
 {
-    if (event->data.size() < 5)
+    NetworkString data = event->data();
+    if (data.size() < 5)
     {
         Log::error("StartGameProtocol", "Too short message.");
-        return;
+        return true;
     }
-    uint32_t token = event->data.gui32();
-    uint8_t ready = event->data.gui8(4);
+    uint32_t token = data.gui32();
+    uint8_t ready = data.gui8(4);
     STKPeer* peer = (*(event->peer));
     if (peer->getClientServerToken() != token)
     {
         Log::error("StartGameProtocol", "Bad token received.");
-        return;
+        return true;
     }
     if (m_listener->isServer() && ready) // on server, player is ready
     {
@@ -61,17 +63,17 @@ void StartGameProtocol::notifyEvent(Event* event)
                 protocol->startCountdown(5000); // 5 seconds countdown
                 Log::info("StartGameProtocol", "All players ready, starting countdown.");
                 m_ready = true;
-                return;
+                return true;
             }
             else
                 Log::error("StartGameProtocol", "The Synchronization protocol hasn't been started.");
         }
     }
-    else
+    else // on the client, we shouldn't even receive messages.
     {
         Log::error("StartGameProtocol", "Received a message with bad format.");
     }
-    // on the client, we shouldn't even receive messages.
+    return true;
 }
 
 void StartGameProtocol::setup()
@@ -93,7 +95,6 @@ void StartGameProtocol::update()
         m_listener->requestStart(new SynchronizationProtocol());
         Log::info("StartGameProtocol", "SynchronizationProtocol started.");
         // race startup sequence
-
         NetworkWorld::getInstance<NetworkWorld>()->start(); // builds it and starts
         race_manager->setNumKarts(m_game_setup->getPlayerCount());
         race_manager->setNumPlayers(m_game_setup->getPlayerCount());
@@ -115,7 +116,11 @@ void StartGameProtocol::update()
                 PlayerProfile* profileToUse = unlock_manager->getCurrentPlayer();
                 assert(profileToUse);
                 InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
-                int new_player_id = StateManager::get()->createActivePlayer( profileToUse, device , players[i]->user_profile);
+                int new_player_id = 0;
+                if (StateManager::get()->getActivePlayers().size() >= 0) // more than one player, we're the first
+                    new_player_id = 0;
+                else
+                    new_player_id = StateManager::get()->createActivePlayer( profileToUse, device , players[i]->user_profile);
                 device->setPlayer(StateManager::get()->getActivePlayer(new_player_id));
                 input_manager->getDeviceList()->setSinglePlayer(StateManager::get()->getActivePlayer(new_player_id));
 
@@ -162,6 +167,7 @@ void StartGameProtocol::update()
             // now the synchronization protocol exists.
             Log::info("StartGameProtocol", "Starting the race loading.");
             race_manager->startSingleRace("jungle", 1, false);
+            World::getWorld()->setNetworkWorld(true);
             m_state = LOADING;
         }
     }
@@ -174,6 +180,8 @@ void StartGameProtocol::update()
     }
     else if (m_state == READY)
     {
+        // set karts into the network game setup
+        NetworkManager::getInstance()->getGameSetup()->bindKartsToProfiles();
         m_state = EXITING;
         m_listener->requestTerminate(this);
     }

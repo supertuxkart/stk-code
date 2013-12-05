@@ -563,6 +563,11 @@ public:
         return m_kart_status[kart].m_overall_time;
     }
     // ------------------------------------------------------------------------
+    float getKartRaceTime(int kart) const
+    {
+        return m_kart_status[kart].m_last_time;
+    }
+    // ------------------------------------------------------------------------
     KartType getKartType(int kart) const
     {
         return m_kart_status[kart].m_kart_type;
@@ -708,7 +713,7 @@ public:
       */
     bool allPlayerFinished() const
     {
-        return m_num_finished_players==m_player_karts.size();
+        return m_num_finished_players == m_player_karts.size();
     }
     // ------------------------------------------------------------------------
     void kartFinishedRace(const AbstractKart* kart, float time);

@@ -16,6 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+/*! \file protocol.hpp
+ *  \brief Generic protocols declarations.
+ */
+
 #ifndef PROTOCOL_HPP
 #define PROTOCOL_HPP
 
@@ -61,55 +65,60 @@ class Protocol
          * \param type The type of the protocol.
          */
         Protocol(CallbackObject* callback_object, PROTOCOL_TYPE type);
-        /*!
-         * \brief Destructor
+        /*! \brief Destructor
          */
         virtual ~Protocol();
 
-        /*!
-         * \brief Notify a protocol matching the Event type of that event.
-         * \param event : Pointer to the event.
+        /*! \brief Notify a protocol matching the Event type of that event.
+         *  \param event : Pointer to the event.
+         *  \return True if the event has been treated, false elseway
          */
-        virtual void notifyEvent(Event* event) = 0;
+        virtual bool notifyEvent(Event* event) { return false; }
 
-        /*!
-         * \brief Set the protocol listener.
-         * \param listener : Pointer to the listener.
+        /*! \brief Notify a protocol matching the Event type of that event.
+         *  This update is done asynchronously :
+         *  \param event : Pointer to the event.
+         *  \return True if the event has been treated, false elseway
+         */
+        virtual bool notifyEventAsynchronous(Event* event) { return false; }
+
+        /*! \brief Set the protocol listener.
+         *  \param listener : Pointer to the listener.
          */
         void setListener(ProtocolManager* listener);
 
-        /*!
-         * \brief Called when the protocol is going to start. Must be re-defined by subclasses.
+        /*! \brief Called when the protocol is going to start. Must be re-defined by subclasses.
          */
         virtual void setup() = 0;
-        /*!
-         * \brief Called when the protocol is paused (by an other entity or by itself).
-         * This function must be called by the subclasse's pause function if re-defined.
+        /*! \brief Called when the protocol is paused (by an other entity or by itself).
+         *  This function must be called by the subclasse's pause function if re-defined.
          */
         virtual void pause();
-        /*!
-         * \brief Called when the protocol is unpaused.
-         * This function must be called by the subclasse's unpause function if re-defined.
+        /*! \brief Called when the protocol is unpaused.
+         *  This function must be called by the subclasse's unpause function if re-defined.
          */
         virtual void unpause();
-        /*!
-         * \brief Called by the protocol listener, synchronously with the main loop. Must be re-defined.
+        /*! \brief Called by the protocol listener, synchronously with the main loop. Must be re-defined.
          */
         virtual void update() = 0;
-        /*!
-         * \brief Called by the protocol listener as often as possible. Must be re-defined.
+        /*! \brief Called by the protocol listener as often as possible. Must be re-defined.
          */
         virtual void asynchronousUpdate() = 0;
-        /*!
-         * \brief Called when the protocol is to be killed.
+        /*! \brief Called when the protocol is to be killed.
          */
         virtual void kill();
 
-        /*!
-         * \brief Method to get a protocol's type.
-         * \return The protocol type.
+        /*! \brief Method to get a protocol's type.
+         *  \return The protocol type.
          */
         PROTOCOL_TYPE getProtocolType();
+
+        /// functions to check incoming data easily
+        bool checkDataSizeAndToken(Event* event, int minimum_size);
+        bool isByteCorrect(Event* event, int byte_nb, int value);
+        void sendMessageToPeersChangingToken(NetworkString prefix, NetworkString message);
+
+
     protected:
         ProtocolManager* m_listener;        //!< The protocol listener
         PROTOCOL_TYPE m_type;               //!< The type of the protocol

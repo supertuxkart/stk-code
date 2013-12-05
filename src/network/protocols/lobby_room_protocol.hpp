@@ -35,11 +35,10 @@ class LobbyRoomProtocol : public Protocol
     public:
         LobbyRoomProtocol(CallbackObject* callback_object);
         virtual ~LobbyRoomProtocol();
-        
-        virtual void notifyEvent(Event* event) = 0;
+
         virtual void setup() = 0;
         virtual void update() = 0;
-        
+
     protected:
         GameSetup* m_setup; //!< The game setup.
 };

@@ -32,10 +32,6 @@ RequestConnection::~RequestConnection()
 {
 }
 
-void RequestConnection::notifyEvent(Event* event)
-{
-}
-
 void RequestConnection::setup()
 {
     m_state = NONE;

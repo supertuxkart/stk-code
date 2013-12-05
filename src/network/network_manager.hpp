@@ -16,6 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+/*! \file network_manager.hpp
+ *  \brief Instantiates the generic functionnalities of a network manager.
+ */
+
 #ifndef NETWORKMANAGER_HPP
 #define NETWORKMANAGER_HPP
 
@@ -30,22 +34,55 @@
 
 #include <vector>
 
+/** \class NetworkManager
+ *  \brief Gives the general functions to use network communication.
+ *  This class is in charge of storing the peers connected to this host.
+ *  It also stores the host, and brings the functions to send messages to peers.
+ *  It automatically dispatches the events or packets it receives. This class 
+ *  also stores the public address when known and the player login. 
+ *  Here are defined some functions that will be specifically implemented by
+ *  the ServerNetworkManager and the ClientNetworkManager.
+ */
 class NetworkManager : public Singleton<NetworkManager>
 {
     friend class Singleton<NetworkManager>;
     public:
+        /** \brief Function to start the Network Manager (start threads) */
         virtual void run();
+        /** \brief Function to reset the Network Manager.
+         *  This function resets the peers and the listening host.
+         */
         virtual void reset();
+        /** \brief Function that aborts the NetworkManager.
+         *  This function will stop the listening, delete the host and stop
+         *  threads that are related to networking.
+         */
+        virtual void abort();
 
         // network management functions
+        /** \brief Try to establish a connection to a given transport address.
+         *  \param peer : The transport address which you want to connect to.
+         *  \return True if we're successfully connected. False elseway.
+         */
         virtual bool connect(TransportAddress peer);
+        /** \brief Changes the socket working mode.
+         *  Sockets can be in two modes : The ENet mode and a mode we will call
+         *  the 'Raw' mode. In the ENet mode, the socket will be read as 
+         *  \param peer : The transport address which you want to connect to.
+         *  \return True if we're successfully connected. False elseway.
+         */
         virtual void setManualSocketsMode(bool manual);
 
         // message/packets related functions
         virtual void notifyEvent(Event* event);
-        virtual void sendPacket(const NetworkString& data, bool reliable = true) = 0;
-        virtual void sendPacket(STKPeer* peer, const NetworkString& data, bool reliable = true);
-        virtual void sendPacketExcept(STKPeer* peer, const NetworkString& data, bool reliable = true);
+        virtual void sendPacket(const NetworkString& data, 
+                                bool reliable = true) = 0;
+        virtual void sendPacket(STKPeer* peer, 
+                                const NetworkString& data, 
+                                bool reliable = true);
+        virtual void sendPacketExcept(STKPeer* peer, 
+                                const NetworkString& data, 
+                                bool reliable = true);
 
         // Game related functions
         virtual GameSetup* setupNewGame(); //!< Creates a new game setup and returns it

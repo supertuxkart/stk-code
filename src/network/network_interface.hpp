@@ -16,6 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+/*! \file network_interface.hpp
+ *  \brief Defines an interface to network middle-level functions.
+ */
+
 #ifndef NETWORK_INTERFACE_H
 #define NETWORK_INTERFACE_H
 
@@ -26,19 +30,24 @@
 #include <pthread.h>
 #include <string>
 
-
+/** \class NetworkInterface
+  * \ingroup network
+  */
 class NetworkInterface : public Singleton<NetworkInterface>
 {
     friend class Singleton<NetworkInterface>;
     public:
-        
+
+        /*! \brief Used to init the network.
+         *  \param server : True if we're a server.
+         */
         void initNetwork(bool server);
-        
+
     protected:
         // protected functions
         NetworkInterface();
         virtual ~NetworkInterface();
-        
+
 };
 
 #endif // NETWORK_INTERFACE_H

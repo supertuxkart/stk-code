@@ -31,6 +31,8 @@
 
 #include <vector>
 
+#define TIME_TO_KEEP_EVENTS 1.0
+
 /*!
  * \enum PROTOCOL_STATE
  * \brief Defines the three states that a protocol can have.
@@ -78,6 +80,16 @@ typedef struct ProtocolRequest
     ProtocolInfo protocol_info; //!< The concerned protocol information
 } ProtocolRequest;
 
+/*! \struct ProtocolRequest
+ *  \brief Used to pass the event to protocols that need it
+ */
+typedef struct EventProcessingInfo
+{
+    Event* event;
+    double arrival_time;
+    std::vector<int> protocols_ids;
+} EventProcessingInfo;
+
 /*!
  * \class ProtocolManager
  * \brief Manages the protocols at runtime.
@@ -93,8 +105,11 @@ typedef struct ProtocolRequest
 class ProtocolManager : public Singleton<ProtocolManager>
 {
     friend class Singleton<ProtocolManager>;
-
+    friend void* protocolManagerAsynchronousUpdate(void* data);
     public:
+        
+        /*! \brief Stops the protocol manager. */
+        virtual void            abort();
         /*!
          * \brief Function that processes incoming events.
          * This function is called by the network manager each time there is an
@@ -269,7 +284,7 @@ class ProtocolManager : public Singleton<ProtocolManager>
          */
         virtual void            protocolTerminated(ProtocolInfo protocol);
 
-        void                    propagateEvent(Event* event);
+        bool                    propagateEvent(EventProcessingInfo* event, bool synchronous);
 
         // protected members
         /*!
@@ -281,7 +296,7 @@ class ProtocolManager : public Singleton<ProtocolManager>
         /*!
          * \brief Contains the network events to pass to protocols.
          */
-        std::vector<Event*>             m_events_to_process;
+        std::vector<EventProcessingInfo>             m_events_to_process;
         /*!
          * \brief Contains the requests to start/stop etc... protocols.
          */
@@ -311,6 +326,8 @@ class ProtocolManager : public Singleton<ProtocolManager>
         pthread_t* m_update_thread;
         /*! Asynchronous update thread.*/
         pthread_t* m_asynchronous_update_thread;
+        /*! True if the thread is running. */
+        bool m_asynchronous_thread_running;
 
 };
 

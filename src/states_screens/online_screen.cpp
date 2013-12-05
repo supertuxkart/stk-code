@@ -46,6 +46,9 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/connect_to_server.hpp"
 
+#include "network/protocol_manager.hpp"
+#include "network/protocols/connect_to_server.hpp"
+
 
 using namespace GUIEngine;
 using namespace Online;
