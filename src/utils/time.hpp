@@ -39,7 +39,6 @@ class StkTime
 public:
     typedef time_t TimeType;
 
-    static double getRealTime(long startAt=0);
     static void getDate(int *day=NULL, int *month=NULL, int *year=NULL);
 
         /** Converts the time in this object to a human readable string. */
