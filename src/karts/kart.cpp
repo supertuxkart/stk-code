@@ -59,6 +59,8 @@
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
+#include "network/network_world.hpp"
+#include "network/network_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
 #include "physics/btUprightConstraint.hpp"
@@ -75,6 +77,12 @@
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
    // Disable warning for using 'this' in base member initializer list
 #  pragma warning(disable:4355)
+#endif
+
+#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
+#  define isnan _isnan
+#else
+#  include <math.h>
 #endif
 
 /** The kart constructor.
@@ -794,29 +802,32 @@ void Kart::finishedRace(float time)
         // in modes that support it, start end animation
         setController(new EndController(this, m_controller->getPlayer(),
                                         m_controller));
-        GameSlot *slot = unlock_manager->getCurrentSlot();
-        const Challenge *challenge = slot->getCurrentChallenge();
-        // In case of a GP challenge don't make the end animation depend
-        // on if the challenge is fulfilled
-        if(challenge && !challenge->getData()->isGrandPrix())
+        if (m_controller->isPlayerController()) // if player is on this computer
         {
-            if(challenge->getData()->isChallengeFulfilled())
-                m_kart_model->setAnimation(KartModel::AF_WIN_START);
+            GameSlot *slot = unlock_manager->getCurrentSlot();
+            const Challenge *challenge = slot->getCurrentChallenge();
+            // In case of a GP challenge don't make the end animation depend
+            // on if the challenge is fulfilled
+            if(challenge && !challenge->getData()->isGrandPrix())
+            {
+                if(challenge->getData()->isChallengeFulfilled())
+                    m_kart_model->setAnimation(KartModel::AF_WIN_START);
+                else
+                    m_kart_model->setAnimation(KartModel::AF_LOSE_START);
+
+            }
+            else if(m_race_position<=0.5f*race_manager->getNumberOfKarts() ||
+                    m_race_position==1)
+                    m_kart_model->setAnimation(KartModel::AF_WIN_START);
             else
                 m_kart_model->setAnimation(KartModel::AF_LOSE_START);
 
-        }
-        else if(m_race_position<=0.5f*race_manager->getNumberOfKarts() ||
-                m_race_position==1)
-                m_kart_model->setAnimation(KartModel::AF_WIN_START);
-        else
-            m_kart_model->setAnimation(KartModel::AF_LOSE_START);
-
-        RaceGUIBase* m = World::getWorld()->getRaceGUI();
-        if(m)
-        {
-            m->addMessage((getPosition() == 1 ? _("You won the race!") : _("You finished the race!")) ,
-                          this, 2.0f);
+            RaceGUIBase* m = World::getWorld()->getRaceGUI();
+            if(m)
+            {
+                m->addMessage((getPosition() == 1 ? _("You won the race!") : _("You finished the race!")) ,
+                              this, 2.0f);
+            }
         }
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
@@ -1236,7 +1247,9 @@ void Kart::update(float dt)
     }   // if there is material
 
     // Check if any item was hit.
-    ItemManager::get()->checkItemHit(this);
+    // check it if we're not in a network world, or if we're on the server (when network mode is on)
+    if (!NetworkWorld::getInstance()->isRunning() || NetworkManager::getInstance()->isServer())
+        ItemManager::get()->checkItemHit(this);
 
     static video::SColor pink(255, 255, 133, 253);
     static video::SColor green(255, 61, 87, 23);
@@ -1282,7 +1295,7 @@ void Kart::update(float dt)
             // take the same time again to reach the bottom
             float t = 2.0f * v/force;
 
-            // Jump if either the jump is estimated to be long enough, or 
+            // Jump if either the jump is estimated to be long enough, or
             // the texture has the jump property set.
             if(t>getKartProperties()->getJumpAnimationTime()  ||
                 last_m->isJumpTexture()                         )

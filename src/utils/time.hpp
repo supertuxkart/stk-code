@@ -21,12 +21,14 @@
 #include <stdexcept>
 
 #ifdef WIN32
+#  define WIN32_LEAN_AND_MEAN
 #  define _WINSOCKAPI_
 #  include <windows.h>
 #  include <time.h>
 #else
 #  include <stdint.h>
 #  include <sys/time.h>
+#  include <unistd.h>
 #endif
 
 #include <string>
@@ -81,7 +83,14 @@ public:
     };   // getTimeSinceEpoch
 
     // ------------------------------------------------------------------------
-    /** 
+    /** Returns a time based on an arbitrary 'epoch' (e.g. could be start
+     *  time of the application, 1.1.1970, ...).
+     *  The value is a double precision floating point value in seconds.
+     */
+    static double getRealTime(long startAt=0);
+
+    // ------------------------------------------------------------------------
+    /**
      * \brief Compare two different times.
      * \return A signed integral indicating the relation between the time.
      */
@@ -98,7 +107,19 @@ public:
     };   // compareTime
 
     // ------------------------------------------------------------------------
-    /** 
+    /** Sleeps for the specified amount of time.
+     *  \param msec Number of milliseconds to sleep.
+     */
+    static void sleep(int msec)
+    {
+#ifdef WIN32
+        Sleep(msec);
+#else
+        usleep(msec*1000);
+#endif
+    }   // sleep
+    // ------------------------------------------------------------------------
+    /**
      * \brief Add a interval to a time.
      */
     static TimeType addInterval(TimeType time, int year, int month, int day) {

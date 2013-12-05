@@ -23,8 +23,12 @@
 #define STK_HOST_HPP
 
 #include "network/types.hpp"
+
 #include "network/network_string.hpp"
 
+// enet.h includes win32.h, which without lean_and_mean includes
+// winspool.h, which defines MAX_PRIORITY as a macro, which then
+// results in http_manager.hpp not being compilable.
 #define WIN32_LEAN_AND_MEAN
 #include <enet/enet.h>
 
@@ -59,6 +63,13 @@ class STKHost
         STKHost();
         /*! \brief Destructor                                               */
         virtual ~STKHost();
+        
+        /*! \brief Log packets into a file
+         *  \param ns : The data in the packet
+         *  \param incoming : True if the packet comes from a peer.
+         *  False if it's sent to a peer.
+         */
+        static void logPacket(const NetworkString ns, bool incoming);
 
         /*! \brief Thread function checking if data is received.
          *  This function tries to get data from network low-level functions as
@@ -113,6 +124,7 @@ class STKHost
          *  \return A string containing the data of the received packet.
          */
         uint8_t*    receiveRawPacket();
+        uint8_t*    receiveRawPacket(TransportAddress* sender);
         /*! \brief Receives a packet directly from the network interface and
          *  filter its address.
          *  Receive a packet whithout ENet processing it. Checks that the
@@ -120,10 +132,13 @@ class STKHost
          *  parameter. Does not check the port right now.
          *  \param sender : Transport address of the original sender of the
          *  wanted packet.
+         *  \param max_tries : Number of times we try to read data from the
+         *  socket. This is aproximately the time we wait in milliseconds.
+         *  -1 means eternal tries.
          *  \return A string containing the data of the received packet
          *  matching the sender's ip address.
          */
-        uint8_t*    receiveRawPacket(TransportAddress sender);
+        uint8_t*    receiveRawPacket(TransportAddress sender, int max_tries = -1);
         /*! \brief Broadcasts a packet to all peers.
          *  \param data : Data to send.
          */
@@ -137,9 +152,21 @@ class STKHost
          *  \return True if the peer is known and connected, false elseway.
          */
         bool        isConnectedTo(TransportAddress peer_address);
+
+        /*! \brief Returns true when the thread should stop listening. */
+        int         mustStopListening();
+        /*! \brief Returns true when the thread has stopped listening. */
+        bool        hasStoppedListening() const { return m_listening; }
+
+        uint32_t    getAddress() const          { return m_host->address.host; }
+        uint16_t    getPort() const;
     protected:
         ENetHost*   m_host;             //!< ENet host interfacing sockets.
         pthread_t*  m_listening_thread; //!< Thread listening network events.
+        pthread_mutex_t m_exit_mutex;   //!< Mutex to kill properly the thread
+        bool        m_listening;
+        static FILE*       m_log_file;         //!< Where to log packets
+        static pthread_mutex_t m_log_mutex;    //!< To write in the log only once at a time
 
 };
 
