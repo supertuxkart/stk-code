@@ -10,8 +10,7 @@
 #include "IVideoDriver.h"
 #include "IGUIFont.h"
 #include "IGUISpriteBank.h"
-#include "CGUIScrollBar.h"
-//#include "os.h"
+#include "IGUIScrollBar.h"
 #include "utils/time.hpp"
 
 
@@ -37,9 +36,10 @@ CGUISTKListBox::CGUISTKListBox(IGUIEnvironment* environment, IGUIElement* parent
 	IGUISkin* skin = Environment->getSkin();
 	const s32 s = skin->getSize(EGDS_SCROLLBAR_SIZE);
 
-	ScrollBar = new CGUIScrollBar(false, Environment, this, -1,
-		core::rect<s32>(RelativeRect.getWidth() - s, 0, RelativeRect.getWidth(), RelativeRect.getHeight()),
-		!clip);
+    ScrollBar = Environment->addScrollBar(false, 
+                            core::rect<s32>(RelativeRect.getWidth() - s, 0, 
+                                            RelativeRect.getWidth(), RelativeRect.getHeight()), this, -1);
+    ScrollBar->grab();
 	ScrollBar->setSubElement(true);
 	ScrollBar->setTabStop(false);
 	ScrollBar->setAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
