@@ -1293,6 +1293,7 @@ static void cleanSuperTuxKart()
 
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
+    Online::HTTPManager::deallocate();
     Online::ServersManager::deallocate();
     Online::ProfileManager::deallocate();
     AchievementsManager::deallocate();
@@ -1330,7 +1331,6 @@ static void cleanSuperTuxKart()
 
     StateManager::deallocate();
     GUIEngine::EventHandler::deallocate();
-    Online::HTTPManager::deallocate();
 }   // cleanSuperTuxKart
 
 //=============================================================================
