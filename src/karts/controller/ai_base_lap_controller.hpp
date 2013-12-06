@@ -33,15 +33,7 @@ class Vec3;
  */
 class AIBaseLapController : public AIBaseController
 {
-private:
-    /** Stores the last N times when a collision happened. This is used
-    *  to detect when the AI is stuck, i.e. N collisions happened in
-    *  a certain period of time. */
-    std::vector<float> m_collision_times;
 
-    /** A flag that is set during the physics processing to indicate that
-    *  this kart is stuck and needs to be rescued. */
-    bool m_stuck_trigger_rescue;
 
 protected:
    
@@ -79,10 +71,7 @@ protected:
     // ------------------------------------------------------------------------
     /** Nothing special to do when the race is finished. */
     virtual void raceFinished() {};
-    // ------------------------------------------------------------------------
-    /** This can be called to detect if the kart is stuck (i.e. repeatedly
-    *  hitting part of the track). */
-    bool     isStuck() const { return m_stuck_trigger_rescue; }
+    
     
 public:
              AIBaseLapController(AbstractKart *kart,
@@ -91,7 +80,6 @@ public:
     virtual void reset();
     static void enableDebug() {m_ai_debug = true; }
     virtual void crashed(const AbstractKart *k) {};
-    virtual void crashed(const Material *m);
     virtual void handleZipper(bool play_sound) {};
     virtual void finishedRace(float time) {};
     virtual void collectedItem(const Item &item, int add_info=-1,

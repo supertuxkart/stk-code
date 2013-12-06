@@ -33,7 +33,15 @@ class Vec3;
 class AIBaseController : public Controller
 {
 
+private:
+    /** Stores the last N times when a collision happened. This is used
+    *  to detect when the AI is stuck, i.e. N collisions happened in
+    *  a certain period of time. */
+    std::vector<float> m_collision_times;
 
+    /** A flag that is set during the physics processing to indicate that
+    *  this kart is stuck and needs to be rescued. */
+    bool m_stuck;
 
 
 protected:
@@ -53,23 +61,32 @@ protected:
     const AIProperties *m_ai_properties;
 
 
-
+    static bool m_ai_debug;
     
-
+    virtual void update      (float delta) ;
     virtual void setSteering   (float angle, float dt);
     void    setControllerName(const std::string &name);
     float   steerToPoint(const Vec3 &point);
     float    normalizeAngle(float angle);
     virtual bool doSkid(float steer_fraction);
-    static bool m_ai_debug;
+
+    
+
+    // ------------------------------------------------------------------------
+    /** This can be called to detect if the kart is stuck (i.e. repeatedly
+    *  hitting part of the track). */
+    bool     isStuck() const { return m_stuck; }
 
 public:
     
     AIBaseController(AbstractKart *kart,
                               StateManager::ActivePlayer *player=NULL);
     virtual ~AIBaseController() {};
+    virtual void reset();
 
     virtual bool  disableSlipstreamBonus() const;
+    
+    virtual void    crashed(const Material *m);
 
 };
 #endif
