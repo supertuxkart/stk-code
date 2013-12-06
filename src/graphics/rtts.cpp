@@ -49,13 +49,20 @@ RTT::RTT()
     //
     // Optionally, the collapse ones use a smaller format.
 
-    // Work around for intel hd3000 cards :(
-#ifdef DONT_USE_STENCILS
-    bool stencil = false;
-#else
     bool stencil = true;
-#endif
     rtts[RTT_TMP1] = drv->addRenderTargetTexture(res, "rtt.tmp1", ECF_A8R8G8B8, stencil);
+    if(!rtts[RTT_TMP1])
+    {
+        // Work around for intel hd3000 cards :(
+        stencil = false;
+        rtts[RTT_TMP1] = drv->addRenderTargetTexture(res, "rtt.tmp1", ECF_A8R8G8B8, stencil);
+        Log::error("rtts", "Stencils for rtt not available, most likely a driver bug.");
+        if(UserConfigParams::m_pixel_shaders)
+        {
+            Log::error("rtts", "This requires pixel shaders to be disabled.");
+            UserConfigParams::m_pixel_shaders = false;
+        }
+    }
     rtts[RTT_TMP2] = drv->addRenderTargetTexture(res, "rtt.tmp2", ECF_A8R8G8B8, stencil);
     rtts[RTT_TMP3] = drv->addRenderTargetTexture(res, "rtt.tmp3", ECF_A8R8G8B8, stencil);
     rtts[RTT_TMP4] = drv->addRenderTargetTexture(res, "rtt.tmp4", ECF_A8R8G8B8, stencil);
