@@ -88,7 +88,7 @@ class RaceConfig
     std::vector<TrackInfo> m_tracks;
     int m_minor_mode;
     int m_major_mode;
-    int m_races_count;
+    unsigned int m_races_count;
 
     std::vector<RaceVote> m_votes;
     uint8_t m_max_players;

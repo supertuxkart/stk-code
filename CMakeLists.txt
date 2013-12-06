@@ -267,6 +267,9 @@ if(USE_WIIUSE)
 
 endif()
 
+if(MSVC)
+  target_link_libraries(supertuxkart iphlpapi.lib)
+endif()
 
 # Optional tools
 add_subdirectory(tools/font_tool)

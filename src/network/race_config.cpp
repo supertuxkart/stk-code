@@ -11,7 +11,7 @@ template<typename S>
 S getHighestInHistogram(std::map<S,int>* histogram)
 {
     S best_item;
-    uint8_t highest_count;
+    uint8_t highest_count = histogram->begin()->second;
     for (typename std::map<S, int>::iterator it = histogram->begin();
         it != histogram->end(); it++)
     {
@@ -260,7 +260,7 @@ void RaceConfig::computeRaceMode()
             {
                 major_histogram.at(m_votes[i].getMajorVote()) ++;
             }
-            catch (const std::out_of_range& oor) // doesn't exist in the map
+            catch (const std::out_of_range&) // doesn't exist in the map
             {
                 major_histogram[m_votes[i].getMajorVote()] = 1;
             }
@@ -271,7 +271,7 @@ void RaceConfig::computeRaceMode()
             {
                 races_count_histogram.at(m_votes[i].getRacesCountVote()) ++;
             }
-            catch (const std::out_of_range& oor) // doesn't exist in the map
+            catch (const std::out_of_range&) // doesn't exist in the map
             {
                 races_count_histogram[m_votes[i].getRacesCountVote()] = 1;
             }
@@ -282,7 +282,7 @@ void RaceConfig::computeRaceMode()
             {
                 minor_histogram.at(m_votes[i].getMinorVote()) ++;
             }
-            catch (const std::out_of_range& oor) // doesn't exist in the map
+            catch (const std::out_of_range&) // doesn't exist in the map
             {
                 minor_histogram[m_votes[i].getMinorVote()] = 1;
             }
@@ -320,7 +320,7 @@ void RaceConfig::computeNextTrack()
                 {
                     tracks_histogram.at(m_votes[i].getTrackVote()) ++;
                 }
-                catch (const std::out_of_range& oor) // doesn't exist in the map
+                catch (const std::out_of_range&) // doesn't exist in the map
                 {
                     tracks_histogram[m_votes[i].getTrackVote()] = 1;
                 }
@@ -331,7 +331,7 @@ void RaceConfig::computeNextTrack()
                 {
                     reversed_histogram.at(m_votes[i].getReversedVote()) ++;
                 }
-                catch (const std::out_of_range& oor) // doesn't exist in the map
+                catch (const std::out_of_range&) // doesn't exist in the map
                 {
                     reversed_histogram[m_votes[i].getReversedVote()] = 1;
                 }
@@ -342,7 +342,7 @@ void RaceConfig::computeNextTrack()
                 {
                     laps_histogram.at(m_votes[i].getLapsVote()) ++;
                 }
-                catch (const std::out_of_range& oor) // doesn't exist in the mapt
+                catch (const std::out_of_range&) // doesn't exist in the mapt
                 {
                     laps_histogram[m_votes[i].getLapsVote()] = 1;
                 }

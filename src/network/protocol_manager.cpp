@@ -150,7 +150,7 @@ void ProtocolManager::notifyEvent(Event* event)
     if (protocols_ids.size() != 0)
     {
         EventProcessingInfo epi;
-        epi.arrival_time = StkTime::getTimeSinceEpoch();
+        epi.arrival_time = (double)StkTime::getTimeSinceEpoch();
         epi.event = event2;
         epi.protocols_ids = protocols_ids;
         m_events_to_process.push_back(epi); // add the event to the queue
