@@ -159,8 +159,7 @@ void OptionsScreenUI::init()
     {
         std::string code_name = (*lang_list)[n];
         std::string nice_name = tinygettext::Language::from_name(code_name.c_str()).get_name();
-        list_widget->addItem(code_name, core::stringw(code_name.c_str()) + " (" +
-                             nice_name.c_str() + ")");
+        list_widget->addItem(code_name, nice_name.c_str());
     }
 
     list_widget->setSelectionID( list_widget->getItemID(UserConfigParams::m_language) );
