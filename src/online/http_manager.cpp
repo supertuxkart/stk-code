@@ -194,7 +194,8 @@ namespace Online{
 
         me->m_current_request = NULL;
         me->m_request_queue.lock();
-        while(  me->m_request_queue.getData().empty() || me->m_request_queue.getData().top()->getType() != Request::RT_QUIT)
+        while( me->m_request_queue.getData().empty() || 
+               me->m_request_queue.getData().top()->getType() != Request::RT_QUIT)
         {
             bool empty = me->m_request_queue.getData().empty();
             // Wait in cond_wait for a request to arrive. The 'while' is necessary
@@ -207,6 +208,8 @@ namespace Online{
             }
             me->m_current_request = me->m_request_queue.getData().top();
             me->m_request_queue.getData().pop();
+            if(me->m_current_request->getType()==Request::RT_QUIT)
+                break;
             me->m_request_queue.unlock();
             me->m_current_request->execute();
             me->addResult(me->m_current_request);
