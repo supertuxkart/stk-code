@@ -25,6 +25,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
+#include "utils/vs.hpp"
 
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
@@ -33,15 +34,9 @@
 #endif
 
 #include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <string>
-
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
-
 
 SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, bool ownsBuffer) : SFXBase()
 {

@@ -35,7 +35,6 @@
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 #include "utils/translation.hpp"
-#include "utils/vs.hpp"
 
 // ----------------------------------------------------------------------------
 /** Create a thread that handles all network functions independent of the

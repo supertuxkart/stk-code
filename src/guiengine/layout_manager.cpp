@@ -323,10 +323,10 @@ void LayoutManager::applyCoords(Widget* self, AbstractTopLevelContainer* topLeve
     else if (self->m_relative_y > -1)         self->m_y = (int)(parent_y + parent_h*self->m_relative_y/100);
 
     if (self->m_absolute_w > -1)      self->m_w = self->m_absolute_w;
-    else if (self->m_relative_w > -1) self->m_w = (int)roundf(parent_w*self->m_relative_w/100.0);
+    else if (self->m_relative_w > -1) self->m_w = (int)roundf(parent_w*self->m_relative_w/100.0f);
 
     if (self->m_absolute_h > -1)      self->m_h = self->m_absolute_h;
-    else if (self->m_relative_h > -1) self->m_h = (int)roundf(parent_h*self->m_relative_h/100.0);
+    else if (self->m_relative_h > -1) self->m_h = (int)roundf(parent_h*self->m_relative_h/100.0f);
 
     // ---- can't make widget bigger than parent
     if (self->m_h > (int)parent_h)

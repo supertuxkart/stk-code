@@ -19,20 +19,12 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/rating_bar_widget.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/vs.hpp"
 
 #include <IGUIEnvironment.h>
 #include <IGUIElement.h>
 #include <IGUIButton.h>
 #include <cmath>
-
-#if defined(WIN32) && _MSC_VER < 1800
-// VS up to and including VS 2012 do not provide the normal round function
-static inline float round(float val)
-{    
-    return floor(val + 0.5f);
-}
-#endif
-
 #include <string.h>
 
 using namespace GUIEngine;
@@ -87,7 +79,7 @@ void RatingBarWidget::setStepValues(float float_rating)
             m_star_values[star] = m_steps-1;
         else
         {
-            m_star_values[star] =(int)round((float_rating * (m_steps-1)) - (star*(m_steps-1)));
+            m_star_values[star] =(int)roundf((float_rating * (m_steps-1)) - (star*(m_steps-1)));
         }
     }
 }
@@ -109,7 +101,7 @@ void RatingBarWidget::setStepValuesByMouse(const core::position2di & mouse_posit
         {
             m_hovering = true;
             float exact_hover = (float)(mouse_position.X - stars_rect.UpperLeftCorner.X) / (float)stars_rect.getWidth() * (float)m_stars;
-            m_hover_rating = round(exact_hover * (m_steps-1)) / (m_steps-1);
+            m_hover_rating = roundf(exact_hover * (m_steps-1)) / (m_steps-1);
             setStepValues(m_hover_rating);
         }
         else if(m_hovering)

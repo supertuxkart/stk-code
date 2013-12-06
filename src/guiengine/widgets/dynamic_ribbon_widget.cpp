@@ -265,8 +265,6 @@ void DynamicRibbonWidget::add()
             assert(m_row_amount != -1);
         }
 
-        // m_row_amount = (int)round((m_h - m_label_height) / (float)m_child_height);
-
         if (m_properties[PROP_MAX_ROWS].size() > 0)
         {
             const int max_rows = atoi(m_properties[PROP_MAX_ROWS].c_str());

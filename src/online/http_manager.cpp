@@ -30,7 +30,6 @@
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  include <windows.h>
-#  define isnan _isnan
 #else
 #  include <sys/time.h>
 #  include <math.h>
