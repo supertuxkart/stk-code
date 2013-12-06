@@ -96,7 +96,7 @@ void IrrDriver::renderGLSL(float dt)
         const Item::ItemType type = item->getType();
 
         if (type != Item::ITEM_NITRO_BIG && type != Item::ITEM_NITRO_SMALL &&
-            type != Item::ITEM_BONUS_BOX)
+            type != Item::ITEM_BONUS_BOX && type != Item::ITEM_BANANA && type != Item::ITEM_BUBBLEGUM)
             continue;
 
         LODNode * const lod = (LODNode *) item->getSceneNode();
@@ -128,6 +128,16 @@ void IrrDriver::renderGLSL(float dt)
                 dat.r = stk_config->m_box_glow_color[0];
                 dat.g = stk_config->m_box_glow_color[1];
                 dat.b = stk_config->m_box_glow_color[2];
+            break;
+            case Item::ITEM_BANANA:
+                dat.r = stk_config->m_banana_glow_color[0];
+                dat.g = stk_config->m_banana_glow_color[1];
+                dat.b = stk_config->m_banana_glow_color[2];
+            break;
+            case Item::ITEM_BUBBLEGUM:
+                dat.r = stk_config->m_bubblegum_glow_color[0];
+                dat.g = stk_config->m_bubblegum_glow_color[1];
+                dat.b = stk_config->m_bubblegum_glow_color[2];
             break;
             default:
                 Log::fatal("render", "Unknown item type got through");

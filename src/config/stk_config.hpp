@@ -150,8 +150,9 @@ public:
 
     /** Colors for glows */
     float m_nitro_glow_color[3];
-
     float m_box_glow_color[3];
+    float m_banana_glow_color[3];
+    float m_bubblegum_glow_color[3];
 
 private:
     /** True if stk_config has been loaded. This is necessary if the
