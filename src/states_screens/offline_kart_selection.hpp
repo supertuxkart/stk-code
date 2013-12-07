@@ -12,7 +12,7 @@ class OfflineKartSelectionScreen : public KartSelectionScreen, public GUIEngine:
         virtual ~OfflineKartSelectionScreen();
 
     public:
-        static bool isRunning() { return singleton!=NULL; }
+        static bool isRunning();
 
         // we do not override anything, this class is just there to have a singleton
 };

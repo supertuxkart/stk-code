@@ -11,3 +11,5 @@ OfflineKartSelectionScreen::~OfflineKartSelectionScreen()
 {
     //dtor
 }
+
+bool OfflineKartSelectionScreen::isRunning() { return singleton!=NULL; }
