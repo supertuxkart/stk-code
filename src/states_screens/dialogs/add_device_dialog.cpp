@@ -44,6 +44,8 @@ using namespace irr::core;
 
 AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
 {
+    doInit();
+
     ScalableFont* font = GUIEngine::getFont();
     const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
