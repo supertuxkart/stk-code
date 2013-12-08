@@ -284,6 +284,11 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
                       s.c_str());
     }
 
+    if (m_disable_z_write && !m_alpha_blending && !m_add)
+    {
+        Log::warn("material", "Disabling writes to z buffer only makes sense when compositing is blending or additive");
+        m_disable_z_write = false;
+    }
 
     bool water_shader = false;
     node->get("water-shader", &water_shader);

@@ -45,6 +45,8 @@ namespace irr
 }
 using namespace irr;
 
+class ShadowImportanceProvider;
+
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/wind.hpp"
@@ -179,7 +181,14 @@ private:
 
     void renderFixed(float dt);
     void renderGLSL(float dt);
-
+    void renderShadows(ShadowImportanceProvider * const sicb,
+                       scene::ICameraSceneNode * const camnode,
+                       video::SOverrideMaterial &overridemat,
+                       Camera * const camera);
+    void renderGlow(video::SOverrideMaterial &overridemat,
+                    std::vector<GlowData>& glows,
+                    const core::aabbox3df& cambox,
+                    int cam);
     void doScreenShot();
 public:
          IrrDriver();
@@ -357,25 +366,25 @@ public:
     // ------------------------------------------------------------------------
     inline bool isGLSL() const { return m_glsl; }
     // ------------------------------------------------------------------------
-    void toggleWireframe() { m_wireframe ^= 1; }
+    void toggleWireframe() { m_wireframe = !m_wireframe; }
     // ------------------------------------------------------------------------
-    void toggleMipVisualization() { m_mipviz ^= 1; }
+    void toggleMipVisualization() { m_mipviz = !m_mipviz; }
     // ------------------------------------------------------------------------
-    void toggleNormals() { m_normals ^= 1; }
+    void toggleNormals() { m_normals = !m_normals; }
     // ------------------------------------------------------------------------
     bool getNormals() { return m_normals; }
     // ------------------------------------------------------------------------
-    void toggleSSAOViz() { m_ssaoviz ^= 1; }
+    void toggleSSAOViz() { m_ssaoviz = !m_ssaoviz; }
     // ------------------------------------------------------------------------
-    void toggleLightViz() { m_lightviz ^= 1; }
+    void toggleLightViz() { m_lightviz = !m_lightviz; }
     // ------------------------------------------------------------------------
     bool getSSAOViz() { return m_ssaoviz; }
     // ------------------------------------------------------------------------
-    void toggleShadowViz() { m_shadowviz ^= 1; }
+    void toggleShadowViz() { m_shadowviz = !m_shadowviz; }
     // ------------------------------------------------------------------------
     bool getShadowViz() { return m_shadowviz; }
     // ------------------------------------------------------------------------
-    void toggleDistortViz() { m_distortviz ^= 1; }
+    void toggleDistortViz() { m_distortviz = !m_distortviz; }
     // ------------------------------------------------------------------------
     bool getDistortViz() { return m_distortviz; }
     // ------------------------------------------------------------------------

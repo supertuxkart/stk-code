@@ -39,6 +39,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 
@@ -155,11 +156,24 @@ void OptionsScreenUI::init()
 
     const std::vector<std::string>* lang_list = translations->getLanguageList();
     const int amount = lang_list->size();
+
+    // The names need to be sorted alphabetically. Store the 2-letter 
+    // language names in a mapping, to be able to get them from the
+    // user visible full name.
+    std::vector<std::string> nice_lang_list;
+    std::map<std::string, std::string> nice_name_2_id;
     for (int n=0; n<amount; n++)
     {
         std::string code_name = (*lang_list)[n];
-        std::string nice_name = tinygettext::Language::from_name(code_name.c_str()).get_name();
-        list_widget->addItem(code_name, nice_name.c_str());
+        std::string nice_name = tinygettext::Language::from_name(code_name).get_name();
+        nice_lang_list.push_back(nice_name);
+        nice_name_2_id[nice_name] = code_name;
+    }
+    std::sort(nice_lang_list.begin(), nice_lang_list.end());
+    for(unsigned int i=0; i<nice_lang_list.size(); i++)
+    {
+        list_widget->addItem(nice_name_2_id[nice_lang_list[i]], 
+                              nice_lang_list[i].c_str());
     }
 
     list_widget->setSelectionID( list_widget->getItemID(UserConfigParams::m_language) );

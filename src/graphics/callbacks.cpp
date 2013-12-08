@@ -376,8 +376,8 @@ void LightBlendProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     float ambient[3] = { s.r, s.g, s.b };
     srv->setVertexShaderConstant("ambient", ambient, 3);
 
-    int spectex = 1;
-    srv->setVertexShaderConstant("spectex", &spectex, 1);
+    //int spectex = 1;
+    //srv->setVertexShaderConstant("spectex", &spectex, 1);
 }
 
 //-------------------------------------
