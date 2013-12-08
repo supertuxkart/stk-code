@@ -9,7 +9,7 @@
                y="-0.01"
                z="0.0"             />
     
-    <material  file="snowflake.png"/>
+    <material  file="snowflake.png" clampu="Y" clampv="Y" />
     
     <!-- Amount of particles emitted per second -->
     <rate      min="400"
@@ -23,10 +23,13 @@
     <size      min="0.40"
                max="0.60"          />
     
-    <color     min="255 255 255"
+    <color     min="40 40 255"
                max="255 255 255"   />
     
     <!-- How much time in milliseconds before the particle is fully faded out  -->
     <fadeout   time="100"          />
+
+    <wind      speed="0.16"
+               flips="Y"           />
 
 </particles>
