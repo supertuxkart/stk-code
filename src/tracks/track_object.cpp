@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2013-2013 Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,6 +26,7 @@
 #include "items/item_manager.hpp"
 #include "physics/physical_object.hpp"
 #include "race/race_manager.hpp"
+#include "utils/helpers.hpp"
 
 
 /** A track object: any additional object on the track. This object implements
@@ -133,23 +134,58 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     }
     else
     {
+        scene::ISceneNode *glownode = NULL;
+
         if (lod_node != NULL)
         {
             m_type = "lod";
             m_presentation = new TrackObjectPresentationLOD(xml_node, lod_node);
+
+            glownode = lod_node->getAllNodes()[0];
         }
         else
         {
             m_type = "mesh";
             m_presentation = new TrackObjectPresentationMesh(xml_node,
                                                              m_enabled);
+            glownode = ((TrackObjectPresentationMesh *) m_presentation)->getNode();
         }
 
-        if (m_interaction != "ghost" && m_interaction != "none")
+        std::string render_pass;
+        xml_node.get("renderpass", &render_pass);
+
+        if (m_interaction != "ghost" && m_interaction != "none" && render_pass != "skybox")
         {
             m_rigid_body = PhysicalObject::fromXML(type == "movable",
                                                    xml_node,
                                                    this);
+        }
+
+        video::SColor glow;
+        if (xml_node.get("glow", &glow) && glownode)
+        {
+            float r, g, b;
+            r = glow.getRed() / 255.0f;
+            g = glow.getGreen() / 255.0f;
+            b = glow.getBlue() / 255.0f;
+
+            irr_driver->addGlowingNode(glownode, r, g, b);
+    }
+
+        bool forcedbloom = false;
+        if (xml_node.get("forcedbloom", &forcedbloom) && forcedbloom && glownode)
+        {
+            float power = 1;
+            xml_node.get("bloompower", &power);
+            power = clampf(power, 0.5f, 10);
+
+            irr_driver->addForcedBloomNode(glownode, power);
+        }
+
+        bool displacing = false;
+        if (xml_node.get("displacing", &displacing) && displacing && glownode)
+        {
+            irr_driver->addDisplacingNode(glownode);
         }
     }
 

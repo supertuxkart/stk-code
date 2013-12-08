@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2013 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -59,7 +59,7 @@
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
-#include "network/race_state.hpp"
+#include "network/network_world.hpp"
 #include "network/network_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
@@ -70,6 +70,7 @@
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
+#include "utils/vs.hpp"
 
 
 
@@ -801,29 +802,32 @@ void Kart::finishedRace(float time)
         // in modes that support it, start end animation
         setController(new EndController(this, m_controller->getPlayer(),
                                         m_controller));
-        GameSlot *slot = unlock_manager->getCurrentSlot();
-        const Challenge *challenge = slot->getCurrentChallenge();
-        // In case of a GP challenge don't make the end animation depend
-        // on if the challenge is fulfilled
-        if(challenge && !challenge->getData()->isGrandPrix())
+        if (m_controller->isPlayerController()) // if player is on this computer
         {
-            if(challenge->getData()->isChallengeFulfilled())
-                m_kart_model->setAnimation(KartModel::AF_WIN_START);
+            GameSlot *slot = unlock_manager->getCurrentSlot();
+            const Challenge *challenge = slot->getCurrentChallenge();
+            // In case of a GP challenge don't make the end animation depend
+            // on if the challenge is fulfilled
+            if(challenge && !challenge->getData()->isGrandPrix())
+            {
+                if(challenge->getData()->isChallengeFulfilled())
+                    m_kart_model->setAnimation(KartModel::AF_WIN_START);
+                else
+                    m_kart_model->setAnimation(KartModel::AF_LOSE_START);
+
+            }
+            else if(m_race_position<=0.5f*race_manager->getNumberOfKarts() ||
+                    m_race_position==1)
+                    m_kart_model->setAnimation(KartModel::AF_WIN_START);
             else
                 m_kart_model->setAnimation(KartModel::AF_LOSE_START);
 
-        }
-        else if(m_race_position<=0.5f*race_manager->getNumberOfKarts() ||
-                m_race_position==1)
-                m_kart_model->setAnimation(KartModel::AF_WIN_START);
-        else
-            m_kart_model->setAnimation(KartModel::AF_LOSE_START);
-
-        RaceGUIBase* m = World::getWorld()->getRaceGUI();
-        if(m)
-        {
-            m->addMessage((getPosition() == 1 ? _("You won the race!") : _("You finished the race!")) ,
-                          this, 2.0f);
+            RaceGUIBase* m = World::getWorld()->getRaceGUI();
+            if(m)
+            {
+                m->addMessage((getPosition() == 1 ? _("You won the race!") : _("You finished the race!")) ,
+                              this, 2.0f);
+            }
         }
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
@@ -846,6 +850,12 @@ void Kart::finishedRace(float time)
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
              race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
     {
+        setController(new EndController(this, m_controller->getPlayer(),
+                                        m_controller));
+    }
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
+    {
+        m_kart_model->setAnimation(KartModel::AF_WIN_START);
         setController(new EndController(this, m_controller->getPlayer(),
                                         m_controller));
     }
@@ -901,15 +911,6 @@ void Kart::collectedItem(Item *item, int add_info)
         break;
     default        : break;
     }   // switch TYPE
-
-    // Attachments and powerups are stored in the corresponding
-    // functions (hit{Red,Green}Item), so only coins need to be
-    // stored here.
-    if(network_manager->getMode()==NetworkManager::NW_SERVER &&
-        (type==Item::ITEM_NITRO_BIG || type==Item::ITEM_NITRO_SMALL) )
-    {
-        race_state->itemCollected(getWorldKartId(), item->getItemId());
-    }
 
     if ( m_collected_energy > m_kart_properties->getNitroMax())
         m_collected_energy = m_kart_properties->getNitroMax();
@@ -1099,14 +1100,6 @@ void Kart::update(float dt)
 
     m_slipstream->update(dt);
 
-    // Store the actual kart controls at the start of update in the server
-    // state. This makes it easier to reset some fields when they are not used
-    // anymore (e.g. controls.fire).
-    if(network_manager->getMode()==NetworkManager::NW_SERVER)
-    {
-        race_state->storeKartControls(*this);
-    }
-
     if (!m_flying)
     {
         // When really on air, free fly, when near ground, try to glide / adjust for landing
@@ -1254,7 +1247,9 @@ void Kart::update(float dt)
     }   // if there is material
 
     // Check if any item was hit.
-    ItemManager::get()->checkItemHit(this);
+    // check it if we're not in a network world, or if we're on the server (when network mode is on)
+    if (!NetworkWorld::getInstance()->isRunning() || NetworkManager::getInstance()->isServer())
+        ItemManager::get()->checkItemHit(this);
 
     static video::SColor pink(255, 255, 133, 253);
     static video::SColor green(255, 61, 87, 23);
@@ -1300,7 +1295,7 @@ void Kart::update(float dt)
             // take the same time again to reach the bottom
             float t = 2.0f * v/force;
 
-            // Jump if either the jump is estimated to be long enough, or 
+            // Jump if either the jump is estimated to be long enough, or
             // the texture has the jump property set.
             if(t>getKartProperties()->getJumpAnimationTime()  ||
                 last_m->isJumpTexture()                         )
@@ -1319,8 +1314,13 @@ void Kart::update(float dt)
         m_kart_model->setAnimation(KartModel::AF_DEFAULT);
         m_jump_time = 0;
     }
-    
-    if( (!isOnGround() || emergency) && m_shadow_enabled)
+
+    //const bool dyn_shadows = World::getWorld()->getTrack()->hasShadows() &&
+    //                         UserConfigParams::m_shadows &&
+    //                         irr_driver->isGLSL();
+
+    // Disable the fake shadow if we're flying
+    if((!isOnGround() || emergency) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
         m_shadow->disableShadow();
@@ -1969,7 +1969,7 @@ void Kart::updatePhysics(float dt)
 
     m_skidding->update(dt, isOnGround(), m_controls.m_steer,
                        m_controls.m_skid);
-
+    m_vehicle->setVisualRotation(m_skidding->getVisualSkidRotation());
     if(( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
          m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
         m_skidding->getGraphicalJumpOffset()==0)
@@ -1988,10 +1988,8 @@ void Kart::updatePhysics(float dt)
 
     updateSliding();
 
-    // Only compute the current speed if this is not the client. On a client the
-    // speed is actually received from the server.
-    if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
-        m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
+    // Compute the speed of the kart.
+    m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
 
     // calculate direction of m_speed
     const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
@@ -2027,6 +2025,13 @@ void Kart::updatePhysics(float dt)
     //at low velocity, forces on kart push it back and forth so we ignore this
     if(fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
          m_speed = 0;
+         
+    if (dynamic_cast<RescueAnimation*>(getKartAnimation()) ||
+        dynamic_cast<ExplosionAnimation*>(getKartAnimation()))
+    {
+        m_speed = 0;
+    }
+    
     updateEngineSFX();
 #ifdef XX
     Log::info("Kart","forward %f %f %f %f  side %f %f %f %f angVel %f %f %f heading %f\n"
@@ -2334,23 +2339,6 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 }   // loadData
 
 // ----------------------------------------------------------------------------
-/** Stores the current suspension length. This function is called from world
- *  after all karts are in resting position (see World::resetAllKarts), so
- *  that the default suspension rest length can be stored. This is then used
- *  later to move the wheels depending on actual suspension, so that when
- *  a kart is in rest, the wheels are at the position at which they were
- *  modelled.
- */
-void Kart::setSuspensionLength()
-{
-    for(unsigned int i=0; i<4; i++)
-    {
-        m_default_suspension_length[i] =
-            m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
-    }   // for i
-}   // setSuspensionLength
-
-//-----------------------------------------------------------------------------
 /** Applies engine power to all the wheels that are traction capable,
  *  so other parts of code do not have to be adjusted to simulate different
  *  kinds of vehicles in the general case, only if they are trying to
@@ -2388,25 +2376,11 @@ void Kart::applyEngineForce(float force)
 void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
                           const btQuaternion& rotation)
 {
-    float wheel_up_axis[4];
-    for(unsigned int i=0; i<4; i++)
-    {
-        // Set the suspension length
-        wheel_up_axis[i] = m_default_suspension_length[i]
-                         - m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
-    }
-    m_kart_model->update(m_wheel_rotation_dt, getSteerPercent(), wheel_up_axis, m_speed);
-
-    Vec3        center_shift  = m_kart_properties->getGravityCenterShift();
-    float y = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getY()
-            - m_default_suspension_length[0]
-            - m_vehicle->getWheelInfo(0).m_wheelsRadius
-            - (m_kart_model->getWheelGraphicsRadius(0)
-               -m_kart_model->getWheelGraphicsPosition(0).getY() );
-    y += m_skidding->getGraphicalJumpOffset();
-    center_shift.setY(y);
-
-    if ((m_controls.m_nitro || m_min_nitro_time > 0.0f) && isOnGround() &&  m_collected_energy > 0)
+    // Upate particle effects (creation rate, and emitter size 
+    // depending on speed)
+    // --------------------------------------------------------
+    if ( (m_controls.m_nitro || m_min_nitro_time > 0.0f) && 
+         isOnGround() &&  m_collected_energy > 0            )
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
@@ -2434,6 +2408,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     m_kart_gfx->resizeBox(KartGFX::KGFX_ZIPPER, getSpeed(), dt);
 
+    // Handle leaning of karts
+    // -----------------------
     // Note that we compare with maximum speed of the kart, not
     // maximum speed including terrain effects. This avoids that
     // leaning might get less if a kart gets a special that increases
@@ -2488,6 +2464,50 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         }
     }
 
+    // Now determine graphical chassis and wheel position depending on
+    // the physics result. The center of gravity of the chassis is at the 
+    // bottom of the chassis, but the position of the graphical chassis is at
+    // the bottom of the wheels (i.e. in blender the kart is positioned on
+    // the horizonal plane through (0,0,0)). So first determine how far
+    // above the terrain is the center of the physics body. If the minimum
+    // of those values is larger than the lowest point of the chassis model
+    // the kart chassis would be too high (and look odd), so in this case
+    // move the chassis down so that the wheels (when touching the ground)
+    // look close enough to the chassis.
+    float height_above_terrain[4];
+    float min_hat = 9999.9f;
+    for(unsigned int i=0; i<4; i++)
+    {
+        // Set the suspension length
+        height_above_terrain[i] = 
+            (  m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS
+             - m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactPointWS).length()
+            - m_vehicle->getWheelInfo(i).m_chassisConnectionPointCS.getY();
+        if(height_above_terrain[i] < min_hat) min_hat = height_above_terrain[i];
+    }
+
+    float chassis_delta = 0;
+    // Check if the chassis needs to be moved down so that the wheels look
+    // like they are in the rest state, i.e. the wheels are not too far down.
+    if(min_hat > m_kart_model->getLowestPoint())
+    {
+        chassis_delta = min_hat - m_kart_model->getLowestPoint();
+        for(unsigned int i=0; i<4; i++)
+            height_above_terrain[i] -= chassis_delta;
+    }
+
+    m_kart_model->update(dt, m_wheel_rotation_dt, getSteerPercent(), 
+                        height_above_terrain, m_speed);
+
+
+    // If the kart is leaning, part of the kart might end up 'in' the track.
+    // To avoid this, raise the kart enough to offset the leaning.
+    float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
+
+    Vec3 center_shift  = m_kart_properties->getGravityCenterShift();
+
+    center_shift.setY(m_skidding->getGraphicalJumpOffset() + lean_height 
+                       - m_kart_model->getLowestPoint() -chassis_delta    );
     float heading = m_skidding->getVisualSkidRotation();
     Moveable::updateGraphics(dt, center_shift,
                              btQuaternion(heading, 0, m_current_lean));

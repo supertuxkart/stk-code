@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -37,8 +37,28 @@ class AbstractKart;
 class KartProperties;
 class XMLNode;
 
+/** A speed-weighted object is an object whose characteristics are influenced by the kart's speed */
 struct SpeedWeightedObject
 {
+    /** Parameters for a speed-weighted object */
+    struct Properties
+    {
+        Properties();
+
+        /** Strength factor: how much the kart speed affects the animation's distance from a static pose (-1 to disable) */
+        float               m_strength_factor;
+
+        /** Speed factor: how much the kart speed affects the animation's speed (-1 to disable) */
+        float               m_speed_factor;
+
+        /** Texture speed, in UV coordinates */
+        core::vector2df     m_texture_speed;
+
+        void    loadFromXMLNode(const XMLNode* xml_node);
+
+        void    checkAllSet();
+    };
+
     SpeedWeightedObject() : m_model(NULL), m_node(NULL), m_position(), m_name() {}
     /** Model */
     scene::IAnimatedMesh *              m_model;
@@ -51,6 +71,13 @@ struct SpeedWeightedObject
 
     /** Filename of the "speed weighted" object */
     std::string                         m_name;
+
+    /** Current uv translation in the texture matrix for speed-weighted texture animations */
+    core::vector2df                     m_texture_cur_offset;
+
+    /** Specific properties for this given speed-weighted object,
+      * otherwise just a copy of the values from the kart's properties */
+    Properties                          m_properties;
 };
 typedef std::vector<SpeedWeightedObject>    SpeedWeightedObjectList;
 
@@ -163,10 +190,21 @@ private:
      *  to AF_DEFAULT the default steering animation is shown. */
     AnimationFrameType m_current_animation;
 
-    float m_kart_width;               /**< Width of kart.  */
-    float m_kart_length;              /**< Length of kart. */
-    float m_kart_height;              /**< Height of kart. */
-	float m_kart_highest_point;       /**< Coordinate on up axis */
+    /** Width of kart.  */
+    float m_kart_width;
+
+    /** Length of kart. */
+    float m_kart_length;
+
+    /** Height of kart. */
+    float m_kart_height;
+
+    /** Largest coordinate on up axis. */
+    float m_kart_highest_point;
+
+    /** Smallest coordinate on up axis. */
+    float m_kart_lowest_point; 
+
     /** True if this is the master copy, managed by KartProperties. This
      *  is mainly used for debugging, e.g. the master copies might not have
      * anything attached to it etc. */
@@ -178,7 +216,8 @@ private:
     void  loadNitroEmitterInfo(const XMLNode &node,
                         const std::string &emitter_name, int index);
 
-    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node);
+    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, 
+                                const SpeedWeightedObject::Properties& fallback_properties);
 
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
@@ -192,8 +231,8 @@ public:
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
-    void          update(float rotation_dt, float steer,
-                         const float suspension[4], float speed);
+    void          update(float dt, float rotation_dt, float steer,
+                         const float height_abve_terrain[4], float speed);
     void          setDefaultPhysicsPosition(const Vec3 &center_shift,
                                             float wheel_radius);
     void          finishedRace();
@@ -239,9 +278,10 @@ public:
                 {assert(i>=0 && i<4); return m_wheel_graphics_radius[i]; }
     // ------------------------------------------------------------------------
     /** Returns the position of nitro emitter relative to the kart.
+     *  \param i Index of the emitter: 0 = right, 1 = left
      */
-    const Vec3* getNitroEmittersPositon() const
-                {return m_nitro_emitter_position;}
+    const Vec3& getNitroEmittersPositon(unsigned int i) const
+                { assert(i>=0 && i<2);  return m_nitro_emitter_position[i]; }
     // ------------------------------------------------------------------------
     /** Returns true if kart has nitro emitters */
     const bool hasNitroEmitters() const
@@ -264,9 +304,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the height of the kart. */
     float getHeight                 () const {return m_kart_height;      }
-	// ------------------------------------------------------------------------
-	/** Coordoinate on up axis */
-	float getHighestPoint           () const { return m_kart_highest_point;  }
+    // ------------------------------------------------------------------------
+    /** Highest coordinate on up axis */
+    float getHighestPoint           () const { return m_kart_highest_point;  }
+    // ------------------------------------------------------------------------
+    /** Lowest coordinate on up axis */
+    float getLowestPoint           () const { return m_kart_lowest_point;  }
     // ------------------------------------------------------------------------
     /** Enables- or disables the end animation. */
     void  setAnimation(AnimationFrameType type);
@@ -276,15 +319,15 @@ public:
     // ------------------------------------------------------------------------
     /**  Name of the hat mesh to use. */
     void setHatMeshName(const std::string &name) {m_hat_name = name; }
-	// ------------------------------------------------------------------------
-	void attachHat();
+    // ------------------------------------------------------------------------
+    void attachHat();
     // ------------------------------------------------------------------------
     /** Returns the array of wheel nodes. */
     scene::ISceneNode** getWheelNodes() { return m_wheel_node; }
-	// ------------------------------------------------------------------------
-	scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
-	// ------------------------------------------------------------------------
-	core::vector3df getHatOffset() { return m_hat_offset; }
+    // ------------------------------------------------------------------------
+    scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
+    // ------------------------------------------------------------------------
+    core::vector3df getHatOffset() { return m_hat_offset; }
 
 };   // KartModel
 #endif

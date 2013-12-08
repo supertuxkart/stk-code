@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -152,6 +152,9 @@ protected:
      */
     bool m_self_destruct;
 
+    /** Set when the world is online and counts network players. */
+    bool m_is_network_world;
+
     virtual void  onGo();
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool  isRaceOver() = 0;
@@ -197,7 +200,7 @@ public:
       * this method in child classes to provide it. */
     virtual const std::string& getIdent() const = 0;
     // ------------------------------------------------------------------------
-    /** Returns the number of rescue positions on a given track and game 
+    /** Returns the number of rescue positions on a given track and game
      *  mode. */
     virtual unsigned int getNumberOfRescuePositions() const OVERRIDE = 0;
     // ------------------------------------------------------------------------
@@ -282,6 +285,9 @@ public:
                         assert(kartId >= 0 && kartId < int(m_karts.size()));
                         return m_karts[kartId];                              }
     // ------------------------------------------------------------------------
+    /** Returns all karts. */
+    const KartList & getKarts() const { return m_karts; }
+    // ------------------------------------------------------------------------
     /** Returns the number of currently active (i.e.non-elikminated) karts. */
     unsigned int    getCurrentNumKarts() const { return (int)m_karts.size() -
                                                          m_eliminated_karts; }
@@ -324,6 +330,10 @@ public:
     // ------------------------------------------------------------------------
     virtual void escapePressed();
 
+    /** Set the network mode (true if networked) */
+    void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
+
+    bool isNetworkWorld() const { return m_is_network_world; }
 };   // World
 
 #endif

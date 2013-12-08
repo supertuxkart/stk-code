@@ -1,8 +1,8 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2010 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2010 Eduardo Hernandez Munoz
-//  Copyright (C) 2008-2010 Joerg Henrichs
+//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2013 Eduardo Hernandez Munoz
+//  Copyright (C) 2008-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -43,7 +43,6 @@
 #include "karts/max_speed.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/linear_world.hpp"
-#include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "tracks/quad_graph.hpp"
@@ -184,7 +183,8 @@ void EndController::update(float dt)
 
     // In case of battle mode: don't do anything
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
-       race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
+       race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER  ||
+       race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG)
     {
         m_controls->m_accel = 0.0f;
         // Brake while we are still driving forwards (if we keep

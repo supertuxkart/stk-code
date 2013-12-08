@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -29,63 +29,10 @@
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
-#include "network/network_manager.hpp"
-#include "network/race_state.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
-
-const wchar_t* getAnchorString()
-{
-    const int ANCHOR_STRINGS_COUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(ANCHOR_STRINGS_COUNT);
-
-    switch (id)
-    {
-        //I18N: shown when anchor applied. %s is the victim.
-        case 0: return _LTR("Arrr, the %s dropped anchor, Captain!");
-        case 1: return _LTR("%s pays the next round of grog!");
-        case 2: return _LTR("%s is a mighty pirate!");
-        default: assert(false); return L"";   // avoid compiler warning.
-    }
-}   // getAnchorString
-
-//-----------------------------------------------------------------------------
-const wchar_t* getParachuteString()
-{
-    const int PARACHUTE_STRINGS_COUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(PARACHUTE_STRINGS_COUNT);
-
-    switch (id)
-    {
-        case 0: return _("Geronimo!!!"); // Parachutist shout
-        case 1: return _("The Space Shuttle has landed!");
-        case 2: return _("Do you want to fly kites?");
-        default: assert(false); return  L"";  // avoid compiler warning
-    }
-}   // getParachuteString
-
-//-----------------------------------------------------------------------------
-const wchar_t* getSwapperString()
-{
-    const int SWAPPER_STRINGS_COUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(SWAPPER_STRINGS_COUNT);
-
-    switch (id)
-    {
-        case 0: return _("Magic, son. Nothing else in the world smells like that.");
-        case 1: return _("A wizard did it!");
-        case 2: return _("Banana? Box? Banana? Box? Banana? Box?");
-        default: assert(false); return L"";  // avoid compiler warning
-    }
-}   // getSwapperString
 
 //-----------------------------------------------------------------------------
 /** Constructor, stores the kart to which this powerup belongs.
@@ -239,7 +186,6 @@ void Powerup::use()
 
     m_number--;
     World *world = World::getWorld();
-    RaceGUIBase* gui = world->getRaceGUI();
     switch (m_type)
     {
     case PowerupManager::POWERUP_ZIPPER:
@@ -250,9 +196,6 @@ void Powerup::use()
             ItemManager::get()->switchItems();
             m_sound_use->position(m_owner->getXYZ());
             m_sound_use->play();
-
-            gui->addMessage(getSwapperString(), NULL, 3.0f,
-                            video::SColor(255, 255, 255, 255), false);
             break;
         }
     case PowerupManager::POWERUP_CAKE:
@@ -361,11 +304,6 @@ void Powerup::use()
                     m_sound_use->position(m_owner->getXYZ());
 
                 m_sound_use->play();
-
-                irr::core::stringw anchor_message;
-                anchor_message += StringUtils::insertValues(getAnchorString(), core::stringw(kart->getName()));
-                gui->addMessage(translations->fribidize(anchor_message), NULL, 3.0f,
-                                video::SColor(255, 255, 255, 255), false);
                 break;
             }
         }
@@ -407,9 +345,6 @@ void Powerup::use()
             else if(player_kart)
                 m_sound_use->position(player_kart->getXYZ());
             m_sound_use->play();
-
-            gui->addMessage(getParachuteString(), NULL, 3.0f,
-                            video::SColor(255, 255, 255, 255), false);
         }
         break;
 
@@ -458,13 +393,21 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
 
     // Check if two bouncing balls are collected less than getRubberBallTimer()
     //seconds apart. If yes, then call getRandomPowerup again. If no, then break.
-    for(int i=0; i<20; i++)
+    if (add_info<0)
     {
-        new_powerup = powerup_manager->getRandomPowerup(position, &n);
-        if(new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
-            ( World::getWorld()->getTime() - powerup_manager->getBallCollectTime()) >
-              RubberBall::getTimeBetweenRubberBalls() )
-            break;
+        for(int i=0; i<20; i++)
+        {
+            new_powerup = powerup_manager->getRandomPowerup(position, &n);
+            if(new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
+                ( World::getWorld()->getTime() - powerup_manager->getBallCollectTime()) >
+                  RubberBall::getTimeBetweenRubberBalls() )
+                break;
+        }
+    }
+    else // set powerup manually
+    {
+        new_powerup = (PowerupManager::PowerupType)((add_info>>4)&0x0f); // highest 4 bits for the type
+        n = (add_info&0x0f); // last 4 bits for the amount
     }
 
     if(new_powerup == PowerupManager::POWERUP_RUBBERBALL)

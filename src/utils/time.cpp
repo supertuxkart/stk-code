@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2013  SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,7 +17,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "utils/time.hpp"
+
 #include "graphics/irr_driver.hpp"
+
+#include <ctime>
 
 /** Returns a time based on an arbitrary 'epoch' (e.g. could be start
  *  time of the application, 1.1.1970, ...).
@@ -27,3 +30,19 @@ double StkTime::getRealTime(long startAt)
 {
     return irr_driver->getRealTime()/1000.0;
 }   // getTimeSinceEpoch
+
+// ----------------------------------------------------------------------------
+/** Returns the current date.
+ *  \param day Day (1 - 31).
+ *  \param month (1-12).
+ *  \param year (4 digits).
+ */
+void StkTime::getDate(int *day, int *month, int *year)
+{
+    std::time_t t = std::time(0);   // get time now
+    std::tm * now = std::localtime(&t);
+ 
+    if(day)   *day   = now->tm_mday;
+    if(month) *month = now->tm_mon + 1;
+    if(year)  *year  = now->tm_year + 1900;
+}   // getDate

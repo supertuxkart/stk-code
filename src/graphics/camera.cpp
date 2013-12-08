@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 SuperTuxKart-Team, Steve Baker
+//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2013 SuperTuxKart-Team, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,11 +19,7 @@
 
 #include "graphics/camera.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
+#include <math.h>
 
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
@@ -35,10 +31,12 @@
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
+#include "physics/btKart.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/constants.hpp"
+#include "utils/vs.hpp"
 
 #include "ICameraSceneNode.h"
 #include "ISceneManager.h"
@@ -387,13 +385,21 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
         // Fall through to falling mode.
     case CM_FALLING:
         {
-            *above_kart    = 0.75f;
+            if(UserConfigParams::m_camera_debug==2)
+            {
+                *above_kart = 0;
+                *cam_angle  = 0;
+            }
+            else
+            {
+                *above_kart    = 0.75f;
+                *cam_angle     = kp->getCameraForwardUpAngle();
+            }
             float steering = m_kart->getSteerPercent()
                            * (1.0f + (m_kart->getSkidding()->getSkidFactor()
                                       - 1.0f)/2.3f );
             // quadratically to dampen small variations (but keep sign)
             float dampened_steer = fabsf(steering) * steering;
-            *cam_angle           = kp->getCameraForwardUpAngle();
             *sideway             = -m_rotation_range*dampened_steer*0.5f;
             *distance            = -m_distance;
             *smoothing           = true;
@@ -447,7 +453,7 @@ void Camera::update(float dt)
 
     // The following settings give a debug camera which shows the track from
     // high above the kart straight down.
-    if (UserConfigParams::m_camera_debug)
+    if (UserConfigParams::m_camera_debug==1)
     {
         core::vector3df xyz = m_kart->getXYZ().toIrrVector();
         m_camera->setTarget(xyz);
@@ -509,9 +515,10 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
 {
     Vec3 wanted_position;
     Vec3 wanted_target = m_kart->getXYZ();
-
-    wanted_target.setY(wanted_target.getY()+above_kart);
-
+    if(UserConfigParams::m_camera_debug==2)
+        wanted_target.setY(m_kart->getVehicle()->getWheelInfo(2).m_raycastInfo.m_contactPointWS.getY());
+    else
+        wanted_target.setY(wanted_target.getY()+above_kart);
     float tan_up = tan(cam_angle);
     Vec3 relative_position(side_way,
                            fabsf(distance)*tan_up+above_kart,

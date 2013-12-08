@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -44,6 +44,8 @@ using namespace irr::core;
 
 AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
 {
+    doInit();
+
     ScalableFont* font = GUIEngine::getFont();
     const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
@@ -178,7 +180,7 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent
     {
         // Remove the previous modal dialog to avoid a warning
         GUIEngine::ModalDialog::dismiss();
-		if(wiimote_manager->askUserToConnectWiimotes() > 0)
+        if(wiimote_manager->askUserToConnectWiimotes() > 0)
             ((OptionsScreenInput*)GUIEngine::getCurrentScreen())->rebuildDeviceList();
 
         return GUIEngine::EVENT_BLOCK;

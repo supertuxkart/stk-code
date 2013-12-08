@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -67,24 +67,39 @@ void CustomVideoSettingsialog::beforeAddingWidgets()
     else if (UserConfigParams::m_anisotropic == 8)  value = 4;
     else if (UserConfigParams::m_anisotropic == 16) value = 5;
     else if (UserConfigParams::m_trilinear)         value = 1;
-    filtering->addLabel( L"Bilinear" );        // 0
-    filtering->addLabel( L"Trilinear" );       // 1
-    filtering->addLabel( L"Anisotropic x2" );  // 2
-    filtering->addLabel( L"Anisotropic x4" );  // 3
-    filtering->addLabel( L"Anisotropic x8" );  // 4
-    filtering->addLabel( L"Anisotropic x16" ); // 5
+    filtering->addLabel( _("Bilinear") );        // 0
+    filtering->addLabel( _("Trilinear") );       // 1
+    filtering->addLabel( _("Anisotropic x2") );  // 2
+    filtering->addLabel( _("Anisotropic x4") );  // 3
+    filtering->addLabel( _("Anisotropic x8") );  // 4
+    filtering->addLabel( _("Anisotropic x16") ); // 5
 
     filtering->setValue( value );
 
+    /*
     SpinnerWidget* antialias = getWidget<SpinnerWidget>("antialiasing");
     antialias->addLabel( _("Disabled") ); // 0
     antialias->addLabel( L"x2" );         // 1
     antialias->addLabel( L"x4" );         // 2
     antialias->addLabel( L"x8" );         // 3
     antialias->setValue( UserConfigParams::m_antialiasing );
+    */
 
-    getWidget<CheckBoxWidget>("postprocessing")->setState( UserConfigParams::m_postprocess_enabled );
-    getWidget<CheckBoxWidget>("pixelshaders")->setState( UserConfigParams::m_pixel_shaders );
+    SpinnerWidget* ssao = getWidget<SpinnerWidget>("ssao");
+    ssao->addLabel( _("Disabled") );   // 0
+    ssao->addLabel( _("low") );          // 1
+    ssao->addLabel( _("high") );         // 2
+    ssao->setValue( UserConfigParams::m_ssao );
+
+    SpinnerWidget* shadows = getWidget<SpinnerWidget>("shadows");
+    shadows->addLabel( _("Disabled") );   // 0
+    shadows->addLabel( _("low") );          // 1
+    shadows->addLabel( _("high") );         // 2
+    shadows->setValue( UserConfigParams::m_shadows );
+    
+    getWidget<CheckBoxWidget>("motionblur")->setState( UserConfigParams::m_motionblur );
+    getWidget<CheckBoxWidget>("mlaa")->setState( UserConfigParams::m_mlaa );
+    getWidget<CheckBoxWidget>("pixelshaders")->setState(UserConfigParams::m_pixel_shaders);
 }
 
 // -----------------------------------------------------------------------------
@@ -97,14 +112,20 @@ GUIEngine::EventPropagation CustomVideoSettingsialog::processEvent(const std::st
             getWidget<CheckBoxWidget>("anim_gfx")->getState();
         UserConfigParams::m_weather_effects          =
             getWidget<CheckBoxWidget>("weather_gfx")->getState();
-        UserConfigParams::m_antialiasing  =
-            getWidget<SpinnerWidget>("antialiasing")->getValue();
-        UserConfigParams::m_postprocess_enabled      =
-            getWidget<CheckBoxWidget>("postprocessing")->getState();
+        //UserConfigParams::m_antialiasing  =
+        //    getWidget<SpinnerWidget>("antialiasing")->getValue();
+        UserConfigParams::m_motionblur      =
+            getWidget<CheckBoxWidget>("motionblur")->getState();
         UserConfigParams::m_show_steering_animations =
             getWidget<SpinnerWidget>("steering_animations")->getValue();
         UserConfigParams::m_pixel_shaders =
             getWidget<CheckBoxWidget>("pixelshaders")->getState();
+        UserConfigParams::m_mlaa =
+            getWidget<CheckBoxWidget>("mlaa")->getState();
+        UserConfigParams::m_ssao  =
+            getWidget<SpinnerWidget>("ssao")->getValue();
+        UserConfigParams::m_shadows  =
+            getWidget<SpinnerWidget>("shadows")->getValue();
 
         switch (getWidget<SpinnerWidget>("filtering")->getValue())
         {

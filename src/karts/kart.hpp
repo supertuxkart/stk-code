@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2013 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -184,12 +184,6 @@ private:
     /** Rotation change in the last time delta, same for all wheels */
     float           m_wheel_rotation_dt;
 
-    /** For each wheel it stores the suspension length after the karts are at
-     *  the start position, i.e. the suspension will be somewhat compressed.
-     *  The bullet suspensionRestLength is the value when the suspension is not
-     *  at all compressed. */
-    float           m_default_suspension_length[4];
-
     /** The skidmarks object for this kart. */
     SkidMarks      *m_skidmarks;
 
@@ -239,7 +233,6 @@ public:
     virtual void   createPhysics    ();
     virtual void   updateWeight     ();
     virtual bool   isInRest         () const;
-    virtual void   setSuspensionLength();
     virtual void   applyEngineForce (float force);
 
     virtual void flyUp();

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
 
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/saved_grand_prix.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -139,11 +140,23 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
 
     // ---- Start button
     ButtonWidget* okBtn = new ButtonWidget();
+    ButtonWidget* continueBtn = new ButtonWidget();
+
+    SavedGrandPrix* saved_gp = SavedGrandPrix::getSavedGP( StateManager::get()
+                                               ->getActivePlayerProfile(0)
+                                               ->getUniqueID(),
+                                               gpIdent,
+                                               race_manager->getDifficulty(),
+                                               race_manager->getNumberOfKarts(),
+                                               race_manager->getNumLocalPlayers());
 
     if (gp_ok)
     {
         okBtn->m_properties[PROP_ID] = "start";
         okBtn->setText(_("Start Grand Prix"));
+
+        continueBtn->m_properties[PROP_ID] = "continue";
+        continueBtn->setText(_("Continue"));
     }
     else
     {
@@ -152,7 +165,25 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         okBtn->setBadge(BAD_BADGE);
     }
 
-    okBtn->m_x = m_area.getWidth()/2 - 200;
+    if (saved_gp && gp_ok)
+    {
+        continueBtn->m_x = m_area.getWidth()/2 + 110;
+        continueBtn->m_y = y2;
+        continueBtn->m_w = 200;
+        continueBtn->m_h = m_area.getHeight() - y2 - 15;
+        continueBtn->setParent(m_irrlicht_window);
+        m_widgets.push_back(continueBtn);
+        continueBtn->add();
+        continueBtn->getIrrlichtElement()->setTabStop(true);
+        continueBtn->getIrrlichtElement()->setTabGroup(false);
+        
+        okBtn->m_x = m_area.getWidth()/2 - 310;
+    }
+    else
+    {
+        okBtn->m_x = m_area.getWidth()/2 - 200;
+    }
+    
     okBtn->m_y = y2;
     okBtn->m_w = 400;
     okBtn->m_h = m_area.getHeight() - y2 - 15;
@@ -163,7 +194,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     okBtn->getIrrlichtElement()->setTabGroup(false);
 
     okBtn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
-
+    
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -189,7 +220,7 @@ void GPInfoDialog::onEnterPressedInternal()
     ModalDialog::dismiss();
     // Disable accidentally unlocking of a challenge
     unlock_manager->getCurrentSlot()->setCurrentChallenge("");
-    race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false);
+    race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false, false);
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -201,7 +232,15 @@ GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& eventS
         // Save GP identifier, since dismiss will delete this object.
         std::string gp_id = m_gp_ident;
         ModalDialog::dismiss();
-        race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false);
+        race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false, false);
+        return GUIEngine::EVENT_BLOCK;
+    }
+    if (eventSource == "continue")
+    {
+        // Save GP identifier, since dismiss will delete this object.
+        std::string gp_id = m_gp_ident;
+        ModalDialog::dismiss();
+        race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false, true);
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "cannot_start")

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006-2013 SuperTuxKart-Team
 //  Modelled after Supertux's configfile.h
 //
 //  This program is free software; you can redistribute it and/or
@@ -98,6 +98,45 @@ public:
 
     irr::core::stringw toString() const;
 };   // GroupUserConfigParam
+
+// ============================================================================
+template<typename T>
+class ListUserConfigParam : public UserConfigParam
+{
+    std::vector<T> m_elements;
+
+public:
+    ListUserConfigParam(const char* param_name,
+                         const char* comment = NULL);
+    ListUserConfigParam(const char* param_name,
+                         const char* comment,
+                         int nb_elts,
+                         ...);
+    ListUserConfigParam(const char* param_name,
+                         GroupUserConfigParam* group,
+                         const char* comment = NULL);
+    ListUserConfigParam(const char* param_name,
+                         GroupUserConfigParam* group,
+                         const char* comment,
+                         int nb_elts,
+                         ...);
+
+    void write(XMLWriter& stream) const;
+    void findYourDataInAChildOf(const XMLNode* node);
+    void findYourDataInAnAttributeOf(const XMLNode* node);
+
+    void addElement(T element);
+
+    irr::core::stringw toString() const;
+
+    operator std::vector<T>() const
+            { return m_elements; }
+    float& operator=(const std::vector<T>& v)
+            { m_elements = std::vector<T>(v); return m_elements; }
+    float& operator=(const ListUserConfigParam& v)
+            { m_elements = std::vector<T>(v); return m_elements; }
+};   // ListUserConfigParam
+typedef ListUserConfigParam<char*>    StringListUserConfigParam;
 
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
@@ -347,31 +386,31 @@ namespace UserConfigParams
         PARAM_DEFAULT( GroupUserConfigParam("WiiMote",
                                             "Settings for the wiimote") );
     PARAM_PREFIX FloatUserConfigParam         m_wiimote_raw_max
-            PARAM_DEFAULT( FloatUserConfigParam(25.0f, "wiimote-raw-max",
+            PARAM_DEFAULT( FloatUserConfigParam(20.0f, "wiimote-raw-max",
             &m_wiimote_group,
             "At what raw input value maximum steering is reached (between 1 and 25).") );
 
-	PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_linear
-            PARAM_DEFAULT( FloatUserConfigParam(0.2f, "wiimote-weight-linear",
+    PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_linear
+            PARAM_DEFAULT( FloatUserConfigParam(1.0f, "wiimote-weight-linear",
             &m_wiimote_group,
-			"A weight applied to the linear component of mapping wiimote angle to steering angle"));
+            "A weight applied to the linear component of mapping wiimote angle to steering angle"));
 
     PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_square
-            PARAM_DEFAULT( FloatUserConfigParam(0.8f, "wiimote-weight-square",
+            PARAM_DEFAULT( FloatUserConfigParam(0.0f, "wiimote-weight-square",
             &m_wiimote_group,
-			"A weight applied to the square component of mapping wiimote angle to steering angle"));
+            "A weight applied to the square component of mapping wiimote angle to steering angle"));
 
     PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_asin
             PARAM_DEFAULT( FloatUserConfigParam(0.0f, "wiimote-weight-asin",
             &m_wiimote_group,
-			"A weight applied to the asin component of mapping wiimote angle to steering angle"));
+            "A weight applied to the asin component of mapping wiimote angle to steering angle"));
 
     PARAM_PREFIX FloatUserConfigParam         m_wiimote_weight_sin
             PARAM_DEFAULT( FloatUserConfigParam(0.0f, "wiimote-weight-sin",
             &m_wiimote_group,
-			"A weight applied to the sin component of mapping wiimote angle to steering angle"));
+            "A weight applied to the sin component of mapping wiimote angle to steering angle"));
 
-	// ---- GP start order
+    // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
             PARAM_DEFAULT( GroupUserConfigParam("GpStartOrder",
                                                 "Order karts start in GP") );
@@ -446,8 +485,9 @@ namespace UserConfigParams
     /** True if check structures should be debugged. */
     PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );
 
-    /** Special debug camera being high over the kart. */
-    PARAM_PREFIX bool m_camera_debug PARAM_DEFAULT( false );
+    /** Special debug camera: 0: normal cameral; 1: being high over the kart.;
+                              2: on ground level. */
+    PARAM_PREFIX int m_camera_debug PARAM_DEFAULT( false );
 
     /** True if physics debugging should be enabled. */
     PARAM_PREFIX bool m_physics_debug PARAM_DEFAULT( false );
@@ -479,18 +519,49 @@ namespace UserConfigParams
     /** True if hardware skinning should be enabled */
     PARAM_PREFIX bool m_hw_skinning_enabled  PARAM_DEFAULT( false );
 
-    /** True if Christmas Mode should be enabled */
-    PARAM_PREFIX bool m_xmas_enabled  PARAM_DEFAULT( false );
-
     // not saved to file
 
     // ---- Networking
-    PARAM_PREFIX StringUserConfigParam      m_server_address
-            PARAM_DEFAULT(  StringUserConfigParam("localhost", "server_adress",
-                                       "Information about last server used") );
     PARAM_PREFIX IntUserConfigParam         m_server_port
-            PARAM_DEFAULT(  IntUserConfigParam(2305, "server_port",
-                                       "Information about last server used") );
+            PARAM_DEFAULT(  IntUserConfigParam(7321, "server_port",
+                                       "Information about the port to listen on.") );
+
+    PARAM_PREFIX IntUserConfigParam         m_server_max_players
+            PARAM_DEFAULT(  IntUserConfigParam(16, "server_max_players",
+                                       "Maximum number of players on the server.") );
+
+    PARAM_PREFIX StringListUserConfigParam         m_stun_servers
+            PARAM_DEFAULT(  StringListUserConfigParam("Stun_servers", "The stun servers"
+                            " that will be used to know the public address.",
+                            24,
+                            "provserver.televolution.net",
+                            "sip1.lakedestiny.cordiaip.com",
+                            "stun1.voiceeclipse.net",
+                            "stun01.sipphone.com",
+                            "stun.callwithus.com",
+                            "stun.counterpath.net",
+                            "stun.endigovoip.com",
+                            "stun.ekiga.net",
+                            "stun.ideasip.com" ,
+                            "stun.internetcalls.com",
+                            "stun.ipns.com",
+                            "stun.noc.ams-ix.net",
+                            "stun.phonepower.com",
+                            "stun.phoneserve.com",
+                            "stun.rnktel.com",
+                            "stun.softjoys.com",
+                            "stunserver.org",
+                            "stun.sipgate.net",
+                            "stun.stunprotocol.org",
+                            "stun.voip.aebc.com",
+                            "stun.voipbuster.com",
+                            "stun.voxalot.com",
+                            "stun.voxgratia.org",
+                            "stun.xten.com") );
+
+    PARAM_PREFIX StringUserConfigParam m_packets_log_filename
+            PARAM_DEFAULT( StringUserConfigParam("packets_log.txt", "packets_log_filename",
+                                                 "Where to log received and sent packets.") );
 
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
@@ -509,13 +580,14 @@ namespace UserConfigParams
 #define FBO_DEFAULT true
 #endif
 
-    PARAM_PREFIX BoolUserConfigParam        m_fbo
-        PARAM_DEFAULT(  BoolUserConfigParam(FBO_DEFAULT, "fbo",
-                     &m_graphics_quality, "Use frame buffer objects (FBOs)") );
-
     PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "anim_gfx",
                             &m_graphics_quality, "Scenery animations") );
+
+    // This saves the actual user preference.
+    PARAM_PREFIX IntUserConfigParam        m_xmas_mode
+            PARAM_DEFAULT(  IntUserConfigParam(0, "christmas-mode",
+                            &m_graphics_quality, "Christmas hats: 0 use calendar, 1 always on, 2 always off") );
 
     PARAM_PREFIX BoolUserConfigParam        m_weather_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx",
@@ -534,10 +606,12 @@ namespace UserConfigParams
                            &m_graphics_quality,
                            "Whether trilinear filtering is allowed to be "
                            "used (true or false)") );
+    /*
     PARAM_PREFIX IntUserConfigParam          m_antialiasing
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "antialiasing", &m_graphics_quality,
                            "Whether antialiasing is enabled (0 = disabled, 1 = 2x, 2 = 4x, 3 = 8x") );
+    */
     PARAM_PREFIX BoolUserConfigParam         m_vsync
             PARAM_DEFAULT( BoolUserConfigParam(false, "vsync",
                            &m_graphics_quality,
@@ -546,18 +620,27 @@ namespace UserConfigParams
     PARAM_DEFAULT( BoolUserConfigParam(true, "pixel_shaders",
                                        &m_graphics_quality,
                                        "Whether to enable pixel shaders (splatting, normal maps, ...)") );
-    PARAM_PREFIX BoolUserConfigParam         m_postprocess_enabled
+    PARAM_PREFIX BoolUserConfigParam         m_motionblur
             PARAM_DEFAULT( BoolUserConfigParam(false,
-                           "postprocess_enabled", &m_graphics_quality,
-                           "Whether post-processing (motion blur...) should "
-                           "be enabled") );
+                           "motionblur_enabled", &m_graphics_quality,
+                           "Whether motion blur should be enabled") );
+    PARAM_PREFIX BoolUserConfigParam         m_mlaa
+            PARAM_DEFAULT( BoolUserConfigParam(false,
+                           "mlaa", &m_graphics_quality,
+                           "Whether MLAA anti-aliasing should be enabled") );
+    PARAM_PREFIX IntUserConfigParam          m_ssao
+            PARAM_DEFAULT( IntUserConfigParam(0,
+                           "ssao", &m_graphics_quality,
+                           "Whether SSAO is enabled (0 = disabled, 1 = low, 2 = high") );
+    PARAM_PREFIX IntUserConfigParam          m_shadows
+            PARAM_DEFAULT( IntUserConfigParam(0,
+                           "shadows", &m_graphics_quality,
+                           "Whether shadows are enabled (0 = disabled, 1 = low, 2 = high") );
 
     // ---- Misc
     PARAM_PREFIX BoolUserConfigParam        m_cache_overworld
             PARAM_DEFAULT(  BoolUserConfigParam(true, "cache-overworld") );
 
-    PARAM_PREFIX BoolUserConfigParam        m_minimal_race_gui
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "minimal-race-gui") );
     // TODO : is this used with new code? does it still work?
     PARAM_PREFIX BoolUserConfigParam        m_crashed
             PARAM_DEFAULT(  BoolUserConfigParam(false, "crashed") );
@@ -601,9 +684,48 @@ namespace UserConfigParams
         PARAM_DEFAULT( WStringUserConfigParam(L"", "default_player",
                                               "Which player to use by default (if empty, will prompt)") );
 
+    // ---- Internet related
+
+    PARAM_PREFIX IntUserConfigParam        m_internet_status
+            PARAM_DEFAULT(  IntUserConfigParam(0, "enable_internet",
+                                               "Status of internet: 0 user "
+                                               "wasn't asked, 1: allowed, 2: "
+                                               "not allowed") );
+
+    // ---- Online gameplay related
+
+    PARAM_PREFIX GroupUserConfigParam       m_online_group
+            PARAM_DEFAULT( GroupUserConfigParam("OnlinePlay",
+                                          "Everything related to online play.") );
+
+    PARAM_PREFIX StringUserConfigParam      m_server_multiplayer
+            PARAM_DEFAULT( StringUserConfigParam(   "https://api.stkaddons.net/",
+                                                     "server_multiplayer",
+                                                     &m_online_group,
+                                                    "The server used for online multiplayer."));
+
+    PARAM_PREFIX BoolUserConfigParam        m_saved_session
+            PARAM_DEFAULT(  BoolUserConfigParam(    false,
+                                                    "saved_session",
+                                                    &m_online_group,
+                                                    "Is there a saved session?") );
+
+    PARAM_PREFIX IntUserConfigParam         m_saved_user
+            PARAM_DEFAULT(  IntUserConfigParam(     0,
+                                                    "saved_user",
+                                                    &m_online_group,
+                                                    "User ID of the saved session.") );
+
+    PARAM_PREFIX StringUserConfigParam      m_saved_token
+            PARAM_DEFAULT(  StringUserConfigParam(  "",
+                                                    "saved_token",
+                                                    &m_online_group,
+                                                    "Token of the saved session.") );
+
+
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
-        PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews",
+            PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews",
                                           "Addon and news related settings") );
 
     PARAM_PREFIX StringUserConfigParam      m_server_addons
@@ -633,13 +755,6 @@ namespace UserConfigParams
                                                &m_addon_group,
                                                "Don't show important message "
                                                "with this or a lower id again") );
-
-    PARAM_PREFIX IntUserConfigParam        m_internet_status
-            PARAM_DEFAULT(  IntUserConfigParam(0, "enable_internet",
-                                               &m_addon_group,
-                                               "Status of internet: 0 user "
-                                               "wasn't asked, 1: allowed, 2: "
-                                               "not allowed") );
 
     PARAM_PREFIX TimeUserConfigParam        m_addons_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "addon_last_updated",
@@ -713,7 +828,7 @@ public:
     const irr::core::stringw& getWarning()        { return m_warning;  }
     void  resetWarning()                          { m_warning="";      }
     void  setWarning(irr::core::stringw& warning) { m_warning=warning; }
-
+    void  postLoadInit();
     void  addDefaultPlayer();
 
 };   // UserConfig

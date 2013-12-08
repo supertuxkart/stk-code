@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -128,7 +128,7 @@ namespace SkinConfig
 
         if(node->get("type", &type) == 0)
         {
-        	Log::error("skin", "All elements must have a type\n");
+            Log::error("skin", "All elements must have a type\n");
             return;
         }
         node->get("state", &state);
@@ -155,7 +155,7 @@ namespace SkinConfig
         if(!root)
         {
             Log::error("skin", "Could not read XML file '%s'.",
-            		   file.c_str());
+                       file.c_str());
             throw std::runtime_error("Invalid skin file");
         }
 
@@ -175,7 +175,7 @@ namespace SkinConfig
             else
             {
                 Log::error("skin", "Unknown node in XML file '%s'.",
-                		   node->getName().c_str());
+                           node->getName().c_str());
             }
         }// nend for
 
@@ -814,14 +814,13 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
 void Skin::drawRatingBar(Widget *w, const core::recti &rect,
                         const bool pressed, const bool focused)
 {
-    static const int step_number = 3; // Harcoded number of step.
-    
+    RatingBarWidget *ratingBar = (RatingBarWidget*)w;
+
     const ITexture *texture = SkinConfig::m_render_params["rating::neutral"].getImage();
     const int texture_w = texture->getSize().Width / 4;
     const int texture_h = texture->getSize().Height;
     const float aspect_ratio = 1.0f;
     
-    RatingBarWidget *ratingBar = (RatingBarWidget*)w;
     const int star_number = ratingBar->getStarNumber();
 
     int star_h = rect.getHeight();
@@ -835,8 +834,18 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
     }
     
     // center horizontally and vertically
-    const int x_from = rect.UpperLeftCorner.X + (rect.getWidth() - star_w) / 2; 
-    const int y_from = rect.UpperLeftCorner.Y + (rect.getHeight() - star_h) / 2;
+    const int x_from = rect.UpperLeftCorner.X;
+    const int y_from = rect.UpperLeftCorner.Y;
+
+    core::recti stars_rect(x_from, y_from, x_from + (star_number * star_w), y_from + star_h);
+
+    if(!w->m_deactivated)
+        ratingBar->setStepValuesByMouse(irr_driver->getDevice()->getCursorControl()->getPosition(), stars_rect);
+
+    SColor colors[] =  { SColor(100,255,255,255),
+                         SColor(100,255,255,255),
+                         SColor(100,255,255,255),
+                         SColor(100,255,255,255) };
 
     for (int i = 0; i < star_number; i++)
     {
@@ -847,14 +856,15 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         star_rect.LowerRightCorner.X = x_from + (i + 1) * star_w;
         star_rect.LowerRightCorner.Y = y_from + star_h;
         
-        int step = ratingBar->getStepOfStar(i, step_number);
+        int step = ratingBar->getStepsOfStar(i);
         
         const core::recti source_area(texture_w * step, 0, 
                                       texture_w * (step + 1), texture_h);
 
         GUIEngine::getDriver()->draw2DImage(texture,
                                             star_rect, source_area,
-                                            0 /* no clipping */, 0,
+                                            0 /* no clipping */,
+                                           (w->m_deactivated || ID_DEBUG) ? colors : 0,
                                             true /* alpha */);
     }
 
@@ -1354,7 +1364,7 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
 void Skin::drawIconButton(const core::recti &rect, Widget* widget,
                           const bool pressed, bool focused)
 {
-    RibbonWidget* parentRibbon = (RibbonWidget*)widget->m_event_handler;
+    RibbonWidget* parentRibbon = dynamic_cast<RibbonWidget*>(widget->m_event_handler);
     IGUIElement* focusedElem = NULL;
     if (GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER) != NULL)
     {
@@ -1627,6 +1637,14 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                 ITexture* tex =
                     irr_driver->getTexture( file_manager->getGUIDir()
                                             + "bar.png" );
+                if(!tex)
+                {
+                    std::string file = file_manager->getGUIDir() + "main_help.png";
+                    tex = irr_driver->getTexture(file);
+                    if(!tex)
+                        Log::fatal("Skin",
+                        "Can't find fallback texture 'main_help.png, aborting.");
+                }
                 core::recti r1(0, (int)(widget.m_y - 40*y_size),
                                framesize.Width, framesize.Height);
                 core::recti r2(core::dimension2di(0,0), tex->getSize());
@@ -1892,6 +1910,9 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
 void doDrawBadge(ITexture* texture, const core::recti& rect,
                  float max_icon_size, bool badge_at_left)
 {
+    // In case of a problem
+    if(!texture) return;
+
     const core::dimension2d<u32>& texture_size = texture->getSize();
     const float aspectRatio = (float)texture_size.Width
                             / (float)texture_size.Height;
@@ -1922,6 +1943,8 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     if (widget->m_badges & LOCKED_BADGE)
     {
         video::ITexture* texture = irr_driver->getTexture(
+                                 file_manager->getTextureFile("gui_lock.png"),
+                                 "Can't find '%s'.",
                                  file_manager->getTextureFile("gui_lock.png"));
         float max_icon_size = 0.5f; // Lock badge can be quite big
         doDrawBadge(texture, rect, max_icon_size, true);
@@ -1929,6 +1952,8 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     if (widget->m_badges & OK_BADGE)
     {
         video::ITexture* texture = irr_driver->getTexture(
+                              file_manager->getTextureFile("green_check.png"),
+                              "Can't find '%s'.",
                               file_manager->getTextureFile("green_check.png"));
         float max_icon_size = 0.35f;
         doDrawBadge(texture, rect, max_icon_size, true);
@@ -1936,7 +1961,8 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     if (widget->m_badges & BAD_BADGE)
     {
         video::ITexture* texture = irr_driver->getTexture(
-                                 file_manager->getTextureFile("red_mark.png"));
+                                 file_manager->getTextureFile("red_mark.png"),
+                                 "Can't find red_mark.png");
         float max_icon_size = 0.35f;
         doDrawBadge(texture, rect, max_icon_size, false);
     }
@@ -1944,13 +1970,16 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     {
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(
-                               file_manager->getTextureFile("cup_bronze.png"));
+                               file_manager->getTextureFile("cup_bronze.png"),
+                               "Can't find cup_bronze.png.");
         doDrawBadge(texture, rect, max_icon_size, false);
     }
     if (widget->m_badges & KEYBOARD_BADGE)
     {
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(
+                                   file_manager->getGUIDir() + "keyboard.png",
+                                   "Can't find '%s'.",
                                    file_manager->getGUIDir() + "keyboard.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
@@ -1958,6 +1987,8 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     {
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(
+                                    file_manager->getGUIDir() + "gamepad.png",
+                                    "Can't find '%s'.",
                                     file_manager->getGUIDir() + "gamepad.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
@@ -1965,6 +1996,8 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     {
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(
+                                  file_manager->getGUIDir() + "hourglass.png",
+                                  "Can't find '%s'.",
                                   file_manager->getGUIDir() + "hourglass.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }

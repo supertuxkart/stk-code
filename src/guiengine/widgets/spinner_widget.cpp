@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -62,33 +62,17 @@ void SpinnerWidget::add()
 
     if (min_s.size() > 0)
     {
-        int i;
-        std::istringstream myStream(min_s);
-		myStream >> i;
-        bool is_number = (i!=0);
-        if (is_number)
+		if (!StringUtils::parseString<int>(min_s, &m_min))
         {
-            m_min = i;
-        }
-        else
-        {
-            std::cerr << "WARNING : invalid value for spinner widget minimum value : '" << min_s << "'\n";
+			Log::warn("invalid value for spinner widget minimum value : %s", min_s.c_str());
         }
     }
 
     if (max_s.size() > 0)
     {
-        int i;
-        std::istringstream myStream(max_s);
-		myStream >> i;
-        bool is_number = (i!=0);
-        if (is_number)
-        {
-            m_max = i;
-        }
-        else
-        {
-            std::cerr << "WARNING : invalid value for spinner widget maximal value : '" << max_s << "'\n";
+		if (!StringUtils::parseString<int>(max_s, &m_max))
+		{
+			Log::warn("invalid value for spinner widget maximum value : %s", max_s.c_str());
         }
     }
 

@@ -122,8 +122,10 @@ void BattleAI::handleGetUnstuck(const float dt)
     }
     if(m_currently_reversing == true)
     {
-        m_controls->m_accel = -0.30f;
-        setSteering(-1.0f*m_target_angle,dt);
+        m_controls->m_accel = -0.34f;
+        if(m_target_angle > 0)
+        setSteering(M_PI,dt);
+        else setSteering(-M_PI,dt);
         m_time_since_stuck += dt;
         
         if(m_time_since_stuck >= 0.6f)
@@ -136,7 +138,7 @@ void BattleAI::handleGetUnstuck(const float dt)
 
 
 
-// Handles steering. Returns the steering angle being used for setSteering()
+// Handles steering. 
 void BattleAI::handleSteering(const float dt)
 {
     Vec3  target_point;

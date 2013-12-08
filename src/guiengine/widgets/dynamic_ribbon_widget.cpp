@@ -1,5 +1,5 @@
-//  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Supertuxkart - a fun racing game with go-kart
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/vs.hpp"
 
 #include <IGUIEnvironment.h>
 #include <sstream>
@@ -28,10 +29,6 @@
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
-
-#ifndef round
-#  define round(x)  (floor(x+0.5f))
-#endif
 
 DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row) : Widget(WTYPE_DYNAMIC_RIBBON)
 {
@@ -268,8 +265,6 @@ void DynamicRibbonWidget::add()
             assert(m_row_amount != -1);
         }
 
-        // m_row_amount = (int)round((m_h - m_label_height) / (float)m_child_height);
-
         if (m_properties[PROP_MAX_ROWS].size() > 0)
         {
             const int max_rows = atoi(m_properties[PROP_MAX_ROWS].c_str());
@@ -330,7 +325,7 @@ void DynamicRibbonWidget::buildInternalStructure()
     // ---- determine column amount
     const float row_height = (float)(m_h - m_label_height)/(float)m_row_amount;
     float ratio_zoom = (float)row_height / (float)(m_child_height - m_label_height);
-    m_col_amount = (int)round( m_w / ( m_child_width*ratio_zoom ) );
+    m_col_amount = (int)roundf( m_w / ( m_child_width*ratio_zoom ) );
 
     // ajust column amount to not add more item slots than we actually need
     const int item_count = m_items.size();
@@ -813,7 +808,7 @@ void DynamicRibbonWidget::propagateSelection()
         {
             if (ribbon != selected_ribbon)
             {
-                ribbon->m_selection[p] = (int)round(where*(ribbon->m_children.size()-1));
+                ribbon->m_selection[p] = (int)roundf(where*(ribbon->m_children.size()-1));
                 ribbon->updateSelection();
             }
         }
@@ -945,37 +940,37 @@ void DynamicRibbonWidget::updateItemDisplay()
             IconButtonWidget* icon = dynamic_cast<IconButtonWidget*>(&row.m_children[i]);
             assert(icon != NULL);
 
-			//FIXME : it is a bit hackish
-			if(i < item_placement[n].size())
-			{
-				icon_id = item_placement[n][i];
-				if (icon_id < item_amount && icon_id != -1)
-				{
-					std::string item_icon = (m_items[icon_id].m_animated ?
-											 m_items[icon_id].m_all_images[0] :
-											 m_items[icon_id].m_sshot_file);
-					icon->setImage( item_icon.c_str(), m_items[icon_id].m_image_path_type );
+            //FIXME : it is a bit hackish
+            if(i < item_placement[n].size())
+            {
+                icon_id = item_placement[n][i];
+                if (icon_id < item_amount && icon_id != -1)
+                {
+                    std::string item_icon = (m_items[icon_id].m_animated ?
+                                             m_items[icon_id].m_all_images[0] :
+                                             m_items[icon_id].m_sshot_file);
+                    icon->setImage( item_icon.c_str(), m_items[icon_id].m_image_path_type );
 
-					icon->m_properties[PROP_ID]   = m_items[icon_id].m_code_name;
-					icon->setLabel(m_items[icon_id].m_user_name);
-					icon->m_text                  = m_items[icon_id].m_user_name;
-					icon->m_badges                = m_items[icon_id].m_badges;
+                    icon->m_properties[PROP_ID]   = m_items[icon_id].m_code_name;
+                    icon->setLabel(m_items[icon_id].m_user_name);
+                    icon->m_text                  = m_items[icon_id].m_user_name;
+                    icon->m_badges                = m_items[icon_id].m_badges;
 
-					//std::cout << "    item " << i << " is " << m_items[icon_id].m_code_name << "\n";
+                    //std::cout << "    item " << i << " is " << m_items[icon_id].m_code_name << "\n";
 
-					//std::wcout << L"Setting widget text '" << icon->m_text.c_str() << L"'\n";
+                    //std::wcout << L"Setting widget text '" << icon->m_text.c_str() << L"'\n";
 
-					// if the ribbon has no "ribbon-wide" label, call will do nothing
-					row.setLabel(i, m_items[icon_id].m_user_name);
-				}
-				else
-				{
-					icon->setImage( "textures/transparence.png", IconButtonWidget::ICON_PATH_TYPE_RELATIVE );
-					icon->resetAllBadges();
-					icon->m_properties[PROP_ID] = RibbonWidget::NO_ITEM_ID;
-					//std::cout << "    item " << i << " is a FILLER\n";
-				}
-			}
+                    // if the ribbon has no "ribbon-wide" label, call will do nothing
+                    row.setLabel(i, m_items[icon_id].m_user_name);
+                }
+                else
+                {
+                    icon->setImage( "textures/transparence.png", IconButtonWidget::ICON_PATH_TYPE_RELATIVE );
+                    icon->resetAllBadges();
+                    icon->m_properties[PROP_ID] = RibbonWidget::NO_ITEM_ID;
+                    //std::cout << "    item " << i << " is a FILLER\n";
+                }
+            }
         } // next column
     } // next row
 }

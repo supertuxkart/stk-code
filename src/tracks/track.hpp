@@ -1,5 +1,7 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//
+//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2009-2013  Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -220,7 +222,7 @@ private:
 #endif
 
     PtrVector<ParticleEmitter>      m_all_emitters;
-    scene::ILightSceneNode  *m_sun;
+    scene::ISceneNode  *m_sun;
     /** Used to collect the triangles for the bullet mesh. */
     TriangleMesh*            m_track_mesh;
     /** Used to collect the triangles which do not have a physical
@@ -349,9 +351,11 @@ private:
     /** True if this track supports using smoothed normals. */
     bool                m_smooth_normals;
 
-    float               m_fog_density;
+    float               m_fog_max;
     float               m_fog_start;
     float               m_fog_end;
+    float               m_fog_height_start;
+    float               m_fog_height_end;
     core::vector3df     m_sun_position;
     /** The current ambient color for each kart. */
     video::SColor       m_ambient_color;
@@ -365,6 +369,24 @@ private:
     core::dimension2du      m_mini_map_size;
     float                   m_minimap_x_scale;
     float                   m_minimap_y_scale;
+
+    bool m_clouds;
+
+    bool m_bloom;
+    float m_bloom_threshold;
+
+    bool m_lensflare;
+    bool m_godrays;
+    bool m_shadows;
+
+    float m_displacement_speed;
+    float m_caustics_speed;
+    
+    /** The levels for color correction 
+     * m_color_inlevel(black, gamma, white)
+     * m_color_outlevel(black, white)*/
+    core::vector3df m_color_inlevel;
+    core::vector2df m_color_outlevel;
 
     /** List of all bezier curves in the track - for e.g. camera, ... */
     std::vector<BezierCurve*> m_all_curves;
@@ -534,7 +556,15 @@ public:
     // ------------------------------------------------------------------------
     float getFogEnd()    const { return m_fog_end; }
     // ------------------------------------------------------------------------
+    float getFogStartHeight()  const { return m_fog_height_start; }
+    // ------------------------------------------------------------------------
+    float getFogEndHeight()    const { return m_fog_height_end; }
+    // ------------------------------------------------------------------------
+    float getFogMax()    const { return m_fog_max; }
+    // ------------------------------------------------------------------------
     video::SColor getFogColor() const { return m_fog_color; }
+    // ------------------------------------------------------------------------
+    video::SColor getSunColor() const { return m_sun_diffuse_color; }
     // ------------------------------------------------------------------------
     /** Whether this is an "internal" track. If so it won't be offered
      * in the track selection screen. */
@@ -557,6 +587,22 @@ public:
 
     const std::vector<Subtitle>& getSubtitles() const { return m_subtitles; }
 
+    bool hasClouds() const { return m_clouds; }
+
+    bool getBloom() const { return m_bloom; }
+    float getBloomThreshold() const { return m_bloom_threshold; }
+    
+    /** Return the color levels for color correction shader */
+    core::vector3df getColorLevelIn() const { return m_color_inlevel; }
+    core::vector2df getColorLevelOut() const { return m_color_outlevel; }
+
+    bool hasLensFlare() const { return m_lensflare; }
+    bool hasGodRays() const { return m_godrays; }
+    bool hasShadows() const { return m_shadows; }
+    
+
+    float getDisplacementSpeed() const { return m_displacement_speed; }
+    float getCausticsSpeed() const { return m_caustics_speed; }
 };   // class Track
 
 #endif

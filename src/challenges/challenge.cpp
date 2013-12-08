@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -90,17 +90,11 @@ void Challenge::setSolved(RaceManager::Difficulty d)
 
 //-----------------------------------------------------------------------------
 
-
-const char* boolstr(bool b)
-{
-    return (b ? "true" : "false");
-}
-
 void Challenge::save(std::ofstream& writer)
 {
     writer << "        <" << m_data->getId().c_str() << ">\n"
-           << "            <easy   solved=\"" << boolstr(isSolved(RaceManager::DIFFICULTY_EASY))   << "\"/>\n"
-           << "            <medium solved=\"" << boolstr(isSolved(RaceManager::DIFFICULTY_MEDIUM)) << "\"/>\n"
-           << "            <hard   solved=\"" << boolstr(isSolved(RaceManager::DIFFICULTY_HARD))   << "\"/>\n"
+           << "            <easy   solved=\"" << StringUtils::boolstr(isSolved(RaceManager::DIFFICULTY_EASY))   << "\"/>\n"
+           << "            <medium solved=\"" << StringUtils::boolstr(isSolved(RaceManager::DIFFICULTY_MEDIUM)) << "\"/>\n"
+           << "            <hard   solved=\"" << StringUtils::boolstr(isSolved(RaceManager::DIFFICULTY_HARD))   << "\"/>\n"
            << "        </" << m_data->getId().c_str() << ">\n";
 }   // save

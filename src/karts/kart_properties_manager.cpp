@@ -1,6 +1,7 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2006 Ingo Ruhnke <grumbel@gmx.de>
+//
+//  Copyright (C) 2004-2013 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -191,7 +192,7 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
 {
     std::string config_filename=dir+"/kart.xml";
     if(!file_manager->fileExists(config_filename))
-    	return false;
+        return false;
 
     KartProperties* kart_properties;
     try
@@ -231,6 +232,18 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
     m_all_kart_dirs.push_back(dir);
     return true;
 }   // loadKartData
+
+//-----------------------------------------------------------------------------
+/** Sets the name of a mesh to use as a hat for all karts.
+ *  \param hat_name Name of the hat mash.
+  */
+void KartPropertiesManager::setHatMeshName(const std::string &hat_name)
+{
+    for (int i=0; i<m_karts_properties.size(); i++)
+    {
+        m_karts_properties[i].setHatMeshName(hat_name);
+    }
+}   // setHatMeshName
 
 //-----------------------------------------------------------------------------
 /** Returns index of the kart properties with the given ident.

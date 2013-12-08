@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -61,6 +61,7 @@ namespace GUIEngine
     template<typename SCREEN>
     class ScreenSingleton
     {
+    protected:
         static SCREEN* singleton;
 
     public:
@@ -302,6 +303,10 @@ namespace GUIEngine
                                  int axisDir,
                                  int value) {}
 
+        /** Callback that gets called when a dialog is closed.
+         *  Can be used to set focus for instance.
+         */
+        virtual void onDialogClose() {}
     };
 
 }

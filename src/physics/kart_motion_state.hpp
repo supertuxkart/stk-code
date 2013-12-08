@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,11 +19,8 @@
 #ifndef HEADER_KART_MOTION_STATE_HPP
 #define HEADER_KART_MOTION_STATE_HPP
 
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
+#include <math.h>
+#include "utils/vs.hpp"
 
 #include "LinearMath/btMotionState.h"
 

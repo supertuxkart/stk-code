@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -195,6 +195,8 @@ namespace GUIEngine
 
     /** \brief Add a screen to the list of screens known by the gui engine */
     void  addScreenToList(Screen* screen);
+    /** \brief Remove a screen from the list of screens known by the gui engine */
+    void  removeScreen(const char* name);
 
     /** \brief Low-level mean to change current screen.
       * \note Do not use directly. Use a state manager instead to get higher-level functionnality.

@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2006 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2011 Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2011-2013 Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -120,7 +120,9 @@
 #  ifdef __CYGWIN__
 #    include <unistd.h>
 #  endif
+#  define WIN32_LEAN_AND_MEAN
 #  define _WINSOCKAPI_
+#  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #  ifdef _MSC_VER
 #    include <direct.h>
@@ -128,7 +130,6 @@
 #else
 #  include <unistd.h>
 #endif
-#include <time.h>
 #include <stdexcept>
 #include <cstdio>
 #include <string>
@@ -139,6 +140,7 @@
 #include <IEventReceiver.h>
 
 #include "main_loop.hpp"
+#include "achievements/achievements_manager.hpp"
 #include "addons/addons_manager.hpp"
 #include "addons/inetwork_http.hpp"
 #include "addons/news_manager.hpp"
@@ -155,6 +157,7 @@
 #include "graphics/referee.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
+#include "guiengine/dialog_queue.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/wiimote_manager.hpp"
@@ -168,6 +171,20 @@
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
+#include "network/client_network_manager.hpp"
+#include "network/server_network_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "online/current_user.hpp"
+#include "online/http_manager.hpp"
+#include "network/client_network_manager.hpp"
+#include "network/server_network_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "online/current_user.hpp"
+#include "online/http_manager.hpp"
+#include "online/profile_manager.hpp"
+#include "online/servers_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -180,6 +197,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/crash_reporting.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -339,11 +357,38 @@ void gamepadVisualisation()
 
         driver->endScene();
     }
-}
+}   // gamepadVisualisation
+
 // ============================================================================
+/** Sets the Christmas flag (m_xmas_enabled), depending on currently set
+ *  Christ mode (m_xmas_mode)
+ */
+void handleXmasMode()
+{
+    bool xmas = false;
+    switch(UserConfigParams::m_xmas_mode)
+    {
+    case 0:  
+        {
+            int day, month;
+            StkTime::getDate(&day, &month);
+            // Christmat hats are shown between 17. of December
+            // and 5th of January
+            xmas = (month == 12 && day>=17)  || (month ==  1 && day <=5);
+            break;
+        }
+    case 1:  xmas = true;  break;
+    default: xmas = false; break;
+    }   // switch m_xmas_mode
 
+    if(xmas)
+        kart_properties_manager->setHatMeshName("christmas_hat.b3d");
+}   // handleXmasMode
 
-void cmdLineHelp (char* invocation)
+// ----------------------------------------------------------------------------
+/** Prints help for command line options to stdout.
+ */
+void cmdLineHelp(char* invocation)
 {
     Log::info("main",
     "Usage: %s [OPTIONS]\n\n"
@@ -390,6 +435,7 @@ void cmdLineHelp (char* invocation)
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
     "       --no-graphics      Do not display the actual race.\n"
+    "       --with-profile     Enables the profile mode.\n"
     "       --demo-mode t      Enables demo mode after t seconds idle time in "
                                "main menu.\n"
     "       --demo-tracks t1,t2 List of tracks to be used in demo mode. No\n"
@@ -401,13 +447,11 @@ void cmdLineHelp (char* invocation)
     // "       --history=n        Replay history file 'history.dat' using:\n"
     // "                            n=1: recorded positions\n"
     // "                            n=2: recorded key strokes\n"
-    //"       --server[=port]    This is the server (running on the specified "
-    //                          "port).\n"
-    //"       --client=ip        This is a client, connect to the specified ip"
-    //                          " address.\n"
-    //"       --port=n           Port number to use.\n"
-    //"       --numclients=n     Number of clients to wait for (server "
-    //                          "only).\n"
+    "       --server           Start a server (not a playing client).\n"
+    "       --login=s          Automatically sign in (set the login).\n"
+    "       --password=s       Automatically sign in (set the password).\n"
+    "       --port=n           Port number to use.\n"
+    "       --max-players=n    Maximum number of clients (server only).\n"
     "       --no-console       Does not write messages in the console but to\n"
     "                          stdout.log.\n"
     "       --console          Write messages in the console and files\n"
@@ -466,14 +510,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
         }
         else if ( sscanf(argv[i], "--xmas=%d", &n) )
         {
-            if (n)
-            {
-                UserConfigParams::m_xmas_enabled = true;
-            }
-            else
-            {
-                UserConfigParams::m_xmas_enabled = false;
-            }
+            UserConfigParams::m_xmas_mode = n;
         }
         else if( !strcmp(argv[i], "--no-console"))
         {
@@ -592,7 +629,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
         }   // --verbose or -v
     }
     return 0;
-}
+}   // handleCmdLinePreliminary
 
 // ============================================================================
 /** Handles command line options.
@@ -603,6 +640,9 @@ int handleCmdLine(int argc, char **argv)
 {
     int n;
     char s[1024];
+
+    bool try_login = false;
+    irr::core::stringw login, password;
 
     for(int i=1; i<argc; i++)
     {
@@ -634,6 +674,11 @@ int handleCmdLine(int argc, char **argv)
         else if(!strcmp(argv[i], "--ftl-debug"))
         {
             UserConfigParams::m_ftl_debug = true;
+        }
+        else if(UserConfigParams::m_artist_debug_mode &&
+               !strcmp(argv[i], "--camera-wheel-debug"))
+        {
+            UserConfigParams::m_camera_debug=2;
         }
         else if(UserConfigParams::m_artist_debug_mode &&
                !strcmp(argv[i], "--camera-debug"))
@@ -680,23 +725,27 @@ int handleCmdLine(int argc, char **argv)
         {
             AIBaseLapController::enableDebug();
         }
-        else if(sscanf(argv[i], "--server=%d",&n)==1)
+        else if(sscanf(argv[i], "--port=%d",&n))
         {
-            network_manager->setMode(NetworkManager::NW_SERVER);
             UserConfigParams::m_server_port = n;
         }
         else if( !strcmp(argv[i], "--server") )
         {
-            network_manager->setMode(NetworkManager::NW_SERVER);
+            NetworkManager::getInstance<ServerNetworkManager>();
+            Log::info("main", "Creating a server network manager.");
         }
-        else if( sscanf(argv[i], "--port=%d", &n) )
+        else if( sscanf(argv[i], "--max-players=%d", &n) )
         {
-            UserConfigParams::m_server_port=n;
+            UserConfigParams::m_server_max_players=n;
         }
-        else if( sscanf(argv[i], "--client=%1023s", s) )
+        else if( sscanf(argv[i], "--login=%1023s", s) )
         {
-            network_manager->setMode(NetworkManager::NW_CLIENT);
-            UserConfigParams::m_server_address=s;
+            login = s;
+            try_login = true;
+        }
+        else if( sscanf(argv[i], "--password=%1023s", s) )
+        {
+            password = s;
         }
         else if ( sscanf(argv[i], "--gfx=%d", &n) )
         {
@@ -983,6 +1032,9 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( !strcmp(argv[i], "--no-graphics") )
         {
+        }
+        else if( !strcmp(argv[i], "--with-profile") )
+        {
             // Set default profile mode of 1 lap if we haven't already set one
             if (!ProfileWorld::isProfileMode()) {
                 UserConfigParams::m_no_start_screen = true;
@@ -1097,6 +1149,20 @@ int handleCmdLine(int argc, char **argv)
         UserConfigParams::m_music = false;// and music when profiling
     }
 
+    if (try_login)
+    {
+        irr::core::stringw s;
+        Online::CurrentUser::SignInRequest* request =
+                Online::CurrentUser::get()->requestSignIn(login, password, false, false);
+
+        Online::HTTPManager::get()->synchronousRequest(request);
+
+        if (request->isSuccess())
+        {
+            Log::info("Main", "Logged in from command line.");
+        }
+    }
+
     return 1;
 }   // handleCmdLine
 
@@ -1108,8 +1174,7 @@ void initUserConfig(char *argv[])
     irr_driver              = new IrrDriver();
     file_manager            = new FileManager(argv);
     user_config             = new UserConfig();     // needs file_manager
-    const bool config_ok    = user_config->loadConfig();
-
+    const bool config_ok    = user_config->loadConfig();    
     if (UserConfigParams::m_language.toString() != "system")
     {
 #ifdef WIN32
@@ -1124,7 +1189,7 @@ void initUserConfig(char *argv[])
     translations            = new Translations();   // needs file_manager
     stk_config              = new STKConfig();      // in case of --stk-config
                                                     // command line parameters
-
+    user_config->postLoadInit();
     if (!config_ok || UserConfigParams::m_all_players.size() == 0)
     {
         user_config->addDefaultPlayer();
@@ -1165,6 +1230,8 @@ void initRest()
     // to network_http (since the thread might use network_http, otherwise
     // a race condition can be introduced resulting in a crash).
     INetworkHttp::get()->startNetworkThread();
+    Online::HTTPManager::get()->startNetworkThread();
+    AchievementsManager::get()->init();
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -1178,7 +1245,6 @@ void initRest()
     powerup_manager         = new PowerupManager       ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
-    network_manager         = new NetworkManager       ();
     KartPropertiesManager::addKartSearchDir(
                  file_manager->getAddonsFile("karts/"));
     track_manager->addTrackSearchDir(
@@ -1194,8 +1260,10 @@ void initRest()
     // Consistency check for challenges, and enable all challenges
     // that have all prerequisites fulfilled
     grand_prix_manager->checkConsistency();
-    GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                               file_manager->getTextureFile("cup_gold.png")) );
+    std::string file = file_manager->getTextureFile("cup_gold.png");
+    if(file.size()==0)
+        Log::fatal("main", "Can not find cup_gold.png, aborting.");
+    GUIEngine::addLoadingIcon( irr_driver->getTexture(file) );
 
     race_manager            = new RaceManager          ();
     // default settings for Quickstart
@@ -1213,19 +1281,33 @@ void initRest()
  */
 static void cleanSuperTuxKart()
 {
+
+    delete main_loop;
+
     irr_driver->updateConfigIfRelevant();
 
     if(INetworkHttp::get())
         INetworkHttp::get()->stopNetworkThread();
+    if(Online::HTTPManager::isRunning())
+        Online::HTTPManager::get()->stopNetworkThread();
+
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
+    Online::HTTPManager::deallocate();
+    Online::ServersManager::deallocate();
+    Online::ProfileManager::deallocate();
+    AchievementsManager::deallocate();
+    Online::CurrentUser::deallocate();
+    GUIEngine::DialogQueue::deallocate();
+
     Referee::cleanup();
     if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
     INetworkHttp::destroy();
     if(news_manager)            delete news_manager;
     if(addons_manager)          delete addons_manager;
-    if(network_manager)         delete network_manager;
+    NetworkManager::kill();
+
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
     if(attachment_manager)      delete attachment_manager;
@@ -1241,19 +1323,6 @@ static void cleanSuperTuxKart()
     if(music_manager)           delete music_manager;
     delete ParticleKindManager::get();
     if(stk_config)              delete stk_config;
-
-#ifndef WIN32
-    if (user_config) //close logfiles
-    {
-        Log::closeOutputFiles();
-#endif
-        fclose(stderr);
-        fclose(stdout);
-#ifndef WIN32
-    }
-#endif
-
-
     if(user_config)             delete user_config;
     if(unlock_manager)          delete unlock_manager;
     if(translations)            delete translations;
@@ -1278,15 +1347,6 @@ bool ShowDumpResults(const wchar_t* dump_path,
 }
 #endif
 
-static bool checkXmasTime()
-{
-    time_t      rawtime;
-    struct tm*  timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    return (timeinfo->tm_mon == 12-1);  // Xmas mode happens in December
-}
-
 #if defined(DEBUG) && defined(WIN32) && !defined(__CYGWIN__)
 #pragma comment(linker, "/SUBSYSTEM:console")
 #endif
@@ -1297,6 +1357,8 @@ int main(int argc, char *argv[] )
     google_breakpad::ExceptionHandler eh(L"C:\\Temp", NULL, ShowDumpResults,
                                          NULL, google_breakpad::ExceptionHandler::HANDLER_ALL);
 #endif
+    CrashReporting::installHandlers();
+
     srand(( unsigned ) time( 0 ));
 
     try {
@@ -1305,8 +1367,6 @@ int main(int argc, char *argv[] )
         // not have) other managers initialised:
         initUserConfig(argv); // argv passed so config file can be
                               // found more reliably
-
-        UserConfigParams::m_xmas_enabled = checkXmasTime();
 
         handleCmdLinePreliminary(argc, argv);
 
@@ -1330,10 +1390,12 @@ int main(int argc, char *argv[] )
         GUIEngine::addLoadingIcon( irr_driver->getTexture(
                            file_manager->getGUIDir() + "options_video.png") );
         kart_properties_manager -> loadAllKarts    ();
+        handleXmasMode();
         unlock_manager          = new UnlockManager();
-        //m_tutorial_manager      = new TutorialManager();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                               file_manager->getTextureFile("gui_lock.png")) );
+        std::string file = file_manager->getTextureFile("gui_lock.png");
+        if(file.size()==0)
+            Log::fatal("main", "Can not find gui_lock.png, aborting.");
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(file));
         projectile_manager      -> loadData        ();
 
         // Both item_manager and powerup_manager load models and therefore
@@ -1368,6 +1430,18 @@ int main(int argc, char *argv[] )
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);
 
+        // load the network manager
+        // If the server has been created (--server option), this will do nothing (just a warning):
+        NetworkManager::getInstance<ClientNetworkManager>();
+        if (NetworkManager::getInstance()->isServer())
+            ServerNetworkManager::getInstance()->setMaxPlayers(
+                    UserConfigParams::m_server_max_players);
+        NetworkManager::getInstance()->run();
+        if (NetworkManager::getInstance()->isServer())
+        {
+            ProtocolManager::getInstance()->requestStart(new ServerLobbyRoomProtocol());
+        }
+
         addons_manager->checkInstalledAddons();
 
         // Load addons.xml to get info about addons even when not
@@ -1380,7 +1454,18 @@ int main(int argc, char *argv[] )
             }
         }
 
-        if(!UserConfigParams::m_no_start_screen)
+        // no graphics, and no profile mode
+        if (ProfileWorld::isNoGraphics() && !ProfileWorld::isProfileMode())
+        {
+            // hack to have a running game slot :
+            PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
+            if (UserConfigParams::m_default_player.toString().size() > 0)
+                for (int n=0; n<players.size(); n++)
+                    if (players[n].getName() == UserConfigParams::m_default_player.toString())
+                        unlock_manager->setCurrentSlot(players[n].getUniqueID());
+
+        }
+        else if(!UserConfigParams::m_no_start_screen)
         {
             StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
 #ifdef ENABLE_WIIUSE
@@ -1442,7 +1527,7 @@ int main(int argc, char *argv[] )
 
             // Create player and associate player with keyboard
             StateManager::get()->createActivePlayer(
-                    UserConfigParams::m_all_players.get(0), device );
+                    UserConfigParams::m_all_players.get(0), device, NULL);
 
             if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
             {
@@ -1465,7 +1550,6 @@ int main(int argc, char *argv[] )
             StateManager::get()->enterGameState();
         }
 
-
         // If an important news message exists it is shown in a popup dialog.
         const core::stringw important_message =
                                            news_manager->getImportantMessage();
@@ -1483,7 +1567,7 @@ int main(int argc, char *argv[] )
         {
             // This will setup the race manager etc.
             history->Load();
-            network_manager->setupPlayerKartInfo();
+            race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
             main_loop->run();
             // well, actually run() will never return, since
@@ -1492,20 +1576,6 @@ int main(int argc, char *argv[] )
             exit(-3);
         }
 
-        // Initialise connection in case that a command line option was set
-        // configuring a client or server. Otherwise this function does nothing
-        // here (and will be called again from the network gui).
-        if(!network_manager->initialiseConnections())
-        {
-            Log::error("main", "Problems initialising network connections,\n"
-                            "Running in non-network mode.");
-        }
-        // On the server start with the network information page for now
-        if(network_manager->getMode()==NetworkManager::NW_SERVER)
-        {
-            // TODO - network menu
-            //menu_manager->pushMenu(MENUID_NETWORK_GUI);
-        }
         // Not replaying
         // =============
         if(!ProfileWorld::isProfileMode())
@@ -1515,7 +1585,7 @@ int main(int argc, char *argv[] )
                 // Quickstart (-N)
                 // ===============
                 // all defaults are set in InitTuxkart()
-                network_manager->setupPlayerKartInfo();
+                race_manager->setupPlayerKartInfo();
                 race_manager->startNew(false);
             }
         }
@@ -1524,8 +1594,7 @@ int main(int argc, char *argv[] )
             // Profiling
             // =========
             race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-            race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
-            network_manager->setupPlayerKartInfo();
+            race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
         }
         main_loop->run();
@@ -1555,12 +1624,26 @@ int main(int argc, char *argv[] )
     // so we don't crash later when StateManager tries to access input devices.
     StateManager::get()->resetActivePlayers();
     if(input_manager) delete input_manager; // if early crash avoid delete NULL
+    NetworkManager::getInstance()->abort();
 
     cleanSuperTuxKart();
 
 #ifdef DEBUG
     MemoryLeaks::checkForLeaks();
 #endif
+
+#ifndef WIN32
+    if (user_config) //close logfiles
+    {
+        Log::closeOutputFiles();
+#endif
+        fclose(stderr);
+        fclose(stdout);
+#ifndef WIN32
+    }
+#endif
+
+
 
     return 0 ;
 }   // main

@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin
-//                2011 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2013 Lucas Baudin
+//  Copyright (C) 2011-2013 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,14 +24,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string>
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  include <windows.h>
-#  define isnan _isnan
-#else
-#  include <sys/time.h>
-#  include <math.h>
-#endif
+#include <math.h>
 
 #include "addons/news_manager.hpp"
 #include "addons/request.hpp"
@@ -494,19 +487,19 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
 
     curl_easy_setopt(m_curl_session, CURLOPT_URL, full_url.c_str());
     std::string uagent = (std::string)"SuperTuxKart/" + STK_VERSION;
-	// Add platform to user-agent string for informational purposes.
-	// Add more cases as necessary.
-	#ifdef WIN32
-		uagent += (std::string)" (Windows)";
-	#elif defined(__APPLE__)
-		uagent += (std::string)" (Macintosh)";
-	#elif defined(__FreeBSD__)
-		uagent += (std::string)" (FreeBSD)";
-	#elif defined(linux)
-		uagent += (std::string)" (Linux)";
-	#else
-		// Unknown system type
-	#endif
+    // Add platform to user-agent string for informational purposes.
+    // Add more cases as necessary.
+    #ifdef WIN32
+        uagent += (std::string)" (Windows)";
+    #elif defined(__APPLE__)
+        uagent += (std::string)" (Macintosh)";
+    #elif defined(__FreeBSD__)
+        uagent += (std::string)" (FreeBSD)";
+    #elif defined(linux)
+        uagent += (std::string)" (Linux)";
+    #else
+        // Unknown system type
+    #endif
     curl_easy_setopt(m_curl_session, CURLOPT_USERAGENT, uagent.c_str());
     curl_easy_setopt(m_curl_session, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSDATA, request);

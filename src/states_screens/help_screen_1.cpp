@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,7 +24,6 @@
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/help_screen_2.hpp"
 #include "states_screens/help_screen_3.hpp"
@@ -66,7 +65,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
 
         // Create player and associate player with keyboard
         StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
-                                                device);
+                                                device, NULL);
 
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
         {
@@ -83,7 +82,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
             ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
         StateManager::get()->enterGameState();
-        network_manager->setupPlayerKartInfo();
+        race_manager->setupPlayerKartInfo();
         race_manager->startNew(false);
     }
     else if (name == "category")
@@ -108,16 +107,16 @@ void HelpScreen1::init()
 {
     Screen::init();
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
-	ButtonWidget* tutorial = getWidget<ButtonWidget>("startTutorial");
+    ButtonWidget* tutorial = getWidget<ButtonWidget>("startTutorial");
 
-	if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-	{
-		tutorial->setDeactivated();
-	}
-	else
-	{
-		tutorial->setActivated();
-	}
+    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+    {
+        tutorial->setDeactivated();
+    }
+    else
+    {
+        tutorial->setActivated();
+    }
 
     if (w != NULL)  w->select( "page1", PLAYER_ID_GAME_MASTER );
 }   //init

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,6 +23,7 @@
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/arenas_screen.hpp"
+#include "states_screens/easter_egg_screen.hpp"
 #include "states_screens/soccer_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
@@ -121,7 +122,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
             race_manager->setMinorMode(RaceManager::MINOR_MODE_EASTER_EGG);
             UserConfigParams::m_game_mode = CONFIG_CODE_EASTER;
             race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
-            StateManager::get()->pushScreen( TracksScreen::getInstance() );
+            StateManager::get()->pushScreen( EasterEggScreen::getInstance() );
         }
         else if (selectedMode == IDENT_SOCCER)
         {
@@ -149,7 +150,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
     {
         StateManager::get()->escapePressed();
     }
-    
+
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
@@ -236,7 +237,7 @@ void RaceSetupScreen::init()
     {
         w->setSelection( UserConfigParams::m_difficulty, PLAYER_ID_GAME_MASTER );
     }
-    
+
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
     kartamount->setActivated();
 
@@ -305,7 +306,7 @@ if (race_manager->getNumLocalPlayers() > 1 || UserConfigParams::m_artist_debug_m
         irr::core::stringw name1 = irr::core::stringw(
            RaceManager::getNameOf(RaceManager::MINOR_MODE_EASTER_EGG)) + L"\n";
         //FIXME: avoid duplicating descriptions from the help menu!
-        name1 +=  _("Find all Easter Eggs");
+        name1 +=  _("Explore tracks to find all hidden eggs");
 
         w2->addItem( name1, IDENT_EASTER,
                    RaceManager::getIconOf(RaceManager::MINOR_MODE_EASTER_EGG));
@@ -339,13 +340,13 @@ if (race_manager->getNumLocalPlayers() > 1 || UserConfigParams::m_artist_debug_m
 
     m_mode_listener = new GameModeRibbonListener(this);
     w2->registerHoverListener(m_mode_listener);
-    
-    
+
+
     if (unlock_manager->getCurrentSlot()->isLocked("difficulty_best"))
     {
         RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
         assert(w != NULL);
-        
+
         int index = w->findItemNamed("best");
         Widget* hardestWidget = &w->getChildren()[index];
         hardestWidget->setBadge(LOCKED_BADGE);

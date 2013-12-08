@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012 Joerg Henrichs
+//  Copyright (C) 2012-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
 #ifndef EASTER_EGG_HUNT_HPP
 #define EASTER_EGG_HUNT_HPP
 
-#include "modes/world_with_rank.hpp"
+#include "modes/linear_world.hpp"
 #include "states_screens/race_gui_base.hpp"
 
 #include <string>
@@ -31,7 +31,7 @@ class AbstractKart;
  * \brief An implementation of World to provide an easter egg hunt like mode
  * \ingroup modes
  */
-class EasterEggHunt: public WorldWithRank
+class EasterEggHunt: public LinearWorld
 {
 private:
     /** Keeps track of how many eggs each kart has found. */
@@ -56,7 +56,7 @@ public:
     virtual bool raceHasLaps(){ return false; }
 
     virtual const std::string& getIdent() const;
-
+    virtual void terminateRace();
     virtual void update(float dt);
     virtual void getKartsDisplayInfo(
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
@@ -64,6 +64,10 @@ public:
     void updateKartRanks();
     void collectedEasterEgg(const AbstractKart *kart);
     void readData(const std::string &filename);
+
+    virtual void checkForWrongDirection(unsigned int i) OVERRIDE;
+    virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
+
 };   // EasterEggHunt
 
 

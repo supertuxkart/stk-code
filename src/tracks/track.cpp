@@ -1,7 +1,7 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//                2009 Joerg Henrichs, Steve Baker
+//
+//  Copyright (C) 2004-2013  Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2009-2013  Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -113,6 +113,16 @@ Track::Track(const std::string &filename)
     m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
     m_mini_map              = NULL;
+    m_bloom                 = true;
+    m_bloom_threshold       = 0.75f;
+    m_color_inlevel         = core::vector3df(0.0,1.0, 255.0);
+    m_color_outlevel        = core::vector2df(0.0, 255.0);
+    m_clouds                = false;
+    m_lensflare             = false;
+    m_godrays               = false;
+    m_displacement_speed    = 1.0f;
+    m_caustics_speed        = 1.0f;
+    m_shadows               = true;
     m_sky_particles         = NULL;
     m_sky_dx                = 0.05f;
     m_sky_dy                = 0.0f;
@@ -260,6 +270,12 @@ void Track::cleanup()
         material_manager->popTempMaterial();
     }
 
+    irr_driver->clearGlowingNodes();
+    irr_driver->clearLights();
+    irr_driver->clearForcedBloom();
+    irr_driver->clearDisplacingNodes();
+    irr_driver->clearBackgroundNodes();
+
     if(UserConfigParams::logMemory())
     {
         Log::debug("track",
@@ -311,9 +327,11 @@ void Track::loadTrackInfo()
 {
     // Default values
     m_use_fog               = false;
-    m_fog_density           = 1.0f/100.0f;
+    m_fog_max               = 1.0f;
     m_fog_start             = 0.0f;
     m_fog_end               = 1000.0f;
+    m_fog_height_start      = 0.0f;
+    m_fog_height_end        = 100.0f;
     m_gravity               = 9.80665f;
     m_smooth_normals        = false;
                               /* ARGB */
@@ -349,6 +367,16 @@ void Track::loadTrackInfo()
     root->get("internal",              &m_internal);
     root->get("reverse",               &m_reverse_available);
     root->get("push-back",             &m_enable_push_back);
+    root->get("clouds",                &m_clouds);
+    root->get("bloom",                 &m_bloom);
+    root->get("bloom-threshold",       &m_bloom_threshold);
+    root->get("lens-flare",            &m_lensflare);
+    root->get("shadows",               &m_shadows);
+    root->get("god-rays",              &m_godrays);
+    root->get("displacement-speed",    &m_displacement_speed);
+    root->get("caustics-speed",        &m_caustics_speed);
+    root->get("color-level-in",        &m_color_inlevel);
+    root->get("color-level-out",       &m_color_outlevel);
 
     // Make the default for auto-rescue in battle mode and soccer mode to be false
     if(m_is_arena || m_is_soccer)
@@ -403,6 +431,7 @@ void Track::loadTrackInfo()
                 break; 
             } 
         } 
+        delete easter;
     } 
 }   // loadTrackInfo
 
@@ -522,7 +551,6 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
         }
     }
 }   // loadQuadGraph
-
 //-----------------------------------------------------------------------------
 /** Loads the polygon graph for battle, i.e. the definition of all polys, and the way
  *  they are connected to each other. Input file name is hardcoded for now
@@ -530,11 +558,7 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
 void Track::loadBattleGraph()
 {
     BattleGraph::create(m_root+"navmesh.xml");
-}
-
-
-
-// -----------------------------------------------------------------------------
+}// -----------------------------------------------------------------------------
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {
     QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at);
@@ -1181,7 +1205,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         convertTrackToBullet(m_all_nodes[i]);
     }
 
-    // Now convert all objects that are only used for the physics 
+    // Now convert all objects that are only used for the physics
     // (like invisible walls).
     for(unsigned int i=0; i<m_all_physics_only_nodes.size(); i++)
     {
@@ -1301,7 +1325,7 @@ void Track::createWater(const XMLNode &node)
         // A speed of 0 results in a division by zero, so avoid this.
         // The actual time for a wave from one maximum to the next is
         // given by 2*M_PI*speed/1000.
-        Log::warn("Track", 
+        Log::warn("Track",
                   "Wave-speed or time is 0, resetting it to the default.");
         wave_speed =300.0f;
     }
@@ -1310,17 +1334,17 @@ void Track::createWater(const XMLNode &node)
 
     if (UserConfigParams::m_graphical_effects)
     {
-        scene_node = irr_driver->addWaterNode(mesh,
+        scene::IMesh *welded;
+        scene_node = irr_driver->addWaterNode(mesh, &welded,
                                               wave_height,
                                               wave_speed,
                                               wave_length);
 
-        // 'addWaterNode' welds the mesh so keep both the original and the welded copy
         mesh->grab();
         irr_driver->grabAllTextures(mesh);
         m_all_cached_meshes.push_back(mesh);
 
-        mesh = ((scene::IMeshSceneNode*)scene_node)->getMesh();
+        mesh = welded;
     }
     else
     {
@@ -1366,6 +1390,9 @@ void Track::createWater(const XMLNode &node)
  */
 void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 {
+    // Use m_filename to also get the path, not only the identifier
+    irr_driver->setTextureErrorMessage("While loading track '%s'",
+                                       m_filename                  );
     if(!m_reverse_available)
     {
         reverse_track = false;
@@ -1484,9 +1511,11 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         node->get("sun-diffuse",   &m_sun_diffuse_color);
         node->get("fog",           &m_use_fog);
         node->get("fog-color",     &m_fog_color);
-        node->get("fog-density",   &m_fog_density);
+        node->get("fog-max",       &m_fog_max);
         node->get("fog-start",     &m_fog_start);
         node->get("fog-end",       &m_fog_end);
+        node->get("fog-start-height", &m_fog_height_start);
+        node->get("fog-end-height",   &m_fog_height_end);
     }
 
     loadMainTrack(*root);
@@ -1542,9 +1571,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
         else if(name=="checks")
         {
-            // Easter egg hunts don't have laps.
-            if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_EASTER_EGG)
-                CheckManager::get()->load(*node);
+            CheckManager::get()->load(*node);
         }
         else if (name=="particle-emitter")
         {
@@ -1568,13 +1595,20 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
             video::SColor color;
             node->get("color", &color);
+            const video::SColorf colorf(color);
 
             float distance = 25.0f;
             node->get("distance", &distance);
 
+            if (irr_driver->isGLSL())
+            {
+                irr_driver->addLight(pos, distance, colorf.r, colorf.g, colorf.b);
+            } else
+            {
             scene::ILightSceneNode* node = irr_driver->getSceneManager()->addLightSceneNode(NULL, pos, color, distance);
             node->setLightType(video::ELT_POINT);
             node->enableCastShadow(true);
+        }
         }
         else if(name=="weather")
         {
@@ -1663,14 +1697,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // It's important to execute this BEFORE the code that creates the skycube,
     // otherwise the skycube node could be modified to have fog enabled, which
     // we don't want
-    if (m_use_fog && !UserConfigParams::m_camera_debug)
+    if (m_use_fog && !UserConfigParams::m_camera_debug && !irr_driver->isGLSL())
     {
         /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start
            and end do not matter */
         irr_driver->getVideoDriver()->setFog(m_fog_color,
                                              video::EFT_FOG_LINEAR,
                                              m_fog_start, m_fog_end,
-                                             m_fog_density);
+                                             1.0f);
     }
 
     // Enable for for all track nodes if fog is used
@@ -1725,21 +1759,30 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
 
     // ---- Create sun (non-ambient directional light)
-    m_sun = irr_driver->getSceneManager()->addLightSceneNode(NULL,
-                                                             m_sun_position,
-                                                             m_sun_diffuse_color);
-    m_sun->setLightType(video::ELT_DIRECTIONAL);
+    if (m_sun_position.getLengthSQ() < 0.03f)
+    {
+        m_sun_position = core::vector3df(500, 250, 250);
+    }
+
+    const video::SColorf tmpf(m_sun_diffuse_color);
+    m_sun = irr_driver->addLight(m_sun_position, 10000.0f, tmpf.r, tmpf.g, tmpf.b, true);
+
+    if (!irr_driver->isGLSL())
+    {
+        scene::ILightSceneNode *sun = (scene::ILightSceneNode *) m_sun;
+        sun->setLightType(video::ELT_DIRECTIONAL);
 
     // The angle of the light is rather important - let the sun
     // point towards (0,0,0).
-    if(m_sun_position.getLengthSQ()==0)
+        if(m_sun_position.getLengthSQ() < 0.03f)
         // Backward compatibility: if no sun is specified, use the
         // old hardcoded default angle
         m_sun->setRotation( core::vector3df(180, 45, 45) );
     else
         m_sun->setRotation((-m_sun_position).getHorizontalAngle());
 
-    m_sun->getLightData().SpecularColor = m_sun_specular_color;
+        sun->getLightData().SpecularColor = m_sun_specular_color;
+    }
 
 
     createPhysicsModel(main_track_count);
@@ -1799,6 +1842,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         std::string dir = StringUtils::getPath(m_filename);
         easter_world->readData(dir+"/easter_eggs.xml");
     }
+
+    irr_driver->unsetTextureErrorMessage();
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------
@@ -2095,7 +2140,7 @@ bool Track::findGround(AbstractKart *kart)
     // Material and hit point are not needed;
     const Material *m;
     Vec3 hit_point, normal;
-    bool over_ground = m_track_mesh->castRay(kart->getXYZ(), to, &hit_point, 
+    bool over_ground = m_track_mesh->castRay(kart->getXYZ(), to, &hit_point,
                                              &m, &normal);
     const Vec3 &xyz = kart->getXYZ();
     if(!over_ground || !m)
@@ -2119,7 +2164,7 @@ bool Track::findGround(AbstractKart *kart)
     // too long.
     if(xyz.getY() - hit_point.getY() > 5)
     {
-        Log::warn("physics", 
+        Log::warn("physics",
                   "Kart at (%f %f %f) is too high above ground at (%f %f %f)",
                   xyz.getX(),xyz.getY(),xyz.getZ(),
                   hit_point.getX(),hit_point.getY(),hit_point.getZ());

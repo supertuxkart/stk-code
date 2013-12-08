@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2007-2013 Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -54,7 +54,6 @@ public:
     virtual ~Bowling();
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual bool updateAndDelete(float dt);
-    virtual const core::stringw getHitString(const AbstractKart *kart) const;
     virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
     virtual HitEffect *getHitEffect() const;
 

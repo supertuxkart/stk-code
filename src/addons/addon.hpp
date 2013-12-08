@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2013 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -115,7 +115,7 @@ private:
     /** Compressed size of the addon package. */
     int         m_size;
     /** Rating for thsi addon package. */
-    float       m_rating;
+    mutable float       m_rating;
     /** Minimum version addon is included with. */
     std::string m_min_include_ver;
     /** Maximum version addon is included with. */
@@ -150,6 +150,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the rating of an addon. */
     const float getRating() const {return m_rating; }
+    // ------------------------------------------------------------------------
+    /** Sets the rating of an addon. */
+    void setRating(const float rating) const {m_rating = rating; }
     // ------------------------------------------------------------------------
     /** Returns the type of the addon. */
     const std::string& getType() const { return m_type; }

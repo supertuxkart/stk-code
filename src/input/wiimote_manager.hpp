@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012 SuperTuxKart-Team
+//  Copyright (C) 2012-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -63,8 +63,8 @@ private:
     bool            m_shut;
 #endif
 
-	/** True if wii is enabled via command line option. */
-	static bool     m_enabled;
+    /** True if wii is enabled via command line option. */
+    static bool     m_enabled;
 
     /** Wiimotes update thread */
     void threadFunc();
@@ -75,11 +75,11 @@ public:
     WiimoteManager();
     ~WiimoteManager();
 
-	/** Sets the wiimote to be enabled. */
-	static void enable() { m_enabled = true; }
+    /** Sets the wiimote to be enabled. */
+    static void enable() { m_enabled = true; }
 
-	/** Returns if the wii was enabled on the command line. */
-	static bool  isEnabled() { return m_enabled; }
+    /** Returns if the wii was enabled on the command line. */
+    static bool  isEnabled() { return m_enabled; }
 
     void launchDetection(int timeout);
     void update();
@@ -87,20 +87,20 @@ public:
 
     void enableAccelerometer(bool state);
 
-	/** A simple listener to allow the user to connect wiimotes. It
-	 *  will display a feedback windows (# wiimotes connected or 'no wiimotes
-	 *  found').
-	 */
-	class WiimoteDialogListener : public MessageDialog::IConfirmDialogListener
-	{
-	public:
-		virtual void onConfirm() OVERRIDE;
-	};   // class WiimoteDialoListener
+    /** A simple listener to allow the user to connect wiimotes. It
+     *  will display a feedback windows (# wiimotes connected or 'no wiimotes
+     *  found').
+     */
+    class WiimoteDialogListener : public MessageDialog::IConfirmDialogListener
+    {
+    public:
+        virtual void onConfirm() OVERRIDE;
+    };   // class WiimoteDialoListener
 
-	/** Shows a dialog allowing the user to connect wiimotes.
-	 *  \return Number of wiimotes connected.
-	 */
-	int askUserToConnectWiimotes();
+    /** Shows a dialog allowing the user to connect wiimotes.
+     *  \return Number of wiimotes connected.
+     */
+    int askUserToConnectWiimotes();
     // ------------------------------------------------------------------------
     /** Returns the number of wiimotes connected. */
     unsigned int  getNumberOfWiimotes() const   {return m_wiimotes.size();}

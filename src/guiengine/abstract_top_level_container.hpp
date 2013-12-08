@@ -1,5 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -76,12 +77,12 @@ namespace GUIEngine
                 Widget*      getWidget(const int id);
 
         /** This function searches and returns a widget by name, cast as specified type,
-		 *  if that widget is found and the type is correct.
-		 *  \param name The name of the widget to find
-		 *  \return an object by name, casted to specified type, or NULL if
+         *  if that widget is found and the type is correct.
+         *  \param name The name of the widget to find
+         *  \return an object by name, casted to specified type, or NULL if
          *  not found/wrong type */
         template <typename T>
-		        T*           getWidget(const char* name)
+                T*           getWidget(const char* name)
         {
             Widget* out = getWidget(name);
             T* outCasted = dynamic_cast<T*>( out );

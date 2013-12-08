@@ -1,4 +1,4 @@
-// Copyright (C) 2002-2009 Nikolaus Gebhardt
+// Copyright (C) 2002-2013 Nikolaus Gebhardt
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
@@ -60,9 +60,6 @@ class ScalableFont : public IGUIFontBitmap
 
     bool m_is_hollow_copy;
     bool m_rtl;
-
-    /** Position in range [0..1] of the single tab stop we support */
-    float m_tab_stop;
 
 public:
 
@@ -144,9 +141,6 @@ public:
     float getScale() const { return m_scale; }
 
     void updateRTL();
-
-    /** \param pos position of the tab stop, in range [0..1] */
-    void setTabStop(float pos) { m_tab_stop = pos; }
 
 private:
 

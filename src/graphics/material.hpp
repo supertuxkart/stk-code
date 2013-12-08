@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2010-2013 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,8 +28,6 @@
 
 #include <IShaderConstantSetCallBack.h>
 
-#define LIGHTMAP_VISUALISATION 0
-
 
 namespace irr
 {
@@ -40,10 +39,6 @@ using namespace irr;
 class XMLNode;
 class SFXBase;
 class ParticleKind;
-
-class NormalMapProvider;
-class SplattingProvider;
-class BubbleEffectProvider;
 
 /**
   * \ingroup graphics
@@ -59,7 +54,8 @@ public:
                           GE_WATER_SHADER,
                           GE_SPHERE_MAP,
                           GE_SPLATTING,
-                          GE_NORMAL_MAP};
+                          GE_NORMAL_MAP,
+                          GE_CAUSTICS};
 
     enum ParticleConditions
     {
@@ -73,22 +69,11 @@ public:
     {
         NORMAL,
         RESCUE,
-        PUSH_BACK
+        PUSH_BACK,
+        PUSH_SOCCER_BALL
     };
 
 private:
-
-    enum Shaders
-    {
-        SHADER_NORMAL_MAP,
-        SHADER_NORMAL_MAP_WITH_LIGHTMAP,
-        SHADER_SPLATTING,
-        SHADER_WATER,
-        SHADER_SPHERE_MAP,
-        SHADER_SPLATTING_LIGHTMAP,
-        SHADER_GRASS,
-        SHADER_COUNT
-    };
 
     video::ITexture *m_texture;
     unsigned int     m_index;
@@ -231,13 +216,6 @@ private:
 
     /** If m_splatting is true, indicates the fourth splatting texture */
     std::string      m_splatting_texture_4;
-
-    std::string      m_splatting_lightmap;
-
-    std::vector<irr::video::IShaderConstantSetCallBack*> m_shaders;
-
-    /** Only used if bubble effect is enabled */
-    std::map<scene::IMeshBuffer*, BubbleEffectProvider*> m_bubble_provider;
 
     bool  m_deprecated;
 

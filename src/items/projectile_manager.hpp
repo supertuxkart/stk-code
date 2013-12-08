@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -53,7 +53,6 @@ private:
      *  being shown or have a sfx playing. */
     HitEffects       m_active_hit_effects;
 
-    void             updateClient(float dt);
     void             updateServer(float dt);
 public:
                      ProjectileManager() {}

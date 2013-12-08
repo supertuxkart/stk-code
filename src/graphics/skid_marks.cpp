@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2004-2013 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2013-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -102,12 +103,11 @@ void SkidMarks::update(float dt, bool force_skid_marks,
 
     // Get raycast information
     // -----------------------
-    const btWheelInfo::RaycastInfo &raycast_right =
-            m_kart.getVehicle()->getWheelInfo(2).m_raycastInfo;
-    const btWheelInfo::RaycastInfo raycast_left =
-            m_kart.getVehicle()->getWheelInfo(3).m_raycastInfo;
-    Vec3 delta = raycast_right.m_contactPointWS
-               - raycast_left.m_contactPointWS;
+    const btKart *vehicle = m_kart.getVehicle();
+    const Vec3& raycast_right = vehicle->getVisualContactPoint(2);
+    const Vec3& raycast_left = vehicle->getVisualContactPoint(3);
+
+    Vec3 delta = raycast_right - raycast_left;
 
     // The kart is making skid marks when it's:
     // - forced to leave skid marks, or all of:
@@ -118,7 +118,7 @@ void SkidMarks::update(float dt, bool force_skid_marks,
     //   If only one wheel touches the ground, the 2nd one gets the same
     //   raycast result --> delta is 0, which is considered to be not skidding.
     const Skidding *skid = m_kart.getSkidding();
-    bool is_skidding = raycast_right.m_isInContact &&
+    bool is_skidding = vehicle->visualWheelsTouchGround() &&
                ( force_skid_marks ||
                  (    (skid->getSkidState()==Skidding::SKID_ACCUMULATE_LEFT||
                        skid->getSkidState()==Skidding::SKID_ACCUMULATE_RIGHT )
@@ -141,20 +141,18 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         // -------------------------------------------------
 
         delta.normalize();
-        delta *= m_width;
+        delta *= m_width*0.5f;
 
         float distance = 0.0f;
         Vec3 start = m_left[m_current]->getCenterStart();
-        Vec3 newPoint = (raycast_left.m_contactPointWS + raycast_right.m_contactPointWS)/2;
+        Vec3 newPoint = (raycast_left + raycast_right)/2;
         // this linear distance does not account for the kart turning, it's true,
         // but it produces good enough results
         distance = (newPoint - start).length();
 
-        m_left [m_current]->add(raycast_left.m_contactPointWS,
-                                raycast_left.m_contactPointWS + delta,
+        m_left [m_current]->add(raycast_left-delta, raycast_left+delta,
                                 distance);
-        m_right[m_current]->add(raycast_right.m_contactPointWS-delta,
-                                raycast_right.m_contactPointWS,
+        m_right[m_current]->add(raycast_right-delta, raycast_right+delta,
                                 distance);
         // Adjust the boundary box of the mesh to include the
         // adjusted aabb of its buffers.
@@ -173,22 +171,20 @@ void SkidMarks::update(float dt, bool force_skid_marks,
     // Start new skid marks
     // --------------------
     // No skidmarking if wheels don't have contact
-    if(!raycast_right.m_isInContact) return;
+    if(!vehicle->visualWheelsTouchGround()) return;
     if(delta.length2()<0.0001) return;
 
     delta.normalize();
-    delta *= m_width;
+    delta *= m_width*0.5f;
 
     SkidMarkQuads *smq_left =
-        new SkidMarkQuads(raycast_left.m_contactPointWS,
-                          raycast_left.m_contactPointWS + delta,
+        new SkidMarkQuads(raycast_left-delta, raycast_left+delta ,
                           m_material, m_avoid_z_fighting, custom_color);
     scene::SMesh *new_mesh = new scene::SMesh();
     new_mesh->addMeshBuffer(smq_left);
 
     SkidMarkQuads *smq_right =
-        new SkidMarkQuads(raycast_right.m_contactPointWS - delta,
-                          raycast_right.m_contactPointWS,
+        new SkidMarkQuads(raycast_right-delta, raycast_right+delta,
                           m_material, m_avoid_z_fighting, custom_color);
     new_mesh->addMeshBuffer(smq_right);
     scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh);
@@ -198,7 +194,7 @@ void SkidMarks::update(float dt, bool force_skid_marks,
 #endif
 
     // We don't keep a reference to the mesh here, so we have to decrement
-    // the reference count (which is set to 1 when doing "new SMesh()".
+    // the reference count (which is set to 1 when doing "new SMesh())".
     // The scene node will keep the mesh alive.
     new_mesh->drop();
     m_current++;

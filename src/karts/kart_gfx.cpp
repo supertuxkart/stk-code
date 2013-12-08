@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012  Joerg Henrichs
+//  Copyright (C) 2012-2013  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -40,20 +40,11 @@ KartGFX::KartGFX(const AbstractKart *kart)
     }
 
     m_kart = kart;
-    /*
-    // FIXME Old Positioning system Maybe usefull for a future effect
-    Vec3 rear_left(-(kart->getKartWidth()+0.20f)*0.35f, (kart->getKartHeight()-0.6f)*0.35f,
-                       -kart->getKartLength()*0.35f);
 
-    Vec3 rear_right((kart->getKartWidth()+0.20f)*0.35f, (kart->getKartHeight()-0.6f)*0.35f,
-                       -kart->getKartLength()*0.35f);
-    
-    
-    */
-    Vec3 rear_left(kart->getWheelGraphicsPosition(3).toIrrVector().X, 0.05f,
-                        kart->getWheelGraphicsPosition(3).toIrrVector().Z-0.1f);
-    Vec3 rear_right(kart->getWheelGraphicsPosition(2).toIrrVector().X, 0.05f,
-                        kart->getWheelGraphicsPosition(2).toIrrVector().Z-0.1f);
+    Vec3 rear_left(kart->getWheelGraphicsPosition(3).getX(), 0.05f,
+                   kart->getWheelGraphicsPosition(3).getZ()-0.1f    );
+    Vec3 rear_right(kart->getWheelGraphicsPosition(2).getX(), 0.05f,
+                    kart->getWheelGraphicsPosition(2).getZ()-0.1f   );
 
     Vec3 rear_center(0, kart->getKartHeight()*0.35f,
                        -kart->getKartLength()*0.35f);
@@ -62,15 +53,12 @@ KartGFX::KartGFX(const AbstractKart *kart)
                        -kart->getKartLength()*0.1f);
 
     // FIXME Used to match the emitter as seen in blender
-    const float delta = 0.6f;
-    Vec3 rear_nitro_right(kart->getNitroEmitterPosition(0).toIrrVector().X,
-                          kart->getNitroEmitterPosition(0).toIrrVector().Y,
-                          kart->getNitroEmitterPosition(0).toIrrVector().Z + delta);
-
-    Vec3 rear_nitro_left(kart->getNitroEmitterPosition(1).toIrrVector().X,
-                          kart->getNitroEmitterPosition(1).toIrrVector().Y,
-                          kart->getNitroEmitterPosition(1).toIrrVector().Z + delta);
-    if (!kart->hasNitroEmitter())
+    const Vec3 delta(0, 0, 0.6f);
+    Vec3 rear_nitro_right = kart->getKartModel()->getNitroEmittersPositon(0)
+                          + delta;
+    Vec3 rear_nitro_left  = kart->getKartModel()->getNitroEmittersPositon(1)
+                          + delta;
+    if (!kart->getKartModel()->hasNitroEmitters())
         rear_nitro_right = rear_nitro_left = rear_nitro_center;
 
     // Create all effects. Note that they must be created

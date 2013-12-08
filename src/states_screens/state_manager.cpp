@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -31,6 +31,7 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "utils/translation.hpp"
+#include "utils/log.hpp"
 
 using namespace GUIEngine;
 
@@ -68,7 +69,7 @@ StateManager::ActivePlayer* StateManager::getActivePlayer(const int id)
     }
     else
     {
-        fprintf(stderr, "getActivePlayer(): id out of bounds\n");
+        Log::error("StateManager", "getActivePlayer(): id %d out of bounds", id);
         assert(false);
         return NULL;
     }
@@ -100,11 +101,11 @@ void StateManager::updateActivePlayerIDs()
 
 // ----------------------------------------------------------------------------
 
-int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device)
+int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device, Online::Profile* user)
 {
     ActivePlayer *p;
     int i;
-    p = new ActivePlayer(profile, device);
+    p = new ActivePlayer(profile, device, user);
     i = m_active_players.size();
     m_active_players.push_back(p);
 
@@ -167,7 +168,8 @@ void StateManager::escapePressed()
     // when another modal dialog is visible
     else if(ModalDialog::isADialogActive())
     {
-        ModalDialog::getCurrent()->escapePressed();
+        if(ModalDialog::getCurrent()->onEscapePressed())
+            ModalDialog::getCurrent()->dismiss();
     }
     // In-game
     else if(m_game_mode == GAME)
@@ -202,7 +204,7 @@ void StateManager::onGameStateChange(GameState new_state)
 
         if (new_state == MENU)
         {
-            Screen* screen = GUIEngine::getCurrentScreen();
+            GUIEngine::Screen* screen = GUIEngine::getCurrentScreen();
             if (screen != NULL)
             {
                 music_manager->startMusic(
@@ -250,7 +252,8 @@ void StateManager::onStackEmptied()
 #endif
 
 StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player,
-                                         InputDevice *device)
+                                         InputDevice *device,
+                                         Online::Profile* user)
 {
 #ifdef DEBUG
     m_magic_number = 0xAC1EF1AE;
@@ -259,6 +262,7 @@ StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player,
     m_player = player;
     m_device = NULL;
     m_kart = NULL;
+    m_online_user = user;
     setDevice(device);
 }  // ActivePlayer
 

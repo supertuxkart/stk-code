@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,9 +34,42 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
+#include "IMeshManipulator.h"
+
 #define SKELETON_DEBUG 0
 
 float KartModel::UNDEFINED = -99.9f;
+
+// ------------------------------------------------------------
+// SpeedWeightedObject implementation
+
+#define SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED -99.f
+
+SpeedWeightedObject::Properties::Properties()
+{
+    m_strength_factor = m_speed_factor = m_texture_speed.X = m_texture_speed.Y = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
+}
+
+void SpeedWeightedObject::Properties::loadFromXMLNode(const XMLNode* xml_node)
+{
+    xml_node->get("strength-factor", &m_strength_factor);
+    xml_node->get("speed-factor",    &m_speed_factor);
+    xml_node->get("texture-speed-x", &m_texture_speed.X);
+    xml_node->get("texture-speed-y", &m_texture_speed.Y);
+}
+
+void SpeedWeightedObject::Properties::checkAllSet()
+{
+#define CHECK_NEG(  a,strA) if(a<=SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED) {                   \
+            Log::fatal("SpeedWeightedObject", "Missing default value for '%s'.",    \
+                        strA);              \
+        }
+    CHECK_NEG(m_strength_factor, "speed-weighted strength-factor"    );
+    CHECK_NEG(m_speed_factor,    "speed-weighted speed-factor"    );
+    CHECK_NEG(m_texture_speed.X,  "speed-weighted texture speed X"    );
+    CHECK_NEG(m_texture_speed.Y,  "speed-weighted texture speed Y"    );
+#undef CHECK_NEG
+}
 
 /** Default constructor which initialises all variables with defaults.
  *  Note that the KartModel is copied, so make sure to update makeCopy
@@ -148,25 +181,21 @@ void KartModel::loadInfo(const XMLNode &node)
         m_has_nitro_emitter = true;
     }
 
-	if(const XMLNode *speedWeighted_node=node.getNode("speed-weighted"))
+    if(const XMLNode *speed_weighted_objects_node=node.getNode("speed-weighted-objects"))
     {
-		for(unsigned int i=0 ; i < speedWeighted_node->getNumNodes() ; i++)
-		{
-			loadSpeedWeightedInfo(speedWeighted_node->getNode(i));
-		}
+        SpeedWeightedObject::Properties   fallback_properties;
+        fallback_properties.loadFromXMLNode(speed_weighted_objects_node);
+
+        for(unsigned int i=0 ; i < speed_weighted_objects_node->getNumNodes() ; i++)
+        {
+            loadSpeedWeightedInfo(speed_weighted_objects_node->getNode(i), fallback_properties);
+        }
     }
 
     if(const XMLNode *hat_node=node.getNode("hat"))
     {
-        if(hat_node->get("offset", &m_hat_offset))
-        {
-            // Xmas mode handling :)
-            if(UserConfigParams::m_xmas_enabled)
-                setHatMeshName("christmas_hat.b3d");
-        }
+        hat_node->get("offset", &m_hat_offset);
     }
-    else
-        m_hat_offset = core::vector3df(0,0,0);
 }   // loadInfo
 
 // ----------------------------------------------------------------------------
@@ -249,7 +278,8 @@ KartModel* KartModel::makeCopy()
     km->m_kart_width        = m_kart_width;
     km->m_kart_length       = m_kart_length;
     km->m_kart_height       = m_kart_height;
-	km->m_kart_highest_point = m_kart_highest_point;
+    km->m_kart_highest_point= m_kart_highest_point;
+    km->m_kart_lowest_point = m_kart_lowest_point;
     km->m_mesh              = m_mesh;
     km->m_model_filename    = m_model_filename;
     km->m_animation_speed   = m_animation_speed;
@@ -279,11 +309,9 @@ KartModel* KartModel::makeCopy()
     km->m_speed_weighted_objects.resize(m_speed_weighted_objects.size());
     for(size_t i=0; i<m_speed_weighted_objects.size(); i++)
     {
-        km->m_speed_weighted_objects[i].m_model            = m_speed_weighted_objects[i].m_model;
         // Master should not have any speed weighted nodes.
         assert(!m_speed_weighted_objects[i].m_node);
-        km->m_speed_weighted_objects[i].m_name             = m_speed_weighted_objects[i].m_name;
-        km->m_speed_weighted_objects[i].m_position         = m_speed_weighted_objects[i].m_position;
+        km->m_speed_weighted_objects[i] = m_speed_weighted_objects[i];
     }
 
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
@@ -325,7 +353,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         std::string debug_name = m_model_filename+" (animated-kart-model)";
         node->setName(debug_name.c_str());
 #if SKELETON_DEBUG
-        irr_driber->addDebugMesh(m_animated_node);
+        irr_driver->addDebugMesh(m_animated_node);
 #endif
 #endif
         m_animated_node->setLoopMode(false);
@@ -344,6 +372,15 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         {
             if(!m_speed_weighted_objects[i].m_node) continue;
             m_speed_weighted_objects[i].m_node->setParent(lod_node);
+        }
+
+        // Enable rim lighting for the kart
+        irr_driver->applyObjectPassShader(lod_node, true);
+        std::vector<scene::ISceneNode*> &lodnodes = lod_node->getAllNodes();
+        const u32 max = lodnodes.size();
+        for (u32 i = 0; i < max; i++)
+        {
+            irr_driver->applyObjectPassShader(lodnodes[i], true);
         }
     }
     else
@@ -368,7 +405,12 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         {
             if(!m_wheel_model[i]) continue;
             m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], node);
+            Vec3 wheel_min, wheel_max;
+            MeshTools::minMax3D(m_wheel_model[i], &wheel_min, &wheel_max);
+            m_wheel_graphics_radius[i] = 0.5f*(wheel_max.getY() - wheel_min.getY());
+
             m_wheel_node[i]->grab();
+            ((scene::IMeshSceneNode *) m_wheel_node[i])->setReadOnlyMaterials(true);
     #ifdef DEBUG
             std::string debug_name = m_wheel_filename[i]+" (wheel)";
             m_wheel_node[i]->setName(debug_name.c_str());
@@ -420,9 +462,29 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     irr_driver->grabAllTextures(m_mesh);
 
     Vec3 kart_min, kart_max;
-    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), &kart_min, &kart_max);
+    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), 
+                        &kart_min, &kart_max);
 
-	m_kart_highest_point = kart_max.getY();
+#undef MOVE_KART_MESHES
+#ifdef MOVE_KART_MESHES
+    // Kart models are not exactly centered. The following code would
+    // transform the mesh so that they are properly centered, but it
+    // would also mean all location relative to the original kart's
+    // center (wheel position, emitter, hat) would need to be modified.
+    scene::IMeshManipulator *mani =
+        irr_driver->getVideoDriver()->getMeshManipulator();
+    Vec3 offset_from_center = -0.5f*(kart_max+kart_min);
+    offset_from_center.setY(-kart_min.getY());
+    offset_from_center.setY(0);
+
+    core::matrix4 translate(core::matrix4::EM4CONST_IDENTITY);
+    translate.setTranslation(offset_from_center.toIrrVector());
+    mani->transform(m_mesh, translate);
+    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), 
+                        &kart_min, &kart_max);
+#endif
+    m_kart_highest_point = kart_max.getY();
+    m_kart_lowest_point  = kart_min.getY();
 
     // Load the speed weighted object models. We need to do that now because it can affect the dimensions of the kart
     for(size_t i=0 ; i < m_speed_weighted_objects.size() ; i++)
@@ -438,11 +500,11 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
 
         // Update min/max
         Vec3 obj_min, obj_max;
-		MeshTools::minMax3D(obj.m_model, &obj_min, &obj_max);
+        MeshTools::minMax3D(obj.m_model, &obj_min, &obj_max);
         obj_min += obj.m_position;
         obj_max += obj.m_position;
         kart_min.min(obj_min);
-        kart_max.min(obj_max);
+        kart_max.max(obj_max);
     }
 
     Vec3 size     = kart_max-kart_min;
@@ -511,9 +573,11 @@ void KartModel::loadNitroEmitterInfo(const XMLNode &node,
 }   // loadNitroEmitterInfo
 
 /** Loads a single speed weighted node. */
-void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node)
+void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, const SpeedWeightedObject::Properties& fallback_properties)
 {
     SpeedWeightedObject obj;
+    obj.m_properties    = fallback_properties;
+    obj.m_properties.loadFromXMLNode(speed_weighted_node);
     
     speed_weighted_node->get("position", &obj.m_position);
     speed_weighted_node->get("model",    &obj.m_name);
@@ -592,7 +656,7 @@ void KartModel::reset()
 {
     // Reset the wheels
     const float suspension[4]={0,0,0,0};
-    update(0, 0.0f, suspension, 0.0f);
+    update(0.0f, 0.0f, 0.0f, suspension, 0.0f);
 
     // Stop any animations currently being played.
     setAnimation(KartModel::AF_DEFAULT);
@@ -700,35 +764,16 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
 // ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension
     + updates the speed-weighted objects' animations.
+ *  \param dt time since last frame
  *  \param rotation_dt How far the wheels have rotated since last time.
  *  \param steer The actual steer settings.
  *  \param suspension Suspension height for all four wheels.
  *  \param speed The speed of the kart in meters/sec, used for the speed-weighted objects' animations
  */
-void KartModel::update(float rotation_dt, float steer, const float suspension[4], float speed)
+void KartModel::update(float dt, float rotation_dt, float steer, 
+                       const float height_above_terrain[4], float speed)
 {
-    float clamped_suspension[4];
-    // Clamp suspension to minimum and maximum suspension length, so that
-    // the graphical wheel models don't look too wrong.
-    for(unsigned int i=0; i<4; i++)
-    {
-        const float suspension_length = (m_max_suspension[i]-m_min_suspension[i])/2;
-
-        // limit amplitude between set limits, first dividing it by a
-        // somewhat arbitrary constant to reduce visible wheel movement
-        clamped_suspension[i] = suspension[i]/m_dampen_suspension_amplitude[i];
-        float ratio = clamped_suspension[i] / suspension_length;
-        const int sign = ratio < 0 ? -1 : 1;
-        // expanded form of 1 - (1 - x)^2, i.e. making suspension display
-        // quadratic and not linear
-        ratio = sign * fabsf(ratio*(2-ratio));
-//        clamped_suspension[i] = ratio*suspension_length;
-        clamped_suspension[i] = std::min(std::max(ratio*suspension_length,
-                                                  m_min_suspension[i]),
-                                                  m_max_suspension[i]);
-    }   // for i<4
-
-    core::vector3df wheel_steer(0, steer*30.0f, 0);
+   core::vector3df wheel_steer(0, steer*30.0f, 0);
 
     for(unsigned int i=0; i<4; i++)
     {
@@ -744,7 +789,8 @@ void KartModel::update(float rotation_dt, float steer, const float suspension[4]
         }
 #endif
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
-        pos.Y += clamped_suspension[i];
+        pos.Y = m_kart_lowest_point -  height_above_terrain[i] 
+              + m_wheel_graphics_radius[i];
         m_wheel_node[i]->setPosition(pos);
 
         // Now calculate the new rotation: (old + change) mod 360
@@ -765,12 +811,52 @@ void KartModel::update(float rotation_dt, float steer, const float suspension[4]
     for(size_t i=0 ; i < m_speed_weighted_objects.size() ; i++)
     {
         SpeedWeightedObject&    obj = m_speed_weighted_objects[i];
-        float strength = speed * m_kart->getKartProperties()->getSpeedWeightedStrengthFactor();
-        btClamp<float>(strength, 0.0f, 1.0f);
-        obj.m_node->setAnimationStrength(strength);
 
-        float anim_speed = speed * m_kart->getKartProperties()->getSpeedWeightedSpeedFactor();
-        obj.m_node->setAnimationSpeed(anim_speed);
+#define GET_VALUE(obj, value_name)   \
+    obj.m_properties.value_name > SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED ? obj.m_properties.value_name : \
+    m_kart->getKartProperties()->getSpeedWeightedObjectProperties().value_name
+
+        // Animation strength
+        float strength = 1.0f;
+        const float strength_factor =   GET_VALUE(obj, m_strength_factor);
+        if(strength_factor >= 0.0f)
+        {
+            strength = speed * strength_factor;
+            btClamp<float>(strength, 0.0f, 1.0f);
+        }
+        obj.m_node->setAnimationStrength(strength);
+        
+        // Animation speed
+        const float speed_factor =   GET_VALUE(obj, m_speed_factor);
+        if(speed_factor >= 0.0f)
+        {
+            float anim_speed = speed * speed_factor;
+            obj.m_node->setAnimationSpeed(anim_speed);
+        }
+
+        // Texture animation
+        core::vector2df tex_speed;
+        tex_speed.X = GET_VALUE(obj, m_texture_speed.X);
+        tex_speed.Y = GET_VALUE(obj, m_texture_speed.Y);
+        if(tex_speed != core::vector2df(0.0f, 0.0f))
+        {
+            obj.m_texture_cur_offset += speed * tex_speed * dt;
+            if(obj.m_texture_cur_offset.X > 1.0f) obj.m_texture_cur_offset.X = fmod(obj.m_texture_cur_offset.X, 1.0f);
+            if(obj.m_texture_cur_offset.Y > 1.0f) obj.m_texture_cur_offset.Y = fmod(obj.m_texture_cur_offset.Y, 1.0f);
+            
+            for(unsigned int i=0; i<obj.m_node->getMaterialCount(); i++)
+            {
+                video::SMaterial &irrMaterial=obj.m_node->getMaterial(i);
+                for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+                {
+                    video::ITexture* t=irrMaterial.getTexture(j);
+                    if(!t) continue;
+                    core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
+                    m->setTextureTranslate(obj.m_texture_cur_offset.X, obj.m_texture_cur_offset.Y);
+                }   // for j<MATERIAL_MAX_TEXTURES
+            }   // for i<getMaterialCount 
+        }
+#undef GET_VALUE
     }
 
     // Check if the end animation is being played, if so, don't
@@ -794,37 +880,35 @@ void KartModel::update(float rotation_dt, float steer, const float suspension[4]
 }   // update
 //-----------------------------------------------------------------------------
 void KartModel::attachHat(){
-	 m_hat_node = NULL;
-        if(m_hat_name.size()>0)
+    m_hat_node = NULL;
+    if(m_hat_name.size()>0)
+    {
+        scene::IBoneSceneNode *bone = m_animated_node->getJointNode("Head");
+        if(!bone)
+            bone = m_animated_node->getJointNode("head");
+        if(bone)
         {
-            scene::IBoneSceneNode *bone = m_animated_node->getJointNode("Head");
-            if(!bone)
-                bone = m_animated_node->getJointNode("head");
-            if(bone)
-            {
-
-                // Till we have all models fixed, accept Head and head as bone naartme
-                scene::IMesh *hat_mesh =
-                    irr_driver->getAnimatedMesh(
-                         file_manager->getModelFile(m_hat_name));
-                m_hat_node = irr_driver->addMesh(hat_mesh);
-                bone->addChild(m_hat_node);
-                m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
-                m_animated_node->OnAnimate(0);
-                bone->updateAbsolutePosition();
-
-                // With the hat node attached to the head bone, we have to
-                // reverse the transformation of the bone, so that the hat
-                // is still properly placed. Esp. the hat offset needs
-                // to be rotated.
-                const core::matrix4 mat = bone->getAbsoluteTransformation();
-                core::matrix4 inv;
-                mat.getInverse(inv);
-                core::vector3df rotated_offset;
-                inv.rotateVect(rotated_offset, m_hat_offset);
-                m_hat_node->setPosition(rotated_offset);
-                m_hat_node->setScale(inv.getScale());
-                m_hat_node->setRotation(inv.getRotationDegrees());
-            }   // if bone
-        }   // if(m_hat_name)
+             // Till we have all models fixed, accept Head and head as bone naartme
+            scene::IMesh *hat_mesh =
+                irr_driver->getAnimatedMesh(
+                     file_manager->getModelFile(m_hat_name));
+            m_hat_node = irr_driver->addMesh(hat_mesh);
+            bone->addChild(m_hat_node);
+            m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
+            m_animated_node->OnAnimate(0);
+            bone->updateAbsolutePosition();
+             // With the hat node attached to the head bone, we have to
+            // reverse the transformation of the bone, so that the hat
+            // is still properly placed. Esp. the hat offset needs
+            // to be rotated.
+            const core::matrix4 mat = bone->getAbsoluteTransformation();
+            core::matrix4 inv;
+            mat.getInverse(inv);
+            core::vector3df rotated_offset;
+            inv.rotateVect(rotated_offset, m_hat_offset);
+            m_hat_node->setPosition(rotated_offset);
+            m_hat_node->setScale(inv.getScale());
+            m_hat_node->setRotation(inv.getRotationDegrees());
+        }   // if bone
+    }   // if(m_hat_name)
 }

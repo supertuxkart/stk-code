@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -47,17 +47,19 @@ using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
 
-ModalDialog::ModalDialog(const float percentWidth, const float percentHeight,
-                         ModalDialogLocation location)
+ModalDialog::ModalDialog(const float percentWidth, const float percentHeight, ModalDialogLocation location)
 {
     m_dialog_location = location;
-    doInit(percentWidth, percentHeight);
+    m_init = false;
+    m_percent_width = percentWidth;
+    m_percent_height = percentHeight;
 }
 
 // ----------------------------------------------------------------------------
 
 void ModalDialog::loadFromFile(const char* xmlFile)
 {
+    doInit();
     IXMLReader* xml = file_manager->createXMLReader( (file_manager->getGUIDir() + xmlFile).c_str() );
     if (xml == NULL)
     {
@@ -82,15 +84,17 @@ void ModalDialog::loadFromFile(const char* xmlFile)
 
 // ----------------------------------------------------------------------------
 
-void ModalDialog::doInit(const float percentWidth, const float percentHeight)
+void ModalDialog::doInit()
 {
+    if(m_init) return;
+    m_init = true;
     pointer_was_shown = irr_driver->isPointerShown();
     irr_driver->showPointer();
 
     const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
 
-    const int w = (int)(frame_size.Width*percentWidth);
-    const int h = (int)(frame_size.Height*percentHeight);
+    const int w = (int)(frame_size.Width* m_percent_width);
+    const int h = (int)(frame_size.Height* m_percent_height);
 
     assert(frame_size.Width > 0);
     assert(frame_size.Height > 0);
@@ -187,6 +191,8 @@ void ModalDialog::dismiss()
 {
     if(modalWindow != NULL) delete modalWindow;
     modalWindow = NULL;
+    if(GUIEngine::getCurrentScreen() != NULL)
+        GUIEngine::getCurrentScreen()->onDialogClose();
 }
 
 // ----------------------------------------------------------------------------

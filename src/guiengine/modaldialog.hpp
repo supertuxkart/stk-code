@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -55,10 +55,11 @@ namespace GUIEngine
     class ModalDialog : public SkinWidgetContainer, public AbstractTopLevelContainer
     {
     private:
-        /** Because C++ doesn't support constructor delegation... */
-        void doInit(const float percentWidth, const float percentHeight);
 
         ModalDialogLocation m_dialog_location;
+
+        float m_percent_width, m_percent_height;
+        bool m_init;
 
 
     protected:
@@ -85,9 +86,14 @@ namespace GUIEngine
           *        that takes a XML file as argument is used)
           */
         virtual void loadedFromFile() {}
+        void doInit();
 
     public:
         LEAK_CHECK()
+
+        /** Because C++ doesn't support constructor delegation... */
+
+        bool isInited() {return m_init;}
 
         virtual ~ModalDialog();
 
@@ -105,7 +111,7 @@ namespace GUIEngine
         static bool isADialogActive();
 
         /** Override to change what happens on escape pressed */
-        virtual void escapePressed() { dismiss(); }
+        virtual bool onEscapePressed() { return true; }
 
         /** Override to be notified of updates */
         virtual void onUpdate(float dt) { }
@@ -115,6 +121,7 @@ namespace GUIEngine
          *        init(), which is invoked afer widgets were added)
          */
         virtual void beforeAddingWidgets() {}
+        virtual void load() {}
 
         /** \brief Optional callback invoked after widgets have been add()ed */
         virtual void init() {}

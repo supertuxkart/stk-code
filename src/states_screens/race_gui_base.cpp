@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
+//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2013 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,21 +20,8 @@
 
 #include "states_screens/race_gui_base.hpp"
 
-#ifdef __APPLE__
-#  include <OpenGL/gl.h>
-#else
-#  define _WINSOCKAPI_
-#  ifdef WIN32
-#    include <windows.h>
-#  endif
-#  ifdef ANDROID
-#    include <GLES/gl.h>
-#  else
-#    include <GL/gl.h>
-#  endif
-#endif
-
 #include "audio/music_manager.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
@@ -70,25 +57,35 @@ RaceGUIBase::RaceGUIBase()
     //I18N: as in "ready, set, go", shown at the beginning of the race
     m_string_go             = _("Go!");
     //I18N: Shown when a goal is scored
-    m_string_goal			= _("GOAL!");
+    m_string_goal           = _("GOAL!");
     // Make the two materials permanent (in case that they are not listed
     // in the textures/materials.xml file).
     m_music_icon            = material_manager->getMaterial("notes.png",
                                                             /*full path*/false,
                                                             /*permanent*/true);
+    if(!m_music_icon->getTexture())
+        Log::fatal("RaceGuiBase", "Can't find 'notes.png' texture, aborting.");
+
     m_plunger_face          = material_manager->getMaterial("plungerface.png",
                                                             /*full path*/false,
                                                             /*permanent*/true);
+    if(!m_plunger_face->getTexture())
+        Log::fatal("RaceGuiBase",
+                   "Can't find 'plungerface.png' texture, aborting.");
+
     //read frame picture for icons in the mini map.
     m_icons_frame           = material_manager->getMaterial("icons-frame.png",
                                                             /*full_path*/false,
                                                             /*permanent*/true);
+    if(!m_icons_frame->getTexture())
+        Log::fatal("RaceGuiBase",
+                   "Can't find 'icons-frame.png' texture, aborting.");
+
     const std::string &guid = file_manager->getGUIDir();
     m_gauge_full            = irr_driver->getTexture(guid+"gauge_full.png" );
     m_gauge_full_bright     = irr_driver->getTexture(guid+"gauge_full_bright.png" );
     m_gauge_empty           = irr_driver->getTexture(guid+"gauge_empty.png");
     m_gauge_goal            = irr_driver->getTexture(guid+"gauge_goal.png" );
-
     m_dist_show_overlap     = 2;
     m_icons_inertia         = 2;
 
@@ -289,7 +286,6 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
     // Draw less important messages first, at the very bottom of the screen
     // unimportant messages are skipped in multiplayer, they take too much screen space
     if (race_manager->getNumLocalPlayers() < 2 &&
-        UserConfigParams::m_minimal_race_gui == false &&
         !m_ignore_unimportant_messages)
     {
         for (AllMessageType::const_iterator i = m_messages.begin();
@@ -678,14 +674,15 @@ void RaceGUIBase::drawGlobalMusicDescription()
 }   // drawGlobalMusicDescription
 
 //-----------------------------------------------------------------------------
-void RaceGUIBase::drawGlobalGoal(){
-	static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(UserConfigParams::m_width>>1,
-                                UserConfigParams::m_height>>1,
-                                UserConfigParams::m_width>>1,
-                                UserConfigParams::m_height>>1);
-            gui::IGUIFont* font = GUIEngine::getTitleFont();
-            font->draw(m_string_goal.c_str(), pos, color, true, true);
+void RaceGUIBase::drawGlobalGoal()
+{
+    static video::SColor color = video::SColor(255, 255, 255, 255);
+    core::rect<s32> pos(UserConfigParams::m_width>>1,
+                        UserConfigParams::m_height>>1,
+                        UserConfigParams::m_width>>1,
+                        UserConfigParams::m_height>>1);
+    gui::IGUIFont* font = GUIEngine::getTitleFont();
+    font->draw(m_string_goal.c_str(), pos, color, true, true);
 }
 // ----------------------------------------------------------------------------
 /** Draws the ready-set-go message on the screen.

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <iostream>
 
+#include "achievements/achievements_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/player.hpp"
@@ -204,7 +205,7 @@ const ChallengeData* UnlockManager::getChallenge(const std::string& id)
 */
 void UnlockManager::load()
 {
-    const std::string filename=file_manager->getChallengeFile("challenges.xml");
+    const std::string filename=file_manager->getConfigFile("challenges.xml");
     XMLNode* root = file_manager->createXMLTree(filename);
     if(!root || root->getName() != "challenges")
     {
@@ -263,7 +264,7 @@ void UnlockManager::load()
 
 void UnlockManager::save()
 {
-    std::string filename = file_manager->getChallengeFile("challenges.xml");
+    std::string filename = file_manager->getConfigFile("challenges.xml");
 
     std::ofstream challenge_file(filename.c_str(), std::ios::out);
 
@@ -420,6 +421,15 @@ void UnlockManager::updateActiveChallengeList()
 {
     getCurrentSlot()->computeActive();
 }
+
+
+//-----------------------------------------------------------------------------
+void UnlockManager::setCurrentSlot(std::string slotid)
+{
+    m_current_game_slot = slotid;
+    AchievementsManager::get()->updateCurrentPlayer();
+}
+
 
 //-----------------------------------------------------------------------------
 

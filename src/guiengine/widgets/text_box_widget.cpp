@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -124,6 +124,15 @@ stringw TextBoxWidget::getText() const
     assert(textCtrl != NULL);
 
     return stringw(textCtrl->getText());
+}
+
+// -----------------------------------------------------------------------------
+
+void TextBoxWidget::setPasswordBox(bool passwordBox, wchar_t passwordChar)
+{
+    IGUIEditBox* textCtrl =  Widget::getIrrlichtElement<IGUIEditBox>();
+    assert(textCtrl != NULL);
+    textCtrl->setPasswordBox(passwordBox, passwordChar);
 }
 
 // -----------------------------------------------------------------------------

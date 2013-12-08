@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012  Joerg Henrichs
+//  Copyright (C) 2012-2013  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -74,6 +74,7 @@ void Skidding::reset()
     m_jump_speed          = 0.0f;
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
+    m_kart->getControls().m_skid = KartControl::SC_NONE;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -121,7 +122,6 @@ void Skidding::updateSteering(float steer, float dt)
         else if (m_visual_rotation < -0.05f) m_visual_rotation += 0.05f;
         else
         {
-            m_visual_rotation = 0;
             reset();
         }        
         break;
@@ -212,7 +212,8 @@ void Skidding::update(float dt, bool is_on_ground,
     }
 
     // No skidding backwards or while stopped
-    if(m_kart->getSpeed() < 0.001f)
+    if(m_kart->getSpeed() < 0.001f && 
+       m_skid_state != SKID_NONE && m_skid_state != SKID_BREAK)
     {
         m_skid_state = SKID_BREAK;
         m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);

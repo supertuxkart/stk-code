@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -147,6 +147,12 @@ public:
     /** A heading difference of more than that will trigger a new event to
      *  be generated. */
     float m_replay_delta_angle;
+
+    /** Colors for glows */
+    float m_nitro_glow_color[3];
+    float m_box_glow_color[3];
+    float m_banana_glow_color[3];
+    float m_bubblegum_glow_color[3];
 
 private:
     /** True if stk_config has been loaded. This is necessary if the

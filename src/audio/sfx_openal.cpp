@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Patrick Ammann <pammann@aro.ch>
-//                2009-2011 Marianne Gagnon
+//  Copyright (C) 2006-2013 Patrick Ammann <pammann@aro.ch>
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -25,6 +25,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
+#include "utils/vs.hpp"
 
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
@@ -33,15 +34,9 @@
 #endif
 
 #include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <string>
-
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
-
 
 SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float gain, bool ownsBuffer) : SFXBase()
 {

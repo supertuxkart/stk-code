@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Joerg Henrichs
+//  Copyright (C) 2011-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -294,28 +294,6 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
 }   // init
 
 // ----------------------------------------------------------------------------
-/** Picks a random message to be displayed when a kart is hit by the
- *  rubber ball.
- *  \param The kart that was hit (ignored here).
- *  \returns The string to display.
- */
-const core::stringw RubberBall::getHitString(const AbstractKart *kart) const
-{
-    const int COUNT = 2;
-    RandomGenerator r;
-    switch (r.get(COUNT))
-    {
-        //I18N: shown when a player is hit by a rubber ball. %1 is the
-        // attacker, %0 is the victim.
-        case 0: return _LTR("%s is being bounced around.");
-        //I18N: shown when a player is hit by a rubber ball. %1 is the
-        // attacker, %0 is the victim.
-        case 1: return _LTR("Fetch the ball, %0!");
-        default:assert(false); return L"";   // avoid compiler warning
-    }
-}   // getHitString
-
-// ----------------------------------------------------------------------------
 /** Updates the rubber ball.
  *  \param dt Time step size.
  *  \returns True if the rubber ball should be removed.
@@ -426,7 +404,11 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
     // at it directly, stop interpolating, instead fly straight
     // towards it.
     Vec3 diff = m_target->getXYZ()-getXYZ();
-    *next_xyz = getXYZ() + (dt*m_speed/diff.length())*diff;
+    // Avoid potential division by zero
+    if(diff.length2()==0)
+        *next_xyz = getXYZ();
+    else
+        *next_xyz = getXYZ() + (dt*m_speed/diff.length())*diff;
 
     Vec3 old_vec = getXYZ()-m_previous_xyz;
     Vec3 new_vec = *next_xyz - getXYZ();
@@ -574,7 +556,7 @@ float RubberBall::updateHeight()
             if(m_current_max_height>m_max_height)
                 m_current_max_height = m_max_height;
             m_interval           = m_current_max_height / 10.0f;
-	        // Avoid too small hops and esp. a division by zero
+            // Avoid too small hops and esp. a division by zero
             if(m_interval<0.01f)
                 m_interval = 0.1f;
         }

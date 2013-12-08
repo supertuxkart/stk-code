@@ -1,5 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -234,8 +235,11 @@ namespace GUIEngine
         /** A bitmask of which badges to show, if any; choices are *_BADGE, defined above */
         int m_badges;
 
-        /** A simple flag that can be raised to hide this widget */
+        /** A simple flag that can be raised to deactivate this widget */
         bool m_deactivated;
+
+        /** A flag to indicate whether this widget should be visible or not. */
+        bool m_is_visible;
 
         /** Set to false if widget is something that should not receive focus */
         bool m_focusable;
@@ -322,6 +326,8 @@ namespace GUIEngine
 
         /** Returns if the element is visible. */
         bool isVisible() const;
+
+        bool isActivated() const;
 
         /**
          * Call to resize/move the widget. Not all widgets can resize gracefully.
@@ -645,6 +651,9 @@ namespace GUIEngine
          */
 
         bool ok() const { return (m_magic_number == 0xCAFEC001); }
+
+        /** Gets called when the widget is active and got clicked. (Only works for button widgets for now.) */
+        virtual void onClick()  { }
     };
 
 

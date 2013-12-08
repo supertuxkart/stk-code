@@ -17,14 +17,16 @@
 ;--------------------------------
 ;Include Modern UI
 
-  !include "MUI.nsh"
+  !include "MUI2.nsh"
 
 ;--------------------------------
 ;General
 
   ;Name and file
-  Name "SuperTuxKart for Windows"
-  OutFile "supertuxkart-win.exe"
+  Name "SuperTuxKart"
+  OutFile "supertuxkart.exe"
+
+  RequestExecutionLevel admin
 
   ;Default installation folder
   InstallDir "$PROGRAMFILES\SuperTuxKart"
@@ -38,6 +40,11 @@
   ;Set the icon
   !define MUI_ICON "SuperTuxKart\install.ico"
   !define MUI_UNICON "SuperTuxKart\uninstall.ico"
+  !define MUI_HEADERIMAGE	
+  !define MUI_WELCOMEFINISHPAGE_BITMAP "stk_installer.bmp"
+  !define MUI_HEADERIMAGE_BITMAP "logo_slim.bmp"
+  ;!define MUI_TEXT_INSTALLING_SUBTITLE "Please vote for SuperTuxKart to become SourceForge's Project of the month at vote.supertuxkart.net"
+  ;!define MUI_TEXT_FINISH_INFO_TEXT "Please vote for SuperTuxKart to become $\"Project of the Month$\" at vote.supertuxkart.net"
 
   ;Sets the compressor to /SOLID lzma which when I tested was the best
   SetCompressor /SOLID lzma
@@ -60,14 +67,14 @@
 Function validate_dir
   IfFileExists $INSTDIR\data\*.* 0 return
     IfFileExists $INSTDIR\Uninstall.exe 0 dont_uninstall
-      MessageBox MB_YESNO "You can't install SuperTuxKart 0.8 in an existing directory. Do you wish to run the uninstaller in $INSTDIR?"  IDNO dont_uninstall
+      MessageBox MB_YESNO "You can't install SuperTuxKart 0.8.1-rc1 in an existing directory. Do you wish to run the uninstaller in $INSTDIR?"  IDNO dont_uninstall
 	; -?=$INSTDIR makes sure that this installer waits for the uninstaller
 	; to finish. The uninstaller (and directory) are not removed, but the
 	; uninstaller will be overwritten by our installer anyway.
         ExecWait '"$INSTDIR\Uninstall.exe" _?=$INSTDIR'
         goto return
     dont_uninstall:
-      MessageBox MB_OK "You can't install SuperTuxKart 0.8 in an existing directory. Please select a new directory."
+      MessageBox MB_OK "You can't install SuperTuxKart 0.8.1-rc1 in an existing directory. Please select a new directory."
       abort
   return:
 FunctionEnd
@@ -88,6 +95,8 @@ FunctionEnd
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
 
   !insertmacro MUI_PAGE_INSTFILES
+  ;!define MUI_FINISHPAGE_LINK "Please vote for SuperTuxkart here"
+  ;!define MUI_FINISHPAGE_LINK_LOCATION "http://vote.supertuxkart.net"
   !insertmacro MUI_PAGE_FINISH
 
 
@@ -103,6 +112,7 @@ FunctionEnd
   !insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
+
 ;Installer Sections
 
 Section "Main Section" SecMain
@@ -155,8 +165,9 @@ Section "Uninstall"redist
   Delete "$INSTDIR\Uninstall.exe"
   RMDir "$INSTDIR"
 
+  SetShellVarContext all
 
-  ;Remove start menuy items
+  ;Remove start menu items
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
 
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"

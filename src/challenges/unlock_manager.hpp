@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -82,8 +82,7 @@ public:
     }
 
     /** \param slotid name of the player */
-    void       setCurrentSlot(std::string slotid) { m_current_game_slot = slotid; }
-
+    void       setCurrentSlot(std::string slotid);
     void       findWhatWasUnlocked(int pointsBefore, int pointsNow,
                                    std::vector<std::string>& tracks,
                                    std::vector<std::string>& gps);

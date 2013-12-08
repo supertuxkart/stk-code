@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Lionel Fuentes
+//  Copyright (C) 2013-2013 Lionel Fuentes
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,6 +23,7 @@
 #include "states_screens/arenas_screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -56,12 +57,30 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, c
     if(name == "continue")
     {
         StateManager::get()->pushScreen( ArenasScreen::getInstance() );
-        race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
+        if(getWidget<SpinnerWidget>("goalamount")->isActivated())
+            race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
+        else
+            race_manager->setTimeTarget((float)getWidget<SpinnerWidget>("timeamount")->getValue()*60);
+
         input_manager->setMasterPlayerOnly(true);
     }
     else if (name == "back")
     {
         StateManager::get()->escapePressed();
+    }
+    else if(name == "time_enabled")
+    {
+        CheckBoxWidget* timeEnabled = dynamic_cast<CheckBoxWidget*>(widget);
+        if(timeEnabled->getState())
+        {
+            getWidget<SpinnerWidget>("goalamount")->setDeactivated();
+            getWidget<SpinnerWidget>("timeamount")->setActivated();
+        }
+        else
+        {
+            getWidget<SpinnerWidget>("timeamount")->setDeactivated();
+            getWidget<SpinnerWidget>("goalamount")->setActivated();
+        }
     }
 }
 
@@ -141,6 +160,13 @@ void SoccerSetupScreen::init()
     // TODO: remember in config.xml the last number of goals
     SpinnerWidget*  goalamount = getWidget<SpinnerWidget>("goalamount");
     goalamount->setValue(3);
+    goalamount->setDeactivated();
+    goalamount->setDeactivated();
+
+    SpinnerWidget* timeAmount = getWidget<SpinnerWidget>("timeamount");
+    timeAmount->setValue(timeAmount->getMin());
+
+    CheckBoxWidget* timeEnabled = getWidget<CheckBoxWidget>("time_enabled");
 
     // Set focus on "continue"
     ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");

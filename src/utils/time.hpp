@@ -1,6 +1,6 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//
+//  Copyright (C) 2013  SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,12 +21,14 @@
 #include <stdexcept>
 
 #ifdef WIN32
+#  define WIN32_LEAN_AND_MEAN
 #  define _WINSOCKAPI_
 #  include <windows.h>
 #  include <time.h>
 #else
 #  include <stdint.h>
 #  include <sys/time.h>
+#  include <unistd.h>
 #endif
 
 #include <string>
@@ -37,7 +39,9 @@ class StkTime
 public:
     typedef time_t TimeType;
 
-    /** Converts the time in this object to a human readable string. */
+    static void getDate(int *day=NULL, int *month=NULL, int *year=NULL);
+
+        /** Converts the time in this object to a human readable string. */
     static std::string toString(const TimeType &tt)
     {
         const struct tm *t = gmtime(&tt);
@@ -85,7 +89,7 @@ public:
     static double getRealTime(long startAt=0);
 
     // ------------------------------------------------------------------------
-    /** 
+    /**
      * \brief Compare two different times.
      * \return A signed integral indicating the relation between the time.
      */
@@ -102,7 +106,19 @@ public:
     };   // compareTime
 
     // ------------------------------------------------------------------------
-    /** 
+    /** Sleeps for the specified amount of time.
+     *  \param msec Number of milliseconds to sleep.
+     */
+    static void sleep(int msec)
+    {
+#ifdef WIN32
+        Sleep(msec);
+#else
+        usleep(msec*1000);
+#endif
+    }   // sleep
+    // ------------------------------------------------------------------------
+    /**
      * \brief Add a interval to a time.
      */
     static TimeType addInterval(TimeType time, int year, int month, int day) {
@@ -111,8 +127,9 @@ public:
         t.tm_mon += month;
         t.tm_mday += day;
         return mktime(&t);
-    }
+    }   // addInterval
 
+    // ------------------------------------------------------------------------
     class ScopeProfiler
     {
         float m_time;
@@ -128,7 +145,7 @@ public:
             float f2 = (float)getRealTime();
             printf("} // took %f s\n", (f2 - m_time));
         }
-    };
+    };   // class ScopeProfiler
 
 };   // namespace time
 #endif

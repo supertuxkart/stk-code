@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -41,11 +41,23 @@
  */
 SoccerWorld::SoccerWorld() : WorldWithRank()
 {
-    WorldStatus::setClockMode(CLOCK_CHRONO);
+    if(race_manager->hasTimeTarget()){
+        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, race_manager->getTimeTarget());
+        countDownReachedZero = false;
+    }
+    else WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = false;
 }   // SoccerWorld
-
 //-----------------------------------------------------------------------------
+
+/** The destructor frees al data structures.
+ */
+SoccerWorld::~SoccerWorld()
+{
+    sfx_manager->deleteSFX(m_goal_sound);
+}   // ~SoccerWorld
+//-----------------------------------------------------------------------------
+
 /** Initializes the soccer world. It sets up the data structure
  *  to keep track of points etc. for each kart.
  */
@@ -55,7 +67,7 @@ void SoccerWorld::init()
     m_display_rank = false;
     m_goal_timer = 0.f;
     m_lastKartToHitBall = -1;
-
+    
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
     {
@@ -73,6 +85,11 @@ void SoccerWorld::init()
 void SoccerWorld::reset()
 {
     WorldWithRank::reset();
+    if(race_manager->hasTimeTarget()){
+        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, race_manager->getTimeTarget());
+        countDownReachedZero = false;
+    }
+    else WorldStatus::setClockMode(CLOCK_CHRONO);
 
     m_can_score_points = true;
     memset(m_team_goals, 0, sizeof(m_team_goals));
@@ -94,6 +111,12 @@ void SoccerWorld::reset()
 
         obj->reset();
         obj->getPhysics()->reset();
+    }
+    
+    if (m_goal_sound != NULL &&
+        m_goal_sound->getStatus() == SFXManager::SFX_PLAYING)
+    {
+        m_goal_sound->stop();
     }
 
     initKartList();
@@ -151,11 +174,17 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         {
             if(first_goal){
                 m_redScorers.push_back(m_lastKartToHitBall);
-                m_redScoreTimes.push_back(world->getTime());
+                if(race_manager->hasTimeTarget())
+                    m_redScoreTimes.push_back(race_manager->getTimeTarget() - world->getTime());
+                else
+                    m_redScoreTimes.push_back(world->getTime());
             }
             else{
                 m_blueScorers.push_back(m_lastKartToHitBall);
-                m_blueScoreTimes.push_back(world->getTime());
+                if(race_manager->hasTimeTarget())
+                    m_blueScoreTimes.push_back(race_manager->getTimeTarget() - world->getTime());
+                else
+                    m_blueScoreTimes.push_back(world->getTime());
             }
         }
     }
@@ -210,7 +239,11 @@ bool SoccerWorld::isRaceOver()
     {
         return false;
     }
-        // One team scored the target goals ...
+    
+    else if(race_manager->hasTimeTarget()){
+        return countDownReachedZero;
+    }
+    // One team scored the target goals ...
     else if(getScore(0) >= m_goal_target ||
             getScore(1) >= m_goal_target    )
     {
@@ -230,6 +263,12 @@ void SoccerWorld::terminateRace()
     m_can_score_points = false;
     WorldWithRank::terminateRace();
 }   // terminateRace
+//-----------------------------------------------------------------------------
+/** Called when the match time ends.
+*/
+void SoccerWorld::countdownReachedZero(){
+    countDownReachedZero = true;
+}
 
 //-----------------------------------------------------------------------------
 /** Returns the data to display in the race gui.
@@ -413,7 +452,7 @@ void SoccerWorld::initKartList()
     // Set kart positions, ordering them by team
     for(unsigned int n=0; n<kart_amount; n++)
     {
-                
+
         SoccerTeam  team = race_manager->getLocalKartInfo(n).getSoccerTeam();
         m_karts[n]->setPosition(team_cur_position[team]);
         team_cur_position[team]++;
@@ -428,12 +467,14 @@ int SoccerWorld::getScore(unsigned int i)
 //-----------------------------------------------------------------------------
 int SoccerWorld::getTeamLeader(unsigned int team)
 {
-                for(unsigned int i = 0; i< m_karts.size(); i++){
-                        if(race_manager->getLocalKartInfo(i).getSoccerTeam() == (SoccerTeam) team)
-                                return i;
-                }
+    for(unsigned int i = 0; i< m_karts.size(); i++)
+    {
+        if(race_manager->getLocalKartInfo(i).getSoccerTeam() == (SoccerTeam) team)
+            return i;
+    }
                 return -1;
-        }
+}   // getTeamLeader
+
 //-----------------------------------------------------------------------------
 AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
                                 int local_player_id, int global_player_id,

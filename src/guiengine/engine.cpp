@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -485,7 +485,7 @@ namespace GUIEngine
 
  Used on divs, indicate by how many pixels to pad contents
 
- 
+
  \n
  <HR>
  \section code Using the engine in code
@@ -657,6 +657,7 @@ namespace GUIEngine
 #include "guiengine/screen.hpp"
 #include "guiengine/skin.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/dialog_queue.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -835,6 +836,7 @@ namespace GUIEngine
             {
                 widget->update(dt);
             }
+            DialogQueue::get()->update();
         }
 
         // Hack : on the first frame, irrlicht processes all events that have been queued
@@ -916,6 +918,25 @@ namespace GUIEngine
     }   // addScreenToList
 
     // ------------------------------------------------------------------------
+
+    void removeScreen(const char* name)
+    {
+        const int screen_amount = g_loaded_screens.size();
+        for(int n=0; n<screen_amount; n++)
+        {
+            if (g_loaded_screens[n].getName() == name)
+            {
+                g_current_screen = g_loaded_screens.get(n);
+                g_current_screen->unload();
+                delete g_current_screen;
+                g_current_screen = NULL;
+                g_loaded_screens.remove(n);
+                break;
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
     void reshowCurrentScreen()
     {
         needsUpdate.clearWithoutDeleting();
@@ -953,6 +974,8 @@ namespace GUIEngine
         //delete g_small_font;
         g_small_font->drop();
         g_small_font = NULL;
+        g_large_font->drop();
+        g_large_font = NULL;
         g_digit_font->drop();
         g_digit_font = NULL;
 
@@ -1259,6 +1282,11 @@ namespace GUIEngine
         ITexture* loading =
             irr_driver->getTexture(file_manager->getGUIDir()+"loading.png");
 
+        if(!loading)
+        {
+            Log::fatal("Engine", "Can not find loading.png texture, aborting.");
+            exit(-1);
+        }
         const int texture_w = loading->getSize().Width;
         const int texture_h = loading->getSize().Height;
 

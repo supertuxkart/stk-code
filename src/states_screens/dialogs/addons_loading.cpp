@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2010 Marianne Gagnon, Joerg Henrichs
+//  Copyright (C) 2009-2013 Marianne Gagnon, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -31,6 +31,8 @@
 #include "io/file_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/vote_dialog.hpp"
+#include "states_screens/dialogs/login_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -43,10 +45,11 @@ using namespace irr::gui;
 /** Creates a modal dialog with given percentage of screen width and height
 */
 
-AddonsLoading::AddonsLoading(const float w, const float h,
-                             const std::string &id)
-             : ModalDialog(w, h)
+AddonsLoading::AddonsLoading(const std::string &id)
+             : ModalDialog(0.8f, 0.8f)
 {
+    m_vote_clicked     = false;
+
     m_addon            = *(addons_manager->getAddon(id));
     m_icon_shown       = false;
     m_download_request = NULL;
@@ -197,8 +200,7 @@ void AddonsLoading::escapePressed()
 
 // ----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation
-                    AddonsLoading::processEvent(const std::string& event_source)
+GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event_source)
 {
     GUIEngine::RibbonWidget* actions_ribbon =
             getWidget<GUIEngine::RibbonWidget>("actions");
@@ -236,13 +238,34 @@ GUIEngine::EventPropagation
             doUninstall();
             return GUIEngine::EVENT_BLOCK;
         }
+        else if (selection == "vote")
+        {
+            voteClicked();
+            return GUIEngine::EVENT_BLOCK;
+        }
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
 
 // ----------------------------------------------------------------------------
+void AddonsLoading::voteClicked()
+{
+    ModalDialog::dismiss();
+    if (Online::CurrentUser::get()->isRegisteredUser())
+        new VoteDialog(m_addon.getId());
+    else
+        new LoginDialog(LoginDialog::Registration_Required, new VoteDialog::LoginListener(m_addon.getId()));
+}
+
+// ----------------------------------------------------------------------------
 void AddonsLoading::onUpdate(float delta)
 {
+    if(m_vote_clicked)
+    {
+        voteClicked();
+        return;
+    }
+
     if(m_progress->isVisible())
     {
         float progress = m_download_request->getProgress();

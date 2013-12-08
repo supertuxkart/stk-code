@@ -1,6 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013 the SuperTuxKart team
-//  Copyright (C) 2013      Joerg Henrichs
+//  Copyright (C) 2011-2013 the SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,19 +33,17 @@ using namespace irr;
 /** \brief   Handles post processing, eg motion blur
  *  \ingroup graphics
  */
-class PostProcessing : public video::IShaderConstantSetCallBack
+class PostProcessing: public IReferenceCounted
 {
 private:
-    video::ITexture    *m_render_target;
-    /** Material to be used when blurring is used. */
-    video::SMaterial    m_blur_material;
-
-    bool                m_supported;
+    video::SMaterial    m_material;
 
     /** Boost time, how long the boost should be displayed. This also
      *  affects the strength of the effect: longer boost time will
      *  have a stronger effect. */
     std::vector<float>  m_boost_time;
+
+    bool m_any_boost;
 
     /** The center of blurring, in texture coordinates [0,1]).*/
     std::vector<core::vector2df> m_center;
@@ -54,19 +51,17 @@ private:
     /** The center to which the blurring is aimed at, in [0,1]. */
     std::vector<core::vector2df> m_direction;
 
-    /** True if any of the cameras is using post processing. */
-    bool                m_used_pp_this_frame;
-
-    /** Currently active camera during post-processing, needed in the
-     *  OnSetConstants callback. */
-    unsigned int        m_current_camera;
-
-
     struct Quad { video::S3DVertex v0, v1, v2, v3; };
 
     /** The vertices for the rectangle used for each camera. This includes
      *  the vertex position, normal, and texture coordinate. */
     std::vector<Quad> m_vertices;
+
+    video::ITexture *m_areamap;
+
+    u32 m_sunpixels;
+
+    void setMotionBlurCenterY(const u32 num, const float y);
 
 public:
                  PostProcessing(video::IVideoDriver* video_driver);
@@ -74,21 +69,22 @@ public:
 
     void         reset();
     /** Those should be called around the part where we render the scene to be post-processed */
-    void         beginCapture();
-    void         endCapture();
+    void         begin();
     void         update(float dt);
+
+    /** Render the post-processed scene, solids only, color to color, no stencil */
+    void         renderSolid(const u32 cam);
 
     /** Render the post-processed scene */
     void         render();
 
-    /** Is the hardware able to use post-processing? */
-    inline bool  isSupported() const                 {return m_supported;}
+    /** Draw the quad for this camera */
+    void         drawQuad(u32 cam, const video::SMaterial &mat);
 
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);
 
-    /** Implement IShaderConstantsSetCallback. Shader constants setter for post-processing */
-    virtual void OnSetConstants(video::IMaterialRendererServices *services, s32 user_data);
+    void         setSunPixels(const u32 in) { m_sunpixels = in; }
 };
 
 #endif // HEADER_POST_PROCESSING_HPP

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Joerg Henrichs
+//  Copyright (C) 2011-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -124,6 +124,8 @@ void Referee::init()
         scene::IMeshBuffer *mb = m_st_referee_mesh->getMeshBuffer(i);
         video::SMaterial &irrMaterial = mb->getMaterial();
         video::ITexture* t=irrMaterial.getTexture(0);
+        if(!t) continue;
+
         std::string name=StringUtils::getBasename(t->getName()
                                                   .getInternalName().c_str());
         if(name==colors[0] || name==colors[1] ||name==colors[2] )
@@ -171,6 +173,8 @@ Referee::Referee()
     m_scene_node->setScale(m_st_scale.toIrrVector());
     m_scene_node->setFrameLoop(m_st_first_start_frame,
                                m_st_last_start_frame);
+
+    irr_driver->applyObjectPassShader(m_scene_node);
 }   // Referee
 
 // ----------------------------------------------------------------------------
@@ -195,6 +199,8 @@ Referee::Referee(const AbstractKart &kart)
     m_scene_node->setPosition(core::vector3df(0, kart.getKartHeight() + 0.4f, 0));
     m_scene_node->setFrameLoop(m_st_first_rescue_frame,
                                m_st_last_rescue_frame);
+
+    irr_driver->applyObjectPassShader(m_scene_node);
 }   // Referee
 
 // ----------------------------------------------------------------------------

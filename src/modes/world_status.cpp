@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,7 +26,6 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
-#include "network/network_manager.hpp"
 
 #include <irrlicht.h>
 
@@ -112,8 +111,6 @@ void WorldStatus::enterRaceOverState()
  */
 void WorldStatus::terminateRace()
 {
-    if(network_manager->getMode()==NetworkManager::NW_SERVER)
-        network_manager->sendRaceResults();
 }   // terminateRace
 
 //-----------------------------------------------------------------------------
@@ -146,7 +143,7 @@ void WorldStatus::update(const float dt)
             // long, we use the aux timer to force the next phase
             // after 3.5 seconds.
             if(m_track_intro_sound->getStatus()==SFXManager::SFX_PLAYING
-	            && m_auxiliary_timer<3.5f)
+                && m_auxiliary_timer<3.5f)
                 return;
             // Wait before ready phase if sounds are disabled
             if(!UserConfigParams::m_sfx && m_auxiliary_timer<3.0f)
@@ -239,8 +236,8 @@ void WorldStatus::update(const float dt)
         case FINISH_PHASE:
             // Nothing to do here.
             break;
-		case GOAL_PHASE:
-			// Nothing to do here as well.
+        case GOAL_PHASE:
+            // Nothing to do here as well.
 
         default: break;
     }

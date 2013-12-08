@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,6 +22,7 @@
 #include <IGUIEnvironment.h>
 #include <IGUIListBox.h>
 
+#include "graphics/irr_driver.hpp"
 #include "guiengine/abstract_state_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -192,14 +193,18 @@ bool EventHandler::OnEvent (const SEvent &event)
 #else
             return true; // EVENT_BLOCK
 #endif
-
+            const std::string &error_info = irr_driver->getTextureErrorMessage();
             if (event.LogEvent.Level == irr::ELL_WARNING)
             {
-                printf("[Irrlicht Warning] %s\n", event.LogEvent.Text);
+                if(error_info.size()>0)
+                    Log::warn("EventHandler", error_info.c_str());
+                Log::warn("Irrlicht", event.LogEvent.Text);
             }
             else if (event.LogEvent.Level == irr::ELL_ERROR)
             {
-                printf("[Irrlicht Error] %s\n", event.LogEvent.Text);
+                if(error_info.size()>0)
+                    Log::error("EventHandler", error_info.c_str());
+                Log::error("Irrlicht", event.LogEvent.Text);
             }
         }
         return true;
@@ -684,12 +689,13 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
             {
                 Widget* w = GUIEngine::getWidget(id);
                 if (w == NULL) break;
-
                 if (w->m_deactivated)
                 {
                     GUIEngine::getCurrentScreen()->onDisabledItemClicked(w->m_properties[PROP_ID].c_str());
                     return EVENT_BLOCK;
                 }
+
+                w->onClick();
 
                 // These events are only triggered by mouse (or so I hope)
                 // The player that owns the mouser receives "game master" priviledges
@@ -736,7 +742,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                     if (playerID == -1) break;
                     if (input_manager->masterPlayerOnly() && playerID != PLAYER_ID_GAME_MASTER) break;
 
-                    if (ribbon->mouseHovered(w, playerID) == EVENT_LET) sendEventToUser(ribbon, ribbon->m_properties[PROP_ID], playerID);
+                    ribbon->mouseHovered(w, playerID);
                     if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w, playerID);
                     ribbon->setFocusForPlayer(playerID);
                 }

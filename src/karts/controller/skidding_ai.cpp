@@ -298,13 +298,6 @@ void SkiddingAI::update(float dt)
     return;
 #endif
 
-    // The client does not do any AI computations.
-    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
-    {
-        AIBaseLapController::update(dt);
-        return;
-    }
-
     // If the kart needs to be rescued, do it now (and nothing else)
     if(isStuck() && !m_kart->getKartAnimation())
     {

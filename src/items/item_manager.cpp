@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -30,6 +30,7 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
+#include "network/network_world.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
@@ -293,9 +294,6 @@ void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
  */
 void  ItemManager::checkItemHit(AbstractKart* kart)
 {
-    // Only do this on the server
-    if(network_manager->getMode()==NetworkManager::NW_CLIENT) return;
-
     // We could use m_items_in_quads to to check for item hits: take the quad
     // of the graph node of the kart, and only check items in that quad. But
     // then we also need to check for any adjacent quads (since an item just
@@ -313,7 +311,14 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         // we pass the kart and the position separately.
         if((*i)->hitKart(kart->getXYZ(), kart))
         {
-            collectedItem(*i, kart);
+            // if we're not playing online, pick the item.
+            if (!NetworkWorld::getInstance()->isRunning())
+                collectedItem(*i, kart);
+            else if (NetworkManager::getInstance()->isServer())
+            {
+                collectedItem(*i, kart);
+                NetworkWorld::getInstance()->collectedItem(*i, kart);
+            }
         }   // if hit
     }   // for m_all_items
 }   // checkItemHit

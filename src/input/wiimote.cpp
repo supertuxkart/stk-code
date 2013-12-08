@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -79,16 +79,6 @@ void Wiimote::update()
     float normalized_angle = -(m_wiimote_handle->accel.y-128)
                            /  UserConfigParams::m_wiimote_raw_max;
 
-#ifdef DEBUG
-    if(UserConfigParams::m_wiimote_debug)
-    {
-        Log::verbose("wiimote", "xyz %d %d %d %f",
-                     m_wiimote_handle->accel.x,
-                     m_wiimote_handle->accel.y,
-                     m_wiimote_handle->accel.z,
-                     normalized_angle);
-    }
-#endif
     if(normalized_angle<-1.0f)
         normalized_angle = -1.0f;
     else if(normalized_angle>1.0f)
@@ -105,8 +95,17 @@ void Wiimote::update()
     const float sign = normalized_angle >= 0.0f ? 1.0f : -1.0f;
     const float normalized_angle_2 = w1 * normalized_angle
                                    + w2 * sign*normalized_angle*normalized_angle
-		                           + wa * asin(normalized_angle)*(2.0f/M_PI)
+                                   + wa * asin(normalized_angle)*(2.0f/M_PI)
                                    + ws * sin(normalized_angle*(M_PI/2.0f));
+
+    if(UserConfigParams::m_wiimote_debug)
+    {
+        Log::verbose("wiimote", "raw %d normal %f result %f",
+                     m_wiimote_handle->accel.y,
+                     normalized_angle,
+                     normalized_angle_2);
+    }
+
     const float JOYSTICK_ABS_MAX_ANGLE = 32766.0f;
 
     const float angle = normalized_angle_2 * JOYSTICK_ABS_MAX_ANGLE;

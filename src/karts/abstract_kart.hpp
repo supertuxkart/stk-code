@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012  Joerg Henrichs
+//  Copyright (C) 2012-2013  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -51,14 +51,10 @@ private:
     float m_kart_width;
     /** Height of the kart, copy of the data from KartModel. */
     float m_kart_height;
-	/** Coordinate on up axis */
-	float m_kart_highest_point;
+    /** Coordinate on up axis */
+    float m_kart_highest_point;
     /** The position of all four wheels in the 3d model */
     const Vec3* m_wheel_graphics_position;
-    /** The position of all nitro emitters in the 3d model */
-    const Vec3* m_nitro_emitter_position;
-    /** True if kart has nitro emitters */
-    bool m_has_nitro_emitter;
 
     /** Index of kart in world. */
     unsigned int m_world_kart_id;
@@ -144,6 +140,9 @@ public:
     /** Returns this kart's kart model. */
     KartModel* getKartModel() { return m_kart_model;      }
     // ------------------------------------------------------------------------
+    /** Returns this kart's kart model. */
+    const KartModel* getKartModel() const { return m_kart_model;      }
+    // ------------------------------------------------------------------------
     /** Returns the length of the kart. */
     float getKartLength() const { return m_kart_length; }
     // ------------------------------------------------------------------------
@@ -152,9 +151,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the width of the kart. */
     float getKartWidth() const {return m_kart_width; }
-	// ------------------------------------------------------------------------
-	/** Returns the highest point of the kart (coordinate on up axis) */
-	float getHighestPoint() const { return m_kart_highest_point;  }
+    // ------------------------------------------------------------------------
+    /** Returns the highest point of the kart (coordinate on up axis) */
+    float getHighestPoint() const { return m_kart_highest_point;  }
     // ------------------------------------------------------------------------
     /** Returns true if this kart has no wheels. */
     bool isWheeless() const;
@@ -164,14 +163,6 @@ public:
      *           right, 3 = rear left.  */
     const Vec3& getWheelGraphicsPosition(int i) const
                 {assert(i>=0 && i<4); return m_wheel_graphics_position[i];}
-    // ------------------------------------------------------------------------
-    /** Returns the position of a nitro emitter relative to the kart */
-    const Vec3& getNitroEmitterPosition(int i) const
-                {assert(i>=0 && i<2); return m_nitro_emitter_position[i];}
-    // ------------------------------------------------------------------------
-    /** Returns true if kart has nitro emitters */
-    const bool hasNitroEmitter() const
-                {return m_has_nitro_emitter;}
 
     // ========================================================================
     // Emergency animation related functions.
@@ -281,7 +272,7 @@ public:
      *  \param add_info Additional info, used in networking games to force
      *         a specific item to be used (instead of a random item) to keep
      *         all karts in synch. */
-    virtual void  collectedItem(Item *item, int random_attachment) = 0;
+    virtual void  collectedItem(Item *item, int add_info) = 0;
     // ------------------------------------------------------------------------
     /** Returns the current position of this kart in the race. */
     virtual int getPosition() const = 0;
@@ -362,14 +353,6 @@ public:
     /** Starts the engine sound effect. Called once the track intro phase is
      *  over. */
     virtual void startEngineSFX() = 0;
-    // ------------------------------------------------------------------------
-    /** Stores the current suspension length. This function is called from
-     *  world after all karts are in resting position (see
-     *  World::resetAllKarts), so that the default suspension rest length can
-     *  be stored. This is then used later to move the wheels depending on
-     *  actual suspension, so that when a kart is in rest, the wheels are at
-     *  the position at which they were modelled. */
-    virtual void setSuspensionLength() = 0;
     // ------------------------------------------------------------------------
     /** This method is to be called every time the mass of the kart is updated,
      *  which includes attaching an anvil to the kart (and detaching). */

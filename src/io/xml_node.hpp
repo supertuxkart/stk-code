@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Joerg Henrichs
+//  Copyright (C) 2009-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,15 +19,6 @@
 #ifndef HEADER_XML_NODE_HPP
 #define HEADER_XML_NODE_HPP
 
-#ifdef _MSC_VER
-  typedef __int32          int32_t;
-  typedef unsigned __int32 uint32_t;
-  typedef __int64          int64_t;
-  typedef unsigned __int64 uint64_t;
-#else
-#  include <stdint.h>
-#endif
-
 #include <string>
 #include <map>
 #include <vector>
@@ -43,6 +34,7 @@ using namespace irr;
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/time.hpp"
+#include "utils/types.hpp"
 
 class InterpolationArray;
 class Vec3;
@@ -82,6 +74,7 @@ public:
     int get(const std::string &attribute, std::string *value) const;
     int get(const std::string &attribute, core::stringw *value) const;
     int get(const std::string &attribute, int32_t  *value) const;
+    int get(const std::string &attribute, uint16_t *value) const;
     int get(const std::string &attribute, uint32_t *value) const;
     int get(const std::string &attribute, int64_t  *value) const;
     int get(const std::string &attribute, float *value) const;

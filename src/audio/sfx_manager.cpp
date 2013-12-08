@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -307,7 +307,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     //       race_manager->getNumLocalPlayers(), buffer->isPositional());
 
 #if HAVE_OGGVORBIS
-    assert( alIsBuffer(buffer->getBufferID()) );
+    //assert( alIsBuffer(buffer->getBufferID()) ); crashes on server
     SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain(), owns_buffer);
 #else
     SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain(), owns_buffer);

@@ -1,9 +1,9 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Joerg Henrichs
+//  Copyright (C) 2007-2013 Joerg Henrichs
 //
 //  Linear item-kart intersection function written by
-//  by David Mikos. Copyright (C) 2009.
+//  Copyright (C) 2009-2013 David Mikos
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,9 +21,6 @@
 
 #include "items/flyable.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
-#  define isnan _isnan
-#endif
 #include <math.h>
 
 #include <IMeshManipulator.h>
@@ -38,11 +35,11 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "modes/world.hpp"
-#include "network/flyable_info.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/vs.hpp"
 
 // static variables:
 float         Flyable::m_st_speed       [PowerupManager::POWERUP_MAX];
@@ -78,6 +75,7 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
 
     // Add the graphical model
     setNode(irr_driver->addMesh(m_st_model[type]));
+    irr_driver->applyObjectPassShader(getNode());
 #ifdef DEBUG
     std::string debug_name("flyable: ");
     debug_name += type;
@@ -411,19 +409,6 @@ bool Flyable::updateAndDelete(float dt)
 }   // updateAndDelete
 
 // ----------------------------------------------------------------------------
-/** Updates the position of a projectile based on information received frmo the
- *  server.
- */
-void Flyable::updateFromServer(const FlyableInfo &f, float dt)
-{
-    setXYZ(f.m_xyz);
-    setRotation(f.m_rotation);
-
-    // Update the graphical position
-    Moveable::update(dt);
-}   // updateFromServer
-
-// ----------------------------------------------------------------------------
 /** Returns true if the item hit the kart who shot it (to avoid that an item
  *  that's too close to the shooter hits the shooter).
  *  \param kart Kart who was hit.
@@ -446,20 +431,6 @@ bool Flyable::hit(AbstractKart *kart_hit, PhysicalObject* object)
 {
     // the owner of this flyable should not be hit by his own flyable
     if(isOwnerImmunity(kart_hit)) return false;
-
-    if (kart_hit != NULL)
-    {    //TODO: reduce shield time; add other string ?
-        RaceGUIBase* gui = World::getWorld()->getRaceGUI();
-        irr::core::stringw hit_message =
-            StringUtils::insertValues(getHitString(kart_hit),
-                                      core::stringw(kart_hit->getName()),
-                                      core::stringw(m_owner ->getName())
-                                                                         );
-        if(hit_message.size()>0)
-            gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f,
-                            video::SColor(255, 255, 255, 255), false);
-    }
-
     m_has_hit_something=true;
 
     return true;

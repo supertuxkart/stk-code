@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -28,6 +28,8 @@
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
+#include "utils/string_utils.hpp"
+
 
 using namespace GUIEngine;
 using namespace irr;
@@ -101,20 +103,7 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     // ---- Otherwise, see if we can accept the new name
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     stringw playerName = textCtrl->getText().trim();
-    const int size = playerName.size();
-
-    // sanity check
-    int nonEmptyChars = 0;
-    for (int n=0; n<size; n++)
-    {
-        if (playerName[n] != L' ')
-        {
-            nonEmptyChars++;
-        }
-    }
-
-
-    if (size > 0 && nonEmptyChars > 0)
+    if (StringUtils::notEmpty(playerName))
     {
         // check for duplicates
         const int amount = UserConfigParams::m_all_players.size();

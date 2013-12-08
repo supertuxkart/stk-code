@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "network/network_manager.hpp"
 
 //-----------------------------------------------------------------------------
 StandardRace::StandardRace() : LinearWorld()
@@ -123,5 +124,6 @@ void StandardRace::endRaceEarly()
     } // Finish the active players
     endSetKartPositions();
     setPhase(RESULT_DISPLAY_PHASE);
-    terminateRace();
+    if (!isNetworkWorld() || NetworkManager::getInstance()->isServer())
+        terminateRace();
 } // endRaceEarly

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Joerg Henrichs
+//  Copyright (C) 2011-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -66,8 +66,6 @@ private:
 
     /** For some reason the built-in animation system doesn't work correctly here?? */
     float              m_swat_bomb_frame;
-
-    const core::stringw getHitString(const AbstractKart *kart) const;
 
 public:
              Swatter(AbstractKart *kart, bool was_bomb,

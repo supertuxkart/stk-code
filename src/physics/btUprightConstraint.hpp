@@ -1,7 +1,7 @@
 /*
 
 Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (C) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the
@@ -111,7 +111,7 @@ public:
                                          timeStep);
     virtual void getInfo1 (btConstraintInfo1* info);
     virtual void getInfo2 (btConstraintInfo2* info);
-    virtual	void setParam(int num, btScalar value, int axis = -1);
+    virtual void setParam(int num, btScalar value, int axis = -1);
     virtual btScalar getParam(int num, int axis) const;
 
 };

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -264,9 +264,8 @@ private:
     float m_roll_influence;
     float m_wheel_radius;
 
-    // Parameters for speed-weighted objects
-    float m_speed_weighted_strength_factor;
-    float m_speed_weighted_speed_factor;
+    /** Parameters for the speed-weighted objects */
+    SpeedWeightedObject::Properties   m_speed_weighted_object_properties;
 
     /** An impulse pushing the kart down which is proportional to speed. So
      *  the actual impulse is  speed * m_downward_impulse_factor. Set it to
@@ -421,6 +420,14 @@ public:
     const KartModel& getMasterKartModel() const {return *m_kart_model;        }
 
     // ------------------------------------------------------------------------
+    /** Sets the name of a mesh to be used for this kart.
+     *  \param hat_name Name of the mesh.
+     */
+    void setHatMeshName(const std::string &hat_name)
+    {
+        m_kart_model->setHatMeshName(hat_name);
+    }   // setHatMeshName
+    // ------------------------------------------------------------------------
     /** Returns the name of this kart.
         \note Pass it through fridibi as needed, this is the LTR name
       */
@@ -533,12 +540,8 @@ public:
     float getWheelRadius            () const {return m_wheel_radius;          }
 
     // ------------------------------------------------------------------------
-    /** Returns animation strength factor for speed-weighted objects */
-    float getSpeedWeightedStrengthFactor() const {return m_speed_weighted_strength_factor;}
-
-    // ------------------------------------------------------------------------
-    /** Returns animation speed factor for speed-weighted objects */
-    float getSpeedWeightedSpeedFactor() const {return m_speed_weighted_speed_factor;}
+    /** Returns parameters for the speed-weighted objects */
+    const SpeedWeightedObject::Properties& getSpeedWeightedObjectProperties() const {return m_speed_weighted_object_properties;}
     
     // ------------------------------------------------------------------------
     /** Returns the wheel base (distance front to rear axis). */

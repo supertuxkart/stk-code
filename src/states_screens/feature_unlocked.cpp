@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 SuperTuxKart-Team
+//  Copyright (C) 2010-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -300,15 +300,16 @@ void FeatureUnlockedCutScene::init()
                                                                  120, 120));
 
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
-    m_light =
-        irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos,
-                                                         video::SColorf(1.0f,1.0f,1.0f),
-                                                         10000.0f /* radius */);
+    m_light = irr_driver->addLight(sun_pos, 10000.0f, 1, 1, 1);
 #ifdef DEBUG
     m_light->setName("light");
 #endif
-    m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-    m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+
+    if (!irr_driver->isGLSL())
+    {
+        ((scene::ILightSceneNode *) m_light)->getLightData().DiffuseColor = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+        ((scene::ILightSceneNode *) m_light)->getLightData().SpecularColor = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+    }
 
     const int unlockedStuffCount = m_unlocked_stuff.size();
 
@@ -330,7 +331,7 @@ void FeatureUnlockedCutScene::init()
             m_unlocked_stuff[n].m_root_gift_node = kart_model->attachModel(true);
             kart_model->setAnimation(KartModel::AF_DEFAULT);
             float susp[4]={0,0,0,0};
-            kart_model->update(0.0f, 0.0f, susp, 0.0f);
+            kart_model->update(0.0f, 0.0f, 0.0f, susp, 0.0f);
 
 #ifdef DEBUG
             m_unlocked_stuff[n].m_root_gift_node->setName("unlocked kart");

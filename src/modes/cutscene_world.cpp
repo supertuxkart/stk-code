@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -35,7 +35,7 @@
 #include "physics/physics.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/cutscene_gui.hpp"
-#include "states_screens/kart_selection.hpp"
+#include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
@@ -384,7 +384,7 @@ void CutsceneWorld::enterRaceOverState()
 
                 slot->setFirstTime(false);
                 unlock_manager->save();
-                KartSelectionScreen* s = KartSelectionScreen::getInstance();
+                KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
                 s->setMultiplayer(false);
                 s->setGoToOverworldNext();
                 StateManager::get()->pushScreen( s );

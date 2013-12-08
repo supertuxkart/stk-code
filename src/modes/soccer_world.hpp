@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -45,27 +45,29 @@ private:
     int m_team_goals[NB_SOCCER_TEAMS];
     /** Number of goals needed to win */
     int m_goal_target;
+    bool countDownReachedZero;
     /** Whether or not goals can be scored (they are disabled when a point is scored
     and re-enabled when the next game can be played)*/
     bool m_can_score_points;
     SFXBase *m_goal_sound;
     /** Timer for displaying goal text*/
     float m_goal_timer;
-	int m_lastKartToHitBall;
-	std::vector<int> m_redScorers;
-	std::vector<float> m_redScoreTimes;
-	std::vector<int> m_blueScorers;
-	std::vector<float> m_blueScoreTimes;
+    int m_lastKartToHitBall;
+    std::vector<int> m_redScorers;
+    std::vector<float> m_redScoreTimes;
+    std::vector<int> m_blueScorers;
+    std::vector<float> m_blueScoreTimes;
 public:
 
     SoccerWorld();
-    virtual ~SoccerWorld() {}
+    virtual ~SoccerWorld();
 
     virtual void init();
 
     // clock events
     virtual bool isRaceOver();
     virtual void terminateRace();
+    virtual void countdownReachedZero() OVERRIDE;
 
     // overriding World methods
     virtual void reset();
@@ -83,21 +85,21 @@ public:
 
     void onCheckGoalTriggered(bool first_goal);
     int getTeamLeader(unsigned int i);
-	void setLastKartTohitBall(unsigned int kartId);
-	std::vector<int> getScorers(unsigned int team)
+    void setLastKartTohitBall(unsigned int kartId);
+    std::vector<int> getScorers(unsigned int team)
     {
-		if(team == 0)
-			return m_redScorers;
+        if(team == 0)
+            return m_redScorers;
         else
-			return m_blueScorers;
-	}
-	std::vector<float> getScoreTimes(unsigned int team)
+            return m_blueScorers;
+    }
+    std::vector<float> getScoreTimes(unsigned int team)
     {
-		if(team == 0)
-			return m_redScoreTimes;
-		else
-			return m_blueScoreTimes;
-	}
+        if(team == 0)
+            return m_redScoreTimes;
+        else
+            return m_blueScoreTimes;
+    }
 
 private:
     void initKartList();

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012 SuperTuxKart-Team
+//  Copyright (C) 2012-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,6 +26,7 @@
 #include "input/device_manager.hpp"
 #include "input/wiimote.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/time.hpp"
 #include "utils/translation.hpp"
 
 #include "wiiuse.h"
@@ -110,7 +111,7 @@ void WiimoteManager::launchDetection(int timeout)
         wiiuse_rumble(wiimote_handle, 1);
     }
 
-    irr_driver->getDevice()->sleep(200);
+    StkTime::sleep(200);
 
     for(unsigned int i=0 ; i < m_wiimotes.size(); i++)
     {
@@ -284,7 +285,7 @@ void WiimoteManager::threadFunc()
             }
         }
 
-        irr_driver->getDevice()->sleep(1);  // 'cause come on, the whole CPU is not ours :)
+        StkTime::sleep(1);  // 'cause come on, the whole CPU is not ours :)
     } // end while
 }   // threadFunc
 
@@ -304,19 +305,19 @@ void* WiimoteManager::threadFuncWrapper(void *data)
  */
 int WiimoteManager::askUserToConnectWiimotes()
 {
-	new MessageDialog(
+    new MessageDialog(
 #ifdef WIN32
-		_("Connect your wiimote to the Bluetooth manager, then click on Ok."
+        _("Connect your wiimote to the Bluetooth manager, then click on Ok."
                   "Detailed instructions at supertuxkart.net/Wiimote"),
 #else
-		_("Press the buttons 1+2 simultaneously on your wiimote to put "
-		  "it in discovery mode, then click on Ok."
+        _("Press the buttons 1+2 simultaneously on your wiimote to put "
+          "it in discovery mode, then click on Ok."
                   "Detailed instructions at supertuxkart.net/Wiimote"),
 #endif
-		MessageDialog::MESSAGE_DIALOG_OK_CANCEL,
-		new WiimoteDialogListener(), true);
+        MessageDialog::MESSAGE_DIALOG_OK_CANCEL,
+        new WiimoteDialogListener(), true);
 
-	return getNumberOfWiimotes();
+    return getNumberOfWiimotes();
 }   // askUserToConnectWiimotes
 
 // ============================================================================
@@ -325,23 +326,23 @@ int WiimoteManager::askUserToConnectWiimotes()
  */
 void WiimoteManager::WiimoteDialogListener::onConfirm()
 {
-	GUIEngine::ModalDialog::dismiss();
+    GUIEngine::ModalDialog::dismiss();
 
-	wiimote_manager->launchDetection(5);
+    wiimote_manager->launchDetection(5);
 
-	int nb_wiimotes = wiimote_manager->getNumberOfWiimotes();
-	if(nb_wiimotes > 0)
-	{
-		core::stringw msg = StringUtils::insertValues(
-			_("Found %d wiimote(s)"),
-			core::stringw(nb_wiimotes));
+    int nb_wiimotes = wiimote_manager->getNumberOfWiimotes();
+    if(nb_wiimotes > 0)
+    {
+        core::stringw msg = StringUtils::insertValues(
+            _("Found %d wiimote(s)"),
+            core::stringw(nb_wiimotes));
 
-		new MessageDialog( msg );
+        new MessageDialog( msg );
 
-	}
-	else
-	{
-		new MessageDialog( _("Could not detect any wiimote :/") );
-	}
+    }
+    else
+    {
+        new MessageDialog( _("Could not detect any wiimote :/") );
+    }
 }   // WiimoteDialogListeneronConfirm
 #endif // ENABLE_WIIUSE

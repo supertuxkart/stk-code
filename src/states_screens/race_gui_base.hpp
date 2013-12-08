@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Joerg Henrichs
+//  Copyright (C) 2010-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -198,8 +198,8 @@ protected:
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
     void drawGlobalMusicDescription();
-    void drawGlobalReadySetGo  ();
-	void drawGlobalGoal		   ();
+    void drawGlobalReadySetGo();
+    void drawGlobalGoal();
     void drawPlungerInFace(const Camera *camera, float dt);
     /** Instructs the base gui to ignore unimportant messages (like
      *  item messages).

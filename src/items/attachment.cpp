@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2013 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,8 +34,8 @@
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp" 
-#include "network/race_state.hpp"
-#include "network/network_manager.hpp"
+#include "physics/triangle_mesh.hpp"
+#include "tracks/track.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -177,6 +177,8 @@ void Attachment::set(AttachmentType type, float time,
         }
     }
     m_node->setVisible(true);
+
+    irr_driver->applyObjectPassShader(m_node);
 }   // set
 
 // -----------------------------------------------------------------------------
@@ -280,15 +282,6 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         if(new_attachment==-1)
             new_attachment = m_random.get(3);
     }   // switch
-
-    // Save the information about the attachment in the race state
-    // so that the clients can be updated.
-    if(network_manager->getMode()==NetworkManager::NW_SERVER)
-    {
-        race_state->itemCollected(m_kart->getWorldKartId(),
-                                  item->getItemId(),
-                                  new_attachment);
-    }
 
     if (add_a_new_item)
     {

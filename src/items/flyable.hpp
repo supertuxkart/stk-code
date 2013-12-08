@@ -1,9 +1,9 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Joerg Henrichs
+//  Copyright (C) 2007-2013 Joerg Henrichs
 //
 //  Linear item-kart intersection function written by
-//  by David Mikos. Copyright (C) 2009.
+//  Copyright (C) 2009-2013 David Mikos. 
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,7 +34,6 @@ using namespace irr;
 #include "tracks/terrain_info.hpp"
 
 class AbstractKart;
-class FlyableInfo;
 class HitEffect;
 class PhysicalObject;
 class XMLNode;
@@ -167,9 +166,7 @@ public:
     static void  init        (const XMLNode &node, scene::IMesh *model,
                               PowerupManager::PowerupType type);
     virtual bool              updateAndDelete(float);
-    virtual const core::stringw getHitString(const AbstractKart *kart) const = 0;
     virtual HitEffect*        getHitEffect() const;
-    void                      updateFromServer(const FlyableInfo &f, float dt);
     bool                      isOwnerImmunity(const AbstractKart *kart_hit) const;
     virtual bool              hit(AbstractKart* kart, PhysicalObject* obj=NULL);
     void                      explode(AbstractKart* kart, PhysicalObject* obj=NULL,

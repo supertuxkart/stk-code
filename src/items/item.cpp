@@ -1,6 +1,7 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
+//
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2013 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -110,8 +111,7 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
     m_deactive_time     = 0;
     m_time_till_return  = 0.0f;  // not strictly necessary, see isCollected()
     m_emitter           = NULL;
-    m_rotate            = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER) &&
-                          (type!=ITEM_EASTER_EGG);
+    m_rotate            = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
     switch(m_type)
     {
     case ITEM_BUBBLEGUM:
@@ -186,7 +186,10 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
     {
         node = m_node->getAllNodes()[1];
         ((scene::IMeshSceneNode*)node)->setMesh(lowmesh);
+        irr_driver->applyObjectPassShader(m_node->getAllNodes()[1]);
     }
+
+    irr_driver->applyObjectPassShader(m_node->getAllNodes()[0]);
 
     World::getWorld()->getTrack()->adjustForFog(m_node);
 }   // switchTo

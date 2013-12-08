@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2008-2013 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -88,6 +89,7 @@ public:
     void              dropFileSystem();
     io::IXMLReader   *createXMLReader(const std::string &filename);
     XMLNode          *createXMLTree(const std::string &filename);
+    XMLNode          *createXMLTreeFromString(const std::string & content);
 
     std::string       getConfigDir() const;
     std::string       getTextureDir() const;
@@ -105,10 +107,7 @@ public:
     std::vector<std::string>getMusicDirs() const;
     std::string getTextureFile   (const std::string& fname) const;
     std::string getDataFile      (const std::string& fname) const;
-    std::string getHighscoreFile (const std::string& fname) const;
-    std::string getChallengeFile (const std::string& fname) const;
-    std::string getTutorialFile  (const std::string& fname) const;
-    std::string getLogFile       (const std::string& fname) const;
+    std::string getConfigFile    (const std::string& fname) const;
     std::string getItemFile      (const std::string& fname) const;
     std::string getGfxFile       (const std::string& fname) const;
     std::string getMusicFile     (const std::string& fname) const;

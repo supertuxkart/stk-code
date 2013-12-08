@@ -1,8 +1,0 @@
-// Xcode build configuration
-
-HEADER_SEARCH_PATHS = /Library/Frameworks/IrrFramework.framework/Versions/A/Headers/ "$(PROJECT_DIR)/../../" "$(PROJECT_DIR)/../../../lib/bullet/src" "$(PROJECT_DIR)/../../../lib/enet/include" /Library/Frameworks/fribidi.framework/Headers /Library/Frameworks/Ogg.framework/Headers /Library/Frameworks/Vorbis.framework/Headers /usr/local/include /usr/include
-
-OTHER_CFLAGS = -Wall -DHAVE_OGGVORBIS=1  -DHAS_SOCKLEN_T -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAS_POLL=1 -DHAS_FCNTL=1 -DHAS_INET_PTON=1 -DHAS_INET_NTOP=1 -DHAS_MSGHDR_FLAGS=1 -DENABLE_NLS=1 -DHAVE_GETTEXT=1 -DHAVE_GLUT=1 -DHAVE_IRRLICHT=1 -DPACKAGE="\"supertuxkart\"" -D__MACOSX__=1 -DHAVE_RTT=0 -DENABLE_BIDI=1 -fvisibility=hidden -DENABLE_WIIUSE=1
-
-OTHER_LDFLAGS = -lcurl
-LIBRARY_SEARCH_PATHS = /usr/lib /usr/local/lib

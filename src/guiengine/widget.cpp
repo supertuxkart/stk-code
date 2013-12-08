@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2013 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,11 +34,7 @@ using namespace gui;
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
-
-
-#ifndef round
-# define round(x)  (floor(x+0.5f))
-#endif
+#include "utils/vs.hpp"
 
 namespace GUIEngine
 {
@@ -98,6 +94,7 @@ Widget::Widget(WidgetType type, bool reserve_id)
 
     m_reserved_id     = -1;
     m_deactivated     = false;
+    m_is_visible      = true;
     m_badges          = 0;
 
     // set a default value, derivates can override this as they wish
@@ -319,7 +316,18 @@ void Widget::setParent(IGUIElement* parent)
 
 bool Widget::isVisible() const
 {
-    return m_element && m_element->isVisible();
+    if (m_element != NULL)
+        assert(m_element->isVisible() == m_is_visible);
+    return m_is_visible;
+}
+
+// -----------------------------------------------------------------------------
+
+bool Widget::isActivated() const
+{
+    if (isVisible())
+        return !m_deactivated;
+    return false;
 }
 
 // -----------------------------------------------------------------------------
@@ -330,6 +338,7 @@ void Widget::setVisible(bool visible)
     {
         m_element->setVisible(visible);
     }
+    m_is_visible = visible;
     m_deactivated = !visible;
 
     const int childrenCount = m_children.size();
@@ -349,4 +358,3 @@ void Widget::moveIrrlichtElement()
                                                          irr::core::dimension2di(m_w, m_h) ) );
     }
 }
-
