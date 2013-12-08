@@ -85,16 +85,6 @@ BattleAI::BattleAI(AbstractKart *kart,
 
 }
 
-void BattleAI::update(float dt)
-{
-    m_controls->m_accel     = 0.5f;
- //   m_controls->m_steer     = 0;
-   // updateCurrentNode();
- 
-    handleSteering(dt);
-}   //BattleAI
-
-
 BattleAI::~BattleAI()
 {
 #ifdef AI_DEBUG
@@ -105,7 +95,109 @@ BattleAI::~BattleAI()
 void BattleAI::reset()
 {
     m_current_node = BattleGraph::UNKNOWN_POLY;
+    m_time_since_stuck = 0.0f;
+    m_currently_reversing = false;
+    AIBaseController::reset();
 }
+
+void BattleAI::update(float dt)
+{
+    m_controls->m_accel     = 0.5f;
+ //   m_controls->m_steer     = 0;
+   // updateCurrentNode();
+ 
+    handleSteering(dt);
+    handleGetUnstuck(dt);
+    AIBaseController::update(dt);
+}   //BattleAI
+
+
+void BattleAI::handleGetUnstuck(const float dt)
+{
+    if(isStuck() == true)
+    {
+        std::cout<<"GOT STUCK\n";
+        m_time_since_stuck = 0.0f;
+        m_currently_reversing = true;
+    }
+    if(m_currently_reversing == true)
+    {
+        m_controls->m_accel = -0.30f;
+        setSteering(-1.0f*m_target_angle,dt);
+        m_time_since_stuck += dt;
+        
+        if(m_time_since_stuck >= 0.6f)
+        {
+            m_currently_reversing = false;
+            m_time_since_stuck = 0.0f;
+        }
+    }
+}
+
+
+
+// Handles steering. Returns the steering angle being used for setSteering()
+void BattleAI::handleSteering(const float dt)
+{
+    Vec3  target_point;
+    const AbstractKart* kart = m_world->getPlayerKart(0);
+    int player_node = -1;
+    for(unsigned int i =0; i<BattleGraph::get()->getNumNodes(); i++)
+        {
+            const NavPoly& p = BattleGraph::get()->getPolyOfNode(i);
+            if(p.pointInPoly(kart->getXYZ()))
+                player_node = i;
+        }
+   // std::cout<<"PLayer node " << player_node<<" This cpu kart node" << m_current_node<<std::endl;
+    if(player_node == BattleGraph::UNKNOWN_POLY || m_current_node == BattleGraph::UNKNOWN_POLY) return;
+    if(player_node == m_current_node)
+    {
+        target_point=kart->getXYZ();  
+        std::cout<<"Aiming at sire nixt\n";
+    }
+    else
+    {    
+    int next_node = BattleGraph::get()->getNextShortestPathPoly(m_current_node, player_node);
+  
+   // std::cout<<"Aiming at "<<next_node<<"\n";
+    if(next_node == -1) return;
+    target_point = NavMesh::get()->getCenterOfPoly(next_node);
+    } 
+    m_target_angle = steerToPoint(target_point);
+    setSteering(m_target_angle,dt);
+    
+#ifdef AI_DEBUG
+        m_debug_sphere->setPosition(target_point.toIrrVector());
+        Log::debug("skidding_ai","-Outside of road: steer to center point.\n");
+#endif
+      
+}
+
+
+
+/*
+float BattleAI::isStuck(const float dt)
+{
+    // check if kart is stuck
+    if(m_kart->getSpeed()<2.0f && !m_kart->getKartAnimation() &&
+        !m_world->isStartPhase())
+    {
+        m_time_since_stuck += dt;
+        if(m_time_since_stuck > 2.0f)
+        {
+            return true;
+            m_time_since_stuck=0.0f;
+        }   // m_time_since_stuck > 2.0f
+    }
+    else
+    {
+        m_time_since_stuck = 0.0f;
+        return false;
+    }
+} 
+
+*/
+
 
 /*
 void BattleAI::updateCurrentNode()
@@ -159,38 +251,3 @@ void BattleAI::updateCurrentNode()
     return;
 }
 */
-
-void BattleAI::handleSteering(const float dt)
-{
-    Vec3  target_point;
-    const AbstractKart* kart = m_world->getPlayerKart(0);
-    int player_node = -1;
-    for(unsigned int i =0; i<BattleGraph::get()->getNumNodes(); i++)
-        {
-            const NavPoly& p = BattleGraph::get()->getPolyOfNode(i);
-            if(p.pointInPoly(kart->getXYZ()))
-                player_node = i;
-        }
-    std::cout<<"PLayer node " << player_node<<" This cpu kart node" << m_current_node<<std::endl;
-    if(player_node == BattleGraph::UNKNOWN_POLY || m_current_node == BattleGraph::UNKNOWN_POLY) return;
-    if(player_node == m_current_node)
-    {
-        target_point=kart->getXYZ();  
-        setSteering(steerToPoint(kart->getXYZ()),dt);
-        std::cout<<"Aiming at sire nixt\n";
-    }
-    else
-    {    
-    int next_node = BattleGraph::get()->getNextShortestPathPoly(m_current_node, player_node);
-  
-    std::cout<<"Aiming at "<<next_node<<"\n";
-    if(next_node == -1) return;
-    target_point = NavMesh::get()->getCenterOfPoly(next_node);
-    setSteering(steerToPoint(target_point),dt);
-    } 
-#ifdef AI_DEBUG
-        m_debug_sphere->setPosition(target_point.toIrrVector());
-        Log::debug("skidding_ai","-Outside of road: steer to center point.\n");
-#endif
-      
-}

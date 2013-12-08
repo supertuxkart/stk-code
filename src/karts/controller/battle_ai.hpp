@@ -47,9 +47,13 @@ class BattleAI : public AIBaseController
 private: 
 
     int m_current_node;
-    
+
+    float m_target_angle;
+
+    float m_time_since_stuck;
+    bool m_currently_reversing;
+
     #ifdef DEBUG
-    
     /** For debugging purpose: a sphere indicating where the AI 
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
@@ -62,7 +66,7 @@ private:
     void handleAcceleration(const float dt) {};
     void handleSteering(const float dt);
     void handleBraking() {};
-    
+    void handleGetUnstuck(const float dt);    
 
 protected:
 
@@ -85,7 +89,6 @@ public:
     virtual void reset       ();
     
     virtual void crashed(const AbstractKart *k) {};
-    virtual void crashed(const Material *m) {};
     virtual void handleZipper(bool play_sound) {};
     virtual void finishedRace(float time) {};
     virtual void collectedItem(const Item &item, int add_info=-1,
