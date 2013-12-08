@@ -32,7 +32,7 @@
 #  define VALIST char*
 #endif
 
-#if defined(_WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
+#if defined(_WIN32) && defined(_MSC_VER) && _MSC_VER < 1800
 #  define va_copy(dest, src) dest = src
 #endif
 

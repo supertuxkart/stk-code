@@ -27,9 +27,11 @@
       typedef __int64          int64_t;
       typedef unsigned __int64 uint64_t;
       typedef char             int8_t;
+    #elif defined(_MSC_VER) && _MSC_VER >= 1800
+    #  include <stdint.h>
     #else
     #  include <stdint.h>
-    #define SOCKET_ERROR -1
+    #  define SOCKET_ERROR -1
     #endif
 
 #endif

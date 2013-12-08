@@ -226,263 +226,14 @@ void IrrDriver::renderGLSL(float dt)
         // Render anything glowing.
         if (!m_mipviz && !m_wireframe)
         {
-            m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
-
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_TMP1), false, false);
-            glClearColor(0, 0, 0, 0);
-            glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-            const u32 glowcount = glows.size();
-            ColorizeProvider * const cb = (ColorizeProvider *) m_shaders->m_callbacks[ES_COLORIZE];
-
-            GlowProvider * const glowcb = (GlowProvider *) m_shaders->m_callbacks[ES_GLOW];
-            glowcb->setResolution(UserConfigParams::m_width,
-                                  UserConfigParams::m_height);
-
-            overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
-            overridemat.EnableFlags = video::EMF_MATERIAL_TYPE;
-            overridemat.EnablePasses = scene::ESNRP_SOLID;
-            overridemat.Enabled = true;
-
-            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-            glStencilFunc(GL_ALWAYS, 1, ~0);
-            glEnable(GL_STENCIL_TEST);
-
-            for (u32 i = 0; i < glowcount; i++)
-            {
-                const GlowData &dat = glows[i];
-                scene::ISceneNode * const cur = dat.node;
-
-                // Quick box-based culling
-                const core::aabbox3df nodebox = cur->getTransformedBoundingBox();
-                if (!nodebox.intersectsWithBox(cambox))
-                    continue;
-
-                cb->setColor(dat.r, dat.g, dat.b);
-                cur->render();
-            }
-
-            // Second round for transparents; it's a no-op for solids
-            m_scene_manager->setCurrentRendertime(scene::ESNRP_TRANSPARENT);
-            overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE_REF);
-            for (u32 i = 0; i < glowcount; i++)
-            {
-                const GlowData &dat = glows[i];
-                scene::ISceneNode * const cur = dat.node;
-
-                // Quick box-based culling
-                const core::aabbox3df nodebox = cur->getTransformedBoundingBox();
-                if (!nodebox.intersectsWithBox(cambox))
-                    continue;
-
-                cb->setColor(dat.r, dat.g, dat.b);
-                cur->render();
-            }
-            overridemat.Enabled = false;
-            overridemat.EnablePasses = 0;
-
-            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-            glDisable(GL_STENCIL_TEST);
-
-            // Cool, now we have the colors set up. Progressively minify.
-            video::SMaterial minimat;
-            minimat.Lighting = false;
-            minimat.ZWriteEnable = false;
-            minimat.ZBuffer = video::ECFN_ALWAYS;
-            minimat.setFlag(video::EMF_TRILINEAR_FILTER, true);
-
-            minimat.TextureLayer[0].TextureWrapU =
-            minimat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
-
-            // To half
-            minimat.setTexture(0, m_rtts->getRTT(RTT_TMP1));
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_HALF1), false, false);
-            m_post_processing->drawQuad(cam, minimat);
-
-            // To quarter
-            minimat.setTexture(0, m_rtts->getRTT(RTT_HALF1));
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_QUARTER1), false, false);
-            m_post_processing->drawQuad(cam, minimat);
-
-            // Blur it
-            ((GaussianBlurProvider *) m_shaders->m_callbacks[ES_GAUSSIAN3H])->setResolution(
-                       UserConfigParams::m_width / 4,
-                       UserConfigParams::m_height / 4);
-
-            minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN6H);
-            minimat.setTexture(0, m_rtts->getRTT(RTT_QUARTER1));
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_QUARTER2), false, false);
-            m_post_processing->drawQuad(cam, minimat);
-
-            minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN6V);
-            minimat.setTexture(0, m_rtts->getRTT(RTT_QUARTER2));
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_QUARTER1), false, false);
-            m_post_processing->drawQuad(cam, minimat);
-
-            // The glows will be rendered in the transparent phase
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
-
-            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-            glDisable(GL_STENCIL_TEST);
+            renderGlow(overridemat, glows, cambox, cam);
         } // end glow
 
         // Shadows
         if (!m_mipviz && !m_wireframe && UserConfigParams::m_shadows &&
             World::getWorld()->getTrack()->hasShadows())
         {
-            m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
-            static u8 tick = 0;
-
-            const Vec3 *vmin, *vmax;
-            World::getWorld()->getTrack()->getAABB(&vmin, &vmax);
-            core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
-                                                          core::vector3df(0, 30, 0));
-
-            const float oldfar = camnode->getFarValue();
-            camnode->setFarValue(std::min(100.0f, oldfar));
-            camnode->render();
-            const core::aabbox3df smallcambox = camnode->
-                                             getViewFrustum()->getBoundingBox();
-            camnode->setFarValue(oldfar);
-            camnode->render();
-
-            // Set up a nice ortho projection that contains our camera frustum
-            core::matrix4 ortho;
-            core::aabbox3df box = smallcambox;
-            box = box.intersect(trackbox);
-
-            m_suncam->getViewMatrix().transformBoxEx(box);
-            m_suncam->getViewMatrix().transformBoxEx(trackbox);
-
-            core::vector3df extent = trackbox.getExtent();
-            const float w = fabsf(extent.X);
-            const float h = fabsf(extent.Y);
-            float z = box.MaxEdge.Z;
-
-            // Snap to texels
-            const float units_per_w = w / m_rtts->getRTT(RTT_SHADOW)->getSize().Width;
-            const float units_per_h = h / m_rtts->getRTT(RTT_SHADOW)->getSize().Height;
-
-            float left = box.MinEdge.X;
-            float right = box.MaxEdge.X;
-            float up = box.MaxEdge.Y;
-            float down = box.MinEdge.Y;
-
-            left -= fmodf(left, units_per_w);
-            right -= fmodf(right, units_per_w);
-            up -= fmodf(up, units_per_h);
-            down -= fmodf(down, units_per_h);
-            z -= fmodf(z, 0.5f);
-
-            // FIXME: quick and dirt (and wrong) workaround to avoid division by zero
-            if (left == right) right += 0.1f;
-            if (up == down) down += 0.1f;
-            if (z == 30) z += 0.1f;
-
-            ortho.buildProjectionMatrixOrthoLH(left, right,
-                                               up, down,
-                                               30, z);
-
-            m_suncam->setProjectionMatrix(ortho, true);
-            m_scene_manager->setActiveCamera(m_suncam);
-            m_suncam->render();
-
-            ortho *= m_suncam->getViewMatrix();
-            ((SunLightProvider *) m_shaders->m_callbacks[ES_SUNLIGHT])->setShadowMatrix(ortho);
-            sicb->setShadowMatrix(ortho);
-
-            overridemat.Enabled = 0;
-
-            // Render the importance map
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLLAPSE), true, true);
-
-            m_shadow_importance->render();
-
-            CollapseProvider * const colcb = (CollapseProvider *)
-                                                 m_shaders->
-                                                 m_callbacks[ES_COLLAPSE];
-            ScreenQuad sq(m_video_driver);
-            sq.setMaterialType(m_shaders->getShader(ES_COLLAPSE));
-            sq.setTexture(m_rtts->getRTT(RTT_COLLAPSE));
-            sq.getMaterial().setFlag(EMF_BILINEAR_FILTER, false);
-
-            const TypeRTT oldh = tick ? RTT_COLLAPSEH : RTT_COLLAPSEH2;
-            const TypeRTT oldv = tick ? RTT_COLLAPSEV : RTT_COLLAPSEV2;
-            const TypeRTT curh = tick ? RTT_COLLAPSEH2 : RTT_COLLAPSEH;
-            const TypeRTT curv = tick ? RTT_COLLAPSEV2 : RTT_COLLAPSEV;
-
-            colcb->setResolution(1, m_rtts->getRTT(RTT_WARPV)->getSize().Height);
-            sq.setTexture(m_rtts->getRTT(oldh), 1);
-            sq.render(m_rtts->getRTT(RTT_WARPH));
-
-            colcb->setResolution(m_rtts->getRTT(RTT_WARPV)->getSize().Height, 1);
-            sq.setTexture(m_rtts->getRTT(oldv), 1);
-            sq.render(m_rtts->getRTT(RTT_WARPV));
-
-            sq.setTexture(0, 1);
-            ((GaussianBlurProvider *) m_shaders->m_callbacks[ES_GAUSSIAN3H])->setResolution(
-                       m_rtts->getRTT(RTT_WARPV)->getSize().Height,
-                       m_rtts->getRTT(RTT_WARPV)->getSize().Height);
-
-            sq.setMaterialType(m_shaders->getShader(ES_GAUSSIAN6H));
-            sq.setTexture(m_rtts->getRTT(RTT_WARPH));
-            sq.render(m_rtts->getRTT(curh));
-
-            sq.setMaterialType(m_shaders->getShader(ES_GAUSSIAN6V));
-            sq.setTexture(m_rtts->getRTT(RTT_WARPV));
-            sq.render(m_rtts->getRTT(curv));
-
-            // Convert importance maps to warp maps
-            //
-            // It should be noted that while they do repeated work
-            // calculating the min, max, and total, it's several hundred us
-            // faster to do that than to do it once in a separate shader
-            // (shader switch overhead, measured).
-            colcb->setResolution(m_rtts->getRTT(RTT_WARPV)->getSize().Height,
-                                 m_rtts->getRTT(RTT_WARPV)->getSize().Height);
-
-            sq.setMaterialType(m_shaders->getShader(ES_SHADOW_WARPH));
-            sq.setTexture(m_rtts->getRTT(curh));
-            sq.render(m_rtts->getRTT(RTT_WARPH));
-
-            sq.setMaterialType(m_shaders->getShader(ES_SHADOW_WARPV));
-            sq.setTexture(m_rtts->getRTT(curv));
-            sq.render(m_rtts->getRTT(RTT_WARPV));
-
-            // Actual shadow map
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_SHADOW), true, true);
-            overridemat.Material.MaterialType = m_shaders->getShader(ES_SHADOWPASS);
-            overridemat.EnableFlags = video::EMF_MATERIAL_TYPE | video::EMF_TEXTURE1 |
-                                      video::EMF_TEXTURE2;
-            overridemat.EnablePasses = scene::ESNRP_SOLID;
-            overridemat.Material.setTexture(1, m_rtts->getRTT(RTT_WARPH));
-            overridemat.Material.setTexture(2, m_rtts->getRTT(RTT_WARPV));
-            overridemat.Material.TextureLayer[1].TextureWrapU =
-            overridemat.Material.TextureLayer[1].TextureWrapV =
-            overridemat.Material.TextureLayer[2].TextureWrapU =
-            overridemat.Material.TextureLayer[2].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
-            overridemat.Material.TextureLayer[1].BilinearFilter =
-            overridemat.Material.TextureLayer[2].BilinearFilter = true;
-            overridemat.Material.TextureLayer[1].TrilinearFilter =
-            overridemat.Material.TextureLayer[2].TrilinearFilter = false;
-            overridemat.Material.TextureLayer[1].AnisotropicFilter =
-            overridemat.Material.TextureLayer[2].AnisotropicFilter = 0;
-            overridemat.Material.Wireframe = 1;
-            overridemat.Enabled = true;
-
-            m_scene_manager->drawAll(scene::ESNRP_SOLID);
-
-            if (m_shadowviz)
-            {
-                overridemat.EnableFlags |= video::EMF_WIREFRAME;
-                m_scene_manager->drawAll(scene::ESNRP_SOLID);
-            }
-
-            overridemat.EnablePasses = 0;
-            overridemat.Enabled = false;
-            camera->activate();
-
-            tick++;
-            tick %= 2;
+            renderShadows(sicb, camnode, overridemat, camera);
         }
 
         // Lights
@@ -584,8 +335,9 @@ void IrrDriver::renderGLSL(float dt)
         lightmat.ZBuffer = video::ECFN_ALWAYS;
         lightmat.setFlag(video::EMF_BILINEAR_FILTER, false);
         lightmat.setTexture(0, m_rtts->getRTT(RTT_TMP1));
-	// Specular mapping
-	lightmat.setTexture(1, m_rtts->getRTT(RTT_COLOR));
+
+        // Specular mapping
+        lightmat.setTexture(1, m_rtts->getRTT(RTT_COLOR));
         lightmat.MaterialType = m_shaders->getShader(ES_LIGHTBLEND);
         lightmat.MaterialTypeParam = video::pack_textureBlendFunc(video::EBF_DST_COLOR, video::EBF_ZERO);
         lightmat.BlendOperation = video::EBO_ADD;
@@ -833,4 +585,270 @@ void IrrDriver::renderFixed(float dt)
 #endif
 
     m_video_driver->endScene();
+}
+
+
+void IrrDriver::renderShadows(ShadowImportanceProvider * const sicb,
+                              scene::ICameraSceneNode * const camnode,
+                              video::SOverrideMaterial &overridemat,
+                              Camera * const camera)
+{
+    m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
+    static u8 tick = 0;
+
+    const Vec3 *vmin, *vmax;
+    World::getWorld()->getTrack()->getAABB(&vmin, &vmax);
+    core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
+                                                    core::vector3df(0, 30, 0));
+
+    const float oldfar = camnode->getFarValue();
+    camnode->setFarValue(std::min(100.0f, oldfar));
+    camnode->render();
+    const core::aabbox3df smallcambox = camnode->
+                                        getViewFrustum()->getBoundingBox();
+    camnode->setFarValue(oldfar);
+    camnode->render();
+
+    // Set up a nice ortho projection that contains our camera frustum
+    core::matrix4 ortho;
+    core::aabbox3df box = smallcambox;
+    box = box.intersect(trackbox);
+
+    m_suncam->getViewMatrix().transformBoxEx(box);
+    m_suncam->getViewMatrix().transformBoxEx(trackbox);
+
+    core::vector3df extent = trackbox.getExtent();
+    const float w = fabsf(extent.X);
+    const float h = fabsf(extent.Y);
+    float z = box.MaxEdge.Z;
+
+    // Snap to texels
+    const float units_per_w = w / m_rtts->getRTT(RTT_SHADOW)->getSize().Width;
+    const float units_per_h = h / m_rtts->getRTT(RTT_SHADOW)->getSize().Height;
+
+    float left = box.MinEdge.X;
+    float right = box.MaxEdge.X;
+    float up = box.MaxEdge.Y;
+    float down = box.MinEdge.Y;
+
+    left -= fmodf(left, units_per_w);
+    right -= fmodf(right, units_per_w);
+    up -= fmodf(up, units_per_h);
+    down -= fmodf(down, units_per_h);
+    z -= fmodf(z, 0.5f);
+
+    // FIXME: quick and dirt (and wrong) workaround to avoid division by zero
+    if (left == right) right += 0.1f;
+    if (up == down) down += 0.1f;
+    if (z == 30) z += 0.1f;
+
+    ortho.buildProjectionMatrixOrthoLH(left, right,
+                                        up, down,
+                                        30, z);
+
+    m_suncam->setProjectionMatrix(ortho, true);
+    m_scene_manager->setActiveCamera(m_suncam);
+    m_suncam->render();
+
+    ortho *= m_suncam->getViewMatrix();
+    ((SunLightProvider *) m_shaders->m_callbacks[ES_SUNLIGHT])->setShadowMatrix(ortho);
+    sicb->setShadowMatrix(ortho);
+
+    overridemat.Enabled = 0;
+
+    // Render the importance map
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLLAPSE), true, true);
+
+    m_shadow_importance->render();
+
+    CollapseProvider * const colcb = (CollapseProvider *)
+                                            m_shaders->
+                                            m_callbacks[ES_COLLAPSE];
+    ScreenQuad sq(m_video_driver);
+    sq.setMaterialType(m_shaders->getShader(ES_COLLAPSE));
+    sq.setTexture(m_rtts->getRTT(RTT_COLLAPSE));
+    sq.getMaterial().setFlag(EMF_BILINEAR_FILTER, false);
+
+    const TypeRTT oldh = tick ? RTT_COLLAPSEH : RTT_COLLAPSEH2;
+    const TypeRTT oldv = tick ? RTT_COLLAPSEV : RTT_COLLAPSEV2;
+    const TypeRTT curh = tick ? RTT_COLLAPSEH2 : RTT_COLLAPSEH;
+    const TypeRTT curv = tick ? RTT_COLLAPSEV2 : RTT_COLLAPSEV;
+
+    colcb->setResolution(1, m_rtts->getRTT(RTT_WARPV)->getSize().Height);
+    sq.setTexture(m_rtts->getRTT(oldh), 1);
+    sq.render(m_rtts->getRTT(RTT_WARPH));
+
+    colcb->setResolution(m_rtts->getRTT(RTT_WARPV)->getSize().Height, 1);
+    sq.setTexture(m_rtts->getRTT(oldv), 1);
+    sq.render(m_rtts->getRTT(RTT_WARPV));
+
+    sq.setTexture(0, 1);
+    ((GaussianBlurProvider *) m_shaders->m_callbacks[ES_GAUSSIAN3H])->setResolution(
+                m_rtts->getRTT(RTT_WARPV)->getSize().Height,
+                m_rtts->getRTT(RTT_WARPV)->getSize().Height);
+
+    sq.setMaterialType(m_shaders->getShader(ES_GAUSSIAN6H));
+    sq.setTexture(m_rtts->getRTT(RTT_WARPH));
+    sq.render(m_rtts->getRTT(curh));
+
+    sq.setMaterialType(m_shaders->getShader(ES_GAUSSIAN6V));
+    sq.setTexture(m_rtts->getRTT(RTT_WARPV));
+    sq.render(m_rtts->getRTT(curv));
+
+    // Convert importance maps to warp maps
+    //
+    // It should be noted that while they do repeated work
+    // calculating the min, max, and total, it's several hundred us
+    // faster to do that than to do it once in a separate shader
+    // (shader switch overhead, measured).
+    colcb->setResolution(m_rtts->getRTT(RTT_WARPV)->getSize().Height,
+                            m_rtts->getRTT(RTT_WARPV)->getSize().Height);
+
+    sq.setMaterialType(m_shaders->getShader(ES_SHADOW_WARPH));
+    sq.setTexture(m_rtts->getRTT(curh));
+    sq.render(m_rtts->getRTT(RTT_WARPH));
+
+    sq.setMaterialType(m_shaders->getShader(ES_SHADOW_WARPV));
+    sq.setTexture(m_rtts->getRTT(curv));
+    sq.render(m_rtts->getRTT(RTT_WARPV));
+
+    // Actual shadow map
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_SHADOW), true, true);
+    overridemat.Material.MaterialType = m_shaders->getShader(ES_SHADOWPASS);
+    overridemat.EnableFlags = video::EMF_MATERIAL_TYPE | video::EMF_TEXTURE1 |
+                                video::EMF_TEXTURE2;
+    overridemat.EnablePasses = scene::ESNRP_SOLID;
+    overridemat.Material.setTexture(1, m_rtts->getRTT(RTT_WARPH));
+    overridemat.Material.setTexture(2, m_rtts->getRTT(RTT_WARPV));
+    overridemat.Material.TextureLayer[1].TextureWrapU =
+    overridemat.Material.TextureLayer[1].TextureWrapV =
+    overridemat.Material.TextureLayer[2].TextureWrapU =
+    overridemat.Material.TextureLayer[2].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
+    overridemat.Material.TextureLayer[1].BilinearFilter =
+    overridemat.Material.TextureLayer[2].BilinearFilter = true;
+    overridemat.Material.TextureLayer[1].TrilinearFilter =
+    overridemat.Material.TextureLayer[2].TrilinearFilter = false;
+    overridemat.Material.TextureLayer[1].AnisotropicFilter =
+    overridemat.Material.TextureLayer[2].AnisotropicFilter = 0;
+    overridemat.Material.Wireframe = 1;
+    overridemat.Enabled = true;
+
+    m_scene_manager->drawAll(scene::ESNRP_SOLID);
+
+    if (m_shadowviz)
+    {
+        overridemat.EnableFlags |= video::EMF_WIREFRAME;
+        m_scene_manager->drawAll(scene::ESNRP_SOLID);
+    }
+
+    overridemat.EnablePasses = 0;
+    overridemat.Enabled = false;
+    camera->activate();
+
+    tick++;
+    tick %= 2;
+}
+
+void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
+                           std::vector<GlowData>& glows,
+                           const core::aabbox3df& cambox,
+                           int cam)
+{
+    m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
+
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_TMP1), false, false);
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    const u32 glowcount = glows.size();
+    ColorizeProvider * const cb = (ColorizeProvider *) m_shaders->m_callbacks[ES_COLORIZE];
+
+    GlowProvider * const glowcb = (GlowProvider *) m_shaders->m_callbacks[ES_GLOW];
+    glowcb->setResolution(UserConfigParams::m_width,
+                            UserConfigParams::m_height);
+
+    overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
+    overridemat.EnableFlags = video::EMF_MATERIAL_TYPE;
+    overridemat.EnablePasses = scene::ESNRP_SOLID;
+    overridemat.Enabled = true;
+
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glStencilFunc(GL_ALWAYS, 1, ~0);
+    glEnable(GL_STENCIL_TEST);
+
+    for (u32 i = 0; i < glowcount; i++)
+    {
+        const GlowData &dat = glows[i];
+        scene::ISceneNode * const cur = dat.node;
+
+        // Quick box-based culling
+        const core::aabbox3df nodebox = cur->getTransformedBoundingBox();
+        if (!nodebox.intersectsWithBox(cambox))
+            continue;
+
+        cb->setColor(dat.r, dat.g, dat.b);
+        cur->render();
+    }
+
+    // Second round for transparents; it's a no-op for solids
+    m_scene_manager->setCurrentRendertime(scene::ESNRP_TRANSPARENT);
+    overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE_REF);
+    for (u32 i = 0; i < glowcount; i++)
+    {
+        const GlowData &dat = glows[i];
+        scene::ISceneNode * const cur = dat.node;
+
+        // Quick box-based culling
+        const core::aabbox3df nodebox = cur->getTransformedBoundingBox();
+        if (!nodebox.intersectsWithBox(cambox))
+            continue;
+
+        cb->setColor(dat.r, dat.g, dat.b);
+        cur->render();
+    }
+    overridemat.Enabled = false;
+    overridemat.EnablePasses = 0;
+
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    glDisable(GL_STENCIL_TEST);
+
+    // Cool, now we have the colors set up. Progressively minify.
+    video::SMaterial minimat;
+    minimat.Lighting = false;
+    minimat.ZWriteEnable = false;
+    minimat.ZBuffer = video::ECFN_ALWAYS;
+    minimat.setFlag(video::EMF_TRILINEAR_FILTER, true);
+
+    minimat.TextureLayer[0].TextureWrapU =
+    minimat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
+
+    // To half
+    minimat.setTexture(0, m_rtts->getRTT(RTT_TMP1));
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_HALF1), false, false);
+    m_post_processing->drawQuad(cam, minimat);
+
+    // To quarter
+    minimat.setTexture(0, m_rtts->getRTT(RTT_HALF1));
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_QUARTER1), false, false);
+    m_post_processing->drawQuad(cam, minimat);
+
+    // Blur it
+    ((GaussianBlurProvider *) m_shaders->m_callbacks[ES_GAUSSIAN3H])->setResolution(
+                UserConfigParams::m_width / 4,
+                UserConfigParams::m_height / 4);
+
+    minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN6H);
+    minimat.setTexture(0, m_rtts->getRTT(RTT_QUARTER1));
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_QUARTER2), false, false);
+    m_post_processing->drawQuad(cam, minimat);
+
+    minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN6V);
+    minimat.setTexture(0, m_rtts->getRTT(RTT_QUARTER2));
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_QUARTER1), false, false);
+    m_post_processing->drawQuad(cam, minimat);
+
+    // The glows will be rendered in the transparent phase
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
+
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    glDisable(GL_STENCIL_TEST);
 }
