@@ -16,11 +16,11 @@ void main()
 {
 	// lookup normal from normal map, move from [0,1] to  [-1, 1] range, normalize
 	vec3 normal  = 2.0 * texture2D (BumpTex1, gl_TexCoord[0].st + delta1).rgb - 1.0;
-    vec3 normal2 = 2.0 * texture2D (BumpTex2, gl_TexCoord[0].st + delta2).rgb - 1.0;
+	vec3 normal2 = 2.0 * texture2D (BumpTex2, gl_TexCoord[0].st + delta2).rgb - 1.0;
 
-    // scale normals
-    normal.y = 4.0*normal.y;
-    normal2.y = 4.0*normal2.y;
+	// scale normals
+	normal.y = 4.0*normal.y;
+	normal2.y = 4.0*normal2.y;
 
 	normal = (normalize(normal) + normalize(normal2))/2.0;
 
@@ -29,31 +29,28 @@ void main()
 	vec4 diffuseMaterial;
 	vec4 diffuseLight;
 
-    diffuseMaterial = texture2D (DecalTex, gl_TexCoord[0].st + vec2(delta1.x, 0.0));
-    diffuseLight  = vec4(1.0, 1.0, 1.0, 1.0);
+	diffuseMaterial = texture2D (DecalTex, gl_TexCoord[0].st + vec2(delta1.x, 0.0));
+	diffuseLight  = vec4(1.0, 1.0, 1.0, 1.0);
 
-    //if (lamberFactor < 0.7)
-    //{
-    //    lamberFactor = 0.0;
-    //}
+	vec3 col = diffuseMaterial.xyz * (0.3 + lamberFactor*0.7);
 
-    gl_FragColor =	diffuseMaterial * (0.3 + lamberFactor*0.7);
+	// specular (phong)
+	vec3 R = normalize(reflect(lightVec, normal));
+	float specular = max(dot(R, eyeVec), 0.0);
 
-    // specular (phong)
-    vec3 R = normalize(reflect(lightVec, normal));
-    float specular = max(dot(R,eyeVec),0.0);
+	// weak specular
+	specular = specular*specular;
+	specular = specular*specular;
+	float specular_weak = specular*0.05;
+	col += vec3(specular_weak, specular_weak, specular_weak);
 
-    if (specular > 0.0)
-    {
-        // weak specular
-        specular = specular*specular;
-        specular = specular*specular;
-        float specular_weak = specular*0.05;
-        gl_FragColor += vec4(specular_weak, specular_weak, specular_weak, 0.0);
+	// strong specular
+	specular = specular*specular;
+	float specular_strong = specular*0.3;
+	col += vec3(specular_strong, specular_strong, specular_strong);
 
-        // strong specular
-        specular = specular*specular;
-        float specular_strong = specular*0.3;
-        gl_FragColor += vec4(specular_strong, specular_strong, specular_strong, 0.0);
-    }
+	float summed = dot(vec3(1.0), col) / 3.0;
+	float alpha = 0.9 + 0.1 * smoothstep(0.0, 1.0, summed);
+
+	gl_FragColor = vec4(col, alpha);
 }

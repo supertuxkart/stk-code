@@ -1,3 +1,21 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2013 the SuperTuxKart team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+
 // motion_blur.frag
 
 // The actual boost amount (which linearly scales the blur to be shown).
@@ -23,7 +41,7 @@ uniform float mask_radius;
 uniform float max_tex_height;
 
 // Number of samples used for blurring
-#define NB_SAMPLES 12
+#define NB_SAMPLES 8
 
 void main()
 {
@@ -31,14 +49,6 @@ void main()
 
 	// Sample the color buffer
 	vec3 color = texture2D(color_buffer, texcoords).rgb;
-
-	// If no motion blur is needed, don't do any of the blur computation,
-	// just return the color from the texture.
-	if(boost_amount==0.0)
-	{
-		gl_FragColor = vec4(color, 1.0);
-		return;
-	}
 
 	// Compute the blur direction.
 	// IMPORTANT: we don't normalize it so that it avoids a glitch around 'center',
