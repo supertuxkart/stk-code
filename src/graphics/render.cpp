@@ -237,118 +237,7 @@ void IrrDriver::renderGLSL(float dt)
         }
 
         // Lights
-        if (!m_lightviz)
-        {
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_TMP1), true, false,
-                                            video::SColor(1, 0, 0, 0));
-        } else
-        {
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
-        }
-
-        const vector3df camcenter = cambox.getCenter();
-        const float camradius = cambox.getExtent().getLength() / 2;
-        const vector3df campos = camnode->getPosition();
-        const float camnear = camnode->getNearValue();
-
-        m_scene_manager->drawAll(scene::ESNRP_CAMERA);
-        PointLightProvider * const pcb = (PointLightProvider *) irr_driver->
-                                            getCallback(ES_POINTLIGHT);
-        pcb->updateIPVMatrix();
-        SunLightProvider * const scb = (SunLightProvider *) irr_driver->
-                                            getCallback(ES_SUNLIGHT);
-        scb->updateIPVMatrix();
-        FogProvider * const fogcb = (FogProvider *) irr_driver->
-                                            getCallback(ES_FOG);
-        fogcb->updateIPVMatrix();
-
-        const u32 lightcount = m_lights.size();
-        for (i = 0; i < lightcount; i++)
-        {
-            // Sphere culling
-            const float distance_sq = (m_lights[i]->getPosition() - camcenter).getLengthSQ();
-            float radius_sum = camradius + m_lights[i]->getRadius();
-            radius_sum *= radius_sum;
-            if (radius_sum < distance_sq)
-                continue;
-
-            bool inside = false;
-
-            const float camdistance_sq = (m_lights[i]->getPosition() - campos).getLengthSQ();
-            float adjusted_radius = m_lights[i]->getRadius() + camnear;
-            adjusted_radius *= adjusted_radius;
-
-            // Camera inside the light's radius? Needs adjustment for the near plane.
-            if (camdistance_sq < adjusted_radius)
-            {
-                inside = true;
-
-                video::SMaterial &m = m_lights[i]->getMaterial(0);
-                m.FrontfaceCulling = true;
-                m.BackfaceCulling = false;
-                m.ZBuffer = video::ECFN_GREATER;
-            }
-
-            if (m_lightviz)
-            {
-                overridemat.Enabled = true;
-                overridemat.EnableFlags = video::EMF_MATERIAL_TYPE | video::EMF_WIREFRAME |
-                                          video::EMF_FRONT_FACE_CULLING |
-                                          video::EMF_BACK_FACE_CULLING |
-                                          video::EMF_ZBUFFER;
-                overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
-                overridemat.Material.Wireframe = true;
-                overridemat.Material.BackfaceCulling = false;
-                overridemat.Material.FrontfaceCulling = false;
-                overridemat.Material.ZBuffer = video::ECFN_LESSEQUAL;
-
-
-                ColorizeProvider * const cb = (ColorizeProvider *) m_shaders->m_callbacks[ES_COLORIZE];
-                float col[3];
-                m_lights[i]->getColor(col);
-                cb->setColor(col[0], col[1], col[2]);
-            }
-
-            // Action
-            m_lights[i]->render();
-
-            // Reset the inside change
-            if (inside)
-            {
-                video::SMaterial &m = m_lights[i]->getMaterial(0);
-                m.FrontfaceCulling = false;
-                m.BackfaceCulling = true;
-                m.ZBuffer = video::ECFN_LESSEQUAL;
-            }
-
-            if (m_lightviz)
-            {
-                overridemat.Enabled = false;
-            }
-
-        } // for i in lights
-
-        // Blend lights to the image
-        video::SMaterial lightmat;
-        lightmat.Lighting = false;
-        lightmat.ZWriteEnable = false;
-        lightmat.ZBuffer = video::ECFN_ALWAYS;
-        lightmat.setFlag(video::EMF_BILINEAR_FILTER, false);
-        lightmat.setTexture(0, m_rtts->getRTT(RTT_TMP1));
-
-        // Specular mapping
-        //lightmat.setTexture(1, m_rtts->getRTT(RTT_COLOR));
-
-        lightmat.MaterialType = m_shaders->getShader(ES_LIGHTBLEND);
-        lightmat.MaterialTypeParam = video::pack_textureBlendFunc(video::EBF_DST_COLOR, video::EBF_ZERO);
-        lightmat.BlendOperation = video::EBO_ADD;
-
-        lightmat.TextureLayer[0].TextureWrapU =
-        lightmat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
-
-        m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
-        if (!m_mipviz)
-            m_post_processing->drawQuad(cam, lightmat);
+        renderLights(cambox, camnode, overridemat, cam);
 
         if (!bgnodes)
         {
@@ -396,65 +285,7 @@ void IrrDriver::renderGLSL(float dt)
         const u32 displacingcount = m_displacing.size();
         if (displacingcount)
         {
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_DISPLACE), false, false);
-            glClearColor(0, 0, 0, 0);
-            glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-            glStencilFunc(GL_ALWAYS, 1, ~0);
-            glEnable(GL_STENCIL_TEST);
-
-            overridemat.Enabled = 1;
-            overridemat.EnableFlags = video::EMF_MATERIAL_TYPE | video::EMF_TEXTURE0;
-            overridemat.Material.MaterialType = m_shaders->getShader(ES_DISPLACE);
-
-            overridemat.Material.TextureLayer[0].Texture =
-                irr_driver->getTexture((file_manager->getTextureDir() + "displace.png").c_str());
-            overridemat.Material.TextureLayer[0].BilinearFilter =
-            overridemat.Material.TextureLayer[0].TrilinearFilter = true;
-            overridemat.Material.TextureLayer[0].AnisotropicFilter = 0;
-            overridemat.Material.TextureLayer[0].TextureWrapU =
-            overridemat.Material.TextureLayer[0].TextureWrapV = video::ETC_REPEAT;
-
-            for (i = 0; i < displacingcount; i++)
-            {
-                m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
-                m_displacing[i]->render();
-
-                m_scene_manager->setCurrentRendertime(scene::ESNRP_TRANSPARENT);
-                m_displacing[i]->render();
-            }
-
-            overridemat.Enabled = 0;
-
-            // Blur it
-            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-            glStencilFunc(GL_EQUAL, 1, ~0);
-
-            video::SMaterial minimat;
-            minimat.Lighting = false;
-            minimat.ZWriteEnable = false;
-            minimat.ZBuffer = video::ECFN_ALWAYS;
-            minimat.setFlag(video::EMF_TRILINEAR_FILTER, true);
-
-            minimat.TextureLayer[0].TextureWrapU =
-            minimat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
-
-            ((GaussianBlurProvider *) m_shaders->m_callbacks[ES_GAUSSIAN3H])->setResolution(
-                       UserConfigParams::m_width,
-                       UserConfigParams::m_height);
-
-            minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN3H);
-            minimat.setTexture(0, m_rtts->getRTT(RTT_DISPLACE));
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_TMP2), true, false);
-            m_post_processing->drawQuad(cam, minimat);
-
-            minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN3V);
-            minimat.setTexture(0, m_rtts->getRTT(RTT_TMP2));
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_DISPLACE), true, false);
-            m_post_processing->drawQuad(cam, minimat);
-
-            glDisable(GL_STENCIL_TEST);
-            m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
+            renderDisplacement(overridemat, cam);
         }
 
         // Drawing for this cam done, cleanup
@@ -588,6 +419,7 @@ void IrrDriver::renderFixed(float dt)
     m_video_driver->endScene();
 }
 
+// ----------------------------------------------------------------------------
 
 void IrrDriver::renderShadows(ShadowImportanceProvider * const sicb,
                               scene::ICameraSceneNode * const camnode,
@@ -750,6 +582,8 @@ void IrrDriver::renderShadows(ShadowImportanceProvider * const sicb,
     tick %= 2;
 }
 
+// ----------------------------------------------------------------------------
+
 void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
                            std::vector<GlowData>& glows,
                            const core::aabbox3df& cambox,
@@ -852,4 +686,193 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
     glDisable(GL_STENCIL_TEST);
+}
+
+// ----------------------------------------------------------------------------
+
+void IrrDriver::renderLights(const core::aabbox3df& cambox,
+                             scene::ICameraSceneNode * const camnode,
+                             video::SOverrideMaterial &overridemat,
+                             int cam)
+{
+    if (!m_lightviz)
+    {
+        m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_TMP1), true, false,
+                                        video::SColor(1, 0, 0, 0));
+    } else
+    {
+        m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
+    }
+
+    const vector3df camcenter = cambox.getCenter();
+    const float camradius = cambox.getExtent().getLength() / 2;
+    const vector3df campos = camnode->getPosition();
+    const float camnear = camnode->getNearValue();
+
+    m_scene_manager->drawAll(scene::ESNRP_CAMERA);
+    PointLightProvider * const pcb = (PointLightProvider *) irr_driver->
+                                        getCallback(ES_POINTLIGHT);
+    pcb->updateIPVMatrix();
+    SunLightProvider * const scb = (SunLightProvider *) irr_driver->
+                                        getCallback(ES_SUNLIGHT);
+    scb->updateIPVMatrix();
+    FogProvider * const fogcb = (FogProvider *) irr_driver->
+                                        getCallback(ES_FOG);
+    fogcb->updateIPVMatrix();
+
+
+    const u32 lightcount = m_lights.size();
+    for (unsigned int i = 0; i < lightcount; i++)
+    {
+        // Sphere culling
+        const float distance_sq = (m_lights[i]->getPosition() - camcenter).getLengthSQ();
+        float radius_sum = camradius + m_lights[i]->getRadius();
+        radius_sum *= radius_sum;
+        if (radius_sum < distance_sq)
+            continue;
+
+        bool inside = false;
+
+        const float camdistance_sq = (m_lights[i]->getPosition() - campos).getLengthSQ();
+        float adjusted_radius = m_lights[i]->getRadius() + camnear;
+        adjusted_radius *= adjusted_radius;
+
+        // Camera inside the light's radius? Needs adjustment for the near plane.
+        if (camdistance_sq < adjusted_radius)
+        {
+            inside = true;
+
+            video::SMaterial &m = m_lights[i]->getMaterial(0);
+            m.FrontfaceCulling = true;
+            m.BackfaceCulling = false;
+            m.ZBuffer = video::ECFN_GREATER;
+        }
+
+        if (m_lightviz)
+        {
+            overridemat.Enabled = true;
+            overridemat.EnableFlags = video::EMF_MATERIAL_TYPE | video::EMF_WIREFRAME |
+                                        video::EMF_FRONT_FACE_CULLING |
+                                        video::EMF_BACK_FACE_CULLING |
+                                        video::EMF_ZBUFFER;
+            overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
+            overridemat.Material.Wireframe = true;
+            overridemat.Material.BackfaceCulling = false;
+            overridemat.Material.FrontfaceCulling = false;
+            overridemat.Material.ZBuffer = video::ECFN_LESSEQUAL;
+
+
+            ColorizeProvider * const cb = (ColorizeProvider *) m_shaders->m_callbacks[ES_COLORIZE];
+            float col[3];
+            m_lights[i]->getColor(col);
+            cb->setColor(col[0], col[1], col[2]);
+        }
+
+        // Action
+        m_lights[i]->render();
+
+        // Reset the inside change
+        if (inside)
+        {
+            video::SMaterial &m = m_lights[i]->getMaterial(0);
+            m.FrontfaceCulling = false;
+            m.BackfaceCulling = true;
+            m.ZBuffer = video::ECFN_LESSEQUAL;
+        }
+
+        if (m_lightviz)
+        {
+            overridemat.Enabled = false;
+        }
+
+    } // for i in lights
+
+    // Blend lights to the image
+    video::SMaterial lightmat;
+    lightmat.Lighting = false;
+    lightmat.ZWriteEnable = false;
+    lightmat.ZBuffer = video::ECFN_ALWAYS;
+    lightmat.setFlag(video::EMF_BILINEAR_FILTER, false);
+    lightmat.setTexture(0, m_rtts->getRTT(RTT_TMP1));
+
+    // Specular mapping
+    //lightmat.setTexture(1, m_rtts->getRTT(RTT_COLOR));
+
+    lightmat.MaterialType = m_shaders->getShader(ES_LIGHTBLEND);
+    lightmat.MaterialTypeParam = video::pack_textureBlendFunc(video::EBF_DST_COLOR, video::EBF_ZERO);
+    lightmat.BlendOperation = video::EBO_ADD;
+
+    lightmat.TextureLayer[0].TextureWrapU =
+    lightmat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
+
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
+    if (!m_mipviz)
+        m_post_processing->drawQuad(cam, lightmat);
+}
+
+// ----------------------------------------------------------------------------
+
+void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
+                                   int cam)
+{
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_DISPLACE), false, false);
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glStencilFunc(GL_ALWAYS, 1, ~0);
+    glEnable(GL_STENCIL_TEST);
+
+    overridemat.Enabled = 1;
+    overridemat.EnableFlags = video::EMF_MATERIAL_TYPE | video::EMF_TEXTURE0;
+    overridemat.Material.MaterialType = m_shaders->getShader(ES_DISPLACE);
+
+    overridemat.Material.TextureLayer[0].Texture =
+        irr_driver->getTexture((file_manager->getTextureDir() + "displace.png").c_str());
+    overridemat.Material.TextureLayer[0].BilinearFilter =
+    overridemat.Material.TextureLayer[0].TrilinearFilter = true;
+    overridemat.Material.TextureLayer[0].AnisotropicFilter = 0;
+    overridemat.Material.TextureLayer[0].TextureWrapU =
+    overridemat.Material.TextureLayer[0].TextureWrapV = video::ETC_REPEAT;
+
+    const int displacingcount = m_displacing.size();
+    for (int i = 0; i < displacingcount; i++)
+    {
+        m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
+        m_displacing[i]->render();
+
+        m_scene_manager->setCurrentRendertime(scene::ESNRP_TRANSPARENT);
+        m_displacing[i]->render();
+    }
+
+    overridemat.Enabled = 0;
+
+    // Blur it
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    glStencilFunc(GL_EQUAL, 1, ~0);
+
+    video::SMaterial minimat;
+    minimat.Lighting = false;
+    minimat.ZWriteEnable = false;
+    minimat.ZBuffer = video::ECFN_ALWAYS;
+    minimat.setFlag(video::EMF_TRILINEAR_FILTER, true);
+
+    minimat.TextureLayer[0].TextureWrapU =
+    minimat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
+
+    ((GaussianBlurProvider *) m_shaders->m_callbacks[ES_GAUSSIAN3H])->setResolution(
+                UserConfigParams::m_width,
+                UserConfigParams::m_height);
+
+    minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN3H);
+    minimat.setTexture(0, m_rtts->getRTT(RTT_DISPLACE));
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_TMP2), true, false);
+    m_post_processing->drawQuad(cam, minimat);
+
+    minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN3V);
+    minimat.setTexture(0, m_rtts->getRTT(RTT_TMP2));
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_DISPLACE), true, false);
+    m_post_processing->drawQuad(cam, minimat);
+
+    glDisable(GL_STENCIL_TEST);
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
 }

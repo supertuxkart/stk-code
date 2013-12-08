@@ -189,6 +189,12 @@ private:
                     std::vector<GlowData>& glows,
                     const core::aabbox3df& cambox,
                     int cam);
+    void renderLights(const core::aabbox3df& cambox,
+                      scene::ICameraSceneNode * const camnode,
+                      video::SOverrideMaterial &overridemat,
+                      int cam);
+    void renderDisplacement(video::SOverrideMaterial &overridemat,
+                            int cam);
     void doScreenShot();
 public:
          IrrDriver();
