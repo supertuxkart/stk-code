@@ -36,26 +36,6 @@
 
 #include <IMesh.h>
 
-const wchar_t* getPlungerString()
-{
-    const int PLUNGER_STRINGS_AMOUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(PLUNGER_STRINGS_AMOUNT);
-
-    switch (id)
-    {
-        //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-        case 0: return _LTR("%0 bites %1's bait");
-        //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-        case 1: return _LTR("%1 latches onto %0 for a free ride");
-        //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-        case 2: return _LTR("%1 tests a tractor beam on %0");
-        default: assert(false); return L"";  // avoid warning about no return value
-    }
-}
-
-
 /** RubberBand constructor. It creates a simple quad and attaches it to the
  *  root(!) of the graph. It's easier this way to get the right coordinates
  *  than attaching it to the plunger or kart, and trying to find the other
@@ -266,15 +246,6 @@ void RubberBand::hit(AbstractKart *kart_hit, const Vec3 *track_xyz)
 
         m_hit_kart       = kart_hit;
         m_attached_state = RB_TO_KART;
-
-        RaceGUIBase* gui = World::getWorld()->getRaceGUI();
-        irr::core::stringw hit_message;
-        hit_message += StringUtils::insertValues(getPlungerString(),
-                                                 core::stringw(kart_hit->getName()),
-                                                 core::stringw(m_owner->getName())
-                                                ).c_str();
-        gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f,
-                        video::SColor(255, 255, 255, 255), false);
         return;
     }
 
