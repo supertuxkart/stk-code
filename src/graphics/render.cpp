@@ -337,7 +337,8 @@ void IrrDriver::renderGLSL(float dt)
         lightmat.setTexture(0, m_rtts->getRTT(RTT_TMP1));
 
         // Specular mapping
-        lightmat.setTexture(1, m_rtts->getRTT(RTT_COLOR));
+        //lightmat.setTexture(1, m_rtts->getRTT(RTT_COLOR));
+
         lightmat.MaterialType = m_shaders->getShader(ES_LIGHTBLEND);
         lightmat.MaterialTypeParam = video::pack_textureBlendFunc(video::EBF_DST_COLOR, video::EBF_ZERO);
         lightmat.BlendOperation = video::EBO_ADD;
