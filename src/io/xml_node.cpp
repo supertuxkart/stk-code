@@ -279,11 +279,22 @@ int XMLNode::get(const std::string &attribute, video::SColorf *color) const
     if(!get(attribute, &s)) return 0;
 
     std::vector<std::string> v = StringUtils::split(s,' ');
-    if(v.size()!=4) return 0;
-    color->set((float)atof(v[3].c_str()),  // set takes ARGB, but we use RGBA
-               (float)atof(v[0].c_str()),
-               (float)atof(v[1].c_str()),
-               (float)atof(v[2].c_str()));
+    if(v.size()==3)
+    {
+        color->set((float)atof(v[0].c_str()),
+                   (float)atof(v[1].c_str()),
+                   (float)atof(v[2].c_str()));
+    }
+    else if(v.size()==4)
+    {
+        color->set((float)atof(v[3].c_str()),  // set takes ARGB, but we use RGBA
+                   (float)atof(v[0].c_str()),
+                   (float)atof(v[1].c_str()),
+                   (float)atof(v[2].c_str()));
+    }
+    else
+        return 0;
+
     return 1;
 }   // get(SColor)
 // ----------------------------------------------------------------------------

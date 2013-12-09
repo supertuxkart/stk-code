@@ -34,6 +34,7 @@
 #include "modes/demo_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/debug.hpp"
 #include "utils/profiler.hpp"
 
 using GUIEngine::EventHandler;
@@ -59,6 +60,9 @@ EventHandler::~EventHandler()
 bool EventHandler::OnEvent (const SEvent &event)
 {
     if (!m_accept_events && event.EventType != EET_LOG_TEXT_EVENT) return true;
+
+    if(!Debug::onEvent(event))
+        return false;
     
     // TO DEBUG HATS (when you don't actually have a hat)
     /*

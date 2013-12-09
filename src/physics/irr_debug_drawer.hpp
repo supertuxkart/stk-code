@@ -28,6 +28,7 @@
   */
 class IrrDebugDrawer : public btIDebugDraw
 {
+public:
     /** The drawing mode to use:
      *  If bit 0 is set, draw the bullet collision shape of karts
      *  If bit 1 is set, don't draw the kart graphics
@@ -63,6 +64,7 @@ public:
     /** Returns true if debug mode is enabled. */
     bool            debugEnabled() const         {return m_debug_mode!=0;}
     void            nextDebugMode();
+    void            setDebugMode(DebugModeType mode);
 };   // IrrDebugDrawer
 
 #endif

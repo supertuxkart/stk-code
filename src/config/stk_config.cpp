@@ -181,19 +181,6 @@ void STKConfig::init_defaults()
     m_disable_steer_while_unskid = false;
     m_camera_follow_skid         = false;
 
-    m_nitro_glow_color[0] = 1.0f;
-    m_nitro_glow_color[1] = 1.0f;
-    m_nitro_glow_color[2] = 1.0f;
-    m_box_glow_color[0] = 1.0f;
-    m_box_glow_color[1] = 1.0f;
-    m_box_glow_color[2] = 1.0f;
-    m_banana_glow_color[0] = 1.0f;
-    m_banana_glow_color[1] = 1.0f;
-    m_banana_glow_color[2] = 1.0f;
-    m_bubblegum_glow_color[0] = 1.0f;
-    m_bubblegum_glow_color[1] = 1.0f;
-    m_bubblegum_glow_color[2] = 1.0f;
-
     m_score_increase.clear();
     m_leader_intervals.clear();
     m_switch_items.clear();
@@ -374,38 +361,6 @@ void STKConfig::getAllData(const XMLNode * root)
         replay_node->get("delta-angle", &m_replay_delta_angle);
         replay_node->get("delta-pos",   &m_replay_delta_pos2 );
         replay_node->get("delta-t",     &m_replay_dt         );
-    }
-
-    if(const XMLNode *colors = root->getNode("glow-colors"))
-    {
-        video::SColor tmpcol;
-        if (colors->get("nitro", &tmpcol))
-        {
-            m_nitro_glow_color[0] = tmpcol.getRed() / 255.0f;
-            m_nitro_glow_color[1] = tmpcol.getGreen() / 255.0f;
-            m_nitro_glow_color[2] = tmpcol.getBlue() / 255.0f;
-        }
-
-        if (colors->get("box", &tmpcol))
-        {
-            m_box_glow_color[0] = tmpcol.getRed() / 255.0f;
-            m_box_glow_color[1] = tmpcol.getGreen() / 255.0f;
-            m_box_glow_color[2] = tmpcol.getBlue() / 255.0f;
-        }
-        
-        if (colors->get("banana", &tmpcol))
-        {
-            m_banana_glow_color[0] = tmpcol.getRed() / 255.0f;
-            m_banana_glow_color[1] = tmpcol.getGreen() / 255.0f;
-            m_banana_glow_color[2] = tmpcol.getBlue() / 255.0f;
-        }
-        
-        if (colors->get("bubblegum", &tmpcol))
-        {
-            m_bubblegum_glow_color[0] = tmpcol.getRed() / 255.0f;
-            m_bubblegum_glow_color[1] = tmpcol.getGreen() / 255.0f;
-            m_bubblegum_glow_color[2] = tmpcol.getBlue() / 255.0f;
-        }
     }
 
     // Get the default KartProperties

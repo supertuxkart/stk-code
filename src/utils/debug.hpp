@@ -1,6 +1,6 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//
+//  Copyright (C) 2013 Lionel Fuentes
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,23 +16,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_TYPES_HPP
-#define HEADER_TYPES_HPP
+#ifndef HEADER_DEBUG_HPP
+#define HEADER_DEBUG_HPP
 
-    #if defined(_MSC_VER) && _MSC_VER < 1700
-      typedef unsigned char    uint8_t;
-      typedef char             int8_t;
-      typedef unsigned short   uint16_t;
-      typedef __int32          int32_t;
-      typedef unsigned __int32 uint32_t;
-      typedef __int64          int64_t;
-      typedef unsigned __int64 uint64_t;
-    #elif defined(_MSC_VER) && _MSC_VER >= 1700
-    #  include <stdint.h>
-    #else
-    #  include <stdint.h>
-    #  define SOCKET_ERROR -1
-    #endif
+namespace irr {
+    struct SEvent;
+}
 
-#endif
+namespace Debug
+{
+    bool onEvent(const irr::SEvent &event);
+    bool isOpen();
+}
 
+
+#endif // HEADER_DEBUG_HPP

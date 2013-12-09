@@ -189,6 +189,12 @@ private:
                     std::vector<GlowData>& glows,
                     const core::aabbox3df& cambox,
                     int cam);
+    void renderLights(const core::aabbox3df& cambox,
+                      scene::ICameraSceneNode * const camnode,
+                      video::SOverrideMaterial &overridemat,
+                      int cam);
+    void renderDisplacement(video::SOverrideMaterial &overridemat,
+                            int cam);
     void doScreenShot();
 public:
          IrrDriver();
@@ -354,8 +360,10 @@ public:
     inline PostProcessing* getPostProcessing()  {return m_post_processing;}
     // ------------------------------------------------------------------------
     inline core::vector3df getWind()  {return m_wind->getWind();}
-    // ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
     inline video::E_MATERIAL_TYPE getShader(const ShaderType num)  {return m_shaders->getShader(num);}
+    // -----------------------------------------------------------------------
+    inline void updateShaders()  {m_shaders->loadShaders();}
     // ------------------------------------------------------------------------
     inline video::IShaderConstantSetCallBack* getCallback(const ShaderType num) 
     {
@@ -365,6 +373,17 @@ public:
     inline video::ITexture* getRTT(TypeRTT which)  {return m_rtts->getRTT(which);}
     // ------------------------------------------------------------------------
     inline bool isGLSL() const { return m_glsl; }
+    // ------------------------------------------------------------------------
+    void resetDebugModes()
+    {
+        m_wireframe = false;
+        m_mipviz = false;
+        m_normals = false;
+        m_ssaoviz = false;
+        m_shadowviz = false;
+        m_lightviz = false;
+        m_distortviz = false;
+    }
     // ------------------------------------------------------------------------
     void toggleWireframe() { m_wireframe = !m_wireframe; }
     // ------------------------------------------------------------------------
