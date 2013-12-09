@@ -429,7 +429,7 @@ bool ThreeStrikesBattle::isRaceOver()
 
     return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
 }   // isRaceOver
-
+#include <iostream>
 //-----------------------------------------------------------------------------
 /** Updates the m_current_node value of each kart controller to localize it  
  *  on the navigation mesh.
@@ -441,7 +441,7 @@ void ThreeStrikesBattle::updateKartNodes()
     for(unsigned int i=0; i<n; i++)
     {
         if(m_karts[i]->isEliminated()) continue;
-
+             
         const AbstractKart* kart = m_karts[i];
         
         if(!kart->getController()->isPlayerController())
@@ -454,7 +454,7 @@ void ThreeStrikesBattle::updateKartNodes()
             {
                 //check if the kart is still on the same node
                 const NavPoly& p = BattleGraph::get()->getPolyOfNode(controller->getCurrentNode());
-                if(p.pointInPoly(kart->getXYZ())) return;
+                if(p.pointInPoly(kart->getXYZ())) continue;
 
                 //if not then check all adjacent polys
                 const std::vector<int>& adjacents = 
@@ -506,7 +506,7 @@ void ThreeStrikesBattle::updateKartNodes()
             {
                 //check if the kart is still on the same node
                 const NavPoly& p = BattleGraph::get()->getPolyOfNode(controller->getCurrentNode());
-                if(p.pointInPoly(kart->getXYZ())) return;
+                if(p.pointInPoly(kart->getXYZ())) continue;
 
                 //if not then check all adjacent polys
                 const std::vector<int>& adjacents = 

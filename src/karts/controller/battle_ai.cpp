@@ -25,8 +25,10 @@
 #ifdef AI_DEBUG
 #  include "graphics/irr_driver.hpp"
 #endif
+
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
@@ -119,18 +121,24 @@ void BattleAI::handleGetUnstuck(const float dt)
         std::cout<<"GOT STUCK\n";
         m_time_since_stuck = 0.0f;
         m_currently_reversing = true;
+        m_controls->reset();
     }
     if(m_currently_reversing == true)
     {
+        setSteering(-2.0f*m_target_angle,dt);
         m_controls->m_accel = -0.34f;
+        /*
         if(m_target_angle > 0)
         setSteering(M_PI,dt);
         else setSteering(-M_PI,dt);
+        */
         m_time_since_stuck += dt;
         
-        if(m_time_since_stuck >= 0.6f)
+
+        if(m_time_since_stuck >= 0.7f)
         {
             m_currently_reversing = false;
+            std::cout<<"GOT UNSTUCK\n";
             m_time_since_stuck = 0.0f;
         }
     }
@@ -143,19 +151,15 @@ void BattleAI::handleSteering(const float dt)
 {
     Vec3  target_point;
     const AbstractKart* kart = m_world->getPlayerKart(0);
-    int player_node = -1;
-    for(unsigned int i =0; i<BattleGraph::get()->getNumNodes(); i++)
-        {
-            const NavPoly& p = BattleGraph::get()->getPolyOfNode(i);
-            if(p.pointInPoly(kart->getXYZ()))
-                player_node = i;
-        }
+    PlayerController* pcontroller = (PlayerController*)kart->getController();
+
+    int player_node = pcontroller->getCurrentNode();    
    // std::cout<<"PLayer node " << player_node<<" This cpu kart node" << m_current_node<<std::endl;
     if(player_node == BattleGraph::UNKNOWN_POLY || m_current_node == BattleGraph::UNKNOWN_POLY) return;
     if(player_node == m_current_node)
     {
         target_point=kart->getXYZ();  
-        std::cout<<"Aiming at sire nixt\n";
+   //     std::cout<<"Aiming at sire nixt\n";
     }
     else
     {    
@@ -166,6 +170,7 @@ void BattleAI::handleSteering(const float dt)
     target_point = NavMesh::get()->getCenterOfPoly(next_node);
     } 
     m_target_angle = steerToPoint(target_point);
+  //  std::cout<<"Target nalge: "<<m_target_angle << "  normalized:"<<normalizeAngle(m_target_angle)<<std::endl;
     setSteering(m_target_angle,dt);
     
 #ifdef AI_DEBUG

@@ -7,7 +7,6 @@
 #include "items/powerup.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
-#include <stdint.h>
 
 GameEventsProtocol::GameEventsProtocol() : Protocol(NULL, PROTOCOL_GAME_EVENTS)
 {
