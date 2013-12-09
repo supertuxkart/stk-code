@@ -53,16 +53,6 @@ private:
     float m_time_since_stuck;
     bool m_currently_reversing;
 
-    #ifdef DEBUG
-    /** For debugging purpose: a sphere indicating where the AI 
-     *  is targeting at. */
-    irr::scene::ISceneNode *m_debug_sphere;
-
-    /** For item debugging: set to the item that is selected to 
-     *  be collected. */
-    irr::scene::ISceneNode *m_item_sphere;
-    #endif
-    
     void handleAcceleration(const float dt) {};
     void handleSteering(const float dt);
     void handleBraking() {};

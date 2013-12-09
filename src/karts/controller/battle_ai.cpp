@@ -125,8 +125,10 @@ void BattleAI::handleGetUnstuck(const float dt)
     }
     if(m_currently_reversing == true)
     {
+        setSteering(-1.0f*m_target_angle,dt);
         setSteering(-2.0f*m_target_angle,dt);
-        m_controls->m_accel = -0.34f;
+        setSteering(-2.0f*m_target_angle,dt);
+        m_controls->m_accel = -0.35f;
         /*
         if(m_target_angle > 0)
         setSteering(M_PI,dt);
@@ -135,7 +137,7 @@ void BattleAI::handleGetUnstuck(const float dt)
         m_time_since_stuck += dt;
         
 
-        if(m_time_since_stuck >= 0.7f)
+        if(m_time_since_stuck >= 0.6f)
         {
             m_currently_reversing = false;
             std::cout<<"GOT UNSTUCK\n";

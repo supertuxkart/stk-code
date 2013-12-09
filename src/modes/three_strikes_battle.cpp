@@ -429,14 +429,13 @@ bool ThreeStrikesBattle::isRaceOver()
 
     return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
 }   // isRaceOver
-#include <iostream>
+
 //-----------------------------------------------------------------------------
 /** Updates the m_current_node value of each kart controller to localize it  
  *  on the navigation mesh.
  */
 void ThreeStrikesBattle::updateKartNodes()
 {
-
     const unsigned int n = getNumKarts();
     for(unsigned int i=0; i<n; i++)
     {
