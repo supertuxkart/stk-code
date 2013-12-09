@@ -17,9 +17,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "debug.hpp"
+#include "config/user_config.hpp"
+#include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
 #include "graphics/irr_driver.hpp"
-#include "config/user_config.hpp"
 #include "items/powerup_manager.hpp"
 #include "modes/world.hpp"
 #include "physics/irr_debug_drawer.hpp"
@@ -68,7 +69,8 @@ enum DebugMenuCommand
     DEBUG_POWERUP_SWATTER,
     DEBUG_POWERUP_SWITCH,
     DEBUG_POWERUP_ZIPPER,
-    DEBUG_POWERUP_NITRO
+    DEBUG_POWERUP_NITRO,
+    DEBUG_TOGGLE_GUI
 };
 
 // -----------------------------------------------------------------------------
@@ -121,7 +123,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"FPS",DEBUG_FPS);
             mnu->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
             mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
-
+            mnu->addItem(L"Toggle GUI", DEBUG_TOGGLE_GUI);
 
 
             g_debug_menu_visible = true;
@@ -317,6 +319,21 @@ bool onEvent(const SEvent &event)
                     if (world == NULL) return false;
                     AbstractKart* kart = world->getLocalPlayerKart(0);
                     kart->setEnergy(100.0f);
+                }
+                else if (cmdID == DEBUG_TOGGLE_GUI)
+                {
+                    World* world = World::getWorld();
+                    if (world == NULL) return false;
+                    RaceGUIBase* gui = world->getRaceGUI();
+                    if (gui != NULL) gui->m_enabled = !gui->m_enabled;
+
+                    const int count = World::getWorld()->getNumKarts();
+                    for (int n=0; n<count; n++)
+                    {
+                        AbstractKart* kart = world->getKart(n);
+                        if (kart->getController()->isPlayerController())
+                            kart->getNode()->setVisible(gui->m_enabled);
+                    }
                 }
             }
 

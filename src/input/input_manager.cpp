@@ -222,7 +222,6 @@ void InputManager::handleStaticAction(int key, int value)
                 kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 10000);
             }
             break;
-            */
         case KEY_F8:
             if (UserConfigParams::m_artist_debug_mode && value && world)
             {
@@ -246,7 +245,6 @@ void InputManager::handleStaticAction(int key, int value)
                 }
             }
             break;
-
         case KEY_F9:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
@@ -259,7 +257,7 @@ void InputManager::handleStaticAction(int key, int value)
                     kart->setPowerup(PowerupManager::POWERUP_SWATTER, 10000);
             }
             break;
-
+            */
         case KEY_F10:
             if(world && value)
             {
@@ -269,7 +267,7 @@ void InputManager::handleStaticAction(int key, int value)
                     history->Save();
             }
             break;
-
+            /*
         case KEY_F11:
             if (UserConfigParams::m_artist_debug_mode && value &&
                 control_is_pressed && world)
@@ -277,7 +275,7 @@ void InputManager::handleStaticAction(int key, int value)
                 world->getPhysics()->nextDebugMode();
             }
             break;
-
+            */
         case KEY_F12:
             if(value)
                 UserConfigParams::m_display_fps =
