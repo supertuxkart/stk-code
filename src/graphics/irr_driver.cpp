@@ -1372,6 +1372,8 @@ void IrrDriver::displayFPS()
 {
     gui::IGUIFont* font = GUIEngine::getFont();
 
+    irr_driver->getVideoDriver()->draw2DRectangle(video::SColor(150, 44, 34, 90),core::rect< s32 >(75,0,800,50),NULL);
+
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
     const int NO_TRUST_COUNT = 200;
@@ -1401,7 +1403,7 @@ void IrrDriver::displayFPS()
     {
         no_trust--;
 
-        static video::SColor fpsColor = video::SColor(255, 106, 82, 217);
+        static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
         font->draw( L"FPS: ...", core::rect< s32 >(100,0,400,50), fpsColor,
                     false );
 
@@ -1434,7 +1436,8 @@ void IrrDriver::displayFPS()
 
     core::stringw fpsString = buffer;
 
-    static video::SColor fpsColor = video::SColor(255, 125, 96, 255);
+    static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
+    
     font->draw( fpsString.c_str(), core::rect< s32 >(100,0,400,50), fpsColor, false );
 }   // updateFPS
 
