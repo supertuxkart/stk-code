@@ -39,8 +39,6 @@ namespace Debug {
         GUI events would be blocked while in a race... */
 static bool g_debug_menu_visible = false;
 
-static bool g_was_pointer_shown = false;
-
 // -----------------------------------------------------------------------------
 // Commands for the debug menu
 enum DebugMenuCommand
@@ -127,8 +125,6 @@ bool onEvent(const SEvent &event)
 
 
             g_debug_menu_visible = true;
-
-            g_was_pointer_shown = irr_driver->isPointerShown();
             irr_driver->showPointer();
         }
 
@@ -147,10 +143,6 @@ bool onEvent(const SEvent &event)
             if(event.GUIEvent.EventType == EGET_ELEMENT_CLOSED)
             {
                 g_debug_menu_visible = false;
-                if(g_was_pointer_shown)
-                    irr_driver->showPointer();
-                else
-                    irr_driver->hidePointer();
             }
 
             if (event.GUIEvent.EventType == gui::EGET_MENU_ITEM_SELECTED)
@@ -343,4 +335,8 @@ bool onEvent(const SEvent &event)
     return true;    // continue event handling
 }
 
+bool isOpen()
+{
+    return g_debug_menu_visible;
+}
 }

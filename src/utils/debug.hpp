@@ -26,6 +26,7 @@ namespace irr {
 namespace Debug
 {
     bool onEvent(const irr::SEvent &event);
+    bool isOpen();
 }
 
 
