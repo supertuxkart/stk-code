@@ -161,7 +161,7 @@ void InputManager::handleStaticAction(int key, int value)
             if (value ==0 )
                 irr_driver->requestScreenshot();
             break;
-
+            /*
         case KEY_F1:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
@@ -222,7 +222,7 @@ void InputManager::handleStaticAction(int key, int value)
                 kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 10000);
             }
             break;
-
+            */
         case KEY_F8:
             if (UserConfigParams::m_artist_debug_mode && value && world)
             {
@@ -282,60 +282,6 @@ void InputManager::handleStaticAction(int key, int value)
             if(value)
                 UserConfigParams::m_display_fps =
                     !UserConfigParams::m_display_fps;
-            break;
-
-        case KEY_KEY_P:
-            if (UserConfigParams::m_artist_debug_mode && value &&
-                control_is_pressed)
-                UserConfigParams::m_profiler_enabled =
-                                         !UserConfigParams::m_profiler_enabled;
-            break;
-
-        // Debug views
-        // These should be available in normal (non-artist) mode
-        // to enable easier bug reports (go there, press this key, screenshot)
-        // without requiring editing the UTF-32 config files (which is inconvenient).
-        case KEY_HOME:
-            if (value)
-            {
-                irr_driver->toggleWireframe();
-            }
-            break;
-        case KEY_END:
-            if (value)
-            {
-                irr_driver->toggleMipVisualization();
-            }
-            break;
-        case KEY_DELETE:
-            if (value)
-            {
-                irr_driver->toggleNormals();
-            }
-            break;
-        case KEY_NEXT: // pgdown
-            if (value)
-            {
-                irr_driver->toggleSSAOViz();
-            }
-            break;
-        case KEY_PRIOR: // pgup
-            if (value)
-            {
-                irr_driver->toggleLightViz();
-            }
-            break;
-        case KEY_INSERT:
-            if (value)
-            {
-                irr_driver->toggleShadowViz();
-            }
-            break;
-        case KEY_SCROLL:
-            if (value)
-            {
-                irr_driver->toggleDistortViz();
-            }
             break;
         default:
             break;

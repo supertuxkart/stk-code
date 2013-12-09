@@ -162,6 +162,7 @@ public:
     /** Activates the next debug mode (or switches it off again).
      */
     void  nextDebugMode    () {m_debug_drawer->nextDebugMode(); }
+    void  setDebugMode(IrrDebugDrawer::DebugModeType mode) { m_debug_drawer->setDebugMode(mode); }
     /** Returns true if the debug drawer is enabled. */
     bool  isDebug() const     {return m_debug_drawer->debugEnabled(); }
     virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies,

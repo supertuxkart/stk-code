@@ -2194,6 +2194,8 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
 void Skin::draw3DMenuPane (IGUIElement *element, const core::recti &rect,
                            const core::recti *clip)
 {
+    SColor color = SColor(150, 255, 255, 255);
+    GUIEngine::getDriver()->draw2DRectangle(color, rect);
 }   // draw3DMenuPane
 
 // -----------------------------------------------------------------------------

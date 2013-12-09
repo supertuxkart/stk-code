@@ -35,7 +35,13 @@ IrrDebugDrawer::IrrDebugDrawer()
 void IrrDebugDrawer::nextDebugMode()
 {
     // Go to next debug mode. Note that debug mode 3 (
-    m_debug_mode = (DebugModeType) ((m_debug_mode+1) % 3);
+    setDebugMode((DebugModeType) ((m_debug_mode+1) % 3));
+}
+// -----------------------------------------------------------------------------
+
+void IrrDebugDrawer::setDebugMode(DebugModeType mode)
+{
+    m_debug_mode = mode;
     World *world = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
     for(unsigned int i=0; i<num_karts; i++)

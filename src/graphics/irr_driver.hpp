@@ -374,6 +374,17 @@ public:
     // ------------------------------------------------------------------------
     inline bool isGLSL() const { return m_glsl; }
     // ------------------------------------------------------------------------
+    void resetDebugModes()
+    {
+        m_wireframe = false;
+        m_mipviz = false;
+        m_normals = false;
+        m_ssaoviz = false;
+        m_shadowviz = false;
+        m_lightviz = false;
+        m_distortviz = false;
+    }
+    // ------------------------------------------------------------------------
     void toggleWireframe() { m_wireframe = !m_wireframe; }
     // ------------------------------------------------------------------------
     void toggleMipVisualization() { m_mipviz = !m_mipviz; }
