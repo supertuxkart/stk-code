@@ -360,8 +360,10 @@ public:
     inline PostProcessing* getPostProcessing()  {return m_post_processing;}
     // ------------------------------------------------------------------------
     inline core::vector3df getWind()  {return m_wind->getWind();}
-    // ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
     inline video::E_MATERIAL_TYPE getShader(const ShaderType num)  {return m_shaders->getShader(num);}
+    // -----------------------------------------------------------------------
+    inline void updateShaders()  {m_shaders->loadShaders();}
     // ------------------------------------------------------------------------
     inline video::IShaderConstantSetCallBack* getCallback(const ShaderType num) 
     {

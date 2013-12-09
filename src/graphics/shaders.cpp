@@ -29,14 +29,6 @@ using namespace video;
 
 Shaders::Shaders()
 {
-    const std::string &dir = file_manager->getShaderDir();
-
-    IGPUProgrammingServices * const gpu = irr_driver->getVideoDriver()->getGPUProgrammingServices();
-
-    #define glsl(a, b, c) gpu->addHighLevelShaderMaterialFromFiles((a).c_str(), (b).c_str(), (IShaderConstantSetCallBack*) c)
-    #define glslmat(a, b, c, d) gpu->addHighLevelShaderMaterialFromFiles((a).c_str(), (b).c_str(), (IShaderConstantSetCallBack*) c, d)
-    #define glsl_noinput(a, b) gpu->addHighLevelShaderMaterialFromFiles((a).c_str(), (b).c_str(), (IShaderConstantSetCallBack*) 0)
-
     // Callbacks
     memset(m_callbacks, 0, sizeof(m_callbacks));
 
@@ -74,6 +66,26 @@ Shaders::Shaders()
     m_callbacks[ES_DISPLACE] = new DisplaceProvider();
     m_callbacks[ES_PPDISPLACE] = new PPDisplaceProvider();
     m_callbacks[ES_FOG] = new FogProvider();
+
+    for(s32 i=0 ; i < ES_COUNT ; i++)
+        m_shaders[i] = -1;
+
+    loadShaders();
+}
+
+void Shaders::loadShaders()
+{
+    const std::string &dir = file_manager->getShaderDir();
+
+    IGPUProgrammingServices * const gpu = irr_driver->getVideoDriver()->getGPUProgrammingServices();
+
+    #define glsl(a, b, c) gpu->addHighLevelShaderMaterialFromFiles((a).c_str(), (b).c_str(), (IShaderConstantSetCallBack*) c)
+    #define glslmat(a, b, c, d) gpu->addHighLevelShaderMaterialFromFiles((a).c_str(), (b).c_str(), (IShaderConstantSetCallBack*) c, d)
+    #define glsl_noinput(a, b) gpu->addHighLevelShaderMaterialFromFiles((a).c_str(), (b).c_str(), (IShaderConstantSetCallBack*) 0)
+
+    // Save previous shaders (used in case some shaders don't compile)
+    int saved_shaders[ES_COUNT];
+    memcpy(saved_shaders, m_shaders, sizeof(m_shaders));
 
     // Ok, go
     m_shaders[ES_NORMAL_MAP] = glslmat(dir + "normalmap.vert", dir + "normalmap.frag",
@@ -221,8 +233,7 @@ Shaders::Shaders()
                                     m_callbacks[ES_FOG], EMT_ONETEXTURE_BLEND);
 
     // Check that all successfully loaded
-    u32 i;
-    for (i = 0; i < ES_COUNT; i++) {
+    for (s32 i = 0; i < ES_COUNT; i++) {
 
         // Old Intel Windows drivers fail here.
         // It's an artist option, so not necessary to play.
@@ -235,6 +246,13 @@ Shaders::Shaders()
     #undef glsl
     #undef glslmat
     #undef glsl_noinput
+
+    // In case we're reloading and a shader didn't compile: keep the previous, working one
+    for(s32 i=0 ; i < ES_COUNT ; i++)
+    {
+        if(m_shaders[i] == -1)
+            m_shaders[i] = saved_shaders[i];
+    }
 }
 
 Shaders::~Shaders()
