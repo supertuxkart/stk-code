@@ -278,7 +278,8 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         if      (s == "blend")    m_alpha_blending = true;
         else if (s == "test")     m_alpha_testing = true;
         else if (s == "additive") m_add = true;
-        else if (s == "coverage") m_alpha_to_coverage = true;
+        // backwards compatibility only, no longer supported
+        else if (s == "coverage") m_alpha_testing = true;
         else if (s != "none")
             Log::warn("material", "Unknown compositing mode '%s'",
                       s.c_str());
@@ -400,7 +401,6 @@ void Material::init(unsigned int index)
     m_zipper_engine_force       = -1.0f;
     m_parallax_map              = false;
     m_is_heightmap              = false;
-    m_alpha_to_coverage         = false;
     m_water_splash              = false;
     m_is_jump_texture           = false;
 
@@ -650,16 +650,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     if (m_alpha_testing)
     {
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-        modes++;
-    }
-    if (m_alpha_to_coverage)
-    {
-        m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-        if (UserConfigParams::m_graphical_effects &&
-            irr_driver->getVideoDriver()->queryFeature(video::EVDF_ALPHA_TO_COVERAGE))
-        {
-            m->AntiAliasing = video::EAAM_QUALITY | video::EAAM_ALPHA_TO_COVERAGE;
-        }
         modes++;
     }
     if (m_alpha_blending)

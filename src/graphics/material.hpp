@@ -152,7 +152,6 @@ private:
     bool             m_smooth_reflection_shader;
     bool             m_alpha_testing;
     bool             m_alpha_blending;
-    bool             m_alpha_to_coverage;
 
     /** True if backface culliing should be enabled. */
     bool             m_backface_culling;
