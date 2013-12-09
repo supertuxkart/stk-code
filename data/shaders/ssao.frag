@@ -74,5 +74,5 @@ void main(void)
 
 	ao = mix(ao, oldao, 0.3);
 
-	gl_FragColor = vec4(vec3(ao), curdepth);
+	gl_FragColor = vec4(vec3(ao), curdepth + 0.05); // offset so that the alpha test doesn't kill us
 }
