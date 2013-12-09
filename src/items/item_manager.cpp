@@ -40,7 +40,9 @@
 
 std::vector<scene::IMesh *> ItemManager::m_item_mesh;
 std::vector<scene::IMesh *> ItemManager::m_item_lowres_mesh;
+std::vector<video::SColorf> ItemManager::m_glow_color;
 ItemManager *               ItemManager::m_item_manager = NULL;
+
 
 //-----------------------------------------------------------------------------
 /** Creates one instance of the item manager. */
@@ -65,6 +67,9 @@ void ItemManager::destroy()
 void ItemManager::loadDefaultItemMeshes()
 {
     m_item_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
+    m_glow_color.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, 
+                        video::SColorf(255.0f, 255.0f, 255.0f) );
+
     m_item_lowres_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
 
     // A temporary mapping of items to names used in the XML file:
@@ -98,6 +103,7 @@ void ItemManager::loadDefaultItemMeshes()
         }
         mesh->grab();
         m_item_mesh[i]            = mesh;
+        node->get("glow", &(m_glow_color[i]));
 
         std::string lowres_model_filename;
         node->get("lowmodel", &lowres_model_filename);

@@ -135,9 +135,6 @@
   <steer disable-while-unskid="false"
          camera-follow-skid="true"     />
 
-  <!-- Glow colors for the items -->
-  <glow-colors nitro="0 70 158" box="31 202 253" banana="197 152 37" bubblegum="246 150 209"/>
-
   <!-- Default values for all karts
        ============================ -->
   <general-kart-defaults>

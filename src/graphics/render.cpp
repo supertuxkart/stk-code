@@ -115,34 +115,10 @@ void IrrDriver::renderGLSL(float dt)
         dat.g = 1.0f;
         dat.b = 1.0f;
 
-        // Item colors
-        switch (type)
-        {
-            case Item::ITEM_NITRO_BIG:
-            case Item::ITEM_NITRO_SMALL:
-                dat.r = stk_config->m_nitro_glow_color[0];
-                dat.g = stk_config->m_nitro_glow_color[1];
-                dat.b = stk_config->m_nitro_glow_color[2];
-            break;
-            case Item::ITEM_BONUS_BOX:
-                dat.r = stk_config->m_box_glow_color[0];
-                dat.g = stk_config->m_box_glow_color[1];
-                dat.b = stk_config->m_box_glow_color[2];
-            break;
-            case Item::ITEM_BANANA:
-                dat.r = stk_config->m_banana_glow_color[0];
-                dat.g = stk_config->m_banana_glow_color[1];
-                dat.b = stk_config->m_banana_glow_color[2];
-            break;
-            case Item::ITEM_BUBBLEGUM:
-                dat.r = stk_config->m_bubblegum_glow_color[0];
-                dat.g = stk_config->m_bubblegum_glow_color[1];
-                dat.b = stk_config->m_bubblegum_glow_color[2];
-            break;
-            default:
-                Log::fatal("render", "Unknown item type got through");
-            break;
-        }
+        const video::SColorf &c = ItemManager::getGlowColor(type);
+        dat.r = c.getRed();
+        dat.g = c.getGreen();
+        dat.b = c.getBlue();
 
         glows.push_back(dat);
 
