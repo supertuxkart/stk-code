@@ -44,7 +44,7 @@ void BattleGraph::buildGraph(NavMesh* navmesh)
 {
     unsigned int n_polys = navmesh->getNumberOfPolys();
     //m_graph.resize(n_polys);
-    m_distance_matrix = std::vector< std::vector<float>> (n_polys, std::vector<float>(n_polys, 9999.9f));
+    m_distance_matrix = std::vector< std::vector<float> > (n_polys, std::vector<float>(n_polys, 9999.9f));
     for(unsigned int i=0; i<n_polys; i++)
     {
         NavPoly currentPoly = navmesh->getNavPoly(i);
@@ -87,7 +87,7 @@ void BattleGraph::computeFloydWarshall()
     // initialize m_parent_poly with unknown_poly so that if no path is found b/w i and j
     // then m_parent_poly[i][j] = -1 (UNKNOWN_POLY)
     // AI must check this
-    m_parent_poly = std::vector< std::vector<int>> (n, std::vector<int>(n,BattleGraph::UNKNOWN_POLY));
+    m_parent_poly = std::vector< std::vector<int> > (n, std::vector<int>(n,BattleGraph::UNKNOWN_POLY));
     for(unsigned int i=0; i<n; i++)
         for(unsigned int j=0; j<n; j++)
         {
