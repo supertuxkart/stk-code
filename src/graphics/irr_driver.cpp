@@ -1401,7 +1401,7 @@ void IrrDriver::displayFPS()
     {
         no_trust--;
 
-        static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
+        static video::SColor fpsColor = video::SColor(255, 106, 82, 217);
         font->draw( L"FPS: ...", core::rect< s32 >(100,0,400,50), fpsColor,
                     false );
 
@@ -1434,7 +1434,7 @@ void IrrDriver::displayFPS()
 
     core::stringw fpsString = buffer;
 
-    static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
+    static video::SColor fpsColor = video::SColor(255, 125, 96, 255);
     font->draw( fpsString.c_str(), core::rect< s32 >(100,0,400,50), fpsColor, false );
 }   // updateFPS
 
