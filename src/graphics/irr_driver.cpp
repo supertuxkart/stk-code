@@ -1372,7 +1372,7 @@ void IrrDriver::displayFPS()
 {
     gui::IGUIFont* font = GUIEngine::getFont();
 
-    irr_driver->getVideoDriver()->draw2DRectangle(video::SColor(150, 44, 34, 90),core::rect< s32 >(75,0,800,50),NULL);
+    irr_driver->getVideoDriver()->draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,800,50),NULL);
 
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
