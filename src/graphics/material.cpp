@@ -645,7 +645,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     }
 
 
-    if (!m_lighting && irr_driver->isGLSL() && !m_alpha_blending)
+    if (!m_lighting && irr_driver->isGLSL() && !m_alpha_blending && !m_add)
     {
         // we abuse alpha blender a little here : in the shader-based pipeline,
         // transparent objects are rendered after lighting has been applied.
@@ -683,7 +683,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         if (irr_driver->isGLSL())
         {
             m->MaterialType = irr_driver->getShader(ES_SPHERE_MAP);
-            }
+        }
         else
         {
             m->MaterialType = video::EMT_SPHERE_MAP;
@@ -1001,15 +1001,30 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
                             bool use_fog) const
 {
-    // The new pipeline does fog as a post-process effect.
     if (irr_driver->isGLSL())
-        return;
-
-    m->setFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
-
-    if (parent != NULL)
     {
-        parent->setMaterialFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
+        // to disable fog in the new pipeline, we slightly abuse the steps :
+        // moving an object into the transparent pass will make it rendered
+        // above fog and thus unaffected by it
+        if (use_fog && !m_fog && !m_alpha_blending && !m_add)
+        {
+            Log::info("Material", "Disabling for for %s", m_texname.c_str());
+
+            m->ZWriteEnable = true;
+            m->MaterialType = video::EMT_ONETEXTURE_BLEND;
+            m->MaterialTypeParam =
+                pack_textureBlendFunc(video::EBF_SRC_ALPHA,
+                                        video::EBF_ONE_MINUS_SRC_ALPHA,
+                                        video::EMFN_MODULATE_1X,
+                                        video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
+        }
+    }
+    else
+    {
+        m->setFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
+
+        if (parent != NULL)
+            parent->setMaterialFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
     }
 }   // adjustForFog
 
