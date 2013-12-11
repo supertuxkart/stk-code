@@ -137,6 +137,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
 
     node->get("additive",         &m_add               );
     node->get("max-speed",        &m_max_speed_fraction);
+    node->get("min-speed",        &m_min_speed         );
     node->get("slowdown-time",    &m_slowdown_time     );
     node->get("backface-culling", &m_backface_culling  );
     node->get("disable-z-write",  &m_disable_z_write   );
@@ -386,6 +387,7 @@ void Material::init(unsigned int index)
     m_water_shader_speed_2      = 4.0f;
     m_fog                       = true;
     m_max_speed_fraction        = 1.0f;
+    m_min_speed                 = -1.0f;
     m_slowdown_time             = 1.0f;
     m_sfx_name                  = "";
     m_sfx_min_speed             = 0.0f;

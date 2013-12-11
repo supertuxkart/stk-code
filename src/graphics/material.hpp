@@ -173,6 +173,10 @@ private:
     float            m_slowdown_time;
     /** Maximum speed at which no more slow down occurs. */
     float            m_max_speed_fraction;
+    /** Minimum speed on this terrain. This is used for zippers on a ramp to 
+     *  guarantee the right jump distance. A negative value indicates no 
+     *  minimum speed. */
+    float            m_min_speed;
     /** The minimum speed at which a special sfx is started to be played. */
     float            m_sfx_min_speed;
     /** The speed at which the maximum pitch is used. */
@@ -265,6 +269,11 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the fraction of maximum speed on this material. */
     float getMaxSpeedFraction() const { return m_max_speed_fraction; }
+    // ------------------------------------------------------------------------
+    /** Returns the minimum speed of a kart on this material. This is used
+     *  for zippers on a ramp to guarantee the right jump distance even
+     *  on lower speeds. A negative value indicates no minimum speed. */
+    float getMinSpeed() const { return m_min_speed; }
     // ------------------------------------------------------------------------
     /** Returns how long it will take for a slowdown to take effect.
      *  It is the time it takes till the full slowdown applies to

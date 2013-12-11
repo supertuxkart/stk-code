@@ -2002,6 +2002,8 @@ void Kart::updatePhysics(float dt)
         m_speed *= -1.f;
 
     // Cap speed if necessary
+    m_max_speed->setMinSpeed(getMaterial() ? getMaterial()->getMinSpeed() 
+                                           : -1.0f                        );
     m_max_speed->update(dt);
 
     // To avoid tunneling (which can happen on long falls), clamp the
