@@ -645,7 +645,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     }
 
 
-    if (!m_lighting && irr_driver->isGLSL())
+    if (!m_lighting && irr_driver->isGLSL() && !m_alpha_blending)
     {
         // we abuse alpha blender a little here : in the shader-based pipeline,
         // transparent objects are rendered after lighting has been applied.
@@ -708,19 +708,19 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         }
         else
         {
-        m->MaterialType = video::EMT_SPHERE_MAP;
+            m->MaterialType = video::EMT_SPHERE_MAP;
 
-        // sphere map + alpha blending is a supported combination so in
-        // this case don't increase mode count
-        if (m_alpha_blending)
-        {
-            m->BlendOperation = video::EBO_ADD;
+            // sphere map + alpha blending is a supported combination so in
+            // this case don't increase mode count
+            if (m_alpha_blending)
+            {
+                m->BlendOperation = video::EBO_ADD;
+            }
+            else
+            {
+                modes++;
+            }
         }
-        else
-        {
-            modes++;
-        }
-    }
     }
 
     if (m_lightmap)
