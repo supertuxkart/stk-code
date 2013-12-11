@@ -9,8 +9,9 @@ void main()
 	float alpha = col.a;
 
 	if (alpha < 0.04) discard;
-
+    
 	col *= vec4(vec3(4.0), 1.5);
-
+    col.a *= 0.6;
+    
 	gl_FragColor = col;
 }
