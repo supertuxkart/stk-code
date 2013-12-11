@@ -11,6 +11,10 @@
   <material name="stk_mod_nitroBottle.png" />
   <material name="stk_mod_nitroLogo.png" compositing="additive" light="N" disable-z-write="Y" />
 
+  <material name="traffic_light_green.jpg" light="N"/>
+  <material name="traffic_light_yellowjpg" light="N"/>
+  <material name="traffic_light_red.jpg" light="N"/>
+  
   <material name="bubblegum_shield.png" compositing="blend" disable-z-write="Y"/>
   <material name="bubblegum_shield_nolok.png" compositing="blend" disable-z-write="Y"/>
   <material name="parachute.png" backface-culling="n" ignore="Y"/>
