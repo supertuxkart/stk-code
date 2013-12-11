@@ -118,6 +118,24 @@ void WaterShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void GrassShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int userData)
 {
+    
+    const float camfar = irr_driver->getSceneManager()->getActiveCamera()->getFarValue();
+    srv->setVertexShaderConstant("far", &camfar, 1);
+
+    // The normal is transformed by the inverse transposed world matrix
+    // because we want world-space normals
+    matrix4 invtworldm = irr_driver->getVideoDriver()->getTransform(ETS_WORLD);
+    invtworldm.makeInverse();
+    invtworldm = invtworldm.getTransposed();
+
+    srv->setVertexShaderConstant("invtworldm", invtworldm.pointer(), 16);
+
+    float objectid = 0;
+    const stringc name = mat.TextureLayer[0].Texture->getName().getPath();
+    objectid = shash8((const u8 *) name.c_str(), name.size()) / 255.0f;
+    srv->setVertexShaderConstant("objectid", &objectid, 1);
+
+    
     IVideoDriver * const drv = srv->getVideoDriver();
     const core::vector3df pos = drv->getTransform(ETS_WORLD).getTranslation();
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;

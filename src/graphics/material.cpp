@@ -278,7 +278,8 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         if      (s == "blend")    m_alpha_blending = true;
         else if (s == "test")     m_alpha_testing = true;
         else if (s == "additive") m_add = true;
-        else if (s == "coverage") m_alpha_to_coverage = true;
+        // backwards compatibility only, no longer supported
+        else if (s == "coverage") m_alpha_testing = true;
         else if (s != "none")
             Log::warn("material", "Unknown compositing mode '%s'",
                       s.c_str());
@@ -400,7 +401,6 @@ void Material::init(unsigned int index)
     m_zipper_engine_force       = -1.0f;
     m_parallax_map              = false;
     m_is_heightmap              = false;
-    m_alpha_to_coverage         = false;
     m_water_splash              = false;
     m_is_jump_texture           = false;
 
@@ -645,21 +645,21 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     }
 
 
+    if (!m_lighting && irr_driver->isGLSL() && !m_alpha_blending && !m_add)
+    {
+        // we abuse alpha blender a little here : in the shader-based pipeline,
+        // transparent objects are rendered after lighting has been applied.
+        // Therefore, pretending the object is transparent will have the effect
+        // of making it unaffected by lights
+        m_alpha_blending = true;
+        m_disable_z_write = false;
+    }
+
     int modes = 0;
 
     if (m_alpha_testing)
     {
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-        modes++;
-    }
-    if (m_alpha_to_coverage)
-    {
-        m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-        if (UserConfigParams::m_graphical_effects &&
-            irr_driver->getVideoDriver()->queryFeature(video::EVDF_ALPHA_TO_COVERAGE))
-        {
-            m->AntiAliasing = video::EAAM_QUALITY | video::EAAM_ALPHA_TO_COVERAGE;
-        }
         modes++;
     }
     if (m_alpha_blending)
@@ -683,7 +683,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         if (irr_driver->isGLSL())
         {
             m->MaterialType = irr_driver->getShader(ES_SPHERE_MAP);
-            }
+        }
         else
         {
             m->MaterialType = video::EMT_SPHERE_MAP;
@@ -708,19 +708,19 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         }
         else
         {
-        m->MaterialType = video::EMT_SPHERE_MAP;
+            m->MaterialType = video::EMT_SPHERE_MAP;
 
-        // sphere map + alpha blending is a supported combination so in
-        // this case don't increase mode count
-        if (m_alpha_blending)
-        {
-            m->BlendOperation = video::EBO_ADD;
+            // sphere map + alpha blending is a supported combination so in
+            // this case don't increase mode count
+            if (m_alpha_blending)
+            {
+                m->BlendOperation = video::EBO_ADD;
+            }
+            else
+            {
+                modes++;
+            }
         }
-        else
-        {
-            modes++;
-        }
-    }
     }
 
     if (m_lightmap)
@@ -1001,15 +1001,28 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
                             bool use_fog) const
 {
-    // The new pipeline does fog as a post-process effect.
     if (irr_driver->isGLSL())
-        return;
-
-    m->setFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
-
-    if (parent != NULL)
     {
-        parent->setMaterialFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
+        // to disable fog in the new pipeline, we slightly abuse the steps :
+        // moving an object into the transparent pass will make it rendered
+        // above fog and thus unaffected by it
+        if (use_fog && !m_fog && !m_alpha_blending && !m_add)
+        {
+            m->ZWriteEnable = true;
+            m->MaterialType = video::EMT_ONETEXTURE_BLEND;
+            m->MaterialTypeParam =
+                pack_textureBlendFunc(video::EBF_SRC_ALPHA,
+                                        video::EBF_ONE_MINUS_SRC_ALPHA,
+                                        video::EMFN_MODULATE_1X,
+                                        video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
+        }
+    }
+    else
+    {
+        m->setFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
+
+        if (parent != NULL)
+            parent->setMaterialFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
     }
 }   // adjustForFog
 
