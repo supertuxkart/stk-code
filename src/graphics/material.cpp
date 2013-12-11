@@ -1008,8 +1008,6 @@ void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
         // above fog and thus unaffected by it
         if (use_fog && !m_fog && !m_alpha_blending && !m_add)
         {
-            Log::info("Material", "Disabling for for %s", m_texname.c_str());
-
             m->ZWriteEnable = true;
             m->MaterialType = video::EMT_ONETEXTURE_BLEND;
             m->MaterialTypeParam =
