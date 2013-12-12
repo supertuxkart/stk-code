@@ -137,7 +137,6 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
 
     node->get("additive",         &m_add               );
     node->get("max-speed",        &m_max_speed_fraction);
-    node->get("min-speed",        &m_min_speed         );
     node->get("slowdown-time",    &m_slowdown_time     );
     node->get("backface-culling", &m_backface_culling  );
     node->get("disable-z-write",  &m_disable_z_write   );
@@ -325,11 +324,13 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
             m_zipper_fade_out_time      = 3.0f;
             m_zipper_speed_gain         = 4.5f;
             m_zipper_engine_force       = 250;
+            m_zipper_min_speed          = -1.0f;
             child_node->get("duration",          &m_zipper_duration          );
             child_node->get("fade-out-time",     &m_zipper_fade_out_time     );
             child_node->get("max-speed-increase",&m_zipper_max_speed_increase);
             child_node->get("speed-gain",        &m_zipper_speed_gain        );
             child_node->get("sengine-force",     &m_zipper_engine_force      );
+            child_node->get("min-speed",         &m_zipper_min_speed         );
         }
         else
         {
@@ -387,7 +388,6 @@ void Material::init(unsigned int index)
     m_water_shader_speed_2      = 4.0f;
     m_fog                       = true;
     m_max_speed_fraction        = 1.0f;
-    m_min_speed                 = -1.0f;
     m_slowdown_time             = 1.0f;
     m_sfx_name                  = "";
     m_sfx_min_speed             = 0.0f;
@@ -401,6 +401,7 @@ void Material::init(unsigned int index)
     m_zipper_max_speed_increase = -1.0f;
     m_zipper_speed_gain         = -1.0f;
     m_zipper_engine_force       = -1.0f;
+    m_zipper_min_speed          = -1.0f;
     m_parallax_map              = false;
     m_is_heightmap              = false;
     m_water_splash              = false;
