@@ -834,16 +834,18 @@ scene::ISceneNode* IrrDriver::addWaterNode(scene::IMesh *mesh,
                                                ->createMeshWelded(mesh);
     scene::ISceneNode* out = NULL;
 
-    if (!m_glsl)
-    {
+    // TODO: using cand's new WaterNode would be better, but it does not
+    // support our material flags (like transparency, etc.)
+    //if (!m_glsl)
+    //{
         out = m_scene_manager->addWaterSurfaceSceneNode(welded_mesh,
                                                      wave_height, wave_speed,
                                                      wave_length);
-    } else
-    {
-        out = new WaterNode(m_scene_manager, welded_mesh, wave_height, wave_speed,
-                            wave_length);
-    }
+    //} else
+    //{
+    //    out = new WaterNode(m_scene_manager, welded_mesh, wave_height, wave_speed,
+    //                        wave_length);
+    //}
 
     out->getMaterial(0).setFlag(video::EMF_GOURAUD_SHADING, true);
     welded_mesh->drop();  // The scene node keeps a reference
@@ -2043,7 +2045,12 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
         viamb = ((scene::IMeshSceneNode *) node)->isReadOnlyMaterials();
         mesh = ((scene::IMeshSceneNode *) node)->getMesh();
     }
-
+    else if (node->getType() == scene::ESNT_WATER_SURFACE)
+    {
+        viamb = (dynamic_cast<scene::IMeshSceneNode*>(node))->isReadOnlyMaterials();
+        mesh = (dynamic_cast<scene::IMeshSceneNode*>(node))->getMesh();
+    }
+    
     for (i = 0; i < mcount; i++)
     {
         video::SMaterial &nodemat = node->getMaterial(i);
