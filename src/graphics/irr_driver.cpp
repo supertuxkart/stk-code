@@ -2045,11 +2045,11 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
         viamb = ((scene::IMeshSceneNode *) node)->isReadOnlyMaterials();
         mesh = ((scene::IMeshSceneNode *) node)->getMesh();
     }
-    else if (node->getType() == scene::ESNT_WATER_SURFACE)
-    {
-        viamb = (dynamic_cast<scene::IMeshSceneNode*>(node))->isReadOnlyMaterials();
-        mesh = (dynamic_cast<scene::IMeshSceneNode*>(node))->getMesh();
-    }
+    //else if (node->getType() == scene::ESNT_WATER_SURFACE)
+    //{
+    //    viamb = (dynamic_cast<scene::IMeshSceneNode*>(node))->isReadOnlyMaterials();
+    //    mesh = (dynamic_cast<scene::IMeshSceneNode*>(node))->getMesh();
+    //}
     
     for (i = 0; i < mcount; i++)
     {
