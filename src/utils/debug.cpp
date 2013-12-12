@@ -253,64 +253,91 @@ bool onEvent(const SEvent &event)
                 {
                     World* world = World::getWorld();
                     if (world == NULL) return false;
-                    AbstractKart* kart = world->getLocalPlayerKart(0);
-                    kart->setPowerup(PowerupManager::POWERUP_BOWLING, 10000);
+                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+                    {
+                        AbstractKart* kart = world->getLocalPlayerKart(i);
+                        kart->setPowerup(PowerupManager::POWERUP_BOWLING, 10000);
+                    }
                 }
                 else if (cmdID == DEBUG_POWERUP_BUBBLEGUM)
                 {
                     World* world = World::getWorld();
                     if (world == NULL) return false;
-                    AbstractKart* kart = world->getLocalPlayerKart(0);
-                    kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
+                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+                    {
+                        AbstractKart* kart = world->getLocalPlayerKart(i);
+                        kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
+                    }
                 }
                 else if (cmdID == DEBUG_POWERUP_CAKE)
                 {
                     World* world = World::getWorld();
                     if (world == NULL) return false;
-                    AbstractKart* kart = world->getLocalPlayerKart(0);
-                    kart->setPowerup(PowerupManager::POWERUP_CAKE, 10000);
+                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+                    {
+                        AbstractKart* kart = world->getLocalPlayerKart(i);
+                        kart->setPowerup(PowerupManager::POWERUP_CAKE, 10000);
+                    }
                 }
                 else if (cmdID == DEBUG_POWERUP_PLUNGER)
                 {
                     World* world = World::getWorld();
                     if (world == NULL) return false;
-                    AbstractKart* kart = world->getLocalPlayerKart(0);
-                    kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
+                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+                    {
+                        AbstractKart* kart = world->getLocalPlayerKart(i);
+                        kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
+                    }
                 }
                 else if (cmdID == DEBUG_POWERUP_RUBBERBALL)
                 {
                     World* world = World::getWorld();
                     if (world == NULL) return false;
-                    AbstractKart* kart = world->getLocalPlayerKart(0);
-                    kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL, 10000);
+                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+                    {
+                        AbstractKart* kart = world->getLocalPlayerKart(i);
+                        kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL, 10000);
+                    }
                 }
                 else if (cmdID == DEBUG_POWERUP_SWATTER)
                 {
                     World* world = World::getWorld();
                     if (world == NULL) return false;
-                    AbstractKart* kart = world->getLocalPlayerKart(0);
-                    kart->setPowerup(PowerupManager::POWERUP_SWATTER, 10000);
+                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+                    {
+                        AbstractKart* kart = world->getLocalPlayerKart(i);
+                        kart->setPowerup(PowerupManager::POWERUP_SWATTER, 10000);
+                    }
                 }
                 else if (cmdID == DEBUG_POWERUP_SWITCH)
                 {
                     World* world = World::getWorld();
                     if (world == NULL) return false;
-                    AbstractKart* kart = world->getLocalPlayerKart(0);
-                    kart->setPowerup(PowerupManager::POWERUP_SWITCH, 10000);
+                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+                    {
+                        AbstractKart* kart = world->getLocalPlayerKart(i);
+                        kart->setPowerup(PowerupManager::POWERUP_SWITCH, 10000);
+                    }
                 }
                 else if (cmdID == DEBUG_POWERUP_ZIPPER)
                 {
                     World* world = World::getWorld();
                     if (world == NULL) return false;
-                    AbstractKart* kart = world->getLocalPlayerKart(0);
-                    kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 10000);
+                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+                    {
+                        AbstractKart* kart = world->getLocalPlayerKart(i);
+                        kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 10000);
+                    }
                 }
                 else if (cmdID == DEBUG_POWERUP_NITRO)
                 {
                     World* world = World::getWorld();
                     if (world == NULL) return false;
-                    AbstractKart* kart = world->getLocalPlayerKart(0);
-                    kart->setEnergy(100.0f);
+                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+                    {
+                        AbstractKart* kart = world->getLocalPlayerKart(i);
+                        kart->setEnergy(100.0f);
+                    }
                 }
                 else if (cmdID == DEBUG_TOGGLE_GUI)
                 {
