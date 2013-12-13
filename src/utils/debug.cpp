@@ -43,8 +43,8 @@ static bool g_debug_menu_visible = false;
 // Commands for the debug menu
 enum DebugMenuCommand
 {
-	//! graphics commands
-	DEBUG_GRAPHICS_RELOAD_SHADERS,
+    //! graphics commands
+    DEBUG_GRAPHICS_RELOAD_SHADERS,
     DEBUG_GRAPHICS_RESET,
     DEBUG_GRAPHICS_WIREFRAME,
     DEBUG_GRAPHICS_MIPMAP_VIZ,
@@ -71,6 +71,19 @@ enum DebugMenuCommand
     DEBUG_POWERUP_NITRO,
     DEBUG_TOGGLE_GUI
 };
+
+// -----------------------------------------------------------------------------
+// Add powerup selected from debug menu for all player karts
+void addPowerup(PowerupManager::PowerupType powerup)
+{
+    World* world = World::getWorld();
+    if (world == NULL) return;
+    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+    {
+        AbstractKart* kart = world->getLocalPlayerKart(i);
+        kart->setPowerup(powerup, 10000);
+    }
+}
 
 // -----------------------------------------------------------------------------
 // Debug menu handling
@@ -253,93 +266,39 @@ bool onEvent(const SEvent &event)
                 }
                 else if (cmdID == DEBUG_POWERUP_BOWLING)
                 {
-                    World* world = World::getWorld();
-                    if (world == NULL) return false;
-                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
-                    {
-                        AbstractKart* kart = world->getLocalPlayerKart(i);
-                        kart->setPowerup(PowerupManager::POWERUP_BOWLING, 10000);
-                    }
+                    addPowerup(PowerupManager::POWERUP_BOWLING);
                 }
                 else if (cmdID == DEBUG_POWERUP_BUBBLEGUM)
                 {
-                    World* world = World::getWorld();
-                    if (world == NULL) return false;
-                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
-                    {
-                        AbstractKart* kart = world->getLocalPlayerKart(i);
-                        kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
-                    }
+                    addPowerup(PowerupManager::POWERUP_BUBBLEGUM);
                 }
                 else if (cmdID == DEBUG_POWERUP_CAKE)
                 {
-                    World* world = World::getWorld();
-                    if (world == NULL) return false;
-                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
-                    {
-                        AbstractKart* kart = world->getLocalPlayerKart(i);
-                        kart->setPowerup(PowerupManager::POWERUP_CAKE, 10000);
-                    }
+                    addPowerup(PowerupManager::POWERUP_CAKE);
                 }
                 else if (cmdID == DEBUG_POWERUP_PARACHUTE)
                 {
-                    World* world = World::getWorld();
-                    if (world == NULL) return false;
-                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
-                    {
-                        AbstractKart* kart = world->getLocalPlayerKart(i);
-                        kart->setPowerup(PowerupManager::POWERUP_PARACHUTE, 10000);
-                    }
+                    addPowerup(PowerupManager::POWERUP_PARACHUTE);
                 }
                 else if (cmdID == DEBUG_POWERUP_PLUNGER)
                 {
-                    World* world = World::getWorld();
-                    if (world == NULL) return false;
-                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
-                    {
-                        AbstractKart* kart = world->getLocalPlayerKart(i);
-                        kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
-                    }
+                    addPowerup(PowerupManager::POWERUP_PLUNGER);
                 }
                 else if (cmdID == DEBUG_POWERUP_RUBBERBALL)
                 {
-                    World* world = World::getWorld();
-                    if (world == NULL) return false;
-                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
-                    {
-                        AbstractKart* kart = world->getLocalPlayerKart(i);
-                        kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL, 10000);
-                    }
+                    addPowerup(PowerupManager::POWERUP_RUBBERBALL);
                 }
                 else if (cmdID == DEBUG_POWERUP_SWATTER)
                 {
-                    World* world = World::getWorld();
-                    if (world == NULL) return false;
-                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
-                    {
-                        AbstractKart* kart = world->getLocalPlayerKart(i);
-                        kart->setPowerup(PowerupManager::POWERUP_SWATTER, 10000);
-                    }
+                    addPowerup(PowerupManager::POWERUP_SWATTER);
                 }
                 else if (cmdID == DEBUG_POWERUP_SWITCH)
                 {
-                    World* world = World::getWorld();
-                    if (world == NULL) return false;
-                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
-                    {
-                        AbstractKart* kart = world->getLocalPlayerKart(i);
-                        kart->setPowerup(PowerupManager::POWERUP_SWITCH, 10000);
-                    }
+                    addPowerup(PowerupManager::POWERUP_SWITCH);
                 }
                 else if (cmdID == DEBUG_POWERUP_ZIPPER)
                 {
-                    World* world = World::getWorld();
-                    if (world == NULL) return false;
-                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
-                    {
-                        AbstractKart* kart = world->getLocalPlayerKart(i);
-                        kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 10000);
-                    }
+                    addPowerup(PowerupManager::POWERUP_ZIPPER);
                 }
                 else if (cmdID == DEBUG_POWERUP_NITRO)
                 {
