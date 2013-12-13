@@ -62,6 +62,7 @@ enum DebugMenuCommand
     DEBUG_POWERUP_BOWLING,
     DEBUG_POWERUP_BUBBLEGUM,
     DEBUG_POWERUP_CAKE,
+    DEBUG_POWERUP_PARACHUTE,
     DEBUG_POWERUP_PLUNGER,
     DEBUG_POWERUP_RUBBERBALL,
     DEBUG_POWERUP_SWATTER,
@@ -111,6 +112,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Bowling", DEBUG_POWERUP_BOWLING );
             sub->addItem(L"Bubblegum", DEBUG_POWERUP_BUBBLEGUM );
             sub->addItem(L"Cake", DEBUG_POWERUP_CAKE );
+            sub->addItem(L"Parachute", DEBUG_POWERUP_PARACHUTE );
             sub->addItem(L"Plunger", DEBUG_POWERUP_PLUNGER );
             sub->addItem(L"Swatter", DEBUG_POWERUP_SWATTER );
             sub->addItem(L"Switch", DEBUG_POWERUP_SWITCH );
@@ -277,6 +279,16 @@ bool onEvent(const SEvent &event)
                     {
                         AbstractKart* kart = world->getLocalPlayerKart(i);
                         kart->setPowerup(PowerupManager::POWERUP_CAKE, 10000);
+                    }
+                }
+                else if (cmdID == DEBUG_POWERUP_PARACHUTE)
+                {
+                    World* world = World::getWorld();
+                    if (world == NULL) return false;
+                    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+                    {
+                        AbstractKart* kart = world->getLocalPlayerKart(i);
+                        kart->setPowerup(PowerupManager::POWERUP_PARACHUTE, 10000);
                     }
                 }
                 else if (cmdID == DEBUG_POWERUP_PLUNGER)
