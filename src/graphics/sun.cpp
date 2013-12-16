@@ -47,6 +47,8 @@ SunNode::SunNode(scene::ISceneManager* mgr, float r, float g, float b):
     m.setTexture(1, irr_driver->getRTT(RTT_DEPTH));
     m.setTexture(2, irr_driver->getTexture((file_manager->getTextureDir() + "cloudshadow.png").c_str()));
     m.setFlag(EMF_BILINEAR_FILTER, false);
+    m.MaterialTypeParam = pack_textureBlendFunc(EBF_ONE, EBF_ONE);
+    m.BlendOperation = EBO_ADD;
 
     if (UserConfigParams::m_shadows)
     {

@@ -33,7 +33,6 @@ void main() {
 	vec3 L = center;
 
 	float NdotL = max(0.0, dot(norm, L));
-	if (NdotL < 0.01) discard;
 
 	vec3 outcol = NdotL * col;
 
