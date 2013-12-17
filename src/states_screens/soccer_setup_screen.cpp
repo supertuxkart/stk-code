@@ -65,10 +65,10 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, c
             {
                 if (!m_kart_view_info[i].confirmed)
                 {
-                    sfx_manager->quickSound( "anvil" );
                     m_kart_view_info[i].view->setBadge(BAD_BADGE);
                 }
             }
+            sfx_manager->quickSound( "anvil" );
             return;
         }
 
@@ -77,7 +77,9 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, c
             race_manager->setLocalKartSoccerTeam(m_kart_view_info[i].local_player_id,
                                              m_kart_view_info[i].team);
         }
+
         StateManager::get()->pushScreen( ArenasScreen::getInstance() );
+
         if(getWidget<SpinnerWidget>("goalamount")->isActivated())
             race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
         else
