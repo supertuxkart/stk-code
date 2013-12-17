@@ -56,6 +56,27 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, c
 {
     if(name == "continue")
     {
+        int nb_players = m_kart_view_info.size();
+
+        if (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 || 
+            getNumKartsInTeam(SOCCER_TEAM_BLUE) == 0)
+        {
+            for(int i=0 ; i < nb_players ; i++)
+            {
+                if (!m_kart_view_info[i].confirmed)
+                {
+                    sfx_manager->quickSound( "anvil" );
+                    m_kart_view_info[i].view->setBadge(BAD_BADGE);
+                }
+            }
+            return;
+        }
+
+        for(int i=0 ; i < nb_players ; i++)
+        {
+            race_manager->setLocalKartSoccerTeam(m_kart_view_info[i].local_player_id,
+                                             m_kart_view_info[i].team);
+        }
         StateManager::get()->pushScreen( ArenasScreen::getInstance() );
         if(getWidget<SpinnerWidget>("goalamount")->isActivated())
             race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
@@ -172,7 +193,6 @@ void SoccerSetupScreen::init()
     // Set focus on "continue"
     ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
     bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    bt_continue->setDeactivated();
 
     // We need players to be able to choose their teams
     //~ input_manager->getDeviceList()->setAssignMode(ASSIGN);
@@ -255,7 +275,9 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
     case PA_MENU_SELECT:
     {
         if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) || areAllKartsConfirmed())
+        {
             return result;
+        }
 
         if (getNumConfirmedKarts() > nb_players-2 && 
            (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 || 
@@ -278,6 +300,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
                 m_kart_view_info[i].confirmed = true;
                 m_kart_view_info[i].view->setRotateTo( KART_CONFIRMATION_TARGET_ANGLE, KART_CONFIRMATION_ROTATION_SPEED );
                 m_kart_view_info[i].view->setBadge(OK_BADGE);
+                m_kart_view_info[i].view->unsetBadge(BAD_BADGE);
                 sfx_manager->quickSound( "wee" );
                 break;
             }
@@ -325,19 +348,6 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
             }
         }
     }
-
-    // Update "continue" button state
-    if(areAllKartsConfirmed())
-    {
-        //~ bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        bt_continue->setActivated();
-
-        for(int i=0 ; i < nb_players ; i++)
-            race_manager->setLocalKartSoccerTeam(m_kart_view_info[i].local_player_id,
-                                                 m_kart_view_info[i].team);
-    }
-    else
-        bt_continue->setDeactivated();
 
     return result;
 }
