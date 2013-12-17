@@ -422,7 +422,8 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         }
         else
         {
-            m_node->setMaterialTexture(0, irr_driver->getTexture((file_manager->getDataDir() + "gui/main_help.png").c_str()));
+            std::string help = file_manager->getAsset(FileManager::GUI, "main_help.png");
+            m_node->setMaterialTexture(0, irr_driver->getTexture(help));
         }
 
         // velocity in m/ms

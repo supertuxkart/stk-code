@@ -175,7 +175,7 @@ void GrandPrixWin::init()
     m_camera->updateAbsolutePosition();
 
 
-    scene::IMesh* model_village = irr_driver->getMesh( file_manager->getModelFile("village.b3d") );
+    scene::IMesh* model_village = irr_driver->getMesh( file_manager->getAsset(FileManager::MODEL,"village.b3d") );
     assert(model_village != NULL);
     m_village = irr_driver->addMesh(model_village);
 #ifdef DEBUG
@@ -184,7 +184,7 @@ void GrandPrixWin::init()
     m_village->setPosition( core::vector3df(2, INITIAL_Y, 0) );
 
 
-    scene::IMesh* podium_model = irr_driver->getMesh( file_manager->getModelFile("wood_podium.b3d") );
+    scene::IMesh* podium_model = irr_driver->getMesh( file_manager->getAsset(FileManager::MODEL,"wood_podium.b3d") );
     assert(podium_model != NULL);
 
 

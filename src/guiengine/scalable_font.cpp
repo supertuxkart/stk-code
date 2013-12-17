@@ -111,7 +111,7 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
                 */
 
                 io::IXMLReader* included = file_manager->createXMLReader(
-                    file_manager->getFontFile(filename.c_str()));
+                    file_manager->getAsset(FileManager::FONT, filename.c_str()));
                 if (included != NULL)
                 {
                     doReadXmlFile(included);
@@ -122,7 +122,8 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
             {
                 // add a texture
                 core::stringc filename = xml->getAttributeValue(L"filename");
-                core::stringc fn = file_manager->getFontFile(filename.c_str()).c_str();
+                core::stringc fn = file_manager->getAsset(FileManager::FONT,
+                                                          filename.c_str()).c_str();
                 u32 i = (u32)xml->getAttributeValueAsInt(L"index");
 
                 float scale=1.0f;

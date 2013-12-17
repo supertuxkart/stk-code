@@ -99,7 +99,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
     {
         std::set<std::string> flist;
         file_manager->listFiles(flist,
-                                file_manager->getTranslationDir(),
+                                file_manager->getAsset(FileManager::TRANSLATION,""),
                                 /*is full path*/true);
 
         // English is always there but won't be found on file system
@@ -149,7 +149,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
     textdomain (PACKAGE);
     */
 
-    m_dictionary_manager.add_directory( file_manager->getTranslationDir());
+    m_dictionary_manager.add_directory(
+                        file_manager->getAsset(FileManager::TRANSLATION,""));
 
     /*
     const std::set<Language>& languages = m_dictionary_manager.get_languages();

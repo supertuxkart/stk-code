@@ -226,7 +226,8 @@ void TrackInfoDialog::updateHighScores()
             line = _("(Empty)");
 
             ITexture* no_kart_texture = irr_driver->getTexture(
-                    (file_manager->getGUIDir() + "random_kart.png").c_str() ) ;
+                                 file_manager->getAsset(FileManager::GUI,
+                                                        "random_kart.png") );
             m_kart_icons[n]->setImage(no_kart_texture);
 
         }

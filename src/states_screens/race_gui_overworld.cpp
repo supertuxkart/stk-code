@@ -113,7 +113,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_trophy_points_width = font->getDimension(L"1000").Width;
 
     m_lock = irr_driver->getTexture( file_manager->getTextureFile("gui_lock.png") );
-    m_open_challenge = irr_driver->getTexture( file_manager->getGUIDir() + "challenge.png" );
+    m_open_challenge = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,"challenge.png") );
 
     m_icons[0] = m_lock;
     m_icons[1] = m_open_challenge;

@@ -437,7 +437,7 @@ void DeviceManager::clearLatestUsedDevice()
 // -----------------------------------------------------------------------------
 bool DeviceManager::deserialize()
 {
-    static std::string filepath = file_manager->getConfigDir() + "/" + INPUT_FILE_NAME;
+    static std::string filepath = file_manager->getUserConfigFile(INPUT_FILE_NAME);
 
     if(UserConfigParams::logMisc())
         printf("Deserializing input.xml...\n");
@@ -556,8 +556,7 @@ bool DeviceManager::deserialize()
 // -----------------------------------------------------------------------------
 void DeviceManager::serialize()
 {
-    static std::string filepath = file_manager->getConfigDir() + "/"
-                                + INPUT_FILE_NAME;
+    static std::string filepath = file_manager->getUserConfigFile(INPUT_FILE_NAME);
     if(UserConfigParams::logMisc()) printf("Serializing input.xml...\n");
 
 

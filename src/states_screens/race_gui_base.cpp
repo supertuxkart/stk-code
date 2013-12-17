@@ -81,11 +81,10 @@ RaceGUIBase::RaceGUIBase()
         Log::fatal("RaceGuiBase",
                    "Can't find 'icons-frame.png' texture, aborting.");
 
-    const std::string &guid = file_manager->getGUIDir();
-    m_gauge_full            = irr_driver->getTexture(guid+"gauge_full.png" );
-    m_gauge_full_bright     = irr_driver->getTexture(guid+"gauge_full_bright.png" );
-    m_gauge_empty           = irr_driver->getTexture(guid+"gauge_empty.png");
-    m_gauge_goal            = irr_driver->getTexture(guid+"gauge_goal.png" );
+    m_gauge_full            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_full.png"));
+    m_gauge_full_bright     = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_full_bright.png"));
+    m_gauge_empty           = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_empty.png"));
+    m_gauge_goal            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_goal.png" ));
     m_dist_show_overlap     = 2;
     m_icons_inertia         = 2;
 

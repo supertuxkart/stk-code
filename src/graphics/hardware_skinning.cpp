@@ -38,11 +38,12 @@ void HardwareSkinning::prepareNode(scene::IAnimatedMeshSceneNode *node)
     HWSkinningCallback* callback = new HWSkinningCallback(node);
 
     // Compile the shaders and associate the callback
-    s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(
-                        (file_manager->getShaderDir()+"skinning.vert").c_str(),
-                        "main", video::EVST_VS_2_0, "",
-                        "main", video::EPST_PS_2_0,
-                        callback, video::EMT_SOLID);
+    std::string skinning = file_manager->getAssetChecked(FileManager::SHADER,
+                                                         "skinning.vert", true);
+    s32 material_type = gpu->addHighLevelShaderMaterialFromFiles(skinning.c_str(),
+                                  "main", video::EVST_VS_2_0, "",
+                                  "main", video::EPST_PS_2_0,
+                                  callback, video::EMT_SOLID);
 
     // Drop
     callback->drop();

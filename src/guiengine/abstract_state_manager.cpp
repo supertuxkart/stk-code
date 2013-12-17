@@ -132,7 +132,7 @@ void AbstractStateManager::pushScreen(Screen* screen)
     screen->init();
 
     onTopMostScreenChanged();
-}   // pushScreen
+}   // pushScreen%
 
 // ----------------------------------------------------------------------------
 

@@ -804,17 +804,6 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                         ? video::SColor(255,255,0,  0  )
                         : video::SColor(255,255,255,255);
 
-#ifdef USE_PER_LINE_BACKGROUND
-    // Draw the background image
-    core::rect<s32> dest(x-50, y,
-                         x+50+m_table_width,
-                         (int)(y+m_distance_between_rows));
-    ri->m_box_params.setTexture(irr_driver->getTexture( (
-        file_manager->getGUIDir() +
-        "skins/glass/glassbutton_focused.png").c_str() ) );
-    GUIEngine::getSkin()->drawBoxFromStretchableTexture(
-        &(ri->m_widget_container),dest, ri->m_box_params);
-#endif
     unsigned int current_x = x;
 
     // First draw the icon
@@ -1097,7 +1086,7 @@ void RaceResultGUI::enableGPProgress()
 
             m_screenshot_widget->m_properties[GUIEngine::PROP_ICON] =
                 (track ? track->getScreenshotFile()
-                       : file_manager->getDataDir() + "gui/main_help.png");
+                       : file_manager->getAsset(FileManager::GUI,"main_help.png"));
             m_screenshot_widget->m_properties[GUIEngine::PROP_ID] = tracks[i];
 
             if(i <= currentTrack)

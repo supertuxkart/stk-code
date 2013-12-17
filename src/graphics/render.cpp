@@ -803,7 +803,7 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
     overridemat.Material.MaterialType = m_shaders->getShader(ES_DISPLACE);
 
     overridemat.Material.TextureLayer[0].Texture =
-        irr_driver->getTexture((file_manager->getTextureDir() + "displace.png").c_str());
+          irr_driver->getTexture(file_manager->getTextureFile("displace.png"));
     overridemat.Material.TextureLayer[0].BilinearFilter =
     overridemat.Material.TextureLayer[0].TrilinearFilter = true;
     overridemat.Material.TextureLayer[0].AnisotropicFilter = 0;

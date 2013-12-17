@@ -117,13 +117,8 @@ void Screen::loadFromFile()
 {
     assert(m_magic_number == 0xCAFEC001);
 
-    IXMLReader* xml = file_manager->createXMLReader( (file_manager->getGUIDir() + m_filename).c_str() );
-    if (xml == NULL)
-    {
-        fprintf(stderr, "Cannot open file %s\n", m_filename.c_str());
-        assert(false);
-        return;
-    }
+    std::string path = file_manager->getAssetChecked(FileManager::GUI, m_filename, true);
+    IXMLReader* xml = file_manager->createXMLReader( path );
 
     parseScreenFileDiv(xml, m_widgets);
     m_loaded = true;

@@ -161,7 +161,7 @@ void History::Save()
         printf("History saved in ./history.dat.\n");
     else
     {
-        std::string fn = file_manager->getConfigDir()+"/history.dat";
+        std::string fn = file_manager->getUserConfigFile("history.dat");
         fd = fopen(fn.c_str(), "w");
         if(fd)
             printf("History saved in '%s'.\n",fn.c_str());
@@ -234,7 +234,7 @@ void History::Load()
         printf("Reading ./history.dat\n");
     else
     {
-        std::string fn = file_manager->getConfigDir()+"/history.dat";
+        std::string fn = file_manager->getUserConfigFile("history.dat");
         fd = fopen(fn.c_str(), "r");
         if(fd)
             printf("Reading '%s'.\n", fn.c_str());

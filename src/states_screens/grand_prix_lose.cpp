@@ -132,8 +132,7 @@ void GrandPrixLose::init()
     m_camera->setFOV( DEGREE_TO_RAD*50.0f );
     m_camera->updateAbsolutePosition();
 
-
-    scene::IAnimatedMesh* model_garage_door = irr_driver->getAnimatedMesh( file_manager->getModelFile("gplose_door.b3d") );
+    scene::IAnimatedMesh* model_garage_door = irr_driver->getAnimatedMesh( file_manager->getAsset(FileManager::MODEL,"gplose_door.b3d") );
     assert(model_garage_door!= NULL);
     m_garage_door = irr_driver->addAnimatedMesh(model_garage_door);
 #ifdef DEBUG
@@ -142,7 +141,7 @@ void GrandPrixLose::init()
     m_garage_door->setPosition( core::vector3df(2, INITIAL_Y, 0) );
     m_garage_door->setAnimationSpeed(0);
 
-    scene::IMesh* model_garage = irr_driver->getMesh( file_manager->getModelFile("gplose.b3d") );
+    scene::IMesh* model_garage = irr_driver->getMesh( file_manager->getAsset(FileManager::MODEL,"gplose.b3d") );
     assert(model_garage!= NULL);
     m_garage = irr_driver->addMesh(model_garage);
 #ifdef DEBUG

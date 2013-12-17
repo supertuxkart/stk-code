@@ -243,8 +243,8 @@ void RibbonWidget::add()
                     GUIEngine::getGUIEnv()->addButton(icon_part, subbtn,
                                                       same_id, L"");
                 icon->setScaleImage(true);
-                std::string filename = file_manager->getDataDir()
-                                     + m_active_children[i].m_properties[PROP_ICON];
+                std::string filename = file_manager->getAsset(
+                                     m_active_children[i].m_properties[PROP_ICON]);
                 icon->setImage( irr_driver->getTexture(filename.c_str()) );
                 icon->setUseAlphaChannel(true);
                 icon->setDrawBorder(false);
@@ -306,13 +306,13 @@ void RibbonWidget::add()
                 (float)m_active_children[i].m_w / (float)m_active_children[i].m_h;
 
             // calculate the size of the image
-            std::string filename = file_manager->getDataDir()
-                                 + m_active_children[i].m_properties[PROP_ICON];
+            std::string filename = 
+                file_manager->getAsset(m_active_children[i].m_properties[PROP_ICON]);
             video::ITexture* image =
                 irr_driver->getTexture((filename).c_str());
             if(!image)
             {
-                std::string file = file_manager->getGUIDir() + "main_help.png";
+                std::string file = file_manager->getAsset(FileManager::GUI,"main_help.png");
                 image = irr_driver->getTexture(file);
                 if(!image)
                     Log::fatal("RibbonWidget",

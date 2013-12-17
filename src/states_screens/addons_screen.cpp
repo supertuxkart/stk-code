@@ -68,18 +68,18 @@ AddonsScreen::AddonsScreen() : Screen("addons_screen.stkgui")
 
 void AddonsScreen::loadedFromFile()
 {
-    video::ITexture* icon1 = irr_driver->getTexture( file_manager->getGUIDir()
-                                                    + "/package.png"         );
-    video::ITexture* icon2 = irr_driver->getTexture( file_manager->getGUIDir()
-                                                    + "/no-package.png"      );
-    video::ITexture* icon3 = irr_driver->getTexture( file_manager->getGUIDir()
-                                                    + "/package-update.png"  );
-    video::ITexture* icon4 = irr_driver->getTexture( file_manager->getGUIDir()
-                                                    + "/package-featured.png");
-    video::ITexture* icon5 = irr_driver->getTexture( file_manager->getGUIDir()
-                                                 + "/no-package-featured.png");
-    video::ITexture* icon6 = irr_driver->getTexture( file_manager->getGUIDir()
-                                                    + "/loading.png");
+    video::ITexture* icon1 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,
+                                                     "package.png"         ));
+    video::ITexture* icon2 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,
+                                                     "no-package.png"      ));
+    video::ITexture* icon3 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,
+                                                     "package-update.png"  ));
+    video::ITexture* icon4 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,
+                                                     "package-featured.png"));
+    video::ITexture* icon5 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,
+                                                  "no-package-featured.png"));
+    video::ITexture* icon6 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,
+                                                     "loading.png"));
 
     m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
     m_icon_installed     = m_icon_bank->addTextureAsSprite(icon1);

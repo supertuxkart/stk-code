@@ -49,14 +49,14 @@ void AchievementsManager::deallocate()
 // ============================================================================
 AchievementsManager::AchievementsManager()
 {
-    parseDataFile();
+    parseAssetFile();
 }
 
 
 // ============================================================================
 void AchievementsManager::init()
 {
-    parseConfigFile();
+    parseUserConfigFile();
 }
 
 // ============================================================================
@@ -72,9 +72,9 @@ AchievementsManager::~AchievementsManager()
 }
 
 // ============================================================================
-void AchievementsManager::parseDataFile()
+void AchievementsManager::parseAssetFile()
 {
-    const std::string file_name = file_manager->getDataFile("achievements.xml");
+    const std::string file_name = file_manager->getAsset("achievements.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
     unsigned int num_nodes = root->getNumNodes();
     for(unsigned int i = 0; i < num_nodes; i++)
@@ -93,24 +93,28 @@ void AchievementsManager::parseDataFile()
         }
         else
         {
-            Log::error("AchievementsManager::parseAchievements","Non-existent achievement type. Skipping - definitely results in unwanted behaviour.");
+            Log::error("AchievementsManager::parseAchievements",
+                       "Non-existent achievement type. Skipping - "
+                       "definitely results in unwanted behaviour.");
             continue;
         }
         m_achievements_info[achievement_info->getID()] = achievement_info;
     }
     if(num_nodes != m_achievements_info.size())
-        Log::error("AchievementsManager::parseAchievements","Multiple achievements with the same id!");
+        Log::error("AchievementsManager::parseAchievements",
+                   "Multiple achievements with the same id!");
 }
 
 
 // ============================================================================
-void AchievementsManager::parseConfigFile()
+void AchievementsManager::parseUserConfigFile()
 {
-    const std::string filename=file_manager->getConfigFile("achievements.xml");
+    const std::string filename=file_manager->getUserConfigFile("achievements.xml");
     XMLNode* root = file_manager->createXMLTree(filename);
     if(!root || root->getName() != "achievements")
     {
-        Log::info("AchievementsManager", "Achievements file '%s' will be created.",filename.c_str());
+        Log::info("AchievementsManager", 
+                  "Achievements file '%s' will be created.",filename.c_str());
         createSlotsIfNeeded();
         if (root) delete root;
         return;
@@ -169,7 +173,7 @@ void AchievementsManager::createSlotsIfNeeded()
 // ============================================================================
 void AchievementsManager::save()
 {
-    std::string filename = file_manager->getConfigFile("achievements.xml");
+    std::string filename = file_manager->getUserConfigFile("achievements.xml");
 
     std::ofstream achievements_file(filename.c_str(), std::ios::out);
 

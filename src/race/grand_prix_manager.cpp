@@ -28,11 +28,12 @@ GrandPrixManager::GrandPrixManager()
 {
     // Findout which grand prixs are available and load them
     std::set<std::string> result;
-    file_manager->listFiles(result, "data/grandprix");
+    std::string gp_dir = file_manager->getAsset(FileManager::GRANDPRIX,"");
+    file_manager->listFiles(result, gp_dir,/*full_path*/true);
     for(std::set<std::string>::iterator i  = result.begin();
                                         i != result.end()  ; i++)
     {
-        if (StringUtils::hasSuffix(*i, ".grandprix")) load("grandprix/"+*i);
+        if (StringUtils::hasSuffix(*i, ".grandprix")) load(*i);
     }   // for i
 }   // GrandPrixManager
 

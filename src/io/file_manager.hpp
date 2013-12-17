@@ -43,18 +43,35 @@ using namespace irr;
   */
 class FileManager : public NoCopy
 {
+public:
+    /** The various asset types (and directories) STK might request.
+     *  The last entry ASSET_COUNT specifies the number of entries. */
+    enum AssetType {ASSET_MIN, 
+                    TEXTURE=ASSET_MIN, 
+                    CHALLENGE, FONT, GFX, 
+                    GRANDPRIX, GUI, SKIN, MODEL, MUSIC,
+                    TRANSLATION, SFX, SHADER,
+                    ASSET_MAX = SHADER,
+                    ASSET_COUNT};
 private:
+
+    /** The names of the various subdirectories of the asset types. */
+    std::vector< std::string > m_subdir_name;
+
     /** Handle to irrlicht's file systems. */
     io::IFileSystem  *m_file_system;
 
     /** Directory where user config files are stored. */
-    std::string       m_config_dir;
+    std::string       m_user_config_dir;
 
     /** Directory where addons are stored. */
     std::string       m_addons_dir;
 
     /** Root data directory. */
     std::string       m_root_dir;
+
+    /** The list of all root directories. */
+    static std::vector<std::string> m_root_dirs;
 
     /** Directory to store screenshots in. */
     std::string       m_screenshot_dir;
@@ -87,13 +104,11 @@ public:
                      ~FileManager();
     void              reInit();
     void              dropFileSystem();
+    static void       addRootDirs(const std::string &roots);
     io::IXMLReader   *createXMLReader(const std::string &filename);
     XMLNode          *createXMLTree(const std::string &filename);
     XMLNode          *createXMLTreeFromString(const std::string & content);
 
-    std::string       getConfigDir() const;
-    std::string       getTextureDir() const;
-    std::string       getShaderDir() const;
     std::string       getScreenshotDir() const;
     bool              checkAndCreateDirectoryP(const std::string &path);
     const std::string &getAddonsDir() const;
@@ -101,19 +116,15 @@ public:
     void checkAndCreateDirForAddons(const std::string &dir);
     bool removeFile(const std::string &name) const;
     bool removeDirectory(const std::string &name) const;
-    std::string getDataDir       () const;
-    std::string getTranslationDir() const;
-    std::string getGUIDir        () const;
     std::vector<std::string>getMusicDirs() const;
+    std::string getAssetChecked(AssetType type, const std::string& name,
+                                bool abort_on_error=false) const;
+    std::string getAsset(AssetType type, const std::string &name) const;
+    std::string getAsset(const std::string &name) const;
+    std::string getMusicFile(const std::string& file_name) const;
+
     std::string getTextureFile   (const std::string& fname) const;
-    std::string getDataFile      (const std::string& fname) const;
-    std::string getConfigFile    (const std::string& fname) const;
-    std::string getItemFile      (const std::string& fname) const;
-    std::string getGfxFile       (const std::string& fname) const;
-    std::string getMusicFile     (const std::string& fname) const;
-    std::string getSFXFile       (const std::string& fname) const;
-    std::string getFontFile      (const std::string& fname) const;
-    std::string getModelFile     (const std::string& fname) const;
+    std::string getUserConfigFile(const std::string& fname) const;
     void        listFiles        (std::set<std::string>& result,
                                   const std::string& dir,
                                   bool is_full_path=false,
@@ -139,7 +150,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if the specified file exists.
      */
-    bool fileExists(const std::string& path)
+    bool fileExists(const std::string& path) const
     {
         return m_file_system->existFile(path.c_str());
     }   // fileExists

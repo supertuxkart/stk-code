@@ -141,7 +141,7 @@ void CreditsScreen::loadedFromFile()
 
     m_throttle_FPS = false;
 
-    std::string creditsfile = file_manager->getDataDir() + "/CREDITS";
+    std::string creditsfile = file_manager->getAsset("CREDITS");
 
     std::ifstream file( creditsfile.c_str() ) ;
 

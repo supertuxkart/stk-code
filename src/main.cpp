@@ -535,7 +535,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
         {
-            stk_config->load(file_manager->getDataFile(argv[i+1]));
+            stk_config->load(file_manager->getAsset(argv[i+1]));
             Log::info("main", "STK config will be read from %s.\n",argv[i+1] );
             i++;
         }
@@ -1201,7 +1201,7 @@ void initUserConfig(char *argv[])
 //=============================================================================
 void initRest()
 {
-    stk_config->load(file_manager->getDataFile("stk_config.xml"));
+    stk_config->load(file_manager->getAsset("stk_config.xml"));
 
     // Now create the actual non-null device in the irrlicht driver
     irr_driver->initDevice();
@@ -1362,6 +1362,14 @@ int main(int argc, char *argv[] )
     srand(( unsigned ) time( 0 ));
 
     try {
+        // Check for "--root COLON:SEPARATED:LIST" parameter
+        for(int i=0; i<argc-1; i++)
+        {
+            if(!strcmp(argv[i],"--root"))
+            {
+                FileManager::addRootDirs(argv[i+1]);
+            }
+        }
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
         // not have) other managers initialised:
@@ -1388,7 +1396,7 @@ int main(int argc, char *argv[] )
         main_loop = new MainLoop();
         material_manager        -> loadMaterial    ();
         GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                           file_manager->getGUIDir() + "options_video.png") );
+                           file_manager->getAsset(FileManager::GUI,"options_video.png")) );
         kart_properties_manager -> loadAllKarts    ();
         handleXmasMode();
         unlock_manager          = new UnlockManager();
@@ -1401,9 +1409,9 @@ int main(int argc, char *argv[] )
         // Both item_manager and powerup_manager load models and therefore
         // textures from the model directory. To avoid reading the
         // materials.xml twice, we do this here once for both:
-        file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
+        file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""));
         const std::string materials_file =
-            file_manager->getModelFile("materials.xml");
+            file_manager->getAsset(FileManager::MODEL,"materials.xml");
         if(materials_file!="")
         {
             // Some of the materials might be needed later, so just add
@@ -1418,14 +1426,14 @@ int main(int argc, char *argv[] )
         ItemManager::loadDefaultItemMeshes();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                                    file_manager->getGUIDir() + "gift.png") );
+                                    file_manager->getAsset(FileManager::GUI,"gift.png")) );
 
         file_manager->popTextureSearchPath();
 
         attachment_manager      -> loadModels      ();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(
-            file_manager->getGUIDir() + "banana.png") );
+            file_manager->getAsset(FileManager::GUI,"banana.png")) );
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);

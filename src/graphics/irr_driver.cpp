@@ -408,7 +408,11 @@ void IrrDriver::initDevice()
     m_video_driver->beginScene(/*backBuffer clear*/true, /* Z */ false);
     m_video_driver->endScene();
 
-    if (m_glsl)
+    // Stores the new file system pointer.
+    file_manager->reInit();
+
+
+//    if (m_glsl)
     {
         Log::info("irr_driver", "GLSL supported.");
 
@@ -441,7 +445,7 @@ void IrrDriver::initDevice()
 
         m_lensflare = new scene::CLensFlareSceneNode(NULL, m_scene_manager, -1);
         video::ITexture * const tex =
-            m_video_driver->getTexture((file_manager->getTextureDir() + "lensflare.png").c_str());
+            m_video_driver->getTexture((file_manager->getTextureFile("lensflare.png")).c_str());
         if (!tex) Log::fatal("irr_driver", "Cannot find lens flare texture");
         m_lensflare->setMaterialTexture(0, tex);
         m_lensflare->setAutomaticCulling(scene::EAC_OFF);
@@ -450,7 +454,7 @@ void IrrDriver::initDevice()
         m_suncam->grab();
         m_suncam->setParent(NULL);
     }
-    else
+//    else
     {
         Log::warn("irr_driver", "Using the fixed pipeline (old GPU, or shaders disabled in options)");
     }
@@ -491,9 +495,6 @@ void IrrDriver::initDevice()
                        UserConfigParams::m_window_y);
         } // If reinstating window location
     } // If showing graphics
-
-    // Stores the new file system pointer.
-    file_manager->reInit();
 
     // Initialize material2D
     video::SMaterial& material2D = m_video_driver->getMaterial2D();
@@ -659,12 +660,12 @@ void IrrDriver::applyResolutionSettings()
     input_manager->setMode(InputManager::MENU);
 
     GUIEngine::addLoadingIcon(
-        irr_driver->getTexture(file_manager->getGUIDir()+"options_video.png")
-        );
+        irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"options_video.png"))
+                             );
 
-    file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
+    file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""));
     const std::string materials_file =
-        file_manager->getModelFile("materials.xml");
+        file_manager->getAssetChecked(FileManager::MODEL, "materials.xml");
     if (materials_file != "")
     {
         material_manager->addSharedMaterial(materials_file);
@@ -675,7 +676,7 @@ void IrrDriver::applyResolutionSettings()
     projectile_manager->loadData();
     Referee::init();
     GUIEngine::addLoadingIcon(
-        irr_driver->getTexture(file_manager->getGUIDir() + "gift.png") );
+        irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gift.png")) );
 
     file_manager->popTextureSearchPath();
 
@@ -683,8 +684,8 @@ void IrrDriver::applyResolutionSettings()
     kart_properties_manager->loadAllKarts();
 
     attachment_manager->loadModels();
-    GUIEngine::addLoadingIcon(irr_driver->getTexture(file_manager->getGUIDir()
-                                                     + "banana.png") );
+    std::string banana = file_manager->getAsset(FileManager::GUI, "banana.png");
+    GUIEngine::addLoadingIcon(irr_driver->getTexture(banana) );
     // No need to reload cached track data (track_manager->cleanAllCachedData
     // above) - this happens dynamically when the tracks are loaded.
     GUIEngine::reshowCurrentScreen();

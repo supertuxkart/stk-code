@@ -513,7 +513,8 @@ void Material::initCustomSFX(const XMLNode *sfx)
 
         // The directory for the track was added to the model search path
         // so just misuse the getModelFile function
-        const std::string full_path = file_manager->getModelFile(filename);
+        const std::string full_path = file_manager->getAsset(FileManager::MODEL,
+                                                             filename);
         SFXBuffer* buffer = sfx_manager->loadSingleSfx(sfx, full_path);
 
         if (buffer != NULL)
@@ -837,7 +838,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         {
         m->MaterialType = irr_driver->getShader(ES_CAUSTICS);
 
-        m->setTexture(1, irr_driver->getTexture((file_manager->getTextureDir() + "caustics.png").c_str()));
+        m->setTexture(1, irr_driver->getTexture(file_manager->getTextureFile("caustics.png")));
         }
 
 
