@@ -184,6 +184,11 @@ void ModelViewWidget::setRotateTo(float targetAngle, float speed)
     m_rotation_target = targetAngle;
 }
 
+bool ModelViewWidget::isRotating()
+{
+    return m_rotation_mode != ROTATE_OFF ? true : false;
+}
+
 void ModelViewWidget::elementRemoved()
 {
     delete m_rtt_provider;

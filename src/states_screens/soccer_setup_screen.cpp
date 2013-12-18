@@ -54,6 +54,9 @@ void SoccerSetupScreen::loadedFromFile()
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
+    if(m_schedule_continue)
+        return;
+
     if(name == "continue")
     {
         int nb_players = m_kart_view_info.size();
@@ -71,14 +74,30 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, c
             sfx_manager->quickSound( "anvil" );
             return;
         }
+        else if(!areAllKartsConfirmed())    
+        {
+            for(int i=0 ; i < nb_players ; i++)
+            {
+                if (!m_kart_view_info[i].confirmed)
+                {
+                    m_kart_view_info[i].confirmed = true;
+                    m_kart_view_info[i].view->setRotateTo( KART_CONFIRMATION_TARGET_ANGLE, KART_CONFIRMATION_ROTATION_SPEED );
+                    m_kart_view_info[i].view->setBadge(OK_BADGE);
+                }
+            }
+            sfx_manager->quickSound( "wee" );
+            m_schedule_continue = true;
+        }
+        else
+        {
+            m_schedule_continue = true;
+        }
 
         for(int i=0 ; i < nb_players ; i++)
         {
             race_manager->setLocalKartSoccerTeam(m_kart_view_info[i].local_player_id,
                                              m_kart_view_info[i].team);
         }
-
-        StateManager::get()->pushScreen( ArenasScreen::getInstance() );
 
         if(getWidget<SpinnerWidget>("goalamount")->isActivated())
             race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
@@ -178,6 +197,8 @@ void SoccerSetupScreen::beforeAddingWidget()
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::init()
 {
+    m_schedule_continue = false;
+
     Screen::init();
     
     if (UserConfigParams::m_num_goals <= 0)
@@ -235,6 +256,9 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
                                                                Input::InputType type,
                                                                int playerId)
 {
+    if(m_schedule_continue)
+        return EVENT_BLOCK;
+
     ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
     GUIEngine::EventPropagation result = EVENT_LET;
     SoccerTeam  team_switch = SOCCER_TEAM_NONE;
@@ -352,6 +376,24 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
     }
 
     return result;
+}
+
+
+// -----------------------------------------------------------------------------
+void SoccerSetupScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+{
+    int nb_players = m_kart_view_info.size();
+    
+    if(m_schedule_continue)
+    {
+        for(int i=0 ; i < nb_players ; i++)
+        {
+            if (m_kart_view_info[i].view->isRotating() == true)
+                return;
+        }
+        m_schedule_continue = false;
+        StateManager::get()->pushScreen( ArenasScreen::getInstance() );
+    }
 }
 
 bool SoccerSetupScreen::areAllKartsConfirmed() const
