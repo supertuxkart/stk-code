@@ -412,7 +412,7 @@ void IrrDriver::initDevice()
     file_manager->reInit();
 
 
-//    if (m_glsl)
+    if (m_glsl)
     {
         Log::info("irr_driver", "GLSL supported.");
 
@@ -454,7 +454,7 @@ void IrrDriver::initDevice()
         m_suncam->grab();
         m_suncam->setParent(NULL);
     }
-//    else
+    else
     {
         Log::warn("irr_driver", "Using the fixed pipeline (old GPU, or shaders disabled in options)");
     }
