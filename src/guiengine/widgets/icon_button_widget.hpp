@@ -107,8 +107,16 @@ namespace GUIEngine
          *                be resized to fit a different aspect ratio.
          * \note May safely be called no matter if the widget is add()ed or not
          */
-        void setImage(const char* path_to_texture, IconPathType pathType=ICON_PATH_TYPE_NO_CHANGE);
+        void setImage(const char* path_to_texture, 
+                      IconPathType path_type=ICON_PATH_TYPE_NO_CHANGE);
         
+        /** Convenience function taking std::string. */
+        void setImage(const std::string &path_to_texture, 
+                      IconPathType path_type=ICON_PATH_TYPE_NO_CHANGE)
+        {
+            setImage(path_to_texture.c_str(), path_type);
+        }
+
         /**
           * Change the texture used for this icon.
           * \pre At the moment, the new texture must have the same aspct ratio

@@ -457,7 +457,7 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(const XMLNode
     }
 
     video::ITexture *texture =
-        irr_driver->getTexture(file_manager->getTextureFile(texture_name));
+        irr_driver->getTexture(file_manager->searchTexture(texture_name));
     m_node = irr_driver->addBillboard(core::dimension2df(width, height),
                                                        texture);
     Material *stk_material = material_manager->getMaterial(texture_name);

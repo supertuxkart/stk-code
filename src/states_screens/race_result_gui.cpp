@@ -548,10 +548,9 @@ void RaceResultGUI::onUpdate(float dt, irr::video::IVideoDriver*)
     {
         try
         {
-            music_manager->startMusic(
-                music_manager->getMusicInformation(
-                    file_manager->getMusicFile("race_summary.music"))
-                    );
+            std::string path = file_manager->getAsset(FileManager::MUSIC,
+                                                      "race_summary.music");
+            music_manager->startMusic(music_manager->getMusicInformation(path));
         }
         catch (std::exception& e)
         {
@@ -914,10 +913,10 @@ void RaceResultGUI::displaySoccerResults()
     //Draw team scores:
     currY += rect.Height;
     currX /= 2;
-    irr::video::ITexture* redTeamIcon = irr_driver->getTexture(
-        file_manager->getTextureFile("soccer_ball_red.png"));
-    irr::video::ITexture* blueTeamIcon = irr_driver->getTexture(
-        file_manager->getTextureFile("soccer_ball_blue.png"));
+    irr::video::ITexture* redTeamIcon = irr_driver->getTexture(FileManager::GUI,
+                                                              "soccer_ball_red.png");
+    irr::video::ITexture* blueTeamIcon = irr_driver->getTexture(FileManager::GUI,
+                                                               "soccer_ball_blue.png");
 
     core::recti sourceRect(core::vector2di(0,0), redTeamIcon->getSize());
     core::recti destRect(currX, currY, currX+redTeamIcon->getSize().Width/2,
@@ -973,8 +972,8 @@ void RaceResultGUI::displaySoccerResults()
 
         pos = core::rect<s32>(currX,currY,currX,currY);
         font->draw(resultText,pos, color, true, false);
-        scorerIcon = soccerWorld->getKart(scorers.at(i))->
-            getKartProperties()->getIconMaterial()->getTexture();
+        scorerIcon = soccerWorld->getKart(scorers.at(i))
+                                ->getKartProperties()->getIconMaterial()->getTexture();
         sourceRect = core::recti(core::vector2di(0,0), scorerIcon->getSize());
         irr::u32 offsetX = GUIEngine::getFont()->getDimension(resultText.c_str()).Width/2;
         destRect = core::recti(currX-offsetX-30, currY, currX-offsetX, currY+ 30);
@@ -1005,7 +1004,7 @@ void RaceResultGUI::displaySoccerResults()
         pos = core::rect<s32>(currX,currY,currX,currY);
         font->draw(resultText,pos, color, true, false);
         scorerIcon = soccerWorld->getKart(scorers.at(i))->
-            getKartProperties()->getIconMaterial()->getTexture();
+                     getKartProperties()->getIconMaterial()->getTexture();
         sourceRect = core::recti(core::vector2di(0,0), scorerIcon->getSize());
         irr::u32 offsetX = GUIEngine::getFont()->getDimension(resultText.c_str()).Width/2;
 

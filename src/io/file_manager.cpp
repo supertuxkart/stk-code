@@ -143,41 +143,42 @@ FileManager::FileManager(char *argv[])
     // Also check for data dirs relative to the path of the executable.
     // This is esp. useful for Visual Studio, since it's not necessary
     // to define the working directory when debugging, it works automatically.
+    std::string root_dir;
     if(m_file_system->existFile(argv[0]))
         exe_path = m_file_system->getFileDir(argv[0]);
     if(exe_path.size()==0 || exe_path[exe_path.size()-1]!='/')
         exe_path += "/";
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
-        m_root_dir = std::string(getenv("SUPERTUXKART_DATADIR"))+"/" ;
+        root_dir = std::string(getenv("SUPERTUXKART_DATADIR"))+"/" ;
 #ifdef __APPLE__
-    else if( macSetBundlePathIfRelevant( m_root_dir ) ) { /* nothing to do */ }
+    else if( macSetBundlePathIfRelevant( root_dir ) ) { /* nothing to do */ }
 #endif
     else if(m_file_system->existFile("data"))
-        m_root_dir = "data/" ;
+        root_dir = "data/" ;
     else if(m_file_system->existFile("../data"))
-        m_root_dir = "../data/" ;
+        root_dir = "../data/" ;
     else if(m_file_system->existFile(exe_path+"data"))
-        m_root_dir = (exe_path+"data/").c_str();
+        root_dir = (exe_path+"data/").c_str();
     else if(m_file_system->existFile(exe_path+"/../data"))
     {
-        m_root_dir = exe_path.c_str();
-        m_root_dir += "/../data/";
+        root_dir = exe_path.c_str();
+        root_dir += "/../data/";
     }
     else
     {
 #ifdef SUPERTUXKART_DATADIR
-        m_root_dir = SUPERTUXKART_DATADIR;
-        if(m_root_dir.size()==0 || m_root_dir[m_root_dir.size()-1]!='/')
-            m_root_dir+='/';
+        root_dir = SUPERTUXKART_DATADIR;
+        if(root_dir.size()==0 || root_dir[root_dir.size()-1]!='/')
+            root_dir+='/';
 
 #else
-        m_root_dir = "/usr/local/share/games/supertuxkart/";
+        root_dir = "/usr/local/share/games/supertuxkart/";
 #endif
     }
 
-    addRootDirs(m_root_dir);
-    if(m_file_system->existFile((m_root_dir+"../../data_supertuxkart").c_str()))
-        addRootDirs(m_root_dir+"../../data_supertuxkart");
+    addRootDirs(root_dir);
+    if( fileExists(root_dir+"../../data_supertuxkart"))
+        addRootDirs(root_dir+"../../data_supertuxkart");
     if ( getenv ( "SUPERTUXKART_ROOT_PATH" ) != NULL )
         addRootDirs(getenv("SUPERTUXKART_ROOT_PATH"));
         
@@ -192,8 +193,9 @@ FileManager::FileManager(char *argv[])
 
     // We can't use _() here, since translations will only be initalised
     // after the filemanager (to get the path to the tranlsations from it)
-    Log::info("FileManager", "Data files will be fetched from: '%s'",
-              m_root_dir.c_str());
+    for(unsigned int i=0; i<m_root_dirs.size(); i++)
+        Log::info("FileManager", "Data files will be fetched from: '%s'",
+                   m_root_dirs[i].c_str());
     Log::info("FileManager", "User directory is '%s'.", 
               m_user_config_dir.c_str());
     Log::info("FileManager", "Addons files will be stored in '%s'.",
@@ -270,7 +272,7 @@ void FileManager::reInit()
 
 
     pushModelSearchPath  (m_subdir_name[MODEL]);
-    pushMusicSearchPath  (m_root_dir+"music/"   );
+    pushMusicSearchPath  (m_subdir_name[MUSIC]);
 
     // Add more paths from the STK_MUSIC_PATH environment variable
     if(getenv("SUPERTUXKART_MUSIC_PATH")!=NULL)
@@ -290,7 +292,7 @@ FileManager::~FileManager()
     // (The 24h delay is useful when debugging a problem with a zip file)
     std::set<std::string> allfiles;
     std::string tmp=getAddonsFile("tmp");
-    listFiles(allfiles, tmp, /*fullpath*/true);
+    listFiles(allfiles, tmp);
     for(std::set<std::string>::iterator i=allfiles.begin();
         i!=allfiles.end(); i++)
     {
@@ -534,6 +536,13 @@ std::string FileManager::getAssetChecked(FileManager::AssetType type,
 }   // getAssetChecked
 
 //-----------------------------------------------------------------------------
+/** Returns the full path of a file of the given asset class. It is not 
+ *  checked if the file actually exists (use getAssetChecked() instead if
+ *  checking is needed).
+ *  \param type Type of the asset class.
+ *  \param name Name of the file to search.
+ *  \return Full path to the file.
+ */
 std::string FileManager::getAsset(FileManager::AssetType type,
                                   const std::string &name) const
 {
@@ -561,21 +570,21 @@ std::string FileManager::getScreenshotDir() const
 }   // getScreenshotDir
 
 //-----------------------------------------------------------------------------
-/** Returns the full path of a texture file name by searching only in the main
- *  texture directory(data/texture), not all texture paths (e.g. kart or
- *  track directories). If the texture is not found, an error message is
- *  printed and the program aborted if abort_on_error is true, otherwise
- *  an empty string is returned.
+/** Returns the full path of a texture file name by searching in all 
+ *  directories currently in the texture search path. The difference to
+ *  a call getAsset(TEXTURE,...) is that the latter will only return
+ *  textures from .../textures, while the searchTexture will also
+ *  search e.g. in kart or track directories (depending on what is currently
+ *  being loaded).
  *  \param file_name Name of the texture file to search.
  *  \return The full path for the texture, or "" if the texture was not found.
-
  */
-std::string FileManager::getTextureFile(const std::string& file_name) const
+std::string FileManager::searchTexture(const std::string& file_name) const
 {
     std::string path;
     findFile(path, file_name, m_texture_search_path);
     return path;
-}   // getTextureFile
+}   // searchTexture
 
 //-----------------------------------------------------------------------------
 /** Returns the list of all directories in which music files are searched.
@@ -935,16 +944,17 @@ std::string FileManager::getUserConfigFile(const std::string &fname) const
  *  It throws an exception if the file is not found.
  *  \param file_name File name to search for.
  */
-std::string FileManager::getMusicFile(const std::string& file_name) const
+std::string FileManager::searchMusic(const std::string& file_name) const
 {
     std::string path;
     bool success = findFile(path, file_name, m_music_search_path);
     if(!success)
     {
         // If a music file is not found in any of the music search paths
-        // check all root dirs. This is used by stk_config loading the
+        // check all root dirs. This is used by stk_config to load the
         // title music before any music search path is defined)
-        success = findFile(path, "music/"+file_name, m_root_dirs);
+        path = getAsset(MUSIC, file_name);
+        success = fileExists(path);
     }
     if (!success)
     {
@@ -953,7 +963,7 @@ std::string FileManager::getMusicFile(const std::string& file_name) const
             +file_name+"'.");
     }
     return path;
-}   // getMusicFile
+}   // searchMusic
 
 //-----------------------------------------------------------------------------
 /** Returns true if the given name is a directory.
@@ -976,26 +986,22 @@ bool FileManager::isDirectory(const std::string &path) const
  *  \param result A reference to a std::vector<std::string> which will
  *         hold all files in a directory. The vector will be cleared.
  *  \param dir The director for which to get the directory listing.
- *  \param is_full_path True if directory is already a full path,
- *         otherwise m_root_dir is used.
  *  \param make_full_path If set to true, all listed files will be full paths.
  */
 void FileManager::listFiles(std::set<std::string>& result,
-                            const std::string& dir, bool is_full_path,
+                            const std::string& dir,
                             bool make_full_path) const
 {
     result.clear();
 
-    std::string path = is_full_path ? dir : m_root_dir+dir;
-
 #ifndef ANDROID
-    if(!isDirectory(path))
+    if(!isDirectory(dir))
         return;
 #endif
 
     io::path previous_cwd = m_file_system->getWorkingDirectory();
 
-    if(!m_file_system->changeWorkingDirectoryTo( path.c_str() ))
+    if(!m_file_system->changeWorkingDirectoryTo( dir.c_str() ))
     {
         Log::error("FileManager", "listFiles : Could not change CWD!\n");
         return;
@@ -1004,7 +1010,7 @@ void FileManager::listFiles(std::set<std::string>& result,
 
     for(int n=0; n<(int)files->getFileCount(); n++)
     {
-        result.insert(make_full_path ? path+"/"+ files->getFileName(n).c_str()
+        result.insert(make_full_path ? dir+"/"+ files->getFileName(n).c_str()
                                      : files->getFileName(n).c_str()         );
     }
 

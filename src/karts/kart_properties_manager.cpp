@@ -167,7 +167,7 @@ void KartPropertiesManager::loadAllKarts(bool loading_icon)
         // If not, check each subdir of this directory.
         // --------------------------------------------
         std::set<std::string> result;
-        file_manager->listFiles(result, *dir, /*is_full_path*/ true);
+        file_manager->listFiles(result, *dir);
         for(std::set<std::string>::const_iterator subdir=result.begin();
             subdir!=result.end(); subdir++)
         {

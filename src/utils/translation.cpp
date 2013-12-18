@@ -99,8 +99,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
     {
         std::set<std::string> flist;
         file_manager->listFiles(flist,
-                                file_manager->getAsset(FileManager::TRANSLATION,""),
-                                /*is full path*/true);
+                                file_manager->getAsset(FileManager::TRANSLATION,""));
 
         // English is always there but won't be found on file system
         g_language_list.push_back("en");

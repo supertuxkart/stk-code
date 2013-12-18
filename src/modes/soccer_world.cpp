@@ -424,10 +424,10 @@ void SoccerWorld::initKartList()
     }
 
     //Loading the indicator textures
-    irr::video::ITexture *redTeamTexture = irr_driver->getTexture(
-                                   file_manager->getTextureFile("soccer_player_red.png"));
-    irr::video::ITexture *blueTeamTexture = irr_driver->getTexture(
-                                   file_manager->getTextureFile("soccer_player_blue.png"));
+    irr::video::ITexture *redTeamTexture = 
+              irr_driver->getTexture(FileManager::GUI,"soccer_player_red.png");
+    irr::video::ITexture *blueTeamTexture = 
+            irr_driver->getTexture(FileManager::GUI, "soccer_player_blue.png");
     //Assigning indicators
     for(unsigned int i=0; i<kart_amount; i++)
     {

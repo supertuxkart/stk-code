@@ -97,21 +97,21 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     if (c->isSolved(RaceManager::DIFFICULTY_EASY))
     {
         IconButtonWidget* btn = getWidget<IconButtonWidget>("novice");
-        btn->setImage(file_manager->getTextureFile("cup_bronze.png").c_str(),
+        btn->setImage(file_manager->getAsset(FileManager::GUI, "cup_bronze.png"),
                      IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     }
 
     if (c->isSolved(RaceManager::DIFFICULTY_MEDIUM))
     {
         IconButtonWidget* btn = getWidget<IconButtonWidget>("intermediate");
-        btn->setImage(file_manager->getTextureFile("cup_silver.png").c_str(),
+        btn->setImage(file_manager->getAsset(FileManager::GUI,"cup_silver.png"),
                      IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     }
 
     if (c->isSolved(RaceManager::DIFFICULTY_HARD))
     {
         IconButtonWidget* btn = getWidget<IconButtonWidget>("expert");
-        btn->setImage(file_manager->getTextureFile("cup_gold.png").c_str(),
+        btn->setImage(file_manager->getAsset(FileManager::GUI,"cup_gold.png"),
                      IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     }
 

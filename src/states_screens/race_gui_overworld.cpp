@@ -69,9 +69,9 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_is_first_render_call = true;
     m_close_to_a_challenge = false;
     m_current_challenge = NULL;
-    m_trophy1 = irr_driver->getTexture( file_manager->getTextureFile("cup_bronze.png") );
-    m_trophy2 = irr_driver->getTexture( file_manager->getTextureFile("cup_silver.png") );
-    m_trophy3 = irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") );
+    m_trophy1 = irr_driver->getTexture(FileManager::GUI, "cup_bronze.png");
+    m_trophy2 = irr_driver->getTexture(FileManager::GUI, "cup_silver.png");
+    m_trophy3 = irr_driver->getTexture(FileManager::GUI, "cup_gold.png"  );
 
     const float scaling = irr_driver->getFrameSize().Height / 420.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
@@ -112,8 +112,8 @@ RaceGUIOverworld::RaceGUIOverworld()
     gui::ScalableFont* font = GUIEngine::getFont();
     m_trophy_points_width = font->getDimension(L"1000").Width;
 
-    m_lock = irr_driver->getTexture( file_manager->getTextureFile("gui_lock.png") );
-    m_open_challenge = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,"challenge.png") );
+    m_lock           = irr_driver->getTexture(FileManager::GUI,"gui_lock.png");
+    m_open_challenge = irr_driver->getTexture(FileManager::GUI,"challenge.png");
 
     m_icons[0] = m_lock;
     m_icons[1] = m_open_challenge;

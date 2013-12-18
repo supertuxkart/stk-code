@@ -64,7 +64,8 @@ GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui")
 
     try
     {
-        m_music = music_manager->getMusicInformation(file_manager->getMusicFile("win_theme.music"));
+        std::string path = file_manager->getAsset(FileManager::MUSIC,"win_theme.music");
+        m_music = music_manager->getMusicInformation(path);
     }
     catch (std::exception& e)
     {
@@ -117,7 +118,7 @@ void GrandPrixWin::init()
         core::rect< s32 > iconarea(label_x_from - label_height, y_from,
                                    label_x_from,                y_to);
         IGUIImage* img = GUIEngine::getGUIEnv()->addImage( iconarea );
-        img->setImage( irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") ) );
+        img->setImage( irr_driver->getTexture( FileManager::GUI, "cup_gold.png") );
         img->setScaleImage(true);
         img->setTabStop(false);
         img->setUseAlphaChannel(true);
@@ -125,7 +126,7 @@ void GrandPrixWin::init()
         core::rect< s32 > icon2area(label_x_to,                y_from,
                                     label_x_to + label_height, y_to);
         img = GUIEngine::getGUIEnv()->addImage( icon2area );
-        img->setImage( irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") ) );
+        img->setImage( irr_driver->getTexture( FileManager::GUI,"cup_gold.png") );
         img->setScaleImage(true);
         img->setTabStop(false);
         img->setUseAlphaChannel(true);
@@ -153,8 +154,8 @@ void GrandPrixWin::init()
     m_sky_angle = 0.0f;
     m_global_time = 0.0f;
 
-    video::ITexture *t = irr_driver->getTexture(
-                                file_manager->getTextureFile("clouds.png"));
+    video::ITexture *t = irr_driver->getTexture(FileManager::TEXTURE,
+                                                "clouds.png          ");
     m_sky = irr_driver->addSkyDome(t,
                                    16 /* hori_res */, 16 /* vert_res */,
                                    1.0f /* texture_percent */,

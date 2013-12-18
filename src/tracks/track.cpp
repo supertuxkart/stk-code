@@ -463,7 +463,7 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
         {
             try
             {
-                std::string shared_name = file_manager->getMusicFile(filenames[i]);
+                std::string shared_name = file_manager->searchMusic(filenames[i]);
                 if(shared_name!="")
                     mi = music_manager->getMusicInformation(shared_name);
             }

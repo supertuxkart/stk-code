@@ -57,7 +57,7 @@ UnlockManager::UnlockManager()
     // ----------------------------------------
     std::set<std::string> result;
     std::string challenge_dir = file_manager->getAsset(FileManager::CHALLENGE, "");
-    file_manager->listFiles(result, challenge_dir, /*full_path*/true);
+    file_manager->listFiles(result, challenge_dir);
     for(std::set<std::string>::iterator i  = result.begin();
                                         i != result.end()  ; i++)
     {
@@ -113,7 +113,7 @@ void UnlockManager::readAllChallengesInDirs(const std::vector<std::string>* all_
         dir != all_dirs->end(); dir++)
     {
         std::set<std::string> all_files;
-        file_manager->listFiles(all_files, *dir, /*is_full_path*/ true);
+        file_manager->listFiles(all_files, *dir);
 
         for(std::set<std::string>::iterator file = all_files.begin();
             file != all_files.end(); file++)

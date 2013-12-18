@@ -50,6 +50,7 @@ class ShadowImportanceProvider;
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/wind.hpp"
+#include "io/file_manager.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
@@ -210,6 +211,11 @@ public:
     void displayFPS();
     bool                  OnEvent(const irr::SEvent &event);
     void                  setAmbientLight(const video::SColor &light);
+    video::ITexture      *getTexture(FileManager::AssetType type, 
+                                     const std::string &filename,
+                                     bool is_premul=false,
+                                     bool is_prediv=false,
+                                     bool complain_if_not_found=true);
     video::ITexture      *getTexture(const std::string &filename,
                                      bool is_premul=false,
                                      bool is_prediv=false,

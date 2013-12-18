@@ -444,8 +444,8 @@ void IrrDriver::initDevice()
         sphere->drop();
 
         m_lensflare = new scene::CLensFlareSceneNode(NULL, m_scene_manager, -1);
-        video::ITexture * const tex =
-            m_video_driver->getTexture((file_manager->getTextureFile("lensflare.png")).c_str());
+        video::ITexture * const tex = getTexture(FileManager::TEXTURE,
+                                                 "lensflare.png"      );
         if (!tex) Log::fatal("irr_driver", "Cannot find lens flare texture");
         m_lensflare->setMaterialTexture(0, tex);
         m_lensflare->setAutomaticCulling(scene::EAC_OFF);
@@ -1175,6 +1175,28 @@ void IrrDriver::unsetTextureErrorMessage()
 {
     m_texture_error_message = "";
 }   // unsetTextureErrorMessage
+
+// ----------------------------------------------------------------------------
+/** Loads a texture from a file and returns the texture object. This is just
+ *  a convenient wrapper which loads the texture from a STK asset directory.
+ *  It calls the file manager to get the full path, then calls the normal
+ *  getTexture() function.s
+ *  \param type The FileManager::AssetType of the texture.
+ *  \param filename File name of the texture to load.
+ *  \param is_premul If the alpha values needd to be multiplied for
+ *         all pixels.
+ *  \param is_prediv If the alpha value needs to be divided into
+ *         each pixel.
+ */
+video::ITexture *IrrDriver::getTexture(FileManager::AssetType type,
+                                       const std::string &filename,
+                                       bool is_premul,
+                                       bool is_prediv,
+                                       bool complain_if_not_found)
+{
+    const std::string path = file_manager->getAsset(type, filename);
+    return getTexture(path, is_premul, is_prediv, complain_if_not_found);
+}   // getTexture
 
 // ----------------------------------------------------------------------------
 /** Loads a texture from a file and returns the texture object.

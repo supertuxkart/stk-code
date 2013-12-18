@@ -144,8 +144,8 @@ void PlayerNameSpinner::markAsIncorrect()
 
     m_incorrect = true;
 
-    irr::video::ITexture* texture = irr_driver->getTexture(
-                                        file_manager->getTextureFile("red_mark.png") );
+    irr::video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+                                                           "red_mark.png"   );
     const int mark_size = m_h;
     const int mark_x = m_w - mark_size*2;
     const int mark_y = 0;

@@ -418,7 +418,7 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
 {
     const std::string &full_path = is_full_path
                                  ? m_texname
-                                 : file_manager->getTextureFile(m_texname);
+                                 : file_manager->searchTexture(m_texname);
 
     if (complain_if_not_found && full_path.size() == 0)
     {
@@ -838,7 +838,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         {
         m->MaterialType = irr_driver->getShader(ES_CAUSTICS);
 
-        m->setTexture(1, irr_driver->getTexture(file_manager->getTextureFile("caustics.png")));
+        m->setTexture(1, irr_driver->getTexture(FileManager::SHADER,
+                                                "caustics.png"));
         }
 
 
@@ -879,8 +880,10 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         if (irr_driver->isGLSL())
         {
-            m->setTexture(1, irr_driver->getTexture(file_manager->getTextureFile("waternormals.jpg")));
-            m->setTexture(2, irr_driver->getTexture(file_manager->getTextureFile("waternormals2.jpg")));
+            m->setTexture(1, irr_driver->getTexture(FileManager::TEXTURE,
+                                                    "waternormals.jpg"));
+            m->setTexture(2, irr_driver->getTexture(FileManager::TEXTURE,
+                                                    "waternormals2.jpg"));
 
             ((WaterShaderProvider *) irr_driver->getCallback(ES_WATER))->
                 setSpeed(m_water_shader_speed_1/100.0f, m_water_shader_speed_2/100.0f);

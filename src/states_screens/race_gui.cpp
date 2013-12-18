@@ -225,10 +225,10 @@ void RaceGUI::drawScores()
     static video::SColor color = video::SColor(255,255,255,255);
 
     //Draw kart icons above score(denoting teams)
-    irr::video::ITexture *red_team = irr_driver->getTexture(
-        file_manager->getTextureFile("soccer_ball_red.png"));
-    irr::video::ITexture *blue_team = irr_driver->getTexture(
-        file_manager->getTextureFile("soccer_ball_blue.png"));
+    irr::video::ITexture *red_team = irr_driver->getTexture(FileManager::GUI,
+                                                            "soccer_ball_red.png");
+    irr::video::ITexture *blue_team = irr_driver->getTexture(FileManager::GUI,
+                                                             "soccer_ball_blue.png");
     irr::video::ITexture *team_icon;
 
     int numLeader = 1;

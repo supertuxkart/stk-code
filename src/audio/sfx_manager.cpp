@@ -19,6 +19,7 @@
 #include "audio/dummy_sfx.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_buffer.hpp"
+#include "io/file_manager.hpp"
 
 #include <stdexcept>
 #include <algorithm>
@@ -148,7 +149,7 @@ void SFXManager::loadSfx()
     XMLNode* root = file_manager->createXMLTree(sfx_config_name);
     if (!root || root->getName()!="sfx-config")
     {
-        Log::error("SFXManager", "Could not read sounf effects XML file '%s'.",
+        Log::fatal("SFXManager", "Could not read sound effects XML file '%s'.",
                    sfx_config_name.c_str());
     }
 

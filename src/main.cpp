@@ -1253,17 +1253,15 @@ void initRest()
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
 
-    GUIEngine::addLoadingIcon(
-        irr_driver->getTexture(file_manager->getTextureFile("notes.png")) );
+    GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI, 
+                                                     "notes.png"      ) );
 
     grand_prix_manager      = new GrandPrixManager     ();
     // Consistency check for challenges, and enable all challenges
     // that have all prerequisites fulfilled
     grand_prix_manager->checkConsistency();
-    std::string file = file_manager->getTextureFile("cup_gold.png");
-    if(file.size()==0)
-        Log::fatal("main", "Can not find cup_gold.png, aborting.");
-    GUIEngine::addLoadingIcon( irr_driver->getTexture(file) );
+    GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+                                                      "cup_gold.png"    ) );
 
     race_manager            = new RaceManager          ();
     // default settings for Quickstart
@@ -1395,15 +1393,13 @@ int main(int argc, char *argv[] )
         input_manager->setMode(InputManager::MENU);
         main_loop = new MainLoop();
         material_manager        -> loadMaterial    ();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                           file_manager->getAsset(FileManager::GUI,"options_video.png")) );
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+                                                          "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
         handleXmasMode();
         unlock_manager          = new UnlockManager();
-        std::string file = file_manager->getTextureFile("gui_lock.png");
-        if(file.size()==0)
-            Log::fatal("main", "Can not find gui_lock.png, aborting.");
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(file));
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI, 
+                                                          "gui_lock.png"  ) );
         projectile_manager      -> loadData        ();
 
         // Both item_manager and powerup_manager load models and therefore
@@ -1425,15 +1421,15 @@ int main(int argc, char *argv[] )
         powerup_manager         -> loadAllPowerups ();
         ItemManager::loadDefaultItemMeshes();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                                    file_manager->getAsset(FileManager::GUI,"gift.png")) );
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+                                                          "gift.png")       );
 
         file_manager->popTextureSearchPath();
 
         attachment_manager      -> loadModels      ();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(
-            file_manager->getAsset(FileManager::GUI,"banana.png")) );
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+                                                          "banana.png")    );
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);

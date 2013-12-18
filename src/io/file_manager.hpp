@@ -47,11 +47,10 @@ public:
     /** The various asset types (and directories) STK might request.
      *  The last entry ASSET_COUNT specifies the number of entries. */
     enum AssetType {ASSET_MIN, 
-                    TEXTURE=ASSET_MIN, 
-                    CHALLENGE, FONT, GFX, 
-                    GRANDPRIX, GUI, SKIN, MODEL, MUSIC,
-                    TRANSLATION, SFX, SHADER,
-                    ASSET_MAX = SHADER,
+                    CHALLENGE=ASSET_MIN, 
+                    FONT, GFX, GRANDPRIX, GUI, MODEL, MUSIC,
+                    SFX, SHADER, SKIN, TEXTURE, TRANSLATION, 
+                    ASSET_MAX = TRANSLATION,
                     ASSET_COUNT};
 private:
 
@@ -66,9 +65,6 @@ private:
 
     /** Directory where addons are stored. */
     std::string       m_addons_dir;
-
-    /** Root data directory. */
-    std::string       m_root_dir;
 
     /** The list of all root directories. */
     static std::vector<std::string> m_root_dirs;
@@ -121,13 +117,12 @@ public:
                                 bool abort_on_error=false) const;
     std::string getAsset(AssetType type, const std::string &name) const;
     std::string getAsset(const std::string &name) const;
-    std::string getMusicFile(const std::string& file_name) const;
 
-    std::string getTextureFile   (const std::string& fname) const;
+    std::string searchMusic(const std::string& file_name) const;
+    std::string searchTexture(const std::string& fname) const;
     std::string getUserConfigFile(const std::string& fname) const;
     void        listFiles        (std::set<std::string>& result,
                                   const std::string& dir,
-                                  bool is_full_path=false,
                                   bool make_full_path=false) const;
 
 

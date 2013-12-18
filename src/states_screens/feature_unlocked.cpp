@@ -257,12 +257,12 @@ void FeatureUnlockedCutScene::init()
     m_global_time = 0.0f;
 
     std::vector<std::string> texture_names(6);
-    texture_names[0] = file_manager->getTextureFile("purplenebula.jpg");
-    texture_names[1] = file_manager->getTextureFile("purplenebula2.png");
-    texture_names[2] = file_manager->getTextureFile("purplenebula.jpg");
-    texture_names[3] = file_manager->getTextureFile("purplenebula2.png");
-    texture_names[4] = file_manager->getTextureFile("purplenebula.jpg");
-    texture_names[5] = file_manager->getTextureFile("purplenebula2.png");
+    texture_names[0] = file_manager->getAsset(FileManager::TEXTURE, "purplenebula.jpg");
+    texture_names[1] = file_manager->getAsset(FileManager::TEXTURE, "purplenebula2.png");
+    texture_names[2] = file_manager->getAsset(FileManager::TEXTURE, "purplenebula.jpg");
+    texture_names[3] = file_manager->getAsset(FileManager::TEXTURE, "purplenebula2.png");
+    texture_names[4] = file_manager->getAsset(FileManager::TEXTURE, "purplenebula.jpg");
+    texture_names[5] = file_manager->getAsset(FileManager::TEXTURE, "purplenebula2.png");
     std::vector<video::ITexture*> textures;
     for(unsigned int i=0; i<texture_names.size(); i++)
     {

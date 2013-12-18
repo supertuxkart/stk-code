@@ -133,8 +133,7 @@ void MusicManager::loadMusicInformation()
 void MusicManager::loadMusicFromOneDir(const std::string& dir)
 {
     std::set<std::string> files;
-    file_manager->listFiles(files, dir, /*is_full_path*/ true,
-                            /*make_full_path*/ true);
+    file_manager->listFiles(files, dir, /*is_full_path*/ true);
     for(std::set<std::string>::iterator i  = files.begin();
                                         i != files.end(); ++i)
     {

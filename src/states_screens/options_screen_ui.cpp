@@ -71,7 +71,7 @@ void OptionsScreenUI::loadedFromFile()
 
     std::set<std::string> skinFiles;
     file_manager->listFiles(skinFiles /* out */, file_manager->getAsset(FileManager::SKIN,""),
-                            true /* is full path */, true /* make full path */ );
+                            true /* make full path */ );
 
     for (std::set<std::string>::iterator it = skinFiles.begin(); it != skinFiles.end(); it++)
     {
