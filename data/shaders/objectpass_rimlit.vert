@@ -9,7 +9,7 @@ void main() {
 	eyenor = gl_NormalMatrix * gl_Normal;
 	viewpos = -normalize((gl_ModelViewMatrix * gl_Vertex).xyz);
 
-	gl_TexCoord[0] = gl_MultiTexCoord0;
+	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
 	gl_Position = ftransform();
 	gl_FrontColor = gl_Color;
 }

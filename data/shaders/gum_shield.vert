@@ -29,7 +29,7 @@ varying vec3 normal;
 
 void main()
 {
-	gl_TexCoord[0] = gl_MultiTexCoord0;
+	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
 	vec4 viewp = gl_ModelViewMatrix * gl_Vertex;
 
 	eyeVec = normalize(-viewp).xyz;
