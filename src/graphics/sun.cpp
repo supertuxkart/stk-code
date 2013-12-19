@@ -88,7 +88,6 @@ void SunNode::render()
     cb->setColor(m_color[0], m_color[1], m_color[2]);
 
     vector3df pos = getPosition();
-    pos.normalize();
     cb->setPosition(pos.X, pos.Y, pos.Z);
 
     if (!UserConfigParams::m_shadows || !World::getWorld()->getTrack()->hasShadows())

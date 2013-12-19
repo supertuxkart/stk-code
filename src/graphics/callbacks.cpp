@@ -31,24 +31,15 @@ void NormalMapProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     if (!firstdone)
     {
-        s32 decaltex = 0;
-        srv->setPixelShaderConstant("DecalTex", &decaltex, 1);
+        s32 texture = 0;
+        srv->setPixelShaderConstant("texture", &texture, 1);
 
-        s32 bumptex = 1;
-        srv->setPixelShaderConstant("BumpTex", &bumptex, 1);
-
-        s32 lightmapTex = (m_with_lightmap ? 2 : 0);
-        srv->setPixelShaderConstant("LightMapTex", &lightmapTex, 1);
-
-        s32 hasLightMap = (m_with_lightmap ? 1 : 0);
-        srv->setPixelShaderConstant("HasLightMap", &hasLightMap, 1);
+        s32 normaltex = 1;
+        srv->setPixelShaderConstant("normalMap", &normaltex, 1);
 
         // We could calculate light direction as coming from the sun (then we'd need to
         // transform it into camera space). But I find that pretending light
         // comes from the camera gives good results
-        const float lightdir[] = {0.1852f, -0.1852f, -0.9259f};
-        srv->setVertexShaderConstant("lightdir", lightdir, 3);
-
 
         firstdone = true;
     }
@@ -122,14 +113,6 @@ void GrassShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int use
     const float camfar = irr_driver->getSceneManager()->getActiveCamera()->getFarValue();
     srv->setVertexShaderConstant("far", &camfar, 1);
 
-    // The normal is transformed by the inverse transposed world matrix
-    // because we want world-space normals
-    matrix4 invtworldm = irr_driver->getVideoDriver()->getTransform(ETS_WORLD);
-    invtworldm.makeInverse();
-    invtworldm = invtworldm.getTransposed();
-
-    srv->setVertexShaderConstant("invtworldm", invtworldm.pointer(), 16);
-
     float objectid = 0;
     const stringc name = mat.TextureLayer[0].Texture->getName().getPath();
     objectid = shash8((const u8 *) name.c_str(), name.size()) / 255.0f;
@@ -184,14 +167,6 @@ void SplattingProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     const float camfar = irr_driver->getSceneManager()->getActiveCamera()->getFarValue();
     srv->setVertexShaderConstant("far", &camfar, 1);
-
-    // The normal is transformed by the inverse transposed world matrix
-    // because we want world-space normals
-    matrix4 invtworldm = irr_driver->getVideoDriver()->getTransform(ETS_WORLD);
-    invtworldm.makeInverse();
-    invtworldm = invtworldm.getTransposed();
-
-    srv->setVertexShaderConstant("invtworldm", invtworldm.pointer(), 16);
 
     float objectid = 0;
     const stringc name = mat.TextureLayer[0].Texture->getName().getPath();
@@ -352,14 +327,6 @@ void ObjectPassProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     const float camfar = irr_driver->getSceneManager()->getActiveCamera()->getFarValue();
     srv->setVertexShaderConstant("far", &camfar, 1);
 
-    // The normal is transformed by the inverse transposed world matrix
-    // because we want world-space normals
-    matrix4 invtworldm = irr_driver->getVideoDriver()->getTransform(ETS_WORLD);
-    invtworldm.makeInverse();
-    invtworldm = invtworldm.getTransposed();
-
-    srv->setVertexShaderConstant("invtworldm", invtworldm.pointer(), 16);
-
     const int hastex = mat.TextureLayer[0].Texture != NULL;
     srv->setVertexShaderConstant("hastex", &hastex, 1);
 
@@ -405,10 +372,9 @@ void PointLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     srv->setVertexShaderConstant("screen", m_screen, 2);
     srv->setVertexShaderConstant("spec", &m_specular, 1);
     srv->setVertexShaderConstant("col", m_color, 3);
-    srv->setVertexShaderConstant("campos", m_campos, 3);
     srv->setVertexShaderConstant("center", m_pos, 3);
     srv->setVertexShaderConstant("r", &m_radius, 1);
-    srv->setVertexShaderConstant("invprojview", m_invprojview.pointer(), 16);
+    srv->setVertexShaderConstant("invproj", m_invproj.pointer(), 16);
 
     if (!firstdone)
     {
@@ -432,7 +398,7 @@ void SunLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     srv->setVertexShaderConstant("screen", m_screen, 2);
     srv->setVertexShaderConstant("col", m_color, 3);
     srv->setVertexShaderConstant("center", m_pos, 3);
-    srv->setVertexShaderConstant("invprojview", m_invprojview.pointer(), 16);
+    srv->setVertexShaderConstant("invproj", m_invproj.pointer(), 16);
     srv->setVertexShaderConstant("hasclouds", &hasclouds, 1);
 
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
