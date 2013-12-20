@@ -539,8 +539,18 @@ public:
 
 class SSAOProvider: public CallBase
 {
+private:
+    core::matrix4 projm, invprojm;
 public:
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
+    void updateIPVMatrix()
+    {
+        // Update the IPV matrix, only once per frame since it's costly
+        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
+
+        projm = drv->getTransform(video::ETS_PROJECTION);
+        projm.getInverse(invprojm);
+    }
 };
 
 //

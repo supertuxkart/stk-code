@@ -695,6 +695,9 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     FogProvider * const fogcb = (FogProvider *) irr_driver->
                                         getCallback(ES_FOG);
     fogcb->updateIPVMatrix();
+    SSAOProvider * const ssaocb = (SSAOProvider *) irr_driver->
+                                        getCallback(ES_SSAO);
+    ssaocb->updateIPVMatrix();
 
 
     const u32 lightcount = m_lights.size();

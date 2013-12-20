@@ -1,78 +1,59 @@
 #version 120
 
-uniform sampler2D tex;
-uniform sampler2D oldtex;
+uniform sampler2D normals_and_depth;
+uniform sampler2D depth;
+uniform mat4 invprojm;
+uniform mat4 projm;
+uniform vec4 samplePoints[16];
 
-const float totStrength = 2.38;
-const float strength = 0.07;
-const float falloff = 0.000002;
+const float strengh = 1.;
+const float radius = 0.1f;
+const float threshold = 0.1;
 
 #define SAMPLES 16
 
-const float invSamples = 1.0 / SAMPLES;
+const float invSamples = strengh / SAMPLES;
+
+float decdepth(vec4 rgba) {
+	return dot(rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0));
+}
 
 void main(void)
 {
 	// A set of Random(tm) vec2's. 8 1s, 6 0.7s, 2 0.4
 	// Again not using const because of broken Intel Windows drivers
-	vec2 vecs[16] = vec2[](vec2(0.43589, -0.9), vec2(-0.9, 0.43589),
-					vec2(-0.8, -0.6), vec2(0.6, 0.8),
-					vec2(0.866025, -0.5), vec2(-0.5, 0.866025),
-					vec2(-0.3, -0.953939), vec2(0.953939, 0.3),
-					vec2(0.3, -0.781025), vec2(-0.781025, 0.3),
-					vec2(-0.56, -0.621611), vec2(0.621611, 0.56),
-					vec2(0.734847, -0.4), vec2(-0.4, 0.734847),
-					vec2(-0.2, -0.6), vec2(0.6, 0.2));
+
 
 	vec2 uv = gl_TexCoord[0].xy;
 
-	vec4 cur = texture2D(tex, uv);
-	float curdepth = cur.a;
-
-	// Will we skip this pixel? (if it's the sky)
-	float len = dot(vec3(1.0), abs(cur.xyz));
-	if (len < 0.2 || curdepth > 0.8) discard;
-
-	float mytotstrength = 3.0 * totStrength * curdepth * (1.0 - curdepth);
+	vec4 cur = texture2D(normals_and_depth, uv);
+	float curdepth = decdepth(vec4(texture2D(depth, uv).xyz, 0.0));
+	vec4 FragPos = invprojm * (2.0f * vec4(uv, curdepth, 1.0f) - 1.0f);
+	FragPos /= FragPos.w;
 
 	// get the normal of current fragment
 	vec3 norm = normalize(cur.xyz * vec3(2.0) - vec3(1.0));
+	if (curdepth > 0.99) discard;
+	vec3 tangent = normalize(cross(norm, norm.yzx));
+	vec3 bitangent = cross(norm, tangent);
 
 	float bl = 0.0;
 
-	// adjust for the depth, 0.1 close, 0.01 far
-	float radD = 0.10 - 0.09 * smoothstep(0.0, 0.2, curdepth);
-
 	for(int i = 0; i < SAMPLES; ++i) {
-
-		vec2 ray = uv + radD * vecs[i];
+		vec3 sampleDir = samplePoints[i].x * tangent + samplePoints[i].y * bitangent + samplePoints[i].z * norm;
+		vec4 samplePos = FragPos + radius * vec4(sampleDir, 0.0);
+		vec4 sampleProj = projm * samplePos;
+		sampleProj /= sampleProj.w;
 
 		// get the depth of the occluder fragment
-		vec4 occluderFragment = texture2D(tex, ray);
-		float normAcceptable = step(0.2, dot(vec3(1.0), abs(occluderFragment.xyz)));
+		float occluderFragmentDepth = decdepth(vec4(texture2D(depth, (sampleProj.xy * 0.5) + 0.5).xyz, 0.0));
 
-		// get the normal of the occluder fragment
-		vec3 occNorm = normalize(occluderFragment.xyz * vec3(2.0) - vec3(1.0));
-
-		// if depthDifference is negative = occluder is behind current fragment
-		float depthDifference = curdepth - occluderFragment.a;
-
-		// calculate the difference between the normals as a weight
-		float normDiff = 1.0 - max(dot(occNorm, norm), 0.0);
-		normDiff = smoothstep(0.1, 0.3, normDiff);
-
-		// the falloff equation, starts at falloff and is kind of 1/x^2 falling
-		bl += step(falloff, depthDifference) * normDiff * normAcceptable *
-			(1.0 - smoothstep(falloff, strength, depthDifference));
+		float depthDifference = sampleProj.z - (2. * occluderFragmentDepth - 1.0);
+		bl += (abs(depthDifference) < threshold) ? step(0., depthDifference) : 0.0;
 	}
 
 	// output the result
-	float ao = 1.0 - mytotstrength * bl * invSamples;
-
-	// Mix with old result to avoid flicker
-	float oldao = texture2D(oldtex, uv).x;
-
-	ao = mix(ao, oldao, 0.3);
+	float ao = 1.0 - bl * invSamples;
 
 	gl_FragColor = vec4(vec3(ao), curdepth + 0.05); // offset so that the alpha test doesn't kill us
 }
