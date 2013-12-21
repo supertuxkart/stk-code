@@ -342,7 +342,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         // as animated mesh are not cheap to render use frustum box culling
         node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
 
-        lod_node->add(50, node, true);
+        lod_node->add(20, node, true);
         scene::ISceneNode* static_model = attachModel(false);
         lod_node->add(500, static_model, true);
         m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
