@@ -162,6 +162,9 @@ void SoccerWorld::update(float dt)
 //-----------------------------------------------------------------------------
 void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 {
+    if (isRaceOver())
+        return;
+
     if (m_can_score_points)
     {
         m_team_goals[first_goal ? 0 : 1]++;

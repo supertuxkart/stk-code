@@ -198,22 +198,26 @@ void SoccerSetupScreen::init()
     
     if (UserConfigParams::m_num_goals <= 0)
         UserConfigParams::m_num_goals = 3;
+        
+    if (UserConfigParams::m_soccer_time_limit <= 0)
+        UserConfigParams::m_soccer_time_limit = 3;
 
     SpinnerWidget*  goalamount = getWidget<SpinnerWidget>("goalamount");
     goalamount->setValue(UserConfigParams::m_num_goals);
-    goalamount->setDeactivated();
+    goalamount->setActivated();
 
     SpinnerWidget* timeAmount = getWidget<SpinnerWidget>("timeamount");
-    timeAmount->setValue(timeAmount->getMin());
+    timeAmount->setValue(UserConfigParams::m_soccer_time_limit);
+    timeAmount->setDeactivated();
 
     CheckBoxWidget* timeEnabled = getWidget<CheckBoxWidget>("time_enabled");
+    timeEnabled->setState(false);
 
     // Set focus on "continue"
-    ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
+    ButtonWidget* bt_continue = getWidget<ButtonWidget>("continue");
     bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
     // We need players to be able to choose their teams
-    //~ input_manager->getDeviceList()->setAssignMode(ASSIGN);
     input_manager->setMasterPlayerOnly(false);
 
     // This flag will cause that a 'fire' event will be mapped to 'select' (if
@@ -231,6 +235,7 @@ void SoccerSetupScreen::tearDown()
     input_manager->getDeviceList()->mapFireToSelect(false);
     
     UserConfigParams::m_num_goals = getWidget<SpinnerWidget>("goalamount")->getValue();
+    UserConfigParams::m_soccer_time_limit = getWidget<SpinnerWidget>("timeamount")->getValue();
 
     // Remove all ModelViewWidgets we created manually
     PtrVector<Widget>&  children = central_div->getChildren();
