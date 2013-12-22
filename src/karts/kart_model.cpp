@@ -344,7 +344,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
 
         lod_node->add(20, node, true);
         scene::ISceneNode* static_model = attachModel(false);
-        lod_node->add(500, static_model, true);
+        lod_node->add(100, static_model, true);
         m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
 
         attachHat();
