@@ -2,7 +2,7 @@
 
     <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 
-    <div x="5%" y="5%" width="95%" height="95%" layout="vertical-row" >
+    <div x="5%" y="5%" width="90%" height="90%" layout="vertical-row" >
 
         <header width="80%" text="Race Setup" align="center" text_align="center" />
         
@@ -34,7 +34,7 @@
         <bright height="15" width="25" I18N="In soccer setup menu" text="Use left/right to choose your team and press fire" text_align="center" align="center" />
         
         <div id="central_div" layout="horizontal-row" width="100%" proportion="1" align="center">
-            <roundedbox x="2%" y="5%" proportion="1" layout="horizontal-row" height="100%">
+            <roundedbox y="5%" width="100%" layout="horizontal-row" height="100%">
                 <!-- Content is added programmatically -->
             </roundedbox>
             <header id="vs" text="VS"/>     <!-- Layout is done programmatically -->
