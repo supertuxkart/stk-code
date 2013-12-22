@@ -6,9 +6,8 @@ uniform mat4 invprojm;
 uniform mat4 projm;
 uniform vec4 samplePoints[16];
 
-const float strengh = 1.;
-const float radius = 0.1f;
-const float threshold = 0.1;
+const float strengh = 4.;
+const float radius = .1f;
 
 #define SAMPLES 16
 
@@ -33,7 +32,9 @@ void main(void)
 
 	// get the normal of current fragment
 	vec3 norm = normalize(cur.xyz * vec3(2.0) - vec3(1.0));
-	if (curdepth > 0.99) discard;
+	// Workaround for nvidia and skyboxes
+	float len = dot(vec3(1.0), abs(cur.xyz));
+	if (len < 0.2 || curdepth > 0.999) discard;
 	vec3 tangent = normalize(cross(norm, norm.yzx));
 	vec3 bitangent = cross(norm, tangent);
 
@@ -47,9 +48,12 @@ void main(void)
 
 		// get the depth of the occluder fragment
 		float occluderFragmentDepth = decdepth(vec4(texture2D(depth, (sampleProj.xy * 0.5) + 0.5).xyz, 0.0));
+		// Position of the occluder fragment in worldSpace
+		vec4 occluderPos = invprojm * vec4(sampleProj.xy, 2.0 * occluderFragmentDepth - 1.0, 1.0f);
+		occluderPos /= occluderPos.w;
 
 		float depthDifference = sampleProj.z - (2. * occluderFragmentDepth - 1.0);
-		bl += (abs(depthDifference) < threshold) ? step(0., depthDifference) : 0.0;
+		bl += (distance(occluderPos, FragPos) < radius) ? step(0., depthDifference) : 0.0;
 	}
 
 	// output the result
