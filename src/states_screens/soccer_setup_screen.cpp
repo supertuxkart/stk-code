@@ -468,7 +468,7 @@ void SoccerSetupScreen::updateKartViewsLayout()
 
         const int cur_col = cur_kart_per_team[team] % nb_columns;
         int nb_karts_in_this_row = (nb_karts_per_team[team] - cur_row*nb_columns) % nb_columns;
-        if(nb_karts_in_this_row == 0)
+        if(nb_karts_in_this_row == 0 || nb_karts_per_team[team] > 1)
             nb_karts_in_this_row = nb_columns;  // TODO: not sure of the computation here...
         const int pos_x = center_x_per_team[team] + cur_col*kart_view_size - nb_karts_in_this_row*kart_view_size/2;
         cur_kart_per_team[team]++;
