@@ -39,6 +39,8 @@ void main(void)
 		vec4 samplePos = FragPos + radius * vec4(sampleDir, 0.0);
 		vec4 sampleProj = projm * samplePos;
 		sampleProj /= sampleProj.w;
+		// Projection of sampleDir over nom
+		float cosTheta = samplePoints[i].z;
 
 		// get the depth of the occluder fragment
 		float occluderFragmentDepth = texture2D(normals_and_depth, (sampleProj.xy * 0.5) + 0.5).a;
@@ -49,7 +51,7 @@ void main(void)
 		float depthDifference = sampleProj.z - (2. * occluderFragmentDepth - 1.0);
 		// depthDifference between 0 and radius
 		float increment = step(0., depthDifference) * step(-radius, -depthDifference);
-		bl += increment * smoothstep(radius, 0, distance(samplePos, FragPos));
+		bl += increment * smoothstep(radius, 0, distance(samplePos, FragPos)) * cosTheta;
 	}
 
 	// output the result
