@@ -203,102 +203,7 @@ void PostProcessing::renderSolid(const u32 cam)
 {
     if (!irr_driver->isGLSL()) return;
 
-    // Early out: do nothing if at all possible
-    if (UserConfigParams::m_ssao < 1 && !World::getWorld()->getTrack()->isFogEnabled())
-        return;
-
-    static u8 tick = 0;
-
     IVideoDriver * const drv = irr_driver->getVideoDriver();
-    drv->setTransform(ETS_WORLD, core::IdentityMatrix);
-    drv->setTransform(ETS_VIEW, core::IdentityMatrix);
-    drv->setTransform(ETS_PROJECTION, core::IdentityMatrix);
-
-    GaussianBlurProvider * const gacb = (GaussianBlurProvider *) irr_driver->
-                                                                 getCallback(ES_GAUSSIAN3H);
-
-
-    if (UserConfigParams::m_ssao == 1) // SSAO low
-    {
-        m_material.MaterialType = irr_driver->getShader(ES_SSAO);
-        m_material.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
-
-        drv->setRenderTarget(irr_driver->getRTT(RTT_SSAO), true, false,
-                             SColor(255, 255, 255, 255));
-
-        drawQuad(cam, m_material);
-
-        // Blur it to reduce noise.
-    {
-            gacb->setResolution(UserConfigParams::m_width / 4,
-                                UserConfigParams::m_height / 4);
-            m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3V);
-            m_material.setTexture(0, irr_driver->getRTT(RTT_SSAO));
-            drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER2), true, false);
-
-            drawQuad(cam, m_material);
-
-            m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3H);
-            m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER2));
-            drv->setRenderTarget(irr_driver->getRTT(RTT_SSAO), false, false);
-
-            drawQuad(cam, m_material);
-    }
-
-        // Overlay
-        m_material.MaterialType = EMT_ONETEXTURE_BLEND;
-        m_material.setTexture(0, irr_driver->getRTT(RTT_SSAO));
-        m_material.setTexture(1, 0);
-        m_material.BlendOperation = EBO_ADD;
-        m_material.MaterialTypeParam = pack_textureBlendFunc(EBF_DST_COLOR, EBF_ZERO);
-
-        drv->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
-        drawQuad(cam, m_material);
-
-        m_material.BlendOperation = EBO_NONE;
-        m_material.MaterialTypeParam = 0;
-
-    } else if (UserConfigParams::m_ssao == 2) // SSAO high
-    {
-        m_material.MaterialType = irr_driver->getShader(ES_SSAO);
-        m_material.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
-
-        drv->setRenderTarget(irr_driver->getRTT(RTT_SSAO), true, false,
-                             SColor(255, 255, 255, 255));
-
-        drawQuad(cam, m_material);
-
-        // Blur it to reduce noise.
-        {
-            gacb->setResolution(UserConfigParams::m_width,
-                                UserConfigParams::m_height);
-            m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN6V);
-            m_material.setTexture(0, irr_driver->getRTT(RTT_SSAO));
-            drv->setRenderTarget(irr_driver->getRTT(RTT_TMP3), true, false);
-
-            drawQuad(cam, m_material);
-
-            m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN6H);
-            m_material.setTexture(0, irr_driver->getRTT(RTT_TMP3));
-            drv->setRenderTarget(irr_driver->getRTT(RTT_SSAO), false, false);
-
-            drawQuad(cam, m_material);
-        }
-
-        // Overlay
-        m_material.MaterialType = EMT_ONETEXTURE_BLEND;
-        m_material.setTexture(0, irr_driver->getRTT(RTT_SSAO));
-        m_material.setTexture(1, 0);
-        m_material.BlendOperation = EBO_ADD;
-        m_material.MaterialTypeParam = pack_textureBlendFunc(EBF_DST_COLOR, EBF_ZERO);
-
-        drv->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
-        drawQuad(cam, m_material);
-
-        m_material.BlendOperation = EBO_NONE;
-        m_material.MaterialTypeParam = 0;
-    }
-    
     if (World::getWorld()->getTrack()->isFogEnabled())
     {
         m_material.MaterialType = irr_driver->getShader(ES_FOG);
@@ -314,11 +219,6 @@ void PostProcessing::renderSolid(const u32 cam)
         m_material.BlendOperation = EBO_NONE;
         m_material.MaterialTypeParam = 0;
     }
-
-    
-
-    tick++;
-    tick %= 2;
 }
 
 // ----------------------------------------------------------------------------

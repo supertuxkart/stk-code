@@ -765,6 +765,47 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 
     } // for i in lights
 
+    // Handle SSAO
+    SMaterial m_material;
+    GaussianBlurProvider * const gacb = (GaussianBlurProvider *) irr_driver->
+                                                               getCallback(ES_GAUSSIAN3H);
+
+    m_material.ZWriteEnable = false;
+    m_material.MaterialType = irr_driver->getShader(ES_SSAO);
+    m_material.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
+
+    m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_SSAO), true, false,
+                         SColor(255, 255, 255, 255));
+
+    m_post_processing->drawQuad(cam, m_material);
+
+    // Blur it to reduce noise.
+    if(UserConfigParams::m_ssao == 1) {
+        gacb->setResolution(UserConfigParams::m_width / 4,
+                            UserConfigParams::m_height / 4);
+        m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3V);
+        m_material.setTexture(0, irr_driver->getRTT(RTT_SSAO));
+        m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_QUARTER4), true, false);
+        m_post_processing->drawQuad(cam, m_material);
+
+        m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3H);
+        m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER4));
+        m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_SSAO), false, false);
+        m_post_processing->drawQuad(cam, m_material);
+    }  else if (UserConfigParams::m_ssao == 2) {
+        gacb->setResolution(UserConfigParams::m_width,
+                            UserConfigParams::m_height);
+        m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN6V);
+        m_material.setTexture(0, irr_driver->getRTT(RTT_SSAO));
+        m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_TMP4), true, false);
+        m_post_processing->drawQuad(cam, m_material);
+
+        m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN6H);
+        m_material.setTexture(0, irr_driver->getRTT(RTT_TMP4));
+        m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_SSAO), false, false);
+        m_post_processing->drawQuad(cam, m_material);
+    }
+
     // Blend lights to the image
     video::SMaterial lightmat;
     lightmat.Lighting = false;
@@ -773,8 +814,8 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     lightmat.setFlag(video::EMF_BILINEAR_FILTER, false);
     lightmat.setTexture(0, m_rtts->getRTT(RTT_TMP1));
 
-    // Specular mapping
-    //lightmat.setTexture(1, m_rtts->getRTT(RTT_COLOR));
+    // Apply ambient occlusion
+    lightmat.setTexture(1, m_rtts->getRTT(RTT_SSAO));
 
     lightmat.MaterialType = m_shaders->getShader(ES_LIGHTBLEND);
     lightmat.MaterialTypeParam = video::pack_textureBlendFunc(video::EBF_DST_COLOR, video::EBF_ZERO);

@@ -1,4 +1,5 @@
-uniform sampler2D tex;
+uniform sampler2D diffuse_and_spec;
+uniform sampler2D ambient_occlusion;
 uniform vec3 ambient;
 //uniform sampler2D spectex;
 
@@ -6,10 +7,10 @@ void main()
 {
 	vec2 texc = gl_TexCoord[0].xy;
 
-	vec4 col = texture2D(tex, texc);
-	//vec4 specular = texture2D(spectex, texc);
+	vec4 col = texture2D(diffuse_and_spec, texc);
+	float ao = texture2D(ambient_occlusion, texc).x;
 
-	col.xyz += ambient;
+	col.xyz += ao * ambient;
 	float spec = col.a - 0.05;
 	//spec *= specular.a;
 	col.xyz += spec * col.xyz;
