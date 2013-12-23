@@ -49,10 +49,8 @@ void main(void)
 		vec4 occluderPos = invprojm * vec4(sampleProj.xy, 2.0 * occluderFragmentDepth - 1.0, 1.0f);
 		occluderPos /= occluderPos.w;
 
-		float depthDifference = sampleProj.z - (2. * occluderFragmentDepth - 1.0);
-		// depthDifference between 0 and radius
-		float increment = step(0., depthDifference) * step(-radius, -depthDifference);
-		bl += increment * smoothstep(radius, 0, distance(samplePos, FragPos)) * cosTheta;
+		bool isOccluded = (sampleProj.z > (2. * occluderFragmentDepth - 1.0)) && (distance(FragPos, occluderPos) < radius);
+		bl += isOccluded ? smoothstep(radius, 0, distance(samplePos, FragPos)) * cosTheta : 0.;
 	}
 
 	// output the result
