@@ -12,6 +12,9 @@ void main() {
 
 	vec2 texc = gl_FragCoord.xy / screen;
 	float z = texture2D(ntex, texc).a;
+	vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0;
+	xpos = invproj * xpos;
+	xpos.xyz /= xpos.w;
 
 	if (z < 0.03)
 	{
@@ -28,18 +31,14 @@ void main() {
 	vec3 L = center;
 
 	float NdotL = max(0.0, dot(norm, L));
+	vec3 R = reflect(L, norm);
+	float RdotE = max(0.0, dot(R, normalize(xpos)));
+	float Specular = pow(RdotE, 200);
 
 	vec3 outcol = NdotL * col;
 
 	if (hasclouds == 1)
 	{
-		vec3 tmp = vec3(texc, z);
-		tmp = tmp * 2.0 - 1.0;
-
-		vec4 xpos = vec4(tmp, 1.0);
-		xpos = invproj * xpos;
-		xpos.xyz /= xpos.w;
-
 		vec2 cloudcoord = (xpos.xz * 0.00833333) + wind;
 		float cloud = texture2D(cloudtex, cloudcoord).x;
 		//float cloud = step(0.5, cloudcoord.x) * step(0.5, cloudcoord.y);
@@ -47,6 +46,6 @@ void main() {
 		outcol *= cloud;
 	}
 
-	gl_FragData[0] = vec4(outcol, 0.05);
+	gl_FragData[0] = vec4(NdotL * col, Specular+ 0.001); // Irrlicht force alpha test, can't be 0
 	gl_FragData[1] = vec4(1.0);
 }

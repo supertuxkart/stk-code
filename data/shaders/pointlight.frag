@@ -24,13 +24,12 @@ void main() {
 
 	// Light Direction
 	vec3 L = normalize(xpos.xyz - center);
-	vec3 eyedir = normalize(xpos.xyz);
-	vec3 H = normalize(-L + eyedir);
 
 	float NdotL = max(0.0, dot(norm, -L)) * att;
-	float NdotH = max(0.0, dot(norm, H));
-	NdotH = pow(NdotH, spec);
-	NdotH += 0.05; // offset so that the alpha test doesn't kill us
+	// Reflected light dir
+	vec3 R = reflect(-L, norm);
+	float RdotE = max(0.0, dot(R, normalize(xpos)));
+	float Specular = pow(RdotE, spec);
 
-	gl_FragColor = NdotL * vec4(NdotL * col, NdotH);
+	gl_FragColor = vec4(NdotL * col, Specular + 0.001); // Irrlicht force alpha test, can't be 0
 }
