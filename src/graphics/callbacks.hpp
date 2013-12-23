@@ -541,7 +541,19 @@ class SSAOProvider: public CallBase
 {
 private:
     core::matrix4 projm, invprojm;
+    float array[64];
 public:
+    SSAOProvider() : CallBase() {
+      for (unsigned i = 0; i < 64; i++) {
+        array[i] = rand();
+        array[i] /= RAND_MAX;
+        if (i % 4 != 2)
+          array[i] = 2 * array[i] - 1;
+        if (i % 4 == 3)
+          continue;
+      }
+    }
+
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
     void updateIPVMatrix()
     {

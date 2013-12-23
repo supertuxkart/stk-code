@@ -4,7 +4,7 @@ uniform mat4 invprojm;
 uniform mat4 projm;
 uniform vec4 samplePoints[16];
 
-const float strengh = 4.;
+const float strengh = 20.;
 const float radius = .1f;
 
 #define SAMPLES 16
@@ -47,7 +47,9 @@ void main(void)
 		occluderPos /= occluderPos.w;
 
 		float depthDifference = sampleProj.z - (2. * occluderFragmentDepth - 1.0);
-		bl += (distance(occluderPos, FragPos) < radius) ? step(0., depthDifference) : 0.0;
+		// depthDifference between 0 and radius
+		float increment = step(0., depthDifference) * step(-radius, -depthDifference);
+		bl += increment * smoothstep(radius, 0, distance(samplePos, FragPos));
 	}
 
 	// output the result

@@ -494,25 +494,6 @@ void MLAANeigh3Provider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void SSAOProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
-    static const float array[64] = {
-        0.43589, -0.9, 0.667945, 0.,
-        -0.9, 0.43589, 0.667945, 0.,
-        -0.8, -0.6, 0.7, 0.,
-        0.6, 0.8, 0.7, 0.,
-        0.866025, -0.5, 0.6830125, 0.,
-        -0.5, 0.866025, 0.6830125, 0.,
-        -0.3, -0.953939, 0.6269695, 0.,
-        0.953939, 0.3, 0.6269695, 0.,
-        0.3, -0.781025, 0.5405125, 0.,
-        -0.781025, 0.3, 0.5405125, 0.,
-        -0.56, -0.621611, 0.5908055, 0.,
-        0.621611, 0.56, 0.5908055, 0.,
-        0.734847, -0.4, 0.5674235, 0.,
-        -0.4, 0.734847, 0.5674235, 0.,
-        -0.2, -0.6, 0.4, 0.,
-        0.6, 0.2, 0.4, 0.,
-    };
-
     srv->setPixelShaderConstant("invprojm", invprojm.pointer(), 16);
     srv->setPixelShaderConstant("projm", projm.pointer(), 16);
     srv->setPixelShaderConstant("samplePoints[0]", array, 64);
