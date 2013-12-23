@@ -4,7 +4,7 @@ uniform mat4 invprojm;
 uniform mat4 projm;
 uniform vec4 samplePoints[16];
 
-const float strengh = 20.;
+const float strengh = 4.;
 const float radius = .1f;
 
 #define SAMPLES 16
@@ -36,6 +36,7 @@ void main(void)
 
 	for(int i = 0; i < SAMPLES; ++i) {
 		vec3 sampleDir = samplePoints[i].x * tangent + samplePoints[i].y * bitangent + samplePoints[i].z * norm;
+		sampleDir *= samplePoints[i].w;
 		vec4 samplePos = FragPos + radius * vec4(sampleDir, 0.0);
 		vec4 sampleProj = projm * samplePos;
 		sampleProj /= sampleProj.w;

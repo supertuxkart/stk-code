@@ -544,13 +544,25 @@ private:
     float array[64];
 public:
     SSAOProvider() : CallBase() {
-      for (unsigned i = 0; i < 64; i++) {
-        array[i] = rand();
-        array[i] /= RAND_MAX;
-        if (i % 4 != 2)
-          array[i] = 2 * array[i] - 1;
-        if (i % 4 == 3)
-          continue;
+      for (unsigned i = 0; i < 16; i++) {
+        // Generate x/y component between -1 and 1
+        // Use double to avoid denorm and get a true uniform distribution
+        double x = rand();
+        x /= RAND_MAX;
+        x = 2 * x - 1;
+        double y = rand();
+        y /= RAND_MAX;
+        y = 2 * y - 1;
+
+        // compute z so that norm (x,y,z) is one
+        double z = sqrt(x * x + y * y);
+        // Norm factor
+        double w = rand();
+        w /= RAND_MAX;
+        array[4 * i] = x;
+        array[4 * i + 1] = y;
+        array[4 * i + 2] = z;
+        array[4 * i + 3] = w;
       }
     }
 
