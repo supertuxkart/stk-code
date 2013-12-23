@@ -6,13 +6,6 @@ noperspective in vec3 tangent;
 noperspective in vec3 bitangent;
 noperspective in vec3 normal;
 
-vec4 encdepth(float v) {
-	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
-	enc = fract(enc);
-	enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
-	return enc;
-}
-
 void main()
 {
 	// normal in Tangent Space
@@ -28,6 +21,5 @@ void main()
 	
 
 	gl_FragData[0] = texture2D (texture, gl_TexCoord[0].st);
-	gl_FragData[1] = vec4(0.5 * FragmentNormal + 0.5, 1.0);
-	gl_FragData[2] = vec4(encdepth(gl_FragCoord.z).xyz, 0.0);
+	gl_FragData[1] = vec4(0.5 * FragmentNormal + 0.5, gl_FragCoord.z);
 }

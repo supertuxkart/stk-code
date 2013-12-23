@@ -1,5 +1,4 @@
 uniform sampler2D ntex;
-uniform sampler2D dtex;
 uniform sampler2D cloudtex;
 
 uniform vec3 center;
@@ -9,14 +8,10 @@ uniform mat4 invproj;
 uniform int hasclouds;
 uniform vec2 wind;
 
-float decdepth(vec4 rgba) {
-	return dot(rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0));
-}
-
 void main() {
 
 	vec2 texc = gl_FragCoord.xy / screen;
-	float z = decdepth(vec4(texture2D(dtex, texc).xyz, 0.0));
+	float z = texture2D(ntex, texc).a;
 
 	if (z < 0.03)
 	{

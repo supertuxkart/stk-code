@@ -139,8 +139,7 @@ void IrrDriver::renderGLSL(float dt)
                                world->getClearColor());
 
     // Clear normal and depth to zero
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_NORMAL), true, false, video::SColor(0,0,0,0));
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_DEPTH), true, false, video::SColor(0,0,0,0));
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_NORMAL_AND_DEPTH), true, false, video::SColor(0,0,0,0));
 
     irr_driver->getVideoDriver()->enableMaterial2D();
     RaceGUIBase *rg = world->getRaceGUI();

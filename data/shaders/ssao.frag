@@ -1,7 +1,5 @@
 #version 120
-
 uniform sampler2D normals_and_depth;
-uniform sampler2D depth;
 uniform mat4 invprojm;
 uniform mat4 projm;
 uniform vec4 samplePoints[16];
@@ -13,10 +11,6 @@ const float radius = .1f;
 
 const float invSamples = strengh / SAMPLES;
 
-float decdepth(vec4 rgba) {
-	return dot(rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0));
-}
-
 void main(void)
 {
 	// A set of Random(tm) vec2's. 8 1s, 6 0.7s, 2 0.4
@@ -26,7 +20,7 @@ void main(void)
 	vec2 uv = gl_TexCoord[0].xy;
 
 	vec4 cur = texture2D(normals_and_depth, uv);
-	float curdepth = decdepth(vec4(texture2D(depth, uv).xyz, 0.0));
+	float curdepth = texture2D(normals_and_depth, uv).a;
 	vec4 FragPos = invprojm * (2.0f * vec4(uv, curdepth, 1.0f) - 1.0f);
 	FragPos /= FragPos.w;
 
@@ -47,7 +41,7 @@ void main(void)
 		sampleProj /= sampleProj.w;
 
 		// get the depth of the occluder fragment
-		float occluderFragmentDepth = decdepth(vec4(texture2D(depth, (sampleProj.xy * 0.5) + 0.5).xyz, 0.0));
+		float occluderFragmentDepth = texture2D(normals_and_depth, (sampleProj.xy * 0.5) + 0.5).a;
 		// Position of the occluder fragment in worldSpace
 		vec4 occluderPos = invprojm * vec4(sampleProj.xy, 2.0 * occluderFragmentDepth - 1.0, 1.0f);
 		occluderPos /= occluderPos.w;

@@ -109,16 +109,6 @@ void WaterShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void GrassShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int userData)
 {
-    
-    const float camfar = irr_driver->getSceneManager()->getActiveCamera()->getFarValue();
-    srv->setVertexShaderConstant("far", &camfar, 1);
-
-    float objectid = 0;
-    const stringc name = mat.TextureLayer[0].Texture->getName().getPath();
-    objectid = shash8((const u8 *) name.c_str(), name.size()) / 255.0f;
-    srv->setVertexShaderConstant("objectid", &objectid, 1);
-
-    
     IVideoDriver * const drv = srv->getVideoDriver();
     const core::vector3df pos = drv->getTransform(ETS_WORLD).getTranslation();
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
@@ -165,14 +155,6 @@ void ColorLevelsProvider::OnSetConstants(IMaterialRendererServices *srv, int use
 
 void SplattingProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
-    const float camfar = irr_driver->getSceneManager()->getActiveCamera()->getFarValue();
-    srv->setVertexShaderConstant("far", &camfar, 1);
-
-    float objectid = 0;
-    const stringc name = mat.TextureLayer[0].Texture->getName().getPath();
-    objectid = shash8((const u8 *) name.c_str(), name.size()) / 255.0f;
-    srv->setVertexShaderConstant("objectid", &objectid, 1);
-
     if (!firstdone)
     {
         s32 tex_layout = 1;
@@ -324,22 +306,11 @@ void GlowProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void ObjectPassProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
-    const float camfar = irr_driver->getSceneManager()->getActiveCamera()->getFarValue();
-    srv->setVertexShaderConstant("far", &camfar, 1);
-
     const int hastex = mat.TextureLayer[0].Texture != NULL;
     srv->setVertexShaderConstant("hastex", &hastex, 1);
 
     const int haslightmap = mat.TextureLayer[1].Texture != NULL;
     srv->setVertexShaderConstant("haslightmap", &haslightmap, 1);
-
-    float objectid = 0;
-    if (hastex)
-    {
-        const stringc name = mat.TextureLayer[0].Texture->getName().getPath();
-        objectid = shash8((const u8 *) name.c_str(), name.size()) / 255.0f;
-    }
-    srv->setVertexShaderConstant("objectid", &objectid, 1);
 
     //if (!firstdone)
     // Can't use the firstdone optimization, as this callback is used for multiple shaders
