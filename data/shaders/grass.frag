@@ -1,8 +1,10 @@
-/*--- GENERIC HEADER -----------------------------------------------------------------------------*/
+#version 130
 
-varying vec3 nor;
 uniform float far;
 uniform float objectid;
+uniform sampler2D tex;
+
+noperspective in vec3 nor;
 
 const float near = 1.0;
 
@@ -13,19 +15,9 @@ vec4 encdepth(float v) {
 	return enc;
 }
 
-/*--- END OF GENERIC HEADER ----------------------------------------------------------------------*/
-
-
-uniform sampler2D tex;
-
 void main()
 {
 	vec4 color = texture2D(tex, gl_TexCoord[0].st);
-
-
-
-
-/*--- GENERIC FOOTER -----------------------------------------------------------------------------*/
 
 	float linear_z = (2.0 * near) / (far + near - gl_FragCoord.z * (far - near));
 	// Tune for better inside range without losing outdoors
@@ -33,8 +25,6 @@ void main()
 
 
 	gl_FragData[0] = color;	
-	gl_FragData[1] = vec4(nor, linear_z);
+	gl_FragData[1] = vec4(0.5 * normalize(nor) + 0.5, linear_z);
 	gl_FragData[2] = vec4(encdepth(gl_FragCoord.z).xyz, objectid);
-
-/*--- END OF GENERIC FOOTER ----------------------------------------------------------------------*/
 }

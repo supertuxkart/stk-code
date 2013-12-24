@@ -144,8 +144,8 @@ void PlayerNameSpinner::markAsIncorrect()
 
     m_incorrect = true;
 
-    irr::video::ITexture* texture = irr_driver->getTexture(
-                                        file_manager->getTextureFile("red_mark.png") );
+    irr::video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+                                                           "red_mark.png"   );
     const int mark_size = m_h;
     const int mark_x = m_w - mark_size*2;
     const int mark_y = 0;
@@ -1470,7 +1470,7 @@ void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
     {
         w3->clearModels();
         w3->addModel(irr_driver->getAnimatedMesh(
-                         file_manager->getDataDir() + "/models/chest.b3d" )->getMesh(20),
+                         file_manager->getAsset(FileManager::MODEL, "chest.b3d") )->getMesh(20),
                      Vec3(0,0,0), Vec3(15.0f, 15.0f, 15.0f) );
         w3->update(0);
 

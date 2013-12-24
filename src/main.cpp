@@ -535,7 +535,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
         }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
         {
-            stk_config->load(file_manager->getDataFile(argv[i+1]));
+            stk_config->load(file_manager->getAsset(argv[i+1]));
             Log::info("main", "STK config will be read from %s.\n",argv[i+1] );
             i++;
         }
@@ -1201,7 +1201,7 @@ void initUserConfig(char *argv[])
 //=============================================================================
 void initRest()
 {
-    stk_config->load(file_manager->getDataFile("stk_config.xml"));
+    stk_config->load(file_manager->getAsset("stk_config.xml"));
 
     // Now create the actual non-null device in the irrlicht driver
     irr_driver->initDevice();
@@ -1253,17 +1253,15 @@ void initRest()
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
 
-    GUIEngine::addLoadingIcon(
-        irr_driver->getTexture(file_manager->getTextureFile("notes.png")) );
+    GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI, 
+                                                     "notes.png"      ) );
 
     grand_prix_manager      = new GrandPrixManager     ();
     // Consistency check for challenges, and enable all challenges
     // that have all prerequisites fulfilled
     grand_prix_manager->checkConsistency();
-    std::string file = file_manager->getTextureFile("cup_gold.png");
-    if(file.size()==0)
-        Log::fatal("main", "Can not find cup_gold.png, aborting.");
-    GUIEngine::addLoadingIcon( irr_driver->getTexture(file) );
+    GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+                                                      "cup_gold.png"    ) );
 
     race_manager            = new RaceManager          ();
     // default settings for Quickstart
@@ -1362,6 +1360,14 @@ int main(int argc, char *argv[] )
     srand(( unsigned ) time( 0 ));
 
     try {
+        // Check for "--root COLON:SEPARATED:LIST" parameter
+        for(int i=0; i<argc-1; i++)
+        {
+            if(!strcmp(argv[i],"--root"))
+            {
+                FileManager::addRootDirs(argv[i+1]);
+            }
+        }
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
         // not have) other managers initialised:
@@ -1387,23 +1393,21 @@ int main(int argc, char *argv[] )
         input_manager->setMode(InputManager::MENU);
         main_loop = new MainLoop();
         material_manager        -> loadMaterial    ();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                           file_manager->getGUIDir() + "options_video.png") );
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+                                                          "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
         handleXmasMode();
         unlock_manager          = new UnlockManager();
-        std::string file = file_manager->getTextureFile("gui_lock.png");
-        if(file.size()==0)
-            Log::fatal("main", "Can not find gui_lock.png, aborting.");
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(file));
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI, 
+                                                          "gui_lock.png"  ) );
         projectile_manager      -> loadData        ();
 
         // Both item_manager and powerup_manager load models and therefore
         // textures from the model directory. To avoid reading the
         // materials.xml twice, we do this here once for both:
-        file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
+        file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""));
         const std::string materials_file =
-            file_manager->getModelFile("materials.xml");
+            file_manager->getAsset(FileManager::MODEL,"materials.xml");
         if(materials_file!="")
         {
             // Some of the materials might be needed later, so just add
@@ -1417,15 +1421,15 @@ int main(int argc, char *argv[] )
         powerup_manager         -> loadAllPowerups ();
         ItemManager::loadDefaultItemMeshes();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(
-                                    file_manager->getGUIDir() + "gift.png") );
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+                                                          "gift.png")       );
 
         file_manager->popTextureSearchPath();
 
         attachment_manager      -> loadModels      ();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(
-            file_manager->getGUIDir() + "banana.png") );
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+                                                          "banana.png")    );
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);

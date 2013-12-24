@@ -46,8 +46,8 @@ private :
     AchievementsManager      ();
     ~AchievementsManager     ();
     AchievementsSlot * createNewSlot(std::string id, bool online);
-    void parseDataFile();
-    void parseConfigFile();
+    void parseAssetFile();
+    void parseUserConfigFile();
 
 public:
     /**Singleton */

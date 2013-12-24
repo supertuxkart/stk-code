@@ -45,7 +45,8 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
     m_use_highscores = false;
     m_insert_tire = 0;
 
-    m_tire = irr_driver->getMesh( file_manager->getModelFile("tire.b3d") );
+    m_tire = irr_driver->getMesh(file_manager->getAsset(FileManager::MODEL,
+                                 "tire.b3d") );
     irr_driver->grabAllTextures(m_tire);
 }   // ThreeStrikesBattle
 
@@ -312,7 +313,7 @@ void ThreeStrikesBattle::update(float dt)
         if(m_insert_tire == 1)
         {
             tire_offset = core::vector3df(0.0f, 0.0f, 0.0f);
-            tire = file_manager->getModelFile("tire.b3d");
+            tire = file_manager->getAsset(FileManager::MODEL,"tire.b3d");
             scale = 0.5f;
             radius = 0.5f;
             body_shape = PhysicalObject::MP_CYLINDER_Y;

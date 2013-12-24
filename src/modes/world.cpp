@@ -736,6 +736,7 @@ void World::updateWorld(float dt)
     {
         if (m_schedule_exit_race)
         {
+            m_schedule_exit_race = false;
             race_manager->exitRace();
             race_manager->setAIKartOverride("");
 
@@ -743,6 +744,7 @@ void World::updateWorld(float dt)
 
             if (m_schedule_tutorial)
             {
+                m_schedule_tutorial = false;
                 race_manager->setNumLocalPlayers(1);
                 race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
                 race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);

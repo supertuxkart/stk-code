@@ -85,6 +85,9 @@ namespace GUIEngine
         /** Rotate to 'targetAngle' in degrees at given speed (in degrees per second) */
         void setRotateTo(float targetAngle, float speed);
         
+        /** Returns information if currently kart is rotating */
+        bool isRotating();
+        
         void clearRttProvider();
     };
     

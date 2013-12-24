@@ -151,8 +151,9 @@ void LayoutManager::readCoords(Widget* self)
 
     if (self->m_properties[PROP_ICON].size() > 0)
     {
-        ITexture* texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +
-                                                    self->m_properties[PROP_ICON]).c_str());
+        // PROP_ICON includes paths (e.g. gui/logo.png)
+        ITexture* texture = irr_driver->getTexture(file_manager->getAsset(
+                                                    self->m_properties[PROP_ICON]));
 
         if (texture != NULL)
         {

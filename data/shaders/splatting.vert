@@ -15,20 +15,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
-varying vec3 normal;
-varying vec4 vertex_color;
-varying vec3 lightdir2;
+#version 130
 uniform vec3 lightdir;
+
+noperspective out vec3 normal;
 
 void main()
 {
-	gl_TexCoord[0] = gl_MultiTexCoord0;
-    gl_TexCoord[1] = gl_MultiTexCoord1;
+    gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
+    gl_TexCoord[1] = gl_TextureMatrix[1] * gl_MultiTexCoord1;
     gl_Position = ftransform();
-    vertex_color = gl_Color;
 
-    //normal = normalize(gl_NormalMatrix * gl_Normal);
-    normal = normalize(gl_Normal);
-    lightdir2 = normalize(lightdir);
+    normal = gl_NormalMatrix * gl_Normal;
 }

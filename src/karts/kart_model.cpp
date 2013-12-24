@@ -888,10 +888,10 @@ void KartModel::attachHat(){
             bone = m_animated_node->getJointNode("head");
         if(bone)
         {
-             // Till we have all models fixed, accept Head and head as bone naartme
+            // Till we have all models fixed, accept Head and head as bone name
             scene::IMesh *hat_mesh =
                 irr_driver->getAnimatedMesh(
-                     file_manager->getModelFile(m_hat_name));
+                           file_manager->getAsset(FileManager::MODEL, m_hat_name));
             m_hat_node = irr_driver->addMesh(hat_mesh);
             bone->addChild(m_hat_node);
             m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);

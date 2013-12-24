@@ -695,6 +695,9 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     FogProvider * const fogcb = (FogProvider *) irr_driver->
                                         getCallback(ES_FOG);
     fogcb->updateIPVMatrix();
+    SSAOProvider * const ssaocb = (SSAOProvider *) irr_driver->
+                                        getCallback(ES_SSAO);
+    ssaocb->updateIPVMatrix();
 
 
     const u32 lightcount = m_lights.size();
@@ -803,7 +806,7 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
     overridemat.Material.MaterialType = m_shaders->getShader(ES_DISPLACE);
 
     overridemat.Material.TextureLayer[0].Texture =
-        irr_driver->getTexture((file_manager->getTextureDir() + "displace.png").c_str());
+        irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
     overridemat.Material.TextureLayer[0].BilinearFilter =
     overridemat.Material.TextureLayer[0].TrilinearFilter = true;
     overridemat.Material.TextureLayer[0].AnisotropicFilter = 0;

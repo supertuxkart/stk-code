@@ -1,10 +1,11 @@
-varying vec3 nor;
+#version 130
 uniform sampler2D tex;
 uniform float far;
 uniform float objectid;
 
-varying vec3 eyenor;
-varying vec3 viewpos;
+noperspective in vec3 eyenor;
+noperspective in vec3 viewpos;
+noperspective in vec3 nor;
 
 const float near = 1.0;
 

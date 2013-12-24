@@ -19,8 +19,8 @@
 #include "audio/dummy_sfx.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_buffer.hpp"
+#include "io/file_manager.hpp"
 
-#include <sstream>
 #include <stdexcept>
 #include <algorithm>
 #include <map>
@@ -44,8 +44,6 @@
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 #include "utils/constants.hpp"
-
-#include <iostream>
 
 SFXManager* sfx_manager= NULL;
 std::map<std::string, SFXBase*> SFXManager::m_quick_sounds;
@@ -147,11 +145,12 @@ bool SFXManager::sfxAllowed()
  */
 void SFXManager::loadSfx()
 {
-    std::string sfx_config_name = file_manager->getSFXFile("sfx.xml");
+    std::string sfx_config_name = file_manager->getAsset(FileManager::SFX, "sfx.xml");
     XMLNode* root = file_manager->createXMLTree(sfx_config_name);
     if (!root || root->getName()!="sfx-config")
     {
-        std::cerr << "Could not read sounf effects XML file " << sfx_config_name.c_str() << std::endl;
+        Log::fatal("SFXManager", "Could not read sound effects XML file '%s'.",
+                   sfx_config_name.c_str());
     }
 
     int i;
@@ -167,7 +166,8 @@ void SFXManager::loadSfx()
         }
         else
         {
-            std::cerr << "Unknown node in sfx XML file : " << node->getName().c_str() << std::endl;
+            Log::warn("SFXManager", "Unknown node '%s' in sfx XML file '%s'.",
+                      node->getName().c_str(), sfx_config_name.c_str());
             throw std::runtime_error("Unknown node in sfx XML file");
         }
     }// nend for
@@ -269,8 +269,9 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
 
     // Only use the filename if no full path is specified. This is used
     // to load terrain specific sfx.
-    const std::string full_path = (path == "") ? file_manager->getSFXFile(filename)
-                                               : path;
+    const std::string full_path = (path == "") 
+                                ? file_manager->getAsset(FileManager::SFX,filename)
+                                : path;
 
     SFXBuffer tmpbuffer(full_path, node);
 

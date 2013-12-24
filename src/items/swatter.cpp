@@ -71,7 +71,7 @@ Swatter::Swatter(AbstractKart *kart, bool was_bomb,
     if (m_removing_bomb)
     {
         m_scene_node->setMesh(irr_driver->getAnimatedMesh(
-                        file_manager->getModelFile("swatter_anim2.b3d") ) );
+                        file_manager->getAsset(FileManager::MODEL,"swatter_anim2.b3d") ) );
         m_scene_node->setRotation(core::vector3df(0.0, -180.0, 0.0));
         m_scene_node->setAnimationSpeed(0.9f);
         m_scene_node->setCurrentFrame(0.0f);

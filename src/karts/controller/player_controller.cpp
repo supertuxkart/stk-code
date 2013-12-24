@@ -221,7 +221,7 @@ void PlayerController::action(PlayerAction action, int value)
     default:
        break;
     }
-    if (NetworkWorld::getInstance()->isRunning())
+    if (World::getWorld()->isNetworkWorld() && NetworkWorld::getInstance()->isRunning())
     {
         NetworkWorld::getInstance()->controllerAction(this, action, value);
     }

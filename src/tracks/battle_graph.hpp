@@ -90,6 +90,8 @@ public:
     const NavPoly&    getPolyOfNode(int i) const 
                                         { return NavMesh::get()->getNavPoly(i); }
 
+    /** m_parent_poly[j][i] contains the parent of i on path from j to i, which is
+     *  the next node on the path from i to j (undirected graph) */
     const int & getNextShortestPathPoly(int i, int j) const 
                                         { return m_parent_poly[j][i]; }
 

@@ -1,11 +1,12 @@
-varying vec3 nor;
+#version 130
 uniform sampler2D tex;
 uniform float far;
 uniform int hastex;
 uniform float objectid;
 
-varying vec3 eyenor;
-varying vec3 viewpos;
+noperspective in vec3 nor;
+noperspective in vec3 eyenor;
+noperspective in vec3 viewpos;
 
 const float near = 1.0;
 
@@ -39,7 +40,7 @@ void main() {
 		gl_FragData[0] = gl_Color + vec4(vec3(rim), 0.0);
 	}
 
-	gl_FragData[1] = vec4(nor, linear_z);
+	gl_FragData[1] = vec4(0.5 * normalize(nor) + 0.5, linear_z);
 	gl_FragData[2] = vec4(encdepth(gl_FragCoord.z).xyz, objectid);
 }
 

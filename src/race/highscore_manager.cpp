@@ -59,7 +59,7 @@ void HighscoreManager::setFilename()
     }
     else
     {
-        m_filename=file_manager->getConfigFile("highscore.xml");
+        m_filename=file_manager->getUserConfigFile("highscore.xml");
     }
 
     return;

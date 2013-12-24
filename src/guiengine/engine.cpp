@@ -1060,14 +1060,16 @@ namespace GUIEngine
 
         ScalableFont* sfont =
             new ScalableFont(g_env,
-                            file_manager->getFontFile("StkFont.xml").c_str());
+                            file_manager->getAssetChecked(FileManager::FONT,
+                                                          "StkFont.xml",true).c_str() );
         sfont->setScale(normal_text_scale);
         sfont->setKerningHeight(-5);
         g_font = sfont;
 
         ScalableFont* digit_font =
             new ScalableFont(g_env,
-                             file_manager->getFontFile("BigDigitFont.xml").c_str());
+                             file_manager->getAssetChecked(FileManager::FONT,
+                                                           "BigDigitFont.xml",true).c_str());
         digit_font->lazyLoadTexture(0); // make sure the texture is loaded for this one
         g_digit_font = digit_font;
 
@@ -1092,7 +1094,9 @@ namespace GUIEngine
 
         ScalableFont* sfont2 =
             new ScalableFont(g_env,
-                          file_manager->getFontFile("title_font.xml").c_str());
+                             file_manager->getAssetChecked(FileManager::FONT,
+                                                           "title_font.xml",
+                                                           true).c_str()     );
         sfont2->m_fallback_font = sfont;
         // Because the fallback font is much smaller than the title font:
         sfont2->m_fallback_font_scale = 4.0f;
@@ -1280,7 +1284,8 @@ namespace GUIEngine
 
         g_skin->drawBgImage();
         ITexture* loading =
-            irr_driver->getTexture(file_manager->getGUIDir()+"loading.png");
+            irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,
+                                                          "loading.png"));
 
         if(!loading)
         {

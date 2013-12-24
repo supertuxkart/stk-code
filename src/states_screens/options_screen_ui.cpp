@@ -36,6 +36,7 @@
 #include "states_screens/options_screen_players.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -69,12 +70,12 @@ void OptionsScreenUI::loadedFromFile()
     skinSelector->clearLabels();
 
     std::set<std::string> skinFiles;
-    file_manager->listFiles(skinFiles /* out */, file_manager->getGUIDir() + "skins",
-                            true /* is full path */, true /* make full path */ );
+    file_manager->listFiles(skinFiles /* out */, file_manager->getAsset(FileManager::SKIN,""),
+                            true /* make full path */ );
 
     for (std::set<std::string>::iterator it = skinFiles.begin(); it != skinFiles.end(); it++)
     {
-        if ( (*it).find(".stkskin") != std::string::npos )
+        if(StringUtils::getExtension(*it)=="stkskin")
         {
             m_skins.push_back( *it );
         }
@@ -82,8 +83,8 @@ void OptionsScreenUI::loadedFromFile()
 
     if (m_skins.size() == 0)
     {
-        std::cerr << "WARNING: could not find a single skin, make sure that "
-                     "the data files are correctly installed\n";
+        Log::warn("OptionsScreenUI", "Could not find a single skin, make sure that "
+                                     "the data files are correctly installed");
         skinSelector->setDeactivated();
         return;
     }
@@ -143,7 +144,8 @@ void OptionsScreenUI::init()
     }
     if (!currSkinFound)
     {
-        std::cerr << "WARNING: couldn't find current skin in the list of skins!!\n";
+        Log::warn("OptionsScreenUI", 
+                  "Couldn't find current skin in the list of skins!");
         skinSelector->setValue(0);
         GUIEngine::reloadSkin();
     }

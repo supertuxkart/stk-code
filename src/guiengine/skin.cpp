@@ -98,8 +98,7 @@ namespace SkinConfig
 
         // call last since it calculates coords considering all other
         // parameters
-        std:: string full_path = file_manager->getGUIDir() + "skins/" + image;
-        new_param.setTexture( irr_driver->getTexture(full_path) );
+        new_param.setTexture( irr_driver->getTexture(FileManager::SKIN, image));
 
         if (areas.size() > 0)
         {
@@ -289,9 +288,8 @@ X##_yflip.LowerRightCorner.Y =  y1;}
 
 Skin::Skin(IGUISkin* fallback_skin)
 {
-    std::string skin_name = file_manager->getGUIDir();
-    skin_name += "skins/";
-    skin_name += UserConfigParams::m_skin_file.c_str();
+    std::string skin_name = file_manager->getAsset(FileManager::SKIN,
+                                                   UserConfigParams::m_skin_file);
 
     try
     {
@@ -303,9 +301,8 @@ Skin::Skin(IGUISkin* fallback_skin)
         // couldn't load skin. Try to revert to default
         UserConfigParams::m_skin_file.revertToDefaults();
 
-        skin_name = file_manager->getGUIDir();
-        skin_name += "skins/";
-        skin_name += UserConfigParams::m_skin_file.c_str();
+        skin_name = file_manager->getAsset(FileManager::SKIN,
+                                           UserConfigParams::m_skin_file);
         SkinConfig::loadFromFile( skin_name );
     }
 
@@ -1635,12 +1632,10 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
 
                 // there's about 40 empty pixels at the top of bar.png
                 ITexture* tex =
-                    irr_driver->getTexture( file_manager->getGUIDir()
-                                            + "bar.png" );
+                    irr_driver->getTexture(FileManager::GUI,"bar.png");
                 if(!tex)
                 {
-                    std::string file = file_manager->getGUIDir() + "main_help.png";
-                    tex = irr_driver->getTexture(file);
+                    tex = irr_driver->getTexture(FileManager::GUI, "main_help.png");
                     if(!tex)
                         Log::fatal("Skin",
                         "Can't find fallback texture 'main_help.png, aborting.");
@@ -1654,8 +1649,7 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
             else if (widget.isTopBar())
             {
                 ITexture* tex =
-                    irr_driver->getTexture( file_manager->getGUIDir()
-                                           + "top_bar.png" );
+                    irr_driver->getTexture(FileManager::GUI, "top_bar.png");
 
                 core::recti r1(0,               0,
                                (int)widget.m_w, (int)widget.m_h);
@@ -1942,63 +1936,51 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
 {
     if (widget->m_badges & LOCKED_BADGE)
     {
-        video::ITexture* texture = irr_driver->getTexture(
-                                 file_manager->getTextureFile("gui_lock.png"),
-                                 "Can't find '%s'.",
-                                 file_manager->getTextureFile("gui_lock.png"));
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+                                                          "gui_lock.png");
         float max_icon_size = 0.5f; // Lock badge can be quite big
         doDrawBadge(texture, rect, max_icon_size, true);
     }
     if (widget->m_badges & OK_BADGE)
     {
-        video::ITexture* texture = irr_driver->getTexture(
-                              file_manager->getTextureFile("green_check.png"),
-                              "Can't find '%s'.",
-                              file_manager->getTextureFile("green_check.png"));
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+                                                          "green_check.png");
         float max_icon_size = 0.35f;
         doDrawBadge(texture, rect, max_icon_size, true);
     }
     if (widget->m_badges & BAD_BADGE)
     {
-        video::ITexture* texture = irr_driver->getTexture(
-                                 file_manager->getTextureFile("red_mark.png"),
-                                 "Can't find red_mark.png");
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+                                                          "red_mark.png");
         float max_icon_size = 0.35f;
         doDrawBadge(texture, rect, max_icon_size, false);
     }
     if (widget->m_badges & TROPHY_BADGE)
     {
         float max_icon_size = 0.43f;
-        video::ITexture* texture = irr_driver->getTexture(
-                               file_manager->getTextureFile("cup_bronze.png"),
-                               "Can't find cup_bronze.png.");
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+                                                          "cup_bronze.png");
         doDrawBadge(texture, rect, max_icon_size, false);
     }
     if (widget->m_badges & KEYBOARD_BADGE)
     {
         float max_icon_size = 0.43f;
-        video::ITexture* texture = irr_driver->getTexture(
-                                   file_manager->getGUIDir() + "keyboard.png",
-                                   "Can't find '%s'.",
-                                   file_manager->getGUIDir() + "keyboard.png");
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+                                                          "keyboard.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
     if (widget->m_badges & GAMEPAD_BADGE)
     {
         float max_icon_size = 0.43f;
-        video::ITexture* texture = irr_driver->getTexture(
-                                    file_manager->getGUIDir() + "gamepad.png",
-                                    "Can't find '%s'.",
-                                    file_manager->getGUIDir() + "gamepad.png");
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+                                                          "gamepad.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
     if (widget->m_badges & LOADING_BADGE)
     {
         float max_icon_size = 0.43f;
-        video::ITexture* texture = irr_driver->getTexture(
-                                  file_manager->getGUIDir() + "hourglass.png",
-                                  "Can't find '%s'.",
-                                  file_manager->getGUIDir() + "hourglass.png");
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+                                                          "hourglass.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
 }   // drawBadgeOn
@@ -2194,7 +2176,7 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
 void Skin::draw3DMenuPane (IGUIElement *element, const core::recti &rect,
                            const core::recti *clip)
 {
-    SColor color = SColor(150, 44, 34, 90);
+    SColor color = SColor(150, 96, 74, 196);
     GUIEngine::getDriver()->draw2DRectangle(color, rect);
 }   // draw3DMenuPane
 
@@ -2233,8 +2215,7 @@ ITexture* Skin::getImage(const char* name)
     }
     else
     {
-        return irr_driver->getTexture(
-                            file_manager->getDataDir() + "gui/main_help.png");
+        return irr_driver->getTexture(FileManager::GUI,"main_help.png");
     }
 }   // getImage
 

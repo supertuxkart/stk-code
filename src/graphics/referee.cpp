@@ -44,11 +44,8 @@ video::ITexture      *Referee::m_st_traffic_lights[3]  = {NULL, NULL, NULL};
 void Referee::init()
 {
     assert(!m_st_referee_mesh);
-    const std::string filename=file_manager->getModelFile("referee.xml");
-    if(filename=="")
-    {
-        Log::fatal("referee", "Can't find referee.xml, aborting.");
-    }
+    const std::string filename=file_manager->getAssetChecked(FileManager::MODEL,
+                                                             "referee.xml", true);
     XMLNode *node = file_manager->createXMLTree(filename);
     if(!node)
     {
@@ -63,7 +60,8 @@ void Referee::init()
     node->get("model", &model_filename);
 
     m_st_referee_mesh = irr_driver->getAnimatedMesh(
-                     file_manager->getModelFile(model_filename) );
+                                 file_manager->getAsset(FileManager::MODEL,
+                                                        model_filename)      );
     if(!m_st_referee_mesh)
     {
         Log::fatal("referee", "Can't find referee model '%s', aborting.",
@@ -108,14 +106,7 @@ void Referee::init()
     }
     for(unsigned int i=0; i<3; i++)
     {
-        std::string full_path = file_manager->getTextureFile(colors[i]);
-        if(full_path.size()==0)
-        {
-            Log::fatal("referee",
-                       "Can't find texture '%s' for referee, aborting.",
-                       colors[i].c_str());
-        }
-        m_st_traffic_lights[i] = irr_driver->getTexture(full_path);
+        m_st_traffic_lights[i] = irr_driver->getTexture(FileManager::MODEL, colors[i]);
     }
 
 

@@ -89,13 +89,13 @@ void AttachmentManager::loadModels()
 {
     for(int i=0; iat[i].attachment!=Attachment::ATTACH_MAX; i++)
     {
-        std::string full_path = file_manager->getModelFile(iat[i].file);
+        std::string full_path = file_manager->getAsset(FileManager::MODEL,iat[i].file);
         m_attachments[iat[i].attachment]=irr_driver->getAnimatedMesh(full_path);
         m_attachments[iat[i].attachment]->grab();
         if(iat[i].icon_file)
         {
             std::string full_icon_path     =
-                file_manager->getModelFile(iat[i].icon_file);
+                file_manager->getAsset(FileManager::MODEL, iat[i].icon_file);
             m_all_icons[iat[i].attachment] =
                 material_manager->getMaterial(full_icon_path,
                                               /* full_path */     true,

@@ -115,7 +115,7 @@ namespace Online{
         struct curl_slist *chunk = NULL;
         chunk = curl_slist_append(chunk, "Host: api.stkaddons.net");
         curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, chunk);
-        curl_easy_setopt(m_curl_session, CURLOPT_CAINFO, (file_manager->getDataDir() + "web.tuxfamily.org.pem").c_str());
+        curl_easy_setopt(m_curl_session, CURLOPT_CAINFO, (file_manager->getAsset("web.tuxfamily.org.pem")).c_str());
         curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 0L);
         //curl_easy_setopt(m_curl_session, CURLOPT_VERBOSE, 1L);
         curl_easy_setopt(m_curl_session, CURLOPT_WRITEDATA, &m_string_buffer);

@@ -111,7 +111,7 @@ PowerupManager::PowerupType
  */
 void PowerupManager::loadAllPowerups()
 {
-    const std::string file_name = file_manager->getDataFile("powerup.xml");
+    const std::string file_name = file_manager->getAsset("powerup.xml");
     XMLNode *root               = file_manager->createXMLTree(file_name);
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
@@ -174,7 +174,7 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
     node.get("model", &model);
     if(model.size()>0)
     {
-        std::string full_path = file_manager->getModelFile(model);
+        std::string full_path = file_manager->getAsset(FileManager::MODEL,model);
         m_all_meshes[type] = irr_driver->getMesh(full_path);
         if(!m_all_meshes[type])
         {

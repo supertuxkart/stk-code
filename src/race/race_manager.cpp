@@ -322,7 +322,7 @@ void RaceManager::startNew(bool from_overworld)
 
     // Then the players, which start behind the AI karts
     // -------------------------------------------------
-    for(int i=m_player_karts.size()-1; i>=0; i--)
+    for(unsigned int i=0; i<m_player_karts.size(); i++)
     {
         KartType kt= m_player_karts[i].isNetworkPlayer() ? KT_NETWORK_PLAYER : KT_PLAYER;
         m_kart_status.push_back(KartStatus(m_player_karts[i].getKartName(), i,

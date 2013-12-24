@@ -60,13 +60,8 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight, Mo
 void ModalDialog::loadFromFile(const char* xmlFile)
 {
     doInit();
-    IXMLReader* xml = file_manager->createXMLReader( (file_manager->getGUIDir() + xmlFile).c_str() );
-    if (xml == NULL)
-    {
-        fprintf(stderr, "Cannot open file %s\n", xmlFile);
-        assert(false);
-        return;
-    }
+    std::string path = file_manager->getAssetChecked(FileManager::GUI,xmlFile, true);
+    IXMLReader* xml = file_manager->createXMLReader(path);
 
     Screen::parseScreenFileDiv(xml, m_widgets, m_irrlicht_window);
     delete xml;

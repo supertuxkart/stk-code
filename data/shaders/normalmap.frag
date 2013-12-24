@@ -1,36 +1,33 @@
-// Shader based on work by Fabien Sanglard
-// Released under the terms of CC-BY 3.0
+#version 130
+uniform sampler2D texture; //The texture
+uniform sampler2D normalMap; //The bump-map
 
-uniform sampler2D BumpTex; //The bump-map
-uniform sampler2D DecalTex; //The texture
-uniform sampler2D LightMapTex;
-uniform int HasLightMap;
+noperspective in vec3 tangent;
+noperspective in vec3 bitangent;
+noperspective in vec3 normal;
 
-// New bumpmapping
-varying vec3 lightVec;
-varying vec3 halfVec;
-varying vec3 eyeVec;
-
+vec4 encdepth(float v) {
+	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+	enc = fract(enc);
+	enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
+	return enc;
+}
 
 void main()
 {
-	// lookup normal from normal map, move from [0,1] to  [-1, 1] range, normalize
-	vec3 normal = 2.0 * texture2D (BumpTex, gl_TexCoord[0].st).rgb - 1.0;
-	normal = normalize (normal);
+	// normal in Tangent Space
+	vec3 TS_normal = 2.0 * texture2D (normalMap, gl_TexCoord[0].st).rgb - 1.0;
+	// Because of interpolation, we need to renormalize
+	vec3 Frag_tangent = normalize(tangent);
+	vec3 Frag_bitangent = normalize(cross(normal, tangent));
+	vec3 Frag_normal = cross(Frag_tangent, Frag_bitangent);
 
-	// compute diffuse lighting
-	float lamberFactor = max (dot (lightVec, normal), 0.0);
-	vec4 diffuseMaterial;
 
-	diffuseMaterial = texture2D (DecalTex, gl_TexCoord[0].st);
+	vec3 FragmentNormal = TS_normal.x * Frag_tangent + TS_normal.y * Frag_bitangent + TS_normal.z * Frag_normal;
+	FragmentNormal = normalize(FragmentNormal);
+	
 
-	if (HasLightMap < 1)
-	{
-		// 0.5 is the ambient light
-		gl_FragColor =	diffuseMaterial * (0.5 + lamberFactor*0.5);
-	}
-	else
-	{
-		gl_FragColor =	diffuseMaterial * (0.5 + lamberFactor*0.5) * texture2D(LightMapTex, gl_TexCoord[0].st);
-	}
+	gl_FragData[0] = texture2D (texture, gl_TexCoord[0].st);
+	gl_FragData[1] = vec4(0.5 * FragmentNormal + 0.5, 1.0);
+	gl_FragData[2] = vec4(encdepth(gl_FragCoord.z).xyz, 0.0);
 }

@@ -219,27 +219,12 @@ void PostProcessing::renderSolid(const u32 cam)
 
     const TypeRTT curssao = tick ? RTT_SSAO2 : RTT_SSAO1;
 
-    if (World::getWorld()->getTrack()->isFogEnabled())
-    {
-        m_material.MaterialType = irr_driver->getShader(ES_FOG);
-        m_material.setTexture(0, irr_driver->getRTT(RTT_DEPTH));
-
-        // Overlay
-        m_material.BlendOperation = EBO_ADD;
-        m_material.MaterialTypeParam = pack_textureBlendFunc(EBF_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA);
-
-        drv->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
-        drawQuad(cam, m_material);
-
-        m_material.BlendOperation = EBO_NONE;
-        m_material.MaterialTypeParam = 0;
-    }
 
     if (UserConfigParams::m_ssao == 1) // SSAO low
     {
         m_material.MaterialType = irr_driver->getShader(ES_SSAO);
         m_material.setTexture(0, irr_driver->getRTT(RTT_NORMAL));
-        m_material.setTexture(1, irr_driver->getRTT(tick ? RTT_SSAO1 : RTT_SSAO2));
+        m_material.setTexture(1, irr_driver->getRTT(RTT_DEPTH));
 
         drv->setRenderTarget(irr_driver->getRTT(curssao), true, false,
                              SColor(255, 255, 255, 255));
@@ -280,7 +265,7 @@ void PostProcessing::renderSolid(const u32 cam)
     {
         m_material.MaterialType = irr_driver->getShader(ES_SSAO);
         m_material.setTexture(0, irr_driver->getRTT(RTT_NORMAL));
-        m_material.setTexture(1, irr_driver->getRTT(tick ? RTT_SSAO1 : RTT_SSAO2));
+        m_material.setTexture(1, irr_driver->getRTT(RTT_DEPTH));
 
         drv->setRenderTarget(irr_driver->getRTT(curssao), true, false,
                              SColor(255, 255, 255, 255));
@@ -317,6 +302,24 @@ void PostProcessing::renderSolid(const u32 cam)
         m_material.BlendOperation = EBO_NONE;
         m_material.MaterialTypeParam = 0;
     }
+    
+    if (World::getWorld()->getTrack()->isFogEnabled())
+    {
+        m_material.MaterialType = irr_driver->getShader(ES_FOG);
+        m_material.setTexture(0, irr_driver->getRTT(RTT_DEPTH));
+
+        // Overlay
+        m_material.BlendOperation = EBO_ADD;
+        m_material.MaterialTypeParam = pack_textureBlendFunc(EBF_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA);
+
+        drv->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
+        drawQuad(cam, m_material);
+
+        m_material.BlendOperation = EBO_NONE;
+        m_material.MaterialTypeParam = 0;
+    }
+
+    
 
     tick++;
     tick %= 2;

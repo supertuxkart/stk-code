@@ -75,7 +75,7 @@ Shaders::Shaders()
 
 void Shaders::loadShaders()
 {
-    const std::string &dir = file_manager->getShaderDir();
+    const std::string &dir = file_manager->getAsset(FileManager::SHADER, "");
 
     IGPUProgrammingServices * const gpu = irr_driver->getVideoDriver()->getGPUProgrammingServices();
 

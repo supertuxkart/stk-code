@@ -798,7 +798,7 @@ bool operator>(const PlayerProfile &a, const PlayerProfile &b)
 /** Load configuration values from file. */
 bool UserConfig::loadConfig()
 {
-    const std::string filename = file_manager->getConfigDir()+"/"+m_filename;
+    const std::string filename = file_manager->getUserConfigFile(m_filename);
     XMLNode* root = file_manager->createXMLTree(filename);
     if(!root || root->getName() != "stkconfig")
     {
@@ -888,14 +888,7 @@ void UserConfig::postLoadInit()
 /** Write settings to config file. */
 void UserConfig::saveConfig()
 {
-    const std::string dir = file_manager->getConfigDir();
-    if(dir=="")
-    {
-        std::cerr << "User config firectory does not exist, cannot save config file!\n";
-        return;
-    }
-
-    const std::string filename = dir + "/" + m_filename;
+    const std::string filename = file_manager->getUserConfigFile(m_filename);
 
     try
     {

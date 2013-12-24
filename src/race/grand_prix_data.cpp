@@ -34,10 +34,11 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
     m_filename = filename;
     m_id       = StringUtils::getBasename(StringUtils::removeExtension(filename));
 
-    XMLNode* root = file_manager->createXMLTree(file_manager->getDataDir()+filename);
+    XMLNode* root = file_manager->createXMLTree(file_manager->getAsset(FileManager::GRANDPRIX,filename));
     if (!root)
     {
-        Log::error("GrandPrixData","Error while trying to read grandprix file '%s'\n", filename.c_str());
+        Log::error("GrandPrixData","Error while trying to read grandprix file '%s'", 
+                    filename.c_str());
         throw std::logic_error("File not found");
     }
 

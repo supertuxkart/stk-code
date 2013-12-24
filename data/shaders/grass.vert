@@ -1,25 +1,15 @@
-/*--- GENERIC HEADER ---*/
-
-varying vec3 nor;
-uniform mat4 invtworldm;
-
-
-/*--- END OF GENERIC HEADER --*/
-
+#version 130
 uniform vec3 windDir;
+
+noperspective out vec3 nor;
 
 void main()
 {
-	gl_TexCoord[0] = gl_MultiTexCoord0;
+	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
 
 	vec4 vertexPosition = gl_Vertex;
 	vertexPosition.xyz += windDir * gl_Color.r;
 
-	nor = (invtworldm * vec4(gl_Normal, 0.0)).xyz;
-	nor = normalize(nor);
-	nor = nor * 0.5 + 0.5;
-
+	nor = gl_NormalMatrix * gl_Normal;
 	gl_Position = gl_ModelViewProjectionMatrix * vertexPosition;
-	
-	
 }

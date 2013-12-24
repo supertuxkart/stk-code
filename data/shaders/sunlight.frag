@@ -5,7 +5,7 @@ uniform sampler2D cloudtex;
 uniform vec3 center;
 uniform vec3 col;
 uniform vec2 screen;
-uniform mat4 invprojview;
+uniform mat4 invproj;
 uniform int hasclouds;
 uniform vec2 wind;
 
@@ -33,7 +33,6 @@ void main() {
 	vec3 L = center;
 
 	float NdotL = max(0.0, dot(norm, L));
-	if (NdotL < 0.01) discard;
 
 	vec3 outcol = NdotL * col;
 
@@ -43,7 +42,7 @@ void main() {
 		tmp = tmp * 2.0 - 1.0;
 
 		vec4 xpos = vec4(tmp, 1.0);
-		xpos = invprojview * xpos;
+		xpos = invproj * xpos;
 		xpos.xyz /= xpos.w;
 
 		vec2 cloudcoord = (xpos.xz * 0.00833333) + wind;

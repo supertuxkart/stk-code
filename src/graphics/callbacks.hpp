@@ -371,7 +371,6 @@ public:
 };
 
 //
-
 class PointLightProvider: public CallBase
 {
 public:
@@ -394,9 +393,20 @@ public:
 
     void setPosition(float x, float y, float z)
     {
-        m_pos[0] = x;
-        m_pos[1] = y;
-        m_pos[2] = z;
+        const core::vector3df &campos =
+                   irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
+        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
+        core::vector3df pos(x,y,z);
+        pos -= campos;
+
+        // get position in eye space coordinates
+        core::matrix4 m_view = drv->getTransform(video::ETS_VIEW);
+        float *mat = m_view.pointer();
+
+        float scale = mat[3] * x + mat[7] * y + mat[11] * z + mat[15];
+        m_pos[0] = (mat[0] * x + mat[4] * y + mat[8] * z + mat[12]) / scale;
+        m_pos[1] = (mat[1] * x + mat[5] * y + mat[9] * z + mat[13]) / scale;
+        m_pos[2] = (mat[2] * x + mat[6] * y + mat[10] * z + mat[14]) / scale;
     }
 
     void setRadius(float r)
@@ -411,24 +421,15 @@ public:
 
     void updateIPVMatrix()
     {
-        // Update the campos and IPV matrix, only once per frame since it's costly
-        const core::vector3df &campos =
-                     irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
-        m_campos[0] = campos.X;
-        m_campos[1] = campos.Y;
-        m_campos[2] = campos.Z;
-
         const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
 
-        m_invprojview = drv->getTransform(video::ETS_PROJECTION);
-        m_invprojview *= drv->getTransform(video::ETS_VIEW);
-        m_invprojview.makeInverse();
+        m_invproj = drv->getTransform(video::ETS_PROJECTION);
+        m_invproj.makeInverse();
     }
 
 private:
-    core::matrix4 m_invprojview;
+    core::matrix4 m_invproj;
 
-    float m_campos[3];
     float m_color[3];
     float m_pos[3];
     float m_screen[2];
@@ -460,9 +461,17 @@ public:
 
     void setPosition(float x, float y, float z)
     {
-        m_pos[0] = x;
-        m_pos[1] = y;
-        m_pos[2] = z;
+        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
+        // Sun "position" is actually a direction and not a position
+        core::matrix4 m_view = drv->getTransform(video::ETS_VIEW);
+        m_view.makeInverse();
+        m_view = m_view.getTransposed();
+        core::vector3df pos(x, y, z);
+        m_view.transformVect(pos);
+        pos.normalize();
+        m_pos[0] = pos.X;
+        m_pos[1] = pos.Y;
+        m_pos[2] = pos.Z;
     }
 
     void updateIPVMatrix()
@@ -470,9 +479,8 @@ public:
         // Update the IPV matrix, only once per frame since it's costly
         const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
 
-        m_invprojview = drv->getTransform(video::ETS_PROJECTION);
-        m_invprojview *= drv->getTransform(video::ETS_VIEW);
-        m_invprojview.makeInverse();
+        m_invproj = drv->getTransform(video::ETS_PROJECTION);
+        m_invproj.makeInverse();
     }
 
     void setShadowMatrix(const core::matrix4 &mat)
@@ -481,7 +489,7 @@ public:
     }
 
 private:
-    core::matrix4 m_invprojview, m_shadowmat;
+    core::matrix4 m_invproj, m_shadowmat;
     float m_color[3];
     float m_pos[3];
     float m_screen[2];
@@ -531,8 +539,18 @@ public:
 
 class SSAOProvider: public CallBase
 {
+private:
+    core::matrix4 projm, invprojm;
 public:
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
+    void updateIPVMatrix()
+    {
+        // Update the IPV matrix, only once per frame since it's costly
+        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
+
+        projm = drv->getTransform(video::ETS_PROJECTION);
+        projm.getInverse(invprojm);
+    }
 };
 
 //

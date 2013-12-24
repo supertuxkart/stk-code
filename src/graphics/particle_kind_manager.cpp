@@ -103,7 +103,8 @@ ParticleKind* ParticleKindManager::getParticles(const std::string &name)
     {
         try
         {
-            ParticleKind* newkind = new ParticleKind(file_manager->getGfxFile(name));
+            std::string path = file_manager->getAsset(FileManager::GFX,name);
+            ParticleKind* newkind = new ParticleKind(path);
             m_kinds[name] = newkind;
             return newkind;
         }

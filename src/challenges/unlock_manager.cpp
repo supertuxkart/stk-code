@@ -56,12 +56,13 @@ UnlockManager::UnlockManager()
     // Read challenges from .../data/challenges
     // ----------------------------------------
     std::set<std::string> result;
-    file_manager->listFiles(result, "data/challenges");
+    std::string challenge_dir = file_manager->getAsset(FileManager::CHALLENGE, "");
+    file_manager->listFiles(result, challenge_dir);
     for(std::set<std::string>::iterator i  = result.begin();
                                         i != result.end()  ; i++)
     {
         if (StringUtils::hasSuffix(*i, ".challenge"))
-            addChallenge(file_manager->getDataFile("challenges/"+*i));
+            addChallenge(file_manager->getAsset("challenges/"+*i));
     }   // for i
 
     // Read challenges from .../data/tracks/*
@@ -112,7 +113,7 @@ void UnlockManager::readAllChallengesInDirs(const std::vector<std::string>* all_
         dir != all_dirs->end(); dir++)
     {
         std::set<std::string> all_files;
-        file_manager->listFiles(all_files, *dir, /*is_full_path*/ true);
+        file_manager->listFiles(all_files, *dir);
 
         for(std::set<std::string>::iterator file = all_files.begin();
             file != all_files.end(); file++)
@@ -205,7 +206,7 @@ const ChallengeData* UnlockManager::getChallenge(const std::string& id)
 */
 void UnlockManager::load()
 {
-    const std::string filename=file_manager->getConfigFile("challenges.xml");
+    const std::string filename=file_manager->getUserConfigFile("challenges.xml");
     XMLNode* root = file_manager->createXMLTree(filename);
     if(!root || root->getName() != "challenges")
     {
@@ -264,7 +265,7 @@ void UnlockManager::load()
 
 void UnlockManager::save()
 {
-    std::string filename = file_manager->getConfigFile("challenges.xml");
+    std::string filename = file_manager->getUserConfigFile("challenges.xml");
 
     std::ofstream challenge_file(filename.c_str(), std::ios::out);
 

@@ -173,6 +173,10 @@ private:
     float            m_slowdown_time;
     /** Maximum speed at which no more slow down occurs. */
     float            m_max_speed_fraction;
+    /** Minimum speed on this terrain. This is used for zippers on a ramp to 
+     *  guarantee the right jump distance. A negative value indicates no 
+     *  minimum speed. */
+    float            m_zipper_min_speed;
     /** The minimum speed at which a special sfx is started to be played. */
     float            m_sfx_min_speed;
     /** The speed at which the maximum pitch is used. */
@@ -320,7 +324,12 @@ public:
         *zipper_fade_out_time      = m_zipper_fade_out_time;
         *zipper_engine_force       = m_zipper_engine_force;
     }   // getZipperParameter
-
+    // ------------------------------------------------------------------------
+    /** Returns the minimum speed of a kart on this material. This is used
+     *  for zippers on a ramp to guarantee the right jump distance even
+     *  on lower speeds. A negative value indicates no minimum speed. */
+    float getZipperMinSpeed() const { return m_zipper_min_speed; }
+    // ------------------------------------------------------------------------
     bool isNormalMap() const { return m_graphical_effect == GE_NORMAL_MAP; }
 
     void onMadeVisible(scene::IMeshBuffer* who);

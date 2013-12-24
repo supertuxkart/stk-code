@@ -29,5 +29,5 @@ void main()
 	gl_PointSize = screenw * projCorner.x / projCorner.w;
 	gl_Position = gl_ProjectionMatrix * eyepos;
 
-	gl_TexCoord[0] = gl_MultiTexCoord0;
+	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
 }

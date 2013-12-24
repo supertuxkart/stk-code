@@ -132,7 +132,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
 
     m_screenshot_widget->m_properties[PROP_ICON] = (track  != NULL ?
                                                     track->getScreenshotFile().c_str() :
-                                                    file_manager->getDataDir() + "gui/main_help.png");
+                                                    file_manager->getAsset(FileManager::GUI,"main_help.png"));
     m_screenshot_widget->setParent(m_irrlicht_window);
     m_screenshot_widget->add();
     m_widgets.push_back(m_screenshot_widget);
@@ -271,9 +271,9 @@ void GPInfoDialog::onUpdate(float dt)
     }
 
     Track* track = track_manager->getTrack(tracks[frameAfter]);
-    m_screenshot_widget->setImage((track  != NULL ? track->getScreenshotFile().c_str() :
-                                                    (file_manager->getDataDir()+"gui/main_help.png").c_str()),
-                                  IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    std::string fn = track ? track->getScreenshotFile()
+                           : file_manager->getAsset(FileManager::GUI, "main_help.png");
+    m_screenshot_widget->setImage(fn.c_str(), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
 }
 
 // ------------------------------------------------------------------------------------------------------

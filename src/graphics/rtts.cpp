@@ -67,7 +67,7 @@ RTT::RTT()
     rtts[RTT_TMP3] = drv->addRenderTargetTexture(res, "rtt.tmp3", ECF_A8R8G8B8, stencil);
     rtts[RTT_TMP4] = drv->addRenderTargetTexture(res, "rtt.tmp4", ECF_A8R8G8B8, stencil);
     rtts[RTT_DEPTH] = drv->addRenderTargetTexture(res, "rtt.depth", ECF_A8R8G8B8, stencil);
-    rtts[RTT_NORMAL] = drv->addRenderTargetTexture(res, "rtt.normal", ECF_A8R8G8B8, stencil);
+    rtts[RTT_NORMAL] = drv->addRenderTargetTexture(res, "rtt.normal", ECF_A32B32G32R32F, stencil);
     rtts[RTT_COLOR] = drv->addRenderTargetTexture(res, "rtt.color", ECF_A8R8G8B8, stencil);
 
     rtts[RTT_HALF1] = drv->addRenderTargetTexture(half, "rtt.half1", ECF_A8R8G8B8, stencil);

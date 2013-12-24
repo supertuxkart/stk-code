@@ -324,11 +324,13 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
             m_zipper_fade_out_time      = 3.0f;
             m_zipper_speed_gain         = 4.5f;
             m_zipper_engine_force       = 250;
+            m_zipper_min_speed          = -1.0f;
             child_node->get("duration",          &m_zipper_duration          );
             child_node->get("fade-out-time",     &m_zipper_fade_out_time     );
             child_node->get("max-speed-increase",&m_zipper_max_speed_increase);
             child_node->get("speed-gain",        &m_zipper_speed_gain        );
             child_node->get("sengine-force",     &m_zipper_engine_force      );
+            child_node->get("min-speed",         &m_zipper_min_speed         );
         }
         else
         {
@@ -399,6 +401,7 @@ void Material::init(unsigned int index)
     m_zipper_max_speed_increase = -1.0f;
     m_zipper_speed_gain         = -1.0f;
     m_zipper_engine_force       = -1.0f;
+    m_zipper_min_speed          = -1.0f;
     m_parallax_map              = false;
     m_is_heightmap              = false;
     m_water_splash              = false;
@@ -415,7 +418,7 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
 {
     const std::string &full_path = is_full_path
                                  ? m_texname
-                                 : file_manager->getTextureFile(m_texname);
+                                 : file_manager->searchTexture(m_texname);
 
     if (complain_if_not_found && full_path.size() == 0)
     {
@@ -510,7 +513,8 @@ void Material::initCustomSFX(const XMLNode *sfx)
 
         // The directory for the track was added to the model search path
         // so just misuse the getModelFile function
-        const std::string full_path = file_manager->getModelFile(filename);
+        const std::string full_path = file_manager->getAsset(FileManager::MODEL,
+                                                             filename);
         SFXBuffer* buffer = sfx_manager->loadSingleSfx(sfx, full_path);
 
         if (buffer != NULL)
@@ -834,7 +838,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         {
         m->MaterialType = irr_driver->getShader(ES_CAUSTICS);
 
-        m->setTexture(1, irr_driver->getTexture((file_manager->getTextureDir() + "caustics.png").c_str()));
+        m->setTexture(1, irr_driver->getTexture(FileManager::SHADER,
+                                                "caustics.png"));
         }
 
 
@@ -875,8 +880,10 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         if (irr_driver->isGLSL())
         {
-            m->setTexture(1, irr_driver->getTexture(file_manager->getTextureFile("waternormals.jpg")));
-            m->setTexture(2, irr_driver->getTexture(file_manager->getTextureFile("waternormals2.jpg")));
+            m->setTexture(1, irr_driver->getTexture(FileManager::TEXTURE,
+                                                    "waternormals.jpg"));
+            m->setTexture(2, irr_driver->getTexture(FileManager::TEXTURE,
+                                                    "waternormals2.jpg"));
 
             ((WaterShaderProvider *) irr_driver->getCallback(ES_WATER))->
                 setSpeed(m_water_shader_speed_1/100.0f, m_water_shader_speed_2/100.0f);

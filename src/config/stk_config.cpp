@@ -266,9 +266,8 @@ void STKConfig::getAllData(const XMLNode * root)
         std::string title_music;
         music_node->get("title", &title_music);
         assert(title_music.size() > 0);
-
-        m_title_music = MusicInformation::create(file_manager->getDataDir()
-                                                 + "/music/" + title_music  );
+        title_music = file_manager->getAsset(FileManager::MUSIC, title_music);
+        m_title_music = MusicInformation::create(title_music);
         if(!m_title_music)
             Log::error("StkConfig", "Cannot load title music : %s", title_music.c_str());
     }

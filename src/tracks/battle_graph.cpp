@@ -17,7 +17,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, B
 
 #include "tracks/battle_graph.hpp"
-#include <iostream>
 
 #include <IMesh.h>
 #include <ICameraSceneNode.h>
@@ -27,6 +26,8 @@
 #include "graphics/irr_driver.hpp"
 #include "tracks/navmesh.hpp"
 #include "utils/vec3.hpp"
+
+#include <iostream>
 
 const int BattleGraph::UNKNOWN_POLY  = -1;
 BattleGraph * BattleGraph::m_battle_graph = NULL;
@@ -61,17 +62,7 @@ void BattleGraph::buildGraph(NavMesh* navmesh)
         }
         m_distance_matrix[i][i] = 0.0f;
     }
-    
-        for(int i=0; i<n_polys; i++)
-        for(int j=0; j<n_polys; j++)
-        {
-            if(fabsf(m_distance_matrix[i][j]-m_distance_matrix[j][i])>0.1)
-            {
-                int d;
-                std::cout<<"messed up";
-                std::cin>>d;
-            }
-}
+
 }
 
 /** computeFloydWarshall() computes the shortest distance between any two nodes.
@@ -106,11 +97,6 @@ void BattleGraph::computeFloydWarshall()
                     m_distance_matrix[i][j] = m_distance_matrix[i][k] + m_distance_matrix[k][j];
                     m_parent_poly[i][j] = m_parent_poly[k][j];
                 }
-               /* else if((m_distance_matrix[i][k] + m_distance_matrix[k][j]) == m_distance_matrix[i][j])
-                {
-                    m_parent_poly[i][j]= j;
-                }
-                */
             }
         }
     }

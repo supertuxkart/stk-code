@@ -2002,6 +2002,10 @@ void Kart::updatePhysics(float dt)
         m_speed *= -1.f;
 
     // Cap speed if necessary
+    const Material *m = getMaterial();
+
+    float min_speed =  m && m->isZipper() ? m->getZipperMinSpeed() : -1.0f;
+    m_max_speed->setMinSpeed(min_speed);
     m_max_speed->update(dt);
 
     // To avoid tunneling (which can happen on long falls), clamp the

@@ -182,7 +182,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     {
         // If the model isn't found in the track directory, look
         // in STK's model directory.
-        full_path = file_manager->getModelFile(model_name);
+        full_path = file_manager->getAsset(FileManager::MODEL,model_name);
         m_mesh    = irr_driver->getAnimatedMesh(full_path);
 
         if(!m_mesh)
@@ -347,10 +347,10 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_no
     xml_node.get("max_dist", &max_dist );
 
     // first try track dir, then global dir
-    std::string soundfile = file_manager->getModelFile(sound);
+    std::string soundfile = file_manager->getAsset(FileManager::MODEL,sound);
     if (!file_manager->fileExists(soundfile))
     {
-        soundfile = file_manager->getSFXFile(sound);
+        soundfile = file_manager->getAsset(FileManager::SFX, sound);
     }
 
     SFXBuffer* buffer = new SFXBuffer(soundfile,
@@ -457,7 +457,7 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(const XMLNode
     }
 
     video::ITexture *texture =
-        irr_driver->getTexture(file_manager->getTextureFile(texture_name));
+        irr_driver->getTexture(file_manager->searchTexture(texture_name));
     m_node = irr_driver->addBillboard(core::dimension2df(width, height),
                                                        texture);
     Material *stk_material = material_manager->getMaterial(texture_name);
