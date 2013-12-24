@@ -419,6 +419,10 @@ public:
         m_specular = s;
     }
 
+    void setEnergy(float e) {
+      m_energy = e;
+    }
+
     void updateIPVMatrix()
     {
         const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
@@ -435,6 +439,7 @@ private:
     float m_screen[2];
     float m_radius;
     float m_specular;
+    float m_energy;
 };
 
 //

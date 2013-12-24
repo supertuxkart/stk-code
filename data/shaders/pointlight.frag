@@ -6,6 +6,7 @@ uniform float r;
 uniform float spec;
 uniform vec2 screen;
 uniform mat4 invproj;
+uniform float energy;
 
 void main() {
 	vec2 texc = gl_FragCoord.xy / screen;
@@ -17,7 +18,7 @@ void main() {
 
 	float d = distance(center, xpos.xyz);
 	if (d > r) discard;
-	float att = 200.0 / (4. * 3.14 * d * d);
+	float att = energy * 200.0 / (4. * 3.14 * d * d);
 
 	vec3 norm = texture2D(ntex, texc).xyz;
 	norm = (norm - 0.5) * 2.0;

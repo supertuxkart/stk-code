@@ -33,7 +33,7 @@ namespace irr
 class LightNode: public scene::ISceneNode
 {
 public:
-    LightNode(scene::ISceneManager* mgr, float radius, float r, float g, float b);
+    LightNode(scene::ISceneManager* mgr, float radius, float energy, float r, float g, float b);
     virtual ~LightNode();
 
     virtual void render() OVERRIDE;
@@ -59,6 +59,7 @@ protected:
 
     float m_radius;
     float m_color[3];
+    float energy;
 };
 
 #endif

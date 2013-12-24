@@ -1590,10 +1590,12 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
             float distance = 25.0f;
             node->get("distance", &distance);
+            float energy = 1.;
+            node->get("energy", &energy);
 
             if (irr_driver->isGLSL())
             {
-                irr_driver->addLight(pos, distance, colorf.r, colorf.g, colorf.b);
+                irr_driver->addLight(pos, distance, energy, colorf.r, colorf.g, colorf.b);
             } else
             {
             scene::ILightSceneNode* node = irr_driver->getSceneManager()->addLightSceneNode(NULL, pos, color, distance);
@@ -1756,7 +1758,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     const video::SColorf tmpf(m_sun_diffuse_color);
-    m_sun = irr_driver->addLight(m_sun_position, 10000.0f, tmpf.r, tmpf.g, tmpf.b, true);
+    m_sun = irr_driver->addLight(m_sun_position, 10000.0f, 0., tmpf.r, tmpf.g, tmpf.b, true);
 
     if (!irr_driver->isGLSL())
     {

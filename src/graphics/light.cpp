@@ -35,7 +35,7 @@ SMaterial LightNode::mat;
 aabbox3df LightNode::box;
 
 
-LightNode::LightNode(scene::ISceneManager* mgr, float radius, float r, float g, float b):
+LightNode::LightNode(scene::ISceneManager* mgr, float radius, float e, float r, float g, float b):
                      ISceneNode(mgr->getRootSceneNode(), mgr, -1)
 {
     if (!sphere)
@@ -63,6 +63,7 @@ LightNode::LightNode(scene::ISceneManager* mgr, float radius, float r, float g, 
 
     setScale(vector3df(radius));
     m_radius = radius;
+    energy = e;
 
     m_color[0] = r;
     m_color[1] = g;
@@ -79,6 +80,7 @@ void LightNode::render()
     cb->setColor(m_color[0], m_color[1], m_color[2]);
     cb->setPosition(getPosition().X, getPosition().Y, getPosition().Z);
     cb->setRadius(m_radius);
+    cb->setEnergy(energy);
 
     IVideoDriver * const drv = irr_driver->getVideoDriver();
     drv->setTransform(ETS_WORLD, AbsoluteTransformation);

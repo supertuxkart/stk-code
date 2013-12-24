@@ -360,6 +360,7 @@ void PointLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     srv->setVertexShaderConstant("center", m_pos, 3);
     srv->setVertexShaderConstant("r", &m_radius, 1);
     srv->setVertexShaderConstant("invproj", m_invproj.pointer(), 16);
+    srv->setVertexShaderConstant("energy", &m_energy, 1);
 
     if (!firstdone)
     {
