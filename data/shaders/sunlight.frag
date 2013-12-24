@@ -46,6 +46,7 @@ void main() {
 		outcol *= cloud;
 	}
 
-	gl_FragData[0] = vec4(NdotL * col, Specular+ 0.001); // Irrlicht force alpha test, can't be 0
-	gl_FragData[1] = vec4(1.0);
+	gl_FragData[0] = vec4(NdotL * col, 1.);
+	gl_FragData[1] = vec4(Specular * col, 1.);
+	gl_FragData[2] = vec4(1.0);
 }

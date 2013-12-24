@@ -25,11 +25,12 @@ void main() {
 	// Light Direction
 	vec3 L = normalize(xpos.xyz - center);
 
-	float NdotL = max(0.0, dot(norm, -L)) * att;
+	float NdotL = max(0.0, dot(norm, -L));
 	// Reflected light dir
 	vec3 R = reflect(-L, norm);
 	float RdotE = max(0.0, dot(R, normalize(xpos.xyz)));
 	float Specular = pow(RdotE, spec);
 
-	gl_FragColor = vec4(NdotL * col, Specular + 0.001); // Irrlicht force alpha test, can't be 0
+	gl_FragData[0] = vec4(NdotL * col * att, 1.);
+	gl_FragData[1] = vec4(Specular * col, 1.);
 }

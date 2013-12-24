@@ -670,7 +670,13 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
                              video::SOverrideMaterial &overridemat,
                              int cam)
 {
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_TMP1), true, false,
+    core::array<video::IRenderTarget> rtts;
+    // Diffuse
+    rtts.push_back(m_rtts->getRTT(RTT_TMP1));
+    // Specular
+    rtts.push_back(m_rtts->getRTT(RTT_TMP2));
+
+    m_video_driver->setRenderTarget(rtts, true, false,
                                         video::SColor(0, 0, 0, 0));
 
     const vector3df camcenter = cambox.getCenter();
@@ -781,9 +787,8 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     lightmat.ZBuffer = video::ECFN_ALWAYS;
     lightmat.setFlag(video::EMF_BILINEAR_FILTER, false);
     lightmat.setTexture(0, m_rtts->getRTT(RTT_TMP1));
-
-    // Apply ambient occlusion
-    lightmat.setTexture(1, m_rtts->getRTT(RTT_SSAO));
+    lightmat.setTexture(1, m_rtts->getRTT(RTT_TMP2));
+    lightmat.setTexture(2, m_rtts->getRTT(RTT_SSAO));
 
     lightmat.MaterialType = m_shaders->getShader(ES_LIGHTBLEND);
 	if (!m_lightviz)
