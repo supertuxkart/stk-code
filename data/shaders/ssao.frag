@@ -43,13 +43,14 @@ void main(void)
 		// Projection of sampleDir over nom
 		float cosTheta = samplePoints[i].z;
 
+		bool isInsideTexture = (sampleProj.x > -1.) && (sampleProj.x < 1.) && (sampleProj.y > -1.) && (sampleProj.y < 1.);
 		// get the depth of the occluder fragment
 		float occluderFragmentDepth = texture2D(normals_and_depth, (sampleProj.xy * 0.5) + 0.5).a;
 		// Position of the occluder fragment in worldSpace
 		vec4 occluderPos = invprojm * vec4(sampleProj.xy, 2.0 * occluderFragmentDepth - 1.0, 1.0f);
 		occluderPos /= occluderPos.w;
 
-		bool isOccluded = (sampleProj.z > (2. * occluderFragmentDepth - 1.0)) && (distance(FragPos, occluderPos) < radius);
+		bool isOccluded = isInsideTexture && (sampleProj.z > (2. * occluderFragmentDepth - 1.0)) && (distance(FragPos, occluderPos) < radius);
 		bl += isOccluded ? smoothstep(radius, 0, distance(samplePos, FragPos)) * cosTheta : 0.;
 	}
 
