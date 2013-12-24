@@ -92,6 +92,7 @@ public:
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
         IVideoDriver * const drv = irr_driver->getVideoDriver();
+		mat.setTexture(1, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
         drv->setTransform(ETS_WORLD, AbsoluteTransformation);
         drv->setMaterial(mat);
 

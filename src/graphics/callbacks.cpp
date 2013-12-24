@@ -209,12 +209,22 @@ void RainEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     const float screenw = (float)UserConfigParams::m_width;
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 90.0f;
     const matrix4 viewm = srv->getVideoDriver()->getTransform(ETS_VIEW);
+	matrix4 invproj = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+	invproj.makeInverse();
     const vector3df campos = irr_driver->getSceneManager()->getActiveCamera()->getPosition();
+	float screen[2] = { (float)UserConfigParams::m_width,
+		(float)UserConfigParams::m_height };
 
     srv->setVertexShaderConstant("screenw", &screenw, 1);
     srv->setVertexShaderConstant("time", &time, 1);
     srv->setVertexShaderConstant("viewm", viewm.pointer(), 16);
     srv->setVertexShaderConstant("campos", &campos.X, 3);
+	srv->setPixelShaderConstant("invproj", invproj.pointer(), 16);
+	srv->setPixelShaderConstant("screen", screen, 2);
+	s32 tex = 0;
+	srv->setPixelShaderConstant("tex", &tex, 1);
+	tex = 1;
+	srv->setPixelShaderConstant("normals_and_depth", &tex, 1);
 }
 
 //-------------------------------------
