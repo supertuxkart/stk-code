@@ -670,14 +670,8 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
                              video::SOverrideMaterial &overridemat,
                              int cam)
 {
-    if (!m_lightviz)
-    {
-        m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_TMP1), true, false,
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_TMP1), true, false,
                                         video::SColor(0, 0, 0, 0));
-    } else
-    {
-        m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
-    }
 
     const vector3df camcenter = cambox.getCenter();
     const float camradius = cambox.getExtent().getLength() / 2;
@@ -726,26 +720,6 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
             m.ZBuffer = video::ECFN_GREATER;
         }
 
-        if (m_lightviz)
-        {
-            overridemat.Enabled = true;
-            overridemat.EnableFlags = video::EMF_MATERIAL_TYPE | video::EMF_WIREFRAME |
-                                        video::EMF_FRONT_FACE_CULLING |
-                                        video::EMF_BACK_FACE_CULLING |
-                                        video::EMF_ZBUFFER;
-            overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
-            overridemat.Material.Wireframe = true;
-            overridemat.Material.BackfaceCulling = false;
-            overridemat.Material.FrontfaceCulling = false;
-            overridemat.Material.ZBuffer = video::ECFN_LESSEQUAL;
-
-
-            ColorizeProvider * const cb = (ColorizeProvider *) m_shaders->m_callbacks[ES_COLORIZE];
-            float col[3];
-            m_lights[i]->getColor(col);
-            cb->setColor(col[0], col[1], col[2]);
-        }
-
         // Action
         m_lights[i]->render();
 
@@ -757,12 +731,6 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
             m.BackfaceCulling = true;
             m.ZBuffer = video::ECFN_LESSEQUAL;
         }
-
-        if (m_lightviz)
-        {
-            overridemat.Enabled = false;
-        }
-
     } // for i in lights
 
     // Handle SSAO
@@ -818,7 +786,10 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     lightmat.setTexture(1, m_rtts->getRTT(RTT_SSAO));
 
     lightmat.MaterialType = m_shaders->getShader(ES_LIGHTBLEND);
-    lightmat.MaterialTypeParam = video::pack_textureBlendFunc(video::EBF_DST_COLOR, video::EBF_ZERO);
+	if (!m_lightviz)
+        lightmat.MaterialTypeParam = video::pack_textureBlendFunc(video::EBF_DST_COLOR, video::EBF_ZERO);
+	else
+		lightmat.MaterialTypeParam = video::pack_textureBlendFunc(video::EBF_ONE, video::EBF_ZERO);
     lightmat.BlendOperation = video::EBO_ADD;
 
     lightmat.TextureLayer[0].TextureWrapU =
