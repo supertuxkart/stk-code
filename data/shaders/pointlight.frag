@@ -17,7 +17,7 @@ void main() {
 
 	float d = distance(center, xpos.xyz);
 	if (d > r) discard;
-	float att = 1.0 - smoothstep(0.0, r, d);
+	float att = 200.0 / (4 * 3.14 * d * d);
 
 	vec3 norm = texture2D(ntex, texc).xyz;
 	norm = (norm - 0.5) * 2.0;
