@@ -32,7 +32,7 @@ void main() {
 
 	float NdotL = max(0.0, dot(norm, L));
 	vec3 R = reflect(L, norm);
-	float RdotE = max(0.0, dot(R, normalize(xpos)));
+	float RdotE = max(0.0, dot(R, normalize(xpos.xyz)));
 	float Specular = pow(RdotE, 200);
 
 	vec3 outcol = NdotL * col;

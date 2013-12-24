@@ -17,7 +17,7 @@ void main() {
 
 	float d = distance(center, xpos.xyz);
 	if (d > r) discard;
-	float att = 200.0 / (4 * 3.14 * d * d);
+	float att = 200.0 / (4. * 3.14 * d * d);
 
 	vec3 norm = texture2D(ntex, texc).xyz;
 	norm = (norm - 0.5) * 2.0;
@@ -28,7 +28,7 @@ void main() {
 	float NdotL = max(0.0, dot(norm, -L)) * att;
 	// Reflected light dir
 	vec3 R = reflect(-L, norm);
-	float RdotE = max(0.0, dot(R, normalize(xpos)));
+	float RdotE = max(0.0, dot(R, normalize(xpos.xyz)));
 	float Specular = pow(RdotE, spec);
 
 	gl_FragColor = vec4(NdotL * col, Specular + 0.001); // Irrlicht force alpha test, can't be 0

@@ -5,7 +5,7 @@ uniform vec2 screen;
 
 void main()
 {
-	vec2 xy = gl_FragCoord / screen;
+	vec2 xy = gl_FragCoord.xy / screen;
 	float FragZ = gl_FragCoord.z;
 	float EnvZ = texture2D(normals_and_depth, xy).a;
 	vec4 FragmentPos = invproj * (2. * vec4(xy, FragZ, 1.0) - 1.);
