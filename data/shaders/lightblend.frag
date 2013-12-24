@@ -11,5 +11,5 @@ void main()
 	vec3 specular = texture2D(diffuse_and_spec, texc).www;
 	float ao = texture2D(ambient_occlusion, texc).x;
 
-	gl_FragColor = vec4(diffuse + specular + ao * ambient, 1.0);
+	gl_FragColor = vec4(diffuse + ao * ambient, 1.0);
 }
