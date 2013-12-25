@@ -140,6 +140,8 @@ void IrrDriver::renderGLSL(float dt)
 
     // Clear normal and depth to zero
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_NORMAL_AND_DEPTH), true, false, video::SColor(0,0,0,0));
+    // Clear specular map to zero
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_SPECULARMAP), true, false, video::SColor(0,0,0,0));
 
     irr_driver->getVideoDriver()->enableMaterial2D();
     RaceGUIBase *rg = world->getRaceGUI();

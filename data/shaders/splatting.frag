@@ -25,7 +25,8 @@ void main() {
 			(1.0 - splatting.a) * detail4)
 			* gl_Color;
 
-	gl_FragData[0] = splatted;
+	gl_FragData[0] = vec4(splatted.xyz, 1.);
 
 	gl_FragData[1] = vec4(normalize(nor) * 0.5 + 0.5, gl_FragCoord.z);
+	gl_FragData[2] = vec4(splatted.a);
 }
