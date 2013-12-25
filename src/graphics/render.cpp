@@ -789,6 +789,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     lightmat.setTexture(0, m_rtts->getRTT(RTT_TMP1));
     lightmat.setTexture(1, m_rtts->getRTT(RTT_TMP2));
     lightmat.setTexture(2, m_rtts->getRTT(RTT_SSAO));
+    lightmat.setTexture(3, m_rtts->getRTT(RTT_SPECULARMAP));
 
     lightmat.MaterialType = m_shaders->getShader(ES_LIGHTBLEND);
 	if (!m_lightviz)

@@ -348,6 +348,8 @@ void LightBlendProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     srv->setVertexShaderConstant("specular", &tex, 1);
     tex = 2;
     srv->setVertexShaderConstant("ambient_occlusion", &tex, 1);
+    tex = 3;
+    srv->setVertexShaderConstant("specular_map", &tex, 1);
 }
 
 //-------------------------------------

@@ -425,6 +425,7 @@ void IrrDriver::initDevice()
         m_mrt.reallocate(3);
         m_mrt.push_back(m_rtts->getRTT(RTT_COLOR));
         m_mrt.push_back(m_rtts->getRTT(RTT_NORMAL_AND_DEPTH));
+        m_mrt.push_back(m_rtts->getRTT(RTT_SPECULARMAP));
 
         irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
         gl_driver->extGlGenQueries(1, &m_lensflare_query);
