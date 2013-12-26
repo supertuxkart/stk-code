@@ -19,9 +19,13 @@ Hope you enjoy the game.
 
 HARDWARE REQUIREMENTS
 =====================
-* You need a 3D graphics card that supports OpenGL or Mesa.
-* You should have a CPU that's running at 450MHz or better.
-* You'll need at least 600 MB of free RAM. 
+* You need a 3D graphics card.
+    NVIDIA GeForce 8xxx and higher
+    ATI Radeon HD 4xxx and higher
+    Intel HD 3000 and higher
+* You should have a CPU that's running at 1GHz or better.
+* You'll need at least 512 MB of free VRAM (video memory).
+* Disk space: 400MB
 * Ideally, you want a joystick with at least 6 buttons.
 
 
