@@ -20,7 +20,7 @@ void main()
 	offset -= 1.0;
 
 	// Fade according to distance to cam
-	float fade = 1.0 - smoothstep(1.0, 40.0, camdist);
+	float fade = 1.0 - smoothstep(1.0, 100.0, camdist);
 
 	// Fade according to distance from the edges
 	vec2 edger = gl_TexCoord[1].xy;
