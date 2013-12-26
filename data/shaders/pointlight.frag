@@ -17,7 +17,6 @@ void main() {
 	xpos /= xpos.w;
 
 	float d = distance(center, xpos.xyz);
-	if (d > r) discard;
 	float att = energy * 200.0 / (4. * 3.14 * d * d);
 
 	vec3 norm = texture2D(ntex, texc).xyz;
@@ -33,5 +32,5 @@ void main() {
 	float Specular = pow(RdotE, spec);
 
 	gl_FragData[0] = vec4(NdotL * col * att, 1.);
-	gl_FragData[1] = vec4(Specular * col, 1.);
+	gl_FragData[1] = vec4(Specular * col * att, 1.);
 }

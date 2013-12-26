@@ -56,6 +56,7 @@ protected:
     static core::aabbox3df box;
 
     static scene::IMesh *sphere;
+    class ScreenQuad *sq;
 
     float m_radius;
     float m_color[3];

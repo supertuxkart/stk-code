@@ -25,6 +25,7 @@
 #include "graphics/material.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/screenquad.hpp"
 
 using namespace video;
 using namespace scene;
@@ -38,28 +39,28 @@ aabbox3df LightNode::box;
 LightNode::LightNode(scene::ISceneManager* mgr, float radius, float e, float r, float g, float b):
                      ISceneNode(mgr->getRootSceneNode(), mgr, -1)
 {
-    if (!sphere)
+    sq = new ScreenQuad(irr_driver->getVideoDriver());
+    SMaterial &mat = sq->getMaterial();
+
+    mat.Lighting = false;
+    mat.MaterialType = irr_driver->getShader(ES_POINTLIGHT);
+
+    mat.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
+
+    for (u32 i = 0; i < MATERIAL_MAX_TEXTURES; ++i)
     {
-        mat.Lighting = false;
-        mat.MaterialType = irr_driver->getShader(ES_POINTLIGHT);
-
-        mat.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
-
-        for (u32 i = 0; i < MATERIAL_MAX_TEXTURES; ++i)
-        {
-            mat.TextureLayer[i].TextureWrapU =
-            mat.TextureLayer[i].TextureWrapV = ETC_CLAMP_TO_EDGE;
-        }
-
-        mat.setFlag(EMF_BILINEAR_FILTER, false);
-        mat.setFlag(EMF_ZWRITE_ENABLE, false);
-
-        mat.MaterialTypeParam = pack_textureBlendFunc(EBF_ONE, EBF_ONE);
-        mat.BlendOperation = EBO_ADD;
-
-        sphere = mgr->getGeometryCreator()->createSphereMesh(1, 16, 16);
-        box = sphere->getBoundingBox();
+        mat.TextureLayer[i].TextureWrapU =
+        mat.TextureLayer[i].TextureWrapV = ETC_CLAMP_TO_EDGE;
     }
+
+    mat.setFlag(EMF_BILINEAR_FILTER, false);
+    mat.setFlag(EMF_ZWRITE_ENABLE, false);
+
+    mat.MaterialTypeParam = pack_textureBlendFunc(EBF_ONE, EBF_ONE);
+    mat.BlendOperation = EBO_ADD;
+
+    sphere = mgr->getGeometryCreator()->createSphereMesh(1, 16, 16);
+    box = sphere->getBoundingBox();
 
     setScale(vector3df(radius));
     m_radius = radius;
@@ -81,12 +82,16 @@ void LightNode::render()
     cb->setPosition(getPosition().X, getPosition().Y, getPosition().Z);
     cb->setRadius(m_radius);
     cb->setEnergy(energy);
-
+    // Irrlicht's ScreenQuad reset the matrixes, we need to keep them
     IVideoDriver * const drv = irr_driver->getVideoDriver();
-    drv->setTransform(ETS_WORLD, AbsoluteTransformation);
-    drv->setMaterial(mat);
-
-    drv->drawMeshBuffer(sphere->getMeshBuffer(0));
+    matrix4 tmpworld = drv->getTransform(ETS_WORLD);
+    matrix4 tmpview = drv->getTransform(ETS_VIEW);
+    matrix4 tmpproj = drv->getTransform(ETS_PROJECTION);
+    sq->render(false);
+    drv->setTransform(ETS_WORLD, tmpworld);
+    drv->setTransform(ETS_VIEW, tmpview);
+    drv->setTransform(ETS_PROJECTION, tmpproj);
+    return;
 }
 
 void LightNode::OnRegisterSceneNode()

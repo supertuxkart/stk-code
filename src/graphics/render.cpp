@@ -710,35 +710,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         radius_sum *= radius_sum;
         if (radius_sum < distance_sq)
             continue;
-
-        bool inside = false;
-
-        const float camdistance_sq = (m_lights[i]->getPosition() - campos).getLengthSQ();
-        float adjusted_radius = m_lights[i]->getRadius() + camnear;
-        adjusted_radius *= adjusted_radius;
-
-        // Camera inside the light's radius? Needs adjustment for the near plane.
-        if (camdistance_sq < adjusted_radius)
-        {
-            inside = true;
-
-            video::SMaterial &m = m_lights[i]->getMaterial(0);
-            m.FrontfaceCulling = true;
-            m.BackfaceCulling = false;
-            m.ZBuffer = video::ECFN_GREATER;
-        }
-
-        // Action
         m_lights[i]->render();
-
-        // Reset the inside change
-        if (inside)
-        {
-            video::SMaterial &m = m_lights[i]->getMaterial(0);
-            m.FrontfaceCulling = false;
-            m.BackfaceCulling = true;
-            m.ZBuffer = video::ECFN_LESSEQUAL;
-        }
     } // for i in lights
 
     // Handle SSAO

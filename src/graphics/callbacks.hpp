@@ -393,11 +393,7 @@ public:
 
     void setPosition(float x, float y, float z)
     {
-        const core::vector3df &campos =
-                   irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
         const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-        core::vector3df pos(x,y,z);
-        pos -= campos;
 
         // get position in eye space coordinates
         core::matrix4 m_view = drv->getTransform(video::ETS_VIEW);
