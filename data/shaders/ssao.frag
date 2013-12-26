@@ -5,7 +5,7 @@ uniform mat4 projm;
 uniform vec4 samplePoints[16];
 
 const float strengh = 4.;
-const float radius = .1f;
+const float radius = .4f;
 
 #define SAMPLES 16
 
