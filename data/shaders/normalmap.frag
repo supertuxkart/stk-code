@@ -22,4 +22,5 @@ void main()
 
 	gl_FragData[0] = texture2D (texture, gl_TexCoord[0].st);
 	gl_FragData[1] = vec4(0.5 * FragmentNormal + 0.5, gl_FragCoord.z);
+	gl_FragData[2] = vec4(0.);
 }

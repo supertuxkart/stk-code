@@ -22,4 +22,5 @@ void main() {
 	gl_FragData[0] = detail0 * gl_Color;
 
 	gl_FragData[1] = vec4(nor, gl_FragCoord.z);
+	gl_FragData[2] = vec4(0.);
 }
