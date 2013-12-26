@@ -21,6 +21,7 @@
 
 #include <ISceneNode.h>
 #include <utils/cpp2011.h>
+#include <vector>
 
 using namespace irr;
 
@@ -37,6 +38,7 @@ public:
     virtual ~LightNode();
 
     virtual void render() OVERRIDE;
+    static void renderLightSet(const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy);
 
     virtual const core::aabbox3d<f32>& getBoundingBox() const OVERRIDE
     {
@@ -46,17 +48,15 @@ public:
     virtual void OnRegisterSceneNode() OVERRIDE;
 
     virtual u32 getMaterialCount() const OVERRIDE { return 1; }
-    virtual video::SMaterial& getMaterial(u32 i) OVERRIDE { return mat; }
-    virtual bool isCullable() { return true; }
+    virtual bool isPointLight() { return true; }
 
     float getRadius() const { return m_radius; }
-    void getColor(float out[3]) const { memcpy(out, m_color, 3 * sizeof(float)); }
+    float getEnergy() const { return energy; }
+    core::vector3df getColor() const { return core::vector3df(m_color[0], m_color[1], m_color[2]); }
 
 protected:
-    static video::SMaterial mat;
     static core::aabbox3df box;
 
-    static scene::IMesh *sphere;
     class ScreenQuad *sq;
 
     float m_radius;

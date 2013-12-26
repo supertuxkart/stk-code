@@ -384,30 +384,15 @@ public:
 
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
 
-    void setColor(float r, float g, float b)
+    void setColor(const std::vector<float> &col)
     {
-        m_color[0] = r;
-        m_color[1] = g;
-        m_color[2] = b;
+      m_color = col;
     }
 
-    void setPosition(float x, float y, float z)
+    void setPosition(const std::vector<float> &pos)
     {
-        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-
-        // get position in eye space coordinates
-        core::matrix4 m_view = drv->getTransform(video::ETS_VIEW);
-        float *mat = m_view.pointer();
-
-        float scale = mat[3] * x + mat[7] * y + mat[11] * z + mat[15];
-        m_pos[0] = (mat[0] * x + mat[4] * y + mat[8] * z + mat[12]) / scale;
-        m_pos[1] = (mat[1] * x + mat[5] * y + mat[9] * z + mat[13]) / scale;
-        m_pos[2] = (mat[2] * x + mat[6] * y + mat[10] * z + mat[14]) / scale;
-    }
-
-    void setRadius(float r)
-    {
-        m_radius = r;
+      m_pos = pos;
+      return;
     }
 
     void setSpecular(float s)
@@ -415,27 +400,26 @@ public:
         m_specular = s;
     }
 
-    void setEnergy(float e) {
+    void setEnergy(const std::vector<float> &e) {
       m_energy = e;
     }
 
     void updateIPVMatrix()
     {
         const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-
+        m_view = drv->getTransform(video::ETS_VIEW);
         m_invproj = drv->getTransform(video::ETS_PROJECTION);
         m_invproj.makeInverse();
     }
 
 private:
-    core::matrix4 m_invproj;
+    core::matrix4 m_invproj, m_view;
 
-    float m_color[3];
-    float m_pos[3];
+    std::vector<float> m_color;
+    std::vector<float> m_pos;
+    std::vector<float> m_energy;
     float m_screen[2];
-    float m_radius;
     float m_specular;
-    float m_energy;
 };
 
 //

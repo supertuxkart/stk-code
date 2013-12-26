@@ -703,27 +703,47 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     const core::vector3df &camdir = (camnode->getTarget() - camcenter).normalize();
 
     float fov = camnode->getFOV() / 2.;
+    std::vector<float> accumulatedLightPos;
+    std::vector<float> accumulatedLightColor;
+    std::vector<float> accumulatedLightEnergy;
+    unsigned lightnum = 0;
     for (unsigned int i = 0; i < lightcount; i++)
     {
+        if (!m_lights[i]->isPointLight()) {
+          m_lights[i]->render();
+          continue;
+        }
+        if (lightnum >= 32)
+          continue;
         // Light culling
         const core::vector3df &lightpos = (m_lights[i]->getPosition() - camcenter);
         float light_radius = m_lights[i]->getRadius();
         float dotprod = camdir.dotProduct(lightpos);
-        if (m_lights[i]->isCullable()) {
-            if (dotprod > 0.) {
-                // Pixels in front of camera
-                // Are they too far ?
-                if (lightpos.getLength() > camradius)
-                    continue;
-                // Is it too divergent from camera normal ?
-                float othogonal_max_dst = light_radius + dotprod * tan(fov);
-                if (lightpos.getLengthSQ() - dotprod * dotprod > othogonal_max_dst * othogonal_max_dst)
-                    continue;
-            } else if (lightpos.getLength() > light_radius)
+        if (dotprod > 0.) {
+            // Pixels in front of camera
+            // Are they too far ?
+            if (lightpos.getLength() > camradius)
                 continue;
-        }
-        m_lights[i]->render();
+            // Is it too divergent from camera normal ?
+            float othogonal_max_dst = light_radius + dotprod * tan(fov);
+            if (lightpos.getLengthSQ() - dotprod * dotprod > othogonal_max_dst * othogonal_max_dst)
+                continue;
+        } else if (lightpos.getLength() > light_radius)
+            continue;
+        const core::vector3df &pos = m_lights[i]->getPosition();
+        accumulatedLightPos.push_back(pos.X);
+        accumulatedLightPos.push_back(pos.Y);
+        accumulatedLightPos.push_back(pos.Z);
+        accumulatedLightPos.push_back(0.);
+        const core::vector3df &col = m_lights[i]->getColor();
+        accumulatedLightColor.push_back(col.X);
+        accumulatedLightColor.push_back(col.Y);
+        accumulatedLightColor.push_back(col.Z);
+        accumulatedLightColor.push_back(0.);
+        accumulatedLightEnergy.push_back(m_lights[i]->getEnergy());
+        lightnum++;
     } // for i in lights
+    LightNode::renderLightSet(accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
     // Handle SSAO
     SMaterial m_material;
     GaussianBlurProvider * const gacb = (GaussianBlurProvider *) irr_driver->

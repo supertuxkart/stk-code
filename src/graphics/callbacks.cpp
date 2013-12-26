@@ -356,13 +356,15 @@ void LightBlendProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void PointLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
+    int lightcount = m_color.size() / 4;
     srv->setVertexShaderConstant("screen", m_screen, 2);
     srv->setVertexShaderConstant("spec", &m_specular, 1);
-    srv->setVertexShaderConstant("col", m_color, 3);
-    srv->setVertexShaderConstant("center", m_pos, 3);
-    srv->setVertexShaderConstant("r", &m_radius, 1);
     srv->setVertexShaderConstant("invproj", m_invproj.pointer(), 16);
-    srv->setVertexShaderConstant("energy", &m_energy, 1);
+    srv->setVertexShaderConstant("energy[0]", m_energy.data(), m_energy.size());
+    srv->setVertexShaderConstant("col[0]", m_color.data(), m_color.size());
+    srv->setVertexShaderConstant("center[0]", m_pos.data(), m_pos.size());
+    srv->setVertexShaderConstant("viewm", m_view.pointer(), 16);
+    srv->setVertexShaderConstant("lightcount", &lightcount, 1);
 
     if (!firstdone)
     {

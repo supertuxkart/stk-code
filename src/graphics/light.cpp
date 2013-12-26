@@ -31,15 +31,31 @@ using namespace video;
 using namespace scene;
 using namespace core;
 
-IMesh * LightNode::sphere = NULL;
-SMaterial LightNode::mat;
 aabbox3df LightNode::box;
 
 
 LightNode::LightNode(scene::ISceneManager* mgr, float radius, float e, float r, float g, float b):
                      ISceneNode(mgr->getRootSceneNode(), mgr, -1)
 {
-    sq = new ScreenQuad(irr_driver->getVideoDriver());
+    energy = e;
+    m_color[0] = r;
+    m_color[1] = g;
+    m_color[2] = b;
+}
+
+LightNode::~LightNode()
+{
+}
+
+void LightNode::render()
+{
+    return;
+}
+
+void LightNode::renderLightSet(const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy)
+{
+    assert (colors.size() == positions.size() && positions.size() == (energy.size() * 4));
+    ScreenQuad *sq = new ScreenQuad(irr_driver->getVideoDriver());
     SMaterial &mat = sq->getMaterial();
 
     mat.Lighting = false;
@@ -59,28 +75,9 @@ LightNode::LightNode(scene::ISceneManager* mgr, float radius, float e, float r, 
     mat.MaterialTypeParam = pack_textureBlendFunc(EBF_ONE, EBF_ONE);
     mat.BlendOperation = EBO_ADD;
 
-    sphere = mgr->getGeometryCreator()->createSphereMesh(1, 16, 16);
-    box = sphere->getBoundingBox();
-
-    setScale(vector3df(radius));
-    m_radius = radius;
-    energy = e;
-
-    m_color[0] = r;
-    m_color[1] = g;
-    m_color[2] = b;
-}
-
-LightNode::~LightNode()
-{
-}
-
-void LightNode::render()
-{
     PointLightProvider * const cb = (PointLightProvider *) irr_driver->getCallback(ES_POINTLIGHT);
-    cb->setColor(m_color[0], m_color[1], m_color[2]);
-    cb->setPosition(getPosition().X, getPosition().Y, getPosition().Z);
-    cb->setRadius(m_radius);
+    cb->setColor(colors);
+    cb->setPosition(positions);
     cb->setEnergy(energy);
     // Irrlicht's ScreenQuad reset the matrixes, we need to keep them
     IVideoDriver * const drv = irr_driver->getVideoDriver();
