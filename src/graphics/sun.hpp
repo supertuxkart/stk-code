@@ -32,6 +32,7 @@ public:
     virtual ~SunNode();
 
     virtual void render() OVERRIDE;
+    virtual bool isCullable() { return false; }
 
 private:
     ScreenQuad *sq;

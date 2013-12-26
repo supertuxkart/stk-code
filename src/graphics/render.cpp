@@ -683,8 +683,6 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 
     const vector3df camcenter = cambox.getCenter();
     const float camradius = cambox.getExtent().getLength() / 2;
-    const vector3df campos = camnode->getPosition();
-    const float camnear = camnode->getNearValue();
 
     m_scene_manager->drawAll(scene::ESNRP_CAMERA);
     PointLightProvider * const pcb = (PointLightProvider *) irr_driver->
@@ -702,17 +700,30 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 
 
     const u32 lightcount = m_lights.size();
+    const core::vector3df &camdir = (camnode->getTarget() - camcenter).normalize();
+
+    float fov = camnode->getFOV() / 2.;
     for (unsigned int i = 0; i < lightcount; i++)
     {
-        // Sphere culling
-        const float distance_sq = (m_lights[i]->getPosition() - camcenter).getLengthSQ();
-        float radius_sum = camradius + m_lights[i]->getRadius();
-        radius_sum *= radius_sum;
-        if (radius_sum < distance_sq)
-            continue;
+        // Light culling
+        const core::vector3df &lightpos = (m_lights[i]->getPosition() - camcenter);
+        float light_radius = m_lights[i]->getRadius();
+        float dotprod = camdir.dotProduct(lightpos);
+        if (m_lights[i]->isCullable()) {
+            if (dotprod > 0.) {
+                // Pixels in front of camera
+                // Are they too far ?
+                if (lightpos.getLength() > camradius)
+                    continue;
+                // Is it too divergent from camera normal ?
+                float othogonal_max_dst = light_radius + dotprod * tan(fov);
+                if (lightpos.getLengthSQ() - dotprod * dotprod > othogonal_max_dst * othogonal_max_dst)
+                    continue;
+            } else if (lightpos.getLength() > light_radius)
+                continue;
+        }
         m_lights[i]->render();
     } // for i in lights
-
     // Handle SSAO
     SMaterial m_material;
     GaussianBlurProvider * const gacb = (GaussianBlurProvider *) irr_driver->
