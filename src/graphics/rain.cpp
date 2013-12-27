@@ -280,7 +280,8 @@ public:
     glUniform1f(lscreenw, screenw);
     glDrawArrays(GL_POINTS, 0, count);
     glDisableVertexAttribArray(0);
-    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glActiveTexture(GL_TEXTURE0);
     glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
   }
 };
@@ -308,16 +309,6 @@ public:
         count = 2500;
         area = 3500;
 
-        // Fill in the mesh buffer
-        buf.Vertices.clear();
-        buf.Indices.clear();
-
-        buf.Vertices.set_used(count);
-        buf.Indices.set_used(count);
-
-        buf.Primitive = EPT_POINT_SPRITES;
-        buf.setHardwareMappingHint(EHM_STATIC);
-
         u32 i;
         float x, y, z, vertices[7500];
         for (i = 0; i < count; i++)
@@ -326,8 +317,6 @@ public:
             y = ((rand() % 2400)) / 100.0f;
             z = ((rand() % area) - area/2) / 100.0f;
 
-            buf.Indices[i] = i;
-            buf.Vertices[i] = S3DVertex(x, y, z, 0, 0, 0, SColor(255, 255, 0, 0), 0, 0);
             vertices[3 * i] = x;
             vertices[3 * i + 1] = y;
             vertices[3 * i + 2] = z;
@@ -340,24 +329,17 @@ public:
 
     ~RainNode()
     {
-      delete gpupart;
+        delete gpupart;
     }
 
     virtual void render()
-        {
-      gpupart->simulate();
-      gpupart->render();
-      // We need to let irrlicht render something so it updates its internal states
-        glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-
+    {
+        gpupart->simulate();
+        gpupart->render();
+        // We need to force irrlicht to update its internal states
         IVideoDriver * const drv = irr_driver->getVideoDriver();
-		mat.setTexture(1, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
-        drv->setTransform(ETS_WORLD, AbsoluteTransformation);
         drv->setMaterial(mat);
-
-        drv->drawMeshBuffer(&buf);
-
-        glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+        static_cast<COpenGLDriver*>(drv)->setRenderStates3DMode();
     }
 
     virtual const core::aabbox3d<f32>& getBoundingBox() const
@@ -384,8 +366,6 @@ private:
     core::aabbox3d<f32> box;
     u32 count;
     s32 area;
-
-    scene::SMeshBuffer buf;
 };
 
 // The rain manager

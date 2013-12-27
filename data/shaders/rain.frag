@@ -1,6 +1,5 @@
 #version 130
 uniform sampler2D tex;
-uniform float bdiscard = 0.0;
 uniform sampler2D normals_and_depth;
 uniform mat4 invproj;
 uniform vec2 screen;
@@ -16,8 +15,6 @@ void main()
 	EnvPos /= EnvPos.w;
 	float len = dot(vec3(1.0), abs(texture2D(normals_and_depth, xy).xyz));
 	float alpha = (len < 0.2) ? 1. : clamp((EnvPos.z - FragmentPos.z) * 0.3, 0., 1.);
-		if (bdiscard < 0.5)
-				discard;
 	gl_FragColor = texture2D(tex, gl_PointCoord.xy);
 	gl_FragColor.a *= alpha;
 }

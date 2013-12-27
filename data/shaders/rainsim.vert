@@ -1,3 +1,4 @@
+#version 130
 uniform float time;
 uniform vec3 campos;
 uniform mat4 viewm;
@@ -24,4 +25,5 @@ void main()
 	start.xyz += campos;
 
 	currentPosition = (viewm * start).xyz;
+	gl_Position = vec4(0.);
 }
