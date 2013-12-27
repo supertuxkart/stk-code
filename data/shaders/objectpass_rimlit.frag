@@ -15,7 +15,7 @@ void main() {
 	if (hastex != 0) {
 		vec4 col = texture2D(tex, gl_TexCoord[0].xy);
 
-		if (col.a < 0.5)
+		if (col.a < 0.1)
 			discard;
 
 		col.xyz += rim;
