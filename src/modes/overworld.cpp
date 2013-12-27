@@ -134,17 +134,13 @@ void OverWorld::update(float dt)
             continue;
 
         Vec3 m_garage_pos = obj->getPosition();
+        float m_distance = obj->getDistance();
         
-        AbstractKart* m_kart = getKart(0);
-        Vec3 m_kart_pos = m_kart->getXYZ();
-        //~ float kart_len = m_kart->getKartModel()->getLength();
+        Vec3 m_kart_pos = getKart(0)->getXYZ();
         
-        //~ printf("%f\n", (m_garage_pos-m_kart_pos).length2_2d());
-        //~ printf("%f\n", kart_len);
-        
-        //TODO: Compare distance between garage and kart with for example length
-        //      of the kart or distance of object defined in scene.xml
-        if ((m_garage_pos-m_kart_pos).length2_2d() > CHALLENGE_DISTANCE_SQUARED*3)
+        // Distance should be written as m_distance*m_distance. Look at
+        // m_distance_2 variable in item.cpp file.
+        if ((m_garage_pos-m_kart_pos).length2_2d() > m_distance*m_distance)
         {
             obj->reset();
         }

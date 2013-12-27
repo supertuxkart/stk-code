@@ -103,6 +103,7 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     xml_node.get("soccer_ball", &m_soccer_ball);
     
     m_garage = false;
+    m_distance = 0;
 
     std::string type;
     xml_node.get("type",    &type );
@@ -126,6 +127,7 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     {
         std::string m_action;
         xml_node.get("action", &m_action);
+        xml_node.get("distance", &m_distance);
         if (m_action == "garage")
         {
             m_garage = true;

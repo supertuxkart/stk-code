@@ -75,6 +75,8 @@ protected:
     bool                           m_soccer_ball;
     
     bool                           m_garage;
+    
+    float                          m_distance;
 
     PhysicalObject*                m_rigid_body;
 
@@ -109,6 +111,7 @@ public:
 
     bool isSoccerBall() const { return m_soccer_ball; }
     bool isGarage() const { return m_garage; }
+    float getDistance() const { return m_distance; }
     
     const PhysicalObject* getPhysics() const { return m_rigid_body; }
     PhysicalObject* getPhysics() { return m_rigid_body; }
