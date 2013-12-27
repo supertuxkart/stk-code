@@ -116,6 +116,11 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
         m_type = "particle-emitter";
         m_presentation = new TrackObjectPresentationParticles(xml_node);
     }
+    else if (xml_node.getName() == "light")
+    {
+        m_type = "light";
+        m_presentation = new TrackObjectPresentationLight(xml_node);
+    }
     else if (type == "sfx-emitter")
     {
         // FIXME: at this time sound emitters are just disabled in multiplayer
@@ -181,7 +186,7 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
             b = glow.getBlue() / 255.0f;
 
             irr_driver->addGlowingNode(glownode, r, g, b);
-    }
+        }
 
         bool forcedbloom = false;
         if (xml_node.get("forcedbloom", &forcedbloom) && forcedbloom && glownode)

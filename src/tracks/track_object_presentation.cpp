@@ -39,6 +39,7 @@
 #include <ICameraSceneNode.h>
 #include <IBillboardSceneNode.h>
 #include <IParticleSystemSceneNode.h>
+#include <ILightSceneNode.h>
 
 // ----------------------------------------------------------------------------
 
@@ -499,7 +500,6 @@ TrackObjectPresentationBillboard::~TrackObjectPresentationBillboard()
 
 // ----------------------------------------------------------------------------
 
-
 TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode& xml_node) :
     TrackObjectPresentationSceneNode(xml_node)
 {
@@ -587,6 +587,43 @@ void TrackObjectPresentationParticles::triggerParticles()
 
 // ----------------------------------------------------------------------------
 
+TrackObjectPresentationLight::TrackObjectPresentationLight(const XMLNode& xml_node) :
+    TrackObjectPresentationSceneNode(xml_node)
+{
+    xml_node.get("color", &m_color);
+    const video::SColorf colorf(m_color);
+
+    m_distance = 25.0f;
+    xml_node.get("distance", &m_distance);
+
+    m_energy = 1.0f;
+    xml_node.get("energy", &m_energy);
+
+    if (irr_driver->isGLSL())
+    {
+        m_node = irr_driver->addLight(m_init_xyz, m_distance, m_energy, colorf.r, colorf.g, colorf.b);
+    }
+    else
+    {
+        m_node = NULL; // lights require shaders to work
+        //scene::ILightSceneNode* node = irr_driver->getSceneManager()->addLightSceneNode(NULL, m_init_xyz, m_color, m_distance);
+        //node->setLightType(video::ELT_POINT);
+        //node->enableCastShadow(true);
+        //m_node = node;
+    }
+}
+
+TrackObjectPresentationLight::~TrackObjectPresentationLight()
+{
+    // TODO
+}
+
+void TrackObjectPresentationLight::update(float dt)
+{
+    // TODO
+}
+
+// ----------------------------------------------------------------------------
 
 TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(const XMLNode& xml_node) :
     TrackObjectPresentation(xml_node)

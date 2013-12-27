@@ -1581,27 +1581,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
         else if(name=="light")
         {
-            core::vector3df pos;
-            node->get("xyz", &pos);
-
-            video::SColor color;
-            node->get("color", &color);
-            const video::SColorf colorf(color);
-
-            float distance = 25.0f;
-            node->get("distance", &distance);
-            float energy = 1.;
-            node->get("energy", &energy);
-
-            if (irr_driver->isGLSL())
-            {
-                irr_driver->addLight(pos, distance, energy, colorf.r, colorf.g, colorf.b);
-            } else
-            {
-            scene::ILightSceneNode* node = irr_driver->getSceneManager()->addLightSceneNode(NULL, pos, color, distance);
-            node->setLightType(video::ELT_POINT);
-            node->enableCastShadow(true);
-        }
+            m_track_object_manager->add(*node);
         }
         else if(name=="weather")
         {

@@ -264,6 +264,25 @@ public:
 };
 
 /**
+* \ingroup tracks
+* A track object representation that consists of a light emitter
+*/
+class TrackObjectPresentationLight : public TrackObjectPresentationSceneNode
+{
+private:
+    video::SColor m_color;
+    float m_distance;
+    float m_energy;
+
+public:
+    TrackObjectPresentationLight(const XMLNode& xml_node);
+    virtual ~TrackObjectPresentationLight();
+
+    virtual void update(float dt) OVERRIDE;
+};
+
+
+/**
  * \ingroup tracks
  * A track object representation that consists of an action trigger
  */
