@@ -408,6 +408,9 @@ namespace video
 		//! Get ZBuffer bits.
 		GLenum getZBufferBits() const;
 
+		//! sets the needed renderstates
+		void setRenderStates3DMode();
+
 		//! Get Cg context
 		#ifdef _IRR_COMPILE_WITH_CG_
 		const CGcontext& getCgContext();
@@ -437,9 +440,6 @@ namespace video
 
 		//! get native wrap mode value
 		GLint getTextureWrapMode(const u8 clamp);
-
-		//! sets the needed renderstates
-		void setRenderStates3DMode();
 
 		//! sets the needed renderstates
 		void setRenderStates2DMode(bool alpha, bool texture, bool alphaChannel);
