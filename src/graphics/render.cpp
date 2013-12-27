@@ -666,7 +666,7 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
 }
 
 // ----------------------------------------------------------------------------
-
+#define MAXLIGHT 16 // to be adjusted in pointlight.frag too
 void IrrDriver::renderLights(const core::aabbox3df& cambox,
                              scene::ICameraSceneNode * const camnode,
                              video::SOverrideMaterial &overridemat,
@@ -680,9 +680,6 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 
     m_video_driver->setRenderTarget(rtts, true, false,
                                         video::SColor(0, 0, 0, 0));
-
-    const vector3df camcenter = cambox.getCenter();
-    const float camradius = cambox.getExtent().getLength() / 2;
 
     m_scene_manager->drawAll(scene::ESNRP_CAMERA);
     PointLightProvider * const pcb = (PointLightProvider *) irr_driver->
@@ -700,49 +697,46 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 
 
     const u32 lightcount = m_lights.size();
-    const core::vector3df &camdir = (camnode->getTarget() - camcenter).normalize();
-
-    float fov = camnode->getFOV() / 2.;
+    const core::vector3df &campos =
+        irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
     std::vector<float> accumulatedLightPos;
     std::vector<float> accumulatedLightColor;
     std::vector<float> accumulatedLightEnergy;
-    unsigned lightnum = 0;
+    std::vector<LightNode *> BucketedLN[15];
     for (unsigned int i = 0; i < lightcount; i++)
     {
         if (!m_lights[i]->isPointLight()) {
           m_lights[i]->render();
           continue;
         }
-        if (lightnum >= 32)
+        const core::vector3df &lightpos = (m_lights[i]->getPosition() - campos);
+        unsigned idx = lightpos.getLength() / 10;
+        if(idx > 14)
           continue;
-        // Light culling
-        const core::vector3df &lightpos = (m_lights[i]->getPosition() - camcenter);
-        float light_radius = m_lights[i]->getRadius();
-        float dotprod = camdir.dotProduct(lightpos);
-        if (dotprod > 0.) {
-            // Pixels in front of camera
-            // Are they too far ?
-            if (lightpos.getLength() > camradius)
-                continue;
-            // Is it too divergent from camera normal ?
-            float othogonal_max_dst = light_radius + dotprod * tan(fov);
-            if (lightpos.getLengthSQ() - dotprod * dotprod > othogonal_max_dst * othogonal_max_dst)
-                continue;
-        } else if (lightpos.getLength() > light_radius)
-            continue;
-        const core::vector3df &pos = m_lights[i]->getPosition();
+        BucketedLN[idx].push_back(m_lights[i]);
+    }
+    unsigned lightnum = 0;
+    for (unsigned i = 0; i < 15; i++) {
+      for (unsigned j = 0; j < BucketedLN[i].size(); j++) {
+        if (++lightnum > MAXLIGHT)
+          break;
+        LightNode *LN = BucketedLN[i].at(j);
+        const core::vector3df &pos = LN->getPosition();
         accumulatedLightPos.push_back(pos.X);
         accumulatedLightPos.push_back(pos.Y);
         accumulatedLightPos.push_back(pos.Z);
         accumulatedLightPos.push_back(0.);
-        const core::vector3df &col = m_lights[i]->getColor();
+        const core::vector3df &col = LN->getColor();
+        
         accumulatedLightColor.push_back(col.X);
         accumulatedLightColor.push_back(col.Y);
         accumulatedLightColor.push_back(col.Z);
         accumulatedLightColor.push_back(0.);
-        accumulatedLightEnergy.push_back(m_lights[i]->getEnergy());
-        lightnum++;
-    } // for i in lights
+        accumulatedLightEnergy.push_back(LN->getEnergy());
+      }
+      if (lightnum > MAXLIGHT)
+        break;
+    }
     LightNode::renderLightSet(accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
     // Handle SSAO
     SMaterial m_material;

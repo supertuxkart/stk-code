@@ -1,8 +1,8 @@
 uniform sampler2D ntex;
 
-uniform vec4 center[32];
-uniform vec4 col[32];
-uniform float energy[32];
+uniform vec4 center[16];
+uniform vec4 col[16];
+uniform float energy[16];
 uniform int lightcount;
 uniform float spec;
 uniform vec2 screen;
