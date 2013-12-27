@@ -358,6 +358,7 @@ src/graphics/CBatchingMesh.hpp
 src/graphics/explosion.hpp
 src/graphics/glow.hpp
 src/graphics/glwrap.hpp
+src/graphics/gpuparticles.h
 src/graphics/hardware_skinning.hpp
 src/graphics/hit_effect.hpp
 src/graphics/hit_sfx.hpp

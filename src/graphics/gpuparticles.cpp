@@ -1,4 +1,3 @@
-#if 0
 #include "graphics/irr_driver.hpp"
 #include "gpuparticles.h"
 #include <fstream>
@@ -6,9 +5,48 @@
 #include "config/user_config.hpp"
 #include <ICameraSceneNode.h>
 
+#ifdef _IRR_WINDOWS_API_
+#define IRR_OGL_LOAD_EXTENSION(X) wglGetProcAddress(reinterpret_cast<const char*>(X))
+
+
+PFNGLGENTRANSFORMFEEDBACKSPROC glGenTransformFeedbacks;
+PFNGLBINDTRANSFORMFEEDBACKPROC glBindTransformFeedback;
+PFNGLDRAWTRANSFORMFEEDBACKPROC glDrawTransformFeedback;
+PFNGLBEGINTRANSFORMFEEDBACKPROC glBeginTransformFeedback;
+PFNGLENDTRANSFORMFEEDBACKPROC glEndTransformFeedback;
+PFNGLTRANSFORMFEEDBACKVARYINGSPROC glTransformFeedbackVaryings;
+PFNGLBINDBUFFERBASEPROC glBindBufferBase;
+PFNGLGENBUFFERSPROC glGenBuffers;
+PFNGLBINDBUFFERPROC glBindBuffer;
+PFNGLBUFFERDATAPROC glBufferData;
+PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
+PFNGLCREATESHADERPROC glCreateShader;
+PFNGLCOMPILESHADERPROC glCompileShader;
+PFNGLSHADERSOURCEPROC glShaderSource;
+PFNGLCREATEPROGRAMPROC glCreateProgram;
+PFNGLATTACHSHADERPROC glAttachShader;
+PFNGLLINKPROGRAMPROC glLinkProgram;
+PFNGLUSEPROGRAMPROC glUseProgram;
+PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
+PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
+PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
+PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
+PFNGLUNIFORM1FPROC glUniform1f;
+PFNGLUNIFORM3FPROC glUniform3f;
+PFNGLDELETESHADERPROC glDeleteShader;
+PFNGLGETSHADERIVPROC glGetShaderiv;
+PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
+PFNGLACTIVETEXTUREPROC glActiveTexture;
+PFNGLUNIFORM2FPROC glUniform2f;
+PFNGLUNIFORM1IPROC glUniform1i;
+PFNGLGETPROGRAMIVPROC glGetProgramiv;
+PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
+#endif
+
 void initGL()
 {
-/*    glGenTransformFeedbacks = (PFNGLGENTRANSFORMFEEDBACKSPROC)IRR_OGL_LOAD_EXTENSION("glGenTransformFeedbacks");
+#ifdef _IRR_WINDOWS_API_
+    glGenTransformFeedbacks = (PFNGLGENTRANSFORMFEEDBACKSPROC)IRR_OGL_LOAD_EXTENSION("glGenTransformFeedbacks");
     glBindTransformFeedback = (PFNGLBINDTRANSFORMFEEDBACKPROC)IRR_OGL_LOAD_EXTENSION("glBindTransformFeedback");
     glDrawTransformFeedback = (PFNGLDRAWTRANSFORMFEEDBACKPROC)IRR_OGL_LOAD_EXTENSION("glDrawTransformFeedback");
     glBeginTransformFeedback = (PFNGLBEGINTRANSFORMFEEDBACKPROC)IRR_OGL_LOAD_EXTENSION("glBeginTransformFeedback");
@@ -34,14 +72,13 @@ void initGL()
     glDeleteShader = (PFNGLDELETESHADERPROC)IRR_OGL_LOAD_EXTENSION("glDeleteShader");
     glGetShaderiv = (PFNGLGETSHADERIVPROC)IRR_OGL_LOAD_EXTENSION("glGetShaderiv");
     glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)IRR_OGL_LOAD_EXTENSION("glGetShaderInfoLog");
-#ifdef _IRR_WINDOWS_API_
     glActiveTexture = (PFNGLACTIVETEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glActiveTexture");
-#endif
     glUniform2f = (PFNGLUNIFORM2FPROC)IRR_OGL_LOAD_EXTENSION("glUniform2f");
     glUniform1i = (PFNGLUNIFORM1IPROC)IRR_OGL_LOAD_EXTENSION("glUniform1i");
     glGetProgramiv = (PFNGLGETPROGRAMIVPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramiv");
     glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramInfoLog");
-    glTransformFeedbackVaryings = (PFNGLTRANSFORMFEEDBACKVARYINGSPROC)IRR_OGL_LOAD_EXTENSION("glTransformFeedbackVaryings");*/
+    glTransformFeedbackVaryings = (PFNGLTRANSFORMFEEDBACKVARYINGSPROC)IRR_OGL_LOAD_EXTENSION("glTransformFeedbackVaryings");
+#endif
 }
 
 // Mostly from shader tutorial
@@ -207,4 +244,3 @@ void GPUParticle::render() {
     glActiveTexture(GL_TEXTURE0);
     glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
 }
-#endif

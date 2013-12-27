@@ -42,7 +42,7 @@ using namespace core;
 class RainNode: public scene::ISceneNode
 {
 private:
-//    GPUParticle *gpupart;
+    GPUParticle *gpupart;
 public:
     RainNode(scene::ISceneManager* mgr, ITexture *tex)
             : scene::ISceneNode(0, mgr, -1)
@@ -72,7 +72,7 @@ public:
             vertices[3 * i + 1] = y;
             vertices[3 * i + 2] = z;
         }
-        //gpupart = new GPUParticle(count, vertices, getTextureGLuint(mat.getTexture(0)), getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)));
+        gpupart = new GPUParticle(count, vertices, getTextureGLuint(mat.getTexture(0)), getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)));
 
         box.addInternalPoint(vector3df((float)(-area/2)));
         box.addInternalPoint(vector3df((float)( area/2)));
@@ -80,13 +80,13 @@ public:
 
     ~RainNode()
     {
-//        delete gpupart;
+        delete gpupart;
     }
 
     virtual void render()
     {
-//        gpupart->simulate();
-//        gpupart->render();
+        gpupart->simulate();
+        gpupart->render();
         // We need to force irrlicht to update its internal states
         IVideoDriver * const drv = irr_driver->getVideoDriver();
         drv->setMaterial(mat);
