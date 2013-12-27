@@ -1397,7 +1397,7 @@ void IrrDriver::displayFPS()
 {
     gui::IGUIFont* font = GUIEngine::getFont();
 
-    irr_driver->getVideoDriver()->draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,800,50),NULL);
+    irr_driver->getVideoDriver()->draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,900,50),NULL);
 
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
@@ -1450,8 +1450,8 @@ void IrrDriver::displayFPS()
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        sprintf(buffer, "FPS: %i/%i/%i - %.2f/%.2f/%.2f KTris",
-                min, fps, max, low, kilotris, high);
+        sprintf(buffer, "FPS: %i/%i/%i - %.2f/%.2f/%.2f KTris - LightDst : ~%d",
+                min, fps, max, low, kilotris, high, m_last_light_bucket_distance);
     }
     else
     {

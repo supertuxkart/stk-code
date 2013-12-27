@@ -149,6 +149,7 @@ private:
     bool                 m_shadowviz;
     bool                 m_lightviz;
     bool                 m_distortviz;
+    unsigned             m_last_light_bucket_distance;
     u32                  m_renderpass;
     u32                  m_lensflare_query;
     scene::IMeshSceneNode *m_sun_interposer;
@@ -270,6 +271,7 @@ public:
 
     void                  showPointer();
     void                  hidePointer();
+    void                  setLastLightBucketDistance(unsigned d) { m_last_light_bucket_distance = d; }
     bool                  isPointerShown() const { return m_pointer_shown; }
     core::position2di     getMouseLocation();
 

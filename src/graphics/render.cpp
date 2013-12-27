@@ -734,8 +734,10 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         accumulatedLightColor.push_back(0.);
         accumulatedLightEnergy.push_back(LN->getEnergy());
       }
-      if (lightnum > MAXLIGHT)
+      if (lightnum > MAXLIGHT) {
+        irr_driver->setLastLightBucketDistance(i * 10);
         break;
+      }
     }
     LightNode::renderLightSet(accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
     // Handle SSAO
