@@ -34,6 +34,7 @@ src/graphics/camera.cpp
 src/graphics/CBatchingMesh.cpp
 src/graphics/explosion.cpp
 src/graphics/glow.cpp
+src/graphics/gpuparticles.cpp
 src/graphics/hardware_skinning.cpp
 src/graphics/hit_sfx.cpp
 src/graphics/irr_driver.cpp
@@ -478,8 +479,8 @@ src/modes/tutorial_world.hpp
 src/modes/world.hpp
 src/modes/world_status.hpp
 src/modes/world_with_rank.hpp
-src/network/event.hpp
 src/network/client_network_manager.hpp
+src/network/event.hpp
 src/network/game_setup.hpp
 src/network/network_interface.hpp
 src/network/network_manager.hpp
@@ -636,10 +637,10 @@ src/tracks/track_object_presentation.hpp
 src/tracks/track_sector.hpp
 src/utils/aligned_array.hpp
 src/utils/constants.hpp
+src/utils/crash_reporting.hpp
 src/utils/debug.hpp
 src/utils/helpers.hpp
 src/utils/interpolation_array.hpp
-src/utils/crash_reporting.hpp
 src/utils/leak_check.hpp
 src/utils/log.hpp
 src/utils/no_copy.hpp
