@@ -73,11 +73,13 @@ protected:
     std::string                    m_type;
 
     bool                           m_soccer_ball;
+    
+    bool                           m_garage;
 
     PhysicalObject*                m_rigid_body;
 
     ThreeDAnimation*               m_animator;
-
+    
     void init(const XMLNode &xml_node, LODNode* lodNode);
 
 public:
@@ -106,7 +108,8 @@ public:
     const std::string& getType() const { return m_type; }
 
     bool isSoccerBall() const { return m_soccer_ball; }
-
+    bool isGarage() const { return m_garage; }
+    
     const PhysicalObject* getPhysics() const { return m_rigid_body; }
     PhysicalObject* getPhysics() { return m_rigid_body; }
 

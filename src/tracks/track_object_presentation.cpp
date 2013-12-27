@@ -612,6 +612,8 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 
     if (m_action == "garage")
     {
+        m_action_active = false;
+
         new RacePausedDialog(0.8f, 0.6f);
         //dynamic_cast<OverWorld*>(World::getWorld())->scheduleSelectKart();
     }

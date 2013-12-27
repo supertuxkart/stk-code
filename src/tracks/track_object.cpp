@@ -101,6 +101,8 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
 
     m_soccer_ball = false;
     xml_node.get("soccer_ball", &m_soccer_ball);
+    
+    m_garage = false;
 
     std::string type;
     xml_node.get("type",    &type );
@@ -122,6 +124,13 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     }
     else if (type == "action-trigger")
     {
+        std::string m_action;
+        xml_node.get("action", &m_action);
+        if (m_action == "garage")
+        {
+            m_garage = true;
+        }
+
         m_presentation = new TrackObjectPresentationActionTrigger(xml_node);
     }
     else if (type == "billboard")

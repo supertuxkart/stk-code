@@ -31,6 +31,7 @@
 #include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/race_gui_overworld.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_object_manager.hpp"
 
 //-----------------------------------------------------------------------------
 OverWorld::OverWorld() : WorldWithRank()
@@ -124,6 +125,31 @@ void OverWorld::update(float dt)
         m_karts[n]->setEnergy(100.0f);
     }
 
+    TrackObjectManager* tom = getTrack()->getTrackObjectManager();
+    PtrVector<TrackObject>& objects = tom->getObjects();
+    for(int i=0; i<objects.size(); i++)
+    {
+        TrackObject* obj = objects.get(i);
+        if(!obj->isGarage())
+            continue;
+
+        Vec3 m_garage_pos = obj->getPosition();
+        
+        AbstractKart* m_kart = getKart(0);
+        Vec3 m_kart_pos = m_kart->getXYZ();
+        //~ float kart_len = m_kart->getKartModel()->getLength();
+        
+        //~ printf("%f\n", (m_garage_pos-m_kart_pos).length2_2d());
+        //~ printf("%f\n", kart_len);
+        
+        //TODO: Compare distance between garage and kart with for example length
+        //      of the kart or distance of object defined in scene.xml
+        if ((m_garage_pos-m_kart_pos).length2_2d() > CHALLENGE_DISTANCE_SQUARED*3)
+        {
+            obj->reset();
+        }
+    }
+
     if (m_return_to_garage)
     {
         m_return_to_garage = false;
@@ -133,7 +159,7 @@ void OverWorld::update(float dt)
         s->setMultiplayer(false);
         s->setFromOverworld(true);
         StateManager::get()->resetAndGoToScreen(s);
-    }
+    }    
 }   // update
 
 //-----------------------------------------------------------------------------
