@@ -710,7 +710,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
           continue;
         }
         const core::vector3df &lightpos = (m_lights[i]->getPosition() - campos);
-        unsigned idx = lightpos.getLength() / 10;
+        unsigned idx = (unsigned)(lightpos.getLength() / 10);
         if(idx > 14)
           continue;
         BucketedLN[idx].push_back(m_lights[i]);

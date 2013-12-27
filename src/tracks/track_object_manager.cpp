@@ -55,71 +55,12 @@ void TrackObjectManager::add(const XMLNode &xml_node)
 
         if (is_lod)
         {
-            //printf("Adding lod obj to group <%s>\n", groupname.c_str());
             m_lod_objects[groupname].push_back(&xml_node);
         }
         else
         {
             m_all_objects.push_back(new TrackObject(xml_node));
         }
-
-        /*
-        std::string groupname;
-        xml_node.get("lod_group", &groupname);
-        bool is_lod = !groupname.empty();
-
-        std::string type;
-        xml_node.get("type", &type);
-
-        if (xml_node.getName() == "particle-emitter")
-        {
-            m_all_objects.push_back(new ThreeDAnimation(xml_node));
-        }
-        else if (type=="movable")
-        {
-            if (is_lod)
-            {
-                assert(false); // TODO
-                //_lod_objects[groupname].push_back(new TrackObject(xml_node));
-            }
-            else
-            {
-                m_all_objects.push_back(new TrackObject(xml_node));
-            }
-        }
-        else if(type=="animation")
-        {
-            if (is_lod)
-            {
-                m_lod_objects[groupname].push_back(new ThreeDAnimation(xml_node));
-            }
-            else
-            {
-                m_all_objects.push_back(new ThreeDAnimation(xml_node));
-            }
-        }
-        else if(type=="billboard")
-        {
-            m_all_objects.push_back(new BillboardAnimation(xml_node));
-        }
-        else if(type=="sfx-emitter")
-        {
-            m_all_objects.push_back(new ThreeDAnimation(xml_node));
-        }
-        else if(type=="cutscene_camera")
-        {
-            m_all_objects.push_back(new ThreeDAnimation(xml_node));
-        }
-        else if(type=="action-trigger")
-        {
-            m_all_objects.push_back(new TrackObject(xml_node));
-        }
-        else
-        {
-            fprintf(stderr, "Unknown track object: '%s' - ignored.\n",
-                    type.c_str());
-        }
-         */
     }
     catch (std::exception& e)
     {

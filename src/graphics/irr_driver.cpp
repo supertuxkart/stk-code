@@ -2130,7 +2130,8 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float radius,
 
         m_lights.push_back(light);
 
-        if (sun) {
+        if (sun)
+        {
             m_sun_interposer->setPosition(pos);
             m_sun_interposer->updateAbsolutePosition();
 
@@ -2144,7 +2145,8 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float radius,
         }
 
         return light;
-    } else
+    }
+    else
     {
         return m_scene_manager->addLightSceneNode(NULL, pos, video::SColorf(r, g, b), radius);
     }

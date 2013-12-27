@@ -544,10 +544,10 @@ public:
         // Norm factor
         double w = rand();
         w /= RAND_MAX;
-        array[4 * i] = x;
-        array[4 * i + 1] = y;
-        array[4 * i + 2] = z;
-        array[4 * i + 3] = w;
+        array[4 * i] = (float)x;
+        array[4 * i + 1] = (float)y;
+        array[4 * i + 2] = (float)z;
+        array[4 * i + 3] = (float)w;
       }
     }
 
