@@ -181,20 +181,41 @@ GLuint LoadProgram(const char * vertex_file_path, const char * fragment_file_pat
     return ProgramID;
 }
 
+GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount){
+  GLuint Shader = LoadShader(vertex_file_path, GL_VERTEX_SHADER);
+  GLuint Program = glCreateProgram();
+  glAttachShader(Program, Shader);
+  glTransformFeedbackVaryings(Program, varyingscount, varyings, GL_INTERLEAVED_ATTRIBS);
+  glLinkProgram(Program);
+
+  GLint Result = GL_FALSE;
+  int InfoLogLength;
+  glGetProgramiv(Program, GL_LINK_STATUS, &Result);
+  if (Result == GL_FALSE) {
+      glGetProgramiv(Program, GL_INFO_LOG_LENGTH, &InfoLogLength);
+      char *ErrorMessage = new char[InfoLogLength];
+      glGetProgramInfoLog(Program, InfoLogLength, NULL, ErrorMessage);
+      printf(ErrorMessage);
+      delete[] ErrorMessage;
+  }
+  glDeleteShader(Shader);
+  return Program;
+}
+
 GLuint getTextureGLuint(ITexture *tex) { return static_cast<const COpenGLTexture*>(tex)->getOpenGLTextureName(); }
 
-void bindUniformToTextureUnit(GLuint program, const char * name, GLuint texid, unsigned textureUnit) {
+void bindUniformToTextureUnit(GLuint location, GLuint texid, unsigned textureUnit) {
     glActiveTexture(GL_TEXTURE0 + textureUnit);
     glBindTexture(GL_TEXTURE_2D, texid);
-    GLuint location = glGetUniformLocation(program, name);
     glUniform1i(location, textureUnit);
 }
 
 class GPUParticle {
 private:
   GLuint SimulationProgram, RenderProgram, tfb_vertex_buffer[2];
-  GLuint texture;
-  GLuint normal_and_depth;
+  GLuint texture, normal_and_depth;
+  GLuint loc_campos, loc_viewm, loc_time;
+  GLuint loc_screenw, loc_screen, loc_invproj, texloc_tex, texloc_normal_and_depths;
   unsigned count;
 public:
   GPUParticle(unsigned c, float *initialSamples, GLuint tex, GLuint rtt) :
@@ -207,24 +228,17 @@ public:
     glBufferData(GL_ARRAY_BUFFER, 3 * count * sizeof(float), 0, GL_STREAM_DRAW);
 
     RenderProgram = LoadProgram(file_manager->getAsset("shaders/rain.vert").c_str(), file_manager->getAsset("shaders/rain.frag").c_str());
-    GLuint SimShader = LoadShader(file_manager->getAsset("shaders/rainsim.vert").c_str(), GL_VERTEX_SHADER);
-    SimulationProgram = glCreateProgram();
-    glAttachShader(SimulationProgram, SimShader);
-    const char *varying[] = { "currentPosition" };
-    glTransformFeedbackVaryings(SimulationProgram, 1, varying, GL_INTERLEAVED_ATTRIBS);
-    glLinkProgram(SimulationProgram);
+    loc_screenw = glGetUniformLocation(RenderProgram, "screenw");
+    loc_screen = glGetUniformLocation(RenderProgram, "screen");
+    loc_invproj = glGetUniformLocation(RenderProgram, "invproj");
+    texloc_tex = glGetUniformLocation(RenderProgram, "tex");
+    texloc_normal_and_depths = glGetUniformLocation(RenderProgram, "normals_and_depth");
 
-    GLint Result = GL_FALSE;
-    int InfoLogLength;
-    glGetProgramiv(SimulationProgram, GL_LINK_STATUS, &Result);
-    if (Result == GL_FALSE) {
-        glGetProgramiv(SimulationProgram, GL_INFO_LOG_LENGTH, &InfoLogLength);
-        char *ErrorMessage = new char[InfoLogLength];
-        glGetProgramInfoLog(SimulationProgram, InfoLogLength, NULL, ErrorMessage);
-        printf(ErrorMessage);
-        delete[] ErrorMessage;
-    }
-    glDeleteShader(SimShader);
+    const char *varyings[] = {"currentPosition"};
+    SimulationProgram = LoadTFBProgram(file_manager->getAsset("shaders/rainsim.vert").c_str(), varyings, 1);
+    loc_campos = glGetUniformLocation(SimulationProgram, "campos");
+    loc_viewm = glGetUniformLocation(SimulationProgram, "viewm");
+    loc_time = glGetUniformLocation(SimulationProgram, "time");
   }
 
   void simulate() {
@@ -238,12 +252,10 @@ public:
     glBindBuffer(GL_ARRAY_BUFFER, tfb_vertex_buffer[0]);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_vertex_buffer[1]);
-    GLuint lcampos = glGetUniformLocation(SimulationProgram, "campos");
-    GLuint lviewm = glGetUniformLocation(SimulationProgram, "viewm");
-    GLuint ltime = glGetUniformLocation(SimulationProgram, "time");
-    glUniformMatrix4fv(lviewm, 1, GL_FALSE, viewm.pointer());
-    glUniform1f(ltime, time);
-    glUniform3f(lcampos, campos.X, campos.Y, campos.Z);
+
+    glUniformMatrix4fv(loc_viewm, 1, GL_FALSE, viewm.pointer());
+    glUniform1f(loc_time, time);
+    glUniform3f(loc_campos, campos.X, campos.Y, campos.Z);
     glBeginTransformFeedback(GL_POINTS);
     glDrawArrays(GL_POINTS, 0, count);
     glEndTransformFeedback();
@@ -265,19 +277,12 @@ public:
     matrix4 invproj = irr_driver->getVideoDriver()->getTransform(ETS_PROJECTION);
     invproj.makeInverse();
 
-    GLuint lscreenw = glGetUniformLocation(RenderProgram, "screenw");
-    GLuint bdiscard = glGetUniformLocation(RenderProgram, "bdiscard");
-    GLuint lscreen = glGetUniformLocation(RenderProgram, "screen");
-    GLuint linvproj = glGetUniformLocation(RenderProgram, "invproj");
+    bindUniformToTextureUnit(texloc_tex, texture, 0);
+    bindUniformToTextureUnit(texloc_normal_and_depths, normal_and_depth, 1);
 
-    bindUniformToTextureUnit(RenderProgram, "tex", texture, 0);
-    bindUniformToTextureUnit(RenderProgram, "normals_and_depth", normal_and_depth, 1);
-
-
-    glUniformMatrix4fv(linvproj, 1, GL_FALSE, invproj.pointer());
-    glUniform2f(lscreen, screen[0], screen[1]);
-    glUniform1f(bdiscard, 1.0);
-    glUniform1f(lscreenw, screenw);
+    glUniformMatrix4fv(loc_invproj, 1, GL_FALSE, invproj.pointer());
+    glUniform2f(loc_screen, screen[0], screen[1]);
+    glUniform1f(loc_screenw, screenw);
     glDrawArrays(GL_POINTS, 0, count);
     glDisableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
