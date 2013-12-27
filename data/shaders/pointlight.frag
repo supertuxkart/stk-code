@@ -26,7 +26,7 @@ void main() {
 		vec3 light_col = col[i].xyz;
 		float d = distance(light_pos, xpos.xyz);
 		float att = energy[i] * 200. / (4. * 3.14 * d * d);
-		float spec_att = (energy[i] + 10) * 200. / (4. * 3.14 * d * d);
+		float spec_att = (energy[i] + 10.) * 200. / (4. * 3.14 * d * d);
 
 		vec3 norm = texture2D(ntex, texc).xyz;
 		norm = (norm - 0.5) * 2.0;
