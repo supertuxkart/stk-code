@@ -615,12 +615,6 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(const XMLNode& xml_no
 
 TrackObjectPresentationLight::~TrackObjectPresentationLight()
 {
-    // TODO
-}
-
-void TrackObjectPresentationLight::update(float dt)
-{
-    // TODO
 }
 
 // ----------------------------------------------------------------------------

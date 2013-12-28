@@ -277,8 +277,6 @@ private:
 public:
     TrackObjectPresentationLight(const XMLNode& xml_node);
     virtual ~TrackObjectPresentationLight();
-
-    virtual void update(float dt) OVERRIDE;
 };
 
 
