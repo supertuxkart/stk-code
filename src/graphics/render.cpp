@@ -47,6 +47,8 @@
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 
+#include <algorithm>
+
 void IrrDriver::renderGLSL(float dt)
 {
     World *world = World::getWorld(); // Never NULL.
@@ -214,7 +216,7 @@ void IrrDriver::renderGLSL(float dt)
         }
 
         // Lights
-        renderLights(cambox, camnode, overridemat, cam);
+        renderLights(cambox, camnode, overridemat, cam, dt);
 
         if (!bgnodes)
         {
@@ -670,7 +672,7 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
 void IrrDriver::renderLights(const core::aabbox3df& cambox,
                              scene::ICameraSceneNode * const camnode,
                              video::SOverrideMaterial &overridemat,
-                             int cam)
+                             int cam, float dt)
 {
     core::array<video::IRenderTarget> rtts;
     // Diffuse
@@ -705,39 +707,58 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     std::vector<LightNode *> BucketedLN[15];
     for (unsigned int i = 0; i < lightcount; i++)
     {
-        if (!m_lights[i]->isPointLight()) {
+        if (!m_lights[i]->isPointLight())
+        {
           m_lights[i]->render();
           continue;
         }
         const core::vector3df &lightpos = (m_lights[i]->getPosition() - campos);
         unsigned idx = (unsigned)(lightpos.getLength() / 10);
-        if(idx > 14)
+        if (idx > 14)
           continue;
         BucketedLN[idx].push_back(m_lights[i]);
     }
+
     unsigned lightnum = 0;
-    for (unsigned i = 0; i < 15; i++) {
-      for (unsigned j = 0; j < BucketedLN[i].size(); j++) {
-        if (++lightnum > MAXLIGHT)
+
+    for (unsigned i = 0; i < 15; i++)
+    {
+        for (unsigned j = 0; j < BucketedLN[i].size(); j++)
+        {
+            if (++lightnum > MAXLIGHT)
+            {
+                LightNode* light_node = BucketedLN[i].at(j);
+                light_node->setEnergyMultiplier(0.0f);
+            }
+            else
+            {
+                LightNode* light_node = BucketedLN[i].at(j);
+
+                float em = light_node->getEnergyMultiplier();
+                if (em < 1.0f)
+                {
+                    light_node->setEnergyMultiplier(std::min(1.0f, em + dt));
+                }
+
+                const core::vector3df &pos = light_node->getPosition();
+                accumulatedLightPos.push_back(pos.X);
+                accumulatedLightPos.push_back(pos.Y);
+                accumulatedLightPos.push_back(pos.Z);
+                accumulatedLightPos.push_back(0.);
+                const core::vector3df &col = light_node->getColor();
+
+                accumulatedLightColor.push_back(col.X);
+                accumulatedLightColor.push_back(col.Y);
+                accumulatedLightColor.push_back(col.Z);
+                accumulatedLightColor.push_back(0.);
+                accumulatedLightEnergy.push_back(light_node->getEffectiveEnergy());
+            }
+        }
+        if (lightnum > MAXLIGHT)
+        {
+          irr_driver->setLastLightBucketDistance(i * 10);
           break;
-        LightNode *LN = BucketedLN[i].at(j);
-        const core::vector3df &pos = LN->getPosition();
-        accumulatedLightPos.push_back(pos.X);
-        accumulatedLightPos.push_back(pos.Y);
-        accumulatedLightPos.push_back(pos.Z);
-        accumulatedLightPos.push_back(0.);
-        const core::vector3df &col = LN->getColor();
-        
-        accumulatedLightColor.push_back(col.X);
-        accumulatedLightColor.push_back(col.Y);
-        accumulatedLightColor.push_back(col.Z);
-        accumulatedLightColor.push_back(0.);
-        accumulatedLightEnergy.push_back(LN->getEnergy());
-      }
-      if (lightnum > MAXLIGHT) {
-        irr_driver->setLastLightBucketDistance(i * 10);
-        break;
-      }
+        }
     }
     LightNode::renderLightSet(accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
     // Handle SSAO

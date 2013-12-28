@@ -37,7 +37,8 @@ aabbox3df LightNode::box;
 LightNode::LightNode(scene::ISceneManager* mgr, float radius, float e, float r, float g, float b):
                      ISceneNode(mgr->getRootSceneNode(), mgr, -1)
 {
-    energy = e;
+    m_energy = e;
+    m_energy_multiplier = 1.0f;
     m_color[0] = r;
     m_color[1] = g;
     m_color[2] = b;

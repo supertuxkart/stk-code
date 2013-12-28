@@ -194,7 +194,7 @@ private:
     void renderLights(const core::aabbox3df& cambox,
                       scene::ICameraSceneNode * const camnode,
                       video::SOverrideMaterial &overridemat,
-                      int cam);
+                      int cam, float dt);
     void renderDisplacement(video::SOverrideMaterial &overridemat,
                             int cam);
     void doScreenShot();
