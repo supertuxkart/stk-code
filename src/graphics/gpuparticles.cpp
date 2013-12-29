@@ -296,6 +296,8 @@ void PointEmitter::simulate()
 
 void PointEmitter::draw()
 {
+  glDisable(GL_ALPHA_TEST);
+  glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	core::matrix4 matrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	matrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
@@ -327,6 +329,8 @@ void PointEmitter::draw()
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glActiveTexture(GL_TEXTURE0);
   glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+  glEnable(GL_ALPHA_TEST);
+  glEnable(GL_DEPTH_TEST);
 }
 
 RainNode::RainNode(scene::ISceneManager* mgr, ITexture *tex)
