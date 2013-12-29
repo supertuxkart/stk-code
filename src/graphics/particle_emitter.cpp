@@ -454,7 +454,6 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                     lifeTimeMin, lifeTimeMax,
                     m_particle_type->getAngleSpread());
                 PE->setPosition(m_node->getPosition());
-				irr_driver->addPerCameraNode(PE, irr_driver->getSceneManager()->getActiveCamera(), NULL);
 #endif
                 break;
             }

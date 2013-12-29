@@ -176,13 +176,14 @@ void bindUniformToTextureUnit(GLuint location, GLuint texid, unsigned textureUni
 }
 
 GPUParticle::GPUParticle(scene::ISceneManager* mgr, ITexture *tex)
-    : scene::ISceneNode(0, mgr, -1) {
+    : scene::ISceneNode(mgr->getRootSceneNode(), mgr, -1) {
     initGL();
 	fakemat.Lighting = false;
 	fakemat.ZWriteEnable = false;
 	fakemat.MaterialType = irr_driver->getShader(ES_RAIN);
 	fakemat.Thickness = 200;
-		fakemat.setTexture(0, tex);
+	fakemat.setTexture(0, tex);
+	setAutomaticCulling(0);
   }
 
 void GPUParticle::render() {
