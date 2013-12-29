@@ -345,8 +345,6 @@ int ParticleEmitter::getCreationRate()
  */
 void ParticleEmitter::setPosition(const Vec3 &pos)
 {
-  if (PE)
-    PE->setPosition(pos.toIrrVector());
   m_node->setPosition(pos.toIrrVector());
 }   // setPosition
 
@@ -457,6 +455,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                     lifeTimeMin, lifeTimeMax,
                     m_particle_type->getAngleSpread());
                 PE->setPosition(m_node->getPosition());
+                PE->set_m_node(m_node);
 #endif
                 break;
             }

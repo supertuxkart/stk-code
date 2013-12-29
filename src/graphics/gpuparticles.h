@@ -36,6 +36,7 @@ protected:
   unsigned duration, count;
   core::vector3df direction;
   core::aabbox3d<f32> box;
+  scene::IParticleSystemSceneNode *m_node;
 
   virtual void simulate();
   virtual void draw();
@@ -52,6 +53,7 @@ public:
 //    const core::dimension2df& minStartSize,
 //    const core::dimension2df& maxStartSize
   );
+  void set_m_node(scene::IParticleSystemSceneNode *nd) { m_node = nd; }
   virtual const core::aabbox3d<f32>& getBoundingBox() const { return box; }
   virtual u32 getMaterialCount() const { return 1; }
 };

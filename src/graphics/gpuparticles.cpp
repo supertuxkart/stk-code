@@ -4,6 +4,7 @@
 #include "io/file_manager.hpp"
 #include "config/user_config.hpp"
 #include <ICameraSceneNode.h>
+#include <IParticleSystemSceneNode.h>
 
 #ifdef _IRR_WINDOWS_API_
 #define IRR_OGL_LOAD_EXTENSION(X) wglGetProcAddress(reinterpret_cast<const char*>(X))
@@ -303,7 +304,7 @@ void PointEmitter::draw()
 	glEnable(GL_BLEND);
 	core::matrix4 matrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	matrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-	matrix *= getAbsoluteTransformation();
+	matrix *= m_node->getAbsoluteTransformation();
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
   glEnable(GL_POINT_SPRITE);
   glBlendEquation(GL_FUNC_ADD);
