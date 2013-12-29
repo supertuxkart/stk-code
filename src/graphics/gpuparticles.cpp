@@ -42,6 +42,7 @@ PFNGLUNIFORM1IPROC glUniform1i;
 PFNGLGETPROGRAMIVPROC glGetProgramiv;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
 PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
+PFNGLBLENDEQUATIONPROC glBlendEquation;
 #endif
 
 void initGL()
@@ -80,6 +81,7 @@ void initGL()
     glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramInfoLog");
     glTransformFeedbackVaryings = (PFNGLTRANSFORMFEEDBACKVARYINGSPROC)IRR_OGL_LOAD_EXTENSION("glTransformFeedbackVaryings");
 	glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glGetAttribLocation");
+	glBlendEquation = (PFNGLBLENDEQUATIONPROC)IRR_OGL_LOAD_EXTENSION("glBlendEquation");
 #endif
 }
 
@@ -214,7 +216,7 @@ PointEmitter::PointEmitter(scene::ISceneManager* mgr, ITexture *tex,
 //  const core::dimension2df& minStartSize,
 //  const core::dimension2df& maxStartSize
 ) : GPUParticle(mgr, tex) {
-	count = lifeTimeMax * maxParticlesPerSecond / 1000;
+	count = maxParticlesPerSecond;
 	duration = lifeTimeMax;
 	float initial_lifetime_incr = 1000.;
 	initial_lifetime_incr /= maxParticlesPerSecond;
@@ -224,6 +226,7 @@ PointEmitter::PointEmitter(scene::ISceneManager* mgr, ITexture *tex,
     "new_particle_velocity",
   };
   texture = getTextureGLuint(tex);
+  normal_and_depth = getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
 
   SimulationProgram = LoadTFBProgram(file_manager->getAsset("shaders/pointemitter.vert").c_str(), varyings, 3);
   loc_duration = glGetUniformLocation(SimulationProgram, "duration");
@@ -237,6 +240,9 @@ PointEmitter::PointEmitter(scene::ISceneManager* mgr, ITexture *tex,
   RenderProgram = LoadProgram(file_manager->getAsset("shaders/particle.vert").c_str(), file_manager->getAsset("shaders/particle.frag").c_str());
   loc_matrix = glGetUniformLocation(RenderProgram, "matrix");
   loc_texture = glGetUniformLocation(RenderProgram, "texture");
+  loc_invproj = glGetUniformLocation(RenderProgram, "invproj");
+  loc_screen = glGetUniformLocation(RenderProgram, "screen");
+  loc_normal_and_depths = glGetUniformLocation(RenderProgram, "normals_and_depth");
 
   float *particles = new float[COMPONENTCOUNT * count];
   for (unsigned i = 0; i < count; i++) {
@@ -244,10 +250,14 @@ PointEmitter::PointEmitter(scene::ISceneManager* mgr, ITexture *tex,
 	  particles[COMPONENTCOUNT * i + 1] = 0.;
 	  particles[COMPONENTCOUNT * i + 2] = 0.;
 	  particles[COMPONENTCOUNT * i + 3] = rand() % duration;
+	  core::vector3df particledir = direction;
+	  particledir.rotateXYBy(os::Randomizer::frand() * maxAngleDegrees);
+	  particledir.rotateYZBy(os::Randomizer::frand() * maxAngleDegrees);
+	  particledir.rotateXZBy(os::Randomizer::frand() * maxAngleDegrees);
 
-	  particles[COMPONENTCOUNT * i + 4] = direction.X;
-	  particles[COMPONENTCOUNT * i + 5] = direction.Y;
-	  particles[COMPONENTCOUNT * i + 6] = direction.Z;
+	  particles[COMPONENTCOUNT * i + 4] = particledir.X;
+	  particles[COMPONENTCOUNT * i + 5] = particledir.Y;
+	  particles[COMPONENTCOUNT * i + 6] = particledir.Z;
   }
   glGenBuffers(2, tfb_buffers);
   glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
@@ -285,16 +295,31 @@ void PointEmitter::simulate()
 
 void PointEmitter::draw()
 {
+	glEnable(GL_BLEND);
 	core::matrix4 matrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	matrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
 	matrix *= getAbsoluteTransformation();
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
   glEnable(GL_POINT_SPRITE);
+  glBlendEquation(GL_FUNC_ADD);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glUseProgram(RenderProgram);
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-  glUniformMatrix4fv(loc_matrix, 1, GL_FALSE, matrix.pointer());
+  float screen[2] = {
+	  (float)UserConfigParams::m_width,
+	  (float)UserConfigParams::m_height
+  };
+  irr::core::matrix4 invproj = irr_driver->getVideoDriver()->getTransform(irr::video::ETS_PROJECTION);
+  invproj.makeInverse();
+
   bindUniformToTextureUnit(loc_texture, texture, 0);
+  bindUniformToTextureUnit(loc_normal_and_depths, normal_and_depth, 1);
+
+  glUniformMatrix4fv(loc_invproj, 1, GL_FALSE, invproj.pointer());
+  glUniform2f(loc_screen, screen[0], screen[1]);
+  glUniformMatrix4fv(loc_matrix, 1, GL_FALSE, matrix.pointer());
+
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), 0);
   glDrawArrays(GL_POINTS, 0, count);
   glDisableVertexAttribArray(0);
