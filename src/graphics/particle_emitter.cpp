@@ -28,6 +28,7 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/helpers.hpp"
+#include "graphics/gpuparticles.h"
 
 #include <SParticle.h>
 #include <IParticleAffector.h>
@@ -436,11 +437,25 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             case EMITTER_POINT:
             {
                 m_emitter = m_node->createPointEmitter(velocity,
-                                                       type->getMinRate(),  type->getMaxRate(),
+#ifdef GPUPARTICLE
+                                                       0., 0.,
+#else
+													   type->getMinRate(),  type->getMaxRate(),
+#endif
                                                        type->getMinColor(), type->getMaxColor(),
                                                        lifeTimeMin, lifeTimeMax,
                                                        m_particle_type->getAngleSpread() /* angle */
                                                        );
+#ifdef GPUPARTICLE
+                PointEmitter *PE = new PointEmitter(irr_driver->getSceneManager(), m_node->getMaterial(0).getTexture(0),
+                    velocity,
+                    type->getMinRate(),  type->getMaxRate(),
+                    type->getMinColor(), type->getMaxColor(),
+                    lifeTimeMin, lifeTimeMax,
+                    m_particle_type->getAngleSpread());
+                PE->setPosition(m_node->getPosition());
+				irr_driver->addPerCameraNode(PE, irr_driver->getSceneManager()->getActiveCamera(), NULL);
+#endif
                 break;
             }
 

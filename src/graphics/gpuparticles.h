@@ -20,10 +20,39 @@ protected:
 	virtual void simulate() = 0;
 	virtual void draw() = 0;
 public:
-    //GPUParticle(unsigned c, float *initialSamples, GLuint tex, GLuint rtt);
 	GPUParticle(scene::ISceneManager* mgr, ITexture *tex);
 	virtual void render();
 	virtual void OnRegisterSceneNode();
+};
+
+class PointEmitter : public GPUParticle
+{
+protected:
+  GLuint SimulationProgram, RenderProgram;
+  GLuint loc_duration, loc_source, loc_dt, loc_matrix;
+  GLuint loc_position, loc_velocity, loc_lifetime;
+  GLuint tfb_buffers[2];
+  unsigned duration, count;
+  core::vector3df direction;
+  core::aabbox3d<f32> box;
+
+  virtual void simulate();
+  virtual void draw();
+public:
+  PointEmitter(
+    scene::ISceneManager* mgr, ITexture *tex,
+    const core::vector3df& dir,
+    u32 minParticlesPerSecond,
+    u32 maxParticlesPerSecond,
+    const video::SColor& minStartColor,
+    const video::SColor& maxStartColor,
+    u32 lifeTimeMin, u32 lifeTimeMax,
+    s32 maxAngleDegrees
+//    const core::dimension2df& minStartSize,
+//    const core::dimension2df& maxStartSize
+  );
+  virtual const core::aabbox3d<f32>& getBoundingBox() const { return box; }
+  virtual u32 getMaterialCount() const { return 1; }
 };
 
 class RainNode : public GPUParticle
