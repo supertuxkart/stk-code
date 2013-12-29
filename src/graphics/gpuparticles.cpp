@@ -214,12 +214,16 @@ PointEmitter::PointEmitter(scene::ISceneManager* mgr, ITexture *tex,
 //  const core::dimension2df& minStartSize,
 //  const core::dimension2df& maxStartSize
 ) : GPUParticle(mgr, tex) {
+	count = lifeTimeMax * maxParticlesPerSecond / 1000;
+	duration = lifeTimeMax;
+	float initial_lifetime_incr = 1000.;
+	initial_lifetime_incr /= maxParticlesPerSecond;
   const char *varyings[] = {
     "new_particle_position",
 	"new_lifetime",
     "new_particle_velocity",
-	//"gl_SkipComponents3"
   };
+  texture = getTextureGLuint(tex);
 
   SimulationProgram = LoadTFBProgram(file_manager->getAsset("shaders/pointemitter.vert").c_str(), varyings, 3);
   loc_duration = glGetUniformLocation(SimulationProgram, "duration");
@@ -228,27 +232,23 @@ PointEmitter::PointEmitter(scene::ISceneManager* mgr, ITexture *tex,
   loc_position = glGetAttribLocation(SimulationProgram, "particle_position");
   loc_lifetime = glGetAttribLocation(SimulationProgram, "lifetime");
   loc_velocity = glGetAttribLocation(SimulationProgram, "particle_velocity");
-  printf("locs are %d, %d, %d\n", loc_position, loc_lifetime, loc_velocity);
+  printf("count:%d\nduration:%d\ninitial_lifetine:%f\n", count, duration, initial_lifetime_incr);
 
   RenderProgram = LoadProgram(file_manager->getAsset("shaders/particle.vert").c_str(), file_manager->getAsset("shaders/particle.frag").c_str());
   loc_matrix = glGetUniformLocation(RenderProgram, "matrix");
-  count = 25;
+  loc_texture = glGetUniformLocation(RenderProgram, "texture");
 
   float *particles = new float[COMPONENTCOUNT * count];
   for (unsigned i = 0; i < count; i++) {
-	  particles[COMPONENTCOUNT * i] = 0.;// getPosition().X;
-	  particles[COMPONENTCOUNT * i + 1] = 0.;// getPosition().Y;
-	  particles[COMPONENTCOUNT * i + 2] = 0.;//getPosition().Z;
-	  particles[COMPONENTCOUNT * i + 3] = i * 10;
+	  particles[COMPONENTCOUNT * i] = 0.;
+	  particles[COMPONENTCOUNT * i + 1] = 0.;
+	  particles[COMPONENTCOUNT * i + 2] = 0.;
+	  particles[COMPONENTCOUNT * i + 3] = rand() % duration;
 
 	  particles[COMPONENTCOUNT * i + 4] = direction.X;
 	  particles[COMPONENTCOUNT * i + 5] = direction.Y;
 	  particles[COMPONENTCOUNT * i + 6] = direction.Z;
-
-//	  particles[COMPONENTCOUNT * i + 8] = 100.;
-	  //memcpy(&particles[COMPONENTCOUNT * i + 3], &i, sizeof(float));
   }
-  printf("dir is %f, %f, %f\n", direction.X, direction.Y, direction.Z);
   glGenBuffers(2, tfb_buffers);
   glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
   glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
@@ -271,7 +271,7 @@ void PointEmitter::simulate()
   glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
 
   glUniform1i(loc_dt, 1);
-  glUniform1i(loc_duration, 100);
+  glUniform1i(loc_duration, duration);
   glUniform3f(loc_source, getPosition().X, getPosition().Y, getPosition().Z);
   glBeginTransformFeedback(GL_POINTS);
   glDrawArrays(GL_POINTS, 0, count);
@@ -285,23 +285,19 @@ void PointEmitter::simulate()
 
 void PointEmitter::draw()
 {
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
 	core::matrix4 matrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	matrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-	matrix *= getAbsoluteTransformation();;
+	matrix *= getAbsoluteTransformation();
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
   glEnable(GL_POINT_SPRITE);
   glUseProgram(RenderProgram);
   glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
   glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
   glUniformMatrix4fv(loc_matrix, 1, GL_FALSE, matrix.pointer());
-  glVertexAttribPointer(glGetAttribLocation(RenderProgram, "position"), 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), 0);
-  glVertexAttribPointer(glGetAttribLocation(RenderProgram, "lf"), 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid *)(3 * sizeof(float)));
+  bindUniformToTextureUnit(loc_texture, texture, 0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), 0);
   glDrawArrays(GL_POINTS, 0, count);
   glDisableVertexAttribArray(0);
-  glDisableVertexAttribArray(1);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glActiveTexture(GL_TEXTURE0);
   glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);

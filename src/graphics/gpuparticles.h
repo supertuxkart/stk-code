@@ -29,9 +29,10 @@ class PointEmitter : public GPUParticle
 {
 protected:
   GLuint SimulationProgram, RenderProgram;
-  GLuint loc_duration, loc_source, loc_dt, loc_matrix;
+  GLuint loc_duration, loc_source, loc_dt, loc_matrix, loc_texture;
   GLuint loc_position, loc_velocity, loc_lifetime;
   GLuint tfb_buffers[2];
+  GLuint texture;
   unsigned duration, count;
   core::vector3df direction;
   core::aabbox3d<f32> box;

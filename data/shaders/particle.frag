@@ -1,12 +1,8 @@
 #version 130
-in float lifetime;
-
-out vec3 color;
+uniform sampler2D texture;
+out vec4 color;
 
 void main(void)
 {
-    color = vec3(
-		(lifetime < 33.) ? 1. : 0.,
-		 (lifetime < 67. && lifetime >= 34.) ? 1. : 0.,
-		 (lifetime > 68.) ? 1. : 0.);
+    color = texture2D(texture, gl_PointCoord.xy);
 }
