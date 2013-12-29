@@ -364,7 +364,6 @@ void PointLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     srv->setVertexShaderConstant("col[0]", m_color.data(), m_color.size());
     srv->setVertexShaderConstant("center[0]", m_pos.data(), m_pos.size());
     srv->setVertexShaderConstant("viewm", m_view.pointer(), 16);
-    srv->setVertexShaderConstant("lightcount", &lightcount, 1);
 
     if (!firstdone)
     {

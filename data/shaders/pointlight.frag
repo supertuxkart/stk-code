@@ -3,7 +3,6 @@ uniform sampler2D ntex;
 uniform vec4 center[16];
 uniform vec4 col[16];
 uniform float energy[16];
-uniform int lightcount;
 uniform float spec;
 uniform vec2 screen;
 uniform mat4 invproj;
@@ -19,7 +18,7 @@ void main() {
 
 	vec3 diffuse = vec3(0.), specular = vec3(0.);
 
-	for (int i = 0; i < lightcount; ++i) {
+	for (int i = 0; i < 16; ++i) {
 		vec4 pseudocenter = viewm * vec4(center[i].xyz, 1.0);
 		pseudocenter /= pseudocenter.w;
 		vec3 light_pos = pseudocenter.xyz;

@@ -760,6 +760,18 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
           break;
         }
     }
+	// Fill lights
+	for (; lightnum < MAXLIGHT; lightnum++) {
+		accumulatedLightPos.push_back(0.);
+		accumulatedLightPos.push_back(0.);
+		accumulatedLightPos.push_back(0.);
+		accumulatedLightPos.push_back(0.);
+		accumulatedLightColor.push_back(0.);
+		accumulatedLightColor.push_back(0.);
+		accumulatedLightColor.push_back(0.);
+		accumulatedLightColor.push_back(0.);
+		accumulatedLightEnergy.push_back(0.);
+	}
     LightNode::renderLightSet(accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
     // Handle SSAO
     SMaterial m_material;
