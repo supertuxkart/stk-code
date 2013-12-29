@@ -20,7 +20,7 @@ protected:
 	virtual void simulate() = 0;
 	virtual void draw() = 0;
 public:
-	GPUParticle(scene::ISceneManager* mgr, ITexture *tex);
+	GPUParticle(scene::ISceneNode *parent, scene::ISceneManager* mgr, ITexture *tex);
 	virtual void render();
 	virtual void OnRegisterSceneNode();
 };
@@ -40,7 +40,7 @@ protected:
   virtual void simulate();
   virtual void draw();
 public:
-  PointEmitter(
+  PointEmitter(scene::ISceneNode *parent,
     scene::ISceneManager* mgr, ITexture *tex,
     const core::vector3df& dir,
     u32 minParticlesPerSecond,

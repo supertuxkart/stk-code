@@ -49,6 +49,7 @@ private:
 
     /** Irrlicht's particle systems. */
     scene::IParticleSystemSceneNode *m_node;
+    class PointEmitter *PE;
 
     Vec3                             m_position;
 

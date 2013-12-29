@@ -233,6 +233,7 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type,
     m_particle_type       = NULL;
     m_parent              = parent;
     m_emission_decay_rate = 0;
+    PE = 0;
 
     setParticleType(type);
     assert(m_node != NULL);
@@ -344,7 +345,9 @@ int ParticleEmitter::getCreationRate()
  */
 void ParticleEmitter::setPosition(const Vec3 &pos)
 {
-    m_node->setPosition(pos.toIrrVector());
+  if (PE)
+    PE->setPosition(pos.toIrrVector());
+  m_node->setPosition(pos.toIrrVector());
 }   // setPosition
 
 //-----------------------------------------------------------------------------
@@ -447,7 +450,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                        m_particle_type->getAngleSpread() /* angle */
                                                        );
 #ifdef GPUPARTICLE
-                PointEmitter *PE = new PointEmitter(irr_driver->getSceneManager(), m_node->getMaterial(0).getTexture(0),
+                PE = new PointEmitter(m_node->getParent(), irr_driver->getSceneManager(), m_node->getMaterial(0).getTexture(0),
                     velocity,
                     type->getMinRate(),  type->getMaxRate(),
                     type->getMinColor(), type->getMaxColor(),

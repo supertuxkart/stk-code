@@ -175,8 +175,8 @@ void bindUniformToTextureUnit(GLuint location, GLuint texid, unsigned textureUni
     glUniform1i(location, textureUnit);
 }
 
-GPUParticle::GPUParticle(scene::ISceneManager* mgr, ITexture *tex)
-    : scene::ISceneNode(mgr->getRootSceneNode(), mgr, -1) {
+GPUParticle::GPUParticle(scene::ISceneNode *parent, scene::ISceneManager* mgr, ITexture *tex)
+    : scene::ISceneNode(parent, mgr, -1) {
     initGL();
 	fakemat.Lighting = false;
 	fakemat.ZWriteEnable = false;
@@ -206,7 +206,8 @@ void GPUParticle::OnRegisterSceneNode() {
 
 #define COMPONENTCOUNT 8
 
-PointEmitter::PointEmitter(scene::ISceneManager* mgr, ITexture *tex,
+PointEmitter::PointEmitter(scene::ISceneNode *parent,
+  scene::ISceneManager* mgr, ITexture *tex,
   const core::vector3df& direction,
   u32 minParticlesPerSecond,
   u32 maxParticlesPerSecond,
@@ -216,7 +217,7 @@ PointEmitter::PointEmitter(scene::ISceneManager* mgr, ITexture *tex,
   s32 maxAngleDegrees
 //  const core::dimension2df& minStartSize,
 //  const core::dimension2df& maxStartSize
-) : GPUParticle(mgr, tex) {
+) : GPUParticle(parent, mgr, tex) {
 	count = maxParticlesPerSecond;
 	duration = lifeTimeMax;
 	float initial_lifetime_incr = 1000.;
@@ -296,6 +297,7 @@ void PointEmitter::simulate()
 
 void PointEmitter::draw()
 {
+  updateAbsolutePosition();
   glDisable(GL_ALPHA_TEST);
   glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
@@ -334,7 +336,7 @@ void PointEmitter::draw()
 }
 
 RainNode::RainNode(scene::ISceneManager* mgr, ITexture *tex)
-    : GPUParticle(mgr, tex)
+    : GPUParticle(0, mgr, tex)
 {
 	RenderProgram = LoadProgram(file_manager->getAsset("shaders/rain.vert").c_str(), file_manager->getAsset("shaders/rain.frag").c_str());
 	loc_screenw = glGetUniformLocation(RenderProgram, "screenw");
