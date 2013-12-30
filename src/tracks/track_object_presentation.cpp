@@ -186,9 +186,14 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
         full_path = file_manager->getAsset(FileManager::MODEL,model_name);
         m_mesh    = irr_driver->getAnimatedMesh(full_path);
 
-        if(!m_mesh)
+        if (!m_mesh)
         {
-            throw std::runtime_error("Model '" + model_name + "' cannot be found");
+            m_mesh = irr_driver->getAnimatedMesh(model_name);
+
+            if (!m_mesh)
+            {
+                throw std::runtime_error("Model '" + model_name + "' cannot be found");
+            }
         }
     }
 
@@ -457,10 +462,13 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(const XMLNode
         xml_node.get("end",    &m_fade_out_end  );
     }
 
-    video::ITexture *texture =
+    video::ITexture* texture =
         irr_driver->getTexture(file_manager->searchTexture(texture_name));
-    m_node = irr_driver->addBillboard(core::dimension2df(width, height),
-                                                       texture);
+    if (texture == NULL)
+    {
+        Log::warn("TrackObjectPresentation", "Billboard texture '%s' not found", texture_name.c_str());
+    }
+    m_node = irr_driver->addBillboard(core::dimension2df(width, height), texture);
     Material *stk_material = material_manager->getMaterial(texture_name);
     stk_material->setMaterialProperties(&(m_node->getMaterial(0)), NULL);
 

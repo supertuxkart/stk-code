@@ -1425,7 +1425,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // Add the track directory to the texture search path
     file_manager->pushTextureSearchPath(m_root);
     file_manager->pushModelSearchPath  (m_root);
-    // First read the temporary materials.dat file if it exists
+
+    // First read the temporary materials.xml file if it exists
     try
     {
         std::string materials_file = m_root+"materials.xml";
@@ -1440,22 +1441,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
     catch (std::exception& e)
     {
-        // no temporary materials.dat file, ignore
+        // no temporary materials.xml file, ignore
         (void)e;
-    }
-
-    // Start building the scene graph
-    std::string path = m_root+m_all_modes[mode_id].m_scene;
-    XMLNode *root    = file_manager->createXMLTree(path);
-
-    // Make sure that we have a track (which is used for raycasts to
-    // place other objects).
-    if(!root || root->getName()!="scene")
-    {
-        std::ostringstream msg;
-        msg<< "No track model defined in '"<<path
-           <<"', aborting.";
-        throw std::runtime_error(msg.str());
     }
 
     // Load the graph only now: this function is called from world, after
@@ -1473,15 +1460,31 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     float upwards_distance   = 0.1f;
     int   karts_per_row      = 2;
 
-    const XMLNode *default_start=root->getNode("default-start");
-    if(default_start)
+
+    // Start building the scene graph
+    std::string path = m_root + m_all_modes[mode_id].m_scene;
+    XMLNode *root    = file_manager->createXMLTree(path);
+
+    // Make sure that we have a track (which is used for raycasts to
+    // place other objects).
+    if (!root || root->getName()!="scene")
+    {
+        std::ostringstream msg;
+        msg<< "No track model defined in '"<<path
+           <<"', aborting.";
+        throw std::runtime_error(msg.str());
+    }
+
+    const XMLNode *default_start = root->getNode("default-start");
+    if (default_start)
     {
         default_start->get("forwards-distance",  &forwards_distance );
         default_start->get("sidewards-distance", &sidewards_distance);
         default_start->get("upwards-distance",   &upwards_distance  );
         default_start->get("karts-per-row",      &karts_per_row     );
     }
-    if(!m_is_arena && !m_is_soccer && !m_is_cutscene)
+
+    if (!m_is_arena && !m_is_soccer && !m_is_cutscene)
     {
         m_start_transforms.resize(race_manager->getNumberOfKarts());
         QuadGraph::get()->setDefaultStartPositions(&m_start_transforms,
@@ -1491,10 +1494,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
                                                    upwards_distance);
     }
 
-    unsigned int start_position_counter = 0;
-
     // we need to check for fog before loading the main track model
-    if(const XMLNode *node = root->getNode("sun"))
+    if (const XMLNode *node = root->getNode("sun"))
     {
         node->get("xyz",           &m_sun_position );
         node->get("ambient",       &m_default_ambient_color);
@@ -1512,31 +1513,204 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
 
-    LodNodeLoader lod_loader;
+    loadObjects(root, path);
 
-    for(unsigned int i=0; i<root->getNumNodes(); i++)
+    // ---- Fog
+    // It's important to execute this BEFORE the code that creates the skycube,
+    // otherwise the skycube node could be modified to have fog enabled, which
+    // we don't want
+    if (m_use_fog && !UserConfigParams::m_camera_debug && !irr_driver->isGLSL())
+    {
+        /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start
+           and end do not matter */
+        irr_driver->getVideoDriver()->setFog(m_fog_color,
+                                             video::EFT_FOG_LINEAR,
+                                             m_fog_start, m_fog_end,
+                                             1.0f);
+    }
+
+    // Enable for for all track nodes if fog is used
+    const unsigned int count = m_all_nodes.size();
+    for(unsigned int i=0; i<count; i++)
+    {
+        adjustForFog(m_all_nodes[i]);
+    }
+    m_track_object_manager->enableFog(m_use_fog);
+
+    // Sky dome and boxes support
+    // --------------------------
+    if(m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
+    {
+        scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],
+                                                         m_sky_hori_segments,
+                                                         m_sky_vert_segments,
+                                                         m_sky_texture_percent,
+                                                         m_sky_sphere_percent);
+        for(unsigned int i=0; i<node->getMaterialCount(); i++)
+        {
+            video::SMaterial &irrMaterial=node->getMaterial(i);
+            for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+            {
+                video::ITexture* t=irrMaterial.getTexture(j);
+                if(!t) continue;
+                core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
+                m_animated_textures.push_back(new MovingTexture(m, m_sky_dx, m_sky_dy));
+            }   // for j<MATERIAL_MAX_TEXTURES
+        }   // for i<getMaterialCount
+
+        m_all_nodes.push_back(node);
+    }
+    else if(m_sky_type==SKY_BOX && m_sky_textures.size() == 6)
+    {
+        m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures));
+    }
+    else if(m_sky_type==SKY_COLOR)
+    {
+        World::getWorld()->setClearbackBufferColor(m_sky_color);
+    }
+
+
+    file_manager->popTextureSearchPath();
+    file_manager->popModelSearchPath  ();
+
+    // ---- Set ambient color
+    m_ambient_color = m_default_ambient_color;
+    irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
+
+    // ---- Create sun (non-ambient directional light)
+    if (m_sun_position.getLengthSQ() < 0.03f)
+    {
+        m_sun_position = core::vector3df(500, 250, 250);
+    }
+
+    const video::SColorf tmpf(m_sun_diffuse_color);
+    m_sun = irr_driver->addLight(m_sun_position, 10000.0f, 0., tmpf.r, tmpf.g, tmpf.b, true);
+
+    if (!irr_driver->isGLSL())
+    {
+        scene::ILightSceneNode *sun = (scene::ILightSceneNode *) m_sun;
+        sun->setLightType(video::ELT_DIRECTIONAL);
+
+        // The angle of the light is rather important - let the sun
+        // point towards (0,0,0).
+        if (m_sun_position.getLengthSQ() < 0.03f)
+            // Backward compatibility: if no sun is specified, use the
+            // old hardcoded default angle
+            m_sun->setRotation( core::vector3df(180, 45, 45) );
+        else
+            m_sun->setRotation((-m_sun_position).getHorizontalAngle());
+
+        sun->getLightData().SpecularColor = m_sun_specular_color;
+    }
+
+
+    createPhysicsModel(main_track_count);
+
+
+    for (unsigned int i=0; i<root->getNumNodes(); i++)
+    {
+        const XMLNode *node = root->getNode(i);
+        const std::string &name = node->getName();
+        if (name=="banana"      || name=="item"      ||
+            name=="small-nitro" || name=="big-nitro" ||
+            name=="easter-egg"                           )
+        {
+            itemCommand(node);
+        }
+    }   // for i<root->getNumNodes()
+
+    delete root;
+
+    if (UserConfigParams::m_track_debug &&
+        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+        !m_is_cutscene)
+    {
+        QuadGraph::get()->createDebugMesh();
+    }
+
+    // Only print warning if not in battle mode, since battle tracks don't have
+    // any quads or check lines.
+    if (CheckManager::get()->getCheckStructureCount()==0  &&
+        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES && !m_is_cutscene)
+    {
+        Log::warn("track", "No check lines found in track '%s'.",
+                  m_ident.c_str());
+        Log::warn("track", "Lap counting will not work, and start "
+                  "positions might be incorrect.");
+    }
+
+    if (UserConfigParams::logMemory())
+    {
+        Log::debug("track", "[memory] After loading  '%s': mesh cache %d "
+                   "texture cache %d\n", getIdent().c_str(),
+                irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
+                irr_driver->getVideoDriver()->getTextureCount());
+    }
+
+    World *world = World::getWorld();
+    if (world->useChecklineRequirements())
+    {
+        QuadGraph::get()->computeChecklineRequirements();
+    }
+
+    EasterEggHunt *easter_world = dynamic_cast<EasterEggHunt*>(world);
+    if(easter_world)
+    {
+        std::string dir = StringUtils::getPath(m_filename);
+        easter_world->readData(dir+"/easter_eggs.xml");
+    }
+
+    irr_driver->unsetTextureErrorMessage();
+}   // loadTrackModel
+
+//-----------------------------------------------------------------------------
+
+void Track::loadObjects(const XMLNode* root, const std::string& path)
+{
+    LodNodeLoader lod_loader;
+    unsigned int start_position_counter = 0;
+
+    unsigned int node_count = root->getNumNodes();
+    for (unsigned int i = 0; i < node_count; i++)
     {
         const XMLNode *node = root->getNode(i);
         const std::string name = node->getName();
         // The track object was already converted before the loop, and the
         // default start was already used, too - so ignore those.
-        if(name=="track" || name=="default-start") continue;
-        if(name=="object")
+        if (name == "track" || name == "default-start") continue;
+        if (name == "object")
         {
             lod_loader.check(node);
             m_track_object_manager->add(*node);
         }
-        else if(name=="water")
+        else if (name == "library")
+        {
+            std::string name;
+            node->get("name", &name);
+            std::string lib_node_path = file_manager->getAsset("library/" + name + "/node.xml");
+            std::string lib_path = file_manager->getAsset("library/" + name);
+            XMLNode *libroot = file_manager->createXMLTree(lib_node_path);
+            if (libroot == NULL) continue;
+
+            file_manager->pushTextureSearchPath(lib_path + "/");
+            file_manager->pushModelSearchPath  (lib_path);
+    
+            loadObjects(libroot, lib_path);
+
+            file_manager->popTextureSearchPath();
+            file_manager->popModelSearchPath();
+        }
+        else if (name == "water")
         {
             createWater(*node);
         }
-        else if(name=="banana"      || name=="item" ||
-                name=="small-nitro" || name=="big-nitro" ||
-                name=="easter-egg"                           )
+        else if (name == "banana"      || name == "item" ||
+                 name == "small-nitro" || name == "big-nitro" ||
+                 name == "easter-egg"                           )
         {
             // will be handled later
         }
-        else if (name=="start")
+        else if (name == "start")
         {
             unsigned int position = start_position_counter;
             start_position_counter++;
@@ -1556,34 +1730,34 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
                                            btQuaternion(btVector3(0,1,0),
                                                         h*DEGREE_TO_RAD ) );
         }
-        else if(name=="camera")
+        else if (name == "camera")
         {
             node->get("far", &m_camera_far);
         }
-        else if(name=="checks")
+        else if (name == "checks")
         {
             CheckManager::get()->load(*node);
         }
-        else if (name=="particle-emitter")
+        else if (name == "particle-emitter")
         {
             if (UserConfigParams::m_graphical_effects)
             {
                 m_track_object_manager->add(*node);
             }
         }
-        else if(name=="sky-dome" || name=="sky-box" || name=="sky-color")
+        else if (name == "sky-dome" || name == "sky-box" || name == "sky-color")
         {
             handleSky(*node, path);
         }
-        else if(name=="end-cameras")
+        else if (name == "end-cameras")
         {
             Camera::readEndCamera(*node);
         }
-        else if(name=="light")
+        else if (name == "light")
         {
             m_track_object_manager->add(*node);
         }
-        else if(name=="weather")
+        else if (name == "weather")
         {
             std::string weather_particles;
             std::string weather_type;
@@ -1646,13 +1820,16 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // -------- Create and assign LOD nodes --------
     // recheck the static area, we will need LOD info
     const XMLNode* track_node = root->getNode("track");
-    for(unsigned int i=0; i<track_node->getNumNodes(); i++)
+    if (track_node != NULL)
     {
-        const XMLNode* n = track_node->getNode(i);
-        bool is_instance = false;
-        n->get("lod_instance", &is_instance);
+        for(unsigned int i=0; i<track_node->getNumNodes(); i++)
+        {
+            const XMLNode* n = track_node->getNode(i);
+            bool is_instance = false;
+            n->get("lod_instance", &is_instance);
 
-        if (!is_instance) lod_loader.check(n);
+            if (!is_instance) lod_loader.check(n);
+        }
     }
 
     std::vector<LODNode*> lod_nodes;
@@ -1664,154 +1841,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // Init all track objects
     m_track_object_manager->init();
-
-
-    // ---- Fog
-    // It's important to execute this BEFORE the code that creates the skycube,
-    // otherwise the skycube node could be modified to have fog enabled, which
-    // we don't want
-    if (m_use_fog && !UserConfigParams::m_camera_debug && !irr_driver->isGLSL())
-    {
-        /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start
-           and end do not matter */
-        irr_driver->getVideoDriver()->setFog(m_fog_color,
-                                             video::EFT_FOG_LINEAR,
-                                             m_fog_start, m_fog_end,
-                                             1.0f);
-    }
-
-    // Enable for for all track nodes if fog is used
-    //if(m_use_fog)
-    //{
-        const unsigned int count = m_all_nodes.size();
-        for(unsigned int i=0; i<count; i++)
-        {
-            adjustForFog(m_all_nodes[i]);
-        }
-    //}
-    m_track_object_manager->enableFog(m_use_fog);
-
-    // Sky dome and boxes support
-    // --------------------------
-    if(m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
-    {
-        scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],
-                                                         m_sky_hori_segments,
-                                                         m_sky_vert_segments,
-                                                         m_sky_texture_percent,
-                                                         m_sky_sphere_percent);
-        for(unsigned int i=0; i<node->getMaterialCount(); i++)
-        {
-            video::SMaterial &irrMaterial=node->getMaterial(i);
-            for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-            {
-                video::ITexture* t=irrMaterial.getTexture(j);
-                if(!t) continue;
-                core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
-                m_animated_textures.push_back(new MovingTexture(m, m_sky_dx, m_sky_dy));
-            }   // for j<MATERIAL_MAX_TEXTURES
-        }   // for i<getMaterialCount
-
-        m_all_nodes.push_back(node);
-    }
-    else if(m_sky_type==SKY_BOX && m_sky_textures.size() == 6)
-    {
-        m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures));
-    }
-    else if(m_sky_type==SKY_COLOR)
-    {
-        World::getWorld()->setClearbackBufferColor(m_sky_color);
-    }
-
-
-    file_manager->popTextureSearchPath();
-    file_manager->popModelSearchPath  ();
-
-    // ---- Set ambient color
-    m_ambient_color = m_default_ambient_color;
-    irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
-
-    // ---- Create sun (non-ambient directional light)
-    if (m_sun_position.getLengthSQ() < 0.03f)
-    {
-        m_sun_position = core::vector3df(500, 250, 250);
-    }
-
-    const video::SColorf tmpf(m_sun_diffuse_color);
-    m_sun = irr_driver->addLight(m_sun_position, 10000.0f, 0., tmpf.r, tmpf.g, tmpf.b, true);
-
-    if (!irr_driver->isGLSL())
-    {
-        scene::ILightSceneNode *sun = (scene::ILightSceneNode *) m_sun;
-        sun->setLightType(video::ELT_DIRECTIONAL);
-
-    // The angle of the light is rather important - let the sun
-    // point towards (0,0,0).
-        if(m_sun_position.getLengthSQ() < 0.03f)
-        // Backward compatibility: if no sun is specified, use the
-        // old hardcoded default angle
-        m_sun->setRotation( core::vector3df(180, 45, 45) );
-    else
-        m_sun->setRotation((-m_sun_position).getHorizontalAngle());
-
-        sun->getLightData().SpecularColor = m_sun_specular_color;
-    }
-
-
-    createPhysicsModel(main_track_count);
-
-
-    for(unsigned int i=0; i<root->getNumNodes(); i++)
-    {
-        const XMLNode *node = root->getNode(i);
-        const std::string &name = node->getName();
-        if (name=="banana"      || name=="item"      ||
-            name=="small-nitro" || name=="big-nitro" ||
-            name=="easter-egg"                           )
-        {
-            itemCommand(node);
-        }
-    }   // for i<root->getNumNodes()
-
-    delete root;
-
-    if (UserConfigParams::m_track_debug &&
-        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
-        !m_is_cutscene)
-        QuadGraph::get()->createDebugMesh();
-
-    // Only print warning if not in battle mode, since battle tracks don't have
-    // any quads or check lines.
-    if(CheckManager::get()->getCheckStructureCount()==0  &&
-        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES && !m_is_cutscene)
-    {
-        Log::warn("track", "No check lines found in track '%s'.",
-                  m_ident.c_str());
-        Log::warn("track", "Lap counting will not work, and start "
-                  "positions might be incorrect.");
-    }
-
-    if(UserConfigParams::logMemory())
-        Log::debug("track", "[memory] After loading  '%s': mesh cache %d "
-                   "texture cache %d\n", getIdent().c_str(),
-                irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
-                irr_driver->getVideoDriver()->getTextureCount());
-
-    World *world = World::getWorld();
-    if (world->useChecklineRequirements())
-    {
-        QuadGraph::get()->computeChecklineRequirements();
-    }
-
-    EasterEggHunt *easter_world = dynamic_cast<EasterEggHunt*>(world);
-    if(easter_world)
-    {
-        std::string dir = StringUtils::getPath(m_filename);
-        easter_world->readData(dir+"/easter_eggs.xml");
-    }
-
-    irr_driver->unsetTextureErrorMessage();
-}   // loadTrackModel
+}
 
 //-----------------------------------------------------------------------------
 /** Changes all materials of the given mesh to use the current fog

@@ -154,12 +154,17 @@ void LodNodeLoader::done(Track* track,
                     full_path = directory + "/" + group[m].second.m_model_file;
 
                     // TODO: check whether the mesh contains animations or not?
-                    scene::IMesh *a_mesh = irr_driver->getMesh(full_path);
-                    if(!a_mesh)
+                    scene::IMesh* a_mesh = irr_driver->getMesh(full_path);
+                    if (!a_mesh)
                     {
-                        fprintf(stderr, "Warning: object model '%s' not found, ignored.\n",
-                                full_path.c_str());
-                        continue;
+                        a_mesh = irr_driver->getMesh(group[m].second.m_model_file);
+
+                        if (!a_mesh)
+                        {
+                            Log::warn("LODNodeLoad", "Warning: object model '%s' not found, ignored.\n",
+                                      full_path.c_str());
+                            continue;
+                        }
                     }
 
                     if (group[m].second.m_tangent)
