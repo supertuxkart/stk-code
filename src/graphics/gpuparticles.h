@@ -5,7 +5,9 @@
 #define GL_GLEXT_PROTOTYPES 1
 #endif
 #include "graphics/glwrap.hpp"
+#include "../lib/irrlicht/source/Irrlicht/CParticleSystemSceneNode.h"
 #include <ISceneManager.h>
+#include <IParticleSystemSceneNode.h>
 
 void initGL();
 GLuint LoadProgram(const char * vertex_file_path, const char * fragment_file_path);
@@ -21,8 +23,36 @@ protected:
 	virtual void draw() = 0;
 public:
 	GPUParticle(scene::ISceneNode *parent, scene::ISceneManager* mgr, ITexture *tex);
+	virtual void GPUParticle::render();
+	virtual void GPUParticle::OnRegisterSceneNode();
+};
+
+class ParticleSystemProxy : public scene::CParticleSystemSceneNode {
+protected:
+	GLuint SimulationProgram, RenderProgram;
+	GLuint loc_duration, loc_sourcematrix, loc_dt, loc_matrix, loc_texture, loc_normal_and_depths, loc_screen, loc_invproj;
+	GLuint loc_position, loc_velocity, loc_lifetime;
+	GLuint tfb_buffers[2];
+	GLuint texture, normal_and_depth;
+	unsigned duration, count;
+
+	virtual void simulate();
+	virtual void draw();
+public:
+	static IParticleSystemSceneNode *addParticleNode(
+		bool withDefaultEmitter = true, ISceneNode* parent = 0, s32 id = -1,
+		const core::vector3df& position = core::vector3df(0, 0, 0),
+		const core::vector3df& rotation = core::vector3df(0, 0, 0),
+		const core::vector3df& scale = core::vector3df(1.0f, 1.0f, 1.0f));
+
+	ParticleSystemProxy(bool createDefaultEmitter,
+		ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
+		const core::vector3df& position,
+		const core::vector3df& rotation,
+		const core::vector3df& scale);
+
+	virtual void setEmitter(scene::IParticleEmitter* emitter);
 	virtual void render();
-	virtual void OnRegisterSceneNode();
 };
 
 class PointEmitter : public GPUParticle

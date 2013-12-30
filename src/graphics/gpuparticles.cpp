@@ -176,6 +176,8 @@ void bindUniformToTextureUnit(GLuint location, GLuint texid, unsigned textureUni
     glUniform1i(location, textureUnit);
 }
 
+#define COMPONENTCOUNT 8
+
 GPUParticle::GPUParticle(scene::ISceneNode *parent, scene::ISceneManager* mgr, ITexture *tex)
     : scene::ISceneNode(parent, mgr, -1) {
     initGL();
@@ -205,134 +207,165 @@ void GPUParticle::OnRegisterSceneNode() {
 	ISceneNode::OnRegisterSceneNode();
 }
 
-#define COMPONENTCOUNT 8
+scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(
+	bool withDefaultEmitter, ISceneNode* parent, s32 id,
+	const core::vector3df& position,
+	const core::vector3df& rotation,
+	const core::vector3df& scale) {
+	if (!parent)
+		parent = irr_driver->getSceneManager()->getRootSceneNode();
 
-PointEmitter::PointEmitter(scene::ISceneNode *parent,
-  scene::ISceneManager* mgr, ITexture *tex,
-  const core::vector3df& direction,
-  u32 minParticlesPerSecond,
-  u32 maxParticlesPerSecond,
-  const video::SColor& minStartColor,
-  const video::SColor& maxStartColor,
-  u32 lifeTimeMin, u32 lifeTimeMax,
-  s32 maxAngleDegrees
-//  const core::dimension2df& minStartSize,
-//  const core::dimension2df& maxStartSize
-) : GPUParticle(parent, mgr, tex) {
-	count = maxParticlesPerSecond;
-	duration = lifeTimeMax;
+	IParticleSystemSceneNode* node = new ParticleSystemProxy(withDefaultEmitter,
+		parent, irr_driver->getSceneManager(), id, position, rotation, scale);
+	node->drop();
+
+	return node;
+}
+
+ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
+	ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
+	const core::vector3df& position,
+	const core::vector3df& rotation,
+	const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale) {
+}
+
+void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
+{
+	if (!emitter)
+		return;
+	CParticleSystemSceneNode::setEmitter(emitter);
+	if (emitter->getType() != scene::EPET_POINT)
+		return;
+	setAutomaticCulling(0);
+	initGL();
+	count = emitter->getMaxParticlesPerSecond();
+	duration = emitter->getMaxLifeTime();
 	float initial_lifetime_incr = 1000.;
-	initial_lifetime_incr /= maxParticlesPerSecond;
-  const char *varyings[] = {
-    "new_particle_position",
-	"new_lifetime",
-    "new_particle_velocity",
-  };
-  texture = getTextureGLuint(tex);
-  normal_and_depth = getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
+	const char *varyings[] = {
+		"new_particle_position",
+		"new_lifetime",
+		"new_particle_velocity",
+	};
+	texture = getTextureGLuint(getMaterial(0).getTexture(0));
+	normal_and_depth = getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
 
-  SimulationProgram = LoadTFBProgram(file_manager->getAsset("shaders/pointemitter.vert").c_str(), varyings, 3);
-  loc_duration = glGetUniformLocation(SimulationProgram, "duration");
-  loc_dt = glGetUniformLocation(SimulationProgram, "dt");
-  loc_sourcematrix = glGetUniformLocation(SimulationProgram, "sourcematrix");
-  loc_position = glGetAttribLocation(SimulationProgram, "particle_position");
-  loc_lifetime = glGetAttribLocation(SimulationProgram, "lifetime");
-  loc_velocity = glGetAttribLocation(SimulationProgram, "particle_velocity");
-  printf("count:%d\nduration:%d\ninitial_lifetine:%f\n", count, duration, initial_lifetime_incr);
+	SimulationProgram = LoadTFBProgram(file_manager->getAsset("shaders/pointemitter.vert").c_str(), varyings, 3);
+	loc_duration = glGetUniformLocation(SimulationProgram, "duration");
+	loc_dt = glGetUniformLocation(SimulationProgram, "dt");
+	loc_sourcematrix = glGetUniformLocation(SimulationProgram, "sourcematrix");
+	loc_position = glGetAttribLocation(SimulationProgram, "particle_position");
+	loc_lifetime = glGetAttribLocation(SimulationProgram, "lifetime");
+	loc_velocity = glGetAttribLocation(SimulationProgram, "particle_velocity");
+	printf("count:%d\nduration:%d\ninitial_lifetine:%f\n", count, duration, initial_lifetime_incr);
 
-  RenderProgram = LoadProgram(file_manager->getAsset("shaders/particle.vert").c_str(), file_manager->getAsset("shaders/particle.frag").c_str());
-  loc_matrix = glGetUniformLocation(RenderProgram, "matrix");
-  loc_texture = glGetUniformLocation(RenderProgram, "texture");
-  loc_invproj = glGetUniformLocation(RenderProgram, "invproj");
-  loc_screen = glGetUniformLocation(RenderProgram, "screen");
-  loc_normal_and_depths = glGetUniformLocation(RenderProgram, "normals_and_depth");
+	RenderProgram = LoadProgram(file_manager->getAsset("shaders/particle.vert").c_str(), file_manager->getAsset("shaders/particle.frag").c_str());
+	loc_matrix = glGetUniformLocation(RenderProgram, "matrix");
+	loc_texture = glGetUniformLocation(RenderProgram, "texture");
+	loc_invproj = glGetUniformLocation(RenderProgram, "invproj");
+	loc_screen = glGetUniformLocation(RenderProgram, "screen");
+	loc_normal_and_depths = glGetUniformLocation(RenderProgram, "normals_and_depth");
 
-  float *particles = new float[COMPONENTCOUNT * count];
-  for (unsigned i = 0; i < count; i++) {
-	  particles[COMPONENTCOUNT * i] = 0.;
-	  particles[COMPONENTCOUNT * i + 1] = 0.;
-	  particles[COMPONENTCOUNT * i + 2] = 0.;
-	  particles[COMPONENTCOUNT * i + 3] = rand() % duration;
-	  core::vector3df particledir = direction;
-	  particledir.rotateXYBy(os::Randomizer::frand() * maxAngleDegrees);
-	  particledir.rotateYZBy(os::Randomizer::frand() * maxAngleDegrees);
-	  particledir.rotateXZBy(os::Randomizer::frand() * maxAngleDegrees);
+	float *particles = new float[COMPONENTCOUNT * count];
+	for (unsigned i = 0; i < count; i++) {
+		particles[COMPONENTCOUNT * i] = 0.;
+		particles[COMPONENTCOUNT * i + 1] = 0.;
+		particles[COMPONENTCOUNT * i + 2] = 0.;
+		particles[COMPONENTCOUNT * i + 3] = rand() % duration;
+		core::vector3df particledir = emitter->getDirection();
+		particledir.rotateXYBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+		particledir.rotateYZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+		particledir.rotateXZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
 
-	  particles[COMPONENTCOUNT * i + 4] = particledir.X;
-	  particles[COMPONENTCOUNT * i + 5] = particledir.Y;
-	  particles[COMPONENTCOUNT * i + 6] = particledir.Z;
-  }
-  glGenBuffers(2, tfb_buffers);
-  glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-  glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-  glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), 0, GL_STREAM_DRAW);
-  delete [] particles;
+		particles[COMPONENTCOUNT * i + 4] = particledir.X;
+		particles[COMPONENTCOUNT * i + 5] = particledir.Y;
+		particles[COMPONENTCOUNT * i + 6] = particledir.Z;
+	}
+	glGenBuffers(2, tfb_buffers);
+	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
+	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
+	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), 0, GL_STREAM_DRAW);
+	delete [] particles;
 }
 
-void PointEmitter::simulate()
-{
-	core::matrix4 matrix = m_node->getAbsoluteTransformation();
-  glUseProgram(SimulationProgram);
-  glEnable(GL_RASTERIZER_DISCARD);
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-  glEnableVertexAttribArray(2);
-  glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-  glVertexAttribPointer(loc_position, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)0);
-  glVertexAttribPointer(loc_lifetime, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(3 * sizeof(float)));
-  glVertexAttribPointer(loc_velocity, 4, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(4 * sizeof(float)));
-  glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
 
-  glUniform1i(loc_dt, 1);
-  glUniform1i(loc_duration, duration);
-  glUniformMatrix4fv(loc_sourcematrix, 1, GL_FALSE, matrix.pointer());
-  glBeginTransformFeedback(GL_POINTS);
-  glDrawArrays(GL_POINTS, 0, count);
-  glEndTransformFeedback();
-  glDisableVertexAttribArray(0);
-  glDisableVertexAttribArray(1);
-  glDisableVertexAttribArray(2);
-  glDisable(GL_RASTERIZER_DISCARD);
-  std::swap(tfb_buffers[0], tfb_buffers[1]);
+void ParticleSystemProxy::simulate()
+{
+	core::matrix4 matrix = getAbsoluteTransformation();
+	glUseProgram(SimulationProgram);
+	glEnable(GL_RASTERIZER_DISCARD);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
+	glVertexAttribPointer(loc_position, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)0);
+	glVertexAttribPointer(loc_lifetime, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+	glVertexAttribPointer(loc_velocity, 4, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(4 * sizeof(float)));
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
+
+	glUniform1i(loc_dt, 1);
+	glUniform1i(loc_duration, duration);
+	glUniformMatrix4fv(loc_sourcematrix, 1, GL_FALSE, matrix.pointer());
+	glBeginTransformFeedback(GL_POINTS);
+	glDrawArrays(GL_POINTS, 0, count);
+	glEndTransformFeedback();
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+	glDisable(GL_RASTERIZER_DISCARD);
+	std::swap(tfb_buffers[0], tfb_buffers[1]);
 }
 
-void PointEmitter::draw()
+void ParticleSystemProxy::draw()
 {
-  glDisable(GL_ALPHA_TEST);
-  glDepthMask(GL_FALSE);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
 	core::matrix4 matrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	matrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-  glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-  glEnable(GL_POINT_SPRITE);
-  glBlendEquation(GL_FUNC_ADD);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  glUseProgram(RenderProgram);
-  glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-  float screen[2] = {
-	  (float)UserConfigParams::m_width,
-	  (float)UserConfigParams::m_height
-  };
-  irr::core::matrix4 invproj = irr_driver->getVideoDriver()->getTransform(irr::video::ETS_PROJECTION);
-  invproj.makeInverse();
+	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+	glEnable(GL_POINT_SPRITE);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glUseProgram(RenderProgram);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
+	float screen[2] = {
+		(float)UserConfigParams::m_width,
+		(float)UserConfigParams::m_height
+	};
+	irr::core::matrix4 invproj = irr_driver->getVideoDriver()->getTransform(irr::video::ETS_PROJECTION);
+	invproj.makeInverse();
 
-  bindUniformToTextureUnit(loc_texture, texture, 0);
-  bindUniformToTextureUnit(loc_normal_and_depths, normal_and_depth, 1);
+	bindUniformToTextureUnit(loc_texture, texture, 0);
+	bindUniformToTextureUnit(loc_normal_and_depths, normal_and_depth, 1);
 
-  glUniformMatrix4fv(loc_invproj, 1, GL_FALSE, invproj.pointer());
-  glUniform2f(loc_screen, screen[0], screen[1]);
-  glUniformMatrix4fv(loc_matrix, 1, GL_FALSE, matrix.pointer());
+	glUniformMatrix4fv(loc_invproj, 1, GL_FALSE, invproj.pointer());
+	glUniform2f(loc_screen, screen[0], screen[1]);
+	glUniformMatrix4fv(loc_matrix, 1, GL_FALSE, matrix.pointer());
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), 0);
-  glDrawArrays(GL_POINTS, 0, count);
-  glDisableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glActiveTexture(GL_TEXTURE0);
-  glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
-  glEnable(GL_ALPHA_TEST);
-  glDepthMask(GL_TRUE);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), 0);
+	glDrawArrays(GL_POINTS, 0, count);
+	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+	glEnable(GL_ALPHA_TEST);
+	glDepthMask(GL_TRUE);
+}
+
+void ParticleSystemProxy::render() {
+	if (getEmitter()->getType() != scene::EPET_POINT)
+	{
+		CParticleSystemSceneNode::render();
+		return;
+	}
+	simulate();
+	draw();
+	// We need to force irrlicht to update its internal states
+	irr::video::IVideoDriver * const drv = irr_driver->getVideoDriver();
+	drv->setMaterial(getMaterial(0));
+	static_cast<irr::video::COpenGLDriver*>(drv)->setRenderStates3DMode();
 }
 
 RainNode::RainNode(scene::ISceneManager* mgr, ITexture *tex)

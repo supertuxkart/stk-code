@@ -233,7 +233,6 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type,
     m_particle_type       = NULL;
     m_parent              = parent;
     m_emission_decay_rate = 0;
-    PE = 0;
 
     setParticleType(type);
     assert(m_node != NULL);
@@ -248,8 +247,6 @@ ParticleEmitter::~ParticleEmitter()
     assert(m_magic_number == 0x58781325);
     if (m_node != NULL)
         irr_driver->removeNode(m_node);
-	if (PE)
-		irr_driver->removeNode(PE);
     m_emitter->drop();
 
     m_magic_number = 0xDEADBEEF;
@@ -373,7 +370,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         }
         else
         {
-            m_node = irr_driver->addParticleNode();
+            m_node = ParticleSystemProxy::addParticleNode();
         }
 
         if (m_parent != NULL)
@@ -440,24 +437,11 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             case EMITTER_POINT:
             {
                 m_emitter = m_node->createPointEmitter(velocity,
-#ifdef GPUPARTICLE
-                                                       0., 0.,
-#else
 													   type->getMinRate(),  type->getMaxRate(),
-#endif
                                                        type->getMinColor(), type->getMaxColor(),
                                                        lifeTimeMin, lifeTimeMax,
                                                        m_particle_type->getAngleSpread() /* angle */
                                                        );
-#ifdef GPUPARTICLE
-                PE = new PointEmitter(m_node->getParent(), irr_driver->getSceneManager(), m_node->getMaterial(0).getTexture(0),
-                    velocity,
-                    type->getMinRate(),  type->getMaxRate(),
-                    type->getMinColor(), type->getMaxColor(),
-                    lifeTimeMin, lifeTimeMax,
-                    m_particle_type->getAngleSpread());
-                PE->set_m_node(m_node);
-#endif
                 break;
             }
 
