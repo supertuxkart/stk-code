@@ -248,6 +248,8 @@ ParticleEmitter::~ParticleEmitter()
     assert(m_magic_number == 0x58781325);
     if (m_node != NULL)
         irr_driver->removeNode(m_node);
+	if (PE)
+		irr_driver->removeNode(PE);
     m_emitter->drop();
 
     m_magic_number = 0xDEADBEEF;
@@ -454,7 +456,6 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                     type->getMinColor(), type->getMaxColor(),
                     lifeTimeMin, lifeTimeMax,
                     m_particle_type->getAngleSpread());
-                PE->setPosition(m_node->getPosition());
                 PE->set_m_node(m_node);
 #endif
                 break;
