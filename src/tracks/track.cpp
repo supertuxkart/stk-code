@@ -1513,7 +1513,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
 
-    loadObjects(root, path);
+    loadObjects(root, path, true);
 
     // ---- Fog
     // It's important to execute this BEFORE the code that creates the skycube,
@@ -1665,10 +1665,13 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
 //-----------------------------------------------------------------------------
 
-void Track::loadObjects(const XMLNode* root, const std::string& path)
+void Track::loadObjects(const XMLNode* root, const std::string& path,
+                        bool create_lod_definitions)
 {
     LodNodeLoader lod_loader;
     unsigned int start_position_counter = 0;
+
+    std::map<std::string, XMLNode*> library_nodes;
 
     unsigned int node_count = root->getNumNodes();
     for (unsigned int i = 0; i < node_count; i++)
@@ -1680,22 +1683,51 @@ void Track::loadObjects(const XMLNode* root, const std::string& path)
         if (name == "track" || name == "default-start") continue;
         if (name == "object")
         {
-            lod_loader.check(node);
+            bool is_instance = false;
+            node->get("lod_instance", &is_instance);
+
+            float lod_distance = -1;
+            node->get("lod_distance", &lod_distance);
+
+            if (lod_distance > 0.0f && !is_instance)
+            {
+                // lod definition
+                if (create_lod_definitions)
+                    lod_loader.check(node);
+            }
+            else
+            {
+                lod_loader.check(node);
+            }
             m_track_object_manager->add(*node);
         }
         else if (name == "library")
         {
             std::string name;
             node->get("name", &name);
-            std::string lib_node_path = file_manager->getAsset("library/" + name + "/node.xml");
+
+            XMLNode* libroot;
             std::string lib_path = file_manager->getAsset("library/" + name);
-            XMLNode *libroot = file_manager->createXMLTree(lib_node_path);
-            if (libroot == NULL) continue;
+            bool create_lod_definitions = true;
+
+            if (library_nodes.find(name) == library_nodes.end())
+            {
+                std::string lib_node_path = file_manager->getAsset("library/" + name + "/node.xml");
+                libroot = file_manager->createXMLTree(lib_node_path);
+                if (libroot == NULL) continue;
+            }
+            else
+            {
+                libroot = library_nodes[name];
+                create_lod_definitions = false; // LOD definitions are already created, don't create them again
+            }
+
+            library_nodes[name] = libroot;
 
             file_manager->pushTextureSearchPath(lib_path + "/");
             file_manager->pushModelSearchPath  (lib_path);
     
-            loadObjects(libroot, lib_path);
+            loadObjects(libroot, lib_path, create_lod_definitions);
 
             file_manager->popTextureSearchPath();
             file_manager->popModelSearchPath();
@@ -1822,13 +1854,13 @@ void Track::loadObjects(const XMLNode* root, const std::string& path)
     const XMLNode* track_node = root->getNode("track");
     if (track_node != NULL)
     {
-        for(unsigned int i=0; i<track_node->getNumNodes(); i++)
+        for (unsigned int i=0; i<track_node->getNumNodes(); i++)
         {
             const XMLNode* n = track_node->getNode(i);
             bool is_instance = false;
             n->get("lod_instance", &is_instance);
 
-            if (!is_instance) lod_loader.check(n);
+            if (!is_instance && create_lod_definitions) lod_loader.check(n);
         }
     }
 

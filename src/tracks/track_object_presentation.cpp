@@ -160,41 +160,25 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
         m_is_in_skybox = true;
     }
 
-    std::string full_path =
-        World::getWorld()->getTrack()->getTrackFile(model_name);
+    //std::string full_path =
+    //    World::getWorld()->getTrack()->getTrackFile(model_name);
 
     bool animated = (UserConfigParams::m_graphical_effects ||
                  World::getWorld()->getIdent() == IDENT_CUSTSCENE);
 
 
-    if (file_manager->fileExists(full_path))
+    if (animated)
     {
-        if (animated)
-        {
-            m_mesh = irr_driver->getAnimatedMesh(full_path);
-        }
-        else
-        {
-            m_mesh = irr_driver->getMesh(full_path);
-        }
+        m_mesh = irr_driver->getAnimatedMesh(model_name);
+    }
+    else
+    {
+        m_mesh = irr_driver->getMesh(model_name);
     }
 
     if (!m_mesh)
     {
-        // If the model isn't found in the track directory, look
-        // in STK's model directory.
-        full_path = file_manager->getAsset(FileManager::MODEL,model_name);
-        m_mesh    = irr_driver->getAnimatedMesh(full_path);
-
-        if (!m_mesh)
-        {
-            m_mesh = irr_driver->getAnimatedMesh(model_name);
-
-            if (!m_mesh)
-            {
-                throw std::runtime_error("Model '" + model_name + "' cannot be found");
-            }
-        }
+        throw std::runtime_error("Model '" + model_name + "' cannot be found");
     }
 
     init(&xml_node, enabled);
