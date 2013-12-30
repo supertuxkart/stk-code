@@ -151,20 +151,14 @@ void LodNodeLoader::done(Track* track,
                 lod_node->updateAbsolutePosition();
                 for (unsigned int m=0; m<group.size(); m++)
                 {
-                    full_path = directory + "/" + group[m].second.m_model_file;
-
                     // TODO: check whether the mesh contains animations or not?
-                    scene::IMesh* a_mesh = irr_driver->getMesh(full_path);
-                    if (!a_mesh)
-                    {
-                        a_mesh = irr_driver->getMesh(group[m].second.m_model_file);
+                    scene::IMesh* a_mesh = irr_driver->getMesh(group[m].second.m_model_file);
 
-                        if (!a_mesh)
-                        {
-                            Log::warn("LODNodeLoad", "Warning: object model '%s' not found, ignored.\n",
-                                      full_path.c_str());
-                            continue;
-                        }
+                     if (!a_mesh)
+                    {
+                        Log::warn("LODNodeLoad", "Warning: object model '%s' not found, ignored.\n",
+                                    full_path.c_str());
+                        continue;
                     }
 
                     if (group[m].second.m_tangent)
@@ -181,9 +175,6 @@ void LodNodeLoader::done(Track* track,
                     cache.push_back(a_mesh);
                     irr_driver->grabAllTextures(a_mesh);
                     scene::IMeshSceneNode* scene_node = irr_driver->addMesh(a_mesh);
-                    //scene_node->setPosition(xyz);
-                    //scene_node->setRotation(hpr);
-                    //scene_node->setScale(scale);
 
                     track->handleAnimatedTextures( scene_node, *group[m].second.m_xml );
 
