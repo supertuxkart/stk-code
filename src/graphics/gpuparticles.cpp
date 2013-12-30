@@ -234,7 +234,7 @@ PointEmitter::PointEmitter(scene::ISceneNode *parent,
   SimulationProgram = LoadTFBProgram(file_manager->getAsset("shaders/pointemitter.vert").c_str(), varyings, 3);
   loc_duration = glGetUniformLocation(SimulationProgram, "duration");
   loc_dt = glGetUniformLocation(SimulationProgram, "dt");
-  loc_source = glGetUniformLocation(SimulationProgram, "source");
+  loc_sourcematrix = glGetUniformLocation(SimulationProgram, "sourcematrix");
   loc_position = glGetAttribLocation(SimulationProgram, "particle_position");
   loc_lifetime = glGetAttribLocation(SimulationProgram, "lifetime");
   loc_velocity = glGetAttribLocation(SimulationProgram, "particle_velocity");
@@ -272,6 +272,7 @@ PointEmitter::PointEmitter(scene::ISceneNode *parent,
 
 void PointEmitter::simulate()
 {
+	core::matrix4 matrix = m_node->getAbsoluteTransformation();
   glUseProgram(SimulationProgram);
   glEnable(GL_RASTERIZER_DISCARD);
   glEnableVertexAttribArray(0);
@@ -285,7 +286,7 @@ void PointEmitter::simulate()
 
   glUniform1i(loc_dt, 1);
   glUniform1i(loc_duration, duration);
-  glUniform3f(loc_source, getPosition().X, getPosition().Y, getPosition().Z);
+  glUniformMatrix4fv(loc_sourcematrix, 1, GL_FALSE, matrix.pointer());
   glBeginTransformFeedback(GL_POINTS);
   glDrawArrays(GL_POINTS, 0, count);
   glEndTransformFeedback();
@@ -298,13 +299,11 @@ void PointEmitter::simulate()
 
 void PointEmitter::draw()
 {
-  updateAbsolutePosition();
   glDisable(GL_ALPHA_TEST);
   glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
 	core::matrix4 matrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	matrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-	matrix *= m_node->getAbsoluteTransformation();
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
   glEnable(GL_POINT_SPRITE);
   glBlendEquation(GL_FUNC_ADD);

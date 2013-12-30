@@ -1,6 +1,6 @@
 #version 130
 uniform int dt;
-uniform vec3 source;
+uniform mat4 sourcematrix;
 uniform int duration;
 
 in vec3 particle_position;
@@ -13,7 +13,8 @@ out vec4 new_particle_velocity;
 
 void main(void)
 {
-  new_particle_position = (lifetime > 0.) ? particle_position + particle_velocity.xyz * float(dt) : vec3(0., 0., 0.);
+  vec4 initialposition = sourcematrix * vec4(0., 0., 0., 1.0);
+  new_particle_position = (lifetime > 0.) ? particle_position + particle_velocity.xyz * float(dt) : initialposition.xyz;
   new_lifetime = (lifetime > 0.) ? lifetime - float(dt) : float(duration);
   new_particle_velocity = particle_velocity;
   gl_Position = vec4(0.);
