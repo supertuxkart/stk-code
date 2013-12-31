@@ -1900,6 +1900,10 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
         {
             // handled above
         }
+        else if (name == "lod")
+        {
+            // handled above
+        }
         else if (name == "subtitles")
         {
             std::vector<XMLNode*> subtitles;
