@@ -44,6 +44,10 @@ TrackObjectManager::~TrackObjectManager()
  * \note If you add add any objects with LOD, don't forget to call
  *       TrackObjectManager::assingLodNodes after everything is loaded
  *       to finalize their creation.
+ *
+ * FIXME: all of this is horrible, just make the exporter write LOD definitions
+ *        in a separate section that's read before everything and remove all this
+ *        crap
  */
 void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent)
 {
@@ -55,7 +59,11 @@ void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent)
 
         if (is_lod)
         {
-            m_lod_objects[groupname].push_back(&xml_node);
+            bool lod_instance = false;
+            xml_node.get("lod_instance", &lod_instance);
+
+            if (lod_instance)
+                m_lod_objects[groupname].push_back(&xml_node);
         }
         else
         {
