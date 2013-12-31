@@ -29,6 +29,7 @@ public:
 
 class ParticleSystemProxy : public scene::CParticleSystemSceneNode {
 protected:
+	GLuint quad_vertex_buffer;
 	GLuint tfb_buffers[2], initial_values_buffer;
 
 	GLuint SimulationProgram;
@@ -36,7 +37,7 @@ protected:
 	GLuint uniform_duration, uniform_sourcematrix, uniform_dt;
 
 	GLuint RenderProgram;
-	GLuint attrib_pos, attrib_lf;
+	GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord;
 	GLuint uniform_matrix, uniform_texture, uniform_normal_and_depths, uniform_screen, uniform_invproj;
 
 	GLuint texture, normal_and_depth;

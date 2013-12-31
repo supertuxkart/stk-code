@@ -44,6 +44,8 @@ PFNGLGETPROGRAMIVPROC glGetProgramiv;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
 PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
 PFNGLBLENDEQUATIONPROC glBlendEquation;
+PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
+PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
 #endif
 
 void initGL()
@@ -83,6 +85,8 @@ void initGL()
     glTransformFeedbackVaryings = (PFNGLTRANSFORMFEEDBACKVARYINGSPROC)IRR_OGL_LOAD_EXTENSION("glTransformFeedbackVaryings");
 	glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glGetAttribLocation");
 	glBlendEquation = (PFNGLBLENDEQUATIONPROC)IRR_OGL_LOAD_EXTENSION("glBlendEquation");
+	glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribDivisor");
+	glDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawArraysInstanced");
 #endif
 }
 
@@ -227,6 +231,17 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	const core::vector3df& position,
 	const core::vector3df& rotation,
 	const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale) {
+	static const GLfloat quad_vertex[] = {
+		-.5, -.5, 0., 0.,
+		.5, -.5, 1., 0.,
+		-.5, .5, 0., 1.,
+		.5, .5, 1., 1.,
+	};
+	initGL();
+	glGenBuffers(1, &quad_vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER,  sizeof(quad_vertex), quad_vertex, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
@@ -240,7 +255,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	setMaterialType(irr_driver->getShader(ES_RAIN));
 	setAutomaticCulling(0);
 	LastEmitTime = 0;
-	initGL();
+
 	duration = emitter->getMaxLifeTime();
 	count = emitter->getMaxParticlesPerSecond() * duration / 1000;
 	const char *varyings[] = {
@@ -253,7 +268,6 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 
 	SimulationProgram = LoadTFBProgram(file_manager->getAsset("shaders/pointemitter.vert").c_str(), varyings, 3);
 
-	uniform_duration = glGetUniformLocation(SimulationProgram, "duration");
 	uniform_dt = glGetUniformLocation(SimulationProgram, "dt");
 	uniform_sourcematrix = glGetUniformLocation(SimulationProgram, "sourcematrix");
 
@@ -267,6 +281,9 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	RenderProgram = LoadProgram(file_manager->getAsset("shaders/particle.vert").c_str(), file_manager->getAsset("shaders/particle.frag").c_str());
 	attrib_pos = glGetAttribLocation(RenderProgram, "position");
 	attrib_lf = glGetAttribLocation(RenderProgram, "lifetime");
+	attrib_quadcorner = glGetAttribLocation(RenderProgram, "quadcorner");
+	attrib_texcoord = glGetAttribLocation(RenderProgram, "texcoord");
+
 	uniform_matrix = glGetUniformLocation(RenderProgram, "matrix");
 	uniform_texture = glGetUniformLocation(RenderProgram, "texture");
 	uniform_invproj = glGetUniformLocation(RenderProgram, "invproj");
@@ -276,13 +293,15 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	float *particles = new float[COMPONENTCOUNT * count], *initialvalue = new float[COMPONENTCOUNT * count];
 	unsigned lifetime_range = emitter->getMaxLifeTime() - emitter->getMinLifeTime();
 
+
 	printf("count:%d\nduration_min:%d\nduration_max:%d\n", count, emitter->getMinLifeTime(), emitter->getMaxLifeTime());
 	for (unsigned i = 0; i < count; i++) {
-		particles[COMPONENTCOUNT * i] = getAbsolutePosition().X;
-		particles[COMPONENTCOUNT * i + 1] = getAbsolutePosition().Y;
-		particles[COMPONENTCOUNT * i + 2] = getAbsolutePosition().Z;
+		particles[COMPONENTCOUNT * i] = 0;
+		particles[COMPONENTCOUNT * i + 1] = 0;
+		particles[COMPONENTCOUNT * i + 2] = 0;
 		// Initial lifetime is 0 percent
-		particles[COMPONENTCOUNT * i + 3] = 0.;
+		particles[COMPONENTCOUNT * i + 3] = rand();
+		particles[COMPONENTCOUNT * i + 3] /= RAND_MAX;
 
 		initialvalue[COMPONENTCOUNT * i] = 0.;
 		initialvalue[COMPONENTCOUNT * i + 1] = 0.;
@@ -302,14 +321,16 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y;
 		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z;
 	}
-	glGenBuffers(2, tfb_buffers);
+	glGenBuffers(1, &initial_values_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
 	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
+	glGenBuffers(2, tfb_buffers);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
 	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
 	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), 0, GL_STREAM_DRAW);
 	delete [] particles;
+	delete [] initialvalue;
 }
 
 
@@ -346,7 +367,6 @@ void ParticleSystemProxy::simulate()
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
 
 	glUniform1i(uniform_dt, 16);
-	glUniform1i(uniform_duration, duration);
 	glUniformMatrix4fv(uniform_sourcematrix, 1, GL_FALSE, matrix.pointer());
 	glBeginTransformFeedback(GL_POINTS);
 	glDrawArrays(GL_POINTS, 0, count);
@@ -365,17 +385,17 @@ void ParticleSystemProxy::draw()
 {
 	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
 	core::matrix4 matrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	matrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-	glEnable(GL_POINT_SPRITE);
 	glBlendEquation(GL_FUNC_ADD);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glUseProgram(RenderProgram);
 	glEnableVertexAttribArray(attrib_pos);
 	glEnableVertexAttribArray(attrib_lf);
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
+	glEnableVertexAttribArray(attrib_quadcorner);
+	glEnableVertexAttribArray(attrib_texcoord);
+	
 	float screen[2] = {
 		(float)UserConfigParams::m_width,
 		(float)UserConfigParams::m_height
@@ -390,15 +410,30 @@ void ParticleSystemProxy::draw()
 	glUniform2f(uniform_screen, screen[0], screen[1]);
 	glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, matrix.pointer());
 
+	glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
+	glVertexAttribPointer(attrib_quadcorner, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
+	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
 	glVertexAttribPointer(attrib_pos, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), 0);
 	glVertexAttribPointer(attrib_lf, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid *) (3 * sizeof(float)));
-	glDrawArrays(GL_POINTS, 0, count);
+
+
+//	glVertexAttribDivisor(attrib_quadcorner, 0);
+//	glVertexAttribDivisor(attrib_texcoord, 0);
+	glVertexAttribDivisor(attrib_lf, 1);
+	glVertexAttribDivisor(attrib_pos, 1);
+
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
+	glVertexAttribDivisor(attrib_lf, 0);
+	glVertexAttribDivisor(attrib_pos, 0);
 	glDisableVertexAttribArray(attrib_pos);
 	glDisableVertexAttribArray(attrib_lf);
+	glDisableVertexAttribArray(attrib_quadcorner);
+	glDisableVertexAttribArray(attrib_texcoord);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glActiveTexture(GL_TEXTURE0);
-	glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
 	glDepthMask(GL_TRUE);
+	glEnable(GL_CULL_FACE);
 }
 
 void ParticleSystemProxy::render() {

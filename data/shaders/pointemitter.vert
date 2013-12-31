@@ -1,7 +1,6 @@
 #version 130
 uniform int dt;
 uniform mat4 sourcematrix;
-uniform int duration;
 
 in vec3 particle_position_initial;
 in float lifetime_initial;
