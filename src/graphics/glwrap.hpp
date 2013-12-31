@@ -3,6 +3,7 @@
 
 #if defined(__APPLE__)
 #    include <OpenGL/gl.h>
+#    include <OpenGL/gl3.h>
 #elif defined(ANDROID)
 #    include <GLES/gl.h>
 #elif defined(WIN32)
