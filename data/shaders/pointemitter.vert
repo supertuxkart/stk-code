@@ -14,8 +14,8 @@ out vec4 new_particle_velocity;
 void main(void)
 {
   vec4 initialposition = sourcematrix * vec4(0., 0., 0., 1.0);
-  new_particle_position = (lifetime > 0.) ? particle_position + particle_velocity.xyz * float(dt) : initialposition.xyz;
-  new_lifetime = (lifetime > 0.) ? lifetime - float(dt) : float(duration);
+  new_particle_position = (lifetime > 0.) ? particle_position + particle_velocity.xyz * float(dt) : initialposition.xyz -  particle_velocity.xyz * lifetime;
+  new_lifetime = (lifetime > 0.) ? lifetime - float(dt) : float(duration) - lifetime;
   new_particle_velocity = particle_velocity;
   gl_Position = vec4(0.);
 }

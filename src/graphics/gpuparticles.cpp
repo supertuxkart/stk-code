@@ -239,10 +239,10 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	// Pass a fake material type to force irrlicht to update its internal states on rendering
 	setMaterialType(irr_driver->getShader(ES_RAIN));
 	setAutomaticCulling(0);
+	LastEmitTime = 0;
 	initGL();
-	count = emitter->getMaxParticlesPerSecond();
 	duration = emitter->getMaxLifeTime();
-	float initial_lifetime_incr = 1000.;
+	count = emitter->getMaxParticlesPerSecond() * duration / 1000;
 	const char *varyings[] = {
 		"new_particle_position",
 		"new_lifetime",
@@ -258,7 +258,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	loc_position = glGetAttribLocation(SimulationProgram, "particle_position");
 	loc_lifetime = glGetAttribLocation(SimulationProgram, "lifetime");
 	loc_velocity = glGetAttribLocation(SimulationProgram, "particle_velocity");
-	printf("count:%d\nduration:%d\ninitial_lifetine:%f\n", count, duration, initial_lifetime_incr);
+	printf("count:%d\nduration:%d\n", count, duration);
 
 	RenderProgram = LoadProgram(file_manager->getAsset("shaders/particle.vert").c_str(), file_manager->getAsset("shaders/particle.frag").c_str());
 	loc_matrix = glGetUniformLocation(RenderProgram, "matrix");
@@ -293,6 +293,17 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 
 void ParticleSystemProxy::simulate()
 {
+	unsigned time = os::Timer::getTime();
+	if (LastEmitTime == 0)
+	{
+		LastEmitTime = time;
+		return;
+	}
+
+	u32 now = time;
+	u32 timediff = time - LastEmitTime;
+	LastEmitTime = time;
+
 	core::matrix4 matrix = getAbsoluteTransformation();
 	glUseProgram(SimulationProgram);
 	glEnable(GL_RASTERIZER_DISCARD);
@@ -305,7 +316,7 @@ void ParticleSystemProxy::simulate()
 	glVertexAttribPointer(loc_velocity, 4, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(4 * sizeof(float)));
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
 
-	glUniform1i(loc_dt, 1);
+	glUniform1i(loc_dt, timediff);
 	glUniform1i(loc_duration, duration);
 	glUniformMatrix4fv(loc_sourcematrix, 1, GL_FALSE, matrix.pointer());
 	glBeginTransformFeedback(GL_POINTS);

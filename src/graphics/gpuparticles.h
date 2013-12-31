@@ -34,7 +34,7 @@ protected:
 	GLuint loc_position, loc_velocity, loc_lifetime;
 	GLuint tfb_buffers[2];
 	GLuint texture, normal_and_depth;
-	unsigned duration, count;
+	unsigned duration, count, LastEmitTime;
 
 	virtual void simulate();
 	virtual void draw();
