@@ -10,6 +10,8 @@ First, make sure that you have the following packages installed:
   * OpenAL (recommended: openal-soft-devel)
   * Ogg    (libogg-dev)
   * Vorbis (libvorbis-dev)
+  * libcurl (libcurl-devel)
+  * libbluetooth (bluez-devel)
   * fribidi (fribidi-devel) - optional for right-to-left text
 
 Unpack the files from the tarball like this:
