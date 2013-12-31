@@ -236,6 +236,8 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	CParticleSystemSceneNode::setEmitter(emitter);
 	if (emitter->getType() != scene::EPET_POINT)
 		return;
+	// Pass a fake material type to force irrlicht to update its internal states on rendering
+	setMaterialType(irr_driver->getShader(ES_RAIN));
 	setAutomaticCulling(0);
 	initGL();
 	count = emitter->getMaxParticlesPerSecond();
