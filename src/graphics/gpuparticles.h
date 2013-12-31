@@ -23,8 +23,8 @@ protected:
 	virtual void draw() = 0;
 public:
 	GPUParticle(scene::ISceneNode *parent, scene::ISceneManager* mgr, ITexture *tex);
-	virtual void GPUParticle::render();
-	virtual void GPUParticle::OnRegisterSceneNode();
+	virtual void render();
+	virtual void OnRegisterSceneNode();
 };
 
 class ParticleSystemProxy : public scene::CParticleSystemSceneNode {
