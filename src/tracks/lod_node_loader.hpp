@@ -36,6 +36,25 @@ namespace irr
     }
 }
 
+struct LodInstance
+{
+    const XMLNode* m_xml_node;
+    scene::ISceneNode* m_parent;
+
+    /** Constructor to allow storing this in STL containers */
+    LodInstance()
+    {
+        m_parent = NULL;
+        m_xml_node = NULL;
+    }
+
+    LodInstance(const XMLNode* xml_node, scene::ISceneNode* parent)
+    {
+        m_xml_node = xml_node;
+        m_parent = parent;
+    }
+};
+
 struct LodModel
 {
     std::string m_model_file;
@@ -68,16 +87,15 @@ class LodNodeLoader
 {
 private:
     std::map< std::string, std::map< int, LodModel > > lod_groups;
-    std::map< std::string, std::vector< const XMLNode* > > lod_instances;
+    std::map< std::string, std::vector< LodInstance > > lod_instances;
 
 public:
          LodNodeLoader();
 
-    bool check(const XMLNode* xml);
+    bool check(const XMLNode* xml, scene::ISceneNode* parent);
     void done(Track* track,
               std::string directory,
               std::vector<irr::scene::IMesh*>& cache,
-              scene::ISceneNode* parent,
               std::vector<LODNode*>& out);
 
     void clear();

@@ -218,7 +218,7 @@ void TrackObjectManager::removeObject(TrackObject* obj)
   *
   * \param lod_nodes the LOD nodes created by the LodNodeLoader.
   */
-void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes, scene::ISceneNode* parent)
+void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes)
 {
     for (unsigned int n=0; n<lod_nodes.size(); n++)
     {
@@ -226,7 +226,7 @@ void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes, 
         assert( queue.size() > 0 );
         const XMLNode* xml = queue[ queue.size() - 1 ];
 
-        TrackObject* obj = new TrackObject(*xml, parent, lod_nodes[n]);
+        TrackObject* obj = new TrackObject(*xml, lod_nodes[n]->getParent(), lod_nodes[n]);
         queue.erase( queue.end() - 1 );
 
         m_all_objects.push_back(obj);

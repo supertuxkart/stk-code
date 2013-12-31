@@ -43,7 +43,7 @@ bool PairCompare(const std::pair<int, LodModel>& i, const std::pair<int, LodMode
 // ----------------------------------------------------------------------------
 
 /** Check a XML node in case it contains a LOD object and if so remember it */
-bool LodNodeLoader::check(const XMLNode* xml)
+bool LodNodeLoader::check(const XMLNode* xml, scene::ISceneNode* parent)
 {
     float lod_distance = -1.0f;
     xml->get("lod_distance", &lod_distance);
@@ -61,7 +61,7 @@ bool LodNodeLoader::check(const XMLNode* xml)
     {
         if (lod_instance)
         {
-            lod_instances[lodgroup].push_back(xml);
+            lod_instances[lodgroup].push_back(LodInstance(xml, parent));
         }
         else
         {
@@ -88,11 +88,9 @@ bool LodNodeLoader::check(const XMLNode* xml)
 void LodNodeLoader::done(Track* track,
                          std::string directory,
                          std::vector<scene::IMesh*>& cache,
-                         scene::ISceneNode* parent,
                          std::vector<LODNode*>& out)
 {
     scene::ISceneManager* sm = irr_driver->getSceneManager();
-    if (parent == NULL) parent = sm->getRootSceneNode();
 
     // Creating LOD nodes is more complicated than one might have hoped, on the C++ side;
     // but it was done this way to minimize the work needed on the side of the artists
@@ -120,15 +118,15 @@ void LodNodeLoader::done(Track* track,
 
     // 2. Read the XML nodes and instanciate LOD scene nodes where relevant
     std::string groupname;
-    std::map< std::string, std::vector< const XMLNode* > >::iterator it3;
+    std::map< std::string, std::vector< LodInstance > >::iterator it3;
     for (it3 = lod_instances.begin(); it3 != lod_instances.end(); it3++)
     {
         std::vector< std::pair<int, LodModel> >& group = sorted_lod_groups[it3->first];
 
-        std::vector< const XMLNode* >& v = it3->second;
+        std::vector< LodInstance >& v = it3->second;
         for (unsigned int n=0; n<v.size(); n++)
         {
-            const XMLNode* node = v[n];
+            const XMLNode* node = v[n].m_xml_node;
 
             groupname = "";
             node->get("lod_group", &groupname);
@@ -141,10 +139,9 @@ void LodNodeLoader::done(Track* track,
             core::vector3df scale(1.0f, 1.0f, 1.0f);
             node->get("scale", &scale);
 
-            std::string full_path;
-
             if (group.size() > 0)
             {
+                scene::ISceneNode* parent = (v[n].m_parent == NULL ? sm->getRootSceneNode() : v[n].m_parent);
                 LODNode* lod_node = new LODNode(groupname, parent, sm);
                 lod_node->setPosition(xyz);
                 lod_node->setRotation(hpr);
@@ -158,7 +155,7 @@ void LodNodeLoader::done(Track* track,
                      if (!a_mesh)
                     {
                         Log::warn("LODNodeLoad", "Warning: object model '%s' not found, ignored.\n",
-                                    full_path.c_str());
+                                  group[m].second.m_model_file.c_str());
                         continue;
                     }
 

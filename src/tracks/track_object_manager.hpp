@@ -68,7 +68,7 @@ public:
 
     void removeObject(TrackObject* who);
 
-    void assingLodNodes(const std::vector<LODNode*>& lod, scene::ISceneNode* parent);
+    void assingLodNodes(const std::vector<LODNode*>& lod);
 
           PtrVector<TrackObject>& getObjects()       { return m_all_objects; }
     const PtrVector<TrackObject>& getObjects() const { return m_all_objects; }

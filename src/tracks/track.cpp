@@ -1016,7 +1016,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         std::string challenge;
         n->get("challenge", &challenge);
 
-        bool is_lod = lodLoader.check(n);
+        bool is_lod = lodLoader.check(n, NULL);
 
         if (tangent)
         {
@@ -1183,7 +1183,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     // Create LOD nodes
     std::vector<LODNode*> lod_nodes;
-    lodLoader.done(this, m_root, m_all_cached_meshes, NULL, lod_nodes);
+    lodLoader.done(this, m_root, m_all_cached_meshes, lod_nodes);
     for (unsigned int n=0; n<lod_nodes.size(); n++)
     {
         // FIXME: support for animated textures on LOD objects
@@ -1513,7 +1513,45 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
 
-    loadObjects(root, path, true, NULL);
+    LodNodeLoader lod_loader;
+    std::map<std::string, XMLNode*> library_nodes;
+    loadObjects(root, path, lod_loader, true, NULL, library_nodes);
+
+    // -------- Create and assign LOD nodes --------
+    // recheck the static area, we will need LOD info
+    const XMLNode* track_node = root->getNode("track");
+    if (track_node != NULL)
+    {
+        for (unsigned int i=0; i<track_node->getNumNodes(); i++)
+        {
+            const XMLNode* n = track_node->getNode(i);
+            bool is_instance = false;
+            n->get("lod_instance", &is_instance);
+
+            if (!is_instance) lod_loader.check(n, NULL);
+        }
+    }
+
+    std::vector<LODNode*> lod_nodes;
+    std::vector<scene::IMesh*> devnull;
+    lod_loader.done(this, m_root, devnull, lod_nodes);
+
+    m_track_object_manager->assingLodNodes(lod_nodes);
+    // ---------------------------------------------
+
+    // Cleanup library nodes
+    for (std::map<std::string, XMLNode*>::iterator it = library_nodes.begin();
+         it != library_nodes.end(); it++)
+    {
+        delete it->second;
+
+        file_manager->popTextureSearchPath();
+        file_manager->popModelSearchPath();
+    }
+
+    // Init all track objects
+    m_track_object_manager->init();
+
 
     // ---- Fog
     // It's important to execute this BEFORE the code that creates the skycube,
@@ -1665,13 +1703,11 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
 //-----------------------------------------------------------------------------
 
-void Track::loadObjects(const XMLNode* root, const std::string& path,
-                        bool create_lod_definitions, scene::ISceneNode* parent)
+void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoader& lod_loader,
+                        bool create_lod_definitions, scene::ISceneNode* parent,
+                        std::map<std::string, XMLNode*>& library_nodes)
 {
-    LodNodeLoader lod_loader;
     unsigned int start_position_counter = 0;
-
-    std::map<std::string, XMLNode*> library_nodes;
 
     unsigned int node_count = root->getNumNodes();
     for (unsigned int i = 0; i < node_count; i++)
@@ -1693,11 +1729,11 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
             {
                 // lod definition
                 if (create_lod_definitions)
-                    lod_loader.check(node);
+                    lod_loader.check(node, parent);
             }
             else
             {
-                lod_loader.check(node);
+                lod_loader.check(node, parent);
             }
             m_track_object_manager->add(*node, parent);
         }
@@ -1715,28 +1751,29 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
 
             if (library_nodes.find(name) == library_nodes.end())
             {
-                std::string lib_node_path = file_manager->getAsset("library/" + name + "/node.xml");
+                std::string node_path = "library/" + name + "/node.xml";
+                std::string lib_node_path = file_manager->getAsset(node_path);
                 libroot = file_manager->createXMLTree(lib_node_path);
-                if (libroot == NULL) continue;
+                if (libroot == NULL)
+                {
+                    Log::error("Track", "Cannot find library '%s'", node_path.c_str());
+                    continue;
+                }
+
+                file_manager->pushTextureSearchPath(lib_path + "/");
+                file_manager->pushModelSearchPath  (lib_path);
+                library_nodes[name] = libroot;
             }
             else
             {
                 libroot = library_nodes[name];
                 create_lod_definitions = false; // LOD definitions are already created, don't create them again
             }
-
-            library_nodes[name] = libroot;
-
-            file_manager->pushTextureSearchPath(lib_path + "/");
-            file_manager->pushModelSearchPath  (lib_path);
     
             scene::ISceneNode* parent = irr_driver->getSceneManager()->addEmptySceneNode();
             parent->setPosition(xyz);
             parent->updateAbsolutePosition();
-            loadObjects(libroot, lib_path, create_lod_definitions, parent);
-
-            file_manager->popTextureSearchPath();
-            file_manager->popModelSearchPath();
+            loadObjects(libroot, lib_path, lod_loader, create_lod_definitions, parent, library_nodes);
         }
         else if (name == "water")
         {
@@ -1854,37 +1891,6 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
         }
 
     }   // for i<root->getNumNodes()
-
-    // -------- Create and assign LOD nodes --------
-    // recheck the static area, we will need LOD info
-    const XMLNode* track_node = root->getNode("track");
-    if (track_node != NULL)
-    {
-        for (unsigned int i=0; i<track_node->getNumNodes(); i++)
-        {
-            const XMLNode* n = track_node->getNode(i);
-            bool is_instance = false;
-            n->get("lod_instance", &is_instance);
-
-            if (!is_instance && create_lod_definitions) lod_loader.check(n);
-        }
-    }
-
-    std::vector<LODNode*> lod_nodes;
-    std::vector<scene::IMesh*> devnull;
-    lod_loader.done(this, m_root, devnull, parent, lod_nodes);
-
-    m_track_object_manager->assingLodNodes(lod_nodes, parent);
-    // ---------------------------------------------
-
-    // Init all track objects
-    m_track_object_manager->init();
-
-    for (std::map<std::string, XMLNode*>::iterator it = library_nodes.begin();
-         it != library_nodes.end(); it++)
-    {
-        delete it->second;
-    }
 }
 
 //-----------------------------------------------------------------------------
