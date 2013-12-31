@@ -789,7 +789,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     m_track_mesh      = new TriangleMesh();
     m_gfx_effect_mesh = new TriangleMesh();
 
-    const XMLNode *track_node= root.getNode("track");
+    const XMLNode *track_node = root.getNode("track");
     std::string model_name;
     track_node->get("model", &model_name);
     std::string full_path = m_root+model_name;
@@ -856,7 +856,24 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     LodNodeLoader lodLoader;
 
-    for(unsigned int i=0; i<track_node->getNumNodes(); i++)
+    // Load LOD groups
+    const XMLNode *lod_xml_node = root.getNode("lod");
+    if (lod_xml_node != NULL)
+    {
+        for (unsigned int i = 0; i < lod_xml_node->getNumNodes(); i++)
+        {
+            const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
+            for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
+            {
+                // TODO: eventually, remove support for the old way of specifying LOD
+                //       definitions among node, and support only the new way of using
+                //       a <lod> section. Then, the LOD loading sequence can be simplified a lot
+                lodLoader.check(lod_group_xml->getNode(j), NULL);
+            }
+        }
+    }
+
+    for (unsigned int i=0; i<track_node->getNumNodes(); i++)
     {
         const XMLNode *n=track_node->getNode(i);
         // Animated textures have already been handled
@@ -1763,6 +1780,23 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
                 file_manager->pushTextureSearchPath(lib_path + "/");
                 file_manager->pushModelSearchPath  (lib_path);
                 library_nodes[name] = libroot;
+
+                // Load LOD groups
+                const XMLNode *lod_xml_node = libroot->getNode("lod");
+                if (lod_xml_node != NULL)
+                {
+                    for (unsigned int i = 0; i < lod_xml_node->getNumNodes(); i++)
+                    {
+                        const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
+                        for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
+                        {
+                            // TODO: eventually, remove support for the old way of specifying LOD
+                            //       definitions among node, and support only the new way of using
+                            //       a <lod> section. Then, the LOD loading sequence can be simplified a lot
+                            lod_loader.check(lod_group_xml->getNode(j), NULL);
+                        }
+                    }
+                }
             }
             else
             {
