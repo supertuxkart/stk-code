@@ -29,10 +29,16 @@ public:
 
 class ParticleSystemProxy : public scene::CParticleSystemSceneNode {
 protected:
-	GLuint SimulationProgram, RenderProgram;
-	GLuint loc_duration, loc_sourcematrix, loc_dt, loc_matrix, loc_texture, loc_normal_and_depths, loc_screen, loc_invproj;
-	GLuint loc_position, loc_velocity, loc_lifetime;
-	GLuint tfb_buffers[2];
+	GLuint tfb_buffers[2], initial_values_buffer;
+
+	GLuint SimulationProgram;
+	GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime;
+	GLuint uniform_duration, uniform_sourcematrix, uniform_dt;
+
+	GLuint RenderProgram;
+	GLuint attrib_pos, attrib_lf;
+	GLuint uniform_matrix, uniform_texture, uniform_normal_and_depths, uniform_screen, uniform_invproj;
+
 	GLuint texture, normal_and_depth;
 	unsigned duration, count, LastEmitTime;
 

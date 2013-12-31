@@ -252,27 +252,44 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	normal_and_depth = getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
 
 	SimulationProgram = LoadTFBProgram(file_manager->getAsset("shaders/pointemitter.vert").c_str(), varyings, 3);
-	loc_duration = glGetUniformLocation(SimulationProgram, "duration");
-	loc_dt = glGetUniformLocation(SimulationProgram, "dt");
-	loc_sourcematrix = glGetUniformLocation(SimulationProgram, "sourcematrix");
-	loc_position = glGetAttribLocation(SimulationProgram, "particle_position");
-	loc_lifetime = glGetAttribLocation(SimulationProgram, "lifetime");
-	loc_velocity = glGetAttribLocation(SimulationProgram, "particle_velocity");
-	printf("count:%d\nduration:%d\n", count, duration);
+
+	uniform_duration = glGetUniformLocation(SimulationProgram, "duration");
+	uniform_dt = glGetUniformLocation(SimulationProgram, "dt");
+	uniform_sourcematrix = glGetUniformLocation(SimulationProgram, "sourcematrix");
+
+	attrib_position = glGetAttribLocation(SimulationProgram, "particle_position");
+	attrib_lifetime = glGetAttribLocation(SimulationProgram, "lifetime");
+	attrib_velocity = glGetAttribLocation(SimulationProgram, "particle_velocity");
+	attrib_initial_position = glGetAttribLocation(SimulationProgram, "particle_position_initial");
+	attrib_initial_lifetime = glGetAttribLocation(SimulationProgram, "lifetime_initial");
+	attrib_initial_velocity = glGetAttribLocation(SimulationProgram, "particle_velocity_initial");
 
 	RenderProgram = LoadProgram(file_manager->getAsset("shaders/particle.vert").c_str(), file_manager->getAsset("shaders/particle.frag").c_str());
-	loc_matrix = glGetUniformLocation(RenderProgram, "matrix");
-	loc_texture = glGetUniformLocation(RenderProgram, "texture");
-	loc_invproj = glGetUniformLocation(RenderProgram, "invproj");
-	loc_screen = glGetUniformLocation(RenderProgram, "screen");
-	loc_normal_and_depths = glGetUniformLocation(RenderProgram, "normals_and_depth");
+	attrib_pos = glGetAttribLocation(RenderProgram, "position");
+	attrib_lf = glGetAttribLocation(RenderProgram, "lifetime");
+	uniform_matrix = glGetUniformLocation(RenderProgram, "matrix");
+	uniform_texture = glGetUniformLocation(RenderProgram, "texture");
+	uniform_invproj = glGetUniformLocation(RenderProgram, "invproj");
+	uniform_screen = glGetUniformLocation(RenderProgram, "screen");
+	uniform_normal_and_depths = glGetUniformLocation(RenderProgram, "normals_and_depth");
 
-	float *particles = new float[COMPONENTCOUNT * count];
+	float *particles = new float[COMPONENTCOUNT * count], *initialvalue = new float[COMPONENTCOUNT * count];
+	unsigned lifetime_range = emitter->getMaxLifeTime() - emitter->getMinLifeTime();
+
+	printf("count:%d\nduration_min:%d\nduration_max:%d\n", count, emitter->getMinLifeTime(), emitter->getMaxLifeTime());
 	for (unsigned i = 0; i < count; i++) {
-		particles[COMPONENTCOUNT * i] = 0.;
-		particles[COMPONENTCOUNT * i + 1] = 0.;
-		particles[COMPONENTCOUNT * i + 2] = 0.;
-		particles[COMPONENTCOUNT * i + 3] = rand() % duration;
+		particles[COMPONENTCOUNT * i] = getAbsolutePosition().X;
+		particles[COMPONENTCOUNT * i + 1] = getAbsolutePosition().Y;
+		particles[COMPONENTCOUNT * i + 2] = getAbsolutePosition().Z;
+		// Initial lifetime is 0 percent
+		particles[COMPONENTCOUNT * i + 3] = 0.;
+
+		initialvalue[COMPONENTCOUNT * i] = 0.;
+		initialvalue[COMPONENTCOUNT * i + 1] = 0.;
+		initialvalue[COMPONENTCOUNT * i + 2] = 0.;
+		initialvalue[COMPONENTCOUNT * i + 3] = rand() % lifetime_range;
+		initialvalue[COMPONENTCOUNT * i + 3] += emitter->getMinLifeTime();
+
 		core::vector3df particledir = emitter->getDirection();
 		particledir.rotateXYBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
 		particledir.rotateYZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
@@ -281,8 +298,13 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 		particles[COMPONENTCOUNT * i + 4] = particledir.X;
 		particles[COMPONENTCOUNT * i + 5] = particledir.Y;
 		particles[COMPONENTCOUNT * i + 6] = particledir.Z;
+		initialvalue[COMPONENTCOUNT * i + 4] = particledir.X;
+		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y;
+		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z;
 	}
 	glGenBuffers(2, tfb_buffers);
+	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
+	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
 	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
@@ -307,31 +329,40 @@ void ParticleSystemProxy::simulate()
 	core::matrix4 matrix = getAbsoluteTransformation();
 	glUseProgram(SimulationProgram);
 	glEnable(GL_RASTERIZER_DISCARD);
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(attrib_position);
+	glEnableVertexAttribArray(attrib_lifetime);
+	glEnableVertexAttribArray(attrib_velocity);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-	glVertexAttribPointer(loc_position, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)0);
-	glVertexAttribPointer(loc_lifetime, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(3 * sizeof(float)));
-	glVertexAttribPointer(loc_velocity, 4, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(4 * sizeof(float)));
+	glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)0);
+	glVertexAttribPointer(attrib_lifetime, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+	glVertexAttribPointer(attrib_velocity, 4, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(4 * sizeof(float)));
+	glEnableVertexAttribArray(attrib_initial_position);
+	glEnableVertexAttribArray(attrib_initial_lifetime);
+	glEnableVertexAttribArray(attrib_initial_velocity);
+	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
+	glVertexAttribPointer(attrib_initial_position, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)0);
+	glVertexAttribPointer(attrib_initial_lifetime, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+	glVertexAttribPointer(attrib_initial_velocity, 4, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(4 * sizeof(float)));
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
 
-	glUniform1i(loc_dt, timediff);
-	glUniform1i(loc_duration, duration);
-	glUniformMatrix4fv(loc_sourcematrix, 1, GL_FALSE, matrix.pointer());
+	glUniform1i(uniform_dt, 16);
+	glUniform1i(uniform_duration, duration);
+	glUniformMatrix4fv(uniform_sourcematrix, 1, GL_FALSE, matrix.pointer());
 	glBeginTransformFeedback(GL_POINTS);
 	glDrawArrays(GL_POINTS, 0, count);
 	glEndTransformFeedback();
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(attrib_position);
+	glDisableVertexAttribArray(attrib_lifetime);
+	glDisableVertexAttribArray(attrib_velocity);
+	glDisableVertexAttribArray(attrib_initial_position);
+	glDisableVertexAttribArray(attrib_initial_lifetime);
+	glDisableVertexAttribArray(attrib_initial_velocity);
 	glDisable(GL_RASTERIZER_DISCARD);
 	std::swap(tfb_buffers[0], tfb_buffers[1]);
 }
 
 void ParticleSystemProxy::draw()
 {
-	glDisable(GL_ALPHA_TEST);
 	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
 	core::matrix4 matrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
@@ -341,6 +372,8 @@ void ParticleSystemProxy::draw()
 	glBlendEquation(GL_FUNC_ADD);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glUseProgram(RenderProgram);
+	glEnableVertexAttribArray(attrib_pos);
+	glEnableVertexAttribArray(attrib_lf);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
 	float screen[2] = {
@@ -350,20 +383,21 @@ void ParticleSystemProxy::draw()
 	irr::core::matrix4 invproj = irr_driver->getVideoDriver()->getTransform(irr::video::ETS_PROJECTION);
 	invproj.makeInverse();
 
-	bindUniformToTextureUnit(loc_texture, texture, 0);
-	bindUniformToTextureUnit(loc_normal_and_depths, normal_and_depth, 1);
+	bindUniformToTextureUnit(uniform_texture, texture, 0);
+	bindUniformToTextureUnit(uniform_normal_and_depths, normal_and_depth, 1);
 
-	glUniformMatrix4fv(loc_invproj, 1, GL_FALSE, invproj.pointer());
-	glUniform2f(loc_screen, screen[0], screen[1]);
-	glUniformMatrix4fv(loc_matrix, 1, GL_FALSE, matrix.pointer());
+	glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, invproj.pointer());
+	glUniform2f(uniform_screen, screen[0], screen[1]);
+	glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, matrix.pointer());
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), 0);
+	glVertexAttribPointer(attrib_pos, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), 0);
+	glVertexAttribPointer(attrib_lf, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid *) (3 * sizeof(float)));
 	glDrawArrays(GL_POINTS, 0, count);
-	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(attrib_pos);
+	glDisableVertexAttribArray(attrib_lf);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
-	glEnable(GL_ALPHA_TEST);
 	glDepthMask(GL_TRUE);
 }
 
