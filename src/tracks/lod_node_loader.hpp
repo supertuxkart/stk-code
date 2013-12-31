@@ -32,6 +32,7 @@ namespace irr
     namespace scene
     {
         class IMesh;
+        class ISceneNode;
     }
 }
 
@@ -76,6 +77,7 @@ public:
     void done(Track* track,
               std::string directory,
               std::vector<irr::scene::IMesh*>& cache,
+              scene::ISceneNode* parent,
               std::vector<LODNode*>& out);
 
     void clear();

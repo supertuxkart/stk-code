@@ -1183,7 +1183,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     // Create LOD nodes
     std::vector<LODNode*> lod_nodes;
-    lodLoader.done(this, m_root, m_all_cached_meshes, lod_nodes);
+    lodLoader.done(this, m_root, m_all_cached_meshes, NULL, lod_nodes);
     for (unsigned int n=0; n<lod_nodes.size(); n++)
     {
         // FIXME: support for animated textures on LOD objects
@@ -1513,7 +1513,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
 
-    loadObjects(root, path, true);
+    loadObjects(root, path, true, NULL);
 
     // ---- Fog
     // It's important to execute this BEFORE the code that creates the skycube,
@@ -1666,7 +1666,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 //-----------------------------------------------------------------------------
 
 void Track::loadObjects(const XMLNode* root, const std::string& path,
-                        bool create_lod_definitions)
+                        bool create_lod_definitions, scene::ISceneNode* parent)
 {
     LodNodeLoader lod_loader;
     unsigned int start_position_counter = 0;
@@ -1699,12 +1699,15 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
             {
                 lod_loader.check(node);
             }
-            m_track_object_manager->add(*node);
+            m_track_object_manager->add(*node, parent);
         }
         else if (name == "library")
         {
             std::string name;
             node->get("name", &name);
+
+            core::vector3df xyz;
+            node->get("xyz", &xyz);
 
             XMLNode* libroot;
             std::string lib_path = file_manager->getAsset("library/" + name);
@@ -1727,7 +1730,10 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
             file_manager->pushTextureSearchPath(lib_path + "/");
             file_manager->pushModelSearchPath  (lib_path);
     
-            loadObjects(libroot, lib_path, create_lod_definitions);
+            scene::ISceneNode* parent = irr_driver->getSceneManager()->addEmptySceneNode();
+            parent->setPosition(xyz);
+            parent->updateAbsolutePosition();
+            loadObjects(libroot, lib_path, create_lod_definitions, parent);
 
             file_manager->popTextureSearchPath();
             file_manager->popModelSearchPath();
@@ -1774,7 +1780,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
         {
             if (UserConfigParams::m_graphical_effects)
             {
-                m_track_object_manager->add(*node);
+                m_track_object_manager->add(*node, parent);
             }
         }
         else if (name == "sky-dome" || name == "sky-box" || name == "sky-color")
@@ -1787,7 +1793,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
         }
         else if (name == "light")
         {
-            m_track_object_manager->add(*node);
+            m_track_object_manager->add(*node, parent);
         }
         else if (name == "weather")
         {
@@ -1866,13 +1872,19 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
 
     std::vector<LODNode*> lod_nodes;
     std::vector<scene::IMesh*> devnull;
-    lod_loader.done(this, m_root, devnull, lod_nodes);
+    lod_loader.done(this, m_root, devnull, parent, lod_nodes);
 
-    m_track_object_manager->assingLodNodes(lod_nodes);
+    m_track_object_manager->assingLodNodes(lod_nodes, parent);
     // ---------------------------------------------
 
     // Init all track objects
     m_track_object_manager->init();
+
+    for (std::map<std::string, XMLNode*>::iterator it = library_nodes.begin();
+         it != library_nodes.end(); it++)
+    {
+        delete it->second;
+    }
 }
 
 //-----------------------------------------------------------------------------

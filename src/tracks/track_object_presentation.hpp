@@ -174,10 +174,10 @@ private:
     /** End frame of the animation to be played. */
     unsigned int            m_frame_end;
 
-    void init(const XMLNode* xml_node, bool enabled);
+    void init(const XMLNode* xml_node, scene::ISceneNode* parent, bool enabled);
 
 public:
-    TrackObjectPresentationMesh(const XMLNode& xml_node, bool enabled);
+    TrackObjectPresentationMesh(const XMLNode& xml_node, bool enabled, scene::ISceneNode* parent);
 
     TrackObjectPresentationMesh(
         const std::string& model_file, const core::vector3df& xyz,
@@ -207,7 +207,7 @@ private:
 
 public:
 
-    TrackObjectPresentationSound(const XMLNode& xml_node);
+    TrackObjectPresentationSound(const XMLNode& xml_node, scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationSound();
     virtual void onTriggerItemApproached(Item* who) OVERRIDE;
     virtual void update(float dt) OVERRIDE;
@@ -235,7 +235,7 @@ class TrackObjectPresentationBillboard : public TrackObjectPresentationSceneNode
     float m_fade_out_start;
     float m_fade_out_end;
 public:
-    TrackObjectPresentationBillboard(const XMLNode& xml_node);
+    TrackObjectPresentationBillboard(const XMLNode& xml_node, scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationBillboard();
     virtual void update(float dt) OVERRIDE;
 };
@@ -253,7 +253,7 @@ private:
     std::string m_trigger_condition;
 
 public:
-    TrackObjectPresentationParticles(const XMLNode& xml_node);
+    TrackObjectPresentationParticles(const XMLNode& xml_node, scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationParticles();
 
     virtual void update(float dt) OVERRIDE;
@@ -275,7 +275,7 @@ private:
     float m_energy;
 
 public:
-    TrackObjectPresentationLight(const XMLNode& xml_node);
+    TrackObjectPresentationLight(const XMLNode& xml_node, scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationLight();
 };
 

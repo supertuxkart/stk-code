@@ -400,7 +400,7 @@ private:
     void loadCurves(const XMLNode &node);
     void handleSky(const XMLNode &root, const std::string &filename);
     void loadObjects(const XMLNode* root, const std::string& path,
-                     bool create_lod_definitions);
+                     bool create_lod_definitions, scene::ISceneNode* parent);
 
 public:
 

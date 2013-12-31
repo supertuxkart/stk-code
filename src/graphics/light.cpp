@@ -34,8 +34,8 @@ using namespace core;
 aabbox3df LightNode::box;
 
 
-LightNode::LightNode(scene::ISceneManager* mgr, float radius, float e, float r, float g, float b):
-                     ISceneNode(mgr->getRootSceneNode(), mgr, -1)
+LightNode::LightNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float radius, float e, float r, float g, float b):
+                     ISceneNode(parent == NULL ? mgr->getRootSceneNode() : parent, mgr, -1)
 {
     m_energy = e;
     m_energy_multiplier = 1.0f;

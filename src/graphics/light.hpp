@@ -34,7 +34,7 @@ namespace irr
 class LightNode: public scene::ISceneNode
 {
 public:
-    LightNode(scene::ISceneManager* mgr, float radius, float energy, float r, float g, float b);
+    LightNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float radius, float energy, float r, float g, float b);
     virtual ~LightNode();
 
     virtual void render() OVERRIDE;

@@ -38,9 +38,9 @@
  *                 model, enable/disable status, timer information.
  * \param lod_node Lod node (defaults to NULL).
  */
-TrackObject::TrackObject(const XMLNode &xml_node, LODNode* lod_node)
+TrackObject::TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent, LODNode* lod_node)
 {
-    init(xml_node, lod_node);
+    init(xml_node, parent, lod_node);
 }
 
 // ----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
 
 // ----------------------------------------------------------------------------
 
-void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
+void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent, LODNode* lod_node)
 {
     m_init_xyz   = core::vector3df(0,0,0);
     m_init_hpr   = core::vector3df(0,0,0);
@@ -114,19 +114,19 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     if (xml_node.getName() == "particle-emitter")
     {
         m_type = "particle-emitter";
-        m_presentation = new TrackObjectPresentationParticles(xml_node);
+        m_presentation = new TrackObjectPresentationParticles(xml_node, parent);
     }
     else if (xml_node.getName() == "light")
     {
         m_type = "light";
-        m_presentation = new TrackObjectPresentationLight(xml_node);
+        m_presentation = new TrackObjectPresentationLight(xml_node, parent);
     }
     else if (type == "sfx-emitter")
     {
         // FIXME: at this time sound emitters are just disabled in multiplayer
         //        otherwise the sounds would be constantly heard
         if (race_manager->getNumLocalPlayers() < 2)
-            m_presentation = new TrackObjectPresentationSound(xml_node);
+            m_presentation = new TrackObjectPresentationSound(xml_node, parent);
     }
     else if (type == "action-trigger")
     {
@@ -142,7 +142,7 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     }
     else if (type == "billboard")
     {
-        m_presentation = new TrackObjectPresentationBillboard(xml_node);
+        m_presentation = new TrackObjectPresentationBillboard(xml_node, parent);
     }
     else if (type=="cutscene_camera")
     {
@@ -163,7 +163,8 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
         {
             m_type = "mesh";
             m_presentation = new TrackObjectPresentationMesh(xml_node,
-                                                             m_enabled);
+                                                             m_enabled,
+                                                             parent);
             glownode = ((TrackObjectPresentationMesh *) m_presentation)->getNode();
         }
 

@@ -54,7 +54,7 @@ protected:
 public:
          TrackObjectManager();
         ~TrackObjectManager();
-    void add(const XMLNode &xml_node);
+    void add(const XMLNode &xml_node, scene::ISceneNode* parent);
     void update(float dt);
     void handleExplosion(const Vec3 &pos, const PhysicalObject *mp,
                          bool secondary_hits=true);
@@ -68,7 +68,7 @@ public:
 
     void removeObject(TrackObject* who);
 
-    void assingLodNodes(const std::vector<LODNode*>& lod);
+    void assingLodNodes(const std::vector<LODNode*>& lod, scene::ISceneNode* parent);
 
           PtrVector<TrackObject>& getObjects()       { return m_all_objects; }
     const PtrVector<TrackObject>& getObjects() const { return m_all_objects; }

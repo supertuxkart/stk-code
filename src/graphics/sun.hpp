@@ -28,7 +28,7 @@ class ScreenQuad;
 class SunNode: public LightNode
 {
 public:
-    SunNode(scene::ISceneManager* mgr, float r, float g, float b);
+    SunNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float r, float g, float b);
     virtual ~SunNode();
 
     virtual void render() OVERRIDE;

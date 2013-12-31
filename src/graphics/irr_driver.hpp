@@ -457,7 +457,7 @@ public:
     void applyObjectPassShader(scene::ISceneNode * const node, bool rimlit = false);
     // ------------------------------------------------------------------------
     scene::ISceneNode *addLight(const core::vector3df &pos, float radius = 1.0f, float energy = 1., float r = 1.0f,
-                  float g = 1.0f, float b = 1.0f, bool sun = false);
+                  float g = 1.0f, float b = 1.0f, bool sun = false, scene::ISceneNode* parent = NULL);
     // ------------------------------------------------------------------------
     void clearLights();
     // ------------------------------------------------------------------------

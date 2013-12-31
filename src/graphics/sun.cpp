@@ -34,10 +34,9 @@ using namespace video;
 using namespace scene;
 using namespace core;
 
-SunNode::SunNode(scene::ISceneManager* mgr, float r, float g, float b):
-                     LightNode(mgr, 10000, 0., r, g, b)
+SunNode::SunNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float r, float g, float b):
+                     LightNode(mgr, parent, 10000, 0., r, g, b)
 {
-
     sq = new ScreenQuad(irr_driver->getVideoDriver());
 
     SMaterial &m = sq->getMaterial();

@@ -82,10 +82,10 @@ protected:
 
     ThreeDAnimation*               m_animator;
     
-    void init(const XMLNode &xml_node, LODNode* lodNode);
+    void init(const XMLNode &xml_node, scene::ISceneNode* parent, LODNode* lodNode);
 
 public:
-                 TrackObject(const XMLNode &xml_node, LODNode* lodNode=NULL);
+                 TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent, LODNode* lodNode=NULL);
 
                  TrackObject(const core::vector3df& xyz,
                              const core::vector3df& hpr,

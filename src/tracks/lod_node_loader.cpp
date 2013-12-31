@@ -88,10 +88,11 @@ bool LodNodeLoader::check(const XMLNode* xml)
 void LodNodeLoader::done(Track* track,
                          std::string directory,
                          std::vector<scene::IMesh*>& cache,
+                         scene::ISceneNode* parent,
                          std::vector<LODNode*>& out)
 {
     scene::ISceneManager* sm = irr_driver->getSceneManager();
-    scene::ISceneNode* sroot = sm->getRootSceneNode();
+    if (parent == NULL) parent = sm->getRootSceneNode();
 
     // Creating LOD nodes is more complicated than one might have hoped, on the C++ side;
     // but it was done this way to minimize the work needed on the side of the artists
@@ -144,7 +145,7 @@ void LodNodeLoader::done(Track* track,
 
             if (group.size() > 0)
             {
-                LODNode* lod_node = new LODNode(groupname, sroot, sm);
+                LODNode* lod_node = new LODNode(groupname, parent, sm);
                 lod_node->setPosition(xyz);
                 lod_node->setRotation(hpr);
                 lod_node->setScale(scale);
