@@ -447,6 +447,7 @@ void ParticleSystemProxy::draw()
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 	glVertexAttribDivisor(attrib_lf, 0);
 	glVertexAttribDivisor(attrib_pos, 0);
+	glVertexAttribDivisor(attrib_sz, 0);
 	glDisableVertexAttribArray(attrib_pos);
 	glDisableVertexAttribArray(attrib_lf);
 	glDisableVertexAttribArray(attrib_quadcorner);
