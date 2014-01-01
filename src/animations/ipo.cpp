@@ -42,8 +42,8 @@ Ipo::IpoData::IpoData(const XMLNode &curve, float fps, bool reverse)
 {
     if(curve.getName()!="curve")
     {
-        fprintf(stderr, "Expected 'curve' for animation, got '%s' --> Ignored.\n",
-            curve.getName().c_str());
+        Log::warn("Animations", "Expected 'curve' for animation, got '%s' --> Ignored.",
+                  curve.getName().c_str());
         return;
     }
     std::string channel;
@@ -59,9 +59,9 @@ Ipo::IpoData::IpoData(const XMLNode &curve, float fps, bool reverse)
     }
     if(m_channel==IPO_MAX)
     {
-        fprintf(stderr, "Unknown animation channel: '%s' - aborting.\n",
+        Log::error("Animation", "Unknown animation channel: '%s' --> Ignored",
                 channel.c_str());
-        exit(-1);
+        return;
     }
 
     std::string interp;
@@ -76,10 +76,9 @@ Ipo::IpoData::IpoData(const XMLNode &curve, float fps, bool reverse)
     else if (extend=="const" ) m_extend = ET_CONST;
     else
     {
-        // FIXME: do we want an error message here?
         // For now extrap and cyclic_extrap do not work
-        fprintf(stderr, "Unsupported extend '%s' - defaulting to CONST.\n",
-                extend.c_str());
+        Log::warn("Animation", "Unsupported extend '%s' - defaulting to CONST.",
+                  extend.c_str());
         m_extend = ET_CONST;
     }
 

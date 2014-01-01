@@ -99,7 +99,7 @@ void NetworkHttp::startNetworkThread()
         delete m_thread_id.getData();
         m_thread_id.unlock();
         m_thread_id.setAtomic(0);
-        printf("[addons] Warning: could not create thread, error=%d.\n", errno);
+        Log::warn("addons", "Could not create thread, error=%d", errno);
     }
     pthread_attr_destroy(&attr);
 }   // startNetworkThread
@@ -129,7 +129,7 @@ void *NetworkHttp::mainLoop(void *obj)
         while(empty)
         {
             if(UserConfigParams::logAddons())
-                printf("[addons] No request, sleeping.\n");
+                Log::debug("addons", "No request, sleeping.");
 
             pthread_cond_wait(&me->m_cond_request,
                               me->m_all_requests.getMutex());
@@ -143,12 +143,12 @@ void *NetworkHttp::mainLoop(void *obj)
         if(UserConfigParams::logAddons())
         {
             if(me->m_current_request->getCommand()==Request::HC_DOWNLOAD_FILE)
-                printf("[addons] Executing download '%s' to '%s' priority %d.\n",
+                Log::info("addons", "Executing download '%s' to '%s' priority %d",
                        me->m_current_request->getURL().c_str(),
                        me->m_current_request->getSavePath().c_str(),
                        me->m_current_request->getPriority());
             else
-                printf("[addons] Executing command '%d' priority %d.\n",
+                Log::info("addons", "Executing command '%d' priority %d.",
                        me->m_current_request->getCommand(),
                        me->m_current_request->getPriority());
         }
@@ -189,7 +189,7 @@ void *NetworkHttp::mainLoop(void *obj)
         me->m_all_requests.lock();
     }   // while !quit
     if(UserConfigParams::logAddons())
-        printf("[addons] Network exiting.\n");
+        Log::info("addons", "Network exiting.");
 
     // At this stage we have the lock for m_all_requests
     while(!me->m_all_requests.getData().empty())
@@ -227,7 +227,7 @@ void NetworkHttp::stopNetworkThread()
 
     Request *r = new Request(Request::HC_QUIT, 9999);
     if(UserConfigParams::logAddons())
-        printf("[addons] Inserting QUIT request.\n");
+        Log::info("addons", "Inserting QUIT request.");
     insertRequest(r);
 }   // stopNetworkThread
 
@@ -275,7 +275,7 @@ CURLcode NetworkHttp::init(bool forceRefresh)
 
     // Initialise the online portion of the addons manager.
     if(download && UserConfigParams::logAddons())
-        printf("[addons] Downloading list.\n");
+        Log::info("addons", "Downloading list.");
 
     Request r(Request::HC_DOWNLOAD_FILE, 9999, false,
               "news.xml", "news.xml");
@@ -350,7 +350,7 @@ CURLcode NetworkHttp::init(bool forceRefresh)
     news_manager->setErrorMessage(error_message);
 
     if(UserConfigParams::logAddons())
-        printf("[addons] %s\n", core::stringc(error_message).c_str());
+        Log::error("addons", "Error raised in NetworkHttp::init : %s", core::stringc(error_message).c_str());
     return status;
 }   // init
 
@@ -365,7 +365,7 @@ void NetworkHttp::insertReInit()
                                    /*manage_memory*/true);
 
     if(UserConfigParams::logAddons())
-        printf("[addons] Inserting reInit request.\n");
+        Log::info("addons", "Inserting reInit request.");
     insertRequest(request);
 }   // insertReInit
 
@@ -387,7 +387,7 @@ CURLcode NetworkHttp::reInit()
     m_all_requests.unlock();
 
     if(UserConfigParams::logAddons())
-        printf("[addons] Xml files deleted, re-initialising addon manager.\n");
+        Log::info("addons", "Xml files deleted, re-initialising addon manager.");
 
     return init(true /* force refresh */);
 
@@ -453,14 +453,14 @@ CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
         const XMLNode *xml = new XMLNode(xml_file);
         addons_manager->initOnline(xml);
         if(UserConfigParams::logAddons())
-            printf("[addons] Addons manager list downloaded\n");
+            Log::info("addons", "Addons manager list downloaded");
         return status;
     }
 
     // Aborted by STK in progress callback, don't display error message
     if(status==CURLE_ABORTED_BY_CALLBACK)
         return status;
-    printf("[addons] Error on download addons.xml: %d\n",
+    Log::error("addons", "Error on download addons.xml: %d\n",
         status);
     return status;
 }   // loadAddonsList
@@ -482,7 +482,7 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
         full_url = (std::string)UserConfigParams::m_server_addons
                  + "/" + full_url;
     if(UserConfigParams::logAddons())
-        printf("[addons] Downloading '%s' as '%s'.\n",
+        Log::info("addons", "Downloading '%s' as '%s'.",
                full_url.c_str(), request->getSavePath().c_str());
 
     curl_easy_setopt(m_curl_session, CURLOPT_URL, full_url.c_str());
@@ -507,7 +507,7 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
 
     if(!fout)
     {
-        printf("[addons] Can't open '%s' for writing, ignored.\n",
+        Log::error("addons", "Can't open '%s' for writing, ignored.",
                (full_save+".part").c_str());
         return CURLE_WRITE_ERROR;
     }
@@ -535,7 +535,7 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
     if(status==CURLE_OK)
     {
         if(UserConfigParams::logAddons())
-            printf("[addons] Download successful.\n");
+            Log::info("addons", "Download successful.");
         // The behaviour of rename is unspecified if the target
         // file should already exist - so remove it.
         file_manager->removeFile(full_save);
@@ -544,7 +544,7 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
         if(ret!=0)
         {
             if(UserConfigParams::logAddons())
-               printf("[addons] Could not rename downloaded file!\n");
+               Log::error("addons", "Could not rename downloaded file!");
             status=CURLE_WRITE_ERROR;
         }
         else
@@ -552,8 +552,8 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
     }
     else
     {
-        printf("[addons] Problems downloading file - return code %d.\n",
-               status);
+        Log::error("addons", "Problems downloading file - return code %d.",
+                   status);
     }
 
     request->setProgress( (status==CURLE_OK) ? 1.0f : -1.0f );
@@ -568,7 +568,7 @@ CURLcode NetworkHttp::downloadFileInternal(Request *request)
 void NetworkHttp::cancelAllDownloads()
 {
     if(UserConfigParams::logAddons())
-        printf("[addons] Requesting cancellation of download.\n");
+        Log::info("addons", "Requesting cancellation of download.");
     m_abort.setAtomic(true);
 }   // cancelAllDownload
 
@@ -594,8 +594,8 @@ Request *NetworkHttp::downloadFileAsynchron(const std::string &url,
                                    url, (save!="") ? save : url          );
 
     if(UserConfigParams::logAddons())
-        printf("[addons] Download asynchron '%s' as '%s'.\n",
-               request->getURL().c_str(), request->getSavePath().c_str());
+        Log::info("addons", "Download asynchron '%s' as '%s'.",
+                  request->getURL().c_str(), request->getSavePath().c_str());
     insertRequest(request);
     return request;
 }   // downloadFileAsynchron
@@ -643,10 +643,10 @@ int NetworkHttp::progressDownload(void *clientp,
                 // Reset abort flag so that the next download will work
                 // as expected.
                 self->m_abort.setAtomic(false);
-                printf("[addons] Global abort of downloads.\n");
+                Log::info("addons", "Global abort of downloads.");
             }
             else
-                printf("[addons] Cancel this download.\n");
+                Log::info("addons", "Cancel this download.");
         }
         // Indicates to abort the current download, which means that this
         // thread will go back to the mainloop and handle the next request.

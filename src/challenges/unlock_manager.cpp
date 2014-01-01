@@ -158,8 +158,8 @@ void UnlockManager::addOrFreeChallenge(ChallengeData *c)
         m_all_challenges[c->getId()]=c;
     else
     {
-        printf("[challenge] Challenge '%s' is not supported - ignored.\n",
-               c->getId().c_str());
+        Log::warn("Challenge", "Challenge '%s' is not supported - ignored.",
+                 c->getId().c_str());
         delete c;
     }
 }   // addOrFreeChallenge
