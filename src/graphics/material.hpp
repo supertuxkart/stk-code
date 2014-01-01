@@ -335,6 +335,9 @@ public:
     void onMadeVisible(scene::IMeshBuffer* who);
     void onHidden(scene::IMeshBuffer* who);
     void isInitiallyHidden(scene::IMeshBuffer* who);
+	/** For particle system : specify if the particle should be additively blended
+	 */
+	bool isAlphaAdditive() const { return !m_alpha_blending;  }
 } ;
 
 

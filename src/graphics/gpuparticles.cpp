@@ -230,7 +230,7 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
 	const core::vector3df& position,
 	const core::vector3df& rotation,
-	const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale) {
+	const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false) {
 	static const GLfloat quad_vertex[] = {
 		-.5, -.5, 0., 0.,
 		.5, -.5, 1., 0.,
@@ -243,6 +243,8 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	glBufferData(GL_ARRAY_BUFFER,  sizeof(quad_vertex), quad_vertex, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+void ParticleSystemProxy::setAlphaAdditive(bool val) { m_alpha_additive = val;  }
 
 void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePointEmitter *emitter)
 {
@@ -485,7 +487,10 @@ void ParticleSystemProxy::draw()
 	glEnable(GL_BLEND);
 	core::matrix4 projm = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	core::matrix4 viewm = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	if (m_alpha_additive)
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	else
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgram(RenderProgram);
 	glEnableVertexAttribArray(attrib_pos);
 	glEnableVertexAttribArray(attrib_lf);

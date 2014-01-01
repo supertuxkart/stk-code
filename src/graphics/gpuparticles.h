@@ -31,6 +31,7 @@ class ParticleSystemProxy : public scene::CParticleSystemSceneNode {
 protected:
 	GLuint quad_vertex_buffer;
 	GLuint tfb_buffers[2], initial_values_buffer;
+	bool m_alpha_additive;
 
 	GLuint SimulationProgram;
 	GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
@@ -62,6 +63,7 @@ public:
 
 	virtual void setEmitter(scene::IParticleEmitter* emitter);
 	virtual void render();
+	void setAlphaAdditive(bool);
 };
 
 class PointEmitter : public GPUParticle
