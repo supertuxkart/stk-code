@@ -404,12 +404,9 @@ void ParticleSystemProxy::simulate()
 void ParticleSystemProxy::draw()
 {
 	glDepthMask(GL_FALSE);
-	glEnable(GL_BLEND);
 	glDisable(GL_CULL_FACE);
 	core::matrix4 projm = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	core::matrix4 viewm = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glUseProgram(RenderProgram);
 	glEnableVertexAttribArray(attrib_pos);
 	glEnableVertexAttribArray(attrib_lf);
@@ -469,8 +466,8 @@ void ParticleSystemProxy::render() {
 	draw();
 	// We need to force irrlicht to update its internal states
 	irr::video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-	drv->setMaterial(getMaterial(0));
-	static_cast<irr::video::COpenGLDriver*>(drv)->setRenderStates3DMode();
+	//drv->setMaterial(getMaterial(0));
+	//static_cast<irr::video::COpenGLDriver*>(drv)->setRenderStates3DMode();
 }
 
 RainNode::RainNode(scene::ISceneManager* mgr, ITexture *tex)
