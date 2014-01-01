@@ -271,17 +271,20 @@ void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePoin
 		particledir.rotateYZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
 		particledir.rotateXZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
 
-		particles[COMPONENTCOUNT * i + 4] = particledir.X;
-		particles[COMPONENTCOUNT * i + 5] = particledir.Y;
-		particles[COMPONENTCOUNT * i + 6] = particledir.Z;
-		initialvalue[COMPONENTCOUNT * i + 4] = particledir.X;
-		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y;
-		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z;
+		float size = rand();
+		size /= RAND_MAX;
+		size *= (sizeMax - sizeMin);
+		size += sizeMin;
 
-		initialvalue[COMPONENTCOUNT * i + 7] = rand();
-		initialvalue[COMPONENTCOUNT * i + 7] /= RAND_MAX;
-		initialvalue[COMPONENTCOUNT * i + 7] *= (sizeMax - sizeMin);
-		initialvalue[COMPONENTCOUNT * i + 7] += sizeMin;
+		initialvalue[COMPONENTCOUNT * i + 7] = size;
+
+		particles[COMPONENTCOUNT * i + 4] = particledir.X / size;
+		particles[COMPONENTCOUNT * i + 5] = particledir.Y / size;
+		particles[COMPONENTCOUNT * i + 6] = particledir.Z / size;
+		initialvalue[COMPONENTCOUNT * i + 4] = particledir.X / size;
+		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y / size;
+		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z / size;
+
 	}
 	glGenBuffers(1, &initial_values_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
@@ -325,17 +328,19 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 		particledir.rotateYZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
 		particledir.rotateXZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
 
-		particles[COMPONENTCOUNT * i + 4] = particledir.X;
-		particles[COMPONENTCOUNT * i + 5] = particledir.Y;
-		particles[COMPONENTCOUNT * i + 6] = particledir.Z;
-		initialvalue[COMPONENTCOUNT * i + 4] = particledir.X;
-		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y;
-		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z;
+		float size = rand();
+		size /= RAND_MAX;
+		size *= (sizeMax - sizeMin);
+		size += sizeMin;
 
-		initialvalue[COMPONENTCOUNT * i + 7] = rand();
-		initialvalue[COMPONENTCOUNT * i + 7] /= RAND_MAX;
-		initialvalue[COMPONENTCOUNT * i + 7] *= (sizeMax - sizeMin);
-		initialvalue[COMPONENTCOUNT * i + 7] += sizeMin;
+		initialvalue[COMPONENTCOUNT * i + 7] = size;
+
+		particles[COMPONENTCOUNT * i + 4] = particledir.X / size;
+		particles[COMPONENTCOUNT * i + 5] = particledir.Y / size;
+		particles[COMPONENTCOUNT * i + 6] = particledir.Z / size;
+		initialvalue[COMPONENTCOUNT * i + 4] = particledir.X / size;
+		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y / size;
+		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z / size;
 	}
 	glGenBuffers(1, &initial_values_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
