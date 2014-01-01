@@ -226,18 +226,22 @@ scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(
 	return node;
 }
 
+GLuint ParticleSystemProxy::quad_vertex_buffer = 0;
+
 ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
 	const core::vector3df& position,
 	const core::vector3df& rotation,
 	const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false) {
+	if (quad_vertex_buffer)
+		return;
+	initGL();
 	static const GLfloat quad_vertex[] = {
 		-.5, -.5, 0., 0.,
 		.5, -.5, 1., 0.,
 		-.5, .5, 0., 1.,
 		.5, .5, 1., 1.,
 	};
-	initGL();
 	glGenBuffers(1, &quad_vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER,  sizeof(quad_vertex), quad_vertex, GL_STATIC_DRAW);
@@ -309,7 +313,6 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 	float sizeMax = emitter->getMaxStartSize().Height;
 
 	const core::vector3df& extent = emitter->getBox().getExtent();
-	printf("particle lifetime [%d-%d]\n", emitter->getMinLifeTime(), emitter->getMaxLifeTime());
 
 	for (unsigned i = 0; i < count; i++) {
 		particles[COMPONENTCOUNT * i] = emitter->getBox().MinEdge.X + os::Randomizer::frand() * extent.X;
@@ -356,6 +359,34 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 	delete[] initialvalue;
 }
 
+GLuint ParticleSystemProxy::SimulationProgram = 0;
+GLuint ParticleSystemProxy::RenderProgram = 0;
+
+GLuint ParticleSystemProxy::attrib_position;
+GLuint ParticleSystemProxy::attrib_velocity;
+GLuint ParticleSystemProxy::attrib_lifetime;
+GLuint ParticleSystemProxy::attrib_initial_position;
+GLuint ParticleSystemProxy::attrib_initial_velocity;
+GLuint ParticleSystemProxy::attrib_initial_lifetime;
+GLuint ParticleSystemProxy::attrib_size;
+GLuint ParticleSystemProxy::attrib_initial_size;
+GLuint ParticleSystemProxy::uniform_sourcematrix;
+GLuint ParticleSystemProxy::uniform_tinvsourcematrix;
+GLuint ParticleSystemProxy::uniform_dt;
+
+
+GLuint ParticleSystemProxy::attrib_pos;
+GLuint ParticleSystemProxy::attrib_lf;
+GLuint ParticleSystemProxy::attrib_quadcorner;
+GLuint ParticleSystemProxy::attrib_texcoord;
+GLuint ParticleSystemProxy::attrib_sz;
+GLuint ParticleSystemProxy::uniform_matrix;
+GLuint ParticleSystemProxy::uniform_viewmatrix;
+GLuint ParticleSystemProxy::uniform_texture;
+GLuint ParticleSystemProxy::uniform_normal_and_depths;
+GLuint ParticleSystemProxy::uniform_screen;
+GLuint ParticleSystemProxy::uniform_invproj;
+
 void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 {
 	if (!emitter)
@@ -368,16 +399,31 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	setAutomaticCulling(0);
 	LastEmitTime = 0;
 
-	duration = emitter->getMaxLifeTime();
-	count = emitter->getMaxParticlesPerSecond() * duration / 1000;
+	count = emitter->getMaxParticlesPerSecond() * emitter->getMaxParticlesPerSecond() / 1000;
+	switch (emitter->getType())
+	{
+	case scene::EPET_POINT:
+		generateParticlesFromPointEmitter(emitter);
+		break;
+	case scene::EPET_BOX:
+		generateParticlesFromBoxEmitter(static_cast<scene::IParticleBoxEmitter *>(emitter));
+		break;
+	default:
+		assert(0 && "Wrong particle type");
+	}
+
+	texture = getTextureGLuint(getMaterial(0).getTexture(0));
+	normal_and_depth = getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
+
+	if (SimulationProgram && RenderProgram)
+		return;
+
 	const char *varyings[] = {
 		"new_particle_position",
 		"new_lifetime",
 		"new_particle_velocity",
 		"new_size",
 	};
-	texture = getTextureGLuint(getMaterial(0).getTexture(0));
-	normal_and_depth = getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
 
 	SimulationProgram = LoadTFBProgram(file_manager->getAsset("shaders/pointemitter.vert").c_str(), varyings, 4);
 
@@ -407,21 +453,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	uniform_invproj = glGetUniformLocation(RenderProgram, "invproj");
 	uniform_screen = glGetUniformLocation(RenderProgram, "screen");
 	uniform_normal_and_depths = glGetUniformLocation(RenderProgram, "normals_and_depth");
-
-	switch (emitter->getType())
-	{
-	case scene::EPET_POINT:
-		generateParticlesFromPointEmitter(emitter);
-		break;
-	case scene::EPET_BOX:
-		generateParticlesFromBoxEmitter(static_cast<scene::IParticleBoxEmitter *>(emitter));
-		break;
-	default:
-		assert(0 && "Wrong particle type");
-	}
-	}
-	
-
+}
 
 void ParticleSystemProxy::simulate()
 {

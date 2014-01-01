@@ -29,17 +29,18 @@ public:
 
 class ParticleSystemProxy : public scene::CParticleSystemSceneNode {
 protected:
-	GLuint quad_vertex_buffer;
 	GLuint tfb_buffers[2], initial_values_buffer;
 	bool m_alpha_additive;
 
-	GLuint SimulationProgram;
-	GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
-	GLuint uniform_duration, uniform_sourcematrix, uniform_tinvsourcematrix, uniform_dt;
+	static GLuint SimulationProgram;
+	static GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
+	static GLuint uniform_sourcematrix, uniform_tinvsourcematrix, uniform_dt;
 
-	GLuint RenderProgram;
-	GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz;
-	GLuint uniform_matrix, uniform_viewmatrix, uniform_texture, uniform_normal_and_depths, uniform_screen, uniform_invproj;
+	static GLuint RenderProgram;
+	static GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz;
+	static GLuint uniform_matrix, uniform_viewmatrix, uniform_texture, uniform_normal_and_depths, uniform_screen, uniform_invproj;
+
+	static GLuint quad_vertex_buffer;
 
 	GLuint texture, normal_and_depth;
 	unsigned duration, count, LastEmitTime;
