@@ -644,7 +644,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         (m->getTexture(0) != NULL && 
          ((core::stringc)m->getTexture(0)->getName()).find("deprecated") != -1))
     {
-        Log::warn("material", "Track uses deprecated texture '%s'\n", 
+        Log::warn("material", "Track uses deprecated texture '%s'", 
                   m_texname.c_str());
     }
 

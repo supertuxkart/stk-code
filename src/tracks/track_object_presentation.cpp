@@ -131,7 +131,7 @@ TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
     TrackObjectPresentationSceneNode(xml_node)
 {
     m_node = lod_loader.instanciate(&xml_node, parent);
-    if (m_node == NULL) throw std::exception("Cannot load LOD node");
+    if (m_node == NULL) throw std::runtime_error("Cannot load LOD node");
     m_node->setPosition(m_init_xyz);
     m_node->setRotation(m_init_hpr);
     m_node->setScale(m_init_scale);

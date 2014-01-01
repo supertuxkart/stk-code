@@ -132,10 +132,11 @@ void AddonsLoading::beforeAddingWidgets()
         else if(m_addon.testStatus(Addon::AS_RC))
             l.push_back("RC");
 
-        if(m_addon.testStatus(Addon::AS_BAD_DIM))
-            l.push_back("bad-texture");
-        if(!m_addon.testStatus(Addon::AS_DFSG))
-            l.push_back("non-DFSG");
+        // Don't displat those for now, they're more confusing than helpful for the average player
+        //if(m_addon.testStatus(Addon::AS_BAD_DIM))
+        //    l.push_back("bad-texture");
+        //if(!m_addon.testStatus(Addon::AS_DFSG))
+        //    l.push_back("non-DFSG");
     }
     if(m_addon.testStatus(Addon::AS_FEATURED))
         l.push_back(_("featured"));
