@@ -408,6 +408,7 @@ void ParticleSystemProxy::draw()
 	glEnable(GL_BLEND);
 	core::matrix4 projm = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	core::matrix4 viewm = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgram(RenderProgram);
 	glEnableVertexAttribArray(attrib_pos);
 	glEnableVertexAttribArray(attrib_lf);
