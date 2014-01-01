@@ -381,6 +381,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 
 	uniform_dt = glGetUniformLocation(SimulationProgram, "dt");
 	uniform_sourcematrix = glGetUniformLocation(SimulationProgram, "sourcematrix");
+	uniform_tinvsourcematrix = glGetUniformLocation(SimulationProgram, "tinvsourcematrix");
 
 	attrib_position = glGetAttribLocation(SimulationProgram, "particle_position");
 	attrib_lifetime = glGetAttribLocation(SimulationProgram, "lifetime");
@@ -434,6 +435,9 @@ void ParticleSystemProxy::simulate()
 	LastEmitTime = time;
 
 	core::matrix4 matrix = getAbsoluteTransformation();
+	core::matrix4 tinvmatrix;
+	matrix.getInverse(tinvmatrix);
+	tinvmatrix = tinvmatrix.getTransposed();
 	glUseProgram(SimulationProgram);
 	glEnable(GL_RASTERIZER_DISCARD);
 	glEnableVertexAttribArray(attrib_position);
@@ -458,6 +462,7 @@ void ParticleSystemProxy::simulate()
 
 	glUniform1i(uniform_dt, 16);
 	glUniformMatrix4fv(uniform_sourcematrix, 1, GL_FALSE, matrix.pointer());
+	glUniformMatrix4fv(uniform_tinvsourcematrix, 1, GL_FALSE, tinvmatrix.pointer());
 	glBeginTransformFeedback(GL_POINTS);
 	glDrawArrays(GL_POINTS, 0, count);
 	glEndTransformFeedback();

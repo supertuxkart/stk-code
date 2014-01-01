@@ -34,7 +34,7 @@ protected:
 
 	GLuint SimulationProgram;
 	GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
-	GLuint uniform_duration, uniform_sourcematrix, uniform_dt;
+	GLuint uniform_duration, uniform_sourcematrix, uniform_tinvsourcematrix, uniform_dt;
 
 	GLuint RenderProgram;
 	GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz;
