@@ -46,10 +46,15 @@ PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
 PFNGLBLENDEQUATIONPROC glBlendEquation;
 PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
+PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 #endif
 
+static bool is_gl_init = false;
 void initGL()
 {
+	if (is_gl_init)
+		return;
+	is_gl_init = true;
 #ifdef _IRR_WINDOWS_API_
     glGenTransformFeedbacks = (PFNGLGENTRANSFORMFEEDBACKSPROC)IRR_OGL_LOAD_EXTENSION("glGenTransformFeedbacks");
     glBindTransformFeedback = (PFNGLBINDTRANSFORMFEEDBACKPROC)IRR_OGL_LOAD_EXTENSION("glBindTransformFeedback");
@@ -87,6 +92,7 @@ void initGL()
 	glBlendEquation = (PFNGLBLENDEQUATIONPROC)IRR_OGL_LOAD_EXTENSION("glBlendEquation");
 	glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribDivisor");
 	glDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawArraysInstanced");
+	glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteBuffers");
 #endif
 }
 
@@ -233,9 +239,11 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	const core::vector3df& position,
 	const core::vector3df& rotation,
 	const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false) {
+	initGL();
+	glGenBuffers(1, &initial_values_buffer);
+	glGenBuffers(2, tfb_buffers);
 	if (quad_vertex_buffer)
 		return;
-	initGL();
 	static const GLfloat quad_vertex[] = {
 		-.5, -.5, 0., 0.,
 		.5, -.5, 1., 0.,
@@ -246,6 +254,12 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER,  sizeof(quad_vertex), quad_vertex, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+ParticleSystemProxy::~ParticleSystemProxy()
+{
+	glDeleteBuffers(2, tfb_buffers);
+	glDeleteBuffers(1, &initial_values_buffer);
 }
 
 void ParticleSystemProxy::setAlphaAdditive(bool val) { m_alpha_additive = val;  }
@@ -292,7 +306,7 @@ void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePoin
 		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z / size;
 
 	}
-	glGenBuffers(1, &initial_values_buffer);
+
 	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
 	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
 	glGenBuffers(2, tfb_buffers);
@@ -347,10 +361,8 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y / size;
 		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z / size;
 	}
-	glGenBuffers(1, &initial_values_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
 	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
-	glGenBuffers(2, tfb_buffers);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
 	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
@@ -399,7 +411,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	setAutomaticCulling(0);
 	LastEmitTime = 0;
 
-	count = emitter->getMaxParticlesPerSecond() * emitter->getMaxParticlesPerSecond() / 1000;
+	count = emitter->getMaxParticlesPerSecond() * emitter->getMaxLifeTime() / 1000;
 	switch (emitter->getType())
 	{
 	case scene::EPET_POINT:

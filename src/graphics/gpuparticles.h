@@ -61,6 +61,7 @@ public:
 		const core::vector3df& position,
 		const core::vector3df& rotation,
 		const core::vector3df& scale);
+	~ParticleSystemProxy();
 
 	virtual void setEmitter(scene::IParticleEmitter* emitter);
 	virtual void render();
