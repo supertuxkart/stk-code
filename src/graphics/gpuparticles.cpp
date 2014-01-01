@@ -405,6 +405,7 @@ void ParticleSystemProxy::draw()
 {
 	glDepthMask(GL_FALSE);
 	glDisable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
 	core::matrix4 projm = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	core::matrix4 viewm = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
 	glUseProgram(RenderProgram);
