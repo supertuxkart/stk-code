@@ -49,6 +49,7 @@ protected:
 	virtual void draw();
 	void generateParticlesFromPointEmitter(scene::IParticlePointEmitter *);
 	void generateParticlesFromBoxEmitter(scene::IParticleBoxEmitter *);
+	void generateParticlesFromSphereEmitter(scene::IParticleSphereEmitter *);
 public:
 	static IParticleSystemSceneNode *addParticleNode(
 		bool withDefaultEmitter = true, ISceneNode* parent = 0, s32 id = -1,

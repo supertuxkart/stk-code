@@ -371,6 +371,66 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 	delete[] initialvalue;
 }
 
+void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSphereEmitter *emitter)
+{
+	float *particles = new float[COMPONENTCOUNT * count], *initialvalue = new float[COMPONENTCOUNT * count];
+	unsigned lifetime_range = emitter->getMaxLifeTime() - emitter->getMinLifeTime();
+
+	float sizeMin = emitter->getMinStartSize().Height;
+	float sizeMax = emitter->getMaxStartSize().Height;
+
+	for (unsigned i = 0; i < count; i++) {
+		// Random distance from center
+		const f32 distance = os::Randomizer::frand() * emitter->getRadius();
+
+		// Random direction from center
+		vector3df pos = emitter->getCenter() + distance;
+		pos.rotateXYBy(os::Randomizer::frand() * 360.f, emitter->getCenter());
+		pos.rotateYZBy(os::Randomizer::frand() * 360.f, emitter->getCenter());
+		pos.rotateXZBy(os::Randomizer::frand() * 360.f, emitter->getCenter());
+
+		particles[COMPONENTCOUNT * i] = pos.X;
+		particles[COMPONENTCOUNT * i + 1] = pos.Y;
+		particles[COMPONENTCOUNT * i + 2] = pos.Z;
+		// Initial lifetime is 0 percent
+		particles[COMPONENTCOUNT * i + 3] = rand();
+		particles[COMPONENTCOUNT * i + 3] /= RAND_MAX;
+
+		initialvalue[COMPONENTCOUNT * i] = particles[COMPONENTCOUNT * i];
+		initialvalue[COMPONENTCOUNT * i + 1] = particles[COMPONENTCOUNT * i + 1];
+		initialvalue[COMPONENTCOUNT * i + 2] = particles[COMPONENTCOUNT * i + 2];
+		initialvalue[COMPONENTCOUNT * i + 3] = (lifetime_range > 0) ? rand() % lifetime_range : 0;
+		initialvalue[COMPONENTCOUNT * i + 3] += emitter->getMinLifeTime();
+
+		core::vector3df particledir = emitter->getDirection();
+		particledir.rotateXYBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+		particledir.rotateYZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+		particledir.rotateXZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+
+		float size = rand();
+		size /= RAND_MAX;
+		size *= (sizeMax - sizeMin);
+		size += sizeMin;
+
+		initialvalue[COMPONENTCOUNT * i + 7] = size;
+
+		particles[COMPONENTCOUNT * i + 4] = particledir.X / size;
+		particles[COMPONENTCOUNT * i + 5] = particledir.Y / size;
+		particles[COMPONENTCOUNT * i + 6] = particledir.Z / size;
+		initialvalue[COMPONENTCOUNT * i + 4] = particledir.X / size;
+		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y / size;
+		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z / size;
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
+	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
+	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
+	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), 0, GL_STREAM_DRAW);
+	delete[] particles;
+	delete[] initialvalue;
+}
+
 GLuint ParticleSystemProxy::SimulationProgram = 0;
 GLuint ParticleSystemProxy::RenderProgram = 0;
 
@@ -404,7 +464,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	if (!emitter)
 		return;
 	CParticleSystemSceneNode::setEmitter(emitter);
-	if (emitter->getType() != scene::EPET_POINT && emitter->getType() != scene::EPET_BOX)
+	if (emitter->getType() != scene::EPET_POINT && emitter->getType() != scene::EPET_BOX && emitter->getType() != scene::EPET_SPHERE)
 		return;
 	// Pass a fake material type to force irrlicht to update its internal states on rendering
 	setMaterialType(irr_driver->getShader(ES_RAIN));
@@ -419,6 +479,9 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 		break;
 	case scene::EPET_BOX:
 		generateParticlesFromBoxEmitter(static_cast<scene::IParticleBoxEmitter *>(emitter));
+		break;
+	case scene::EPET_SPHERE:
+		generateParticlesFromSphereEmitter(static_cast<scene::IParticleSphereEmitter *>(emitter));
 		break;
 	default:
 		assert(0 && "Wrong particle type");
@@ -585,7 +648,7 @@ void ParticleSystemProxy::draw()
 }
 
 void ParticleSystemProxy::render() {
-	if (getEmitter()->getType() != scene::EPET_POINT && getEmitter()->getType() != scene::EPET_BOX)
+	if (getEmitter()->getType() != scene::EPET_POINT && getEmitter()->getType() != scene::EPET_BOX && getEmitter()->getType() != scene::EPET_SPHERE)
 	{
 		CParticleSystemSceneNode::render();
 		return;
