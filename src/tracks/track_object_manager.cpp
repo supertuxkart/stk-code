@@ -49,31 +49,16 @@ TrackObjectManager::~TrackObjectManager()
  *        in a separate section that's read before everything and remove all this
  *        crap
  */
-void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent)
+void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader)
 {
     try
     {
-        std::string groupname;
-        xml_node.get("lod_group", &groupname);
-        bool is_lod = !groupname.empty();
-
-        if (is_lod)
-        {
-            bool lod_instance = false;
-            xml_node.get("lod_instance", &lod_instance);
-
-            if (lod_instance)
-                m_lod_objects[groupname].push_back(&xml_node);
-        }
-        else
-        {
-            m_all_objects.push_back(new TrackObject(xml_node, parent));
-        }
+        m_all_objects.push_back(new TrackObject(xml_node, parent, lod_loader));
     }
     catch (std::exception& e)
     {
-        fprintf(stderr, "[TrackObjectManager] WARNING: Could not load track object. Reason : %s\n",
-                e.what());
+        Log::warn("TrackObjectManager", "Could not load track object. Reason : %s",
+                  e.what());
     }
 }   // add
 
@@ -219,13 +204,8 @@ void TrackObjectManager::removeObject(TrackObject* obj)
 }   // removeObject
 
 // ----------------------------------------------------------------------------
-/**
-  * \brief To be called after all objects are loaded and the LodNodeLoader is done
-  *        parsing everything.
-  * This method exists because LOD objects need to be created after others.
-  *
-  * \param lod_nodes the LOD nodes created by the LodNodeLoader.
-  */
+
+/*
 void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes)
 {
     for (unsigned int n=0; n<lod_nodes.size(); n++)
@@ -242,3 +222,4 @@ void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes)
 
     m_lod_objects.clear();
 }
+*/

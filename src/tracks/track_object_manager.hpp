@@ -46,15 +46,10 @@ protected:
     enum TrackObjectType {TO_PHYSICAL, TO_GRAPHICAL};
     PtrVector<TrackObject> m_all_objects;
 
-    /** Temporary storage for LOD objects whose XML node was read but whose
-      * scene node is not yet ready
-      */
-    std::map<std::string, std::vector<const XMLNode*> > m_lod_objects;
-
 public:
          TrackObjectManager();
         ~TrackObjectManager();
-    void add(const XMLNode &xml_node, scene::ISceneNode* parent);
+    void add(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader);
     void update(float dt);
     void handleExplosion(const Vec3 &pos, const PhysicalObject *mp,
                          bool secondary_hits=true);
@@ -67,8 +62,6 @@ public:
     void insertObject(TrackObject* object);
 
     void removeObject(TrackObject* who);
-
-    void assingLodNodes(const std::vector<LODNode*>& lod);
 
           PtrVector<TrackObject>& getObjects()       { return m_all_objects; }
     const PtrVector<TrackObject>& getObjects() const { return m_all_objects; }

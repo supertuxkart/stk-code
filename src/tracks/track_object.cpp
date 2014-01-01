@@ -38,9 +38,9 @@
  *                 model, enable/disable status, timer information.
  * \param lod_node Lod node (defaults to NULL).
  */
-TrackObject::TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent, LODNode* lod_node)
+TrackObject::TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader)
 {
-    init(xml_node, parent, lod_node);
+    init(xml_node, parent, lod_loader);
 }
 
 // ----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
 
 // ----------------------------------------------------------------------------
 
-void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent, LODNode* lod_node)
+void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader)
 {
     m_init_xyz   = core::vector3df(0,0,0);
     m_init_hpr   = core::vector3df(0,0,0);
@@ -98,6 +98,9 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent, LODNo
     m_interaction = "static";
     xml_node.get("interaction", &m_interaction);
     xml_node.get("lod_group", &m_lod_group);
+
+    bool lod_instance = false;
+    xml_node.get("lod_instance", &lod_instance);
 
     m_soccer_ball = false;
     xml_node.get("soccer_ball", &m_soccer_ball);
@@ -152,12 +155,13 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent, LODNo
     {
         scene::ISceneNode *glownode = NULL;
 
-        if (lod_node != NULL)
+        if (lod_instance)
         {
             m_type = "lod";
-            m_presentation = new TrackObjectPresentationLOD(xml_node, lod_node);
+            TrackObjectPresentationLOD* lod_node = new TrackObjectPresentationLOD(xml_node, parent, lod_loader);
+            m_presentation = lod_node;
 
-            glownode = lod_node->getAllNodes()[0];
+            glownode = ((LODNode*)lod_node->getNode())->getAllNodes()[0];
         }
         else
         {

@@ -40,6 +40,7 @@ class SFXBase;
 class ParticleEmitter;
 class PhysicalObject;
 class ThreeDAnimation;
+class LodNodeLoader;
 
 /**
  * \ingroup tracks
@@ -147,7 +148,9 @@ class TrackObjectPresentationLOD : public TrackObjectPresentationSceneNode
 {
 public:
 
-    TrackObjectPresentationLOD(const XMLNode& xml_node, LODNode* lod_node);
+    TrackObjectPresentationLOD(const XMLNode& xml_node,
+                               scene::ISceneNode* parent,
+                               LodNodeLoader& lod_loader);
     virtual ~TrackObjectPresentationLOD();
 };
 

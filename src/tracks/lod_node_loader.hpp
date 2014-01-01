@@ -36,43 +36,28 @@ namespace irr
     }
 }
 
-struct LodInstance
-{
-    const XMLNode* m_xml_node;
-    scene::ISceneNode* m_parent;
-
-    /** Constructor to allow storing this in STL containers */
-    LodInstance()
-    {
-        m_parent = NULL;
-        m_xml_node = NULL;
-    }
-
-    LodInstance(const XMLNode* xml_node, scene::ISceneNode* parent)
-    {
-        m_xml_node = xml_node;
-        m_parent = parent;
-    }
-};
 
 struct LodModel
 {
     std::string m_model_file;
     bool m_tangent;
     const XMLNode* m_xml;
+    int m_distance;
 
     /** Constructor to allow storing this in STL containers */
     LodModel()
     {
         m_tangent = false;
+        m_distance = 0;
         m_xml = NULL;
     }
 
-    LodModel(const XMLNode* xml, std::string& model, bool tangent)
+    LodModel(const XMLNode* xml, int distance, std::string& model, bool tangent)
     {
         m_model_file = model;
         m_tangent = tangent;
         m_xml = xml;
+        m_distance = distance;
     }
 
     ~LodModel()
@@ -86,17 +71,15 @@ struct LodModel
 class LodNodeLoader
 {
 private:
-    std::map< std::string, std::map< int, LodModel > > lod_groups;
-    std::map< std::string, std::vector< LodInstance > > lod_instances;
+    std::map< std::string, std::vector< LodModel > > m_lod_groups;
+    Track* m_track;
 
 public:
-         LodNodeLoader();
+         LodNodeLoader(Track* track);
 
-    bool check(const XMLNode* xml, scene::ISceneNode* parent);
-    void done(Track* track,
-              std::string directory,
-              std::vector<irr::scene::IMesh*>& cache,
-              std::vector<LODNode*>& out);
+    void addLODModelDefinition(const XMLNode* xml);
+    LODNode* instanciate(const XMLNode* xml_node, scene::ISceneNode* parent);
+                         //Track* track, std::vector<irr::scene::IMesh*>& cache);
 
     void clear();
 

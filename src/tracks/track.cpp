@@ -854,7 +854,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     m_aabb_max.setY(m_aabb_max.getY()+30.0f);
     World::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
 
-    LodNodeLoader lodLoader;
+    LodNodeLoader lodLoader(this);
 
     // Load LOD groups
     const XMLNode *lod_xml_node = root.getNode("lod");
@@ -865,10 +865,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
             for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
             {
-                // TODO: eventually, remove support for the old way of specifying LOD
-                //       definitions among node, and support only the new way of using
-                //       a <lod> section. Then, the LOD loading sequence can be simplified a lot
-                lodLoader.check(lod_group_xml->getNode(j), NULL);
+                lodLoader.addLODModelDefinition(lod_group_xml->getNode(j));
             }
         }
     }
@@ -1033,7 +1030,8 @@ bool Track::loadMainTrack(const XMLNode &root)
         std::string challenge;
         n->get("challenge", &challenge);
 
-        bool is_lod = lodLoader.check(n, NULL);
+        bool lod_instance = false;
+        n->get("lod_instance", &lod_instance);
 
         if (tangent)
         {
@@ -1078,9 +1076,17 @@ bool Track::loadMainTrack(const XMLNode &root)
             handleAnimatedTextures(scene_node, *n);
             m_all_nodes.push_back( scene_node );
         }
-        else if (is_lod)
+        else if (lod_instance)
         {
-            // nothing to do
+            LODNode* node = lodLoader.instanciate(n, NULL);
+            if (node != NULL)
+            {
+                node->setPosition(xyz);
+                node->setRotation(hpr);
+                node->setScale(scale);
+
+                m_all_nodes.push_back( node );
+            }
         }
         else
         {
@@ -1197,16 +1203,6 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
 
     }   // for i
-
-    // Create LOD nodes
-    std::vector<LODNode*> lod_nodes;
-    lodLoader.done(this, m_root, m_all_cached_meshes, lod_nodes);
-    for (unsigned int n=0; n<lod_nodes.size(); n++)
-    {
-        // FIXME: support for animated textures on LOD objects
-        // handleAnimatedTextures( lod_nodes[n], *node );
-        m_all_nodes.push_back( lod_nodes[n] );
-    }
 
     // This will (at this stage) only convert the main track model.
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
@@ -1530,31 +1526,24 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
 
-    LodNodeLoader lod_loader;
-    std::map<std::string, XMLNode*> library_nodes;
-    loadObjects(root, path, lod_loader, true, NULL, library_nodes);
+    LodNodeLoader lod_loader(this);
 
-    // -------- Create and assign LOD nodes --------
-    // recheck the static area, we will need LOD info
-    const XMLNode* track_node = root->getNode("track");
-    if (track_node != NULL)
+    // Load LOD groups
+    const XMLNode *lod_xml_node = root->getNode("lod");
+    if (lod_xml_node != NULL)
     {
-        for (unsigned int i=0; i<track_node->getNumNodes(); i++)
+        for (unsigned int i = 0; i < lod_xml_node->getNumNodes(); i++)
         {
-            const XMLNode* n = track_node->getNode(i);
-            bool is_instance = false;
-            n->get("lod_instance", &is_instance);
-
-            if (!is_instance) lod_loader.check(n, NULL);
+            const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
+            for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
+            {
+                lod_loader.addLODModelDefinition(lod_group_xml->getNode(j));
+            }
         }
     }
 
-    std::vector<LODNode*> lod_nodes;
-    std::vector<scene::IMesh*> devnull;
-    lod_loader.done(this, m_root, devnull, lod_nodes);
-
-    m_track_object_manager->assingLodNodes(lod_nodes);
-    // ---------------------------------------------
+    std::map<std::string, XMLNode*> library_nodes;
+    loadObjects(root, path, lod_loader, true, NULL, library_nodes);
 
     // Cleanup library nodes
     for (std::map<std::string, XMLNode*>::iterator it = library_nodes.begin();
@@ -1736,23 +1725,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
         if (name == "track" || name == "default-start") continue;
         if (name == "object")
         {
-            bool is_instance = false;
-            node->get("lod_instance", &is_instance);
-
-            float lod_distance = -1;
-            node->get("lod_distance", &lod_distance);
-
-            if (lod_distance > 0.0f && !is_instance)
-            {
-                // lod definition
-                if (create_lod_definitions)
-                    lod_loader.check(node, parent);
-            }
-            else
-            {
-                lod_loader.check(node, parent);
-            }
-            m_track_object_manager->add(*node, parent);
+            m_track_object_manager->add(*node, parent, lod_loader);
         }
         else if (name == "library")
         {
@@ -1790,10 +1763,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
                         const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
                         for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
                         {
-                            // TODO: eventually, remove support for the old way of specifying LOD
-                            //       definitions among node, and support only the new way of using
-                            //       a <lod> section. Then, the LOD loading sequence can be simplified a lot
-                            lod_loader.check(lod_group_xml->getNode(j), NULL);
+                            lod_loader.addLODModelDefinition(lod_group_xml->getNode(j));
                         }
                     }
                 }
@@ -1851,7 +1821,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
         {
             if (UserConfigParams::m_graphical_effects)
             {
-                m_track_object_manager->add(*node, parent);
+                m_track_object_manager->add(*node, parent, lod_loader);
             }
         }
         else if (name == "sky-dome" || name == "sky-box" || name == "sky-color")
@@ -1864,7 +1834,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
         }
         else if (name == "light")
         {
-            m_track_object_manager->add(*node, parent);
+            m_track_object_manager->add(*node, parent, lod_loader);
         }
         else if (name == "weather")
         {

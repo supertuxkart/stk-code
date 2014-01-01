@@ -31,7 +31,7 @@
 
 class XMLNode;
 class ThreeDAnimation;
-
+class LodNodeLoader;
 
 /**
  * \ingroup tracks
@@ -82,10 +82,10 @@ protected:
 
     ThreeDAnimation*               m_animator;
     
-    void init(const XMLNode &xml_node, scene::ISceneNode* parent, LODNode* lodNode);
+    void init(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader);
 
 public:
-                 TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent, LODNode* lodNode=NULL);
+                 TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader);
 
                  TrackObject(const core::vector3df& xyz,
                              const core::vector3df& hpr,
