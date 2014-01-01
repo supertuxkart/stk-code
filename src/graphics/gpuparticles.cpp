@@ -244,12 +244,117 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePointEmitter *emitter)
+{
+	float *particles = new float[COMPONENTCOUNT * count], *initialvalue = new float[COMPONENTCOUNT * count];
+	unsigned lifetime_range = emitter->getMaxLifeTime() - emitter->getMinLifeTime();
+
+	float sizeMin = emitter->getMinStartSize().Height;
+	float sizeMax = emitter->getMaxStartSize().Height;
+
+	for (unsigned i = 0; i < count; i++) {
+		particles[COMPONENTCOUNT * i] = 0;
+		particles[COMPONENTCOUNT * i + 1] = 0;
+		particles[COMPONENTCOUNT * i + 2] = 0;
+		// Initial lifetime is 0 percent
+		particles[COMPONENTCOUNT * i + 3] = rand();
+		particles[COMPONENTCOUNT * i + 3] /= RAND_MAX;
+
+		initialvalue[COMPONENTCOUNT * i] = 0.;
+		initialvalue[COMPONENTCOUNT * i + 1] = 0.;
+		initialvalue[COMPONENTCOUNT * i + 2] = 0.;
+		initialvalue[COMPONENTCOUNT * i + 3] = rand() % lifetime_range;
+		initialvalue[COMPONENTCOUNT * i + 3] += emitter->getMinLifeTime();
+
+		core::vector3df particledir = emitter->getDirection();
+		particledir.rotateXYBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+		particledir.rotateYZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+		particledir.rotateXZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+
+		particles[COMPONENTCOUNT * i + 4] = particledir.X;
+		particles[COMPONENTCOUNT * i + 5] = particledir.Y;
+		particles[COMPONENTCOUNT * i + 6] = particledir.Z;
+		initialvalue[COMPONENTCOUNT * i + 4] = particledir.X;
+		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y;
+		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z;
+
+		initialvalue[COMPONENTCOUNT * i + 7] = rand();
+		initialvalue[COMPONENTCOUNT * i + 7] /= RAND_MAX;
+		initialvalue[COMPONENTCOUNT * i + 7] *= (sizeMax - sizeMin);
+		initialvalue[COMPONENTCOUNT * i + 7] += sizeMin;
+	}
+	glGenBuffers(1, &initial_values_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
+	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
+	glGenBuffers(2, tfb_buffers);
+	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
+	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
+	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), 0, GL_STREAM_DRAW);
+	delete[] particles;
+	delete[] initialvalue;
+}
+
+void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmitter *emitter)
+{
+	float *particles = new float[COMPONENTCOUNT * count], *initialvalue = new float[COMPONENTCOUNT * count];
+	unsigned lifetime_range = emitter->getMaxLifeTime() - emitter->getMinLifeTime();
+
+	float sizeMin = emitter->getMinStartSize().Height;
+	float sizeMax = emitter->getMaxStartSize().Height;
+
+	const core::vector3df& extent = emitter->getBox().getExtent();
+	printf("particle lifetime [%d-%d]\n", emitter->getMinLifeTime(), emitter->getMaxLifeTime());
+
+	for (unsigned i = 0; i < count; i++) {
+		particles[COMPONENTCOUNT * i] = emitter->getBox().MinEdge.X + os::Randomizer::frand() * extent.X;
+		particles[COMPONENTCOUNT * i + 1] = emitter->getBox().MinEdge.Y + os::Randomizer::frand() * extent.Y;
+		particles[COMPONENTCOUNT * i + 2] = emitter->getBox().MinEdge.Z + os::Randomizer::frand() * extent.Z;
+		// Initial lifetime is 0 percent
+		particles[COMPONENTCOUNT * i + 3] = rand();
+		particles[COMPONENTCOUNT * i + 3] /= RAND_MAX;
+
+		initialvalue[COMPONENTCOUNT * i] = particles[COMPONENTCOUNT * i];
+		initialvalue[COMPONENTCOUNT * i + 1] = particles[COMPONENTCOUNT * i + 1];
+		initialvalue[COMPONENTCOUNT * i + 2] = particles[COMPONENTCOUNT * i + 2];
+		initialvalue[COMPONENTCOUNT * i + 3] = (lifetime_range > 0) ? rand() % lifetime_range : 0;
+		initialvalue[COMPONENTCOUNT * i + 3] += emitter->getMinLifeTime();
+
+		core::vector3df particledir = emitter->getDirection();
+		particledir.rotateXYBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+		particledir.rotateYZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+		particledir.rotateXZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+
+		particles[COMPONENTCOUNT * i + 4] = particledir.X;
+		particles[COMPONENTCOUNT * i + 5] = particledir.Y;
+		particles[COMPONENTCOUNT * i + 6] = particledir.Z;
+		initialvalue[COMPONENTCOUNT * i + 4] = particledir.X;
+		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y;
+		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z;
+
+		initialvalue[COMPONENTCOUNT * i + 7] = rand();
+		initialvalue[COMPONENTCOUNT * i + 7] /= RAND_MAX;
+		initialvalue[COMPONENTCOUNT * i + 7] *= (sizeMax - sizeMin);
+		initialvalue[COMPONENTCOUNT * i + 7] += sizeMin;
+	}
+	glGenBuffers(1, &initial_values_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
+	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
+	glGenBuffers(2, tfb_buffers);
+	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
+	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
+	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), 0, GL_STREAM_DRAW);
+	delete[] particles;
+	delete[] initialvalue;
+}
+
 void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 {
 	if (!emitter)
 		return;
 	CParticleSystemSceneNode::setEmitter(emitter);
-	if (emitter->getType() != scene::EPET_POINT)
+	if (emitter->getType() != scene::EPET_POINT && emitter->getType() != scene::EPET_BOX)
 		return;
 	// Pass a fake material type to force irrlicht to update its internal states on rendering
 	setMaterialType(irr_driver->getShader(ES_RAIN));
@@ -295,57 +400,19 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	uniform_screen = glGetUniformLocation(RenderProgram, "screen");
 	uniform_normal_and_depths = glGetUniformLocation(RenderProgram, "normals_and_depth");
 
-	float *particles = new float[COMPONENTCOUNT * count], *initialvalue = new float[COMPONENTCOUNT * count];
-	unsigned lifetime_range = emitter->getMaxLifeTime() - emitter->getMinLifeTime();
-
-	float sizeMin = emitter->getMinStartSize().Height;
-	float sizeMax = emitter->getMaxStartSize().Height;
-
-	printf("count:%d\nduration_min:%d\nduration_max:%d\nsize_min:%f\nsize_max:%f\n", count, 
-		emitter->getMinLifeTime(), emitter->getMaxLifeTime(), 
-		sizeMin, sizeMax);
-	for (unsigned i = 0; i < count; i++) {
-		particles[COMPONENTCOUNT * i] = 0;
-		particles[COMPONENTCOUNT * i + 1] = 0;
-		particles[COMPONENTCOUNT * i + 2] = 0;
-		// Initial lifetime is 0 percent
-		particles[COMPONENTCOUNT * i + 3] = rand();
-		particles[COMPONENTCOUNT * i + 3] /= RAND_MAX;
-
-		initialvalue[COMPONENTCOUNT * i] = 0.;
-		initialvalue[COMPONENTCOUNT * i + 1] = 0.;
-		initialvalue[COMPONENTCOUNT * i + 2] = 0.;
-		initialvalue[COMPONENTCOUNT * i + 3] = rand() % lifetime_range;
-		initialvalue[COMPONENTCOUNT * i + 3] += emitter->getMinLifeTime();
-
-		core::vector3df particledir = emitter->getDirection();
-		particledir.rotateXYBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
-		particledir.rotateYZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
-		particledir.rotateXZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
-
-		particles[COMPONENTCOUNT * i + 4] = particledir.X;
-		particles[COMPONENTCOUNT * i + 5] = particledir.Y;
-		particles[COMPONENTCOUNT * i + 6] = particledir.Z;
-		initialvalue[COMPONENTCOUNT * i + 4] = particledir.X;
-		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y;
-		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z;
-
-		initialvalue[COMPONENTCOUNT * i + 7] = rand();
-		initialvalue[COMPONENTCOUNT * i + 7] /= RAND_MAX;
-		initialvalue[COMPONENTCOUNT * i + 7] *= (sizeMax - sizeMin);
-		initialvalue[COMPONENTCOUNT * i + 7] += sizeMin;
+	switch (emitter->getType())
+	{
+	case scene::EPET_POINT:
+		generateParticlesFromPointEmitter(emitter);
+		break;
+	case scene::EPET_BOX:
+		generateParticlesFromBoxEmitter(static_cast<scene::IParticleBoxEmitter *>(emitter));
+		break;
+	default:
+		assert(0 && "Wrong particle type");
 	}
-	glGenBuffers(1, &initial_values_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
-	glGenBuffers(2, tfb_buffers);
-	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), 0, GL_STREAM_DRAW);
-	delete [] particles;
-	delete [] initialvalue;
-}
+	}
+	
 
 
 void ParticleSystemProxy::simulate()
@@ -459,7 +526,7 @@ void ParticleSystemProxy::draw()
 }
 
 void ParticleSystemProxy::render() {
-	if (getEmitter()->getType() != scene::EPET_POINT)
+	if (getEmitter()->getType() != scene::EPET_POINT && getEmitter()->getType() != scene::EPET_BOX)
 	{
 		CParticleSystemSceneNode::render();
 		return;
