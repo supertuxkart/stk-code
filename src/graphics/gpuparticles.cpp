@@ -308,10 +308,7 @@ void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePoin
 		// Initial lifetime is >1
 		particles[COMPONENTCOUNT * i + 3] = 2.;
 
-		initialvalue[COMPONENTCOUNT * i] = 0.;
-		initialvalue[COMPONENTCOUNT * i + 1] = 0.;
-		initialvalue[COMPONENTCOUNT * i + 2] = 0.;
-
+		memcpy(&initialvalue[COMPONENTCOUNT * i], &particles[COMPONENTCOUNT * i], 3 * sizeof(float));
 		generateLifetimeSizeDirection(emitter, initialvalue[COMPONENTCOUNT * i + 3], initialvalue[COMPONENTCOUNT * i + 7],
 			initialvalue[COMPONENTCOUNT * i + 4], initialvalue[COMPONENTCOUNT * i + 5], initialvalue[COMPONENTCOUNT * i + 6]);
 		memcpy(&particles[COMPONENTCOUNT * i + 4], &initialvalue[COMPONENTCOUNT * i + 4], 4 * sizeof(float));
@@ -344,10 +341,7 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 		// Initial lifetime is > 1
 		particles[COMPONENTCOUNT * i + 3] = os::Randomizer::frand();
 
-		initialvalue[COMPONENTCOUNT * i] = particles[COMPONENTCOUNT * i];
-		initialvalue[COMPONENTCOUNT * i + 1] = particles[COMPONENTCOUNT * i + 1];
-		initialvalue[COMPONENTCOUNT * i + 2] = particles[COMPONENTCOUNT * i + 2];
-
+		memcpy(&initialvalue[COMPONENTCOUNT * i], &particles[COMPONENTCOUNT * i], 3 * sizeof(float));
 		generateLifetimeSizeDirection(emitter, initialvalue[COMPONENTCOUNT * i + 3], initialvalue[COMPONENTCOUNT * i + 7],
 			initialvalue[COMPONENTCOUNT * i + 4], initialvalue[COMPONENTCOUNT * i + 5], initialvalue[COMPONENTCOUNT * i + 6]);
 		memcpy(&particles[COMPONENTCOUNT * i + 4], &initialvalue[COMPONENTCOUNT * i + 4], 4 * sizeof(float));
@@ -386,10 +380,7 @@ void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSph
 		// Initial lifetime is > 1
 		particles[COMPONENTCOUNT * i + 3] = 2.;
 
-		initialvalue[COMPONENTCOUNT * i] = particles[COMPONENTCOUNT * i];
-		initialvalue[COMPONENTCOUNT * i + 1] = particles[COMPONENTCOUNT * i + 1];
-		initialvalue[COMPONENTCOUNT * i + 2] = particles[COMPONENTCOUNT * i + 2];
-
+		memcpy(&initialvalue[COMPONENTCOUNT * i], &particles[COMPONENTCOUNT * i], 3 * sizeof(float));
 		generateLifetimeSizeDirection(emitter, initialvalue[COMPONENTCOUNT * i + 3], initialvalue[COMPONENTCOUNT * i + 7],
 			initialvalue[COMPONENTCOUNT * i + 4], initialvalue[COMPONENTCOUNT * i + 5], initialvalue[COMPONENTCOUNT * i + 6]);
 		memcpy(&particles[COMPONENTCOUNT * i + 4], &initialvalue[COMPONENTCOUNT * i + 4], 4 * sizeof(float));
