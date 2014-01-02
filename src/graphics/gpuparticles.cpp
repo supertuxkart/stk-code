@@ -336,7 +336,7 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 		particles[COMPONENTCOUNT * i + 1] = emitter->getBox().MinEdge.Y + os::Randomizer::frand() * extent.Y;
 		particles[COMPONENTCOUNT * i + 2] = emitter->getBox().MinEdge.Z + os::Randomizer::frand() * extent.Z;
 		// Initial lifetime is > 1
-		particles[COMPONENTCOUNT * i + 3] = 2.;
+		particles[COMPONENTCOUNT * i + 3] = os::Randomizer::frand();
 
 		initialvalue[COMPONENTCOUNT * i] = particles[COMPONENTCOUNT * i];
 		initialvalue[COMPONENTCOUNT * i + 1] = particles[COMPONENTCOUNT * i + 1];
