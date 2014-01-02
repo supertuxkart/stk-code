@@ -246,6 +246,7 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	fakemat.MaterialType = irr_driver->getShader(ES_RAIN);
 	fakemat.Thickness = 200;
 	fakemat.setTexture(0, getMaterial(0).getTexture(0));
+	fakemat.BlendOperation = video::EBO_NONE;
 	glGenBuffers(1, &initial_values_buffer);
 	glGenBuffers(2, tfb_buffers);
 	if (quad_vertex_buffer)
@@ -582,7 +583,7 @@ void ParticleSystemProxy::simulate()
 	glVertexAttribPointer(attrib_initial_size, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(7 * sizeof(float)));
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
 
-	glUniform1i(uniform_dt, 16);
+	glUniform1i(uniform_dt, timediff);
 	glUniformMatrix4fv(uniform_sourcematrix, 1, GL_FALSE, matrix.pointer());
 	glUniformMatrix4fv(uniform_tinvsourcematrix, 1, GL_FALSE, tinvmatrix.pointer());
 	glBeginTransformFeedback(GL_POINTS);
