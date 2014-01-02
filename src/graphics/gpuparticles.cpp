@@ -569,6 +569,9 @@ void ParticleSystemProxy::simulate()
 
 void ParticleSystemProxy::draw()
 {
+	unsigned active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
+	// No max in windows ??
+	active_count = (active_count > count) ? count : active_count;
 	glDepthMask(GL_FALSE);
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
@@ -612,7 +615,8 @@ void ParticleSystemProxy::draw()
 	glVertexAttribDivisor(attrib_pos, 1);
 	glVertexAttribDivisor(attrib_sz, 1);
 
-	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
+	if (active_count)
+		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, active_count);
 	glVertexAttribDivisor(attrib_lf, 0);
 	glVertexAttribDivisor(attrib_pos, 0);
 	glVertexAttribDivisor(attrib_sz, 0);
