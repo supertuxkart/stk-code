@@ -1735,6 +1735,12 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
             core::vector3df xyz;
             node->get("xyz", &xyz);
 
+            core::vector3df hpr;
+            node->get("hpr", &hpr);
+
+            core::vector3df scale;
+            node->get("scale", &scale);
+
             XMLNode* libroot;
             std::string lib_path = file_manager->getAsset("library/" + name);
             bool create_lod_definitions = true;
@@ -1776,6 +1782,8 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
     
             scene::ISceneNode* parent = irr_driver->getSceneManager()->addEmptySceneNode();
             parent->setPosition(xyz);
+            parent->setRotation(hpr);
+            parent->setScale(scale);
             parent->updateAbsolutePosition();
             loadObjects(libroot, lib_path, lod_loader, create_lod_definitions, parent, library_nodes);
         }
