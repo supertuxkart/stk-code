@@ -244,9 +244,10 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	fakemat.Lighting = false;
 	fakemat.ZWriteEnable = false;
 	fakemat.MaterialType = irr_driver->getShader(ES_RAIN);
-	fakemat.Thickness = 200;
 	fakemat.setTexture(0, getMaterial(0).getTexture(0));
 	fakemat.BlendOperation = video::EBO_NONE;
+	fakemat.FrontfaceCulling = false;
+	fakemat.BackfaceCulling = false;
 	glGenBuffers(1, &initial_values_buffer);
 	glGenBuffers(2, tfb_buffers);
 	if (quad_vertex_buffer)
@@ -657,7 +658,6 @@ void ParticleSystemProxy::draw()
 	glDisableVertexAttribArray(attrib_sz);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glActiveTexture(GL_TEXTURE0);
-	glEnable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
 }
 
