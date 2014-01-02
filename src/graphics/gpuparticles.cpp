@@ -276,9 +276,8 @@ void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePoin
 		particles[COMPONENTCOUNT * i] = 0;
 		particles[COMPONENTCOUNT * i + 1] = 0;
 		particles[COMPONENTCOUNT * i + 2] = 0;
-		// Initial lifetime is 0 percent
-		particles[COMPONENTCOUNT * i + 3] = rand();
-		particles[COMPONENTCOUNT * i + 3] /= RAND_MAX;
+		// Initial lifetime is >1
+		particles[COMPONENTCOUNT * i + 3] = 2.;
 
 		initialvalue[COMPONENTCOUNT * i] = 0.;
 		initialvalue[COMPONENTCOUNT * i + 1] = 0.;
@@ -309,7 +308,6 @@ void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePoin
 
 	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
 	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
-	glGenBuffers(2, tfb_buffers);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
 	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
@@ -332,9 +330,8 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 		particles[COMPONENTCOUNT * i] = emitter->getBox().MinEdge.X + os::Randomizer::frand() * extent.X;
 		particles[COMPONENTCOUNT * i + 1] = emitter->getBox().MinEdge.Y + os::Randomizer::frand() * extent.Y;
 		particles[COMPONENTCOUNT * i + 2] = emitter->getBox().MinEdge.Z + os::Randomizer::frand() * extent.Z;
-		// Initial lifetime is 0 percent
-		particles[COMPONENTCOUNT * i + 3] = rand();
-		particles[COMPONENTCOUNT * i + 3] /= RAND_MAX;
+		// Initial lifetime is > 1
+		particles[COMPONENTCOUNT * i + 3] = 2.;
 
 		initialvalue[COMPONENTCOUNT * i] = particles[COMPONENTCOUNT * i];
 		initialvalue[COMPONENTCOUNT * i + 1] = particles[COMPONENTCOUNT * i + 1];
@@ -392,9 +389,8 @@ void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSph
 		particles[COMPONENTCOUNT * i] = pos.X;
 		particles[COMPONENTCOUNT * i + 1] = pos.Y;
 		particles[COMPONENTCOUNT * i + 2] = pos.Z;
-		// Initial lifetime is 0 percent
-		particles[COMPONENTCOUNT * i + 3] = rand();
-		particles[COMPONENTCOUNT * i + 3] /= RAND_MAX;
+		// Initial lifetime is > 1
+		particles[COMPONENTCOUNT * i + 3] = 2.;
 
 		initialvalue[COMPONENTCOUNT * i] = particles[COMPONENTCOUNT * i];
 		initialvalue[COMPONENTCOUNT * i + 1] = particles[COMPONENTCOUNT * i + 1];
@@ -459,12 +455,23 @@ GLuint ParticleSystemProxy::uniform_normal_and_depths;
 GLuint ParticleSystemProxy::uniform_screen;
 GLuint ParticleSystemProxy::uniform_invproj;
 
+static bool isGPUParticleType(scene::E_PARTICLE_EMITTER_TYPE type)
+{
+	switch (type)
+	{
+	case scene::EPET_POINT:
+	case scene::EPET_BOX:
+	case scene::EPET_SPHERE:
+		return true;
+	default:
+		return false;
+	}
+}
+
 void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 {
-	if (!emitter)
-		return;
 	CParticleSystemSceneNode::setEmitter(emitter);
-	if (emitter->getType() != scene::EPET_POINT && emitter->getType() != scene::EPET_BOX && emitter->getType() != scene::EPET_SPHERE)
+	if (!emitter || !isGPUParticleType(emitter->getType()))
 		return;
 	// Pass a fake material type to force irrlicht to update its internal states on rendering
 	setMaterialType(irr_driver->getShader(ES_RAIN));
@@ -648,7 +655,7 @@ void ParticleSystemProxy::draw()
 }
 
 void ParticleSystemProxy::render() {
-	if (getEmitter()->getType() != scene::EPET_POINT && getEmitter()->getType() != scene::EPET_BOX && getEmitter()->getType() != scene::EPET_SPHERE)
+	if (!getEmitter() || !isGPUParticleType(getEmitter()->getType()))
 	{
 		CParticleSystemSceneNode::render();
 		return;
