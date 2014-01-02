@@ -740,7 +740,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
                     light_node->setEnergyMultiplier(std::min(1.0f, em + dt));
                 }
 
-                const core::vector3df &pos = light_node->getPosition();
+                const core::vector3df &pos = light_node->getAbsolutePosition();
                 accumulatedLightPos.push_back(pos.X);
                 accumulatedLightPos.push_back(pos.Y);
                 accumulatedLightPos.push_back(pos.Z);

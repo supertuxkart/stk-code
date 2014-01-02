@@ -2121,6 +2121,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
 {
     if (m_glsl)
     {
+        if (parent == NULL) parent = m_scene_manager->getRootSceneNode();
         LightNode *light = NULL;
 
         if (!sun)
@@ -2129,7 +2130,6 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
             light = new SunNode(m_scene_manager, parent, r, g, b);
 
         light->grab();
-        light->setParent(NULL);
 
         light->setPosition(pos);
         light->updateAbsolutePosition();
