@@ -272,13 +272,34 @@ ParticleSystemProxy::~ParticleSystemProxy()
 
 void ParticleSystemProxy::setAlphaAdditive(bool val) { m_alpha_additive = val;  }
 
+static
+void generateLifetimeSizeDirection(scene::IParticleEmitter *emitter, float &lifetime, float &size, float &dirX, float &dirY, float &dirZ)
+{
+	float sizeMin = emitter->getMinStartSize().Height;
+	float sizeMax = emitter->getMaxStartSize().Height;
+	float lifetime_range = emitter->getMaxLifeTime() - emitter->getMinLifeTime();
+
+	lifetime = os::Randomizer::frand() * lifetime_range;
+	lifetime += emitter->getMinLifeTime();
+
+	size = os::Randomizer::frand();
+	size *= (sizeMax - sizeMin);
+	size += sizeMin;
+
+	core::vector3df particledir = emitter->getDirection();
+	particledir.rotateXYBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+	particledir.rotateYZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+	particledir.rotateXZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
+
+	dirX = particledir.X / size;
+	dirY = particledir.Y / size;
+	dirZ = particledir.Z / size;
+}
+
 void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePointEmitter *emitter)
 {
 	float *particles = new float[COMPONENTCOUNT * count], *initialvalue = new float[COMPONENTCOUNT * count];
-	unsigned lifetime_range = emitter->getMaxLifeTime() - emitter->getMinLifeTime();
 
-	float sizeMin = emitter->getMinStartSize().Height;
-	float sizeMax = emitter->getMaxStartSize().Height;
 
 	for (unsigned i = 0; i < count; i++) {
 		particles[COMPONENTCOUNT * i] = 0;
@@ -290,28 +311,10 @@ void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePoin
 		initialvalue[COMPONENTCOUNT * i] = 0.;
 		initialvalue[COMPONENTCOUNT * i + 1] = 0.;
 		initialvalue[COMPONENTCOUNT * i + 2] = 0.;
-		initialvalue[COMPONENTCOUNT * i + 3] = rand() % lifetime_range;
-		initialvalue[COMPONENTCOUNT * i + 3] += emitter->getMinLifeTime();
 
-		core::vector3df particledir = emitter->getDirection();
-		particledir.rotateXYBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
-		particledir.rotateYZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
-		particledir.rotateXZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
-
-		float size = rand();
-		size /= RAND_MAX;
-		size *= (sizeMax - sizeMin);
-		size += sizeMin;
-
-		initialvalue[COMPONENTCOUNT * i + 7] = size;
-
-		particles[COMPONENTCOUNT * i + 4] = particledir.X / size;
-		particles[COMPONENTCOUNT * i + 5] = particledir.Y / size;
-		particles[COMPONENTCOUNT * i + 6] = particledir.Z / size;
-		initialvalue[COMPONENTCOUNT * i + 4] = particledir.X / size;
-		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y / size;
-		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z / size;
-
+		generateLifetimeSizeDirection(emitter, initialvalue[COMPONENTCOUNT * i + 3], initialvalue[COMPONENTCOUNT * i + 7],
+			initialvalue[COMPONENTCOUNT * i + 4], initialvalue[COMPONENTCOUNT * i + 5], initialvalue[COMPONENTCOUNT * i + 6]);
+		memcpy(&particles[COMPONENTCOUNT * i + 4], &initialvalue[COMPONENTCOUNT * i + 4], 4 * sizeof(float));
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
@@ -344,27 +347,10 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 		initialvalue[COMPONENTCOUNT * i] = particles[COMPONENTCOUNT * i];
 		initialvalue[COMPONENTCOUNT * i + 1] = particles[COMPONENTCOUNT * i + 1];
 		initialvalue[COMPONENTCOUNT * i + 2] = particles[COMPONENTCOUNT * i + 2];
-		initialvalue[COMPONENTCOUNT * i + 3] = (lifetime_range > 0) ? rand() % lifetime_range : 0;
-		initialvalue[COMPONENTCOUNT * i + 3] += emitter->getMinLifeTime();
 
-		core::vector3df particledir = emitter->getDirection();
-		particledir.rotateXYBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
-		particledir.rotateYZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
-		particledir.rotateXZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
-
-		float size = rand();
-		size /= RAND_MAX;
-		size *= (sizeMax - sizeMin);
-		size += sizeMin;
-
-		initialvalue[COMPONENTCOUNT * i + 7] = size;
-
-		particles[COMPONENTCOUNT * i + 4] = particledir.X / size;
-		particles[COMPONENTCOUNT * i + 5] = particledir.Y / size;
-		particles[COMPONENTCOUNT * i + 6] = particledir.Z / size;
-		initialvalue[COMPONENTCOUNT * i + 4] = particledir.X / size;
-		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y / size;
-		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z / size;
+		generateLifetimeSizeDirection(emitter, initialvalue[COMPONENTCOUNT * i + 3], initialvalue[COMPONENTCOUNT * i + 7],
+			initialvalue[COMPONENTCOUNT * i + 4], initialvalue[COMPONENTCOUNT * i + 5], initialvalue[COMPONENTCOUNT * i + 6]);
+		memcpy(&particles[COMPONENTCOUNT * i + 4], &initialvalue[COMPONENTCOUNT * i + 4], 4 * sizeof(float));
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
 	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
@@ -403,27 +389,10 @@ void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSph
 		initialvalue[COMPONENTCOUNT * i] = particles[COMPONENTCOUNT * i];
 		initialvalue[COMPONENTCOUNT * i + 1] = particles[COMPONENTCOUNT * i + 1];
 		initialvalue[COMPONENTCOUNT * i + 2] = particles[COMPONENTCOUNT * i + 2];
-		initialvalue[COMPONENTCOUNT * i + 3] = (lifetime_range > 0) ? rand() % lifetime_range : 0;
-		initialvalue[COMPONENTCOUNT * i + 3] += emitter->getMinLifeTime();
 
-		core::vector3df particledir = emitter->getDirection();
-		particledir.rotateXYBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
-		particledir.rotateYZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
-		particledir.rotateXZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
-
-		float size = rand();
-		size /= RAND_MAX;
-		size *= (sizeMax - sizeMin);
-		size += sizeMin;
-
-		initialvalue[COMPONENTCOUNT * i + 7] = size;
-
-		particles[COMPONENTCOUNT * i + 4] = particledir.X / size;
-		particles[COMPONENTCOUNT * i + 5] = particledir.Y / size;
-		particles[COMPONENTCOUNT * i + 6] = particledir.Z / size;
-		initialvalue[COMPONENTCOUNT * i + 4] = particledir.X / size;
-		initialvalue[COMPONENTCOUNT * i + 5] = particledir.Y / size;
-		initialvalue[COMPONENTCOUNT * i + 6] = particledir.Z / size;
+		generateLifetimeSizeDirection(emitter, initialvalue[COMPONENTCOUNT * i + 3], initialvalue[COMPONENTCOUNT * i + 7],
+			initialvalue[COMPONENTCOUNT * i + 4], initialvalue[COMPONENTCOUNT * i + 5], initialvalue[COMPONENTCOUNT * i + 6]);
+		memcpy(&particles[COMPONENTCOUNT * i + 4], &initialvalue[COMPONENTCOUNT * i + 4], 4 * sizeof(float));
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
 	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
