@@ -196,6 +196,7 @@ GPUParticle::GPUParticle(scene::ISceneNode *parent, scene::ISceneManager* mgr, I
 	fakemat.MaterialType = irr_driver->getShader(ES_RAIN);
 	fakemat.Thickness = 200;
 	fakemat.setTexture(0, tex);
+	fakemat.BlendOperation = video::EBO_NONE;
 	setAutomaticCulling(0);
   }
 
@@ -656,6 +657,7 @@ void ParticleSystemProxy::draw()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
 }
 
 void ParticleSystemProxy::render() {
